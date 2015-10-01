@@ -1,6 +1,6 @@
 # Configuration variables
 %define name            lmms
-%define version         0.3.0
+%define version         ${LMMS_VERSION}
 %define rel             1
 %define release         %{rel}%{?disttag}%{?repotag}
 
@@ -194,23 +194,7 @@ desktop-file-install \
 %dir %{_datadir}/lmms
 %{_datadir}/lmms/*
 
-%changelog
-* Fri Apr 13 2007 Eric Lassauge <lassauge@users.fr.net> - 0.2.1-1
-- build for FC6
-- added dependencies and build configuration
-- added .desktop file
-
-* Tue Sep 20 2005 Tobias Doerffel
-- added JACK-dependencies
-
-* Fri Jul 22 2005 Tobias Doerffel
-- added more dependencies for builds under SuSE
-
-* Sat Jun 25 2005 Tobias Doerffel
-- splitted package into lmms and lmms-data
-- additional requirements
-- updated project-homepage and email-address of packager
-
-* Thu May 12 2005 Tobias Doerffel
-- created lmms.spec.in
-
+-%changelog
+-* Please see release notes (viewable online):
+-- https://github.com/LMMS/lmms/releases/tag/v${LMMS_VERSION}
+-

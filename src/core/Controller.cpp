@@ -95,11 +95,6 @@ Controller::~Controller()
 		s_controllers.remove( idx );
 	}
 
-	if( Engine::getSong() )
-	{
-		Engine::getSong()->removeController( this );
-	}
-
 	m_valueBuffer.clear();
 	// Remove connections by destroyed signal
 }

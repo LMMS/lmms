@@ -59,6 +59,7 @@ class PluginView;
 class TabWidget;
 class TrackLabelButton;
 class LedCheckBox;
+class QLabel;
 
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -206,13 +207,13 @@ public:
 		return &m_effectChannelModel;
 	}
 
-	void setIndicator( FadeButton *fb );
 
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const Note& );
 	void midiNoteOff( const Note& );
 	void nameChanged();
+	void newNote();
 
 
 protected:
@@ -254,8 +255,6 @@ private:
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
-
-	FadeButton *m_fb;
 
 
 	Instrument * m_instrument;
@@ -433,7 +432,9 @@ private:
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
+	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
+	QLabel * m_pitchRangeLabel;
 	LcdSpinBox * m_effectChannelNumber;
 
 

@@ -51,6 +51,7 @@ set(LMMS_SRCS
 	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
+	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/SampleBuffer.cpp
 	core/SamplePlayHandle.cpp
@@ -72,6 +73,7 @@ set(LMMS_SRCS
 	core/audio/AudioOss.cpp
 	core/audio/AudioPort.cpp
 	core/audio/AudioPortAudio.cpp
+	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
@@ -81,7 +83,9 @@ set(LMMS_SRCS
 	core/midi/MidiClient.cpp
 	core/midi/MidiController.cpp
 	core/midi/MidiOss.cpp
+	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
+	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
 	PARENT_SCOPE

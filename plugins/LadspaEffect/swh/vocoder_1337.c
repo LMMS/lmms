@@ -65,24 +65,24 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 
 #define LADSPA_UNIQUE_ID 1337
 
-#define MAX_BANDS  16 /* max 16 bandsn should be increased */
+#define MAX_BANDS  16 /* max 16 bands should be increased */
 #define AMPLIFIER 16.0
 
-struct bandpass
+struct bandpasses
 {
-  LADSPA_Data c, f, att;
+  LADSPA_Data c[MAX_BANDS], f[MAX_BANDS], att[MAX_BANDS];
 
-  LADSPA_Data freq;
-  LADSPA_Data low1, low2;
-  LADSPA_Data mid1, mid2;
-  LADSPA_Data high1, high2;
-  LADSPA_Data y;
+  LADSPA_Data freq[MAX_BANDS];
+  LADSPA_Data low1[MAX_BANDS], low2[MAX_BANDS];
+  LADSPA_Data mid1[MAX_BANDS], mid2[MAX_BANDS];
+  LADSPA_Data high1[MAX_BANDS], high2[MAX_BANDS];
+  LADSPA_Data y[MAX_BANDS];
 };
 
 struct bands_out{
-  LADSPA_Data decay;
-  LADSPA_Data oldval;
-  LADSPA_Data level;		/* 0.0 - 1.0 level of this output band */
+  LADSPA_Data decay[MAX_BANDS];
+  LADSPA_Data oldval[MAX_BANDS];
+  LADSPA_Data level[MAX_BANDS];		/* 0.0 - 1.0 level of this output band */
 };
 
 const LADSPA_Data decay_table[] =
@@ -119,9 +119,9 @@ typedef struct {
   int num_bands;		/* current number of bands */
   float mainvol;		/* main volume */
 
-  struct bandpass bands_formant[MAX_BANDS]; /* one structure per band */
-  struct bandpass bands_carrier[MAX_BANDS]; /* one structure per band */
-  struct bands_out bands_out[MAX_BANDS]; /* one structure per band */
+  struct bandpasses bands_formant; /* all bands in one struct now */
+  struct bandpasses bands_carrier; /* ...same here */ 
+  struct bands_out bands_out;      /* ...and here. */
 
   /* Ports */
 
@@ -165,7 +165,7 @@ activateVocoder(LADSPA_Handle Instance) {
   vocoder->mainvol = 1.0 * AMPLIFIER;
 
   for (i = 0; i < MAX_BANDS; i++)
-    vocoder->bands_out[i].oldval = 0.0;
+    vocoder->bands_out.oldval[i] = 0.0f;
 }
 
 /*****************************************************************************/
@@ -208,21 +208,21 @@ connectPortToVocoder(LADSPA_Handle Instance,
 /*****************************************************************************/
 
 // vocoder_do_bandpasses /*fold00*/
-void vocoder_do_bandpasses(struct bandpass *bands, LADSPA_Data sample,
+void inline vocoder_do_bandpasses(struct bandpasses *bands, LADSPA_Data sample,
 			   VocoderInstance *vocoder)
 {
   int i;
   for (i=0; i < vocoder->num_bands; i++)
     {
-      bands[i].high1 = sample - bands[i].f * bands[i].mid1 - bands[i].low1;
-      bands[i].mid1 += bands[i].high1 * bands[i].c;
-      bands[i].low1 += bands[i].mid1;
+      bands->high1[i] = sample - bands->f[i] * bands->mid1[i] - bands->low1[i];
+      bands->mid1[i] += bands->high1[i] * bands->c[i];
+      bands->low1[i] += bands->mid1[i];
 
-      bands[i].high2 = bands[i].low1 - bands[i].f * bands[i].mid2
-	- bands[i].low2;
-      bands[i].mid2 += bands[i].high2 * bands[i].c;
-      bands[i].low2 += bands[i].mid2;
-      bands[i].y = bands[i].high2 * bands[i].att;
+      bands->high2[i] = bands->low1[i] - bands->f[i] * bands->mid2[i]
+	- bands->low2[i];
+      bands->mid2[i] += bands->high2[i] * bands->c[i];
+      bands->low2[i] += bands->mid2[i];
+      bands->y[i]     = bands->high2[i] * bands->att[i];
     }
 }
 
@@ -246,63 +246,62 @@ runVocoder(LADSPA_Handle Instance,
     {
       vocoder->num_bands = numbands;
 
+      memset(&vocoder->bands_formant, 0, sizeof(struct bandpasses));
       for(i=0; i < numbands; i++)
 	{
-	  memset(&vocoder->bands_formant[i], 0, sizeof(struct bandpass));
-
 	  a = 16.0 * i/(double)numbands;  // stretch existing bands
 
 	  if (a < 4.0)
-	    vocoder->bands_formant[i].freq = 150 + 420 * a / 4.0;
+	    vocoder->bands_formant.freq[i] = 150 + 420 * a / 4.0;
 	  else
-	    vocoder->bands_formant[i].freq = 600 * pow (1.23, a - 4.0);
+	    vocoder->bands_formant.freq[i] = 600 * pow (1.23, a - 4.0);
 
-	  c = vocoder->bands_formant[i].freq * 2 * M_PI / vocoder->SampleRate;
-	  vocoder->bands_formant[i].c = c * c;
+	  c = vocoder->bands_formant.freq[i] * 2 * M_PI / vocoder->SampleRate;
+	  vocoder->bands_formant.c[i] = c * c;
 
-	  vocoder->bands_formant[i].f = 0.4/c;
-	  vocoder->bands_formant[i].att =
-	    1/(6.0 + ((exp (vocoder->bands_formant[i].freq
+	  vocoder->bands_formant.f[i] = 0.4/c;
+	  vocoder->bands_formant.att[i] =
+	    1/(6.0 + ((exp (vocoder->bands_formant.freq[i]
 			    / vocoder->SampleRate) - 1) * 10));
 
-	  memcpy(&vocoder->bands_carrier[i],
-		 &vocoder->bands_formant[i], sizeof(struct bandpass));
-
-	  vocoder->bands_out[i].decay = decay_table[(int)a];
-	  vocoder->bands_out[i].level =
+	  vocoder->bands_out.decay[i] = decay_table[(int)a];
+	  vocoder->bands_out.level[i] =
 	    CLAMP (*vocoder->ctrlBandLevels[i], 0.0, 1.0);
 	}
+      memcpy(&vocoder->bands_carrier,
+	     &vocoder->bands_formant, sizeof(struct bandpasses));
+
     }
   else		       /* get current values of band level controls */
     {
       for (i = 0; i < numbands; i++)
-	vocoder->bands_out[i].level = CLAMP (*vocoder->ctrlBandLevels[i],
+	vocoder->bands_out.level[i] = CLAMP (*vocoder->ctrlBandLevels[i],
 					     0.0, 1.0);
     }
 
   for (i=0; i < SampleCount; i++)
     {
-      vocoder_do_bandpasses (vocoder->bands_carrier,
+      vocoder_do_bandpasses (&(vocoder->bands_carrier),
 			     vocoder->portCarrier[i], vocoder);
-      vocoder_do_bandpasses (vocoder->bands_formant,
+      vocoder_do_bandpasses (&(vocoder->bands_formant),
 			     vocoder->portFormant[i], vocoder);
 
-      vocoder->portOutput[i] = 0.0;
-      vocoder->portOutput2[i] = 0.0;
+
+      LADSPA_Data sample = 0.0;
       for (j=0; j < numbands; j++)
 	{
-	  vocoder->bands_out[j].oldval = vocoder->bands_out[j].oldval
-	    + (fabs (vocoder->bands_formant[j].y)
-	       - vocoder->bands_out[j].oldval)
-	    * vocoder->bands_out[j].decay;
-	  x = vocoder->bands_carrier[j].y * vocoder->bands_out[j].oldval;
-	  vocoder->portOutput[i] += x * vocoder->bands_out[j].level;
-	  vocoder->portOutput2[i] += x * vocoder->bands_out[j].level;
+	  vocoder->bands_out.oldval[j] = vocoder->bands_out.oldval[j]
+	    + (fabs (vocoder->bands_formant.y[j])
+	       - vocoder->bands_out.oldval[j])
+	    * vocoder->bands_out.decay[j];
+	  x = vocoder->bands_carrier.y[j] * vocoder->bands_out.oldval[j];
+
+	  sample += x * vocoder->bands_out.level[j];
 	}
 	    /* treat paning + main volume */
-	    pan = (int)(*vocoder->ctrlPan);
-      fl = fr = 1.;
-	    if (pan != 0) { /* no paning, don't compute useless values */
+      pan = (int)(*vocoder->ctrlPan);
+      fl = fr = 1.0f;
+      if (pan != 0) { /* no paning, don't compute useless values */
         if (pan > 0) { /* reduce left */
           fl = (100.-pan)/100.;
         } else {
@@ -310,8 +309,8 @@ runVocoder(LADSPA_Handle Instance,
         }
       }
       /* apply volume and paning */
-      vocoder->portOutput[i] *= vocoder->mainvol * fl;
-      vocoder->portOutput2[i] *= vocoder->mainvol * fr;
+      vocoder->portOutput[i] = sample * vocoder->mainvol * fl;
+      vocoder->portOutput2[i] = sample * vocoder->mainvol * fr;
     }
 }
 

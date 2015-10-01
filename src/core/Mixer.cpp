@@ -41,6 +41,7 @@
 #include "AudioJack.h"
 #include "AudioOss.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -50,6 +51,7 @@
 #include "MidiAlsaSeq.h"
 #include "MidiOss.h"
 #include "MidiWinMM.h"
+#include "MidiApple.h"
 #include "MidiDummy.h"
 
 #include "MemoryHelper.h"
@@ -57,7 +59,7 @@
 
 
 
-Mixer::Mixer() :
+Mixer::Mixer( bool renderOnly ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_workingBuf( NULL ),
 	m_inputBufferRead( 0 ),
@@ -66,13 +68,13 @@ Mixer::Mixer() :
 	m_writeBuf( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_queueReadyWaitCond(),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 	m_globalMutex( QMutex::Recursive ),
-	m_profiler()
+	m_profiler(),
+	m_metronomeActive(false)
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -82,37 +84,37 @@ Mixer::Mixer() :
 		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
-	// just rendering?
-	if( !gui )
-	{
-		m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
-		m_fifo = new fifo( 1 );
-	}
-	else if( ConfigManager::inst()->value( "mixer", "framesperaudiobuffer"
-						).toInt() >= 32 )
-	{
-		m_framesPerPeriod =
-			(fpp_t) ConfigManager::inst()->value( "mixer",
-					"framesperaudiobuffer" ).toInt();
+	// determine FIFO size and number of frames per period
+	int fifoSize = 1;
 
-		if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
+	// if not only rendering (that is, using the GUI), load the buffer
+	// size from user configuration
+	if( renderOnly == false )
+	{
+		m_framesPerPeriod = 
+			( fpp_t ) ConfigManager::inst()->
+				value( "mixer", "framesperaudiobuffer" ).toInt();
+
+		// if the value read from user configuration is not set or
+		// lower than the minimum allowed, use the default value and
+		// save it to the configuration
+		if( m_framesPerPeriod < MINIMUM_BUFFER_SIZE )
 		{
-			m_fifo = new fifo( m_framesPerPeriod
-							/ DEFAULT_BUFFER_SIZE );
+			ConfigManager::inst()->setValue( "mixer",
+						"framesperaudiobuffer",
+						QString::number( DEFAULT_BUFFER_SIZE ) );
+
 			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
-		else
+		else if( m_framesPerPeriod > DEFAULT_BUFFER_SIZE )
 		{
-			m_fifo = new fifo( 1 );
+			fifoSize = m_framesPerPeriod / DEFAULT_BUFFER_SIZE;
+			m_framesPerPeriod = DEFAULT_BUFFER_SIZE;
 		}
 	}
-	else
-	{
-		ConfigManager::inst()->setValue( "mixer",
-							"framesperaudiobuffer",
-				QString::number( m_framesPerPeriod ) );
-		m_fifo = new fifo( 1 );
-	}
+
+	// allocte the FIFO from the determined size
+	m_fifo = new fifo( fifoSize );
 
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
@@ -218,11 +220,10 @@ void Mixer::stopProcessing()
 	if( m_fifoWriter != NULL )
 	{
 		m_fifoWriter->finish();
-		m_audioDev->stopProcessing();
-		m_fifoWriter->wait( 1000 );
-		m_fifoWriter->terminate();
+		m_fifoWriter->wait();
 		delete m_fifoWriter;
 		m_fifoWriter = NULL;
+		m_audioDev->stopProcessing();
 	}
 	else
 	{
@@ -317,18 +318,25 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	static Song::PlayPos last_metro_pos = -1;
 
-	Song::PlayPos p = Engine::getSong()->getPlayPos(
-						Song::Mode_PlayPattern );
-	if( Engine::getSong()->playMode() == Song::Mode_PlayPattern &&
-		gui->pianoRoll()->isRecording() == true &&
+	Song *song = Engine::getSong();
+
+	Song::PlayModes currentPlayMode = song->playMode();
+	Song::PlayPos p = song->getPlayPos( currentPlayMode );
+
+	bool playModeSupportsMetronome = currentPlayMode == Song::Mode_PlayPattern ||
+					 currentPlayMode == Song::Mode_PlaySong ||
+					 currentPlayMode == Song::Mode_PlayBB;
+
+	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
 		p != last_metro_pos )
 	{
-		if ( p.getTicks() % (MidiTime::ticksPerTact() / 1 ) == 0 )
+		tick_t ticksPerTact = MidiTime::ticksPerTact();
+		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome02.ogg" ) );
 		}
-		else if ( p.getTicks() % (MidiTime::ticksPerTact() /
-			Engine::getSong()->getTimeSigModel().getNumerator() ) == 0 )
+		else if ( p.getTicks() % (ticksPerTact /
+			song->getTimeSigModel().getNumerator() ) == 0 )
 		{
 			addPlayHandle( new SamplePlayHandle( "misc/metronome01.ogg" ) );
 		}
@@ -336,9 +344,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	}
 
 	lockInputFrames();
+
 	// swap buffer
 	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
 	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
+
 	// clear new write buffer
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 	unlockInputFrames();
@@ -382,10 +392,11 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	Engine::fxMixer()->prepareMasterMix();
+	FxMixer * fxMixer = Engine::fxMixer();
+	fxMixer->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.
-	Engine::getSong()->processNextBuffer();
+	song->processNextBuffer();
 
 	// add all play-handles that have to be added
 	m_playHandleMutex.lock();
@@ -431,7 +442,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	// STAGE 3: do master mix in FX mixer
-	Engine::fxMixer()->masterMix( m_writeBuf );
+	fxMixer->masterMix( m_writeBuf );
 
 	unlock();
 
@@ -735,6 +746,20 @@ AudioDevice * Mixer::tryAudioDevices()
 		dev_name = "";
 	}
 
+#ifdef LMMS_HAVE_SDL
+	if( dev_name == AudioSdl::name() || dev_name == "" )
+	{
+		dev = new AudioSdl( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSdl::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+
 #ifdef LMMS_HAVE_ALSA
 	if( dev_name == AudioAlsa::name() || dev_name == "" )
 	{
@@ -791,20 +816,6 @@ AudioDevice * Mixer::tryAudioDevices()
 #endif
 
 
-#ifdef LMMS_HAVE_SDL
-	if( dev_name == AudioSdl::name() || dev_name == "" )
-	{
-		dev = new AudioSdl( success_ful, this );
-		if( success_ful )
-		{
-			m_audioDevName = AudioSdl::name();
-			return dev;
-		}
-		delete dev;
-	}
-#endif
-
-
 #ifdef LMMS_HAVE_PORTAUDIO
 	if( dev_name == AudioPortAudio::name() || dev_name == "" )
 	{
@@ -812,6 +823,20 @@ AudioDevice * Mixer::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioPortAudio::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if( dev_name == AudioSoundIo::name() || dev_name == "" )
+	{
+		dev = new AudioSoundIo( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSoundIo::name();
 			return dev;
 		}
 		delete dev;
@@ -892,6 +917,18 @@ MidiClient * Mixer::tryMidiClients()
 		}
 		delete mwmm;
 	}
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    printf( "trying midi apple...\n" );
+    if( client_name == MidiApple::name() || client_name == "" )
+    {
+        MidiApple * mapple = new MidiApple;
+        m_midiClientName = MidiApple::name();
+        printf( "Returning midi apple\n" );
+        return mapple;
+    }
+    printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
 	printf( "Couldn't create MIDI-client, neither with ALSA nor with "

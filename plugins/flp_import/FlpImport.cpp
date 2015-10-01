@@ -874,15 +874,15 @@ bool FlpImport::tryImport( TrackContainer* tc )
 				qDebug( "channel type: %d\n", data );
 				if( cc )
 				{
-		switch( data )
-		{
-			case 0: cc->pluginType = FL_Plugin::Sampler; break;
-			case 1: cc->pluginType = FL_Plugin::TS404; break;
-//			case 2: cc->pluginType = FL_Plugin::Fruity_3x_Osc; break;
-			case 3: cc->pluginType = FL_Plugin::Layer; break;
-			default:
-				break;
-		}
+					switch( data )
+					{
+						case 0: cc->pluginType = FL_Plugin::Sampler; break;
+						case 1: cc->pluginType = FL_Plugin::TS404; break;
+//						case 2: cc->pluginType = FL_Plugin::Fruity_3x_Osc; break;
+						case 3: cc->pluginType = FL_Plugin::Layer; break;
+						default:
+							break;
+					}
 				}
 				break;
 
@@ -891,11 +891,11 @@ bool FlpImport::tryImport( TrackContainer* tc )
 				break;
 
 			case FLP_EffectChannelMuted:
-if( p.currentEffectChannel <= NumFLFxChannels )
-{
-	p.effectChannels[p.currentEffectChannel].isMuted =
-					( data & 0x08 ) > 0 ? false : true;
-}
+				if( p.currentEffectChannel <= NumFLFxChannels )
+				{
+					p.effectChannels[p.currentEffectChannel].isMuted =
+									( data & 0x08 ) > 0 ? false : true;
+				}
 				break;
 
 
@@ -1107,8 +1107,8 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 				if( mappedPluginTypes.
 					contains( QString( text ).toLower() ) )
 				{
-	const FL_Plugin::PluginTypes t = static_cast<FL_Plugin::PluginTypes>(
-				mappedPluginTypes[QString( text ).toLower()] );
+					const FL_Plugin::PluginTypes t = static_cast<FL_Plugin::PluginTypes>(
+						mappedPluginTypes[QString( text ).toLower()] );
 					if( t > FL_Plugin::EffectPlugin )
 					{
 						qDebug( "recognized new effect %s\n", text );
@@ -1185,11 +1185,11 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 				cc->arpDir = mappedArpDir[pi[10]];
 				cc->arpRange = pi[11];
 				cc->selectedArp = pi[12];
-	if( cc->selectedArp < 8 )
-	{
-		const int mappedArps[] = { 0, 1, 5, 6, 2, 3, 4 } ;
-		cc->selectedArp = mappedArps[cc->selectedArp];
-	}
+				if( cc->selectedArp < 8 )
+				{
+					const int mappedArps[] = { 0, 1, 5, 6, 2, 3, 4 } ;
+					cc->selectedArp = mappedArps[cc->selectedArp];
+				}
 				cc->arpTime = ( ( pi[13]+1 ) * p.tempo ) /
 								( 4*16 ) + 1;
 				cc->arpGate = ( pi[14] * 100.0f ) / 48.0f;
@@ -1204,21 +1204,21 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 				const float scaling = 1.0 / 65536.0f;
 				FL_Channel_Envelope e;
 
-		switch( cc->envelopes.size() )
-		{
-			case 1:
-				e.target = InstrumentSoundShaping::Volume;
-				break;
-			case 2:
-				e.target = InstrumentSoundShaping::Cut;
-				break;
-			case 3:
-				e.target = InstrumentSoundShaping::Resonance;
-				break;
-			default:
-				e.target = InstrumentSoundShaping::NumTargets;
-				break;
-		}
+				switch( cc->envelopes.size() )
+				{
+					case 1:
+						e.target = InstrumentSoundShaping::Volume;
+						break;
+					case 2:
+						e.target = InstrumentSoundShaping::Cut;
+						break;
+					case 3:
+						e.target = InstrumentSoundShaping::Resonance;
+						break;
+					default:
+						e.target = InstrumentSoundShaping::NumTargets;
+						break;
+				}
 				e.predelay = pi[2] * scaling;
 				e.attack = pi[3] * scaling;
 				e.hold = pi[4] * scaling;
@@ -1243,19 +1243,19 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 			}
 
 			case FLP_Text_BasicChanParams:
-		cc->volume = ( pi[1] / p.versionSpecificFactor ) * 100 / 128;
-		cc->panning = ( pi[0] / p.versionSpecificFactor ) * 200 / 128 -
+				cc->volume = ( pi[1] / p.versionSpecificFactor ) * 100 / 128;
+				cc->panning = ( pi[0] / p.versionSpecificFactor ) * 200 / 128 -
 								PanningRight;
 				if( text_len > 12 )
 				{
-			cc->filterType = mappedFilter[puc[20]];
-			cc->filterCut = puc[12] / ( 255.0f * 2.5f );
-			cc->filterRes = 0.01f + puc[16] / ( 256.0f * 2 );
-			cc->filterEnabled = ( puc[13] == 0 );
-			if( puc[20] >= 6 )
-			{
-				cc->filterCut *= 0.5f;
-			}
+					cc->filterType = mappedFilter[puc[20]];
+					cc->filterCut = puc[12] / ( 255.0f * 2.5f );
+					cc->filterRes = 0.01f + puc[16] / ( 256.0f * 2 );
+					cc->filterEnabled = ( puc[13] == 0 );
+					if( puc[20] >= 6 )
+					{
+						cc->filterCut *= 0.5f;
+					}
 				}
 				qDebug( "basic chan params: " );
 				dump_mem( text, text_len );
@@ -1319,7 +1319,7 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 							pan*200 / 128 - 100 );
 					if( ch < p.numChannels )
 					{
-	p.channels[ch].notes.push_back( qMakePair( p.currentPattern, n ) );
+						p.channels[ch].notes.push_back( qMakePair( p.currentPattern, n ) );
 					}
 					else
 					{
@@ -1359,11 +1359,11 @@ if( p.currentEffectChannel <= NumFLFxChannels )
 					const int val = pi[i*3+2];
 					if( param == EffectParamVolume )
 					{
-p.effectChannels[ch].volume = ( val / p.versionSpecificFactor ) * 100 / 128;
+						p.effectChannels[ch].volume = ( val / p.versionSpecificFactor ) * 100 / 128;
 					}
 					else
 					{
-qDebug( "FX-ch: %d  param: %x  value:%x\n", ch, param, val );
+						qDebug( "FX-ch: %d  param: %x  value:%x\n", ch, param, val );
 					}
 				}
 				break;
@@ -1375,22 +1375,22 @@ qDebug( "FX-ch: %d  param: %x  value:%x\n", ch, param, val );
 				const int imax = text_len / bpi;
 				for( int i = 0; i < imax; ++i )
 				{
-const int pos = pi[i*bpi/sizeof(int)+0] / ( (4*ppq) / DefaultTicksPerTact );
-const int len = pi[i*bpi/sizeof(int)+2] / ( (4*ppq) / DefaultTicksPerTact );
-const int pat = pi[i*bpi/sizeof(int)+3] & 0xfff;
-if( pat > 2146 && pat <= 2278 )	// whatever these magic numbers are for...
-{
-	FL_PlayListItem i;
-	i.position = pos;
-	i.length = len;
-	i.pattern = 2278 - pat;
-	p.playListItems += i;
-}
-else
-{
-	qDebug( "unknown playlist item: " );
-	dump_mem( text+i*bpi, bpi );
-}
+					const int pos = pi[i*bpi/sizeof(int)+0] / ( (4*ppq) / DefaultTicksPerTact );
+					const int len = pi[i*bpi/sizeof(int)+2] / ( (4*ppq) / DefaultTicksPerTact );
+					const int pat = pi[i*bpi/sizeof(int)+3] & 0xfff;
+					if( pat > 2146 && pat <= 2278 )	// whatever these magic numbers are for...
+					{
+						FL_PlayListItem i;
+						i.position = pos;
+						i.length = len;
+						i.pattern = 2278 - pat;
+						p.playListItems += i;
+					}
+					else
+					{
+						qDebug( "unknown playlist item: " );
+						dump_mem( text+i*bpi, bpi );
+					}
 				}
 				break;
 			}
@@ -1622,13 +1622,13 @@ else
 			}
 			if( m )
 			{
-if( scale )
-{
-	value = m->minValue<float>() + value *
-				( m->maxValue<float>() - m->minValue<float>() );
-}
-AutomationPattern * p = AutomationPattern::globalAutomationPattern( m );
-p->putValue( jt->pos, value, false );
+				if( scale )
+				{
+					value = m->minValue<float>() + value *
+								( m->maxValue<float>() - m->minValue<float>() );
+				}
+				AutomationPattern * p = AutomationPattern::globalAutomationPattern( m );
+				p->putValue( jt->pos, value, false );
 			}
 		}
 

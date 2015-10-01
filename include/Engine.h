@@ -46,7 +46,7 @@ class EXPORT Engine : public QObject
 {
 	Q_OBJECT
 public:
-	static void init();
+	static void init( bool renderOnly );
 	static void destroy();
 
 	// core

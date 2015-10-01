@@ -32,9 +32,6 @@
 #include "Plugin.h"
 
 
-class trackContainer;
-
-
 class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT

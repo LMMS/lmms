@@ -280,7 +280,7 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 
 
 AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioPulseAudio::name(), _parent )
+	AudioDeviceSetupWidget( AudioPulseAudio::name(), _parent )
 {
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

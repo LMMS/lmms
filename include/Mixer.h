@@ -57,6 +57,7 @@ class MidiClient;
 class AudioPort;
 
 
+const fpp_t MINIMUM_BUFFER_SIZE = 32;
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
 const int BYTES_PER_SAMPLE = sizeof( sample_t );
@@ -354,6 +355,9 @@ public:
 
 	void changeQuality( const struct qualitySettings & _qs );
 
+	inline bool isMetronomeActive() const { return m_metronomeActive; }
+	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
+
 
 signals:
 	void qualitySettingsChanged();
@@ -382,7 +386,7 @@ private:
 	} ;
 
 
-	Mixer();
+	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
 	void startProcessing( bool _needs_fifo = true );
@@ -417,44 +421,41 @@ private:
 	int m_writeBuffer;
 	int m_poolDepth;
 
-	surroundSampleFrame m_maxClip;
-	surroundSampleFrame m_previousSample;
-	fpp_t m_halfStart[SURROUND_CHANNELS];
-	bool m_oldBuffer[SURROUND_CHANNELS];
-	bool m_newBuffer[SURROUND_CHANNELS];
-
+	// worker thread stuff
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
-	QWaitCondition m_queueReadyWaitCond;
 
-	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
-	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
-
+	// playhandle stuff
 	PlayHandleList m_playHandles;
+	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
 	ConstPlayHandleList m_playHandlesToRemove;
+
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
-
+	// audio device stuff
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
 
-
+	// MIDI device stuff
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
-
+	// mutexes
 	QMutex m_globalMutex;
 	QMutex m_inputFramesMutex;
-
+	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
 	QMutex m_playHandleRemovalMutex;
 
+	// FIFO stuff
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
 	MixerProfiler m_profiler;
+
+	bool m_metronomeActive;
 
 	friend class Engine;
 	friend class MixerWorkerThread;

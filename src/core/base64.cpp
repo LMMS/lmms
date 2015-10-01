@@ -35,21 +35,6 @@ namespace base64
 {
 
 
-QString encode( const QVariant & _data )
-{
-	QBuffer buf;
-	buf.open( QBuffer::WriteOnly );
-	QDataStream out( &buf );
-	out << _data;
-	QByteArray data = buf.buffer();
-	QString dst;
-	encode( data.constData(), data.size(), dst );
-	return( dst );
-}
-
-
-
-
 QVariant decode( const QString & _b64, QVariant::Type _force_type )
 {
 	char * dst = NULL;

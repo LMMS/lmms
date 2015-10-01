@@ -27,6 +27,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QApplication>
+#include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
 #include "MainWindow.h"
@@ -52,13 +53,7 @@ ConfigManager::ConfigManager() :
 								".lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
 						"lmms" + QDir::separator() ),
-	m_dataDir( qApp->applicationDirPath()
-#ifdef LMMS_BUILD_WIN32
-			+ QDir::separator() + "data" + QDir::separator()
-#else
-				.section( '/', 0, -2 ) + "/share/lmms/"
-#endif
-									),
+	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
 	m_flDir( QDir::home().absolutePath() ),
@@ -68,7 +63,36 @@ ConfigManager::ConfigManager() :
 {
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
-	QDir::addSearchPath("data", m_dataDir);
+
+	// If we're in development (lmms is not installed) let's get the source
+	// directory by reading the CMake Cache
+	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
+	if (cmakeCache.exists()) {
+		cmakeCache.open(QFile::ReadOnly);
+		QTextStream stream(&cmakeCache);
+
+		// Find the line containing something like lmms_SOURCE_DIR:static=<dir>
+		while(! stream.atEnd())
+		{
+			QString line = stream.readLine();
+
+			if (line.startsWith("lmms_SOURCE_DIR:")) {
+				QString srcDir = line.section('=', -1).trimmed();
+				QDir::addSearchPath("data", srcDir + "/data/");
+				break;
+			}
+		}
+
+		cmakeCache.close();
+	}
+
+#ifdef LMMS_BUILD_WIN32
+	QDir::addSearchPath("data", qApp->applicationDirPath() + "/data/");
+#else
+	QDir::addSearchPath("data", qApp->applicationDirPath().section('/', 0, -2) + "/share/lmms/");
+#endif
+
+
 }
 
 
@@ -80,6 +104,28 @@ ConfigManager::~ConfigManager()
 }
 
 
+void ConfigManager::upgrade_1_1_90()
+{
+	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
+	if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
+	{
+		setValue("mixer", "audiodev", "PulseAudio");
+	}
+
+	// MidiAlsaRaw used to store the device info as "Device" instead of "device"
+	if ( value( "MidiAlsaRaw", "device" ).isNull() )
+	{
+		// copy "device" = "Device" and then delete the old "Device" (further down)
+		QString oldDevice = value( "MidiAlsaRaw", "Device" );
+		setValue("MidiAlsaRaw", "device", oldDevice);
+	}
+	if ( !value( "MidiAlsaRaw", "device" ).isNull() )
+	{
+		// delete the old "Device" in the case that we just copied it to "device"
+		//   or if the user somehow set both the "Device" and "device" fields
+		deleteValue("MidiAlsaRaw", "Device");
+	}
+}
 
 
 void ConfigManager::upgrade()
@@ -92,13 +138,9 @@ void ConfigManager::upgrade()
 
 	ProjectVersion createdWith = m_version;
 	
-	// Remove trailing " (bad latency!)" string which was once saved with PulseAudio
 	if ( createdWith.setCompareType(Build) < "1.1.90" )
 	{
-		if( value( "mixer", "audiodev" ).startsWith( "PulseAudio (" ) )
-		{
-			setValue("mixer", "audiodev", "PulseAudio");
-		}
+		upgrade_1_1_90();
 	}
 	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
@@ -109,6 +151,11 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
+}
+
+bool ConfigManager::hasWorkingDir() const
+{
+	return QDir( m_workingDir ).exists();
 }
 
 
@@ -190,35 +237,49 @@ void ConfigManager::setSF2Dir(const QString &sfd)
 }
 
 
+void ConfigManager::createWorkingDir()
+{
+	QDir().mkpath( m_workingDir );
+
+	QDir().mkpath( userProjectsDir() );
+	QDir().mkpath( userTemplateDir() );
+	QDir().mkpath( userSamplesDir() );
+	QDir().mkpath( userPresetsDir() );
+	QDir().mkpath( userGigDir() );
+	QDir().mkpath( userSf2Dir() );
+	QDir().mkpath( userVstDir() );
+	QDir().mkpath( userLadspaDir() );
+}
+
 
 
 void ConfigManager::addRecentlyOpenedProject( const QString & _file )
 {
 	if( !_file.endsWith( ".mpt", Qt::CaseInsensitive ) ) 
+	{
+		m_recentlyOpenedProjects.removeAll( _file );
+		if( m_recentlyOpenedProjects.size() > 30 )
 		{
-			m_recentlyOpenedProjects.removeAll( _file );
-			if( m_recentlyOpenedProjects.size() > 15 )
-				{
-					m_recentlyOpenedProjects.removeLast();
-				}
-			m_recentlyOpenedProjects.push_front( _file );
-			ConfigManager::inst()->saveConfigFile();
+			m_recentlyOpenedProjects.removeLast();
 		}
+		m_recentlyOpenedProjects.push_front( _file );
+		ConfigManager::inst()->saveConfigFile();
+	}
 }
 
 
 
 
-const QString & ConfigManager::value( const QString & _class,
-					const QString & _attribute ) const
+const QString & ConfigManager::value( const QString & cls,
+					const QString & attribute ) const
 {
-	if( m_settings.contains( _class ) )
+	if( m_settings.contains( cls ) )
 	{
 		for( stringPairVector::const_iterator it =
-						m_settings[_class].begin();
-					it != m_settings[_class].end(); ++it )
+						m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
 		{
-			if( ( *it ).first == _attribute )
+			if( ( *it ).first == attribute )
 			{
 				return ( *it ).second ;
 			}
@@ -231,26 +292,42 @@ const QString & ConfigManager::value( const QString & _class,
 
 
 
-void ConfigManager::setValue( const QString & _class,
-				const QString & _attribute,
-				const QString & _value )
+void ConfigManager::setValue( const QString & cls,
+				const QString & attribute,
+				const QString & value )
 {
-	if( m_settings.contains( _class ) )
+	if( m_settings.contains( cls ) )
 	{
-		for( stringPairVector::iterator it = m_settings[_class].begin();
-					it != m_settings[_class].end(); ++it )
+		for( stringPairVector::iterator it = m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
 		{
-			if( ( *it ).first == _attribute )
+			if( ( *it ).first == attribute )
 			{
-				( *it ).second = _value;
+				( *it ).second = value;
 				return;
 			}
 		}
 	}
 	// not in map yet, so we have to add it...
-	m_settings[_class].push_back( qMakePair( _attribute, _value ) );
+	m_settings[cls].push_back( qMakePair( attribute, value ) );
 }
 
+
+void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
+{
+	if( m_settings.contains( cls ) )
+	{
+		for( stringPairVector::iterator it = m_settings[cls].begin();
+					it != m_settings[cls].end(); ++it )
+		{
+			if( ( *it ).first == attribute )
+			{
+				m_settings[cls].erase(it);
+				return;
+			}
+		}
+	}
+}
 
 
 void ConfigManager::loadConfigFile()
@@ -287,12 +364,12 @@ void ConfigManager::loadConfigFile()
 					for( int i = 0; i < node_attr.count();
 									++i )
 					{
-		QDomNode n = node_attr.item( i );
-		if( n.isAttr() )
-		{
-			attr.push_back( qMakePair( n.toAttr().name(),
-							n.toAttr().value() ) );
-		}
+						QDomNode n = node_attr.item( i );
+						if( n.isAttr() )
+						{
+							attr.push_back( qMakePair( n.toAttr().name(),
+											n.toAttr().value() ) );
+						}
 					}
 					m_settings[node.nodeName()] = attr;
 				}
@@ -302,12 +379,12 @@ void ConfigManager::loadConfigFile()
 					QDomNode n = node.firstChild();
 					while( !n.isNull() )
 					{
-		if( n.isElement() && n.toElement().hasAttributes() )
-		{
-			m_recentlyOpenedProjects <<
-					n.toElement().attribute( "path" );
-		}
-		n = n.nextSibling();
+						if( n.isElement() && n.toElement().hasAttributes() )
+						{
+							m_recentlyOpenedProjects <<
+									n.toElement().attribute( "path" );
+						}
+						n = n.nextSibling();
 					}
 				}
 				node = node.nextSibling();
@@ -369,16 +446,16 @@ void ConfigManager::loadConfigFile()
 		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
-	if( m_ladDir.isEmpty() || m_ladDir == QDir::separator() ||
-			( !m_ladDir.contains( ':' ) && !QDir( m_ladDir ).exists() ) )
+	if( m_ladDir.isEmpty()  )
 	{
 #if defined(LMMS_BUILD_WIN32)
 		m_ladDir = qApp->applicationDirPath() + "/plugins/ladspa" + QDir::separator();
 #elif defined(LMMS_BUILD_APPLE)
 		m_ladDir = qApp->applicationDirPath() + "/../lib/lmms/ladspa/";
 #else
-		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/ladspa/";
+		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/lmms/ladspa/";
 #endif
+		m_ladDir = QDir::cleanPath( m_ladDir );
 		m_ladDir += ","+userLadspaDir();
 	}
 
@@ -402,28 +479,10 @@ void ConfigManager::loadConfigFile()
 	searchPaths << artworkDir() << defaultArtworkDir();
 	QDir::setSearchPaths( "resources", searchPaths);
 
-	if( !QDir( m_workingDir ).exists() && gui &&
-		QMessageBox::question( 0,
-			MainWindow::tr( "Working directory" ),
-			MainWindow::tr( "The LMMS working directory %1 does not "
-				"exist. Create it now? You can change the directory "
-				"later via Edit -> Settings." ).arg( m_workingDir ),
-					QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+	// Create any missing subdirectories in the working dir, but only if the working dir exists
+	if( hasWorkingDir() )
 	{
-		QDir().mkpath( m_workingDir );
-	}
-
-	if( QDir( m_workingDir ).exists() )
-	{
-		QDir().mkpath( userProjectsDir() );
-		QDir().mkpath( userTemplateDir() );
-		QDir().mkpath( userSamplesDir() );
-		QDir().mkpath( userPresetsDir() );
-		QDir().mkpath( userGigDir() );
-		QDir().mkpath( userSf2Dir() );
-		QDir().mkpath( userVstDir() );
-		QDir().mkpath( userLadspaDir() );
-
+		createWorkingDir();
 	}
 
 	upgrade();

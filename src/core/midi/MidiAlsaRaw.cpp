@@ -22,9 +22,6 @@
  *
  */
 
-#include <QLabel>
-#include <QLineEdit>
-
 #include "MidiAlsaRaw.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
@@ -80,7 +77,7 @@ MidiAlsaRaw::~MidiAlsaRaw()
 
 QString MidiAlsaRaw::probeDevice()
 {
-	QString dev = ConfigManager::inst()->value( "MidiAlsaRaw", "Device" );
+	QString dev = ConfigManager::inst()->value( "MidiAlsaRaw", "device" );
 	if( dev == "" )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
@@ -172,37 +169,6 @@ void MidiAlsaRaw::run()
 	}
 
 }
-
-
-
-
-MidiAlsaRaw::setupWidget::setupWidget( QWidget * _parent ) :
-	MidiClientRaw::setupWidget( MidiAlsaRaw::name(), _parent )
-{
-	m_device = new QLineEdit( MidiAlsaRaw::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-}
-
-
-
-
-MidiAlsaRaw::setupWidget::~setupWidget()
-{
-}
-
-
-
-
-void MidiAlsaRaw::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue( "MidiAlsaRaw", "Device",
-							m_device->text() );
-}
-
 
 #endif
 

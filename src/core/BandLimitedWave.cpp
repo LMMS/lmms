@@ -25,6 +25,8 @@
 
 #include "BandLimitedWave.h"
 
+#include <QDataStream>
+
 #include "ConfigManager.h"
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };

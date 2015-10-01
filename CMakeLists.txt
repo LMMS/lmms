@@ -7,19 +7,36 @@ SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0005 NEW)
 	CMAKE_POLICY(SET CMP0003 NEW)
+	IF (CMAKE_MAJOR_VERSION GREATER 2)
+		CMAKE_POLICY(SET CMP0026 OLD)
+	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
 
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
 
-SET(VERSION_MAJOR "1")
-SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "3")
-#SET(VERSION_SUFFIX "")
-SET(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
+
+# Timestamp available since cmake 2.8.11
+IF(CMAKE_VERSION VERSION_LESS "2.8.11")
+	SET(PROJECT_YEAR        "2015")
+ELSE()
+	STRING(TIMESTAMP        PROJECT_YEAR "%Y")
+ENDIF()
+
+SET(PROJECT_AUTHOR      "LMMS Developers")
+SET(PROJECT_URL         "http://lmms.io")
+SET(PROJECT_EMAIL       "lmms-devel@lists.sourceforge.net")
+SET(PROJECT_DESCRIPTION "${PROJECT_NAME_UCASE} - Free music production software")
+SET(PROJECT_COPYRIGHT   "${PROJECT_AUTHOR}, 2008-${PROJECT_YEAR}")
+SET(VERSION_MAJOR       "1")
+SET(VERSION_MINOR       "1")
+SET(VERSION_PATCH       "3")
+#SET(VERSION_SUFFIX     "")
+SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 IF(VERSION_SUFFIX)
-	SET(VERSION "${VERSION}-${VERSION_SUFFIX}")
+	SET(VERSION     "${VERSION}-${VERSION_SUFFIX}")
 ENDIF(VERSION_SUFFIX)
 
 INCLUDE(DetectMachine)
@@ -34,6 +51,7 @@ OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
+OPTION(WANT_SOUNDIO	"Include libsoundio support" ON)
 OPTION(WANT_SDL		"Include SDL (Simple DirectMedia Layer) support" ON)
 OPTION(WANT_SF2		"Include SoundFont2 player plugin" ON)
 OPTION(WANT_GIG		"Include GIG player plugin" ON)
@@ -53,8 +71,9 @@ IF(LMMS_BUILD_APPLE)
 	SET(WANT_VST OFF)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
-	# MacPorts: /opt/local/lib
-	LINK_DIRECTORIES(${LINK_DIRECTORIES} /opt/local/lib)
+	SET(STATUS_APPLEMIDI "OK")
+ELSE(LMMS_BUILD_APPLE)
+	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ENDIF(LMMS_BUILD_APPLE)
 
 
@@ -69,6 +88,7 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_WINMM "OK")
+	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ELSE(LMMS_BUILD_WIN32)
 	SET(STATUS_WINMM "<not supported on this platform>")
 ENDIF(LMMS_BUILD_WIN32)
@@ -84,10 +104,6 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
-CHECK_INCLUDE_FILES(sys/wait.h LMMS_HAVE_SYS_WAIT_H)
-CHECK_INCLUDE_FILES(sys/select.h LMMS_HAVE_SYS_SELECT_H)
-CHECK_INCLUDE_FILES(stdarg.h LMMS_HAVE_STDARG_H)
-CHECK_INCLUDE_FILES(signal.h LMMS_HAVE_SIGNAL_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -245,6 +261,20 @@ IF(WANT_PORTAUDIO)
 	ENDIF(PORTAUDIO_FOUND)
 ENDIF(WANT_PORTAUDIO)
 
+# check for libsoundio
+IF(WANT_SOUNDIO)
+  FIND_PACKAGE(SoundIo)
+  IF(SOUNDIO_FOUND)
+    SET(LMMS_HAVE_SOUNDIO TRUE)
+    SET(STATUS_SOUNDIO "OK")
+    INCLUDE_DIRECTORIES("${SOUNDIO_INCLUDE_DIR}")
+  ELSE(SOUNDIO_FOUND)
+    SET(SOUNDIO_INCLUDE_DIR "")
+    SET(STATUS_SOUNDIO "not found, please install libsoundio if you require libsoundio support")
+    SET(SOUNDIO_LIBRARY "")
+  ENDIF(SOUNDIO_FOUND)
+ENDIF(WANT_SOUNDIO)
+
 
 # check for PulseAudio
 IF(WANT_PULSEAUDIO)
@@ -365,12 +395,6 @@ ENDIF(LMMS_BUILD_WIN32)
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
 
-
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmmsconfig.h.in" "${CMAKE_BINARY_DIR}/lmmsconfig.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmmsversion.h.in" "${CMAKE_BINARY_DIR}/lmmsversion.h")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/lmms.rc.in" "${CMAKE_BINARY_DIR}/lmms.rc")
-CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc.in" "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
-
 # set compiler flags
 SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
@@ -428,19 +452,6 @@ ENDIF(WIN32 OR WIN64)
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-# set up apple vars before traversing into data/scripts
-SET(MACOSX_BUNDLE_ICON_FILE "lmms.icns")
-SET(MACOSX_BUNDLE_GUI_IDENTIFIER "LMMS")
-SET(MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION}")
-SET(MACOSX_BUNDLE_BUNDLE_NAME "LMMS")
-SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION}")
-SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}")
-SET(MACOSX_BUNDLE_COPYRIGHT "Tobias Doerffel, 2008-2010")
-SET(MACOSX_BUNDLE_MIMETYPE "application/x-lmms-project")
-SET(MACOSX_BUNDLE_MIMETYPE_ICON "project.icns")
-SET(MACOSX_BUNDLE_MIMETYPE_ID "net.sourceforge.lmms")
-SET(MACOSX_BUNDLE_PROJECT_URL "http://lmms.io")
-
 IF(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 ELSE(WIN32)
@@ -448,16 +459,21 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # make sub-directories
+ADD_SUBDIRECTORY(cmake)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(plugins)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
+# post-install tasks
+ADD_SUBDIRECTORY(cmake/postinstall)
+
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
-				DEPENDS "${CMAKE_SOURCE_DIR}/lmms.1"
+				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/doc/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
+				DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
 				COMMENT "Generating lmms.1.gz")
+
 
 ADD_CUSTOM_TARGET(manpage ALL
 				DEPENDS "${CMAKE_BINARY_DIR}/lmms.1.gz")
@@ -498,7 +514,7 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND make clean
 			COMMAND rm -rf "${TMP}"
 			COMMAND mkdir -p "${TMP}"
-			COMMAND cp AUTHORS build_mingw32 build_mingw64 CMakeLists.txt configure COPYING INSTALL lmms.1 lmms.rc.in lmms.spec.in lmmsconfig.h.in lmmsversion.h.in README TODO "${TMP}"
+			COMMAND cp CMakeLists.txt LICENSE.txt INSTALL.txt README.md "${TMP}"
 			COMMAND cp -r buildtools cmake data doc include plugins src "${TMP}"
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
@@ -521,6 +537,7 @@ MESSAGE(
 "* JACK                        : ${STATUS_JACK}\n"
 "* OSS                         : ${STATUS_OSS}\n"
 "* PortAudio                   : ${STATUS_PORTAUDIO}\n"
+"* libsoundio                  : ${STATUS_SOUNDIO}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
 "* SDL                         : ${STATUS_SDL}\n"
 )
@@ -531,6 +548,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
+"* AppleMidi                   : ${STATUS_APPLEMIDI}\n"
 )
 
 MESSAGE(
@@ -566,59 +584,4 @@ MESSAGE(
 "\n\n")
 
 INCLUDE(InstallRequiredSystemLibraries)
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "LMMS - easy music production for everyone!")
-SET(CPACK_PACKAGE_VENDOR "LMMS Developers")
-IF(LMMS_BUILD_APPLE)
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/README" "${CMAKE_BINARY_DIR}/README.txt" COPYONLY)
-	CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/COPYING" "${CMAKE_BINARY_DIR}/COPYING.txt" COPYONLY)
-	SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_BINARY_DIR}/README.txt")
-	SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/COPYING.txt")
-ELSE(LMMS_BUILD_APPLE)
-	SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README")
-	SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
-ENDIF(LMMS_BUILD_APPLE)
-
-SET(CPACK_PACKAGE_VERSION_MAJOR "${VERSION_MAJOR}")
-SET(CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
-SET(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}")
-IF(VERSION_SUFFIX)
-	SET(CPACK_PACKAGE_VERSION_PATCH "${VERSION_PATCH}-${VERSION_SUFFIX}")
-ENDIF(VERSION_SUFFIX)
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "LMMS")
-IF(WIN32)
-	SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/data/nsis_branding.bmp")
-	SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/data/lmms.ico")
-	SET(CPACK_NSIS_INSTALLED_ICON_NAME "lmms.exe")
-	SET(CPACK_NSIS_DISPLAY_NAME "LMMS ${VERSION}")
-	SET(CPACK_NSIS_HELP_LINK "http://lmms.io")
-	SET(CPACK_NSIS_URL_INFO_ABOUT "http://lmms.io")
-	SET(CPACK_NSIS_CONTACT "lmms-devel@lists.sourceforge.net")
-	SET(CPACK_PACKAGE_EXECUTABLES "lmms.exe;LMMS")
-	SET(CPACK_NSIS_MENU_LINKS "lmms.exe;LMMS")
-	SET(CPACK_NSIS_DEFINES "!include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh")
-	SET(CPACK_PACKAGE_FILE_NAME "lmms-${VERSION}-win32")
-	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-	  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmp\\\" \\\"LMMS Project\\\"
-	  \\\${registerExtension} \\\"$INSTDIR\\\\lmms.exe\\\" \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
-	  ")
-	SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
-	  \\\${unregisterExtension} \\\".mmp\\\" \\\"LMMS Project\\\"
-	  \\\${unregisterExtension} \\\".mmpz\\\" \\\"LMMS Project (compressed)\\\"
-	  DeleteRegKey HKCR \\\"LMMS Project\\\"
-	  DeleteRegKey HKCR \\\"LMMS Project (compressed)\\\"
-	  ")
-ELSE(WIN32)
-	SET(CPACK_STRIP_FILES "bin/lmms;${PLUGIN_DIR}/*.so")
-	SET(CPACK_PACKAGE_EXECUTABLES "lmms" "LMMS binary")
-ENDIF(WIN32)
-
-IF(WIN64)
-	SET(CPACK_PACKAGE_FILE_NAME "lmms-${VERSION}-win64")
-	SET(CPACK_NSIS_DEFINES "${CPACK_NSIS_DEFINES}
-		InstallDir \\\"\\\$PROGRAMFILES64\\\\${CPACK_PACKAGE_INSTALL_DIRECTORY}\\\"")
-ENDIF(WIN64)
-
-SET(CPACK_SOURCE_GENERATOR "TBZ2")
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "lmms-${VERSION}")
-INCLUDE(CPack)
 

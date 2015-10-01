@@ -40,7 +40,7 @@
 #include "PluginFactory.h"
 
 
-bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
+static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
 {
 	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 }
@@ -68,7 +68,6 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 					"Beat+Bassline Editor or into an "
 					"existing instrument track." ),
 								m_view );
-	hint->setFont( pointSize<8>( hint->font() ) );
 	hint->setWordWrap( true );
 
 	QScrollArea* scrollarea = new QScrollArea( m_view );
@@ -153,8 +152,12 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	p.drawPixmap( 4, 4, logo );
 
-	QFont f = pointSize<8>( p.font() );
-	f.setBold( true );
+	QFont f = p.font();
+	if ( m_mouseOver )
+	{
+		f.setBold( true );
+	}
+
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
@@ -162,7 +165,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 	if( height() > 24 || m_mouseOver )
 	{
 		f.setBold( false );
-		p.setFont( pointSize<8>( f ) );
+		p.setFont( f );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
 								Qt::TextWordWrap,
@@ -231,7 +234,7 @@ void PluginDescWidget::updateHeight()
 
 	if( !m_updateTimer.isActive() )
 	{
-		m_updateTimer.start( 15 );
+		m_updateTimer.start( 10 );
 	}
 }
 

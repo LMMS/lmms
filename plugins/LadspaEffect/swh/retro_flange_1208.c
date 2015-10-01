@@ -31,7 +31,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 
 #define BASE_BUFFER 0.001 // Base buffer length (s)
 
-inline LADSPA_Data sat(LADSPA_Data x, float q,  float dist) {
+static inline LADSPA_Data sat(LADSPA_Data x, float q,  float dist) {
         if (x == q) {
                 return 1.0f / dist + q / (1.0f - f_exp(dist * q));
         }

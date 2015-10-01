@@ -32,6 +32,9 @@
 #include "lmmsconfig.h"
 #include "AudioDevice.h"
 #include "MidiClient.h"
+#include "MidiSetupWidget.h"
+
+#include "AudioDeviceSetupWidget.h"
 
 
 class QComboBox;
@@ -95,6 +98,7 @@ private slots:
 	void toggleDisplaydBV( bool _enabled );
 	void toggleMMPZ( bool _enabled );
 	void toggleDisableBackup( bool _enabled );
+	void toggleOpenLastProject( bool _enabled );
 	void toggleHQAudioDev( bool _enabled );
 
 	void openWorkingDir();
@@ -133,6 +137,7 @@ private:
 	bool m_displaydBV;
 	bool m_MMPZ;
 	bool m_disableBackup;
+	bool m_openLastProject;
 	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
@@ -178,8 +183,8 @@ private:
 	bool m_displayWaveform;
 	bool m_disableAutoQuit;
 
-	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
-	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
+	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
+	typedef QMap<QString, MidiSetupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 
 	QComboBox * m_audioInterfaces;

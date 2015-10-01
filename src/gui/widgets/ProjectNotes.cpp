@@ -71,7 +71,7 @@ ProjectNotes::ProjectNotes() :
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
-	gui->mainWindow()->workspace()->addSubWindow( this );
+	gui->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 700, 10 );
 	parentWidget()->resize( 400, 300 );
@@ -379,7 +379,7 @@ void ProjectNotes::alignmentChanged( int _a )
 
 void ProjectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this );
+	MainWindow::saveWidgetState( this, _this, QSize( 640, 400 ) );
 
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
 	_this.appendChild( ds );

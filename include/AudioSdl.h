@@ -33,6 +33,7 @@
 #include <SDL/SDL_audio.h>
 
 #include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 
 class QLineEdit;
 
@@ -50,7 +51,7 @@ public:
 	}
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -81,8 +82,7 @@ private:
 
 	bool m_convertEndian;
 
-	volatile bool m_stopped;
-	QSemaphore m_stopSemaphore;
+	bool m_stopped;
 
 } ;
 

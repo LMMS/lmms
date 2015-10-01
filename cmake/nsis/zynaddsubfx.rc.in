@@ -1,0 +1,26 @@
+zynaddsubfx_icon ICON zynaddsubfx/zynaddsubfx.ico
+#include <windows.h>
+
+VS_VERSION_INFO	VERSIONINFO
+  FILEVERSION   0,2,3,0
+  FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+  FILEOS        VOS_NT_WINDOWS32
+  FILETYPE      VFT_APP
+  FILESUBTYPE   VFT2_UNKNOWN
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    //language ID = U.S. English, charset = Windows, Multilingual
+    BEGIN
+      VALUE "Comments",         "ZynAddSubFX Plugin - ${PROJECT_NAME_UCASE} (${PROJECT_URL})\0"
+      VALUE "CompanyName",      "${PROJECT_AUTHOR}\0"
+      VALUE "FileDescription",  "ZynAddSubFX ${PROJECT_NAME_UCASE} Plugin\0"
+      VALUE "FileVersion",      "2.3.0/@VERSION@\0"
+      VALUE "LegalCopyright",   "Copyright (c) Nasca Octavian Paul, Mark McCurry, Harald Hvaal, Tobias Doerffel\0"
+      VALUE "OriginalFilename", "RemoteZynAddSubFx.exe\0"
+      VALUE "ProductName",      "ZynAddSubFX/${PROJECT_NAME_UCASE}\0"
+      VALUE "ProductVersion",   "2.3.0/@VERSION@\0"
+    END
+  END
+END

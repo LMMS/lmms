@@ -483,7 +483,6 @@ void sf2Instrument::updateSampleRate()
 
 		// synth program change (set bank and patch)
 		updatePatch();
-		updateGain();
 	}
 	else
 	{
@@ -524,6 +523,12 @@ void sf2Instrument::updateSampleRate()
 	updateChorus();
 	updateReverbOn();
 	updateChorusOn();
+	updateGain();
+
+	// Reset last MIDI pitch properties, which will be set to the correct values
+	// upon playing the next note
+	m_lastMidiPitch = -1;
+	m_lastMidiPitchRange = -1;
 }
 
 

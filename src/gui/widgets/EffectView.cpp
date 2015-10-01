@@ -110,7 +110,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			m_subWindow = gui->mainWindow()->workspace()->addSubWindow(
+			m_subWindow = gui->mainWindow()->addWindowedWidget(
 								m_controlView,
 				Qt::SubWindow | Qt::CustomizeWindowHint  |
 					Qt::WindowTitleHint | Qt::WindowSystemMenuHint );

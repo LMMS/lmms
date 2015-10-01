@@ -117,24 +117,18 @@ FileBrowser::~FileBrowser()
 
 
 
-void FileBrowser::filterItems( const QString & filter )
+bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 {
-	const bool show_all = filter.isEmpty();
+	// call with item=NULL to filter the entire tree
+	bool anyMatched = false;
 
-	for( int i = 0; i < m_l->topLevelItemCount(); ++i )
+	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+	for( int i = 0; i < numChildren; ++i )
 	{
-		QTreeWidgetItem * it = m_l->topLevelItem( i );
-		// show all items if filter is empty
-		if( show_all )
-		{
-			it->setHidden( false );
-			if( it->childCount() )
-			{
-				filterItems( it, filter );
-			}
-		}
+		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
+
 		// is directory?
-		else if( it->childCount() )
+		if( it->childCount() )
 		{
 			// matches filter?
 			if( it->text( 0 ).
@@ -142,91 +136,34 @@ void FileBrowser::filterItems( const QString & filter )
 			{
 				// yes, then show everything below
 				it->setHidden( false );
-				filterItems( it, QString::null );
+				filterItems( QString::null, it );
+				anyMatched = true;
 			}
 			else
 			{
 				// only show if item below matches filter
-				it->setHidden( !filterItems( it, filter ) );
+				bool didMatch = filterItems( filter, it );
+				it->setHidden( !didMatch );
+				anyMatched = anyMatched || didMatch;
 			}
 		}
 		// a standard item (i.e. no file or directory item?)
 		else if( it->type() == QTreeWidgetItem::Type )
 		{
-			// hide in every case when filtering
-			it->setHidden( true );
+			// hide if there's any filter
+			it->setHidden( !filter.isEmpty() );
 		}
 		else
 		{
 			// file matches filter?
-			it->setHidden( !it->text( 0 ).
-				contains( filter, Qt::CaseInsensitive ) );
-		}
-	
-	}
-}
-
-
-
-
-bool FileBrowser::filterItems(QTreeWidgetItem * item, const QString & filter )
-{
-	const bool show_all = filter.isEmpty();
-	bool matched = false;
-
-	for( int i = 0; i < item->childCount(); ++i )
-	{
-		QTreeWidgetItem * it = item->child( i );
-		bool cm = false;	// whether current item matched
-		// show all items if filter is empty
-		if( show_all )
-		{
-			it->setHidden( false );
-			if( it->childCount() )
-			{
-				filterItems( it, filter );
-			}
-		}
-		// is directory?
-		else if( it->childCount() )
-		{
-			// matches filter?
-			if( it->text( 0 ).
-				contains( filter, Qt::CaseInsensitive ) )
-			{
-				// yes, then show everything below
-				it->setHidden( false );
-				filterItems( it, QString::null );
-				cm = true;
-			}
-			else
-			{
-				// only show if item below matches filter
-				cm = filterItems( it, filter );
-				it->setHidden( !cm );
-			}
-		}
-		// a standard item (i.e. no file or directory item?)
-		else if( it->type() == QTreeWidgetItem::Type )
-		{
-			// hide in every case when filtering
-			it->setHidden( true );
-		}
-		else
-		{
-			// file matches filter?
-			cm = it->text( 0 ).
+			bool didMatch = it->text( 0 ).
 				contains( filter, Qt::CaseInsensitive );
-			it->setHidden( !cm );
-		}
-	
-		if( cm )
-		{
-			matched = true;
+			it->setHidden( !didMatch );
+			anyMatched = anyMatched || didMatch;
 		}
 	}
 
-	return matched;
+	return anyMatched;
 }
 
 
@@ -372,8 +309,6 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 	headerItem()->setHidden( true );
 	setSortingEnabled( false );
 
-	setFont( pointSizeF( font(), 7.5f ) );
-
 	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
 	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem * ) ),
@@ -405,11 +340,11 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 						this,
 					SLOT( sendToActiveInstrumentTrack() ) );
 		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"Song-Editor" ),
+								"Song Editor" ),
 						this,
 					SLOT( openInNewInstrumentTrackSE() ) );
 		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"B+B Editor" ),
+								"Pattern Editor" ),
 						this,
 					SLOT( openInNewInstrumentTrackBBE() ) );
 		contextMenu.exec( e->globalPos() );
@@ -429,7 +364,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 	}
 
 	QTreeWidgetItem * i = itemAt( me->pos() );
-        if ( i )
+	if ( i )
 	{
 		// TODO: Restrict to visible selection
 //		if ( _me->x() > header()->cellPos( header()->mapToActual( 0 ) )
@@ -523,35 +458,35 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 			switch( f->type() )
 			{
 				case FileItem::PresetFile:
-	new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
-					"presetfile" : "pluginpresetfile",
-				f->fullName(),
-				embed::getIconPixmap( "preset_file" ), this );
+					new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
+							"presetfile" : "pluginpresetfile",
+							f->fullName(),
+							embed::getIconPixmap( "preset_file" ), this );
 					break;
 
 				case FileItem::SampleFile:
-	new StringPairDrag( "samplefile", f->fullName(),
-				embed::getIconPixmap( "sample_file" ), this );
+					new StringPairDrag( "samplefile", f->fullName(),
+							embed::getIconPixmap( "sample_file" ), this );
 					break;
 				case FileItem::SoundFontFile:
- 	new StringPairDrag( "soundfontfile", f->fullName(),
- 				embed::getIconPixmap( "soundfont_file" ), this );
- 					break;
+					new StringPairDrag( "soundfontfile", f->fullName(),
+							embed::getIconPixmap( "soundfont_file" ), this );
+					break;
 				case FileItem::VstPluginFile:
-	new StringPairDrag( "vstpluginfile", f->fullName(),
-				embed::getIconPixmap( "vst_plugin_file" ), this );
+					new StringPairDrag( "vstpluginfile", f->fullName(),
+							embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
 				case FileItem::MidiFile:
 // don't allow dragging FLP-files as FLP import filter clears project
 // without asking
 //				case fileItem::FlpFile:
-	new StringPairDrag( "importedproject", f->fullName(),
-				embed::getIconPixmap( "midi_file" ), this );
+					new StringPairDrag( "importedproject", f->fullName(),
+							embed::getIconPixmap( "midi_file" ), this );
 					break;
-			case FileItem::ProjectFile:
-				new StringPairDrag( "projectfile", f->fullName(),
+				case FileItem::ProjectFile:
+					new StringPairDrag( "projectfile", f->fullName(),
 							embed::getIconPixmap( "project_file" ), this );
-								break;
+					break;
 
 				default:
 					break;

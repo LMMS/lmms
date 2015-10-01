@@ -39,6 +39,8 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 	setOption( QFileDialog::DontUseCustomDirectoryIcons );
 #endif
 
+	setOption( QFileDialog::DontUseNativeDialog );
+
 	// Add additional locations to the sidebar
 	QList<QUrl> urls = sidebarUrls();
 #if QT_VERSION >= 0x050000

@@ -42,6 +42,28 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("play"));
 }
 
+DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
+{
+	return addDropToolBar(Qt::TopToolBarArea, windowTitle);
+}
+
+DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+{
+	return addDropToolBar(this, whereToAdd, windowTitle);
+}
+
+DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+{
+	DropToolBar *toolBar = new DropToolBar(parent);
+	addToolBar(whereToAdd, toolBar);
+	toolBar->setMovable(false);
+	toolBar->setFloatable(false);
+	toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+	toolBar->setWindowTitle(windowTitle);
+
+	return toolBar;
+}
+
 void Editor::togglePlayStop()
 {
 	if (Engine::getSong()->isPlaying())
@@ -57,8 +79,7 @@ Editor::Editor(bool record) :
 	m_recordAccompanyAction(nullptr),
 	m_stopAction(nullptr)
 {
-	m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-	m_toolBar->setMovable(false);
+	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
 	auto addButton = [this](QAction* action, QString objectName) {
 		m_toolBar->addAction(action);
@@ -78,9 +99,6 @@ Editor::Editor(bool record) :
 	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
-
-	// Add toolbar to window
-	addToolBar(Qt::TopToolBarArea, m_toolBar);
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");

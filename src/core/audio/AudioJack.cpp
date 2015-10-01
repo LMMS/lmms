@@ -425,7 +425,7 @@ void AudioJack::shutdownCallback( void * _udata )
 
 
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioJack::name(), _parent )
+	AudioDeviceSetupWidget( AudioJack::name(), _parent )
 {
 	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )

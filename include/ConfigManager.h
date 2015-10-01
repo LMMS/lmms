@@ -120,6 +120,11 @@ public:
 		return dataDir() + PROJECTS_PATH;
 	}
 
+	QString factoryTemplatesDir() const
+	{
+		return factoryProjectsDir() + TEMPLATE_PATH;
+	}
+
 	QString factoryPresetsDir() const
 	{
 		return dataDir() + PRESETS_PATH;
@@ -214,12 +219,16 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	// returns true if the working dir (e.g. ~/lmms) exists on disk
+	bool hasWorkingDir() const;
+
 	void addRecentlyOpenedProject( const QString & _file );
 
-	const QString & value( const QString & _class,
-					const QString & _attribute ) const;
-	void setValue( const QString & _class, const QString & _attribute,
-						const QString & _value );
+	const QString & value( const QString & cls,
+					const QString & attribute ) const;
+	void setValue( const QString & cls, const QString & attribute,
+						const QString & value );
+	void deleteValue( const QString & cls, const QString & attribute);
 
 	void loadConfigFile();
 	void saveConfigFile();
@@ -237,6 +246,9 @@ public:
 	void setGIGDir( const QString & gd );
 	void setSF2Dir( const QString & sfd );
 
+	// creates the working directory & subdirectories on disk.
+	void createWorkingDir();
+
 
 private:
 	static ConfigManager * s_instanceOfMe;
@@ -245,7 +257,7 @@ private:
 	ConfigManager( const ConfigManager & _c );
 	~ConfigManager();
 
-	
+	void upgrade_1_1_90();
 	void upgrade();
 
 	const QString m_lmmsRcFile;

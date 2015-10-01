@@ -29,6 +29,7 @@
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
+#include <QtCore/QWriteLocker>
 
 #include <samplerate.h>
 
@@ -151,26 +152,23 @@ public:
 
 	void setLoopStartFrame( f_cnt_t _start )
 	{
-		m_varLock.lockForWrite();
+		QWriteLocker writeLocker(&m_varLock);
 		m_loopStartFrame = _start;
-		m_varLock.unlock();
 	}
 
 	void setLoopEndFrame( f_cnt_t _end )
 	{
-		m_varLock.lockForWrite();
+		QWriteLocker writeLocker(&m_varLock);
 		m_loopEndFrame = _end;
-		m_varLock.unlock();
 	}
 
 	void setAllPointFrames( f_cnt_t _start, f_cnt_t _end, f_cnt_t _loopstart, f_cnt_t _loopend )
 	{
-		m_varLock.lockForWrite();
+		QWriteLocker writeLocker(&m_varLock);
 		m_startFrame = _start;
 		m_endFrame = _end;
 		m_loopStartFrame = _loopstart;
 		m_loopEndFrame = _loopend;
-		m_varLock.unlock();
 	}
 
 	inline f_cnt_t frames() const
@@ -205,16 +203,14 @@ public:
 
 	inline void setFrequency( float _freq )
 	{
-		m_varLock.lockForWrite();
+		QWriteLocker writeLocker(&m_varLock);
 		m_frequency = _freq;
-		m_varLock.unlock();
 	}
 
 	inline void setSampleRate( sample_rate_t _rate )
 	{
-		m_varLock.lockForWrite();
+		QWriteLocker writeLocker(&m_varLock);
 		m_sampleRate = _rate;
-		m_varLock.unlock();
 	}
 
 	inline const sampleFrame * data() const
@@ -222,8 +218,8 @@ public:
 		return m_data;
 	}
 
-    QString openAudioFile() const;
-    QString openAndSetAudioFile();
+	QString openAudioFile() const;
+	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
 	QString & toBase64( QString & _dst ) const;
@@ -272,8 +268,8 @@ public slots:
 private:
 	void update( bool _keep_settings = false );
 
-    void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-    void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
+	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
 
 	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
 						ch_cnt_t & _channels,

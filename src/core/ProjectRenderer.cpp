@@ -37,7 +37,7 @@
 #endif
 #include <QMutexLocker>
 
-FileEncodeDevice __fileEncodeDevices[] =
+const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
 	{ ProjectRenderer::WaveFile,
@@ -73,13 +73,13 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 	m_progress( 0 ),
 	m_abort( false )
 {
-	if( __fileEncodeDevices[_file_format].m_getDevInst == NULL )
+	if( fileEncodeDevices[_file_format].m_getDevInst == NULL )
 	{
 		return;
 	}
 
 	bool success_ful = false;
-	m_fileDev = __fileEncodeDevices[_file_format].m_getDevInst(
+	m_fileDev = fileEncodeDevices[_file_format].m_getDevInst(
 				_os.samplerate, DEFAULT_CHANNELS, success_ful,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
@@ -109,16 +109,25 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
 	int idx = 0;
-	while( __fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
+	while( fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
 	{
-		if( QString( __fileEncodeDevices[idx].m_extension ) == _ext )
+		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
-			return( __fileEncodeDevices[idx].m_fileFormat );
+			return( fileEncodeDevices[idx].m_fileFormat );
 		}
 		++idx;
 	}
 
 	return( WaveFile );	// default
+}
+
+
+
+
+QString ProjectRenderer::getFileExtensionFromFormat(
+		ExportFileFormats fmt )
+{
+	return fileEncodeDevices[fmt].m_extension;
 }
 
 
@@ -163,17 +172,20 @@ void ProjectRenderer::run()
     //skip first empty buffer
     Engine::mixer()->nextBuffer();
 
-	Song::PlayPos & pp = Engine::getSong()->getPlayPos(
+	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
 							Song::Mode_PlaySong );
 	m_progress = 0;
-	const int sl = ( Engine::getSong()->length() + 1 ) * 192;
+	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
+	tick_t startTick = exportEndpoints.first.getTicks();
+	tick_t lengthTicks = exportEndpoints.second.getTicks() - startTick;
 
+	// Continually track and emit progress percentage to listeners
 	while( Engine::getSong()->isExportDone() == false &&
 				Engine::getSong()->isExporting() == true
 							&& !m_abort )
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = pp * 100 / sl;
+		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
 		if( m_progress != nprog )
 		{
 			m_progress = nprog;

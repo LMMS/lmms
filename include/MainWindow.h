@@ -30,6 +30,8 @@
 #include <QtCore/QList>
 #include <QMainWindow>
 
+#include "SubWindow.h"
+
 class QAction;
 class QDomElement;
 class QGridLayout;
@@ -56,6 +58,9 @@ public:
 
 	int addWidgetToToolBar( QWidget * _w, int _row = -1, int _col = -1 );
 	void addSpacingToToolBar( int _size );
+
+	// wrap the widget with a window decoration and add it to the workspace
+	EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
 
 
 	///
@@ -94,7 +99,7 @@ public:
 		return m_keyMods.m_alt;
 	}
 
-	static void saveWidgetState( QWidget * _w, QDomElement & _de );
+	static void saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible = QSize(0, 0) );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 public slots:
@@ -108,6 +113,7 @@ public slots:
 	bool saveProject();
 	bool saveProjectAs();
 	bool saveProjectAsNewVersion();
+	void saveProjectAsDefaultTemplate();
 	void showSettingsDialog();
 	void aboutLMMS();
 	void help();
@@ -179,6 +185,8 @@ private:
 
 	QMenu * m_viewMenu;
 
+	ToolButton * m_metronomeToggle;
+
 private slots:
 	void browseHelp();
 	void fillTemplatesMenu();
@@ -187,6 +195,7 @@ private slots:
 	void updateRecentlyOpenedProjectsMenu();
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
+	void onToggleMetronome();
 
 
 	void autoSave();

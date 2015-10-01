@@ -27,125 +27,76 @@
 #ifndef MIDI_TIME_H
 #define MIDI_TIME_H
 
-#include "lmms_basics.h"
-#include "export.h"
+#include <QtGlobal>
 
+#include "export.h"
+#include "lmms_basics.h"
+
+// note: 1 "Tact" = 1 Measure
 const int DefaultTicksPerTact = 192;
 const int DefaultStepsPerTact = 16;
 const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
 
 
+class MeterModel;
+
+class EXPORT TimeSig
+{
+public:
+	// in a time signature,
+	// the numerator represents the number of beats in a measure.
+	// the denominator indicates which type of note represents a beat.
+	// example: 6/8 means 6 beats in a measure, where each beat has duration equal to one 8th-note.
+	TimeSig( int num, int denom );
+	TimeSig( const MeterModel &model );
+	int numerator() const;
+	int denominator() const;
+private:
+	int m_num;
+	int m_denom;
+};
+
+
 class EXPORT MidiTime
 {
 public:
-	MidiTime( const tact_t tact, const tick_t ticks ) :
-		m_ticks( tact * s_ticksPerTact + ticks )
-	{
-	}
+	MidiTime( const tact_t tact, const tick_t ticks );
+	MidiTime( const tick_t ticks = 0 );
+	MidiTime( const MidiTime& time );
 
-	MidiTime( const tick_t ticks = 0 ) :
-		m_ticks( ticks )
-	{
-	}
+	MidiTime toNearestTact() const;
+	MidiTime toAbsoluteTact() const;
 
-	MidiTime( const MidiTime& time ) :
-		m_ticks( time.m_ticks )
-	{
-	}
+	MidiTime& operator=( const MidiTime& time );
+	MidiTime& operator+=( const MidiTime& time );
+	MidiTime& operator-=( const MidiTime& time );
 
-	MidiTime toNearestTact() const
-	{
-		if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
-		{
-			return ( getTact() + 1 ) * s_ticksPerTact;
-		}
-		return getTact() * s_ticksPerTact;
-	}
+	// return the tact, rounded down and 0-based
+	tact_t getTact() const;
+	// return the tact, rounded up and 0-based
+	tact_t nextFullTact() const;
 
-	MidiTime toAbsoluteTact() const
-	{
-		return getTact() * s_ticksPerTact;
-	}
+	void setTicks( tick_t ticks );
+	tick_t getTicks() const;
 
-	MidiTime& operator=( const MidiTime& time )
-	{
-		m_ticks = time.m_ticks;
-		return *this;
-	}
+	operator int() const;
 
-	MidiTime& operator+=( const MidiTime& time )
-	{
-		m_ticks += time.m_ticks;
-		return *this;
-	}
-
-	MidiTime& operator-=( const MidiTime& time )
-	{
-		m_ticks -= time.m_ticks;
-		return *this;
-	}
-
-	tact_t getTact() const
-	{
-		return m_ticks / s_ticksPerTact;
-	}
-
-	tact_t nextFullTact() const
-	{
-		if( m_ticks % s_ticksPerTact == 0 )
-		{
-			return m_ticks / s_ticksPerTact;
-		}
-		return m_ticks / s_ticksPerTact + 1;
-	}
-
-	void setTicks( tick_t ticks )
-	{
-		m_ticks = ticks;
-	}
-
-	tick_t getTicks() const
-	{
-		return m_ticks;
-	}
-
-	operator int() const
-	{
-		return m_ticks;
-	}
+	tick_t ticksPerBeat( const TimeSig &sig ) const;
+	// Remainder ticks after bar is removed
+	tick_t getTickWithinBar( const TimeSig &sig ) const;
+	// Returns the beat position inside the bar, 0-based
+	tick_t getBeatWithinBar( const TimeSig &sig ) const;
+	// Remainder ticks after bar and beat are removed
+	tick_t getTickWithinBeat( const TimeSig &sig ) const;
 
 	// calculate number of frame that are needed this time
-	f_cnt_t frames( const float framesPerTick ) const
-	{
-		if( m_ticks >= 0 )
-		{
-			return static_cast<f_cnt_t>( m_ticks * framesPerTick );
-		}
-		return 0;
-	}
+	f_cnt_t frames( const float framesPerTick ) const;
 
-	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick )
-	{
-		return MidiTime( static_cast<int>( frames / framesPerTick ) );
-	}
-
-
-	static tick_t ticksPerTact()
-	{
-		return s_ticksPerTact;
-	}
-
-	static int stepsPerTact()
-	{
-		int steps = ticksPerTact() / DefaultBeatsPerTact;
-		return qMax( 1, steps );
-	}
-
-	static void setTicksPerTact( tick_t _tpt )
-	{
-		s_ticksPerTact = _tpt;
-	}
-
+	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
+	static tick_t ticksPerTact();
+	static tick_t ticksPerTact( const TimeSig &sig );
+	static int stepsPerTact();
+	static void setTicksPerTact( tick_t tpt );
 
 private:
 	tick_t m_ticks;

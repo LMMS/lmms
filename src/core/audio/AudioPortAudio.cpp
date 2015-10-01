@@ -389,7 +389,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioPortAudio::name(), _parent )
+	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );

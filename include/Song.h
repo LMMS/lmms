@@ -25,6 +25,8 @@
 #ifndef SONG_H
 #define SONG_H
 
+#include <utility>
+
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
@@ -111,22 +113,18 @@ public:
 
 	inline int ticksPerTact() const
 	{
-		return DefaultTicksPerTact *
-				m_timeSigModel.getNumerator() /
-					 m_timeSigModel.getDenominator();
+		return MidiTime::ticksPerTact(m_timeSigModel);
 	}
 
 	// Returns the beat position inside the bar, 0-based
 	inline int getBeat() const
 	{
-		return ( currentTick() - currentTact() * ticksPerTact() ) /
-			( ticksPerTact() / m_timeSigModel.getNumerator() );
+		return getPlayPos().getBeatWithinBar(m_timeSigModel);
 	}
 	// the remainder after bar and beat are removed
 	inline int getBeatTicks() const
 	{
-		return 	( currentTick() - currentTact() * ticksPerTact() ) %
-			( ticksPerTact() / m_timeSigModel.getNumerator() );
+		return getPlayPos().getTickWithinBeat(m_timeSigModel);
 	}
 	inline int getTicks() const
 	{
@@ -135,10 +133,6 @@ public:
 	inline f_cnt_t getFrames() const
 	{
 		return currentFrame();
-	}
-	inline bool isTempoAutomated()
-	{
-		return m_tempoModel.isAutomated();
 	}
 	inline bool isPaused() const
 	{
@@ -171,6 +165,7 @@ public:
 	}
 
 	bool isExportDone() const;
+	std::pair<MidiTime, MidiTime> getExportEndpoints() const;
 
 	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{
@@ -185,6 +180,14 @@ public:
 	inline PlayPos & getPlayPos( PlayModes pm )
 	{
 		return m_playPos[pm];
+	}
+	inline const PlayPos & getPlayPos( PlayModes pm ) const
+	{
+		return m_playPos[pm];
+	}
+	inline const PlayPos & getPlayPos() const
+	{
+		return getPlayPos(m_playMode);
 	}
 
 	void updateLength();
@@ -320,6 +323,8 @@ private:
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
+	void removeAllControllers();
+
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -373,6 +378,8 @@ signals:
 	void lengthChanged( int tacts );
 	void tempoChanged( bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
+	void controllerAdded( Controller * );
+	void controllerRemoved( Controller * );
 
 } ;
 

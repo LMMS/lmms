@@ -416,7 +416,7 @@ bool Song::isExportDone() const
 				m_playPos[Mode_PlaySong].m_timeLine->loopEnd().getTicks();
 	}
 
-	if( m_exportLoop)
+	if( m_exportLoop )
 	{
 		return m_exporting == true &&
 			m_playPos[Mode_PlaySong].getTicks() >= 
@@ -427,6 +427,26 @@ bool Song::isExportDone() const
 		return m_exporting == true &&
 			m_playPos[Mode_PlaySong].getTicks() >= 
 				( length() + 1 ) * ticksPerTact();
+	}
+}
+
+std::pair<MidiTime, MidiTime> Song::getExportEndpoints() const
+{
+	if ( m_renderBetweenMarkers )
+	{
+		return std::pair<MidiTime, MidiTime>(
+			m_playPos[Mode_PlaySong].m_timeLine->loopBegin(),
+			m_playPos[Mode_PlaySong].m_timeLine->loopEnd()
+		);
+	}
+	else if ( m_exportLoop )
+	{
+		return std::pair<MidiTime, MidiTime>( MidiTime(0, 0), MidiTime(m_length, 0) );
+	}
+	else
+	{
+		// if not exporting as a loop, we leave one bar of padding at the end of the song to accomodate reverb, etc.
+		return std::pair<MidiTime, MidiTime>( MidiTime(0, 0), MidiTime(m_length+1, 0) );
 	}
 }
 
@@ -808,11 +828,7 @@ void Song::clearProject()
 		gui->getProjectNotes()->clear();
 	}
 
-	// Move to function
-	while( !m_controllers.empty() )
-	{
-		delete m_controllers.last();
-	}
+	removeAllControllers();
 
 	emit dataChanged();
 
@@ -1195,6 +1211,19 @@ void Song::restoreControllerStates( const QDomElement & element )
 }
 
 
+
+void Song::removeAllControllers()
+{
+	for (int i = 0; i < m_controllers.size(); ++i)
+	{
+		delete m_controllers.at(i);
+	}
+
+	m_controllers.clear();
+}
+
+
+
 void Song::exportProjectTracks()
 {
 	exportProject( true );
@@ -1228,9 +1257,9 @@ void Song::exportProject( bool multiExport )
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( __fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats )
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats )
 		{
-			types << tr( __fileEncodeDevices[idx].m_description );
+			types << tr( ProjectRenderer::fileEncodeDevices[idx].m_description );
 			++idx;
 		}
 		efd.setNameFilters( types );
@@ -1245,7 +1274,7 @@ void Song::exportProject( bool multiExport )
 			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 			baseFilename = tr( "untitled" );
 		}
-		efd.selectFile( baseFilename + __fileEncodeDevices[0].m_extension );
+		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
@@ -1363,12 +1392,14 @@ void Song::setModified()
 
 
 
-void Song::addController( Controller * c )
+void Song::addController( Controller * controller )
 {
-	if( c != NULL && m_controllers.contains( c ) == false ) 
+	if( controller && !m_controllers.contains( controller ) )
 	{
-		m_controllers.append( c );
-		emit dataChanged();
+		m_controllers.append( controller );
+		emit controllerAdded( controller );
+
+		this->setModified();
 	}
 }
 
@@ -1382,11 +1413,10 @@ void Song::removeController( Controller * controller )
 	{
 		m_controllers.remove( index );
 
-		if( Engine::getSong() )
-		{
-			Engine::getSong()->setModified();
-		}
-		emit dataChanged();
+		emit controllerRemoved( controller );
+		delete controller;
+
+		this->setModified();
 	}
 }
 

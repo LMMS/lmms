@@ -228,7 +228,7 @@ void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 
 void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & dom_parent)
 {
-	MainWindow::saveWidgetState(parentWidget(), dom_parent);
+	MainWindow::saveWidgetState(parentWidget(), dom_parent, QSize( 640, 400 ));
 }
 
 
@@ -280,6 +280,8 @@ void AutomationEditor::updateAfterPatternChange()
 	m_maxLevel = m_pattern->firstObject()->maxValue<float>();
 	m_step = m_pattern->firstObject()->step<float>();
 	m_scrollLevel = ( m_minLevel + m_maxLevel ) / 2;
+
+	m_tensionModel->setValue( m_pattern->getTension() );
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
 	// of levels and so on...)
@@ -1676,8 +1678,11 @@ void AutomationEditor::setProgressionType(int type)
 
 void AutomationEditor::setTension()
 {
-	m_pattern->setTension( QString::number( m_tensionModel->value() ) );
-	update();
+	if ( m_pattern )
+	{
+		m_pattern->setTension( QString::number( m_tensionModel->value() ) );
+		update();
+	}
 }
 
 
@@ -2019,9 +2024,12 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"current pattern." ) );
 
 	// Edit mode buttons
+	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
+
 	ActionGroup* editModeGroup = new ActionGroup(this);
 	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
 	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
+	drawAction->setChecked(true);
 
 	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
 	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
@@ -2064,11 +2072,23 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
-	// Progression type buttons
+	editActionsToolBar->addAction(drawAction);
+	editActionsToolBar->addAction(eraseAction);
+//	editActionsToolBar->addAction(m_selectButton);
+//	editActionsToolBar->addAction(m_moveButton);
+	editActionsToolBar->addAction(m_flipXAction);
+	editActionsToolBar->addAction(m_flipYAction);
+
+
+	// Interpolation actions
+	DropToolBar *interpolationActionsToolBar = addDropToolBarToTop(tr("Interpolation controls"));
+
 	ActionGroup* progression_type_group = new ActionGroup(this);
 
 	m_discreteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_discrete"), tr("Discrete progression"));
+	m_discreteAction->setChecked(true);
+
 	m_linearAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_linear"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
@@ -2106,14 +2126,25 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"object will change in a smooth curve and ease in to "
 			"the peaks and valleys." ) );
 
+	interpolationActionsToolBar->addSeparator();
+	interpolationActionsToolBar->addAction(m_discreteAction);
+	interpolationActionsToolBar->addAction(m_linearAction);
+	interpolationActionsToolBar->addAction(m_cubicHermiteAction);
+	interpolationActionsToolBar->addSeparator();
+	interpolationActionsToolBar->addWidget( new QLabel( tr("Tension: "), interpolationActionsToolBar ));
+	interpolationActionsToolBar->addWidget( m_tensionKnob );
+
+
+
 	// Copy paste buttons
+	/*DropToolBar *copyPasteActionsToolBar = addDropToolBarToTop(tr("Copy paste actions"));*/
 
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
 					tr("Cut selected values (Ctrl+X)"), this);
 	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
 					tr("Copy selected values (Ctrl+C)"), this);
 	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste values from clipboard Ctrl+V)"), this);
+					tr("Paste values from clipboard (Ctrl+V)"), this);
 
 	cutAction->setWhatsThis(
 		tr( "Click here and selected values will be cut into the "
@@ -2135,12 +2166,26 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	connect(copyAction,  SIGNAL(triggered()), m_editor, SLOT(copySelectedValues()));
 	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteValues()));
 
-	// Zoom controls
+	//	Select is broken
+	//	copyPasteActionsToolBar->addAction( cutAction );
+	//	copyPasteActionsToolBar->addAction( copyAction );
+	//	copyPasteActionsToolBar->addAction( pasteAction );
 
-	QLabel * zoom_x_label = new QLabel( m_toolBar );
+
+	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
+
+
+	addToolBarBreak();
+
+
+	// Zoom controls
+	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
+
+	QLabel * zoom_x_label = new QLabel( zoomToolBar );
 	zoom_x_label->setPixmap( embed::getIconPixmap( "zoom_x" ) );
 
-	m_zoomingXComboBox = new ComboBox( m_toolBar );
+	m_zoomingXComboBox = new ComboBox( zoomToolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 
 	for( int i = 0; i < 6; ++i )
@@ -2155,10 +2200,10 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			m_editor, SLOT( zoomingXChanged() ) );
 
 
-	QLabel * zoom_y_label = new QLabel( m_toolBar );
+	QLabel * zoom_y_label = new QLabel( zoomToolBar );
 	zoom_y_label->setPixmap( embed::getIconPixmap( "zoom_y" ) );
 
-	m_zoomingYComboBox = new ComboBox( m_toolBar );
+	m_zoomingYComboBox = new ComboBox( zoomToolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
 
 	m_editor->m_zoomingYModel.addItem( "Auto" );
@@ -2173,9 +2218,16 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	connect( &m_editor->m_zoomingYModel, SIGNAL( dataChanged() ),
 			m_editor, SLOT( zoomingYChanged() ) );
 
+	zoomToolBar->addWidget( zoom_x_label );
+	zoomToolBar->addWidget( m_zoomingXComboBox );
+	zoomToolBar->addSeparator();
+	zoomToolBar->addWidget( zoom_y_label );
+	zoomToolBar->addWidget( m_zoomingYComboBox );
+
 
 
 	// Quantization controls
+	DropToolBar *quantizationActionsToolBar = addDropToolBarToTop(tr("Quantization controls"));
 
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
@@ -2185,40 +2237,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 
+	quantizationActionsToolBar->addWidget( quantize_lbl );
+	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 
-	m_toolBar->addSeparator();;
-	m_toolBar->addAction(drawAction);
-	m_toolBar->addAction(eraseAction);
-//	m_toolBar->addAction(m_selectButton);
-//	m_toolBar->addAction(m_moveButton);
-	m_toolBar->addAction(m_flipXAction);
-	m_toolBar->addAction(m_flipYAction);
-	m_toolBar->addSeparator();
-	m_toolBar->addAction(m_discreteAction);
-	m_toolBar->addAction(m_linearAction);
-	m_toolBar->addAction(m_cubicHermiteAction);
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( new QLabel( tr("Tension: "), m_toolBar ));
-	m_toolBar->addWidget( m_tensionKnob );
-	m_toolBar->addSeparator();
-//	Select is broken
-//	m_toolBar->addAction( cutAction );
-//	m_toolBar->addAction( copyAction );
-//	m_toolBar->addAction( pasteAction );
-	m_toolBar->addSeparator();
-	m_editor->m_timeLine->addToolButtons(m_toolBar);
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( zoom_x_label );
-	m_toolBar->addWidget( m_zoomingXComboBox );
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( zoom_y_label );
-	m_toolBar->addWidget( m_zoomingYComboBox );
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( quantize_lbl );
-	m_toolBar->addWidget( m_quantizeComboBox );
-
-	drawAction->setChecked(true);
-	m_discreteAction->setChecked(true);
 
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -2260,12 +2281,15 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	{
 	case AutomationPattern::DiscreteProgression:
 		m_discreteAction->setChecked(true);
+		m_tensionKnob->setEnabled(false);
 		break;
 	case AutomationPattern::LinearProgression:
 		m_linearAction->setChecked(true);
+		m_tensionKnob->setEnabled(false);
 		break;
 	case AutomationPattern::CubicHermiteProgression:
 		m_cubicHermiteAction->setChecked(true);
+		m_tensionKnob->setEnabled(true);
 		break;
 	}
 

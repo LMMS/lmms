@@ -47,7 +47,6 @@
 #endif
 
 
-QPixmap * TimeLineWidget::s_timeLinePixmap = NULL;
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
 QPixmap * TimeLineWidget::s_loopPointBeginPixmap = NULL;
 QPixmap * TimeLineWidget::s_loopPointEndPixmap = NULL;
@@ -73,11 +72,6 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerTact;
 
-	if( s_timeLinePixmap == NULL )
-	{
-		s_timeLinePixmap = new QPixmap( embed::getIconPixmap(
-								"timeline" ) );
-	}
 	if( s_posMarkerPixmap == NULL )
 	{
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
@@ -96,7 +90,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
-	setFixedHeight( s_timeLinePixmap->height() );
+	setFixedHeight( 18 );
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
@@ -250,10 +244,18 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppt ) / MidiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
-	p.setPen( QColor( 192, 192, 192 ) );
+	QColor lineColor( 192, 192, 192 );
+	QColor tactColor( lineColor.darker( 120 ) );
+
+	// Set font to half of the widgets size (in pixels)
+	QFont font = p.font();
+	font.setPixelSize( this->height() * 0.5 );
+	p.setFont( font );
+
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
 		const int cx = x + qRound( i * m_ppt );
+		p.setPen( lineColor );
 		p.drawLine( cx, 5, cx, height() - 6 );
 		++tact_num;
 		if( ( tact_num - 1 ) %
@@ -261,9 +263,10 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 				MidiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
 			const QString s = QString::number( tact_num );
+			p.setPen( tactColor );
 			p.drawText( cx + qRound( ( m_ppt - p.fontMetrics().
 							width( s ) ) / 2 ),
-				height() - p.fontMetrics().height() / 2, s );
+				height() - p.fontMetrics().ascent() / 2, s );
 		}
 	}
 

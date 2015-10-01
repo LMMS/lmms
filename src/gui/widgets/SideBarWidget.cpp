@@ -55,21 +55,22 @@ SideBarWidget::~SideBarWidget()
 
 void SideBarWidget::paintEvent( QPaintEvent * )
 {
-	const int TITLE_FONT_HEIGHT = 13;
-
 	QPainter p( this );
 	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
 
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont( pointSize<TITLE_FONT_HEIGHT>( f ) );
+	f.setUnderline( true );
+	f.setPointSize( f.pointSize() + 2 );
+	p.setFont( f );
 
 	p.setPen( palette().highlightedText().color() );
 
 	const int tx = m_icon.width()+4;
-	const int ty = 2+TITLE_FONT_HEIGHT;
+
+	QFontMetrics metrics( f );
+	const int ty = metrics.ascent();
 	p.drawText( tx, ty, m_title );
-	p.drawLine( tx, ty+4, width()-4, ty+4 );
 
 	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
 }

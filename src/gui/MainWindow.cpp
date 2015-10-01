@@ -24,48 +24,49 @@
 
 #include "MainWindow.h"
 
-#include <QDomElement>
-#include <QUrl>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QDomElement>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QSplitter>
+#include <QUrl>
 #include <QWhatsThis>
 
-#include "lmmsversion.h"
-#include "GuiApplication.h"
+#include "AboutDialog.h"
+#include "AudioDummy.h"
+#include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "SongEditor.h"
-#include "Song.h"
-#include "PianoRoll.h"
+#include "ConfigManager.h"
+#include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
-#include "FxMixerView.h"
-#include "InstrumentTrack.h"
-#include "PianoView.h"
-#include "AboutDialog.h"
-#include "ControllerRackView.h"
 #include "FileBrowser.h"
-#include "PluginBrowser.h"
-#include "SideBar.h"
-#include "ConfigManager.h"
+#include "FileDialog.h"
+#include "FxMixerView.h"
+#include "GuiApplication.h"
+#include "InstrumentTrack.h"
+#include "lmmsversion.h"
 #include "Mixer.h"
+#include "PianoRoll.h"
+#include "PianoView.h"
+#include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
+#include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "SetupDialog.h"
-#include "AudioDummy.h"
-#include "ToolPlugin.h"
-#include "ToolButton.h"
-#include "ProjectJournal.h"
-#include "AutomationEditor.h"
+#include "SideBar.h"
+#include "Song.h"
+#include "SongEditor.h"
+#include "SubWindow.h"
 #include "templates.h"
-#include "FileDialog.h"
+#include "ToolButton.h"
+#include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
 
@@ -77,7 +78,8 @@ MainWindow::MainWindow() :
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
-	m_viewMenu( NULL )
+	m_viewMenu( NULL ),
+	m_metronomeToggle( 0 )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -243,6 +245,13 @@ void MainWindow::finalize()
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
+	m_templatesMenu = new QMenu( tr("New from template"), this );
+	connect( m_templatesMenu, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
+	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
+		 SLOT( createNewProjectFromTemplate( QAction * ) ) );
+
+	project_menu->addMenu(m_templatesMenu);
+
 	project_menu->addAction( embed::getIconPixmap( "project_open" ),
 					tr( "&Open..." ),
 					this, SLOT( openProject() ),
@@ -268,6 +277,10 @@ void MainWindow::finalize()
 					tr( "Save as New &Version" ),
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
+
+	project_menu->addAction( tr( "Save as default template" ),
+				     this, SLOT( saveProjectAsDefaultTemplate() ) );
+
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
@@ -381,12 +394,6 @@ void MainWindow::finalize()
 				tr( "Create new project from template" ),
 					this, SLOT( emptySlot() ),
 							m_toolBar );
-
-	m_templatesMenu = new QMenu( project_new_from_template );
-	connect( m_templatesMenu, SIGNAL( aboutToShow() ),
-					this, SLOT( fillTemplatesMenu() ) );
-	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
-		this, SLOT( createNewProjectFromTemplate( QAction * ) ) );
 	project_new_from_template->setMenu( m_templatesMenu );
 	project_new_from_template->setPopupMode( ToolButton::InstantPopup );
 
@@ -424,6 +431,13 @@ void MainWindow::finalize()
 					this, SLOT( enterWhatsThisMode() ),
 								m_toolBar );
 
+	m_metronomeToggle = new ToolButton(
+				embed::getIconPixmap( "metronome" ),
+				tr( "Toggle metronome" ),
+				this, SLOT( onToggleMetronome() ),
+							m_toolBar );
+	m_metronomeToggle->setCheckable(true);
+	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -433,6 +447,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( project_save, 0, 5 );
 	m_toolBarLayout->addWidget( project_export, 0, 6 );
 	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
+	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 8 );
 
 
 	// window-toolbar
@@ -560,7 +575,7 @@ void MainWindow::finalize()
 			gui->songEditor()
 	})
 	{
-		QMdiSubWindow* window = workspace()->addSubWindow(widget);
+		QMdiSubWindow* window = addWindowedWidget(widget);
 		window->setWindowIcon(widget->windowIcon());
 		window->setAttribute(Qt::WA_DeleteOnClose, false);
 		window->resize(widget->sizeHint());
@@ -568,7 +583,7 @@ void MainWindow::finalize()
 
 	gui->automationEditor()->parentWidget()->hide();
 	gui->getBBEditor()->parentWidget()->move( 610, 5 );
-	gui->getBBEditor()->parentWidget()->show();
+	gui->getBBEditor()->parentWidget()->hide();
 	gui->pianoRoll()->parentWidget()->move(5, 5);
 	gui->pianoRoll()->parentWidget()->hide();
 	gui->songEditor()->parentWidget()->move(5, 5);
@@ -607,7 +622,15 @@ void MainWindow::addSpacingToToolBar( int _size )
 								7, _size );
 }
 
-
+SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
+{
+	// wrap the widget in our own *custom* window that patches some errors in QMdiSubWindow
+	SubWindow *win = new SubWindow(m_workspace->viewport(), windowFlags);
+	win->setAttribute(Qt::WA_DeleteOnClose);
+	win->setWidget(w);
+	m_workspace->addSubWindow(win);
+	return win;
+}
 
 
 void MainWindow::resetWindowTitle()
@@ -678,28 +701,32 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
+void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible )
 {
+	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 	{
 		_w = _w->parentWidget();
 	}
 
-	_de.setAttribute( "visible", _w->isVisible() );
+	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that 
+	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
+	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
+	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
+
+	bool visible = _w->isVisible();
+	_de.setAttribute( "visible", visible );
 	_de.setAttribute( "minimized", _w->isMinimized() );
 	_de.setAttribute( "maximized", _w->isMaximized() );
 
-	bool maxed = _w->isMaximized();
-	bool mined = _w->isMinimized();
-	if( mined || maxed ) { _w->showNormal(); }
+	_de.setAttribute( "x", normalGeom.x() );
+	_de.setAttribute( "y", normalGeom.y() );
 
-	_de.setAttribute( "x", _w->x() );
-	_de.setAttribute( "y", _w->y() );
-	_de.setAttribute( "width", _w->width() );
-	_de.setAttribute( "height", _w->height() );
-	if( maxed ) { _w->showMaximized(); }
-	if( mined ) { _w->showMinimized(); }
+	QSize sizeToStore = visible ? normalGeom.size() : sizeIfInvisible;
+	_de.setAttribute( "width", sizeToStore.width() );
+	_de.setAttribute( "height", sizeToStore.height() );
 }
 
 
@@ -713,21 +740,30 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( 100, _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
+		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
 		{
 			_w = _w->parentWidget();
 		}
+		// first restore the window, as attempting to resize a maximized window causes graphics glitching
+		_w->setWindowState( _w->windowState() & ~(Qt::WindowMaximized | Qt::WindowMinimized) );
 
 		_w->resize( r.size() );
 		_w->move( r.topLeft() );
+
+		// set the window to its correct minimized/maximized/restored state
+		Qt::WindowStates flags = _w->windowState();
+		flags = _de.attribute( "minimized" ).toInt() ?
+				( flags | Qt::WindowMinimized ) :
+				( flags & ~Qt::WindowMinimized );
+		flags = _de.attribute( "maximized" ).toInt() ?
+				( flags | Qt::WindowMaximized ) :
+				( flags & ~Qt::WindowMaximized );
+		_w->setWindowState( flags );
+
 		_w->setVisible( _de.attribute( "visible" ).toInt() );
-		_w->setWindowState( _de.attribute( "minimized" ).toInt() ?
-				( _w->windowState() | Qt::WindowMinimized ) :
-				( _w->windowState() & ~Qt::WindowMinimized ) );
-		_w->setWindowState( _de.attribute( "maximized" ).toInt() ?
-				( _w->windowState() | Qt::WindowMaximized ) :
-				( _w->windowState() & ~Qt::WindowMaximized ) );
 	}
 }
 
@@ -752,14 +788,6 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
-	QString default_template = ConfigManager::inst()->userTemplateDir()
-						+ "default.mpt";
-
-	//if we dont have a user default template, make one
-	if( !QFile::exists( default_template ) )
-	{
-		Engine::getSong()->saveProjectFile( default_template );
-	}
 }
 
 
@@ -767,14 +795,16 @@ void MainWindow::createNewProject()
 
 void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
-	if( m_templatesMenu != NULL && mayChangeProject(true) )
+	if( m_templatesMenu && mayChangeProject(true) )
 	{
-		QString dir_base = m_templatesMenu->actions().indexOf( _idx )
-						>= m_custom_templates_count ?
-				ConfigManager::inst()->factoryProjectsDir() :
-				ConfigManager::inst()->userProjectsDir();
+		int indexOfTemplate = m_templatesMenu->actions().indexOf( _idx );
+		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
+		QString dirBase =  isFactoryTemplate ?
+				ConfigManager::inst()->factoryTemplatesDir() :
+				ConfigManager::inst()->userTemplateDir();
+
 		Engine::getSong()->createNewProjectFromTemplate(
-			dir_base + "templates/" + _idx->text() + ".mpt" );
+			dirBase + _idx->text() + ".mpt" );
 	}
 }
 
@@ -792,11 +822,11 @@ void MainWindow::openProject()
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-            Engine::getSong()->stop();
+			Song *song = Engine::getSong();
 
+			song->stop();
 			setCursor( Qt::WaitCursor );
-			Engine::getSong()->loadProject(
-						ofd.selectedFiles()[0] );
+			song->loadProject( ofd.selectedFiles()[0] );
 			setCursor( Qt::ArrowCursor );
 		}
 	}
@@ -809,10 +839,24 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 {
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
+
+//	The file history goes 30 deep but we only show the 15
+//	most recent ones that we can open.
+	int shownInMenu = 0;
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
-		m_recentlyOpenedProjectsMenu->addAction(
-				embed::getIconPixmap( "project_file" ), *it );
+		QFileInfo recentFile( *it );
+		if ( recentFile.exists() && 
+				*it != ConfigManager::inst()->recoveryFile() )
+		{
+			m_recentlyOpenedProjectsMenu->addAction(
+					embed::getIconPixmap( "project_file" ), *it );
+			shownInMenu++;
+			if( shownInMenu >= 15 )
+			{
+				return;
+			}
+		}
 	}
 }
 
@@ -899,6 +943,29 @@ bool MainWindow::saveProjectAsNewVersion()
 		Engine::getSong()->guiSaveProjectAs( fileName );
 		return true;
 	}
+}
+
+
+
+
+void MainWindow::saveProjectAsDefaultTemplate()
+{
+	QString defaultTemplate = ConfigManager::inst()->userTemplateDir() + "default.mpt";
+
+	QFileInfo fileInfo(defaultTemplate);
+	if (fileInfo.exists())
+	{
+		if (QMessageBox::warning(this,
+					 tr("Overwrite default template?"),
+					 tr("This will overwrite your current default template."),
+					 QMessageBox::Ok,
+					 QMessageBox::Cancel) != QMessageBox::Ok)
+		{
+			return;
+		}
+	}
+
+	Engine::getSong()->saveProjectFile( defaultTemplate );
 }
 
 
@@ -1154,6 +1221,17 @@ void MainWindow::updateConfig( QAction * _who )
 }
 
 
+
+void MainWindow::onToggleMetronome()
+{
+	Mixer * mixer = Engine::mixer();
+
+	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
+}
+
+
+
+
 void MainWindow::toggleControllerRack()
 {
 	toggleWindow( gui->getControllerRackView() );
@@ -1311,7 +1389,7 @@ void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
-	QDir user_d( ConfigManager::inst()->userProjectsDir() + "templates" );
+	QDir user_d( ConfigManager::inst()->userTemplateDir() );
 	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
 						QDir::Files | QDir::Readable );
 

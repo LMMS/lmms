@@ -13,6 +13,7 @@
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS
 #cmakedefine LMMS_HAVE_PORTAUDIO
+#cmakedefine LMMS_HAVE_SOUNDIO
 #cmakedefine LMMS_HAVE_PULSEAUDIO
 #cmakedefine LMMS_HAVE_SDL
 #cmakedefine LMMS_HAVE_STK
@@ -27,10 +28,6 @@
 #cmakedefine LMMS_HAVE_SEMAPHORE_H
 #cmakedefine LMMS_HAVE_SYS_SHM_H
 #cmakedefine LMMS_HAVE_SYS_TIME_H
-#cmakedefine LMMS_HAVE_SYS_WAIT_H
-#cmakedefine LMMS_HAVE_SYS_SELECT_H
-#cmakedefine LMMS_HAVE_STDARG_H
-#cmakedefine LMMS_HAVE_SIGNAL_H
 #cmakedefine LMMS_HAVE_SCHED_H
 #cmakedefine LMMS_HAVE_SYS_SOUNDCARD_H
 #cmakedefine LMMS_HAVE_SOUNDCARD_H

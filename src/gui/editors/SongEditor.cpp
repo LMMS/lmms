@@ -111,7 +111,7 @@ SongEditor::SongEditor( Song * _song ) :
 	// add some essential widgets to global tool-bar
 	QWidget * tb = gui->mainWindow()->toolBar();
 
-	gui->mainWindow()->addSpacingToToolBar( 10 );
+	gui->mainWindow()->addSpacingToToolBar( 40 );
 
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
@@ -265,7 +265,7 @@ SongEditor::~SongEditor()
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
-	MainWindow::saveWidgetState(parentWidget(), element);
+	MainWindow::saveWidgetState(parentWidget(), element, QSize( 640, 400 ));
 }
 
 void SongEditor::loadSettings( const QDomElement& element )
@@ -382,7 +382,7 @@ void SongEditor::wheelEvent( QWheelEvent * _we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( gui->mainWindow()->isShiftPressed() == true )
+	else if( gui->mainWindow()->isShiftPressed() == true || _we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
 							_we->delta() / 30 );
@@ -415,7 +415,9 @@ void SongEditor::closeEvent( QCloseEvent * _ce )
 
 void SongEditor::setMasterVolume( int _new_val )
 {
-	if( m_mvsStatus->isVisible() == false && m_song->m_loadingProject == false
+	updateMasterVolumeFloat( _new_val );
+
+	if( !m_mvsStatus->isVisible() && !m_song->m_loadingProject
 					&& m_masterVolumeSlider->showStatus() )
 	{
 		m_mvsStatus->moveGlobal( m_masterVolumeSlider,
@@ -630,6 +632,18 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
+	m_playAction->setWhatsThis(
+				tr("Click here, if you want to play your whole song. "
+				   "Playing will be started at the song-position-marker (green). "
+				   "You can also move it while playing."));
+	m_stopAction->setWhatsThis(
+				tr("Click here, if you want to stop playing of your song. "
+				   "The song-position-marker will be set to the start of your song."));
+
+
+	// Track actions
+	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
+
 	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
 									 tr("Add beat/bassline"), this);
 
@@ -643,6 +657,14 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_addSampleTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addSampleTrack()));
 	connect(m_addAutomationTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addAutomationTrack()));
 
+	trackActionsToolBar->addAction( m_addBBTrackAction );
+	trackActionsToolBar->addAction( m_addSampleTrackAction );
+	trackActionsToolBar->addAction( m_addAutomationTrackAction );
+
+
+	// Edit actions
+	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
+
 	ActionGroup* editModeGroup = new ActionGroup(this);
 	m_drawModeAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode"));
 	m_selectModeAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Edit mode (select and move)"));
@@ -652,15 +674,14 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	connect(m_drawModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeDraw()));
 	connect(m_selectModeAction, SIGNAL(triggered()), m_editor, SLOT(setEditModeSelect()));
 
+	editActionsToolBar->addAction( m_drawModeAction );
+	editActionsToolBar->addAction( m_selectModeAction );
 
-	m_playAction->setWhatsThis(
-				tr("Click here, if you want to play your whole song. "
-				   "Playing will be started at the song-position-marker (green). "
-				   "You can also move it while playing."));
-	m_stopAction->setWhatsThis(
-				tr("Click here, if you want to stop playing of your song. "
-				   "The song-position-marker will be set to the start of your song."));
+	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
+
+	DropToolBar *zoomToolBar = addDropToolBarToTop(tr("Zoom controls"));
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -671,19 +692,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
 
-
-	m_toolBar->addSeparator();
-	m_toolBar->addAction( m_addBBTrackAction );
-	m_toolBar->addAction( m_addSampleTrackAction );
-	m_toolBar->addAction( m_addAutomationTrackAction );
-	m_toolBar->addSeparator();
-	m_toolBar->addAction( m_drawModeAction );
-	m_toolBar->addAction( m_selectModeAction );
-	m_toolBar->addSeparator();
-	m_editor->m_timeLine->addToolButtons(m_toolBar);
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( zoom_lbl );
-	m_toolBar->addWidget( m_zoomingComboBox );
+	zoomToolBar->addWidget( zoom_lbl );
+	zoomToolBar->addWidget( m_zoomingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 }
