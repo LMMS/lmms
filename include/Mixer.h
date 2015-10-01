@@ -400,8 +400,6 @@ private:
 
 	fpp_t m_framesPerPeriod;
 
-	sampleFrame * m_workingBuf;
-
 	sampleFrame * m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
 	f_cnt_t m_inputBufferSize[2];
