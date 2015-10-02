@@ -35,6 +35,7 @@
 #include "ToolTip.h"
 #include "Song.h"
 
+#include "BufferManager.h"
 #include "ConfigManager.h"
 
 
@@ -53,7 +54,7 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
-	Engine::mixer()->clearAudioBuffer( m_buffer, frames );
+	BufferManager::clear( m_buffer, frames );
 
 
 	ToolTip::add( this, tr( "click to enable/disable visualization of "

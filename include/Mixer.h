@@ -315,16 +315,6 @@ public:
 		m_playHandleRemovalMutex.unlock();
 	}
 
-	// audio-buffer-mgm
-	static void clearAudioBuffer( sampleFrame * _ab,
-						const f_cnt_t _frames,
-						const f_cnt_t _offset = 0 );
-#ifndef LMMS_DISABLE_SURROUND
-	static void clearAudioBuffer( surroundSampleFrame * _ab,
-						const f_cnt_t _frames,
-						const f_cnt_t _offset = 0 );
-#endif
-
 	static float peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames );
 	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
 

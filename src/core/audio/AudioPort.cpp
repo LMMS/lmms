@@ -111,9 +111,9 @@ void AudioPort::doProcessing()
 
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
-	m_portBuffer = BufferManager::acquire(); // get buffer for processing
-
-	Engine::mixer()->clearAudioBuffer( m_portBuffer, fpp ); // clear the audioport buffer so we can use it
+	// get a buffer for processing and clear it
+	m_portBuffer = BufferManager::acquire();
+	BufferManager::clear( m_portBuffer, fpp );
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	foreach( PlayHandle * ph, m_playHandles ) // now we mix all playhandle buffers into the audioport buffer

@@ -81,7 +81,7 @@ Mixer::Mixer( bool renderOnly ) :
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		clearAudioBuffer( m_inputBuffer[i], m_inputBufferSize[i] );
+		BufferManager::clear( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
 	// determine FIFO size and number of frames per period
@@ -127,7 +127,7 @@ Mixer::Mixer( bool renderOnly ) :
 			MemoryHelper::alignedMalloc( m_framesPerPeriod *
 						sizeof( surroundSampleFrame ) );
 
-		clearAudioBuffer( m_readBuf, m_framesPerPeriod );
+		BufferManager::clear( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
 
@@ -389,7 +389,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_readBuf = m_bufferPool[m_readBuffer];
 
 	// clear last audio-buffer
-	clearAudioBuffer( m_writeBuf, m_framesPerPeriod );
+	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
 	FxMixer * fxMixer = Engine::fxMixer();
@@ -482,25 +482,6 @@ void Mixer::clear()
 	}
 	unlock();
 }
-
-
-
-
-void Mixer::clearAudioBuffer( sampleFrame * _ab, const f_cnt_t _frames,
-							const f_cnt_t _offset )
-{
-	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
-}
-
-
-
-#ifndef LMMS_DISABLE_SURROUND
-void Mixer::clearAudioBuffer( surroundSampleFrame * _ab, const f_cnt_t _frames,
-							const f_cnt_t _offset )
-{
-	memset( _ab+_offset, 0, sizeof( *_ab ) * _frames );
-}
-#endif
 
 
 
