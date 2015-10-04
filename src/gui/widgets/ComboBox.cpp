@@ -129,9 +129,12 @@ void ComboBox::contextMenuEvent( QContextMenuEvent * event )
 		return;
 	}
 
-	CaptionMenu contextMenu( model()->displayName() );
-	addDefaultActions( &contextMenu );
-	contextMenu.exec( QCursor::pos() );
+	if ( automationsEnabled() )
+	{
+		CaptionMenu contextMenu( model()->displayName() );
+		addDefaultActions( &contextMenu );
+		contextMenu.exec( QCursor::pos() );
+	}
 }
 
 

@@ -68,6 +68,8 @@ public:
 
 	void addDefaultActions( QMenu* menu );
 
+	inline void enableAutomations( bool value ) { m_enableAutomations = value; }
+	inline bool automationsEnabled() const { return m_enableAutomations; }
 
 protected:
 	virtual void mousePressEvent( QMouseEvent* event );
@@ -75,6 +77,7 @@ protected:
 	QString m_description;
 	QString m_unit;
 
+	bool m_enableAutomations;
 } ;
 
 

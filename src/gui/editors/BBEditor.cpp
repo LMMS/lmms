@@ -88,6 +88,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	m_bbComboBox = new ComboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
+	m_bbComboBox->enableAutomations( false );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
 	beatSelectionToolBar->addWidget( m_bbComboBox );

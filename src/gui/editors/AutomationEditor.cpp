@@ -2099,6 +2099,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	// setup tension-stuff
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionKnob->setModel(m_editor->m_tensionModel);
+	m_tensionKnob->enableAutomations( false );
 	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
 	m_tensionKnob->setWhatsThis(
 				tr("A higher tension value may make a smoother curve "
@@ -2187,6 +2188,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
+	m_zoomingXComboBox->enableAutomations( false );
 
 	for( int i = 0; i < 6; ++i )
 	{
@@ -2205,6 +2207,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
+	m_zoomingYComboBox->enableAutomations( false );
 
 	m_editor->m_zoomingYModel.addItem( "Auto" );
 	for( int i = 0; i < 7; ++i )
@@ -2234,6 +2237,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
+	m_quantizeComboBox->enableAutomations( false );
 
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 

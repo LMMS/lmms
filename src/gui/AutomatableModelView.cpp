@@ -41,7 +41,8 @@
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	ModelView( model, _this ),
 	m_description( QString::null ),
-	m_unit( QString::null )
+	m_unit( QString::null ),
+	m_enableAutomations( true )
 {
 	widget()->setAcceptDrops( true );
 	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
@@ -147,7 +148,7 @@ void AutomatableModelView::setModel( Model* model, bool isOldModelValid )
 
 void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 {
-	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier )
+	if( event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier && automationsEnabled() )
 	{
 		new StringPairDrag( "automatable_model", QString::number( modelUntyped()->id() ), QPixmap(), widget() );
 		event->accept();

@@ -483,14 +483,17 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
 
-	CaptionMenu contextMenu( model()->displayName(), this );
-	addDefaultActions( &contextMenu );
-	contextMenu.addAction( QPixmap(),
-		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
-		this, SLOT( toggleScale() ) );
-	contextMenu.addSeparator();
-	contextMenu.addHelpAction();
-	contextMenu.exec( QCursor::pos() );
+	if ( automationsEnabled() )
+	{
+		CaptionMenu contextMenu( model()->displayName(), this );
+		addDefaultActions( &contextMenu );
+		contextMenu.addAction( QPixmap(),
+			model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+			this, SLOT( toggleScale() ) );
+		contextMenu.addSeparator();
+		contextMenu.addHelpAction();
+		contextMenu.exec( QCursor::pos() );
+	}
 }
 
 

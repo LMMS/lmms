@@ -688,6 +688,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	// setup zooming-stuff
 	m_zoomingComboBox = new ComboBox( m_toolBar );
+	m_zoomingComboBox->enableAutomations( false );
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
