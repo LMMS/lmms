@@ -54,7 +54,7 @@ protected:
 
 
 protected slots:
-	void updateAudioBuffer();
+	void updateAudioBuffer( const surroundSampleFrame * buffer );
 
 
 private:

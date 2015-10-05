@@ -61,7 +61,6 @@
 
 Mixer::Mixer( bool renderOnly ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
-	m_workingBuf( NULL ),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
 	m_readBuf( NULL ),
@@ -119,8 +118,6 @@ Mixer::Mixer( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
-	m_workingBuf = (sampleFrame*) MemoryHelper::alignedMalloc( m_framesPerPeriod *
-							sizeof( sampleFrame ) );
 	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = (surroundSampleFrame*)
@@ -176,8 +173,6 @@ Mixer::~Mixer()
 	{
 		MemoryHelper::alignedFree( m_bufferPool[i] );
 	}
-
-	MemoryHelper::alignedFree( m_workingBuf );
 
 	for( int i = 0; i < 2; ++i )
 	{
@@ -447,7 +442,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	unlock();
 
 
-	emit nextAudioBuffer();
+	emit nextAudioBuffer( m_readBuf );
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();

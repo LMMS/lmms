@@ -73,14 +73,12 @@ VisualizationWidget::~VisualizationWidget()
 
 
 
-void VisualizationWidget::updateAudioBuffer()
+void VisualizationWidget::updateAudioBuffer( const surroundSampleFrame * buffer )
 {
 	if( !Engine::getSong()->isExporting() )
 	{
-		const surroundSampleFrame * c = Engine::mixer()->
-							currentReadBuffer();
 		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
-		memcpy( m_buffer, c, sizeof( surroundSampleFrame ) * fpp );
+		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
 	}
 }
 
@@ -96,8 +94,8 @@ void VisualizationWidget::setActive( bool _active )
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		connect( Engine::mixer(),
-					SIGNAL( nextAudioBuffer() ),
-				this, SLOT( updateAudioBuffer() ) );
+			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
+			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 	}
 	else
 	{
@@ -105,8 +103,8 @@ void VisualizationWidget::setActive( bool _active )
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
 		disconnect( Engine::mixer(),
-					SIGNAL( nextAudioBuffer() ),
-				this, SLOT( updateAudioBuffer() ) );
+			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
+			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 		// we have to update (remove last waves),
 		// because timer doesn't do that anymore
 		update();

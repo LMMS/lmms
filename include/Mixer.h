@@ -231,11 +231,6 @@ public:
 		return m_framesPerPeriod;
 	}
 
-	inline const surroundSampleFrame * currentReadBuffer() const
-	{
-		return m_readBuf;
-	}
-
 
 	MixerProfiler& profiler()
 	{
@@ -352,7 +347,7 @@ public:
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer();
+	void nextAudioBuffer( const surroundSampleFrame * buffer );
 
 
 private:
@@ -394,8 +389,6 @@ private:
 	QVector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
-
-	sampleFrame * m_workingBuf;
 
 	sampleFrame * m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
