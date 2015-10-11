@@ -105,10 +105,9 @@ void * MemoryManager::alloc( size_t size )
 
 void MemoryManager::free( void * ptr )
 {
-	if( ptr == NULL )
+	if( !ptr )
 	{
-		qDebug( "MemoryManager: Null pointer deallocation attempted" );
-		return; // let's not try to deallocate null pointers, ok?
+		return; // Null pointer deallocations are OK but do not need to be handled
 	}
 
 	// fetch info on the ptr and remove
