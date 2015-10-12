@@ -1216,7 +1216,7 @@ void Song::removeAllControllers()
 {
 	for (int i = 0; i < m_controllers.size(); ++i)
 	{
-		delete m_controllers.at(i);
+		removeController(m_controllers.at(i));
 	}
 
 	m_controllers.clear();
