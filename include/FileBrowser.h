@@ -199,10 +199,9 @@ public:
 							const QString & path );
 	FileItem( const QString & name, const QString & path );
 
-	inline QString fullName( void ) const
+	QString fullName() const
 	{
-		return( QDir::cleanPath( m_path ) + QDir::separator() +
-								text( 0 ) );
+		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
 	inline FileTypes type( void ) const
