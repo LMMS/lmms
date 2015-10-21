@@ -622,6 +622,10 @@ void Song::stop()
 			case TimeLineWidget::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
 				m_elapsedMilliSeconds = 0;
+				if( gui && gui->songEditor() )
+				{
+					gui->songEditor()->m_editor->scrolled( 0 );
+				}
 				break;
 
 			case TimeLineWidget::BackToStart:
@@ -632,6 +636,11 @@ void Song::stop()
 						( ( ( tl->savedPos().getTicks() ) * 60 * 1000 / 48 ) / 
 							getTempo() );
 					tl->savePos( -1 );
+					if( gui && gui->songEditor() )
+					{
+						gui->songEditor()->m_editor->scrolled( m_playPos[m_playMode].getTicks() /
+							m_playPos[m_playMode].ticksPerTact() );
+					}
 				}
 				break;
 
