@@ -711,16 +711,20 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 			}
 			else // otherwise remove the handle
 			{
+				m_playingNotesMutex.lock();
 				m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
+				m_playingNotesMutex.unlock();
 			}
 		}
 		else
 		{
 			noteOff( currentData );
+			m_playingNotesMutex.lock();
 			m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
+			m_playingNotesMutex.unlock();
 		}
 	}
-	
+
 	if( currentFrame < frames )
 	{
 		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
@@ -780,6 +784,12 @@ void sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 									// do it here
 	{
 		noteOff( pluginData );
+		m_playingNotesMutex.lock();
+		if( m_playingNotes.indexOf( _n ) >= 0 )
+		{
+			m_playingNotes.remove( m_playingNotes.indexOf( _n ) );
+		}
+		m_playingNotesMutex.unlock();
 	}
 	delete pluginData;
 }
