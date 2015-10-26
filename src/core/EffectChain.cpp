@@ -133,10 +133,20 @@ void EffectChain::appendEffect( Effect * _effect )
 void EffectChain::removeEffect( Effect * _effect )
 {
 	Engine::mixer()->lock();
-	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
-	Engine::mixer()->unlock();
 
+	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
+	if( found == m_effects.end() )
+	{
+		goto fail;
+	}
+	m_effects.erase( found );
+
+	Engine::mixer()->unlock();
 	emit dataChanged();
+	return;
+
+fail:
+	Engine::mixer()->unlock();
 }
 
 
@@ -261,8 +271,3 @@ void EffectChain::clear()
 	}
 	m_effects.clear();
 }
-
-
-
-
-
