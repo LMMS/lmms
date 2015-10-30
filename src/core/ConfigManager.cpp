@@ -448,15 +448,8 @@ void ConfigManager::loadConfigFile()
 
 	if( m_ladDir.isEmpty()  )
 	{
-#if defined(LMMS_BUILD_WIN32)
-		m_ladDir = qApp->applicationDirPath() + "/plugins/ladspa" + QDir::separator();
-#elif defined(LMMS_BUILD_APPLE)
-		m_ladDir = qApp->applicationDirPath() + "/../lib/lmms/ladspa/";
-#else
-		m_ladDir = qApp->applicationDirPath() + '/' + LIB_DIR + "/lmms/ladspa/";
-#endif
-		m_ladDir = QDir::cleanPath( m_ladDir );
-		m_ladDir += ","+userLadspaDir();
+		m_ladDir = "plugins:ladspa/";
+		m_ladDir = ","+userLadspaDir();
 	}
 
 #ifdef LMMS_HAVE_STK

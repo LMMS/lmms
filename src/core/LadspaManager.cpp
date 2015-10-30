@@ -34,16 +34,19 @@
 
 #include "ConfigManager.h"
 #include "LadspaManager.h"
+#include "PluginFactory.h"
 
 
 
 LadspaManager::LadspaManager()
 {
+	// Make sure plugin search paths are set up
+	PluginFactory::instance();
+
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );
 	ladspaDirectories += ConfigManager::inst()->ladspaDir().split( ',' );
 
-	ladspaDirectories.push_back( "plugins:ladspa" );
 #ifndef LMMS_BUILD_WIN32
 	ladspaDirectories.push_back( qApp->applicationDirPath() + '/' + LIB_DIR + "ladspa" );
 	ladspaDirectories.push_back( "/usr/lib/ladspa" );
