@@ -77,17 +77,10 @@ ConfigManager::ConfigManager() :
 			QString line = stream.readLine();
 
 			if (line.startsWith("lmms_SOURCE_DIR:")) {
-				// Current source directory contains respective data directory
 				QString srcDir = line.section('=', -1).trimmed();
 				QDir::addSearchPath("data", srcDir + "/data/");
+				break;
 			}
-			if (line.startsWith("lmms_BINARY_DIR:")) {
-				// Current build directory contains respective LADSPA plugins
-				QString binDir = line.section('=', -1).trimmed();
-				m_ladDir = binDir + "/plugins/ladspa/";
-				m_ladDir += "," + userLadspaDir();
-			}
-	
 		}
 
 		cmakeCache.close();
