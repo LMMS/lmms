@@ -16,11 +16,12 @@ IF(LMMS_BUILD_WIN32)
 	ADD_CUSTOM_COMMAND(TARGET RemoteVstPlugin POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:RemoteVstPlugin>")
 	INSTALL(TARGETS RemoteVstPlugin RUNTIME DESTINATION "${PLUGIN_DIR}")
 
-	IF(LMMS_BUILD_WIN64)
+	# FIXME: 32-bit VST fails on MSYS
+	IF(LMMS_BUILD_WIN64 AND NOT LMMS_BUILD_MSYS)
 		# build 32 bit version of RemoteVstPlugin for Win64 so we can load
 		# 32 bit VST plugins
 		ADD_SUBDIRECTORY(Win64)
-	ENDIF(LMMS_BUILD_WIN64)
+	ENDIF(LMMS_BUILD_WIN64 AND NOT LMMS_BUILD_MSYS)
 ENDIF(LMMS_BUILD_WIN32)
 
 BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
