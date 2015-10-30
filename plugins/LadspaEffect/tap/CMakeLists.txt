@@ -1,3 +1,5 @@
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ladspa")
+
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 FILE(GLOB PLUGIN_SOURCES *.c)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wno-write-strings -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math")
