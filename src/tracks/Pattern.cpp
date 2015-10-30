@@ -875,7 +875,7 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 		_me->ignore();
 		return;
 	}
-	if( !fixedTCOs() )
+	if( m_pat->m_patternType == Pattern::MelodyPattern || !fixedTCOs() )
 	{
 		openInPianoRoll();
 	}
