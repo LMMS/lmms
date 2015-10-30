@@ -3630,7 +3630,7 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture pour ce f
         <translation>En appuyant sur ce bouton, vous pouvez montrer ou cacher l&apos;éditeur de morceau. À l&apos;aide de l&apos;éditeur de morceau vous pouvez éditer la liste de lecture du morceau et indiquer quelle piste devra être jouée. Vous pouvez également insérer et déplacer des échantillons (p. ex. des échantillons de Rap) directement dans la liste de lecture.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Montrer/Cacher l&apos;éditeur de rythme et de ligne de basse</translation>
     </message>
     <message>
@@ -3816,7 +3816,7 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>Éditeur de morceau</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Éditeur de motif</translation>
     </message>
     <message>

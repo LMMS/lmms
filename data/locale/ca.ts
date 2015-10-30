@@ -3455,7 +3455,7 @@ Per favor, comprova que tens permís d&apos;escriptura per a aquest fitxer i tor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation type="unfinished">Mostra/amaga Editor de Ritme Base</translation>
     </message>
     <message>

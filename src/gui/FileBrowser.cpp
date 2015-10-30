@@ -344,7 +344,7 @@ void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 						this,
 					SLOT( openInNewInstrumentTrackSE() ) );
 		contextMenu.addAction( tr( "Open in new instrument-track/"
-								"Pattern Editor" ),
+								"B+B Editor" ),
 						this,
 					SLOT( openInNewInstrumentTrackBBE() ) );
 		contextMenu.exec( e->globalPos() );

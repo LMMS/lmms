@@ -3455,7 +3455,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
         <translation type="unfinished">Zmačknutím tohoto knoflíku zobrazíte nebo schováte Editor skladby. S jeho pomocí můžete editovat playlist skladby a specifikovat, kdy a která stopa má být přehrána. Můžete také vložit a přesunovat samply (např. rapové) přímo do playlistu.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation type="unfinished">Ukaž/schovej Beat+Bassline editor</translation>
     </message>
     <message>

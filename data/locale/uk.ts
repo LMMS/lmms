@@ -3819,7 +3819,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>Музичний редактор</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Редактор шаблонів</translation>
     </message>
     <message>

@@ -3476,7 +3476,7 @@ Bitte überprüfen Sie Ihre Rechte und versuchen es erneut.</translation>
         <translation>Mit diesem Knopf können Sie den Song-Editor zeigen oder verstecken. Mit Hilfe des Song-Editors können Sie die Song-Playliste bearbeiten und angeben, wann welche Spur abgespielt werden soll. Außerdem können Sie Samples (z.B. Rap samples) direkt in die Playliste einfügen und verschieben.</translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>Zeige/verstecke Beat+Bassline Editor</translation>
     </message>
     <message>

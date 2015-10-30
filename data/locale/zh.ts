@@ -3463,7 +3463,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pattern Editor</source>
+        <source>Beat+Bassline Editor</source>
         <translation>显示/隐藏节拍+旋律编辑器</translation>
     </message>
     <message>
