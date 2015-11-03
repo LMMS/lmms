@@ -448,8 +448,7 @@ void ConfigManager::loadConfigFile()
 
 	if( m_ladDir.isEmpty()  )
 	{
-		m_ladDir = "plugins:ladspa/";
-		m_ladDir = ","+userLadspaDir();
+		m_ladDir = userLadspaDir();
 	}
 
 #ifdef LMMS_HAVE_STK
