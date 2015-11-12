@@ -71,6 +71,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_masterGain( 1.0f ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
+	m_audioDevStartFailed( false ),
 	m_globalMutex( QMutex::Recursive ),
 	m_profiler(),
 	m_metronomeActive(false)
@@ -717,10 +718,7 @@ AudioDevice * Mixer::tryAudioDevices()
 	AudioDevice * dev = NULL;
 	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
 
-	if( dev_name == AudioDummy::name() )
-	{
-		dev_name = "";
-	}
+	m_audioDevStartFailed = false;
 
 #ifdef LMMS_HAVE_SDL
 	if( dev_name == AudioSdl::name() || dev_name == "" )
@@ -828,9 +826,14 @@ AudioDevice * Mixer::tryAudioDevices()
 	//}
 	//delete dev
 
-	printf( "No audio-driver working - falling back to dummy-audio-"
-		"driver\nYou can render your songs and listen to the output "
-		"files...\n" );
+	if( dev_name != AudioDummy::name() )
+	{
+		printf( "No audio-driver working - falling back to dummy-audio-"
+			"driver\nYou can render your songs and listen to the output "
+			"files...\n" );
+
+		m_audioDevStartFailed = true;
+	}
 
 	m_audioDevName = AudioDummy::name();
 
