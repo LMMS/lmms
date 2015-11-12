@@ -175,6 +175,10 @@ public:
 	{
 		return m_audioDevName;
 	}
+	inline bool audioDevStartFailed() const
+	{
+		return m_audioDevStartFailed;
+	}
 
 	void setAudioDevice( AudioDevice * _dev );
 	void setAudioDevice( AudioDevice * _dev,
@@ -421,6 +425,7 @@ private:
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
+	bool m_audioDevStartFailed;
 
 	// MIDI device stuff
 	MidiClient * m_midiClient;

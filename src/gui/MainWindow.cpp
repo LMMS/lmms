@@ -559,10 +559,11 @@ void MainWindow::finalize()
 		SetupDialog sd;
 		sd.exec();
 	}
-	// look whether mixer could use a audio-interface beside AudioDummy
-	else if( Engine::mixer()->audioDevName() == AudioDummy::name() )
+	// look whether mixer failed to start the audio device selected by the
+	// user and is using AudioDummy as a fallback
+	else if( Engine::mixer()->audioDevStartFailed() )
 	{
-		// no, so we offer setup-dialog with audio-settings...
+		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
 		sd.exec();
 	}
