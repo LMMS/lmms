@@ -986,7 +986,9 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	QWidget( parent ),
 	m_trackView( parent ),
 	m_darkerColor( Qt::SolidPattern ),
-	m_lighterColor( Qt::SolidPattern )
+	m_lighterColor( Qt::SolidPattern ),
+	m_gridColor( Qt::SolidPattern ),
+	m_embossColor( Qt::SolidPattern )
 {
 	setAcceptDrops( true );
 
@@ -1030,7 +1032,7 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	// horizontal line
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
@@ -1040,7 +1042,7 @@ void TrackContentWidget::updateBackground()
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	pmp.setPen( QPen( QColor( 140, 140, 140, 64 ), 1 ) );
+	pmp.setPen( QPen( embossColor(), 1 ) );
 	for( float x = 1.0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1519,6 +1521,14 @@ QBrush TrackContentWidget::lighterColor() const
 { return m_lighterColor; }
 
 //! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::gridColor() const
+{ return m_gridColor; }
+
+//! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::embossColor() const
+{ return m_embossColor; }
+
+//! \brief CSS theming qproperty access method
 void TrackContentWidget::setDarkerColor( const QBrush & c )
 { m_darkerColor = c; }
 
@@ -1526,6 +1536,13 @@ void TrackContentWidget::setDarkerColor( const QBrush & c )
 void TrackContentWidget::setLighterColor( const QBrush & c )
 { m_lighterColor = c; }
 
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setGridColor( const QBrush & c )
+{ m_gridColor = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setEmbossColor( const QBrush & c )
+{ m_embossColor = c; }
 
 
 // ===========================================================================

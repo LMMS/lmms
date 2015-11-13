@@ -291,6 +291,8 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	// qproperties for track background gradients
 	Q_PROPERTY( QBrush darkerColor READ darkerColor WRITE setDarkerColor )
 	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
+	Q_PROPERTY( QBrush gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QBrush embossColor READ embossColor WRITE setEmbossColor )
 
 public:
 	TrackContentWidget( TrackView * parent );
@@ -318,9 +320,13 @@ public:
 
 	QBrush darkerColor() const;
 	QBrush lighterColor() const;
+	QBrush gridColor() const;
+	QBrush embossColor() const;
 
 	void setDarkerColor( const QBrush & c );
 	void setLighterColor( const QBrush & c );
+	void setGridColor( const QBrush & c );
+	void setEmbossColor( const QBrush & c);
 
 public slots:
 	void update();
@@ -365,6 +371,8 @@ private:
 	// qproperty fields
 	QBrush m_darkerColor;
 	QBrush m_lighterColor;
+	QBrush m_gridColor;
+	QBrush m_embossColor;
 } ;
 
 
