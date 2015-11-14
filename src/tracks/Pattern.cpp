@@ -1130,31 +1130,9 @@ void PatternView::paintEvent( QPaintEvent * )
 		( fixedTCOs() || ppt >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
 	{
-		QPixmap stepon;
-		QPixmap stepoverlay;
-		QPixmap stepoff;
-		QPixmap stepoffl;
 		const int steps = qMax( 1,
 					m_pat->m_steps );
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
-
-		// scale step graphics to fit the beat pattern length
-		stepon = s_stepBtnOn->scaled( w / steps,
-					      s_stepBtnOn->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoverlay = s_stepBtnOverlay->scaled( w / steps,
-					      s_stepBtnOn->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoff = s_stepBtnOff->scaled( w / steps,
-						s_stepBtnOff->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
-		stepoffl = s_stepBtnOffLight->scaled( w / steps,
-						s_stepBtnOffLight->height(),
-						Qt::IgnoreAspectRatio,
-						Qt::SmoothTransformation );
 
 		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
@@ -1162,7 +1140,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 			// figure out x and y coordinates for step graphic
 			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
-			const int y = height() - s_stepBtnOff->height() - 1;
+			const int y = height() - (*s_stepBtnOff).height() - 1;
 
 			// get volume and length of note, if noteAtStep returned null
 			// (meaning, note at step doesn't exist for some reason)
@@ -1172,24 +1150,24 @@ void PatternView::paintEvent( QPaintEvent * )
 
 			if( len < 0 )
 			{
-				p.drawPixmap( x, y, stepoff );
+				p.drawPixmap( x, y, *s_stepBtnOff );
 				for( int i = 0; i < vol / 5 + 1; ++i )
 				{
-					p.drawPixmap( x, y, stepon );
+					p.drawPixmap( x, y, *s_stepBtnOn );
 				}
 				for( int i = 0; i < ( 25 + ( vol - 75 ) ) / 5;
 									++i )
 				{
-					p.drawPixmap( x, y, stepoverlay );
+					p.drawPixmap( x, y, *s_stepBtnOverlay );
 				}
 			}
 			else if( ( it / 4 ) % 2 )
 			{
-				p.drawPixmap( x, y, stepoffl );
+				p.drawPixmap( x, y, *s_stepBtnOffLight );
 			}
 			else
 			{
-				p.drawPixmap( x, y, stepoff );
+				p.drawPixmap( x, y, *s_stepBtnOff );
 			}
 		} // end for loop
 	}
