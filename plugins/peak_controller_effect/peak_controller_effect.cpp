@@ -132,15 +132,8 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 		}
 	}
 
-	// TODO: flipping this might cause clipping
-	// this will mute the output after the values were measured
-	if( c.m_muteModel.value() )
-	{
-		for( int i = 0; i < _frames; ++i )
-		{
-			_buf[i][0] = _buf[i][1] = 0.0f;
-		}
-	}
+	const float d = dryLevel();
+	const float w = wetLevel();
 
 	float curRMS = helpers::sqrt_neg( sum / _frames );
 	const float origRMS = curRMS;
@@ -170,6 +163,23 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	}
 
 	//checkGate( out_sum / _frames );
+
+	// TODO: flipping this might cause clipping
+	// this will mute the output after the values were measured
+	if( c.m_muteModel.value() )
+	{
+		for( int i = 0; i < _frames; ++i )
+		{
+			_buf[i][0] = _buf[i][1] = 0.0f;
+		}
+	} 
+	else
+	{
+		for( int i = 0; i < _frames; ++i )
+		{
+			_buf[i][0] = d * _buf[i][0] + w * _buf[i][0] * (0.45f * (1.0f - m_lastRMS) + 1.0f);
+		}
+	}
 
 	return isRunning();
 }
