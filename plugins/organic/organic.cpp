@@ -557,9 +557,9 @@ void organicInstrumentView::updateKnobHint()
 		const float harm = oi->m_osc[i]->m_harmModel.value();
 		const float wave = oi->m_osc[i]->m_oscModel.value();
 		
-		m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ), " (" +
+		m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ).arg( i + 1 ), " (" +
 			HARMONIC_NAMES[ static_cast<int>( harm ) ] + ")" );
-		m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ), " (" +
+		m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), " (" +
 			WAVEFORM_NAMES[ static_cast<int>( wave ) ] + ")" );
 	}
 }
