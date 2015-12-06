@@ -1198,12 +1198,6 @@ void Song::restoreControllerStates( const QDomElement & element )
 		Controller * c = Controller::create( node.toElement(), this );
 		Q_ASSERT( c != NULL );
 
-		/* For PeakController, addController() was called in
-		 * PeakControllerEffect::PeakControllerEffect().
-		 * This line removes the previously added controller for PeakController
-		 * without affecting the order of controllers in Controller Rack
-		 */
-		Engine::getSong()->removeController( c );
 		addController( c );
 
 		node = node.nextSibling();
