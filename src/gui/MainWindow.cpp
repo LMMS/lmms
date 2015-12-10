@@ -28,6 +28,7 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDomElement>
+#include <QFileInfo>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QMenuBar>
@@ -79,7 +80,8 @@ MainWindow::MainWindow() :
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
 	m_viewMenu( NULL ),
-	m_metronomeToggle( 0 )
+	m_metronomeToggle( 0 ),
+	m_session( Normal )
 {
 	setAttribute( Qt::WA_DeleteOnClose );
 
@@ -201,7 +203,10 @@ MainWindow::MainWindow() :
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
-		m_autoSaveTimer.start(1000 * 60);  // 1 minute
+		// The auto save function mustn't run until there is a project
+		// to save or it will run over recover.mmp if you hesitate at the
+		// recover messagebox for a minute. It is now started in main.
+		// See autoSaveTimerStart() in MainWindow.h
 	}
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
@@ -650,6 +655,14 @@ void MainWindow::resetWindowTitle()
 	{
 		title += '*';
 	}
+	if( getSession() == Recover )
+	{
+		title += " - " + tr( "Recover session. Please save your work!" );
+	}
+	if( getSession() == Limited )
+	{
+		title += " - " + tr( "Automatic backup disabled. Remember to save your work!" );
+	}
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
@@ -659,17 +672,31 @@ void MainWindow::resetWindowTitle()
 bool MainWindow::mayChangeProject(bool stopPlayback)
 {
 	if( stopPlayback )
+	{
 		Engine::getSong()->stop();
+	}
 
-	if( !Engine::getSong()->isModified() )
+	if( !Engine::getSong()->isModified() && getSession() != Recover )
 	{
 		return( true );
 	}
 
-	QMessageBox mb( tr( "Project not saved" ),
-				tr( "The current project was modified since "
+	// Separate message strings for modified and recovered files
+	QString messageTitleRecovered = tr( "Recovered project not saved" );
+	QString messageRecovered = tr( "This project was recovered from the "
+					"previous session. It is currently "
+					"unsaved and will be lost if you don't "
+					"save it. Do you want to save it now?" );
+
+	QString messageTitleUnsaved = tr( "Project not saved" );
+	QString messageUnsaved = tr( "The current project was modified since "
 					"last saving. Do you want to save it "
-								"now?" ),
+								"now?" );
+
+	QMessageBox mb( ( getSession() == Recover ?
+				messageTitleRecovered : messageTitleUnsaved ),
+			( getSession() == Recover ?
+					messageRecovered : messageUnsaved ),
 				QMessageBox::Question,
 				QMessageBox::Save,
 				QMessageBox::Discard,
@@ -683,6 +710,10 @@ bool MainWindow::mayChangeProject(bool stopPlayback)
 	}
 	else if( answer == QMessageBox::Discard )
 	{
+		if( getSession() == Recover )
+		{
+			sessionCleanup();
+		}
 		return( true );
 	}
 
@@ -789,6 +820,7 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
+	runAutoSave();
 }
 
 
@@ -807,6 +839,7 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 		Engine::getSong()->createNewProjectFromTemplate(
 			dirBase + _idx->text() + ".mpt" );
 	}
+	runAutoSave();
 }
 
 
@@ -831,6 +864,7 @@ void MainWindow::openProject()
 			setCursor( Qt::ArrowCursor );
 		}
 	}
+	runAutoSave();
 }
 
 
@@ -874,6 +908,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
+	runAutoSave();
 }
 
 
@@ -888,6 +923,10 @@ bool MainWindow::saveProject()
 	else
 	{
 		Engine::getSong()->guiSaveProject();
+		if( getSession() == Recover )
+		{
+			sessionCleanup();
+		}
 	}
 	return( true );
 }
@@ -919,8 +958,11 @@ bool MainWindow::saveProjectAs()
 		{
 			fname += ".mpt";
 		}
-		Engine::getSong()->guiSaveProjectAs(
-						fname );
+		Engine::getSong()->guiSaveProjectAs( fname );
+		if( getSession() == Recover )
+		{
+			sessionCleanup();
+		}
 		return( true );
 	}
 	return( false );
@@ -1189,6 +1231,8 @@ void MainWindow::updateViewMenu()
 }
 
 
+
+
 void MainWindow::updateConfig( QAction * _who )
 {
 	QString tag = _who->data().toString();
@@ -1306,13 +1350,27 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject(true) )
 	{
 		// delete recovery file
-		QFile::remove(ConfigManager::inst()->recoveryFile());
-		_ce->accept();
+		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt()
+			&& getSession() != Limited )
+		{
+			sessionCleanup();
+			_ce->accept();
+		}
 	}
 	else
 	{
 		_ce->ignore();
 	}
+}
+
+
+
+
+void MainWindow::sessionCleanup()
+{
+	// delete recover session files
+	QFile::remove( ConfigManager::inst()->recoveryFile() );
+	setSession( Normal );
 }
 
 
@@ -1457,5 +1515,17 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
+	}
+}
+
+
+// For the occasional auto save action that isn't run
+// from the timer where we need to do extra tests.
+void MainWindow::runAutoSave()
+{
+	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
+		getSession() != Limited )
+	{
+		autoSave();
 	}
 }
