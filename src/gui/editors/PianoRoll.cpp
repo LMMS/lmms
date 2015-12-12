@@ -3859,6 +3859,28 @@ int PianoRoll::quantization() const
 }
 
 
+void PianoRoll::quantizeNotes()
+{
+	NoteVector selected = getSelectedNotes();
+
+	for (Note* n : selected.empty() ? m_pattern->notes() : selected)
+	{
+		if (n->length() == MidiTime(0))
+		{
+			continue;
+		}
+
+		Note copy(*n);
+		m_pattern->removeNote(n);
+		copy.quantizeLength(quantization());
+		m_pattern->addNote(copy);
+	}
+
+	update();
+	gui->songEditor()->update();
+}
+
+
 
 
 void PianoRoll::updateSemiToneMarkerMenu()
@@ -4006,10 +4028,15 @@ PianoRollWindow::PianoRollWindow() :
 
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
+	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
+	connect(quantizeAction, SIGNAL(triggered()), m_editor, SLOT(quantizeNotes()));
+
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
 	notesActionsToolBar->addAction( detuneAction );
+	notesActionsToolBar->addSeparator();
+	notesActionsToolBar->addAction( quantizeAction );
 
 	// Copy + paste actions
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop(tr("Copy paste controls"));

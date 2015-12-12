@@ -159,6 +159,7 @@ protected slots:
 
 	void zoomingChanged();
 	void quantizeChanged();
+	void quantizeNotes();
 
 	void updateSemiToneMarkerMenu();
 
