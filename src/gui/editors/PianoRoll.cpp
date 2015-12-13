@@ -3861,9 +3861,17 @@ int PianoRoll::quantization() const
 
 void PianoRoll::quantizeNotes()
 {
-	NoteVector selected = getSelectedNotes();
+	NoteVector notes = getSelectedNotes();
 
-	for (Note* n : selected.empty() ? m_pattern->notes() : selected)
+	if (notes.empty())
+	{
+		for (Note* n : m_pattern->notes())
+		{
+			notes.push_back(n);
+		}
+	}
+
+	for (Note* n : notes)
 	{
 		if (n->length() == MidiTime(0))
 		{
