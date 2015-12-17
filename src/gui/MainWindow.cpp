@@ -1515,6 +1515,7 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
+		m_autoSaveTimer.start(1000 * 60);  // Reset timer.
 	}
 }
 
