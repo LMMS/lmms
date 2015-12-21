@@ -3880,7 +3880,7 @@ void PianoRoll::quantizeNotes()
 
 		Note copy(*n);
 		m_pattern->removeNote(n);
-		copy.quantizeLength(quantization());
+		copy.quantizePos(quantization());
 		m_pattern->addNote(copy);
 	}
 
