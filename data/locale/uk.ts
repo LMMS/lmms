@@ -115,7 +115,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
-    <name>AudioAlsa::setupWidget</name>
+    <name>AudioAlsaSetupWidget</name>
     <message>
         <source>DEVICE</source>
         <translation>ПРИСТРІЙ</translation>
@@ -273,6 +273,17 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 </context>
 <context>
     <name>AudioSdl::setupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>ПРИСТРІЙ</translation>
+    </message>
+</context>
+<context>
+    <name>AudioSoundIo::setupWidget</name>
+    <message>
+        <source>BACKEND</source>
+        <translation>УПРАВЛІННЯ</translation>
+    </message>
     <message>
         <source>DEVICE</source>
         <translation>ПРИСТРІЙ</translation>
@@ -464,6 +475,26 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Model is already connected to this pattern.</source>
         <translation>Модель вже підключена до цього шаблону.</translation>
     </message>
+    <message>
+        <source>Edit actions</source>
+        <translation>Редагувати дії</translation>
+    </message>
+    <message>
+        <source>Interpolation controls</source>
+        <translation>Управління інтерполяцією</translation>
+    </message>
+    <message>
+        <source>Timeline controls</source>
+        <translation>Управління хронологією</translation>
+    </message>
+    <message>
+        <source>Zoom controls</source>
+        <translation>Управління масштабом</translation>
+    </message>
+    <message>
+        <source>Quantization controls</source>
+        <translation>Управління квантуванням</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -567,6 +598,14 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Clone Steps</source>
         <translation>Клонувати такти</translation>
+    </message>
+    <message>
+        <source>Beat selector</source>
+        <translation>Вибір ударних</translation>
+    </message>
+    <message>
+        <source>Track and step actions</source>
+        <translation>Дії для доріжки чи її частини</translation>
     </message>
 </context>
 <context>
@@ -706,7 +745,8 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Enable bitdepth-crushing</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Знову не зовсім зрозуміло</translatorcomment>
+        <translation type="unfinished">Включити глибину кольору ​​дроблення</translation>
     </message>
     <message>
         <source>Sample rate:</source>
@@ -1201,6 +1241,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Record while playing</source>
         <translation>Запис під час програвання</translation>
+    </message>
+    <message>
+        <source>Transport controls</source>
+        <translation>Управління засобами сполучення </translation>
     </message>
 </context>
 <context>
@@ -2047,10 +2091,6 @@ Please make sure you have write-permission to the file and the directory contain
         <translation>З&apos;єднати з активним інструментом-доріжкою</translation>
     </message>
     <message>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation>Відкрити в новій доріжці інструменту/редакторі пісні</translation>
-    </message>
-    <message>
         <source>Open in new instrument-track/B+B Editor</source>
         <translation>Відкрити в новій інструментальній доріжці/Біт + Бас редакторі</translation>
     </message>
@@ -2077,6 +2117,10 @@ Please make sure you have write-permission to the file and the directory contain
     <message>
         <source>file</source>
         <translation>файл</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/Song Editor</source>
+        <translation>Відкрити в новій інструментальній доріжці/Музичному редакторі</translation>
     </message>
 </context>
 <context>
@@ -3316,6 +3360,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>MISC</source>
         <translation>РІЗНЕ</translation>
     </message>
+    <message>
+        <source>SAVE</source>
+        <translation>ЗБЕРЕГТИ</translation>
+    </message>
 </context>
 <context>
     <name>Knob</name>
@@ -3854,6 +3902,26 @@ Please make sure you have write-access to the file and try again.</source>
         <source>Enable note labels in piano roll</source>
         <translation>Включити позначення нот у музичному редакторі</translation>
     </message>
+    <message>
+        <source>New from template</source>
+        <translation>Новий проект по шаблону</translation>
+    </message>
+    <message>
+        <source>Save as default template</source>
+        <translation>Зберегти як шаблон за замовчуванням</translation>
+    </message>
+    <message>
+        <source>Toggle metronome</source>
+        <translation>Переключити метроном</translation>
+    </message>
+    <message>
+        <source>Overwrite default template?</source>
+        <translation>Переписати шаблон за замовчуванням?</translation>
+    </message>
+    <message>
+        <source>This will overwrite your current default template.</source>
+        <translation>Це перезапише поточний шаблон за замовчуванням.</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -3879,20 +3947,6 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>Denominator</source>
         <translation>Знаменник</translation>
-    </message>
-</context>
-<context>
-    <name>MidiAlsaRaw::setupWidget</name>
-    <message>
-        <source>DEVICE</source>
-        <translation>ПРИСТРІЙ</translation>
-    </message>
-</context>
-<context>
-    <name>MidiAlsaSeq</name>
-    <message>
-        <source>DEVICE</source>
-        <translation>ПРИСТРІЙ</translation>
     </message>
 </context>
 <context>
@@ -3924,13 +3978,6 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>Track</source>
         <translation>Трек</translation>
-    </message>
-</context>
-<context>
-    <name>MidiOss::setupWidget</name>
-    <message>
-        <source>DEVICE</source>
-        <translation>ПРИСТРІЙ</translation>
     </message>
 </context>
 <context>
@@ -3978,6 +4025,37 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>Base velocity</source>
         <translation>Базова швидкість</translation>
+    </message>
+</context>
+<context>
+    <name>MidiSetupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>ПРИСТРІЙ</translation>
+    </message>
+    <message>
+        <source>Apple MIDI</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>WinMM MIDI</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>OSS Raw-MIDI (Open Sound System)</source>
+        <translation>OSS Raw-MIDI (Відкрита Звукова Система)</translation>
+    </message>
+    <message>
+        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA-Sequencer (Передова Linux Звукова Архітектура)</translation>
+    </message>
+    <message>
+        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA Raw-MIDI (Передова Linux Звукова Архітектура)</translation>
+    </message>
+    <message>
+        <source>Dummy (no MIDI support)</source>
+        <translation>Dummy (без підтримки MIDI)</translation>
     </message>
 </context>
 <context>
@@ -5182,7 +5260,8 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
     </message>
     <message>
         <source>TRES</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Поріг?</translatorcomment>
+        <translation type="unfinished">ПОР</translation>
     </message>
     <message>
         <source>Treshold:</source>
@@ -5289,6 +5368,15 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
     <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Введіть нове значення від %1 до %2:</translation>
+    </message>
+    <message>
+        <source>Mark/unmark all corresponding octave semitones</source>
+        <translation>Відмітити/Зняти всі відповідні півтони октави</translation>
+    </message>
+    <message>
+        <source>Select all notes on this key</source>
+        <translatorcomment>тональності ж?</translatorcomment>
+        <translation>Вибрати всі ноти на цій тональності</translation>
     </message>
 </context>
 <context>
@@ -5409,6 +5497,22 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
     <message>
         <source>Piano-Roll - no pattern</source>
         <translation>Нотний редактор - без шаблону</translation>
+    </message>
+    <message>
+        <source>Edit actions</source>
+        <translation>Редагувати дії</translation>
+    </message>
+    <message>
+        <source>Copy paste controls</source>
+        <translation>Управління копіюванням та вставкою</translation>
+    </message>
+    <message>
+        <source>Timeline controls</source>
+        <translation>Управління хронологією</translation>
+    </message>
+    <message>
+        <source>Zoom and note controls</source>
+        <translation>Управління масштабом і нотами</translation>
     </message>
 </context>
 <context>
@@ -5593,94 +5697,6 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>WAV-File (*.wav)</source>
         <translation>Файл WAV (*.wav)</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>C</source>
-        <comment>Note name</comment>
-        <translation>До-дієз C</translation>
-    </message>
-    <message>
-        <source>Db</source>
-        <comment>Note name</comment>
-        <translation>Ре-бемоль Db</translation>
-    </message>
-    <message>
-        <source>C#</source>
-        <comment>Note name</comment>
-        <translation>До-мажор C#</translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>Note name</comment>
-        <translation>Ре-дієз D</translation>
-    </message>
-    <message>
-        <source>Eb</source>
-        <comment>Note name</comment>
-        <translation>Мі-бемоль Eb</translation>
-    </message>
-    <message>
-        <source>D#</source>
-        <comment>Note name</comment>
-        <translation>Ре-мажор D#</translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>Note name</comment>
-        <translation>Мі-дієз E</translation>
-    </message>
-    <message>
-        <source>Fb</source>
-        <comment>Note name</comment>
-        <translation>Фа-бемоль Fb</translation>
-    </message>
-    <message>
-        <source>Gb</source>
-        <comment>Note name</comment>
-        <translation>Соль-бемоль Gb</translation>
-    </message>
-    <message>
-        <source>F#</source>
-        <comment>Note name</comment>
-        <translation>Фа-мажор F#</translation>
-    </message>
-    <message>
-        <source>G</source>
-        <comment>Note name</comment>
-        <translation>Соль-дієз G</translation>
-    </message>
-    <message>
-        <source>Ab</source>
-        <comment>Note name</comment>
-        <translation>Ля-бемоль Ab</translation>
-    </message>
-    <message>
-        <source>G#</source>
-        <comment>Note name</comment>
-        <translation>Соль-мажор G#</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>Note name</comment>
-        <translation>Ля дієз A</translation>
-    </message>
-    <message>
-        <source>Bb</source>
-        <comment>Note name</comment>
-        <translation>Сі-бемоль Bb</translation>
-    </message>
-    <message>
-        <source>A#</source>
-        <comment>Note name</comment>
-        <translation>Ля-мажор A#</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>Note name</comment>
-        <translation>Сі-дієз B</translation>
     </message>
 </context>
 <context>
@@ -6093,6 +6109,10 @@ Latency: %2 ms</source>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
         <translation>Будь ласка, виберіть інтерфейс MIDI. Залежно від конфігурації під час компілювання програми, ви можете використовувати ALSA, OSS та інші. У нижній частині вікна налаштування можна задати специфічні параметри обраного інтерфейсу.</translation>
     </message>
+    <message>
+        <source>Reopen last project on start</source>
+        <translation>Відкривати останній проект при запуску</translation>
+    </message>
 </context>
 <context>
     <name>Song</name>
@@ -6303,6 +6323,22 @@ Latency: %2 ms</source>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
         <translation>Натисніть сюди, якщо хочете зупинити відтворення мелодії. Курсор при цьому буде встановлений на початок композиції.</translation>
+    </message>
+    <message>
+        <source>Track actions</source>
+        <translation>Відстежувати дії</translation>
+    </message>
+    <message>
+        <source>Edit actions</source>
+        <translation>Редагувати дії</translation>
+    </message>
+    <message>
+        <source>Timeline controls</source>
+        <translation>Управління хронологією</translation>
+    </message>
+    <message>
+        <source>Zoom controls</source>
+        <translation>Управління масштабом</translation>
     </message>
 </context>
 <context>
@@ -8596,6 +8632,25 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
+    <name>opl2instrumentView</name>
+    <message>
+        <source>Attack</source>
+        <translation>Вступ</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>Згасання</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation>Зменшення</translation>
+    </message>
+    <message>
+        <source>Frequency multiplier</source>
+        <translation>Множник частоти</translation>
+    </message>
+</context>
+<context>
     <name>organicInstrument</name>
     <message>
         <source>Volume</source>
@@ -9121,28 +9176,12 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>ALSA (Передова Linux Звукова Архітектура)</translation>
     </message>
     <message>
-        <source>WinMM MIDI</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation>OSS Raw-MIDI (Відкрита Звукова Система)</translation>
-    </message>
-    <message>
         <source>SDL (Simple DirectMedia Layer)</source>
         <translation>SDL (Простий DirectMedia Шар)</translation>
     </message>
     <message>
         <source>Dummy (no sound output)</source>
         <translation>Dummy (без вихідного звуку)</translation>
-    </message>
-    <message>
-        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
-        <translation>ALSA-Sequencer (Передова Linux Звукова Архітектура)</translation>
-    </message>
-    <message>
-        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
-        <translation>ALSA Raw-MIDI (Передова Linux Звукова Архітектура)</translation>
     </message>
     <message>
         <source>PortAudio</source>
@@ -9153,15 +9192,11 @@ This chip was used in the Commodore 64 computer.</source>
         <translation>OSS (Відкрита Звукова Система)</translation>
     </message>
     <message>
-        <source>Dummy (no MIDI support)</source>
-        <translation>Dummy (без підтримки MIDI)</translation>
-    </message>
-    <message>
-        <source>Apple MIDI</source>
+        <source>PulseAudio</source>
         <translation></translation>
     </message>
     <message>
-        <source>PulseAudio</source>
+        <source>soundio</source>
         <translation></translation>
     </message>
 </context>
