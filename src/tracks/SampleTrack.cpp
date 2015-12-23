@@ -61,7 +61,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( LmmsEngine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -144,7 +144,7 @@ void SampleTCO::updateLength( bpm_t )
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
+	return (int)( m_sampleBuffer->frames() / LmmsEngine::framesPerTick() );
 }
 
 
@@ -305,7 +305,7 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 		m_tco->updateLength();
 		update();
 		_de->accept();
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 	}
 	else
 	{
@@ -339,7 +339,7 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
 	{
 		m_tco->setSampleFile( af );
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 	}
 }
 
@@ -441,7 +441,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 
 SampleTrack::~SampleTrack()
 {
-	Engine::mixer()->removePlayHandles( this );
+	LmmsEngine::mixer()->removePlayHandles( this );
 }
 
 
@@ -466,7 +466,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			PlayHandle* handle;
 			if( st->isRecord() )
 			{
-				if( !Engine::getSong()->isRecording() )
+				if( !LmmsEngine::getSong()->isRecording() )
 				{
 					return played_a_note;
 				}
@@ -483,7 +483,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 //			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
-			Engine::mixer()->addPlayHandle( handle );
+			LmmsEngine::mixer()->addPlayHandle( handle );
 			played_a_note = true;
 		}
 	}

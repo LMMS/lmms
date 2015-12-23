@@ -149,7 +149,7 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 	if( m_startPosition != pos )
 	{
 		m_startPosition = pos;
-		Engine::getSong()->updateLength();
+		LmmsEngine::getSong()->updateLength();
 	}
 	emit positionChanged();
 }
@@ -169,7 +169,7 @@ void TrackContentObject::changeLength( const MidiTime & length )
 	if( m_length != length )
 	{
 		m_length = length;
-		Engine::getSong()->updateLength();
+		LmmsEngine::getSong()->updateLength();
 	}
 	emit lengthChanged();
 }
@@ -1092,7 +1092,7 @@ void TrackContentWidget::removeTCOView( TrackContentObjectView * tcov )
 	if( it != m_tcoViews.end() )
 	{
 		m_tcoViews.erase( it );
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 	}
 }
 
@@ -1126,7 +1126,7 @@ void TrackContentWidget::changePosition( const MidiTime & newPos )
 {
 	if( m_trackView->trackContainerView() == gui->getBBEditor()->trackContainerView() )
 	{
-		const int curBB = Engine::getBBTrackContainer()->currentBB();
+		const int curBB = LmmsEngine::getBBTrackContainer()->currentBB();
 		setUpdatesEnabled( false );
 
 		// first show TCO for current BB...
@@ -2091,10 +2091,10 @@ void Track::removeTCO( TrackContentObject * tco )
 	if( it != m_trackContentObjects.end() )
 	{
 		m_trackContentObjects.erase( it );
-		if( Engine::getSong() )
+		if( LmmsEngine::getSong() )
 		{
-			Engine::getSong()->updateLength();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->updateLength();
+			LmmsEngine::getSong()->setModified();
 		}
 	}
 }

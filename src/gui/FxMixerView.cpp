@@ -53,7 +53,7 @@ FxMixerView::FxMixerView() :
 	ModelView( NULL, this ),
 	SerializingObjectHook()
 {
-	FxMixer * m = Engine::fxMixer();
+	FxMixer * m = LmmsEngine::fxMixer();
 	m->setHook( this );
 
 	//QPalette pal = palette();
@@ -174,7 +174,7 @@ FxMixerView::~FxMixerView()
 int FxMixerView::addNewChannel()
 {
 	// add new fx mixer channel and redraw the form.
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 
 	int newChannelIndex = mix->createChannel();
 	m_fxChannelViews.push_back(new FxChannelView(m_channelAreaWidget, this,
@@ -207,7 +207,7 @@ void FxMixerView::refreshDisplay()
 	m_channelAreaWidget->adjustSize();
 
 	// re-add the views
-	m_fxChannelViews.resize(Engine::fxMixer()->numChannels());
+	m_fxChannelViews.resize(LmmsEngine::fxMixer()->numChannels());
 	for( int i = 1; i < m_fxChannelViews.size(); ++i )
 	{
 		m_fxChannelViews[i] = new FxChannelView(m_channelAreaWidget, this, i);
@@ -231,8 +231,8 @@ void FxMixerView::refreshDisplay()
 // update the and max. channel number for every instrument
 void FxMixerView::updateMaxChannelSelector()
 {
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	QVector<Track *> songTrackList = LmmsEngine::getSong()->tracks();
+	QVector<Track *> bbTrackList = LmmsEngine::getBBTrackContainer()->tracks();
 
 	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
@@ -270,7 +270,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 {
 	m_fxLine = new FxLine(_parent, _mv, channelIndex);
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel(channelIndex);
+	FxChannel *fxChannel = LmmsEngine::fxMixer()->effectChannel(channelIndex);
 
 	m_fader = new Fader( &fxChannel->m_volumeModel,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
@@ -308,7 +308,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 
 void FxMixerView::FxChannelView::setChannelIndex( int index )
 {
-	FxChannel* fxChannel = Engine::fxMixer()->effectChannel( index );
+	FxChannel* fxChannel = LmmsEngine::fxMixer()->effectChannel( index );
 
 	m_fader->setModel( &fxChannel->m_volumeModel );
 	m_muteBtn->setModel( &fxChannel->m_muteModel );
@@ -319,7 +319,7 @@ void FxMixerView::FxChannelView::setChannelIndex( int index )
 
 void FxMixerView::toggledSolo()
 {
-	Engine::fxMixer()->toggledSolo();
+	LmmsEngine::fxMixer()->toggledSolo();
 }
 
 
@@ -340,7 +340,7 @@ void FxMixerView::setCurrentFxLine( FxLine * _line )
 
 void FxMixerView::updateFxLine(int index)
 {
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 
 	// does current channel send to this channel?
 	int selIndex = m_currentFxLine->channelIndex();
@@ -374,7 +374,7 @@ void FxMixerView::deleteChannel(int index)
 	int selLine = m_currentFxLine->channelIndex();
 
 	// delete the real channel
-	Engine::fxMixer()->deleteChannel(index);
+	LmmsEngine::fxMixer()->deleteChannel(index);
 
 	// delete the view
 	chLayout->removeWidget(m_fxChannelViews[index]->m_fxLine);
@@ -412,8 +412,8 @@ void FxMixerView::deleteChannel(int index)
 void FxMixerView::deleteUnusedChannels()
 {
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getBBTrackContainer()->tracks();
+	tracks += LmmsEngine::getSong()->tracks();
+	tracks += LmmsEngine::getBBTrackContainer()->tracks();
 
 	// go through all FX Channels
 	for(int i = m_fxChannelViews.size()-1; i > 0; --i)
@@ -432,7 +432,7 @@ void FxMixerView::deleteUnusedChannels()
 				}
 			}
 		}
-		FxChannel * ch = Engine::fxMixer()->effectChannel( i );
+		FxChannel * ch = LmmsEngine::fxMixer()->effectChannel( i );
 		// delete channel if no references found
 		if( empty && ch->m_receives.isEmpty() )
 		{
@@ -448,7 +448,7 @@ void FxMixerView::moveChannelLeft(int index, int focusIndex)
 	// can't move master or first channel left or last channel right
 	if( index <= 1 || index >= m_fxChannelViews.size() ) return;
 
-	FxMixer *m = Engine::fxMixer();
+	FxMixer *m = LmmsEngine::fxMixer();
 
 	// Move instruments channels
 	m->moveChannelLeft( index );
@@ -544,7 +544,7 @@ void FxMixerView::setCurrentFxLine( int _line )
 
 void FxMixerView::clear()
 {
-	Engine::fxMixer()->clear();
+	LmmsEngine::fxMixer()->clear();
 
 	refreshDisplay();
 }
@@ -554,11 +554,11 @@ void FxMixerView::clear()
 
 void FxMixerView::updateFaders()
 {
-	FxMixer * m = Engine::fxMixer();
+	FxMixer * m = LmmsEngine::fxMixer();
 
 	// apply master gain
-	m->effectChannel(0)->m_peakLeft *= Engine::mixer()->masterGain();
-	m->effectChannel(0)->m_peakRight *= Engine::mixer()->masterGain();
+	m->effectChannel(0)->m_peakLeft *= LmmsEngine::mixer()->masterGain();
+	m->effectChannel(0)->m_peakRight *= LmmsEngine::mixer()->masterGain();
 
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{

@@ -84,7 +84,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	setAcceptDrops( true );
 
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( LmmsEngine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
 	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
 			this, SLOT( createTrackView( Track * ) ),
@@ -148,9 +148,9 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 		m_scrollLayout->removeWidget( _tv );
 
 		realignTracks();
-		if( Engine::getSong() )
+		if( LmmsEngine::getSong() )
 		{
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 		}
 	}
 }
@@ -412,7 +412,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 	{
 		if( gui->mainWindow()->mayChangeProject(true) )
 		{
-			Engine::getSong()->loadProject( value );
+			LmmsEngine::getSong()->loadProject( value );
 		}
 		_de->accept();
 	}

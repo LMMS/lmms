@@ -27,7 +27,7 @@
 #include "../globals.h"
 #include "Engine.h"
 
-class AudioOut:public virtual Engine
+class AudioOut:public virtual LmmsEngine
 {
     public:
         AudioOut();

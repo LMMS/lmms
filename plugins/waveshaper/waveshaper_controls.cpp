@@ -55,7 +55,7 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 
 void waveShaperControls::samplesChanged( int _begin, int _end)
 {
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -115,13 +115,13 @@ void waveShaperControls::setDefaultShape()
 void waveShaperControls::resetClicked()
 {
 	setDefaultShape();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 void waveShaperControls::smoothClicked()
 {
 	m_wavegraphModel.smoothNonCyclic();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 void waveShaperControls::addOneClicked()
@@ -130,7 +130,7 @@ void waveShaperControls::addOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
 	}
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 void waveShaperControls::subOneClicked()
@@ -139,7 +139,7 @@ void waveShaperControls::subOneClicked()
 	{
 		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
 	}
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 

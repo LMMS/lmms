@@ -340,7 +340,7 @@ void MidiPort::updateMidiPortMode()
 	emit writablePortsChanged();
 	emit modeChanged();
 
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 

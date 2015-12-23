@@ -88,7 +88,7 @@ void TempoSyncKnob::contextMenuEvent( QContextMenuEvent * )
 	addDefaultActions( &contextMenu );
 	contextMenu.addSeparator();
 
-	float limit = 60000.0f / ( Engine::getSong()->getTempo() *
+	float limit = 60000.0f / ( LmmsEngine::getSong()->getTempo() *
 							model()->m_scale );
 
 	QMenu * syncMenu = contextMenu.addMenu( m_tempoSyncIcon,

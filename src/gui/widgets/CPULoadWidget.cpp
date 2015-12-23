@@ -92,7 +92,7 @@ void CPULoadWidget::paintEvent( QPaintEvent *  )
 void CPULoadWidget::updateCpuLoad()
 {
 	// smooth load-values a bit
-	int new_load = ( m_currentLoad + Engine::mixer()->cpuLoad() ) / 2;
+	int new_load = ( m_currentLoad + LmmsEngine::mixer()->cpuLoad() ) / 2;
 	if( new_load != m_currentLoad )
 	{
 		m_currentLoad = new_load;

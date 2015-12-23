@@ -57,12 +57,12 @@ LfoController::LfoController( Model * _parent ) :
 			this, SLOT( updateDuration() ) );
 	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateDuration() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateDuration() ) );
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
+	connect( LmmsEngine::getSong(), SIGNAL( playbackStateChanged() ),
 			this, SLOT( updatePhase() ) );
-	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
+	connect( LmmsEngine::getSong(), SIGNAL( playbackPositionChanged() ),
 			this, SLOT( updatePhase() ) );
 
 	updateDuration();
@@ -94,7 +94,7 @@ void LfoController::updateValueBuffer()
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
-		phase += static_cast<float>( Engine::mixer()->framesPerPeriod() * diff ) / m_duration;
+		phase += static_cast<float>( LmmsEngine::mixer()->framesPerPeriod() * diff ) / m_duration;
 		m_bufferLastUpdated += diff;
 	}
 
@@ -120,14 +120,14 @@ void LfoController::updateValueBuffer()
 
 void LfoController::updatePhase()
 {
-	m_currentPhase = ( Engine::getSong()->getFrames() ) / m_duration;
+	m_currentPhase = ( LmmsEngine::getSong()->getFrames() ) / m_duration;
 	m_bufferLastUpdated = s_periods - 1;
 }
 
 
 void LfoController::updateDuration()
 {
-	float newDurationF = Engine::mixer()->processingSampleRate() *	m_speedModel.value();
+	float newDurationF = LmmsEngine::mixer()->processingSampleRate() *	m_speedModel.value();
 
 	switch(m_multiplierModel.value() )
 	{

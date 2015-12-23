@@ -278,7 +278,7 @@ void SongEditor::loadSettings( const QDomElement& element )
 
 void SongEditor::setHighQuality( bool _hq )
 {
-	Engine::mixer()->changeQuality( Mixer::qualitySettings(
+	LmmsEngine::mixer()->changeQuality( Mixer::qualitySettings(
 			_hq ? Mixer::qualitySettings::Mode_HighQuality :
 				Mixer::qualitySettings::Mode_Draft ) );
 }
@@ -424,7 +424,7 @@ void SongEditor::setMasterVolume( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	Engine::mixer()->setMasterGain( _new_val / 100.0f );
+	LmmsEngine::mixer()->setMasterGain( _new_val / 100.0f );
 }
 
 
@@ -614,7 +614,7 @@ bool SongEditor::allowRubberband() const
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :
-	Editor(Engine::mixer()->audioDev()->supportsCapture()),
+	Editor(LmmsEngine::mixer()->audioDev()->supportsCapture()),
 	m_editor(new SongEditor(song))
 {
 	setWindowTitle( tr( "Song-Editor" ) );
@@ -706,13 +706,13 @@ QSize SongEditorWindow::sizeHint() const
 
 void SongEditorWindow::play()
 {
-	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
+	if( LmmsEngine::getSong()->playMode() != Song::Mode_PlaySong )
 	{
-		Engine::getSong()->playSong();
+		LmmsEngine::getSong()->playSong();
 	}
 	else
 	{
-		Engine::getSong()->togglePause();
+		LmmsEngine::getSong()->togglePause();
 	}
 }
 

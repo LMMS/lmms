@@ -1005,9 +1005,9 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateSampleRate
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
 
-	m_fpp = Engine::mixer()->framesPerPeriod();
+	m_fpp = LmmsEngine::mixer()->framesPerPeriod();
 
 	updateSamplerate();
 	updateVolume1();
@@ -1418,7 +1418,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::mixer()->processingSampleRate();
+	m_samplerate = LmmsEngine::mixer()->processingSampleRate();
 	
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;

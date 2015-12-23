@@ -103,8 +103,8 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<int>( samples ) / Engine::mixer()->framesPerPeriod() );
+		const float samples = LmmsEngine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		return 1 + ( static_cast<int>( samples ) / LmmsEngine::mixer()->framesPerPeriod() );
 	}
 
 	inline float wetLevel() const
@@ -177,9 +177,9 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::mixer()->processingSampleRate(),
+				LmmsEngine::mixer()->processingSampleRate(),
 					_dst_buf, _dst_sr,
-					Engine::mixer()->framesPerPeriod() );
+					LmmsEngine::mixer()->framesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
@@ -187,9 +187,9 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::mixer()->processingSampleRate(),
-			Engine::mixer()->framesPerPeriod() * _src_sr /
-				Engine::mixer()->processingSampleRate() );
+				LmmsEngine::mixer()->processingSampleRate(),
+			LmmsEngine::mixer()->framesPerPeriod() * _src_sr /
+				LmmsEngine::mixer()->processingSampleRate() );
 	}
 	void reinitSRC();
 

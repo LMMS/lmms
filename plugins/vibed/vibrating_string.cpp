@@ -42,7 +42,7 @@ vibratingString::vibratingString(	float _pitch,
 					float _detune,
 					bool _state ) :
 	m_oversample( 2 * _oversample / (int)( _sample_rate /
-				Engine::mixer()->baseSampleRate() ) ),
+				LmmsEngine::mixer()->baseSampleRate() ) ),
 	m_randomize( _randomize ),
 	m_stringLoss( 1.0f - _string_loss ),
 	m_state( 0.1f )

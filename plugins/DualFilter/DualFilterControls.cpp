@@ -97,7 +97,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	m_filter2Model.addItem( tr( "Fast Formant" ), new PixmapLoader( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "Tripole" ), new PixmapLoader( "filter_lp" ) );
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateFilters() ) );
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateFilters() ) );
 }
 
 
@@ -108,8 +108,8 @@ void DualFilterControls::updateFilters()
 	
 	delete m_effect->m_filter1;
 	delete m_effect->m_filter2;
-	m_effect->m_filter1 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
-	m_effect->m_filter2 = new BasicFilters<2>( Engine::mixer()->processingSampleRate() );
+	m_effect->m_filter1 = new BasicFilters<2>( LmmsEngine::mixer()->processingSampleRate() );
+	m_effect->m_filter2 = new BasicFilters<2>( LmmsEngine::mixer()->processingSampleRate() );
 	
 	// flag filters as needing recalculation
 	

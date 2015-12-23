@@ -21,8 +21,8 @@
 */
 #include "Engine.h"
 
-Engine::Engine()
+LmmsEngine::LmmsEngine()
 {}
 
-Engine::~Engine()
+LmmsEngine::~LmmsEngine()
 {}

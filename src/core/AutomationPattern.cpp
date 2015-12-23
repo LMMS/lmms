@@ -651,9 +651,9 @@ TrackContentObjectView * AutomationPattern::createView( TrackView * _tv )
 bool AutomationPattern::isAutomated( const AutomatableModel * _m )
 {
 	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	l += LmmsEngine::getSong()->tracks();
+	l += LmmsEngine::getBBTrackContainer()->tracks();
+	l += LmmsEngine::getSong()->globalAutomationTrack();
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
@@ -688,9 +688,9 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 {
 	QVector<AutomationPattern *> patterns;
 	TrackContainer::TrackList l;
-	l += Engine::getSong()->tracks();
-	l += Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	l += LmmsEngine::getSong()->tracks();
+	l += LmmsEngine::getBBTrackContainer()->tracks();
+	l += LmmsEngine::getSong()->globalAutomationTrack();
 
 	// go through all tracks...
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
@@ -732,7 +732,7 @@ QVector<AutomationPattern *> AutomationPattern::patternsForModel( const Automata
 AutomationPattern * AutomationPattern::globalAutomationPattern(
 							AutomatableModel * _m )
 {
-	AutomationTrack * t = Engine::getSong()->globalAutomationTrack();
+	AutomationTrack * t = LmmsEngine::getSong()->globalAutomationTrack();
 	Track::tcoVector v = t->getTCOs();
 	for( Track::tcoVector::const_iterator j = v.begin(); j != v.end(); ++j )
 	{
@@ -760,9 +760,9 @@ AutomationPattern * AutomationPattern::globalAutomationPattern(
 
 void AutomationPattern::resolveAllIDs()
 {
-	TrackContainer::TrackList l = Engine::getSong()->tracks() +
-				Engine::getBBTrackContainer()->tracks();
-	l += Engine::getSong()->globalAutomationTrack();
+	TrackContainer::TrackList l = LmmsEngine::getSong()->tracks() +
+				LmmsEngine::getBBTrackContainer()->tracks();
+	l += LmmsEngine::getSong()->globalAutomationTrack();
 	for( TrackContainer::TrackList::iterator it = l.begin();
 							it != l.end(); ++it )
 	{
@@ -779,7 +779,7 @@ void AutomationPattern::resolveAllIDs()
 					for( QVector<jo_id_t>::Iterator k = a->m_idsToResolve.begin();
 									k != a->m_idsToResolve.end(); ++k )
 					{
-						JournallingObject * o = Engine::projectJournal()->
+						JournallingObject * o = LmmsEngine::projectJournal()->
 														journallingObject( *k );
 						if( o && dynamic_cast<AutomatableModel *>( o ) )
 						{

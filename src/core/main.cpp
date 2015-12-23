@@ -584,7 +584,7 @@ int main( int argc, char * * argv )
 	// without starting the GUI
 	if( !renderOut.isEmpty() )
 	{
-		Engine::init( true );
+		LmmsEngine::init( true );
 
 		QFileInfo fileInfo( fileToLoad );
 		if ( !fileInfo.exists() )
@@ -594,10 +594,10 @@ int main( int argc, char * * argv )
 		}
 
 		printf( "Loading project...\n" );
-		Engine::getSong()->loadProject( fileToLoad );
+		LmmsEngine::getSong()->loadProject( fileToLoad );
 		printf( "Done\n" );
 
-		Engine::getSong()->setExportLoop( renderLoop );
+		LmmsEngine::getSong()->setExportLoop( renderLoop );
 
 		// when rendering multiple tracks, renderOut is a directory
 		// otherwise, it is a file, so we need to append the file extension
@@ -620,7 +620,7 @@ int main( int argc, char * * argv )
 
 		if( profilerOutputFile.isEmpty() == false )
 		{
-			Engine::mixer()->profiler().setOutputFile( profilerOutputFile );
+			LmmsEngine::mixer()->profiler().setOutputFile( profilerOutputFile );
 		}
 
 		// start now!
@@ -664,16 +664,16 @@ int main( int argc, char * * argv )
 
 			if( fileToLoad == recoveryFile )
 			{
-				Engine::getSong()->createNewProjectFromTemplate( fileToLoad );
+				LmmsEngine::getSong()->createNewProjectFromTemplate( fileToLoad );
 			}
 			else
 			{
-				Engine::getSong()->loadProject( fileToLoad );
+				LmmsEngine::getSong()->loadProject( fileToLoad );
 			}
 		}
 		else if( !fileToImport.isEmpty() )
 		{
-			ImportFilter::import( fileToImport, Engine::getSong() );
+			ImportFilter::import( fileToImport, LmmsEngine::getSong() );
 			if( exitAfterImport )
 			{
 				return EXIT_SUCCESS;
@@ -700,16 +700,16 @@ int main( int argc, char * * argv )
 
 			if ( recentFile.exists() )
 			{
-				Engine::getSong()->loadProject( f );
+				LmmsEngine::getSong()->loadProject( f );
 			}
 			else
 			{
-				Engine::getSong()->createNewProject();
+				LmmsEngine::getSong()->createNewProject();
 			}
 		}
 		else
 		{
-		Engine::getSong()->createNewProject();
+		LmmsEngine::getSong()->createNewProject();
 		}
 
 			// [Settel] workaround: showMaximized() doesn't work with

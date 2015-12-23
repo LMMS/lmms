@@ -279,7 +279,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
-				Engine::mixer()->processingSampleRate() );
+				LmmsEngine::mixer()->processingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -472,7 +472,7 @@ void bitInvaderView::modelChanged()
 void bitInvaderView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -481,7 +481,7 @@ void bitInvaderView::sinWaveClicked()
 void bitInvaderView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -490,7 +490,7 @@ void bitInvaderView::triangleWaveClicked()
 void bitInvaderView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -499,7 +499,7 @@ void bitInvaderView::sawWaveClicked()
 void bitInvaderView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -508,7 +508,7 @@ void bitInvaderView::sqrWaveClicked()
 void bitInvaderView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -518,7 +518,7 @@ void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
 	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 	/*
 	m_graph->model()->setWaveToNoise();
 	Engine::getSong()->setModified();
@@ -554,7 +554,7 @@ void bitInvaderView::usrWaveClicked()
 void bitInvaderView::smoothClicked()
 {
 	m_graph->model()->smooth();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -563,7 +563,7 @@ void bitInvaderView::smoothClicked()
 void bitInvaderView::interpolationToggled( bool value )
 {
 	m_graph->setGraphStyle( value ? Graph::LinearStyle : Graph::NearestStyle);
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -571,7 +571,7 @@ void bitInvaderView::interpolationToggled( bool value )
 
 void bitInvaderView::normalizeToggled( bool value )
 {
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 

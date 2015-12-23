@@ -141,7 +141,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
 
-	Engine::projectJournal()->setJournalling( false );
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
@@ -782,7 +782,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		ConfigManager::inst()->value( "mixer", "audiodev" );
 	if( audioDevName.length() == 0 )
 	{
-		audioDevName = Engine::mixer()->audioDevName();
+		audioDevName = LmmsEngine::mixer()->audioDevName();
 		ConfigManager::inst()->setValue(
 					"mixer", "audiodev", audioDevName );
 	}
@@ -876,7 +876,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		ConfigManager::inst()->value( "mixer", "mididev" );
 	if( midiDevName.length() == 0 )
 	{
-		midiDevName = Engine::mixer()->midiClientName();
+		midiDevName = LmmsEngine::mixer()->midiClientName();
 		ConfigManager::inst()->setValue(
 					"mixer", "mididev", midiDevName );
 	}
@@ -953,7 +953,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 SetupDialog::~SetupDialog()
 {
-	Engine::projectJournal()->setJournalling( true );
+	LmmsEngine::projectJournal()->setJournalling( true );
 }
 
 
@@ -1072,7 +1072,7 @@ void SetupDialog::setBufferSize( int _value )
 	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
-				Engine::mixer()->processingSampleRate(),
+				LmmsEngine::mixer()->processingSampleRate(),
 						0, 'f', 1 ) );
 }
 

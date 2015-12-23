@@ -445,7 +445,7 @@ private:
 
 	bool m_metronomeActive;
 
-	friend class Engine;
+	friend class LmmsEngine;
 	friend class MixerWorkerThread;
 
 } ;
