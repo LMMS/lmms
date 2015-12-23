@@ -69,7 +69,7 @@ ControllerRackView::ControllerRackView( ) :
 	connect( m_addButton, SIGNAL( clicked() ),
 			this, SLOT( addController() ) );
 
-	Song * song = Engine::getSong();
+	Song * song = LmmsEngine::getSong();
 	connect( song, SIGNAL( controllerAdded( Controller* ) ), SLOT( onControllerAdded( Controller* ) ) );
 	connect( song, SIGNAL( controllerRemoved( Controller* ) ), SLOT( onControllerRemoved( Controller* ) ) );
 
@@ -135,7 +135,7 @@ void ControllerRackView::deleteController( ControllerView * _view )
 		}
 	}
 
-	Song * song = Engine::getSong();
+	Song * song = LmmsEngine::getSong();
 	song->removeController( c );
 }
 
@@ -192,7 +192,7 @@ void ControllerRackView::addController()
 {
 	// TODO: Eventually let the user pick from available controller types
 
-	Engine::getSong()->addController( new LfoController( Engine::getSong() ) );
+	LmmsEngine::getSong()->addController( new LfoController( LmmsEngine::getSong() ) );
 
 	// fix bug which always made ControllerRackView loose focus when adding
 	// new controller

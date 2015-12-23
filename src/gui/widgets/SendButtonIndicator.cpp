@@ -31,7 +31,7 @@ SendButtonIndicator:: SendButtonIndicator( QWidget * _parent, FxLine * _owner,
 
 void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 {
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 	int from = m_mv->currentFxLine()->channelIndex();
 	int to = m_parent->channelIndex();
 	FloatModel * sendModel = mix->channelSendModel(from, to);
@@ -52,7 +52,7 @@ void SendButtonIndicator::mousePressEvent( QMouseEvent * e )
 
 FloatModel * SendButtonIndicator::getSendModel()
 {
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 	return mix->channelSendModel(
 		m_mv->currentFxLine()->channelIndex(), m_parent->channelIndex());
 }

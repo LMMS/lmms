@@ -101,7 +101,7 @@ const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	Track( Track::InstrumentTrack, tc ),
 	MidiEventProcessor(),
-	m_midiPort( tr( "unnamed_track" ), Engine::mixer()->midiClient(),
+	m_midiPort( tr( "unnamed_track" ), LmmsEngine::mixer()->midiClient(),
 								this, this ),
 	m_notes(),
 	m_sustainPedalPressed( false ),
@@ -125,7 +125,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_panningModel.setCenterValue( DefaultPanning );
 	m_baseNoteModel.setInitValue( DefaultKey );
 
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+	m_effectChannelModel.setRange( 0, LmmsEngine::fxMixer()->numChannels()-1, 1);
 
 	for( int i = 0; i < NumKeys; ++i )
 	{
@@ -144,7 +144,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 
 int InstrumentTrack::baseNote() const
 {
-	int mp = m_useMasterPitchModel.value() ? Engine::getSong()->masterPitch() : 0;
+	int mp = m_useMasterPitchModel.value() ? LmmsEngine::getSong()->masterPitch() : 0;
 
 	return m_baseNoteModel.value() - mp;
 }
@@ -268,7 +268,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 								NULL, event.channel(),
 								NotePlayHandle::OriginMidiInput );
 					m_notes[event.key()] = nph;
-					if( ! Engine::mixer()->addPlayHandle( nph ) )
+					if( ! LmmsEngine::mixer()->addPlayHandle( nph ) )
 					{
 						m_notes[event.key()] = NULL;
 					}
@@ -430,7 +430,7 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	Engine::mixer()->removePlayHandles( this, removeIPH );
+	LmmsEngine::mixer()->removePlayHandles( this, removeIPH );
 	unlock();
 }
 
@@ -581,7 +581,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		return false;
 	}
-	const float frames_per_tick = Engine::framesPerTick();
+	const float frames_per_tick = LmmsEngine::framesPerTick();
 
 	tcoVector tcos;
 	::BBTrack * bb_track = NULL;
@@ -664,7 +664,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 				}
 
-				Engine::mixer()->addPlayHandle( notePlayHandle );
+				LmmsEngine::mixer()->addPlayHandle( notePlayHandle );
 				played_a_note = true;
 			}
 			++nit;
@@ -731,7 +731,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_panningModel.loadSettings( thisElement, "pan" );
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
-	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
+	m_effectChannelModel.setRange( 0, LmmsEngine::fxMixer()->numChannels()-1 );
 	m_effectChannelModel.loadSettings( thisElement, "fxch" );
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
@@ -878,7 +878,7 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_midiMenu = new QMenu( tr( "MIDI" ), this );
 
 	// sequenced MIDI?
-	if( !Engine::mixer()->midiClient()->isRaw() )
+	if( !LmmsEngine::mixer()->midiClient()->isRaw() )
 	{
 		_it->m_midiPort.m_readablePortsMenu = new MidiPortMenu(
 							MidiPort::Input );
@@ -967,7 +967,7 @@ void InstrumentTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
 
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+	LmmsEngine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
 
 	assignFxLine(channelIndex);
 }
@@ -1173,7 +1173,7 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+	FxChannel *fxChannel = LmmsEngine::fxMixer()->effectChannel( channelIndex );
 
 	// If title allows interpolation, pass channel index and name
 	if ( title.contains( "%2" ) )
@@ -1188,9 +1188,9 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
-	for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
+	for (int i = 0; i < LmmsEngine::fxMixer()->fxChannels().size(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
+		FxChannel * currentChannel = LmmsEngine::fxMixer()->fxChannels()[i];
 
 		if ( currentChannel != fxChannel )
 		{
@@ -1627,7 +1627,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 void InstrumentTrackWindow::textChanged( const QString& newName )
 {
 	m_track->setName( newName );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -1703,7 +1703,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	{
 		m_track->loadInstrument( value );
 
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 
 		event->accept();
 		setFocus();
@@ -1715,7 +1715,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		m_track->setSimpleSerializing();
 		m_track->loadSettings( dataFile.content().toElement() );
 
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 
 		event->accept();
 		setFocus();

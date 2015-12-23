@@ -54,10 +54,10 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
 	Effect( &bitcrush_plugin_descriptor, parent, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( LmmsEngine::mixer()->processingSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() * OS_RATE );
+	m_buffer = MM_ALLOC( sampleFrame, LmmsEngine::mixer()->framesPerPeriod() * OS_RATE );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 	
@@ -78,7 +78,7 @@ BitcrushEffect::~BitcrushEffect()
 
 void BitcrushEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = LmmsEngine::mixer()->processingSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;

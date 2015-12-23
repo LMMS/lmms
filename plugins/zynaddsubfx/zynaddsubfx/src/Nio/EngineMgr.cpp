@@ -30,7 +30,7 @@ EngineMgr &EngineMgr::getInstance()
 
 EngineMgr::EngineMgr()
 {
-    Engine *defaultEng = new NulEngine();
+    LmmsEngine *defaultEng = new NulEngine();
 
     //conditional compiling mess (but contained)
     engines.push_back(defaultEng);
@@ -61,15 +61,15 @@ EngineMgr::EngineMgr()
 
 EngineMgr::~EngineMgr()
 {
-    for(list<Engine *>::iterator itr = engines.begin();
+    for(list<LmmsEngine *>::iterator itr = engines.begin();
         itr != engines.end(); ++itr)
         delete *itr;
 }
 
-Engine *EngineMgr::getEng(string name)
+LmmsEngine *EngineMgr::getEng(string name)
 {
     transform(name.begin(), name.end(), name.begin(), ::toupper);
-    for(list<Engine *>::iterator itr = engines.begin();
+    for(list<LmmsEngine *>::iterator itr = engines.begin();
         itr != engines.end(); ++itr)
         if((*itr)->name == name)
             return *itr;
@@ -120,7 +120,7 @@ bool EngineMgr::start()
 
 void EngineMgr::stop()
 {
-    for(list<Engine *>::iterator itr = engines.begin();
+    for(list<LmmsEngine *>::iterator itr = engines.begin();
         itr != engines.end(); ++itr)
         (*itr)->Stop();
 }

@@ -560,7 +560,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
 	{	
-		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
+		NesObject * nes = new NesObject( this, LmmsEngine::mixer()->processingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	

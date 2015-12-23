@@ -124,8 +124,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	}
 
 
-	const bool j = Engine::projectJournal()->isJournalling();
-	Engine::projectJournal()->setJournalling( false );
+	const bool j = LmmsEngine::projectJournal()->isJournalling();
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 	if( _load_by_plugin )
 	{
@@ -186,7 +186,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	s_previewTC->setPreviewNote( m_previewNote );
 
 	s_previewTC->unlockData();
-	Engine::projectJournal()->setJournalling( j );
+	LmmsEngine::projectJournal()->setJournalling( j );
 }
 
 

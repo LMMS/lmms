@@ -96,7 +96,7 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 void TimeDisplayWidget::updateTime()
 {
-	Song* s = Engine::getSong();
+	Song* s = LmmsEngine::getSong();
 
 	switch( m_displayMode )
 	{

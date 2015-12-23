@@ -253,7 +253,7 @@ void AudioJack::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
 
 		if( jack_get_sample_rate( m_client ) != sampleRate() )
 		{

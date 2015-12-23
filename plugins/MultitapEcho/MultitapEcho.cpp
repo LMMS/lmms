@@ -51,10 +51,10 @@ MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPlug
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( LmmsEngine::mixer()->processingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	m_work = MM_ALLOC( sampleFrame, LmmsEngine::mixer()->framesPerPeriod() );
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );

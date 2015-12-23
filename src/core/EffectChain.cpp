@@ -120,9 +120,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	Engine::mixer()->lock();
+	LmmsEngine::mixer()->lock();
 	m_effects.append( _effect );
-	Engine::mixer()->unlock();
+	LmmsEngine::mixer()->unlock();
 
 	emit dataChanged();
 }
@@ -132,7 +132,7 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	Engine::mixer()->lock();
+	LmmsEngine::mixer()->lock();
 
 	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
 	if( found == m_effects.end() )
@@ -141,12 +141,12 @@ void EffectChain::removeEffect( Effect * _effect )
 	}
 	m_effects.erase( found );
 
-	Engine::mixer()->unlock();
+	LmmsEngine::mixer()->unlock();
 	emit dataChanged();
 	return;
 
 fail:
-	Engine::mixer()->unlock();
+	LmmsEngine::mixer()->unlock();
 }
 
 
@@ -204,7 +204,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	{
 		return false;
 	}
-	const bool exporting = Engine::getSong()->isExporting();
+	const bool exporting = LmmsEngine::getSong()->isExporting();
 	if( exporting ) // strip infs/nans if exporting
 	{
 		MixHelpers::sanitize( _buf, _frames );

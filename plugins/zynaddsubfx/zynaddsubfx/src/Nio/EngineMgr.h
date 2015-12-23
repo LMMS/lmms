@@ -20,7 +20,7 @@ class EngineMgr
          * @param name case unsensitive name of engine
          * @return pointer to Engine or NULL
          */
-        Engine *getEng(std::string name);
+        LmmsEngine *getEng(std::string name);
 
         /**Start up defaults*/
         bool start();
@@ -28,7 +28,7 @@ class EngineMgr
         /**Stop all engines*/
         void stop();
 
-        std::list<Engine *> engines;
+        std::list<LmmsEngine *> engines;
 
         //return false on failure
         bool setInDefault(std::string name);

@@ -149,8 +149,8 @@ void ExportProjectDialog::startExport()
 
 	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
 
-	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
-	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
+	LmmsEngine::getSong()->setExportLoop( exportLoopCB->isChecked() );
+	LmmsEngine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
 
 	connect( m_renderManager, SIGNAL( progressChanged( int ) ),
 			progressBar, SLOT( setValue( int ) ) );

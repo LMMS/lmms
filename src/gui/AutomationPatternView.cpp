@@ -118,7 +118,7 @@ void AutomationPatternView::changeName()
 
 void AutomationPatternView::disconnectObject( QAction * _a )
 {
-	JournallingObject * j = Engine::projectJournal()->
+	JournallingObject * j = LmmsEngine::projectJournal()->
 				journallingObject( _a->data().toInt() );
 	if( j && dynamic_cast<AutomatableModel *>( j ) )
 	{
@@ -417,7 +417,7 @@ void AutomationPatternView::dropEvent( QDropEvent * _de )
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
+				LmmsEngine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{

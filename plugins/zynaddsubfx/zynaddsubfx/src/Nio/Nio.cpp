@@ -74,7 +74,7 @@ std::string Nio::getPostfix(void)
 set<string> Nio::getSources(void)
 {
     set<string> sources;
-    for(std::list<Engine *>::iterator itr = eng->engines.begin();
+    for(std::list<LmmsEngine *>::iterator itr = eng->engines.begin();
         itr != eng->engines.end(); ++itr)
         if(dynamic_cast<MidiIn *>(*itr))
             sources.insert((*itr)->name);
@@ -84,7 +84,7 @@ set<string> Nio::getSources(void)
 set<string> Nio::getSinks(void)
 {
     set<string> sinks;
-    for(std::list<Engine *>::iterator itr = eng->engines.begin();
+    for(std::list<LmmsEngine *>::iterator itr = eng->engines.begin();
         itr != eng->engines.end(); ++itr)
         if(dynamic_cast<AudioOut *>(*itr))
             sinks.insert((*itr)->name);

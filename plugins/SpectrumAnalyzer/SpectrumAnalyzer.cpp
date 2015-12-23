@@ -127,7 +127,7 @@ bool SpectrumAnalyzer::processAudioBuffer( sampleFrame* _buf, const fpp_t _frame
 
 //	hanming( m_buffer, FFT_BUFFER_SIZE, HAMMING );
 
-	const sample_rate_t sr = Engine::mixer()->processingSampleRate();
+	const sample_rate_t sr = LmmsEngine::mixer()->processingSampleRate();
 	const int LOWEST_FREQ = 0;
 	const int HIGHEST_FREQ = sr / 2;
 

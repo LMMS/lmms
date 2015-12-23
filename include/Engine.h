@@ -42,7 +42,7 @@ class Song;
 class Ladspa2LMMS;
 
 
-class EXPORT Engine : public QObject
+class EXPORT LmmsEngine : public QObject
 {
 	Q_OBJECT
 public:
@@ -91,11 +91,11 @@ public:
 	}
 	static void updateFramesPerTick();
 
-	static inline Engine * inst()
+	static inline LmmsEngine * inst()
 	{
 		if( s_instanceOfMe == NULL )
 		{
-			s_instanceOfMe = new Engine();
+			s_instanceOfMe = new LmmsEngine();
 		}
 		return s_instanceOfMe;
 	}
@@ -128,7 +128,7 @@ private:
 	static Ladspa2LMMS * s_ladspaManager;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
-	static Engine * s_instanceOfMe;
+	static LmmsEngine * s_instanceOfMe;
 
 	friend class GuiApplication;
 };

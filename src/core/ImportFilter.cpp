@@ -57,8 +57,8 @@ void ImportFilter::import( const QString & _file_to_import,
 	char * s = qstrdup( _file_to_import.toUtf8().constData() );
 
 	// do not record changes while importing files
-	const bool j = Engine::projectJournal()->isJournalling();
-	Engine::projectJournal()->setJournalling( false );
+	const bool j = LmmsEngine::projectJournal()->isJournalling();
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 	for (const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::ImportFilter))
 	{
@@ -73,7 +73,7 @@ void ImportFilter::import( const QString & _file_to_import,
 		delete p;
 	}
 
-	Engine::projectJournal()->setJournalling( j );
+	LmmsEngine::projectJournal()->setJournalling( j );
 
 	delete[] s;
 

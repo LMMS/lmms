@@ -204,7 +204,7 @@ MainWindow::MainWindow() :
 		m_autoSaveTimer.start(1000 * 60);  // 1 minute
 	}
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
+	connect( LmmsEngine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
 }
 
@@ -225,7 +225,7 @@ MainWindow::~MainWindow()
 	delete gui->pianoRoll();
 	delete gui->songEditor();
 	// destroy engine which will do further cleanups etc.
-	Engine::destroy();
+	LmmsEngine::destroy();
 }
 
 
@@ -284,22 +284,22 @@ void MainWindow::finalize()
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
-					Engine::getSong(),
+					LmmsEngine::getSong(),
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					Engine::getSong(),
+					LmmsEngine::getSong(),
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
-					Engine::getSong(),
+					LmmsEngine::getSong(),
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
-					Engine::getSong(),
+					LmmsEngine::getSong(),
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );
 
@@ -421,7 +421,7 @@ void MainWindow::finalize()
 	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					Engine::getSong(),
+					LmmsEngine::getSong(),
 							SLOT( exportProject() ),
 								m_toolBar );
 
@@ -437,7 +437,7 @@ void MainWindow::finalize()
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+	m_metronomeToggle->setChecked(LmmsEngine::mixer()->isMetronomeActive());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -561,7 +561,7 @@ void MainWindow::finalize()
 	}
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
-	else if( Engine::mixer()->audioDevStartFailed() )
+	else if( LmmsEngine::mixer()->audioDevStartFailed() )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -637,16 +637,16 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 void MainWindow::resetWindowTitle()
 {
 	QString title = "";
-	if( Engine::getSong()->projectFileName() != "" )
+	if( LmmsEngine::getSong()->projectFileName() != "" )
 	{
-		title = QFileInfo( Engine::getSong()->projectFileName()
+		title = QFileInfo( LmmsEngine::getSong()->projectFileName()
 							).completeBaseName();
 	}
 	if( title == "" )
 	{
 		title = tr( "Untitled" );
 	}
-	if( Engine::getSong()->isModified() )
+	if( LmmsEngine::getSong()->isModified() )
 	{
 		title += '*';
 	}
@@ -659,9 +659,9 @@ void MainWindow::resetWindowTitle()
 bool MainWindow::mayChangeProject(bool stopPlayback)
 {
 	if( stopPlayback )
-		Engine::getSong()->stop();
+		LmmsEngine::getSong()->stop();
 
-	if( !Engine::getSong()->isModified() )
+	if( !LmmsEngine::getSong()->isModified() )
 	{
 		return( true );
 	}
@@ -787,7 +787,7 @@ void MainWindow::createNewProject()
 {
 	if( mayChangeProject(true) )
 	{
-		Engine::getSong()->createNewProject();
+		LmmsEngine::getSong()->createNewProject();
 	}
 }
 
@@ -804,7 +804,7 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
-		Engine::getSong()->createNewProjectFromTemplate(
+		LmmsEngine::getSong()->createNewProjectFromTemplate(
 			dirBase + _idx->text() + ".mpt" );
 	}
 }
@@ -823,7 +823,7 @@ void MainWindow::openProject()
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-			Song *song = Engine::getSong();
+			Song *song = LmmsEngine::getSong();
 
 			song->stop();
 			setCursor( Qt::WaitCursor );
@@ -870,7 +870,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 	{
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
-		Engine::getSong()->loadProject( f );
+		LmmsEngine::getSong()->loadProject( f );
 		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
@@ -881,13 +881,13 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool MainWindow::saveProject()
 {
-	if( Engine::getSong()->projectFileName() == "" )
+	if( LmmsEngine::getSong()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
 	else
 	{
-		Engine::getSong()->guiSaveProject();
+		LmmsEngine::getSong()->guiSaveProject();
 	}
 	return( true );
 }
@@ -900,7 +900,7 @@ bool MainWindow::saveProjectAs()
 	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
-	QString f = Engine::getSong()->projectFileName();
+	QString f = LmmsEngine::getSong()->projectFileName();
 	if( f != "" )
 	{
 		sfd.setDirectory( QFileInfo( f ).absolutePath() );
@@ -919,7 +919,7 @@ bool MainWindow::saveProjectAs()
 		{
 			fname += ".mpt";
 		}
-		Engine::getSong()->guiSaveProjectAs(
+		LmmsEngine::getSong()->guiSaveProjectAs(
 						fname );
 		return( true );
 	}
@@ -931,7 +931,7 @@ bool MainWindow::saveProjectAs()
 
 bool MainWindow::saveProjectAsNewVersion()
 {
-	QString fileName = Engine::getSong()->projectFileName();
+	QString fileName = LmmsEngine::getSong()->projectFileName();
 	if( fileName == "" )
 	{
 		return saveProjectAs();
@@ -941,7 +941,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
+		LmmsEngine::getSong()->guiSaveProjectAs( fileName );
 		return true;
 	}
 }
@@ -966,7 +966,7 @@ void MainWindow::saveProjectAsDefaultTemplate()
 		}
 	}
 
-	Engine::getSong()->saveProjectFile( defaultTemplate );
+	LmmsEngine::getSong()->saveProjectFile( defaultTemplate );
 }
 
 
@@ -1225,7 +1225,7 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Mixer * mixer = Engine::mixer();
+	Mixer * mixer = LmmsEngine::mixer();
 
 	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
 }
@@ -1248,9 +1248,9 @@ void MainWindow::updatePlayPauseIcons()
 	gui->getBBEditor()->setPauseIcon( false );
 	gui->pianoRoll()->setPauseIcon( false );
 
-	if( Engine::getSong()->isPlaying() )
+	if( LmmsEngine::getSong()->isPlaying() )
 	{
-		switch( Engine::getSong()->playMode() )
+		switch( LmmsEngine::getSong()->playMode() )
 		{
 			case Song::Mode_PlaySong:
 				gui->songEditor()->setPauseIcon( true );
@@ -1279,15 +1279,15 @@ void MainWindow::updateUndoRedoButtons()
 {
 	// when the edit menu is shown, grey out the undo/redo buttons if there's nothing to undo/redo
 	// else, un-grey them
-	m_undoAction->setEnabled(Engine::projectJournal()->canUndo());
-	m_redoAction->setEnabled(Engine::projectJournal()->canRedo());
+	m_undoAction->setEnabled(LmmsEngine::projectJournal()->canUndo());
+	m_redoAction->setEnabled(LmmsEngine::projectJournal()->canRedo());
 }
 
 
 
 void MainWindow::undo()
 {
-	Engine::projectJournal()->undo();
+	LmmsEngine::projectJournal()->undo();
 }
 
 
@@ -1295,7 +1295,7 @@ void MainWindow::undo()
 
 void MainWindow::redo()
 {
-	Engine::projectJournal()->redo();
+	LmmsEngine::projectJournal()->redo();
 }
 
 
@@ -1448,10 +1448,10 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ) )
+	if( !( LmmsEngine::getSong()->isPlaying() ||
+			LmmsEngine::getSong()->isExporting() ) )
 	{
-		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		LmmsEngine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 	}
 	else
 	{

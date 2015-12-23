@@ -24,11 +24,11 @@
 #define ENGINE_H
 #include <string>
 /**Marker for input/output driver*/
-class Engine
+class LmmsEngine
 {
     public:
-        Engine();
-        virtual ~Engine();
+        LmmsEngine();
+        virtual ~LmmsEngine();
 
         /**Start the Driver with all capabilities
          * @return true on success*/

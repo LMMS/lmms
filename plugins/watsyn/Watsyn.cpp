@@ -337,8 +337,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 				&B1_wave[0],
 				&B2_wave[0],
 				m_amod.value(), m_bmod.value(),
-				Engine::mixer()->processingSampleRate(), _n,
-				Engine::mixer()->framesPerPeriod(), this );
+				LmmsEngine::mixer()->processingSampleRate(), _n,
+				LmmsEngine::mixer()->framesPerPeriod(), this );
 
 		_n->m_pluginData = w;
 	}
@@ -985,19 +985,19 @@ void WatsynView::sinWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1009,19 +1009,19 @@ void WatsynView::triWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1033,19 +1033,19 @@ void WatsynView::sawWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1057,19 +1057,19 @@ void WatsynView::sqrWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1081,19 +1081,19 @@ void WatsynView::normalizeClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->normalize();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->normalize();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->normalize();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->normalize();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1105,19 +1105,19 @@ void WatsynView::invertClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->invert();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->invert();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->invert();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->invert();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1129,19 +1129,19 @@ void WatsynView::smoothClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->smooth();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->smooth();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->smooth();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->smooth();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1153,19 +1153,19 @@ void WatsynView::phaseLeftClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1177,19 +1177,19 @@ void WatsynView::phaseRightClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }
@@ -1202,19 +1202,19 @@ void WatsynView::loadClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 	}
 }

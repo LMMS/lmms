@@ -277,7 +277,7 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
-				Engine::mixer()->processingSampleRate(),
+				LmmsEngine::mixer()->processingSampleRate(),
 						__sampleLength );
 		
 		for( int i = 0; i < 9; ++i )
@@ -690,7 +690,7 @@ void vibedView::showString( int _string )
 void vibedView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -698,7 +698,7 @@ void vibedView::sinWaveClicked()
 void vibedView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -706,7 +706,7 @@ void vibedView::triangleWaveClicked()
 void vibedView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -714,7 +714,7 @@ void vibedView::sawWaveClicked()
 void vibedView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -722,7 +722,7 @@ void vibedView::sqrWaveClicked()
 void vibedView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -731,7 +731,7 @@ void vibedView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
 	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -739,7 +739,7 @@ void vibedView::usrWaveClicked()
 void vibedView::smoothClicked()
 {
 	m_graph->model()->smooth();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -747,7 +747,7 @@ void vibedView::smoothClicked()
 void vibedView::normalizeClicked()
 {
 	m_graph->model()->normalize();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 

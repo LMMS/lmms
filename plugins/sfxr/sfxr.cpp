@@ -452,7 +452,7 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	float currentSampleRate = Engine::mixer()->processingSampleRate();
+	float currentSampleRate = LmmsEngine::mixer()->processingSampleRate();
 
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
     const f_cnt_t offset = _n->noteOffset();

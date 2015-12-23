@@ -52,8 +52,8 @@ DelayEffect::DelayEffect( Model* parent, const Plugin::Descriptor::SubPluginFeat
 	m_delayControls( this )
 {
 	m_delay = 0;
-	m_delay = new StereoDelay( 20, Engine::mixer()->processingSampleRate() );
-	m_lfo = new Lfo( Engine::mixer()->processingSampleRate() );
+	m_delay = new StereoDelay( 20, LmmsEngine::mixer()->processingSampleRate() );
+	m_lfo = new Lfo( LmmsEngine::mixer()->processingSampleRate() );
 	m_outGain = 1.0;
 }
 
@@ -82,7 +82,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		return( false );
 	}
 	double outSum = 0.0;
-	const float sr = Engine::mixer()->processingSampleRate();
+	const float sr = LmmsEngine::mixer()->processingSampleRate();
 	const float d = dryLevel();
 	const float w = wetLevel();
 	sample_t dryS[2];
@@ -117,7 +117,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
-		sampleLength = *lengthPtr * Engine::mixer()->processingSampleRate();
+		sampleLength = *lengthPtr * LmmsEngine::mixer()->processingSampleRate();
 		m_currentLength = sampleLength;
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
@@ -146,8 +146,8 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 void DelayEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_delay->setSampleRate( Engine::mixer()->processingSampleRate() );
+	m_lfo->setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
+	m_delay->setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
 }
 
 

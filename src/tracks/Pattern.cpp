@@ -117,7 +117,7 @@ Pattern::~Pattern()
 
 void Pattern::init()
 {
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( LmmsEngine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
 	saveJournallingState( false );
 
@@ -603,9 +603,9 @@ void Pattern::ensureBeatNotes()
 
 void Pattern::updateBBTrack()
 {
-	if( getTrack()->trackContainer() == Engine::getBBTrackContainer() )
+	if( getTrack()->trackContainer() == LmmsEngine::getBBTrackContainer() )
 	{
-		Engine::getBBTrackContainer()->updateBBTrack( this );
+		LmmsEngine::getBBTrackContainer()->updateBBTrack( this );
 	}
 
 	if( gui && gui->pianoRoll() && gui->pianoRoll()->currentPattern() == this )
@@ -851,7 +851,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 			}
 		}
 
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 		update();
 
 		if( gui->pianoRoll()->currentPattern() == m_pat )
@@ -926,7 +926,7 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 				n->setVolume( qMax( 0, vol - 5 ) );
 			}
 
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			update();
 			if( gui->pianoRoll()->currentPattern() == m_pat )
 			{

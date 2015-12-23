@@ -57,7 +57,7 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl )
 {
-	if( m_freq >= Engine::mixer()->processingSampleRate() / 2 )
+	if( m_freq >= LmmsEngine::mixer()->processingSampleRate() / 2 )
 	{
 		BufferManager::clear( _ab, _frames );
 		return;
@@ -458,7 +458,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 	recalcPhase();
 	const float osc_coeff = m_freq * m_detuning;
 	const float sampleRateCorrection = 44100.0f /
-				Engine::mixer()->processingSampleRate();
+				LmmsEngine::mixer()->processingSampleRate();
 
 	for( fpp_t frame = 0; frame < _frames; ++frame )
 	{
