@@ -44,14 +44,14 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 						visualizationTypes _vtype ) :
 	QWidget( _p ),
 	s_background( _bg ),
-	m_points( new QPointF[Engine::mixer()->framesPerPeriod()] ),
+	m_points( new QPointF[LmmsEngine::mixer()->framesPerPeriod()] ),
 	m_active( false )
 {
 	setFixedSize( s_background.width(), s_background.height() );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setActive( ConfigManager::inst()->value( "ui", "displaywaveform").toInt() );
 
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = LmmsEngine::mixer()->framesPerPeriod();
 	m_buffer = new sampleFrame[frames];
 
 	BufferManager::clear( m_buffer, frames );
@@ -75,9 +75,9 @@ VisualizationWidget::~VisualizationWidget()
 
 void VisualizationWidget::updateAudioBuffer( const surroundSampleFrame * buffer )
 {
-	if( !Engine::getSong()->isExporting() )
+	if( !LmmsEngine::getSong()->isExporting() )
 	{
-		const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+		const fpp_t fpp = LmmsEngine::mixer()->framesPerPeriod();
 		memcpy( m_buffer, buffer, sizeof( surroundSampleFrame ) * fpp );
 	}
 }
@@ -93,7 +93,7 @@ void VisualizationWidget::setActive( bool _active )
 		connect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		connect( Engine::mixer(),
+		connect( LmmsEngine::mixer(),
 			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 	}
@@ -102,7 +102,7 @@ void VisualizationWidget::setActive( bool _active )
 		disconnect( gui->mainWindow(),
 					SIGNAL( periodicUpdate() ),
 					this, SLOT( update() ) );
-		disconnect( Engine::mixer(),
+		disconnect( LmmsEngine::mixer(),
 			SIGNAL( nextAudioBuffer( const surroundSampleFrame* ) ),
 			this, SLOT( updateAudioBuffer( const surroundSampleFrame* ) ) );
 		// we have to update (remove last waves),
@@ -120,9 +120,9 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 
 	p.drawPixmap( 0, 0, s_background );
 
-	if( m_active && !Engine::getSong()->isExporting() )
+	if( m_active && !LmmsEngine::getSong()->isExporting() )
 	{
-		float master_output = Engine::mixer()->masterGain();
+		float master_output = LmmsEngine::mixer()->masterGain();
 		int w = width()-4;
 		const float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		int x_base = 2;
@@ -132,7 +132,7 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 
 
 		const fpp_t frames =
-				Engine::mixer()->framesPerPeriod();
+				LmmsEngine::mixer()->framesPerPeriod();
 		const float max_level = qMax<float>(
 				Mixer::peakValueLeft( m_buffer, frames ),
 				Mixer::peakValueRight( m_buffer, frames ) );

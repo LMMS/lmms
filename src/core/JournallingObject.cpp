@@ -35,7 +35,7 @@
 
 JournallingObject::JournallingObject() :
 	SerializingObject(),
-	m_id( Engine::projectJournal()->allocID( this ) ),
+	m_id( LmmsEngine::projectJournal()->allocID( this ) ),
 	m_journalling( true ),
 	m_journallingStateStack()
 {
@@ -46,9 +46,9 @@ JournallingObject::JournallingObject() :
 
 JournallingObject::~JournallingObject()
 {
-	if( Engine::projectJournal() )
+	if( LmmsEngine::projectJournal() )
 	{
-		Engine::projectJournal()->freeID( id() );
+		LmmsEngine::projectJournal()->freeID( id() );
 	}
 }
 
@@ -59,7 +59,7 @@ void JournallingObject::addJournalCheckPoint()
 {
 	if( isJournalling() )
 	{
-		Engine::projectJournal()->addJournalCheckPoint( this );
+		LmmsEngine::projectJournal()->addJournalCheckPoint( this );
 	}
 }
 
@@ -118,7 +118,7 @@ void JournallingObject::changeID( jo_id_t _id )
 {
 	if( id() != _id )
 	{
-		JournallingObject * jo = Engine::projectJournal()->
+		JournallingObject * jo = LmmsEngine::projectJournal()->
 											journallingObject( _id );
 		if( jo != NULL )
 		{
@@ -135,7 +135,7 @@ void JournallingObject::changeID( jo_id_t _id )
 			return;
 		}
 
-		Engine::projectJournal()->reallocID( _id, this );
+		LmmsEngine::projectJournal()->reallocID( _id, this );
 		m_id = _id;
 	}
 }

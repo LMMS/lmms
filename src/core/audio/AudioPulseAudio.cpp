@@ -179,7 +179,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.minreq = (uint32_t)(-1);
 			buffer_attr.fragsize = (uint32_t)(-1);
 
-			double latency = (double)( Engine::mixer()->framesPerPeriod() ) /
+			double latency = (double)( LmmsEngine::mixer()->framesPerPeriod() ) /
 													(double)_this->sampleRate();
 
 			// ask PulseAudio for the desired latency (which might not be approved)

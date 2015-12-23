@@ -66,8 +66,8 @@ PeakControllerEffect::PeakControllerEffect(
 	m_lastSample( 0 ),
 	m_autoController( NULL )
 {
-	m_autoController = new PeakController( Engine::getSong(), this );
-	Engine::getSong()->addController( m_autoController );
+	m_autoController = new PeakController( LmmsEngine::getSong(), this );
+	LmmsEngine::getSong()->addController( m_autoController );
 	PeakController::s_effects.append( this );
 }
 
@@ -80,7 +80,7 @@ PeakControllerEffect::~PeakControllerEffect()
 	if( idx >= 0 )
 	{
 		PeakController::s_effects.remove( idx );
-		Engine::getSong()->removeController( m_autoController );
+		LmmsEngine::getSong()->removeController( m_autoController );
 	}
 }
 

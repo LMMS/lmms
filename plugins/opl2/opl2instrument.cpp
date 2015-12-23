@@ -136,7 +136,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(LmmsEngine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -155,7 +155,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = Engine::mixer()->framesPerPeriod();
+	frameCount = LmmsEngine::mixer()->framesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane defaults
@@ -165,7 +165,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	tuneEqual(69, 440);
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -212,12 +212,12 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	// Connect the plugin to the mixer...
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	LmmsEngine::mixer()->addPlayHandle( iph );
 }
 
 opl2instrument::~opl2instrument() {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	LmmsEngine::mixer()->removePlayHandles( instrumentTrack() );
 	delete [] renderbuffer;
 }
 
@@ -225,7 +225,7 @@ opl2instrument::~opl2instrument() {
 void opl2instrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(LmmsEngine::mixer()->processingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();

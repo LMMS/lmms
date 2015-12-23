@@ -119,7 +119,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	connect( m_midiOutputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 		m_fixedOutputNoteSpinBox, SLOT( setEnabled( bool ) ) );
 
-	if( !Engine::mixer()->midiClient()->isRaw() )
+	if( !LmmsEngine::mixer()->midiClient()->isRaw() )
 	{
 		m_rpBtn = new QToolButton;
 		m_rpBtn->setMinimumSize( 32, 32 );

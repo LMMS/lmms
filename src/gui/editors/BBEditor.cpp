@@ -98,7 +98,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
-						 Engine::getSong(), SLOT(addBBTrack()));
+						 LmmsEngine::getSong(), SLOT(addBBTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
@@ -150,20 +150,20 @@ void BBEditor::removeBBView( int bb )
 
 void BBEditor::play()
 {
-	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
+	if( LmmsEngine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
-		Engine::getSong()->playBB();
+		LmmsEngine::getSong()->playBB();
 	}
 	else
 	{
-		Engine::getSong()->togglePause();
+		LmmsEngine::getSong()->togglePause();
 	}
 }
 
 
 void BBEditor::stop()
 {
-	Engine::getSong()->stop();
+	LmmsEngine::getSong()->stop();
 }
 
 

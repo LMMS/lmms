@@ -49,9 +49,9 @@ FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPlugin
 	Effect( &flanger_plugin_descriptor, parent, key ),
 	m_flangerControls( this )
 {
-	m_lfo = new QuadratureLfo( Engine::mixer()->processingSampleRate() );
-	m_lDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
-	m_rDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
+	m_lfo = new QuadratureLfo( LmmsEngine::mixer()->processingSampleRate() );
+	m_lDelay = new MonoDelay( 1, LmmsEngine::mixer()->processingSampleRate() );
+	m_rDelay = new MonoDelay( 1, LmmsEngine::mixer()->processingSampleRate() );
 	m_noise = new Noise;
 }
 
@@ -90,9 +90,9 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
+	const float length = m_flangerControls.m_delayTimeModel.value() * LmmsEngine::mixer()->processingSampleRate();
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
-	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
+	float amplitude = m_flangerControls.m_lfoAmountModel.value() * LmmsEngine::mixer()->processingSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  m_flangerControls.m_lfoFrequencyModel.value() );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
@@ -132,9 +132,9 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 void FlangerEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_lDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_rDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
+	m_lfo->setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
+	m_lDelay->setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
+	m_rDelay->setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
 }
 
 

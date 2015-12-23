@@ -63,7 +63,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_stillRunning( false ),
 	m_peakLeft( 0.0f ),
 	m_peakRight( 0.0f ),
-	m_buffer( new sampleFrame[Engine::mixer()->framesPerPeriod()] ),
+	m_buffer( new sampleFrame[LmmsEngine::mixer()->framesPerPeriod()] ),
 	m_muteModel( false, _parent ),
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
@@ -73,7 +73,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_queued( false ),
 	m_dependenciesMet( 0 )
 {
-	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
+	BufferManager::clear( m_buffer, LmmsEngine::mixer()->framesPerPeriod() );
 }
 
 
@@ -116,8 +116,8 @@ void FxChannel::unmuteForSolo()
 
 void FxChannel::doProcessing()
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
-	const bool exporting = Engine::getSong()->isExporting();
+	const fpp_t fpp = LmmsEngine::mixer()->framesPerPeriod();
+	const bool exporting = LmmsEngine::getSong()->isExporting();
 
 	if( m_muted == false )
 	{
@@ -175,8 +175,8 @@ void FxChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		m_peakLeft = qMax( m_peakLeft, Engine::mixer()->peakValueLeft( m_buffer, fpp ) * v );
-		m_peakRight = qMax( m_peakRight, Engine::mixer()->peakValueRight( m_buffer, fpp ) * v );
+		m_peakLeft = qMax( m_peakLeft, LmmsEngine::mixer()->peakValueLeft( m_buffer, fpp ) * v );
+		m_peakRight = qMax( m_peakRight, LmmsEngine::mixer()->peakValueRight( m_buffer, fpp ) * v );
 	}
 	else
 	{
@@ -287,8 +287,8 @@ void FxMixer::deleteChannel( int index )
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
-	tracks += Engine::getSong()->tracks();
-	tracks += Engine::getBBTrackContainer()->tracks();
+	tracks += LmmsEngine::getSong()->tracks();
+	tracks += LmmsEngine::getBBTrackContainer()->tracks();
 
 	foreach( Track* t, tracks )
 	{
@@ -356,8 +356,8 @@ void FxMixer::moveChannelLeft( int index )
 	int a = index - 1, b = index;
 
 	// go through every instrument and adjust for the channel index change
-	QVector<Track *> songTrackList = Engine::getSong()->tracks();
-	QVector<Track *> bbTrackList = Engine::getBBTrackContainer()->tracks();
+	QVector<Track *> songTrackList = LmmsEngine::getSong()->tracks();
+	QVector<Track *> bbTrackList = LmmsEngine::getBBTrackContainer()->tracks();
 
 	QVector<Track *> trackLists[] = {songTrackList, bbTrackList};
 	for(int tl=0; tl<2; ++tl)
@@ -433,7 +433,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	to->m_receives.append( route );
 
 	// add us to fxmixer's list
-	Engine::fxMixer()->m_fxRoutes.append( route );
+	LmmsEngine::fxMixer()->m_fxRoutes.append( route );
 	m_sendsMutex.unlock();
 
 	return route;
@@ -467,7 +467,7 @@ void FxMixer::deleteChannelSend( FxRoute * route )
 	// remove us from to's receives
 	route->receiver()->m_receives.remove( route->receiver()->m_receives.indexOf( route ) );
 	// remove us from fxmixer's list
-	Engine::fxMixer()->m_fxRoutes.remove( Engine::fxMixer()->m_fxRoutes.indexOf( route ) );
+	LmmsEngine::fxMixer()->m_fxRoutes.remove( LmmsEngine::fxMixer()->m_fxRoutes.indexOf( route ) );
 	delete route;
 	m_sendsMutex.unlock();
 }
@@ -542,7 +542,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 			m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
 		m_fxChannels[_ch]->m_lock.lock();
-		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::mixer()->framesPerPeriod() );
+		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, LmmsEngine::mixer()->framesPerPeriod() );
 		m_fxChannels[_ch]->m_hasInput = true;
 		m_fxChannels[_ch]->m_lock.unlock();
 	}
@@ -554,14 +554,14 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 void FxMixer::prepareMasterMix()
 {
 	BufferManager::clear( m_fxChannels[0]->m_buffer, 
-					Engine::mixer()->framesPerPeriod() );
+					LmmsEngine::mixer()->framesPerPeriod() );
 }
 
 
 
 void FxMixer::masterMix( sampleFrame * _buf )
 {
-	const int fpp = Engine::mixer()->framesPerPeriod();
+	const int fpp = LmmsEngine::mixer()->framesPerPeriod();
 
 	if( m_sendsMutex.tryLock() )
 	{
@@ -614,7 +614,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	for( int i = 0; i < numChannels(); ++i)
 	{
 		BufferManager::clear( m_fxChannels[i]->m_buffer, 
-				Engine::mixer()->framesPerPeriod() );
+				LmmsEngine::mixer()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;
 		// also reset hasInput

@@ -301,7 +301,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiCC ccs[129];
 	smfMidiChannel chs[256];
 
-	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
+	MeterModel & timeSigMM = LmmsEngine::getSong()->getTimeSigModel();
 	AutomationPattern * timeSigNumeratorPat = 
 		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
 	AutomationPattern * timeSigDenominatorPat = 

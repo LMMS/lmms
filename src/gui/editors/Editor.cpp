@@ -66,7 +66,7 @@ DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAd
 
 void Editor::togglePlayStop()
 {
-	if (Engine::getSong()->isPlaying())
+	if (LmmsEngine::getSong()->isPlaying())
 		stop();
 	else
 		play();

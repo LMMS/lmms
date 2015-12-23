@@ -769,8 +769,8 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	
 	int cur_channel = -1;
 
-	const bool is_journ = Engine::projectJournal()->isJournalling();
-	Engine::projectJournal()->setJournalling( false );
+	const bool is_journ = LmmsEngine::projectJournal()->isJournalling();
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 
 	while( file().atEnd() == false )
@@ -1413,19 +1413,19 @@ bool FlpImport::tryImport( TrackContainer* tc )
 
 
 	// now create a project from FL_Project data structure
-	Engine::getSong()->clearProject();
+	LmmsEngine::getSong()->clearProject();
 
 	// configure the mixer
 	for( int i=0; i<NumFLFxChannels; ++i )
 	{
-		Engine::fxMixer()->createChannel();
+		LmmsEngine::fxMixer()->createChannel();
 	}
 	gui->fxMixerView()->refreshDisplay();
 
 	// set global parameters
-	Engine::getSong()->setMasterVolume( p.mainVolume );
-	Engine::getSong()->setMasterPitch( p.mainPitch );
-	Engine::getSong()->setTempo( p.tempo );
+	LmmsEngine::getSong()->setMasterVolume( p.mainVolume );
+	LmmsEngine::getSong()->setMasterPitch( p.mainPitch );
+	LmmsEngine::getSong()->setTempo( p.tempo );
 
 	// set project notes
 	gui->getProjectNotes()->setText( p.projectNotes );
@@ -1439,11 +1439,11 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	QList<BBTrack *> bb_tracks;
 	QList<InstrumentTrack *> i_tracks;
 
-	while( Engine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
+	while( LmmsEngine::getBBTrackContainer()->numOfBBs() <= p.maxPatterns )
 	{
 		const int cur_pat = bb_tracks.size();
 		BBTrack * bbt = dynamic_cast<BBTrack *>(
-			Track::create( Track::BBTrack, Engine::getSong() ) );
+			Track::create( Track::BBTrack, LmmsEngine::getSong() ) );
 		if( p.patternNames.contains( cur_pat ) )
 		{
 			bbt->setName( p.patternNames[cur_pat] );
@@ -1459,8 +1459,8 @@ bool FlpImport::tryImport( TrackContainer* tc )
 	{
 		InstrumentTrack * t = dynamic_cast<InstrumentTrack *>(
 			Track::create( Track::InstrumentTrack,
-					Engine::getBBTrackContainer() ) );
-		Engine::getBBTrackContainer()->updateAfterTrackAdd();
+					LmmsEngine::getBBTrackContainer() ) );
+		LmmsEngine::getBBTrackContainer()->updateAfterTrackAdd();
 		i_tracks.push_back( t );
 		switch( it->pluginType )
 		{
@@ -1652,7 +1652,7 @@ bool FlpImport::tryImport( TrackContainer* tc )
 
 	for( int fx_ch = 0; fx_ch <= NumFLFxChannels ; ++fx_ch )
 	{
-		FxChannel * ch = Engine::fxMixer()->effectChannel( fx_ch );
+		FxChannel * ch = LmmsEngine::fxMixer()->effectChannel( fx_ch );
 		if( !ch )
 		{
 			continue;
@@ -1714,7 +1714,7 @@ bool FlpImport::tryImport( TrackContainer* tc )
 		{
 			continue;
 		}
-		EffectChain * ec = &Engine::fxMixer()->
+		EffectChain * ec = &LmmsEngine::fxMixer()->
 					effectChannel( it->fxChannel )->m_fxChain;
 		qDebug( "adding %s to %d\n", effName.toUtf8().constData(),
 								it->fxChannel );
@@ -1758,14 +1758,14 @@ bool FlpImport::tryImport( TrackContainer* tc )
 
 
 	// set current pattern
-	if( p.activeEditPattern < Engine::getBBTrackContainer()->numOfBBs() )
+	if( p.activeEditPattern < LmmsEngine::getBBTrackContainer()->numOfBBs() )
 	{
-		Engine::getBBTrackContainer()->setCurrentBB(
+		LmmsEngine::getBBTrackContainer()->setCurrentBB(
 							p.activeEditPattern );
 	}
 
 	// restore journalling settings
-	Engine::projectJournal()->setJournalling( is_journ );
+	LmmsEngine::projectJournal()->setJournalling( is_journ );
 
 	return true;
 }

@@ -37,7 +37,7 @@
 #include "MemoryManager.h"
 #include "lmmsversion.h"
 
-class Engine;
+class LmmsEngine;
 
 
 const QString PROJECTS_PATH = "projects/";
@@ -284,7 +284,7 @@ private:
 	settingsMap m_settings;
 
 
-	friend class Engine;
+	friend class LmmsEngine;
 
 } ;
 

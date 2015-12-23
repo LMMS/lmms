@@ -551,7 +551,7 @@ void PatmanView::openFile( void )
 		if( f != "" )
 		{
 			m_pi->setFile( f );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 		}
 	}
 }

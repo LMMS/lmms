@@ -93,14 +93,14 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	snd_seq_queue_tempo_t * tempo;
 	snd_seq_queue_tempo_malloc( &tempo );
 	snd_seq_queue_tempo_set_tempo( tempo, 6000000 /
-					Engine::getSong()->getTempo() );
+					LmmsEngine::getSong()->getTempo() );
 	snd_seq_queue_tempo_set_ppq( tempo, 16 );
 	snd_seq_set_queue_tempo( m_seqHandle, m_queueID, tempo );
 	snd_seq_queue_tempo_free( tempo );
 
 	snd_seq_start_queue( m_seqHandle, m_queueID, NULL );
-	changeQueueTempo( Engine::getSong()->getTempo() );
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	changeQueueTempo( LmmsEngine::getSong()->getTempo() );
+	connect( LmmsEngine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( changeQueueTempo( bpm_t ) ) );
 
 	// initial list-update

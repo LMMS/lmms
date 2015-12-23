@@ -108,7 +108,7 @@ Song::Song() :
 					this, SLOT( setTimeSignature() ) );
 
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this,
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ), this,
 						SLOT( updateFramesPerTick() ) );
 
 	connect( &m_masterVolumeModel, SIGNAL( dataChanged() ),
@@ -134,7 +134,7 @@ Song::~Song()
 
 void Song::masterVolumeChanged()
 {
-	Engine::mixer()->setMasterGain( m_masterVolumeModel.value() /
+	LmmsEngine::mixer()->setMasterGain( m_masterVolumeModel.value() /
 								100.0f );
 }
 
@@ -143,9 +143,9 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	Engine::mixer()->lockPlayHandleRemoval();
+	LmmsEngine::mixer()->lockPlayHandleRemoval();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
-	PlayHandleList & playHandles = Engine::mixer()->playHandles();
+	PlayHandleList & playHandles = LmmsEngine::mixer()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
 						it != playHandles.end(); ++it )
 	{
@@ -157,9 +157,9 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	Engine::mixer()->unlockPlayHandleRemoval();
+	LmmsEngine::mixer()->unlockPlayHandleRemoval();
 
-	Engine::updateFramesPerTick();
+	LmmsEngine::updateFramesPerTick();
 
 	m_vstSyncController.setTempo( tempo );
 
@@ -221,9 +221,9 @@ void Song::processNextBuffer()
 			break;
 
 		case Mode_PlayBB:
-			if( Engine::getBBTrackContainer()->numOfBBs() > 0 )
+			if( LmmsEngine::getBBTrackContainer()->numOfBBs() > 0 )
 			{
-				tcoNum = Engine::getBBTrackContainer()->
+				tcoNum = LmmsEngine::getBBTrackContainer()->
 								currentBB();
 				trackList.push_back( BBTrack::findBBTrack(
 								tcoNum ) );
@@ -271,9 +271,9 @@ void Song::processNextBuffer()
 	}
 
 	f_cnt_t framesPlayed = 0;
-	const float framesPerTick = Engine::framesPerTick();
+	const float framesPerTick = LmmsEngine::framesPerTick();
 
-	while( framesPlayed < Engine::mixer()->framesPerPeriod() )
+	while( framesPlayed < LmmsEngine::mixer()->framesPerPeriod() )
 	{
 		m_vstSyncController.update();
 
@@ -299,7 +299,7 @@ void Song::processNextBuffer()
 				// or to loop back to first tact
 				if( m_playMode == Mode_PlayBB )
 				{
-					maxTact = Engine::getBBTrackContainer()
+					maxTact = LmmsEngine::getBBTrackContainer()
 							->lengthOfCurrentBB();
 				}
 				else if( m_playMode == Mode_PlayPattern &&
@@ -355,7 +355,7 @@ void Song::processNextBuffer()
 		}
 
 		f_cnt_t framesToPlay = 
-			Engine::mixer()->framesPerPeriod() - framesPlayed;
+			LmmsEngine::mixer()->framesPerPeriod() - framesPlayed;
 
 		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick - 
 						( f_cnt_t )currentFrame;
@@ -652,7 +652,7 @@ void Song::stop()
 	m_vstSyncController.setAbsolutePosition( m_playPos[m_playMode].getTicks() );
 
 	// remove all note-play-handles that are active
-	Engine::mixer()->clear();
+	LmmsEngine::mixer()->clear();
 
 	m_playMode = Mode_None;
 
@@ -727,7 +727,7 @@ void Song::removeBar()
 void Song::addBBTrack()
 {
 	Track * t = Track::create( Track::BBTrack, this );
-	Engine::getBBTrackContainer()->setCurrentBB( dynamic_cast<BBTrack *>( t )->index() );
+	LmmsEngine::getBBTrackContainer()->setCurrentBB( dynamic_cast<BBTrack *>( t )->index() );
 }
 
 
@@ -767,7 +767,7 @@ AutomationPattern * Song::tempoAutomationPattern()
 
 void Song::clearProject()
 {
-	Engine::projectJournal()->setJournalling( false );
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 	if( m_playing )
 	{
@@ -780,7 +780,7 @@ void Song::clearProject()
 	}
 
 
-	Engine::mixer()->lock();
+	LmmsEngine::mixer()->lock();
 
 	if( gui && gui->getBBEditor() )
 	{
@@ -795,10 +795,10 @@ void Song::clearProject()
 		gui->fxMixerView()->clear();
 	}
 	QCoreApplication::sendPostedEvents();
-	Engine::getBBTrackContainer()->clearAllTracks();
+	LmmsEngine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
 
-	Engine::fxMixer()->clear();
+	LmmsEngine::fxMixer()->clear();
 
 	if( gui && gui->automationEditor() )
 	{
@@ -821,7 +821,7 @@ void Song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	Engine::mixer()->unlock();
+	LmmsEngine::mixer()->unlock();
 
 	if( gui && gui->getProjectNotes() )
 	{
@@ -832,9 +832,9 @@ void Song::clearProject()
 
 	emit dataChanged();
 
-	Engine::projectJournal()->clearJournal();
+	LmmsEngine::projectJournal()->clearJournal();
 
-	Engine::projectJournal()->setJournalling( true );
+	LmmsEngine::projectJournal()->setJournalling( true );
 
 	InstrumentTrackView::cleanupWindowCache();
 }
@@ -868,7 +868,7 @@ void Song::createNewProject()
 
 	clearProject();
 
-	Engine::projectJournal()->setJournalling( false );
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 	m_fileName = m_oldFileName = "";
 
@@ -877,7 +877,7 @@ void Song::createNewProject()
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 					"tripleoscillator" );
 	t = Track::create( Track::InstrumentTrack,
-						Engine::getBBTrackContainer() );
+						LmmsEngine::getBBTrackContainer() );
 	dynamic_cast<InstrumentTrack * >( t )->loadInstrument(
 						"kicker" );
 	Track::create( Track::SampleTrack, this );
@@ -893,9 +893,9 @@ void Song::createNewProject()
 
 	m_loadingProject = false;
 
-	Engine::getBBTrackContainer()->updateAfterTrackAdd();
+	LmmsEngine::getBBTrackContainer()->updateAfterTrackAdd();
 
-	Engine::projectJournal()->setJournalling( true );
+	LmmsEngine::projectJournal()->setJournalling( true );
 
 	QCoreApplication::sendPostedEvents();
 
@@ -934,7 +934,7 @@ void Song::loadProject( const QString & fileName )
 
 	m_loadingProject = true;
 
-	Engine::projectJournal()->setJournalling( false );
+	LmmsEngine::projectJournal()->setJournalling( false );
 
 	m_fileName = fileName;
 	m_oldFileName = fileName;
@@ -953,7 +953,7 @@ void Song::loadProject( const QString & fileName )
 
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
 
-	Engine::mixer()->lock();
+	LmmsEngine::mixer()->lock();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -977,10 +977,10 @@ void Song::loadProject( const QString & fileName )
 	PeakController::initGetControllerBySetting();
 
 	// Load mixer first to be able to set the correct range for FX channels
-	node = dataFile.content().firstChildElement( Engine::fxMixer()->nodeName() );
+	node = dataFile.content().firstChildElement( LmmsEngine::fxMixer()->nodeName() );
 	if( !node.isNull() )
 	{
-		Engine::fxMixer()->restoreState( node.toElement() );
+		LmmsEngine::fxMixer()->restoreState( node.toElement() );
 		if( gui )
 		{
 			// refresh FxMixerView
@@ -1030,7 +1030,7 @@ void Song::loadProject( const QString & fileName )
 
 	// quirk for fixing projects with broken positions of TCOs inside
 	// BB-tracks
-	Engine::getBBTrackContainer()->fixIncorrectPositions();
+	LmmsEngine::getBBTrackContainer()->fixIncorrectPositions();
 
 	// Connect controller links to their controllers 
 	// now that everything is loaded
@@ -1040,11 +1040,11 @@ void Song::loadProject( const QString & fileName )
 	AutomationPattern::resolveAllIDs();
 
 
-	Engine::mixer()->unlock();
+	LmmsEngine::mixer()->unlock();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( fileName );
 
-	Engine::projectJournal()->setJournalling( true );
+	LmmsEngine::projectJournal()->setJournalling( true );
 
 	emit projectLoaded();
 
@@ -1057,7 +1057,7 @@ void Song::loadProject( const QString & fileName )
 		}
 		else
 		{
-			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
+			QTextStream(stderr) << *LmmsEngine::getSong()->errorSummary() << endl;
 		}
 	}
 
@@ -1086,7 +1086,7 @@ bool Song::saveProjectFile( const QString & filename )
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
-	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+	LmmsEngine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( gui )
 	{
 		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );
@@ -1349,14 +1349,14 @@ void Song::exportProjectMidi()
 		
 		// instantiate midi export plugin
 		TrackContainer::TrackList tracks;
-		tracks += Engine::getSong()->tracks();
-		tracks += Engine::getBBTrackContainer()->tracks();
+		tracks += LmmsEngine::getSong()->tracks();
+		tracks += LmmsEngine::getBBTrackContainer()->tracks();
 		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
 		if (exf==NULL) {
 			qDebug() << "failed to load midi export filter!";
 			return;
 		}
-		exf->tryExport(tracks, Engine::getSong()->getTempo(), export_filename);
+		exf->tryExport(tracks, LmmsEngine::getSong()->getTempo(), export_filename);
 	}
 }
 
@@ -1364,7 +1364,7 @@ void Song::exportProjectMidi()
 
 void Song::updateFramesPerTick()
 {
-	Engine::updateFramesPerTick();
+	LmmsEngine::updateFramesPerTick();
 }
 
 

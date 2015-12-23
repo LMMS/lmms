@@ -67,7 +67,7 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / Engine::framesPerTick()) );
+					_frames / LmmsEngine::framesPerTick()) );
 	}
 
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
@@ -164,7 +164,7 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
+				LmmsEngine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{

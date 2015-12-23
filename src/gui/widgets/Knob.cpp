@@ -523,7 +523,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	else if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
+				LmmsEngine::projectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{

@@ -158,9 +158,9 @@ void ControllerConnection::finalizeConnections()
 	{
 		ControllerConnection * c = s_connections[i];
 		if ( !c->isFinalized() && c->m_controllerId <
-				Engine::getSong()->controllers().size() )
+				LmmsEngine::getSong()->controllers().size() )
 		{
-			c->setController( Engine::getSong()->
+			c->setController( LmmsEngine::getSong()->
 					controllers().at( c->m_controllerId ) );
 		}
 	}
@@ -171,7 +171,7 @@ void ControllerConnection::finalizeConnections()
 
 void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if( Engine::getSong() )
+	if( LmmsEngine::getSong() )
 	{
 		if( m_ownsController )
 		{
@@ -179,7 +179,7 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 		}
 		else
 		{
-			int id = Engine::getSong()->controllers().indexOf( m_controller );
+			int id = LmmsEngine::getSong()->controllers().indexOf( m_controller );
 			if( id >= 0 )
 			{
 				_this.setAttribute( "id", id );
@@ -196,7 +196,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 	QDomNode node = _this.firstChild();
 	if( !node.isNull() )
 	{
-		setController( Controller::create( node.toElement(), Engine::getSong() ) );
+		setController( Controller::create( node.toElement(), LmmsEngine::getSong() ) );
 	}
 	else
 	{

@@ -384,7 +384,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		m_pphMutex.lock();
 		if( m_previewPlayHandle != NULL )
 		{
-			Engine::mixer()->removePlayHandle(
+			LmmsEngine::mixer()->removePlayHandle(
 							m_previewPlayHandle );
 			m_previewPlayHandle = NULL;
 		}
@@ -430,7 +430,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 		}
 		if( m_previewPlayHandle != NULL )
 		{
-			if( !Engine::mixer()->addPlayHandle(
+			if( !LmmsEngine::mixer()->addPlayHandle(
 							m_previewPlayHandle ) )
 			{
 				m_previewPlayHandle = NULL;
@@ -512,7 +512,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 			SamplePlayHandle * s = dynamic_cast<SamplePlayHandle *>(
 							m_previewPlayHandle );
 			if( s && s->totalFrames() - s->framesDone() <=
-				static_cast<f_cnt_t>( Engine::mixer()->
+				static_cast<f_cnt_t>( LmmsEngine::mixer()->
 						processingSampleRate() * 3 ) )
 			{
 				s->setDoneMayReturnTrue( true );
@@ -521,7 +521,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 				return;
 			}
 		}
-		Engine::mixer()->removePlayHandle( m_previewPlayHandle );
+		LmmsEngine::mixer()->removePlayHandle( m_previewPlayHandle );
 		m_previewPlayHandle = NULL;
 	}
 	m_pphMutex.unlock();
@@ -533,13 +533,13 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 {
-	Engine::mixer()->lock();
+	LmmsEngine::mixer()->lock();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
 			if( gui->mainWindow()->mayChangeProject(true) )
 			{
-				Engine::getSong()->loadProject( f->fullName() );
+				LmmsEngine::getSong()->loadProject( f->fullName() );
 			}
 			break;
 
@@ -573,7 +573,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 				break;
 			}
 			ImportFilter::import( f->fullName(),
-							Engine::getSong() );
+							LmmsEngine::getSong() );
 			break;
 
 		case FileItem::NotSupported:
@@ -581,7 +581,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			break;
 
 	}
-	Engine::mixer()->unlock();
+	LmmsEngine::mixer()->unlock();
 }
 
 
@@ -606,7 +606,7 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 //		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
-					Engine::getBBTrackContainer() ) );
+					LmmsEngine::getBBTrackContainer() ) );
 		handleFile( f, it );
 //		engine::mixer()->unlock();
 	}
@@ -633,7 +633,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 
 void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 {
-	openInNewInstrumentTrack( Engine::getBBTrackContainer() );
+	openInNewInstrumentTrack( LmmsEngine::getBBTrackContainer() );
 }
 
 
@@ -641,7 +641,7 @@ void FileBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 
 void FileBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 {
-	openInNewInstrumentTrack( Engine::getSong() );
+	openInNewInstrumentTrack( LmmsEngine::getSong() );
 }
 
 

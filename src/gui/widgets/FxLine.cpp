@@ -92,7 +92,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	"You can remove and move FX channels in the context menu, which is accessed "
 	"by right-clicking the FX channel.\n") );
 
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 	setToolTip( mix->effectChannel( m_channelIndex )->m_name );
 }
 
@@ -159,7 +159,7 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 	bool sendToThis = mix->channelSendModel(
 		m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
 	bool receiveFromThis = mix->channelSendModel(
@@ -187,7 +187,7 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master 
 	{
@@ -217,7 +217,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 void FxLine::renameChannel()
 {
 	bool ok;
-	FxMixer * mix = Engine::fxMixer();
+	FxMixer * mix = LmmsEngine::fxMixer();
 	QString new_name = QInputDialog::getText( this,
 			FxMixerView::tr( "Rename FX channel" ),
 			FxMixerView::tr( "Enter the new name for this "

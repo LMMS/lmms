@@ -98,7 +98,7 @@ SamplePlayHandle::~SamplePlayHandle()
 
 void SamplePlayHandle::play( sampleFrame * buffer )
 {
-	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+	const fpp_t fpp = LmmsEngine::mixer()->framesPerPeriod();
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
@@ -154,7 +154,7 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate() );
+	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( LmmsEngine::mixer()->processingSampleRate() / LmmsEngine::mixer()->baseSampleRate() );
 }
 
 

@@ -272,7 +272,7 @@ sample_rate_t Mixer::processingSampleRate() const
 
 bool Mixer::criticalXRuns() const
 {
-	return cpuLoad() >= 99 && Engine::getSong()->isExporting() == false;
+	return cpuLoad() >= 99 && LmmsEngine::getSong()->isExporting() == false;
 }
 
 
@@ -314,7 +314,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 	static Song::PlayPos last_metro_pos = -1;
 
-	Song *song = Engine::getSong();
+	Song *song = LmmsEngine::getSong();
 
 	Song::PlayModes currentPlayMode = song->playMode();
 	Song::PlayPos p = song->getPlayPos( currentPlayMode );
@@ -388,7 +388,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
-	FxMixer * fxMixer = Engine::fxMixer();
+	FxMixer * fxMixer = LmmsEngine::fxMixer();
 	fxMixer->prepareMasterMix();
 
 	// create play-handles for new notes, samples etc.

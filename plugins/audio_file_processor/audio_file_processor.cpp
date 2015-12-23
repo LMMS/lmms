@@ -240,7 +240,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 		{
 			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
 
-			Engine::getSong()->collectError( message );
+			LmmsEngine::getSong()->collectError( message );
 		}
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
@@ -301,7 +301,7 @@ QString audioFileProcessor::nodeName( void ) const
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
-			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
+			LmmsEngine::mixer()->processingSampleRate() / LmmsEngine::mixer()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
@@ -732,7 +732,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	if( af != "" )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
-		Engine::getSong()->setModified();
+		LmmsEngine::getSong()->setModified();
 		m_waveView->updateSampleRange();
 	}
 }

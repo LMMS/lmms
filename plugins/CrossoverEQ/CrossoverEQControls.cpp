@@ -42,7 +42,7 @@ CrossoverEQControls::CrossoverEQControls( CrossoverEQEffect * eff ) :
 	m_mute3( false, this, "Mute Band 3" ),
 	m_mute4( false, this, "Mute Band 4" )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	connect( &m_xover12, SIGNAL( dataChanged() ), this, SLOT( xover12Changed() ) );
 	connect( &m_xover23, SIGNAL( dataChanged() ), this, SLOT( xover23Changed() ) );
 	connect( &m_xover34, SIGNAL( dataChanged() ), this, SLOT( xover34Changed() ) );

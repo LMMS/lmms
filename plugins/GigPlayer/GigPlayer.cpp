@@ -87,13 +87,13 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_currentKeyDimension( 0 )
 {
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	LmmsEngine::mixer()->addPlayHandle( iph );
 
 	updateSampleRate();
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 }
 
 
@@ -101,7 +101,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	LmmsEngine::mixer()->removePlayHandles( instrumentTrack() );
 	freeInstance();
 }
 
@@ -316,8 +316,8 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 // the preferences)
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
-	const int rate = Engine::mixer()->processingSampleRate();
+	const fpp_t frames = LmmsEngine::mixer()->framesPerPeriod();
+	const int rate = LmmsEngine::mixer()->processingSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -753,7 +753,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / Engine::mixer()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / LmmsEngine::mixer()->processingSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
@@ -1094,7 +1094,7 @@ void GigInstrumentView::showFileDialog()
 		if( f != "" )
 		{
 			k->openFile( f );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 		}
 	}
 
