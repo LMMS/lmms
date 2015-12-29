@@ -31,7 +31,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
-#include <QMessageBox>
 #include <QTextStream>
 
 #include "base64.h"
@@ -126,16 +125,13 @@ DataFile::DataFile( const QString & _fileName ) :
 	QFile inFile( _fileName );
 	if( !inFile.open( QIODevice::ReadOnly ) )
 	{
-		if( gui )
-		{
-			QMessageBox::critical( NULL,
+		Engine::messenger()->broadcastError(
 				SongEditor::tr( "Could not open file" ),
 				SongEditor::tr( "Could not open file %1. You probably "
 						"have no permissions to read this "
 						"file.\n Please make sure to have at "
 						"least read permissions to the file "
 						"and try again." ).arg( _fileName ) );
-		}
 
 		return;
 	}
@@ -272,14 +268,11 @@ bool DataFile::writeFile( const QString& filename )
 
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		if( gui )
-		{
-			QMessageBox::critical( NULL,
+		Engine::messenger()->broadcastError(
 				SongEditor::tr( "Could not write file" ),
 				SongEditor::tr( "Could not open %1 for writing. You probably are not permitted to "
 								"write to this file. Please make sure you have write-access to "
 								"the file and try again." ).arg( fullName ) );
-		}
 
 		return false;
 	}
@@ -900,15 +893,12 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		if( line >= 0 && col >= 0 )
 		{
 			qWarning() << "at line" << line << "column" << errorMsg;
-			if( gui )
-			{
-				QMessageBox::critical( NULL,
+			Engine::messenger()->broadcastError(
 					SongEditor::tr( "Error in file" ),
 					SongEditor::tr( "The file %1 seems to contain "
 							"errors and therefore can't be "
 							"loaded." ).
 								arg( _sourceFile ) );
-			}
 
 			return;
 		}
@@ -930,9 +920,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
 			if ( createdWith.setCompareType(Minor) != openedWith)
 			{
-				if( gui != nullptr && root.attribute( "type" ) == "song" )
+				if( root.attribute( "type" ) == "song" )
 				{
-					QMessageBox::information( NULL,
+					Engine::messenger()->broadcastError(
 						SongEditor::tr( "Project Version Mismatch" ),
 						SongEditor::tr( 
 								"This %1 was created with "

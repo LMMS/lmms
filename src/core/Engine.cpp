@@ -46,19 +46,17 @@ Song * Engine::s_song = NULL;
 ProjectJournal * Engine::s_projectJournal = NULL;
 Ladspa2LMMS * Engine::s_ladspaManager = NULL;
 DummyTrackContainer * Engine::s_dummyTC = NULL;
+Messenger Engine::s_messenger;
 
 
 
 
 void Engine::init( bool renderOnly )
 {
-	Engine *engine = inst();
-
-	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
+	s_messenger.broadcastWaveTableInit();
 
-	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
 	s_mixer = new Mixer( renderOnly );
 	s_song = new Song;
@@ -69,14 +67,14 @@ void Engine::init( bool renderOnly )
 
 	s_projectJournal->setJournalling( true );
 
-	emit engine->initProgress(tr("Opening audio and midi devices"));
 	s_mixer->initDevices();
+	s_messenger.broadcastMixerDevInit();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
-	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
+	s_messenger.broadcastMixerProcessing();
 }
 
 
@@ -115,5 +113,3 @@ void Engine::updateFramesPerTick()
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
-
-Engine * Engine::s_instanceOfMe = NULL;
