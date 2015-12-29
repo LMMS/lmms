@@ -84,6 +84,42 @@ signals:
 
 } ;
 
+// Start of PianoKeyboard.h
+class PianoKeyboard
+{
+public:
+
+	static int getLinuxKey(int key);
+	static int getWindowsKey(int key);
+	static int getAppleKey(int key);
+
+	static int getScaledNoteByIndex(int index);
+
+	static QString getNoteByNumber(int index)	   { return m_notes[index]; }
+
+	static int	   getOctaveNumber()			   { return m_octave; }
+	static void	   setOctaveNumber(int octave)	   { m_octave = octave - 3; }
+
+	static QString getScaleNote()				   { return m_notes[m_scaleNoteIndex]; }
+	static int	   getScaleNoteIndex()			   { return m_scaleNoteIndex; }
+	static void	   setScaleNote(QString note);
+
+	static QString getScaleType()				   { return m_scaleType; }
+	static void	   setScaleType(QString scale)	   { m_scaleType = scale; }
+
+private:
+	static int		m_octave;
+	static int		m_scaleNoteIndex;
+	static QString	m_scaleType;
+
+	static const int majorNotes[];		// W W H W W W H
+	static const int minorNotes[];		// W H W W H W W
+	static const int lydianNotes[];		// W W W H W W H
+
+	static QString m_notes[];
+
+};
+// End of PianoKeyboard.h
 
 #endif
 

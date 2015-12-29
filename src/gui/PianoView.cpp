@@ -175,6 +175,9 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 #endif
 
 #ifdef LMMS_BUILD_WIN32
+
+	return PianoKeyboard::getWindowsKey(k);
+
 	switch( k )
 	{
 		case 44: return 0; // Z  = C
@@ -218,6 +221,9 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 	}
 #endif
 #ifdef LMMS_BUILD_LINUX
+
+	return PianoKeyboard::getLinuxKey(k);
+
 	switch( k )
 	{
 		case 52: return 0; // Z  = C
@@ -260,6 +266,9 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 	}
 #endif
 #ifdef LMMS_BUILD_APPLE
+
+	//return PianoKeyboard::getAppleKey(k);
+
 	switch( k )
 	{
 		case 6: return 0; // Z  = C
@@ -915,8 +924,73 @@ void PianoView::paintEvent( QPaintEvent * )
 	}
 }
 
+// Start of PianoKeyboard.cpp
+int     PianoKeyboard::m_octave = 2;
+int     PianoKeyboard::m_scaleNoteIndex = 0;
+QString PianoKeyboard::m_scaleType = "Major";
 
+const int PianoKeyboard::majorNotes[] = {0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19};
+const int PianoKeyboard::minorNotes[] = {0, 2, 3, 5, 7, 8, 10, 12, 14, 15, 17, 19};
+const int PianoKeyboard::lydianNotes[] = {0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19};
 
+QString PianoKeyboard::m_notes[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+
+int PianoKeyboard::getLinuxKey(int key)
+{
+	if (key < 38 && key >= 24)
+		return getScaledNoteByIndex(key % 24) + 12 * m_octave + m_scaleNoteIndex;
+	else if (key < 52 && key >= 38)
+		return getScaledNoteByIndex(key % 38) + 12 * (m_octave - 1) + m_scaleNoteIndex;
+	else if (key < 66 && key >= 52)
+		return getScaledNoteByIndex(key % 52) + 12 * (m_octave - 2) + m_scaleNoteIndex;
+	else
+		return -100;
+}
+
+int PianoKeyboard::getWindowsKey(int key)
+{
+	if (key < 30 && key >= 16)
+		return getScaledNoteByIndex(key % 16) + 12 * m_octave + m_scaleNoteIndex;
+	else if (key < 44 && key >= 30)
+		return getScaledNoteByIndex(key % 30) + 12 * (m_octave - 1) + m_scaleNoteIndex;
+	else if (key < 58 && key >= 44)
+		return getScaledNoteByIndex(key % 44) + 12 * (m_octave - 2) + m_scaleNoteIndex;
+	else
+		return -100;
+}
+
+int PianoKeyboard::getAppleKey(int key)
+{
+	return -100;
+}
+
+int PianoKeyboard::getScaledNoteByIndex(int index)
+{
+	if (m_scaleType == "Major")
+		return majorNotes[index];
+	else if (m_scaleType == "Minor")
+		return minorNotes[index];
+	else if (m_scaleType == "Lydian")
+		return lydianNotes[index];
+	return 0;
+}
+
+void PianoKeyboard::setScaleNote(QString note)
+{
+	if (note == "C")        m_scaleNoteIndex = 0;
+	else if (note == "C#")  m_scaleNoteIndex = 1;
+	else if (note == "D")   m_scaleNoteIndex = 2;
+	else if (note == "D#")  m_scaleNoteIndex = 3;
+	else if (note == "E")   m_scaleNoteIndex = 4;
+	else if (note == "F")   m_scaleNoteIndex = 5;
+	else if (note == "F#")  m_scaleNoteIndex = 6;
+	else if (note == "G")   m_scaleNoteIndex = 7;
+	else if (note == "G#")  m_scaleNoteIndex = 8;
+	else if (note == "A")   m_scaleNoteIndex = 9;
+	else if (note == "A#")  m_scaleNoteIndex = 10;
+	else if (note == "B")   m_scaleNoteIndex = 11;
+}
+// End of PianoKeyboard.cpp
 
 #include "moc_PianoView.cxx"
 

@@ -69,6 +69,7 @@
 #include "tool_button.h"
 #include "text_float.h"
 
+class PianoKeyboard;
 
 #if QT_VERSION < 0x040800
 #define MiddleButton MidButton
@@ -586,6 +587,38 @@ PianoRoll::PianoRoll() :
 					this, SLOT( updateSemiToneMarkerMenu() ) );
 
 
+	// setup octave-stuff
+	//QLabel * octave_lbl = new QLabel( m_toolBar );
+	//octave_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
+
+	m_octaveModel.addItem( tr("5") );
+	for( int i = 3; i <= 8; ++i )
+	{
+		m_octaveModel.addItem( QString::number(i) );
+	}
+
+	m_octaveModel.setValue( 0 );
+	m_octaveComboBox = new comboBox( m_toolBar );
+	m_octaveComboBox->setModel( &m_octaveModel );
+	m_octaveComboBox->setFixedSize( 36, 22 );
+	connect( &m_octaveModel, SIGNAL( dataChanged() ),
+					this, SLOT( octaveChanged() ) );
+
+	m_octaveScaleModel.addItem( tr("C") );
+
+	for( int i = 0; i < 12; ++i )
+	{
+		m_octaveScaleModel.addItem( PianoKeyboard::getNoteByNumber(i) );
+	}
+
+	m_octaveScaleModel.setValue( 0 );
+	m_octaveScaleComboBox = new comboBox( m_toolBar );
+	m_octaveScaleComboBox->setModel( &m_octaveScaleModel );
+	m_octaveScaleComboBox->setFixedSize( 42, 22 );
+	connect( &m_octaveScaleModel, SIGNAL( dataChanged() ),
+					this, SLOT( scaleNoteChanged() ) );
+
+
 	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_playButton );
 	tb_layout->addWidget( m_recordButton );
@@ -622,6 +655,10 @@ PianoRoll::PianoRoll() :
 	tb_layout->addWidget( chord_lbl );
 	tb_layout->addSpacing( 4 );
 	tb_layout->addWidget( m_chordComboBox );
+	tb_layout->addSpacing( 4 );
+	tb_layout->addWidget( m_octaveComboBox );
+	tb_layout->addSpacing( 4 );
+	tb_layout->addWidget( m_octaveScaleComboBox );
 	tb_layout->addStretch();
 	
         m_zoomingComboBox->setWhatsThis(
@@ -671,6 +708,16 @@ PianoRoll::PianoRoll() :
 			"To return to single note placement, you need to choose 'No chord' " 
 			"in this drop-down menu." 
 		) );	  
+
+		m_octaveComboBox->setWhatsThis(
+		tr(
+			"Let you select a octave for pc keyboard."
+		) );
+
+		m_octaveScaleComboBox->setWhatsThis(
+		tr(
+			"Let you select a octave scale for pc keyboard."
+		) );
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
@@ -4216,6 +4263,16 @@ void PianoRoll::updatePositionAccompany( const MidiTime & _t )
 
 
 
+void PianoRoll::octaveChanged()
+{
+	PianoKeyboard::setOctaveNumber(m_octaveModel.currentText().toInt());
+	update();
+}
+void PianoRoll::scaleNoteChanged()
+{
+	PianoKeyboard::setScaleNote(m_octaveScaleModel.currentText());
+	update();
+}
 
 void PianoRoll::zoomingChanged()
 {
@@ -4269,6 +4326,8 @@ void PianoRoll::updateSemiToneMarkerMenu()
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );
+
+	PianoKeyboard::setScaleType(m_scaleModel.currentText());
 }
 
 
