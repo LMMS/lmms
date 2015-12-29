@@ -97,7 +97,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_model.setFilterCaseSensitivity( Qt::CaseInsensitive );
 
 	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
-				&m_model, SLOT( setFilterRegExp( const QString & ) ) );
+				&m_model, SLOT( setFilterFixedString( const QString & ) ) );
 	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
 					this, SLOT( updateSelection() ) );
 
