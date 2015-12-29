@@ -163,7 +163,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 bool RemotePlugin::process( const sampleFrame * _in_buf,
 						sampleFrame * _out_buf )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = LmmsEngine::mixer()->framesPerPeriod();
 
 	if( m_failed || !isRunning() )
 	{
@@ -300,7 +300,7 @@ void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 void RemotePlugin::resizeSharedProcessingMemory()
 {
 	const size_t s = ( m_inputCount+m_outputCount ) *
-				Engine::mixer()->framesPerPeriod() *
+				LmmsEngine::mixer()->framesPerPeriod() *
 							sizeof( float );
 	if( m_shm != NULL )
 	{
@@ -353,12 +353,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdSampleRateInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->processingSampleRate() );
+			reply_message.addInt( LmmsEngine::mixer()->processingSampleRate() );
 			break;
 
 		case IdBufferSizeInformation:
 			reply = true;
-			reply_message.addInt( Engine::mixer()->framesPerPeriod() );
+			reply_message.addInt( LmmsEngine::mixer()->framesPerPeriod() );
 			break;
 
 		case IdChangeInputCount:

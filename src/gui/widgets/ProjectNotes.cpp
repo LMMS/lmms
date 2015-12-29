@@ -63,7 +63,7 @@ ProjectNotes::ProjectNotes() :
 //	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
 //			this, SLOT( alignmentChanged( int ) ) );
 	connect( m_edit, SIGNAL( textChanged() ),
-			Engine::getSong(), SLOT( setModified() ) );
+			LmmsEngine::getSong(), SLOT( setModified() ) );
 
 	setupActions();
 
@@ -251,7 +251,7 @@ void ProjectNotes::textBold()
 {
 	m_edit->setFontWeight( m_actionTextBold->isChecked() ? QFont::Bold :
 								QFont::Normal );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -260,7 +260,7 @@ void ProjectNotes::textBold()
 void ProjectNotes::textUnderline()
 {
 	m_edit->setFontUnderline( m_actionTextUnderline->isChecked() );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -269,7 +269,7 @@ void ProjectNotes::textUnderline()
 void ProjectNotes::textItalic()
 {
 	m_edit->setFontItalic( m_actionTextItalic->isChecked() );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -279,7 +279,7 @@ void ProjectNotes::textFamily( const QString & _f )
 {
 	m_edit->setFontFamily( _f );
 	m_edit->viewport()->setFocus();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -289,7 +289,7 @@ void ProjectNotes::textSize( const QString & _p )
 {
 	m_edit->setFontPointSize( _p.toInt() );
 	m_edit->viewport()->setFocus();
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -347,7 +347,7 @@ void ProjectNotes::formatChanged( const QTextCharFormat & _f )
 	pix.fill( _f.foreground().color() );
 	m_actionTextColor->setIcon( pix );
 
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -371,7 +371,7 @@ void ProjectNotes::alignmentChanged( int _a )
 	{
 		m_actionAlignJustify->setChecked( true );
 	}
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 

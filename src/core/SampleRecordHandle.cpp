@@ -68,12 +68,12 @@ SampleRecordHandle::~SampleRecordHandle()
 
 void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
-	const sampleFrame * recbuf = Engine::mixer()->inputBuffer();
-	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
+	const sampleFrame * recbuf = LmmsEngine::mixer()->inputBuffer();
+	const f_cnt_t frames = LmmsEngine::mixer()->inputBufferFrames();
 	writeBuffer( recbuf, frames );
 	m_framesRecorded += frames;
 
-	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
+	MidiTime len = (tick_t)( m_framesRecorded / LmmsEngine::framesPerTick() );
 	if( len > m_minLength )
 	{
 //		m_tco->changeLength( len );
@@ -129,7 +129,7 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	}
 	// create according sample-buffer out of big buffer
 	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf)->setSampleRate( Engine::mixer()->inputSampleRate() );
+	( *sampleBuf)->setSampleRate( LmmsEngine::mixer()->inputSampleRate() );
 	delete[] data;
 }
 

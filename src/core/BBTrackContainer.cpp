@@ -81,9 +81,9 @@ bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
 
 void BBTrackContainer::updateAfterTrackAdd()
 {
-	if( numOfBBs() == 0 && !Engine::getSong()->isLoadingProject() )
+	if( numOfBBs() == 0 && !LmmsEngine::getSong()->isLoadingProject() )
 	{
-		Engine::getSong()->addBBTrack();
+		LmmsEngine::getSong()->addBBTrack();
 	}
 
 	// make sure, new track(s) have TCOs for every beat/bassline
@@ -115,7 +115,7 @@ tact_t BBTrackContainer::lengthOfBB( int _bb )
 
 int BBTrackContainer::numOfBBs() const
 {
-	return Engine::getSong()->countTracks( Track::BBTrack );
+	return LmmsEngine::getSong()->countTracks( Track::BBTrack );
 }
 
 
@@ -181,13 +181,13 @@ void BBTrackContainer::fixIncorrectPositions()
 
 void BBTrackContainer::play()
 {
-	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
+	if( LmmsEngine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
-		Engine::getSong()->playBB();
+		LmmsEngine::getSong()->playBB();
 	}
 	else
 	{
-		Engine::getSong()->togglePause();
+		LmmsEngine::getSong()->togglePause();
 	}
 }
 
@@ -196,7 +196,7 @@ void BBTrackContainer::play()
 
 void BBTrackContainer::stop()
 {
-	Engine::getSong()->stop();
+	LmmsEngine::getSong()->stop();
 }
 
 
@@ -226,7 +226,7 @@ void BBTrackContainer::currentBBChanged()
 
 	// now update all track-labels (the current one has to become white,
 	// the others gray)
-	TrackList tl = Engine::getSong()->tracks();
+	TrackList tl = LmmsEngine::getSong()->tracks();
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		if( ( *it )->type() == Track::BBTrack )
@@ -241,7 +241,7 @@ void BBTrackContainer::currentBBChanged()
 
 void BBTrackContainer::createTCOsForBB( int _bb )
 {
-	if( numOfBBs() == 0 || Engine::getSong()->isLoadingProject() )
+	if( numOfBBs() == 0 || LmmsEngine::getSong()->isLoadingProject() )
 	{
 		return;
 	}

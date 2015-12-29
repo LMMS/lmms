@@ -36,7 +36,7 @@
 
 ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 {
-	Ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = LmmsEngine::getLADSPAManager();
 
 	setWindowIcon( embed::getIconPixmap( "ports" ) );
 	setWindowTitle( tr( "Ports" ) );
@@ -87,11 +87,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= Engine::mixer()->processingSampleRate();
+				min *= LmmsEngine::mixer()->processingSampleRate();
 			}
 			if( max != NOHINT )
 			{
-				max *= Engine::mixer()->processingSampleRate();
+				max *= LmmsEngine::mixer()->processingSampleRate();
 			}
 		}
 

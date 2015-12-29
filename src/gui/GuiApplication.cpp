@@ -99,11 +99,11 @@ GuiApplication::GuiApplication()
 	splashScreen.update();
 	qApp->processEvents();
 
-	connect(Engine::inst(), SIGNAL(initProgress(const QString&)), 
+	connect(LmmsEngine::inst(), SIGNAL(initProgress(const QString&)), 
 		this, SLOT(displayInitProgress(const QString&)));
 
 	// Init central engine which handles all components of LMMS
-	Engine::init(false);
+	LmmsEngine::init(false);
 
 	s_instance = this;
 
@@ -115,7 +115,7 @@ GuiApplication::GuiApplication()
 		this, SLOT(displayInitProgress(const QString&)));
 
 	displayInitProgress(tr("Preparing song editor"));
-	m_songEditor = new SongEditorWindow(Engine::getSong());
+	m_songEditor = new SongEditorWindow(LmmsEngine::getSong());
 	connect(m_songEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing mixer"));
@@ -131,7 +131,7 @@ GuiApplication::GuiApplication()
 	connect(m_projectNotes, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing beat/bassline editor"));
-	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
+	m_bbEditor = new BBEditor(LmmsEngine::getBBTrackContainer());
 	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing piano roll"));

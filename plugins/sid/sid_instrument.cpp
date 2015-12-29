@@ -230,7 +230,7 @@ QString sidInstrument::nodeName() const
 
 f_cnt_t sidInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = Engine::mixer()->processingSampleRate();
+	const float samplerate = LmmsEngine::mixer()->processingSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
@@ -305,7 +305,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	const int clockrate = C64_PAL_CYCLES_PER_SEC;
-	const int samplerate = Engine::mixer()->processingSampleRate();
+	const int samplerate = LmmsEngine::mixer()->processingSampleRate();
 
 	if ( tfp == 0 )
 	{

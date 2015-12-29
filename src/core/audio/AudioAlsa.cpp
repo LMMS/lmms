@@ -258,7 +258,7 @@ void AudioAlsa::applyQualitySettings()
 {
 	if( hqAudio() )
 	{
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
 
 		if( m_handle != NULL )
 		{

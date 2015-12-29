@@ -108,11 +108,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	}
 #endif
 
-	setTempo( Engine::getSong()->getTempo() );
+	setTempo( LmmsEngine::getSong()->getTempo() );
 
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( LmmsEngine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( LmmsEngine::mixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -378,7 +378,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::mixer()->processingSampleRate() ) );
+			addInt( LmmsEngine::mixer()->processingSampleRate() ) );
 	unlock();
 }
 

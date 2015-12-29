@@ -115,7 +115,7 @@ void RenderManager::renderNextTrack()
 // Render the song into individual tracks
 void RenderManager::renderTracks()
 {
-	const TrackContainer::TrackList & tl = Engine::getSong()->tracks();
+	const TrackContainer::TrackList & tl = LmmsEngine::getSong()->tracks();
 
 	// find all currently unnmuted tracks -- we want to render these.
 	for( auto it = tl.begin(); it != tl.end(); ++it )
@@ -131,7 +131,7 @@ void RenderManager::renderTracks()
 		}
 	}
 
-	const TrackContainer::TrackList t2 = Engine::getBBTrackContainer()->tracks();
+	const TrackContainer::TrackList t2 = LmmsEngine::getBBTrackContainer()->tracks();
 	for( auto it = t2.begin(); it != t2.end(); ++it )
 	{
 		Track* tk = (*it);

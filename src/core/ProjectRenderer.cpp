@@ -66,10 +66,10 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 					const OutputSettings & _os,
 					ExportFileFormats _file_format,
 					const QString & _out_file ) :
-	QThread( Engine::mixer() ),
+	QThread( LmmsEngine::mixer() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( _qs ),
-	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
+	m_oldQualitySettings( LmmsEngine::mixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
@@ -84,7 +84,7 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
 				_os.depth == Depth_32Bit ? 32 : 16,
-							Engine::mixer() );
+							LmmsEngine::mixer() );
 	if( success_ful == false )
 	{
 		delete m_fileDev;
@@ -141,7 +141,7 @@ void ProjectRenderer::startProcessing()
 		// have to do mixer stuff with GUI-thread-affinity in order to
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
-		Engine::mixer()->setAudioDevice( m_fileDev,
+		LmmsEngine::mixer()->setAudioDevice( m_fileDev,
 						m_qualitySettings, false );
 
 		start(
@@ -168,20 +168,20 @@ void ProjectRenderer::run()
 #endif
 
 
-	Engine::getSong()->startExport();
+	LmmsEngine::getSong()->startExport();
     //skip first empty buffer
-    Engine::mixer()->nextBuffer();
+    LmmsEngine::mixer()->nextBuffer();
 
-	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
+	const Song::PlayPos & exportPos = LmmsEngine::getSong()->getPlayPos(
 							Song::Mode_PlaySong );
 	m_progress = 0;
-	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
+	std::pair<MidiTime, MidiTime> exportEndpoints = LmmsEngine::getSong()->getExportEndpoints();
 	tick_t startTick = exportEndpoints.first.getTicks();
 	tick_t lengthTicks = exportEndpoints.second.getTicks() - startTick;
 
 	// Continually track and emit progress percentage to listeners
-	while( Engine::getSong()->isExportDone() == false &&
-				Engine::getSong()->isExporting() == true
+	while( LmmsEngine::getSong()->isExportDone() == false &&
+				LmmsEngine::getSong()->isExporting() == true
 							&& !m_abort )
 	{
 		m_fileDev->processNextBuffer();
@@ -193,12 +193,12 @@ void ProjectRenderer::run()
 		}
 	}
 
-	Engine::getSong()->stopExport();
+	LmmsEngine::getSong()->stopExport();
 
 	const QString f = m_fileDev->outputFile();
 
-	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
+	LmmsEngine::mixer()->restoreAudioDevice();  // also deletes audio-dev
+	LmmsEngine::mixer()->changeQuality( m_oldQualitySettings );
 
 	// if the user aborted export-process, the file has to be deleted
 	if( m_abort )

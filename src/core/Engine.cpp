@@ -38,21 +38,21 @@
 
 #include "GuiApplication.h"
 
-float Engine::s_framesPerTick;
-Mixer* Engine::s_mixer = NULL;
-FxMixer * Engine::s_fxMixer = NULL;
-BBTrackContainer * Engine::s_bbTrackContainer = NULL;
-Song * Engine::s_song = NULL;
-ProjectJournal * Engine::s_projectJournal = NULL;
-Ladspa2LMMS * Engine::s_ladspaManager = NULL;
-DummyTrackContainer * Engine::s_dummyTC = NULL;
+float LmmsEngine::s_framesPerTick;
+Mixer* LmmsEngine::s_mixer = NULL;
+FxMixer * LmmsEngine::s_fxMixer = NULL;
+BBTrackContainer * LmmsEngine::s_bbTrackContainer = NULL;
+Song * LmmsEngine::s_song = NULL;
+ProjectJournal * LmmsEngine::s_projectJournal = NULL;
+Ladspa2LMMS * LmmsEngine::s_ladspaManager = NULL;
+DummyTrackContainer * LmmsEngine::s_dummyTC = NULL;
 
 
 
 
-void Engine::init( bool renderOnly )
+void LmmsEngine::init( bool renderOnly )
 {
-	Engine *engine = inst();
+    LmmsEngine *engine = inst();
 
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
@@ -82,7 +82,7 @@ void Engine::init( bool renderOnly )
 
 
 
-void Engine::destroy()
+void LmmsEngine::destroy()
 {
 	s_projectJournal->stopAllJournalling();
 	s_mixer->stopProcessing();
@@ -110,10 +110,10 @@ void Engine::destroy()
 
 
 
-void Engine::updateFramesPerTick()
+void LmmsEngine::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
 
-Engine * Engine::s_instanceOfMe = NULL;
+LmmsEngine * LmmsEngine::s_instanceOfMe = NULL;

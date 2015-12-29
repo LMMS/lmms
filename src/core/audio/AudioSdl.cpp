@@ -126,7 +126,7 @@ void AudioSdl::applyQualitySettings()
 	{
 		SDL_CloseAudio();
 
-		setSampleRate( Engine::mixer()->processingSampleRate() );
+		setSampleRate( LmmsEngine::mixer()->processingSampleRate() );
 
 		m_audioHandle.freq = sampleRate();
 

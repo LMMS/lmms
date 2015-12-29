@@ -66,7 +66,7 @@ void ProjectJournal::undo()
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		}
 	}
@@ -91,7 +91,7 @@ void ProjectJournal::redo()
 			setJournalling( false );
 			jo->restoreState( c.data.content().firstChildElement() );
 			setJournalling( prev );
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 			break;
 		}
 	}

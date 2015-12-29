@@ -41,7 +41,7 @@ TempoSyncKnobModel::TempoSyncKnobModel( const float _val, const float _min,
 	m_scale( _scale ),
 	m_custom( _parent )
 {
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( LmmsEngine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( calculateTempoSyncTime( bpm_t ) ) );
 }
 
@@ -66,7 +66,7 @@ void TempoSyncKnobModel::setTempoSync( QAction * _item )
 void TempoSyncKnobModel::setTempoSync( int _note_type )
 {
 	setSyncMode( ( TempoSyncMode ) _note_type );
-	Engine::getSong()->setModified();
+	LmmsEngine::getSong()->setModified();
 }
 
 
@@ -157,7 +157,7 @@ void TempoSyncKnobModel::setSyncMode( TempoSyncMode _new_mode )
 					this, SLOT( updateCustom() ) );
 		}
 	}
-	calculateTempoSyncTime( Engine::getSong()->getTempo() );
+	calculateTempoSyncTime( LmmsEngine::getSong()->getTempo() );
 }
 
 
@@ -166,7 +166,7 @@ void TempoSyncKnobModel::setSyncMode( TempoSyncMode _new_mode )
 void TempoSyncKnobModel::setScale( float _new_scale )
 {
 	m_scale = _new_scale;
-	calculateTempoSyncTime( Engine::getSong()->getTempo() );
+	calculateTempoSyncTime( LmmsEngine::getSong()->getTempo() );
 	emit scaleChanged( _new_scale );
 }
 

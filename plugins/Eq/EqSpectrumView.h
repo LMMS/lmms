@@ -109,7 +109,7 @@ public:
 				return;
 			}
 
-			m_sr = Engine::mixer()->processingSampleRate();
+			m_sr = LmmsEngine::mixer()->processingSampleRate();
 			const int LOWEST_FREQ = 0;
 			const int HIGHEST_FREQ = m_sr / 2;
 

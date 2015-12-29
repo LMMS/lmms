@@ -143,7 +143,7 @@ bool HydrogenImport::readSong()
 	QHash<QString, int> pattern_length;
 	QHash<QString, int> pattern_id;
 
-	Song *s = Engine::getSong();
+	Song *s = LmmsEngine::getSong();
 	int song_num_tracks = s->tracks().size();
 	if ( QFile( filename ).exists() == false ) 
 	{
@@ -213,7 +213,7 @@ bool HydrogenImport::readSong()
 
 					if ( nLayer == 0 ) 
 					{
-						drum_track[sId] = ( InstrumentTrack * ) Track::create( Track::InstrumentTrack,Engine::getBBTrackContainer() );
+						drum_track[sId] = ( InstrumentTrack * ) Track::create( Track::InstrumentTrack,LmmsEngine::getBBTrackContainer() );
 						drum_track[sId]->volumeModel()->setValue( fVolume * 100 );
 						drum_track[sId]->panningModel()->setValue( ( fPan_R - fPan_L ) * 100 );
 						ins = drum_track[sId]->loadInstrument( "audiofileprocessor" );
@@ -237,7 +237,7 @@ bool HydrogenImport::readSong()
 	}
 	QDomNode patterns = songNode.firstChildElement( "patternList" );
 	int pattern_count = 0;
-	int nbb = Engine::getBBTrackContainer()->numOfBBs();
+	int nbb = LmmsEngine::getBBTrackContainer()->numOfBBs();
 	QDomNode patternNode =  patterns.firstChildElement( "pattern" );
 	int pn = 1;
 	while (  !patternNode.isNull()  ) 

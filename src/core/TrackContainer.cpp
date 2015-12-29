@@ -189,9 +189,9 @@ void TrackContainer::removeTrack( Track * _track )
 		m_tracks.remove( index );
 		lockTracksAccess.unlock();
 
-		if( Engine::getSong() )
+		if( LmmsEngine::getSong() )
 		{
-			Engine::getSong()->setModified();
+			LmmsEngine::getSong()->setModified();
 		}
 	}
 }

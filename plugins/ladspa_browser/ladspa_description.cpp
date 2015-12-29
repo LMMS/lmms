@@ -41,7 +41,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 						ladspaPluginType _type ) :
 	QWidget( _parent )
 {
-	Ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = LmmsEngine::getLADSPAManager();
 
 	l_sortable_plugin_t plugins;
 	switch( _type )
@@ -74,7 +74,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 	{
 		if( _type != VALID || 
 			manager->getDescription( ( *it ).second )->inputChannels
-				<= Engine::mixer()->audioDev()->channels() )
+				<= LmmsEngine::mixer()->audioDev()->channels() )
 		{ 
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );
@@ -128,7 +128,7 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 	QVBoxLayout * layout = new QVBoxLayout( description );
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 
-	Ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = LmmsEngine::getLADSPAManager();
 
 	QLabel * name = new QLabel( description );
 	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );

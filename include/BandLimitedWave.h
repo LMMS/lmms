@@ -102,7 +102,7 @@ public:
 	 */
 	static inline float freqToLen( float f )
 	{
-		return freqToLen( f, Engine::mixer()->processingSampleRate() );
+		return freqToLen( f, LmmsEngine::mixer()->processingSampleRate() );
 	}
 
 	/*! \brief This method converts frequency to wavelength, but you can use any custom sample rate with it.

@@ -38,7 +38,7 @@ MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
+			LmmsEngine::mixer()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f )
 {
 	setSampleExact( true );

@@ -185,7 +185,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 	const float outGain =  m_outGain;
-	const int sampleRate = Engine::mixer()->processingSampleRate();
+	const int sampleRate = LmmsEngine::mixer()->processingSampleRate();
 	sampleFrame m_inPeak = { 0, 0 };
 
 	if(m_eqControls.m_analyseIn )
