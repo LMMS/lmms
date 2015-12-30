@@ -366,7 +366,7 @@ private:
 	VstSyncController m_vstSyncController;
 
 
-	friend class Engine;
+	friend class LmmsCore;
 	friend class SongEditor;
 	friend class mainWindow;
 	friend class ControllerRackView;
