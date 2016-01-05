@@ -2,6 +2,7 @@
  * eqparameterwidget.cpp - defination of EqParameterWidget class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+ * Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -23,34 +24,55 @@
  */
 
 #include "EqParameterWidget.h"
-#include "QPainter"
-#include "qwidget.h"
 #include "lmms_math.h"
-#include "MainWindow.h"
-#include "QMouseEvent"
 #include "EqControls.h"
+#include <QMouseEvent>
+#include <QPainter>
+#include <QWidget>
+
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
 	m_bands ( 0 ),
-	m_selectedBand ( 0 )
+	m_displayWidth ( 400 ),
+	m_displayHeigth ( 200 ),
+	m_notFirst ( false ),
+	m_controls ( controls )
+
 {
 	m_bands = new EqBand[8];
-	resize( 250, 116 );
-	//    connect( Engine::mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( update() ) );
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(100);
-	float totalLength = log10( 21000 );
-	m_pixelsPerUnitWidth = width( ) /  totalLength ;
-	float totalHeight = 80;
-	m_pixelsPerUnitHeight = (height() - 4) / ( totalHeight );
-	m_scale = 1.5;
+	resize( m_displayWidth, m_displayHeigth );
+	float totalHeight = 36; // gain range from -18 to +18
+	m_pixelsPerUnitHeight = m_displayHeigth / totalHeight;
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
-	m_controls = controls;
-	tf = new TextFloat();
-	tf->hide();
 
+	//GraphicsScene and GraphicsView stuff
+	m_scene = new QGraphicsScene();
+	m_scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
+	m_view = new QGraphicsView(this);
+	m_view->setStyleSheet(  "border-style: none; background: transparent;");
+	m_view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_view->setScene( m_scene );
+
+	//adds the handles
+	m_handleList = new QList<EqHandle*>;
+	for ( int i = 0; i < bandCount(); i++ )
+	{
+		m_handle = new EqHandle ( i, m_displayWidth, m_displayHeigth );
+		m_handleList->append( m_handle );
+		m_handle->setZValue(1);
+		m_scene->addItem( m_handle );
+	}
+
+	//adds the curve widget
+	m_eqcurve = new EqCurve( m_handleList, m_displayWidth, m_displayHeigth );
+	m_scene->addItem( m_eqcurve );
+	for ( int i = 0; i < bandCount(); i++ )
+	{
+		// if the data of handle position has changed update the models
+		QObject::connect( m_handleList->at( i ) ,SIGNAL( positionChanged() ), this ,SLOT( updateModels() ) );
+	}
 }
 
 
@@ -58,7 +80,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 
 EqParameterWidget::~EqParameterWidget()
 {
-	if(m_bands)
+	if( m_bands )
 	{
 		delete[] m_bands;
 		m_bands = 0;
@@ -68,174 +90,122 @@ EqParameterWidget::~EqParameterWidget()
 
 
 
-void EqParameterWidget::paintEvent( QPaintEvent *event )
+void EqParameterWidget::updateView()
 {
-	QPainter painter( this );
-	//Draw Frequecy maker lines
-	painter.setPen( QPen( QColor( 100, 100, 100, 200 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
-	for( int x = 20 ; x < 100; x += 10)
-	{
-		painter.drawLine( freqToXPixel( x )  , 0, freqToXPixel( x ) , height() );
-	}
-	for( int x = 100 ; x < 1000; x += 100)
-	{
-		painter.drawLine( freqToXPixel( x )  , 0, freqToXPixel( x ) , height() );
-	}
-	for( int x = 1000 ; x < 11000; x += 1000)
-	{
-		painter.drawLine( freqToXPixel( x )  , 0, freqToXPixel( x ) , height() );
-	}
-	//draw 0dB line
-	painter.drawLine(0, gainToYPixel( 0 ) , width(), gainToYPixel( 0 ) );
-
 	for( int i = 0 ; i < bandCount() ; i++ )
 	{
-		m_bands[i].color.setAlpha( m_bands[i].active->value() ? activeAplha() : inactiveAlpha() );
-		painter.setPen( QPen( m_bands[i].color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
-		float  x = freqToXPixel( m_bands[i].freq->value() );
-		float y = height() * 0.5;
-		float gain = 1;
-		if( m_bands[i].gain )
+		if ( m_handleList->at( i )->getHandleMoved() == false ) //prevents a short circuit between handle and data model
 		{
-			gain = m_bands[i].gain->value();
-		}
-		y = gainToYPixel( gain );
-		float bw = m_bands[i].freq->value() * m_bands[i].res->value();
-		m_bands[i].x = x; m_bands[i].y = y;
-		const int radius = 7;
-		painter.drawEllipse( x - radius , y - radius, radius * 2 ,radius * 2 );
-		QString msg = QString ( "%1" ).arg ( QString::number (i + 1) );
-		painter.drawText(x - ( radius * 0.5 ), y + ( radius * 0.85 ), msg );
-		painter.setPen( QPen( m_bands[i].color, 1, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin ) );
-		if( i == 0 || i == bandCount() - 1 )
-		{
-			painter.drawLine(x , y, x, y - (m_bands[i].res->value() * 4  ) );
+			//sets the band on active if a fader or a knob is moved
+			bool hover= false; // prevents an action if handle is moved
+			for ( int j = 0; j < bandCount(); j++ )
+			{
+				if ( m_handleList->at(j)->isMouseHover() ) hover = true;
+			}
+			if ( !hover )
+			{
+				if ( sender() == m_bands[i].gain  ) m_bands[i].active->setValue( true );
+				if ( sender() == m_bands[i].freq ) m_bands[i].active->setValue( true );
+				if ( sender() == m_bands[i].res ) m_bands[i].active->setValue( true );
+			}
+
+			changeHandle(i);
 		}
 		else
 		{
-			painter.drawLine(freqToXPixel(m_bands[i].freq->value()-(bw * 0.5)),y,freqToXPixel(m_bands[i].freq->value()+(bw * 0.5)),y);
+			m_handleList->at( i )->setHandleActive( m_bands[i].active->value() );
+			m_handleList->at( i )->setHandleMoved( false );
 		}
 	}
+
+	m_notFirst = true;
+	if ( m_bands[0].hp12->value() ) m_handleList->at( 0 )->sethp12();
+	if ( m_bands[0].hp24->value() ) m_handleList->at( 0 )->sethp24();
+	if ( m_bands[0].hp48->value() ) m_handleList->at( 0 )->sethp48();
+	if ( m_bands[7].lp12->value() ) m_handleList->at( 7 )->setlp12();
+	if ( m_bands[7].lp24->value() ) m_handleList->at( 7 )->setlp24();
+	if ( m_bands[7].lp48->value() ) m_handleList->at( 7 )->setlp48();
 }
 
 
 
 
-void EqParameterWidget::mousePressEvent( QMouseEvent *event )
+void EqParameterWidget::changeHandle( int i )
 {
-	m_oldX = event->x(); m_oldY = event->y();
-	m_selectedBand = selectNearestHandle( event->x(), event->y() );
-	m_mouseAction = none;
-	if ( event->button() == Qt::LeftButton ) m_mouseAction = drag;
-	if ( event->button() == Qt::RightButton ) m_mouseAction = res;
+	//fill x, y, and bw with data from model
+	float x = freqToXPixel( m_bands[i].freq->value() );
+	float y = m_handleList->at( i )->y();
+	//for pass filters there is no gain model
+	if( m_bands[i].gain )
+	{
+		float gain = m_bands[i].gain->value();
+		y = gainToYPixel( gain );
+	}
+	float bw = m_bands[i].res->value();
+
+	// set the handle position, filter type for each handle
+	switch ( i )
+	{
+	case 0 :
+		m_handleList->at( i )->setType( highpass );
+		m_handleList->at( i )->setPos( x, m_displayHeigth/2 );
+		break;
+	case 1:
+		m_handleList->at( i )->setType( lowshelf );
+		m_handleList->at( i )->setPos( x, y );
+		break;
+	case 2:
+		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setPos( x, y );
+		break;
+	case 3:
+		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setPos( x, y );
+		break;
+	case 4:
+		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setPos( x, y );
+		break;
+	case 5:
+		m_handleList->at( i )->setType( para );
+		m_handleList->at( i )->setPos( x, y );
+		break;
+	case 6:
+		m_handleList->at( i )->setType( highshelf );
+		m_handleList->at( i )->setPos( x, y );
+		break;
+	case 7:
+		m_handleList->at( i )->setType( lowpass );
+		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth/2 ) );
+		break;
+	}
+
+	// set resonance/bandwidth for each handle
+	if ( m_handleList->at( i )->getResonance() != bw )
+	{
+		m_handleList->at( i )->setResonance( bw );
+	}
+
+	// and the active status
+	m_handleList->at( i )->setHandleActive( m_bands[i].active->value() );
+	m_handleList->at( i )->update();
+	m_eqcurve->update();
 }
 
 
 
 
-void EqParameterWidget::mouseReleaseEvent( QMouseEvent *event )
+void EqParameterWidget::updateModels()
 {
-	m_selectedBand = 0;
-	m_mouseAction = none;
-	const int inXmin = 228;
-	const int inXmax = 250;
-	const int inYmin = 20;
-	const int inYmax = 30;
-
-	const int outXmin = 228;
-	const int outXmax = 250;
-	const int outYmin = 30;
-	const int outYmax = 40;
-
-	if(event->x() > inXmin && event->x() < inXmax && event->y() > inYmin && event->y() < inYmax )
+	for ( int i=0 ; i < bandCount(); i++ )
 	{
-		m_controls->m_analyseIn = !m_controls->m_analyseIn;
+		m_bands[i].freq->setValue( xPixelToFreq( m_handleList->at(i)->x() ) );
+		if( m_bands[i].gain ) m_bands[i].gain->setValue( yPixelToGain( m_handleList->at(i)->y() ) );
+		m_bands[i].res->setValue( m_handleList->at( i )->getResonance() );
+		//sets the band on active if the handle is moved
+		if ( sender() == m_handleList->at( i ) ) m_bands[i].active->setValue( true );
 	}
-
-	if(event->x() > outXmin && event->x() < outXmax && event->y() > outYmin && event->y() < outYmax )
-	{
-		m_controls->m_analyseOut = !m_controls->m_analyseOut;
-	}
-
-	tf->hide();
-}
-
-
-
-
-void EqParameterWidget::mouseMoveEvent( QMouseEvent *event )
-{
-	int deltaX = event->x() - m_oldX;
-	int deltaR = event->y() - m_oldY;
-	m_oldX = event->x(); m_oldY = event->y();
-	if(m_selectedBand && m_selectedBand->active->value() )
-	{
-		switch ( m_mouseAction ) {
-		case none :
-			break;
-		case drag:
-			if( m_selectedBand->freq ) m_selectedBand->freq->setValue( xPixelToFreq( m_oldX ) );
-			if( m_selectedBand->gain )m_selectedBand->gain->setValue( yPixelToGain( m_oldY ) );
-			break;
-		case res:
-			if( m_selectedBand->res )m_selectedBand->res->incValue( ( deltaX) * resPixelMultiplyer() );
-			if( m_selectedBand->res )m_selectedBand->res->incValue( (-deltaR) * resPixelMultiplyer() );
-			break;
-		default:
-			break;
-		}
-	}
-	if( m_oldX > 0 && m_oldX < width() && m_oldY > 0 && m_oldY < height() )
-	{
-		tf->setText( QString::number(xPixelToFreq( m_oldX )) + tr( "Hz ") );
-		tf->show();
-		const int x = event->x() > width() * 0.5 ?
-					m_oldX - tf->width() :
-					m_oldX;
-		tf->moveGlobal(this, QPoint( x, m_oldY - tf->height() ) );
-	}
-}
-
-
-
-
-void EqParameterWidget::mouseDoubleClickEvent( QMouseEvent *event )
-{
-	EqBand* selected = selectNearestHandle( event->x() , event->y() );
-	if( selected )
-	{
-		selected->active->setValue( selected->active->value() ? 0 : 1 );
-	}
-}
-
-
-
-
-EqBand*  EqParameterWidget::selectNearestHandle( const int x, const  int y )
-{
-	EqBand* selectedModel = 0;
-	float* distanceToHandles = new float[bandCount()];
-	//calc distance to each handle
-	for( int i = 0 ; i < bandCount() ; i++ )
-	{
-		int xOffset = m_bands[i].x - x;
-		int yOffset = m_bands[i].y - y;
-		distanceToHandles[i] = fabs( sqrt( ( xOffset * xOffset ) + ( yOffset * yOffset ) ) );
-	}
-	//select band
-	int shortestBand = 0;
-	for ( int i = 1 ; i < bandCount() ; i++ )
-	{
-		if ( distanceToHandles [i] < distanceToHandles[shortestBand] ){
-			shortestBand = i;
-		}
-	}
-	if(distanceToHandles[shortestBand] <  maxDistanceFromHandle() )
-	{
-		selectedModel = &m_bands[shortestBand];
-	}
-	delete[] distanceToHandles;
-	return selectedModel;
+	m_eqcurve->update();
 }
 
 
