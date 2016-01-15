@@ -28,8 +28,6 @@
 
 #include <QCompleter>
 #include <QDirModel>
-//#include <QLabel>
-//#include <QLineEdit>
 #include <QMessageBox>
 #include <QTranslator>
 
