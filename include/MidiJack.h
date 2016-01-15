@@ -54,7 +54,7 @@ public:
 
 	inline static QString name()
 	{
-		return( QT_TRANSLATE_NOOP( "setupWidget",
+		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
 			"Jack-MIDI" ) );
 	}
 
@@ -62,18 +62,10 @@ public:
 	void JackMidiRead(jack_nframes_t nframes);
 
 
-	class setupWidget : public MidiClientRaw::setupWidget
+	inline static QString configSection()
 	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-
-	} ;
+		return "MidiJack";
+	}
 
 
 protected:

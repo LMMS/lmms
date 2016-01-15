@@ -28,8 +28,8 @@
 
 #include <QCompleter>
 #include <QDirModel>
-#include <QLabel>
-#include <QLineEdit>
+//#include <QLabel>
+//#include <QLineEdit>
 #include <QMessageBox>
 #include <QTranslator>
 
@@ -211,33 +211,6 @@ void MidiJack::run()
 		// midi processing is handled by jack server callbacks
 		sleep(1);
 	}
-}
-
-MidiJack::setupWidget::setupWidget( QWidget * _parent ) :
-	MidiClientRaw::setupWidget( MidiJack::name(), _parent )
-{
-	m_device = new QLineEdit( MidiJack::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 180, 20 );
-	QDirModel * model = new QDirModel( QStringList(),
-			QDir::AllDirs | QDir::System,
-			QDir::Name | QDir::DirsFirst,
-			this );
-	m_device->setCompleter(	new QCompleter( model, this ) );
-
-
-	QLabel * dev_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
-	dev_lbl->setFont( pointSize<6>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 180, 10 );
-}
-
-MidiJack::setupWidget::~setupWidget()
-{
-}
-
-void MidiJack::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue( "midijack", "lmms",
-							m_device->text() );
 }
 
 #endif // LMMS_HAVE_JACK

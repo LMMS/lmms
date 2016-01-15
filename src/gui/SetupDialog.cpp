@@ -842,7 +842,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_JACK
 	m_midiIfaceSetupWidgets[MidiJack::name()] =
-					new MidiJack::setupWidget( msw );
+					MidiSetupWidget::create<MidiJack>( msw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
