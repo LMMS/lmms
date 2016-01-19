@@ -81,6 +81,29 @@ public:
 	///
 	bool mayChangeProject(bool stopPlayback);
 
+	void autoSaveTimerStart()
+	{
+		m_autoSaveTimer.start( 1000 * 60 );  // 1 minute
+	}
+
+	enum SessionState
+	{
+		Normal,
+		Recover,
+		Limited,
+	};
+
+	void setSession( SessionState session )
+	{
+		m_session = session;
+	}
+
+	SessionState getSession()
+	{
+		return m_session;
+	}
+
+	void sessionCleanup();
 
 	void clearKeyModifiers();
 
@@ -131,6 +154,8 @@ public slots:
 	void undo();
 	void redo();
 
+	void autoSave();
+	void runAutoSave();
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -149,7 +174,6 @@ private:
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
-
 
 	QMdiArea * m_workspace;
 
@@ -187,6 +211,8 @@ private:
 
 	ToolButton * m_metronomeToggle;
 
+	SessionState m_session;
+
 private slots:
 	void browseHelp();
 	void fillTemplatesMenu();
@@ -197,8 +223,6 @@ private slots:
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
 
-
-	void autoSave();
 
 signals:
 	void periodicUpdate();
