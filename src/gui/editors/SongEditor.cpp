@@ -733,6 +733,7 @@ void SongEditorWindow::stop()
 {
 	m_editor->m_song->stop();
 	gui->pianoRoll()->stopRecording();
+	gui->mainWindow()->runAutoSave();
 }
 
 void SongEditorWindow::adjustUiAfterProjectLoad()

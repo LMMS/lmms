@@ -24,6 +24,7 @@
 
 #include "MainWindow.h"
 
+#include <QDebug>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopServices>
@@ -1506,6 +1507,7 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
+//	qDebug("Running autoSave()");
 	if( !( Engine::getSong()->isPlaying() ||
 			Engine::getSong()->isExporting() ) )
 	{
@@ -1524,9 +1526,11 @@ void MainWindow::autoSave()
 // from the timer where we need to do extra tests.
 void MainWindow::runAutoSave()
 {
+	qDebug("Running runAutoSave...");
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
 		getSession() != Limited )
 	{
+		m_autoSaveTimer.start(1000 * 60);  // Reset timer.
 		autoSave();
 	}
 }
