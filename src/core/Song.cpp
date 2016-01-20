@@ -29,7 +29,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
-
+#include <QDebug>
 #include <math.h>
 
 #include "AutomationTrack.h"
@@ -658,10 +658,11 @@ void Song::stop()
 	m_playMode = Mode_None;
 
 	emit playbackStateChanged();
-
 	if( Engine::getSong()->isModifiedSinceAutoSave() )
 	{
+		qDebug("Stopped, saving...");
 		gui->mainWindow()->runAutoSave();
+//		gui->mainWindow()->autoSaveTimerStart(); // Reset timer
 	}
 }
 

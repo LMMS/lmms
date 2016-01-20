@@ -1514,12 +1514,15 @@ void MainWindow::autoSave()
 		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
+		autoSaveTimerStart();  // Reset timer
 	}
 	else
 	{
 		// try again in 10 seconds
-		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
-		m_autoSaveTimer.start(1000 * 60);  // Reset timer.
+		qDebug("in singleShot");
+		m_autoSaveTimer.start( 1000 * 10 );
+//		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
+//		autoSaveTimerStart(); // Reset timer
 	}
 }
 
@@ -1531,7 +1534,7 @@ void MainWindow::runAutoSave()
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
 		getSession() != Limited )
 	{
-		m_autoSaveTimer.start(1000 * 60);  // Reset timer.
 		autoSave();
+		autoSaveTimerStart();  // Reset timer
 	}
 }

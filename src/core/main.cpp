@@ -821,7 +821,6 @@ int main( int argc, char * * argv )
 			gui->mainWindow()->getSession() != MainWindow::SessionState::Limited )
 		{
 			gui->mainWindow()->runAutoSave();
-			gui->mainWindow()->autoSaveTimerStart();
 		}
 	}
 

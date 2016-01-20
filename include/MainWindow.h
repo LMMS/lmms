@@ -29,6 +29,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QMainWindow>
+#include <QDebug>
 
 #include "SubWindow.h"
 
@@ -83,6 +84,7 @@ public:
 
 	void autoSaveTimerStart()
 	{
+		qDebug("Timer reset");
 		m_autoSaveTimer.start( 1000 * 60 );  // 1 minute
 	}
 
