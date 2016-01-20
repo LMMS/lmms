@@ -1512,6 +1512,7 @@ void MainWindow::autoSave()
 			Engine::getSong()->isExporting() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		Engine::getSong()->setUnmodifiedSinceAutoSave();
 	}
 	else
 	{

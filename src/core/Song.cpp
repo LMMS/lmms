@@ -84,6 +84,7 @@ Song::Song() :
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
+	m_modifiedSinceAutoSave( false ),
 	m_recording( false ),
 	m_exporting( false ),
 	m_exportLoop( false ),
@@ -900,6 +901,7 @@ void Song::createNewProject()
 	QCoreApplication::sendPostedEvents();
 
 	m_modified = false;
+	m_modifiedSinceAutoSave = false;
 
 	if( gui->mainWindow() )
 	{
@@ -1063,6 +1065,7 @@ void Song::loadProject( const QString & fileName )
 
 	m_loadingProject = false;
 	m_modified = false;
+	m_modifiedSinceAutoSave = false;
 
 	if( gui && gui->mainWindow() )
 	{
@@ -1375,6 +1378,7 @@ void Song::setModified()
 	if( !m_loadingProject )
 	{
 		m_modified = true;
+		m_modifiedSinceAutoSave = true;
 		if( gui != nullptr && gui->mainWindow() &&
 			QThread::currentThread() == gui->mainWindow()->thread() )
 		{

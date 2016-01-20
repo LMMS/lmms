@@ -228,6 +228,16 @@ public:
 		return m_modified;
 	}
 
+	bool isModifiedSinceAutoSave()
+	{
+		return m_modifiedSinceAutoSave;
+	}
+
+	void setUnmodifiedSinceAutoSave()
+	{
+		m_modifiedSinceAutoSave = false;
+	}
+
 	virtual QString nodeName() const
 	{
 		return "song";
@@ -340,6 +350,7 @@ private:
 	QString m_fileName;
 	QString m_oldFileName;
 	bool m_modified;
+	bool m_modifiedSinceAutoSave;
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
