@@ -658,6 +658,11 @@ void Song::stop()
 	m_playMode = Mode_None;
 
 	emit playbackStateChanged();
+
+	if( Engine::getSong()->isModifiedSinceAutoSave() )
+	{
+		gui->mainWindow()->runAutoSave();
+	}
 }
 
 

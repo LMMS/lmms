@@ -3383,10 +3383,6 @@ void PianoRoll::stop()
 	Engine::getSong()->stop();
 	m_recording = false;
 	m_scrollBack = true;
-	if( Engine::getSong()->isModifiedSinceAutoSave() )
-	{
-		gui->mainWindow()->runAutoSave();
-	}
 }
 
 
