@@ -29,8 +29,6 @@
 #include <QMainWindow>
 #include <QToolBar>
 
-#include "GuiApplication.h"
-#include "Song.h"
 #include "TimeLineWidget.h"
 #include "ToolButton.h"
 

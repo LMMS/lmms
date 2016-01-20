@@ -1511,6 +1511,7 @@ void MainWindow::autoSave()
 	if( !( Engine::getSong()->isPlaying() ||
 			Engine::getSong()->isExporting() ) )
 	{
+		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
 	}
@@ -1527,7 +1528,6 @@ void MainWindow::autoSave()
 // from the timer where we need to do extra tests.
 void MainWindow::runAutoSave()
 {
-	qDebug("Running runAutoSave...");
 	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
 		getSession() != Limited )
 	{
