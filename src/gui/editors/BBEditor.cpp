@@ -164,7 +164,10 @@ void BBEditor::play()
 void BBEditor::stop()
 {
 	Engine::getSong()->stop();
-	gui->mainWindow()->runAutoSave();
+	if( Engine::getSong()->isModified() )
+	{
+		gui->mainWindow()->runAutoSave();
+	}
 }
 
 

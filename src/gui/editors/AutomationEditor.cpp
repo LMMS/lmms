@@ -1600,7 +1600,10 @@ void AutomationEditor::stop()
 		Engine::getSong()->stop();
 	}
 	m_scrollBack = true;
-	gui->mainWindow()->runAutoSave();
+	if( Engine::getSong()->isModified() )
+	{
+		gui->mainWindow()->runAutoSave();
+	}
 }
 
 
