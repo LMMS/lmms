@@ -1513,7 +1513,6 @@ void MainWindow::autoSave()
 			QApplication::mouseButtons() ) )
 	{
 		qDebug("autoSave...");
-		qDebug("Timer %i seconds", m_autoSaveTimer.interval() / 1000 );
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
 		if( m_autoSaveTimer.interval() / 1000 == 10 )

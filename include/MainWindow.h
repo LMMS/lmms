@@ -84,7 +84,7 @@ public:
 
 	void autoSaveTimerStart( int seconds = 60 )
 	{
-		qDebug("Timer reset");
+		qDebug("Timer reset to %i seconds", seconds );
 		m_autoSaveTimer.start( seconds * 1000 ); // Default = 1 minute
 	}
 

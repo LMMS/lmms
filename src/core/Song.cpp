@@ -660,7 +660,7 @@ void Song::stop()
 	emit playbackStateChanged();
 	if( Engine::getSong()->isModifiedSinceAutoSave() )
 	{
-		qDebug("Stopped, saving...");
+		qDebug("Stopped, runAutoSave()");
 		gui->mainWindow()->runAutoSave();
 //		gui->mainWindow()->autoSaveTimerStart(); // Reset timer
 	}
