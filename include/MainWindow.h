@@ -82,10 +82,10 @@ public:
 	///
 	bool mayChangeProject(bool stopPlayback);
 
-	void autoSaveTimerStart()
+	void autoSaveTimerStart( int seconds = 60 )
 	{
 		qDebug("Timer reset");
-		m_autoSaveTimer.start( 1000 * 60 );  // 1 minute
+		m_autoSaveTimer.start( seconds * 1000 ); // Default = 1 minute
 	}
 
 	enum SessionState

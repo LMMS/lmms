@@ -1512,10 +1512,10 @@ void MainWindow::autoSave()
 			Engine::getSong()->isExporting() ) )
 	{
 		qDebug("autoSave...");
-		qDebug("Timer usec %i", m_autoSaveTimer.interval() );
+		qDebug("Timer %i seconds", m_autoSaveTimer.interval() / 1000 );
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
-		if( m_autoSaveTimer.interval() == 10000 )
+		if( m_autoSaveTimer.interval() / 1000 == 10 )
 		{
 			autoSaveTimerStart();  // Reset timer
 		}
@@ -1524,9 +1524,9 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		qDebug("in singleShot");
-		if( m_autoSaveTimer.interval() == 60000 )
+		if( m_autoSaveTimer.interval() / 1000 == 60 )
 		{
-			m_autoSaveTimer.start( 1000 * 10 );
+			autoSaveTimerStart( 10 );
 		}
 //		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
 //		autoSaveTimerStart(); // Reset timer
