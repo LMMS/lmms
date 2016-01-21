@@ -1507,7 +1507,6 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-//	qDebug("Running autoSave()");
 	if( !( Engine::getSong()->isPlaying() ||
 			Engine::getSong()->isExporting() ||
 			QApplication::mouseButtons() ) )
@@ -1515,7 +1514,7 @@ void MainWindow::autoSave()
 		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
-		if( m_autoSaveTimer.interval() / 1000 == 10 )
+		if( m_autoSaveTimer.interval() / 1000 != 60 )
 		{
 			autoSaveTimerStart();  // Reset timer
 		}
@@ -1524,12 +1523,10 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		qDebug("in singleShot");
-		if( m_autoSaveTimer.interval() / 1000 == 60 )
+		if( m_autoSaveTimer.interval() / 1000 != 10 )
 		{
 			autoSaveTimerStart( 10 );
 		}
-//		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
-//		autoSaveTimerStart(); // Reset timer
 	}
 }
 

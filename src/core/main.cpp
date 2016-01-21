@@ -820,7 +820,7 @@ int main( int argc, char * * argv )
 		if( autoSaveEnabled &&
 			gui->mainWindow()->getSession() != MainWindow::SessionState::Limited )
 		{
-			gui->mainWindow()->runAutoSave();
+			gui->mainWindow()->autoSave();
 		}
 	}
 

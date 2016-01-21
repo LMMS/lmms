@@ -662,7 +662,6 @@ void Song::stop()
 	{
 		qDebug("Stopped, runAutoSave()");
 		gui->mainWindow()->runAutoSave();
-//		gui->mainWindow()->autoSaveTimerStart(); // Reset timer
 	}
 }
 
