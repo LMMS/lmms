@@ -1509,7 +1509,8 @@ void MainWindow::autoSave()
 {
 //	qDebug("Running autoSave()");
 	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ) )
+			Engine::getSong()->isExporting() ||
+			QApplication::mouseButtons() ) )
 	{
 		qDebug("autoSave...");
 		qDebug("Timer %i seconds", m_autoSaveTimer.interval() / 1000 );
