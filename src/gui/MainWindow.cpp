@@ -1509,7 +1509,7 @@ void MainWindow::autoSave()
 {
 	if( !( Engine::getSong()->isPlaying() ||
 			Engine::getSong()->isExporting() ||
-			QApplication::mouseButtons() ) )
+				QApplication::mouseButtons() ) )
 	{
 		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());

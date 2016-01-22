@@ -658,7 +658,10 @@ void Song::stop()
 	m_playMode = Mode_None;
 
 	emit playbackStateChanged();
-	if( Engine::getSong()->isModifiedSinceAutoSave() )
+	if( Engine::getSong()->isModifiedSinceAutoSave() &&
+		ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
+		gui->mainWindow()->getSession() != MainWindow::SessionState::Limited
+											 )
 	{
 		qDebug("Stopped, runAutoSave()");
 		gui->mainWindow()->runAutoSave();
