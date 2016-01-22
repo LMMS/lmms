@@ -82,7 +82,7 @@ public:
 	///
 	bool mayChangeProject(bool stopPlayback);
 
-	void autoSaveTimerStart( int seconds = 60 )
+	void autoSaveTimerStart( int seconds = 120 )
 	{
 		qDebug("Timer reset to %i seconds", seconds );
 		m_autoSaveTimer.start( seconds * 1000 ); // Default = 1 minute

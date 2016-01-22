@@ -1514,7 +1514,7 @@ void MainWindow::autoSave()
 		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
-		if( m_autoSaveTimer.interval() / 1000 != 60 )
+		if( m_autoSaveTimer.interval() / 1000 != 120 )
 		{
 			autoSaveTimerStart();  // Reset timer
 		}
