@@ -666,6 +666,13 @@ void Song::stop()
 		qDebug("Stopped, runAutoSave()");
 		gui->mainWindow()->runAutoSave();
 	}
+	else if( gui->mainWindow()->getAutoSaveTimerInterval() ==
+					gui->mainWindow()->m_autoSaveShortTime )
+	{
+		qDebug("Stopped and in short loop, runAutoSave()");
+		// We are in the short loop so autoSave() will do a reset
+		gui->mainWindow()->autoSave();
+	}
 }
 
 

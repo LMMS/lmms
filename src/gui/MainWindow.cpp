@@ -917,6 +917,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool MainWindow::saveProject()
 {
+	m_autoSaveTimer.stop(); // No edit while here...
 	if( Engine::getSong()->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
@@ -929,6 +930,7 @@ bool MainWindow::saveProject()
 			sessionCleanup();
 		}
 	}
+	autoSaveTimerStart( 60 );
 	return( true );
 }
 
@@ -937,6 +939,7 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
+	m_autoSaveTimer.stop(); // No edit while here...
 	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
@@ -964,8 +967,10 @@ bool MainWindow::saveProjectAs()
 		{
 			sessionCleanup();
 		}
+		autoSaveTimerStart();
 		return( true );
 	}
+	autoSave();
 	return( false );
 }
 
@@ -1514,7 +1519,7 @@ void MainWindow::autoSave()
 		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
-		if( m_autoSaveTimer.interval() / 1000 != 120 )
+		if( getAutoSaveTimerInterval() != m_autoSaveLongTime )
 		{
 			autoSaveTimerStart();  // Reset timer
 		}
@@ -1523,7 +1528,7 @@ void MainWindow::autoSave()
 	{
 		// try again in 10 seconds
 		qDebug("in singleShot");
-		if( m_autoSaveTimer.interval() / 1000 != 10 )
+		if( getAutoSaveTimerInterval() != 10 )
 		{
 			autoSaveTimerStart( 10 );
 		}
