@@ -82,13 +82,16 @@ public:
 	///
 	bool mayChangeProject(bool stopPlayback);
 
-	const static int m_autoSaveLongTime = 120;
-	const static int m_autoSaveShortTime = 10;
+	// Auto save timer intervals
+	const static int m_autoSaveLongSeconds = 120;
+	const static int m_autoSaveShortSeconds = 10;
+	const static int m_autoSaveLongTime = m_autoSaveLongSeconds * 1000;
+	const static int m_autoSaveShortTime = m_autoSaveShortSeconds * 1000;
 
-	void autoSaveTimerReset( int seconds = m_autoSaveLongTime )
+	void autoSaveTimerReset( int msec = m_autoSaveLongTime )
 	{
-		qDebug("Timer reset to %i seconds", seconds );
-		m_autoSaveTimer.start( seconds * 1000 ); // Default = 1 minute
+		qDebug("Timer reset to %i seconds", msec / 1000 );
+		m_autoSaveTimer.start( msec );
 	}
 
 	int getAutoSaveTimerInterval()

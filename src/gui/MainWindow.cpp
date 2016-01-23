@@ -917,9 +917,12 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool MainWindow::saveProject()
 {
-	m_autoSaveTimer.stop(); // No edit while here...
+	// Prevent auto save while doing a manual save
+	m_autoSaveTimer.stop();
+	qDebug("Stopping timer and resetting while saving manually");
 	if( Engine::getSong()->projectFileName() == "" )
 	{
+			qDebug("No previous save so opening 'save project as' dialog");
 		return( saveProjectAs() );
 	}
 	else
@@ -928,6 +931,7 @@ bool MainWindow::saveProject()
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
+			autoSave();
 		}
 	}
 	autoSaveTimerReset();
@@ -939,7 +943,9 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	m_autoSaveTimer.stop(); // No edit while here...
+	// Prevent auto save while doing a manual save
+	qDebug("Stopping timer while in save menu");
+	m_autoSaveTimer.stop();
 	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
@@ -966,10 +972,13 @@ bool MainWindow::saveProjectAs()
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
+			autoSave();
 		}
+		qDebug("Resetting after manual save");
 		autoSaveTimerReset();
 		return( true );
 	}
+	qDebug("No manual save so backing up...");
 	autoSave();
 	return( false );
 }
