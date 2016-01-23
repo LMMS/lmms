@@ -207,7 +207,7 @@ MainWindow::MainWindow() :
 		// The auto save function mustn't run until there is a project
 		// to save or it will run over recover.mmp if you hesitate at the
 		// recover messagebox for a minute. It is now started in main.
-		// See autoSaveTimerStart() in MainWindow.h
+		// See autoSaveTimerReset() in MainWindow.h
 	}
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
@@ -930,7 +930,7 @@ bool MainWindow::saveProject()
 			sessionCleanup();
 		}
 	}
-	autoSaveTimerStart( 60 );
+	autoSaveTimerReset();
 	return( true );
 }
 
@@ -967,7 +967,7 @@ bool MainWindow::saveProjectAs()
 		{
 			sessionCleanup();
 		}
-		autoSaveTimerStart();
+		autoSaveTimerReset();
 		return( true );
 	}
 	autoSave();
@@ -1521,16 +1521,18 @@ void MainWindow::autoSave()
 		Engine::getSong()->setUnmodifiedSinceAutoSave();
 		if( getAutoSaveTimerInterval() != m_autoSaveLongTime )
 		{
-			autoSaveTimerStart();  // Reset timer
+			autoSaveTimerReset();  // Reset timer
 		}
 	}
 	else
 	{
 		// try again in 10 seconds
-		qDebug("in singleShot");
-		if( getAutoSaveTimerInterval() != 10 )
+		if( QApplication::mouseButtons() )
+			qDebug("Mouse button pressed");
+		qDebug("in short loop");
+		if( getAutoSaveTimerInterval() != m_autoSaveShortTime )
 		{
-			autoSaveTimerStart( 10 );
+			autoSaveTimerReset( m_autoSaveShortTime );
 		}
 	}
 }
@@ -1544,6 +1546,6 @@ void MainWindow::runAutoSave()
 		getSession() != Limited )
 	{
 		autoSave();
-		autoSaveTimerStart();  // Reset timer
+		autoSaveTimerReset();  // Reset timer
 	}
 }
