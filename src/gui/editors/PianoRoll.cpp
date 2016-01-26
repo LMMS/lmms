@@ -152,6 +152,9 @@ PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 
 const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
+const QVector<double> PianoRoll::m_zoomLevels =
+			{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
+
 
 PianoRoll::PianoRoll() :
 	m_nemStr( QVector<QString>() ),
@@ -350,9 +353,9 @@ PianoRoll::PianoRoll() :
 						SLOT( verScrolled( int ) ) );
 
 	// setup zooming-stuff
-	for( int i = 0; i < 6; ++i )
+	for( float const & zoomLevel : m_zoomLevels )
 	{
-		m_zoomingModel.addItem( QString::number( 25 << i ) + "%" );
+		m_zoomingModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
 	connect( &m_zoomingModel, SIGNAL( dataChanged() ),
@@ -3255,11 +3258,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		int z = m_zoomingModel.value();
 		if( we->delta() > 0 )
 		{
-			z++;
+			z--;
 		}
 		if( we->delta() < 0 )
 		{
-			z--;
+			z++;
 		}
 		z = qBound( 0, z, m_zoomingModel.size() - 1 );
 		// update combobox with zooming-factor
@@ -3853,8 +3856,7 @@ void PianoRoll::updatePositionAccompany( const MidiTime & t )
 
 void PianoRoll::zoomingChanged()
 {
-	const QString & zfac = m_zoomingModel.currentText();
-	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PR_PPT / 100;
+	m_ppt = m_zoomLevels[m_zoomingModel.value()] * DEFAULT_PR_PPT;
 
 	assert( m_ppt > 0 );
 
@@ -3869,6 +3871,8 @@ void PianoRoll::quantizeChanged()
 {
 	update();
 }
+
+
 
 
 int PianoRoll::quantization() const
