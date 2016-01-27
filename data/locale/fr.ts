@@ -3261,11 +3261,13 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effet avec le menu contextu
     </message>
     <message>
         <source>FUNC</source>
-        <translation>FONCTIONS</translation>
+        <translatorcomment>&quot;FONCTIONS&quot; (previous translation) is too long for the limited available width. </translatorcomment>
+        <translation>FONCT</translation>
     </message>
     <message>
         <source>FX</source>
-        <translation>EFFETS</translation>
+        <translatorcomment>&quot;EFFETS&quot; (previous translation) is too long for the limited available width. &quot;FX&quot; should be understable by all</translatorcomment>
+        <translation>FX</translation>
     </message>
     <message>
         <source>MIDI</source>
@@ -3810,30 +3812,6 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     <message>
         <source>LMMS Project Template</source>
         <translation>Modèle de projet LMMS</translation>
-    </message>
-    <message>
-        <source>Song Editor</source>
-        <translation>Éditeur de morceau</translation>
-    </message>
-    <message>
-        <source>Beat+Bassline Editor</source>
-        <translation>Éditeur de motif</translation>
-    </message>
-    <message>
-        <source>Piano Roll</source>
-        <translation>Piano virtuel</translation>
-    </message>
-    <message>
-        <source>Automation Editor</source>
-        <translation>Éditeur d&apos;automation</translation>
-    </message>
-    <message>
-        <source>FX Mixer</source>
-        <translation>Mélangeur d&apos;effets</translation>
-    </message>
-    <message>
-        <source>Project Notes</source>
-        <translation>Notes du projet</translation>
     </message>
     <message>
         <source>Volume as dBV</source>
