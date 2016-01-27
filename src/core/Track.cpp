@@ -651,8 +651,13 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			s_textFloat->setTitle( tr( "Current position" ) );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> and drag to make "
-							"a copy." ),
+					tr( "Press <%1> and drag to make "
+							"a copy." ).arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 		else if( !m_tco->getAutoResize() )
@@ -664,8 +669,13 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			s_textFloat->setTitle( tr( "Current length" ) );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> for free "
-							"resizing." ),
+					tr( "Press <%1> for free "
+							"resizing." ).arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 //		s_textFloat->reparent( this );
@@ -933,7 +943,12 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<Ctrl> + middle click)" ),
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(
+					#ifdef LMMS_BUILD_APPLE
+					"⌘"),
+					#else
+					"Ctrl"),
+					#endif
 						m_tco, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
 
@@ -1569,8 +1584,13 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 							"track_op_grip" ) );
 	}
 
-	ToolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
-				"to begin a new drag'n'drop-action." ) );
+	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
+				"to begin a new drag'n'drop-action." ).arg(
+					#ifdef LMMS_BUILD_APPLE
+					"⌘") );
+					#else
+					"Ctrl") );
+					#endif
 
 	QMenu * toMenu = new QMenu( this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
@@ -1755,7 +1775,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-						
+	
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -2738,6 +2758,3 @@ void TrackView::createTCOView( TrackContentObject * tco )
 	}
 	tco->selectViewOnCreate( false );
 }
-
-
-

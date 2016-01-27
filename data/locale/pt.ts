@@ -425,15 +425,15 @@ Esteban Viveros</translation>
         <translation type="unfinished">Clique aqui para selecionar progressão cúbica hermite-progressions para este sequenciador de automação.  O valor do objeto conectado irá mudar em curva e suavemente entre picos e vales.</translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">Cortar (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation type="unfinished">Cortar (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">Copiar (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation type="unfinished">Copiar (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
+        <source>Paste values from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -464,8 +464,8 @@ Esteban Viveros</translation>
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Arraste o controle enquanto pressiona a tecla &lt;Ctrl&gt;</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>Arraste o controle enquanto pressiona a tecla &lt;%1&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -4882,7 +4882,7 @@ use a roda do mouse para midificar o volume de cada passo</translation>
         <translation type="unfinished">Automação para Afinação (Shift+T)</translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation type="unfinished">Clique aqui e o lápis será ativado. O lápis serve para adicionar ou mover valores simples. Ele estará ativado previamente e será utilizado a maior parte do tempo. Você pode usar &apos;Shift+D&apos; no teclado para ativar o lápis.</translation>
     </message>
     <message>
@@ -4890,7 +4890,7 @@ use a roda do mouse para midificar o volume de cada passo</translation>
         <translation type="unfinished">Clique aqui e a borracha será ativada. A borracha serve para apagar valores simples. Você pode usar &apos;Shif+E&apos; no teclado para utilizar a borracha.</translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
         <translation type="unfinished">Clique aqui e modo de seleção será ativado. A borracha serve para apagar valores simples. Você pode usar &apos;Shif+E&apos; no teclado para utilizar a borracha.A borracha serve para apagar valores simples. Você pode usar &apos;Shif+E&apos; no teclado para utilizar a borracha. Este modo torna possível a seleção de notas. Alternativamente você pode pressionar Crtl enquanto estiver usando o lápis para utilizar o modo de seleção temporariamente.</translation>
     </message>
     <message>
@@ -4898,16 +4898,16 @@ use a roda do mouse para midificar o volume de cada passo</translation>
         <translation type="unfinished">Clique aqui e a automação para afinação será ativada. Nela você pode clicar na nota para abrir sua automação de afinação. Você pode utilizar esta ferramenta para fazer glissandos de uma altura para outra.</translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">Recortar notas selecionadas (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation type="unfinished">Recortar notas selecionadas (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">Copiar notas selecionadas (Ctrl+C)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation type="unfinished">Copiar notas selecionadas (%1+C)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">Colar notas da área de transferência (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation type="unfinished">Colar notas da área de transferência (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -5008,40 +5008,40 @@ Motivo: &quot;%2&quot;</translation>
         <translation type="unfinished">Des&amp;fazer</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation type="unfinished">Ctrl+Z</translation>
+        <source>%1+Z</source>
+        <translation type="unfinished">%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
         <translation type="unfinished">&amp;Refazer</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation type="unfinished">Ctrl+Y</translation>
+        <source>%1+Y</source>
+        <translation type="unfinished">%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
         <translation type="unfinished">&amp;Copiar</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <source>%1+C</source>
+        <translation type="unfinished">%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
         <translation type="unfinished">Recor&amp;tar</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
-        <translation type="unfinished">Ctrl+X</translation>
+        <source>%1+X</source>
+        <translation type="unfinished">%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
         <translation type="unfinished">C&amp;olar</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
-        <translation type="unfinished">Ctrl+V</translation>
+        <source>%1+V</source>
+        <translation type="unfinished">%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5052,56 +5052,56 @@ Motivo: &quot;%2&quot;</translation>
         <translation type="unfinished">&amp;Negrito</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation type="unfinished">Ctrl+B</translation>
+        <source>%1+B</source>
+        <translation type="unfinished">%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
         <translation type="unfinished">&amp;Itálico</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <translation type="unfinished">Ctrl+I</translation>
+        <source>%1+I</source>
+        <translation type="unfinished">%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
         <translation type="unfinished">S&amp;ublinhado</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation type="unfinished">Ctrl+U</translation>
+        <source>%1+U</source>
+        <translation type="unfinished">%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
         <translation type="unfinished">&amp;Esquerda</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <source>%1+L</source>
+        <translation type="unfinished">%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
         <translation type="unfinished">C&amp;entro</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <source>%1+E</source>
+        <translation type="unfinished">%1+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
         <translation type="unfinished">Di&amp;reita</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
-        <translation type="unfinished">Ctrl+R</translation>
+        <source>%1+R</source>
+        <translation type="unfinished">%1+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
         <translation type="unfinished">&amp;Justificar</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
-        <translation type="unfinished">Ctrl+J</translation>
+        <source>%1+J</source>
+        <translation type="unfinished">%1+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
@@ -5339,8 +5339,8 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Duplo clique para selecionar amostra</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Mudo/Não Mudo (&lt;Ctrl&gt; + middle click)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>Mudo/Não Mudo (&lt;%1&gt; + middle click)</translation>
     </message>
 </context>
 <context>
@@ -5939,12 +5939,12 @@ Latência: %2 ms</translation>
         <translation type="unfinished">Sugestão</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">Pressione &lt;Ctrl&gt; para desabilitar os pontos de loop magnéticos.</translation>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished">Pressione &lt;%1&gt; para desabilitar os pontos de loop magnéticos.</translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">Pressione &lt;Shift&gt; para mover o começo do ponto de loop; Pressione &lt;Ctrl&gt; para desabilitar os pontos de loop magnéticos.</translation>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished">Pressione &lt;Shift&gt; para mover o começo do ponto de loop; Pressione &lt;%1&gt; para desabilitar os pontos de loop magnéticos.</translation>
     </message>
 </context>
 <context>
@@ -6019,16 +6019,16 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation type="unfinished">Sugestão</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation type="unfinished">Pressione &lt;Ctrl&gt; e arraste para fazer uma cópia.</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation type="unfinished">Pressione &lt;%1&gt; e arraste para fazer uma cópia.</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation type="unfinished">Tamanho atual</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation type="unfinished">Pressione &lt;Ctrl&gt; para redimensionar livremente.</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation type="unfinished">Pressione &lt;%1&gt; para redimensionar livremente.</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6051,15 +6051,15 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation type="unfinished">Colar</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished">Pressione &lt;Ctrl&gt; enquanto clica em mover-grip para o começo, uma ação de arrastar.</translation>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="unfinished">Pressione &lt;%1&gt; enquanto clica em mover-grip para o começo, uma ação de arrastar.</translation>
     </message>
     <message>
         <source>Actions for this track</source>

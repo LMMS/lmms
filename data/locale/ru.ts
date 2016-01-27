@@ -432,16 +432,16 @@ Oe Ai &lt;oeai/at/symbiants/dot/com&gt;
         <translation>Кубическая Эрмитова прогрессия для этого шаблона автоматизации. Кол-во подсоединенных объектов изменится по сглаженной кривой и смягчится на пиках и спадах.</translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Вырезать выбранные ноты (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation>Вырезать выбранные ноты (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Копировать выбранные ноты в буфер (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation>Копировать выбранные ноты в буфер (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
-        <translation>Вставить запомненные значения (Ctrl+V)</translation>
+        <source>Paste values from clipboard (%1+V)</source>
+        <translation>Вставить запомненные значения (%1+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -471,8 +471,8 @@ Oe Ai &lt;oeai/at/symbiants/dot/com&gt;
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Тяните контроль удерживая &lt;Ctrl&gt;</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>Тяните контроль удерживая &lt;%1&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -4933,33 +4933,33 @@ use mouse wheel to set volume of a step</source>
         <translation>Режим подстраивания (Shift+T)</translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation>Режим рисования нот, в нём вы можете добавлять/перемещать и изменять длительность одиночных нот.  Это режим по умолчанию и используется большую часть времени.
-Для включения этого режима можно использовать комбинацию клавиш Shift+D, удерживайте Ctrl для временного переключения в режим выбора.</translation>
+Для включения этого режима можно использовать комбинацию клавиш Shift+D, удерживайте %1 для временного переключения в режим выбора.</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation>Режим стирания. В этом режиме вы можете стирать ноты. Для включения этого режима можно использовать комбинацию клавиш Shift+E.</translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation>Режим выделения. В этом режиме можно выделять ноты, можно также удерживать Ctrl в режиме рисования, чтобы можно было на время войти в режим выделения.</translation>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
+        <translation>Режим выделения. В этом режиме можно выделять ноты, можно также удерживать %1 в режиме рисования, чтобы можно было на время войти в режим выделения.</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation>Режим подстройки. В этом режиме можно выбирать ноты для автоматизации их подстраивания. Можно использовать это для переходов нот от одной к другой. Для активации с клавиатуры &lt;Shift+T&gt;.</translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation>Переместить выделенные ноты в буфер (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation>Переместить выделенные ноты в буфер (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation>Копировать выделенные ноты в буфер (Ctrl+X)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation>Копировать выделенные ноты в буфер (%1+X)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation>Вставить ноты из буфера (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation>Вставить ноты из буфера (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -5060,40 +5060,40 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;U Отменить</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation>Ctrl+Z</translation>
+        <source>%1+Z</source>
+        <translation>%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
         <translation>&amp;R Повторить</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation>Ctrl+Y</translation>
+        <source>%1+Y</source>
+        <translation>%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
         <translation>&amp;C Копировать</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation>Ctrl+C</translation>
+        <source>%1+C</source>
+        <translation>%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
         <translation>&amp;t Вырезать</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
-        <translation>Ctrl+X</translation>
+        <source>%1+X</source>
+        <translation>%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
         <translation>&amp;P Вставить</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
-        <translation>Ctrl+V</translation>
+        <source>%1+V</source>
+        <translation>%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5104,39 +5104,39 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;b Полужирный</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
+        <source>%1+B</source>
+        <translation>%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
         <translation>&amp;i Курсив</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <translation>Ctrl+I</translation>
+        <source>%1+I</source>
+        <translation>%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
         <translation>&amp;U Подчеркнутый</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation>Ctrl+U</translation>
+        <source>%1+U</source>
+        <translation>%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
         <translation>&amp;L По левому краю</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
+        <source>%1+L</source>
+        <translation>%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
         <translation>По &amp;центру</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
+        <source>%1+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5144,7 +5144,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">По &amp;правому краю</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
+        <source>%1+R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5152,7 +5152,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">По &amp;ширине</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
+        <source>%1+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5388,8 +5388,8 @@ Reason: &quot;%2&quot;</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Заглушить/включить (&lt;Ctrl&gt; + средняя кнопка мыши)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>Заглушить/включить (&lt;%1&gt; + средняя кнопка мыши)</translation>
     </message>
     <message>
         <source>Set/clear record</source>
@@ -5992,12 +5992,12 @@ Latency: %2 ms</source>
         <translation>Подсказка</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation>Нажмите &lt;Ctrl&gt;, чтобы убрать прилипание точек петли.</translation>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation>Нажмите &lt;%1&gt;, чтобы убрать прилипание точек петли.</translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation>Зажмите &lt;Shift&gt; чтобы сдвинуть начало точек петли; Нажмите &lt;Ctrl&gt;, чтобы убрать прилипание точек петли.</translation>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation>Зажмите &lt;Shift&gt; чтобы сдвинуть начало точек петли; Нажмите &lt;%1&gt;, чтобы убрать прилипание точек петли.</translation>
     </message>
 </context>
 <context>
@@ -6072,16 +6072,16 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Подсказка</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation>Нажмите &lt;Ctrl&gt; и тащите мышью, чтобы создать копию.</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation>Нажмите &lt;%1&gt; и тащите мышью, чтобы создать копию.</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation>Текущая длительность</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation>Для свободного изменения размера нажмите &lt;Ctrl&gt;.</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation>Для свободного изменения размера нажмите &lt;%1&gt;.</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6104,14 +6104,14 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Вставить</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Тихо/громко (&lt;Ctrl&gt; + middle click)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>Тихо/громко (&lt;%1&gt; + middle click)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation>Зажмите &lt;Сtrl&gt; и нажимайте мышь во время движения, чтобы начать новую переброску.</translation>
     </message>
     <message>

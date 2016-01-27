@@ -424,15 +424,15 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation type="unfinished">Clicca qui per scegliere il metodo di progressione a cubica di Hermite per questo pattern di automazione. Il valore della variabile connessa cambierà seguendo una curva morbida.</translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">Taglia i valori selezionati (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation type="unfinished">Taglia i valori selezionati (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">Copia i valori selezionati (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation type="unfinished">Copia i valori selezionati (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
+        <source>Paste values from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -463,8 +463,8 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Trascina un controllo tenendo premuto &lt;Ctrl&gt;</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>Trascina un controllo tenendo premuto &lt;%1&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -4903,7 +4903,7 @@ la rotellina del mouse impostare il volume delle note</translation>
         <translation type="unfinished">Modalità intonanzione (Shift+T)</translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation type="unfinished">Cliccando qui si attiva la modalità disegno. In questa modalità è possibile aggiungere e spostare singoli valori. Questa è la modalità predefinita, che viene usata la maggior parte del tempo. Questa modalità si attiva anche premendo la combinazione di tasti &apos;Shift+D&apos;. Tieni premuto Ctfl per andare temporaneamente in modalità selezione.</translation>
     </message>
     <message>
@@ -4911,24 +4911,24 @@ la rotellina del mouse impostare il volume delle note</translation>
         <translation type="unfinished">Cliccando qui si attiva la modalità cancellazione. In questa modalità è possibile cancellare singoli valori. Questa modalità si attiva anche premendo la combinazione di tasti &apos;Shift+E&apos;.</translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished">Cliccando qui viene attivata la modalità selezione. Puoi selezionare le note. Puoi anche tenere premuto Ctrl durante la modalità disegno per usare la modalità selezione temporaneamente.</translation>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
+        <translation type="unfinished">Cliccando qui viene attivata la modalità selezione. Puoi selezionare le note. Puoi anche tenere premuto %1 durante la modalità disegno per usare la modalità selezione temporaneamente.</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished">Cliccando qui viene attivata la modalità intonazione. Puoi cliccare una nota per aprire la finestra di automazione dell&apos;intonazione. Puoi usare questa modalità per fare uno slide da una nota ad un&apos;altra. Puoi anche premere Shift+T per attivare questa modalità.</translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">Taglia le note selezionate (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation type="unfinished">Taglia le note selezionate (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">Copia le note selezionate (Ctrl+C)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation type="unfinished">Copia le note selezionate (%1+C)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">Incolla le note selezionate (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation type="unfinished">Incolla le note selezionate (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -5029,40 +5029,40 @@ Motivo: &quot;%2&quot;</translation>
         <translation type="unfinished">&amp;Annulla operazione</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation type="unfinished">Ctrl+Z</translation>
+        <source>%1+Z</source>
+        <translation type="unfinished">%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
         <translation type="unfinished">&amp;Ripeti operazione</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation type="unfinished">Ctrl+Y</translation>
+        <source>%1+Y</source>
+        <translation type="unfinished">%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
         <translation type="unfinished">&amp;Copia</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <source>%1+C</source>
+        <translation type="unfinished">%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
         <translation type="unfinished">&amp;Taglia</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
-        <translation type="unfinished">Ctrl+X</translation>
+        <source>%1+X</source>
+        <translation type="unfinished">%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
         <translation type="unfinished">&amp;Incolla</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
-        <translation type="unfinished">Ctrl+V</translation>
+        <source>%1+V</source>
+        <translation type="unfinished">%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5073,56 +5073,56 @@ Motivo: &quot;%2&quot;</translation>
         <translation type="unfinished">&amp;Grassetto</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation type="unfinished">Ctrl+B</translation>
+        <source>%1+B</source>
+        <translation type="unfinished">%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
         <translation type="unfinished">&amp;Corsivo</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <translation type="unfinished">Ctrl+I</translation>
+        <source>%1+I</source>
+        <translation type="unfinished">%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
         <translation type="unfinished">&amp;Sottolineato</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation type="unfinished">Ctrl+U</translation>
+        <source>%1+U</source>
+        <translation type="unfinished">%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
         <translation type="unfinished">&amp;Sinistra</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <source>%1+L</source>
+        <translation type="unfinished">%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
         <translation type="unfinished">&amp;Centro</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <source>%1+E</source>
+        <translation type="unfinished">%1+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
         <translation type="unfinished">&amp;Destra</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
-        <translation type="unfinished">Ctrl+R</translation>
+        <source>%1+R</source>
+        <translation type="unfinished">%1+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
         <translation type="unfinished">&amp;Giustifica</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
-        <translation type="unfinished">Ctrl+J</translation>
+        <source>%1+J</source>
+        <translation type="unfinished">%1+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
@@ -5356,8 +5356,8 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Incolla</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Attiva/disattiva la modalità muta (&lt;Ctrl&gt; + tasto centrale)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>Attiva/disattiva la modalità muta (&lt;%1&gt; + tasto centrale)</translation>
     </message>
     <message>
         <source>Set/clear record</source>
@@ -5960,12 +5960,12 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
         <translation type="unfinished">Suggerimento</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">Premi &lt;Ctrl&gt; per disabilitare i punti di loop magnetici.</translation>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished">Premi &lt;%1&gt; per disabilitare i punti di loop magnetici.</translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">Tieni premuto &lt;Shift&gt; per spostare l&apos;inizio del punto di loop; premi &lt;Ctrl&gt; per disabilitare i punti di loop magnetici.</translation>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished">Tieni premuto &lt;Shift&gt; per spostare l&apos;inizio del punto di loop; premi &lt;%1&gt; per disabilitare i punti di loop magnetici.</translation>
     </message>
 </context>
 <context>
@@ -6040,16 +6040,16 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
         <translation type="unfinished">Suggerimento</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation type="unfinished">Premere &lt;Ctrl&gt;, cliccare e trascinare per copiare.</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation type="unfinished">Premere &lt;%1&gt;, cliccare e trascinare per copiare.</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation type="unfinished">Lunghezza attuale</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation type="unfinished">Premere &lt;Ctrl&gt; per ridimensionare liberamente.</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation type="unfinished">Premere &lt;%1&gt; per ridimensionare liberamente.</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6072,15 +6072,15 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
         <translation type="unfinished">Incolla</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished">Attiva/disattiva la modalità muta (&lt;Ctrl&gt; + tasto centrale)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation type="unfinished">Attiva/disattiva la modalità muta (&lt;%1&gt; + tasto centrale)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished">Premere &lt;Ctrl&gt; mentre si clicca sulla maniglia per lo spostamento per iniziare una nuova azione di drag&apos;n&apos;drop.</translation>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="unfinished">Premere &lt;%1&gt; mentre si clicca sulla maniglia per lo spostamento per iniziare una nuova azione di drag&apos;n&apos;drop.</translation>
     </message>
     <message>
         <source>Actions for this track</source>

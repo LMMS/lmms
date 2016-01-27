@@ -421,15 +421,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">선택된 값 잘라내기 (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation type="unfinished">선택된 값 잘라내기 (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">선택된 값 복사 (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation type="unfinished">선택된 값 복사 (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
+        <source>Paste values from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -460,8 +460,8 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation type="unfinished">&lt;Ctrl&gt; 누르는 동안 제어를 끌기</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation type="unfinished">&lt;%1&gt; 누르는 동안 제어를 끌기</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -4864,7 +4864,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4872,7 +4872,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4880,16 +4880,16 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">선택 박자를 잘라내기 (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation type="unfinished">선택 박자를 잘라내기 (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">선택 박자를 복사 (Ctrl+C)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation type="unfinished">선택 박자를 복사 (%1+C)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">클립보드에서 박자 붙여넣기 (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation type="unfinished">클립보드에서 박자 붙여넣기 (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -4990,7 +4990,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">작업 취소(&amp;U)</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
+        <source>%1+Z</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4998,7 +4998,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">작업 재실행(&amp;R)</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
+        <source>%1+Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5006,7 +5006,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">복사(&amp;C)</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
+        <source>%1+C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5014,7 +5014,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">잘라내기(&amp;T)</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
+        <source>%1+X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5022,7 +5022,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">붙여넣기(&amp;P)</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
+        <source>%1+V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5034,7 +5034,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">진하게(&amp;B)</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
+        <source>%1+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5042,7 +5042,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">기울임(&amp;I)</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
+        <source>%1+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5050,7 +5050,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">밑줄(&amp;U)</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
+        <source>%1+U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5058,7 +5058,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">왼쪽(&amp;L)</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
+        <source>%1+L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5066,7 +5066,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">중앙(&amp;E)</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
+        <source>%1+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5074,7 +5074,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">오른쪽(&amp;R)</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
+        <source>%1+R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5082,7 +5082,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">양쪽 배분(&amp;J)</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
+        <source>%1+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5317,8 +5317,8 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">붙여넣기</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished">무음/무음해제 (&lt;Ctrl&gt; + 중간 클릭)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation type="unfinished">무음/무음해제 (&lt;%1&gt; + 중간 클릭)</translation>
     </message>
     <message>
         <source>Set/clear record</source>
@@ -5921,11 +5921,11 @@ Latency: %2 ms</source>
         <translation type="unfinished">힌트</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5999,16 +5999,16 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished">힌트</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation type="unfinished">&lt;Ctrl&gt; 누르고 복사본을 만들기 위하여 끌기</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation type="unfinished">&lt;%1&gt; 누르고 복사본을 만들기 위하여 끌기</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation type="unfinished">현재 길이</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation type="unfinished">자유 크기 재조정하기 위하여 &lt;Ctrl&gt; 누르기</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation type="unfinished">자유 크기 재조정하기 위하여 &lt;%1&gt; 누르기</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6031,14 +6031,14 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished">붙여넣기</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished">무음/무음해제 (&lt;Ctrl&gt; + 중간 클릭)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation type="unfinished">무음/무음해제 (&lt;%1&gt; + 중간 클릭)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
