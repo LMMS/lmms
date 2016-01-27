@@ -785,12 +785,7 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 	QColor col = QColor( noteCol );
 
-	if( n->length() < 0 )
-	{
-		//step note
-		col.setRgb( 0, 255, 0 );
-	}
-	else if( n->selected() )
+	if( n->selected() )
 	{
 		col.setRgb( 0x00, 0x40, 0xC0 );
 	}
