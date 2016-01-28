@@ -82,14 +82,6 @@ static inline QString baseName( const QString & file )
 
 
 
-static std::string getCurrentYear()
-{
-	return QString::number( QDate::currentDate().year() ).toStdString();
-}
-
-
-
-
 inline void loadTranslation( const QString & tname,
 	const QString & dir = ConfigManager::inst()->localeDir() )
 {
@@ -107,14 +99,14 @@ inline void loadTranslation( const QString & tname,
 void printVersion( char *executableName )
 {
 	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
-		"Copyright (c) 2004-%s LMMS developers.\n\n"
+		"Copyright (c) %s\n\n"
 		"This program is free software; you can redistribute it and/or\n"
 		"modify it under the terms of the GNU General Public\n"
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
 		PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
-		getCurrentYear().c_str(), executableName );
+		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
 
@@ -123,7 +115,7 @@ void printVersion( char *executableName )
 void printHelp()
 {
 	printf( "LMMS %s\n"
-		"Copyright (c) 2004-%s LMMS developers.\n\n"
+		"Copyright (c) %s\n\n"
 		"Usage: lmms [ -r <project file> ] [ options ]\n"
 		"            [ -u <in> <out> ]\n"
 		"            [ -d <in> ]\n"
@@ -157,7 +149,7 @@ void printHelp()
 		"-v, --version			Show version information and exit.\n"
 		"    --allowroot			Bypass root user startup check (use with caution).\n"
 		"-h, --help			Show this usage information and exit.\n\n",
-		LMMS_VERSION, getCurrentYear().c_str() );
+		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
 }
 
 

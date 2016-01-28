@@ -46,9 +46,12 @@ AboutDialog::AboutDialog(QWidget* parent) :
 					arg( QT_VERSION_STR ).
 					arg( GCC_VERSION ) );
 
+	copyrightLabel->setText( copyrightLabel->text().
+					arg( LMMS_PROJECT_COPYRIGHT ) );
+
 	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
 
-	licenseLabel->setPlainText( embed::getText( "COPYING" ) );
+	licenseLabel->setPlainText( embed::getText( "LICENSE.txt" ) );
 
 	involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );
 }
