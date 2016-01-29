@@ -691,33 +691,42 @@ int main( int argc, char * * argv )
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
 					"the restored files. This is not reversible." ),
-				MainWindow::tr( "Quit" ),
+				MainWindow::tr( "Exit" ),
 				MainWindow::tr( "Shut down LMMS with no further action." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
 			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
 
-			mb.setStandardButtons( 	QMessageBox::Ok |
-							QMessageBox::Discard );
+			mb.setStandardButtons( 	QMessageBox::Ok		|
+						QMessageBox::Open	|
+						QMessageBox::Abort	|
+						QMessageBox::Close 	);
 
 			mb.setButtonText( QMessageBox::Ok,
-							MainWindow::tr( "Recover" ) );
+						MainWindow::tr( "Recover" ) );
+			mb.setButtonText( QMessageBox::Open,
+						MainWindow::tr( "Ignore" ) );
+			mb.setButtonText( QMessageBox::Abort,
+						MainWindow::tr( "Discard" ) );
+			mb.setButtonText( QMessageBox::Close,
+						MainWindow::tr( "Exit" ) );
 
-			QAbstractButton * recover;
-			QAbstractButton * discard;
+			QPushButton * recover;
 			QPushButton * ignore;
+			QPushButton * discard;
 			QPushButton * exit;
 
-			recover = mb.QMessageBox::button( QMessageBox::Ok );
-			discard = mb.QMessageBox::button( QMessageBox::Discard );
+
+/*			recover = mb.QMessageBox::button( QMessageBox::Ok );
+//			discard = mb.QMessageBox::button( QMessageBox::Discard );
 			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 								QMessageBox::NoRole );
 			ignore->setIcon( embed::getIconPixmap( "no_entry" ) );
 			exit = mb.addButton( MainWindow::tr( "Exit" ),
 								QMessageBox::RejectRole );
 			exit->setIcon( embed::getIconPixmap( "exit" ) );
-
+*/
 			mb.setDefaultButton( QMessageBox::Ok );
 			mb.setEscapeButton( exit );
 
@@ -726,7 +735,7 @@ int main( int argc, char * * argv )
 			{
 				gui->mainWindow()->sessionCleanup();
 			}
-			else if( mb.clickedButton() == recover ) // ::Recover
+			else if( mb.clickedButton() == recover )
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
@@ -738,7 +747,7 @@ int main( int argc, char * * argv )
 					gui->mainWindow()->setSession( MainWindow::SessionState::Limited );
 				}
 			}
-			else // Exit
+			else
 			{
 				return 0;
 			}
