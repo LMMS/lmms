@@ -483,8 +483,8 @@ void NesObject::updatePitch()
 
 
 
-NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
-	Instrument( instrumentTrack, &nes_plugin_descriptor ),
+NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack, Engine * engine ) :
+	Instrument( instrumentTrack, &nes_plugin_descriptor, engine ),
 	m_ch1Enabled( true, this ),
 	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 Coarse detune" ) ),
 	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Volume" ) ),
@@ -560,7 +560,7 @@ void NesInstrument::playNote( NotePlayHandle * n, sampleFrame * workingBuffer )
 	
 	if ( n->totalFramesPlayed() == 0 || n->m_pluginData == NULL )
 	{	
-		NesObject * nes = new NesObject( this, Engine::mixer()->processingSampleRate(), n );
+		NesObject * nes = new NesObject( this, getProcessingSampleRate(), n );
 		n->m_pluginData = nes;
 	}
 	
@@ -917,9 +917,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return( new NesInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new NesInstrument( static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 

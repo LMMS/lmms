@@ -36,7 +36,7 @@
 class FlangerEffect : public Effect
 {
 public:
-	FlangerEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	FlangerEffect( Model* parent , Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~FlangerEffect();
 	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
 	virtual EffectControls* controls()

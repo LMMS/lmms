@@ -1,8 +1,7 @@
 /*
- * ToolPlugin.cpp - base class for all tool plugins (graphs, extensions, etc)
+ * EngineClient.h - Interface to the engine-system of LMMS
  *
- * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2016 Michael Gregorius
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -23,36 +22,36 @@
  *
  */
 
-#include "ToolPlugin.h"
 
+#ifndef ENGINECLIENT_H
+#define ENGINECLIENT_H
 
-ToolPlugin::ToolPlugin( const Descriptor * _descriptor, Model * _parent, Engine * engine ) :
-	Plugin( _descriptor, _parent, engine )
+#include "export.h"
+
+#include "Engine.h"
+
+class Song;
+class Mixer;
+class FxMixer;
+class BBTrackContainer;
+class ProjectJournal;
+
+class EXPORT EngineClient
 {
-}
+public:
+	EngineClient( Engine * engine) : m_engine(engine) {}
+
+	Engine * getEngine() const { return m_engine; }
+	Song * getSong() const { return m_engine->getSong(); }
+	Mixer * getMixer() const { return m_engine->mixer(); }
+	FxMixer * getFxMixer() const { return m_engine->fxMixer(); }
+	BBTrackContainer * getBBTrackContainer() const { return m_engine->getBBTrackContainer(); }
+	ProjectJournal * getProjectJournal() const { return m_engine->projectJournal(); }
+
+private:
+	Engine * m_engine;
+};
 
 
-
-
-ToolPlugin::~ToolPlugin()
-{
-}
-
-
-
-
-ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _parent )
-{
-	Plugin * p = Plugin::instantiate( _plugin_name, _parent, NULL );
-	// check whether instantiated plugin is a tool
-	if( p->type() == Plugin::Tool )
-	{
-		// everything ok, so return pointer
-		return dynamic_cast<ToolPlugin *>( p );
-	}
-
-	// not quite... so delete plugin
-	delete p;
-	return NULL;
-}
+#endif
 

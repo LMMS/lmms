@@ -35,7 +35,7 @@
 class waveShaperEffect : public Effect
 {
 public:
-	waveShaperEffect( Model * _parent,
+	waveShaperEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~waveShaperEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,

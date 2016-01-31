@@ -63,8 +63,8 @@ class lb302Filter
 	lb302Filter(lb302FilterKnobState* p_fs);
 	virtual ~lb302Filter() {};
 
-	virtual void recalc();
-	virtual void envRecalc();
+	virtual void recalc( sample_rate_t processingSampleRate );
+	virtual void envRecalc( sample_rate_t processingSampleRate );
 	virtual float process(const float& samp)=0;
 	virtual void playNote();
 
@@ -84,8 +84,8 @@ class lb302FilterIIR2 : public lb302Filter
 	lb302FilterIIR2(lb302FilterKnobState* p_fs);
 	virtual ~lb302FilterIIR2();
 
-	virtual void recalc();
-	virtual void envRecalc();
+	virtual void recalc( sample_rate_t processingSampleRate );
+	virtual void envRecalc( sample_rate_t processingSampleRate );
 	virtual float process(const float& samp);
 
 	protected:
@@ -108,8 +108,8 @@ class lb302Filter3Pole : public lb302Filter
 	lb302Filter3Pole(lb302FilterKnobState* p_fs);
 
 	//virtual void recalc();
-	virtual void envRecalc();
-	virtual void recalc();
+	virtual void envRecalc( sample_rate_t processingSampleRate );
+	virtual void recalc( sample_rate_t processingSampleRate );
 	virtual float process(const float& samp);
 
 	protected:
@@ -139,7 +139,7 @@ class lb302Synth : public Instrument
 {
 	Q_OBJECT
 public:
-	lb302Synth( InstrumentTrack * _instrument_track );
+	lb302Synth( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~lb302Synth();
 
 	virtual void play( sampleFrame * _working_buffer );

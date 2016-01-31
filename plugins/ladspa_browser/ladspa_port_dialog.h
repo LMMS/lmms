@@ -31,14 +31,14 @@
 
 #include "LadspaManager.h"
 
-
+class Ladspa2LMMS;
 
 
 class ladspaPortDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ladspaPortDialog( const ladspa_key_t & _key );
+	ladspaPortDialog( const ladspa_key_t & _key, Ladspa2LMMS * manager, sample_rate_t processingSampleRate );
 	virtual ~ladspaPortDialog();
 
 };

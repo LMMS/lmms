@@ -30,6 +30,7 @@
 #include "InstrumentView.h"
 #include "Oscillator.h"
 #include "AutomatableModel.h"
+#include "EngineClient.h"
 
 
 class automatableButtonGroup;
@@ -41,12 +42,12 @@ class SampleBuffer;
 const int NUM_OF_OSCILLATORS = 3;
 
 
-class OscillatorObject : public Model
+class OscillatorObject : public Model, public EngineClient
 {
 	MM_OPERATORS
 	Q_OBJECT
 public:
-	OscillatorObject( Model * _parent, int _idx );
+	OscillatorObject( Model * _parent, int _idx, Engine * engine );
 	virtual ~OscillatorObject();
 
 
@@ -94,7 +95,7 @@ class TripleOscillator : public Instrument
 {
 	Q_OBJECT
 public:
-	TripleOscillator( InstrumentTrack * _track );
+	TripleOscillator( InstrumentTrack * _track, Engine * engine );
 	virtual ~TripleOscillator();
 
 	virtual void playNote( NotePlayHandle * _n,

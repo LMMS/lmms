@@ -55,7 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 }
 
 
-MidiExport::MidiExport() : ExportFilter( &midiexport_plugin_descriptor)
+MidiExport::MidiExport(Engine * engine) : ExportFilter( &midiexport_plugin_descriptor, engine)
 {
 }
 
@@ -173,9 +173,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new MidiExport();
+	return new MidiExport(engine);
 }
 
 

@@ -32,7 +32,7 @@
 class PeakControllerEffect : public Effect
 {
 public:
-	PeakControllerEffect( Model * parent, 
+	PeakControllerEffect( Model * parent, Engine * engine,
 						const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~PeakControllerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,

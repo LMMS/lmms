@@ -43,7 +43,8 @@ public:
 				float _randomize,
 				float _string_loss,
 				float _detune,
-				bool _state );
+				bool _state,
+				sample_rate_t baseSampleRate );
 	
 	inline ~vibratingString()
 	{

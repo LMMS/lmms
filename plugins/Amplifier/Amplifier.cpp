@@ -48,8 +48,8 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 
 
 
-AmplifierEffect::AmplifierEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &amplifier_plugin_descriptor, parent, key ),
+AmplifierEffect::AmplifierEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key ) :
+	Effect( &amplifier_plugin_descriptor, parent, engine, key ),
 	m_ampControls( this )
 {
 }
@@ -138,9 +138,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new AmplifierEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new AmplifierEffect( parent, engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

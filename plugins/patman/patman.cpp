@@ -64,9 +64,9 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 }
@@ -74,8 +74,8 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 
-patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &patman_plugin_descriptor ),
+patmanInstrument::patmanInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &patman_plugin_descriptor, engine ),
 	m_patchFile( QString::null ),
 	m_loopedModel( true, this ),
 	m_tunedModel( true, this )
@@ -551,7 +551,7 @@ void PatmanView::openFile( void )
 		if( f != "" )
 		{
 			m_pi->setFile( f );
-			Engine::getSong()->setModified();
+			model()->getSong()->setModified();
 		}
 	}
 }

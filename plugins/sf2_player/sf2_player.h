@@ -55,7 +55,7 @@ class sf2Instrument : public Instrument
 	mapPropertyFromModel(int,getPatch,setPatch,m_patchNum);
 
 public:
-	sf2Instrument( InstrumentTrack * _instrument_track );
+	sf2Instrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~sf2Instrument();
 
 	virtual void play( sampleFrame * _working_buffer );

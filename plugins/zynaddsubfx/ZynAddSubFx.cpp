@@ -103,9 +103,8 @@ bool ZynAddSubFxRemotePlugin::processMessage( const message & _m )
 
 
 
-ZynAddSubFxInstrument::ZynAddSubFxInstrument(
-									InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor ),
+ZynAddSubFxInstrument::ZynAddSubFxInstrument( InstrumentTrack * _instrumentTrack, Engine * engine ) :
+	Instrument( _instrumentTrack, &zynaddsubfx_plugin_descriptor, engine ),
 	m_hasGUI( false ),
 	m_plugin( NULL ),
 	m_remotePlugin( NULL ),
@@ -130,9 +129,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
-	Engine::mixer()->addPlayHandle( iph );
+	getMixer()->addPlayHandle( iph );
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( reloadPlugin() ) );
 
 	connect( instrumentTrack()->pitchRangeModel(), SIGNAL( dataChanged() ),
@@ -144,7 +143,7 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	getMixer()->removePlayHandles( instrumentTrack() );
 
 	m_pluginMutex.lock();
 	delete m_plugin;
@@ -333,7 +332,7 @@ void ZynAddSubFxInstrument::play( sampleFrame * _buf )
 		m_plugin->processAudio( _buf );
 	}
 	m_pluginMutex.unlock();
-	instrumentTrack()->processAudioBuffer( _buf, Engine::mixer()->framesPerPeriod(), NULL );
+	instrumentTrack()->processAudioBuffer( _buf, getFramesPerPeriod(), NULL );
 }
 
 
@@ -445,11 +444,11 @@ void ZynAddSubFxInstrument::initPlugin()
 						QString( ConfigManager::inst()->factoryPresetsDir() +
 								QDir::separator() + "ZynAddSubFX" ) ) ) );
 
-		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
+		m_remotePlugin->updateSampleRate( getProcessingSampleRate() );
 
 		// temporary workaround until the VST synchronization feature gets stripped out of the RemotePluginClient class
 		// causing not to send buffer size information requests
-		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( Engine::mixer()->framesPerPeriod() ) );
+		m_remotePlugin->sendMessage( RemotePlugin::message( IdBufferSizeInformation ).addInt( getFramesPerPeriod() ) );
 
 		m_remotePlugin->showUI();
 		m_remotePlugin->unlock();
@@ -457,8 +456,8 @@ void ZynAddSubFxInstrument::initPlugin()
 	else
 	{
 		m_plugin = new LocalZynAddSubFx;
-		m_plugin->setSampleRate( Engine::mixer()->processingSampleRate() );
-		m_plugin->setBufferSize( Engine::mixer()->framesPerPeriod() );
+		m_plugin->setSampleRate( getProcessingSampleRate() );
+		m_plugin->setBufferSize( getFramesPerPeriod() );
 	}
 
 	m_pluginMutex.unlock();
@@ -658,10 +657,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
 
-	return new ZynAddSubFxInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new ZynAddSubFxInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 

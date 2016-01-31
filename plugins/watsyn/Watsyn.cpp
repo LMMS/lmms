@@ -227,8 +227,8 @@ void WatsynObject::renderOutput( fpp_t _frames )
 
 
 
-WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, &watsyn_plugin_descriptor ),
+WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+		Instrument( _instrument_track, &watsyn_plugin_descriptor, engine ),
 
 		a1_vol( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Volume A1" ) ),
 		a2_vol( 100.0f, 0.0f, 200.0f, 0.1f, this, tr( "Volume A2" ) ),
@@ -337,8 +337,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 				&B1_wave[0],
 				&B2_wave[0],
 				m_amod.value(), m_bmod.value(),
-				Engine::mixer()->processingSampleRate(), _n,
-				Engine::mixer()->framesPerPeriod(), this );
+				getProcessingSampleRate(), _n,
+				getFramesPerPeriod(), this );
 
 		_n->m_pluginData = w;
 	}
@@ -985,21 +985,20 @@ void WatsynView::sinWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToSine();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1009,21 +1008,20 @@ void WatsynView::triWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToTriangle();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1033,21 +1031,20 @@ void WatsynView::sawWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToSaw();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1057,21 +1054,20 @@ void WatsynView::sqrWaveClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToSquare();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1081,21 +1077,20 @@ void WatsynView::normalizeClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->normalize();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->normalize();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->normalize();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->normalize();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1105,21 +1100,20 @@ void WatsynView::invertClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->invert();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->invert();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->invert();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->invert();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1129,21 +1123,20 @@ void WatsynView::smoothClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->smooth();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->smooth();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->smooth();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->smooth();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1153,21 +1146,20 @@ void WatsynView::phaseLeftClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->shiftPhase( -15 );
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1177,21 +1169,20 @@ void WatsynView::phaseRightClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->shiftPhase( 15 );
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1202,21 +1193,20 @@ void WatsynView::loadClicked()
 	{
 		case A1_OSC:
 			a1_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
 			break;
 		case A2_OSC:
 			a2_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
 			break;
 		case B1_OSC:
 			b1_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
 			break;
 		case B2_OSC:
 			b2_graph->model()->setWaveToUser();
-			Engine::getSong()->setModified();
 			break;
 	}
+
+	Song * song = model()->getSong();
+	song->setModified();
 }
 
 
@@ -1277,9 +1267,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return( new WatsynInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new WatsynInstrument( static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 

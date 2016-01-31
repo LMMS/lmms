@@ -82,8 +82,8 @@ public:
 class DummyEffect : public Effect
 {
 public:
-	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
-		Effect( NULL, _parent, NULL ),
+	DummyEffect( Model * _parent, Engine * engine, const QDomElement& originalPluginData ) :
+		Effect( NULL, _parent, engine, NULL ),
 		m_controls( this ),
 		m_originalPluginData( originalPluginData )
 	{

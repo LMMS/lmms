@@ -32,6 +32,8 @@
 #include "LadspaManager.h"
 
 
+class Ladspa2LMMS;
+
 class QListWidgetItem;
 class QScrollArea;
 
@@ -40,7 +42,7 @@ class ladspaDescription : public QWidget
 {
 	Q_OBJECT
 public:
-	ladspaDescription( QWidget * _parent, ladspaPluginType _type );
+	ladspaDescription( QWidget * _parent, ladspaPluginType _type, Ladspa2LMMS * m_ladspaManager, ch_cnt_t const );
 	virtual ~ladspaDescription();
 
 
@@ -60,6 +62,12 @@ private:
 private slots:
 	void rowChanged( int _pluginIndex );
 	void onDoubleClicked( QListWidgetItem * _item );
+
+private:
+	Ladspa2LMMS * getLADSPAManager() const { return m_ladspaManager; }
+
+private:
+	Ladspa2LMMS * m_ladspaManager;
 
 } ;
 

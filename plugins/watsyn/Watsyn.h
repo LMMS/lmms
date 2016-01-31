@@ -131,7 +131,7 @@ class WatsynInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	WatsynInstrument( InstrumentTrack * _instrument_track );
+	WatsynInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~WatsynInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

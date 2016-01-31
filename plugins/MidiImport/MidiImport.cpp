@@ -72,8 +72,8 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 }
 
 
-MidiImport::MidiImport( const QString & _file ) :
-	ImportFilter( _file, &midiimport_plugin_descriptor ),
+MidiImport::MidiImport( const QString & _file, Engine * engine ) :
+	ImportFilter( _file, &midiimport_plugin_descriptor, engine ),
 	m_events(),
 	m_timingDivision( 0 )
 {
@@ -301,7 +301,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	smfMidiCC ccs[129];
 	smfMidiChannel chs[256];
 
-	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
+	MeterModel & timeSigMM = getSong()->getTimeSigModel();
 	AutomationPattern * timeSigNumeratorPat = 
 		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
 	AutomationPattern * timeSigDenominatorPat = 
@@ -607,10 +607,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
 	return new MidiImport( QString::fromUtf8(
-									static_cast<const char *>( _data ) ) );
+									static_cast<const char *>( _data ) ), engine );
 }
 
 

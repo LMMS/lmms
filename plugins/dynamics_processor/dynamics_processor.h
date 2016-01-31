@@ -35,7 +35,7 @@
 class dynProcEffect : public Effect
 {
 public:
-	dynProcEffect( Model * _parent,
+	dynProcEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~dynProcEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,

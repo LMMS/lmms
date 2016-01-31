@@ -199,7 +199,7 @@ class NesInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	NesInstrument( InstrumentTrack * instrumentTrack );
+	NesInstrument( InstrumentTrack * instrumentTrack, Engine * engine );
 	virtual ~NesInstrument();
 	
 	virtual void playNote( NotePlayHandle * n,

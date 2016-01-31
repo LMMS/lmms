@@ -44,7 +44,7 @@ public:
 		RightChannel
 	} ;
 
-	SpectrumAnalyzer( Model * _parent,
+	SpectrumAnalyzer( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~SpectrumAnalyzer();
 	virtual bool processAudioBuffer( sampleFrame * _buf,

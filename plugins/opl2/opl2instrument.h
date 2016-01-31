@@ -45,7 +45,7 @@ class opl2instrument : public Instrument
 {
 	Q_OBJECT
 public:
-	opl2instrument( InstrumentTrack * _instrument_track );
+	opl2instrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~opl2instrument();
 
 	virtual QString nodeName() const;

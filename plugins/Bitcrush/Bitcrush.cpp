@@ -51,13 +51,13 @@ Plugin::Descriptor PLUGIN_EXPORT bitcrush_plugin_descriptor =
 
 }
 
-BitcrushEffect::BitcrushEffect( Model * parent, const Descriptor::SubPluginFeatures::Key * key ) :
-	Effect( &bitcrush_plugin_descriptor, parent, key ),
+BitcrushEffect::BitcrushEffect( Model * parent, Engine * engine, const Descriptor::SubPluginFeatures::Key * key ) :
+	Effect( &bitcrush_plugin_descriptor, parent, engine, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( getProcessingSampleRate() ),
 	m_filter( m_sampleRate )
 {
-	m_buffer = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() * OS_RATE );
+	m_buffer = MM_ALLOC( sampleFrame, getFramesPerPeriod() * OS_RATE );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
 	
@@ -78,7 +78,7 @@ BitcrushEffect::~BitcrushEffect()
 
 void BitcrushEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = getProcessingSampleRate();
 	m_filter.setSampleRate( m_sampleRate );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
@@ -244,9 +244,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new BitcrushEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new BitcrushEffect( parent, engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

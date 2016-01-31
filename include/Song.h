@@ -253,6 +253,8 @@ public:
 		return m_timeSigModel;
 	}
 
+	void exportProjectMidi(TrackContainer::TrackList & tracks, bpm_t bpm, QString const & exportFilename);
+
 
 public slots:
 	void playSong();
@@ -266,7 +268,6 @@ public slots:
 	void importProject();
 	void exportProject( bool multiExport = false );
 	void exportProjectTracks();
-	void exportProjectMidi();
 
 	void startExport();
 	void stopExport();
