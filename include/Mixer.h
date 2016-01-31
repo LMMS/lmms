@@ -314,8 +314,7 @@ public:
 		m_playHandleRemovalMutex.unlock();
 	}
 
-	static float peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames );
-	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
+	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
 
 
 	bool criticalXRuns() const;

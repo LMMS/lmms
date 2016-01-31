@@ -88,24 +88,6 @@ ComboBox::~ComboBox()
 
 
 
-QSize ComboBox::sizeHint() const
-{
-	int maxTextWidth = 0;
-	for( int i = 0; model() && i < model()->size(); ++i )
-	{
-		int w = fontMetrics().width( model()->itemText( i ) );
-		if( w > maxTextWidth )
-		{
-			maxTextWidth = w;
-		}
-	}
-
-	return QSize( 32 + maxTextWidth, 22 );
-}
-
-
-
-
 void ComboBox::selectNext()
 {
 	model()->setInitValue( model()->value() + 1 );

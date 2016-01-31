@@ -122,7 +122,9 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 
 	if( m_active && !Engine::getSong()->isExporting() )
 	{
-		float master_output = Engine::mixer()->masterGain();
+		Mixer const * mixer = Engine::mixer();
+
+		float master_output = mixer->masterGain();
 		int w = width()-4;
 		const float half_h = -( height() - 6 ) / 3.0 * master_output - 1;
 		int x_base = 2;
@@ -131,11 +133,11 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 //		p.setClipRect( 2, 2, w, height()-4 );
 
 
-		const fpp_t frames =
-				Engine::mixer()->framesPerPeriod();
-		const float max_level = qMax<float>(
-				Mixer::peakValueLeft( m_buffer, frames ),
-				Mixer::peakValueRight( m_buffer, frames ) );
+		const fpp_t frames = mixer->framesPerPeriod();
+		float peakLeft;
+		float peakRight;
+		mixer->getPeakValues( m_buffer, frames, peakLeft, peakRight );
+		const float max_level = qMax<float>( peakLeft, peakRight );
 
 		// and set color according to that...
 		if( max_level * master_output < 0.9 )

@@ -484,27 +484,25 @@ void Mixer::clear()
 
 
 
-float Mixer::peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames )
+void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const
 {
-	float p = 0.0f;
+	peakLeft = 0.0f;
+	peakRight = 0.0f;
+
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
-		p = qMax( p, qAbs( _ab[f][0] ) );
+		float const absLeft = qAbs( _ab[f][0] );
+		float const absRight = qAbs( _ab[f][1] );
+		if (absLeft > peakLeft)
+		{
+			peakLeft = absLeft;
+		}
+
+		if (absRight > peakRight)
+		{
+			peakRight = absRight;
+		}
 	}
-	return p;
-}
-
-
-
-
-float Mixer::peakValueRight( sampleFrame * _ab, const f_cnt_t _frames )
-{
-	float p = 0.0f;
-	for( f_cnt_t f = 0; f < _frames; ++f )
-	{
-		p = qMax( p, qAbs( _ab[f][1] ) );
-	}
-	return p;
 }
 
 
