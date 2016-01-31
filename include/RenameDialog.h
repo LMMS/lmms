@@ -43,6 +43,7 @@ public:
 
 protected:
 	void keyPressEvent( QKeyEvent * _ke );
+	virtual void resizeEvent(QResizeEvent * event);
 
 
 protected slots:
@@ -58,4 +59,3 @@ private:
 
 
 #endif
-

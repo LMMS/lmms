@@ -36,6 +36,7 @@ RenameDialog::RenameDialog( QString & _string ) :
 	m_originalString( _string )
 {
 	setWindowTitle( tr("Rename...") );
+	setFixedHeight( 30 );
 	m_stringLE = new QLineEdit( this );
 	m_stringLE->setText( _string );
 	m_stringLE->setGeometry ( 10, 5, 220, 20 );
@@ -51,6 +52,13 @@ RenameDialog::RenameDialog( QString & _string ) :
 
 RenameDialog::~RenameDialog()
 {
+}
+
+
+
+
+void RenameDialog::resizeEvent (QResizeEvent * event) {
+	m_stringLE->setGeometry ( 10, 5, width() - 20, 20 );	
 }
 
 
@@ -72,9 +80,3 @@ void RenameDialog::textChanged( const QString & _new_string )
 {
 	m_stringToEdit = _new_string;
 }
-
-
-
-
-
-
