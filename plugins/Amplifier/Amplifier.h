@@ -34,7 +34,7 @@
 class AmplifierEffect : public Effect
 {
 public:
-	AmplifierEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	AmplifierEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~AmplifierEffect();
 	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
 

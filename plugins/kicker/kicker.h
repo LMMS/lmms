@@ -46,7 +46,7 @@ class kickerInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	kickerInstrument( InstrumentTrack * _instrument_track );
+	kickerInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~kickerInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

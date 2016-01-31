@@ -52,14 +52,15 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 const float DYN_NOISE_FLOOR = 0.00001f; // -100dBV noise floor
 const double DNF_LOG = 5.0;
 
-dynProcEffect::dynProcEffect( Model * _parent,
+dynProcEffect::dynProcEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &dynamicsprocessor_plugin_descriptor, _parent, _key ),
+	Effect( &dynamicsprocessor_plugin_descriptor, _parent, engine, _key ),
 	m_dpControls( this )
 {
 	m_currentPeak[0] = m_currentPeak[1] = DYN_NOISE_FLOOR;
-	m_rms[0] = new RmsHelper( 64 * Engine::mixer()->processingSampleRate() / 44100 );
-	m_rms[1] = new RmsHelper( 64 * Engine::mixer()->processingSampleRate() / 44100 );
+	int size = 64 * getProcessingSampleRate() / 44100;
+	m_rms[0] = new RmsHelper( size );
+	m_rms[1] = new RmsHelper( size );
 	calcAttack();
 	calcRelease();
 }
@@ -76,12 +77,12 @@ dynProcEffect::~dynProcEffect()
 
 inline void dynProcEffect::calcAttack()
 {
-	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / Engine::mixer()->processingSampleRate() );
+	m_attCoeff = exp10( ( DNF_LOG / ( m_dpControls.m_attackModel.value() * 0.001 ) ) / getProcessingSampleRate() );
 }
 
 inline void dynProcEffect::calcRelease()
 {
-	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / Engine::mixer()->processingSampleRate() );
+	m_relCoeff = exp10( ( -DNF_LOG / ( m_dpControls.m_releaseModel.value() * 0.001 ) ) / getProcessingSampleRate() );
 }
 
 
@@ -117,8 +118,9 @@ bool dynProcEffect::processAudioBuffer( sampleFrame * _buf,
 
 	if( m_needsUpdate )
 	{
-		m_rms[0]->setSize( 64 * Engine::mixer()->processingSampleRate() / 44100 );
-		m_rms[1]->setSize( 64 * Engine::mixer()->processingSampleRate() / 44100 );
+		int size = 64 * getProcessingSampleRate() / 44100;
+		m_rms[0]->setSize( size );
+		m_rms[1]->setSize( size );
 		calcAttack();
 		calcRelease();
 		m_needsUpdate = false;
@@ -233,9 +235,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, Engine * engine, void * _data )
 {
-	return( new dynProcEffect( _parent,
+	return( new dynProcEffect( _parent, engine,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }

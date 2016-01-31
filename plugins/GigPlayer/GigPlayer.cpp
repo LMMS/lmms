@@ -74,8 +74,8 @@ Plugin::Descriptor PLUGIN_EXPORT gigplayer_plugin_descriptor =
 
 
 
-GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &gigplayer_plugin_descriptor ),
+GigInstrument::GigInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &gigplayer_plugin_descriptor, engine ),
 	m_instance( NULL ),
 	m_instrument( NULL ),
 	m_filename( "" ),
@@ -87,13 +87,13 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 	m_currentKeyDimension( 0 )
 {
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	getMixer()->addPlayHandle( iph );
 
 	updateSampleRate();
 
 	connect( &m_bankNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
 	connect( &m_patchNum, SIGNAL( dataChanged() ), this, SLOT( updatePatch() ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
+	connect( getMixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
 }
 
 
@@ -101,7 +101,7 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	getMixer()->removePlayHandles( instrumentTrack() );
 	freeInstance();
 }
 
@@ -316,8 +316,8 @@ void GigInstrument::playNote( NotePlayHandle * _n, sampleFrame * )
 // the preferences)
 void GigInstrument::play( sampleFrame * _working_buffer )
 {
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
-	const int rate = Engine::mixer()->processingSampleRate();
+	const fpp_t frames = getFramesPerPeriod();
+	const int rate = getProcessingSampleRate();
 
 	// Initialize to zeros
 	std::memset( &_working_buffer[0][0], 0, DEFAULT_CHANNELS * frames * sizeof( float ) );
@@ -753,7 +753,7 @@ void GigInstrument::addSamples( GigNote & gignote, bool wantReleaseSample )
 			if( gignote.midiNote >= keyLow && gignote.midiNote <= keyHigh )
 			{
 				float attenuation = pDimRegion->GetVelocityAttenuation( gignote.velocity );
-				float length = (float) pSample->SamplesTotal / Engine::mixer()->processingSampleRate();
+				float length = (float) pSample->SamplesTotal / getProcessingSampleRate();
 
 				// TODO: sample panning? crossfade different layers?
 
@@ -1094,7 +1094,7 @@ void GigInstrumentView::showFileDialog()
 		if( f != "" )
 		{
 			k->openFile( f );
-			Engine::getSong()->setModified();
+			model()->getSong()->setModified();
 		}
 	}
 
@@ -1409,9 +1409,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new GigInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new GigInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 }

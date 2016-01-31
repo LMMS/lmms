@@ -36,7 +36,7 @@
 class MultitapEchoEffect : public Effect
 {
 public:
-	MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	MultitapEchoEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~MultitapEchoEffect();
 	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
 

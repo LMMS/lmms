@@ -57,8 +57,8 @@ Plugin::Descriptor PLUGIN_EXPORT kicker_plugin_descriptor =
 }
 
 
-kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &kicker_plugin_descriptor ),
+kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &kicker_plugin_descriptor, engine ),
 	m_startFreqModel( 150.0f, 5.0f, 1000.0f, 1.0f, this, tr( "Start frequency" ) ),
 	m_endFreqModel( 40.0f, 5.0f, 1000.0f, 1.0f, this, tr( "End frequency" ) ),
 	m_decayModel( 440.0f, 5.0f, 5000.0f, 1.0f, 5000.0f, this, tr( "Length" ) ),
@@ -166,7 +166,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 	const float decfr = m_decayModel.value() *
-		Engine::mixer()->processingSampleRate() / 1000.0f;
+		getProcessingSampleRate() / 1000.0f;
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if ( tfp == 0 )
@@ -190,7 +190,7 @@ void kickerInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	SweepOsc * so = static_cast<SweepOsc *>( _n->m_pluginData );
-	so->update( _working_buffer + offset, frames, Engine::mixer()->processingSampleRate() );
+	so->update( _working_buffer + offset, frames, getProcessingSampleRate() );
 
 	if( _n->isReleased() )
 	{
@@ -366,9 +366,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new kickerInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new kickerInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 

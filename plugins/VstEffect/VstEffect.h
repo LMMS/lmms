@@ -36,7 +36,7 @@
 class VstEffect : public Effect
 {
 public:
-	VstEffect( Model * _parent,
+    VstEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~VstEffect();
 

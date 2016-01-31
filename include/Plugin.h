@@ -32,7 +32,9 @@
 #include "JournallingObject.h"
 #include "Model.h"
 #include "MemoryManager.h"
+#include "Mixer.h"
 
+#include "EngineClient.h"
 
 class QWidget;
 
@@ -41,7 +43,7 @@ class PluginView;
 class AutomatableModel;
 
 
-class EXPORT Plugin : public Model, public JournallingObject
+class EXPORT Plugin : public Model, public JournallingObject, public EngineClient
 {
 	MM_OPERATORS
 	Q_OBJECT
@@ -141,7 +143,7 @@ public:
 	typedef QList<Descriptor*> DescriptorList;
 
 	// contructor of a plugin
-	Plugin( const Descriptor * descriptor, Model * parent );
+	Plugin( const Descriptor * descriptor, Model * parent, Engine * engine );
 	virtual ~Plugin();
 
 	// returns display-name out of descriptor
@@ -179,18 +181,20 @@ public:
 	// create a view for the model 
 	PluginView * createView( QWidget * parent );
 
+	sample_rate_t getProcessingSampleRate() const { return getMixer()->processingSampleRate(); }
+	fpp_t getFramesPerPeriod() const { return getMixer()->framesPerPeriod(); }
+
 
 protected:
 	// create a view for the model 
 	virtual PluginView* instantiateView( QWidget * ) = 0;
 	void collectErrorForUI( QString errMsg );
 
-
 private:
 	const Descriptor * m_descriptor;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model * , void * );
+    typedef Plugin * ( * InstantiationHook )( Model * , Engine * , void * );
 
 } ;
 

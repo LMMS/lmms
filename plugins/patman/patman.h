@@ -49,7 +49,7 @@ class patmanInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	patmanInstrument( InstrumentTrack * _track );
+	patmanInstrument( InstrumentTrack * _track, Engine * engine );
 	virtual ~patmanInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

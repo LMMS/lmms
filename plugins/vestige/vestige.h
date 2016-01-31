@@ -51,7 +51,7 @@ class vestigeInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	vestigeInstrument( InstrumentTrack * _instrument_track );
+    vestigeInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~vestigeInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );

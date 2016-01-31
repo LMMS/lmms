@@ -41,6 +41,11 @@ class ConfigManager;
 class PluginView;
 class ToolButton;
 
+class Song;
+class Mixer;
+class BBTrackContainer;
+class ProjectJournal;
+
 
 class MainWindow : public QMainWindow
 {
@@ -175,6 +180,13 @@ private:
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
 
+	// Convenience function to get rid of several Engine::getSong
+	// calls so we only have to adjust very few places in the end
+	Song * getSong() const;
+	Mixer * getMixer() const;
+	BBTrackContainer * getBBTrackContainer() const;
+	ProjectJournal * getProjectJournal() const;
+
 	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
@@ -222,6 +234,7 @@ private slots:
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
+	void exportMIDI();
 
 
 signals:

@@ -66,7 +66,7 @@ class bitInvader : public Instrument
 {
 	Q_OBJECT
 public:
-	bitInvader(InstrumentTrack * _instrument_track );
+	bitInvader(InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~bitInvader();
 
 	virtual void playNote( NotePlayHandle * _n,

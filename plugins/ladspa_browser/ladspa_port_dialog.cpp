@@ -29,15 +29,11 @@
 #include <QTableWidget>
 
 #include "embed.h"
-#include "Engine.h"
 #include "Ladspa2LMMS.h"
-#include "Mixer.h"
 
 
-ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
+ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key, Ladspa2LMMS * manager, sample_rate_t processingSampleRate )
 {
-	Ladspa2LMMS * manager = Engine::getLADSPAManager();
-
 	setWindowIcon( embed::getIconPixmap( "ports" ) );
 	setWindowTitle( tr( "Ports" ) );
 	setModal( true );
@@ -87,11 +83,11 @@ ladspaPortDialog::ladspaPortDialog( const ladspa_key_t & _key )
 		{
 			if( min != NOHINT )
 			{
-				min *= Engine::mixer()->processingSampleRate();
+				min *= processingSampleRate;
 			}
 			if( max != NOHINT )
 			{
-				max *= Engine::mixer()->processingSampleRate();
+				max *= processingSampleRate;
 			}
 		}
 

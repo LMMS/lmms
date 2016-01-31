@@ -55,9 +55,10 @@ static Plugin::Descriptor dummyPluginDescriptor =
 
 
 
-Plugin::Plugin( const Descriptor * descriptor, Model * parent ) :
+Plugin::Plugin( const Descriptor * descriptor, Model * parent, Engine * engine ) :
 	Model( parent ),
 	JournallingObject(),
+	EngineClient(engine),
 	m_descriptor( descriptor )
 {
 	if( m_descriptor == NULL )
@@ -95,6 +96,8 @@ AutomatableModel * Plugin::childModel( const QString & )
 Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 								void * data )
 {
+	Engine * engine = pluginFactory->getEngine();
+
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 	if( pi.isNull() )
 	{
@@ -106,7 +109,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
-		return new DummyPlugin();
+		return new DummyPlugin(engine);
 	}
 
 	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
@@ -119,10 +122,10 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 				tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
-		return new DummyPlugin();
+		return new DummyPlugin(engine);
 	}
 
-	Plugin * inst = instantiationHook( parent, data );
+	Plugin * inst = instantiationHook( parent, engine, data );
 	return inst;
 }
 

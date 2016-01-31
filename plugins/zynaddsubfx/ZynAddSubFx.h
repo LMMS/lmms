@@ -65,7 +65,7 @@ class ZynAddSubFxInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track );
+	ZynAddSubFxInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~ZynAddSubFxInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );

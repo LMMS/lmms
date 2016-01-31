@@ -89,7 +89,7 @@ public:
 	};
 
 
-	sidInstrument( InstrumentTrack * _instrument_track );
+	sidInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~sidInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

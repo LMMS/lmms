@@ -42,6 +42,7 @@
 #include "AudioDummy.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
+#include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "embed.h"
@@ -209,7 +210,7 @@ MainWindow::MainWindow() :
 		// See autoSaveTimerStart() in MainWindow.h
 	}
 
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
+	connect( getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
 }
 
@@ -287,25 +288,26 @@ void MainWindow::finalize()
 				     this, SLOT( saveProjectAsDefaultTemplate() ) );
 
 	project_menu->addSeparator();
+	Song * song = getSong();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
-					Engine::getSong(),
+					song,
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					Engine::getSong(),
+					song,
 					SLOT( exportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
-					Engine::getSong(),
+					song,
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
-					Engine::getSong(),
-					SLOT( exportProjectMidi() ),
+					this,
+					SLOT( exportMIDI() ),
 					Qt::CTRL + Qt::Key_M );
 
 	project_menu->addSeparator();
@@ -426,7 +428,7 @@ void MainWindow::finalize()
 	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					Engine::getSong(),
+					song,
 							SLOT( exportProject() ),
 								m_toolBar );
 
@@ -442,7 +444,7 @@ void MainWindow::finalize()
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
-	m_metronomeToggle->setChecked(Engine::mixer()->isMetronomeActive());
+	m_metronomeToggle->setChecked(getMixer()->isMetronomeActive());
 
 	m_toolBarLayout->setColumnMinimumWidth( 0, 5 );
 	m_toolBarLayout->addWidget( project_new, 0, 1 );
@@ -566,7 +568,7 @@ void MainWindow::finalize()
 	}
 	// look whether mixer failed to start the audio device selected by the
 	// user and is using AudioDummy as a fallback
-	else if( Engine::mixer()->audioDevStartFailed() )
+	else if( getMixer()->audioDevStartFailed() )
 	{
 		// if so, offer the audio settings section of the setup dialog
 		SetupDialog sd( SetupDialog::AudioSettings );
@@ -641,17 +643,19 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 
 void MainWindow::resetWindowTitle()
 {
+	Song * song = getSong();
+
 	QString title = "";
-	if( Engine::getSong()->projectFileName() != "" )
+	if( song->projectFileName() != "" )
 	{
-		title = QFileInfo( Engine::getSong()->projectFileName()
+		title = QFileInfo( song->projectFileName()
 							).completeBaseName();
 	}
 	if( title == "" )
 	{
 		title = tr( "Untitled" );
 	}
-	if( Engine::getSong()->isModified() )
+	if( song->isModified() )
 	{
 		title += '*';
 	}
@@ -671,12 +675,14 @@ void MainWindow::resetWindowTitle()
 
 bool MainWindow::mayChangeProject(bool stopPlayback)
 {
+	Song * song = getSong();
+
 	if( stopPlayback )
 	{
-		Engine::getSong()->stop();
+		song->stop();
 	}
 
-	if( !Engine::getSong()->isModified() && getSession() != Recover )
+	if( !song->isModified() && getSession() != Recover )
 	{
 		return( true );
 	}
@@ -818,7 +824,7 @@ void MainWindow::createNewProject()
 {
 	if( mayChangeProject(true) )
 	{
-		Engine::getSong()->createNewProject();
+		getSong()->createNewProject();
 	}
 	runAutoSave();
 }
@@ -830,13 +836,15 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 {
 	if( m_templatesMenu && mayChangeProject(true) )
 	{
+		Song * song = getSong();
+
 		int indexOfTemplate = m_templatesMenu->actions().indexOf( _idx );
 		bool isFactoryTemplate = indexOfTemplate >= m_custom_templates_count;
 		QString dirBase =  isFactoryTemplate ?
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
-		Engine::getSong()->createNewProjectFromTemplate(
+		song->createNewProjectFromTemplate(
 			dirBase + _idx->text() + ".mpt" );
 	}
 	runAutoSave();
@@ -856,7 +864,7 @@ void MainWindow::openProject()
 		if( ofd.exec () == QDialog::Accepted &&
 						!ofd.selectedFiles().isEmpty() )
 		{
-			Song *song = Engine::getSong();
+			Song *song = getSong();
 
 			song->stop();
 			setCursor( Qt::WaitCursor );
@@ -900,11 +908,13 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
+	Song * song = getSong();
+
 	if ( mayChangeProject(true) )
 	{
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
-		Engine::getSong()->loadProject( f );
+		song->loadProject( f );
 		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
@@ -916,13 +926,15 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool MainWindow::saveProject()
 {
-	if( Engine::getSong()->projectFileName() == "" )
+	Song * song = getSong();
+
+	if( song->projectFileName() == "" )
 	{
 		return( saveProjectAs() );
 	}
 	else
 	{
-		Engine::getSong()->guiSaveProject();
+		song->guiSaveProject();
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
@@ -936,10 +948,12 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
+	Song * song = getSong();
+
 	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
-	QString f = Engine::getSong()->projectFileName();
+	QString f = song->projectFileName();
 	if( f != "" )
 	{
 		sfd.setDirectory( QFileInfo( f ).absolutePath() );
@@ -958,7 +972,7 @@ bool MainWindow::saveProjectAs()
 		{
 			fname += ".mpt";
 		}
-		Engine::getSong()->guiSaveProjectAs( fname );
+		song->guiSaveProjectAs( fname );
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
@@ -973,7 +987,9 @@ bool MainWindow::saveProjectAs()
 
 bool MainWindow::saveProjectAsNewVersion()
 {
-	QString fileName = Engine::getSong()->projectFileName();
+	Song * song = getSong();
+
+	QString fileName = song->projectFileName();
 	if( fileName == "" )
 	{
 		return saveProjectAs();
@@ -983,7 +999,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
+		song->guiSaveProjectAs( fileName );
 		return true;
 	}
 }
@@ -993,6 +1009,8 @@ bool MainWindow::saveProjectAsNewVersion()
 
 void MainWindow::saveProjectAsDefaultTemplate()
 {
+	Song * song = getSong();
+
 	QString defaultTemplate = ConfigManager::inst()->userTemplateDir() + "default.mpt";
 
 	QFileInfo fileInfo(defaultTemplate);
@@ -1008,7 +1026,7 @@ void MainWindow::saveProjectAsDefaultTemplate()
 		}
 	}
 
-	Engine::getSong()->saveProjectFile( defaultTemplate );
+	song->saveProjectFile( defaultTemplate );
 }
 
 
@@ -1100,6 +1118,28 @@ void MainWindow::refocus()
 
 	if( ! found )
 		this->setFocus();
+}
+
+
+
+Song * MainWindow::getSong() const
+{
+	return Engine::getSong();
+}
+
+Mixer * MainWindow::getMixer() const
+{
+	return Engine::mixer();
+}
+
+BBTrackContainer * MainWindow::getBBTrackContainer() const
+{
+	return Engine::getBBTrackContainer();
+}
+
+ProjectJournal * MainWindow::getProjectJournal() const
+{
+	return Engine::projectJournal();
 }
 
 
@@ -1269,9 +1309,73 @@ void MainWindow::updateConfig( QAction * _who )
 
 void MainWindow::onToggleMetronome()
 {
-	Mixer * mixer = Engine::mixer();
+	Mixer * mixer = getMixer();
 
 	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
+}
+
+
+
+void MainWindow::exportMIDI()
+{
+	Song * song = getSong();
+	if ( !song )
+	{
+		return;
+	}
+
+	if ( song->isEmpty() )
+	{
+		QMessageBox::information( gui->mainWindow(),
+				tr( "Empty project" ),
+				tr( "This project is empty so exporting makes "
+					"no sense. Please put some items into "
+					"Song Editor first!" ) );
+		return;
+	}
+
+	FileDialog efd( gui->mainWindow() );
+
+	efd.setFileMode( FileDialog::AnyFile );
+
+	QStringList types;
+	types << tr("MIDI File (*.mid)");
+	efd.setNameFilters( types );
+	QString base_filename;
+
+	QString const & fileName = song->projectFileName();
+
+	if( !fileName.isEmpty() )
+	{
+		efd.setDirectory( QFileInfo( fileName ).absolutePath() );
+		base_filename = QFileInfo( fileName ).completeBaseName();
+	}
+	else
+	{
+		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+		base_filename = tr( "untitled" );
+	}
+	efd.selectFile( base_filename + ".mid" );
+	efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	{
+		const QString suffix = ".mid";
+
+		QString export_filename = efd.selectedFiles()[0];
+		if (!export_filename.endsWith(suffix)) export_filename += suffix;
+
+		// NOTE start midi export
+
+		// instantiate midi export plugin
+		TrackContainer::TrackList tracks;
+		tracks += song->tracks();
+		tracks += getBBTrackContainer()->tracks();
+
+		song->exportProjectMidi(tracks, song->getTempo(), export_filename);
+	}
 }
 
 
@@ -1287,14 +1391,16 @@ void MainWindow::toggleControllerRack()
 
 void MainWindow::updatePlayPauseIcons()
 {
+	Song * song = getSong();
+
 	gui->songEditor()->setPauseIcon( false );
 	gui->automationEditor()->setPauseIcon( false );
 	gui->getBBEditor()->setPauseIcon( false );
 	gui->pianoRoll()->setPauseIcon( false );
 
-	if( Engine::getSong()->isPlaying() )
+	if( song->isPlaying() )
 	{
-		switch( Engine::getSong()->playMode() )
+		switch( song->playMode() )
 		{
 			case Song::Mode_PlaySong:
 				gui->songEditor()->setPauseIcon( true );
@@ -1321,17 +1427,19 @@ void MainWindow::updatePlayPauseIcons()
 
 void MainWindow::updateUndoRedoButtons()
 {
+	ProjectJournal * projectJournal = getProjectJournal();
+
 	// when the edit menu is shown, grey out the undo/redo buttons if there's nothing to undo/redo
 	// else, un-grey them
-	m_undoAction->setEnabled(Engine::projectJournal()->canUndo());
-	m_redoAction->setEnabled(Engine::projectJournal()->canRedo());
+	m_undoAction->setEnabled(projectJournal->canUndo());
+	m_redoAction->setEnabled(projectJournal->canRedo());
 }
 
 
 
 void MainWindow::undo()
 {
-	Engine::projectJournal()->undo();
+	getProjectJournal()->undo();
 }
 
 
@@ -1339,7 +1447,7 @@ void MainWindow::undo()
 
 void MainWindow::redo()
 {
-	Engine::projectJournal()->redo();
+	getProjectJournal()->redo();
 }
 
 
@@ -1506,10 +1614,12 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ) )
+	Song * song = getSong();
+
+	if( !( song->isPlaying() ||
+			song->isExporting() ) )
 	{
-		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		song->saveProjectFile(ConfigManager::inst()->recoveryFile());
 	}
 	else
 	{

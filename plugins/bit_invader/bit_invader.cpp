@@ -135,8 +135,8 @@ sample_t bSynth::nextStringSample()
 ***********************************************************************/
 
 
-bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
+bitInvader::bitInvader( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &bitinvader_plugin_descriptor, engine ),
 	m_sampleLength( 128, 4, 200, 1, this, tr( "Samplelength" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
 	m_interpolation( false, this ),
@@ -279,7 +279,7 @@ void bitInvader::playNote( NotePlayHandle * _n,
 					m_graph.length(),
 					_n,
 					m_interpolation.value(), factor,
-				Engine::mixer()->processingSampleRate() );
+					getProcessingSampleRate() );
 	}
 
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
@@ -472,7 +472,7 @@ void bitInvaderView::modelChanged()
 void bitInvaderView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -481,7 +481,7 @@ void bitInvaderView::sinWaveClicked()
 void bitInvaderView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -490,7 +490,7 @@ void bitInvaderView::triangleWaveClicked()
 void bitInvaderView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -499,7 +499,7 @@ void bitInvaderView::sawWaveClicked()
 void bitInvaderView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -508,7 +508,7 @@ void bitInvaderView::sqrWaveClicked()
 void bitInvaderView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -518,10 +518,10 @@ void bitInvaderView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
 	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 	/*
 	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 	// zero sample_shape
 	for (int i = 0; i < sample_length; i++)
 	{
@@ -554,7 +554,7 @@ void bitInvaderView::usrWaveClicked()
 void bitInvaderView::smoothClicked()
 {
 	m_graph->model()->smooth();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -563,7 +563,7 @@ void bitInvaderView::smoothClicked()
 void bitInvaderView::interpolationToggled( bool value )
 {
 	m_graph->setGraphStyle( value ? Graph::LinearStyle : Graph::NearestStyle);
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -571,7 +571,7 @@ void bitInvaderView::interpolationToggled( bool value )
 
 void bitInvaderView::normalizeToggled( bool value )
 {
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -581,9 +581,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return( new bitInvader( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new bitInvader( static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 

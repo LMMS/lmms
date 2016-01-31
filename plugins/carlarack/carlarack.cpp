@@ -43,9 +43,9 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
     NULL
 } ;
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, void* data)
+Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, Engine * engine, void* data)
 {
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlarack_plugin_descriptor, false);
+    return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlarack_plugin_descriptor, engine, false);
 }
 
 }

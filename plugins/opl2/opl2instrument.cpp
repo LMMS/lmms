@@ -76,9 +76,9 @@ Plugin::Descriptor PLUGIN_EXPORT OPL2_plugin_descriptor =
 };
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-        return( new opl2instrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new opl2instrument( static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 }
@@ -90,8 +90,8 @@ QMutex opl2instrument::emulatorMutex;
 // Weird ordering of voice parameters
 const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
-opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &OPL2_plugin_descriptor ),
+opl2instrument::opl2instrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &OPL2_plugin_descriptor, engine ),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
 	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Attack" )  ),
 	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Decay" )   ),
@@ -136,7 +136,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(getProcessingSampleRate(), true, false);
 	theEmulator->init();
 	// Enable waveform selection
 	theEmulator->write(0x01,0x20);
@@ -155,7 +155,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	updatePatch();
 
 	// Can the buffer size change suddenly? I bet that would break lots of stuff
-	frameCount = Engine::mixer()->framesPerPeriod();
+	frameCount = getFramesPerPeriod();
 	renderbuffer = new short[frameCount];
 
 	// Some kind of sane defaults
@@ -165,7 +165,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	tuneEqual(69, 440);
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( getMixer(), SIGNAL( sampleRateChanged() ),
 		 this, SLOT( reloadEmulator() ) );
 	// Connect knobs
 	// This one's for testing...
@@ -212,12 +212,12 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 
 	// Connect the plugin to the mixer...
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	getMixer()->addPlayHandle( iph );
 }
 
 opl2instrument::~opl2instrument() {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	getMixer()->removePlayHandles( instrumentTrack() );
 	delete [] renderbuffer;
 }
 
@@ -225,7 +225,7 @@ opl2instrument::~opl2instrument() {
 void opl2instrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
-	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
+	theEmulator = new CTemuopl(getProcessingSampleRate(), true, false);
 	theEmulator->init();
 	theEmulator->write(0x01,0x20);
 	emulatorMutex.unlock();

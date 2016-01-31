@@ -40,7 +40,7 @@ struct FL_Channel;
 class FlpImport : public ImportFilter
 {
 public:
-	FlpImport( const QString & _file );
+	FlpImport( const QString & _file, Engine * engine );
 	virtual ~FlpImport();
 
 	virtual PluginView * instantiateView( QWidget * )

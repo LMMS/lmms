@@ -138,8 +138,8 @@ const NativePluginDescriptor* carla_get_native_rack_plugin();
 
 // -----------------------------------------------------------------------
 
-CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
-    : Instrument(instrumentTrack, descriptor),
+CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, Engine * engine, const bool isPatchbay)
+    : Instrument(instrumentTrack, descriptor, engine),
       kIsPatchbay(isPatchbay),
       fHandle(NULL),
       fDescriptor(isPatchbay ? carla_get_native_patchbay_plugin() : carla_get_native_rack_plugin()),
@@ -181,14 +181,16 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
     // we need a play-handle which cares for calling play()
     InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, instrumentTrack );
-    Engine::mixer()->addPlayHandle( iph );
 
-    connect(Engine::mixer(), SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
+    Mixer * mixer = getMixer();
+    mixer->addPlayHandle( iph );
+
+    connect(mixer, SIGNAL(sampleRateChanged()), this, SLOT(sampleRateChanged()));
 }
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::mixer()->removePlayHandles( instrumentTrack() );
+    getMixer()->removePlayHandles( instrumentTrack() );
 
     if (fHost.resourceDir != NULL)
     {
@@ -218,12 +220,12 @@ CarlaInstrument::~CarlaInstrument()
 
 uint32_t CarlaInstrument::handleGetBufferSize() const
 {
-    return Engine::mixer()->framesPerPeriod();
+    return getFramesPerPeriod();
 }
 
 double CarlaInstrument::handleGetSampleRate() const
 {
-    return Engine::mixer()->processingSampleRate();
+    return getProcessingSampleRate();
 }
 
 bool CarlaInstrument::handleIsOffline() const
@@ -320,7 +322,7 @@ void CarlaInstrument::loadSettings(const QDomElement& elem)
 
 void CarlaInstrument::play(sampleFrame* workingBuffer)
 {
-    const uint bufsize = Engine::mixer()->framesPerPeriod();
+    const uint bufsize = getFramesPerPeriod();
 
     std::memset(workingBuffer, 0, sizeof(sample_t)*bufsize*DEFAULT_CHANNELS);
 
@@ -331,9 +333,9 @@ void CarlaInstrument::play(sampleFrame* workingBuffer)
     }
 
     // set time info
-    Song * const s = Engine::getSong();
+    Song * const s = getSong();
     fTimeInfo.playing  = s->isPlaying();
-    fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(Engine::framesPerTick());
+    fTimeInfo.frame    = s->getPlayPos(s->playMode()).frames(getEngine()->framesPerTick());
     fTimeInfo.usecs    = s->getMilliseconds()*1000;
     fTimeInfo.bbt.bar  = s->getTacts() + 1;
     fTimeInfo.bbt.beat = s->getBeat() + 1;

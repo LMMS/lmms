@@ -47,9 +47,9 @@ Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 
 
 
-SpectrumAnalyzer::SpectrumAnalyzer( Model * _parent,
+SpectrumAnalyzer::SpectrumAnalyzer( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &spectrumanalyzer_plugin_descriptor, _parent, _key ),
+	Effect( &spectrumanalyzer_plugin_descriptor, _parent, engine, _key ),
 	m_saControls( this ),
 	m_framesFilledUp( 0 ),
 	m_energy( 0 )
@@ -127,7 +127,7 @@ bool SpectrumAnalyzer::processAudioBuffer( sampleFrame* _buf, const fpp_t _frame
 
 //	hanming( m_buffer, FFT_BUFFER_SIZE, HAMMING );
 
-	const sample_rate_t sr = Engine::mixer()->processingSampleRate();
+	const sample_rate_t sr = getProcessingSampleRate();
 	const int LOWEST_FREQ = 0;
 	const int HIGHEST_FREQ = sr / 2;
 
@@ -163,9 +163,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new SpectrumAnalyzer( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new SpectrumAnalyzer( parent, engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

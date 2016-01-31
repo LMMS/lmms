@@ -48,7 +48,8 @@ public:
 			const float _detune,
 			const int _oversample,
 			const bool _state,
-			const int _id );
+			const int _id,
+			const sample_rate_t baseSampleRate );
 	
 	bool exists( int _id ) const
 	{

@@ -72,6 +72,7 @@
 #include "DataFile.h"
 #include "Song.h"
 #include "SetupDialog.h"
+#include "PluginFactory.h"
 
 static inline QString baseName( const QString & file )
 {
@@ -578,7 +579,12 @@ int main( int argc, char * * argv )
 	// without starting the GUI
 	if( !renderOut.isEmpty() )
 	{
+		// Initialize the engine
 		Engine::init( true );
+
+		// Initialize the plugin factory with the engine so that
+		// plugins can later be injected with the Engine
+		PluginFactory::instance()->setEngine(Engine::inst());
 
 		QFileInfo fileInfo( fileToLoad );
 		if ( !fileInfo.exists() )

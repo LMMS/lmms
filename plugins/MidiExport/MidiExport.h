@@ -36,7 +36,7 @@ class MidiExport: public ExportFilter
 {
 // 	Q_OBJECT
 public:
-	MidiExport( );
+	MidiExport( Engine * engine );
 	~MidiExport();
 
 	virtual PluginView * instantiateView( QWidget * )

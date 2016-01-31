@@ -45,13 +45,14 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 
 
 
-FlangerEffect::FlangerEffect( Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key ) :
-	Effect( &flanger_plugin_descriptor, parent, key ),
+FlangerEffect::FlangerEffect( Model *parent, Engine * engine, const Plugin::Descriptor::SubPluginFeatures::Key *key ) :
+	Effect( &flanger_plugin_descriptor, parent, engine, key ),
 	m_flangerControls( this )
 {
-	m_lfo = new QuadratureLfo( Engine::mixer()->processingSampleRate() );
-	m_lDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
-	m_rDelay = new MonoDelay( 1, Engine::mixer()->processingSampleRate() );
+	sample_rate_t sampleRate = getProcessingSampleRate();
+	m_lfo = new QuadratureLfo( sampleRate );
+	m_lDelay = new MonoDelay( 1, sampleRate );
+	m_rDelay = new MonoDelay( 1, sampleRate );
 	m_noise = new Noise;
 }
 
@@ -87,12 +88,14 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	{
 		return( false );
 	}
+	sample_rate_t sampleRate = getProcessingSampleRate();
+
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
+	const float length = m_flangerControls.m_delayTimeModel.value() * sampleRate;
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
-	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
+	float amplitude = m_flangerControls.m_lfoAmountModel.value() * sampleRate;
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
 	m_lfo->setFrequency(  m_flangerControls.m_lfoFrequencyModel.value() );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
@@ -132,9 +135,10 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 void FlangerEffect::changeSampleRate()
 {
-	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_lDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
-	m_rDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
+	sample_rate_t sampleRate = getProcessingSampleRate();
+	m_lfo->setSampleRate( sampleRate );
+	m_lDelay->setSampleRate( sampleRate );
+	m_rDelay->setSampleRate( sampleRate );
 }
 
 
@@ -143,9 +147,9 @@ extern "C"
 {
 
 //needed for getting plugin out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new FlangerEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new FlangerEffect( parent , engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }}

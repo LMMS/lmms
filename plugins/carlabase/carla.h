@@ -39,7 +39,7 @@ class PLUGIN_EXPORT CarlaInstrument : public Instrument
 public:
     static const uint32_t kMaxMidiEvents = 512;
 
-    CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
+    CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, Engine * engine, const bool isPatchbay );
     virtual ~CarlaInstrument();
 
     // CarlaNative functions
