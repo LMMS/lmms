@@ -6084,11 +6084,11 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor deze bestanden en mapen en prob
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6100,15 +6100,15 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor deze bestanden en mapen en prob
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6120,7 +6120,7 @@ Zorg ervoor dat je schrijf-bevoegdheid hebt voor deze bestanden en mapen en prob
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

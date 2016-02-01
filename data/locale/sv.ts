@@ -6083,11 +6083,11 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6099,15 +6099,15 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6119,7 +6119,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -6107,11 +6107,11 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Użyj modulacji fazowej aby zmodulować oscylator 2 oscylatorem 1</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Użyj modulacji amplitudowej aby zmodulować oscylator 2 oscylatorem 1</translation>
     </message>
     <message>
@@ -6123,15 +6123,15 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation>Synchronizuj oscylator 1 z oscylatorem 2</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Użyj modulacji częstotliwościowej aby zmodulować oscylator 2 oscylatorem 1</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Użyj modulacji fazowej aby zmodulować oscylator 3 oscylatorem 2</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Użyj modulacji amplitudowej aby zmodulować oscylator 3 oscylatorem 2</translation>
     </message>
     <message>
@@ -6143,7 +6143,7 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation>Synchronizuj oscylator 2 z oscylatorem 3</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Użyj modulacji częstotliwościowej aby zmodulować oscylator 3 oscylatorem 2</translation>
     </message>
     <message>
