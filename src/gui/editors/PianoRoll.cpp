@@ -209,7 +209,9 @@ PianoRoll::PianoRoll() :
 	m_gridColor( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
-	m_barColor( 0, 0, 0 )
+	m_barColor( 0, 0, 0 ),
+	m_noteBorderRadiusX( 0 ),
+	m_noteBorderRadiusY( 0 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Volume" ) );
@@ -759,10 +761,22 @@ QColor PianoRoll::barColor() const
 void PianoRoll::setBarColor( const QColor & c )
 { m_barColor = c; }
 
+float PianoRoll::noteBorderRadiusX() const
+{ return m_noteBorderRadiusX; }
+
+void PianoRoll::setNoteBorderRadiusX( float b )
+{ m_noteBorderRadiusX = b; }
+
+float PianoRoll::noteBorderRadiusY() const
+{ return m_noteBorderRadiusY; }
+
+void PianoRoll::setNoteBorderRadiusY( float b )
+{ m_noteBorderRadiusY = b; }
 
 
-void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
-					int width, const Note * n, const QColor & noteCol )
+void PianoRoll::drawNoteRect(QPainter & p, int x, int y, 
+				int width, const Note * n, const QColor & noteCol,
+						float radiusX, float radiusY )
 {
 	++x;
 	++y;
@@ -804,15 +818,17 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 	p.setPen( col );
 	p.setRenderHint(QPainter::Antialiasing);
-	p.drawRoundedRect( x, y, width, KEY_LINE_HEIGHT-1, 5, 2 );
+	p.drawRoundedRect( QRectF ( x + 0.5, y - 0.5, width, KEY_LINE_HEIGHT ), radiusX, radiusY );
 
 	// that little tab thing on the end hinting at the user
 	// to resize the note
 	p.setPen( noteCol.lighter( 200 ) );
+	p.setBrush( noteCol.lighter( 200 ) );
 	if( width > 2 )
 	{
-		p.drawLine( x + width - 3, y + 3, x + width - 3,
-						y + KEY_LINE_HEIGHT - 5 );
+		float leftIndent = 2.5;
+		float vertIndent = 3.5;
+		p.drawRect( QRectF (x + width - leftIndent, y + vertIndent, 1, KEY_LINE_HEIGHT - (2*vertIndent + 1) ) );
 	}
 }
 
@@ -2900,7 +2916,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KEY_LINE_HEIGHT + 2;
 
-		QPolygon editHandles;
+		QPolygonF editHandles;
 
 		for( const Note *note : m_pattern->notes() )
 		{
@@ -2936,7 +2952,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				// note
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
-								note_width, note, noteColor() );
+								note_width, note, noteColor(), noteBorderRadiusX(), noteBorderRadiusY() );
 			}
 
 			// draw note editing stuff
@@ -2955,8 +2971,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( (float)( MaxVolume - MinVolume ) ) *
 					( (float)( noteEditBottom() - noteEditTop() ) );
 
-				p.drawLine( noteEditLeft() + x, editHandleTop,
-							noteEditLeft() + x, noteEditBottom() );
+				p.drawLine( QLineF ( noteEditLeft() + x + 0.5, editHandleTop + 0.5,
+							noteEditLeft() + x + 0.5, noteEditBottom() + 0.5 ) );
 
 			}
 			else if( m_noteEditMode == NoteEditPanning )
@@ -2974,12 +2990,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( (float)( (PanningRight - PanningLeft ) ) ) *
 					( (float)( noteEditBottom() - noteEditTop() ) );
 
-				p.drawLine( noteEditLeft() + x, noteEditTop() +
+				p.drawLine( QLineF( noteEditLeft() + x + 0.5, noteEditTop() + 0.5 +
 						( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
-						    noteEditLeft() + x, editHandleTop );
+						    noteEditLeft() + x + 0.5, editHandleTop + 0.5 ) );
 			}
-			editHandles << QPoint( x + noteEditLeft(),
-						editHandleTop+1 );
+			editHandles << QPointF ( x + noteEditLeft() + 0.5,
+						editHandleTop + 1.5 );
 
 			if( note->hasDetuningInfo() )
 			{

@@ -57,6 +57,8 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
+	Q_PROPERTY( float noteBorderRadiusX READ noteBorderRadiusX WRITE setNoteBorderRadiusX )
+	Q_PROPERTY( float noteBorderRadiusY READ noteBorderRadiusY WRITE setNoteBorderRadiusY )
 public:
 	enum EditModes
 	{
@@ -109,6 +111,10 @@ public:
 	void setNoteColor( const QColor & c );
 	QColor barColor() const;
 	void setBarColor( const QColor & c );
+	float noteBorderRadiusX() const;
+	void setNoteBorderRadiusX( float b );
+	float noteBorderRadiusY() const;
+	void setNoteBorderRadiusY( float b );
 
 
 protected:
@@ -126,7 +132,8 @@ protected:
 
 	int getKey( int y ) const;
 	static void drawNoteRect( QPainter & p, int x, int y,
-					int  width, const Note * n, const QColor & noteCol );
+					int  width, const Note * n, const QColor & noteCol,
+				 	float radiusX, float radiusY );
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes();
@@ -349,6 +356,8 @@ private:
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_barColor;
+	float m_noteBorderRadiusX;
+	float m_noteBorderRadiusY;
 
 signals:
 	void positionChanged( const MidiTime & );
@@ -408,4 +417,3 @@ private:
 
 
 #endif
-
