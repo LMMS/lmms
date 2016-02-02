@@ -1199,7 +1199,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin();			
+			timeMap::iterator it = time_map.begin(); 
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1464,7 +1464,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 			y--;
 		}
 		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y );	
+		m_zoomingYModel.setValue( y ); 
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
@@ -2140,11 +2140,26 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	/*DropToolBar *copyPasteActionsToolBar = addDropToolBarToTop(tr("Copy paste actions"));*/
 
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
-					tr("Cut selected values (Ctrl+X)"), this);
+					tr("Cut selected values (%1+X)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
-					tr("Copy selected values (Ctrl+C)"), this);
+					tr("Copy selected values (%1+C)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste values from clipboard (Ctrl+V)"), this);
+					tr("Paste values from clipboard (%1+V)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 
 	cutAction->setWhatsThis(
 		tr( "Click here and selected values will be cut into the "

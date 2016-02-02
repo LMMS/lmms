@@ -423,15 +423,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
+        <source>Cut selected values (%1+X)</source>
         <translation>選択した値を切り取り (Shift+M)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>選択した値をコピー  (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation>選択した値をコピー  (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
+        <source>Paste values from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -462,8 +462,8 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>&lt;Ctrl&gt;を押しながらコントロールをドラッグしてください</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>&lt;%1&gt;を押しながらコントロールをドラッグしてください</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -4881,32 +4881,32 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished">ディチューン モード (Shift+T)</translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation type="unfinished">ここをクリックすると描画モードになります。描画モードでは個々のノートを追加・リサイズ・移動することができます。普段このモードをデフォルトで使用します。&apos;Shift+D&apos; を押してもこのモードになります。このモードではCtrlを長押しすることで一時的に選択モードにすることができます。</translation>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
+        <translation type="unfinished">ここをクリックすると描画モードになります。描画モードでは個々のノートを追加・リサイズ・移動することができます。普段このモードをデフォルトで使用します。&apos;Shift+D&apos; を押してもこのモードになります。このモードでは%1を長押しすることで一時的に選択モードにすることができます。</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished">ここをクリックすると消去モードになります。消去モードでは個々のノートを消去することができます。&apos;Shift+E&apos; を押してもこのモードにすることができます。</translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished">ここをクリックすると選択モードになります。選択モードでは個々のノートを選択することができます。また、描画モード中にCtrlを長押しすることで一時的に選択モードを使用することができます。</translation>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
+        <translation type="unfinished">ここをクリックすると選択モードになります。選択モードでは個々のノートを選択することができます。また、描画モード中に%1を長押しすることで一時的に選択モードを使用することができます。</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">選択したノートの切り取り (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation type="unfinished">選択したノートの切り取り (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">選択したノートのコピー (Ctrl+C)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation type="unfinished">選択したノートのコピー (%1+C)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">クリップボードからノートを貼り付け (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation type="unfinished">クリップボードからノートを貼り付け (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -5007,40 +5007,40 @@ Reason: &quot;%2&quot;</source>
         <translation>元に戻す(&amp;U)</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation>Ctrl+Z</translation>
+        <source>%1+Z</source>
+        <translation>%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
         <translation>やり直し(&amp;R)</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation>Ctrl+Y</translation>
+        <source>%1+Y</source>
+        <translation>%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
         <translation>コピー(&amp;C)</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation>Ctrl+C</translation>
+        <source>%1+C</source>
+        <translation>%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
         <translation>切り取り(&amp;t)</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
-        <translation>Ctrl+X</translation>
+        <source>%1+X</source>
+        <translation>%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
         <translation>貼り付け(&amp;P)</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
-        <translation>Ctrl+V</translation>
+        <source>%1+V</source>
+        <translation>%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5051,56 +5051,56 @@ Reason: &quot;%2&quot;</source>
         <translation>太字(&amp;B)</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
+        <source>%1+B</source>
+        <translation>%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
         <translation>斜体(&amp;I)</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <translation>Ctrl+I</translation>
+        <source>%1+I</source>
+        <translation>%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
         <translation>下線(&amp;U)</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation>Ctrl+U</translation>
+        <source>%1+U</source>
+        <translation>%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
         <translation>左揃え(&amp;L)</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
+        <source>%1+L</source>
+        <translation>%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
         <translation>中央揃え(&amp;e)</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
+        <source>%1+E</source>
+        <translation>%1+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
         <translation>右揃え(&amp;R)</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
-        <translation>Ctrl+R</translation>
+        <source>%1+R</source>
+        <translation>%1+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
         <translation>両端揃え(&amp;J)</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
-        <translation>Ctrl+J</translation>
+        <source>%1+J</source>
+        <translation>%1+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
@@ -5334,8 +5334,8 @@ Reason: &quot;%2&quot;</source>
         <translation>貼り付け</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>ミュート/ミュート解除(&lt;Ctrl&gt; + 中ボタンクリック）</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>ミュート/ミュート解除(&lt;%1&gt; + 中ボタンクリック）</translation>
     </message>
     <message>
         <source>Set/clear record</source>
@@ -5938,11 +5938,11 @@ Latency: %2 ms</source>
         <translation>ヒント</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">マグネティック ループポイントを無効化するには&lt;Ctrl&gt;を押してください。</translation>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation type="unfinished">マグネティック ループポイントを無効化するには&lt;%1&gt;を押してください。</translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6018,16 +6018,16 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>ヒント</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation>コピーするには&lt;Ctrl&gt;を押しながらドラッグしてください。</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation>コピーするには&lt;%1&gt;を押しながらドラッグしてください。</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation>現在の長さ</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation>フリーズ解除には&lt;Ctrl&gt;を押してください。</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation>フリーズ解除には&lt;%1&gt;を押してください。</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6050,15 +6050,15 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>貼り付け</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>ミュート/ミュート解除(&lt;Ctrl&gt; + 中ボタンクリック）</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>ミュート/ミュート解除(&lt;%1&gt; + 中ボタンクリック）</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished">新しいドラッグ＆ドロップアクションを開始するには、移動グリップをクリック中に &lt;Ctrl&gt;を押してください。</translation>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="unfinished">新しいドラッグ＆ドロップアクションを開始するには、移動グリップをクリック中に &lt;%1&gt;を押してください。</translation>
     </message>
     <message>
         <source>Actions for this track</source>

@@ -324,14 +324,24 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> to disable magnetic loop points." ),
+					tr( "Press <%1> to disable magnetic loop points." ).arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"),
+						#else
+						"Ctrl"),
+						#endif
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 	else if( m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
+					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"),
+						#else
+						"Ctrl"),
+						#endif
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 
@@ -401,6 +411,3 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
-
-
-

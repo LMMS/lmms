@@ -2429,7 +2429,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
-		
+			
 		if (shift)
 		{
 			// Algorithm:
@@ -3981,8 +3981,13 @@ PianoRollWindow::PianoRollWindow() :
 			"mode you can add, resize and move notes. This "
 			"is the default mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode. In this mode, hold Ctrl to "
-			"temporarily go into select mode." ) );
+			"activate this mode. In this mode, hold %1 to "
+			"temporarily go into select mode." ).arg(
+				#ifdef LMMS_BUILD_APPLE
+				"⌘") );
+				#else
+				"Ctrl") );
+				#endif
 	eraseAction->setWhatsThis(
 		tr( "Click here and erase mode will be activated. In this "
 			"mode you can erase notes. You can also press "
@@ -3990,8 +3995,13 @@ PianoRollWindow::PianoRollWindow() :
 	selectAction->setWhatsThis(
 		tr( "Click here and select mode will be activated. "
 			"In this mode you can select notes. Alternatively, "
-			"you can hold Ctrl in draw mode to temporarily use "
-			"select mode." ) );
+			"you can hold %1 in draw mode to temporarily use "
+			"select mode." ).arg(
+				#ifdef LMMS_BUILD_APPLE
+				"⌘") );
+				#else
+				"Ctrl") );
+				#endif
 	detuneAction->setWhatsThis(
 		tr( "Click here and detune mode will be activated. "
 			"In this mode you can click a note to open its "
@@ -4010,13 +4020,28 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop(tr("Copy paste controls"));
 
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
-							  tr("Cut selected notes (Ctrl+X)"), this);
+							  tr("Cut selected notes (%1+X)").arg(
+									#ifdef LMMS_BUILD_APPLE
+									"⌘"), this);
+									#else
+									"Ctrl"), this);
+									#endif
 
 	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
-							   tr("Copy selected notes (Ctrl+C)"), this);
+							   tr("Copy selected notes (%1+C)").arg(
+	 								#ifdef LMMS_BUILD_APPLE
+	 								"⌘"), this);
+	 								#else
+	 								"Ctrl"), this);
+	 								#endif
 
 	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste notes from clipboard (Ctrl+V)"), this);
+					tr("Paste notes from clipboard (%1+V)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 
 	cutAction->setWhatsThis(
 		tr( "Click here and the selected notes will be cut into the "

@@ -421,15 +421,15 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
+        <source>Cut selected values (%1+X)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
+        <source>Copy selected values (%1+C)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
+        <source>Paste values from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -460,7 +460,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4862,7 +4862,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4870,7 +4870,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4878,15 +4878,15 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
+        <source>Cut selected notes (%1+X)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
+        <source>Copy selected notes (%1+C)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <source>Paste notes from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4987,7 +4987,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
+        <source>%1+Z</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4995,7 +4995,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
+        <source>%1+Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5003,7 +5003,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
+        <source>%1+C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5011,7 +5011,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
+        <source>%1+X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5019,7 +5019,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
+        <source>%1+V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5031,7 +5031,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
+        <source>%1+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5039,7 +5039,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
+        <source>%1+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5047,7 +5047,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
+        <source>%1+U</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5055,7 +5055,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
+        <source>%1+L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5063,7 +5063,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
+        <source>%1+E</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5071,7 +5071,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
+        <source>%1+R</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5079,7 +5079,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
+        <source>%1+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5314,7 +5314,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5916,11 +5916,11 @@ Latency: %2 ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5994,7 +5994,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6002,7 +6002,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <source>Press &lt;%1&gt; for free resizing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6026,14 +6026,14 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
