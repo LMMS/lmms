@@ -45,6 +45,9 @@ AboutDialog::AboutDialog(QWidget* parent) :
 					arg( MACHINE ).
 					arg( QT_VERSION_STR ).
 					arg( GCC_VERSION ) );
+	versionLabel->setTextInteractionFlags(
+					versionLabel->textInteractionFlags() |
+					Qt::TextSelectableByMouse );
 
 	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
 
