@@ -45,6 +45,9 @@ AboutDialog::AboutDialog(QWidget* parent) :
 					arg( MACHINE ).
 					arg( QT_VERSION_STR ).
 					arg( GCC_VERSION ) );
+	versionLabel->setTextInteractionFlags(
+					versionLabel->textInteractionFlags() |
+					Qt::TextSelectableByMouse );
 
 	copyrightLabel->setText( copyrightLabel->text().
 					arg( LMMS_PROJECT_COPYRIGHT ) );
