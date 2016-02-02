@@ -6125,7 +6125,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Com este botão você pode modificar Ajuste bruto do oscilador %1. Você pode descer o tom  do oscilador 24 semitons (2 oitavas) para cima e para baixo. Isto é útil para criar sons com um acorde.</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Use o modulador de fase para modular o oscilador 3 com o oscilador 2</translation>
     </message>
     <message>
@@ -6153,11 +6153,11 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Com este botão você pode ajustar o defasamento estéreo do oscilador %1. O defasador estéreo especifica o tamanho da diferença entre a defasagem entre os canais esquerdo e direito. Isto é muito bom para abrir o som.</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Use o modulador de frequência para modular o oscilador 2 com o oscilador 1</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Use o modulador de fase para modular o oscilador 2 com o oscilador 1</translation>
     </message>
     <message>
@@ -6177,7 +6177,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Ajuste fino direito %1:</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Use o modulador de amplitude para modular o oscilador 2 com o oscilador 1</translation>
     </message>
     <message>
@@ -6193,7 +6193,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Use ruído branco no oscilador atual.</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Use o modulador de frequência para modular o oscilador 3 com o oscilador 2</translation>
     </message>
     <message>
@@ -6225,7 +6225,7 @@ Por favor certifique-se que você tem permissões de leitura para o arquivo e pa
         <translation>Com este botão você pode modificar o ajuste fino do oscilador %1 para o canal direito. O ajuste fino varia entre -100 centésimos e +100 centésimos. Isto é útil para criar sons &apos;gordos&apos;.</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Use o modulador de amplitude para modular o oscilador 3 com o oscilador 2</translation>
     </message>
     <message>

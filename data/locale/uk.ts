@@ -6669,7 +6669,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Точне підстроювання лівого каналу осциллятора %1:</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулювати фазу осциллятора 3 сигналом з 2</translation>
     </message>
     <message>
@@ -6697,11 +6697,11 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Ця ручка встановлює фазове підстроювання осциллятора %1 між каналами, тобто різницю фаз між лівим і правим каналами. Це зручно для створення розширення стереоефектів.</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулювати частоту осциллятора 2 сигналом з 1</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулювати фазу осциллятора 2 сигналом з 1</translation>
     </message>
     <message>
@@ -6721,7 +6721,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Точна підстройка правого канала осциллятора %1:</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулювати амплітуду осциллятора 2 сигналом з 1</translation>
     </message>
     <message>
@@ -6737,7 +6737,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Використовувати білий шум для цього осциллятора.</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулювати частоту осциллятора 3 сигналом з 2</translation>
     </message>
     <message>
@@ -6769,7 +6769,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Ця ручка встановлює точне підстроювання для правого каналу осциллятора %1. Підстроювання задається в діапазоні від -100 сотих до +100 сотих. Це корисно для створення &quot;насичених&quot; звуків.</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулювати амплітуду осциллятора 3 сигналом з 2</translation>
     </message>
     <message>

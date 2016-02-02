@@ -6158,11 +6158,11 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулировать фазу осциллятора 2 сигналом с 1</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулировать амплитуду осциллятора 2 сигналом с первого</translation>
     </message>
     <message>
@@ -6174,15 +6174,15 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Синхронизировать первый осциллятор по второму</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулировать частоту осциллятора 2 сигналом с 1</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулировать фазу осциллятора 3 сигналом с 2</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулировать амплитуду осциллятора 3 сигналом с 2</translation>
     </message>
     <message>
@@ -6194,7 +6194,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Синхронизировать осциллятор 2 и 3</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулировать частоту осциллятора 3 сигналом со 2</translation>
     </message>
     <message>

@@ -6080,11 +6080,11 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6096,15 +6096,15 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6116,7 +6116,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
