@@ -140,6 +140,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
+	setFixedSize( 452, 520 );
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -411,8 +412,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathScroll->move( 0, 30 );
 	pathSelectors->resize( 360, pathsHeight - 50 );
 
-	const int txtLength = 285;
-	const int btnStart = 305;
+	const int txtLength = 284;
+	const int btnStart = 297;
 
 
 	// working-dir
@@ -1526,7 +1527,3 @@ void SetupDialog::displayMIDIHelp()
 					"controls to setup the selected "
 					"MIDI-interface." ) );
 }
-
-
-
-
