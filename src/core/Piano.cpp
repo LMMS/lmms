@@ -44,6 +44,19 @@
 #include "Note.h"
 
 
+/*! The black / white order of keys as they appear on the keyboard.
+ */
+static const Piano::KeyTypes KEY_ORDER[] =
+{
+//	C                CIS              D                DIS
+	Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
+//	E                F                FIS              G
+	Piano::WhiteKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey,
+//	GIS              A                AIS              B
+	Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey
+} ;
+
+
 /*! \brief Create a new keyboard display
  *
  *  \param _it the InstrumentTrack window to attach to
@@ -131,17 +144,7 @@ bool Piano::isBlackKey( int key )
 {
 	int keyCode = key % KeysPerOctave;
 
-	switch (keyCode)
-	{
-	case 1:
-	case 3:
-	case 6:
-	case 8:
-	case 10:
-		return true;
-	}
-
-	return false;
+	return KEY_ORDER[keyCode] == Piano::BlackKey;
 }
 
 
