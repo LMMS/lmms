@@ -37,9 +37,11 @@
  */
 
 #include "Piano.h"
+
 #include "InstrumentTrack.h"
 #include "MidiEvent.h"
 #include "MidiEventProcessor.h"
+#include "Note.h"
 
 
 /*! \brief Create a new keyboard display
@@ -125,6 +127,26 @@ void Piano::handleKeyRelease( int key )
 
 
 
+bool Piano::isBlackKey( int key )
+{
+	int keyCode = key % KeysPerOctave;
+
+	switch (keyCode)
+	{
+	case 1:
+	case 3:
+	case 6:
+	case 8:
+	case 10:
+		return true;
+	}
+
+	return false;
+}
 
 
+bool Piano::isWhiteKey( int key )
+{
+	return !isBlackKey( key );
+}
 

@@ -63,6 +63,9 @@ public:
 		return m_midiEvProc;
 	}
 
+	static bool isWhiteKey(int key);
+	static bool isBlackKey(int key);
+
 
 private:
 	static bool isValidKey( int key )

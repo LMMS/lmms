@@ -45,6 +45,7 @@
 
 
 #include "PianoView.h"
+#include "Piano.h"
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
@@ -58,17 +59,6 @@
 #include "update_event.h"
 
 
-/*! The black / white order of keys as they appear on the keyboard.
- */
-const Piano::KeyTypes KEY_ORDER[] =
-{
-//	C                CIS              D                DIS
-	Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
-//	E                F                FIS              G
-	Piano::WhiteKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey,
-//	GIS              A                B                H
-	Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey
-} ;
 
 
 /*! The scale of C Major - white keys only.
@@ -348,8 +338,7 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 
 	for( int i = 0; i <= key_num; ++i )
 	{
-		if( KEY_ORDER[( m_startKey+i ) % KeysPerOctave] ==
-							Piano::BlackKey )
+		if ( Piano::isBlackKey( m_startKey+i ) )
 		{
 			++key_num;
 		}
@@ -362,17 +351,14 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 	{
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
-		if( key_num > 0 && KEY_ORDER[(key_num-1 ) % KeysPerOctave] ==
-							Piano::BlackKey &&
+		if( key_num > 0 && Piano::isBlackKey( key_num-1 ) &&
 			_p.x() % PW_WHITE_KEY_WIDTH <=
 					( PW_WHITE_KEY_WIDTH / 2 ) -
 						( PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			--key_num;
 		}
-		if( key_num < NumKeys - 1 &&
-			KEY_ORDER[( key_num + 1 ) % KeysPerOctave] ==
-							Piano::BlackKey &&
+		if( key_num < NumKeys - 1 && Piano::isBlackKey( key_num+1 ) &&
 			_p.x() % PW_WHITE_KEY_WIDTH >=
 				( PW_WHITE_KEY_WIDTH -
 				  		PW_BLACK_KEY_WIDTH / 2 ) )
@@ -456,8 +442,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 		{
 			int y_diff = _me->pos().y() - PIANO_BASE;
 			int velocity = (int)( ( float ) y_diff /
-				( ( KEY_ORDER[key_num % KeysPerOctave] ==
-							Piano::WhiteKey ) ?
+				( Piano::isWhiteKey( key_num )  ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
 						(float) m_piano->instrumentTrack()->midiPort()->baseVelocity() );
 			if( y_diff < 0 )
@@ -465,8 +450,7 @@ void PianoView::mousePressEvent( QMouseEvent * _me )
 				velocity = 0;
 			}
 			else if( y_diff >
-				( ( KEY_ORDER[key_num % KeysPerOctave] ==
-							Piano::WhiteKey ) ?
+				( Piano::isWhiteKey( key_num ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 			{
 				velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
@@ -555,7 +539,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 	int key_num = getKeyFromMouse( _me->pos() );
 	int y_diff = _me->pos().y() - PIANO_BASE;
 	int velocity = (int)( (float) y_diff /
-		( ( KEY_ORDER[key_num % KeysPerOctave] == Piano::WhiteKey ) ?
+		( Piano::isWhiteKey( key_num ) ?
 			PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) *
 						(float) m_piano->instrumentTrack()->midiPort()->baseVelocity() );
 	// maybe the user moved the mouse-cursor above or under the
@@ -566,7 +550,7 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
 		velocity = 0;
 	}
 	else if( y_diff >
-		( ( KEY_ORDER[key_num % KeysPerOctave] == Piano::WhiteKey ) ?
+		( Piano::isWhiteKey( key_num ) ?
 				PW_WHITE_KEY_HEIGHT : PW_BLACK_KEY_HEIGHT ) )
 	{
 		velocity = m_piano->instrumentTrack()->midiPort()->baseVelocity();
@@ -751,7 +735,7 @@ int PianoView::getKeyX( int _key_num ) const
 
 	while( k <= _key_num )
 	{
-		if( KEY_ORDER[k % KeysPerOctave] == Piano::WhiteKey )
+		if( Piano::isWhiteKey( k ) )
 		{
 			++white_cnt;
 			if( white_cnt > 1 )
@@ -818,7 +802,7 @@ void PianoView::paintEvent( QPaintEvent * )
 							QPalette::BrightText ) );
 	g.setColorAt( 1, QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
-	if( KEY_ORDER[base_key % KeysPerOctave] == Piano::WhiteKey )
+	if( Piano::isWhiteKey( base_key ) )
 	{
 		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,
 							PIANO_BASE-2 ), g );
@@ -835,7 +819,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	// draw all white keys...
 	for( int x = 0; x < width(); )
 	{
-		while( KEY_ORDER[cur_key%KeysPerOctave] != Piano::WhiteKey )
+		while( Piano::isBlackKey( cur_key ) )
 		{
 			++cur_key;
 		}
@@ -870,8 +854,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	int white_cnt = 0;
 
 	int startKey = m_startKey;
-	if( startKey > 0 &&
-		KEY_ORDER[(Keys)(--startKey) % KeysPerOctave] == Piano::BlackKey )
+	if( startKey > 0 && Piano::isBlackKey( (Keys)(--startKey) ) )
 	{
 		if( m_piano && m_piano->isKeyPressed( startKey ) )
 		{
@@ -886,7 +869,7 @@ void PianoView::paintEvent( QPaintEvent * )
 	// now draw all black keys...
 	for( int x = 0; x < width(); )
 	{
-		if( KEY_ORDER[cur_key%KeysPerOctave] == Piano::BlackKey )
+		if( Piano::isBlackKey( cur_key ) )
 		{
 			// draw pressed or not pressed key, depending on
 			// state of current key
