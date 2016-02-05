@@ -115,6 +115,8 @@ PianoRoll {
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
 	qproperty-barColor: #4afd85;
+	qproperty-noteBorderRadiusX: 5;
+	qproperty-noteBorderRadiusY: 2;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
