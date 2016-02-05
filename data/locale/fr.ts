@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
+<TS version="2.1" language="fr_FR">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -6614,11 +6614,11 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     <name>TripleOscillatorView</name>
     <message>
         <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation>Utiliser la modulation de phase pour moduler l&apos;oscillateur 2 avec l&apos;oscillateur 1</translation>
+        <translation>Utiliser la modulation de phase pour moduler l&apos;oscillateur 1 avec l&apos;oscillateur 2</translation>
     </message>
     <message>
         <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation>Utiliser la modulation d&apos;amplitude pour moduler l&apos;oscillateur 2 avec l&apos;oscillateur 1</translation>
+        <translation>Utiliser la modulation d&apos;amplitude pour moduler l&apos;oscillateur 1 avec l&apos;oscillateur 2</translation>
     </message>
     <message>
         <source>Mix output of oscillator 1 &amp; 2</source>
@@ -6630,15 +6630,15 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation>Utiliser la modulation de fréquence pour moduler l&apos;oscillateur 2 avec l&apos;oscillateur 1</translation>
+        <translation>Utiliser la modulation de fréquence pour moduler l&apos;oscillateur 1 avec l&apos;oscillateur 2</translation>
     </message>
     <message>
         <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation>Utiliser la modulation de phase pour moduler l&apos;oscillateur 3 avec l&apos;oscillateur 2</translation>
+        <translation>Utiliser la modulation de phase pour moduler l&apos;oscillateur 2 avec l&apos;oscillateur 3</translation>
     </message>
     <message>
         <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation>Utiliser la modulation d&apos;amplitude pour moduler l&apos;oscillateur 3 avec l&apos;oscillateur 2</translation>
+        <translation>Utiliser la modulation d&apos;amplitude pour moduler l&apos;oscillateur 2 avec l&apos;oscillateur 3</translation>
     </message>
     <message>
         <source>Mix output of oscillator 2 &amp; 3</source>
@@ -6646,11 +6646,11 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
-        <translation>Synchroniser l&apos;oscillateur 2 avec l&apos;oscillateur 3</translation>
+        <translation type="unfinished">Synchroniser l&apos;oscillateur 2 avec l&apos;oscillateur 3</translation>
     </message>
     <message>
         <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation>Utiliser la modulation de fréquence pour moduler l&apos;oscillateur 3 avec l&apos;oscillateur 2</translation>
+        <translation>Utiliser la modulation de fréquence pour moduler l&apos;oscillateur 2 avec l&apos;oscillateur 3</translation>
     </message>
     <message>
         <source>Osc %1 volume:</source>
