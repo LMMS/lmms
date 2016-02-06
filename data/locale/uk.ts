@@ -2974,7 +2974,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>СВОЯ БАЗОВА ШВИДКІСТЬ</translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation>Визначає базову швидкість нормальізаціі для MiDi інструментів при гучності ноти 100%</translation>
     </message>
     <message>
@@ -5186,7 +5186,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Видалити такти</translation>
     </message>
     <message>
-        <source>use mouse wheel to set volume of a step</source>
+        <source>use mouse wheel to set velocity of a step</source>
         <translation>використовуйте колесо миші для встановлення кроку гучності</translation>
     </message>
 </context>
@@ -5318,7 +5318,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Стереофонія нот</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Гучність нот</translation>
     </message>
     <message>
@@ -5350,7 +5350,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Відкрийте шаблон за допомогою подвійного клацання мишею!</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation>Гучність %1%</translation>
     </message>
     <message>

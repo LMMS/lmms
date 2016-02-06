@@ -2809,7 +2809,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>ПРОИЗВОЛЬНАЯ БАЗОВАЯ СКОРОСТЬ</translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation>Опрделяет базовую скорость нормальизации для MiDi инструментов при громкости ноты 100%</translation>
     </message>
     <message>
@@ -4666,7 +4666,7 @@ PM (ФМ) режим значит фазовая модуляция: Осцил�
     <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation>Чтобы открыть эту мелодию в нотном редакторе, дважды на нём щёлкните
 Используйте колёсико мыши для установки громкости отдельного такта</translation>
     </message>
@@ -4830,7 +4830,7 @@ use mouse wheel to set volume of a step</source>
         <translation>Фиксация нот</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Громкость нот</translation>
     </message>
     <message>
@@ -4862,7 +4862,7 @@ use mouse wheel to set volume of a step</source>
         <translation>Убрать аккорды</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation>Громкость %1%</translation>
     </message>
     <message>

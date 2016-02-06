@@ -214,7 +214,7 @@ PianoRoll::PianoRoll() :
 	m_noteBorderRadiusY( 0 )
 {
 	// gui names of edit modes
-	m_nemStr.push_back( tr( "Note Volume" ) );
+	m_nemStr.push_back( tr( "Note Velocity" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
 
 	QSignalMapper * signalMapper = new QSignalMapper( this );
@@ -490,7 +490,7 @@ void PianoRoll::showVolTextFloat(volume_t vol, const QPoint &pos, int timeout)
 {
 	//! \todo display velocity for MIDI-based instruments
 	// possibly dBV values too? not sure if it makes sense for note volumes...
-	showTextFloat( tr("Volume: %1%").arg( vol ), pos, timeout );
+	showTextFloat( tr("Velocity: %1%").arg( vol ), pos, timeout );
 }
 
 
@@ -3575,7 +3575,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 	{
 		bool ok;
 		int new_val;
-		new_val = QInputDialog::getInt(	this, "Piano roll: note volume",
+		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
 					tr( "Please enter a new value between %1 and %2:" ).
 						arg( MinVolume ).arg( MaxVolume ),
 					(*nv)[0]->getVolume(),

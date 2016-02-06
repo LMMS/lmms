@@ -2795,7 +2795,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>VELOCITY BASE PERSONALIZZATA</translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation>Specifica la normalizzazione della velocity per strumenti MIDI al volume della nota 100%</translation>
     </message>
     <message>
@@ -4636,7 +4636,7 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
     <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation>un doppio click apre questo pattern nel piano-roll
 la rotellina del mouse impostare il volume delle note</translation>
     </message>
@@ -4800,7 +4800,7 @@ la rotellina del mouse impostare il volume delle note</translation>
         <translation>Note lock</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Volume Note</translation>
     </message>
     <message>
@@ -4832,8 +4832,8 @@ la rotellina del mouse impostare il volume delle note</translation>
         <translation>- Accordi</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
-        <translation>Volume: %1%</translation>
+        <source>Velocity: %1%</source>
+        <translation>Velocity: %1%</translation>
     </message>
     <message>
         <source>Panning: %1% left</source>
