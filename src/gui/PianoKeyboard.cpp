@@ -27,7 +27,16 @@
 
 int PianoKeyboard::m_octave = 2;
 int PianoKeyboard::m_scaleNoteIndex = 0;
-QString PianoKeyboard::m_scaleType = "No scale";
+int PianoKeyboard::m_scaleType = 0;
+
+const QString PianoKeyboard::scaleTypes[] =
+{
+	"No scale", "Major", "Harmonic minor", "Melodic minor",
+	"Diminished", "Major bebop", "Dominant bebop", "Arabic",
+	"Enigmatic", "Neopolitan", "Neopolitan minor", "Hungarian minor",
+	"Dorian", "Phrygolydian", "Lydian", "Mixolydian", "Aeolian",
+	"Locrian", "Minor", "Chromatic", "Half-Whole Diminished"
+};
 
 const int PianoKeyboard::majorNotes[] = {0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19};
 const int PianoKeyboard::minorNotes[] = {0, 2, 3, 5, 7, 8, 10, 12, 14, 15, 17, 19};
@@ -179,9 +188,9 @@ int PianoKeyboard::getAppleKey( int key )
 
 int PianoKeyboard::getScaledNoteByIndex( int index )
 {
-	if ( m_scaleType == "Major" ) 		{ return majorNotes[index]; }
-	else if ( m_scaleType == "Minor" ) 	{ return minorNotes[index]; }
-	else if ( m_scaleType == "Lydian" )	{ return lydianNotes[index]; }
+	if ( getScaleName() == "Major" ) 		{ return majorNotes[index]; }
+	else if ( getScaleName() == "Minor" ) 	{ return minorNotes[index]; }
+	else if ( getScaleName() == "Lydian" )	{ return lydianNotes[index]; }
 	return 0;
 }
 

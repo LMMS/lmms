@@ -431,8 +431,6 @@ PianoRoll::PianoRoll() :
 						this, SLOT( updateSemiToneMarkerMenu() ) );
 
 	// Set up scale note model
-	m_noteModel.addItem( tr("C") );
-
 	for( int i = 0; i < 12; ++i )
 	{
 		m_noteModel.addItem( PianoKeyboard::getNoteByNumber(i) );
@@ -444,13 +442,12 @@ PianoRoll::PianoRoll() :
 					this, SLOT( scaleNoteChanged() ) );
 
 	// Set up octave model
-	m_octaveModel.addItem( tr("5") );
 	for( int i = 3; i <= 8; ++i )
 	{
 		m_octaveModel.addItem( QString::number(i) );
 	}
 
-	m_octaveModel.setValue( 0 );
+	m_octaveModel.setValue( 2 );
 	connect( &m_octaveModel, SIGNAL( dataChanged() ),
 					this, SLOT( octaveChanged() ) );
 
@@ -3909,7 +3906,7 @@ void PianoRoll::updateSemiToneMarkerMenu()
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );
 
-	PianoKeyboard::setScaleType( m_scaleModel.currentText() );
+	PianoKeyboard::setScaleType( m_scaleModel.value() );
 }
 
 

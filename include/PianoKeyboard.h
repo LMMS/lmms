@@ -47,22 +47,23 @@ public:
 	static int	getScaleNoteIndex()					{ return m_scaleNoteIndex; }
 	static void	setScaleNote( QString note );
 
-	static QString	getScaleType()					{ return m_scaleType; }
-	static void	setScaleType( QString scale )		{ m_scaleType = scale; }
+	static QString getScaleName()				{ return scaleTypes[m_scaleType]; }
+	static void	setScaleType( int scale )		{ m_scaleType = scale; }
 
-	static bool isThereScale()	{ return (m_scaleType == "No scale") ? false : true; }
+	static bool isThereScale()	{ return (m_scaleType == 0) ? false : true; }
 
 private:
 	static int	m_octave;
 	static int	m_scaleNoteIndex;
-	static QString	m_scaleType;
+	static int	m_scaleType;
+
+	static const QString scaleTypes[];
 
 	static const int majorNotes[];		// W W H W W W H
 	static const int minorNotes[];		// W H W W H W W
 	static const int lydianNotes[];		// W W W H W W H
 
 	static QString m_notes[];
-
 };
 
 #endif
