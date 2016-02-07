@@ -139,27 +139,7 @@ static QString getNoteString( int key )
 	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
 }
 
-static bool isBlackKey( int key )
-{
-	int keyCode = key % KeysPerOctave;
 
-	switch (keyCode)
-	{
-	case 1:
-	case 3:
-	case 6:
-	case 8:
-	case 10:
-		return true;
-	}
-
-	return false;
-}
-
-static bool isWhiteKey( int key )
-{
-	return !isBlackKey( key );
-}
 
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
@@ -2707,7 +2687,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		}
 
-		if ( isWhiteKey( key ) )
+		if ( Piano::isWhiteKey( key ) )
 		{
 			// Draw note names if activated in the preferences, C notes are always drawn
 			if ( key % 12 == 0 || drawNoteNames )

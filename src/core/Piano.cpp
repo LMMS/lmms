@@ -37,9 +37,24 @@
  */
 
 #include "Piano.h"
+
 #include "InstrumentTrack.h"
 #include "MidiEvent.h"
 #include "MidiEventProcessor.h"
+#include "Note.h"
+
+
+/*! The black / white order of keys as they appear on the keyboard.
+ */
+static const Piano::KeyTypes KEY_ORDER[] =
+{
+//	C                CIS              D                DIS
+	Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey,
+//	E                F                FIS              G
+	Piano::WhiteKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey,
+//	GIS              A                AIS              B
+	Piano::BlackKey, Piano::WhiteKey, Piano::BlackKey, Piano::WhiteKey
+} ;
 
 
 /*! \brief Create a new keyboard display
@@ -125,6 +140,16 @@ void Piano::handleKeyRelease( int key )
 
 
 
+bool Piano::isBlackKey( int key )
+{
+	int keyCode = key % KeysPerOctave;
+
+	return KEY_ORDER[keyCode] == Piano::BlackKey;
+}
 
 
+bool Piano::isWhiteKey( int key )
+{
+	return !isBlackKey( key );
+}
 
