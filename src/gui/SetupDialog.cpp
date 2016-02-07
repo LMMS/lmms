@@ -1031,7 +1031,17 @@ void SetupDialog::accept()
 		it.value()->saveSettings();
 	}
 
-	ConfigManager::inst()->saveConfigFile();
+	if (!ConfigManager::inst()->saveConfigFile())
+	{
+		QMessageBox::critical( NULL,
+			tr( "Could not save config-file" ),
+			tr( "Could not save configuration file %1. "
+					"You're probably not permitted to "
+					"write to this file.\n"
+					"Please make sure you have write-"
+					"access to the file and try again." ).
+							arg( ConfigManager::inst()->lmmsRcFile() ) );
+	}
 
 	QDialog::accept();
 	if( m_warnAfterSetup )

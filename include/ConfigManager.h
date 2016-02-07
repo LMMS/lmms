@@ -75,6 +75,11 @@ public:
 		return m_workingDir;
 	}
 
+	const QString & lmmsRcFile() const
+	{
+		return m_lmmsRcFile;
+	}
+
 	QString userProjectsDir() const
 	{
 		return workingDir() + PROJECTS_PATH;
@@ -230,8 +235,27 @@ public:
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);
 
-	void loadConfigFile();
-	void saveConfigFile();
+	struct ConfigLoadResult
+	{
+		ConfigLoadResult() :
+			failuresOccurred(false) {}
+
+		ConfigLoadResult(int _errorLine, int _errorColumn,
+				 QString const & _errorString) :
+			failuresOccurred(true),
+			errorLine(_errorLine),
+			errorColumn(_errorColumn),
+			errorString(_errorString)
+		{}
+
+		bool failuresOccurred;
+		int errorLine;
+		int errorColumn;
+		QString errorString;
+	};
+
+	ConfigLoadResult loadConfigFile();
+	bool saveConfigFile();
 
 
 	void setWorkingDir( const QString & _wd );

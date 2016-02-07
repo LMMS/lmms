@@ -530,7 +530,7 @@ int main( int argc, char * * argv )
 	}
 
 
-	ConfigManager::inst()->loadConfigFile();
+	ConfigManager::ConfigLoadResult configLoadResult = ConfigManager::inst()->loadConfigFile();
 
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
@@ -636,6 +636,15 @@ int main( int argc, char * * argv )
 	else // otherwise, start the GUI
 	{
 		new GuiApplication();
+
+		if (configLoadResult.failuresOccurred)
+		{
+			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
+					      MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
+						arg( configLoadResult.errorLine ).
+						arg( configLoadResult.errorColumn ).
+						arg( configLoadResult.errorString ) );
+		}
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure
