@@ -49,6 +49,7 @@
 #include "ActionGroup.h"
 #include "ConfigManager.h"
 #include "PianoRoll.h"
+#include "PianoKeyboard.h"
 #include "BBTrackContainer.h"
 #include "Clipboard.h"
 #include "ComboBox.h"
@@ -430,6 +431,28 @@ PianoRoll::PianoRoll() :
 	// change can update m_semiToneMarkerMenu
 	connect( &m_scaleModel, SIGNAL( dataChanged() ),
 						this, SLOT( updateSemiToneMarkerMenu() ) );
+
+	// Set up scale note model
+	for( int i = 0; i < 12; ++i )
+	{
+		m_noteModel.addItem( PianoKeyboard::getNoteByNumber(i) );
+	}
+
+	m_noteModel.setValue( 0 );
+
+	connect( &m_noteModel, SIGNAL( dataChanged() ),
+					this, SLOT( scaleNoteChanged() ) );
+
+	// Set up octave model
+	for( int i = 3; i <= 8; ++i )
+	{
+		m_octaveModel.addItem( QString::number(i) );
+	}
+
+	m_octaveModel.setValue( 2 );
+	connect( &m_octaveModel, SIGNAL( dataChanged() ),
+					this, SLOT( octaveChanged() ) );
+
 
 	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
@@ -3830,6 +3853,16 @@ void PianoRoll::updatePositionAccompany( const MidiTime & t )
 
 
 
+void PianoRoll::scaleNoteChanged()
+{
+	PianoKeyboard::setScaleNote( m_noteModel.currentText() );
+	update();
+}
+void PianoRoll::octaveChanged()
+{
+	PianoKeyboard::setOctaveNumber( m_octaveModel.currentText().toInt() );
+	update();
+}
 
 void PianoRoll::zoomingChanged()
 {
@@ -3883,6 +3916,8 @@ void PianoRoll::updateSemiToneMarkerMenu()
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );
+
+	PianoKeyboard::setScaleType( m_scaleModel.value() );
 }
 
 
@@ -4126,6 +4161,16 @@ PianoRollWindow::PianoRollWindow() :
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
 	m_scaleComboBox->setFixedSize( 105, 22 );
 
+	// setup scale-note-stuff
+	m_noteComboBox = new ComboBox( m_toolBar );
+	m_noteComboBox->setModel( &m_editor->m_noteModel );
+	m_noteComboBox->setFixedSize( 42, 22 );
+
+	// setup octave-stuff
+	m_octaveComboBox = new ComboBox( m_toolBar );
+	m_octaveComboBox->setModel( &m_editor->m_octaveModel );
+	m_octaveComboBox->setFixedSize( 36, 22 );
+
 	// setup chord-stuff
 	QLabel * chord_lbl = new QLabel( m_toolBar );
 	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
@@ -4149,6 +4194,12 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( scale_lbl );
 	zoomAndNotesToolBar->addWidget( m_scaleComboBox );
+
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( m_noteComboBox );
+
+	zoomAndNotesToolBar->addSeparator();
+	zoomAndNotesToolBar->addWidget( m_octaveComboBox );
 
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( chord_lbl );
@@ -4191,6 +4242,25 @@ PianoRollWindow::PianoRollWindow() :
 					"and in the key you have selected!"
 					) );
 
+	m_noteComboBox->setWhatsThis(
+				tr(
+					"Let you select a note for scale."
+					"After you have chosen the scale type you want "
+					"in scale drop-down menu, "
+					"you can select a note for scale, "
+					"that will remap pc keyboard according to selected note."
+					"Q key will map to selected note and octave."
+					) );
+
+	m_octaveComboBox->setWhatsThis(
+				tr(
+					"Let you select a octave for scale."
+					"After you have chosen the scale type you want "
+					"in scale drop-down menu, "
+					"you can select a octave for scale, "
+					"that will remap pc keyboard according to selected octave."
+					"Q key will map to selected note and octave."
+					) );
 
 	m_chordComboBox->setWhatsThis(
 				tr(

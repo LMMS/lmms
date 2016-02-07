@@ -45,6 +45,7 @@
 
 
 #include "PianoView.h"
+#include "PianoKeyboard.h"
 #include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
@@ -175,6 +176,12 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 #endif
 
 #ifdef LMMS_BUILD_WIN32
+
+	if ( PianoKeyboard::isThereScale() )
+	{
+		return PianoKeyboard::getWindowsKey( k );
+	}
+
 	switch( k )
 	{
 		case 44: return 0; // Z  = C
@@ -218,6 +225,12 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 	}
 #endif
 #ifdef LMMS_BUILD_LINUX
+
+	if ( PianoKeyboard::isThereScale() )
+	{
+		return PianoKeyboard::getLinuxKey( k );
+	}
+
 	switch( k )
 	{
 		case 52: return 0; // Z  = C
@@ -260,6 +273,12 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 	}
 #endif
 #ifdef LMMS_BUILD_APPLE
+
+	if ( PianoKeyboard::isThereScale() )
+	{
+		return PianoKeyboard::getAppleKey( k );
+	}
+
 	switch( k )
 	{
 		case 6: return 0; // Z  = C

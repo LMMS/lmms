@@ -164,6 +164,8 @@ protected slots:
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
 
+	void octaveChanged();
+	void scaleNoteChanged();
 	void zoomingChanged();
 	void quantizeChanged();
 
@@ -274,6 +276,8 @@ private:
 	ComboBoxModel m_quantizeModel;
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
+	ComboBoxModel m_noteModel;
+	ComboBoxModel m_octaveModel;
 	ComboBoxModel m_chordModel;
 
 
@@ -411,6 +415,8 @@ private:
 	ComboBox * m_quantizeComboBox;
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
+	ComboBox * m_noteComboBox;
+	ComboBox * m_octaveComboBox;
 	ComboBox * m_chordComboBox;
 
 };

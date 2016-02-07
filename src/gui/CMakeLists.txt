@@ -24,6 +24,7 @@ SET(LMMS_SRCS
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
+	gui/PianoKeyboard.cpp
 	gui/PluginBrowser.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
