@@ -770,33 +770,32 @@ int main( int argc, char * * argv )
 		}
 		else
 		{
-
-		// If enabled, open last project if there is one. Else, create
-		// a new one. Also skip recently opened file if limited session to
-		// lower the chance of opening an already opened file.
-		if( ConfigManager::inst()->
-				value( "app", "openlastproject" ).toInt() &&
-			!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() &&
-			gui->mainWindow()->getSession()
-					!= MainWindow::SessionState::Limited )
-		{
-			QString f = ConfigManager::inst()->
-						recentlyOpenedProjects().first();
-			QFileInfo recentFile( f );
-
-			if ( recentFile.exists() )
+			// If enabled, open last project if there is one. Else, create
+			// a new one. Also skip recently opened file if limited session to
+			// lower the chance of opening an already opened file.
+			if( ConfigManager::inst()->
+					value( "app", "openlastproject" ).toInt() &&
+				!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() &&
+				gui->mainWindow()->getSession()
+						!= MainWindow::SessionState::Limited )
 			{
-				Engine::getSong()->loadProject( f );
+				QString f = ConfigManager::inst()->
+							recentlyOpenedProjects().first();
+				QFileInfo recentFile( f );
+
+				if ( recentFile.exists() )
+				{
+					Engine::getSong()->loadProject( f );
+				}
+				else
+				{
+					Engine::getSong()->createNewProject();
+				}
 			}
 			else
 			{
 				Engine::getSong()->createNewProject();
 			}
-		}
-		else
-		{
-		Engine::getSong()->createNewProject();
-		}
 
 			// [Settel] workaround: showMaximized() doesn't work with
 			// FVWM2 unless the window is already visible -> show() first
@@ -806,6 +805,7 @@ int main( int argc, char * * argv )
 				gui->mainWindow()->showMaximized();
 			}
 		}
+
 		// Finally we start the auto save timer and also trigger the
 		// autosave one time as recover.mmp is a signal to possible other
 		// instances of LMMS.
