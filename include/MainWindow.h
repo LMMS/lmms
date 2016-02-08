@@ -83,10 +83,8 @@ public:
 	bool mayChangeProject(bool stopPlayback);
 
 	// Auto save timer intervals
-	const static int m_autoSaveLongSeconds = 120;
-	const static int m_autoSaveShortSeconds = 10;
-	const static int m_autoSaveLongTime = m_autoSaveLongSeconds * 1000;
-	const static int m_autoSaveShortTime = m_autoSaveShortSeconds * 1000;
+	const static int m_autoSaveLongTime = 120 * 1000;
+	const static int m_autoSaveShortTime = 10 * 1000; // 10s short loop
 
 	void autoSaveTimerReset( int msec = m_autoSaveLongTime )
 	{
@@ -96,7 +94,7 @@ public:
 
 	int getAutoSaveTimerInterval()
 	{
-		return m_autoSaveTimer.interval() / 1000;
+		return m_autoSaveTimer.interval();
 	}
 
 	enum SessionState
