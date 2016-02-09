@@ -336,7 +336,7 @@ class MonstroInstrument : public Instrument
 		name .addItem( tr( "Random smooth" ), static_cast<PixmapLoader*>( new PluginPixmapLoader( "rand" ) ) );
 
 public:
-	MonstroInstrument( InstrumentTrack * _instrument_track );
+	MonstroInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~MonstroInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

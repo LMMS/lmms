@@ -40,7 +40,8 @@
 
 PluginFactory* PluginFactory::s_instance = nullptr;
 
-PluginFactory::PluginFactory()
+PluginFactory::PluginFactory() :
+	m_engine(nullptr)
 {
 	// Adds a search path relative to the main executable to if the path exists.
 	auto addRelativeIfExists = [this] (const QString& path) {

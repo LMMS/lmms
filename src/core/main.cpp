@@ -72,6 +72,7 @@
 #include "DataFile.h"
 #include "Song.h"
 #include "SetupDialog.h"
+#include "PluginFactory.h"
 
 static inline QString baseName( const QString & file )
 {
@@ -529,7 +530,7 @@ int main( int argc, char * * argv )
 	}
 
 
-	ConfigManager::inst()->loadConfigFile();
+	ConfigManager::ConfigLoadResult configLoadResult = ConfigManager::inst()->loadConfigFile();
 
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
@@ -578,7 +579,12 @@ int main( int argc, char * * argv )
 	// without starting the GUI
 	if( !renderOut.isEmpty() )
 	{
+		// Initialize the engine
 		Engine::init( true );
+
+		// Initialize the plugin factory with the engine so that
+		// plugins can later be injected with the Engine
+		PluginFactory::instance()->setEngine(Engine::inst());
 
 		QFileInfo fileInfo( fileToLoad );
 		if ( !fileInfo.exists() )
@@ -630,6 +636,15 @@ int main( int argc, char * * argv )
 	else // otherwise, start the GUI
 	{
 		new GuiApplication();
+
+		if (configLoadResult.failuresOccurred)
+		{
+			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
+					      MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
+						arg( configLoadResult.errorLine ).
+						arg( configLoadResult.errorColumn ).
+						arg( configLoadResult.errorString ) );
+		}
 
 		// re-intialize RNG - shared libraries might have srand() or
 		// srandom() calls in their init procedure

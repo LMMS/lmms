@@ -25,14 +25,11 @@
 #include <QDomElement>
 #include <QDir>
 #include <QFile>
-#include <QMessageBox>
-#include <QApplication>
 #include <QtCore/QTextStream>
+#include <QtCore/QCoreApplication>
 
 #include "ConfigManager.h"
-#include "MainWindow.h"
 #include "ProjectVersion.h"
-#include "GuiApplication.h"
 
 
 static inline QString ensureTrailingSlash( const QString & _s )
@@ -330,7 +327,7 @@ void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
 }
 
 
-void ConfigManager::loadConfigFile()
+ConfigManager::ConfigLoadResult ConfigManager::loadConfigFile()
 {
 	// read the XML file and create DOM tree
 	QFile cfg_file( m_lmmsRcFile );
@@ -418,13 +415,9 @@ void ConfigManager::loadConfigFile()
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
-		else if( gui )
+		else
 		{
-			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
-									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
-													arg( errorLine ).
-													arg( errorCol ).
-													arg( errorString ) );
+			return ConfigLoadResult(errorLine, errorCol, errorString);
 		}
 		cfg_file.close();
 	}
@@ -478,12 +471,14 @@ void ConfigManager::loadConfigFile()
 	}
 
 	upgrade();
+
+	return ConfigLoadResult();
 }
 
 
 
 
-void ConfigManager::saveConfigFile()
+bool ConfigManager::saveConfigFile()
 {
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
@@ -534,19 +529,13 @@ void ConfigManager::saveConfigFile()
 	QFile outfile( m_lmmsRcFile );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			MainWindow::tr( "Could not save config-file" ),
-			MainWindow::tr( "Could not save configuration file %1. "
-					"You're probably not permitted to "
-					"write to this file.\n"
-					"Please make sure you have write-"
-					"access to the file and try again." ).
-							arg( m_lmmsRcFile  ) );
-		return;
+		return false;
 	}
 
 	outfile.write( xml.toUtf8() );
 	outfile.close();
+
+	return true;
 }
 
 

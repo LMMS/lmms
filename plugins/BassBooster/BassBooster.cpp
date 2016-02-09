@@ -47,8 +47,8 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 
 
 
-BassBoosterEffect::BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &bassbooster_plugin_descriptor, parent, key ),
+BassBoosterEffect::BassBoosterEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key ) :
+	Effect( &bassbooster_plugin_descriptor, parent, engine, key ),
 	m_frequencyChangeNeeded( false ),
 	m_bbFX( DspEffectLibrary::FastBassBoost( 70.0f, 1.0f, 2.8f ) ),
 	m_bbControls( this )
@@ -132,7 +132,7 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 
 inline void BassBoosterEffect::changeFrequency()
 {
-	const sample_t fac = Engine::mixer()->processingSampleRate() / 44100.0f;
+	const sample_t fac = getProcessingSampleRate() / 44100.0f;
 
 	m_bbFX.leftFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
 	m_bbFX.rightFX().setFrequency( m_bbControls.m_freqModel.value() * fac );
@@ -163,9 +163,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new BassBoosterEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new BassBoosterEffect( parent, engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

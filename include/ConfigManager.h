@@ -75,6 +75,11 @@ public:
 		return m_workingDir;
 	}
 
+	const QString & lmmsRcFile() const
+	{
+		return m_lmmsRcFile;
+	}
+
 	QString userProjectsDir() const
 	{
 		return workingDir() + PROJECTS_PATH;
@@ -230,8 +235,57 @@ public:
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);
 
-	void loadConfigFile();
-	void saveConfigFile();
+	/**
+	 * @brief Structure used to describe the result of the configuration's
+	 * loading process.
+	 *
+	 * In case a failure has occurred the member failuresOccurred is set to
+	 * <tt>true</tt> otherwise it is set to <tt>false</tt>. The other
+	 * members hold the line and column where the error occurred together
+	 * with an error message that can be used by clients to report the
+	 * problem.
+	 */
+	struct ConfigLoadResult
+	{
+		ConfigLoadResult() :
+			failuresOccurred(false) {}
+
+		ConfigLoadResult(int _errorLine, int _errorColumn,
+				 QString const & _errorString) :
+			failuresOccurred(true),
+			errorLine(_errorLine),
+			errorColumn(_errorColumn),
+			errorString(_errorString)
+		{}
+
+		bool failuresOccurred;
+		int errorLine;
+		int errorColumn;
+		QString errorString;
+	};
+
+	/**
+	 * @brief Loads the configuration from the file that's returned by
+	 *        lmmsRcFile().
+	 *
+	 * The result of the loading is returned in an instance of the struct
+	 * ConfigLoadResult.
+	 *
+	 * @return Result of the loading.
+	 */
+	ConfigLoadResult loadConfigFile();
+
+	/**
+	 * @brief Saves the configuration into the file that's returned by
+	 *        lmmsRcFile().
+	 *
+	 * In case the saving succeeds <tt>true</tt> is returned. In case of an
+	 * error <tt>false</tt> is returned.
+	 *
+	 * @return A boolean that indicates whether the saving has succeeded
+	 * (<tt>true</tt>) or not (<tt>false</tt>).
+	 */
+	bool saveConfigFile();
 
 
 	void setWorkingDir( const QString & _wd );

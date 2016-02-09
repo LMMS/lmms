@@ -74,6 +74,9 @@ public:
 	/// It can be retrieved by calling this function.
 	QString errorString(QString pluginName) const;
 
+	Engine * getEngine() const { return m_engine; }
+	void setEngine(Engine * engine) { m_engine = engine; }
+
 public slots:
 	void discoverPlugins();
 
@@ -83,6 +86,8 @@ private:
 	QMap<QString, PluginInfo*> m_pluginByExt;
 
 	QHash<QString, QString> m_errors;
+
+	Engine * m_engine;
 
 	static PluginFactory* s_instance;
 };

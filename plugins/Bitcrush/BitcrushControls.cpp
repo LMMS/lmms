@@ -47,7 +47,7 @@ BitcrushControls::BitcrushControls( BitcrushEffect * eff ) :
 	m_rate.setStrictStepSize( true );
 	m_levels.setStrictStepSize( true );
 	
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	connect( m_effect->getMixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 }
 
 BitcrushControls::~BitcrushControls()

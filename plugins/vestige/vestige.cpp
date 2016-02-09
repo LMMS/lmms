@@ -73,8 +73,8 @@ QPixmap * VestigeInstrumentView::s_artwork = NULL;
 QPixmap * manageVestigeInstrumentView::s_artwork = NULL;
 
 
-vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &vestige_plugin_descriptor ),
+vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+    Instrument( _instrument_track, &vestige_plugin_descriptor, engine ),
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_subWindow( NULL ),
@@ -84,7 +84,7 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 {
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
+	getMixer()->addPlayHandle( iph );
 }
 
 
@@ -102,7 +102,7 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	getMixer()->removePlayHandles( instrumentTrack() );
 	closePlugin();
 }
 
@@ -257,7 +257,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 
 	m_pluginMutex.lock();
-	m_plugin = new VstPlugin( m_pluginDLL );
+	m_plugin = new VstPlugin( m_pluginDLL, getEngine() );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -295,7 +295,7 @@ void vestigeInstrument::play( sampleFrame * _buf )
 
 	m_plugin->process( NULL, _buf );
 
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = getMixer()->framesPerPeriod();
 
 	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
@@ -640,7 +640,7 @@ void VestigeInstrumentView::openPlugin()
 		{
 			return;
 		}
-		Engine::mixer()->lock();
+		model()->getMixer()->lock();
 
 		if (m_vi->p_subWindow != NULL) {
 			delete m_vi->p_subWindow;
@@ -648,7 +648,7 @@ void VestigeInstrumentView::openPlugin()
 		}
 
 		m_vi->loadFile( ofd.selectedFiles()[0] );
-		Engine::mixer()->unlock();
+		model()->getMixer()->unlock();
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
@@ -1149,9 +1149,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
+    return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 

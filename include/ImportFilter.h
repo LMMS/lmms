@@ -38,7 +38,7 @@ class EXPORT ImportFilter : public Plugin
 {
 public:
 	ImportFilter( const QString & _file_name,
-					const Descriptor * _descriptor );
+					const Descriptor * _descriptor, Engine * engine );
 	virtual ~ImportFilter();
 
 

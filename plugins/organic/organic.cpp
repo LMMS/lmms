@@ -75,8 +75,8 @@ float * organicInstrument::s_harmonics = NULL;
 ***********************************************************************/
 
 
-organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &organic_plugin_descriptor ),
+organicInstrument::organicInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &organic_plugin_descriptor, engine ),
 	m_modulationAlgo( Oscillator::SignalMix, Oscillator::SignalMix, Oscillator::SignalMix),
 	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
 	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
@@ -86,7 +86,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	m_osc = new OscillatorObject*[ m_numOscillators ];
 	for (int i=0; i < m_numOscillators; i++)
 	{
-		m_osc[i] = new OscillatorObject( this, i );
+		m_osc[i] = new OscillatorObject( this, i, engine );
 		m_osc[i]->m_numOscillators = m_numOscillators;
 
 		// Connect events 
@@ -143,7 +143,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	}
 	
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( getMixer(), SIGNAL( sampleRateChanged() ),
 					this, SLOT( updateAllDetuning() ) );	
 }
 
@@ -567,8 +567,9 @@ void organicInstrumentView::updateKnobHint()
 
 
 
-OscillatorObject::OscillatorObject( Model * _parent, int _index ) :
+OscillatorObject::OscillatorObject( Model * _parent, int _index, Engine * engine ) :
 	Model( _parent ),
+	EngineClient( engine ),
 	m_waveShape( Oscillator::SineWave, 0, Oscillator::NumWaveShapes-1, this ),
 	m_oscModel( 0.0f, 0.0f, 5.0f, 1.0f,
 			this, tr( "Osc %1 waveform" ).arg( _index + 1 ) ),
@@ -628,10 +629,10 @@ void OscillatorObject::updateDetuning()
 {
 	m_detuningLeft = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				+ (float)m_detuneModel.value() * CENT ) /
-				Engine::mixer()->processingSampleRate();
+				getEngine()->mixer()->processingSampleRate();
 	m_detuningRight = powf( 2.0f, organicInstrument::s_harmonics[ static_cast<int>( m_harmModel.value() ) ]
 				- (float)m_detuneModel.value() * CENT ) /
-				Engine::mixer()->processingSampleRate();
+				getEngine()->mixer()->processingSampleRate();
 }
 
 
@@ -641,9 +642,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return( new organicInstrument( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new organicInstrument( static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 

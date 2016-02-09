@@ -321,8 +321,8 @@ bool SfxrSynth::isPlaying() const
 
 
 
-sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &sfxr_plugin_descriptor ),
+sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &sfxr_plugin_descriptor, engine ),
 	m_attModel(0.0f, this, "Attack Time"),
 	m_holdModel(0.3f, this, "Sustain Time"),
 	m_susModel(0.0f, this, "Sustain Punch"),
@@ -452,7 +452,7 @@ QString sfxrInstrument::nodeName() const
 
 void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 {
-	float currentSampleRate = Engine::mixer()->processingSampleRate();
+	float currentSampleRate = getProcessingSampleRate();
 
     fpp_t frameNum = _n->framesLeftForCurrentPeriod();
     const f_cnt_t offset = _n->noteOffset();
@@ -1117,9 +1117,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model*, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model*, Engine * engine, void* data )
 {
-	return new sfxrInstrument( static_cast<InstrumentTrack *>( data ) );
+	return new sfxrInstrument( static_cast<InstrumentTrack *>( data ), engine );
 }
 
 

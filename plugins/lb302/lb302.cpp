@@ -105,19 +105,19 @@ lb302Filter::lb302Filter(lb302FilterKnobState* p_fs) :
 };
 
 
-void lb302Filter::recalc()
+void lb302Filter::recalc( sample_rate_t processingSampleRate )
 {
 	vcf_e1 = exp(6.109 + 1.5876*(fs->envmod) + 2.1553*(fs->cutoff) - 1.2*(1.0-(fs->reso)));
 	vcf_e0 = exp(5.613 - 0.8*(fs->envmod) + 2.1553*(fs->cutoff) - 0.7696*(1.0-(fs->reso)));
-	vcf_e0*=M_PI/Engine::mixer()->processingSampleRate();
-	vcf_e1*=M_PI/Engine::mixer()->processingSampleRate();
+	vcf_e0 *= M_PI / processingSampleRate;
+	vcf_e1 *= M_PI / processingSampleRate;
 	vcf_e1 -= vcf_e0;
 
 	vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso));
 };
 
 
-void lb302Filter::envRecalc()
+void lb302Filter::envRecalc( sample_rate_t processingSampleRate )
 {
 	vcf_c0 *= fs->envdecay;       // Filter Decay. vcf_decay is adjusted for Hz and ENVINC
 	// vcf_rescoeff = exp(-1.20 + 3.455*(fs->reso)); moved above
@@ -154,19 +154,19 @@ lb302FilterIIR2::~lb302FilterIIR2()
 }
 
 
-void lb302FilterIIR2::recalc()
+void lb302FilterIIR2::recalc( sample_rate_t processingSampleRate )
 {
-	lb302Filter::recalc();
+	lb302Filter::recalc( processingSampleRate );
 	//m_dist->setThreshold(0.5+(fs->dist*2.0));
 	m_dist->setThreshold(fs->dist*75.0);
 };
 
 
-void lb302FilterIIR2::envRecalc()
+void lb302FilterIIR2::envRecalc( sample_rate_t processingSampleRate )
 {
 	float k, w;
 
-	lb302Filter::envRecalc();
+	lb302Filter::envRecalc( processingSampleRate );
 
 	w = vcf_e0 + vcf_c0;          // e0 is adjusted for Hz and doesn't need ENVINC
 	k = exp(-w/vcf_rescoeff);     // Does this mean c0 is inheritantly?
@@ -206,7 +206,7 @@ lb302Filter3Pole::lb302Filter3Pole(lb302FilterKnobState *p_fs) :
 };
 
 
-void lb302Filter3Pole::recalc()
+void lb302Filter3Pole::recalc( sample_rate_t processingSampleRate )
 {
 	// DO NOT CALL BASE CLASS
 	vcf_e0 = 0.000001;
@@ -215,25 +215,25 @@ void lb302Filter3Pole::recalc()
 
 
 // TODO: Try using k instead of vcf_reso
-void lb302Filter3Pole::envRecalc()
+void lb302Filter3Pole::envRecalc( sample_rate_t processingSampleRate )
 {
 	float w,k;
 	float kfco;
 
-	lb302Filter::envRecalc();
+	lb302Filter::envRecalc( processingSampleRate );
 
 	// e0 is adjusted for Hz and doesn't need ENVINC
 	w = vcf_e0 + vcf_c0;
 	k = (fs->cutoff > 0.975)?0.975:fs->cutoff;
 	kfco = 50.f + (k)*((2300.f-1600.f*(fs->envmod))+(w) *
-	                   (700.f+1500.f*(k)+(1500.f+(k)*(Engine::mixer()->processingSampleRate()/2.f-6000.f)) *
+			   (700.f+1500.f*(k)+(1500.f+(k)*(processingSampleRate/2.f-6000.f)) *
 	                   (fs->envmod)) );
 	//+iacc*(.3+.7*kfco*kenvmod)*kaccent*kaccurve*2000
 
 
 #ifdef LB_24_IGNORE_ENVELOPE
 	// kfcn = fs->cutoff;
-	kfcn = 2.0 * kfco / Engine::mixer()->processingSampleRate();
+	kfcn = 2.0 * kfco / processingSampleRate;
 #else
 	kfcn = w;
 #endif
@@ -268,8 +268,8 @@ float lb302Filter3Pole::process(const float& samp)
 // LBSynth
 //
 
-lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &lb302_plugin_descriptor ),
+lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack, Engine * engine ) :
+	Instrument( _instrumentTrack, &lb302_plugin_descriptor, engine ),
 	vcf_cut_knob( 0.75f, 0.0f, 1.5f, 0.005f, this, tr( "VCF Cutoff Frequency" ) ),
 	vcf_res_knob( 0.75f, 0.0f, 1.25f, 0.005f, this, tr( "VCF Resonance" ) ),
 	vcf_mod_knob( 0.1f, 0.0f, 1.0f, 0.005f, this, tr( "VCF Envelope Mod" ) ),
@@ -284,7 +284,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 {
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged( ) ),
+	connect( getMixer(), SIGNAL( sampleRateChanged( ) ),
 	         this, SLOT ( filterChanged( ) ) );
 
 	connect( &vcf_cut_knob, SIGNAL( dataChanged( ) ),
@@ -354,7 +354,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	filterChanged();
 
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrumentTrack );
-	Engine::mixer()->addPlayHandle( iph );
+	getMixer()->addPlayHandle( iph );
 }
 
 
@@ -413,7 +413,7 @@ void lb302Synth::filterChanged()
 
 	float d = 0.2 + (2.3*vcf_dec_knob.value());
 
-	d *= Engine::mixer()->processingSampleRate();                                // d *= smpl rate
+	d *= getProcessingSampleRate();                      // d *= smpl rate
 	fs.envdecay = pow(0.1, 1.0/d * ENVINC);    // decay is 0.1 to the 1/d * ENVINC
 	                                           // vcf_envdecay is now adjusted for both
 	                                           // sampling rate and ENVINC
@@ -440,9 +440,9 @@ QString lb302Synth::nodeName() const
 void lb302Synth::recalcFilter()
 {
 #if QT_VERSION >= 0x050000
-	vcf.load()->recalc();
+	vcf.load()->recalc( getProcessingSampleRate() );
 #else
-	vcf->recalc();
+	vcf->recalc( getProcessingSampleRate() );
 #endif
 
 	// THIS IS OLD 3pole/24dB code, I may reintegrate it.  Don't need it
@@ -458,13 +458,13 @@ void lb302Synth::recalcFilter()
 	vcf_envpos = ENVINC; // Trigger filter update in process()
 }
 
-inline float GET_INC(float freq) {
-	return freq/Engine::mixer()->processingSampleRate();  // TODO: Use actual sampling rate.
+inline float GET_INC(float freq, sample_rate_t sampleRate) {
+	return freq / sampleRate;  // TODO: Use actual sampling rate.
 }
 
 int lb302Synth::process(sampleFrame *outbuf, const int size)
 {
-	const float sampleRatio = 44100.f / Engine::mixer()->processingSampleRate();
+	const float sampleRatio = 44100.f / getProcessingSampleRate();
 	float w;
 	float samp;
 
@@ -484,7 +484,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	{
 		//printf("  playing new note..\n");
 		lb302Note note;
-		note.vco_inc = GET_INC( true_freq );
+		note.vco_inc = GET_INC( true_freq, getProcessingSampleRate() );
 		note.dead = deadToggle.value();
 		initNote(&note);
 
@@ -506,7 +506,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 
 		// update vcf
 		if(vcf_envpos >= ENVINC) {
-			filter->envRecalc();
+			filter->envRecalc( getProcessingSampleRate() );
 
 			vcf_envpos = 0;
 
@@ -643,7 +643,7 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 		// Handle Envelope
 		if(vca_mode==0) {
 			vca_a+=(vca_a0-vca_a)*vca_attack;
-			if(sample_cnt>=0.5*Engine::mixer()->processingSampleRate())
+			if(sample_cnt>=0.5*getProcessingSampleRate())
 				vca_mode = 2;
 		}
 		else if(vca_mode == 1) {
@@ -766,7 +766,7 @@ void lb302Synth::processNote( NotePlayHandle * _n )
 			m_playingNote = _n;
 			if ( slideToggle.value() ) 
 			{
-				vco_slideinc = GET_INC( _n->frequency() );
+				vco_slideinc = GET_INC( _n->frequency(), getProcessingSampleRate() );
 			}
 		}
 
@@ -776,10 +776,10 @@ void lb302Synth::processNote( NotePlayHandle * _n )
 			true_freq = _n->frequency();
 
 			if( slideToggle.value() ) {
-				vco_slidebase = GET_INC( true_freq );			// The REAL frequency
+				vco_slidebase = GET_INC( true_freq, getProcessingSampleRate() );			// The REAL frequency
 			}
 			else {
-				vco_inc = GET_INC( true_freq );
+				vco_inc = GET_INC( true_freq, getProcessingSampleRate() );
 			}
 		}
 }
@@ -795,7 +795,7 @@ void lb302Synth::play( sampleFrame * _working_buffer )
 	};
 	m_notesMutex.unlock();
 	
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+	const fpp_t frames = getFramesPerPeriod();
 
 	process( _working_buffer, frames );
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
@@ -1046,11 +1046,11 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
 
 	return( new lb302Synth(
-	        static_cast<InstrumentTrack *>( _data ) ) );
+		static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 

@@ -32,7 +32,7 @@
 class stereoMatrixEffect : public Effect
 {
 public:
-	stereoMatrixEffect( Model * parent, 
+	stereoMatrixEffect( Model * parent, Engine * engine,
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~stereoMatrixEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,

@@ -39,6 +39,7 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
+#include "PluginFactory.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -99,11 +100,13 @@ GuiApplication::GuiApplication()
 	splashScreen.update();
 	qApp->processEvents();
 
-	connect(Engine::inst(), SIGNAL(initProgress(const QString&)), 
-		this, SLOT(displayInitProgress(const QString&)));
-
 	// Init central engine which handles all components of LMMS
 	Engine::init(false);
+	Engine * engine = Engine::inst();
+	connect(engine, SIGNAL(initProgress(const QString&)),
+		this, SLOT(displayInitProgress(const QString&)));
+
+	PluginFactory::instance()->setEngine(engine);
 
 	s_instance = this;
 
@@ -135,11 +138,11 @@ GuiApplication::GuiApplication()
 	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing piano roll"));
-	m_pianoRoll = new PianoRollWindow();
+	m_pianoRoll = new PianoRollWindow( engine );
 	connect(m_pianoRoll, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	displayInitProgress(tr("Preparing automation editor"));
-	m_automationEditor = new AutomationEditorWindow;
+	m_automationEditor = new AutomationEditorWindow( engine );
 	connect(m_automationEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
 	m_mainWindow->finalize();

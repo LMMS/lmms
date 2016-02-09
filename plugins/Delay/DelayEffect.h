@@ -34,7 +34,7 @@
 class DelayEffect : public Effect
 {
 public:
-	DelayEffect(Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	DelayEffect(Model* parent , Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~DelayEffect();
 	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
 	virtual EffectControls* controls()

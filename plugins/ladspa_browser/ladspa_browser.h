@@ -58,7 +58,7 @@ private:
 class ladspaBrowser : public ToolPlugin
 {
 public:
-	ladspaBrowser();
+	ladspaBrowser(Engine * engine);
 	virtual ~ladspaBrowser();
 
 	virtual PluginView * instantiateView( QWidget * )

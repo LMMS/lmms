@@ -52,9 +52,9 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 }
 
 
-VstEffect::VstEffect( Model * _parent,
+VstEffect::VstEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &vsteffect_plugin_descriptor, _parent, _key ),
+    Effect( &vsteffect_plugin_descriptor, _parent, engine, _key ),
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_key( *_key ),
@@ -129,7 +129,7 @@ void VstEffect::openPlugin( const QString & _plugin )
 		VstPlugin::tr( "Please wait while loading VST plugin..." ),
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	m_pluginMutex.lock();
-	m_plugin = new VstPlugin( _plugin );
+	m_plugin = new VstPlugin( _plugin, getEngine() );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -139,8 +139,9 @@ void VstEffect::openPlugin( const QString & _plugin )
 		return;
 	}
 
-	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
-	m_plugin->setTempo( Engine::getSong()->getTempo() );
+	Song * song = getSong();
+	VstPlugin::connect( song, SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
+	m_plugin->setTempo( song->getTempo() );
 
 	m_pluginMutex.unlock();
 
@@ -171,9 +172,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, Engine * engine, void * _data )
 {
-	return new VstEffect( _parent,
+    return new VstEffect( _parent, engine,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) );
 }

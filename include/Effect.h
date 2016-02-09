@@ -44,6 +44,7 @@ class EXPORT Effect : public Plugin
 public:
 	Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
+			Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~Effect();
 
@@ -103,8 +104,8 @@ public:
 
 	inline f_cnt_t timeout() const
 	{
-		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<int>( samples ) / Engine::mixer()->framesPerPeriod() );
+		const float samples = getProcessingSampleRate() * m_autoQuitModel.value() / 1000.0f;
+		return 1 + ( static_cast<int>( samples ) / getFramesPerPeriod() );
 	}
 
 	inline float wetLevel() const
@@ -177,9 +178,9 @@ protected:
 							sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::mixer()->processingSampleRate(),
-					_dst_buf, _dst_sr,
-					Engine::mixer()->framesPerPeriod() );
+			  getProcessingSampleRate(),
+			  _dst_buf, _dst_sr,
+			  getFramesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
@@ -187,9 +188,9 @@ protected:
 							sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::mixer()->processingSampleRate(),
-			Engine::mixer()->framesPerPeriod() * _src_sr /
-				Engine::mixer()->processingSampleRate() );
+				getProcessingSampleRate(),
+				getFramesPerPeriod() * _src_sr /
+				getProcessingSampleRate() );
 	}
 	void reinitSRC();
 

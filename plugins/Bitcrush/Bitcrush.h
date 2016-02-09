@@ -36,7 +36,7 @@
 class BitcrushEffect : public Effect
 {
 public:
-	BitcrushEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	BitcrushEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~BitcrushEffect();
 	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
 

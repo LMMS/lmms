@@ -11,7 +11,7 @@
 class HydrogenImport : public ImportFilter
 {
 public:
-	HydrogenImport( const QString & _file );
+	HydrogenImport( const QString & _file, Engine * engine );
         bool readSong();
 
 	virtual ~HydrogenImport();

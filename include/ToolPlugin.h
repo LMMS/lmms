@@ -32,7 +32,7 @@
 class EXPORT ToolPlugin : public Plugin
 {
 public:
-	ToolPlugin( const Descriptor * _descriptor, Model * _parent );
+	ToolPlugin( const Descriptor * _descriptor, Model * _parent, Engine * engine );
 	virtual ~ToolPlugin();
 
 	// instantiate tool-plugin with given name or return NULL

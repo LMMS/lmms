@@ -34,7 +34,7 @@
 class stereoEnhancerEffect : public Effect
 {
 public:
-	stereoEnhancerEffect( Model * parent,
+	stereoEnhancerEffect( Model * parent, Engine * engine,
 	                      const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~stereoEnhancerEffect();
 	virtual bool processAudioBuffer( sampleFrame * _buf,

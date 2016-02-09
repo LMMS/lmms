@@ -42,7 +42,7 @@ class audioFileProcessor : public Instrument
 {
 	Q_OBJECT
 public:
-	audioFileProcessor( InstrumentTrack * _instrument_track );
+	audioFileProcessor( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~audioFileProcessor();
 
 	virtual void playNote( NotePlayHandle * _n,

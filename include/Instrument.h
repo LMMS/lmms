@@ -56,8 +56,9 @@ public:
 
 	Q_DECLARE_FLAGS(Flags, Flag);
 
-	Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor );
+	Instrument(InstrumentTrack * _instrument_track,
+		   const Descriptor * _descriptor,
+		   Engine * engine);
 	virtual ~Instrument();
 
 	// --------------------------------------------------------------------

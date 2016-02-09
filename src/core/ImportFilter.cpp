@@ -33,8 +33,8 @@
 
 
 ImportFilter::ImportFilter( const QString & _file_name,
-							const Descriptor * _descriptor ) :
-	Plugin( _descriptor, NULL ),
+							const Descriptor * _descriptor, Engine * engine ) :
+	Plugin( _descriptor, NULL, engine ),
 	m_file( _file_name )
 {
 }

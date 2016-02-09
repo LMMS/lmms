@@ -59,8 +59,8 @@ Plugin::Descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 }
 
 
-papuInstrument::papuInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &papu_plugin_descriptor ),
+papuInstrument::papuInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &papu_plugin_descriptor, engine ),
 
 	m_ch1SweepTimeModel( 4.0f, 0.0f, 7.0f, 1.0f, this, tr( "Sweep time" ) ),
 	m_ch1SweepDirModel( false, this, tr( "Sweep direction" ) ),
@@ -215,7 +215,7 @@ QString papuInstrument::nodeName() const
 
 /*f_cnt_t papuInstrument::desiredReleaseFrames() const
 {
-	const float samplerate = Engine::mixer()->processingSampleRate();
+	const float samplerate = getSampleRate();
 	int maxrel = 0;
 	for( int i = 0 ; i < 3 ; ++i )
 	{
@@ -237,7 +237,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
-	const int samplerate = Engine::mixer()->processingSampleRate();
+	const int samplerate = getProcessingSampleRate();
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const f_cnt_t offset = _n->noteOffset();
 
@@ -736,10 +736,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
 	return( new papuInstrument(
-				static_cast<InstrumentTrack *>( _data ) ) );
+				static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 

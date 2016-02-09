@@ -232,7 +232,7 @@ class GigInstrument : public Instrument
 	mapPropertyFromModel( int, getPatch, setPatch, m_patchNum );
 
 public:
-	GigInstrument( InstrumentTrack * _instrument_track );
+	GigInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~GigInstrument();
 
 	virtual void play( sampleFrame * _working_buffer );

@@ -135,7 +135,7 @@ class malletsInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	malletsInstrument( InstrumentTrack * _instrument_track );
+	malletsInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~malletsInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

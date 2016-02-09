@@ -69,8 +69,8 @@ Plugin::Descriptor PLUGIN_EXPORT audiofileprocessor_plugin_descriptor =
 
 
 
-audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &audiofileprocessor_plugin_descriptor ),
+audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &audiofileprocessor_plugin_descriptor, engine ),
 	m_sampleBuffer(),
 	m_ampModel( 100, 0, 500, 1, this, tr( "Amplify" ) ),
 	m_startPointModel( 0, 0, 1, 0.0000001f, this, tr( "Start of sample" ) ),
@@ -240,7 +240,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 		{
 			QString message = tr( "Sample not found: %1" ).arg( m_sampleBuffer.audioFile() );
 
-			Engine::getSong()->collectError( message );
+			getSong()->collectError( message );
 		}
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
@@ -301,7 +301,7 @@ QString audioFileProcessor::nodeName( void ) const
 int audioFileProcessor::getBeatLen( NotePlayHandle * _n ) const
 {
 	const float freq_factor = BaseFreq / _n->frequency() *
-			Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate();
+			getProcessingSampleRate() / getMixer()->baseSampleRate();
 
 	return static_cast<int>( floorf( ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * freq_factor ) );
 }
@@ -727,12 +727,12 @@ void AudioFileProcessorView::sampleUpdated( void )
 
 void AudioFileProcessorView::openAudioFile( void )
 {
-	QString af = castModel<audioFileProcessor>()->m_sampleBuffer.
-							openAudioFile();
+	audioFileProcessor * afp = castModel<audioFileProcessor>();
+	QString af = afp->m_sampleBuffer.openAudioFile();
 	if( af != "" )
 	{
-		castModel<audioFileProcessor>()->setAudioFile( af );
-		Engine::getSong()->setModified();
+		afp->setAudioFile( af );
+		afp->getSong()->setModified();
 		m_waveView->updateSampleRange();
 	}
 }
@@ -1317,10 +1317,10 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
 	return new audioFileProcessor(
-				static_cast<InstrumentTrack *>( _data ) );
+				static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 

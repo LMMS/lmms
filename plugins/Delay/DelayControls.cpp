@@ -38,7 +38,7 @@ DelayControls::DelayControls( DelayEffect* effect ):
 	m_lfoAmountModel(0.0, 0.0, 0.5, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) ),
 	m_outGainModel( 0.0, -60.0, 20.0, 0.01, this, tr( "Output gain" ) )
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
+	connect( m_effect->getMixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );
 	m_outPeakL = 0.0;
 	m_outPeakR = 0.0;
 }

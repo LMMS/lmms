@@ -47,10 +47,10 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 }
 
 
-CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &crossovereq_plugin_descriptor, parent, key ),
+CrossoverEQEffect::CrossoverEQEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key ) :
+	Effect( &crossovereq_plugin_descriptor, parent, engine, key ),
 	m_controls( this ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( getProcessingSampleRate() ),
 	m_lp1( m_sampleRate ),
 	m_lp2( m_sampleRate ),
 	m_lp3( m_sampleRate ),
@@ -59,9 +59,10 @@ CrossoverEQEffect::CrossoverEQEffect( Model* parent, const Descriptor::SubPlugin
 	m_hp4( m_sampleRate ),
 	m_needsUpdate( true )
 {
-	m_tmp1 = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
-	m_tmp2 = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	fpp_t framesPerPeriod = getFramesPerPeriod();
+	m_tmp1 = MM_ALLOC( sampleFrame, framesPerPeriod );
+	m_tmp2 = MM_ALLOC( sampleFrame, framesPerPeriod );
+	m_work = MM_ALLOC( sampleFrame, framesPerPeriod );
 }
 
 CrossoverEQEffect::~CrossoverEQEffect()
@@ -73,7 +74,7 @@ CrossoverEQEffect::~CrossoverEQEffect()
 
 void CrossoverEQEffect::sampleRateChanged()
 {
-	m_sampleRate = Engine::mixer()->processingSampleRate();
+	m_sampleRate = getProcessingSampleRate();
 	m_lp1.setSampleRate( m_sampleRate );
 	m_lp2.setSampleRate( m_sampleRate );
 	m_lp3.setSampleRate( m_sampleRate );
@@ -211,9 +212,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new CrossoverEQEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new CrossoverEQEffect( parent, engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

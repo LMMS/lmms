@@ -62,8 +62,8 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 }
 
 
-vibed::vibed( InstrumentTrack * _instrumentTrack ) :
-	Instrument( _instrumentTrack, &vibedstrings_plugin_descriptor )
+vibed::vibed( InstrumentTrack * _instrumentTrack, Engine * engine ) :
+	Instrument( _instrumentTrack, &vibedstrings_plugin_descriptor, engine )
 {
 
 	FloatModel * knob;
@@ -277,8 +277,8 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
 		_n->m_pluginData = new stringContainer( _n->frequency(),
-				Engine::mixer()->processingSampleRate(),
-						__sampleLength );
+							getProcessingSampleRate(),
+							__sampleLength );
 		
 		for( int i = 0; i < 9; ++i )
 		{
@@ -296,7 +296,8 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 				static_cast<int>(
 					m_lengthKnobs[i]->value() ),
 				m_impulses[i]->value(),
-				i );
+				i,
+				getMixer()->baseSampleRate() );
 			}
 		}
 	}
@@ -690,7 +691,7 @@ void vibedView::showString( int _string )
 void vibedView::sinWaveClicked()
 {
 	m_graph->model()->setWaveToSine();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -698,7 +699,7 @@ void vibedView::sinWaveClicked()
 void vibedView::triangleWaveClicked()
 {
 	m_graph->model()->setWaveToTriangle();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -706,7 +707,7 @@ void vibedView::triangleWaveClicked()
 void vibedView::sawWaveClicked()
 {
 	m_graph->model()->setWaveToSaw();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -714,7 +715,7 @@ void vibedView::sawWaveClicked()
 void vibedView::sqrWaveClicked()
 {
 	m_graph->model()->setWaveToSquare();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -722,7 +723,7 @@ void vibedView::sqrWaveClicked()
 void vibedView::noiseWaveClicked()
 {
 	m_graph->model()->setWaveToNoise();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -731,7 +732,7 @@ void vibedView::usrWaveClicked()
 {
 	QString fileName = m_graph->model()->setWaveToUser();
 	ToolTip::add( m_usrWaveBtn, fileName );
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -739,7 +740,7 @@ void vibedView::usrWaveClicked()
 void vibedView::smoothClicked()
 {
 	m_graph->model()->smooth();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -747,7 +748,7 @@ void vibedView::smoothClicked()
 void vibedView::normalizeClicked()
 {
 	m_graph->model()->normalize();
-	Engine::getSong()->setModified();
+	model()->getSong()->setModified();
 }
 
 
@@ -776,9 +777,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return( new vibed( static_cast<InstrumentTrack *>( _data ) ) );
+	return( new vibed( static_cast<InstrumentTrack *>( _data ), engine ) );
 }
 
 
