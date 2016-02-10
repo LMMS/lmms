@@ -1414,20 +1414,24 @@ QString SampleBuffer::tryToMakeRelative( const QString & _file )
 
 
 
-QString SampleBuffer::tryToMakeAbsolute( const QString & _file )
+QString SampleBuffer::tryToMakeAbsolute(const QString& file)
 {
-	if( QFileInfo( _file ).isAbsolute() )
+	QFileInfo f(file);
+
+	if(f.isRelative())
 	{
-		return _file;
+		f = QFileInfo(ConfigManager::inst()->userSamplesDir() + file);
+
+		if(! f.exists())
+		{
+			f = QFileInfo(ConfigManager::inst()->factorySamplesDir() + file);
+		}
 	}
 
-	QString f = ConfigManager::inst()->userSamplesDir() + _file;
-	if( QFileInfo( f ).exists() )
-	{
-		return f;
+	if (f.exists()) {
+		return f.absoluteFilePath();
 	}
-
-	return ConfigManager::inst()->factorySamplesDir() + _file;
+	return file;
 }
 
 
