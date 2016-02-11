@@ -11,6 +11,14 @@ QMdiArea {
 	background-image: url(resources:background_artwork.png);
 }
 
+PluginDescList {
+	background-color: #808080;
+}
+
+PluginDescWidget {
+	color: #e0e0e0;
+}
+
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
 	color: #e0e0e0;

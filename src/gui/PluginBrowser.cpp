@@ -54,28 +54,18 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 {
 	setWindowTitle( tr( "Instrument browser" ) );
 	m_view = new QWidget( contentParent() );
-	//m_view->setFrameShape( QFrame::NoFrame );
-
+	
 	addContentWidget( m_view );
 
 	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
 	view_layout->setMargin( 5 );
 	view_layout->setSpacing( 5 );
 
-
-	QLabel * hint = new QLabel( tr( "Drag an instrument "
-					"into either the Song-Editor, the "
-					"Beat+Bassline Editor or into an "
-					"existing instrument track." ),
-								m_view );
-	hint->setWordWrap( true );
-
 	QScrollArea* scrollarea = new QScrollArea( m_view );
 	PluginDescList* descList = new PluginDescList( m_view );
 	scrollarea->setWidget(descList);
 	scrollarea->setWidgetResizable(true);
 
-	view_layout->addWidget(hint);
 	view_layout->addWidget(scrollarea);
 }
 
@@ -93,6 +83,11 @@ PluginDescList::PluginDescList(QWidget *parent) :
 	QWidget(parent)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
+
+	// Compact instrument buttons
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	layout->setContentsMargins(0,0,0,0);
 
 	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
 	std::sort(descs.begin(), descs.end(), pluginBefore);
@@ -137,31 +132,21 @@ PluginDescWidget::~PluginDescWidget()
 
 void PluginDescWidget::paintEvent( QPaintEvent * )
 {
-	const QColor fill_color = m_mouseOver ? QColor( 224, 224, 224 ) :
-						QColor( 192, 192, 192 );
-
 	QPainter p( this );
-	p.fillRect( rect(), fill_color );
-
 	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
 								( 60 - 24 );
 	const QSize logo_size( s, s );
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	p.drawPixmap( 4, 4, logo );
-
 	QFont f = p.font();
 	if ( m_mouseOver )
 	{
 		f.setBold( true );
 	}
-
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
-
 	if( height() > 24 || m_mouseOver )
 	{
 		f.setBold( false );
