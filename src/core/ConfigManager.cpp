@@ -25,6 +25,7 @@
 #include <QDomElement>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
 #include <QtCore/QTextStream>
@@ -253,16 +254,18 @@ void ConfigManager::createWorkingDir()
 
 
 
-void ConfigManager::addRecentlyOpenedProject( const QString & _file )
+void ConfigManager::addRecentlyOpenedProject( const QString & file )
 {
-	if( !_file.endsWith( ".mpt", Qt::CaseInsensitive ) ) 
+	QFileInfo recentFile( file );
+	if( recentFile.suffix().toLower() == "mmp" ||
+			recentFile.suffix().toLower() == "mmpz" )
 	{
-		m_recentlyOpenedProjects.removeAll( _file );
-		if( m_recentlyOpenedProjects.size() > 30 )
+		m_recentlyOpenedProjects.removeAll( file );
+		if( m_recentlyOpenedProjects.size() > 50 )
 		{
 			m_recentlyOpenedProjects.removeLast();
 		}
-		m_recentlyOpenedProjects.push_front( _file );
+		m_recentlyOpenedProjects.push_front( file );
 		ConfigManager::inst()->saveConfigFile();
 	}
 }
