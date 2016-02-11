@@ -153,6 +153,8 @@ private:
 		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
+		float * phaseOffsetLeft;
+		float * phaseOffsetRight;		
 	} ;
 
 	const IntModel m_modulationAlgo;

@@ -234,16 +234,14 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	{
 		Oscillator * oscs_l[m_numOscillators];
 		Oscillator * oscs_r[m_numOscillators];
+		float * phaseOffsetLeft = new float[m_numOscillators];
+		float * phaseOffsetRight = new float[m_numOscillators];
 
 		for( int i = m_numOscillators - 1; i >= 0; --i )
 		{
 			
-			m_osc[i]->m_phaseOffsetLeft = rand()
-							/ ( RAND_MAX + 1.0f );
-			m_osc[i]->m_phaseOffsetRight = rand()
-							/ ( RAND_MAX + 1.0f );
-			
-
+			phaseOffsetLeft[i] = rand() / ( RAND_MAX + 1.0f );
+			phaseOffsetRight[i] = rand() / ( RAND_MAX + 1.0f );
 			
 			// initialise ocillators
 			
@@ -255,7 +253,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						phaseOffsetLeft[i],
 						m_osc[i]->m_volumeLeft );
 				// create right oscillator
 				oscs_r[i] = new Oscillator(
@@ -263,7 +261,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						phaseOffsetRight[i],
 						m_osc[i]->m_volumeRight );
 			}
 			else
@@ -274,7 +272,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						phaseOffsetLeft[i],
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
 				// create right oscillator
@@ -283,7 +281,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						phaseOffsetRight[i],
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
 			}
@@ -294,6 +292,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 		_n->m_pluginData = new oscPtr;
 		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = oscs_l[0];
 		static_cast<oscPtr *>( _n->m_pluginData )->oscRight = oscs_r[0];
+		static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft = phaseOffsetLeft;
+		static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight = phaseOffsetRight;
 	}
 
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
@@ -330,6 +330,9 @@ void organicInstrument::deleteNotePluginData( NotePlayHandle * _n )
 						_n->m_pluginData )->oscLeft );
 	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
 						_n->m_pluginData )->oscRight );
+	delete[] static_cast<oscPtr *>(	_n->m_pluginData )->phaseOffsetLeft;
+	delete[] static_cast<oscPtr *>(	_n->m_pluginData )->phaseOffsetRight;
+
 	delete static_cast<oscPtr *>( _n->m_pluginData );
 }
 
