@@ -1439,11 +1439,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
 
 
-	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), 1 );
-	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), 2 );
-	m_tabWidget->addTab( m_effectView, tr( "FX" ), 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), 4 );
-	m_tabWidget->addTab( m_miscView, tr( "MISC" ), 5 );
+	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), "usr_wave", 1 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), "sin_wave", 2 );
+	m_tabWidget->addTab( m_effectView, tr( "FX" ), "saw_wave", 3 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "round_square_wave", 4 );
+	m_tabWidget->addTab( m_miscView, tr( "MISC" ), "exp_wave", 5 );
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -1617,7 +1617,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 	if( m_track->m_instrument != NULL )
 	{
 		m_instrumentView = m_track->m_instrument->createView( m_tabWidget );
-		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), 0 );
+		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), "moog_saw_wave", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
 		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) );
