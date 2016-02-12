@@ -481,6 +481,23 @@ SideBar QToolButton {
 	font-size: 12px;
 }
 
+/* Instrument plugin list */
+
+PluginDescList {
+	background-color: #5b6571;
+}
+
+PluginDescWidget {
+	background-color: #e0e0e0;
+	color: #404040;
+	border: 1px solid rgb(64, 64, 64);
+	margin: 0px;
+}
+
+PluginDescWidget:hover {
+	background-color: #e0e0e0;
+}
+
 /* font sizes for text buttons */
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
