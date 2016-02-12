@@ -31,6 +31,7 @@
 #include <QWheelEvent>
 
 #include "gui_templates.h"
+#include "embed.h"
 
 
 
@@ -61,17 +62,25 @@ TabWidget::~TabWidget()
 
 
 
-void TabWidget::addTab( QWidget * _w, const QString & _name, int _idx )
+void TabWidget::addTab( QWidget * _w, const QString & _name,  const char * pixmapName, int _idx )
 {
 	setFont( pointSize<8>( font() ) );
-	widgetDesc d = { _w, _name, fontMetrics().width( _name ) + 10 } ;
+
+        // Append tab when position is not given
 	if( _idx < 0/* || m_widgets.contains( _idx ) == true*/ )
 	{
 		while( m_widgets.contains( ++_idx ) == true )
 		{
 		}
 	}
+
+        fprintf( stderr, "adding tab %s. idx=%d\n", pixmapName, _idx);
+
+        // Register new tab
+	widgetDesc d = { _w, pixmapName, _name, fontMetrics().width( _name ) + 10 } ;
 	m_widgets[_idx] = d;
+
+        // Initialize tab's window
 	_w->setFixedSize( width() - 4, height() - 14 );
 	_w->move( 2, 13 );
 	_w->hide();
@@ -108,21 +117,22 @@ void TabWidget::setActiveTab( int _idx )
 
 void TabWidget::mousePressEvent( QMouseEvent * _me )
 {
+
+        fprintf( stderr, "TabWidget::mousePressEvent x=%d y=%d\n", _me->x(), _me->y() );
+
 	if( _me->y() > 1 && _me->y() < 13 )
 	{
-		int cx = ( ( m_caption == "" ) ? 4 : 14 ) +
-					fontMetrics().width( m_caption );
 		for( widgetStack::iterator it = m_widgets.begin();
 						it != m_widgets.end(); ++it )
 		{
-			if( _me->x() >= cx &&
-					_me->x() <= cx + ( *it ).nwidth )
+			if( _me->x() >= 8 + it.key() * 30 &&
+					_me->x() <= 8 + it.key() * 30 + 14 )
 			{
+        			fprintf( stderr, "TabWidget::mousePressEvent Pressed tab %d\n", it.key() );
 				setActiveTab( it.key() );
 				update();
 				return;
 			}
-			cx += ( *it ).nwidth;
 		}
 	}
 }
@@ -177,9 +187,6 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 		p.drawText( 5, 11, m_caption );
 	}
 
-	// Calculate the tabs' x (tabs are painted next to the caption)
-	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
-
 	QColor cap_col( 160, 160, 160 );
 	if( big_tab_captions )
 	{
@@ -192,19 +199,29 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 	}
 	p.setPen( cap_col );
 
+	// Draw all tabs
+	int tab_x_offset = 8;
+        for( widgetStack::iterator it = m_widgets.begin();
+                                               it != m_widgets.end(); ++it )
+        {
 
-	for( widgetStack::iterator it = m_widgets.begin();
-						it != m_widgets.end(); ++it )
-	{
-		if( it.key() == m_activeTab )
+		// Get active or inactive artwork
+		std::string tab = string( ( *it).pixmapName );
+                if( it.key() == m_activeTab )
+                {
+			tab += "_active";
+                } else 
 		{
-			p.setPen( QColor( 32, 48, 64 ) );
-			p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, 10, cap_col );
+			tab += "_inactive";
 		}
-		p.drawText( tab_x_offset + 3, m_tabheight, ( *it ).name );
-		p.setPen( cap_col );
-		tab_x_offset += ( *it ).nwidth;
-	}
+                QPixmap *artwork = new QPixmap(  embed::getIconPixmap( tab.c_str() ) );
+
+		// Draw tab
+                p.drawPixmap(tab_x_offset, 0, *artwork );
+
+		// Next tab's horizontal position
+                tab_x_offset += 30;
+        }
 }
 
 

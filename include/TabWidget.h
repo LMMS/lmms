@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <QtCore/QMap>
 
+#include <string>
 
 class TabWidget : public QWidget
 {
@@ -37,7 +38,7 @@ public:
 	TabWidget( const QString & _caption, QWidget * _parent );
 	virtual ~TabWidget();
 
-	void addTab( QWidget * _w, const QString & _name, int _idx = -1 );
+	void addTab( QWidget * _w, const QString & _name, const char * pixmapName, int _idx = -1 );
 
 	void setActiveTab( int _idx );
 
@@ -57,9 +58,10 @@ protected:
 private:
 	struct widgetDesc
 	{
-		QWidget * w;	// ptr to widget
-		QString name;	// name for widget
-		int nwidth;	// width of name when painting
+		QWidget       * w;	   // ptr to widget
+		const char    *pixmapName; // artwork for the widget 
+		QString       name;	   // name for widget
+		int           nwidth;	   // width of name when painting
 	} ;
 	typedef QMap<int, widgetDesc> widgetStack;
 
