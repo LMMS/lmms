@@ -201,7 +201,7 @@ public:
 
 	QString fullName() const
 	{
-		return QDir::cleanPath(m_path) + "/" + text(0);
+		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
 	inline FileTypes type( void ) const
