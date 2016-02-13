@@ -1093,6 +1093,11 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 			}
 			break;
 
+		case Qt::Key_Escape:
+			// Same as Ctrl + Shift + A
+			clearSelectedNotes();
+			break;
+
 		case Qt::Key_Delete:
 			deleteSelectedNotes();
 			ke->accept();
