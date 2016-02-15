@@ -825,8 +825,8 @@ inline sample_t MonstroSynth::calcSlope( int slope, sample_t s )
 }
 
 
-MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, &monstro_plugin_descriptor ),
+MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+		Instrument( _instrument_track, &monstro_plugin_descriptor, engine ),
 
 		m_osc1Vol( 33.0, 0.0, 200.0, 0.1, this, tr( "Osc 1 Volume" ) ),
 		m_osc1Pan( 0.0, -100.0, 100.0, 0.1, this, tr( "Osc 1 Panning" ) ),
@@ -1005,9 +1005,9 @@ MonstroInstrument::MonstroInstrument( InstrumentTrack * _instrument_track ) :
 
 // updateSampleRate
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
+	connect( getMixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSamplerate() ) );
 
-	m_fpp = Engine::mixer()->framesPerPeriod();
+	m_fpp = getFramesPerPeriod();
 
 	updateSamplerate();
 	updateVolume1();
@@ -1418,7 +1418,7 @@ void MonstroInstrument::updateLFOAtts()
 
 void MonstroInstrument::updateSamplerate()
 {
-	m_samplerate = Engine::mixer()->processingSampleRate();
+	m_samplerate = getProcessingSampleRate();
 	
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
@@ -1963,9 +1963,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new MonstroInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new MonstroInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 

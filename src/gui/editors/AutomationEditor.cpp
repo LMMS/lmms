@@ -78,8 +78,9 @@ QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 
 
-AutomationEditor::AutomationEditor() :
+AutomationEditor::AutomationEditor( Engine * engine ) :
 	QWidget(),
+	EngineClient( engine ),
 	m_zoomingXModel(),
 	m_zoomingYModel(),
 	m_quantizeModel(),
@@ -111,7 +112,7 @@ AutomationEditor::AutomationEditor() :
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
 				Qt::QueuedConnection );
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
+	connect( getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -140,7 +141,7 @@ AutomationEditor::AutomationEditor() :
 
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
-				Engine::getSong()->getPlayPos(
+				getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
 						m_currentPosition, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -538,7 +539,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				QCursor c( Qt::SizeAllCursor );
 				QApplication::setOverrideCursor( c );
 
-				Engine::getSong()->setModified();
+				getSong()->setModified();
 			}
 			else if( ( mouseEvent->button() == Qt::RightButton &&
 							m_editMode == DRAW ) ||
@@ -549,7 +550,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				if( it != time_map.end() )
 				{
 					m_pattern->removeValue( it.key() );
-					Engine::getSong()->setModified();
+					getSong()->setModified();
 				}
 				m_action = NONE;
 			}
@@ -583,7 +584,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 				m_action = MOVE_SELECTION;
 
-				Engine::getSong()->setModified();
+				getSong()->setModified();
 			}
 			else if( mouseEvent->button() == Qt::RightButton &&
 							m_editMode == MOVE )
@@ -662,7 +663,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 								level );
 			}
 
-			Engine::getSong()->setModified();
+			getSong()->setModified();
 
 		}
 		else if( ( mouseEvent->buttons() & Qt::RightButton &&
@@ -1115,7 +1116,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		}
 		// Then beat grid
 		int ticksPerBeat = DefaultTicksPerTact /
-			Engine::getSong()->getTimeSigModel().getDenominator();
+			getSong()->getTimeSigModel().getDenominator();
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
 				 x = xCoordOfTick( tick );
 			 x<=width();
@@ -1441,9 +1442,9 @@ void AutomationEditor::resizeEvent(QResizeEvent * re)
 
 	m_topBottomScroll->setValue( (int) m_scrollLevel );
 
-	if( Engine::getSong() )
+	if( getSong() )
 	{
-		Engine::getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
+		getSong()->getPlayPos( Song::Mode_PlayAutomationPattern
 					).m_timeLine->setFixedWidth( width() );
 	}
 
@@ -1537,7 +1538,7 @@ inline bool AutomationEditor::inBBEditor()
 {
 	QMutexLocker m( &m_patternMutex );
 	return( validPattern() &&
-				m_pattern->getTrack()->trackContainer() == Engine::getBBTrackContainer() );
+				m_pattern->getTrack()->trackContainer() == getBBTrackContainer() );
 }
 
 
@@ -1554,33 +1555,33 @@ void AutomationEditor::play()
 
 	if( !m_pattern->getTrack() )
 	{
-		if( Engine::getSong()->playMode() != Song::Mode_PlayPattern )
+		if( getSong()->playMode() != Song::Mode_PlayPattern )
 		{
-			Engine::getSong()->stop();
-			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
+			getSong()->stop();
+			getSong()->playPattern( gui->pianoRoll()->currentPattern() );
 		}
-		else if( Engine::getSong()->isStopped() == false )
+		else if( getSong()->isStopped() == false )
 		{
-			Engine::getSong()->togglePause();
+			getSong()->togglePause();
 		}
 		else
 		{
-			Engine::getSong()->playPattern( gui->pianoRoll()->currentPattern() );
+			getSong()->playPattern( gui->pianoRoll()->currentPattern() );
 		}
 	}
 	else if( inBBEditor() )
 	{
-		Engine::getBBTrackContainer()->play();
+		getBBTrackContainer()->play();
 	}
 	else
 	{
-		if( Engine::getSong()->isStopped() == true )
+		if( getSong()->isStopped() == true )
 		{
-			Engine::getSong()->playSong();
+			getSong()->playSong();
 		}
 		else
 		{
-			Engine::getSong()->togglePause();
+			getSong()->togglePause();
 		}
 	}
 }
@@ -1598,11 +1599,11 @@ void AutomationEditor::stop()
 	}
 	if( m_pattern->getTrack() && inBBEditor() )
 	{
-		Engine::getBBTrackContainer()->stop();
+		getBBTrackContainer()->stop();
 	}
 	else
 	{
-		Engine::getSong()->stop();
+		getSong()->stop();
 	}
 	m_scrollBack = true;
 }
@@ -1668,7 +1669,7 @@ void AutomationEditor::setProgressionType(AutomationPattern::ProgressionTypes ty
 		m_pattern->addJournalCheckPoint();
 		QMutexLocker m(&m_patternMutex);
 		m_pattern->setProgressionType(type);
-		Engine::getSong()->setModified();
+		getSong()->setModified();
 		update();
 	}
 }
@@ -1816,7 +1817,7 @@ void AutomationEditor::cutSelectedValues()
 
 	if( !selected_values.isEmpty() )
 	{
-		Engine::getSong()->setModified();
+		getSong()->setModified();
 
 		for( timeMap::iterator it = selected_values.begin();
 					it != selected_values.end(); ++it )
@@ -1848,7 +1849,7 @@ void AutomationEditor::pasteValues()
 
 		// we only have to do the following lines if we pasted at
 		// least one value...
-		Engine::getSong()->setModified();
+		getSong()->setModified();
 		update();
 		gui->songEditor()->update();
 	}
@@ -1879,7 +1880,7 @@ void AutomationEditor::deleteSelectedValues()
 
 	if( update_after_delete == true )
 	{
-		Engine::getSong()->setModified();
+		getSong()->setModified();
 		update();
 		gui->songEditor()->update();
 	}
@@ -1890,8 +1891,8 @@ void AutomationEditor::deleteSelectedValues()
 
 void AutomationEditor::updatePosition(const MidiTime & t )
 {
-	if( ( Engine::getSong()->isPlaying() &&
-			Engine::getSong()->playMode() ==
+	if( ( getSong()->isPlaying() &&
+			getSong()->playMode() ==
 					Song::Mode_PlayAutomationPattern ) ||
 							m_scrollBack == true )
 	{
@@ -2008,9 +2009,9 @@ void AutomationEditor::updateTopBottomLevels()
 
 
 
-AutomationEditorWindow::AutomationEditorWindow() :
+AutomationEditorWindow::AutomationEditorWindow( Engine * engine ) :
 	Editor(),
-	m_editor(new AutomationEditor())
+	m_editor(new AutomationEditor(engine))
 {
 	setCentralWidget(m_editor);
 
@@ -2339,7 +2340,7 @@ void AutomationEditorWindow::dropEvent( QDropEvent *_de )
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
+				m_editor->getProjectJournal()->
 					journallingObject( val.toInt() ) );
 		if( mod != NULL )
 		{
@@ -2386,7 +2387,7 @@ void AutomationEditorWindow::clearCurrentPattern()
 void AutomationEditorWindow::play()
 {
 	m_editor->play();
-	setPauseIcon(Engine::getSong()->isPlaying());
+	setPauseIcon(m_editor->getSong()->isPlaying());
 }
 
 void AutomationEditorWindow::stop()

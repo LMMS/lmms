@@ -42,7 +42,7 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
 	m_invertFeedbackModel ( false , this, tr( "Invert" ) )
 
 {
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
+	connect( m_effect->getMixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
 }
 
 

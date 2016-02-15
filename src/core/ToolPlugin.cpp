@@ -26,8 +26,8 @@
 #include "ToolPlugin.h"
 
 
-ToolPlugin::ToolPlugin( const Descriptor * _descriptor, Model * _parent ) :
-	Plugin( _descriptor, _parent )
+ToolPlugin::ToolPlugin( const Descriptor * _descriptor, Model * _parent, Engine * engine ) :
+	Plugin( _descriptor, _parent, engine )
 {
 }
 

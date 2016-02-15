@@ -50,9 +50,9 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 
 
 stereoMatrixEffect::stereoMatrixEffect(
-			Model * _parent,
+			Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &stereomatrix_plugin_descriptor, _parent, _key ),
+	Effect( &stereomatrix_plugin_descriptor, _parent, engine, _key ),
 	m_smControls( this )
 {
 }
@@ -113,9 +113,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, Engine * engine, void * _data )
 {
-	return( new stereoMatrixEffect( _parent,
+	return( new stereoMatrixEffect( _parent, engine,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }

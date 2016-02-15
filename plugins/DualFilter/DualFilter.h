@@ -34,7 +34,7 @@
 class DualFilterEffect : public Effect
 {
 public:
-	DualFilterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	DualFilterEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~DualFilterEffect();
 	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
 

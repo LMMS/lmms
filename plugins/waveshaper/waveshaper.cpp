@@ -51,9 +51,9 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 
 
 
-waveShaperEffect::waveShaperEffect( Model * _parent,
+waveShaperEffect::waveShaperEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &waveshaper_plugin_descriptor, _parent, _key ),
+	Effect( &waveshaper_plugin_descriptor, _parent, engine, _key ),
 	m_wsControls( this )
 {
 }
@@ -161,9 +161,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, Engine * engine, void * _data )
 {
-	return( new waveShaperEffect( _parent,
+	return( new waveShaperEffect( _parent, engine,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(
 								_data ) ) );
 }

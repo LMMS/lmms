@@ -63,8 +63,9 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 
 
 
-OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
+OscillatorObject::OscillatorObject( Model * _parent, int _idx, Engine * engine ) :
 	Model( _parent ),
+	EngineClient( engine ),
 	m_volumeModel( DefaultVolume / NUM_OF_OSCILLATORS, MinVolume,
 			MaxVolume, 1.0f, this, tr( "Osc %1 volume" ).arg( _idx+1 ) ),
 	m_panModel( DefaultPanning, PanningLeft, PanningRight, 1.0f, this,
@@ -175,7 +176,7 @@ void OscillatorObject::updateDetuningLeft()
 {
 	m_detuningLeft = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineLeftModel.value() ) / 1200.0f )
-				/ Engine::mixer()->processingSampleRate();
+				/ getEngine()->mixer()->processingSampleRate();
 }
 
 
@@ -185,7 +186,7 @@ void OscillatorObject::updateDetuningRight()
 {
 	m_detuningRight = powf( 2.0f, ( (float)m_coarseModel.value() * 100.0f
 				+ (float)m_fineRightModel.value() ) / 1200.0f )
-				/ Engine::mixer()->processingSampleRate();
+				/ getEngine()->mixer()->processingSampleRate();
 }
 
 
@@ -208,16 +209,16 @@ void OscillatorObject::updatePhaseOffsetRight()
 
  
 
-TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &tripleoscillator_plugin_descriptor )
+TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track, Engine * engine ) :
+	Instrument( _instrument_track, &tripleoscillator_plugin_descriptor, engine )
 {
 	for( int i = 0; i < NUM_OF_OSCILLATORS; ++i )
 	{
-		m_osc[i] = new OscillatorObject( this, i );
+		m_osc[i] = new OscillatorObject( this, i, engine );
 
 	}
 
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( getMixer(), SIGNAL( sampleRateChanged() ),
 			this, SLOT( updateAllDetuning() ) );
 }
 
@@ -790,9 +791,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new TripleOscillator( static_cast<InstrumentTrack *>( _data ) );
+	return new TripleOscillator( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 }

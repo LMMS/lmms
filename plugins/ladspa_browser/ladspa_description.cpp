@@ -30,18 +30,17 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
-#include "AudioDevice.h"
-#include "Engine.h"
 #include "Ladspa2LMMS.h"
-#include "Mixer.h"
-
 
 
 ladspaDescription::ladspaDescription( QWidget * _parent,
-						ladspaPluginType _type ) :
-	QWidget( _parent )
+				      ladspaPluginType _type,
+				      Ladspa2LMMS * ladspaManager,
+				      ch_cnt_t const numberOfChannels) :
+	QWidget( _parent ),
+	m_ladspaManager(ladspaManager)
 {
-	Ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = getLADSPAManager();
 
 	l_sortable_plugin_t plugins;
 	switch( _type )
@@ -74,7 +73,7 @@ ladspaDescription::ladspaDescription( QWidget * _parent,
 	{
 		if( _type != VALID || 
 			manager->getDescription( ( *it ).second )->inputChannels
-				<= Engine::mixer()->audioDev()->channels() )
+				<= numberOfChannels )
 		{ 
 			pluginNames.push_back( ( *it ).first );
 			m_pluginKeys.push_back( ( *it ).second );
@@ -128,7 +127,7 @@ void ladspaDescription::update( const ladspa_key_t & _key )
 	QVBoxLayout * layout = new QVBoxLayout( description );
 	layout->setSizeConstraint( QLayout::SetFixedSize );
 
-	Ladspa2LMMS * manager = Engine::getLADSPAManager();
+	Ladspa2LMMS * manager = getLADSPAManager();
 
 	QLabel * name = new QLabel( description );
 	name->setText( QWidget::tr( "Name: " ) + manager->getName( _key ) );

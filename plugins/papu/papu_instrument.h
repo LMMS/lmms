@@ -41,7 +41,7 @@ class papuInstrument : public Instrument
 	Q_OBJECT
 public:
 
-	papuInstrument( InstrumentTrack * _instrument_track );
+	papuInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~papuInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

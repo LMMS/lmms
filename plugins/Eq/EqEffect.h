@@ -36,7 +36,7 @@
 class EqEffect : public Effect
 {
 public:
-	EqEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	EqEffect( Model* parent , Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~EqEffect();
 	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
 	virtual EffectControls* controls()

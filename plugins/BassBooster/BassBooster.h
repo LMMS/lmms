@@ -34,7 +34,7 @@
 class BassBoosterEffect : public Effect
 {
 public:
-	BassBoosterEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key );
+	BassBoosterEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key );
 	virtual ~BassBoosterEffect();
 	virtual bool processAudioBuffer( sampleFrame* buf, const fpp_t frames );
 

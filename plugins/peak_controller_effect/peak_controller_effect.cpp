@@ -58,16 +58,16 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 //QVector<PeakControllerEffect *> PeakControllerEffect::s_effects;
 
 PeakControllerEffect::PeakControllerEffect(
-			Model * _parent,
+			Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Effect( &peakcontrollereffect_plugin_descriptor, _parent, _key ),
+	Effect( &peakcontrollereffect_plugin_descriptor, _parent, engine, _key ),
 	m_effectId( rand() ),
 	m_peakControls( this ),
 	m_lastSample( 0 ),
 	m_autoController( NULL )
 {
-	m_autoController = new PeakController( Engine::getSong(), this );
-	Engine::getSong()->addController( m_autoController );
+	m_autoController = new PeakController( getSong(), this );
+	getSong()->addController( m_autoController );
 	PeakController::s_effects.append( this );
 }
 
@@ -80,7 +80,7 @@ PeakControllerEffect::~PeakControllerEffect()
 	if( idx >= 0 )
 	{
 		PeakController::s_effects.remove( idx );
-		Engine::getSong()->removeController( m_autoController );
+		getSong()->removeController( m_autoController );
 	}
 }
 
@@ -145,9 +145,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, Engine * engine, void * _data )
 {
-	return new PeakControllerEffect( _parent,
+	return new PeakControllerEffect( _parent, engine,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( _data ) );
 }
 

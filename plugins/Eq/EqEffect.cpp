@@ -50,8 +50,8 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 }
 
 
-EqEffect::EqEffect(Model *parent, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
-	Effect( &eq_plugin_descriptor, parent, key ),
+EqEffect::EqEffect(Model *parent, Engine * engine, const Plugin::Descriptor::SubPluginFeatures::Key *key) :
+	Effect( &eq_plugin_descriptor, parent, engine, key ),
 	m_eqControls( this ),
 	m_inGain( 1.0 ),
 	m_outGain( 1.0 )
@@ -185,12 +185,12 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 	const float outGain =  m_outGain;
-	const int sampleRate = Engine::mixer()->processingSampleRate();
+	const int sampleRate = getProcessingSampleRate();
 	sampleFrame m_inPeak = { 0, 0 };
 
 	if(m_eqControls.m_analyseIn )
 	{
-		m_eqControls.m_inFftBands.analyze( buf, frames );
+		m_eqControls.m_inFftBands.analyze( buf, frames, getProcessingSampleRate() );
 	}
 	else
 	{
@@ -328,7 +328,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	checkGate( outSum / frames );
 	if(m_eqControls.m_analyseOut )
 	{
-		m_eqControls.m_outFftBands.analyze( buf, frames );
+		m_eqControls.m_outFftBands.analyze( buf, frames, getProcessingSampleRate() );
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate * 0.5 ) );
 	}
 	else
@@ -405,9 +405,9 @@ extern "C"
 {
 
 //needed for getting plugin out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new EqEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new EqEffect( parent , engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

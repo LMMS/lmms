@@ -37,6 +37,7 @@
 #include "lmms_basics.h"
 #include "Song.h"
 #include "ToolTip.h"
+#include "EngineClient.h"
 
 class QPainter;
 class QPixmap;
@@ -50,7 +51,7 @@ class NotePlayHandle;
 class Pattern;
 class TimeLineWidget;
 
-class PianoRoll : public QWidget
+class PianoRoll : public QWidget, public EngineClient
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
@@ -239,7 +240,7 @@ private:
 	QList<int> m_markedSemiTones;
 	QMenu * m_semiToneMarkerMenu; // when you right click on the key area
 
-	PianoRoll();
+	PianoRoll( Engine * engine );
 	PianoRoll( const PianoRoll & );
 	virtual ~PianoRoll();
 
@@ -389,7 +390,7 @@ class PianoRollWindow : public Editor, SerializingObject
 {
 	Q_OBJECT
 public:
-	PianoRollWindow();
+	PianoRollWindow( Engine * engine );
 
 	const Pattern* currentPattern() const;
 	void setCurrentPattern(Pattern* pattern);

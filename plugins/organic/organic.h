@@ -32,6 +32,7 @@
 #include "InstrumentView.h"
 #include "Oscillator.h"
 #include "AutomatableModel.h"
+#include "EngineClient.h"
 
 class QPixmap;
 
@@ -72,7 +73,7 @@ const QString WAVEFORM_NAMES[6] = {
 	
 const float CENT = 1.0f / 1200.0f;
 
-class OscillatorObject : public Model
+class OscillatorObject : public Model, public EngineClient
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -94,7 +95,7 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
-	OscillatorObject( Model * _parent, int _index );
+	OscillatorObject( Model * _parent, int _index, Engine * engine );
 	virtual ~OscillatorObject();
 
 	friend class organicInstrument;
@@ -113,7 +114,7 @@ class organicInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	organicInstrument( InstrumentTrack * _instrument_track );
+	organicInstrument( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~organicInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,

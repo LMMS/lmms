@@ -39,7 +39,7 @@ class LadspaEffect : public Effect
 {
 	Q_OBJECT
 public:
-	LadspaEffect( Model * _parent,
+	LadspaEffect( Model * _parent, Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~LadspaEffect();
 
@@ -67,7 +67,7 @@ private:
 	void pluginInstantiation();
 	void pluginDestruction();
 
-	static sample_rate_t maxSamplerate( const QString & _name );
+	sample_rate_t maxSamplerate( const QString & _name );
 
 
 	QMutex m_pluginMutex;

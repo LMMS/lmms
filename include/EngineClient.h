@@ -1,7 +1,7 @@
 /*
- * carlapatchbay.cpp - Carla for LMMS (Patchbay)
+ * EngineClient.h - Interface to the engine-system of LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (c) 2016 Michael Gregorius
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,30 +22,36 @@
  *
  */
 
-#include "carla.h"
 
-#include "embed.cpp"
+#ifndef ENGINECLIENT_H
+#define ENGINECLIENT_H
 
-extern "C"
+#include "export.h"
+
+#include "Engine.h"
+
+class Song;
+class Mixer;
+class FxMixer;
+class BBTrackContainer;
+class ProjectJournal;
+
+class EXPORT EngineClient
 {
+public:
+	EngineClient( Engine * engine) : m_engine(engine) {}
 
-Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
-{
-    STRINGIFY( PLUGIN_NAME ),
-    "Carla Patchbay",
-    QT_TRANSLATE_NOOP( "pluginBrowser",
-                       "Carla Patchbay Instrument" ),
-    "falkTX <falktx/at/falktx.com>",
-    0x0195,
-    Plugin::Instrument,
-    new PluginPixmapLoader( "logo" ),
-    NULL,
-    NULL
-} ;
+	Engine * getEngine() const { return m_engine; }
+	Song * getSong() const { return m_engine->getSong(); }
+	Mixer * getMixer() const { return m_engine->mixer(); }
+	FxMixer * getFxMixer() const { return m_engine->fxMixer(); }
+	BBTrackContainer * getBBTrackContainer() const { return m_engine->getBBTrackContainer(); }
+	ProjectJournal * getProjectJournal() const { return m_engine->projectJournal(); }
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, Engine * engine, void* data)
-{
-    return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlapatchbay_plugin_descriptor, engine, true);
-}
+private:
+	Engine * m_engine;
+};
 
-}
+
+#endif
+

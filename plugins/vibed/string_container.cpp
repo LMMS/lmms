@@ -51,7 +51,8 @@ void stringContainer::addString(int _harm,
 				const float _detune,
 				const int _oversample,
 				const bool _state,
-				const int _id )
+				const int _id,
+				const sample_rate_t baseSampleRate)
 {
 	float harm;
 	switch( _harm )
@@ -97,6 +98,7 @@ void stringContainer::addString(int _harm,
 						_randomize,
 						_string_loss,
 						_detune,
-						_state ) );
+						_state,
+						baseSampleRate ) );
 	m_exists[_id] = true;
 }

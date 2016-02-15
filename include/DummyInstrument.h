@@ -33,8 +33,8 @@
 class DummyInstrument : public Instrument
 {
 public:
-	DummyInstrument( InstrumentTrack * _instrument_track ) :
-		Instrument( _instrument_track, NULL )
+	DummyInstrument( InstrumentTrack * _instrument_track, Engine * engine ) :
+		Instrument( _instrument_track, NULL, engine )
 	{
 	}
 

@@ -36,8 +36,9 @@
 
 Effect::Effect( const Plugin::Descriptor * _desc,
 			Model * _parent,
+			Engine * engine,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
-	Plugin( _desc, _parent ),
+	Plugin( _desc, _parent, engine ),
 	m_parent( NULL ),
 	m_key( _key ? *_key : Descriptor::SubPluginFeatures::Key()  ),
 	m_processors( 1 ),

@@ -37,6 +37,7 @@
 #include "AutomationPattern.h"
 #include "ComboBoxModel.h"
 #include "Knob.h"
+#include "EngineClient.h"
 
 class QPainter;
 class QPixmap;
@@ -48,7 +49,7 @@ class TimeLineWidget;
 
 
 
-class AutomationEditor : public QWidget, public JournallingObject
+class AutomationEditor : public QWidget, public JournallingObject, public EngineClient
 {
 	Q_OBJECT
 	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
@@ -171,7 +172,7 @@ private:
 
 	static const int VALUES_WIDTH = 64;
 
-	AutomationEditor();
+	AutomationEditor( Engine * engine );
 	AutomationEditor( const AutomationEditor & );
 	virtual ~AutomationEditor();
 
@@ -259,7 +260,7 @@ class AutomationEditorWindow : public Editor
 	static const int INITIAL_WIDTH = 860;
 	static const int INITIAL_HEIGHT = 480;
 public:
-	AutomationEditorWindow();
+	AutomationEditorWindow(Engine * engine);
 	~AutomationEditorWindow();
 
 	void setCurrentPattern(AutomationPattern* pattern);

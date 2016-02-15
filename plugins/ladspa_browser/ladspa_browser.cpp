@@ -35,6 +35,7 @@
 #include "gui_templates.h"
 #include "ladspa_description.h"
 #include "ladspa_port_dialog.h"
+#include "AudioDevice.h"
 #include "TabBar.h"
 #include "TabButton.h"
 
@@ -61,9 +62,9 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, Engine * engine, void * _data )
 {
-	return new ladspaBrowser;
+	return new ladspaBrowser(engine);
 }
 
 }
@@ -71,8 +72,8 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 
 
 
-ladspaBrowser::ladspaBrowser() :
-	ToolPlugin( &ladspabrowser_plugin_descriptor, NULL )
+ladspaBrowser::ladspaBrowser(Engine * engine) :
+	ToolPlugin( &ladspabrowser_plugin_descriptor, NULL, engine )
 {
 }
 
@@ -215,7 +216,12 @@ QWidget * ladspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 	layout->addWidget( title );
 	layout->addSpacing( 10 );
 
-	ladspaDescription * description = new ladspaDescription( tab, _type );
+	Engine * engine = castModel<ToolPlugin>()->getEngine();
+	ch_cnt_t const channelCount = engine->mixer()->audioDev()->channels();
+	ladspaDescription * description = new ladspaDescription( tab,
+								 _type,
+								 engine->getLADSPAManager(),
+								 channelCount );
 	connect( description, SIGNAL( doubleClicked( const ladspa_key_t & ) ),
 				SLOT( showPorts( const ladspa_key_t & ) ) );
 	layout->addWidget( description, 1 );
@@ -228,7 +234,8 @@ QWidget * ladspaBrowserView::createTab( QWidget * _parent, const QString & _txt,
 
 void ladspaBrowserView::showPorts( const ladspa_key_t & _key )
 {
-	ladspaPortDialog ports( _key );
+	Engine * engine = castModel<ToolPlugin>()->getEngine();
+	ladspaPortDialog ports( _key, engine->getLADSPAManager(), engine->mixer()->processingSampleRate() );
 	ports.exec();
 }
 

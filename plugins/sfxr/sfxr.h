@@ -168,7 +168,7 @@ class sfxrInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	sfxrInstrument(InstrumentTrack * _instrument_track );
+	sfxrInstrument(InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~sfxrInstrument();
 
 	virtual void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );

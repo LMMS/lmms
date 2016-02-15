@@ -60,8 +60,8 @@ Plugin::Descriptor PLUGIN_EXPORT malletsstk_plugin_descriptor =
 }
 
 
-malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
-	Instrument( _instrument_track, &malletsstk_plugin_descriptor ),
+malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track, Engine * engine ):
+	Instrument( _instrument_track, &malletsstk_plugin_descriptor, engine ),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
 	m_positionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Position" )),
 	m_vibratoGainModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Gain" )),
@@ -224,7 +224,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_vibratoFreqModel.value(),
 						p,
 						(uint8_t) m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate() );
+						getProcessingSampleRate() );
 		}
 		else if( p == 9 )
 		{
@@ -237,7 +237,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_lfoSpeedModel.value(),
 						m_adsrModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate() );
+						getProcessingSampleRate() );
 		}
 		else
 		{
@@ -250,7 +250,7 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 						m_strikeModel.value() * 128.0,
 						m_velocityModel.value(),
 						(uint8_t) m_spreadModel.value(),
-				Engine::mixer()->processingSampleRate() );
+						getProcessingSampleRate() );
 		}
 		m.unlock();
 	}
@@ -661,9 +661,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, Engine * engine, void * _data )
 {
-	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ) );
+	return new malletsInstrument( static_cast<InstrumentTrack *>( _data ), engine );
 }
 
 

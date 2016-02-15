@@ -83,7 +83,7 @@ public:
 
 
 
-	void analyze( sampleFrame *buf, const fpp_t frames )
+	void analyze( sampleFrame *buf, const fpp_t frames, const sample_rate_t processingSampleRate )
 	{
 		if ( m_active )
 		{
@@ -109,7 +109,7 @@ public:
 				return;
 			}
 
-			m_sr = Engine::mixer()->processingSampleRate();
+			m_sr = processingSampleRate;
 			const int LOWEST_FREQ = 0;
 			const int HIGHEST_FREQ = m_sr / 2;
 

@@ -46,15 +46,15 @@ Plugin::Descriptor PLUGIN_EXPORT multitapecho_plugin_descriptor =
 }
 
 
-MultitapEchoEffect::MultitapEchoEffect( Model* parent, const Descriptor::SubPluginFeatures::Key* key ) :
-	Effect( &multitapecho_plugin_descriptor, parent, key ),
+MultitapEchoEffect::MultitapEchoEffect( Model* parent, Engine * engine, const Descriptor::SubPluginFeatures::Key* key ) :
+	Effect( &multitapecho_plugin_descriptor, parent, engine, key ),
 	m_stages( 1 ),
 	m_controls( this ),
 	m_buffer( 16100.0f ),
-	m_sampleRate( Engine::mixer()->processingSampleRate() ),
+	m_sampleRate( getProcessingSampleRate() ),
 	m_sampleRatio( 1.0f / m_sampleRate )
 {
-	m_work = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() );
+	m_work = MM_ALLOC( sampleFrame, getFramesPerPeriod() );
 	m_buffer.reset();
 	m_stages = static_cast<int>( m_controls.m_stages.value() );
 	updateFilters( 0, 19 );
@@ -164,9 +164,9 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, Engine * engine, void* data )
 {
-	return new MultitapEchoEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
+	return new MultitapEchoEffect( parent, engine, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }
 
 }

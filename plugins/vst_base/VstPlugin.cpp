@@ -79,10 +79,11 @@ public:
 
 
 
-VstPlugin::VstPlugin( const QString & _plugin ) :
+VstPlugin::VstPlugin( const QString & _plugin, Engine * engine ) :
 	QObject(),
 	JournallingObject(),
 	RemotePlugin(),
+	EngineClient( engine ),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
 	m_pluginWindowID( 0 ),
@@ -108,11 +109,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	}
 #endif
 
-	setTempo( Engine::getSong()->getTempo() );
+	setTempo( getSong()->getTempo() );
 
-	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
+	connect( getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 			this, SLOT( setTempo( bpm_t ) ) );
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
+	connect( getMixer(), SIGNAL( sampleRateChanged() ),
 				this, SLOT( updateSampleRate() ) );
 
 	// update once per second
@@ -378,7 +379,7 @@ void VstPlugin::updateSampleRate()
 {
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
-			addInt( Engine::mixer()->processingSampleRate() ) );
+			addInt( getMixer()->processingSampleRate() ) );
 	unlock();
 }
 

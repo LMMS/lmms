@@ -39,7 +39,7 @@ class vibed : public Instrument
 {
 	Q_OBJECT
 public:
-	vibed( InstrumentTrack * _instrument_track );
+	vibed( InstrumentTrack * _instrument_track, Engine * engine );
 	virtual ~vibed();
 
 	virtual void playNote( NotePlayHandle * _n,

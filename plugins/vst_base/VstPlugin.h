@@ -35,14 +35,15 @@
 #include "Mixer.h"
 #include "JournallingObject.h"
 #include "communication.h"
+#include "EngineClient.h"
 
 
 class PLUGIN_EXPORT VstPlugin : public QObject, public JournallingObject,
-								public RemotePlugin
+				public RemotePlugin, public EngineClient
 {
 	Q_OBJECT
 public:
-	VstPlugin( const QString & _plugin );
+	VstPlugin( const QString & _plugin, Engine * engine );
 	virtual ~VstPlugin();
 
 	void tryLoad( const QString &remoteVstPluginExecutable );

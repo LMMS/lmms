@@ -27,11 +27,12 @@
 #include "DummyInstrument.h"
 #include "NotePlayHandle.h"
 #include "Engine.h"
+#include "PluginFactory.h"
 
 
 Instrument::Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor ) :
-	Plugin( _descriptor, NULL/* _instrument_track*/ ),
+					const Descriptor * _descriptor, Engine * engine ) :
+	Plugin( _descriptor, NULL/* _instrument_track*/, engine ),
 	m_instrumentTrack( _instrument_track )
 {
 }
@@ -82,7 +83,8 @@ Instrument * Instrument::instantiate( const QString & _plugin_name,
 
 	// not quite... so delete plugin and return dummy instrument
 	delete p;
-	return( new DummyInstrument( _instrument_track ) );
+	Engine * engine = pluginFactory->getEngine();
+	return( new DummyInstrument( _instrument_track, engine ) );
 }
 
 

@@ -37,7 +37,7 @@ class MidiImport : public ImportFilter
 {
 	Q_OBJECT
 public:
-	MidiImport( const QString & _file );
+	MidiImport( const QString & _file, Engine * engine );
 	virtual ~MidiImport();
 
 	virtual PluginView * instantiateView( QWidget * )
