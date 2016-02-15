@@ -116,39 +116,58 @@ void printHelp()
 {
 	printf( "LMMS %s\n"
 		"Copyright (c) %s\n\n"
-		"Usage: lmms [ -r <project file> ] [ options ]\n"
-		"            [ -u <in> <out> ]\n"
+		"Usage: lmms [ -a ]\n"
+		"            [ -b <bitrate> ]\n"
+		"            [ -c <configfile> ]\n"
 		"            [ -d <in> ]\n"
+		"            [ -f <format> ]\n"
+		"            [ -geometry <geometry> ]\n"
 		"            [ -h ]\n"
+		"            [ -i <method> ]\n"
+		"            [ --import <in> [-e]]\n"
+		"            [ -l ]\n"
+		"            [ -o <path> ]\n"
+		"            [ -p <out> ]\n"
+		"            [ -r <project file> ] [ options ]\n"
+		"            [ -s <samplerate> ]\n"
+		"            [ -u <in> <out> ]\n"
+		"            [ -v ]\n"
+		"            [ -x <value> ]\n"
 		"            [ <file to load> ]\n\n"
-		"-r, --render <project file>	Render given project file\n"
-		"    --rendertracks <project>	Render each track to a different file\n"
-		"-o, --output <path>		Render into <path>\n"
-		"				For --render, provide a file path\n"
-		"				For --rendertracks, provide a directory path\n"
-		"-f, --format <format>		Specify format of render-output where\n"
-		"				Format is either 'wav' or 'ogg'.\n"
-		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
-		"				Range: 44100 (default) to 192000\n"
+		"-a, --float			32bit float bit depth\n"
 		"-b, --bitrate <bitrate>		Specify output bitrate in KBit/s\n"
 		"				Default: 160.\n"
+		"-c, --config <configfile>			Get the configuration from <configfile>\n"
+		"-d, --dump <in>			Dump XML of compressed file <in>\n"
+		"-f, --format <format>		Specify format of render-output where\n"
+		"				Format is either 'wav' or 'ogg'.\n"
+		"    --geometry <geometry>	Specify the prefered size and position of the main window\n"
+		"				geometry is <xsizexysize+xoffset+yoffsety>.\n"
+		"-h, --help			Show this usage information and exit.\n"
 		"-i, --interpolation <method>	Specify interpolation method\n"
 		"				Possible values:\n"
 		"				   - linear\n"
 		"				   - sincfastest (default)\n"
 		"				   - sincmedium\n"
 		"				   - sincbest\n"
-		"-x, --oversampling <value>	Specify oversampling\n"
-		"				Possible values: 1, 2, 4, 8\n"
-		"				Default: 2\n"
-		"-a, --float			32bit float bit depth\n"
+		"    --import <in> [-e]			Import MIDI file <in>.\n"
+		"				If -e is specified lmms exits after importing the file.\n"
 		"-l, --loop			Render as a loop\n"
+		"-o, --output <path>		Render into <path>\n"
+		"				For --render, provide a file path\n"
+		"				For --rendertracks, provide a directory path\n"
+		"-p, --profile <out>			Dump profiling information to file <out>\n"
+		"-r, --render <project file>	Render given project file\n"
+		"    --rendertracks <project>	Render each track to a different file\n"
+		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
+		"				Range: 44100 (default) to 192000\n"
 		"-u, --upgrade <in> [out]	Upgrade file <in> and save as <out>\n"
 		"       Standard out is used if no output file is specifed\n"
-		"-d, --dump <in>			Dump XML of compressed file <in>\n"
 		"-v, --version			Show version information and exit.\n"
 		"    --allowroot			Bypass root user startup check (use with caution).\n"
-		"-h, --help			Show this usage information and exit.\n\n",
+		"-x, --oversampling <value>	Specify oversampling\n"
+		"				Possible values: 1, 2, 4, 8\n"
+		"				Default: 2\n\n",
 		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
 }
 
@@ -172,7 +191,7 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
-	QString fileToLoad, fileToImport, renderOut, profilerOutputFile;
+	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -194,8 +213,10 @@ int main( int argc, char * * argv )
 		{
 			allowRoot = true;
 		}
-		else if( arg == "-geometry" )
+		else if( arg == "--geometry" )
 		{
+			// Delete the first "-" so Qt recognize the option
+			strcpy(argv[i], "-geometry");
 			// option -geometry is filtered by Qt later,
 			// so we need to check its presence now to
 			// determine, if the application should run in
@@ -514,7 +535,20 @@ int main( int argc, char * * argv )
 			}
 
 
-			profilerOutputFile = QString::fromLocal8Bit( argv[1] );
+			profilerOutputFile = QString::fromLocal8Bit( argv[i] );
+		}
+		else if( arg == "--config" || arg == "-c" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				printf( "\nNo configuration file specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+			configFile = QString::fromLocal8Bit( argv[i] );
 		}
 		else
 		{
@@ -529,7 +563,7 @@ int main( int argc, char * * argv )
 	}
 
 
-	ConfigManager::inst()->loadConfigFile();
+	ConfigManager::inst()->loadConfigFile(configFile);
 
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
