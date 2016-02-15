@@ -121,7 +121,7 @@ void printHelp()
 		"            [ -c <configfile> ]\n"
 		"            [ -d <in> ]\n"
 		"            [ -f <format> ]\n"
-		"            [ -geometry <geometry> ]\n"
+		"            [ --geometry <geometry> ]\n"
 		"            [ -h ]\n"
 		"            [ -i <method> ]\n"
 		"            [ --import <in> [-e]]\n"
