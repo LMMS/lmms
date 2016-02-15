@@ -59,6 +59,11 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 	Q_PROPERTY( float noteBorderRadiusX READ noteBorderRadiusX WRITE setNoteBorderRadiusX )
 	Q_PROPERTY( float noteBorderRadiusY READ noteBorderRadiusY WRITE setNoteBorderRadiusY )
+	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textColorLight READ textColorLight WRITE setTextColorLight )
+	Q_PROPERTY( QColor textShadow READ textShadow WRITE setTextShadow )
+	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
 public:
 	enum EditModes
 	{
@@ -115,6 +120,16 @@ public:
 	void setNoteBorderRadiusX( float b );
 	float noteBorderRadiusY() const;
 	void setNoteBorderRadiusY( float b );
+	QColor selectedNoteColor() const;
+	void setSelectedNoteColor( const QColor & c );
+	QColor textColor() const;
+	void setTextColor( const QColor & c );
+	QColor textColorLight() const;
+	void setTextColorLight( const QColor & c );
+	QColor textShadow() const;
+	void setTextShadow( const QColor & c );
+	QColor markedSemitoneColor() const;
+	void setMarkedSemitoneColor( const QColor & c );
 
 
 protected:
@@ -133,7 +148,7 @@ protected:
 	int getKey( int y ) const;
 	static void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol,
-				 	float radiusX, float radiusY );
+				 	float radiusX, float radiusY, const QColor & selCol );
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes();
@@ -358,6 +373,11 @@ private:
 	QColor m_barColor;
 	float m_noteBorderRadiusX;
 	float m_noteBorderRadiusY;
+	QColor m_selectedNoteColor;
+	QColor m_textColor;
+	QColor m_textColorLight;
+	QColor m_textShadow;
+	QColor m_markedSemitoneColor;
 
 signals:
 	void positionChanged( const MidiTime & );

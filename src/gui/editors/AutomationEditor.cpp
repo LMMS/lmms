@@ -105,7 +105,8 @@ AutomationEditor::AutomationEditor() :
 	m_gridColor( 0,0,0 ),
 	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
-	m_scaleColor( Qt::SolidPattern )
+	m_scaleColor( Qt::SolidPattern ),
+	m_crossColor( 0, 0, 0 )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -251,6 +252,8 @@ QColor AutomationEditor::vertexColor() const
 { return m_vertexColor; }
 QBrush AutomationEditor::scaleColor() const
 { return m_scaleColor; }
+QColor AutomationEditor::crossColor() const
+{ return m_crossColor; }
 void AutomationEditor::setGridColor( const QColor & c )
 { m_gridColor = c; }
 void AutomationEditor::setGraphColor( const QBrush & c )
@@ -259,6 +262,8 @@ void AutomationEditor::setVertexColor( const QColor & c )
 { m_vertexColor = c; }
 void AutomationEditor::setScaleColor( const QBrush & c )
 { m_scaleColor = c; }
+void AutomationEditor::setCrossColor( const QColor & c )
+{ m_crossColor = c; }
 
 
 
@@ -972,7 +977,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
-	p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
+	p.setPen( crossColor() );
 	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
 	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
 						height() - SCROLLBAR_SIZE );

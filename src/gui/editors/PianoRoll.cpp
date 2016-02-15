@@ -191,7 +191,12 @@ PianoRoll::PianoRoll() :
 	m_noteColor( 0, 0, 0 ),
 	m_barColor( 0, 0, 0 ),
 	m_noteBorderRadiusX( 0 ),
-	m_noteBorderRadiusY( 0 )
+	m_noteBorderRadiusY( 0 ),
+	m_selectedNoteColor( 0, 0, 0 ),
+	m_textColor( 0, 0, 0 ),
+	m_textColorLight( 0, 0, 0 ),
+	m_textShadow( 0, 0, 0 ),
+	m_markedSemitoneColor( 0, 0, 0 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -753,10 +758,39 @@ float PianoRoll::noteBorderRadiusY() const
 void PianoRoll::setNoteBorderRadiusY( float b )
 { m_noteBorderRadiusY = b; }
 
+QColor PianoRoll::selectedNoteColor() const
+{ return m_selectedNoteColor; }
+
+void PianoRoll::setSelectedNoteColor( const QColor & c )
+{ m_selectedNoteColor = c; }
+
+QColor PianoRoll::textColor() const
+{ return m_textColor; }
+
+void PianoRoll::setTextColor( const QColor & c )
+{ m_textColor = c; }
+
+QColor PianoRoll::textColorLight() const
+{ return m_textColorLight; }
+
+void PianoRoll::setTextColorLight( const QColor & c )
+{ m_textColorLight = c; }
+
+QColor PianoRoll::textShadow() const
+{ return m_textShadow; }
+
+void PianoRoll::setTextShadow( const QColor & c )
+{ m_textShadow = c; }
+
+QColor PianoRoll::markedSemitoneColor() const
+{ return m_markedSemitoneColor; }
+
+void PianoRoll::setMarkedSemitoneColor( const QColor & c )
+{ m_markedSemitoneColor = c; }
 
 void PianoRoll::drawNoteRect(QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
-						float radiusX, float radiusY )
+						float radiusX, float radiusY, const QColor & selCol )
 {
 	++x;
 	++y;
@@ -781,7 +815,7 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 	if( n->selected() )
 	{
-		col.setRgb( 0x00, 0x40, 0xC0 );
+		col = QColor( selCol );
 	}
 
 	// adjust note to make it a bit faded if it has a lower volume
@@ -2589,7 +2623,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT,
-			    QColor( 40, 40, 40, 200 ) );
+			    markedSemitoneColor() );
 	}
 
 
@@ -2697,16 +2731,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				QPoint textStart( WHITE_KEY_WIDTH - 18, key_line_y );
 				textStart += QPoint( 0, yCorrectionForNoteLabels );
 
-				p.setPen( QColor( 240, 240, 240 ) );
+				p.setPen( textShadow() );
 				p.drawText( textStart + QPoint( 1, 1 ), noteString );
 				// The C key is painted darker than the other ones
 				if ( key % 12 == 0 )
 				{
-					p.setPen( QColor( 0, 0, 0 ) );
+					p.setPen( textColor() );
 				}
 				else
 				{
-					p.setPen( QColor( 128, 128, 128 ) );
+					p.setPen( textColorLight() );
 				}
 				p.drawText( textStart, noteString );
 			}
@@ -2932,7 +2966,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				// note
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
-								note_width, note, noteColor(), noteBorderRadiusX(), noteBorderRadiusY() );
+								note_width, note, noteColor(), noteBorderRadiusX(), noteBorderRadiusY(), selectedNoteColor() );
 			}
 
 			// draw note editing stuff
@@ -2942,7 +2976,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				QColor color = barColor().lighter( 30 + ( note->getVolume() * 90 / MaxVolume ) );
 				if( note->selected() )
 				{
-					color.setRgb( 0x00, 0x40, 0xC0 );
+					color = selectedNoteColor();
 				}
 				p.setPen( QPen( color, NOTE_EDIT_LINE_WIDTH ) );
 
@@ -2957,10 +2991,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				QColor color( noteColor() );
+				QColor color = noteColor();
 				if( note->selected() )
 				{
-					color.setRgb( 0x00, 0x40, 0xC0 );
+					color = selectedNoteColor();
 				}
 
 				p.setPen( QPen( color, NOTE_EDIT_LINE_WIDTH ) );
@@ -3012,7 +3046,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						MidiTime::ticksPerTact() ) - x;
 	int y = (int) y_base - sel_key_start * KEY_LINE_HEIGHT;
 	int h = (int) y_base - sel_key_end * KEY_LINE_HEIGHT - y;
-	p.setPen( QColor( 0, 64, 192 ) );
+	p.setPen( selectedNoteColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
 
