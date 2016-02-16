@@ -665,13 +665,13 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 
 
-void Mixer::removePlayHandles( Track * _track, bool removeIPHs )
+void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 {
 	lockPlayHandleRemoval();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( _track ) && ( removeIPHs || ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle ) )
+		if( ( *it )->isFromTrack( _track ) && ( ( *it )->type() & types ) )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )

@@ -102,7 +102,9 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	closePlugin();
 }
 
