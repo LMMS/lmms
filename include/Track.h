@@ -191,8 +191,12 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_OBJECT
 
 // theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
+	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
+	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -204,16 +208,29 @@ public:
 	{
 		return m_tco;
 	}
-// qproperty access func
-	QColor fgColor() const;
+	// qproperty access func
+	QColor mutedColor() const;
+	QColor mutedBackgroundColor() const;
+	QColor selectedColor() const;
 	QColor textColor() const;
-	void setFgColor( const QColor & c );
+	QColor textShadowColor() const;
+	bool gradient() const;
+	void setMutedColor( const QColor & c );
+	void setMutedBackgroundColor( const QColor & c );
+	void setSelectedColor( const QColor & c );
 	void setTextColor( const QColor & c );
+	void setTextShadowColor( const QColor & c );
+	void setGradient( const bool & b );
 
+	// access needsUpdate member variable
+	bool needsUpdate();
+	void setNeedsUpdate( bool b );
+	
 public slots:
 	virtual bool close();
 	void cut();
 	void remove();
+	virtual void update();
 
 protected:
 	virtual void constructContextMenu( QMenu * )
@@ -227,6 +244,11 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseMoveEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
+	virtual void resizeEvent( QResizeEvent * re )
+	{
+		m_needsUpdate = true;
+		selectableObject::resizeEvent( re );
+	}
 
 	float pixelsPerTact();
 
@@ -267,9 +289,14 @@ private:
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
 // qproperty fields
-	QColor m_fgColor;
+	QColor m_mutedColor;
+	QColor m_mutedBackgroundColor;
+	QColor m_selectedColor;
 	QColor m_textColor;
+	QColor m_textShadowColor;
+	bool m_gradient;
 
+ 	bool m_needsUpdate;
 	inline void setInitialMousePos( QPoint pos )
 	{
 		m_initialMousePos = pos;

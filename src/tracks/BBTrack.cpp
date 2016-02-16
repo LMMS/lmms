@@ -21,6 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+#include "BBTrack.h"
 
 #include <QDomElement>
 #include <QColorDialog>
@@ -28,7 +29,6 @@
 #include <QPainter>
 
 #include "BBEditor.h"
-#include "BBTrack.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "Engine.h"
@@ -159,16 +159,14 @@ TrackContentObjectView * BBTCO::createView( TrackView * _tv )
 
 
 
-
-
-
-
-
-
 BBTCOView::BBTCOView( TrackContentObject * _tco, TrackView * _tv ) :
 	TrackContentObjectView( _tco, _tv ),
-	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) )
+	m_bbTCO( dynamic_cast<BBTCO *>( _tco ) ),
+	m_paintPixmap()
 {
+	connect( _tco->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+
+	setStyle( QApplication::style() );
 }
 
 
@@ -215,64 +213,103 @@ void BBTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 void BBTCOView::paintEvent( QPaintEvent * )
 {
-	QPainter p( this );
+	QPainter painter( this );
 
-	QColor col;
-	if( m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted() )
+	if( !needsUpdate() )
 	{
-		col = QColor( 160, 160, 160 );
+		painter.drawPixmap( 0, 0, m_paintPixmap );
+		return;
 	}
-	else if ( m_bbTCO->m_useStyleColor )
+
+	setNeedsUpdate( false );
+
+	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
+		? QPixmap( size() ) : m_paintPixmap;
+
+	QPainter p( &m_paintPixmap );
+
+	QLinearGradient lingrad( 0, 0, 0, height() );
+	QColor c;
+	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
+	
+	// state: selected, muted, default, user selected
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
+		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
+		: m_bbTCO->colorObj() ) );
+	
+	lingrad.setColorAt( 0, c.light( 130 ) );
+	lingrad.setColorAt( 1, c.light( 70 ) );
+	
+	if( gradient() )
 	{
-		col =  p.pen().brush().color();
+		p.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		col = m_bbTCO->colorObj();
+		p.fillRect( rect(), c );
 	}
-
-	if( isSelected() == true )
-	{
-		col.setRgb( qMax( col.red() - 128, 0 ), qMax( col.green() - 128, 0 ), 255 );
-	}
-
-	QLinearGradient lingrad( 0, 0, 0, height() );
-	lingrad.setColorAt( 0, col.light( 130 ) );
-	lingrad.setColorAt( 1, col.light( 70 ) );
-	p.fillRect( rect(), lingrad );
+	
+	// bar lines
+	const int lineSize = 3;
 
 	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
 	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
 	{
 		for( int x = static_cast<int>( t * pixelsPerTact() );
-								x < width()-2;
+								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerTact() ) )
 		{
-			p.setPen( col.light( 80 ) );
-			p.drawLine( x, 1, x, 5 );
-			p.setPen( col.light( 120 ) );
-			p.drawLine( x, height() - 6, x, height() - 2 );
+			p.setPen( c.light( 80 ) );
+			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
+			p.setPen( c.light( 120 ) );
+			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
+			 	x, rect().bottom() - TCO_BORDER_WIDTH );
 		}
 	}
 
-	p.setPen( col.lighter( 130 ) );
-	p.drawRect( 1, 1, rect().right()-2, rect().bottom()-2 );
+	// pattern name
+	p.setRenderHint( QPainter::TextAntialiasing );
 
-	p.setPen( col.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+	if(  m_staticTextName.text() != m_bbTCO->name() )
+	{
+		m_staticTextName.setText( m_bbTCO->name() );
+	}
 
-	p.setFont( pointSize<8>( p.font() ) );
-	
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawText( 4, p.fontMetrics().height()+1, m_bbTCO->name() );
+	QFont font;
+	font.setHintingPreference( QFont::PreferFullHinting );
+	font.setPointSize( 8 );
+	p.setFont( font );
+
+	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textLeft = TCO_BORDER_WIDTH + 1;
+
+	p.setPen( textShadowColor() );
+	p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
 	p.setPen( textColor() );
-	p.drawText( 3, p.fontMetrics().height(), m_bbTCO->name() );
+	p.drawStaticText( textLeft, textTop, m_staticTextName );
+
+	// inner border
+	p.setPen( c.lighter( 130 ) );
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
+		rect().bottom() - TCO_BORDER_WIDTH );	
+
+	// outer border
+	p.setPen( c.darker( 300 ) );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	
+	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_bbTCO->isMuted() )
 	{
-		p.drawPixmap( 3, p.fontMetrics().height() + 1,
-				embed::getIconPixmap( "muted", 16, 16 ) );
+		const int spacing = TCO_BORDER_WIDTH;
+		const int size = 14;
+		p.drawPixmap( spacing, height() - ( size + spacing ),
+			embed::getIconPixmap( "muted", size, size ) );
 	}
+	
+	p.end();
+	
+	painter.drawPixmap( 0, 0, m_paintPixmap );
+	
 }
 
 

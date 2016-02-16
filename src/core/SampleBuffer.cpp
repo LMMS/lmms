@@ -903,9 +903,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 	const bool focus_on_range = _to_frame <= m_frames
 					&& 0 <= _from_frame && _from_frame < _to_frame;
-//	_p.setClipRect( _clip );
-//	_p.setPen( QColor( 0x22, 0xFF, 0x44 ) );
-	//_p.setPen( QColor( 64, 224, 160 ) );
+	//_p.setClipRect( _clip );
 	const int w = _dr.width();
 	const int h = _dr.height();
 
