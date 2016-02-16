@@ -79,6 +79,8 @@ void EffectChain::loadSettings( const QDomElement & _this )
 {
 	clear();
 
+	// TODO This method should probably also lock the mixer
+
 	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
 
 	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
@@ -264,10 +266,14 @@ void EffectChain::clear()
 {
 	emit aboutToClear();
 
+	Engine::mixer()->lock();
+
 	m_enabledModel.setValue( false );
 	for( int i = 0; i < m_effects.count(); ++i )
 	{
 		delete m_effects[i];
 	}
 	m_effects.clear();
+
+	Engine::mixer()->unlock();
 }
