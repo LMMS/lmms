@@ -430,7 +430,10 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	Engine::mixer()->removePlayHandles( this, removeIPH );
+	Engine::mixer()->removePlayHandlesOfTypes( this, removeIPH
+				? PlayHandle::TypeNotePlayHandle
+					| PlayHandle::TypeInstrumentPlayHandle
+				: PlayHandle::TypeNotePlayHandle );
 	unlock();
 }
 

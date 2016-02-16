@@ -446,7 +446,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 
 SampleTrack::~SampleTrack()
 {
-	Engine::mixer()->removePlayHandles( this );
+	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
 }
 
 

@@ -101,7 +101,9 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	freeInstance();
 }
 

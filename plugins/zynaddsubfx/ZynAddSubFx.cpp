@@ -144,7 +144,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 
 	m_pluginMutex.lock();
 	delete m_plugin;

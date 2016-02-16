@@ -642,12 +642,32 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 	{
 		lockPlayHandleRemoval();
 		_ph->audioPort()->removePlayHandle( _ph );
+		bool removedFromList = false;
+		// Check m_newPlayHandles first because doing it the other way around
+		// creates a race condition
+		m_playHandleMutex.lock();
 		PlayHandleList::Iterator it =
-				qFind( m_playHandles.begin(),
-						m_playHandles.end(), _ph );
+				qFind( m_newPlayHandles.begin(),
+						m_newPlayHandles.end(), _ph );
+		if( it != m_newPlayHandles.end() )
+		{
+			m_newPlayHandles.erase( it );
+			removedFromList = true;
+		}
+		m_playHandleMutex.unlock();
+		// Now check m_playHandles
+		it = qFind( m_playHandles.begin(),
+					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{
 			m_playHandles.erase( it );
+			removedFromList = true;
+		}
+		// Only deleting PlayHandles that were actually found in the list
+		// "fixes crash when previewing a preset under high load"
+		// (See tobydox's 2008 commit 4583e48)
+		if ( removedFromList )
+		{
 			if( _ph->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) _ph );
@@ -665,13 +685,13 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 
 
-void Mixer::removePlayHandles( Track * _track, bool removeIPHs )
+void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 {
 	lockPlayHandleRemoval();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
-		if( ( *it )->isFromTrack( _track ) && ( removeIPHs || ( *it )->type() != PlayHandle::TypeInstrumentPlayHandle ) )
+		if( ( *it )->isFromTrack( _track ) && ( ( *it )->type() & types ) )
 		{
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )

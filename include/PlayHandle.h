@@ -40,11 +40,10 @@ class PlayHandle : public ThreadableJob
 public:
 	enum Types
 	{
-		TypeNotePlayHandle,
-		TypeInstrumentPlayHandle,
-		TypeSamplePlayHandle,
-		TypePresetPreviewHandle,
-		TypeCount
+		TypeNotePlayHandle = 0x01,
+		TypeInstrumentPlayHandle = 0x02,
+		TypeSamplePlayHandle = 0x04,
+		TypePresetPreviewHandle = 0x08
 	} ;
 	typedef Types Type;
 
