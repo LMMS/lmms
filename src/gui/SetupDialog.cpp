@@ -1003,18 +1003,18 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 
 
-	ConfigManager::inst()->setWorkingDir( m_workingDir );
-	ConfigManager::inst()->setVSTDir( m_vstDir );
-	ConfigManager::inst()->setGIGDir( m_gigDir );
-	ConfigManager::inst()->setSF2Dir( m_sf2Dir );
-	ConfigManager::inst()->setArtworkDir( m_artworkDir );
-	ConfigManager::inst()->setFLDir( m_flDir );
-	ConfigManager::inst()->setLADSPADir( m_ladDir );
+	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
+	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
+	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
+	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
+	ConfigManager::inst()->setArtworkDir(QDir::fromNativeSeparators(m_artworkDir));
+	ConfigManager::inst()->setFLDir(QDir::fromNativeSeparators(m_flDir));
+	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
 #endif
 #ifdef LMMS_HAVE_STK
-	ConfigManager::inst()->setSTKDir( m_stkDir );
+	ConfigManager::inst()->setSTKDir(QDir::fromNativeSeparators(m_stkDir));
 #endif	
 	ConfigManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
 

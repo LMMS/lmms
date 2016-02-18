@@ -79,8 +79,7 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
-		!QFileInfo( ConfigManager::inst()->stkDir() + QDir::separator()
-						+ "sinewave.raw" ).exists() )
+		!QFileInfo( ConfigManager::inst()->stkDir() + "/sinewave.raw" ).exists() )
 {
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
