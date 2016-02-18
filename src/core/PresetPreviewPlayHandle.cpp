@@ -118,6 +118,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 {
 	s_previewTC->lockData();
 
+	setUsesBuffer( false );
+
 	if( s_previewTC->previewNote() != NULL )
 	{
 		s_previewTC->previewNote()->mute();
@@ -185,6 +187,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	s_previewTC->setPreviewNote( m_previewNote );
 
+	Engine::mixer()->addPlayHandle( m_previewNote );
+
 	s_previewTC->unlockData();
 	Engine::projectJournal()->setJournalling( j );
 }
@@ -201,7 +205,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 		// then set according state
 		s_previewTC->setPreviewNote( NULL );
 	}
-	NotePlayHandleManager::release( m_previewNote );
+	m_previewNote->noteOff();
 	s_previewTC->unlockData();
 }
 
@@ -210,7 +214,8 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 
 void PresetPreviewPlayHandle::play( sampleFrame * _working_buffer )
 {
-	m_previewNote->play( _working_buffer );
+	// Do nothing; the preview instrument is played by m_previewNote, which
+	// has been added to the mixer
 }
 
 
