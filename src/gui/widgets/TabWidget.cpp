@@ -77,7 +77,7 @@ void TabWidget::addTab( QWidget * _w, const QString & _name,  const char * pixma
 	if ( pixmapName == NULL ) {
 		w = fontMetrics().width( _name ) + 10;
 	} else {
-		w = 30; 
+		w = 28; // artwork's width
 	}
 
         // Register new tab
