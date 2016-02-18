@@ -387,7 +387,9 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 
 BBTrack::~BBTrack()
 {
-	Engine::mixer()->removePlayHandles( this );
+	Engine::mixer()->removePlayHandlesOfTypes( this,
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 
 	const int bb = s_infoMap[this];
 	Engine::getBBTrackContainer()->removeBB( bb );

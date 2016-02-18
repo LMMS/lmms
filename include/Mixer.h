@@ -224,7 +224,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( Track * _track, bool removeIPHs = true );
+	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
 
 	bool hasNotePlayHandles();
 
