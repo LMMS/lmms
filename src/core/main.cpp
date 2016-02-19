@@ -736,15 +736,18 @@ int main( int argc, char * * argv )
 			}
 		}
 
-		// we try to load given file
+		// first show the Main Window and then try to load given file
+
+		// [Settel] workaround: showMaximized() doesn't work with
+		// FVWM2 unless the window is already visible -> show() first
+		gui->mainWindow()->show();
+		if( fullscreen )
+		{
+			gui->mainWindow()->showMaximized();
+		}
+
 		if( !fileToLoad.isEmpty() )
 		{
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
-
 			if( fileToLoad == recoveryFile )
 			{
 				Engine::getSong()->createNewProjectFromTemplate( fileToLoad );
@@ -761,49 +764,33 @@ int main( int argc, char * * argv )
 			{
 				return EXIT_SUCCESS;
 			}
-
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
 		}
-		else
+		// If enabled, open last project if there is one. Else, create
+		// a new one. Also skip recently opened file if limited session to
+		// lower the chance of opening an already opened file.
+		else if( ConfigManager::inst()->
+				value( "app", "openlastproject" ).toInt() &&
+			!ConfigManager::inst()->
+				recentlyOpenedProjects().isEmpty() &&
+			gui->mainWindow()->getSession() !=
+				MainWindow::SessionState::Limited )
 		{
-			// If enabled, open last project if there is one. Else, create
-			// a new one. Also skip recently opened file if limited session to
-			// lower the chance of opening an already opened file.
-			if( ConfigManager::inst()->
-					value( "app", "openlastproject" ).toInt() &&
-				!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() &&
-				gui->mainWindow()->getSession()
-						!= MainWindow::SessionState::Limited )
-			{
-				QString f = ConfigManager::inst()->
-							recentlyOpenedProjects().first();
-				QFileInfo recentFile( f );
+			QString f = ConfigManager::inst()->
+					recentlyOpenedProjects().first();
+			QFileInfo recentFile( f );
 
-				if ( recentFile.exists() )
-				{
-					Engine::getSong()->loadProject( f );
-				}
-				else
-				{
-					Engine::getSong()->createNewProject();
-				}
+			if ( recentFile.exists() )
+			{
+				Engine::getSong()->loadProject( f );
 			}
 			else
 			{
 				Engine::getSong()->createNewProject();
 			}
-
-			// [Settel] workaround: showMaximized() doesn't work with
-			// FVWM2 unless the window is already visible -> show() first
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
+		}
+		else
+		{
+			Engine::getSong()->createNewProject();
 		}
 
 		// Finally we start the auto save timer and also trigger the
