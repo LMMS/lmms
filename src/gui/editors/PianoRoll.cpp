@@ -1081,7 +1081,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				}
 				else if( ke->modifiers() & Qt::AltModifier)
 				{
-					Pattern * p = m_pattern->previousPattern();
+					// switch to editing a pattern adjacent to this one in the song editor
+					Pattern * p = direction > 0 ? m_pattern->nextPattern() : m_pattern->previousPattern();
 					if(p != NULL)
 					{
 						setCurrentPattern(p);
