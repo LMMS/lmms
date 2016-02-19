@@ -105,7 +105,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		}
 		m_resKnob->setVolumeKnob(false);
 		m_resKnob->setModel( m_parameterWidget->getBandModels( i )->res );
-		if(i > 1 && i < 6) { m_resKnob->setHintText( tr( "Bandwidth: " ) , " Octave" ); }
+		if(i > 0 && i < 7) { m_resKnob->setHintText( tr( "Bandwidth: " ) , tr( " Octave" ) ); }
 		else { m_resKnob->setHintText( tr( "Resonance : " ) , "" ); }
 
 		m_freqKnob = new Knob( knobBright_26, this );
