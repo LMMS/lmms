@@ -41,6 +41,10 @@ class FxLine : public QWidget
 	Q_OBJECT
 public:
 	Q_PROPERTY( QBrush backgroundActive READ backgroundActive WRITE setBackgroundActive )
+	Q_PROPERTY( QColor strokeOuterActive READ strokeOuterActive WRITE setStrokeOuterActive )
+	Q_PROPERTY( QColor strokeOuterInactive READ strokeOuterInactive WRITE setStrokeOuterInactive )
+	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
+	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
 	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
 	~FxLine();
 
@@ -57,6 +61,19 @@ public:
 
 	QBrush backgroundActive() const;
 	void setBackgroundActive( const QBrush & c );
+	
+	QColor strokeOuterActive() const;
+	void setStrokeOuterActive( const QColor & c );
+	
+	QColor strokeOuterInactive() const;
+	void setStrokeOuterInactive( const QColor & c );
+	
+	QColor strokeInnerActive() const;
+	void setStrokeInnerActive( const QColor & c );
+	
+	QColor strokeInnerInactive() const;
+	void setStrokeInnerInactive( const QColor & c );
+
 
 	static const int FxLineHeight;
 
@@ -67,6 +84,10 @@ private:
 	LcdWidget* m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;
+	QColor m_strokeOuterActive;
+	QColor m_strokeOuterInactive;
+	QColor m_strokeInnerActive;
+	QColor m_strokeInnerInactive;
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
 

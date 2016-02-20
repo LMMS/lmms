@@ -514,6 +514,10 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
 }
 
 /* persistent peak markers for fx peak meters */
