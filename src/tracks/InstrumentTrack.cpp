@@ -1411,8 +1411,8 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
-	m_tabWidget = new TabWidget( "", this );
-	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + 10 );
+	m_tabWidget = new TabWidget( "", this, true ); 
+	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + 16 );
 
 
 	// create tab-widgets
@@ -1439,11 +1439,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
 
 
-	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), "env_lfo", 1 );
-	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), "functions", 2 );
-	m_tabWidget->addTab( m_effectView, tr( "FX" ), "fx", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_inactive", 4 );
-	m_tabWidget->addTab( m_miscView, tr( "MISC" ), "miscellaneous", 5 );
+	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), "env_lfo_active", "env_lfo_inactive", 1 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), "functions_active", "functions_inactive", 2 );
+	m_tabWidget->addTab( m_effectView, tr( "FX" ), "fx_active", "fx_inactive", 3 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_active", "midi_inactive", 4 );
+	m_tabWidget->addTab( m_miscView, tr( "MISC" ), "miscellaneous_active", "miscellaneous_inactive", 5 );
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -1617,7 +1617,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 	if( m_track->m_instrument != NULL )
 	{
 		m_instrumentView = m_track->m_instrument->createView( m_tabWidget );
-		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), "plugin", 0 );
+		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), "plugin_active", "plugin_inactive", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
 		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) );

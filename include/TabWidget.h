@@ -29,16 +29,14 @@
 #include <QWidget>
 #include <QtCore/QMap>
 
-#include <string>
-
 class TabWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TabWidget( const QString & _caption, QWidget * _parent );
+	TabWidget( const QString & _caption, QWidget * _parent, bool usePixmap = false );
 	virtual ~TabWidget();
 
-	void addTab( QWidget * _w, const QString & _name, const char * pixmapName, int _idx = -1 );
+	void addTab( QWidget *_w, const QString &_name, const char *activePixmap = NULL, const char *inactivePixmap = NULL, int _idx = -1 );
 
 	void setActiveTab( int _idx );
 
@@ -58,17 +56,20 @@ protected:
 private:
 	struct widgetDesc
 	{
-		QWidget       * w;	   // ptr to widget
-		const char    *pixmapName; // artwork for the widget 
-		QString       name;	   // name for widget
-		int           nwidth;	   // width of name when painting
+		QWidget       * w;	   	// ptr to widget
+		const char    *activePixmap; 	// artwork for the widget 
+		const char    *inactivePixmap; 	// artwork for the widget 
+		QString       name;	   	// name for widget
+		int           nwidth;	   	// width of name when painting (only valid for text tab)
 	} ;
 	typedef QMap<int, widgetDesc> widgetStack;
 
 	widgetStack m_widgets;
-	int m_activeTab;
+
+	int 	m_activeTab;
 	QString m_caption;
-	quint8 m_tabheight;
+	quint8 	m_tabheight;
+	bool	m_usePixmap;	// true if the tabs are to be displayed with icons. False for text tabs.
 } ;
 
 #endif
