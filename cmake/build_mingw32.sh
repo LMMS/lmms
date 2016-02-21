@@ -16,5 +16,5 @@ if [ "$1" = "-qt5" ] ; then
 	CMAKE_OPTS="-DWANT_QT5=ON -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
 fi
 
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/modules/Win32Toolchain.cmake -DCMAKE_MODULE_PATH=`pwd`/../cmake/modules/ $CMAKE_OPTS
-
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cmake $DIR/.. -DCMAKE_TOOLCHAIN_FILE=$DIR/../cmake/modules/Win32Toolchain.cmake -DCMAKE_MODULE_PATH=$DIR/../cmake/modules/ $CMAKE_OPTS
