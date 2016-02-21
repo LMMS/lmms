@@ -1437,7 +1437,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), "env_lfo", 1 );
 	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), "functions", 2 );
 	m_tabWidget->addTab( m_effectView, tr( "FX" ), "fx", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi", 4 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_inactive", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "MISC" ), "miscellaneous", 5 );
 
 	// setup piano-widget
