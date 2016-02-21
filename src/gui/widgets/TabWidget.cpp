@@ -72,13 +72,8 @@ void TabWidget::addTab( QWidget * _w, const QString & _name,  const char * pixma
 		}
 	}
 
-	// Compute tab's width
-	int w;
-	if ( pixmapName == NULL ) {
-		w = fontMetrics().width( _name ) + 10;
-	} else {
-		w = 28; // artwork's width
-	}
+	// Tab's width when it is a text tab
+	int w = fontMetrics().width( _name ) + 10;
 
         // Register new tab
 	widgetDesc d = { _w, pixmapName, _name, w } ;
@@ -207,48 +202,57 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 	p.setPen( cap_col );
 
 	// Draw all tabs
-        for( widgetStack::iterator it = m_widgets.begin();
-                                               it != m_widgets.end(); ++it )
+  	widgetStack::iterator first = m_widgets.begin();
+  	widgetStack::iterator last = m_widgets.end();
+  	int size = std::distance(first,last);
+        for( widgetStack::iterator it = first ; it != last ; ++it )
         {
 
 		// Draw a text tab when no artwork has been defined for the tab.
 		if ( (*it ).pixmapName  == NULL )
-		{
-			// Highlight text tabs when they are active
-			if ( it.key() == m_activeTab ) {
+		{	
+
+			// Highlight tab when active
+                	if( it.key() == m_activeTab )
+	                {
 				p.setPen( QColor( 32, 48, 64 ) );
 				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, 10, cap_col );
 			}
 
-			// Draw tab
+			// Draw text
 			p.drawText( tab_x_offset + 3, m_tabheight, ( *it ).name );
+
+			// Reset text color
 			p.setPen( cap_col );
+
+
 		} else
 		{
-			// Get active or inactive artwork
-			std::string tab = std::string( ( *it ).pixmapName );
-	                if( it.key() == m_activeTab )
-	                {
-				tab += "_active";
-	                } else 
-			{
-				tab += "_inactive";
-			}
-	                QPixmap *artwork = new QPixmap(  embed::getIconPixmap( tab.c_str() ) );
+			// Get artwork
+	                QPixmap *artwork = new QPixmap( embed::getIconPixmap( ( *it ).pixmapName ) );
 
-			// Draw tab
-	                p.drawPixmap(tab_x_offset, 0, *artwork );
+                	if( it.key() == m_activeTab )
+	                {
+				p.fillRect( tab_x_offset, 1, width() / size, 12, cap_col );
+			}
+
+			// Draw artwork
+	                p.drawPixmap(tab_x_offset + ( width() / ( size * 2 ) ) - 7, 0, *artwork );
+
+			// Recompute tab's width, because original size is only correct for text tabs
+			( *it).nwidth = width() / size;
+
 		}
 
 		// Next tab's horizontal position
 		tab_x_offset += ( *it ).nwidth;
-
         }
 }
 
 
 
 
+// Switch between tabs with mouse wheel
 void TabWidget::wheelEvent( QWheelEvent * _we )
 {
 	if (_we->y() > m_tabheight)
