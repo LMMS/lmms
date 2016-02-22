@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Accomodate both linux windows mingw locations
 MINGW=/mingw32
