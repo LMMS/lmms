@@ -29,7 +29,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
-
+#include <QDebug>
 #include <math.h>
 
 #include "AutomationTrack.h"
@@ -84,6 +84,7 @@ Song::Song() :
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
+	m_modifiedSinceAutoSave( false ),
 	m_recording( false ),
 	m_exporting( false ),
 	m_exportLoop( false ),
@@ -657,6 +658,21 @@ void Song::stop()
 	m_playMode = Mode_None;
 
 	emit playbackStateChanged();
+	if( Engine::getSong()->isModifiedSinceAutoSave() &&
+		ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
+		gui->mainWindow()->getSession() != MainWindow::SessionState::Limited
+											 )
+	{
+		qDebug("Stopped, runAutoSave()");
+		gui->mainWindow()->runAutoSave();
+	}
+	else if( gui->mainWindow()->getAutoSaveTimerInterval() ==
+					gui->mainWindow()->m_autoSaveShortTime )
+	{
+		qDebug("Stopped and in short loop, autoSave()");
+		// We are in the short loop so autoSave() will do a reset
+		gui->mainWindow()->autoSave();
+	}
 }
 
 
@@ -900,6 +916,7 @@ void Song::createNewProject()
 	QCoreApplication::sendPostedEvents();
 
 	m_modified = false;
+	m_modifiedSinceAutoSave = false;
 
 	if( gui->mainWindow() )
 	{
@@ -1063,6 +1080,7 @@ void Song::loadProject( const QString & fileName )
 
 	m_loadingProject = false;
 	m_modified = false;
+	m_modifiedSinceAutoSave = false;
 
 	if( gui && gui->mainWindow() )
 	{
@@ -1375,6 +1393,7 @@ void Song::setModified()
 	if( !m_loadingProject )
 	{
 		m_modified = true;
+		m_modifiedSinceAutoSave = true;
 		if( gui != nullptr && gui->mainWindow() &&
 			QThread::currentThread() == gui->mainWindow()->thread() )
 		{

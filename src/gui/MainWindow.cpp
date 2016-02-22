@@ -24,6 +24,7 @@
 
 #include "MainWindow.h"
 
+#include <QDebug>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopServices>
@@ -206,7 +207,7 @@ MainWindow::MainWindow() :
 		// The auto save function mustn't run until there is a project
 		// to save or it will run over recover.mmp if you hesitate at the
 		// recover messagebox for a minute. It is now started in main.
-		// See autoSaveTimerStart() in MainWindow.h
+		// See autoSaveTimerReset() in MainWindow.h
 	}
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
@@ -916,8 +917,12 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 
 bool MainWindow::saveProject()
 {
+	// Prevent auto save while doing a manual save
+	m_autoSaveTimer.stop();
+	qDebug("Stopping timer and resetting while saving manually");
 	if( Engine::getSong()->projectFileName() == "" )
 	{
+			qDebug("No previous save so opening 'save project as' dialog");
 		return( saveProjectAs() );
 	}
 	else
@@ -926,8 +931,10 @@ bool MainWindow::saveProject()
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
+			autoSave();
 		}
 	}
+	autoSaveTimerReset();
 	return( true );
 }
 
@@ -936,6 +943,9 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
+	// Prevent auto save while doing a manual save
+	qDebug("Stopping timer while in save menu");
+	m_autoSaveTimer.stop();
 	VersionedSaveDialog sfd( this, tr( "Save Project" ), "",
 			tr( "LMMS Project" ) + " (*.mmpz *.mmp);;" +
 				tr( "LMMS Project Template" ) + " (*.mpt)" );
@@ -962,9 +972,14 @@ bool MainWindow::saveProjectAs()
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
+			autoSave();
 		}
+		qDebug("Resetting after manual save");
+		autoSaveTimerReset();
 		return( true );
 	}
+	qDebug("No manual save so backing up...");
+	autoSave();
 	return( false );
 }
 
@@ -1507,14 +1522,27 @@ void MainWindow::browseHelp()
 void MainWindow::autoSave()
 {
 	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ) )
+			Engine::getSong()->isExporting() ||
+				QApplication::mouseButtons() ) )
 	{
+		qDebug("autoSave...");
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		Engine::getSong()->setUnmodifiedSinceAutoSave();
+		if( getAutoSaveTimerInterval() != m_autoSaveLongTime )
+		{
+			autoSaveTimerReset();  // Reset timer
+		}
 	}
 	else
 	{
 		// try again in 10 seconds
-		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
+		if( QApplication::mouseButtons() )
+			qDebug("Mouse button pressed");
+		qDebug("in short loop");
+		if( getAutoSaveTimerInterval() != m_autoSaveShortTime )
+		{
+			autoSaveTimerReset( m_autoSaveShortTime );
+		}
 	}
 }
 
@@ -1527,5 +1555,6 @@ void MainWindow::runAutoSave()
 		getSession() != Limited )
 	{
 		autoSave();
+		autoSaveTimerReset();  // Reset timer
 	}
 }

@@ -29,6 +29,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QMainWindow>
+#include <QDebug>
 
 #include "SubWindow.h"
 
@@ -81,9 +82,19 @@ public:
 	///
 	bool mayChangeProject(bool stopPlayback);
 
-	void autoSaveTimerStart()
+	// Auto save timer intervals
+	const static int m_autoSaveLongTime = 120 * 1000;
+	const static int m_autoSaveShortTime = 10 * 1000; // 10s short loop
+
+	void autoSaveTimerReset( int msec = m_autoSaveLongTime )
 	{
-		m_autoSaveTimer.start( 1000 * 60 );  // 1 minute
+		qDebug("Timer reset to %i seconds", msec / 1000 );
+		m_autoSaveTimer.start( msec );
+	}
+
+	int getAutoSaveTimerInterval()
+	{
+		return m_autoSaveTimer.interval();
 	}
 
 	enum SessionState
