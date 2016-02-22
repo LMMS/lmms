@@ -252,29 +252,30 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 	// Draw all tabs
   	widgetStack::iterator first = m_widgets.begin();
   	widgetStack::iterator last = m_widgets.end();
+	int tab_width = ( width() - tab_x_offset ) / std::distance( first, last ); // Correct tab's width for artwork tabs
         for( widgetStack::iterator it = first ; it != last ; ++it )
         {
 
 		// Draw a text tab or a artwork tab.
 		if ( m_usePixmap )
 		{	
-			// Recompute tab's width, because original size is only correct for text tabs
-  			int size = std::distance(first,last);
-			( *it ).nwidth = width() / size;
+
+			// Fixes tab's width, because original size is only correct for text tabs
+			( *it ).nwidth = tab_width;
 
 			// Get active or inactive artwork
                 	QPixmap *artwork;
 			if( it.key() == m_activeTab )
                         {
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
-				p.fillRect( tab_x_offset, 1, width() / size, TAB_HEIGHT, cap_col );
+				p.fillRect( tab_x_offset, 1, ( *it ).nwidth, TAB_HEIGHT - 1, cap_col );
 			} else 
 			{
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
 			}
 
 			// Draw artwork
-	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 1, *artwork );
+	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 0, *artwork );
 
 		} else
 		{
