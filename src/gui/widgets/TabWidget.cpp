@@ -34,26 +34,15 @@
 #include "gui_templates.h"
 #include "embed.h"
 
-const int GRAPHICAL_TAB_HEIGHT = 20;
-const int TEXT_TAB_HEIGHT = 14;
-
 TabWidget::TabWidget( const QString & _caption, QWidget * _parent, bool usePixmap ) :
 	QWidget( _parent ),
 	m_activeTab( 0 ),
 	m_caption( _caption ),
-	m_tabheight( _caption.isEmpty() ? 11: 10 )
+	m_tabheight( _caption.isEmpty() ? 11: 10 ),
+	m_usePixmap( usePixmap )
 {
 
-	// TabWidget with artwork tabs have a height of 20 pixels
-	if ( usePixmap )
-	{ 
-		m_usePixmap = true;
-		m_tabheight = GRAPHICAL_TAB_HEIGHT;
-	} else
-	{
-		m_usePixmap = false;
-		m_tabheight = _caption.isEmpty() ? TEXT_TAB_HEIGHT - 3 : TEXT_TAB_HEIGHT - 4;
-	}
+	m_tabheight = _caption.isEmpty() ? TAB_HEIGHT - 3 : TAB_HEIGHT - 4;
 
 	setFont( pointSize<8>( font() ) );
 
@@ -88,7 +77,7 @@ void TabWidget::addTab( QWidget * _w, const QString & _name,  const char *active
 		}
 	}
 
-	// Tab's width when it is a text tab
+	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
 	int w = fontMetrics().width( _name ) + 10;
 
         // Register new tab
@@ -96,14 +85,8 @@ void TabWidget::addTab( QWidget * _w, const QString & _name,  const char *active
 	m_widgets[_idx] = d;
 
         // Position tab's window
-	if (m_usePixmap) {
-		_w->setFixedSize( width() - 4, height() - GRAPHICAL_TAB_HEIGHT );
-		_w->move( 2, GRAPHICAL_TAB_HEIGHT -1 );
-	} else 
-	{
-		_w->setFixedSize( width() - 4, height() - TEXT_TAB_HEIGHT );
-		_w->move( 2, TEXT_TAB_HEIGHT - 1 );
-	}
+	_w->setFixedSize( width() - 4, height() - TAB_HEIGHT );
+	_w->move( 2, TAB_HEIGHT - 1 );
 	_w->hide();
 
 	// Show tab's window if it's active
@@ -139,9 +122,7 @@ void TabWidget::setActiveTab( int _idx )
 int TabWidget::findTabAtPos( const QPoint *pos )
 {
 
-	int height = ( m_usePixmap ? GRAPHICAL_TAB_HEIGHT -1 : TEXT_TAB_HEIGHT -1 );
-
-	if( pos->y() > 1 && pos->y() < height )
+	if( pos->y() > 1 && pos->y() < TAB_HEIGHT - 1 )
 	{
                int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
 
@@ -211,12 +192,7 @@ void TabWidget::resizeEvent( QResizeEvent * )
 	for( widgetStack::iterator it = m_widgets.begin();
 						it != m_widgets.end(); ++it )
 	{
-		if ( m_usePixmap ) {
-			( *it ).w->setFixedSize( width() - 4, height() - GRAPHICAL_TAB_HEIGHT );
-		} else
-		{
-			( *it ).w->setFixedSize( width() - 4, height() - TEXT_TAB_HEIGHT );
-		}
+		( *it ).w->setFixedSize( width() - 4, height() - TAB_HEIGHT );
 	}
 }
 
@@ -291,7 +267,7 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 			if( it.key() == m_activeTab )
                         {
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
-				p.fillRect( tab_x_offset, 1, width() / size, GRAPHICAL_TAB_HEIGHT, cap_col );
+				p.fillRect( tab_x_offset, 1, width() / size, TAB_HEIGHT, cap_col );
 			} else 
 			{
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
@@ -307,7 +283,7 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
                 	if( it.key() == m_activeTab )
 	                {
 				p.setPen( QColor( 32, 48, 64 ) );
-				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, TEXT_TAB_HEIGHT - 4, cap_col );
+				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, TAB_HEIGHT - 4, cap_col );
 			}
 
 			// Draw text

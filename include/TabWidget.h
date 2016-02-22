@@ -29,6 +29,8 @@
 #include <QWidget>
 #include <QtCore/QMap>
 
+const int TAB_HEIGHT = 14;
+
 class TabWidget : public QWidget
 {
 	Q_OBJECT
