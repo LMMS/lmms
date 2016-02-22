@@ -40,6 +40,8 @@ public:
 
 	void setActiveTab( int _idx );
 
+	int findTabAtPos( const QPoint *pos );
+
 	inline int activeTab() const
 	{
 		return( m_activeTab );
@@ -47,6 +49,7 @@ public:
 
 
 protected:
+	virtual bool event( QEvent * event );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );

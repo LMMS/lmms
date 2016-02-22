@@ -28,6 +28,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
+#include <QToolTip>
 #include <QWheelEvent>
 
 #include "gui_templates.h"
@@ -134,29 +135,71 @@ void TabWidget::setActiveTab( int _idx )
 }
 
 
-
-
-void TabWidget::mousePressEvent( QMouseEvent * _me )
+// Return the index of the tab at position "pos"
+int TabWidget::findTabAtPos( const QPoint *pos )
 {
 
 	int height = ( m_usePixmap ? GRAPHICAL_TAB_HEIGHT -1 : TEXT_TAB_HEIGHT -1 );
 
-	if( _me->y() > 1 && _me->y() < height )
+	if( pos->y() > 1 && pos->y() < height )
 	{
-               int cx = ( ( m_caption == "" ) ? 4 : 14 ) +
-                                       fontMetrics().width( m_caption );
-		for( widgetStack::iterator it = m_widgets.begin();
-						it != m_widgets.end(); ++it )
+               int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
+
+		for( widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it )
 		{
-			if( _me->x() >= cx &&
-					_me->x() <= cx + ( *it ).nwidth )
+			if( pos->x() >= cx && pos->x() <= cx + ( *it ).nwidth )
 			{
-				setActiveTab( it.key() );
-				update();
-				return;
+				return( it.key() );
 			}
 			cx += ( *it ).nwidth;
 		}
+	}
+
+	// Haven't found any tab at position "pos"
+	return( -1 );
+}
+
+
+// Overload the QWidget::event handler to display tooltips (from https://doc.qt.io/qt-4.8/qt-widgets-tooltips-example.html)
+bool TabWidget::event(QEvent *event)
+{
+
+	if ( event->type() == QEvent::ToolTip )
+	{
+		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+
+		int idx = findTabAtPos( & helpEvent->pos() );
+
+		if ( idx != -1 )
+		{
+			// Display tab's tooltip
+			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].name );
+		} else
+		{
+			// The tooltip event doesn't relate to any tab, let's ignore it
+			QToolTip::hideText();
+			event->ignore();
+		}
+
+		return true;
+	}
+
+	// not a Tooltip event, let's propagate it to the other event handlers
+	return QWidget::event(event);	
+}
+
+
+// Activate tab when clicked
+void TabWidget::mousePressEvent( QMouseEvent * _me )
+{
+
+	int idx = findTabAtPos( & _me->pos() );
+
+	if ( idx != -1 )
+        {
+		setActiveTab( idx );
+                update();
+                return;
 	}
 }
 
