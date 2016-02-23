@@ -213,10 +213,13 @@ int main( int argc, char * * argv )
 		{
 			allowRoot = true;
 		}
-		else if( arg == "--geometry" )
+		else if( arg == "--geometry" || arg == "-geometry")
 		{
-			// Delete the first "-" so Qt recognize the option
-			strcpy(argv[i], "-geometry");
+			if( arg == "--geometry" )
+			{
+				// Delete the first "-" so Qt recognize the option
+				strcpy(argv[i], "-geometry");
+			}
 			// option -geometry is filtered by Qt later,
 			// so we need to check its presence now to
 			// determine, if the application should run in
