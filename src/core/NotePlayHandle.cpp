@@ -449,17 +449,17 @@ int NotePlayHandle::index() const
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
 		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
-		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() )
+		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
 		}
 		if( nph == this )
 		{
-			break;
+			return idx;
 		}
 		++idx;
 	}
-	return idx;
+	return -1;
 }
 
 
@@ -473,7 +473,7 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
 		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
-		if( nph != NULL && nph->m_instrumentTrack == _it && ( nph->isReleased() == false || _all_ph == true ) )
+		if( nph != NULL && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
 		}
