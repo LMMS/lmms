@@ -68,14 +68,12 @@ QMenu {
 QMenu::separator {
 	height: 1px;
 	background: #8d8d8d;
-	margin-left: 5px;
-	margin-right: 5px;
 }
 
 QMenu::item {
 	color: black;
-	padding: 2px 32px 2px 20px;
-	margin:3px;
+	padding: 2px 35px 2px 23px;
+	margin: 3px 0px 3px 0px;
 }
 
 QMenu::item:selected {
