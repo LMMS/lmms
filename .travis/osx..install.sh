@@ -1,4 +1,15 @@
-brew reinstall cmake pkgconfig qt fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node
+#!/usr/bin/env bash
+
+PACKAGES="cmake pkgconfig fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node"
+
+if [ $QT5 ]; then
+	PACKAGES="$PACKAGES qt5"
+else
+	PACKAGES="$PACKAGES qt"
+fi
+
+brew reinstall $PACKAGES
+
 sudo npm install -g appdmg
 
 # Workaround per Homebrew bug #44806
