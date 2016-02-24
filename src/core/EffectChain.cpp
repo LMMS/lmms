@@ -223,20 +223,6 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 				MixHelpers::sanitize( _buf, _frames );
 			}
 		}
-
-#ifdef LMMS_DEBUG
-		for( int f = 0; f < _frames; ++f )
-		{
-			if( fabs( _buf[f][0] ) > 5 || fabs( _buf[f][1] ) > 5 )
-			{
-				it = m_effects.end()-1;
-				printf( "numerical overflow after processing "
-					"plugin \"%s\"\n", ( *it )->
-					descriptor()->name);
-				break;
-			}
-		}
-#endif
 	}
 
 	return moreEffects;
