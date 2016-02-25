@@ -271,7 +271,7 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 			if( it.key() == m_activeTab )
                         {
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
-				p.fillRect( tab_x_offset, 1, ( *it ).nwidth, TAB_HEIGHT - 1, cap_col );
+				p.fillRect( tab_x_offset, 2, ( *it ).nwidth, TAB_HEIGHT - 3, cap_col );
 			} else 
 			{
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
