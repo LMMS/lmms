@@ -3261,13 +3261,11 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effet avec le menu contextu
     </message>
     <message>
         <source>FUNC</source>
-        <translatorcomment>&quot;FONCTIONS&quot; (previous translation) is too long for the limited available width. </translatorcomment>
-        <translation>FONCT</translation>
+        <translation>FONCTIONS</translation>
     </message>
     <message>
         <source>FX</source>
-        <translatorcomment>&quot;EFFETS&quot; (previous translation) is too long for the limited available width. &quot;FX&quot; should be understable by all</translatorcomment>
-        <translation>FX</translation>
+        <translation>EFFETS</translation>
     </message>
     <message>
         <source>MIDI</source>
