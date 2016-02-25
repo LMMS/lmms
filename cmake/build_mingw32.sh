@@ -12,8 +12,12 @@ export PATH=$PATH:$MINGW/bin
 export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -mfpmath=sse"
 export CXXFLAGS="$CFLAGS"
 
-if [ "$1" = "-qt5" ] ; then
-	CMAKE_OPTS="-DWANT_QT5=ON -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
+if [ "$1" = "-qt5" ]; then
+	QT5=True
+fi
+
+if [ $QT5 ]; then
+	CMAKE_OPTS="-DWANT_QT5=$QT5 -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

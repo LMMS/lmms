@@ -178,11 +178,27 @@ IF(LMMS_BUILD_WIN32)
 	ENDIF()
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES
+
+	IF(QT5)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/Qt5Core.dll"
+					"${MINGW_PREFIX}/bin/Qt5Gui.dll"
+					"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
+					"${MINGW_PREFIX}/bin/Qt5Xml.dll"
+				DESTINATION .)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
+				DESTINATION ./platforms)
+	ELSE()
+		INSTALL(FILES
 					"${MINGW_PREFIX}/bin/QtCore4.dll"
 					"${MINGW_PREFIX}/bin/QtGui4.dll"
 					"${MINGW_PREFIX}/bin/QtSvg4.dll"
 					"${MINGW_PREFIX}/bin/QtXml4.dll"
+				DESTINATION .)
+	ENDIF()
+
+	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
