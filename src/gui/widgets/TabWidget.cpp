@@ -65,7 +65,7 @@ TabWidget::~TabWidget()
 
 
 
-void TabWidget::addTab( QWidget * _w, const QString & _name,  const char *activePixmap, const char *inactivePixmap, int _idx )
+void TabWidget::addTab( QWidget * _w, const QString & _name, const QString & _tooltip, const char *activePixmap, const char *inactivePixmap, int _idx )
 {
 	setFont( pointSize<8>( font() ) );
 
@@ -81,7 +81,7 @@ void TabWidget::addTab( QWidget * _w, const QString & _name,  const char *active
 	int w = fontMetrics().width( _name ) + 10;
 
         // Register new tab
-	widgetDesc d = { _w, activePixmap, inactivePixmap, _name, w } ;
+	widgetDesc d = { _w, activePixmap, inactivePixmap, _name, _tooltip, w } ;
 	m_widgets[_idx] = d;
 
         // Position tab's window
@@ -154,7 +154,7 @@ bool TabWidget::event(QEvent *event)
 		if ( idx != -1 )
 		{
 			// Display tab's tooltip
-			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].name );
+			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].tooltip );
 		} else
 		{
 			// The tooltip event doesn't relate to any tab, let's ignore it
@@ -174,8 +174,11 @@ bool TabWidget::event(QEvent *event)
 void TabWidget::mousePressEvent( QMouseEvent * _me )
 {
 
-	int idx = findTabAtPos( & _me->pos() );
+	// Find index of tab that has been clicked
+	QPoint pos = _me->pos();
+	int idx = findTabAtPos( &pos );
 
+	// When found, activate tab that has been clicked 
 	if ( idx != -1 )
         {
 		setActiveTab( idx );
