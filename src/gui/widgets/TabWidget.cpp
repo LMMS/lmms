@@ -252,10 +252,16 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 	}
 	p.setPen( cap_col );
 
-	// Draw all tabs
+	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
   	widgetStack::iterator first = m_widgets.begin();
   	widgetStack::iterator last = m_widgets.end();
-	int tab_width = ( width() - tab_x_offset ) / std::distance( first, last ); // Correct tab's width for artwork tabs
+	int tab_width = width();
+	if ( first != last )
+	{
+		tab_width = ( width() - tab_x_offset ) / std::distance( first, last );
+	}
+
+	// Draw all tabs
         for( widgetStack::iterator it = first ; it != last ; ++it )
         {
 
