@@ -1412,7 +1412,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	m_tabWidget = new TabWidget( "", this, true ); 
-	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + TAB_HEIGHT - 4 );
+	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 );
 
 
 	// create tab-widgets

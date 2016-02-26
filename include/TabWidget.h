@@ -29,7 +29,8 @@
 #include <QWidget>
 #include <QtCore/QMap>
 
-const int TAB_HEIGHT = 14;
+const int TEXT_TAB_HEIGHT = 14;
+const int GRAPHIC_TAB_HEIGHT = 17;
 
 class TabWidget : public QWidget
 {
@@ -74,7 +75,8 @@ private:
 
 	int 	m_activeTab;
 	QString m_caption;
-	quint8 	m_tabheight;
+	quint8 	m_tabbarHeight;	// The height of the tab bar
+	quint8 	m_tabheight;	// The height of the tabs
 	bool	m_usePixmap;	// true if the tabs are to be displayed with icons. False for text tabs.
 } ;
 
