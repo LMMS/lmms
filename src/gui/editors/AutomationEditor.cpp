@@ -1044,7 +1044,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			for( int i = 0; i < 2; ++i )
 			{
 				const QString & label = m_pattern->firstObject()
-						->displayValue( level[i] );
+						->displayValue( level[i] /100 );
 				p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::Shadow ) );
 				p.drawText( 1, y[i] - font_height + 1,
@@ -1072,7 +1072,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			for( ; level <= m_topLevel; level += printable )
 			{
 				const QString & label = m_pattern->firstObject()
-							->displayValue( level );
+							->displayValue( level / 100 );
 				y = yCoordOfLevel( level );
 				p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::Shadow ) );
