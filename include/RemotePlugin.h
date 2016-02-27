@@ -85,94 +85,65 @@ typedef int32_t key_t;
 #include <QtCore/QThread>
 #endif
 
+#include "SemaphoreWrapper.h"
+#include "ShmWrapper.h"
+
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
 const int SHM_FIFO_SIZE = 512*1024;
 
 
+
 // implements a FIFO inside a shared memory segment
 class shmFifo
 {
-	// need this union to handle different sizes of sem_t on 32 bit
+ 	// need this union to handle different sizes of sem_t on 32 bit
 	// and 64 bit platforms
 	union sem32_t
 	{
-#ifndef USE_QT_SEMAPHORES
-		sem_t sem;
-#endif
-		int semKey;
-		char fill[32];
+	#ifndef USE_QT_SEMAPHORES
+	  sem_t sem;
+	#endif
+	int semKey;
+	char fill[32];
 	} ;
 	struct shmData
 	{
-		sem32_t dataSem;	// semaphore for locking this
-					// FIFO management data
-		sem32_t messageSem;	// semaphore for incoming messages
-		volatile int32_t startPtr; // current start of FIFO in memory
-		volatile int32_t endPtr;   // current end of FIFO in memory
-		char data[SHM_FIFO_SIZE];  // actual data
+	    sem32_t dataSem;	// semaphore for locking this
+				// FIFO management data
+	    sem32_t messageSem;	// semaphore for incoming messages
+	    volatile int32_t startPtr; // current start of FIFO in memory
+	    volatile int32_t endPtr;   // current end of FIFO in memory
+	    char data[SHM_FIFO_SIZE];  // actual data
 	} ;
-
 public:
 	// constructor for master-side
 	shmFifo() :
 		m_invalid( false ),
 		m_master( true ),
 		m_shmKey( 0 ),
-#ifdef USE_QT_SHMEM
 		m_shmObj(),
-#else
-		m_shmID( -1 ),
-#endif
 		m_data( NULL ),
-#ifdef USE_QT_SEMAPHORES
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
-#else
-		m_dataSem( NULL ),
-		m_messageSem( NULL ),
-#endif
+		m_dataSem(),
+		m_messageSem(),
 		m_lockDepth( 0 )
 	{
-#ifdef USE_QT_SHMEM
-		do
-		{
-			m_shmObj.setKey( QString( "%1" ).arg( ++m_shmKey ) );
-			m_shmObj.create( sizeof( shmData ) );
-		} while( m_shmObj.error() != QSharedMemory::NoError );
-
-		m_data = (shmData *) m_shmObj.data();
-#else
-		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
-					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
-		{
-		}
-		m_data = (shmData *) shmat( m_shmID, 0, 0 );
-#endif
+		m_shmObj.initializeData();
+		m_data = (shmData*)m_shmObj.data();
+		m_shmKey = m_shmObj.key();
+		
 		assert( m_data != NULL );
-		m_data->startPtr = m_data->endPtr = 0;
+		m_data->startPtr = 0;
+		m_data->endPtr = 0;
 #ifdef USE_QT_SEMAPHORES
 		static int k = 0;
 		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
 		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
-		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ),
-						1, QSystemSemaphore::Create );
-		m_messageSem.setKey( QString::number(
-						m_data->messageSem.semKey ),
-						0, QSystemSemaphore::Create );
+		m_dataSem.createKey( QString::number( m_data->dataSem.semKey), 1 );
+		m_messageSem.createKey( QString::number(m_data->messageSem.semKey),0 );
 #else
-		m_dataSem = &m_data->dataSem.sem;
-		m_messageSem = &m_data->messageSem.sem;
-
-		if( sem_init( m_dataSem, 1, 1 ) )
-		{
-			fprintf( stderr, "could not initialize m_dataSem\n" );
-		}
-		if( sem_init( m_messageSem, 1, 0 ) )
-		{
-			fprintf( stderr, "could not initialize "
-							"m_messageSem\n" );
-		}
+		m_dataSem.setSemaphore(&m_data->dataSem.sem, true);
+		m_messageSem.setSemaphore(&m_data->messageSem.sem, true);
 #endif
 	}
 
@@ -182,58 +153,35 @@ public:
 		m_invalid( false ),
 		m_master( false ),
 		m_shmKey( 0 ),
-#ifdef USE_QT_SHMEM
-		m_shmObj( QString::number( _shm_key ) ),
-#else
-		m_shmID( shmget( _shm_key, 0, 0 ) ),
-#endif
+		m_shmObj( _shm_key ),
 		m_data( NULL ),
-#ifdef USE_QT_SEMAPHORES
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
-#else
-		m_dataSem( NULL ),
-		m_messageSem( NULL ),
-#endif
+		m_dataSem(),
+		m_messageSem(),
 		m_lockDepth( 0 )
 	{
-#ifdef USE_QT_SHMEM
-		if( m_shmObj.attach() )
+		if (m_shmObj.attach() )
 		{
-			m_data = (shmData *) m_shmObj.data();
+		    m_data = (shmData *) m_shmObj.data();
+		  
 		}
-#else
-		if( m_shmID != -1 )
-		{
-			m_data = (shmData *) shmat( m_shmID, 0, 0 );
-		}
-#endif
 		assert( m_data != NULL );
 #ifdef USE_QT_SEMAPHORES
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
 						m_data->messageSem.semKey ) );
 #else
-		m_dataSem = &m_data->dataSem.sem;
-		m_messageSem = &m_data->messageSem.sem;
+		m_dataSem.setSemaphore(&m_data->dataSem.sem, false);
+		m_messageSem.setSemaphore(&m_data->messageSem.sem, false);
 #endif
 	}
 
 	~shmFifo()
 	{
-#ifndef USE_QT_SHMEM
-		shmdt( m_data );
-#endif
+		m_shmObj.detach();
 		// master?
 		if( m_master )
 		{
-#ifndef USE_QT_SHMEM
-			shmctl( m_shmID, IPC_RMID, NULL );
-#endif
-#ifndef USE_QT_SEMAPHORES
-			sem_destroy( m_dataSem );
-			sem_destroy( m_messageSem );
-#endif
+		    m_shmObj.destroy();
 		}
 	}
 
@@ -258,11 +206,7 @@ public:
 	{
 		if( !isInvalid() && __sync_add_and_fetch( &m_lockDepth, 1 ) == 1 )
 		{
-#ifdef USE_QT_SEMAPHORES
 			m_dataSem.acquire();
-#else
-			sem_wait( m_dataSem );
-#endif
 		}
 	}
 
@@ -271,11 +215,7 @@ public:
 	{
 		if( __sync_sub_and_fetch( &m_lockDepth, 1) <= 0 )
 		{
-#ifdef USE_QT_SEMAPHORES
 			m_dataSem.release();
-#else
-			sem_post( m_dataSem );
-#endif
 		}
 	}
 
@@ -284,22 +224,14 @@ public:
 	{
 		if( !isInvalid() )
 		{
-#ifdef USE_QT_SEMAPHORES
 			m_messageSem.acquire();
-#else
-			sem_wait( m_messageSem );
-#endif
 		}
 	}
 
 	// increase message-semaphore
 	inline void messageSent()
 	{
-#ifdef USE_QT_SEMAPHORES
 		m_messageSem.release();
-#else
-		sem_post( m_messageSem );
-#endif
 	}
 
 
@@ -341,20 +273,15 @@ public:
 
 	inline bool messagesLeft()
 	{
-		if( isInvalid() )
-		{
-			return false;
-		}
-#ifdef USE_QT_SEMAPHORES
 		lock();
 		const bool empty = ( m_data->startPtr == m_data->endPtr );
 		unlock();
 		return !empty;
-#else
-		int v;
-		sem_getvalue( m_messageSem, &v );
-		return v > 0;
-#endif
+		/* if( isInvalid() )
+		{
+			return false;
+		}
+		return m_messageSem.getValue()> 0;*/
 	}
 
 
@@ -440,19 +367,10 @@ private:
 	volatile bool m_invalid;
 	bool m_master;
 	key_t m_shmKey;
-#ifdef USE_QT_SHMEM
-	QSharedMemory m_shmObj;
-#else
-	int m_shmID;
-#endif
+	ShmWrapper m_shmObj;
 	shmData * m_data;
-#ifdef USE_QT_SEMAPHORES
-	QSystemSemaphore m_dataSem;
-	QSystemSemaphore m_messageSem;
-#else
-	sem_t * m_dataSem;
-	sem_t * m_messageSem;
-#endif
+	SemaphoreWrapper m_dataSem;
+	SemaphoreWrapper m_messageSem;
 	volatile int m_lockDepth;
 
 } ;
