@@ -44,7 +44,6 @@ class QSlider;
 
 class TabBar;
 
-
 class SetupDialog : public QDialog
 {
 	Q_OBJECT
@@ -83,6 +82,11 @@ private slots:
 	void setSTKDir( const QString & _sd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
+
+	// performance settings widget
+	void setAutoSaveInterval( int time );
+	void resetAutoSaveInterval();
+	void displaySaveIntervalHelp();
 
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -175,6 +179,10 @@ private:
 
 	bool m_smoothScroll;
 	bool m_enableAutoSave;
+	int m_saveInterval;
+	QSlider * m_saveIntervalSlider;
+	QLabel * m_saveIntervalLbl;
+
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;
 	bool m_syncVSTPlugins;
