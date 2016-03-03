@@ -11,7 +11,7 @@ IF(LMMS_BUILD_WIN32)
 	ELSE()
 		TARGET_LINK_LIBRARIES(RemoteVstPlugin -lQtCore4)
 	ENDIF()
-	TARGET_LINK_LIBRARIES(RemoteVstPlugin -lpthread -lgdi32 -lws2_32)
+	TARGET_LINK_LIBRARIES(RemoteVstPlugin -lpthread -lgdi32 -lws2_32 -lstdc++)
 	SET_TARGET_PROPERTIES(RemoteVstPlugin PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -O0")
 	ADD_CUSTOM_COMMAND(TARGET RemoteVstPlugin POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:RemoteVstPlugin>")
 	INSTALL(TARGETS RemoteVstPlugin RUNTIME DESTINATION "${PLUGIN_DIR}")
@@ -24,10 +24,10 @@ IF(LMMS_BUILD_WIN32)
 	ENDIF(LMMS_BUILD_WIN64 AND NOT LMMS_BUILD_MSYS)
 ENDIF(LMMS_BUILD_WIN32)
 
-BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
+BUILD_LIKE_A_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
 
 
-IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
+IF(NOT WANT_VST_NOWINE)
 
 IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32)
@@ -40,17 +40,17 @@ IF(LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86_64)
 
 ADD_CUSTOM_COMMAND(
-		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
+		#SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 		COMMAND ${WINE_CXX}
-		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -o RemoteVstPlugin
-		COMMAND find -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
+		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -o RemoteVstPlugin -stdlib=libstdc++ -nostdlib -l stdc++ -l wine -D USE_WS_PREFIX
+		COMMAND find . -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
 		TARGET vstbase
 		OUTPUTS RemoteVstPlugin
 		)
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES RemoteVstPlugin.exe.so)
 INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/RemoteVstPlugin" "${CMAKE_CURRENT_BINARY_DIR}/RemoteVstPlugin.exe.so" DESTINATION "${PLUGIN_DIR}")
-ENDIF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
+ENDIF(NOT WANT_VST_NOWINE)
 
 
 ENDIF(LMMS_SUPPORT_VST)

@@ -42,7 +42,7 @@
 #include <fcntl.h>
 #endif
 
-#ifdef LMMS_BUILD_LINUX
+#ifndef LMMS_BUILD_WIN32
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -62,8 +62,9 @@
 #ifdef LMMS_BUILD_WIN64
 #include "basename.c"
 #else
-#include <libgen.h>
 #endif
+#else
+#include <libgen.h>
 #endif
 
 
@@ -421,7 +422,7 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	if( m_window != NULL )
 	{
 		pluginDispatch( effEditClose );
-#ifdef LMMS_BUILD_LINUX
+#ifndef LMMS_BUILD_LINUX
 		CloseWindow( m_window );
 #endif
 		m_window = NULL;
@@ -651,7 +652,7 @@ void RemoteVstPlugin::initEditor()
 		return;
 	}
 
-#ifdef LMMS_BUILD_LINUX
+#ifndef LMMS_BUILD_WIN32
 	//m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
 	//		       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
 	//		       0, 0, 10, 10, NULL, NULL, hInst, NULL );
@@ -689,7 +690,7 @@ void RemoteVstPlugin::initEditor()
 	ShowWindow( m_window, SW_SHOWNORMAL );
 	UpdateWindow( m_window );
 
-#ifdef LMMS_BUILD_LINUX
+#ifndef LMMS_BUILD_WIN32
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
 #endif
 }
@@ -1867,8 +1868,8 @@ int main( int _argc, char * * _argv )
 #endif
 #endif
 
-#ifdef LMMS_BUILD_LINUX
-#ifdef LMMS_HAVE_SCHED_H
+#ifndef LMMS_BUILD_WIN32
+#ifdef XXX_ACTUALLY_I_DONT_LMMS_HAVE_SCHED_H
 	// try to set realtime-priority
 	struct sched_param sparam;
 	sparam.sched_priority = ( sched_get_priority_max( SCHED_FIFO ) +
