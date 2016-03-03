@@ -113,7 +113,7 @@ PianoRoll {
 	qproperty-noteColor: rgb( 119, 199, 216 );
 	qproperty-noteBorderRadiusX: 5;
 	qproperty-noteBorderRadiusY: 2;
-	qproperty-selectedNoteColor: rgb( 0, 64, 192 );
+	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 40, 40, 40, 200 );
 	/* Text on the white piano keys */
@@ -539,31 +539,37 @@ TrackContainerView QLabel
 
 /* Patterns */
 
+/* common pattern colors */
+TrackContentObjectView   {
+	qproperty-mutedColor: rgb( 128, 128, 128 );
+	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
+	qproperty-selectedColor: rgb( 0, 125, 255 );
+	qproperty-textColor: rgb( 255, 255, 255 );
+	qproperty-textShadowColor: rgb( 0, 0, 0 );
+	qproperty-gradient: true;
+}
+
 /* instrument pattern */
 PatternView {
-	color: rgb( 119, 199, 216 );
-	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 255, 255 );
+	background-color: rgb( 119, 199, 216 );
+	color: rgb( 187, 227, 236 );
 }
 
 /* sample track pattern */
 SampleTCOView {
-	color: rgb( 74, 253, 133 );
-	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 60, 60 );
+	background-color: rgb( 74, 253, 133 );
+	color: rgb( 187, 227, 236 );
 }
 
 /* automation pattern */
 AutomationPatternView {
-	color: #99afff;
-	qproperty-fgColor: rgb( 204, 215, 255 );
-	qproperty-textColor: rgb( 255, 255, 255 );
+	background-color: #99afff;
+	color: rgb( 204, 215, 255 );
 }
 
 /* bb-pattern */
 BBTCOView {
-	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
-	qproperty-textColor: rgb( 255, 255, 255 );
+	background-color: rgb( 128, 182, 175 ); /* default colour for bb-tracks */
 }
 
 /* Plugins */

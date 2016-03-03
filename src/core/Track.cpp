@@ -251,8 +251,13 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_hint( NULL ),
-	m_fgColor( 0, 0, 0 ),
-	m_textColor( 0, 0, 0 )
+	m_mutedColor( 0, 0, 0 ),
+	m_mutedBackgroundColor( 0, 0, 0 ),
+	m_selectedColor( 0, 0, 0 ),
+	m_textColor( 0, 0, 0 ),
+	m_textShadowColor( 0, 0, 0 ),
+	m_gradient( true ),
+	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
 	{
@@ -264,10 +269,10 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
-	move( 0, 1 );
+	move( 0, 0 );
 	show();
 
-	setFixedHeight( tv->getTrackContentWidget()->height() - 2 );
+	setFixedHeight( tv->getTrackContentWidget()->height() - 1);
 	setAcceptDrops( true );
 	setMouseTracking( true );
 
@@ -300,6 +305,19 @@ TrackContentObjectView::~TrackContentObjectView()
 }
 
 
+/*! \brief Update a TrackContentObjectView
+ *
+ *  TCO's get drawn only when needed, 
+ *  and when a TCO is updated, 
+ *  it needs to be redrawn.
+ *
+ */
+void TrackContentObjectView::update()
+{
+	m_needsUpdate = true;
+	selectableObject::update();
+}
+
 
 
 /*! \brief Does this trackContentObjectView have a fixed TCO?
@@ -319,21 +337,48 @@ bool TrackContentObjectView::fixedTCOs()
 
 // qproperty access functions, to be inherited & used by TCOviews
 //! \brief CSS theming qproperty access method
-QColor TrackContentObjectView::fgColor() const
-{ return m_fgColor; }
+QColor TrackContentObjectView::mutedColor() const
+{ return m_mutedColor; }
 
-//! \brief CSS theming qproperty access method
+QColor TrackContentObjectView::mutedBackgroundColor() const
+{ return m_mutedBackgroundColor; }
+
+QColor TrackContentObjectView::selectedColor() const
+{ return m_selectedColor; }
+
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
 
-//! \brief CSS theming qproperty access method
-void TrackContentObjectView::setFgColor( const QColor & c )
-{ m_fgColor = QColor( c ); }
+QColor TrackContentObjectView::textShadowColor() const
+{ return m_textShadowColor; }
+
+bool TrackContentObjectView::gradient() const
+{ return m_gradient; }
 
 //! \brief CSS theming qproperty access method
+void TrackContentObjectView::setMutedColor( const QColor & c )
+{ m_mutedColor = QColor( c ); }
+
+void TrackContentObjectView::setMutedBackgroundColor( const QColor & c )
+{ m_mutedBackgroundColor = QColor( c ); }
+
+void TrackContentObjectView::setSelectedColor( const QColor & c )
+{ m_selectedColor = QColor( c ); }
+
 void TrackContentObjectView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
 
+void TrackContentObjectView::setTextShadowColor( const QColor & c )
+{ m_textShadowColor = QColor( c ); }
+
+void TrackContentObjectView::setGradient( const bool & b )
+{ m_gradient = b; }
+
+// access needsUpdate member variable
+bool TrackContentObjectView::needsUpdate()
+{ return m_needsUpdate; }
+void TrackContentObjectView::setNeedsUpdate( bool b )
+{ m_needsUpdate = b; }
 
 /*! \brief Close a trackContentObjectView
  *
@@ -1047,11 +1092,8 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	pmp.setPen( QPen( gridColor(), 1 ) );
-	// horizontal line
-	pmp.drawLine( 0, h-1, w*2, h-1 );
-
 	// vertical lines
+	pmp.setPen( QPen( gridColor(), 1 ) );	
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1062,6 +1104,10 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
+	
+	// horizontal line
+	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
 
@@ -1122,7 +1168,7 @@ void TrackContentWidget::update()
 	for( tcoViewVector::iterator it = m_tcoViews.begin();
 				it != m_tcoViews.end(); ++it )
 	{
-		( *it )->setFixedHeight( height() - 2 );
+		( *it )->setFixedHeight( height() - 1 );
 		( *it )->update();
 	}
 	QWidget::update();

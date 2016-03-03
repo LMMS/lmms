@@ -31,6 +31,7 @@
 #include <QDialog>
 #include <QtCore/QThread>
 #include <QPixmap>
+#include <QStaticText>
 
 
 #include "Note.h"
@@ -159,9 +160,6 @@ class PatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
-// theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 public:
 	PatternView( Pattern* pattern, TrackView* parent );
 	virtual ~PatternView();
@@ -182,12 +180,7 @@ protected:
 	virtual void constructContextMenu( QMenu * );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re )
-	{
-		m_needsUpdate = true;
-		TrackContentObjectView::resizeEvent( _re );
-	}
+	virtual void paintEvent( QPaintEvent * pe );
 	virtual void wheelEvent( QWheelEvent * _we );
 
 
@@ -199,7 +192,8 @@ private:
 
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
-	bool m_needsUpdate;
+	
+	QStaticText m_staticTextName;
 } ;
 
 
