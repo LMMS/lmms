@@ -90,6 +90,10 @@ QMenu::item:disabled {
 	padding: 4px 32px 4px 20px;
 }
 
+QMenu::icon {
+	margin: 3px;
+}
+
 QMenu::indicator {
 	width: 16;
 	height: 16;
