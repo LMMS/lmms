@@ -42,6 +42,7 @@
 namespace stk { } ;
 using namespace stk;
 
+static const int MALLETS_PRESET_VERSION = 1;
 
 class malletsSynth
 {
@@ -173,6 +174,8 @@ private:
 
 	ComboBoxModel m_presetsModel;
 	FloatModel m_spreadModel;
+	IntModel m_versionModel;
+	BoolModel m_isOldVersionModel;
 
 	QVector<sample_t> m_scalers;
 
@@ -219,10 +222,10 @@ private:
 
 	QWidget * m_bandedWGWidget;
 	Knob * m_pressureKnob;
-	Knob * m_motionKnob;
-	Knob * m_vibratoKnob;
+//	Knob * m_motionKnob;
+//	Knob * m_vibratoKnob;
 	Knob * m_velocityKnob;
-	LedCheckBox * m_strikeLED;
+//	LedCheckBox * m_strikeLED;
 
 	ComboBox * m_presetsCombo;
 	Knob * m_spreadKnob;
