@@ -150,16 +150,25 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 	}
 
 	// draw the channel name
+	if( m_staticTextName.text() != name )
+	{
+		m_staticTextName.setText( name );
+	}
 	p->rotate( -90 );
 
-	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );	
+	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );
+
+	// Coordinates of the foreground text
+	int const textLeft = -145;
+	int const textTop = 9;
+
+	// Draw text shadow
 	p->setPen( sh_color );
-	p->drawText( -146, 21, name ); 
+	p->drawStaticText( textLeft - 1, textTop + 1, m_staticTextName );
 	
+	// Draw foreground text
 	p->setPen( isActive ? bt_color : te_color );
-
-	p->drawText( -145, 20, name );
-
+	p->drawStaticText( textLeft, textTop, m_staticTextName );
 }
 
 

@@ -28,6 +28,7 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QStaticText>
 
 #include "Knob.h"
 #include "LcdWidget.h"
@@ -78,7 +79,7 @@ public:
 	static const int FxLineHeight;
 
 private:
-	static void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
+	void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
@@ -90,6 +91,8 @@ private:
 	QColor m_strokeInnerInactive;
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
+
+	QStaticText m_staticTextName;
 
 private slots:
 	void renameChannel();
