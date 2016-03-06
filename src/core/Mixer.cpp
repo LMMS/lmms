@@ -467,6 +467,7 @@ void Mixer::clear()
 {
 	// TODO: m_midiClient->noteOffAll();
 	lock();
+	lockPlayHandleRemoval();
 	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
 		// we must not delete instrument-play-handles as they exist
@@ -476,6 +477,7 @@ void Mixer::clear()
 			m_playHandlesToRemove.push_back( *it );
 		}
 	}
+	unlockPlayHandleRemoval();
 	unlock();
 }
 
@@ -635,12 +637,12 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 
 void Mixer::removePlayHandle( PlayHandle * _ph )
 {
+	lockPlayHandleRemoval();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
 	if( _ph->affinityMatters() &&
 				_ph->affinity() == QThread::currentThread() )
 	{
-		lockPlayHandleRemoval();
 		_ph->audioPort()->removePlayHandle( _ph );
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
@@ -674,12 +676,12 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 			}
 			else delete _ph;
 		}
-		unlockPlayHandleRemoval();
 	}
 	else
 	{
 		m_playHandlesToRemove.push_back( _ph );
 	}
+	unlockPlayHandleRemoval();
 }
 
 
