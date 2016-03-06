@@ -383,6 +383,10 @@ void FxMixer::moveChannelLeft( int index )
 
 	// Swap positions in array
 	qSwap(m_fxChannels[index], m_fxChannels[index - 1]);
+
+	// Update m_channelIndex of both channels
+	m_fxChannels[index]->m_channelIndex = index;
+	m_fxChannels[index - 1]->m_channelIndex = index -1;
 }
 
 
