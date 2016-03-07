@@ -3,6 +3,17 @@ if (QT5)
 	set (QT_LRELEASE_EXECUTABLE "${Qt5_LRELEASE_EXECUTABLE}")
 endif ()
 
+IF(QT_LUPDATE_EXECUTABLE STREQUAL "")
+	EXECUTE_PROCESS(COMMAND "lupdate" "--help" RESULT_VARIABLE LUPDATE_FALLBACK OUTPUT_QUIET)	
+	IF(LUPDATE_FALLBACK EQUAL 0)
+        	SET(QT_LUPDATE_EXECUTABLE lupdate)
+        	SET(QT_LRELEASE_EXECUTABLE lrelease)
+	ELSE()
+		MESSAGE(FATAL_ERROR "Cannot generate locales")
+	ENDIF()
+ENDIF()
+
+
 #
 # rules for building localizations
 #
