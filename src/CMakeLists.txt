@@ -175,7 +175,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-					"${MINGW_PREFIX}/bin/libgig-6.dll"					
+					"${MINGW_PREFIX}/bin/libgig-6.dll"
 					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
 					"${MINGW_PREFIX}/lib/libsoundio.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
