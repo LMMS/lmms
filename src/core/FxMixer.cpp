@@ -578,18 +578,21 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
 		// their recipients right away.
 		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
-		foreach( FxChannel * ch, m_fxChannels )
+
+		// Do not use foreach here, as foreach creates a copy of
+		// m_fxChannels that causes a race condition with Qt5!
+		for ( QVector<FxChannel *>::const_iterator it = m_fxChannels.constBegin(); it != m_fxChannels.constEnd(); ++it )
 		{
-			ch->m_muted = ch->m_muteModel.value();
-			if( ch->m_muted ) // instantly "process" muted channels
+			(*it)->m_muted = (*it)->m_muteModel.value();
+			if( (*it)->m_muted ) // instantly "process" muted channels
 			{
-				ch->processed();
-				ch->done();
+				(*it)->processed();
+				(*it)->done();
 			}
-			else if( ch->m_receives.size() == 0 )
+			else if( (*it)->m_receives.size() == 0 )
 			{
-				ch->m_queued = true;
-				MixerWorkerThread::addJob( ch );
+				(*it)->m_queued = true;
+				MixerWorkerThread::addJob( (*it) );
 			}
 		}
 		while( m_fxChannels[0]->state() != ThreadableJob::Done )
