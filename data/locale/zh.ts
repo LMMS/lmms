@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
         <translation>关于LMMS</translation>
+    </message>
+    <message>
+        <source>LMMS</source>
+        <translation>LMMS</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
@@ -20,8 +24,24 @@
         <translation>LMMS - 人人都是作曲家</translation>
     </message>
     <message>
+        <source>Copyright © %1</source>
+        <translation>版权所有 © %1</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
         <source>Authors</source>
         <translation>作者</translation>
+    </message>
+    <message>
+        <source>Involved</source>
+        <translation>参与者</translation>
+    </message>
+    <message>
+        <source>Contributors ordered by number of commits:</source>
+        <translation>贡献者名单（以提交次数排序）：</translation>
     </message>
     <message>
         <source>Translation</source>
@@ -33,13 +53,14 @@
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
         <translation>当前语言是中文（中国）
 
-您可以帮助我们改进翻译：https://github.com/LMMS/lmms/wiki/Creating-a-localization
+翻译人员：
+TonyChyi &lt;tonychee1989 at gmail.com&gt;
+Min Zhang &lt;zm1990s at gmail.com&gt;
+Jeff Bai &lt;jeffbaichina at gmail.com&gt;
+Mingye Wang &lt;arthur2e5@aosc.xyz&gt;
+Zixing Liu &lt;liushuyu@aosc.xyz&gt;
 
-主要译者：
-TonyChyi，邮箱：tonychee1989@gmail.com
-Min Zhang ，邮箱：zm1990s@gmail.com
-校对：
-Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
+若你有兴趣提高翻译质量，请联系维护团队 (https://github.com/AOSC-Dev/translations)、之前的译者或本项目维护者!</translation>
     </message>
     <message>
         <source>License</source>
@@ -47,23 +68,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation>Copyright (c) 2004-2014, LMMS 开发者</translation>
+        <translation>Copyright (c) 2004-2016, LMMS 开发者</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>LMMS</source>
-        <translation>LMMS</translation>
-    </message>
-    <message>
-        <source>Involved</source>
-        <translation>参与者</translation>
-    </message>
-    <message>
-        <source>Contributors ordered by number of commits:</source>
-        <translation>贡献者名单（以提交次数排序）：</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.sourceforge.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -121,7 +130,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
 </context>
 <context>
-    <name>AudioAlsa::setupWidget</name>
+    <name>AudioAlsaSetupWidget</name>
     <message>
         <source>DEVICE</source>
         <translation>设备</translation>
@@ -139,7 +148,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。    诸如环回模式(looping-mode)、起始/结束点、放大值(amplify-value)之类的值不会被重置，因此音频听起来会和原采样有差异。</translation>
+        <translation>如果想打开另一个音频文件，请点击这里。接着会出现文件选择对话框。诸如环回模式(looping-mode)，起始/结束点，放大值(amplify-value)之类的值不会被重置。因此听起来会和源采样有差异。</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -147,31 +156,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation type="unfinished">如果点击此按钮，整个采样将会被反转。反转处理能用于制作很酷的效果，例如reversed crash。</translation>
-    </message>
-    <message>
-        <source>Amplify:</source>
-        <translation type="unfinished">放大:</translation>
-    </message>
-    <message>
-        <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>此旋钮用于调整振幅放大比率。当设为100%时采样不会变化。除此之外，振幅不是放大就是减弱。    （原始的采样文件不会被更改）</translation>
-    </message>
-    <message>
-        <source>Startpoint:</source>
-        <translation>起始点： </translation>
-    </message>
-    <message>
-        <source>Endpoint:</source>
-        <translation>终止点： </translation>
-    </message>
-    <message>
-        <source>Continue sample playback across notes</source>
-        <translation>跨音符继续播放采样</translation>
-    </message>
-    <message>
-        <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>如果点击此按钮，整个采样将会被反转。能用于制作很酷的效果，例如reversed crash.</translation>
     </message>
     <message>
         <source>Disable loop</source>
@@ -187,15 +172,39 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>This button enables forwards-looping. The sample loops between the end point and the loop point.</source>
-        <translation type="unfinished">点击此按钮后，Forwards-looping 会被打开，采样将在终止点（End Point）和循环点（Loop Point）之间播放。</translation>
+        <translation>点击此按钮后，Forwards-looping 会被打开，采样将在终止点（End Point）和循环点（Loop Point）之间播放。</translation>
     </message>
     <message>
         <source>This button enables ping-pong-looping. The sample loops backwards and forwards between the end point and the loop point.</source>
-        <translation type="unfinished">点击此按钮后，Ping-pong-looping 会被打开，采样将在终止点（End Point）和循环点（Loop Point）之间来回播放。</translation>
+        <translation>点击此按钮后，Ping-pong-looping 会被打开，采样将在终止点（End Point）和循环点（Loop Point）之间来回播放。</translation>
+    </message>
+    <message>
+        <source>Continue sample playback across notes</source>
+        <translation>跨音符继续播放采样</translation>
+    </message>
+    <message>
+        <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amplify:</source>
+        <translation>放大: </translation>
+    </message>
+    <message>
+        <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
+        <translation>此旋钮用于调整放大比率。当设为100% 时采样不会变化。除此之外，不是放大就是减弱(原始的采样文件不会被改变)</translation>
+    </message>
+    <message>
+        <source>Startpoint:</source>
+        <translation>起始点:</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should begin playing your sample. </source>
         <translation>调节此旋钮，以告诉 AudioFileProcessor 在哪里开始播放。</translation>
+    </message>
+    <message>
+        <source>Endpoint:</source>
+        <translation>终点:</translation>
     </message>
     <message>
         <source>With this knob you can set the point where AudioFileProcessor should stop playing your sample. </source>
@@ -225,7 +234,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation>LMMS由于某些原因与JACK断开连接。  这可能是因为LMMS的JACK后端重启导致的，你需要手动重新连接。</translation>
+        <translation>LMMS由于某些原因与JACK断开连接，这可能是因为LMMS的JACK后端重启导致的，你需要手动重新连接。</translation>
     </message>
     <message>
         <source>JACK server down</source>
@@ -233,7 +242,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation>JACK服务好像崩溃了，而且未能正常启动。  LMMS不能正常工作，你需要保存你的工作然后重启JACK和LMMS。</translation>
+        <translation>JACK服务好像崩溃了而且未能正常启动，LMMS不能正常工作，你需要保存你的工作然后重启JACK和LMMS。</translation>
     </message>
     <message>
         <source>CLIENT-NAME</source>
@@ -285,22 +294,41 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
 </context>
 <context>
+    <name>AudioSoundIo::setupWidget</name>
+    <message>
+        <source>BACKEND</source>
+        <translation>后端</translation>
+    </message>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
+    </message>
+</context>
+<context>
     <name>AutomatableModel</name>
     <message>
         <source>&amp;Reset (%1%2)</source>
-        <translation>重置（%1%2）（&amp;R）</translation>
+        <translation>重置（%1%2）(&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Copy value (%1%2)</source>
-        <translation>复制值（%1%2）（&amp;C）</translation>
+        <translation>复制值（%1%2）(&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Paste value (%1%2)</source>
-        <translation>粘贴值（%1%2）（&amp;P）</translation>
+        <translation>粘贴值（%1%2）(&amp;P)</translation>
     </message>
     <message>
         <source>Edit song-global automation</source>
-        <translation>编辑歌曲全局自动控制选项</translation>
+        <translation>编辑歌曲全局自动控制</translation>
+    </message>
+    <message>
+        <source>Remove song-global automation</source>
+        <translation>删除歌曲全局自动控制</translation>
+    </message>
+    <message>
+        <source>Remove all linked controls</source>
+        <translation>删除所有已连接的控制器</translation>
     </message>
     <message>
         <source>Connected to %1</source>
@@ -322,14 +350,6 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <source>Connect to controller...</source>
         <translation>连接到控制器...</translation>
     </message>
-    <message>
-        <source>Remove song-global automation</source>
-        <translation>删除歌曲全局自动控制</translation>
-    </message>
-    <message>
-        <source>Remove all linked controls</source>
-        <translation>移除所有已连接的控制器</translation>
-    </message>
 </context>
 <context>
     <name>AutomationEditor</name>
@@ -344,6 +364,66 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <message>
         <source>All selected values were copied to the clipboard.</source>
         <translation>所有选中的值已复制。</translation>
+    </message>
+    <message>
+        <source>Automation Editor - %1</source>
+        <translation>自动控制编辑器 - %1</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>绘制模式 (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
+        <translation>点击这里启用绘制模式。在此模式下你可以增加或移动单个值。  大部分时间下默认使用此模式。你也可以按键盘上的 ‘Shift+D’激活此模式。</translation>
+    </message>
+    <message>
+        <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
+        <translation>点击启用擦除模式。此模式下你可以擦除单个值。你可以按键盘上的 &apos;Shift+E&apos; 启用此模式。</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation>点击这里，选择的值将会被剪切到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>擦除模式 (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Automation Editor - no pattern</source>
+        <translation>自动控制编辑器 - 没有片段</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation>剪切选定值 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation>复制选定值 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
+        <translation>点击这里播放片段。编辑时很有用，片段会自动循环播放。</translation>
+    </message>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>播放/暂停当前片段（空格）</translation>
+    </message>
+    <message>
+        <source>Click here if you want to stop playing of the current pattern.</source>
+        <translation>点击这里停止播放片段。</translation>
+    </message>
+    <message>
+        <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
+        <translation>点击这里，选择的值将会被复制到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>停止当前片段（空格）</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard (Ctrl+V)</source>
+        <translation>从剪贴板粘贴值 (Ctrl+V)</translation>
     </message>
 </context>
 <context>
@@ -363,6 +443,10 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
         <translation>点击这里停止播放片段。</translation>
+    </message>
+    <message>
+        <source>Edit actions</source>
+        <translation>编辑功能</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
@@ -390,11 +474,15 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">点击这里启用绘制模式。在此模式下你可以增加或移动单个值。  大部分时间下默认使用此模式。你也可以按键盘上的 ‘Shift+D’激活此模式。</translation>
+        <translation>点击这里启用绘制模式。在此模式下你可以增加或移动单个值。  大部分时间下默认使用此模式。你也可以按键盘上的 ‘Shift+D’激活此模式。</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished">点击启用擦除模式。此模式下你可以擦除单个值。你可以按键盘上的 &apos;Shift+E&apos; 启用此模式。</translation>
+        <translation>点击启用擦除模式。此模式下你可以擦除单个值。你可以按键盘上的 &apos;Shift+E&apos; 启用此模式。</translation>
+    </message>
+    <message>
+        <source>Interpolation controls</source>
+        <translation>补间控制</translation>
     </message>
     <message>
         <source>Discrete progression</source>
@@ -429,12 +517,16 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Tension: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Cut selected values (%1+X)</source>
-        <translation type="unfinished">剪切选定值 (%1+X)</translation>
+        <translation>剪切选定值 (%1+X)</translation>
     </message>
     <message>
         <source>Copy selected values (%1+C)</source>
-        <translation type="unfinished">复制选定值 (%1+C)</translation>
+        <translation>复制选定值 (%1+C)</translation>
     </message>
     <message>
         <source>Paste values from clipboard (%1+V)</source>
@@ -442,27 +534,51 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">点击这里，选择的值将会被剪切到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
+        <translation>点击这里，选择的值将会被剪切到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation type="unfinished">点击这里，选择的值将会被复制到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
+        <translation>点击这里，选择的值将会被复制到剪切板。你可以使用粘贴按钮将它们粘贴到任意地方，存为任意片段。</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation type="unfinished">点击这里，选择的值将从剪贴板粘贴到第一个可见的小节。</translation>
+        <translation>点击这里，选择的值将从剪贴板粘贴到第一个可见的小节。</translation>
     </message>
     <message>
-        <source>Tension: </source>
+        <source>Timeline controls</source>
+        <translation>时间线控制</translation>
+    </message>
+    <message>
+        <source>Zoom controls</source>
+        <translation>缩放控制</translation>
+    </message>
+    <message>
+        <source>Quantization controls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation type="unfinished">自动控制编辑器 - 没有片段</translation>
+        <translation>自动控制编辑器 - 没有片段</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation type="unfinished">自动控制编辑器 - %1</translation>
+        <translation>自动控制编辑器 - %1</translation>
+    </message>
+    <message>
+        <source>Model is already connected to this pattern.</source>
+        <translation>模型已连接到此片段。</translation>
+    </message>
+    <message>
+        <source>Cut selected values (Ctrl+X)</source>
+        <translation>剪切选定值 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected values (Ctrl+C)</source>
+        <translation>复制选定值 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste values from clipboard Ctrl+V)</source>
+        <translation>从剪切板粘贴数值</translation>
     </message>
 </context>
 <context>
@@ -475,12 +591,16 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <source>Model is already connected to this pattern.</source>
         <translation>模型已连接到此片段。</translation>
     </message>
+    <message>
+        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
+        <translation>按住&lt;Ctrl&gt;拖动控制器</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation>双击以在自动编辑器中打开此片段</translation>
+        <translation>双击在自动编辑器中打开此片段</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
@@ -499,6 +619,18 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <translation>修改名称</translation>
     </message>
     <message>
+        <source>Set/clear record</source>
+        <translation>设置/清除录制</translation>
+    </message>
+    <message>
+        <source>Flip Vertically (Visible)</source>
+        <translation>垂直翻转 (可见)</translation>
+    </message>
+    <message>
+        <source>Flip Horizontally (Visible)</source>
+        <translation>水平翻转 (可见)</translation>
+    </message>
+    <message>
         <source>%1 Connections</source>
         <translation>%1个连接</translation>
     </message>
@@ -507,16 +639,8 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <translation>断开“%1”的连接</translation>
     </message>
     <message>
-        <source>Set/clear record</source>
-        <translation>设置/清除录制</translation>
-    </message>
-    <message>
-        <source>Flip Vertically (Visible)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Flip Horizontally (Visible)</source>
-        <translation type="unfinished"></translation>
+        <source>Model is already connected to this pattern.</source>
+        <translation>模型已连接到此片段。</translation>
     </message>
 </context>
 <context>
@@ -530,27 +654,35 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation type="unfinished">节拍+Bassline编辑器</translation>
+        <translation>节拍+低音线编辑器</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation type="unfinished">播放/暂停当前节拍/Bassline（空格）</translation>
+        <translation>播放/暂停当前节拍/低音线（空格）</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
-        <translation type="unfinished">停止播放当前节拍/Bassline(空格)</translation>
+        <translation>停止播放当前节拍/低音线(空格)</translation>
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation type="unfinished">点击这里停止播放当前节拍/Bassline。当结束时节拍/Bassline会自动循环播放。</translation>
+        <translation>点击这里停止播放当前节拍/低音线。当结束时节拍/低音线会自动循环播放。</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation type="unfinished">点击这里停止播发当前节拍/Bassline。</translation>
+        <translation>点击这里停止播发当前节拍/低音线。</translation>
+    </message>
+    <message>
+        <source>Beat selector</source>
+        <translation>节拍选择器</translation>
+    </message>
+    <message>
+        <source>Track and step actions</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation type="unfinished">添加节拍/Bassline</translation>
+        <translation>添加节拍/低音线</translation>
     </message>
     <message>
         <source>Add automation-track</source>
@@ -558,45 +690,49 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation type="unfinished">移除音阶</translation>
+        <translation>移除音阶</translation>
     </message>
     <message>
         <source>Add steps</source>
-        <translation type="unfinished">添加音阶</translation>
+        <translation>添加音阶</translation>
+    </message>
+    <message>
+        <source>Clone Steps</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>BBTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation type="unfinished">在节拍+Bassline编辑器中打开</translation>
+        <translation>在节拍+Bassline编辑器中打开</translation>
     </message>
     <message>
         <source>Reset name</source>
-        <translation type="unfinished">重置名称</translation>
+        <translation>重置名称</translation>
     </message>
     <message>
         <source>Change name</source>
-        <translation type="unfinished">修改名称</translation>
+        <translation>修改名称</translation>
     </message>
     <message>
         <source>Change color</source>
-        <translation type="unfinished">改变颜色</translation>
+        <translation>改变颜色</translation>
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation type="unfinished">重置颜色</translation>
+        <translation>重置颜色</translation>
     </message>
 </context>
 <context>
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation type="unfinished">节拍/Bassline %1</translation>
+        <translation>节拍/Bassline %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
-        <translation type="unfinished">%1 的副本</translation>
+        <translation>%1 的副本</translation>
     </message>
 </context>
 <context>
@@ -645,19 +781,19 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation type="unfinished"></translation>
+        <translation>输入</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation type="unfinished"></translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>GAIN</source>
-        <translation type="unfinished">增益</translation>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Input Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>输入增益:</translation>
     </message>
     <message>
         <source>NOIS</source>
@@ -665,19 +801,19 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Input Noise:</source>
-        <translation type="unfinished"></translation>
+        <translation>输入噪音:</translation>
     </message>
     <message>
         <source>Output Gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>输出增益:</translation>
     </message>
     <message>
         <source>CLIP</source>
-        <translation type="unfinished"></translation>
+        <translation>压限</translation>
     </message>
     <message>
         <source>Output Clip:</source>
-        <translation type="unfinished"></translation>
+        <translation>输出压限:</translation>
     </message>
     <message>
         <source>Rate</source>
@@ -693,11 +829,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>位深</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>深度已启用</translation>
     </message>
     <message>
         <source>Enable bitdepth-crushing</source>
@@ -705,30 +841,30 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Sample rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>采样率:</translation>
     </message>
     <message>
         <source>STD</source>
-        <translation type="unfinished"></translation>
+        <translation>STD</translation>
     </message>
     <message>
         <source>Stereo difference:</source>
-        <translation type="unfinished"></translation>
+        <translation>双声道差异:</translation>
     </message>
     <message>
         <source>Levels</source>
-        <translation type="unfinished"></translation>
+        <translation>级别</translation>
     </message>
     <message>
         <source>Levels:</source>
-        <translation type="unfinished"></translation>
+        <translation>级别:</translation>
     </message>
 </context>
 <context>
     <name>CaptionMenu</name>
     <message>
         <source>&amp;Help</source>
-        <translation>帮助（&amp;H）</translation>
+        <translation>帮助(&amp;H)</translation>
     </message>
     <message>
         <source>Help (not available)</source>
@@ -785,7 +921,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
-        <translation>用来接收 MIDI 事件的 MIDI 设备</translation>
+        <translation>用来接收 MIDI 事件的MIDI 设备</translation>
     </message>
     <message>
         <source>USER CONTROLLER</source>
@@ -827,6 +963,10 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <translation>删除前确认</translation>
     </message>
     <message>
+        <source>Confirm delete? There are existing connection(s) associated with this controller. There is no way to undo.</source>
+        <translation>确定要删除吗？此控制器仍处于被连接状态。此操作不可撤销。</translation>
+    </message>
+    <message>
         <source>Confirm delete? There are existing connection(s) associted with this controller. There is no way to undo.</source>
         <translation>确定要删除吗？此控制器仍处于被连接状态。此操作不可撤销。</translation>
     </message>
@@ -851,7 +991,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation>删除这个插件（&amp;R）</translation>
+        <translation>删除这个插件(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>帮助(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -935,12 +1079,16 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <source>Lfo Amount</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Output gain</source>
+        <translation>输出增益</translation>
+    </message>
 </context>
 <context>
     <name>DelayControlsDialog</name>
     <message>
         <source>Delay</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">延迟</translation>
     </message>
     <message>
         <source>Delay Time</source>
@@ -966,16 +1114,49 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <source>Lfo Amt</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>DetuningHelper</name>
     <message>
-        <source>Note detuning</source>
+        <source>Out Gain</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">增益</translation>
     </message>
 </context>
 <context>
     <name>DualFilterControlDialog</name>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished">频率</translation>
+    </message>
+    <message>
+        <source>Cutoff frequency</source>
+        <translation type="unfinished">切除频率</translation>
+    </message>
+    <message>
+        <source>RESO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resonance</source>
+        <translation type="unfinished">共鸣</translation>
+    </message>
+    <message>
+        <source>GAIN</source>
+        <translation type="unfinished">增益</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">增益</translation>
+    </message>
+    <message>
+        <source>MIX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix</source>
+        <translation type="unfinished">混合</translation>
+    </message>
     <message>
         <source>Filter 1 enabled</source>
         <translation>已启用过滤器 1</translation>
@@ -997,11 +1178,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>DualFilterControls</name>
     <message>
         <source>Filter 1 enabled</source>
-        <translation>滤波器 1 已启用</translation>
+        <translation>过滤器1 已启用</translation>
     </message>
     <message>
         <source>Filter 1 type</source>
-        <translation>滤波器 1 的类型</translation>
+        <translation>过滤器 1 类型</translation>
     </message>
     <message>
         <source>Cutoff 1 frequency</source>
@@ -1021,11 +1202,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation>滤波器 2 已启用</translation>
+        <translation>已启用过滤器 2</translation>
     </message>
     <message>
         <source>Filter 2 type</source>
-        <translation>滤波器 2 的类型</translation>
+        <translation>过滤器 1 类型 {2 ?}</translation>
     </message>
     <message>
         <source>Cutoff 2 frequency</source>
@@ -1129,14 +1310,11 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
 </context>
 <context>
-    <name>DummyEffect</name>
-    <message>
-        <source>NOT FOUND</source>
-        <translation>未找到</translation>
-    </message>
-</context>
-<context>
     <name>Editor</name>
+    <message>
+        <source>Transport controls</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Play (Space)</source>
         <translation>播放（空格）</translation>
@@ -1158,7 +1336,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
-        <translation>效果器已启用</translation>
+        <translation>启用效果器</translation>
     </message>
     <message>
         <source>Wet/Dry mix</source>
@@ -1177,7 +1355,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     <name>EffectChain</name>
     <message>
         <source>Effects enabled</source>
-        <translation>效果器已启用</translation>
+        <translation>启用效果器</translation>
     </message>
 </context>
 <context>
@@ -1198,15 +1376,27 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
         <translation>增加效果器</translation>
     </message>
     <message>
+        <source>Name</source>
+        <translation type="unfinished">名称</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">描述</translation>
+    </message>
+    <message>
+        <source>Author</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Plugin description</source>
-        <translation>插件说明</translation>
+        <translation>插件描述</translation>
     </message>
 </context>
 <context>
     <name>EffectView</name>
     <message>
         <source>Toggles the effect on or off.</source>
-        <translation type="unfinished">打开/关闭效果。</translation>
+        <translation>打开或关闭效果.</translation>
     </message>
     <message>
         <source>On/Off</source>
@@ -1214,7 +1404,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>W/D</source>
-        <translation>干/湿</translation>
+        <translation>W/D</translation>
     </message>
     <message>
         <source>Wet Level:</source>
@@ -1250,7 +1440,7 @@ Jeff Bai，邮箱：jeffbaichina@gmail.com</translation>
     </message>
     <message>
         <source>Controls</source>
-        <translation>控制器</translation>
+        <translation>控制</translation>
     </message>
     <message>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
@@ -1270,15 +1460,19 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Move &amp;up</source>
-        <translation>向上移 (&amp;u)</translation>
+        <translation>向上移(&amp;U)</translation>
     </message>
     <message>
         <source>Move &amp;down</source>
-        <translation>向下移 (&amp;d)</translation>
+        <translation>向下移(&amp;D)</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation>移除此插件 (&amp;R)</translation>
+        <translation>移除此插件(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>帮助(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -1289,7 +1483,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Attack</source>
-        <translation>起音</translation>
+        <translation>打进声</translation>
     </message>
     <message>
         <source>Hold</source>
@@ -1305,7 +1499,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Release</source>
-        <translation>释音</translation>
+        <translation>释放</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -1317,7 +1511,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO Attack</source>
-        <translation>LFO 起音</translation>
+        <translation>LFO 打进声（attack）</translation>
     </message>
     <message>
         <source>LFO speed</source>
@@ -1348,7 +1542,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Predelay:</source>
-        <translation>预延迟</translation>
+        <translation>预延迟:</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
@@ -1360,7 +1554,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished">起音：</translation>
+        <translation>打进声:</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
@@ -1372,7 +1566,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Hold:</source>
-        <translation type="unfinished">持续：</translation>
+        <translation>持续：</translation>
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
@@ -1396,7 +1590,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Sustain:</source>
-        <translation type="unfinished">持续：</translation>
+        <translation>持续：</translation>
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
@@ -1420,7 +1614,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation>调制量</translation>
+        <translation>调制量:</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
@@ -1428,7 +1622,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO predelay:</source>
-        <translation>LFO 预延迟</translation>
+        <translation>LFO 预延迟:</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
@@ -1479,6 +1673,10 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Click here for random wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>FREQ x 100</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1508,14 +1706,10 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished">提示</translation>
+        <translation>提示</translation>
     </message>
     <message>
         <source>Drag a sample from somewhere and drop it in this window.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here for random wave.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1523,11 +1717,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>EqControls</name>
     <message>
         <source>Input gain</source>
-        <translation type="unfinished">输入增益</translation>
+        <translation>输入增益</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation type="unfinished">输出增益</translation>
+        <translation>输出增益</translation>
     </message>
     <message>
         <source>Low shelf gain</source>
@@ -1681,6 +1875,16 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>high pass type</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="plugins/Eq/EqControls.cpp" line="75"/>
+        <source>Analyse IN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/Eq/EqControls.cpp" line="76"/>
+        <source>Analyse OUT</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EqControlsDialog</name>
@@ -1722,7 +1926,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">增益</translation>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Out Gain</source>
@@ -1733,12 +1937,41 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="plugins/Eq/EqControlsDialog.cpp" line="106"/>
+        <source> Octave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Resonance : </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Frequency:</source>
-        <translation type="unfinished">频率：</translation>
+        <translation>频率：</translation>
+    </message>
+    <message>
+        <source>lp grp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hp grp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/Eq/EqControlsDialog.cpp" line="289"/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/Eq/EqControlsDialog.cpp" line="293"/>
+        <location filename="plugins/Eq/EqControlsDialog.cpp" line="297"/>
+        <source>Resonance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/Eq/EqControlsDialog.cpp" line="301"/>
+        <source>Bandwidth</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>12dB</source>
@@ -1752,19 +1985,23 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source>48dB</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>lp grp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hp grp</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
-    <name>EqParameterWidget</name>
+    <name>EqHandle</name>
     <message>
-        <source>Hz </source>
+        <location filename="plugins/Eq/EqCurve.cpp" line="108"/>
+        <source>Reso: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/Eq/EqCurve.cpp" line="112"/>
+        <source>BW: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="plugins/Eq/EqCurve.cpp" line="121"/>
+        <location filename="plugins/Eq/EqCurve.cpp" line="124"/>
+        <source>Freq: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1848,7 +2085,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>请注意：上面的参数不一定适用于所有文件格式。</translation>
+        <translation>请注意上面的参数不一定适用于所有文件格式。</translation>
     </message>
     <message>
         <source>Quality settings</source>
@@ -1856,27 +2093,27 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Interpolation:</source>
-        <translation type="unfinished"></translation>
+        <translation>补间:</translation>
     </message>
     <message>
         <source>Zero Order Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>零阶保持</translation>
     </message>
     <message>
         <source>Sinc Fastest</source>
-        <translation type="unfinished"></translation>
+        <translation>最快 Sinc 补间</translation>
     </message>
     <message>
         <source>Sinc Medium (recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>中等 Sinc 补间 (推荐)</translation>
     </message>
     <message>
         <source>Sinc Best (very slow!)</source>
-        <translation type="unfinished"></translation>
+        <translation>最佳 Sinc 补间 (很慢!)</translation>
     </message>
     <message>
         <source>Oversampling (use with care!):</source>
-        <translation type="unfinished"></translation>
+        <translation>过采样 (请谨慎使用!):</translation>
     </message>
     <message>
         <source>1x (None)</source>
@@ -1895,6 +2132,14 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation>8x</translation>
     </message>
     <message>
+        <source>Export as loop (remove end silence)</source>
+        <translation>导出为回环loop（移除结尾的静音）</translation>
+    </message>
+    <message>
+        <source>Export between loop markers</source>
+        <translation>只导出回环标记中间的部分</translation>
+    </message>
+    <message>
         <source>Start</source>
         <translation>开始</translation>
     </message>
@@ -1903,79 +2148,87 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation>取消</translation>
     </message>
     <message>
-        <source>Export as loop (remove end silence)</source>
-        <translation>导出为回环loop（移除结尾的静音）</translation>
-    </message>
-    <message>
-        <source>Export between loop markers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not open file</source>
-        <translation type="unfinished">无法打开文件</translation>
+        <translation>无法打开文件</translation>
     </message>
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished">无法打开文件 %1 写入数据。
+        <translation>无法打开文件 %1 写入数据。
 请确保你拥有对文件以及存储文件的目录的写权限，然后重试！</translation>
     </message>
     <message>
         <source>Export project to %1</source>
-        <translation type="unfinished">导出项目到 %1</translation>
+        <translation>导出项目到 %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">错误</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation type="unfinished">寻找文件编码设备时出错。请使用另外一种输出格式。</translation>
+        <translation>寻找文件编码设备时出错。请使用另外一种输出格式。</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
-        <translation type="unfinished">渲染中：%1%</translation>
+        <translation>渲染中:%1%</translation>
     </message>
 </context>
 <context>
     <name>Fader</name>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
-        <translation type="unfinished"></translation>
+        <translation>请输入一个介于%1和%2之间的数值：</translation>
     </message>
 </context>
 <context>
     <name>FileBrowser</name>
     <message>
         <source>Browser</source>
-        <translation type="unfinished">浏览器</translation>
+        <translation>浏览器</translation>
     </message>
 </context>
 <context>
     <name>FileBrowserTreeWidget</name>
     <message>
         <source>Send to active instrument-track</source>
-        <translation type="unfinished">发送到活跃的乐器轨道</translation>
+        <translation>发送到活跃的乐器轨道</translation>
     </message>
     <message>
-        <source>Open in new instrument-track/Song-Editor</source>
-        <translation type="unfinished">在新乐器轨道/歌曲编辑器中打开</translation>
+        <source>Open in new instrument-track/Song Editor</source>
+        <translation>在新的乐器轨道/歌曲编辑器中打开</translation>
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation type="unfinished">在新乐器轨道/B+B 编辑器中打开</translation>
+        <translation>在新乐器轨道/B+B 编辑器中打开</translation>
     </message>
     <message>
         <source>Loading sample</source>
-        <translation type="unfinished">加载采样中</translation>
+        <translation>加载采样中</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
-        <translation type="unfinished">请稍候，加载采样中...</translation>
+        <translation>请稍候，加载采样中...</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <source>does not appear to be a valid</source>
+        <translation>并不是一个有效的</translation>
+    </message>
+    <message>
+        <source>file</source>
+        <translation>文件</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished">---软件自带文件---</translation>
+        <translation>---软件自带文件---</translation>
+    </message>
+    <message>
+        <source>Open in new instrument-track/Song-Editor</source>
+        <translation>在新乐器轨道/歌曲编辑器中打开</translation>
     </message>
 </context>
 <context>
@@ -1990,7 +2243,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>Regen</source>
@@ -1998,22 +2251,22 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Noise</source>
-        <translation type="unfinished">噪音</translation>
+        <translation>噪音</translation>
     </message>
     <message>
         <source>Invert</source>
-        <translation type="unfinished"></translation>
+        <translation>反转</translation>
     </message>
 </context>
 <context>
     <name>FlangerControlsDialog</name>
     <message>
         <source>Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>延迟</translation>
     </message>
     <message>
         <source>Delay Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>延迟时间:</translation>
     </message>
     <message>
         <source>Lfo Hz</source>
@@ -2041,18 +2294,18 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Noise</source>
-        <translation type="unfinished">噪音</translation>
+        <translation>噪音</translation>
     </message>
     <message>
         <source>White Noise Amount:</source>
-        <translation type="unfinished"></translation>
+        <translation>白噪音数量:</translation>
     </message>
 </context>
 <context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
-        <translation type="unfinished"></translation>
+        <translation>通道发送的数量</translation>
     </message>
     <message>
         <source>The FX channel receives input from one or more instrument tracks.
@@ -2066,23 +2319,23 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Move &amp;left</source>
-        <translation type="unfinished"></translation>
+        <translation>向左移(&amp;L)</translation>
     </message>
     <message>
         <source>Move &amp;right</source>
-        <translation type="unfinished"></translation>
+        <translation>向右移(&amp;R)</translation>
     </message>
     <message>
         <source>Rename &amp;channel</source>
-        <translation type="unfinished"></translation>
+        <translation>重命名通道(&amp;C)</translation>
     </message>
     <message>
         <source>R&amp;emove channel</source>
-        <translation type="unfinished"></translation>
+        <translation>删除通道(&amp;E)</translation>
     </message>
     <message>
         <source>Remove &amp;unused channels</source>
-        <translation type="unfinished"></translation>
+        <translation>移除所有未用通道(&amp;U)</translation>
     </message>
 </context>
 <context>
@@ -2099,36 +2352,36 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 <context>
     <name>FxMixerView</name>
     <message>
+        <source>FX-Mixer</source>
+        <translation>效果混合器</translation>
+    </message>
+    <message>
+        <source>FX Fader %1</source>
+        <translation>FX 衰减器 %1</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
+        <source>Mute this FX channel</source>
+        <translation>静音此效果通道</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>独奏</translation>
+    </message>
+    <message>
+        <source>Solo FX channel</source>
+        <translation>独奏效果通道</translation>
+    </message>
+    <message>
         <source>Rename FX channel</source>
         <translation>重命名效果通道</translation>
     </message>
     <message>
         <source>Enter the new name for this FX channel</source>
         <translation>为此效果通道输入一个新的名称</translation>
-    </message>
-    <message>
-        <source>FX-Mixer</source>
-        <translation>效果混合器</translation>
-    </message>
-    <message>
-        <source>FX Fader %1</source>
-        <translation type="unfinished">FX 衰减器 %1</translation>
-    </message>
-    <message>
-        <source>Mute</source>
-        <translation type="unfinished">静音</translation>
-    </message>
-    <message>
-        <source>Mute this FX channel</source>
-        <translation type="unfinished">静音此效果通道</translation>
-    </message>
-    <message>
-        <source>Solo</source>
-        <translation type="unfinished">独奏</translation>
-    </message>
-    <message>
-        <source>Solo FX channel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2142,50 +2395,50 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>GigInstrument</name>
     <message>
         <source>Bank</source>
-        <translation type="unfinished">库</translation>
+        <translation>库</translation>
     </message>
     <message>
         <source>Patch</source>
-        <translation type="unfinished"></translation>
+        <translation>音色</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">增益</translation>
+        <translation>增益</translation>
     </message>
 </context>
 <context>
     <name>GigInstrumentView</name>
     <message>
         <source>Open other GIG file</source>
-        <translation type="unfinished"></translation>
+        <translation>打开另外的 GIG 文件</translation>
     </message>
     <message>
         <source>Click here to open another GIG file</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里打开另外一个 GIG 文件</translation>
     </message>
     <message>
         <source>Choose the patch</source>
-        <translation type="unfinished">选择路径</translation>
+        <translation>选择路径</translation>
     </message>
     <message>
         <source>Click here to change which patch of the GIG file to use</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里选择另一种 GIG 音色</translation>
     </message>
     <message>
         <source>Change which instrument of the GIG file is being played</source>
-        <translation type="unfinished"></translation>
+        <translation>更换正在使用的 GIG 文件中的乐器</translation>
     </message>
     <message>
         <source>Which GIG file is currently being used</source>
-        <translation type="unfinished"></translation>
+        <translation>哪一个 GIG 文件正在被使用</translation>
     </message>
     <message>
         <source>Which patch of the GIG file is currently being used</source>
-        <translation type="unfinished"></translation>
+        <translation>GIG 文件的哪一个音色正在被使用</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation type="unfinished">增益</translation>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Factor to multiply samples by</source>
@@ -2193,11 +2446,54 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Open GIG file</source>
-        <translation type="unfinished"></translation>
+        <translation>打开 GIG 文件</translation>
     </message>
     <message>
         <source>GIG Files (*.gig)</source>
-        <translation type="unfinished"></translation>
+        <translation>GIG 文件 (*.gig)</translation>
+    </message>
+</context>
+<context>
+    <name>GuiApplication</name>
+    <message>
+        <source>Working directory</source>
+        <translation>工作目录</translation>
+    </message>
+    <message>
+        <source>The LMMS working directory %1 does not exist. Create it now? You can change the directory later via Edit -&gt; Settings.</source>
+        <translation>LMMS工作目录%1不存在，现在新建一个吗？你可以稍后在 编辑 -&gt; 设置 中更改此设置。</translation>
+    </message>
+    <message>
+        <source>Preparing UI</source>
+        <translation>正在准备界面</translation>
+    </message>
+    <message>
+        <source>Preparing song editor</source>
+        <translation>正在准备歌曲编辑器</translation>
+    </message>
+    <message>
+        <source>Preparing mixer</source>
+        <translation>正在准备混音器</translation>
+    </message>
+    <message>
+        <source>Preparing controller rack</source>
+        <translation>正在准备控制机架</translation>
+    </message>
+    <message>
+        <source>Preparing project notes</source>
+        <translation>正在准备工程注释</translation>
+    </message>
+    <message>
+        <source>Preparing beat/bassline editor</source>
+        <translation>正在准备节拍/低音线编辑器</translation>
+    </message>
+    <message>
+        <source>Preparing piano roll</source>
+        <translation>正在准备钢琴窗</translation>
+    </message>
+    <message>
+        <source>Preparing automation editor</source>
+        <translation>正在准备自动编辑器</translation>
     </message>
 </context>
 <context>
@@ -2247,6 +2543,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>随机</translation>
     </message>
     <message>
+        <source>Down and up</source>
+        <translation>下和上</translation>
+    </message>
+    <message>
         <source>Free</source>
         <translation>自由</translation>
     </message>
@@ -2258,16 +2558,12 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Sync</source>
         <translation>同步</translation>
     </message>
-    <message>
-        <source>Down and up</source>
-        <translation>下和上</translation>
-    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
     <message>
         <source>ARPEGGIO</source>
-        <translation type="unfinished"></translation>
+        <translation>琶音</translation>
     </message>
     <message>
         <source>An arpeggio is a method playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords. The only difference is that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads, but there are a lot of other possible chords, you can select.</source>
@@ -2315,7 +2611,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation>%</translation>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato arpeggios.</source>
@@ -2689,18 +2985,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Locrian</translation>
     </message>
     <message>
-        <source>Chords</source>
-        <translation>Chords</translation>
-    </message>
-    <message>
-        <source>Chord type</source>
-        <translation>Chord type</translation>
-    </message>
-    <message>
-        <source>Chord range</source>
-        <translation>Chord range</translation>
-    </message>
-    <message>
         <source>Minor</source>
         <translation>Minor</translation>
     </message>
@@ -2716,9 +3000,29 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>5</source>
         <translation>5</translation>
     </message>
+    <message>
+        <source>Chords</source>
+        <translation>Chords</translation>
+    </message>
+    <message>
+        <source>Chord type</source>
+        <translation>Chord type</translation>
+    </message>
+    <message>
+        <source>Chord range</source>
+        <translation>Chord range</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionNoteStackingView</name>
+    <message>
+        <source>STACKING</source>
+        <translation>堆叠</translation>
+    </message>
+    <message>
+        <source>Chord:</source>
+        <translation>和弦：</translation>
+    </message>
     <message>
         <source>RANGE</source>
         <translation>范围</translation>
@@ -2734,14 +3038,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>STACKING</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Chord:</source>
-        <translation>和弦：</translation>
     </message>
 </context>
 <context>
@@ -2767,20 +3063,20 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>乐器</translation>
     </message>
     <message>
-        <source>MIDI devices to receive MIDI events from</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MIDI devices to send MIDI events to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>NOTE</source>
         <translation>音符</translation>
     </message>
     <message>
+        <source>MIDI devices to receive MIDI events from</source>
+        <translation>用于接收 MIDI 事件的 MIDI 设备</translation>
+    </message>
+    <message>
+        <source>MIDI devices to send MIDI events to</source>
+        <translation>用于发送 MIDI 事件的 MIDI 设备</translation>
+    </message>
+    <message>
         <source>CUSTOM BASE VELOCITY</source>
-        <translation type="unfinished"></translation>
+        <translation>自定义基准力度</translation>
     </message>
     <message>
         <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
@@ -2788,18 +3084,18 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>BASE VELOCITY</source>
-        <translation type="unfinished"></translation>
+        <translation>基准力度</translation>
     </message>
 </context>
 <context>
     <name>InstrumentMiscView</name>
     <message>
         <source>MASTER PITCH</source>
-        <translation type="unfinished"></translation>
+        <translation>主音高</translation>
     </message>
     <message>
         <source>Enables the use of Master Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>启用主音高</translation>
     </message>
 </context>
 <context>
@@ -2826,11 +3122,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Resonance</source>
-        <translation type="unfinished">共鸣</translation>
+        <translation>共鸣</translation>
     </message>
     <message>
         <source>Envelopes/LFOs</source>
-        <translation type="unfinished"></translation>
+        <translation>压限/低频振荡</translation>
     </message>
     <message>
         <source>Filter type</source>
@@ -2858,43 +3154,43 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Notch</source>
-        <translation type="unfinished">凹口滤波器</translation>
+        <translation>凹口滤波器</translation>
     </message>
     <message>
         <source>Allpass</source>
-        <translation type="unfinished">全通</translation>
+        <translation>全通</translation>
     </message>
     <message>
         <source>Moog</source>
-        <translation type="unfinished">Moog</translation>
+        <translation>Moog</translation>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation type="unfinished">2 个低通串联</translation>
+        <translation>2 个低通串联</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation type="unfinished">RC 低通(12dB)</translation>
+        <translation>RC 低通(12dB)</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation type="unfinished">RC 带通(12dB)</translation>
+        <translation>RC 带通(12dB)</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation type="unfinished">RC 高通(12dB)</translation>
+        <translation>RC 高通(12dB)</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation type="unfinished">RC 低通(24dB)</translation>
+        <translation>RC 低通(24dB)</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation type="unfinished">RC 带通(24dB)</translation>
+        <translation>RC 带通(24dB)</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation type="unfinished">RC 高通(24dB)</translation>
+        <translation>RC 高通(24dB)</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
@@ -2933,7 +3229,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentSoundShapingView</name>
     <message>
         <source>TARGET</source>
-        <translation type="unfinished"></translation>
+        <translation>目标</translation>
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
@@ -2948,8 +3244,16 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hz</source>
+        <source>FREQ</source>
+        <translation>频率</translation>
+    </message>
+    <message>
+        <source>cutoff frequency:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hz</source>
+        <translation>Hz</translation>
     </message>
     <message>
         <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
@@ -2961,30 +3265,34 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Resonance:</source>
-        <translation type="unfinished">共鸣：</translation>
+        <translation>共鸣：</translation>
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FREQ</source>
-        <translation type="unfinished">频率</translation>
-    </message>
-    <message>
-        <source>cutoff frequency:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
-        <translation type="unfinished"></translation>
+        <translation>包络和低频振荡 (LFO) 不被当前乐器支持。</translation>
     </message>
 </context>
 <context>
     <name>InstrumentTrack</name>
     <message>
+        <source>Default preset</source>
+        <translation>预置</translation>
+    </message>
+    <message>
+        <source>With this knob you can set the volume of the opened channel.</source>
+        <translation>使用此旋钮可以设置开放通道的音量。</translation>
+    </message>
+    <message>
         <source>unnamed_track</source>
         <translation>未命名轨道</translation>
+    </message>
+    <message>
+        <source>Base note</source>
+        <translation>基本音</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -2999,28 +3307,16 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>音高</translation>
     </message>
     <message>
-        <source>FX channel</source>
-        <translation>效果通道</translation>
-    </message>
-    <message>
-        <source>Default preset</source>
-        <translation>预置</translation>
-    </message>
-    <message>
-        <source>With this knob you can set the volume of the opened channel.</source>
-        <translation>使用此旋钮可以设置开放通道的音量</translation>
-    </message>
-    <message>
-        <source>Base note</source>
-        <translation>基本音</translation>
-    </message>
-    <message>
         <source>Pitch range</source>
         <translation>音域范围</translation>
     </message>
     <message>
+        <source>FX channel</source>
+        <translation>效果通道</translation>
+    </message>
+    <message>
         <source>Master Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>主音高</translation>
     </message>
 </context>
 <context>
@@ -3061,12 +3357,20 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Output</source>
         <translation>输出</translation>
     </message>
+    <message>
+        <source>FX %1: %2</source>
+        <translation>效果 %1: %2</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentTrackWindow</name>
     <message>
         <source>GENERAL SETTINGS</source>
-        <translation>一般设置</translation>
+        <translation>常规设置</translation>
+    </message>
+    <message>
+        <source>Use these controls to view and edit the next/previous track in the song editor.</source>
+        <translation>使用这些控制选项来查看和编辑在歌曲编辑器中的上个/下个轨道。</translation>
     </message>
     <message>
         <source>Instrument volume</source>
@@ -3109,24 +3413,48 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation></translation>
     </message>
     <message>
+        <source>Pitch range (semitones)</source>
+        <translation>音域范围（半音）</translation>
+    </message>
+    <message>
+        <source>RANGE</source>
+        <translation>范围</translation>
+    </message>
+    <message>
         <source>FX channel</source>
         <translation>效果通道</translation>
-    </message>
-    <message>
-        <source>ENV/LFO</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FUNC</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>FX</source>
         <translation>效果</translation>
     </message>
     <message>
+        <source>Save current instrument track settings in a preset file</source>
+        <translation>保存当前乐器轨道设置到预设文件</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
+        <translation>如果你想保存当前乐器轨道设置到预设文件, 请点击这里。稍后你可以在预设浏览器中双击以使用它。</translation>
+    </message>
+    <message>
+        <source>SAVE</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>ENV/LFO</source>
+        <translation>包络/低振</translation>
+    </message>
+    <message>
+        <source>FUNC</source>
+        <translation>功能</translation>
+    </message>
+    <message>
         <source>MIDI</source>
         <translation>MIDI</translation>
+    </message>
+    <message>
+        <source>MISC</source>
+        <translation>杂项</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -3140,40 +3468,20 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>PLUGIN</source>
         <translation>插件</translation>
     </message>
-    <message>
-        <source>Pitch range (semitones)</source>
-        <translation>音域范围（半音）</translation>
-    </message>
-    <message>
-        <source>RANGE</source>
-        <translation>范围</translation>
-    </message>
-    <message>
-        <source>Save current instrument track settings in a preset file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MISC</source>
-        <translation type="unfinished">杂项</translation>
-    </message>
 </context>
 <context>
     <name>Knob</name>
     <message>
         <source>Set linear</source>
-        <translation type="unfinished"></translation>
+        <translation>设置为线性</translation>
     </message>
     <message>
         <source>Set logarithmic</source>
-        <translation type="unfinished"></translation>
+        <translation>设置为对数</translation>
     </message>
     <message>
         <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation type="unfinished">请输入介于96.0 dBV 和 6.0 dBV之间的值：</translation>
+        <translation>请输入介于96.0 dBV 和 6.0 dBV之间的值：</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -3219,6 +3527,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Unknown LADSPA plugin %1 requested.</source>
         <translation>已请求未知 LADSPA 插件 %1.</translation>
     </message>
+    <message>
+        <source>Effect</source>
+        <translation>效果器</translation>
+    </message>
 </context>
 <context>
     <name>LcdSpinBox</name>
@@ -3228,18 +3540,37 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
 </context>
 <context>
+    <name>LeftRightNav</name>
+    <message>
+        <source>Previous</source>
+        <translation>上个</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>下个</translation>
+    </message>
+    <message>
+        <source>Previous (%1)</source>
+        <translation>上 (%1)</translation>
+    </message>
+    <message>
+        <source>Next (%1)</source>
+        <translation>下 (%1)</translation>
+    </message>
+</context>
+<context>
     <name>LfoController</name>
     <message>
         <source>LFO Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>LFO 控制器</translation>
     </message>
     <message>
         <source>Base value</source>
-        <translation type="unfinished"></translation>
+        <translation>基准值</translation>
     </message>
     <message>
         <source>Oscillator speed</source>
-        <translation type="unfinished"></translation>
+        <translation>振动速度</translation>
     </message>
     <message>
         <source>Oscillator amount</source>
@@ -3251,7 +3582,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Oscillator waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>振动波形</translation>
     </message>
     <message>
         <source>Frequency Multiplier</source>
@@ -3266,7 +3597,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>LFO Controller</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LFO 控制器</translation>
     </message>
     <message>
         <source>BASE</source>
@@ -3298,7 +3629,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation type="unfinished">调制量：</translation>
+        <translation>调制量：</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
@@ -3337,6 +3668,10 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Click here for a moog saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Click here for an exponential wave.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3349,20 +3684,35 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 Double click to pick a file.</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>LmmsCore</name>
     <message>
-        <source>Click here for a moog saw-wave.</source>
-        <translation type="unfinished"></translation>
+        <source>Generating wavetables</source>
+        <translation>正在生成波形表</translation>
+    </message>
+    <message>
+        <source>Initializing data structures</source>
+        <translation>正在初始化数据结构</translation>
+    </message>
+    <message>
+        <source>Opening audio and midi devices</source>
+        <translation>正在启动音频和 MIDI 设备</translation>
+    </message>
+    <message>
+        <source>Launching mixer threads</source>
+        <translation>生在启动混音器线程</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Working directory</source>
-        <translation>工作目录</translation>
+        <source>Configuration file</source>
+        <translation>配置文件</translation>
     </message>
     <message>
-        <source>The LMMS working directory %1 does not exist. Create it now? You can change the directory later via Edit -&gt; Settings.</source>
-        <translation>LMMS工作目录%1不存在，现在新建一个吗？你可以稍后在 编辑 -&gt; 设置 中更改此设置。</translation>
+        <source>Error while parsing configuration file at line %1:%2: %3</source>
+        <translation>解析配置文件发生错误（行%1:%2:%3）</translation>
     </message>
     <message>
         <source>Could not save config-file</source>
@@ -3375,20 +3725,128 @@ Please make sure you have write-access to the file and try again.</source>
 请确保你可以写入这个文件并重试。</translation>
     </message>
     <message>
+        <source>Project recovery</source>
+        <translation>工程恢复</translation>
+    </message>
+    <message>
+        <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
+        <translation>发现了一个恢复文件。看上去上个会话没有正常结束或者其他的 LMMS 进程已经运行。你想要恢复这个项目吗?</translation>
+    </message>
+    <message>
+        <source>Recover</source>
+        <translation>恢复</translation>
+    </message>
+    <message>
+        <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
+        <translation>恢复文件。请不要在恢复文件时运行多个 LMMS 程序。</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>忽略</translation>
+    </message>
+    <message>
+        <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
+        <translation>正常启动 LMMS 但是关闭自动备份来防止备份文件被覆盖。</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>丢弃</translation>
+    </message>
+    <message>
+        <source>Launch a default session and delete the restored files. This is not reversible.</source>
+        <translation>运行一个新的默认会话并且删除恢复文件。此操作无法撤销。</translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <source>Shut down LMMS with no further action.</source>
+        <translation>什么也不做并关闭 LMMS。</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation>版本 %1</translation>
+    </message>
+    <message>
+        <source>Preparing plugin browser</source>
+        <translation>正在准备插件浏览器</translation>
+    </message>
+    <message>
+        <source>Preparing file browsers</source>
+        <translation>正在准备文件浏览器</translation>
+    </message>
+    <message>
+        <source>My Projects</source>
+        <translation>我的工程</translation>
+    </message>
+    <message>
+        <source>My Samples</source>
+        <translation>我的采样</translation>
+    </message>
+    <message>
+        <source>My Presets</source>
+        <translation>我的预设</translation>
+    </message>
+    <message>
+        <source>My Home</source>
+        <translation>我的主目录</translation>
+    </message>
+    <message>
+        <source>Root directory</source>
+        <translation>根目录</translation>
+    </message>
+    <message>
+        <source>Volumes</source>
+        <translation>音量</translation>
+    </message>
+    <message>
+        <source>My Computer</source>
+        <translation>我的电脑</translation>
+    </message>
+    <message>
+        <source>Loading background artwork</source>
+        <translation>正在加载背景图案</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>文件(&amp;F)</translation>
+    </message>
+    <message>
         <source>&amp;New</source>
-        <translation>新建（&amp;N）</translation>
+        <translation>新建(&amp;N)</translation>
+    </message>
+    <message>
+        <source>New from template</source>
+        <translation>从模版新建工程</translation>
     </message>
     <message>
         <source>&amp;Open...</source>
-        <translation>打开（&amp;O）...</translation>
+        <translation>打开(&amp;O)...</translation>
+    </message>
+    <message>
+        <source>&amp;Recently Opened Projects</source>
+        <translation>最近打开的工程(&amp;R)</translation>
     </message>
     <message>
         <source>&amp;Save</source>
-        <translation>保存（&amp;S）...</translation>
+        <translation>保存（&amp;S)</translation>
     </message>
     <message>
         <source>Save &amp;As...</source>
-        <translation>另存为（&amp;A）...</translation>
+        <translation>另存为(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>Save as New &amp;Version</source>
+        <translation>保存为新版本(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Save as default template</source>
+        <translation>保存为默认模板</translation>
     </message>
     <message>
         <source>Import...</source>
@@ -3396,35 +3854,59 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <source>E&amp;xport...</source>
-        <translation>导出（&amp;E）...</translation>
+        <translation>导出(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>E&amp;xport Tracks...</source>
+        <translation>导出音轨(&amp;X)...</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>导出 MIDI (&amp;M)...</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>退出（&amp;Q）</translation>
+        <translation>退出(&amp;Q)</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation>编辑（&amp;E）</translation>
+        <translation>编辑(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>撤销</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>重做</translation>
     </message>
     <message>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
+        <source>&amp;View</source>
+        <translation>视图 (&amp;V)</translation>
+    </message>
+    <message>
         <source>&amp;Tools</source>
-        <translation>工具（&amp;T）</translation>
+        <translation>工具(&amp;T)</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>帮助（&amp;H）</translation>
+        <translation>帮助(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Online Help</source>
+        <translation>在线帮助</translation>
     </message>
     <message>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <source>What&apos;s this?</source>
-        <translation>这是什么？</translation>
+        <source>What&apos;s This?</source>
+        <translation>这是什么?</translation>
     </message>
     <message>
         <source>About</source>
@@ -3455,47 +3937,55 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>导出当前工程</translation>
     </message>
     <message>
-        <source>Song Editor</source>
+        <source>What&apos;s this?</source>
+        <translation>这是什么？</translation>
+    </message>
+    <message>
+        <source>Toggle metronome</source>
+        <translation>开启/关闭节拍器</translation>
+    </message>
+    <message>
+        <source>Show/hide Song-Editor</source>
         <translation>显示/隐藏歌曲编辑器</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这个按钮, 你可以显示/隐藏歌曲编辑器。在歌曲编辑器的帮助下, 你可以编辑歌曲播放列表并且设置哪个音轨在哪个时间播放。你还可以在播放列表中直接插入和移动采样(如 RAP 采样)。</translation>
     </message>
     <message>
-        <source>Beat+Bassline Editor</source>
+        <source>Show/hide Beat+Bassline Editor</source>
         <translation>显示/隐藏节拍+旋律编辑器</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <source>Piano Roll</source>
+        <source>Show/hide Piano-Roll</source>
         <translation>显示/隐藏钢琴窗</translation>
     </message>
     <message>
         <source>Click here to show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melodies in an easy way.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里显示或隐藏钢琴窗。在钢琴窗的帮助下, 你可以很容易地编辑旋律。</translation>
     </message>
     <message>
-        <source>Automation Editor</source>
+        <source>Show/hide Automation Editor</source>
         <translation>显示/隐藏自动控制编辑器</translation>
     </message>
     <message>
         <source>Click here to show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里显示或隐藏自动控制编辑器。在自动控制编辑器的帮助下, 你可以很简单地控制动态数值。</translation>
     </message>
     <message>
-        <source>FX Mixer</source>
+        <source>Show/hide FX Mixer</source>
         <translation>显示/隐藏混音器</translation>
     </message>
     <message>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里显示或隐藏 FX 混音器。FX 混音器是管理你歌曲中不同音效的强大工具。你可以向不同的通道添加不同的效果。</translation>
     </message>
     <message>
-        <source>Project Notes</source>
+        <source>Show/hide project notes</source>
         <translation>显示/隐藏工程注释</translation>
     </message>
     <message>
@@ -3503,7 +3993,7 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>点击这里显示或隐藏工程注释窗。在此窗口中你可以写下工程的注释。</translation>
     </message>
     <message>
-        <source>Controller Rack</source>
+        <source>Show/hide controller rack</source>
         <translation>显示/隐藏控制器机架</translation>
     </message>
     <message>
@@ -3511,8 +4001,24 @@ Please make sure you have write-access to the file and try again.</source>
         <translation>未标题</translation>
     </message>
     <message>
+        <source>Recover session. Please save your work!</source>
+        <translation>恢复会话。请保存你的工作!</translation>
+    </message>
+    <message>
+        <source>Automatic backup disabled. Remember to save your work!</source>
+        <translation>自动备份已禁用。记得保存你的作品哟!</translation>
+    </message>
+    <message>
         <source>LMMS %1</source>
         <translation>LMMS %1</translation>
+    </message>
+    <message>
+        <source>Recovered project not saved</source>
+        <translation>恢复的工程没有保存</translation>
+    </message>
+    <message>
+        <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
+        <translation>这个工程已从上一个会话中恢复。它现在没有被保存, 并且如果你不保存, 它将会丢失。你现在想保存它吗?</translation>
     </message>
     <message>
         <source>Project not saved</source>
@@ -3521,6 +4027,34 @@ Please make sure you have write-access to the file and try again.</source>
     <message>
         <source>The current project was modified since last saving. Do you want to save it now?</source>
         <translation>此工程自上次保存后有了修改，你想保存吗？</translation>
+    </message>
+    <message>
+        <source>Open Project</source>
+        <translation>打开工程</translation>
+    </message>
+    <message>
+        <source>LMMS (*.mmp *.mmpz)</source>
+        <translation>LMMS (*.mmp *.mmpz)</translation>
+    </message>
+    <message>
+        <source>Save Project</source>
+        <translation>保存工程</translation>
+    </message>
+    <message>
+        <source>LMMS Project</source>
+        <translation>LMMS 工程</translation>
+    </message>
+    <message>
+        <source>LMMS Project Template</source>
+        <translation>LMMS 工程模板</translation>
+    </message>
+    <message>
+        <source>Overwrite default template?</source>
+        <translation>覆盖默认的模板?</translation>
+    </message>
+    <message>
+        <source>This will overwrite your current default template.</source>
+        <translation>这将会覆盖你的当前默认模板。</translation>
     </message>
     <message>
         <source>Help not available</source>
@@ -3533,96 +4067,112 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 请访问 http://lmms.sf.net/wiki 了解LMMS的相关文档。</translation>
     </message>
     <message>
-        <source>LMMS (*.mmp *.mmpz)</source>
-        <translation>LMMS (*.mmp *.mmpz)</translation>
+        <source>Song Editor</source>
+        <translation>显示/隐藏歌曲编辑器</translation>
     </message>
     <message>
-        <source>Version %1</source>
-        <translation>版本 %1</translation>
+        <source>Beat+Bassline Editor</source>
+        <translation>显示/隐藏节拍+旋律编辑器</translation>
     </message>
     <message>
-        <source>Configuration file</source>
-        <translation>配置文件</translation>
+        <source>Piano Roll</source>
+        <translation>显示/隐藏钢琴窗</translation>
     </message>
     <message>
-        <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation>解析配置文件发生错误（行%1:%2:%3）</translation>
+        <source>Automation Editor</source>
+        <translation>显示/隐藏自动控制编辑器</translation>
     </message>
     <message>
-        <source>Undo</source>
-        <translation>撤销</translation>
+        <source>FX Mixer</source>
+        <translation>显示/隐藏混音器</translation>
     </message>
     <message>
-        <source>Redo</source>
-        <translation>重做</translation>
+        <source>Project Notes</source>
+        <translation>显示/隐藏工程注释</translation>
     </message>
     <message>
-        <source>LMMS Project</source>
-        <translation>LMMS 工程</translation>
+        <source>Controller Rack</source>
+        <translation>显示/隐藏控制器机架</translation>
     </message>
     <message>
-        <source>LMMS Project Template</source>
-        <translation>LMMS 工程模板</translation>
+        <source>Volume as dBV</source>
+        <translation>以 dBV 显示音量</translation>
     </message>
     <message>
-        <source>Volumes</source>
-        <translation type="unfinished"></translation>
+        <source>Smooth scroll</source>
+        <translation>平滑滚动</translation>
     </message>
     <message>
-        <source>My Projects</source>
-        <translation type="unfinished"></translation>
+        <source>Enable note labels in piano roll</source>
+        <translation>在钢琴窗中显示音号</translation>
     </message>
     <message>
-        <source>My Samples</source>
-        <translation type="unfinished"></translation>
+        <source>Working directory</source>
+        <translation>工作目录</translation>
     </message>
     <message>
-        <source>My Presets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>My Computer</source>
-        <translation type="unfinished"></translation>
+        <source>The LMMS working directory %1 does not exist. Create it now? You can change the directory later via Edit -&gt; Settings.</source>
+        <translation>LMMS工作目录%1不存在，现在新建一个吗？你可以稍后在 编辑 -&gt; 设置 中更改此设置。</translation>
     </message>
     <message>
         <source>Root Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>根目录</translation>
     </message>
     <message>
-        <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <source>E&amp;xport tracks...</source>
+        <translation>导出音轨(&amp;E)...</translation>
     </message>
     <message>
-        <source>&amp;Recently Opened Projects</source>
-        <translation type="unfinished"></translation>
+        <source>Save project</source>
+        <translation>保存工程</translation>
     </message>
     <message>
-        <source>Save as New &amp;Version</source>
-        <translation type="unfinished"></translation>
+        <source>Open project</source>
+        <translation>打开工程</translation>
     </message>
     <message>
-        <source>E&amp;xport Tracks...</source>
-        <translation type="unfinished"></translation>
+        <source>Save as new &amp;version</source>
+        <translation>保存为新版本(&amp;V)</translation>
     </message>
     <message>
-        <source>Online Help</source>
-        <translation type="unfinished"></translation>
+        <source>Online help</source>
+        <translation>在线帮助</translation>
     </message>
     <message>
-        <source>What&apos;s This?</source>
-        <translation type="unfinished"></translation>
+        <source>My home</source>
+        <translation>我的主目录</translation>
     </message>
     <message>
-        <source>Open Project</source>
-        <translation type="unfinished"></translation>
+        <source>My computer</source>
+        <translation>我的电脑</translation>
     </message>
     <message>
-        <source>Save Project</source>
-        <translation type="unfinished"></translation>
+        <source>Recently opened project</source>
+        <translation>最近打开的工程</translation>
+    </message>
+    <message>
+        <source>My presets</source>
+        <translation>我的预置</translation>
+    </message>
+    <message>
+        <source>&amp;Project</source>
+        <translation>工程(&amp;P)</translation>
+    </message>
+    <message>
+        <source>My projects</source>
+        <translation>我的工程</translation>
+    </message>
+    <message>
+        <source>My samples</source>
+        <translation>我的采样</translation>
+    </message>
+    <message>
+        <source>LMMS Project (*.mmpz *.mmp);;LMMS Project Template (*.mpt)</source>
+        <translation>LMMS 工程 (*.mmpz *.mmp);;LMMS 工程模板 (*.mpt)</translation>
+    </message>
+    <message>
+        <source>It looks like the last session did not end properly. Do you want to recover the project of this session?</source>
+        <translation>好像上次会话未能正常退出，你想要恢复上次会话未保存的工程吗？</translation>
     </message>
 </context>
 <context>
@@ -3637,7 +4187,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>TIME SIG</source>
-        <translation type="unfinished"></translation>
+        <translation>拍子记号</translation>
     </message>
 </context>
 <context>
@@ -3652,24 +4202,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
 </context>
 <context>
-    <name>MidiAlsaRaw::setupWidget</name>
-    <message>
-        <source>DEVICE</source>
-        <translation type="unfinished">设备</translation>
-    </message>
-</context>
-<context>
-    <name>MidiAlsaSeq</name>
-    <message>
-        <source>DEVICE</source>
-        <translation type="unfinished">设备</translation>
-    </message>
-</context>
-<context>
     <name>MidiController</name>
     <message>
         <source>MIDI Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>MIDI控制器</translation>
     </message>
     <message>
         <source>unnamed_midi_controller</source>
@@ -3680,22 +4216,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <name>MidiImport</name>
     <message>
         <source>Setup incomplete</source>
-        <translation type="unfinished"></translation>
+        <translation>设置不完整</translation>
     </message>
     <message>
         <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>你还没有在设置(在编辑-&gt;设置)中设置默认的 Soundfont。因此在导入此 MIDI 文件后将会没有声音。你需要下载一个通用 MIDI (GM) 的 Soundfont, 并且在设置对话框中选中后再试一次。</translation>
     </message>
     <message>
         <source>You did not compile LMMS with support for SoundFont2 player, which is used to add default sound to imported MIDI files. Therefore no sound will be played back after importing this MIDI file.</source>
-        <translation type="unfinished"></translation>
+        <translation>你在编译 LMMS 时没有加入 SoundFont2 播放器支持, 此播放器默认用于添加导入的 MIDI 文件。因此在 MIDI 文件导入后, 将没有声音。</translation>
     </message>
-</context>
-<context>
-    <name>MidiOss::setupWidget</name>
     <message>
-        <source>DEVICE</source>
-        <translation>设备</translation>
+        <source>Track</source>
+        <translation>轨道</translation>
     </message>
 </context>
 <context>
@@ -3725,24 +4258,31 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Output MIDI program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Receive MIDI-events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send MIDI-events</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Fixed output note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Base velocity</source>
+        <source>Output MIDI program</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base velocity</source>
+        <translation>基准力度</translation>
+    </message>
+    <message>
+        <source>Receive MIDI-events</source>
+        <translation>接受 MIDI 事件</translation>
+    </message>
+    <message>
+        <source>Send MIDI-events</source>
+        <translation>发送 MIDI 事件</translation>
+    </message>
+</context>
+<context>
+    <name>MidiSetupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
     </message>
 </context>
 <context>
@@ -4129,7 +4669,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Bandlimited Triangle wave</source>
@@ -4189,11 +4729,11 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished">锯齿波</translation>
+        <translation>锯齿波</translation>
     </message>
     <message>
         <source>Ramp wave</source>
@@ -4201,7 +4741,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished">方波</translation>
+        <translation>方波</translation>
     </message>
     <message>
         <source>Moog saw wave</source>
@@ -4213,7 +4753,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished">随机</translation>
+        <translation>随机</translation>
     </message>
     <message>
         <source>Random smooth</source>
@@ -4234,7 +4774,7 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
     </message>
     <message>
         <source>Matrix view</source>
-        <translation type="unfinished"></translation>
+        <translation>矩阵视图</translation>
     </message>
     <message>
         <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
@@ -4242,6 +4782,110 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
 The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>音量</translation>
+    </message>
+    <message>
+        <source>Panning</source>
+        <translation>声相</translation>
+    </message>
+    <message>
+        <source>Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> semitones</source>
+        <translation>半音</translation>
+    </message>
+    <message>
+        <source>Finetune left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> cents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finetune right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo phase offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> deg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pulse width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send sync on pulse rise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send sync on pulse fall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard sync oscillator 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse sync oscillator 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub-osc mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard sync oscillator 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse sync oscillator 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attack</source>
+        <translation>打进声</translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold</source>
+        <translation>保持</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation>衰减</translation>
+    </message>
+    <message>
+        <source>Sustain</source>
+        <translation>持续</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation>释放</translation>
+    </message>
+    <message>
+        <source>Slope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4390,24 +5034,28 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Modulation amount</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultitapEchoControlDialog</name>
     <message>
         <source>Length</source>
-        <translation type="unfinished">长度</translation>
+        <translation>长度</translation>
     </message>
     <message>
         <source>Step length:</source>
-        <translation type="unfinished">步进长度：</translation>
+        <translation>步进长度：</translation>
     </message>
     <message>
         <source>Dry</source>
-        <translation type="unfinished">干声</translation>
+        <translation>干声</translation>
     </message>
     <message>
         <source>Dry Gain:</source>
-        <translation type="unfinished">干声增益：</translation>
+        <translation>干声增益：</translation>
     </message>
     <message>
         <source>Stages</source>
@@ -4502,7 +5150,122 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Master volume</source>
-        <translation type="unfinished">主音量</translation>
+        <translation>主音量</translation>
+    </message>
+    <message>
+        <source>Vibrato</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NesInstrumentView</name>
+    <message>
+        <source>Volume</source>
+        <translation>音量</translation>
+    </message>
+    <message>
+        <source>Coarse detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Envelope length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable channel 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable envelope 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable envelope 1 loop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sweep 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sweep amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sweep rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12.5% Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>25% Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>50% Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>75% Duty cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable channel 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable envelope 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable envelope 2 loop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sweep 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable channel 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency sweep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable channel 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable envelope 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable envelope 4 loop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quantize noise frequency when using note frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use note frequency for noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Noise mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master Volume</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Vibrato</source>
@@ -4512,19 +5275,27 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 <context>
     <name>OscillatorObject</name>
     <message>
-        <source>Osc %1 volume</source>
+        <source>Osc %1 waveform</source>
+        <translation>Osc %1 波形</translation>
+    </message>
+    <message>
+        <source>Osc %1 harmonic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Osc %1 volume</source>
+        <translation>Osc %1 音量</translation>
+    </message>
+    <message>
         <source>Osc %1 panning</source>
+        <translation>Osc %1 声像</translation>
+    </message>
+    <message>
+        <source>Osc %1 fine detuning left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Osc %1 fine detuning left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4547,13 +5318,40 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>Modulation type %1</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>PatchesDialog</name>
     <message>
-        <source>Osc %1 waveform</source>
+        <source>Qsynth: Channel Preset</source>
+        <translation>Qsynth: 通道预设</translation>
+    </message>
+    <message>
+        <source>Bank selector</source>
+        <translation>音色选择器</translation>
+    </message>
+    <message>
+        <source>Bank</source>
+        <translation>库</translation>
+    </message>
+    <message>
+        <source>Program selector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Osc %1 harmonic</source>
-        <translation type="unfinished"></translation>
+        <source>Patch</source>
+        <translation>音色</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
     </message>
 </context>
 <context>
@@ -4606,10 +5404,8 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
 <context>
     <name>PatternView</name>
     <message>
-        <source>double-click to open this pattern in piano-roll
-use mouse wheel to set velocity of a step</source>
-        <translation>双击在钢琴窗中打开此片段
-使用鼠标滑轮设置此音阶的音量</translation>
+        <source>use mouse wheel to set velocity of a step</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Open in piano-roll</source>
@@ -4635,20 +5431,32 @@ use mouse wheel to set velocity of a step</source>
         <source>Remove steps</source>
         <translation>移除音阶</translation>
     </message>
+    <message>
+        <source>double-click to open this pattern in piano-roll
+use mouse wheel to set velocity of a step</source>
+        <translation>双击在钢琴窗中打开此片段
+使用鼠标滑轮设置此音阶的音量</translation>
+    </message>
+    <message>
+        <source>double-click to open this pattern in piano-roll
+use mouse wheel to set volume of a step</source>
+        <translation>双击在钢琴窗中打开此片段
+使用鼠标滑轮设置此音阶的音量</translation>
+    </message>
 </context>
 <context>
     <name>PeakController</name>
     <message>
         <source>Peak Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值控制器</translation>
     </message>
     <message>
         <source>Peak Controller Bug</source>
-        <translation type="unfinished"></translation>
+        <translation>峰值控制器 Bug</translation>
     </message>
     <message>
         <source>Due to a bug in older version of LMMS, the peak controllers may not be connect properly. Please ensure that peak controllers are connected properly and re-save this file. Sorry for any inconvenience caused.</source>
-        <translation type="unfinished"></translation>
+        <translation>在老版本的 LMMS 中, 峰值控制器因为有 bug 而可能没有正确连接。请确保峰值控制器正常连接后再次保存次文件。我们对给你造成的不便深表歉意。</translation>
     </message>
 </context>
 <context>
@@ -4659,34 +5467,26 @@ use mouse wheel to set velocity of a step</source>
     </message>
     <message>
         <source>LFO Controller</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LFO 控制器</translation>
     </message>
 </context>
 <context>
     <name>PeakControllerEffectControlDialog</name>
     <message>
         <source>BASE</source>
-        <translation type="unfinished"></translation>
+        <translation>基准</translation>
     </message>
     <message>
         <source>Base amount:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modulation amount:</source>
-        <translation type="unfinished">调制量：</translation>
-    </message>
-    <message>
-        <source>Attack:</source>
-        <translation type="unfinished">打进声：</translation>
-    </message>
-    <message>
-        <source>Release:</source>
-        <translation type="unfinished"></translation>
+        <translation>基础值:</translation>
     </message>
     <message>
         <source>AMNT</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation amount:</source>
+        <translation>调制量：</translation>
     </message>
     <message>
         <source>MULT</source>
@@ -4698,10 +5498,18 @@ use mouse wheel to set velocity of a step</source>
     </message>
     <message>
         <source>ATCK</source>
-        <translation type="unfinished"></translation>
+        <translation>打击</translation>
+    </message>
+    <message>
+        <source>Attack:</source>
+        <translation>打击声:</translation>
     </message>
     <message>
         <source>DCAY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4717,23 +5525,27 @@ use mouse wheel to set velocity of a step</source>
     <name>PeakControllerEffectControls</name>
     <message>
         <source>Base value</source>
-        <translation type="unfinished"></translation>
+        <translation>基准值</translation>
     </message>
     <message>
         <source>Modulation amount</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mute output</source>
-        <translation type="unfinished"></translation>
+        <translation>调制量</translation>
     </message>
     <message>
         <source>Attack</source>
-        <translation type="unfinished">打进声</translation>
+        <translation>打进声</translation>
     </message>
     <message>
         <source>Release</source>
-        <translation type="unfinished">释放</translation>
+        <translation>释放</translation>
+    </message>
+    <message>
+        <source>Treshold</source>
+        <translation>阀值</translation>
+    </message>
+    <message>
+        <source>Mute output</source>
+        <translation>输出静音</translation>
     </message>
     <message>
         <source>Abs Value</source>
@@ -4743,33 +5555,9 @@ use mouse wheel to set velocity of a step</source>
         <source>Amount Multiplicator</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Treshold</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PianoRoll</name>
-    <message>
-        <source>Piano-Roll - no pattern</source>
-        <translation>钢琴窗 - 没有片段</translation>
-    </message>
-    <message>
-        <source>Piano-Roll - %1</source>
-        <translation>钢琴窗 - %1</translation>
-    </message>
-    <message>
-        <source>Please open a pattern by double-clicking on it!</source>
-        <translation>双击打开片段！</translation>
-    </message>
-    <message>
-        <source>Last note</source>
-        <translation>上一个音符</translation>
-    </message>
-    <message>
-        <source>Note lock</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Note Velocity</source>
         <translation>音符音量</translation>
@@ -4780,6 +5568,10 @@ use mouse wheel to set velocity of a step</source>
     </message>
     <message>
         <source>Mark/unmark current semitone</source>
+        <translation>标记/取消标记当前半音</translation>
+    </message>
+    <message>
+        <source>Mark/unmark all corresponding octave semitones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4793,6 +5585,18 @@ use mouse wheel to set velocity of a step</source>
     <message>
         <source>Unmark all</source>
         <translation>取消标记所有</translation>
+    </message>
+    <message>
+        <source>Select all notes on this key</source>
+        <translation>选中所有相同音调的音符</translation>
+    </message>
+    <message>
+        <source>Note lock</source>
+        <translation>音符锁定</translation>
+    </message>
+    <message>
+        <source>Last note</source>
+        <translation>上一个音符</translation>
     </message>
     <message>
         <source>No scale</source>
@@ -4819,19 +5623,75 @@ use mouse wheel to set velocity of a step</source>
         <translation>声相：居中</translation>
     </message>
     <message>
+        <source>Please open a pattern by double-clicking on it!</source>
+        <translation>双击打开片段！</translation>
+    </message>
+    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>请输入一个介于 %1 和 %2 的值：</translation>
+    </message>
+    <message>
+        <source>Piano-Roll - no pattern</source>
+        <translation>钢琴窗 - 没有片段</translation>
+    </message>
+    <message>
+        <source>Piano-Roll - %1</source>
+        <translation>钢琴窗 - %1</translation>
+    </message>
+    <message>
+        <source>Note Volume</source>
+        <translation>音符音量</translation>
+    </message>
+    <message>
+        <source>Volume: %1%</source>
+        <translation>音量：%1%</translation>
+    </message>
+    <message>
+        <source>Cut selected notes (Ctrl+X)</source>
+        <translation>剪切选定音符 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Draw mode (Shift+D)</source>
+        <translation>绘制模式 (Shift+D)</translation>
+    </message>
+    <message>
+        <source>Erase mode (Shift+E)</source>
+        <translation>擦除模式 (Shift+E)</translation>
+    </message>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation>播放/暂停当前片段（空格）</translation>
+    </message>
+    <message>
+        <source>Select mode (Shift+S)</source>
+        <translation>选择模式 （Shift+S）</translation>
+    </message>
+    <message>
+        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <translation>从剪贴板粘贴音符 (Ctrl+V)</translation>
+    </message>
+    <message>
+        <source>Record notes from MIDI-device/channel-piano</source>
+        <translation>从 MIDI 设备/通道钢琴(channel-piano) 录制音符</translation>
+    </message>
+    <message>
+        <source>Copy selected notes (Ctrl+C)</source>
+        <translation>复制选定音符 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Stop playing of current pattern (Space)</source>
+        <translation>停止当前片段（空格）</translation>
     </message>
 </context>
 <context>
     <name>PianoRollWindow</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation type="unfinished">播放/暂停当前片段（空格）</translation>
+        <translation>播放/暂停当前片段（空格）</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano</source>
-        <translation type="unfinished">从 MIDI 设备/通道钢琴(channel-piano) 录制音符</translation>
+        <translation>从 MIDI 设备/通道钢琴(channel-piano) 录制音符</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
@@ -4839,7 +5699,7 @@ use mouse wheel to set velocity of a step</source>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
-        <translation type="unfinished">停止当前片段（空格）</translation>
+        <translation>停止当前片段（空格）</translation>
     </message>
     <message>
         <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
@@ -4858,16 +5718,20 @@ use mouse wheel to set velocity of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Edit actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Draw mode (Shift+D)</source>
-        <translation type="unfinished">绘制模式 (Shift+D)</translation>
+        <translation>绘制模式 (Shift+D)</translation>
     </message>
     <message>
         <source>Erase mode (Shift+E)</source>
-        <translation type="unfinished">擦除模式 (Shift+E)</translation>
+        <translation>擦除模式 (Shift+E)</translation>
     </message>
     <message>
         <source>Select mode (Shift+S)</source>
-        <translation type="unfinished">选择模式 （Shift+S）</translation>
+        <translation>选择模式 （Shift+S）</translation>
     </message>
     <message>
         <source>Detune mode (Shift+T)</source>
@@ -4879,7 +5743,7 @@ use mouse wheel to set velocity of a step</source>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击启用擦除模式。此模式下你可以擦除音符。你可以按键盘上的 &apos;Shift+E&apos; 启用此模式。</translation>
     </message>
     <message>
         <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
@@ -4890,16 +5754,20 @@ use mouse wheel to set velocity of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Copy paste controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Cut selected notes (%1+X)</source>
-        <translation type="unfinished">剪切选定音符 (%1+X)</translation>
+        <translation>剪切选定音符 (%1+X)</translation>
     </message>
     <message>
         <source>Copy selected notes (%1+C)</source>
-        <translation type="unfinished">复制选定音符 (%1+C)</translation>
+        <translation>复制选定音符 (%1+C)</translation>
     </message>
     <message>
         <source>Paste notes from clipboard (%1+V)</source>
-        <translation type="unfinished">从剪贴板粘贴音符 (%1+V)</translation>
+        <translation>从剪贴板粘贴音符 (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -4911,6 +5779,14 @@ use mouse wheel to set velocity of a step</source>
     </message>
     <message>
         <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeline controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom and note controls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4932,6 +5808,30 @@ use mouse wheel to set velocity of a step</source>
     <message>
         <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Piano-Roll - %1</source>
+        <translation>钢琴窗 - %1</translation>
+    </message>
+    <message>
+        <source>Piano-Roll - no pattern</source>
+        <translation>钢琴窗 - 没有片段</translation>
+    </message>
+    <message>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <translation>点击这里启用绘制模式。在此模式下你可以增加、改变尺寸或移动音符。大部分时间下默认使用此模式。你也可以按键盘上的 ‘Shift+D’激活此模式。在此模式中，按住 Ctrl 以便临时切换到选择模式。</translation>
+    </message>
+    <message>
+        <source>Cut selected notes (Ctrl+X)</source>
+        <translation>剪切选定音符 (Ctrl+X)</translation>
+    </message>
+    <message>
+        <source>Copy selected notes (Ctrl+C)</source>
+        <translation>复制选定音符 (Ctrl+C)</translation>
+    </message>
+    <message>
+        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <translation>从剪贴板粘贴音符 (Ctrl+V)</translation>
     </message>
 </context>
 <context>
@@ -4961,23 +5861,30 @@ Reason: &quot;%2&quot;</source>
         <source>Failed to load plugin &quot;%1&quot;!</source>
         <translation>载入插件“%1”失败！</translation>
     </message>
-    <message>
-        <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PluginBrowser</name>
     <message>
         <source>Instrument plugins</source>
-        <translation type="unfinished">乐器插件</translation>
+        <translation>乐器插件</translation>
     </message>
     <message>
         <source>Instrument browser</source>
-        <translation type="unfinished">乐器浏览器</translation>
+        <translation>乐器浏览器</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <translation>将乐器插件拖入歌曲编辑器, 节拍低音线编辑器, 或者现有的乐器轨道。</translation>
+    </message>
+</context>
+<context>
+    <name>PluginFactory</name>
+    <message>
+        <source>Plugin not found.</source>
+        <translation>未找到插件。</translation>
+    </message>
+    <message>
+        <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4985,119 +5892,167 @@ Reason: &quot;%2&quot;</source>
     <name>ProjectNotes</name>
     <message>
         <source>Project notes</source>
-        <translation type="unfinished">工程注释</translation>
+        <translation>工程注释</translation>
     </message>
     <message>
         <source>Put down your project notes here.</source>
-        <translation type="unfinished">在这里写下你的工程注释。</translation>
+        <translation>在这里写下你的工程注释。</translation>
     </message>
     <message>
         <source>Edit Actions</source>
-        <translation type="unfinished">编辑功能</translation>
+        <translation>编辑功能</translation>
     </message>
     <message>
         <source>&amp;Undo</source>
-        <translation type="unfinished">撤销（&amp;U)</translation>
+        <translation>撤销（&amp;U)</translation>
     </message>
     <message>
         <source>%1+Z</source>
-        <translation type="unfinished">%1+Z</translation>
+        <translation>%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
-        <translation type="unfinished">重做（&amp;R）</translation>
+        <translation>重做(&amp;R)</translation>
     </message>
     <message>
         <source>%1+Y</source>
-        <translation type="unfinished">%1+Y</translation>
+        <translation>%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation type="unfinished">复制（&amp;C）</translation>
+        <translation>复制(&amp;C)</translation>
     </message>
     <message>
         <source>%1+C</source>
-        <translation type="unfinished">%1+C</translation>
+        <translation>%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
-        <translation type="unfinished">剪切（&amp;T）</translation>
+        <translation>剪切(&amp;T)</translation>
     </message>
     <message>
         <source>%1+X</source>
-        <translation type="unfinished">%1+X</translation>
+        <translation>%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
-        <translation type="unfinished">粘贴（&amp;P）</translation>
+        <translation>粘贴(&amp;P)</translation>
     </message>
     <message>
         <source>%1+V</source>
-        <translation type="unfinished">%1+V</translation>
+        <translation>%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
-        <translation type="unfinished">格式功能</translation>
+        <translation>格式功能</translation>
     </message>
     <message>
         <source>&amp;Bold</source>
-        <translation type="unfinished">加粗（&amp;B）</translation>
+        <translation>加粗(&amp;B)</translation>
     </message>
     <message>
         <source>%1+B</source>
-        <translation type="unfinished">%1+B</translation>
+        <translation>%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
-        <translation type="unfinished">斜体（&amp;I）</translation>
+        <translation>斜体(&amp;I)</translation>
     </message>
     <message>
         <source>%1+I</source>
-        <translation type="unfinished">%1+I</translation>
+        <translation>%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
-        <translation type="unfinished">下划线（&amp;U）</translation>
+        <translation>下划线(&amp;U)</translation>
     </message>
     <message>
         <source>%1+U</source>
-        <translation type="unfinished">%1+U</translation>
+        <translation>%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
-        <translation type="unfinished">左对齐（&amp;L）</translation>
+        <translation>左对齐(&amp;L)</translation>
     </message>
     <message>
         <source>%1+L</source>
-        <translation type="unfinished">%1+L</translation>
+        <translation>%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
-        <translation type="unfinished">居中（&amp;E）</translation>
+        <translation>居中(&amp;E)</translation>
     </message>
     <message>
         <source>%1+E</source>
-        <translation type="unfinished">%1+E</translation>
+        <translation>%1+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
-        <translation type="unfinished">右对齐（&amp;R）</translation>
+        <translation>右对齐(&amp;R)</translation>
     </message>
     <message>
         <source>%1+R</source>
-        <translation type="unfinished">%1+R</translation>
+        <translation>%1+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
-        <translation type="unfinished">匀齐（&amp;J）</translation>
+        <translation>匀齐(&amp;J)</translation>
     </message>
     <message>
         <source>%1+J</source>
-        <translation type="unfinished">%1+J</translation>
+        <translation>%1+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
-        <translation type="unfinished">颜色（&amp;C）...</translation>
+        <translation>颜色(&amp;C)...</translation>
+    </message>
+    <message>
+        <source>Ctrl+Z</source>
+        <translation>Ctrl+Z</translation>
+    </message>
+    <message>
+        <source>Ctrl+Y</source>
+        <translation>Ctrl+Y</translation>
+    </message>
+    <message>
+        <source>Ctrl+C</source>
+        <translation>Ctrl+C</translation>
+    </message>
+    <message>
+        <source>Ctrl+X</source>
+        <translation>Ctrl+X</translation>
+    </message>
+    <message>
+        <source>Ctrl+V</source>
+        <translation>Ctrl+V</translation>
+    </message>
+    <message>
+        <source>Ctrl+B</source>
+        <translation>Ctrl+B</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
+        <source>Ctrl+U</source>
+        <translation>Ctrl+U</translation>
+    </message>
+    <message>
+        <source>Ctrl+L</source>
+        <translation>Ctrl+L</translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation>Ctrl+E</translation>
+    </message>
+    <message>
+        <source>Ctrl+R</source>
+        <translation>Ctrl+R</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <translation>Ctrl+J</translation>
     </message>
 </context>
 <context>
@@ -5109,94 +6064,6 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation>压缩的 OGG 文件(*.ogg)</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>C</source>
-        <comment>Note name</comment>
-        <translation>C</translation>
-    </message>
-    <message>
-        <source>Db</source>
-        <comment>Note name</comment>
-        <translation>Db</translation>
-    </message>
-    <message>
-        <source>C#</source>
-        <comment>Note name</comment>
-        <translation>C#</translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>Note name</comment>
-        <translation>D</translation>
-    </message>
-    <message>
-        <source>Eb</source>
-        <comment>Note name</comment>
-        <translation>Eb</translation>
-    </message>
-    <message>
-        <source>D#</source>
-        <comment>Note name</comment>
-        <translation>D#</translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>Note name</comment>
-        <translation>E</translation>
-    </message>
-    <message>
-        <source>Fb</source>
-        <comment>Note name</comment>
-        <translation>Fb</translation>
-    </message>
-    <message>
-        <source>Gb</source>
-        <comment>Note name</comment>
-        <translation>Gb</translation>
-    </message>
-    <message>
-        <source>F#</source>
-        <comment>Note name</comment>
-        <translation>F#</translation>
-    </message>
-    <message>
-        <source>G</source>
-        <comment>Note name</comment>
-        <translation>G</translation>
-    </message>
-    <message>
-        <source>Ab</source>
-        <comment>Note name</comment>
-        <translation>Ab</translation>
-    </message>
-    <message>
-        <source>G#</source>
-        <comment>Note name</comment>
-        <translation>G#</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>Note name</comment>
-        <translation>A</translation>
-    </message>
-    <message>
-        <source>Bb</source>
-        <comment>Note name</comment>
-        <translation>Bb</translation>
-    </message>
-    <message>
-        <source>A#</source>
-        <comment>Note name</comment>
-        <translation>A#</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>Note name</comment>
-        <translation>B</translation>
     </message>
 </context>
 <context>
@@ -5215,7 +6082,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Requires Real Time: </source>
-        <translation>需要实时：</translation>
+        <translation>要求实时：</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -5242,19 +6109,19 @@ Reason: &quot;%2&quot;</source>
         <translation>输出通道：</translation>
     </message>
     <message>
-        <source>File: </source>
-        <translation>文件：</translation>
-    </message>
-    <message>
         <source>File: %1</source>
         <translation>文件：%1</translation>
+    </message>
+    <message>
+        <source>File: </source>
+        <translation>文件：</translation>
     </message>
 </context>
 <context>
     <name>RenameDialog</name>
     <message>
         <source>Rename...</source>
-        <translation type="unfinished">重命名...</translation>
+        <translation>重命名...</translation>
     </message>
 </context>
 <context>
@@ -5262,6 +6129,10 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Open audio file</source>
         <translation>打开音频文件</translation>
+    </message>
+    <message>
+        <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
+        <translation>所有音频文件 (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
     </message>
     <message>
         <source>Wave-Files (*.wav)</source>
@@ -5299,10 +6170,6 @@ Reason: &quot;%2&quot;</source>
         <source>RAW-Files (*.raw)</source>
         <translation>RAW-文件 (*.raw)</translation>
     </message>
-    <message>
-        <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
-        <translation>所有音频文件 (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
-    </message>
 </context>
 <context>
     <name>SampleTCOView</name>
@@ -5334,20 +6201,24 @@ Reason: &quot;%2&quot;</source>
         <source>Set/clear record</source>
         <translation>设置/清除录制</translation>
     </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation>静音/取消静音 (&lt;Ctrl&gt; + 鼠标中键)</translation>
+    </message>
 </context>
 <context>
     <name>SampleTrack</name>
-    <message>
-        <source>Sample track</source>
-        <translation>采样轨道</translation>
-    </message>
     <message>
         <source>Volume</source>
         <translation>音量</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished">声相</translation>
+        <translation>声相</translation>
+    </message>
+    <message>
+        <source>Sample track</source>
+        <translation>采样轨道</translation>
     </message>
 </context>
 <context>
@@ -5366,291 +6237,350 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Panning</source>
-        <translation type="unfinished">声相</translation>
+        <translation>声相</translation>
     </message>
     <message>
         <source>Panning:</source>
-        <translation type="unfinished">声相：</translation>
+        <translation>声相：</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation type="unfinished">PAN</translation>
+        <translation>PAN</translation>
     </message>
 </context>
 <context>
     <name>SetupDialog</name>
     <message>
         <source>Setup LMMS</source>
-        <translation type="unfinished">设置LMMS</translation>
+        <translation>设置LMMS</translation>
     </message>
     <message>
         <source>General settings</source>
-        <translation type="unfinished">常规设置</translation>
+        <translation>常规设置</translation>
     </message>
     <message>
         <source>BUFFER SIZE</source>
-        <translation type="unfinished">缓冲区大小</translation>
+        <translation>缓冲区大小</translation>
     </message>
     <message>
         <source>Reset to default-value</source>
-        <translation type="unfinished">重置为默认值</translation>
+        <translation>重置为默认值</translation>
     </message>
     <message>
         <source>MISC</source>
-        <translation type="unfinished">杂项</translation>
+        <translation>杂项</translation>
     </message>
     <message>
         <source>Enable tooltips</source>
-        <translation type="unfinished">启用工具提示</translation>
+        <translation>启用工具提示</translation>
     </message>
     <message>
         <source>Show restart warning after changing settings</source>
-        <translation type="unfinished">在改变设置后显示重启警告</translation>
+        <translation>在改变设置后显示重启警告</translation>
     </message>
     <message>
         <source>Display volume as dBV </source>
-        <translation type="unfinished">音量显示为dBV</translation>
+        <translation>音量显示为dBV</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
-        <translation type="unfinished">默认压缩项目文件</translation>
+        <translation>默认压缩项目文件</translation>
     </message>
     <message>
         <source>One instrument track window mode</source>
-        <translation type="unfinished"></translation>
+        <translation>单乐器轨道窗口模式</translation>
     </message>
     <message>
         <source>HQ-mode for output audio-device</source>
-        <translation type="unfinished"></translation>
+        <translation>对输出设备使用高质量输出</translation>
     </message>
     <message>
         <source>Compact track buttons</source>
-        <translation type="unfinished">紧凑化轨道图标</translation>
+        <translation>紧凑化轨道图标</translation>
     </message>
     <message>
         <source>Sync VST plugins to host playback</source>
-        <translation type="unfinished">同步 VST 插件和主机回放</translation>
+        <translation>同步 VST 插件和主机回放</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation type="unfinished">在钢琴窗中显示音号</translation>
+        <translation>在钢琴窗中显示音号</translation>
     </message>
     <message>
         <source>Enable waveform display by default</source>
-        <translation type="unfinished">默认启用波形图</translation>
+        <translation>默认启用波形图</translation>
     </message>
     <message>
         <source>Keep effects running even without input</source>
-        <translation type="unfinished"></translation>
+        <translation>在没有输入时也运行音频效果</translation>
     </message>
     <message>
         <source>Create backup file when saving a project</source>
-        <translation type="unfinished"></translation>
+        <translation>保存工程时建立备份</translation>
+    </message>
+    <message>
+        <source>Reopen last project on start</source>
+        <translation>启动时打开最近的项目</translation>
     </message>
     <message>
         <source>LANGUAGE</source>
-        <translation type="unfinished"></translation>
+        <translation>语言</translation>
     </message>
     <message>
         <source>Paths</source>
-        <translation type="unfinished">路径</translation>
+        <translation>路径</translation>
+    </message>
+    <message>
+        <source>Directories</source>
+        <translation>目录</translation>
     </message>
     <message>
         <source>LMMS working directory</source>
-        <translation type="unfinished">LMMS工作目录</translation>
+        <translation>LMMS工作目录</translation>
     </message>
     <message>
-        <source>VST-plugin directory</source>
-        <translation type="unfinished">VST插件目录</translation>
-    </message>
-    <message>
-        <source>Artwork directory</source>
-        <translation type="unfinished">插图目录</translation>
+        <source>Themes directory</source>
+        <translation>主题文件目录</translation>
     </message>
     <message>
         <source>Background artwork</source>
-        <translation type="unfinished">背景图片</translation>
+        <translation>背景图片</translation>
     </message>
     <message>
         <source>FL Studio installation directory</source>
-        <translation type="unfinished">FL Studio安装目录</translation>
+        <translation>FL Studio安装目录</translation>
     </message>
     <message>
-        <source>LADSPA plugin paths</source>
-        <translation type="unfinished">LADSPA 插件路径</translation>
+        <source>VST-plugin directory</source>
+        <translation>VST插件目录</translation>
+    </message>
+    <message>
+        <source>GIG directory</source>
+        <translation>GIG 目录</translation>
+    </message>
+    <message>
+        <source>SF2 directory</source>
+        <translation>SF2 目录</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin directories</source>
+        <translation>LADSPA 插件目录</translation>
     </message>
     <message>
         <source>STK rawwave directory</source>
-        <translation type="unfinished">STK rawwave 目录</translation>
+        <translation>STK rawwave 目录</translation>
     </message>
     <message>
         <source>Default Soundfont File</source>
-        <translation type="unfinished">默认 SoundFont 文件</translation>
+        <translation>默认 SoundFont 文件</translation>
     </message>
     <message>
         <source>Performance settings</source>
-        <translation type="unfinished">性能设置</translation>
+        <translation>性能设置</translation>
     </message>
     <message>
-        <source>UI effects vs. performance</source>
-        <translation type="unfinished">界面特效 vs 性能</translation>
-    </message>
-    <message>
-        <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished">歌曲编辑器中启用平滑滚动</translation>
+        <location filename="src/gui/SetupDialog.cpp" line="669"/>
+        <source>Auto save</source>
+        <translation>自动保存</translation>
     </message>
     <message>
         <source>Enable auto save feature</source>
-        <translation type="unfinished">启用自动保存功能</translation>
+        <translation>启用自动保存功能</translation>
+    </message>
+    <message>
+        <source>UI effects vs. performance</source>
+        <translation>界面特效 vs 性能</translation>
+    </message>
+    <message>
+        <source>Smooth scroll in Song Editor</source>
+        <translation>歌曲编辑器中启用平滑滚动</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
-        <translation type="unfinished">在 AudioFileProcessor 中显示回放光标</translation>
+        <translation>在 AudioFileProcessor 中显示回放光标</translation>
     </message>
     <message>
         <source>Audio settings</source>
-        <translation type="unfinished">音频设置</translation>
+        <translation>音频设置</translation>
     </message>
     <message>
         <source>AUDIO INTERFACE</source>
-        <translation type="unfinished">音频接口</translation>
+        <translation>音频接口</translation>
     </message>
     <message>
         <source>MIDI settings</source>
-        <translation type="unfinished">MIDI设置</translation>
+        <translation>MIDI设置</translation>
     </message>
     <message>
         <source>MIDI INTERFACE</source>
-        <translation type="unfinished">MIDI接口</translation>
+        <translation>MIDI接口</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">确定</translation>
+        <translation>确定</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">取消</translation>
+        <translation>取消</translation>
     </message>
     <message>
         <source>Restart LMMS</source>
-        <translation type="unfinished">重启LMMS</translation>
+        <translation>重启LMMS</translation>
     </message>
     <message>
         <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
-        <translation type="unfinished">请注意很多设置需要重启LMMS才可生效！</translation>
+        <translation>请注意很多设置需要重启LMMS才可生效！</translation>
     </message>
     <message>
         <source>Frames: %1
 Latency: %2 ms</source>
-        <translation type="unfinished">帧数: %1
+        <translation>帧数: %1
 延迟: %2 毫秒</translation>
     </message>
     <message>
         <source>Here you can setup the internal buffer-size used by LMMS. Smaller values result in a lower latency but also may cause unusable sound or bad performance, especially on older computers or systems with a non-realtime kernel.</source>
-        <translation type="unfinished">在这里，你可以设置 LMMS 所用缓冲区的大小。缓冲区越小，延迟越小，但声音质量和性能可能会受影响。</translation>
+        <translation>在这里，你可以设置 LMMS 所用缓冲区的大小。缓冲区越小，延迟越小，但声音质量和性能可能会受影响。</translation>
     </message>
     <message>
         <source>Choose LMMS working directory</source>
-        <translation type="unfinished">选择 LMMS 工作目录</translation>
+        <translation>选择 LMMS 工作目录</translation>
+    </message>
+    <message>
+        <source>Choose your GIG directory</source>
+        <translation>选择 GIG 目录</translation>
+    </message>
+    <message>
+        <source>Choose your SF2 directory</source>
+        <translation>选择 SF2 目录</translation>
     </message>
     <message>
         <source>Choose your VST-plugin directory</source>
-        <translation type="unfinished">选择 VST 插件目录</translation>
+        <translation>选择 VST 插件目录</translation>
     </message>
     <message>
         <source>Choose artwork-theme directory</source>
-        <translation type="unfinished">选择插图目录</translation>
+        <translation>选择插图目录</translation>
     </message>
     <message>
         <source>Choose FL Studio installation directory</source>
-        <translation type="unfinished">选择 FL Studio 安装目录</translation>
+        <translation>选择 FL Studio 安装目录</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
-        <translation type="unfinished">选择 LADSPA 插件目录</translation>
+        <translation>选择 LADSPA 插件目录</translation>
     </message>
     <message>
         <source>Choose STK rawwave directory</source>
-        <translation type="unfinished">选择 STK rawwave 目录</translation>
+        <translation>选择 STK rawwave 目录</translation>
     </message>
     <message>
         <source>Choose default SoundFont</source>
-        <translation type="unfinished">选择默认的 SoundFont</translation>
+        <translation>选择默认的 SoundFont</translation>
     </message>
     <message>
         <source>Choose background artwork</source>
-        <translation type="unfinished">选择背景图片</translation>
+        <translation>选择背景图片</translation>
+    </message>
+    <message>
+        <location filename="src/gui/SetupDialog.cpp" line="1521"/>
+        <source>minutes</source>
+        <translation>分钟</translation>
+    </message>
+    <message>
+        <location filename="src/gui/SetupDialog.cpp" line="1521"/>
+        <source>minute</source>
+        <translation>分钟</translation>
+    </message>
+    <message>
+        <location filename="src/gui/SetupDialog.cpp" line="1522"/>
+        <source>Auto save interval: %1 %2</source>
+        <translation>自动保存间隔: %1 %2</translation>
+    </message>
+    <message>
+        <location filename="src/gui/SetupDialog.cpp" line="1544"/>
+        <source>Set the time between automatic backup to %1.
+Remember to also save your project manually.</source>
+        <translation>设置自动备份到 %1 的保存时间间隔。
+不过, 请你还是记得时常手动保存你的项目哟。</translation>
     </message>
     <message>
         <source>Here you can select your preferred audio-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, JACK, OSS and more. Below you see a box which offers controls to setup the selected audio-interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>在这里你可以选择你想要的音频接口。取决于你的系统和编译时的设置, 你可以选择 ALSA, JACK, OSS 等选项。在下面的方框中你可以设置音频接口的控制项目。</translation>
     </message>
     <message>
         <source>Here you can select your preferred MIDI-interface. Depending on the configuration of your system during compilation time you can choose between ALSA, OSS and more. Below you see a box which offers controls to setup the selected MIDI-interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>在这里你可以选择你想要的 MIDI 接口。取决于你的系统和编译时的设置, 你可以选择 ALSA, OSS 等选项。在下面的方框中你可以设置 MIDI 接口的控制项目。</translation>
+    </message>
+    <message>
+        <source>Artwork directory</source>
+        <translation>插图目录</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin paths</source>
+        <translation>LADSPA 插件路径</translation>
     </message>
 </context>
 <context>
     <name>Song</name>
     <message>
         <source>Tempo</source>
-        <translation type="unfinished">节奏</translation>
+        <translation>节奏</translation>
     </message>
     <message>
         <source>Master volume</source>
-        <translation type="unfinished">主音量</translation>
+        <translation>主音量</translation>
     </message>
     <message>
         <source>Master pitch</source>
-        <translation type="unfinished">主音高</translation>
+        <translation>主音高</translation>
     </message>
     <message>
         <source>Project saved</source>
-        <translation type="unfinished">工程已保存</translation>
+        <translation>工程已保存</translation>
     </message>
     <message>
         <source>The project %1 is now saved.</source>
-        <translation type="unfinished">工程 %1 已保存。</translation>
+        <translation>工程 %1 已保存。</translation>
     </message>
     <message>
         <source>Project NOT saved.</source>
-        <translation type="unfinished">工程 **没有** 保存。</translation>
+        <translation>工程 **没有** 保存。</translation>
     </message>
     <message>
         <source>The project %1 was not saved!</source>
-        <translation type="unfinished">工程%1没有保存！</translation>
+        <translation>工程%1没有保存！</translation>
     </message>
     <message>
         <source>Import file</source>
-        <translation type="unfinished">导入文件</translation>
+        <translation>导入文件</translation>
     </message>
     <message>
         <source>MIDI sequences</source>
-        <translation type="unfinished">MIDI 音序器</translation>
+        <translation>MIDI 音序器</translation>
     </message>
     <message>
         <source>FL Studio projects</source>
-        <translation type="unfinished">FL Studio 工程</translation>
+        <translation>FL Studio 工程</translation>
     </message>
     <message>
         <source>Hydrogen projects</source>
-        <translation type="unfinished">Hydrogen工程</translation>
+        <translation>Hydrogen工程</translation>
     </message>
     <message>
         <source>All file types</source>
-        <translation type="unfinished">所有类型</translation>
+        <translation>所有类型</translation>
     </message>
     <message>
         <source>Empty project</source>
-        <translation type="unfinished">空工程</translation>
+        <translation>空工程</translation>
     </message>
     <message>
         <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
-        <translation type="unfinished">这个工程是空的所以就算导出也没有意义，请在歌曲编辑器中加入一点声音吧！</translation>
+        <translation>这个工程是空的所以就算导出也没有意义，请在歌曲编辑器中加入一点声音吧！</translation>
     </message>
     <message>
         <source>Select directory for writing exported tracks...</source>
-        <translation type="unfinished">选择写入导出音轨的目录...</translation>
+        <translation>选择写入导出音轨的目录...</translation>
     </message>
     <message>
         <source>untitled</source>
@@ -5658,7 +6588,11 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Select file for project-export...</source>
-        <translation type="unfinished">为工程导出选择文件...</translation>
+        <translation>为工程导出选择文件...</translation>
+    </message>
+    <message>
+        <source>MIDI File (*.mid)</source>
+        <translation>MIDI 文件 (*.mid)</translation>
     </message>
     <message>
         <source>The following errors occured while loading: </source>
@@ -5672,14 +6606,18 @@ Latency: %2 ms</source>
         <translation>无法打开文件</translation>
     </message>
     <message>
-        <source>Could not write file</source>
-        <translation>无法写入文件</translation>
-    </message>
-    <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
         <translation>无法打开 %1 。或许没有权限读此文件。
 请确保您拥有对此文件的读权限，然后重试。</translation>
+    </message>
+    <message>
+        <source>Could not write file</source>
+        <translation>无法写入文件</translation>
+    </message>
+    <message>
+        <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
+        <translation>无法打开 %1 写入数据。或许没有权限修改此文件。请确保您拥有对此文件的写权限，然后重试。</translation>
     </message>
     <message>
         <source>Error in file</source>
@@ -5688,6 +6626,14 @@ Latency: %2 ms</source>
     <message>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
         <translation>文件 %1 似乎包含错误，无法被加载。</translation>
+    </message>
+    <message>
+        <source>Project Version Mismatch</source>
+        <translation>版本号不匹配</translation>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
+        <translation>这个 %1 是由版本为 %2 的 LMMS 创建的, 但是已安装的 LMMS 版本号为 %3</translation>
     </message>
     <message>
         <source>Tempo</source>
@@ -5734,8 +6680,52 @@ Latency: %2 ms</source>
         <translation>值: %1 半音程</translation>
     </message>
     <message>
-        <source>Could not open %1 for writing. You probably are not permitted to write to this file. Please make sure you have write-access to the file and try again.</source>
-        <translation>无法打开 %1 写入数据。或许没有权限修改此文件。请确保您拥有对此文件的写权限，然后重试。</translation>
+        <source>Add beat/bassline</source>
+        <translation>添加节拍/低音线</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device</source>
+        <translation>从音频设备录制样本</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation>添加自动化轨道</translation>
+    </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation>添加采样轨道</translation>
+    </message>
+    <message>
+        <source>Song-Editor</source>
+        <translation>歌曲编辑器</translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device while playing song or BB track</source>
+        <translation>在播放歌曲或BB轨道时从音频设备录入样本</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
+        <translation>点击这里停止播放，歌曲位置标记会跳到歌曲的开头。</translation>
+    </message>
+    <message>
+        <source>Draw mode</source>
+        <translation>绘制模式</translation>
+    </message>
+    <message>
+        <source>Stop song (Space)</source>
+        <translation>停止歌曲（空格）</translation>
+    </message>
+    <message>
+        <source>Play song (Space)</source>
+        <translation>播放歌曲（空格）</translation>
+    </message>
+    <message>
+        <source>Edit mode (select and move)</source>
+        <translation>编辑模式（选定和移动）</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
+        <translation>点击这里完整播放歌曲。将从绿色歌曲标记开始播放。在播放的同时可以对它进行移动。</translation>
     </message>
 </context>
 <context>
@@ -5761,6 +6751,18 @@ Latency: %2 ms</source>
         <translation>停止歌曲（空格）</translation>
     </message>
     <message>
+        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
+        <translation>点击这里完整播放歌曲。将从绿色歌曲标记开始播放。在播放的同时可以对它进行移动。</translation>
+    </message>
+    <message>
+        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
+        <translation>点击这里停止播放，歌曲位置标记会跳到歌曲的开头。</translation>
+    </message>
+    <message>
+        <source>Track actions</source>
+        <translation>轨道动作</translation>
+    </message>
+    <message>
         <source>Add beat/bassline</source>
         <translation>添加节拍/Bassline</translation>
     </message>
@@ -5773,6 +6775,10 @@ Latency: %2 ms</source>
         <translation>添加自动控制轨道</translation>
     </message>
     <message>
+        <source>Edit actions</source>
+        <translation>编辑动作</translation>
+    </message>
+    <message>
         <source>Draw mode</source>
         <translation>绘制模式</translation>
     </message>
@@ -5781,12 +6787,12 @@ Latency: %2 ms</source>
         <translation>编辑模式（选定和移动）</translation>
     </message>
     <message>
-        <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation>点击这里完整播放歌曲。将从绿色歌曲标记开始播放。在播放的同时可以对它进行移动。</translation>
+        <source>Timeline controls</source>
+        <translation>时间线控制</translation>
     </message>
     <message>
-        <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation>点击这里停止播放，歌曲位置标记会跳到歌曲的开头。</translation>
+        <source>Zoom controls</source>
+        <translation>缩放控制</translation>
     </message>
 </context>
 <context>
@@ -5797,7 +6803,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Linear Y axis</source>
-        <translation type="unfinished"></translation>
+        <translation>线性 Y 轴</translation>
     </message>
 </context>
 <context>
@@ -5808,18 +6814,18 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Linear Y axis</source>
-        <translation type="unfinished"></translation>
+        <translation>线性 Y 轴</translation>
     </message>
     <message>
         <source>Channel mode</source>
-        <translation type="unfinished"></translation>
+        <translation>通道模式</translation>
     </message>
 </context>
 <context>
     <name>TabWidget</name>
     <message>
         <source>Settings for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 的设定</translation>
     </message>
 </context>
 <context>
@@ -5830,7 +6836,7 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>No Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>无同步</translation>
     </message>
     <message>
         <source>Eight beats</source>
@@ -5908,71 +6914,61 @@ Latency: %2 ms</source>
     <name>TimeLineWidget</name>
     <message>
         <source>Enable/disable auto-scrolling</source>
-        <translation type="unfinished">启用/禁用自动滚动</translation>
+        <translation>启用/禁用自动滚动</translation>
     </message>
     <message>
         <source>Enable/disable loop-points</source>
-        <translation type="unfinished">启用/禁用循环点</translation>
+        <translation>启用/禁用循环点</translation>
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="unfinished">停止后前往开头</translation>
+        <translation>停止后前往开头</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="unfinished">停止后前往播放开始的地方</translation>
+        <translation>停止后前往播放开始的地方</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
-        <translation type="unfinished">停止后保持位置不变</translation>
+        <translation>停止后保持位置不变</translation>
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished">提示</translation>
+        <translation>提示</translation>
     </message>
     <message>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">按住 &lt;%1&gt; 禁用磁性吸附。</translation>
+        <translation>按住 &lt;%1&gt; 禁用磁性吸附。</translation>
     </message>
     <message>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished">按住 &lt;Shift&gt; 移动起始循环点；按住 &lt;%1&gt; 禁用磁性吸附。</translation>
+        <translation>按住 &lt;Shift&gt; 移动起始循环点；按住 &lt;%1&gt; 禁用磁性吸附。</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation>按住 &lt;Ctrl&gt; 禁用磁性吸附。</translation>
+    </message>
+    <message>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation>按住 &lt;Shift&gt; 移动起始循环点；按住 &lt;Ctrl&gt; 禁用磁性吸附。</translation>
     </message>
 </context>
 <context>
     <name>Track</name>
     <message>
         <source>Mute</source>
-        <translation type="unfinished">静音</translation>
+        <translation>静音</translation>
     </message>
     <message>
         <source>Solo</source>
-        <translation type="unfinished">独奏</translation>
+        <translation>独奏</translation>
     </message>
 </context>
 <context>
     <name>TrackContainer</name>
     <message>
-        <source>Couldn&apos;t import file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t find a filter for importing file %1.
-You should convert this file into a format supported by LMMS using another software.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t open file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Couldn&apos;t open file %1 for reading.
-Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loading project...</source>
-        <translation type="unfinished"></translation>
+        <source>Importing FLP-file...</source>
+        <translation>正在导入 FLP-文件...</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -5980,69 +6976,105 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>请稍等...</translation>
     </message>
     <message>
         <source>Importing MIDI-file...</source>
-        <translation type="unfinished"></translation>
+        <translation>正在导入 MIDI-文件...</translation>
     </message>
     <message>
-        <source>Importing FLP-file...</source>
-        <translation type="unfinished"></translation>
+        <source>Couldn&apos;t import file</source>
+        <translation>无法导入文件</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t find a filter for importing file %1.
+You should convert this file into a format supported by LMMS using another software.</source>
+        <translation>无法找到导入文件 %1 的导入器
+你需要使用其他软件将此文件转换成 LMMS 支持的格式。</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t open file</source>
+        <translation>无法打开文件</translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t open file %1 for reading.
+Please make sure you have read-permission to the file and the directory containing the file and try again!</source>
+        <translation>无法读取文件 %1
+请确认你有对该文件及其目录的读取权限后再试!</translation>
+    </message>
+    <message>
+        <source>Loading project...</source>
+        <translation>正在加载工程...</translation>
     </message>
 </context>
 <context>
     <name>TrackContentObject</name>
     <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
         <source>Muted</source>
-        <translation type="unfinished">静音</translation>
+        <translation>静音</translation>
     </message>
 </context>
 <context>
     <name>TrackContentObjectView</name>
     <message>
         <source>Current position</source>
-        <translation type="unfinished">当前位置</translation>
+        <translation>当前位置</translation>
     </message>
     <message>
         <source>Hint</source>
-        <translation type="unfinished">提示</translation>
+        <translation>提示</translation>
     </message>
     <message>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
-        <translation type="unfinished">按住 &lt;%1&gt; 并拖动以创建副本。</translation>
+        <translation>按住 &lt;%1&gt; 并拖动以创建副本。</translation>
     </message>
     <message>
         <source>Current length</source>
-        <translation type="unfinished">当前长度</translation>
+        <translation>当前长度</translation>
     </message>
     <message>
         <source>Press &lt;%1&gt; for free resizing.</source>
-        <translation type="unfinished">按住 &lt;%1&gt; 自由调整大小。</translation>
+        <translation>按住 &lt;%1&gt; 自由调整大小。</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
-        <translation type="unfinished">%1:%2 (%3:%4 到 %5:%6)</translation>
+        <translation>%1:%2 (%3:%4 到 %5:%6)</translation>
     </message>
     <message>
         <source>Delete (middle mousebutton)</source>
-        <translation type="unfinished">删除 (鼠标中键)</translation>
+        <translation>删除 (鼠标中键)</translation>
     </message>
     <message>
         <source>Cut</source>
-        <translation type="unfinished">剪切</translation>
+        <translation>剪切</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">复制</translation>
+        <translation>复制</translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished">粘贴</translation>
+        <translation>粘贴</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
-        <translation type="unfinished">静音/取消静音 (&lt;%1&gt; + 鼠标中键)</translation>
+        <translation>静音/取消静音 (&lt;%1&gt; + 鼠标中键)</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
+        <translation>按住 &lt;Ctrl&gt; 并拖动以创建副本。</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <translation>按住 &lt;Ctrl&gt; 自由调整大小。</translation>
+    </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation>静音/取消静音 (&lt;Ctrl&gt; + 鼠标中键)</translation>
     </message>
 </context>
 <context>
@@ -6084,12 +7116,20 @@ Please make sure you have read-permission to the file and the directory containi
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Assign to new FX Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Turn all recording on</source>
         <translation type="unfinished">打开所有录制</translation>
     </message>
     <message>
         <source>Turn all recording off</source>
         <translation type="unfinished">关闭所有录制</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="obsolete">按住 &lt;Ctrl&gt; 的同时拖动移动柄复制并移动此轨道。</translation>
     </message>
 </context>
 <context>
@@ -6239,54 +7279,26 @@ Please make sure you have read-permission to the file and the directory containi
     <name>VersionedSaveDialog</name>
     <message>
         <source>Increment version number</source>
-        <translation type="unfinished"></translation>
+        <translation>递增版本号</translation>
     </message>
     <message>
         <source>Decrement version number</source>
-        <translation type="unfinished"></translation>
+        <translation>递减版本号</translation>
     </message>
 </context>
 <context>
     <name>VestigeInstrumentView</name>
     <message>
         <source>Open other VST-plugin</source>
-        <translation type="unfinished">打开其他的VST插件</translation>
+        <translation>打开其他的VST插件</translation>
     </message>
     <message>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show/hide GUI</source>
-        <translation type="unfinished">显示/隐藏界面</translation>
-    </message>
-    <message>
-        <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
-        <translation type="unfinished">点此显示/隐藏VST插件的界面。</translation>
-    </message>
-    <message>
-        <source>Turn off all notes</source>
-        <translation type="unfinished">全部静音</translation>
-    </message>
-    <message>
-        <source>Open VST-plugin</source>
-        <translation type="unfinished">打开VST插件</translation>
-    </message>
-    <message>
-        <source>DLL-files (*.dll)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>EXE-files (*.exe)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No VST-plugin loaded</source>
-        <translation type="unfinished">未载入VST插件</translation>
-    </message>
-    <message>
         <source>Control VST-plugin from LMMS host</source>
-        <translation type="unfinished"></translation>
+        <translation>从 LMMS 宿主控制 VST-插件</translation>
     </message>
     <message>
         <source>Click here, if you want to control VST-plugin from host.</source>
@@ -6294,7 +7306,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Open VST-plugin preset</source>
-        <translation type="unfinished"></translation>
+        <translation>打开 VST-插件预设</translation>
     </message>
     <message>
         <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
@@ -6302,7 +7314,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Previous (-)</source>
-        <translation type="unfinished"></translation>
+        <translation>上一个 (-)</translation>
     </message>
     <message>
         <source>Click here, if you want to switch to another VST-plugin preset program.</source>
@@ -6310,23 +7322,51 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished">保存预置</translation>
+        <translation>保存预置</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里, 如果你想保存当前 VST-插件预设。</translation>
     </message>
     <message>
         <source>Next (+)</source>
-        <translation type="unfinished"></translation>
+        <translation>下一个 (+)</translation>
     </message>
     <message>
         <source>Click here to select presets that are currently loaded in VST.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Show/hide GUI</source>
+        <translation>显示/隐藏界面</translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
+        <translation>点此显示/隐藏VST插件的界面。</translation>
+    </message>
+    <message>
+        <source>Turn off all notes</source>
+        <translation>全部静音</translation>
+    </message>
+    <message>
+        <source>Open VST-plugin</source>
+        <translation>打开VST插件</translation>
+    </message>
+    <message>
+        <source>DLL-files (*.dll)</source>
+        <translation>DLL-文件 (*.dll)</translation>
+    </message>
+    <message>
+        <source>EXE-files (*.exe)</source>
+        <translation>EXE-文件 (*.exe)</translation>
+    </message>
+    <message>
+        <source>No VST-plugin loaded</source>
+        <translation>未载入VST插件</translation>
+    </message>
+    <message>
         <source>Preset</source>
-        <translation type="unfinished">预置</translation>
+        <translation>预置</translation>
     </message>
     <message>
         <source>by </source>
@@ -6334,29 +7374,29 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source> - VST plugin control</source>
-        <translation type="unfinished"> - VST插件控制</translation>
+        <translation> - VST插件控制</translation>
     </message>
 </context>
 <context>
     <name>VisualizationWidget</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
-        <translation type="unfinished">点击启用/禁用视觉化主输出</translation>
+        <translation>点击启用/禁用视觉化主输出</translation>
     </message>
     <message>
         <source>Click to enable</source>
-        <translation type="unfinished">点击启用</translation>
+        <translation>点击启用</translation>
     </message>
 </context>
 <context>
     <name>VstEffectControlDialog</name>
     <message>
         <source>Show/hide</source>
-        <translation type="unfinished">显示/隐藏</translation>
+        <translation>显示/隐藏</translation>
     </message>
     <message>
         <source>Control VST-plugin from LMMS host</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">从 LMMS 宿主控制 VST-插件</translation>
     </message>
     <message>
         <source>Click here, if you want to control VST-plugin from host.</source>
@@ -6364,7 +7404,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Open VST-plugin preset</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">打开 VST-插件预设</translation>
     </message>
     <message>
         <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
@@ -6372,7 +7412,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Previous (-)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">上一个 (-)</translation>
     </message>
     <message>
         <source>Click here, if you want to switch to another VST-plugin preset program.</source>
@@ -6380,7 +7420,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Next (+)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">下一个 (+)</translation>
     </message>
     <message>
         <source>Click here to select presets that are currently loaded in VST.</source>
@@ -6388,11 +7428,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation type="unfinished">保存预置</translation>
+        <translation>保存预置</translation>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">点击这里, 如果你想保存当前 VST-插件预设。</translation>
     </message>
     <message>
         <source>Effect by: </source>
@@ -6400,62 +7440,62 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>VstPlugin</name>
     <message>
-        <source>Loading plugin</source>
-        <translation type="unfinished">载入插件</translation>
+        <source>The VST plugin %1 could not be loaded.</source>
+        <translation>无法载入VST插件 %1。</translation>
     </message>
     <message>
         <source>Open Preset</source>
-        <translation type="unfinished">打开预置</translation>
+        <translation>打开预置</translation>
     </message>
     <message>
         <source>Vst Plugin Preset (*.fxp *.fxb)</source>
-        <translation type="unfinished">VST插件预置文件(*.fxp *.fxb)</translation>
+        <translation>VST插件预置文件(*.fxp *.fxb)</translation>
     </message>
     <message>
         <source>: default</source>
-        <translation type="unfinished">: 默认</translation>
+        <translation>: 默认</translation>
     </message>
     <message>
         <source>&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;</translation>
     </message>
     <message>
         <source>&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;</translation>
     </message>
     <message>
         <source>Save Preset</source>
-        <translation type="unfinished">保存预置</translation>
+        <translation>保存预置</translation>
     </message>
     <message>
         <source>.fxp</source>
-        <translation type="unfinished"></translation>
+        <translation>.fxp</translation>
     </message>
     <message>
         <source>.FXP</source>
-        <translation type="unfinished"></translation>
+        <translation>.FXP</translation>
     </message>
     <message>
         <source>.FXB</source>
-        <translation type="unfinished"></translation>
+        <translation>.FXB</translation>
     </message>
     <message>
         <source>.fxb</source>
-        <translation type="unfinished"></translation>
+        <translation>.fxb</translation>
+    </message>
+    <message>
+        <source>Loading plugin</source>
+        <translation>载入插件</translation>
     </message>
     <message>
         <source>Please wait while loading VST plugin...</source>
-        <translation type="unfinished">正在载入VST插件，请稍候……</translation>
-    </message>
-    <message>
-        <source>The VST plugin %1 could not be loaded.</source>
-        <translation type="unfinished">无法载入VST插件 %1。</translation>
+        <translation>正在载入VST插件，请稍候……</translation>
     </message>
 </context>
 <context>
@@ -6580,6 +7620,54 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>WatsynView</name>
     <message>
+        <source>Volume</source>
+        <translation type="unfinished">音量</translation>
+    </message>
+    <message>
+        <source>Panning</source>
+        <translation type="unfinished">声相</translation>
+    </message>
+    <message>
+        <source>Freq. multiplier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> cents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right detune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A-B Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix envelope amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix envelope attack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix envelope hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mix envelope decay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Crosstalk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Select oscillator A1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6657,7 +7745,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished">标准化</translation>
+        <translation>标准化</translation>
     </message>
     <message>
         <source>Click to normalize</source>
@@ -6665,7 +7753,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Invert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">反转</translation>
     </message>
     <message>
         <source>Click to invert</source>
@@ -6673,7 +7761,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished">平滑</translation>
+        <translation>平滑</translation>
     </message>
     <message>
         <source>Click to smooth</source>
@@ -6681,7 +7769,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">正弦波</translation>
     </message>
     <message>
         <source>Click for sine wave</source>
@@ -6689,7 +7777,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">三角波</translation>
     </message>
     <message>
         <source>Click for triangle wave</source>
@@ -6701,7 +7789,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished">方波</translation>
+        <translation>方波</translation>
     </message>
     <message>
         <source>Click for square wave</source>
@@ -6746,14 +7834,6 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>ZynAddSubFxView</name>
     <message>
-        <source>Show GUI</source>
-        <translation type="unfinished">显示图形界面</translation>
-    </message>
-    <message>
-        <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Portamento:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6767,7 +7847,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>FREQ</source>
-        <translation type="unfinished">频率</translation>
+        <translation>频率</translation>
     </message>
     <message>
         <source>Filter Resonance:</source>
@@ -6813,56 +7893,64 @@ Please make sure you have read-permission to the file and the directory containi
         <source>Forward MIDI Control Changes</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show GUI</source>
+        <translation>显示图形界面</translation>
+    </message>
+    <message>
+        <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>audioFileProcessor</name>
     <message>
         <source>Amplify</source>
-        <translation type="unfinished"></translation>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Start of sample</source>
-        <translation type="unfinished"></translation>
+        <translation>采样起始</translation>
     </message>
     <message>
         <source>End of sample</source>
-        <translation type="unfinished"></translation>
+        <translation>采样结尾</translation>
+    </message>
+    <message>
+        <source>Loopback point</source>
+        <translation>循环点</translation>
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation type="unfinished">反转采样</translation>
+        <translation>反转采样</translation>
+    </message>
+    <message>
+        <source>Loop mode</source>
+        <translation>循环模式</translation>
     </message>
     <message>
         <source>Stutter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loopback point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Loop mode</source>
-        <translation type="unfinished">循环模式</translation>
-    </message>
-    <message>
         <source>Interpolation mode</source>
-        <translation type="unfinished"></translation>
+        <translation>补间方式</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>无</translation>
     </message>
     <message>
         <source>Linear</source>
-        <translation type="unfinished"></translation>
+        <translation>线性插补</translation>
     </message>
     <message>
         <source>Sinc</source>
-        <translation type="unfinished"></translation>
+        <translation>辛格(Sinc)插补</translation>
     </message>
     <message>
         <source>Sample not found: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>采样未找到: %1</translation>
     </message>
 </context>
 <context>
@@ -6879,36 +7967,64 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>采样长度</translation>
     </message>
     <message>
+        <source>Draw your own waveform here by dragging your mouse on this graph.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Sine wave</source>
+        <translation>正弦波</translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Triangle wave</source>
+        <translation>三角波</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished">锯齿波</translation>
+        <translation>锯齿波</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished">方波</translation>
+        <translation>方波</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation type="unfinished">白噪音</translation>
+        <translation>白噪音</translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>User defined wave</source>
-        <translation type="unfinished">用户自定义波形</translation>
+        <translation>用户自定义波形</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Smooth</source>
-        <translation type="unfinished">平滑</translation>
+        <translation>平滑</translation>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation type="unfinished">点击这里平滑波形。</translation>
+        <translation>点击这里平滑波形。</translation>
     </message>
     <message>
         <source>Interpolation</source>
@@ -6916,35 +8032,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Normalize</source>
-        <translation type="unfinished">标准化</translation>
-    </message>
-    <message>
-        <source>Draw your own waveform here by dragging your mouse on this graph.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click for a sine-wave.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here for a triangle-wave.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here for a saw-wave.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here for a square-wave.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here for white-noise.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here for a user-defined shape.</source>
-        <translation type="unfinished"></translation>
+        <translation>标准化</translation>
     </message>
 </context>
 <context>
@@ -7042,11 +8130,11 @@ Please make sure you have read-permission to the file and the directory containi
     <name>dynProcControls</name>
     <message>
         <source>Input gain</source>
-        <translation type="unfinished">输入增益</translation>
+        <translation>输入增益</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation type="unfinished">输出增益</translation>
+        <translation>输出增益</translation>
     </message>
     <message>
         <source>Attack time</source>
@@ -7059,6 +8147,17 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Stereo mode</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>fxLineLcdSpinBox</name>
+    <message>
+        <source>Assign to:</source>
+        <translation>分配给:</translation>
+    </message>
+    <message>
+        <source>New FX Channel</source>
+        <translation>新的效果通道</translation>
     </message>
 </context>
 <context>
@@ -7079,20 +8178,20 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>结束频率</translation>
     </message>
     <message>
-        <source>Gain</source>
-        <translation>增益</translation>
-    </message>
-    <message>
         <source>Length</source>
         <translation>长度</translation>
     </message>
     <message>
         <source>Distortion Start</source>
-        <translation type="unfinished"></translation>
+        <translation>起始失真度</translation>
     </message>
     <message>
         <source>Distortion End</source>
-        <translation type="unfinished"></translation>
+        <translation>结束失真度</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation>增益</translation>
     </message>
     <message>
         <source>Envelope Slope</source>
@@ -7130,12 +8229,12 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>结束频率：</translation>
     </message>
     <message>
-        <source>Gain:</source>
-        <translation>增益：</translation>
-    </message>
-    <message>
         <source>Frequency Slope:</source>
         <translation>频率倾斜度：</translation>
+    </message>
+    <message>
+        <source>Gain:</source>
+        <translation>增益：</translation>
     </message>
     <message>
         <source>Envelope Length:</source>
@@ -7198,11 +8297,23 @@ Analysis Tools are plugins for which only input channels were identified.
 Don&apos;t Knows are plugins for which no input or output channels were identified.
 
 Double clicking any of the plugins will bring up information on the ports.</source>
-        <translation type="unfinished"></translation>
+        <translation>这个对话框显示 LMMS 找到的所有 LADSPA 插件信息。这些插件根据接口类型和名字被分为五个类别。
+
+&quot;可用效果&quot; 是指可以被 LMMS 使用的插件。为了让 LMMS 可以开启效果, 首先, 这个插件需要是有效果的。也就是说, 这个插件需要有输入和输出通道。LMMS 会将音频接口名称中有 ‘in’ 的接口识别为输入接口, 将音频接口名称中有 ‘out’ 的接口识别为输出接口。并且, 效果插件需要有相同的输入输出通道, 还要能支持实时处理。
+
+&quot;不可用效果&quot; 是指被识别为效果插件的插件, 但是输入输出通道数不同或者不支持实时音频处理。
+
+&quot;乐器&quot; 是指只检测到有输出通道的插件。
+
+&quot;分析工具&quot; 是指只检测到有输入通道的插件。
+
+&quot;未知&quot; 是指没有检测到任何输出或输出通道的插件。
+
+双击任意插件将会显示接口信息。</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation>类型</translation>
+        <translation>类型:</translation>
     </message>
 </context>
 <context>
@@ -7224,7 +8335,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <source>Rate</source>
@@ -7232,19 +8343,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>方向</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>类型</translation>
     </message>
     <message>
         <source>Min &lt; Default &lt; Max</source>
-        <translation type="unfinished"></translation>
+        <translation>最小 &lt; 默认 &lt; 最大</translation>
     </message>
     <message>
         <source>Logarithmic</source>
-        <translation type="unfinished"></translation>
+        <translation>对数</translation>
     </message>
     <message>
         <source>SR Dependent</source>
@@ -7252,19 +8363,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>音频</translation>
     </message>
     <message>
         <source>Control</source>
-        <translation type="unfinished"></translation>
+        <translation>控制</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished">输入</translation>
+        <translation>输入</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished">输出</translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>Toggled</source>
@@ -7272,15 +8383,15 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Integer</source>
-        <translation type="unfinished"></translation>
+        <translation>整型</translation>
     </message>
     <message>
         <source>Float</source>
-        <translation type="unfinished"></translation>
+        <translation>浮点</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">是</translation>
+        <translation>是</translation>
     </message>
 </context>
 <context>
@@ -7338,7 +8449,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Resonance:</source>
-        <translation type="unfinished">共鸣：</translation>
+        <translation>共鸣：</translation>
     </message>
     <message>
         <source>Env Mod:</source>
@@ -7346,7 +8457,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished">衰减：</translation>
+        <translation>衰减：</translation>
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
@@ -7362,7 +8473,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Saw wave</source>
-        <translation type="unfinished">锯齿波</translation>
+        <translation>锯齿波</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
@@ -7370,7 +8481,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>三角波</translation>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
@@ -7378,7 +8489,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Square wave</source>
-        <translation type="unfinished">方波</translation>
+        <translation>方波</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
@@ -7402,7 +8513,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>正弦波</translation>
     </message>
     <message>
         <source>Click for a sine-wave.</source>
@@ -7410,7 +8521,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>White noise wave</source>
-        <translation type="unfinished">白噪音</translation>
+        <translation>白噪音</translation>
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
@@ -7450,116 +8561,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Click here for bandlimited moog saw wave.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>lb303Synth</name>
-    <message>
-        <source>VCF Cutoff Frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>VCF Resonance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>VCF Envelope Mod</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>VCF Envelope Decay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Distortion</source>
-        <translation>失真</translation>
-    </message>
-    <message>
-        <source>Waveform</source>
-        <translation>波形</translation>
-    </message>
-    <message>
-        <source>Slide Decay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Slide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Accent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dead</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>24dB/oct Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>lb303SynthView</name>
-    <message>
-        <source>Cutoff Freq:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CUT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Resonance:</source>
-        <translation type="unfinished">共鸣：</translation>
-    </message>
-    <message>
-        <source>RES</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Env Mod:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ENV MOD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decay:</source>
-        <translation type="unfinished">衰减：</translation>
-    </message>
-    <message>
-        <source>DEC</source>
-        <translation type="unfinished">衰减</translation>
-    </message>
-    <message>
-        <source>303-es-que, 24dB/octave, 3 pole filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Slide Decay:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SLIDE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DIST:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DIST</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>WAVE:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>WAVE</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7681,14 +8682,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <source>Tibetan Bowl</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Missing files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>malletsInstrumentView</name>
@@ -7702,6 +8695,14 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Spread:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7825,19 +8826,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>manageVSTEffectView</name>
     <message>
         <source> - VST parameter control</source>
-        <translation type="unfinished"></translation>
+        <translation> - VST 参数控制</translation>
     </message>
     <message>
         <source>VST Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 同步</translation>
     </message>
     <message>
         <source>Click here if you want to synchronize all parameters with VST plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里, 如果你想与 VST 插件同步所有参数。</translation>
     </message>
     <message>
         <source>Automated</source>
-        <translation type="unfinished"></translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Click here if you want to display automated parameters only.</source>
@@ -7856,19 +8857,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>manageVestigeInstrumentView</name>
     <message>
         <source> - VST plugin control</source>
-        <translation type="unfinished"></translation>
+        <translation> - VST插件控制</translation>
     </message>
     <message>
         <source>VST Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>VST 同步</translation>
     </message>
     <message>
         <source>Click here if you want to synchronize all parameters with VST plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里, 如果你想与 VST 插件同步所有参数。</translation>
     </message>
     <message>
         <source>Automated</source>
-        <translation type="unfinished"></translation>
+        <translation>自动</translation>
     </message>
     <message>
         <source>Click here if you want to display automated parameters only.</source>
@@ -7887,7 +8888,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     <name>opl2instrument</name>
     <message>
         <source>Patch</source>
-        <translation type="unfinished"></translation>
+        <translation>音色</translation>
     </message>
     <message>
         <source>Op 1 Attack</source>
@@ -8003,6 +9004,25 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
+    <name>opl2instrumentView</name>
+    <message>
+        <source>Attack</source>
+        <translation type="unfinished">打进声</translation>
+    </message>
+    <message>
+        <source>Decay</source>
+        <translation type="unfinished">衰减</translation>
+    </message>
+    <message>
+        <source>Release</source>
+        <translation type="unfinished">释放</translation>
+    </message>
+    <message>
+        <source>Frequency multiplier</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>organicInstrument</name>
     <message>
         <source>Distortion</source>
@@ -8020,11 +9040,23 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation>失真：</translation>
     </message>
     <message>
+        <source>The distortion knob adds distortion to the output of the instrument. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Volume:</source>
         <translation>音量：</translation>
     </message>
     <message>
+        <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Randomise</source>
+        <translation>随机</translation>
+    </message>
+    <message>
+        <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8040,24 +9072,12 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>cents</source>
-        <translation>音分 cents</translation>
-    </message>
-    <message>
-        <source>The distortion knob adds distortion to the output of the instrument. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Osc %1 stereo detuning</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>cents</source>
+        <translation>音分 cents</translation>
     </message>
     <message>
         <source>Osc %1 harmonic:</source>
@@ -8104,6 +9124,10 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Channel 4 volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shift Register width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8154,10 +9178,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <source>Bass</source>
         <translation>低音</translation>
     </message>
-    <message>
-        <source>Shift Register width</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>papuInstrumentView</name>
@@ -8170,11 +9190,19 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>The amount of increase or decrease in frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Sweep RtShift amount:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sweep RtShift amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The rate at which increase or decrease in frequency occurs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8186,7 +9214,15 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>The duty cycle is the ratio of the duration (time) that a signal is ON versus the total period of the signal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Square Channel 1 Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square Channel 1 Volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8195,6 +9231,10 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Length of each step in sweep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The delay between step change</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8255,7 +9295,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>Bass</source>
-        <translation type="unfinished">低音</translation>
+        <translation>低音</translation>
     </message>
     <message>
         <source>Sweep Direction</source>
@@ -8306,62 +9346,149 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The amount of increase or decrease in frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The rate at which increase or decrease in frequency occurs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The duty cycle is the ratio of the duration (time) that a signal is ON versus the total period of the signal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Square Channel 1 Volume</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The delay between step change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Draw the wave here</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
+    <name>patchesDialog</name>
+    <message>
+        <source>Qsynth: Channel Preset</source>
+        <translation>Qsynth: 通道预设</translation>
+    </message>
+    <message>
+        <source>Bank selector</source>
+        <translation>音色选择器</translation>
+    </message>
+    <message>
+        <source>Bank</source>
+        <translation>库</translation>
+    </message>
+    <message>
+        <source>Program selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patch</source>
+        <translation>音色</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+</context>
+<context>
     <name>pluginBrowser</name>
     <message>
-        <source>no description</source>
-        <translation>没有描述</translation>
+        <source>A native amplifier plugin</source>
+        <translation>原生增益插件</translation>
     </message>
     <message>
-        <source>Incomplete monophonic imitation tb303</source>
+        <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
+        <translation>简单地在乐器栏使用采样(比如鼓音源), 同时也提供多种设置</translation>
+    </message>
+    <message>
+        <source>Boost your bass the fast and simple way</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plugin for freely manipulating stereo output</source>
+        <source>Customizable wavetable synthesizer</source>
+        <translation>可自定制的波表合成器</translation>
+    </message>
+    <message>
+        <source>An oversampling bitcrusher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plugin for controlling knobs with sound peaks</source>
+        <source>Carla Patchbay Instrument</source>
+        <translation>Carla Patchbay 乐器</translation>
+    </message>
+    <message>
+        <source>Carla Rack Instrument</source>
+        <translation>Carla Rack 乐器</translation>
+    </message>
+    <message>
+        <source>A 4-band Crossover Equalizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plugin for enhancing stereo separation of a stereo input file</source>
+        <source>A native delay plugin</source>
+        <translation>原生的衰减插件</translation>
+    </message>
+    <message>
+        <source>A Dual filter plugin</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>plugin for processing dynamics in a flexible way</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A native eq plugin</source>
+        <translation>原生的 EQ 插件</translation>
+    </message>
+    <message>
+        <source>A native flanger plugin</source>
+        <translation>一个原生的 镶边 (Flanger) 插件</translation>
+    </message>
+    <message>
+        <source>Filter for importing FL Studio projects into LMMS</source>
+        <translation>将 FL Studio 工程导入 LMMS 的过滤器</translation>
+    </message>
+    <message>
+        <source>Player for GIG files</source>
+        <translation>播放 GIG 文件的播放器</translation>
+    </message>
+    <message>
+        <source>Filter for importing Hydrogen files into LMMS</source>
+        <translation>导入 Hydrogen 工程文件到 LMMS 的解析器</translation>
+    </message>
+    <message>
+        <source>Versatile drum synthesizer</source>
+        <translation>多功能鼓合成器</translation>
     </message>
     <message>
         <source>List installed LADSPA plugins</source>
         <translation>列出已安装的 LADSPA 插件</translation>
     </message>
     <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
+        <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
+        <translation>在 LMMS 中使用任意 LADSPA 效果的插件。</translation>
+    </message>
+    <message>
+        <source>Incomplete monophonic imitation tb303</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>GUS-compatible patch instrument</source>
+        <source>Filter for exporting MIDI-files from LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter for importing MIDI-files into LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monstrous 3-oscillator synth with modulation matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A multitap echo delay plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A NES-like synthesizer</source>
+        <translation>类似于 NES 的合成器</translation>
+    </message>
+    <message>
+        <source>2-operator FM Synth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8369,7 +9496,49 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Emulation of GameBoy (TM) APU</source>
+        <translation>GameBoy (TM) APU 模拟器</translation>
+    </message>
+    <message>
+        <source>GUS-compatible patch instrument</source>
+        <translation>GUS 兼容音色的乐器</translation>
+    </message>
+    <message>
+        <source>Plugin for controlling knobs with sound peaks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Player for SoundFont files</source>
+        <translation>在工程中使用SoundFont</translation>
+    </message>
+    <message>
+        <source>LMMS port of sfxr</source>
+        <translation>sfxr 的 LMMS 移植版本</translation>
+    </message>
+    <message>
+        <source>Emulation of the MOS6581 and MOS8580 SID.
+This chip was used in the Commodore 64 computer.</source>
+        <translation>模拟 MOS6581 和 MOS8580 SID 的模拟器
+这些芯片曾在 Commodore 64 电脑上用过。</translation>
+    </message>
+    <message>
+        <source>Graphical spectrum analyzer plugin</source>
+        <translation>图形频谱分析器插件</translation>
+    </message>
+    <message>
+        <source>Plugin for enhancing stereo separation of a stereo input file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin for freely manipulating stereo output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Tuneful things to bang on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Three powerful oscillators you can modulate in several ways</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8381,56 +9550,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filter for importing MIDI-files into LMMS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Emulation of the MOS6581 and MOS8580 SID.
-This chip was used in the Commodore 64 computer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Player for SoundFont files</source>
-        <translation>在工程中使用SoundFont</translation>
-    </message>
-    <message>
-        <source>Emulation of GameBoy (TM) APU</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Customizable wavetable synthesizer</source>
-        <translation>可自定制的波表合成器</translation>
-    </message>
-    <message>
-        <source>Embedded ZynAddSubFX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2-operator FM Synth</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filter for importing Hydrogen files into LMMS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LMMS port of sfxr</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>plugin for processing dynamics in a flexible way</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>plugin for waveshaping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Versatile drum synthesizer</source>
+        <source>plugin for using arbitrary VST effects inside LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8438,123 +9558,24 @@ This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A native amplifier plugin</source>
+        <source>plugin for waveshaping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>plugin for using arbitrary VST effects inside LMMS.</source>
-        <translation type="unfinished"></translation>
+        <source>Embedded ZynAddSubFX</source>
+        <translation>内置的 ZynAddSubFX</translation>
     </message>
     <message>
-        <source>Monstrous 3-oscillator synth with modulation matrix</source>
-        <translation type="unfinished"></translation>
+        <source>no description</source>
+        <translation>没有描述</translation>
     </message>
     <message>
-        <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation type="unfinished"></translation>
+        <source>Instrument browser</source>
+        <translation>乐器浏览器</translation>
     </message>
     <message>
-        <source>Boost your bass the fast and simple way</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A NES-like synthesizer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Graphical spectrum analyzer plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Carla Rack Instrument</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Carla Patchbay Instrument</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Player for GIG files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A multitap echo delay plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A native flanger plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A native delay plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An oversampling bitcrusher</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A native eq plugin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A 4-band Crossover Equalizer</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>setupWidget</name>
-    <message>
-        <source>JACK (JACK Audio Connection Kit)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OSS Raw-MIDI (Open Sound System)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SDL (Simple DirectMedia Layer)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PulseAudio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dummy (no MIDI support)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PortAudio</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dummy (no sound output)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ALSA (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OSS (Open Sound System)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>WinMM MIDI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
-        <translation type="unfinished"></translation>
+        <source>Instrument plugins</source>
+        <translation>乐器插件</translation>
     </message>
 </context>
 <context>
@@ -8565,7 +9586,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Patch</source>
-        <translation type="unfinished">音色</translation>
+        <translation>音色</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -8597,7 +9618,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Chorus Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱声部</translation>
     </message>
     <message>
         <source>Chorus Level</source>
@@ -8613,7 +9634,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>A soundfont %1 could not be loaded.</source>
-        <translation type="unfinished">无法载入Soundfont %1。</translation>
+        <translation>无法载入Soundfont %1。</translation>
     </message>
 </context>
 <context>
@@ -8664,15 +9685,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
-        <translation type="unfinished">此按钮会启用合唱效果器。</translation>
+        <translation>此按钮会启用合唱效果器。</translation>
     </message>
     <message>
         <source>Chorus Lines:</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱声部:</translation>
     </message>
     <message>
         <source>Chorus Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>合唱级别:</translation>
     </message>
     <message>
         <source>Chorus Speed:</source>
@@ -8702,7 +9723,7 @@ This chip was used in the Commodore 64 computer.</source>
     <name>sidInstrument</name>
     <message>
         <source>Cutoff</source>
-        <translation type="unfinished">切频谱</translation>
+        <translation>切除</translation>
     </message>
     <message>
         <source>Resonance</source>
@@ -8714,7 +9735,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Voice 3 off</source>
-        <translation type="unfinished">声音 3 关</translation>
+        <translation>声音 3 关</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -8722,7 +9743,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Chip model</source>
-        <translation type="unfinished"></translation>
+        <translation>芯片型号</translation>
     </message>
 </context>
 <context>
@@ -8757,15 +9778,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>MOS6581 SID </source>
-        <translation type="unfinished"></translation>
+        <translation>MOS6581 SID </translation>
     </message>
     <message>
         <source>MOS8580 SID </source>
-        <translation type="unfinished"></translation>
+        <translation>MOS8580 SID </translation>
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished">打进声：</translation>
+        <translation>打进声:</translation>
     </message>
     <message>
         <source>Attack rate determines how rapidly the output of Voice %1 rises from zero to peak amplitude.</source>
@@ -8773,7 +9794,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Decay:</source>
-        <translation type="unfinished">衰减：</translation>
+        <translation>衰减：</translation>
     </message>
     <message>
         <source>Decay rate determines how rapidly the output falls from the peak amplitude to the selected Sustain level.</source>
@@ -8781,7 +9802,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation type="unfinished">振幅持平：</translation>
+        <translation>振幅持平：</translation>
     </message>
     <message>
         <source>Output of Voice %1 will remain at the selected Sustain amplitude as long as the note is held.</source>
@@ -8789,7 +9810,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Release:</source>
-        <translation type="unfinished">声音消失：</translation>
+        <translation>声音消失：</translation>
     </message>
     <message>
         <source>The output of of Voice %1 will fall from Sustain amplitude to zero amplitude at the selected Release rate.</source>
@@ -8825,11 +9846,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Noise</source>
-        <translation type="unfinished">噪音</translation>
+        <translation>噪音</translation>
     </message>
     <message>
         <source>Sync</source>
-        <translation type="unfinished">同步</translation>
+        <translation>同步</translation>
     </message>
     <message>
         <source>Sync synchronizes the fundamental frequency of Oscillator %1 with the fundamental frequency of Oscillator %2 producing &quot;Hard Sync&quot; effects.</source>
@@ -8853,7 +9874,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>测试</translation>
     </message>
     <message>
         <source>Test, when set, resets and locks Oscillator %1 at zero until Test is turned off.</source>
@@ -8868,14 +9889,14 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Width:</source>
-        <translation type="unfinished"></translation>
+        <translation>宽度:</translation>
     </message>
 </context>
 <context>
     <name>stereoEnhancerControls</name>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>宽度</translation>
     </message>
 </context>
 <context>
@@ -8926,6 +9947,16 @@ This chip was used in the Commodore 64 computer.</source>
         <source>Please wait while loading VST-plugin...</source>
         <translation>请等待VST插件加载完成...</translation>
     </message>
+    <message>
+        <source>The VST-plugin %1 could not be loaded for some reason.
+If it runs with other VST-software under Linux, please contact an LMMS-developer!</source>
+        <translation>VST插件%1由于某些原因不能加载
+如果它在Linux下的其他VST宿主中运行正常，请联系LMMS开发者！</translation>
+    </message>
+    <message>
+        <source>Failed loading VST-plugin</source>
+        <translation>加载VST插件失败</translation>
+    </message>
 </context>
 <context>
     <name>vibed</name>
@@ -8955,7 +9986,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Fuzziness %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>模糊度 %1 </translation>
     </message>
     <message>
         <source>Length %1</source>
@@ -9030,7 +10061,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Length:</source>
-        <translation type="unfinished"></translation>
+        <translation>长度:</translation>
     </message>
     <message>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
@@ -9082,7 +10113,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Enable waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>启用波形</translation>
     </message>
     <message>
         <source>Click here to enable/disable waveform.</source>
@@ -9098,27 +10129,51 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Sine wave</source>
-        <translation type="unfinished"></translation>
+        <translation>正弦波</translation>
+    </message>
+    <message>
+        <source>Use a sine-wave for current oscillator.</source>
+        <translation>为当前振荡器使用正弦波。</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation type="unfinished"></translation>
+        <translation>三角波</translation>
+    </message>
+    <message>
+        <source>Use a triangle-wave for current oscillator.</source>
+        <translation>为当前振荡器使用三角波。</translation>
     </message>
     <message>
         <source>Saw wave</source>
         <translation>锯齿波</translation>
     </message>
     <message>
+        <source>Use a saw-wave for current oscillator.</source>
+        <translation>为当前振荡器使用锯齿波。</translation>
+    </message>
+    <message>
         <source>Square wave</source>
         <translation>方波</translation>
+    </message>
+    <message>
+        <source>Use a square-wave for current oscillator.</source>
+        <translation>为当前振荡器使用方波。</translation>
     </message>
     <message>
         <source>White noise wave</source>
         <translation>白噪音</translation>
     </message>
     <message>
+        <source>Use white-noise for current oscillator.</source>
+        <translation>为当前振荡器使用白噪音。</translation>
+    </message>
+    <message>
         <source>User defined wave</source>
         <translation>用户自定义波形</translation>
+    </message>
+    <message>
+        <source>Use a user-defined waveform for current oscillator.</source>
+        <translation>为当前振荡器使用用户自定波形。</translation>
     </message>
     <message>
         <source>Smooth</source>
@@ -9137,28 +10192,8 @@ The LED in the lower right corner of the waveform editor determines whether the 
         <translation>点击这里标准化波形。</translation>
     </message>
     <message>
-        <source>Use a sine-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use a triangle-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use a saw-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use a square-wave for current oscillator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use white-noise for current oscillator.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use a user-defined waveform for current oscillator.</source>
-        <translation type="unfinished"></translation>
+        <source>&amp;Help</source>
+        <translation>帮助(&amp;H)</translation>
     </message>
 </context>
 <context>
@@ -9189,11 +10224,11 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Voice %1 wave shape</source>
-        <translation type="unfinished"></translation>
+        <translation>声音 %1 波形形状</translation>
     </message>
     <message>
         <source>Voice %1 sync</source>
-        <translation type="unfinished"></translation>
+        <translation>声音 %1 同步</translation>
     </message>
     <message>
         <source>Voice %1 ring modulate</source>
@@ -9205,30 +10240,30 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Voice %1 test</source>
-        <translation type="unfinished"></translation>
+        <translation>声音 %1 测试</translation>
     </message>
 </context>
 <context>
     <name>waveShaperControlDialog</name>
     <message>
         <source>INPUT</source>
-        <translation type="unfinished"></translation>
+        <translation>输入</translation>
     </message>
     <message>
         <source>Input gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>输入增益:</translation>
     </message>
     <message>
         <source>OUTPUT</source>
-        <translation type="unfinished"></translation>
+        <translation>输出</translation>
     </message>
     <message>
         <source>Output gain:</source>
-        <translation type="unfinished"></translation>
+        <translation>输出增益:</translation>
     </message>
     <message>
         <source>Reset waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>重置波形</translation>
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
@@ -9236,11 +10271,11 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Smooth waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>平滑波形</translation>
     </message>
     <message>
         <source>Click here to apply smoothing to wavegraph</source>
-        <translation type="unfinished"></translation>
+        <translation>点击这里来使波形图更为平滑</translation>
     </message>
     <message>
         <source>Increase graph amplitude by 1dB</source>
@@ -9260,11 +10295,11 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Clip input</source>
-        <translation type="unfinished"></translation>
+        <translation>输入压限</translation>
     </message>
     <message>
         <source>Clip input signal to 0dB</source>
-        <translation type="unfinished"></translation>
+        <translation>将输入信号限制到 0dB</translation>
     </message>
 </context>
 <context>
@@ -9276,6 +10311,982 @@ The LED in the lower right corner of the waveform editor determines whether the 
     <message>
         <source>Output gain</source>
         <translation>输出增益</translation>
+    </message>
+</context>
+<context>
+    <name>AudioAlsa::setupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
+    </message>
+    <message>
+        <source>CHANNELS</source>
+        <translation>声道数</translation>
+    </message>
+</context>
+<context>
+    <name>AudioJack::setupWidget</name>
+    <message>
+        <source>CLIENT-NAME</source>
+        <translation>客户端名称</translation>
+    </message>
+    <message>
+        <source>CHANNELS</source>
+        <translation>声道数</translation>
+    </message>
+</context>
+<context>
+    <name>DummyEffect</name>
+    <message>
+        <source>NOT FOUND</source>
+        <translation>未找到</translation>
+    </message>
+</context>
+<context>
+    <name>EqParameterWidget</name>
+    <message>
+        <source>Hz </source>
+        <translation>Hz </translation>
+    </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
+    <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
+        <source>Mute this FX channel</source>
+        <translation>静音此效果通道</translation>
+    </message>
+    <message>
+        <source>FX Fader %1</source>
+        <translation>FX 衰减器 %1</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>独奏</translation>
+    </message>
+    <message>
+        <source>Solo FX channel</source>
+        <translation>独奏效果通道</translation>
+    </message>
+</context>
+<context>
+    <name>MidiAlsaRaw::setupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
+    </message>
+</context>
+<context>
+    <name>MidiAlsaSeq</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
+    </message>
+</context>
+<context>
+    <name>MidiAlsaSeq::setupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
+    </message>
+</context>
+<context>
+    <name>MidiOss::setupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation>设备</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>C</source>
+        <comment>Note name</comment>
+        <translation>C</translation>
+    </message>
+    <message>
+        <source>Db</source>
+        <comment>Note name</comment>
+        <translation>Db</translation>
+    </message>
+    <message>
+        <source>C#</source>
+        <comment>Note name</comment>
+        <translation>C#</translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>Note name</comment>
+        <translation>D</translation>
+    </message>
+    <message>
+        <source>Eb</source>
+        <comment>Note name</comment>
+        <translation>Eb</translation>
+    </message>
+    <message>
+        <source>D#</source>
+        <comment>Note name</comment>
+        <translation>D#</translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>Note name</comment>
+        <translation>E</translation>
+    </message>
+    <message>
+        <source>Fb</source>
+        <comment>Note name</comment>
+        <translation>Fb</translation>
+    </message>
+    <message>
+        <source>Gb</source>
+        <comment>Note name</comment>
+        <translation>Gb</translation>
+    </message>
+    <message>
+        <source>F#</source>
+        <comment>Note name</comment>
+        <translation>F#</translation>
+    </message>
+    <message>
+        <source>G</source>
+        <comment>Note name</comment>
+        <translation>G</translation>
+    </message>
+    <message>
+        <source>Ab</source>
+        <comment>Note name</comment>
+        <translation>Ab</translation>
+    </message>
+    <message>
+        <source>G#</source>
+        <comment>Note name</comment>
+        <translation>G#</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>Note name</comment>
+        <translation>A</translation>
+    </message>
+    <message>
+        <source>Bb</source>
+        <comment>Note name</comment>
+        <translation>Bb</translation>
+    </message>
+    <message>
+        <source>A#</source>
+        <comment>Note name</comment>
+        <translation>A#</translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>Note name</comment>
+        <translation>B</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <translation>A</translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation>B</translation>
+    </message>
+    <message>
+        <source>C</source>
+        <translation>C</translation>
+    </message>
+    <message>
+        <source>D</source>
+        <translation>D</translation>
+    </message>
+    <message>
+        <source>E</source>
+        <translation>E</translation>
+    </message>
+    <message>
+        <source>G</source>
+        <translation>G</translation>
+    </message>
+    <message>
+        <source>A#</source>
+        <translation>A#</translation>
+    </message>
+    <message>
+        <source>C#</source>
+        <translation>C#</translation>
+    </message>
+    <message>
+        <source>D#</source>
+        <translation>D#</translation>
+    </message>
+    <message>
+        <source>Ab</source>
+        <translation>Ab</translation>
+    </message>
+    <message>
+        <source>Bb</source>
+        <translation>Bb</translation>
+    </message>
+    <message>
+        <source>F#</source>
+        <translation>F#</translation>
+    </message>
+    <message>
+        <source>G#</source>
+        <translation>G#</translation>
+    </message>
+    <message>
+        <source>Db</source>
+        <translation>Db</translation>
+    </message>
+    <message>
+        <source>Eb</source>
+        <translation>Eb</translation>
+    </message>
+    <message>
+        <source>Fb</source>
+        <translation>Fb</translation>
+    </message>
+    <message>
+        <source>Gb</source>
+        <translation>Gb</translation>
+    </message>
+</context>
+<context>
+    <name>bbEditor</name>
+    <message>
+        <source>Add beat/bassline</source>
+        <translation>添加节拍/低音线</translation>
+    </message>
+    <message>
+        <source>Click here to stop playing of current beat/bassline.</source>
+        <translation>点击这里停止播发当前节拍/低音线。</translation>
+    </message>
+    <message>
+        <source>Add automation-track</source>
+        <translation>添加自动轨道</translation>
+    </message>
+    <message>
+        <source>Stop playback of current beat/bassline (Space)</source>
+        <translation>停止播放当前节拍/低音线(空格)</translation>
+    </message>
+    <message>
+        <source>Remove steps</source>
+        <translation>移除音阶</translation>
+    </message>
+    <message>
+        <source>Beat+Bassline Editor</source>
+        <translation>节拍+低音线编辑器</translation>
+    </message>
+    <message>
+        <source>Add steps</source>
+        <translation>添加音阶</translation>
+    </message>
+    <message>
+        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
+        <translation>点击这里停止播放当前节拍/低音线。当结束时节拍/低音线会自动循环播放。</translation>
+    </message>
+    <message>
+        <source>Play/pause current beat/bassline (Space)</source>
+        <translation>播放/暂停当前节拍/低音线（空格）</translation>
+    </message>
+</context>
+<context>
+    <name>bbTCOView</name>
+    <message>
+        <source>Open in Beat+Bassline-Editor</source>
+        <translation>在节拍+低音线编辑器中打开</translation>
+    </message>
+    <message>
+        <source>Reset color to default</source>
+        <translation>重置颜色</translation>
+    </message>
+    <message>
+        <source>Change color</source>
+        <translation>改变颜色</translation>
+    </message>
+    <message>
+        <source>Reset name</source>
+        <translation>重置名称</translation>
+    </message>
+    <message>
+        <source>Change name</source>
+        <translation>修改名称</translation>
+    </message>
+</context>
+<context>
+    <name>bbTrack</name>
+    <message>
+        <source>Beat/Bassline %1</source>
+        <translation>节拍/低音线 %1</translation>
+    </message>
+    <message>
+        <source>Clone of %1</source>
+        <translation>%1 的副本</translation>
+    </message>
+</context>
+<context>
+    <name>exportProjectDialog</name>
+    <message>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>无法打开文件</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
+        <translation>无法打开文件 %1 写入数据。
+请确保你拥有对文件以及存储文件的目录的写权限，然后重试！</translation>
+    </message>
+    <message>
+        <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
+        <translation>寻找文件编码设备时出错。请使用另外一种输出格式。</translation>
+    </message>
+    <message>
+        <source>Rendering: %1%</source>
+        <translation>渲染中：%1%</translation>
+    </message>
+    <message>
+        <source>Export project to %1</source>
+        <translation>导出项目到 %1</translation>
+    </message>
+</context>
+<context>
+    <name>fader</name>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>请输入一个介于 %1 和 %2 之间的值：</translation>
+    </message>
+</context>
+<context>
+    <name>knob</name>
+    <message>
+        <source>&amp;Help</source>
+        <translation>帮助(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>请输入介于96.0 dBV 和 6.0 dBV之间的值：</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between %1 and %2:</source>
+        <translation>请输入介于%1和%2之间的值：</translation>
+    </message>
+</context>
+<context>
+    <name>lb303Synth</name>
+    <message>
+        <source>Distortion</source>
+        <translation>失真</translation>
+    </message>
+    <message>
+        <source>Waveform</source>
+        <translation>波形</translation>
+    </message>
+</context>
+<context>
+    <name>lb303SynthView</name>
+    <message>
+        <source>Resonance:</source>
+        <translation>共鸣：</translation>
+    </message>
+    <message>
+        <source>Decay:</source>
+        <translation>衰减：</translation>
+    </message>
+    <message>
+        <source>DEC</source>
+        <translation>衰减</translation>
+    </message>
+</context>
+<context>
+    <name>projectNotes</name>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation>剪切(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Bold</source>
+        <translation>加粗(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>复制(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Left</source>
+        <translation>左对齐(&amp;L)</translation>
+    </message>
+    <message>
+        <source>&amp;Redo</source>
+        <translation>重做(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Undo</source>
+        <translation>撤销（&amp;U)</translation>
+    </message>
+    <message>
+        <source>Format Actions</source>
+        <translation>格式功能</translation>
+    </message>
+    <message>
+        <source>&amp;Justify</source>
+        <translation>匀齐(&amp;J)</translation>
+    </message>
+    <message>
+        <source>Project notes</source>
+        <translation>工程注释</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>粘贴(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Right</source>
+        <translation>右对齐(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Edit Actions</source>
+        <translation>编辑功能</translation>
+    </message>
+    <message>
+        <source>Ctrl+B</source>
+        <translation>Ctrl+B</translation>
+    </message>
+    <message>
+        <source>Ctrl+C</source>
+        <translation>Ctrl+C</translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation>Ctrl+E</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <translation>Ctrl+J</translation>
+    </message>
+    <message>
+        <source>Ctrl+L</source>
+        <translation>Ctrl+L</translation>
+    </message>
+    <message>
+        <source>Ctrl+R</source>
+        <translation>Ctrl+R</translation>
+    </message>
+    <message>
+        <source>Ctrl+U</source>
+        <translation>Ctrl+U</translation>
+    </message>
+    <message>
+        <source>Ctrl+V</source>
+        <translation>Ctrl+V</translation>
+    </message>
+    <message>
+        <source>Ctrl+X</source>
+        <translation>Ctrl+X</translation>
+    </message>
+    <message>
+        <source>Ctrl+Y</source>
+        <translation>Ctrl+Y</translation>
+    </message>
+    <message>
+        <source>Ctrl+Z</source>
+        <translation>Ctrl+Z</translation>
+    </message>
+    <message>
+        <source>Put down your project notes here.</source>
+        <translation>在这里写下你的工程注释。</translation>
+    </message>
+    <message>
+        <source>C&amp;enter</source>
+        <translation>居中(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Color...</source>
+        <translation>颜色(&amp;C)...</translation>
+    </message>
+    <message>
+        <source>&amp;Underline</source>
+        <translation>下划线(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Italic</source>
+        <translation>斜体(&amp;I)</translation>
+    </message>
+</context>
+<context>
+    <name>renameDialog</name>
+    <message>
+        <source>Rename...</source>
+        <translation>重命名...</translation>
+    </message>
+</context>
+<context>
+    <name>setupDialog</name>
+    <message>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <source>MISC</source>
+        <translation>杂项</translation>
+    </message>
+    <message>
+        <source>General settings</source>
+        <translation>常规设置</translation>
+    </message>
+    <message>
+        <source>AUDIO INTERFACE</source>
+        <translation>音频接口</translation>
+    </message>
+    <message>
+        <source>Paths</source>
+        <translation>路径</translation>
+    </message>
+    <message>
+        <source>Performance settings</source>
+        <translation>性能设置</translation>
+    </message>
+    <message>
+        <source>Choose background artwork</source>
+        <translation>选择背景图片</translation>
+    </message>
+    <message>
+        <source>FL Studio installation directory</source>
+        <translation>FL Studio安装目录</translation>
+    </message>
+    <message>
+        <source>Enable waveform display by default</source>
+        <translation>默认启用波形图</translation>
+    </message>
+    <message>
+        <source>Reset to default-value</source>
+        <translation>重置为默认值</translation>
+    </message>
+    <message>
+        <source>Choose LADSPA plugin directory</source>
+        <translation>选择LADSPA插件目录</translation>
+    </message>
+    <message>
+        <source>LMMS working directory</source>
+        <translation>LMMS工作目录</translation>
+    </message>
+    <message>
+        <source>Choose default SoundFont</source>
+        <translation>选择默认SoundFont</translation>
+    </message>
+    <message>
+        <source>Please note that most changes won&apos;t take effect until you restart LMMS!</source>
+        <translation>请注意很多设置需要重启LMMS才可生效！</translation>
+    </message>
+    <message>
+        <source>Enable tooltips</source>
+        <translation>启用工具提示</translation>
+    </message>
+    <message>
+        <source>Show restart warning after changing settings</source>
+        <translation>在改变设置后显示重启警告</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Smooth scroll in Song Editor</source>
+        <translation>歌曲编辑器中启用平滑滚动</translation>
+    </message>
+    <message>
+        <source>Frames: %1
+Latency: %2 ms</source>
+        <translation>帧数: %1
+延迟: %2 毫秒</translation>
+    </message>
+    <message>
+        <source>MIDI INTERFACE</source>
+        <translation>MIDI接口</translation>
+    </message>
+    <message>
+        <source>Background artwork</source>
+        <translation>背景图片</translation>
+    </message>
+    <message>
+        <source>Compact track buttons</source>
+        <translation>紧凑化轨道图标</translation>
+    </message>
+    <message>
+        <source>Choose FL Studio installation directory</source>
+        <translation>选择FL Studio安装目录</translation>
+    </message>
+    <message>
+        <source>Audio settings</source>
+        <translation>音频设置</translation>
+    </message>
+    <message>
+        <source>UI effects vs. performance</source>
+        <translation>界面特效 vs 性能</translation>
+    </message>
+    <message>
+        <source>LADSPA plugin paths</source>
+        <translation>LADSPA插件目录</translation>
+    </message>
+    <message>
+        <source>Choose artwork-theme directory</source>
+        <translation>选择插图目录</translation>
+    </message>
+    <message>
+        <source>Show playback cursor in AudioFileProcessor</source>
+        <translation>在 AudioFileProcessor 中显示回放光标</translation>
+    </message>
+    <message>
+        <source>Enable auto save feature</source>
+        <translation>启用自动保存功能</translation>
+    </message>
+    <message>
+        <source>Compress project files per default</source>
+        <translation>默认压缩项目文件</translation>
+    </message>
+    <message>
+        <source>BUFFER SIZE</source>
+        <translation>缓冲大小</translation>
+    </message>
+    <message>
+        <source>Display volume as dBV </source>
+        <translation>音量显示为dBV</translation>
+    </message>
+    <message>
+        <source>Choose STK rawwave directory</source>
+        <translation>选择 STK rawwave 文件夹</translation>
+    </message>
+    <message>
+        <source>Default Soundfont File</source>
+        <translation>默认SoundFont文件</translation>
+    </message>
+    <message>
+        <source>Sync VST plugins to host playback</source>
+        <translation>同步 VST 插件和主机回放</translation>
+    </message>
+    <message>
+        <source>Setup LMMS</source>
+        <translation>设置LMMS</translation>
+    </message>
+    <message>
+        <source>Choose your VST-plugin directory</source>
+        <translation>选择VST插件目录</translation>
+    </message>
+    <message>
+        <source>Choose LMMS working directory</source>
+        <translation>选择LMMS工作目录</translation>
+    </message>
+    <message>
+        <source>Restart LMMS</source>
+        <translation>重启LMMS</translation>
+    </message>
+    <message>
+        <source>STK rawwave directory</source>
+        <translation>STK rawwave 目录</translation>
+    </message>
+    <message>
+        <source>VST-plugin directory</source>
+        <translation>VST插件目录</translation>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation>MIDI设置</translation>
+    </message>
+    <message>
+        <source>Artwork directory</source>
+        <translation>插图目录</translation>
+    </message>
+    <message>
+        <source>Enable note labels in piano roll</source>
+        <translation>在钢琴窗中显示音号</translation>
+    </message>
+</context>
+<context>
+    <name>setupWidget</name>
+    <message>
+        <source>JACK (JACK Audio Connection Kit)</source>
+        <translation>JACK (JACK 音频连接套件)</translation>
+    </message>
+    <message>
+        <source>OSS Raw-MIDI (Open Sound System)</source>
+        <translation>OSS 原始-MIDI (开放声音系统)</translation>
+    </message>
+    <message>
+        <source>SDL (Simple DirectMedia Layer)</source>
+        <translation>SDL (Simple DirectMedia Layer)</translation>
+    </message>
+    <message>
+        <source>PulseAudio</source>
+        <translation>PulseAudio</translation>
+    </message>
+    <message>
+        <source>Dummy (no MIDI support)</source>
+        <translation>Dummy (无 MIDI 支持)</translation>
+    </message>
+    <message>
+        <source>ALSA Raw-MIDI (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA 原始-MIDI (高级 Linux 音频架构)</translation>
+    </message>
+    <message>
+        <source>PortAudio</source>
+        <translation>PortAudio</translation>
+    </message>
+    <message>
+        <source>Dummy (no sound output)</source>
+        <translation>Dummy (无声音输出)</translation>
+    </message>
+    <message>
+        <source>ALSA (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA (高级Linux声音架构)</translation>
+    </message>
+    <message>
+        <source>OSS (Open Sound System)</source>
+        <translation>OSS (开放声音系统)</translation>
+    </message>
+    <message>
+        <source>WinMM MIDI</source>
+        <translation>WinMM MIDI</translation>
+    </message>
+    <message>
+        <source>ALSA-Sequencer (Advanced Linux Sound Architecture)</source>
+        <translation>ALSA-序列器 (高级 Linux 音频架构)</translation>
+    </message>
+</context>
+<context>
+    <name>song</name>
+    <message>
+        <source>Tempo</source>
+        <translation>节奏</translation>
+    </message>
+    <message>
+        <source>Master pitch</source>
+        <translation>主音高</translation>
+    </message>
+    <message>
+        <source>Project saved</source>
+        <translation>工程已保存</translation>
+    </message>
+    <message>
+        <source>Master volume</source>
+        <translation>主音量</translation>
+    </message>
+    <message>
+        <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
+        <translation>这个工程是空的所以就算导出也没有意义，请在歌曲编辑器中加入一点声音吧！</translation>
+    </message>
+    <message>
+        <source>MIDI sequences</source>
+        <translation>MIDI音序器</translation>
+    </message>
+    <message>
+        <source>All file types</source>
+        <translation>所有类型</translation>
+    </message>
+    <message>
+        <source>untitled</source>
+        <translation>未标题</translation>
+    </message>
+    <message>
+        <source>Select file for project-export...</source>
+        <translation>为工程导出选择文件...</translation>
+    </message>
+    <message>
+        <source>FL Studio projects</source>
+        <translation>FL Studio工程</translation>
+    </message>
+    <message>
+        <source>Project NOT saved.</source>
+        <translation>工程没有保存。</translation>
+    </message>
+    <message>
+        <source>Import file</source>
+        <translation>导入文件</translation>
+    </message>
+    <message>
+        <source>The project %1 is now saved.</source>
+        <translation>工程%1已保存。</translation>
+    </message>
+    <message>
+        <source>Select directory for writing exported tracks...</source>
+        <translation>选择写入导出音轨的目录...</translation>
+    </message>
+    <message>
+        <source>Empty project</source>
+        <translation>空工程</translation>
+    </message>
+    <message>
+        <source>The project %1 was not saved!</source>
+        <translation>工程%1未保存！</translation>
+    </message>
+    <message>
+        <source>Hydrogen projects</source>
+        <translation>Hydrogen工程</translation>
+    </message>
+</context>
+<context>
+    <name>timeLine</name>
+    <message>
+        <source>Hint</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <source>After stopping go back to begin</source>
+        <translation>停止后前往开头</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation>按住 &lt;Ctrl&gt; 禁用磁性吸附。</translation>
+    </message>
+    <message>
+        <source>Enable/disable auto-scrolling</source>
+        <translation>启用/禁用自动滚动</translation>
+    </message>
+    <message>
+        <source>After stopping go back to position at which playing was started</source>
+        <translation>停止后前往播放开始的地方</translation>
+    </message>
+    <message>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <translation>按住 &lt;Shift&gt; 移动起始循环点；按住 &lt;Ctrl&gt; 禁用磁性吸附。</translation>
+    </message>
+    <message>
+        <source>After stopping keep position</source>
+        <translation>停止后保持位置不变</translation>
+    </message>
+    <message>
+        <source>Enable/disable loop-points</source>
+        <translation>启用/禁用循环点</translation>
+    </message>
+</context>
+<context>
+    <name>track</name>
+    <message>
+        <source>Solo</source>
+        <translation>独奏</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <translation>静音</translation>
+    </message>
+</context>
+<context>
+    <name>trackContentObject</name>
+    <message>
+        <source>Muted</source>
+        <translation>静音</translation>
+    </message>
+</context>
+<context>
+    <name>trackContentObjectView</name>
+    <message>
+        <source>Cut</source>
+        <translation>剪切</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>复制</translation>
+    </message>
+    <message>
+        <source>Hint</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation>粘贴</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <translation>按住 &lt;Ctrl&gt; 自由调整大小。</translation>
+    </message>
+    <message>
+        <source>Delete (middle mousebutton)</source>
+        <translation>删除 (鼠标中键)</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
+        <translation>按住 &lt;Ctrl&gt; 并拖动以创建副本。</translation>
+    </message>
+    <message>
+        <source>%1:%2 (%3:%4 to %5:%6)</source>
+        <translation>%1:%2 (%3:%4 到 %5:%6)</translation>
+    </message>
+    <message>
+        <source>Current length</source>
+        <translation>当前长度</translation>
+    </message>
+    <message>
+        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <translation>静音/取消静音 (&lt;Ctrl&gt; + 鼠标中键)</translation>
+    </message>
+    <message>
+        <source>Current position</source>
+        <translation>当前位置</translation>
+    </message>
+</context>
+<context>
+    <name>trackOperationsWidget</name>
+    <message>
+        <source>Mute</source>
+        <translation>静音</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>独奏</translation>
+    </message>
+    <message>
+        <source>Clone this track</source>
+        <translation>克隆此轨道</translation>
+    </message>
+    <message>
+        <source>Actions for this track</source>
+        <translation>对此轨道可进行的操作</translation>
+    </message>
+    <message>
+        <source>Turn all recording on</source>
+        <translation>打开所有录制</translation>
+    </message>
+    <message>
+        <source>Turn all recording off</source>
+        <translation>关闭所有录制</translation>
+    </message>
+    <message>
+        <source>Remove this track</source>
+        <translation>移除此轨道</translation>
+    </message>
+    <message>
+        <source>Clear this track</source>
+        <translation>清除此轨道</translation>
+    </message>
+    <message>
+        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation>按住 &lt;Ctrl&gt; 的同时拖动移动柄复制并移动此轨道。</translation>
+    </message>
+    <message>
+        <source>Mute this track</source>
+        <translation>静音此轨道</translation>
+    </message>
+</context>
+<context>
+    <name>visualizationWidget</name>
+    <message>
+        <source>click to enable/disable visualization of master-output</source>
+        <translation>点击启用/禁用视觉化主输出</translation>
+    </message>
+    <message>
+        <source>Click to enable</source>
+        <translation>点击启用</translation>
     </message>
 </context>
 </TS>
