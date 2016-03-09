@@ -701,9 +701,9 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
 						"step_btn_off_light" ) );
 	}
+	
+	update();	
 
-	ToolTip::add( this,
-		tr( "use mouse wheel to set velocity of a step" ) );
 	setStyle( QApplication::style() );
 }
 
@@ -722,7 +722,22 @@ PatternView::~PatternView()
 
 void PatternView::update()
 {
-	m_pat->changeLength( m_pat->length() );
+	if( fixedTCOs() )
+	{
+		m_pat->changeLength( m_pat->length() );
+	}
+	
+	if ( m_pat->m_patternType == Pattern::BeatPattern )
+	{
+		ToolTip::add( this,
+			tr( "use mouse wheel to set velocity of a step" ) );	
+	}
+	else 
+	{
+		ToolTip::add( this,
+			tr( "double-click to open in Piano Roll" ) );		
+	}
+	
 	TrackContentObjectView::update();
 }
 
