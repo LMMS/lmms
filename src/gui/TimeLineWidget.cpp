@@ -57,8 +57,8 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	QWidget( parent ),
 	m_inactiveLoopColor( 255, 255, 255, 32 ),
 	m_activeLoopColor( 255, 255, 255, 64 ),
-	m_tactLineColor( 192, 192, 192 ),
-	m_tactNumberColor( m_tactLineColor.darker( 120 )),
+	m_barLineColor( 192, 192, 192 ),
+	m_barNumberColor( m_barLineColor.darker( 120 )),
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
@@ -233,36 +233,36 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	// Clip so that we only draw everything starting from the offset
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 
-	// Draw the tact lines and numbers
-	QColor const & tactLineColor = getTactLineColor();
-	QColor const & tactNumberColor = getTactNumberColor();
+	// Draw the bar lines and numbers
+	QColor const & barLineColor = getBarLineColor();
+	QColor const & barNumberColor = getBarNumberColor();
 
-	tact_t tact_num = m_begin.getTact();
-	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
+	tact_t barNumber = m_begin.getTact();
+	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppt ) / MidiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
-		++tact_num;
-		if( ( tact_num - 1 ) %
+		++barNumber;
+		if( ( barNumber - 1 ) %
 			qMax( 1, qRound( 1.0f / 3.0f *
 				MidiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
 			const int cx = x + qRound( i * m_ppt );
-			p.setPen( tactLineColor );
+			p.setPen( barLineColor );
 			p.drawLine( cx, 5, cx, height() - 6 );
 
-			const QString s = QString::number( tact_num );
-			p.setPen( tactNumberColor );
+			const QString s = QString::number( barNumber );
+			p.setPen( barNumberColor );
 			p.drawText( cx + 5, height() - p.fontMetrics().ascent() / 2, s );
 		}
 	}
 
 	// Draw the loop rectangle
-	int loopRectMargin = 2;
-	int loopRectHeight = this->height() - 2 * loopRectMargin;
-	int const loopStart = markerX( loopBegin() ) + 8 + 1;
-	int const loopEndR = markerX( loopEnd() ) + 7;
+	int const loopRectMargin = 1;
+	int const loopRectHeight = this->height() - 2 * loopRectMargin;
+	int const loopStart = markerX( loopBegin() ) + 8;
+	int const loopEndR = markerX( loopEnd() ) + 9;
 	int const loopRectWidth = loopEndR - loopStart;
 	p.setPen(Qt::NoPen);
 	p.setBrush(loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor());
@@ -271,7 +271,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	// Draw the markers
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
-	int loopMarkerHeight = ( this->height() - s_loopPointBeginPixmap->height() ) / 2;
+	int const loopMarkerHeight = ( this->height() - s_loopPointBeginPixmap->height() ) / 2;
 	p.drawPixmap( markerX( loopBegin() ) + 2, loopMarkerHeight, *s_loopPointBeginPixmap );
 	p.drawPixmap( markerX( loopEnd() ) + 2, loopMarkerHeight, *s_loopPointEndPixmap );
 

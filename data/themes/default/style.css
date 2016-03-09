@@ -545,8 +545,8 @@ TimeLineWidget {
 	min-height: 1.25em;
 	qproperty-inactiveLoopColor: rgba( 255, 255, 255, 32 );
 	qproperty-activeLoopColor: rgba( 255, 255, 255, 64 );
-	qproperty-tactLineColor: rgb( 192, 192, 192 );
-	qproperty-tactNumberColor: rgb( 192, 192, 192 );
+	qproperty-barLineColor: rgb( 192, 192, 192 );
+	qproperty-barNumberColor: rgb( 192, 192, 192 );
 }
 
 QTreeView {

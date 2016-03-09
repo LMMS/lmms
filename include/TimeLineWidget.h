@@ -42,8 +42,8 @@ class TimeLineWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
-	Q_PROPERTY( QColor tactLineColor READ getTactLineColor WRITE setTactLineColor )
-	Q_PROPERTY( QColor tactNumberColor READ getTactNumberColor WRITE setTactNumberColor )
+	Q_PROPERTY( QColor barLineColor READ getBarLineColor WRITE setBarLineColor )
+	Q_PROPERTY( QColor barNumberColor READ getBarNumberColor WRITE setBarNumberColor )
 	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
 	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
 
@@ -71,11 +71,11 @@ public:
 				const MidiTime & begin, QWidget * parent );
 	virtual ~TimeLineWidget();
 
-	inline QColor const & getTactLineColor() const { return m_tactLineColor; }
-	inline void setTactLineColor(QColor const & tactLineColor) { m_tactLineColor = tactLineColor; }
+	inline QColor const & getBarLineColor() const { return m_barLineColor; }
+	inline void setBarLineColor(QColor const & tactLineColor) { m_barLineColor = tactLineColor; }
 
-	inline QColor const & getTactNumberColor() const { return m_tactNumberColor; }
-	inline void setTactNumberColor(QColor const & tactNumberColor) { m_tactNumberColor = tactNumberColor; }
+	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
+	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
 
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
 	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
@@ -178,8 +178,8 @@ private:
 
 	QColor m_inactiveLoopColor;
 	QColor m_activeLoopColor;
-	QColor m_tactLineColor;
-	QColor m_tactNumberColor;
+	QColor m_barLineColor;
+	QColor m_barNumberColor;
 
 	AutoScrollStates m_autoScroll;
 	LoopPointStates m_loopPoints;
