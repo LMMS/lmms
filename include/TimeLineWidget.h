@@ -42,6 +42,11 @@ class TimeLineWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
+	Q_PROPERTY( QColor tactLineColor READ getTactLineColor WRITE setTactLineColor )
+	Q_PROPERTY( QColor tactNumberColor READ getTactNumberColor WRITE setTactNumberColor )
+	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
+	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
+
 	enum AutoScrollStates
 	{
 		AutoScrollEnabled,
@@ -65,6 +70,18 @@ public:
 	TimeLineWidget( int xoff, int yoff, float ppt, Song::PlayPos & pos,
 				const MidiTime & begin, QWidget * parent );
 	virtual ~TimeLineWidget();
+
+	inline QColor const & getTactLineColor() const { return m_tactLineColor; }
+	inline void setTactLineColor(QColor const & tactLineColor) { m_tactLineColor = tactLineColor; }
+
+	inline QColor const & getTactNumberColor() const { return m_tactNumberColor; }
+	inline void setTactNumberColor(QColor const & tactNumberColor) { m_tactNumberColor = tactNumberColor; }
+
+	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
+	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
+
+	inline QColor const & getActiveLoopColor() const { return m_activeLoopColor; }
+	inline void setActiveLoopColor(QColor const & activeLoopColor) { m_activeLoopColor = activeLoopColor; }
 
 	inline Song::PlayPos & pos()
 	{
@@ -158,6 +175,11 @@ private:
 	static QPixmap * s_loopPointBeginPixmap;
 	static QPixmap * s_loopPointEndPixmap;
 	static QPixmap * s_loopPointDisabledPixmap;
+
+	QColor m_inactiveLoopColor;
+	QColor m_activeLoopColor;
+	QColor m_tactLineColor;
+	QColor m_tactNumberColor;
 
 	AutoScrollStates m_autoScroll;
 	LoopPointStates m_loopPoints;

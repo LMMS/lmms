@@ -55,6 +55,10 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 			Song::PlayPos & pos, const MidiTime & begin,
 							QWidget * parent ) :
 	QWidget( parent ),
+	m_inactiveLoopColor( 255, 255, 255, 32 ),
+	m_activeLoopColor( 255, 255, 255, 64 ),
+	m_tactLineColor( 192, 192, 192 ),
+	m_tactNumberColor( m_tactLineColor.darker( 120 )),
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
@@ -90,7 +94,6 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
-	setFixedHeight( 18 );
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
@@ -232,43 +235,48 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( 0, 0, width(), height(), g );
 
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
-	p.setPen( QColor( 0, 0, 0 ) );
 
-	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
-	p.drawPixmap( markerX( loopBegin() )+2, 2, *s_loopPointBeginPixmap );
-	p.drawPixmap( markerX( loopEnd() )+2, 2, *s_loopPointEndPixmap );
-	p.setOpacity( 1.0 );
-
+	// Draw the tact lines and numbers
+	QColor const & tactLineColor = getTactLineColor();
+	QColor const & tactNumberColor = getTactNumberColor();
 
 	tact_t tact_num = m_begin.getTact();
 	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppt ) / MidiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
-	QColor lineColor( 192, 192, 192 );
-	QColor tactColor( lineColor.darker( 120 ) );
-
-	// Set font to half of the widgets size (in pixels)
-	QFont font = p.font();
-	font.setPixelSize( this->height() * 0.5 );
-	p.setFont( font );
-
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
-		const int cx = x + qRound( i * m_ppt );
-		p.setPen( lineColor );
-		p.drawLine( cx, 5, cx, height() - 6 );
 		++tact_num;
 		if( ( tact_num - 1 ) %
 			qMax( 1, qRound( 1.0f / 3.0f *
 				MidiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
+			const int cx = x + qRound( i * m_ppt );
+			p.setPen( tactLineColor );
+			p.drawLine( cx, 5, cx, height() - 6 );
+
 			const QString s = QString::number( tact_num );
-			p.setPen( tactColor );
-			p.drawText( cx + qRound( ( m_ppt - p.fontMetrics().
-							width( s ) ) / 2 ),
-				height() - p.fontMetrics().ascent() / 2, s );
+			p.setPen( tactNumberColor );
+			p.drawText( cx + 5, height() - p.fontMetrics().ascent() / 2, s );
 		}
 	}
+
+	// Draw the loop rectangle
+	int loopRectMargin = 2;
+	int loopRectHeight = this->height() - 2 * loopRectMargin;
+	int const loopStart = markerX( loopBegin() ) + 8 + 1;
+	int const loopEndR = markerX( loopEnd() ) + 7;
+	int const loopRectWidth = loopEndR - loopStart;
+	p.setPen(Qt::NoPen);
+	p.setBrush(loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor());
+	p.drawRect(loopStart, loopRectMargin, loopRectWidth, loopRectHeight);
+
+	// Draw the markers
+	p.setPen( QColor( 0, 0, 0 ) );
+	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
+	int loopMarkerHeight = ( this->height() - s_loopPointBeginPixmap->height() ) / 2;
+	p.drawPixmap( markerX( loopBegin() ) + 2, loopMarkerHeight, *s_loopPointBeginPixmap );
+	p.drawPixmap( markerX( loopEnd() ) + 2, loopMarkerHeight, *s_loopPointEndPixmap );
 
 	p.setOpacity( 0.6 );
 	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(),

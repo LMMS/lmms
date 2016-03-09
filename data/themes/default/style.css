@@ -540,6 +540,15 @@ TimeLine {
 	font-size: 8px;
 }
 
+TimeLineWidget {
+	font-size: 1em;
+	min-height: 1.25em;
+	qproperty-inactiveLoopColor: rgba( 255, 255, 255, 32 );
+	qproperty-activeLoopColor: rgba( 255, 255, 255, 64 );
+	qproperty-tactLineColor: rgb( 192, 192, 192 );
+	qproperty-tactNumberColor: rgb( 192, 192, 192 );
+}
+
 QTreeView {
 	alternate-background-color: #111314;
 }
