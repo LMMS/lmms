@@ -227,13 +227,10 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	QColor bg_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Background );
-	QLinearGradient g( 0, 0, 0, height() );
-	g.setColorAt( 0, bg_color.lighter( 150 ) );
-	g.setColorAt( 1, bg_color.darker( 150 ) );
-	p.fillRect( 0, 0, width(), height(), g );
+	// Draw background
+	p.fillRect( 0, 0, width(), height(), p.background() );
 
+	// Clip so that we only draw everything starting from the offset
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 
 	// Draw the tact lines and numbers
