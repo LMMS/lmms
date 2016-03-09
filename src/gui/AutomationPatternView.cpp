@@ -60,6 +60,8 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 	
 	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
 							"pat_rec" ) ); }
+							
+	update();
 }
 
 
