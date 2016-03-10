@@ -420,11 +420,11 @@ void FxMixerView::deleteUnusedChannels()
 	{
 		// check if an instrument references to the current channel
 		bool empty=true;
-		foreach( Track* t, tracks )
+		for( TrackContainer::TrackList::const_iterator it = tracks.constBegin(); it != tracks.constEnd(); ++it )
 		{
-			if( t->type() == Track::InstrumentTrack )
+			if( ( *it )->type() == Track::InstrumentTrack )
 			{
-				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
+				InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( *it );
 				if( i == inst->effectChannelModel()->value(0) )
 				{
 					empty=false;

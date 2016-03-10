@@ -262,11 +262,12 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		m_pluginMutex.unlock();
 
 		m_modifiedControllers.clear();
-		foreach( const QString & c, _this.attribute( "modifiedcontrollers" ).split( ',' ) )
+		QStringList modifiedControllers = _this.attribute( "modifiedcontrollers" ).split( ',' );
+		for( QStringList::const_iterator it = modifiedControllers.constBegin(); it != modifiedControllers.constEnd(); ++it )
 		{
-			if( !c.isEmpty() )
+			if( !( *it ).isEmpty() )
 			{
-				switch( c.toInt() )
+				switch( ( *it ).toInt() )
 				{
 					case C_portamento: updatePortamento(); break;
 					case C_filtercutoff: updateFilterFreq(); break;

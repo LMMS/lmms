@@ -87,11 +87,11 @@ FxChannel::~FxChannel()
 
 inline void FxChannel::processed()
 {
-	foreach( FxRoute * receiverRoute, m_sends )
+	for( FxRouteVector::const_iterator it = m_sends.constBegin(); it != m_sends.constEnd(); ++it )
 	{
-		if( receiverRoute->receiver()->m_muted == false )
+		if( ( *it )->receiver()->m_muted == false )
 		{
-			receiverRoute->receiver()->incrementDeps();
+			( *it )->receiver()->incrementDeps();
 		}
 	}
 }
@@ -121,11 +121,11 @@ void FxChannel::doProcessing()
 
 	if( m_muted == false )
 	{
-		foreach( FxRoute * senderRoute, m_receives )
+		for( FxRouteVector::const_iterator it = m_receives.constBegin(); it != m_receives.constEnd(); ++it )
 		{
-			FxChannel * sender = senderRoute->sender();
-			FloatModel * sendModel = senderRoute->amount();
-			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", senderRoute->senderIndex(), m_channelIndex );
+			FxChannel * sender = ( *it )->sender();
+			FloatModel * sendModel = ( *it )->amount();
+			if( ! sendModel ) qFatal( "Error: no send model found from %d to %d", ( *it )->senderIndex(), m_channelIndex );
 
 			if( sender->m_hasInput || sender->m_stillRunning )
 			{
@@ -293,11 +293,11 @@ void FxMixer::deleteChannel( int index )
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	foreach( Track* t, tracks )
+	for( TrackContainer::TrackList::const_iterator it = tracks.constBegin(); it != tracks.constEnd(); ++it )
 	{
-		if( t->type() == Track::InstrumentTrack )
+		if( ( *it )->type() == Track::InstrumentTrack )
 		{
-			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( t );
+			InstrumentTrack* inst = dynamic_cast<InstrumentTrack *>( *it );
 			int val = inst->effectChannelModel()->value(0);
 			if( val == index )
 			{
@@ -335,13 +335,13 @@ void FxMixer::deleteChannel( int index )
 		m_fxChannels[i]->m_channelIndex = i;
 
 		// now check all routes and update names of the send models
-		foreach( FxRoute * r, m_fxChannels[i]->m_sends )
+		for( FxRouteVector::const_iterator it = m_fxChannels[i]->m_sends.constBegin(); it != m_fxChannels[i]->m_sends.constEnd(); ++it )
 		{
-			r->updateName();
+			( *it )->updateName();
 		}
-		foreach( FxRoute * r, m_fxChannels[i]->m_receives )
+		for( FxRouteVector::const_iterator it = m_fxChannels[i]->m_receives.constBegin(); it != m_fxChannels[i]->m_receives.constEnd(); ++it )
 		{
-			r->updateName();
+			( *it )->updateName();
 		}
 	}
 }
@@ -528,11 +528,11 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 	const FxChannel * from = m_fxChannels[fromChannel];
 	const FxChannel * to = m_fxChannels[toChannel];
 
-	foreach( FxRoute * route, from->m_sends )
+	for( FxRouteVector::const_iterator it = from->m_sends.constBegin(); it != from->m_sends.constEnd(); ++it )
 	{
-		if( route->receiver() == to )
+		if( ( *it )->receiver() == to )
 		{
-			return route->amount();
+			return ( *it )->amount();
 		}
 	}
 
@@ -578,18 +578,18 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
 		// their recipients right away.
 		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
-		foreach( FxChannel * ch, m_fxChannels )
+		for( QVector<FxChannel *>::const_iterator it = m_fxChannels.constBegin(); it != m_fxChannels.constEnd(); ++it )
 		{
-			ch->m_muted = ch->m_muteModel.value();
-			if( ch->m_muted ) // instantly "process" muted channels
+			( *it )->m_muted = ( *it )->m_muteModel.value();
+			if( ( *it )->m_muted ) // instantly "process" muted channels
 			{
-				ch->processed();
-				ch->done();
+				( *it )->processed();
+				( *it )->done();
 			}
-			else if( ch->m_receives.size() == 0 )
+			else if( ( *it )->m_receives.size() == 0 )
 			{
-				ch->m_queued = true;
-				MixerWorkerThread::addJob( ch );
+				( *it )->m_queued = true;
+				MixerWorkerThread::addJob( *it );
 			}
 		}
 		while( m_fxChannels[0]->state() != ThreadableJob::Done )

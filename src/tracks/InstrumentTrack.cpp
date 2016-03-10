@@ -949,13 +949,12 @@ InstrumentTrackView::~InstrumentTrackView()
 InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = NULL;
-	foreach( QMdiSubWindow * sw,
-				gui->mainWindow()->workspace()->subWindowList(
-											QMdiArea::ActivationHistoryOrder ) )
+	QList<QMdiSubWindow *> subWindowList = gui->mainWindow()->workspace()->subWindowList( QMdiArea::ActivationHistoryOrder );
+	for( QList<QMdiSubWindow *>::const_iterator it = subWindowList.constBegin(); it != subWindowList.constEnd(); ++it )
 	{
-		if( sw->isVisible() && sw->widget()->inherits( "InstrumentTrackWindow" ) )
+		if( ( *it )->isVisible() && ( *it )->widget()->inherits( "InstrumentTrackWindow" ) )
 		{
-			w = qobject_cast<InstrumentTrackWindow *>( sw->widget() );
+			w = qobject_cast<InstrumentTrackWindow *>( ( *it )->widget() );
 		}
 	}
 

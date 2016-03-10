@@ -83,7 +83,13 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 	uint8_t buffer[BUFFER_SIZE];
 	uint32_t size;
 
-	foreach( Track* track, tracks ) if( track->type() == Track::InstrumentTrack ) nTracks++;
+	for( TrackContainer::TrackList::const_iterator it = tracks.constBegin(); it != tracks.constEnd(); ++it )
+	{
+		if( ( *it )->type() == Track::InstrumentTrack )
+		{
+			nTracks++;
+		}
+	}
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
@@ -91,21 +97,21 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 	midiout.writeRawData((char *)buffer, size);
 
 	// midi tracks
-	foreach( Track* track, tracks )
+	for( TrackContainer::TrackList::const_iterator it = tracks.constBegin(); it != tracks.constEnd(); ++it )
 	{
 		DataFile dataFile( DataFile::SongProject );
 		MidiFile::MIDITrack<BUFFER_SIZE> mtrack;
 	
-		if( track->type() != Track::InstrumentTrack ) continue;
+		if( ( *it )->type() != Track::InstrumentTrack ) continue;
 
-		//qDebug() << "exporting " << track->name();
+		//qDebug() << "exporting " << ( *it )->name();
 	
 	
-		mtrack.addName(track->name().toStdString(), 0);
+		mtrack.addName(( *it )->name().toStdString(), 0);
 		//mtrack.addProgramChange(0, 0);
 		mtrack.addTempo(tempo, 0);
 	
-		instTrack = dynamic_cast<InstrumentTrack *>( track );
+		instTrack = dynamic_cast<InstrumentTrack *>( *it );
 		element = instTrack->saveState( dataFile, dataFile.content() );
 	
 		// instrumentTrack

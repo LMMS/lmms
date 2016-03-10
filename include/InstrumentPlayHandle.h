@@ -56,9 +56,9 @@ public:
 		do
 		{
 			nphsLeft = false;
-			foreach( const NotePlayHandle * cnph, nphv )
+			for( ConstNotePlayHandleList::const_iterator it = nphv.constBegin(); it != nphv.constEnd(); ++it )
 			{
-				NotePlayHandle * nph = const_cast<NotePlayHandle *>( cnph );
+				NotePlayHandle * nph = const_cast<NotePlayHandle *>( *it );
 				if( nph->state() != ThreadableJob::Done && ! nph->isFinished() )
 				{
 					nphsLeft = true;

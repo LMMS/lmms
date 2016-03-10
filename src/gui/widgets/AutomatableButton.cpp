@@ -236,9 +236,9 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 					m_buttons.indexOf( _btn ) != -1 )
 	{
 		model()->setValue( m_buttons.indexOf( _btn ) );
-		foreach( AutomatableButton * btn, m_buttons )
+		for( QList<AutomatableButton *>::const_iterator it = m_buttons.constBegin(); it != m_buttons.constEnd(); ++it )
 		{
-			btn->update();
+			( *it )->update();
 		}
 	}
 }
@@ -261,9 +261,9 @@ void automatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
-	foreach( AutomatableButton * btn, m_buttons )
+	for( QList<AutomatableButton *>::const_iterator it = m_buttons.constBegin(); it != m_buttons.constEnd(); ++it )
 	{
-		btn->model()->setValue( i == model()->value() );
+		( *it )->model()->setValue( i == model()->value() );
 		++i;
 	}
 }
