@@ -722,10 +722,7 @@ PatternView::~PatternView()
 
 void PatternView::update()
 {
-	if( fixedTCOs() )
-	{
-		m_pat->changeLength( m_pat->length() );
-	}
+	m_pat->changeLength( m_pat->length() );
 	
 	if ( m_pat->m_patternType == Pattern::BeatPattern )
 	{
