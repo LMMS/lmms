@@ -541,8 +541,15 @@ TimeLine {
 }
 
 TimeLineWidget {
-	font-size: 1em;
-	min-height: 1.25em;
+	/* font-size only supports px and pt. */
+	font-size: 7pt;
+	/* lengths also support em. This will make sure that the height
+	   will always change in the same proportion as the font size
+	   defined above.
+	   If you want a fixed size set min and max to the same value. */
+	min-height: 1.5em;
+	max-height: 1.5em;
+
 	qproperty-inactiveLoopColor: rgba( 255, 255, 255, 32 );
 	qproperty-activeLoopColor: rgba( 255, 255, 255, 64 );
 	qproperty-barLineColor: rgb( 192, 192, 192 );
