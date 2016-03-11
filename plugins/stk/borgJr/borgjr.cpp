@@ -236,7 +236,7 @@ borgjrInstrumentView::borgjrInstrumentView( borgjrInstrument * _instrument,
 	m_FMSynthWidget->move( 0,0 );
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 140, 50, 99, 22 );
+	m_presetsCombo->setGeometry( 150, 100, 90, 22 );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
@@ -244,32 +244,32 @@ borgjrInstrumentView::borgjrInstrumentView( borgjrInstrument * _instrument,
 
 	m_modulatorKnob = new Knob( knobVintage_32, this );
 	m_modulatorKnob->setLabel( tr( "Modulator 1" ) );
-	m_modulatorKnob->move( 30, 90 );
+	m_modulatorKnob->move( 30, 136 );
 	m_modulatorKnob->setHintText( tr( "Modulator 1:" ), "" );
 
 	m_crossfadeKnob = new Knob( knobVintage_32, this );
 	m_crossfadeKnob->setLabel( tr( "Modulator 2" ) );
-	m_crossfadeKnob->move( 110, 90 );
+	m_crossfadeKnob->move( 110, 136 );
 	m_crossfadeKnob->setHintText( tr( "Modulator 2:" ), "" );
 	
 	m_lfoSpeedKnob = new Knob( knobVintage_32, this );
 	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
-	m_lfoSpeedKnob->move( 30, 140 );
+	m_lfoSpeedKnob->move( 30, 186 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ), "" );
 	
 	m_lfoDepthKnob = new Knob( knobVintage_32, this );
 	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
-	m_lfoDepthKnob->move( 110, 140 );
+	m_lfoDepthKnob->move( 110, 186 );
 	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ), "" );
 	
 	m_adsrKnob = new Knob( knobVintage_32, this );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
-	m_adsrKnob->move( 190, 90 );
+	m_adsrKnob->move( 190, 136 );
 	m_adsrKnob->setHintText( tr( "ADSR:" ), "" );
 
 	m_spreadKnob = new Knob( knobVintage_32, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
-	m_spreadKnob->move( 190, 140 );
+	m_spreadKnob->move( 190, 186 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
 
 	// try to inform user about missing Stk-installation
