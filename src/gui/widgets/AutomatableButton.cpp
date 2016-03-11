@@ -236,7 +236,7 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 					m_buttons.indexOf( _btn ) != -1 )
 	{
 		model()->setValue( m_buttons.indexOf( _btn ) );
-		foreach( AutomatableButton * btn, m_buttons )
+		for( AutomatableButton * btn : m_buttons )
 		{
 			btn->update();
 		}
@@ -261,7 +261,7 @@ void automatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
-	foreach( AutomatableButton * btn, m_buttons )
+	for( AutomatableButton * btn : m_buttons )
 	{
 		btn->model()->setValue( i == model()->value() );
 		++i;

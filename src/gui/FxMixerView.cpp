@@ -420,7 +420,7 @@ void FxMixerView::deleteUnusedChannels()
 	{
 		// check if an instrument references to the current channel
 		bool empty=true;
-		foreach( Track* t, tracks )
+		for( Track* t : tracks )
 		{
 			if( t->type() == Track::InstrumentTrack )
 			{

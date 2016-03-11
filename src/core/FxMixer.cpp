@@ -87,7 +87,7 @@ FxChannel::~FxChannel()
 
 inline void FxChannel::processed()
 {
-	foreach( FxRoute * receiverRoute, m_sends )
+	for( const FxRoute * receiverRoute : m_sends )
 	{
 		if( receiverRoute->receiver()->m_muted == false )
 		{
@@ -121,7 +121,7 @@ void FxChannel::doProcessing()
 
 	if( m_muted == false )
 	{
-		foreach( FxRoute * senderRoute, m_receives )
+		for( FxRoute * senderRoute : m_receives )
 		{
 			FxChannel * sender = senderRoute->sender();
 			FloatModel * sendModel = senderRoute->amount();
@@ -293,7 +293,7 @@ void FxMixer::deleteChannel( int index )
 	tracks += Engine::getSong()->tracks();
 	tracks += Engine::getBBTrackContainer()->tracks();
 
-	foreach( Track* t, tracks )
+	for( Track* t : tracks )
 	{
 		if( t->type() == Track::InstrumentTrack )
 		{
@@ -335,11 +335,11 @@ void FxMixer::deleteChannel( int index )
 		m_fxChannels[i]->m_channelIndex = i;
 
 		// now check all routes and update names of the send models
-		foreach( FxRoute * r, m_fxChannels[i]->m_sends )
+		for( FxRoute * r : m_fxChannels[i]->m_sends )
 		{
 			r->updateName();
 		}
-		foreach( FxRoute * r, m_fxChannels[i]->m_receives )
+		for( FxRoute * r : m_fxChannels[i]->m_receives )
 		{
 			r->updateName();
 		}
@@ -528,7 +528,7 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 	const FxChannel * from = m_fxChannels[fromChannel];
 	const FxChannel * to = m_fxChannels[toChannel];
 
-	foreach( FxRoute * route, from->m_sends )
+	for( FxRoute * route : from->m_sends )
 	{
 		if( route->receiver() == to )
 		{
@@ -578,7 +578,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
 		// their recipients right away.
 		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
-		foreach( FxChannel * ch, m_fxChannels )
+		for( FxChannel * ch : m_fxChannels )
 		{
 			ch->m_muted = ch->m_muteModel.value();
 			if( ch->m_muted ) // instantly "process" muted channels

@@ -145,7 +145,7 @@ MainWindow::MainWindow() :
 
 #if ! defined(LMMS_BUILD_APPLE)
 	QFileInfoList drives = QDir::drives();
-	foreach( const QFileInfo & drive, drives )
+	for( const QFileInfo & drive : drives )
 	{
 		root_paths += drive.absolutePath();
 	}
@@ -602,7 +602,7 @@ void MainWindow::finalize()
 	gui->songEditor()->parentWidget()->show();
 
 	// reset window title every time we change the state of a subwindow to show the correct title
-	foreach( QMdiSubWindow * subWindow, workspace()->subWindowList() )
+	for( const QMdiSubWindow * subWindow : workspace()->subWindowList() )
 	{
 		connect( subWindow, SIGNAL( windowStateChanged(Qt::WindowStates,Qt::WindowStates) ), this, SLOT( resetWindowTitle() ) );
 	}
