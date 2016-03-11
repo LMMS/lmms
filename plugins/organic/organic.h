@@ -39,6 +39,7 @@ class Knob;
 class NotePlayHandle;
 class PixmapButton;
 
+const int NUM_OSCILLATORS = 8;
 const int NUM_HARMONICS = 18;
 const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
 	"Octave below",
@@ -153,8 +154,8 @@ private:
 		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
-		float * phaseOffsetLeft;
-		float * phaseOffsetRight;		
+		float phaseOffsetLeft[NUM_OSCILLATORS];
+		float phaseOffsetRight[NUM_OSCILLATORS];		
 	} ;
 
 	const IntModel m_modulationAlgo;
