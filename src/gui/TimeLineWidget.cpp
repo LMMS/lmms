@@ -234,6 +234,11 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 
 	// Draw the bar lines and numbers
+	// Activate hinting on the font
+	QFont font = p.font();
+	font.setHintingPreference( QFont::PreferFullHinting );
+	p.setFont(font);
+
 	QColor const & barLineColor = getBarLineColor();
 	QColor const & barNumberColor = getBarNumberColor();
 
