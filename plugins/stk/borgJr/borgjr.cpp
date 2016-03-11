@@ -236,7 +236,7 @@ borgjrInstrumentView::borgjrInstrumentView( borgjrInstrument * _instrument,
 	m_FMSynthWidget->move( 0,0 );
 
 	m_presetsCombo = new ComboBox( this, tr( "Instrument" ) );
-	m_presetsCombo->setGeometry( 150, 100, 90, 22 );
+	m_presetsCombo->setGeometry( 140, 100, 96, 22 );
 	m_presetsCombo->setFont( pointSize<8>( m_presetsCombo->font() ) );
 
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
