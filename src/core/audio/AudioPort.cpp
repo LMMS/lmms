@@ -116,17 +116,18 @@ void AudioPort::doProcessing()
 	BufferManager::clear( m_portBuffer, fpp );
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
-	foreach( PlayHandle * ph, m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
+	// now we mix all playhandle buffers into the audioport buffer
+	for( PlayHandleList::const_iterator it = m_playHandles.constBegin(); it != m_playHandles.constEnd(); ++it )
 	{
-		if( ph->buffer() )
+		if( ( *it )->buffer() )
 		{
-			if( ph->usesBuffer() )
+			if( ( *it )->usesBuffer() )
 			{
 				m_bufferUsage = true;
-				MixHelpers::add( m_portBuffer, ph->buffer(), fpp );
+				MixHelpers::add( m_portBuffer, ( *it )->buffer(), fpp );
 			}
-			ph->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
-									// pointer to null, so if it doesn't get re-acquired we know to skip it next time
+			( *it )->releaseBuffer(); 	// gets rid of playhandle's buffer and sets
+										// pointer to null, so if it doesn't get re-acquired we know to skip it next time
 		}
 	}
 

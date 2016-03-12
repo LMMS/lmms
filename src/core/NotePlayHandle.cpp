@@ -301,17 +301,6 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		}
 	}
 
-	// play sub-notes (e.g. chords)
-	// handled by mixer now
-/*	foreach( NotePlayHandle * n, m_subNotes )
-	{
-		n->play( _working_buffer );
-		if( n->isFinished() )
-		{
-			NotePlayHandleManager::release( n );
-		}
-	}*/
-
 	// update internal data
 	m_totalFramesPlayed += framesThisPeriod;
 	unlock();
@@ -369,11 +358,11 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_released = true;
 
 	// first note-off all sub-notes
-	foreach( NotePlayHandle * n, m_subNotes )
+	for( NotePlayHandleList::const_iterator it = m_subNotes.constBegin(); it != m_subNotes.constEnd(); ++it )
 	{
-		n->lock();
-		n->noteOff( _s );
-		n->unlock();
+		( *it )->lock();
+		( *it )->noteOff( _s );
+		( *it )->unlock();
 	}
 
 	// then set some variables indicating release-state

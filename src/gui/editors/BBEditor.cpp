@@ -220,9 +220,10 @@ void BBTrackContainerView::addAutomationTrack()
 
 void BBTrackContainerView::removeBBView(int bb)
 {
-	foreach( TrackView* view, trackViews() )
+	QList<TrackView *> tvs = trackViews();
+	for( QList<TrackView *>::const_iterator it = tvs.constBegin(); it != tvs.constEnd(); ++it )
 	{
-		view->getTrackContentWidget()->removeTCOView( bb );
+		( *it )->getTrackContentWidget()->removeTCOView( bb );
 	}
 }
 

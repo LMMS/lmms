@@ -39,9 +39,9 @@ void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
 void ComboBoxModel::clear()
 {
 	setRange( 0, 0 );
-	foreach( const Item& i, m_items )
+	for( QVector<Item>::const_iterator it = m_items.constBegin(); it != m_items.constEnd(); ++it )
 	{
-		delete i.second;
+		delete ( *it ).second;
 	}
 
 	m_items.clear();

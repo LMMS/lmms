@@ -216,11 +216,12 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
             subLayout->setSpacing( 0 );
             m_currentSelection.desc->subPluginFeatures->
                 fillDescriptionWidget( subWidget, &m_currentSelection );
-            foreach( QWidget * w, subWidget->findChildren<QWidget *>() )
+            QList<QWidget *> subChildren = subWidget->findChildren<QWidget *>();
+            for( QList<QWidget *>::const_iterator it = subChildren.constBegin(); it != subChildren.constEnd(); ++it )
             {
-                if( w->parent() == subWidget )
+                if( ( *it )->parent() == subWidget )
                 {
-                    subLayout->addWidget( w );
+                    subLayout->addWidget( *it );
                 }
             }
 

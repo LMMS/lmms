@@ -450,9 +450,9 @@ void AutomatableModel::unlinkModels( AutomatableModel* model1, AutomatableModel*
 
 void AutomatableModel::unlinkAllModels()
 {
-	foreach( AutomatableModel* model, m_linkedModels )
+	for( AutoModelVector::const_iterator it = m_linkedModels.constBegin(); it != m_linkedModels.constEnd(); ++it )
 	{
-		unlinkModels( this, model );
+		unlinkModels( this, *it );
 	}
 
 	m_hasLinkedModels = false;
