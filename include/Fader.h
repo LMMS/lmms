@@ -63,6 +63,8 @@ class EXPORT Fader : public QWidget, public FloatModelView
 public:
 	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
 	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
+	Q_PROPERTY( bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS )
+
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
 	virtual ~Fader();
@@ -73,15 +75,26 @@ public:
 	void setPeak_R( float fPeak );
 	float getPeak_R() {	return m_fPeakValue_R;	}
 
-	QColor peakGreen() const;
-	QColor peakRed() const;
+	inline float getMinPeak() const { return m_fMinPeak; }
+	inline void setMinPeak(float minPeak) { m_fMinPeak = minPeak; }
+
+	inline float getMaxPeak() const { return m_fMaxPeak; }
+	inline void setMaxPeak(float maxPeak) { m_fMaxPeak = maxPeak; }
+
+	QColor const & peakGreen() const;
 	void setPeakGreen( const QColor & c );
+
+	QColor const & peakRed() const;
 	void setPeakRed( const QColor & c );
+
+	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
+	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
 	
 	void setDisplayConversion( bool b )
 	{
 		m_displayConversion = b;
 	}
+
 	inline void setHintText( const QString & _txt_before,
 						const QString & _txt_after )
 	{
@@ -98,6 +111,11 @@ private:
 	virtual void wheelEvent( QWheelEvent *ev );
 	virtual void paintEvent( QPaintEvent *ev );
 
+	inline bool clips(float const & value) const { return value > 1.0f; }
+
+	void paintDBFSLevels(QPaintEvent *ev, QPainter & painter);
+	void paintLinearLevels(QPaintEvent *ev, QPainter & painter);
+
 	int knobPosY() const
 	{
 		float fRange = model()->maxValue() - model()->minValue();
@@ -109,12 +127,16 @@ private:
 	void setPeak( float fPeak, float &targetPeak, float &persistentPeak, QTime &lastPeakTime );
 	int calculateDisplayPeak( float fPeak );
 
+	void updateTextFloat();
+
+	// Private members
+private:
 	float m_fPeakValue_L;
 	float m_fPeakValue_R;
 	float m_persistentPeak_L;
 	float m_persistentPeak_R;
-	const float m_fMinPeak;
-	const float m_fMaxPeak;
+	float m_fMinPeak;
+	float m_fMaxPeak;
 
 	QTime m_lastPeakTime_L;
 	QTime m_lastPeakTime_R;
@@ -128,12 +150,12 @@ private:
 	QPixmap * m_knob;
 	
 	bool m_displayConversion;
+	bool m_levelsDisplayedInDBFS;
 
 	int m_moveStartPoint;
 	float m_startValue;
 
 	static TextFloat * s_textFloat;
-	void updateTextFloat();
 
 	QColor m_peakGreen;
 	QColor m_peakRed;
