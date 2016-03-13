@@ -102,13 +102,7 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_leds = s_leds;
 	m_knob = s_knob;
 
-	setWindowTitle( _name );
-	setAttribute( Qt::WA_OpaquePaintEvent, false );
-	setMinimumSize( 23, 116 );
-	setMaximumSize( 23, 116);
-	resize( 23, 116 );
-	setModel( _model );
-	setHintText( "Volume:","%");
+	init(_model, _name);
 }
 
 
@@ -137,13 +131,7 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	m_leds = leds;
 	m_knob = knob;
 
-	setWindowTitle( name );
-	setAttribute( Qt::WA_OpaquePaintEvent, false );
-	setMinimumSize( m_back->width(), m_back->height() );
-	setMaximumSize( m_back->width(), m_back->height() );
-	resize( m_back->width(), m_back->height() );
-	setModel( model );
-	setHintText( "Volume:","%");
+	init(model, name);
 }
 
 
@@ -151,6 +139,18 @@ Fader::~Fader()
 {
 }
 
+
+void Fader::init(FloatModel * model, QString const & name)
+{
+	setWindowTitle( name );
+	setAttribute( Qt::WA_OpaquePaintEvent, false );
+	QSize backgroundSize = m_back->size();
+	setMinimumSize( backgroundSize );
+	setMaximumSize( backgroundSize );
+	resize( backgroundSize );
+	setModel( model );
+	setHintText( "Volume:","%");
+}
 
 
 
