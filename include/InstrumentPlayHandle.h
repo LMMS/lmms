@@ -56,13 +56,13 @@ public:
 		do
 		{
 			nphsLeft = false;
-			foreach( const NotePlayHandle * cnph, nphv )
+			for( const NotePlayHandle * constNotePlayHandle : nphv )
 			{
-				NotePlayHandle * nph = const_cast<NotePlayHandle *>( cnph );
-				if( nph->state() != ThreadableJob::Done && ! nph->isFinished() )
+				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
+				if( notePlayHandle->state() != ThreadableJob::Done && ! notePlayHandle->isFinished() )
 				{
 					nphsLeft = true;
-					nph->process();
+					notePlayHandle->process();
 				}
 			}
 		}

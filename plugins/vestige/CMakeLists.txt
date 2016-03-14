@@ -1,4 +1,7 @@
 IF(LMMS_SUPPORT_VST)
+   # Enable C++11
+   ADD_DEFINITIONS(-std=c++0x)
+
    INCLUDE(BuildPlugin)
    INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../vst_base")
    LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/../vst_base")

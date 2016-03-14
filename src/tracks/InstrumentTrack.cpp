@@ -949,7 +949,7 @@ InstrumentTrackView::~InstrumentTrackView()
 InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = NULL;
-	foreach( QMdiSubWindow * sw,
+	for( const QMdiSubWindow * sw :
 				gui->mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{

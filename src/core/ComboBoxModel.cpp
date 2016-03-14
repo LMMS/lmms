@@ -39,7 +39,7 @@ void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
 void ComboBoxModel::clear()
 {
 	setRange( 0, 0 );
-	foreach( const Item& i, m_items )
+	for( const Item& i : m_items )
 	{
 		delete i.second;
 	}

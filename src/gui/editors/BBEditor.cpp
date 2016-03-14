@@ -220,7 +220,7 @@ void BBTrackContainerView::addAutomationTrack()
 
 void BBTrackContainerView::removeBBView(int bb)
 {
-	foreach( TrackView* view, trackViews() )
+	for( TrackView* view : trackViews() )
 	{
 		view->getTrackContentWidget()->removeTCOView( bb );
 	}
