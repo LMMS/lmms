@@ -68,7 +68,6 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
-	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
 	m_dependenciesMet( 0 )
@@ -284,7 +283,8 @@ void FxMixer::toggledSolo()
 
 void FxMixer::deleteChannel( int index )
 {
-	m_fxChannels[index]->m_lock.lock();
+	// lock the mixer so channel deletion is performed between mixer rounds
+	Engine::mixer()->lock();
 
 	FxChannel * ch = m_fxChannels[index];
 
@@ -344,6 +344,8 @@ void FxMixer::deleteChannel( int index )
 			r->updateName();
 		}
 	}
+
+	Engine::mixer()->unlock();
 }
 
 
@@ -543,15 +545,10 @@ FloatModel * FxMixer::channelSendModel( fx_ch_t fromChannel, fx_ch_t toChannel )
 
 void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
-	// The first check is for the case where the last fxchannel was deleted but
-	// there was a race condition where it had to be processed.
-	if( _ch < m_fxChannels.size() &&
-			m_fxChannels[_ch]->m_muteModel.value() == false )
+	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
-		m_fxChannels[_ch]->m_lock.lock();
 		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::mixer()->framesPerPeriod() );
 		m_fxChannels[_ch]->m_hasInput = true;
-		m_fxChannels[_ch]->m_lock.unlock();
 	}
 }
 

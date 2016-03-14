@@ -227,6 +227,7 @@ protected slots:
 	void updateBaseNote();
 	void updatePitch();
 	void updatePitchRange();
+	void updateEffectChannel();
 
 
 private:
