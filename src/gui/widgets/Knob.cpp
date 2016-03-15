@@ -111,8 +111,27 @@ void Knob::onKnobNumUpdated()
 {
 	if( m_knobNum != knobStyled )
 	{
-		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
-			QString::number( m_knobNum + 1 ) ).toUtf8().constData() ) );
+		QString knobFilename;
+		switch (m_knobNum)
+		{
+		case knobDark_28:
+			knobFilename = "knob01";
+			break;
+		case knobBright_26:
+			knobFilename = "knob02";
+			break;
+		case knobSmall_17:
+			knobFilename = "knob03";
+			break;
+		case knobVintage_32:
+			knobFilename = "knob05";
+			break;
+		case knobStyled: // only here to stop the compiler from complaining
+			break;
+		}
+
+		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
+		m_knobPixmap = new QPixmap( embed::getIconPixmap( knobFilename.toUtf8().constData() ) );
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
@@ -429,13 +448,6 @@ void Knob::drawKnob( QPainter * _p )
 			QLineF ln = calculateLine( mid, re, rb );
 			ln.translate( 1, 1 );
 			p.drawLine( ln );
-			break;
-		}
-		case knobGreen_17:
-		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText), 2 ) );
-			p.drawLine( calculateLine( mid, radius ) );
 			break;
 		}
 		case knobVintage_32:
