@@ -1,4 +1,7 @@
 if(LMMS_HAVE_CARLA)
+        # Enable C++11
+        ADD_DEFINITIONS(-std=c++0x)
+
         INCLUDE(BuildPlugin)
         INCLUDE_DIRECTORIES(${CARLA_INCLUDE_DIRS})
         LINK_DIRECTORIES(${CARLA_LIBRARY_DIRS})
