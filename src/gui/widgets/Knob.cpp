@@ -101,6 +101,28 @@ void Knob::initUi( const QString & _name )
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
 	setFocusPolicy( Qt::ClickFocus );
+
+	// This is a workaround to enable style sheets for knobs which are not styled knobs.
+	//
+	// It works as follows: the palette colors that are assigned as the line color previously
+	// had been hard coded in the drawKnob method for the different knob types. Now the
+	// drawKnob method uses the line color to draw the lines. By assigning the palette colors
+	// as the line colors here the knob lines will be drawn in this color unless the stylesheet
+	// overrides that color.
+	switch (knobNum())
+	{
+	case knobSmall_17:
+	case knobBright_26:
+	case knobDark_28:
+		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText ));
+		break;
+	case knobVintage_32:
+		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
+		break;
+	default:
+		break;
+	}
+
 	doConnections();
 }
 
@@ -428,20 +450,19 @@ void Knob::drawKnob( QPainter * _p )
 	{
 		case knobSmall_17:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
@@ -452,8 +473,7 @@ void Knob::drawKnob( QPainter * _p )
 		}
 		case knobVintage_32:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}

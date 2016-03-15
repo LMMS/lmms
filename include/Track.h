@@ -54,7 +54,6 @@ class TrackContainerView;
 class TrackContentWidget;
 class TrackView;
 
-typedef QWidget trackSettingsWidget;
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
 const int TRACK_OP_WIDTH = 78;
@@ -640,7 +639,7 @@ public:
 		return &m_trackOperationsWidget;
 	}
 
-	inline trackSettingsWidget * getTrackSettingsWidget()
+	inline QWidget * getTrackSettingsWidget()
 	{
 		return &m_trackSettingsWidget;
 	}
@@ -703,7 +702,7 @@ private:
 	TrackContainerView * m_trackContainerView;
 
 	TrackOperationsWidget m_trackOperationsWidget;
-	trackSettingsWidget m_trackSettingsWidget;
+	QWidget m_trackSettingsWidget;
 	TrackContentWidget m_trackContentWidget;
 
 	Actions m_action;
