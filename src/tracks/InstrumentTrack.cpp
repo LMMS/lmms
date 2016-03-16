@@ -1191,9 +1191,9 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
-	for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
+	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
+		FxChannel * currentChannel = Engine::fxMixer()->effectChannel( i );
 
 		if ( currentChannel != fxChannel )
 		{
