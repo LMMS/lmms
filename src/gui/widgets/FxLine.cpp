@@ -152,7 +152,11 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 	// draw the channel name
 	if( m_staticTextName.text() != name )
 	{
-		m_staticTextName.setText( name );
+		// elide the name of the fxLine when its too long
+		const int maxTextHeight = 78;
+		QFontMetrics metrics( fxLine->font() );
+		QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
+		m_staticTextName.setText( elidedName );
 	}
 	p->rotate( -90 );
 
