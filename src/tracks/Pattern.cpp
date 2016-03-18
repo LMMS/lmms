@@ -1147,6 +1147,14 @@ void PatternView::paintEvent( QPaintEvent * )
 				p.drawPixmap( x, y, stepoff );
 			}
 		} // end for loop
+		
+		// draw a transparent rectangle over muted patterns
+		if ( muted )
+		{
+			p.setBrush( mutedBackgroundColor() );
+			p.setOpacity( 0.3 );
+			p.drawRect( 0, 0, width(), height() );
+		}
 	}
 	
 	// bar lines
