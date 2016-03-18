@@ -38,7 +38,7 @@
 
 static inline QString ensureTrailingSlash( const QString & s )
 {
-	if(s.at(s.length()-1) != '/')
+	if( ! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\') )
 	{
 		return s + '/';
 	}
