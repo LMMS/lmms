@@ -24,6 +24,10 @@
 #define PLATFORM "OS X"
 #endif
 
+#ifdef LMMS_BUILD_OPENBSD
+#define PLATFORM "OpenBSD"
+#endif
+
 #ifdef LMMS_BUILD_WIN32
 #define PLATFORM "win32"
 #endif
