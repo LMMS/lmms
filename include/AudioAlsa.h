@@ -99,6 +99,9 @@ private:
 
 	bool m_convertEndian;
 
+	bool m_stopped;
+	bool m_quit;
+
 } ;
 
 #endif
