@@ -209,7 +209,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 		try
 		{
-			m_instance = new GigInstance( _gigFile );
+			m_instance = new GigInstance( SampleBuffer::tryToMakeAbsolute( _gigFile ) );
 			m_filename = SampleBuffer::tryToMakeRelative( _gigFile );
 		}
 		catch( ... )
@@ -1067,18 +1067,7 @@ void GigInstrumentView::showFileDialog()
 	QString dir;
 	if( k->m_filename != "" )
 	{
-		QString f = k->m_filename;
-
-		if( QFileInfo( f ).isRelative() )
-		{
-			f = ConfigManager::inst()->gigDir() + f;
-
-			if( QFileInfo( f ).exists() == false )
-			{
-				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
-			}
-		}
-
+		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
