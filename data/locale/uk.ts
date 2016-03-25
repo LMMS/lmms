@@ -436,16 +436,16 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Кубічна Ермітова прогресія для цього шаблону автоматизації. Кількість приєднаних об&apos;єктів зміниться по згладженій кривій і пом&apos;якшиться на піках і спадах.</translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Вирізати вибрані ноти (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation>Вирізати вибрані ноти (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Копіювати вибрані ноти до буферу (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation>Копіювати вибрані ноти до буферу (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard (Ctrl+V)</source>
-        <translation>Вставити значення з буферу (Ctrl+V)</translation>
+        <source>Paste values from clipboard (%1+V)</source>
+        <translation>Вставити значення з буферу (%1+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -499,8 +499,8 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Тягніть контроль утримуючи &lt;Ctrl&gt;</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>Тягніть контроль утримуючи &lt;%1&gt;</translation>
     </message>
 </context>
 <context>
@@ -2974,7 +2974,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>СВОЯ БАЗОВА ШВИДКІСТЬ</translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation>Визначає базову швидкість нормальізаціі для MiDi інструментів при гучності ноти 100%</translation>
     </message>
     <message>
@@ -5186,7 +5186,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Видалити такти</translation>
     </message>
     <message>
-        <source>use mouse wheel to set volume of a step</source>
+        <source>use mouse wheel to set velocity of a step</source>
         <translation>використовуйте колесо миші для встановлення кроку гучності</translation>
     </message>
 </context>
@@ -5318,7 +5318,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Стереофонія нот</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Гучність нот</translation>
     </message>
     <message>
@@ -5350,7 +5350,7 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Відкрийте шаблон за допомогою подвійного клацання мишею!</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation>Гучність %1%</translation>
     </message>
     <message>
@@ -5430,33 +5430,33 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Режим підлаштовування (Shift+T)</translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation>Режим малювання нот, в ньому ви можете додавати/переміщати і змінювати тривалість одиночних нот. Це режим за замовчуванням і використовується більшу частину часу.
-Для включення цього режиму можна скористатися комбінацією клавіш Shift+D, утримуйте Ctrl для тимчасового перемикання в режим вибору.</translation>
+Для включення цього режиму можна скористатися комбінацією клавіш Shift+D, утримуйте %1 для тимчасового перемикання в режим вибору.</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation>Режим стирання. У цьому режимі ви можете стирати ноти. Для увімкнення цього режиму можна скористатися комбінацією клавіш Shift+E.</translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation>Режим виділення. У цьому режимі можна виділяти ноти, також можна утримувати Ctrl в режимі малювання, щоб на час увійти в режим виділення.</translation>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
+        <translation>Режим виділення. У цьому режимі можна виділяти ноти, також можна утримувати %1 в режимі малювання, щоб на час увійти в режим виділення.</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation>Режим підстроювання. У цьому режимі можна вибирати ноти для автоматизації їх підлаштування. Можна використовувати це для переходів нот від однієї до іншої. Для активації з клавіатури &lt;Shift+T&gt;.</translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation>Перемістити виділені ноти до буферу (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation>Перемістити виділені ноти до буферу (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation>Копіювати виділені ноти до буферу (Ctrl+X)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation>Копіювати виділені ноти до буферу (%1+X)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation>Вставити ноти з буферу (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation>Вставити ноти з буферу (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -5588,7 +5588,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;U Скасувати</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
+        <source>%1+Z</source>
         <translation></translation>
     </message>
     <message>
@@ -5596,7 +5596,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;R Повторити</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
+        <source>%1+Y</source>
         <translation></translation>
     </message>
     <message>
@@ -5604,7 +5604,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;C Копіювати</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
+        <source>%1+C</source>
         <translation></translation>
     </message>
     <message>
@@ -5612,7 +5612,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;t Вирізати</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
+        <source>%1+X</source>
         <translation></translation>
     </message>
     <message>
@@ -5620,7 +5620,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;P Вставити</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
+        <source>%1+V</source>
         <translation></translation>
     </message>
     <message>
@@ -5632,7 +5632,7 @@ Reason: &quot;%2&quot;</source>
         <translation>Напів&amp;жирний</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
+        <source>%1+B</source>
         <translation></translation>
     </message>
     <message>
@@ -5640,7 +5640,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;Курсив</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
+        <source>%1+I</source>
         <translation></translation>
     </message>
     <message>
@@ -5648,7 +5648,7 @@ Reason: &quot;%2&quot;</source>
         <translation>&amp;Підкреслити</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
+        <source>%1+U</source>
         <translation></translation>
     </message>
     <message>
@@ -5656,7 +5656,7 @@ Reason: &quot;%2&quot;</source>
         <translation>По &amp;лівому краю</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
+        <source>%1+L</source>
         <translation></translation>
     </message>
     <message>
@@ -5664,7 +5664,7 @@ Reason: &quot;%2&quot;</source>
         <translation>По &amp;центрі</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
+        <source>%1+E</source>
         <translation></translation>
     </message>
     <message>
@@ -5672,7 +5672,7 @@ Reason: &quot;%2&quot;</source>
         <translation>По &amp;правому краю</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
+        <source>%1+R</source>
         <translation></translation>
     </message>
     <message>
@@ -5680,7 +5680,7 @@ Reason: &quot;%2&quot;</source>
         <translation>По &amp;ширині</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
+        <source>%1+J</source>
         <translation></translation>
     </message>
     <message>
@@ -5831,8 +5831,8 @@ Reason: &quot;%2&quot;</source>
         <translation>Виберіть запис подвійним натисненням миші</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Заглушити/включити (&lt;Ctrl&gt; + середня кнопка миші)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>Заглушити/включити (&lt;%1&gt; + середня кнопка миші)</translation>
     </message>
 </context>
 <context>
@@ -6483,12 +6483,12 @@ Latency: %2 ms</source>
         <translation>Підказка</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation>Натисніть &lt;Ctrl&gt;, щоб прибрати прилипання точок циклу.</translation>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation>Натисніть &lt;%1&gt;, щоб прибрати прилипання точок циклу.</translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
-        <translation>Зажміть &lt;Shift&gt; щоб змістити початок точок циклу; Натисніть &lt;Ctrl&gt;, щоб прибрати прилипання точок циклу.</translation>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
+        <translation>Зажміть &lt;Shift&gt; щоб змістити початок точок циклу; Натисніть &lt;%1&gt;, щоб прибрати прилипання точок циклу.</translation>
     </message>
 </context>
 <context>
@@ -6563,16 +6563,16 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Підказка</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation>Натисніть &lt;Ctrl&gt; і перетягніть, щоб створити копію.</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation>Натисніть &lt;%1&gt; і перетягніть, щоб створити копію.</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation>Тривалість</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation>Для вільної зміни розміру натисніть &lt;Ctrl&gt;.</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation>Для вільної зміни розміру натисніть &lt;%1&gt;.</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6595,14 +6595,14 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Вставити</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation>Заглушити/включити (&lt;Ctrl&gt; + середня кнопка миші)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation>Заглушити/включити (&lt;%1&gt; + середня кнопка миші)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation>Затисніть &lt;Сtrl&gt; і натискайте мишку під час руху, щоб почати нову перезбірку.</translation>
     </message>
     <message>
@@ -6669,7 +6669,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Точне підстроювання лівого каналу осциллятора %1:</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулювати фазу осциллятора 3 сигналом з 2</translation>
     </message>
     <message>
@@ -6697,11 +6697,11 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Ця ручка встановлює фазове підстроювання осциллятора %1 між каналами, тобто різницю фаз між лівим і правим каналами. Це зручно для створення розширення стереоефектів.</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулювати частоту осциллятора 2 сигналом з 1</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулювати фазу осциллятора 2 сигналом з 1</translation>
     </message>
     <message>
@@ -6721,7 +6721,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Точна підстройка правого канала осциллятора %1:</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Модулювати амплітуду осциллятора 2 сигналом з 1</translation>
     </message>
     <message>
@@ -6737,7 +6737,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Використовувати білий шум для цього осциллятора.</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулювати частоту осциллятора 3 сигналом з 2</translation>
     </message>
     <message>
@@ -6769,7 +6769,7 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Ця ручка встановлює точне підстроювання для правого каналу осциллятора %1. Підстроювання задається в діапазоні від -100 сотих до +100 сотих. Це корисно для створення &quot;насичених&quot; звуків.</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Модулювати амплітуду осциллятора 3 сигналом з 2</translation>
     </message>
     <message>

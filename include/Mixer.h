@@ -224,7 +224,7 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( Track * _track, bool removeIPHs = true );
+	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
 
 	bool hasNotePlayHandles();
 
@@ -314,8 +314,7 @@ public:
 		m_playHandleRemovalMutex.unlock();
 	}
 
-	static float peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames );
-	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
+	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
 
 
 	bool criticalXRuns() const;

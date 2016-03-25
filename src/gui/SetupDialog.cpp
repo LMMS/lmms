@@ -38,6 +38,7 @@
 #include "TabWidget.h"
 #include "gui_templates.h"
 #include "Mixer.h"
+#include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "ConfigManager.h"
 #include "embed.h"
@@ -122,7 +123,10 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
+	m_enableAutoSave( ConfigManager::inst()->value(	"ui", "enableautosave" ).toInt() ),
+	m_saveInterval(	ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() < 1 ?
+					MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
+			ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() ),
 	m_oneInstrumentTrackWindow( ConfigManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
 	m_compactTrackButtons( ConfigManager::inst()->value( "ui",
@@ -141,6 +145,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
+	setFixedSize( 452, 520 );
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -412,8 +417,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathScroll->move( 0, 30 );
 	pathSelectors->resize( 360, pathsHeight - 50 );
 
-	const int txtLength = 285;
-	const int btnStart = 305;
+	const int txtLength = 284;
+	const int btnStart = 297;
 
 
 	// working-dir
@@ -654,16 +659,61 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * performance = new QWidget( ws );
-	performance->setFixedSize( 360, 240 );
+	performance->setFixedSize( 360, 200 );
 	QVBoxLayout * perf_layout = new QVBoxLayout( performance );
 	perf_layout->setSpacing( 0 );
 	perf_layout->setMargin( 0 );
 	labelWidget( performance, tr( "Performance settings" ) );
 
+
+	TabWidget * auto_save_tw = new TabWidget(
+			tr( "Auto save" ).toUpper(), performance );
+	auto_save_tw->setFixedHeight( 100 );
+
+	m_saveIntervalSlider = new QSlider( Qt::Horizontal, auto_save_tw );
+	m_saveIntervalSlider->setRange( 1, 20 );
+	m_saveIntervalSlider->setTickPosition( QSlider::TicksBelow );
+	m_saveIntervalSlider->setPageStep( 1 );
+	m_saveIntervalSlider->setTickInterval( 1 );
+	m_saveIntervalSlider->setGeometry( 10, 16, 340, 18 );
+	m_saveIntervalSlider->setValue( m_saveInterval );
+
+	connect( m_saveIntervalSlider, SIGNAL( valueChanged( int ) ), this,
+						SLOT( setAutoSaveInterval( int ) ) );
+
+	m_saveIntervalLbl = new QLabel( auto_save_tw );
+	m_saveIntervalLbl->setGeometry( 10, 40, 200, 24 );
+	setAutoSaveInterval( m_saveIntervalSlider->value() );
+
+	LedCheckBox * autoSave = new LedCheckBox(
+			tr( "Enable auto save feature" ), auto_save_tw );
+	autoSave->move( 10, 70 );
+	autoSave->setChecked( m_enableAutoSave );
+	connect( autoSave, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleAutoSave( bool ) ) );
+	if( ! m_enableAutoSave ){ m_saveIntervalSlider->setEnabled( false ); }
+
+	QPushButton * saveIntervalResetBtn = new QPushButton(
+			embed::getIconPixmap( "reload" ), "", auto_save_tw );
+	saveIntervalResetBtn->setGeometry( 290, 50, 28, 28 );
+	connect( saveIntervalResetBtn, SIGNAL( clicked() ), this,
+						SLOT( resetAutoSaveInterval() ) );
+	ToolTip::add( bufsize_reset_btn, tr( "Reset to default-value" ) );
+
+	QPushButton * saventervalBtn = new QPushButton(
+			embed::getIconPixmap( "help" ), "", auto_save_tw );
+	saventervalBtn->setGeometry( 320, 50, 28, 28 );
+	connect( saventervalBtn, SIGNAL( clicked() ), this,
+						SLOT( displaySaveIntervalHelp() ) );
+
+	perf_layout->addWidget( auto_save_tw );
+	perf_layout->addSpacing( 10 );
+
+
 	TabWidget * ui_fx_tw = new TabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 80 );
+	ui_fx_tw->setFixedHeight( 70 );
 
 	LedCheckBox * smoothScroll = new LedCheckBox(
 			tr( "Smooth scroll in Song Editor" ), ui_fx_tw );
@@ -672,19 +722,10 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( smoothScroll, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSmoothScroll( bool ) ) );
 
-
-	LedCheckBox * autoSave = new LedCheckBox(
-			tr( "Enable auto save feature" ), ui_fx_tw );
-	autoSave->move( 10, 40 );
-	autoSave->setChecked( m_enableAutoSave );
-	connect( autoSave, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleAutoSave( bool ) ) );
-
-
 	LedCheckBox * animAFP = new LedCheckBox(
 				tr( "Show playback cursor in AudioFileProcessor" ),
 								ui_fx_tw );
-	animAFP->move( 10, 60 );
+	animAFP->move( 10, 40 );
 	animAFP->setChecked( m_animateAFP );
 	connect( animAFP, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAnimateAFP( bool ) ) );
@@ -991,6 +1032,8 @@ void SetupDialog::accept()
 					QString::number( m_smoothScroll ) );
 	ConfigManager::inst()->setValue( "ui", "enableautosave",
 					QString::number( m_enableAutoSave ) );
+	ConfigManager::inst()->setValue( "ui", "saveinterval",
+					QString::number( m_saveInterval ) );
 	ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	ConfigManager::inst()->setValue( "ui", "compacttrackbuttons",
@@ -1008,18 +1051,18 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 
 
-	ConfigManager::inst()->setWorkingDir( m_workingDir );
-	ConfigManager::inst()->setVSTDir( m_vstDir );
-	ConfigManager::inst()->setGIGDir( m_gigDir );
-	ConfigManager::inst()->setSF2Dir( m_sf2Dir );
-	ConfigManager::inst()->setArtworkDir( m_artworkDir );
-	ConfigManager::inst()->setFLDir( m_flDir );
-	ConfigManager::inst()->setLADSPADir( m_ladDir );
+	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
+	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
+	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
+	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
+	ConfigManager::inst()->setArtworkDir(QDir::fromNativeSeparators(m_artworkDir));
+	ConfigManager::inst()->setFLDir(QDir::fromNativeSeparators(m_flDir));
+	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
 #endif
 #ifdef LMMS_HAVE_STK
-	ConfigManager::inst()->setSTKDir( m_stkDir );
+	ConfigManager::inst()->setSTKDir(QDir::fromNativeSeparators(m_stkDir));
 #endif	
 	ConfigManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
 
@@ -1174,6 +1217,7 @@ void SetupDialog::toggleSmoothScroll( bool _enabled )
 void SetupDialog::toggleAutoSave( bool _enabled )
 {
 	m_enableAutoSave = _enabled;
+	m_saveIntervalSlider->setEnabled( _enabled );
 }
 
 
@@ -1476,6 +1520,41 @@ void SetupDialog::setBackgroundArtwork( const QString & _ba )
 
 
 
+void SetupDialog::setAutoSaveInterval( int value )
+{
+	m_saveInterval = value;
+	m_saveIntervalSlider->setValue( m_saveInterval );
+	QString minutes = m_saveInterval > 1 ? tr( "minutes" ) : tr( "minute" );
+	m_saveIntervalLbl->setText( tr( "Auto save interval: %1 %2" ).arg(
+				 QString::number( m_saveInterval ), minutes ) );
+}
+
+
+
+
+void SetupDialog::resetAutoSaveInterval()
+{
+	if( m_enableAutoSave )
+	{
+		setAutoSaveInterval( MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES );
+	}
+
+}
+
+
+
+
+void SetupDialog::displaySaveIntervalHelp()
+{
+	QWhatsThis::showText( QCursor::pos(),
+			tr( "Set the time between automatic backup to %1.\n"
+			"Remember to also save your project manually." ).arg(
+			ConfigManager::inst()->recoveryFile() ) );
+}
+
+
+
+
 void SetupDialog::audioInterfaceChanged( const QString & _iface )
 {
 	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
@@ -1532,7 +1611,3 @@ void SetupDialog::displayMIDIHelp()
 					"controls to setup the selected "
 					"MIDI-interface." ) );
 }
-
-
-
-

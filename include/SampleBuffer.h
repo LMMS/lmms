@@ -253,7 +253,7 @@ public:
 	}
 
 	static QString tryToMakeRelative( const QString & _file );
-	static QString tryToMakeAbsolute( const QString & _file );
+	static QString tryToMakeAbsolute(const QString & file);
 
 
 public slots:

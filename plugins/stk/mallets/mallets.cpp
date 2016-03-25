@@ -79,8 +79,7 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_presetsModel(this),
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
-		!QFileInfo( ConfigManager::inst()->stkDir() + QDir::separator()
-						+ "sinewave.raw" ).exists() )
+		!QFileInfo( ConfigManager::inst()->stkDir() + "/sinewave.raw" ).exists() )
 {
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
@@ -533,7 +532,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
+		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
 	
 		m_voice = new ModalBar();
@@ -580,7 +579,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
+		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
 	
 		m_voice = new TubeBell();
@@ -625,7 +624,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( ConfigManager::inst()->stkDir()
+		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
 
 		m_voice = new BandedWG();

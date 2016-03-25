@@ -48,7 +48,11 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	QWidget( _parent ),
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex ),
-	m_backgroundActive( Qt::SolidPattern )
+	m_backgroundActive( Qt::SolidPattern ),
+	m_strokeOuterActive( 0, 0, 0 ),
+	m_strokeOuterInactive( 0, 0, 0 ),
+	m_strokeInnerActive( 0, 0, 0 ),
+	m_strokeInnerInactive( 0, 0, 0 )
 {
 	if( ! s_sendBgArrow )
 	{
@@ -126,11 +130,13 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 
 
 	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
-
-	p->setPen( QColor( 255, 255, 255, isActive ? 100 : 50 ) );
+	
+	// inner border
+	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
 	p->drawRect( 1, 1, width-3, height-3 );
-
-	p->setPen( isActive ? sh_color : QColor( 0, 0, 0, 50 ) );
+	
+	// outer border
+	p->setPen( isActive ? fxLine->strokeOuterActive() : fxLine->strokeOuterInactive() );
 	p->drawRect( 0, 0, width-1, height-1 );
 
 	// draw the mixer send background
@@ -144,16 +150,29 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 	}
 
 	// draw the channel name
+	if( m_staticTextName.text() != name )
+	{
+		// elide the name of the fxLine when its too long
+		const int maxTextHeight = 78;
+		QFontMetrics metrics( fxLine->font() );
+		QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
+		m_staticTextName.setText( elidedName );
+	}
 	p->rotate( -90 );
 
-	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );	
+	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );
+
+	// Coordinates of the foreground text
+	int const textLeft = -145;
+	int const textTop = 9;
+
+	// Draw text shadow
 	p->setPen( sh_color );
-	p->drawText( -146, 21, name ); 
+	p->drawStaticText( textLeft - 1, textTop + 1, m_staticTextName );
 	
+	// Draw foreground text
 	p->setPen( isActive ? bt_color : te_color );
-
-	p->drawText( -145, 20, name );
-
+	p->drawStaticText( textLeft, textTop, m_staticTextName );
 }
 
 
@@ -276,5 +295,42 @@ void FxLine::setBackgroundActive( const QBrush & c )
 	m_backgroundActive = c;
 }
 
+QColor FxLine::strokeOuterActive() const
+{
+	return m_strokeOuterActive;
+}
 
+void FxLine::setStrokeOuterActive( const QColor & c )
+{
+	m_strokeOuterActive = c;
+}
 
+QColor FxLine::strokeOuterInactive() const
+{
+	return m_strokeOuterInactive;
+}
+
+void FxLine::setStrokeOuterInactive( const QColor & c )
+{
+	m_strokeOuterInactive = c;
+}
+
+QColor FxLine::strokeInnerActive() const
+{
+	return m_strokeInnerActive;
+}
+
+void FxLine::setStrokeInnerActive( const QColor & c )
+{
+	m_strokeInnerActive = c;
+}
+
+QColor FxLine::strokeInnerInactive() const
+{
+	return m_strokeInnerInactive;
+}
+
+void FxLine::setStrokeInnerInactive( const QColor & c )
+{
+	m_strokeInnerInactive = c;
+}

@@ -36,6 +36,7 @@
 #include <QTranslator>
 #include <QApplication>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QTextStream>
 
 #ifdef LMMS_BUILD_WIN32
@@ -61,6 +62,7 @@
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
+#include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
@@ -75,14 +77,6 @@ static inline QString baseName( const QString & file )
 {
 	return QFileInfo( file ).absolutePath() + "/" +
 			QFileInfo( file ).completeBaseName();
-}
-
-
-
-
-static std::string getCurrentYear()
-{
-	return QString::number( QDate::currentDate().year() ).toStdString();
 }
 
 
@@ -105,14 +99,14 @@ inline void loadTranslation( const QString & tname,
 void printVersion( char *executableName )
 {
 	printf( "LMMS %s\n(%s %s, Qt %s, %s)\n\n"
-		"Copyright (c) 2004-%s LMMS developers.\n\n"
+		"Copyright (c) %s\n\n"
 		"This program is free software; you can redistribute it and/or\n"
 		"modify it under the terms of the GNU General Public\n"
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
 		PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
-		getCurrentYear().c_str(), executableName );
+		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
 
@@ -121,7 +115,7 @@ void printVersion( char *executableName )
 void printHelp()
 {
 	printf( "LMMS %s\n"
-		"Copyright (c) 2004-%s LMMS developers.\n\n"
+		"Copyright (c) %s\n\n"
 		"Usage: lmms [ -r <project file> ] [ options ]\n"
 		"            [ -u <in> <out> ]\n"
 		"            [ -d <in> ]\n"
@@ -155,7 +149,7 @@ void printHelp()
 		"-v, --version			Show version information and exit.\n"
 		"    --allowroot			Bypass root user startup check (use with caution).\n"
 		"-h, --help			Show this usage information and exit.\n\n",
-		LMMS_VERSION, getCurrentYear().c_str() );
+		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
 }
 
 
@@ -644,24 +638,116 @@ int main( int argc, char * * argv )
 		// recover a file?
 		QString recoveryFile = ConfigManager::inst()->recoveryFile();
 
-		if( QFileInfo(recoveryFile).exists() &&
-			QMessageBox::question( gui->mainWindow(), MainWindow::tr( "Project recovery" ),
-						MainWindow::tr( "It looks like the last session did not end properly. "
-										"Do you want to recover the project of this session?" ),
-						QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
+		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
+				QFileInfo( recoveryFile ).isFile();
+		bool autoSaveEnabled =
+			ConfigManager::inst()->value( "ui", "enableautosave" ).toInt();
+		if( recoveryFilePresent )
 		{
-			fileToLoad = recoveryFile;
+			QMessageBox mb;
+			mb.setWindowTitle( MainWindow::tr( "Project recovery" ) );
+			mb.setText( QString(
+				"<html>"
+				"<p style=\"margin-left:6\">%1</p>"
+				"<table cellpadding=\"3\">"
+				"  <tr>"
+				"    <td><b>%2</b></td>"
+				"    <td>%3</td>"
+				"  </tr>"
+				"  <tr>"
+				"    <td><b>%4</b></td>"
+				"    <td>%5</td>"
+				"  </tr>"
+				"  <tr>"
+				"    <td><b>%6</b></td>"
+				"    <td>%7</td>"
+				"  </tr>"
+				"  <tr>"
+				"    <td><b>%8</b></td>"
+				"    <td>%9</td>"
+				"  </tr>"
+				"</table>"
+				"</html>" ).arg(
+				MainWindow::tr( "There is a recovery file present. "
+					"It looks like the last session did not end "
+					"properly or another instance of LMMS is "
+					"already running. Do you want to recover the "
+					"project of this session?" ),
+				MainWindow::tr( "Recover" ),
+				MainWindow::tr( "Recover the file. Please don't run "
+					"multiple instances of LMMS when you do this." ),
+				MainWindow::tr( "Ignore" ),
+				MainWindow::tr( "Launch LMMS as usual but with "
+					"automatic backup disabled to prevent the "
+					"present recover file from being overwritten." ),
+				MainWindow::tr( "Discard" ),
+				MainWindow::tr( "Launch a default session and delete "
+					"the restored files. This is not reversible." ),
+				MainWindow::tr( "Quit" ),
+				MainWindow::tr( "Shut down LMMS with no further action." )
+							) );
+
+			mb.setIcon( QMessageBox::Warning );
+			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
+
+			mb.setStandardButtons( 	QMessageBox::Ok |
+							QMessageBox::Discard );
+
+			mb.setButtonText( QMessageBox::Ok,
+							MainWindow::tr( "Recover" ) );
+
+			QAbstractButton * recover;
+			QAbstractButton * discard;
+			QPushButton * ignore;
+			QPushButton * exit;
+
+			recover = mb.QMessageBox::button( QMessageBox::Ok );
+			discard = mb.QMessageBox::button( QMessageBox::Discard );
+			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+								QMessageBox::NoRole );
+			ignore->setIcon( embed::getIconPixmap( "no_entry" ) );
+			exit = mb.addButton( MainWindow::tr( "Exit" ),
+								QMessageBox::RejectRole );
+			exit->setIcon( embed::getIconPixmap( "exit" ) );
+
+			mb.setDefaultButton( QMessageBox::Ok );
+			mb.setEscapeButton( exit );
+
+			mb.exec();
+			if( mb.clickedButton() == discard )
+			{
+				gui->mainWindow()->sessionCleanup();
+			}
+			else if( mb.clickedButton() == recover ) // ::Recover
+			{
+				fileToLoad = recoveryFile;
+				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
+			}
+			else if( mb.clickedButton() == ignore )
+			{
+				if( autoSaveEnabled )
+				{
+					gui->mainWindow()->setSession( MainWindow::SessionState::Limited );
+				}
+			}
+			else // Exit
+			{
+				return 0;
+			}
 		}
 
-		// we try to load given file
+		// first show the Main Window and then try to load given file
+
+		// [Settel] workaround: showMaximized() doesn't work with
+		// FVWM2 unless the window is already visible -> show() first
+		gui->mainWindow()->show();
+		if( fullscreen )
+		{
+			gui->mainWindow()->showMaximized();
+		}
+
 		if( !fileToLoad.isEmpty() )
 		{
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
-
 			if( fileToLoad == recoveryFile )
 			{
 				Engine::getSong()->createNewProjectFromTemplate( fileToLoad );
@@ -678,24 +764,19 @@ int main( int argc, char * * argv )
 			{
 				return EXIT_SUCCESS;
 			}
-
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
 		}
-		else
-		{
-
 		// If enabled, open last project if there is one. Else, create
-		// a new one.
-		if( ConfigManager::inst()->
+		// a new one. Also skip recently opened file if limited session to
+		// lower the chance of opening an already opened file.
+		else if( ConfigManager::inst()->
 				value( "app", "openlastproject" ).toInt() &&
-		!ConfigManager::inst()->recentlyOpenedProjects().isEmpty() )
+			!ConfigManager::inst()->
+				recentlyOpenedProjects().isEmpty() &&
+			gui->mainWindow()->getSession() !=
+				MainWindow::SessionState::Limited )
 		{
 			QString f = ConfigManager::inst()->
-						recentlyOpenedProjects().first();
+					recentlyOpenedProjects().first();
 			QFileInfo recentFile( f );
 
 			if ( recentFile.exists() )
@@ -709,16 +790,17 @@ int main( int argc, char * * argv )
 		}
 		else
 		{
-		Engine::getSong()->createNewProject();
+			Engine::getSong()->createNewProject();
 		}
 
-			// [Settel] workaround: showMaximized() doesn't work with
-			// FVWM2 unless the window is already visible -> show() first
-			gui->mainWindow()->show();
-			if( fullscreen )
-			{
-				gui->mainWindow()->showMaximized();
-			}
+		// Finally we start the auto save timer and also trigger the
+		// autosave one time as recover.mmp is a signal to possible other
+		// instances of LMMS.
+		if( autoSaveEnabled &&
+			gui->mainWindow()->getSession() != MainWindow::SessionState::Limited )
+		{
+			gui->mainWindow()->autoSaveTimerReset();
+			gui->mainWindow()->autoSave();
 		}
 	}
 

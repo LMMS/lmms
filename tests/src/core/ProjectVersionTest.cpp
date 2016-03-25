@@ -30,14 +30,16 @@ class ProjectVersionTest : QTestSuite
 {
 	Q_OBJECT
 private slots:
-	void test()
-	{
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Minor) > "1.0.3");
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Major) < "2.1.0");
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Release) > "0.2.1");
-		Q_ASSERT(ProjectVersion("1.1.4", CompareType::Release) < "1.1.10");
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Minor) == "1.1.5");
-	}
-} instance;
+        void ProjectVersionComparaisonTests()
+        {
+                QVERIFY(ProjectVersion("1.1.0", CompareType::Minor) > "1.0.3");
+                QVERIFY(ProjectVersion("1.1.0", CompareType::Major) < "2.1.0");
+                QVERIFY(ProjectVersion("1.1.0", CompareType::Release) > "0.2.1");
+                QVERIFY(ProjectVersion("1.1.4", CompareType::Release) < "1.1.10");
+                QVERIFY(ProjectVersion("1.1.0", CompareType::Minor) == "1.1.5");
+                QVERIFY( ! ( ProjectVersion("3.1.0", CompareType::Minor) < "2.2.5" ) );
+                QVERIFY( ! ( ProjectVersion("2.5.0", CompareType::Release) < "2.2.5" ) );
+        }
+} ProjectVersionTests;
 
 #include "ProjectVersionTest.moc"

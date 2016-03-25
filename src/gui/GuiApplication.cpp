@@ -142,8 +142,8 @@ GuiApplication::GuiApplication()
 	m_automationEditor = new AutomationEditorWindow;
 	connect(m_automationEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	m_mainWindow->finalize();
 	splashScreen.finish(m_mainWindow);
+	m_mainWindow->finalize();
 
 	m_loadingProgressLabel = nullptr;
 }

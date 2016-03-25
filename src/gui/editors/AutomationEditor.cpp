@@ -105,7 +105,8 @@ AutomationEditor::AutomationEditor() :
 	m_gridColor( 0,0,0 ),
 	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
-	m_scaleColor( Qt::SolidPattern )
+	m_scaleColor( Qt::SolidPattern ),
+	m_crossColor( 0, 0, 0 )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -251,6 +252,8 @@ QColor AutomationEditor::vertexColor() const
 { return m_vertexColor; }
 QBrush AutomationEditor::scaleColor() const
 { return m_scaleColor; }
+QColor AutomationEditor::crossColor() const
+{ return m_crossColor; }
 void AutomationEditor::setGridColor( const QColor & c )
 { m_gridColor = c; }
 void AutomationEditor::setGraphColor( const QBrush & c )
@@ -259,6 +262,8 @@ void AutomationEditor::setVertexColor( const QColor & c )
 { m_vertexColor = c; }
 void AutomationEditor::setScaleColor( const QBrush & c )
 { m_scaleColor = c; }
+void AutomationEditor::setCrossColor( const QColor & c )
+{ m_crossColor = c; }
 
 
 
@@ -972,7 +977,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
-	p.setPen( QColor( 0xFF, 0x33, 0x33 ) );
+	p.setPen( crossColor() );
 	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
 	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
 						height() - SCROLLBAR_SIZE );
@@ -1199,7 +1204,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin();			
+			timeMap::iterator it = time_map.begin(); 
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1464,7 +1469,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 			y--;
 		}
 		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y );	
+		m_zoomingYModel.setValue( y ); 
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
@@ -2140,11 +2145,26 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	/*DropToolBar *copyPasteActionsToolBar = addDropToolBarToTop(tr("Copy paste actions"));*/
 
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
-					tr("Cut selected values (Ctrl+X)"), this);
+					tr("Cut selected values (%1+X)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
-					tr("Copy selected values (Ctrl+C)"), this);
+					tr("Copy selected values (%1+C)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste values from clipboard (Ctrl+V)"), this);
+					tr("Paste values from clipboard (%1+V)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 
 	cutAction->setWhatsThis(
 		tr( "Click here and selected values will be cut into the "

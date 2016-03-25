@@ -83,7 +83,7 @@ typedef AutomationPattern::timeMap timeMap;
 // some constants...
 const int INITIAL_PIANOROLL_HEIGHT = 480;
 
-const int SCROLLBAR_SIZE = 16;
+const int SCROLLBAR_SIZE = 14;
 const int PIANO_X = 0;
 
 const int WHITE_KEY_WIDTH = 64;
@@ -139,27 +139,7 @@ static QString getNoteString( int key )
 	return s_noteStrings[key % 12] + QString::number( static_cast<int>( key / KeysPerOctave ) );
 }
 
-static bool isBlackKey( int key )
-{
-	int keyCode = key % KeysPerOctave;
 
-	switch (keyCode)
-	{
-	case 1:
-	case 3:
-	case 6:
-	case 8:
-	case 10:
-		return true;
-	}
-
-	return false;
-}
-
-static bool isWhiteKey( int key )
-{
-	return !isBlackKey( key );
-}
 
 // used for drawing of piano
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
@@ -209,10 +189,17 @@ PianoRoll::PianoRoll() :
 	m_gridColor( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
-	m_barColor( 0, 0, 0 )
+	m_barColor( 0, 0, 0 ),
+	m_noteBorderRadiusX( 0 ),
+	m_noteBorderRadiusY( 0 ),
+	m_selectedNoteColor( 0, 0, 0 ),
+	m_textColor( 0, 0, 0 ),
+	m_textColorLight( 0, 0, 0 ),
+	m_textShadow( 0, 0, 0 ),
+	m_markedSemitoneColor( 0, 0, 0 )
 {
 	// gui names of edit modes
-	m_nemStr.push_back( tr( "Note Volume" ) );
+	m_nemStr.push_back( tr( "Note Velocity" ) );
 	m_nemStr.push_back( tr( "Note Panning" ) );
 
 	QSignalMapper * signalMapper = new QSignalMapper( this );
@@ -488,7 +475,7 @@ void PianoRoll::showVolTextFloat(volume_t vol, const QPoint &pos, int timeout)
 {
 	//! \todo display velocity for MIDI-based instruments
 	// possibly dBV values too? not sure if it makes sense for note volumes...
-	showTextFloat( tr("Volume: %1%").arg( vol ), pos, timeout );
+	showTextFloat( tr("Velocity: %1%").arg( vol ), pos, timeout );
 }
 
 
@@ -759,10 +746,51 @@ QColor PianoRoll::barColor() const
 void PianoRoll::setBarColor( const QColor & c )
 { m_barColor = c; }
 
+float PianoRoll::noteBorderRadiusX() const
+{ return m_noteBorderRadiusX; }
 
+void PianoRoll::setNoteBorderRadiusX( float b )
+{ m_noteBorderRadiusX = b; }
 
-void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
-					int width, const Note * n, const QColor & noteCol )
+float PianoRoll::noteBorderRadiusY() const
+{ return m_noteBorderRadiusY; }
+
+void PianoRoll::setNoteBorderRadiusY( float b )
+{ m_noteBorderRadiusY = b; }
+
+QColor PianoRoll::selectedNoteColor() const
+{ return m_selectedNoteColor; }
+
+void PianoRoll::setSelectedNoteColor( const QColor & c )
+{ m_selectedNoteColor = c; }
+
+QColor PianoRoll::textColor() const
+{ return m_textColor; }
+
+void PianoRoll::setTextColor( const QColor & c )
+{ m_textColor = c; }
+
+QColor PianoRoll::textColorLight() const
+{ return m_textColorLight; }
+
+void PianoRoll::setTextColorLight( const QColor & c )
+{ m_textColorLight = c; }
+
+QColor PianoRoll::textShadow() const
+{ return m_textShadow; }
+
+void PianoRoll::setTextShadow( const QColor & c )
+{ m_textShadow = c; }
+
+QColor PianoRoll::markedSemitoneColor() const
+{ return m_markedSemitoneColor; }
+
+void PianoRoll::setMarkedSemitoneColor( const QColor & c )
+{ m_markedSemitoneColor = c; }
+
+void PianoRoll::drawNoteRect(QPainter & p, int x, int y, 
+				int width, const Note * n, const QColor & noteCol,
+						float radiusX, float radiusY, const QColor & selCol )
 {
 	++x;
 	++y;
@@ -785,14 +813,9 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 	QColor col = QColor( noteCol );
 
-	if( n->length() < 0 )
+	if( n->selected() )
 	{
-		//step note
-		col.setRgb( 0, 255, 0 );
-	}
-	else if( n->selected() )
-	{
-		col.setRgb( 0x00, 0x40, 0xC0 );
+		col = QColor( selCol );
 	}
 
 	// adjust note to make it a bit faded if it has a lower volume
@@ -809,15 +832,17 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 
 	p.setPen( col );
 	p.setRenderHint(QPainter::Antialiasing);
-	p.drawRoundedRect( x, y, width, KEY_LINE_HEIGHT-1, 5, 2 );
+	p.drawRoundedRect( QRectF ( x + 0.5, y - 0.5, width, KEY_LINE_HEIGHT ), radiusX, radiusY );
 
 	// that little tab thing on the end hinting at the user
 	// to resize the note
 	p.setPen( noteCol.lighter( 200 ) );
+	p.setBrush( noteCol.lighter( 200 ) );
 	if( width > 2 )
 	{
-		p.drawLine( x + width - 3, y + 3, x + width - 3,
-						y + KEY_LINE_HEIGHT - 5 );
+		float leftIndent = 2.5;
+		float vertIndent = 3.5;
+		p.drawRect( QRectF (x + width - leftIndent, y + vertIndent, 1, KEY_LINE_HEIGHT - (2*vertIndent + 1) ) );
 	}
 }
 
@@ -1056,7 +1081,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				}
 				else if( ke->modifiers() & Qt::AltModifier)
 				{
-					Pattern * p = m_pattern->previousPattern();
+					// switch to editing a pattern adjacent to this one in the song editor
+					Pattern * p = direction > 0 ? m_pattern->nextPattern() : m_pattern->previousPattern();
 					if(p != NULL)
 					{
 						setCurrentPattern(p);
@@ -2434,7 +2460,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
-		
+			
 		if (shift)
 		{
 			// Algorithm:
@@ -2598,7 +2624,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT,
-			    QColor( 40, 40, 40, 200 ) );
+			    markedSemitoneColor() );
 	}
 
 
@@ -2696,7 +2722,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		}
 
-		if ( isWhiteKey( key ) )
+		if ( Piano::isWhiteKey( key ) )
 		{
 			// Draw note names if activated in the preferences, C notes are always drawn
 			if ( key % 12 == 0 || drawNoteNames )
@@ -2706,16 +2732,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				QPoint textStart( WHITE_KEY_WIDTH - 18, key_line_y );
 				textStart += QPoint( 0, yCorrectionForNoteLabels );
 
-				p.setPen( QColor( 240, 240, 240 ) );
+				p.setPen( textShadow() );
 				p.drawText( textStart + QPoint( 1, 1 ), noteString );
 				// The C key is painted darker than the other ones
 				if ( key % 12 == 0 )
 				{
-					p.setPen( QColor( 0, 0, 0 ) );
+					p.setPen( textColor() );
 				}
 				else
 				{
-					p.setPen( QColor( 128, 128, 128 ) );
+					p.setPen( textColorLight() );
 				}
 				p.drawText( textStart, noteString );
 			}
@@ -2905,7 +2931,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		const int visible_keys = ( keyAreaBottom()-keyAreaTop() ) /
 							KEY_LINE_HEIGHT + 2;
 
-		QPolygon editHandles;
+		QPolygonF editHandles;
 
 		for( const Note *note : m_pattern->notes() )
 		{
@@ -2941,7 +2967,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				// note
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
-								note_width, note, noteColor() );
+								note_width, note, noteColor(), noteBorderRadiusX(), noteBorderRadiusY(), selectedNoteColor() );
 			}
 
 			// draw note editing stuff
@@ -2951,7 +2977,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				QColor color = barColor().lighter( 30 + ( note->getVolume() * 90 / MaxVolume ) );
 				if( note->selected() )
 				{
-					color.setRgb( 0x00, 0x40, 0xC0 );
+					color = selectedNoteColor();
 				}
 				p.setPen( QPen( color, NOTE_EDIT_LINE_WIDTH ) );
 
@@ -2960,16 +2986,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( (float)( MaxVolume - MinVolume ) ) *
 					( (float)( noteEditBottom() - noteEditTop() ) );
 
-				p.drawLine( noteEditLeft() + x, editHandleTop,
-							noteEditLeft() + x, noteEditBottom() );
+				p.drawLine( QLineF ( noteEditLeft() + x + 0.5, editHandleTop + 0.5,
+							noteEditLeft() + x + 0.5, noteEditBottom() + 0.5 ) );
 
 			}
 			else if( m_noteEditMode == NoteEditPanning )
 			{
-				QColor color( noteColor() );
+				QColor color = noteColor();
 				if( note->selected() )
 				{
-					color.setRgb( 0x00, 0x40, 0xC0 );
+					color = selectedNoteColor();
 				}
 
 				p.setPen( QPen( color, NOTE_EDIT_LINE_WIDTH ) );
@@ -2979,12 +3005,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( (float)( (PanningRight - PanningLeft ) ) ) *
 					( (float)( noteEditBottom() - noteEditTop() ) );
 
-				p.drawLine( noteEditLeft() + x, noteEditTop() +
+				p.drawLine( QLineF( noteEditLeft() + x + 0.5, noteEditTop() + 0.5 +
 						( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
-						    noteEditLeft() + x, editHandleTop );
+						    noteEditLeft() + x + 0.5, editHandleTop + 0.5 ) );
 			}
-			editHandles << QPoint( x + noteEditLeft(),
-						editHandleTop+1 );
+			editHandles << QPointF ( x + noteEditLeft() + 0.5,
+						editHandleTop + 1.5 );
 
 			if( note->hasDetuningInfo() )
 			{
@@ -3021,7 +3047,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						MidiTime::ticksPerTact() ) - x;
 	int y = (int) y_base - sel_key_start * KEY_LINE_HEIGHT;
 	int h = (int) y_base - sel_key_end * KEY_LINE_HEIGHT - y;
-	p.setPen( QColor( 0, 64, 192 ) );
+	p.setPen( selectedNoteColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
 
@@ -3564,7 +3590,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 	{
 		bool ok;
 		int new_val;
-		new_val = QInputDialog::getInt(	this, "Piano roll: note volume",
+		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
 					tr( "Please enter a new value between %1 and %2:" ).
 						arg( MinVolume ).arg( MaxVolume ),
 					(*nv)[0]->getVolume(),
@@ -3986,8 +4012,13 @@ PianoRollWindow::PianoRollWindow() :
 			"mode you can add, resize and move notes. This "
 			"is the default mode which is used most of the time. "
 			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode. In this mode, hold Ctrl to "
-			"temporarily go into select mode." ) );
+			"activate this mode. In this mode, hold %1 to "
+			"temporarily go into select mode." ).arg(
+				#ifdef LMMS_BUILD_APPLE
+				"⌘") );
+				#else
+				"Ctrl") );
+				#endif
 	eraseAction->setWhatsThis(
 		tr( "Click here and erase mode will be activated. In this "
 			"mode you can erase notes. You can also press "
@@ -3995,8 +4026,13 @@ PianoRollWindow::PianoRollWindow() :
 	selectAction->setWhatsThis(
 		tr( "Click here and select mode will be activated. "
 			"In this mode you can select notes. Alternatively, "
-			"you can hold Ctrl in draw mode to temporarily use "
-			"select mode." ) );
+			"you can hold %1 in draw mode to temporarily use "
+			"select mode." ).arg(
+				#ifdef LMMS_BUILD_APPLE
+				"⌘") );
+				#else
+				"Ctrl") );
+				#endif
 	detuneAction->setWhatsThis(
 		tr( "Click here and detune mode will be activated. "
 			"In this mode you can click a note to open its "
@@ -4015,13 +4051,28 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop(tr("Copy paste controls"));
 
 	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
-							  tr("Cut selected notes (Ctrl+X)"), this);
+							  tr("Cut selected notes (%1+X)").arg(
+									#ifdef LMMS_BUILD_APPLE
+									"⌘"), this);
+									#else
+									"Ctrl"), this);
+									#endif
 
 	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
-							   tr("Copy selected notes (Ctrl+C)"), this);
+							   tr("Copy selected notes (%1+C)").arg(
+	 								#ifdef LMMS_BUILD_APPLE
+	 								"⌘"), this);
+	 								#else
+	 								"Ctrl"), this);
+	 								#endif
 
 	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste notes from clipboard (Ctrl+V)"), this);
+					tr("Paste notes from clipboard (%1+V)").arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"), this);
+						#else
+						"Ctrl"), this);
+						#endif
 
 	cutAction->setWhatsThis(
 		tr( "Click here and the selected notes will be cut into the "

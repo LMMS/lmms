@@ -10,7 +10,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Enable C++11
 ADD_DEFINITIONS(-std=c++0x)
 
-IF(LMMS_BUILD_CLANG)
+IF(LMMS_BUILD_APPLE)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()
 
@@ -132,36 +132,6 @@ IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(lmms QtCore4 QtGui4 QtXml4)
 ENDIF()
 
-#
-# rules for building localizations
-#
-FILE(GLOB lmms_LOCALES ${CMAKE_SOURCE_DIR}/data/locale/*.ts)
-SET(ts_targets "")
-SET(qm_targets "")
-FOREACH(_ts_file ${lmms_LOCALES})
-	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target}
-		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\""
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-	ADD_CUSTOM_TARGET(${_qm_target}
-		COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\""
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-	LIST(APPEND ts_targets "${_ts_target}")
-	LIST(APPEND qm_targets "${_qm_target}")
-ENDFOREACH(_ts_file ${lmms_LOCALES})
-
-ADD_CUSTOM_TARGET(update-locales)
-FOREACH(_item ${ts_targets})
-	ADD_DEPENDENCIES(update-locales "${_item}")
-ENDFOREACH(_item ${ts_targets})
-
-ADD_CUSTOM_TARGET(finalize-locales ALL)
-FOREACH(_item ${qm_targets})
-	ADD_DEPENDENCIES(finalize-locales "${_item}")
-ENDFOREACH(_item ${qm_targets})
-
 # Install
 IF(LMMS_BUILD_WIN32)
 	SET_TARGET_PROPERTIES(lmms PROPERTIES
@@ -173,11 +143,27 @@ IF(LMMS_BUILD_WIN32)
 	ENDIF()
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES
+
+	IF(QT5)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/Qt5Core.dll"
+					"${MINGW_PREFIX}/bin/Qt5Gui.dll"
+					"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
+					"${MINGW_PREFIX}/bin/Qt5Xml.dll"
+				DESTINATION .)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
+				DESTINATION ./platforms)
+	ELSE()
+		INSTALL(FILES
 					"${MINGW_PREFIX}/bin/QtCore4.dll"
 					"${MINGW_PREFIX}/bin/QtGui4.dll"
 					"${MINGW_PREFIX}/bin/QtSvg4.dll"
 					"${MINGW_PREFIX}/bin/QtXml4.dll"
+				DESTINATION .)
+	ENDIF()
+
+	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
@@ -189,6 +175,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
+					"${MINGW_PREFIX}/bin/libgig-6.dll"
 					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
 					"${MINGW_PREFIX}/lib/libsoundio.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"

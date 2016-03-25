@@ -3,7 +3,7 @@
  ********************/
 
 /* most foreground text items */
-QLabel, QTreeWidget, QListWidget, QGroupBox {
+QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 	color: #e0e0e0;
 }
 
@@ -16,15 +16,14 @@ AutomationEditor {
 	color: #e0e0e0;
 	qproperty-vertexColor: #ff77af;
 	qproperty-gridColor: #808080;
+	qproperty-crossColor: rgb( 255, 51, 51 );
 
 	qproperty-graphColor: qlineargradient(spread:reflect,
                      x1:0, y1:0, x2:0, y2:1,
                      stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
-	/*#99afff;*/
 	qproperty-scaleColor: qlineargradient(spread:reflect,
                      x1:0, y1:0.5, x2:1, y2:0.5,
                      stop:0 #333, stop:1 #202020);
-	/*rgb( 32, 32, 32 );*/
 }
 
 /* text box */
@@ -69,14 +68,12 @@ QMenu {
 QMenu::separator {
 	height: 1px;
 	background: #8d8d8d;
-	margin-left: 5px;
-	margin-right: 5px;
 }
 
 QMenu::item {
 	color: black;
-	padding: 2px 32px 2px 20px;
-	margin:3px;
+	padding: 2px 35px 2px 23px;
+	margin: 3px 0px 3px 0px;
 }
 
 QMenu::item:selected {
@@ -91,6 +88,10 @@ QMenu::item:disabled {
 	font-size:12px;
 	font-weight: normal;
 	padding: 4px 32px 4px 20px;
+}
+
+QMenu::icon {
+	margin: 3px;
 }
 
 QMenu::indicator {
@@ -114,7 +115,15 @@ PianoRoll {
 	qproperty-gridColor: rgb( 128, 128, 128 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
+	qproperty-noteBorderRadiusX: 5;
+	qproperty-noteBorderRadiusY: 2;
+	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
 	qproperty-barColor: #4afd85;
+	qproperty-markedSemitoneColor: rgba( 40, 40, 40, 200 );
+	/* Text on the white piano keys */
+	qproperty-textColor: rgb( 0, 0, 0 );
+	qproperty-textColorLight: rgb( 128, 128, 128);
+	qproperty-textShadow: rgb( 240, 240, 240 );
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
@@ -479,6 +488,23 @@ SideBar QToolButton {
 	font-size: 12px;
 }
 
+/* Instrument plugin list */
+
+PluginDescList {
+	background-color: #5b6571;
+}
+
+PluginDescWidget {
+	background-color: #e0e0e0;
+	color: #404040;
+	border: 1px solid rgb(64, 64, 64);
+	margin: 0px;
+}
+
+PluginDescWidget:hover {
+	background-color: #e0e0e0;
+}
+
 /* font sizes for text buttons */
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
@@ -490,6 +516,10 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
 }
 
 /* persistent peak markers for fx peak meters */
@@ -513,38 +543,44 @@ TrackContainerView QLabel
 
 /* Patterns */
 
+/* common pattern colors */
+TrackContentObjectView   {
+	qproperty-mutedColor: rgb( 128, 128, 128 );
+	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
+	qproperty-selectedColor: rgb( 0, 125, 255 );
+	qproperty-textColor: rgb( 255, 255, 255 );
+	qproperty-textShadowColor: rgb( 0, 0, 0 );
+	qproperty-gradient: true;
+}
+
 /* instrument pattern */
 PatternView {
-	color: rgb( 119, 199, 216 );
-	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 255, 255 );
+	background-color: rgb( 119, 199, 216 );
+	color: rgb( 187, 227, 236 );
 }
 
 /* sample track pattern */
 SampleTCOView {
-	color: rgb( 74, 253, 133 );
-	qproperty-fgColor: rgb( 187, 227, 236 );
-	qproperty-textColor: rgb( 255, 60, 60 );
+	background-color: rgb( 74, 253, 133 );
+	color: rgb( 187, 227, 236 );
 }
 
 /* automation pattern */
 AutomationPatternView {
-	color: #99afff;
-	qproperty-fgColor: rgb( 204, 215, 255 );
-	qproperty-textColor: rgb( 255, 255, 255 );
+	background-color: #99afff;
+	color: rgb( 204, 215, 255 );
 }
 
 /* bb-pattern */
 BBTCOView {
-	color: rgb( 128, 182, 175 ); /* default colour for bb-tracks, used when the colour hasn't been defined by the user */
-	qproperty-textColor: rgb( 255, 255, 255 );
+	background-color: rgb( 128, 182, 175 ); /* default colour for bb-tracks */
 }
 
 /* Plugins */
 
 TripleOscillatorView Knob {
-	color: rgb(1, 32, 64);
-	qproperty-outerColor: rgb(0, 0, 0);
+	color: rgb(255, 255, 255);
+	qproperty-outerColor: rgb(255, 255, 255);
 	qproperty-innerRadius: 2;
 	qproperty-outerRadius: 7;
 	qproperty-centerPointX: 13.0;

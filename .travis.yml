@@ -4,16 +4,20 @@ matrix:
     include:
         - env: TARGET_OS=win32
         - env: TARGET_OS=win64
+        - os: osx 
         - env: QT5=True
+        - env: QT5=True TARGET_OS=win32
+        - env: QT5=True TARGET_OS=win64
         - os: osx
+          env: QT5=True
 before_install:
-   - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
+   - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:
-    - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
+    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
 before_script:
     - mkdir build && cd build
 script:
-    - sh ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
+    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
     - make -j4
     - if [[ $TARGET_OS != win* ]]; then make tests && ./tests/tests; fi;
 before_deploy: make package

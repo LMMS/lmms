@@ -421,16 +421,16 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Klicka här för att aktivera cubic hermite talföljd. Värdet följer en mjuk kurva mellan kontrollpunkter.</translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation>Klipp ut valda värden (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation>Klipp ut valda värden (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation>Kopiera valda värden (ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation>Kopiera valda värden (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
-        <translation>Klistra värden (Ctrl+V)</translation>
+        <source>Paste values from clipboard (%1+V)</source>
+        <translation>Klistra värden (%1+V)</translation>
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -460,8 +460,8 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Dra en kontroll samtidigt som du håller &lt;Ctrl&gt;</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>Dra en kontroll samtidigt som du håller &lt;%1&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -2774,7 +2774,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4596,7 +4596,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4759,7 +4759,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4791,7 +4791,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4862,7 +4862,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4870,7 +4870,7 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4878,15 +4878,15 @@ use mouse wheel to set volume of a step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">Klipp ut valda noter(Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation type="unfinished">Klipp ut valda noter(%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
+        <source>Copy selected notes (%1+C)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
+        <source>Paste notes from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4987,40 +4987,40 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">&amp;Ångra</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation type="unfinished">Ctrl+Z</translation>
+        <source>%1+Z</source>
+        <translation type="unfinished">%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
         <translation type="unfinished">&amp;Återställ</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation type="unfinished">Ctrl+Y</translation>
+        <source>%1+Y</source>
+        <translation type="unfinished">%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
         <translation type="unfinished">&amp;Kopiera</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <source>%1+C</source>
+        <translation type="unfinished">%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
         <translation type="unfinished">Klipp&amp; ut</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
-        <translation type="unfinished">Ctrl+X</translation>
+        <source>%1+X</source>
+        <translation type="unfinished">%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
         <translation type="unfinished">&amp;Klistra in</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
-        <translation type="unfinished">Ctrl+V</translation>
+        <source>%1+V</source>
+        <translation type="unfinished">%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5031,56 +5031,56 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">&amp;Fet</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation type="unfinished">Ctrl+B</translation>
+        <source>%1+B</source>
+        <translation type="unfinished">%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
         <translation type="unfinished">&amp;Kursiv</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <translation type="unfinished">Ctrl+I</translation>
+        <source>%1+I</source>
+        <translation type="unfinished">%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
         <translation type="unfinished">&amp;Understruken</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation type="unfinished">Ctrl+U</translation>
+        <source>%1+U</source>
+        <translation type="unfinished">%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
         <translation type="unfinished">&amp;Vänster</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <source>%1+L</source>
+        <translation type="unfinished">%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
         <translation type="unfinished">C&amp;entrera</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <source>%1+E</source>
+        <translation type="unfinished">%1+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
         <translation type="unfinished">&amp;Höger</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
-        <translation type="unfinished">Ctrl+R</translation>
+        <source>%1+R</source>
+        <translation type="unfinished">%1+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
-        <translation type="unfinished">Ctrl+J</translation>
+        <source>%1+J</source>
+        <translation type="unfinished">%1+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
@@ -5315,7 +5315,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished">Klistra in</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5917,11 +5917,11 @@ Latency: %2 ms</source>
         <translation type="unfinished">Ledtråd</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5997,7 +5997,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished">Ledtråd</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6005,7 +6005,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished">Aktuell längd</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
+        <source>Press &lt;%1&gt; for free resizing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6029,14 +6029,14 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished">Klistra in</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6083,11 +6083,11 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6099,15 +6099,15 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6119,7 +6119,7 @@ Se till att du har läsningsrättigheter för filen och katalogen som innehålle
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

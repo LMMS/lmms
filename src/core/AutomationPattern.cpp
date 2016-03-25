@@ -595,7 +595,12 @@ const QString AutomationPattern::name() const
 	{
 		return m_objects.first()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <Ctrl>" );
+	return tr( "Drag a control while pressing <%1>" ).arg(
+	#ifdef LMMS_BUILD_APPLE
+		"⌘");
+	#else
+		"Ctrl");
+	#endif
 }
 
 

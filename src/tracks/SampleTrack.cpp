@@ -22,6 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+#include "SampleTrack.h"
 
 #include <QDomElement>
 #include <QDropEvent>
@@ -33,7 +34,6 @@
 #include <QPushButton>
 
 #include "gui_templates.h"
-#include "SampleTrack.h"
 #include "Song.h"
 #include "embed.h"
 #include "Engine.h"
@@ -200,15 +200,10 @@ TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
 
 
 
-
-
-
-
-
-
 SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	TrackContentObjectView( _tco, _tv ),
-	m_tco( _tco )
+	m_tco( _tco ),
+	m_paintPixmap()
 {
 	// update UI and tooltip
 	updateSample();
@@ -266,11 +261,16 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<Ctrl> + middle click)" ),
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(
+					#ifdef LMMS_BUILD_APPLE
+					"⌘"),
+					#else
+					"Ctrl"),
+					#endif
 						m_tco, SLOT( toggleMute() ) );
-	contextMenu.addAction( embed::getIconPixmap( "record" ),
+	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
-						m_tco, SLOT( toggleRecord() ) );
+						m_tco, SLOT( toggleRecord() ) );*/
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -346,77 +346,98 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 
 
-void SampleTCOView::paintEvent( QPaintEvent * _pe )
+void SampleTCOView::paintEvent( QPaintEvent * pe )
 {
-	QPainter p( this );
-	const QColor styleColor = p.pen().brush().color();
+	QPainter painter( this );
 
+	if( !needsUpdate() )
+	{
+		painter.drawPixmap( 0, 0, m_paintPixmap );
+		return;
+	}
+
+	setNeedsUpdate( false );
+
+	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
+		? QPixmap( size() ) : m_paintPixmap;
+
+	QPainter p( &m_paintPixmap );
+
+	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
-	if( !( m_tco->getTrack()->isMuted() || m_tco->isMuted() ) )
+	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
+	
+	// state: selected, muted, normal
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
+		: painter.background().color() );
+
+	lingrad.setColorAt( 1, c.darker( 300 ) );
+	lingrad.setColorAt( 0, c );
+	
+	if( gradient() )
 	{
-		c = styleColor;
+		p.fillRect( rect(), lingrad );
 	}
 	else
 	{
-		c = QColor( 80, 80, 80 );
+		p.fillRect( rect(), c );
 	}
 
-	if( isSelected() == true )
-	{
-		c.setRgb( qMax( c.red() - 128, 0 ), qMax( c.green() - 128, 0 ), 255 );
-	}
-
-	QLinearGradient grad( 0, 0, 0, height() );
-
-	grad.setColorAt( 1, c.darker( 300 ) );
-	grad.setColorAt( 0, c );
-
-	p.setBrush( grad );
-	p.setPen( c.lighter( 160 ) );
-	p.drawRect( 1, 1, width()-3, height()-3 );
-
-	p.setBrush( QBrush() );
-	p.setPen( c.darker( 300 ) );
-	p.drawRect( 0, 0, width()-1, height()-1 );
-
-
-	if( m_tco->getTrack()->isMuted() || m_tco->isMuted() )
-	{
-		p.setPen( QColor( 128, 128, 128 ) );
-	}
-	else
-	{
-		p.setPen( fgColor() );
-	}
-	QRect r = QRect( 1, 1,
+	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
+	
+	const int spacing = TCO_BORDER_WIDTH + 1;
+	
+	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() *
 				pixelsPerTact() / DefaultTicksPerTact ), 1 ),
-								height() - 4 );
-	p.setClipRect( QRect( 1, 1, width() - 2, height() - 2 ) );
-	m_tco->m_sampleBuffer->visualize( p, r, _pe->rect() );
+					rect().bottom() - 2 * spacing );
+	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+
+	// disable antialiasing for borders, since its not needed
+	p.setRenderHint( QPainter::Antialiasing, false );
+
 	if( r.width() < width() - 1 )
 	{
-		p.drawLine( r.x() + r.width(), r.y() + r.height() / 2,
-				width() - 2, r.y() + r.height() / 2 );
+		p.drawLine( r.x(), r.y() + r.height() / 2,
+			rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
 	}
 
-	p.translate( 0, 0 );
+	// inner border
+	p.setPen( c.lighter( 160 ) );
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+		rect().bottom() - TCO_BORDER_WIDTH );
+		
+	// outer border
+	p.setPen( c.darker( 300 ) );
+	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+	
+	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_tco->isMuted() )
 	{
-		p.drawPixmap( 3, 8, embed::getIconPixmap( "muted", 16, 16 ) );
+		const int spacing = TCO_BORDER_WIDTH;
+		const int size = 14;
+		p.drawPixmap( spacing, height() - ( size + spacing ),
+			embed::getIconPixmap( "muted", size, size ) );
 	}
-	if( m_tco->isRecord() )
+	
+	// recording sample tracks is not possible at the moment 
+	
+	/* if( m_tco->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 
-		p.setPen( QColor( 0, 0, 0 ) );
+		p.setPen( textShadowColor() );
 		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
 		p.setPen( textColor() );
 		p.drawText( 9, p.fontMetrics().height(), "Rec" );
 
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
-	}
+	}*/
+	
+	p.end();
+	
+	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
 
@@ -441,7 +462,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 
 SampleTrack::~SampleTrack()
 {
-	Engine::mixer()->removePlayHandles( this );
+	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
 }
 
 

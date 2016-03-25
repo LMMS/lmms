@@ -206,11 +206,13 @@ public:
 	void mute();
 
 	/*! Returns index of NotePlayHandle in vector of note-play-handles
-        belonging to this instrument track - used by arpeggiator */
+	    belonging to this instrument track - used by arpeggiator.
+	    Ignores child note-play-handles, returns -1 when called on one */
 	int index() const;
 
-	/*! returns list of note-play-handles belonging to given instrument track,
-	    if allPlayHandles = true, also released note-play-handles are returned */
+	/*! Returns list of note-play-handles belonging to given instrument track.
+	    If allPlayHandles = true, also released note-play-handles and children
+	    are returned */
 	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* Track, bool allPlayHandles = false );
 
 	/*! Returns whether given NotePlayHandle instance is equal to *this */

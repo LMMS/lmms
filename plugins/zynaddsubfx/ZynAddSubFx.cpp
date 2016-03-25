@@ -144,7 +144,9 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 
 ZynAddSubFxInstrument::~ZynAddSubFxInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 
 	m_pluginMutex.lock();
 	delete m_plugin;
@@ -260,7 +262,7 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 		m_pluginMutex.unlock();
 
 		m_modifiedControllers.clear();
-		foreach( const QString & c, _this.attribute( "modifiedcontrollers" ).split( ',' ) )
+		for( const QString & c : _this.attribute( "modifiedcontrollers" ).split( ',' ) )
 		{
 			if( !c.isEmpty() )
 			{

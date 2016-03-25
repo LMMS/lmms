@@ -41,16 +41,21 @@ public:
 	virtual ~EqControls()
 	{
 	}
+
 	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
+
 	virtual void loadSettings ( const QDomElement &_this );
+
 	inline virtual QString nodeName() const
 	{
 		return "Eq";
 	}
+
 	virtual int controlCount()
 	{
 		return 39;
 	}
+
 	virtual EffectControlDialog* createView()
 	{
 		return new EqControlsDialog( this );
@@ -66,19 +71,12 @@ public:
 	float m_para3PeakL, m_para3PeakR;
 	float m_para4PeakL, m_para4PeakR;
 	float m_highShelfPeakL, m_highShelfPeakR;
-	bool m_analyseIn;
-	bool m_analyseOut;
 
 	EqAnalyser m_inFftBands;
 	EqAnalyser m_outFftBands;
 
 	bool m_inProgress;
-
 	bool visable();
-
-
-
-
 
 private:
 	EqEffect* m_effect;
@@ -130,9 +128,10 @@ private:
 	IntModel m_lpTypeModel;
 	IntModel m_hpTypeModel;
 
+	BoolModel m_analyseInModel;
+	BoolModel m_analyseOutModel;
+
 	friend class EqControlsDialog;
 	friend class EqEffect;
-
 };
-
 #endif // EQCONTROLS_H

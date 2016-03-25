@@ -427,15 +427,15 @@ Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cut selected values (Ctrl+X)</source>
-        <translation type="unfinished">Wytnij zaznaczone elementy (Ctrl+X)</translation>
+        <source>Cut selected values (%1+X)</source>
+        <translation type="unfinished">Wytnij zaznaczone elementy (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected values (Ctrl+C)</source>
-        <translation type="unfinished">Skopiuj zaznaczone elementy (Ctrl+C)</translation>
+        <source>Copy selected values (%1+C)</source>
+        <translation type="unfinished">Skopiuj zaznaczone elementy (%1+C)</translation>
     </message>
     <message>
-        <source>Paste values from clipboard Ctrl+V)</source>
+        <source>Paste values from clipboard (%1+V)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -466,8 +466,8 @@ Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail:
 <context>
     <name>AutomationPattern</name>
     <message>
-        <source>Drag a control while pressing &lt;Ctrl&gt;</source>
-        <translation>Przeciągnij trzymając wciśnięty klawisz &lt;Ctrl&gt;</translation>
+        <source>Drag a control while pressing &lt;%1&gt;</source>
+        <translation>Przeciągnij trzymając wciśnięty klawisz &lt;%1&gt;</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
@@ -2793,7 +2793,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4617,7 +4617,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation>Podwójne kliknięcie otwiera pattern w Edytorze Pianolowym
 użyj kółka myszy aby ustawić głośność poszczególnych kroków</translation>
     </message>
@@ -4781,7 +4781,7 @@ użyj kółka myszy aby ustawić głośność poszczególnych kroków</translati
         <translation>Blokada nuty</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Głośność Nuty</translation>
     </message>
     <message>
@@ -4813,7 +4813,7 @@ użyj kółka myszy aby ustawić głośność poszczególnych kroków</translati
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4884,32 +4884,32 @@ użyj kółka myszy aby ustawić głośność poszczególnych kroków</translati
         <translation type="unfinished">Tryb odstrojenia (Shift+T)</translation>
     </message>
     <message>
-        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold Ctrl to temporarily go into select mode.</source>
-        <translation type="unfinished">Kliknij tutaj, aby przejść do trybu rysowania. W tym trybie możesz dodawać, przemieszczać i zmieniać rozmiar nut To domyślny tryb, który będziesz używać przez większość czasu. Możesz go aktywować z poziomu klawiatury za pomocą skrótu &apos;Shift+D&apos;. Przytrzymaj klawisz &apos;Ctrl&apos; aby czasowo przejść do trybu zaznaczenia.</translation>
+        <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
+        <translation type="unfinished">Kliknij tutaj, aby przejść do trybu rysowania. W tym trybie możesz dodawać, przemieszczać i zmieniać rozmiar nut To domyślny tryb, który będziesz używać przez większość czasu. Możesz go aktywować z poziomu klawiatury za pomocą skrótu &apos;Shift+D&apos;. Przytrzymaj klawisz &apos;%1&apos; aby czasowo przejść do trybu zaznaczenia.</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished">Kliknij tutaj, aby przejść do trybu kasowania. W tym trybie możesz usuwać nuty. Możesz go aktywować z poziomu klawiatury za pomocą skrótu &apos;Shift+E&apos;.</translation>
     </message>
     <message>
-        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold Ctrl in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished">Kliknij tutaj, aby przejść do trybu zaznaczania. W tym trybie możesz zaznaczać pojedyncze nuty lub całe ich grupy. Alternatywnie możesz przytrzymać klawisz &apos;Ctrl&apos; w trybie rysowania aby tymczasowo przejść do trybu zaznaczania.</translation>
+        <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
+        <translation type="unfinished">Kliknij tutaj, aby przejść do trybu zaznaczania. W tym trybie możesz zaznaczać pojedyncze nuty lub całe ich grupy. Alternatywnie możesz przytrzymać klawisz &apos;%1&apos; w trybie rysowania aby tymczasowo przejść do trybu zaznaczania.</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
         <translation type="unfinished">Kliknij tutaj, aby przejść do trybu odstrojenia. W tym trybie możesz odstrajać nuty w oknie, które otworzy się po kliknięciu na nich. Ten tryb możesz aktywować z poziomu klawiatury przez wciśnięcie kombinacji &apos;Shift+T&apos;.</translation>
     </message>
     <message>
-        <source>Cut selected notes (Ctrl+X)</source>
-        <translation type="unfinished">Wytnij zaznaczone nuty (Ctrl+X)</translation>
+        <source>Cut selected notes (%1+X)</source>
+        <translation type="unfinished">Wytnij zaznaczone nuty (%1+X)</translation>
     </message>
     <message>
-        <source>Copy selected notes (Ctrl+C)</source>
-        <translation type="unfinished">Skopiuj zaznaczone nuty (Ctrl+C)</translation>
+        <source>Copy selected notes (%1+C)</source>
+        <translation type="unfinished">Skopiuj zaznaczone nuty (%1+C)</translation>
     </message>
     <message>
-        <source>Paste notes from clipboard (Ctrl+V)</source>
-        <translation type="unfinished">Wklej nuty ze schowka (Ctrl+V)</translation>
+        <source>Paste notes from clipboard (%1+V)</source>
+        <translation type="unfinished">Wklej nuty ze schowka (%1+V)</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
@@ -5010,40 +5010,40 @@ Powód: &quot;%2&quot;</translation>
         <translation type="unfinished">Cofnij [&amp;U]</translation>
     </message>
     <message>
-        <source>Ctrl+Z</source>
-        <translation type="unfinished">Ctrl+Z</translation>
+        <source>%1+Z</source>
+        <translation type="unfinished">%1+Z</translation>
     </message>
     <message>
         <source>&amp;Redo</source>
         <translation type="unfinished">Powtórz [&amp;R]</translation>
     </message>
     <message>
-        <source>Ctrl+Y</source>
-        <translation type="unfinished">Ctrl+Y</translation>
+        <source>%1+Y</source>
+        <translation type="unfinished">%1+Y</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
         <translation type="unfinished">&amp;Kopiuj</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation type="unfinished">Ctrl+C</translation>
+        <source>%1+C</source>
+        <translation type="unfinished">%1+C</translation>
     </message>
     <message>
         <source>Cu&amp;t</source>
         <translation type="unfinished">Wy&amp;tnij</translation>
     </message>
     <message>
-        <source>Ctrl+X</source>
-        <translation type="unfinished">Ctrl+X</translation>
+        <source>%1+X</source>
+        <translation type="unfinished">%1+X</translation>
     </message>
     <message>
         <source>&amp;Paste</source>
         <translation type="unfinished">&amp;Wklej</translation>
     </message>
     <message>
-        <source>Ctrl+V</source>
-        <translation type="unfinished">Ctrl+V</translation>
+        <source>%1+V</source>
+        <translation type="unfinished">%1+V</translation>
     </message>
     <message>
         <source>Format Actions</source>
@@ -5054,56 +5054,56 @@ Powód: &quot;%2&quot;</translation>
         <translation type="unfinished">Wytłuść [&amp;B]</translation>
     </message>
     <message>
-        <source>Ctrl+B</source>
-        <translation type="unfinished">Ctrl+B</translation>
+        <source>%1+B</source>
+        <translation type="unfinished">%1+B</translation>
     </message>
     <message>
         <source>&amp;Italic</source>
         <translation type="unfinished">Kursywa [&amp;I]</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <translation type="unfinished">Ctrl+I</translation>
+        <source>%1+I</source>
+        <translation type="unfinished">%1+I</translation>
     </message>
     <message>
         <source>&amp;Underline</source>
         <translation type="unfinished">Podkreślenie [&amp;U]</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation type="unfinished">Ctrl+U</translation>
+        <source>%1+U</source>
+        <translation type="unfinished">%1+U</translation>
     </message>
     <message>
         <source>&amp;Left</source>
         <translation type="unfinished">Lewo [&amp;L]</translation>
     </message>
     <message>
-        <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <source>%1+L</source>
+        <translation type="unfinished">%1+L</translation>
     </message>
     <message>
         <source>C&amp;enter</source>
         <translation type="unfinished">Centrowanie [&amp;E]</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <source>%1+E</source>
+        <translation type="unfinished">%1+E</translation>
     </message>
     <message>
         <source>&amp;Right</source>
         <translation type="unfinished">Prawo [&amp;R]</translation>
     </message>
     <message>
-        <source>Ctrl+R</source>
-        <translation type="unfinished">Ctrl+R</translation>
+        <source>%1+R</source>
+        <translation type="unfinished">%1+R</translation>
     </message>
     <message>
         <source>&amp;Justify</source>
         <translation type="unfinished">Justowanie [&amp;J]</translation>
     </message>
     <message>
-        <source>Ctrl+J</source>
-        <translation type="unfinished">Ctrl+J</translation>
+        <source>%1+J</source>
+        <translation type="unfinished">%1+J</translation>
     </message>
     <message>
         <source>&amp;Color...</source>
@@ -5337,8 +5337,8 @@ Powód: &quot;%2&quot;</translation>
         <translation type="unfinished">Wklej</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished">Wycisz/anuluj wyciszenie (&lt;Ctrl&gt; + kliknięcie rolką myszy)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation type="unfinished">Wycisz/anuluj wyciszenie (&lt;%1&gt; + kliknięcie rolką myszy)</translation>
     </message>
     <message>
         <source>Set/clear record</source>
@@ -5941,11 +5941,11 @@ Upewnij się, że masz przynajmniej uprawnienia odczytu tego pliku a następnie 
         <translation type="unfinished">Wskazówka</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;Ctrl&gt; to disable magnetic loop points.</source>
+        <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6021,16 +6021,16 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation type="unfinished">Wskazówka</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; and drag to make a copy.</source>
-        <translation type="unfinished">Naciśnij &lt;Ctrl&gt; i przeciągnij aby stworzyć kopię.</translation>
+        <source>Press &lt;%1&gt; and drag to make a copy.</source>
+        <translation type="unfinished">Naciśnij &lt;%1&gt; i przeciągnij aby stworzyć kopię.</translation>
     </message>
     <message>
         <source>Current length</source>
         <translation type="unfinished">Aktualna długość</translation>
     </message>
     <message>
-        <source>Press &lt;Ctrl&gt; for free resizing.</source>
-        <translation type="unfinished">Naciśnij &lt;Ctrl&gt; aby zmienić rozmiar.</translation>
+        <source>Press &lt;%1&gt; for free resizing.</source>
+        <translation type="unfinished">Naciśnij &lt;%1&gt; aby zmienić rozmiar.</translation>
     </message>
     <message>
         <source>%1:%2 (%3:%4 to %5:%6)</source>
@@ -6053,15 +6053,15 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation type="unfinished">Wklej</translation>
     </message>
     <message>
-        <source>Mute/unmute (&lt;Ctrl&gt; + middle click)</source>
-        <translation type="unfinished">Wycisz/anuluj wyciszenie (&lt;Ctrl&gt; + kliknięcie rolką myszy)</translation>
+        <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
+        <translation type="unfinished">Wycisz/anuluj wyciszenie (&lt;%1&gt; + kliknięcie rolką myszy)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
-        <source>Press &lt;Ctrl&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished">Naciśnij &lt;Ctrl&gt; podczas przeciągania elementu kursorem aby rozpocząć nową akcję &apos;przeciągnij i upuść&apos;.</translation>
+        <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
+        <translation type="unfinished">Naciśnij &lt;%1&gt; podczas przeciągania elementu kursorem aby rozpocząć nową akcję &apos;przeciągnij i upuść&apos;.</translation>
     </message>
     <message>
         <source>Actions for this track</source>
@@ -6107,11 +6107,11 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
 <context>
     <name>TripleOscillatorView</name>
     <message>
-        <source>Use phase modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Użyj modulacji fazowej aby zmodulować oscylator 2 oscylatorem 1</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Użyj modulacji amplitudowej aby zmodulować oscylator 2 oscylatorem 1</translation>
     </message>
     <message>
@@ -6123,15 +6123,15 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation>Synchronizuj oscylator 1 z oscylatorem 2</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 2 with oscillator 1</source>
+        <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
         <translation>Użyj modulacji częstotliwościowej aby zmodulować oscylator 2 oscylatorem 1</translation>
     </message>
     <message>
-        <source>Use phase modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Użyj modulacji fazowej aby zmodulować oscylator 3 oscylatorem 2</translation>
     </message>
     <message>
-        <source>Use amplitude modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Użyj modulacji amplitudowej aby zmodulować oscylator 3 oscylatorem 2</translation>
     </message>
     <message>
@@ -6143,7 +6143,7 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
         <translation>Synchronizuj oscylator 2 z oscylatorem 3</translation>
     </message>
     <message>
-        <source>Use frequency modulation for modulating oscillator 3 with oscillator 2</source>
+        <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
         <translation>Użyj modulacji częstotliwościowej aby zmodulować oscylator 3 oscylatorem 2</translation>
     </message>
     <message>

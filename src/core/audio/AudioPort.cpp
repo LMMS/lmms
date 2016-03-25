@@ -116,7 +116,7 @@ void AudioPort::doProcessing()
 	BufferManager::clear( m_portBuffer, fpp );
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
-	foreach( PlayHandle * ph, m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
+	for( PlayHandle * ph : m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
 	{
 		if( ph->buffer() )
 		{

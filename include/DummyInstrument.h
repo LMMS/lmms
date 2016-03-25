@@ -28,6 +28,9 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "Engine.h"
+
+#include <string.h>
 
 
 class DummyInstrument : public Instrument
@@ -42,8 +45,10 @@ public:
 	{
 	}
 
-	virtual void playNote( NotePlayHandle *, sampleFrame * )
+	virtual void playNote( NotePlayHandle *, sampleFrame * buffer )
 	{
+		memset( buffer, 0, sizeof( sampleFrame ) *
+			Engine::mixer()->framesPerPeriod() );
 	}
 
 	virtual void saveSettings( QDomDocument &, QDomElement & )

@@ -188,7 +188,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	const int sampleRate = Engine::mixer()->processingSampleRate();
 	sampleFrame m_inPeak = { 0, 0 };
 
-	if(m_eqControls.m_analyseIn )
+	if(m_eqControls.m_analyseInModel.value( true ) )
 	{
 		m_eqControls.m_inFftBands.analyze( buf, frames );
 	}
@@ -326,7 +326,7 @@ bool EqEffect::processAudioBuffer(sampleFrame *buf, const fpp_t frames)
 	m_eqControls.m_outPeakR = m_eqControls.m_outPeakR < outPeak[1] ? outPeak[1] : m_eqControls.m_outPeakR;
 
 	checkGate( outSum / frames );
-	if(m_eqControls.m_analyseOut )
+	if(m_eqControls.m_analyseOutModel.value( true ) )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate * 0.5 ) );
