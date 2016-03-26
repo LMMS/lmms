@@ -382,7 +382,9 @@ void FxMixerView::deleteChannel(int index)
 	delete m_fxChannelViews[index]->m_fader;
 	delete m_fxChannelViews[index]->m_muteBtn;
 	delete m_fxChannelViews[index]->m_soloBtn;
-	delete m_fxChannelViews[index]->m_fxLine;
+	// delete fxLine later to prevent a crash when deleting from context menu
+	m_fxChannelViews[index]->m_fxLine->hide();
+	m_fxChannelViews[index]->m_fxLine->deleteLater();
 	delete m_fxChannelViews[index]->m_rackView;
 	delete m_fxChannelViews[index];
 	m_channelAreaWidget->adjustSize();
