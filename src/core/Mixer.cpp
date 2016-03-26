@@ -40,6 +40,7 @@
 #include "AudioAlsa.h"
 #include "AudioJack.h"
 #include "AudioOss.h"
+#include "AudioSndio.h"
 #include "AudioPortAudio.h"
 #include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
@@ -789,6 +790,19 @@ AudioDevice * Mixer::tryAudioDevices()
 		if( success_ful )
 		{
 			m_audioDevName = AudioOss::name();
+			return dev;
+		}
+		delete dev;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if( dev_name == AudioSndio::name() || dev_name == "" )
+	{
+		dev = new AudioSndio( success_ful, this );
+		if( success_ful )
+		{
+			m_audioDevName = AudioSndio::name();
 			return dev;
 		}
 		delete dev;

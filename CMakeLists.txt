@@ -390,6 +390,16 @@ IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
 ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 
+IF(LMMS_BUILD_OPENBSD)
+	FIND_PACKAGE(Sndio)
+	IF(SNDIO_FOUND)
+		SET(LMMS_HAVE_SNDIO TRUE)
+        	SET(STATUS_SNDIO "OK")
+    	ELSE()
+        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	ENDIF(SNDIO_FOUND)
+ENDIF(LMMS_BUILD_OPENBSD)
+
 # check for WINE
 IF(WANT_VST)
 	FIND_PACKAGE(Wine)
@@ -550,6 +560,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* JACK                        : ${STATUS_JACK}\n"
 "* OSS                         : ${STATUS_OSS}\n"
+"* Sndio                       : ${STATUS_SNDIO}\n"
 "* PortAudio                   : ${STATUS_PORTAUDIO}\n"
 "* libsoundio                  : ${STATUS_SOUNDIO}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
@@ -561,6 +572,7 @@ MESSAGE(
 "-------------------------\n"
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
+"* Sndio                       : ${STATUS_SNDIO}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
 "* AppleMidi                   : ${STATUS_APPLEMIDI}\n"
 )
