@@ -56,6 +56,7 @@ class FxChannel : public ThreadableJob
 		BoolModel m_soloModel;
 		FloatModel m_volumeModel;
 		QString m_name;
+		QMutex m_lock;
 		int m_channelIndex; // what channel index are we
 		bool m_queued; // are we queued up for rendering yet?
 		bool m_muted; // are we muted? updated per period so we don't have to call m_muteModel.value() twice
