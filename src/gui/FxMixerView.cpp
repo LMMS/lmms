@@ -69,6 +69,9 @@ FxMixerView::FxMixerView() :
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;
 
+	// Set margins
+	ml->setContentsMargins( 0, 4, 0, 0 );
+	
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
