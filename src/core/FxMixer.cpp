@@ -68,6 +68,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_soloModel( false, _parent ),
 	m_volumeModel( 1.0, 0.0, 2.0, 0.001, _parent ),
 	m_name(),
+	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
 	m_dependenciesMet( 0 )
@@ -547,8 +548,10 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 {
 	if( m_fxChannels[_ch]->m_muteModel.value() == false )
 	{
+		m_fxChannels[_ch]->m_lock.lock();
 		MixHelpers::add( m_fxChannels[_ch]->m_buffer, _buf, Engine::mixer()->framesPerPeriod() );
 		m_fxChannels[_ch]->m_hasInput = true;
+		m_fxChannels[_ch]->m_lock.unlock();
 	}
 }
 
