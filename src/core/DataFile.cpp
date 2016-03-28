@@ -792,6 +792,20 @@ void DataFile::upgrade_0_4_0_rc2()
 }
 
 
+void DataFile::upgrade_1_1_91()
+{
+	// Upgrade to version 1.1.91 from some version less than 1.1.91
+	QDomNodeList list = elementsByTagName( "audiofileprocessor" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		QString s = el.attribute( "src" );
+		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
+		el.setAttribute( "src", s );
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -855,6 +869,10 @@ void DataFile::upgrade()
 	if( version < "0.4.0-rc2" )
 	{
 		upgrade_0_4_0_rc2();
+	}
+	if( version < ProjectVersion("1.1.91", CompareType::Release) )
+	{
+		upgrade_1_1_91();
 	}
 
 	// update document meta data
