@@ -277,6 +277,17 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
 </context>
 <context>
+    <name>AudioSndio::setupWidget</name>
+    <message>
+        <source>DEVICE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CHANNELS</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AudioSoundIo::setupWidget</name>
     <message>
         <source>BACKEND</source>
