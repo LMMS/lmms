@@ -51,6 +51,7 @@
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
 #include "MidiOss.h"
+#include "MidiSndio.h"
 #include "MidiWinMM.h"
 #include "MidiApple.h"
 #include "MidiDummy.h"
@@ -916,6 +917,19 @@ MidiClient * Mixer::tryMidiClients()
 			return moss;
 		}
 		delete moss;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if( client_name == MidiSndio::name() || client_name == "" )
+	{
+		MidiSndio * msndio = new MidiSndio;
+		if( msndio->isRunning() )
+		{
+			m_midiClientName = MidiSndio::name();
+			return msndio;
+		}
+		delete msndio;
 	}
 #endif
 
