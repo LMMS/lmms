@@ -6326,6 +6326,14 @@ Remember to also save your project manually.</source>
         <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>project</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SongEditorWindow</name>
@@ -8335,10 +8343,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bowed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8347,27 +8351,11 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vibrato</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vibrato:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

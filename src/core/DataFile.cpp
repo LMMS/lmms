@@ -957,8 +957,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 								"LMMS version %2, but version %3 "
 								"is installed")
 								.arg( _sourceFile.endsWith( ".mpt" ) ?
-									"template" : 
-									"project" )
+                                                                        SongEditor::tr("template") :
+                                                                        SongEditor::tr("project") )
 								.arg( root.attribute( "creatorversion" ) )
 								.arg( LMMS_VERSION ) );
 				}

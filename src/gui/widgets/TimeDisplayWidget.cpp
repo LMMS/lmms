@@ -76,15 +76,15 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
-			m_majorLCD.setLabel( "MIN" );
-			m_minorLCD.setLabel( "SEC" );
-			m_milliSecondsLCD.setLabel( "MSEC" );
+			m_majorLCD.setLabel( tr( "MIN" ) );
+			m_minorLCD.setLabel( tr( "SEC" ) );
+			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setLabel( "BAR" );
-			m_minorLCD.setLabel( "BEAT" );
-			m_milliSecondsLCD.setLabel( "TICK" );
+			m_majorLCD.setLabel( tr( "BAR" ) );
+			m_minorLCD.setLabel( tr( "BEAT" ) );
+			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
 			break;
 
 		default: break;
