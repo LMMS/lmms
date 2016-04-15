@@ -115,7 +115,7 @@ void Note::setPos( const MidiTime & pos )
 
 void Note::setKey( const int key )
 {
-	const int k = qBound( 0, key, NumKeys );
+	const int k = qBound( 0, key, NumKeys - 1 );
 	m_key = k;
 }
 
