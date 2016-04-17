@@ -800,6 +800,8 @@ void PatternView::constructContextMenu( QMenu * _cm )
 			tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
 		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
 			tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
+			tr( "Clone Steps" ), m_pat, SLOT( cloneSteps() ) );
 	}
 }
 
