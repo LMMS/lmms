@@ -53,6 +53,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_OBJECT
 	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
 	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
+	Q_PROPERTY(QColor controlPointColor READ controlPointColor WRITE setControlPointColor)
 	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
 	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
@@ -80,11 +81,13 @@ public:
 	QColor gridColor() const;
 	QBrush graphColor() const;
 	QColor vertexColor() const;
+	QColor controlPointColor() const;
 	QBrush scaleColor() const;
 	QColor crossColor() const;
 	void setGridColor(const QColor& c);
 	void setGraphColor(const QBrush& c);
 	void setVertexColor(const QColor& c);
+	void setControlPointColor(const QColor& c);
 	void setScaleColor(const QBrush& c);
 	void setCrossColor(const QColor& c);
 
@@ -103,6 +106,7 @@ public slots:
 
 protected:
 	typedef AutomationPattern::timeMap timeMap;
+	typedef AutomationPattern::controlPointTimeMap controlPointTimeMap;
 
 	virtual void keyPressEvent(QKeyEvent * ke);
 	virtual void leaveEvent(QEvent * e);
@@ -157,6 +161,7 @@ private:
 	{
 		NONE,
 		MOVE_VALUE,
+		MOVE_CONTROL_POINT,
 		SELECT_VALUES,
 		MOVE_SELECTION
 	} ;
@@ -234,11 +239,13 @@ private:
 
 	void drawCross(QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
+	void drawControlPoint( QPainter & p, controlPointTimeMap::iterator it, float key_y );
 	bool inBBEditor();
 
 	QColor m_gridColor;
 	QBrush m_graphColor;
 	QColor m_vertexColor;
+	QColor m_controlPointColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
 
@@ -288,6 +295,7 @@ private:
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
 	QAction* m_cubicHermiteAction;
+	QAction* m_bezierAction;
 
 	QAction* m_flipYAction;
 	QAction* m_flipXAction;

@@ -105,6 +105,7 @@ AutomationEditor::AutomationEditor() :
 	m_gridColor( 0,0,0 ),
 	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
+	m_controlPointColor( 0xFF,0xFF,0x25 ),
 	m_scaleColor( Qt::SolidPattern ),
 	m_crossColor( 0, 0, 0 )
 {
@@ -250,6 +251,8 @@ QBrush AutomationEditor::graphColor() const
 { return m_graphColor; }
 QColor AutomationEditor::vertexColor() const
 { return m_vertexColor; }
+QColor AutomationEditor::controlPointColor() const
+{ return m_controlPointColor; }
 QBrush AutomationEditor::scaleColor() const
 { return m_scaleColor; }
 QColor AutomationEditor::crossColor() const
@@ -260,6 +263,8 @@ void AutomationEditor::setGraphColor( const QBrush & c )
 { m_graphColor = c; }
 void AutomationEditor::setVertexColor( const QColor & c )
 { m_vertexColor = c; }
+void AutomationEditor::setControlPointColor( const QColor & c )
+{ m_controlPointColor = c; }
 void AutomationEditor::setScaleColor( const QBrush & c )
 { m_scaleColor = c; }
 void AutomationEditor::setCrossColor( const QColor & c )
@@ -472,19 +477,50 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 			// get time map of current pattern
 			timeMap & time_map = m_pattern->getTimeMap();
+			controlPointTimeMap & control_points = m_pattern->getControlPoints();
 
 			// will be our iterator in the following loop
 			timeMap::iterator it = time_map.begin();
 
+			// If there is a control point at the mouse
+			int controlPoint = 0;
+
 			// loop through whole time-map...
 			while( it != time_map.end() )
 			{
-				MidiTime len = 4;
+				// If this automation point has its control point at the mouse
+				// And the progression type is bezier
+				// P.S. I'm not entirely sure how the automation clicks work below
+				// so I'm just doing it my own way
+				if ( m_pattern->progressionType() == AutomationPattern::BezierProgression &&
+					mouseEvent->button() == Qt::LeftButton &&
+					m_editMode == DRAW &&
+					yCoordOfLevel(level) <= yCoordOfLevel(control_points[it.key()][1]) + 16 &&
+					yCoordOfLevel(level) >= yCoordOfLevel(control_points[it.key()][1]) - 16 &&
+					xCoordOfTick(pos_ticks) <= xCoordOfTick(control_points[it.key()][0]) + 16 && 
+					xCoordOfTick(pos_ticks) >= xCoordOfTick(control_points[it.key()][0]) - 16 )
+				{
+					controlPoint = true;
+					m_pattern->flipControlPoint(false);
+					break;
+				}
+				// This is to get the left control point
+				else if ( m_pattern->progressionType() == AutomationPattern::BezierProgression &&
+					mouseEvent->button() == Qt::LeftButton &&
+					m_editMode == DRAW &&
+					yCoordOfLevel(level) <= yCoordOfLevel(2 * it.value() - control_points[it.key()][1]) + 16 &&
+					yCoordOfLevel(level) >= yCoordOfLevel(2 * it.value() - control_points[it.key()][1]) - 16 &&
+					xCoordOfTick(pos_ticks) <= xCoordOfTick(2 * it.key() - control_points[it.key()][0]) + 16 && 
+					xCoordOfTick(pos_ticks) >= xCoordOfTick(2 * it.key() - control_points[it.key()][0]) - 16 )
+				{
+					controlPoint = true;
+					m_pattern->flipControlPoint(true);
+					break;
+				}
 
-				// and check whether the user clicked on an
+				// Check whether the user clicked on an
 				// existing value
 				if( pos_ticks >= it.key() &&
-					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
@@ -510,16 +546,36 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				m_drawLastTick = pos_ticks;
 				m_drawLastLevel = level;
 
+				m_action = MOVE_VALUE;
 				// did it reach end of map because
-				// there's no value??
-				if( it == time_map.end() )
+				// there's no value?? (And no control point)
+				if( it == time_map.end() && !controlPoint)
 				{
 					// then set new value
 					MidiTime value_pos( pos_ticks );
 
-					MidiTime new_time =
-						m_pattern->setDragValue( value_pos,
-									level );
+					//m_pattern->putValue( value_pos, level );
+					MidiTime new_time = 
+							m_pattern->setDragValue( value_pos,
+										level );
+
+
+					// reset it so that it can be used for
+					// ops (move, resize) after this
+					// code-block
+					it = time_map.find( new_time );
+				}
+				else if ( controlPoint )
+				{
+					// then set new value
+					MidiTime value_pos( pos_ticks );
+
+					MidiTime new_time = 
+							m_pattern->setControlPointDragValue( it.key(),
+									level, value_pos );
+
+					m_action = MOVE_CONTROL_POINT;
+
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this
@@ -528,7 +584,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				}
 
 				// move it
-				m_action = MOVE_VALUE;
+
 				int aligned_x = (int)( (float)( (
 						it.key() -
 						m_currentPosition ) *
@@ -605,7 +661,7 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 {
 	if( m_editMode == DRAW )
 	{
-		if( m_action == MOVE_VALUE )
+		if( m_action == MOVE_VALUE || m_action == MOVE_CONTROL_POINT )
 		{
 			m_pattern->applyDragValue();
 		}
@@ -660,6 +716,23 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// time in the time map of pattern
 				m_pattern->setDragValue( MidiTime( pos_ticks ),
 								level );
+			}
+			else if( m_action == MOVE_CONTROL_POINT )
+			{
+				// moving value
+				if( pos_ticks < 0 )
+				{
+					pos_ticks = 0;
+				}
+
+				m_drawLastTick = pos_ticks;
+				m_drawLastLevel = level;
+				// we moved the value so the value has to be
+				// moved properly according to new starting-
+				// time in the time map of pattern
+				m_pattern->setControlPointDragValue(MidiTime( pos_ticks ), 
+								level, MidiTime( pos_ticks ));
+				m_pattern->clampControlPoints();
 			}
 
 			Engine::getSong()->setModified();
@@ -1004,6 +1077,28 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 
 
 
+inline void AutomationEditor::drawControlPoint( QPainter & p, controlPointTimeMap::iterator it , float key_y )
+{
+	// The x and y of the "real" point (to the right of the automation point)
+	int x = xCoordOfTick( it.value()[0] );
+	int y = yCoordOfLevel( it.value()[1] );
+	// The x and y of the "fake" point (to the left of the automation point)
+	const int outerRadius = qBound( 2, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); 
+	p.setPen( QPen( controlPointColor().lighter( 200 ) ) );
+	p.setBrush( QBrush( controlPointColor() ) );
+	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
+	p.setPen( controlPointColor() );
+	p.drawLine( x, y, xCoordOfTick( it.key() ), yCoordOfLevel( key_y ) );
+	// Oh look! An easy way to draw the line out the other side of the control point!
+	int reflected_x = 2*xCoordOfTick( it.key() ) - x;
+	int reflected_y = 2*yCoordOfLevel( key_y ) - y;
+	p.drawLine( reflected_x, reflected_y, xCoordOfTick( it.key() ), yCoordOfLevel( key_y ) );
+	p.drawEllipse( reflected_x - outerRadius, reflected_y - outerRadius, outerRadius * 2, outerRadius * 2 );
+}
+
+
+
+
 void AutomationEditor::paintEvent(QPaintEvent * pe )
 {
 	QMutexLocker m( &m_patternMutex );
@@ -1200,6 +1295,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	{
 		int len_ticks = 4;
 		timeMap & time_map = m_pattern->getTimeMap();
+		controlPointTimeMap & controlPoint_time_map = m_pattern->getControlPoints();
 
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
@@ -1267,6 +1363,38 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
+		}
+
+		//Don't bother doing/rendering anything if there is no control points or if it's not a bezier curve
+		if( controlPoint_time_map.size() > 0 && m_pattern->progressionType() == AutomationPattern::BezierProgression)
+		{
+			// Now we've drawn the automation points, we should draw the control points
+			controlPointTimeMap::iterator it = controlPoint_time_map.begin();			
+			while( it+1 != controlPoint_time_map.end() )
+			{
+				// skip this section if it occurs completely before the
+				// visible area
+				int next_x = xCoordOfTick( (it+1).key() );
+				if( next_x < 0 )
+				{
+					++it;
+					continue;
+				}
+
+				int x = xCoordOfTick( it.key() );
+				if( x > width() )
+				{
+					break;
+				}
+
+				// Draw circle
+				drawControlPoint( p, it, time_map[it.key()] );
+
+				++it;
+			}
+
+			// Draw circle(the last one)
+			drawControlPoint(p, it, time_map[it.key()] );
 		}
 	}
 	else
@@ -2098,6 +2226,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 				embed::getIconPixmap("progression_linear"), tr("Linear progression"));
 	m_cubicHermiteAction = progression_type_group->addAction(
 				embed::getIconPixmap("progression_cubic_hermite"), tr( "Cubic Hermite progression"));
+	m_bezierAction = progression_type_group->addAction(
+				embed::getIconPixmap("progression_bezier"), tr( "Bezier progression"));
 
 	connect(progression_type_group, SIGNAL(triggered(int)), m_editor, SLOT(setProgressionType(int)));
 
@@ -2130,15 +2260,20 @@ AutomationEditorWindow::AutomationEditorWindow() :
 			"automation pattern.  The value of the connected "
 			"object will change in a smooth curve and ease in to "
 			"the peaks and valleys." ) );
+	m_bezierAction->setWhatsThis(
+		tr( "Click here to choose bezier progressions for this "
+			"automation pattern.  The value of the connected "
+			"object will change in a smooth curve and give handles "
+			"to give more control for the ease in and out." ) );
 
 	interpolationActionsToolBar->addSeparator();
 	interpolationActionsToolBar->addAction(m_discreteAction);
 	interpolationActionsToolBar->addAction(m_linearAction);
 	interpolationActionsToolBar->addAction(m_cubicHermiteAction);
+	interpolationActionsToolBar->addAction(m_bezierAction);
 	interpolationActionsToolBar->addSeparator();
 	interpolationActionsToolBar->addWidget( new QLabel( tr("Tension: "), interpolationActionsToolBar ));
 	interpolationActionsToolBar->addWidget( m_tensionKnob );
-
 
 
 	// Copy paste buttons
@@ -2310,6 +2445,10 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	case AutomationPattern::CubicHermiteProgression:
 		m_cubicHermiteAction->setChecked(true);
 		m_tensionKnob->setEnabled(true);
+		break;
+	case AutomationPattern::BezierProgression:
+		m_bezierAction->setChecked(true);
+		m_tensionKnob->setEnabled(false);
 		break;
 	}
 
