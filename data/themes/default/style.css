@@ -392,15 +392,6 @@ QToolBar::separator {
 	width: 5px;
 }
 
-QToolButton {
-	padding: 1px 1px 1px 1px;
-	border-radius: 5px;
-	border: 1px solid rgba(63, 63, 63, 128);
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
-	font-size:10px;
-	color: black;
-}
-
 /* separate corner rounding for play and stop buttons! */
 
 QToolButton#playButton {
@@ -416,6 +407,15 @@ QToolButton#stopButton {
 /* record and record-accompany can be styled with #recordButton and #recordAccompanyButton respectively */
 
 /* all tool buttons */
+
+QToolButton {
+	padding: 1px 1px 1px 1px;
+	border-radius: 5px;
+	border: 1px solid rgba(63, 63, 63, 128);
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #98a2a7, stop:1 #5b646f);
+	font-size:10px;
+	color: black;
+}
 
 QToolButton:hover {
 	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #c0cdd3, stop:1 #71797d);
