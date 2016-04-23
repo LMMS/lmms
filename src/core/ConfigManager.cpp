@@ -63,14 +63,16 @@ ConfigManager::ConfigManager() :
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
 
-	// If we're in development (lmms is not installed) let's get the source
-	// directory by reading the CMake Cache
+	// If we're in development (lmms is not installed) let's get the source and
+	// binary directories by reading the CMake Cache
 	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
 	if (cmakeCache.exists()) {
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
 
-		// Find the line containing something like lmms_SOURCE_DIR:static=<dir>
+		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
+		// and lmms_BINARY_DIR:static=<dir>
+		int done = 0;
 		while(! stream.atEnd())
 		{
 			QString line = stream.readLine();
@@ -78,6 +80,15 @@ ConfigManager::ConfigManager() :
 			if (line.startsWith("lmms_SOURCE_DIR:")) {
 				QString srcDir = line.section('=', -1).trimmed();
 				QDir::addSearchPath("data", srcDir + "/data/");
+				done++;
+			}
+			if (line.startsWith("lmms_BINARY_DIR:")) {
+				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
+											 ".lmmsrc.xml";
+				done++;
+			}
+			if (done == 2)
+			{
 				break;
 			}
 		}
@@ -331,9 +342,15 @@ void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
 }
 
 
-void ConfigManager::loadConfigFile()
+void ConfigManager::loadConfigFile( const QString & configFile )
 {
 	// read the XML file and create DOM tree
+	// Allow configuration file override through --config commandline option
+	if ( !configFile.isEmpty() )
+	{
+		m_lmmsRcFile = configFile;
+	}
+
 	QFile cfg_file( m_lmmsRcFile );
 	QDomDocument dom_tree;
 
