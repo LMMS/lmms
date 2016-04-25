@@ -5231,6 +5231,10 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>double-click to open in Piano Roll</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Clone Steps</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PeakController</name>
@@ -6246,6 +6250,10 @@ Remember to also save your project manually.</source>
         <source>MIDI File (*.mid)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>LMMS Error report</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SongEditor</name>
@@ -6514,6 +6522,30 @@ Remember to also save your project manually.</source>
     <name>TimeDisplayWidget</name>
     <message>
         <source>click to change time units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SEC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MSEC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEAT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TICK</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

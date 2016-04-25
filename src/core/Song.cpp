@@ -1052,7 +1052,7 @@ void Song::loadProject( const QString & fileName )
 	{
 		if ( gui )
 		{
-			QMessageBox::warning( NULL, "LMMS Error report", *errorSummary(),
+			QMessageBox::warning( NULL, tr("LMMS Error report"), *errorSummary(),
 							QMessageBox::Ok );
 		}
 		else
