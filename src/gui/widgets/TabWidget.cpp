@@ -34,16 +34,16 @@
 #include "gui_templates.h"
 #include "embed.h"
 
-TabWidget::TabWidget( const QString & _caption, QWidget * _parent, bool usePixmap ) :
-	QWidget( _parent ),
+TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap ) :
+	QWidget( parent ),
 	m_activeTab( 0 ),
-	m_caption( _caption ),
+	m_caption( caption ),
 	m_usePixmap( usePixmap )
 {
 
 	// Create taller tabbar when it's to display artwork tabs
 	m_tabbarHeight = usePixmap ? GRAPHIC_TAB_HEIGHT : TEXT_TAB_HEIGHT;
-	m_tabheight = _caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
+	m_tabheight = caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
 
 	setFont( pointSize<8>( font() ) );
 
@@ -66,29 +66,29 @@ TabWidget::~TabWidget()
 
 
 
-void TabWidget::addTab( QWidget * _w, const QString & _name, const QString & _tooltip, const char *activePixmap, const char *inactivePixmap, int _idx )
+void TabWidget::addTab( QWidget * w, const QString & name, const QString & tooltip, const char *activePixmap, const char *inactivePixmap, int idx )
 {
 	setFont( pointSize<8>( font() ) );
 
         // Append tab when position is not given
-	if( _idx < 0/* || m_widgets.contains( _idx ) == true*/ )
+	if( idx < 0/* || m_widgets.contains( idx ) == true*/ )
 	{
-		while( m_widgets.contains( ++_idx ) == true )
+		while( m_widgets.contains( ++idx ) == true )
 		{
 		}
 	}
 
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
-	int w = fontMetrics().width( _name ) + 10;
+	int tab_width = fontMetrics().width( name ) + 10;
 
         // Register new tab
-	widgetDesc d = { _w, activePixmap, inactivePixmap, _name, _tooltip, w } ;
-	m_widgets[_idx] = d;
+	widgetDesc d = { w, activePixmap, inactivePixmap, name, tooltip, tab_width } ;
+	m_widgets[idx] = d;
 
         // Position tab's window
-	_w->setFixedSize( width() - 4, height() - m_tabbarHeight );
-	_w->move( 2, m_tabbarHeight - 1 );
-	_w->hide();
+	w->setFixedSize( width() - 4, height() - m_tabbarHeight );
+	w->move( 2, m_tabbarHeight - 1 );
+	w->hide();
 
 	// Show tab's window if it's active
 	if( m_widgets.contains( m_activeTab ) )
@@ -102,15 +102,15 @@ void TabWidget::addTab( QWidget * _w, const QString & _name, const QString & _to
 
 
 
-void TabWidget::setActiveTab( int _idx )
+void TabWidget::setActiveTab( int idx )
 {
-	if( m_widgets.contains( _idx ) )
+	if( m_widgets.contains( idx ) )
 	{
 		int old_active = m_activeTab;
-		m_activeTab = _idx;
+		m_activeTab = idx;
 		m_widgets[m_activeTab].w->raise();
 		m_widgets[m_activeTab].w->show();
-		if( old_active != _idx && m_widgets.contains( old_active ) )
+		if( old_active != idx && m_widgets.contains( old_active ) )
 		{
 			m_widgets[old_active].w->hide();
 		}
@@ -172,11 +172,11 @@ bool TabWidget::event(QEvent *event)
 
 
 // Activate tab when clicked
-void TabWidget::mousePressEvent( QMouseEvent * _me )
+void TabWidget::mousePressEvent( QMouseEvent * me )
 {
 
 	// Find index of tab that has been clicked
-	QPoint pos = _me->pos();
+	QPoint pos = me->pos();
 	int idx = findTabAtPos( &pos );
 
 	// When found, activate tab that has been clicked 
@@ -204,7 +204,7 @@ void TabWidget::resizeEvent( QResizeEvent * )
 
 
 
-void TabWidget::paintEvent( QPaintEvent * _pe )
+void TabWidget::paintEvent( QPaintEvent * pe )
 {
 	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
@@ -313,13 +313,13 @@ void TabWidget::paintEvent( QPaintEvent * _pe )
 
 
 // Switch between tabs with mouse wheel
-void TabWidget::wheelEvent( QWheelEvent * _we )
+void TabWidget::wheelEvent( QWheelEvent * we )
 {
-	if (_we->y() > m_tabheight)
+	if (we->y() > m_tabheight)
 		return;
 
-	_we->accept();
-	int dir = ( _we->delta() < 0 ) ? 1 : -1;
+	we->accept();
+	int dir = ( we->delta() < 0 ) ? 1 : -1;
 	int tab = m_activeTab;
 	while( tab > -1 && static_cast<int>( tab ) < m_widgets.count() )
 	{
