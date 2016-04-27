@@ -5277,6 +5277,10 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <source>double-click to open in Piano Roll</source>
         <translation>Відкрити в редакторі нот подвійним клацанням миші</translation>
     </message>
+    <message>
+        <source>Clone Steps</source>
+        <translation>Клонувати такти</translation>
+    </message>
 </context>
 <context>
     <name>PeakController</name>
@@ -6296,6 +6300,10 @@ Remember to also save your project manually.</source>
         <source>MIDI File (*.mid)</source>
         <translation>MIDI-файл (* mid)</translation>
     </message>
+    <message>
+        <source>LMMS Error report</source>
+        <translation>Повідомлення про помилку в LMMS</translation>
+    </message>
 </context>
 <context>
     <name>SongEditor</name>
@@ -6565,7 +6573,31 @@ Remember to also save your project manually.</source>
     <name>TimeDisplayWidget</name>
     <message>
         <source>click to change time units</source>
-        <translation>натисни для зміни одиниць часу</translation>
+        <translation>натисніть для зміни одиниць часу</translation>
+    </message>
+    <message>
+        <source>MIN</source>
+        <translation>ХВ</translation>
+    </message>
+    <message>
+        <source>SEC</source>
+        <translation>С</translation>
+    </message>
+    <message>
+        <source>MSEC</source>
+        <translation>МС</translation>
+    </message>
+    <message>
+        <source>BAR</source>
+        <translation>БАР</translation>
+    </message>
+    <message>
+        <source>BEAT</source>
+        <translation>БІТ</translation>
+    </message>
+    <message>
+        <source>TICK</source>
+        <translation>ТІК</translation>
     </message>
 </context>
 <context>
