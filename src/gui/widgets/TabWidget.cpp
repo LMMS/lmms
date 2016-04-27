@@ -209,12 +209,8 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
 
-	QColor bg_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Background );
-	QLinearGradient g( 0, 0, 0, m_tabheight );
-	g.setColorAt( 0, bg_color.darker( 250 ) );
-	g.setColorAt( 0.1, bg_color.lighter( 120 ) );
-	g.setColorAt( 1, bg_color.darker( 250 ) );
+	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background );
+
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
 
 	bool big_tab_captions = ( m_caption == "" );
@@ -229,7 +225,6 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
-	p.fillRect( 2, 2, width() - 4, m_tabheight, g );
 	p.drawLine( 2, m_tabheight + 2, width() - 3, m_tabheight + 2);
 
 	if( ! m_caption.isEmpty() )
