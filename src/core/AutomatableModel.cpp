@@ -193,14 +193,33 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 				}
 			}
 	}
-	else if( element.hasAttribute( name ) )
-	// attribute => read the element's value from the attribute list
-	{
-		setInitValue( element.attribute( name ).toFloat() );
-	}
 	else
 	{
-		reset();
+		// needed for backward compatibility
+		if( element.hasAttribute( "scale_type" ) )
+		{
+			if( element.attribute( "scale_type" ) == "linear" )
+			{
+				setScaleType( Linear );
+			}
+			else if( element.attribute( "scale_type" ) == "log" )
+			{
+				setScaleType( Logarithmic );
+			}
+		}
+		else
+		{
+			setScaleType( Linear );
+		}
+		if( element.hasAttribute( name ) )
+			// attribute => read the element's value from the attribute list
+		{
+			setInitValue( element.attribute( name ).toFloat() );
+		}
+		else
+		{
+			reset();
+		}
 	}
 }
 
