@@ -76,6 +76,8 @@ public slots:
 	void setEditModeDraw();
 	void setEditModeSelect();
 
+	void updatePosition( const MidiTime & _t );
+
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 
@@ -93,7 +95,6 @@ private slots:
 	void hideMasterPitchFloat();
 
 	void updateScrollBar( int );
-	void updatePosition( const MidiTime & _t );
 
 	void zoomingChanged();
 

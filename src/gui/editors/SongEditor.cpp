@@ -568,11 +568,7 @@ void SongEditor::updatePosition( const MidiTime & _t )
 		}
 		else if( _t < m_currentPosition )
 		{
-			MidiTime t = qMax(
-				(int)( _t - w * MidiTime::ticksPerTact() /
-							pixelsPerTact() ),
-									0 );
-			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
+			animateScroll( m_leftRightScroll, _t.getTact(), m_smoothScroll );
 		}
 		m_scrollBack = false;
 	}
