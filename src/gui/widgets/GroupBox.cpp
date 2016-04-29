@@ -99,7 +99,7 @@ void GroupBox::updatePixmap()
 	QColor bg_color = QApplication::palette().color( QPalette::Active,
 							QPalette::Background );
 	QPixmap pm( size() );
-	pm.fill( bg_color/*.dark( 132 )*/ );
+	pm.fill( bg_color );
 
 	QPainter p( &pm );
 
@@ -112,13 +112,6 @@ void GroupBox::updatePixmap()
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
-	// draw groupbox-titlebar
-	QLinearGradient g( 0, 0, 0, m_titleBarHeight );
-	g.setColorAt( 0, bg_color.darker( 250 ) );
-	g.setColorAt( 0.1, bg_color.lighter( 120 ) );
-	g.setColorAt( 1, bg_color.darker( 250 ) );
-	p.fillRect( 2, 2, width() - 4, m_titleBarHeight, g );
-
 	// draw line below titlebar
 	p.setPen( bg_color.dark( 400 ) );
 	p.drawLine( 1, m_titleBarHeight + 1, width() - 3, m_titleBarHeight + 1 );
@@ -126,8 +119,6 @@ void GroupBox::updatePixmap()
 	// black inner rect
 	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
-
-	//p.setPen( QColor( 255, 255, 255 ) );
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
 	p.setFont( pointSize<8>( font() ) );
 	p.drawText( 22, m_titleBarHeight, m_caption );
