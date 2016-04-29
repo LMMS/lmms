@@ -80,7 +80,7 @@ const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 						"the volume of the opened "
 						"channel.");
 
-const int INSTRUMENT_WIDTH	= 254;
+const int INSTRUMENT_WIDTH	= 256;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
@@ -1412,7 +1412,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	m_tabWidget = new TabWidget( "", this, true ); 
-	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 4 );
+	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 6 );
 
 
 	// create tab-widgets
