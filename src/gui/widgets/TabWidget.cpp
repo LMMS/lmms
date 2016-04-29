@@ -273,14 +273,14 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			if( it.key() == m_activeTab )
                         {
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
-				p.fillRect( tab_x_offset, 2, ( *it ).nwidth, m_tabbarHeight - 3, cap_col );
+				p.fillRect( tab_x_offset, 3, ( *it ).nwidth, m_tabbarHeight - 5, cap_col );
 			} else 
 			{
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
 			}
 
 			// Draw artwork
-	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 2, *artwork );
+	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 3, *artwork );
 
 		} else
 		{
