@@ -154,7 +154,8 @@ float DrumSynth::waveform(float ph, int form)
      case 1: w = (float)fabs(2.0f*(float)sin(fmod(0.5f*ph,TwoPi)))-1.f; break; //sine^2
      case 2: while(ph<TwoPi) ph+=TwoPi;
              w = 0.6366197f * (float)fmod(ph,TwoPi) - 1.f;                     //tri
-             if(w>1.f) w=2.f-w;                                         break;
+             if(w>1.f) w=2.f-w;
+             break;
      case 3: w = ph - TwoPi * (float)(int)(ph / TwoPi);                        //saw
              w = (0.3183098f * w) - 1.f;                                break;
     default: w = (sin(fmod(ph,TwoPi))>0.0)? 1.f: -1.f;                  break; //square
@@ -428,7 +429,9 @@ int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels
   strcpy(sec, "Distortion");
   chkOn[5] = GetPrivateProfileInt(sec,"On",0,dsfile); DiON = chkOn[5];
   DStep = 1 + GetPrivateProfileInt(sec,"Rate",0,dsfile);
-  if(DStep==7) DStep=20; if(DStep==6) DStep=10; if(DStep==5) DStep=8;
+  if(DStep==7) DStep=20;
+  if(DStep==6) DStep=10;
+  if(DStep==5) DStep=8;
 
   clippoint = 32700;
   DAtten = 1.0f;

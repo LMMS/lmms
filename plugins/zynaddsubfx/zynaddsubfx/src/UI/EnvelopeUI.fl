@@ -204,12 +204,14 @@ if (event==FL_RELEASE){
 
 if ((event==FL_DRAG)&&(currentpoint>=0)){
   int ny=127-(int) (y_*127.0/h());
-  if (ny<0) ny=0;if (ny>127) ny=127;
+  if (ny<0) ny=0;
+  if (ny>127) ny=127;
   env->Penvval[currentpoint]=ny;
 
   int dx=(int)((x_-cpx)*0.1);
   int newdt=cpdt+dx;
-  if (newdt<0) newdt=0;if (newdt>127) newdt=127;
+  if (newdt<0) newdt=0;
+  if (newdt>127) newdt=127;
   if (currentpoint!=0) env->Penvdt[currentpoint]=newdt;
      else env->Penvdt[currentpoint]=0;
 
