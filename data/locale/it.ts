@@ -5268,6 +5268,10 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
         <source>double-click to open in Piano Roll</source>
         <translation>Fai doppio-click per aprire il pattern nel Piano Roll</translation>
     </message>
+    <message>
+        <source>Clone Steps</source>
+        <translation>Clona gli step</translation>
+    </message>
 </context>
 <context>
     <name>PeakController</name>
@@ -6286,6 +6290,10 @@ Ricorda di salvare il tuo progetto anche manualmente.</translation>
         <source>MIDI File (*.mid)</source>
         <translation>File MIDI (*.mid)</translation>
     </message>
+    <message>
+        <source>LMMS Error report</source>
+        <translation>Informazioni sull&apos;errore di LMMS</translation>
+    </message>
 </context>
 <context>
     <name>SongEditor</name>
@@ -6556,6 +6564,30 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
     <message>
         <source>click to change time units</source>
         <translation>Clicca per cambiare l&apos;unità di tempo visualizzata</translation>
+    </message>
+    <message>
+        <source>MIN</source>
+        <translation>MIN</translation>
+    </message>
+    <message>
+        <source>SEC</source>
+        <translation>SEC</translation>
+    </message>
+    <message>
+        <source>MSEC</source>
+        <translation>MSEC</translation>
+    </message>
+    <message>
+        <source>BAR</source>
+        <translation>BAR</translation>
+    </message>
+    <message>
+        <source>BEAT</source>
+        <translation>BATT</translation>
+    </message>
+    <message>
+        <source>TICK</source>
+        <translation>TICK</translation>
     </message>
 </context>
 <context>
