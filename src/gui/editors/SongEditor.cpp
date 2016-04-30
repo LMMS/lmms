@@ -57,7 +57,7 @@
 
 
 
-positionLine::positionLine(QWidget * parent ) :
+positionLine::positionLine( QWidget * parent ) :
 	QWidget( parent )
 {
 	setFixedWidth( 1 );
@@ -67,7 +67,7 @@ positionLine::positionLine(QWidget * parent ) :
 
 
 
-void positionLine::paintEvent(QPaintEvent * pe )
+void positionLine::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
@@ -76,7 +76,7 @@ void positionLine::paintEvent(QPaintEvent * pe )
 
 
 
-SongEditor::SongEditor(Song * song ) :
+SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
@@ -286,7 +286,7 @@ void SongEditor::setHighQuality( bool hq )
 
 
 
-void SongEditor::scrolled(int new_pos )
+void SongEditor::scrolled( int new_pos )
 {
 	update();
 	emit positionChanged( m_currentPosition = MidiTime( new_pos, 0 ) );
@@ -295,7 +295,7 @@ void SongEditor::scrolled(int new_pos )
 
 
 
-void SongEditor::setEditMode(EditMode mode)
+void SongEditor::setEditMode( EditMode mode )
 {
 	m_mode = mode;
 }
@@ -313,7 +313,7 @@ void SongEditor::setEditModeSelect()
 
 
 
-void SongEditor::keyPressEvent(QKeyEvent * ke )
+void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
 		gui->mainWindow()->isShiftPressed() == true &&
@@ -356,7 +356,7 @@ void SongEditor::keyPressEvent(QKeyEvent * ke )
 
 
 
-void SongEditor::wheelEvent(QWheelEvent * we )
+void SongEditor::wheelEvent( QWheelEvent * we )
 {
 	if( gui->mainWindow()->isCtrlPressed() == true )
 	{
@@ -397,7 +397,7 @@ void SongEditor::wheelEvent(QWheelEvent * we )
 
 
 
-void SongEditor::closeEvent(QCloseEvent * ce )
+void SongEditor::closeEvent( QCloseEvent * ce )
  {
 	if( parentWidget() )
 	{
@@ -413,7 +413,7 @@ void SongEditor::closeEvent(QCloseEvent * ce )
 
 
 
-void SongEditor::setMasterVolume(int new_val )
+void SongEditor::setMasterVolume( int new_val )
 {
 	updateMasterVolumeFloat( new_val );
 
@@ -441,7 +441,7 @@ void SongEditor::showMasterVolumeFloat( void )
 
 
 
-void SongEditor::updateMasterVolumeFloat(int new_val )
+void SongEditor::updateMasterVolumeFloat( int new_val )
 {
 	m_mvsStatus->setText( tr( "Value: %1%" ).arg( new_val ) );
 }
@@ -457,7 +457,7 @@ void SongEditor::hideMasterVolumeFloat( void )
 
 
 
-void SongEditor::setMasterPitch(int new_val )
+void SongEditor::setMasterPitch( int new_val )
 {
 	updateMasterPitchFloat( new_val );
 	if( m_mpsStatus->isVisible() == false && m_song->m_loadingProject == false
@@ -609,7 +609,7 @@ bool SongEditor::allowRubberband() const
 }
 
 
-SongEditorWindow::SongEditorWindow(Song* song) :
+SongEditorWindow::SongEditorWindow( Song* song ) :
 	Editor(Engine::mixer()->audioDev()->supportsCapture()),
 	m_editor(new SongEditor(song))
 {

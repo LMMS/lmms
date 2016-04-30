@@ -72,7 +72,7 @@ public:
 public slots:
 	void scrolled( int new_pos );
 
-	void setEditMode(EditMode mode);
+	void setEditMode( EditMode mode );
 	void setEditModeDraw();
 	void setEditModeSelect();
 
@@ -137,7 +137,7 @@ class SongEditorWindow : public Editor
 {
 	Q_OBJECT
 public:
-	SongEditorWindow(Song* song);
+	SongEditorWindow( Song* song );
 
 	QSize sizeHint() const;
 
