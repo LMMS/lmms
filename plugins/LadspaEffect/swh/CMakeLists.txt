@@ -4,13 +4,16 @@ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include"
                     ${FFTW3F_INCLUDE_DIRS}
                     "${CMAKE_BINARY_DIR}")
 LINK_DIRECTORIES(${FFTW3F_LIBRARY_DIRS})
-LINK_LIBRARIES(-lfftw3f)
 FILE(GLOB PLUGIN_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
 
 FOREACH(_item ${PLUGIN_SOURCES})
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)
 
 	ADD_LIBRARY("${_plugin}" MODULE "${_item}")
+	# vocoder_1337 does not use fftw3f
+	IF(NOT ("${_plugin}" STREQUAL "vocoder_1337"))
+		TARGET_LINK_LIBRARIES("${_plugin}" -lfftw3f)
+	ENDIF()
 	INSTALL(TARGETS "${_plugin}" LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES PREFIX "")
 	SET_TARGET_PROPERTIES("${_plugin}" PROPERTIES COMPILE_FLAGS "-O3 -Wall -fomit-frame-pointer -fstrength-reduce -funroll-loops -ffast-math -c -fno-strict-aliasing")
@@ -71,5 +74,6 @@ TARGET_LINK_LIBRARIES(se4_1883 rms db)
 
 ADD_LIBRARY(pitchscale STATIC util/pitchscale.c)
 SET_TARGET_PROPERTIES(pitchscale PROPERTIES COMPILE_FLAGS "${PIC_FLAGS}")
+TARGET_LINK_LIBRARIES(pitchscale -lfftw3f)
 TARGET_LINK_LIBRARIES(pitch_scale_1193 pitchscale)
 TARGET_LINK_LIBRARIES(pitch_scale_1194 pitchscale)
