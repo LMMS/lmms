@@ -409,8 +409,8 @@ QToolButton#stopButton {
 /* all tool buttons */
 
 QToolButton:hover {
-        background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #c0cdd3, stop:1 #71797d);
-        color: white;
+	background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #c0cdd3, stop:1 #71797d);
+	color: white;
 }
 
 QToolButton:pressed {
@@ -540,7 +540,7 @@ BBTCOView {
 	qproperty-textColor: rgb( 255, 255, 255 );
 }
 
-/* subwindows in MDI-Area */
+/* Subwindows in MDI-Area */
 SubWindow {
 	color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 						stop: 0 #4b525c, stop: 1.0 #31363d);
@@ -550,20 +550,20 @@ SubWindow {
 	qproperty-borderColor: rgb( 0, 0, 0 );
 }
 
-/*SubWindow Title Text */
+/* Subwindow title text */
 SubWindow > QLabel {
 	color: rgb( 255, 255, 255 );
 	font-size: 12px;
 	font-style: normal;
-	}
+}
 
-/*SubWindow titlebar button */
+/* SubWindow titlebar button */
 SubWindow > QPushButton {
 	background-color: rgba( 255, 255, 255, 0% );
 	border-width: 0px;
 	border-color: none;
 	border-style: none;
-	}
+}
 
 SubWindow > QPushButton:hover{
 	background-color: rgba( 255, 255, 255, 15% );
@@ -571,7 +571,7 @@ SubWindow > QPushButton:hover{
 	border-color: rgba( 0, 0, 0, 20% );
 	border-style: solid;
 	border-radius: 2px;
-	}
+}
 
 
 /* Plugins */

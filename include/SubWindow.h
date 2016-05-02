@@ -78,7 +78,7 @@ private:
 	QPoint m_position;
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
-	QGraphicsDropShadowEffect* m_shadow;
+	QGraphicsDropShadowEffect * m_shadow;
 
 	static void elideText( QLabel *label, QString text );
 };

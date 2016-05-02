@@ -47,11 +47,11 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
 
-	//close, minimize, maximize and restore(after minimize) buttons
+	// close, minimize, maximize and restore (after minimizing) buttons
 	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString::null, this );
 	m_closeBtn->resize( m_buttonSize );
 	m_closeBtn->setFocusPolicy( Qt::NoFocus );
-	m_closeBtn->setToolTip(tr( "Close" ));
+	m_closeBtn->setToolTip( tr( "Close" ) );
 	connect( m_closeBtn, SIGNAL( clicked( bool ) ), this, SLOT( close() ) );
 
 	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString::null, this );
@@ -72,7 +72,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_restoreBtn->setToolTip( tr( "Restore" ) );
 	connect( m_restoreBtn, SIGNAL( clicked( bool ) ), this, SLOT( showNormal() ) );
 
-	// QLabel for window title and shadow effect
+	// QLabel for the window title and the shadow effect
 	m_shadow = new QGraphicsDropShadowEffect();
 	m_shadow->setColor( m_textShadowColor );
 	m_shadow->setXOffset( 1 );
@@ -102,7 +102,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 	p.drawLine( 0, m_titleBarHeight, 0, height() - 1 );
 	p.drawLine( width() - 1, m_titleBarHeight, width() - 1, height() - 1 );
 
-	//window icon
+	// window icon
 	QPixmap winicon( widget()->windowIcon().pixmap( m_buttonSize ) );
 	p.drawPixmap( 3, 3, m_buttonSize.width(), m_buttonSize.height(), winicon );
 }
@@ -181,7 +181,7 @@ void SubWindow::moveEvent( QMoveEvent * event )
 {
 	QMdiSubWindow::moveEvent( event );
 	// if the window was moved and ISN'T minimized/maximized/fullscreen,
-	//   then save the current position
+	// then save the current position
 	if( !isMaximized() && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.moveTopLeft( event->pos() );
@@ -193,7 +193,7 @@ void SubWindow::moveEvent( QMoveEvent * event )
 
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
-	/* button adjustments*/
+	// button adjustments
 	m_minimizeBtn->hide();
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
@@ -206,22 +206,23 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	QPoint middleButtonPos( width() - rightSpace - ( 2 * m_buttonSize.width() ) - buttonGap, 3 );
 	QPoint leftButtonPos( width() - rightSpace - ( 3 * m_buttonSize.width() ) - ( 2 * buttonGap ), 3 );
 
-	//The buttonBarWidth relates on the count of button.
-	//We need it to calculate the width of window title label
+	// the buttonBarWidth depends on the number of buttons.
+	// we need it to calculate the width of window title label
 	int buttonBarWidth = rightSpace + m_buttonSize.width();
 
-	//set the buttons on their positions.
-	//the close button is ever needed and on the rightButtonPos
+	// set the buttons on their positions.
+	// the close button is always needed and on the rightButtonPos
 	m_closeBtn->move( rightButtonPos );
 
-	//here we ask: is the Subwindow maximizable and/or minimizable
-	//then we set the buttons and show them if needed
+	// here we ask: is the Subwindow maximizable and/or minimizable
+	// then we set the buttons and show them if needed
 	if( windowFlags() & Qt::WindowMaximizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
 		m_maximizeBtn->show();
 	}
+
 	if( windowFlags() & Qt::WindowMinimizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
@@ -253,21 +254,25 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	// title QLabel adjustments
 	m_windowTitle->setAlignment( Qt::AlignHCenter );
 	m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
-	m_windowTitle->move( menuButtonSpace, ( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
-	// if minimized we can't use widget()->width(). We have to set the width hard coded
-	// the width of all minimized windows is the same.
+	m_windowTitle->move( menuButtonSpace,
+		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
+
+	// if minimized we can't use widget()->width(). We have to hard code the width,
+	// as the width of all minimized windows is the same.
 	if( isMinimized() )
 	{
 		m_windowTitle->setFixedWidth( 120 );
 	}
-	// for truncate the Label String if the window is to small. Adds "..."
+
+	// truncate the label string if the window is to small. Adds "..."
 	elideText( m_windowTitle, widget()->windowTitle() );
 	m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
 	m_windowTitle->adjustSize();
 
 	QMdiSubWindow::resizeEvent( event );
+
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
-	//   then save the current size
+	// then save the current size
 	if( !isMaximized() && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
