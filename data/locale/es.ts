@@ -29,7 +29,7 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>Traducción al Español por Mariano Macri (Contacto: gnu.mariano.macri@gmail.com)
+        <translation>Traducido al Español por Mariano Macri (Contacto: gnu.mariano.macri@gmail.com)
 
 Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existentes, ¡tu ayuda será bienvenida!
 ¡Simplemente ponte en contacto con el encargado del proyecto!</translation>
@@ -83,7 +83,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Left gain:</source>
-        <translation>Ganancia Izq:</translation>
+        <translation>Ganancia izquierda:</translation>
     </message>
     <message>
         <source>RIGHT</source>
