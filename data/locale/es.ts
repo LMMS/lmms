@@ -164,7 +164,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
-        <translation>Activando esta opción la muestra se ejecutará a lo largo de las distintas notas. Si cambias la altura o la nota termina antes que la muestra, la nota siguente reproducirá la muestra desde el lugar en que la nota anterior terminó. Para reiniciar la reproducción desde el principio de la muestra, inserta una nota en el extremo grave del teclado (&lt;- 20 Hz)</translation>
+        <translation>Activando esta opción la muestra se ejecutará a lo largo de las distintas notas. Si cambias la altura o la nota termina antes que la muestra, la nota siguente reproducirá la muestra desde el lugar en que la nota anterior terminó. Para reiniciar la reproducción desde el principio de la muestra, inserta una nota en el extremo grave del teclado (&lt; 20 Hz)</translation>
     </message>
     <message>
         <source>Disable loop</source>
