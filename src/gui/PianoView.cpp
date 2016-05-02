@@ -207,7 +207,7 @@ int PianoView::getKeyFromKeyEvent( QKeyEvent * _ke )
 		case 27: return 31; // ]
 	}
 #endif
-#ifdef LMMS_BUILD_LINUX
+#if defined(LMMS_BUILD_LINUX) || defined(LMMS_BUILD_OPENBSD)
 	switch( k )
 	{
 		case 52: return 0; // Z  = C
