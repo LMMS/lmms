@@ -389,11 +389,11 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Flip vertically</source>
-        <translation>Voltar verticalmente</translation>
+        <translation>Voltear verticalmente</translation>
     </message>
     <message>
         <source>Flip horizontally</source>
-        <translation>Volter horizontalmente</translation>
+        <translation>Voltear horizontalmente</translation>
     </message>
     <message>
         <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
