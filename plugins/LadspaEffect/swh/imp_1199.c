@@ -63,7 +63,7 @@ typedef rfftw_plan fft_plan;
 
 #define MK_IMP(i) impulse2freq(c, i, IMP_LENGTH(i), impulse_freq[c]); c++
 
-static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out);
+inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out);
 
 #include "impulses/all.h"
 
@@ -77,7 +77,7 @@ unsigned int fft_length[IMPULSES];
 #ifdef __clang__
 void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
 #else
-static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
 #endif
 {
   fftw_real impulse_time[MAX_FFT_LENGTH];
@@ -103,7 +103,7 @@ static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_re
   for (i=0; i<length; i++) {
     impulse_time[i] = imp[i];
   }
-  
+          
   int last = i;
   for (i = 0; i<fftl; i++) {
     if (i >=last) impulse_time[i] = 0.0f;
@@ -172,7 +172,7 @@ static void activateImp(LADSPA_Handle instance) {
 	LADSPA_Data *opc = plugin_data->opc;
 	unsigned long out_ptr = plugin_data->out_ptr;
 	LADSPA_Data *overlap = plugin_data->overlap;
-#line 161 "imp_1199.xml"
+#line 167 "imp_1199.xml"
 	memset(block_time, 0, MAX_FFT_LENGTH * sizeof(fftw_real));
 	memset(block_freq, 0, MAX_FFT_LENGTH * sizeof(fftw_real));
 	memset(op, 0, MAX_FFT_LENGTH * sizeof(fftw_real));
@@ -195,7 +195,7 @@ static void activateImp(LADSPA_Handle instance) {
 }
 
 static void cleanupImp(LADSPA_Handle instance) {
-#line 173 "imp_1199.xml"
+#line 179 "imp_1199.xml"
 	Imp *plugin_data = (Imp *)instance;
 	local_free(plugin_data->block_time);
 	local_free(plugin_data->block_freq);
@@ -242,7 +242,7 @@ static void connectPortImp(
 static LADSPA_Handle instantiateImp(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Imp *plugin_data = (Imp *)malloc(sizeof(Imp));
+	Imp *plugin_data = (Imp *)calloc(1, sizeof(Imp));
 	fftw_real *block_freq = NULL;
 	fftw_real *block_time = NULL;
 	unsigned int count;
@@ -253,7 +253,7 @@ static LADSPA_Handle instantiateImp(
 	unsigned long out_ptr;
 	LADSPA_Data *overlap = NULL;
 
-#line 135 "imp_1199.xml"
+#line 141 "imp_1199.xml"
 	unsigned int i;
 
 	impulse_freq = local_malloc(IMPULSES * sizeof(fftw_real *));
@@ -326,7 +326,7 @@ static void runImp(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned long out_ptr = plugin_data->out_ptr;
 	LADSPA_Data * overlap = plugin_data->overlap;
 
-#line 181 "imp_1199.xml"
+#line 192 "imp_1199.xml"
 	unsigned long i, pos, ipos, limit;
 	unsigned int im;
 	unsigned int len;
@@ -448,7 +448,7 @@ static void runAddingImp(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned long out_ptr = plugin_data->out_ptr;
 	LADSPA_Data * overlap = plugin_data->overlap;
 
-#line 181 "imp_1199.xml"
+#line 192 "imp_1199.xml"
 	unsigned long i, pos, ipos, limit;
 	unsigned int im;
 	unsigned int len;
@@ -538,7 +538,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -637,12 +636,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (impDescriptor) {
 		free((LADSPA_PortDescriptor *)impDescriptor->PortDescriptors);
 		free((char **)impDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)impDescriptor->PortRangeHints);
 		free(impDescriptor);
 	}
+	impDescriptor = NULL;
 
 }

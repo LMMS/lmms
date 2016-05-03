@@ -132,7 +132,7 @@ static void connectPortPlate(
 static LADSPA_Handle instantiatePlate(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Plate *plugin_data = (Plate *)malloc(sizeof(Plate));
+	Plate *plugin_data = (Plate *)calloc(1, sizeof(Plate));
 	float *out = NULL;
 	waveguide_nl **w = NULL;
 
@@ -302,7 +302,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -401,12 +400,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (plateDescriptor) {
 		free((LADSPA_PortDescriptor *)plateDescriptor->PortDescriptors);
 		free((char **)plateDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)plateDescriptor->PortRangeHints);
 		free(plateDescriptor);
 	}
+	plateDescriptor = NULL;
 
 }

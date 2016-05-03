@@ -114,7 +114,7 @@ static void connectPortSmoothDecimate(
 static LADSPA_Handle instantiateSmoothDecimate(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	SmoothDecimate *plugin_data = (SmoothDecimate *)malloc(sizeof(SmoothDecimate));
+	SmoothDecimate *plugin_data = (SmoothDecimate *)calloc(1, sizeof(SmoothDecimate));
 	float accum;
 	float *buffer = NULL;
 	int buffer_pos;
@@ -247,7 +247,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -329,12 +328,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (smoothDecimateDescriptor) {
 		free((LADSPA_PortDescriptor *)smoothDecimateDescriptor->PortDescriptors);
 		free((char **)smoothDecimateDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)smoothDecimateDescriptor->PortRangeHints);
 		free(smoothDecimateDescriptor);
 	}
+	smoothDecimateDescriptor = NULL;
 
 }

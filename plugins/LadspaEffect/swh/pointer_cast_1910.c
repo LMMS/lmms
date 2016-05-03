@@ -115,7 +115,7 @@ static void connectPortPointerCastDistortion(
 static LADSPA_Handle instantiatePointerCastDistortion(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	PointerCastDistortion *plugin_data = (PointerCastDistortion *)malloc(sizeof(PointerCastDistortion));
+	PointerCastDistortion *plugin_data = (PointerCastDistortion *)calloc(1, sizeof(PointerCastDistortion));
 	biquad *filt = NULL;
 	float fs;
 
@@ -228,7 +228,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -310,12 +309,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (pointerCastDistortionDescriptor) {
 		free((LADSPA_PortDescriptor *)pointerCastDistortionDescriptor->PortDescriptors);
 		free((char **)pointerCastDistortionDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)pointerCastDistortionDescriptor->PortRangeHints);
 		free(pointerCastDistortionDescriptor);
 	}
+	pointerCastDistortionDescriptor = NULL;
 
 }

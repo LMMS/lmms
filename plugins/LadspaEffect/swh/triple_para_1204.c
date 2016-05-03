@@ -176,7 +176,7 @@ static void connectPortTriplePara(
 static LADSPA_Handle instantiateTriplePara(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	TriplePara *plugin_data = (TriplePara *)malloc(sizeof(TriplePara));
+	TriplePara *plugin_data = (TriplePara *)calloc(1, sizeof(TriplePara));
 	biquad *filters = NULL;
 	float fs;
 
@@ -375,7 +375,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -593,12 +592,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (tripleParaDescriptor) {
 		free((LADSPA_PortDescriptor *)tripleParaDescriptor->PortDescriptors);
 		free((char **)tripleParaDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)tripleParaDescriptor->PortRangeHints);
 		free(tripleParaDescriptor);
 	}
+	tripleParaDescriptor = NULL;
 
 }

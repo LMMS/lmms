@@ -88,7 +88,7 @@ static void connectPortZm1(
 static LADSPA_Handle instantiateZm1(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Zm1 *plugin_data = (Zm1 *)malloc(sizeof(Zm1));
+	Zm1 *plugin_data = (Zm1 *)calloc(1, sizeof(Zm1));
 	LADSPA_Data xm1;
 
 #line 17 "zm1_1428.xml"
@@ -170,7 +170,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -232,12 +231,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (zm1Descriptor) {
 		free((LADSPA_PortDescriptor *)zm1Descriptor->PortDescriptors);
 		free((char **)zm1Descriptor->PortNames);
 		free((LADSPA_PortRangeHint *)zm1Descriptor->PortRangeHints);
 		free(zm1Descriptor);
 	}
+	zm1Descriptor = NULL;
 
 }

@@ -25,6 +25,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
+#line 10 "comb_1887.xml"
 
 #include "ladspa-util.h"
 
@@ -151,6 +152,7 @@ static void activateComb_n(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 53 "comb_1887.xml"
 	unsigned int minsize, size;
    
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -182,6 +184,7 @@ static void activateComb_n(LADSPA_Handle instance) {
 }
 
 static void cleanupComb_n(LADSPA_Handle instance) {
+#line 75 "comb_1887.xml"
 	Comb_n *plugin_data = (Comb_n *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -216,17 +219,26 @@ static void connectPortComb_n(
 static LADSPA_Handle instantiateComb_n(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Comb_n *plugin_data = (Comb_n *)malloc(sizeof(Comb_n));
+	Comb_n *plugin_data = (Comb_n *)calloc(1, sizeof(Comb_n));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data feedback = 0;
-	LADSPA_Data last_decay_time = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data feedback;
+	LADSPA_Data last_decay_time;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 41 "comb_1887.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	feedback = 0;
+	last_decay_time = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -274,7 +286,8 @@ static void runComb_n(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 79 "comb_1887.xml"
+	int i;
 
 	i = max_delay; /* stop gcc complaining */
 
@@ -412,7 +425,8 @@ static void runAddingComb_n(LADSPA_Handle instance, unsigned long sample_count) 
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 79 "comb_1887.xml"
+	int i;
 
 	i = max_delay; /* stop gcc complaining */
 
@@ -522,6 +536,7 @@ static void activateComb_l(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 53 "comb_1887.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -553,6 +568,7 @@ static void activateComb_l(LADSPA_Handle instance) {
 }
 
 static void cleanupComb_l(LADSPA_Handle instance) {
+#line 75 "comb_1887.xml"
 	Comb_l *plugin_data = (Comb_l *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -587,17 +603,26 @@ static void connectPortComb_l(
 static LADSPA_Handle instantiateComb_l(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Comb_l *plugin_data = (Comb_l *)malloc(sizeof(Comb_l));
+	Comb_l *plugin_data = (Comb_l *)calloc(1, sizeof(Comb_l));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data feedback = 0;
-	LADSPA_Data last_decay_time = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data feedback;
+	LADSPA_Data last_decay_time;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 41 "comb_1887.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	feedback = 0;
+	last_decay_time = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -645,7 +670,8 @@ static void runComb_l(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 79 "comb_1887.xml"
+	int i;
 
 	i = max_delay;
 
@@ -741,7 +767,8 @@ static void runAddingComb_l(LADSPA_Handle instance, unsigned long sample_count) 
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 79 "comb_1887.xml"
+	int i;
 
 	i = max_delay;
 
@@ -809,6 +836,7 @@ static void activateComb_c(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 53 "comb_1887.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -840,6 +868,7 @@ static void activateComb_c(LADSPA_Handle instance) {
 }
 
 static void cleanupComb_c(LADSPA_Handle instance) {
+#line 75 "comb_1887.xml"
 	Comb_c *plugin_data = (Comb_c *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -874,17 +903,26 @@ static void connectPortComb_c(
 static LADSPA_Handle instantiateComb_c(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Comb_c *plugin_data = (Comb_c *)malloc(sizeof(Comb_c));
+	Comb_c *plugin_data = (Comb_c *)calloc(1, sizeof(Comb_c));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data feedback = 0;
-	LADSPA_Data last_decay_time = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data feedback;
+	LADSPA_Data last_decay_time;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 41 "comb_1887.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	feedback = 0;
+	last_decay_time = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -932,7 +970,8 @@ static void runComb_c(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 79 "comb_1887.xml"
+	int i;
 
 	i = max_delay;
 
@@ -1032,7 +1071,8 @@ static void runAddingComb_c(LADSPA_Handle instance, unsigned long sample_count) 
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 79 "comb_1887.xml"
+	int i;
 
 	i = max_delay;
 
@@ -1101,7 +1141,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -1352,24 +1391,27 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (comb_nDescriptor) {
 		free((LADSPA_PortDescriptor *)comb_nDescriptor->PortDescriptors);
 		free((char **)comb_nDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)comb_nDescriptor->PortRangeHints);
 		free(comb_nDescriptor);
 	}
+	comb_nDescriptor = NULL;
 	if (comb_lDescriptor) {
 		free((LADSPA_PortDescriptor *)comb_lDescriptor->PortDescriptors);
 		free((char **)comb_lDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)comb_lDescriptor->PortRangeHints);
 		free(comb_lDescriptor);
 	}
+	comb_lDescriptor = NULL;
 	if (comb_cDescriptor) {
 		free((LADSPA_PortDescriptor *)comb_cDescriptor->PortDescriptors);
 		free((char **)comb_cDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)comb_cDescriptor->PortRangeHints);
 		free(comb_cDescriptor);
 	}
+	comb_cDescriptor = NULL;
 
 }

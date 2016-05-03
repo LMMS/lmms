@@ -131,7 +131,7 @@ static void connectPortSc2(
 static LADSPA_Handle instantiateSc2(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Sc2 *plugin_data = (Sc2 *)malloc(sizeof(Sc2));
+	Sc2 *plugin_data = (Sc2 *)calloc(1, sizeof(Sc2));
 	float amp;
 	float *as = NULL;
 	unsigned int count;
@@ -362,7 +362,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -491,12 +490,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (sc2Descriptor) {
 		free((LADSPA_PortDescriptor *)sc2Descriptor->PortDescriptors);
 		free((char **)sc2Descriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sc2Descriptor->PortRangeHints);
 		free(sc2Descriptor);
 	}
+	sc2Descriptor = NULL;
 
 }

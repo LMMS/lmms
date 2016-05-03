@@ -165,7 +165,7 @@ static void connectPortGate(
 static LADSPA_Handle instantiateGate(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Gate *plugin_data = (Gate *)malloc(sizeof(Gate));
+	Gate *plugin_data = (Gate *)calloc(1, sizeof(Gate));
 	float env;
 	float fs;
 	float gate;
@@ -440,7 +440,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -582,12 +581,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (gateDescriptor) {
 		free((LADSPA_PortDescriptor *)gateDescriptor->PortDescriptors);
 		free((char **)gateDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)gateDescriptor->PortRangeHints);
 		free(gateDescriptor);
 	}
+	gateDescriptor = NULL;
 
 }

@@ -160,7 +160,7 @@ static void connectPortSurroundEncoder(
 static LADSPA_Handle instantiateSurroundEncoder(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	SurroundEncoder *plugin_data = (SurroundEncoder *)malloc(sizeof(SurroundEncoder));
+	SurroundEncoder *plugin_data = (SurroundEncoder *)calloc(1, sizeof(SurroundEncoder));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_pos;
 	unsigned int buffer_size;
@@ -324,7 +324,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -414,12 +413,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (surroundEncoderDescriptor) {
 		free((LADSPA_PortDescriptor *)surroundEncoderDescriptor->PortDescriptors);
 		free((char **)surroundEncoderDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)surroundEncoderDescriptor->PortRangeHints);
 		free(surroundEncoderDescriptor);
 	}
+	surroundEncoderDescriptor = NULL;
 
 }

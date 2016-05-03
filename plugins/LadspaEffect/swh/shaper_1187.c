@@ -83,7 +83,7 @@ static void connectPortShaper(
 static LADSPA_Handle instantiateShaper(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Shaper *plugin_data = (Shaper *)malloc(sizeof(Shaper));
+	Shaper *plugin_data = (Shaper *)calloc(1, sizeof(Shaper));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -182,7 +182,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -260,12 +259,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (shaperDescriptor) {
 		free((LADSPA_PortDescriptor *)shaperDescriptor->PortDescriptors);
 		free((char **)shaperDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)shaperDescriptor->PortRangeHints);
 		free(shaperDescriptor);
 	}
+	shaperDescriptor = NULL;
 
 }
