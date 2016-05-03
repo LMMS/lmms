@@ -238,6 +238,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	QFont font = p.font();
 	font.setHintingPreference( QFont::PreferFullHinting );
 	p.setFont(font);
+	int const fontAscent = p.fontMetrics().ascent();
+	int const fontHeight = p.fontMetrics().height();
 
 	QColor const & barLineColor = getBarLineColor();
 	QColor const & barNumberColor = getBarNumberColor();
@@ -259,7 +261,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 			const QString s = QString::number( barNumber );
 			p.setPen( barNumberColor );
-			p.drawText( cx + 5, height() - p.fontMetrics().ascent() / 2, s );
+			p.drawText( cx + 5, ((height() - fontHeight) / 2) + fontAscent, s );
 		}
 	}
 
@@ -269,9 +271,9 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int const loopStart = markerX( loopBegin() ) + 8;
 	int const loopEndR = markerX( loopEnd() ) + 9;
 	int const loopRectWidth = loopEndR - loopStart;
-	p.setPen(Qt::NoPen);
-	p.setBrush(loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor());
-	p.drawRect(loopStart, loopRectMargin, loopRectWidth, loopRectHeight);
+	p.setPen( Qt::NoPen );
+	p.setBrush( loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor() );
+	p.drawRect( loopStart, loopRectMargin, loopRectWidth, loopRectHeight );
 
 	// Draw the markers
 	p.setPen( QColor( 0, 0, 0 ) );
