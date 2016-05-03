@@ -23,17 +23,18 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
-
 #ifndef SUBWINDOW_H
 #define SUBWINDOW_H
 
-
+#include <QEvent>
+#include <QGraphicsDropShadowEffect>
 #include <QMdiSubWindow>
-#include <QRect>
+#include <QLabel>
+#include <QPainter>
+#include <QPushButton>
+#include <QString>
 
 #include "export.h"
-
 
 class QMoveEvent;
 class QResizeEvent;
@@ -43,16 +44,43 @@ class QWidget;
 class EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
+	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
+	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	Q_PROPERTY( QColor borderColor READ borderColor WRITE setBorderColor )
+
 public:
-	SubWindow(QWidget *parent=NULL, Qt::WindowFlags windowFlags=0);
+	SubWindow( QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0 );
 	// same as QWidet::normalGeometry, but works properly under X11 (see https://bugreports.qt.io/browse/QTBUG-256)
 	QRect getTrueNormalGeometry() const;
+	QBrush activeColor() const;
+	QColor textShadowColor() const;
+	QColor borderColor() const;
+	void setActiveColor( const QBrush & b );
+	void setTextShadowColor( const QColor &c );
+	void setBorderColor( const QColor &c );
+
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
-	virtual void moveEvent(QMoveEvent * event);
-	virtual void resizeEvent(QResizeEvent * event);
+	virtual void moveEvent( QMoveEvent * event );
+	virtual void resizeEvent( QResizeEvent * event );
+	virtual void paintEvent( QPaintEvent * pe );
+	
 private:
+	const QSize m_buttonSize;
+	const int m_titleBarHeight;
+	QPushButton * m_closeBtn;
+	QPushButton * m_minimizeBtn;
+	QPushButton * m_maximizeBtn;
+	QPushButton * m_restoreBtn;
+	QBrush m_activeColor;
+	QColor m_textShadowColor;
+	QColor m_borderColor;
+	QPoint m_position;
 	QRect m_trackedNormalGeom;
+	QLabel * m_windowTitle;
+	QGraphicsDropShadowEffect * m_shadow;
+
+	static void elideText( QLabel *label, QString text );
 };
 
 #endif
