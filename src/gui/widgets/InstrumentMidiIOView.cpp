@@ -147,7 +147,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	baseVelocityLayout->setContentsMargins( 8, 18, 8, 8 );
 	baseVelocityLayout->setSpacing( 6 );
 
-	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at note volume 100%" ) );
+	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at 100% note velocity" ) );
 	baseVelocityHelp->setWordWrap( true );
     baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
 

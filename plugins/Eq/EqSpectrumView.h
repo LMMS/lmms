@@ -23,11 +23,11 @@
 #ifndef EQSPECTRUMVIEW_H
 #define EQSPECTRUMVIEW_H
 
-#include "qpainter.h"
-//#include "eqeffect.h"
-#include "qwidget.h"
+#include <QPainter>
+#include <QWidget>
 #include "fft_helpers.h"
 #include "Engine.h"
+
 
 
 const int MAX_BANDS = 2048;
@@ -54,7 +54,7 @@ public:
 		m_active ( true )
 	{
 		m_inProgress=false;
-		m_specBuf = (fftwf_complex *) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
+		m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
 		m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer, m_specBuf, FFTW_MEASURE );
 		clear();
 	}
@@ -121,6 +121,8 @@ public:
 						   ( int )( LOWEST_FREQ * ( FFT_BUFFER_SIZE + 1 ) / ( float )( m_sr / 2 ) ),
 						   ( int )( HIGHEST_FREQ * ( FFT_BUFFER_SIZE +  1) / ( float )( m_sr / 2 ) ) );
 			m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
+
+
 			m_framesFilledUp = 0;
 			m_inProgress = false;
 			m_active = false;
@@ -139,16 +141,20 @@ public:
 		QWidget( _parent ),
 		m_sa( b )
 	{
-		setFixedSize( 250, 116 );
+		setFixedSize( 400, 200 );
 		QTimer *timer = new QTimer(this);
 		connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-		timer->start(2000);
+		timer->start(100);
 		setAttribute( Qt::WA_TranslucentBackground, true );
 		m_skipBands = MAX_BANDS * 0.5;
-		float totalLength = log10( 21000);
-		m_pixelsPerUnitWidth = width( ) /  totalLength ;
+		float totalLength = log10( 20000 );
+		m_pixelsPerUnitWidth = width( ) / totalLength ;
 		m_scale = 1.5;
 		color = QColor( 255, 255, 255, 255 );
+		for ( int i=0 ; i < MAX_BANDS ; i++ )
+		{
+			m_bandHeight.append( 0 );
+		}
 	}
 
 
@@ -168,7 +174,7 @@ public:
 	{
 		m_sa->m_active = isVisible();
 		const int fh = height();
-		const int LOWER_Y = -60;	// dB
+		const int LOWER_Y = -36;	// dB
 		QPainter p( this );
 		p.setPen( QPen( color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
 		const float e =  m_sa->m_energy;
@@ -183,13 +189,28 @@ public:
 		}
 		pp = QPainterPath();
 		float * b = m_sa->m_bands;
-		int h;
+		float h;
 		pp.moveTo( 0,height() );
 		for( int x = 0; x < MAX_BANDS; ++x, ++b )
 		{
-			h = (int)( fh * 2.0 / 3.0 * ( 20 * ( log10 ( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
-			if( h < 0 ) h = 0; else if( h >= fh ) continue;
-			pp.lineTo( freqToXPixel(bandToFreq( x ) ), fh-h );
+			h = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+			if( h < 0 )
+			{
+				h = 0;
+			}
+			else if( h >= fh )
+			{
+				continue;
+			}
+			if (h > m_bandHeight.at(x))
+			{
+				m_bandHeight[x] = h;
+			}
+			else
+			{
+				m_bandHeight[x] = m_bandHeight[x] -1;
+			}
+			pp.lineTo( freqToXPixel( bandToFreq( x ) ), fh - m_bandHeight.at( x ) );
 		}
 		pp.lineTo( width(), height() );
 		pp.closeSubpath();
@@ -205,21 +226,29 @@ public:
 		return ( log10( band - m_skipBands ) * m_pixelsPerUnitWidth * m_scale );
 	}
 
+
+
+
 	inline float bandToFreq ( int index )
 	{
 		return index * m_sa->m_sr / (MAX_BANDS * 2 );
 	}
 
 
-	inline int freqToXPixel( float freq )
+
+
+	inline float freqToXPixel( float freq )
 	{
-		return ( log10( freq ) * m_pixelsPerUnitWidth * m_scale ) - ( width() * 0.5 );
+		float min = log ( 27) / log( 10 );
+		float max = log ( 20000 )/ log( 10 );
+		float range = max - min;
+		return ( log( freq ) / log( 10 ) - min ) / range * width();
 	}
+
 private:
 	float m_pixelsPerUnitWidth;
 	float m_scale;
 	int m_skipBands;
+	QList<float> m_bandHeight;
 } ;
-
-
 #endif // EQSPECTRUMVIEW_H

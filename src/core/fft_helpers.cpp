@@ -134,7 +134,7 @@ int compressbands(float *absspec_buffer, float *compressedband, int num_old, int
 
 	ratio=(float)usefromold/(float)num_new;
 
-	// foreach new subband
+	// for each new subband
 	for ( i=0; i<num_new; i++ )
 	{
 		compressedband[i]=0;

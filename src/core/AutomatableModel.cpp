@@ -450,7 +450,7 @@ void AutomatableModel::unlinkModels( AutomatableModel* model1, AutomatableModel*
 
 void AutomatableModel::unlinkAllModels()
 {
-	foreach( AutomatableModel* model, m_linkedModels )
+	for( AutomatableModel* model : m_linkedModels )
 	{
 		unlinkModels( this, model );
 	}

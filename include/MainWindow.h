@@ -30,6 +30,7 @@
 #include <QtCore/QList>
 #include <QMainWindow>
 
+#include "ConfigManager.h"
 #include "SubWindow.h"
 
 class QAction;
@@ -81,10 +82,30 @@ public:
 	///
 	bool mayChangeProject(bool stopPlayback);
 
-	void autoSaveTimerStart()
+	// Auto save timer intervals. The slider in SetupDialog.cpp wants
+	// minutes and the rest milliseconds.
+	static const int DEFAULT_SAVE_INTERVAL_MINUTES = 2;
+	static const int DEFAULT_AUTO_SAVE_INTERVAL = DEFAULT_SAVE_INTERVAL_MINUTES * 60 * 1000;
+
+	static const int m_autoSaveShortTime = 10 * 1000; // 10s short loop
+
+	void autoSaveTimerReset( int msec = ConfigManager::inst()->
+					value( "ui", "saveinterval" ).toInt()
+						* 60 * 1000 )
 	{
-		m_autoSaveTimer.start( 1000 * 60 );  // 1 minute
+		if( msec < m_autoSaveShortTime ) // No 'saveinterval' in .lmmsrc.xml
+		{
+			msec = DEFAULT_AUTO_SAVE_INTERVAL;
+		}
+		m_autoSaveTimer.start( msec );
 	}
+
+	int getAutoSaveTimerInterval()
+	{
+		return m_autoSaveTimer.interval();
+	}
+
+	void runAutoSave();
 
 	enum SessionState
 	{
@@ -155,7 +176,6 @@ public slots:
 	void redo();
 
 	void autoSave();
-	void runAutoSave();
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -204,6 +224,7 @@ private:
 
 	QBasicTimer m_updateTimer;
 	QTimer m_autoSaveTimer;
+	int m_autoSaveInterval;
 
 	friend class GuiApplication;
 

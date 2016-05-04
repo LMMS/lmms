@@ -88,10 +88,6 @@ signals:
 class SampleTCOView : public TrackContentObjectView
 {
 	Q_OBJECT
-	
-// theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
 	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
@@ -100,6 +96,7 @@ public:
 
 public slots:
 	void updateSample();
+
 
 
 protected:
@@ -113,6 +110,7 @@ protected:
 
 private:
 	SampleTCO * m_tco;
+	QPixmap m_paintPixmap;
 } ;
 
 

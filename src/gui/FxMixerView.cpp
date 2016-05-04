@@ -69,6 +69,9 @@ FxMixerView::FxMixerView() :
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;
 
+	// Set margins
+	ml->setContentsMargins( 0, 4, 0, 0 );
+	
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
@@ -382,7 +385,9 @@ void FxMixerView::deleteChannel(int index)
 	delete m_fxChannelViews[index]->m_fader;
 	delete m_fxChannelViews[index]->m_muteBtn;
 	delete m_fxChannelViews[index]->m_soloBtn;
-	delete m_fxChannelViews[index]->m_fxLine;
+	// delete fxLine later to prevent a crash when deleting from context menu
+	m_fxChannelViews[index]->m_fxLine->hide();
+	m_fxChannelViews[index]->m_fxLine->deleteLater();
 	delete m_fxChannelViews[index]->m_rackView;
 	delete m_fxChannelViews[index];
 	m_channelAreaWidget->adjustSize();
@@ -420,7 +425,7 @@ void FxMixerView::deleteUnusedChannels()
 	{
 		// check if an instrument references to the current channel
 		bool empty=true;
-		foreach( Track* t, tracks )
+		for( Track* t : tracks )
 		{
 			if( t->type() == Track::InstrumentTrack )
 			{

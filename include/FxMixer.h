@@ -194,11 +194,6 @@ public:
 		return m_fxChannels.size();
 	}
 
-	inline QVector<FxChannel *> fxChannels() const
-	{
-		return m_fxChannels;
-	}
-
 	FxRouteVector m_fxRoutes;
 
 private:

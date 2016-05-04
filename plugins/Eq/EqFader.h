@@ -27,9 +27,9 @@
 #include "EffectControls.h"
 #include "MainWindow.h"
 #include "GuiApplication.h"
-#include "qwidget.h"
 #include "TextFloat.h"
-#include "qlist.h"
+#include <QList>
+#include <QWidget>
 
 
 
@@ -39,8 +39,8 @@ class EqFader : public Fader
 public:
 	Q_OBJECT
 public:
-	EqFader( FloatModel * model, const QString & name, QWidget * parent, float* lPeak, float* rPeak ) :
-		Fader( model, name, parent)
+	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob,  float* lPeak, float* rPeak ) :
+		Fader( model, name, parent, back, leds, knob )
 	{
 		setMinimumSize( 23, 116 );
 		setMaximumSize( 23, 116 );
@@ -53,6 +53,19 @@ public:
 		setPeak_R( 0 );
 	}
 
+	EqFader( FloatModel * model, const QString & name, QWidget * parent,  float* lPeak, float* rPeak ) :
+		Fader( model, name, parent )
+	{
+		setMinimumSize( 23, 116 );
+		setMaximumSize( 23, 116 );
+		resize( 23, 116 );
+		m_lPeak = lPeak;
+		m_rPeak = rPeak;
+		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
+		m_model = model;
+		setPeak_L( 0 );
+		setPeak_R( 0 );
+	}
 
 
 

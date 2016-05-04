@@ -83,7 +83,7 @@ void FadeButton::customEvent( QEvent * )
 void FadeButton::paintEvent( QPaintEvent * _pe )
 {
 	QColor col = m_normalColor;
-	if( m_stateTimer.elapsed() < FadeDuration )
+	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
 	{
 		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
 		const int r = (int)( m_normalColor.red() *

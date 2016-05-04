@@ -2,6 +2,7 @@
  * eqparameterwidget.cpp - defination of EqParameterWidget class.
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+* Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -26,8 +27,13 @@
 #ifndef EQPARAMETERWIDGET_H
 #define EQPARAMETERWIDGET_H
 #include <QWidget>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QGraphicsView>
 #include "EffectControls.h"
 #include "TextFloat.h"
+#include "EqCurve.h"
+
 
 class EqControls;
 
@@ -40,6 +46,12 @@ public :
 	FloatModel* res;
 	FloatModel* freq;
 	BoolModel* active;
+	BoolModel* hp12;
+	BoolModel* hp24;
+	BoolModel* hp48;
+	BoolModel* lp12;
+	BoolModel* lp24;
+	BoolModel* lp48;
 	QColor color;
 	int x;
 	int y;
@@ -58,16 +70,13 @@ class EqParameterWidget : public QWidget
 public:
 	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0);
 	~EqParameterWidget();
+	QList<EqHandle*> *m_handleList;
+
+	void changeHandle(int i);
+
 	const int bandCount()
 	{
 		return 8;
-	}
-
-
-
-	const int maxDistanceFromHandle()
-	{
-		return 20;
 	}
 
 
@@ -79,88 +88,65 @@ public:
 	}
 
 
-
-
-	const int activeAplha()
-	{
-		return 200;
-	}
-
-
-
-
-	const int inactiveAlpha()
-	{
-		return 100;
-	}
-
-
-
-
-	const float resPixelMultiplyer()
-	{
-		return 100;
-	}
-
-
-signals:
-
-public slots:
-
-protected:
-	virtual void paintEvent ( QPaintEvent * event );
-	virtual void mousePressEvent(QMouseEvent * event );
-	virtual void mouseReleaseEvent(QMouseEvent * event);
-	virtual void mouseMoveEvent(QMouseEvent * event);
-	virtual void mouseDoubleClickEvent(QMouseEvent * event);
-
 private:
+
 	EqBand *m_bands;
+	int m_displayWidth, m_displayHeigth;
+	bool m_notFirst;
 	EqControls *m_controls;
+
+	QGraphicsView *m_view;
+	QGraphicsScene *m_scene;
+	EqHandle *m_handle;
+	EqCurve *m_eqcurve;
+
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_pixelsPerOctave;
 	float m_scale;
-	EqBand* m_selectedBand;
-	TextFloat *tf;
-
-	EqBand*  selectNearestHandle( const int x, const int y );
-
-	enum MouseAction { none, drag, res } m_mouseAction;
-	int m_oldX, m_oldY;
-	int *m_xGridBands;
 
 
-	inline int freqToXPixel( float freq )
+
+
+	inline float freqToXPixel( float freq )
 	{
-		return ( log10( freq ) * m_pixelsPerUnitWidth * m_scale ) - ( width() * 0.5 );
+		float min = log ( 27) / log( 10 );
+		float max = log ( 20000 )/ log( 10 );
+		float range = max - min;
+		return ( log( freq ) / log( 10 ) - min ) / range * m_displayWidth;
 	}
 
 
 
 
-	inline float xPixelToFreq( int x )
+
+	inline float xPixelToFreq( float x )
 	{
-		return   pow( 10, ( x + ( width() * 0.5 ) ) / ( m_pixelsPerUnitWidth * m_scale ) );
+		float min = log ( 27 ) / log( 10 );
+		float max = log ( 20000 ) / log( 10 );
+		float range = max - min;
+		return pow( 10 , x * ( range / m_displayWidth ) + min );
 	}
 
 
 
 
-	inline int gainToYPixel( float gain )
+	inline float gainToYPixel( float gain )
 	{
-		return ( height() - 3) - ( gain * m_pixelsPerUnitHeight ) - ( (height() -3 ) * 0.5);
+		return m_displayHeigth - ( gain * m_pixelsPerUnitHeight ) - ( m_displayHeigth * 0.5 );
 	}
 
 
 
 
-	inline float yPixelToGain( int y )
+	inline float yPixelToGain( float y )
 	{
-		return ( ( 0.5 * height() ) - y) / m_pixelsPerUnitHeight;
+		return ( ( 0.5 * m_displayHeigth ) - y ) / m_pixelsPerUnitHeight;
 	}
 
+private slots:
+	void updateModels();
+	void updateView();
 };
-
 
 #endif // EQPARAMETERWIDGET_H

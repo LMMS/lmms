@@ -32,7 +32,7 @@ SET(PROJECT_DESCRIPTION "${PROJECT_NAME_UCASE} - Free music production software"
 SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "1")
-SET(VERSION_PATCH       "3")
+SET(VERSION_PATCH       "91")
 #SET(VERSION_SUFFIX     "")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 IF(VERSION_SUFFIX)
@@ -83,12 +83,14 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
+	SET(WANT_SOUNDIO OFF)
 	SET(WANT_SYSTEM_SR OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
 ELSE(LMMS_BUILD_WIN32)
@@ -132,7 +134,7 @@ IF(WANT_QT5)
 
 	FIND_PACKAGE(Qt5Core REQUIRED)
 	FIND_PACKAGE(Qt5Gui REQUIRED)
-	FIND_PACKAGE(Qt5LinguistTools REQUIRED)
+	FIND_PACKAGE(Qt5LinguistTools)
 	FIND_PACKAGE(Qt5Widgets REQUIRED)
 	FIND_PACKAGE(Qt5Xml REQUIRED)
 
@@ -384,9 +386,19 @@ If(WANT_GIG)
 ENDIF(WANT_GIG)
 
 # check for pthreads
-IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
+IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
-ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
+ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
+
+IF(LMMS_BUILD_OPENBSD)
+	FIND_PACKAGE(Sndio)
+	IF(SNDIO_FOUND)
+		SET(LMMS_HAVE_SNDIO TRUE)
+        	SET(STATUS_SNDIO "OK")
+    	ELSE()
+        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	ENDIF(SNDIO_FOUND)
+ENDIF(LMMS_BUILD_OPENBSD)
 
 # check for WINE
 IF(WANT_VST)
@@ -548,6 +560,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* JACK                        : ${STATUS_JACK}\n"
 "* OSS                         : ${STATUS_OSS}\n"
+"* Sndio                       : ${STATUS_SNDIO}\n"
 "* PortAudio                   : ${STATUS_PORTAUDIO}\n"
 "* libsoundio                  : ${STATUS_SOUNDIO}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
@@ -559,6 +572,7 @@ MESSAGE(
 "-------------------------\n"
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
+"* Sndio                       : ${STATUS_SNDIO}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
 "* AppleMidi                   : ${STATUS_APPLEMIDI}\n"
 )

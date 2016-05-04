@@ -51,8 +51,6 @@ public:
 		return castModel<ComboBoxModel>();
 	}
 
-	virtual QSize sizeHint() const;
-
 public slots:
 	void selectNext();
 	void selectPrevious();

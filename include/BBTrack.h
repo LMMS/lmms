@@ -29,6 +29,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QStaticText>
 
 #include "Track.h"
 
@@ -107,14 +108,16 @@ protected slots:
 
 
 protected:
-	void paintEvent( QPaintEvent * );
-	void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void constructContextMenu( QMenu * );
 
 
 private:
 	BBTCO * m_bbTCO;
-
+	QPixmap m_paintPixmap;
+	
+	QStaticText m_staticTextName;
 } ;
 
 

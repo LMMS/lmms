@@ -31,6 +31,7 @@
 
 class DetuningHelper : public InlineAutomation
 {
+	Q_OBJECT
 	MM_OPERATORS
 public:
 	DetuningHelper() :

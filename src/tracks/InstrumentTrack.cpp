@@ -139,6 +139,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
+	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
 }
 
 
@@ -220,8 +221,6 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 			}
 		}
 	}
-
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
 
 
@@ -430,7 +429,10 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	lock();
 	// invalidate all NotePlayHandles linked to this track
 	m_processHandles.clear();
-	Engine::mixer()->removePlayHandles( this, removeIPH );
+	Engine::mixer()->removePlayHandlesOfTypes( this, removeIPH
+				? PlayHandle::TypeNotePlayHandle
+					| PlayHandle::TypeInstrumentPlayHandle
+				: PlayHandle::TypeNotePlayHandle );
 	unlock();
 }
 
@@ -550,6 +552,14 @@ void InstrumentTrack::updatePitchRange()
 	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(),
 								MidiControllerRegisteredParameterNumberMSB, ( MidiPitchBendSensitivityRPN >> 8 ) & 0x7F ) );
 	processOutEvent( MidiEvent( MidiControlChange, midiPort()->realOutputChannel(), MidiControllerDataEntry, midiPitchRange() ) );
+}
+
+
+
+
+void InstrumentTrack::updateEffectChannel()
+{
+	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
 
 
@@ -946,7 +956,7 @@ InstrumentTrackView::~InstrumentTrackView()
 InstrumentTrackWindow * InstrumentTrackView::topLevelInstrumentTrackWindow()
 {
 	InstrumentTrackWindow * w = NULL;
-	foreach( QMdiSubWindow * sw,
+	for( const QMdiSubWindow * sw :
 				gui->mainWindow()->workspace()->subWindowList(
 											QMdiArea::ActivationHistoryOrder ) )
 	{
@@ -1188,9 +1198,9 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
 	fxMenu->addSeparator();
 
-	for (int i = 0; i < Engine::fxMixer()->fxChannels().size(); ++i)
+	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->fxChannels()[i];
+		FxChannel * currentChannel = Engine::fxMixer()->effectChannel( i );
 
 		if ( currentChannel != fxChannel )
 		{

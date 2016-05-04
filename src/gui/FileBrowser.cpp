@@ -766,7 +766,7 @@ void Directory::update( void )
 						"--- Factory files ---" ) );
 				sep->setIcon( 0, embed::getIconPixmap(
 							"factory_files" ) );
-				insertChild(  m_dirCount + top_index - 1, sep );
+				insertChild(  m_dirCount + top_index, sep );
 			}
 		}
 	}

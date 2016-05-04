@@ -2791,7 +2791,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4631,7 +4631,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation>duplo clique para abrir esta sequência no Editor de notas MDll
 use a roda do mouse para midificar o volume de cada passo</translation>
     </message>
@@ -4771,7 +4771,7 @@ use a roda do mouse para midificar o volume de cada passo</translation>
         <translation>Panorâmico da nota</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Volume da nota</translation>
     </message>
     <message>
@@ -4811,7 +4811,7 @@ use a roda do mouse para midificar o volume de cada passo</translation>
         <translation>Por favor abra um a sequência com um duplo clique sobre ela!</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

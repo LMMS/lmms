@@ -2922,7 +2922,7 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effet avec le menu contextu
         <translation>VÉLOCITÉ DE BASE PERSONNALISÉE</translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation>Spécifiez la vélocité normalisée de base des instruments MIDI pour un volume de note de 100%</translation>
     </message>
     <message>
@@ -5085,7 +5085,7 @@ Le mode PM signifie modulation de phase: la phase de l&apos;oscillateur 3 est mo
     <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation>double-cliquer pour ouvrir ce motif dans le piano virtuel
 utilisez la molette de la souris pour régler le volume d&apos;un pas</translation>
     </message>
@@ -5249,7 +5249,7 @@ utilisez la molette de la souris pour régler le volume d&apos;un pas</translati
         <translation>Vérouiller la note</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Volume de note </translation>
     </message>
     <message>
@@ -5281,8 +5281,8 @@ utilisez la molette de la souris pour régler le volume d&apos;un pas</translati
         <translation>Pas d&apos;accord</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
-        <translation>Volume: %1%</translation>
+        <source>Velocity: %1%</source>
+        <translation>Velocity: %1%</translation>
     </message>
     <message>
         <source>Panning: %1% left</source>

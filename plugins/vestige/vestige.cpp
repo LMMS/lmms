@@ -78,6 +78,7 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_subWindow( NULL ),
+	m_scrollArea( NULL ),
 	vstKnobs( NULL ),
 	knobFModel( NULL ),
 	p_subWindow( NULL )
@@ -102,7 +103,9 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	closePlugin();
 }
 

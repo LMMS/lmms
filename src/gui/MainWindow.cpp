@@ -145,7 +145,7 @@ MainWindow::MainWindow() :
 
 #if ! defined(LMMS_BUILD_APPLE)
 	QFileInfoList drives = QDir::drives();
-	foreach( const QFileInfo & drive, drives )
+	for( const QFileInfo & drive : drives )
 	{
 		root_paths += drive.absolutePath();
 	}
@@ -203,10 +203,16 @@ MainWindow::MainWindow() :
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
+		m_autoSaveInterval = ConfigManager::inst()->value(
+					"ui", "saveinterval" ).toInt() < 1 ?
+						DEFAULT_AUTO_SAVE_INTERVAL :
+				ConfigManager::inst()->value(
+					"ui", "saveinterval" ).toInt();
+
 		// The auto save function mustn't run until there is a project
 		// to save or it will run over recover.mmp if you hesitate at the
 		// recover messagebox for a minute. It is now started in main.
-		// See autoSaveTimerStart() in MainWindow.h
+		// See autoSaveTimerReset() in MainWindow.h
 	}
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
@@ -596,7 +602,7 @@ void MainWindow::finalize()
 	gui->songEditor()->parentWidget()->show();
 
 	// reset window title every time we change the state of a subwindow to show the correct title
-	foreach( QMdiSubWindow * subWindow, workspace()->subWindowList() )
+	for( const QMdiSubWindow * subWindow : workspace()->subWindowList() )
 	{
 		connect( subWindow, SIGNAL( windowStateChanged(Qt::WindowStates,Qt::WindowStates) ), this, SLOT( resetWindowTitle() ) );
 	}
@@ -1507,14 +1513,19 @@ void MainWindow::browseHelp()
 void MainWindow::autoSave()
 {
 	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ) )
+			Engine::getSong()->isExporting() ||
+				QApplication::mouseButtons() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		autoSaveTimerReset();  // Reset timer
 	}
 	else
 	{
 		// try again in 10 seconds
-		QTimer::singleShot( 10*1000, this, SLOT( autoSave() ) );
+		if( getAutoSaveTimerInterval() != m_autoSaveShortTime )
+		{
+			autoSaveTimerReset( m_autoSaveShortTime );
+		}
 	}
 }
 
@@ -1527,5 +1538,6 @@ void MainWindow::runAutoSave()
 		getSession() != Limited )
 	{
 		autoSave();
+		autoSaveTimerReset();  // Reset timer
 	}
 }

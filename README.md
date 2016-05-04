@@ -23,7 +23,7 @@ Features
 * Song-Editor for composing songs
 * A Beat+Bassline-Editor for creating beats and basslines
 * An easy-to-use Piano-Roll for editing patterns and melodies
-* An FX mixer with 64 FX channels and arbitrary number of effects allow unlimited mixing possibilities
+* An FX mixer with unlimited FX channels and arbitrary number of effects
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support

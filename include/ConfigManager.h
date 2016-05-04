@@ -230,7 +230,7 @@ public:
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);
 
-	void loadConfigFile();
+	void loadConfigFile( const QString & configFile = "" );
 	void saveConfigFile();
 
 
@@ -260,7 +260,7 @@ private:
 	void upgrade_1_1_90();
 	void upgrade();
 
-	const QString m_lmmsRcFile;
+	QString m_lmmsRcFile;
 	QString m_workingDir;
 	QString m_dataDir;
 	QString m_artworkDir;

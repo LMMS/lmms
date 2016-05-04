@@ -31,6 +31,7 @@
 #include <QCursor>
 #include <QMouseEvent>
 #include <QScrollArea>
+#include <QStyleOption>
 
 #include "embed.h"
 #include "debug.h"
@@ -135,21 +136,22 @@ PluginDescWidget::~PluginDescWidget()
 
 
 
-void PluginDescWidget::paintEvent( QPaintEvent * )
+void PluginDescWidget::paintEvent( QPaintEvent * e )
 {
-	const QColor fill_color = m_mouseOver ? QColor( 224, 224, 224 ) :
-						QColor( 192, 192, 192 );
 
 	QPainter p( this );
-	p.fillRect( rect(), fill_color );
 
+	// Paint everything according to the style sheet
+	QStyleOption o;
+	o.initFrom( this );
+	style()->drawPrimitive( QStyle::PE_Widget, &o, &p, this );
+
+	// Draw the rest
 	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
 								( 60 - 24 );
 	const QSize logo_size( s, s );
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	p.drawPixmap( 4, 4, logo );
 
 	QFont f = p.font();

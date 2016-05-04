@@ -36,13 +36,13 @@
 #include "GuiApplication.h"
 
 
-static inline QString ensureTrailingSlash( const QString & _s )
+static inline QString ensureTrailingSlash( const QString & s )
 {
-	if( _s.right( 1 ) != QDir::separator() )
+	if( ! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\') )
 	{
-		return _s + QDir::separator();
+		return s + '/';
 	}
-	return _s;
+	return s;
 }
 
 
@@ -50,13 +50,11 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
 ConfigManager::ConfigManager() :
-	m_lmmsRcFile( QDir::home().absolutePath() + QDir::separator() +
-								".lmmsrc.xml" ),
-	m_workingDir( QDir::home().absolutePath() + QDir::separator() +
-						"lmms" + QDir::separator() ),
+	m_lmmsRcFile( QDir::home().absolutePath() +"/.lmmsrc.xml" ),
+	m_workingDir( QDir::home().absolutePath() + "/lmms/"),
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
-	m_vstDir( m_workingDir + "vst" + QDir::separator() ),
+	m_vstDir( m_workingDir + "vst/" ),
 	m_flDir( QDir::home().absolutePath() ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
@@ -65,14 +63,16 @@ ConfigManager::ConfigManager() :
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
 
-	// If we're in development (lmms is not installed) let's get the source
-	// directory by reading the CMake Cache
+	// If we're in development (lmms is not installed) let's get the source and
+	// binary directories by reading the CMake Cache
 	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
 	if (cmakeCache.exists()) {
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
 
-		// Find the line containing something like lmms_SOURCE_DIR:static=<dir>
+		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
+		// and lmms_BINARY_DIR:static=<dir>
+		int done = 0;
 		while(! stream.atEnd())
 		{
 			QString line = stream.readLine();
@@ -80,6 +80,15 @@ ConfigManager::ConfigManager() :
 			if (line.startsWith("lmms_SOURCE_DIR:")) {
 				QString srcDir = line.section('=', -1).trimmed();
 				QDir::addSearchPath("data", srcDir + "/data/");
+				done++;
+			}
+			if (line.startsWith("lmms_BINARY_DIR:")) {
+				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
+											 ".lmmsrc.xml";
+				done++;
+			}
+			if (done == 2)
+			{
 				break;
 			}
 		}
@@ -333,9 +342,15 @@ void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
 }
 
 
-void ConfigManager::loadConfigFile()
+void ConfigManager::loadConfigFile( const QString & configFile )
 {
 	// read the XML file and create DOM tree
+	// Allow configuration file override through --config commandline option
+	if ( !configFile.isEmpty() )
+	{
+		m_lmmsRcFile = configFile;
+	}
+
 	QFile cfg_file( m_lmmsRcFile );
 	QDomDocument dom_tree;
 
@@ -400,11 +415,7 @@ void ConfigManager::loadConfigFile()
 				{
 					m_artworkDir = defaultArtworkDir();
 				}
-				if( m_artworkDir.right( 1 ) !=
-							QDir::separator() )
-				{
-					m_artworkDir += QDir::separator();
-				}
+				m_artworkDir = ensureTrailingSlash(m_artworkDir);
 			}
 			setWorkingDir( value( "paths", "workingdir" ) );
 
@@ -433,18 +444,18 @@ void ConfigManager::loadConfigFile()
 	}
 
 
-	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() ||
+	if( m_vstDir.isEmpty() || m_vstDir == QDir::separator() || m_vstDir == "/" ||
 			!QDir( m_vstDir ).exists() )
 	{
 #ifdef LMMS_BUILD_WIN32
 		QString programFiles = QString::fromLocal8Bit( getenv( "ProgramFiles" ) );
-		m_vstDir =  programFiles + QDir::separator() + "VstPlugins" + QDir::separator();
+		m_vstDir =  programFiles + "/VstPlugins/";
 #else
 		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
 	}
 
-	if( m_flDir.isEmpty() || m_flDir == QDir::separator() )
+	if( m_flDir.isEmpty() || m_flDir == QDir::separator() || m_flDir == "/")
 	{
 		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
@@ -455,7 +466,7 @@ void ConfigManager::loadConfigFile()
 	}
 
 #ifdef LMMS_HAVE_STK
-	if( m_stkDir.isEmpty() || m_stkDir == QDir::separator() ||
+	if( m_stkDir.isEmpty() || m_stkDir == QDir::separator() || m_stkDir == "/" ||
 			!QDir( m_stkDir ).exists() )
 	{
 #if defined(LMMS_BUILD_WIN32)

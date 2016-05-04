@@ -2795,7 +2795,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <translation>BENUTZERDEFINIERTE GRUNDLAUTSTÄRKE</translation>
     </message>
     <message>
-        <source>Specify the velocity normalization base for MIDI-based instruments at note volume 100%</source>
+        <source>Specify the velocity normalization base for MIDI-based instruments at 100% note velocity</source>
         <translation>Geben Sie die Lautstärken-Normalisationsbasis für MIDI-basierende Instrumente bei einer Notenlautstärke von 100% an</translation>
     </message>
     <message>
@@ -4640,7 +4640,7 @@ PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 
     <name>PatternView</name>
     <message>
         <source>double-click to open this pattern in piano-roll
-use mouse wheel to set volume of a step</source>
+use mouse wheel to set velocity of a step</source>
         <translation>Doppelklick, um dieses Pattern im Piano-Roll zu öffnen
 Lautstärke eines Schritts kann mit dem Mausrad geändert werden</translation>
     </message>
@@ -4804,7 +4804,7 @@ Lautstärke eines Schritts kann mit dem Mausrad geändert werden</translation>
         <translation>Notenraster</translation>
     </message>
     <message>
-        <source>Note Volume</source>
+        <source>Note Velocity</source>
         <translation>Noten-Lautstärke</translation>
     </message>
     <message>
@@ -4836,7 +4836,7 @@ Lautstärke eines Schritts kann mit dem Mausrad geändert werden</translation>
         <translation>Kein Akkord</translation>
     </message>
     <message>
-        <source>Volume: %1%</source>
+        <source>Velocity: %1%</source>
         <translation>Lautstärke: %1%</translation>
     </message>
     <message>
