@@ -549,8 +549,8 @@ TimeLineWidget {
 	background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
 					   stop: 0 #8796a7, stop: 1.0 #3e454e );
 
-	qproperty-inactiveLoopColor: rgba( 255, 255, 255, 32 );
-	qproperty-activeLoopColor: rgba( 255, 255, 255, 64 );
+	qproperty-inactiveLoopColor: rgba( 0, 128, 0, 64 );
+	qproperty-activeLoopColor: rgba( 0, 128, 0, 192 );
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
 }

@@ -233,6 +233,16 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	// Clip so that we only draw everything starting from the offset
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 
+	// Draw the loop rectangle
+	int const loopRectMargin = 1;
+	int const loopRectHeight = this->height() - 2 * loopRectMargin;
+	int const loopStart = markerX( loopBegin() ) + 8;
+	int const loopEndR = markerX( loopEnd() ) + 9;
+	int const loopRectWidth = loopEndR - loopStart;
+	p.setPen( Qt::NoPen );
+	p.setBrush( loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor() );
+	p.drawRect( loopStart, loopRectMargin, loopRectWidth, loopRectHeight );
+
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
 	QFont font = p.font();
@@ -264,16 +274,6 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 			p.drawText( cx + 5, ((height() - fontHeight) / 2) + fontAscent, s );
 		}
 	}
-
-	// Draw the loop rectangle
-	int const loopRectMargin = 1;
-	int const loopRectHeight = this->height() - 2 * loopRectMargin;
-	int const loopStart = markerX( loopBegin() ) + 8;
-	int const loopEndR = markerX( loopEnd() ) + 9;
-	int const loopRectWidth = loopEndR - loopStart;
-	p.setPen( Qt::NoPen );
-	p.setBrush( loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor() );
-	p.drawRect( loopStart, loopRectMargin, loopRectWidth, loopRectHeight );
 
 	// Draw the markers
 	p.setPen( QColor( 0, 0, 0 ) );
