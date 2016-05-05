@@ -117,7 +117,11 @@ SET(zynaddsubfx_core_SRCS
     )
 
 
-ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
+IF(LMMS_BUILD_LINUX)
+	ADD_LIBRARY(ZynAddSubFxCore MODULE LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
+ELSE()
+	ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
+ENDIF()
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
 
 # required libs for debug msys builds
@@ -136,8 +140,14 @@ ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS ZynAddSubFxCore LIBRARY DESTINATION "${PLUGIN_DIR}")
 ENDIF(LMMS_BUILD_WIN32)
 
+IF(LMMS_BUILD_LINUX)
+	LINK_LIBRARIES(ZynAddSubFxCore -Wl,--enable-new-dtags)
+ENDIF()
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
-TARGET_LINK_LIBRARIES(zynaddsubfx ZynAddSubFxCore)
+IF(NOT LMMS_BUILD_LINUX)
+	TARGET_LINK_LIBRARIES(zynaddsubfx ZynAddSubFxCore)
+ENDIF()
 
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
@@ -163,7 +173,11 @@ IF(FLTK_CONFIG AND NOT (LMMS_BUILD_APPLE OR LMMS_BUILD_WIN32))
 	STRING(REPLACE " " ";" FLTK_FILTERED_LDFLAGS ${FLTK_FILTERED_LDFLAGS})
 	LIST(REMOVE_ITEM FLTK_FILTERED_LDFLAGS -lX11)
 ENDIF()
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS} -lpthread )
+IF(LMMS_BUILD_LINUX)
+	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ${FLTK_FILTERED_LDFLAGS} -lpthread )
+ELSE()
+	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS} -lpthread )
+ENDIF()
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)
