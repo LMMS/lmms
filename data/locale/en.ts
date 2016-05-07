@@ -5557,6 +5557,10 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>Piano-Roll - no pattern</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Quantize</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -6433,6 +6437,25 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>Channel mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
