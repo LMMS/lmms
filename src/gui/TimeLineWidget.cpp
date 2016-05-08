@@ -274,8 +274,12 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	// Draw the inner border outline (no fill)
 	QRect innerRectangle = outerRectangle.adjusted( 1, 1, -1, -1 );
 	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
-	p.setBrush(Qt::NoBrush);
+	p.setBrush( Qt::NoBrush );
 	p.drawRect( innerRectangle );
+
+	// Draw the position marker
+	p.setOpacity( 0.6 );
+	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap );
 }
 
 
