@@ -533,8 +533,28 @@ Fader {
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
-TimeLine {
-	font-size: 8px;
+TimeLineWidget {
+        /* font-size only supports px and pt. */
+	font-size: 7pt;
+	/* lengths also support em. This will make sure that the height
+	   will always change in the same proportion as the font size
+	   defined above.
+	   If you want a fixed size set min and max to the same value. */
+	min-height: 1.5em;
+	max-height: 1.5em;
+
+        background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
+	                                   stop: 0 #8796a7, stop: 1.0 #3e454e );
+
+        qproperty-inactiveLoopColor: rgba( 52, 63, 53, 64 );
+	qproperty-inactiveLoopBrush: rgba( 255, 255, 255, 32 );
+	qproperty-inactiveLoopInnerColor: rgba( 255, 255, 255, 32 );
+	qproperty-activeLoopColor: rgba( 52, 63, 53, 255 );
+	qproperty-activeLoopBrush: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
+	                                            stop: 0 #378d59, stop: 1.0 #297e36 );
+	qproperty-activeLoopInnerColor: rgba( 74, 155, 100, 255 );
+	qproperty-barLineColor: rgb( 192, 192, 192 );
+	qproperty-barNumberColor: rgb( 192, 192, 192 );
 }
 
 QTreeView {

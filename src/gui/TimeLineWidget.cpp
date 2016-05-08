@@ -48,8 +48,6 @@
 
 
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
-QPixmap * TimeLineWidget::s_loopPointBeginPixmap = NULL;
-QPixmap * TimeLineWidget::s_loopPointEndPixmap = NULL;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 			Song::PlayPos & pos, const MidiTime & begin,
@@ -80,16 +78,6 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	{
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
 							"playpos_marker" ) );
-	}
-	if( s_loopPointBeginPixmap == NULL )
-	{
-		s_loopPointBeginPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point_b" ) );
-	}
-	if( s_loopPointEndPixmap == NULL )
-	{
-		s_loopPointEndPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point_e" ) );
 	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
@@ -239,9 +227,20 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int const loopStart = markerX( loopBegin() ) + 8;
 	int const loopEndR = markerX( loopEnd() ) + 9;
 	int const loopRectWidth = loopEndR - loopStart;
-	p.setPen( Qt::NoPen );
-	p.setBrush( loopPointsEnabled() ? getActiveLoopColor() : getInactiveLoopColor() );
-	p.drawRect( loopStart, loopRectMargin, loopRectWidth, loopRectHeight );
+
+	bool const loopPointsActive = loopPointsEnabled();
+
+	// Draw the main rectangle (outer border with inner fill)
+	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
+	p.setBrush( loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush() );
+	QRect outerRectangle( loopStart, loopRectMargin, loopRectWidth - 1, loopRectHeight - 1 );
+	p.drawRect( outerRectangle );
+
+	// Draw the inner border outline (no fill)
+	QRect innerRectangle = outerRectangle.adjusted( 1, 1, -1, -1 );
+	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
+	p.setBrush(Qt::NoBrush);
+	p.drawRect( innerRectangle );
 
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
@@ -274,17 +273,6 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 			p.drawText( cx + 5, ((height() - fontHeight) / 2) + fontAscent, s );
 		}
 	}
-
-	// Draw the markers
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
-	int const loopMarkerHeight = ( this->height() - s_loopPointBeginPixmap->height() ) / 2;
-	p.drawPixmap( markerX( loopBegin() ) + 2, loopMarkerHeight, *s_loopPointBeginPixmap );
-	p.drawPixmap( markerX( loopEnd() ) + 2, loopMarkerHeight, *s_loopPointEndPixmap );
-
-	p.setOpacity( 0.6 );
-	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(),
-							*s_posMarkerPixmap );
 }
 
 
