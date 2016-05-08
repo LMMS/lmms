@@ -99,7 +99,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 {
 	setSplittedChannels( true );
 
-	tryLoad( "RemoteVstPlugin" );
+	tryLoad( REMOTE_VST_PLUGIN_FILEPATH );
 #ifdef LMMS_BUILD_WIN64
 	if( m_badDllFormat )
 	{
