@@ -230,17 +230,9 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 
 	bool const loopPointsActive = loopPointsEnabled();
 
-	// Draw the main rectangle (outer border with inner fill)
-	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
-	p.setBrush( loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush() );
+	// Draw the main rectangle (inner fill only)
 	QRect outerRectangle( loopStart, loopRectMargin, loopRectWidth - 1, loopRectHeight - 1 );
-	p.drawRect( outerRectangle );
-
-	// Draw the inner border outline (no fill)
-	QRect innerRectangle = outerRectangle.adjusted( 1, 1, -1, -1 );
-	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
-	p.setBrush(Qt::NoBrush);
-	p.drawRect( innerRectangle );
+	p.fillRect( outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
 
 	// Draw the bar lines and numbers
 	// Activate hinting on the font
@@ -273,6 +265,17 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 			p.drawText( cx + 5, ((height() - fontHeight) / 2) + fontAscent, s );
 		}
 	}
+
+	// Draw the main rectangle (outer border)
+	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
+	p.setBrush( Qt::NoBrush );
+	p.drawRect( outerRectangle );
+
+	// Draw the inner border outline (no fill)
+	QRect innerRectangle = outerRectangle.adjusted( 1, 1, -1, -1 );
+	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
+	p.setBrush(Qt::NoBrush);
+	p.drawRect( innerRectangle );
 }
 
 
