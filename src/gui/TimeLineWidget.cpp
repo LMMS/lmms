@@ -53,10 +53,15 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 			Song::PlayPos & pos, const MidiTime & begin,
 							QWidget * parent ) :
 	QWidget( parent ),
-	m_inactiveLoopColor( 255, 255, 255, 32 ),
-	m_activeLoopColor( 255, 255, 255, 64 ),
+	m_inactiveLoopColor( 52, 63, 53, 64 ),
+	m_inactiveLoopBrush( QColor( 255, 255, 255, 32 ) ),
+	m_inactiveLoopInnerColor( 255, 255, 255, 32 ),
+	m_activeLoopColor( 52, 63, 53, 255 ),
+	m_activeLoopBrush( QColor( 55, 141, 89 ) ),
+	m_activeLoopInnerColor( 74, 155, 100, 255 ),
+	m_loopRectangleVerticalPadding( 1 ),
 	m_barLineColor( 192, 192, 192 ),
-	m_barNumberColor( m_barLineColor.darker( 120 )),
+	m_barNumberColor( m_barLineColor.darker( 120 ) ),
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
@@ -222,7 +227,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
 
 	// Draw the loop rectangle
-	int const loopRectMargin = 1;
+	int const & loopRectMargin = getLoopRectangleVerticalPadding();
 	int const loopRectHeight = this->height() - 2 * loopRectMargin;
 	int const loopStart = markerX( loopBegin() ) + 8;
 	int const loopEndR = markerX( loopEnd() ) + 9;
