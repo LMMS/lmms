@@ -182,6 +182,12 @@ ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
 IF(QT5)
 	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
+	# Link with newer libraries in a non-standard directory
+	FOREACH(PREFIX ${CMAKE_PREFIX_PATH})
+		IF(IS_ABSOLUTE "${PREFIX}" AND IS_DIRECTORY "${PREFIX}/lib")
+			TARGET_LINK_LIBRARIES(RemoteZynAddSubFx "-L${PREFIX}/lib")
+		ENDIF()
+	ENDFOREACH(PREFIX)
 ENDIF(QT5)
 
 # link Qt libraries when on win32
