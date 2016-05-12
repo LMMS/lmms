@@ -24,6 +24,9 @@ IF(LMMS_BUILD_WIN32)
 	ENDIF(LMMS_BUILD_WIN64 AND NOT LMMS_BUILD_MSYS)
 ENDIF(LMMS_BUILD_WIN32)
 
+SET(REMOTE_VST_PLUGIN_FILEPATH "RemoteVstPlugin" CACHE STRING "Relative file path to RemoteVstPlugin")
+
+ADD_DEFINITIONS(-DREMOTE_VST_PLUGIN_FILEPATH="${REMOTE_VST_PLUGIN_FILEPATH}")
 IF(LMMS_BUILD_WIN32)
 	BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
 ELSE()
@@ -45,14 +48,14 @@ ENDIF(LMMS_HOST_X86_64)
 ADD_CUSTOM_COMMAND(
 		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 		COMMAND ${WINE_CXX}
-		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -o RemoteVstPlugin
-		COMMAND find -name RemoteVstPlugin.exe -exec mv "'{}'" RemoteVstPlugin "';'"
+		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -o ../RemoteVstPlugin
+		COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 		TARGET vstbase
-		OUTPUTS RemoteVstPlugin
+		OUTPUTS ../RemoteVstPlugin
 		)
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES RemoteVstPlugin.exe.so)
-INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/RemoteVstPlugin" "${CMAKE_CURRENT_BINARY_DIR}/RemoteVstPlugin.exe.so" DESTINATION "${PLUGIN_DIR}")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ../RemoteVstPlugin.exe.so)
+INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin" "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin.exe.so" DESTINATION "${PLUGIN_DIR}")
 ENDIF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 
 

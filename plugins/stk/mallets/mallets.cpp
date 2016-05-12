@@ -202,7 +202,7 @@ void malletsInstrument::loadSettings( const QDomElement & _this )
 			default of 0.2. 0.2 * 128.0 = 25.6 	*/
 			m_vibratoGainModel.setValue( 25.6f );
 		}
-		if( ! m_presetsModel.value() == 1 )
+		if( m_presetsModel.value() != 1 )
 		{
 			// Frequency actually worked for Vibraphone!
 			m_vibratoFreqModel.setValue( 0.0f );
