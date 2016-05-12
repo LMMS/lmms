@@ -50,6 +50,11 @@ public:
 		return( m_activeTab );
 	}
 
+	// Themeability
+	Q_PROPERTY( QColor tabSelected READ tabSelected WRITE setTabSelected)
+
+	QColor tabSelected() const;
+	void setTabSelected( const QColor & c );
 
 protected:
 	virtual bool event( QEvent * event );
@@ -78,6 +83,8 @@ private:
 	quint8 	m_tabbarHeight;	// The height of the tab bar
 	quint8 	m_tabheight;	// The height of the tabs
 	bool	m_usePixmap;	// true if the tabs are to be displayed with icons. False for text tabs.
+
+	QColor m_tabSelected;	// The highlighting color for the selected tab.
 } ;
 
 #endif

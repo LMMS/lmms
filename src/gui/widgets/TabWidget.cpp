@@ -38,11 +38,13 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	QWidget( parent ),
 	m_activeTab( 0 ),
 	m_caption( caption ),
-	m_usePixmap( usePixmap )
+	m_usePixmap( usePixmap ),
+	m_tabSelected( 0, 0, 0 )
 {
 
 	// Create taller tabbar when it's to display artwork tabs
 	m_tabbarHeight = usePixmap ? GRAPHIC_TAB_HEIGHT : TEXT_TAB_HEIGHT;
+
 	m_tabheight = caption.isEmpty() ? m_tabbarHeight - 3 : m_tabbarHeight - 4;
 
 	setFont( pointSize<8>( font() ) );
@@ -231,20 +233,18 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 		p.drawText( 5, 11, m_caption );
 	}
 
-       // Calculate the tabs' x (tabs are painted next to the caption)
-       int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
+        // Calculate the tabs' x (tabs are painted next to the caption)
+        int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
 
-	QColor cap_col( 160, 160, 160 );
 	if( big_tab_captions )
 	{
 		p.setFont( pointSize<8>( p.font() ) );
-		cap_col = QColor( 224, 224, 224 );
 	}
 	else
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 	}
-	p.setPen( cap_col );
+	p.setPen( tabSelected() );
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
   	widgetStack::iterator first = m_widgets.begin();
@@ -271,7 +271,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			if( it.key() == m_activeTab )
                         {
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
-				p.fillRect( tab_x_offset, 3, ( *it ).nwidth, m_tabbarHeight - 5, cap_col );
+				p.fillRect( tab_x_offset, 3, ( *it ).nwidth, m_tabbarHeight - 5, tabSelected() );
 			} else 
 			{
 	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
@@ -287,14 +287,14 @@ void TabWidget::paintEvent( QPaintEvent * pe )
                 	if( it.key() == m_activeTab )
 	                {
 				p.setPen( QColor( 32, 48, 64 ) );
-				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, cap_col );
+				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, tabSelected() );
 			}
 
 			// Draw text
 			p.drawText( tab_x_offset + 3, m_tabheight, ( *it ).name );
 
 			// Reset text color
-			p.setPen( cap_col );
+			p.setPen( tabSelected() );
 		}
 
 		// Next tab's horizontal position
@@ -324,3 +324,14 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	}
 	setActiveTab( tab );
 }
+
+QColor TabWidget::tabSelected() const
+{
+	return m_tabSelected;
+}
+
+void TabWidget::setTabSelected( const QColor & c ) 
+{
+	m_tabSelected = c;
+}
+
