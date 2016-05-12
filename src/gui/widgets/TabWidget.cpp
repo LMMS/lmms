@@ -48,22 +48,19 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
-	QColor bg_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Background ).
-								darker( 132 );
-	QPalette pal = palette();
-	pal.setColor( QPalette::Background, bg_color );
-	setPalette( pal );
+        QColor bg_color = QApplication::palette().color( QPalette::Active,
+                                                        QPalette::Background ).
+                                                                darker( 132 );
+        QPalette pal = palette();
+        pal.setColor( QPalette::Background, bg_color );
+        setPalette( pal );
+
 }
-
-
 
 
 TabWidget::~TabWidget()
 {
 }
-
-
 
 
 void TabWidget::addTab( QWidget * w, const QString & name, const QString & tooltip, const char *activePixmap, const char *inactivePixmap, int idx )
@@ -209,16 +206,17 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
 
-	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background );
+//	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background );
+	QBrush bg_color = p.background();
 
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
 
 	bool big_tab_captions = ( m_caption == "" );
 
-	p.setPen( bg_color.darker( 150 ) );
+	p.setPen( bg_color.color().darker( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
-	p.setPen( bg_color.light( 150 ) );
+	p.setPen( bg_color.color().light( 150 ) );
 	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
 	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
 
