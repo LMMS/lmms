@@ -208,24 +208,20 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
 
+	// Draw background
 	QBrush bg_color = p.background();
-
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
 
 	bool big_tab_captions = ( m_caption == "" );
 
+	// Draw external borders
 	p.setPen( bg_color.color().darker( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
-	p.setPen( bg_color.color().light( 150 ) );
-	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
-	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
+	// Draw tabs' bar background
+	p.fillRect( 1, 1, width() - 2, m_tabheight + 2, bg_color.color().darker( 150 ) );
 
-	p.setPen( QColor( 0, 0, 0 ) );
-	p.drawRect( 1, 1, width() - 3, height() - 3 );
-
-	p.fillRect( 2, 0, width() - 3, m_tabheight + 2, bg_color.color().darker( 150 ) );
-
+	// Draw title, if any
 	if( ! m_caption.isEmpty() )
 	{
 		p.setPen( tabTitleText() );
