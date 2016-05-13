@@ -224,7 +224,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	p.setPen( QColor( 0, 0, 0 ) );
 	p.drawRect( 1, 1, width() - 3, height() - 3 );
 
-	p.drawLine( 2, m_tabheight + 2, width() - 3, m_tabheight + 2);
+	p.fillRect( 2, 0, width() - 3, m_tabheight + 2, bg_color.color().darker( 150 ) );
 
 	if( ! m_caption.isEmpty() )
 	{
