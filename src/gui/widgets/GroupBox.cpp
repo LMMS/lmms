@@ -107,18 +107,10 @@ void GroupBox::updatePixmap()
 	p.setPen( bg_color.dark( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
-	// brighter line at bottom/right
-	p.setPen( bg_color.light( 150 ) );
-	p.drawLine( width() - 1, 0, width() - 1, height() - 1 );
-	p.drawLine( 0, height() - 1, width() - 1, height() - 1 );
-
 	// draw line below titlebar
-	p.setPen( bg_color.dark( 400 ) );
-	p.drawLine( 1, m_titleBarHeight + 1, width() - 3, m_titleBarHeight + 1 );
+	p.fillRect( 1, 1, width() - 2, m_titleBarHeight + 1, bg_color.darker( 150 ) );
 
-	// black inner rect
-	p.drawRect( 1, 1, width() - 3, height() - 3 );
-
+	// draw text
 	p.setPen( palette().color( QPalette::Active, QPalette::Text ) );
 	p.setFont( pointSize<8>( font() ) );
 	p.drawText( 22, m_titleBarHeight, m_caption );
