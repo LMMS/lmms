@@ -39,6 +39,8 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	m_activeTab( 0 ),
 	m_caption( caption ),
 	m_usePixmap( usePixmap ),
+	m_tabText( 0, 0, 0 ),
+	m_tabTitleText( 0, 0, 0 ),
 	m_tabSelected( 0, 0, 0 )
 {
 
@@ -59,11 +61,9 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 
 }
 
-
 TabWidget::~TabWidget()
 {
 }
-
 
 void TabWidget::addTab( QWidget * w, const QString & name, const QString & tooltip, const char *activePixmap, const char *inactivePixmap, int idx )
 {
@@ -208,7 +208,6 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
 
-//	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background );
 	QBrush bg_color = p.background();
 
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
@@ -229,7 +228,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 
 	if( ! m_caption.isEmpty() )
 	{
-		p.setPen( QColor( 255, 255, 255 ) );
+		p.setPen( tabTitleText() );
 		p.drawText( 5, 11, m_caption );
 	}
 
@@ -244,7 +243,6 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 	}
-	p.setPen( tabSelected() );
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
   	widgetStack::iterator first = m_widgets.begin();
@@ -256,13 +254,13 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	}
 
 	// Draw all tabs
+	p.setPen( tabText() );
         for( widgetStack::iterator it = first ; it != last ; ++it )
         {
 
 		// Draw a text tab or a artwork tab.
 		if ( m_usePixmap )
 		{	
-
 			// Fixes tab's width, because original size is only correct for text tabs
 			( *it ).nwidth = tab_width;
 
@@ -279,22 +277,16 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 
 			// Draw artwork
 	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 3, *artwork );
-
 		} else
 		{
-
 			// Highlight tab when active
                 	if( it.key() == m_activeTab )
 	                {
-				p.setPen( QColor( 32, 48, 64 ) );
 				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, tabSelected() );
 			}
 
 			// Draw text
 			p.drawText( tab_x_offset + 3, m_tabheight, ( *it ).name );
-
-			// Reset text color
-			p.setPen( tabSelected() );
 		}
 
 		// Next tab's horizontal position
@@ -325,11 +317,37 @@ void TabWidget::wheelEvent( QWheelEvent * we )
 	setActiveTab( tab );
 }
 
+// Return the color to be used to draw a TabWidget's title text (if any)
+QColor TabWidget::tabTitleText() const
+{
+	return m_tabTitleText;
+}
+
+// Set the color to be used to draw a TabWidget's title text (if any)
+void TabWidget::setTabTitleText( const QColor & c ) 
+{
+	m_tabTitleText = c;
+}
+
+// Return the color to be used to draw a TabWidget's text (if any)
+QColor TabWidget::tabText() const
+{
+	return m_tabText;
+}
+
+// Set the color to be used to draw a TabWidget's text (if any)
+void TabWidget::setTabText( const QColor & c ) 
+{
+	m_tabText = c;
+}
+
+// Return the color to be used to highlight a TabWidget'selected tab (if any)
 QColor TabWidget::tabSelected() const
 {
 	return m_tabSelected;
 }
 
+// Set the color to be used to highlight a TabWidget'selected tab (if any)
 void TabWidget::setTabSelected( const QColor & c ) 
 {
 	m_tabSelected = c;
