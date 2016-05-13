@@ -51,8 +51,14 @@ public:
 	}
 
 	// Themeability
+	Q_PROPERTY( QColor tabText READ tabText WRITE setTabText)
+	Q_PROPERTY( QColor tabTitleText READ tabTitleText WRITE setTabTitleText)
 	Q_PROPERTY( QColor tabSelected READ tabSelected WRITE setTabSelected)
 
+	QColor tabText() const;
+	void setTabText( const QColor & c );
+	QColor tabTitleText() const;
+	void setTabTitleText( const QColor & c );
 	QColor tabSelected() const;
 	void setTabSelected( const QColor & c );
 
@@ -84,6 +90,8 @@ private:
 	quint8 	m_tabheight;	// The height of the tabs
 	bool	m_usePixmap;	// true if the tabs are to be displayed with icons. False for text tabs.
 
+	QColor m_tabText;	// The color of the tabs' text.
+	QColor m_tabTitleText;	// The color of the TabWidget's title text.
 	QColor m_tabSelected;	// The highlighting color for the selected tab.
 } ;
 
