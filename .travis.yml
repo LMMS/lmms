@@ -1,5 +1,7 @@
 language: cpp
 compiler: gcc
+dist: trusty
+sudo: required
 matrix:
     include:
         - env: TARGET_OS=win32
