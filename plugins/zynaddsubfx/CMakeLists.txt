@@ -180,6 +180,11 @@ ENDIF()
 TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui -L.. -lZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS} -lpthread )
 ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
+# Support qt_version_tag in Qt 5.6
+IF(QT5)
+	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
+ENDIF(QT5)
+
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx ${QT_LIBRARIES})
