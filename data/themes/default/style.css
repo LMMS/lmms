@@ -344,6 +344,11 @@ AutomatableSlider::handle:vertical {
 	margin: -4px -12px -2px;
 }
 
+/* about dialog */
+QTabWidget, QTabWidget QWidget {
+	background: #5b6571;
+}
+
 /* window that shows up when you add effects */
 
 EffectSelectDialog QScrollArea {
