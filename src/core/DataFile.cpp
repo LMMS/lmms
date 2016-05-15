@@ -803,6 +803,15 @@ void DataFile::upgrade_1_1_91()
 		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
 		el.setAttribute( "src", s );
 	}
+
+	list = elementsByTagName( "attribute" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if ( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
+			el.setAttribute( "value", "vocoder" );
+		}
+	}
 }
 
 
