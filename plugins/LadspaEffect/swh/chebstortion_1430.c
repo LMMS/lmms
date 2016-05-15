@@ -143,7 +143,7 @@ static void connectPortChebstortion(
 static LADSPA_Handle instantiateChebstortion(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Chebstortion *plugin_data = (Chebstortion *)malloc(sizeof(Chebstortion));
+	Chebstortion *plugin_data = (Chebstortion *)calloc(1, sizeof(Chebstortion));
 	unsigned int count;
 	float env;
 	float itm1;
@@ -321,7 +321,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -399,12 +398,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (chebstortionDescriptor) {
 		free((LADSPA_PortDescriptor *)chebstortionDescriptor->PortDescriptors);
 		free((char **)chebstortionDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)chebstortionDescriptor->PortRangeHints);
 		free(chebstortionDescriptor);
 	}
+	chebstortionDescriptor = NULL;
 
 }

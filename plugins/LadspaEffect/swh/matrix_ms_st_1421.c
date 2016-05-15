@@ -93,7 +93,7 @@ static void connectPortMatrixMSSt(
 static LADSPA_Handle instantiateMatrixMSSt(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	MatrixMSSt *plugin_data = (MatrixMSSt *)malloc(sizeof(MatrixMSSt));
+	MatrixMSSt *plugin_data = (MatrixMSSt *)calloc(1, sizeof(MatrixMSSt));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -180,7 +180,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -266,12 +265,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (matrixMSStDescriptor) {
 		free((LADSPA_PortDescriptor *)matrixMSStDescriptor->PortDescriptors);
 		free((char **)matrixMSStDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)matrixMSStDescriptor->PortRangeHints);
 		free(matrixMSStDescriptor);
 	}
+	matrixMSStDescriptor = NULL;
 
 }

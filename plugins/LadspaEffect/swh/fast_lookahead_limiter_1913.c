@@ -182,7 +182,7 @@ static void connectPortFastLookaheadLimiter(
 static LADSPA_Handle instantiateFastLookaheadLimiter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	FastLookaheadLimiter *plugin_data = (FastLookaheadLimiter *)malloc(sizeof(FastLookaheadLimiter));
+	FastLookaheadLimiter *plugin_data = (FastLookaheadLimiter *)calloc(1, sizeof(FastLookaheadLimiter));
 	float atten;
 	float atten_lp;
 	LADSPA_Data *buffer = NULL;
@@ -581,7 +581,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -704,12 +703,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (fastLookaheadLimiterDescriptor) {
 		free((LADSPA_PortDescriptor *)fastLookaheadLimiterDescriptor->PortDescriptors);
 		free((char **)fastLookaheadLimiterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)fastLookaheadLimiterDescriptor->PortRangeHints);
 		free(fastLookaheadLimiterDescriptor);
 	}
+	fastLookaheadLimiterDescriptor = NULL;
 
 }

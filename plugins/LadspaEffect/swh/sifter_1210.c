@@ -33,11 +33,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 
 inline int partition(LADSPA_Data array[], int left, int right);
 
-#ifdef __clang__
 void q_sort(LADSPA_Data array[], int left, int right) {
-#else
-inline void q_sort(LADSPA_Data array[], int left, int right) {
-#endif
         float pivot = partition(array, left, right);
 
         if (left < pivot) {
@@ -164,7 +160,7 @@ static void connectPortSifter(
 static LADSPA_Handle instantiateSifter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Sifter *plugin_data = (Sifter *)malloc(sizeof(Sifter));
+	Sifter *plugin_data = (Sifter *)calloc(1, sizeof(Sifter));
 	LADSPA_Data *b1 = NULL;
 	long b1ptr;
 	LADSPA_Data *b2 = NULL;
@@ -366,7 +362,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -438,12 +433,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (sifterDescriptor) {
 		free((LADSPA_PortDescriptor *)sifterDescriptor->PortDescriptors);
 		free((char **)sifterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sifterDescriptor->PortRangeHints);
 		free(sifterDescriptor);
 	}
+	sifterDescriptor = NULL;
 
 }

@@ -88,7 +88,7 @@ static void connectPortFoldover(
 static LADSPA_Handle instantiateFoldover(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Foldover *plugin_data = (Foldover *)malloc(sizeof(Foldover));
+	Foldover *plugin_data = (Foldover *)calloc(1, sizeof(Foldover));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -173,7 +173,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -255,12 +254,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (foldoverDescriptor) {
 		free((LADSPA_PortDescriptor *)foldoverDescriptor->PortDescriptors);
 		free((char **)foldoverDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)foldoverDescriptor->PortRangeHints);
 		free(foldoverDescriptor);
 	}
+	foldoverDescriptor = NULL;
 
 }

@@ -83,7 +83,7 @@ static void connectPortSinusWavewrapper(
 static LADSPA_Handle instantiateSinusWavewrapper(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	SinusWavewrapper *plugin_data = (SinusWavewrapper *)malloc(sizeof(SinusWavewrapper));
+	SinusWavewrapper *plugin_data = (SinusWavewrapper *)calloc(1, sizeof(SinusWavewrapper));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -166,7 +166,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -244,12 +243,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (sinusWavewrapperDescriptor) {
 		free((LADSPA_PortDescriptor *)sinusWavewrapperDescriptor->PortDescriptors);
 		free((char **)sinusWavewrapperDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sinusWavewrapperDescriptor->PortRangeHints);
 		free(sinusWavewrapperDescriptor);
 	}
+	sinusWavewrapperDescriptor = NULL;
 
 }

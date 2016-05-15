@@ -175,7 +175,7 @@ static void connectPortHarmonicGen(
 static LADSPA_Handle instantiateHarmonicGen(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	HarmonicGen *plugin_data = (HarmonicGen *)malloc(sizeof(HarmonicGen));
+	HarmonicGen *plugin_data = (HarmonicGen *)calloc(1, sizeof(HarmonicGen));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -374,7 +374,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -542,12 +541,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (harmonicGenDescriptor) {
 		free((LADSPA_PortDescriptor *)harmonicGenDescriptor->PortDescriptors);
 		free((char **)harmonicGenDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)harmonicGenDescriptor->PortRangeHints);
 		free(harmonicGenDescriptor);
 	}
+	harmonicGenDescriptor = NULL;
 
 }

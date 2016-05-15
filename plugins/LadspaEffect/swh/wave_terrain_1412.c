@@ -83,7 +83,7 @@ static void connectPortWaveTerrain(
 static LADSPA_Handle instantiateWaveTerrain(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	WaveTerrain *plugin_data = (WaveTerrain *)malloc(sizeof(WaveTerrain));
+	WaveTerrain *plugin_data = (WaveTerrain *)calloc(1, sizeof(WaveTerrain));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -162,7 +162,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -231,12 +230,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (waveTerrainDescriptor) {
 		free((LADSPA_PortDescriptor *)waveTerrainDescriptor->PortDescriptors);
 		free((char **)waveTerrainDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)waveTerrainDescriptor->PortRangeHints);
 		free(waveTerrainDescriptor);
 	}
+	waveTerrainDescriptor = NULL;
 
 }

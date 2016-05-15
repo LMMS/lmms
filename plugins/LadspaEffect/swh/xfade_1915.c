@@ -132,7 +132,7 @@ static void connectPortXfade(
 static LADSPA_Handle instantiateXfade(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Xfade *plugin_data = (Xfade *)malloc(sizeof(Xfade));
+	Xfade *plugin_data = (Xfade *)calloc(1, sizeof(Xfade));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -273,7 +273,7 @@ static void connectPortXfade4(
 static LADSPA_Handle instantiateXfade4(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Xfade4 *plugin_data = (Xfade4 *)malloc(sizeof(Xfade4));
+	Xfade4 *plugin_data = (Xfade4 *)calloc(1, sizeof(Xfade4));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -392,7 +392,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -598,18 +597,20 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (xfadeDescriptor) {
 		free((LADSPA_PortDescriptor *)xfadeDescriptor->PortDescriptors);
 		free((char **)xfadeDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)xfadeDescriptor->PortRangeHints);
 		free(xfadeDescriptor);
 	}
+	xfadeDescriptor = NULL;
 	if (xfade4Descriptor) {
 		free((LADSPA_PortDescriptor *)xfade4Descriptor->PortDescriptors);
 		free((char **)xfade4Descriptor->PortNames);
 		free((LADSPA_PortRangeHint *)xfade4Descriptor->PortRangeHints);
 		free(xfade4Descriptor);
 	}
+	xfade4Descriptor = NULL;
 
 }

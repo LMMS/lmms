@@ -94,7 +94,7 @@ static void connectPortSinCos(
 static LADSPA_Handle instantiateSinCos(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	SinCos *plugin_data = (SinCos *)malloc(sizeof(SinCos));
+	SinCos *plugin_data = (SinCos *)calloc(1, sizeof(SinCos));
 	float fs;
 	double last_om;
 	double phi;
@@ -214,7 +214,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -296,12 +295,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (sinCosDescriptor) {
 		free((LADSPA_PortDescriptor *)sinCosDescriptor->PortDescriptors);
 		free((char **)sinCosDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sinCosDescriptor->PortRangeHints);
 		free(sinCosDescriptor);
 	}
+	sinCosDescriptor = NULL;
 
 }

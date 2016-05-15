@@ -192,7 +192,7 @@ static void connectPortSvf(
 static LADSPA_Handle instantiateSvf(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Svf *plugin_data = (Svf *)malloc(sizeof(Svf));
+	Svf *plugin_data = (Svf *)calloc(1, sizeof(Svf));
 	int sample_rate;
 	sv_filter *svf = NULL;
 
@@ -300,7 +300,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -408,12 +407,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (svfDescriptor) {
 		free((LADSPA_PortDescriptor *)svfDescriptor->PortDescriptors);
 		free((char **)svfDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)svfDescriptor->PortRangeHints);
 		free(svfDescriptor);
 	}
+	svfDescriptor = NULL;
 
 }

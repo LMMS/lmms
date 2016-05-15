@@ -255,7 +255,7 @@ static void connectPortLfoPhaser(
 static LADSPA_Handle instantiateLfoPhaser(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	LfoPhaser *plugin_data = (LfoPhaser *)malloc(sizeof(LfoPhaser));
+	LfoPhaser *plugin_data = (LfoPhaser *)calloc(1, sizeof(LfoPhaser));
 	allpass *ap = NULL;
 	int count;
 	float f_per_lv;
@@ -551,7 +551,7 @@ static void connectPortFourByFourPole(
 static LADSPA_Handle instantiateFourByFourPole(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	FourByFourPole *plugin_data = (FourByFourPole *)malloc(sizeof(FourByFourPole));
+	FourByFourPole *plugin_data = (FourByFourPole *)calloc(1, sizeof(FourByFourPole));
 	allpass *ap = NULL;
 	float sr_r_2;
 	float y0;
@@ -838,7 +838,7 @@ static void connectPortAutoPhaser(
 static LADSPA_Handle instantiateAutoPhaser(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	AutoPhaser *plugin_data = (AutoPhaser *)malloc(sizeof(AutoPhaser));
+	AutoPhaser *plugin_data = (AutoPhaser *)calloc(1, sizeof(AutoPhaser));
 	allpass *ap = NULL;
 	envelope *env = NULL;
 	float sample_rate;
@@ -1037,7 +1037,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -1377,24 +1376,27 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (lfoPhaserDescriptor) {
 		free((LADSPA_PortDescriptor *)lfoPhaserDescriptor->PortDescriptors);
 		free((char **)lfoPhaserDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)lfoPhaserDescriptor->PortRangeHints);
 		free(lfoPhaserDescriptor);
 	}
+	lfoPhaserDescriptor = NULL;
 	if (fourByFourPoleDescriptor) {
 		free((LADSPA_PortDescriptor *)fourByFourPoleDescriptor->PortDescriptors);
 		free((char **)fourByFourPoleDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)fourByFourPoleDescriptor->PortRangeHints);
 		free(fourByFourPoleDescriptor);
 	}
+	fourByFourPoleDescriptor = NULL;
 	if (autoPhaserDescriptor) {
 		free((LADSPA_PortDescriptor *)autoPhaserDescriptor->PortDescriptors);
 		free((char **)autoPhaserDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)autoPhaserDescriptor->PortRangeHints);
 		free(autoPhaserDescriptor);
 	}
+	autoPhaserDescriptor = NULL;
 
 }

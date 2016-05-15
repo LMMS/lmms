@@ -111,7 +111,7 @@ static void connectPortRateShifter(
 static LADSPA_Handle instantiateRateShifter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	RateShifter *plugin_data = (RateShifter *)malloc(sizeof(RateShifter));
+	RateShifter *plugin_data = (RateShifter *)calloc(1, sizeof(RateShifter));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_mask;
 	fixp32 read_ptr;
@@ -242,7 +242,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -314,12 +313,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (rateShifterDescriptor) {
 		free((LADSPA_PortDescriptor *)rateShifterDescriptor->PortDescriptors);
 		free((char **)rateShifterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)rateShifterDescriptor->PortRangeHints);
 		free(rateShifterDescriptor);
 	}
+	rateShifterDescriptor = NULL;
 
 }

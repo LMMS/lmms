@@ -153,7 +153,7 @@ static void connectPortSc4(
 static LADSPA_Handle instantiateSc4(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Sc4 *plugin_data = (Sc4 *)malloc(sizeof(Sc4));
+	Sc4 *plugin_data = (Sc4 *)calloc(1, sizeof(Sc4));
 	float amp;
 	float *as = NULL;
 	unsigned int count;
@@ -452,7 +452,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -618,12 +617,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (sc4Descriptor) {
 		free((LADSPA_PortDescriptor *)sc4Descriptor->PortDescriptors);
 		free((char **)sc4Descriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sc4Descriptor->PortRangeHints);
 		free(sc4Descriptor);
 	}
+	sc4Descriptor = NULL;
 
 }
