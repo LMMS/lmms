@@ -120,7 +120,7 @@ static void connectPortRingmod_2i1o(
 static LADSPA_Handle instantiateRingmod_2i1o(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Ringmod_2i1o *plugin_data = (Ringmod_2i1o *)malloc(sizeof(Ringmod_2i1o));
+	Ringmod_2i1o *plugin_data = (Ringmod_2i1o *)calloc(1, sizeof(Ringmod_2i1o));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -207,6 +207,8 @@ static void activateRingmod_1i1o1l(LADSPA_Handle instance) {
 
 static void cleanupRingmod_1i1o1l(LADSPA_Handle instance) {
 #line 93 "ringmod_1188.xml"
+	Ringmod_1i1o1l *plugin_data = (Ringmod_1i1o1l *)instance;
+	plugin_data = plugin_data;
 	if (--refcount == 0) {
 	        free(sin_tbl);
 	        free(tri_tbl);
@@ -254,7 +256,7 @@ static void connectPortRingmod_1i1o1l(
 static LADSPA_Handle instantiateRingmod_1i1o1l(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Ringmod_1i1o1l *plugin_data = (Ringmod_1i1o1l *)malloc(sizeof(Ringmod_1i1o1l));
+	Ringmod_1i1o1l *plugin_data = (Ringmod_1i1o1l *)calloc(1, sizeof(Ringmod_1i1o1l));
 	LADSPA_Data offset;
 
 #line 59 "ringmod_1188.xml"
@@ -434,7 +436,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -630,18 +631,20 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (ringmod_2i1oDescriptor) {
 		free((LADSPA_PortDescriptor *)ringmod_2i1oDescriptor->PortDescriptors);
 		free((char **)ringmod_2i1oDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)ringmod_2i1oDescriptor->PortRangeHints);
 		free(ringmod_2i1oDescriptor);
 	}
+	ringmod_2i1oDescriptor = NULL;
 	if (ringmod_1i1o1lDescriptor) {
 		free((LADSPA_PortDescriptor *)ringmod_1i1o1lDescriptor->PortDescriptors);
 		free((char **)ringmod_1i1o1lDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)ringmod_1i1o1lDescriptor->PortRangeHints);
 		free(ringmod_1i1o1lDescriptor);
 	}
+	ringmod_1i1o1lDescriptor = NULL;
 
 }

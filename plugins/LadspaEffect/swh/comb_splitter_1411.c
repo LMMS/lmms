@@ -121,7 +121,7 @@ static void connectPortCombSplitter(
 static LADSPA_Handle instantiateCombSplitter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	CombSplitter *plugin_data = (CombSplitter *)malloc(sizeof(CombSplitter));
+	CombSplitter *plugin_data = (CombSplitter *)calloc(1, sizeof(CombSplitter));
 	long comb_pos;
 	LADSPA_Data *comb_tbl = NULL;
 	float last_offset;
@@ -262,7 +262,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -341,12 +340,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (combSplitterDescriptor) {
 		free((LADSPA_PortDescriptor *)combSplitterDescriptor->PortDescriptors);
 		free((char **)combSplitterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)combSplitterDescriptor->PortRangeHints);
 		free(combSplitterDescriptor);
 	}
+	combSplitterDescriptor = NULL;
 
 }

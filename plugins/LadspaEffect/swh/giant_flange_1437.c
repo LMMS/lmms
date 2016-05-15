@@ -160,7 +160,7 @@ static void connectPortGiantFlange(
 static LADSPA_Handle instantiateGiantFlange(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	GiantFlange *plugin_data = (GiantFlange *)malloc(sizeof(GiantFlange));
+	GiantFlange *plugin_data = (GiantFlange *)calloc(1, sizeof(GiantFlange));
 	int16_t *buffer = NULL;
 	unsigned int buffer_mask;
 	unsigned int buffer_pos;
@@ -508,7 +508,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -637,12 +636,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (giantFlangeDescriptor) {
 		free((LADSPA_PortDescriptor *)giantFlangeDescriptor->PortDescriptors);
 		free((char **)giantFlangeDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)giantFlangeDescriptor->PortRangeHints);
 		free(giantFlangeDescriptor);
 	}
+	giantFlangeDescriptor = NULL;
 
 }

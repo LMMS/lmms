@@ -136,7 +136,7 @@ static void connectPortDjFlanger(
 static LADSPA_Handle instantiateDjFlanger(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	DjFlanger *plugin_data = (DjFlanger *)malloc(sizeof(DjFlanger));
+	DjFlanger *plugin_data = (DjFlanger *)calloc(1, sizeof(DjFlanger));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_mask;
 	unsigned int buffer_pos;
@@ -373,7 +373,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -472,12 +471,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (djFlangerDescriptor) {
 		free((LADSPA_PortDescriptor *)djFlangerDescriptor->PortDescriptors);
 		free((char **)djFlangerDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)djFlangerDescriptor->PortRangeHints);
 		free(djFlangerDescriptor);
 	}
+	djFlangerDescriptor = NULL;
 
 }

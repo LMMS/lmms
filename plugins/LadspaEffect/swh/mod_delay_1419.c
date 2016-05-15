@@ -114,7 +114,7 @@ static void connectPortModDelay(
 static LADSPA_Handle instantiateModDelay(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	ModDelay *plugin_data = (ModDelay *)malloc(sizeof(ModDelay));
+	ModDelay *plugin_data = (ModDelay *)calloc(1, sizeof(ModDelay));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_mask;
 	float fs;
@@ -236,7 +236,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -318,12 +317,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (modDelayDescriptor) {
 		free((LADSPA_PortDescriptor *)modDelayDescriptor->PortDescriptors);
 		free((char **)modDelayDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)modDelayDescriptor->PortRangeHints);
 		free(modDelayDescriptor);
 	}
+	modDelayDescriptor = NULL;
 
 }

@@ -25,6 +25,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
+#line 9 "highpass_iir_1890.xml"
 
 #include "config.h"
 #include "util/iir.h"
@@ -69,6 +70,7 @@ static void activateHighpass_iir(LADSPA_Handle instance) {
 	iir_stage_t*gt = plugin_data->gt;
 	iirf_t*iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
+#line 35 "highpass_iir_1890.xml"
 	
 	gt = init_iir_stage(IIR_STAGE_HIGHPASS,10,3,2);
 	iirf = init_iirf_t(gt);
@@ -80,6 +82,7 @@ static void activateHighpass_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupHighpass_iir(LADSPA_Handle instance) {
+#line 41 "highpass_iir_1890.xml"
 	Highpass_iir *plugin_data = (Highpass_iir *)instance;
 	free_iirf_t(plugin_data->iirf, plugin_data->gt);
 	free_iir_stage(plugin_data->gt);
@@ -112,11 +115,12 @@ static void connectPortHighpass_iir(
 static LADSPA_Handle instantiateHighpass_iir(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Highpass_iir *plugin_data = (Highpass_iir *)malloc(sizeof(Highpass_iir));
+	Highpass_iir *plugin_data = (Highpass_iir *)calloc(1, sizeof(Highpass_iir));
 	iir_stage_t*gt = NULL;
 	iirf_t*iirf = NULL;
 	long sample_rate;
 
+#line 24 "highpass_iir_1890.xml"
 	sample_rate = s_rate;
 
 	plugin_data->gt = gt;
@@ -136,6 +140,7 @@ static LADSPA_Handle instantiateHighpass_iir(
 
 static void runHighpass_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Highpass_iir *plugin_data = (Highpass_iir *)instance;
+	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Cutoff Frequency (float value) */
 	const LADSPA_Data cutoff = *(plugin_data->cutoff);
@@ -152,8 +157,12 @@ static void runHighpass_iir(LADSPA_Handle instance, unsigned long sample_count) 
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
+#line 27 "highpass_iir_1890.xml"
 	chebyshev(iirf, gt, 2*CLAMP((int)stages,1,10), IIR_STAGE_HIGHPASS, cutoff/(float)sample_rate, 0.5f);
 	iir_process_buffer_ns_5(iirf, gt, input, output, sample_count,RUN_ADDING);
+
+	// Unused variable
+	(void)(run_adding_gain);
 }
 #undef buffer_write
 #undef RUN_ADDING
@@ -169,6 +178,7 @@ static void setRunAddingGainHighpass_iir(LADSPA_Handle instance, LADSPA_Data gai
 
 static void runAddingHighpass_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Highpass_iir *plugin_data = (Highpass_iir *)instance;
+	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Cutoff Frequency (float value) */
 	const LADSPA_Data cutoff = *(plugin_data->cutoff);
@@ -185,8 +195,12 @@ static void runAddingHighpass_iir(LADSPA_Handle instance, unsigned long sample_c
 	iirf_t* iirf = plugin_data->iirf;
 	long sample_rate = plugin_data->sample_rate;
 
+#line 27 "highpass_iir_1890.xml"
 	chebyshev(iirf, gt, 2*CLAMP((int)stages,1,10), IIR_STAGE_HIGHPASS, cutoff/(float)sample_rate, 0.5f);
 	iir_process_buffer_ns_5(iirf, gt, input, output, sample_count,RUN_ADDING);
+
+	// Unused variable
+	(void)(run_adding_gain);
 }
 
 void __attribute__((constructor)) swh_init() {
@@ -196,7 +210,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -278,12 +291,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (highpass_iirDescriptor) {
 		free((LADSPA_PortDescriptor *)highpass_iirDescriptor->PortDescriptors);
 		free((char **)highpass_iirDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)highpass_iirDescriptor->PortRangeHints);
 		free(highpass_iirDescriptor);
 	}
+	highpass_iirDescriptor = NULL;
 
 }

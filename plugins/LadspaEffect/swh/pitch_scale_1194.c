@@ -128,7 +128,7 @@ static void connectPortPitchScaleHQ(
 static LADSPA_Handle instantiatePitchScaleHQ(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	PitchScaleHQ *plugin_data = (PitchScaleHQ *)malloc(sizeof(PitchScaleHQ));
+	PitchScaleHQ *plugin_data = (PitchScaleHQ *)calloc(1, sizeof(PitchScaleHQ));
 	sbuffers *buffers = NULL;
 	long sample_rate;
 
@@ -232,7 +232,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -311,12 +310,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (pitchScaleHQDescriptor) {
 		free((LADSPA_PortDescriptor *)pitchScaleHQDescriptor->PortDescriptors);
 		free((char **)pitchScaleHQDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)pitchScaleHQDescriptor->PortRangeHints);
 		free(pitchScaleHQDescriptor);
 	}
+	pitchScaleHQDescriptor = NULL;
 
 }

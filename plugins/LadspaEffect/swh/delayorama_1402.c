@@ -214,7 +214,7 @@ static void connectPortDelayorama(
 static LADSPA_Handle instantiateDelayorama(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Delayorama *plugin_data = (Delayorama *)malloc(sizeof(Delayorama));
+	Delayorama *plugin_data = (Delayorama *)calloc(1, sizeof(Delayorama));
 	unsigned int active_set;
 	LADSPA_Data *buffer = NULL;
 	unsigned long buffer_pos;
@@ -675,7 +675,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -847,12 +846,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (delayoramaDescriptor) {
 		free((LADSPA_PortDescriptor *)delayoramaDescriptor->PortDescriptors);
 		free((char **)delayoramaDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)delayoramaDescriptor->PortRangeHints);
 		free(delayoramaDescriptor);
 	}
+	delayoramaDescriptor = NULL;
 
 }

@@ -31,7 +31,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 
 #define BASE_BUFFER 0.001 // Base buffer length (s)
 
-static inline LADSPA_Data sat(LADSPA_Data x, float q,  float dist) {
+inline LADSPA_Data sat(LADSPA_Data x, float q,  float dist) {
         if (x == q) {
                 return 1.0f / dist + q / (1.0f - f_exp(dist * q));
         }
@@ -178,7 +178,7 @@ static void connectPortRetroFlange(
 static LADSPA_Handle instantiateRetroFlange(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	RetroFlange *plugin_data = (RetroFlange *)malloc(sizeof(RetroFlange));
+	RetroFlange *plugin_data = (RetroFlange *)calloc(1, sizeof(RetroFlange));
 	LADSPA_Data *buffer = NULL;
 	long buffer_size;
 	long count;
@@ -499,7 +499,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -581,12 +580,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (retroFlangeDescriptor) {
 		free((LADSPA_PortDescriptor *)retroFlangeDescriptor->PortDescriptors);
 		free((char **)retroFlangeDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)retroFlangeDescriptor->PortRangeHints);
 		free(retroFlangeDescriptor);
 	}
+	retroFlangeDescriptor = NULL;
 
 }

@@ -165,7 +165,7 @@ static void connectPortMatrixSpatialiser(
 static LADSPA_Handle instantiateMatrixSpatialiser(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	MatrixSpatialiser *plugin_data = (MatrixSpatialiser *)malloc(sizeof(MatrixSpatialiser));
+	MatrixSpatialiser *plugin_data = (MatrixSpatialiser *)calloc(1, sizeof(MatrixSpatialiser));
 	LADSPA_Data current_m_gain;
 	LADSPA_Data current_s_gain;
 
@@ -338,7 +338,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -424,12 +423,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (matrixSpatialiserDescriptor) {
 		free((LADSPA_PortDescriptor *)matrixSpatialiserDescriptor->PortDescriptors);
 		free((char **)matrixSpatialiserDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)matrixSpatialiserDescriptor->PortRangeHints);
 		free(matrixSpatialiserDescriptor);
 	}
+	matrixSpatialiserDescriptor = NULL;
 
 }

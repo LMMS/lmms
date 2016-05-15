@@ -93,7 +93,7 @@ static void connectPortConst(
 static LADSPA_Handle instantiateConst(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Const *plugin_data = (Const *)malloc(sizeof(Const));
+	Const *plugin_data = (Const *)calloc(1, sizeof(Const));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -178,7 +178,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -250,12 +249,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (constDescriptor) {
 		free((LADSPA_PortDescriptor *)constDescriptor->PortDescriptors);
 		free((char **)constDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)constDescriptor->PortRangeHints);
 		free(constDescriptor);
 	}
+	constDescriptor = NULL;
 
 }

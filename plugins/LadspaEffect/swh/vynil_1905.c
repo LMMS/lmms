@@ -211,7 +211,7 @@ static void connectPortVynil(
 static LADSPA_Handle instantiateVynil(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Vynil *plugin_data = (Vynil *)malloc(sizeof(Vynil));
+	Vynil *plugin_data = (Vynil *)calloc(1, sizeof(Vynil));
 	LADSPA_Data *buffer_m = NULL;
 	unsigned int buffer_mask;
 	unsigned int buffer_pos;
@@ -587,7 +587,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -713,12 +712,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (vynilDescriptor) {
 		free((LADSPA_PortDescriptor *)vynilDescriptor->PortDescriptors);
 		free((char **)vynilDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)vynilDescriptor->PortRangeHints);
 		free(vynilDescriptor);
 	}
+	vynilDescriptor = NULL;
 
 }

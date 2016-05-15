@@ -25,6 +25,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
+#line 9 "notch_iir_1894.xml"
 
 #include "config.h"
 #include "util/iir.h"
@@ -79,6 +80,7 @@ static void activateNotch_iir(LADSPA_Handle instance) {
 	long sample_rate = plugin_data->sample_rate;
 	iir_stage_t*second = plugin_data->second;
 	float ufc = plugin_data->ufc;
+#line 39 "notch_iir_1894.xml"
 	
 	ufc = (*(plugin_data->center) - *(plugin_data->width)*0.5f)/(float)sample_rate;
 	lfc = (*(plugin_data->center) + *(plugin_data->width)*0.5f)/(float)sample_rate;
@@ -99,6 +101,7 @@ static void activateNotch_iir(LADSPA_Handle instance) {
 }
 
 static void cleanupNotch_iir(LADSPA_Handle instance) {
+#line 50 "notch_iir_1894.xml"
 	Notch_iir *plugin_data = (Notch_iir *)instance;
 	free_iirf_t(plugin_data->iirf1, plugin_data->first);
 	free_iirf_t(plugin_data->iirf2, plugin_data->second);
@@ -136,7 +139,7 @@ static void connectPortNotch_iir(
 static LADSPA_Handle instantiateNotch_iir(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Notch_iir *plugin_data = (Notch_iir *)malloc(sizeof(Notch_iir));
+	Notch_iir *plugin_data = (Notch_iir *)calloc(1, sizeof(Notch_iir));
 	iir_stage_t*first = NULL;
 	iirf_t*iirf1 = NULL;
 	iirf_t*iirf2 = NULL;
@@ -145,6 +148,7 @@ static LADSPA_Handle instantiateNotch_iir(
 	iir_stage_t*second = NULL;
 	float ufc;
 
+#line 23 "notch_iir_1894.xml"
 	sample_rate = s_rate;
 	ufc = lfc = 0.0f;
 
@@ -169,6 +173,7 @@ static LADSPA_Handle instantiateNotch_iir(
 
 static void runNotch_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Notch_iir *plugin_data = (Notch_iir *)instance;
+	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Center Frequency (Hz) (float value) */
 	const LADSPA_Data center = *(plugin_data->center);
@@ -192,12 +197,16 @@ static void runNotch_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	iir_stage_t* second = plugin_data->second;
 	float ufc = plugin_data->ufc;
 
+#line 27 "notch_iir_1894.xml"
 	ufc = (center - width*0.5f)/(float)sample_rate;
 	lfc = (center + width*0.5f)/(float)sample_rate;
 	chebyshev(iirf1, first,  2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS,  ufc, 0.5f);
 	chebyshev(iirf2, second, 2*CLAMP((int)stages,1,10), IIR_STAGE_HIGHPASS, lfc, 0.5f);
 	iir_process_buffer_ns_5(iirf1, first, input, output, sample_count, RUN_ADDING);
 	iir_process_buffer_ns_5(iirf2, second, input, output, sample_count, 1); /* add to first buffer */
+
+	// Unused variable
+	(void)(run_adding_gain);
 }
 #undef buffer_write
 #undef RUN_ADDING
@@ -213,6 +222,7 @@ static void setRunAddingGainNotch_iir(LADSPA_Handle instance, LADSPA_Data gain) 
 
 static void runAddingNotch_iir(LADSPA_Handle instance, unsigned long sample_count) {
 	Notch_iir *plugin_data = (Notch_iir *)instance;
+	LADSPA_Data run_adding_gain = plugin_data->run_adding_gain;
 
 	/* Center Frequency (Hz) (float value) */
 	const LADSPA_Data center = *(plugin_data->center);
@@ -236,12 +246,16 @@ static void runAddingNotch_iir(LADSPA_Handle instance, unsigned long sample_coun
 	iir_stage_t* second = plugin_data->second;
 	float ufc = plugin_data->ufc;
 
+#line 27 "notch_iir_1894.xml"
 	ufc = (center - width*0.5f)/(float)sample_rate;
 	lfc = (center + width*0.5f)/(float)sample_rate;
 	chebyshev(iirf1, first,  2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS,  ufc, 0.5f);
 	chebyshev(iirf2, second, 2*CLAMP((int)stages,1,10), IIR_STAGE_HIGHPASS, lfc, 0.5f);
 	iir_process_buffer_ns_5(iirf1, first, input, output, sample_count, RUN_ADDING);
 	iir_process_buffer_ns_5(iirf2, second, input, output, sample_count, 1); /* add to first buffer */
+
+	// Unused variable
+	(void)(run_adding_gain);
 }
 
 void __attribute__((constructor)) swh_init() {
@@ -251,7 +265,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -343,12 +356,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (notch_iirDescriptor) {
 		free((LADSPA_PortDescriptor *)notch_iirDescriptor->PortDescriptors);
 		free((char **)notch_iirDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)notch_iirDescriptor->PortRangeHints);
 		free(notch_iirDescriptor);
 	}
+	notch_iirDescriptor = NULL;
 
 }

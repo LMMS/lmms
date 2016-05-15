@@ -128,7 +128,7 @@ static void connectPortHilbert(
 static LADSPA_Handle instantiateHilbert(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Hilbert *plugin_data = (Hilbert *)malloc(sizeof(Hilbert));
+	Hilbert *plugin_data = (Hilbert *)calloc(1, sizeof(Hilbert));
 	LADSPA_Data *delay = NULL;
 	unsigned int dptr;
 
@@ -240,7 +240,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -316,12 +315,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (hilbertDescriptor) {
 		free((LADSPA_PortDescriptor *)hilbertDescriptor->PortDescriptors);
 		free((char **)hilbertDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)hilbertDescriptor->PortRangeHints);
 		free(hilbertDescriptor);
 	}
+	hilbertDescriptor = NULL;
 
 }

@@ -141,7 +141,7 @@ static void connectPortBodeShifter(
 static LADSPA_Handle instantiateBodeShifter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	BodeShifter *plugin_data = (BodeShifter *)malloc(sizeof(BodeShifter));
+	BodeShifter *plugin_data = (BodeShifter *)calloc(1, sizeof(BodeShifter));
 	LADSPA_Data *delay = NULL;
 	unsigned int dptr;
 	float fs;
@@ -372,7 +372,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -458,12 +457,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (bodeShifterDescriptor) {
 		free((LADSPA_PortDescriptor *)bodeShifterDescriptor->PortDescriptors);
 		free((char **)bodeShifterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)bodeShifterDescriptor->PortRangeHints);
 		free(bodeShifterDescriptor);
 	}
+	bodeShifterDescriptor = NULL;
 
 }

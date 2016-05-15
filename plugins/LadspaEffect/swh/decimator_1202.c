@@ -95,7 +95,7 @@ static void connectPortDecimator(
 static LADSPA_Handle instantiateDecimator(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Decimator *plugin_data = (Decimator *)malloc(sizeof(Decimator));
+	Decimator *plugin_data = (Decimator *)calloc(1, sizeof(Decimator));
 	float count;
 	LADSPA_Data last_out;
 	long sample_rate;
@@ -247,7 +247,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -335,12 +334,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (decimatorDescriptor) {
 		free((LADSPA_PortDescriptor *)decimatorDescriptor->PortDescriptors);
 		free((char **)decimatorDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)decimatorDescriptor->PortRangeHints);
 		free(decimatorDescriptor);
 	}
+	decimatorDescriptor = NULL;
 
 }

@@ -116,7 +116,7 @@ static void connectPortSatanMaximiser(
 static LADSPA_Handle instantiateSatanMaximiser(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	SatanMaximiser *plugin_data = (SatanMaximiser *)malloc(sizeof(SatanMaximiser));
+	SatanMaximiser *plugin_data = (SatanMaximiser *)calloc(1, sizeof(SatanMaximiser));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_pos;
 	float env;
@@ -262,7 +262,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -344,12 +343,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (satanMaximiserDescriptor) {
 		free((LADSPA_PortDescriptor *)satanMaximiserDescriptor->PortDescriptors);
 		free((char **)satanMaximiserDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)satanMaximiserDescriptor->PortRangeHints);
 		free(satanMaximiserDescriptor);
 	}
+	satanMaximiserDescriptor = NULL;
 
 }
