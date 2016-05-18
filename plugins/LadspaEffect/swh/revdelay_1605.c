@@ -25,6 +25,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
+#line 10 "revdelay_1605.xml"
 
 #include "ladspa-util.h"
 #include <stdio.h>
@@ -85,6 +86,7 @@ static void activateRevdelay(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 38 "revdelay_1605.xml"
 	unsigned int size;
 
 	size = sample_rate * 5 * 2; /* 5 second maximum */
@@ -105,6 +107,7 @@ static void activateRevdelay(LADSPA_Handle instance) {
 }
 
 static void cleanupRevdelay(LADSPA_Handle instance) {
+#line 51 "revdelay_1605.xml"
 	Revdelay *plugin_data = (Revdelay *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -145,7 +148,7 @@ static void connectPortRevdelay(
 static LADSPA_Handle instantiateRevdelay(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Revdelay *plugin_data = (Revdelay *)malloc(sizeof(Revdelay));
+	Revdelay *plugin_data = (Revdelay *)calloc(1, sizeof(Revdelay));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_size;
 	LADSPA_Data delay_samples;
@@ -153,6 +156,7 @@ static LADSPA_Handle instantiateRevdelay(
 	unsigned int sample_rate;
 	long write_phase;
 
+#line 30 "revdelay_1605.xml"
 	sample_rate = s_rate;
 	buffer_size = 0;
 	delay_samples = 0;
@@ -207,6 +211,7 @@ static void runRevdelay(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
+#line 55 "revdelay_1605.xml"
 	int i;
 	unsigned long delay2;
 	float dry = DB_CO(dry_level);
@@ -335,6 +340,7 @@ static void runAddingRevdelay(LADSPA_Handle instance, unsigned long sample_count
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
+#line 55 "revdelay_1605.xml"
 	int i;
 	unsigned long delay2;
 	float dry = DB_CO(dry_level);
@@ -428,7 +434,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -540,12 +545,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (revdelayDescriptor) {
 		free((LADSPA_PortDescriptor *)revdelayDescriptor->PortDescriptors);
 		free((char **)revdelayDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)revdelayDescriptor->PortRangeHints);
 		free(revdelayDescriptor);
 	}
+	revdelayDescriptor = NULL;
 
 }

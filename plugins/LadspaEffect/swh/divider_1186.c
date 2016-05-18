@@ -89,7 +89,7 @@ static void connectPortDivider(
 static LADSPA_Handle instantiateDivider(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Divider *plugin_data = (Divider *)malloc(sizeof(Divider));
+	Divider *plugin_data = (Divider *)calloc(1, sizeof(Divider));
 	LADSPA_Data amp;
 	float count;
 	LADSPA_Data lamp;
@@ -256,7 +256,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -331,12 +330,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (dividerDescriptor) {
 		free((LADSPA_PortDescriptor *)dividerDescriptor->PortDescriptors);
 		free((char **)dividerDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)dividerDescriptor->PortRangeHints);
 		free(dividerDescriptor);
 	}
+	dividerDescriptor = NULL;
 
 }

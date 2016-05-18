@@ -254,7 +254,7 @@ static void connectPortDysonCompress(
 static LADSPA_Handle instantiateDysonCompress(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	DysonCompress *plugin_data = (DysonCompress *)malloc(sizeof(DysonCompress));
+	DysonCompress *plugin_data = (DysonCompress *)calloc(1, sizeof(DysonCompress));
 	LADSPA_Data *delay = NULL;
 	float extra_maxlevel;
 	float lastrgain;
@@ -783,7 +783,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -885,12 +884,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (dysonCompressDescriptor) {
 		free((LADSPA_PortDescriptor *)dysonCompressDescriptor->PortDescriptors);
 		free((char **)dysonCompressDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)dysonCompressDescriptor->PortRangeHints);
 		free(dysonCompressDescriptor);
 	}
+	dysonCompressDescriptor = NULL;
 
 }

@@ -126,7 +126,7 @@ static void connectPortValveRect(
 static LADSPA_Handle instantiateValveRect(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	ValveRect *plugin_data = (ValveRect *)malloc(sizeof(ValveRect));
+	ValveRect *plugin_data = (ValveRect *)calloc(1, sizeof(ValveRect));
 	unsigned int apos;
 	float *avg = NULL;
 	int avg_size;
@@ -319,7 +319,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -401,12 +400,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (valveRectDescriptor) {
 		free((LADSPA_PortDescriptor *)valveRectDescriptor->PortDescriptors);
 		free((char **)valveRectDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)valveRectDescriptor->PortRangeHints);
 		free(valveRectDescriptor);
 	}
+	valveRectDescriptor = NULL;
 
 }

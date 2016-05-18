@@ -25,6 +25,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
+#line 8 "fad_delay_1192.xml"
 
 #include "ladspa-util.h"
 
@@ -78,7 +79,8 @@ static void activateFadDelay(LADSPA_Handle instance) {
 	int last_phase = plugin_data->last_phase;
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
-	unsigned int i;
+#line 35 "fad_delay_1192.xml"
+	int i;
 
 	for (i = 0; i < buffer_size; i++) {
 	        buffer[i] = 0;
@@ -86,6 +88,7 @@ static void activateFadDelay(LADSPA_Handle instance) {
 	phase = 0;
 	last_phase = 0;
 	last_in = 0.0f;
+	sample_rate = sample_rate;
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
 	plugin_data->buffer_size = buffer_size;
@@ -97,6 +100,7 @@ static void activateFadDelay(LADSPA_Handle instance) {
 }
 
 static void cleanupFadDelay(LADSPA_Handle instance) {
+#line 47 "fad_delay_1192.xml"
 	FadDelay *plugin_data = (FadDelay *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -128,7 +132,7 @@ static void connectPortFadDelay(
 static LADSPA_Handle instantiateFadDelay(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	FadDelay *plugin_data = (FadDelay *)malloc(sizeof(FadDelay));
+	FadDelay *plugin_data = (FadDelay *)calloc(1, sizeof(FadDelay));
 	LADSPA_Data *buffer = NULL;
 	unsigned long buffer_mask;
 	unsigned long buffer_size;
@@ -137,6 +141,7 @@ static LADSPA_Handle instantiateFadDelay(
 	float phase;
 	long sample_rate;
 
+#line 21 "fad_delay_1192.xml"
 	unsigned int min_bs;
 
 	sample_rate = s_rate;
@@ -190,7 +195,8 @@ static void runFadDelay(LADSPA_Handle instance, unsigned long sample_count) {
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
 
-	unsigned long int pos;
+#line 51 "fad_delay_1192.xml"
+	long int pos;
 	float increment = (float)buffer_size / ((float)sample_rate *
 	                                        f_max(fabs(delay), 0.01));
 	float lin_int, lin_inc;
@@ -261,7 +267,8 @@ static void runAddingFadDelay(LADSPA_Handle instance, unsigned long sample_count
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
 
-	unsigned long int pos;
+#line 51 "fad_delay_1192.xml"
+	long int pos;
 	float increment = (float)buffer_size / ((float)sample_rate *
 	                                        f_max(fabs(delay), 0.01));
 	float lin_int, lin_inc;
@@ -305,7 +312,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -387,12 +393,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (fadDelayDescriptor) {
 		free((LADSPA_PortDescriptor *)fadDelayDescriptor->PortDescriptors);
 		free((char **)fadDelayDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)fadDelayDescriptor->PortRangeHints);
 		free(fadDelayDescriptor);
 	}
+	fadDelayDescriptor = NULL;
 
 }

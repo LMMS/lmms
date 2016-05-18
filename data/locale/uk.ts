@@ -5604,6 +5604,10 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <source>Piano-Roll - no pattern</source>
         <translation>Нотний редактор - без шаблону</translation>
     </message>
+    <message>
+        <source>Quantize</source>
+        <translation>Квантовать</translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -6485,6 +6489,25 @@ Remember to also save your project manually.</source>
     <message>
         <source>Channel mode</source>
         <translation>Режим каналу</translation>
+    </message>
+</context>
+<context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation>Закрити</translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation>Розгорнути</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Згорнути</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Відновити</translation>
     </message>
 </context>
 <context>

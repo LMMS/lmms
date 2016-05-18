@@ -144,7 +144,7 @@ static void connectPortFlanger(
 static LADSPA_Handle instantiateFlanger(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Flanger *plugin_data = (Flanger *)malloc(sizeof(Flanger));
+	Flanger *plugin_data = (Flanger *)calloc(1, sizeof(Flanger));
 	long count;
 	long delay_pos;
 	long delay_size;
@@ -442,7 +442,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -544,12 +543,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (flangerDescriptor) {
 		free((LADSPA_PortDescriptor *)flangerDescriptor->PortDescriptors);
 		free((char **)flangerDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)flangerDescriptor->PortRangeHints);
 		free(flangerDescriptor);
 	}
+	flangerDescriptor = NULL;
 
 }

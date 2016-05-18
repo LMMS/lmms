@@ -113,7 +113,7 @@ static void connectPortLsFilter(
 static LADSPA_Handle instantiateLsFilter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	LsFilter *plugin_data = (LsFilter *)malloc(sizeof(LsFilter));
+	LsFilter *plugin_data = (LsFilter *)calloc(1, sizeof(LsFilter));
 	ls_filt *filt = NULL;
 	float fs;
 
@@ -216,7 +216,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -308,12 +307,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (lsFilterDescriptor) {
 		free((LADSPA_PortDescriptor *)lsFilterDescriptor->PortDescriptors);
 		free((char **)lsFilterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)lsFilterDescriptor->PortRangeHints);
 		free(lsFilterDescriptor);
 	}
+	lsFilterDescriptor = NULL;
 
 }

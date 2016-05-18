@@ -146,7 +146,7 @@ static void connectPortGverb(
 static LADSPA_Handle instantiateGverb(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Gverb *plugin_data = (Gverb *)malloc(sizeof(Gverb));
+	Gverb *plugin_data = (Gverb *)calloc(1, sizeof(Gverb));
 	ty_gverb *verb = NULL;
 
 #line 50 "gverb_1216.xml"
@@ -290,7 +290,6 @@ void __attribute__((constructor)) swh_init() {
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -429,12 +428,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+void __attribute__((destructor)) swh_fini() {
 	if (gverbDescriptor) {
 		free((LADSPA_PortDescriptor *)gverbDescriptor->PortDescriptors);
 		free((char **)gverbDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)gverbDescriptor->PortRangeHints);
 		free(gverbDescriptor);
 	}
+	gverbDescriptor = NULL;
 
 }
