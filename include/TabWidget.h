@@ -30,7 +30,7 @@
 #include <QtCore/QMap>
 
 const int TEXT_TAB_HEIGHT = 14;
-const int GRAPHIC_TAB_HEIGHT = 19;
+const int GRAPHIC_TAB_HEIGHT = 17;
 
 class TabWidget : public QWidget
 {

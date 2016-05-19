@@ -27,6 +27,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QImage>
 #include <QPixmap>
 #include <QToolTip>
 #include <QWheelEvent>
@@ -205,14 +206,12 @@ void TabWidget::resizeEvent( QResizeEvent * )
 
 void TabWidget::paintEvent( QPaintEvent * pe )
 {
-	setFont( pointSize<8>( font() ) );
 	QPainter p( this );
+	p.setFont( pointSize<7>( font() ) );
 
 	// Draw background
 	QBrush bg_color = p.background();
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
-
-	bool big_tab_captions = ( m_caption == "" );
 
 	// Draw external borders
 	p.setPen( bg_color.color().darker( 150 ) );
@@ -224,21 +223,13 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	// Draw title, if any
 	if( ! m_caption.isEmpty() )
 	{
+		p.setFont( pointSize<8>( p.font() ) );
 		p.setPen( tabTitleText() );
 		p.drawText( 5, 11, m_caption );
 	}
 
         // Calculate the tabs' x (tabs are painted next to the caption)
         int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
-
-	if( big_tab_captions )
-	{
-		p.setFont( pointSize<8>( p.font() ) );
-	}
-	else
-	{
-		p.setFont( pointSize<7>( p.font() ) );
-	}
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
   	widgetStack::iterator first = m_widgets.begin();
@@ -264,15 +255,14 @@ void TabWidget::paintEvent( QPaintEvent * pe )
                 	QPixmap *artwork;
 			if( it.key() == m_activeTab )
                         {
-	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
-				p.fillRect( tab_x_offset, 3, ( *it ).nwidth, m_tabbarHeight - 5, tabSelected() );
-			} else 
-			{
-	                	artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
+                		artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
+				p.fillRect( tab_x_offset, 0, ( *it ).nwidth, m_tabbarHeight - 1, tabSelected() );
+			} else {
+                		artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
 			}
 
 			// Draw artwork
-	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 3, *artwork );
+	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 1, *artwork );
 		} else
 		{
 			// Highlight tab when active
@@ -282,7 +272,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			}
 
 			// Draw text
-			p.drawText( tab_x_offset + 3, m_tabheight, ( *it ).name );
+			p.drawText( tab_x_offset + 3, m_tabheight + 1, ( *it ).name );
 		}
 
 		// Next tab's horizontal position
