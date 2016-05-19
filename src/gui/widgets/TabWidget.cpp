@@ -27,7 +27,6 @@
 
 #include <QMouseEvent>
 #include <QPainter>
-#include <QImage>
 #include <QPixmap>
 #include <QToolTip>
 #include <QWheelEvent>
@@ -253,18 +252,17 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			// Fixes tab's width, because original size is only correct for text tabs
 			( *it ).nwidth = tab_width;
 
-			// Get active or inactive artwork
-                	QPixmap *artwork;
+			// Get artwork
+                	QPixmap artwork( embed::getIconPixmap( ( *it ).inactivePixmap ) );
+
+			// Highlight active tab
 			if( it.key() == m_activeTab )
                         {
-                		artwork = new QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) );
 				p.fillRect( tab_x_offset, 0, ( *it ).nwidth, m_tabbarHeight - 1, tabSelected() );
-			} else {
-                		artwork = new QPixmap( embed::getIconPixmap( ( *it ).inactivePixmap ) );
 			}
 
 			// Draw artwork
-	                p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - ( *artwork ).width() ) / 2, 1, *artwork );
+                	p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - artwork.width() ) / 2, 1, artwork );
 		} else
 		{
 			// Highlight tab when active
