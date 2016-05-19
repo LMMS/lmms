@@ -42,7 +42,9 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	m_usePixmap( usePixmap ),
 	m_tabText( 0, 0, 0 ),
 	m_tabTitleText( 0, 0, 0 ),
-	m_tabSelected( 0, 0, 0 )
+	m_tabSelected( 0, 0, 0 ),
+	m_tabBackground( 0, 0, 0 ),
+	m_tabBorder( 0, 0, 0 )
 {
 
 	// Create taller tabbar when it's to display artwork tabs
@@ -214,11 +216,11 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	p.fillRect( 0, 0, width() - 1, height() - 1, bg_color );
 
 	// Draw external borders
-	p.setPen( bg_color.color().darker( 150 ) );
+	p.setPen( tabBorder() );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
 
 	// Draw tabs' bar background
-	p.fillRect( 1, 1, width() - 2, m_tabheight + 2, bg_color.color().darker( 150 ) );
+	p.fillRect( 1, 1, width() - 2, m_tabheight + 2, tabBackground() );
 
 	// Draw title, if any
 	if( ! m_caption.isEmpty() )
@@ -337,5 +339,29 @@ QColor TabWidget::tabSelected() const
 void TabWidget::setTabSelected( const QColor & c ) 
 {
 	m_tabSelected = c;
+}
+
+// Return the color to be used for the TabWidget's background
+QColor TabWidget::tabBackground() const
+{
+	return m_tabBackground;
+}
+
+// Set the color to be used for the TabWidget's background
+void TabWidget::setTabBackground( const QColor & c ) 
+{
+	m_tabBackground = c;
+}
+
+// Return the color to be used for the TabWidget's borders
+QColor TabWidget::tabBorder() const
+{
+	return m_tabBorder;
+}
+
+// Set the color to be used for the TabWidget's borders
+void TabWidget::setTabBorder( const QColor & c ) 
+{
+	m_tabBorder = c;
 }
 

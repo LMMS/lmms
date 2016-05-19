@@ -131,6 +131,8 @@ TabWidget {
 	qproperty-tabText: rgb(32, 48, 64);
 	qproperty-tabTitleText: rgb(255, 255, 255);
 	qproperty-tabSelected: rgb(160, 160, 160);
+	qproperty-tabBackground: rgb(60, 67, 75);
+	qproperty-tabBorder: rgb(60, 67, 75);
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
