@@ -54,6 +54,8 @@ public:
 	Q_PROPERTY( QColor tabText READ tabText WRITE setTabText)
 	Q_PROPERTY( QColor tabTitleText READ tabTitleText WRITE setTabTitleText)
 	Q_PROPERTY( QColor tabSelected READ tabSelected WRITE setTabSelected)
+	Q_PROPERTY( QColor tabBackground READ tabBackground WRITE setTabBackground)
+	Q_PROPERTY( QColor tabBorder READ tabBorder WRITE setTabBorder)
 
 	QColor tabText() const;
 	void setTabText( const QColor & c );
@@ -61,6 +63,10 @@ public:
 	void setTabTitleText( const QColor & c );
 	QColor tabSelected() const;
 	void setTabSelected( const QColor & c );
+	QColor tabBackground() const;
+	void setTabBackground( const QColor & c );
+	QColor tabBorder() const;
+	void setTabBorder( const QColor & c );
 
 protected:
 	virtual bool event( QEvent * event );
@@ -93,6 +99,8 @@ private:
 	QColor m_tabText;	// The color of the tabs' text.
 	QColor m_tabTitleText;	// The color of the TabWidget's title text.
 	QColor m_tabSelected;	// The highlighting color for the selected tab.
+	QColor m_tabBackground;	// The TabWidget's background color.
+	QColor m_tabBorder;	// The TabWidget's borders color.
 } ;
 
 #endif
