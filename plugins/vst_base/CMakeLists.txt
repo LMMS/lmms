@@ -27,11 +27,7 @@ ENDIF(LMMS_BUILD_WIN32)
 SET(REMOTE_VST_PLUGIN_FILEPATH "RemoteVstPlugin" CACHE STRING "Relative file path to RemoteVstPlugin")
 
 ADD_DEFINITIONS(-DREMOTE_VST_PLUGIN_FILEPATH="${REMOTE_VST_PLUGIN_FILEPATH}")
-IF(LMMS_BUILD_WIN32)
-	BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
-ELSE()
-	BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h LINK SHARED)
-ENDIF()
+BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
 
 IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 
