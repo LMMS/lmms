@@ -56,6 +56,8 @@ public:
 	Q_PROPERTY( QColor tabSelected READ tabSelected WRITE setTabSelected)
 	Q_PROPERTY( QColor tabBackground READ tabBackground WRITE setTabBackground)
 	Q_PROPERTY( QColor tabBorder READ tabBorder WRITE setTabBorder)
+	Q_PROPERTY( QColor tabArtworkActive READ tabArtworkActive WRITE setTabArtworkActive)
+	Q_PROPERTY( QColor tabArtworkInactive READ tabArtworkInactive WRITE setTabArtworkInactive)
 
 	QColor tabText() const;
 	void setTabText( const QColor & c );
@@ -67,6 +69,10 @@ public:
 	void setTabBackground( const QColor & c );
 	QColor tabBorder() const;
 	void setTabBorder( const QColor & c );
+	QColor tabArtworkActive() const;
+	void setTabArtworkActive( const QColor & c );
+	QColor tabArtworkInactive() const;
+	void setTabArtworkInactive( const QColor & c );
 
 protected:
 	virtual bool event( QEvent * event );
@@ -96,11 +102,13 @@ private:
 	quint8 	m_tabheight;	// The height of the tabs
 	bool	m_usePixmap;	// true if the tabs are to be displayed with icons. False for text tabs.
 
-	QColor m_tabText;	// The color of the tabs' text.
-	QColor m_tabTitleText;	// The color of the TabWidget's title text.
-	QColor m_tabSelected;	// The highlighting color for the selected tab.
-	QColor m_tabBackground;	// The TabWidget's background color.
-	QColor m_tabBorder;	// The TabWidget's borders color.
+	QColor m_tabText;		// The color of the tabs' text.
+	QColor m_tabTitleText;		// The color of the TabWidget's title text.
+	QColor m_tabSelected;		// The highlighting color for the selected tab.
+	QColor m_tabBackground;		// The TabWidget's background color.
+	QColor m_tabBorder;		// The TabWidget's borders color.
+	QColor m_tabArtworkActive;	// The color for active artwork tabs.
+	QColor m_tabArtworkInactive;	// The color for inactive artwork tabs.
 } ;
 
 #endif
