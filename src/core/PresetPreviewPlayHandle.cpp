@@ -276,7 +276,10 @@ ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(
 
 bool PresetPreviewPlayHandle::isPreviewing()
 {
-	return s_previewTC->isPreviewing();
+	if (s_previewTC) {
+		return s_previewTC->isPreviewing();
+	}
+	return false;
 }
 
 
