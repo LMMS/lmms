@@ -101,7 +101,10 @@ private:
 			{
 				break;
 			}
-			delete[] b;
+			if( mixer()->hasFifoWriter() )
+			{
+				delete[] b;
+			}
 
 			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )
