@@ -1,4 +1,6 @@
 #![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
+
+[![Join the chat at https://gitter.im/LMMS/lmms](https://badges.gitter.im/LMMS/lmms.svg)](https://gitter.im/LMMS/lmms?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/LMMS/lmms.png)](https://travis-ci.org/LMMS/lmms)
 
 What is LMMS?
