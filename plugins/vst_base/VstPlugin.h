@@ -37,8 +37,7 @@
 #include "communication.h"
 
 
-class PLUGIN_EXPORT VstPlugin : public QObject, public JournallingObject,
-								public RemotePlugin
+class PLUGIN_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:

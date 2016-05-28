@@ -59,6 +59,8 @@
 #include <unistd.h>
 #endif
 
+#include <signal.h>
+
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
@@ -608,6 +610,20 @@ int main( int argc, char * * argv )
 	if( !SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
 	{
 		printf( "Notice: could not set high priority.\n" );
+	}
+#endif
+
+#if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE
+	struct sigaction sa;
+	sa.sa_handler = SIG_IGN;
+	sa.sa_flags = SA_SIGINFO;
+	if ( sigemptyset( &sa.sa_mask ) )
+	{
+		fprintf( stderr, "Signal initialization failed.\n" );
+	}
+	if ( sigaction( SIGPIPE, &sa, NULL ) )
+	{
+		fprintf( stderr, "Signal initialization failed.\n" );
 	}
 #endif
 
