@@ -184,13 +184,8 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
 					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
-					"${MINGW_PREFIX}/bin/libfltk.dll"
-					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-					"${MINGW_PREFIX}/bin/libgig-6.dll"
-					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
-					"${MINGW_PREFIX}/lib/libsoundio.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
 					"${MINGW_PREFIX}/bin/SDL.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
@@ -202,6 +197,31 @@ IF(LMMS_BUILD_WIN32)
 		INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
 					"${MINGW_PREFIX}/bin/libstdc++-6.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(FLTK_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libfltk.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(FLUIDSYNTH_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(GIG_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libgig-6.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(PORTAUDIO_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(SOUNDIO_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/lib/libsoundio.dll"
 				DESTINATION .)
 	ENDIF()
 
