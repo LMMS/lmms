@@ -190,13 +190,12 @@ PianoRoll::PianoRoll() :
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
 	m_barColor( 0, 0, 0 ),
-	m_noteBorderRadiusX( 0 ),
-	m_noteBorderRadiusY( 0 ),
 	m_selectedNoteColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textColorLight( 0, 0, 0 ),
 	m_textShadow( 0, 0, 0 ),
-	m_markedSemitoneColor( 0, 0, 0 )
+	m_markedSemitoneColor( 0, 0, 0 ),
+	m_noteOpacity( 1 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -746,18 +745,6 @@ QColor PianoRoll::barColor() const
 void PianoRoll::setBarColor( const QColor & c )
 { m_barColor = c; }
 
-float PianoRoll::noteBorderRadiusX() const
-{ return m_noteBorderRadiusX; }
-
-void PianoRoll::setNoteBorderRadiusX( float b )
-{ m_noteBorderRadiusX = b; }
-
-float PianoRoll::noteBorderRadiusY() const
-{ return m_noteBorderRadiusY; }
-
-void PianoRoll::setNoteBorderRadiusY( float b )
-{ m_noteBorderRadiusY = b; }
-
 QColor PianoRoll::selectedNoteColor() const
 { return m_selectedNoteColor; }
 
@@ -788,9 +775,19 @@ QColor PianoRoll::markedSemitoneColor() const
 void PianoRoll::setMarkedSemitoneColor( const QColor & c )
 { m_markedSemitoneColor = c; }
 
-void PianoRoll::drawNoteRect(QPainter & p, int x, int y, 
+float PianoRoll::noteOpacity() const
+{ return m_noteOpacity; }
+
+void PianoRoll::setNoteOpacity( const float f )
+{ m_noteOpacity = f; }
+
+
+
+
+
+void PianoRoll::drawNoteRect( QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
-						float radiusX, float radiusY, const QColor & selCol )
+				const QColor & selCol, const float noteOpc )
 {
 	++x;
 	++y;
@@ -801,8 +798,8 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 		width = 2;
 	}
 
-	int volVal = qMin( 255, 25 + (int) ( ( (float)( n->getVolume() - MinVolume ) ) /
-			( (float)( MaxVolume - MinVolume ) ) * 230.0f) );
+	int volVal = qMin( 255, 100 + (int) ( ( (float)( n->getVolume() - MinVolume ) ) /
+			( (float)( MaxVolume - MinVolume ) ) * 155.0f) );
 	float rightPercent = qMin<float>( 1.0f,
 			( (float)( n->getPanning() - PanningLeft ) ) /
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
@@ -812,6 +809,7 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
 	QColor col = QColor( noteCol );
+	const int noteHeight = KEY_LINE_HEIGHT - 1;
 
 	if( n->selected() )
 	{
@@ -825,25 +823,26 @@ void PianoRoll::drawNoteRect(QPainter & p, int x, int y,
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
 						volVal * rightPercent );
 
-	QLinearGradient gradient( x, y, x+width, y+KEY_LINE_HEIGHT );
+	QLinearGradient gradient( x, y, x + width, y + noteHeight );
 	gradient.setColorAt( 0, lcol );
 	gradient.setColorAt( 1, rcol );
 	p.setBrush( gradient );
 
-	p.setPen( col );
-	p.setRenderHint(QPainter::Antialiasing);
-	p.drawRoundedRect( QRectF ( x + 0.5, y - 0.5, width, KEY_LINE_HEIGHT ), radiusX, radiusY );
+	p.setPen( Qt::NoPen );
+	p.setOpacity( noteOpc );
+	p.drawRect( x, y, width + 1, noteHeight );
 
-	// that little tab thing on the end hinting at the user
-	// to resize the note
-	p.setPen( noteCol.lighter( 200 ) );
-	p.setBrush( noteCol.lighter( 200 ) );
+	// draw the note endmark, to hint the user to resize
+	p.setPen( Qt::NoPen );
+	p.setBrush( col );
 	if( width > 2 )
 	{
-		float leftIndent = 2.5;
-		float vertIndent = 3.5;
-		p.drawRect( QRectF (x + width - leftIndent, y + vertIndent, 1, KEY_LINE_HEIGHT - (2*vertIndent + 1) ) );
+		const int endmarkWidth = 3;
+		p.drawRect( x + width + 1 - endmarkWidth, y, 
+				endmarkWidth, noteHeight );
 	}
+	// reset opacity
+	p.setOpacity( 1 );
 }
 
 
@@ -2972,7 +2971,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				// note
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
-								note_width, note, noteColor(), noteBorderRadiusX(), noteBorderRadiusY(), selectedNoteColor() );
+								note_width, note, noteColor(), selectedNoteColor(),
+							 	noteOpacity() );
 			}
 
 			// draw note editing stuff
@@ -3010,12 +3010,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( (float)( (PanningRight - PanningLeft ) ) ) *
 					( (float)( noteEditBottom() - noteEditTop() ) );
 
-				p.drawLine( QLineF( noteEditLeft() + x + 0.5, noteEditTop() + 0.5 +
+				p.drawLine( QLine( noteEditLeft() + x, noteEditTop() +
 						( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
-						    noteEditLeft() + x + 0.5, editHandleTop + 0.5 ) );
+						    noteEditLeft() + x , editHandleTop ) );
 			}
-			editHandles << QPointF ( x + noteEditLeft() + 0.5,
-						editHandleTop + 1.5 );
+			editHandles << QPoint ( x + noteEditLeft(),
+						editHandleTop );
 
 			if( note->hasDetuningInfo() )
 			{
