@@ -27,6 +27,7 @@
 #ifndef PIANO_ROLL_H
 #define PIANO_ROLL_H
 
+#include <QVector>
 #include <QWidget>
 #include <QInputDialog>
 
@@ -292,6 +293,7 @@ private:
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 
+	static const QVector<double> m_zoomLevels;
 
 	Pattern* m_pattern;
 	QScrollBar * m_leftRightScroll;
@@ -384,6 +386,8 @@ signals:
 	void positionChanged( const MidiTime & );
 
 } ;
+
+
 
 
 class PianoRollWindow : public Editor, SerializingObject
