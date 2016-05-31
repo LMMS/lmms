@@ -140,15 +140,15 @@ CPULoadWidget {
 /* scrollbar: trough */
 
 QScrollBar:horizontal {
-    border: none;
+    border-top: 3px solid #262b30;
     background: #262b30;
-    height: 9px;
+    height: 12px;
     margin: 0px 12px;
 }
 QScrollBar:vertical {
-    border: none;
+    border-left: 3px solid #262b30;
     background: #262b30;
-    width: 9px;
+    width: 12px;
     margin: 12px 0px;
 }
 
@@ -236,6 +236,14 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
     background-color: none;
     width: 5px;
     height: 5px;
+}
+
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+	margin-top: 3px;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+	margin-left: 3px;
 }
 
 QScrollBar::left-arrow:horizontal { background-image: url(resources:sbarrow_left.png);}
@@ -500,6 +508,12 @@ PluginDescWidget:hover {
 	color: #d1d8e4;
 }
 
+/* piano widget */
+
+PianoView {
+	background-color: #14171a;
+}
+
 /* font sizes for text buttons */
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
@@ -550,7 +564,7 @@ TrackContentObjectView   {
 /* instrument pattern */
 PatternView {
 	background-color: #21A14F;
-	color: rgba(255,255,255,220)
+	color: rgba(255,255,255,220);
 }
 
 /* sample track pattern */
