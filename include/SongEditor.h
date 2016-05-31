@@ -27,6 +27,8 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
+#include <QVector>
+
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -124,6 +126,8 @@ private:
 
 	ComboBoxModel* m_zoomingModel;
 
+	static const QVector<double> m_zoomLevels;
+
 	bool m_scrollBack;
 	bool m_smoothScroll;
 
@@ -132,6 +136,9 @@ private:
 	friend class SongEditorWindow;
 
 } ;
+
+
+
 
 class SongEditorWindow : public Editor
 {

@@ -27,6 +27,7 @@
 #define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
+#include <QVector>
 #include <QWidget>
 
 #include "Editor.h"
@@ -186,6 +187,8 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
+	static const QVector<double> m_zoomXLevels;
+
 	FloatModel * m_tensionModel;
 
 	QMutex m_patternMutex;
@@ -249,6 +252,7 @@ signals:
 	void currentPatternChanged();
 	void positionChanged( const MidiTime & );
 } ;
+
 
 
 
