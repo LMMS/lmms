@@ -174,7 +174,7 @@ QScrollBar::handle:horizontal {
 }
 
 QScrollBar::handle:horizontal:hover {
-	background: #49535d;
+	background: #525e69;
 }
 
 QScrollBar::handle:horizontal:pressed {
@@ -189,7 +189,7 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar::handle:vertical:hover {
-	background: #49535d;
+	background: #525e69;
 }
 
 QScrollBar::handle:vertical:pressed {
