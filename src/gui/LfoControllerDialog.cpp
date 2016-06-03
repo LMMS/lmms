@@ -89,7 +89,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 
 	m_amountKnob = new Knob( knobBright_26, this );
-	m_amountKnob->setLabel( tr( "AMT" ) );
+	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 	m_amountKnob->setWhatsThis(
