@@ -779,15 +779,11 @@ void PianoView::paintEvent( QPaintEvent * )
 	p.setFont( pointSize<LABEL_TEXT_SIZE>( p.font() ) );
 
 
-	// draw blue bar above the actual keyboard (there will be the labels
+	// draw bar above the keyboard (there will be the labels
 	// for all C's)
-	QLinearGradient g( 0, 0, 0, PIANO_BASE-3 );
-	g.setColorAt( 0, Qt::black );
-	g.setColorAt( 0.1, QColor( 96, 96, 96 ) );
-	g.setColorAt( 1, Qt::black );
-	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), g );
+	p.fillRect( QRect( 0, 1, width(), PIANO_BASE-2 ), p.background() );
 
-	// draw stuff above the actual keyboard
+	// draw the line above the keyboard
 	p.setPen( Qt::black );
 	p.drawLine( 0, 0, width(), 0 );
 	p.drawLine( 0, PIANO_BASE-1, width(), PIANO_BASE-1 );
@@ -796,21 +792,18 @@ void PianoView::paintEvent( QPaintEvent * )
 
 	const int base_key = ( m_piano != NULL ) ?
 		m_piano->instrumentTrack()->baseNoteModel()->value() : 0;
-	g.setColorAt( 0, QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ).darker(220) );
-	g.setColorAt( 0.1, QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
-	g.setColorAt( 1, QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText ) );
+
+	QColor baseKeyColor = QApplication::palette().color( QPalette::Active,
+							QPalette::BrightText );
 	if( Piano::isWhiteKey( base_key ) )
 	{
 		p.fillRect( QRect( getKeyX( base_key ), 1, PW_WHITE_KEY_WIDTH-1,
-							PIANO_BASE-2 ), g );
+							PIANO_BASE-2 ), baseKeyColor );
 	}
 	else
 	{
 		p.fillRect( QRect( getKeyX( base_key ) + 1, 1,
-				PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ), g );
+				PW_BLACK_KEY_WIDTH - 1, PIANO_BASE - 2 ), baseKeyColor);
 	}
 
 

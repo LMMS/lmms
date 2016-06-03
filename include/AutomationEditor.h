@@ -163,7 +163,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int SCROLLBAR_SIZE = 14;
+	static const int SCROLLBAR_SIZE = 12;
 	static const int TOP_MARGIN = 16;
 
 	static const int DEFAULT_Y_DELTA = 6;
