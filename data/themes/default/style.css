@@ -546,9 +546,6 @@ TimeLineWidget {
 	min-height: 1.5em;
 	max-height: 1.5em;
 
-	background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
-					   stop: 0 #8796a7, stop: 1.0 #3e454e );
-
 	/* Properties for the loop indicator rectangle in inactive state:
 	    - LoopColor: Color of the outermost border
 	    - LoopBrush: Brush to paint the main portion of the rectangle
