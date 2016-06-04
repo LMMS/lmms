@@ -73,7 +73,8 @@ void positionLine::paintEvent( QPaintEvent * pe )
 	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
 }
 
-
+const QVector<double> SongEditor::m_zoomLevels =
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 
 SongEditor::SongEditor( Song * song ) :
@@ -242,10 +243,9 @@ SongEditor::SongEditor( Song * song ) :
 			this, SLOT( updateScrollBar( int ) ) );
 
 	// Set up zooming model
-	for( int i = 0; i < 7; ++i )
+	for( float const & zoomLevel : m_zoomLevels )
 	{
-		m_zoomingModel->addItem(
-					QString::number( 25 << i ) + "%" );
+		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel->setInitValue(
 			m_zoomingModel->findText( "100%" ) );
@@ -360,22 +360,20 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 {
 	if( gui->mainWindow()->isCtrlPressed() == true )
 	{
+		int z = m_zoomingModel->value();
+
 		if( we->delta() > 0 )
 		{
-			setPixelsPerTact( (int) qMin( pixelsPerTact() * 2,
-								256.0f ) );
+			z--;
 		}
-		else if( pixelsPerTact() >= 8 )
+		if( we->delta() < 0 )
 		{
-			setPixelsPerTact( (int) pixelsPerTact() / 2 );
+			z++;
 		}
+		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 		// update combobox with zooming-factor
-		m_zoomingModel->setValue(
-			m_zoomingModel->findText(
-				QString::number(
-					static_cast<int>( pixelsPerTact() *
-					100 / DEFAULT_PIXELS_PER_TACT ) ) +
-									"%" ) );
+		m_zoomingModel->setValue( z );
+
 		// update timeline
 		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
@@ -593,13 +591,13 @@ void SongEditor::updatePosition( const MidiTime & t )
 
 void SongEditor::zoomingChanged()
 {
-	const QString & zfac = m_zoomingModel->currentText();
-	setPixelsPerTact( zfac.left( zfac.length() - 1 ).toInt() *
-					DEFAULT_PIXELS_PER_TACT / 100 );
+	setPixelsPerTact( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_TACT );
+
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
 }
+
 
 
 
@@ -609,7 +607,9 @@ bool SongEditor::allowRubberband() const
 }
 
 
-SongEditorWindow::SongEditorWindow( Song* song ) :
+
+
+SongEditorWindow::SongEditorWindow(Song* song) :
 	Editor(Engine::mixer()->audioDev()->supportsCapture()),
 	m_editor(new SongEditor(song))
 {
