@@ -34,6 +34,8 @@
 #include <vorbis/vorbisenc.h>
 #include <cstring>
 
+#include "Mixer.h"
+
 
 AudioFileOgg::AudioFileOgg( const sample_rate_t _sample_rate,
 				const ch_cnt_t _channels,

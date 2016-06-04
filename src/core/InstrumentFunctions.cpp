@@ -28,6 +28,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PresetPreviewPlayHandle.h"
 

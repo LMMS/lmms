@@ -27,6 +27,7 @@
 
 #include "MidiPort.h"
 #include "MidiClient.h"
+#include "Note.h"
 #include "Song.h"
 
 

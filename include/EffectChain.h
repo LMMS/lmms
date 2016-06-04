@@ -28,7 +28,6 @@
 
 #include "Model.h"
 #include "SerializingObject.h"
-#include "Mixer.h"
 #include "AutomatableModel.h"
 
 class Effect;

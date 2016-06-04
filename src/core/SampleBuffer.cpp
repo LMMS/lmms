@@ -59,6 +59,7 @@
 #include "endian_handling.h"
 #include "Engine.h"
 #include "interpolation.h"
+#include "Mixer.h"
 #include "templates.h"
 
 #include "FileDialog.h"

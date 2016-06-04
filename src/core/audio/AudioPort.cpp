@@ -27,6 +27,7 @@
 #include "EffectChain.h"
 #include "FxMixer.h"
 #include "Engine.h"
+#include "Mixer.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
 #include "ValueBuffer.h"

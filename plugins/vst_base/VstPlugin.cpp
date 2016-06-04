@@ -48,6 +48,7 @@
 #include "ConfigManager.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
