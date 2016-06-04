@@ -80,9 +80,8 @@ public:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	QObject(),
-	JournallingObject(),
 	RemotePlugin(),
+	JournallingObject(),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
 	m_pluginWindowID( 0 ),
