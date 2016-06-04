@@ -71,12 +71,17 @@ Mixer::Mixer( bool renderOnly ) :
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
+	m_isProcessing( false ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 	m_audioDevStartFailed( false ),
 	m_globalMutex( QMutex::Recursive ),
 	m_profiler(),
-	m_metronomeActive(false)
+	m_metronomeActive(false),
+	m_changesSignal( false ),
+	m_waitForMixer( true ),
+	m_changes( 0 ),
+	m_doChangesMutex( QMutex::Recursive )
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -151,6 +156,8 @@ Mixer::Mixer( bool renderOnly ) :
 
 Mixer::~Mixer()
 {
+	runChangesInModel();
+
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
@@ -208,6 +215,8 @@ void Mixer::startProcessing( bool _needs_fifo )
 	}
 
 	m_audioDev->startProcessing();
+
+	m_isProcessing = true;
 }
 
 
@@ -215,6 +224,8 @@ void Mixer::startProcessing( bool _needs_fifo )
 
 void Mixer::stopProcessing()
 {
+	m_isProcessing = false;
+
 	if( m_fifoWriter != NULL )
 	{
 		m_fifoWriter->finish();
@@ -446,6 +457,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 	emit nextAudioBuffer( m_readBuf );
+
+	runChangesInModel();
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -729,6 +742,58 @@ bool Mixer::hasNotePlayHandles()
 
 	unlock();
 	return false;
+}
+
+
+
+
+void Mixer::requestChangeInModel()
+{
+	m_changesMutex.lock();
+	m_changes++;
+	m_changesMutex.unlock();
+
+	m_doChangesMutex.lock();
+	if ( m_isProcessing && m_waitForMixer )
+	{
+		m_waitForMixer = false;
+		m_waitChangesMutex.lock();
+		m_changesSignal = true;
+		m_changesRequestCondition.wait( &m_waitChangesMutex );
+		m_waitChangesMutex.unlock();
+	}
+}
+
+
+
+
+void Mixer::doneChangeInModel()
+{
+	m_changesMutex.lock();
+	bool moreChanges = --m_changes;
+	m_changesMutex.unlock();
+
+	if( !moreChanges )
+	{
+		m_waitForMixer = true;
+		m_changesSignal = false;
+		m_changesMixerCondition.wakeOne();
+	}
+	m_doChangesMutex.unlock();
+}
+
+
+
+
+void Mixer::runChangesInModel()
+{
+	if( m_changesSignal )
+	{
+		m_waitChangesMutex.lock();
+		m_changesRequestCondition.wakeOne();
+		m_changesMixerCondition.wait( &m_waitChangesMutex );
+		m_waitChangesMutex.unlock();
+	}
 }
 
 

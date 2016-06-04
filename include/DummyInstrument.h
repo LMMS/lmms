@@ -32,6 +32,8 @@
 
 #include <string.h>
 
+#include "Mixer.h"
+
 
 class DummyInstrument : public Instrument
 {

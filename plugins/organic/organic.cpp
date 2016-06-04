@@ -33,6 +33,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"

@@ -29,7 +29,6 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
-#include "Mixer.h"
 #include "MemoryManager.h"
 #include "PlayHandle.h"
 

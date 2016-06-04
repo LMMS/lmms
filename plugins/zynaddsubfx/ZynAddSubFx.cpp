@@ -42,6 +42,7 @@
 #include "StringPairDrag.h"
 #include "RemoteZynAddSubFx.h"
 #include "LocalZynAddSubFx.h"
+#include "Mixer.h"
 #include "ControllerConnection.h"
 
 #include "embed.cpp"

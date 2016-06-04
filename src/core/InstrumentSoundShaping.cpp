@@ -31,6 +31,7 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 
 

@@ -25,6 +25,7 @@
 
 #include "AudioFileWave.h"
 #include "endian_handling.h"
+#include "Mixer.h"
 
 
 AudioFileWave::AudioFileWave( const sample_rate_t _sample_rate,

@@ -27,6 +27,7 @@
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 #include "Pattern.h"
 #include "SampleBuffer.h"
 #include "SampleTrack.h"

@@ -47,6 +47,7 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
+#include "Mixer.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"

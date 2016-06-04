@@ -36,6 +36,7 @@
 #include "templates.h"
 #include "ComboBox.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
