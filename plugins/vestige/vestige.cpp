@@ -886,7 +886,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
-	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+	m_vi->m_subWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 
 
 	l->setContentsMargins( 20, 10, 10, 10 );
