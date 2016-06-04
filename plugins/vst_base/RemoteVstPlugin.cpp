@@ -56,6 +56,7 @@
 
 #endif
 
+#define USE_WS_PREFIX
 #include <windows.h>
 
 #ifdef LMMS_BUILD_WIN32
@@ -121,7 +122,11 @@ DWORD __GuiThreadID = 0;
 class RemoteVstPlugin : public RemotePluginClient
 {
 public:
+#ifdef SYNC_WITH_SHM_FIFO
 	RemoteVstPlugin( key_t _shm_in, key_t _shm_out );
+#else
+	RemoteVstPlugin( const char * socketPath );
+#endif
 	virtual ~RemoteVstPlugin();
 
 	virtual bool processMessage( const message & _m );
@@ -332,8 +337,13 @@ private:
 
 
 
+#ifdef SYNC_WITH_SHM_FIFO
 RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	RemotePluginClient( _shm_in, _shm_out ),
+#else
+RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
+	RemotePluginClient( socketPath ),
+#endif
 	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
@@ -1014,7 +1024,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			int fd = open( _file.c_str(), O_WRONLY | O_BINARY );
-			write( fd, chunk, len );
+			::write( fd, chunk, len );
 			close( fd );
 		}
 	}
@@ -1331,7 +1341,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	}
 
 	const int fd = open( _file.c_str(), O_RDONLY | O_BINARY );
-	read( fd, chunk, _len );
+	::read( fd, chunk, _len );
 	close( fd );
 	pluginDispatch( 24, 0, _len, chunk );
 
@@ -1853,7 +1863,11 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 
 int main( int _argc, char * * _argv )
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 3 )
+#else
+	if( _argc < 2 )
+#endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
@@ -1886,7 +1900,11 @@ int main( int _argc, char * * _argv )
 
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
+#ifdef SYNC_WITH_SHM_FIFO
 	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
+#else
+	__plugin = new RemoteVstPlugin( _argv[1] );
+#endif
 
 	if( __plugin->isInitialized() )
 	{
