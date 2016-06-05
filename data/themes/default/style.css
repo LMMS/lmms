@@ -550,9 +550,9 @@ TimeLineWidget {
 	    - LoopColor: Color of the outermost border
 	    - LoopBrush: Brush to paint the main portion of the rectangle
 	    - LoopInnerColor: Color used to paint the inlayed border */
-	qproperty-inactiveLoopColor: #41464A;
-	qproperty-inactiveLoopBrush: #41464A;
-	qproperty-inactiveLoopInnerColor: #41464A;
+	qproperty-inactiveLoopColor: #3B424A;
+	qproperty-inactiveLoopBrush: #3B424A;
+	qproperty-inactiveLoopInnerColor: #3B424A;
 
 	/* Properties for the loop indicator rectangle in active state.
 	   See above for detailed description. */
