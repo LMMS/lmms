@@ -456,6 +456,7 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 FILE(REMOVE include/lmmsconfig.h)
 
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
+LIST(SORT LMMS_INCLUDES)
 
 # Get list of all committers from git history, ordered by number of commits
 FIND_PACKAGE(Git)
@@ -526,6 +527,7 @@ IF(LMMS_BUILD_WIN32)
 		FILE(GLOB ZASF_BINARIES
 			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll"
 			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe")
+		LIST(SORT ZASF_BINARIES)
 		INSTALL(FILES "${ZASF_BINARIES}" DESTINATION "${PLUGIN_DIR}")
 	ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
 ENDIF(LMMS_BUILD_WIN32)
