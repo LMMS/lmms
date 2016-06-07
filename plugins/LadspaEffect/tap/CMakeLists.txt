@@ -1,5 +1,6 @@
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
 FILE(GLOB PLUGIN_SOURCES *.c)
+LIST(SORT PLUGIN_SOURCES)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wno-write-strings -fomit-frame-pointer -fno-strict-aliasing -fstrength-reduce -funroll-loops -ffast-math")
 FOREACH(_item ${PLUGIN_SOURCES})
 	GET_FILENAME_COMPONENT(_plugin "${_item}" NAME_WE)

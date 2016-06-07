@@ -22,6 +22,7 @@ SET(qm_targets "")
 SET(QM_FILES "")
 
 FILE(GLOB lmms_LOCALES ${CMAKE_CURRENT_SOURCE_DIR}/*.ts)
+LIST(SORT lmms_LOCALES)
 FOREACH(_ts_file ${lmms_LOCALES})
 	GET_FILENAME_COMPONENT(_ts_target "${_ts_file}" NAME)
 	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
@@ -49,6 +50,7 @@ ENDFOREACH(_item ${qm_targets})
 
 IF(LMMS_BUILD_WIN32)
 	FILE(GLOB QT_QM_FILES "${QT_TRANSLATIONS_DIR}/qt*[^h].qm")
+	LIST(SORT QT_QM_FILES)
 ENDIF(LMMS_BUILD_WIN32)
 
 INSTALL(FILES ${QM_FILES} ${QT_QM_FILES} DESTINATION "${LMMS_DATA_DIR}/locale")
