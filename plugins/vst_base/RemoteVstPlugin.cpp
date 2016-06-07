@@ -1024,7 +1024,11 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			int fd = open( _file.c_str(), O_WRONLY | O_BINARY );
-			::write( fd, chunk, len );
+			if ( ::write( fd, chunk, len ) != len )
+			{
+				fprintf( stderr,
+					"Error saving chunk to file.\n" );
+			}
 			close( fd );
 		}
 	}
@@ -1241,7 +1245,10 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
 	FILE * stream = fopen( _file.c_str(), "r" );
-	fread ( pBank, 1, 56, stream );
+	if ( fread ( pBank, 1, 56, stream ) != 56 )
+	{
+		fprintf( stderr, "Error loading preset file.\n" );
+	}
         pBank->fxID = endian_swap( pBank->fxID );
 	pBank->numPrograms = endian_swap( pBank->numPrograms );
 	unsigned int toUInt;
@@ -1261,10 +1268,17 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 	if(pBank->fxMagic != 0x6B427846) {
 		if(pBank->fxMagic != 0x6B437846) {
-			fread (pLen, 1, 4, stream);
+			if ( fread (pLen, 1, 4, stream) != 4 )
+			{
+				fprintf( stderr,
+					"Error loading preset file.\n" );
+			}
 			chunk = new char[len = endian_swap(*pLen)];
 		} else chunk = new char[len = sizeof(float)*pBank->numPrograms];
-		fread (chunk, len, 1, stream);
+		if ( fread (chunk, len, 1, stream) != 1 )
+		{
+			fprintf( stderr, "Error loading preset file.\n" );
+		}
 		fclose( stream );
 	}
 
@@ -1296,8 +1310,16 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
 			lock();
 			for (int i =0; i < numPrograms; i++) {
-				fread (pBank, 1, 56, stream);
-				fread (chunk, len, 1, stream);
+				if ( fread (pBank, 1, 56, stream) != 56 )
+				{
+					fprintf( stderr,
+					"Error loading preset file.\n" );
+				}
+				if ( fread (chunk, len, 1, stream) != 1 )
+				{
+					fprintf( stderr,
+					"Error loading preset file.\n" );
+				}
 				pluginDispatch( effSetProgram, 0, i );
 				pBank->prgName[23] = 0;
 				pluginDispatch( 4, 0, 0, pBank->prgName );
@@ -1341,7 +1363,10 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	}
 
 	const int fd = open( _file.c_str(), O_RDONLY | O_BINARY );
-	::read( fd, chunk, _len );
+	if ( ::read( fd, chunk, _len ) != _len )
+	{
+		fprintf( stderr, "Error loading chunk from file.\n" );
+	}
 	close( fd );
 	pluginDispatch( 24, 0, _len, chunk );
 
