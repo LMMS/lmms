@@ -823,9 +823,9 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
 						volVal * rightPercent );
 
-	QLinearGradient gradient( x, y, x + width, y + noteHeight );
-	gradient.setColorAt( 0, lcol );
-	gradient.setColorAt( 1, rcol );
+	QLinearGradient gradient( x, y, x, y + noteHeight );
+	gradient.setColorAt( 0, rcol );
+	gradient.setColorAt( 1, lcol );
 	p.setBrush( gradient );
 
 	p.setPen( Qt::NoPen );
