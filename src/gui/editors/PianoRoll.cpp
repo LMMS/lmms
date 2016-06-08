@@ -195,7 +195,8 @@ PianoRoll::PianoRoll() :
 	m_textColorLight( 0, 0, 0 ),
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
-	m_noteOpacity( 255 )
+	m_noteOpacity( 255 ),
+	m_noteBorderWidth( 0 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -781,13 +782,19 @@ int PianoRoll::noteOpacity() const
 void PianoRoll::setNoteOpacity( const int i )
 { m_noteOpacity = i; }
 
+int PianoRoll::noteBorderWidth() const
+{ return m_noteBorderWidth; }
+
+void PianoRoll::setNoteBorderWidth( const int i )
+{ m_noteBorderWidth = i; }
+
 
 
 
 
 void PianoRoll::drawNoteRect( QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
-				const QColor & selCol, const int noteOpc )
+				const QColor & selCol, const int noteOpc, const int borderWidth )
 {
 	++x;
 	++y;
@@ -809,13 +816,15 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
 	QColor col = QColor( noteCol );
+	QPen pen;
 
 	if( n->selected() )
 	{
 		col = QColor( selCol );
 	}
 
-	const int noteHeight = KEY_LINE_HEIGHT - 2;
+	const int noteHeight = KEY_LINE_HEIGHT - 1 - borderWidth;
+	int noteWidth = width + 1 - borderWidth;
 
 	// adjust note to make it a bit faded if it has a lower volume
 	// in stereo using gradients
@@ -829,15 +838,24 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	gradient.setColorAt( 0, lcol );
 	p.setBrush( gradient );
 
-	p.setPen( col );
-	p.drawRect( x, y, width, noteHeight );
+	if ( borderWidth == 0 )
+	{
+		p.setPen( Qt::NoPen );
+	}
+	else
+	{
+		pen.setColor( col );
+		pen.setWidth( borderWidth );
+		p.setPen( pen );
+	}
+	p.drawRect( x, y, noteWidth, noteHeight );
 
 	// draw the note endmark, to hint the user to resize
 	p.setBrush( col );
 	if( width > 2 )
 	{
-		const int endmarkWidth = 2;
-		p.drawRect( x + width - endmarkWidth, y, endmarkWidth, noteHeight );
+		const int endmarkWidth = 3 - borderWidth;
+		p.drawRect( x + noteWidth - endmarkWidth, y, endmarkWidth, noteHeight );
 	}
 }
 
@@ -2968,7 +2986,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
 								note_width, note, noteColor(), selectedNoteColor(),
-							 	noteOpacity() );
+							 	noteOpacity(), noteBorderWidth() );
 			}
 
 			// draw note editing stuff

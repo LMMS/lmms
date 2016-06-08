@@ -116,6 +116,7 @@ PianoRoll {
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
 	qproperty-noteOpacity: 128;
+	qproperty-noteBorderWidth: 5;
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 40, 40, 40, 200 );
