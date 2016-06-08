@@ -195,7 +195,7 @@ PianoRoll::PianoRoll() :
 	m_textColorLight( 0, 0, 0 ),
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
-	m_noteOpacity( 1 )
+	m_noteOpacity( 255 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -775,11 +775,11 @@ QColor PianoRoll::markedSemitoneColor() const
 void PianoRoll::setMarkedSemitoneColor( const QColor & c )
 { m_markedSemitoneColor = c; }
 
-float PianoRoll::noteOpacity() const
+int PianoRoll::noteOpacity() const
 { return m_noteOpacity; }
 
-void PianoRoll::setNoteOpacity( const float f )
-{ m_noteOpacity = f; }
+void PianoRoll::setNoteOpacity( const int i )
+{ m_noteOpacity = i; }
 
 
 
@@ -787,7 +787,7 @@ void PianoRoll::setNoteOpacity( const float f )
 
 void PianoRoll::drawNoteRect( QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
-				const QColor & selCol, const float noteOpc )
+				const QColor & selCol, const int noteOpc )
 {
 	++x;
 	++y;
@@ -808,41 +808,38 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			( (float)( PanningRight - n->getPanning() ) ) /
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	QColor col = QColor( noteCol );
-	const int noteHeight = KEY_LINE_HEIGHT - 1;
+	QColor col = QColor( noteCol );	
 
 	if( n->selected() )
 	{
 		col = QColor( selCol );
 	}
 
+	const int noteHeight = KEY_LINE_HEIGHT - 2;
+
 	// adjust note to make it a bit faded if it has a lower volume
 	// in stereo using gradients
 	QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
-						volVal * leftPercent );
+						volVal * leftPercent, noteOpc );
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
-						volVal * rightPercent );
+						volVal * rightPercent, noteOpc );	
 
-	QLinearGradient gradient( x, y, x, y + noteHeight );
-	gradient.setColorAt( 0, rcol );
-	gradient.setColorAt( 1, lcol );
+	QLinearGradient gradient( x, y, x + width, y + noteHeight );
+	gradient.setColorAt( 1, rcol );
+	gradient.setColorAt( 0, lcol );
 	p.setBrush( gradient );
 
-	p.setPen( Qt::NoPen );
-	p.setOpacity( noteOpc );
-	p.drawRect( x, y, width + 1, noteHeight );
+	p.setPen( col );
+	p.drawRect( x, y, width, noteHeight );
 
 	// draw the note endmark, to hint the user to resize
-	p.setPen( Qt::NoPen );
+	p.setPen( col );
 	p.setBrush( col );
 	if( width > 2 )
 	{
-		const int endmarkWidth = 3;
-		p.drawRect( x + width + 1 - endmarkWidth, y, 
-				endmarkWidth, noteHeight );
+		const int endmarkWidth = 2;
+		p.drawRect( x + width - endmarkWidth, y, endmarkWidth, noteHeight );
 	}
-	// reset opacity
-	p.setOpacity( 1 );
 }
 
 
