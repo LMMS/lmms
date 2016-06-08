@@ -808,7 +808,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 			( (float)( PanningRight - n->getPanning() ) ) /
 			( (float)( PanningRight - PanningLeft ) ) * 2.0f );
 
-	QColor col = QColor( noteCol );	
+	QColor col = QColor( noteCol );
 
 	if( n->selected() )
 	{
@@ -822,7 +822,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
 						volVal * leftPercent, noteOpc );
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
-						volVal * rightPercent, noteOpc );	
+						volVal * rightPercent, noteOpc );
 
 	QLinearGradient gradient( x, y, x + width, y + noteHeight );
 	gradient.setColorAt( 1, rcol );
@@ -833,7 +833,6 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	p.drawRect( x, y, width, noteHeight );
 
 	// draw the note endmark, to hint the user to resize
-	p.setPen( col );
 	p.setBrush( col );
 	if( width > 2 )
 	{
