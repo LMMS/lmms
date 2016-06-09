@@ -15,7 +15,7 @@ AutomationEditor {
 	background-color: #040506;
 	color: #ffffff;
 	qproperty-vertexColor: #7f0a1d;
-	qproperty-gridColor: #171a1d;
+	qproperty-gridColor: #2d3339;
 	qproperty-crossColor: #FE143A;
 
 	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
@@ -109,12 +109,12 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: #040506;
-	qproperty-gridColor: #171a1d;
+	qproperty-gridColor: #2d3339;
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
-	qproperty-noteBorderRadiusX: 0;
-	qproperty-noteBorderRadiusY: 0;
-	qproperty-selectedNoteColor: #044d1f;
+	qproperty-noteOpacity: 165;
+	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
+	qproperty-selectedNoteColor: #006b65;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: #06170E;
 	/* Text on the white piano keys */
@@ -558,7 +558,7 @@ TrackContentObjectView   {
 	qproperty-selectedColor: #006B65;
 	qproperty-textColor: #fff;
 	qproperty-textShadowColor: rgb(0,0,0,200);
-	qproperty-gradient: false;
+	qproperty-gradient: false; /* boolean property, set true to have a gradient */
 }
 
 /* instrument pattern */
