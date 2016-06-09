@@ -103,7 +103,6 @@ const int effEditIdle = 19;
 const int effEditTop = 20;
 const int effProcessEvents = 25;
 const int effGetEffectName = 45;
-const int effGetParameterProperties = 47; // missing
 const int effGetVendorString = 47;
 const int effGetProductString = 48;
 const int effGetVendorVersion = 49;
@@ -114,14 +113,33 @@ const int kEffectMagic = CCONST( 'V', 's', 't', 'P' );
 const int kVstLangEnglish = 1;
 const int kVstMidiType = 1;
 
+const int kVstTransportChanged = 1;
 const int kVstTransportPlaying = 1 << 1;
 const int kVstTransportCycleActive = 1 << 2;
-const int kVstTransportChanged = 1;
+const int kVstTransportRecording = 1 << 3; // currently unused
+const int kVstPpqPosValid = 1 << 9;
+const int kVstTempoValid = 1 << 10;
+const int kVstBarsValid = 1 << 11;
+const int kVstCyclePosValid = 1 << 12;
+const int kVstTimeSigValid = 1 << 13;
+const int kVstSmpteValid = 1 << 14; // currently unused
+const int kVstClockValid = 1 << 15; // currently unused
+
+// currently unused
+const int kVstSmpte24fps = 0;
+const int kVstSmpte25fps = 1;
+const int kVstSmpte2997fps = 2;
+const int kVstSmpte30fps = 3;
+const int kVstSmpte2997dfps = 4;
+const int kVstSmpte30dfps = 5;
+const int kVstSmpteFilm16mm = 6; // very likely
+const int kVstSmpteFilm35mm = 7; // very likely
+const int kVstSmpte239fps = 10;
+const int kVstSmpte249fps = 11;
+const int kVstSmpte599fps = 12;
+const int kVstSmpte60fps = 13;
 
 
-
-
-class RemoteVstPlugin;
 
 
 class VstMidiEvent
@@ -207,7 +225,7 @@ public:
 	// Zeroes 2c-2f 30-33 34-37 38-3b
 	char empty3[4 + 4 + 4];
 	// 1.0f 3c-3f
-	float unkown_float;
+	float unknown_float;
 	// An object? pointer 40-43
 	void *ptr3;
 	// Zeroes 44-47
@@ -235,22 +253,24 @@ public:
 	double nanoSeconds;
 	// 18
 	double ppqPos;
-	// 20?
+	// 20
 	double tempo;
 	// 28
 	double barStartPos;
-	// 30?
+	// 30
 	double cycleStartPos;
-	// 38?
+	// 38
 	double cycleEndPos;
-	// 40?
+	// 40
 	int32_t timeSigNumerator;
-	// 44?
+	// 44
 	int32_t timeSigDenominator;
-
-    int32_t   smpteOffset;
-    int32_t   smpteFrameRate;
-    int32_t   samplesToNextClock;
+	// 48 unused
+	int32_t smpteOffset;
+	// 4c unused
+	int32_t smpteFrameRate;
+	// 50? unused, where does this come from?
+	int32_t samplesToNextClock;
 	// 54
 	int32_t flags;
 
