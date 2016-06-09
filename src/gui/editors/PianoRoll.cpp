@@ -196,7 +196,7 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
-	m_borderlessNotes( true )
+	m_noteBorders( true )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -782,11 +782,11 @@ int PianoRoll::noteOpacity() const
 void PianoRoll::setNoteOpacity( const int i )
 { m_noteOpacity = i; }
 
-bool PianoRoll::borderlessNotes() const
-{ return m_borderlessNotes; }
+bool PianoRoll::noteBorders() const
+{ return m_noteBorders; }
 
-void PianoRoll::setBorderlessNotes( const bool b )
-{ m_borderlessNotes = b; }
+void PianoRoll::setNoteBorders( const bool b )
+{ m_noteBorders = b; }
 
 
 
@@ -794,7 +794,7 @@ void PianoRoll::setBorderlessNotes( const bool b )
 
 void PianoRoll::drawNoteRect( QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
-				const QColor & selCol, const int noteOpc, const bool borderless )
+				const QColor & selCol, const int noteOpc, const bool borders )
 {
 	++x;
 	++y;
@@ -823,7 +823,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 		col = QColor( selCol );
 	}
 
-	const int borderWidth = borderless ? 0 : 1;
+	const int borderWidth = borders ? 1 : 0;
 
 	const int noteHeight = KEY_LINE_HEIGHT - 1 - borderWidth;
 	int noteWidth = width + 1 - borderWidth;
@@ -840,13 +840,13 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	gradient.setColorAt( 1, lcol );
 	p.setBrush( gradient );
 
-	if ( borderless )
+	if ( borders )
 	{
-		p.setPen( Qt::NoPen );
+		p.setPen( col );
 	}
 	else
 	{
-		p.setPen( col );
+		p.setPen( Qt::NoPen );
 	}
 
 	p.drawRect( x, y, noteWidth, noteHeight );
@@ -2987,7 +2987,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
 								note_width, note, noteColor(), selectedNoteColor(),
-							 	noteOpacity(), borderlessNotes() );
+							 	noteOpacity(), noteBorders() );
 			}
 
 			// draw note editing stuff
