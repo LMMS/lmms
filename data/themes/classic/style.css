@@ -116,7 +116,7 @@ PianoRoll {
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
 	qproperty-noteOpacity: 128;
-	qproperty-noteBorderWidth: 5;
+	qproperty-borderlessNotes: false; /* boolean property, set true to have borderless notes */
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 40, 40, 40, 200 );
@@ -555,7 +555,7 @@ TrackContentObjectView   {
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-textColor: rgb( 255, 255, 255 );
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
-	qproperty-gradient: true;
+	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 }
 
 /* instrument pattern */

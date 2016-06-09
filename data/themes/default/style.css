@@ -112,8 +112,8 @@ PianoRoll {
 	qproperty-gridColor: #2d3339;
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
-	qproperty-noteOpacity: 128;
-	qproperty-noteBorderWidth: 1;
+	qproperty-noteOpacity: 165;
+	qproperty-borderlessNotes: true; /* boolean property, set true to have borderless notes */
 	qproperty-selectedNoteColor: #006b65;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: #06170E;

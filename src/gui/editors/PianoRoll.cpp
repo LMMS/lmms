@@ -196,7 +196,7 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
-	m_noteBorderWidth( 0 )
+	m_borderlessNotes( true )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -782,11 +782,11 @@ int PianoRoll::noteOpacity() const
 void PianoRoll::setNoteOpacity( const int i )
 { m_noteOpacity = i; }
 
-int PianoRoll::noteBorderWidth() const
-{ return m_noteBorderWidth; }
+bool PianoRoll::borderlessNotes() const
+{ return m_borderlessNotes; }
 
-void PianoRoll::setNoteBorderWidth( const int i )
-{ m_noteBorderWidth = i; }
+void PianoRoll::setBorderlessNotes( const bool b )
+{ m_borderlessNotes = b; }
 
 
 
@@ -794,7 +794,7 @@ void PianoRoll::setNoteBorderWidth( const int i )
 
 void PianoRoll::drawNoteRect( QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
-				const QColor & selCol, const int noteOpc, const int borderWidth )
+				const QColor & selCol, const int noteOpc, const bool borderless )
 {
 	++x;
 	++y;
@@ -823,6 +823,8 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 		col = QColor( selCol );
 	}
 
+	const int borderWidth = borderless ? 0 : 1;
+
 	const int noteHeight = KEY_LINE_HEIGHT - 1 - borderWidth;
 	int noteWidth = width + 1 - borderWidth;
 
@@ -833,21 +835,20 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
 						volVal * rightPercent, noteOpc );
 
-	QLinearGradient gradient( x, y, x + width, y + noteHeight );
-	gradient.setColorAt( 1, rcol );
-	gradient.setColorAt( 0, lcol );
+	QLinearGradient gradient( x, y, x, y + noteHeight );
+	gradient.setColorAt( 0, rcol );
+	gradient.setColorAt( 1, lcol );
 	p.setBrush( gradient );
 
-	if ( borderWidth == 0 )
+	if ( borderless )
 	{
 		p.setPen( Qt::NoPen );
 	}
 	else
 	{
-		pen.setColor( col );
-		pen.setWidth( borderWidth );
-		p.setPen( pen );
+		p.setPen( col );
 	}
+
 	p.drawRect( x, y, noteWidth, noteHeight );
 
 	// draw the note endmark, to hint the user to resize
@@ -2986,7 +2987,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
 								note_width, note, noteColor(), selectedNoteColor(),
-							 	noteOpacity(), noteBorderWidth() );
+							 	noteOpacity(), borderlessNotes() );
 			}
 
 			// draw note editing stuff

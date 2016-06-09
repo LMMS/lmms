@@ -63,7 +63,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor textShadow READ textShadow WRITE setTextShadow )
 	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
 	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
-	Q_PROPERTY( int noteBorderWidth READ noteBorderWidth WRITE setNoteBorderWidth )
+	Q_PROPERTY( bool borderlessNotes READ borderlessNotes WRITE setBorderlessNotes )
 public:
 	enum EditModes
 	{
@@ -128,8 +128,8 @@ public:
 	void setMarkedSemitoneColor( const QColor & c );
 	int noteOpacity() const;
 	void setNoteOpacity( const int i );
-	int noteBorderWidth() const;
-	void setNoteBorderWidth( const int i );
+	bool borderlessNotes() const;
+	void setBorderlessNotes( const bool b );
 
 
 protected:
@@ -148,7 +148,7 @@ protected:
 	int getKey( int y ) const;
 	static void drawNoteRect( QPainter & p, int x, int y,
 					int  width, const Note * n, const QColor & noteCol,
-					const QColor & selCol, const int noteOpc, const int borderWidth );
+					const QColor & selCol, const int noteOpc, const bool borderless );
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes();
@@ -378,7 +378,7 @@ private:
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
 	int m_noteOpacity;
-	int m_noteBorderWidth;
+	bool m_borderlessNotes;
 
 signals:
 	void positionChanged( const MidiTime & );
