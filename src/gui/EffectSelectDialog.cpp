@@ -71,24 +71,26 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_effectKeys += subPluginEffectKeys;
 
 	// and fill our source model
-	QStringList pluginNames;
-	for( EffectKeyList::ConstIterator it = m_effectKeys.begin(); it != m_effectKeys.end(); ++it )
+	m_sourceModel.setHorizontalHeaderItem( 0, new QStandardItem( "Name" ) );
+	m_sourceModel.setHorizontalHeaderItem( 1, new QStandardItem( "Type" ) );
+	int row = 0;
+	for( EffectKeyList::ConstIterator it = m_effectKeys.begin();
+						it != m_effectKeys.end(); ++it )
 	{
+		QString name;
+		QString type;
 		if( ( *it ).desc->subPluginFeatures )
 		{
-			pluginNames += QString( "%1: %2" ).arg(  ( *it ).desc->displayName, ( *it ).name );
+			name = ( *it ).name;
+			type = ( *it ).desc->displayName;
 		}
 		else
 		{
-			pluginNames += ( *it ).desc->displayName;
+			name = ( *it ).desc->displayName;
+			type = "LMMS";
 		}
-	}
-
-	int row = 0;
-	for( QStringList::ConstIterator it = pluginNames.begin();
-								it != pluginNames.end(); ++it )
-	{
-		m_sourceModel.setItem( row, 0, new QStandardItem( *it ) );
+		m_sourceModel.setItem( row, 0, new QStandardItem( name ) );
+		m_sourceModel.setItem( row, 1, new QStandardItem( type ) );
 		++row;
 	}
 
@@ -100,6 +102,8 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 				&m_model, SLOT( setFilterFixedString( const QString & ) ) );
 	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
 					this, SLOT( updateSelection() ) );
+	connect( ui->filterEdit, SIGNAL( textChanged( const QString & ) ),
+							SLOT( sortAgain() ) );
 
 	ui->pluginList->setModel( &m_model );
 
@@ -115,7 +119,22 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	// try to accept current selection when pressing "OK"
 	connect( ui->buttonBox, SIGNAL( accepted() ),
 				this, SLOT( acceptSelection() ) );
-	
+
+#if QT_VERSION >= 0x050000
+#define setResizeMode setSectionResizeMode
+#endif
+	ui->pluginList->verticalHeader()->setResizeMode(
+						QHeaderView::ResizeToContents );
+	ui->pluginList->verticalHeader()->hide();
+	ui->pluginList->horizontalHeader()->setResizeMode( 0,
+							QHeaderView::Stretch );
+	ui->pluginList->horizontalHeader()->setResizeMode( 1,
+						QHeaderView::ResizeToContents );
+	ui->pluginList->sortByColumn( 0, Qt::AscendingOrder );
+#if QT_VERSION >= 0x050000
+#undef setResizeMode
+#endif
+
 	updateSelection();
 	show();
 }
@@ -235,6 +254,14 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
 
 
 
+void EffectSelectDialog::sortAgain()
+{
+	ui->pluginList->setSortingEnabled( ui->pluginList->isSortingEnabled() );
+}
+
+
+
+
 void EffectSelectDialog::updateSelection()
 {
 	// no valid selection anymore due to changed filter?
@@ -242,7 +269,8 @@ void EffectSelectDialog::updateSelection()
 	{
 		// then select our first item
 		ui->pluginList->selectionModel()->select( m_model.index( 0, 0 ),
-									QItemSelectionModel::ClearAndSelect );
+					QItemSelectionModel::ClearAndSelect
+					| QItemSelectionModel::Rows );
 		rowChanged( m_model.index( 0, 0 ), QModelIndex() );
 	}
 }
