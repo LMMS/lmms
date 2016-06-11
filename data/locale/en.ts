@@ -3490,10 +3490,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3548,6 +3544,10 @@ Double click to pick a file.</source>
     </message>
     <message>
         <source>Click here for a moog saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AMNT</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
