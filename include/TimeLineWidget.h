@@ -42,6 +42,16 @@ class TimeLineWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
 public:
+	Q_PROPERTY( QColor barLineColor READ getBarLineColor WRITE setBarLineColor )
+	Q_PROPERTY( QColor barNumberColor READ getBarNumberColor WRITE setBarNumberColor )
+	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
+	Q_PROPERTY( QBrush inactiveLoopBrush READ getInactiveLoopBrush WRITE setInactiveLoopBrush )
+	Q_PROPERTY( QColor inactiveLoopInnerColor READ getInactiveLoopInnerColor WRITE setInactiveLoopInnerColor )
+	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
+	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
+	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
+	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+
 	enum AutoScrollStates
 	{
 		AutoScrollEnabled,
@@ -65,6 +75,33 @@ public:
 	TimeLineWidget( int xoff, int yoff, float ppt, Song::PlayPos & pos,
 				const MidiTime & begin, QWidget * parent );
 	virtual ~TimeLineWidget();
+
+	inline QColor const & getBarLineColor() const { return m_barLineColor; }
+	inline void setBarLineColor(QColor const & tactLineColor) { m_barLineColor = tactLineColor; }
+
+	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
+	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
+
+	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
+	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
+
+	inline QBrush const & getInactiveLoopBrush() const { return m_inactiveLoopBrush; }
+	inline void setInactiveLoopBrush(QBrush const & inactiveLoopBrush) { m_inactiveLoopBrush = inactiveLoopBrush; }
+
+	inline QColor const & getInactiveLoopInnerColor() const { return m_inactiveLoopInnerColor; }
+	inline void setInactiveLoopInnerColor(QColor const & inactiveLoopInnerColor) { m_inactiveLoopInnerColor = inactiveLoopInnerColor; }
+
+	inline QColor const & getActiveLoopColor() const { return m_activeLoopColor; }
+	inline void setActiveLoopColor(QColor const & activeLoopColor) { m_activeLoopColor = activeLoopColor; }
+
+	inline QBrush const & getActiveLoopBrush() const { return m_activeLoopBrush; }
+	inline void setActiveLoopBrush(QBrush const & activeLoopBrush) { m_activeLoopBrush = activeLoopBrush; }
+
+	inline QColor const & getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
+	inline void setActiveLoopInnerColor(QColor const & activeLoopInnerColor) { m_activeLoopInnerColor = activeLoopInnerColor; }
+
+	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
+	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
 	inline Song::PlayPos & pos()
 	{
@@ -155,9 +192,19 @@ protected:
 
 private:
 	static QPixmap * s_posMarkerPixmap;
-	static QPixmap * s_loopPointBeginPixmap;
-	static QPixmap * s_loopPointEndPixmap;
-	static QPixmap * s_loopPointDisabledPixmap;
+
+	QColor m_inactiveLoopColor;
+	QBrush m_inactiveLoopBrush;
+	QColor m_inactiveLoopInnerColor;
+
+	QColor m_activeLoopColor;
+	QBrush m_activeLoopBrush;
+	QColor m_activeLoopInnerColor;
+
+	int m_loopRectangleVerticalPadding;
+
+	QColor m_barLineColor;
+	QColor m_barNumberColor;
 
 	AutoScrollStates m_autoScroll;
 	LoopPointStates m_loopPoints;
