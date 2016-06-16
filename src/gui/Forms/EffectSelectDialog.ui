@@ -24,18 +24,30 @@
     <widget class="QLineEdit" name="filterEdit"/>
    </item>
    <item>
-    <widget class="QListView" name="pluginList">
+    <widget class="RowTableView" name="pluginList">
      <property name="minimumSize">
       <size>
        <width>500</width>
        <height>250</height>
       </size>
      </property>
+     <property name="editTriggers">
+      <enum>QAbstractItemView::NoEditTriggers</enum>
+     </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -87,4 +99,10 @@
    </hints>
   </connection>
  </connections>
+ <customwidgets>
+  <customwidget>
+   <class>RowTableView</class>
+   <header>RowTableView.h</header>
+  </customwidget>
+ </customwidgets>
 </ui>
