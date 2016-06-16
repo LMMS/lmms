@@ -192,9 +192,6 @@ public:
 	// read parameter-dump and set it for plugin
 	void setParameterDump( const message & _m );
 
-	// post properties of specified parameter
-	void getParameterProperties( const int _idx );
-
 	// save settings chunk of plugin into file
 	void saveChunkToFile( const std::string & _file );
 
@@ -501,10 +498,6 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 
 		case IdVstSetParameterDump:
 			setParameterDump( _m );
-			break;
-
-		case IdVstGetParameterProperties:
-			getParameterProperties( _m.getInt() );
 			break;
 
 		case IdSaveSettingsToFile:
@@ -979,37 +972,6 @@ void RemoteVstPlugin::setParameterDump( const message & _m )
 		m_plugin->setParameter( m_plugin, item.index, item.value );
 	}
 	unlock();
-}
-
-
-
-
-void RemoteVstPlugin::getParameterProperties( const int _idx )
-{
-	VstParameterProperties p;
-	pluginDispatch( effGetParameterProperties, _idx, 0, &p );
-	message m( IdVstParameterProperties );
-	m.addString( p.label );
-	m.addString( p.shortLabel );
-	m.addString(
-#if kVstVersion > 2
-			p.categoryLabel
-#else
-			""
-#endif
-					);
-	m.addFloat( p.minInteger );
-	m.addFloat( p.maxInteger );
-	m.addFloat( ( p.flags & kVstParameterUsesFloatStep ) ?
-						p.stepFloat : p.stepInteger );
-	m.addInt(
-#if kVstVersion > 2
-			p.category
-#else
-			0
-#endif
-				);
-	sendMessage( m );
 }
 
 
