@@ -49,6 +49,7 @@ public:
 protected slots:
 	void acceptSelection();
 	void rowChanged( const QModelIndex &, const QModelIndex & );
+	void sortAgain();
 	void updateSelection();
 
 
