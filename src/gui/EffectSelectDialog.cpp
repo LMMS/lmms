@@ -71,8 +71,8 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	m_effectKeys += subPluginEffectKeys;
 
 	// and fill our source model
-	m_sourceModel.setHorizontalHeaderItem( 0, new QStandardItem( "Name" ) );
-	m_sourceModel.setHorizontalHeaderItem( 1, new QStandardItem( "Type" ) );
+	m_sourceModel.setHorizontalHeaderItem( 0, new QStandardItem( tr( "Name" ) ) );
+	m_sourceModel.setHorizontalHeaderItem( 1, new QStandardItem( tr( "Type" ) ) );
 	int row = 0;
 	for( EffectKeyList::ConstIterator it = m_effectKeys.begin();
 						it != m_effectKeys.end(); ++it )
