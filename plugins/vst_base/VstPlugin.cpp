@@ -35,6 +35,8 @@
 #if QT_VERSION < 0x050000
 #include <QX11EmbedContainer>
 #include <QX11Info>
+#else
+#include <QWindow>
 #endif
 #else
 #include <QLayout>
@@ -249,6 +251,13 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->show();
+#else
+			QWindow * window = QWindow::fromWinId(
+							m_pluginWindowID );
+			QWidget * container = QWidget::createWindowContainer(
+								window, sw );
+			container->setFixedSize( m_pluginGeometry );
+			container->show();
 #endif
 		} 
 		else
@@ -262,6 +271,15 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 			xe->setFixedSize( m_pluginGeometry );
 			xe->move( 4, 24 );
 			xe->show();
+#else
+			QWindow * window = QWindow::fromWinId(
+							m_pluginWindowID );
+			QWidget * container = QWidget::createWindowContainer(
+								window, sw );
+			container->setAttribute( Qt::WA_NoMousePropagation );
+			container->setFixedSize( m_pluginGeometry );
+			container->move( 4, 24 );
+			container->show();
 #endif
 		}
 	}
