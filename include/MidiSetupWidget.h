@@ -33,6 +33,7 @@ class QLineEdit;
 
 class MidiSetupWidget : public TabWidget
 {
+	Q_OBJECT
 	MidiSetupWidget( const QString & caption, const QString & configSection,
 		const QString & devName, QWidget * parent );
 public:
