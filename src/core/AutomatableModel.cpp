@@ -27,6 +27,7 @@
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
 #include "lmms_math.h"
+#include "Mixer.h"
 
 float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;

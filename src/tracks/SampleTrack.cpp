@@ -44,11 +44,13 @@
 #include "StringPairDrag.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "GuiApplication.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
 #include "ConfigManager.h"
 #include "panning_constants.h"
+#include "volume.h"
 
 
 SampleTCO::SampleTCO( Track * _track ) :

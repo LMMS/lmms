@@ -28,12 +28,14 @@
 #include <QtCore/QPair>
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
+#include <samplerate.h>
 
-#include "Mixer.h"
+#include "lmms_basics.h"
 #include "TabWidget.h"
 
 
 class AudioPort;
+class Mixer;
 
 
 class AudioDevice

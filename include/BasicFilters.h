@@ -39,7 +39,6 @@
 #include <math.h>
 
 #include "lmms_basics.h"
-#include "Mixer.h"
 #include "templates.h"
 #include "lmms_constants.h"
 #include "interpolation.h"

@@ -38,6 +38,7 @@
 #include "InstrumentTrack.h"
 #include "VstPlugin.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"

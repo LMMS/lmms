@@ -32,7 +32,6 @@
 #include <QTimer>
 #include <QWidget>
 
-#include "Mixer.h"
 #include "JournallingObject.h"
 #include "communication.h"
 

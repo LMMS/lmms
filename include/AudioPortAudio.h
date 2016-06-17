@@ -51,6 +51,8 @@ public:
 #include <portaudio.h>
 #endif
 
+#include <QtCore/QSemaphore>
+
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 

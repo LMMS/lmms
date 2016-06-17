@@ -25,9 +25,9 @@
 #ifndef SAMPLE_PLAY_HANDLE_H
 #define SAMPLE_PLAY_HANDLE_H
 
-#include "Mixer.h"
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
+#include "PlayHandle.h"
 
 class BBTrack;
 class SampleTCO;

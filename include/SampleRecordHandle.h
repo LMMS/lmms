@@ -29,7 +29,8 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include "Mixer.h"
+#include "MidiTime.h"
+#include "PlayHandle.h"
 #include "SampleBuffer.h"
 
 class BBTrack;

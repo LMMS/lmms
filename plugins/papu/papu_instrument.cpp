@@ -32,6 +32,7 @@
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"

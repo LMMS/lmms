@@ -32,6 +32,7 @@
 #include "endian_handling.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 #include "gui_templates.h"
 #include "templates.h"
 #include "Engine.h"
