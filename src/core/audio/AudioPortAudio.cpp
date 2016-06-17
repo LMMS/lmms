@@ -48,6 +48,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include "templates.h"
 #include "ComboBox.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :

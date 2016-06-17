@@ -29,21 +29,11 @@
 
 #include "lmmsconfig.h"
 
-#ifndef LMMS_USE_3RDPARTY_LIBSRC
-#include <samplerate.h>
-#else
-#ifndef OUT_OF_TREE_BUILD
-#include "src/3rdparty/samplerate/samplerate.h"
-#else
-#include <samplerate.h>
-#endif
-#endif
-
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtCore/QWaitCondition>
+#include <samplerate.h>
 
 
 #include "lmms_basics.h"
@@ -346,6 +336,9 @@ public:
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
+	void requestChangeInModel();
+	void doneChangeInModel();
+
 
 signals:
 	void qualitySettingsChanged();
@@ -388,6 +381,9 @@ private:
 	const surroundSampleFrame * renderNextBuffer();
 
 
+	void runChangesInModel();
+
+
 
 	QVector<AudioPort *> m_audioPorts;
 
@@ -420,6 +416,8 @@ private:
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
+	bool m_isProcessing;
+
 	// audio device stuff
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
@@ -443,6 +441,15 @@ private:
 	MixerProfiler m_profiler;
 
 	bool m_metronomeActive;
+
+	bool m_changesSignal;
+	bool m_waitForMixer;
+	unsigned int m_changes;
+	QMutex m_changesMutex;
+	QMutex m_doChangesMutex;
+	QMutex m_waitChangesMutex;
+	QWaitCondition m_changesMixerCondition;
+	QWaitCondition m_changesRequestCondition;
 
 	friend class LmmsCore;
 	friend class MixerWorkerThread;

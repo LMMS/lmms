@@ -46,6 +46,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "DataFile.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"

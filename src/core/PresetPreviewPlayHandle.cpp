@@ -31,6 +31,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MidiPort.h"
+#include "Mixer.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "PluginFactory.h"

@@ -29,7 +29,7 @@
 #include <QWidget>
 #include <QPixmap>
 
-#include "Mixer.h"
+#include "lmms_basics.h"
 
 
 class VisualizationWidget : public QWidget

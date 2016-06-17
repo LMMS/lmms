@@ -27,6 +27,7 @@
 #include "AudioDevice.h"
 #include "ConfigManager.h"
 #include "debug.h"
+#include "Mixer.h"
 
 
 

@@ -35,6 +35,7 @@
 #include "Engine.h"
 #include "Song.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "interpolation.h"
 #include "gui_templates.h"

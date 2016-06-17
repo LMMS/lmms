@@ -30,6 +30,7 @@
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "embed.h"
 #include "Engine.h"
 #include "ToolTip.h"

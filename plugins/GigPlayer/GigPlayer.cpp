@@ -40,6 +40,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
 #include "Song.h"
