@@ -75,7 +75,6 @@ Mixer::Mixer( bool renderOnly ) :
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 	m_audioDevStartFailed( false ),
-	m_globalMutex( QMutex::Recursive ),
 	m_profiler(),
 	m_metronomeActive(false),
 	m_changesSignal( false ),
@@ -386,10 +385,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	}
 	unlockPlayHandleRemoval();
 
-	// now we have to make sure no other thread does anything bad
-	// while we're acting...
-	lock();
-
 	// rotate buffers
 	m_writeBuffer = ( m_writeBuffer + 1 ) % m_poolDepth;
 	m_readBuffer = ( m_readBuffer + 1 ) % m_poolDepth;
@@ -453,8 +448,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// STAGE 3: do master mix in FX mixer
 	fxMixer->masterMix( m_writeBuf );
 
-	unlock();
-
 
 	emit nextAudioBuffer( m_readBuf );
 
@@ -481,7 +474,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 void Mixer::clear()
 {
 	// TODO: m_midiClient->noteOffAll();
-	lock();
 	lockPlayHandleRemoval();
 	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
@@ -493,7 +485,6 @@ void Mixer::clear()
 		}
 	}
 	unlockPlayHandleRemoval();
-	unlock();
 }
 
 
@@ -620,9 +611,7 @@ void Mixer::removeAudioPort( AudioPort * _port )
 							_port );
 	if( it != m_audioPorts.end() )
 	{
-		lock();
 		m_audioPorts.erase( it );
-		unlock();
 	}
 }
 
@@ -650,7 +639,7 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 
 void Mixer::removePlayHandle( PlayHandle * _ph )
 {
-	lockPlayHandleRemoval();
+	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
 	if( _ph->affinityMatters() &&
@@ -694,7 +683,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 	{
 		m_playHandlesToRemove.push_back( _ph );
 	}
-	unlockPlayHandleRemoval();
+	doneChangeInModel();
 }
 
 
@@ -702,7 +691,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 {
-	lockPlayHandleRemoval();
+	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
@@ -721,7 +710,7 @@ void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 			++it;
 		}
 	}
-	unlockPlayHandleRemoval();
+	doneChangeInModel();
 }
 
 
@@ -729,18 +718,13 @@ void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 
 bool Mixer::hasNotePlayHandles()
 {
-	lock();
-
 	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
 		if( (*it)->type() == PlayHandle::TypeNotePlayHandle )
 		{
-			unlock();
 			return true;
 		}
 	}
-
-	unlock();
 	return false;
 }
 

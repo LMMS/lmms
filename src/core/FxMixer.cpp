@@ -285,8 +285,8 @@ void FxMixer::toggledSolo()
 
 void FxMixer::deleteChannel( int index )
 {
-	// lock the mixer so channel deletion is performed between mixer rounds
-	Engine::mixer()->lock();
+	// channel deletion is performed between mixer rounds
+	Engine::mixer()->requestChangeInModel();
 
 	FxChannel * ch = m_fxChannels[index];
 
@@ -347,7 +347,7 @@ void FxMixer::deleteChannel( int index )
 		}
 	}
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
