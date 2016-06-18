@@ -184,9 +184,9 @@ public:
 	// audio-port-stuff
 	inline void addAudioPort( AudioPort * _port )
 	{
-		lock();
+		requestChangeInModel();
 		m_audioPorts.push_back( _port );
-		unlock();
+		doneChangeInModel();
 	}
 
 	void removeAudioPort( AudioPort * _port );
@@ -274,16 +274,6 @@ public:
 
 
 	// methods needed by other threads to alter knob values, waveforms, etc
-	void lock()
-	{
-		m_globalMutex.lock();
-	}
-
-	void unlock()
-	{
-		m_globalMutex.unlock();
-	}
-
 	void lockInputFrames()
 	{
 		m_inputFramesMutex.lock();
@@ -429,7 +419,6 @@ private:
 	QString m_midiClientName;
 
 	// mutexes
-	QMutex m_globalMutex;
 	QMutex m_inputFramesMutex;
 	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
 	QMutex m_playHandleRemovalMutex;

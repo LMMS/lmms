@@ -170,6 +170,7 @@ void SampleBuffer::update( bool _keep_settings )
 	const bool lock = ( m_data != NULL );
 	if( lock )
 	{
+		Engine::mixer()->requestChangeInModel();
 		m_varLock.lockForWrite();
 		MM_FREE( m_data );
 	}
@@ -270,6 +271,7 @@ void SampleBuffer::update( bool _keep_settings )
 	if( lock )
 	{
 		m_varLock.unlock();
+		Engine::mixer()->doneChangeInModel();
 	}
 
 	emit sampleUpdated();
@@ -354,7 +356,7 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != Engine::mixer()->baseSampleRate() )
 	{
-		SampleBuffer * resampled = resample( this, _src_sr,
+		SampleBuffer * resampled = resample( _src_sr,
 					Engine::mixer()->baseSampleRate() );
 		MM_FREE( m_data );
 		m_frames = resampled->frames();
@@ -597,8 +599,6 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 					const float _freq,
 					const LoopMode _loopmode )
 {
-	QReadLocker readLocker(&m_varLock);
-
 	f_cnt_t startFrame = m_startFrame;
 	f_cnt_t endFrame = m_endFrame;
 	f_cnt_t loopStartFrame = m_loopStartFrame;
@@ -1147,12 +1147,12 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 
 
 
-SampleBuffer * SampleBuffer::resample( sampleFrame * _data,
-						const f_cnt_t _frames,
-						const sample_rate_t _src_sr,
+SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
-	const f_cnt_t dst_frames = static_cast<f_cnt_t>( _frames /
+	sampleFrame * data = m_data;
+	const f_cnt_t frames = m_frames;
+	const f_cnt_t dst_frames = static_cast<f_cnt_t>( frames /
 					(float) _src_sr * (float) _dst_sr );
 	SampleBuffer * dst_sb = new SampleBuffer( dst_frames );
 	sampleFrame * dst_buf = dst_sb->m_origData;
@@ -1165,9 +1165,9 @@ SampleBuffer * SampleBuffer::resample( sampleFrame * _data,
 	{
 		SRC_DATA src_data;
 		src_data.end_of_input = 1;
-		src_data.data_in = _data[0];
+		src_data.data_in = data[0];
 		src_data.data_out = dst_buf[0];
-		src_data.input_frames = _frames;
+		src_data.input_frames = frames;
 		src_data.output_frames = dst_frames;
 		src_data.src_ratio = (double) _dst_sr / _src_sr;
 		if( ( error = src_process( state, &src_data ) ) )
@@ -1355,7 +1355,6 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 
 void SampleBuffer::setStartFrame( const f_cnt_t _s )
 {
-	QWriteLocker writeLocker(&m_varLock);
 	m_startFrame = _s;
 }
 
@@ -1364,7 +1363,6 @@ void SampleBuffer::setStartFrame( const f_cnt_t _s )
 
 void SampleBuffer::setEndFrame( const f_cnt_t _e )
 {
-	QWriteLocker writeLocker(&m_varLock);
 	m_endFrame = _e;
 }
 

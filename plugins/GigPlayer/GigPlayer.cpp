@@ -43,6 +43,7 @@
 #include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
+#include "SampleBuffer.h"
 #include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
