@@ -36,6 +36,7 @@
 #include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
+#include "SampleBuffer.h"
 #include "Song.h"
 
 #include "patches_dialog.h"
