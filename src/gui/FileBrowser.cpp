@@ -534,7 +534,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 {
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
@@ -582,7 +582,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			break;
 
 	}
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -604,12 +604,10 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	}
 	else if( f->handling() != FileItem::NotSupported )
 	{
-//		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 					Engine::getBBTrackContainer() ) );
 		handleFile( f, it );
-//		engine::mixer()->unlock();
 	}
 }
 
@@ -621,11 +619,9 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 	if( m_contextMenuItem->handling() == FileItem::LoadAsPreset ||
 		m_contextMenuItem->handling() == FileItem::LoadByPlugin )
 	{
-//		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack, tc ) );
 		handleFile( m_contextMenuItem, it );
-//		engine::mixer()->unlock();
 	}
 }
 

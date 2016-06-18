@@ -790,7 +790,7 @@ void Song::clearProject()
 	}
 
 
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 
 	if( gui && gui->getBBEditor() )
 	{
@@ -831,7 +831,7 @@ void Song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	if( gui && gui->getProjectNotes() )
 	{
@@ -963,7 +963,7 @@ void Song::loadProject( const QString & fileName )
 
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
 
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -1050,7 +1050,7 @@ void Song::loadProject( const QString & fileName )
 	AutomationPattern::resolveAllIDs();
 
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( fileName );
 

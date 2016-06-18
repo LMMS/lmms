@@ -31,9 +31,9 @@
 
 #include "MidiTime.h"
 #include "PlayHandle.h"
-#include "SampleBuffer.h"
 
 class BBTrack;
+class SampleBuffer;
 class SampleTCO;
 class Track;
 

@@ -28,6 +28,7 @@
 #define SF2_PLAYER_H
 
 #include <QMutex>
+#include <samplerate.h>
 
 #include "Instrument.h"
 #include "PixmapButton.h"
@@ -36,7 +37,6 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "fluidsynth.h"
-#include "SampleBuffer.h"
 #include "MemoryManager.h"
 
 class sf2InstrumentView;
