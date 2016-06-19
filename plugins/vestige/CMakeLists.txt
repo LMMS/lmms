@@ -1,6 +1,10 @@
 IF(LMMS_SUPPORT_VST)
    # Enable C++11
    ADD_DEFINITIONS(-std=c++0x)
+   
+   IF(LMMS_BUILD_APPLE)
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+   ENDIF()
 
    INCLUDE(BuildPlugin)
    INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../vst_base")
