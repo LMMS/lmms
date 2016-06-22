@@ -252,11 +252,12 @@ void EffectChain::clear()
 	Engine::mixer()->requestChangeInModel();
 
 	m_enabledModel.setValue( false );
-	for( int i = 0; i < m_effects.count(); ++i )
+	while( m_effects.count() )
 	{
-		delete m_effects[i];
+		Effect * e = m_effects[m_effects.count() - 1];
+		m_effects.pop_back();
+		delete e;
 	}
-	m_effects.clear();
 
 	Engine::mixer()->doneChangeInModel();
 }
