@@ -29,8 +29,10 @@
 #include <QMdiArea>
 #include <QMoveEvent>
 #include <QResizeEvent>
+#include <QScrollBar>
 
 #include "embed.h"
+
 
 
 SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
@@ -130,6 +132,23 @@ void SubWindow::elideText( QLabel *label, QString text )
 
 
 
+bool SubWindow::isMaximized()
+{
+#ifdef LMMS_BUILD_APPLE
+	// check if subwindow size is identical to the MdiArea size, accounting for scrollbars
+	int hScrollBarHeight = mdiArea()->horizontalScrollBar()->isVisible() ? mdiArea()->horizontalScrollBar()->size().height() : 0;
+	int vScrollBarWidth = mdiArea()->verticalScrollBar()->isVisible() ? mdiArea()->verticalScrollBar()->size().width() : 0;
+	QSize areaSize( this->mdiArea()->size().width() - vScrollBarWidth, this->mdiArea()->size().height() - hScrollBarHeight );
+
+	return areaSize == this->size();
+#else
+	return QMdiSubWindow::isMaximized();
+#endif
+}
+
+
+
+
 QRect SubWindow::getTrueNormalGeometry() const
 {
 	return m_trackedNormalGeom;
@@ -207,11 +226,13 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
 
+	const bool isMax = isMaximized();
+	const bool isMin = isMinimized();
 	const int rightSpace = 3;
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
 
-	QPoint rightButtonPos( width() - rightSpace - m_buttonSize.width() , 3 );
+	QPoint rightButtonPos( width() - rightSpace - m_buttonSize.width(), 3 );
 	QPoint middleButtonPos( width() - rightSpace - ( 2 * m_buttonSize.width() ) - buttonGap, 3 );
 	QPoint leftButtonPos( width() - rightSpace - ( 3 * m_buttonSize.width() ) - ( 2 * buttonGap ), 3 );
 
@@ -229,36 +250,17 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
-		m_maximizeBtn->show();
+		m_restoreBtn->move( middleButtonPos );
+		m_maximizeBtn->setHidden( isMax );
 	}
 
 	if( windowFlags() & Qt::WindowMinimizeButtonHint )
 	{
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
-		if( m_maximizeBtn->isHidden() )
-		{
-			m_minimizeBtn->move( middleButtonPos );
-		}
-		else
-		{
-			m_minimizeBtn->move( leftButtonPos );
-		}
-		m_minimizeBtn->show();
-		m_restoreBtn->hide();
-		if( isMinimized() )
-		{
-			if( m_maximizeBtn->isHidden() )
-			{
-				m_restoreBtn->move( middleButtonPos );
-			}
-			else
-			{
-				m_restoreBtn->move( leftButtonPos );
-			}
-			m_restoreBtn->show();
-			m_minimizeBtn->hide();
-		}
+		m_minimizeBtn->move( m_maximizeBtn->isHidden() && !isMax ? middleButtonPos : leftButtonPos );
+		m_minimizeBtn->setHidden( isMin );
 	}
+	m_restoreBtn->setVisible( isMax || isMin );
 
 	// title QLabel adjustments
 	m_windowTitle->setAlignment( Qt::AlignHCenter );
@@ -268,8 +270,9 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 
 	// if minimized we can't use widget()->width(). We have to hard code the width,
 	// as the width of all minimized windows is the same.
-	if( isMinimized() )
+	if( isMin )
 	{
+		m_restoreBtn->move(  m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
 		m_windowTitle->setFixedWidth( 120 );
 	}
 
@@ -282,7 +285,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
-	if( !isMaximized() && !isMinimized() && !isFullScreen() )
+	if( !isMax && !isMin && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}
