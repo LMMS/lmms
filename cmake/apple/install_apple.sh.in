@@ -23,6 +23,19 @@ LIBREADLINE="libreadline.6.2.dylib"
 MSG_COLOR='\x1B[1;36m'
 COLOR_RESET='\x1B[0m'
 echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
+
+# Locate macdeployqt, assume homebrew & Qt5
+which macdeployqt > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+  brew --prefix qt55 > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    # Prefer Qt 5.5 (QTBUG-53533)
+    export PATH=$PATH:$(brew --prefix qt55)/bin
+  else
+    # Fallback Qt 5.6+
+  	export PATH=$PATH:$(brew --prefix qt5)/bin
+  fi
+fi
  
 # MacPorts only - check for u+w permissions on libreadline
 if [ -f "@APPLE_PREFIX@/lib/$LIBREADLINE" ]; then
@@ -49,7 +62,7 @@ cp -R * "$APP/Contents"
  
 # Manually copy STK rawwaves
 mkdir -p "$APP/Contents/share/stk/rawwaves"
-cp $STK_RAWWAVE/*.raw "$APP/Contents/share/stk/rawwaves"
+cp $STK_RAWWAVE/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
  
 # Make all libraries writable for macdeployqt
 cd "$APP"
@@ -62,20 +75,15 @@ rm -rf "$APP/Contents/bin"
  
 # Move libraries to proper locations
 mkdir -p "$APP/Contents/Frameworks"
-mv "$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib" \
-   "$APP/Contents/Frameworks/libZynAddSubFxCore.dylib"
-   
 mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" \
    "$APP/Contents/MacOS/RemoteZynAddSubFx"
- 
-# Fix more Zyn Linking issues
+   
+rm "$APP/Contents/Frameworks/libZynAddSubFxCore.dylib" > /dev/null 2>&1
+
+# Fix zyn linking 
 install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
-   @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
-   "$APP/Contents/lib/lmms/libzynaddsubfx.so"
- 
-install_name_tool -change @CMAKE_BINARY_DIR@/plugins/zynaddsubfx/libZynAddSubFxCore.dylib \
-   @loader_path/../../Frameworks/libZynAddSubFxCore.dylib \
-   "$APP/Contents/MacOS/RemoteZynAddSubFx"
+   @loader_path/../lib/lmms/libZynAddSubFxCore.dylib \
+  "$APP/Contents/MacOS/RemoteZynAddSubFx"
  
 # Build a list of shared objects in target/lib/lmms
 for file in "$APP/Contents/lib/lmms/"*.so; do
@@ -91,13 +99,13 @@ done
  
 # Additional binaries that require linking
 _executables="${_executables} -executable=$APP/Contents/MacOS/RemoteZynAddSubFx"
-_executables="${_executables} -executable=$APP/Contents/Frameworks/libZynAddSubFxCore.dylib"
+_executables="${_executables} -executable=$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib"
 
 # Build our App Package using "macdeployqt"
 macdeployqt "$APP" $_executables
- 
+
 # OS X Specific Artwork
 mkdir -p "$APP/Contents/Resources"
 cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
- 
+
 echo -e "\nFinished.\n\n"

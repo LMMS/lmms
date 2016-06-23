@@ -181,6 +181,14 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 		m_failed = false;
 	}
 	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
+#ifdef LMMS_BUILD_APPLE
+	// search current directory first
+	QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
+	if( QFile( curDir ).exists() )
+	{
+		exec = curDir;
+	}
+#endif
 #ifdef LMMS_BUILD_WIN32
 	if( ! exec.endsWith( ".exe", Qt::CaseInsensitive ) )
 	{
