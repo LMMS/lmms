@@ -3,7 +3,7 @@
 PACKAGES="cmake pkgconfig fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node"
 
 if [ $QT5 ]; then
-	PACKAGES="$PACKAGES qt5"
+	PACKAGES="$PACKAGES qt55"
 else
 	PACKAGES="$PACKAGES qt"
 fi
