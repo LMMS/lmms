@@ -216,8 +216,6 @@ public:
 
 	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
 
-	bool hasNotePlayHandles();
-
 
 	// methods providing information for other classes
 	inline fpp_t framesPerPeriod() const
@@ -272,27 +270,6 @@ public:
 		return _s;
 	}
 
-
-	// methods needed by other threads to alter knob values, waveforms, etc
-	void lockInputFrames()
-	{
-		m_inputFramesMutex.lock();
-	}
-
-	void unlockInputFrames()
-	{
-		m_inputFramesMutex.unlock();
-	}
-
-	void lockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.lock();
-	}
-
-	void unlockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.unlock();
-	}
 
 	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
 
@@ -417,11 +394,6 @@ private:
 	// MIDI device stuff
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
-
-	// mutexes
-	QMutex m_inputFramesMutex;
-	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
-	QMutex m_playHandleRemovalMutex;
 
 	// FIFO stuff
 	fifo * m_fifo;
