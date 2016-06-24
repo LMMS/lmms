@@ -25,6 +25,7 @@
 #include "Song.h"
 #include <QTextStream>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>

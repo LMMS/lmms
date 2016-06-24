@@ -201,7 +201,6 @@ private:
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
-	QMutex m_sendsMutex;
 
 	int m_lastSoloed;
 
