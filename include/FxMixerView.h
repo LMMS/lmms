@@ -30,8 +30,6 @@
 #include <QStackedLayout>
 #include <QScrollArea>
 
-#include "FxLine.h"
-#include "FxMixer.h"
 #include "ModelView.h"
 #include "Engine.h"
 #include "Fader.h"
