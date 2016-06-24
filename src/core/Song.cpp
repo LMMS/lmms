@@ -143,7 +143,7 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	Engine::mixer()->lockPlayHandleRemoval();
+	Engine::mixer()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
@@ -157,7 +157,7 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	Engine::mixer()->unlockPlayHandleRemoval();
+	Engine::mixer()->doneChangeInModel();
 
 	Engine::updateFramesPerTick();
 
