@@ -29,7 +29,7 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 
-#include "JournallingObject.h"
+#include "SerializingObject.h"
 
 class QAction;
 class QComboBox;
