@@ -83,15 +83,20 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	connect( m_restoreBtn, SIGNAL( clicked( bool ) ), this, SLOT( showNormal() ) );
 
 	// QLabel for the window title and the shadow effect
-	m_shadow = new QGraphicsDropShadowEffect();
-	m_shadow->setColor( m_textShadowColor );
-	m_shadow->setXOffset( 1 );
-	m_shadow->setYOffset( 1 );
-
 	m_windowTitle = new QLabel( this );
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
-	m_windowTitle->setGraphicsEffect( m_shadow );
+
+	m_titleShadow = new QLabel( this );
+	m_titleShadow->setFocusPolicy( Qt::NoFocus );
+	m_titleShadow->setAttribute( Qt::WA_TransparentForMouseEvents, true );
+
+	//Shadow effect for the subwindow
+	m_windowShadow = new QGraphicsDropShadowEffect();
+	m_windowShadow->setBlurRadius( 15.0 );
+	m_windowShadow->setColor( QColor( 0, 0, 0, 255 ) );
+	m_windowShadow->setOffset( 0 );
+	SubWindow::setGraphicsEffect( m_windowShadow );
 }
 
 
@@ -267,6 +272,11 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
 	m_windowTitle->move( menuButtonSpace,
 		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
+	m_titleShadow->setAlignment( Qt::AlignHCenter );
+	m_titleShadow->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) + 1 );
+	m_titleShadow->move( menuButtonSpace,
+		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 )  );
+	m_titleShadow->setStyleSheet( "color: black" );
 
 	// if minimized we can't use widget()->width(). We have to hard code the width,
 	// as the width of all minimized windows is the same.
@@ -274,12 +284,17 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	{
 		m_restoreBtn->move(  m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
 		m_windowTitle->setFixedWidth( 120 );
+		m_titleShadow->setFixedWidth( 120 );
 	}
 
 	// truncate the label string if the window is to small. Adds "..."
 	elideText( m_windowTitle, widget()->windowTitle() );
+	elideText( m_titleShadow, widget()->windowTitle() );
 	m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
 	m_windowTitle->adjustSize();
+	m_titleShadow->setTextInteractionFlags( Qt::NoTextInteraction );
+	m_titleShadow->adjustSize();
+	m_windowTitle->raise();
 
 	QMdiSubWindow::resizeEvent( event );
 

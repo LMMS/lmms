@@ -78,7 +78,8 @@ private:
 	QPoint m_position;
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
-	QGraphicsDropShadowEffect * m_shadow;
+	QLabel * m_titleShadow;
+	QGraphicsDropShadowEffect * m_windowShadow;
 
 	static void elideText( QLabel *label, QString text );
 	bool isMaximized();
