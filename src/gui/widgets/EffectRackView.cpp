@@ -84,12 +84,12 @@ EffectRackView::~EffectRackView()
 
 void EffectRackView::clearViews()
 {
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
-					it != m_effectViews.end(); ++it )
+	while( m_effectViews.size() )
 	{
-		delete *it;
+		EffectView * e = m_effectViews[m_effectViews.size() - 1];
+		m_effectViews.pop_back();
+		delete e;
 	}
-	m_effectViews.clear();
 }
 
 

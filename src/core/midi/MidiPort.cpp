@@ -341,7 +341,10 @@ void MidiPort::updateMidiPortMode()
 	emit writablePortsChanged();
 	emit modeChanged();
 
-	Engine::getSong()->setModified();
+	if( Engine::getSong() )
+	{
+		Engine::getSong()->setModified();
+	}
 }
 
 
