@@ -331,6 +331,8 @@ private:
 
 		virtual void run();
 
+		void write( surroundSampleFrame * buffer );
+
 	} ;
 
 
@@ -347,6 +349,7 @@ private:
 
 	const surroundSampleFrame * renderNextBuffer();
 
+	void clearInternal();
 
 	void runChangesInModel();
 
@@ -402,6 +405,8 @@ private:
 	MixerProfiler m_profiler;
 
 	bool m_metronomeActive;
+
+	bool m_clearSignal;
 
 	bool m_changesSignal;
 	bool m_waitForMixer;

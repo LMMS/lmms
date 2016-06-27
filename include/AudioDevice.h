@@ -25,17 +25,15 @@
 #ifndef AUDIO_DEVICE_H
 #define AUDIO_DEVICE_H
 
-#include <QtCore/QPair>
 #include <QtCore/QMutex>
-#include <QtCore/QThread>
 #include <samplerate.h>
 
 #include "lmms_basics.h"
-#include "TabWidget.h"
 
 
 class AudioPort;
 class Mixer;
+class QThread;
 
 
 class AudioDevice
@@ -134,6 +132,8 @@ protected:
 	}
 
 	bool hqAudio() const;
+
+	static void stopProcessingThread( QThread * thread );
 
 
 protected:

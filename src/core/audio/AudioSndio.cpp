@@ -114,11 +114,7 @@ void AudioSndio::startProcessing( void )
 
 void AudioSndio::stopProcessing( void )
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 

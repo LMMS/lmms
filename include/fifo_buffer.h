@@ -57,6 +57,18 @@ public:
 		m_reader_sem.release();
 	}
 
+	bool tryWrite( T _element )
+	{
+		if( m_writer_sem.tryAcquire() )
+		{
+			m_buffer[m_writer_index++] = _element;
+			m_writer_index %= m_size;
+			m_reader_sem.release();
+			return true;
+		}
+		return false;
+	}
+
 	T read()
 	{
 		m_reader_sem.acquire();

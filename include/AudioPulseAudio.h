@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_PULSEAUDIO
 
 #include <pulse/pulseaudio.h>
+#include <QThread>
 
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
