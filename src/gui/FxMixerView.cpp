@@ -41,6 +41,8 @@
 #include "Knob.h"
 #include "Engine.h"
 #include "embed.h"
+#include "FxLine.h"
+#include "FxMixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Mixer.h"
