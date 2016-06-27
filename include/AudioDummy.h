@@ -84,11 +84,7 @@ private:
 
 	virtual void stopProcessing()
 	{
-		if( isRunning() )
-		{
-			wait( 1000 );
-			terminate();
-		}
+		stopProcessingThread( this );
 	}
 
 	virtual void run()
