@@ -67,7 +67,7 @@ public:
 	void addTrack( Track * _track );
 	void removeTrack( Track * _track );
 
-	virtual void updateAfterTrackAdd();
+	virtual void updateAfterTrackAdd( Track * track );
 
 	void clearAllTracks();
 
@@ -96,6 +96,7 @@ public:
 
 signals:
 	void trackAdded( Track * _track );
+	void postTrackAdded( Track * _track );
 
 protected:
 	mutable QReadWriteLock m_tracksMutex;

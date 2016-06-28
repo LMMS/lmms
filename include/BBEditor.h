@@ -89,10 +89,12 @@ public slots:
 protected slots:
 	void dropEvent(QDropEvent * de );
 	void updatePosition();
+	void postTrackWasAdded(Track * track);
 
 private:
 	BBTrackContainer * m_bbtc;
 	void makeSteps( bool clone );
+	void resizeNewTrack(Track * track);
 };
 
 

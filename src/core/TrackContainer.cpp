@@ -199,8 +199,9 @@ void TrackContainer::removeTrack( Track * _track )
 
 
 
-void TrackContainer::updateAfterTrackAdd()
+void TrackContainer::updateAfterTrackAdd( Track * track )
 {
+	emit postTrackAdded( track );
 }
 
 
