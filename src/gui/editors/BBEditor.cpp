@@ -333,14 +333,12 @@ void BBTrackContainerView::resizeNewTrack(Track * track)
 		if( ( *it )->type() == Track::InstrumentTrack &&
 			( *it ) != track )
 		{
-			std::cout << m_bbtc->currentBB() << std::endl;
 			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
 			steps = p->getSteps();
 			break;
 		}
 	}
 
-	std::cout << m_bbtc->currentBB() << std::endl;
 	Pattern* p = static_cast<Pattern *>( track->getTCO( m_bbtc->currentBB() ) );
 
 	// If the track already has the same amount of steps, no need to resize
