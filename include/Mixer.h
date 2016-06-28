@@ -174,7 +174,7 @@ public:
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 							bool _needs_fifo );
-	void restoreAudioDevice();
+	void restoreAudioDevice( const struct qualitySettings & _qs );
 	inline AudioDevice * audioDev()
 	{
 		return m_audioDev;

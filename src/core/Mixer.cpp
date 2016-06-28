@@ -586,14 +586,17 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 
 
 
-void Mixer::restoreAudioDevice()
+void Mixer::restoreAudioDevice( const struct qualitySettings & _qs )
 {
 	if( m_oldAudioDev != NULL )
 	{
 		stopProcessing();
 		delete m_audioDev;
 
+		m_qualitySettings = _qs;
 		m_audioDev = m_oldAudioDev;
+
+		emit qualitySettingsChanged();
 		emit sampleRateChanged();
 
 		m_oldAudioDev = NULL;

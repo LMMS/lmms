@@ -50,7 +50,8 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	m_handle( NULL ),
 	m_hwParams( NULL ),
 	m_swParams( NULL ),
-	m_convertEndian( false )
+	m_convertEndian( false ),
+	m_quit( false )
 {
 	_success_ful = false;
 
@@ -107,6 +108,11 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 AudioAlsa::~AudioAlsa()
 {
 	stopProcessing();
+
+	m_quit = true;
+	wait( 1000 );
+	terminate();
+
 	if( m_handle != NULL )
 	{
 		snd_pcm_close( m_handle );
@@ -234,6 +240,8 @@ int AudioAlsa::handleError( int _err )
 
 void AudioAlsa::startProcessing()
 {
+	m_stopped = false;
+
 	if( !isRunning() )
 	{
 		start( QThread::HighPriority );
@@ -245,11 +253,7 @@ void AudioAlsa::startProcessing()
 
 void AudioAlsa::stopProcessing()
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	m_stopped = true;
 }
 
 
@@ -311,8 +315,7 @@ void AudioAlsa::run()
 	int outbuf_pos = 0;
 	int pcmbuf_size = m_periodSize * channels();
 
-	bool quit = false;
-	while( quit == false )
+	while( m_quit == false )
 	{
 		int_sample_t * ptr = pcmbuf;
 		int len = pcmbuf_size;
@@ -320,11 +323,16 @@ void AudioAlsa::run()
 		{
 			if( outbuf_pos == 0 )
 			{
+				if( m_stopped )
+				{
+					memset( ptr, 0, len
+						* sizeof( int_sample_t ) );
+					break;
+				}
 				// frames depend on the sample rate
 				const fpp_t frames = getNextBuffer( temp );
 				if( !frames )
 				{
-					quit = true;
 					memset( ptr, 0, len
 						* sizeof( int_sample_t ) );
 					break;
