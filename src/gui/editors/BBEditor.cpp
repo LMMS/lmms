@@ -319,41 +319,44 @@ void BBTrackContainerView::resizeNewTrack(Track * track)
 		return;
 	}
 
-	// Ensure that the newly added track has a TCO
+	// Ensure that the newly added track has at least one TCO
 	m_bbtc->updateAfterTrackAdd();
 
-	// Default a single tact if there does not exist tracks in the Beat/Baseline
-	// editor
-	int steps = MidiTime::stepsPerTact();
-
-	// get size of pre-existing track
-	for( TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end(); ++it)
+	for(unsigned int currentBB=0; currentBB < m_bbtc->numOfBBs(); ++currentBB)
 	{
-		if( ( *it )->type() == Track::InstrumentTrack &&
-			( *it ) != track )
+		// Default a single tact if there does not exist tracks in the Beat/Baseline
+		// editor
+		int steps = MidiTime::stepsPerTact();
+
+		// get size of pre-existing track
+		for( TrackContainer::TrackList::iterator it = tl.begin();
+			it != tl.end(); ++it)
 		{
-			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
-			steps = p->getSteps();
-			break;
+			if( ( *it )->type() == Track::InstrumentTrack &&
+				( *it ) != track )
+			{
+				Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( currentBB ) );
+				steps = p->getSteps();
+				break;
+			}
 		}
-	}
 
-	Pattern* p = static_cast<Pattern *>( track->getTCO( m_bbtc->currentBB() ) );
+		Pattern* p = static_cast<Pattern *>( track->getTCO( currentBB ) );
 
-	// If the track already has the same amount of steps, no need to resize
-	// (For example, when cloning a track)
-	if(p->getSteps() == steps)
-	{
-		return;
-	}
+		// If the track already has the same amount of steps, no need to resize
+		// (For example, when cloning a track)
+		if(p->getSteps() == steps)
+		{
+			continue;
+		}
 
-	// convert steps to tacts
-	int tacts = steps / MidiTime::stepsPerTact();
+		// convert steps to tacts
+		int tacts = steps / MidiTime::stepsPerTact();
 
-	// A newly created track has 1 tact, so increment tacts by "tacts - 1"
-	while(--tacts > 0)
-	{
-		p->addSteps();
+		// A newly created track has 1 tact, so increment tacts by "tacts - 1"
+		while(--tacts > 0)
+		{
+			p->addSteps();
+		}
 	}
 }

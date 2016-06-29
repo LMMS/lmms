@@ -94,6 +94,7 @@ protected slots:
 private:
 	BBTrackContainer * m_bbtc;
 	void makeSteps( bool clone );
+	// Resizes a newly added track to match size of pre-existing tracks in the BB
 	void resizeNewTrack(Track * track);
 };
 
