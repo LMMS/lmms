@@ -94,7 +94,10 @@ public:
 
 
 	void processNextBuffer();
-
+	void setPlayMode(PlayModes, int);
+	TrackList getTrackList(); 
+	track* getTrackToPlay();
+	
 	inline int getMilliseconds() const
 	{
 		return m_elapsedMilliSeconds;
@@ -299,7 +302,7 @@ private:
 	song();
 	song( const song & );
 	virtual ~song();
-
+	TrackList m_tracklist;
 
 	inline tact_t currentTact() const
 	{
@@ -358,7 +361,10 @@ private:
 	friend class SongEditor;
 	friend class mainWindow;
 	friend class ControllerRackView;
-
+	friend class PlaySong;
+	friend class PlayTrack;
+	friend class PlayBB;
+	friend class PlayPattern;
 signals:
 	void projectLoaded();
 	void playbackStateChanged();

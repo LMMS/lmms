@@ -52,6 +52,10 @@
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "pattern.h"
+#include "PlayBB.h"
+#include "PlayPattern.h"
+#include "PlaySong.h"
+#include "PlayTrack.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "project_notes.h"
@@ -95,6 +99,7 @@ song::song() :
 	m_elapsedMilliSeconds( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
+
 {
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
@@ -194,55 +199,58 @@ void song::processNextBuffer()
 	{
 		return;
 	}
-
-	TrackList track_list;
+	
 	int tco_num = -1;
+	setPlayMode(m_playMode, tco_num);
+}
 
-	switch( m_playMode )
+
+
+TrackContainer::TrackList song::getTrackList(){
+  
+  return m_tracklist;
+}
+
+track * song::getTrackToPlay(){
+  return m_trackToPlay;
+}
+
+void song::setPlayMode(PlayModes m_playMode, int tco_num){
+  
+  IPlayMode * pm;
+  
+  switch( m_playMode )
 	{
+	        
 		case Mode_PlaySong:
-			track_list = tracks();
-			// at song-start we have to reset the LFOs
-			if( m_playPos[Mode_PlaySong] == 0 )
-			{
-				EnvelopeAndLfoParameters::instances()->reset();
-			}
-			break;
+		  pm = new PlaySong;
+		  break;
 
 		case Mode_PlayTrack:
-			track_list.push_back( m_trackToPlay );
-			break;
+		  pm = new PlayTrack;
+		  break;
 
 		case Mode_PlayBB:
-			if( engine::getBBTrackContainer()->numOfBBs() > 0 )
-			{
-				tco_num = engine::getBBTrackContainer()->
-								currentBB();
-				track_list.push_back( bbTrack::findBBTrack(
-								tco_num ) );
-			}
-			break;
+		  pm = new PlayBB;
+		  break;
 
 		case Mode_PlayPattern:
-			if( m_patternToPlay != NULL )
-			{
-				tco_num = m_patternToPlay->getTrack()->
-						getTCONum( m_patternToPlay );
-				track_list.push_back(
-						m_patternToPlay->getTrack() );
-			}
-			break;
+		  pm = new PlayPattern;
+		  break;
 
 		default:
 			return;
 
 	}
-
-	if( track_list.empty() == true )
+	
+	pm->process(this);
+	
+	if( m_tracklist.empty() == true )
 	{
 		return;
 	}
 
+	
 	// check for looping-mode and act if necessary
 	timeLine * tl = m_playPos[m_playMode].m_timeLine;
 	bool check_loop = tl != NULL && m_exporting == false &&
@@ -366,9 +374,9 @@ void song::processNextBuffer()
 			}
 
 			// loop through all tracks and play them
-			for( int i = 0; i < track_list.size(); ++i )
+			for( int i = 0; i < m_tracklist.size(); ++i )
 			{
-				track_list[i]->play( m_playPos[m_playMode],
+				m_tracklist[i]->play( m_playPos[m_playMode],
 						played_frames,
 						total_frames_played, tco_num );
 			}
@@ -383,8 +391,6 @@ void song::processNextBuffer()
 		m_elapsedTicks = (m_playPos[Mode_PlaySong].getTicks()%ticksPerTact())/48;
 	}
 }
-
-
 
 
 void song::playSong()
