@@ -255,11 +255,7 @@ void AudioOss::startProcessing()
 
 void AudioOss::stopProcessing()
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 
