@@ -66,6 +66,7 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 {
 	setName( _instrument_track->name() );
 	init();
+	setAutoResize( true );
 }
 
 
@@ -83,6 +84,14 @@ Pattern::Pattern( const Pattern& other ) :
 	}
 
 	init();
+	if( getTrack()->trackContainer()->type() == TrackContainer::BBTrackContainer )
+	{
+		setAutoResize( true );
+	}
+	else
+	{
+		setAutoResize( false );
+	}
 }
 
 
@@ -635,7 +644,6 @@ PatternView::PatternView( Pattern* pattern, trackView* parent ) :
 	}
 
 	setFixedHeight( parentWidget()->height() - 2 );
-	setAutoResizeEnabled( false );
 
 	toolTip::add( this,
 		tr( "double-click to open this pattern in piano-roll\n"
