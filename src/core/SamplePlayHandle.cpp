@@ -24,7 +24,6 @@
 
 #include "SamplePlayHandle.h"
 #include "AudioPort.h"
-#include "bb_track.h"
 #include "engine.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"
@@ -42,8 +41,7 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_track( NULL )
 {
 }
 
@@ -59,8 +57,7 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 	m_ownAudioPort( true ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
+	m_track( NULL )
 {
 }
 
@@ -76,8 +73,7 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 	m_ownAudioPort( false ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( tco->getTrack() ),
-	m_bbTrack( NULL )
+	m_track( tco->getTrack() )
 {
 }
 
@@ -105,8 +101,7 @@ void SamplePlayHandle::play( sampleFrame * _working_buffer )
 	}
 
 	const fpp_t frames = engine::mixer()->framesPerPeriod();
-	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+	if( !( m_track && m_track->isMuted() ) )
 	{
 		stereoVolumeVector v =
 			{ { m_volumeModel->value() / DefaultVolume,
@@ -133,7 +128,7 @@ bool SamplePlayHandle::isFinished() const
 
 bool SamplePlayHandle::isFromTrack( const track * _track ) const
 {
-	return m_track == _track || m_bbTrack == _track;
+	return m_track == _track;
 }
 
 

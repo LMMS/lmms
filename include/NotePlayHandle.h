@@ -199,18 +199,6 @@ public:
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
 
-	/*! Returns whether NotePlayHandle belongs to BB track and BB track is muted */
-	bool isBbTrackMuted()
-	{
-		return m_bbTrack && m_bbTrack->isMuted();
-	}
-
-	/*! Sets attached BB track */
-	void setBBTrack( track* t )
-	{
-		m_bbTrack = t;
-	}
-
 	/*! Process note detuning automation */
 	void processMidiTime( const MidiTime& time );
 
@@ -270,7 +258,6 @@ private:
 	bool m_hasParent;
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	track* m_bbTrack;						// related BB track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
