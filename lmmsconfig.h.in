@@ -39,6 +39,7 @@
 #cmakedefine LMMS_HAVE_STRING_H
 #cmakedefine LMMS_HAVE_PROCESS_H
 #cmakedefine LMMS_HAVE_LOCALE_H
+#cmakedefine LMMS_HAVE_DSSI_H
 
 /* defines for libsamplerate */
 

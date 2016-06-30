@@ -35,12 +35,16 @@
 #include "config_mgr.h"
 #include "ladspa_manager.h"
 
+#ifdef LMMS_HAVE_DSSI_H
+#include <dssi.h>
+#endif
 
 
 ladspaManager::ladspaManager()
 {
 	QStringList ladspaDirectories = QString( getenv( "LADSPA_PATH" ) ).
 								split( LADSPA_PATH_SEPERATOR );
+	ladspaDirectories += QString( getenv( "DSSI_PATH" ) ).split( LADSPA_PATH_SEPERATOR );
 	ladspaDirectories += configManager::inst()->ladspaDir().split( ',' );
 
 	ladspaDirectories.push_back( configManager::inst()->pluginDir() + "ladspa" );
@@ -80,11 +84,22 @@ ladspaManager::ladspaManager()
 				LADSPA_Descriptor_Function descriptorFunction =
 			( LADSPA_Descriptor_Function ) plugin_lib.resolve(
 							"ladspa_descriptor" );
+#ifdef	LMMS_HAVE_DSSI_H
+				DSSI_Descriptor_Function dssiFunction =
+			( DSSI_Descriptor_Function ) plugin_lib.resolve(
+							"dssi_descriptor" );
 				if( descriptorFunction != NULL )
 				{
 					addPlugins( descriptorFunction,
-							f.fileName() );
+						    f.fileName(), dssiFunction );
 				}
+#else
+				if( descriptorFunction != NULL )
+				{
+					addPlugins( descriptorFunction,
+						    f.fileName() );
+				}
+#endif
 			}
 			else
 			{
@@ -135,7 +150,11 @@ ladspaManagerDescription * ladspaManager::getDescription(
 
 void ladspaManager::addPlugins(
 		LADSPA_Descriptor_Function _descriptor_func,
-						const QString & _file )
+		const QString & _file
+#ifdef	LMMS_HAVE_DSSI_H
+		, DSSI_Descriptor_Function _dssi_func 
+#endif
+)
 {
 	const LADSPA_Descriptor * descriptor;
 
@@ -152,6 +171,9 @@ void ladspaManager::addPlugins(
 		ladspaManagerDescription * plugIn = 
 				new ladspaManagerDescription;
 		plugIn->descriptorFunction = _descriptor_func;
+#ifdef	LMMS_HAVE_DSSI_H
+		plugIn->dssiFunction = _dssi_func;
+#endif
 		plugIn->index = pluginIndex;
 		plugIn->inputChannels = getPluginInputs( descriptor );
 		plugIn->outputChannels = getPluginOutputs( descriptor );
@@ -298,6 +320,26 @@ bool ladspaManager::isInplaceBroken( const ladspa_key_t &  _plugin )
 	{
 		return( false );
 	}
+}
+
+bool ladspaManager::isDSSI( const ladspa_key_t &  _plugin )
+{
+#ifdef LMMS_HAVE_DSSI_H
+	if( m_ladspaManagerMap.contains( _plugin ) && 
+	    m_ladspaManagerMap[_plugin]->dssiFunction != NULL &&
+	    m_ladspaManagerMap[_plugin]->dssiFunction( m_ladspaManagerMap[_plugin]->index )
+	    != NULL )
+	{
+		return( true );
+		
+	}
+	else
+	{
+		return( false );
+	}
+#else
+	return( false );
+#endif
 }
 
 
