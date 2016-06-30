@@ -51,6 +51,8 @@ protected slots:
 	void changeName();
 	void disconnectObject( QAction * _a );
 	void toggleRecording();
+	void flipY();
+	void flipX();
 
 protected:
 	virtual void constructContextMenu( QMenu * );
