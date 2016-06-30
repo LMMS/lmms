@@ -489,9 +489,12 @@ void fileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * _me )
 	new stringPairDrag( "importedproject", f->fullName(),
 				embed::getIconPixmap( "midi_file" ), this );
 					break;
-
+				case fileItem::SoundFontFile:
+	new stringPairDrag( "soundfontfile", f->fullName(),
+				embed::getIconPixmap( "sample_file" ), this );
+					break;
 				case fileItem::VstPluginFile:
-	new stringPairDrag( "vstplugin", f->fullName(),
+	new stringPairDrag( "vstpluginfile", f->fullName(),
 				embed::getIconPixmap( "sample_file" ), this );
 					break;
 
@@ -931,6 +934,7 @@ void fileItem::initPixmaps( void )
 		case SampleFile:
 		case SoundFontFile:		// TODO
 		case PatchFile:			// TODO
+		case VstPluginFile:		// TODO
 			setIcon( 0, *s_sampleFilePixmap );
 			break;
 		case MidiFile:
