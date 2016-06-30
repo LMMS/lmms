@@ -95,33 +95,52 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		m_filter2changed = true;
 	}
 
+	float cut1 = m_dfControls.m_cut1Model.value();
+	float res1 = m_dfControls.m_res1Model.value();
+	float gain1 = m_dfControls.m_gain1Model.value();
+	float cut2 = m_dfControls.m_cut2Model.value();
+	float res2 = m_dfControls.m_res2Model.value();
+	float gain2 = m_dfControls.m_gain2Model.value();
+	float mix = m_dfControls.m_mixModel.value();
+
+	ValueBuffer *cut1Buffer = m_dfControls.m_cut1Model.valueBuffer();
+	ValueBuffer *res1Buffer = m_dfControls.m_res1Model.valueBuffer();
+	ValueBuffer *gain1Buffer = m_dfControls.m_gain1Model.valueBuffer();
+	ValueBuffer *cut2Buffer = m_dfControls.m_cut2Model.valueBuffer();
+	ValueBuffer *res2Buffer = m_dfControls.m_res2Model.valueBuffer();
+	ValueBuffer *gain2Buffer = m_dfControls.m_gain2Model.valueBuffer();
+	ValueBuffer *mixBuffer = m_dfControls.m_mixModel.valueBuffer();
+
+	int cut1Inc = cut1Buffer ? 1 : 0;
+	int res1Inc = res1Buffer ? 1 : 0;
+	int gain1Inc = gain1Buffer ? 1 : 0;
+	int cut2Inc = cut2Buffer ? 1 : 0;
+	int res2Inc = res2Buffer ? 1 : 0;
+	int gain2Inc = gain2Buffer ? 1 : 0;
+	int mixInc = mixBuffer ? 1 : 0;
+
+	float *cut1Ptr = cut1Buffer ? &( cut1Buffer->values()[ 0 ] ) : &cut1;
+	float *res1Ptr = res1Buffer ? &( res1Buffer->values()[ 0 ] ) : &res1;
+	float *gain1Ptr = gain1Buffer ? &( gain1Buffer->values()[ 0 ] ) : &gain1;
+	float *cut2Ptr = cut2Buffer ? &( cut2Buffer->values()[ 0 ] ) : &cut2;
+	float *res2Ptr = res2Buffer ? &( res2Buffer->values()[ 0 ] ) : &res2;
+	float *gain2Ptr = gain2Buffer ? &( gain2Buffer->values()[ 0 ] ) : &gain2;
+	float *mixPtr = mixBuffer ? &( mixBuffer->values()[ 0 ] ) : &mix;
+
 	const bool enabled1 = m_dfControls.m_enabled1Model.value();
 	const bool enabled2 = m_dfControls.m_enabled2Model.value();
 
-	// recalculate only when necessary: either cut/res is changed, or the changed-flag is set (filter type or samplerate changed)
-	if( ( enabled1 && ( m_dfControls.m_cut1Model.isValueChanged() ||
-		m_dfControls.m_res1Model.isValueChanged() ) ) || m_filter1changed )
-	{
-		m_filter1->calcFilterCoeffs( m_dfControls.m_cut1Model.value(), m_dfControls.m_res1Model.value() );
-		m_filter1changed = false;
-	}
-	if( ( enabled2 && ( m_dfControls.m_cut2Model.isValueChanged() ||
-		m_dfControls.m_res2Model.isValueChanged() ) ) || m_filter2changed )
-	{
-		m_filter2->calcFilterCoeffs( m_dfControls.m_cut2Model.value(), m_dfControls.m_res2Model.value() );
-		m_filter2changed = false;
-	}
 	
-	// get mix amounts for wet signals of both filters
-	const float mix2 = ( ( m_dfControls.m_mixModel.value() + 1.0f ) * 0.5f );
-	const float mix1 = 1.0f - mix2;
 	
-	const float gain1 = m_dfControls.m_gain1Model.value() * 0.01f;
-	const float gain2 = m_dfControls.m_gain2Model.value() * 0.01f;
 
 	// buffer processing loop
 	for( fpp_t f = 0; f < frames; ++f )
 	{
+		// get mix amounts for wet signals of both filters
+		const float mix2 = ( ( *mixPtr + 1.0f ) * 0.5f );
+		const float mix1 = 1.0f - mix2;
+		const float gain1 = *gain1Ptr * 0.01f;
+		const float gain2 = *gain2Ptr * 0.01f;
 		sample_t s[2] = { 0.0f, 0.0f };	// mix
 		sample_t s1[2] = { buf[f][0], buf[f][1] };	// filter 1
 		sample_t s2[2] = { buf[f][0], buf[f][1] };	// filter 2
@@ -129,6 +148,16 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		// update filter 1
 		if( enabled1 )
 		{
+			//update filter 1 params here
+			// recalculate only when necessary: either cut/res is changed, or the changed-flag is set (filter type or samplerate changed)
+			if( ( ( *cut1Ptr != m_currentCut1 ||
+				*res1Ptr != m_currentRes1 ) ) || m_filter1changed )
+			{
+				m_filter1->calcFilterCoeffs( *cut1Ptr, *res1Ptr );
+				m_filter1changed = false;
+				m_currentCut1 = *cut1Ptr;
+				m_currentRes1 = *res1Ptr;
+			}
 			s1[0] = m_filter1->update( s1[0], 0 );
 			s1[1] = m_filter1->update( s1[1], 1 );
 
@@ -144,6 +173,15 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		// update filter 2
 		if( enabled2 )
 		{
+			//update filter 2 params here
+			if( ( ( *cut2Ptr != m_currentCut2 ||
+								*res2Ptr != m_currentRes2 ) ) || m_filter2changed )
+			{
+				m_filter2->calcFilterCoeffs( *cut2Ptr, *res2Ptr );
+				m_filter2changed = false;
+				m_currentCut2 = *cut2Ptr;
+				m_currentRes2 = *res2Ptr;
+			}
 			s2[0] = m_filter2->update( s2[0], 0 );
 			s2[1] = m_filter2->update( s2[1], 1 );
 
@@ -160,6 +198,15 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 		// do another mix with dry signal
 		buf[f][0] = d * buf[f][0] + w * s[0];
 		buf[f][1] = d * buf[f][1] + w * s[1];
+
+		//increment pointers
+		cut1Ptr += cut1Inc;
+		res1Ptr += res1Inc;
+		gain1Ptr += gain1Inc;
+		cut2Ptr += cut2Inc;
+		res2Ptr += res2Inc;
+		gain2Ptr += gain2Inc;
+		mixPtr += mixInc;
 	}
 
 	checkGate( outSum / frames );
