@@ -174,6 +174,9 @@ BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
 	m_bbtc(tc)
 {
 	setModel( tc );
+
+	connect ( m_bbtc, SIGNAL( postTrackAdded ( Track * ) ),
+			this, SLOT( postTrackWasAdded( Track * ) ) );
 }
 
 
@@ -274,6 +277,14 @@ void BBTrackContainerView::updatePosition()
 
 
 
+void BBTrackContainerView::postTrackWasAdded( Track * track )
+{
+	resizeNewTrack(track);
+}
+
+
+
+
 void BBTrackContainerView::makeSteps( bool clone )
 {
 	TrackContainer::TrackList tl = model()->tracks();
@@ -291,6 +302,61 @@ void BBTrackContainerView::makeSteps( bool clone )
 			{
 				p->addSteps();
 			}
+		}
+	}
+}
+
+
+
+
+void BBTrackContainerView::resizeNewTrack(Track * track)
+{
+	TrackContainer::TrackList tl = model()->tracks();
+
+	// Resizing is unnecessary if there does not already exist a track
+	if(tl.size() <= 1)
+	{
+		return;
+	}
+
+	// Ensure that the newly added track has at least one TCO
+	m_bbtc->updateAfterTrackAdd();
+
+	for(unsigned int currentBB=0; currentBB < m_bbtc->numOfBBs(); ++currentBB)
+	{
+		// Default a single tact if there does not exist tracks in the Beat/Baseline
+		// editor
+		int steps = MidiTime::stepsPerTact();
+
+		// get size of pre-existing track
+		for( TrackContainer::TrackList::iterator it = tl.begin();
+			it != tl.end(); ++it)
+		{
+			if( ( *it )->type() == Track::InstrumentTrack &&
+				( *it ) != track )
+			{
+				Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( currentBB ) );
+				steps = p->getSteps();
+				break;
+			}
+		}
+
+		Pattern* p = static_cast<Pattern *>( track->getTCO( currentBB ) );
+
+		// If the track already has the same amount of steps, no need to resize
+		// (For example, when cloning a track)
+		if(p->getSteps() == steps)
+		{
+			continue;
+		}
+
+		// convert steps to tacts
+		int tacts = steps / MidiTime::stepsPerTact();
+
+		// A newly created track has 1 tact, so increment tacts by "tacts - 1"
+		while(--tacts > 0)
+		{
+			p->addSteps();
 		}
 	}
 }

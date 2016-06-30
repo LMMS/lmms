@@ -1956,7 +1956,7 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
-	tc->updateAfterTrackAdd();
+	tc->updateAfterTrackAdd(t);
 
 	return t;
 }

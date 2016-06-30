@@ -121,6 +121,9 @@ public:
 	using Model::dataChanged;
 
 
+	const int getSteps() const;
+
+
 protected:
 	void ensureBeatNotes();
 	void updateBBTrack();

@@ -541,6 +541,13 @@ TrackContentObjectView * Pattern::createView( TrackView * _tv )
 
 
 
+const int Pattern::getSteps() const
+{
+	return m_steps;
+}
+
+
+
 
 void Pattern::ensureBeatNotes()
 {
