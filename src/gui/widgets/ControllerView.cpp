@@ -143,22 +143,25 @@ void ControllerView::deleteController()
 	emit( deleteController( this ) );
 }
 
-
+void ControllerView::renameController()
+{
+    bool ok;
+    Controller * c = castModel<Controller>();
+    QString new_name = QInputDialog::getText( this,
+                    tr( "Rename controller" ),
+                    tr( "Enter the new name for this controller" ),
+                    QLineEdit::Normal, c->name() , &ok );
+    if( ok && !new_name.isEmpty() )
+    {
+            c->setName( new_name );
+            m_nameLabel->setText( new_name );
+    }
+}
 
 
 void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 {
-	bool ok;
-	Controller * c = castModel<Controller>();
-	QString new_name = QInputDialog::getText( this,
-			tr( "Rename controller" ),
-			tr( "Enter the new name for this controller" ),
-			QLineEdit::Normal, c->name() , &ok );
-	if( ok && !new_name.isEmpty() )
-	{
-		c->setName( new_name );
-		m_nameLabel->setText( new_name );
-	}
+        renameController();
 }
 
 
@@ -173,14 +176,14 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
+                                                tr( "&Remove this controller" ),
 						this, SLOT( deleteController() ) );
+        contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
-
 
 
 void ControllerView::displayHelp()
