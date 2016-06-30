@@ -131,6 +131,22 @@ void AudioDevice::stopProcessing()
 
 
 
+void AudioDevice::stopProcessingThread( QThread * thread )
+{
+	if( !thread->wait( 30000 ) )
+	{
+		fprintf( stderr, "Terminating audio device thread\n" );
+		thread->terminate();
+		if( !thread->wait( 1000 ) )
+		{
+			fprintf( stderr, "Thread not terminated yet\n" );
+		}
+	}
+}
+
+
+
+
 void AudioDevice::applyQualitySettings()
 {
 	src_delete( m_srcState );

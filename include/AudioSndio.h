@@ -5,6 +5,7 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
+#include <QThread>
 #include <sndio.h>
 
 #include "AudioDevice.h"

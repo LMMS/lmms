@@ -82,6 +82,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_audioDevStartFailed( false ),
 	m_profiler(),
 	m_metronomeActive(false),
+	m_clearSignal( false ),
 	m_changesSignal( false ),
 	m_waitForMixer( true ),
 	m_changes( 0 ),
@@ -234,9 +235,9 @@ void Mixer::stopProcessing()
 	{
 		m_fifoWriter->finish();
 		m_fifoWriter->wait();
+		m_audioDev->stopProcessing();
 		delete m_fifoWriter;
 		m_fifoWriter = NULL;
-		m_audioDev->stopProcessing();
 	}
 	else
 	{
@@ -365,6 +366,12 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// clear new write buffer
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
 
+	if( m_clearSignal )
+	{
+		m_clearSignal = false;
+		clearInternal();
+	}
+
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
@@ -469,12 +476,19 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 
-// removes all play-handles. this is necessary, when the song is stopped ->
-// all remaining notes etc. would be played until their end
 void Mixer::clear()
 {
+	m_clearSignal = true;
+}
+
+
+
+
+// removes all play-handles. this is necessary, when the song is stopped ->
+// all remaining notes etc. would be played until their end
+void Mixer::clearInternal()
+{
 	// TODO: m_midiClient->noteOffAll();
-	requestChangeInModel();
 	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
 		// we must not delete instrument-play-handles as they exist
@@ -484,7 +498,6 @@ void Mixer::clear()
 			m_playHandlesToRemove.push_back( *it );
 		}
 	}
-	doneChangeInModel();
 }
 
 
@@ -1053,10 +1066,26 @@ void Mixer::fifoWriter::run()
 		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
-		m_fifo->write( buffer );
+		write( buffer );
 	}
 
-	m_fifo->write( NULL );
+	write( NULL );
+}
+
+
+
+
+void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
+{
+	while( !m_fifo->tryWrite( buffer ) )
+	{
+		if( m_mixer->m_changesSignal )
+		{
+			m_mixer->runChangesInModel();
+			continue;
+		}
+		yieldCurrentThread();
+	}
 }
 
 
