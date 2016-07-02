@@ -76,6 +76,8 @@ public:
 		reallocID( _id, NULL );
 	}
 
+	static jo_id_t idToSave( jo_id_t id );
+
 	void clearJournal();
 	void stopAllJournalling();
 	JournallingObject * journallingObject( const jo_id_t _id )
