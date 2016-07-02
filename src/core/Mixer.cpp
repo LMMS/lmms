@@ -84,9 +84,9 @@ Mixer::Mixer( bool renderOnly ) :
 	m_metronomeActive(false),
 	m_clearSignal( false ),
 	m_changesSignal( false ),
-	m_waitForMixer( true ),
 	m_changes( 0 ),
-	m_doChangesMutex( QMutex::Recursive )
+	m_doChangesMutex( QMutex::Recursive ),
+	m_waitingForWrite( false )
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -739,14 +739,13 @@ void Mixer::requestChangeInModel()
 	m_changesMutex.unlock();
 
 	m_doChangesMutex.lock();
-	if ( m_isProcessing && m_waitForMixer )
+	m_waitChangesMutex.lock();
+	if ( m_isProcessing && !m_waitingForWrite && !m_changesSignal )
 	{
-		m_waitForMixer = false;
-		m_waitChangesMutex.lock();
 		m_changesSignal = true;
 		m_changesRequestCondition.wait( &m_waitChangesMutex );
-		m_waitChangesMutex.unlock();
 	}
+	m_waitChangesMutex.unlock();
 }
 
 
@@ -763,7 +762,6 @@ void Mixer::doneChangeInModel()
 
 	if( !moreChanges )
 	{
-		m_waitForMixer = true;
 		m_changesSignal = false;
 		m_changesMixerCondition.wakeOne();
 	}
@@ -1077,15 +1075,16 @@ void Mixer::fifoWriter::run()
 
 void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
 {
-	while( !m_fifo->tryWrite( buffer ) )
-	{
-		if( m_mixer->m_changesSignal )
-		{
-			m_mixer->runChangesInModel();
-			continue;
-		}
-		yieldCurrentThread();
-	}
+	m_mixer->m_waitChangesMutex.lock();
+	m_mixer->m_waitingForWrite = true;
+	m_mixer->m_waitChangesMutex.unlock();
+	m_mixer->runChangesInModel();
+
+	m_fifo->write( buffer );
+
+	m_mixer->m_doChangesMutex.lock();
+	m_mixer->m_waitingForWrite = false;
+	m_mixer->m_doChangesMutex.unlock();
 }
 
 
