@@ -262,11 +262,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				NotePlayHandle* nph;
-				m_notesMutex.lock();
 				if( m_notes[event.key()] == NULL )
 				{
-					nph = NotePlayHandleManager::acquire( this, offset,
+					NotePlayHandle* nph =
+						NotePlayHandleManager::acquire(
+								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
@@ -277,21 +277,20 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 						m_notes[event.key()] = NULL;
 					}
 				}
-				m_notesMutex.unlock();
 				eventHandled = true;
 				break;
 			}
 
 		case MidiNoteOff:
-			m_notesMutex.lock();
 			if( m_notes[event.key()] != NULL )
 			{
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
+				Engine::mixer()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
+				Engine::mixer()->doneChangeInModel();
 			}
-			m_notesMutex.unlock();
 			eventHandled = true;
 			break;
 
@@ -421,14 +420,12 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	m_notesMutex.lock();
 	m_midiNotesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
-	m_notesMutex.unlock();
 	m_midiNotesMutex.unlock();
 
 	lock();
