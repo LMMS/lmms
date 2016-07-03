@@ -61,6 +61,9 @@
 
 
 
+typedef LocklessList<PlayHandle *>::Element LocklessListElement;
+
+
 static __thread bool s_renderingThread;
 
 
@@ -412,8 +415,13 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	song->processNextBuffer();
 
 	// add all play-handles that have to be added
-	m_playHandles += m_newPlayHandles;
-	m_newPlayHandles.clear();
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	{
+		m_playHandles += e->value;
+		LocklessListElement * next = e->next;
+		delete e;
+		e = next;
+	}
 
 	// STAGE 1: run and render all play handles
 	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
@@ -635,10 +643,8 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 {
 	if( criticalXRuns() == false )
 	{
-		requestChangeInModel();
-			m_newPlayHandles.append( handle );
-			handle->audioPort()->addPlayHandle( handle );
-		doneChangeInModel();
+		m_newPlayHandles.push( handle );
+		handle->audioPort()->addPlayHandle( handle );
 		return true;
 	}
 
@@ -664,16 +670,26 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		PlayHandleList::Iterator it =
-				qFind( m_newPlayHandles.begin(),
-						m_newPlayHandles.end(), _ph );
-		if( it != m_newPlayHandles.end() )
+		for( LocklessListElement * e = m_newPlayHandles.first(),
+				* ePrev = NULL; e; ePrev = e, e = e->next )
 		{
-			m_newPlayHandles.erase( it );
-			removedFromList = true;
+			if( e->value == _ph )
+			{
+				if( ePrev )
+				{
+					ePrev->next = e->next;
+				}
+				else
+				{
+					m_newPlayHandles.setFirst( e->next );
+				}
+				delete e;
+				removedFromList = true;
+				break;
+			}
 		}
 		// Now check m_playHandles
-		it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{
