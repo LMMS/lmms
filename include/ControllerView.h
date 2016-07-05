@@ -62,7 +62,7 @@ public slots:
 	void deleteController();
 	void displayHelp();
 	void closeControls();
-
+	void renameController();
 
 signals:
 	void deleteController( ControllerView * _view );

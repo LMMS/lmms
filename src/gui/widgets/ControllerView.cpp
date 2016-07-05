@@ -143,10 +143,7 @@ void ControllerView::deleteController()
 	emit( deleteController( this ) );
 }
 
-
-
-
-void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+void ControllerView::renameController()
 {
 	bool ok;
 	Controller * c = castModel<Controller>();
@@ -162,6 +159,12 @@ void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 }
 
 
+void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+{
+	renameController();
+}
+
+
 
 void ControllerView::modelChanged()
 {
@@ -173,14 +176,14 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
+						tr( "&Remove this controller" ),
 						this, SLOT( deleteController() ) );
+	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
-
 
 
 void ControllerView::displayHelp()
