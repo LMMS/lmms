@@ -19,6 +19,7 @@ ADD_EXECUTABLE(tests
 	$<TARGET_OBJECTS:lmmsobjs>
 
 	src/core/ProjectVersionTest.cpp
-)
+	src/gui/MainWindowTest.cpp
+	src/gui/editors/BBEditorTest.cpp)
 TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})

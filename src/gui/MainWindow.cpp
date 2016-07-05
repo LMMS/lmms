@@ -105,6 +105,7 @@ MainWindow::MainWindow() :
 	emit initProgress(tr("Preparing plugin browser"));
 	sideBar->appendTab( new PluginBrowser( splitter ) );
 	emit initProgress(tr("Preparing file browsers"));
+	
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userProjectsDir() + "*" +
 				confMgr->factoryProjectsDir(),
@@ -112,12 +113,14 @@ MainWindow::MainWindow() :
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
+	
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +
 				confMgr->factorySamplesDir(),
 					"*", tr( "My Samples" ),
 					embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
+	
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userPresetsDir() + "*" +
 				confMgr->factoryPresetsDir(),
@@ -125,6 +128,7 @@ MainWindow::MainWindow() :
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true  ) );
+	
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
@@ -1416,9 +1420,6 @@ void MainWindow::keyPressEvent( QKeyEvent * _ke )
 	}
 }
 
-
-
-
 void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 {
 	switch( _ke->key() )
@@ -1427,11 +1428,11 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 		case Qt::Key_Shift: m_keyMods.m_shift = false; break;
 		case Qt::Key_Alt: m_keyMods.m_alt = false; break;
 		default:
-			if( InstrumentTrackView::topLevelInstrumentTrackWindow() )
-			{
-				InstrumentTrackView::topLevelInstrumentTrackWindow()->
-					pianoView()->keyReleaseEvent( _ke );
-			}
+            InstrumentTrackWindow *pInstrumentTrackWindow = InstrumentTrackView::topLevelInstrumentTrackWindow();
+            if(pInstrumentTrackWindow)
+            {
+                pInstrumentTrackWindow->pianoView()->keyReleaseEvent(_ke );
+            }
 			if( !_ke->isAccepted() )
 			{
 				QMainWindow::keyReleaseEvent( _ke );
@@ -1439,16 +1440,10 @@ void MainWindow::keyReleaseEvent( QKeyEvent * _ke )
 	}
 }
 
-
-
-
 void MainWindow::timerEvent( QTimerEvent * _te)
 {
 	emit periodicUpdate();
 }
-
-
-
 
 void MainWindow::fillTemplatesMenu()
 {

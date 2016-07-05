@@ -27,8 +27,7 @@
 #define BB_EDITOR_H
 
 #include "Editor.h"
-#include "TrackContainerView.h"
-
+#include "BBTrackContainerView.h"
 
 class BBTrackContainer;
 class ComboBox;
@@ -40,6 +39,7 @@ class BBEditor : public Editor
 	Q_OBJECT
 public:
 	BBEditor( BBTrackContainer * _tc );
+	BBEditor( BBTrackContainer * _tc, BBTrackContainerView * _tcView );
 	~BBEditor();
 
 	QSize sizeHint() const;
@@ -58,42 +58,10 @@ public slots:
 	void stop();
 
 private:
+	void initialize(BBTrackContainer * _tc);
+
 	BBTrackContainerView* m_trackContainerView;
 	ComboBox * m_bbComboBox;
 } ;
-
-
-
-class BBTrackContainerView : public TrackContainerView
-{
-	Q_OBJECT
-public:
-	BBTrackContainerView(BBTrackContainer* tc);
-
-	bool fixedTCOs() const
-	{
-		return true;
-	}
-
-	void removeBBView(int bb);
-
-	void saveSettings(QDomDocument& doc, QDomElement& element);
-	void loadSettings(const QDomElement& element);
-
-public slots:
-	void addSteps();
-	void cloneSteps();
-	void removeSteps();
-	void addAutomationTrack();
-
-protected slots:
-	void dropEvent(QDropEvent * de );
-	void updatePosition();
-
-private:
-	BBTrackContainer * m_bbtc;
-	void makeSteps( bool clone );
-};
-
 
 #endif

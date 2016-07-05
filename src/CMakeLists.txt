@@ -87,7 +87,7 @@ IF(CMAKE_VERSION VERSION_GREATER "2.8.7")
 		${LMMS_INCLUDES}
 		${LMMS_UI_OUT}
 		${LMMS_ER_H}
-	)
+			gui/editors/BBTrackContainerView.cpp ../include/BBTrackContainerView.h)
 	ADD_EXECUTABLE(lmms
 		core/main.cpp
 		$<TARGET_OBJECTS:lmmsobjs>

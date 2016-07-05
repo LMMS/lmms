@@ -25,7 +25,7 @@
 #include "BBEditor.h"
 
 #include <QAction>
-#include <QKeyEvent>
+
 #include <QLabel>
 #include <QLayout>
 #include <QMdiArea>
@@ -42,11 +42,21 @@
 #include "TrackContainer.h"
 #include "Pattern.h"
 
-
-
 BBEditor::BBEditor( BBTrackContainer* tc ) :
 	Editor(false),
-	m_trackContainerView( new BBTrackContainerView(tc) )
+	m_trackContainerView(new BBTrackContainerView(tc))
+{
+	this->initialize(tc);
+}
+
+BBEditor::BBEditor(BBTrackContainer* tc, BBTrackContainerView* containerView) :
+	Editor(false),
+	m_trackContainerView(containerView)
+{
+	this->initialize(tc);
+}
+
+void BBEditor::initialize( BBTrackContainer* tc )
 {
 	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
 	setWindowTitle( tr( "Beat+Bassline Editor" ) );
@@ -58,8 +68,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_trackContainerView, SLOT(dropEvent(QDropEvent*)));
 
 	// TODO: Use style sheet
-	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
+	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
 			     + 2 * TCO_BORDER_WIDTH + 264 );
@@ -144,12 +153,14 @@ QSize BBEditor::sizeHint() const
 
 void BBEditor::removeBBView( int bb )
 {
+	printf("BBEditor::removeBBView()\n");
 	m_trackContainerView->removeBBView(bb);
 }
 
 
 void BBEditor::play()
 {
+	printf("BBEditor::play()\n");
 	if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
 	{
 		Engine::getSong()->playBB();
@@ -163,134 +174,7 @@ void BBEditor::play()
 
 void BBEditor::stop()
 {
+	printf("BBEditor::stop()\n");
 	Engine::getSong()->stop();
 }
 
-
-
-
-BBTrackContainerView::BBTrackContainerView(BBTrackContainer* tc) :
-	TrackContainerView(tc),
-	m_bbtc(tc)
-{
-	setModel( tc );
-}
-
-
-
-
-void BBTrackContainerView::addSteps()
-{
-	makeSteps( false );
-}
-
-void BBTrackContainerView::cloneSteps()
-{
-	makeSteps( true );
-}
-
-
-
-
-void BBTrackContainerView::removeSteps()
-{
-	TrackContainer::TrackList tl = model()->tracks();
-
-	for( TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end(); ++it )
-	{
-		if( ( *it )->type() == Track::InstrumentTrack )
-		{
-			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
-			p->removeSteps();
-		}
-	}
-}
-
-
-
-
-void BBTrackContainerView::addAutomationTrack()
-{
-	(void) Track::create( Track::AutomationTrack, model() );
-}
-
-
-
-
-void BBTrackContainerView::removeBBView(int bb)
-{
-	for( TrackView* view : trackViews() )
-	{
-		view->getTrackContentWidget()->removeTCOView( bb );
-	}
-}
-
-
-
-void BBTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
-{
-	MainWindow::saveWidgetState(parentWidget(), element, QSize( 640, 400 ) );
-}
-
-void BBTrackContainerView::loadSettings(const QDomElement& element)
-{
-	MainWindow::restoreWidgetState(parentWidget(), element);
-}
-
-
-
-
-void BBTrackContainerView::dropEvent(QDropEvent* de)
-{
-	QString type = StringPairDrag::decodeKey( de );
-	QString value = StringPairDrag::decodeValue( de );
-
-	if( type.left( 6 ) == "track_" )
-	{
-		DataFile dataFile( value.toUtf8() );
-		Track * t = Track::create( dataFile.content().firstChild().toElement(), model() );
-
-		t->deleteTCOs();
-		m_bbtc->updateAfterTrackAdd();
-
-		de->accept();
-	}
-	else
-	{
-		TrackContainerView::dropEvent( de );
-	}
-}
-
-
-
-
-void BBTrackContainerView::updatePosition()
-{
-	//realignTracks();
-	emit positionChanged( m_currentPosition );
-}
-
-
-
-
-void BBTrackContainerView::makeSteps( bool clone )
-{
-	TrackContainer::TrackList tl = model()->tracks();
-
-	for( TrackContainer::TrackList::iterator it = tl.begin();
-		it != tl.end(); ++it )
-	{
-		if( ( *it )->type() == Track::InstrumentTrack )
-		{
-			Pattern* p = static_cast<Pattern *>( ( *it )->getTCO( m_bbtc->currentBB() ) );
-			if( clone )
-			{
-				p->cloneSteps();
-			} else
-			{
-				p->addSteps();
-			}
-		}
-	}
-}
