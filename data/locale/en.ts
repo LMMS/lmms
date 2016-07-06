@@ -900,7 +900,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
+        <source>&amp;Remove this controller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
