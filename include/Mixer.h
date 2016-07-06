@@ -37,6 +37,7 @@
 
 
 #include "lmms_basics.h"
+#include "LocklessList.h"
 #include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
@@ -379,7 +380,8 @@ private:
 
 	// playhandle stuff
 	PlayHandleList m_playHandles;
-	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
+	// place where new playhandles are added temporarily
+	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
 
