@@ -568,7 +568,7 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -900,8 +900,12 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Inserire il nuovo nome di questo controller</translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
-        <translation>&amp;Elimina questo plugin</translation>
+        <source>&amp;Remove this controller</source>
+        <translation>&amp;Rimuovi questo controller</translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
+        <translation>Ri&amp;nomina questo controller</translation>
     </message>
 </context>
 <context>
@@ -1284,6 +1288,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Name</source>
         <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
     </message>
     <message>
         <source>Description</source>
@@ -3508,10 +3516,6 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Questa manopola imposta la velocità dell&apos;LFO selezionato. Più grande è questo valore più velocemente l&apos;LFO oscillerà e più veloce sarà l&apos;effetto.</translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation>Q.TÀ</translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation>Quantità di modulazione:</translation>
     </message>
@@ -3568,6 +3572,10 @@ Fare doppio click per scegliere il file dell&apos;onda.</translation>
     <message>
         <source>Click here for a moog saw-wave.</source>
         <translation>Clicca per usare un&apos;onda Moog a banda limitata.</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
     </message>
 </context>
 <context>
@@ -3691,7 +3699,7 @@ Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Mostra/nascondi il Beat+Bassline Editor</translation>
+        <translation>Beat+Bassline Editor</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
@@ -5594,6 +5602,10 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
         <source>Piano-Roll - no pattern</source>
         <translation>Piano-Roll - nessun pattern</translation>
     </message>
+    <message>
+        <source>Quantize</source>
+        <translation>Quantizza</translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -6475,6 +6487,25 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
     <message>
         <source>Channel mode</source>
         <translation>Modalità del canale</translation>
+    </message>
+</context>
+<context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation>Chiudi</translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation>Massimizza</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Minimizza</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Apri</translation>
     </message>
 </context>
 <context>
