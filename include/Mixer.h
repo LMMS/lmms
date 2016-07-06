@@ -409,13 +409,14 @@ private:
 	bool m_clearSignal;
 
 	bool m_changesSignal;
-	bool m_waitForMixer;
 	unsigned int m_changes;
 	QMutex m_changesMutex;
 	QMutex m_doChangesMutex;
 	QMutex m_waitChangesMutex;
 	QWaitCondition m_changesMixerCondition;
 	QWaitCondition m_changesRequestCondition;
+
+	bool m_waitingForWrite;
 
 	friend class LmmsCore;
 	friend class MixerWorkerThread;
