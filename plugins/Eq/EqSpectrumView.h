@@ -144,7 +144,7 @@ public:
 		setFixedSize( 400, 200 );
 		QTimer *timer = new QTimer(this);
 		connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-		timer->start(10);
+		timer->start(20);
 		setAttribute( Qt::WA_TranslucentBackground, true );
 		m_skipBands = MAX_BANDS * 0.5;
 		float totalLength = log10( 20000 );
