@@ -261,6 +261,12 @@ TrackContainerView QFrame{
 	background-color: #262b30;
 }
 
+/* background for track controls */
+TrackView > QWidget{
+	background-color: #3B424A;
+}
+
+
 /* autoscroll, loop, stop behaviour toggle buttons */
 
 /* track background colors */
@@ -414,17 +420,16 @@ QToolButton:checked  {
 /* track label buttons - the part that contains the icon and track title */
 
 TrackLabelButton {
-	border: 1px solid #262b30;
-	background-color: #262b30;
-	border-radius: none;
+	background-color: #3B424A;
+	border: none;
 	font-size: 11px;
 	font-weight: normal;
 	padding: 2px 1px;
 }
 
 TrackLabelButton:hover {
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #333940, stop:1 #262b30);
-	border: 1px solid #262b30;
+	background: #3B424A;
+	border: 1px solid #515B66;
 	border-radius: none;
 	font-size: 11px;
 	font-weight: normal;
