@@ -901,8 +901,12 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
         <translation>Ingrese un nombre nuevo para este controlador</translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
-        <translation>Quita&amp;r este complemento</translation>
+        <source>&amp;Remove this controller</source>
+        <translation>Quita&amp;R este controlador</translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
+        <translation>Re&amp;Nombrar este controlador</translation>
     </message>
 </context>
 <context>
@@ -1285,6 +1289,10 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <message>
         <source>Name</source>
         <translation>Nombre</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
     </message>
     <message>
         <source>Description</source>
@@ -3509,10 +3517,6 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
         <translation>Usa esta perilla para definir la velocidad del LFO. A mayor valor, más rápida la velocidad de oscilación del LFO y más rápido el efecto.</translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation>CANT</translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation>Cantidad de modulación:</translation>
     </message>
@@ -3569,6 +3573,10 @@ Haz doble click para seleccionar un archivo.</translation>
     <message>
         <source>Click here for a moog saw-wave.</source>
         <translation>Haz click aquí para elegir una onda moog.</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>CANT</translation>
     </message>
 </context>
 <context>
@@ -5594,6 +5602,10 @@ PM significa &apos;modulación de fase&apos;. La fase el oscilador 3 es modulada
         <source>Piano-Roll - no pattern</source>
         <translation>Piano-Roll - sin patrón</translation>
     </message>
+    <message>
+        <source>Quantize</source>
+        <translation>Cuantizar</translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -6474,6 +6486,25 @@ Recuerda también guardar tu proyecto manualmente.</translation>
     <message>
         <source>Channel mode</source>
         <translation>Modo del canal</translation>
+    </message>
+</context>
+<context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation>Cerrar</translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation>Maximizar</translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation>Minimizar</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Restaurar</translation>
     </message>
 </context>
 <context>
