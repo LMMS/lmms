@@ -1,91 +1,86 @@
 <?xml version="1.0"?>
 <!DOCTYPE lmms-project>
-<lmms-project type="song" version="1.0" creatorversion="1.1.90-g9c5cbbe" creator="LMMS">
-  <head masterpitch="0" bpm="140" timesig_denominator="4" mastervol="100" timesig_numerator="4"/>
+<lmms-project type="song" version="1.0" creator="LMMS" creatorversion="1.2.0">
+  <head timesig_denominator="4" bpm="140" masterpitch="0" mastervol="100" timesig_numerator="4"/>
   <song>
-    <trackcontainer visible="1" type="song" x="425" y="16" height="159" width="580" maximized="0" minimized="0">
-      <track type="1" name="Beat/Bassline 0" muted="0" solo="0">
+    <trackcontainer visible="1" width="580" height="159" type="song" x="425" y="16" maximized="0" minimized="0">
+      <track type="1" muted="0" name="Beat/Bassline 0" solo="0">
         <bbtrack>
-          <trackcontainer visible="1" type="bbtrackcontainer" x="426" y="182" height="249" width="580" maximized="0" minimized="0">
-            <track type="0" name="Jupiter" muted="0" solo="0">
-              <instrumenttrack pan="0" pitchrange="1" basenote="57" fxch="0" pitch="0" usemasterpitch="1" vol="29">
+          <trackcontainer visible="1" width="580" height="249" type="bbtrackcontainer" x="426" y="182" maximized="0" minimized="0">
+            <track type="0" muted="0" name="Jupiter" solo="0">
+              <instrumenttrack pitch="0" vol="29" fxch="0" pan="0" basenote="57" usemasterpitch="1" pitchrange="1">
                 <instrument name="tripleoscillator">
-                  <tripleoscillator stphdetun0="121" stphdetun1="259" userwavefile0="" stphdetun2="92" userwavefile1="" phoffset0="0" userwavefile2="samples/shapes/smooth_inv_saw.ogg" phoffset1="266" phoffset2="80" modalgo1="2" modalgo2="0" modalgo3="2" finel0="0" coarse0="0" finer0="0" finel1="-16" coarse1="0" finer1="13" coarse2="12" finel2="0" finer2="0" wavetype0="2" wavetype1="2" vol0="100" wavetype2="3" vol1="100" vol2="63" pan0="0" pan1="0" pan2="0"/>
+                  <tripleoscillator finel0="0" vol1="100" finel1="-16" coarse0="0" finer0="0" vol2="63" pan0="0" finer1="13" coarse1="0" finel2="0" pan1="0" coarse2="12" finer2="0" pan2="0" wavetype0="2" wavetype1="2" wavetype2="3" phoffset0="0" phoffset1="266" phoffset2="80" modalgo1="2" modalgo2="0" modalgo3="2" stphdetun0="121" stphdetun1="259" stphdetun2="92" userwavefile0="" userwavefile1="" userwavefile2="samples/shapes/smooth_inv_saw.ogg" vol0="100"/>
                 </instrument>
-                <eldata fwet="1" fres="1.2" ftype="7" fcut="1754">
-                  <elvol dec="0.597" syncmode="0" latt="0" att="0" lamt="0" amt="1" lshp="0" x100="0" userwavefile="" ctlenvamt="0" lspd_numerator="4" lpdel="0" sustain="1" lspd_denominator="4" lspd="0.1" pdel="0" rel="0.328" hold="0"/>
-                  <elcut dec="0.136" syncmode="0" latt="0" att="0" lamt="0.63" amt="0.82" lshp="1" x100="0" userwavefile="" ctlenvamt="1" lspd_numerator="4" lpdel="0" sustain="0.002" lspd_denominator="4" lspd="0.2918" pdel="0" rel="0.016" hold="0"/>
-                  <elres dec="0.499" syncmode="0" latt="0" att="0" lamt="0" amt="0" lshp="0" x100="0" userwavefile="" ctlenvamt="0" lspd_numerator="4" lpdel="0" sustain="0.501" lspd_denominator="4" lspd="0.1" pdel="0" rel="0.1" hold="0.499"/>
+                <eldata fwet="1" ftype="7" fres="1.2" fcut="1754">
+                  <elvol lspd="0.1" ctlenvamt="0" lpdel="0" pdel="0" amt="1" hold="0" syncmode="0" userwavefile="" latt="0" sustain="1" lamt="0" lshp="0" lspd_denominator="4" lspd_numerator="4" x100="0" rel="0.328" dec="0.597" att="0"/>
+                  <elcut lspd="0.2918" ctlenvamt="1" lpdel="0" pdel="0" amt="0.82" hold="0" syncmode="0" userwavefile="" latt="0" sustain="0.002" lamt="0.63" lshp="1" lspd_denominator="4" lspd_numerator="4" x100="0" rel="0.016" dec="0.136" att="0"/>
+                  <elres lspd="0.1" ctlenvamt="0" lpdel="0" pdel="0" amt="0" hold="0.499" syncmode="0" userwavefile="" latt="0" sustain="0.501" lamt="0" lshp="0" lspd_denominator="4" lspd_numerator="4" x100="0" rel="0.1" dec="0.499" att="0"/>
                 </eldata>
-                <chordcreator chord-enabled="1" chordrange="1" chord="0"/>
-                <arpeggiator arpgate="100" arp-enabled="0" syncmode="0" arpdir="0" arprange="2" arp="8" arptime_numerator="4" arptime_denominator="4" arpmode="0" arptime="158"/>
-                <midiport fixedinputvelocity="-1" readable="0" writable="0" outputcontroller="0" basevelocity="127" fixedoutputnote="-1" outputchannel="1" outputprogram="1" inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0"/>
-                <fxchain enabled="0" numofeffects="0"/>
+                <chordcreator chordrange="1" chord="0" chord-enabled="1"/>
+                <arpeggiator arpdir="0" arpgate="100" arptime_denominator="4" syncmode="0" arp-enabled="0" arprange="2" arptime_numerator="4" arpmode="0" arp="8" arptime="158"/>
+                <midiport inputchannel="0" fixedinputvelocity="-1" outputcontroller="0" outputchannel="1" fixedoutputvelocity="-1" readable="0" fixedoutputnote="-1" outputprogram="1" writable="0" basevelocity="127" inputcontroller="0"/>
+                <fxchain numofeffects="0" enabled="0"/>
               </instrumenttrack>
-              <pattern pos="0" type="1" len="192" name="Jupiter" muted="0" steps="16">
-                <note pos="0" pan="0" len="12" key="72" vol="100"/>
-                <note pos="12" pan="0" len="12" key="65" vol="84"/>
-                <note pos="18" pan="0" len="12" key="56" vol="64"/>
-                <note pos="24" pan="0" len="12" key="68" vol="46"/>
-                <note pos="24" pan="0" len="12" key="72" vol="54"/>
-                <note pos="36" pan="0" len="12" key="61" vol="64"/>
-                <note pos="42" pan="0" len="12" key="53" vol="34"/>
-                <note pos="48" pan="0" len="12" key="68" vol="16"/>
-                <note pos="60" pan="0" len="12" key="60" vol="42"/>
-                <note pos="72" pan="0" len="12" key="72" vol="6"/>
-                <note pos="84" pan="0" len="12" key="53" vol="34"/>
-                <note pos="96" pan="0" len="12" key="72" vol="100"/>
-                <note pos="108" pan="0" len="12" key="65" vol="88"/>
-                <note pos="120" pan="0" len="12" key="68" vol="58"/>
-                <note pos="120" pan="0" len="12" key="72" vol="52"/>
-                <note pos="132" pan="0" len="12" key="61" vol="66"/>
-                <note pos="144" pan="0" len="12" key="68" vol="16"/>
-                <note pos="156" pan="0" len="12" key="60" vol="56"/>
-                <note pos="168" pan="0" len="12" key="72" vol="6"/>
-                <note pos="180" pan="0" len="12" key="53" vol="50"/>
+              <pattern type="1" muted="0" steps="16" name="Jupiter" pos="0" len="192">
+                <note key="72" vol="100" pos="0" pan="0" len="12"/>
+                <note key="65" vol="84" pos="12" pan="0" len="12"/>
+                <note key="56" vol="64" pos="18" pan="0" len="12"/>
+                <note key="68" vol="46" pos="24" pan="0" len="12"/>
+                <note key="72" vol="54" pos="24" pan="0" len="12"/>
+                <note key="61" vol="64" pos="36" pan="0" len="12"/>
+                <note key="53" vol="34" pos="42" pan="0" len="12"/>
+                <note key="68" vol="16" pos="48" pan="0" len="12"/>
+                <note key="60" vol="42" pos="60" pan="0" len="12"/>
+                <note key="72" vol="6" pos="72" pan="0" len="12"/>
+                <note key="53" vol="34" pos="84" pan="0" len="12"/>
+                <note key="72" vol="100" pos="96" pan="0" len="12"/>
+                <note key="65" vol="88" pos="108" pan="0" len="12"/>
+                <note key="68" vol="58" pos="120" pan="0" len="12"/>
+                <note key="72" vol="52" pos="120" pan="0" len="12"/>
+                <note key="61" vol="66" pos="132" pan="0" len="12"/>
+                <note key="68" vol="16" pos="144" pan="0" len="12"/>
+                <note key="60" vol="56" pos="156" pan="0" len="12"/>
+                <note key="72" vol="6" pos="168" pan="0" len="12"/>
+                <note key="53" vol="50" pos="180" pan="0" len="12"/>
               </pattern>
             </track>
           </trackcontainer>
         </bbtrack>
-        <bbtco pos="0" color="4282417407" len="1536" usestyle="1" name="Beat/Baseline 0" muted="0"/>
+        <bbtco usestyle="1" muted="0" name="Beat/Baseline 0" pos="0" len="1536" color="4282417407"/>
       </track>
     </trackcontainer>
-    <track type="6" name="Automation track" muted="0" solo="0">
+    <track type="6" muted="0" name="Automation track" solo="0">
       <automationtrack/>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Tempo" tens="1">
+      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192">
         <time pos="0" value="140"/>
       </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Master volume" tens="1">
+      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192">
         <time pos="0" value="100"/>
       </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Master pitch" tens="1">
+      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192">
         <time pos="0" value="0"/>
       </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Numerator" tens="1">
-        <object id="5548314"/>
-      </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Denominator" tens="1">
-        <object id="5774662"/>
-      </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Tempo" tens="1">
-        <object id="585020"/>
-      </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Master volume" tens="1">
-        <object id="1061329"/>
-      </automationpattern>
-      <automationpattern pos="0" prog="0" len="192" mute="0" name="Master pitch" tens="1">
-        <object id="1260714"/>
-      </automationpattern>
+      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
     </track>
-    <fxmixer visible="1" x="9" y="441" height="332" width="647" maximized="0" minimized="0">
-      <fxchannel name="Master" muted="0" num="0" volume="1" soloed="0">
-        <fxchain enabled="0" numofeffects="0"/>
+    <fxmixer visible="1" width="647" height="332" x="9" y="441" maximized="0" minimized="0">
+      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+        <fxchain numofeffects="0" enabled="0"/>
+        <connection>
+          <muted>
+            <Midicontroller type="2" inputchannel="1" fixedinputvelocity="-1" outputcontroller="0" inports="" name="MIDI ch1 ctrl37" outputchannel="1" fixedoutputvelocity="-1" readable="1" fixedoutputnote="-1" outputprogram="1" writable="0" basevelocity="127" inputcontroller="37"/>
+          </muted>
+        </connection>
       </fxchannel>
     </fxmixer>
-    <ControllerRackView visible="1" x="664" y="444" height="173" width="258" maximized="0" minimized="0"/>
-    <pianoroll visible="0" x="1" y="1" height="480" width="640" maximized="1" minimized="0"/>
-    <automationeditor visible="0" x="356" y="129" height="400" width="640" maximized="0" minimized="0"/>
-    <projectnotes visible="1" x="9" y="16" height="394" width="408" maximized="0" minimized="0"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+    <ControllerRackView visible="1" width="258" height="173" x="664" y="444" maximized="0" minimized="0"/>
+    <pianoroll visible="0" width="640" height="480" x="1" y="1" maximized="1" minimized="0"/>
+    <automationeditor visible="0" width="640" height="400" x="356" y="129" maximized="0" minimized="0"/>
+    <projectnotes visible="1" width="408" height="394" x="9" y="16" maximized="0" minimized="0"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
 p, li { white-space: pre-wrap; }
 </style></head><body style=" font-family:'Verdana'; font-size:11pt; font-weight:600; font-style:normal;">
@@ -95,7 +90,7 @@ p, li { white-space: pre-wrap; }
 <p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">3.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Try to change the volume of some notes by changing the length of these lines with the mouse.</span></p>
 <p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">4.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Listen to the result by clicking on the &quot;play&quot;-button!</span></p>
 <p style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;">(</span><span style=" font-family:'Bitstream Vera Sans'; color:#00ffff;">5.</span><span style=" font-family:'Bitstream Vera Sans'; color:#cbcbcb;"> Create your own tracks with dynamic note-volumes!!)</span></p></body></html>]]></projectnotes>
-    <timeline lp0pos="0" lpstate="0" lp1pos="192"/>
+    <timeline lp0pos="0" lp1pos="192" lpstate="0"/>
     <controllers/>
   </song>
 </lmms-project>
