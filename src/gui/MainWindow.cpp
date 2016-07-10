@@ -128,7 +128,7 @@ MainWindow::MainWindow() :
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
-							splitter, false, true ) );
+							splitter, false, false ) );
 
 
 	QStringList root_paths;
