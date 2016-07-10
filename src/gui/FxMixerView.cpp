@@ -50,6 +50,7 @@
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
+#include "lmms_math.h"
 
 FxMixerView::FxMixerView() :
 	QWidget(),
@@ -280,6 +281,11 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 
 	m_fader = new Fader( &fxChannel->m_volumeModel,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
+	m_fader->setLevelsDisplayedInDBFS();
+	// TODO dbvToAmp is really dBFSToAmp. Rename in later commit.
+	m_fader->setMinPeak(dbvToAmp(-40));
+	m_fader->setMaxPeak(dbvToAmp(12));
+
 	m_fader->move( 16-m_fader->width()/2,
 					m_fxLine->height()-
 					m_fader->height()-5 );
