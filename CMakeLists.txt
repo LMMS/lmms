@@ -554,6 +554,11 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf "${TMP}")
 
 #
+# adds minimalist target, useful when bisecting
+#
+ADD_CUSTOM_TARGET(minimal DEPENDS lmms audiofileprocessor kicker tripleoscillator)
+
+#
 # display configuration information
 #
 
