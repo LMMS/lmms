@@ -729,13 +729,13 @@ int main( int argc, char * * argv )
 				MainWindow::tr( "Recover" ),
 				MainWindow::tr( "Recover the file. Please don't run "
 					"multiple instances of LMMS when you do this." ),
+				MainWindow::tr( "Discard" ),
+				MainWindow::tr( "Launch a default session and delete "
+					"the restored files. This is not reversible." ),
 				MainWindow::tr( "Ignore" ),
 				MainWindow::tr( "Launch LMMS as usual but with "
 					"automatic backup disabled to prevent the "
 					"present recover file from being overwritten." ),
-				MainWindow::tr( "Discard" ),
-				MainWindow::tr( "Launch a default session and delete "
-					"the restored files. This is not reversible." ),
 				MainWindow::tr( "Exit" ),
 				MainWindow::tr( "Shut down LMMS with no further action." )
 							) );
@@ -744,8 +744,8 @@ int main( int argc, char * * argv )
 			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
 
 			QPushButton * recover;
-			QPushButton * ignore;
 			QPushButton * discard;
+			QPushButton * ignore;
 			QPushButton * exit;
 
 			recover = mb.addButton( MainWindow::tr( "Recover" ),
@@ -755,6 +755,7 @@ int main( int argc, char * * argv )
 			discard = mb.addButton( MainWindow::tr( "Discard" ),
 								QMessageBox::DestructiveRole );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
+
 
 			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 								QMessageBox::NoRole );
