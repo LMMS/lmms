@@ -33,6 +33,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QTimer>
 
 #include "base64.h"
 #include "ConfigManager.h"
@@ -959,9 +960,10 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
-					QMessageBox::information( NULL,
-						SongEditor::tr( "Project Version Mismatch" ),
-						SongEditor::tr( 
+					QMessageBox *mb = new QMessageBox();
+					mb->setWindowTitle( SongEditor::tr( "Project Version Mismatch" ) );
+					mb->setIcon(QMessageBox::Information);
+					mb->setText( SongEditor::tr( 
 								"This %1 was created with "
 								"LMMS version %2, but version %3 "
 								"is installed")
@@ -970,6 +972,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
                                                                         SongEditor::tr("project") )
 								.arg( root.attribute( "creatorversion" ) )
 								.arg( LMMS_VERSION ) );
+					QTimer::singleShot(5000, mb, SLOT( close() ) );
+					mb->exec();					
 				}
 			}
 
