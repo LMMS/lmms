@@ -269,7 +269,6 @@ private:
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class FlpImport;
 	friend class InstrumentMiscView;
 
 } ;

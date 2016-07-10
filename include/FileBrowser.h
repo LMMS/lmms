@@ -179,7 +179,6 @@ public:
 		SoundFontFile,
 		PatchFile,
 		MidiFile,
-		FlpFile,
 		VstPluginFile,
 		UnknownFile,
 		NumFileTypes
@@ -228,7 +227,6 @@ private:
 	static QPixmap * s_soundfontFilePixmap;
 	static QPixmap * s_vstPluginFilePixmap;
 	static QPixmap * s_midiFilePixmap;
-	static QPixmap * s_flpFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;
