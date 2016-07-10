@@ -736,34 +736,35 @@ int main( int argc, char * * argv )
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
 					"the restored files. This is not reversible." ),
-				MainWindow::tr( "Quit" ),
+				MainWindow::tr( "Exit" ),
 				MainWindow::tr( "Shut down LMMS with no further action." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
 			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
 
-			mb.setStandardButtons( 	QMessageBox::Ok |
-							QMessageBox::Discard );
-
-			mb.setButtonText( QMessageBox::Ok,
-							MainWindow::tr( "Recover" ) );
-
-			QAbstractButton * recover;
-			QAbstractButton * discard;
+			QPushButton * recover;
 			QPushButton * ignore;
+			QPushButton * discard;
 			QPushButton * exit;
 
-			recover = mb.QMessageBox::button( QMessageBox::Ok );
-			discard = mb.QMessageBox::button( QMessageBox::Discard );
+			recover = mb.addButton( MainWindow::tr( "Recover" ),
+								QMessageBox::AcceptRole );
+			recover->setIcon( embed::getIconPixmap( "recover" ) );
+
+			discard = mb.addButton( MainWindow::tr( "Discard" ),
+								QMessageBox::DestructiveRole );
+			discard->setIcon( embed::getIconPixmap( "discard" ) );
+
 			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 								QMessageBox::NoRole );
-			ignore->setIcon( embed::getIconPixmap( "no_entry" ) );
+			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
+
 			exit = mb.addButton( MainWindow::tr( "Exit" ),
 								QMessageBox::RejectRole );
 			exit->setIcon( embed::getIconPixmap( "exit" ) );
 
-			mb.setDefaultButton( QMessageBox::Ok );
+			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
 
 			mb.exec();
@@ -771,7 +772,7 @@ int main( int argc, char * * argv )
 			{
 				gui->mainWindow()->sessionCleanup();
 			}
-			else if( mb.clickedButton() == recover ) // ::Recover
+			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
