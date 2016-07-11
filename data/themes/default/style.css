@@ -619,8 +619,8 @@ BBTCOView {
 
 /* Subwindows in MDI-Area */
 SubWindow {
-	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #3D454F, stop:1 #262B30);
-	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #202329, stop:1 #14171A);
+	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #090909, stop:0.05 #3D454F, stop:1 #262B30);
+	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #090909, stop:0.05 #636c7a, stop:1 #343840);
 	qproperty-textShadowColor: #000;
 	qproperty-borderColor: #323940;
 }
