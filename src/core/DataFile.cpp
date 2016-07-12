@@ -191,7 +191,7 @@ bool DataFile::validate( QString extension )
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "pat" || extension == "mid" ||
-				extension == "flp" || extension == "dll"
+				extension == "dll"
 				) )
 		{
 			return true;

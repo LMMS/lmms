@@ -478,9 +478,6 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 							embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
 				case FileItem::MidiFile:
-// don't allow dragging FLP-files as FLP import filter clears project
-// without asking
-//				case fileItem::FlpFile:
 					new StringPairDrag( "importedproject", f->fullName(),
 							embed::getIconPixmap( "midi_file" ), this );
 					break;
@@ -568,11 +565,6 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 		}
 
 		case FileItem::ImportAsProject:
-			if( f->type() == FileItem::FlpFile &&
-				!gui->mainWindow()->mayChangeProject(true) )
-			{
-				break;
-			}
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
 			break;
@@ -853,7 +845,6 @@ QPixmap * FileItem::s_sampleFilePixmap = NULL;
 QPixmap * FileItem::s_soundfontFilePixmap = NULL;
 QPixmap * FileItem::s_vstPluginFilePixmap = NULL;
 QPixmap * FileItem::s_midiFilePixmap = NULL;
-QPixmap * FileItem::s_flpFilePixmap = NULL;
 QPixmap * FileItem::s_unknownFilePixmap = NULL;
 
 
@@ -918,12 +909,6 @@ void FileItem::initPixmaps( void )
 							"midi_file", 16, 16 ) );
 	}
 
-	if( s_flpFilePixmap == NULL )
-	{
-		s_flpFilePixmap = new QPixmap( embed::getIconPixmap(
-							"midi_file", 16, 16 ) );
-	}
-
 	if( s_unknownFilePixmap == NULL )
 	{
 		s_unknownFilePixmap = new QPixmap( embed::getIconPixmap(
@@ -950,9 +935,6 @@ void FileItem::initPixmaps( void )
 			break;
 		case MidiFile:
 			setIcon( 0, *s_midiFilePixmap );
-			break;
-		case FlpFile:
-			setIcon( 0, *s_flpFilePixmap );
 			break;
 		case UnknownFile:
 		default:
@@ -995,11 +977,6 @@ void FileItem::determineFileType( void )
 	else if( ext == "mid" )
 	{
 		m_type = MidiFile;
-		m_handling = ImportAsProject;
-	}
-	else if( ext == "flp" )
-	{
-		m_type = FlpFile;
 		m_handling = ImportAsProject;
 	}
 	else if( ext == "dll" )

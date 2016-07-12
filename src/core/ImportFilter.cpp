@@ -1,5 +1,5 @@
 /*
- * ImportFilter.cpp - base-class for all import-filters (MIDI, FLP etc)
+ * ImportFilter.cpp - base-class for all import-filters
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
