@@ -179,7 +179,6 @@ private:
 
 
 	friend class EnvelopeAndLfoView;
-	friend class FlpImport;
 
 } ;
 
