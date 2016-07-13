@@ -62,6 +62,7 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "DataFile.h"
 #include "PixmapButton.h"
 #include "ProjectJournal.h"
@@ -1971,6 +1972,8 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
  */
 Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = create(
 		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
 									tc );
@@ -1978,6 +1981,9 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 	{
 		t->restoreState( element );
 	}
+
+	Engine::mixer()->doneChangeInModel();
+
 	return t;
 }
 
