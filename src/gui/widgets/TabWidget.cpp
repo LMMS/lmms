@@ -57,7 +57,7 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
-        QColor bg_color = QApplication::palette().color( QPalette::Active,
+	QColor bg_color = QApplication::palette().color( QPalette::Active,
                                                         QPalette::Background ).
                                                                 darker( 132 );
         QPalette pal = palette();
@@ -160,7 +160,8 @@ bool TabWidget::event(QEvent *event)
 		{
 			// Display tab's tooltip
 			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].tooltip );
-		} else
+		}
+		else
 		{
 			// The tooltip event doesn't relate to any tab, let's ignore it
 			QToolTip::hideText();
@@ -245,8 +246,8 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	}
 
 	// Draw all tabs
-        for( widgetStack::iterator it = first ; it != last ; ++it )
-        {
+	for( widgetStack::iterator it = first ; it != last ; ++it )
+	{
 
 		// Draw a text tab or a artwork tab.
 		if ( m_usePixmap )
@@ -259,17 +260,19 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 
 			// Select artwork's color and highlight active tab
 			if( it.key() == m_activeTab )
-                        {
+			{
 				p.fillRect( tab_x_offset, 0, ( *it ).nwidth, m_tabbarHeight - 1, tabSelected() );
 				p.setPen( tabArtworkActive() );
-			} else 
+			}
+			else 
 			{
 				p.setPen( tabArtworkInactive() );
 			}
 			
 			// Draw colorized artwork
-               		p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - mask.width() ) / 2, 1, mask );
-		} else
+			p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - mask.width() ) / 2, 1, mask );
+		}
+		else
 		{
 			// Highlight tab when active
                 	if( it.key() == m_activeTab )
