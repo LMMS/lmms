@@ -3,8 +3,8 @@
 [![Build status](https://img.shields.io/travis/LMMS/lmms.svg?maxAge=3600)](https://travis-ci.org/LMMS/lmms)
 [![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)
 [![Overall downloads on Github](https://img.shields.io/github/downloads/LMMS/lmms/total.svg?maxAge=3600)](https://github.com/LMMS/lmms/releases)
-[![Join the chat at Gitter](https://img.shields.io/gitter/room/LMMS/lmms.svg?maxAge=3600)](https://gitter.im/LMMS/lmms)
-[![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg?maxAge=3600)](https://www.transifex.com/lmms/lmms/)
+[![Join the chat at Discord](https://img.shields.io/badge/chat%20on-discord-7289DA.svg)](https://discord.gg/5kSc32Z)
+[![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
 What is LMMS?
 --------------
