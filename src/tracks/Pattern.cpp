@@ -65,26 +65,11 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	m_steps( MidiTime::stepsPerTact() )
 {
 	setName( _instrument_track->name() );
-
-	// Resize this track to be the same as existing tracks in the BB
-	const TrackContainer::TrackList & tracks =
-		m_instrumentTrack->trackContainer()->tracks();
-	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
+	if( _instrument_track->trackContainer()
+					== Engine::getBBTrackContainer() )
 	{
-		if(tracks.at(trackID)->type() == Track::InstrumentTrack)
-		{
-			if(tracks.at(trackID) != m_instrumentTrack)
-			{
-				unsigned int currentTCO = m_instrumentTrack->
-					getTCOs().indexOf(this);
-				m_steps = static_cast<Pattern *>
-					(tracks.at(trackID)->getTCO(currentTCO))
-					->m_steps;
-			}
-			break;
-		}
+		resizeToFirstTrack();
 	}
-
 	init();
 	setAutoResize( true );
 }
@@ -130,6 +115,31 @@ Pattern::~Pattern()
 	}
 
 	m_notes.clear();
+}
+
+
+
+
+void Pattern::resizeToFirstTrack()
+{
+	// Resize this track to be the same as existing tracks in the BB
+	const TrackContainer::TrackList & tracks =
+		m_instrumentTrack->trackContainer()->tracks();
+	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
+	{
+		if(tracks.at(trackID)->type() == Track::InstrumentTrack)
+		{
+			if(tracks.at(trackID) != m_instrumentTrack)
+			{
+				unsigned int currentTCO = m_instrumentTrack->
+					getTCOs().indexOf(this);
+				m_steps = static_cast<Pattern *>
+					(tracks.at(trackID)->getTCO(currentTCO))
+					->m_steps;
+			}
+			break;
+		}
+	}
 }
 
 
