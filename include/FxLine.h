@@ -26,13 +26,17 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsProxyWidget>
+#include <QLineEdit>
 #include <QWidget>
-#include <QLabel>
-#include <QStaticText>
 
 #include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
+
+
 
 class FxMixerView;
 class SendButtonIndicator;
@@ -75,11 +79,11 @@ public:
 	QColor strokeInnerInactive() const;
 	void setStrokeInnerInactive( const QColor & c );
 
-
 	static const int FxLineHeight;
 
 private:
-	void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
+	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
+	QString elideName( QString name );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
@@ -91,17 +95,22 @@ private:
 	QColor m_strokeInnerInactive;
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
-
-	QStaticText m_staticTextName;
+	bool m_inRename;
+	QString m_newName;
+	QLineEdit * m_renameLineEdit;
+	QGraphicsProxyWidget * m_proxyWidget;
+	QGraphicsView * m_view;
+	QGraphicsScene * m_scene;
+	QString m_name;
 
 private slots:
 	void renameChannel();
+	void renameFinished();
 	void removeChannel();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
 	void displayHelp();
-
 };
 
 
