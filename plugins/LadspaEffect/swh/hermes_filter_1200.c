@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -117,7 +117,7 @@ inline void setup_f_svf(sv_filter *sv, const float fs, const float fc) {
 
 /* Run one sample through the SV filter. Filter is by andy@vellocet */
 
-inline float run_svf(sv_filter *sv, float in) {
+static inline float run_svf(sv_filter *sv, float in) {
         float out;
         int i;
 
@@ -144,7 +144,7 @@ inline float run_svf(sv_filter *sv, float in) {
         return out;
 }
 
-inline int wave_tbl(const float wave) {
+static inline int wave_tbl(const float wave) {
         switch (f_round(wave)) {
                 case 0:
                 return BLO_SINE;
@@ -1403,7 +1403,7 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	plugin_data->lfo2_phase = lfo2_phase;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -1997,7 +1997,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (hermesFilterDescriptor) {
 		free((LADSPA_PortDescriptor *)hermesFilterDescriptor->PortDescriptors);
 		free((char **)hermesFilterDescriptor->PortNames);

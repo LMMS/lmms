@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -932,7 +932,7 @@ static void runAddingDelay_c(LADSPA_Handle instance, unsigned long sample_count)
 	(void)(max_delay);
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -1162,7 +1162,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (delay_nDescriptor) {
 		free((LADSPA_PortDescriptor *)delay_nDescriptor->PortDescriptors);
 		free((char **)delay_nDescriptor->PortNames);
