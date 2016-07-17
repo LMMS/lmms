@@ -37,11 +37,13 @@
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
+#include "embed.h"
 #include "GuiApplication.h"
 #include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
+#include "TextFloat.h"
 
 
 
@@ -959,17 +961,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
-					QMessageBox::information( NULL,
-						SongEditor::tr( "Project Version Mismatch" ),
-						SongEditor::tr( 
-								"This %1 was created with "
-								"LMMS version %2, but version %3 "
-								"is installed")
-								.arg( _sourceFile.endsWith( ".mpt" ) ?
-                                                                        SongEditor::tr("template") :
-                                                                        SongEditor::tr("project") )
-								.arg( root.attribute( "creatorversion" ) )
-								.arg( LMMS_VERSION ) );
+					TextFloat::displayMessage(
+						SongEditor::tr( "Version difference" ),
+						SongEditor::tr(
+							"This %1 was created with "
+							"LMMS %2."
+						).arg(
+							_sourceFile.endsWith( ".mpt" ) ?
+								SongEditor::tr( "template" ) :
+								SongEditor::tr( "project" )
+						)
+						.arg( root.attribute( "creatorversion" ) ),
+						embed::getIconPixmap( "whatsthis", 24, 24 ),
+						2500
+					);
 				}
 			}
 
@@ -984,4 +989,3 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_content = root.elementsByTagName( typeName( m_type ) ).
 							item( 0 ).toElement();
 }
-
