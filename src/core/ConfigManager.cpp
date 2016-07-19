@@ -55,7 +55,6 @@ ConfigManager::ConfigManager() :
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
-	m_flDir( QDir::home().absolutePath() ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
@@ -188,14 +187,6 @@ void ConfigManager::setVSTDir( const QString & _vd )
 void ConfigManager::setArtworkDir( const QString & _ad )
 {
 	m_artworkDir = ensureTrailingSlash( _ad );
-}
-
-
-
-
-void ConfigManager::setFLDir( const QString & _fd )
-{
-	m_flDir = ensureTrailingSlash( _fd );
 }
 
 
@@ -422,7 +413,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
 			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
-			setFLDir( value( "paths", "fldir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
 		#ifdef LMMS_HAVE_STK
 			setSTKDir( value( "paths", "stkdir" ) );
@@ -453,11 +443,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 #else
 		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
-	}
-
-	if( m_flDir.isEmpty() || m_flDir == QDir::separator() || m_flDir == "/")
-	{
-		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
 	if( m_ladDir.isEmpty()  )
@@ -502,7 +487,6 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
-	setValue( "paths", "fldir", m_flDir );
 	setValue( "paths", "gigdir", m_gigDir );
 	setValue( "paths", "sf2dir", m_sf2Dir );
 	setValue( "paths", "laddir", m_ladDir );
