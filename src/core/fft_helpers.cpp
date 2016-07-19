@@ -204,7 +204,7 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 
 		if ( (j_min<0)||(j_max<0) )
 		{
-			fprintf(stderr, "Error: calc13octaveband31() in %s line %d failed.\n", __FILE__, __LINE__);
+			fprintf(stderr, "Error: calc13octaveband31() in fft_helpers.cpp line %d failed.\n", __LINE__);
 			return -1;
 		}
 
