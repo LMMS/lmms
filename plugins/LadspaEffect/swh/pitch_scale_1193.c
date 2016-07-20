@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -241,7 +241,7 @@ static void runAddingPitchScale(LADSPA_Handle instance, unsigned long sample_cou
 	                                OVER_SAMP);
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -326,7 +326,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (pitchScaleDescriptor) {
 		free((LADSPA_PortDescriptor *)pitchScaleDescriptor->PortDescriptors);
 		free((char **)pitchScaleDescriptor->PortNames);
