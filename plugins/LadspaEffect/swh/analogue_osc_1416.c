@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -201,7 +201,7 @@ static void runAnalogueOsc(LADSPA_Handle instance, unsigned long sample_count) {
 	  y = (x - q) / (1.0f - f_exp(-1.2f * (x - q))) +
 	        q / (1.0f - f_exp(1.2f * q));
 	  /* Catch the case where x ~= q */
-	  if (fabs(y) > 1.0f) {
+	  if (isnan(y) || fabs(y) > 1.0f) {
 	          y = 0.83333f + q / (1.0f - f_exp(1.2f * q));
 	  }
 	  otm2 = otm1;
@@ -280,7 +280,7 @@ static void runAddingAnalogueOsc(LADSPA_Handle instance, unsigned long sample_co
 	  y = (x - q) / (1.0f - f_exp(-1.2f * (x - q))) +
 	        q / (1.0f - f_exp(1.2f * q));
 	  /* Catch the case where x ~= q */
-	  if (fabs(y) > 1.0f) {
+	  if (isnan(y) || fabs(y) > 1.0f) {
 	          y = 0.83333f + q / (1.0f - f_exp(1.2f * q));
 	  }
 	  otm2 = otm1;
@@ -297,7 +297,7 @@ static void runAddingAnalogueOsc(LADSPA_Handle instance, unsigned long sample_co
 	plugin_data->rndb = rndb;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -398,7 +398,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (analogueOscDescriptor) {
 		free((LADSPA_PortDescriptor *)analogueOscDescriptor->PortDescriptors);
 		free((char **)analogueOscDescriptor->PortNames);

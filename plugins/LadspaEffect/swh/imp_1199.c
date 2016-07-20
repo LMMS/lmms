@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -63,7 +63,7 @@ typedef rfftw_plan fft_plan;
 
 #define MK_IMP(i) impulse2freq(c, i, IMP_LENGTH(i), impulse_freq[c]); c++
 
-inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out);
+static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out);
 
 #include "impulses/all.h"
 
@@ -75,9 +75,9 @@ static fftw_real *real_in, *real_out, *comp_in, *comp_out;
 unsigned int fft_length[IMPULSES];
 
 #ifdef __clang__
-void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+static void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
 #else
-inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
 #endif
 {
   fftw_real impulse_time[MAX_FFT_LENGTH];
@@ -531,7 +531,7 @@ static void runAddingImp(LADSPA_Handle instance, unsigned long sample_count) {
 	*(plugin_data->latency) = SEG_LENGTH;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
@@ -636,7 +636,7 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (impDescriptor) {
 		free((LADSPA_PortDescriptor *)impDescriptor->PortDescriptors);
 		free((char **)impDescriptor->PortNames);
