@@ -3533,43 +3533,41 @@ void PianoRoll::selectAll()
 
 	for( const Note *note : m_pattern->notes() )
 	{
-		int len_ticks = note->length();
+		int len_ticks = static_cast<int>( note->length() ) > 0 ?
+				static_cast<int>( note->length() ) : 1;
 
-		if( len_ticks > 0 )
+		const int key = note->key();
+
+		int pos_ticks = note->pos();
+		if( key <= m_selectStartKey || first_time )
 		{
-			const int key = note->key();
-
-			int pos_ticks = note->pos();
-			if( key <= m_selectStartKey || first_time )
-			{
-				// if we move start-key down, we have to add
-				// the difference between old and new start-key
-				// to m_selectedKeys, otherwise the selection
-				// is just moved down...
-				m_selectedKeys += m_selectStartKey
-								- ( key - 1 );
-				m_selectStartKey = key - 1;
-			}
-			if( key >= m_selectedKeys+m_selectStartKey ||
-								first_time )
-			{
-				m_selectedKeys = key - m_selectStartKey;
-			}
-			if( pos_ticks < m_selectStartTick ||
-								first_time )
-			{
-				m_selectStartTick = pos_ticks;
-			}
-			if( pos_ticks + len_ticks >
-				m_selectStartTick + m_selectedTick ||
-								first_time )
-			{
-				m_selectedTick = pos_ticks +
-							len_ticks -
-							m_selectStartTick;
-			}
-			first_time = false;
+			// if we move start-key down, we have to add
+			// the difference between old and new start-key
+			// to m_selectedKeys, otherwise the selection
+			// is just moved down...
+			m_selectedKeys += m_selectStartKey
+							- ( key - 1 );
+			m_selectStartKey = key - 1;
 		}
+		if( key >= m_selectedKeys + m_selectStartKey ||
+							first_time )
+		{
+			m_selectedKeys = key - m_selectStartKey;
+		}
+		if( pos_ticks < m_selectStartTick ||
+							first_time )
+		{
+			m_selectStartTick = pos_ticks;
+		}
+		if( pos_ticks + len_ticks >
+			m_selectStartTick + m_selectedTick ||
+							first_time )
+		{
+			m_selectedTick = pos_ticks +
+						len_ticks -
+						m_selectStartTick;
+		}
+		first_time = false;
 	}
 }
 
