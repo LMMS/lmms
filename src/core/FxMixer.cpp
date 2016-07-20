@@ -737,7 +737,6 @@ void FxMixer::loadSettings( const QDomElement & _this )
 {
 	clear();
 	QDomNode node = _this.firstChild();
-	bool thereIsASend = false;
 
 	while( ! node.isNull() )
 	{
@@ -764,7 +763,6 @@ void FxMixer::loadSettings( const QDomElement & _this )
 			QDomElement chDataItem = chData.at(i).toElement();
 			if( chDataItem.nodeName() == QString( "send" ) )
 			{
-				thereIsASend = true;
 				int sendTo = chDataItem.attribute( "channel" ).toInt();
 				allocateChannelsTo( sendTo ) ;
 				FxRoute * fxr = createChannelSend( num, sendTo, 1.0f );
@@ -775,15 +773,6 @@ void FxMixer::loadSettings( const QDomElement & _this )
 
 
 		node = node.nextSibling();
-	}
-
-	// check for old format. 65 fx channels and no explicit sends.
-	if( ! thereIsASend && m_fxChannels.size() == 65 ) {
-		// create a send from every channel into master
-		for( int i=1; i<m_fxChannels.size(); ++i )
-		{
-			createChannelSend( i, 0 );
-		}
 	}
 
 	emit dataChanged();

@@ -794,6 +794,20 @@ void DataFile::upgrade_0_4_0_rc2()
 }
 
 
+void DataFile::upgrade_1_1_0()
+{
+	QDomNodeList list = elementsByTagName("fxchannel");
+	for (int i = 1; !list.item(i).isNull(); ++i)
+	{
+		QDomElement el = list.item(i).toElement();
+		QDomElement send = createElement("send");
+		send.setAttribute("channel", "0");
+		send.setAttribute("amount", "1");
+		el.appendChild(send);
+	}
+}
+
+
 void DataFile::upgrade_1_1_91()
 {
 	// Upgrade to version 1.1.91 from some version less than 1.1.91
@@ -880,6 +894,10 @@ void DataFile::upgrade()
 	if( version < "0.4.0-rc2" )
 	{
 		upgrade_0_4_0_rc2();
+	}
+	if( version < ProjectVersion("1.1.0", CompareType::Release) )
+	{
+		upgrade_1_1_0();
 	}
 	if( version < ProjectVersion("1.1.91", CompareType::Release) )
 	{
