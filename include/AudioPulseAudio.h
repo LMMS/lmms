@@ -30,6 +30,7 @@
 #ifdef LMMS_HAVE_PULSEAUDIO
 
 #include <pulse/pulseaudio.h>
+#include <QSemaphore>
 #include <QThread>
 
 #include "AudioDevice.h"
@@ -71,6 +72,8 @@ public:
 
 	void streamWriteCallback( pa_stream * s, size_t length );
 
+	void signalConnected( bool connected );
+
 	pa_stream * m_s;
 	pa_sample_spec m_sampleSpec;
 
@@ -84,6 +87,9 @@ private:
 	volatile bool m_quit;
 
 	bool m_convertEndian;
+
+	bool m_connected;
+	QSemaphore m_connectedSemaphore;
 
 } ;
 
