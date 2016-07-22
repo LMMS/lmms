@@ -465,7 +465,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
-        <translation>Haz click aquí y los valores del portapapeles se pegarán en el primer compás visible.</translation>
+        <translation>Haz click aquí para pegar el contenido del portapapeles en el primer compás visible.</translation>
     </message>
     <message>
         <source>Tension: </source>
