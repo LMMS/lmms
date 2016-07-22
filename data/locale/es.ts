@@ -1165,7 +1165,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation>RC pasoBajo 12 dB</translation>
+        <translation>RC PasoBajo 12 dB</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
@@ -1236,7 +1236,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Record while playing</source>
-        <translation>Grabar tocando</translation>
+        <translation>Grabar reproduciendo</translation>
     </message>
     <message>
         <source>Transport controls</source>
