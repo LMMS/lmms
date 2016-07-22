@@ -1501,7 +1501,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation>Usa este control para configurar el tiempo de caída de la envolvente actual. A mayor valor mayor tiempo necesitará la envolvente para pasar del nivel de ataque a sostenido. Escoje un valor pequeño para instrumentos como pianos.</translation>
+        <translation>Usa este control para configurar el tiempo de caída de la envolvente actual. A mayor valor mayor tiempo necesitará la envolvente para pasar del nivel de ataque al de sostenido. Escoje un valor pequeño para instrumentos como pianos.</translation>
     </message>
     <message>
         <source>SUST</source>
@@ -1525,7 +1525,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation>Usa este control para configurar el intervalo de Disipación de la envolvente actual. A mayor valor, la envolvente necesitará más tiempo para pasar del nivel de sustain a cero. Escoje un valor grande para instrumentos suaves como cuerdas.</translation>
+        <translation>Usa este control para configurar el intervalo de Disipación de la envolvente actual. A mayor valor, la envolvente necesitará más tiempo para pasar del nivel de sostenido a cero. Escoje un valor grande para instrumentos suaves como cuerdas.</translation>
     </message>
     <message>
         <source>AMT</source>
@@ -1537,7 +1537,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
-        <translation>Usa esta perilla para configurar la cantidad de modulación de la envolvente actual.  Mientras más alto sea este valor, mayor será la infuencia de esta envolvente sobre el tamaño correspondiente (por ej. volumen o frecuencia de corte).</translation>
+        <translation>Usa esta perilla para configurar la cantidad de modulación de la envolvente actual.  Mientras más alto sea este valor, mayor será la infuencia de la envolvente sobre,  por ej., el volumen o la frecuencia de corte.</translation>
     </message>
     <message>
         <source>LFO predelay:</source>
@@ -1545,7 +1545,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
-        <translation>Usa este control para configurar el pre-retraso del LFO actual. A mayor valor, mayor tiempo hasta que el LFO comience a oscilar.</translation>
+        <translation>Usa este control para configurar el pre-retraso del LFO actual. A mayor valor, mayor el tiempo hasta que el LFO comience a oscilar.</translation>
     </message>
     <message>
         <source>LFO- attack:</source>
@@ -1569,7 +1569,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation>Usa esta perilla para configurar la cantidad de modulación de este LFO. A mayores valores, mayor será la infuencia que ejercerá este oscilador (LFO) sobre el tamaño seleccionado (ej.: volumen o frecuencia de muestreo).</translation>
+        <translation>Usa esta perilla para configurar la cantidad de modulación de este LFO. A mayores valores, mayor será la infuencia que ejercerá este oscilador (LFO) sobre la propiedad seleccionada (por ej.: el volumen o la frecuencia de corte).</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
@@ -1581,11 +1581,11 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Click here for a saw-wave for current.</source>
-        <translation>Haz click aquí para una onda de sierra.</translation>
+        <translation>Haz click aquí para seleccionar una onda de sierra.</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Haz click aquí para elegir una onda cuadrada.</translation>
+        <translation>Haz click aquí para seleccionar una onda cuadrada.</translation>
     </message>
     <message>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
