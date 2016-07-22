@@ -557,6 +557,12 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
 
+# Installer targets
+IF(LMMS_BUILD_LINUX)
+	ADD_CUSTOM_TARGET(makeself DEPENDS makeself-linux)
+	ADD_CUSTOM_TARGET(bundled-source DEPENDS bundled-source-linux)
+ENDIF()
+
 #
 # display configuration information
 #

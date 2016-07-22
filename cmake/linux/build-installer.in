@@ -1,0 +1,115 @@
+#!/bin/sh
+set -e
+BINDIR="$1"
+RUNFILE="$2"
+[ "$BINDIR" -a "$RUNFILE" ]
+
+VERSION=@VERSION@
+
+cd "$BINDIR"
+[ -e CMakeCache.txt ]
+
+rm -fr installer.root
+mkdir installer.root
+make install DESTDIR=installer.root
+cd installer.root
+
+if [ ! -e usr/bin/lmms ]
+then
+	mkdir -p usr
+	mv ./"@CMAKE_INSTALL_PREFIX@"/* usr
+	rmdir -p --ignore-fail-on-non-empty \
+		../installer.root/"@CMAKE_INSTALL_PREFIX@"
+fi
+
+strip usr/bin/lmms usr/lib/lmms/RemoteZynAddSubFx usr/lib/lmms/*.so \
+	usr/lib/lmms/ladspa/*
+
+rm -f ../download.log
+
+download_and_unpack_packages()
+{
+	sort -u |
+	xargs apt-get download |
+	tee -a ../download.log
+
+	ls *.deb |
+	while read DEB
+	do
+		dpkg-deb -x $DEB .
+	done
+	rm *.deb
+}
+
+# Find required libraries and download the deb files that contain them;
+# RemoteVstPlugin.exe.so is not considered
+ldd usr/bin/lmms usr/lib/lmms/RemoteZynAddSubFx usr/lib/lmms/lib*.so \
+	usr/lib/lmms/ladspa/* |
+grep = |
+cut -d " " -f 3 |
+grep -v usr/lib/lmms |
+sort -u |
+xargs dpkg -S |
+cut -d : -f 1 |
+download_and_unpack_packages
+
+# Fetch missing copyright files
+PACKAGES=$(find -L usr/share/doc -maxdepth 1 -type l -printf "%l\n")
+if [ "$PACKAGES" ]
+then
+	echo "$PACKAGES" |
+	download_and_unpack_packages
+fi
+
+mv usr/share/applications/lmms.desktop lmms-$VERSION.desktop
+sed -e "
+/^Name=/ s/LMMS/LMMS $VERSION/
+/^Icon=/ s/lmms/lmms-$VERSION/
+" -i lmms-$VERSION.desktop
+
+mv usr/share/pixmaps/lmms.png lmms-$VERSION.png
+rmdir --ignore-fail-on-non-empty usr/share/pixmaps
+
+mv usr/share/mime/packages/lmms.xml .
+
+rm -fr lib64 usr/include usr/share/applications usr/share/doc-base \
+	usr/share/lintian usr/share/man usr/share/menu usr/share/mime
+
+find usr/share/doc -mindepth 2 ! -name copyright -delete
+
+# Convert RPATH to RUNPATH
+find lib usr/lib -type f |
+while read FILE
+do
+	if readelf -d "$FILE" 2> /dev/null | grep "(RPATH)" |
+		grep -v '\[\$ORIGIN\]' > /dev/null
+	then
+		chrpath -c "$FILE"
+	fi
+done
+
+# libc6 is included, so its loader should be used instead of the system one;
+# move the loader to usr/bin because of Qt applicationDirPath() usage
+MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+mv lib/$MULTIARCH/ld-*.so usr/bin/ld.so
+
+find -type l -execdir \[ ! -e '{}' \] \; -delete
+
+# FHS requires /opt programs to be in /opt/<package>/bin
+mkdir -p bin
+
+cat > bin/lmms-launcher << EOF
+#!/bin/sh
+DIR=\$(dirname \$(readlink -f "\$0"))
+DIR=\${DIR%/bin}
+export LD_LIBRARY_PATH="\$DIR"/lib/$MULTIARCH:"\$DIR"/usr/lib/$MULTIARCH\
+:"\$DIR"/usr/lib/$MULTIARCH/pulseaudio:"\$DIR"/usr/lib
+"\$DIR"/usr/bin/ld.so "\$DIR"/usr/bin/lmms "\$@"
+EOF
+
+chmod a+x bin/lmms-launcher
+
+cp -a ../../cmake/linux/installer .
+
+cd ..
+makeself --xz --complevel 6 installer.root "$RUNFILE" LMMS ./installer $VERSION
