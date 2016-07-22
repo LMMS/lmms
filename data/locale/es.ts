@@ -501,14 +501,14 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation>El modelo ya se encuentra conectado a este patrón.</translation>
+        <translation>El modelo ya está conectado a este patrón.</translation>
     </message>
 </context>
 <context>
     <name>AutomationPattern</name>
     <message>
         <source>Drag a control while pressing &lt;%1&gt;</source>
-        <translation>Arrastre un control manteniendo presionado &lt;%1&gt;</translation>
+        <translation>Arrastre un control mientras presiona &lt;%1&gt;</translation>
     </message>
 </context>
 <context>
@@ -547,15 +547,15 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Flip Vertically (Visible)</source>
-        <translation>Voltar verticalmente (Visible)</translation>
+        <translation>Voltear verticalmente (Visible)</translation>
     </message>
     <message>
         <source>Flip Horizontally (Visible)</source>
-        <translation>Volter horizontalmente (Visible)</translation>
+        <translation>Voltear horizontalmente (Visible)</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation>El modelo ya se encuentra conectado a este patrón.</translation>
+        <translation>El modelo ya está conectado a este patrón.</translation>
     </message>
 </context>
 <context>
