@@ -3917,11 +3917,11 @@ Por favor visite http://lmms.sf.net/wiki por documentación de LMMS.</translatio
     </message>
     <message>
         <source>Export &amp;MIDI...</source>
-        <translation>Exportar %MIDI...</translation>
+        <translation>Exportar &amp;MIDI...</translation>
     </message>
     <message>
         <source>&amp;View</source>
-        <translation>%Ver</translation>
+        <translation>&amp;Ver</translation>
     </message>
     <message>
         <source>Toggle metronome</source>
@@ -6263,10 +6263,6 @@ Recuerda también guardar tu proyecto manualmente.</translation>
         <translation>secuencias MIDI</translation>
     </message>
     <message>
-        <source>FL Studio projects</source>
-        <translation>Proyectos de FL-Studio</translation>
-    </message>
-    <message>
         <source>Hydrogen projects</source>
         <translation>Proyectos de Hydrogen</translation>
     </message>
@@ -6379,20 +6375,20 @@ Recuerda también guardar tu proyecto manualmente.</translation>
         <translation>No se pudo abrir el archivo %1 para escritura. Probablemente no tienes permisos de escritura sobre este archivo. Asegúrate de tener acceso de escritura a este archivo e inténtalo nuevamente.</translation>
     </message>
     <message>
-        <source>Project Version Mismatch</source>
-        <translation>La versión del proyecto no concuerda</translation>
-    </message>
-    <message>
-        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
-        <translation>Este %1 ha sido creado usando LMMS versión %2, pero se encuentra instalada la versión %3.</translation>
-    </message>
-    <message>
         <source>template</source>
         <translation>plantilla</translation>
     </message>
     <message>
         <source>project</source>
         <translation>proyecto</translation>
+    </message>
+    <message>
+        <source>Version difference</source>
+        <translation>Diferencia de versiones</translation>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS %2.</source>
+        <translation>Este %1 fue creado con LMMS %2.</translation>
     </message>
 </context>
 <context>
@@ -6703,10 +6699,6 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Importing MIDI-file...</source>
         <translation>Importando archivo MIDI...</translation>
-    </message>
-    <message>
-        <source>Importing FLP-file...</source>
-        <translation>Importando archivo FLP...</translation>
     </message>
 </context>
 <context>
@@ -9072,10 +9064,6 @@ Haciendo doble click en cualquier complementos mostrará la información de sus 
     <message>
         <source>List installed LADSPA plugins</source>
         <translation>Listar los complementos LADSPA instalados</translation>
-    </message>
-    <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation>Filtro para importar proyectos de FL-Studio a LMMS</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
