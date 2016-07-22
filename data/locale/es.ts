@@ -636,7 +636,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation>Restaurar al color por defecto</translation>
+        <translation>Restaurar el color por defecto</translation>
     </message>
 </context>
 <context>
@@ -752,7 +752,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Enable bitdepth-crushing</source>
-        <translation>Habilitar reduccion de bits de profundidad</translation>
+        <translation>Habilitar reducción de profundidad bits</translation>
     </message>
     <message>
         <source>Sample rate:</source>
