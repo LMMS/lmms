@@ -1457,7 +1457,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     <name>EnvelopeAndLfoView</name>
     <message>
         <source>DEL</source>
-        <translation>DEL</translation>
+        <translation>RETR</translation>
     </message>
     <message>
         <source>Predelay:</source>
@@ -1509,11 +1509,11 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Sustain:</source>
-        <translation>Sostén:</translation>
+        <translation>Sostenido:</translation>
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation>Usa este control para configurar el nivel de sustain de la envolvente actual. A mayor valor mayor tiempo tardará la envolvente hasta llegar a cero.</translation>
+        <translation>Usa este control para configurar el nivel de sostenido de la envolvente actual. Mientras mayor sea este valor, más altor será el nivel al que se mantendrá la envolvente antes de disiparse.</translation>
     </message>
     <message>
         <source>REL</source>
