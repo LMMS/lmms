@@ -790,11 +790,11 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <name>CarlaInstrumentView</name>
     <message>
         <source>Show GUI</source>
-        <translation>Mostrar Interfaz</translation>
+        <translation>Mostrar IGU</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
-        <translation>Haz click aquí para mostrar u ocultar la interfaz gráfica (GUI) de Carla.</translation>
+        <translation>Haz click aquí para mostrar u ocultar la interfaz gráfica de usuario (IGU) de Carla.</translation>
     </message>
 </context>
 <context>
@@ -844,7 +844,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>MAPPING FUNCTION</source>
-        <translation>FUNCION DE MAPEO</translation>
+        <translation>FUNCIÓN DE MAPEO</translation>
     </message>
     <message>
         <source>OK</source>
