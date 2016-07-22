@@ -573,23 +573,23 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation>Reproducir/pausar el ritmo base actual (espacio)</translation>
+        <translation>Reproducir/pausar el ritmo/bajo actual (espacio)</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
-        <translation>Detener la reproducción del ritmo/base actual (Espacio)</translation>
+        <translation>Detener la reproducción del ritmo/bajo actual (Espacio)</translation>
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation>Haz click aquí para reproducir el Ritmo/Base actual. El Ritmo/base se reproducirá automáticamente desde el principio cada vez que llegue al final.</translation>
+        <translation>Haz click aquí para reproducir el Ritmo/Bajo actual. El Ritmo/bajo se reproducirá automáticamente desde el principio cada vez que llegue al final.</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation>Haz click aquí para detener el Ritmo/Base actual.</translation>
+        <translation>Haz click aquí para detener el Ritmo/Bajo actual.</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation>Agregar Ritmo/base</translation>
+        <translation>Agregar Ritmo/bajo</translation>
     </message>
     <message>
         <source>Add automation-track</source>
@@ -643,7 +643,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation>Ritmo/Base %1</translation>
+        <translation>Ritmo/Bajo %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
@@ -2382,7 +2382,7 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
     </message>
     <message>
         <source>Preparing beat/bassline editor</source>
-        <translation>Preparando editor de ritmo/base</translation>
+        <translation>Preparando editor de ritmo/bajo</translation>
     </message>
     <message>
         <source>Preparing piano roll</source>
@@ -6415,7 +6415,7 @@ Recuerda también guardar tu proyecto manualmente.</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
-        <translation>Agregar Ritmo/base</translation>
+        <translation>Agregar Ritmo/bajo</translation>
     </message>
     <message>
         <source>Add sample-track</source>
