@@ -1383,11 +1383,11 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Move &amp;up</source>
-        <translation>Mover &amp;arriba</translation>
+        <translation>Mover arriba (&amp;U)</translation>
     </message>
     <message>
         <source>Move &amp;down</source>
-        <translation>Mover a&amp;bajo</translation>
+        <translation>Mover abajo (&amp;D)</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
