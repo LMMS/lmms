@@ -569,7 +569,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Editor de Ritmo+Base</translation>
+        <translation>Editor de Ritmo+Bajo</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -620,7 +620,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <name>BBTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation>Abrir en Editor de Ritmo+Base</translation>
+        <translation>Abrir en Editor de Ritmo+Bajo</translation>
     </message>
     <message>
         <source>Reset name</source>
@@ -3699,11 +3699,11 @@ Please make sure you have write-access to the file and try again.</source>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Editor de Ritmo+Base</translation>
+        <translation>Editor de Ritmo+Bajo</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation>Presionando este botón puedes mostrar u ocultar el Editor de Ritmo+Base. El Editor de Ritmo+Base es necesario para crear ritmos, y para abrir, agregar y quitar canales, y para copiar, cortar y pegar patrones de ritmo y base, y otras cosas por el estilo.</translation>
+        <translation>Presionando este botón puedes mostrar u ocultar el Editor de Ritmo+Bajo. El Editor de Ritmo+Bajo es necesario para crear ritmos, y para abrir, agregar y quitar canales, y para copiar, cortar y pegar patrones de ritmo y bajo, y otras cosas por el estilo.</translation>
     </message>
     <message>
         <source>Piano Roll</source>
@@ -3933,7 +3933,7 @@ Por favor visite http://lmms.sf.net/wiki por documentación de LMMS.</translatio
     </message>
     <message>
         <source>Show/hide Beat+Bassline Editor</source>
-        <translation>Mostrar/ocultar Editor de Ritmo/Base</translation>
+        <translation>Mostrar/ocultar el Editor de Ritmo+Bajo</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
@@ -5647,7 +5647,7 @@ Razón: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation>Arrastra un instrumento al Editor de Canción, al Editor de Ritmo+Base o sobre una pista de instrumento existente.</translation>
+        <translation>Arrastra un instrumento al Editor de Canción, al Editor de Ritmo+Bajo o sobre una pista de instrumento existente.</translation>
     </message>
 </context>
 <context>
