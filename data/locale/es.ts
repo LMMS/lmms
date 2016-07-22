@@ -2081,7 +2081,7 @@ Please make sure you have write-permission to the file and the directory contain
     <name>FileBrowser</name>
     <message>
         <source>Browser</source>
-        <translation>Navegador</translation>
+        <translation>Explorador</translation>
     </message>
 </context>
 <context>
@@ -2092,11 +2092,11 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation>Abrir en la nueva pista de instrumento/Editor de Ritmo+Base</translation>
+        <translation>Abrir en la nueva pista de instrumento/Editor de R+B</translation>
     </message>
     <message>
         <source>Loading sample</source>
-        <translation>Cargar muestra</translation>
+        <translation>Cargando muestra</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
@@ -2108,7 +2108,7 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Open in new instrument-track/Song Editor</source>
-        <translation>Abrir en nueva pista de instrumento/Editor de canción</translation>
+        <translation>Abrir en una nueva pista de instrumento/Editor de canción</translation>
     </message>
     <message>
         <source>Error</source>
