@@ -980,7 +980,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Feedback</source>
-        <translation>realimentacion (feedback)</translation>
+        <translation>Realimentacion</translation>
     </message>
     <message>
         <source>Lfo Frequency</source>
@@ -992,14 +992,14 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Output gain</source>
-        <translation>ganancia de salida</translation>
+        <translation>Ganancia de salida</translation>
     </message>
 </context>
 <context>
     <name>DelayControlsDialog</name>
     <message>
         <source>Delay</source>
-        <translation>Retraso (delay)</translation>
+        <translation>Retraso</translation>
     </message>
     <message>
         <source>Lfo Amt</source>
@@ -1007,7 +1007,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Delay Time</source>
-        <translation>Tiempo de retraso (delay)</translation>
+        <translation>Tiempo de retraso</translation>
     </message>
     <message>
         <source>Regen</source>
@@ -1015,7 +1015,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Feedback Amount</source>
-        <translation>Cantidad de realimentacion (feedback)</translation>
+        <translation>Cantidad de realimentacion</translation>
     </message>
     <message>
         <source>Rate</source>
