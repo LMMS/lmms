@@ -457,11 +457,11 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Haz click aquí y los valores seleccionados se-moverán al portapapeles. Puedes pegarlos en cualquier lugar de cualquier patrón haciendo click en el botón &quot;pegar&quot;.</translation>
+        <translation>Haz click aquí y los valores seleccionados se moverán al portapapeles. Puedes pegarlos en cualquier lugar de cualquier patrón haciendo click en el botón &quot;pegar&quot;.</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Haz click aquí y los valores seleccionados se-copiarán al portapapeles. Puedes pegarlos en cualquier lugar de cualquier patrón haciendo click en el botón &quot;pegar&quot;.</translation>
+        <translation>Haz click aquí y los valores seleccionados se copiarán al portapapeles. Puedes pegarlos en cualquier lugar de cualquier patrón haciendo click en el botón &quot;pegar&quot;.</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
