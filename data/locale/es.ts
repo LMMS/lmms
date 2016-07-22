@@ -1414,7 +1414,7 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Sustain</source>
-        <translation>Sostén</translation>
+        <translation>Sostenido</translation>
     </message>
     <message>
         <source>Release</source>
