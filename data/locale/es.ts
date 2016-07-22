@@ -848,7 +848,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation>Aceptar</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -894,11 +894,11 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Rename controller</source>
-        <translation>Renombrar controlador</translation>
+        <translation>Renombrar el controlador</translation>
     </message>
     <message>
         <source>Enter the new name for this controller</source>
-        <translation>Ingrese un nombre nuevo para este controlador</translation>
+        <translation>Escribe un nombre nuevo para este controlador</translation>
     </message>
     <message>
         <source>&amp;Remove this controller</source>
@@ -906,7 +906,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>Re&amp;name this controller</source>
-        <translation>Re&amp;Nombrar este controlador</translation>
+        <translation>Re&amp;nombrar este controlador</translation>
     </message>
 </context>
 <context>
