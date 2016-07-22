@@ -1629,18 +1629,18 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     </message>
     <message>
         <source>Click here for random wave.</source>
-        <translation>Haz click aquí para obtener una onda aleatoria.</translation>
+        <translation>Haz click aquí para seleccionar una onda aleatoria.</translation>
     </message>
 </context>
 <context>
     <name>EqControls</name>
     <message>
         <source>Input gain</source>
-        <translation>ganancia de entrada</translation>
+        <translation>Ganancia de entrada</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation>ganancia de salida</translation>
+        <translation>Ganancia de salida</translation>
     </message>
     <message>
         <source>Low shelf gain</source>
