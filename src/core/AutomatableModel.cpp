@@ -197,22 +197,9 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	}
 	else
 	{
-		// Needed for backward compatibility
-		if ( name == "data" && element.hasAttribute( "scale_type") )
-		{
-			if( element.attribute( "scale_type" ) == "linear" )
-			{
-				setScaleType( Linear );
-			}
-			else if( element.attribute( "scale_type" ) == "log" )
-			{
-				setScaleType( Logarithmic );
-			}
-		}
-		else
-		{
-			setScaleType( Linear );
-		}
+
+		setScaleType( Linear );
+
 		if( element.hasAttribute( name ) )
 			// attribute => read the element's value from the attribute list
 		{
