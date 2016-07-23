@@ -213,6 +213,7 @@ void ProjectRenderer::run()
 void ProjectRenderer::abortProcessing()
 {
 	m_abort = true;
+	wait();
 }
 
 
