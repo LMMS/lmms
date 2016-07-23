@@ -77,7 +77,6 @@ private slots:
 	void setGIGDir( const QString & _gd );
 	void setSF2Dir( const QString & _sfd );
 	void setArtworkDir( const QString & _ad );
-	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _ld );
 	void setSTKDir( const QString & _sd );
 	void setDefaultSoundfont( const QString & _sf );
@@ -110,7 +109,6 @@ private slots:
 	void openGIGDir();
 	void openSF2Dir();
 	void openArtworkDir();
-	void openFLDir();
 	void openLADSPADir();
 	void openSTKDir();
 	void openDefaultSoundfont();
@@ -150,7 +148,6 @@ private:
 	QLineEdit * m_wdLineEdit;
 	QLineEdit * m_vdLineEdit;
 	QLineEdit * m_adLineEdit;
-	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
 	QLineEdit * m_gigLineEdit;
 	QLineEdit * m_sf2LineEdit;
@@ -165,7 +162,6 @@ private:
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_artworkDir;
-	QString m_flDir;
 	QString m_ladDir;
 	QString m_gigDir;
 	QString m_sf2Dir;

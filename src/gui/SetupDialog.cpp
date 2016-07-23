@@ -112,7 +112,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_workingDir( QDir::toNativeSeparators( ConfigManager::inst()->workingDir() ) ),
 	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
 	m_artworkDir( QDir::toNativeSeparators( ConfigManager::inst()->artworkDir() ) ),
-	m_flDir( QDir::toNativeSeparators( ConfigManager::inst()->flDir() ) ),
 	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
 	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
 	m_sf2Dir( QDir::toNativeSeparators( ConfigManager::inst()->sf2Dir() ) ),
@@ -482,29 +481,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( backgroundartworkdir_select_btn, SIGNAL( clicked() ), this,
 					SLOT( openBackgroundArtwork() ) );
 
-
-
-
-
-	// FL Studio-dir
-	TabWidget * fl_tw = new TabWidget( tr(
-				"FL Studio installation directory" ).toUpper(),
-								paths );
-	fl_tw->setFixedHeight( 48 );
-
-	m_fdLineEdit = new QLineEdit( m_flDir, fl_tw );
-	m_fdLineEdit->setGeometry( 10, 20, txtLength, 16 );
-	connect( m_fdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
-					SLOT( setFLDir( const QString & ) ) );
-
-	QPushButton * fldir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
-								"", fl_tw );
-	fldir_select_btn->setFixedSize( 24, 24 );
-	fldir_select_btn->move( btnStart, 16 );
-	connect( fldir_select_btn, SIGNAL( clicked() ), this,
-						SLOT( openFLDir() ) );
-
 	// vst-dir
 	TabWidget * vst_tw = new TabWidget( tr(
 					"VST-plugin directory" ).toUpper(),
@@ -644,7 +620,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( sf_tw );
 #endif	
-	pathSelectorLayout->addWidget( fl_tw );
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( artwork_tw );
 	pathSelectorLayout->addSpacing( 10 );
@@ -1062,7 +1037,6 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
 	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
 	ConfigManager::inst()->setArtworkDir(QDir::fromNativeSeparators(m_artworkDir));
-	ConfigManager::inst()->setFLDir(QDir::fromNativeSeparators(m_flDir));
 	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
@@ -1380,20 +1354,6 @@ void SetupDialog::setArtworkDir( const QString & _ad )
 
 
 
-void SetupDialog::openFLDir()
-{
-	QString new_dir = FileDialog::getExistingDirectory( this,
-				tr( "Choose FL Studio installation directory" ),
-							m_flDir );
-	if( new_dir != QString::null )
-	{
-		m_fdLineEdit->setText( new_dir );
-	}
-}
-
-
-
-
 void SetupDialog::openLADSPADir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
@@ -1475,14 +1435,6 @@ void SetupDialog::openBackgroundArtwork()
 	{
 		m_baLineEdit->setText( new_file );
 	}
-}
-
-
-
-
-void SetupDialog::setFLDir( const QString & _fd )
-{
-	m_flDir = _fd;
 }
 
 
