@@ -289,7 +289,10 @@ void malletsInstrument::playNote( NotePlayHandle * _n,
 	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		const float vel = _n->getVolume() / 100.0f;
+		// If newer projects, adjust velocity to within stk's limits
+		float velocityAdjust =
+			m_isOldVersionModel.value() ? 100.0 : 200.0;
+		const float vel = _n->getVolume() / velocityAdjust;
 
 		// critical section as STK is not thread-safe
 		static QMutex m;
