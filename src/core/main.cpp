@@ -765,8 +765,8 @@ int main( int argc, char * * argv )
 			#endif
 			
 			// have a hidden exit button
-			exit = mb.addButton( "", QMessageBox::AcceptRole );
-			exit->setFlat(true);
+			exit = mb.addButton( "", QMessageBox::RejectRole);
+			exit->setVisible(false);
 			
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
