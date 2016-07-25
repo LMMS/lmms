@@ -747,22 +747,34 @@ int main( int argc, char * * argv )
 			QPushButton * discard;
 			QPushButton * ignore;
 			QPushButton * exit;
-
-			recover = mb.addButton( MainWindow::tr( "Recover" ),
-								QMessageBox::AcceptRole );
+			
+			#if QT_VERSION >= 0x050000
+				// setting all buttons to the same roles allows us 
+				// to have a custom layout
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
+				discard = mb.addButton( MainWindow::tr( "Discard" ),
+									QMessageBox::AcceptRole );				
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
+				exit = mb.addButton( MainWindow::tr( "Exit" ),
+									QMessageBox::AcceptRole );
+			# else 
+				// in qt4 the button order is reversed
+				exit = mb.addButton( MainWindow::tr( "Exit" ),
+									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
+				discard = mb.addButton( MainWindow::tr( "Discard" ),
+									QMessageBox::AcceptRole );
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
+			#endif
+			
+			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
-
-			discard = mb.addButton( MainWindow::tr( "Discard" ),
-								QMessageBox::DestructiveRole );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
-
-
-			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
-								QMessageBox::NoRole );
 			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
-
-			exit = mb.addButton( MainWindow::tr( "Exit" ),
-								QMessageBox::RejectRole );
 			exit->setIcon( embed::getIconPixmap( "exit" ) );
 
 			mb.setDefaultButton( recover );
