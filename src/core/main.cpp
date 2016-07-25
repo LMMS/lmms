@@ -715,10 +715,6 @@ int main( int argc, char * * argv )
 				"    <td><b>%6</b></td>"
 				"    <td>%7</td>"
 				"  </tr>"
-				"  <tr>"
-				"    <td><b>%8</b></td>"
-				"    <td>%9</td>"
-				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
 				MainWindow::tr( "There is a recovery file present. "
@@ -729,19 +725,18 @@ int main( int argc, char * * argv )
 				MainWindow::tr( "Recover" ),
 				MainWindow::tr( "Recover the file. Please don't run "
 					"multiple instances of LMMS when you do this." ),
-				MainWindow::tr( "Discard" ),
-				MainWindow::tr( "Launch a default session and delete "
-					"the restored files. This is not reversible." ),
 				MainWindow::tr( "Ignore" ),
 				MainWindow::tr( "Launch LMMS as usual but with "
 					"automatic backup disabled to prevent the "
 					"present recover file from being overwritten." ),
-				MainWindow::tr( "Exit" ),
-				MainWindow::tr( "Shut down LMMS with no further action." )
+				MainWindow::tr( "Discard" ),
+				MainWindow::tr( "Launch a default session and delete "
+					"the restored files. This is not reversible." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
 			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
+			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
 			QPushButton * recover;
 			QPushButton * discard;
@@ -751,31 +746,32 @@ int main( int argc, char * * argv )
 			#if QT_VERSION >= 0x050000
 				// setting all buttons to the same roles allows us 
 				// to have a custom layout
-				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
-									QMessageBox::AcceptRole );				
+									QMessageBox::AcceptRole );
 				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 									QMessageBox::AcceptRole );
-				exit = mb.addButton( MainWindow::tr( "Exit" ),
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
+
 			# else 
 				// in qt4 the button order is reversed
-				exit = mb.addButton( MainWindow::tr( "Exit" ),
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
 				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 									QMessageBox::AcceptRole );
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
-				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
+
 			#endif
+			
+			// have a hidden exit button
+			exit = mb.addButton( "", QMessageBox::AcceptRole );
+			exit->setFlat(true);
 			
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
 			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
-			exit->setIcon( embed::getIconPixmap( "exit" ) );
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
