@@ -24,17 +24,18 @@
  */
 
 
+#include "TrackLabelButton.h"
+
 #include <QApplication>
 #include <QMouseEvent>
 
-
-#include "TrackLabelButton.h"
-#include "embed.h"
-#include "RenameDialog.h"
-#include "InstrumentTrack.h"
-#include "Instrument.h"
 #include "ConfigManager.h"
+#include "embed.h"
 #include "Engine.h"
+#include "Instrument.h"
+#include "InstrumentTrack.h"
+#include "RenameDialog.h"
+#include "Song.h"
 
 
 
@@ -87,6 +88,7 @@ void TrackLabelButton::rename()
 		if( txt != text() )
 		{
 			m_trackView->getTrack()->setName( txt );
+			Engine::getSong()->setModified();
 		}
 	}
 	else
@@ -107,8 +109,12 @@ void TrackLabelButton::renameFinished()
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
-		setText( m_renameLineEdit->text() );
-		m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+		if( m_renameLineEdit->text() != text() )
+		{
+			setText( m_renameLineEdit->text() );
+			m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+			Engine::getSong()->setModified();
+		}
 	}
 }
 
