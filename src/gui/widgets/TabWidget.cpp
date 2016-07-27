@@ -186,10 +186,10 @@ void TabWidget::mousePressEvent( QMouseEvent * me )
 
 	// When found, activate tab that has been clicked 
 	if ( idx != -1 )
-        {
+	{
 		setActiveTab( idx );
-                update();
-                return;
+		update();
+		return;
 	}
 }
 
@@ -287,7 +287,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 
 		// Next tab's horizontal position
 		tab_x_offset += ( *it ).nwidth;
-        }
+	}
 }
 
 
