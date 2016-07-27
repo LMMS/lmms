@@ -1007,9 +1007,10 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 	
-	// state: selected, muted, normal
+	// state: selected, normal, beat pattern, muted
 	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern ) 
-		? painter.background().color() : mutedBackgroundColor() );
+		? painter.background().color() : ( beatPattern 
+		? BBPatternBackground() : mutedBackgroundColor() ) );
 
 	// invert the gradient for the background in the B&B editor
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );

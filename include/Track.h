@@ -195,6 +195,7 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 
 public:
@@ -213,12 +214,14 @@ public:
 	QColor selectedColor() const;
 	QColor textColor() const;
 	QColor textShadowColor() const;
+	QColor BBPatternBackground() const;
 	bool gradient() const;
 	void setMutedColor( const QColor & c );
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
 	void setTextColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
+	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
 
 	// access needsUpdate member variable
@@ -293,6 +296,7 @@ private:
 	QColor m_selectedColor;
 	QColor m_textColor;
 	QColor m_textShadowColor;
+	QColor m_BBPatternBackground;
 	bool m_gradient;
 
  	bool m_needsUpdate;
