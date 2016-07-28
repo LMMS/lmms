@@ -627,11 +627,14 @@ int main( int argc, char * * argv )
 	}
 #endif
 
+	bool destroyEngine = false;
+
 	// if we have an output file for rendering, just render the song
 	// without starting the GUI
 	if( !renderOut.isEmpty() )
 	{
 		Engine::init( true );
+		destroyEngine = true;
 
 		QFileInfo fileInfo( fileToLoad );
 		if ( !fileInfo.exists() )
@@ -859,6 +862,11 @@ int main( int argc, char * * argv )
 
 	const int ret = app->exec();
 	delete app;
+
+	if( destroyEngine )
+	{
+		Engine::destroy();
+	}
 
 	// cleanup memory managers
 	MemoryManager::cleanup();
