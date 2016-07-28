@@ -272,11 +272,14 @@ void FxLine::renameFinished()
 	setFocus();
 	if( !m_newName.isEmpty() )
 	{
-		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = m_newName;
-		setToolTip( m_newName );
+		if( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != m_newName )
+		{
+			Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = m_newName;
+			setToolTip( m_newName );
+			m_renameLineEdit->setText( elideName( m_newName ) );
+			Engine::getSong()->setModified();
+		}
 	}
-	m_renameLineEdit->setText( elideName( m_newName ) );
-	Engine::getSong()->setModified();
 }
 
 
