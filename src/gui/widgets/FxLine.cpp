@@ -146,7 +146,7 @@ void FxLine::setChannelIndex( int index )
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
 	m_name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	if( !m_inRename )
+	if( !m_inRename && m_renameLineEdit->text() != elideName( m_name ) )
 	{
 		m_renameLineEdit->setText( elideName( m_name ) );
 	}
@@ -270,15 +270,12 @@ void FxLine::renameFinished()
 	m_lcd->show();
 	m_newName = m_renameLineEdit->text();
 	setFocus();
-	if( !m_newName.isEmpty() )
+	if( !m_newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != m_newName )
 	{
-		if( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != m_newName )
-		{
-			Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = m_newName;
-			setToolTip( m_newName );
-			m_renameLineEdit->setText( elideName( m_newName ) );
-			Engine::getSong()->setModified();
-		}
+		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = m_newName;
+		setToolTip( m_newName );
+		m_renameLineEdit->setText( elideName( m_newName ) );
+		Engine::getSong()->setModified();
 	}
 }
 
