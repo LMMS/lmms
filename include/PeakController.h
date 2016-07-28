@@ -52,6 +52,7 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName() const;
+	PeakControllerEffect *getPeakControllerEffect();
 
 	static void initGetControllerBySetting();
 	static PeakController * getControllerBySetting( const QDomElement & _this );
@@ -90,7 +91,7 @@ class PeakControllerDialog : public ControllerDialog
 {
 	Q_OBJECT
 public:
-	PeakControllerDialog( Controller * _controller, QWidget * _parent );
+	PeakControllerDialog(PeakController *_controller, QWidget * _parent );
 	virtual ~PeakControllerDialog();
 
 protected:

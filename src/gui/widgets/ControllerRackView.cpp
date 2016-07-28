@@ -54,10 +54,16 @@ ControllerRackView::ControllerRackView( ) :
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_scrollArea->setFrameStyle( QFrame::Plain );
+	m_scrollArea->setFrameShadow( QFrame::Plain );
+
 
 	QWidget * scrollAreaWidget = new QWidget( m_scrollArea );
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
 	m_scrollAreaLayout->addStretch();
+	m_scrollAreaLayout->setMargin( 0 );
+	m_scrollAreaLayout->setSpacing( 0 );
+//	m_scrollAreaLayout->setContentsMargins( 0, 0, 0, 0 );
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
 	m_scrollArea->setWidget( scrollAreaWidget );
@@ -76,7 +82,8 @@ ControllerRackView::ControllerRackView( ) :
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
-	this->setLayout( layout );
+	layout->setMargin( 0 );
+	setLayout( layout );
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 
@@ -86,8 +93,9 @@ ControllerRackView::ControllerRackView( ) :
 	subWin->setWindowFlags( flags );
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
-	subWin->move( 680, 310 );
-	subWin->resize(400, 200);
+	subWin->move( 680, 60 );
+	subWin->resize( 400, 262 );
+	subWin->setFixedWidth( 262 );
 }
 
 
@@ -103,7 +111,7 @@ ControllerRackView::~ControllerRackView()
 void ControllerRackView::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this, QSize( 400, 300) );
+	MainWindow::saveWidgetState( this, _this, QSize( 400, 300 ) );
 }
 
 
@@ -213,5 +221,4 @@ void ControllerRackView::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	_ce->ignore();
- }
-
+}

@@ -251,6 +251,11 @@ QString PeakController::nodeName() const
 	return( "Peakcontroller" );
 }
 
+PeakControllerEffect * PeakController::getPeakControllerEffect()
+{
+	return m_peakEffect;
+}
+
 
 
 ControllerDialog * PeakController::createDialog( QWidget * _parent )

@@ -23,79 +23,71 @@
  *
  */
 
+#include "ControllerView.h"
 
+#include <QInputDialog>
 #include <QLabel>
-#include <QPushButton>
+#include <QLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QInputDialog>
+#include <QPushButton>
 #include <QWhatsThis>
-#include <QLayout>
 
-#include "ControllerView.h"
 
 #include "CaptionMenu.h"
 #include "ControllerDialog.h"
-#include "gui_templates.h"
 #include "embed.h"
 #include "Engine.h"
+#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
+#include "Song.h"
 #include "ToolTip.h"
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QFrame( _parent ),
 	ModelView( _model, this ),
-	m_subWindow( NULL ),
 	m_controllerDlg( NULL ),
 	m_show( true )
 {
-	this->setFrameStyle( QFrame::StyledPanel );
-	this->setFrameShadow( QFrame::Raised );
-
-	QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
-
-	QHBoxLayout *hBox = new QHBoxLayout();
-	vBoxLayout->addLayout(hBox);
-
-	QLabel *label = new QLabel( "<b>" + _model->displayName() + "</b>", this);
-	QSizePolicy sizePolicy = label->sizePolicy();
-	sizePolicy.setHorizontalStretch(1);
-	label->setSizePolicy(sizePolicy);
-
-	hBox->addWidget(label);
-
-	QPushButton * controlsButton = new QPushButton( tr( "Controls" ), this );
-	connect( controlsButton, SIGNAL( clicked() ), SLOT( editControls() ) );
-
-	hBox->addWidget(controlsButton);
-
-	m_nameLabel = new QLabel(_model->name(), this);
-	vBoxLayout->addWidget(m_nameLabel);
-
-
-	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
-
-	m_subWindow = gui->mainWindow()->addWindowedWidget( m_controllerDlg );
+	QSize buttonsize( 17, 17 );
+	setFrameStyle( QFrame::Plain );
+	setFrameShadow( QFrame::Plain );
+	setLineWidth( 0 );
+	setContentsMargins( 0, 0, 0, 0 );
 	
-	Qt::WindowFlags flags = m_subWindow->windowFlags();
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	m_subWindow->setWindowFlags( flags );
-	m_subWindow->setFixedSize( m_subWindow->size() );
-
-	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
-
-	connect( m_controllerDlg, SIGNAL( closed() ),
-		this, SLOT( closeControls() ) );
-
-	m_subWindow->hide();
-
 	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
-				"slider, and other controls."  ) );
-
+	"slider, and other controls."  ) );
+		
+	m_controllerDlg = getController()->createDialog( this );
+	m_controllerDlg->move( 1, 24 );
+	
+	m_nameLineEdit = new QLineEdit( this );
+	m_nameLineEdit->setText( _model->name() );
+	m_nameLineEdit->setReadOnly( true );
+	m_nameLineEdit->setAttribute( Qt::WA_TransparentForMouseEvents );
+	m_nameLineEdit->move( 3, 3 );
+	// REMOVE THIS IF "rename FxLine directly in QLineEdit" IS MERGED!!!
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	m_nameLineEdit->setStyleSheet( "border-style: none; "
+								   "background: transparent; " );
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	connect( m_nameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+	setFixedWidth( m_controllerDlg->width() + 2 );
+	setFixedHeight( m_controllerDlg->height() + 24 );
+	
+	m_collapse = new QPushButton( embed::getIconPixmap( "stepper-down" ), QString::null, this );
+	m_collapse->resize( buttonsize );
+	m_collapse->setFocusPolicy( Qt::NoFocus );
+	m_collapse->setCursor( Qt::ArrowCursor );
+	m_collapse->setAttribute( Qt::WA_NoMousePropagation );
+	m_collapse->setToolTip( tr( "collapse" ) );
+	m_collapse->move( width() - buttonsize.width() - 3, 3 );
+	connect( m_collapse, SIGNAL( clicked() ), this, SLOT( collapseController() ) );
+		
 	setModel( _model );
 }
 
@@ -104,38 +96,11 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 ControllerView::~ControllerView()
 {
-	if (m_subWindow)
-	{
-		delete m_subWindow;
-	}
+
 }
 
 
 
-
-void ControllerView::editControls()
-{
-	if( m_show )
-	{
-		m_subWindow->show();
-		m_subWindow->raise();
-		m_show = false;
-	}
-	else
-	{
-		m_subWindow->hide();
-		m_show = true;
-	}
-}
-
-
-
-
-void ControllerView::closeControls()
-{
-	m_subWindow->hide();
-	m_show = true;
-}
 
 
 void ControllerView::deleteController()
@@ -143,26 +108,59 @@ void ControllerView::deleteController()
 	emit( deleteController( this ) );
 }
 
-void ControllerView::renameController()
+
+
+
+void ControllerView::collapseController()
 {
-	bool ok;
-	Controller * c = castModel<Controller>();
-	QString new_name = QInputDialog::getText( this,
-			tr( "Rename controller" ),
-			tr( "Enter the new name for this controller" ),
-			QLineEdit::Normal, c->name() , &ok );
-	if( ok && !new_name.isEmpty() )
+	if( m_controllerDlg->isHidden() )
 	{
-		c->setName( new_name );
-		m_nameLabel->setText( new_name );
+		m_controllerDlg->show();
+		setFixedHeight( m_controllerDlg->height() + 24 );
+		m_collapse->setIcon( embed::getIconPixmap( "stepper-down" ) );
+	}
+	else
+	{
+		m_collapse->setIcon( embed::getIconPixmap( "stepper-left" ) );
+		m_controllerDlg->hide();
+		setFixedHeight( 24 );
 	}
 }
 
 
+
+
+void ControllerView::renameFinished()
+{
+	m_nameLineEdit->setReadOnly( true );
+	Controller * c = castModel<Controller>();
+	QString new_name = m_nameLineEdit->text();
+	if( new_name != c->name() )
+	{
+		c->setName( new_name );
+		Engine::getSong()->setModified();
+	}
+}
+
+
+
+
+void ControllerView::rename()
+{
+	m_nameLineEdit->setReadOnly( false );
+	m_nameLineEdit->setFocus();
+	m_nameLineEdit->selectAll();
+}
+
+
+
+
+
 void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 {
-	renameController();
+	rename();
 }
+
 
 
 
@@ -172,13 +170,33 @@ void ControllerView::modelChanged()
 
 
 
+
+void ControllerView::paintEvent(QPaintEvent* event)
+{
+	int titleBarHeight = 24;
+	QPainter p( this );
+	QRect rect( 1, 1, width()-2, titleBarHeight + 5 );
+	QLinearGradient grad( QPoint( 0, 0 ), QPoint( 0, 24 ) );
+	grad.setSpread( QGradient::ReflectSpread );
+	QColor upperColor, bottomColor;
+	upperColor.setNamedColor( "#636c7a" );
+	bottomColor.setNamedColor( "#343840");
+	
+	grad.setColorAt(0, upperColor);
+	grad.setColorAt(1, bottomColor);
+	
+	p.fillRect( rect, grad );
+}
+
+
+
+
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this controller" ),
+						tr( "&Remove this plugin" ),
 						this, SLOT( deleteController() ) );
-	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
@@ -186,13 +204,9 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 }
 
 
+
 void ControllerView::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().center() ),
 								whatsThis() );
 }
-
-
-
-
-
