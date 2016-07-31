@@ -107,6 +107,11 @@ QMenu::indicator:selected {
 	background-color: #101213;
 }
 
+ControllerView {
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #636c7a, stop:1 #343840);
+
+}
+
 PianoRoll {
 	background-color: #040506;
 	qproperty-gridColor: #2d3339;

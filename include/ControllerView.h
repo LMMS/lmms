@@ -81,6 +81,7 @@ private:
 	ControllerDialog * m_controllerDlg;
 	QLineEdit * m_nameLineEdit;
 	QPushButton * m_collapse;
+	const int m_titleBarHeight;
 	bool m_show;
 } ;
 

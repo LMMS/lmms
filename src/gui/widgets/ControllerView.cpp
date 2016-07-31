@@ -51,19 +51,19 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QFrame( _parent ),
 	ModelView( _model, this ),
 	m_controllerDlg( NULL ),
-	m_show( true )
+	m_show( true ),
+	m_titleBarHeight( 24 )
 {
-	QSize buttonsize( 17, 17 );
+	const QSize buttonsize( 17, 17 );
 	setFrameStyle( QFrame::Plain );
 	setFrameShadow( QFrame::Plain );
 	setLineWidth( 0 );
 	setContentsMargins( 0, 0, 0, 0 );
-	
 	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
 	"slider, and other controls."  ) );
 		
 	m_controllerDlg = getController()->createDialog( this );
-	m_controllerDlg->move( 1, 24 );
+	m_controllerDlg->move( 1, m_titleBarHeight );
 	
 	m_nameLineEdit = new QLineEdit( this );
 	m_nameLineEdit->setText( _model->name() );
@@ -77,7 +77,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	connect( m_nameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 	setFixedWidth( m_controllerDlg->width() + 2 );
-	setFixedHeight( m_controllerDlg->height() + 24 );
+	setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
 	
 	m_collapse = new QPushButton( embed::getIconPixmap( "stepper-down" ), QString::null, this );
 	m_collapse->resize( buttonsize );
@@ -96,9 +96,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 ControllerView::~ControllerView()
 {
-
 }
-
 
 
 
@@ -116,14 +114,14 @@ void ControllerView::collapseController()
 	if( m_controllerDlg->isHidden() )
 	{
 		m_controllerDlg->show();
-		setFixedHeight( m_controllerDlg->height() + 24 );
+		setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
 		m_collapse->setIcon( embed::getIconPixmap( "stepper-down" ) );
 	}
 	else
 	{
 		m_collapse->setIcon( embed::getIconPixmap( "stepper-left" ) );
 		m_controllerDlg->hide();
-		setFixedHeight( 24 );
+		setFixedHeight( m_titleBarHeight );
 	}
 }
 
@@ -155,7 +153,6 @@ void ControllerView::rename()
 
 
 
-
 void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 {
 	rename();
@@ -173,19 +170,9 @@ void ControllerView::modelChanged()
 
 void ControllerView::paintEvent(QPaintEvent* event)
 {
-	int titleBarHeight = 24;
 	QPainter p( this );
-	QRect rect( 1, 1, width()-2, titleBarHeight + 5 );
-	QLinearGradient grad( QPoint( 0, 0 ), QPoint( 0, 24 ) );
-	grad.setSpread( QGradient::ReflectSpread );
-	QColor upperColor, bottomColor;
-	upperColor.setNamedColor( "#636c7a" );
-	bottomColor.setNamedColor( "#343840");
-	
-	grad.setColorAt(0, upperColor);
-	grad.setColorAt(1, bottomColor);
-	
-	p.fillRect( rect, grad );
+	QRect rect( 1, 1, width()-2, m_titleBarHeight );
+	p.fillRect( rect, p.background() );
 }
 
 
@@ -194,9 +181,7 @@ void ControllerView::paintEvent(QPaintEvent* event)
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
-						this, SLOT( deleteController() ) );
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Remove this plugin" ), this, SLOT( deleteController() ) );
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
@@ -205,8 +190,8 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 
 
 
+
 void ControllerView::displayHelp()
 {
-	QWhatsThis::showText( mapToGlobal( rect().center() ),
-								whatsThis() );
+	QWhatsThis::showText( mapToGlobal( rect().center() ), whatsThis() );
 }
