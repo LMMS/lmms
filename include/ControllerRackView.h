@@ -25,6 +25,7 @@
 #ifndef CONTROLLER_RACK_VIEW_H
 #define CONTROLLER_RACK_VIEW_H
 
+#include <QMdiSubWindow>
 #include <QWidget>
 #include <QCloseEvent>
 
@@ -63,6 +64,8 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void resizeEvent( QResizeEvent * re );
+	virtual void paintEvent( QPaintEvent * pe );
 
 private slots:
 	void addController();
@@ -74,6 +77,7 @@ private:
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
+	QMdiSubWindow * m_subWin;
 
 	// Stores the index of where to insert the next ControllerView.
 	// Needed so that the StretchItem always stays at the last position.

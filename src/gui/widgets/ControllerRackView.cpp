@@ -54,6 +54,7 @@ ControllerRackView::ControllerRackView( ) :
 	m_scrollArea = new QScrollArea( this );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_scrollArea->setFrameStyle( QFrame::Plain );
 	m_scrollArea->setFrameShadow( QFrame::Plain );
 
@@ -70,10 +71,9 @@ ControllerRackView::ControllerRackView( ) :
 	m_scrollArea->setWidgetResizable( true );
 
 	m_addButton = new QPushButton( this );
-	m_addButton->setText( tr( "Add" ) );
+	m_addButton->setText( tr( "Add LFO" ) );
 
-	connect( m_addButton, SIGNAL( clicked() ),
-			this, SLOT( addController() ) );
+	connect( m_addButton, SIGNAL( clicked() ), this, SLOT( addController() ) );
 
 	Song * song = Engine::getSong();
 	connect( song, SIGNAL( controllerAdded( Controller* ) ), SLOT( onControllerAdded( Controller* ) ) );
@@ -85,17 +85,17 @@ ControllerRackView::ControllerRackView( ) :
 	layout->setMargin( 0 );
 	setLayout( layout );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
+	m_subWin = gui->mainWindow()->addWindowedWidget( this );
 
 	// No maximize button
-	Qt::WindowFlags flags = subWin->windowFlags();
+	Qt::WindowFlags flags = m_subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
+	m_subWin->setWindowFlags( flags );
 	
-	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
-	subWin->move( 680, 60 );
-	subWin->resize( 400, 262 );
-	subWin->setFixedWidth( 262 );
+	m_subWin->setAttribute( Qt::WA_DeleteOnClose, false );
+	m_subWin->move( 680, 60 );
+	m_subWin->resize( 400, 249 );
+	m_subWin->setFixedWidth( 249 );
 }
 
 
@@ -153,16 +153,13 @@ void ControllerRackView::deleteController( ControllerView * _view )
 void ControllerRackView::onControllerAdded( Controller * controller )
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
-
 	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
-
 	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ),
 		 this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
-
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
-
 	++m_nextIndex;
+	update();
 }
 
 
@@ -190,7 +187,10 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 
 		delete viewOfRemovedController;
 		--m_nextIndex;
+		m_scrollArea->verticalScrollBar()->hide();
+		update();
 	}
+
 }
 
 
@@ -201,7 +201,6 @@ void ControllerRackView::addController()
 	// TODO: Eventually let the user pick from available controller types
 
 	Engine::getSong()->addController( new LfoController( Engine::getSong() ) );
-
 	// fix bug which always made ControllerRackView loose focus when adding
 	// new controller
 	setFocus();
@@ -221,4 +220,21 @@ void ControllerRackView::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	_ce->ignore();
+}
+
+
+
+
+void ControllerRackView::resizeEvent( QResizeEvent *re )
+{
+	m_subWin->setFixedWidth( m_scrollArea->verticalScrollBar()->isVisible() ? 262 : 249 );
+}
+
+
+
+
+void ControllerRackView::paintEvent(QPaintEvent *pe)
+{
+	m_subWin->setFixedWidth( m_scrollArea->verticalScrollBar()->isVisible() ? 262 : 249 );
+	m_scrollArea->verticalScrollBar()->show();
 }
