@@ -23,25 +23,25 @@
  *
  */
 
+#include "ControllerRackView.h"
+
 #include <QApplication>
 #include <QLayout>
+#include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QVBoxLayout>
-#include <QMdiArea>
-#include <QMessageBox>
-#include <QVBoxLayout>
 
-#include "Song.h"
-#include "embed.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
-#include "GroupBox.h"
-#include "ControllerRackView.h"
 #include "ControllerView.h"
+#include "embed.h"
+#include "GroupBox.h"
+#include "GuiApplication.h"
 #include "LfoController.h"
+#include "MainWindow.h"
+#include "Song.h"
 
 
 ControllerRackView::ControllerRackView( ) :
@@ -64,7 +64,6 @@ ControllerRackView::ControllerRackView( ) :
 	m_scrollAreaLayout->addStretch();
 	m_scrollAreaLayout->setMargin( 0 );
 	m_scrollAreaLayout->setSpacing( 0 );
-//	m_scrollAreaLayout->setContentsMargins( 0, 0, 0, 0 );
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
 	m_scrollArea->setWidget( scrollAreaWidget );
@@ -91,7 +90,7 @@ ControllerRackView::ControllerRackView( ) :
 	Qt::WindowFlags flags = m_subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	m_subWin->setWindowFlags( flags );
-	
+
 	m_subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_subWin->move( 680, 60 );
 	m_subWin->resize( 400, 249 );
@@ -108,8 +107,7 @@ ControllerRackView::~ControllerRackView()
 
 
 
-void ControllerRackView::saveSettings( QDomDocument & _doc,
-							QDomElement & _this )
+void ControllerRackView::saveSettings( QDomDocument & _doc,	QDomElement & _this )
 {
 	MainWindow::saveWidgetState( this, _this, QSize( 400, 300 ) );
 }
@@ -154,8 +152,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
-	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ),
-		 this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
+	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ), this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
 	++m_nextIndex;
@@ -180,7 +177,7 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 		}
 	}
 
-	if (viewOfRemovedController )
+	if ( viewOfRemovedController )
 	{
 		m_controllerViews.erase( qFind( m_controllerViews.begin(),
 					m_controllerViews.end(), viewOfRemovedController ) );
@@ -190,7 +187,6 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 		m_scrollArea->verticalScrollBar()->hide();
 		update();
 	}
-
 }
 
 
@@ -233,7 +229,7 @@ void ControllerRackView::resizeEvent( QResizeEvent *re )
 
 
 
-void ControllerRackView::paintEvent(QPaintEvent *pe)
+void ControllerRackView::paintEvent( QPaintEvent *pe )
 {
 	m_subWin->setFixedWidth( m_scrollArea->verticalScrollBar()->isVisible() ? 262 : 249 );
 	m_scrollArea->verticalScrollBar()->show();

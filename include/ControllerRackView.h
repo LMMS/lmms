@@ -25,12 +25,12 @@
 #ifndef CONTROLLER_RACK_VIEW_H
 #define CONTROLLER_RACK_VIEW_H
 
+#include <QCloseEvent>
 #include <QMdiSubWindow>
 #include <QWidget>
-#include <QCloseEvent>
 
-#include "SerializingObject.h"
 #include "lmms_basics.h"
+#include "SerializingObject.h"
 
 
 class QPushButton;
@@ -69,7 +69,6 @@ protected:
 
 private slots:
 	void addController();
-
 
 private:
 	QVector<ControllerView *> m_controllerViews;
