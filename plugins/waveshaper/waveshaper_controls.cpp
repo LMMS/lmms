@@ -41,6 +41,7 @@ waveShaperControls::waveShaperControls( waveShaperEffect * _eff ) :
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
+	m_symmetryModel( 0.0f, -0.5f, 0.5f, 0.01f, this, tr( "Symmetry" ) ),
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_clipModel( false, this )
 {
@@ -66,6 +67,7 @@ void waveShaperControls::loadSettings( const QDomElement & _this )
 //load input, output knobs
 	m_inputModel.loadSettings( _this, "inputGain" );
 	m_outputModel.loadSettings( _this, "outputGain" );
+	m_symmetryModel.loadSettings( _this, "symmetry" );
 	
 	m_clipModel.loadSettings( _this, "clipInput" );
 
@@ -88,6 +90,7 @@ void waveShaperControls::saveSettings( QDomDocument & _doc,
 //save input, output knobs
 	m_inputModel.saveSettings( _doc, _this, "inputGain" );
 	m_outputModel.saveSettings( _doc, _this, "outputGain" );
+	m_symmetryModel.saveSettings( _doc, _this, "symmetry" );
 
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
 

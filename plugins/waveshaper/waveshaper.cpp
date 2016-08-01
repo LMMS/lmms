@@ -85,21 +85,29 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
+	float symmetry = m_wsControls.m_symmetryModel.value();
 	const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
 	ValueBuffer *outputBufer = m_wsControls.m_outputModel.valueBuffer();
+	ValueBuffer *symmetryBuffer = m_wsControls.m_symmetryModel.valueBuffer();
 
 	int inputInc = inputBuffer ? 1 : 0;
 	int outputInc = outputBufer ? 1 : 0;
+	int symmetryInc = symmetryBuffer ? 1 : 0;
 
 	const float *inputPtr = inputBuffer ? &( inputBuffer->values()[ 0 ] ) : &input;
 	const float *outputPtr = outputBufer ? &( outputBufer->values()[ 0 ] ) : &output;
+	const float *symmetryPtr = symmetryBuffer ? &( symmetryBuffer->values()[ 0 ] ) : &symmetry;
 
 	for( fpp_t f = 0; f < _frames; ++f )
 	{
 		float s[2] = { _buf[f][0], _buf[f][1] };
+
+// apply symmetry
+		s[0] += *symmetryPtr;
+		s[1] += *symmetryPtr;
 
 // apply input gain
 		s[0] *= *inputPtr;
@@ -147,6 +155,7 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;
+		symmetryPtr += symmetryInc;
 	}
 
 	checkGate( out_sum / _frames );

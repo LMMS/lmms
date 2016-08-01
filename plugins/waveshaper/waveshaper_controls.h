@@ -76,6 +76,7 @@ private:
 	waveShaperEffect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
+	FloatModel m_symmetryModel;
 	graphModel m_wavegraphModel;
 	BoolModel  m_clipModel;
 

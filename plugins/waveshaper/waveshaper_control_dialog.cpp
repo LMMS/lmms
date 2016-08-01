@@ -62,16 +62,22 @@ waveShaperControlDialog::waveShaperControlDialog(
 	inputKnob -> setVolumeRatio( 1.0 );
 	inputKnob -> move( 26, 225 );
 	inputKnob->setModel( &_controls->m_inputModel );
-	inputKnob->setLabel( tr( "INPUT" ) );
+	inputKnob->setLabel( tr( "IN" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
 
 	Knob * outputKnob = new Knob( knobBright_26, this );
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
-	outputKnob -> move( 76, 225 );
+	outputKnob -> move( 52, 225 );
 	outputKnob->setModel( &_controls->m_outputModel );
-	outputKnob->setLabel( tr( "OUTPUT" ) );
+	outputKnob->setLabel( tr( "OUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
+
+	Knob * symmetryKnob = new Knob( knobBright_26, this );
+	symmetryKnob -> move( 86, 225 );
+	symmetryKnob->setModel( &_controls->m_symmetryModel );
+	symmetryKnob->setLabel( tr( "SYM" ) );
+	symmetryKnob->setHintText( tr( "DC Component:" ), "" );
 
 	PixmapButton * resetButton = new PixmapButton( this, tr("Reset wavegraph") );
 	resetButton -> move( 162, 221 );
