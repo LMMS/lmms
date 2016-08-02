@@ -384,6 +384,7 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
+	sf_info.format = 0;
 	f_cnt_t frames = 0;
 	bool sf_rr = false;
 
