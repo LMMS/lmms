@@ -1007,9 +1007,10 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 	
-	// state: selected, muted, normal
+	// state: selected, normal, beat pattern, muted
 	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern ) 
-		? painter.background().color() : mutedBackgroundColor() );
+		? painter.background().color() : ( beatPattern 
+		? BBPatternBackground() : mutedBackgroundColor() ) );
 
 	// invert the gradient for the background in the B&B editor
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
@@ -1236,12 +1237,11 @@ void PatternView::paintEvent( QPaintEvent * )
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
 			rect().bottom() - TCO_BORDER_WIDTH );
-	}
 	
 	// outer border
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-
+	}
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_pat->isMuted() )
 	{

@@ -257,6 +257,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
+	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_needsUpdate( true )
 {
@@ -353,6 +354,9 @@ QColor TrackContentObjectView::textColor() const
 QColor TrackContentObjectView::textShadowColor() const
 { return m_textShadowColor; }
 
+QColor TrackContentObjectView::BBPatternBackground() const
+{ return m_BBPatternBackground; }
+
 bool TrackContentObjectView::gradient() const
 { return m_gradient; }
 
@@ -371,6 +375,9 @@ void TrackContentObjectView::setTextColor( const QColor & c )
 
 void TrackContentObjectView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
+
+void TrackContentObjectView::setBBPatternBackground( const QColor & c )
+{ m_BBPatternBackground = QColor( c ); }
 
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
