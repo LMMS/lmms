@@ -1778,7 +1778,12 @@ void TrackOperationsWidget::cloneTrack()
 	TrackView *newTrackView = tcView->createTrackView( newTrack );
 
 	int index = tcView->trackViews().indexOf( m_trackView );
-	tcView->moveTrackView( newTrackView, index + 1 );
+	int i = tcView->trackViews().size();
+	while ( i != index + 1 )
+	{
+		tcView->moveTrackView( newTrackView, i - 1 );
+		i--;
+	}
 }
 
 
