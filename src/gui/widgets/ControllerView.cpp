@@ -51,8 +51,8 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	QFrame( _parent ),
 	ModelView( _model, this ),
 	m_controllerDlg( NULL ),
-	m_show( true ),
-	m_titleBarHeight( 24 )
+	m_titleBarHeight( 24 ),
+	m_show( true )
 {
 	const QSize buttonsize( 17, 17 );
 	setFrameStyle( QFrame::Plain );
@@ -70,12 +70,8 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_nameLineEdit->setReadOnly( true );
 	m_nameLineEdit->setAttribute( Qt::WA_TransparentForMouseEvents );
 	m_nameLineEdit->move( 3, 3 );
-	// REMOVE THIS IF "rename FxLine directly in QLineEdit" IS MERGED!!!
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	m_nameLineEdit->setStyleSheet( "border-style: none; "
-								   "background: transparent; " );
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	connect( m_nameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
+
 	setFixedWidth( m_controllerDlg->width() + 2 );
 	setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
 	
