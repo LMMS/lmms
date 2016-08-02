@@ -45,6 +45,7 @@
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
 #include "Song.h"
+#include "plugins/peak_controller_effect/peak_controller_effect_control_dialog.h"
 
 
 EffectView::EffectView( Effect * _model, QWidget * _parent ) :
@@ -111,7 +112,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			if( !(m_controlView->windowTitle() == "Peak Controller") )
+			if( dynamic_cast<PeakControllerEffectControlDialog*>( m_controlView ) == NULL )
 			{
 				m_subWindow = gui->mainWindow()->addWindowedWidget(	m_controlView,
 							Qt::SubWindow | Qt::CustomizeWindowHint  |
