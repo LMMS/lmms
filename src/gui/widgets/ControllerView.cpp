@@ -118,6 +118,7 @@ void ControllerView::collapseController()
 		m_collapse->setIcon( embed::getIconPixmap( "stepper-left" ) );
 		m_controllerDlg->hide();
 		setFixedHeight( m_titleBarHeight );
+		emit controllerCollapsed();
 	}
 }
 

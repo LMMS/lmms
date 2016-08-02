@@ -56,11 +56,11 @@ public:
 		return "ControllerRackView";
 	}
 
-
 public slots:
 	void deleteController( ControllerView * _view );
 	void onControllerAdded( Controller * );
 	void onControllerRemoved( Controller * );
+	void onControllerCollapsed();
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );

@@ -68,6 +68,7 @@ public slots:
 
 signals:
 	void deleteController( ControllerView * _view );
+	void controllerCollapsed();
 
 
 protected:

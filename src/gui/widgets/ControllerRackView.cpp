@@ -153,6 +153,7 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
 	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ), this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
+	connect( controllerView, SIGNAL( controllerCollapsed() ), this, SLOT( onControllerCollapsed() ) );
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
 	++m_nextIndex;
@@ -187,6 +188,15 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 		m_scrollArea->verticalScrollBar()->hide();
 		update();
 	}
+}
+
+
+
+
+void ControllerRackView::onControllerCollapsed()
+{
+	m_scrollArea->verticalScrollBar()->hide();
+	update();
 }
 
 
