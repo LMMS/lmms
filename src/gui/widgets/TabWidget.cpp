@@ -57,12 +57,10 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	setFont( pointSize<8>( font() ) );
 
 	setAutoFillBackground( true );
-	QColor bg_color = QApplication::palette().color( QPalette::Active,
-                                                        QPalette::Background ).
-                                                                darker( 132 );
-        QPalette pal = palette();
-        pal.setColor( QPalette::Background, bg_color );
-        setPalette( pal );
+	QColor bg_color = QApplication::palette().color( QPalette::Active, QPalette::Background ). darker( 132 );
+	QPalette pal = palette();
+	pal.setColor( QPalette::Background, bg_color );
+	setPalette( pal );
 
 }
 
@@ -74,7 +72,7 @@ void TabWidget::addTab( QWidget * w, const QString & name, const QString & toolt
 {
 	setFont( pointSize<8>( font() ) );
 
-        // Append tab when position is not given
+	// Append tab when position is not given
 	if( idx < 0/* || m_widgets.contains( idx ) == true*/ )
 	{
 		while( m_widgets.contains( ++idx ) == true )
@@ -85,11 +83,11 @@ void TabWidget::addTab( QWidget * w, const QString & name, const QString & toolt
 	// Tab's width when it is a text tab. This isn't correct for artwork tabs, but it's fixed later during the PaintEvent
 	int tab_width = fontMetrics().width( name ) + 10;
 
-        // Register new tab
+	// Register new tab
 	widgetDesc d = { w, activePixmap, inactivePixmap, name, tooltip, tab_width } ;
 	m_widgets[idx] = d;
 
-        // Position tab's window
+	// Position tab's window
 	w->setFixedSize( width() - 4, height() - m_tabbarHeight );
 	w->move( 2, m_tabbarHeight - 1 );
 	w->hide();
@@ -129,7 +127,7 @@ int TabWidget::findTabAtPos( const QPoint *pos )
 
 	if( pos->y() > 1 && pos->y() < m_tabbarHeight - 1 )
 	{
-               int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
+		int cx = ( ( m_caption == "" ) ? 4 : 14 ) + fontMetrics().width( m_caption );
 
 		for( widgetStack::iterator it = m_widgets.begin(); it != m_widgets.end(); ++it )
 		{
@@ -233,12 +231,12 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 		p.drawText( 5, 11, m_caption );
 	}
 
-        // Calculate the tabs' x (tabs are painted next to the caption)
-        int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
+	// Calculate the tabs' x (tabs are painted next to the caption)
+	int tab_x_offset = m_caption.isEmpty() ? 4 : 14 + fontMetrics().width( m_caption );
 
 	// Compute tabs' width depending on the number of tabs (only applicable for artwork tabs)
-  	widgetStack::iterator first = m_widgets.begin();
-  	widgetStack::iterator last = m_widgets.end();
+	widgetStack::iterator first = m_widgets.begin();
+	widgetStack::iterator last = m_widgets.end();
 	int tab_width = width();
 	if ( first != last )
 	{
@@ -275,7 +273,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 		else
 		{
 			// Highlight tab when active
-                	if( it.key() == m_activeTab )
+			if( it.key() == m_activeTab )
 	                {
 				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, tabSelected() );
 			}
