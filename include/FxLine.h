@@ -26,9 +26,7 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
-#include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGraphicsProxyWidget>
 #include <QLineEdit>
 #include <QWidget>
 
@@ -96,12 +94,8 @@ private:
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
 	bool m_inRename;
-	QString m_newName;
 	QLineEdit * m_renameLineEdit;
-	QGraphicsProxyWidget * m_proxyWidget;
 	QGraphicsView * m_view;
-	QGraphicsScene * m_scene;
-	QString m_name;
 
 private slots:
 	void renameChannel();

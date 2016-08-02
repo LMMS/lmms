@@ -25,6 +25,8 @@
 
 #include "FxLine.h"
 
+#include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
 #include <QPainter>
 #include <QLineEdit>
 #include <QWhatsThis>
@@ -97,28 +99,28 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	"You can remove and move FX channels in the context menu, which is accessed "
 	"by right-clicking the FX channel.\n" ) );
 
-	m_name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	setToolTip( m_name );
+	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	setToolTip( name );
 
 	m_renameLineEdit = new QLineEdit();
-	m_renameLineEdit->setText( m_name );
+	m_renameLineEdit->setText( name );
 	m_renameLineEdit->setFixedWidth( 65 );
 	m_renameLineEdit->setFont( pointSizeF( FxLine::font(), 7.5f ) );
 	m_renameLineEdit->setReadOnly( true );
 
-	m_scene = new QGraphicsScene();
-	m_scene->setSceneRect( 0, 0, 33, FxLineHeight );
+	QGraphicsScene * scene = new QGraphicsScene();
+	scene->setSceneRect( 0, 0, 33, FxLineHeight );
 
 	m_view = new QGraphicsView( this );
 	m_view->setStyleSheet( "border-style: none; background: transparent;" );
 	m_view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_view->setAttribute( Qt::WA_TransparentForMouseEvents, true );
-	m_view->setScene( m_scene );
+	m_view->setScene( scene );
 
-	m_proxyWidget = m_scene->addWidget( m_renameLineEdit );
-	m_proxyWidget->setRotation( -90 );
-	m_proxyWidget->setPos( 8, 145 );
+	QGraphicsProxyWidget * proxyWidget = scene->addWidget( m_renameLineEdit );
+	proxyWidget->setRotation( -90 );
+	proxyWidget->setPos( 8, 145 );
 
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 }
@@ -145,10 +147,10 @@ void FxLine::setChannelIndex( int index )
 
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
-	m_name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	if( !m_inRename && m_renameLineEdit->text() != elideName( m_name ) )
+	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	if( !m_inRename && m_renameLineEdit->text() != elideName( name ) )
 	{
-		m_renameLineEdit->setText( elideName( m_name ) );
+		m_renameLineEdit->setText( elideName( name ) );
 	}
 
 	int width = fxLine->rect().width();
@@ -181,7 +183,7 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 QString FxLine::elideName( QString name )
 {
 	const int maxTextHeight = 70;
-	QFontMetrics metrics( FxLine::font() );
+	QFontMetrics metrics( font() );
 	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
 	return elidedName;
 }
@@ -268,13 +270,13 @@ void FxLine::renameFinished()
 	m_renameLineEdit->setReadOnly( true );
 	m_renameLineEdit->setFixedWidth( 65 );
 	m_lcd->show();
-	m_newName = m_renameLineEdit->text();
+	QString newName = m_renameLineEdit->text();
 	setFocus();
-	if( !m_newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != m_newName )
+	if( !newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != newName )
 	{
-		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = m_newName;
-		setToolTip( m_newName );
-		m_renameLineEdit->setText( elideName( m_newName ) );
+		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = newName;
+		setToolTip( newName );
+		m_renameLineEdit->setText( elideName( newName ) );
 		Engine::getSong()->setModified();
 	}
 }
