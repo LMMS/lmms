@@ -105,13 +105,13 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	{
 		float s[2] = { _buf[f][0], _buf[f][1] };
 
-// apply symmetry
-		s[0] += *symmetryPtr;
-		s[1] += *symmetryPtr;
-
 // apply input gain
 		s[0] *= *inputPtr;
 		s[1] *= *inputPtr;
+
+// apply symmetry
+		s[0] += *symmetryPtr;
+		s[1] += *symmetryPtr;
 
 // clip if clip enabled
 		if( clip )
