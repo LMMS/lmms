@@ -1172,7 +1172,7 @@ void PatternView::paintEvent( QPaintEvent * )
 		if ( muted )
 		{
 			p.setBrush( mutedBackgroundColor() );
-			p.setOpacity( 0.3 );
+			p.setOpacity( 0.5 );
 			p.drawRect( 0, 0, width(), height() );
 		}
 	}
