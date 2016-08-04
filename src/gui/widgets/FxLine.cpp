@@ -105,7 +105,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	m_renameLineEdit = new QLineEdit();
 	m_renameLineEdit->setText( name );
 	m_renameLineEdit->setFixedWidth( 65 );
-	m_renameLineEdit->setFont( pointSizeF( FxLine::font(), 7.5f ) );
+	m_renameLineEdit->setFont( pointSizeF( font(), 7.5f ) );
 	m_renameLineEdit->setReadOnly( true );
 
 	QGraphicsScene * scene = new QGraphicsScene();
@@ -193,13 +193,11 @@ QString FxLine::elideName( QString name )
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	bool sendToThis = Engine::fxMixer()->channelSendModel(
-		m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
-	bool receiveFromThis = Engine::fxMixer()->channelSendModel(
-		m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
+	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
+	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
 	QPainter painter;
 	painter.begin( this );
-	drawFxLine( &painter, this,	m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
+	drawFxLine( &painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
 	painter.end();
 }
 
@@ -238,7 +236,6 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ), this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
-
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
@@ -322,8 +319,7 @@ void FxLine::moveChannelRight()
 
 void FxLine::displayHelp()
 {
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
+	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), whatsThis() );
 }
 
 
