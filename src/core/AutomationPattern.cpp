@@ -496,12 +496,12 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 		// The x values are essentially twice the distance from their control points
 		// to make up for their range being limited.
-		int targetX1 = ( m_controlPoints[v.key()][0] - v.key() ) * 2;
-		int targetX2 = ( 3 * (v+1).key() - 2 * m_controlPoints[(v+1).key()][0] - v.key() );
+		int targetX1 = ( m_controlPoints[v.key()].at(0) - v.key() ) * 2;
+		int targetX2 = ( 3 * (v+1).key() - 2 * m_controlPoints[(v+1).key()].at(0) - v.key() );
 		// The y values are the actual y values. Maybe this should be doubled, 
 		// but it doesn't seem necessary to me.
-		float targetY1 = m_controlPoints[v.key()][1];
-		float targetY2 = 2*(v+1).value() - m_controlPoints[(v+1).key()][1];
+		float targetY1 = m_controlPoints[v.key()].at(1);
+		float targetY2 = 2*(v+1).value() - m_controlPoints[(v+1).key()].at(1);
 
 		// To find the y value on the curve at a certain x, we first have to find the t (between 0 and 1) that gives the x
 		float t = 0;
