@@ -25,6 +25,7 @@
 #include "Song.h"
 #include <QTextStream>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -143,7 +144,7 @@ void Song::masterVolumeChanged()
 
 void Song::setTempo()
 {
-	Engine::mixer()->lockPlayHandleRemoval();
+	Engine::mixer()->requestChangeInModel();
 	const bpm_t tempo = ( bpm_t ) m_tempoModel.value();
 	PlayHandleList & playHandles = Engine::mixer()->playHandles();
 	for( PlayHandleList::Iterator it = playHandles.begin();
@@ -157,7 +158,7 @@ void Song::setTempo()
 			nph->unlock();
 		}
 	}
-	Engine::mixer()->unlockPlayHandleRemoval();
+	Engine::mixer()->doneChangeInModel();
 
 	Engine::updateFramesPerTick();
 
@@ -610,7 +611,6 @@ void Song::stop()
 	}
 
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
-	m_playing = false;
 	m_paused = false;
 	m_recording = true;
 
@@ -622,6 +622,11 @@ void Song::stop()
 			case TimeLineWidget::BackToZero:
 				m_playPos[m_playMode].setTicks( 0 );
 				m_elapsedMilliSeconds = 0;
+				if( gui && gui->songEditor() &&
+						( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+				{
+					gui->songEditor()->m_editor->updatePosition(0);
+				}
 				break;
 
 			case TimeLineWidget::BackToStart:
@@ -631,6 +636,11 @@ void Song::stop()
 					m_elapsedMilliSeconds = 
 						( ( ( tl->savedPos().getTicks() ) * 60 * 1000 / 48 ) / 
 							getTempo() );
+					if( gui && gui->songEditor() &&
+							( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+					{
+						gui->songEditor()->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+					}
 					tl->savePos( -1 );
 				}
 				break;
@@ -645,6 +655,7 @@ void Song::stop()
 		m_playPos[m_playMode].setTicks( 0 );
 		m_elapsedMilliSeconds = 0;
 	}
+	m_playing = false;
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
@@ -780,7 +791,7 @@ void Song::clearProject()
 	}
 
 
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 
 	if( gui && gui->getBBEditor() )
 	{
@@ -821,7 +832,7 @@ void Song::clearProject()
 	AutomationPattern::globalAutomationPattern( &m_masterPitchModel )->
 									clear();
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	if( gui && gui->getProjectNotes() )
 	{
@@ -953,7 +964,7 @@ void Song::loadProject( const QString & fileName )
 
 	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
 
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 
 	// get the header information from the DOM
 	m_tempoModel.loadSettings( dataFile.head(), "bpm" );
@@ -1040,7 +1051,7 @@ void Song::loadProject( const QString & fileName )
 	AutomationPattern::resolveAllIDs();
 
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	ConfigManager::inst()->addRecentlyOpenedProject( fileName );
 
@@ -1052,7 +1063,7 @@ void Song::loadProject( const QString & fileName )
 	{
 		if ( gui )
 		{
-			QMessageBox::warning( NULL, "LMMS Error report", *errorSummary(),
+			QMessageBox::warning( NULL, tr("LMMS Error report"), *errorSummary(),
 							QMessageBox::Ok );
 		}
 		else
@@ -1159,8 +1170,6 @@ void Song::importProject()
 			ConfigManager::inst()->userProjectsDir(),
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
-			tr("FL Studio projects") +
-			" (*.flp);;" +
 			tr("Hydrogen projects") +
 			" (*.h2song);;" +
 			tr("All file types") +

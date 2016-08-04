@@ -28,9 +28,9 @@
 #define CONTROLLER_H
 
 #include "Engine.h"
-#include "Mixer.h"
 #include "Model.h"
 #include "JournallingObject.h"
+#include "templates.h"
 #include "ValueBuffer.h"
 
 class ControllerDialog;

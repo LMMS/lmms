@@ -28,6 +28,7 @@
 
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
+#include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
@@ -719,7 +720,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if( *it )
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id", ( *it )->id() );
+			element.setAttribute( "id",
+				ProjectJournal::idToSave( ( *it )->id() ) );
 			_this.appendChild( element );
 		}
 	}

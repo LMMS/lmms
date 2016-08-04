@@ -20,11 +20,12 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
 
+#line 10 "delay_1898.xml"
 
 #include "ladspa-util.h"
 
@@ -122,6 +123,7 @@ static void activateDelay_n(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 37 "delay_1898.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -151,6 +153,7 @@ static void activateDelay_n(LADSPA_Handle instance) {
 }
 
 static void cleanupDelay_n(LADSPA_Handle instance) {
+#line 59 "delay_1898.xml"
 	Delay_n *plugin_data = (Delay_n *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -182,15 +185,22 @@ static void connectPortDelay_n(
 static LADSPA_Handle instantiateDelay_n(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Delay_n *plugin_data = (Delay_n *)malloc(sizeof(Delay_n));
+	Delay_n *plugin_data = (Delay_n *)calloc(1, sizeof(Delay_n));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 27 "delay_1898.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -219,6 +229,9 @@ static void runDelay_n(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 	LADSPA_Data * buffer = plugin_data->buffer;
@@ -228,7 +241,8 @@ static void runDelay_n(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 63 "delay_1898.xml"
+	int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -286,6 +300,9 @@ static void runDelay_n(LADSPA_Handle instance, unsigned long sample_count) {
 	}
 	
 	plugin_data->write_phase = write_phase;
+
+	// Unused variable
+	(void)(max_delay);
 }
 #undef buffer_write
 #undef RUN_ADDING
@@ -309,6 +326,9 @@ static void runAddingDelay_n(LADSPA_Handle instance, unsigned long sample_count)
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 	LADSPA_Data * buffer = plugin_data->buffer;
@@ -318,7 +338,8 @@ static void runAddingDelay_n(LADSPA_Handle instance, unsigned long sample_count)
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 63 "delay_1898.xml"
+	int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -376,6 +397,9 @@ static void runAddingDelay_n(LADSPA_Handle instance, unsigned long sample_count)
 	}
 	
 	plugin_data->write_phase = write_phase;
+
+	// Unused variable
+	(void)(max_delay);
 }
 
 static void activateDelay_l(LADSPA_Handle instance) {
@@ -386,6 +410,7 @@ static void activateDelay_l(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 37 "delay_1898.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -415,6 +440,7 @@ static void activateDelay_l(LADSPA_Handle instance) {
 }
 
 static void cleanupDelay_l(LADSPA_Handle instance) {
+#line 59 "delay_1898.xml"
 	Delay_l *plugin_data = (Delay_l *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -446,15 +472,22 @@ static void connectPortDelay_l(
 static LADSPA_Handle instantiateDelay_l(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Delay_l *plugin_data = (Delay_l *)malloc(sizeof(Delay_l));
+	Delay_l *plugin_data = (Delay_l *)calloc(1, sizeof(Delay_l));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 27 "delay_1898.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -483,6 +516,9 @@ static void runDelay_l(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 	LADSPA_Data * buffer = plugin_data->buffer;
@@ -492,7 +528,8 @@ static void runDelay_l(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 63 "delay_1898.xml"
+	int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -538,6 +575,9 @@ static void runDelay_l(LADSPA_Handle instance, unsigned long sample_count) {
 	}
 	
 	plugin_data->write_phase = write_phase;
+
+	// Unused variable
+	(void)(max_delay);
 }
 #undef buffer_write
 #undef RUN_ADDING
@@ -561,6 +601,9 @@ static void runAddingDelay_l(LADSPA_Handle instance, unsigned long sample_count)
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 	LADSPA_Data * buffer = plugin_data->buffer;
@@ -570,7 +613,8 @@ static void runAddingDelay_l(LADSPA_Handle instance, unsigned long sample_count)
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 63 "delay_1898.xml"
+	int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -616,6 +660,9 @@ static void runAddingDelay_l(LADSPA_Handle instance, unsigned long sample_count)
 	}
 	
 	plugin_data->write_phase = write_phase;
+
+	// Unused variable
+	(void)(max_delay);
 }
 
 static void activateDelay_c(LADSPA_Handle instance) {
@@ -626,6 +673,7 @@ static void activateDelay_c(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 37 "delay_1898.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -655,6 +703,7 @@ static void activateDelay_c(LADSPA_Handle instance) {
 }
 
 static void cleanupDelay_c(LADSPA_Handle instance) {
+#line 59 "delay_1898.xml"
 	Delay_c *plugin_data = (Delay_c *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -686,15 +735,22 @@ static void connectPortDelay_c(
 static LADSPA_Handle instantiateDelay_c(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Delay_c *plugin_data = (Delay_c *)malloc(sizeof(Delay_c));
+	Delay_c *plugin_data = (Delay_c *)calloc(1, sizeof(Delay_c));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 27 "delay_1898.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -723,6 +779,9 @@ static void runDelay_c(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 	LADSPA_Data * buffer = plugin_data->buffer;
@@ -732,7 +791,8 @@ static void runDelay_c(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 63 "delay_1898.xml"
+	int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -780,6 +840,9 @@ static void runDelay_c(LADSPA_Handle instance, unsigned long sample_count) {
 	}
 	
 	plugin_data->write_phase = write_phase;
+
+	// Unused variable
+	(void)(max_delay);
 }
 #undef buffer_write
 #undef RUN_ADDING
@@ -803,6 +866,9 @@ static void runAddingDelay_c(LADSPA_Handle instance, unsigned long sample_count)
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 	LADSPA_Data * buffer = plugin_data->buffer;
@@ -812,7 +878,8 @@ static void runAddingDelay_c(LADSPA_Handle instance, unsigned long sample_count)
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 63 "delay_1898.xml"
+	int i;
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -860,16 +927,18 @@ static void runAddingDelay_c(LADSPA_Handle instance, unsigned long sample_count)
 	}
 	
 	plugin_data->write_phase = write_phase;
+
+	// Unused variable
+	(void)(max_delay);
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -1093,24 +1162,27 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (delay_nDescriptor) {
 		free((LADSPA_PortDescriptor *)delay_nDescriptor->PortDescriptors);
 		free((char **)delay_nDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)delay_nDescriptor->PortRangeHints);
 		free(delay_nDescriptor);
 	}
+	delay_nDescriptor = NULL;
 	if (delay_lDescriptor) {
 		free((LADSPA_PortDescriptor *)delay_lDescriptor->PortDescriptors);
 		free((char **)delay_lDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)delay_lDescriptor->PortRangeHints);
 		free(delay_lDescriptor);
 	}
+	delay_lDescriptor = NULL;
 	if (delay_cDescriptor) {
 		free((LADSPA_PortDescriptor *)delay_cDescriptor->PortDescriptors);
 		free((char **)delay_cDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)delay_cDescriptor->PortRangeHints);
 		free(delay_cDescriptor);
 	}
+	delay_cDescriptor = NULL;
 
 }

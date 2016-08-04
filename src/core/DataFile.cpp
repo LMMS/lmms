@@ -37,11 +37,13 @@
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
+#include "embed.h"
 #include "GuiApplication.h"
 #include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
+#include "TextFloat.h"
 
 
 
@@ -191,7 +193,7 @@ bool DataFile::validate( QString extension )
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "pat" || extension == "mid" ||
-				extension == "flp" || extension == "dll"
+				extension == "dll"
 				) )
 		{
 			return true;
@@ -792,6 +794,20 @@ void DataFile::upgrade_0_4_0_rc2()
 }
 
 
+void DataFile::upgrade_1_1_0()
+{
+	QDomNodeList list = elementsByTagName("fxchannel");
+	for (int i = 1; !list.item(i).isNull(); ++i)
+	{
+		QDomElement el = list.item(i).toElement();
+		QDomElement send = createElement("send");
+		send.setAttribute("channel", "0");
+		send.setAttribute("amount", "1");
+		el.appendChild(send);
+	}
+}
+
+
 void DataFile::upgrade_1_1_91()
 {
 	// Upgrade to version 1.1.91 from some version less than 1.1.91
@@ -802,6 +818,15 @@ void DataFile::upgrade_1_1_91()
 		QString s = el.attribute( "src" );
 		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
 		el.setAttribute( "src", s );
+	}
+
+	list = elementsByTagName( "attribute" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if ( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
+			el.setAttribute( "value", "vocoder" );
+		}
 	}
 }
 
@@ -869,6 +894,10 @@ void DataFile::upgrade()
 	if( version < "0.4.0-rc2" )
 	{
 		upgrade_0_4_0_rc2();
+	}
+	if( version < ProjectVersion("1.1.0", CompareType::Release) )
+	{
+		upgrade_1_1_0();
 	}
 	if( version < ProjectVersion("1.1.91", CompareType::Release) )
 	{
@@ -950,17 +979,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
-					QMessageBox::information( NULL,
-						SongEditor::tr( "Project Version Mismatch" ),
-						SongEditor::tr( 
-								"This %1 was created with "
-								"LMMS version %2, but version %3 "
-								"is installed")
-								.arg( _sourceFile.endsWith( ".mpt" ) ?
-                                                                        SongEditor::tr("template") :
-                                                                        SongEditor::tr("project") )
-								.arg( root.attribute( "creatorversion" ) )
-								.arg( LMMS_VERSION ) );
+					TextFloat::displayMessage(
+						SongEditor::tr( "Version difference" ),
+						SongEditor::tr(
+							"This %1 was created with "
+							"LMMS %2."
+						).arg(
+							_sourceFile.endsWith( ".mpt" ) ?
+								SongEditor::tr( "template" ) :
+								SongEditor::tr( "project" )
+						)
+						.arg( root.attribute( "creatorversion" ) ),
+						embed::getIconPixmap( "whatsthis", 24, 24 ),
+						2500
+					);
 				}
 			}
 
@@ -975,4 +1007,3 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_content = root.elementsByTagName( typeName( m_type ) ).
 							item( 0 ).toElement();
 }
-

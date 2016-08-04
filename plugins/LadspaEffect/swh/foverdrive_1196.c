@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -83,7 +83,7 @@ static void connectPortFoverdrive(
 static LADSPA_Handle instantiateFoverdrive(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Foverdrive *plugin_data = (Foverdrive *)malloc(sizeof(Foverdrive));
+	Foverdrive *plugin_data = (Foverdrive *)calloc(1, sizeof(Foverdrive));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -155,14 +155,13 @@ static void runAddingFoverdrive(LADSPA_Handle instance, unsigned long sample_cou
 	}
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -234,12 +233,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (foverdriveDescriptor) {
 		free((LADSPA_PortDescriptor *)foverdriveDescriptor->PortDescriptors);
 		free((char **)foverdriveDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)foverdriveDescriptor->PortRangeHints);
 		free(foverdriveDescriptor);
 	}
+	foverdriveDescriptor = NULL;
 
 }

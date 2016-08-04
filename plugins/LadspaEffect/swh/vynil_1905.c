@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -211,7 +211,7 @@ static void connectPortVynil(
 static LADSPA_Handle instantiateVynil(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Vynil *plugin_data = (Vynil *)malloc(sizeof(Vynil));
+	Vynil *plugin_data = (Vynil *)calloc(1, sizeof(Vynil));
 	LADSPA_Data *buffer_m = NULL;
 	unsigned int buffer_mask;
 	unsigned int buffer_pos;
@@ -580,14 +580,13 @@ static void runAddingVynil(LADSPA_Handle instance, unsigned long sample_count) {
 	plugin_data->phi = phi;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -713,12 +712,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (vynilDescriptor) {
 		free((LADSPA_PortDescriptor *)vynilDescriptor->PortDescriptors);
 		free((char **)vynilDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)vynilDescriptor->PortRangeHints);
 		free(vynilDescriptor);
 	}
+	vynilDescriptor = NULL;
 
 }

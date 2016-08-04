@@ -135,6 +135,8 @@ protected slots:
 
 
 private:
+	void resizeToFirstTrack();
+
 	InstrumentTrack * m_instrumentTrack;
 
 	PatternTypes m_patternType;

@@ -61,6 +61,14 @@
 
 
 
+typedef LocklessList<PlayHandle *>::Element LocklessListElement;
+
+
+static __thread bool s_renderingThread;
+
+
+
+
 Mixer::Mixer( bool renderOnly ) :
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_inputBufferRead( 0 ),
@@ -71,12 +79,17 @@ Mixer::Mixer( bool renderOnly ) :
 	m_numWorkers( QThread::idealThreadCount()-1 ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
+	m_isProcessing( false ),
 	m_audioDev( NULL ),
 	m_oldAudioDev( NULL ),
 	m_audioDevStartFailed( false ),
-	m_globalMutex( QMutex::Recursive ),
 	m_profiler(),
-	m_metronomeActive(false)
+	m_metronomeActive(false),
+	m_clearSignal( false ),
+	m_changesSignal( false ),
+	m_changes( 0 ),
+	m_doChangesMutex( QMutex::Recursive ),
+	m_waitingForWrite( false )
 {
 	for( int i = 0; i < 2; ++i )
 	{
@@ -151,6 +164,8 @@ Mixer::Mixer( bool renderOnly ) :
 
 Mixer::~Mixer()
 {
+	runChangesInModel();
+
 	for( int w = 0; w < m_numWorkers; ++w )
 	{
 		m_workers[w]->quit();
@@ -208,6 +223,8 @@ void Mixer::startProcessing( bool _needs_fifo )
 	}
 
 	m_audioDev->startProcessing();
+
+	m_isProcessing = true;
 }
 
 
@@ -215,13 +232,15 @@ void Mixer::startProcessing( bool _needs_fifo )
 
 void Mixer::stopProcessing()
 {
+	m_isProcessing = false;
+
 	if( m_fifoWriter != NULL )
 	{
 		m_fifoWriter->finish();
 		m_fifoWriter->wait();
+		m_audioDev->stopProcessing();
 		delete m_fifoWriter;
 		m_fifoWriter = NULL;
-		m_audioDev->stopProcessing();
 	}
 	else
 	{
@@ -282,7 +301,7 @@ bool Mixer::criticalXRuns() const
 
 void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 {
-	lockInputFrames();
+	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
 	int size = m_inputBufferSize[ m_inputBufferWrite ];
@@ -304,7 +323,7 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 
-	unlockInputFrames();
+	doneChangeInModel();
 }
 
 
@@ -313,6 +332,8 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 const surroundSampleFrame * Mixer::renderNextBuffer()
 {
 	m_profiler.startPeriod();
+
+	s_renderingThread = true;
 
 	static Song::PlayPos last_metro_pos = -1;
 
@@ -341,20 +362,22 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		last_metro_pos = p;
 	}
 
-	lockInputFrames();
-
 	// swap buffer
 	m_inputBufferWrite = ( m_inputBufferWrite + 1 ) % 2;
 	m_inputBufferRead =  ( m_inputBufferRead + 1 ) % 2;
 
 	// clear new write buffer
 	m_inputBufferFrames[ m_inputBufferWrite ] = 0;
-	unlockInputFrames();
+
+	if( m_clearSignal )
+	{
+		m_clearSignal = false;
+		clearInternal();
+	}
 
 	// remove all play-handles that have to be deleted and delete
 	// them if they still exist...
 	// maybe this algorithm could be optimized...
-	lockPlayHandleRemoval();
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
@@ -373,11 +396,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 		it_rem = m_playHandlesToRemove.erase( it_rem );
 	}
-	unlockPlayHandleRemoval();
-
-	// now we have to make sure no other thread does anything bad
-	// while we're acting...
-	lock();
 
 	// rotate buffers
 	m_writeBuffer = ( m_writeBuffer + 1 ) % m_poolDepth;
@@ -397,13 +415,15 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	song->processNextBuffer();
 
 	// add all play-handles that have to be added
-	m_playHandleMutex.lock();
-	m_playHandles += m_newPlayHandles;
-	m_newPlayHandles.clear();
-	m_playHandleMutex.unlock();
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	{
+		m_playHandles += e->value;
+		LocklessListElement * next = e->next;
+		delete e;
+		e = next;
+	}
 
 	// STAGE 1: run and render all play handles
-	lockPlayHandleRemoval();
 	MixerWorkerThread::fillJobQueue<PlayHandleList>( m_playHandles );
 	MixerWorkerThread::startAndWaitForJobs();
 
@@ -432,7 +452,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			++it;
 		}
 	}
-	unlockPlayHandleRemoval();
 
 	// STAGE 2: process effects of all instrument- and sampletracks
 	MixerWorkerThread::fillJobQueue<QVector<AudioPort *> >( m_audioPorts );
@@ -442,10 +461,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// STAGE 3: do master mix in FX mixer
 	fxMixer->masterMix( m_writeBuf );
 
-	unlock();
-
 
 	emit nextAudioBuffer( m_readBuf );
+
+	runChangesInModel();
 
 	// and trigger LFOs
 	EnvelopeAndLfoParameters::instances()->trigger();
@@ -455,6 +474,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	// refresh buffer pool
 	BufferManager::refresh();
 
+	s_renderingThread = false;
+
 	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
 
 	return m_readBuf;
@@ -463,13 +484,19 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 
 
-// removes all play-handles. this is necessary, when the song is stopped ->
-// all remaining notes etc. would be played until their end
 void Mixer::clear()
 {
+	m_clearSignal = true;
+}
+
+
+
+
+// removes all play-handles. this is necessary, when the song is stopped ->
+// all remaining notes etc. would be played until their end
+void Mixer::clearInternal()
+{
 	// TODO: m_midiClient->noteOffAll();
-	lock();
-	lockPlayHandleRemoval();
 	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
 	{
 		// we must not delete instrument-play-handles as they exist
@@ -479,8 +506,6 @@ void Mixer::clear()
 			m_playHandlesToRemove.push_back( *it );
 		}
 	}
-	unlockPlayHandleRemoval();
-	unlock();
 }
 
 
@@ -602,15 +627,15 @@ void Mixer::restoreAudioDevice()
 
 void Mixer::removeAudioPort( AudioPort * _port )
 {
+	requestChangeInModel();
 	QVector<AudioPort *>::Iterator it = qFind( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 	if( it != m_audioPorts.end() )
 	{
-		lock();
 		m_audioPorts.erase( it );
-		unlock();
 	}
+	doneChangeInModel();
 }
 
 
@@ -618,10 +643,8 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 {
 	if( criticalXRuns() == false )
 	{
-		m_playHandleMutex.lock();
-			m_newPlayHandles.append( handle );
-			handle->audioPort()->addPlayHandle( handle );
-		m_playHandleMutex.unlock();
+		m_newPlayHandles.push( handle );
+		handle->audioPort()->addPlayHandle( handle );
 		return true;
 	}
 
@@ -637,7 +660,7 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 
 void Mixer::removePlayHandle( PlayHandle * _ph )
 {
-	lockPlayHandleRemoval();
+	requestChangeInModel();
 	// check thread affinity as we must not delete play-handles
 	// which were created in a thread different than mixer thread
 	if( _ph->affinityMatters() &&
@@ -647,18 +670,26 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		m_playHandleMutex.lock();
-		PlayHandleList::Iterator it =
-				qFind( m_newPlayHandles.begin(),
-						m_newPlayHandles.end(), _ph );
-		if( it != m_newPlayHandles.end() )
+		for( LocklessListElement * e = m_newPlayHandles.first(),
+				* ePrev = NULL; e; ePrev = e, e = e->next )
 		{
-			m_newPlayHandles.erase( it );
-			removedFromList = true;
+			if( e->value == _ph )
+			{
+				if( ePrev )
+				{
+					ePrev->next = e->next;
+				}
+				else
+				{
+					m_newPlayHandles.setFirst( e->next );
+				}
+				delete e;
+				removedFromList = true;
+				break;
+			}
 		}
-		m_playHandleMutex.unlock();
 		// Now check m_playHandles
-		it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{
@@ -681,7 +712,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 	{
 		m_playHandlesToRemove.push_back( _ph );
 	}
-	unlockPlayHandleRemoval();
+	doneChangeInModel();
 }
 
 
@@ -689,7 +720,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 
 void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 {
-	lockPlayHandleRemoval();
+	requestChangeInModel();
 	PlayHandleList::Iterator it = m_playHandles.begin();
 	while( it != m_playHandles.end() )
 	{
@@ -708,27 +739,63 @@ void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 			++it;
 		}
 	}
-	unlockPlayHandleRemoval();
+	doneChangeInModel();
 }
 
 
 
 
-bool Mixer::hasNotePlayHandles()
+void Mixer::requestChangeInModel()
 {
-	lock();
+	if( s_renderingThread )
+		return;
 
-	for( PlayHandleList::Iterator it = m_playHandles.begin(); it != m_playHandles.end(); ++it )
+	m_changesMutex.lock();
+	m_changes++;
+	m_changesMutex.unlock();
+
+	m_doChangesMutex.lock();
+	m_waitChangesMutex.lock();
+	if ( m_isProcessing && !m_waitingForWrite && !m_changesSignal )
 	{
-		if( (*it)->type() == PlayHandle::TypeNotePlayHandle )
-		{
-			unlock();
-			return true;
-		}
+		m_changesSignal = true;
+		m_changesRequestCondition.wait( &m_waitChangesMutex );
 	}
+	m_waitChangesMutex.unlock();
+}
 
-	unlock();
-	return false;
+
+
+
+void Mixer::doneChangeInModel()
+{
+	if( s_renderingThread )
+		return;
+
+	m_changesMutex.lock();
+	bool moreChanges = --m_changes;
+	m_changesMutex.unlock();
+
+	if( !moreChanges )
+	{
+		m_changesSignal = false;
+		m_changesMixerCondition.wakeOne();
+	}
+	m_doChangesMutex.unlock();
+}
+
+
+
+
+void Mixer::runChangesInModel()
+{
+	if( m_changesSignal )
+	{
+		m_waitChangesMutex.lock();
+		m_changesRequestCondition.wakeOne();
+		m_changesMixerCondition.wait( &m_waitChangesMutex );
+		m_waitChangesMutex.unlock();
+	}
 }
 
 
@@ -1013,10 +1080,27 @@ void Mixer::fifoWriter::run()
 		surroundSampleFrame * buffer = new surroundSampleFrame[frames];
 		const surroundSampleFrame * b = m_mixer->renderNextBuffer();
 		memcpy( buffer, b, frames * sizeof( surroundSampleFrame ) );
-		m_fifo->write( buffer );
+		write( buffer );
 	}
 
-	m_fifo->write( NULL );
+	write( NULL );
+}
+
+
+
+
+void Mixer::fifoWriter::write( surroundSampleFrame * buffer )
+{
+	m_mixer->m_waitChangesMutex.lock();
+	m_mixer->m_waitingForWrite = true;
+	m_mixer->m_waitChangesMutex.unlock();
+	m_mixer->runChangesInModel();
+
+	m_fifo->write( buffer );
+
+	m_mixer->m_doChangesMutex.lock();
+	m_mixer->m_waitingForWrite = false;
+	m_mixer->m_doChangesMutex.unlock();
 }
 
 

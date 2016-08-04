@@ -1,5 +1,10 @@
 #![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
-[![Build Status](https://travis-ci.org/LMMS/lmms.png)](https://travis-ci.org/LMMS/lmms)
+
+[![Build status](https://img.shields.io/travis/LMMS/lmms.svg?maxAge=3600)](https://travis-ci.org/LMMS/lmms)
+[![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)
+[![Overall downloads on Github](https://img.shields.io/github/downloads/LMMS/lmms/total.svg?maxAge=3600)](https://github.com/LMMS/lmms/releases)
+[![Join the chat at Discord](https://img.shields.io/badge/chat%20on-discord-7289DA.svg)](https://discord.gg/5kSc32Z)
+[![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
 What is LMMS?
 --------------
@@ -27,7 +32,7 @@ Features
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
-* Import of MIDI and FLP (FL Studio®/Fruityloops® Project) files
+* MIDI file importing
 
 Building
 ---------

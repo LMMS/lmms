@@ -75,6 +75,8 @@ QPixmap * AutomationEditor::s_toolMove = NULL;
 QPixmap * AutomationEditor::s_toolYFlip = NULL;
 QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
+const QVector<double> AutomationEditor::m_zoomXLevels =
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
 
@@ -1619,11 +1621,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		int x = m_zoomingXModel.value();
 		if( we->delta() > 0 )
 		{
-			x++;
+			x--;
 		}
 		if( we->delta() < 0 )
 		{
-			x--;
+			x++;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 		m_zoomingXModel.setValue( x );
@@ -2045,8 +2047,7 @@ void AutomationEditor::updatePosition(const MidiTime & t )
 
 void AutomationEditor::zoomingXChanged()
 {
-	const QString & zfac = m_zoomingXModel.currentText();
-	m_ppt = zfac.left( zfac.length() - 1 ).toInt() * DEFAULT_PPT / 100;
+	m_ppt = m_zoomXLevels[m_zoomingXModel.value()] * DEFAULT_PPT;
 
 	assert( m_ppt > 0 );
 
@@ -2343,9 +2344,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
 
-	for( int i = 0; i < 6; ++i )
+	for( float const & zoomLevel : m_editor->m_zoomXLevels )
 	{
-		m_editor->m_zoomingXModel.addItem( QString::number( 25 << i ) + "%" );
+		m_editor->m_zoomingXModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_editor->m_zoomingXModel.setValue( m_editor->m_zoomingXModel.findText( "100%" ) );
 

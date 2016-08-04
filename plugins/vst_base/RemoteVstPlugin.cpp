@@ -56,6 +56,7 @@
 
 #endif
 
+#define USE_WS_PREFIX
 #include <windows.h>
 
 #ifdef LMMS_BUILD_WIN32
@@ -121,7 +122,11 @@ DWORD __GuiThreadID = 0;
 class RemoteVstPlugin : public RemotePluginClient
 {
 public:
+#ifdef SYNC_WITH_SHM_FIFO
 	RemoteVstPlugin( key_t _shm_in, key_t _shm_out );
+#else
+	RemoteVstPlugin( const char * socketPath );
+#endif
 	virtual ~RemoteVstPlugin();
 
 	virtual bool processMessage( const message & _m );
@@ -186,9 +191,6 @@ public:
 
 	// read parameter-dump and set it for plugin
 	void setParameterDump( const message & _m );
-
-	// post properties of specified parameter
-	void getParameterProperties( const int _idx );
 
 	// save settings chunk of plugin into file
 	void saveChunkToFile( const std::string & _file );
@@ -332,8 +334,13 @@ private:
 
 
 
+#ifdef SYNC_WITH_SHM_FIFO
 RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 	RemotePluginClient( _shm_in, _shm_out ),
+#else
+RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
+	RemotePluginClient( socketPath ),
+#endif
 	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
@@ -491,10 +498,6 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 
 		case IdVstSetParameterDump:
 			setParameterDump( _m );
-			break;
-
-		case IdVstGetParameterProperties:
-			getParameterProperties( _m.getInt() );
 			break;
 
 		case IdSaveSettingsToFile:
@@ -974,37 +977,6 @@ void RemoteVstPlugin::setParameterDump( const message & _m )
 
 
 
-void RemoteVstPlugin::getParameterProperties( const int _idx )
-{
-	VstParameterProperties p;
-	pluginDispatch( effGetParameterProperties, _idx, 0, &p );
-	message m( IdVstParameterProperties );
-	m.addString( p.label );
-	m.addString( p.shortLabel );
-	m.addString(
-#if kVstVersion > 2
-			p.categoryLabel
-#else
-			""
-#endif
-					);
-	m.addFloat( p.minInteger );
-	m.addFloat( p.maxInteger );
-	m.addFloat( ( p.flags & kVstParameterUsesFloatStep ) ?
-						p.stepFloat : p.stepInteger );
-	m.addInt(
-#if kVstVersion > 2
-			p.category
-#else
-			0
-#endif
-				);
-	sendMessage( m );
-}
-
-
-
-
 void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 {
 	if( m_plugin->flags & 32 )
@@ -1014,7 +986,11 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			int fd = open( _file.c_str(), O_WRONLY | O_BINARY );
-			write( fd, chunk, len );
+			if ( ::write( fd, chunk, len ) != len )
+			{
+				fprintf( stderr,
+					"Error saving chunk to file.\n" );
+			}
 			close( fd );
 		}
 	}
@@ -1231,7 +1207,10 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
 	FILE * stream = fopen( _file.c_str(), "r" );
-	fread ( pBank, 1, 56, stream );
+	if ( fread ( pBank, 1, 56, stream ) != 56 )
+	{
+		fprintf( stderr, "Error loading preset file.\n" );
+	}
         pBank->fxID = endian_swap( pBank->fxID );
 	pBank->numPrograms = endian_swap( pBank->numPrograms );
 	unsigned int toUInt;
@@ -1251,10 +1230,17 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 	if(pBank->fxMagic != 0x6B427846) {
 		if(pBank->fxMagic != 0x6B437846) {
-			fread (pLen, 1, 4, stream);
+			if ( fread (pLen, 1, 4, stream) != 4 )
+			{
+				fprintf( stderr,
+					"Error loading preset file.\n" );
+			}
 			chunk = new char[len = endian_swap(*pLen)];
 		} else chunk = new char[len = sizeof(float)*pBank->numPrograms];
-		fread (chunk, len, 1, stream);
+		if ( fread (chunk, len, 1, stream) != 1 )
+		{
+			fprintf( stderr, "Error loading preset file.\n" );
+		}
 		fclose( stream );
 	}
 
@@ -1286,8 +1272,16 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
 			lock();
 			for (int i =0; i < numPrograms; i++) {
-				fread (pBank, 1, 56, stream);
-				fread (chunk, len, 1, stream);
+				if ( fread (pBank, 1, 56, stream) != 56 )
+				{
+					fprintf( stderr,
+					"Error loading preset file.\n" );
+				}
+				if ( fread (chunk, len, 1, stream) != 1 )
+				{
+					fprintf( stderr,
+					"Error loading preset file.\n" );
+				}
 				pluginDispatch( effSetProgram, 0, i );
 				pBank->prgName[23] = 0;
 				pluginDispatch( 4, 0, 0, pBank->prgName );
@@ -1331,7 +1325,10 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	}
 
 	const int fd = open( _file.c_str(), O_RDONLY | O_BINARY );
-	read( fd, chunk, _len );
+	if ( ::read( fd, chunk, _len ) != _len )
+	{
+		fprintf( stderr, "Error loading chunk from file.\n" );
+	}
 	close( fd );
 	pluginDispatch( 24, 0, _len, chunk );
 
@@ -1853,7 +1850,11 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 
 int main( int _argc, char * * _argv )
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 3 )
+#else
+	if( _argc < 2 )
+#endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
@@ -1886,7 +1887,11 @@ int main( int _argc, char * * _argv )
 
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
+#ifdef SYNC_WITH_SHM_FIFO
 	__plugin = new RemoteVstPlugin( atoi( _argv[1] ), atoi( _argv[2] ) );
+#else
+	__plugin = new RemoteVstPlugin( _argv[1] );
+#endif
 
 	if( __plugin->isInitialized() )
 	{

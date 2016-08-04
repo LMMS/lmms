@@ -900,7 +900,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
+        <source>&amp;Remove this controller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1283,6 +1287,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3490,10 +3498,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3548,6 +3552,10 @@ Double click to pick a file.</source>
     </message>
     <message>
         <source>Click here for a moog saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AMNT</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5231,6 +5239,10 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <source>double-click to open in Piano Roll</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Clone Steps</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PeakController</name>
@@ -5551,6 +5563,10 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quantize</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6207,10 +6223,6 @@ Remember to also save your project manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FL Studio projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hydrogen projects</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6244,6 +6256,10 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>MIDI File (*.mid)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LMMS Error report</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6319,19 +6335,19 @@ Remember to also save your project manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Project Version Mismatch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>template</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version difference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6429,6 +6445,25 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TabWidget</name>
     <message>
         <source>Settings for %1</source>
@@ -6516,6 +6551,30 @@ Remember to also save your project manually.</source>
         <source>click to change time units</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>MIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SEC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MSEC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BAR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BEAT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TICK</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TimeLineWidget</name>
@@ -6597,10 +6656,6 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Importing MIDI-file...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Importing FLP-file...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8954,10 +9009,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
     <message>
         <source>List installed LADSPA plugins</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

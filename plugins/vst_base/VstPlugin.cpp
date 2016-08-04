@@ -48,6 +48,7 @@
 #include "ConfigManager.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
@@ -80,9 +81,8 @@ public:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	QObject(),
-	JournallingObject(),
 	RemotePlugin(),
+	JournallingObject(),
 	m_plugin( _plugin ),
 	m_pluginWidget( NULL ),
 	m_pluginWindowID( 0 ),
@@ -99,7 +99,7 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 {
 	setSplittedChannels( true );
 
-	tryLoad( "RemoteVstPlugin" );
+	tryLoad( REMOTE_VST_PLUGIN_FILEPATH );
 #ifdef LMMS_BUILD_WIN64
 	if( m_badDllFormat )
 	{

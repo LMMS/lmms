@@ -30,6 +30,7 @@
 #include <QList>
 #include <QMutex>
 #include <QMutexLocker>
+#include <samplerate.h>
 
 #include "Instrument.h"
 #include "PixmapButton.h"
@@ -37,7 +38,6 @@
 #include "Knob.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
-#include "SampleBuffer.h"
 #include "MemoryManager.h"
 #include "gig.h"
 

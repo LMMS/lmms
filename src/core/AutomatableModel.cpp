@@ -27,6 +27,8 @@
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
 #include "lmms_math.h"
+#include "Mixer.h"
+#include "ProjectJournal.h"
 
 float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;
@@ -97,7 +99,7 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		// scale type also needs an extra value
 		// => it must be appended as a node
 		QDomElement me = doc.createElement( name );
-		me.setAttribute( "id", id() );
+		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
 		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
 		element.appendChild( me );

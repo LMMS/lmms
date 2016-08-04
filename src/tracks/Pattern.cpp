@@ -65,6 +65,11 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	m_steps( MidiTime::stepsPerTact() )
 {
 	setName( _instrument_track->name() );
+	if( _instrument_track->trackContainer()
+					== Engine::getBBTrackContainer() )
+	{
+		resizeToFirstTrack();
+	}
 	init();
 	setAutoResize( true );
 }
@@ -110,6 +115,31 @@ Pattern::~Pattern()
 	}
 
 	m_notes.clear();
+}
+
+
+
+
+void Pattern::resizeToFirstTrack()
+{
+	// Resize this track to be the same as existing tracks in the BB
+	const TrackContainer::TrackList & tracks =
+		m_instrumentTrack->trackContainer()->tracks();
+	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
+	{
+		if(tracks.at(trackID)->type() == Track::InstrumentTrack)
+		{
+			if(tracks.at(trackID) != m_instrumentTrack)
+			{
+				unsigned int currentTCO = m_instrumentTrack->
+					getTCOs().indexOf(this);
+				m_steps = static_cast<Pattern *>
+					(tracks.at(trackID)->getTCO(currentTCO))
+					->m_steps;
+			}
+			break;
+		}
+	}
 }
 
 
@@ -977,9 +1007,10 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 	
-	// state: selected, muted, normal
+	// state: selected, normal, beat pattern, muted
 	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern ) 
-		? painter.background().color() : mutedBackgroundColor() );
+		? painter.background().color() : ( beatPattern 
+		? BBPatternBackground() : mutedBackgroundColor() ) );
 
 	// invert the gradient for the background in the B&B editor
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
@@ -1206,12 +1237,11 @@ void PatternView::paintEvent( QPaintEvent * )
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
 			rect().bottom() - TCO_BORDER_WIDTH );
-	}
 	
 	// outer border
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-
+	}
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_pat->isMuted() )
 	{

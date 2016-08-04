@@ -122,9 +122,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 	m_effects.append( _effect );
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	emit dataChanged();
 }
@@ -134,21 +134,18 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 
 	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
 	if( found == m_effects.end() )
 	{
-		goto fail;
+		Engine::mixer()->doneChangeInModel();
+		return;
 	}
 	m_effects.erase( found );
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 	emit dataChanged();
-	return;
-
-fail:
-	Engine::mixer()->unlock();
 }
 
 
@@ -252,14 +249,15 @@ void EffectChain::clear()
 {
 	emit aboutToClear();
 
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 
 	m_enabledModel.setValue( false );
-	for( int i = 0; i < m_effects.count(); ++i )
+	while( m_effects.count() )
 	{
-		delete m_effects[i];
+		Effect * e = m_effects[m_effects.count() - 1];
+		m_effects.pop_back();
+		delete e;
 	}
-	m_effects.clear();
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 }

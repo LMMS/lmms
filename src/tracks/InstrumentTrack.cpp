@@ -69,6 +69,7 @@
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
+#include "Mixer.h"
 #include "MixHelpers.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
@@ -93,7 +94,7 @@ const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
-const int PIANO_HEIGHT		= 82;
+const int PIANO_HEIGHT		= 80;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
@@ -154,11 +155,15 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
+	Engine::mixer()->requestChangeInModel();
+
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
 	// now we're save deleting the instrument
 	if( m_instrument ) delete m_instrument;
+
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -257,11 +262,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				NotePlayHandle* nph;
-				m_notesMutex.lock();
 				if( m_notes[event.key()] == NULL )
 				{
-					nph = NotePlayHandleManager::acquire( this, offset,
+					NotePlayHandle* nph =
+						NotePlayHandleManager::acquire(
+								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
@@ -272,21 +277,20 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 						m_notes[event.key()] = NULL;
 					}
 				}
-				m_notesMutex.unlock();
 				eventHandled = true;
 				break;
 			}
 
 		case MidiNoteOff:
-			m_notesMutex.lock();
 			if( m_notes[event.key()] != NULL )
 			{
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
+				Engine::mixer()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
+				Engine::mixer()->doneChangeInModel();
 			}
-			m_notesMutex.unlock();
 			eventHandled = true;
 			break;
 
@@ -416,14 +420,12 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	m_notesMutex.lock();
 	m_midiNotesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
-	m_notesMutex.unlock();
 	m_midiNotesMutex.unlock();
 
 	lock();

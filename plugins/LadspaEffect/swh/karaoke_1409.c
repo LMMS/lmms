@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -93,7 +93,7 @@ static void connectPortKaraoke(
 static LADSPA_Handle instantiateKaraoke(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Karaoke *plugin_data = (Karaoke *)malloc(sizeof(Karaoke));
+	Karaoke *plugin_data = (Karaoke *)calloc(1, sizeof(Karaoke));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -181,14 +181,13 @@ static void runAddingKaraoke(LADSPA_Handle instance, unsigned long sample_count)
 	}
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -274,12 +273,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (karaokeDescriptor) {
 		free((LADSPA_PortDescriptor *)karaokeDescriptor->PortDescriptors);
 		free((char **)karaokeDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)karaokeDescriptor->PortRangeHints);
 		free(karaokeDescriptor);
 	}
+	karaokeDescriptor = NULL;
 
 }

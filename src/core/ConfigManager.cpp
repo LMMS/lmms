@@ -55,7 +55,6 @@ ConfigManager::ConfigManager() :
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
-	m_flDir( QDir::home().absolutePath() ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
@@ -63,14 +62,16 @@ ConfigManager::ConfigManager() :
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
 
-	// If we're in development (lmms is not installed) let's get the source
-	// directory by reading the CMake Cache
+	// If we're in development (lmms is not installed) let's get the source and
+	// binary directories by reading the CMake Cache
 	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
 	if (cmakeCache.exists()) {
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
 
-		// Find the line containing something like lmms_SOURCE_DIR:static=<dir>
+		// Find the lines containing something like lmms_SOURCE_DIR:static=<dir>
+		// and lmms_BINARY_DIR:static=<dir>
+		int done = 0;
 		while(! stream.atEnd())
 		{
 			QString line = stream.readLine();
@@ -78,6 +79,15 @@ ConfigManager::ConfigManager() :
 			if (line.startsWith("lmms_SOURCE_DIR:")) {
 				QString srcDir = line.section('=', -1).trimmed();
 				QDir::addSearchPath("data", srcDir + "/data/");
+				done++;
+			}
+			if (line.startsWith("lmms_BINARY_DIR:")) {
+				m_lmmsRcFile = line.section('=', -1).trimmed() +  QDir::separator() +
+											 ".lmmsrc.xml";
+				done++;
+			}
+			if (done == 2)
+			{
 				break;
 			}
 		}
@@ -177,14 +187,6 @@ void ConfigManager::setVSTDir( const QString & _vd )
 void ConfigManager::setArtworkDir( const QString & _ad )
 {
 	m_artworkDir = ensureTrailingSlash( _ad );
-}
-
-
-
-
-void ConfigManager::setFLDir( const QString & _fd )
-{
-	m_flDir = ensureTrailingSlash( _fd );
 }
 
 
@@ -331,9 +333,15 @@ void ConfigManager::deleteValue( const QString & cls, const QString & attribute)
 }
 
 
-void ConfigManager::loadConfigFile()
+void ConfigManager::loadConfigFile( const QString & configFile )
 {
 	// read the XML file and create DOM tree
+	// Allow configuration file override through --config commandline option
+	if ( !configFile.isEmpty() )
+	{
+		m_lmmsRcFile = configFile;
+	}
+
 	QFile cfg_file( m_lmmsRcFile );
 	QDomDocument dom_tree;
 
@@ -405,7 +413,6 @@ void ConfigManager::loadConfigFile()
 			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
 			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
-			setFLDir( value( "paths", "fldir" ) );
 			setLADSPADir( value( "paths", "laddir" ) );
 		#ifdef LMMS_HAVE_STK
 			setSTKDir( value( "paths", "stkdir" ) );
@@ -436,11 +443,6 @@ void ConfigManager::loadConfigFile()
 #else
 		m_vstDir =  m_workingDir + "plugins/vst/";
 #endif
-	}
-
-	if( m_flDir.isEmpty() || m_flDir == QDir::separator() || m_flDir == "/")
-	{
-		m_flDir = ensureTrailingSlash( QDir::home().absolutePath() );
 	}
 
 	if( m_ladDir.isEmpty()  )
@@ -485,7 +487,6 @@ void ConfigManager::saveConfigFile()
 	setValue( "paths", "artwork", m_artworkDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
-	setValue( "paths", "fldir", m_flDir );
 	setValue( "paths", "gigdir", m_gigDir );
 	setValue( "paths", "sf2dir", m_sf2Dir );
 	setValue( "paths", "laddir", m_ladDir );

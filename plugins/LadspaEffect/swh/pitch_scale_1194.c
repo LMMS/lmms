@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -128,7 +128,7 @@ static void connectPortPitchScaleHQ(
 static LADSPA_Handle instantiatePitchScaleHQ(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	PitchScaleHQ *plugin_data = (PitchScaleHQ *)malloc(sizeof(PitchScaleHQ));
+	PitchScaleHQ *plugin_data = (PitchScaleHQ *)calloc(1, sizeof(PitchScaleHQ));
 	sbuffers *buffers = NULL;
 	long sample_rate;
 
@@ -225,14 +225,13 @@ static void runAddingPitchScaleHQ(LADSPA_Handle instance, unsigned long sample_c
 	                                / OVER_SAMP);
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -311,12 +310,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (pitchScaleHQDescriptor) {
 		free((LADSPA_PortDescriptor *)pitchScaleHQDescriptor->PortDescriptors);
 		free((char **)pitchScaleHQDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)pitchScaleHQDescriptor->PortRangeHints);
 		free(pitchScaleHQDescriptor);
 	}
+	pitchScaleHQDescriptor = NULL;
 
 }

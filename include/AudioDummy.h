@@ -28,6 +28,7 @@
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 #include "MicroTimer.h"
+#include "Mixer.h"
 
 
 class AudioDummy : public AudioDevice, public QThread
@@ -83,11 +84,7 @@ private:
 
 	virtual void stopProcessing()
 	{
-		if( isRunning() )
-		{
-			wait( 1000 );
-			terminate();
-		}
+		stopProcessingThread( this );
 	}
 
 	virtual void run()
@@ -101,7 +98,10 @@ private:
 			{
 				break;
 			}
-			delete[] b;
+			if( mixer()->hasFifoWriter() )
+			{
+				delete[] b;
+			}
 
 			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )

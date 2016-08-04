@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -246,7 +246,7 @@ static void connectPortMbeq(
 static LADSPA_Handle instantiateMbeq(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Mbeq *plugin_data = (Mbeq *)malloc(sizeof(Mbeq));
+	Mbeq *plugin_data = (Mbeq *)calloc(1, sizeof(Mbeq));
 	int *bin_base = NULL;
 	float *bin_delta = NULL;
 	fftw_real *comp = NULL;
@@ -286,10 +286,11 @@ static LADSPA_Handle instantiateMbeq(
 	
 	// Create raised cosine window table
 	for (i=0; i < FFT_LENGTH; i++) {
-	        window[i] = -0.5f * cos(2.0f*M_PI*(double)i/(double)FFT_LENGTH) + 0.5f;
+	        window[i] = -0.5f*cos(2.0f*M_PI*(double)i/(double)FFT_LENGTH)+0.5f;
+	        window[i] *= 2.0f;
 	}
 	
-	// Create db->coefficient lookup table
+	// Create db->coeffiecnt lookup table
 	db_table = malloc(1000 * sizeof(float));
 	for (i=0; i < 1000; i++) {
 	        db = ((float)i/10) - 70;
@@ -471,12 +472,8 @@ static void runMbeq(LADSPA_Handle instance, unsigned long sample_count) {
 	
 	                // Window into the output accumulator
 	                for (i = 0; i < FFT_LENGTH; i++) {
-	                        // correction factor for window measured from white noise
-	                        // reduce intermediate output by (number of coefficients) * OVER_SAMP
-	                        out_accum[i] += real[i] * window[i] * 1.27519f /
-	                                        ((FFT_LENGTH/2) * OVER_SAMP);
+	                        out_accum[i] += 0.9186162f * window[i] * real[i]/(FFT_LENGTH * OVER_SAMP);
 	                }
-	
 	                for (i = 0; i < step_size; i++) {
 	                        out_fifo[i] = out_accum[i];
 	                }
@@ -662,14 +659,13 @@ static void runAddingMbeq(LADSPA_Handle instance, unsigned long sample_count) {
 	*(plugin_data->latency) = fft_latency;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -888,12 +884,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (mbeqDescriptor) {
 		free((LADSPA_PortDescriptor *)mbeqDescriptor->PortDescriptors);
 		free((char **)mbeqDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)mbeqDescriptor->PortRangeHints);
 		free(mbeqDescriptor);
 	}
+	mbeqDescriptor = NULL;
 
 }

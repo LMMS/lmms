@@ -135,6 +135,7 @@ void JournallingObject::changeID( jo_id_t _id )
 			return;
 		}
 
+		Engine::projectJournal()->freeID( m_id );
 		Engine::projectJournal()->reallocID( _id, this );
 		m_id = _id;
 	}

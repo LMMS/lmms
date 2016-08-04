@@ -59,6 +59,8 @@
 #include <unistd.h>
 #endif
 
+#include <signal.h>
+
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
@@ -116,39 +118,58 @@ void printHelp()
 {
 	printf( "LMMS %s\n"
 		"Copyright (c) %s\n\n"
-		"Usage: lmms [ -r <project file> ] [ options ]\n"
-		"            [ -u <in> <out> ]\n"
+		"Usage: lmms [ -a ]\n"
+		"            [ -b <bitrate> ]\n"
+		"            [ -c <configfile> ]\n"
 		"            [ -d <in> ]\n"
+		"            [ -f <format> ]\n"
+		"            [ --geometry <geometry> ]\n"
 		"            [ -h ]\n"
+		"            [ -i <method> ]\n"
+		"            [ --import <in> [-e]]\n"
+		"            [ -l ]\n"
+		"            [ -o <path> ]\n"
+		"            [ -p <out> ]\n"
+		"            [ -r <project file> ] [ options ]\n"
+		"            [ -s <samplerate> ]\n"
+		"            [ -u <in> <out> ]\n"
+		"            [ -v ]\n"
+		"            [ -x <value> ]\n"
 		"            [ <file to load> ]\n\n"
-		"-r, --render <project file>	Render given project file\n"
-		"    --rendertracks <project>	Render each track to a different file\n"
-		"-o, --output <path>		Render into <path>\n"
-		"				For --render, provide a file path\n"
-		"				For --rendertracks, provide a directory path\n"
-		"-f, --format <format>		Specify format of render-output where\n"
-		"				Format is either 'wav' or 'ogg'.\n"
-		"-s, --samplerate <samplerate>	Specify output samplerate in Hz\n"
-		"				Range: 44100 (default) to 192000\n"
-		"-b, --bitrate <bitrate>		Specify output bitrate in KBit/s\n"
-		"				Default: 160.\n"
-		"-i, --interpolation <method>	Specify interpolation method\n"
-		"				Possible values:\n"
-		"				   - linear\n"
-		"				   - sincfastest (default)\n"
-		"				   - sincmedium\n"
-		"				   - sincbest\n"
-		"-x, --oversampling <value>	Specify oversampling\n"
-		"				Possible values: 1, 2, 4, 8\n"
-		"				Default: 2\n"
-		"-a, --float			32bit float bit depth\n"
-		"-l, --loop			Render as a loop\n"
-		"-u, --upgrade <in> [out]	Upgrade file <in> and save as <out>\n"
+		"-a, --float                   32bit float bit depth\n"
+		"-b, --bitrate <bitrate>       Specify output bitrate in KBit/s\n"
+		"       Default: 160.\n"
+		"-c, --config <configfile>     Get the configuration from <configfile>\n"
+		"-d, --dump <in>               Dump XML of compressed file <in>\n"
+		"-f, --format <format>         Specify format of render-output where\n"
+		"       Format is either 'wav' or 'ogg'.\n"
+		"    --geometry <geometry>     Specify the size and position of the main window\n"
+		"       geometry is <xsizexysize+xoffset+yoffsety>.\n"
+		"-h, --help                    Show this usage information and exit.\n"
+		"-i, --interpolation <method>  Specify interpolation method\n"
+		"       Possible values:\n"
+		"          - linear\n"
+		"          - sincfastest (default)\n"
+		"          - sincmedium\n"
+		"          - sincbest\n"
+		"    --import <in> [-e]        Import MIDI file <in>.\n"
+		"       If -e is specified lmms exits after importing the file.\n"
+		"-l, --loop                    Render as a loop\n"
+		"-o, --output <path>           Render into <path>\n"
+		"       For --render, provide a file path\n"
+		"       For --rendertracks, provide a directory path\n"
+		"-p, --profile <out>           Dump profiling information to file <out>\n"
+		"-r, --render <project file>   Render given project file\n"
+		"    --rendertracks <project>  Render each track to a different file\n"
+		"-s, --samplerate <samplerate> Specify output samplerate in Hz\n"
+		"       Range: 44100 (default) to 192000\n"
+		"-u, --upgrade <in> [out]      Upgrade file <in> and save as <out>\n"
 		"       Standard out is used if no output file is specifed\n"
-		"-d, --dump <in>			Dump XML of compressed file <in>\n"
-		"-v, --version			Show version information and exit.\n"
-		"    --allowroot			Bypass root user startup check (use with caution).\n"
-		"-h, --help			Show this usage information and exit.\n\n",
+		"-v, --version                 Show version information and exit.\n"
+		"    --allowroot               Bypass root user startup check (use with caution).\n"
+		"-x, --oversampling <value>    Specify oversampling\n"
+		"       Possible values: 1, 2, 4, 8\n"
+		"       Default: 2\n\n",
 		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
 }
 
@@ -172,7 +193,7 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
-	QString fileToLoad, fileToImport, renderOut, profilerOutputFile;
+	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	// first of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -194,8 +215,13 @@ int main( int argc, char * * argv )
 		{
 			allowRoot = true;
 		}
-		else if( arg == "-geometry" )
+		else if( arg == "--geometry" || arg == "-geometry")
 		{
+			if( arg == "--geometry" )
+			{
+				// Delete the first "-" so Qt recognize the option
+				strcpy(argv[i], "-geometry");
+			}
 			// option -geometry is filtered by Qt later,
 			// so we need to check its presence now to
 			// determine, if the application should run in
@@ -514,7 +540,20 @@ int main( int argc, char * * argv )
 			}
 
 
-			profilerOutputFile = QString::fromLocal8Bit( argv[1] );
+			profilerOutputFile = QString::fromLocal8Bit( argv[i] );
+		}
+		else if( arg == "--config" || arg == "-c" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				printf( "\nNo configuration file specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+			configFile = QString::fromLocal8Bit( argv[i] );
 		}
 		else
 		{
@@ -529,7 +568,7 @@ int main( int argc, char * * argv )
 	}
 
 
-	ConfigManager::inst()->loadConfigFile();
+	ConfigManager::inst()->loadConfigFile(configFile);
 
 	// set language
 	QString pos = ConfigManager::inst()->value( "app", "language" );
@@ -574,11 +613,28 @@ int main( int argc, char * * argv )
 	}
 #endif
 
+#if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _POSIX_SOURCE
+	struct sigaction sa;
+	sa.sa_handler = SIG_IGN;
+	sa.sa_flags = SA_SIGINFO;
+	if ( sigemptyset( &sa.sa_mask ) )
+	{
+		fprintf( stderr, "Signal initialization failed.\n" );
+	}
+	if ( sigaction( SIGPIPE, &sa, NULL ) )
+	{
+		fprintf( stderr, "Signal initialization failed.\n" );
+	}
+#endif
+
+	bool destroyEngine = false;
+
 	// if we have an output file for rendering, just render the song
 	// without starting the GUI
 	if( !renderOut.isEmpty() )
 	{
 		Engine::init( true );
+		destroyEngine = true;
 
 		QFileInfo fileInfo( fileToLoad );
 		if ( !fileInfo.exists() )
@@ -662,10 +718,6 @@ int main( int argc, char * * argv )
 				"    <td><b>%6</b></td>"
 				"    <td>%7</td>"
 				"  </tr>"
-				"  <tr>"
-				"    <td><b>%8</b></td>"
-				"    <td>%9</td>"
-				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
 				MainWindow::tr( "There is a recovery file present. "
@@ -682,35 +734,49 @@ int main( int argc, char * * argv )
 					"present recover file from being overwritten." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
-					"the restored files. This is not reversible." ),
-				MainWindow::tr( "Quit" ),
-				MainWindow::tr( "Shut down LMMS with no further action." )
+					"the restored files. This is not reversible." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
 			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
+			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
-			mb.setStandardButtons( 	QMessageBox::Ok |
-							QMessageBox::Discard );
-
-			mb.setButtonText( QMessageBox::Ok,
-							MainWindow::tr( "Recover" ) );
-
-			QAbstractButton * recover;
-			QAbstractButton * discard;
+			QPushButton * recover;
+			QPushButton * discard;
 			QPushButton * ignore;
 			QPushButton * exit;
+			
+			#if QT_VERSION >= 0x050000
+				// setting all buttons to the same roles allows us 
+				// to have a custom layout
+				discard = mb.addButton( MainWindow::tr( "Discard" ),
+									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
 
-			recover = mb.QMessageBox::button( QMessageBox::Ok );
-			discard = mb.QMessageBox::button( QMessageBox::Discard );
-			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
-								QMessageBox::NoRole );
-			ignore->setIcon( embed::getIconPixmap( "no_entry" ) );
-			exit = mb.addButton( MainWindow::tr( "Exit" ),
-								QMessageBox::RejectRole );
-			exit->setIcon( embed::getIconPixmap( "exit" ) );
+			# else 
+				// in qt4 the button order is reversed
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
+				discard = mb.addButton( MainWindow::tr( "Discard" ),
+									QMessageBox::AcceptRole );
 
-			mb.setDefaultButton( QMessageBox::Ok );
+			#endif
+			
+			// have a hidden exit button
+			exit = mb.addButton( "", QMessageBox::RejectRole);
+			exit->setVisible(false);
+			
+			// set icons
+			recover->setIcon( embed::getIconPixmap( "recover" ) );
+			discard->setIcon( embed::getIconPixmap( "discard" ) );
+			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
+
+			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
 
 			mb.exec();
@@ -718,7 +784,7 @@ int main( int argc, char * * argv )
 			{
 				gui->mainWindow()->sessionCleanup();
 			}
-			else if( mb.clickedButton() == recover ) // ::Recover
+			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
@@ -806,6 +872,11 @@ int main( int argc, char * * argv )
 
 	const int ret = app->exec();
 	delete app;
+
+	if( destroyEngine )
+	{
+		Engine::destroy();
+	}
 
 	// cleanup memory managers
 	MemoryManager::cleanup();

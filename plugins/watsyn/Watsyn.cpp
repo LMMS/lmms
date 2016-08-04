@@ -32,6 +32,7 @@
 #include "ToolTip.h"
 #include "Song.h"
 #include "lmms_math.h"
+#include "Mixer.h"
 #include "interpolation.h"
 
 #include "embed.cpp"

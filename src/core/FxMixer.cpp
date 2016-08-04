@@ -26,6 +26,7 @@
 
 #include "BufferManager.h"
 #include "FxMixer.h"
+#include "Mixer.h"
 #include "MixerWorkerThread.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -210,9 +211,11 @@ FxMixer::~FxMixer()
 	{
 		deleteChannelSend( m_fxRoutes.first() );
 	}
-	for( int i = 0; i < m_fxChannels.size(); ++i )
+	while( m_fxChannels.size() )
 	{
-		delete m_fxChannels[i];
+		FxChannel * f = m_fxChannels[m_fxChannels.size() - 1];
+		m_fxChannels.pop_back();
+		delete f;
 	}
 }
 
@@ -284,10 +287,8 @@ void FxMixer::toggledSolo()
 
 void FxMixer::deleteChannel( int index )
 {
-	// lock the mixer so channel deletion is performed between mixer rounds
-	Engine::mixer()->lock();
-
-	FxChannel * ch = m_fxChannels[index];
+	// channel deletion is performed between mixer rounds
+	Engine::mixer()->requestChangeInModel();
 
 	// go through every instrument and adjust for the channel index change
 	TrackContainer::TrackList tracks;
@@ -314,6 +315,8 @@ void FxMixer::deleteChannel( int index )
 		}
 	}
 
+	FxChannel * ch = m_fxChannels[index];
+
 	// delete all of this channel's sends and receives
 	while( ! ch->m_sends.isEmpty() )
 	{
@@ -325,8 +328,8 @@ void FxMixer::deleteChannel( int index )
 	}
 
 	// actually delete the channel
-	delete m_fxChannels[index];
 	m_fxChannels.remove(index);
+	delete ch;
 
 	for( int i = index; i < m_fxChannels.size(); ++i )
 	{
@@ -346,7 +349,7 @@ void FxMixer::deleteChannel( int index )
 		}
 	}
 
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -433,7 +436,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 	{
 		return NULL;
 	}
-	m_sendsMutex.lock();
+	Engine::mixer()->requestChangeInModel();
 	FxRoute * route = new FxRoute( from, to, amount );
 
 	// add us to from's sends
@@ -444,7 +447,7 @@ FxRoute * FxMixer::createRoute( FxChannel * from, FxChannel * to, float amount )
 
 	// add us to fxmixer's list
 	Engine::fxMixer()->m_fxRoutes.append( route );
-	m_sendsMutex.unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	return route;
 }
@@ -471,7 +474,7 @@ void FxMixer::deleteChannelSend( fx_ch_t fromChannel, fx_ch_t toChannel )
 
 void FxMixer::deleteChannelSend( FxRoute * route )
 {
-	m_sendsMutex.lock();
+	Engine::mixer()->requestChangeInModel();
 	// remove us from from's sends
 	route->sender()->m_sends.remove( route->sender()->m_sends.indexOf( route ) );
 	// remove us from to's receives
@@ -479,7 +482,7 @@ void FxMixer::deleteChannelSend( FxRoute * route )
 	// remove us from fxmixer's list
 	Engine::fxMixer()->m_fxRoutes.remove( Engine::fxMixer()->m_fxRoutes.indexOf( route ) );
 	delete route;
-	m_sendsMutex.unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -570,33 +573,46 @@ void FxMixer::masterMix( sampleFrame * _buf )
 {
 	const int fpp = Engine::mixer()->framesPerPeriod();
 
-	if( m_sendsMutex.tryLock() )
+	// add the channels that have no dependencies (no incoming senders, ie.
+	// no receives) to the jobqueue. The channels that have receives get
+	// added when their senders get processed, which is detected by
+	// dependency counting.
+	// also instantly add all muted channels as they don't need to care
+	// about their senders, and can just increment the deps of their
+	// recipients right away.
+	MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
+	for( FxChannel * ch : m_fxChannels )
 	{
-		// add the channels that have no dependencies (no incoming senders, ie. no receives)
-		// to the jobqueue. The channels that have receives get added when their senders get processed, which
-		// is detected by dependency counting.
-		// also instantly add all muted channels as they don't need to care about their senders, and can just increment the deps of
-		// their recipients right away.
-		MixerWorkerThread::resetJobQueue( MixerWorkerThread::JobQueue::Dynamic );
+		ch->m_muted = ch->m_muteModel.value();
+		if( ch->m_muted ) // instantly "process" muted channels
+		{
+			ch->processed();
+			ch->done();
+		}
+		else if( ch->m_receives.size() == 0 )
+		{
+			ch->m_queued = true;
+			MixerWorkerThread::addJob( ch );
+		}
+	}
+	while( m_fxChannels[0]->state() != ThreadableJob::Done )
+	{
+		bool found = false;
 		for( FxChannel * ch : m_fxChannels )
 		{
-			ch->m_muted = ch->m_muteModel.value();
-			if( ch->m_muted ) // instantly "process" muted channels
+			int s = ch->state();
+			if( s == ThreadableJob::Queued
+				|| s == ThreadableJob::InProgress )
 			{
-				ch->processed();
-				ch->done();
-			}
-			else if( ch->m_receives.size() == 0 )
-			{
-				ch->m_queued = true;
-				MixerWorkerThread::addJob( ch );
+				found = true;
+				break;
 			}
 		}
-		while( m_fxChannels[0]->state() != ThreadableJob::Done )
+		if( !found )
 		{
-			MixerWorkerThread::startAndWaitForJobs();
+			break;
 		}
-		m_sendsMutex.unlock();
+		MixerWorkerThread::startAndWaitForJobs();
 	}
 
 	// handle sample-exact data in master volume fader
@@ -721,7 +737,6 @@ void FxMixer::loadSettings( const QDomElement & _this )
 {
 	clear();
 	QDomNode node = _this.firstChild();
-	bool thereIsASend = false;
 
 	while( ! node.isNull() )
 	{
@@ -748,7 +763,6 @@ void FxMixer::loadSettings( const QDomElement & _this )
 			QDomElement chDataItem = chData.at(i).toElement();
 			if( chDataItem.nodeName() == QString( "send" ) )
 			{
-				thereIsASend = true;
 				int sendTo = chDataItem.attribute( "channel" ).toInt();
 				allocateChannelsTo( sendTo ) ;
 				FxRoute * fxr = createChannelSend( num, sendTo, 1.0f );
@@ -759,15 +773,6 @@ void FxMixer::loadSettings( const QDomElement & _this )
 
 
 		node = node.nextSibling();
-	}
-
-	// check for old format. 65 fx channels and no explicit sends.
-	if( ! thereIsASend && m_fxChannels.size() == 65 ) {
-		// create a send from every channel into master
-		for( int i=1; i<m_fxChannels.size(); ++i )
-		{
-			createChannelSend( i, 0 );
-		}
 	}
 
 	emit dataChanged();

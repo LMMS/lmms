@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PACKAGES="nsis cloog-isl libmpc2 qt4-linguist-tools mingw32
+PACKAGES="nsis cloog-isl libmpc3 qt4-linguist-tools mingw32
 	mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x-stk
 	mingw32-x-glib2 mingw32-x-portaudio mingw32-x-libsndfile mingw32-x-fftw
 	mingw32-x-flac mingw32-x-fltk mingw32-x-libsamplerate

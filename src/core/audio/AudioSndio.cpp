@@ -12,6 +12,7 @@
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "templates.h"
@@ -114,11 +115,7 @@ void AudioSndio::startProcessing( void )
 
 void AudioSndio::stopProcessing( void )
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 

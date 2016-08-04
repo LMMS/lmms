@@ -44,7 +44,7 @@ class Knob;
 class LedCheckBox;
 
 
-class ZynAddSubFxRemotePlugin : public QObject, public RemotePlugin
+class ZynAddSubFxRemotePlugin : public RemotePlugin
 {
 	Q_OBJECT
 public:
