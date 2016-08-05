@@ -46,7 +46,7 @@ const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
 QPixmap * FxLine::s_receiveBgArrow = NULL;
 
-FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
+FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex ),
@@ -127,12 +127,15 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 
 
 
+
 FxLine::~FxLine()
 {
 	delete m_sendKnob;
 	delete m_sendBtn;
 	delete m_lcd;
 }
+
+
 
 
 void FxLine::setChannelIndex( int index )
@@ -148,9 +151,10 @@ void FxLine::setChannelIndex( int index )
 void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
-	if( !m_inRename && m_renameLineEdit->text() != elideName( name ) )
+	QString elidedName = elideName( name );
+	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
-		m_renameLineEdit->setText( elideName( name ) );
+		m_renameLineEdit->setText( elidedName );
 	}
 
 	int width = fxLine->rect().width();
@@ -180,7 +184,7 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 
 
 
-QString FxLine::elideName( QString name )
+QString FxLine::elideName( const QString & name )
 {
 	const int maxTextHeight = 70;
 	QFontMetrics metrics( font() );
@@ -249,6 +253,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 void FxLine::renameChannel()
 {
 	m_inRename = true;
+	setToolTip( "" );
 	m_renameLineEdit->setReadOnly( false );
 	m_lcd->hide();
 	m_renameLineEdit->setFixedWidth( 135 );
@@ -272,10 +277,11 @@ void FxLine::renameFinished()
 	if( !newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != newName )
 	{
 		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = newName;
-		setToolTip( newName );
 		m_renameLineEdit->setText( elideName( newName ) );
 		Engine::getSong()->setModified();
 	}
+	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	setToolTip( name );
 }
 
 

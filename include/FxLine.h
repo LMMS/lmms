@@ -81,7 +81,7 @@ public:
 
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
-	QString elideName( QString name );
+	QString elideName( const QString & name );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
