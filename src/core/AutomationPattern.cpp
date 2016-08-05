@@ -295,7 +295,7 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	{
 		--it;
 	}
-	//cleanControlPoints();
+
 	generateTangents(it, 3);
 
 	if( getTrack() &&
@@ -775,8 +775,6 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 
 	// Very important for reading older files
 	cleanControlPoints();
-
-	clampControlPoints(false);
 }
 
 
@@ -1129,7 +1127,7 @@ void AutomationPattern::cleanControlPoints()
 		}
 	}
 
-	// If there's any automation points without a control point then destroy it
+	// If there's any automation points without a control point then insert control points
 	for( timeMap::iterator it = m_timeMap.begin(); it != m_timeMap.end(); )
 	{
 		if(m_controlPoints.contains( (int)it.key()) )
@@ -1138,9 +1136,12 @@ void AutomationPattern::cleanControlPoints()
 		}
 		else
 		{
-			putControlPoint( it, it.value() );
+			m_controlPoints[it.key()].insert( 0, it.key() + 50 );
+			m_controlPoints[it.key()].insert( 1, it.value() );
 		}
 	}
+
+	clampControlPoints(false);
 }
 
 
