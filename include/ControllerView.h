@@ -76,6 +76,8 @@ protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
 	virtual void modelChanged();
 	virtual void mouseDoubleClickEvent( QMouseEvent * event );
+	virtual void dragEnterEvent( QDragEnterEvent * dee );
+	virtual void dropEvent( QDropEvent * de );
 
 
 private:
@@ -84,6 +86,7 @@ private:
 	bool m_show;
 	QLineEdit * m_nameLineEdit;
 	QPushButton * m_collapse;
+	Controller * m_modelC;
 } ;
 
 #endif

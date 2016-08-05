@@ -28,6 +28,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
+#include <QMessageBox>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
@@ -36,6 +37,7 @@
 
 
 #include "CaptionMenu.h"
+#include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "embed.h"
 #include "Engine.h"
@@ -43,8 +45,12 @@
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
+#include "ProjectJournal.h"
 #include "Song.h"
+#include "StringPairDrag.h"
 #include "ToolTip.h"
+
+
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
@@ -52,15 +58,15 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	ModelView( _model, this ),
 	m_controllerDlg( NULL ),
 	m_titleBarHeight( 24 ),
-	m_show( true )
+	m_show( true ),
+	m_modelC( _model )
 {
 	const QSize buttonsize( 17, 17 );
 	setFrameStyle( QFrame::Plain );
 	setFrameShadow( QFrame::Plain );
 	setLineWidth( 0 );
 	setContentsMargins( 0, 0, 0, 0 );
-	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
-	"slider, and other controls."  ) );
+	setWhatsThis( tr( "Controllers are able to automate the value of a knob, slider, and other controls."  ) );
 		
 	m_controllerDlg = getController()->createDialog( this );
 	m_controllerDlg->move( 1, m_titleBarHeight );
@@ -83,7 +89,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_collapse->setToolTip( tr( "collapse" ) );
 	m_collapse->move( width() - buttonsize.width() - 3, 3 );
 	connect( m_collapse, SIGNAL( clicked() ), this, SLOT( collapseController() ) );
-		
+	setAcceptDrops( true );
 	setModel( _model );
 }
 
@@ -153,6 +159,44 @@ void ControllerView::rename()
 void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 {
 	rename();
+}
+
+
+
+
+void ControllerView::dragEnterEvent(QDragEnterEvent *dee)
+{
+	StringPairDrag::processDragEnterEvent( dee, "float_value,"
+												"automatable_model" );
+}
+
+
+
+
+void ControllerView::dropEvent( QDropEvent *de )
+{
+	QString type = StringPairDrag::decodeKey( de );
+	QString val = StringPairDrag::decodeValue( de );
+	if( type == "automatable_model" )
+	{
+		AutomatableModel * mod = dynamic_cast<AutomatableModel *>( Engine::projectJournal()->journallingObject( val.toInt() ) );
+		if( m_modelC->hasModel( mod ) )
+		{
+			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
+		}
+		if( mod != NULL && m_modelC->hasModel( mod ) == false )
+		{
+			if( mod->controllerConnection() )
+			{
+				mod->controllerConnection()->setController( getController() );
+			}
+			else
+			{
+				ControllerConnection * cc = new ControllerConnection( getController() );
+				mod->setControllerConnection( cc );
+			}
+		}
+	}
 }
 
 
