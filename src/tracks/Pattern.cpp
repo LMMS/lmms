@@ -1149,7 +1149,7 @@ void PatternView::paintEvent( QPaintEvent * )
 			if( len < 0 )
 			{
 				p.drawPixmap( x, y, stepoff );
-				p.setOpacity( vol / 100.0 );
+				p.setOpacity( min(vol, 100) / 100.0 );
 				p.drawPixmap( x, y, stepon );
 				if( vol > 100 )
 				{
