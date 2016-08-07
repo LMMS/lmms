@@ -665,7 +665,7 @@ bool Pattern::empty()
 
 void Pattern::changeTimeSignature()
 {
-	MidiTime last_pos = MidiTime::ticksPerTact();
+	MidiTime last_pos = MidiTime::ticksPerTact() - 1;
 	for( NoteVector::ConstIterator cit = m_notes.begin();
 						cit != m_notes.end(); ++cit )
 	{
