@@ -32,6 +32,11 @@ QLineEdit {
 	color: #d1d8e4;
 }
 
+QLineEdit:read-only {
+	border-style: none;
+	background: transparent;
+}
+
 /* text box when it wants text */
 
 QLineEdit:focus {
