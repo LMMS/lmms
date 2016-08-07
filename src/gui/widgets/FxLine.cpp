@@ -25,26 +25,28 @@
 
 #include "FxLine.h"
 
-#include <QDebug>
-#include <QInputDialog>
+#include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
 #include <QPainter>
 #include <QLineEdit>
 #include <QWhatsThis>
 
-#include "FxMixer.h"
-#include "FxMixerView.h"
+#include "CaptionMenu.h"
 #include "embed.h"
 #include "Engine.h"
+#include "FxMixer.h"
+#include "FxMixerView.h"
+#include "gui_templates.h"
 #include "GuiApplication.h"
 #include "SendButtonIndicator.h"
-#include "gui_templates.h"
-#include "CaptionMenu.h"
+#include "Song.h"
+
 
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
 QPixmap * FxLine::s_receiveBgArrow = NULL;
 
-FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
+FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	QWidget( _parent ),
 	m_mv( _mv ),
 	m_channelIndex( _channelIndex ),
@@ -52,13 +54,14 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	m_strokeOuterActive( 0, 0, 0 ),
 	m_strokeOuterInactive( 0, 0, 0 ),
 	m_strokeInnerActive( 0, 0, 0 ),
-	m_strokeInnerInactive( 0, 0, 0 )
+	m_strokeInnerInactive( 0, 0, 0 ),
+	m_inRename( false )
 {
-	if( ! s_sendBgArrow )
+	if( !s_sendBgArrow )
 	{
 		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
 	}
-	if( ! s_receiveBgArrow )
+	if( !s_receiveBgArrow )
 	{
 		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
 	}
@@ -68,9 +71,9 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 
 	// mixer sends knob
-	m_sendKnob = new Knob( knobBright_26, this, tr("Channel send amount") );
+	m_sendKnob = new Knob( knobBright_26, this, tr( "Channel send amount" ) );
 	m_sendKnob->move( 3, 22 );
-	m_sendKnob->setVisible(false);
+	m_sendKnob->setVisible( false );
 
 	// send button indicator
 	m_sendBtn = new SendButtonIndicator( this, this, m_mv );
@@ -94,11 +97,35 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex) :
 	"to the channel.\n\n"
 	
 	"You can remove and move FX channels in the context menu, which is accessed "
-	"by right-clicking the FX channel.\n") );
+	"by right-clicking the FX channel.\n" ) );
 
-	FxMixer * mix = Engine::fxMixer();
-	setToolTip( mix->effectChannel( m_channelIndex )->m_name );
+	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	setToolTip( name );
+
+	m_renameLineEdit = new QLineEdit();
+	m_renameLineEdit->setText( name );
+	m_renameLineEdit->setFixedWidth( 65 );
+	m_renameLineEdit->setFont( pointSizeF( font(), 7.5f ) );
+	m_renameLineEdit->setReadOnly( true );
+
+	QGraphicsScene * scene = new QGraphicsScene();
+	scene->setSceneRect( 0, 0, 33, FxLineHeight );
+
+	m_view = new QGraphicsView( this );
+	m_view->setStyleSheet( "border-style: none; background: transparent;" );
+	m_view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_view->setAttribute( Qt::WA_TransparentForMouseEvents, true );
+	m_view->setScene( scene );
+
+	QGraphicsProxyWidget * proxyWidget = scene->addWidget( m_renameLineEdit );
+	proxyWidget->setRotation( -90 );
+	proxyWidget->setPos( 8, 145 );
+
+	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 }
+
+
 
 
 FxLine::~FxLine()
@@ -109,25 +136,29 @@ FxLine::~FxLine()
 }
 
 
-void FxLine::setChannelIndex(int index) {
-	m_channelIndex = index;
 
+
+void FxLine::setChannelIndex( int index )
+{
+	m_channelIndex = index;
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->update();
 }
 
 
-void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis )
+
+
+void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
+	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	QString elidedName = elideName( name );
+	if( !m_inRename && m_renameLineEdit->text() != elidedName )
+	{
+		m_renameLineEdit->setText( elidedName );
+	}
+
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
-
-	QColor sh_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow );
-	QColor te_color = p->pen().brush().color();
-	QColor bt_color = QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText );
-
 
 	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
 	
@@ -148,48 +179,33 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name,
 	{
 		p->drawPixmap( 2, 0, 29, 56, *s_receiveBgArrow );
 	}
-
-	// draw the channel name
-	if( m_staticTextName.text() != name )
-	{
-		// elide the name of the fxLine when its too long
-		const int maxTextHeight = 78;
-		QFontMetrics metrics( fxLine->font() );
-		QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
-		m_staticTextName.setText( elidedName );
-	}
-	p->rotate( -90 );
-
-	p->setFont( pointSizeF( fxLine->font(), 7.5f ) );
-
-	// Coordinates of the foreground text
-	int const textLeft = -145;
-	int const textTop = 9;
-
-	// Draw text shadow
-	p->setPen( sh_color );
-	p->drawStaticText( textLeft - 1, textTop + 1, m_staticTextName );
-	
-	// Draw foreground text
-	p->setPen( isActive ? bt_color : te_color );
-	p->drawStaticText( textLeft, textTop, m_staticTextName );
 }
+
+
+
+
+QString FxLine::elideName( const QString & name )
+{
+	const int maxTextHeight = 70;
+	QFontMetrics metrics( font() );
+	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
+	return elidedName;
+}
+
+
 
 
 void FxLine::paintEvent( QPaintEvent * )
 {
-	FxMixer * mix = Engine::fxMixer();
-	bool sendToThis = mix->channelSendModel(
-		m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
-	bool receiveFromThis = mix->channelSendModel(
-		m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
+	bool sendToThis = Engine::fxMixer()->channelSendModel( m_mv->currentFxLine()->m_channelIndex, m_channelIndex ) != NULL;
+	bool receiveFromThis = Engine::fxMixer()->channelSendModel( m_channelIndex, m_mv->currentFxLine()->m_channelIndex ) != NULL;
 	QPainter painter;
 	painter.begin( this );
-	drawFxLine( &painter, this,
-		mix->effectChannel( m_channelIndex )->m_name,
-		m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
+	drawFxLine( &painter, this, m_mv->currentFxLine() == this, sendToThis, receiveFromThis );
 	painter.end();
 }
+
+
 
 
 void FxLine::mousePressEvent( QMouseEvent * )
@@ -198,16 +214,19 @@ void FxLine::mousePressEvent( QMouseEvent * )
 }
 
 
+
+
 void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 {
 	renameChannel();
 }
 
 
+
+
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
-	FxMixer * mix = Engine::fxMixer();
-	QPointer<CaptionMenu> contextMenu = new CaptionMenu( mix->effectChannel( m_channelIndex )->m_name, this );
+	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name, this );
 	if( m_channelIndex != 0 ) // no move-options in master 
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
@@ -218,37 +237,54 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 
 	if( m_channelIndex != 0 ) // no remove-option in master
 	{
-		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ),
-							this, SLOT( removeChannel() ) );
+		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ), this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
-
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ),
-						this, SLOT( removeUnusedChannels() ) );
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
-
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
 
 
+
+
 void FxLine::renameChannel()
 {
-	bool ok;
-	FxMixer * mix = Engine::fxMixer();
-	QString new_name = QInputDialog::getText( this,
-			FxMixerView::tr( "Rename FX channel" ),
-			FxMixerView::tr( "Enter the new name for this "
-						"FX channel" ),
-			QLineEdit::Normal, mix->effectChannel(m_channelIndex)->m_name, &ok );
-	if( ok && !new_name.isEmpty() )
-	{
-		mix->effectChannel( m_channelIndex )->m_name = new_name;
-		setToolTip( new_name );
-		update();
-	}
+	m_inRename = true;
+	setToolTip( "" );
+	m_renameLineEdit->setReadOnly( false );
+	m_lcd->hide();
+	m_renameLineEdit->setFixedWidth( 135 );
+	m_renameLineEdit->setText( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name );
+	m_view->setFocus();
+	m_renameLineEdit->selectAll();
+	m_renameLineEdit->setFocus();
 }
+
+
+
+
+void FxLine::renameFinished()
+{
+	m_inRename = false;
+	m_renameLineEdit->setReadOnly( true );
+	m_renameLineEdit->setFixedWidth( 65 );
+	m_lcd->show();
+	QString newName = m_renameLineEdit->text();
+	setFocus();
+	if( !newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != newName )
+	{
+		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = newName;
+		m_renameLineEdit->setText( elideName( newName ) );
+		Engine::getSong()->setModified();
+	}
+	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
+	setToolTip( name );
+}
+
+
 
 
 void FxLine::removeChannel()
@@ -258,11 +294,15 @@ void FxLine::removeChannel()
 }
 
 
+
+
 void FxLine::removeUnusedChannels()
 {
 	FxMixerView * mix = gui->fxMixerView();
 	mix->deleteUnusedChannels();
 }
+
+
 
 
 void FxLine::moveChannelLeft()
@@ -272,6 +312,8 @@ void FxLine::moveChannelLeft()
 }
 
 
+
+
 void FxLine::moveChannelRight()
 {
 	FxMixerView * mix = gui->fxMixerView();
@@ -279,56 +321,87 @@ void FxLine::moveChannelRight()
 }
 
 
+
+
 void FxLine::displayHelp()
 {
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
+	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ), whatsThis() );
 }
+
+
+
 
 QBrush FxLine::backgroundActive() const
 {
 	return m_backgroundActive;
 }
 
+
+
+
 void FxLine::setBackgroundActive( const QBrush & c )
 {
 	m_backgroundActive = c;
 }
+
+
+
 
 QColor FxLine::strokeOuterActive() const
 {
 	return m_strokeOuterActive;
 }
 
+
+
+
 void FxLine::setStrokeOuterActive( const QColor & c )
 {
 	m_strokeOuterActive = c;
 }
+
+
+
 
 QColor FxLine::strokeOuterInactive() const
 {
 	return m_strokeOuterInactive;
 }
 
+
+
+
 void FxLine::setStrokeOuterInactive( const QColor & c )
 {
 	m_strokeOuterInactive = c;
 }
+
+
+
 
 QColor FxLine::strokeInnerActive() const
 {
 	return m_strokeInnerActive;
 }
 
+
+
+
 void FxLine::setStrokeInnerActive( const QColor & c )
 {
 	m_strokeInnerActive = c;
 }
 
+
+
+
 QColor FxLine::strokeInnerInactive() const
 {
 	return m_strokeInnerInactive;
 }
+
+
+
 
 void FxLine::setStrokeInnerInactive( const QColor & c )
 {
