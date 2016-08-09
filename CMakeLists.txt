@@ -25,6 +25,10 @@ ELSE()
 	STRING(TIMESTAMP        PROJECT_YEAR "%Y")
 ENDIF()
 
+# Override version information for non-base builds
+INCLUDE(VersionInfo)
+INCLUDE(DetectMachine)
+
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "http://lmms.io")
 SET(PROJECT_EMAIL       "lmms-devel@lists.sourceforge.net")
@@ -38,10 +42,6 @@ SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 IF(VERSION_SUFFIX)
 	SET(VERSION     "${VERSION}-${VERSION_SUFFIX}")
 ENDIF(VERSION_SUFFIX)
-
-# Override version information for non-base builds
-INCLUDE(VersionInfo)
-INCLUDE(DetectMachine)
 
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
