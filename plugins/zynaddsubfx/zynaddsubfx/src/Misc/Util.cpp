@@ -190,8 +190,7 @@ void returnTmpBuffer(float *buf)
             return;
         }
     fprintf(stderr,
-            "ERROR: invalid buffer returned %s %d\n",
-            __FILE__,
+            "ERROR: invalid buffer returned src/Misc/Util.cpp %d\n",
             __LINE__);
 }
 
