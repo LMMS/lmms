@@ -821,8 +821,8 @@ void DataFile::upgrade_1_0_99()
 					me.setAttribute("scale_type", "log");
 					
 					jo_id_t id;
-					for(jo_id_t tid = last_assigned_id + 1;
-						idList.contains(id = tid); tid++)
+					for(id = last_assigned_id + 1;
+						idList.contains(id); id++)
 					{
 					}
 					
