@@ -511,11 +511,19 @@ void Pattern::addSteps()
 void Pattern::cloneSteps()
 {
 	int oldLength = m_steps;
+	int newTacts = (oldLength / MidiTime::stepsPerTact()) + 1;
+	int startStep = 0; //The cloning process will normally start from 0
+	if ( (newTacts % 2 == 0) && (newTacts > 3) ) {
+		startStep = MidiTime::stepsPerTact();
+	}
+	//But if we're creating the 4th, 6th, 8th (etc.) tact, we'll clone the second one
+	//That's why we won't start from 0, but from , e.g, 16 in 4/4
+
 	m_steps += MidiTime::stepsPerTact();
 	ensureBeatNotes();
 	for(int i = 0; i < MidiTime::stepsPerTact(); ++i )
 	{
-		Note *toCopy = noteAtStep( i );
+		Note *toCopy = noteAtStep( i + startStep );
 		if( toCopy )
 		{
 			setStep( oldLength + i, true );
