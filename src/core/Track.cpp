@@ -309,8 +309,8 @@ TrackContentObjectView::~TrackContentObjectView()
 
 /*! \brief Update a TrackContentObjectView
  *
- *  TCO's get drawn only when needed, 
- *  and when a TCO is updated, 
+ *  TCO's get drawn only when needed,
+ *  and when a TCO is updated,
  *  it needs to be redrawn.
  *
  */
@@ -669,7 +669,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( me->button() == Qt::LeftButton && 
+	else if( me->button() == Qt::LeftButton &&
 			 me->modifiers() & Qt::ControlModifier )
 	{
 		// start drag-action
@@ -1101,7 +1101,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1112,9 +1112,9 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	
+
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
@@ -1711,7 +1711,7 @@ TrackOperationsWidget::~TrackOperationsWidget()
 /*! \brief Respond to trackOperationsWidget mouse events
  *
  *  If it's the left mouse button, and Ctrl is held down, and we're
- *  not a Beat+Bassline Editor track, then start a new drag event to
+ *  not a Pattern Editor track, then start a new drag event to
  *  copy this track.
  *
  *  Otherwise, ignore all other events.
@@ -1744,7 +1744,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 
 /*! \brief Repaint the trackOperationsWidget
  *
- *  If we're not moving, and in the Beat+Bassline Editor, then turn
+ *  If we're not moving, and in the Pattern Editor, then turn
  *  automation on or off depending on its previous state and show
  *  ourselves.
  *
@@ -1834,7 +1834,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-	
+
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -1896,7 +1896,7 @@ void TrackOperationsWidget::recordingOff()
  *  The track object is the whole track, linking its contents, its
  *  automation, name, type, and so forth.
  *
- * \param type The type of track (Song Editor or Beat+Bassline Editor)
+ * \param type The type of track (Song Editor or Pattern Editor)
  * \param tc The track Container object to encapsulate in this track.
  *
  * \todo check the definitions of all the properties - are they OK?
@@ -1922,7 +1922,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 
 /*! \brief Destroy this track
  *
- *  If the track container is a Beat+Bassline container, step through
+ *  If the track container is a Pattern container, step through
  *  its list of tracks and remove us.
  *
  *  Then delete the TrackContentObject's contents, remove this track from
@@ -2738,7 +2738,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos = 
+		const int yPos =
 			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 

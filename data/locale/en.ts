@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.0">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -53,7 +53,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Contributors ordered by number of commits:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message utf8="true">
         <source>Copyright © %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -567,30 +567,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>BBEditor</name>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Play/pause current beat/bassline (Space)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop playback of current beat/bassline (Space)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Click here to stop playing of current beat/bassline.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Add automation-track</source>
         <translation type="unfinished"></translation>
     </message>
@@ -603,10 +579,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Beat selector</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Track and step actions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -614,13 +586,37 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Clone Steps</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Pattern Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play/pause current pattern (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop playback of current pattern (Space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to play the current pattern.  The pattern is automatically looped when its end is reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here to stop playing of current pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pattern selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BBTCOView</name>
-    <message>
-        <source>Open in Beat+Bassline-Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Reset name</source>
         <translation type="unfinished"></translation>
@@ -637,15 +633,19 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Reset color to default</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open in Pattern Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BBTrack</name>
     <message>
-        <source>Beat/Bassline %1</source>
+        <source>Clone of %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clone of %1</source>
+        <source>Pattern %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2230,14 +2230,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 <context>
     <name>FxMixerView</name>
     <message>
-        <source>Rename FX channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter the new name for this FX channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2362,15 +2354,15 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Preparing beat/bassline editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Preparing piano roll</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Preparing automation editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preparing pattern editor</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3859,18 +3851,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Quit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shut down LMMS with no further action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Preparing plugin browser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3908,10 +3888,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Show/hide Song-Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show/hide Beat+Bassline Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3976,6 +3952,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show/hide Pattern Editor</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5608,7 +5588,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <source>Drag an instrument into either the Song Editor, the Pattern Editor or into an existing instrument track.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6018,10 +5998,6 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>FL Studio installation directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>STK rawwave directory</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6100,10 +6076,6 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose artwork-theme directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6366,15 +6338,7 @@ Remember to also save your project manually.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stop song (Space)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add beat/bassline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6415,6 +6379,14 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>Zoom controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record samples from Audio-device while playing song or pattern</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add pattern</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

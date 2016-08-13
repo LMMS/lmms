@@ -828,6 +828,17 @@ void DataFile::upgrade_1_1_91()
 			el.setAttribute( "value", "vocoder" );
 		}
 	}
+
+	list = elementsByTagName( "bbtrack" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		QString s = el.attribute( "name" );
+		s.replace( QRegExp("Beat/Bassline"),
+						"Pattern" );
+		printf("hey dawg");
+		el.setAttribute( "name", s );
+	}
 }
 
 

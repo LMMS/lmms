@@ -86,7 +86,7 @@ void BBTCO::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "len", length() );
 	element.setAttribute( "muted", isMuted() );
 	element.setAttribute( "color", color() );
-	
+
 	if( m_useStyleColor )
 	{
 		element.setAttribute( "usestyle", 1 );
@@ -117,10 +117,10 @@ void BBTCO::loadSettings( const QDomElement & element )
 	{
 		setColor( QColor( element.attribute( "color" ).toUInt() ) );
 	}
-	
+
 	if( element.hasAttribute( "usestyle" ) )
 	{
-		if( element.attribute( "usestyle" ).toUInt() == 1 ) 
+		if( element.attribute( "usestyle" ).toUInt() == 1 )
 		{
 			m_useStyleColor = true;
 		}
@@ -182,7 +182,7 @@ BBTCOView::~BBTCOView()
 void BBTCOView::constructContextMenu( QMenu * _cm )
 {
 	QAction * a = new QAction( embed::getIconPixmap( "bb_track" ),
-					tr( "Open in Beat+Bassline-Editor" ),
+					tr( "Open in Pattern Editor" ),
 					_cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
@@ -223,7 +223,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
+	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size()
 		? QPixmap( size() ) : m_paintPixmap;
 
 	QPainter p( &m_paintPixmap );
@@ -231,15 +231,15 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
 	bool muted = m_bbTCO->getTrack()->isMuted() || m_bbTCO->isMuted();
-	
+
 	// state: selected, muted, default, user selected
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: ( m_bbTCO->m_useStyleColor ? painter.background().color() 
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
+		: ( m_bbTCO->m_useStyleColor ? painter.background().color()
 		: m_bbTCO->colorObj() ) );
-	
+
 	lingrad.setColorAt( 0, c.light( 130 ) );
 	lingrad.setColorAt( 1, c.light( 70 ) );
-	
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -248,7 +248,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	{
 		p.fillRect( rect(), c );
 	}
-	
+
 	// bar lines
 	const int lineSize = 3;
 
@@ -291,12 +291,12 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	// inner border
 	p.setPen( c.lighter( 130 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
-		rect().bottom() - TCO_BORDER_WIDTH );	
+		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-	
+
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_bbTCO->isMuted() )
 	{
@@ -305,11 +305,11 @@ void BBTCOView::paintEvent( QPaintEvent * )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-	
+
 	p.end();
-	
+
 	painter.drawPixmap( 0, 0, m_paintPixmap );
-	
+
 }
 
 
@@ -411,7 +411,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 	int bbNum = s_infoMap.size();
 	s_infoMap[this] = bbNum;
 
-	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
+	setName( tr( "Pattern %1" ).arg( bbNum ) );
 	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	Engine::getBBTrackContainer()->updateComboBox();
 
@@ -665,4 +665,3 @@ void BBTrackView::clickedTrackLabel()
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
 	gui->getBBEditor()->show();
 }
-

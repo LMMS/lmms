@@ -26,8 +26,8 @@ Features
 ---------
 
 * Song-Editor for composing songs
-* A Beat+Bassline-Editor for creating beats and basslines
-* An easy-to-use Piano-Roll for editing patterns and melodies
+* A Pattern Editor for creating complex paterns
+* An easy-to-use Piano-Roll for editing melodies
 * An FX mixer with unlimited FX channels and arbitrary number of effects
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources

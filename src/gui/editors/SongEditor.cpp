@@ -626,7 +626,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	// Set up buttons
 	m_playAction->setToolTip(tr("Play song (Space)"));
 	m_recordAction->setToolTip(tr("Record samples from Audio-device"));
-	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
+	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or pattern"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
 	m_playAction->setWhatsThis(
@@ -642,7 +642,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
 
 	m_addBBTrackAction = new QAction(embed::getIconPixmap("add_bb_track"),
-									 tr("Add beat/bassline"), this);
+									 tr("Add pattern"), this);
 
 	m_addSampleTrackAction = new QAction(embed::getIconPixmap("add_sample_track"),
 										 tr("Add sample-track"), this);

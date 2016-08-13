@@ -1,5 +1,5 @@
 /*
- * BBEditor.cpp - basic main-window for editing of beats and basslines
+ * BBEditor.cpp - basic main-window for editing of patterns
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -49,7 +49,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	m_trackContainerView( new BBTrackContainerView(tc) )
 {
 	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
-	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setWindowTitle( tr( "Pattern Editor" ) );
 	setCentralWidget(m_trackContainerView);
 
 	setAcceptDrops(true);
@@ -71,20 +71,20 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	}
 
 
-	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
-	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
+	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ));
+	m_stopAction->setToolTip(tr( "Stop playback of current pattern (Space)" ));
 
 	m_playAction->setWhatsThis(
 		tr( "Click here to play the current "
-			"beat/bassline.  The beat/bassline is automatically "
+			"pattern.  The pattern is automatically "
 			"looped when its end is reached." ) );
 	m_stopAction->setWhatsThis(
 		tr( "Click here to stop playing of current "
-							"beat/bassline." ) );
+							"pattern." ) );
 
 
 	// Beat selector
-	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
+	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Pattern selector"));
 
 	m_bbComboBox = new ComboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
@@ -97,7 +97,7 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
 
 
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add pattern"),
 						 Engine::getSong(), SLOT(addBBTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));

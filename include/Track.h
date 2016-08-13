@@ -1,6 +1,6 @@
 /*
  * Track.h - declaration of classes concerning tracks -> necessary for all
- *           track-like objects (beat/bassline, sample-track...)
+ *           track-like objects (pattern, sample-track...)
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -227,7 +227,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
+
 public slots:
 	virtual bool close();
 	void cut();
@@ -551,13 +551,13 @@ public:
 
 	using Model::dataChanged;
 
-	inline int getHeight() 
+	inline int getHeight()
 	{
 		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height 
+			? m_height
 			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height ) 
+	inline void setHeight( int height )
 	{
 		m_height = height;
 	}
