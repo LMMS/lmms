@@ -486,11 +486,10 @@ void MainWindow::finalize()
 	bb_editor_window->setShortcut( Qt::Key_F6 );
 	bb_editor_window->setWhatsThis(
 		tr( "By pressing this button, you can show or hide the "
-			"Beat+Bassline Editor. The Beat+Bassline Editor is "
+			"Pattern Editor. The Pattern Editor is "
 			"needed for creating beats, and for opening, adding, and "
 			"removing channels, and for cutting, copying and pasting "
-			"beat and bassline-patterns, and for other things like "
-			"that." ) );
+			"patterns, and for other things like that." ) );
 
 
 	ToolButton * piano_roll_window = new ToolButton(
@@ -1168,7 +1167,7 @@ void MainWindow::updateViewMenu()
 			      this, SLOT( toggleSongEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "bb_track" ),
-					tr( "Beat+Bassline Editor" ) + " (F6)",
+					tr( "Pattern Editor" ) + " (F6)",
 					this, SLOT( toggleBBEditorWin() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "piano" ),

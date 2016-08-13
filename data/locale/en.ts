@@ -3670,14 +3670,6 @@ Please make sure you have write-access to the file and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Beat+Bassline Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Piano Roll</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3956,6 +3948,14 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Show/hide Pattern Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By pressing this button, you can show or hide the Pattern Editor. The Pattern Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting patterns, and for other things like that.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pattern Editor</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
