@@ -43,6 +43,7 @@
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 
 #include "embed.cpp"
 
