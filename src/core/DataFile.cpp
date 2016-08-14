@@ -39,11 +39,14 @@
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "lmms_basics.h"
 #include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+
+static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 
@@ -794,6 +797,47 @@ void DataFile::upgrade_0_4_0_rc2()
 }
 
 
+void DataFile::upgrade_1_0_99()
+{
+	jo_id_t last_assigned_id = 0;
+	
+	QList<jo_id_t> idList;
+	findIds(documentElement(), idList);
+	
+	QDomNodeList list = elementsByTagName("ladspacontrols");
+	for(int i = 0; !list.item(i).isNull(); ++i)
+	{
+		for(QDomNode node = list.item(i).firstChild(); !node.isNull();
+			node = node.nextSibling())
+		{
+			QDomElement el = node.toElement();
+			QDomNode data_child = el.namedItem("data");
+			if(!data_child.isElement())
+			{
+				if (el.attribute("scale_type") == "log")
+				{
+					QDomElement me = createElement("data");
+					me.setAttribute("value", el.attribute("data"));
+					me.setAttribute("scale_type", "log");
+					
+					jo_id_t id;
+					for(id = last_assigned_id + 1;
+						idList.contains(id); id++)
+					{
+					}
+					
+					last_assigned_id = id;
+					idList.append(id);
+					me.setAttribute("id", id);
+					el.appendChild(me);
+					
+				}
+			}
+		}
+	}	
+}
+
+
 void DataFile::upgrade_1_1_0()
 {
 	QDomNodeList list = elementsByTagName("fxchannel");
@@ -894,6 +938,10 @@ void DataFile::upgrade()
 	if( version < "0.4.0-rc2" )
 	{
 		upgrade_0_4_0_rc2();
+	}
+	if( version < ProjectVersion("1.0.99", CompareType::Release) )
+	{
+		upgrade_1_0_99();
 	}
 	if( version < ProjectVersion("1.1.0", CompareType::Release) )
 	{
@@ -1007,3 +1055,19 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_content = root.elementsByTagName( typeName( m_type ) ).
 							item( 0 ).toElement();
 }
+
+
+void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
+{
+	if(elem.hasAttribute("id"))
+	{
+		idList.append(elem.attribute("id").toInt());
+	}
+	QDomElement child = elem.firstChildElement();
+	while(!child.isNull()) 
+	{
+		findIds(child, idList);
+		child = child.nextSiblingElement();
+	}
+}
+

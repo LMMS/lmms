@@ -195,14 +195,20 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 				}
 			}
 	}
-	else if( element.hasAttribute( name ) )
-	// attribute => read the element's value from the attribute list
-	{
-		setInitValue( element.attribute( name ).toFloat() );
-	}
 	else
 	{
-		reset();
+
+		setScaleType( Linear );
+
+		if( element.hasAttribute( name ) )
+			// attribute => read the element's value from the attribute list
+		{
+			setInitValue( element.attribute( name ).toFloat() );
+		}
+		else
+		{
+			reset();
+		}
 	}
 }
 
