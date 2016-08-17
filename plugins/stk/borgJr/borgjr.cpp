@@ -247,32 +247,32 @@ borgjrInstrumentView::borgjrInstrumentView( borgjrInstrument * _instrument,
 	connect( &_instrument->m_presetsModel, SIGNAL( dataChanged() ),
 		 this, SLOT( changePreset() ) );
 
-	m_modulatorKnob = new Knob( knobVintage_32, this );
+	m_modulatorKnob = new Knob( knobDark_28, this );
 	m_modulatorKnob->setLabel( tr( "Modulator 1" ) );
 	m_modulatorKnob->move( 30, 136 );
 	m_modulatorKnob->setHintText( tr( "Modulator 1:" ), "" );
 
-	m_crossfadeKnob = new Knob( knobVintage_32, this );
+	m_crossfadeKnob = new Knob( knobDark_28, this );
 	m_crossfadeKnob->setLabel( tr( "Modulator 2" ) );
 	m_crossfadeKnob->move( 110, 136 );
 	m_crossfadeKnob->setHintText( tr( "Modulator 2:" ), "" );
 	
-	m_lfoSpeedKnob = new Knob( knobVintage_32, this );
+	m_lfoSpeedKnob = new Knob( knobDark_28, this );
 	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
 	m_lfoSpeedKnob->move( 30, 186 );
 	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ), "" );
 	
-	m_lfoDepthKnob = new Knob( knobVintage_32, this );
+	m_lfoDepthKnob = new Knob( knobDark_28, this );
 	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
 	m_lfoDepthKnob->move( 110, 186 );
 	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ), "" );
 	
-	m_adsrKnob = new Knob( knobVintage_32, this );
+	m_adsrKnob = new Knob( knobDark_28, this );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );
 	m_adsrKnob->move( 190, 136 );
 	m_adsrKnob->setHintText( tr( "ADSR:" ), "" );
 
-	m_spreadKnob = new Knob( knobVintage_32, this );
+	m_spreadKnob = new Knob( knobDark_28, this );
 	m_spreadKnob->setLabel( tr( "Spread" ) );
 	m_spreadKnob->move( 190, 186 );
 	m_spreadKnob->setHintText( tr( "Spread:" ), "" );
