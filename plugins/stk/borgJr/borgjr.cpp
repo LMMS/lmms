@@ -82,31 +82,24 @@ borgjrInstrument::borgjrInstrument( InstrumentTrack * _instrument_track ):
 {
 	// BeeThree
 	m_presetsModel.addItem( tr( "BeeThree" ) );
-	m_scalers.append( 1.8 );
 	
 	// FMVoices
 	m_presetsModel.addItem( tr( "FMVoices" ) );
-	m_scalers.append( 1.8 );
 
 	// HevyMetl
 	m_presetsModel.addItem( tr( "Metal" ) );
-	m_scalers.append( 1.8 );
 
 	// PercFlut
 	m_presetsModel.addItem( tr( "PercFlut" ) );
-	m_scalers.append( 1.8 );
 
 	// Rhodey
 	m_presetsModel.addItem( tr( "Rhodey" ) );
-	m_scalers.append( 1.8 );
 
 	// TubeBell
 	m_presetsModel.addItem( tr( "Tubular Bells" ) );
-	m_scalers.append( 1.8 );
 
 	// Wurley
 	m_presetsModel.addItem( tr( "Wurley" ) );
-	m_scalers.append( 1.8 );
 }
 
 
@@ -212,10 +205,8 @@ void borgjrInstrument::playNote( NotePlayHandle * _n,
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
-		_working_buffer[frame][0] = ps->nextSampleLeft() *
-					( m_scalers[m_presetsModel.value()] );
-		_working_buffer[frame][1] = ps->nextSampleRight() *
-					( m_scalers[m_presetsModel.value()] );
+		_working_buffer[frame][0] = ps->nextSampleLeft();
+		_working_buffer[frame][1] = ps->nextSampleRight();
 	}
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
