@@ -355,7 +355,7 @@ borgjrSynth::borgjrSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
-	
+
 		switch( _preset )
 		{
 			case 0:
