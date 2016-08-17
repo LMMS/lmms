@@ -511,9 +511,9 @@ void Pattern::addSteps()
 void Pattern::cloneSteps()
 {
 	int oldLength = m_steps;
-	m_steps += MidiTime::stepsPerTact();
+	m_steps *= 2; // cloning doubles the track
 	ensureBeatNotes();
-	for(int i = 0; i < MidiTime::stepsPerTact(); ++i )
+	for(int i = 0; i < oldLength; ++i )
 	{
 		Note *toCopy = noteAtStep( i );
 		if( toCopy )
@@ -536,10 +536,10 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int _n = MidiTime::stepsPerTact();
-	if( _n < m_steps )
+	int n = MidiTime::stepsPerTact();
+	if( n < m_steps )
 	{
-		for( int i = m_steps - _n; i < m_steps; ++i )
+		for( int i = m_steps - n; i < m_steps; ++i )
 		{
 			for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
@@ -554,7 +554,7 @@ void Pattern::removeSteps()
 				}
 			}
 		}
-		m_steps -= _n;
+		m_steps -= n;
 		emit dataChanged();
 	}
 	updateBBTrack();
