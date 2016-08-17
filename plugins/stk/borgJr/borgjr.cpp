@@ -71,7 +71,7 @@ Plugin::Descriptor PLUGIN_EXPORT borgjrstk_plugin_descriptor =
 borgjrInstrument::borgjrInstrument( InstrumentTrack * _instrument_track ):
 	Instrument( _instrument_track, &borgjrstk_plugin_descriptor ),
 	m_modulatorModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Modulator 1" )),
-	m_crossfadeModel(0.0f, 0.0f, 127.9f, 0.1f, this, tr( "Modulator 2" )),
+	m_crossfadeModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Modulator 2" )),
 	m_lfoSpeedModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Speed" )),
 	m_lfoDepthModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Depth" )),
 	m_adsrModel(0.1f, 0.1f, 128.0f, 0.1f, this, tr( "ADSR" )),
@@ -171,6 +171,13 @@ void borgjrInstrument::playNote( NotePlayHandle * _n,
 	const float freq = _n->frequency();
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
+		// To counter for a bug in stk we don't allow this value
+		// to be over 127.9 in FMVoices (1).
+		float crossfade = m_crossfadeModel.value();
+		if( p == 1 && crossfade > 127.9 )
+		{
+			crossfade = 127.9;
+		}
 		const float vel = _n->getVolume() / 100.0f;
 
 		// critical section as STK is not thread-safe
@@ -182,7 +189,7 @@ void borgjrInstrument::playNote( NotePlayHandle * _n,
 					p,
 					m_lfoDepthModel.value(),
 					m_modulatorModel.value(),
-					m_crossfadeModel.value(),
+					crossfade,
 					m_lfoSpeedModel.value(),
 					m_adsrModel.value(),
 					(uint8_t) m_spreadModel.value(),
