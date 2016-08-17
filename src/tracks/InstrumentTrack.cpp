@@ -155,15 +155,11 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
-	Engine::mixer()->requestChangeInModel();
-
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
 	// now we're save deleting the instrument
 	if( m_instrument ) delete m_instrument;
-
-	Engine::mixer()->doneChangeInModel();
 }
 
 

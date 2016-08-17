@@ -22,6 +22,8 @@
  *
  */
 
+#include "TrackContainerView.h"
+
 #include <algorithm>
 
 #include <QApplication>
@@ -32,10 +34,10 @@
 #include <QWheelEvent>
 
 
-#include "TrackContainerView.h"
 #include "TrackContainer.h"
 #include "BBTrack.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "debug.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
@@ -271,7 +273,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	t->deleteLater();
+	Engine::mixer()->requestChangeInModel();
+	delete t;
+	Engine::mixer()->doneChangeInModel();
 }
 
 
