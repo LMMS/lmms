@@ -100,6 +100,45 @@ public:
 		}
 	}
 
+	inline void setModulation( const StkFloat _control2 )
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 2, _control2 );
+		}
+	}
+
+	inline void setCrossfade( const StkFloat _control4 )
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 4, _control4 );
+		}
+	}
+
+	inline void setADSR( const StkFloat _control128 )
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 128, _control128 );
+		}
+	}
+
+	inline void setLFODepth( const StkFloat _control1 )
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 1, _control1 );
+		}
+	}
+
+	inline void setLFOSpeed( const StkFloat _control11 )
+	{
+		if( m_voice )
+		{
+			m_voice->controlChange( 11, _control11 );
+		}
+	}
 
 protected:
 	Instrmnt * m_voice;

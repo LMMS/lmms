@@ -167,17 +167,18 @@ void borgjrInstrument::playNote( NotePlayHandle * _n,
 	}
 
 	int p = m_presetsModel.value();
-	
 	const float freq = _n->frequency();
+
+	// To counter for a bug in stk we don't allow this value
+	// to be over 127.9 in FMVoices (1).
+	float crossfade = m_crossfadeModel.value();
+	if( p == 1 && crossfade > 127.9 )
+	{
+		crossfade = 127.9;
+	}
+
 	if ( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		// To counter for a bug in stk we don't allow this value
-		// to be over 127.9 in FMVoices (1).
-		float crossfade = m_crossfadeModel.value();
-		if( p == 1 && crossfade > 127.9 )
-		{
-			crossfade = 127.9;
-		}
 		const float vel = _n->getVolume() / 100.0f;
 
 		// critical section as STK is not thread-safe
@@ -203,6 +204,11 @@ void borgjrInstrument::playNote( NotePlayHandle * _n,
 
 	borgjrSynth * ps = static_cast<borgjrSynth *>( _n->m_pluginData );
 	ps->setFrequency( freq );
+	ps->setModulation( m_modulatorModel.value() );
+	ps->setCrossfade( crossfade );
+	ps->setADSR( m_adsrModel.value() );
+	ps->setLFODepth( m_lfoDepthModel.value() );
+	ps->setLFOSpeed( m_lfoSpeedModel.value() );
 
 	for( fpp_t frame = offset; frame < frames + offset; ++frame )
 	{
