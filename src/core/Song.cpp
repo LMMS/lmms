@@ -1217,9 +1217,9 @@ void Song::restoreControllerStates( const QDomElement & element )
 
 void Song::removeAllControllers()
 {
-	for (int i = 0; i < m_controllers.size(); ++i)
+	while (m_controllers.size() != 0)
 	{
-		removeController(m_controllers.at(i));
+		removeController(m_controllers.at(0));
 	}
 
 	m_controllers.clear();
