@@ -526,6 +526,8 @@ public:
 							const MidiTime & end );
 	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
 
+	void createTCOsForBB( int bb );
+
 
 	void insertTact( const MidiTime & pos );
 	void removeTact( const MidiTime & pos );

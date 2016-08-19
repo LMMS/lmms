@@ -1954,6 +1954,8 @@ Track::~Track()
  */
 Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = NULL;
 
 	switch( tt )
@@ -1969,7 +1971,15 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
+	if( tc == Engine::getBBTrackContainer() && t )
+	{
+		t->createTCOsForBB( Engine::getBBTrackContainer()->numOfBBs()
+									- 1 );
+	}
+
 	tc->updateAfterTrackAdd();
+
+	Engine::mixer()->doneChangeInModel();
 
 	return t;
 }
@@ -2327,6 +2337,20 @@ void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
 	m_trackContentObjects[tcoNum1]->movePosition(
 			m_trackContentObjects[tcoNum2]->startPosition() );
 	m_trackContentObjects[tcoNum2]->movePosition( pos );
+}
+
+
+
+
+void Track::createTCOsForBB( int bb )
+{
+	while( numOfTCOs() < bb + 1 )
+	{
+		MidiTime position = MidiTime( numOfTCOs(), 0 );
+		TrackContentObject * tco = createTCO( position );
+		tco->movePosition( position );
+		tco->changeLength( MidiTime( 1, 0 ) );
+	}
 }
 
 
