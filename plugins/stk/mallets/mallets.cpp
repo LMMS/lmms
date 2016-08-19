@@ -578,8 +578,9 @@ void malletsInstrumentView::modelChanged()
 void malletsInstrumentView::changePreset()
 {
 	malletsInstrument * inst = castModel<malletsInstrument>();
+	inst->instrumentTrack()->silenceAllNotes();
 	int _preset = inst->m_presetsModel.value();
-	
+
 	if( _preset < 9 )
 	{
 		m_tubeBellWidget->hide();
@@ -597,7 +598,7 @@ void malletsInstrumentView::changePreset()
 		m_modalBarWidget->hide();
 		m_tubeBellWidget->hide();
 		m_bandedWGWidget->show();
-	}		
+	}
 }
 
 
