@@ -49,7 +49,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_textShadowColor = Qt::black;
 	m_borderColor = Qt::black;
 
-	// close, minimize, maximize and restore (after minimizing) buttons
+	// close, maximize and restore (after maximizing) buttons
 	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString::null, this );
 	m_closeBtn->resize( m_buttonSize );
 	m_closeBtn->setFocusPolicy( Qt::NoFocus );
@@ -65,14 +65,6 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_maximizeBtn->setAttribute( Qt::WA_NoMousePropagation );
 	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
 	connect( m_maximizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMaximized() ) );
-
-	m_minimizeBtn = new QPushButton( embed::getIconPixmap( "minimize" ), QString::null, this );
-	m_minimizeBtn->resize( m_buttonSize );
-	m_minimizeBtn->setFocusPolicy( Qt::NoFocus );
-	m_minimizeBtn->setCursor( Qt::ArrowCursor );
-	m_minimizeBtn->setAttribute( Qt::WA_NoMousePropagation );
-	m_minimizeBtn->setToolTip( tr( "Minimize" ) );
-	connect( m_minimizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMinimized() ) );
 
 	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString::null, this );
 	m_restoreBtn->resize( m_buttonSize );
@@ -92,6 +84,11 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_windowTitle->setFocusPolicy( Qt::NoFocus );
 	m_windowTitle->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_windowTitle->setGraphicsEffect( m_shadow );
+
+	// disable the minimize button
+	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
+		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
+		Qt::CustomizeWindowHint );
 }
 
 
@@ -224,7 +221,7 @@ void SubWindow::moveEvent( QMoveEvent * event )
 	QMdiSubWindow::moveEvent( event );
 	// if the window was moved and ISN'T minimized/maximized/fullscreen,
 	// then save the current position
-	if( !isMaximized() && !isMinimized() && !isFullScreen() )
+	if( !isMaximized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.moveTopLeft( event->pos() );
 	}
@@ -236,12 +233,10 @@ void SubWindow::moveEvent( QMoveEvent * event )
 void SubWindow::adjustTitleBar()
 {
 	// button adjustments
-	m_minimizeBtn->hide();
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
 
 	const bool isMax = isMaximized();
-	const bool isMin = isMinimized();
 	const int rightSpace = 3;
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
@@ -268,27 +263,13 @@ void SubWindow::adjustTitleBar()
 		m_maximizeBtn->setHidden( isMax );
 	}
 
-	if( windowFlags() & Qt::WindowMinimizeButtonHint )
-	{
-		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
-		m_minimizeBtn->move( m_maximizeBtn->isHidden() && !isMax ? middleButtonPos : leftButtonPos );
-		m_minimizeBtn->setHidden( isMin );
-	}
-	m_restoreBtn->setVisible( isMax || isMin );
+	m_restoreBtn->setVisible( isMax );
 
 	// title QLabel adjustments
 	m_windowTitle->setAlignment( Qt::AlignHCenter );
 	m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
 	m_windowTitle->move( menuButtonSpace,
 		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
-
-	// if minimized we can't use widget()->width(). We have to hard code the width,
-	// as the width of all minimized windows is the same.
-	if( isMin )
-	{
-		m_restoreBtn->move(  m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
-		m_windowTitle->setFixedWidth( 120 );
-	}
 
 	// truncate the label string if the window is to small. Adds "..."
 	elideText( m_windowTitle, widget()->windowTitle() );
@@ -306,7 +287,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
-	if( !isMaximized() && !isMinimized() && !isFullScreen() )
+	if( !isMaximized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}

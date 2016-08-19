@@ -110,12 +110,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )
 		{
-			m_subWindow = gui->mainWindow()->addWindowedWidget(
-								m_controlView,
-				Qt::SubWindow | Qt::CustomizeWindowHint  |
-					Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
+			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
 			m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 			m_subWindow->setFixedSize( m_subWindow->size() );
+
+			Qt::WindowFlags flags = m_subWindow->windowFlags();
+			flags &= ~Qt::WindowMaximizeButtonHint;
+			m_subWindow->setWindowFlags( flags );
 
 			connect( m_controlView, SIGNAL( closed() ),
 					this, SLOT( closeEffects() ) );
@@ -291,8 +292,3 @@ void EffectView::modelChanged()
 	m_autoQuit->setModel( &effect()->m_autoQuitModel );
 	m_gate->setModel( &effect()->m_gateModel );
 }
-
-
-
-
-
