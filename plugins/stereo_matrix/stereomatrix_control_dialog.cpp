@@ -38,7 +38,7 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	EffectControlDialog( _controls )
 {
 
-	setFixedSize( 170, 150 );
+	setFixedSize( 150, 185 );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -50,20 +50,20 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	Knob * llKnob = new Knob( knobBright_26, this );
 	llKnob->setModel( &_controls->m_llModel );
 	llKnob->setHintText( tr( "Left to Left Vol:" ) , "" );
-	llKnob->move( 76, 78 );
+	llKnob->move( 5, 79 );
 
 	Knob * lrKnob = new Knob( knobBright_26, this );
 	lrKnob->setModel( &_controls->m_lrModel );
 	lrKnob->setHintText( tr( "Left to Right Vol:" ) , "" );
-	lrKnob->move( 121, 78 );
+	lrKnob->move( 43, 79 );
 
 	Knob * rlKnob = new Knob( knobBright_26, this );
 	rlKnob->setModel( &_controls->m_rlModel );
 	rlKnob->setHintText( tr( "Right to Left Vol:" ) , "" );
-	rlKnob->move( 76, 115 );
+	rlKnob->move( 80, 79 );
 
 	Knob * rrKnob = new Knob( knobBright_26, this );
 	rrKnob->setModel( &_controls->m_rrModel );
 	rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
-	rrKnob->move( 121, 115 );
+	rrKnob->move( 118, 79 );
 }
