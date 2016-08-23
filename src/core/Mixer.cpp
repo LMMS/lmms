@@ -77,6 +77,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_writeBuf( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
+	m_newPlayHandles( PlayHandle::MaxNumber ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
@@ -419,7 +420,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	{
 		m_playHandles += e->value;
 		LocklessListElement * next = e->next;
-		delete e;
+		m_newPlayHandles.free( e );
 		e = next;
 	}
 
@@ -683,7 +684,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 				{
 					m_newPlayHandles.setFirst( e->next );
 				}
-				delete e;
+				m_newPlayHandles.free( e );
 				removedFromList = true;
 				break;
 			}
