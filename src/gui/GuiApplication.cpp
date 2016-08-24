@@ -83,7 +83,7 @@ GuiApplication::GuiApplication()
 	layout.setAlignment(Qt::AlignBottom);
 	splashScreen.setLayout(&layout);
 
-	// Create a left-aligned label for loading progress 
+	// Create a left-aligned label for loading progress
 	// & a right-aligned label for version info
 	QLabel loadingProgressLabel;
 	m_loadingProgressLabel = &loadingProgressLabel;
@@ -99,7 +99,7 @@ GuiApplication::GuiApplication()
 	splashScreen.update();
 	qApp->processEvents();
 
-	connect(Engine::inst(), SIGNAL(initProgress(const QString&)), 
+	connect(Engine::inst(), SIGNAL(initProgress(const QString&)),
 		this, SLOT(displayInitProgress(const QString&)));
 
 	// Init central engine which handles all components of LMMS
@@ -111,7 +111,7 @@ GuiApplication::GuiApplication()
 
 	m_mainWindow = new MainWindow;
 	connect(m_mainWindow, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
-	connect(m_mainWindow, SIGNAL(initProgress(const QString&)), 
+	connect(m_mainWindow, SIGNAL(initProgress(const QString&)),
 		this, SLOT(displayInitProgress(const QString&)));
 
 	displayInitProgress(tr("Preparing song editor"));
@@ -130,7 +130,7 @@ GuiApplication::GuiApplication()
 	m_projectNotes = new ProjectNotes;
 	connect(m_projectNotes, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing beat/bassline editor"));
+	displayInitProgress(tr("Preparing pattern editor"));
 	m_bbEditor = new BBEditor(Engine::getBBTrackContainer());
 	connect(m_bbEditor, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
@@ -158,7 +158,7 @@ GuiApplication::~GuiApplication()
 void GuiApplication::displayInitProgress(const QString &msg)
 {
 	Q_ASSERT(m_loadingProgressLabel != nullptr);
-	
+
 	m_loadingProgressLabel->setText(msg);
 	// must force a UI update and process events, as there may be long gaps between processEvents() calls during init
 	m_loadingProgressLabel->repaint();
