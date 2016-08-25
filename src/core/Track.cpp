@@ -2658,9 +2658,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		m_track->lock();
+		Engine::mixer()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		m_track->unlock();
+		Engine::mixer()->doneChangeInModel();
 		de->accept();
 	}
 }
