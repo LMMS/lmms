@@ -53,29 +53,7 @@ public:
 
 private:
 	EqControls * m_controls;
-	Fader* m_inGainFader;
-	Fader* m_outGainFader;
-	Fader* m_gainFader;
-	Knob* m_resKnob;
-	Knob* m_freqKnob;
-	PixmapButton* m_inSpecB;
-	PixmapButton* m_outSpecB;
-	PixmapButton* m_activeBox;
-	PixmapButton* m_lp12Box;
-	PixmapButton* m_lp24Box;
-	PixmapButton* m_lp48Box;
-	PixmapButton* m_hp12Box;
-	PixmapButton* m_hp24Box;
-	PixmapButton* m_hp48Box;
-	LedCheckBox* m_analyzeBox;
 	EqParameterWidget* m_parameterWidget;
-	EqSpectrumView* m_inSpec;
-	EqSpectrumView* m_outSpec;
-	QLabel* m_freqLabel;
-	QLabel* m_resLabel1;
-	QLabel* m_resLabel2;
-	QLabel* m_bandWidthLabel;
-
 
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
