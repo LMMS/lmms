@@ -752,8 +752,6 @@ PatternView::~PatternView()
 
 void PatternView::update()
 {
-	m_pat->changeLength( m_pat->length() );
-	
 	if ( m_pat->m_patternType == Pattern::BeatPattern )
 	{
 		ToolTip::add( this,

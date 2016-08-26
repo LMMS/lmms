@@ -316,6 +316,10 @@ TrackContentObjectView::~TrackContentObjectView()
  */
 void TrackContentObjectView::update()
 {
+	if( fixedTCOs() )
+	{
+		updateLength();
+	}
 	m_needsUpdate = true;
 	selectableObject::update();
 }

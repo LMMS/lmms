@@ -368,14 +368,14 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-	
+
 	// state: selected, muted, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
 		: painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
-	
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -386,13 +386,17 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
-	
+
 	const int spacing = TCO_BORDER_WIDTH + 1;
-	
+	const float ppt = fixedTCOs() ?
+			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+					/ (float) m_tco->length().getTact() :
+								pixelsPerTact();
+
 	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() *
-				pixelsPerTact() / DefaultTicksPerTact ), 1 ),
-					rect().bottom() - 2 * spacing );
+			qMax( static_cast<int>( m_tco->sampleLength() * ppt
+						/ DefaultTicksPerTact ), 1 ),
+						rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	// disable antialiasing for borders, since its not needed
@@ -408,11 +412,11 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setPen( c.lighter( 160 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
 		rect().bottom() - TCO_BORDER_WIDTH );
-		
+
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-	
+
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_tco->isMuted() )
 	{
@@ -421,9 +425,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-	
+
 	// recording sample tracks is not possible at the moment 
-	
+
 	/* if( m_tco->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
@@ -436,9 +440,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
-	
+
 	p.end();
-	
+
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
