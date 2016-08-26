@@ -42,10 +42,9 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-				PLUGIN_NAME::getIconPixmap( "artwork" ) );
+	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 240, 100 );
+	setFixedSize( 240, 80 );
 
 	m_baseKnob = new Knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
@@ -73,7 +72,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_decayKnob->setHintText( tr( "Release:" ) , "" );
 	
 	m_tresholdKnob = new Knob( knobBright_26, this );
-	m_tresholdKnob->setLabel( tr( "TRES" ) );
+	m_tresholdKnob->setLabel( tr( "TRSH" ) );
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
 	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
 
@@ -97,10 +96,10 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	ledLayout->addWidget( m_muteLed );
 	ledLayout->addWidget( m_absLed );
 
-	mainLayout->setContentsMargins( 0, 30, 0, 0 );
+	mainLayout->setContentsMargins( 3, 10, 0, 0 );
 	mainLayout->addLayout( knobLayout );
 	mainLayout->addLayout( ledLayout );
 
-	this->setLayout( mainLayout );
+	setLayout( mainLayout );
 }
 
