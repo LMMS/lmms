@@ -3905,7 +3905,7 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     </message>
     <message>
         <source>Save as default template</source>
-        <translation>Sauvegardder en tant que omdèle par défaut</translation>
+        <translation>Sauvegarder en tant que modèle par défaut</translation>
     </message>
     <message>
         <source>Export &amp;MIDI...</source>
