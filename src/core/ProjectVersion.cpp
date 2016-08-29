@@ -111,7 +111,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 		return 0;
 	}
 
-	// make sure 0.x.y > 0.x.y-patch
+	// make sure 0.x.y > 0.x.y-alpha
 	if(a.getBuild().isEmpty())
 	{
 		return 1;
@@ -121,6 +121,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 		return -1;
 	}
 
+	// 0.x.y-beta > 0.x.y-alpha
 	return QString::compare(a.getBuild(), b.getBuild());
 }
 
