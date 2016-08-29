@@ -39,6 +39,8 @@ private slots:
                 QVERIFY(ProjectVersion("1.1.0", CompareType::Minor) == "1.1.5");
                 QVERIFY( ! ( ProjectVersion("3.1.0", CompareType::Minor) < "2.2.5" ) );
                 QVERIFY( ! ( ProjectVersion("2.5.0", CompareType::Release) < "2.2.5" ) );
+				QVERIFY(ProjectVersion("1.1.0") > "1.1.0-alpha");
+				QVERIFY(ProjectVersion("1.1.0-alpha") < "1.1.0-beta");
         }
 } ProjectVersionTests;
 
