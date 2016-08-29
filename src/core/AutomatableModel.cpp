@@ -221,7 +221,7 @@ void AutomatableModel::setValue( const float value )
 	++m_setValueDepth;
 	const float old_val = m_value;
 
-	m_value = fittedValue( value, true );
+	m_value = fittedValue( value );
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
