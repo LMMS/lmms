@@ -282,6 +282,10 @@ void AudioSoundIo::writeCallback(int frameCountMin, int frameCountMax)
 	}
 }
 
+AudioSoundIoSetupUtil::~AudioSoundIoSetupUtil()
+{
+}
+
 void AudioSoundIoSetupUtil::reconnectSoundIo()
 {
 	((AudioSoundIo::setupWidget *)m_setupWidget)->reconnectSoundIo();
