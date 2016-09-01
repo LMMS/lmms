@@ -121,6 +121,20 @@ void SubWindow::paintEvent( QPaintEvent * )
 
 
 
+void SubWindow::changeEvent( QEvent *event )
+{
+	QMdiSubWindow::changeEvent( event );
+
+	if( event->type() ==  QEvent::WindowTitleChange )
+	{
+		adjustTitleBar();
+	}
+
+}
+
+
+
+
 void SubWindow::elideText( QLabel *label, QString text )
 {
 	QFontMetrics metrix( label->font() );
@@ -219,7 +233,7 @@ void SubWindow::moveEvent( QMoveEvent * event )
 
 
 
-void SubWindow::resizeEvent( QResizeEvent * event )
+void SubWindow::adjustTitleBar()
 {
 	// button adjustments
 	m_minimizeBtn->hide();
@@ -280,12 +294,19 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 	elideText( m_windowTitle, widget()->windowTitle() );
 	m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
 	m_windowTitle->adjustSize();
+}
 
+
+
+
+void SubWindow::resizeEvent( QResizeEvent * event )
+{
+	adjustTitleBar();
 	QMdiSubWindow::resizeEvent( event );
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
-	if( !isMax && !isMin && !isFullScreen() )
+	if( !isMaximized() && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}
