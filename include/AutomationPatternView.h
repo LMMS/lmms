@@ -44,7 +44,6 @@ public:
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
-	virtual void update();
 
 
 protected slots:

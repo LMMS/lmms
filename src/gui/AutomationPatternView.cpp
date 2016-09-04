@@ -82,19 +82,6 @@ void AutomationPatternView::openInAutomationEditor()
 
 
 
-
-void AutomationPatternView::update()
-{
-	if( fixedTCOs() )
-	{
-		m_pat->changeLength( m_pat->length() );
-	}
-	TrackContentObjectView::update();
-}
-
-
-
-
 void AutomationPatternView::resetName()
 {
 	m_pat->setName( QString::null );
