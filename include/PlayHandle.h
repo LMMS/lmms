@@ -47,6 +47,11 @@ public:
 	} ;
 	typedef Types Type;
 
+	enum
+	{
+		MaxNumber = 1024
+	} ;
+
 	PlayHandle( const Type type, f_cnt_t offset = 0 );
 
 	PlayHandle & operator = ( PlayHandle & p )
