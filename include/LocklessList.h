@@ -27,6 +27,8 @@
 
 #include <QAtomicPointer>
 
+#include "LocklessAllocator.h"
+
 template<typename T>
 class LocklessList
 {
@@ -37,9 +39,19 @@ public:
 		Element * next;
 	} ;
 
+	LocklessList( size_t size )
+	{
+		m_allocator = new LocklessAllocatorT<Element>( size );
+	}
+
+	~LocklessList()
+	{
+		delete m_allocator;
+	}
+
 	void push( T value )
 	{
-		Element * e = new Element;
+		Element * e = m_allocator->alloc();
 		e->value = value;
 
 		do
@@ -76,9 +88,15 @@ public:
 #endif
 	}
 
+	void free( Element * e )
+	{
+		m_allocator->free( e );
+	}
+
 
 private:
 	QAtomicPointer<Element> m_first;
+	LocklessAllocatorT<Element> * m_allocator;
 
 } ;
 
