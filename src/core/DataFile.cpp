@@ -1046,8 +1046,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			}
 
 			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType(
-				ProjectVersion::Revision ) < openedWith )
+			if( createdWith.setCompareType( ProjectVersion::Build )
+								< openedWith )
 			{
 				upgrade();
 			}

@@ -147,7 +147,7 @@ void ConfigManager::upgrade()
 
 	ProjectVersion createdWith = m_version;
 	
-	if ( createdWith.setCompareType(ProjectVersion::Revision) < "1.1.90" )
+	if ( createdWith.setCompareType(ProjectVersion::Build) < "1.1.90" )
 	{
 		upgrade_1_1_90();
 	}

@@ -36,16 +36,16 @@
 class ProjectVersion
 {
 public:
-	enum CompareType { Major, Minor, Build, Stage, Revision };
+	enum CompareType { Major, Minor, Release, Stage, Build };
 
-	ProjectVersion(QString version, CompareType c = Revision);
-	ProjectVersion(const char * version, CompareType c = Revision);
+	ProjectVersion(QString version, CompareType c = Build);
+	ProjectVersion(const char * version, CompareType c = Build);
 
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
-	int getBuild() const { return m_build; }
+	int getRelease() const { return m_release; }
 	QString getStage() const { return m_stage; }
-	int getRevision() const { return m_revision; }
+	int getBuild() const { return m_build; }
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
@@ -56,9 +56,9 @@ private:
 	QString m_version;
 	int m_major;
 	int m_minor;
-	int m_build;
+	int m_release;
 	QString m_stage;
-	int m_revision;
+	int m_build;
 	CompareType m_compareType;
 } ;
 

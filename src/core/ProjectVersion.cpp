@@ -41,7 +41,7 @@ int parseMinor(QString & version) {
 
 
 
-int parseBuild(QString & version) {
+int parseRelease(QString & version) {
 	return version.section( '.', 2, 2 ).section( '-', 0, 0 ).toInt();
 }
 
@@ -55,7 +55,7 @@ QString parseStage(QString & version) {
 
 
 
-int parseRevision(QString & version) {
+int parseBuild(QString & version) {
 	return version.section( '.', 3 ).toInt();
 }
 
@@ -66,9 +66,9 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 	m_version(version),
 	m_major(parseMajor(m_version)),
 	m_minor(parseMinor(m_version)),
-	m_build(parseBuild(m_version)),
+	m_release(parseRelease(m_version)),
 	m_stage(parseStage(m_version)),
-	m_revision(parseRevision(m_version)),
+	m_build(parseBuild(m_version)),
 	m_compareType(c)
 {
 }
@@ -80,9 +80,9 @@ ProjectVersion::ProjectVersion(const char* version, CompareType c) :
 	m_version(QString(version)),
 	m_major(parseMajor(m_version)),
 	m_minor(parseMinor(m_version)),
-	m_build(parseBuild(m_version)),
+	m_release(parseRelease(m_version)),
 	m_stage(parseStage(m_version)),
-	m_revision(parseRevision(m_version)),
+	m_build(parseBuild(m_version)),
 	m_compareType(c)
 {
 }
@@ -110,11 +110,11 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 		return 0;
 	}
 
-	if(a.getBuild() != b.getBuild())
+	if(a.getRelease() != b.getRelease())
 	{
-		return a.getBuild() - b.getBuild();
+		return a.getRelease() - b.getRelease();
 	}
-	if(c == Build)
+	if(c == Release)
 	{
 		return 0;
 	}
@@ -143,7 +143,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 		return 0;
 	}
 
-	return a.getRevision() - b.getRevision();
+	return a.getBuild() - b.getBuild();
 }
 
 
