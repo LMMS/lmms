@@ -135,6 +135,10 @@ TabWidget {
 	qproperty-tabBorder: rgb(60, 67, 75);
 }
 
+GroupBox {
+	background-color: #5b6571; 
+}
+
 /* main toolbar oscilloscope - can have transparent bg now */
 
 VisualizationWidget  {
