@@ -28,7 +28,6 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
-#include <QBitmap>
 #include <QToolTip>
 #include <QWheelEvent>
 
@@ -44,9 +43,7 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 	m_tabTitleText( 0, 0, 0 ),
 	m_tabSelected( 0, 0, 0 ),
 	m_tabBackground( 0, 0, 0 ),
-	m_tabBorder( 0, 0, 0 ),
-	m_tabArtworkActive( 0, 0, 0 ),
-	m_tabArtworkInactive( 0, 0, 0 )
+	m_tabBorder( 0, 0, 0 )
 {
 
 	// Create taller tabbar when it's to display artwork tabs
@@ -244,8 +241,9 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 	}
 
 	// Draw all tabs
-	for( widgetStack::iterator it = first ; it != last ; ++it )
-	{
+	p.setPen( tabText() );
+        for( widgetStack::iterator it = first ; it != last ; ++it )
+        {
 
 		// Draw a text tab or a artwork tab.
 		if ( m_usePixmap )
@@ -253,24 +251,18 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			// Fixes tab's width, because original size is only correct for text tabs
 			( *it ).nwidth = tab_width;
 
-			// Create a mask out of the tab's artwork (for changing it's color later on)
-			QBitmap mask = QPixmap( embed::getIconPixmap( ( *it ).activePixmap ) ).createMaskFromColor( Qt::black, Qt::MaskOutColor );
+			// Get artwork
+                	QPixmap artwork( embed::getIconPixmap( ( *it ).inactivePixmap ) );
 
-			// Select artwork's color and highlight active tab
+			// Highlight active tab
 			if( it.key() == m_activeTab )
 			{
 				p.fillRect( tab_x_offset, 0, ( *it ).nwidth, m_tabbarHeight - 1, tabSelected() );
-				p.setPen( tabArtworkActive() );
 			}
-			else 
-			{
-				p.setPen( tabArtworkInactive() );
-			}
-			
-			// Draw colorized artwork
-			p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - mask.width() ) / 2, 1, mask );
-		}
-		else
+
+			// Draw artwork
+                	p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - artwork.width() ) / 2, 1, artwork );
+		} else
 		{
 			// Highlight tab when active
 			if( it.key() == m_activeTab )
@@ -279,7 +271,6 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			}
 
 			// Draw text
-			p.setPen( tabText() );
 			p.drawText( tab_x_offset + 3, m_tabheight + 1, ( *it ).name );
 		}
 
@@ -371,26 +362,3 @@ void TabWidget::setTabBorder( const QColor & c )
 	m_tabBorder = c;
 }
 
-// Return the color to be used for drawing active artwork tabs
-QColor TabWidget::tabArtworkActive() const
-{
-	return m_tabArtworkActive;
-}
-
-// Set the color to be used for drawing active artwork tabs
-void TabWidget::setTabArtworkActive( const QColor & c ) 
-{
-	m_tabArtworkActive = c;
-}
-
-// Return the color to be used for drawing inactive artwork tabs
-QColor TabWidget::tabArtworkInactive() const
-{
-	return m_tabArtworkInactive;
-}
-
-// Set the color to be used for drawing inactive artwork tabs
-void TabWidget::setTabArtworkInactive( const QColor & c ) 
-{
-	m_tabArtworkInactive = c;
-}
