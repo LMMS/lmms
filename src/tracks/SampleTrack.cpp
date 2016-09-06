@@ -39,6 +39,7 @@
 #include "Engine.h"
 #include "ToolTip.h"
 #include "AudioPort.h"
+#include "BBTrack.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
 #include "StringPairDrag.h"
@@ -475,19 +476,37 @@ SampleTrack::~SampleTrack()
 
 
 bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _offset, int /*_tco_num*/ )
+					const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
 
-	for( int i = 0; i < numOfTCOs(); ++i )
+	tcoVector tcos;
+	::BBTrack * bb_track = NULL;
+	if( _tco_num >= 0 )
 	{
-		TrackContentObject * tco = getTCO( i );
-		if( tco->startPosition() != _start )
+		if( _start != 0 )
 		{
-			continue;
+			return false;
 		}
-		SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
+		tcos.push_back( getTCO( _tco_num ) );
+		bb_track = BBTrack::findBBTrack( _tco_num );
+	}
+	else
+	{
+		for( int i = 0; i < numOfTCOs(); ++i )
+		{
+			TrackContentObject * tco = getTCO( i );
+			if( tco->startPosition() == _start )
+			{
+				tcos.push_back( tco );
+			}
+		}
+	}
+
+	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
+	{
+		SampleTCO * st = dynamic_cast<SampleTCO *>( *it );
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;
@@ -504,10 +523,9 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
+				smpHandle->setBBTrack( bb_track );
 				handle = smpHandle;
 			}
-//TODO: check whether this works
-//			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
 			Engine::mixer()->addPlayHandle( handle );
