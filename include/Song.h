@@ -340,6 +340,7 @@ private:
 	QString m_fileName;
 	QString m_oldFileName;
 	bool m_modified;
+	bool m_loadOnLaunch;
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
