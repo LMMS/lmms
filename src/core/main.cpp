@@ -31,6 +31,7 @@
 
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
 #include <QLocale>
@@ -742,18 +743,41 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QDir workingDirectory = ConfigManager::inst()->workingDir();
+		QString recoveryFile = "";
 		int numRecoveryFiles = 0;
-		while( m_workingDir + wildcard + .mmp )
-		QString recoveryFile = ConfigManager::inst()->recoveryFile();
+		QString newest;
+		QDateTime created;
+		QDirIterator it( ConfigManager::inst()->workingDir(),
+					QStringList() << "*.recover.mmp", QDir::Files );
+		while( it.hasNext() )
+		{
+			if( ! QFile( it.filePath() ).size() )
+			{
+				QFile::remove( it.filePath() );
+				qDebug() << "Removing empty file " << it.filePath();
+			}
+			if( QFileInfo( it.filePath() ).created() > created )
+			{
+				created = QFileInfo( it.filePath() ).created();
+				recoveryFile = it.filePath();
+			}
+			qDebug() << it.next();
+			numRecoveryFiles++;
+		}
+		qDebug() << "Newest file is " << recoveryFile;
 
-		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
-				QFileInfo( recoveryFile ).isFile();
-		bool autoSaveEnabled =
-			ConfigManager::inst()->value( "ui", "enableautosave" ).toInt();
-		if( recoveryFilePresent )
+		if( numRecoveryFiles )
 		{
 			QMessageBox mb;
+			QString oneFile = MainWindow::tr( "There is a recovery file present. "
+					"It looks like the last session did not end "
+					"properly.  Do you want to recover the "
+					"project of this session?" );
+			QString manyRecoverFiles = MainWindow::tr( 
+					"There is more than one recover file "
+					"present. Do you want to open the "
+					"latest one?" );
+			QString message = numRecoveryFiles > 1 ? manyRecoverFiles : oneFile;
 			mb.setWindowTitle( MainWindow::tr( "Project recovery" ) );
 			mb.setText( QString(
 				"<html>"
@@ -767,16 +791,20 @@ int main( int argc, char * * argv )
 				"    <td><b>%4</b></td>"
 				"    <td>%5</td>"
 				"  </tr>"
+				"  <tr>"
+				"    <td><b>%6</b></td>"
+				"    <td>%7</td>"
+				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
-				MainWindow::tr( "There is a recovery file present. "
-					"It looks like the last session did not end "
-					"properly or another instance of LMMS is "
-					"already running. Do you want to recover the "
-					"project of this session?" ),
+				message,
 				MainWindow::tr( "Recover" ),
 				MainWindow::tr( "Recover the file. Please don't run "
 					"multiple instances of LMMS when you do this." ),
+				MainWindow::tr( "Ignore" ),
+				MainWindow::tr( "Launch LMMS as usual but with "
+					"automatic backup disabled to prevent the "
+					"present recover file from being overwritten." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
 					"the restored files. This is not reversible." )
@@ -788,6 +816,7 @@ int main( int argc, char * * argv )
 
 			QPushButton * recover;
 			QPushButton * discard;
+			QPushButton * ignore;
 			QPushButton * exit;
 			
 			#if QT_VERSION >= 0x050000
@@ -795,12 +824,16 @@ int main( int argc, char * * argv )
 				// to have a custom layout
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
 
 			# else 
 				// in qt4 the button order is reversed
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 									QMessageBox::AcceptRole );
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
@@ -814,6 +847,7 @@ int main( int argc, char * * argv )
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
+			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
@@ -821,12 +855,17 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
+				QFile::remove( newest );
 				gui->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
+			}
+			else if( mb.clickedButton() == ignore )
+			{
+				fileToLoad = "";
 			}
 			else // Exit
 			{
@@ -850,8 +889,11 @@ int main( int argc, char * * argv )
 		QFile file( ConfigManager::inst()->recoveryFile() );
 		if ( ! file.open(QIODevice::ReadWrite) )
 		{
-			printf( "Couldn't create unique a unique recover file for this session." );
-			printf( "You may not have the permission to write to %s", ConfigManager::inst()->workingDir() );
+			printf( "Couldn't create unique a unique recover \
+				file for this session." );
+			printf( "You may not have the permission to write \
+				to %s", ConfigManager::inst()->
+					workingDir().toUtf8().constData() );
 		}
 
 
@@ -908,7 +950,7 @@ int main( int argc, char * * argv )
 		// Finally we start the auto save timer and also trigger the
 		// autosave one time as recover.mmp is a signal to possible other
 		// instances of LMMS.
-		if( autoSaveEnabled )
+		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 		{
 			gui->mainWindow()->autoSaveTimerReset();
 			gui->mainWindow()->autoSave();
