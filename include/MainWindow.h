@@ -110,8 +110,7 @@ public:
 	enum SessionState
 	{
 		Normal,
-		Recover,
-		Limited,
+		Recover
 	};
 
 	void setSession( SessionState session )
