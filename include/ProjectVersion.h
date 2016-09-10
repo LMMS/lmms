@@ -29,9 +29,6 @@
 
 #include <QtCore/QString>
 
-enum CompareType { Major, Minor, Release, Build };
-
-
 /*! \brief Version number parsing and comparison
  *
  *  Parses and compares version information.  i.e. "1.0.3" < "1.0.10"
@@ -39,13 +36,16 @@ enum CompareType { Major, Minor, Release, Build };
 class ProjectVersion
 {
 public:
-	ProjectVersion(QString version, CompareType c = CompareType::Build);
-	ProjectVersion(const char * version, CompareType c = CompareType::Build);
+	enum CompareType { Major, Minor, Release, Stage, Build };
+
+	ProjectVersion(QString version, CompareType c = Build);
+	ProjectVersion(const char * version, CompareType c = Build);
 
 	int getMajor() const { return m_major; }
 	int getMinor() const { return m_minor; }
 	int getRelease() const { return m_release; }
-	QString getBuild() const { return m_build; }
+	QString getStage() const { return m_stage; }
+	int getBuild() const { return m_build; }
 	CompareType getCompareType() const { return m_compareType; }
 	ProjectVersion setCompareType(CompareType compareType) { m_compareType = compareType; return * this; }
 
@@ -57,7 +57,8 @@ private:
 	int m_major;
 	int m_minor;
 	int m_release;
-	QString m_build;
+	QString m_stage;
+	int m_build;
 	CompareType m_compareType;
 } ;
 

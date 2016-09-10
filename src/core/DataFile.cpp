@@ -939,15 +939,15 @@ void DataFile::upgrade()
 	{
 		upgrade_0_4_0_rc2();
 	}
-	if( version < ProjectVersion("1.0.99", CompareType::Release) )
+	if( version < "1.0.99-0" )
 	{
 		upgrade_1_0_99();
 	}
-	if( version < ProjectVersion("1.1.0", CompareType::Release) )
+	if( version < "1.1.0-0" )
 	{
 		upgrade_1_1_0();
 	}
-	if( version < ProjectVersion("1.1.91", CompareType::Release) )
+	if( version < "1.1.91-0" )
 	{
 		upgrade_1_1_91();
 	}
@@ -1018,12 +1018,13 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	{
 		// compareType defaults to Build,so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute( "creatorversion" );
-		ProjectVersion openedWith = LMMS_VERSION;;
+		ProjectVersion openedWith = LMMS_VERSION;
 
 		if ( createdWith != openedWith )
 		{
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
-			if ( createdWith.setCompareType(Minor) != openedWith)
+			if( createdWith.setCompareType( ProjectVersion::Minor )
+								!= openedWith )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
@@ -1045,7 +1046,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			}
 
 			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType(Build) < openedWith )
+			if( createdWith.setCompareType( ProjectVersion::Build )
+								< openedWith )
 			{
 				upgrade();
 			}
