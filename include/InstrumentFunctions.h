@@ -196,6 +196,8 @@ private:
 	BoolModel m_arpEnabledModel;
 	ComboBoxModel m_arpModel;
 	FloatModel m_arpRangeModel;
+	FloatModel m_arpSkipModel;
+	FloatModel m_arpMissModel;
 	TempoSyncKnobModel m_arpTimeModel;
 	FloatModel m_arpGateModel;
 	ComboBoxModel m_arpDirectionModel;
