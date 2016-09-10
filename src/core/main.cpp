@@ -29,6 +29,9 @@
 
 #include "denormals.h"
 
+#include <QCryptographicHash>
+#include <QDebug>
+#include <QFile>
 #include <QFileInfo>
 #include <QLocale>
 #include <QDate>
@@ -192,6 +195,20 @@ void fileCheck( QString &file )
 				file.toUtf8().constData() );
 		exit( EXIT_FAILURE );
 	}
+}
+
+
+
+
+QString createRandomFileName()
+{
+	QByteArray hashString;
+	for( int x = 0; x < 16; x++ )
+	{
+		hashString.append( rand() % 256 );
+	}
+
+	return QString( QCryptographicHash::hash( hashString, QCryptographicHash::Md5 ).toHex() );
 }
 
 
