@@ -751,11 +751,6 @@ int main( int argc, char * * argv )
 					QStringList() << "*.recover.mmp", QDir::Files );
 		while( it.hasNext() )
 		{
-			if( ! QFile( it.filePath() ).size() )
-			{
-				QFile::remove( it.filePath() );
-				qDebug() << "Removing empty file " << it.filePath();
-			}
 			if( QFileInfo( it.filePath() ).created() > created )
 			{
 				created = QFileInfo( it.filePath() ).created();
@@ -873,29 +868,16 @@ int main( int argc, char * * argv )
 			}
 		}
 
-
 		// Create unique recover file
 		session = createRandomFileName();
-		QFileInfo fileToCheck( session );
-		while( fileToCheck.exists() )
+		while( QFileInfo(ConfigManager::inst()->workingDir()
+					+ session + ".recover.mmp" ).exists() )
 		{
 			session = createRandomFileName();
-	//		fileToCheck( session );
 		}
 		ConfigManager::inst()->setUniqueSessionName( session );
 
 		qDebug() << ConfigManager::inst()->recoveryFile();
-
-		QFile file( ConfigManager::inst()->recoveryFile() );
-		if ( ! file.open(QIODevice::ReadWrite) )
-		{
-			printf( "Couldn't create unique a unique recover \
-				file for this session." );
-			printf( "You may not have the permission to write \
-				to %s", ConfigManager::inst()->
-					workingDir().toUtf8().constData() );
-		}
-
 
 		gui->mainWindow()->show();
 		if( fullscreen )
