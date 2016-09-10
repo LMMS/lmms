@@ -737,10 +737,6 @@ int main( int argc, char * * argv )
 				"    <td><b>%4</b></td>"
 				"    <td>%5</td>"
 				"  </tr>"
-				"  <tr>"
-				"    <td><b>%6</b></td>"
-				"    <td>%7</td>"
-				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
 				MainWindow::tr( "There is a recovery file present. "
@@ -751,10 +747,6 @@ int main( int argc, char * * argv )
 				MainWindow::tr( "Recover" ),
 				MainWindow::tr( "Recover the file. Please don't run "
 					"multiple instances of LMMS when you do this." ),
-				MainWindow::tr( "Ignore" ),
-				MainWindow::tr( "Launch LMMS as usual but with "
-					"automatic backup disabled to prevent the "
-					"present recover file from being overwritten." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
 					"the restored files. This is not reversible." )
@@ -766,7 +758,6 @@ int main( int argc, char * * argv )
 
 			QPushButton * recover;
 			QPushButton * discard;
-			QPushButton * ignore;
 			QPushButton * exit;
 			
 			#if QT_VERSION >= 0x050000
@@ -774,16 +765,12 @@ int main( int argc, char * * argv )
 				// to have a custom layout
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
-				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
-									QMessageBox::AcceptRole );
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
 
 			# else 
 				// in qt4 the button order is reversed
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
-				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 									QMessageBox::AcceptRole );
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
@@ -797,7 +784,6 @@ int main( int argc, char * * argv )
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
-			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
@@ -811,13 +797,6 @@ int main( int argc, char * * argv )
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
-			}
-			else if( mb.clickedButton() == ignore )
-			{
-				if( autoSaveEnabled )
-				{
-					gui->mainWindow()->setSession( MainWindow::SessionState::Limited );
-				}
 			}
 			else // Exit
 			{
@@ -861,14 +840,11 @@ int main( int argc, char * * argv )
 			}
 		}
 		// If enabled, open last project if there is one. Else, create
-		// a new one. Also skip recently opened file if limited session to
-		// lower the chance of opening an already opened file.
+		// a new one.
 		else if( ConfigManager::inst()->
 				value( "app", "openlastproject" ).toInt() &&
 			!ConfigManager::inst()->
-				recentlyOpenedProjects().isEmpty() &&
-			gui->mainWindow()->getSession() !=
-				MainWindow::SessionState::Limited )
+				recentlyOpenedProjects().isEmpty() )
 		{
 			QString f = ConfigManager::inst()->
 					recentlyOpenedProjects().first();
@@ -891,8 +867,7 @@ int main( int argc, char * * argv )
 		// Finally we start the auto save timer and also trigger the
 		// autosave one time as recover.mmp is a signal to possible other
 		// instances of LMMS.
-		if( autoSaveEnabled &&
-			gui->mainWindow()->getSession() != MainWindow::SessionState::Limited )
+		if( autoSaveEnabled )
 		{
 			gui->mainWindow()->autoSaveTimerReset();
 			gui->mainWindow()->autoSave();
