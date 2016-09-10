@@ -208,7 +208,10 @@ QString createRandomFileName()
 		hashString.append( rand() % 256 );
 	}
 
-	return QString( QCryptographicHash::hash( hashString, QCryptographicHash::Md5 ).toHex() );
+	QString recoverFile;
+	recoverFile = QString( QCryptographicHash::hash( hashString, QCryptographicHash::Md5 ).toHex() );
+	recoverFile.truncate( 8 );
+	return recoverFile += ".recover.mmp";
 }
 
 
@@ -231,7 +234,9 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
-	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
+	QString session, fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
+
+	QString filename="Data.txt";
 
 	// first of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -824,6 +829,29 @@ int main( int argc, char * * argv )
 			{
 				return 0;
 			}
+		}
+
+		// Create unique recover file
+		session = createRandomFileName();
+		QFileInfo fileToCheck( session );
+		while( fileToCheck.exists() )
+		{
+			session = createRandomFileName();
+	//		fileToCheck( session );
+		}
+
+		QFile file( session );
+		if ( ! file.open(QIODevice::ReadWrite) )
+		{
+			printf( "Couldn't create unique a unique recover file for this session." );
+			printf( "You may not have the permission to write to this directory?" );
+		}
+		else
+		{
+		    QTextStream stream( &file );
+		    stream << "" << endl;
+		    file.close();
+		qDebug() << "Creating file " << session << ".";
 		}
 
 		// first show the Main Window and then try to load given file
