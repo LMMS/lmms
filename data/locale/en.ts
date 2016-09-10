@@ -614,6 +614,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Clone Steps</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BBTCOView</name>
@@ -2428,6 +2432,14 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Down and up</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Skip rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miss rate</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
@@ -2497,6 +2509,30 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miss rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The miss function will make the arpeggiator miss the intended note.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5293,11 +5329,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>TRES</source>
+        <source>Treshold:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Treshold:</source>
+        <source>TRSH</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
