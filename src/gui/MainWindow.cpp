@@ -664,10 +664,6 @@ void MainWindow::resetWindowTitle()
 	{
 		title += " - " + tr( "Recover session. Please save your work!" );
 	}
-	if( getSession() == Limited )
-	{
-		title += " - " + tr( "Automatic backup disabled. Remember to save your work!" );
-	}
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
@@ -1374,8 +1370,8 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject(true) )
 	{
 		// delete recovery file
-		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt()
-			&& getSession() != Limited )
+		if( ConfigManager::inst()->
+				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
 			_ce->accept();
@@ -1562,8 +1558,7 @@ void MainWindow::autoSave()
 // from the timer where we need to do extra tests.
 void MainWindow::runAutoSave()
 {
-	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
-		getSession() != Limited )
+	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
 		autoSave();
 		autoSaveTimerReset();  // Reset timer
