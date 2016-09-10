@@ -182,7 +182,7 @@ public:
 
 	const QString recoveryFile() const
 	{
-		return m_workingDir + "recover.mmp";
+		return m_workingDir + m_uniqueSessionString + ".recover.mmp";
 	}
 	
 	const QString & version() const
@@ -216,6 +216,11 @@ public:
 
 	// returns true if the working dir (e.g. ~/lmms) exists on disk
 	bool hasWorkingDir() const;
+
+	void setUniqueSessionName( QString uniqueString )
+	{
+		m_uniqueSessionString = uniqueString;
+	}
 
 	void addRecentlyOpenedProject( const QString & _file );
 
@@ -254,6 +259,7 @@ private:
 	void upgrade_1_1_90();
 	void upgrade();
 
+	QString m_uniqueSessionString;
 	QString m_lmmsRcFile;
 	QString m_workingDir;
 	QString m_dataDir;

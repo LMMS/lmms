@@ -208,10 +208,10 @@ QString createRandomFileName()
 		hashString.append( rand() % 256 );
 	}
 
-	QString recoverFile;
-	recoverFile = QString( QCryptographicHash::hash( hashString, QCryptographicHash::Md5 ).toHex() );
-	recoverFile.truncate( 8 );
-	return recoverFile += ".recover.mmp";
+	QString randFileName;
+	randFileName = QString( QCryptographicHash::hash( hashString, QCryptographicHash::Md5 ).toHex() );
+	randFileName.truncate( 8 );
+	return randFileName;
 }
 
 
@@ -742,6 +742,9 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
+		QDir workingDirectory = ConfigManager::inst()->workingDir();
+		int numRecoveryFiles = 0;
+		while( m_workingDir + wildcard + .mmp )
 		QString recoveryFile = ConfigManager::inst()->recoveryFile();
 
 		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
@@ -831,6 +834,7 @@ int main( int argc, char * * argv )
 			}
 		}
 
+
 		// Create unique recover file
 		session = createRandomFileName();
 		QFileInfo fileToCheck( session );
@@ -839,25 +843,18 @@ int main( int argc, char * * argv )
 			session = createRandomFileName();
 	//		fileToCheck( session );
 		}
+		ConfigManager::inst()->setUniqueSessionName( session );
 
-		QFile file( session );
+		qDebug() << ConfigManager::inst()->recoveryFile();
+
+		QFile file( ConfigManager::inst()->recoveryFile() );
 		if ( ! file.open(QIODevice::ReadWrite) )
 		{
 			printf( "Couldn't create unique a unique recover file for this session." );
-			printf( "You may not have the permission to write to this directory?" );
-		}
-		else
-		{
-		    QTextStream stream( &file );
-		    stream << "" << endl;
-		    file.close();
-		qDebug() << "Creating file " << session << ".";
+			printf( "You may not have the permission to write to %s", ConfigManager::inst()->workingDir() );
 		}
 
-		// first show the Main Window and then try to load given file
 
-		// [Settel] workaround: showMaximized() doesn't work with
-		// FVWM2 unless the window is already visible -> show() first
 		gui->mainWindow()->show();
 		if( fullscreen )
 		{
