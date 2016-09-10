@@ -235,7 +235,7 @@ int main( int argc, char * * argv )
 	bool allowRoot = false;
 	bool renderLoop = false;
 	bool renderTracks = false;
-	QString session, fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
+	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
 
 	QString filename="Data.txt";
 
@@ -743,30 +743,31 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = "";
+		QString recoveryFile;
 		int numRecoveryFiles = 0;
-		QString newest;
+		QString newestFile;
 		QDateTime created;
+		created.setTime_t( 0 );
 		QDirIterator it( ConfigManager::inst()->workingDir(),
-					QStringList() << "*.recover.mmp", QDir::Files );
+					QStringList() << "*.recover.mmp", QDir::Files | QDir::NoSymLinks );
 		while( it.hasNext() )
 		{
+			it.next();
+			recoveryFile = it.filePath();
+			numRecoveryFiles++;
 			if( QFileInfo( it.filePath() ).created() > created )
 			{
 				created = QFileInfo( it.filePath() ).created();
-				recoveryFile = it.filePath();
+				newestFile = it.filePath();
 			}
-			qDebug() << it.next();
-			numRecoveryFiles++;
 		}
-		qDebug() << "Newest file is " << recoveryFile;
 
 		if( numRecoveryFiles )
 		{
 			QMessageBox mb;
-			QString oneFile = MainWindow::tr( "There is a recovery file present. "
+			QString oneFile = MainWindow::tr( "There is a recover file present. "
 					"It looks like the last session did not end "
-					"properly.  Do you want to recover the "
+					"properly. Do you want to recover the "
 					"project of this session?" );
 			QString manyRecoverFiles = MainWindow::tr( 
 					"There is more than one recover file "
@@ -794,15 +795,12 @@ int main( int argc, char * * argv )
 				"</html>" ).arg(
 				message,
 				MainWindow::tr( "Recover" ),
-				MainWindow::tr( "Recover the file. Please don't run "
-					"multiple instances of LMMS when you do this." ),
+				MainWindow::tr( "Recover the file." ),
 				MainWindow::tr( "Ignore" ),
-				MainWindow::tr( "Launch LMMS as usual but with "
-					"automatic backup disabled to prevent the "
-					"present recover file from being overwritten." ),
+				MainWindow::tr( "Launch a default session." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
-					"the restored files. This is not reversible." )
+					"the recover file. This is not reversible." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
@@ -838,7 +836,7 @@ int main( int argc, char * * argv )
 			// have a hidden exit button
 			exit = mb.addButton( "", QMessageBox::RejectRole);
 			exit->setVisible(false);
-			
+
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
@@ -850,7 +848,10 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
-				QFile::remove( newest );
+				if( !newestFile.isEmpty() )
+				{
+					QFile::remove( newestFile );
+				}
 				gui->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
@@ -869,15 +870,27 @@ int main( int argc, char * * argv )
 		}
 
 		// Create unique recover file
-		session = createRandomFileName();
-		while( QFileInfo(ConfigManager::inst()->workingDir()
-					+ session + ".recover.mmp" ).exists() )
+		QString session;
+		if( ( fileToLoad == recoveryFile ) && !fileToLoad.isEmpty() )
+		{
+			// Don't create a recover file for a recover file.
+			QFileInfo file( fileToLoad );
+			QString fileName = file.fileName();
+			fileName.remove( ".recover.mmp" );
+			ConfigManager::inst()->
+				setUniqueSessionName( fileName );
+		}
+		else
 		{
 			session = createRandomFileName();
+			while( QFileInfo(ConfigManager::inst()->workingDir()
+					+ session + ".recover.mmp" ).exists() ||
+						session.isEmpty() )
+			{
+				session = createRandomFileName();
+			}
+			ConfigManager::inst()->setUniqueSessionName( session );
 		}
-		ConfigManager::inst()->setUniqueSessionName( session );
-
-		qDebug() << ConfigManager::inst()->recoveryFile();
 
 		gui->mainWindow()->show();
 		if( fullscreen )
