@@ -42,14 +42,21 @@ int parseMinor(QString & version) {
 
 
 int parseRelease(QString & version) {
-	return version.section( '.', 2 ).section( '-', 0, 0 ).toInt();
+	return version.section( '.', 2, 2 ).section( '-', 0, 0 ).toInt();
 }
 
 
 
 
-QString parseBuild(QString & version) {
-	return version.section( '.', 2 ).section( '-', 1 );
+QString parseStage(QString & version) {
+	return version.section( '.', 2, 2 ).section( '-', 1 );
+}
+
+
+
+
+int parseBuild(QString & version) {
+	return version.section( '.', 3 ).toInt();
 }
 
 
@@ -59,7 +66,8 @@ ProjectVersion::ProjectVersion(QString version, CompareType c) :
 	m_version(version),
 	m_major(parseMajor(m_version)),
 	m_minor(parseMinor(m_version)),
-	m_release(parseRelease(m_version)) ,
+	m_release(parseRelease(m_version)),
+	m_stage(parseStage(m_version)),
 	m_build(parseBuild(m_version)),
 	m_compareType(c)
 {
@@ -73,6 +81,7 @@ ProjectVersion::ProjectVersion(const char* version, CompareType c) :
 	m_major(parseMajor(m_version)),
 	m_minor(parseMinor(m_version)),
 	m_release(parseRelease(m_version)),
+	m_stage(parseStage(m_version)),
 	m_build(parseBuild(m_version)),
 	m_compareType(c)
 {
@@ -87,8 +96,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	{
 		return a.getMajor() - b.getMajor();
 	}
-
-	else if(c == CompareType::Major)
+	if(c == Major)
 	{
 		return 0;
 	}
@@ -97,7 +105,7 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	{
 		return a.getMinor() - b.getMinor();
 	}
-	else if(c == CompareType::Minor)
+	if(c == Minor)
 	{
 		return 0;
 	}
@@ -106,23 +114,36 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 	{
 		return a.getRelease() - b.getRelease();
 	}
-	else if(c == CompareType::Release)
+	if(c == Release)
 	{
 		return 0;
 	}
 
-	// make sure 0.x.y > 0.x.y-alpha
-	if(a.getBuild().isEmpty())
+	if(!(a.getStage().isEmpty() && b.getStage().isEmpty()))
 	{
-		return 1;
+		// make sure 0.x.y > 0.x.y-alpha
+		if(a.getStage().isEmpty())
+		{
+			return 1;
+		}
+		if(b.getStage().isEmpty())
+		{
+			return -1;
+		}
+
+		// 0.x.y-beta > 0.x.y-alpha
+		int cmp = QString::compare(a.getStage(), b.getStage());
+		if(cmp)
+		{
+			return cmp;
+		}
 	}
-	if(b.getBuild().isEmpty())
+	if(c == Stage)
 	{
-		return -1;
+		return 0;
 	}
 
-	// 0.x.y-beta > 0.x.y-alpha
-	return QString::compare(a.getBuild(), b.getBuild());
+	return a.getBuild() - b.getBuild();
 }
 
 
