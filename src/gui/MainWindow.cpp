@@ -883,8 +883,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		QFileInfo recentFile( *it );
-		if ( recentFile.exists() && 
-				*it != ConfigManager::inst()->recoveryFile() )
+		if ( recentFile.exists() )
 		{
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
@@ -907,7 +906,6 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
-		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
 	runAutoSave();

@@ -745,7 +745,6 @@ int main( int argc, char * * argv )
 		// recover a file?
 		QString recoveryFile;
 		int numRecoveryFiles = 0;
-		QString newestFile;
 		QDateTime created;
 		created.setTime_t( 0 );
 		QDirIterator it( ConfigManager::inst()->workingDir(),
@@ -753,12 +752,11 @@ int main( int argc, char * * argv )
 		while( it.hasNext() )
 		{
 			it.next();
-			recoveryFile = it.filePath();
 			numRecoveryFiles++;
 			if( QFileInfo( it.filePath() ).created() > created )
 			{
 				created = QFileInfo( it.filePath() ).created();
-				newestFile = it.filePath();
+				recoveryFile = it.filePath();
 			}
 		}
 
@@ -769,7 +767,7 @@ int main( int argc, char * * argv )
 					"It looks like the last session did not end "
 					"properly. Do you want to recover the "
 					"project of this session?" );
-			QString manyRecoverFiles = MainWindow::tr( 
+			QString manyRecoverFiles = MainWindow::tr(
 					"There is more than one recover file "
 					"present. Do you want to open the "
 					"latest one?" );
@@ -848,9 +846,9 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
-				if( !newestFile.isEmpty() )
+				if( !recoveryFile.isEmpty() )
 				{
-					QFile::remove( newestFile );
+					QFile::remove( recoveryFile );
 				}
 				gui->mainWindow()->sessionCleanup();
 			}
