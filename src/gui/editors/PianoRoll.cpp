@@ -2857,11 +2857,27 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 
 	int tact_16th = m_currentPosition / bpt;
+	
+	int barCount = m_currentPosition / MidiTime::ticksPerTact();
 
 	const int offset = ( m_currentPosition % bpt ) *
 			m_ppt / MidiTime::ticksPerTact();
 
 	bool show32nds = ( m_zoomingModel.value() > 3 );
+
+	printf("%d\n", m_ppt);
+	
+	p.setBrush( QColor(255, 0, 0) );
+	/*int xx = WHITE_KEY_WIDTH - offset;
+	p.drawRect( xx, PR_TOP_MARGIN, m_ppt - offset, height() - PR_BOTTOM_MARGIN );*/
+	for ( int x = WHITE_KEY_WIDTH - offset; x < width(); 
+				x += m_ppt,  ++barCount) {
+		if (barCount % 2 != 0)
+		{
+			p.setBrush( QColor(255, 0, 0) );
+			p.drawRect( x, PR_TOP_MARGIN, m_ppt - offset, height() - PR_BOTTOM_MARGIN );
+		}
+	}
 
 	// we need float here as odd time signatures might produce rounding
 	// errors else and thus an unusable grid

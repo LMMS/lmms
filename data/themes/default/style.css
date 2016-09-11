@@ -15,12 +15,12 @@ AutomationEditor {
 	background-color: #040506;
 	color: #ffffff;
 	qproperty-vertexColor: #6749C2;
-	qproperty-gridColor: #190F38;
+	qproperty-gridColor: #4f5964;
 	qproperty-crossColor: #9875FF;
 
 	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
-                     stop:0 rgba(69,42,153,255),  stop:1 rgba(81,48,179,50));
-										 qproperty-scaleColor: #262b30;
+  	stop:0 rgba(69,42,153,255),  stop:1 rgba(81,48,179,50));
+	qproperty-scaleColor: #262b30;
 }
 
 /* text box */
@@ -114,7 +114,7 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: #040506;
-	qproperty-gridColor: #2d3339;
+	qproperty-gridColor: #4f5964;
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
 	qproperty-noteOpacity: 165;
@@ -145,37 +145,37 @@ CPULoadWidget {
 /* scrollbar: trough */
 
 QScrollBar:horizontal {
-    border-top: 3px solid #262b30;
-    background: #262b30;
-    height: 12px;
-    margin: 0px 12px;
+  border-top: 3px solid #262b30;
+  background: #262b30;
+  height: 12px;
+  margin: 0px 12px;
 }
 QScrollBar:vertical {
-    border-left: 3px solid #262b30;
-    background: #262b30;
-    width: 12px;
-    margin: 12px 0px;
+  border-left: 3px solid #262b30;
+  background: #262b30;
+  width: 12px;
+  margin: 12px 0px;
 }
 
 /* scrollbar: trough clicky things */
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-    background: none;
+  background: none;
 }
 
 QScrollBar::add-page:horizontal:pressed, QScrollBar::sub-page:horizontal:pressed,
 QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
-    background: rgba(0,0,0,50);
+  background: rgba(0,0,0,50);
 }
 
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-    background: #3f4750;
-    border: none;
-    border-radius: 4px;
-    min-width: 24px;
+  background: #3f4750;
+  border: none;
+  border-radius: 4px;
+  min-width: 24px;
 }
 
 QScrollBar::handle:horizontal:hover {
@@ -187,10 +187,10 @@ QScrollBar::handle:horizontal:pressed {
 }
 
 QScrollBar::handle:vertical {
-    background: #3f4750;
-    border: none;
-    border-radius: 4px;
-    min-height: 24px;
+  background: #3f4750;
+  border: none;
+  border-radius: 4px;
+  min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
@@ -210,10 +210,10 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
-    background: #262b30;
-    border-radius: 0px;
-    border: none;
-    subcontrol-origin: margin;
+  background: #262b30;
+  border-radius: 0px;
+  border: none;
+  subcontrol-origin: margin;
 }
 
 QScrollBar::add-line:horizontal 	{  	subcontrol-position: right; width: 12px;}
@@ -237,10 +237,10 @@ QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
 
 QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal,
 QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-    border: none;
-    background-color: none;
-    width: 5px;
-    height: 5px;
+  border: none;
+  background-color: none;
+  width: 5px;
+  height: 5px;
 }
 
 QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
@@ -262,12 +262,12 @@ QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarr
 
 /* background for song editor and bb-editor */
 
-TrackContainerView QFrame{
+TrackContainerView QFrame {
 	background-color: #262b30;
 }
 
 /* background for track controls */
-TrackView > QWidget{
+TrackView > QWidget {
 	background-color: #3B424A;
 }
 
@@ -415,7 +415,7 @@ QToolButton:pressed {
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #636c7a, stop:1 #262b30);
 }
 
-QToolButton:checked  {
+QToolButton:checked {
 	border-top: 1px solid #1b1f22;
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
