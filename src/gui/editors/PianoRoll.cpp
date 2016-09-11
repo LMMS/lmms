@@ -1627,17 +1627,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				m_mouseDownRight = true;
 				if( it != notes.begin()-1 )
 				{
-					Note *note = *it;
 					m_pattern->addJournalCheckPoint();
-					if( note->length() > 0 )
-					{
-						m_pattern->removeNote( note );
-					}
-					else
-					{
-						note->setLength( 0 );
-						m_pattern->dataChanged();
-					}
+					m_pattern->removeNote( *it );
 					Engine::getSong()->setModified();
 				}
 			}
@@ -2288,19 +2279,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					)
 				{
 					// delete this note
-					if( it != notes.end() )
-					{
-						if( note->length() > 0 )
-						{
-							m_pattern->removeNote( note );
-						}
-						else
-						{
-							note->setLength( 0 );
-							m_pattern->dataChanged();
-						}
-						Engine::getSong()->setModified();
-					}
+					m_pattern->removeNote( note );
+					Engine::getSong()->setModified();
 				}
 				else
 				{
@@ -3700,7 +3680,7 @@ void PianoRoll::cutSelectedNotes()
 
 		Engine::getSong()->setModified();
 
-		for( const Note *note : selected_notes )
+		for( Note *note : selected_notes )
 		{
 			// note (the memory of it) is also deleted by
 			// pattern::removeNote(...) so we don't have to do that
