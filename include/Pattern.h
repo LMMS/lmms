@@ -70,11 +70,11 @@ public:
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( const Note * _note_to_del );
+	void removeNote( Note * _note_to_del );
 
 	Note * noteAtStep( int _step );
 
-	Note * rearrangeNote( const Note * _note_to_proc,
+	Note * rearrangeNote( Note * _note_to_proc,
 						const bool _quant_pos = true );
 	void rearrangeAllNotes();
 	void clearNotes();
@@ -84,7 +84,8 @@ public:
 		return m_notes;
 	}
 
-	void setStep( int _step, bool _enabled );
+	Note * addStepNote( int step );
+	void setStep( int step, bool enabled );
 
 	// pattern-type stuff
 	inline PatternTypes type() const
@@ -122,7 +123,6 @@ public:
 
 
 protected:
-	void ensureBeatNotes();
 	void updateBBTrack();
 
 

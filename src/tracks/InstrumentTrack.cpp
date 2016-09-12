@@ -656,25 +656,21 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
-			if( cur_note->length() != 0 )
+			const f_cnt_t note_frames =
+				cur_note->length().frames( frames_per_tick );
+
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			notePlayHandle->setBBTrack( bb_track );
+			// are we playing global song?
+			if( _tco_num < 0 )
 			{
-				const f_cnt_t note_frames =
-					cur_note->length().frames(
-							frames_per_tick );
-
-				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-				notePlayHandle->setBBTrack( bb_track );
-				// are we playing global song?
-				if( _tco_num < 0 )
-				{
-					// then set song-global offset of pattern in order to
-					// properly perform the note detuning
-					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
-				}
-
-				Engine::mixer()->addPlayHandle( notePlayHandle );
-				played_a_note = true;
+				// then set song-global offset of pattern in order to
+				// properly perform the note detuning
+				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 			}
+
+			Engine::mixer()->addPlayHandle( notePlayHandle );
+			played_a_note = true;
 			++nit;
 		}
 	}
