@@ -59,7 +59,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
 	lfoAmtKnob->setLabel( tr( "AMNT" ) );
-	lfoAmtKnob->setHintText( tr ( "Amt:" ) , "" );
+	lfoAmtKnob->setHintText( tr ( "Amount:" ) , "" );
 
 	Knob * feedbackKnob = new Knob( knobBright_26, this );
 	feedbackKnob->move( 122,10 );
