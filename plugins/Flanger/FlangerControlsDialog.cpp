@@ -62,7 +62,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	lfoAmtKnob->setHintText( tr ( "Amt:" ) , "" );
 
 	Knob * feedbackKnob = new Knob( knobBright_26, this );
-	feedbackKnob->move( 119,10 );
+	feedbackKnob->move( 122,10 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel );
 	feedbackKnob->setLabel( tr( "FDBK" ) );
