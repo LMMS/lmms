@@ -45,13 +45,16 @@ public:
 	float m_energy;
 	int m_sr;
 	bool m_active;
+	float m_sum;
+
 
 
 	EqAnalyser() :
 		m_framesFilledUp ( 0 ),
 		m_energy ( 0 ),
 		m_sr ( 1 ),
-		m_active ( true )
+		m_active ( true ),
+		m_sum( 0 )
 	{
 		m_inProgress=false;
 		m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
@@ -63,6 +66,12 @@ public:
 	{
 		fftwf_destroy_plan( m_fftPlan );
 		fftwf_free( m_specBuf );
+	}
+
+
+	void setSum( float sum )
+	{
+		m_sum = sum;
 	}
 
 
@@ -85,7 +94,8 @@ public:
 
 	void analyze( sampleFrame *buf, const fpp_t frames )
 	{
-		if ( m_active )
+
+		if ( m_active && !( m_sum == 0 ) )
 		{
 			m_inProgress=true;
 			const int FFT_BUFFER_SIZE = 2048;
@@ -128,6 +138,7 @@ public:
 			m_active = false;
 		}
 	}
+
 private:
 	bool m_inProgress;
 };
@@ -177,7 +188,7 @@ public:
 		const int LOWER_Y = -36;	// dB
 		QPainter p( this );
 		p.setPen( QPen( color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
-		const float e =  m_sa->m_energy;
+		float e =  m_sa->m_energy;
 		if( e <= 0 )
 		{
 			//dont draw anything
@@ -191,18 +202,26 @@ public:
 		float * b = m_sa->m_bands;
 		float h;
 		pp.moveTo( 0,height() );
+		int h_sum = 0;
 		for( int x = 0; x < MAX_BANDS; ++x, ++b )
 		{
-			h = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+			if( m_sa->m_sum == 0)
+			{
+				h = 0;
+			}else
+			{
+				h = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
+			}
 			if( h < 0 )
 			{
 				h = 0;
 			}
+
 			else if( h >= fh )
 			{
 				continue;
 			}
-			if (h > m_bandHeight.at(x))
+			if ( h > m_bandHeight[x] )
 			{
 				m_bandHeight[x] = h;
 			}
@@ -210,7 +229,16 @@ public:
 			{
 				m_bandHeight[x] = m_bandHeight[x] -1;
 			}
-			pp.lineTo( freqToXPixel( bandToFreq( x ) ), fh - m_bandHeight.at( x ) );
+			if( m_bandHeight[x] < 0)
+			{
+				m_bandHeight[x] = 0;
+			}
+			pp.lineTo( freqToXPixel( bandToFreq( x ) ), fh - m_bandHeight[x] );
+			h_sum = h_sum + m_bandHeight[x];
+		}
+		if( h_sum == 0)
+		{
+			m_sa->m_energy = 0;
 		}
 		pp.lineTo( width(), height() );
 		pp.closeSubpath();
