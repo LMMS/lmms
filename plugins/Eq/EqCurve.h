@@ -157,11 +157,14 @@ class EqCurve : public QGraphicsObject
 public:
 	EqCurve( QList<EqHandle*> *handle, int x, int y );
 	QList<EqHandle*> *m_handle;
+	QPainterPath m_curve;
 	QRectF boundingRect() const;
 	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
+	void setModelChanged(bool mc);
 private:
 	int m_width, m_heigth;
 	int m_alpha;
+	bool m_modelChanged;
 
 	float m_pixelsPerUnitHeight;
 	float m_scale;

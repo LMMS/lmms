@@ -678,12 +678,13 @@ QVariant EqHandle::itemChange( QGraphicsItem::GraphicsItemChange change, const Q
 //
 // ----------------------------------------------------------------------
 
-EqCurve::EqCurve( QList<EqHandle*> *handle, int x, int y )
+EqCurve::EqCurve( QList<EqHandle*> *handle, int x, int y ) :
+	m_handle( handle ),
+	m_width( x ),
+	m_heigth( y ),
+	m_alpha( 0 ),
+	m_modelChanged( false )
 {
-	m_width = x;
-	m_heigth = y;
-	m_handle = handle;
-	m_alpha = 0;
 }
 
 
@@ -700,68 +701,71 @@ QRectF EqCurve::boundingRect() const
 void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
 	painter->setRenderHint( QPainter::Antialiasing, true );
-
-	//Computes the main curve
-	//if a band is active the curve will be computed by averaging the curves of each band
-	QMap<float,float> mainCurve;
-	for ( int x = 0; x < m_width ; x++ )
+	if( m_modelChanged )
 	{
-		mainCurve[x] = 0;
-	}
-	int activeHandles=0;
-	for ( int thatHandle = 0; thatHandle<m_handle->count(); thatHandle++ )
-	{
-		if ( m_handle->at(thatHandle)->isActiveHandle() == true )
+		m_curve = QPainterPath();
+		//Computes the main curve
+		//if a band is active the curve will be computed by averaging the curves of each band
+		QMap<float,float> mainCurve;
+		for ( int x = 0; x < m_width ; x++ )
 		{
-			activeHandles++;
+			mainCurve[x] = 0;
 		}
-	}
-	for ( int thatHandle = 0; thatHandle<m_handle->count(); thatHandle++ )
-	{
-		if ( m_handle->at(thatHandle)->isActiveHandle() == true )
+		int activeHandles=0;
+		for ( int thatHandle = 0; thatHandle<m_handle->count(); thatHandle++ )
 		{
-			for ( int x = 0; x < m_width ; x=x+1 )
+			if ( m_handle->at(thatHandle)->isActiveHandle() == true )
 			{
-				if ( m_handle->at( thatHandle )->getType() == 1 )
+				activeHandles++;
+			}
+		}
+		for ( int thatHandle = 0; thatHandle<m_handle->count(); thatHandle++ )
+		{
+			if ( m_handle->at(thatHandle)->isActiveHandle() == true )
+			{
+				for ( int x = 0; x < m_width ; x=x+1 )
 				{
-					mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
-				}
-				if ( m_handle->at(thatHandle)->getType() == 2 )
-				{
-					mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
-				}
-				if ( m_handle->at( thatHandle )->getType() == 3 )
-				{
-					mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getPeakCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
-				}
-				if ( m_handle->at( thatHandle )->getType() == 4 )
-				{
-					mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
-				}
-				if ( m_handle->at(thatHandle)->getType() == 5 )
-				{
-					mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
+					if ( m_handle->at( thatHandle )->getType() == 1 )
+					{
+						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
+					}
+					if ( m_handle->at(thatHandle)->getType() == 2 )
+					{
+						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
+					}
+					if ( m_handle->at( thatHandle )->getType() == 3 )
+					{
+						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getPeakCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
+					}
+					if ( m_handle->at( thatHandle )->getType() == 4 )
+					{
+						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
+					}
+					if ( m_handle->at(thatHandle)->getType() == 5 )
+					{
+						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
+					}
 				}
 			}
 		}
-	}
 
-	QPainterPath mCurve;
-	//compute a QPainterPath
-	for ( int x = 0; x < m_width ; x++ )
-	{
-		mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
-		if ( x==0 )
+
+		//compute a QPainterPath
+		for ( int x = 0; x < m_width ; x++ )
 		{
-			mCurve.moveTo( x, mainCurve[x] );
+			mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
+			if ( x==0 )
+			{
+				m_curve.moveTo( x, mainCurve[x] );
+			}
+			m_curve.lineTo( x, mainCurve[x] );
 		}
-		mCurve.lineTo( x, mainCurve[x] );
 	}
 	//and paint it with Pathstroker
 	QPainterPathStroker stroke;
 	QPainterPath strokeP;
 	stroke.setWidth( 2 );
-	strokeP = stroke.createStroke( mCurve );
+	strokeP = stroke.createStroke( m_curve );
 	painter->fillPath( strokeP, QBrush( Qt::white ) );
 
 	// if mouse hover a handle, m_alpha counts up slow for blend in the filled EQ curve
@@ -810,9 +814,17 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	}
 	// draw on mouse hover the EQ curve filled. with m_alpha it blends in and out smooth
 	QPainterPath cPath;
-	cPath.addPath( mCurve );
+	cPath.addPath( m_curve );
 	cPath.lineTo( cPath.currentPosition().x(), m_heigth );
 	cPath.lineTo( cPath.elementAt( 0 ).x  , m_heigth );
 	painter->fillPath( cPath, QBrush ( QColor( 255,255,255, m_alpha ) ) );
+	setModelChanged( false );
+}
 
+
+
+
+void EqCurve::setModelChanged(bool mc)
+{
+	m_modelChanged = mc;
 }

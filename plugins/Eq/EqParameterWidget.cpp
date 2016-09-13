@@ -92,6 +92,7 @@ EqParameterWidget::~EqParameterWidget()
 
 void EqParameterWidget::updateView()
 {
+	m_eqcurve->setModelChanged( true );
 	for( int i = 0 ; i < bandCount() ; i++ )
 	{
 		if ( m_handleList->at( i )->getHandleMoved() == false ) //prevents a short circuit between handle and data model
