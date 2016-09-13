@@ -25,8 +25,10 @@
 
 #include <QPainter>
 #include <QWidget>
-#include "fft_helpers.h"
+
 #include "Engine.h"
+#include "fft_helpers.h"
+#include "GuiApplication.h"
 
 
 
@@ -62,6 +64,9 @@ public:
 		clear();
 	}
 
+
+
+
 	virtual ~EqAnalyser()
 	{
 		fftwf_destroy_plan( m_fftPlan );
@@ -69,10 +74,14 @@ public:
 	}
 
 
+
+
 	void setSum( float sum )
 	{
 		m_sum = sum;
 	}
+
+
 
 
 	bool getInProgress()
@@ -94,7 +103,6 @@ public:
 
 	void analyze( sampleFrame *buf, const fpp_t frames )
 	{
-
 		if ( m_active && !( m_sum == 0 ) )
 		{
 			m_inProgress=true;
@@ -105,7 +113,7 @@ public:
 				m_framesFilledUp = 0;
 				f = frames - FFT_BUFFER_SIZE;
 			}
-			// meger channels
+			// merge channels
 			for( ; f < frames; ++f )
 			{
 				m_buffer[m_framesFilledUp] =
@@ -154,8 +162,8 @@ public:
 	{
 		setFixedSize( 400, 200 );
 		QTimer *timer = new QTimer(this);
-		connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-		timer->start(20);
+		connect(timer, SIGNAL( timeout() ), this, SLOT( update() ) );
+		timer->start( 20 );
 		setAttribute( Qt::WA_TranslucentBackground, true );
 		m_skipBands = MAX_BANDS * 0.5;
 		float totalLength = log10( 20000 );
@@ -194,7 +202,8 @@ public:
 			//dont draw anything
 			return;
 		}
-		if(m_sa->getInProgress() ){
+		if( m_sa->getInProgress() )
+		{
 			p.fillPath( pp ,QBrush( color ) );
 			return;
 		}
@@ -205,22 +214,24 @@ public:
 		int h_sum = 0;
 		for( int x = 0; x < MAX_BANDS; ++x, ++b )
 		{
-			if( m_sa->m_sum == 0)
+			if( m_sa->m_sum == 0 )
 			{
 				h = 0;
-			}else
+			}
+			else
 			{
 				h = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *b / e ) ) - LOWER_Y ) / (-LOWER_Y ) );
 			}
+
 			if( h < 0 )
 			{
 				h = 0;
 			}
-
 			else if( h >= fh )
 			{
 				continue;
 			}
+
 			if ( h > m_bandHeight[x] )
 			{
 				m_bandHeight[x] = h;
@@ -229,17 +240,20 @@ public:
 			{
 				m_bandHeight[x] = m_bandHeight[x] -1;
 			}
-			if( m_bandHeight[x] < 0)
+			if( m_bandHeight[x] < 0 )
 			{
 				m_bandHeight[x] = 0;
 			}
+
 			pp.lineTo( freqToXPixel( bandToFreq( x ) ), fh - m_bandHeight[x] );
 			h_sum = h_sum + m_bandHeight[x];
 		}
-		if( h_sum == 0)
+
+		if( h_sum == 0 )
 		{
 			m_sa->m_energy = 0;
 		}
+
 		pp.lineTo( width(), height() );
 		pp.closeSubpath();
 		p.fillPath( pp, QBrush( color ) );
@@ -259,7 +273,7 @@ public:
 
 	inline float bandToFreq ( int index )
 	{
-		return index * m_sa->m_sr / (MAX_BANDS * 2 );
+		return index * m_sa->m_sr / ( MAX_BANDS * 2 );
 	}
 
 
