@@ -625,7 +625,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 #endif
 
 		m_voice = new ModalBar();
-
+	
 		m_voice->controlChange( 16, _control16 );
 		m_voice->controlChange( 1, _control1 );
 		m_voice->controlChange( 2, _control2 );
@@ -675,7 +675,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 #endif
 
 		m_voice = new TubeBell();
-
+	
 		m_voice->controlChange( 1, _control1 );
 		m_voice->controlChange( 2, _control2 );
 		m_voice->controlChange( 4, _control4 );
@@ -723,7 +723,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 #endif
 
 		m_voice = new BandedWG();
-
+	
 		m_voice->controlChange( 1, 128.0 );
 		m_voice->controlChange( 2, _control2 );
 		m_voice->controlChange( 4, _control4 );

@@ -319,6 +319,7 @@ QWidget * borgjrInstrumentView::setupFMSynthControls( QWidget * _parent )
 void borgjrInstrumentView::modelChanged()
 {
 	borgjrInstrument * inst = castModel<borgjrInstrument>();
+	inst->instrumentTrack()->silenceAllNotes();
 	m_modulatorKnob->setModel( &inst->m_modulatorModel );
 	m_crossfadeKnob->setModel( &inst->m_crossfadeModel );
 	m_lfoSpeedKnob->setModel( &inst->m_lfoSpeedModel );
@@ -355,6 +356,7 @@ borgjrSynth::borgjrSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+		Stk::showWarnings( false );
 
 		switch( _preset )
 		{
@@ -380,13 +382,13 @@ borgjrSynth::borgjrSynth( const StkFloat _pitch,
 				m_voice = new Wurley();
 				break;
 		}
-	
+
 		m_voice->controlChange( 1, _control1 );
 		m_voice->controlChange( 2, _control2 );
 		m_voice->controlChange( 4, _control4 );
 		m_voice->controlChange( 11, _control11 );
 		m_voice->controlChange( 128, _control128 );
-	
+
 		m_voice->noteOn( _pitch, _velocity );
 	}
 	catch( ... )
