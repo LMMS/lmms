@@ -186,12 +186,19 @@ const AutomatableModel * AutomationPattern::firstObject() const
 
 
 
-
-MidiTime AutomationPattern::length() const
+MidiTime AutomationPattern::timeMapLength() const
 {
 	if( m_timeMap.isEmpty() ) return 0;
 	timeMap::const_iterator it = m_timeMap.end();
 	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
+}
+
+
+
+
+void AutomationPattern::updateLength()
+{
+	changeLength( timeMapLength() );
 }
 
 
@@ -219,7 +226,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 	// automation track as the user can't resize this pattern
 	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
 	{
-		changeLength( length() );
+		updateLength();
 	}
 
 	emit dataChanged();
@@ -248,10 +255,9 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 	}
 	generateTangents(it, 3);
 
-	if( getTrack() &&
-		getTrack()->type() == Track::HiddenAutomationTrack )
+	if( getTrack() && getTrack()->type() == Track::HiddenAutomationTrack )
 	{
-		changeLength( length() );
+		updateLength();
 	}
 
 	emit dataChanged();
@@ -514,7 +520,7 @@ void AutomationPattern::flipX( int length )
 void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	_this.setAttribute( "pos", startPosition() );
-	_this.setAttribute( "len", TrackContentObject::length() );
+	_this.setAttribute( "len", length() );
 	_this.setAttribute( "name", name() );
 	_this.setAttribute( "prog", QString::number( progressionType() ) );
 	_this.setAttribute( "tens", QString::number( getTension() ) );
@@ -578,9 +584,13 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 	int len = _this.attribute( "len" ).toInt();
 	if( len <= 0 )
 	{
-		len = length();
+		// TODO: Handle with an upgrade method
+		updateLength();
 	}
-	changeLength( len );
+	else
+	{
+		changeLength( len );
+	}
 	generateTangents();
 }
 

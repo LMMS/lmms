@@ -73,7 +73,8 @@ public:
 	}
 	void setTension( QString _new_tension );
 
-	virtual MidiTime length() const;
+	MidiTime timeMapLength() const;
+	void updateLength();
 
 	MidiTime putValue( const MidiTime & _time, const float _value,
 						const bool _quant_pos = true );
