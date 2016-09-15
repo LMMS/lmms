@@ -2143,31 +2143,7 @@ Please make sure you have write-permission to the file and the directory contain
 <context>
     <name>FlangerControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delay Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lfo Hz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lfo:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Amt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Amt:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Regen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2175,11 +2151,39 @@ Please make sure you have write-permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Noise</source>
+        <source>White Noise Amount:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>White Noise Amount:</source>
+        <source>DELAY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
