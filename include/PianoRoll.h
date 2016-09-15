@@ -429,7 +429,7 @@ signals:
 	void currentPatternChanged();
 
 
-public slots:
+private slots:
 	void patternRenamed();
 
 private:
