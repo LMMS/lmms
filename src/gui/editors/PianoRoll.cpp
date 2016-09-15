@@ -3057,6 +3057,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
 				tr( "Please open a pattern by double-clicking "
 								"on it!" ) );
+		emit noValidPattern();
+
 	}
 
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
@@ -4283,6 +4285,7 @@ PianoRollWindow::PianoRollWindow() :
 
 	// Connections
 	connect(m_editor, SIGNAL(currentPatternChanged()), this, SIGNAL(currentPatternChanged()));
+	connect( m_editor, SIGNAL(noValidPattern()), this, SLOT( patternRenamed() ) );
 }
 
 const Pattern* PianoRollWindow::currentPattern() const
@@ -4297,6 +4300,7 @@ void PianoRollWindow::setCurrentPattern(Pattern* pattern)
 	if ( pattern )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
+		connect( pattern->instrumentTrack(), SIGNAL(nameChanged()), this, SLOT( patternRenamed()) );
 	}
 	else
 	{
@@ -4358,6 +4362,18 @@ void PianoRollWindow::loadSettings(const QDomElement & de)
 QSize PianoRollWindow::sizeHint() const
 {
 	return {m_toolBar->sizeHint().width() + 10, INITIAL_PIANOROLL_HEIGHT};
+}
+
+void PianoRollWindow::patternRenamed()
+{
+	if ( currentPattern() )
+	{
+		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentPattern()->name() ) );
+	}
+	else
+	{
+		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+	}
 }
 
 void PianoRollWindow::focusInEvent(QFocusEvent * event)

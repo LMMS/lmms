@@ -384,6 +384,7 @@ private:
 
 signals:
 	void positionChanged( const MidiTime & );
+	void noValidPattern();
 
 } ;
 
@@ -426,6 +427,10 @@ public:
 
 signals:
 	void currentPatternChanged();
+
+
+public slots:
+	void patternRenamed();
 
 private:
 	void focusInEvent(QFocusEvent * event);
