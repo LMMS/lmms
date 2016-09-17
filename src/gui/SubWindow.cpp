@@ -125,7 +125,7 @@ void SubWindow::changeEvent( QEvent *event )
 {
 	QMdiSubWindow::changeEvent( event );
 
-	if( event->type() ==  QEvent::WindowTitleChange )
+	if( event->type() == QEvent::WindowTitleChange )
 	{
 		adjustTitleBar();
 	}

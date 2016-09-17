@@ -3057,8 +3057,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
 				tr( "Please open a pattern by double-clicking "
 								"on it!" ) );
-		emit noValidPattern();
-
 	}
 
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
@@ -4019,12 +4017,12 @@ PianoRollWindow::PianoRollWindow() :
 	Editor(true),
 	m_editor(new PianoRoll())
 {
-	setCentralWidget(m_editor);
+	setCentralWidget( m_editor );
 
-	m_playAction->setToolTip(tr("Play/pause current pattern (Space)"));
-	m_recordAction->setToolTip(tr("Record notes from MIDI-device/channel-piano"));
-	m_recordAccompanyAction->setToolTip(tr("Record notes from MIDI-device/channel-piano while playing song or BB track"));
-	m_stopAction->setToolTip(tr("Stop playing of current pattern (Space)"));
+	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ) );
+	m_recordAction->setToolTip(tr( "Record notes from MIDI-device/channel-piano" ) );
+	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ) );
+	m_stopAction->setToolTip( tr( "Stop playing of current pattern (Space)" ) );
 
 	m_playAction->setWhatsThis(
 		tr( "Click here to play the current pattern. "
@@ -4045,21 +4043,21 @@ PianoRollWindow::PianoRollWindow() :
 	m_stopAction->setWhatsThis(
 		tr( "Click here to stop playback of current pattern." ) );
 
-	DropToolBar *notesActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
+	DropToolBar *notesActionsToolBar = addDropToolBarToTop( tr( "Edit actions" ) );
 
 	// init edit-buttons at the top
-	ActionGroup* editModeGroup = new ActionGroup(this);
-	QAction* drawAction = editModeGroup->addAction(embed::getIconPixmap("edit_draw"), tr("Draw mode (Shift+D)"));
-	QAction* eraseAction = editModeGroup->addAction(embed::getIconPixmap("edit_erase"), tr("Erase mode (Shift+E)"));
-	QAction* selectAction = editModeGroup->addAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"));
-	QAction* detuneAction = editModeGroup->addAction(embed::getIconPixmap("automation"), tr("Detune mode (Shift+T)"));
+	ActionGroup* editModeGroup = new ActionGroup( this );
+	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
+	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
+	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
+	QAction* detuneAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Detune mode (Shift+T)" ) );
 
 	drawAction->setChecked( true );
 
-	drawAction->setShortcut(Qt::SHIFT | Qt::Key_D);
-	eraseAction->setShortcut(Qt::SHIFT | Qt::Key_E);
-	selectAction->setShortcut(Qt::SHIFT | Qt::Key_S);
-	detuneAction->setShortcut(Qt::SHIFT | Qt::Key_T);
+	drawAction->setShortcut( Qt::SHIFT | Qt::Key_D );
+	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
+	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
+	detuneAction->setShortcut( Qt::SHIFT | Qt::Key_T );
 
 	drawAction->setWhatsThis(
 		tr( "Click here and draw mode will be activated. In this "
@@ -4069,9 +4067,9 @@ PianoRollWindow::PianoRollWindow() :
 			"activate this mode. In this mode, hold %1 to "
 			"temporarily go into select mode." ).arg(
 				#ifdef LMMS_BUILD_APPLE
-				"⌘") );
+				"⌘" ) );
 				#else
-				"Ctrl") );
+				"Ctrl" ) );
 				#endif
 	eraseAction->setWhatsThis(
 		tr( "Click here and erase mode will be activated. In this "
@@ -4083,9 +4081,9 @@ PianoRollWindow::PianoRollWindow() :
 			"you can hold %1 in draw mode to temporarily use "
 			"select mode." ).arg(
 				#ifdef LMMS_BUILD_APPLE
-				"⌘") );
+				"⌘" ) );
 				#else
-				"Ctrl") );
+				"Ctrl" ) );
 				#endif
 	detuneAction->setWhatsThis(
 		tr( "Click here and detune mode will be activated. "
@@ -4094,10 +4092,10 @@ PianoRollWindow::PianoRollWindow() :
 			"notes from one to another. You can also press "
 			"'Shift+T' on your keyboard to activate this mode." ) );
 
-	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
+	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap("quantize"), tr("Quantize"), this);
-	connect(quantizeAction, SIGNAL(triggered()), m_editor, SLOT(quantizeNotes()));
+	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
+	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
 
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
@@ -4107,30 +4105,30 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( quantizeAction );
 
 	// Copy + paste actions
-	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop(tr("Copy paste controls"));
+	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
-	QAction* cutAction = new QAction(embed::getIconPixmap("edit_cut"),
-							  tr("Cut selected notes (%1+X)").arg(
+	QAction* cutAction = new QAction(embed::getIconPixmap( "edit_cut" ),
+							  tr( "Cut selected notes (%1+X)" ).arg(
 									#ifdef LMMS_BUILD_APPLE
-									"⌘"), this);
+									"⌘" ), this );
 									#else
-									"Ctrl"), this);
+									"Ctrl" ), this );
 									#endif
 
-	QAction* copyAction = new QAction(embed::getIconPixmap("edit_copy"),
-							   tr("Copy selected notes (%1+C)").arg(
+	QAction* copyAction = new QAction(embed::getIconPixmap( "edit_copy" ),
+							   tr( "Copy selected notes (%1+C)" ).arg(
 	 								#ifdef LMMS_BUILD_APPLE
 	 								"⌘"), this);
 	 								#else
-	 								"Ctrl"), this);
+									"Ctrl" ), this );
 	 								#endif
 
-	QAction* pasteAction = new QAction(embed::getIconPixmap("edit_paste"),
-					tr("Paste notes from clipboard (%1+V)").arg(
+	QAction* pasteAction = new QAction(embed::getIconPixmap( "edit_paste" ),
+					tr( "Paste notes from clipboard (%1+V)" ).arg(
 						#ifdef LMMS_BUILD_APPLE
-						"⌘"), this);
+						"⌘" ), this );
 						#else
-						"Ctrl"), this);
+						"Ctrl" ), this );
 						#endif
 
 	cutAction->setWhatsThis(
@@ -4145,27 +4143,27 @@ PianoRollWindow::PianoRollWindow() :
 		tr( "Click here and the notes from the clipboard will be "
 			"pasted at the first visible measure." ) );
 
-	cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
-	copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
-	pasteAction->setShortcut(Qt::CTRL | Qt::Key_V);
+	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
+	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
+	pasteAction->setShortcut( Qt::CTRL | Qt::Key_V );
 
-	connect(cutAction, SIGNAL(triggered()), m_editor, SLOT(cutSelectedNotes()));
-	connect(copyAction, SIGNAL(triggered()), m_editor, SLOT(copySelectedNotes()));
-	connect(pasteAction, SIGNAL(triggered()), m_editor, SLOT(pasteNotes()));
+	connect( cutAction, SIGNAL( triggered() ), m_editor, SLOT( cutSelectedNotes() ) );
+	connect( copyAction, SIGNAL( triggered() ), m_editor, SLOT( copySelectedNotes() ) );
+	connect( pasteAction, SIGNAL( triggered() ), m_editor, SLOT( pasteNotes() ) );
 
-	copyPasteActionsToolBar->addAction(cutAction);
-	copyPasteActionsToolBar->addAction(copyAction);
-	copyPasteActionsToolBar->addAction(pasteAction);
+	copyPasteActionsToolBar->addAction( cutAction );
+	copyPasteActionsToolBar->addAction( copyAction );
+	copyPasteActionsToolBar->addAction( pasteAction );
 
 
-	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
-	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
+	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
+	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 
 	addToolBarBreak();
 
 
-	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop(tr("Zoom and note controls"));
+	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop( tr( "Zoom and note controls" ) );
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -4182,11 +4180,9 @@ PianoRollWindow::PianoRollWindow() :
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 64, 22 );
 
-
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
-
 
 	m_noteLenComboBox = new ComboBox( m_toolBar );
 	m_noteLenComboBox->setModel( &m_editor->m_noteLenModel );
@@ -4265,7 +4261,6 @@ PianoRollWindow::PianoRollWindow() :
 					"and in the key you have selected!"
 					) );
 
-
 	m_chordComboBox->setWhatsThis(
 				tr(
 					"Let you select a chord which LMMS then can draw or highlight."
@@ -4276,7 +4271,6 @@ PianoRollWindow::PianoRollWindow() :
 					"in this drop-down menu."
 					) );
 
-
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -4284,23 +4278,29 @@ PianoRollWindow::PianoRollWindow() :
 	setCurrentPattern( NULL );
 
 	// Connections
-	connect(m_editor, SIGNAL(currentPatternChanged()), this, SIGNAL(currentPatternChanged()));
-	connect( m_editor, SIGNAL(noValidPattern()), this, SLOT( patternRenamed() ) );
+	connect( m_editor, SIGNAL( currentPatternChanged() ), this, SIGNAL( currentPatternChanged() ) );
+	connect( m_editor, SIGNAL( currentPatternChanged() ), this, SLOT( patternRenamed() ) );
 }
+
+
+
 
 const Pattern* PianoRollWindow::currentPattern() const
 {
 	return m_editor->currentPattern();
 }
 
-void PianoRollWindow::setCurrentPattern(Pattern* pattern)
+
+
+
+void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 {
-	m_editor->setCurrentPattern(pattern);
+	m_editor->setCurrentPattern( pattern );
 
 	if ( pattern )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
-		connect( pattern->instrumentTrack(), SIGNAL(nameChanged()), this, SLOT( patternRenamed()) );
+		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this, SLOT( patternRenamed()) );
 	}
 	else
 	{
@@ -4308,40 +4308,64 @@ void PianoRollWindow::setCurrentPattern(Pattern* pattern)
 	}
 }
 
+
+
+
 bool PianoRollWindow::isRecording() const
 {
 	return m_editor->isRecording();
 }
+
+
+
 
 int PianoRollWindow::quantization() const
 {
 	return m_editor->quantization();
 }
 
+
+
+
 void PianoRollWindow::play()
 {
 	m_editor->play();
 }
+
+
+
 
 void PianoRollWindow::stop()
 {
 	m_editor->stop();
 }
 
+
+
+
 void PianoRollWindow::record()
 {
 	m_editor->record();
 }
+
+
+
 
 void PianoRollWindow::recordAccompany()
 {
 	m_editor->recordAccompany();
 }
 
+
+
+
 void PianoRollWindow::stopRecording()
 {
 	m_editor->stopRecording();
 }
+
+
+
 
 void PianoRollWindow::reset()
 {
@@ -4349,20 +4373,31 @@ void PianoRollWindow::reset()
 }
 
 
-void PianoRollWindow::saveSettings(QDomDocument & doc, QDomElement & de)
+
+
+void PianoRollWindow::saveSettings( QDomDocument & doc, QDomElement & de )
 {
-	MainWindow::saveWidgetState(this, de, QSize( 640, 480 ) );
+	MainWindow::saveWidgetState( this, de, QSize( 640, 480 ) );
 }
 
-void PianoRollWindow::loadSettings(const QDomElement & de)
+
+
+
+void PianoRollWindow::loadSettings( const QDomElement & de )
 {
-	MainWindow::restoreWidgetState(this, de);
+	MainWindow::restoreWidgetState( this, de );
 }
+
+
+
 
 QSize PianoRollWindow::sizeHint() const
 {
-	return {m_toolBar->sizeHint().width() + 10, INITIAL_PIANOROLL_HEIGHT};
+	return { m_toolBar->sizeHint().width() + 10, INITIAL_PIANOROLL_HEIGHT };
 }
+
+
+
 
 void PianoRollWindow::patternRenamed()
 {
@@ -4376,8 +4411,11 @@ void PianoRollWindow::patternRenamed()
 	}
 }
 
-void PianoRollWindow::focusInEvent(QFocusEvent * event)
+
+
+
+void PianoRollWindow::focusInEvent( QFocusEvent * event )
 {
 	// when the window is given focus, also give focus to the actual piano roll
-	m_editor->setFocus(event->reason());
+	m_editor->setFocus( event->reason() );
 }

@@ -384,8 +384,6 @@ private:
 
 signals:
 	void positionChanged( const MidiTime & );
-	void noValidPattern();
-
 } ;
 
 
