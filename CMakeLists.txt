@@ -18,12 +18,29 @@ INCLUDE(FindPkgConfig)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
+FIND_PACKAGE(Git)
+INCLUDE(${CMAKE_SOURCE_DIR}/release-info/ProjectYear.cmake OPTIONAL)
 IF(NOT PROJECT_YEAR)
 	# Timestamp available since cmake 2.8.11
 	IF(CMAKE_VERSION VERSION_LESS "2.8.11")
-		EXECUTE_PROCESS(COMMAND date +%Y OUTPUT_VARIABLE PROJECT_YEAR OUTPUT_STRIP_TRAILING_WHITESPACE)
+		EXECUTE_PROCESS(COMMAND date -u +%Y
+			OUTPUT_VARIABLE PROJECT_YEAR
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
 	ELSE()
-		STRING(TIMESTAMP        PROJECT_YEAR "%Y")
+		STRING(TIMESTAMP PROJECT_YEAR "%Y" UTC)
+	ENDIF()
+	IF(GIT_FOUND)
+		WHILE(TRUE)
+			EXECUTE_PROCESS(
+				COMMAND ${GIT_EXECUTABLE} log -n 1
+					--since=${PROJECT_YEAR}-01-01T00:00:00Z
+				OUTPUT_VARIABLE LOG_ENTRY
+				WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+			IF(LOG_ENTRY)
+				BREAK()
+			ENDIF()
+			MATH(EXPR PROJECT_YEAR ${PROJECT_YEAR} - 1)
+		ENDWHILE()
 	ENDIF()
 ENDIF()
 
@@ -465,19 +482,19 @@ FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
 
 # Get list of all committers from git history, ordered by number of commits.
-# The CONTRIBUTORS file is used by AboutDialog. This information can be provided
-# with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
-# this file for version 1.1.3, the command is:
-# 	git shortlog -sne v1.1.3 | cut -c8-
-FIND_PACKAGE(Git)
-IF(GIT_FOUND AND NOT CONTRIBUTORS)
-	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
-	EXECUTE_PROCESS(
-		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
-		COMMAND cut -c8-
-		OUTPUT_FILE "${CONTRIBUTORS}"
-		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-		TIMEOUT 1)
+# The CONTRIBUTORS file is used by AboutDialog.
+SET(CONTRIBUTORS ${CMAKE_SOURCE_DIR}/release-info/CONTRIBUTORS)
+IF(NOT EXISTS ${CONTRIBUTORS})
+	SET(CONTRIBUTORS)
+	IF(GIT_FOUND)
+		SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
+		EXECUTE_PROCESS(
+			COMMAND "${GIT_EXECUTABLE}" shortlog -sne
+			COMMAND cut -c8-
+			OUTPUT_FILE "${CONTRIBUTORS}"
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+			TIMEOUT 1)
+	ENDIF()
 ENDIF()
 
 # embedded resources stuff
@@ -562,6 +579,21 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
+
+# Release info
+IF(GIT_FOUND AND NOT EXISTS ${CMAKE_SOURCE_DIR}/release-info)
+	ADD_CUSTOM_TARGET(release-info
+		COMMAND rm -fr ${TMP}
+		COMMAND mkdir -p ${TMP}/release-info
+		COMMAND echo "\"SET(PROJECT_YEAR" "${PROJECT_YEAR})\""
+			> ${TMP}/release-info/ProjectYear.cmake
+		COMMAND ${GIT_EXECUTABLE} shortlog -sne | cut -c8-
+			> ${TMP}/release-info/CONTRIBUTORS
+		COMMAND tar c --owner=0 --group=0 -zf
+			${CMAKE_PROJECT_NAME}-${VERSION}-release-info.tar.gz
+			${TMP}
+	)
+ENDIF()
 
 #
 # display configuration information
