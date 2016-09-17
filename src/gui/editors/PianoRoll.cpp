@@ -1442,7 +1442,6 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				{
 					is_new_note = true;
 					m_pattern->addJournalCheckPoint();
-					m_pattern->setType( Pattern::MelodyPattern );
 
 					// then set new note
 
@@ -2426,7 +2425,18 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		{
 			if( note->selected() )
 			{
-				if( ! ( shift && ! m_startedWithShift ) )
+				if( shift && ! m_startedWithShift )
+				{
+					// quick resize, toggled by holding shift after starting a note move, but not before
+					int ticks_new = note->oldLength().getTicks() + off_ticks;
+					if( ticks_new <= 0 )
+					{
+						ticks_new = 1;
+					}
+					note->setLength( MidiTime( ticks_new ) );
+					m_lenOfNewNotes = note->length();
+				}
+				else
 				{
 					// moving note
 					int pos_ticks = note->oldPos().getTicks() + off_ticks;
@@ -2440,17 +2450,6 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 					note->setPos( MidiTime( pos_ticks ) );
 					note->setKey( key_num );
-				}
-				else if( shift && ! m_startedWithShift )
-				{
-					// quick resize, toggled by holding shift after starting a note move, but not before
-					int ticks_new = note->oldLength().getTicks() + off_ticks;
-					if( ticks_new <= 0 )
-					{
-						ticks_new = 1;
-					}
-					note->setLength( MidiTime( ticks_new ) );
-					m_lenOfNewNotes = note->length();
 				}
 			}
 		}
@@ -2563,6 +2562,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		}
 	}
 
+	m_pattern->updateLength();
 	m_pattern->dataChanged();
 	Engine::getSong()->setModified();
 }

@@ -151,18 +151,20 @@ void Pattern::init()
 				this, SLOT( changeTimeSignature() ) );
 	saveJournallingState( false );
 
-	changeLength( length() );
+	updateLength();
 	restoreJournallingState();
 }
 
 
 
 
-MidiTime Pattern::length() const
+void Pattern::updateLength()
 {
 	if( m_patternType == BeatPattern )
 	{
-		return beatPatternLength();
+		changeLength( beatPatternLength() );
+		updateBBTrack();
+		return;
 	}
 
 	tick_t max_length = MidiTime::ticksPerTact();
@@ -176,8 +178,9 @@ MidiTime Pattern::length() const
 							( *it )->endPos() );
 		}
 	}
-	return MidiTime( max_length ).nextFullTact() *
-						MidiTime::ticksPerTact();
+	changeLength( MidiTime( max_length ).nextFullTact() *
+						MidiTime::ticksPerTact() );
+	updateBBTrack();
 }
 
 
@@ -242,11 +245,9 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 	instrumentTrack()->unlock();
 
 	checkType();
-	changeLength( length() );
+	updateLength();
 
 	emit dataChanged();
-
-	updateBBTrack();
 
 	return new_note;
 }
@@ -271,11 +272,9 @@ void Pattern::removeNote( Note * _note_to_del )
 	instrumentTrack()->unlock();
 
 	checkType();
-	changeLength( length() );
+	updateLength();
 
 	emit dataChanged();
-
-	updateBBTrack();
 }
 
 
@@ -293,17 +292,6 @@ Note * Pattern::noteAtStep( int _step )
 		}
 	}
 	return NULL;
-}
-
-
-Note * Pattern::rearrangeNote( Note * _note_to_proc, const bool _quant_pos )
-{
-	// just rearrange the position of the note by removing it and adding
-	// a copy of it -> addNote inserts it at the correct position
-	Note copy_of_note( *_note_to_proc );
-	removeNote( _note_to_proc );
-
-	return addNote( copy_of_note, _quant_pos );
 }
 
 
@@ -382,12 +370,12 @@ void Pattern::checkType()
 	{
 		if( ( *it )->length() > 0 )
 		{
-			setType( Pattern::MelodyPattern );
+			setType( MelodyPattern );
 			return;
 		}
 		++it;
 	}
-	setType( Pattern::BeatPattern );
+	setType( BeatPattern );
 }
 
 
@@ -409,7 +397,6 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		_this.setAttribute( "pos", startPosition() );
 	}
-	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "steps", m_steps );
 
@@ -433,7 +420,6 @@ void Pattern::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	changeLength( MidiTime( _this.attribute( "len" ).toInt() ) );
 	if( _this.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
@@ -461,10 +447,9 @@ void Pattern::loadSettings( const QDomElement & _this )
 	}
 
 	checkType();
+	updateLength();
 
 	emit dataChanged();
-
-	updateBBTrack();
 }
 
 
@@ -508,8 +493,8 @@ void Pattern::clear()
 void Pattern::addSteps()
 {
 	m_steps += MidiTime::stepsPerTact();
+	updateLength();
 	emit dataChanged();
-	updateBBTrack();
 }
 
 void Pattern::cloneSteps()
@@ -529,8 +514,8 @@ void Pattern::cloneSteps()
 			newNote->setVolume( toCopy->getVolume() );
 		}
 	}
+	updateLength();
 	emit dataChanged();
-	updateBBTrack();
 }
 
 
@@ -546,9 +531,9 @@ void Pattern::removeSteps()
 			setStep( i, false );
 		}
 		m_steps -= n;
+		updateLength();
 		emit dataChanged();
 	}
-	updateBBTrack();
 }
 
 
@@ -609,7 +594,7 @@ void Pattern::changeTimeSignature()
 	last_pos = last_pos.nextFullTact() * MidiTime::ticksPerTact();
 	m_steps = qMax<tick_t>( MidiTime::stepsPerTact(),
 				last_pos.getTact() * MidiTime::stepsPerTact() );
-	updateBBTrack();
+	updateLength();
 }
 
 
