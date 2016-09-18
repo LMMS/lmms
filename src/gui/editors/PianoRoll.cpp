@@ -4301,6 +4301,7 @@ void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 	{
 		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
 		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this, SLOT( patternRenamed()) );
+		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( patternRenamed() ) );
 	}
 	else
 	{
