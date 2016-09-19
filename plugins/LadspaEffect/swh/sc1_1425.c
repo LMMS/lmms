@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -126,7 +126,7 @@ static void connectPortSc1(
 static LADSPA_Handle instantiateSc1(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Sc1 *plugin_data = (Sc1 *)malloc(sizeof(Sc1));
+	Sc1 *plugin_data = (Sc1 *)calloc(1, sizeof(Sc1));
 	float amp;
 	float *as = NULL;
 	unsigned int count;
@@ -344,14 +344,13 @@ static void runAddingSc1(LADSPA_Handle instance, unsigned long sample_count) {
 	plugin_data->count = count;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -473,12 +472,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (sc1Descriptor) {
 		free((LADSPA_PortDescriptor *)sc1Descriptor->PortDescriptors);
 		free((char **)sc1Descriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sc1Descriptor->PortRangeHints);
 		free(sc1Descriptor);
 	}
+	sc1Descriptor = NULL;
 
 }

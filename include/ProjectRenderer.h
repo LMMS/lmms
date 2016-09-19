@@ -27,6 +27,7 @@
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
+#include "Mixer.h"
 
 
 class ProjectRenderer : public QThread

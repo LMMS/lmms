@@ -29,6 +29,8 @@
 #include "JournallingObject.h"
 #include "Song.h"
 
+static const int EO_ID_MSB = 1 << 23;
+
 const int ProjectJournal::MAX_UNDO_STATES = 100; // TODO: make this configurable in settings
 
 ProjectJournal::ProjectJournal() :
@@ -131,11 +133,9 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 
 jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 {
-	const jo_id_t EO_ID_MAX = (1 << 23)-1;
 	jo_id_t id;
-	while( m_joIDs.contains( id =
-			static_cast<jo_id_t>( (jo_id_t)rand()*(jo_id_t)rand() %
-								 EO_ID_MAX ) ) )
+	for( jo_id_t tid = rand(); m_joIDs.contains( id = tid % EO_ID_MSB
+							| EO_ID_MSB ); tid++ )
 	{
 	}
 
@@ -154,6 +154,14 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 	{
 		m_joIDs[_id] = _obj;
 	}
+}
+
+
+
+
+jo_id_t ProjectJournal::idToSave( jo_id_t id )
+{
+	return id & ~EO_ID_MSB;
 }
 
 

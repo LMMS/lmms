@@ -31,6 +31,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MidiPort.h"
+#include "Mixer.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
 #include "PluginFactory.h"
@@ -276,7 +277,10 @@ ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(
 
 bool PresetPreviewPlayHandle::isPreviewing()
 {
-	return s_previewTC->isPreviewing();
+	if (s_previewTC) {
+		return s_previewTC->isPreviewing();
+	}
+	return false;
 }
 
 

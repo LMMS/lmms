@@ -27,6 +27,7 @@
 #include "AudioDevice.h"
 #include "ConfigManager.h"
 #include "debug.h"
+#include "Mixer.h"
 
 
 
@@ -123,6 +124,22 @@ void AudioDevice::stopProcessing()
 		while( m_inProcess )
 		{
 			processNextBuffer();
+		}
+	}
+}
+
+
+
+
+void AudioDevice::stopProcessingThread( QThread * thread )
+{
+	if( !thread->wait( 30000 ) )
+	{
+		fprintf( stderr, "Terminating audio device thread\n" );
+		thread->terminate();
+		if( !thread->wait( 1000 ) )
+		{
+			fprintf( stderr, "Thread not terminated yet\n" );
 		}
 	}
 }

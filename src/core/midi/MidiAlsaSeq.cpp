@@ -114,7 +114,7 @@ MidiAlsaSeq::MidiAlsaSeq() :
 	// use a pipe to detect shutdown
 	if( pipe( m_pipe ) == -1 )
 	{
-		perror( __FILE__ ": pipe" );
+		perror( "MidiAlsaSeq: pipe" );
 	}
 
 	start( QThread::IdlePriority );

@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -153,7 +153,7 @@ static void connectPortSe4(
 static LADSPA_Handle instantiateSe4(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Se4 *plugin_data = (Se4 *)malloc(sizeof(Se4));
+	Se4 *plugin_data = (Se4 *)calloc(1, sizeof(Se4));
 	float amp;
 	float *as = NULL;
 	unsigned int count;
@@ -441,14 +441,13 @@ static void runAddingSe4(LADSPA_Handle instance, unsigned long sample_count) {
 	*(plugin_data->gain_exp) = lin2db(gain);
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -614,12 +613,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (se4Descriptor) {
 		free((LADSPA_PortDescriptor *)se4Descriptor->PortDescriptors);
 		free((char **)se4Descriptor->PortNames);
 		free((LADSPA_PortRangeHint *)se4Descriptor->PortRangeHints);
 		free(se4Descriptor);
 	}
+	se4Descriptor = NULL;
 
 }

@@ -65,6 +65,11 @@ Pattern::Pattern( InstrumentTrack * _instrument_track ) :
 	m_steps( MidiTime::stepsPerTact() )
 {
 	setName( _instrument_track->name() );
+	if( _instrument_track->trackContainer()
+					== Engine::getBBTrackContainer() )
+	{
+		resizeToFirstTrack();
+	}
 	init();
 	setAutoResize( true );
 }
@@ -115,26 +120,51 @@ Pattern::~Pattern()
 
 
 
+void Pattern::resizeToFirstTrack()
+{
+	// Resize this track to be the same as existing tracks in the BB
+	const TrackContainer::TrackList & tracks =
+		m_instrumentTrack->trackContainer()->tracks();
+	for(unsigned int trackID = 0; trackID < tracks.size(); ++trackID)
+	{
+		if(tracks.at(trackID)->type() == Track::InstrumentTrack)
+		{
+			if(tracks.at(trackID) != m_instrumentTrack)
+			{
+				unsigned int currentTCO = m_instrumentTrack->
+					getTCOs().indexOf(this);
+				m_steps = static_cast<Pattern *>
+					(tracks.at(trackID)->getTCO(currentTCO))
+					->m_steps;
+			}
+			break;
+		}
+	}
+}
+
+
+
+
 void Pattern::init()
 {
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 				this, SLOT( changeTimeSignature() ) );
 	saveJournallingState( false );
 
-	ensureBeatNotes();
-
-	changeLength( length() );
+	updateLength();
 	restoreJournallingState();
 }
 
 
 
 
-MidiTime Pattern::length() const
+void Pattern::updateLength()
 {
 	if( m_patternType == BeatPattern )
 	{
-		return beatPatternLength();
+		changeLength( beatPatternLength() );
+		updateBBTrack();
+		return;
 	}
 
 	tick_t max_length = MidiTime::ticksPerTact();
@@ -148,8 +178,9 @@ MidiTime Pattern::length() const
 							( *it )->endPos() );
 		}
 	}
-	return MidiTime( max_length ).nextFullTact() *
-						MidiTime::ticksPerTact();
+	changeLength( MidiTime( max_length ).nextFullTact() *
+						MidiTime::ticksPerTact() );
+	updateBBTrack();
 }
 
 
@@ -214,11 +245,9 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 	instrumentTrack()->unlock();
 
 	checkType();
-	changeLength( length() );
+	updateLength();
 
 	emit dataChanged();
-
-	updateBBTrack();
 
 	return new_note;
 }
@@ -226,7 +255,7 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 
 
 
-void Pattern::removeNote( const Note * _note_to_del )
+void Pattern::removeNote( Note * _note_to_del )
 {
 	instrumentTrack()->lock();
 	NoteVector::Iterator it = m_notes.begin();
@@ -243,11 +272,9 @@ void Pattern::removeNote( const Note * _note_to_del )
 	instrumentTrack()->unlock();
 
 	checkType();
-	changeLength( length() );
+	updateLength();
 
 	emit dataChanged();
-
-	updateBBTrack();
 }
 
 
@@ -258,24 +285,13 @@ Note * Pattern::noteAtStep( int _step )
 	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
 									++it )
 	{
-		if( ( *it )->pos() == ( _step *  MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact() )
+		if( ( *it )->pos() == MidiTime::stepPosition( _step )
+						&& ( *it )->length() < 0 )
 		{
 			return *it;
 		}
 	}
 	return NULL;
-}
-
-
-Note * Pattern::rearrangeNote( const Note * _note_to_proc,
-							const bool _quant_pos )
-{
-	// just rearrange the position of the note by removing it and adding
-	// a copy of it -> addNote inserts it at the correct position
-	Note copy_of_note( *_note_to_proc );
-	removeNote( _note_to_proc );
-
-	return addNote( copy_of_note, _quant_pos );
 }
 
 
@@ -306,17 +322,29 @@ void Pattern::clearNotes()
 
 
 
-void Pattern::setStep( int _step, bool _enabled )
+Note * Pattern::addStepNote( int step )
 {
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end();
-									++it )
+	return addNote( Note( MidiTime( -DefaultTicksPerTact ),
+				MidiTime::stepPosition( step ) ), false );
+}
+
+
+
+
+void Pattern::setStep( int step, bool enabled )
+{
+	if( enabled )
 	{
-		if( ( *it )->pos() == ( _step * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact() &&
-						( *it )->length() <= 0 )
+		if ( !noteAtStep( step ) )
 		{
-			( *it )->setLength( _enabled ?
-						-DefaultTicksPerTact : 0 );
+			addStepNote( step );
 		}
+		return;
+	}
+
+	while( Note * note = noteAtStep( step ) )
+	{
+		removeNote( note );
 	}
 }
 
@@ -342,12 +370,12 @@ void Pattern::checkType()
 	{
 		if( ( *it )->length() > 0 )
 		{
-			setType( Pattern::MelodyPattern );
+			setType( MelodyPattern );
 			return;
 		}
 		++it;
 	}
-	setType( Pattern::BeatPattern );
+	setType( BeatPattern );
 }
 
 
@@ -369,7 +397,6 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		_this.setAttribute( "pos", startPosition() );
 	}
-	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "steps", m_steps );
 
@@ -377,10 +404,7 @@ void Pattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	for( NoteVector::Iterator it = m_notes.begin();
 						it != m_notes.end(); ++it )
 	{
-		if( ( *it )->length() )
-		{
-			( *it )->saveState( _doc, _this );
-		}
+		( *it )->saveState( _doc, _this );
 	}
 }
 
@@ -396,7 +420,6 @@ void Pattern::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	changeLength( MidiTime( _this.attribute( "len" ).toInt() ) );
 	if( _this.attribute( "muted" ).toInt() != isMuted() )
 	{
 		toggleMute();
@@ -423,12 +446,10 @@ void Pattern::loadSettings( const QDomElement & _this )
 		m_steps = MidiTime::stepsPerTact();
 	}
 
-	ensureBeatNotes();
 	checkType();
+	updateLength();
 
 	emit dataChanged();
-
-	updateBBTrack();
 }
 
 
@@ -464,7 +485,6 @@ void Pattern::clear()
 {
 	addJournalCheckPoint();
 	clearNotes();
-	ensureBeatNotes();
 }
 
 
@@ -473,17 +493,15 @@ void Pattern::clear()
 void Pattern::addSteps()
 {
 	m_steps += MidiTime::stepsPerTact();
-	ensureBeatNotes();
+	updateLength();
 	emit dataChanged();
-	updateBBTrack();
 }
 
 void Pattern::cloneSteps()
 {
 	int oldLength = m_steps;
-	m_steps += MidiTime::stepsPerTact();
-	ensureBeatNotes();
-	for(int i = 0; i < MidiTime::stepsPerTact(); ++i )
+	m_steps *= 2; // cloning doubles the track
+	for(int i = 0; i < oldLength; ++i )
 	{
 		Note *toCopy = noteAtStep( i );
 		if( toCopy )
@@ -496,9 +514,8 @@ void Pattern::cloneSteps()
 			newNote->setVolume( toCopy->getVolume() );
 		}
 	}
-	ensureBeatNotes();
+	updateLength();
 	emit dataChanged();
-	updateBBTrack();
 }
 
 
@@ -506,28 +523,17 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int _n = MidiTime::stepsPerTact();
-	if( _n < m_steps )
+	int n = MidiTime::stepsPerTact();
+	if( n < m_steps )
 	{
-		for( int i = m_steps - _n; i < m_steps; ++i )
+		for( int i = m_steps - n; i < m_steps; ++i )
 		{
-			for( NoteVector::Iterator it = m_notes.begin();
-						it != m_notes.end(); ++it )
-			{
-				if( ( *it )->pos() ==
-					( i * MidiTime::ticksPerTact() ) /
-						MidiTime::stepsPerTact() &&
-							( *it )->length() <= 0 )
-				{
-					removeNote( *it );
-					break;
-				}
-			}
+			setStep( i, false );
 		}
-		m_steps -= _n;
+		m_steps -= n;
+		updateLength();
 		emit dataChanged();
 	}
-	updateBBTrack();
 }
 
 
@@ -536,66 +542,6 @@ void Pattern::removeSteps()
 TrackContentObjectView * Pattern::createView( TrackView * _tv )
 {
 	return new PatternView( this, _tv );
-}
-
-
-
-
-
-void Pattern::ensureBeatNotes()
-{
-	// make sure, that all step-note exist
-	for( int i = 0; i < m_steps; ++i )
-	{
-		bool found = false;
-		NoteVector::Iterator it;
-
-		for( it = m_notes.begin(); it != m_notes.end(); ++it )
-		{
-			Note *note = *it;
-			// if a note in this position is the one we want
-			if( note->pos() ==
-				( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				&& note->length() <= 0 )
-			{
-				found = true;
-				break;
-			}
-		}
-		if( found == false )
-		{
-			addNote( Note( MidiTime( 0 ), MidiTime( ( i *
-				MidiTime::ticksPerTact() ) /
-					MidiTime::stepsPerTact() ) ), false );
-		}
-	}
-
-	// remove notes we no longer need:
-	// that is, disabled notes that no longer fall to the steps of the new time sig
-
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
-	{
-		bool needed = false;
-		Note *note = *it;
-
-		for( int i = 0; i < m_steps; ++i )
-		{
-			if( note->pos() == ( i * MidiTime::ticksPerTact() ) / MidiTime::stepsPerTact()
-				|| note->length() != 0 )
-			{
-				needed = true;
-				break;
-			}
-		}
-		if( needed == false )
-		{
-			delete note;
-			it = m_notes.erase( it );
-		}
-		else {
-			++it;
-		}
-	}
 }
 
 
@@ -635,7 +581,7 @@ bool Pattern::empty()
 
 void Pattern::changeTimeSignature()
 {
-	MidiTime last_pos = MidiTime::ticksPerTact();
+	MidiTime last_pos = MidiTime::ticksPerTact() - 1;
 	for( NoteVector::ConstIterator cit = m_notes.begin();
 						cit != m_notes.end(); ++cit )
 	{
@@ -646,24 +592,9 @@ void Pattern::changeTimeSignature()
 		}
 	}
 	last_pos = last_pos.nextFullTact() * MidiTime::ticksPerTact();
-	for( NoteVector::Iterator it = m_notes.begin(); it != m_notes.end(); )
-	{
-		if( ( *it )->length() == 0 && ( *it )->pos() >= last_pos )
-		{
-			delete *it;
-			it = m_notes.erase( it );
-			--m_steps;
-		}
-		else
-		{
-			++it;
-		}
-	}
-	m_steps = qMax<tick_t>(
-		qMax<tick_t>( m_steps, MidiTime::stepsPerTact() ),
+	m_steps = qMax<tick_t>( MidiTime::stepsPerTact(),
 				last_pos.getTact() * MidiTime::stepsPerTact() );
-	ensureBeatNotes();
-	updateBBTrack();
+	updateLength();
 }
 
 
@@ -722,8 +653,6 @@ PatternView::~PatternView()
 
 void PatternView::update()
 {
-	m_pat->changeLength( m_pat->length() );
-	
 	if ( m_pat->m_patternType == Pattern::BeatPattern )
 	{
 		ToolTip::add( this,
@@ -800,6 +729,8 @@ void PatternView::constructContextMenu( QMenu * _cm )
 			tr( "Add steps" ), m_pat, SLOT( addSteps() ) );
 		_cm->addAction( embed::getIconPixmap( "step_btn_remove" ),
 			tr( "Remove steps" ), m_pat, SLOT( removeSteps() ) );
+		_cm->addAction( embed::getIconPixmap( "step_btn_duplicate" ),
+			tr( "Clone Steps" ), m_pat, SLOT( cloneSteps() ) );
 	}
 }
 
@@ -835,28 +766,14 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 
 		Note * n = m_pat->noteAtStep( step );
 
-		// if note at step not found, ensureBeatNotes and try again
 		if( n == NULL )
 		{
-			m_pat -> ensureBeatNotes();
-			n = m_pat->noteAtStep( step );
-			if( n == NULL ) // still can't find a note? bail!
-			{
-				qDebug( "Something went wrong in pattern.cpp: couldn't add note at step %d!", step );
-				return;
-			}
+			m_pat->addStepNote( step );
 		}
 		else // note at step found
 		{
 			m_pat->addJournalCheckPoint();
-			if( n->length() < 0 )
-			{
-				n->setLength( 0 );	// set note as enabled beat note
-			}
-			else
-			{
-				n->setLength( -DefaultTicksPerTact );	// set note as disabled beat note
-			}
+			m_pat->setStep( step, false );
 		}
 
 		Engine::getSong()->setModified();
@@ -911,21 +828,17 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 			return;
 		}
 
-		int vol = 0;
-		int len = 0;
-
 		Note * n = m_pat->noteAtStep( step );
+		if( !n && _we->delta() > 0 )
+		{
+			n = m_pat->addStepNote( step );
+			n->setVolume( 0 );
+		}
 		if( n != NULL )
 		{
-			vol = n->getVolume();
-			len = n->length();
+			int vol = n->getVolume();
 
-			if( len == 0 && _we->delta() > 0 )
-			{
-				n->setLength( -DefaultTicksPerTact );
-				n->setVolume( 5 );
-			}
-			else if( _we->delta() > 0 )
+			if( _we->delta() > 0 )
 			{
 				n->setVolume( qMin( 100, vol + 5 ) );
 			}
@@ -975,9 +888,10 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 	
-	// state: selected, muted, normal
+	// state: selected, normal, beat pattern, muted
 	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern ) 
-		? painter.background().color() : mutedBackgroundColor() );
+		? painter.background().color() : ( beatPattern 
+		? BBPatternBackground() : mutedBackgroundColor() ) );
 
 	// invert the gradient for the background in the B&B editor
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
@@ -1119,14 +1033,9 @@ void PatternView::paintEvent( QPaintEvent * )
 			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
 
-			// get volume and length of note, if noteAtStep returned null
-			// (meaning, note at step doesn't exist for some reason)
-			// then set both at zero, ie. treat as an off step
-			const int vol = ( n != NULL ? n->getVolume() : 0 );
-			const int len = ( n != NULL ? int( n->length() ) : 0 );
-
-			if( len < 0 )
+			if( n )
 			{
+				const int vol = n->getVolume();
 				p.drawPixmap( x, y, stepoff );
 				for( int i = 0; i < vol / 5 + 1; ++i )
 				{
@@ -1204,12 +1113,11 @@ void PatternView::paintEvent( QPaintEvent * )
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
 			rect().bottom() - TCO_BORDER_WIDTH );
-	}
 	
 	// outer border
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-
+	}
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_pat->isMuted() )
 	{

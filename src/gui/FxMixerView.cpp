@@ -41,12 +41,16 @@
 #include "Knob.h"
 #include "Engine.h"
 #include "embed.h"
+#include "FxLine.h"
+#include "FxMixer.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
+#include "lmms_math.h"
 
 FxMixerView::FxMixerView() :
 	QWidget(),
@@ -69,6 +73,9 @@ FxMixerView::FxMixerView() :
 	// main-layout
 	QHBoxLayout * ml = new QHBoxLayout;
 
+	// Set margins
+	ml->setContentsMargins( 0, 4, 0, 0 );
+	
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
@@ -274,6 +281,11 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 
 	m_fader = new Fader( &fxChannel->m_volumeModel,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
+	m_fader->setLevelsDisplayedInDBFS();
+	// TODO dbvToAmp is really dBFSToAmp. Rename in later commit.
+	m_fader->setMinPeak(dbvToAmp(-40));
+	m_fader->setMaxPeak(dbvToAmp(12));
+
 	m_fader->move( 16-m_fader->width()/2,
 					m_fxLine->height()-
 					m_fader->height()-5 );
@@ -382,7 +394,9 @@ void FxMixerView::deleteChannel(int index)
 	delete m_fxChannelViews[index]->m_fader;
 	delete m_fxChannelViews[index]->m_muteBtn;
 	delete m_fxChannelViews[index]->m_soloBtn;
-	delete m_fxChannelViews[index]->m_fxLine;
+	// delete fxLine later to prevent a crash when deleting from context menu
+	m_fxChannelViews[index]->m_fxLine->hide();
+	m_fxChannelViews[index]->m_fxLine->deleteLater();
 	delete m_fxChannelViews[index]->m_rackView;
 	delete m_fxChannelViews[index];
 	m_channelAreaWidget->adjustSize();

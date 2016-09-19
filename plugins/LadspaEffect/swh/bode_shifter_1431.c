@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -141,7 +141,7 @@ static void connectPortBodeShifter(
 static LADSPA_Handle instantiateBodeShifter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	BodeShifter *plugin_data = (BodeShifter *)malloc(sizeof(BodeShifter));
+	BodeShifter *plugin_data = (BodeShifter *)calloc(1, sizeof(BodeShifter));
 	LADSPA_Data *delay = NULL;
 	unsigned int dptr;
 	float fs;
@@ -365,14 +365,13 @@ static void runAddingBodeShifter(LADSPA_Handle instance, unsigned long sample_co
 	*(plugin_data->latency) = 99;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -458,12 +457,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (bodeShifterDescriptor) {
 		free((LADSPA_PortDescriptor *)bodeShifterDescriptor->PortDescriptors);
 		free((char **)bodeShifterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)bodeShifterDescriptor->PortRangeHints);
 		free(bodeShifterDescriptor);
 	}
+	bodeShifterDescriptor = NULL;
 
 }

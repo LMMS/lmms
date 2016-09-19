@@ -34,6 +34,7 @@
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 #include "gui_templates.h"
 #include "templates.h"
 
@@ -244,11 +245,7 @@ void AudioAlsa::startProcessing()
 
 void AudioAlsa::stopProcessing()
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 

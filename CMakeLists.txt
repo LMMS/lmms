@@ -31,13 +31,17 @@ SET(PROJECT_EMAIL       "lmms-devel@lists.sourceforge.net")
 SET(PROJECT_DESCRIPTION "${PROJECT_NAME_UCASE} - Free music production software")
 SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
-SET(VERSION_MINOR       "1")
-SET(VERSION_PATCH       "90")
-#SET(VERSION_SUFFIX     "")
-SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-IF(VERSION_SUFFIX)
-	SET(VERSION     "${VERSION}-${VERSION_SUFFIX}")
-ENDIF(VERSION_SUFFIX)
+SET(VERSION_MINOR       "2")
+SET(VERSION_RELEASE     "0")
+SET(VERSION_STAGE       "rc2")
+SET(VERSION_BUILD       "0")
+SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
+IF(VERSION_STAGE)
+	SET(VERSION     "${VERSION}-${VERSION_STAGE}")
+ENDIF()
+IF(VERSION_BUILD)
+	SET(VERSION     "${VERSION}.${VERSION_BUILD}")
+ENDIF()
 
 # Override version information for non-base builds
 INCLUDE(VersionInfo)
@@ -362,6 +366,10 @@ ENDIF(WANT_JACK)
 PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
 
 
+# check for FLTK
+FIND_PACKAGE(FLTK)
+
+
 # check for Fluidsynth
 IF(WANT_SF2)
 	PKG_CHECK_MODULES(FLUIDSYNTH fluidsynth>=1.0.7)
@@ -386,14 +394,27 @@ If(WANT_GIG)
 ENDIF(WANT_GIG)
 
 # check for pthreads
-IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
+IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
-ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
+ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
+
+IF(LMMS_BUILD_OPENBSD)
+	FIND_PACKAGE(Sndio)
+	IF(SNDIO_FOUND)
+		SET(LMMS_HAVE_SNDIO TRUE)
+        	SET(STATUS_SNDIO "OK")
+    	ELSE()
+        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	ENDIF(SNDIO_FOUND)
+ENDIF(LMMS_BUILD_OPENBSD)
 
 # check for WINE
 IF(WANT_VST)
 	FIND_PACKAGE(Wine)
 	IF(WINE_FOUND)
+		SET(LMMS_SUPPORT_VST TRUE)
+		SET(STATUS_VST "OK")
+	ELSEIF(WANT_VST_NOWINE)
 		SET(LMMS_SUPPORT_VST TRUE)
 		SET(STATUS_VST "OK")
 	ELSE(WINE_FOUND)
@@ -439,10 +460,15 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLMMS_DEBUG")
 FILE(REMOVE include/lmmsconfig.h)
 
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
+LIST(SORT LMMS_INCLUDES)
 
-# Get list of all committers from git history, ordered by number of commits
+# Get list of all committers from git history, ordered by number of commits.
+# The CONTRIBUTORS file is used by AboutDialog. This information can be provided
+# with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
+# this file for version 1.1.3, the command is:
+# 	git shortlog -sne v1.1.3 | cut -c8-
 FIND_PACKAGE(Git)
-IF(GIT_FOUND)
+IF(GIT_FOUND AND NOT CONTRIBUTORS)
 	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
 	EXECUTE_PROCESS(
 		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
@@ -450,7 +476,7 @@ IF(GIT_FOUND)
 		OUTPUT_FILE "${CONTRIBUTORS}"
 		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 		TIMEOUT 1)
-ENDIF(GIT_FOUND)
+ENDIF()
 
 # embedded resources stuff
 IF(WIN32 OR WIN64)
@@ -509,6 +535,7 @@ IF(LMMS_BUILD_WIN32)
 		FILE(GLOB ZASF_BINARIES
 			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/zynaddsubfx.dll"
 			"${CMAKE_SOURCE_DIR}/extras/plugins/zynaddsubfx/remote_zynaddsubfx.exe")
+		LIST(SORT ZASF_BINARIES)
 		INSTALL(FILES "${ZASF_BINARIES}" DESTINATION "${PLUGIN_DIR}")
 	ENDIF(EXISTS "${CMAKE_SOURCE_DIR}/extras")
 ENDIF(LMMS_BUILD_WIN32)
@@ -550,6 +577,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* JACK                        : ${STATUS_JACK}\n"
 "* OSS                         : ${STATUS_OSS}\n"
+"* Sndio                       : ${STATUS_SNDIO}\n"
 "* PortAudio                   : ${STATUS_PORTAUDIO}\n"
 "* libsoundio                  : ${STATUS_SOUNDIO}\n"
 "* PulseAudio                  : ${STATUS_PULSEAUDIO}\n"
@@ -561,6 +589,7 @@ MESSAGE(
 "-------------------------\n"
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
+"* Sndio                       : ${STATUS_SNDIO}\n"
 "* JACK                        : ${STATUS_JACK}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
 "* AppleMidi                   : ${STATUS_APPLEMIDI}\n"

@@ -297,7 +297,7 @@ protected:
 	//! max() and aligned according to the step size (step size 0.05 -> value
 	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
 	//! doing your own calculations.
-	float fittedValue( float value, bool forceStep = false ) const;
+	float fittedValue( float value ) const;
 
 
 private:

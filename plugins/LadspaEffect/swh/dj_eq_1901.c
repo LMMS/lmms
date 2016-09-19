@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -116,6 +116,7 @@ static void activateDj_eq_mono(LADSPA_Handle instance) {
 }
 
 static void cleanupDj_eq_mono(LADSPA_Handle instance) {
+#line 60 "dj_eq_1901.xml"
 	Dj_eq_mono *plugin_data = (Dj_eq_mono *)instance;
 	free(plugin_data->filters);
 	free(instance);
@@ -153,7 +154,7 @@ static void connectPortDj_eq_mono(
 static LADSPA_Handle instantiateDj_eq_mono(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Dj_eq_mono *plugin_data = (Dj_eq_mono *)malloc(sizeof(Dj_eq_mono));
+	Dj_eq_mono *plugin_data = (Dj_eq_mono *)calloc(1, sizeof(Dj_eq_mono));
 	biquad *filters = NULL;
 	float fs;
 
@@ -285,6 +286,7 @@ static void activateDj_eq(LADSPA_Handle instance) {
 }
 
 static void cleanupDj_eq(LADSPA_Handle instance) {
+#line 60 "dj_eq_1901.xml"
 	Dj_eq *plugin_data = (Dj_eq *)instance;
 	free(plugin_data->filters);
 	free(instance);
@@ -328,7 +330,7 @@ static void connectPortDj_eq(
 static LADSPA_Handle instantiateDj_eq(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Dj_eq *plugin_data = (Dj_eq *)malloc(sizeof(Dj_eq));
+	Dj_eq *plugin_data = (Dj_eq *)calloc(1, sizeof(Dj_eq));
 	biquad *filters = NULL;
 	float fs;
 
@@ -467,14 +469,13 @@ static void runAddingDj_eq(LADSPA_Handle instance, unsigned long sample_count) {
 	*(plugin_data->latency) = 3; //XXX is this right?
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -678,18 +679,20 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (dj_eq_monoDescriptor) {
 		free((LADSPA_PortDescriptor *)dj_eq_monoDescriptor->PortDescriptors);
 		free((char **)dj_eq_monoDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)dj_eq_monoDescriptor->PortRangeHints);
 		free(dj_eq_monoDescriptor);
 	}
+	dj_eq_monoDescriptor = NULL;
 	if (dj_eqDescriptor) {
 		free((LADSPA_PortDescriptor *)dj_eqDescriptor->PortDescriptors);
 		free((char **)dj_eqDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)dj_eqDescriptor->PortRangeHints);
 		free(dj_eqDescriptor);
 	}
+	dj_eqDescriptor = NULL;
 
 }

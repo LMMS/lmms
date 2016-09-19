@@ -33,8 +33,10 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
+#include "SampleBuffer.h"
 #include "Song.h"
 
 #include "patches_dialog.h"
@@ -574,16 +576,15 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_playingNotes.append( _n );
 		m_playingNotesMutex.unlock();
 	}
-	else if( _n->isReleased() ) // note is released during this period
+	else if( _n->isReleased() && ! _n->instrumentTrack()->isSustainPedalPressed() ) // note is released during this period
 	{
 		SF2PluginData * pluginData = static_cast<SF2PluginData *>( _n->m_pluginData );
 		pluginData->offset = _n->framesBeforeRelease();
 		pluginData->isNew = false;
-		
+
 		m_playingNotesMutex.lock();
 		m_playingNotes.append( _n );
 		m_playingNotesMutex.unlock();
-
 	}
 }
 

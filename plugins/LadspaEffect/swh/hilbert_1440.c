@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -128,7 +128,7 @@ static void connectPortHilbert(
 static LADSPA_Handle instantiateHilbert(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Hilbert *plugin_data = (Hilbert *)malloc(sizeof(Hilbert));
+	Hilbert *plugin_data = (Hilbert *)calloc(1, sizeof(Hilbert));
 	LADSPA_Data *delay = NULL;
 	unsigned int dptr;
 
@@ -233,14 +233,13 @@ static void runAddingHilbert(LADSPA_Handle instance, unsigned long sample_count)
 	*(plugin_data->latency) = 99;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -316,12 +315,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (hilbertDescriptor) {
 		free((LADSPA_PortDescriptor *)hilbertDescriptor->PortDescriptors);
 		free((char **)hilbertDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)hilbertDescriptor->PortRangeHints);
 		free(hilbertDescriptor);
 	}
+	hilbertDescriptor = NULL;
 
 }

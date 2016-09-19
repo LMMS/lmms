@@ -29,6 +29,8 @@
 
 #ifdef LMMS_HAVE_OSS
 
+#include <QThread>
+
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 

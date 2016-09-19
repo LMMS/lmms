@@ -39,16 +39,19 @@
 #include "Engine.h"
 #include "ToolTip.h"
 #include "AudioPort.h"
+#include "BBTrack.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
 #include "StringPairDrag.h"
 #include "Knob.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "GuiApplication.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
 #include "ConfigManager.h"
 #include "panning_constants.h"
+#include "volume.h"
 
 
 SampleTCO::SampleTCO( Track * _track ) :
@@ -366,14 +369,14 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-	
+
 	// state: selected, muted, normal
 	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
 		: painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
-	
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -384,13 +387,17 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
-	
+
 	const int spacing = TCO_BORDER_WIDTH + 1;
-	
+	const float ppt = fixedTCOs() ?
+			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+					/ (float) m_tco->length().getTact() :
+								pixelsPerTact();
+
 	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() *
-				pixelsPerTact() / DefaultTicksPerTact ), 1 ),
-					rect().bottom() - 2 * spacing );
+			qMax( static_cast<int>( m_tco->sampleLength() * ppt
+						/ DefaultTicksPerTact ), 1 ),
+						rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	// disable antialiasing for borders, since its not needed
@@ -406,11 +413,11 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	p.setPen( c.lighter( 160 ) );
 	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
 		rect().bottom() - TCO_BORDER_WIDTH );
-		
+
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
-	
+
 	// draw the 'muted' pixmap only if the pattern was manualy muted
 	if( m_tco->isMuted() )
 	{
@@ -419,9 +426,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.drawPixmap( spacing, height() - ( size + spacing ),
 			embed::getIconPixmap( "muted", size, size ) );
 	}
-	
+
 	// recording sample tracks is not possible at the moment 
-	
+
 	/* if( m_tco->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
@@ -434,9 +441,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
-	
+
 	p.end();
-	
+
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
@@ -469,19 +476,37 @@ SampleTrack::~SampleTrack()
 
 
 bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _offset, int /*_tco_num*/ )
+					const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
 
-	for( int i = 0; i < numOfTCOs(); ++i )
+	tcoVector tcos;
+	::BBTrack * bb_track = NULL;
+	if( _tco_num >= 0 )
 	{
-		TrackContentObject * tco = getTCO( i );
-		if( tco->startPosition() != _start )
+		if( _start != 0 )
 		{
-			continue;
+			return false;
 		}
-		SampleTCO * st = dynamic_cast<SampleTCO *>( tco );
+		tcos.push_back( getTCO( _tco_num ) );
+		bb_track = BBTrack::findBBTrack( _tco_num );
+	}
+	else
+	{
+		for( int i = 0; i < numOfTCOs(); ++i )
+		{
+			TrackContentObject * tco = getTCO( i );
+			if( tco->startPosition() == _start )
+			{
+				tcos.push_back( tco );
+			}
+		}
+	}
+
+	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
+	{
+		SampleTCO * st = dynamic_cast<SampleTCO *>( *it );
 		if( !st->isMuted() )
 		{
 			PlayHandle* handle;
@@ -498,10 +523,9 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
+				smpHandle->setBBTrack( bb_track );
 				handle = smpHandle;
 			}
-//TODO: check whether this works
-//			handle->setBBTrack( _tco_num );
 			handle->setOffset( _offset );
 			// send it to the mixer
 			Engine::mixer()->addPlayHandle( handle );

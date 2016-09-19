@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -178,7 +178,7 @@ static void connectPortRetroFlange(
 static LADSPA_Handle instantiateRetroFlange(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	RetroFlange *plugin_data = (RetroFlange *)malloc(sizeof(RetroFlange));
+	RetroFlange *plugin_data = (RetroFlange *)calloc(1, sizeof(RetroFlange));
 	LADSPA_Data *buffer = NULL;
 	long buffer_size;
 	long count;
@@ -492,14 +492,13 @@ static void runAddingRetroFlange(LADSPA_Handle instance, unsigned long sample_co
 	plugin_data->z2 = z2;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -581,12 +580,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (retroFlangeDescriptor) {
 		free((LADSPA_PortDescriptor *)retroFlangeDescriptor->PortDescriptors);
 		free((char **)retroFlangeDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)retroFlangeDescriptor->PortRangeHints);
 		free(retroFlangeDescriptor);
 	}
+	retroFlangeDescriptor = NULL;
 
 }

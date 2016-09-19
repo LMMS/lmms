@@ -32,6 +32,7 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 
 #include <QApplication>
 #include <QFileDialog>

@@ -66,7 +66,8 @@ TextFloat * Knob::s_textFloat = NULL;
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
 	m_buttonPressed( false ), \
 	m_angle( -10 ), \
-	m_lineWidth(0)
+	m_lineWidth( 0 ), \
+	m_textColor( 255, 255, 255 )
 
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	DEFAULT_KNOB_INITIALIZER_LIST,
@@ -173,9 +174,9 @@ Knob::~Knob()
 
 
 
-void Knob::setLabel( const QString & _txt )
+void Knob::setLabel( const QString & txt )
 {
-	m_label = _txt;
+	m_label = txt;
 	if( m_knobPixmap )
 	{
 		setFixedSize( qMax<int>( m_knobPixmap->width(),
@@ -188,15 +189,15 @@ void Knob::setLabel( const QString & _txt )
 
 
 
-void Knob::setTotalAngle( float _angle )
+void Knob::setTotalAngle( float angle )
 {
-	if( _angle < 10.0 )
+	if( angle < 10.0 )
 	{
 		m_totalAngle = 10.0;
 	}
 	else
 	{
-		m_totalAngle = _angle;
+		m_totalAngle = angle;
 	}
 
 	update();
@@ -212,9 +213,9 @@ float Knob::innerRadius() const
 
 
 
-void Knob::setInnerRadius( float _r )
+void Knob::setInnerRadius( float r )
 {
-	m_innerRadius = _r;
+	m_innerRadius = r;
 }
 
 
@@ -226,9 +227,9 @@ float Knob::outerRadius() const
 
 
 
-void Knob::setOuterRadius( float _r )
+void Knob::setOuterRadius( float r )
 {
-	m_outerRadius = _r;
+	m_outerRadius = r;
 }
 
 
@@ -242,11 +243,11 @@ knobTypes Knob::knobNum() const
 
 
 
-void Knob::setknobNum( knobTypes _k )
+void Knob::setknobNum( knobTypes k )
 {
-	if( m_knobNum != _k )
+	if( m_knobNum != k )
 	{
-		m_knobNum = _k;
+		m_knobNum = k;
 		onKnobNumUpdated();
 	}
 }
@@ -268,9 +269,9 @@ float Knob::centerPointX() const
 
 
 
-void Knob::setCenterPointX( float _c )
+void Knob::setCenterPointX( float c )
 {
-	m_centerPoint.setX( _c );
+	m_centerPoint.setX( c );
 }
 
 
@@ -282,9 +283,9 @@ float Knob::centerPointY() const
 
 
 
-void Knob::setCenterPointY( float _c )
+void Knob::setCenterPointY( float c )
 {
-	m_centerPoint.setY( _c );
+	m_centerPoint.setY( c );
 }
 
 
@@ -296,9 +297,9 @@ float Knob::lineWidth() const
 
 
 
-void Knob::setLineWidth( float _w )
+void Knob::setLineWidth( float w )
 {
-	m_lineWidth = _w;
+	m_lineWidth = w;
 }
 
 
@@ -310,9 +311,9 @@ QColor Knob::outerColor() const
 
 
 
-void Knob::setOuterColor( const QColor & _c )
+void Knob::setOuterColor( const QColor & c )
 {
-	m_outerColor = _c;
+	m_outerColor = c;
 }
 
 
@@ -324,9 +325,9 @@ QColor Knob::lineColor() const
 
 
 
-void Knob::setlineColor( const QColor & _c )
+void Knob::setlineColor( const QColor & c )
 {
-	m_lineColor = _c;
+	m_lineColor = c;
 }
 
 
@@ -338,11 +339,25 @@ QColor Knob::arcColor() const
 
 
 
-void Knob::setarcColor( const QColor & _c )
+void Knob::setarcColor( const QColor & c )
 {
-	m_arcColor = _c;
+	m_arcColor = c;
 }
 
+
+
+
+QColor Knob::textColor() const
+{
+	return m_textColor;
+}
+
+
+
+void Knob::setTextColor( const QColor & c )
+{
+	m_textColor = c;
+}
 
 
 
@@ -680,7 +695,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 		p.drawText( width() / 2 -
 			p.fontMetrics().width( m_label ) / 2 + 1,
 				height() - 1, m_label );*/
-		p.setPen( QColor( 255, 255, 255 ) );
+		p.setPen( textColor() );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2,
 				height() - 2, m_label );

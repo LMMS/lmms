@@ -34,6 +34,7 @@
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
+#include "Mixer.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"

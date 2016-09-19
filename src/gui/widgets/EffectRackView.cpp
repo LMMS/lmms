@@ -40,7 +40,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	ModelView( NULL, this )
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout( this );
-	mainLayout->setMargin( 5 );
+	mainLayout->setMargin( 0 );
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
@@ -84,12 +84,12 @@ EffectRackView::~EffectRackView()
 
 void EffectRackView::clearViews()
 {
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
-					it != m_effectViews.end(); ++it )
+	while( m_effectViews.size() )
 	{
-		delete *it;
+		EffectView * e = m_effectViews[m_effectViews.size() - 1];
+		m_effectViews.pop_back();
+		delete e;
 	}
-	m_effectViews.clear();
 }
 
 

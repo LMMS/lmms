@@ -26,7 +26,6 @@
 #define FX_MIXER_H
 
 #include "Model.h"
-#include "Mixer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "ThreadableJob.h"
@@ -202,7 +201,6 @@ private:
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
-	QMutex m_sendsMutex;
 
 	int m_lastSoloed;
 

@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -158,7 +158,7 @@ static void connectPortGsm(
 static LADSPA_Handle instantiateGsm(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Gsm *plugin_data = (Gsm *)malloc(sizeof(Gsm));
+	Gsm *plugin_data = (Gsm *)calloc(1, sizeof(Gsm));
 	biquad *blf = NULL;
 	int count;
 	LADSPA_Data *dry = NULL;
@@ -224,6 +224,7 @@ static void runGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	int count = plugin_data->count;
 	LADSPA_Data * dry = plugin_data->dry;
 	gsm_signal * dst = plugin_data->dst;
+	float fs = plugin_data->fs;
 	gsm handle = plugin_data->handle;
 	int resamp = plugin_data->resamp;
 	float rsf = plugin_data->rsf;
@@ -236,6 +237,8 @@ static void runGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	float part;
 	int error_rate = f_round(error);
 	int num_passes = f_round(passes);
+
+	fs = fs; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 
@@ -319,6 +322,7 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	int count = plugin_data->count;
 	LADSPA_Data * dry = plugin_data->dry;
 	gsm_signal * dst = plugin_data->dst;
+	float fs = plugin_data->fs;
 	gsm handle = plugin_data->handle;
 	int resamp = plugin_data->resamp;
 	float rsf = plugin_data->rsf;
@@ -331,6 +335,8 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	float part;
 	int error_rate = f_round(error);
 	int num_passes = f_round(passes);
+
+	fs = fs; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 
@@ -381,14 +387,13 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	*(plugin_data->latency) = 160 * resamp;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -487,12 +492,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (gsmDescriptor) {
 		free((LADSPA_PortDescriptor *)gsmDescriptor->PortDescriptors);
 		free((char **)gsmDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)gsmDescriptor->PortRangeHints);
 		free(gsmDescriptor);
 	}
+	gsmDescriptor = NULL;
 
 }

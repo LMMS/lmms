@@ -69,6 +69,7 @@
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
+#include "Mixer.h"
 #include "MixHelpers.h"
 #include "DataFile.h"
 #include "NotePlayHandle.h"
@@ -93,7 +94,7 @@ const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 
 const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
-const int PIANO_HEIGHT		= 82;
+const int PIANO_HEIGHT		= 80;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
 
 
@@ -139,6 +140,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_baseNoteModel, SIGNAL( dataChanged() ), this, SLOT( updateBaseNote() ) );
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
+	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
 }
 
 
@@ -220,8 +222,6 @@ void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, 
 			}
 		}
 	}
-
-	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
 
 
@@ -258,11 +258,11 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 		case MidiNoteOn:
 			if( event.velocity() > 0 )
 			{
-				NotePlayHandle* nph;
-				m_notesMutex.lock();
 				if( m_notes[event.key()] == NULL )
 				{
-					nph = NotePlayHandleManager::acquire( this, offset,
+					NotePlayHandle* nph =
+						NotePlayHandleManager::acquire(
+								this, offset,
 								typeInfo<f_cnt_t>::max() / 2,
 								Note( MidiTime(), MidiTime(), event.key(), event.volume( midiPort()->baseVelocity() ) ),
 								NULL, event.channel(),
@@ -273,21 +273,20 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 						m_notes[event.key()] = NULL;
 					}
 				}
-				m_notesMutex.unlock();
 				eventHandled = true;
 				break;
 			}
 
 		case MidiNoteOff:
-			m_notesMutex.lock();
 			if( m_notes[event.key()] != NULL )
 			{
 				// do actual note off and remove internal reference to NotePlayHandle (which itself will
 				// be deleted later automatically)
+				Engine::mixer()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
 				m_notes[event.key()] = NULL;
+				Engine::mixer()->doneChangeInModel();
 			}
-			m_notesMutex.unlock();
 			eventHandled = true;
 			break;
 
@@ -417,14 +416,12 @@ void InstrumentTrack::processOutEvent( const MidiEvent& event, const MidiTime& t
 
 void InstrumentTrack::silenceAllNotes( bool removeIPH )
 {
-	m_notesMutex.lock();
 	m_midiNotesMutex.lock();
 	for( int i = 0; i < NumKeys; ++i )
 	{
 		m_notes[i] = NULL;
 		m_runningMidiNotes[i] = 0;
 	}
-	m_notesMutex.unlock();
 	m_midiNotesMutex.unlock();
 
 	lock();
@@ -558,6 +555,14 @@ void InstrumentTrack::updatePitchRange()
 
 
 
+void InstrumentTrack::updateEffectChannel()
+{
+	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
+}
+
+
+
+
 int InstrumentTrack::masterKey( int _midi_key ) const
 {
 
@@ -651,25 +656,21 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
-			if( cur_note->length() != 0 )
+			const f_cnt_t note_frames =
+				cur_note->length().frames( frames_per_tick );
+
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			notePlayHandle->setBBTrack( bb_track );
+			// are we playing global song?
+			if( _tco_num < 0 )
 			{
-				const f_cnt_t note_frames =
-					cur_note->length().frames(
-							frames_per_tick );
-
-				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-				notePlayHandle->setBBTrack( bb_track );
-				// are we playing global song?
-				if( _tco_num < 0 )
-				{
-					// then set song-global offset of pattern in order to
-					// properly perform the note detuning
-					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
-				}
-
-				Engine::mixer()->addPlayHandle( notePlayHandle );
-				played_a_note = true;
+				// then set song-global offset of pattern in order to
+				// properly perform the note detuning
+				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 			}
+
+			Engine::mixer()->addPlayHandle( notePlayHandle );
+			played_a_note = true;
 			++nit;
 		}
 	}
@@ -1574,7 +1575,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile(fname.remove(QRegExp("[^a-zA-Z0-9\\d\\s]")).toLower().replace( " ", "_" ) );
+	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
 
 	if( sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&

@@ -29,24 +29,15 @@
 
 #include "lmmsconfig.h"
 
-#ifndef LMMS_USE_3RDPARTY_LIBSRC
-#include <samplerate.h>
-#else
-#ifndef OUT_OF_TREE_BUILD
-#include "src/3rdparty/samplerate/samplerate.h"
-#else
-#include <samplerate.h>
-#endif
-#endif
-
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtCore/QWaitCondition>
+#include <samplerate.h>
 
 
 #include "lmms_basics.h"
+#include "LocklessList.h"
 #include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
@@ -194,9 +185,9 @@ public:
 	// audio-port-stuff
 	inline void addAudioPort( AudioPort * _port )
 	{
-		lock();
+		requestChangeInModel();
 		m_audioPorts.push_back( _port );
-		unlock();
+		doneChangeInModel();
 	}
 
 	void removeAudioPort( AudioPort * _port );
@@ -225,8 +216,6 @@ public:
 	}
 
 	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
-
-	bool hasNotePlayHandles();
 
 
 	// methods providing information for other classes
@@ -283,37 +272,6 @@ public:
 	}
 
 
-	// methods needed by other threads to alter knob values, waveforms, etc
-	void lock()
-	{
-		m_globalMutex.lock();
-	}
-
-	void unlock()
-	{
-		m_globalMutex.unlock();
-	}
-
-	void lockInputFrames()
-	{
-		m_inputFramesMutex.lock();
-	}
-
-	void unlockInputFrames()
-	{
-		m_inputFramesMutex.unlock();
-	}
-
-	void lockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.lock();
-	}
-
-	void unlockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.unlock();
-	}
-
 	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
 
 
@@ -346,6 +304,9 @@ public:
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
 	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
 
+	void requestChangeInModel();
+	void doneChangeInModel();
+
 
 signals:
 	void qualitySettingsChanged();
@@ -371,6 +332,8 @@ private:
 
 		virtual void run();
 
+		void write( surroundSampleFrame * buffer );
+
 	} ;
 
 
@@ -386,6 +349,10 @@ private:
 
 
 	const surroundSampleFrame * renderNextBuffer();
+
+	void clearInternal();
+
+	void runChangesInModel();
 
 
 
@@ -413,12 +380,15 @@ private:
 
 	// playhandle stuff
 	PlayHandleList m_playHandles;
-	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
+	// place where new playhandles are added temporarily
+	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
+
+	bool m_isProcessing;
 
 	// audio device stuff
 	AudioDevice * m_audioDev;
@@ -430,12 +400,6 @@ private:
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
-	// mutexes
-	QMutex m_globalMutex;
-	QMutex m_inputFramesMutex;
-	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
-	QMutex m_playHandleRemovalMutex;
-
 	// FIFO stuff
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
@@ -443,6 +407,18 @@ private:
 	MixerProfiler m_profiler;
 
 	bool m_metronomeActive;
+
+	bool m_clearSignal;
+
+	bool m_changesSignal;
+	unsigned int m_changes;
+	QMutex m_changesMutex;
+	QMutex m_doChangesMutex;
+	QMutex m_waitChangesMutex;
+	QWaitCondition m_changesMixerCondition;
+	QWaitCondition m_changesRequestCondition;
+
+	bool m_waitingForWrite;
 
 	friend class LmmsCore;
 	friend class MixerWorkerThread;

@@ -175,11 +175,6 @@ public:
 		return m_vstDir;
 	}
 
-	const QString & flDir() const
-	{
-		return m_flDir;
-	}
-
 	const QString & ladspaDir() const
 	{
 		return m_ladDir;
@@ -230,14 +225,13 @@ public:
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);
 
-	void loadConfigFile();
+	void loadConfigFile( const QString & configFile = "" );
 	void saveConfigFile();
 
 
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
 	void setArtworkDir( const QString & _ad );
-	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _fd );
 	void setVersion( const QString & _cv );
 	void setSTKDir( const QString & _fd );
@@ -260,12 +254,11 @@ private:
 	void upgrade_1_1_90();
 	void upgrade();
 
-	const QString m_lmmsRcFile;
+	QString m_lmmsRcFile;
 	QString m_workingDir;
 	QString m_dataDir;
 	QString m_artworkDir;
 	QString m_vstDir;
-	QString m_flDir;
 	QString m_ladDir;
 	QString m_gigDir;
 	QString m_sf2Dir;

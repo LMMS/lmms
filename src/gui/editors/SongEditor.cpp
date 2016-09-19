@@ -47,6 +47,7 @@
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
 #include "MeterDialog.h"
+#include "Mixer.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
@@ -57,8 +58,8 @@
 
 
 
-positionLine::positionLine( QWidget * _parent ) :
-	QWidget( _parent )
+positionLine::positionLine( QWidget * parent ) :
+	QWidget( parent )
 {
 	setFixedWidth( 1 );
 	setAttribute( Qt::WA_NoSystemBackground, true );
@@ -67,18 +68,19 @@ positionLine::positionLine( QWidget * _parent ) :
 
 
 
-void positionLine::paintEvent( QPaintEvent * _pe )
+void positionLine::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 	p.fillRect( rect(), QColor( 255, 255, 255, 153 ) );
 }
 
+const QVector<double> SongEditor::m_zoomLevels =
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 
-
-SongEditor::SongEditor( Song * _song ) :
-	TrackContainerView( _song ),
-	m_song( _song ),
+SongEditor::SongEditor( Song * song ) :
+	TrackContainerView( song ),
+	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
@@ -242,10 +244,9 @@ SongEditor::SongEditor( Song * _song ) :
 			this, SLOT( updateScrollBar( int ) ) );
 
 	// Set up zooming model
-	for( int i = 0; i < 7; ++i )
+	for( float const & zoomLevel : m_zoomLevels )
 	{
-		m_zoomingModel->addItem(
-					QString::number( 25 << i ) + "%" );
+		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel->setInitValue(
 			m_zoomingModel->findText( "100%" ) );
@@ -276,26 +277,26 @@ void SongEditor::loadSettings( const QDomElement& element )
 
 
 
-void SongEditor::setHighQuality( bool _hq )
+void SongEditor::setHighQuality( bool hq )
 {
 	Engine::mixer()->changeQuality( Mixer::qualitySettings(
-			_hq ? Mixer::qualitySettings::Mode_HighQuality :
+			hq ? Mixer::qualitySettings::Mode_HighQuality :
 				Mixer::qualitySettings::Mode_Draft ) );
 }
 
 
 
 
-void SongEditor::scrolled( int _new_pos )
+void SongEditor::scrolled( int new_pos )
 {
 	update();
-	emit positionChanged( m_currentPosition = MidiTime( _new_pos, 0 ) );
+	emit positionChanged( m_currentPosition = MidiTime( new_pos, 0 ) );
 }
 
 
 
 
-void SongEditor::setEditMode(EditMode mode)
+void SongEditor::setEditMode( EditMode mode )
 {
 	m_mode = mode;
 }
@@ -313,21 +314,21 @@ void SongEditor::setEditModeSelect()
 
 
 
-void SongEditor::keyPressEvent( QKeyEvent * _ke )
+void SongEditor::keyPressEvent( QKeyEvent * ke )
 {
 	if( /*_ke->modifiers() & Qt::ShiftModifier*/
 		gui->mainWindow()->isShiftPressed() == true &&
-						_ke->key() == Qt::Key_Insert )
+						ke->key() == Qt::Key_Insert )
 	{
 		m_song->insertBar();
 	}
 	else if(/* _ke->modifiers() & Qt::ShiftModifier &&*/
 			gui->mainWindow()->isShiftPressed() == true &&
-						_ke->key() == Qt::Key_Delete )
+						ke->key() == Qt::Key_Delete )
 	{
 		m_song->removeBar();
 	}
-	else if( _ke->key() == Qt::Key_Left )
+	else if( ke->key() == Qt::Key_Left )
 	{
 		tick_t t = m_song->currentTick() - MidiTime::ticksPerTact();
 		if( t >= 0 )
@@ -335,7 +336,7 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
 		}
 	}
-	else if( _ke->key() == Qt::Key_Right )
+	else if( ke->key() == Qt::Key_Right )
 	{
 		tick_t t = m_song->currentTick() + MidiTime::ticksPerTact();
 		if( t < MaxSongLength )
@@ -343,61 +344,59 @@ void SongEditor::keyPressEvent( QKeyEvent * _ke )
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
 		}
 	}
-	else if( _ke->key() == Qt::Key_Home )
+	else if( ke->key() == Qt::Key_Home )
 	{
 		m_song->setPlayPos( 0, Song::Mode_PlaySong );
 	}
 	else
 	{
-		QWidget::keyPressEvent( _ke );
+		QWidget::keyPressEvent( ke );
 	}
 }
 
 
 
 
-void SongEditor::wheelEvent( QWheelEvent * _we )
+void SongEditor::wheelEvent( QWheelEvent * we )
 {
 	if( gui->mainWindow()->isCtrlPressed() == true )
 	{
-		if( _we->delta() > 0 )
+		int z = m_zoomingModel->value();
+
+		if( we->delta() > 0 )
 		{
-			setPixelsPerTact( (int) qMin( pixelsPerTact() * 2,
-								256.0f ) );
+			z--;
 		}
-		else if( pixelsPerTact() >= 8 )
+		if( we->delta() < 0 )
 		{
-			setPixelsPerTact( (int) pixelsPerTact() / 2 );
+			z++;
 		}
+		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 		// update combobox with zooming-factor
-		m_zoomingModel->setValue(
-			m_zoomingModel->findText(
-				QString::number(
-					static_cast<int>( pixelsPerTact() *
-					100 / DEFAULT_PIXELS_PER_TACT ) ) +
-									"%" ) );
+		m_zoomingModel->setValue( z );
+
 		// update timeline
 		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
-	else if( gui->mainWindow()->isShiftPressed() == true || _we->orientation() == Qt::Horizontal )
+	else if( gui->mainWindow()->isShiftPressed() == true || we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							_we->delta() / 30 );
+							we->delta() / 30 );
 	}
 	else
 	{
-		_we->ignore();
+		we->ignore();
 		return;
 	}
-	_we->accept();
+	we->accept();
 }
 
 
 
-void SongEditor::closeEvent( QCloseEvent * _ce )
+void SongEditor::closeEvent( QCloseEvent * ce )
  {
 	if( parentWidget() )
 	{
@@ -407,15 +406,15 @@ void SongEditor::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
-	_ce->ignore();
+	ce->ignore();
  }
 
 
 
 
-void SongEditor::setMasterVolume( int _new_val )
+void SongEditor::setMasterVolume( int new_val )
 {
-	updateMasterVolumeFloat( _new_val );
+	updateMasterVolumeFloat( new_val );
 
 	if( !m_mvsStatus->isVisible() && !m_song->m_loadingProject
 					&& m_masterVolumeSlider->showStatus() )
@@ -424,7 +423,7 @@ void SongEditor::setMasterVolume( int _new_val )
 			QPoint( m_masterVolumeSlider->width() + 2, -2 ) );
 		m_mvsStatus->setVisibilityTimeOut( 1000 );
 	}
-	Engine::mixer()->setMasterGain( _new_val / 100.0f );
+	Engine::mixer()->setMasterGain( new_val / 100.0f );
 }
 
 
@@ -441,9 +440,9 @@ void SongEditor::showMasterVolumeFloat( void )
 
 
 
-void SongEditor::updateMasterVolumeFloat( int _new_val )
+void SongEditor::updateMasterVolumeFloat( int new_val )
 {
-	m_mvsStatus->setText( tr( "Value: %1%" ).arg( _new_val ) );
+	m_mvsStatus->setText( tr( "Value: %1%" ).arg( new_val ) );
 }
 
 
@@ -457,9 +456,9 @@ void SongEditor::hideMasterVolumeFloat( void )
 
 
 
-void SongEditor::setMasterPitch( int _new_val )
+void SongEditor::setMasterPitch( int new_val )
 {
-	updateMasterPitchFloat( _new_val );
+	updateMasterPitchFloat( new_val );
 	if( m_mpsStatus->isVisible() == false && m_song->m_loadingProject == false
 					&& m_masterPitchSlider->showStatus() )
 	{
@@ -483,9 +482,9 @@ void SongEditor::showMasterPitchFloat( void )
 
 
 
-void SongEditor::updateMasterPitchFloat( int _new_val )
+void SongEditor::updateMasterPitchFloat( int new_val )
 {
-	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( _new_val ) );
+	m_mpsStatus->setText( tr( "Value: %1 semitones").arg( new_val ) );
 
 }
 
@@ -500,9 +499,9 @@ void SongEditor::hideMasterPitchFloat( void )
 
 
 
-void SongEditor::updateScrollBar( int _len )
+void SongEditor::updateScrollBar( int len )
 {
-	m_leftRightScroll->setMaximum( _len );
+	m_leftRightScroll->setMaximum( len );
 }
 
 
@@ -539,7 +538,7 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 
 
 
-void SongEditor::updatePosition( const MidiTime & _t )
+void SongEditor::updatePosition( const MidiTime & t )
 {
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -561,24 +560,20 @@ void SongEditor::updatePosition( const MidiTime & _t )
 		const int w = width() - widgetWidth
 							- trackOpWidth
 							- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-		if( _t > m_currentPosition + w * MidiTime::ticksPerTact() /
+		if( t > m_currentPosition + w * MidiTime::ticksPerTact() /
 							pixelsPerTact() )
 		{
-			animateScroll( m_leftRightScroll, _t.getTact(), m_smoothScroll );
+			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
 		}
-		else if( _t < m_currentPosition )
+		else if( t < m_currentPosition )
 		{
-			MidiTime t = qMax(
-				(int)( _t - w * MidiTime::ticksPerTact() /
-							pixelsPerTact() ),
-									0 );
 			animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
 		}
 		m_scrollBack = false;
 	}
 
 	const int x = m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
-							markerX( _t ) + 8;
+							markerX( t ) + 8;
 	if( x >= trackOpWidth + widgetWidth -1 )
 	{
 		m_positionLine->show();
@@ -597,9 +592,8 @@ void SongEditor::updatePosition( const MidiTime & _t )
 
 void SongEditor::zoomingChanged()
 {
-	const QString & zfac = m_zoomingModel->currentText();
-	setPixelsPerTact( zfac.left( zfac.length() - 1 ).toInt() *
-					DEFAULT_PIXELS_PER_TACT / 100 );
+	setPixelsPerTact( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_TACT );
+
 	m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
 					setPixelsPerTact( pixelsPerTact() );
 	realignTracks();
@@ -607,10 +601,13 @@ void SongEditor::zoomingChanged()
 
 
 
+
 bool SongEditor::allowRubberband() const
 {
 	return m_mode == SelectMode;
 }
+
+
 
 
 SongEditorWindow::SongEditorWindow(Song* song) :

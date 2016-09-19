@@ -2,6 +2,7 @@
 #cmakedefine LMMS_BUILD_WIN32
 #cmakedefine LMMS_BUILD_WIN64
 #cmakedefine LMMS_BUILD_APPLE
+#cmakedefine LMMS_BUILD_OPENBSD
 #cmakedefine LMMS_BUILD_HAIKU
 
 #cmakedefine LMMS_HOST_X86
@@ -12,6 +13,7 @@
 #cmakedefine LMMS_HAVE_JACK
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS
+#cmakedefine LMMS_HAVE_SNDIO
 #cmakedefine LMMS_HAVE_PORTAUDIO
 #cmakedefine LMMS_HAVE_SOUNDIO
 #cmakedefine LMMS_HAVE_PULSEAUDIO

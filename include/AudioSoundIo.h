@@ -45,6 +45,8 @@ class AudioSoundIoSetupUtil : public QObject
 {
 	Q_OBJECT
 public:
+	virtual ~AudioSoundIoSetupUtil();
+
 	void *m_setupWidget;
 public slots:
 	void updateDevices();

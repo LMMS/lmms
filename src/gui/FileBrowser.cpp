@@ -46,6 +46,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "DataFile.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
@@ -477,9 +478,6 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 							embed::getIconPixmap( "vst_plugin_file" ), this );
 					break;
 				case FileItem::MidiFile:
-// don't allow dragging FLP-files as FLP import filter clears project
-// without asking
-//				case fileItem::FlpFile:
 					new StringPairDrag( "importedproject", f->fullName(),
 							embed::getIconPixmap( "midi_file" ), this );
 					break;
@@ -533,7 +531,7 @@ void FileBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 {
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 	switch( f->handling() )
 	{
 		case FileItem::LoadAsProject:
@@ -567,11 +565,6 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 		}
 
 		case FileItem::ImportAsProject:
-			if( f->type() == FileItem::FlpFile &&
-				!gui->mainWindow()->mayChangeProject(true) )
-			{
-				break;
-			}
 			ImportFilter::import( f->fullName(),
 							Engine::getSong() );
 			break;
@@ -581,7 +574,7 @@ void FileBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
 			break;
 
 	}
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -603,12 +596,10 @@ void FileBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 	}
 	else if( f->handling() != FileItem::NotSupported )
 	{
-//		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack,
 					Engine::getBBTrackContainer() ) );
 		handleFile( f, it );
-//		engine::mixer()->unlock();
 	}
 }
 
@@ -620,11 +611,9 @@ void FileBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 	if( m_contextMenuItem->handling() == FileItem::LoadAsPreset ||
 		m_contextMenuItem->handling() == FileItem::LoadByPlugin )
 	{
-//		engine::mixer()->lock();
 		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
 				Track::create( Track::InstrumentTrack, tc ) );
 		handleFile( m_contextMenuItem, it );
-//		engine::mixer()->unlock();
 	}
 }
 
@@ -856,7 +845,6 @@ QPixmap * FileItem::s_sampleFilePixmap = NULL;
 QPixmap * FileItem::s_soundfontFilePixmap = NULL;
 QPixmap * FileItem::s_vstPluginFilePixmap = NULL;
 QPixmap * FileItem::s_midiFilePixmap = NULL;
-QPixmap * FileItem::s_flpFilePixmap = NULL;
 QPixmap * FileItem::s_unknownFilePixmap = NULL;
 
 
@@ -921,12 +909,6 @@ void FileItem::initPixmaps( void )
 							"midi_file", 16, 16 ) );
 	}
 
-	if( s_flpFilePixmap == NULL )
-	{
-		s_flpFilePixmap = new QPixmap( embed::getIconPixmap(
-							"midi_file", 16, 16 ) );
-	}
-
 	if( s_unknownFilePixmap == NULL )
 	{
 		s_unknownFilePixmap = new QPixmap( embed::getIconPixmap(
@@ -953,9 +935,6 @@ void FileItem::initPixmaps( void )
 			break;
 		case MidiFile:
 			setIcon( 0, *s_midiFilePixmap );
-			break;
-		case FlpFile:
-			setIcon( 0, *s_flpFilePixmap );
 			break;
 		case UnknownFile:
 		default:
@@ -998,11 +977,6 @@ void FileItem::determineFileType( void )
 	else if( ext == "mid" )
 	{
 		m_type = MidiFile;
-		m_handling = ImportAsProject;
-	}
-	else if( ext == "flp" )
-	{
-		m_type = FlpFile;
 		m_handling = ImportAsProject;
 	}
 	else if( ext == "dll" )

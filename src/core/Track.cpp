@@ -62,6 +62,7 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "DataFile.h"
 #include "PixmapButton.h"
 #include "ProjectJournal.h"
@@ -256,6 +257,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_selectedColor( 0, 0, 0 ),
 	m_textColor( 0, 0, 0 ),
 	m_textShadowColor( 0, 0, 0 ),
+	m_BBPatternBackground( 0, 0, 0 ),
 	m_gradient( true ),
 	m_needsUpdate( true )
 {
@@ -314,6 +316,10 @@ TrackContentObjectView::~TrackContentObjectView()
  */
 void TrackContentObjectView::update()
 {
+	if( fixedTCOs() )
+	{
+		updateLength();
+	}
 	m_needsUpdate = true;
 	selectableObject::update();
 }
@@ -352,6 +358,9 @@ QColor TrackContentObjectView::textColor() const
 QColor TrackContentObjectView::textShadowColor() const
 { return m_textShadowColor; }
 
+QColor TrackContentObjectView::BBPatternBackground() const
+{ return m_BBPatternBackground; }
+
 bool TrackContentObjectView::gradient() const
 { return m_gradient; }
 
@@ -370,6 +379,9 @@ void TrackContentObjectView::setTextColor( const QColor & c )
 
 void TrackContentObjectView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
+
+void TrackContentObjectView::setBBPatternBackground( const QColor & c )
+{ m_BBPatternBackground = QColor( c ); }
 
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
@@ -1777,7 +1789,12 @@ void TrackOperationsWidget::cloneTrack()
 	TrackView *newTrackView = tcView->createTrackView( newTrack );
 
 	int index = tcView->trackViews().indexOf( m_trackView );
-	tcView->moveTrackView( newTrackView, index + 1 );
+	int i = tcView->trackViews().size();
+	while ( i != index + 1 )
+	{
+		tcView->moveTrackView( newTrackView, i - 1 );
+		i--;
+	}
 }
 
 
@@ -1941,6 +1958,8 @@ Track::~Track()
  */
 Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = NULL;
 
 	switch( tt )
@@ -1956,7 +1975,15 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
+	if( tc == Engine::getBBTrackContainer() && t )
+	{
+		t->createTCOsForBB( Engine::getBBTrackContainer()->numOfBBs()
+									- 1 );
+	}
+
 	tc->updateAfterTrackAdd();
+
+	Engine::mixer()->doneChangeInModel();
 
 	return t;
 }
@@ -1971,6 +1998,8 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
  */
 Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = create(
 		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
 									tc );
@@ -1978,6 +2007,9 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 	{
 		t->restoreState( element );
 	}
+
+	Engine::mixer()->doneChangeInModel();
+
 	return t;
 }
 
@@ -2314,6 +2346,20 @@ void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
 
 
 
+void Track::createTCOsForBB( int bb )
+{
+	while( numOfTCOs() < bb + 1 )
+	{
+		MidiTime position = MidiTime( numOfTCOs(), 0 );
+		TrackContentObject * tco = createTCO( position );
+		tco->movePosition( position );
+		tco->changeLength( MidiTime( 1, 0 ) );
+	}
+}
+
+
+
+
 /*! \brief Move all the trackContentObjects after a certain time later by one bar.
  *
  *  \param pos The time at which we want to insert the bar.
@@ -2616,9 +2662,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		m_track->lock();
+		Engine::mixer()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		m_track->unlock();
+		Engine::mixer()->doneChangeInModel();
 		de->accept();
 	}
 }

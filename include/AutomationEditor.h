@@ -27,6 +27,7 @@
 #define AUTOMATION_EDITOR_H
 
 #include <QtCore/QMutex>
+#include <QVector>
 #include <QWidget>
 
 #include "Editor.h"
@@ -162,7 +163,7 @@ private:
 	} ;
 
 	// some constants...
-	static const int SCROLLBAR_SIZE = 14;
+	static const int SCROLLBAR_SIZE = 12;
 	static const int TOP_MARGIN = 16;
 
 	static const int DEFAULT_Y_DELTA = 6;
@@ -185,6 +186,8 @@ private:
 	ComboBoxModel m_zoomingXModel;
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
+
+	static const QVector<double> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
@@ -249,6 +252,7 @@ signals:
 	void currentPatternChanged();
 	void positionChanged( const MidiTime & );
 } ;
+
 
 
 

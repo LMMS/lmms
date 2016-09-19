@@ -62,12 +62,12 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-			     + 2 * TCO_BORDER_WIDTH + 264 );
+			     + 2 * TCO_BORDER_WIDTH + 384 );
 	}
 	else
 	{
 		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-			     + 2 * TCO_BORDER_WIDTH + 264 );
+			     + 2 * TCO_BORDER_WIDTH + 384 );
 	}
 
 
@@ -99,6 +99,10 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
+	trackAndStepActionsToolBar->addAction(
+				embed::getIconPixmap("add_sample_track"),
+				tr("Add sample-track"), m_trackContainerView,
+				SLOT(addSampleTrack()));
 	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
@@ -205,6 +209,14 @@ void BBTrackContainerView::removeSteps()
 			p->removeSteps();
 		}
 	}
+}
+
+
+
+
+void BBTrackContainerView::addSampleTrack()
+{
+	(void) Track::create( Track::SampleTrack, model() );
 }
 
 

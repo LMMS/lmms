@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -116,6 +116,7 @@ static void activateTapeDelay(LADSPA_Handle instance) {
 	last_in = 0.0f;
 	last2_in = 0.0f;
 	last3_in = 0.0f;
+	sample_rate = sample_rate;
 	z0 = 0.0f;
 	z1 = 0.0f;
 	z2 = 0.0f;
@@ -191,7 +192,7 @@ static void connectPortTapeDelay(
 static LADSPA_Handle instantiateTapeDelay(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	TapeDelay *plugin_data = (TapeDelay *)malloc(sizeof(TapeDelay));
+	TapeDelay *plugin_data = (TapeDelay *)calloc(1, sizeof(TapeDelay));
 	LADSPA_Data *buffer = NULL;
 	unsigned int buffer_mask;
 	unsigned int buffer_size;
@@ -475,14 +476,13 @@ static void runAddingTapeDelay(LADSPA_Handle instance, unsigned long sample_coun
 	plugin_data->z2 = z2;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -644,12 +644,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (tapeDelayDescriptor) {
 		free((LADSPA_PortDescriptor *)tapeDelayDescriptor->PortDescriptors);
 		free((char **)tapeDelayDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)tapeDelayDescriptor->PortRangeHints);
 		free(tapeDelayDescriptor);
 	}
+	tapeDelayDescriptor = NULL;
 
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project type="song" version="1.0" creator="LMMS" creatorversion="1.2.0">
+  <head timesig_denominator="4" bpm="140" masterpitch="0" mastervol="100" timesig_numerator="4"/>
+  <song>
+    <trackcontainer visible="1" width="600" height="300" type="song" x="6" y="5" maximized="0" minimized="0"/>
+    <track type="6" muted="0" name="Automation track" solo="0">
+      <automationtrack/>
+      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Numerator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Denominator" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Tempo" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master volume" pos="0" tens="1" len="192"/>
+      <automationpattern prog="0" mute="0" name="Master pitch" pos="0" tens="1" len="192"/>
+    </track>
+    <fxmixer visible="1" width="561" height="332" x="5" y="310" maximized="0" minimized="0">
+      <fxchannel num="0" muted="0" volume="1" name="Master" soloed="0">
+        <fxchain numofeffects="0" enabled="0"/>
+        <connection>
+          <muted>
+            <Midicontroller type="2" inputchannel="1" fixedinputvelocity="-1" outputcontroller="0" inports="" name="MIDI ch1 ctrl37" outputchannel="1" fixedoutputvelocity="-1" readable="1" fixedoutputnote="-1" outputprogram="1" writable="0" basevelocity="127" inputcontroller="37"/>
+          </muted>
+        </connection>
+      </fxchannel>
+    </fxmixer>
+    <ControllerRackView visible="1" width="258" height="142" x="836" y="407" maximized="0" minimized="0"/>
+    <pianoroll visible="0" width="640" height="480" x="1" y="1" maximized="0" minimized="0"/>
+    <automationeditor visible="0" width="640" height="400" x="56" y="255" maximized="0" minimized="0"/>
+    <projectnotes visible="0" width="640" height="400" x="1" y="1" maximized="0" minimized="0"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'Verdana'; font-size:11pt; font-weight:600; font-style:normal;">
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Droid Sans'; font-size:10pt; font-weight:400; color:#e0e0e0;">Put down your project notes here.</span></p></body></html>]]></projectnotes>
+    <timeline lp0pos="0" lp1pos="192" lpstate="0"/>
+    <controllers/>
+  </song>
+</lmms-project>

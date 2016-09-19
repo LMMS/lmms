@@ -33,6 +33,7 @@
 #include "Song.h"
 #include "lmms_math.h"
 #include "interpolation.h"
+#include "Mixer.h"
 #include "Oscillator.h"
 
 #include "embed.cpp"

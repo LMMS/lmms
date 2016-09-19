@@ -412,6 +412,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 	s_infoMap[this] = bbNum;
 
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
+	Engine::getBBTrackContainer()->createTCOsForBB( bbNum );
 	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	Engine::getBBTrackContainer()->updateComboBox();
 
@@ -425,8 +426,9 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 BBTrack::~BBTrack()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( this,
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+					PlayHandle::TypeNotePlayHandle
+					| PlayHandle::TypeInstrumentPlayHandle
+					| PlayHandle::TypeSamplePlayHandle );
 
 	const int bb = s_infoMap[this];
 	Engine::getBBTrackContainer()->removeBB( bb );
@@ -548,7 +550,6 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
-		Engine::getBBTrackContainer()->createTCOsForBB( dst );
 		TrackContainer::TrackList tl =
 					Engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination

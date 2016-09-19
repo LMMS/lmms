@@ -5,6 +5,9 @@ PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev  libogg-dev
 	libfluidsynth-dev portaudio19-dev wine-dev g++-multilib libfltk1.3-dev
 	libgig-dev libsoundio-dev"
 
+# Help with unmet dependencies
+PACKAGES="$PACKAGES libjack0"
+
 if [ $QT5 ]; then
 	PACKAGES="$PACKAGES qtbase5-dev qttools5-dev-tools qttools5-dev"
 else

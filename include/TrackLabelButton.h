@@ -27,6 +27,7 @@
 #define TRACK_LABEL_BUTTON_H
 
 #include <QToolButton>
+#include <QLineEdit>
 
 
 class TrackView;
@@ -42,6 +43,7 @@ public:
 
 public slots:
 	void rename();
+	void renameFinished();
 
 
 protected:
@@ -55,6 +57,7 @@ protected:
 private:
 	TrackView * m_trackView;
 	QString m_iconName;
+	QLineEdit * m_renameLineEdit;
 
 } ;
 

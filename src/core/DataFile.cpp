@@ -37,11 +37,16 @@
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
+#include "embed.h"
 #include "GuiApplication.h"
+#include "lmms_basics.h"
 #include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
+#include "TextFloat.h"
+
+static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 
@@ -191,7 +196,7 @@ bool DataFile::validate( QString extension )
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
 				extension == "sf2" || extension == "pat" || extension == "mid" ||
-				extension == "flp" || extension == "dll"
+				extension == "dll"
 				) )
 		{
 			return true;
@@ -792,6 +797,84 @@ void DataFile::upgrade_0_4_0_rc2()
 }
 
 
+void DataFile::upgrade_1_0_99()
+{
+	jo_id_t last_assigned_id = 0;
+	
+	QList<jo_id_t> idList;
+	findIds(documentElement(), idList);
+	
+	QDomNodeList list = elementsByTagName("ladspacontrols");
+	for(int i = 0; !list.item(i).isNull(); ++i)
+	{
+		for(QDomNode node = list.item(i).firstChild(); !node.isNull();
+			node = node.nextSibling())
+		{
+			QDomElement el = node.toElement();
+			QDomNode data_child = el.namedItem("data");
+			if(!data_child.isElement())
+			{
+				if (el.attribute("scale_type") == "log")
+				{
+					QDomElement me = createElement("data");
+					me.setAttribute("value", el.attribute("data"));
+					me.setAttribute("scale_type", "log");
+					
+					jo_id_t id;
+					for(id = last_assigned_id + 1;
+						idList.contains(id); id++)
+					{
+					}
+					
+					last_assigned_id = id;
+					idList.append(id);
+					me.setAttribute("id", id);
+					el.appendChild(me);
+					
+				}
+			}
+		}
+	}	
+}
+
+
+void DataFile::upgrade_1_1_0()
+{
+	QDomNodeList list = elementsByTagName("fxchannel");
+	for (int i = 1; !list.item(i).isNull(); ++i)
+	{
+		QDomElement el = list.item(i).toElement();
+		QDomElement send = createElement("send");
+		send.setAttribute("channel", "0");
+		send.setAttribute("amount", "1");
+		el.appendChild(send);
+	}
+}
+
+
+void DataFile::upgrade_1_1_91()
+{
+	// Upgrade to version 1.1.91 from some version less than 1.1.91
+	QDomNodeList list = elementsByTagName( "audiofileprocessor" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		QString s = el.attribute( "src" );
+		s.replace( QRegExp("/samples/bassloopes/"), "/samples/bassloops/" );
+		el.setAttribute( "src", s );
+	}
+
+	list = elementsByTagName( "attribute" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if ( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
+			el.setAttribute( "value", "vocoder" );
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -855,6 +938,18 @@ void DataFile::upgrade()
 	if( version < "0.4.0-rc2" )
 	{
 		upgrade_0_4_0_rc2();
+	}
+	if( version < "1.0.99-0" )
+	{
+		upgrade_1_0_99();
+	}
+	if( version < "1.1.0-0" )
+	{
+		upgrade_1_1_0();
+	}
+	if( version < "1.1.91-0" )
+	{
+		upgrade_1_1_91();
 	}
 
 	// update document meta data
@@ -923,31 +1018,36 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	{
 		// compareType defaults to Build,so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute( "creatorversion" );
-		ProjectVersion openedWith = LMMS_VERSION;;
+		ProjectVersion openedWith = LMMS_VERSION;
 
 		if ( createdWith != openedWith )
 		{
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
-			if ( createdWith.setCompareType(Minor) != openedWith)
+			if( createdWith.setCompareType( ProjectVersion::Minor )
+								!= openedWith )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
-					QMessageBox::information( NULL,
-						SongEditor::tr( "Project Version Mismatch" ),
-						SongEditor::tr( 
-								"This %1 was created with "
-								"LMMS version %2, but version %3 "
-								"is installed")
-								.arg( _sourceFile.endsWith( ".mpt" ) ?
-									"template" : 
-									"project" )
-								.arg( root.attribute( "creatorversion" ) )
-								.arg( LMMS_VERSION ) );
+					TextFloat::displayMessage(
+						SongEditor::tr( "Version difference" ),
+						SongEditor::tr(
+							"This %1 was created with "
+							"LMMS %2."
+						).arg(
+							_sourceFile.endsWith( ".mpt" ) ?
+								SongEditor::tr( "template" ) :
+								SongEditor::tr( "project" )
+						)
+						.arg( root.attribute( "creatorversion" ) ),
+						embed::getIconPixmap( "whatsthis", 24, 24 ),
+						2500
+					);
 				}
 			}
 
 			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType(Build) < openedWith )
+			if( createdWith.setCompareType( ProjectVersion::Build )
+								< openedWith )
 			{
 				upgrade();
 			}
@@ -956,5 +1056,20 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 	m_content = root.elementsByTagName( typeName( m_type ) ).
 							item( 0 ).toElement();
+}
+
+
+void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
+{
+	if(elem.hasAttribute("id"))
+	{
+		idList.append(elem.attribute("id").toInt());
+	}
+	QDomElement child = elem.firstChildElement();
+	while(!child.isNull()) 
+	{
+		findIds(child, idList);
+		child = child.nextSiblingElement();
+	}
 }
 

@@ -50,8 +50,7 @@ ELSE()
 	# Mingw tools
 	SET(STRIP                       ${MINGW_TOOL_PREFIX}strip)
 	SET(WINDRES                     ${MINGW_TOOL_PREFIX}windres)
-	SET(PKG_CONFIG_EXECUTABLE       ${MINGW_TOOL_PREFIX}pkg-config)
-	SET(PKG_CONFIG_FOUND            TRUE)
+	SET(ENV{PKG_CONFIG}             ${MINGW_TOOL_PREFIX}pkg-config)
 	
 	# Search for programs in the build host directories
 	SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -85,7 +84,7 @@ IF(NOT DEFINED ENV{MINGW_DEBUG_INFO})
 	MESSAGE("* CMAKE_CXX_COMPILER                   : ${CMAKE_CXX_COMPILER}")
 	MESSAGE("* CMAKE_RC_COMPILER                    : ${CMAKE_RC_COMPILER}")
 	MESSAGE("* WINDRES                              : ${WINDRES}")
-	MESSAGE("* PKG_CONFIG_EXECUTABLE                : ${PKG_CONFIG_EXECUTABLE}")
+	MESSAGE("* ENV{PKG_CONFIG}                      : $ENV{PKG_CONFIG}")
 	MESSAGE("* MINGW_TOOL_PREFIX32                  : ${MINGW_TOOL_PREFIX32}")
 	MESSAGE("* CMAKE_C_COMPILER32                   : ${CMAKE_C_COMPILER32}")
 	MESSAGE("* CMAKE_CXX_COMPILER32                 : ${CMAKE_CXX_COMPILER32}")

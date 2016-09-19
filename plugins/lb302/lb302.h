@@ -37,7 +37,6 @@
 #include "InstrumentView.h"
 #include "LedCheckbox.h"
 #include "Knob.h"
-#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include <QMutex>
 

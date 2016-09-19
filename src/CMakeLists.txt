@@ -53,6 +53,7 @@ INCLUDE_DIRECTORIES(
 	${JACK_INCLUDE_DIRS}
 	${SAMPLERATE_INCLUDE_DIRS}
 	${SNDFILE_INCLUDE_DIRS}
+	${SNDIO_INCLUDE_DIRS}
 )
 
 IF(NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
@@ -70,6 +71,13 @@ ENDIF()
 IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
 ENDIF()
+
+# Use libraries in non-standard directories (e.g., another version of Qt)
+IF(LMMS_BUILD_LINUX)
+	LINK_LIBRARIES(-Wl,--enable-new-dtags)
+	SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+ENDIF()
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # ADD_LIBRARY's OBJECT is only supported in CMake >=2.8.8
 IF(CMAKE_VERSION VERSION_GREATER "2.8.7")
@@ -106,6 +114,10 @@ IF(LMMS_BUILD_APPLE)
 	SET(EXTRA_LIBRARIES "-framework CoreMIDI")
 ENDIF()
 
+if(LMMS_HAVE_OSS AND LMMS_BUILD_OPENBSD)
+    SET(EXTRA_LIBRARIES "-lossaudio")
+endif()
+
 SET(LMMS_REQUIRED_LIBS
 	${CMAKE_THREAD_LIBS_INIT}
 	${QT_LIBRARIES}
@@ -113,6 +125,7 @@ SET(LMMS_REQUIRED_LIBS
 	${SDL_LIBRARY}
 	${PORTAUDIO_LIBRARIES}
 	${SOUNDIO_LIBRARY}
+	${SNDIO_LIBRARY}
 	${PULSEAUDIO_LIBRARIES}
 	${JACK_LIBRARIES}
 	${OGGVORBIS_LIBRARIES}
@@ -171,13 +184,8 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
 					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
-					"${MINGW_PREFIX}/bin/libfltk.dll"
-					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-					"${MINGW_PREFIX}/bin/libgig-6.dll"
-					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
-					"${MINGW_PREFIX}/lib/libsoundio.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
 					"${MINGW_PREFIX}/bin/SDL.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
@@ -189,6 +197,31 @@ IF(LMMS_BUILD_WIN32)
 		INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
 					"${MINGW_PREFIX}/bin/libstdc++-6.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(FLTK_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libfltk.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(FLUIDSYNTH_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(GIG_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libgig-6.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(PORTAUDIO_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(SOUNDIO_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/lib/libsoundio.dll"
 				DESTINATION .)
 	ENDIF()
 

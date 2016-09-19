@@ -29,10 +29,11 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include "Mixer.h"
-#include "SampleBuffer.h"
+#include "MidiTime.h"
+#include "PlayHandle.h"
 
 class BBTrack;
+class SampleBuffer;
 class SampleTCO;
 class Track;
 
