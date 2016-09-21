@@ -24,11 +24,15 @@
  */
 
 #include "EqParameterWidget.h"
-#include "lmms_math.h"
-#include "EqControls.h"
+
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QWidget>
+
+#include "lmms_math.h"
+#include "EqControls.h"
 
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
@@ -47,13 +51,13 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
 
 	//GraphicsScene and GraphicsView stuff
-	m_scene = new QGraphicsScene();
-	m_scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	m_view = new QGraphicsView(this);
-	m_view->setStyleSheet(  "border-style: none; background: transparent;");
-	m_view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_view->setScene( m_scene );
+	QGraphicsScene *scene = new QGraphicsScene();
+	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
+	QGraphicsView *view = new QGraphicsView(this);
+	view->setStyleSheet(  "border-style: none; background: transparent;");
+	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	view->setScene( scene );
 
 	//adds the handles
 	m_handleList = new QList<EqHandle*>;
@@ -62,12 +66,12 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 		m_handle = new EqHandle ( i, m_displayWidth, m_displayHeigth );
 		m_handleList->append( m_handle );
 		m_handle->setZValue(1);
-		m_scene->addItem( m_handle );
+		scene->addItem( m_handle );
 	}
 
 	//adds the curve widget
 	m_eqcurve = new EqCurve( m_handleList, m_displayWidth, m_displayHeigth );
-	m_scene->addItem( m_eqcurve );
+	scene->addItem( m_eqcurve );
 	for ( int i = 0; i < bandCount(); i++ )
 	{
 		// if the data of handle position has changed update the models

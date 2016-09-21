@@ -26,17 +26,14 @@
 
 #ifndef EQPARAMETERWIDGET_H
 #define EQPARAMETERWIDGET_H
-#include <QWidget>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QGraphicsView>
-#include "EffectControls.h"
-#include "TextFloat.h"
-#include "EqCurve.h"
 
+#include <QWidget>
+
+#include "EffectControls.h"
+#include "EqCurve.h"
+#include "TextFloat.h"
 
 class EqControls;
-
 
 class EqBand
 {
@@ -58,9 +55,8 @@ public :
 	QString name;
 	float* peakL;
 	float* peakR;
-
-
 };
+
 
 
 
@@ -72,7 +68,7 @@ public:
 	~EqParameterWidget();
 	QList<EqHandle*> *m_handleList;
 
-	void changeHandle(int i);
+	void changeHandle( int i );
 
 	const int bandCount()
 	{
@@ -94,9 +90,6 @@ private:
 	int m_displayWidth, m_displayHeigth;
 	bool m_notFirst;
 	EqControls *m_controls;
-
-	QGraphicsView *m_view;
-	QGraphicsScene *m_scene;
 	EqHandle *m_handle;
 	EqCurve *m_eqcurve;
 

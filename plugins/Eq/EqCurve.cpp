@@ -21,28 +21,28 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
 #include "EqCurve.h"
-#include "lmms_math.h"
+
 #include "Effect.h"
 #include "embed.h"
+#include "lmms_math.h"
 
-EqHandle::EqHandle( int num, int x, int y )
+EqHandle::EqHandle(int num, int x, int y )
+	: m_numb( num )
+	, m_width( x )
+	, m_heigth( y )
+	, m_mousePressed( false )
+	, m_active( false )
+	, m_handleMoved( false )
 {
-	PI = LD_PI;
-	m_numb = num;
-	setMouseHover( false );
-	m_width = x;
-	m_heigth = y;
-	m_mousePressed = false;
-	m_active = false;
+	m_hoverPixmap = PLUGIN_NAME::getIconPixmap( "handlehover" );
 	setFlag( ItemIsMovable );
 	setFlag( ItemSendsGeometryChanges );
 	setAcceptHoverEvents( true );
 	float totalHeight = 36;
 	m_pixelsPerUnitHeight = ( m_heigth ) / ( totalHeight );
-	m_handleMoved = false;
-	QObject::connect( this,SIGNAL( positionChanged() ) , this, SLOT( handleMoved() ) );
+	setMouseHover( false );
+	connect( this, SIGNAL( positionChanged() ), this, SLOT( handleMoved() ) );
 }
 
 
@@ -66,19 +66,13 @@ void EqHandle::handleMoved()
 
 void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
-	painter->setRenderHint( QPainter::Antialiasing, true) ;
+	painter->setRenderHint( QPainter::Antialiasing, true );
 	if ( m_mousePressed )
 	{
 		emit positionChanged();
-
 	}
 
-	// graphics for the handles
-	QString fileName = "handle" + QString::number(m_numb+1);
-	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
-	QPixmap circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
-    painter->drawPixmap( -12, -12, circlePixmap );
-
+	painter->drawPixmap( -12, -12, m_circlePixmap );
 	// on mouse hover draw an info box and change the pixmap of the handle
 	if ( isMouseHover() )
 	{
@@ -95,15 +89,15 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		}
 		if ( EqHandle::x() > m_width - 40 )
 		{
-			rectX = rectX - (40 - (m_width - EqHandle::x() ) );
+			rectX = rectX - ( 40 - ( m_width - EqHandle::x() ) );
 		}
 
-        painter->drawPixmap( -12, -12, PLUGIN_NAME::getIconPixmap( "handlehover" ) );
+		painter->drawPixmap( -12, -12, m_hoverPixmap );
 		QRectF textRect = QRectF ( rectX, rectY, 80, 30 );
 		QRectF textRect2 = QRectF ( rectX+1, rectY+1, 80, 30 );
 		QString freq = QString::number( xPixelToFreq(EqHandle::x() )) ;
 		QString res;
-		if ( getType() < 3 || getType() > 3 )
+		if ( !(getType() == para ) )
 		{
 			res = tr( "Reso: ") + QString::number( getResonance() );
 		}
@@ -131,15 +125,15 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 QPainterPath EqHandle::getCurvePath()
 {
 	QPainterPath path;
-	float y = m_heigth*0.5;
-	for ( float x=0 ; x < m_width; x++ )
+	float y = m_heigth * 0.5;
+	for ( float x = 0 ; x < m_width; x++ )
 	{
-		if ( m_type == 1 ) y = getLowCutCurve( x );
-		if ( m_type == 2 ) y = getLowShelfCurve( x );
-		if ( m_type == 3 ) y = getPeakCurve( x );
-		if ( m_type == 4 ) y = getHighShelfCurve( x );
-		if ( m_type == 5 ) y = getHighCutCurve( x );
-		if ( x==0 ) path.moveTo( x, y ); // sets the begin of Path
+		if ( m_type == highpass ) y = getLowCutCurve( x );
+		if ( m_type == lowshelf ) y = getLowShelfCurve( x );
+		if ( m_type == para ) y = getPeakCurve( x );
+		if ( m_type == highshelf ) y = getHighShelfCurve( x );
+		if ( m_type == lowpass ) y = getHighCutCurve( x );
+		if ( x == 0 ) path.moveTo( x, y ); // sets the begin of Path
 		path.lineTo( x, y );
 	}
 	return path;
@@ -149,45 +143,40 @@ QPainterPath EqHandle::getCurvePath()
 
 
 
-float EqHandle::getPeakCurve(float x)
+float EqHandle::getPeakCurve( float x )
 {
-		double freqZ = xPixelToFreq( EqHandle::x() );
-		const int SR = Engine::mixer()->processingSampleRate();
-		double w0 = 2* PI * freqZ / SR ;
-		double c = cosf( w0 );
-		double s = sinf( w0 );
-		double Q = getResonance();
-		double A =  pow( 10, yPixelToGain(EqHandle::y()) / 40 );
-		double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
-		double a0, a1, a2, b0, b1, b2; // coeffs to calculate
+	double freqZ = xPixelToFreq( EqHandle::x() );
+	const int SR = Engine::mixer()->processingSampleRate();
+	double w0 = 2 * LD_PI * freqZ / SR ;
+	double c = cosf( w0 );
+	double s = sinf( w0 );
+	double Q = getResonance();
+	double A =  pow( 10, yPixelToGain( EqHandle::y() ) / 40 );
+	double alpha = s * sinh( log( 2 ) / 2 * Q * w0 / sinf( w0 ) );
+	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-		//calc coefficents
-		b0 =   1 + alpha*A;
-		b1 =  -2*c;
-		b2 =   1 - alpha*A;
-		a0 =   1 + alpha/A;
-		a1 =  -2*c;
-		a2 =   1 - alpha/A;
+	//calc coefficents
+	b0 =   1 + alpha*A;
+	b1 =  -2 * c;
+	b2 =   1 - alpha*A;
+	a0 =   1 + alpha/A;
+	a1 =  -2 * c;
+	a2 =   1 - alpha/A;
 
-		//normalise
-		b0 /= a0;
-		b1 /= a0;
-		b2 /= a0;
-		a1 /= a0;
-		a2 /= a0;
-		a0 = 1;
+	//normalise
+	b0 /= a0;
+	b1 /= a0;
+	b2 /= a0;
+	a1 /= a0;
+	a2 /= a0;
+	a0 = 1;
 
-		double w;
-		double PHI;
-		double gain;
-		double freq = xPixelToFreq( x );
-		w = 2*PI * freq / SR;
-		PHI = pow( sin( w/2 ), 2 )*4;
-		gain = 10* log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1*(b0+b2 )+ 4*b0*b2 ) ) *PHI )
-						  - 10*log10( pow( 1+ a1+ a2 ,2 ) + ( 1* a2 * PHI - ( a1 * ( 1+ a2 ) +4 *1 * a2 ) ) *PHI );
-		float y= gainToYPixel( gain );
-		return y;
+	double gain;
+	double freq = xPixelToFreq( x );
+	gain = calculateGain( freq, a1, a2, b0, b1, b2 );
+	float y= gainToYPixel( gain );
+
+	return y;
 }
 
 
@@ -197,7 +186,7 @@ float EqHandle::getHighShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x() );
 	const int SR = Engine::mixer()->processingSampleRate();
-	double w0 = 2 * PI * freqZ / SR;
+	double w0 = 2 * LD_PI * freqZ / SR;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y() ) * 0.025 );
@@ -219,16 +208,11 @@ float EqHandle::getHighShelfCurve( float x )
 	a2 /= a0;
 	a0 = 1;
 
-	double w;
-	double PHI;
 	double gain;
 	double freq = xPixelToFreq( x );
-	w = 2* PI * freq /  SR ;
-	PHI = pow(sin( w/2 ), 2 ) * 4;
-	gain = 10* log10( pow( b0 + b1 + b2 , 2 )
-					  + ( b0 * b2 * PHI - ( b1*( b0+b2 )+ 4*b0*b2 ) ) *PHI )
-					  - 10*log10( pow(1+ a1+ a2 ,2 ) + ( 1* a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2) ) *PHI );
+	gain = calculateGain( freq, a1, a2, b0, b1, b2 );
 	float y= gainToYPixel( gain );
+
 	return y;
 }
 
@@ -239,7 +223,7 @@ float EqHandle::getLowShelfCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x() );
 	const int SR = Engine::mixer()->processingSampleRate();
-	double w0 = 2 * PI * freqZ / SR ;
+	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double A =  pow( 10, yPixelToGain( EqHandle::y() ) / 40 );
@@ -262,16 +246,11 @@ float EqHandle::getLowShelfCurve( float x )
 	a2 /= a0;
 	a0 = 1;
 
-	double w;
-	double PHI;
 	double gain;
 	double freq = xPixelToFreq( x );
-	w = 2* PI * freq / SR ;
-	PHI = pow( sin( w/2 ), 2 ) * 4;
-	gain = 10 * log10( pow( b0 + b1 + b2 , 2 )
-					  + ( b0 * b2 * PHI - ( b1 * ( b0+b2 ) + 4 * b0 * b2 ) ) *PHI )
-					  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
+	gain = calculateGain( freq, a1, a2, b0, b1, b2 );
 	float y= gainToYPixel( gain );
+
 	return y;
 }
 
@@ -282,7 +261,7 @@ float EqHandle::getLowCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x() );
 	const int SR = Engine::mixer()->processingSampleRate();
-	double w0 = 2 * PI * freqZ / SR ;
+	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double resonance = getResonance();
@@ -304,37 +283,20 @@ float EqHandle::getLowCutCurve( float x )
 	a2 /= a0;
 	a0 = 1;
 
-	double w;
-	double PHI;
 	double gain;
 	double freq = xPixelToFreq( x );
-	w = 2 * PI * freq / SR ;
-	PHI = pow( sin( w/2), 2 ) * 4;
-	gain = 10 * log10( pow( b0 + b1 + b2 , 2 )
-					  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-					  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
-
+	gain = calculateGain( freq, a1, a2, b0, b1, b2 );
 	if ( m_hp24 )
 	{
-		gain = gain + 10 * log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-						  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
-
+		gain += calculateGain( freq, a1, a2, b0, b1, b2 );
 	}
-
 	if ( m_hp48 )
 	{
-		gain = gain + 10 * log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-						  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
-
-		gain = gain + ( 10 * log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-						  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI ));
-
+		gain += calculateGain( freq, a1, a2, b0, b1, b2 );
+		gain += calculateGain( freq, a1, a2, b0, b1, b2 );
 	}
-
 	float y= gainToYPixel( gain );
+
 	return y;
 }
 
@@ -345,7 +307,7 @@ float EqHandle::getHighCutCurve( float x )
 {
 	double freqZ = xPixelToFreq( EqHandle::x() );
 	const int SR = Engine::mixer()->processingSampleRate();
-	double w0 = 2 * PI * freqZ / SR ;
+	double w0 = 2 * LD_PI * freqZ / SR ;
 	double c = cosf( w0 );
 	double s = sinf( w0 );
 	double resonance = getResonance();
@@ -353,14 +315,12 @@ float EqHandle::getHighCutCurve( float x )
 	double alpha = s / 2 * sqrt ( ( A + 1 / A ) * ( 1 / resonance -1 ) +2 );
 	double a0, a1, a2, b0, b1, b2; // coeffs to calculate
 
-
 	b0 = ( 1 - c ) * 0.5;
 	b1 = 1 - c;
 	b2 = ( 1 - c ) * 0.5;
 	a0 = 1 + alpha;
 	a1 = -2 * c;
 	a2 = 1 - alpha;
-
 	//normalise
 	b0 /= a0;
 	b1 /= a0;
@@ -369,38 +329,20 @@ float EqHandle::getHighCutCurve( float x )
 	a2 /= a0;
 	a0 = 1;
 
-	double w;
-	double PHI;
-	double gain;
 	double freq = xPixelToFreq( x );
-	w = 2 * PI * freq / SR ;
-	PHI = pow(sin( w/2),2 )*4;
-
-	gain = 10 * log10( pow( b0 + b1 + b2 , 2 )
-					  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-					  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
-
+	double gain;
+	gain = calculateGain( freq, a1, a2, b0, b1, b2 );
 	if ( m_lp24 )
 	{
-		gain = gain + ( 10 * log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-						  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI ) );
-
+		gain += calculateGain( freq, a1, a2, b0, b1, b2 );
 	}
-
 	if ( m_lp48 )
 	{
-		gain = gain + ( 10 * log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-						  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI ) );
-
-		gain = gain + ( 10 * log10( pow( b0 + b1 + b2 , 2 )
-						  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
-						  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI ) );
+		gain += calculateGain( freq, a1, a2, b0, b1, b2 );
+		gain += calculateGain( freq, a1, a2, b0, b1, b2 );
 	}
-
-
 	float y= gainToYPixel( gain );
+
 	return y;
 }
 
@@ -475,6 +417,9 @@ bool EqHandle::isActiveHandle()
 void EqHandle::setHandleActive( bool a )
 {
 	EqHandle::m_active = a;
+	QString fileName = "handle" + QString::number(m_numb+1);
+	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
+	m_circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
 }
 
 
@@ -551,6 +496,25 @@ void EqHandle::setlp48()
 	m_lp12 = false;
 	m_lp24 = false;
 	m_lp48 = true;
+}
+
+
+
+
+double EqHandle::calculateGain( const double &freq, const double &a1, const double &a2, const double &b0, const double &b1, const double &b2 )
+{
+	double w;
+	double PHI;
+	double gain;
+	const int SR = Engine::mixer()->processingSampleRate();
+
+	w = 2 * LD_PI * freq / SR ;
+	PHI = pow(sin( w/2),2 )*4;
+
+	gain = 10 * log10( pow( b0 + b1 + b2 , 2 )
+					  + ( b0 * b2 * PHI - ( b1 * ( b0 + b2 ) + 4 * b0 * b2 ) ) * PHI )
+					  - 10 * log10( pow( 1 + a1 + a2, 2 ) + ( 1 * a2 * PHI - ( a1 * ( 1 + a2 ) + 4 * 1 * a2 ) ) * PHI );
+	return gain;
 }
 
 
@@ -639,7 +603,7 @@ QVariant EqHandle::itemChange( QGraphicsItem::GraphicsItemChange change, const Q
 	if ( change == ItemPositionChange )
 	{
 		// pass filter don't move in y direction
-		if ( EqHandle::m_type == 1 || EqHandle::m_type == 5 )
+		if ( EqHandle::m_type == highpass || EqHandle::m_type == lowpass )
 		{
 			float newX = value.toPointF().x();
 			if ( newX < 0 )
@@ -703,14 +667,7 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	painter->setRenderHint( QPainter::Antialiasing, true );
 	if( m_modelChanged )
 	{
-		m_curve = QPainterPath();
-		//Computes the main curve
-		//if a band is active the curve will be computed by averaging the curves of each band
-		QMap<float,float> mainCurve;
-		for ( int x = 0; x < m_width ; x++ )
-		{
-			mainCurve[x] = 0;
-		}
+		//counts the active bands
 		int activeHandles=0;
 		for ( int thatHandle = 0; thatHandle<m_handle->count(); thatHandle++ )
 		{
@@ -719,38 +676,40 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 				activeHandles++;
 			}
 		}
+		//Computes the main curve
+		//if a band is active the curve will be computed by averaging the curves of each band
+		QMap<float,float> mainCurve;
 		for ( int thatHandle = 0; thatHandle<m_handle->count(); thatHandle++ )
 		{
 			if ( m_handle->at(thatHandle)->isActiveHandle() == true )
 			{
 				for ( int x = 0; x < m_width ; x=x+1 )
 				{
-					if ( m_handle->at( thatHandle )->getType() == 1 )
+					if ( m_handle->at( thatHandle )->getType() == highpass )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at(thatHandle)->getType() == 2 )
+					if ( m_handle->at(thatHandle)->getType() == lowshelf )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getLowShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at( thatHandle )->getType() == 3 )
+					if ( m_handle->at( thatHandle )->getType() == para )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getPeakCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at( thatHandle )->getType() == 4 )
+					if ( m_handle->at( thatHandle )->getType() == highshelf )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighShelfCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
-					if ( m_handle->at(thatHandle)->getType() == 5 )
+					if ( m_handle->at(thatHandle)->getType() == lowpass )
 					{
 						mainCurve[x]= ( mainCurve[x] + ( m_handle->at( thatHandle )->getHighCutCurve( x ) * ( activeHandles ) ) - ( ( activeHandles * ( m_heigth/2 ) ) - m_heigth ) );
 					}
 				}
 			}
 		}
-
-
 		//compute a QPainterPath
+		m_curve = QPainterPath();
 		for ( int x = 0; x < m_width ; x++ )
 		{
 			mainCurve[x] = ( ( mainCurve[x] / activeHandles ) ) - ( m_heigth/2 );
@@ -760,14 +719,23 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 			}
 			m_curve.lineTo( x, mainCurve[x] );
 		}
-	}
-	//and paint it with Pathstroker
-	QPainterPathStroker stroke;
-	QPainterPath strokeP;
-	stroke.setWidth( 2 );
-	strokeP = stroke.createStroke( m_curve );
-	painter->fillPath( strokeP, QBrush( Qt::white ) );
+		//we cache the curve painting in a pixmap for saving cpu
+		QPixmap cacheMap( boundingRect().size().toSize() );
+		cacheMap.fill( QColor( 0, 0, 0, 0 ) );
+		QPainter cachePainter( &cacheMap );
+		cachePainter.setRenderHint( QPainter::Antialiasing, true );
+		QPen pen;
+		pen.setWidth( 2 );
+		pen.setColor( Qt::white );
+		cachePainter.setPen( pen );
+		cachePainter.drawPath( m_curve );
+		cachePainter.end();
 
+		m_curvePixmapCache.fill( QColor( 0, 0, 0, 0 ) );
+		m_curvePixmapCache.swap( cacheMap );
+	}
+	//we paint our cached curve
+	painter->drawPixmap( 0, 0, m_width, m_heigth, m_curvePixmapCache );
 	// if mouse hover a handle, m_alpha counts up slow for blend in the filled EQ curve
 	// todo: a smarter way of this "if-monster"
 	QColor curveColor;
@@ -782,15 +750,18 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 		 )
 	{
 		if ( m_alpha < 40 )
+		{
 			m_alpha = m_alpha + 10;
+		}
 	}
 	else
 	{
 		if ( m_alpha > 0 )
+		{
 			m_alpha = m_alpha - 10;
+		}
 	}
-
-	//draw on mouse hover the curve of hovered filter
+	//draw on mouse hover the curve of hovered filter in different colors
 	for ( int i = 0; i < m_handle->count(); i++ )
 	{
 		if ( m_handle->at(i)->isMouseHover() )
@@ -812,7 +783,7 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 			painter->drawPath( m_handle->at( i )->getCurvePath() );
 		}
 	}
-	// draw on mouse hover the EQ curve filled. with m_alpha it blends in and out smooth
+	//draw on mouse hover the EQ curve filled. with m_alpha it blends in and out smooth
 	QPainterPath cPath;
 	cPath.addPath( m_curve );
 	cPath.lineTo( cPath.currentPosition().x(), m_heigth );
@@ -824,7 +795,7 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 
 
-void EqCurve::setModelChanged(bool mc)
+void EqCurve::setModelChanged( bool mc )
 {
 	m_modelChanged = mc;
 }

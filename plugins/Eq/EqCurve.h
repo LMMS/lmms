@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QGraphicsSceneWheelEvent>
 #include "lmms_math.h"
+#include "AutomatableModelView.h"
 
 
 enum{
@@ -48,7 +49,7 @@ class EqHandle : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	EqHandle( int num, int x, int y );
+	EqHandle(int num, int x, int y);
 	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
 	QPainterPath getCurvePath();
 	float getPeakCurve( float x );
@@ -74,7 +75,7 @@ public:
 	void setlp24();
 	void setlp48();
 private:
-	long double PI;
+	double calculateGain( const double &freq, const double &a1, const double &a2, const double &b0, const double &b1, const double &b2 );
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_scale;
@@ -85,13 +86,15 @@ private:
 	bool m_lp24;
 	bool m_lp48;
 	bool m_mouseHover;
-	bool m_active;
 	int m_type, m_numb;
-	float m_resonance;
 	float m_width, m_heigth;
+	float m_resonance;
 	bool m_mousePressed;
+	bool m_active;
 	bool m_handleMoved;
 	QRectF boundingRect() const;
+	QPixmap m_circlePixmap;
+	QPixmap m_hoverPixmap;
 
 
 
@@ -166,6 +169,7 @@ private:
 	int m_alpha;
 	bool m_modelChanged;
 
+	QPixmap m_curvePixmapCache;
 	float m_pixelsPerUnitHeight;
 	float m_scale;
 

@@ -25,16 +25,17 @@
 #ifndef EQCONTROLSDIALOG_H
 #define EQCONTROLSDIALOG_H
 
+#include <QLabel>
+#include <QPushButton>
+
 #include "EffectControlDialog.h"
+#include "EqParameterWidget.h"
+#include "EqSpectrumView.h"
 #include "Fader.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "EqParameterWidget.h"
 #include "MainWindow.h"
-#include "EqSpectrumView.h"
 #include "PixmapButton.h"
-#include <QLabel>
-#include <QPushButton>
 
 
 
@@ -44,44 +45,22 @@ class EqControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	EqControlsDialog( EqControls* controls );
+	EqControlsDialog( EqControls * controls );
 	virtual ~EqControlsDialog()
 	{
 	}
 
-	EqBand * setBand(EqControls *controls);
+	EqBand * setBand( EqControls * controls );
 
 private:
 	EqControls * m_controls;
-	Fader* m_inGainFader;
-	Fader* m_outGainFader;
-	Fader* m_gainFader;
-	Knob* m_resKnob;
-	Knob* m_freqKnob;
-	PixmapButton* m_inSpecB;
-	PixmapButton* m_outSpecB;
-	PixmapButton* m_activeBox;
-	PixmapButton* m_lp12Box;
-	PixmapButton* m_lp24Box;
-	PixmapButton* m_lp48Box;
-	PixmapButton* m_hp12Box;
-	PixmapButton* m_hp24Box;
-	PixmapButton* m_hp48Box;
-	LedCheckBox* m_analyzeBox;
-	EqParameterWidget* m_parameterWidget;
-	EqSpectrumView* m_inSpec;
-	EqSpectrumView* m_outSpec;
-	QLabel* m_freqLabel;
-	QLabel* m_resLabel1;
-	QLabel* m_resLabel2;
-	QLabel* m_bandWidthLabel;
-
+	EqParameterWidget * m_parameterWidget;
 
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
-	EqBand* setBand( int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color, QString name, float* peakL, float* peakR, BoolModel *hp12, BoolModel *hp24, BoolModel *hp48, BoolModel *lp12, BoolModel *lp24, BoolModel *lp48 )
+	EqBand * setBand( int index, BoolModel * active, FloatModel * freq, FloatModel * res, FloatModel * gain, QColor color, QString name, float * peakL, float * peakR, BoolModel * hp12, BoolModel * hp24, BoolModel * hp48, BoolModel * lp12, BoolModel * lp24, BoolModel * lp48 )
 	{
-		EqBand* filterModels = m_parameterWidget->getBandModels( index );
+		EqBand * filterModels = m_parameterWidget->getBandModels( index );
 		filterModels->active = active;
 		filterModels->freq = freq;
 		filterModels->res = res;
@@ -99,9 +78,6 @@ private:
 	}
 
 	int m_originalHeight;
-
 };
-
-
 
 #endif // EQCONTROLSDIALOG_H
