@@ -288,6 +288,9 @@ protected slots:
 	void play();
 	void stop();
 
+private slots:
+	void updateWindowTitle();
+
 private:
 	QAction* m_discreteAction;
 	QAction* m_linearAction;
