@@ -43,14 +43,14 @@ enum{
 
 
 
-
 // implements the Eq_Handle to control a band
 class EqHandle : public QGraphicsObject
 {
 	Q_OBJECT
 public:
-	EqHandle(int num, int x, int y);
+	EqHandle( int num, int x, int y );
 	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
+	QRectF boundingRect() const;
 	QPainterPath getCurvePath();
 	float getPeakCurve( float x );
 	float getHighShelfCurve( float x );
@@ -74,8 +74,25 @@ public:
 	void setlp12();
 	void setlp24();
 	void setlp48();
+
+signals:
+	void positionChanged();
+
+protected:
+	void mousePressEvent( QGraphicsSceneMouseEvent *event );
+	void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
+	void wheelEvent( QGraphicsSceneWheelEvent *wevent );
+	void hoverEnterEvent( QGraphicsSceneHoverEvent *hevent );
+	void hoverLeaveEvent( QGraphicsSceneHoverEvent *hevent );
+	QVariant itemChange( GraphicsItemChange change, const QVariant &value );
+
 private:
 	double calculateGain( const double &freq, const double &a1, const double &a2, const double &b0, const double &b1, const double &b2 );
+	float freqToXPixel( float freq );
+	float xPixelToFreq( float x );
+	float gainToYPixel( float gain );
+	float yPixelToGain( float y );
+
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_scale;
@@ -92,65 +109,12 @@ private:
 	bool m_mousePressed;
 	bool m_active;
 	bool m_handleMoved;
-	QRectF boundingRect() const;
-	QPixmap m_circlePixmap;
-	QPixmap m_hoverPixmap;
 
-
-
-
-	inline float freqToXPixel( float freq )
-	{
-		float min = log ( 27) / log( 10 );
-		float max = log ( 20000 )/ log( 10 );
-		float range = max - min;
-		return ( log( freq ) / log( 10 ) - min ) / range * m_width;
-	}
-
-
-
-
-	inline float xPixelToFreq( float x )
-	{
-		float min = log ( 27) / log( 10 );
-		float max = log ( 20000 ) / log( 10 );
-		float range = max - min;
-		return pow( 10 , x * ( range / m_width ) + min );
-	}
-
-
-
-
-	inline float gainToYPixel( float gain )
-	{
-		return ( m_heigth ) - ( gain * m_pixelsPerUnitHeight ) - ( ( m_heigth ) * 0.5 );
-	}
-
-
-
-
-	inline float yPixelToGain( float y )
-	{
-		return ( ( 0.5 * m_heigth ) - y ) / m_pixelsPerUnitHeight;
-	}
-
-
-
-
-signals:
-	void positionChanged();
 private slots:
 	void handleMoved();
 
-
-protected:
-	void mousePressEvent( QGraphicsSceneMouseEvent *event );
-	void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
-	void wheelEvent( QGraphicsSceneWheelEvent *wevent );
-	void hoverEnterEvent( QGraphicsSceneHoverEvent *hevent );
-	void hoverLeaveEvent( QGraphicsSceneHoverEvent *hevent );
-	QVariant itemChange( GraphicsItemChange change, const QVariant &value );
 };
+
 
 
 
@@ -159,58 +123,26 @@ class EqCurve : public QGraphicsObject
 	Q_OBJECT
 public:
 	EqCurve( QList<EqHandle*> *handle, int x, int y );
+	QRectF boundingRect() const;
+	void setModelChanged(bool mc);
+
+protected:
+	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
+
+private:
+	float freqToXPixel( float freq );
+	float xPixelToFreq( float x );
+	float gainToYPixel( float gain );
+	float yPixelToGain( float y );
+
 	QList<EqHandle*> *m_handle;
 	QPainterPath m_curve;
-	QRectF boundingRect() const;
-	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
-	void setModelChanged(bool mc);
-private:
+	QPixmap m_curvePixmapCache;
 	int m_width, m_heigth;
 	int m_alpha;
 	bool m_modelChanged;
-
-	QPixmap m_curvePixmapCache;
 	float m_pixelsPerUnitHeight;
 	float m_scale;
-
-
-
-
-	inline float freqToXPixel( float freq )
-	{
-		float min = log ( 27) / log( 10 );
-		float max = log ( 20000 ) / log( 10 );
-		float range = max - min;
-		return ( log( freq ) / log( 10 ) - min ) / range * m_width;
-	}
-
-
-
-
-	inline float xPixelToFreq( float x )
-	{
-		float min = log ( 27) / log( 10 );
-		float max = log ( 20000 ) / log( 10 );
-		float range = max - min;
-		return pow( 10 , x * ( range / m_width ) + min );
-	}
-
-
-
-
-	inline float gainToYPixel( float gain )
-	{
-		return ( m_heigth ) - ( gain * m_pixelsPerUnitHeight ) - ( ( m_heigth ) * 0.5 );
-	}
-
-
-
-
-	inline float yPixelToGain( float y )
-	{
-		return ( ( 0.5 * m_heigth ) - y ) / m_pixelsPerUnitHeight;
-	}
-
 };
 
 #endif // EQCURVE_H

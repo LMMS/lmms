@@ -24,7 +24,6 @@
 
 #include "EqEffect.h"
 
-
 #include "embed.cpp"
 #include "Engine.h"
 #include "EqFader.h"

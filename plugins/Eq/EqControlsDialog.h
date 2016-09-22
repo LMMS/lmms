@@ -58,9 +58,9 @@ private:
 
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
-	EqBand * setBand( int index, BoolModel * active, FloatModel * freq, FloatModel * res, FloatModel * gain, QColor color, QString name, float * peakL, float * peakR, BoolModel * hp12, BoolModel * hp24, BoolModel * hp48, BoolModel * lp12, BoolModel * lp24, BoolModel * lp48 )
+	EqBand *setBand( int index, BoolModel *active, FloatModel *freq, FloatModel *res, FloatModel *gain, QColor color, QString name, float *peakL, float *peakR, BoolModel *hp12, BoolModel *hp24, BoolModel *hp48, BoolModel *lp12, BoolModel *lp24, BoolModel *lp48 )
 	{
-		EqBand * filterModels = m_parameterWidget->getBandModels( index );
+		EqBand *filterModels = m_parameterWidget->getBandModels( index );
 		filterModels->active = active;
 		filterModels->freq = freq;
 		filterModels->res = res;

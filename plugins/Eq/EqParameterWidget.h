@@ -39,22 +39,22 @@ class EqBand
 {
 public :
 	EqBand();
-	FloatModel* gain;
-	FloatModel* res;
-	FloatModel* freq;
-	BoolModel* active;
-	BoolModel* hp12;
-	BoolModel* hp24;
-	BoolModel* hp48;
-	BoolModel* lp12;
-	BoolModel* lp24;
-	BoolModel* lp48;
+	FloatModel *gain;
+	FloatModel *res;
+	FloatModel *freq;
+	BoolModel *active;
+	BoolModel *hp12;
+	BoolModel *hp24;
+	BoolModel *hp48;
+	BoolModel *lp12;
+	BoolModel *lp24;
+	BoolModel *lp48;
 	QColor color;
 	int x;
 	int y;
 	QString name;
-	float* peakL;
-	float* peakR;
+	float *peakL;
+	float *peakR;
 };
 
 
@@ -64,82 +64,37 @@ class EqParameterWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0);
+	explicit EqParameterWidget( QWidget *parent = 0, EqControls * controls = 0 );
 	~EqParameterWidget();
 	QList<EqHandle*> *m_handleList;
-
-	void changeHandle( int i );
 
 	const int bandCount()
 	{
 		return 8;
 	}
 
-
-
-
-	EqBand* getBandModels( int i )
-	{
-		return &m_bands[i];
-	}
-
+	EqBand* getBandModels( int i );
+	void changeHandle( int i );
 
 private:
-
-	EqBand *m_bands;
-	int m_displayWidth, m_displayHeigth;
-	bool m_notFirst;
-	EqControls *m_controls;
-	EqHandle *m_handle;
-	EqCurve *m_eqcurve;
+	float freqToXPixel( float freq );
+	float xPixelToFreq( float x );
+	float gainToYPixel( float gain );
+	float yPixelToGain( float y );
 
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_pixelsPerOctave;
 	float m_scale;
+	int m_displayWidth, m_displayHeigth;
+	EqBand *m_bands;
+	EqControls *m_controls;
+	EqHandle *m_handle;
+	EqCurve *m_eqcurve;
 
-
-
-
-	inline float freqToXPixel( float freq )
-	{
-		float min = log ( 27) / log( 10 );
-		float max = log ( 20000 )/ log( 10 );
-		float range = max - min;
-		return ( log( freq ) / log( 10 ) - min ) / range * m_displayWidth;
-	}
-
-
-
-
-
-	inline float xPixelToFreq( float x )
-	{
-		float min = log ( 27 ) / log( 10 );
-		float max = log ( 20000 ) / log( 10 );
-		float range = max - min;
-		return pow( 10 , x * ( range / m_displayWidth ) + min );
-	}
-
-
-
-
-	inline float gainToYPixel( float gain )
-	{
-		return m_displayHeigth - ( gain * m_pixelsPerUnitHeight ) - ( m_displayHeigth * 0.5 );
-	}
-
-
-
-
-	inline float yPixelToGain( float y )
-	{
-		return ( ( 0.5 * m_displayHeigth ) - y ) / m_pixelsPerUnitHeight;
-	}
 
 private slots:
 	void updateModels();
-	void updateView();
+	void updateHandle();
 };
-
 #endif // EQPARAMETERWIDGET_H

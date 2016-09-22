@@ -31,8 +31,8 @@
 #include <QPainter>
 #include <QWidget>
 
-#include "lmms_math.h"
 #include "EqControls.h"
+#include "lmms_math.h"
 
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
@@ -40,7 +40,6 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	m_bands ( 0 ),
 	m_displayWidth ( 400 ),
 	m_displayHeigth ( 200 ),
-	m_notFirst ( false ),
 	m_controls ( controls )
 
 {
@@ -94,27 +93,37 @@ EqParameterWidget::~EqParameterWidget()
 
 
 
-void EqParameterWidget::updateView()
+EqBand *EqParameterWidget::getBandModels( int i )
+{
+	return &m_bands[i];
+}
+
+
+
+
+void EqParameterWidget::updateHandle()
 {
 	m_eqcurve->setModelChanged( true );
-	for( int i = 0 ; i < bandCount() ; i++ )
+	for( int i = 0 ; i < bandCount(); i++ )
 	{
 		if ( m_handleList->at( i )->getHandleMoved() == false ) //prevents a short circuit between handle and data model
 		{
 			//sets the band on active if a fader or a knob is moved
-			bool hover= false; // prevents an action if handle is moved
+			bool hover = false; // prevents an action if handle is moved
 			for ( int j = 0; j < bandCount(); j++ )
 			{
-				if ( m_handleList->at(j)->isMouseHover() ) hover = true;
+				if ( m_handleList->at(j)->isMouseHover() )
+				{
+					hover = true;
+				}
 			}
 			if ( !hover )
 			{
-				if ( sender() == m_bands[i].gain  ) m_bands[i].active->setValue( true );
+				if ( sender() == m_bands[i].gain ) m_bands[i].active->setValue( true );
 				if ( sender() == m_bands[i].freq ) m_bands[i].active->setValue( true );
 				if ( sender() == m_bands[i].res ) m_bands[i].active->setValue( true );
 			}
-
-			changeHandle(i);
+			changeHandle( i );
 		}
 		else
 		{
@@ -122,8 +131,6 @@ void EqParameterWidget::updateView()
 			m_handleList->at( i )->setHandleMoved( false );
 		}
 	}
-
-	m_notFirst = true;
 	if ( m_bands[0].hp12->value() ) m_handleList->at( 0 )->sethp12();
 	if ( m_bands[0].hp24->value() ) m_handleList->at( 0 )->sethp24();
 	if ( m_bands[0].hp48->value() ) m_handleList->at( 0 )->sethp48();
@@ -195,6 +202,44 @@ void EqParameterWidget::changeHandle( int i )
 	m_handleList->at( i )->setHandleActive( m_bands[i].active->value() );
 	m_handleList->at( i )->update();
 	m_eqcurve->update();
+}
+
+
+
+
+float EqParameterWidget::freqToXPixel( float freq )
+{
+	float min = log ( 27) / log( 10 );
+	float max = log ( 20000 )/ log( 10 );
+	float range = max - min;
+	return ( log( freq ) / log( 10 ) - min ) / range * m_displayWidth;
+}
+
+
+
+
+float EqParameterWidget::xPixelToFreq( float x )
+{
+	float min = log ( 27 ) / log( 10 );
+	float max = log ( 20000 ) / log( 10 );
+	float range = max - min;
+	return pow( 10 , x * ( range / m_displayWidth ) + min );
+}
+
+
+
+
+float EqParameterWidget::gainToYPixel( float gain )
+{
+	return m_displayHeigth - ( gain * m_pixelsPerUnitHeight ) - ( m_displayHeigth * 0.5 );
+}
+
+
+
+
+float EqParameterWidget::yPixelToGain( float y )
+{
+	return ( ( 0.5 * m_displayHeigth ) - y ) / m_pixelsPerUnitHeight;
 }
 
 

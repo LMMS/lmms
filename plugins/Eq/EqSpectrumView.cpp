@@ -149,7 +149,7 @@ void EqAnalyser::clear()
 
 
 
-EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent):
+EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
 	m_analyser( b )
 {

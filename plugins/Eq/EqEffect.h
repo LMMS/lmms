@@ -21,7 +21,6 @@
 *
 */
 
-
 #ifndef EQEFFECT_H
 #define EQEFFECT_H
 
