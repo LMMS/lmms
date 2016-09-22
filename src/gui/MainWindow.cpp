@@ -125,6 +125,12 @@ MainWindow::MainWindow() :
 					tr( "My Presets" ),
 					embed::getIconPixmap( "preset_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter , false, true  ) );
+	sideBar->appendTab( new FileBrowser(
+				confMgr->userVstDir(),
+					"*.dll",
+					tr( "My VST Plugins" ),
+					embed::getIconPixmap( "vst_plugin_file" ).transformed( QTransform().rotate( 90 ) ),
+							splitter , false, true  ) );
 	sideBar->appendTab( new FileBrowser( QDir::homePath(), "*",
 							tr( "My Home" ),
 					embed::getIconPixmap( "home" ).transformed( QTransform().rotate( 90 ) ),
@@ -742,7 +748,7 @@ void MainWindow::clearKeyModifiers()
 
 void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible )
 {
-	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 	// we really care about the position of the *window* - not the position of the widget within its window
 	if( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -750,7 +756,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const &
 		_w = _w->parentWidget();
 	}
 
-	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that 
+	// If the widget is a SubWindow, then we can make use of the getTrueNormalGeometry() method that
 	// performs the same as normalGeometry, but isn't broken on X11 ( see https://bugreports.qt.io/browse/QTBUG-256 )
 	SubWindow *asSubWindow = qobject_cast<SubWindow*>(_w);
 	QRect normalGeom = asSubWindow != nullptr ? asSubWindow->getTrueNormalGeometry() : _w->normalGeometry();
@@ -779,7 +785,7 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 			qMax( 100, _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
-		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
+		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc),
 		// we really care about the position of the *window* - not the position of the widget within its window
 		if ( _w->parentWidget() != NULL &&
 			_w->parentWidget()->inherits( "QMdiSubWindow" ) )
@@ -888,7 +894,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
 		QFileInfo recentFile( *it );
-		if ( recentFile.exists() && 
+		if ( recentFile.exists() &&
 				*it != ConfigManager::inst()->recoveryFile() )
 		{
 			m_recentlyOpenedProjectsMenu->addAction(
