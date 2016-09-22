@@ -2318,6 +2318,7 @@ void AutomationEditorWindow::setCurrentPattern(AutomationPattern* pattern)
 	if (pattern)
 	{
 		connect(pattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( updateWindowTitle() ) );
 		connect(pattern, SIGNAL(destroyed()), this, SLOT(clearCurrentPattern()));
 
 		connect(m_flipXAction, SIGNAL(triggered()), pattern, SLOT(flipX()));
@@ -2393,4 +2394,15 @@ void AutomationEditorWindow::play()
 void AutomationEditorWindow::stop()
 {
 	m_editor->stop();
+}
+
+void AutomationEditorWindow::updateWindowTitle()
+{
+	if ( m_editor->m_pattern == nullptr)
+	{
+		setWindowTitle( tr( "Automation Editor - no pattern" ) );
+		return;
+	}
+
+	setWindowTitle( tr( "Automation Editor - %1" ).arg( m_editor->m_pattern->name() ) );
 }
