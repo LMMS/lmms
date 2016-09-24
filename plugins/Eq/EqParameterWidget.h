@@ -87,8 +87,8 @@ private:
 	float m_pixelsPerOctave;
 	float m_scale;
 	int m_displayWidth, m_displayHeigth;
-	EqBand *m_bands;
 	EqControls *m_controls;
+	EqBand *m_bands;
 	EqHandle *m_handle;
 	EqCurve *m_eqcurve;
 
