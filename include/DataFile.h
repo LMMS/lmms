@@ -122,6 +122,7 @@ private:
 	void upgrade_0_4_0_20080622();
 	void upgrade_0_4_0_beta1();
 	void upgrade_0_4_0_rc2();
+	void upgrade_1_0_99();
 	void upgrade_1_1_0();
 	void upgrade_1_1_91();
 

@@ -82,19 +82,6 @@ void AutomationPatternView::openInAutomationEditor()
 
 
 
-
-void AutomationPatternView::update()
-{
-	if( fixedTCOs() )
-	{
-		m_pat->changeLength( m_pat->length() );
-	}
-	TrackContentObjectView::update();
-}
-
-
-
-
 void AutomationPatternView::resetName()
 {
 	m_pat->setName( QString::null );
@@ -165,8 +152,7 @@ void AutomationPatternView::flipY()
 
 void AutomationPatternView::flipX()
 {
-	//m_pat->flipX( m_pat->length() );
-	m_pat->flipX( m_pat->TrackContentObject::length() );
+	m_pat->flipX( m_pat->length() );
 	update();
 }
 
@@ -282,7 +268,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_pat->length().getTact() :
+				/ (float) m_pat->timeMapLength().getTact() :
 								pixelsPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
@@ -354,7 +340,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
+	for( tact_t t = 1; t < m_pat->timeMapLength().getTact(); ++t )
 	{
 		const int tx = x_base + static_cast<int>( ppt * t ) - 2;
 		if( tx < ( width() - TCO_BORDER_WIDTH * 2 ) )

@@ -176,6 +176,27 @@ void printHelp()
 
 
 
+void fileCheck( QString &file )
+{
+	QFileInfo fileToCheck( file );
+
+	if( !fileToCheck.size() )
+	{
+		printf( "The file %s does not have any content.\n",
+				file.toUtf8().constData() );
+		exit( EXIT_FAILURE );
+	}
+	else if( fileToCheck.isDir() )
+	{
+		printf( "%s is a directory.\n",
+				file.toUtf8().constData() );
+		exit( EXIT_FAILURE );
+	}
+}
+
+
+
+
 int main( int argc, char * * argv )
 {
 	// initialize memory managers
@@ -567,6 +588,15 @@ int main( int argc, char * * argv )
 		}
 	}
 
+	// Test file argument before continuing
+	if( !fileToLoad.isEmpty() )
+	{
+		fileCheck( fileToLoad );
+	}
+	else if( !fileToImport.isEmpty() )
+	{
+		fileCheck( fileToImport );
+	}
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
@@ -636,15 +666,13 @@ int main( int argc, char * * argv )
 		Engine::init( true );
 		destroyEngine = true;
 
-		QFileInfo fileInfo( fileToLoad );
-		if ( !fileInfo.exists() )
-		{
-			printf("The file %s does not exist!\n", fileToLoad.toStdString().c_str());
-			exit( 1 );
-		}
-
 		printf( "Loading project...\n" );
 		Engine::getSong()->loadProject( fileToLoad );
+		if( Engine::getSong()->isEmpty() )
+		{
+			printf("The project %s is empty, aborting!\n", fileToLoad.toUtf8().constData() );
+			exit( EXIT_FAILURE );
+		}
 		printf( "Done\n" );
 
 		Engine::getSong()->setExportLoop( renderLoop );

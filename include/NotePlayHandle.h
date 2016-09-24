@@ -196,6 +196,12 @@ public:
 		return m_subNotes.size() > 0 || m_hadChildren;
 	}
 
+	void setMasterNote()
+	{
+		m_hadChildren = true;
+		setUsesBuffer( false );
+	}
+
 	/*! Returns whether note is muted */
 	bool isMuted() const
 	{

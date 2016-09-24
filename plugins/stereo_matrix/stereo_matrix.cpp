@@ -34,7 +34,7 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"Stereophonic Matrix",
+	"Stereo Matrix",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
@@ -121,4 +121,3 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 }
 
 }
-

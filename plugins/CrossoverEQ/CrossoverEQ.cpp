@@ -152,7 +152,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 
 	// run band 1
-	if( ! mute1 )
+	if( mute1 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -162,7 +162,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 	
 	// run band 2
-	if( ! mute2 )
+	if( mute2 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -172,7 +172,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 	
 	// run band 3
-	if( ! mute3 )
+	if( mute3 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -182,7 +182,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 	
 	// run band 4
-	if( ! mute4 )
+	if( mute4 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{

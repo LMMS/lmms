@@ -198,3 +198,9 @@ void MidiTime::setTicksPerTact( tick_t tpt )
 {
 	s_ticksPerTact = tpt;
 }
+
+
+MidiTime MidiTime::stepPosition( int step )
+{
+	return step * ticksPerTact() / stepsPerTact();
+}

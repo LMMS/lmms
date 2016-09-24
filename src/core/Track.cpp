@@ -316,6 +316,10 @@ TrackContentObjectView::~TrackContentObjectView()
  */
 void TrackContentObjectView::update()
 {
+	if( fixedTCOs() )
+	{
+		updateLength();
+	}
 	m_needsUpdate = true;
 	selectableObject::update();
 }
@@ -1954,6 +1958,8 @@ Track::~Track()
  */
 Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = NULL;
 
 	switch( tt )
@@ -1969,7 +1975,15 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
+	if( tc == Engine::getBBTrackContainer() && t )
+	{
+		t->createTCOsForBB( Engine::getBBTrackContainer()->numOfBBs()
+									- 1 );
+	}
+
 	tc->updateAfterTrackAdd();
+
+	Engine::mixer()->doneChangeInModel();
 
 	return t;
 }
@@ -2332,6 +2346,20 @@ void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
 
 
 
+void Track::createTCOsForBB( int bb )
+{
+	while( numOfTCOs() < bb + 1 )
+	{
+		MidiTime position = MidiTime( numOfTCOs(), 0 );
+		TrackContentObject * tco = createTCO( position );
+		tco->movePosition( position );
+		tco->changeLength( MidiTime( 1, 0 ) );
+	}
+}
+
+
+
+
 /*! \brief Move all the trackContentObjects after a certain time later by one bar.
  *
  *  \param pos The time at which we want to insert the bar.
@@ -2634,9 +2662,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		m_track->lock();
+		Engine::mixer()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		m_track->unlock();
+		Engine::mixer()->doneChangeInModel();
 		de->accept();
 	}
 }

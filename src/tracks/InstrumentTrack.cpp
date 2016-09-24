@@ -155,15 +155,11 @@ int InstrumentTrack::baseNote() const
 
 InstrumentTrack::~InstrumentTrack()
 {
-	Engine::mixer()->requestChangeInModel();
-
 	// kill all running notes and the iph
 	silenceAllNotes( true );
 
 	// now we're save deleting the instrument
 	if( m_instrument ) delete m_instrument;
-
-	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -660,25 +656,21 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		while( nit != notes.end() &&
 					( cur_note = *nit )->pos() == cur_start )
 		{
-			if( cur_note->length() != 0 )
+			const f_cnt_t note_frames =
+				cur_note->length().frames( frames_per_tick );
+
+			NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
+			notePlayHandle->setBBTrack( bb_track );
+			// are we playing global song?
+			if( _tco_num < 0 )
 			{
-				const f_cnt_t note_frames =
-					cur_note->length().frames(
-							frames_per_tick );
-
-				NotePlayHandle* notePlayHandle = NotePlayHandleManager::acquire( this, _offset, note_frames, *cur_note );
-				notePlayHandle->setBBTrack( bb_track );
-				// are we playing global song?
-				if( _tco_num < 0 )
-				{
-					// then set song-global offset of pattern in order to
-					// properly perform the note detuning
-					notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
-				}
-
-				Engine::mixer()->addPlayHandle( notePlayHandle );
-				played_a_note = true;
+				// then set song-global offset of pattern in order to
+				// properly perform the note detuning
+				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 			}
+
+			Engine::mixer()->addPlayHandle( notePlayHandle );
+			played_a_note = true;
 			++nit;
 		}
 	}
@@ -1583,7 +1575,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setDirectory( presetRoot + m_track->instrumentName() );
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
-	sfd.selectFile(fname.remove(QRegExp("[^a-zA-Z0-9\\d\\s]")).toLower().replace( " ", "_" ) );
+	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
 
 	if( sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&

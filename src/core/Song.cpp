@@ -85,6 +85,7 @@ Song::Song() :
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
+	m_loadOnLaunch( true ),
 	m_recording( false ),
 	m_exporting( false ),
 	m_exportLoop( false ),
@@ -911,6 +912,7 @@ void Song::createNewProject()
 	QCoreApplication::sendPostedEvents();
 
 	m_modified = false;
+	m_loadOnLaunch = false;
 
 	if( gui->mainWindow() )
 	{
@@ -928,11 +930,11 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 	// saving...
 	m_fileName = m_oldFileName = "";
 	// update window title
+	m_loadOnLaunch = false;
 	if( gui->mainWindow() )
 	{
 		gui->mainWindow()->resetWindowTitle();
 	}
-
 }
 
 
@@ -947,16 +949,23 @@ void Song::loadProject( const QString & fileName )
 
 	Engine::projectJournal()->setJournalling( false );
 
+	m_oldFileName = m_fileName;
 	m_fileName = fileName;
-	m_oldFileName = fileName;
 
 	DataFile dataFile( m_fileName );
 	// if file could not be opened, head-node is null and we create
 	// new project
-	if( dataFile.validate( fileName.right( fileName.lastIndexOf(".") ) ) )
+	if( dataFile.head().isNull() )
 	{
+		if( m_loadOnLaunch )
+		{
+			createNewProject();
+		}
+		m_fileName = m_oldFileName;
 		return;
 	}
+
+	m_oldFileName = m_fileName;
 
 	clearProject();
 
@@ -1074,6 +1083,7 @@ void Song::loadProject( const QString & fileName )
 
 	m_loadingProject = false;
 	m_modified = false;
+	m_loadOnLaunch = false;
 
 	if( gui && gui->mainWindow() )
 	{
@@ -1180,6 +1190,7 @@ void Song::importProject()
 	{
 		ImportFilter::import( ofd.selectedFiles()[0], this );
 	}
+	m_loadOnLaunch = false;
 }
 
 
@@ -1217,9 +1228,9 @@ void Song::restoreControllerStates( const QDomElement & element )
 
 void Song::removeAllControllers()
 {
-	for (int i = 0; i < m_controllers.size(); ++i)
+	while (m_controllers.size() != 0)
 	{
-		removeController(m_controllers.at(i));
+		removeController(m_controllers.at(0));
 	}
 
 	m_controllers.clear();
