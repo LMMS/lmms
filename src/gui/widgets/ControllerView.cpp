@@ -154,6 +154,10 @@ void ControllerView::renameController()
 	if( ok && !new_name.isEmpty() )
 	{
 		c->setName( new_name );
+		if( getController()->type() == Controller::LfoController )
+		{
+			m_controllerDlg->setWindowTitle( tr( "LFO" ) + " (" + new_name + ")" );
+		}
 		m_nameLabel->setText( new_name );
 	}
 }
