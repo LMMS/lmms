@@ -221,7 +221,7 @@ void SubWindow::moveEvent( QMoveEvent * event )
 	QMdiSubWindow::moveEvent( event );
 	// if the window was moved and ISN'T minimized/maximized/fullscreen,
 	// then save the current position
-	if( !isMaximized() && !isFullScreen() )
+	if( !isMaximized() && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.moveTopLeft( event->pos() );
 	}
@@ -262,13 +262,21 @@ void SubWindow::adjustTitleBar()
 		m_maximizeBtn->setHidden( isMaximized() );
 	}
 
-	m_restoreBtn->setVisible( isMaximized() );
+	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
 
 	// title QLabel adjustments
 	m_windowTitle->setAlignment( Qt::AlignHCenter );
 	m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
 	m_windowTitle->move( menuButtonSpace,
 		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
+
+	// if minimized we can't use widget()->width(). We have to hard code the width,
+ 	// as the width of all minimized windows is the same.
+ 	if( isMinimized() )
+ 	{
+ 		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
+ 		m_windowTitle->setFixedWidth( 120 );
+ 	}
 
 	// truncate the label string if the window is to small. Adds "..."
 	elideText( m_windowTitle, widget()->windowTitle() );
@@ -286,7 +294,7 @@ void SubWindow::resizeEvent( QResizeEvent * event )
 
 	// if the window was resized and ISN'T minimized/maximized/fullscreen,
 	// then save the current size
-	if( !isMaximized() && !isFullScreen() )
+	if( !isMaximized() && !isMinimized() && !isFullScreen() )
 	{
 		m_trackedNormalGeom.setSize( event->size() );
 	}
