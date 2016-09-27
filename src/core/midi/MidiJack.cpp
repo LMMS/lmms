@@ -95,12 +95,16 @@ MidiJack::MidiJack() :
 
 	if(jackClient())
 	{
+		/* jack midi out not implemented
+		   JackMidiWrite and sendByte needs to be functional
+		   before enabling this
 		m_output_port = jack_port_register(
-				jackClient(), "midi_TX", JACK_DEFAULT_MIDI_TYPE,
+				jackClient(), "MIDI out", JACK_DEFAULT_MIDI_TYPE,
 				JackPortIsOutput, 0);
+		*/
 
 		m_input_port = jack_port_register(
-				jackClient(), "midi_RX", JACK_DEFAULT_MIDI_TYPE,
+				jackClient(), "MIDI in", JACK_DEFAULT_MIDI_TYPE,
 				JackPortIsInput, 0);
 
 		if(jack_activate(jackClient()) == 0 )
@@ -164,11 +168,6 @@ QString MidiJack::probeDevice()
 	return jid;
 }
 
-void MidiJack::sendByte( const unsigned char c )
-{
-	//m_midiDev.putChar( c );
-}
-
 // we read data from jack
 void MidiJack::JackMidiRead(jack_nframes_t nframes)
 {
@@ -193,6 +192,16 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 				jack_midi_event_get(&in_event, port_buf, event_index);
 		}
 	}
+}
+
+/* jack midi out is not implemented
+   sending plain bytes to jack midi outputs doesn't work
+   once working the output port needs to be enabled in the constructor
+ */
+
+void MidiJack::sendByte( const unsigned char c )
+{
+	//m_midiDev.putChar( c );
 }
 
 // we write data to jack
