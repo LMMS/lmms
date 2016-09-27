@@ -252,7 +252,7 @@ void SubWindow::adjustTitleBar()
 	// the close button is always needed and on the rightButtonPos
 	m_closeBtn->move( rightButtonPos );
 
-	// here we ask: is the Subwindow maximizable and/or minimizable
+	// here we ask: is the Subwindow maximizable and
 	// then we set the buttons and show them if needed
 	if( windowFlags() & Qt::WindowMaximizeButtonHint )
 	{
@@ -262,6 +262,8 @@ void SubWindow::adjustTitleBar()
 		m_maximizeBtn->setHidden( isMaximized() );
 	}
 
+	// we're keeping the restore button around if we open projects
+	// from older versions that have saved minimized windows
 	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
 
 	// title QLabel adjustments
