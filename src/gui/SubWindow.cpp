@@ -236,7 +236,6 @@ void SubWindow::adjustTitleBar()
 	m_maximizeBtn->hide();
 	m_restoreBtn->hide();
 
-	const bool isMax = isMaximized();
 	const int rightSpace = 3;
 	const int buttonGap = 1;
 	const int menuButtonSpace = 24;
@@ -260,10 +259,10 @@ void SubWindow::adjustTitleBar()
 		buttonBarWidth = buttonBarWidth + m_buttonSize.width() + buttonGap;
 		m_maximizeBtn->move( middleButtonPos );
 		m_restoreBtn->move( middleButtonPos );
-		m_maximizeBtn->setHidden( isMax );
+		m_maximizeBtn->setHidden( isMaximized() );
 	}
 
-	m_restoreBtn->setVisible( isMax );
+	m_restoreBtn->setVisible( isMaximized() );
 
 	// title QLabel adjustments
 	m_windowTitle->setAlignment( Qt::AlignHCenter );
