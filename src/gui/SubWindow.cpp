@@ -271,12 +271,12 @@ void SubWindow::adjustTitleBar()
 		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
 
 	// if minimized we can't use widget()->width(). We have to hard code the width,
- 	// as the width of all minimized windows is the same.
- 	if( isMinimized() )
- 	{
- 		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
- 		m_windowTitle->setFixedWidth( 120 );
- 	}
+	// as the width of all minimized windows is the same.
+	if( isMinimized() )
+	{
+		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
+		m_windowTitle->setFixedWidth( 120 );
+	}
 
 	// truncate the label string if the window is to small. Adds "..."
 	elideText( m_windowTitle, widget()->windowTitle() );
