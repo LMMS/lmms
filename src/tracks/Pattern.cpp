@@ -1068,7 +1068,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	
 	// bar lines
 	const int lineSize = 3;
-	p.setPen( c.darker( 300 ) );
+	p.setPen( c.darker( 200 ) );
 
 	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
@@ -1132,5 +1132,3 @@ void PatternView::paintEvent( QPaintEvent * )
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 
 }
-
-
