@@ -68,6 +68,7 @@ private:
 
 class EqSpectrumView : public QWidget
 {
+	Q_OBJECT
 public:
 	explicit EqSpectrumView( EqAnalyser *b, QWidget *_parent = 0 );
 	virtual ~EqSpectrumView()
@@ -80,6 +81,9 @@ public:
 protected:
 	virtual void paintEvent( QPaintEvent *event );
 
+private slots:
+	void periodicalUpdate();
+
 private:
 	QColor m_color;
 	EqAnalyser *m_analyser;
@@ -88,10 +92,12 @@ private:
 	float m_pixelsPerUnitWidth;
 	float m_scale;
 	int m_skipBands;
+	bool m_periodicalUpdate;
 	QList<float> m_bandHeight;
 
 	int bandToXPixel( float band );
 	float bandToFreq ( int index );
 	float freqToXPixel( float freq );
+
 };
 #endif // EQSPECTRUMVIEW_H

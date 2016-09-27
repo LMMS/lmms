@@ -23,9 +23,9 @@
 
 #include "EqSpectrumView.h"
 
-#include <QTimer>
-
 #include "Engine.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "Mixer.h"
 
 EqAnalyser::EqAnalyser() :
@@ -49,8 +49,12 @@ EqAnalyser::~EqAnalyser()
 	fftwf_free( m_specBuf );
 }
 
+
+
+
 void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 {
+	//only analyse if the view is visible
 	if ( m_active )
 	{
 		m_inProgress=true;
@@ -87,7 +91,6 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 					   ( int )( LOWEST_FREQ * ( FFT_BUFFER_SIZE + 1 ) / ( float )( m_sampleRate / 2 ) ),
 					   ( int )( HIGHEST_FREQ * ( FFT_BUFFER_SIZE +  1) / ( float )( m_sampleRate / 2 ) ) );
 		m_energy = maximum( m_bands, MAX_BANDS ) / maximum( m_buffer, FFT_BUFFER_SIZE );
-
 
 		m_framesFilledUp = 0;
 		m_inProgress = false;
@@ -151,19 +154,18 @@ void EqAnalyser::clear()
 
 EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 	QWidget( _parent ),
-	m_analyser( b )
+	m_analyser( b ),
+	m_periodicalUpdate( false )
 {
 	setFixedSize( 400, 200 );
-	QTimer *timer = new QTimer(this);
-	connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-	timer->start(20);
+	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( periodicalUpdate() ) );
 	setAttribute( Qt::WA_TranslucentBackground, true );
 	m_skipBands = MAX_BANDS * 0.5;
 	float totalLength = log10( 20000 );
 	m_pixelsPerUnitWidth = width( ) / totalLength ;
 	m_scale = 1.5;
 	m_color = QColor( 255, 255, 255, 255 );
-	for ( int i=0 ; i < MAX_BANDS ; i++ )
+	for ( int i = 0 ; i < MAX_BANDS ; i++ )
 	{
 		m_bandHeight.append( 0 );
 	}
@@ -172,34 +174,40 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 
 
 
-
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
+	//only analyse if the view is visible
+	m_analyser->setActive( isVisible() );
 	const float energy =  m_analyser->getEnergy();
 	if( energy <= 0 && m_peakSum <= 0 )
-	{
+	{		
 		//dont draw anything
 		return;
 	}
-	m_analyser->setActive( isVisible() );
+
 	const int fh = height();
 	const int LOWER_Y = -36;	// dB
-	QPainter p( this );
-	p.setPen( QPen( m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+	QPainter painter( this );
+	painter.setPen( QPen( m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
 
-	if(m_analyser->getInProgress() ){
-		p.fillPath( m_path ,QBrush( m_color ) );
+	if( m_analyser->getInProgress() || m_periodicalUpdate == false )
+	{
+		//only paint the cached path
+		painter.fillPath( m_path, QBrush( m_color ) );
 		return;
 	}
 
+	m_periodicalUpdate = false;
+	//Now we calculate the path
 	m_path = QPainterPath();
-	float * bands = m_analyser->m_bands;
+	float *bands = m_analyser->m_bands;
 	float peak;
-	m_path.moveTo( 0,height() );
+	m_path.moveTo( 0, height() );
 	m_peakSum = 0;
+	float fallOff = 1.2;
 	for( int x = 0; x < MAX_BANDS; ++x, ++bands )
 	{
-		peak = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *bands / energy ) ) - LOWER_Y ) / (-LOWER_Y ) );
+		peak = ( fh * 2.0 / 3.0 * ( 20 * ( log10( *bands / energy ) ) - LOWER_Y ) / ( - LOWER_Y ) );
 		if( peak < 0 )
 		{
 			peak = 0;
@@ -208,25 +216,29 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 		{
 			continue;
 		}
+
 		if ( peak > m_bandHeight[x] )
 		{
 			m_bandHeight[x] = peak;
 		}
 		else
 		{
-			m_bandHeight[x] = m_bandHeight[x] / 1.2;
+			m_bandHeight[x] = m_bandHeight[x] / fallOff;
 		}
+
 		if( m_bandHeight[x] < 0 )
 		{
 			m_bandHeight[x] = 0;
 		}
+
 		m_path.lineTo( freqToXPixel( bandToFreq( x ) ), fh - m_bandHeight[x] );
 		m_peakSum += m_bandHeight[x];
 	}
+
 	m_path.lineTo( width(), height() );
 	m_path.closeSubpath();
-	p.fillPath( m_path, QBrush( m_color ) );
-	p.drawPath( m_path );
+	painter.fillPath( m_path, QBrush( m_color ) );
+	painter.drawPath( m_path );
 }
 
 
@@ -270,4 +282,13 @@ float EqSpectrumView::freqToXPixel(float freq)
 	float max = log ( 20000 )/ log( 10 );
 	float range = max - min;
 	return ( log( freq ) / log( 10 ) - min ) / range * width();
+}
+
+
+
+
+void EqSpectrumView::periodicalUpdate()
+{
+	m_periodicalUpdate = true;
+	update();
 }
