@@ -46,7 +46,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	resize( m_displayWidth, m_displayHeigth );
 	float totalHeight = 36; // gain range from -18 to +18
 	m_pixelsPerUnitHeight = m_displayHeigth / totalHeight;
-	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
+	m_pixelsPerOctave =	EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
 	QGraphicsScene *scene = new QGraphicsScene();
@@ -144,13 +144,13 @@ void EqParameterWidget::updateHandle()
 void EqParameterWidget::changeHandle( int i )
 {
 	//fill x, y, and bw with data from model
-	float x = freqToXPixel( m_bands[i].freq->value() );
+	float x = EqHandle::freqToXPixel( m_bands[i].freq->value(), m_displayWidth );
 	float y = m_handleList->at( i )->y();
 	//for pass filters there is no gain model
 	if( m_bands[i].gain )
 	{
 		float gain = m_bands[i].gain->value();
-		y = gainToYPixel( gain );
+		y = EqHandle::gainToYPixel( gain, m_displayHeigth, m_pixelsPerUnitHeight );
 	}
 	float bw = m_bands[i].res->value();
 
@@ -206,50 +206,12 @@ void EqParameterWidget::changeHandle( int i )
 
 
 
-float EqParameterWidget::freqToXPixel( float freq )
-{
-	float min = log ( 27) / log( 10 );
-	float max = log ( 20000 )/ log( 10 );
-	float range = max - min;
-	return ( log( freq ) / log( 10 ) - min ) / range * m_displayWidth;
-}
-
-
-
-
-float EqParameterWidget::xPixelToFreq( float x )
-{
-	float min = log ( 27 ) / log( 10 );
-	float max = log ( 20000 ) / log( 10 );
-	float range = max - min;
-	return pow( 10 , x * ( range / m_displayWidth ) + min );
-}
-
-
-
-
-float EqParameterWidget::gainToYPixel( float gain )
-{
-	return m_displayHeigth - ( gain * m_pixelsPerUnitHeight ) - ( m_displayHeigth * 0.5 );
-}
-
-
-
-
-float EqParameterWidget::yPixelToGain( float y )
-{
-	return ( ( 0.5 * m_displayHeigth ) - y ) / m_pixelsPerUnitHeight;
-}
-
-
-
-
 void EqParameterWidget::updateModels()
 {
 	for ( int i=0 ; i < bandCount(); i++ )
 	{
-		m_bands[i].freq->setValue( xPixelToFreq( m_handleList->at(i)->x() ) );
-		if( m_bands[i].gain ) m_bands[i].gain->setValue( yPixelToGain( m_handleList->at(i)->y() ) );
+		m_bands[i].freq->setValue( EqHandle::xPixelToFreq( m_handleList->at(i)->x(), m_displayWidth ) );
+		if( m_bands[i].gain ) m_bands[i].gain->setValue( EqHandle::yPixelToGain( m_handleList->at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight ) );
 		m_bands[i].res->setValue( m_handleList->at( i )->getResonance() );
 		//sets the band on active if the handle is moved
 		if ( sender() == m_handleList->at( i ) ) m_bands[i].active->setValue( true );

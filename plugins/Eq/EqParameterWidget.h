@@ -77,11 +77,6 @@ public:
 	void changeHandle( int i );
 
 private:
-	float freqToXPixel( float freq );
-	float xPixelToFreq( float x );
-	float gainToYPixel( float gain );
-	float yPixelToGain( float y );
-
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_pixelsPerOctave;

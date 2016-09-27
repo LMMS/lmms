@@ -49,7 +49,12 @@ class EqHandle : public QGraphicsObject
 	Q_OBJECT
 public:
 	EqHandle( int num, int x, int y );
-	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
+
+	static float freqToXPixel( float freq, int w );
+	static float xPixelToFreq( float x , int w );
+	static float gainToYPixel( float gain, int h, int pixelPerUnitHeight );
+	static float yPixelToGain( float y, int h, int pixelPerUnitHeight );
+
 	QRectF boundingRect() const;
 	QPainterPath getCurvePath();
 	float getPeakCurve( float x );
@@ -81,6 +86,7 @@ signals:
 protected:
 	void mousePressEvent( QGraphicsSceneMouseEvent *event );
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent *event );
+	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
 	void wheelEvent( QGraphicsSceneWheelEvent *wevent );
 	void hoverEnterEvent( QGraphicsSceneHoverEvent *hevent );
 	void hoverLeaveEvent( QGraphicsSceneHoverEvent *hevent );
@@ -88,10 +94,6 @@ protected:
 
 private:
 	double calculateGain( const double &freq, const double &a1, const double &a2, const double &b0, const double &b1, const double &b2 );
-	float freqToXPixel( float freq );
-	float xPixelToFreq( float x );
-	float gainToYPixel( float gain );
-	float yPixelToGain( float y );
 
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
@@ -130,11 +132,6 @@ protected:
 	void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
 private:
-	float freqToXPixel( float freq );
-	float xPixelToFreq( float x );
-	float gainToYPixel( float gain );
-	float yPixelToGain( float y );
-
 	QList<EqHandle*> *m_handle;
 	QPainterPath m_curve;
 	QPixmap m_curvePixmapCache;
