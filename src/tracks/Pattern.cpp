@@ -52,7 +52,6 @@
 
 
 QPixmap * PatternView::s_stepBtnOn = NULL;
-QPixmap * PatternView::s_stepBtnOverlay = NULL;
 QPixmap * PatternView::s_stepBtnOff = NULL;
 QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
@@ -615,12 +614,6 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 							"step_btn_on_100" ) );
 	}
 
-	if( s_stepBtnOverlay == NULL )
-	{
-		s_stepBtnOverlay = new QPixmap( embed::getIconPixmap(
-						"step_btn_on_yellow" ) );
-	}
-
 	if( s_stepBtnOff == NULL )
 	{
 		s_stepBtnOff = new QPixmap( embed::getIconPixmap(
@@ -632,8 +625,8 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 		s_stepBtnOffLight = new QPixmap( embed::getIconPixmap(
 						"step_btn_off_light" ) );
 	}
-	
-	update();	
+
+	update();
 
 	setStyle( QApplication::style() );
 }
@@ -656,14 +649,14 @@ void PatternView::update()
 	if ( m_pat->m_patternType == Pattern::BeatPattern )
 	{
 		ToolTip::add( this,
-			tr( "use mouse wheel to set velocity of a step" ) );	
+			tr( "use mouse wheel to set velocity of a step" ) );
 	}
-	else 
+	else
 	{
 		ToolTip::add( this,
-			tr( "double-click to open in Piano Roll" ) );		
+			tr( "double-click to open in Piano Roll" ) );
 	}
-	
+
 	TrackContentObjectView::update();
 }
 
@@ -877,7 +870,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
+	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size()
 		? QPixmap( size() ) : m_paintPixmap;
 
 	QPainter p( &m_paintPixmap );
@@ -887,16 +880,16 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
-	
+
 	// state: selected, normal, beat pattern, muted
-	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern ) 
-		? painter.background().color() : ( beatPattern 
+	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
+		? painter.background().color() : ( beatPattern
 		? BBPatternBackground() : mutedBackgroundColor() ) );
 
 	// invert the gradient for the background in the B&B editor
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
 	lingrad.setColorAt( beatPattern ? 1 : 0, c );
-	
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -905,7 +898,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	{
 		p.fillRect( rect(), c );
 	}
-	
+
 	const float ppt = fixedTCOs() ?
 			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
 					/ (float) m_pat->length().getTact() :
@@ -913,7 +906,7 @@ void PatternView::paintEvent( QPaintEvent * )
 					/ (float) m_pat->length().getTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
-	
+
 	// melody pattern paint event
 	if( m_pat->m_patternType == Pattern::MelodyPattern )
 	{
@@ -993,14 +986,13 @@ void PatternView::paintEvent( QPaintEvent * )
 				}
 			}
 		}
-	}	
+	}
 
 	// beat pattern paint event
 	else if( beatPattern &&	( fixedTCOs() || ppt >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
 	{
 		QPixmap stepon;
-		QPixmap stepoverlay;
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
@@ -1009,10 +1001,6 @@ void PatternView::paintEvent( QPaintEvent * )
 
 		// scale step graphics to fit the beat pattern length
 		stepon = s_stepBtnOn->scaled( w / steps,
-					      s_stepBtnOn->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepoverlay = s_stepBtnOverlay->scaled( w / steps,
 					      s_stepBtnOn->height(),
 					      Qt::IgnoreAspectRatio,
 					      Qt::SmoothTransformation );
@@ -1036,16 +1024,10 @@ void PatternView::paintEvent( QPaintEvent * )
 			if( n )
 			{
 				const int vol = n->getVolume();
-				p.drawPixmap( x, y, stepoff );
-				for( int i = 0; i < vol / 5 + 1; ++i )
-				{
-					p.drawPixmap( x, y, stepon );
-				}
-				for( int i = 0; i < ( 25 + ( vol - 75 ) ) / 5;
-									++i )
-				{
-					p.drawPixmap( x, y, stepoverlay );
-				}
+				p.drawPixmap( x, y, stepoffl );
+				p.setOpacity( sqrt( vol / 200.0 ) );
+				p.drawPixmap( x, y, stepon );
+				p.setOpacity( 1 );
 			}
 			else if( ( it / 4 ) % 2 )
 			{
@@ -1056,16 +1038,16 @@ void PatternView::paintEvent( QPaintEvent * )
 				p.drawPixmap( x, y, stepoff );
 			}
 		} // end for loop
-		
+
 		// draw a transparent rectangle over muted patterns
 		if ( muted )
 		{
 			p.setBrush( mutedBackgroundColor() );
-			p.setOpacity( 0.3 );
+			p.setOpacity( 0.5 );
 			p.drawRect( 0, 0, width(), height() );
 		}
 	}
-	
+
 	// bar lines
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
@@ -1083,22 +1065,22 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	// pattern name
 	p.setRenderHint( QPainter::TextAntialiasing );
-	
+
 	bool isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
-	
+
 	if( !isDefaultName && m_staticTextName.text() != m_pat->name() )
 	{
 		m_staticTextName.setText( m_pat->name() );
 	}
-	
+
 	QFont font;
 	font.setHintingPreference( QFont::PreferFullHinting );
 	font.setPointSize( 8 );
 	p.setFont( font );
-	
+
 	const int textTop = TCO_BORDER_WIDTH + 1;
 	const int textLeft = TCO_BORDER_WIDTH + 1;
-	
+
 	if( !isDefaultName )
 	{
 		p.setPen( textShadowColor() );
@@ -1111,9 +1093,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	if( !beatPattern )
 	{
 		p.setPen( c.lighter( current ? 160 : 130 ) );
-		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 			rect().bottom() - TCO_BORDER_WIDTH );
-	
+
 	// outer border
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
