@@ -251,6 +251,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	// bar lines
 	const int lineSize = 3;
+	p.setPen( c.darker( 200 ) );
 
 	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
 	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
@@ -259,9 +260,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerTact() ) )
 		{
-			p.setPen( c.light( 80 ) );
 			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
-			p.setPen( c.light( 120 ) );
 			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
 			 	x, rect().bottom() - TCO_BORDER_WIDTH );
 		}
@@ -666,4 +665,3 @@ void BBTrackView::clickedTrackLabel()
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
 	gui->getBBEditor()->show();
 }
-
