@@ -283,8 +283,8 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 					tr( "FX Fader %1" ).arg( channelIndex ), m_fxLine );
 	m_fader->setLevelsDisplayedInDBFS();
 	// TODO dbvToAmp is really dBFSToAmp. Rename in later commit.
-	m_fader->setMinPeak(dbvToAmp(-40));
-	m_fader->setMaxPeak(dbvToAmp(12));
+	m_fader->setMinPeak(dbvToAmp(-42));
+	m_fader->setMaxPeak(dbvToAmp(9));
 
 	m_fader->move( 16-m_fader->width()/2,
 					m_fxLine->height()-
@@ -600,8 +600,3 @@ void FxMixerView::updateFaders()
 		}
 	}
 }
-
-
-
-
-

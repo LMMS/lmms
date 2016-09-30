@@ -544,8 +544,9 @@ FxLine {
 
 /* persistent peak markers for fx peak meters */
 Fader {
-	qproperty-peakGreen: #0BD556;
-	qproperty-peakRed: #660505;
+	qproperty-peakGreen: #0ad45c;
+	qproperty-peakYellow: #d6ec52;
+	qproperty-peakRed: #c12038;
 }
 
 TimeLineWidget {
