@@ -2870,14 +2870,23 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.setBrush( QColor(255, 0, 0) );
 	/*int xx = WHITE_KEY_WIDTH - offset;
 	p.drawRect( xx, PR_TOP_MARGIN, m_ppt - offset, height() - PR_BOTTOM_MARGIN );*/
-	for ( int x = WHITE_KEY_WIDTH - offset; x < width(); 
-				x += m_ppt,  ++barCount) {
-		if (barCount % 2 != 0)
-		{
-			p.setBrush( QColor(255, 0, 0) );
-			p.drawRect( x, PR_TOP_MARGIN, m_ppt - offset, height() - PR_BOTTOM_MARGIN );
-		}
-	}
+    for ( int x = WHITE_KEY_WIDTH - offset; x < width();
+          x += m_ppt,  ++barCount) {
+        if (barCount % 2 != 0)
+        {
+            if( m_currentPosition < m_ppt)
+            {
+
+                p.setBrush( QColor(255, 0, 0) );
+                p.drawRect( x - m_currentPosition + offset, PR_TOP_MARGIN, m_ppt, height() - PR_BOTTOM_MARGIN );
+            }
+            else
+            {
+                p.setBrush( QColor(255, 0, 0) );
+                p.drawRect( x + offset, PR_TOP_MARGIN, m_ppt, height() - PR_BOTTOM_MARGIN );
+            }
+        }
+    }
 
 	// we need float here as odd time signatures might produce rounding
 	// errors else and thus an unusable grid
