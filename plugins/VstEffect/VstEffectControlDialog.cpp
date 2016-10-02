@@ -76,7 +76,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
 		btn->setCheckable( true );
 		connect( btn, SIGNAL( toggled( bool ) ),
-					m_pluginWidget, SLOT( setVisible( bool ) ) );
+					SLOT( togglePluginUI( bool ) ) );
 		emit btn->click();
 
 		btn->setMinimumWidth( 78 );
@@ -262,5 +262,23 @@ void VstEffectControlDialog::paintEvent( QPaintEvent * )
 VstEffectControlDialog::~VstEffectControlDialog()
 {
 	//delete m_pluginWidget;
+}
+
+
+
+
+void VstEffectControlDialog::togglePluginUI( bool checked )
+{
+	if( m_plugin )
+	{
+		if( checked )
+		{
+			m_plugin->showUI();
+		}
+		else
+		{
+			m_plugin->hideUI();
+		}
+	}
 }
 
