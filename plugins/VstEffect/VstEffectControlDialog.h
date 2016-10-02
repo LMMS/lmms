@@ -62,6 +62,9 @@ private:
 	VstPlugin * m_plugin;
 
 	QLabel * tbLabel;
+
+private slots:
+	void togglePluginUI( bool checked );
 } ;
 
 #endif
