@@ -52,6 +52,7 @@
 #include <sched.h>
 #endif
 
+#include <sys/wait.h>
 #include <wine/exception.h>
 
 #endif
@@ -106,6 +107,12 @@ struct ERect
 #include <sys/shm.h>
 #endif
 
+#define EMBEDDER_NAME "embed-window"
+
+#ifdef LMMS_BUILD_LINUX
+#define USE_LINUX_EMBEDDER
+#endif
+
 static VstHostLanguages hlang = LanguageEnglish;
 
 
@@ -114,6 +121,10 @@ class RemoteVstPlugin;
 RemoteVstPlugin * __plugin = NULL;
 
 DWORD __GuiThreadID = 0;
+
+#ifdef USE_LINUX_EMBEDDER
+static char * s_embedderPath;
+#endif
 
 
 
@@ -131,6 +142,7 @@ public:
 
 	void init( const std::string & _plugin_file );
 	void initEditor();
+	void destroyEditor();
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
@@ -299,8 +311,16 @@ private:
 	intptr_t m_windowID;
 	int m_windowWidth;
 	int m_windowHeight;
+#ifdef USE_LINUX_EMBEDDER
+	pid_t m_embedderPid;
+	int m_embedderStdin;
+	int m_embedderStdout;
+#else
+	PROCESS_INFORMATION m_processInfo;
+#endif
 
 	bool m_initialized;
+	bool m_registeredWindowClass;
 
 	pthread_mutex_t m_pluginLock;
 
@@ -347,6 +367,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
+	m_registeredWindowClass( false ),
 	m_pluginLock(),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
@@ -357,7 +378,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_in( NULL ),
 	m_shmID( -1 ),
 	m_vstSyncData( NULL )
-
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
 
@@ -423,14 +443,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 RemoteVstPlugin::~RemoteVstPlugin()
 {
-	if( m_window != NULL )
-	{
-		pluginDispatch( effEditClose );
-#ifdef LMMS_BUILD_LINUX
-		CloseWindow( m_window );
-#endif
-		m_window = NULL;
-	}
+	destroyEditor();
 	pluginDispatch( effMainsChanged, 0, 0 );
 	pluginDispatch( effClose );
 #ifndef USE_QT_SHMEM
@@ -464,23 +477,102 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 
 
+#ifdef USE_LINUX_EMBEDDER
+static void checkExitStatus( int status )
+{
+	if( WIFEXITED( status ) && WEXITSTATUS( status ) == EXIT_SUCCESS )
+	{
+		return;
+	}
+	fprintf( stderr, "Child process did not exit properly\n" );
+}
+#endif
+
+
+
+
 bool RemoteVstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
+		case IdShowUI:
+#ifdef USE_LINUX_EMBEDDER
+			if( m_window )
+			{
+				int status;
+				pid_t pid = waitpid( m_embedderPid, &status,
+								WNOHANG );
+				switch( pid )
+				{
+					case -1:
+						perror( "waitpid" );
+						break;
+
+					case 0:
+						break;
+
+					default:
+						checkExitStatus( status );
+						m_embedderPid = -1;
+						destroyEditor();
+				}
+			}
+#endif
+			initEditor();
+			break;
+
+		case IdHideUI:
+			destroyEditor();
+			break;
+
+		case IdToggleUI:
+#ifdef USE_LINUX_EMBEDDER
+			if( m_window )
+			{
+				bool restart = false;
+				int status;
+				pid_t pid = waitpid( m_embedderPid, &status,
+								WNOHANG );
+				switch( pid )
+				{
+					case -1:
+						perror( "waitpid" );
+						break;
+
+					case 0:
+						break;
+
+					default:
+						checkExitStatus( status );
+						m_embedderPid = -1;
+						restart = true;
+				}
+				destroyEditor();
+
+				if( !restart )
+				{
+					break;
+				}
+			}
+
+			initEditor();
+			break;
+#else
+			// Temporary implementation, not using an embedder
+			if( m_window )
+			{
+				destroyEditor();
+			}
+			else
+			{
+				initEditor();
+			}
+			break;
+#endif
+
 		case IdVstLoadPlugin:
 			init( _m.getString() );
 			break;
-
-#ifdef LMMS_BUILD_WIN32
-		case IdVstPluginWindowInformation:
-		{
-			HWND top = FindWindowEx( NULL, NULL, NULL,
-						_m.getString().c_str() );
-			m_window = FindWindowEx( top, NULL, NULL, NULL );
-			break;
-		}
-#endif
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -619,9 +711,32 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
+static void assert_dup2( int oldfd, int newfd )
+{
+	if( dup2( oldfd, newfd ) == -1 )
+	{
+		perror( "dup2" );
+		exit( EXIT_FAILURE );
+	}
+}
+
+
+
+
+static void close_check( int fd )
+{
+	if( close( fd ) )
+	{
+		perror( "close" );
+	}
+}
+
+
+
+
 void RemoteVstPlugin::initEditor()
 {
-	if( !( m_plugin->flags & effFlagsHasEditor ) )
+	if( m_window || !( m_plugin->flags & effFlagsHasEditor ) )
 	{
 		return;
 	}
@@ -635,44 +750,39 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	WNDCLASS wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = DefWindowProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInst;
-	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "LVSL";
-
-	if( !RegisterClass( &wc ) )
+	if( !m_registeredWindowClass )
 	{
-		return;
+		WNDCLASS wc;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = DefWindowProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInst;
+		wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+		wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+		wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = "LVSL";
+
+		if( !RegisterClass( &wc ) )
+		{
+			return;
+		}
+		m_registeredWindowClass = true;
 	}
 
-#ifdef LMMS_BUILD_LINUX
-	//m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-	//		       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
-	//		       0, 0, 10, 10, NULL, NULL, hInst, NULL );
-
-	m_window = CreateWindowEx( 0 , "LVSL", m_shortName.c_str(),
-	   WS_POPUP | WS_SYSMENU | WS_BORDER , 0, 0, 10, 10, NULL, NULL, hInst, NULL);
-#else
-	m_windowID = 1;	// arbitrary value on win32 to signal
-			// vstPlugin-class that we have an editor
-
 	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-					WS_CHILD, 0, 0, 10, 10,
-					m_window, NULL, hInst, NULL );
+#if QT_VERSION < 0x050000 && defined( LMMS_BUILD_LINUX )
+		WS_POPUP | WS_SYSMENU | WS_BORDER,
+#else
+		( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
 #endif
+		0, 0, 10, 10, NULL, NULL, hInst, NULL );
 	if( m_window == NULL )
 	{
 		debugMessage( "initEditor(): cannot create editor window\n" );
 		return;
 	}
-
 
 	pluginDispatch( effEditOpen, 0, 0, m_window );
 
@@ -682,17 +792,202 @@ void RemoteVstPlugin::initEditor()
 	m_windowWidth = er->right - er->left;
 	m_windowHeight = er->bottom - er->top;
 
+#ifdef USE_LINUX_EMBEDDER
+	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
+
+	m_embedderPid = -1;
+	m_embedderStdin = -1;
+	m_embedderStdout = -1;
+
+	int infd[2];
+	int outfd[2];
+	if( pipe( infd ) )
+	{
+		perror( "pipe" );
+		destroyEditor();
+		return;
+	}
+	if( pipe( outfd ) )
+	{
+		perror( "pipe" );
+		close_check( infd[0] );
+		close_check( infd[1] );
+		destroyEditor();
+		return;
+	}
+
+	m_embedderPid = fork();
+	switch ( m_embedderPid )
+	{
+		case -1:
+			perror( "fork" );
+			close_check( infd[0] );
+			close_check( infd[1] );
+			close_check( outfd[0] );
+			close_check( outfd[1] );
+			destroyEditor();
+			return;
+
+		case 0:
+			assert_dup2( infd[0], STDIN_FILENO );
+			assert_dup2( outfd[1], STDOUT_FILENO );
+
+			close_check( infd[0] );
+			close_check( infd[1] );
+			close_check( outfd[0] );
+			close_check( outfd[1] );
+
+			char * widStr = new char[2 * sizeof m_windowID + 1];
+			sprintf( widStr, "%x", m_windowID );
+			char * widthStr
+				= new char[2 * sizeof m_windowWidth + 1];
+			sprintf( widthStr, "%x", m_windowWidth );
+			char * heightStr
+				= new char[2 * sizeof m_windowHeight + 1];
+			sprintf( heightStr, "%x", m_windowHeight );
+			execl( s_embedderPath, s_embedderPath,
+				m_shortName.c_str(), widStr, widthStr,
+				heightStr, (char *) NULL );
+			perror( "execl" );
+			exit( EXIT_FAILURE );
+	}
+
+	close_check( infd[0] );
+	close_check( outfd[1] );
+	m_embedderStdin = infd[1];
+	m_embedderStdout = outfd[0];
+#else
+	// Pending: Check that Qt 5 embedding works on Windows
+	// Should wait until Qt 4 support is dropped
+
+	// TODO: Set to native window ID
+	m_windowID = 1;
+
+	const char * name = m_shortName.c_str();
+	char * commandLine = new char[sizeof EMBEDDER_NAME " " + strlen( name )
+		+ 1 + 2 * sizeof m_windowID + 1 + 2 * sizeof m_windowWidth + 1
+		+ 2 * sizeof m_windowHeight];
+	sprintf( commandLine, EMBEDDER_NAME " %s %x %x %x", name, m_windowID,
+						m_windowWidth, m_windowHeight );
+
+	// Set up the pipes
+/*
+	SECURITY_ATTRIBUTES saAttr;
+
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+
+	if ( !CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0) )
+		ErrorExit(TEXT("StdoutRd CreatePipe"));
+
+	if ( !SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) )
+		ErrorExit(TEXT("Stdout SetHandleInformation"));
+
+	if (! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0))
+		ErrorExit(TEXT("Stdin CreatePipe"));
+
+	if ( ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
+		ErrorExit(TEXT("Stdin SetHandleInformation"));
+*/
+
+	STARTUPINFO si;
+	ZeroMemory( &si, sizeof si );
+	si.cb = sizeof si;
+//	si.hStdOutput = g_hChildStd_OUT_Wr;
+//	si.hStdInput = g_hChildStd_IN_Rd;
+//	si.dwFlags |= STARTF_USESTDHANDLES;
+	ZeroMemory( &m_processInfo, sizeof m_processInfo );
+
+	// Pending: Create new process when the embedder is ready
+//	bool ok = CreateProcess( NULL, commandLine, NULL, NULL, TRUE, 0, NULL,
+//		NULL, &si, &m_processInfo );
+	delete[] commandLine;
+/*
+	if ( !ok )
+	{
+		fprintf( stderr, "CreateProcess failed (%d)\n",
+							GetLastError() );
+		destroyEditor();
+		return;
+	}
+*/
+	// close unused pipe handles if possible
+//	if ( ! CloseHandle(g_hChildStd_IN_Rd) ) error
+#endif
+
+
 	SetWindowPos( m_window, 0, 0, 0, m_windowWidth + 8,
 			m_windowHeight + 26, SWP_NOACTIVATE |
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
 
-	ShowWindow( m_window, SW_SHOWNORMAL );
-	UpdateWindow( m_window );
-
-#ifdef LMMS_BUILD_LINUX
-	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
+#ifdef USE_LINUX_EMBEDDER
+	char c;
+	if( ::read( m_embedderStdout, &c, 1 ) != 1 )
+	{
+		fprintf( stderr, "Could not read from embedder\n" );
+		destroyEditor();
+		return;
+	}
+#else
+//	bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
+//	if ( ! bSuccess || dwRead == 0 ) break;
 #endif
+	ShowWindow( m_window, SW_SHOWNORMAL );
+#ifdef USE_LINUX_EMBEDDER
+	if( ::write( m_embedderStdin, "", 1 ) != 1 )
+	{
+		fprintf( stderr, "Could not write to embedder\n" );
+		destroyEditor();
+		return;
+	}
+#else
+//	bSuccess = WriteFile(g_hChildStd_IN_Wr, chBuf, dwRead, &dwWritten, NULL);
+//	if ( ! bSuccess ) break;
+#endif
+}
+
+
+
+
+void RemoteVstPlugin::destroyEditor()
+{
+	if( m_window == NULL )
+	{
+		return;
+	}
+
+#ifdef USE_LINUX_EMBEDDER
+	close_check( m_embedderStdin );
+	close_check( m_embedderStdout );
+	if( m_embedderPid != -1 )
+	{
+		int status;
+		pid_t pid = waitpid( m_embedderPid, &status, 0 );
+		if( pid == -1 )
+		{
+			perror( "waitpid" );
+		}
+		else
+		{
+			checkExitStatus( status );
+		}
+	}
+#else
+	// Close pipes
+	// Wait until child process exits.
+//	WaitForSingleObject( m_processInfo.hProcess, INFINITE );
+
+	// Close process and thread handles.
+//	CloseHandle( m_processInfo.hProcess );
+//	CloseHandle( m_processInfo.hThread );
+#endif
+
+	pluginDispatch( effEditClose );
+	// Destroying the window takes some time in Wine 1.8.5
+	DestroyWindow( m_window );
+	m_window = NULL;
 }
 
 
@@ -989,7 +1284,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
 			}
-			close( fd );
+			close_check( fd );
 		}
 	}
 }
@@ -1327,7 +1622,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
-	close( fd );
+	close_check( fd );
 	pluginDispatch( 24, 0, _len, chunk );
 
 	delete[] buf;
@@ -1807,6 +2102,13 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 	while( quit == false && GetMessage( &msg, NULL, 0, 0 ) )
 	{
 		TranslateMessage( &msg );
+
+		if( msg.message == WM_SYSCOMMAND && msg.wParam == SC_CLOSE )
+		{
+			_this->destroyEditor();
+			continue;
+		}
+
 		DispatchMessage( &msg );
 
 		if( msg.message == WM_TIMER && _this->isInitialized() )
@@ -1842,6 +2144,63 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 
 	return 0;
 }
+
+
+
+
+#ifdef USE_LINUX_EMBEDDER
+static char * findMyPath( const char * argv0 )
+{
+	// TODO: escape ' or use execlp
+	std::string command = "winepath '";
+	command += argv0;
+	command += '\'';
+	FILE * stream = popen( command.c_str(), "r" );
+	if( !stream )
+	{
+		perror( "popen" );
+		return NULL;
+	}
+	char * unixPath = (char *) malloc( BUFSIZ );
+	char * s = fgets( unixPath, BUFSIZ, stream );
+	if( !s )
+	{
+		perror( "fgets" );
+		free( unixPath );
+		return NULL;
+	}
+	if( strlen( s ) == BUFSIZ - 1 )
+	{
+		//TODO: Read a longer line
+		fprintf( stderr, "findMyPath: Buffer too small\n" );
+	}
+	char * eol = strchr( unixPath, '\n' );
+	if( eol )
+	{
+		*eol = '\0';
+	}
+	if( pclose( stream ) == -1 )
+	{
+		perror( "pclose" );
+	}
+	return unixPath;
+}
+
+
+
+
+static char * findEmbedderPath( const char * argv0 )
+{
+	char * myPath = findMyPath( argv0 );
+	const char * slash = myPath ? strrchr( myPath, '/' ) : NULL;
+	size_t prefixLength = slash ? slash - myPath + 1 : 0;
+	char * path = new char[prefixLength + sizeof EMBEDDER_NAME];
+	memcpy( path, myPath, prefixLength );
+	memcpy( path + prefixLength, EMBEDDER_NAME, sizeof EMBEDDER_NAME );
+	free( myPath );
+	return path;
+}
+#endif
 
 
 
@@ -1883,6 +2242,10 @@ int main( int _argc, char * * _argv )
 	}
 #endif
 
+#ifdef USE_LINUX_EMBEDDER
+	s_embedderPath = findEmbedderPath( _argv[0] );
+#endif
+
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it
 #ifdef SYNC_WITH_SHM_FIFO
@@ -1906,6 +2269,10 @@ int main( int _argc, char * * _argv )
 
 
 	delete __plugin;
+
+#ifdef USE_LINUX_EMBEDDER
+	delete[] s_embedderPath;
+#endif
 
 
 #ifdef LMMS_BUILD_WIN32

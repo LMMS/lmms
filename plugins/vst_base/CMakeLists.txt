@@ -76,6 +76,18 @@ ADD_CUSTOM_COMMAND(
 	OUTPUTS ../RemoteVstPlugin
 )
 
+IF(QT5)
+	QT5_WRAP_CPP(embed-window_MOC_out EmbedderApplication.h)
+ELSE()
+	QT4_WRAP_CPP(embed-window_MOC_out EmbedderApplication.h)
+ENDIF()
+
+ADD_EXECUTABLE(embed-window embed-window.cpp ${embed-window_MOC_out})
+TARGET_LINK_LIBRARIES(embed-window ${QT_LIBRARIES})
+IF(NOT QT5)
+	TARGET_LINK_LIBRARIES(embed-window ${X11_X11_LIB})
+ENDIF()
+
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ../RemoteVstPlugin.exe.so)
 INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin" "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin.exe.so" DESTINATION "${PLUGIN_DIR}")
 ENDIF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
