@@ -57,6 +57,7 @@ class AutomationEditor : public QWidget, public JournallingObject
 	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
 	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
+	Q_PROPERTY(QColor backgroundShade READ backgroundShade WRITE setBackgroundShade)
 public:
 	void setCurrentPattern(AutomationPattern * new_pattern);
 
@@ -83,11 +84,13 @@ public:
 	QColor vertexColor() const;
 	QBrush scaleColor() const;
 	QColor crossColor() const;
+	QColor backgroundShade() const;
 	void setGridColor(const QColor& c);
 	void setGraphColor(const QBrush& c);
 	void setVertexColor(const QColor& c);
 	void setScaleColor(const QBrush& c);
 	void setCrossColor(const QColor& c);
+	void setBackgroundShade(const QColor& c);
 
 	enum EditModes
 	{
@@ -244,6 +247,7 @@ private:
 	QColor m_vertexColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
+	QColor m_backgroundShade;
 
 	friend class AutomationEditorWindow;
 

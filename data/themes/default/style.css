@@ -15,6 +15,7 @@ AutomationEditor {
 	background-color: #040506;
 	color: #ffffff;
 	qproperty-vertexColor: #6749C2;
+	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-gridColor: #4f5964;
 	qproperty-crossColor: #9875FF;
 
@@ -114,6 +115,7 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: #040506;
+	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-gridColor: #4f5964;
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
@@ -323,7 +325,7 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 
 /* main toolbar sliders (master vol, master pitch) */
 
-AutomatableSlider::groove:vertical {
+atableSlider::groove:vertical {
 	background: #040506;
 	border: none;
 	border-radius: 2px;

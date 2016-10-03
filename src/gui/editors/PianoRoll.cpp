@@ -199,7 +199,8 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
-	m_noteBorders( true )
+	m_noteBorders( true ),
+	m_backgroundShade( 0, 0, 0 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -790,6 +791,12 @@ bool PianoRoll::noteBorders() const
 
 void PianoRoll::setNoteBorders( const bool b )
 { m_noteBorders = b; }
+
+QColor PianoRoll::backgroundShade() const
+{ return m_backgroundShade; }
+
+void PianoRoll::setBackgroundShade( const QColor & c )
+{ m_backgroundShade = c; }
 
 
 
@@ -2857,23 +2864,25 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 
 	int tact_16th = m_currentPosition / bpt;
-	
-	int barCount = m_currentPosition / MidiTime::ticksPerTact();
 
 	const int offset = ( m_currentPosition % bpt ) *
 			m_ppt / MidiTime::ticksPerTact();
 
 	bool show32nds = ( m_zoomingModel.value() > 3 );
 
-	//count the bars which disappearse on left by scrolling
+	// alternating shades for better contrast
+	// count the bars which disappear on left by scrolling
+	int barCount = m_currentPosition / MidiTime::ticksPerTact();
 	int leftBars = m_currentPosition / m_ppt;
+
+	p.setBrush( backgroundShade() );
 
 	for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
 	{
 		if ( (barCount + leftBars)  % 2 != 0 )
 		{
-				p.setBrush( QColor(255, 0, 0) );
-				p.drawRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt, height() - PR_BOTTOM_MARGIN );
+				p.drawRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ) );
 		}
 	}
 

@@ -108,7 +108,8 @@ AutomationEditor::AutomationEditor() :
 	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
 	m_scaleColor( Qt::SolidPattern ),
-	m_crossColor( 0, 0, 0 )
+	m_crossColor( 0, 0, 0 ),
+	m_backgroundShade( 0, 0, 0 )
 {
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
@@ -256,6 +257,8 @@ QBrush AutomationEditor::scaleColor() const
 { return m_scaleColor; }
 QColor AutomationEditor::crossColor() const
 { return m_crossColor; }
+QColor AutomationEditor::backgroundShade() const
+{ return m_backgroundShade; }
 void AutomationEditor::setGridColor( const QColor & c )
 { m_gridColor = c; }
 void AutomationEditor::setGraphColor( const QBrush & c )
@@ -266,6 +269,8 @@ void AutomationEditor::setScaleColor( const QBrush & c )
 { m_scaleColor = c; }
 void AutomationEditor::setCrossColor( const QColor & c )
 { m_crossColor = c; }
+void AutomationEditor::setBackgroundShade( const QColor & c )
+{ m_backgroundShade = c; }
 
 
 
@@ -1093,6 +1098,22 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// keyboard...
 	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
 								grid_height  );
+
+	// alternating shades for better contrast
+	// count the bars which disappear on left by scrolling
+	int barCount = m_currentPosition / MidiTime::ticksPerTact();
+	int leftBars = m_currentPosition / m_ppt;
+
+	p.setBrush( backgroundShade() );
+
+	for ( int x = VALUES_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+	{
+		if ( (barCount + leftBars)  % 2 != 0 )
+		{
+			p.drawRect( x - m_currentPosition, TOP_MARGIN, m_ppt,
+				height() - ( SCROLLBAR_SIZE + TOP_MARGIN ) );
+		}
+	}
 
 	// draw vertical raster
 	QColor lineColor = QColor( gridColor() );
