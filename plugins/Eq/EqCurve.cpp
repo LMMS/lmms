@@ -547,8 +547,11 @@ double EqHandle::calculateGain(const double freq, const double a1, const double 
 
 void EqHandle::mousePressEvent( QGraphicsSceneMouseEvent *event )
 {
-	m_mousePressed = true;
-	QGraphicsItem::mousePressEvent( event );
+	if( event->button() == Qt::LeftButton )
+	{
+		m_mousePressed = true;
+		QGraphicsItem::mousePressEvent( event );
+	}
 }
 
 
@@ -556,8 +559,11 @@ void EqHandle::mousePressEvent( QGraphicsSceneMouseEvent *event )
 
 void EqHandle::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
 {
-	m_mousePressed = false;
-	QGraphicsItem::mouseReleaseEvent( event );
+	if( event->button() == Qt::LeftButton )
+	{
+		m_mousePressed = false;
+		QGraphicsItem::mouseReleaseEvent( event );
+	}
 }
 
 
