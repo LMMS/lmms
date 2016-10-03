@@ -325,7 +325,7 @@ nameLabel, effectLabel, sf2InstrumentView > QLabel {
 
 /* main toolbar sliders (master vol, master pitch) */
 
-atableSlider::groove:vertical {
+AutomatableSlider::groove:vertical {
 	background: #040506;
 	border: none;
 	border-radius: 2px;
