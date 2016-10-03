@@ -147,37 +147,37 @@ CPULoadWidget {
 /* scrollbar: trough */
 
 QScrollBar:horizontal {
-  border-top: 3px solid #262b30;
-  background: #262b30;
-  height: 12px;
-  margin: 0px 12px;
+	border-top: 3px solid #262b30;
+	background: #262b30;
+	height: 12px;
+	margin: 0px 12px;
 }
 QScrollBar:vertical {
-  border-left: 3px solid #262b30;
-  background: #262b30;
-  width: 12px;
-  margin: 12px 0px;
+	border-left: 3px solid #262b30;
+	background: #262b30;
+	width: 12px;
+	margin: 12px 0px;
 }
 
 /* scrollbar: trough clicky things */
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-  background: none;
+	background: none;
 }
 
 QScrollBar::add-page:horizontal:pressed, QScrollBar::sub-page:horizontal:pressed,
 QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
-  background: rgba(0,0,0,50);
+	background: rgba(0,0,0,50);
 }
 
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-  background: #3f4750;
-  border: none;
-  border-radius: 4px;
-  min-width: 24px;
+	background: #3f4750;
+	border: none;
+	border-radius: 4px;
+	min-width: 24px;
 }
 
 QScrollBar::handle:horizontal:hover {
@@ -189,10 +189,10 @@ QScrollBar::handle:horizontal:pressed {
 }
 
 QScrollBar::handle:vertical {
-  background: #3f4750;
-  border: none;
-  border-radius: 4px;
-  min-height: 24px;
+	background: #3f4750;
+	border: none;
+	border-radius: 4px;
+	min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
@@ -212,10 +212,10 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
-  background: #262b30;
-  border-radius: 0px;
-  border: none;
-  subcontrol-origin: margin;
+	background: #262b30;
+	border-radius: 0px;
+	border: none;
+	subcontrol-origin: margin;
 }
 
 QScrollBar::add-line:horizontal 	{  	subcontrol-position: right; width: 12px;}
@@ -239,10 +239,10 @@ QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
 
 QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal,
 QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-  border: none;
-  background-color: none;
-  width: 5px;
-  height: 5px;
+	border: none;
+	background-color: none;
+	width: 5px;
+	height: 5px;
 }
 
 QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
