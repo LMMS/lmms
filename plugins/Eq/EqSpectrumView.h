@@ -95,9 +95,6 @@ private:
 	bool m_periodicalUpdate;
 	QList<float> m_bandHeight;
 
-	int bandToXPixel( float band );
 	float bandToFreq ( int index );
-	float freqToXPixel( float freq );
-
 };
 #endif // EQSPECTRUMVIEW_H

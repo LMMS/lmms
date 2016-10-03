@@ -24,6 +24,7 @@
 #include "EqSpectrumView.h"
 
 #include "Engine.h"
+#include "EqCurve.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Mixer.h"
@@ -231,7 +232,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 			m_bandHeight[x] = 0;
 		}
 
-		m_path.lineTo( freqToXPixel( bandToFreq( x ) ), fh - m_bandHeight[x] );
+		m_path.lineTo( EqHandle::freqToXPixel( bandToFreq( x ), width() ), fh - m_bandHeight[x] );
 		m_peakSum += m_bandHeight[x];
 	}
 
@@ -260,28 +261,9 @@ void EqSpectrumView::setColor( const QColor &value )
 
 
 
-int EqSpectrumView::bandToXPixel( float band )
-{
-	return ( log10( band - m_skipBands ) * m_pixelsPerUnitWidth * m_scale );
-}
-
-
-
-
 float EqSpectrumView::bandToFreq( int index )
 {
 	return index * m_analyser->getSampleRate() / ( MAX_BANDS * 2 );
-}
-
-
-
-
-float EqSpectrumView::freqToXPixel(float freq)
-{
-	float min = log ( 27) / log( 10 );
-	float max = log ( 20000 )/ log( 10 );
-	float range = max - min;
-	return ( log( freq ) / log( 10 ) - min ) / range * width();
 }
 
 

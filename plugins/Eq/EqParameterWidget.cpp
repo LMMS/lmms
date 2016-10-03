@@ -46,13 +46,13 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	resize( m_displayWidth, m_displayHeigth );
 	float totalHeight = 36; // gain range from -18 to +18
 	m_pixelsPerUnitHeight = m_displayHeigth / totalHeight;
-	m_pixelsPerOctave =	EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
+	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
 	QGraphicsScene *scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	QGraphicsView *view = new QGraphicsView(this);
-	view->setStyleSheet(  "border-style: none; background: transparent;");
+	QGraphicsView *view = new QGraphicsView( this );
+	view->setStyleSheet( "border-style: none; background: transparent;" );
 	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	view->setScene( scene );
@@ -63,7 +63,7 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	{
 		m_handle = new EqHandle ( i, m_displayWidth, m_displayHeigth );
 		m_handleList->append( m_handle );
-		m_handle->setZValue(1);
+		m_handle->setZValue( 1 );
 		scene->addItem( m_handle );
 	}
 
@@ -159,7 +159,7 @@ void EqParameterWidget::changeHandle( int i )
 	{
 	case 0 :
 		m_handleList->at( i )->setType( highpass );
-		m_handleList->at( i )->setPos( x, m_displayHeigth/2 );
+		m_handleList->at( i )->setPos( x, m_displayHeigth / 2 );
 		break;
 	case 1:
 		m_handleList->at( i )->setType( lowshelf );
@@ -187,7 +187,7 @@ void EqParameterWidget::changeHandle( int i )
 		break;
 	case 7:
 		m_handleList->at( i )->setType( lowpass );
-		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth/2 ) );
+		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth / 2 ) );
 		break;
 	}
 
@@ -205,16 +205,24 @@ void EqParameterWidget::changeHandle( int i )
 
 
 
-
+//this is called if a handle is moved
 void EqParameterWidget::updateModels()
 {
 	for ( int i=0 ; i < bandCount(); i++ )
 	{
-		m_bands[i].freq->setValue( EqHandle::xPixelToFreq( m_handleList->at(i)->x(), m_displayWidth ) );
-		if( m_bands[i].gain ) m_bands[i].gain->setValue( EqHandle::yPixelToGain( m_handleList->at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight ) );
+		m_bands[i].freq->setValue( EqHandle::xPixelToFreq( m_handleList->at( i )->x(), m_displayWidth ) );
+
+		if( m_bands[i].gain )
+		{
+			m_bands[i].gain->setValue( EqHandle::yPixelToGain( m_handleList->at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight ) );
+		}
+
 		m_bands[i].res->setValue( m_handleList->at( i )->getResonance() );
-		//sets the band on active if the handle is moved
-		if ( sender() == m_handleList->at( i ) ) m_bands[i].active->setValue( true );
+		//identifies the handle which is moved and set the band active
+		if ( sender() == m_handleList->at( i ) )
+		{
+			m_bands[i].active->setValue( true );
+		}
 	}
 	m_eqcurve->update();
 }

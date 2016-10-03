@@ -93,7 +93,7 @@ protected:
 	QVariant itemChange( GraphicsItemChange change, const QVariant &value );
 
 private:
-	double calculateGain( const double &freq, const double &a1, const double &a2, const double &b0, const double &b1, const double &b2 );
+	double calculateGain( const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 );
 
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
