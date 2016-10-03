@@ -350,6 +350,7 @@ private:
 
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
+	bool m_mouseInPianoRoll; //true if mouse is the edit area
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
