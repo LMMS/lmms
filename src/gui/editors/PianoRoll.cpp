@@ -199,7 +199,8 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
-	m_noteBorders( true )
+    m_noteBorders( true ),
+    m_cursor( NULL )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -1980,9 +1981,18 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		return;
 	}
 
+    if( me->x() > WHITE_KEY_WIDTH )
+    {
+        setCursor( QCursor( *m_cursor, 0, m_cursor->height() ) );
+    }
+    else
+    {
+        setCursor( Qt::ArrowCursor );
+    }
+
 	if( m_action == ActionNone && me->buttons() == 0 )
 	{
-		if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
+        if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
 		{
 			QApplication::setOverrideCursor(
 					QCursor( Qt::SizeVerCursor ) );
@@ -3080,33 +3090,34 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.fillRect( QRect( 0, keyAreaBottom(),
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), horizCol );
 
-	const QPixmap * cursor = NULL;
+
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
 		case ModeDraw:
 			if( m_mouseDownRight )
 			{
-				cursor = s_toolErase;
+                m_cursor = s_toolErase;
+                setCursor( QCursor( *m_cursor, 0, m_cursor->height() ) );
 			}
 			else if( m_action == ActionMoveNote )
 			{
-				cursor = s_toolMove;
+                m_cursor = s_toolMove;
 			}
 			else
 			{
-				cursor = s_toolDraw;
+                m_cursor = s_toolDraw;
 			}
 			break;
-		case ModeErase: cursor = s_toolErase; break;
-		case ModeSelect: cursor = s_toolSelect; break;
-		case ModeEditDetuning: cursor = s_toolOpen; break;
+        case ModeErase: m_cursor = s_toolErase; break;
+        case ModeSelect: m_cursor = s_toolSelect; break;
+        case ModeEditDetuning: m_cursor = s_toolOpen; break;
 	}
-	if( cursor != NULL )
-	{
-		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
-	}
+//    if( m_cursor != NULL )
+//	{
+//        //p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ), *cursor );
+//        setCursor( QCursor( *m_cursor, 0, 0 ) );
+//	}
 }
 
 

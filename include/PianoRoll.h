@@ -381,6 +381,7 @@ private:
 	QColor m_markedSemitoneColor;
 	int m_noteOpacity;
 	bool m_noteBorders;
+    QPixmap * m_cursor;
 
 signals:
 	void positionChanged( const MidiTime & );
