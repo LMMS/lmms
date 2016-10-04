@@ -14,12 +14,12 @@ QMdiArea {
 AutomationEditor {
 	background-color: #040506;
 	color: #ffffff;
-	qproperty-vertexColor: #7f0a1d;
-	qproperty-gridColor: #2d3339;
-	qproperty-crossColor: #FE143A;
+	qproperty-vertexColor: #6749C2;
+	qproperty-gridColor: #190F38;
+	qproperty-crossColor: #9875FF;
 
 	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
-                     stop:0 rgba(83,7,19,255),  stop:1 rgba(127,10,29,50));
+                     stop:0 rgba(69,42,153,255),  stop:1 rgba(81,48,179,50));
 										 qproperty-scaleColor: #262b30;
 }
 
@@ -611,14 +611,14 @@ PatternView {
 
 /* sample track pattern */
 SampleTCOView {
-	background-color: #261657;
-	color: #100A26;
+	background-color: #DE7C05;
+	color: #FFE8CD;
 }
 
 /* automation pattern */
 AutomationPatternView {
-	background-color: #4D0818;
-	color: rgba(0,0,0,130);
+	background-color: #663DE1;
+	color: rgba(255,255,255,90);
 }
 
 /* bb-pattern */
