@@ -2875,14 +2875,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	int barCount = m_currentPosition / MidiTime::ticksPerTact();
 	int leftBars = m_currentPosition / m_ppt;
 
-	p.setBrush( backgroundShade() );
-
 	for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
 	{
 		if ( (barCount + leftBars)  % 2 != 0 )
 		{
-				p.drawRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
-					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ) );
+				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
 		}
 	}
 
