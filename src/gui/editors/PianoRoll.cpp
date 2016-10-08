@@ -188,6 +188,7 @@ PianoRoll::PianoRoll() :
 	m_editMode( ModeDraw ),
 	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
+	m_mouseInPianoRoll( false ),
 	m_scrollBack( false ),
 	m_gridColor( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
@@ -796,7 +797,7 @@ void PianoRoll::setNoteBorders( const bool b )
 
 
 
-void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
+void PianoRoll::drawNoteRect( QPainter & p, int x, int y, 
 				int width, const Note * n, const QColor & noteCol,
 				const QColor & selCol, const int noteOpc, const bool borders )
 {
@@ -1912,7 +1913,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 		{
 			// select the notes within the selection rectangle and
 			// then destroy the selection rectangle
-			computeSelectedNotes(
+			computeSelectedNotes( 
 					me->modifiers() & Qt::ShiftModifier );
 		}
 		else if( m_action == ActionMoveNote )
@@ -2017,19 +2018,20 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		repaint();
 		return;
 	}
-
+	
 	if( me->y() > PR_TOP_MARGIN || m_action != ActionNone )
 	{
 		bool edit_note = ( me->y() > noteEditTop() )
-				&& m_action != ActionSelectNotes;
+						&& m_action != ActionSelectNotes;
+
 
 		int key_num = getKey( me->y() );
 		int x = me->x();
 
 		// see if they clicked on the keyboard on the left
 		if( x < WHITE_KEY_WIDTH && m_action == ActionNone
-				&& ! edit_note && key_num != m_lastKey
-				&& me->buttons() & Qt::LeftButton )
+		    && ! edit_note && key_num != m_lastKey
+			&& me->buttons() & Qt::LeftButton )
 		{
 			// clicked on a key, play the note
 			testPlayKey( key_num, ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity, 0 );
@@ -2181,7 +2183,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				// and check whether the cursor is over an
 				// existing note
 				if( pos_ticks >= note->pos() &&
-						pos_ticks <= note->pos() +
+			    		pos_ticks <= note->pos() +
 							note->length() &&
 					note->key() == key_num &&
 					note->length() > 0 )
@@ -2203,7 +2205,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				bool atTail = note->length() > 0 && x > noteRightX -
 							RESIZE_AREA_WIDTH;
 				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
-													   Qt::SizeAllCursor;
+				                                       Qt::SizeAllCursor;
 				if( QApplication::overrideCursor() )
 				{
 					if( QApplication::overrideCursor()->shape() != cursorShape )
@@ -2469,7 +2471,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				}
 			}
 		}
-	}
+	} 
 	else if (m_action == ActionResizeNote)
 	{
 		// When resizing notes:
@@ -2477,7 +2479,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		// If shift is pressed we resize and rearrange only the selected notes
 		// If shift + ctrl then we also rearrange all posterior notes (sticky)
 		// If shift is pressed but only one note is selected, apply sticky
-
+			
 		if (shift)
 		{
 			// Algorithm:
@@ -2497,8 +2499,8 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			const Note *posteriorNote = nullptr;
 			for (const Note *note : notes)
 			{
-				if (note->selected() && (posteriorNote == nullptr ||
-					note->oldPos().getTicks() + note->oldLength().getTicks() >
+				if (note->selected() && (posteriorNote == nullptr || 
+					note->oldPos().getTicks() + note->oldLength().getTicks() > 
 					posteriorNote->oldPos().getTicks() + posteriorNote->oldLength().getTicks()))
 				{
 					posteriorNote = note;
@@ -2518,9 +2520,9 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				if(note->selected())
 				{
 					// scale relative start and end positions by scaleFactor
-					int newStart = stretchStartTick + scaleFactor *
+					int newStart = stretchStartTick + scaleFactor * 
 						(note->oldPos().getTicks() - stretchStartTick);
-					int newEnd = stretchStartTick + scaleFactor *
+					int newEnd = stretchStartTick + scaleFactor * 
 						(note->oldPos().getTicks()+note->oldLength().getTicks() - stretchStartTick);
 					// if  not holding alt, quantize the offsets
 					if(!alt)
@@ -2539,7 +2541,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 					int newLength = qMax(1, newEnd-newStart);
 					if (note == posteriorNote)
 					{
-						posteriorDeltaThisFrame = (newStart+newLength) -
+						posteriorDeltaThisFrame = (newStart+newLength) - 
 							(note->pos().getTicks() + note->length().getTicks());
 					}
 					note->setLength( MidiTime(newLength) );
@@ -2642,7 +2644,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT,
-				markedSemitoneColor() );
+			    markedSemitoneColor() );
 	}
 
 
@@ -2779,11 +2781,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		// check for black key that is only half visible on the bottom
 		// of piano-roll
 		if( keys_processed == 0
-			// current key may not be a black one
-			&& prKeyOrder[key % KeysPerOctave] != PR_BLACK_KEY
-			// but the previous one must be black (we must check this
-			// because there might be two white keys (E-F)
-			&& prKeyOrder[( key - 1 ) % KeysPerOctave] ==
+		    // current key may not be a black one
+		    && prKeyOrder[key % KeysPerOctave] != PR_BLACK_KEY
+		    // but the previous one must be black (we must check this
+		    // because there might be two white keys (E-F)
+		    && prKeyOrder[( key - 1 ) % KeysPerOctave] ==
 								PR_BLACK_KEY )
 		{
 			// draw the black key!
@@ -2810,7 +2812,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						WHITE_KEY_SMALL_HEIGHT/2 - 1 -
 						BLACK_KEY_HEIGHT, *s_blackKeyPressedPm );
 			}
-			else
+		    else
 			{
 				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
 						WHITE_KEY_SMALL_HEIGHT ) -
@@ -2889,7 +2891,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// every tact-start needs to be a bright line
 			if( tact_16th % spt == 0 )
 			{
-				p.setPen( gridColor() );
+	 			p.setPen( gridColor() );
 			}
 			// normal line
 			else if( tact_16th % 4 == 0 )
@@ -2986,7 +2988,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
 								note_width, note, noteColor(), selectedNoteColor(),
-								noteOpacity(), noteBorders() );
+							 	noteOpacity(), noteBorders() );
 			}
 
 			// draw note editing stuff
@@ -3026,7 +3028,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 				p.drawLine( QLine( noteEditLeft() + x, noteEditTop() +
 						( (float)( noteEditBottom() - noteEditTop() ) ) / 2.0f,
-							noteEditLeft() + x , editHandleTop ) );
+						    noteEditLeft() + x , editHandleTop ) );
 			}
 			editHandles << QPoint ( x + noteEditLeft(),
 						editHandleTop );
@@ -3091,6 +3093,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, horizCol );
 	}
 
+	// bar to resize note edit area
+	p.setClipRect( 0, 0, width(), height() );
+	p.fillRect( QRect( 0, keyAreaBottom(),
+					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), horizCol );
+
+	m_cursor = NULL;
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
@@ -3134,7 +3142,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 void PianoRoll::resizeEvent(QResizeEvent * re)
 {
 	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH,
-									  height() -
+								      height() -
 								SCROLLBAR_SIZE,
 					width()-WHITE_KEY_WIDTH,
 							SCROLLBAR_SIZE );
@@ -4130,11 +4138,11 @@ PianoRollWindow::PianoRollWindow() :
 
 	QAction* copyAction = new QAction(embed::getIconPixmap( "edit_copy" ),
 							   tr( "Copy selected notes (%1+C)" ).arg(
-									#ifdef LMMS_BUILD_APPLE
-									"⌘"), this);
-									#else
+	 								#ifdef LMMS_BUILD_APPLE
+	 								"⌘"), this);
+	 								#else
 									"Ctrl" ), this );
-									#endif
+	 								#endif
 
 	QAction* pasteAction = new QAction(embed::getIconPixmap( "edit_paste" ),
 					tr( "Paste notes from clipboard (%1+V)" ).arg(
