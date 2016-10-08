@@ -879,9 +879,9 @@ void DataFile::upgrade_1_1_91()
 	{
 		QDomElement el = list.item( i ).toElement();
 		// invert the mute LEDs
-		for( int d = 1; d <= 4; ++d ){
-			QString muteLed = QString( "mute%1" ).arg( d );
-			el.setAttribute( muteLed, ( el.attribute( muteLed ) == "0" ) ? "1" : "0" );
+		for( int j = 1; j <= 4; ++j ){
+			QString a = QString( "mute%1" ).arg( j );
+			el.setAttribute( a, ( el.attribute( a ) == "0" ) ? "1" : "0" );
 		}
 	}
 }
