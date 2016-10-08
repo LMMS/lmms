@@ -2018,7 +2018,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		repaint();
 		return;
 	}
-	
+
 	if( me->y() > PR_TOP_MARGIN || m_action != ActionNone )
 	{
 		bool edit_note = ( me->y() > noteEditTop() )
