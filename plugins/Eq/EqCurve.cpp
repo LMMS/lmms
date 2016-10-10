@@ -327,7 +327,7 @@ float EqHandle::getLowCutCurve( float x )
 	}
 	if ( m_hp48 )
 	{
-		gain = gain * 4;
+        gain = gain * 3;
 	}
 	float y = gainToYPixel( gain, m_heigth, m_pixelsPerUnitHeight );
 
@@ -371,7 +371,7 @@ float EqHandle::getHighCutCurve( float x )
 	}
 	if ( m_lp48 )
 	{
-		gain = gain * 4;
+        gain = gain * 3;
 	}
 	float y = gainToYPixel( gain, m_heigth, m_pixelsPerUnitHeight );
 
