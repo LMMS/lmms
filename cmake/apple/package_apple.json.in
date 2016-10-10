@@ -1,6 +1,5 @@
 {
  "title": "@MACOSX_BUNDLE_BUNDLE_NAME@ @MACOSX_BUNDLE_LONG_VERSION_STRING@",
- "icon": "@CMAKE_SOURCE_DIR@/cmake/apple/lmms.icns",
  "background": "@CMAKE_SOURCE_DIR@/cmake/apple/dmg_branding.png",
  "icon-size": 72,
  "contents": [
