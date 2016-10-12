@@ -50,13 +50,13 @@ const int CD_KNOB_X_SPACING = 32;
 const int CD_LFO_SHAPES_X = 6;
 const int CD_LFO_SHAPES_Y = CD_ENV_KNOBS_LBL_Y + 4;
 
-const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y+3;
-const int CD_LFO_CD_KNOB_Y = CD_LFO_GRAPH_Y-2;
+const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y + 3;
+const int CD_LFO_CD_KNOB_Y = CD_LFO_GRAPH_Y - 2;
 const int CD_LFO_BASE_CD_KNOB_X = CD_LFO_SHAPES_X + 68;
-const int CD_LFO_SPEED_CD_KNOB_X = CD_LFO_BASE_CD_KNOB_X+CD_KNOB_X_SPACING;
-const int CD_LFO_AMOUNT_CD_KNOB_X = CD_LFO_SPEED_CD_KNOB_X+CD_KNOB_X_SPACING;
-const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X+CD_KNOB_X_SPACING;
-const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X+CD_KNOB_X_SPACING+3;
+const int CD_LFO_SPEED_CD_KNOB_X = CD_LFO_BASE_CD_KNOB_X + CD_KNOB_X_SPACING;
+const int CD_LFO_AMOUNT_CD_KNOB_X = CD_LFO_SPEED_CD_KNOB_X + CD_KNOB_X_SPACING;
+const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X + CD_KNOB_X_SPACING;
+const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X + CD_KNOB_X_SPACING + 3;
 
 LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
@@ -68,106 +68,92 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	setWindowTitle( title );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setFixedSize( 240, 58 );
-	
 	ToolTip::add( this, tr( "LFO Controller" ) );
-
 	m_baseKnob = new Knob( knobBright_26, this );
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base amount:" ), "" );
-	m_baseKnob->setWhatsThis( tr("todo") );
-
-
+	m_baseKnob->setWhatsThis( tr( "todo" ) );
 	m_speedKnob = new TempoSyncKnob( knobBright_26, this );
 	m_speedKnob->setLabel( tr( "SPD" ) );
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO-speed:" ), "" );
 	m_speedKnob->setWhatsThis(
 		tr( "Use this knob for setting speed of the LFO. The "
-			"bigger this value the faster the LFO oscillates and "
-			"the faster the effect." ) );
-
-
+		    "bigger this value the faster the LFO oscillates and "
+		    "the faster the effect." ) );
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 	m_amountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
-			"LFO. The bigger this value, the more the connected "
-			"control (e.g. volume or cutoff-frequency) will "
-			"be influenced by the LFO." ) );
-
+		    "LFO. The bigger this value, the more the connected "
+		    "control (e.g. volume or cutoff-frequency) will "
+		    "be influenced by the LFO." ) );
 	m_phaseKnob = new Knob( knobBright_26, this );
 	m_phaseKnob->setLabel( tr( "PHS" ) );
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( "degrees" ) );
 	m_phaseKnob->setWhatsThis(
-			tr( "With this knob you can set the phase offset of "
-				"the LFO. That means you can move the "
-				"point within an oscillation where the "
-				"oscillator begins to oscillate. For example "
-				"if you have a sine-wave and have a phase-"
-				"offset of 180 degrees the wave will first go "
-				"down. It's the same with a square-wave."
-				) );
-
+		tr( "With this knob you can set the phase offset of "
+		    "the LFO. That means you can move the "
+		    "point within an oscillation where the "
+		    "oscillator begins to oscillate. For example "
+		    "if you have a sine-wave and have a phase-"
+		    "offset of 180 degrees the wave will first go "
+		    "down. It's the same with a square-wave."
+		  ) );
 	PixmapButton * sin_wave_btn = new PixmapButton( this, NULL );
 	sin_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y );
 	sin_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"sin_wave_active" ) );
 	sin_wave_btn->setInactiveGraphic( embed::getIconPixmap(
-						"sin_wave_inactive" ) );
+			"sin_wave_inactive" ) );
 	ToolTip::add( sin_wave_btn,
-			tr( "Click here for a sine-wave." ) );
-
+		      tr( "Click here for a sine-wave." ) );
 	PixmapButton * triangle_wave_btn =
-					new PixmapButton( this, NULL );
+		new PixmapButton( this, NULL );
 	triangle_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y );
 	triangle_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "triangle_wave_active" ) );
 	triangle_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
 	ToolTip::add( triangle_wave_btn,
-			tr( "Click here for a triangle-wave." ) );
-
+		      tr( "Click here for a triangle-wave." ) );
 	PixmapButton * saw_wave_btn = new PixmapButton( this, NULL );
 	saw_wave_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y );
 	saw_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"saw_wave_active" ) );
 	saw_wave_btn->setInactiveGraphic( embed::getIconPixmap(
-						"saw_wave_inactive" ) );
+			"saw_wave_inactive" ) );
 	ToolTip::add( saw_wave_btn,
-			tr( "Click here for a saw-wave." ) );
-
+		      tr( "Click here for a saw-wave." ) );
 	PixmapButton * sqr_wave_btn = new PixmapButton( this, NULL );
 	sqr_wave_btn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y );
 	sqr_wave_btn->setActiveGraphic( embed::getIconPixmap(
-					"square_wave_active" ) );
+						"square_wave_active" ) );
 	sqr_wave_btn->setInactiveGraphic( embed::getIconPixmap(
-					"square_wave_inactive" ) );
+			"square_wave_inactive" ) );
 	ToolTip::add( sqr_wave_btn,
-			tr( "Click here for a square-wave." ) );
-
+		      tr( "Click here for a square-wave." ) );
 	PixmapButton * moog_saw_wave_btn =
-					new PixmapButton( this, NULL );
+		new PixmapButton( this, NULL );
 	moog_saw_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y + 15 );
 	moog_saw_wave_btn->setActiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_active" ) );
 	moog_saw_wave_btn->setInactiveGraphic(
 		embed::getIconPixmap( "moog_saw_wave_inactive" ) );
 	ToolTip::add( moog_saw_wave_btn,
-			tr( "Click here for a moog saw-wave." ) );
-
+		      tr( "Click here for a moog saw-wave." ) );
 	PixmapButton * exp_wave_btn = new PixmapButton( this, NULL );
 	exp_wave_btn->move( CD_LFO_SHAPES_X + 15, CD_LFO_SHAPES_Y + 15 );
 	exp_wave_btn->setActiveGraphic( embed::getIconPixmap(
 						"exp_wave_active" ) );
 	exp_wave_btn->setInactiveGraphic( embed::getIconPixmap(
-						"exp_wave_inactive" ) );
+			"exp_wave_inactive" ) );
 	ToolTip::add( exp_wave_btn,
-			tr( "Click here for an exponential wave." ) );
-
+		      tr( "Click here for an exponential wave." ) );
 	PixmapButton * white_noise_btn = new PixmapButton( this, NULL );
 	white_noise_btn->move( CD_LFO_SHAPES_X + 30, CD_LFO_SHAPES_Y + 15 );
 	white_noise_btn->setActiveGraphic(
@@ -175,20 +161,18 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	white_noise_btn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	ToolTip::add( white_noise_btn,
-				tr( "Click here for white-noise." ) );
-
+		      tr( "Click here for white-noise." ) );
 	m_userWaveBtn = new PixmapButton( this, NULL );
 	m_userWaveBtn->move( CD_LFO_SHAPES_X + 45, CD_LFO_SHAPES_Y + 15 );
 	m_userWaveBtn->setActiveGraphic( embed::getIconPixmap(
-						"usr_wave_active" ) );
+			"usr_wave_active" ) );
 	m_userWaveBtn->setInactiveGraphic( embed::getIconPixmap(
-						"usr_wave_inactive" ) );
+			"usr_wave_inactive" ) );
 	connect( m_userWaveBtn,
-					SIGNAL( doubleClicked() ),
-			this, SLOT( askUserDefWave() ) );
+		 SIGNAL( doubleClicked() ),
+		 this, SLOT( askUserDefWave() ) );
 	ToolTip::add( m_userWaveBtn,
-				tr( "Click here for a user-defined shape.\nDouble click to pick a file." ) );
-	
+		      tr( "Click here for a user-defined shape.\nDouble click to pick a file." ) );
 	m_waveBtnGrp = new automatableButtonGroup( this );
 	m_waveBtnGrp->addButton( sin_wave_btn );
 	m_waveBtnGrp->addButton( triangle_wave_btn );
@@ -198,42 +182,33 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_waveBtnGrp->addButton( exp_wave_btn );
 	m_waveBtnGrp->addButton( white_noise_btn );
 	m_waveBtnGrp->addButton( m_userWaveBtn );
-
-
 	PixmapButton * x1 = new PixmapButton( this, NULL );
-	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y +7);
+	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 7 );
 	x1->setActiveGraphic( embed::getIconPixmap(
-						"lfo_x1_active" ) );
+				      "lfo_x1_active" ) );
 	x1->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_x1_inactive" ) );
-
+					"lfo_x1_inactive" ) );
 	PixmapButton * x100 = new PixmapButton( this, NULL );
 	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8 );
 	x100->setActiveGraphic( embed::getIconPixmap(
-						"lfo_x100_active" ) );
+					"lfo_x100_active" ) );
 	x100->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_x100_inactive" ) );
-
+					  "lfo_x100_inactive" ) );
 	PixmapButton * d100 = new PixmapButton( this, NULL );
 	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22 );
 	d100->setActiveGraphic( embed::getIconPixmap(
-						"lfo_d100_active" ) );
+					"lfo_d100_active" ) );
 	d100->setInactiveGraphic( embed::getIconPixmap(
-						"lfo_d100_inactive" ) );
-
+					  "lfo_d100_inactive" ) );
 	m_multiplierBtnGrp = new automatableButtonGroup( this );
 	m_multiplierBtnGrp->addButton( x1 );
 	m_multiplierBtnGrp->addButton( x100 );
 	m_multiplierBtnGrp->addButton( d100 );
-
-
 	setModel( _model );
-
 	setAutoFillBackground( true );
 	QPalette pal;
 	pal.setBrush( backgroundRole(), embed::getIconPixmap( "lfo_controller_artwork" ) );
 	setPalette( pal );
-
 }
 
 
@@ -247,9 +222,10 @@ LfoControllerDialog::~LfoControllerDialog()
 
 void LfoControllerDialog::askUserDefWave()
 {
-	SampleBuffer * sampleBuffer = dynamic_cast<LfoController*>(this->model())->
-									m_userDefSampleBuffer;
+	SampleBuffer * sampleBuffer = dynamic_cast<LfoController *>( this->model() )->
+				      m_userDefSampleBuffer;
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
+
 	if( fileName.isEmpty() == false )
 	{
 		// TODO:
@@ -288,7 +264,6 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 void LfoControllerDialog::modelChanged()
 {
 	m_lfo = castModel<LfoController>();
-
 	m_baseKnob->setModel( &m_lfo->m_baseModel );
 	m_speedKnob->setModel( &m_lfo->m_speedModel );
 	m_amountKnob->setModel( &m_lfo->m_amountModel );

@@ -77,13 +77,13 @@ public:
 	void updateLength();
 
 	MidiTime putValue( const MidiTime & _time, const float _value,
-						const bool _quant_pos = true );
+			   const bool _quant_pos = true );
 
 	void removeValue( const MidiTime & _time,
-					  const bool _quant_pos = true );
+			  const bool _quant_pos = true );
 
 	MidiTime setDragValue( const MidiTime & _time, const float _value,
-						   const bool _quant_pos = true );
+			       const bool _quant_pos = true );
 
 	void applyDragValue();
 
@@ -129,7 +129,7 @@ public:
 	}
 
 	float valueAt( const MidiTime & _time ) const;
-	float *valuesAfter( const MidiTime & _time ) const;
+	float * valuesAfter( const MidiTime & _time ) const;
 
 	const QString name() const;
 
@@ -154,7 +154,7 @@ public:
 	void setRecording( const bool b ) { m_isRecording = b; }
 
 	static int quantization() { return s_quantization; }
-	static void setQuantization(int q) { s_quantization = q; }
+	static void setQuantization( int q ) { s_quantization = q; }
 
 public slots:
 	void clear();
@@ -180,7 +180,7 @@ private:
 	ProgressionTypes m_progressionType;
 
 	bool m_dragging;
-	
+
 	bool m_isRecording;
 	float m_lastRecordedValue;
 

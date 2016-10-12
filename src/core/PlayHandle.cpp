@@ -21,17 +21,17 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "PlayHandle.h"
 #include "BufferManager.h"
 
 
 PlayHandle::PlayHandle( const Type type, f_cnt_t offset ) :
-		m_type( type ),
-		m_offset( offset ),
-		m_affinity( QThread::currentThread() ),
-		m_playHandleBuffer( NULL ),
-		m_usesBuffer( true )
+	m_type( type ),
+	m_offset( offset ),
+	m_affinity( QThread::currentThread() ),
+	m_playHandleBuffer( NULL ),
+	m_usesBuffer( true )
 {
 }
 
@@ -45,7 +45,8 @@ void PlayHandle::doProcessing()
 {
 	if( m_usesBuffer )
 	{
-		if( ! m_playHandleBuffer ) m_playHandleBuffer = BufferManager::acquire();
+		if( ! m_playHandleBuffer ) { m_playHandleBuffer = BufferManager::acquire(); }
+
 		play( m_playHandleBuffer );
 	}
 	else
@@ -57,6 +58,7 @@ void PlayHandle::doProcessing()
 
 void PlayHandle::releaseBuffer()
 {
-	if( m_playHandleBuffer ) BufferManager::release( m_playHandleBuffer );
+	if( m_playHandleBuffer ) { BufferManager::release( m_playHandleBuffer ); }
+
 	m_playHandleBuffer = NULL;
 }

@@ -44,7 +44,7 @@ class QLineEdit;
 class AudioPulseAudio : public AudioDevice, public QThread
 {
 public:
-	AudioPulseAudio( bool & _success_ful, Mixer* mixer );
+	AudioPulseAudio( bool & _success_ful, Mixer * mixer );
 	virtual ~AudioPulseAudio();
 
 	inline static QString name()

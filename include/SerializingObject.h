@@ -52,7 +52,7 @@ public:
 
 	void setHook( SerializingObjectHook * _hook );
 
-	SerializingObjectHook* hook()
+	SerializingObjectHook * hook()
 	{
 		return m_hook;
 	}
@@ -60,8 +60,8 @@ public:
 
 protected:
 	// to be implemented by sub-objects
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element ) = 0;
-	virtual void loadSettings( const QDomElement& element ) = 0;
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element ) = 0;
+	virtual void loadSettings( const QDomElement & element ) = 0;
 
 
 private:

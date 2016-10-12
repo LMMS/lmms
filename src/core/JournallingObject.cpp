@@ -67,19 +67,19 @@ void JournallingObject::addJournalCheckPoint()
 
 
 QDomElement JournallingObject::saveState( QDomDocument & _doc,
-							QDomElement & _parent )
+		QDomElement & _parent )
 {
 	if( isJournalling() )
 	{
 		QDomElement _this = SerializingObject::saveState( _doc, _parent );
-
 		QDomElement journalNode = _doc.createElement( "journallingObject" );
 		journalNode.setAttribute( "id", id() );
 		journalNode.setAttribute( "metadata", true );
 		_this.appendChild( journalNode );
-
 		return _this;
-	} else {
+	}
+	else
+	{
 		return QDomElement();
 	}
 }
@@ -90,21 +90,22 @@ QDomElement JournallingObject::saveState( QDomDocument & _doc,
 void JournallingObject::restoreState( const QDomElement & _this )
 {
 	SerializingObject::restoreState( _this );
-
 	saveJournallingState( false );
-
 	// search for journal-node
 	QDomNode node = _this.firstChild();
+
 	while( !node.isNull() )
 	{
 		if( node.isElement() && node.nodeName() == "journal" )
 		{
 			const jo_id_t new_id = node.toElement().attribute( "id" ).toInt();
+
 			if( new_id )
 			{
 				changeID( new_id );
 			}
 		}
+
 		node = node.nextSibling();
 	}
 
@@ -119,19 +120,22 @@ void JournallingObject::changeID( jo_id_t _id )
 	if( id() != _id )
 	{
 		JournallingObject * jo = Engine::projectJournal()->
-											journallingObject( _id );
+					 journallingObject( _id );
+
 		if( jo != NULL )
 		{
 			QString used_by = jo->nodeName();
+
 			if( used_by == "automatablemodel" &&
-				dynamic_cast<AutomatableModel *>( jo ) )
+					dynamic_cast<AutomatableModel *>( jo ) )
 			{
 				used_by += ":" +
-					dynamic_cast<AutomatableModel *>( jo )->
-								displayName();
+					   dynamic_cast<AutomatableModel *>( jo )->
+					   displayName();
 			}
+
 			fprintf( stderr, "JO-ID %d already in use by %s!\n",
-				(int) _id, used_by.toUtf8().constData() );
+				 ( int ) _id, used_by.toUtf8().constData() );
 			return;
 		}
 

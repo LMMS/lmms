@@ -75,9 +75,9 @@ typedef struct PortDescription
 
 
 inline Plugin::Descriptor::SubPluginFeatures::Key ladspaKeyToSubPluginKey(
-						const Plugin::Descriptor * _desc,
-						const QString & _name,
-						const ladspa_key_t & _key )
+	const Plugin::Descriptor * _desc,
+	const QString & _name,
+	const ladspa_key_t & _key )
 {
 	Plugin::Descriptor::SubPluginFeatures::Key::AttributeMap m;
 	QString file = _key.first;

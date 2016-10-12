@@ -30,14 +30,14 @@
 
 
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
-					const ch_cnt_t _channels,
-					const QString & _file,
-					const bool _use_vbr,
-					const bitrate_t _nom_bitrate,
-					const bitrate_t _min_bitrate,
-					const bitrate_t _max_bitrate,
-					const int _depth,
-					Mixer*  _mixer ) :
+				  const ch_cnt_t _channels,
+				  const QString & _file,
+				  const bool _use_vbr,
+				  const bitrate_t _nom_bitrate,
+				  const bitrate_t _min_bitrate,
+				  const bitrate_t _max_bitrate,
+				  const int _depth,
+				  Mixer * _mixer ) :
 	AudioDevice( _channels, _mixer ),
 	m_outputFile( _file ),
 	m_useVbr( _use_vbr ),
@@ -51,16 +51,16 @@ AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
 	{
 		QMessageBox::critical( NULL,
-			ExportProjectDialog::tr( "Could not open file" ),
-			ExportProjectDialog::tr( "Could not open file %1 "
-						"for writing.\nPlease make "
-						"sure you have write-"
-						"permission to the file and "
-						"the directory containing the "
-						"file and try again!" ).arg(
-									_file ),
-					QMessageBox::Ok,
-					QMessageBox::NoButton );
+				       ExportProjectDialog::tr( "Could not open file" ),
+				       ExportProjectDialog::tr( "Could not open file %1 "
+						       "for writing.\nPlease make "
+						       "sure you have write-"
+						       "permission to the file and "
+						       "the directory containing the "
+						       "file and try again!" ).arg(
+					       _file ),
+				       QMessageBox::Ok,
+				       QMessageBox::NoButton );
 	}
 }
 
@@ -75,11 +75,11 @@ AudioFileDevice::~AudioFileDevice()
 
 
 
-int AudioFileDevice::writeData( const void* data, int len )
+int AudioFileDevice::writeData( const void * data, int len )
 {
 	if( m_outputFile.isOpen() )
 	{
-		return m_outputFile.write( (const char *) data, len );
+		return m_outputFile.write( ( const char * ) data, len );
 	}
 
 	return -1;

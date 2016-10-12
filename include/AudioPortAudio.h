@@ -70,7 +70,7 @@ class LcdSpinBox;
 class AudioPortAudio : public AudioDevice
 {
 public:
-	AudioPortAudio( bool & _success_ful, Mixer* mixer );
+	AudioPortAudio( bool & _success_ful, Mixer * mixer );
 	virtual ~AudioPortAudio();
 
 	inline static QString name()
@@ -79,9 +79,9 @@ public:
 	}
 
 
-	int process_callback( const float *_inputBuffer,
-		float * _outputBuffer,
-		unsigned long _framesPerBuffer );
+	int process_callback( const float * _inputBuffer,
+			      float * _outputBuffer,
+			      unsigned long _framesPerBuffer );
 
 
 	class setupWidget : public AudioDeviceSetupWidget
@@ -105,11 +105,11 @@ private:
 	virtual void applyQualitySettings();
 
 #ifdef PORTAUDIO_V19
-	static int _process_callback( const void *_inputBuffer, void * _outputBuffer,
-		unsigned long _framesPerBuffer,
-		const PaStreamCallbackTimeInfo * _timeInfo,
-		PaStreamCallbackFlags _statusFlags,
-		void *arg );
+	static int _process_callback( const void * _inputBuffer, void * _outputBuffer,
+				      unsigned long _framesPerBuffer,
+				      const PaStreamCallbackTimeInfo * _timeInfo,
+				      PaStreamCallbackFlags _statusFlags,
+				      void * arg );
 
 #else
 
@@ -121,7 +121,7 @@ private:
 #define Pa_IsStreamActive Pa_StreamActive
 
 	static int _process_callback( void * _inputBuffer, void * _outputBuffer,
-		unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
+				      unsigned long _framesPerBuffer, PaTimestamp _outTime, void * _arg );
 
 
 	typedef double PaTime;
@@ -133,7 +133,7 @@ private:
 		int channelCount;
 		PaSampleFormat sampleFormat;
 		PaTime suggestedLatency;
-		void *hostApiSpecificStreamInfo;
+		void * hostApiSpecificStreamInfo;
 
 	} PaStreamParameters;
 #endif

@@ -2,7 +2,7 @@
  * Note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -36,8 +36,8 @@
 
 
 Note::Note( const MidiTime & length, const MidiTime & pos,
-		int key, volume_t volume, panning_t panning,
-						DetuningHelper * detuning ) :
+	    int key, volume_t volume, panning_t panning,
+	    DetuningHelper * detuning ) :
 	m_selected( false ),
 	m_oldKey( qBound( 0, key, NumKeys ) ),
 	m_oldPos( pos ),
@@ -70,7 +70,7 @@ Note::Note( const Note & note ) :
 	m_oldPos( note.m_oldPos ),
 	m_oldLength( note.m_oldLength ),
 	m_isPlaying( note.m_isPlaying ),
-	m_key( note.m_key),
+	m_key( note.m_key ),
 	m_volume( note.m_volume ),
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
@@ -142,11 +142,13 @@ void Note::setPanning( panning_t panning )
 
 MidiTime Note::quantized( const MidiTime & m, const int qGrid )
 {
-	float p = ( (float) m / qGrid );
+	float p = ( ( float ) m / qGrid );
+
 	if( p - floorf( p ) < 0.5f )
 	{
 		return static_cast<int>( p ) * qGrid;
 	}
+
 	return static_cast<int>( p + 1 ) * qGrid;
 }
 
@@ -156,6 +158,7 @@ MidiTime Note::quantized( const MidiTime & m, const int qGrid )
 void Note::quantizeLength( const int qGrid )
 {
 	setLength( quantized( length(), qGrid ) );
+
 	if( length() == 0 )
 	{
 		setLength( qGrid );
@@ -215,7 +218,7 @@ void Note::createDetuning()
 	if( m_detuning == NULL )
 	{
 		m_detuning = new DetuningHelper;
-		(void) m_detuning->automationPattern();
+		( void ) m_detuning->automationPattern();
 		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
 		m_detuning->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
 	}
@@ -231,8 +234,8 @@ bool Note::hasDetuningInfo() const
 
 
 
-bool Note::withinRange(int tickStart, int tickEnd) const
+bool Note::withinRange( int tickStart, int tickEnd ) const
 {
 	return pos().getTicks() >= tickStart && pos().getTicks() <= tickEnd
-		&& length().getTicks() != 0;
+	       && length().getTicks() != 0;
 }

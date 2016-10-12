@@ -30,7 +30,7 @@
 
 
 Instrument::Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor ) :
+			const Descriptor * _descriptor ) :
 	Plugin( _descriptor, NULL/* _instrument_track*/ ),
 	m_instrumentTrack( _instrument_track )
 {
@@ -69,10 +69,11 @@ f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
 
 
 Instrument * Instrument::instantiate( const QString & _plugin_name,
-					InstrumentTrack * _instrument_track )
+				      InstrumentTrack * _instrument_track )
 {
 	Plugin * p = Plugin::instantiate( _plugin_name, _instrument_track,
-							_instrument_track );
+					  _instrument_track );
+
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<Instrument *>( p ) != NULL )
 	{
@@ -101,14 +102,16 @@ void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 	const fpp_t frames = _n->framesLeftForCurrentPeriod();
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 	const f_cnt_t fl = _n->framesLeft();
-	if( fl <= desiredReleaseFrames()+fpp )
+
+	if( fl <= desiredReleaseFrames() + fpp )
 	{
-		for( fpp_t f = (fpp_t)( ( fl > desiredReleaseFrames() ) ?
-				( qMax( fpp - desiredReleaseFrames(), 0 ) +
-					fl % fpp ) : 0 ); f < frames; ++f )
+		for( fpp_t f = ( fpp_t )( ( fl > desiredReleaseFrames() ) ?
+					  ( qMax( fpp - desiredReleaseFrames(), 0 ) +
+					    fl % fpp ) : 0 ); f < frames; ++f )
 		{
-			const float fac = (float)( fl-f-1 ) /
-							desiredReleaseFrames();
+			const float fac = ( float )( fl - f - 1 ) /
+					  desiredReleaseFrames();
+
 			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
 			{
 				buf[f][ch] *= fac;

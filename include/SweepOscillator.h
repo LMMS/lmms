@@ -43,9 +43,10 @@ public:
 	{
 	}
 
-	void update( sampleFrame* buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
+	void update( sampleFrame * buf, const fpp_t frames, const float freq1, const float freq2, const float sampleRate )
 	{
 		const float df = freq2 - freq1;
+
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{
 			const sample_t s = Oscillator::sinSample( m_phase );

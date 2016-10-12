@@ -32,10 +32,10 @@ MeterModel::MeterModel( ::Model * _parent ) :
 	m_numeratorModel( 4, 1, 32, this, tr( "Numerator" ) ),
 	m_denominatorModel( 4, 1, 32, this, tr( "Denominator" ) )
 {
-	connect( &m_numeratorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( dataChanged() ) );
-	connect( &m_denominatorModel, SIGNAL( dataChanged() ), 
-				this, SIGNAL( dataChanged() ) );
+	connect( &m_numeratorModel, SIGNAL( dataChanged() ),
+		 this, SIGNAL( dataChanged() ) );
+	connect( &m_denominatorModel, SIGNAL( dataChanged() ),
+		 this, SIGNAL( dataChanged() ) );
 }
 
 
@@ -52,7 +52,6 @@ void MeterModel::reset()
 {
 	m_numeratorModel.setValue( 4 );
 	m_denominatorModel.setValue( 4 );
-
 	AutomationPattern::globalAutomationPattern( &m_numeratorModel )->clear();
 	AutomationPattern::globalAutomationPattern( &m_denominatorModel )->clear();
 }
@@ -61,7 +60,7 @@ void MeterModel::reset()
 
 
 void MeterModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
-								const QString & _name )
+			       const QString & _name )
 {
 	m_numeratorModel.saveSettings( _doc, _this, _name + "_numerator" );
 	m_denominatorModel.saveSettings( _doc, _this, _name + "_denominator" );
@@ -71,7 +70,7 @@ void MeterModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 
 
 void MeterModel::loadSettings( const QDomElement & _this,
-								const QString & _name )
+			       const QString & _name )
 {
 	m_numeratorModel.loadSettings( _this, _name + "_numerator" );
 	m_denominatorModel.loadSettings( _this, _name + "_denominator" );

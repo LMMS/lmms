@@ -34,7 +34,7 @@ class updateEvent : public QEvent
 {
 public:
 	updateEvent() :
-		QEvent( (QEvent::Type)customEvents::GUI_UPDATE )
+		QEvent( ( QEvent::Type )customEvents::GUI_UPDATE )
 	{
 	}
 

@@ -56,7 +56,7 @@ public:
 		Depths depth;
 
 		OutputSettings( sample_rate_t _sr, bool _vbr, int _bitrate,
-								Depths _d ) :
+				Depths _d ) :
 			samplerate( _sr ),
 			vbr( _vbr ),
 			bitrate( _bitrate ),
@@ -75,9 +75,9 @@ public:
 
 
 	ProjectRenderer( const Mixer::qualitySettings & _qs,
-				const OutputSettings & _os,
-				ExportFileFormats _file_format,
-				const QString & _out_file );
+			 const OutputSettings & _os,
+			 ExportFileFormats _file_format,
+			 const QString & _out_file );
 	virtual ~ProjectRenderer();
 
 	bool isReady() const
@@ -86,7 +86,7 @@ public:
 	}
 
 	static ExportFileFormats getFileFormatFromExtension(
-							const QString & _ext );
+		const QString & _ext );
 
 	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
 

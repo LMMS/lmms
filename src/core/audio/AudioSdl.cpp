@@ -39,18 +39,16 @@
 
 
 
-AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
+AudioSdl::AudioSdl( bool & _success_ful, Mixer * _mixer ) :
 	AudioDevice( DEFAULT_CHANNELS, _mixer ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_convertedBufPos( 0 ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
-
 	m_convertedBufSize = mixer()->framesPerPeriod() * channels()
-						* sizeof( int_sample_t );
+			     * sizeof( int_sample_t );
 	m_convertedBuf = new Uint8[m_convertedBufSize];
-
 
 	if( SDL_Init( SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE ) < 0 )
 	{
@@ -60,15 +58,13 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 
 	m_audioHandle.freq = sampleRate();
 	m_audioHandle.format = AUDIO_S16SYS;	// we want it in byte-order
-						// of system, so we don't have
-						// to convert the buffers
+	// of system, so we don't have
+	// to convert the buffers
 	m_audioHandle.channels = channels();
-	m_audioHandle.samples = qMax( 1024, mixer()->framesPerPeriod()*2 );
-
+	m_audioHandle.samples = qMax( 1024, mixer()->framesPerPeriod() * 2 );
 	m_audioHandle.callback = sdlAudioCallback;
 	m_audioHandle.userdata = this;
-
-  	SDL_AudioSpec actual; 
+	SDL_AudioSpec actual;
 
 	// open the audio device, forcing the desired format
 	if( SDL_OpenAudio( &m_audioHandle, &actual ) < 0 )
@@ -76,8 +72,8 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 		qCritical( "Couldn't open SDL-audio: %s\n", SDL_GetError() );
 		return;
 	}
-	m_convertEndian = ( m_audioHandle.format != actual.format );
 
+	m_convertEndian = ( m_audioHandle.format != actual.format );
 	_success_ful = true;
 }
 
@@ -87,7 +83,6 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 AudioSdl::~AudioSdl()
 {
 	stopProcessing();
-
 	SDL_CloseAudio();
 	SDL_Quit();
 	delete[] m_convertedBuf;
@@ -100,7 +95,6 @@ AudioSdl::~AudioSdl()
 void AudioSdl::startProcessing()
 {
 	m_stopped = false;
-
 	SDL_PauseAudio( 0 );
 }
 
@@ -126,12 +120,9 @@ void AudioSdl::applyQualitySettings()
 	if( 0 )//hqAudio() )
 	{
 		SDL_CloseAudio();
-
 		setSampleRate( Engine::mixer()->processingSampleRate() );
-
 		m_audioHandle.freq = sampleRate();
-
-		SDL_AudioSpec actual; 
+		SDL_AudioSpec actual;
 
 		// open the audio device, forcing the desired format
 		if( SDL_OpenAudio( &m_audioHandle, &actual ) < 0 )
@@ -149,7 +140,6 @@ void AudioSdl::applyQualitySettings()
 void AudioSdl::sdlAudioCallback( void * _udata, Uint8 * _buf, int _len )
 {
 	AudioSdl * _this = static_cast<AudioSdl *>( _udata );
-
 	_this->sdlAudioCallback( _buf, _len );
 }
 
@@ -170,21 +160,23 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 		{
 			// frames depend on the sample rate
 			const fpp_t frames = getNextBuffer( m_outBuf );
+
 			if( !frames )
 			{
 				memset( _buf, 0, _len );
 				return;
 			}
-			m_convertedBufSize = frames * channels()
-						* sizeof( int_sample_t );
 
+			m_convertedBufSize = frames * channels()
+					     * sizeof( int_sample_t );
 			convertToS16( m_outBuf, frames,
-						mixer()->masterGain(),
-						(int_sample_t *)m_convertedBuf,
-						m_convertEndian );
+				      mixer()->masterGain(),
+				      ( int_sample_t * )m_convertedBuf,
+				      m_convertEndian );
 		}
+
 		const int min_len = qMin( _len, m_convertedBufSize
-							- m_convertedBufPos );
+					  - m_convertedBufPos );
 		memcpy( _buf, m_convertedBuf + m_convertedBufPos, min_len );
 		_buf += min_len;
 		_len -= min_len;
@@ -202,11 +194,9 @@ AudioSdl::setupWidget::setupWidget( QWidget * _parent ) :
 	QString dev = ConfigManager::inst()->value( "audiosdl", "device" );
 	m_device = new QLineEdit( dev, this );
 	m_device->setGeometry( 10, 20, 160, 20 );
-
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
 }
 
 
@@ -222,7 +212,7 @@ AudioSdl::setupWidget::~setupWidget()
 void AudioSdl::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audiosdl", "device",
-							m_device->text() );
+					 m_device->text() );
 }
 
 

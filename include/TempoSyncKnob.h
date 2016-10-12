@@ -38,7 +38,7 @@ class EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:
-	TempoSyncKnob( knobTypes knobNum, QWidget* parent = NULL, const QString& name = QString() );
+	TempoSyncKnob( knobTypes knobNum, QWidget * parent = NULL, const QString & name = QString() );
 	virtual ~TempoSyncKnob();
 
 	const QString & syncDescription();

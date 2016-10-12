@@ -35,14 +35,14 @@ class MidiSetupWidget : public TabWidget
 {
 	Q_OBJECT
 	MidiSetupWidget( const QString & caption, const QString & configSection,
-		const QString & devName, QWidget * parent );
+			 const QString & devName, QWidget * parent );
 public:
 	// create a widget with editors for all of @MidiClientType's fields
-	template <typename MidiClientType> static MidiSetupWidget* create( QWidget * parent )
+	template <typename MidiClientType> static MidiSetupWidget * create( QWidget * parent )
 	{
 		QString configSection = MidiClientType::configSection();
 		QString dev = MidiClientType::probeDevice();
-		return new MidiSetupWidget(MidiClientType::name(), configSection, dev, parent);
+		return new MidiSetupWidget( MidiClientType::name(), configSection, dev, parent );
 	}
 
 	void saveSettings();
@@ -50,7 +50,7 @@ public:
 	void show();
 private:
 	QString m_configSection;
-	QLineEdit *m_device;
+	QLineEdit * m_device;
 
 };
 

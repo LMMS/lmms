@@ -34,10 +34,10 @@ const int FFT_BUFFER_SIZE = 2048;
 
 enum WINDOWS
 {
-        KAISER=1,
-        RECTANGLE,
-        HANNING,
-        HAMMING
+	KAISER = 1,
+	RECTANGLE,
+	HANNING,
+	HAMMING
 };
 
 /* returns biggest value from abs_spectrum[spec_size] array
@@ -59,7 +59,7 @@ int EXPORT hanming( float * _timebuffer, int _length, WINDOWS _type );
  *    returns 0 on success, else -1
  */
 int EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffer,
-							int _compl_length );
+		    int _compl_length );
 
 /* build fewer subbands from many absolute spectrum values
  * take care that - compressedbands[] array num_new elements long
@@ -68,17 +68,17 @@ int EXPORT absspec( fftwf_complex * _complex_buffer, float * _absspec_buffer,
  *    returns 0 on success, else -1
  */
 int EXPORT compressbands( float * _absspec_buffer, float * _compressedband,
-			int _num_old, int _num_new, int _bottom, int _top );
+			  int _num_old, int _num_new, int _bottom, int _top );
 
 
 int EXPORT calc13octaveband31( float * _absspec_buffer, float * _subbands,
-				int _num_spec, float _max_frequency );
+			       int _num_spec, float _max_frequency );
 
 /* compute power of finite time sequence
  * take care num_values is length of timesignal[]
  *
  *    returns power on success, else -1
  */
-float EXPORT signalpower(float *timesignal, int num_values);
+float EXPORT signalpower( float * timesignal, int num_values );
 
 #endif

@@ -44,12 +44,13 @@ class QString;
 #define MAXTLEN 3 << MAXLEN
 
 // table for table sizes
-const int TLENS[MAXTBL+1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
-					2 << 2, 3 << 2, 2 << 3, 3 << 3,
-					2 << 4, 3 << 4, 2 << 5, 3 << 5,
-					2 << 6, 3 << 6, 2 << 7, 3 << 7,
-					2 << 8, 3 << 8, 2 << 9, 3 << 9,
-					2 << 10, 3 << 10, 2 << 11, 3 << 11 };
+const int TLENS[MAXTBL + 1] = { 2 << 0, 3 << 0, 2 << 1, 3 << 1,
+				2 << 2, 3 << 2, 2 << 3, 3 << 3,
+				2 << 4, 3 << 4, 2 << 5, 3 << 5,
+				2 << 6, 3 << 6, 2 << 7, 3 << 7,
+				2 << 8, 3 << 8, 2 << 9, 3 << 9,
+				2 << 10, 3 << 10, 2 << 11, 3 << 11
+			      };
 
 typedef struct
 {
@@ -75,10 +76,10 @@ private:
 } WaveMipMap;
 
 
-QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap );
+QDataStream & operator<< ( QDataStream & out, WaveMipMap & waveMipMap );
 
 
-QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap );
+QDataStream & operator>> ( QDataStream & in, WaveMipMap & waveMipMap );
 
 
 
@@ -134,16 +135,15 @@ public:
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
 			const float ip = fraction( lookupf );
-
 			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
 			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
 			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
 			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-
 			return sr;
 		}
+
 		// low wavelen/ high freq
 		if( _wavelen < 3.0f )
 		{
@@ -153,19 +153,18 @@ public:
 			const float lookupf = ph * static_cast<float>( tlen );
 			const int lookup = static_cast<int>( lookupf );
 			const float ip = fraction( lookupf );
-
 			const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 			const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
 			const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
 			const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 			const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
 			const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-
 			return sr;
 		}
 
 		// get the next higher tlen
 		int t = MAXTBL - 1;
+
 		while( _wavelen < TLENS[t] ) { t--; }
 
 		int tlen = TLENS[t];
@@ -173,28 +172,24 @@ public:
 		const float lookupf = ph * static_cast<float>( tlen );
 		int lookup = static_cast<int>( lookupf );
 		const float ip = fraction( lookupf );
-
 		const sample_t s1 = s_waveforms[ _wave ].sampleAt( t, lookup );
 		const sample_t s2 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-
 		const int lm = lookup == 0 ? tlen - 1 : lookup - 1;
 		const sample_t s0 = s_waveforms[ _wave ].sampleAt( t, lm );
 		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 2 ) % tlen );
 		const sample_t sr = optimal4pInterpolate( s0, s1, s2, s3, ip );
-
 		return sr;
+		/*		lookup = lookup << 1;
+				tlen = tlen << 1;
+				t += 1;
+				const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
+				const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
+				const sample_t s34 = linearInterpolate( s3, s4, ip );
 
-/*		lookup = lookup << 1;
-		tlen = tlen << 1;
-		t += 1;
-		const sample_t s3 = s_waveforms[ _wave ].sampleAt( t, lookup );
-		const sample_t s4 = s_waveforms[ _wave ].sampleAt( t, ( lookup + 1 ) % tlen );
-		const sample_t s34 = linearInterpolate( s3, s4, ip );
+				const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
 
-		const float ip2 = ( ( tlen - _wavelen ) / tlen - 0.5 ) * 2.0;
-
-		return linearInterpolate( s12, s34, ip2 );
-	*/
+				return linearInterpolate( s12, s34, ip2 );
+			*/
 	};
 
 

@@ -33,23 +33,23 @@
 
 namespace base64
 {
-	inline void encode( const char * _data, const int _size,
-								QString & _dst )
-	{
-		_dst = QByteArray( _data, _size ).toBase64();
-	}
+inline void encode( const char * _data, const int _size,
+		    QString & _dst )
+{
+	_dst = QByteArray( _data, _size ).toBase64();
+}
 
-	template<class T>
-	inline void decode( const QString & _b64, T * * _data, int * _size )
-	{
-		QByteArray data = QByteArray::fromBase64( _b64.toUtf8() );
-		*_size = data.size();
-		*_data = new T[*_size / sizeof(T)];
-		memcpy( *_data, data.constData(), *_size );
-	}
-	// for compatibility-code only
-	QVariant decode( const QString & _b64,
-			QVariant::Type _force_type = QVariant::Invalid );
+template<class T>
+inline void decode( const QString & _b64, T ** _data, int * _size )
+{
+	QByteArray data = QByteArray::fromBase64( _b64.toUtf8() );
+	*_size = data.size();
+	*_data = new T[*_size / sizeof( T )];
+	memcpy( *_data, data.constData(), *_size );
+}
+// for compatibility-code only
+QVariant decode( const QString & _b64,
+		 QVariant::Type _force_type = QVariant::Invalid );
 
 }
 

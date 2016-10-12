@@ -2,7 +2,7 @@
  * ConfigManager.h - class ConfigManager, a class for managing LMMS-configuration
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString GIG_PATH = "samples/gig/";
 const QString SF2_PATH = "samples/sf2/";
-const QString LADSPA_PATH ="plugins/ladspa/";
+const QString LADSPA_PATH = "plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
@@ -62,6 +62,7 @@ public:
 		{
 			s_instanceOfMe = new ConfigManager();
 		}
+
 		return s_instanceOfMe;
 	}
 
@@ -184,7 +185,7 @@ public:
 	{
 		return m_workingDir + "recover.mmp";
 	}
-	
+
 	const QString & version() const
 	{
 		return m_version;
@@ -220,10 +221,10 @@ public:
 	void addRecentlyOpenedProject( const QString & _file );
 
 	const QString & value( const QString & cls,
-					const QString & attribute ) const;
+			       const QString & attribute ) const;
 	void setValue( const QString & cls, const QString & attribute,
-						const QString & value );
-	void deleteValue( const QString & cls, const QString & attribute);
+		       const QString & value );
+	void deleteValue( const QString & cls, const QString & attribute );
 
 	void loadConfigFile( const QString & configFile = "" );
 	void saveConfigFile();

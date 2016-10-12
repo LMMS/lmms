@@ -31,14 +31,14 @@
 class MeterModel : public Model
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,getNumerator,setNumerator,m_numeratorModel);
-	mapPropertyFromModel(int,getDenominator,setDenominator,m_denominatorModel);
+	mapPropertyFromModel( int, getNumerator, setNumerator, m_numeratorModel );
+	mapPropertyFromModel( int, getDenominator, setDenominator, m_denominatorModel );
 public:
 	MeterModel( Model * _parent );
 	~MeterModel();
 
 	void saveSettings( QDomDocument & _doc, QDomElement & _this,
-						const QString & _name );
+			   const QString & _name );
 	void loadSettings( const QDomElement & _this, const QString & _name );
 
 	void reset();

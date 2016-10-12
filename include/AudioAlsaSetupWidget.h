@@ -49,7 +49,7 @@ public:
 	virtual void saveSettings();
 
 public slots:
-	void onCurrentIndexChanged(int index);
+	void onCurrentIndexChanged( int index );
 
 private:
 	QComboBox * m_deviceComboBox;

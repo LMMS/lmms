@@ -43,8 +43,8 @@ class EXPORT Effect : public Plugin
 	Q_OBJECT
 public:
 	Effect( const Plugin::Descriptor * _desc,
-			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key );
+		Model * _parent,
+		const Descriptor::SubPluginFeatures::Key * _key );
 	virtual ~Effect();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -55,9 +55,9 @@ public:
 		return "effect";
 	}
 
-	
+
 	virtual bool processAudioBuffer( sampleFrame * _buf,
-						const fpp_t _frames ) = 0;
+					 const fpp_t _frames ) = 0;
 
 	inline ch_cnt_t processorCount() const
 	{
@@ -85,10 +85,10 @@ public:
 		return m_running;
 	}
 
-	inline void startRunning() 
-	{ 
+	inline void startRunning()
+	{
 		m_bufferCount = 0;
-		m_running = true; 
+		m_running = true;
 	}
 
 	inline void stopRunning()
@@ -120,7 +120,7 @@ public:
 	inline float gate() const
 	{
 		const float level = m_gateModel.value();
-		return level*level * m_processors;
+		return level * level * m_processors;
 	}
 
 	inline f_cnt_t bufferCount() const
@@ -161,8 +161,8 @@ public:
 	virtual EffectControls * controls() = 0;
 
 	static Effect * instantiate( const QString & _plugin_name,
-				Model * _parent,
-				Descriptor::SubPluginFeatures::Key * _key );
+				     Model * _parent,
+				     Descriptor::SubPluginFeatures::Key * _key );
 
 
 protected:
@@ -173,23 +173,23 @@ protected:
 	// some effects might not be capable of higher sample-rates so they can
 	// sample it down before processing and back after processing
 	inline void sampleDown( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
-							sample_rate_t _dst_sr )
+				sampleFrame * _dst_buf,
+				sample_rate_t _dst_sr )
 	{
 		resample( 0, _src_buf,
-				Engine::mixer()->processingSampleRate(),
-					_dst_buf, _dst_sr,
-					Engine::mixer()->framesPerPeriod() );
+			  Engine::mixer()->processingSampleRate(),
+			  _dst_buf, _dst_sr,
+			  Engine::mixer()->framesPerPeriod() );
 	}
 
 	inline void sampleBack( const sampleFrame * _src_buf,
-							sampleFrame * _dst_buf,
-							sample_rate_t _src_sr )
+				sampleFrame * _dst_buf,
+				sample_rate_t _src_sr )
 	{
 		resample( 1, _src_buf, _src_sr, _dst_buf,
-				Engine::mixer()->processingSampleRate(),
-			Engine::mixer()->framesPerPeriod() * _src_sr /
-				Engine::mixer()->processingSampleRate() );
+			  Engine::mixer()->processingSampleRate(),
+			  Engine::mixer()->framesPerPeriod() * _src_sr /
+			  Engine::mixer()->processingSampleRate() );
 	}
 	void reinitSRC();
 
@@ -197,9 +197,9 @@ protected:
 private:
 	EffectChain * m_parent;
 	void resample( int _i, const sampleFrame * _src_buf,
-					sample_rate_t _src_sr,
-					sampleFrame * _dst_buf, sample_rate_t _dst_sr,
-					const f_cnt_t _frames );
+		       sample_rate_t _src_sr,
+		       sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+		       const f_cnt_t _frames );
 
 	Descriptor::SubPluginFeatures::Key m_key;
 
@@ -214,7 +214,7 @@ private:
 	FloatModel m_wetDryModel;
 	FloatModel m_gateModel;
 	TempoSyncKnobModel m_autoQuitModel;
-	
+
 	bool m_autoQuitDisabled;
 
 	SRC_DATA m_srcData[2];

@@ -52,7 +52,7 @@ public:
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"ALSA Raw-MIDI (Advanced Linux Sound Architecture)" );
+					  "ALSA Raw-MIDI (Advanced Linux Sound Architecture)" );
 	}
 
 	inline static QString configSection()

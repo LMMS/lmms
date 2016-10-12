@@ -54,10 +54,10 @@ public:
 		IsNotBendable = 0x04,		/*! Instrument can't react to pitch bend changes */
 	};
 
-	Q_DECLARE_FLAGS(Flags, Flag);
+	Q_DECLARE_FLAGS( Flags, Flag );
 
 	Instrument( InstrumentTrack * _instrument_track,
-					const Descriptor * _descriptor );
+		    const Descriptor * _descriptor );
 	virtual ~Instrument();
 
 	// --------------------------------------------------------------------
@@ -71,7 +71,7 @@ public:
 
 	// to be implemented by actual plugin
 	virtual void playNote( NotePlayHandle * /* _note_to_play */,
-					sampleFrame * /* _working_buf */ )
+			       sampleFrame * /* _working_buf */ )
 	{
 	}
 
@@ -103,7 +103,7 @@ public:
 
 	// sub-classes can re-implement this for receiving all incoming
 	// MIDI-events
-	inline virtual bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
+	inline virtual bool handleMidiEvent( const MidiEvent &, const MidiTime & = MidiTime(), f_cnt_t offset = 0 )
 	{
 		return true;
 	}
@@ -117,7 +117,7 @@ public:
 	// instantiate instrument-plugin with given name or return NULL
 	// on failure
 	static Instrument * instantiate( const QString & _plugin_name,
-									InstrumentTrack * _instrument_track );
+					 InstrumentTrack * _instrument_track );
 
 	virtual bool isFromTrack( const Track * _track ) const;
 
@@ -139,6 +139,6 @@ private:
 
 } ;
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(Instrument::Flags)
+Q_DECLARE_OPERATORS_FOR_FLAGS( Instrument::Flags )
 
 #endif

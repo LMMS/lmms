@@ -41,7 +41,7 @@ class EXPORT LadspaControl : public Model, public JournallingObject
 	Q_OBJECT
 public:
 	LadspaControl( Model * _parent, port_desc_t * _port,
-							bool _link = false );
+		       bool _link = false );
 	~LadspaControl();
 
 	LADSPA_Data value();
@@ -92,15 +92,15 @@ protected slots:
 	void linkStateChanged();
 
 protected:
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
-		Q_UNUSED(doc)
-		Q_UNUSED(element)
+		Q_UNUSED( doc )
+		Q_UNUSED( element )
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	virtual void loadSettings( const QDomElement & element )
 	{
-		Q_UNUSED(element)
+		Q_UNUSED( element )
 	}
 
 

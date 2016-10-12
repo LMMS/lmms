@@ -50,7 +50,7 @@ public:
 
 	void restoreJournallingState()
 	{
-		if( !isJournallingStateStackEmpty())
+		if( !isJournallingStateStackEmpty() )
 		{
 			m_journalling = m_journallingStateStack.pop();
 		}
@@ -59,7 +59,7 @@ public:
 	void addJournalCheckPoint();
 
 	virtual QDomElement saveState( QDomDocument & _doc,
-									QDomElement & _parent );
+				       QDomElement & _parent );
 
 	virtual void restoreState( const QDomElement & _this );
 

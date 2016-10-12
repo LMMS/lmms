@@ -73,35 +73,35 @@ public:
 
 
 	TimeLineWidget( int xoff, int yoff, float ppt, Song::PlayPos & pos,
-				const MidiTime & begin, QWidget * parent );
+			const MidiTime & begin, QWidget * parent );
 	virtual ~TimeLineWidget();
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
-	inline void setBarLineColor(QColor const & tactLineColor) { m_barLineColor = tactLineColor; }
+	inline void setBarLineColor( QColor const & tactLineColor ) { m_barLineColor = tactLineColor; }
 
 	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
-	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
+	inline void setBarNumberColor( QColor const & tactNumberColor ) { m_barNumberColor = tactNumberColor; }
 
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
-	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
+	inline void setInactiveLoopColor( QColor const & inactiveLoopColor ) { m_inactiveLoopColor = inactiveLoopColor; }
 
 	inline QBrush const & getInactiveLoopBrush() const { return m_inactiveLoopBrush; }
-	inline void setInactiveLoopBrush(QBrush const & inactiveLoopBrush) { m_inactiveLoopBrush = inactiveLoopBrush; }
+	inline void setInactiveLoopBrush( QBrush const & inactiveLoopBrush ) { m_inactiveLoopBrush = inactiveLoopBrush; }
 
 	inline QColor const & getInactiveLoopInnerColor() const { return m_inactiveLoopInnerColor; }
-	inline void setInactiveLoopInnerColor(QColor const & inactiveLoopInnerColor) { m_inactiveLoopInnerColor = inactiveLoopInnerColor; }
+	inline void setInactiveLoopInnerColor( QColor const & inactiveLoopInnerColor ) { m_inactiveLoopInnerColor = inactiveLoopInnerColor; }
 
 	inline QColor const & getActiveLoopColor() const { return m_activeLoopColor; }
-	inline void setActiveLoopColor(QColor const & activeLoopColor) { m_activeLoopColor = activeLoopColor; }
+	inline void setActiveLoopColor( QColor const & activeLoopColor ) { m_activeLoopColor = activeLoopColor; }
 
 	inline QBrush const & getActiveLoopBrush() const { return m_activeLoopBrush; }
-	inline void setActiveLoopBrush(QBrush const & activeLoopBrush) { m_activeLoopBrush = activeLoopBrush; }
+	inline void setActiveLoopBrush( QBrush const & activeLoopBrush ) { m_activeLoopBrush = activeLoopBrush; }
 
 	inline QColor const & getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
-	inline void setActiveLoopInnerColor(QColor const & activeLoopInnerColor) { m_activeLoopInnerColor = activeLoopInnerColor; }
+	inline void setActiveLoopInnerColor( QColor const & activeLoopInnerColor ) { m_activeLoopInnerColor = activeLoopInnerColor; }
 
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
-	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
+	inline void setLoopRectangleVerticalPadding( int const & loopRectangleVerticalPadding ) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
 	inline Song::PlayPos & pos()
 	{
@@ -126,13 +126,13 @@ public:
 	inline const MidiTime & loopBegin() const
 	{
 		return ( m_loopPos[0] < m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
+		       m_loopPos[0] : m_loopPos[1];
 	}
 
 	inline const MidiTime & loopEnd() const
 	{
 		return ( m_loopPos[0] > m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
+		       m_loopPos[0] : m_loopPos[1];
 	}
 
 	inline void savePos( const MidiTime & _pos )
@@ -150,7 +150,7 @@ public:
 		update();
 	}
 
-	void addToolButtons(QToolBar* _tool_bar );
+	void addToolButtons( QToolBar * _tool_bar );
 
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -163,7 +163,7 @@ public:
 	inline int markerX( const MidiTime & _t ) const
 	{
 		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
-					m_ppt / MidiTime::ticksPerTact() );
+						     m_ppt / MidiTime::ticksPerTact() );
 	}
 
 signals:

@@ -46,13 +46,13 @@ class AudioJack : public QObject, public AudioDevice
 {
 	Q_OBJECT
 public:
-	AudioJack( bool & _success_ful, Mixer* mixer );
+	AudioJack( bool & _success_ful, Mixer * mixer );
 	virtual ~AudioJack();
 
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "setupWidget",
-			"JACK (JACK Audio Connection Kit)" );
+					  "JACK (JACK Audio Connection Kit)" );
 	}
 
 
@@ -89,7 +89,7 @@ private:
 	int processCallback( jack_nframes_t _nframes, void * _udata );
 
 	static int staticProcessCallback( jack_nframes_t _nframes,
-							void * _udata );
+					  void * _udata );
 	static void shutdownCallback( void * _udata );
 
 
@@ -99,7 +99,7 @@ private:
 	bool m_stopped;
 
 	QVector<jack_port_t *> m_outputPorts;
-	jack_default_audio_sample_t * * m_tempOutBufs;
+	jack_default_audio_sample_t ** m_tempOutBufs;
 	surroundSampleFrame * m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;

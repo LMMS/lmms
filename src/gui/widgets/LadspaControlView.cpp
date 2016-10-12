@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@
 
 
 LadspaControlView::LadspaControlView( QWidget * _parent,
-						LadspaControl * _ctl ) :
+				      LadspaControl * _ctl ) :
 	QWidget( _parent ),
 	ModelView( _ctl, this ),
 	m_ctl( _ctl )
@@ -42,7 +42,6 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 	QHBoxLayout * layout = new QHBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
-
 	LedCheckBox * link = NULL;
 
 	if( m_ctl->m_link )
@@ -63,16 +62,18 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 				m_ctl->port()->name, this, QString::null, LedCheckBox::Green );
 			toggle->setModel( m_ctl->toggledModel() );
 			layout->addWidget( toggle );
+
 			if( link != NULL )
 			{
 				setFixedSize( link->width() + toggle->width(),
-							toggle->height() );
+					      toggle->height() );
 			}
 			else
 			{
 				setFixedSize( toggle->width(),
-							toggle->height() );
+					      toggle->height() );
 			}
+
 			break;
 		}
 
@@ -99,14 +100,16 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		{
 			knb->setModel( m_ctl->tempoSyncKnobModel() );
 		}
+
 		knb->setLabel( m_ctl->port()->name );
 		knb->setHintText( tr( "Value:" ), "" );
 		knb->setWhatsThis( tr( "Sorry, no help available." ) );
 		layout->addWidget( knb );
+
 		if( link != NULL )
 		{
 			setFixedSize( link->width() + knb->width(),
-						knb->height() );
+				      knb->height() );
 		}
 		else
 		{

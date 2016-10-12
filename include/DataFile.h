@@ -52,8 +52,8 @@ public:
 	} ;
 	typedef Types Type;
 
-	DataFile( const QString& fileName );
-	DataFile( const QByteArray& data );
+	DataFile( const QString & fileName );
+	DataFile( const QByteArray & data );
 	DataFile( Type type );
 
 	virtual ~DataFile();
@@ -64,17 +64,17 @@ public:
 	///
 	bool validate( QString extension );
 
-	QString nameWithExtension( const QString& fn ) const;
+	QString nameWithExtension( const QString & fn ) const;
 
-	void write( QTextStream& strm );
-	bool writeFile( const QString& fn );
+	void write( QTextStream & strm );
+	bool writeFile( const QString & fn );
 
-	QDomElement& content()
+	QDomElement & content()
 	{
 		return m_content;
 	}
 
-	QDomElement& head()
+	QDomElement & head()
 	{
 		return m_head;
 	}
@@ -104,7 +104,7 @@ public:
 
 
 private:
-	static Type type( const QString& typeName );
+	static Type type( const QString & typeName );
 	static QString typeName( Type type );
 
 	void cleanMetaNodes( QDomElement de );

@@ -36,40 +36,40 @@ class AudioFileWave : public AudioFileDevice
 {
 public:
 	AudioFileWave( const sample_rate_t _sample_rate,
-			const ch_cnt_t _channels,
-			bool & _success_ful,
-			const QString & _file,
-			const bool _use_vbr,
-			const bitrate_t _nom_bitrate,
-			const bitrate_t _min_bitrate,
-			const bitrate_t _max_bitrate,
-			const int _depth,
-			Mixer* mixer );
+		       const ch_cnt_t _channels,
+		       bool & _success_ful,
+		       const QString & _file,
+		       const bool _use_vbr,
+		       const bitrate_t _nom_bitrate,
+		       const bitrate_t _min_bitrate,
+		       const bitrate_t _max_bitrate,
+		       const int _depth,
+		       Mixer * mixer );
 	virtual ~AudioFileWave();
 
 	static AudioFileDevice * getInst( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
-						bool & _success_ful,
-						const QString & _file,
-						const bool _use_vbr,
-						const bitrate_t _nom_bitrate,
-						const bitrate_t _min_bitrate,
-						const bitrate_t _max_bitrate,
-						const int _depth,
-						Mixer* mixer )
+					  const ch_cnt_t _channels,
+					  bool & _success_ful,
+					  const QString & _file,
+					  const bool _use_vbr,
+					  const bitrate_t _nom_bitrate,
+					  const bitrate_t _min_bitrate,
+					  const bitrate_t _max_bitrate,
+					  const int _depth,
+					  Mixer * mixer )
 	{
 		return new AudioFileWave( _sample_rate, _channels,
-						_success_ful, _file, _use_vbr,
-						_nom_bitrate, _min_bitrate,
-							_max_bitrate, _depth,
-							mixer );
+					  _success_ful, _file, _use_vbr,
+					  _nom_bitrate, _min_bitrate,
+					  _max_bitrate, _depth,
+					  mixer );
 	}
 
 
 private:
 	virtual void writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						float _master_gain );
+				  const fpp_t _frames,
+				  float _master_gain );
 
 	bool startEncoding();
 	void finishEncoding();

@@ -58,7 +58,7 @@ public:
 	} ;
 
 	Controller( ControllerTypes _type, Model * _parent,
-						const QString & _display_name );
+		    const QString & _display_name );
 
 	virtual ~Controller();
 
@@ -87,11 +87,16 @@ public:
 	{
 		switch( m_type )
 		{
-			case LfoController: return( true );
-			case PeakController: return( true );
+			case LfoController:
+				return( true );
+
+			case PeakController:
+				return( true );
+
 			default:
 				break;
 		}
+
 		return( false );
 	}
 
@@ -107,7 +112,7 @@ public:
 
 	static Controller * create( ControllerTypes _tt, Model * _parent );
 	static Controller * create( const QDomElement & _this,
-							Model * _parent );
+				    Model * _parent );
 
 	inline static float fittedValue( float _val )
 	{

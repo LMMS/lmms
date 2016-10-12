@@ -4,15 +4,17 @@
 
 #include <QDebug>
 
-int main(int argc, char* argv[])
+int main( int argc, char * argv[] )
 {
 	int numsuites = QTestSuite::suites().size();
 	qDebug() << ">> Will run" << numsuites << "test suites";
 	int failed = 0;
-	for (QTestSuite*& suite : QTestSuite::suites())
+
+	for ( QTestSuite *& suite : QTestSuite::suites() )
 	{
-		failed += QTest::qExec(suite, argc, argv);
+		failed += QTest::qExec( suite, argc, argv );
 	}
-	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
+
+	qDebug() << "<<" << failed << "out of" << numsuites << "test suites failed.";
 	return failed;
 }

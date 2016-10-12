@@ -72,7 +72,7 @@ const int WhiteKeysPerOctave = 7;
 const int BlackKeysPerOctave = 5;
 const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
 const int NumKeys = NumOctaves * KeysPerOctave;
-const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
+const int DefaultKey = DefaultOctave * KeysPerOctave + Key_A;
 
 const float MaxDetuning = 4 * 12.0f;
 
@@ -82,11 +82,11 @@ class EXPORT Note : public SerializingObject
 {
 public:
 	Note( const MidiTime & length = MidiTime( 0 ),
-		const MidiTime & pos = MidiTime( 0 ),
-		int key = DefaultKey,
-		volume_t volume = DefaultVolume,
-		panning_t panning = DefaultPanning,
-		DetuningHelper * detuning = NULL );
+	      const MidiTime & pos = MidiTime( 0 ),
+	      int key = DefaultKey,
+	      volume_t volume = DefaultVolume,
+	      panning_t panning = DefaultPanning,
+	      DetuningHelper * detuning = NULL );
 	Note( const Note & note );
 	virtual ~Note();
 
@@ -113,11 +113,11 @@ public:
 	void quantizeLength( const int qGrid );
 	void quantizePos( const int qGrid );
 
-	static inline bool lessThan( Note * &lhs, Note * &rhs )
+	static inline bool lessThan( Note *& lhs, Note *& rhs )
 	{
 		// function to compare two notes - must be called explictly when
 		// using qSort
-		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
+		return ( bool ) ( ( int ) ( *lhs ).pos() < ( int ) ( *rhs ).pos() );
 	}
 
 	inline bool selected() const
@@ -204,7 +204,7 @@ public:
 		return m_detuning;
 	}
 	bool hasDetuningInfo() const;
-	bool withinRange(int tickStart, int tickEnd) const;
+	bool withinRange( int tickStart, int tickEnd ) const;
 
 	void createDetuning();
 

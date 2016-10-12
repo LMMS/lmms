@@ -71,7 +71,7 @@ public:
 		return false;
 	}
 
-	const QThread* affinity() const
+	const QThread * affinity() const
 	{
 		return m_affinity;
 	}
@@ -101,7 +101,7 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
-	virtual void play( sampleFrame* buffer ) = 0;
+	virtual void play( sampleFrame * buffer ) = 0;
 	virtual bool isFinished() const = 0;
 
 	// returns the frameoffset at the start of the playhandle,
@@ -123,24 +123,24 @@ public:
 	{
 		return m_usesBuffer;
 	}
-	
+
 	void setUsesBuffer( const bool b )
 	{
 		m_usesBuffer = b;
 	}
-	
+
 	AudioPort * audioPort()
 	{
 		return m_audioPort;
 	}
-	
+
 	void setAudioPort( AudioPort * port )
 	{
 		m_audioPort = port;
 	}
-	
+
 	void releaseBuffer();
-	
+
 	sampleFrame * buffer()
 	{
 		return m_playHandleBuffer;
@@ -149,7 +149,7 @@ public:
 private:
 	Type m_type;
 	f_cnt_t m_offset;
-	QThread* m_affinity;
+	QThread * m_affinity;
 	QMutex m_processingLock;
 	sampleFrame * m_playHandleBuffer;
 	bool m_usesBuffer;

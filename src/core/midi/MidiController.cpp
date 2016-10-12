@@ -38,12 +38,12 @@ MidiController::MidiController( Model * _parent ) :
 	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
-			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
+		    Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
 	m_lastValue( 0.0f )
 {
 	setSampleExact( true );
 	connect( &m_midiPort, SIGNAL( modeChanged() ),
-			this, SLOT( updateName() ) );
+		 this, SLOT( updateName() ) );
 }
 
 
@@ -67,23 +67,25 @@ void MidiController::updateValueBuffer()
 	{
 		m_valueBuffer.fill( m_lastValue );
 	}
+
 	m_bufferLastUpdated = s_periods;
 }
 
 
 void MidiController::updateName()
 {
-	setName( QString("MIDI ch%1 ctrl%2").
-			arg( m_midiPort.inputChannel() ).
-			arg( m_midiPort.inputController() ) );
+	setName( QString( "MIDI ch%1 ctrl%2" ).
+		 arg( m_midiPort.inputChannel() ).
+		 arg( m_midiPort.inputController() ) );
 }
 
 
 
 
-void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+void MidiController::processInEvent( const MidiEvent & event, const MidiTime & time, f_cnt_t offset )
 {
 	unsigned char controllerNum;
+
 	switch( event.type() )
 	{
 		case MidiControlChange:
@@ -95,9 +97,10 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 			{
 				unsigned char val = event.controllerValue();
 				m_previousValue = m_lastValue;
-				m_lastValue = (float)( val ) / 127.0f;
+				m_lastValue = ( float )( val ) / 127.0f;
 				emit valueChanged();
 			}
+
 			break;
 
 		default:
@@ -112,7 +115,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 void MidiController::subscribeReadablePorts( const MidiPort::Map & _map )
 {
 	for( MidiPort::Map::ConstIterator it = _map.constBegin();
-						it != _map.constEnd(); ++it )
+			it != _map.constEnd(); ++it )
 	{
 		m_midiPort.subscribeReadablePort( it.key(), *it );
 	}
@@ -125,7 +128,6 @@ void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	Controller::saveSettings( _doc, _this );
 	m_midiPort.saveSettings( _doc, _this );
-
 }
 
 
@@ -134,9 +136,7 @@ void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void MidiController::loadSettings( const QDomElement & _this )
 {
 	Controller::loadSettings( _this );
-
 	m_midiPort.loadSettings( _this );
-
 	updateName();
 }
 

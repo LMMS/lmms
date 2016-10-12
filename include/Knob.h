@@ -48,25 +48,25 @@ class EXPORT Knob : public QWidget, public FloatModelView
 	Q_OBJECT
 	Q_ENUMS( knobTypes )
 
-	Q_PROPERTY(float innerRadius READ innerRadius WRITE setInnerRadius)
-	Q_PROPERTY(float outerRadius READ outerRadius WRITE setOuterRadius)
+	Q_PROPERTY( float innerRadius READ innerRadius WRITE setInnerRadius )
+	Q_PROPERTY( float outerRadius READ outerRadius WRITE setOuterRadius )
 
-	Q_PROPERTY(float centerPointX READ centerPointX WRITE setCenterPointX)
-	Q_PROPERTY(float centerPointY READ centerPointY WRITE setCenterPointY)
+	Q_PROPERTY( float centerPointX READ centerPointX WRITE setCenterPointX )
+	Q_PROPERTY( float centerPointY READ centerPointY WRITE setCenterPointY )
 
-	Q_PROPERTY(float lineWidth READ lineWidth WRITE setLineWidth)
+	Q_PROPERTY( float lineWidth READ lineWidth WRITE setLineWidth )
 
 	// Unfortunately, the gradient syntax doesn't create our gradient
 	// correctly so we need to do this:
-	Q_PROPERTY(QColor outerColor READ outerColor WRITE setOuterColor)
-	Q_PROPERTY(QColor lineColor READ lineColor WRITE setlineColor)
-	Q_PROPERTY(QColor arcColor READ arcColor WRITE setarcColor)
-	mapPropertyFromModel(bool,isVolumeKnob,setVolumeKnob,m_volumeKnob);
-	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
+	Q_PROPERTY( QColor outerColor READ outerColor WRITE setOuterColor )
+	Q_PROPERTY( QColor lineColor READ lineColor WRITE setlineColor )
+	Q_PROPERTY( QColor arcColor READ arcColor WRITE setarcColor )
+	mapPropertyFromModel( bool, isVolumeKnob, setVolumeKnob, m_volumeKnob );
+	mapPropertyFromModel( float, volumeRatio, setVolumeRatio, m_volumeRatio );
 
-	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
-	
-	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
+	Q_PROPERTY( knobTypes knobNum READ knobNum WRITE setknobNum )
+
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 	void initUi( const QString & _name ); //!< to be called by ctors
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
@@ -78,7 +78,7 @@ public:
 
 	// TODO: remove
 	inline void setHintText( const QString & _txt_before,
-						const QString & _txt_after )
+				 const QString & _txt_after )
 	{
 		setDescription( _txt_before );
 		setUnit( _txt_after );
@@ -112,7 +112,7 @@ public:
 	void setlineColor( const QColor & c );
 	QColor arcColor() const;
 	void setarcColor( const QColor & c );
-	
+
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
 
@@ -149,7 +149,7 @@ private:
 	virtual void doConnections();
 
 	QLineF calculateLine( const QPointF & _mid, float _radius,
-						float _innerRadius = 1) const;
+			      float _innerRadius = 1 ) const;
 
 	void drawKnob( QPainter * _p );
 	void setPosition( const QPoint & _p );
@@ -191,7 +191,7 @@ private:
 	QColor m_outerColor;
 	QColor m_lineColor; //!< unused yet
 	QColor m_arcColor; //!< unused yet
-	
+
 	QColor m_textColor;
 
 	knobTypes m_knobNum;

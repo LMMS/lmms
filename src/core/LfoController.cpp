@@ -41,7 +41,7 @@ LfoController::LfoController( Model * _parent ) :
 	m_amountModel( 1.0, -1.0, 1.0, 0.005, this, tr( "Oscillator amount" ) ),
 	m_phaseModel( 0.0, 0.0, 360.0, 4.0, this, tr( "Oscillator phase" ) ),
 	m_waveModel( Oscillator::SineWave, 0, Oscillator::NumWaveShapes,
-			this, tr( "Oscillator waveform" ) ),
+		     this, tr( "Oscillator waveform" ) ),
 	m_multiplierModel( 0, 0, 2, this, tr( "Frequency Multiplier" ) ),
 	m_duration( 1000 ),
 	m_phaseOffset( 0 ),
@@ -51,20 +51,17 @@ LfoController::LfoController( Model * _parent ) :
 {
 	setSampleExact( true );
 	connect( &m_waveModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateSampleFunction() ) );
-
+		 this, SLOT( updateSampleFunction() ) );
 	connect( &m_speedModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ) );
+		 this, SLOT( updateDuration() ) );
 	connect( &m_multiplierModel, SIGNAL( dataChanged() ),
-			this, SLOT( updateDuration() ) );
+		 this, SLOT( updateDuration() ) );
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ),
-			this, SLOT( updateDuration() ) );
-
+		 this, SLOT( updateDuration() ) );
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
-			this, SLOT( updatePhase() ) );
+		 this, SLOT( updatePhase() ) );
 	connect( Engine::getSong(), SIGNAL( playbackPositionChanged() ),
-			this, SLOT( updatePhase() ) );
-
+		 this, SLOT( updatePhase() ) );
 	updateDuration();
 }
 
@@ -88,9 +85,9 @@ void LfoController::updateValueBuffer()
 	m_phaseOffset = m_phaseModel.value() / 360.0;
 	float * values = m_valueBuffer.values();
 	float phase = m_currentPhase + m_phaseOffset;
-
 	// roll phase up until we're in sync with period counter
 	m_bufferLastUpdated++;
+
 	if( m_bufferLastUpdated < s_periods )
 	{
 		int diff = s_periods - m_bufferLastUpdated;
@@ -99,18 +96,16 @@ void LfoController::updateValueBuffer()
 	}
 
 	float amount = m_amountModel.value();
-	ValueBuffer *amountBuffer = m_amountModel.valueBuffer();
+	ValueBuffer * amountBuffer = m_amountModel.valueBuffer();
 	int amountInc = amountBuffer ? 1 : 0;
-	float *amountPtr = amountBuffer ? &(amountBuffer->values()[ 0 ] ) : &amount;
+	float * amountPtr = amountBuffer ? &( amountBuffer->values()[ 0 ] ) : &amount;
 
 	for( int i = 0; i < m_valueBuffer.length(); i++ )
 	{
 		const float currentSample = m_sampleFunction != NULL
-			? m_sampleFunction( phase )
-			: m_userDefSampleBuffer->userWaveSample( phase );
-
+					    ? m_sampleFunction( phase )
+					    : m_userDefSampleBuffer->userWaveSample( phase );
 		values[i] = qBound( 0.0f, m_baseModel.value() + ( *amountPtr * currentSample / 2.0f ), 1.0f );
-
 		phase += 1.0 / m_duration;
 		amountPtr += amountInc;
 	}
@@ -129,7 +124,7 @@ void LfoController::updateDuration()
 {
 	float newDurationF = Engine::mixer()->processingSampleRate() *	m_speedModel.value();
 
-	switch(m_multiplierModel.value() )
+	switch( m_multiplierModel.value() )
 	{
 		case 1:
 			newDurationF /= 100.0;
@@ -153,24 +148,31 @@ void LfoController::updateSampleFunction()
 		case Oscillator::SineWave:
 			m_sampleFunction = &Oscillator::sinSample;
 			break;
+
 		case Oscillator::TriangleWave:
 			m_sampleFunction = &Oscillator::triangleSample;
 			break;
+
 		case Oscillator::SawWave:
 			m_sampleFunction = &Oscillator::sawSample;
 			break;
+
 		case Oscillator::SquareWave:
 			m_sampleFunction = &Oscillator::squareSample;
 			break;
+
 		case Oscillator::MoogSawWave:
 			m_sampleFunction = &Oscillator::moogSawSample;
 			break;
+
 		case Oscillator::ExponentialWave:
 			m_sampleFunction = &Oscillator::expSample;
 			break;
+
 		case Oscillator::WhiteNoise:
 			m_sampleFunction = &Oscillator::noiseSample;
 			break;
+
 		case Oscillator::UserDefinedWave:
 			m_sampleFunction = NULL;
 			/*TODO: If C++11 is allowed, should change the type of
@@ -187,7 +189,6 @@ void LfoController::updateSampleFunction()
 void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	Controller::saveSettings( _doc, _this );
-
 	m_baseModel.saveSettings( _doc, _this, "base" );
 	m_speedModel.saveSettings( _doc, _this, "speed" );
 	m_amountModel.saveSettings( _doc, _this, "amount" );
@@ -202,15 +203,13 @@ void LfoController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void LfoController::loadSettings( const QDomElement & _this )
 {
 	Controller::loadSettings( _this );
-
 	m_baseModel.loadSettings( _this, "base" );
 	m_speedModel.loadSettings( _this, "speed" );
 	m_amountModel.loadSettings( _this, "amount" );
 	m_phaseModel.loadSettings( _this, "phase" );
 	m_waveModel.loadSettings( _this, "wave" );
 	m_multiplierModel.loadSettings( _this, "multiplier" );
-	m_userDefSampleBuffer->setAudioFile( _this.attribute("userwavefile" ) );
-
+	m_userDefSampleBuffer->setAudioFile( _this.attribute( "userwavefile" ) );
 	updateSampleFunction();
 }
 

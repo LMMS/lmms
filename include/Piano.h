@@ -40,7 +40,7 @@ public:
 		BlackKey
 	} ;
 
-	Piano( InstrumentTrack* track );
+	Piano( InstrumentTrack * track );
 	virtual ~Piano();
 
 	void setKeyState( int key, bool state );
@@ -53,18 +53,18 @@ public:
 	void handleKeyPress( int key, int midiVelocity = -1 );
 	void handleKeyRelease( int key );
 
-	InstrumentTrack* instrumentTrack() const
+	InstrumentTrack * instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
-	MidiEventProcessor* midiEventProcessor() const
+	MidiEventProcessor * midiEventProcessor() const
 	{
 		return m_midiEvProc;
 	}
 
-	static bool isWhiteKey(int key);
-	static bool isBlackKey(int key);
+	static bool isWhiteKey( int key );
+	static bool isBlackKey( int key );
 
 
 private:
@@ -73,8 +73,8 @@ private:
 		return key >= 0 && key < NumKeys;
 	}
 
-	InstrumentTrack* m_instrumentTrack;
-	MidiEventProcessor* m_midiEvProc;
+	InstrumentTrack * m_instrumentTrack;
+	MidiEventProcessor * m_midiEvProc;
 	bool m_pressedKeys[NumKeys];
 
 } ;

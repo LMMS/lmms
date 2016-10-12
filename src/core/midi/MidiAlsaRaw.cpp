@@ -37,21 +37,20 @@ MidiAlsaRaw::MidiAlsaRaw() :
 	m_quit( false )
 {
 	int err;
+
 	if( ( err = snd_rawmidi_open( m_inputp, m_outputp,
-					probeDevice().toLatin1().constData(),
-								0 ) ) < 0 )
+				      probeDevice().toLatin1().constData(),
+				      0 ) ) < 0 )
 	{
 		printf( "cannot open MIDI-device: %s\n", snd_strerror( err ) );
 		return;
 	}
 
 	snd_rawmidi_read( m_input, NULL, 0 );
-
 	snd_rawmidi_nonblock( m_input, 1 );
 	m_npfds = snd_rawmidi_poll_descriptors_count( m_input );
 	m_pfds = new pollfd[m_npfds];
 	snd_rawmidi_poll_descriptors( m_input, m_pfds, m_npfds );
-
 	start( QThread::LowPriority );
 }
 
@@ -65,7 +64,6 @@ MidiAlsaRaw::~MidiAlsaRaw()
 		m_quit = true;
 		wait( 1000 );
 		terminate();
-
 		snd_rawmidi_close( m_input );
 		snd_rawmidi_close( m_output );
 		delete[] m_pfds;
@@ -78,14 +76,17 @@ MidiAlsaRaw::~MidiAlsaRaw()
 QString MidiAlsaRaw::probeDevice()
 {
 	QString dev = ConfigManager::inst()->value( "MidiAlsaRaw", "device" );
+
 	if( dev == "" )
 	{
 		if( getenv( "MIDIDEV" ) != NULL )
 		{
 			return getenv( "MIDIDEV" );
 		}
+
 		return "default";
 	}
+
 	return dev;
 }
 
@@ -103,12 +104,14 @@ void MidiAlsaRaw::sendByte( unsigned char c )
 void MidiAlsaRaw::run()
 {
 	unsigned char buf[128];
+
 	//int cnt = 0;
 	while( m_quit == false )
 	{
 		msleep( 5 );	// must do that, otherwise this thread takes
-				// too much CPU-time, even with LowPriority...
+		// too much CPU-time, even with LowPriority...
 		int err = poll( m_pfds, m_npfds, 10000 );
+
 		if( err < 0 && errno == EINTR )
 		{
 			printf( "MidiAlsaRaw::run(): Got EINTR while "
@@ -116,41 +119,50 @@ void MidiAlsaRaw::run()
 				"MIDI-port.\n" );
 			break;
 		}
+
 		if( err < 0 )
 		{
 			printf( "poll failed: %s\nWill stop polling "
 				"MIDI-events from MIDI-port.\n",
-							strerror( errno ) );
+				strerror( errno ) );
 			break;
 		}
+
 		if( err == 0 )
 		{
 			//printf( "there seems to be no active MIDI-device %d\n", ++cnt );
 			continue;
 		}
+
 		unsigned short revents;
+
 		if( ( err = snd_rawmidi_poll_descriptors_revents(
-				m_input, m_pfds, m_npfds, &revents ) ) < 0 )
+					m_input, m_pfds, m_npfds, &revents ) ) < 0 )
 		{
 			printf( "cannot get poll events: %s\nWill stop polling "
 				"MIDI-events from MIDI-port.\n",
-							snd_strerror( errno ) );
+				snd_strerror( errno ) );
 			break;
 		}
+
 		if( revents & ( POLLERR | POLLHUP ) )
 		{
 			printf( "POLLERR or POLLHUP\n" );
 			break;
 		}
+
 		if( !( revents & POLLIN ) )
 		{
 			continue;
 		}
+
 		err = snd_rawmidi_read( m_input, buf, sizeof( buf ) );
+
 		if( err == -EAGAIN )
 		{
 			continue;
 		}
+
 		if( err < 0 )
 		{
 			printf( "cannot read from port \"%s\": %s\nWill stop "
@@ -158,16 +170,17 @@ void MidiAlsaRaw::run()
 				/*port_name*/"default", snd_strerror( err ) );
 			break;
 		}
+
 		if( err == 0 )
 		{
 			continue;
 		}
+
 		for( int i = 0; i < err; ++i )
 		{
 			parseData( buf[i] );
 		}
 	}
-
 }
 
 #endif

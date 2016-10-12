@@ -41,12 +41,12 @@ class TrackContainer;
 
 
 class TrackContainerView : public QWidget, public ModelView,
-						public JournallingObject,
-						public SerializingObjectHook
+	public JournallingObject,
+	public SerializingObjectHook
 {
 	Q_OBJECT
 public:
-	TrackContainerView( TrackContainer* tc );
+	TrackContainerView( TrackContainer * tc );
 	virtual ~TrackContainerView();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
@@ -89,16 +89,17 @@ public:
 		{
 			return( m_rubberBand->selectedObjects() );
 		}
+
 		return( QVector<selectableObject *>() );
 	}
 
 
-	TrackContainer* model()
+	TrackContainer * model()
 	{
 		return m_tc;
 	}
 
-	const TrackContainer* model() const
+	const TrackContainer * model() const
 	{
 		return m_tc;
 	}
@@ -138,7 +139,7 @@ public slots:
 	/// \param x
 	/// \param y
 	/// Use the rubber band to select TCO from all tracks using x, y pixels
-	void selectRegionFromPixels(int xStart, int xEnd);
+	void selectRegionFromPixels( int xStart, int xEnd );
 
 	///
 	/// \brief stopRubberBand
@@ -166,18 +167,18 @@ private:
 	class scrollArea : public QScrollArea
 	{
 	public:
-		scrollArea( TrackContainerView* parent );
+		scrollArea( TrackContainerView * parent );
 		virtual ~scrollArea();
 
 	protected:
 		virtual void wheelEvent( QWheelEvent * _we );
 
 	private:
-		TrackContainerView* m_trackContainerView;
+		TrackContainerView * m_trackContainerView;
 
 	} ;
 
-	TrackContainer* m_tc;
+	TrackContainer * m_tc;
 	typedef QList<TrackView *> trackViewList;
 	trackViewList m_trackViews;
 
@@ -200,15 +201,15 @@ class InstrumentLoaderThread : public QThread
 {
 	Q_OBJECT
 public:
-	InstrumentLoaderThread( QObject *parent = 0, InstrumentTrack *it = 0,
-							QString name = "" );
+	InstrumentLoaderThread( QObject * parent = 0, InstrumentTrack * it = 0,
+				QString name = "" );
 
 	void run();
 
 private:
-	InstrumentTrack *m_it;
+	InstrumentTrack * m_it;
 	QString m_name;
-	QThread *m_containerThread;
+	QThread * m_containerThread;
 };
 
 #endif

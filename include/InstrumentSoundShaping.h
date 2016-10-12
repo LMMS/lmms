@@ -41,7 +41,7 @@ public:
 	virtual ~InstrumentSoundShaping();
 
 	void processAudioBuffer( sampleFrame * _ab, const fpp_t _frames,
-							NotePlayHandle * _n );
+				 NotePlayHandle * _n );
 
 	enum Targets
 	{

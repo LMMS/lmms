@@ -46,12 +46,14 @@ QVariant decode( const QString & _b64, QVariant::Type _force_type )
 	QDataStream in( &buf );
 	QVariant ret;
 	in >> ret;
+
 	if( _force_type != QVariant::Invalid && ret.type() != _force_type )
 	{
 		buf.reset();
 		in.setVersion( QDataStream::Qt_3_3 );
 		in >> ret;
 	}
+
 	delete[] dst;
 	return( ret );
 }

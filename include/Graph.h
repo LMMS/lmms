@@ -52,9 +52,9 @@ public:
 	};
 
 	Graph( QWidget * _parent, graphStyle _style = Graph::LinearStyle,
-		int _width = 132,
-		int _height = 104
-	);
+	       int _width = 132,
+	       int _height = 104
+	     );
 	virtual ~Graph();
 
 	void setForeground( const QPixmap & _pixmap );
@@ -115,11 +115,11 @@ class EXPORT graphModel : public Model
 	Q_OBJECT
 public:
 	graphModel( float _min,
-			float _max,
-			int _size,
-			:: Model * _parent,
-			bool _default_constructed = false,
-			float _step = 0.0 );
+		    float _max,
+		    int _size,
+		    :: Model * _parent,
+		    bool _default_constructed = false,
+		    float _step = 0.0 );
 
 	virtual ~graphModel();
 

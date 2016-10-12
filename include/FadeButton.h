@@ -36,7 +36,7 @@ class FadeButton : public QAbstractButton
 	Q_OBJECT
 public:
 	FadeButton( const QColor & _normal_color, const QColor &
-					_activated_color, QWidget * _parent );
+		    _activated_color, QWidget * _parent );
 
 	virtual ~FadeButton();
 	void setActiveColor( const QColor & activated_color );

@@ -30,19 +30,18 @@
 #include "gui_templates.h"
 
 MidiSetupWidget::MidiSetupWidget( const QString & caption, const QString & configSection,
-	const QString & devName, QWidget * parent ) :
+				  const QString & devName, QWidget * parent ) :
 	TabWidget( TabWidget::tr( "Settings for %1" ).arg(
-		tr( caption.toLatin1() ) ).toUpper(), parent ),
-	m_configSection(configSection),
-	m_device(nullptr)
+			   tr( caption.toLatin1() ) ).toUpper(), parent ),
+	m_configSection( configSection ),
+	m_device( nullptr )
 {
 	// supply devName=QString::Null() (distinct from QString(""))
 	//   to indicate that there is no editable DEVICE field
-	if (!devName.isNull())
+	if ( !devName.isNull() )
 	{
 		m_device = new QLineEdit( devName, this );
 		m_device->setGeometry( 10, 20, 160, 20 );
-
 		QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 		dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 		dev_lbl->setGeometry( 10, 40, 160, 10 );
@@ -51,10 +50,10 @@ MidiSetupWidget::MidiSetupWidget( const QString & caption, const QString & confi
 
 void MidiSetupWidget::saveSettings()
 {
-	if (!m_configSection.isEmpty() && m_device)
+	if ( !m_configSection.isEmpty() && m_device )
 	{
 		ConfigManager::inst()->setValue( m_configSection, "device",
-							m_device->text() );
+						 m_device->text() );
 	}
 }
 
@@ -62,7 +61,7 @@ void MidiSetupWidget::show()
 {
 	// the setup widget should only be visible if the device has some configurable attributes
 	bool visible = !m_configSection.isEmpty();
-	parentWidget()->setVisible(visible);
-	QWidget::setVisible(visible);
+	parentWidget()->setVisible( visible );
+	QWidget::setVisible( visible );
 }
 

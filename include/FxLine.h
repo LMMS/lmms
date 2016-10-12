@@ -48,7 +48,7 @@ public:
 	Q_PROPERTY( QColor strokeOuterInactive READ strokeOuterInactive WRITE setStrokeOuterInactive )
 	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
 	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
-	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
+	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex );
 	~FxLine();
 
 	virtual void paintEvent( QPaintEvent * );
@@ -57,34 +57,34 @@ public:
 	virtual void contextMenuEvent( QContextMenuEvent * );
 
 	inline int channelIndex() { return m_channelIndex; }
-	void setChannelIndex(int index);
+	void setChannelIndex( int index );
 
 	Knob * m_sendKnob;
 	SendButtonIndicator * m_sendBtn;
 
 	QBrush backgroundActive() const;
 	void setBackgroundActive( const QBrush & c );
-	
+
 	QColor strokeOuterActive() const;
 	void setStrokeOuterActive( const QColor & c );
-	
+
 	QColor strokeOuterInactive() const;
 	void setStrokeOuterInactive( const QColor & c );
-	
+
 	QColor strokeInnerActive() const;
 	void setStrokeInnerActive( const QColor & c );
-	
+
 	QColor strokeInnerInactive() const;
 	void setStrokeInnerInactive( const QColor & c );
 
 	static const int FxLineHeight;
 
 private:
-	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
+	void drawFxLine( QPainter * p, const FxLine * fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );
 
 	FxMixerView * m_mv;
-	LcdWidget* m_lcd;
+	LcdWidget * m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;
 	QColor m_strokeOuterActive;

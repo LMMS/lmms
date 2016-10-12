@@ -54,7 +54,7 @@ struct MemoryPool
 	MemoryPool( int chunks ) :
 		m_chunks( chunks )
 	{
-		m_free = (char*) MemoryHelper::alignedMalloc( chunks );
+		m_free = ( char * ) MemoryHelper::alignedMalloc( chunks );
 		memset( m_free, 1, chunks );
 	}
 
@@ -84,7 +84,7 @@ struct PtrInfo
 };
 
 typedef QVector<MemoryPool> MemoryPoolVector;
-typedef QHash<void*, PtrInfo> PointerInfoMap;
+typedef QHash<void *, PtrInfo> PointerInfoMap;
 
 class EXPORT MemoryManager
 {
@@ -105,23 +105,23 @@ private:
 
 
 #define MM_OPERATORS								\
-public: 											\
-static void * operator new ( size_t size )		\
-{													\
-	return MemoryManager::alloc( size );			\
-}													\
-static void * operator new[] ( size_t size )		\
-{													\
-	return MemoryManager::alloc( size );			\
-}													\
-static void operator delete ( void * ptr )		\
-{													\
-	MemoryManager::free( ptr );					\
-}													\
-static void operator delete[] ( void * ptr )	\
-{													\
-	MemoryManager::free( ptr );					\
-}
+	public: 											\
+	static void * operator new ( size_t size )		\
+	{													\
+		return MemoryManager::alloc( size );			\
+	}													\
+	static void * operator new[] ( size_t size )		\
+	{													\
+		return MemoryManager::alloc( size );			\
+	}													\
+	static void operator delete ( void * ptr )		\
+	{													\
+		MemoryManager::free( ptr );					\
+	}													\
+	static void operator delete[] ( void * ptr )	\
+	{													\
+		MemoryManager::free( ptr );					\
+	}
 
 // for use in cases where overriding new/delete isn't a possibility
 #define MM_ALLOC( type, count ) (type*) MemoryManager::alloc( sizeof( type ) * count )
@@ -133,27 +133,27 @@ static void operator delete[] ( void * ptr )	\
 // for debugging purposes
 
 #define MM_OPERATORS_DEBUG												\
-public: 																\
-static void * operator new ( size_t size )							\
-{																		\
-	qDebug( "MM_OPERATORS_DEBUG: new called for %d bytes", size );		\
-	return MemoryManager::alloc( size );								\
-}																		\
-static void * operator new[] ( size_t size )							\
-{																		\
-	qDebug( "MM_OPERATORS_DEBUG: new[] called for %d bytes", size );	\
-	return MemoryManager::alloc( size );								\
-}																		\
-static void operator delete ( void * ptr )							\
-{																		\
-	qDebug( "MM_OPERATORS_DEBUG: delete called for %p", ptr );			\
-	MemoryManager::free( ptr );										\
-}																		\
-static void operator delete[] ( void * ptr )						\
-{																		\
-	qDebug( "MM_OPERATORS_DEBUG: delete[] called for %p", ptr );		\
-	MemoryManager::free( ptr );										\
-}
+	public: 																\
+	static void * operator new ( size_t size )							\
+	{																		\
+		qDebug( "MM_OPERATORS_DEBUG: new called for %d bytes", size );		\
+		return MemoryManager::alloc( size );								\
+	}																		\
+	static void * operator new[] ( size_t size )							\
+	{																		\
+		qDebug( "MM_OPERATORS_DEBUG: new[] called for %d bytes", size );	\
+		return MemoryManager::alloc( size );								\
+	}																		\
+	static void operator delete ( void * ptr )							\
+	{																		\
+		qDebug( "MM_OPERATORS_DEBUG: delete called for %p", ptr );			\
+		MemoryManager::free( ptr );										\
+	}																		\
+	static void operator delete[] ( void * ptr )						\
+	{																		\
+		qDebug( "MM_OPERATORS_DEBUG: delete[] called for %p", ptr );		\
+		MemoryManager::free( ptr );										\
+	}
 
 
 #endif

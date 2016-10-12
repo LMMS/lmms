@@ -28,12 +28,13 @@
 /**
  * Helper class to alocate aligned memory and free it.
  */
-class MemoryHelper {
+class MemoryHelper
+{
 public:
 
-	static void* alignedMalloc( int );
+	static void * alignedMalloc( int );
 
-	static void alignedFree( void* );
+	static void alignedFree( void * );
 
 private:
 };

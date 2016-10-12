@@ -110,11 +110,13 @@ public:
 					interpolation = Interpolation_Linear;
 					oversampling = Oversampling_None;
 					break;
+
 				case Mode_HighQuality:
 					interpolation =
 						Interpolation_SincFastest;
 					oversampling = Oversampling_2x;
 					break;
+
 				case Mode_FinalMix:
 					interpolation = Interpolation_SincBest;
 					oversampling = Oversampling_8x;
@@ -132,11 +134,19 @@ public:
 		{
 			switch( oversampling )
 			{
-				case Oversampling_None: return 1;
-				case Oversampling_2x: return 2;
-				case Oversampling_4x: return 4;
-				case Oversampling_8x: return 8;
+				case Oversampling_None:
+					return 1;
+
+				case Oversampling_2x:
+					return 2;
+
+				case Oversampling_4x:
+					return 4;
+
+				case Oversampling_8x:
+					return 8;
 			}
+
 			return 1;
 		}
 
@@ -146,13 +156,17 @@ public:
 			{
 				case Interpolation_Linear:
 					return SRC_ZERO_ORDER_HOLD;
+
 				case Interpolation_SincFastest:
 					return SRC_SINC_FASTEST;
+
 				case Interpolation_SincMedium:
 					return SRC_SINC_MEDIUM_QUALITY;
+
 				case Interpolation_SincBest:
 					return SRC_SINC_BEST_QUALITY;
 			}
+
 			return SRC_LINEAR;
 		}
 	} ;
@@ -173,8 +187,8 @@ public:
 
 	void setAudioDevice( AudioDevice * _dev );
 	void setAudioDevice( AudioDevice * _dev,
-				const struct qualitySettings & _qs,
-							bool _needs_fifo );
+			     const struct qualitySettings & _qs,
+			     bool _needs_fifo );
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
 	{
@@ -206,11 +220,11 @@ public:
 
 
 	// play-handle stuff
-	bool addPlayHandle( PlayHandle* handle );
+	bool addPlayHandle( PlayHandle * handle );
 
-	void removePlayHandle( PlayHandle* handle );
+	void removePlayHandle( PlayHandle * handle );
 
-	inline PlayHandleList& playHandles()
+	inline PlayHandleList & playHandles()
 	{
 		return m_playHandles;
 	}
@@ -225,7 +239,7 @@ public:
 	}
 
 
-	MixerProfiler& profiler()
+	MixerProfiler & profiler()
 	{
 		return m_profiler;
 	}
@@ -268,6 +282,7 @@ public:
 		{
 			return -1.0f;
 		}
+
 		return _s;
 	}
 
@@ -302,7 +317,7 @@ public:
 	void changeQuality( const struct qualitySettings & _qs );
 
 	inline bool isMetronomeActive() const { return m_metronomeActive; }
-	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
+	inline void setMetronomeActive( bool value = true ) { m_metronomeActive = value; }
 
 	void requestChangeInModel();
 	void doneChangeInModel();

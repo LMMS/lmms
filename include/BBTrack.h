@@ -54,7 +54,7 @@ public:
 	{
 		return( m_color.rgb() );
 	}
-	
+
 	QColor colorObj() const
 	{
 		return m_color;
@@ -116,7 +116,7 @@ protected:
 private:
 	BBTCO * m_bbTCO;
 	QPixmap m_paintPixmap;
-	
+
 	QStaticText m_staticTextName;
 } ;
 
@@ -127,16 +127,16 @@ class EXPORT BBTrack : public Track
 {
 	Q_OBJECT
 public:
-	BBTrack( TrackContainer* tc );
+	BBTrack( TrackContainer * tc );
 	virtual ~BBTrack();
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual TrackView * createView( TrackContainerView* tcv );
+			   const f_cnt_t _frame_base, int _tco_num = -1 );
+	virtual TrackView * createView( TrackContainerView * tcv );
 	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+						QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 	static BBTrack * findBBTrack( int _bb_num );
@@ -171,13 +171,14 @@ public:
 			*s_lastTCOColor = QColor( c );
 		}
 	}
-	
+
 	static void clearLastTCOColor()
 	{
 		if( s_lastTCOColor )
 		{
 			delete s_lastTCOColor;
 		}
+
 		s_lastTCOColor = NULL;
 	}
 
@@ -206,7 +207,7 @@ class BBTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	BBTrackView( BBTrack* bbt, TrackContainerView* tcv );
+	BBTrackView( BBTrack * bbt, TrackContainerView * tcv );
 	virtual ~BBTrackView();
 
 	virtual bool close();

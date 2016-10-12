@@ -35,16 +35,16 @@ public:
 	RowDelegate( QAbstractItemView * table, QObject * parent = 0 ) :
 		QStyledItemDelegate( parent ),
 		m_table( table )
-		{
-		}
+	{
+	}
 	virtual void paint( QPainter * painter,
-					const QStyleOptionViewItem & option,
-					const QModelIndex & index ) const;
+			    const QStyleOptionViewItem & option,
+			    const QModelIndex & index ) const;
 
 
 protected:
 	virtual void initStyleOption( QStyleOptionViewItem * option,
-					const QModelIndex & index ) const;
+				      const QModelIndex & index ) const;
 
 
 private:
@@ -56,7 +56,7 @@ private:
 
 
 void RowDelegate::initStyleOption( QStyleOptionViewItem * option,
-					const QModelIndex & index ) const
+				   const QModelIndex & index ) const
 {
 	QStyledItemDelegate::initStyleOption( option, index );
 	option->state &= ~QStyle::State_HasFocus;
@@ -66,22 +66,25 @@ void RowDelegate::initStyleOption( QStyleOptionViewItem * option,
 
 
 void RowDelegate::paint( QPainter * painter,
-	const QStyleOptionViewItem & option, const QModelIndex & index ) const
+			 const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
 	QStyledItemDelegate::paint( painter, option, index );
+
 	if ( index.row() == m_table->currentIndex().row() )
 	{
 		const QRect rect( option.rect );
 		painter->drawLine( rect.topLeft(), rect.topRight() );
 		painter->drawLine( rect.bottomLeft(), rect.bottomRight() );
+
 		if ( index.column() == 0 )
 		{
 			painter->drawLine( rect.topLeft(), rect.bottomLeft() );
 		}
+
 		if ( index.column() == index.model()->columnCount() - 1 )
 		{
 			painter->drawLine( rect.topRight(),
-							rect.bottomRight() );
+					   rect.bottomRight() );
 		}
 	}
 }
@@ -109,11 +112,11 @@ RowTableView::~RowTableView()
 void RowTableView::setModel( QAbstractItemModel * model )
 {
 	QTableView::setModel( model );
+
 	for ( int i = 0; i < model->rowCount(); i++ )
 	{
 		setItemDelegateForRow( i, m_rowDelegate );
 	}
-
 }
 
 
@@ -129,6 +132,7 @@ void RowTableView::keyPressEvent( QKeyEvent * event )
 			{
 				QTableView::keyPressEvent( event );
 			}
+
 		default:
 			QTableView::keyPressEvent( event );
 	}

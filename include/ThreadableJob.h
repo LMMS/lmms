@@ -49,7 +49,7 @@ public:
 
 	inline ProcessingState state() const
 	{
-		return static_cast<ProcessingState>( (int) m_state );
+		return static_cast<ProcessingState>( ( int ) m_state );
 	}
 
 	inline void reset()
@@ -61,7 +61,7 @@ public:
 	{
 		m_state = Queued;
 	}
-	
+
 	inline void done()
 	{
 		m_state = Done;

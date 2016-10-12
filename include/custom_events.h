@@ -33,10 +33,10 @@
 namespace customEvents
 {
 
-	enum Type
-	{
-		GUI_UPDATE = QEvent::User
-	} ;
+enum Type
+{
+	GUI_UPDATE = QEvent::User
+} ;
 
 }
 

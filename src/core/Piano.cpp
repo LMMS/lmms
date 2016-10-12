@@ -61,7 +61,7 @@ static const Piano::KeyTypes KEY_ORDER[] =
  *
  *  \param _it the InstrumentTrack window to attach to
  */
-Piano::Piano( InstrumentTrack* track ) :
+Piano::Piano( InstrumentTrack * track ) :
 	Model( NULL ),              /*!< base class ctor */
 	m_instrumentTrack( track ),
 	m_midiEvProc( track )        /*!< the InstrumentTrack Model */
@@ -70,7 +70,6 @@ Piano::Piano( InstrumentTrack* track ) :
 	{
 		m_pressedKeys[i] = false;
 	}
-
 }
 
 
@@ -96,7 +95,6 @@ void Piano::setKeyState( int key, bool state )
 	if( isValidKey( key ) )
 	{
 		m_pressedKeys[key] = state;
-
 		emit dataChanged();
 	}
 }
@@ -114,6 +112,7 @@ void Piano::handleKeyPress( int key, int midiVelocity )
 	{
 		midiVelocity = m_instrumentTrack->midiPort()->baseVelocity();
 	}
+
 	if( isValidKey( key ) )
 	{
 		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, -1, key, midiVelocity ) );
@@ -143,7 +142,6 @@ void Piano::handleKeyRelease( int key )
 bool Piano::isBlackKey( int key )
 {
 	int keyCode = key % KeysPerOctave;
-
 	return KEY_ORDER[keyCode] == Piano::BlackKey;
 }
 

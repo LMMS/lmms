@@ -35,39 +35,29 @@
 #include "GroupBox.h"
 
 
-EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
+EffectRackView::EffectRackView( EffectChain * model, QWidget * parent ) :
 	QWidget( parent ),
 	ModelView( NULL, this )
 {
-	QVBoxLayout* mainLayout = new QVBoxLayout( this );
+	QVBoxLayout * mainLayout = new QVBoxLayout( this );
 	mainLayout->setMargin( 0 );
-
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
-
-	QVBoxLayout* effectsLayout = new QVBoxLayout( m_effectsGroupBox );
+	QVBoxLayout * effectsLayout = new QVBoxLayout( m_effectsGroupBox );
 	effectsLayout->setSpacing( 0 );
 	effectsLayout->setContentsMargins( 2, m_effectsGroupBox->titleBarHeight() + 2, 2, 2 );
-
 	m_scrollArea = new QScrollArea;
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
 	m_scrollArea->setFrameStyle( QFrame::NoFrame );
 	m_scrollArea->setWidget( new QWidget );
-
 	effectsLayout->addWidget( m_scrollArea );
-
-	QPushButton* addButton = new QPushButton;
+	QPushButton * addButton = new QPushButton;
 	addButton->setText( tr( "Add effect" ) );
-
 	effectsLayout->addWidget( addButton );
-
 	connect( addButton, SIGNAL( clicked() ), this, SLOT( addEffect() ) );
-
-
 	m_lastY = 0;
-
 	setModel( model );
 }
 
@@ -95,14 +85,16 @@ void EffectRackView::clearViews()
 
 
 
-void EffectRackView::moveUp( EffectView* view )
+void EffectRackView::moveUp( EffectView * view )
 {
 	fxChain()->moveUp( view->effect() );
+
 	if( view != m_effectViews.first() )
 	{
 		int i = 0;
-		for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); it++, i++ )
+
+		for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
+				it != m_effectViews.end(); it++, i++ )
 		{
 			if( *it == view )
 			{
@@ -111,10 +103,8 @@ void EffectRackView::moveUp( EffectView* view )
 		}
 
 		EffectView * temp = m_effectViews[ i - 1 ];
-
 		m_effectViews[i - 1] = view;
 		m_effectViews[i] = temp;
-
 		update();
 	}
 }
@@ -122,7 +112,7 @@ void EffectRackView::moveUp( EffectView* view )
 
 
 
-void EffectRackView::moveDown( EffectView* view )
+void EffectRackView::moveDown( EffectView * view )
 {
 	if( view != m_effectViews.last() )
 	{
@@ -134,7 +124,7 @@ void EffectRackView::moveDown( EffectView* view )
 
 
 
-void EffectRackView::deletePlugin( EffectView* view )
+void EffectRackView::deletePlugin( EffectView * view )
 {
 	Effect * e = view->effect();
 	m_effectViews.erase( qFind( m_effectViews.begin(), m_effectViews.end(), view ) );
@@ -151,12 +141,13 @@ void EffectRackView::update()
 {
 	QWidget * w = m_scrollArea->widget();
 	QVector<bool> view_map( qMax<int>( fxChain()->m_effects.size(),
-						m_effectViews.size() ), false );
+					   m_effectViews.size() ), false );
 
 	for( QVector<Effect *>::Iterator it = fxChain()->m_effects.begin();
-					it != fxChain()->m_effects.end(); ++it )
+			it != fxChain()->m_effects.end(); ++it )
 	{
 		int i = 0;
+
 		for( QVector<EffectView *>::Iterator vit = m_effectViews.begin();
 				vit != m_effectViews.end(); ++vit, ++i )
 		{
@@ -166,18 +157,20 @@ void EffectRackView::update()
 				break;
 			}
 		}
+
 		if( i >= m_effectViews.size() )
 		{
 			EffectView * view = new EffectView( *it, w );
-			connect( view, SIGNAL( moveUp( EffectView * ) ), 
-					this, SLOT( moveUp( EffectView * ) ) );
+			connect( view, SIGNAL( moveUp( EffectView * ) ),
+				 this, SLOT( moveUp( EffectView * ) ) );
 			connect( view, SIGNAL( moveDown( EffectView * ) ),
-				this, SLOT( moveDown( EffectView * ) ) );
+				 this, SLOT( moveDown( EffectView * ) ) );
 			connect( view, SIGNAL( deletePlugin( EffectView * ) ),
-				this, SLOT( deletePlugin( EffectView * ) ),
-							Qt::QueuedConnection );
+				 this, SLOT( deletePlugin( EffectView * ) ),
+				 Qt::QueuedConnection );
 			view->show();
 			m_effectViews.append( view );
+
 			if( i < view_map.size() )
 			{
 				view_map[i] = true;
@@ -186,17 +179,15 @@ void EffectRackView::update()
 			{
 				view_map.append( true );
 			}
-
 		}
 	}
 
 	int i = 0, nView = 0;
-
 	const int EffectViewMargin = 3;
 	m_lastY = EffectViewMargin;
 
-	for( QVector<EffectView *>::Iterator it = m_effectViews.begin(); 
-					it != m_effectViews.end(); i++ )
+	for( QVector<EffectView *>::Iterator it = m_effectViews.begin();
+			it != m_effectViews.end(); i++ )
 	{
 		if( i < view_map.size() && view_map[i] == false )
 		{
@@ -212,8 +203,7 @@ void EffectRackView::update()
 		}
 	}
 
-	w->setFixedSize( 210 + 2*EffectViewMargin, m_lastY );
-
+	w->setFixedSize( 210 + 2 * EffectViewMargin, m_lastY );
 	QWidget::update();
 }
 
@@ -231,24 +221,20 @@ void EffectRackView::addEffect()
 	}
 
 	Effect * fx = esd.instantiateSelectedPlugin( fxChain() );
-
 	fxChain()->m_enabledModel.setValue( true );
 	fxChain()->appendEffect( fx );
 	update();
 
 	// Find the effectView, and show the controls
 	for( QVector<EffectView *>::Iterator vit = m_effectViews.begin();
-					vit != m_effectViews.end(); ++vit )
+			vit != m_effectViews.end(); ++vit )
 	{
 		if( ( *vit )->effect() == fx )
 		{
 			( *vit )->editControls();
-
 			break;
 		}
 	}
-
-
 }
 
 

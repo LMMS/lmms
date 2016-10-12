@@ -40,18 +40,21 @@
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
-	{ ProjectRenderer::WaveFile,
+	{
+		ProjectRenderer::WaveFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV-File (*.wav)" ),
-					".wav", &AudioFileWave::getInst },
-	{ ProjectRenderer::OggFile,
+		".wav", &AudioFileWave::getInst
+	},
+	{
+		ProjectRenderer::OggFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "Compressed OGG-File (*.ogg)" ),
-					".ogg",
+		".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
-					&AudioFileOgg::getInst
+		& AudioFileOgg::getInst
 #else
-					NULL
+		NULL
 #endif
-									},
+	},
 	// ... insert your own file-encoder-infos here... may be one day the
 	// user can add own encoders inside the program...
 
@@ -63,9 +66,9 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 
 
 ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
-					const OutputSettings & _os,
-					ExportFileFormats _file_format,
-					const QString & _out_file ) :
+				  const OutputSettings & _os,
+				  ExportFileFormats _file_format,
+				  const QString & _out_file ) :
 	QThread( Engine::mixer() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( _qs ),
@@ -80,17 +83,17 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 
 	bool success_ful = false;
 	m_fileDev = fileEncodeDevices[_file_format].m_getDevInst(
-				_os.samplerate, DEFAULT_CHANNELS, success_ful,
-				_out_file, _os.vbr,
-				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 : 16,
-							Engine::mixer() );
+			    _os.samplerate, DEFAULT_CHANNELS, success_ful,
+			    _out_file, _os.vbr,
+			    _os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
+			    _os.depth == Depth_32Bit ? 32 : 16,
+			    Engine::mixer() );
+
 	if( success_ful == false )
 	{
 		delete m_fileDev;
 		m_fileDev = NULL;
 	}
-
 }
 
 
@@ -106,15 +109,17 @@ ProjectRenderer::~ProjectRenderer()
 // little help-function for getting file-format from a file-extension (only for
 // registered file-encoders)
 ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
-							const QString & _ext )
+	const QString & _ext )
 {
 	int idx = 0;
+
 	while( fileEncodeDevices[idx].m_fileFormat != NumFileFormats )
 	{
 		if( QString( fileEncodeDevices[idx].m_extension ) == _ext )
 		{
 			return( fileEncodeDevices[idx].m_fileFormat );
 		}
+
 		++idx;
 	}
 
@@ -125,7 +130,7 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 
 
 QString ProjectRenderer::getFileExtensionFromFormat(
-		ExportFileFormats fmt )
+	ExportFileFormats fmt )
 {
 	return fileEncodeDevices[fmt].m_extension;
 }
@@ -135,21 +140,18 @@ QString ProjectRenderer::getFileExtensionFromFormat(
 
 void ProjectRenderer::startProcessing()
 {
-
 	if( isReady() )
 	{
 		// have to do mixer stuff with GUI-thread-affinity in order to
 		// make slots connected to sampleRateChanged()-signals being
 		// called immediately
 		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false );
-
+						 m_qualitySettings, false );
 		start(
 #ifndef LMMS_BUILD_WIN32
 			QThread::HighPriority
 #endif
-						);
-
+		);
 	}
 }
 
@@ -166,14 +168,11 @@ void ProjectRenderer::run()
 #endif
 #endif
 #endif
-
-
 	Engine::getSong()->startExport();
-    //skip first empty buffer
-    Engine::mixer()->nextBuffer();
-
+	//skip first empty buffer
+	Engine::mixer()->nextBuffer();
 	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
-							Song::Mode_PlaySong );
+			Song::Mode_PlaySong );
 	m_progress = 0;
 	std::pair<MidiTime, MidiTime> exportEndpoints = Engine::getSong()->getExportEndpoints();
 	tick_t startTick = exportEndpoints.first.getTicks();
@@ -181,11 +180,12 @@ void ProjectRenderer::run()
 
 	// Continually track and emit progress percentage to listeners
 	while( Engine::getSong()->isExportDone() == false &&
-				Engine::getSong()->isExporting() == true
-							&& !m_abort )
+			Engine::getSong()->isExporting() == true
+			&& !m_abort )
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
+		const int nprog = lengthTicks == 0 ? 100 : ( exportPos.getTicks() - startTick ) * 100 / lengthTicks;
+
 		if( m_progress != nprog )
 		{
 			m_progress = nprog;
@@ -194,9 +194,7 @@ void ProjectRenderer::run()
 	}
 
 	Engine::getSong()->stopExport();
-
 	const QString f = m_fileDev->outputFile();
-
 	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
 	Engine::mixer()->changeQuality( m_oldQualitySettings );
 
@@ -223,20 +221,19 @@ void ProjectRenderer::updateConsoleProgress()
 	const int cols = 50;
 	static int rot = 0;
 	char buf[80];
-	char prog[cols+1];
+	char prog[cols + 1];
 
 	for( int i = 0; i < cols; ++i )
 	{
-		prog[i] = ( i*100/cols <= m_progress ? '-' : ' ' );
+		prog[i] = ( i * 100 / cols <= m_progress ? '-' : ' ' );
 	}
-	prog[cols] = 0;
 
-	const char * activity = (const char *) "|/-\\";
+	prog[cols] = 0;
+	const char * activity = ( const char * ) "|/-\\";
 	memset( buf, 0, sizeof( buf ) );
 	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
-							activity[rot] );
-	rot = ( rot+1 ) % 4;
-
+		 activity[rot] );
+	rot = ( rot + 1 ) % 4;
 	fprintf( stderr, "%s", buf );
 	fflush( stderr );
 }

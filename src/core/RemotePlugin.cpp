@@ -63,10 +63,11 @@ void ProcessWatcher::run()
 	{
 		msleep( 200 );
 	}
+
 	if( !m_quit )
 	{
 		fprintf( stderr,
-				"remote plugin died! invalidating now.\n" );
+			 "remote plugin died! invalidating now.\n" );
 		m_plugin->invalidate();
 	}
 }
@@ -100,30 +101,34 @@ RemotePlugin::RemotePlugin() :
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
 	sa.sun_family = AF_LOCAL;
-
 	m_socketFile = QDir::tempPath() + QDir::separator() +
-						QUuid::createUuid().toString();
+		       QUuid::createUuid().toString();
 	const char * path = m_socketFile.toUtf8().constData();
 	size_t length = strlen( path );
+
 	if ( length >= sizeof sa.sun_path )
 	{
 		length = sizeof sa.sun_path - 1;
 		qWarning( "Socket path too long." );
 	}
+
 	memcpy( sa.sun_path, path, length );
 	sa.sun_path[length] = '\0';
-
 	m_server = socket( PF_LOCAL, SOCK_STREAM, 0 );
+
 	if ( m_server == -1 )
 	{
 		qWarning( "Unable to start the server." );
 	}
+
 	remove( path );
-	int ret = bind( m_server, (struct sockaddr *) &sa, sizeof sa );
+	int ret = bind( m_server, ( struct sockaddr * ) &sa, sizeof sa );
+
 	if ( ret == -1 || listen( m_server, 1 ) == -1 )
 	{
 		qWarning( "Unable to start the server." );
 	}
+
 #endif
 }
 
@@ -141,13 +146,14 @@ RemotePlugin::~RemotePlugin()
 		{
 			lock();
 			sendMessage( IdQuit );
-
 			m_process.waitForFinished( 1000 );
+
 			if( m_process.state() != QProcess::NotRunning )
 			{
 				m_process.terminate();
 				m_process.kill();
 			}
+
 			unlock();
 		}
 
@@ -158,10 +164,12 @@ RemotePlugin::~RemotePlugin()
 	}
 
 #ifndef SYNC_WITH_SHM_FIFO
-	if ( close( m_server ) == -1)
+
+	if ( close( m_server ) == -1 )
 	{
 		qWarning( "Error freeing resources." );
 	}
+
 	remove( m_socketFile.toUtf8().constData() );
 #endif
 }
@@ -169,10 +177,11 @@ RemotePlugin::~RemotePlugin()
 
 
 
-bool RemotePlugin::init( const QString &pluginExecutable,
-							bool waitForInitDoneMsg )
+bool RemotePlugin::init( const QString & pluginExecutable,
+			 bool waitForInitDoneMsg )
 {
 	lock();
+
 	if( m_failed )
 	{
 #ifdef SYNC_WITH_SHM_FIFO
@@ -180,26 +189,31 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 #endif
 		m_failed = false;
 	}
-	QString exec = QFileInfo(QDir("plugins:"), pluginExecutable).absoluteFilePath();
+
+	QString exec = QFileInfo( QDir( "plugins:" ), pluginExecutable ).absoluteFilePath();
 #ifdef LMMS_BUILD_APPLE
 	// search current directory first
 	QString curDir = QCoreApplication::applicationDirPath() + "/" + pluginExecutable;
+
 	if( QFile( curDir ).exists() )
 	{
 		exec = curDir;
 	}
+
 #endif
 #ifdef LMMS_BUILD_WIN32
+
 	if( ! exec.endsWith( ".exe", Qt::CaseInsensitive ) )
 	{
 		exec += ".exe";
 	}
+
 #endif
 
 	if( ! QFile( exec ).exists() )
 	{
 		qWarning( "Remote plugin '%s' not found.",
-						exec.toUtf8().constData() );
+			  exec.toUtf8().constData() );
 		m_failed = true;
 		unlock();
 		return failed();
@@ -221,10 +235,8 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 #else
 	qDebug() << exec << args;
 #endif
-
 	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
-		this, SLOT( processFinished( int, QProcess::ExitStatus ) ) );
-
+		 this, SLOT( processFinished( int, QProcess::ExitStatus ) ) );
 #ifndef SYNC_WITH_SHM_FIFO
 	struct pollfd pollin;
 	pollin.fd = m_server;
@@ -242,21 +254,22 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 
 		default:
 			m_socket = accept( m_server, NULL, NULL );
+
 			if ( m_socket == -1 )
 			{
 				qWarning( "Unexpected socket error." );
 			}
 	}
-#endif
 
+#endif
 	resizeSharedProcessingMemory();
 
 	if( waitForInitDoneMsg )
 	{
 		waitForInitDone();
 	}
-	unlock();
 
+	unlock();
 	return failed();
 }
 
@@ -264,7 +277,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 
 
 bool RemotePlugin::process( const sampleFrame * _in_buf,
-						sampleFrame * _out_buf )
+			    sampleFrame * _out_buf )
 {
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
@@ -274,6 +287,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
+
 		return false;
 	}
 
@@ -289,15 +303,16 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 			fetchAndProcessAllMessages();
 			unlock();
 		}
+
 		if( _out_buf != NULL )
 		{
 			BufferManager::clear( _out_buf, frames );
 		}
+
 		return false;
 	}
 
 	memset( m_shm, 0, m_shmSize );
-
 	ch_cnt_t inputs = qMin<ch_cnt_t>( m_inputCount, DEFAULT_CHANNELS );
 
 	if( _in_buf != NULL && inputs > 0 )
@@ -309,7 +324,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 				for( fpp_t frame = 0; frame < frames; ++frame )
 				{
 					m_shm[ch * frames + frame] =
-							_in_buf[frame][ch];
+						_in_buf[frame][ch];
 				}
 			}
 		}
@@ -319,7 +334,8 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		}
 		else
 		{
-			sampleFrame * o = (sampleFrame *) m_shm;
+			sampleFrame * o = ( sampleFrame * ) m_shm;
+
 			for( ch_cnt_t ch = 0; ch < inputs; ++ch )
 			{
 				for( fpp_t frame = 0; frame < frames; ++frame )
@@ -341,29 +357,29 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 
 	waitForMessage( IdProcessingDone );
 	unlock();
-
 	const ch_cnt_t outputs = qMin<ch_cnt_t>( m_outputCount,
-							DEFAULT_CHANNELS );
+				 DEFAULT_CHANNELS );
+
 	if( m_splitChannels )
 	{
 		for( ch_cnt_t ch = 0; ch < outputs; ++ch )
 		{
 			for( fpp_t frame = 0; frame < frames; ++frame )
 			{
-				_out_buf[frame][ch] = m_shm[( m_inputCount+ch )*
-								frames + frame];
+				_out_buf[frame][ch] = m_shm[( m_inputCount + ch ) *
+							    frames + frame];
 			}
 		}
 	}
 	else if( outputs == DEFAULT_CHANNELS )
 	{
 		memcpy( _out_buf, m_shm + m_inputCount * frames,
-						frames * BYTES_PER_FRAME );
+			frames * BYTES_PER_FRAME );
 	}
 	else
 	{
-		sampleFrame * o = (sampleFrame *) ( m_shm +
-							m_inputCount*frames );
+		sampleFrame * o = ( sampleFrame * ) ( m_shm +
+						      m_inputCount * frames );
 		// clear buffer, if plugin didn't fill up both channels
 		BufferManager::clear( _out_buf, frames );
 
@@ -384,7 +400,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 
 
 void RemotePlugin::processMidiEvent( const MidiEvent & _e,
-							const f_cnt_t _offset )
+				     const f_cnt_t _offset )
 {
 	message m( IdMidiEvent );
 	m.addInt( _e.type() );
@@ -402,9 +418,10 @@ void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 
 void RemotePlugin::resizeSharedProcessingMemory()
 {
-	const size_t s = ( m_inputCount+m_outputCount ) *
-				Engine::mixer()->framesPerPeriod() *
-							sizeof( float );
+	const size_t s = ( m_inputCount + m_outputCount ) *
+			 Engine::mixer()->framesPerPeriod() *
+			 sizeof( float );
+
 	if( m_shm != NULL )
 	{
 #ifdef USE_QT_SHMEM
@@ -417,31 +434,34 @@ void RemotePlugin::resizeSharedProcessingMemory()
 
 	static int shm_key = 0;
 #ifdef USE_QT_SHMEM
+
 	do
 	{
 		m_shmObj.setKey( QString( "%1" ).arg( ++shm_key ) );
 		m_shmObj.create( s );
-	} while( m_shmObj.error() != QSharedMemory::NoError );
+	}
+	while( m_shmObj.error() != QSharedMemory::NoError );
 
-	m_shm = (float *) m_shmObj.data();
+	m_shm = ( float * ) m_shmObj.data();
 #else
+
 	while( ( m_shmID = shmget( ++shm_key, s, IPC_CREAT | IPC_EXCL |
-								0600 ) ) == -1 )
+				   0600 ) ) == -1 )
 	{
 	}
 
-	m_shm = (float *) shmat( m_shmID, 0, 0 );
+	m_shm = ( float * ) shmat( m_shmID, 0, 0 );
 #endif
 	m_shmSize = s;
 	sendMessage( message( IdChangeSharedMemoryKey ).
-				addInt( shm_key ).addInt( m_shmSize ) );
+		     addInt( shm_key ).addInt( m_shmSize ) );
 }
 
 
 
 
 void RemotePlugin::processFinished( int exitCode,
-					QProcess::ExitStatus exitStatus )
+				    QProcess::ExitStatus exitStatus )
 {
 #ifndef SYNC_WITH_SHM_FIFO
 	invalidate();
@@ -456,6 +476,7 @@ bool RemotePlugin::processMessage( const message & _m )
 	lock();
 	message reply_message( _m.id );
 	bool reply = false;
+
 	switch( _m.id )
 	{
 		case IdUndefined:
@@ -488,7 +509,7 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdDebugMessage:
 			fprintf( stderr, "RemotePlugin::DebugMessage: %s",
-						_m.getString( 0 ).c_str() );
+				 _m.getString( 0 ).c_str() );
 			break;
 
 		case IdProcessingDone:
@@ -496,12 +517,13 @@ bool RemotePlugin::processMessage( const message & _m )
 		default:
 			break;
 	}
+
 	if( reply )
 	{
 		sendMessage( reply_message );
 	}
-	unlock();
 
+	unlock();
 	return true;
 }
 

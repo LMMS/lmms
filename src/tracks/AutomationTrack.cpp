@@ -34,7 +34,7 @@
 #include "TrackLabelButton.h"
 
 
-AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
+AutomationTrack::AutomationTrack( TrackContainer * tc, bool _hidden ) :
 	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
 {
 	setName( tr( "Automation track" ) );
@@ -51,7 +51,7 @@ AutomationTrack::~AutomationTrack()
 
 
 bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
-							const f_cnt_t _frame_base, int _tco_num )
+			    const f_cnt_t _frame_base, int _tco_num )
 {
 	if( isMuted() )
 	{
@@ -59,6 +59,7 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 	}
 
 	tcoVector tcos;
+
 	if( _tco_num >= 0 )
 	{
 		TrackContentObject * tco = getTCO( _tco_num );
@@ -67,30 +68,35 @@ bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
 	else
 	{
 		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / Engine::framesPerTick()) );
+					_frames / Engine::framesPerTick() ) );
 	}
 
 	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		AutomationPattern * p = dynamic_cast<AutomationPattern *>( *it );
+
 		if( p == NULL || ( *it )->isMuted() )
 		{
 			continue;
 		}
+
 		MidiTime cur_start = _start;
+
 		if( _tco_num < 0 )
 		{
 			cur_start -= p->startPosition();
 		}
+
 		p->processMidiTime( cur_start );
 	}
+
 	return false;
 }
 
 
 
 
-TrackView * AutomationTrack::createView( TrackContainerView* tcv )
+TrackView * AutomationTrack::createView( TrackContainerView * tcv )
 {
 	return new AutomationTrackView( this, tcv );
 }
@@ -107,7 +113,7 @@ TrackContentObject * AutomationTrack::createTCO( const MidiTime & )
 
 
 void AutomationTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+		QDomElement & _this )
 {
 }
 
@@ -127,12 +133,12 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
+AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView * tcv ) :
 	TrackView( _at, tcv )
 {
-        setFixedHeight( 32 );
+	setFixedHeight( 32 );
 	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
+			getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
 	tlb->move( 3, 1 );
 	tlb->show();
@@ -161,20 +167,22 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString val = StringPairDrag::decodeValue( _de );
+
 	if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+						 Engine::projectJournal()->
+						 journallingObject( val.toInt() ) );
+
 		if( mod != NULL )
 		{
 			MidiTime pos = MidiTime( trackContainerView()->
-							currentPosition() +
-				( _de->pos().x() -
-					getTrackContentWidget()->x() ) *
-						MidiTime::ticksPerTact() /
-		static_cast<int>( trackContainerView()->pixelsPerTact() ) )
-				.toAbsoluteTact();
+						 currentPosition() +
+						 ( _de->pos().x() -
+						   getTrackContentWidget()->x() ) *
+						 MidiTime::ticksPerTact() /
+						 static_cast<int>( trackContainerView()->pixelsPerTact() ) )
+				       .toAbsoluteTact();
 
 			if( pos.getTicks() < 0 )
 			{

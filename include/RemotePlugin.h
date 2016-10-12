@@ -101,7 +101,7 @@ typedef int32_t key_t;
 #ifdef SYNC_WITH_SHM_FIFO
 // sometimes we need to exchange bigger messages (e.g. for VST parameter dumps)
 // so set a usable value here
-const int SHM_FIFO_SIZE = 512*1024;
+const int SHM_FIFO_SIZE = 512 * 1024;
 
 
 // implements a FIFO inside a shared memory segment
@@ -117,7 +117,7 @@ class shmFifo
 	struct shmData
 	{
 		sem32_t dataSem;	// semaphore for locking this
-					// FIFO management data
+		// FIFO management data
 		sem32_t messageSem;	// semaphore for incoming messages
 		volatile int32_t startPtr; // current start of FIFO in memory
 		volatile int32_t endPtr;   // current end of FIFO in memory
@@ -141,30 +141,34 @@ public:
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
+
 		do
 		{
 			m_shmObj.setKey( QString( "%1" ).arg( ++m_shmKey ) );
 			m_shmObj.create( sizeof( shmData ) );
-		} while( m_shmObj.error() != QSharedMemory::NoError );
+		}
+		while( m_shmObj.error() != QSharedMemory::NoError );
 
-		m_data = (shmData *) m_shmObj.data();
+		m_data = ( shmData * ) m_shmObj.data();
 #else
+
 		while( ( m_shmID = shmget( ++m_shmKey, sizeof( shmData ),
-					IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
+					   IPC_CREAT | IPC_EXCL | 0600 ) ) == -1 )
 		{
 		}
-		m_data = (shmData *) shmat( m_shmID, 0, 0 );
+
+		m_data = ( shmData * ) shmat( m_shmID, 0, 0 );
 #endif
 		assert( m_data != NULL );
 		m_data->startPtr = m_data->endPtr = 0;
 		static int k = 0;
-		m_data->dataSem.semKey = ( getpid()<<10 ) + ++k;
-		m_data->messageSem.semKey = ( getpid()<<10 ) + ++k;
+		m_data->dataSem.semKey = ( getpid() << 10 ) + ++k;
+		m_data->messageSem.semKey = ( getpid() << 10 ) + ++k;
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ),
-						1, QSystemSemaphore::Create );
+				  1, QSystemSemaphore::Create );
 		m_messageSem.setKey( QString::number(
-						m_data->messageSem.semKey ),
-						0, QSystemSemaphore::Create );
+					     m_data->messageSem.semKey ),
+				     0, QSystemSemaphore::Create );
 	}
 
 	// constructor for remote-/client-side - use _shm_key for making up
@@ -184,20 +188,24 @@ public:
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
+
 		if( m_shmObj.attach() )
 		{
-			m_data = (shmData *) m_shmObj.data();
+			m_data = ( shmData * ) m_shmObj.data();
 		}
+
 #else
+
 		if( m_shmID != -1 )
 		{
-			m_data = (shmData *) shmat( m_shmID, 0, 0 );
+			m_data = ( shmData * ) shmat( m_shmID, 0, 0 );
 		}
+
 #endif
 		assert( m_data != NULL );
 		m_dataSem.setKey( QString::number( m_data->dataSem.semKey ) );
 		m_messageSem.setKey( QString::number(
-						m_data->messageSem.semKey ) );
+					     m_data->messageSem.semKey ) );
 	}
 
 	~shmFifo()
@@ -209,6 +217,7 @@ public:
 			shmctl( m_shmID, IPC_RMID, NULL );
 #endif
 		}
+
 #ifndef USE_QT_SHMEM
 		shmdt( m_data );
 #endif
@@ -242,7 +251,7 @@ public:
 	// recursive unlock
 	inline void unlock()
 	{
-		if( __sync_sub_and_fetch( &m_lockDepth, 1) <= 0 )
+		if( __sync_sub_and_fetch( &m_lockDepth, 1 ) <= 0 )
 		{
 			m_dataSem.release();
 		}
@@ -279,6 +288,7 @@ public:
 	inline std::string readString()
 	{
 		const int len = readInt();
+
 		if( len )
 		{
 			char * sc = new char[len + 1];
@@ -288,6 +298,7 @@ public:
 			delete[] sc;
 			return s;
 		}
+
 		return std::string();
 	}
 
@@ -306,6 +317,7 @@ public:
 		{
 			return false;
 		}
+
 		lock();
 		const bool empty = ( m_data->startPtr == m_data->endPtr );
 		unlock();
@@ -321,12 +333,12 @@ public:
 
 private:
 	static inline void fastMemCpy( void * _dest, const void * _src,
-							const int _len )
+				       const int _len )
 	{
 		// calling memcpy() for just an integer is obsolete overhead
 		if( _len == 4 )
 		{
-			*( (int32_t *) _dest ) = *( (int32_t *) _src );
+			*( ( int32_t * ) _dest ) = *( ( int32_t * ) _src );
 		}
 		else
 		{
@@ -341,7 +353,9 @@ private:
 			memset( _buf, 0, _len );
 			return;
 		}
+
 		lock();
+
 		while( isInvalid() == false &&
 				_len > m_data->endPtr - m_data->startPtr )
 		{
@@ -351,14 +365,17 @@ private:
 #endif
 			lock();
 		}
+
 		fastMemCpy( _buf, m_data->data + m_data->startPtr, _len );
 		m_data->startPtr += _len;
+
 		// nothing left?
 		if( m_data->startPtr == m_data->endPtr )
 		{
 			// then reset to 0
 			m_data->startPtr = m_data->endPtr = 0;
 		}
+
 		unlock();
 	}
 
@@ -368,25 +385,29 @@ private:
 		{
 			return;
 		}
+
 		lock();
+
 		while( _len > SHM_FIFO_SIZE - m_data->endPtr )
 		{
 			// if no space is left, try to move data to front
 			if( m_data->startPtr > 0 )
 			{
 				memmove( m_data->data,
-					m_data->data + m_data->startPtr,
-					m_data->endPtr - m_data->startPtr );
+					 m_data->data + m_data->startPtr,
+					 m_data->endPtr - m_data->startPtr );
 				m_data->endPtr = m_data->endPtr -
-							m_data->startPtr;
+						 m_data->startPtr;
 				m_data->startPtr = 0;
 			}
+
 			unlock();
 #ifndef LMMS_BUILD_WIN32
 			usleep( 5 );
 #endif
 			lock();
 		}
+
 		fastMemCpy( m_data->data + m_data->endPtr, _buf, _len );
 		m_data->endPtr += _len;
 		unlock();
@@ -501,7 +522,7 @@ public:
 
 		inline float getFloat( int _p ) const
 		{
-			return (float) atof( data[_p].c_str() );
+			return ( float ) atof( data[_p].c_str() );
 		}
 
 		inline bool operator==( const message & _m ) const
@@ -526,7 +547,7 @@ public:
 	virtual ~RemotePluginBase();
 
 #ifdef SYNC_WITH_SHM_FIFO
-	void reset( shmFifo *in, shmFifo *out )
+	void reset( shmFifo * in, shmFifo * out )
 	{
 		delete m_in;
 		delete m_out;
@@ -548,7 +569,7 @@ public:
 	}
 
 	message waitForMessage( const message & _m,
-						bool _busy_waiting = false );
+				bool _busy_waiting = false );
 
 	inline message fetchAndProcessNextMessage()
 	{
@@ -573,6 +594,7 @@ public:
 	inline std::string readString()
 	{
 		const int len = readInt();
+
 		if( len )
 		{
 			char * sc = new char[len + 1];
@@ -582,6 +604,7 @@ public:
 			delete[] sc;
 			return s;
 		}
+
 		return std::string();
 	}
 
@@ -608,6 +631,7 @@ public:
 		{
 			qWarning( "Unexpected poll error." );
 		}
+
 		return pollin.revents & POLLIN;
 #endif
 	}
@@ -666,21 +690,26 @@ private:
 			memset( _buf, 0, _len );
 			return;
 		}
-		char * buf = (char *) _buf;
+
+		char * buf = ( char * ) _buf;
 		int remaining = _len;
+
 		while ( remaining )
 		{
 			ssize_t nread = ::read( m_socket, buf, remaining );
+
 			switch ( nread )
 			{
 				case -1:
 					fprintf( stderr,
-						"Error while reading.\n" );
+						 "Error while reading.\n" );
+
 				case 0:
 					invalidate();
 					memset( _buf, 0, _len );
 					return;
 			}
+
 			buf += nread;
 			remaining -= nread;
 		}
@@ -692,20 +721,25 @@ private:
 		{
 			return;
 		}
-		const char * buf = (const char *) _buf;
+
+		const char * buf = ( const char * ) _buf;
 		int remaining = _len;
+
 		while ( remaining )
 		{
 			ssize_t nwritten = ::write( m_socket, buf, remaining );
+
 			switch ( nwritten )
 			{
 				case -1:
 					fprintf( stderr,
-						"Error while writing.\n" );
+						 "Error while writing.\n" );
+
 				case 0:
 					invalidate();
 					return;
 			}
+
 			buf += nwritten;
 			remaining -= nwritten;
 		}
@@ -766,7 +800,7 @@ public:
 #endif
 	}
 
-	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg );
+	bool init( const QString & pluginExecutable, bool waitForInitDoneMsg );
 
 	inline void waitForInitDone( bool _busyWaiting = true )
 	{
@@ -777,7 +811,7 @@ public:
 
 	bool process( const sampleFrame * _in_buf, sampleFrame * _out_buf );
 
-	void processMidiEvent( const MidiEvent&, const f_cnt_t _offset );
+	void processMidiEvent( const MidiEvent &, const f_cnt_t _offset );
 
 	void updateSampleRate( sample_rate_t _sr )
 	{
@@ -877,9 +911,9 @@ public:
 	virtual bool processMessage( const message & _m );
 
 	virtual void process( const sampleFrame * _in_buf,
-					sampleFrame * _out_buf ) = 0;
+			      sampleFrame * _out_buf ) = 0;
 
-	virtual void processMidiEvent( const MidiEvent&, const f_cnt_t /* _offset */ )
+	virtual void processMidiEvent( const MidiEvent &, const f_cnt_t /* _offset */ )
 	{
 	}
 
@@ -1011,11 +1045,13 @@ int RemotePluginBase::sendMessage( const message & _m )
 	m_out->writeInt( _m.id );
 	m_out->writeInt( _m.data.size() );
 	int j = 8;
+
 	for( unsigned int i = 0; i < _m.data.size(); ++i )
 	{
 		m_out->writeString( _m.data[i] );
 		j += 4 + _m.data[i].size();
 	}
+
 	m_out->unlock();
 	m_out->messageSent();
 #else
@@ -1023,14 +1059,15 @@ int RemotePluginBase::sendMessage( const message & _m )
 	writeInt( _m.id );
 	writeInt( _m.data.size() );
 	int j = 8;
+
 	for( unsigned int i = 0; i < _m.data.size(); ++i )
 	{
 		writeString( _m.data[i] );
 		j += 4 + _m.data[i].size();
 	}
+
 	pthread_mutex_unlock( &m_sendMutex );
 #endif
-
 	return j;
 }
 
@@ -1045,20 +1082,24 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 	message m;
 	m.id = m_in->readInt();
 	const int s = m_in->readInt();
+
 	for( int i = 0; i < s; ++i )
 	{
 		m.data.push_back( m_in->readString() );
 	}
+
 	m_in->unlock();
 #else
 	pthread_mutex_lock( &m_receiveMutex );
 	message m;
 	m.id = readInt();
 	const int s = readInt();
+
 	for( int i = 0; i < s; ++i )
 	{
 		m.data.push_back( readString() );
 	}
+
 	pthread_mutex_unlock( &m_receiveMutex );
 #endif
 	return m;
@@ -1068,21 +1109,24 @@ RemotePluginBase::message RemotePluginBase::receiveMessage()
 
 
 RemotePluginBase::message RemotePluginBase::waitForMessage(
-							const message & _wm,
-							bool _busy_waiting )
+	const message & _wm,
+	bool _busy_waiting )
 {
 	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
+
 		if( _busy_waiting && !messagesLeft() )
 		{
 			QCoreApplication::processEvents(
 				QEventLoop::ExcludeUserInputEvents, 50 );
 			continue;
 		}
+
 #endif
 		message m = receiveMessage();
 		processMessage( m );
+
 		if( m.id == _wm.id )
 		{
 			return m;
@@ -1127,35 +1171,39 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 #ifndef SYNC_WITH_SHM_FIFO
 	struct sockaddr_un sa;
 	sa.sun_family = AF_LOCAL;
-
 	size_t length = strlen( socketPath );
+
 	if ( length >= sizeof sa.sun_path )
 	{
 		length = sizeof sa.sun_path - 1;
 		fprintf( stderr, "Socket path too long.\n" );
 	}
+
 	memcpy( sa.sun_path, socketPath, length );
 	sa.sun_path[length] = '\0';
-
 	m_socket = socket( PF_LOCAL, SOCK_STREAM, 0 );
+
 	if ( m_socket == -1 )
 	{
 		fprintf( stderr, "Could not connect to local server.\n" );
 	}
-	if ( ::connect( m_socket, (struct sockaddr *) &sa, sizeof sa ) == -1 )
+
+	if ( ::connect( m_socket, ( struct sockaddr * ) &sa, sizeof sa ) == -1 )
 	{
 		fprintf( stderr, "Could not connect to local server.\n" );
 	}
-#endif
 
+#endif
 #ifdef USE_QT_SHMEM
+
 	if( m_shmQtID.attach( QSharedMemory::ReadOnly ) )
 	{
-		m_vstSyncData = (VstSyncData *) m_shmQtID.data();
+		m_vstSyncData = ( VstSyncData * ) m_shmQtID.data();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
 		return;
 	}
+
 #else
 	key_t key;
 	int m_shmID;
@@ -1165,15 +1213,18 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 		perror( "RemotePluginClient::ftok" );
 	}
 	else
-	{	// connect to shared memory segment
+	{
+		// connect to shared memory segment
 		if( ( m_shmID = shmget( key, 0, 0 ) ) == -1 )
 		{
 			perror( "RemotePluginClient::shmget" );
 		}
 		else
-		{	// attach segment
-			m_vstSyncData = (VstSyncData *)shmat(m_shmID, 0, 0);
-			if( m_vstSyncData == (VstSyncData *)( -1 ) )
+		{
+			// attach segment
+			m_vstSyncData = ( VstSyncData * )shmat( m_shmID, 0, 0 );
+
+			if( m_vstSyncData == ( VstSyncData * )( -1 ) )
 			{
 				perror( "RemotePluginClient::shmat" );
 			}
@@ -1183,16 +1234,17 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 				m_sampleRate = m_vstSyncData->m_sampleRate;
 
 				// detach segment
-				if( shmdt(m_vstSyncData) == -1 )
+				if( shmdt( m_vstSyncData ) == -1 )
 				{
-					perror("RemotePluginClient::shmdt");
+					perror( "RemotePluginClient::shmdt" );
 				}
+
 				return;
 			}
 		}
 	}
-#endif
 
+#endif
 	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
 	sendMessage( IdBufferSizeInformation );
@@ -1207,16 +1259,16 @@ RemotePluginClient::~RemotePluginClient()
 	m_shmQtID.detach();
 #endif
 	sendMessage( IdQuit );
-
 #ifndef USE_QT_SHMEM
 	shmdt( m_shm );
 #endif
-
 #ifndef SYNC_WITH_SHM_FIFO
-	if ( close( m_socket ) == -1)
+
+	if ( close( m_socket ) == -1 )
 	{
 		fprintf( stderr, "Error freeing resources.\n" );
 	}
+
 #endif
 }
 
@@ -1235,6 +1287,7 @@ bool RemotePluginClient::processMessage( const message & _m )
 {
 	message reply_message( _m.id );
 	bool reply = false;
+
 	switch( _m.id )
 	{
 		case IdUndefined:
@@ -1256,11 +1309,11 @@ bool RemotePluginClient::processMessage( const message & _m )
 		case IdMidiEvent:
 			processMidiEvent(
 				MidiEvent( static_cast<MidiEventTypes>(
-							_m.getInt( 0 ) ),
-						_m.getInt( 1 ),
-						_m.getInt( 2 ),
-						_m.getInt( 3 ) ),
-							_m.getInt( 4 ) );
+						   _m.getInt( 0 ) ),
+					   _m.getInt( 1 ),
+					   _m.getInt( 2 ),
+					   _m.getInt( 3 ) ),
+				_m.getInt( 4 ) );
 			break;
 
 		case IdStartProcessing:
@@ -1279,11 +1332,12 @@ bool RemotePluginClient::processMessage( const message & _m )
 		default:
 		{
 			char buf[64];
-			sprintf( buf, "undefined message: %d\n", (int) _m.id );
+			sprintf( buf, "undefined message: %d\n", ( int ) _m.id );
 			debugMessage( buf );
 			break;
 		}
 	}
+
 	if( reply )
 	{
 		sendMessage( reply_message );
@@ -1299,9 +1353,10 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 {
 #ifdef USE_QT_SHMEM
 	m_shmObj.setKey( QString::number( _key ) );
+
 	if( m_shmObj.attach() || m_shmObj.error() == QSharedMemory::NoError )
 	{
-		m_shm = (float *) m_shmObj.data();
+		m_shm = ( float * ) m_shmObj.data();
 	}
 	else
 	{
@@ -1309,7 +1364,9 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 		sprintf( buf, "failed getting shared memory: %d\n", m_shmObj.error() );
 		debugMessage( buf );
 	}
+
 #else
+
 	if( m_shm != NULL )
 	{
 		shmdt( m_shm );
@@ -1323,14 +1380,16 @@ void RemotePluginClient::setShmKey( key_t _key, int _size )
 	}
 
 	int shm_id = shmget( _key, _size, 0 );
+
 	if( shm_id == -1 )
 	{
 		debugMessage( "failed getting shared memory\n" );
 	}
 	else
 	{
-		m_shm = (float *) shmat( shm_id, 0, 0 );
+		m_shm = ( float * ) shmat( shm_id, 0, 0 );
 	}
+
 #endif
 }
 
@@ -1341,9 +1400,9 @@ void RemotePluginClient::doProcessing()
 {
 	if( m_shm != NULL )
 	{
-		process( (sampleFrame *)( m_inputCount > 0 ? m_shm : NULL ),
-				(sampleFrame *)( m_shm +
-					( m_inputCount*m_bufferSize ) ) );
+		process( ( sampleFrame * )( m_inputCount > 0 ? m_shm : NULL ),
+			 ( sampleFrame * )( m_shm +
+					    ( m_inputCount * m_bufferSize ) ) );
 	}
 	else
 	{

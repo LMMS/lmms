@@ -29,17 +29,17 @@
 
 
 AudioFileWave::AudioFileWave( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, bool & _success_ful,
-				const QString & _file,
-				const bool _use_vbr,
-				const bitrate_t _nom_bitrate,
-				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate,
-				const int _depth,
-				Mixer*  _mixer ) :
+			      const ch_cnt_t _channels, bool & _success_ful,
+			      const QString & _file,
+			      const bool _use_vbr,
+			      const bitrate_t _nom_bitrate,
+			      const bitrate_t _min_bitrate,
+			      const bitrate_t _max_bitrate,
+			      const int _depth,
+			      Mixer * _mixer ) :
 	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-			_nom_bitrate, _min_bitrate, _max_bitrate,
-								_depth, _mixer ),
+			 _nom_bitrate, _min_bitrate, _max_bitrate,
+			 _depth, _mixer ),
 	m_sf( NULL )
 {
 	_success_ful = outputFileOpened() && startEncoding();
@@ -66,17 +66,23 @@ bool AudioFileWave::startEncoding()
 
 	switch( depth() )
 	{
-		case 32: m_si.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT; break;
+		case 32:
+			m_si.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT;
+			break;
+
 		case 16:
-		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
+		default:
+			m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+			break;
 	}
+
 	m_sf = sf_open(
 #ifdef LMMS_BUILD_WIN32
-					outputFile().toLocal8Bit().constData(),
+		       outputFile().toLocal8Bit().constData(),
 #else
-					outputFile().toUtf8().constData(),
+		       outputFile().toUtf8().constData(),
 #endif
-					SFM_WRITE, &m_si );
+		       SFM_WRITE, &m_si );
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
 	return true;
 }
@@ -85,20 +91,22 @@ bool AudioFileWave::startEncoding()
 
 
 void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain )
+				 const fpp_t _frames,
+				 const float _master_gain )
 {
 	if( depth() == 32 )
 	{
-		float *  buf = new float[_frames*channels()];
+		float  * buf = new float[_frames * channels()];
+
 		for( fpp_t frame = 0; frame < _frames; ++frame )
 		{
 			for( ch_cnt_t chnl = 0; chnl < channels(); ++chnl )
 			{
-				buf[frame*channels()+chnl] = _ab[frame][chnl] *
-								_master_gain;
+				buf[frame * channels() + chnl] = _ab[frame][chnl] *
+								 _master_gain;
 			}
 		}
+
 		sf_writef_float( m_sf, buf, _frames );
 		delete[] buf;
 	}
@@ -106,8 +114,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 	{
 		int_sample_t * buf = new int_sample_t[_frames * channels()];
 		convertToS16( _ab, _frames, _master_gain, buf,
-							!isLittleEndian() );
-
+			      !isLittleEndian() );
 		sf_writef_short( m_sf, buf, _frames );
 		delete[] buf;
 	}

@@ -39,13 +39,13 @@ enum MidiEventTypes
 	MidiChannelPressure = 0xD0,
 	MidiPitchBend = 0xE0,
 	// system exclusive
-	MidiSysEx= 0xF0,
+	MidiSysEx = 0xF0,
 	// system common - never in midi files
-	MidiTimeCode= 0xF1,
+	MidiTimeCode = 0xF1,
 	MidiSongPosition = 0xF2,
 	MidiSongSelect = 0xF3,
 	MidiTuneRequest = 0xF6,
-	MidiEOX= 0xF7,
+	MidiEOX = 0xF7,
 	// system real-time - never in midi files
 	MidiSync = 0xF8,
 	MidiTick = 0xF9,

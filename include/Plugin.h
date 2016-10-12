@@ -54,7 +54,7 @@ public:
 		ExportFilter,	// filter for exporting a file
 		Tool,		// additional tool (level-meter etc)
 		Library,	// simple library holding a code-base for
-				// several other plugins (e.g. VST-support)
+		// several other plugins (e.g. VST-support)
 		Other,
 		Undefined = 255
 	} ;
@@ -73,7 +73,7 @@ public:
 		const PixmapLoader * logo;
 		const char * supportedFileTypes;
 
-		inline bool supportsFileType( const QString& extension ) const
+		inline bool supportsFileType( const QString & extension ) const
 		{
 			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
 		}
@@ -86,8 +86,8 @@ public:
 				typedef QMap<QString, QString> AttributeMap;
 
 				inline Key( const Plugin::Descriptor * desc = NULL,
-							const QString & name = QString(),
-							const AttributeMap & am = AttributeMap() )
+					    const QString & name = QString(),
+					    const AttributeMap & am = AttributeMap() )
 					:
 					desc( desc ),
 					name( name ),
@@ -104,7 +104,7 @@ public:
 					return desc != NULL && name.isNull() == false;
 				}
 
-				const Plugin::Descriptor* desc;
+				const Plugin::Descriptor * desc;
 				QString name;
 				AttributeMap attributes;
 			} ;
@@ -138,7 +138,7 @@ public:
 
 	} ;
 	// typedef a list so we can easily work with list of plugin descriptors
-	typedef QList<Descriptor*> DescriptorList;
+	typedef QList<Descriptor *> DescriptorList;
 
 	// contructor of a plugin
 	Plugin( const Descriptor * descriptor, Model * parent );
@@ -148,8 +148,8 @@ public:
 	virtual QString displayName() const
 	{
 		return Model::displayName().isEmpty()
-			? m_descriptor->displayName
-			: Model::displayName();
+		       ? m_descriptor->displayName
+		       : Model::displayName();
 	}
 
 	// return plugin-type
@@ -170,19 +170,19 @@ public:
 
 	// Called if external source needs to change something but we cannot
 	// reference the class header.  Should return null if not key not found.
-	virtual AutomatableModel* childModel( const QString & modelName );
+	virtual AutomatableModel * childModel( const QString & modelName );
 
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
+	static Plugin * instantiate( const QString & pluginName, Model * parent, void * data );
 
-	// create a view for the model 
+	// create a view for the model
 	PluginView * createView( QWidget * parent );
 
 
 protected:
-	// create a view for the model 
-	virtual PluginView* instantiateView( QWidget * ) = 0;
+	// create a view for the model
+	virtual PluginView * instantiateView( QWidget * ) = 0;
 	void collectErrorForUI( QString errMsg );
 
 
@@ -190,7 +190,7 @@ private:
 	const Descriptor * m_descriptor;
 
 	// pointer to instantiation-function in plugin
-	typedef Plugin * ( * InstantiationHook )( Model * , void * );
+	typedef Plugin * ( * InstantiationHook )( Model *, void * );
 
 } ;
 

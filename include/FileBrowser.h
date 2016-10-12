@@ -2,7 +2,7 @@
  * FileBrowser.h - include file for FileBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -49,14 +49,14 @@ class FileBrowser : public SideBarWidget
 	Q_OBJECT
 public:
 	FileBrowser( const QString & directories, const QString & filter,
-			const QString & title, const QPixmap & pm,
-			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
+		     const QString & title, const QPixmap & pm,
+		     QWidget * parent, bool dirs_as_items = false, bool recurse = false );
 	virtual ~FileBrowser();
 
 private slots:
 	void reloadTree( void );
 	// call with item=NULL to filter the entire tree
-	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
+	bool filterItems( const QString & filter, QTreeWidgetItem * item = NULL );
 	void giveFocusToFilter();
 
 private:
@@ -96,13 +96,13 @@ protected:
 
 private:
 	void handleFile( FileItem * fi, InstrumentTrack * it );
-	void openInNewInstrumentTrack( TrackContainer* tc );
+	void openInNewInstrumentTrack( TrackContainer * tc );
 
 
 	bool m_mousePressed;
 	QPoint m_pressPos;
 
-	PlayHandle* m_previewPlayHandle;
+	PlayHandle * m_previewPlayHandle;
 	QMutex m_pphMutex;
 
 	FileItem * m_contextMenuItem;
@@ -124,7 +124,7 @@ class Directory : public QTreeWidgetItem
 {
 public:
 	Directory( const QString & filename, const QString & path,
-						const QString & filter );
+		   const QString & filter );
 
 	void update( void );
 
@@ -134,12 +134,14 @@ public:
 		{
 			path = m_directories[0];
 		}
+
 		if( path != QString::null )
 		{
 			path += QDir::separator();
 		}
+
 		return( QDir::cleanPath( path + text( 0 ) ) +
-							QDir::separator() );
+			QDir::separator() );
 	}
 
 	inline void addDirectory( const QString & dir )
@@ -195,12 +197,12 @@ public:
 
 
 	FileItem( QTreeWidget * parent, const QString & name,
-							const QString & path );
+		  const QString & path );
 	FileItem( const QString & name, const QString & path );
 
 	QString fullName() const
 	{
-		return QFileInfo(m_path, text(0)).absoluteFilePath();
+		return QFileInfo( m_path, text( 0 ) ).absoluteFilePath();
 	}
 
 	inline FileTypes type( void ) const

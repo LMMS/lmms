@@ -32,9 +32,9 @@
 // additional range-checkings) should be compiled
 
 #ifdef LMMS_DEBUG
-	#include <assert.h>
+#include <assert.h>
 #else
-	#define assert(x) ((void)(x))
+#define assert(x) ((void)(x))
 #endif
 #include <cstdio>
 

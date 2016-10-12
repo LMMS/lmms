@@ -63,7 +63,7 @@ private:
 	Knob * m_filterCutKnob;
 	Knob * m_filterResKnob;
 
-	QLabel* m_singleStreamInfoLabel;
+	QLabel * m_singleStreamInfoLabel;
 
 } ;
 

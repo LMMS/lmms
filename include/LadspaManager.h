@@ -89,7 +89,7 @@ public:
 
 	l_sortable_plugin_t getSortedPlugins();
 	ladspaManagerDescription * getDescription( const ladspa_key_t &
-								_plugin );
+			_plugin );
 
 	/* This identifier can be used as a unique, case-sensitive
 	identifier for the plugin type within the plugin file. Plugin
@@ -121,7 +121,7 @@ public:
 	/* Returns the copyright for the plug-in */
 	QString  getCopyright( const ladspa_key_t & _plugin );
 
-  	/* This indicates the number of ports (input AND output) present on
+	/* This indicates the number of ports (input AND output) present on
 	the plugin. */
 	uint32_t  getPortCount( const ladspa_key_t & _plugin );
 
@@ -145,15 +145,15 @@ public:
 	Hosts that support bounds at all must support this hint to retain
 	meaning. */
 	bool  areHintsSampleRateDependent( const ladspa_key_t & _plugin,
-								uint32_t _port );
+					   uint32_t _port );
 
-  	/* Returns the lower boundary value for the given port. If
+	/* Returns the lower boundary value for the given port. If
 	no lower bound is provided by the plug-in, returns -999e-99. When
 	areHintsSampleRateDependent() is also true then this value should be
 	multiplied by the relevant sample rate. */
 	float  getLowerBound( const ladspa_key_t & _plugin, uint32_t _port );
 
-  	/* Returns the upper boundary value for the given port. If
+	/* Returns the upper boundary value for the given port. If
 	no upper bound is provided by the plug-in, returns -999e-99. When
 	areHintsSampleRateDependent() is also true then this value should be
 	multiplied by the relevant sample rate. */
@@ -188,14 +188,14 @@ public:
 	or interpreted by the host. It is expected that most plugin
 	writers will not use this facility as LADSPA_Handle should be
 	used to hold instance data. */
-	const void *  getImplementationData(
-						const ladspa_key_t & _plugin );
+	const void  * getImplementationData(
+		const ladspa_key_t & _plugin );
 
 
 	/* Returns a pointer to the plug-in's descriptor from which control
 	of the plug-in is accessible */
-	const LADSPA_Descriptor *  getDescriptor(
-						const ladspa_key_t & _plugin );
+	const LADSPA_Descriptor  * getDescriptor(
+		const ladspa_key_t & _plugin );
 
 
 	/* The following methods are convenience functions for use during
@@ -206,9 +206,9 @@ public:
 
 	/* Returns a handle to an instantiation of the given plug-in. */
 	LADSPA_Handle  instantiate( const ladspa_key_t & _plugin,
-						uint32_t _sample_rate );
+				    uint32_t _sample_rate );
 
-  	/* This method calls a function pointer that connects a port on an
+	/* This method calls a function pointer that connects a port on an
 	instantiated plugin to a memory location at which a block of data
 	for the port will be read/written. The data location is expected
 	to be an array of LADSPA_Data for audio ports or a single
@@ -226,11 +226,11 @@ public:
 	connectPort() must be called at least once for each port before
 	run() or runAdding() is called. */
 	bool  connectPort( const ladspa_key_t & _plugin,
-					LADSPA_Handle _instance,
-					uint32_t _port,
-					LADSPA_Data * _data_location );
+			   LADSPA_Handle _instance,
+			   uint32_t _port,
+			   LADSPA_Data * _data_location );
 
-  	/* This method calls a function pointer that initialises a plugin
+	/* This method calls a function pointer that initialises a plugin
 	instance and activates it for use. This is separated from
 	instantiate() to aid real-time support and so that hosts can
 	reinitialise a plugin instance by calling deactivate() and then
@@ -250,7 +250,7 @@ public:
 	connectPort() may be called before or after a call to
 	activate(). */
 	bool  activate( const ladspa_key_t & _plugin,
-						LADSPA_Handle _instance );
+			LADSPA_Handle _instance );
 
 	/* This method calls a function pointer that runs an instance of a
 	plugin for a block. Two parameters are required: the first is a
@@ -263,8 +263,8 @@ public:
 	plugin instance then the plugin instance may not be reused until
 	activate() has been called again. */
 	bool  run( const ladspa_key_t & _plugin,
-					LADSPA_Handle _instance,
-					uint32_t _sample_count );
+		   LADSPA_Handle _instance,
+		   uint32_t _sample_count );
 
 	/* This method calls a function pointer that runs an instance of a
 	plugin for a block. This has identical behaviour to run() except
@@ -280,10 +280,10 @@ public:
 	this function pointer must be set to NULL. When it is provided,
 	the function setRunAddingGain() must be provided also. */
 	bool  runAdding( const ladspa_key_t & _plugin,
-						LADSPA_Handle _instance,
-						uint32_t _sample_count );
+			 LADSPA_Handle _instance,
+			 uint32_t _sample_count );
 
-  	/* This method calls a function pointer that sets the output gain for
+	/* This method calls a function pointer that sets the output gain for
 	use when runAdding() is called (see above). If this function is
 	never called the gain is assumed to default to 1. Gain
 	information should be retained when activate() or deactivate()
@@ -293,8 +293,8 @@ public:
 	runAdding() function is provided. When it is absent this
 	function pointer must be set to NULL. */
 	bool  setRunAddingGain( const ladspa_key_t & _plugin,
-						LADSPA_Handle _instance,
-						LADSPA_Data _gain );
+				LADSPA_Handle _instance,
+				LADSPA_Data _gain );
 
 	/* This is the counterpart to activate() (see above). If there is
 	nothing for deactivate() to do then the plugin writer may provide
@@ -310,7 +310,7 @@ public:
 	Deactivation is not similar to pausing as the plugin instance
 	will be reinitialised when activate() is called to reuse it. */
 	bool  deactivate( const ladspa_key_t & _plugin,
-						LADSPA_Handle _instance );
+			  LADSPA_Handle _instance );
 
 	/* Once an instance of a plugin has been finished with it can be
 	deleted using the following function. The instance handle passed
@@ -320,16 +320,16 @@ public:
 	corresponding call to deactivate() must be made before cleanup()
 	is called. */
 	bool  cleanup( const ladspa_key_t & _plugin,
-						LADSPA_Handle _instance );
+		       LADSPA_Handle _instance );
 
 private:
 	void  addPlugins( LADSPA_Descriptor_Function _descriptor_func,
-						const QString & _file );
+			  const QString & _file );
 	uint16_t  getPluginInputs( const LADSPA_Descriptor * _descriptor );
 	uint16_t  getPluginOutputs( const LADSPA_Descriptor * _descriptor );
 
 	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
-						ladspaManagerMapType;
+	ladspaManagerMapType;
 	ladspaManagerMapType m_ladspaManagerMap;
 	l_sortable_plugin_t m_sortedPlugins;
 

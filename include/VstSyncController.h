@@ -88,7 +88,7 @@ private:
 #endif
 	} ;
 
-	VstSyncData* m_syncData;
+	VstSyncData * m_syncData;
 
 	int m_shmID;
 

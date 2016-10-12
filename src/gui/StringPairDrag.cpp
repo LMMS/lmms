@@ -36,20 +36,21 @@
 
 
 StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
-					const QPixmap & _icon, QWidget * _w ) :
+				const QPixmap & _icon, QWidget * _w ) :
 	QDrag( _w )
 {
 	if( _icon.isNull() && _w )
 	{
 		setPixmap( QPixmap::grabWidget( _w ).scaled(
-						64, 64,
-						Qt::KeepAspectRatio,
-						Qt::SmoothTransformation ) );
+				   64, 64,
+				   Qt::KeepAspectRatio,
+				   Qt::SmoothTransformation ) );
 	}
 	else
 	{
 		setPixmap( _icon );
 	}
+
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
 	m->setData( mimeType(), txt.toUtf8() );
@@ -74,18 +75,21 @@ StringPairDrag::~StringPairDrag()
 
 
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
-						const QString & _allowed_keys )
+		const QString & _allowed_keys )
 {
 	if( !_dee->mimeData()->hasFormat( mimeType() ) )
 	{
 		return( false );
 	}
+
 	QString txt = _dee->mimeData()->data( mimeType() );
+
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
 		return( true );
 	}
+
 	_dee->ignore();
 	return( false );
 }

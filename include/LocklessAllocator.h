@@ -69,7 +69,7 @@ public:
 
 	T * alloc()
 	{
-		return (T *)LocklessAllocator::alloc();
+		return ( T * )LocklessAllocator::alloc();
 	}
 
 	void free( T * ptr )

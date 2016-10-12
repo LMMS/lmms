@@ -35,7 +35,7 @@ class SideBarWidget : public QWidget
 	Q_OBJECT
 public:
 	SideBarWidget( const QString & _title, const QPixmap & _icon,
-							QWidget * _parent );
+		       QWidget * _parent );
 	virtual ~SideBarWidget();
 
 	inline const QPixmap & icon() const

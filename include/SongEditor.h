@@ -68,8 +68,8 @@ public:
 	SongEditor( Song * song );
 	~SongEditor();
 
-	void saveSettings( QDomDocument& doc, QDomElement& element );
-	void loadSettings( const QDomElement& element );
+	void saveSettings( QDomDocument & doc, QDomElement & element );
+	void loadSettings( const QDomElement & element );
 
 public slots:
 	void scrolled( int new_pos );
@@ -96,7 +96,7 @@ private slots:
 	void updateMasterPitchFloat( int new_val );
 	void hideMasterPitchFloat();
 
-	void updateScrollBar(int len);
+	void updateScrollBar( int len );
 
 	void zoomingChanged();
 
@@ -124,7 +124,7 @@ private:
 
 	positionLine * m_positionLine;
 
-	ComboBoxModel* m_zoomingModel;
+	ComboBoxModel * m_zoomingModel;
 
 	static const QVector<double> m_zoomLevels;
 
@@ -144,11 +144,11 @@ class SongEditorWindow : public Editor
 {
 	Q_OBJECT
 public:
-	SongEditorWindow( Song* song );
+	SongEditorWindow( Song * song );
 
 	QSize sizeHint() const;
 
-	SongEditor* m_editor;
+	SongEditor * m_editor;
 
 protected slots:
 	void play();
@@ -159,12 +159,12 @@ protected slots:
 	void adjustUiAfterProjectLoad();
 
 private:
-	QAction* m_addBBTrackAction;
-	QAction* m_addSampleTrackAction;
-	QAction* m_addAutomationTrackAction;
+	QAction * m_addBBTrackAction;
+	QAction * m_addSampleTrackAction;
+	QAction * m_addAutomationTrackAction;
 
-	QAction* m_drawModeAction;
-	QAction* m_selectModeAction;
+	QAction * m_drawModeAction;
+	QAction * m_selectModeAction;
 
 	ComboBox * m_zoomingComboBox;
 };

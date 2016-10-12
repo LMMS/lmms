@@ -37,9 +37,9 @@ class EXPORT ComboBoxModel : public IntModel
 {
 	Q_OBJECT
 public:
-	ComboBoxModel( Model* parent = NULL,
-					const QString& displayName = QString(),
-					bool isDefaultConstructed = false ) :
+	ComboBoxModel( Model * parent = NULL,
+		       const QString & displayName = QString(),
+		       bool isDefaultConstructed = false ) :
 		IntModel( 0, 0, 0, parent, displayName, isDefaultConstructed )
 	{
 	}
@@ -49,18 +49,18 @@ public:
 		clear();
 	}
 
-	void addItem( const QString& item, PixmapLoader* loader = NULL );
+	void addItem( const QString & item, PixmapLoader * loader = NULL );
 
 	void clear();
 
-	int findText( const QString& txt ) const;
+	int findText( const QString & txt ) const;
 
 	QString currentText() const
 	{
 		return ( size() > 0 && value() < size() ) ? m_items[value()].first : QString();
 	}
 
-	const PixmapLoader* currentData() const
+	const PixmapLoader * currentData() const
 	{
 		return m_items[value()].second;
 	}
@@ -70,7 +70,7 @@ public:
 		return m_items[qBound<int>( minValue(), i,  maxValue() )].first;
 	}
 
-	const PixmapLoader* itemPixmap( int i ) const
+	const PixmapLoader * itemPixmap( int i ) const
 	{
 		return m_items[qBound<int>( minValue(), i, maxValue() )].second;
 	}

@@ -40,9 +40,8 @@ int BufferManager::s_size;
 
 void BufferManager::init( fpp_t framesPerPeriod )
 {
-	s_available = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
-	s_released = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
-
+	s_available = MM_ALLOC( sampleFrame *, BM_INITIAL_BUFFERS );
+	s_released = MM_ALLOC( sampleFrame *, BM_INITIAL_BUFFERS );
 	int c = framesPerPeriod * BM_INITIAL_BUFFERS;
 	sampleFrame * b = MM_ALLOC( sampleFrame, c );
 
@@ -51,6 +50,7 @@ void BufferManager::init( fpp_t framesPerPeriod )
 		s_available[ i ] = b;
 		b += framesPerPeriod;
 	}
+
 	s_availableIndex = BM_INITIAL_BUFFERS - 1;
 	s_size = BM_INITIAL_BUFFERS;
 }
@@ -65,14 +65,13 @@ sampleFrame * BufferManager::acquire()
 
 	int i = s_availableIndex.fetchAndAddOrdered( -1 );
 	sampleFrame * b = s_available[ i ];
-
 	//qDebug( "acquired buffer: %p - index %d", b, i );
 	return b;
 }
 
 
 void BufferManager::clear( sampleFrame * ab, const f_cnt_t frames,
-							const f_cnt_t offset )
+			   const f_cnt_t offset )
 {
 	memset( ab + offset, 0, sizeof( *ab ) * frames );
 }
@@ -80,7 +79,7 @@ void BufferManager::clear( sampleFrame * ab, const f_cnt_t frames,
 
 #ifndef LMMS_DISABLE_SURROUND
 void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
-							const f_cnt_t offset )
+			   const f_cnt_t offset )
 {
 	memset( ab + offset, 0, sizeof( *ab ) * frames );
 }
@@ -97,15 +96,17 @@ void BufferManager::release( sampleFrame * buf )
 
 void BufferManager::refresh() // non-threadsafe, hence it's called periodically from mixer at a time when no other threads can interfere
 {
-	if( s_releasedIndex == 0 ) return;
-	//qDebug( "refresh: %d buffers", int( s_releasedIndex ) );
+	if( s_releasedIndex == 0 ) { return; }
 
+	//qDebug( "refresh: %d buffers", int( s_releasedIndex ) );
 	int j = s_availableIndex;
+
 	for( int i = 0; i < s_releasedIndex; ++i )
 	{
 		++j;
 		s_available[ j ] = s_released[ i ];
 	}
+
 	s_availableIndex = j;
 	s_releasedIndex = 0;
 }

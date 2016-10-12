@@ -30,31 +30,24 @@
 
 
 
-AboutDialog::AboutDialog(QWidget* parent) :
-	QDialog(parent),
+AboutDialog::AboutDialog( QWidget * parent ) :
+	QDialog( parent ),
 	Ui::AboutDialog()
 {
 	setupUi( this );
-
-
 	iconLabel->setPixmap( embed::getIconPixmap( "icon", 64, 64 ) );
-
 	versionLabel->setText( versionLabel->text().
-					arg( LMMS_VERSION ).
-					arg( PLATFORM ).
-					arg( MACHINE ).
-					arg( QT_VERSION_STR ).
-					arg( GCC_VERSION ) );
+			       arg( LMMS_VERSION ).
+			       arg( PLATFORM ).
+			       arg( MACHINE ).
+			       arg( QT_VERSION_STR ).
+			       arg( GCC_VERSION ) );
 	versionLabel->setTextInteractionFlags(
-					versionLabel->textInteractionFlags() |
-					Qt::TextSelectableByMouse );
-
+		versionLabel->textInteractionFlags() |
+		Qt::TextSelectableByMouse );
 	copyrightLabel->setText( copyrightLabel->text().
-					arg( LMMS_PROJECT_COPYRIGHT ) );
-
+				 arg( LMMS_PROJECT_COPYRIGHT ) );
 	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
-
 	licenseLabel->setPlainText( embed::getText( "LICENSE.txt" ) );
-
 	involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );
 }

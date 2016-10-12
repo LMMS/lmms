@@ -24,32 +24,30 @@
 
 #include "ActionGroup.h"
 
-ActionGroup::ActionGroup(QObject* parent) : QActionGroup(parent)
+ActionGroup::ActionGroup( QObject * parent ) : QActionGroup( parent )
 {
-	connect(this, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered_(QAction*)));
+	connect( this, SIGNAL( triggered( QAction * ) ), this, SLOT( actionTriggered_( QAction * ) ) );
 }
 
-QAction* ActionGroup::addAction(QAction* a)
+QAction * ActionGroup::addAction( QAction * a )
 {
-	a->setCheckable(true);
-
-	return QActionGroup::addAction(a);
+	a->setCheckable( true );
+	return QActionGroup::addAction( a );
 }
 
-QAction* ActionGroup::addAction(const QString& text)
+QAction * ActionGroup::addAction( const QString & text )
 {
-	return addAction(new QAction(text, this));
+	return addAction( new QAction( text, this ) );
 }
 
-QAction* ActionGroup::addAction(const QIcon& icon, const QString& text)
+QAction * ActionGroup::addAction( const QIcon & icon, const QString & text )
 {
-	return addAction(new QAction(icon, text, this));
+	return addAction( new QAction( icon, text, this ) );
 }
 
-void ActionGroup::actionTriggered_(QAction* action)
+void ActionGroup::actionTriggered_( QAction * action )
 {
-	Q_ASSERT(action != 0);
-	Q_ASSERT(actions().contains(action));
-
-	emit triggered(actions().indexOf(action));
+	Q_ASSERT( action != 0 );
+	Q_ASSERT( actions().contains( action ) );
+	emit triggered( actions().indexOf( action ) );
 }

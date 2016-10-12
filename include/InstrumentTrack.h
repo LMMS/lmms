@@ -66,19 +66,19 @@ class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
-	mapPropertyFromModel(int,getVolume,setVolume,m_volumeModel);
+	mapPropertyFromModel( int, getVolume, setVolume, m_volumeModel );
 public:
-	InstrumentTrack( TrackContainer* tc );
+	InstrumentTrack( TrackContainer * tc );
 	virtual ~InstrumentTrack();
 
 	// used by instrument
 	void processAudioBuffer( sampleFrame * _buf, const fpp_t _frames,
-							NotePlayHandle * _n );
+				 NotePlayHandle * _n );
 
-	MidiEvent applyMasterKey( const MidiEvent& event );
+	MidiEvent applyMasterKey( const MidiEvent & event );
 
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime(), f_cnt_t offset = 0 );
+	virtual void processInEvent( const MidiEvent & event, const MidiTime & time = MidiTime(), f_cnt_t offset = 0 );
+	virtual void processOutEvent( const MidiEvent & event, const MidiTime & time = MidiTime(), f_cnt_t offset = 0 );
 	// silence all running notes played by this track
 	void silenceAllNotes( bool removeIPH = false );
 
@@ -95,12 +95,12 @@ public:
 	void playNote( NotePlayHandle * _n, sampleFrame * _working_buffer );
 
 	QString instrumentName() const;
-	const Instrument *instrument() const
+	const Instrument * instrument() const
 	{
 		return m_instrument;
 	}
 
-	Instrument *instrument()
+	Instrument * instrument()
 	{
 		return m_instrument;
 	}
@@ -117,7 +117,7 @@ public:
 	// translate pitch to midi-pitch [0,16383]
 	int midiPitch() const
 	{
-		return static_cast<int>( ( ( m_pitchModel.value() + m_pitchModel.range()/2 ) * MidiMaxPitchBend ) / m_pitchModel.range() );
+		return static_cast<int>( ( ( m_pitchModel.value() + m_pitchModel.range() / 2 ) * MidiMaxPitchBend ) / m_pitchModel.range() );
 	}
 
 	/*! \brief Returns current range for pitch bend in semitones */
@@ -128,9 +128,9 @@ public:
 
 	// play everything in given frame-range - creates note-play-handles
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
+			   const f_cnt_t _frame_base, int _tco_num = -1 );
 	// create new view for me
-	virtual TrackView * createView( TrackContainerView* tcv );
+	virtual TrackView * createView( TrackContainerView * tcv );
 
 	// create new track-content-object = pattern
 	virtual TrackContentObject * createTCO( const MidiTime & _pos );
@@ -138,7 +138,7 @@ public:
 
 	// called by track
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+						QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 	using Track::setJournalling;
@@ -157,19 +157,19 @@ public:
 		return &m_midiPort;
 	}
 
-	const IntModel *baseNoteModel() const
+	const IntModel * baseNoteModel() const
 	{
 		return &m_baseNoteModel;
 	}
 
-	IntModel *baseNoteModel()
+	IntModel * baseNoteModel()
 	{
 		return &m_baseNoteModel;
 	}
-	
+
 	int baseNote() const;
 
-	Piano *pianoModel()
+	Piano * pianoModel()
 	{
 		return &m_piano;
 	}
@@ -180,7 +180,7 @@ public:
 	}
 
 	// simple helper for removing midiport-XML-node when loading presets
-	static void removeMidiPortNode( DataFile& dataFile );
+	static void removeMidiPortNode( DataFile & dataFile );
 
 	FloatModel * pitchModel()
 	{
@@ -197,7 +197,7 @@ public:
 		return &m_panningModel;
 	}
 
-	IntModel* pitchRangeModel()
+	IntModel * pitchRangeModel()
 	{
 		return &m_pitchRangeModel;
 	}
@@ -210,8 +210,8 @@ public:
 
 signals:
 	void instrumentChanged();
-	void midiNoteOn( const Note& );
-	void midiNoteOff( const Note& );
+	void midiNoteOn( const Note & );
+	void midiNoteOff( const Note & );
 	void nameChanged();
 	void newNote();
 
@@ -233,7 +233,7 @@ protected slots:
 private:
 	MidiPort m_midiPort;
 
-	NotePlayHandle* m_notes[NumKeys];
+	NotePlayHandle * m_notes[NumKeys];
 
 	int m_runningMidiNotes[NumKeys];
 	QMutex m_midiNotesMutex;
@@ -248,9 +248,9 @@ private:
 
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
-	
+
 	AudioPort m_audioPort;
-	
+
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
@@ -279,7 +279,7 @@ class InstrumentTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	InstrumentTrackView( InstrumentTrack * _it, TrackContainerView* tc );
+	InstrumentTrackView( InstrumentTrack * _it, TrackContainerView * tc );
 	virtual ~InstrumentTrackView();
 
 	InstrumentTrackWindow * getInstrumentTrackWindow();
@@ -355,7 +355,7 @@ private:
 
 
 class InstrumentTrackWindow : public QWidget, public ModelView,
-								public SerializingObjectHook
+	public SerializingObjectHook
 {
 	Q_OBJECT
 public:
@@ -380,7 +380,7 @@ public:
 
 	void setInstrumentTrackView( InstrumentTrackView * _tv );
 
-	InstrumentTrackView *instrumentTrackView()
+	InstrumentTrackView * instrumentTrackView()
 	{
 		return m_itv;
 	}
@@ -420,7 +420,7 @@ protected slots:
 
 private:
 	virtual void modelChanged();
-	void viewInstrumentInDirection(int d);
+	void viewInstrumentInDirection( int d );
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
@@ -432,7 +432,7 @@ private:
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
 	QLabel * m_pitchLabel;
-	LcdSpinBox* m_pitchRangeSpinBox;
+	LcdSpinBox * m_pitchRangeSpinBox;
 	QLabel * m_pitchRangeLabel;
 	LcdSpinBox * m_effectChannelNumber;
 
@@ -442,11 +442,11 @@ private:
 	TabWidget * m_tabWidget;
 	PluginView * m_instrumentView;
 	InstrumentSoundShapingView * m_ssView;
-	InstrumentFunctionNoteStackingView* m_noteStackingView;
-	InstrumentFunctionArpeggioView* m_arpeggioView;
+	InstrumentFunctionNoteStackingView * m_noteStackingView;
+	InstrumentFunctionArpeggioView * m_arpeggioView;
 	InstrumentMidiIOView * m_midiView;
 	EffectRackView * m_effectView;
-	InstrumentMiscView *m_miscView;
+	InstrumentMiscView * m_miscView;
 
 
 	// test-piano at the bottom of every instrument-settings-window

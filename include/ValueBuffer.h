@@ -40,7 +40,7 @@ public:
 		m_values = NULL;
 		m_length = 0;
 	}
-	
+
 	ValueBuffer( int length )
 	{
 		m_values = new float[length];
@@ -50,21 +50,22 @@ public:
 	ValueBuffer( float * values, int length )
 	{
 		m_values = new float[length];
-		m_length = length;		
-		memcpy( m_values, values, sizeof(float) * length );
+		m_length = length;
+		memcpy( m_values, values, sizeof( float ) * length );
 	}
 
 	ValueBuffer( float value, int length )
 	{
 		m_values = new float[length];
 		m_length = length;
+
 		for( int i = 0; i < length; i++ )
 		{
 			m_values[i] = value;
 		}
 	}
 
-	virtual ~ValueBuffer() 
+	virtual ~ValueBuffer()
 	{
 		delete[] m_values;
 	}
@@ -75,7 +76,7 @@ public:
 		m_values = NULL;
 		m_length = 0;
 	}
-	
+
 	void fill( float value )
 	{
 		for( int i = 0; i < m_length; i++ )
@@ -88,7 +89,7 @@ public:
 	{
 		return m_values[ offset % m_length ];
 	}
-	
+
 	void setValue( int offset, float value )
 	{
 		m_values[ offset % m_length ] = value;
@@ -98,17 +99,17 @@ public:
 	{
 		return m_values;
 	}
-	
+
 	void setValues( float * values )
 	{
 		m_values = values;
 	}
-	
+
 	int length() const
 	{
 		return m_length;
 	}
-	
+
 	void setLength( const int length )
 	{
 		m_length = length;
@@ -118,6 +119,7 @@ public:
 	{
 		float f = 0.0f;
 		const float fstep = 1.0f / static_cast<float>( m_length );
+
 		for( int i = 0; i < m_length; i++ )
 		{
 			f += fstep;
@@ -132,19 +134,20 @@ public:
 			m_values[i] *= f;
 		}
 	}
-	
+
 	ValueBuffer & operator*=( const float & f )
 	{
 		multiply( f );
 		return *this;
 	}
-	
+
 	ValueBuffer & operator+=( const ValueBuffer & v )
 	{
 		for( int i = 0; i < qMin( m_length, v.length() ); i++ )
 		{
 			m_values[i] += v.values()[i];
 		}
+
 		return *this;
 	}
 

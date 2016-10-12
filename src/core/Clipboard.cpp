@@ -46,6 +46,7 @@ const QDomElement * Clipboard::getContent( const QString & _node_name )
 	{
 		return &content[_node_name];
 	}
+
 	return NULL;
 }
 

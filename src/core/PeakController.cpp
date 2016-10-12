@@ -45,17 +45,19 @@ bool PeakController::m_buggedFile;
 
 
 PeakController::PeakController( Model * _parent,
-		PeakControllerEffect * _peak_effect ) :
+				PeakControllerEffect * _peak_effect ) :
 	Controller( Controller::PeakController, _parent, tr( "Peak Controller" ) ),
 	m_peakEffect( _peak_effect ),
 	m_currentSample( 0.0f )
 {
 	setSampleExact( true );
+
 	if( m_peakEffect )
 	{
 		connect( m_peakEffect, SIGNAL( destroyed( ) ),
-			this, SLOT( handleDestroyedEffect( ) ) );
+			 this, SLOT( handleDestroyedEffect( ) ) );
 	}
+
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateCoeffs() ) );
 	connect( m_peakEffect->attackModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
 	connect( m_peakEffect->decayModel(), SIGNAL( dataChanged() ), this, SLOT( updateCoeffs() ) );
@@ -91,6 +93,7 @@ void PeakController::updateValueBuffer()
 	if( m_peakEffect )
 	{
 		float targetSample = m_peakEffect->lastSample();
+
 		if( m_currentSample != targetSample )
 		{
 			const f_cnt_t frames = Engine::mixer()->framesPerPeriod();
@@ -99,6 +102,7 @@ void PeakController::updateValueBuffer()
 			for( f_cnt_t f = 0; f < frames; ++f )
 			{
 				const float diff = ( targetSample - m_currentSample );
+
 				if( m_currentSample < targetSample ) // going up...
 				{
 					m_currentSample += diff * m_attackCoeff;
@@ -107,6 +111,7 @@ void PeakController::updateValueBuffer()
 				{
 					m_currentSample += diff * m_decayCoeff;
 				}
+
 				values[f] = m_currentSample;
 			}
 		}
@@ -119,6 +124,7 @@ void PeakController::updateValueBuffer()
 	{
 		m_valueBuffer.fill( 0 );
 	}
+
 	m_bufferLastUpdated = s_periods;
 }
 
@@ -146,7 +152,6 @@ void PeakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	if( m_peakEffect )
 	{
 		Controller::saveSettings( _doc, _this );
-
 		_this.setAttribute( "effectId", m_peakEffect->m_effectId );
 	}
 }
@@ -156,17 +161,18 @@ void PeakController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void PeakController::loadSettings( const QDomElement & _this )
 {
 	Controller::loadSettings( _this );
-
 	int effectId = _this.attribute( "effectId" ).toInt();
+
 	if( m_buggedFile == true )
 	{
 		effectId = m_loadCount++;
 	}
 
 	PeakControllerEffectVector::Iterator i;
+
 	for( i = s_effects.begin(); i != s_effects.end(); ++i )
 	{
-		if( (*i)->m_effectId == effectId )
+		if( ( *i )->m_effectId == effectId )
 		{
 			m_peakEffect = *i;
 			return;
@@ -188,41 +194,43 @@ void PeakController::initGetControllerBySetting()
 
 
 
-PeakController * PeakController::getControllerBySetting(const QDomElement & _this )
+PeakController * PeakController::getControllerBySetting( const QDomElement & _this )
 {
 	int effectId = _this.attribute( "effectId" ).toInt();
-
 	PeakControllerEffectVector::Iterator i;
-
 	//Backward compatibility for bug in <= 0.4.15 . For >= 1.0.0 ,
 	//foundCount should always be 1 because m_effectId is initialized with rand()
 	int foundCount = 0;
+
 	if( m_buggedFile == false )
 	{
 		for( i = s_effects.begin(); i != s_effects.end(); ++i )
 		{
-			if( (*i)->m_effectId == effectId )
+			if( ( *i )->m_effectId == effectId )
 			{
 				foundCount++;
 			}
 		}
+
 		if( foundCount >= 2 )
 		{
 			m_buggedFile = true;
 			int newEffectId = 0;
+
 			for( i = s_effects.begin(); i != s_effects.end(); ++i )
 			{
-				(*i)->m_effectId = newEffectId++;
+				( *i )->m_effectId = newEffectId++;
 			}
+
 			QMessageBox msgBox;
 			msgBox.setIcon( QMessageBox::Information );
-			msgBox.setWindowTitle( tr("Peak Controller Bug") );
-			msgBox.setText( tr("Due to a bug in older version of LMMS, the peak "
-							   "controllers may not be connect properly. "
-							   "Please ensure that peak controllers are connected "
-							   "properly and re-save this file. "
-							   "Sorry for any inconvenience caused.") );
-			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.setWindowTitle( tr( "Peak Controller Bug" ) );
+			msgBox.setText( tr( "Due to a bug in older version of LMMS, the peak "
+					    "controllers may not be connect properly. "
+					    "Please ensure that peak controllers are connected "
+					    "properly and re-save this file. "
+					    "Sorry for any inconvenience caused." ) );
+			msgBox.setStandardButtons( QMessageBox::Ok );
 			msgBox.exec();
 		}
 	}
@@ -231,13 +239,14 @@ PeakController * PeakController::getControllerBySetting(const QDomElement & _thi
 	{
 		effectId = m_getCount;
 	}
+
 	m_getCount++; //NB: m_getCount should be increased even m_buggedFile is false
 
 	for( i = s_effects.begin(); i != s_effects.end(); ++i )
 	{
-		if( (*i)->m_effectId == effectId )
+		if( ( *i )->m_effectId == effectId )
 		{
-			return (*i)->controller();
+			return ( *i )->controller();
 		}
 	}
 

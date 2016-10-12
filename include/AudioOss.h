@@ -42,7 +42,7 @@ class QLineEdit;
 class AudioOss : public AudioDevice, public QThread
 {
 public:
-	AudioOss( bool & _success_ful, Mixer* mixer );
+	AudioOss( bool & _success_ful, Mixer * mixer );
 	virtual ~AudioOss();
 
 	inline static QString name()

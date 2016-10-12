@@ -92,33 +92,37 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 #include "PluginFactory.h"
-Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
-								void * data )
+Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
+			      void * data )
 {
-	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	const PluginFactory::PluginInfo & pi = pluginFactory->pluginInfo( pluginName.toUtf8() );
+
 	if( pi.isNull() )
 	{
 		if( gui )
 		{
 			QMessageBox::information( NULL,
-				tr( "Plugin not found" ),
-				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
-				QMessageBox::Ok | QMessageBox::Default );
+						  tr( "Plugin not found" ),
+						  tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
+						  arg( pluginName ).arg( pluginFactory->errorString( pluginName ) ),
+						  QMessageBox::Ok | QMessageBox::Default );
 		}
+
 		return new DummyPlugin();
 	}
 
 	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
+
 	if( instantiationHook == NULL )
 	{
 		if( gui )
 		{
 			QMessageBox::information( NULL,
-				tr( "Error while loading plugin" ),
-				tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-				QMessageBox::Ok | QMessageBox::Default );
+						  tr( "Error while loading plugin" ),
+						  tr( "Failed to load plugin \"%1\"!" ).arg( pluginName ),
+						  QMessageBox::Ok | QMessageBox::Default );
 		}
+
 		return new DummyPlugin();
 	}
 
@@ -140,10 +144,12 @@ void Plugin::collectErrorForUI( QString errMsg )
 PluginView * Plugin::createView( QWidget * parent )
 {
 	PluginView * pv = instantiateView( parent );
+
 	if( pv != NULL )
 	{
 		pv->setModel( this );
 	}
+
 	return pv;
 }
 
@@ -156,29 +162,31 @@ Plugin::Descriptor::SubPluginFeatures::Key::Key( const QDomElement & key ) :
 	attributes()
 {
 	QDomNodeList l = key.elementsByTagName( "attribute" );
+
 	for( int i = 0; !l.item( i ).isNull(); ++i )
 	{
 		QDomElement e = l.item( i ).toElement();
 		attributes[e.attribute( "name" )] = e.attribute( "value" );
 	}
-		
 }
 
 
 
 
 QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
-						QDomDocument & doc ) const
+	QDomDocument & doc ) const
 {
 	QDomElement e = doc.createElement( "key" );
-	for( AttributeMap::ConstIterator it = attributes.begin(); 
-		it != attributes.end(); ++it )
+
+	for( AttributeMap::ConstIterator it = attributes.begin();
+			it != attributes.end(); ++it )
 	{
 		QDomElement a = doc.createElement( "attribute" );
 		a.setAttribute( "name", it.key() );
 		a.setAttribute( "value", it.value() );
 		e.appendChild( a );
 	}
+
 	return e;
 }
 

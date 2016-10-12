@@ -25,7 +25,7 @@ MidiSndio::MidiSndio( void ) :
 {
 	QString dev = probeDevice();
 
-	if (dev == "")
+	if ( dev == "" )
 	{
 		m_hdl = mio_open( NULL, MIO_IN | MIO_OUT, 0 );
 	}
@@ -58,7 +58,6 @@ MidiSndio::~MidiSndio()
 QString MidiSndio::probeDevice( void )
 {
 	QString dev = ConfigManager::inst()->value( "MidiSndio", "device" );
-
 	return dev ;
 }
 
@@ -76,20 +75,30 @@ void MidiSndio::run( void )
 	char buf[0x100], *p;
 	size_t n;
 	int ret;
+
 	while( m_quit == FALSE && m_hdl )
 	{
 		nfds = mio_pollfd( m_hdl, &pfd, POLLIN );
 		ret = poll( &pfd, nfds, 100 );
+
 		if ( ret < 0 )
+		{
 			break;
+		}
+
 		if ( !ret || !( mio_revents( m_hdl, &pfd ) & POLLIN ) )
+		{
 			continue;
-		n = mio_read( m_hdl, buf, sizeof(buf) );
+		}
+
+		n = mio_read( m_hdl, buf, sizeof( buf ) );
+
 		if ( !n )
 		{
 			break;
 		}
-		for (p = buf; n > 0; n--, p++)
+
+		for ( p = buf; n > 0; n--, p++ )
 		{
 			parseData( *p );
 		}

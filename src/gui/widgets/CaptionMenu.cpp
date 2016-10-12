@@ -2,7 +2,7 @@
  * CaptionMenu.cpp - context menu with a caption
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -48,17 +48,21 @@ CaptionMenu::~CaptionMenu()
 
 void CaptionMenu::addHelpAction()
 {
-	QWidget* parent = (QWidget*) this->parent();
+	QWidget * parent = ( QWidget * ) this->parent();
 
-	if (parent == NULL)
+	if ( parent == NULL )
+	{
 		return;
-
-	if (! parent->whatsThis().isEmpty()) {
-		addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-							parent, SLOT( displayHelp() ) );
 	}
-	else {
-		QAction* helpAction = addAction( embed::getIconPixmap("help"), tr("Help (not available)") );
-		helpAction->setDisabled(true);
+
+	if ( ! parent->whatsThis().isEmpty() )
+	{
+		addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
+			   parent, SLOT( displayHelp() ) );
+	}
+	else
+	{
+		QAction * helpAction = addAction( embed::getIconPixmap( "help" ), tr( "Help (not available)" ) );
+		helpAction->setDisabled( true );
 	}
 }

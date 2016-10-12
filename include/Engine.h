@@ -62,7 +62,7 @@ public:
 	static void destroy();
 
 	// core
-	static Mixer *mixer()
+	static Mixer * mixer()
 	{
 		return s_mixer;
 	}
@@ -109,18 +109,19 @@ public:
 		{
 			s_instanceOfMe = new LmmsCore();
 		}
+
 		return s_instanceOfMe;
 	}
 
 signals:
-	void initProgress(const QString &msg);
+	void initProgress( const QString & msg );
 
 
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to
 	template<class T>
-	static inline void deleteHelper( T * * ptr )
+	static inline void deleteHelper( T ** ptr )
 	{
 		T * tmp = *ptr;
 		*ptr = NULL;
@@ -130,7 +131,7 @@ private:
 	static float s_framesPerTick;
 
 	// core
-	static Mixer *s_mixer;
+	static Mixer * s_mixer;
 	static FxMixer * s_fxMixer;
 	static Song * s_song;
 	static BBTrackContainer * s_bbTrackContainer;

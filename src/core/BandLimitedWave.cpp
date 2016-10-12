@@ -34,7 +34,7 @@ bool BandLimitedWave::s_wavesGenerated = false;
 QString BandLimitedWave::s_wavetableDir = "";
 
 
-QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
+QDataStream & operator<< ( QDataStream & out, WaveMipMap & waveMipMap )
 {
 	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
 	{
@@ -43,12 +43,14 @@ QDataStream& operator<< ( QDataStream &out, WaveMipMap &waveMipMap )
 			out << waveMipMap.sampleAt( tbl, i );
 		}
 	}
-    return out;
+
+	return out;
 }
 
-QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
+QDataStream & operator>> ( QDataStream & in, WaveMipMap & waveMipMap )
 {
 	sample_t sample;
+
 	for( int tbl = 0; tbl <= MAXTBL; tbl++ )
 	{
 		for( int i = 0; i < TLENS[tbl]; i++ )
@@ -57,20 +59,19 @@ QDataStream& operator>> ( QDataStream &in, WaveMipMap &waveMipMap )
 			waveMipMap.setSampleAt( tbl, i, sample );
 		}
 	}
-    return in;
+
+	return in;
 }
 
 
 void BandLimitedWave::generateWaves()
 {
 // don't generate if they already exist
-	if( s_wavesGenerated ) return;
+	if( s_wavesGenerated ) { return; }
 
 	int i;
-
 // set wavetable directory
 	s_wavetableDir = "data:wavetables/";
-
 // set wavetable files
 	QFile saw_file( s_wavetableDir + "saw.bin" );
 	QFile sqr_file( s_wavetableDir + "sqr.bin" );
@@ -99,6 +100,7 @@ void BandLimitedWave::generateWaves()
 				int harm = 1;
 				double s = 0.0f;
 				double hlen;
+
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
@@ -106,10 +108,13 @@ void BandLimitedWave::generateWaves()
 					//const double a2 = cos( om * harm * F_2PI );
 					s += amp * /*a2 **/sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
 					harm++;
-				} while( hlen > 2.0 );
+				}
+				while( hlen > 2.0 );
+
 				s_waveforms[ BandLimitedWave::BLSaw ].setSampleAt( i, ph, s );
 				max = qMax( max, qAbs( s ) );
 			}
+
 			// normalize
 			for( int ph = 0; ph < len; ph++ )
 			{
@@ -141,6 +146,7 @@ void BandLimitedWave::generateWaves()
 				int harm = 1;
 				double s = 0.0f;
 				double hlen;
+
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
@@ -148,10 +154,13 @@ void BandLimitedWave::generateWaves()
 					//const double a2 = cos( om * harm * F_2PI );
 					s += amp * /*a2 **/ sin( static_cast<double>( ph * harm ) / static_cast<double>( len ) * F_2PI );
 					harm += 2;
-				} while( hlen > 2.0 );
+				}
+				while( hlen > 2.0 );
+
 				s_waveforms[ BandLimitedWave::BLSquare ].setSampleAt( i, ph, s );
 				max = qMax( max, qAbs( s ) );
 			}
+
 			// normalize
 			for( int ph = 0; ph < len; ph++ )
 			{
@@ -182,18 +191,22 @@ void BandLimitedWave::generateWaves()
 				int harm = 1;
 				double s = 0.0f;
 				double hlen;
+
 				do
 				{
 					hlen = static_cast<double>( len ) / static_cast<double>( harm );
 					const double amp = 1.0 / static_cast<double>( harm * harm );
 					//const double a2 = cos( om * harm * F_2PI );
 					s += amp * /*a2 **/ sin( ( static_cast<double>( ph * harm ) / static_cast<double>( len ) +
-							( ( harm + 1 ) % 4 == 0 ? 0.5 : 0.0 ) ) * F_2PI );
+								   ( ( harm + 1 ) % 4 == 0 ? 0.5 : 0.0 ) ) * F_2PI );
 					harm += 2;
-				} while( hlen > 2.0 );
+				}
+				while( hlen > 2.0 );
+
 				s_waveforms[ BandLimitedWave::BLTriangle ].setSampleAt( i, ph, s );
 				max = qMax( max, qAbs( s ) );
 			}
+
 			// normalize
 			for( int ph = 0; ph < len; ph++ )
 			{
@@ -230,45 +243,41 @@ void BandLimitedWave::generateWaves()
 
 // set the generated flag so we don't load/generate them again needlessly
 	s_wavesGenerated = true;
-
-
 // generate files, serialize mipmaps as QDataStreams and save them on disk
 //
 // normally these are now provided with LMMS as pre-generated so we don't have to do this,
 // but I'm leaving the code here in case it's needed in the future
 // (maybe we add more waveforms or change the generation code or mipmap format, etc.)
+	/*
 
-/*
+	// if you want to generate the files, you need to set the filenames and paths here -
+	// can't use the usual wavetable directory here as it can require permissions on
+	// some systems...
 
-// if you want to generate the files, you need to set the filenames and paths here -
-// can't use the usual wavetable directory here as it can require permissions on
-// some systems...
+	QFile sawfile( "path-to-wavetables/saw.bin" );
+	QFile sqrfile( "path-to-wavetables/sqr.bin" );
+	QFile trifile( "path-to-wavetables/tri.bin" );
+	QFile moogfile( "path-to-wavetables/moog.bin" );
 
-QFile sawfile( "path-to-wavetables/saw.bin" );
-QFile sqrfile( "path-to-wavetables/sqr.bin" );
-QFile trifile( "path-to-wavetables/tri.bin" );
-QFile moogfile( "path-to-wavetables/moog.bin" );
+	sawfile.open( QIODevice::WriteOnly );
+	QDataStream sawout( &sawfile );
+	sawout << s_waveforms[ BandLimitedWave::BLSaw ];
+	sawfile.close();
 
-sawfile.open( QIODevice::WriteOnly );
-QDataStream sawout( &sawfile );
-sawout << s_waveforms[ BandLimitedWave::BLSaw ];
-sawfile.close();
+	sqrfile.open( QIODevice::WriteOnly );
+	QDataStream sqrout( &sqrfile );
+	sqrout << s_waveforms[ BandLimitedWave::BLSquare ];
+	sqrfile.close();
 
-sqrfile.open( QIODevice::WriteOnly );
-QDataStream sqrout( &sqrfile );
-sqrout << s_waveforms[ BandLimitedWave::BLSquare ];
-sqrfile.close();
+	trifile.open( QIODevice::WriteOnly );
+	QDataStream triout( &trifile );
+	triout << s_waveforms[ BandLimitedWave::BLTriangle ];
+	trifile.close();
 
-trifile.open( QIODevice::WriteOnly );
-QDataStream triout( &trifile );
-triout << s_waveforms[ BandLimitedWave::BLTriangle ];
-trifile.close();
+	moogfile.open( QIODevice::WriteOnly );
+	QDataStream moogout( &moogfile );
+	moogout << s_waveforms[ BandLimitedWave::BLMoog ];
+	moogfile.close();
 
-moogfile.open( QIODevice::WriteOnly );
-QDataStream moogout( &moogfile );
-moogout << s_waveforms[ BandLimitedWave::BLMoog ];
-moogfile.close();
-
-*/
-
+	*/
 }

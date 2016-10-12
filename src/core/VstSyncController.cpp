@@ -50,37 +50,43 @@ VstSyncController::VstSyncController() :
 	if( ConfigManager::inst()->value( "ui", "syncvstplugins" ).toInt() )
 	{
 		connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateSampleRate() ) );
-
 #ifdef USE_QT_SHMEM
+
 		if ( m_shm.create( sizeof( VstSyncData ) ) )
 		{
-			m_syncData = (VstSyncData*) m_shm.data();
+			m_syncData = ( VstSyncData * ) m_shm.data();
 		}
 		else
 		{
 			qWarning() << QString( "Failed to allocate shared memory for VST sync: %1" ).arg( m_shm.errorString() );
 		}
+
 #else
 		key_t key; // make the key:
+
 		if( ( key = ftok( VST_SNC_SHM_KEY_FILE, 'R' ) ) == -1 )
 		{
-				qWarning( "VstSyncController: ftok() failed" );
+			qWarning( "VstSyncController: ftok() failed" );
 		}
 		else
-		{	// connect to shared memory segment
+		{
+			// connect to shared memory segment
 			if( ( m_shmID = shmget( key, sizeof( VstSyncData ), 0644 | IPC_CREAT ) ) == -1 )
 			{
 				qWarning( "VstSyncController: shmget() failed" );
 			}
 			else
-			{		// attach segment
-				m_syncData = (VstSyncData *)shmat( m_shmID, 0, 0 );
-				if( m_syncData == (VstSyncData *)( -1 ) )
+			{
+				// attach segment
+				m_syncData = ( VstSyncData * )shmat( m_shmID, 0, 0 );
+
+				if( m_syncData == ( VstSyncData * )( -1 ) )
 				{
 					qWarning( "VstSyncController: shmat() failed" );
 				}
 			}
 		}
+
 #endif
 	}
 	else
@@ -102,7 +108,6 @@ VstSyncController::VstSyncController() :
 	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
 	m_syncData->timeSigNumer = 4;
 	m_syncData->timeSigDenom = 4;
-
 	updateSampleRate();
 }
 
@@ -117,12 +122,15 @@ VstSyncController::~VstSyncController()
 	else
 	{
 #ifdef USE_QT_SHMEM
+
 		if( m_shm.data() )
 		{
 			// detach shared memory, delete it:
 			m_shm.detach();
 		}
+
 #else
+
 		if( shmdt( m_syncData ) != -1 )
 		{
 			shmctl( m_shmID, IPC_RMID, NULL );
@@ -131,6 +139,7 @@ VstSyncController::~VstSyncController()
 		{
 			qWarning( "VstSyncController: shmdt() failed" );
 		}
+
 #endif
 	}
 }
@@ -140,9 +149,9 @@ VstSyncController::~VstSyncController()
 void VstSyncController::setAbsolutePosition( int ticks )
 {
 #ifdef VST_SNC_LATENCY
-	m_syncData->ppqPos = ( ( ticks + 0 ) / (float)48 ) - m_syncData->m_latency;
+	m_syncData->ppqPos = ( ( ticks + 0 ) / ( float )48 ) - m_syncData->m_latency;
 #else
-	m_syncData->ppqPos = ( ( ticks + 0 ) / (float)48 );
+	m_syncData->ppqPos = ( ( ticks + 0 ) / ( float )48 );
 #endif
 }
 
@@ -151,11 +160,9 @@ void VstSyncController::setAbsolutePosition( int ticks )
 void VstSyncController::setTempo( int newTempo )
 {
 	m_syncData->m_bpm = newTempo;
-
 #ifdef VST_SNC_LATENCY
-	m_syncData->m_latency = m_syncData->m_bufferSize * newTempo / ( (float) m_syncData->m_sampleRate * 60 );
+	m_syncData->m_latency = m_syncData->m_bufferSize * newTempo / ( ( float ) m_syncData->m_sampleRate * 60 );
 #endif
-
 }
 
 
@@ -163,8 +170,8 @@ void VstSyncController::setTempo( int newTempo )
 void VstSyncController::startCycle( int startTick, int endTick )
 {
 	m_syncData->isCycle = true;
-	m_syncData->cycleStart = startTick / (float)48;
-	m_syncData->cycleEnd = endTick / (float)48;
+	m_syncData->cycleStart = startTick / ( float )48;
+	m_syncData->cycleEnd = endTick / ( float )48;
 }
 
 
@@ -172,9 +179,8 @@ void VstSyncController::startCycle( int startTick, int endTick )
 void VstSyncController::update()
 {
 	m_syncData->m_bufferSize = Engine::mixer()->framesPerPeriod();
-
 #ifdef VST_SNC_LATENCY
-	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );
+	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( ( float ) m_syncData->m_sampleRate * 60 );
 #endif
 }
 
@@ -183,9 +189,8 @@ void VstSyncController::update()
 void VstSyncController::updateSampleRate()
 {
 	m_syncData->m_sampleRate = Engine::mixer()->processingSampleRate();
-
 #ifdef VST_SNC_LATENCY
-	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( (float) m_syncData->m_sampleRate * 60 );
+	m_syncData->m_latency = m_syncData->m_bufferSize * m_syncData->m_bpm / ( ( float ) m_syncData->m_sampleRate * 60 );
 #endif
 }
 

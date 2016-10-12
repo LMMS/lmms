@@ -54,10 +54,12 @@ public:
 	{
 		QSize s = QToolButton::sizeHint();
 		s.setWidth( s.width() + 8 );
+
 		if( orientation() == Qt::Horizontal )
 		{
 			return s;
 		}
+
 		return QSize( s.height(), s.width() );
 	}
 
@@ -68,6 +70,7 @@ protected:
 		QStylePainter p( this );
 		QStyleOptionToolButton opt;
 		initStyleOption( &opt );
+
 		if( orientation() == Qt::Vertical )
 		{
 			const QSize s = sizeHint();
@@ -75,6 +78,7 @@ protected:
 			p.translate( -s.height(), 0 );
 			opt.rect = QRect( 0, 0, s.height(), s.width() );
 		}
+
 		p.drawComplexControl( QStyle::CC_ToolButton, opt );
 	}
 
@@ -91,10 +95,9 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 {
 	setOrientation( _orientation );
 	setIconSize( QSize( 16, 16 ) );
-
 	m_btnGroup.setExclusive( false );
 	connect( &m_btnGroup, SIGNAL( buttonClicked( QAbstractButton * ) ),
-				this, SLOT( toggleButton( QAbstractButton * ) ) );
+		 this, SLOT( toggleButton( QAbstractButton * ) ) );
 }
 
 
@@ -107,19 +110,17 @@ SideBar::~SideBar()
 
 
 
-void SideBar::appendTab( SideBarWidget *widget )
+void SideBar::appendTab( SideBarWidget * widget )
 {
-	SideBarButton *button = new SideBarButton( orientation(), this );
+	SideBarButton * button = new SideBarButton( orientation(), this );
 	button->setText( widget->title() );
 	button->setIcon( widget->icon() );
 	button->setCheckable( true );
 	m_widgets[button] = widget;
 	m_btnGroup.addButton( button );
 	addWidget( button );
-
 	widget->hide();
 	widget->setMinimumWidth( 200 );
-
 	ToolTip::add( button, widget->title() );
 }
 
@@ -128,13 +129,13 @@ void SideBar::appendTab( SideBarWidget *widget )
 
 void SideBar::toggleButton( QAbstractButton * button )
 {
-	QToolButton *toolButton = NULL;
-	QWidget *activeWidget = NULL;
+	QToolButton * toolButton = NULL;
+	QWidget * activeWidget = NULL;
 
 	for( auto it = m_widgets.begin(); it != m_widgets.end(); ++it )
 	{
-		QToolButton *curBtn = it.key();
-		QWidget *curWidget = it.value();
+		QToolButton * curBtn = it.key();
+		QWidget * curWidget = it.value();
 
 		if( curBtn == button )
 		{
@@ -157,7 +158,7 @@ void SideBar::toggleButton( QAbstractButton * button )
 	{
 		activeWidget->setVisible( button->isChecked() );
 		toolButton->setToolButtonStyle( button->isChecked() ?
-				Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
+						Qt::ToolButtonTextBesideIcon : Qt::ToolButtonIconOnly );
 	}
 }
 

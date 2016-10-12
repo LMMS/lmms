@@ -52,13 +52,13 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
-	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
-	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
-	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
-	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
+	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor vertexColor READ vertexColor WRITE setVertexColor )
+	Q_PROPERTY( QBrush scaleColor READ scaleColor WRITE setScaleColor )
+	Q_PROPERTY( QBrush graphColor READ graphColor WRITE setGraphColor )
+	Q_PROPERTY( QColor crossColor READ crossColor WRITE setCrossColor )
 public:
-	void setCurrentPattern(AutomationPattern * new_pattern);
+	void setCurrentPattern( AutomationPattern * new_pattern );
 
 	inline const AutomationPattern * currentPattern() const
 	{
@@ -70,8 +70,8 @@ public:
 		return m_pattern != nullptr;
 	}
 
-	virtual void saveSettings(QDomDocument & doc, QDomElement & parent);
-	virtual void loadSettings(const QDomElement & parent);
+	virtual void saveSettings( QDomDocument & doc, QDomElement & parent );
+	virtual void loadSettings( const QDomElement & parent );
 	QString nodeName() const
 	{
 		return "automationeditor";
@@ -83,11 +83,11 @@ public:
 	QColor vertexColor() const;
 	QBrush scaleColor() const;
 	QColor crossColor() const;
-	void setGridColor(const QColor& c);
-	void setGraphColor(const QBrush& c);
-	void setVertexColor(const QColor& c);
-	void setScaleColor(const QBrush& c);
-	void setCrossColor(const QColor& c);
+	void setGridColor( const QColor & c );
+	void setGraphColor( const QBrush & c );
+	void setVertexColor( const QColor & c );
+	void setScaleColor( const QBrush & c );
+	void setCrossColor( const QColor & c );
 
 	enum EditModes
 	{
@@ -105,23 +105,23 @@ public slots:
 protected:
 	typedef AutomationPattern::timeMap timeMap;
 
-	virtual void keyPressEvent(QKeyEvent * ke);
-	virtual void leaveEvent(QEvent * e);
-	virtual void mousePressEvent(QMouseEvent * mouseEvent);
-	virtual void mouseReleaseEvent(QMouseEvent * mouseEvent);
-	virtual void mouseMoveEvent(QMouseEvent * mouseEvent);
-	virtual void paintEvent(QPaintEvent * pe);
-	virtual void resizeEvent(QResizeEvent * re);
-	virtual void wheelEvent(QWheelEvent * we);
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void leaveEvent( QEvent * e );
+	virtual void mousePressEvent( QMouseEvent * mouseEvent );
+	virtual void mouseReleaseEvent( QMouseEvent * mouseEvent );
+	virtual void mouseMoveEvent( QMouseEvent * mouseEvent );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void resizeEvent( QResizeEvent * re );
+	virtual void wheelEvent( QWheelEvent * we );
 
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
 	int yCoordOfLevel( float level );
 	inline void drawLevelTick( QPainter & p, int tick,
-					float value, bool is_selected );
+				   float value, bool is_selected );
 	void removeSelection();
 	void selectAll();
-	void getSelectedValues(timeMap & selected_values );
+	void getSelectedValues( timeMap & selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
 
@@ -132,11 +132,11 @@ protected slots:
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
 
-	void setEditMode(AutomationEditor::EditModes mode);
-	void setEditMode(int mode);
+	void setEditMode( AutomationEditor::EditModes mode );
+	void setEditMode( int mode );
 
-	void setProgressionType(AutomationPattern::ProgressionTypes type);
-	void setProgressionType(int type);
+	void setProgressionType( AutomationPattern::ProgressionTypes type );
+	void setProgressionType( int type );
 	void setTension();
 
 	void copySelectedValues();
@@ -235,7 +235,7 @@ private:
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void drawCross(QPainter & p );
+	void drawCross( QPainter & p );
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 
@@ -266,15 +266,15 @@ public:
 	AutomationEditorWindow();
 	~AutomationEditorWindow();
 
-	void setCurrentPattern(AutomationPattern* pattern);
-	const AutomationPattern* currentPattern();
+	void setCurrentPattern( AutomationPattern * pattern );
+	const AutomationPattern * currentPattern();
 
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 
-	void open(AutomationPattern* pattern);
+	void open( AutomationPattern * pattern );
 
-	AutomationEditor* m_editor;
+	AutomationEditor * m_editor;
 
 	QSize sizeHint() const;
 
@@ -292,12 +292,12 @@ private slots:
 	void updateWindowTitle();
 
 private:
-	QAction* m_discreteAction;
-	QAction* m_linearAction;
-	QAction* m_cubicHermiteAction;
+	QAction * m_discreteAction;
+	QAction * m_linearAction;
+	QAction * m_cubicHermiteAction;
 
-	QAction* m_flipYAction;
-	QAction* m_flipXAction;
+	QAction * m_flipYAction;
+	QAction * m_flipXAction;
 
 	Knob * m_tensionKnob;
 

@@ -2,7 +2,7 @@
  * lmms_math.h - defines math functions
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -72,7 +72,7 @@ static inline float fraction( const float _x )
 static inline float absFraction( const float _x )
 {
 	return( _x - ( _x >= 0.0f ? static_cast<int>( _x ) :
-						static_cast<int>( _x ) - 1 ) );
+		       static_cast<int>( _x ) - 1 ) );
 }
 
 static inline float fraction( const float _x )
@@ -95,7 +95,7 @@ static inline float absFraction( float _x )
 		"jae 1f\n\t"
 		"fld1\n\t"
 		"fsubrp %%st, %%st(1)\n\t"
-	"1:\n\t"
+		"1:\n\t"
 		"fsubrp %%st, %%st(1)"
 		: "+t"( _x ), "=m"( tmp )
 		:
@@ -127,7 +127,7 @@ static inline int fast_rand()
 {
 	static unsigned long next = 1;
 	next = next * 1103515245 + 12345;
-	return( (unsigned)( next / 65536 ) % 32768 );
+	return( ( unsigned )( next / 65536 ) % 32768 );
 }
 
 static inline double fastRand( double range )
@@ -143,35 +143,35 @@ static inline float fastRandf( float range )
 }
 
 //! @brief Takes advantage of fmal() function if present in hardware
-static inline long double fastFmal( long double a, long double b, long double c ) 
+static inline long double fastFmal( long double a, long double b, long double c )
 {
 #ifdef FP_FAST_FMAL
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmal( a, b, c );
-	#endif
+#ifdef __clang__
+	return fma( a, b, c );
+#else
+	return fmal( a, b, c );
+#endif
 #else
 	return a * b + c;
 #endif
 }
 
 //! @brief Takes advantage of fmaf() function if present in hardware
-static inline float fastFmaf( float a, float b, float c ) 
+static inline float fastFmaf( float a, float b, float c )
 {
 #ifdef FP_FAST_FMAF
-	#ifdef __clang__
-		return fma( a, b, c );
-	#else
-		return fmaf( a, b, c );
-	#endif
+#ifdef __clang__
+	return fma( a, b, c );
+#else
+	return fmaf( a, b, c );
+#endif
 #else
 	return a * b + c;
 #endif
 }
 
 //! @brief Takes advantage of fma() function if present in hardware
-static inline double fastFma( double a, double b, double c ) 
+static inline double fastFma( double a, double b, double c )
 {
 #ifdef FP_FAST_FMA
 	return fma( a, b, c );
@@ -203,9 +203,9 @@ static inline double sinc( double _x )
 //! @brief Exponential function that deals with negative bases
 static inline float signedPowf( float v, float e )
 {
-	return v < 0 
-		? powf( -v, e ) * -1.0f
-		: powf( v, e );
+	return v < 0
+	       ? powf( -v, e ) * -1.0f
+	       : powf( v, e );
 }
 
 
@@ -220,6 +220,7 @@ static inline float logToLinearScale( float min, float max, float value )
 		float result = signedPowf( val / mmax, F_E ) * mmax;
 		return isnan( result ) ? 0 : result;
 	}
+
 	float result = powf( value, F_E ) * ( max - min ) + min;
 	return isnan( result ) ? 0 : result;
 }
@@ -230,12 +231,14 @@ static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
 	const float val = ( value - min ) / ( max - min );
+
 	if( min < 0 )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
 		float result = signedPowf( value / mmax, EXP ) * mmax;
 		return isnan( result ) ? 0 : result;
 	}
+
 	float result = powf( val, EXP ) * ( max - min ) + min;
 	return isnan( result ) ? 0 : result;
 }
@@ -244,13 +247,13 @@ static inline float linearToLogScale( float min, float max, float value )
 
 
 //! @brief Converts linear amplitude (0-1.0) to dBV scale. Handles zeroes as -inf.
-//! @param amp Linear amplitude, where 1.0 = 0dBV. 
+//! @param amp Linear amplitude, where 1.0 = 0dBV.
 //! @return Amplitude in dBV. -inf for 0 amplitude.
 static inline float safeAmpToDbv( float amp )
 {
 	return amp == 0.0f
-		? -INFINITY
-		: log10f( amp ) * 20.0f;
+	       ? -INFINITY
+	       : log10f( amp ) * 20.0f;
 }
 
 
@@ -260,14 +263,14 @@ static inline float safeAmpToDbv( float amp )
 static inline float safeDbvToAmp( float dbv )
 {
 	return isinff( dbv )
-		? 0.0f
-		: exp10f( dbv * 0.05f );
+	       ? 0.0f
+	       : exp10f( dbv * 0.05f );
 }
 
 
-//! @brief Converts linear amplitude (>0-1.0) to dBV scale. 
+//! @brief Converts linear amplitude (>0-1.0) to dBV scale.
 //! @param amp Linear amplitude, where 1.0 = 0dBV. ** Must be larger than zero! **
-//! @return Amplitude in dBV. 
+//! @return Amplitude in dBV.
 static inline float ampToDbv( float amp )
 {
 	return log10f( amp ) * 20.0f;
@@ -285,14 +288,14 @@ static inline float dbvToAmp( float dbv )
 
 
 //! returns 1.0f if val >= 0.0f, -1.0 else
-static inline float sign( float val ) 
-{ 
-	return val >= 0.0f ? 1.0f : -1.0f; 
+static inline float sign( float val )
+{
+	return val >= 0.0f ? 1.0f : -1.0f;
 }
 
 
 //! if val >= 0.0f, returns sqrtf(val), else: -sqrtf(-val)
-static inline float sqrt_neg( float val ) 
+static inline float sqrt_neg( float val )
 {
 	return sqrtf( fabs( val ) ) * sign( val );
 }
@@ -301,7 +304,7 @@ static inline float sqrt_neg( float val )
 // fast approximation of square root
 static inline float fastSqrt( float n )
 {
-	union 
+	union
 	{
 		int32_t i;
 		float f;
@@ -315,14 +318,14 @@ static inline float fastSqrt( float n )
 template<class T>
 static inline T absMax( T a, T b )
 {
-	return qAbs<T>(a) > qAbs<T>(b) ? a : b;
+	return qAbs<T>( a ) > qAbs<T>( b ) ? a : b;
 }
 
 //! returns value nearest to zero
 template<class T>
 static inline T absMin( T a, T b )
 {
-	return qAbs<T>(a) < qAbs<T>(b) ? a : b;
+	return qAbs<T>( a ) < qAbs<T>( b ) ? a : b;
 }
 
 #endif

@@ -34,9 +34,9 @@ class EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
 	Q_OBJECT
 public:
-	LcdSpinBox( int numDigits, QWidget* parent, const QString& name = QString::null );
+	LcdSpinBox( int numDigits, QWidget * parent, const QString & name = QString::null );
 
-	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
+	LcdSpinBox( int numDigits, const QString & style, QWidget * parent, const QString & name = QString::null );
 
 	virtual ~LcdSpinBox();
 
