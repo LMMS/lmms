@@ -23,13 +23,14 @@
 
 #ifndef EQFADER_H
 #define EQFADER_H
-#include "Fader.h"
-#include "EffectControls.h"
-#include "MainWindow.h"
-#include "GuiApplication.h"
-#include "TextFloat.h"
 #include <QList>
 #include <QWidget>
+
+#include "EffectControls.h"
+#include "Fader.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "TextFloat.h"
 
 
 

@@ -24,19 +24,21 @@
  */
 
 #include "EqParameterWidget.h"
-#include "lmms_math.h"
-#include "EqControls.h"
+
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QWidget>
 
+#include "EqControls.h"
+#include "lmms_math.h"
+
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
-	m_bands ( 0 ),
 	m_displayWidth ( 400 ),
 	m_displayHeigth ( 200 ),
-	m_notFirst ( false ),
 	m_controls ( controls )
 
 {
@@ -44,16 +46,16 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	resize( m_displayWidth, m_displayHeigth );
 	float totalHeight = 36; // gain range from -18 to +18
 	m_pixelsPerUnitHeight = m_displayHeigth / totalHeight;
-	m_pixelsPerOctave = freqToXPixel( 10000 ) - freqToXPixel( 5000 );
+	m_pixelsPerOctave = EqHandle::freqToXPixel( 10000, m_displayWidth ) - EqHandle::freqToXPixel( 5000, m_displayWidth );
 
 	//GraphicsScene and GraphicsView stuff
-	m_scene = new QGraphicsScene();
-	m_scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
-	m_view = new QGraphicsView(this);
-	m_view->setStyleSheet(  "border-style: none; background: transparent;");
-	m_view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	m_view->setScene( m_scene );
+	QGraphicsScene *scene = new QGraphicsScene();
+	scene->setSceneRect( 0, 0, m_displayWidth, m_displayHeigth );
+	QGraphicsView *view = new QGraphicsView( this );
+	view->setStyleSheet( "border-style: none; background: transparent;" );
+	view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	view->setScene( scene );
 
 	//adds the handles
 	m_handleList = new QList<EqHandle*>;
@@ -61,13 +63,13 @@ EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	{
 		m_handle = new EqHandle ( i, m_displayWidth, m_displayHeigth );
 		m_handleList->append( m_handle );
-		m_handle->setZValue(1);
-		m_scene->addItem( m_handle );
+		m_handle->setZValue( 1 );
+		scene->addItem( m_handle );
 	}
 
 	//adds the curve widget
 	m_eqcurve = new EqCurve( m_handleList, m_displayWidth, m_displayHeigth );
-	m_scene->addItem( m_eqcurve );
+	scene->addItem( m_eqcurve );
 	for ( int i = 0; i < bandCount(); i++ )
 	{
 		// if the data of handle position has changed update the models
@@ -90,26 +92,37 @@ EqParameterWidget::~EqParameterWidget()
 
 
 
-void EqParameterWidget::updateView()
+EqBand *EqParameterWidget::getBandModels( int i )
 {
-	for( int i = 0 ; i < bandCount() ; i++ )
+	return &m_bands[i];
+}
+
+
+
+
+void EqParameterWidget::updateHandle()
+{
+	m_eqcurve->setModelChanged( true );
+	for( int i = 0 ; i < bandCount(); i++ )
 	{
 		if ( m_handleList->at( i )->getHandleMoved() == false ) //prevents a short circuit between handle and data model
 		{
 			//sets the band on active if a fader or a knob is moved
-			bool hover= false; // prevents an action if handle is moved
+			bool hover = false; // prevents an action if handle is moved
 			for ( int j = 0; j < bandCount(); j++ )
 			{
-				if ( m_handleList->at(j)->isMouseHover() ) hover = true;
+				if ( m_handleList->at(j)->isMouseHover() )
+				{
+					hover = true;
+				}
 			}
 			if ( !hover )
 			{
-				if ( sender() == m_bands[i].gain  ) m_bands[i].active->setValue( true );
+				if ( sender() == m_bands[i].gain ) m_bands[i].active->setValue( true );
 				if ( sender() == m_bands[i].freq ) m_bands[i].active->setValue( true );
 				if ( sender() == m_bands[i].res ) m_bands[i].active->setValue( true );
 			}
-
-			changeHandle(i);
+			changeHandle( i );
 		}
 		else
 		{
@@ -117,8 +130,6 @@ void EqParameterWidget::updateView()
 			m_handleList->at( i )->setHandleMoved( false );
 		}
 	}
-
-	m_notFirst = true;
 	if ( m_bands[0].hp12->value() ) m_handleList->at( 0 )->sethp12();
 	if ( m_bands[0].hp24->value() ) m_handleList->at( 0 )->sethp24();
 	if ( m_bands[0].hp48->value() ) m_handleList->at( 0 )->sethp48();
@@ -133,13 +144,13 @@ void EqParameterWidget::updateView()
 void EqParameterWidget::changeHandle( int i )
 {
 	//fill x, y, and bw with data from model
-	float x = freqToXPixel( m_bands[i].freq->value() );
+	float x = EqHandle::freqToXPixel( m_bands[i].freq->value(), m_displayWidth );
 	float y = m_handleList->at( i )->y();
 	//for pass filters there is no gain model
 	if( m_bands[i].gain )
 	{
 		float gain = m_bands[i].gain->value();
-		y = gainToYPixel( gain );
+		y = EqHandle::gainToYPixel( gain, m_displayHeigth, m_pixelsPerUnitHeight );
 	}
 	float bw = m_bands[i].res->value();
 
@@ -148,7 +159,7 @@ void EqParameterWidget::changeHandle( int i )
 	{
 	case 0 :
 		m_handleList->at( i )->setType( highpass );
-		m_handleList->at( i )->setPos( x, m_displayHeigth/2 );
+		m_handleList->at( i )->setPos( x, m_displayHeigth / 2 );
 		break;
 	case 1:
 		m_handleList->at( i )->setType( lowshelf );
@@ -176,7 +187,7 @@ void EqParameterWidget::changeHandle( int i )
 		break;
 	case 7:
 		m_handleList->at( i )->setType( lowpass );
-		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth/2 ) );
+		m_handleList->at( i )->setPos( QPointF( x, m_displayHeigth / 2 ) );
 		break;
 	}
 
@@ -194,16 +205,24 @@ void EqParameterWidget::changeHandle( int i )
 
 
 
-
+//this is called if a handle is moved
 void EqParameterWidget::updateModels()
 {
 	for ( int i=0 ; i < bandCount(); i++ )
 	{
-		m_bands[i].freq->setValue( xPixelToFreq( m_handleList->at(i)->x() ) );
-		if( m_bands[i].gain ) m_bands[i].gain->setValue( yPixelToGain( m_handleList->at(i)->y() ) );
+		m_bands[i].freq->setValue( EqHandle::xPixelToFreq( m_handleList->at( i )->x(), m_displayWidth ) );
+
+		if( m_bands[i].gain )
+		{
+			m_bands[i].gain->setValue( EqHandle::yPixelToGain( m_handleList->at(i)->y(), m_displayHeigth, m_pixelsPerUnitHeight ) );
+		}
+
 		m_bands[i].res->setValue( m_handleList->at( i )->getResonance() );
-		//sets the band on active if the handle is moved
-		if ( sender() == m_handleList->at( i ) ) m_bands[i].active->setValue( true );
+		//identifies the handle which is moved and set the band active
+		if ( sender() == m_handleList->at( i ) )
+		{
+			m_bands[i].active->setValue( true );
+		}
 	}
 	m_eqcurve->update();
 }

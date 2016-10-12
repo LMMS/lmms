@@ -21,29 +21,28 @@
 *
 */
 
-
 #ifndef EQEFFECT_H
 #define EQEFFECT_H
 
+#include "BasicFilters.h"
 #include "Effect.h"
 #include "EqControls.h"
-#include "lmms_math.h"
-#include "BasicFilters.h"
 #include "EqFilter.h"
+#include "lmms_math.h"
 
 
 
 class EqEffect : public Effect
 {
 public:
-	EqEffect( Model* parent , const Descriptor::SubPluginFeatures::Key* key );
+	EqEffect( Model * parent , const Descriptor::SubPluginFeatures::Key * key );
 	virtual ~EqEffect();
-	virtual bool processAudioBuffer( sampleFrame *buf, const fpp_t frames );
-	virtual EffectControls* controls()
+	virtual bool processAudioBuffer( sampleFrame * buf, const fpp_t frames );
+	virtual EffectControls * controls()
 	{
 		return &m_eqControls;
 	}
-	inline void  gain( sampleFrame *buf, const fpp_t frames, float scale, sampleFrame* peak )
+	inline void  gain( sampleFrame * buf, const fpp_t frames, float scale, sampleFrame * peak )
 	{
 		peak[0][0] = 0.0f; peak[0][1] = 0.0f;
 		for( fpp_t f = 0; f < frames; ++f )
@@ -88,20 +87,14 @@ private:
 	float m_inGain;
 	float m_outGain;
 
-
-
-
-	void analyze( sampleFrame *buf, const fpp_t frames, EqAnalyser* fft );
-	float peakBand(float minF, float maxF,EqAnalyser*, int);
+	float peakBand( float minF, float maxF, EqAnalyser *, int );
 
 	inline float bandToFreq ( int index , int sampleRate )
 	{
-		return index * sampleRate / (MAX_BANDS * 2);
+		return index * sampleRate / ( MAX_BANDS * 2 );
 	}
 
-	void setBandPeaks( EqAnalyser *fft , int);
-
-
+	void setBandPeaks( EqAnalyser * fft , int );
 };
 
 #endif // EQEFFECT_H
