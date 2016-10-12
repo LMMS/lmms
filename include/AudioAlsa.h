@@ -48,9 +48,9 @@ public:
 	class DeviceInfo
 	{
 	public:
-		DeviceInfo(QString const & deviceName, QString const & deviceDescription) :
-			m_deviceName(deviceName),
-			m_deviceDescription(deviceDescription)
+		DeviceInfo( QString const & deviceName, QString const & deviceDescription ) :
+			m_deviceName( deviceName ),
+			m_deviceDescription( deviceDescription )
 		{}
 		~DeviceInfo() {}
 
@@ -66,13 +66,13 @@ public:
 	typedef std::vector<DeviceInfo> DeviceInfoCollection;
 
 public:
-	AudioAlsa( bool & _success_ful, Mixer* mixer );
+	AudioAlsa( bool & _success_ful, Mixer * mixer );
 	virtual ~AudioAlsa();
 
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "setupWidget",
-			"ALSA (Advanced Linux Sound Architecture)" );
+					  "ALSA (Advanced Linux Sound Architecture)" );
 	}
 
 	static QString probeDevice();

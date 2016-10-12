@@ -35,8 +35,8 @@
 
 
 Effect::Effect( const Plugin::Descriptor * _desc,
-			Model * _parent,
-			const Descriptor::SubPluginFeatures::Key * _key ) :
+		Model * _parent,
+		const Descriptor::SubPluginFeatures::Key * _key ) :
 	Plugin( _desc, _parent ),
 	m_parent( NULL ),
 	m_key( _key ? *_key : Descriptor::SubPluginFeatures::Key()  ),
@@ -53,8 +53,8 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 {
 	m_srcState[0] = m_srcState[1] = NULL;
 	reinitSRC();
-	
-	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
+
+	if( ConfigManager::inst()->value( "ui", "disableautoquit" ).toInt() )
 	{
 		m_autoQuitDisabled = true;
 	}
@@ -95,8 +95,8 @@ void Effect::loadSettings( const QDomElement & _this )
 	m_wetDryModel.loadSettings( _this, "wet" );
 	m_autoQuitModel.loadSettings( _this, "autoquit" );
 	m_gateModel.loadSettings( _this, "gate" );
-
 	QDomNode node = _this.firstChild();
+
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -106,6 +106,7 @@ void Effect::loadSettings( const QDomElement & _this )
 				controls()->restoreState( node.toElement() );
 			}
 		}
+
 		node = node.nextSibling();
 	}
 }
@@ -114,23 +115,23 @@ void Effect::loadSettings( const QDomElement & _this )
 
 
 
-Effect * Effect::instantiate( const QString& pluginName,
-				Model * _parent,
-				Descriptor::SubPluginFeatures::Key * _key )
+Effect * Effect::instantiate( const QString & pluginName,
+			      Model * _parent,
+			      Descriptor::SubPluginFeatures::Key * _key )
 {
 	Plugin * p = Plugin::instantiate( pluginName, _parent, _key );
+
 	// check whether instantiated plugin is an effect
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{
 		// everything ok, so return pointer
 		Effect * effect = dynamic_cast<Effect *>( p );
-		effect->m_parent = dynamic_cast<EffectChain *>(_parent);
+		effect->m_parent = dynamic_cast<EffectChain *>( _parent );
 		return effect;
 	}
 
 	// not quite... so delete plugin and leave it up to the caller to instantiate a DummyEffect
 	delete p;
-
 	return NULL;
 }
 
@@ -149,6 +150,7 @@ void Effect::checkGate( double _out_sum )
 	if( _out_sum - gate() <= typeInfo<float>::minEps() )
 	{
 		incrementBufferCount();
+
 		if( bufferCount() > timeout() )
 		{
 			stopRunning();
@@ -169,7 +171,7 @@ PluginView * Effect::instantiateView( QWidget * _parent )
 	return new EffectView( this, _parent );
 }
 
-	
+
 
 
 void Effect::reinitSRC()
@@ -180,11 +182,13 @@ void Effect::reinitSRC()
 		{
 			src_delete( m_srcState[i] );
 		}
+
 		int error;
+
 		if( ( m_srcState[i] = src_new(
-			Engine::mixer()->currentQualitySettings().
-							libsrcInterpolation(),
-					DEFAULT_CHANNELS, &error ) ) == NULL )
+					      Engine::mixer()->currentQualitySettings().
+					      libsrcInterpolation(),
+					      DEFAULT_CHANNELS, &error ) ) == NULL )
 		{
 			qFatal( "Error: src_new() failed in effect.cpp!\n" );
 		}
@@ -195,25 +199,27 @@ void Effect::reinitSRC()
 
 
 void Effect::resample( int _i, const sampleFrame * _src_buf,
-							sample_rate_t _src_sr,
-				sampleFrame * _dst_buf, sample_rate_t _dst_sr,
-								f_cnt_t _frames )
+		       sample_rate_t _src_sr,
+		       sampleFrame * _dst_buf, sample_rate_t _dst_sr,
+		       f_cnt_t _frames )
 {
 	if( m_srcState[_i] == NULL )
 	{
 		return;
 	}
+
 	m_srcData[_i].input_frames = _frames;
 	m_srcData[_i].output_frames = Engine::mixer()->framesPerPeriod();
-	m_srcData[_i].data_in = (float *) _src_buf[0];
+	m_srcData[_i].data_in = ( float * ) _src_buf[0];
 	m_srcData[_i].data_out = _dst_buf[0];
-	m_srcData[_i].src_ratio = (double) _dst_sr / _src_sr;
+	m_srcData[_i].src_ratio = ( double ) _dst_sr / _src_sr;
 	m_srcData[_i].end_of_input = 0;
 	int error;
+
 	if( ( error = src_process( m_srcState[_i], &m_srcData[_i] ) ) )
 	{
 		qFatal( "Effect::resample(): error while resampling: %s\n",
-							src_strerror( error ) );
+			src_strerror( error ) );
 	}
 }
 

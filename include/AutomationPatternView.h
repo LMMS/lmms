@@ -56,7 +56,7 @@ protected slots:
 
 protected:
 	virtual void constructContextMenu( QMenu * );
-	virtual void mouseDoubleClickEvent(QMouseEvent * me );
+	virtual void mouseDoubleClickEvent( QMouseEvent * me );
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
@@ -65,9 +65,9 @@ protected:
 private:
 	AutomationPattern * m_pat;
 	QPixmap m_paintPixmap;
-	
+
 	QStaticText m_staticTextName;
-	
+
 	static QPixmap * s_pat_rec;
 
 	void scaleTimemapToFit( float oldMin, float oldMax );

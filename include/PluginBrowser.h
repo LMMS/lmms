@@ -51,7 +51,7 @@ class PluginDescList : public QWidget
 {
 	Q_OBJECT
 public:
-	PluginDescList(QWidget* parent);
+	PluginDescList( QWidget * parent );
 };
 
 

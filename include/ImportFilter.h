@@ -38,18 +38,18 @@ class EXPORT ImportFilter : public Plugin
 {
 public:
 	ImportFilter( const QString & _file_name,
-					const Descriptor * _descriptor );
+		      const Descriptor * _descriptor );
 	virtual ~ImportFilter();
 
 
 	// tries to import given file to given track-container by having all
 	// available import-filters to try to import the file
 	static void import( const QString & _file_to_import,
-						TrackContainer* tc );
+			    TrackContainer * tc );
 
 
 protected:
-	virtual bool tryImport( TrackContainer* tc ) = 0;
+	virtual bool tryImport( TrackContainer * tc ) = 0;
 
 	const QFile & file() const
 	{
@@ -66,10 +66,12 @@ protected:
 	inline int readByte()
 	{
 		unsigned char c;
-		if( m_file.getChar( (char*) &c ) )
+
+		if( m_file.getChar( ( char * ) &c ) )
 		{
 			return static_cast<int>( c );
 		}
+
 		return -1;
 	}
 

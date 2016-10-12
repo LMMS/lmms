@@ -55,8 +55,8 @@ public:
 	inline static QString name()
 	{
 		return QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"ALSA-Sequencer (Advanced Linux Sound "
-							"Architecture)" );
+					  "ALSA-Sequencer (Advanced Linux Sound "
+					  "Architecture)" );
 	}
 
 	inline static QString configSection()
@@ -67,8 +67,8 @@ public:
 
 
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
-						const MidiPort * _port );
+				      const MidiTime & _time,
+				      const MidiPort * _port );
 
 	virtual void applyPortMode( MidiPort * _port );
 	virtual void applyPortName( MidiPort * _port );
@@ -92,23 +92,23 @@ public:
 
 	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
-						const QString & _dest,
-						bool _subscribe = true );
+					    const QString & _dest,
+					    bool _subscribe = true );
 	virtual void subscribeWritablePort( MidiPort * _port,
-						const QString & _dest,
-						bool _subscribe = true );
+					    const QString & _dest,
+					    bool _subscribe = true );
 	virtual void connectRPChanged( QObject * _receiver,
-							const char * _member )
+				       const char * _member )
 	{
 		connect( this, SIGNAL( readablePortsChanged() ),
-							_receiver, _member );
+			 _receiver, _member );
 	}
 
 	virtual void connectWPChanged( QObject * _receiver,
-							const char * _member )
+				       const char * _member )
 	{
 		connect( this, SIGNAL( writablePortsChanged() ),
-							_receiver, _member );
+			 _receiver, _member );
 	}
 
 
@@ -127,7 +127,8 @@ private:
 	{
 		Ports() { p[0] = -1; p[1] = -1; }
 		int & operator[]( const int _i ) { return p[_i]; }
-		private: int p[2];
+	private:
+		int p[2];
 	} ;
 	QMap<MidiPort *, Ports> m_portIDs;
 #endif

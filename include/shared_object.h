@@ -43,7 +43,7 @@ public:
 	}
 
 	template<class T>
-	static T* ref( T* object )
+	static T * ref( T * object )
 	{
 		object->m_lock.lock();
 		// TODO: Use QShared
@@ -53,7 +53,7 @@ public:
 	}
 
 	template<class T>
-	static void unref( T* object )
+	static void unref( T * object )
 	{
 		object->m_lock.lock();
 		bool deleteObject = --object->m_referenceCount <= 0;

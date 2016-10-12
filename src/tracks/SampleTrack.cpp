@@ -61,11 +61,11 @@ SampleTCO::SampleTCO( Track * _track ) :
 	saveJournallingState( false );
 	setSampleFile( "" );
 	restoreJournallingState();
-
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength( bpm_t ) ) );
+		 this, SLOT( updateLength( bpm_t ) ) );
+
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::BBContainer:
@@ -73,7 +73,8 @@ SampleTCO::SampleTCO( Track * _track ) :
 			break;
 
 		case TrackContainer::SongContainer:
-			// move down
+
+		// move down
 		default:
 			setAutoResize( false );
 			break;
@@ -106,12 +107,11 @@ const QString & SampleTCO::sampleFile() const
 
 
 
-void SampleTCO::setSampleBuffer( SampleBuffer* sb )
+void SampleTCO::setSampleBuffer( SampleBuffer * sb )
 {
 	sharedObject::unref( m_sampleBuffer );
 	m_sampleBuffer = sb;
 	updateLength();
-
 	emit sampleChanged();
 }
 
@@ -121,7 +121,6 @@ void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
 	updateLength();
-
 	emit sampleChanged();
 }
 
@@ -147,7 +146,7 @@ void SampleTCO::updateLength( bpm_t )
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
+	return ( int )( m_sampleBuffer->frames() / Engine::framesPerTick() );
 }
 
 
@@ -163,14 +162,17 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		_this.setAttribute( "pos", startPosition() );
 	}
+
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
+
 	if( sampleFile() == "" )
 	{
 		QString s;
 		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
+
 	// TODO: start- and end-frame
 }
 
@@ -183,11 +185,14 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
+
 	setSampleFile( _this.attribute( "src" ) );
+
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
 		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
 	}
+
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 }
@@ -210,11 +215,9 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 {
 	// update UI and tooltip
 	updateSample();
-
 	// track future changes of SampleTCO
 	connect( m_tco, SIGNAL( sampleChanged() ),
-			this, SLOT( updateSample() ) );
-
+		 this, SLOT( updateSample() ) );
 	setStyle( QApplication::style() );
 }
 
@@ -234,8 +237,8 @@ void SampleTCOView::updateSample()
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
-					m_tco->m_sampleBuffer->audioFile() :
-					tr( "double-click to select sample" ) );
+		      m_tco->m_sampleBuffer->audioFile() :
+		      tr( "double-click to select sample" ) );
 }
 
 
@@ -249,33 +252,34 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	}
 
 	QMenu contextMenu( this );
+
 	if( fixedTCOs() == false )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
-					tr( "Delete (middle mousebutton)" ),
-						this, SLOT( remove() ) );
+				       tr( "Delete (middle mousebutton)" ),
+				       this, SLOT( remove() ) );
 		contextMenu.addSeparator();
 		contextMenu.addAction( embed::getIconPixmap( "edit_cut" ),
-					tr( "Cut" ), this, SLOT( cut() ) );
+				       tr( "Cut" ), this, SLOT( cut() ) );
 	}
+
 	contextMenu.addAction( embed::getIconPixmap( "edit_copy" ),
-					tr( "Copy" ), m_tco, SLOT( copy() ) );
+			       tr( "Copy" ), m_tco, SLOT( copy() ) );
 	contextMenu.addAction( embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste" ), m_tco, SLOT( paste() ) );
+			       tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘"),
-					#else
-					"Ctrl"),
-					#endif
-						m_tco, SLOT( toggleMute() ) );
+			       tr( "Mute/unmute (<%1> + middle click)" ).arg(
+#ifdef LMMS_BUILD_APPLE
+				       "⌘" ),
+#else
+				       "Ctrl" ),
+#endif
+			       m_tco, SLOT( toggleMute() ) );
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
 						m_tco, SLOT( toggleRecord() ) );*/
 	constructContextMenu( &contextMenu );
-
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -285,7 +289,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	if( StringPairDrag::processDragEnterEvent( _dee,
-					"samplefile,sampledata" ) == false )
+			"samplefile,sampledata" ) == false )
 	{
 		TrackContentObjectView::dragEnterEvent( _dee );
 	}
@@ -304,7 +308,7 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
 		m_tco->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) );
+			StringPairDrag::decodeValue( _de ) );
 		m_tco->updateLength();
 		update();
 		_de->accept();
@@ -322,8 +326,8 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-		_me->modifiers() & Qt::ControlModifier &&
-		_me->modifiers() & Qt::ShiftModifier )
+			_me->modifiers() & Qt::ControlModifier &&
+			_me->modifiers() & Qt::ShiftModifier )
 	{
 		m_tco->toggleRecord();
 	}
@@ -339,6 +343,7 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
+
 	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
 	{
 		m_tco->setSampleFile( af );
@@ -360,20 +365,15 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 
 	setNeedsUpdate( false );
-
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
-		? QPixmap( size() ) : m_paintPixmap;
-
+	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size()
+			? QPixmap( size() ) : m_paintPixmap;
 	QPainter p( &m_paintPixmap );
-
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
-
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: painter.background().color() );
-
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
+					       : painter.background().color() );
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
@@ -387,33 +387,29 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
-
 	const int spacing = TCO_BORDER_WIDTH + 1;
 	const float ppt = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getTact() :
-								pixelsPerTact();
-
+			  ( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
+			  / ( float ) m_tco->length().getTact() :
+			  pixelsPerTact();
 	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt
-						/ DefaultTicksPerTact ), 1 ),
-						rect().bottom() - 2 * spacing );
+			 qMax( static_cast<int>( m_tco->sampleLength() * ppt
+					 / DefaultTicksPerTact ), 1 ),
+			 rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
-
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
 	if( r.width() < width() - 1 )
 	{
 		p.drawLine( r.x(), r.y() + r.height() / 2,
-			rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
+			    rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
 	}
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
-		rect().bottom() - TCO_BORDER_WIDTH );
-
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
+		    rect().bottom() - TCO_BORDER_WIDTH );
 	// outer border
 	p.setPen( c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
@@ -424,11 +420,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		const int spacing = TCO_BORDER_WIDTH;
 		const int size = 14;
 		p.drawPixmap( spacing, height() - ( size + spacing ),
-			embed::getIconPixmap( "muted", size, size ) );
+			      embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	// recording sample tracks is not possible at the moment 
-
+	// recording sample tracks is not possible at the moment
 	/* if( m_tco->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
@@ -441,9 +436,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
 	}*/
-
 	p.end();
-
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
@@ -452,12 +445,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 
 
-SampleTrack::SampleTrack( TrackContainer* tc ) :
+SampleTrack::SampleTrack( TrackContainer * tc ) :
 	Track( Track::SampleTrack, tc ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
-							tr( "Volume" ) ),
+		       tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
-					this, tr( "Panning" ) ),
+			this, tr( "Panning" ) ),
 	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
 {
 	setName( tr( "Sample track" ) );
@@ -476,19 +469,20 @@ SampleTrack::~SampleTrack()
 
 
 bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
-					const f_cnt_t _offset, int _tco_num )
+			const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
-
 	tcoVector tcos;
 	::BBTrack * bb_track = NULL;
+
 	if( _tco_num >= 0 )
 	{
 		if( _start != 0 )
 		{
 			return false;
 		}
+
 		tcos.push_back( getTCO( _tco_num ) );
 		bb_track = BBTrack::findBBTrack( _tco_num );
 	}
@@ -497,6 +491,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		for( int i = 0; i < numOfTCOs(); ++i )
 		{
 			TrackContentObject * tco = getTCO( i );
+
 			if( tco->startPosition() == _start )
 			{
 				tcos.push_back( tco );
@@ -507,25 +502,29 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	for( tcoVector::Iterator it = tcos.begin(); it != tcos.end(); ++it )
 	{
 		SampleTCO * st = dynamic_cast<SampleTCO *>( *it );
+
 		if( !st->isMuted() )
 		{
-			PlayHandle* handle;
+			PlayHandle * handle;
+
 			if( st->isRecord() )
 			{
 				if( !Engine::getSong()->isRecording() )
 				{
 					return played_a_note;
 				}
-				SampleRecordHandle* smpHandle = new SampleRecordHandle( st );
+
+				SampleRecordHandle * smpHandle = new SampleRecordHandle( st );
 				handle = smpHandle;
 			}
 			else
 			{
-				SamplePlayHandle* smpHandle = new SamplePlayHandle( st );
+				SamplePlayHandle * smpHandle = new SamplePlayHandle( st );
 				smpHandle->setVolumeModel( &m_volumeModel );
 				smpHandle->setBBTrack( bb_track );
 				handle = smpHandle;
 			}
+
 			handle->setOffset( _offset );
 			// send it to the mixer
 			Engine::mixer()->addPlayHandle( handle );
@@ -539,7 +538,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 
 
-TrackView * SampleTrack::createView( TrackContainerView* tcv )
+TrackView * SampleTrack::createView( TrackContainerView * tcv )
 {
 	return new SampleTrackView( this, tcv );
 }
@@ -556,7 +555,7 @@ TrackContentObject * SampleTrack::createTCO( const MidiTime & )
 
 
 void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _this )
+		QDomElement & _this )
 {
 	m_audioPort.effects()->saveState( _doc, _this );
 #if 0
@@ -573,6 +572,7 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 {
 	QDomNode node = _this.firstChild();
 	m_audioPort.effects()->clear();
+
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -582,8 +582,10 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 				m_audioPort.effects()->restoreState( node.toElement() );
 			}
 		}
+
 		node = node.nextSibling();
 	}
+
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
 }
@@ -593,53 +595,49 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 
 
-SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
+SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView * tcv ) :
 	TrackView( _t, tcv )
 {
 	setFixedHeight( 32 );
-
 	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
+			getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
-			this, SLOT( showEffects() ) );
+		 this, SLOT( showEffects() ) );
 	tlb->setIcon( embed::getIconPixmap( "sample_track" ) );
 	tlb->move( 3, 1 );
 	tlb->show();
-
 	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
-						    tr( "Track volume" ) );
+				 tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
+
 	if( ConfigManager::inst()->value( "ui",
 					  "compacttrackbuttons" ).toInt() )
 	{
-		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT-2*24, 2 );
+		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT - 2 * 24, 2 );
 	}
 	else
 	{
-		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-2*24, 2 );
+		m_volumeKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH - 2 * 24, 2 );
 	}
+
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
-
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
-							tr( "Panning" ) );
+				  tr( "Panning" ) );
 	m_panningKnob->setModel( &_t->m_panningModel );
 	m_panningKnob->setHintText( tr( "Panning:" ), "%" );
-	m_panningKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH-24, 2 );
+	m_panningKnob->move( DEFAULT_SETTINGS_WIDGET_WIDTH - 24, 2 );
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
-
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
-
 	m_effWindow = gui->mainWindow()->addWindowedWidget( m_effectRack );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
- 	m_effWindow->setWindowTitle( _t->name() );
+	m_effWindow->setWindowTitle( _t->name() );
 	m_effWindow->hide();
-
 	setModel( _t );
 }
 
@@ -674,6 +672,5 @@ void SampleTrackView::modelChanged()
 {
 	SampleTrack * st = castModel<SampleTrack>();
 	m_volumeKnob->setModel( &st->m_volumeModel );
-
 	TrackView::modelChanged();
 }

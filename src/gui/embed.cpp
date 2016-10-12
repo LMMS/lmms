@@ -39,7 +39,7 @@ namespace PLUGIN_NAME
 
 namespace
 {
-	static QHash<QString, QPixmap> s_pixmapCache;
+static QHash<QString, QPixmap> s_pixmapCache;
 }
 
 #include "embedded_resources.h"
@@ -51,6 +51,7 @@ QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 	{
 		// Return cached pixmap
 		QPixmap cached = s_pixmapCache.value( pixmapName );
+
 		if( !cached.isNull() )
 		{
 			return cached;
@@ -62,54 +63,62 @@ QPixmap getIconPixmap( const char * pixmapName, int width, int height )
 		QPixmap pixmap;
 		QString name;
 		int i;
-		
-		for ( i = 0; i < formats.size() && pixmap.isNull(); ++i )  
+
+		for ( i = 0; i < formats.size() && pixmap.isNull(); ++i )
 		{
 			candidates << QString( pixmapName ) + "." + formats.at( i ).data();
 		}
 
 #ifdef PLUGIN_NAME
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )
+		{
 			name = candidates.at( i );
 			pixmap = QPixmap( "resources:plugins/" STRINGIFY( PLUGIN_NAME ) "_" + name );
 		}
+
 #endif
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )
+		{
 			name = candidates.at( i );
 			pixmap = QPixmap( "resources:" + name );
 		}
-		
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
+
+		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )
+		{
 			name = candidates.at( i );
-			const embed::descriptor & e = 
+			const embed::descriptor & e =
 				findEmbeddedData( name.toUtf8().constData() );
+
 			// found?
 			if( name == e.name )
 			{
 				pixmap.loadFromData( e.data, e.size );
 			}
 		}
-		
+
 		// Fallback
 		if( pixmap.isNull() )
 		{
 			pixmap = QPixmap( 1, 1 );
 		}
+
 		// Save to cache and return
 		s_pixmapCache.insert( pixmapName, pixmap );
 		return pixmap;
 	}
 
 	return getIconPixmap( pixmapName ).
-		scaled( width, height, Qt::IgnoreAspectRatio,
-			Qt::SmoothTransformation );
+	       scaled( width, height, Qt::IgnoreAspectRatio,
+		       Qt::SmoothTransformation );
 }
 
 
 QString getText( const char * _name )
 {
 	const embed::descriptor & e = findEmbeddedData( _name );
-	return QString::fromUtf8( (const char *) e.data, e.size );
+	return QString::fromUtf8( ( const char * ) e.data, e.size );
 }
 
 

@@ -36,7 +36,7 @@ class EXPORT Model : public QObject
 	Q_OBJECT
 public:
 	Model( Model * _parent, QString _display_name = QString::null,
-					bool _default_constructed = false ) :
+	       bool _default_constructed = false ) :
 		QObject( _parent ),
 		m_displayName( _display_name ),
 		m_defaultConstructed( _default_constructed )
@@ -52,7 +52,7 @@ public:
 		return m_defaultConstructed;
 	}
 
-	Model* parentModel() const
+	Model * parentModel() const
 	{
 		return static_cast<Model *>( parent() );
 	}
@@ -62,7 +62,7 @@ public:
 		return m_displayName;
 	}
 
-	virtual void setDisplayName( const QString& displayName )
+	virtual void setDisplayName( const QString & displayName )
 	{
 		m_displayName = displayName;
 	}

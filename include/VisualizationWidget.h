@@ -2,7 +2,7 @@
  * VisualizationWidget.h - widget for visualization of sound-data
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ public:
 	} ;
 
 	VisualizationWidget( const QPixmap & _bg, QWidget * _parent,
-					visualizationTypes _vtype = Simple );
+			     visualizationTypes _vtype = Simple );
 	virtual ~VisualizationWidget();
 
 	void setActive( bool _active );

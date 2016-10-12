@@ -2,7 +2,7 @@
  * ProjectNotes.cpp - implementation of project-notes-editor
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -54,23 +54,18 @@ ProjectNotes::ProjectNotes() :
 	pal.setColor( m_edit->backgroundRole(), QColor( 64, 64, 64 ) );
 	m_edit->setPalette( pal );
 	m_edit->show();
-
 	clear();
-
 	connect( m_edit,
-		SIGNAL( currentCharFormatChanged( const QTextCharFormat & ) ),
-		this, SLOT( formatChanged( const QTextCharFormat & ) ) );
+		 SIGNAL( currentCharFormatChanged( const QTextCharFormat & ) ),
+		 this, SLOT( formatChanged( const QTextCharFormat & ) ) );
 //	connect( m_edit, SIGNAL( currentAlignmentChanged( int ) ),
 //			this, SLOT( alignmentChanged( int ) ) );
 	connect( m_edit, SIGNAL( textChanged() ),
-			Engine::getSong(), SLOT( setModified() ) );
-
+		 Engine::getSong(), SLOT( setModified() ) );
 	setupActions();
-
 	setCentralWidget( m_edit );
 	setWindowTitle( tr( "Project notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
-
 	gui->mainWindow()->addWindowedWidget( this );
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
 	parentWidget()->move( 700, 10 );
@@ -113,194 +108,173 @@ void ProjectNotes::setupActions()
 {
 	QToolBar * tb = addToolBar( tr( "Edit Actions" ) );
 	QAction * a;
-
 	a = new QAction( embed::getIconPixmap( "edit_undo" ), tr( "&Undo" ),
-									this );
+			 this );
 	a->setShortcut( tr( "%1+Z" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+				"⌘" ) );
+#else
+				"Ctrl" ) );
+#endif
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( undo() ) );
 	tb->addAction( a );
-
 	a = new QAction( embed::getIconPixmap( "edit_redo" ), tr( "&Redo" ),
-									this );
+			 this );
 	a->setShortcut( tr( "%1+Y" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+				"⌘" ) );
+#else
+				"Ctrl" ) );
+#endif
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( redo() ) );
 	tb->addAction( a );
-
 	a = new QAction( embed::getIconPixmap( "edit_copy" ), tr( "&Copy" ),
-									this );
+			 this );
 	a->setShortcut( tr( "%1+C" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+				"⌘" ) );
+#else
+				"Ctrl" ) );
+#endif
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( copy() ) );
 	tb->addAction( a );
-
 	a = new QAction( embed::getIconPixmap( "edit_cut" ), tr( "Cu&t" ),
-									this );
+			 this );
 	a->setShortcut( tr( "%1+X" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+				"⌘" ) );
+#else
+				"Ctrl" ) );
+#endif
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( cut() ) );
 	tb->addAction( a );
-
 	a = new QAction( embed::getIconPixmap( "edit_paste" ), tr( "&Paste" ),
-									this );
+			 this );
 	a->setShortcut( tr( "%1+V" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+				"⌘" ) );
+#else
+				"Ctrl" ) );
+#endif
 	connect( a, SIGNAL( triggered() ), m_edit, SLOT( paste() ) );
 	tb->addAction( a );
-
-
 	tb = addToolBar( tr( "Format Actions" ) );
-
 	m_comboFont = new QComboBox( tb );
 	m_comboFont->setEditable( true );
 	QFontDatabase db;
 	m_comboFont->addItems( db.families() );
 	connect( m_comboFont, SIGNAL( activated( const QString & ) ),
-			m_edit, SLOT( setFontFamily( const QString & ) ) );
+		 m_edit, SLOT( setFontFamily( const QString & ) ) );
 	m_comboFont->lineEdit()->setText( QApplication::font().family() );
-
 	m_comboSize = new QComboBox( tb );
 	m_comboSize->setEditable( true );
 	QList<int> sizes = db.standardSizes();
 	QList<int>::Iterator it = sizes.begin();
+
 	for ( ; it != sizes.end(); ++it )
 	{
 		m_comboSize->addItem( QString::number( *it ) );
 	}
-	connect( m_comboSize, SIGNAL( activated( const QString & ) ),
-		     this, SLOT( textSize( const QString & ) ) );
-	m_comboSize->lineEdit()->setText( QString::number(
-					QApplication::font().pointSize() ) );
 
+	connect( m_comboSize, SIGNAL( activated( const QString & ) ),
+		 this, SLOT( textSize( const QString & ) ) );
+	m_comboSize->lineEdit()->setText( QString::number(
+			QApplication::font().pointSize() ) );
 	m_actionTextBold = new QAction( embed::getIconPixmap( "text_bold" ),
-							tr( "&Bold" ), this );
+					tr( "&Bold" ), this );
 	m_actionTextBold->setShortcut( tr( "%1+B" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+					       "⌘" ) );
+#else
+					       "Ctrl" ) );
+#endif
 	m_actionTextBold->setCheckable( true );
 	connect( m_actionTextBold, SIGNAL( triggered() ), this,
-							SLOT( textBold() ) );
-
+		 SLOT( textBold() ) );
 	m_actionTextItalic = new QAction( embed::getIconPixmap( "text_italic" ),
-							tr( "&Italic" ), this );
+					  tr( "&Italic" ), this );
 	m_actionTextItalic->setShortcut( tr( "%1+I" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+			"⌘" ) );
+#else
+			"Ctrl" ) );
+#endif
 	m_actionTextItalic->setCheckable( true );
 	connect( m_actionTextItalic, SIGNAL( triggered() ), this,
-							SLOT( textItalic() ) );
-
+		 SLOT( textItalic() ) );
 	m_actionTextUnderline = new QAction( embed::getIconPixmap(
-								"text_under" ),
-						tr( "&Underline" ), this );
+			"text_under" ),
+					     tr( "&Underline" ), this );
 	m_actionTextUnderline->setShortcut( tr( "%1+U" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+			"⌘" ) );
+#else
+			"Ctrl" ) );
+#endif
 	m_actionTextUnderline->setCheckable( true );
 	connect( m_actionTextUnderline, SIGNAL( triggered() ), this,
-						SLOT( textUnderline() ) );
-
-
+		 SLOT( textUnderline() ) );
 	QActionGroup * grp = new QActionGroup( tb );
 	connect( grp, SIGNAL( triggered( QAction * ) ), this,
-					SLOT( textAlign( QAction * ) ) );
-
+		 SLOT( textAlign( QAction * ) ) );
 	m_actionAlignLeft = new QAction( embed::getIconPixmap( "text_left" ),
-						tr( "&Left" ), m_edit );
+					 tr( "&Left" ), m_edit );
 	m_actionAlignLeft->setShortcut( tr( "%1+L" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+						"⌘" ) );
+#else
+						"Ctrl" ) );
+#endif
 	m_actionAlignLeft->setCheckable( true );
 	grp->addAction( m_actionAlignLeft );
-
 	m_actionAlignCenter = new QAction( embed::getIconPixmap(
-								"text_center" ),
-						tr( "C&enter" ), m_edit );
+			"text_center" ),
+					   tr( "C&enter" ), m_edit );
 	m_actionAlignCenter->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignCenter->setShortcut( tr( "%1+E" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+			"⌘" ) );
+#else
+			"Ctrl" ) );
+#endif
 	m_actionAlignCenter->setCheckable( true );
 	grp->addAction( m_actionAlignCenter );
-
 	m_actionAlignRight = new QAction( embed::getIconPixmap( "text_right" ),
-						tr( "&Right" ), m_edit );
+					  tr( "&Right" ), m_edit );
 	m_actionAlignRight->setShortcutContext( Qt::WidgetShortcut );
 	m_actionAlignRight->setShortcut( tr( "%1+R" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+			"⌘" ) );
+#else
+			"Ctrl" ) );
+#endif
 	m_actionAlignRight->setCheckable( true );
 	grp->addAction( m_actionAlignRight );
-
 	m_actionAlignJustify = new QAction( embed::getIconPixmap(
-								"text_block" ),
-						tr( "&Justify" ), m_edit );
+			"text_block" ),
+					    tr( "&Justify" ), m_edit );
 	m_actionAlignJustify->setShortcut( tr( "%1+J" ).arg(
-		#ifdef LMMS_BUILD_APPLE
-		"⌘") );
-		#else
-		"Ctrl") );
-		#endif
+#ifdef LMMS_BUILD_APPLE
+			"⌘" ) );
+#else
+			"Ctrl" ) );
+#endif
 	m_actionAlignJustify->setCheckable( true );
 	grp->addAction( m_actionAlignJustify );
-
-
 	QPixmap pix( 16, 16 );
 	pix.fill( Qt::black );
 	m_actionTextColor = new QAction( pix, tr( "&Color..." ), this );
 	connect( m_actionTextColor, SIGNAL( triggered() ), this,
-							SLOT( textColor() ) );
-
+		 SLOT( textColor() ) );
 	tb->addWidget( m_comboFont );
 	tb->addWidget( m_comboSize );
 	tb->addAction( m_actionTextBold );
 	tb->addAction( m_actionTextItalic );
 	tb->addAction( m_actionTextUnderline );
-
 	tb->addAction( m_actionAlignLeft );
 	tb->addAction( m_actionAlignCenter );
 	tb->addAction( m_actionAlignRight );
 	tb->addAction( m_actionAlignJustify );
-
 	tb->addAction( m_actionTextColor );
 }
 
@@ -310,7 +284,7 @@ void ProjectNotes::setupActions()
 void ProjectNotes::textBold()
 {
 	m_edit->setFontWeight( m_actionTextBold->isChecked() ? QFont::Bold :
-								QFont::Normal );
+			       QFont::Normal );
 	Engine::getSong()->setModified();
 }
 
@@ -358,10 +332,12 @@ void ProjectNotes::textSize( const QString & _p )
 void ProjectNotes::textColor()
 {
 	QColor col = QColorDialog::getColor( m_edit->textColor(), this );
+
 	if ( !col.isValid() )
 	{
 		return;
 	}
+
 	m_edit->setTextColor( col );
 	QPixmap pix( 16, 16 );
 	pix.fill( Qt::black );
@@ -402,11 +378,9 @@ void ProjectNotes::formatChanged( const QTextCharFormat & _f )
 	m_actionTextBold->setChecked( font.bold() );
 	m_actionTextItalic->setChecked( font.italic() );
 	m_actionTextUnderline->setChecked( font.underline() );
-
 	QPixmap pix( 16, 16 );
 	pix.fill( _f.foreground().color() );
 	m_actionTextColor->setIcon( pix );
-
 	Engine::getSong()->setModified();
 }
 
@@ -431,6 +405,7 @@ void ProjectNotes::alignmentChanged( int _a )
 	{
 		m_actionAlignJustify->setChecked( true );
 	}
+
 	Engine::getSong()->setModified();
 }
 
@@ -440,7 +415,6 @@ void ProjectNotes::alignmentChanged( int _a )
 void ProjectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	MainWindow::saveWidgetState( this, _this, QSize( 640, 400 ) );
-
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
 	_this.appendChild( ds );
 }
@@ -467,5 +441,6 @@ void ProjectNotes::closeEvent( QCloseEvent * _ce )
 	{
 		hide();
 	}
+
 	_ce->ignore();
- }
+}

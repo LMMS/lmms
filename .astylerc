@@ -1,0 +1,43 @@
+# broken brackets
+--style=allman
+# don't break one line blocks
+--keep-one-line-blocks
+# indent using tab characters, add spaces when not possible and treat each tab as 8 spaces
+--indent=force-tab=8
+# inden switch blocks
+--indent-switches
+# indent labels
+--indent-labels
+# indent multi-line preprocessor definitions
+--indent-preproc-define
+# pad empty lines around header blocks
+--break-blocks
+# add space padding around operators
+--pad-oper
+# add space padding around parenthesis in the inside
+--pad-paren-in
+# delete empty lines except the lines added by the break-blocks options
+--delete-empty-lines
+# align pointers and references between var type and var name
+--align-pointer=middle
+# add brackets to one line conditionnal statement
+--add-brackets
+
+# set mode to C, C++, C++/CLI, and Objective-C
+--mode=c
+# treat each folder recursively
+--recursive
+# display only formatted files
+--formatted
+
+# break lines after 80 characters, disabled ?
+#--max-code-length=80
+# suppress all output except errors, disabled ?
+#--quiet
+# forcing use of linux line-end files, disabled ?
+#--lineend=linux
+
+# maximum of spaces to indent a continuation line, disabled as it produces errors currently
+#--max-instatement-indent=16
+# indent preprocessor blocks, disabled as it produces errors currently
+#--indent-preproc-block

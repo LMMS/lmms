@@ -39,7 +39,7 @@ public:
 	{
 		setCheckable( true );
 		connect( this, SIGNAL( clicked() ), this,
-						SLOT( slotClicked() ) );
+			 SLOT( slotClicked() ) );
 	}
 
 	~TabButton()

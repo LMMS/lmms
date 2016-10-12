@@ -28,7 +28,7 @@
 
 
 
-ModelView::ModelView( Model* model, QWidget* widget ) :
+ModelView::ModelView( Model * model, QWidget * widget ) :
 	m_widget( widget ),
 	m_model( model )
 {
@@ -48,7 +48,7 @@ ModelView::~ModelView()
 
 
 
-void ModelView::setModel( Model* model, bool isOldModelValid )
+void ModelView::setModel( Model * model, bool isOldModelValid )
 {
 	if( isOldModelValid && m_model != NULL )
 	{
@@ -63,11 +63,8 @@ void ModelView::setModel( Model* model, bool isOldModelValid )
 	}
 
 	m_model = model;
-
 	doConnections();
-
 	widget()->update();
-
 	modelChanged();
 }
 

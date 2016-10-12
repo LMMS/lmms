@@ -35,7 +35,7 @@ class PreviewTrackContainer;
 class EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
-	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
+	PresetPreviewPlayHandle( const QString & presetFile, bool loadByPlugin = false, DataFile * dataFile = 0 );
 	virtual ~PresetPreviewPlayHandle();
 
 	virtual inline bool affinityMatters() const
@@ -43,22 +43,22 @@ public:
 		return true;
 	}
 
-	virtual void play( sampleFrame* buffer );
+	virtual void play( sampleFrame * buffer );
 	virtual bool isFinished() const;
 
 	virtual bool isFromTrack( const Track * _track ) const;
 
 	static void init();
 	static void cleanup();
-	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* instrumentTrack );
+	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack * instrumentTrack );
 
 	static bool isPreviewing();
 
 
 private:
-	static PreviewTrackContainer* s_previewTC;
+	static PreviewTrackContainer * s_previewTC;
 
-	NotePlayHandle* m_previewNote;
+	NotePlayHandle * m_previewNote;
 
 } ;
 

@@ -46,7 +46,7 @@ QVector<Controller *> Controller::s_controllers;
 
 
 Controller::Controller( ControllerTypes _type, Model * _parent,
-					const QString & _display_name ) :
+			const QString & _display_name ) :
 	Model( _parent, _display_name ),
 	JournallingObject(),
 	m_valueBuffer( Engine::mixer()->framesPerPeriod() ),
@@ -57,24 +57,26 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	if( _type != DummyController && _type != MidiController )
 	{
 		s_controllers.append( this );
+
 		// Determine which name to use
-		for ( uint i=s_controllers.size(); ; i++ )
+		for ( uint i = s_controllers.size(); ; i++ )
 		{
 			QString new_name = QString( tr( "Controller %1" ) )
-					.arg( i );
-
+					   .arg( i );
 			// Check if name is already in use
 			bool name_used = false;
 			QVector<Controller *>::const_iterator it;
+
 			for ( it = s_controllers.constBegin();
-				  it != s_controllers.constEnd(); ++it )
+					it != s_controllers.constEnd(); ++it )
 			{
-				if ( (*it)->name() == new_name )
+				if ( ( *it )->name() == new_name )
 				{
 					name_used = true;
 					break;
 				}
 			}
+
 			if ( ! name_used )
 			{
 				m_name = new_name;
@@ -82,6 +84,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 			}
 		}
 	}
+
 	updateValueBuffer();
 }
 
@@ -90,6 +93,7 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 Controller::~Controller()
 {
 	int idx = s_controllers.indexOf( this );
+
 	if( idx >= 0 )
 	{
 		s_controllers.remove( idx );
@@ -108,7 +112,7 @@ float Controller::currentValue( int _offset )
 	{
 		m_currentValue = fittedValue( value( _offset ) );
 	}
-	
+
 	return m_currentValue;
 }
 
@@ -120,9 +124,10 @@ float Controller::value( int offset )
 	{
 		updateValueBuffer();
 	}
+
 	return m_valueBuffer.values()[ offset ];
 }
-	
+
 
 ValueBuffer * Controller::valueBuffer()
 {
@@ -130,6 +135,7 @@ ValueBuffer * Controller::valueBuffer()
 	{
 		updateValueBuffer();
 	}
+
 	return &m_valueBuffer;
 }
 
@@ -137,10 +143,12 @@ ValueBuffer * Controller::valueBuffer()
 void Controller::updateValueBuffer()
 {
 	float * values = m_valueBuffer.values();
+
 	for( int i = 0; i < m_valueBuffer.length(); i++ )
 	{
 		values[i] = 0.5f;
 	}
+
 	m_bufferLastUpdated = s_periods;
 }
 
@@ -163,13 +171,13 @@ float Controller::runningTime()
 
 void Controller::triggerFrameCounter()
 {
-	for( int i = 0; i < s_controllers.size(); ++i ) 
+	for( int i = 0; i < s_controllers.size(); ++i )
 	{
 		// This signal is for updating values for both stubborn knobs and for
 		// painting.  If we ever get all the widgets to use or at least check
 		// currentValue() then we can throttle the signal and only use it for
 		// GUI.
-		emit s_controllers.at(i)->valueChanged();
+		emit s_controllers.at( i )->valueChanged();
 	}
 
 	s_periods ++;
@@ -180,10 +188,11 @@ void Controller::triggerFrameCounter()
 
 void Controller::resetFrameCounter()
 {
-	for( int i = 0; i < s_controllers.size(); ++i ) 
+	for( int i = 0; i < s_controllers.size(); ++i )
 	{
 		s_controllers.at( i )->m_bufferLastUpdated = 0;
-	} 
+	}
+
 	s_periods = 0;
 }
 
@@ -196,15 +205,18 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 
 	switch( _ct )
 	{
-		case Controller::DummyController: 
+		case Controller::DummyController:
 			if( dummy )
+			{
 				c = dummy;
+			}
 			else
 			{
 				c = new Controller( DummyController, NULL,
-								QString() );
+						    QString() );
 				dummy = c;
 			}
+
 			break;
 
 		case Controller::LfoController:
@@ -220,7 +232,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 			c = new ::MidiController( _parent );
 			break;
 
-		default: 
+		default:
 			break;
 	}
 
@@ -232,6 +244,7 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 Controller * Controller::create( const QDomElement & _this, Model * _parent )
 {
 	Controller * c;
+
 	if( _this.attribute( "type" ).toInt() == Controller::PeakController )
 	{
 		c = PeakController::getControllerBySetting( _this );
@@ -239,8 +252,8 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 	else
 	{
 		c = create(
-			static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
-										_parent );
+			    static_cast<ControllerTypes>( _this.attribute( "type" ).toInt() ),
+			    _parent );
 	}
 
 	if( c != NULL )
@@ -256,10 +269,12 @@ Controller * Controller::create( const QDomElement & _this, Model * _parent )
 bool Controller::hasModel( const Model * m )
 {
 	QObjectList chldren = children();
+
 	for( int i = 0; i < chldren.size(); ++i )
 	{
-		QObject * c = chldren.at(i);
-		AutomatableModel * am = qobject_cast<AutomatableModel*>(c);
+		QObject * c = chldren.at( i );
+		AutomatableModel * am = qobject_cast<AutomatableModel *>( c );
+
 		if( am != NULL )
 		{
 			if( am == m )
@@ -268,6 +283,7 @@ bool Controller::hasModel( const Model * m )
 			}
 
 			ControllerConnection * cc = am->controllerConnection();
+
 			if( cc != NULL )
 			{
 				if( cc->getController()->hasModel( m ) )
@@ -277,7 +293,7 @@ bool Controller::hasModel( const Model * m )
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -296,7 +312,7 @@ void Controller::loadSettings( const QDomElement & _this )
 	if( _this.attribute( "type" ).toInt() != type() )
 	{
 		qWarning( "controller-type does not match controller-type of "
-							"settings-node!\n" );
+			  "settings-node!\n" );
 	}
 
 	setName( _this.attribute( "name" ) );
@@ -313,7 +329,6 @@ QString Controller::nodeName() const
 ControllerDialog * Controller::createDialog( QWidget * _parent )
 {
 	ControllerDialog * d = new ControllerDialog( this, _parent );
-
 	return d;
 }
 
@@ -337,7 +352,8 @@ void Controller::removeConnection( ControllerConnection * )
 
 
 
-int Controller::connectionCount() const{
+int Controller::connectionCount() const
+{
 	return m_connectionCount;
 }
 

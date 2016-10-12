@@ -21,25 +21,25 @@ public:
 	MidiSndio( void );
 	virtual ~MidiSndio();
 
-	static QString probeDevice(void);
+	static QString probeDevice( void );
 
-	inline static QString name(void)
+	inline static QString name( void )
 	{
-		return QT_TRANSLATE_NOOP("MidiSetupWidget", "sndio MIDI");
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget", "sndio MIDI" );
 	}
 
-    inline static QString configSection()
-    {
-        return "MidiSndio";
-    }
+	inline static QString configSection()
+	{
+		return "MidiSndio";
+	}
 
 
 protected:
-	virtual void sendByte(const unsigned char c);
-	virtual void run(void);
+	virtual void sendByte( const unsigned char c );
+	virtual void run( void );
 
 private:
-	struct mio_hdl *m_hdl;
+	struct mio_hdl * m_hdl;
 	volatile bool m_quit;
 } ;
 

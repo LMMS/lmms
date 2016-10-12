@@ -41,12 +41,12 @@ class EXPORT TabBar : public QWidget
 	Q_OBJECT
 public:
 	TabBar( QWidget * _parent,
-			QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
+		QBoxLayout::Direction _dir = QBoxLayout::LeftToRight );
 	virtual ~TabBar();
 
 	TabButton * addTab( QWidget * _w, const QString & _text,
-					int _id, bool _add_stretch = false,
-					bool _text_is_tooltip = false );
+			    int _id, bool _add_stretch = false,
+			    bool _text_is_tooltip = false );
 	void removeTab( int _id );
 
 	inline void setExclusive( bool _on )

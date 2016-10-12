@@ -46,16 +46,12 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	m_spinBoxesLayout.addWidget( &m_majorLCD );
 	m_spinBoxesLayout.addWidget( &m_minorLCD );
 	m_spinBoxesLayout.addWidget( &m_milliSecondsLCD );
-
 	setMaximumHeight( 32 );
-
 	ToolTip::add( this, tr( "click to change time units" ) );
-
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
-
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+		 this, SLOT( updateTime() ) );
 }
 
 
@@ -87,7 +83,8 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
 			break;
 
-		default: break;
+		default:
+			break;
 	}
 }
 
@@ -96,7 +93,7 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 
 void TimeDisplayWidget::updateTime()
 {
-	Song* s = Engine::getSong();
+	Song * s = Engine::getSong();
 
 	switch( m_displayMode )
 	{
@@ -108,22 +105,23 @@ void TimeDisplayWidget::updateTime()
 
 		case BarsTicks:
 			int tick;
-			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
-			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
+			tick = ( s->getMilliseconds() * s->getTempo() * ( DefaultTicksPerTact / 4 ) ) / 60000 ;
+			m_majorLCD.setValue( ( int )( tick / s->ticksPerTact() ) + 1 );
 			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
-						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
+					     ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) + 1 );
 			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
-							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+						    ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
 			break;
 
-		default: break;
+		default:
+			break;
 	}
 }
 
 
 
 
-void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
+void TimeDisplayWidget::mousePressEvent( QMouseEvent * mouseEvent )
 {
 	if( mouseEvent->button() == Qt::LeftButton )
 	{

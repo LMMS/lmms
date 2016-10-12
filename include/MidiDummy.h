@@ -41,7 +41,7 @@ public:
 	inline static QString name()
 	{
 		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
-			"Dummy (no MIDI support)" ) );
+					   "Dummy (no MIDI support)" ) );
 	}
 
 	inline static QString probeDevice()

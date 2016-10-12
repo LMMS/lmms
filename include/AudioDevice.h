@@ -39,7 +39,7 @@ class QThread;
 class AudioDevice
 {
 public:
-	AudioDevice( const ch_cnt_t _channels, Mixer* mixer );
+	AudioDevice( const ch_cnt_t _channels, Mixer * mixer );
 	virtual ~AudioDevice();
 
 	inline void lock()
@@ -94,8 +94,8 @@ protected:
 	// subclasses can re-implement this for being used in conjunction with
 	// processNextBuffer()
 	virtual void writeBuffer( const surroundSampleFrame * /* _buf*/,
-						const fpp_t /*_frames*/,
-						const float /*_master_gain*/ )
+				  const fpp_t /*_frames*/,
+				  const float /*_master_gain*/ )
 	{
 	}
 
@@ -105,28 +105,28 @@ protected:
 	// convert a given audio-buffer to a buffer in signed 16-bit samples
 	// returns num of bytes in outbuf
 	int convertToS16( const surroundSampleFrame * _ab,
-						const fpp_t _frames,
-						const float _master_gain,
-						int_sample_t * _output_buffer,
-						const bool _convert_endian = false );
+			  const fpp_t _frames,
+			  const float _master_gain,
+			  int_sample_t * _output_buffer,
+			  const bool _convert_endian = false );
 
 	// clear given signed-int-16-buffer
 	void clearS16Buffer( int_sample_t * _outbuf,
-							const fpp_t _frames );
+			     const fpp_t _frames );
 
 	// resample given buffer from samplerate _src_sr to samplerate _dst_sr
 	void resample( const surroundSampleFrame * _src,
-					const fpp_t _frames,
-					surroundSampleFrame * _dst,
-					const sample_rate_t _src_sr,
-					const sample_rate_t _dst_sr );
+		       const fpp_t _frames,
+		       surroundSampleFrame * _dst,
+		       const sample_rate_t _src_sr,
+		       const sample_rate_t _dst_sr );
 
 	inline void setSampleRate( const sample_rate_t _new_sr )
 	{
 		m_sampleRate = _new_sr;
 	}
 
-	Mixer* mixer()
+	Mixer * mixer()
 	{
 		return m_mixer;
 	}
@@ -143,7 +143,7 @@ protected:
 private:
 	sample_rate_t m_sampleRate;
 	ch_cnt_t m_channels;
-	Mixer* m_mixer;
+	Mixer * m_mixer;
 	bool m_inProcess;
 
 	QMutex m_devMutex;

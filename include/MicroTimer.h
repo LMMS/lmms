@@ -57,7 +57,7 @@ public:
 		struct timeval now;
 		gettimeofday( &now, NULL );
 		return ( now.tv_sec - begin.tv_sec ) * 1000 * 1000 +
-					( now.tv_usec - begin.tv_usec );
+		       ( now.tv_usec - begin.tv_usec );
 	}
 
 

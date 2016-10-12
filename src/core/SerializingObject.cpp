@@ -47,11 +47,10 @@ SerializingObject::~SerializingObject()
 
 
 
-QDomElement SerializingObject::saveState( QDomDocument& doc, QDomElement& parent )
+QDomElement SerializingObject::saveState( QDomDocument & doc, QDomElement & parent )
 {
 	QDomElement element = doc.createElement( nodeName() );
 	parent.appendChild( element );
-
 	saveSettings( doc, element );
 
 	if( hook() )
@@ -65,7 +64,7 @@ QDomElement SerializingObject::saveState( QDomDocument& doc, QDomElement& parent
 
 
 
-void SerializingObject::restoreState( const QDomElement& element )
+void SerializingObject::restoreState( const QDomElement & element )
 {
 	loadSettings( element );
 
@@ -78,7 +77,7 @@ void SerializingObject::restoreState( const QDomElement& element )
 
 
 
-void SerializingObject::setHook( SerializingObjectHook* hook )
+void SerializingObject::setHook( SerializingObjectHook * hook )
 {
 	if( m_hook )
 	{
@@ -96,18 +95,18 @@ void SerializingObject::setHook( SerializingObjectHook* hook )
 
 
 
-void SerializingObject::saveSettings( QDomDocument& doc, QDomElement& element )
+void SerializingObject::saveSettings( QDomDocument & doc, QDomElement & element )
 {
-	Q_UNUSED(doc)
-	Q_UNUSED(element)
+	Q_UNUSED( doc )
+	Q_UNUSED( element )
 }
 
 
 
 
-void SerializingObject::loadSettings( const QDomElement& element )
+void SerializingObject::loadSettings( const QDomElement & element )
 {
-	Q_UNUSED(element)
+	Q_UNUSED( element )
 }
 
 

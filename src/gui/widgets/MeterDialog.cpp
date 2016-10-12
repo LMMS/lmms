@@ -42,15 +42,11 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
 	vlayout->setSpacing( 0 );
 	vlayout->setMargin( 0 );
-
 	QWidget * num = new QWidget( this );
 	QHBoxLayout * num_layout = new QHBoxLayout( num );
 	num_layout->setSpacing( 0 );
 	num_layout->setMargin( 0 );
-
-
 	m_numerator = new LcdSpinBox( 2, num, tr( "Meter Numerator" ) );
-
 	num_layout->addWidget( m_numerator );
 
 	if( !_simple )
@@ -61,15 +57,14 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 		num_layout->addSpacing( 5 );
 		num_layout->addWidget( num_label );
 	}
+
 	num_layout->addStretch();
-
-
 	QWidget * den = new QWidget( this );
 	QHBoxLayout * den_layout = new QHBoxLayout( den );
 	den_layout->setSpacing( 0 );
 	den_layout->setMargin( 0 );
-
 	m_denominator = new LcdSpinBox( 2, den, tr( "Meter Denominator" ) );
+
 	if( _simple )
 	{
 		m_denominator->setLabel( tr( "TIME SIG" ) );
@@ -80,15 +75,14 @@ MeterDialog::MeterDialog( QWidget * _parent, bool _simple ) :
 	if( !_simple )
 	{
 		QLabel * den_label = new QLabel( tr( "Meter Denominator" ),
-									den );
+						 den );
 		QFont f = den_label->font();
 		den_label->setFont( pointSize<7>( f ) );
 		den_layout->addSpacing( 5 );
 		den_layout->addWidget( den_label );
 	}
+
 	den_layout->addStretch();
-
-
 	vlayout->addSpacing( _simple ? 1 : 3 );
 	vlayout->addWidget( num );
 	vlayout->addSpacing( 2 );

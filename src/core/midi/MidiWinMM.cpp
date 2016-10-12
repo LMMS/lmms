@@ -54,13 +54,13 @@ MidiWinMM::~MidiWinMM()
 
 
 
-void MidiWinMM::processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port )
+void MidiWinMM::processOutEvent( const MidiEvent & event, const MidiTime & time, const MidiPort * port )
 {
 	const DWORD shortMsg = ( event.type() + event.channel() ) +
-				( ( event.param( 0 ) & 0xff ) << 8 ) +
-				( ( event.param( 1 ) & 0xff ) << 16 );
-
+			       ( ( event.param( 0 ) & 0xff ) << 8 ) +
+			       ( ( event.param( 1 ) & 0xff ) << 16 );
 	QStringList outDevs;
+
 	for( SubMap::ConstIterator it = m_outputSubs.begin(); it != m_outputSubs.end(); ++it )
 	{
 		for( MidiPortList::ConstIterator jt = it.value().begin(); jt != it.value().end(); ++jt )
@@ -85,7 +85,7 @@ void MidiWinMM::processOutEvent( const MidiEvent& event, const MidiTime& time, c
 
 
 
-void MidiWinMM::applyPortMode( MidiPort* port )
+void MidiWinMM::applyPortMode( MidiPort * port )
 {
 	// make sure no subscriptions exist which are not possible with
 	// current port-mode
@@ -109,7 +109,7 @@ void MidiWinMM::applyPortMode( MidiPort* port )
 
 
 
-void MidiWinMM::removePort( MidiPort* port )
+void MidiWinMM::removePort( MidiPort * port )
 {
 	for( SubMap::Iterator it = m_inputSubs.begin(); it != m_inputSubs.end(); ++it )
 	{
@@ -127,7 +127,7 @@ void MidiWinMM::removePort( MidiPort* port )
 
 
 
-QString MidiWinMM::sourcePortName( const MidiEvent& event ) const
+QString MidiWinMM::sourcePortName( const MidiEvent & event ) const
 {
 	if( event.sourcePort() )
 	{
@@ -140,7 +140,7 @@ QString MidiWinMM::sourcePortName( const MidiEvent& event ) const
 
 
 
-void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool subscribe )
+void MidiWinMM::subscribeReadablePort( MidiPort * port, const QString & dest, bool subscribe )
 {
 	if( subscribe && port->isInputEnabled() == false )
 	{
@@ -149,6 +149,7 @@ void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool
 	}
 
 	m_inputSubs[dest].removeAll( port );
+
 	if( subscribe )
 	{
 		m_inputSubs[dest].push_back( port );
@@ -158,7 +159,7 @@ void MidiWinMM::subscribeReadablePort( MidiPort* port, const QString& dest, bool
 
 
 
-void MidiWinMM::subscribeWritablePort( MidiPort* port, const QString& dest, bool subscribe )
+void MidiWinMM::subscribeWritablePort( MidiPort * port, const QString & dest, bool subscribe )
 {
 	if( subscribe && port->isOutputEnabled() == false )
 	{
@@ -167,6 +168,7 @@ void MidiWinMM::subscribeWritablePort( MidiPort* port, const QString& dest, bool
 	}
 
 	m_outputSubs[dest].removeAll( port );
+
 	if( subscribe )
 	{
 		m_outputSubs[dest].push_back( port );
@@ -180,7 +182,7 @@ void WINAPI CALLBACK MidiWinMM::inputCallback( HMIDIIN hm, UINT msg, DWORD_PTR i
 {
 	if( msg == MIM_DATA )
 	{
-		( (MidiWinMM *) inst )->handleInputEvent( hm, param1 );
+		( ( MidiWinMM * ) inst )->handleInputEvent( hm, param1 );
 	}
 }
 
@@ -190,22 +192,25 @@ void WINAPI CALLBACK MidiWinMM::inputCallback( HMIDIIN hm, UINT msg, DWORD_PTR i
 void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 {
 	const int cmd = ev & 0xff;
+
 	if( cmd == MidiActiveSensing )
 	{
 		return;
 	}
+
 	const int par1 = ( ev >> 8 ) & 0xff;
 	const int par2 = ev >> 16;
 	const MidiEventTypes cmdtype = static_cast<MidiEventTypes>( cmd & 0xf0 );
 	const int chan = cmd & 0x0f;
-
 	const QString d = m_inputDevices.value( hm );
+
 	if( d.isEmpty() || !m_inputSubs.contains( d ) )
 	{
 		return;
 	}
 
 	const MidiPortList & l = m_inputSubs[d];
+
 	for( MidiPortList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
 		switch( cmdtype )
@@ -223,7 +228,7 @@ void MidiWinMM::handleInputEvent( HMIDIIN hm, DWORD ev )
 				break;
 
 			case MidiPitchBend:
-				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 + par2*128, 0, &hm ) );
+				( *it )->processInEvent( MidiEvent( cmdtype, chan, par1 + par2 * 128, 0, &hm ) );
 				break;
 
 			default:
@@ -240,7 +245,6 @@ void MidiWinMM::updateDeviceList()
 {
 	closeDevices();
 	openDevices();
-
 	emit readablePortsChanged();
 	emit writablePortsChanged();
 }
@@ -251,14 +255,15 @@ void MidiWinMM::closeDevices()
 {
 	m_inputSubs.clear();
 	m_outputSubs.clear();
-
 	QMapIterator<HMIDIIN, QString> i( m_inputDevices );
+
 	while( i.hasNext() )
 	{
 		midiInClose( i.next().key() );
 	}
 
 	QMapIterator<HMIDIOUT, QString> o( m_outputDevices );
+
 	while( o.hasNext() )
 	{
 		midiOutClose( o.next().key() );
@@ -274,14 +279,16 @@ void MidiWinMM::closeDevices()
 void MidiWinMM::openDevices()
 {
 	m_inputDevices.clear();
+
 	for( unsigned int i = 0; i < midiInGetNumDevs(); ++i )
 	{
 		MIDIINCAPS c;
 		midiInGetDevCaps( i, &c, sizeof( c ) );
 		HMIDIIN hm = 0;
-		MMRESULT res = midiInOpen( &hm, i, (DWORD_PTR) &inputCallback,
-						(DWORD_PTR) this,
-							CALLBACK_FUNCTION );
+		MMRESULT res = midiInOpen( &hm, i, ( DWORD_PTR ) &inputCallback,
+					   ( DWORD_PTR ) this,
+					   CALLBACK_FUNCTION );
+
 		if( res == MMSYSERR_NOERROR )
 		{
 			m_inputDevices[hm] = qstrdup( c.szPname );
@@ -290,12 +297,14 @@ void MidiWinMM::openDevices()
 	}
 
 	m_outputDevices.clear();
+
 	for( unsigned int i = 0; i < midiOutGetNumDevs(); ++i )
 	{
 		MIDIOUTCAPS c;
 		midiOutGetDevCaps( i, &c, sizeof( c ) );
 		HMIDIOUT hm = 0;
 		MMRESULT res = midiOutOpen( &hm, i, 0, 0, CALLBACK_NULL );
+
 		if( res == MMSYSERR_NOERROR )
 		{
 			m_outputDevices[hm] = qstrdup( c.szPname );

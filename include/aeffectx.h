@@ -27,9 +27,9 @@
 #define AEFFECTX_H
 
 #define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
-				( ( (int) b ) << 16 ) |		\
-				( ( (int) c ) << 8 ) |		\
-				( ( (int) d ) << 0 ) )
+			    ( ( (int) b ) << 16 ) |		\
+			    ( ( (int) c ) << 8 ) |		\
+			    ( ( (int) d ) << 0 ) )
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -188,9 +188,9 @@ public:
 	// 00
 	int numEvents;
 	// 04
-	void *reserved;
+	void * reserved;
 	// 08
-	VstEvent* events[1];
+	VstEvent * events[1];
 
 } ;
 
@@ -202,13 +202,13 @@ public:
 	// 00-03
 	int magic;
 	// dispatcher 04-07
-	intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
+	intptr_t ( * dispatcher )( AEffect *, int , int , intptr_t, void *, float );
 	// process, quite sure 08-0b
-	void (* process)( AEffect * , float * * , float * * , int );
+	void ( * process )( AEffect *, float **, float **, int );
 	// setParameter 0c-0f
-	void (* setParameter)( AEffect * , int , float );
+	void ( * setParameter )( AEffect *, int , float );
 	// getParameter 10-13
-	float (* getParameter)( AEffect * , int );
+	float ( * getParameter )( AEffect *, int );
 	// programs 14-17
 	int numPrograms;
 	// Params 18-1b
@@ -220,22 +220,22 @@ public:
 	// flags 24-27
 	int flags;
 	// Fill somewhere 28-2b
-	void *ptr1;
-	void *ptr2;
+	void * ptr1;
+	void * ptr2;
 	// Zeroes 2c-2f 30-33 34-37 38-3b
 	char empty3[4 + 4 + 4];
 	// 1.0f 3c-3f
 	float unknown_float;
 	// An object? pointer 40-43
-	void *ptr3;
+	void * ptr3;
 	// Zeroes 44-47
-	void *user;
+	void * user;
 	// Id 48-4b
 	int32_t uniqueID;
 	// Don't know 4c-4f
 	char unknown1[4];
 	// processReplacing 50-53
-	void (* processReplacing)( AEffect * , float * * , float * * , int );
+	void ( * processReplacing )( AEffect *, float **, float **, int );
 
 } ;
 
@@ -278,7 +278,7 @@ public:
 
 
 
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
+typedef intptr_t ( * audioMasterCallback )( AEffect *, int32_t, int32_t, intptr_t, void *, float );
 
 
 #endif

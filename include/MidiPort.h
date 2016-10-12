@@ -45,17 +45,17 @@ class MidiPortMenu;
 class MidiPort : public Model, public SerializingObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,inputChannel,setInputChannel,m_inputChannelModel);
-	mapPropertyFromModel(int,outputChannel,setOutputChannel,m_outputChannelModel);
-	mapPropertyFromModel(int,inputController,setInputController,m_inputControllerModel);
-	mapPropertyFromModel(int,outputController,setOutputController,m_outputControllerModel);
-	mapPropertyFromModel(int,fixedInputVelocity,setFixedInputVelocity,m_fixedInputVelocityModel);
-	mapPropertyFromModel(int,fixedOutputVelocity,setFixedOutputVelocity,m_fixedOutputVelocityModel);
-	mapPropertyFromModel(int,fixedOutputNote,setFixedOutputNote,m_fixedOutputNoteModel);
-	mapPropertyFromModel(int,outputProgram,setOutputProgram,m_outputProgramModel);
-	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
-	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
-	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
+	mapPropertyFromModel( int, inputChannel, setInputChannel, m_inputChannelModel );
+	mapPropertyFromModel( int, outputChannel, setOutputChannel, m_outputChannelModel );
+	mapPropertyFromModel( int, inputController, setInputController, m_inputControllerModel );
+	mapPropertyFromModel( int, outputController, setOutputController, m_outputControllerModel );
+	mapPropertyFromModel( int, fixedInputVelocity, setFixedInputVelocity, m_fixedInputVelocityModel );
+	mapPropertyFromModel( int, fixedOutputVelocity, setFixedOutputVelocity, m_fixedOutputVelocityModel );
+	mapPropertyFromModel( int, fixedOutputNote, setFixedOutputNote, m_fixedOutputNoteModel );
+	mapPropertyFromModel( int, outputProgram, setOutputProgram, m_outputProgramModel );
+	mapPropertyFromModel( int, baseVelocity, setBaseVelocity, m_baseVelocityModel );
+	mapPropertyFromModel( bool, isReadable, setReadable, m_readableModel );
+	mapPropertyFromModel( bool, isWritable, setWritable, m_writableModel );
 public:
 	typedef QMap<QString, bool> Map;
 
@@ -68,14 +68,14 @@ public:
 	} ;
 	typedef Modes Mode;
 
-	MidiPort( const QString& name,
-			MidiClient* client,
-			MidiEventProcessor* eventProcessor,
-			Model* parent = NULL,
-			Mode mode = Disabled );
+	MidiPort( const QString & name,
+		  MidiClient * client,
+		  MidiEventProcessor * eventProcessor,
+		  Model * parent = NULL,
+		  Mode mode = Disabled );
 	virtual ~MidiPort();
 
-	void setName( const QString& name );
+	void setName( const QString & name );
 
 	Mode mode() const
 	{
@@ -99,33 +99,33 @@ public:
 		return outputChannel() - 1;
 	}
 
-	void processInEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
-	void processOutEvent( const MidiEvent& event, const MidiTime& time = MidiTime() );
+	void processInEvent( const MidiEvent & event, const MidiTime & time = MidiTime() );
+	void processOutEvent( const MidiEvent & event, const MidiTime & time = MidiTime() );
 
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& thisElement );
-	virtual void loadSettings( const QDomElement& thisElement );
+	virtual void saveSettings( QDomDocument & doc, QDomElement & thisElement );
+	virtual void loadSettings( const QDomElement & thisElement );
 
 	virtual QString nodeName() const
 	{
 		return "midiport";
 	}
 
-	void subscribeReadablePort( const QString& port, bool subscribe = true );
-	void subscribeWritablePort( const QString& port, bool subscribe = true );
+	void subscribeReadablePort( const QString & port, bool subscribe = true );
+	void subscribeWritablePort( const QString & port, bool subscribe = true );
 
-	const Map& readablePorts() const
+	const Map & readablePorts() const
 	{
 		return m_readablePorts;
 	}
 
-	const Map& writablePorts() const
+	const Map & writablePorts() const
 	{
 		return m_writablePorts;
 	}
 
-	MidiPortMenu* m_readablePortsMenu;
-	MidiPortMenu* m_writablePortsMenu;
+	MidiPortMenu * m_readablePortsMenu;
+	MidiPortMenu * m_writablePortsMenu;
 
 
 public slots:
@@ -139,8 +139,8 @@ private slots:
 
 
 private:
-	MidiClient* m_midiClient;
-	MidiEventProcessor* m_midiEventProcessor;
+	MidiClient * m_midiClient;
+	MidiEventProcessor * m_midiEventProcessor;
 
 	Mode m_mode;
 

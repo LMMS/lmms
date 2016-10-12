@@ -83,7 +83,7 @@ class DummyEffect : public Effect
 {
 	Q_OBJECT
 public:
-	DummyEffect( Model * _parent, const QDomElement& originalPluginData ) :
+	DummyEffect( Model * _parent, const QDomElement & originalPluginData ) :
 		Effect( NULL, _parent, NULL ),
 		m_controls( this ),
 		m_originalPluginData( originalPluginData )
@@ -105,7 +105,7 @@ public:
 		return false;
 	}
 
-	const QDomElement& originalPluginData() const
+	const QDomElement & originalPluginData() const
 	{
 		return m_originalPluginData;
 	}
@@ -115,26 +115,27 @@ public:
 private:
 	DummyEffectControls m_controls;
 	const QDomElement m_originalPluginData;
-	
+
 	// Parse the display name from the dom
 	virtual void setName()
 	{
 		QDomNodeList keys = originalPluginData().elementsByTagName( "key" );
+
 		for( int i = 0; !keys.item( i ).isNull(); ++i )
 		{
 			QDomNodeList attributes = keys.item( i ).toElement().elementsByTagName( "attribute" );
+
 			for( int j = 0; !attributes.item( j ).isNull(); ++j )
 			{
 				QDomElement attribute = attributes.item( j ).toElement();
+
 				if( attribute.hasAttribute( "value" ) )
 				{
-					QString name = tr("NOT FOUND") + " (" + attribute.attribute( "value" ) + ")";
-					setDisplayName(name);
+					QString name = tr( "NOT FOUND" ) + " (" + attribute.attribute( "value" ) + ")";
+					setDisplayName( name );
 					return;
 				}
-
 			}
-
 		}
 	}
 } ;

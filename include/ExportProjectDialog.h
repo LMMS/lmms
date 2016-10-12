@@ -60,7 +60,7 @@ private:
 	bool m_multiExport;
 
 	ProjectRenderer::ExportFileFormats m_ft;
-	RenderManager* m_renderManager;
+	RenderManager * m_renderManager;
 } ;
 
 #endif

@@ -90,7 +90,7 @@ private:
 
 	LedCheckBox * m_x100Cb;
 	LedCheckBox * m_controlEnvAmountCb;
-	
+
 	float m_randomGraph;
 } ;
 

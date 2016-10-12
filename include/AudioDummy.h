@@ -34,7 +34,7 @@
 class AudioDummy : public AudioDevice, public QThread
 {
 public:
-	AudioDummy( bool & _success_ful, Mixer* mixer ) :
+	AudioDummy( bool & _success_ful, Mixer * mixer ) :
 		AudioDevice( DEFAULT_CHANNELS, mixer )
 	{
 		_success_ful = true;
@@ -90,20 +90,24 @@ private:
 	virtual void run()
 	{
 		MicroTimer timer;
+
 		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame* b = mixer()->nextBuffer();
+			const surroundSampleFrame * b = mixer()->nextBuffer();
+
 			if( !b )
 			{
 				break;
 			}
+
 			if( mixer()->hasFifoWriter() )
 			{
 				delete[] b;
 			}
 
 			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
+
 			if( microseconds > 0 )
 			{
 				usleep( microseconds );

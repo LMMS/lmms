@@ -55,7 +55,7 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 		// update job state
 		_job->queue();
 		// actually queue the job via atomic operations
-		m_items[m_queueSize.fetchAndAddOrdered(1)] = _job;
+		m_items[m_queueSize.fetchAndAddOrdered( 1 )] = _job;
 	}
 }
 
@@ -64,12 +64,15 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 void MixerWorkerThread::JobQueue::run()
 {
 	bool processedJob = true;
-	while( processedJob && (int) m_itemsDone < (int) m_queueSize )
+
+	while( processedJob && ( int ) m_itemsDone < ( int ) m_queueSize )
 	{
 		processedJob = false;
+
 		for( int i = 0; i < m_queueSize; ++i )
 		{
 			ThreadableJob * job = m_items[i].fetchAndStoreOrdered( NULL );
+
 			if( job )
 			{
 				job->process();
@@ -77,6 +80,7 @@ void MixerWorkerThread::JobQueue::run()
 				m_itemsDone.fetchAndAddOrdered( 1 );
 			}
 		}
+
 		// always exit loop if we're not in dynamic mode
 		processedJob = processedJob && ( m_opMode == Dynamic );
 	}
@@ -87,7 +91,7 @@ void MixerWorkerThread::JobQueue::run()
 
 void MixerWorkerThread::JobQueue::wait()
 {
-	while( (int) m_itemsDone < (int) m_queueSize )
+	while( ( int ) m_itemsDone < ( int ) m_queueSize )
 	{
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 		asm( "pause" );
@@ -101,7 +105,7 @@ void MixerWorkerThread::JobQueue::wait()
 
 // implementation of worker threads
 
-MixerWorkerThread::MixerWorkerThread( Mixer* mixer ) :
+MixerWorkerThread::MixerWorkerThread( Mixer * mixer ) :
 	QThread( mixer ),
 	m_quit( false )
 {
@@ -115,7 +119,6 @@ MixerWorkerThread::MixerWorkerThread( Mixer* mixer ) :
 	// processing the last worker thread "inline", see comments in
 	// MixerWorkerThread::startAndWaitForJobs() for details
 	workerThreads << this;
-
 	resetJobQueue();
 }
 
@@ -155,8 +158,8 @@ void MixerWorkerThread::startAndWaitForJobs()
 void MixerWorkerThread::run()
 {
 	disable_denormals();
-
 	QMutex m;
+
 	while( m_quit == false )
 	{
 		m.lock();

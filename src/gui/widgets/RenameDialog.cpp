@@ -2,7 +2,7 @@
  * RenameDialog.cpp - implementation of dialog for renaming something
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -35,16 +35,16 @@ RenameDialog::RenameDialog( QString & _string ) :
 	m_stringToEdit( _string ),
 	m_originalString( _string )
 {
-	setWindowTitle( tr("Rename...") );
+	setWindowTitle( tr( "Rename..." ) );
 	setFixedHeight( 30 );
 	m_stringLE = new QLineEdit( this );
 	m_stringLE->setText( _string );
 	m_stringLE->setGeometry ( 10, 5, 220, 20 );
 	m_stringLE->selectAll();
 	connect( m_stringLE, SIGNAL( textChanged( const QString & ) ), this,
-				SLOT( textChanged( const QString & ) ) );
+		 SLOT( textChanged( const QString & ) ) );
 	connect( m_stringLE, SIGNAL( returnPressed() ), this,
-							SLOT( accept() ) );
+		 SLOT( accept() ) );
 }
 
 
@@ -57,8 +57,9 @@ RenameDialog::~RenameDialog()
 
 
 
-void RenameDialog::resizeEvent (QResizeEvent * event) {
-	m_stringLE->setGeometry ( 10, 5, width() - 20, 20 );	
+void RenameDialog::resizeEvent ( QResizeEvent * event )
+{
+	m_stringLE->setGeometry ( 10, 5, width() - 20, 20 );
 }
 
 

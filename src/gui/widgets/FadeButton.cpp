@@ -2,7 +2,7 @@
  * FadeButton.cpp - implementation of fade-button
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QTimer>
 #include <QApplication>
@@ -83,32 +83,32 @@ void FadeButton::customEvent( QEvent * )
 void FadeButton::paintEvent( QPaintEvent * _pe )
 {
 	QColor col = m_normalColor;
+
 	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
 	{
 		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
-		const int r = (int)( m_normalColor.red() *
-					( 1.0f - state ) +
-			m_activatedColor.red() * state );
-		const int g = (int)( m_normalColor.green() *
-					( 1.0f - state ) +
-			m_activatedColor.green() * state );
-		const int b = (int)( m_normalColor.blue() *
-					( 1.0f - state ) +
-			m_activatedColor.blue() * state );
+		const int r = ( int )( m_normalColor.red() *
+				       ( 1.0f - state ) +
+				       m_activatedColor.red() * state );
+		const int g = ( int )( m_normalColor.green() *
+				       ( 1.0f - state ) +
+				       m_activatedColor.green() * state );
+		const int b = ( int )( m_normalColor.blue() *
+				       ( 1.0f - state ) +
+				       m_activatedColor.blue() * state );
 		col.setRgb( r, g, b );
 		QTimer::singleShot( 20, this, SLOT( update() ) );
 	}
 
 	QPainter p( this );
 	p.fillRect( rect(), col );
-
 	int w = rect().right();
 	int h = rect().bottom();
-	p.setPen( m_normalColor.darker(130) );
+	p.setPen( m_normalColor.darker( 130 ) );
 	p.drawLine( w, 1, w, h );
 	p.drawLine( 1, h, w, h );
-	p.setPen( m_normalColor.lighter(130) );
-	p.drawLine( 0, 0, 0, h-1 );
+	p.setPen( m_normalColor.lighter( 130 ) );
+	p.drawLine( 0, 0, 0, h - 1 );
 	p.drawLine( 0, 0, w, 0 );
 }
 

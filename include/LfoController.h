@@ -2,7 +2,7 @@
  * LfoController.h - A LFO-based controller and dialog
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ class TempoSyncKnob;
 class PixmapButton;
 
 
-class LfoController : public Controller 
+class LfoController : public Controller
 {
 	Q_OBJECT
 public:
@@ -73,7 +73,7 @@ protected:
 	float m_phaseOffset;
 	float m_currentPhase;
 
-	sample_t (*m_sampleFunction)( const float );
+	sample_t ( *m_sampleFunction )( const float );
 
 private:
 	SampleBuffer * m_userDefSampleBuffer;

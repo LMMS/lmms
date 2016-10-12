@@ -27,118 +27,129 @@
 
 #include "ProjectVersion.h"
 
-int parseMajor(QString & version) {
+int parseMajor( QString & version )
+{
 	return version.section( '.', 0, 0 ).toInt();
 }
 
 
 
 
-int parseMinor(QString & version) {
+int parseMinor( QString & version )
+{
 	return version.section( '.', 1, 1 ).toInt();
 }
 
 
 
 
-int parseRelease(QString & version) {
+int parseRelease( QString & version )
+{
 	return version.section( '.', 2, 2 ).section( '-', 0, 0 ).toInt();
 }
 
 
 
 
-QString parseStage(QString & version) {
+QString parseStage( QString & version )
+{
 	return version.section( '.', 2, 2 ).section( '-', 1 );
 }
 
 
 
 
-int parseBuild(QString & version) {
+int parseBuild( QString & version )
+{
 	return version.section( '.', 3 ).toInt();
 }
 
 
 
 
-ProjectVersion::ProjectVersion(QString version, CompareType c) :
-	m_version(version),
-	m_major(parseMajor(m_version)),
-	m_minor(parseMinor(m_version)),
-	m_release(parseRelease(m_version)),
-	m_stage(parseStage(m_version)),
-	m_build(parseBuild(m_version)),
-	m_compareType(c)
+ProjectVersion::ProjectVersion( QString version, CompareType c ) :
+	m_version( version ),
+	m_major( parseMajor( m_version ) ),
+	m_minor( parseMinor( m_version ) ),
+	m_release( parseRelease( m_version ) ),
+	m_stage( parseStage( m_version ) ),
+	m_build( parseBuild( m_version ) ),
+	m_compareType( c )
 {
 }
 
 
 
 
-ProjectVersion::ProjectVersion(const char* version, CompareType c) :
-	m_version(QString(version)),
-	m_major(parseMajor(m_version)),
-	m_minor(parseMinor(m_version)),
-	m_release(parseRelease(m_version)),
-	m_stage(parseStage(m_version)),
-	m_build(parseBuild(m_version)),
-	m_compareType(c)
+ProjectVersion::ProjectVersion( const char * version, CompareType c ) :
+	m_version( QString( version ) ),
+	m_major( parseMajor( m_version ) ),
+	m_minor( parseMinor( m_version ) ),
+	m_release( parseRelease( m_version ) ),
+	m_stage( parseStage( m_version ) ),
+	m_build( parseBuild( m_version ) ),
+	m_compareType( c )
 {
 }
 
 
 
 
-int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, CompareType c)
+int ProjectVersion::compare( const ProjectVersion & a, const ProjectVersion & b, CompareType c )
 {
-	if(a.getMajor() != b.getMajor())
+	if( a.getMajor() != b.getMajor() )
 	{
 		return a.getMajor() - b.getMajor();
 	}
-	if(c == Major)
+
+	if( c == Major )
 	{
 		return 0;
 	}
 
-	if(a.getMinor() != b.getMinor())
+	if( a.getMinor() != b.getMinor() )
 	{
 		return a.getMinor() - b.getMinor();
 	}
-	if(c == Minor)
+
+	if( c == Minor )
 	{
 		return 0;
 	}
 
-	if(a.getRelease() != b.getRelease())
+	if( a.getRelease() != b.getRelease() )
 	{
 		return a.getRelease() - b.getRelease();
 	}
-	if(c == Release)
+
+	if( c == Release )
 	{
 		return 0;
 	}
 
-	if(!(a.getStage().isEmpty() && b.getStage().isEmpty()))
+	if( !( a.getStage().isEmpty() && b.getStage().isEmpty() ) )
 	{
 		// make sure 0.x.y > 0.x.y-alpha
-		if(a.getStage().isEmpty())
+		if( a.getStage().isEmpty() )
 		{
 			return 1;
 		}
-		if(b.getStage().isEmpty())
+
+		if( b.getStage().isEmpty() )
 		{
 			return -1;
 		}
 
 		// 0.x.y-beta > 0.x.y-alpha
-		int cmp = QString::compare(a.getStage(), b.getStage());
-		if(cmp)
+		int cmp = QString::compare( a.getStage(), b.getStage() );
+
+		if( cmp )
 		{
 			return cmp;
 		}
 	}
-	if(c == Stage)
+
+	if( c == Stage )
 	{
 		return 0;
 	}
@@ -149,9 +160,9 @@ int ProjectVersion::compare(const ProjectVersion & a, const ProjectVersion & b, 
 
 
 
-int ProjectVersion::compare(ProjectVersion v1, ProjectVersion v2)
+int ProjectVersion::compare( ProjectVersion v1, ProjectVersion v2 )
 {
-	return compare(v1, v2, std::min(v1.getCompareType(), v2.getCompareType()));
+	return compare( v1, v2, std::min( v1.getCompareType(), v2.getCompareType() ) );
 }
 
 

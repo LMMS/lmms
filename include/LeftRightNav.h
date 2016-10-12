@@ -33,10 +33,10 @@ class LeftRightNav : public QWidget
 {
 	Q_OBJECT
 public:
-	LeftRightNav(QWidget *parent=NULL);
-	PixmapButton* getLeftBtn();
-	PixmapButton* getRightBtn();
-	void setShortcuts(const QKeySequence &leftShortcut=Qt::Key_Minus, const QKeySequence &rightShortcut=Qt::Key_Plus);
+	LeftRightNav( QWidget * parent = NULL );
+	PixmapButton * getLeftBtn();
+	PixmapButton * getRightBtn();
+	void setShortcuts( const QKeySequence & leftShortcut = Qt::Key_Minus, const QKeySequence & rightShortcut = Qt::Key_Plus );
 signals:
 	void onNavLeft();
 	void onNavRight();

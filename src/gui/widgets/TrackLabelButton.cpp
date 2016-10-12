@@ -3,7 +3,7 @@
  *                          which is renamable by double-clicking it
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -85,6 +85,7 @@ void TrackLabelButton::rename()
 		QString txt = m_trackView->getTrack()->name();
 		RenameDialog rename_dlg( txt );
 		rename_dlg.exec();
+
 		if( txt != text() )
 		{
 			m_trackView->getTrack()->setName( txt );
@@ -109,6 +110,7 @@ void TrackLabelButton::renameFinished()
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
+
 		if( m_renameLineEdit->text() != text() )
 		{
 			setText( m_renameLineEdit->text() );
@@ -168,9 +170,10 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 		InstrumentTrack * it =
 			dynamic_cast<InstrumentTrack *>( m_trackView->getTrack() );
 		const PixmapLoader * pl;
+
 		if( it && it->instrument() &&
-			it->instrument()->descriptor() &&
-			( pl = it->instrument()->descriptor()->logo ) )
+				it->instrument()->descriptor() &&
+				( pl = it->instrument()->descriptor()->logo ) )
 		{
 			if( pl->pixmapName() != m_iconName )
 			{
@@ -179,6 +182,7 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 			}
 		}
 	}
+
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		setText( " " );
@@ -188,5 +192,6 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 	{
 		setText( m_trackView->getTrack()->displayName() );
 	}
+
 	QToolButton::paintEvent( _pe );
 }

@@ -2,7 +2,7 @@
  * FxMixerView.h - effect-mixer-view for LMMS
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -42,14 +42,14 @@ class QButtonGroup;
 class FxLine;
 
 class EXPORT FxMixerView : public QWidget, public ModelView,
-					public SerializingObjectHook
+	public SerializingObjectHook
 {
 	Q_OBJECT
 public:
 	class FxChannelView
 	{
 	public:
-		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+		FxChannelView( QWidget * _parent, FxMixerView * _mv, int _chIndex );
 
 		void setChannelIndex( int index );
 
@@ -64,7 +64,7 @@ public:
 	FxMixerView();
 	virtual ~FxMixerView();
 
-	virtual void keyPressEvent(QKeyEvent * e);
+	virtual void keyPressEvent( QKeyEvent * e );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
@@ -74,7 +74,7 @@ public:
 		return m_currentFxLine;
 	}
 
-	inline FxChannelView * channelView(int index)
+	inline FxChannelView * channelView( int index )
 	{
 		return m_fxChannelViews[index];
 	}
@@ -87,18 +87,18 @@ public:
 
 
 	// display the send button and knob correctly
-	void updateFxLine(int index);
+	void updateFxLine( int index );
 
 	// notify the view that an fx channel was deleted
-	void deleteChannel(int index);
+	void deleteChannel( int index );
 
 	// delete all unused channels
 	void deleteUnusedChannels();
 
 	// move the channel to the left or right
-	void moveChannelLeft(int index);
-	void moveChannelLeft(int index, int focusIndex);
-	void moveChannelRight(int index);
+	void moveChannelLeft( int index );
+	void moveChannelLeft( int index, int focusIndex );
+	void moveChannelRight( int index );
 
 	// make sure the display syncs up with the fx mixer.
 	// useful for loading projects
@@ -109,7 +109,7 @@ public slots:
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
-	
+
 private slots:
 	void updateFaders();
 	void toggledSolo();
@@ -127,7 +127,7 @@ private:
 	QWidget * m_racksWidget;
 
 	void updateMaxChannelSelector();
-	
+
 	friend class FxChannelView;
 } ;
 

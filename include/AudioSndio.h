@@ -45,7 +45,7 @@ private:
 	virtual void applyQualitySettings( void );
 	virtual void run( void );
 
-	struct sio_hdl *m_hdl;
+	struct sio_hdl * m_hdl;
 	struct sio_par m_par;
 } ;
 

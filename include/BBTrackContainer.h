@@ -33,13 +33,13 @@
 class EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
-	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);
+	mapPropertyFromModel( int, currentBB, setCurrentBB, m_bbComboBoxModel );
 public:
 	BBTrackContainer();
 	virtual ~BBTrackContainer();
 
 	virtual bool play( MidiTime _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
+			   const f_cnt_t _frame_base, int _tco_num = -1 );
 
 	virtual void updateAfterTrackAdd();
 

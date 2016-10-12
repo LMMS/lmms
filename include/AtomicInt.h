@@ -19,11 +19,13 @@ public:
 	int fetchAndAndOrdered( int valueToAnd )
 	{
 		int value;
+
 		do
 		{
-			value = (int)*this;
+			value = ( int ) * this;
 		}
 		while( !testAndSetOrdered( value, value & valueToAnd ) );
+
 		return value;
 	}
 

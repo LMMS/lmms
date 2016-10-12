@@ -38,7 +38,7 @@ class SampleBuffer;
 class SampleTCO : public TrackContentObject
 {
 	Q_OBJECT
-	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
+	mapPropertyFromModel( bool, isRecord, setRecord, m_recordModel );
 public:
 	SampleTCO( Track * _track );
 	virtual ~SampleTCO();
@@ -53,7 +53,7 @@ public:
 		return "sampletco";
 	}
 
-	SampleBuffer* sampleBuffer()
+	SampleBuffer * sampleBuffer()
 	{
 		return m_sampleBuffer;
 	}
@@ -64,14 +64,14 @@ public:
 
 
 public slots:
-	void setSampleBuffer( SampleBuffer* sb );
+	void setSampleBuffer( SampleBuffer * sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
 	void toggleRecord();
 
 
 private:
-	SampleBuffer* m_sampleBuffer;
+	SampleBuffer * m_sampleBuffer;
 	BoolModel m_recordModel;
 
 
@@ -120,17 +120,17 @@ class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
-	SampleTrack( TrackContainer* tc );
+	SampleTrack( TrackContainer * tc );
 	virtual ~SampleTrack();
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
-						const f_cnt_t _frame_base, int _tco_num = -1 );
-	virtual TrackView * createView( TrackContainerView* tcv );
+			   const f_cnt_t _frame_base, int _tco_num = -1 );
+	virtual TrackView * createView( TrackContainerView * tcv );
 	virtual TrackContentObject * createTCO( const MidiTime & _pos );
 
 
 	virtual void saveTrackSpecificSettings( QDomDocument & _doc,
-							QDomElement & _parent );
+						QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
 	inline AudioPort * audioPort()
@@ -161,7 +161,7 @@ class SampleTrackView : public TrackView
 {
 	Q_OBJECT
 public:
-	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
+	SampleTrackView( SampleTrack * Track, TrackContainerView * tcv );
 	virtual ~SampleTrackView();
 
 

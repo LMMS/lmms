@@ -57,8 +57,8 @@ public:
 		MelodyPattern
 	} ;
 
-	Pattern( InstrumentTrack* instrumentTrack );
-	Pattern( const Pattern& other );
+	Pattern( InstrumentTrack * instrumentTrack );
+	Pattern( const Pattern & other );
 	virtual ~Pattern();
 
 	void init();
@@ -144,14 +144,14 @@ private:
 	NoteVector m_notes;
 	int m_steps;
 
-	Pattern * adjacentPatternByOffset(int offset) const;
+	Pattern * adjacentPatternByOffset( int offset ) const;
 
 	friend class PatternView;
 	friend class BBTrackContainerView;
 
 
 signals:
-	void destroyedPattern( Pattern* );
+	void destroyedPattern( Pattern * );
 
 } ;
 
@@ -162,7 +162,7 @@ class PatternView : public TrackContentObjectView
 	Q_OBJECT
 
 public:
-	PatternView( Pattern* pattern, TrackView* parent );
+	PatternView( Pattern * pattern, TrackView * parent );
 	virtual ~PatternView();
 
 
@@ -191,9 +191,9 @@ private:
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
-	Pattern* m_pat;
+	Pattern * m_pat;
 	QPixmap m_paintPixmap;
-	
+
 	QStaticText m_staticTextName;
 } ;
 

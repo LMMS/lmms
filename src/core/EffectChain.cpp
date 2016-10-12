@@ -57,9 +57,9 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "enabled", m_enabledModel.value() );
 	_this.setAttribute( "numofeffects", m_effects.count() );
 
-	for( Effect* effect : m_effects)
+	for( Effect * effect : m_effects )
 	{
-		if( DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect) )
+		if( DummyEffect * dummy = dynamic_cast<DummyEffect *>( effect ) )
 		{
 			_this.appendChild( dummy->originalPluginData() );
 		}
@@ -78,25 +78,20 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void EffectChain::loadSettings( const QDomElement & _this )
 {
 	clear();
-
 	// TODO This method should probably also lock the mixer
-
 	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
-
 	const int plugin_cnt = _this.attribute( "numofeffects" ).toInt();
-
 	QDomNode node = _this.firstChild();
 	int fx_loaded = 0;
+
 	while( !node.isNull() && fx_loaded < plugin_cnt )
 	{
 		if( node.isElement() && node.nodeName() == "effect" )
 		{
 			QDomElement effectData = node.toElement();
-
 			const QString name = effectData.attribute( "name" );
 			EffectKey key( effectData.elementsByTagName( "key" ).item( 0 ).toElement() );
-
-			Effect* e = Effect::instantiate( name.toUtf8(), this, &key );
+			Effect * e = Effect::instantiate( name.toUtf8(), this, &key );
 
 			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
 			{
@@ -111,6 +106,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 			m_effects.push_back( e );
 			++fx_loaded;
 		}
+
 		node = node.nextSibling();
 	}
 
@@ -125,7 +121,6 @@ void EffectChain::appendEffect( Effect * _effect )
 	Engine::mixer()->requestChangeInModel();
 	m_effects.append( _effect );
 	Engine::mixer()->doneChangeInModel();
-
 	emit dataChanged();
 }
 
@@ -135,15 +130,15 @@ void EffectChain::appendEffect( Effect * _effect )
 void EffectChain::removeEffect( Effect * _effect )
 {
 	Engine::mixer()->requestChangeInModel();
-
 	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
+
 	if( found == m_effects.end() )
 	{
 		Engine::mixer()->doneChangeInModel();
 		return;
 	}
-	m_effects.erase( found );
 
+	m_effects.erase( found );
 	Engine::mixer()->doneChangeInModel();
 	emit dataChanged();
 }
@@ -156,8 +151,9 @@ void EffectChain::moveDown( Effect * _effect )
 	if( _effect != m_effects.last() )
 	{
 		int i = 0;
+
 		for( EffectList::Iterator it = m_effects.begin();
-					it != m_effects.end(); it++, i++ )
+				it != m_effects.end(); it++, i++ )
 		{
 			if( *it == _effect )
 			{
@@ -179,8 +175,9 @@ void EffectChain::moveUp( Effect * _effect )
 	if( _effect != m_effects.first() )
 	{
 		int i = 0;
+
 		for( EffectList::Iterator it = m_effects.begin();
-					it != m_effects.end(); it++, i++ )
+				it != m_effects.end(); it++, i++ )
 		{
 			if( *it == _effect )
 			{
@@ -203,18 +200,22 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	{
 		return false;
 	}
+
 	const bool exporting = Engine::getSong()->isExporting();
+
 	if( exporting ) // strip infs/nans if exporting
 	{
 		MixHelpers::sanitize( _buf, _frames );
 	}
 
 	bool moreEffects = false;
+
 	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
 	{
 		if( hasInputNoise || ( *it )->isRunning() )
 		{
 			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
+
 			if( exporting ) // strip infs/nans if exporting
 			{
 				MixHelpers::sanitize( _buf, _frames );
@@ -236,7 +237,7 @@ void EffectChain::startRunning()
 	}
 
 	for( EffectList::Iterator it = m_effects.begin();
-						it != m_effects.end(); it++ )
+			it != m_effects.end(); it++ )
 	{
 		( *it )->startRunning();
 	}
@@ -248,10 +249,9 @@ void EffectChain::startRunning()
 void EffectChain::clear()
 {
 	emit aboutToClear();
-
 	Engine::mixer()->requestChangeInModel();
-
 	m_enabledModel.setValue( false );
+
 	while( m_effects.count() )
 	{
 		Effect * e = m_effects[m_effects.count() - 1];

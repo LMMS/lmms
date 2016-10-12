@@ -55,47 +55,31 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 {
 	this->setFrameStyle( QFrame::StyledPanel );
 	this->setFrameShadow( QFrame::Raised );
-
-	QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
-
-	QHBoxLayout *hBox = new QHBoxLayout();
-	vBoxLayout->addLayout(hBox);
-
-	QLabel *label = new QLabel( "<b>" + _model->displayName() + "</b>", this);
+	QVBoxLayout * vBoxLayout = new QVBoxLayout( this );
+	QHBoxLayout * hBox = new QHBoxLayout();
+	vBoxLayout->addLayout( hBox );
+	QLabel * label = new QLabel( "<b>" + _model->displayName() + "</b>", this );
 	QSizePolicy sizePolicy = label->sizePolicy();
-	sizePolicy.setHorizontalStretch(1);
-	label->setSizePolicy(sizePolicy);
-
-	hBox->addWidget(label);
-
+	sizePolicy.setHorizontalStretch( 1 );
+	label->setSizePolicy( sizePolicy );
+	hBox->addWidget( label );
 	QPushButton * controlsButton = new QPushButton( tr( "Controls" ), this );
 	connect( controlsButton, SIGNAL( clicked() ), SLOT( editControls() ) );
-
-	hBox->addWidget(controlsButton);
-
-	m_nameLabel = new QLabel(_model->name(), this);
-	vBoxLayout->addWidget(m_nameLabel);
-
-
+	hBox->addWidget( controlsButton );
+	m_nameLabel = new QLabel( _model->name(), this );
+	vBoxLayout->addWidget( m_nameLabel );
 	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
-
 	m_subWindow = gui->mainWindow()->addWindowedWidget( m_controllerDlg );
-	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	m_subWindow->setWindowFlags( flags );
 	m_subWindow->setFixedSize( m_subWindow->size() );
-
 	m_subWindow->setWindowIcon( m_controllerDlg->windowIcon() );
-
 	connect( m_controllerDlg, SIGNAL( closed() ),
-		this, SLOT( closeControls() ) );
-
+		 this, SLOT( closeControls() ) );
 	m_subWindow->hide();
-
 	setWhatsThis( tr( "Controllers are able to automate the value of a knob, "
-				"slider, and other controls."  ) );
-
+			  "slider, and other controls."  ) );
 	setModel( _model );
 }
 
@@ -104,7 +88,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 ControllerView::~ControllerView()
 {
-	if (m_subWindow)
+	if ( m_subWindow )
 	{
 		delete m_subWindow;
 	}
@@ -148,16 +132,19 @@ void ControllerView::renameController()
 	bool ok;
 	Controller * c = castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
-			tr( "Rename controller" ),
-			tr( "Enter the new name for this controller" ),
-			QLineEdit::Normal, c->name() , &ok );
+			   tr( "Rename controller" ),
+			   tr( "Enter the new name for this controller" ),
+			   QLineEdit::Normal, c->name() , &ok );
+
 	if( ok && !new_name.isEmpty() )
 	{
 		c->setName( new_name );
+
 		if( getController()->type() == Controller::LfoController )
 		{
 			m_controllerDlg->setWindowTitle( tr( "LFO" ) + " (" + new_name + ")" );
 		}
+
 		m_nameLabel->setText( new_name );
 	}
 }
@@ -180,9 +167,9 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this controller" ),
-						this, SLOT( deleteController() ) );
-	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
+				tr( "&Remove this controller" ),
+				this, SLOT( deleteController() ) );
+	contextMenu->addAction( tr( "Re&name this controller" ), this, SLOT( renameController() ) );
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
@@ -193,7 +180,7 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 void ControllerView::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().center() ),
-								whatsThis() );
+			      whatsThis() );
 }
 
 

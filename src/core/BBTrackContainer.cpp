@@ -35,11 +35,11 @@ BBTrackContainer::BBTrackContainer() :
 	m_bbComboBoxModel( this )
 {
 	connect( &m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			this, SLOT( currentBBChanged() ) );
+		 this, SLOT( currentBBChanged() ) );
 	// we *always* want to receive updates even in case BB actually did
 	// not change upon setCurrentBB()-call
 	connect( &m_bbComboBoxModel, SIGNAL( dataUnchanged() ),
-			this, SLOT( currentBBChanged() ) );
+		 this, SLOT( currentBBChanged() ) );
 	setType( BBContainer );
 }
 
@@ -54,17 +54,18 @@ BBTrackContainer::~BBTrackContainer()
 
 
 bool BBTrackContainer::play( MidiTime _start, fpp_t _frames,
-								f_cnt_t _offset, int _tco_num )
+			     f_cnt_t _offset, int _tco_num )
 {
 	bool played_a_note = false;
+
 	if( lengthOfBB( _tco_num ) <= 0 )
 	{
 		return false;
 	}
 
 	_start = _start % ( lengthOfBB( _tco_num ) * MidiTime::ticksPerTact() );
-
 	TrackList tl = tracks();
+
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		if( ( *it )->play( _start, _frames, _offset, _tco_num ) )
@@ -93,12 +94,12 @@ void BBTrackContainer::updateAfterTrackAdd()
 tact_t BBTrackContainer::lengthOfBB( int _bb )
 {
 	MidiTime max_length = MidiTime::ticksPerTact();
-
 	const TrackList & tl = tracks();
+
 	for( TrackList::const_iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		max_length = qMax( max_length,
-					( *it )->getTCO( _bb )->length() );
+				   ( *it )->getTCO( _bb )->length() );
 	}
 
 	return max_length.nextFullTact();
@@ -118,11 +119,13 @@ int BBTrackContainer::numOfBBs() const
 void BBTrackContainer::removeBB( int _bb )
 {
 	TrackList tl = tracks();
+
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		delete ( *it )->getTCO( _bb );
 		( *it )->removeTact( _bb * DefaultTicksPerTact );
 	}
+
 	if( _bb <= currentBB() )
 	{
 		setCurrentBB( qMax( currentBB() - 1, 0 ) );
@@ -135,10 +138,12 @@ void BBTrackContainer::removeBB( int _bb )
 void BBTrackContainer::swapBB( int _bb1, int _bb2 )
 {
 	TrackList tl = tracks();
+
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		( *it )->swapPositionOfTCOs( _bb1, _bb2 );
 	}
+
 	updateComboBox();
 }
 
@@ -148,7 +153,8 @@ void BBTrackContainer::swapBB( int _bb1, int _bb2 )
 void BBTrackContainer::updateBBTrack( TrackContentObject * _tco )
 {
 	BBTrack * t = BBTrack::findBBTrack( _tco->startPosition() /
-							DefaultTicksPerTact );
+					    DefaultTicksPerTact );
+
 	if( t != NULL )
 	{
 		t->dataChanged();
@@ -161,6 +167,7 @@ void BBTrackContainer::updateBBTrack( TrackContentObject * _tco )
 void BBTrackContainer::fixIncorrectPositions()
 {
 	TrackList tl = tracks();
+
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		for( int i = 0; i < numOfBBs(); ++i )
@@ -199,7 +206,6 @@ void BBTrackContainer::stop()
 void BBTrackContainer::updateComboBox()
 {
 	const int cur_bb = currentBB();
-
 	m_bbComboBoxModel.clear();
 
 	for( int i = 0; i < numOfBBs(); ++i )
@@ -207,6 +213,7 @@ void BBTrackContainer::updateComboBox()
 		BBTrack * bbt = BBTrack::findBBTrack( i );
 		m_bbComboBoxModel.addItem( bbt->name() );
 	}
+
 	setCurrentBB( cur_bb );
 }
 
@@ -218,6 +225,7 @@ void BBTrackContainer::currentBBChanged()
 	// now update all track-labels (the current one has to become white,
 	// the others gray)
 	TrackList tl = Engine::getSong()->tracks();
+
 	for( TrackList::iterator it = tl.begin(); it != tl.end(); ++it )
 	{
 		if( ( *it )->type() == Track::BBTrack )
@@ -233,6 +241,7 @@ void BBTrackContainer::currentBBChanged()
 void BBTrackContainer::createTCOsForBB( int _bb )
 {
 	TrackList tl = tracks();
+
 	for( int i = 0; i < tl.size(); ++i )
 	{
 		tl[i]->createTCOsForBB( _bb );

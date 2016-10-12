@@ -37,7 +37,7 @@
 
 
 AutomatableButton::AutomatableButton( QWidget * _parent,
-						const QString & _name ) :
+				      const QString & _name ) :
 	QPushButton( _parent ),
 	BoolModelView( new BoolModel( false, NULL, _name, true ), this ),
 	m_group( NULL )
@@ -78,6 +78,7 @@ void AutomatableButton::update()
 	{
 		QPushButton::setChecked( model()->value() );
 	}
+
 	QPushButton::update();
 }
 
@@ -104,7 +105,6 @@ void AutomatableButton::contextMenuEvent( QContextMenuEvent * _me )
 		addDefaultActions( &contextMenu );
 		contextMenu.exec( QCursor::pos() );
 	}
-
 }
 
 
@@ -115,11 +115,12 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton &&
 			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
-        // User simply clicked, toggle if needed
+		// User simply clicked, toggle if needed
 		if( isCheckable() )
 		{
 			toggle();
 		}
+
 		_me->accept();
 	}
 	else
@@ -128,10 +129,10 @@ void AutomatableButton::mousePressEvent( QMouseEvent * _me )
 		if( m_group )
 		{
 			// A group, we must get process it instead
-			AutomatableModelView* groupView = (AutomatableModelView*)m_group;
+			AutomatableModelView * groupView = ( AutomatableModelView * )m_group;
 			new StringPairDrag( "automatable_model",
-					QString::number( groupView->modelUntyped()->id() ),
-					QPixmap(), widget() );
+					    QString::number( groupView->modelUntyped()->id() ),
+					    QPixmap(), widget() );
 			// TODO: ^^ Maybe use a predefined icon instead of the button they happened to select
 			_me->accept();
 		}
@@ -181,7 +182,7 @@ void AutomatableButton::toggle()
 
 
 automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
-						const QString & _name ) :
+		const QString & _name ) :
 	QWidget( _parent ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this )
 {
@@ -195,7 +196,7 @@ automatableButtonGroup::automatableButtonGroup( QWidget * _parent,
 automatableButtonGroup::~automatableButtonGroup()
 {
 	for( QList<AutomatableButton *>::iterator it = m_buttons.begin();
-					it != m_buttons.end(); ++it )
+			it != m_buttons.end(); ++it )
 	{
 		( *it )->m_group = NULL;
 	}
@@ -209,10 +210,9 @@ void automatableButtonGroup::addButton( AutomatableButton * _btn )
 	_btn->m_group = this;
 	_btn->setCheckable( true );
 	_btn->model()->setValue( false );
-	// disable journalling as we're recording changes of states of 
+	// disable journalling as we're recording changes of states of
 	// button-group members on our own
 	_btn->model()->setJournalling( false );
-
 	m_buttons.push_back( _btn );
 	model()->setRange( 0, m_buttons.size() - 1 );
 	updateButtons();
@@ -233,9 +233,10 @@ void automatableButtonGroup::removeButton( AutomatableButton * _btn )
 void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 {
 	if( _btn != m_buttons[model()->value()] &&
-					m_buttons.indexOf( _btn ) != -1 )
+			m_buttons.indexOf( _btn ) != -1 )
 	{
 		model()->setValue( m_buttons.indexOf( _btn ) );
+
 		for( AutomatableButton * btn : m_buttons )
 		{
 			btn->update();
@@ -249,7 +250,7 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 void automatableButtonGroup::modelChanged()
 {
 	connect( model(), SIGNAL( dataChanged() ),
-			this, SLOT( updateButtons() ) );
+		 this, SLOT( updateButtons() ) );
 	IntModelView::modelChanged();
 	updateButtons();
 }
@@ -261,6 +262,7 @@ void automatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
+
 	for( AutomatableButton * btn : m_buttons )
 	{
 		btn->model()->setValue( i == model()->value() );

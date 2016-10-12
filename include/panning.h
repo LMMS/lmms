@@ -33,7 +33,7 @@
 #include "Midi.h"
 
 inline stereoVolumeVector panningToVolumeVector( panning_t _p,
-							float _scale = 1.0f )
+		float _scale = 1.0f )
 {
 	stereoVolumeVector v = { { _scale, _scale } };
 	const float pf = _p / 100.0f;
@@ -44,10 +44,10 @@ inline stereoVolumeVector panningToVolumeVector( panning_t _p,
 
 inline int panningToMidi( panning_t _p )
 {
-	return MidiMinPanning + (int) (
-			  ( (float)( _p - PanningLeft ) ) /
-			  ( (float)( PanningRight - PanningLeft ) ) *
-			  ( (float)( MidiMaxPanning - MidiMinPanning ) ) );
+	return MidiMinPanning + ( int ) (
+		       ( ( float )( _p - PanningLeft ) ) /
+		       ( ( float )( PanningRight - PanningLeft ) ) *
+		       ( ( float )( MidiMaxPanning - MidiMinPanning ) ) );
 }
 
 #endif

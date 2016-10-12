@@ -41,7 +41,7 @@
 #include "PluginFactory.h"
 
 
-static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
+static bool pluginBefore( const Plugin::Descriptor * d1, const Plugin::Descriptor * d2 )
 {
 	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 }
@@ -51,33 +51,27 @@ static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument plugins" ),
-				embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
+		       embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
 {
 	setWindowTitle( tr( "Instrument browser" ) );
 	m_view = new QWidget( contentParent() );
 	//m_view->setFrameShape( QFrame::NoFrame );
-
 	addContentWidget( m_view );
-
 	QVBoxLayout * view_layout = new QVBoxLayout( m_view );
 	view_layout->setMargin( 5 );
 	view_layout->setSpacing( 5 );
-
-
 	QLabel * hint = new QLabel( tr( "Drag an instrument "
 					"into either the Song-Editor, the "
 					"Beat+Bassline Editor or into an "
 					"existing instrument track." ),
-								m_view );
+				    m_view );
 	hint->setWordWrap( true );
-
-	QScrollArea* scrollarea = new QScrollArea( m_view );
-	PluginDescList* descList = new PluginDescList( m_view );
-	scrollarea->setWidget(descList);
-	scrollarea->setWidgetResizable(true);
-
-	view_layout->addWidget(hint);
-	view_layout->addWidget(scrollarea);
+	QScrollArea * scrollarea = new QScrollArea( m_view );
+	PluginDescList * descList = new PluginDescList( m_view );
+	scrollarea->setWidget( descList );
+	scrollarea->setWidgetResizable( true );
+	view_layout->addWidget( hint );
+	view_layout->addWidget( scrollarea );
 }
 
 
@@ -90,21 +84,21 @@ PluginBrowser::~PluginBrowser()
 
 
 
-PluginDescList::PluginDescList(QWidget *parent) :
-	QWidget(parent)
+PluginDescList::PluginDescList( QWidget * parent ) :
+	QWidget( parent )
 {
-	QVBoxLayout* layout = new QVBoxLayout(this);
+	QVBoxLayout * layout = new QVBoxLayout( this );
+	QList<Plugin::Descriptor *> descs = pluginFactory->descriptors( Plugin::Instrument );
+	std::sort( descs.begin(), descs.end(), pluginBefore );
 
-	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
-	std::sort(descs.begin(), descs.end(), pluginBefore);
-	for (const Plugin::Descriptor* desc : descs)
+	for ( const Plugin::Descriptor * desc : descs )
 	{
-		PluginDescWidget* p = new PluginDescWidget( *desc, this );
+		PluginDescWidget * p = new PluginDescWidget( *desc, this );
 		p->show();
-		layout->addWidget(p);
+		layout->addWidget( p );
 	}
 
-	setLayout(layout);
+	setLayout( layout );
 	layout->addStretch();
 }
 
@@ -112,7 +106,7 @@ PluginDescList::PluginDescList(QWidget *parent) :
 
 
 PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
-							QWidget * _parent ) :
+				    QWidget * _parent ) :
 	QWidget( _parent ),
 	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
@@ -138,23 +132,20 @@ PluginDescWidget::~PluginDescWidget()
 
 void PluginDescWidget::paintEvent( QPaintEvent * e )
 {
-
 	QPainter p( this );
-
 	// Paint everything according to the style sheet
 	QStyleOption o;
 	o.initFrom( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &o, &p, this );
-
 	// Draw the rest
 	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
-								( 60 - 24 );
+		      ( 60 - 24 );
 	const QSize logo_size( s, s );
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
-						Qt::SmoothTransformation );
+				      Qt::SmoothTransformation );
 	p.drawPixmap( 4, 4, logo );
-
 	QFont f = p.font();
+
 	if ( m_mouseOver )
 	{
 		f.setBold( true );
@@ -162,7 +153,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
-					m_pluginDescriptor.displayName );
+		    m_pluginDescriptor.displayName );
 
 	if( height() > 24 || m_mouseOver )
 	{
@@ -170,9 +161,10 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 		p.setFont( f );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
-								Qt::TextWordWrap,
-								qApp->translate( "pluginBrowser", m_pluginDescriptor.description ),
-								&br );
+			    Qt::TextWordWrap,
+			    qApp->translate( "pluginBrowser", m_pluginDescriptor.description ),
+			    &br );
+
 		if( m_mouseOver )
 		{
 			m_targetHeight = qMax( 60, 25 + br.height() );
@@ -210,7 +202,7 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 	if( _me->button() == Qt::LeftButton )
 	{
 		new StringPairDrag( "instrument", m_pluginDescriptor.name,
-								m_logo, this );
+				    m_logo, this );
 		leaveEvent( _me );
 	}
 }

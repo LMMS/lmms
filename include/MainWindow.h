@@ -47,12 +47,12 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	QMdiArea* workspace()
+	QMdiArea * workspace()
 	{
 		return m_workspace;
 	}
 
-	QWidget* toolBar()
+	QWidget * toolBar()
 	{
 		return m_toolBar;
 	}
@@ -61,7 +61,7 @@ public:
 	void addSpacingToToolBar( int _size );
 
 	// wrap the widget with a window decoration and add it to the workspace
-	EXPORT SubWindow* addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags=0);
+	EXPORT SubWindow * addWindowedWidget( QWidget * w, Qt::WindowFlags windowFlags = 0 );
 
 
 	///
@@ -80,7 +80,7 @@ public:
 	/// \return	true if the user allows the software to proceed, false if they
 	///         cancel the action.
 	///
-	bool mayChangeProject(bool stopPlayback);
+	bool mayChangeProject( bool stopPlayback );
 
 	// Auto save timer intervals. The slider in SetupDialog.cpp wants
 	// minutes and the rest milliseconds.
@@ -90,13 +90,14 @@ public:
 	static const int m_autoSaveShortTime = 10 * 1000; // 10s short loop
 
 	void autoSaveTimerReset( int msec = ConfigManager::inst()->
-					value( "ui", "saveinterval" ).toInt()
-						* 60 * 1000 )
+					    value( "ui", "saveinterval" ).toInt()
+					    * 60 * 1000 )
 	{
 		if( msec < m_autoSaveShortTime ) // No 'saveinterval' in .lmmsrc.xml
 		{
 			msec = DEFAULT_AUTO_SAVE_INTERVAL;
 		}
+
 		m_autoSaveTimer.start( msec );
 	}
 
@@ -143,7 +144,7 @@ public:
 		return m_keyMods.m_alt;
 	}
 
-	static void saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible = QSize(0, 0) );
+	static void saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible = QSize( 0, 0 ) );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 public slots:
@@ -192,7 +193,7 @@ private:
 
 	void finalize();
 
-	void toggleWindow( QWidget *window, bool forceShow = false );
+	void toggleWindow( QWidget * window, bool forceShow = false );
 	void refocus();
 
 	QMdiArea * m_workspace;
@@ -247,7 +248,7 @@ private slots:
 
 signals:
 	void periodicUpdate();
-	void initProgress(const QString &msg);
+	void initProgress( const QString & msg );
 
 } ;
 

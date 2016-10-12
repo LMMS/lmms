@@ -103,6 +103,7 @@ inline bool typeInfo<float>::isEqual( float x, float y )
 	{
 		return true;
 	}
+
 	return absVal( x - y ) < minEps();
 }
 
@@ -113,9 +114,9 @@ const ch_cnt_t DEFAULT_CHANNELS = 2;
 const ch_cnt_t SURROUND_CHANNELS =
 #define LMMS_DISABLE_SURROUND
 #ifndef LMMS_DISABLE_SURROUND
-				4;
+	4;
 #else
-				2;
+	2;
 #endif
 
 
@@ -131,7 +132,7 @@ typedef sample_t sampleFrame[DEFAULT_CHANNELS];
 typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
 #define ALIGN_SIZE 16
 #if __GNUC__
-typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
+typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__( ( __aligned__( ALIGN_SIZE ) ) );
 #endif
 
 

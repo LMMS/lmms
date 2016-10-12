@@ -56,9 +56,9 @@ public:
 			// prevent saving inline automation if there's just one value which equals value
 			// of model which is going to be saved anyways
 			if( isAtInitValue() &&
-				m_autoPattern->getTimeMap().size() == 1 &&
-				m_autoPattern->getTimeMap().keys().first() == 0 &&
-				m_autoPattern->getTimeMap().values().first() == value() )
+					m_autoPattern->getTimeMap().size() == 1 &&
+					m_autoPattern->getTimeMap().keys().first() == 0 &&
+					m_autoPattern->getTimeMap().values().first() == value() )
 			{
 				return false;
 			}
@@ -76,6 +76,7 @@ public:
 			m_autoPattern = new AutomationPattern( NULL );
 			m_autoPattern->addObject( this );
 		}
+
 		return m_autoPattern;
 	}
 

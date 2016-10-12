@@ -34,10 +34,10 @@ class MidiEvent
 {
 public:
 	MidiEvent( MidiEventTypes type = MidiActiveSensing,
-				int8_t channel = 0,
-				int16_t param1 = 0,
-				int16_t param2 = 0,
-				const void* sourcePort = NULL ) :
+		   int8_t channel = 0,
+		   int16_t param1 = 0,
+		   int16_t param2 = 0,
+		   const void * sourcePort = NULL ) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( channel ),
@@ -48,7 +48,7 @@ public:
 		m_data.m_param[1] = param2;
 	}
 
-	MidiEvent( MidiEventTypes type, const char* sysExData, int dataLen ) :
+	MidiEvent( MidiEventTypes type, const char * sysExData, int dataLen ) :
 		m_type( type ),
 		m_metaEvent( MidiMetaInvalid ),
 		m_channel( 0 ),
@@ -58,7 +58,7 @@ public:
 		m_data.m_sysExDataLen = dataLen;
 	}
 
-	MidiEvent( const MidiEvent& other ) :
+	MidiEvent( const MidiEvent & other ) :
 		m_type( other.m_type ),
 		m_metaEvent( other.m_metaEvent ),
 		m_channel( other.m_channel ),
@@ -130,10 +130,10 @@ public:
 
 	panning_t panning() const
 	{
-		return (panning_t) ( PanningLeft +
-			( (float)( midiPanning() - MidiMinPanning ) ) / 
-			( (float)( MidiMaxPanning - MidiMinPanning ) ) *
-			( (float)( PanningRight - PanningLeft ) ) );
+		return ( panning_t ) ( PanningLeft +
+				       ( ( float )( midiPanning() - MidiMinPanning ) ) /
+				       ( ( float )( MidiMaxPanning - MidiMinPanning ) ) *
+				       ( ( float )( PanningRight - PanningLeft ) ) );
 	}
 	int16_t midiPanning() const
 	{
@@ -142,10 +142,10 @@ public:
 
 	volume_t volume( int midiBaseVelocity ) const
 	{
-		return (volume_t)( velocity() * DefaultVolume / midiBaseVelocity );
+		return ( volume_t )( velocity() * DefaultVolume / midiBaseVelocity );
 	}
 
-	const void* sourcePort() const
+	const void * sourcePort() const
 	{
 		return m_sourcePort;
 	}
@@ -202,8 +202,8 @@ private:
 		int32_t m_sysExDataLen;	// len of m_sysExData
 	} m_data;
 
-	const char* m_sysExData;
-	const void* m_sourcePort;
+	const char * m_sysExData;
+	const void * m_sourcePort;
 
 } ;
 

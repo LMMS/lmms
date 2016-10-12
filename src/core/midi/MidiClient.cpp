@@ -43,21 +43,21 @@ MidiClient::~MidiClient()
 
 
 
-void MidiClient::applyPortMode( MidiPort* )
+void MidiClient::applyPortMode( MidiPort * )
 {
 }
 
 
 
 
-void MidiClient::applyPortName( MidiPort* )
+void MidiClient::applyPortName( MidiPort * )
 {
 }
 
 
 
 
-void MidiClient::addPort( MidiPort* port )
+void MidiClient::addPort( MidiPort * port )
 {
 	m_midiPorts.push_back( port );
 }
@@ -65,10 +65,11 @@ void MidiClient::addPort( MidiPort* port )
 
 
 
-void MidiClient::removePort( MidiPort* port )
+void MidiClient::removePort( MidiPort * port )
 {
 	QVector<MidiPort *>::Iterator it =
 		qFind( m_midiPorts.begin(), m_midiPorts.end(), port );
+
 	if( it != m_midiPorts.end() )
 	{
 		m_midiPorts.erase( it );
@@ -78,14 +79,14 @@ void MidiClient::removePort( MidiPort* port )
 
 
 
-void MidiClient::subscribeReadablePort( MidiPort*, const QString& , bool )
+void MidiClient::subscribeReadablePort( MidiPort *, const QString &, bool )
 {
 }
 
 
 
 
-void MidiClient::subscribeWritablePort( MidiPort* , const QString& , bool )
+void MidiClient::subscribeWritablePort( MidiPort *, const QString &, bool )
 {
 }
 
@@ -115,10 +116,10 @@ void MidiClientRaw::parseData( const unsigned char c )
 	/* 'Process' system real-time messages                               */
 	/*********************************************************************/
 	/* There are not too many real-time messages that are of interest here.
-	 * They can occur anywhere, even in the middle of a noteon message! 
+	 * They can occur anywhere, even in the middle of a noteon message!
 	 * Real-time range: 0xF8 .. 0xFF
 	 * Note: Real-time does not affect (running) status.
-	 */  
+	 */
 	if( c >= 0xF8 )
 	{
 		if( c == MidiSystemReset )
@@ -127,6 +128,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 			m_midiParseData.m_status = 0;
 			processParsedEvent();
 		}
+
 		return;
 	}
 
@@ -134,14 +136,14 @@ void MidiClientRaw::parseData( const unsigned char c )
 	/* 'Process' system common messages (again, just skip them)          */
 	/*********************************************************************/
 	/* There are no system common messages that are of interest here.
-	 * System common range: 0xF0 .. 0xF7 
+	 * System common range: 0xF0 .. 0xF7
 	 */
 	if( c > 0xF0 )
 	{
-	/* MIDI spec say: To ignore a non-real-time message, just discard all
-	 * data up to the next status byte.  And our parser will ignore data
-	 * that is received without a valid status.  
-	 * Note: system common cancels running status. */
+		/* MIDI spec say: To ignore a non-real-time message, just discard all
+		 * data up to the next status byte.  And our parser will ignore data
+		 * that is received without a valid status.
+		 * Note: system common cancels running status. */
 		m_midiParseData.m_status = 0;
 		return;
 	}
@@ -185,6 +187,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 	{
 		m_midiParseData.m_buffer[m_midiParseData.m_bytes] = c;
 	}
+
 	++m_midiParseData.m_bytes;
 
 	/* Do we still need more data to get this event complete? */
@@ -196,18 +199,19 @@ void MidiClientRaw::parseData( const unsigned char c )
 	/*********************************************************************/
 	/* Send the event                                                    */
 	/*********************************************************************/
-	/* The event is ready-to-go.  About 'running status': 
-	 * 
+	/* The event is ready-to-go.  About 'running status':
+	 *
 	 * The MIDI protocol has a built-in compression mechanism. If several
 	 * similar events are sent in-a-row, for example note-ons, then the
 	 * event type is only sent once. For this case, the last event type
 	 * (status) is remembered.
 	 * We simply keep the status as it is, just reset the parameter counter.
-	 * If another status byte comes in, it will overwrite the status. 
+	 * If another status byte comes in, it will overwrite the status.
 	 */
 	m_midiParseData.m_midiEvent.setType( static_cast<MidiEventTypes>( m_midiParseData.m_status ) );
 	m_midiParseData.m_midiEvent.setChannel( m_midiParseData.m_channel );
 	m_midiParseData.m_bytes = 0; /* Related to running status! */
+
 	switch( m_midiParseData.m_midiEvent.type() )
 	{
 		case MidiNoteOff:
@@ -231,7 +235,7 @@ void MidiClientRaw::parseData( const unsigned char c )
 			m_midiParseData.m_midiEvent.setPitchBend( ( m_midiParseData.m_buffer[1] * 128 ) | m_midiParseData.m_buffer[0] );
 			break;
 
-		default: 
+		default:
 			// Unlikely
 			return;
 	}
@@ -253,7 +257,7 @@ void MidiClientRaw::processParsedEvent()
 
 
 
-void MidiClientRaw::processOutEvent( const MidiEvent& event, const MidiTime & , const MidiPort* port )
+void MidiClientRaw::processOutEvent( const MidiEvent & event, const MidiTime &, const MidiPort * port )
 {
 	// TODO: also evaluate _time and queue event if necessary
 	switch( event.type() )
@@ -268,7 +272,7 @@ void MidiClientRaw::processOutEvent( const MidiEvent& event, const MidiTime & , 
 
 		default:
 			qWarning( "MidiClientRaw: unhandled MIDI-event %d\n",
-							(int) event.type() );
+				  ( int ) event.type() );
 			break;
 	}
 }
@@ -315,6 +319,7 @@ int MidiClientRaw::eventLength( const unsigned char event )
 	{
 		return REMAINS_F0F6[event - 0xF0];
 	}
+
 	return 1;
 }
 

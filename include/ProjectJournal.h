@@ -48,7 +48,7 @@ public:
 	bool canUndo() const;
 	bool canRedo() const;
 
-	void addJournalCheckPoint( JournallingObject *jo );
+	void addJournalCheckPoint( JournallingObject * jo );
 
 	bool isJournalling() const
 	{
@@ -86,6 +86,7 @@ public:
 		{
 			return m_joIDs[_id];
 		}
+
 		return NULL;
 	}
 
@@ -95,7 +96,7 @@ private:
 
 	struct CheckPoint
 	{
-		CheckPoint( jo_id_t initID = 0, const DataFile& initData = DataFile( DataFile::JournalData ) ) :
+		CheckPoint( jo_id_t initID = 0, const DataFile & initData = DataFile( DataFile::JournalData ) ) :
 			joID( initID ),
 			data( initData )
 		{

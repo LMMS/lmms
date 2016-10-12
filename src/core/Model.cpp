@@ -28,9 +28,11 @@
 QString Model::fullDisplayName() const
 {
 	const QString & n = displayName();
-	if( parentModel() ) 
+
+	if( parentModel() )
 	{
 		const QString p = parentModel()->fullDisplayName();
+
 		if( n.isEmpty() && p.isEmpty() )
 		{
 			return QString::null;
@@ -39,8 +41,10 @@ QString Model::fullDisplayName() const
 		{
 			return n;
 		}
+
 		return p + ">" + n;
 	}
+
 	return n;
 }
 

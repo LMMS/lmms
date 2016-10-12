@@ -42,7 +42,7 @@
 
 
 
-LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
+LcdSpinBox::LcdSpinBox( int numDigits, QWidget * parent, const QString & name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
@@ -54,7 +54,7 @@ LcdSpinBox::LcdSpinBox( int numDigits, QWidget* parent, const QString& name ) :
 
 
 
-LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name ) :
+LcdSpinBox::LcdSpinBox( int numDigits, const QString & style, QWidget * parent, const QString & name ) :
 	LcdWidget( numDigits, parent, name ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, name, true ), this ),
 	m_mouseMoving( false ),
@@ -74,20 +74,18 @@ LcdSpinBox::~LcdSpinBox()
 void LcdSpinBox::update()
 {
 	setValue( model()->value() + m_displayOffset );
-
 	QWidget::update();
 }
 
 
 
-void LcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
+void LcdSpinBox::contextMenuEvent( QContextMenuEvent * event )
 {
 	// for the case, the user clicked right while pressing left mouse-
 	// button, the context-menu appears while mouse-cursor is still hidden
 	// and it isn't shown again until user does something which causes
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
-
 	CaptionMenu contextMenu( model()->displayName() );
 	addDefaultActions( &contextMenu );
 	contextMenu.exec( QCursor::pos() );
@@ -96,17 +94,17 @@ void LcdSpinBox::contextMenuEvent( QContextMenuEvent* event )
 
 
 
-void LcdSpinBox::mousePressEvent( QMouseEvent* event )
+void LcdSpinBox::mousePressEvent( QMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton &&
-		! ( event->modifiers() & Qt::ControlModifier ) &&
-						event->y() < cellHeight() + 2  )
+			! ( event->modifiers() & Qt::ControlModifier ) &&
+			event->y() < cellHeight() + 2  )
 	{
 		m_mouseMoving = true;
 		m_origMousePos = event->globalPos();
 		QApplication::setOverrideCursor( Qt::BlankCursor );
+		AutomatableModel * thisModel = model();
 
-		AutomatableModel *thisModel = model();
 		if( thisModel )
 		{
 			thisModel->addJournalCheckPoint();
@@ -122,17 +120,21 @@ void LcdSpinBox::mousePressEvent( QMouseEvent* event )
 
 
 
-void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
+void LcdSpinBox::mouseMoveEvent( QMouseEvent * event )
 {
 	if( m_mouseMoving )
 	{
 		int dy = event->globalY() - m_origMousePos.y();
+
 		if( gui->mainWindow()->isShiftPressed() )
-			dy = qBound( -4, dy/4, 4 );
+		{
+			dy = qBound( -4, dy / 4, 4 );
+		}
+
 		if( dy > 1 || dy < -1 )
 		{
 			model()->setInitValue( model()->value() -
-						dy / 2 * model()->step<int>() );
+					       dy / 2 * model()->step<int>() );
 			emit manualChange();
 			QCursor::setPos( m_origMousePos );
 		}
@@ -142,15 +144,13 @@ void LcdSpinBox::mouseMoveEvent( QMouseEvent* event )
 
 
 
-void LcdSpinBox::mouseReleaseEvent( QMouseEvent* )
+void LcdSpinBox::mouseReleaseEvent( QMouseEvent * )
 {
 	if( m_mouseMoving )
 	{
 		model()->restoreJournallingState();
-
 		QCursor::setPos( m_origMousePos );
 		QApplication::restoreOverrideCursor();
-
 		m_mouseMoving = false;
 	}
 }
@@ -162,7 +162,7 @@ void LcdSpinBox::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
 	model()->setInitValue( model()->value() +
-			( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step<int>() );
+			       ( ( _we->delta() > 0 ) ? 1 : -1 ) * model()->step<int>() );
 	emit manualChange();
 }
 
@@ -175,15 +175,14 @@ void LcdSpinBox::enterValue()
 {
 	bool ok;
 	int new_val;
-
 	new_val = QInputDialog::getInt(
-			this, windowTitle(),
-			tr( "Please enter a new value between %1 and %2:" ).
-			arg( model()->minValue() ).
-			arg( model()->maxValue() ),
-			model()->value(),
-			model()->minValue(),
-			model()->maxValue(), 4, &ok );
+			  this, windowTitle(),
+			  tr( "Please enter a new value between %1 and %2:" ).
+			  arg( model()->minValue() ).
+			  arg( model()->maxValue() ),
+			  model()->value(),
+			  model()->minValue(),
+			  model()->maxValue(), 4, &ok );
 
 	if( ok )
 	{

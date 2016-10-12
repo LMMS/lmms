@@ -28,12 +28,12 @@
 
 
 void InlineAutomation::saveSettings( QDomDocument & _doc,
-							QDomElement & _parent )
+				     QDomElement & _parent )
 {
 	if( hasAutomation() )
 	{
 		QDomElement ap = _doc.createElement(
-					AutomationPattern::classNodeName() );
+					 AutomationPattern::classNodeName() );
 		QDomElement v = _doc.createElement( nodeName() );
 		automationPattern()->saveSettings( _doc, v );
 		ap.appendChild( v );
@@ -47,13 +47,15 @@ void InlineAutomation::saveSettings( QDomDocument & _doc,
 void InlineAutomation::loadSettings( const QDomElement & _this )
 {
 	QDomNode node = _this.namedItem( AutomationPattern::classNodeName() );
+
 	if( node.isElement() )
 	{
 		node = node.namedItem( nodeName() );
+
 		if( node.isElement() )
 		{
 			automationPattern()->loadSettings(
-							node.toElement() );
+				node.toElement() );
 		}
 	}
 }

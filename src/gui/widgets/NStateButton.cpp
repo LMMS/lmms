@@ -2,7 +2,7 @@
  * NStateButton.cpp - implementation of n-state-button
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QMouseEvent>
 
@@ -55,6 +55,7 @@ NStateButton::~NStateButton()
 void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 {
 	m_states.push_back( qMakePair( _pm, _tooltip ) );
+
 	// first inserted pixmap?
 	if( m_states.size() == 1 )
 	{
@@ -68,18 +69,15 @@ void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 
 void NStateButton::changeState( int _n )
 {
-	if( _n >= 0 && _n < (int) m_states.size() )
+	if( _n >= 0 && _n < ( int ) m_states.size() )
 	{
 		m_curState = _n;
-
 		const QString & _tooltip =
 			( m_states[m_curState].second != "" ) ?
-				m_states[m_curState].second :
-					m_generalToolTip;
+			m_states[m_curState].second :
+			m_generalToolTip;
 		ToolTip::add( this, _tooltip );
-
 		setIcon( m_states[m_curState].first );
-
 		emit changedState( m_curState );
 	}
 }
@@ -92,5 +90,6 @@ void NStateButton::mousePressEvent( QMouseEvent * _me )
 	{
 		changeState( ( ++m_curState ) % m_states.size() );
 	}
+
 	ToolButton::mousePressEvent( _me );
 }

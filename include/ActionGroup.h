@@ -37,21 +37,21 @@ class ActionGroup : public QActionGroup
 {
 	Q_OBJECT
 public:
-	ActionGroup(QObject* parent);
+	ActionGroup( QObject * parent );
 
-	QAction* addAction(QAction *a);
-	QAction* addAction(const QString &text);
-	QAction* addAction(const QIcon &icon, const QString &text);
+	QAction * addAction( QAction * a );
+	QAction * addAction( const QString & text );
+	QAction * addAction( const QIcon & icon, const QString & text );
 
 signals:
 	/// This signal is emitted when the action at the given index is triggered.
-	void triggered(int index);
+	void triggered( int index );
 
 private slots:
-	void actionTriggered_(QAction* action);
+	void actionTriggered_( QAction * action );
 
 private:
-	QList<QAction*> m_actions;
+	QList<QAction *> m_actions;
 };
 
 #endif

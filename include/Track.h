@@ -77,8 +77,8 @@ class TrackContentObject : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
-	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
-	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
+	mapPropertyFromModel( bool, isMuted, setMuted, m_mutedModel );
+	mapPropertyFromModel( bool, isSolo, setSolo, m_soloModel );
 public:
 	TrackContentObject( Track * track );
 	virtual ~TrackContentObject();
@@ -227,7 +227,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
+
 public slots:
 	virtual bool close();
 	void cut();
@@ -259,7 +259,7 @@ protected:
 		return m_trackView;
 	}
 
-	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
+	DataFile createTCODataFiles( const QVector<TrackContentObjectView *> & tcos ) const;
 
 
 protected slots:
@@ -299,7 +299,7 @@ private:
 	QColor m_BBPatternBackground;
 	bool m_gradient;
 
- 	bool m_needsUpdate;
+	bool m_needsUpdate;
 	inline void setInitialMousePos( QPoint pos )
 	{
 		m_initialMousePos = pos;
@@ -356,7 +356,7 @@ public:
 	void setDarkerColor( const QBrush & c );
 	void setLighterColor( const QBrush & c );
 	void setGridColor( const QBrush & c );
-	void setEmbossColor( const QBrush & c);
+	void setEmbossColor( const QBrush & c );
 
 public slots:
 	void update();
@@ -375,15 +375,15 @@ protected:
 		return "trackcontentwidget";
 	}
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
-		Q_UNUSED(doc)
-		Q_UNUSED(element)
+		Q_UNUSED( doc )
+		Q_UNUSED( element )
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	virtual void loadSettings( const QDomElement & element )
 	{
-		Q_UNUSED(element)
+		Q_UNUSED( element )
 	}
 
 
@@ -456,8 +456,8 @@ class EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
-	mapPropertyFromModel(bool,isMuted,setMuted,m_mutedModel);
-	mapPropertyFromModel(bool,isSolo,setSolo,m_soloModel);
+	mapPropertyFromModel( bool, isMuted, setMuted, m_mutedModel );
+	mapPropertyFromModel( bool, isSolo, setSolo, m_soloModel );
 public:
 	typedef QVector<TrackContentObject *> tcoVector;
 
@@ -478,7 +478,7 @@ public:
 
 	static Track * create( TrackTypes tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
-							TrackContainer * tc );
+			       TrackContainer * tc );
 	Track * clone();
 
 
@@ -489,7 +489,7 @@ public:
 	}
 
 	virtual bool play( const MidiTime & start, const fpp_t frames,
-						const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
+			   const f_cnt_t frameBase, int tcoNum = -1 ) = 0;
 
 
 	virtual TrackView * createView( TrackContainerView * view ) = 0;
@@ -516,14 +516,14 @@ public:
 
 	int numOfTCOs();
 	TrackContentObject * getTCO( int tcoNum );
-	int getTCONum(const TrackContentObject* tco );
+	int getTCONum( const TrackContentObject * tco );
 
 	const tcoVector & getTCOs() const
 	{
 		return m_trackContentObjects;
 	}
 	void getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
-							const MidiTime & end );
+			     const MidiTime & end );
 	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
 
 	void createTCOsForBB( int bb );
@@ -535,7 +535,7 @@ public:
 	tact_t length() const;
 
 
-	inline TrackContainer* trackContainer() const
+	inline TrackContainer * trackContainer() const
 	{
 		return m_trackContainer;
 	}
@@ -553,13 +553,13 @@ public:
 
 	using Model::dataChanged;
 
-	inline int getHeight() 
+	inline int getHeight()
 	{
 		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height 
-			: DEFAULT_TRACK_HEIGHT;
+		       ? m_height
+		       : DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height ) 
+	inline void setHeight( int height )
 	{
 		m_height = height;
 	}
@@ -588,7 +588,7 @@ public slots:
 
 
 private:
-	TrackContainer* m_trackContainer;
+	TrackContainer * m_trackContainer;
 	TrackTypes m_type;
 	QString m_name;
 	int m_height;
@@ -622,7 +622,7 @@ class TrackView : public QWidget, public ModelView, public JournallingObject
 {
 	Q_OBJECT
 public:
-	TrackView( Track * _track, TrackContainerView* tcv );
+	TrackView( Track * _track, TrackContainerView * tcv );
 	virtual ~TrackView();
 
 	inline const Track * getTrack() const
@@ -635,7 +635,7 @@ public:
 		return m_track;
 	}
 
-	inline TrackContainerView* trackContainerView()
+	inline TrackContainerView * trackContainerView()
 	{
 		return m_trackContainerView;
 	}
@@ -670,15 +670,15 @@ public slots:
 protected:
 	virtual void modelChanged();
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
-		Q_UNUSED(doc)
-		Q_UNUSED(element)
+		Q_UNUSED( doc )
+		Q_UNUSED( element )
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	virtual void loadSettings( const QDomElement & element )
 	{
-		Q_UNUSED(element)
+		Q_UNUSED( element )
 	}
 
 	virtual QString nodeName() const

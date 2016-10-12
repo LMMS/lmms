@@ -47,7 +47,7 @@ public:
 		return m_cpuLoad;
 	}
 
-	void setOutputFile( const QString& outputFile );
+	void setOutputFile( const QString & outputFile );
 
 
 private:

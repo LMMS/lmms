@@ -61,6 +61,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	{
 		s_sendBgArrow = new QPixmap( embed::getIconPixmap( "send_bg_arrow", 29, 56 ) );
 	}
+
 	if( !s_receiveBgArrow )
 	{
 		s_receiveBgArrow = new QPixmap( embed::getIconPixmap( "receive_bg_arrow", 29, 56 ) );
@@ -69,59 +70,47 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	setFixedSize( 33, FxLineHeight );
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
-
 	// mixer sends knob
 	m_sendKnob = new Knob( knobBright_26, this, tr( "Channel send amount" ) );
 	m_sendKnob->move( 3, 22 );
 	m_sendKnob->setVisible( false );
-
 	// send button indicator
 	m_sendBtn = new SendButtonIndicator( this, this, m_mv );
 	m_sendBtn->move( 2, 2 );
-
 	// channel number
 	m_lcd = new LcdWidget( 2, this );
 	m_lcd->setValue( m_channelIndex );
 	m_lcd->move( 4, 58 );
 	m_lcd->setMarginWidth( 1 );
-	
 	setWhatsThis( tr(
-	"The FX channel receives input from one or more instrument tracks.\n "
-	"It in turn can be routed to multiple other FX channels. LMMS automatically "
-	"takes care of preventing infinite loops for you and doesn't allow making "
-	"a connection that would result in an infinite loop.\n\n"
-	
-	"In order to route the channel to another channel, select the FX channel "
-	"and click on the \"send\" button on the channel you want to send to. "
-	"The knob under the send button controls the level of signal that is sent "
-	"to the channel.\n\n"
-	
-	"You can remove and move FX channels in the context menu, which is accessed "
-	"by right-clicking the FX channel.\n" ) );
-
+			      "The FX channel receives input from one or more instrument tracks.\n "
+			      "It in turn can be routed to multiple other FX channels. LMMS automatically "
+			      "takes care of preventing infinite loops for you and doesn't allow making "
+			      "a connection that would result in an infinite loop.\n\n"
+			      "In order to route the channel to another channel, select the FX channel "
+			      "and click on the \"send\" button on the channel you want to send to. "
+			      "The knob under the send button controls the level of signal that is sent "
+			      "to the channel.\n\n"
+			      "You can remove and move FX channels in the context menu, which is accessed "
+			      "by right-clicking the FX channel.\n" ) );
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
 	setToolTip( name );
-
 	m_renameLineEdit = new QLineEdit();
 	m_renameLineEdit->setText( name );
 	m_renameLineEdit->setFixedWidth( 65 );
 	m_renameLineEdit->setFont( pointSizeF( font(), 7.5f ) );
 	m_renameLineEdit->setReadOnly( true );
-
 	QGraphicsScene * scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, 33, FxLineHeight );
-
 	m_view = new QGraphicsView( this );
 	m_view->setStyleSheet( "border-style: none; background: transparent;" );
 	m_view->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_view->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	m_view->setAttribute( Qt::WA_TransparentForMouseEvents, true );
 	m_view->setScene( scene );
-
 	QGraphicsProxyWidget * proxyWidget = scene->addWidget( m_renameLineEdit );
 	proxyWidget->setRotation( -90 );
 	proxyWidget->setPos( 8, 145 );
-
 	connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 }
 
@@ -148,10 +137,11 @@ void FxLine::setChannelIndex( int index )
 
 
 
-void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
+void FxLine::drawFxLine( QPainter * p, const FxLine * fxLine, bool isActive, bool sendToThis, bool receiveFromThis )
 {
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
 	QString elidedName = elideName( name );
+
 	if( !m_inRename && m_renameLineEdit->text() != elidedName )
 	{
 		m_renameLineEdit->setText( elidedName );
@@ -159,16 +149,13 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 
 	int width = fxLine->rect().width();
 	int height = fxLine->rect().height();
-
 	p->fillRect( fxLine->rect(), isActive ? fxLine->backgroundActive() : p->background() );
-	
 	// inner border
 	p->setPen( isActive ? fxLine->strokeInnerActive() : fxLine->strokeInnerInactive() );
-	p->drawRect( 1, 1, width-3, height-3 );
-	
+	p->drawRect( 1, 1, width - 3, height - 3 );
 	// outer border
 	p->setPen( isActive ? fxLine->strokeOuterActive() : fxLine->strokeOuterInactive() );
-	p->drawRect( 0, 0, width-1, height-1 );
+	p->drawRect( 0, 0, width - 1, height - 1 );
 
 	// draw the mixer send background
 	if( sendToThis )
@@ -227,11 +214,13 @@ void FxLine::mouseDoubleClickEvent( QMouseEvent * )
 void FxLine::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( Engine::fxMixer()->effectChannel( m_channelIndex )->m_name, this );
-	if( m_channelIndex != 0 ) // no move-options in master 
+
+	if( m_channelIndex != 0 ) // no move-options in master
 	{
 		contextMenu->addAction( tr( "Move &left" ),	this, SLOT( moveChannelLeft() ) );
 		contextMenu->addAction( tr( "Move &right" ), this, SLOT( moveChannelRight() ) );
 	}
+
 	contextMenu->addAction( tr( "Rename &channel" ), this, SLOT( renameChannel() ) );
 	contextMenu->addSeparator();
 
@@ -240,6 +229,7 @@ void FxLine::contextMenuEvent( QContextMenuEvent * )
 		contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "R&emove channel" ), this, SLOT( removeChannel() ) );
 		contextMenu->addSeparator();
 	}
+
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "Remove &unused channels" ), this, SLOT( removeUnusedChannels() ) );
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
@@ -274,12 +264,14 @@ void FxLine::renameFinished()
 	m_lcd->show();
 	QString newName = m_renameLineEdit->text();
 	setFocus();
+
 	if( !newName.isEmpty() && Engine::fxMixer()->effectChannel( m_channelIndex )->m_name != newName )
 	{
 		Engine::fxMixer()->effectChannel( m_channelIndex )->m_name = newName;
 		m_renameLineEdit->setText( elideName( newName ) );
 		Engine::getSong()->setModified();
 	}
+
 	QString name = Engine::fxMixer()->effectChannel( m_channelIndex )->m_name;
 	setToolTip( name );
 }

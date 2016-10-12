@@ -45,11 +45,11 @@ public:
 	} ;
 
 	LedCheckBox( const QString & _txt, QWidget * _parent,
-				const QString & _name = QString::null,
-						LedColors _color = Yellow );
+		     const QString & _name = QString::null,
+		     LedColors _color = Yellow );
 	LedCheckBox( QWidget * _parent,
-				const QString & _name = QString::null,
-						LedColors _color = Yellow );
+		     const QString & _name = QString::null,
+		     LedColors _color = Yellow );
 
 	virtual ~LedCheckBox();
 
@@ -59,7 +59,7 @@ public:
 		return( m_text );
 	}
 
-	void setText( const QString& s );
+	void setText( const QString & s );
 
 	Q_PROPERTY( QString text READ text WRITE setText )
 

@@ -68,7 +68,7 @@ public:
 	} ;
 
 	EnvelopeAndLfoParameters( float _value_for_zero_amount,
-							Model * _parent );
+				  Model * _parent );
 	virtual ~EnvelopeAndLfoParameters();
 
 	static inline float expKnobVal( float _val )
@@ -82,8 +82,8 @@ public:
 	}
 
 	void fillLevel( float * _buf, f_cnt_t _frame,
-				const f_cnt_t _release_begin,
-				const fpp_t _frames );
+			const f_cnt_t _release_begin,
+			const fpp_t _frames );
 
 	inline bool isUsed() const
 	{

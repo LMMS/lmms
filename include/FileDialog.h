@@ -34,9 +34,9 @@ class EXPORT FileDialog : public QFileDialog
 {
 	Q_OBJECT
 public:
-	explicit FileDialog( QWidget *parent = 0, const QString &caption = QString(),
-						const QString &directory = QString(),
-						const QString &filter = QString() );
+	explicit FileDialog( QWidget * parent = 0, const QString & caption = QString(),
+			     const QString & directory = QString(),
+			     const QString & filter = QString() );
 
 	void clearSelection();
 };

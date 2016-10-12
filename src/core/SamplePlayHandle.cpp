@@ -33,7 +33,7 @@
 
 
 
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
+SamplePlayHandle::SamplePlayHandle( const QString & sampleFile ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
 	m_doneMayReturnTrue( true ),
@@ -50,7 +50,7 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
+SamplePlayHandle::SamplePlayHandle( SampleBuffer * sampleBuffer ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
@@ -67,7 +67,7 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
+SamplePlayHandle::SamplePlayHandle( SampleTCO * tco ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
 	m_doneMayReturnTrue( true ),
@@ -78,7 +78,7 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 	m_track( tco->getTrack() ),
 	m_bbTrack( NULL )
 {
-	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
+	setAudioPort( ( ( SampleTrack * )tco->getTrack() )->audioPort() );
 }
 
 
@@ -87,6 +87,7 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 SamplePlayHandle::~SamplePlayHandle()
 {
 	sharedObject::unref( m_sampleBuffer );
+
 	if( m_ownAudioPort )
 	{
 		delete audioPort();
@@ -99,6 +100,7 @@ SamplePlayHandle::~SamplePlayHandle()
 void SamplePlayHandle::play( sampleFrame * buffer )
 {
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
+
 	//play( 0, _try_parallelizing );
 	if( framesDone() >= totalFrames() )
 	{
@@ -118,13 +120,13 @@ void SamplePlayHandle::play( sampleFrame * buffer )
 	}
 
 	if( !( m_track && m_track->isMuted() )
-				&& !( m_bbTrack && m_bbTrack->isMuted() ) )
+			&& !( m_bbTrack && m_bbTrack->isMuted() ) )
 	{
-/*		stereoVolumeVector v =
-			{ { m_volumeModel->value() / DefaultVolume,
-				m_volumeModel->value() / DefaultVolume } };*/
+		/*		stereoVolumeVector v =
+					{ { m_volumeModel->value() / DefaultVolume,
+						m_volumeModel->value() / DefaultVolume } };*/
 		if( ! m_sampleBuffer->play( workingBuffer, &m_state, frames,
-								BaseFreq ) )
+					    BaseFreq ) )
 		{
 			memset( workingBuffer, 0, frames * sizeof( sampleFrame ) );
 		}

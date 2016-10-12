@@ -2,7 +2,7 @@
  * PeakController.h - peak-controller class
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ class EXPORT PeakController : public Controller
 	Q_OBJECT
 public:
 	PeakController( Model * _parent,
-		PeakControllerEffect *_peak_effect = NULL );
+			PeakControllerEffect * _peak_effect = NULL );
 
 
 	virtual ~PeakController();
@@ -78,7 +78,7 @@ private:
 	static int m_getCount;
 	static int m_loadCount;
 	static bool m_buggedFile;
-	
+
 	float m_attackCoeff;
 	float m_decayCoeff;
 	bool m_coeffNeedsUpdate;

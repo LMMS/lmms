@@ -3,7 +3,7 @@
  *                     checkboxes/radiobuttons etc)
  *
  * Copyright (c) 2004-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QMouseEvent>
 #include <QPainter>
@@ -124,6 +124,7 @@ void PixmapButton::setActiveGraphic( const QPixmap & _pm )
 void PixmapButton::setInactiveGraphic( const QPixmap & _pm, bool _update )
 {
 	m_inactivePixmap = _pm;
+
 	if( _update )
 	{
 		update();
@@ -136,7 +137,7 @@ QSize PixmapButton::sizeHint() const
 	{
 		return m_activePixmap.size();
 	}
-	else 
+	else
 	{
 		return m_inactivePixmap.size();
 	}

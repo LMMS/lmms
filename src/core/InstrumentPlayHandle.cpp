@@ -26,9 +26,9 @@
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
 
-InstrumentPlayHandle::InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack ) :
-		PlayHandle( TypeInstrumentPlayHandle ),
-		m_instrument( instrument )
+InstrumentPlayHandle::InstrumentPlayHandle( Instrument * instrument, InstrumentTrack * instrumentTrack ) :
+	PlayHandle( TypeInstrumentPlayHandle ),
+	m_instrument( instrument )
 {
 	setAudioPort( instrumentTrack->audioPort() );
 }

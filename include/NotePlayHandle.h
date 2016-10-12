@@ -37,7 +37,7 @@ class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;
 
-template<ch_cnt_t=DEFAULT_CHANNELS> class BasicFilters;
+template<ch_cnt_t = DEFAULT_CHANNELS> class BasicFilters;
 typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
@@ -60,13 +60,13 @@ public:
 	};
 	typedef Origins Origin;
 
-	NotePlayHandle( InstrumentTrack* instrumentTrack,
-					const f_cnt_t offset,
-					const f_cnt_t frames,
-					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
-					int midiEventChannel = -1,
-					Origin origin = OriginPattern );
+	NotePlayHandle( InstrumentTrack * instrumentTrack,
+			const f_cnt_t offset,
+			const f_cnt_t frames,
+			const Note & noteToPlay,
+			NotePlayHandle * parent = NULL,
+			int midiEventChannel = -1,
+			Origin origin = OriginPattern );
 	virtual ~NotePlayHandle() {}
 	void done();
 
@@ -90,11 +90,11 @@ public:
 	f_cnt_t noteOffset() const
 	{
 		return m_totalFramesPlayed == 0
-			? offset()
-			: 0;
+		       ? offset()
+		       : 0;
 	}
 
-	const float& frequency() const
+	const float & frequency() const
 	{
 		return m_frequency;
 	}
@@ -106,7 +106,7 @@ public:
 	}
 
 	/*! Renders one chunk using the attached instrument into the buffer */
-	virtual void play( sampleFrame* buffer );
+	virtual void play( sampleFrame * buffer );
 
 	/*! Returns whether playback of note is finished and thus handle can be deleted */
 	virtual bool isFinished() const
@@ -121,7 +121,7 @@ public:
 	fpp_t framesLeftForCurrentPeriod() const;
 
 	/*! Returns whether the play handle plays on a certain track */
-	virtual bool isFromTrack( const Track* _track ) const;
+	virtual bool isFromTrack( const Track * _track ) const;
 
 	/*! Releases the note (and plays release frames */
 	void noteOff( const f_cnt_t offset = 0 );
@@ -167,13 +167,13 @@ public:
 	float volumeLevel( const f_cnt_t frame );
 
 	/*! Returns instrument track which is being played by this handle (const version) */
-	const InstrumentTrack* instrumentTrack() const
+	const InstrumentTrack * instrumentTrack() const
 	{
 		return m_instrumentTrack;
 	}
 
 	/*! Returns instrument track which is being played by this handle */
-	InstrumentTrack* instrumentTrack()
+	InstrumentTrack * instrumentTrack()
 	{
 		return m_instrumentTrack;
 	}
@@ -219,7 +219,7 @@ public:
 	/*! Returns list of note-play-handles belonging to given instrument track.
 	    If allPlayHandles = true, also released note-play-handles and children
 	    are returned */
-	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* Track, bool allPlayHandles = false );
+	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack * Track, bool allPlayHandles = false );
 
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
 	bool operator==( const NotePlayHandle & _nph ) const;
@@ -231,25 +231,25 @@ public:
 	}
 
 	/*! Sets attached BB track */
-	void setBBTrack( Track* t )
+	void setBBTrack( Track * t )
 	{
 		m_bbTrack = t;
 	}
 
 	/*! Process note detuning automation */
-	void processMidiTime( const MidiTime& time );
+	void processMidiTime( const MidiTime & time );
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
 	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
-	void setSongGlobalParentOffset( const MidiTime& offset )
+	void setSongGlobalParentOffset( const MidiTime & offset )
 	{
 		m_songGlobalParentOffset = offset;
 	}
 
 	/*! Returns song-global offset */
-	const MidiTime& songGlobalParentOffset() const
+	const MidiTime & songGlobalParentOffset() const
 	{
 		return m_songGlobalParentOffset;
 	}
@@ -264,7 +264,7 @@ private:
 	{
 		MM_OPERATORS
 	public:
-		BaseDetuning( DetuningHelper* detuning );
+		BaseDetuning( DetuningHelper * detuning );
 
 		void setValue( float val )
 		{
@@ -284,25 +284,25 @@ private:
 
 	void updateFrequency();
 
-	InstrumentTrack* m_instrumentTrack;		// needed for calling
-											// InstrumentTrack::playNote
+	InstrumentTrack * m_instrumentTrack;		// needed for calling
+	// InstrumentTrack::playNote
 	f_cnt_t m_frames;						// total frames to play
 	f_cnt_t m_totalFramesPlayed;			// total frame-counter - used for
-											// figuring out whether a whole note
-											// has been played
+	// figuring out whether a whole note
+	// has been played
 	f_cnt_t m_framesBeforeRelease;			// number of frames after which note
-											// is released
+	// is released
 	f_cnt_t m_releaseFramesToDo;			// total numbers of frames to be
-											// played after release
+	// played after release
 	f_cnt_t m_releaseFramesDone;			// number of frames done after
-											// release of note
+	// release of note
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
 	bool m_hasParent;						// indicates whether note has parent
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;
 	bool m_muted;							// indicates whether note is muted
-	Track* m_bbTrack;						// related BB track
+	Track * m_bbTrack;						// related BB track
 
 	// tempo reaction
 	bpm_t m_origTempo;						// original tempo
@@ -313,7 +313,7 @@ private:
 	float m_frequency;
 	float m_unpitchedFrequency;
 
-	BaseDetuning* m_baseDetuning;
+	BaseDetuning * m_baseDetuning;
 	MidiTime m_songGlobalParentOffset;
 
 	int m_midiChannel;
@@ -331,13 +331,13 @@ class NotePlayHandleManager
 	MM_OPERATORS
 public:
 	static void init();
-	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
-					const f_cnt_t offset,
-					const f_cnt_t frames,
-					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
-					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
+	static NotePlayHandle * acquire( InstrumentTrack * instrumentTrack,
+					 const f_cnt_t offset,
+					 const f_cnt_t frames,
+					 const Note & noteToPlay,
+					 NotePlayHandle * parent = NULL,
+					 int midiEventChannel = -1,
+					 NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
 	static void release( NotePlayHandle * nph );
 	static void extend( int i );
 

@@ -72,15 +72,14 @@
 
 
 
-AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
+AudioOss::AudioOss( bool & _success_ful, Mixer * _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
-		ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
-					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+			     ConfigManager::inst()->value( "audiooss", "channels" ).toInt(),
+			     DEFAULT_CHANNELS, SURROUND_CHANNELS ),
+		     _mixer ),
 	m_convertEndian( false )
 {
 	_success_ful = false;
-
 	m_audioFD = open( probeDevice().toLatin1().constData(), O_WRONLY, 0 );
 
 	if( m_audioFD == -1 )
@@ -89,10 +88,9 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 		return;
 	}
 
-
 	// Make the file descriptor use blocking writes with fcntl()
 	if ( fcntl( m_audioFD, F_SETFL, fcntl( m_audioFD, F_GETFL ) &
-							~O_NONBLOCK ) < 0 )
+			~O_NONBLOCK ) < 0 )
 	{
 		printf( "could not set audio blocking mode\n" );
 		return;
@@ -101,12 +99,12 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	// set FD_CLOEXEC flag for file descriptor so forked processes
 	// do not inherit it
 	fcntl( m_audioFD, F_SETFD, fcntl( m_audioFD, F_GETFD ) | FD_CLOEXEC );
-
 	int frag_spec;
+
 	for( frag_spec = 0; static_cast<int>( 0x01 << frag_spec ) <
-		mixer()->framesPerPeriod() * channels() *
-							BYTES_PER_INT_SAMPLE;
-		++frag_spec )
+			mixer()->framesPerPeriod() * channels() *
+			BYTES_PER_INT_SAMPLE;
+			++frag_spec )
 	{
 	}
 
@@ -119,6 +117,7 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	}
 
 	unsigned int value;
+
 	// Get a list of supported hardware formats
 	if ( ioctl( m_audioFD, SNDCTL_DSP_GETFMTS, &value ) < 0 )
 	{
@@ -138,14 +137,16 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 	}
 	else
 	{
-		printf(" Soundcard doesn't support signed 16-bit-data\n");
+		printf( " Soundcard doesn't support signed 16-bit-data\n" );
 	}
+
 	if ( ioctl( m_audioFD, SNDCTL_DSP_SETFMT, &value ) < 0 )
 	{
 		perror( "SNDCTL_DSP_SETFMT" );
 		printf( "Couldn't set audio format\n" );
 		return;
 	}
+
 	if( ( isLittleEndian() && ( value == AFMT_S16_BE ) ) ||
 			( !isLittleEndian() && ( value == AFMT_S16_LE ) ) )
 	{
@@ -154,12 +155,14 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 
 	// Set the number of channels of output
 	value = channels();
+
 	if ( ioctl( m_audioFD, SNDCTL_DSP_CHANNELS, &value ) < 0 )
 	{
 		perror( "SNDCTL_DSP_CHANNELS" );
 		printf( "Cannot set the number of channels\n" );
 		return;
 	}
+
 	if( value != channels() )
 	{
 		printf( "Couldn't set number of channels\n" );
@@ -168,21 +171,25 @@ AudioOss::AudioOss( bool & _success_ful, Mixer*  _mixer ) :
 
 	// Set the DSP frequency
 	value = sampleRate();
+
 	if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 	{
 		perror( "SNDCTL_DSP_SPEED" );
 		printf( "Couldn't set audio frequency\n" );
 		return;
 	}
+
 	if( value != sampleRate() )
 	{
 		value = mixer()->baseSampleRate();
+
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 		{
 			perror( "SNDCTL_DSP_SPEED" );
 			printf( "Couldn't set audio frequency\n" );
 			return;
 		}
+
 		setSampleRate( value );
 	}
 
@@ -204,10 +211,12 @@ AudioOss::~AudioOss()
 QString AudioOss::probeDevice()
 {
 	QString dev = ConfigManager::inst()->value( "AudioOss", "Device" );
+
 	if( dev.isEmpty() )
 	{
 		char * adev = getenv( "AUDIODEV" );	// Is there a standard
-							// variable name?
+
+		// variable name?
 		if( adev != NULL )
 		{
 			dev = adev;
@@ -222,20 +231,24 @@ QString AudioOss::probeDevice()
 	if( QFileInfo( dev ).isWritable() == false )
 	{
 		int instance = -1;
+
 		while( 1 )
 		{
 			dev = _PATH_DEV_DSP + QString::number( ++instance );
+
 			if( !QFileInfo( dev ).exists() )
 			{
 				dev = _PATH_DEV_DSP;
 				break;
 			}
+
 			if( QFileInfo( dev ).isWritable() )
 			{
 				break;
 			}
 		}
 	}
+
 	return dev;
 }
 
@@ -266,23 +279,26 @@ void AudioOss::applyQualitySettings()
 	if( hqAudio() )
 	{
 		setSampleRate( Engine::mixer()->processingSampleRate() );
-
 		unsigned int value = sampleRate();
+
 		if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 		{
 			perror( "SNDCTL_DSP_SPEED" );
 			printf( "Couldn't set audio frequency\n" );
 			return;
 		}
+
 		if( value != sampleRate() )
 		{
 			value = mixer()->baseSampleRate();
+
 			if ( ioctl( m_audioFD, SNDCTL_DSP_SPEED, &value ) < 0 )
 			{
 				perror( "SNDCTL_DSP_SPEED" );
 				printf( "Couldn't set audio frequency\n" );
 				return;
 			}
+
 			setSampleRate( value );
 		}
 	}
@@ -298,20 +314,22 @@ void AudioOss::run()
 	surroundSampleFrame * temp =
 		new surroundSampleFrame[mixer()->framesPerPeriod()];
 	int_sample_t * outbuf =
-			new int_sample_t[mixer()->framesPerPeriod() *
-								channels()];
+		new int_sample_t[mixer()->framesPerPeriod() *
+				 channels()];
 
 	while( true )
 	{
 		const fpp_t frames = getNextBuffer( temp );
+
 		if( !frames )
 		{
 			break;
 		}
 
 		int bytes = convertToS16( temp, frames,
-				mixer()->masterGain(), outbuf,
-							m_convertEndian );
+					  mixer()->masterGain(), outbuf,
+					  m_convertEndian );
+
 		if( write( m_audioFD, outbuf, bytes ) != bytes )
 		{
 			break;
@@ -330,22 +348,18 @@ AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
 {
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );
-
 	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
 	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
 	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );	
+	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
 	m->setStep( 2 );
 	m->setValue( ConfigManager::inst()->value( "audiooss",
-							"channels" ).toInt() );
-
+			"channels" ).toInt() );
 	m_channels = new LcdSpinBox( 1, this );
 	m_channels->setModel( m );
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 180, 20 );
-
 }
 
 
@@ -362,9 +376,9 @@ AudioOss::setupWidget::~setupWidget()
 void AudioOss::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audiooss", "device",
-							m_device->text() );
+					 m_device->text() );
 	ConfigManager::inst()->setValue( "audiooss", "channels",
-				QString::number( m_channels->value<int>() ) );
+					 QString::number( m_channels->value<int>() ) );
 }
 
 

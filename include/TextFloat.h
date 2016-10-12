@@ -2,7 +2,7 @@
  * TextFloat.h - class textFloat, a floating text-label
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -49,19 +49,19 @@ public:
 
 
 	static TextFloat * displayMessage( const QString & _msg,
-						int _timeout = 2000,
-						QWidget * _parent = NULL,
-						int _add_y_margin = 0 );
+					   int _timeout = 2000,
+					   QWidget * _parent = NULL,
+					   int _add_y_margin = 0 );
 	static TextFloat * displayMessage( const QString & _title,
-						const QString & _msg,
-						const QPixmap & _pixmap =
-								QPixmap(),
-						int _timeout = 2000,
-						QWidget * _parent = NULL );
+					   const QString & _msg,
+					   const QPixmap & _pixmap =
+							   QPixmap(),
+					   int _timeout = 2000,
+					   QWidget * _parent = NULL );
 
 	void moveGlobal( QWidget * _w, const QPoint & _offset )
 	{
-		move( _w->mapToGlobal( QPoint( 0, 0 ) )+_offset );
+		move( _w->mapToGlobal( QPoint( 0, 0 ) ) + _offset );
 	}
 
 

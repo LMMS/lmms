@@ -37,17 +37,16 @@
 
 
 AutomatableSlider::AutomatableSlider( QWidget * _parent,
-						const QString & _name ) :
+				      const QString & _name ) :
 	QSlider( _parent ),
 	IntModelView( new IntModel( 0, 0, 0, NULL, _name, true ), this ),
 	m_showStatus( false )
 {
 	setWindowTitle( _name );
-
 	connect( this, SIGNAL( valueChanged( int ) ),
-					this, SLOT( changeValue( int ) ) );
+		 this, SLOT( changeValue( int ) ) );
 	connect( this, SIGNAL( sliderMoved( int ) ),
-					this, SLOT( moveSlider( int ) ) );
+		 this, SLOT( moveSlider( int ) ) );
 }
 
 
@@ -73,7 +72,7 @@ void AutomatableSlider::contextMenuEvent( QContextMenuEvent * _me )
 void AutomatableSlider::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
-	   ! ( _me->modifiers() & Qt::ControlModifier ) )
+			! ( _me->modifiers() & Qt::ControlModifier ) )
 	{
 		m_showStatus = true;
 		QSlider::mousePressEvent( _me );
@@ -112,7 +111,7 @@ void AutomatableSlider::modelChanged()
 	QSlider::setRange( model()->minValue(), model()->maxValue() );
 	updateSlider();
 	connect( model(), SIGNAL( dataChanged() ),
-				this, SLOT( updateSlider() ) );
+		 this, SLOT( updateSlider() ) );
 }
 
 

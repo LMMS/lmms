@@ -34,22 +34,22 @@
 class EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
-	
+
 	// theming qproperties
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-	
+
 public:
-	LcdWidget( QWidget* parent, const QString& name = QString::null );
-	LcdWidget( int numDigits, QWidget* parent, const QString& name = QString::null );
-	LcdWidget( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
+	LcdWidget( QWidget * parent, const QString & name = QString::null );
+	LcdWidget( int numDigits, QWidget * parent, const QString & name = QString::null );
+	LcdWidget( int numDigits, const QString & style, QWidget * parent, const QString & name = QString::null );
 
 	virtual ~LcdWidget();
 
 	void setValue( int value );
-	void setLabel( const QString& label );
+	void setLabel( const QString & label );
 
-	void addTextForValue( int value, const QString& text )
+	void addTextForValue( int value, const QString & text )
 	{
 		m_textForValue[value] = text;
 		update();
@@ -59,10 +59,10 @@ public:
 
 	inline int numDigits() const { return m_numDigits; }
 	inline void setNumDigits( int n ) { m_numDigits = n; updateSize(); }
-	
+
 	QColor textColor() const;
 	void setTextColor( const QColor & c );
-	
+
 	QColor textShadowColor() const;
 	void setTextShadowColor( const QColor & c );
 
@@ -90,7 +90,7 @@ private:
 	QString m_display;
 
 	QString m_label;
-	QPixmap* m_lcdPixmap;
+	QPixmap * m_lcdPixmap;
 
 	QColor m_textColor;
 	QColor m_textShadowColor;
@@ -100,7 +100,7 @@ private:
 	int m_numDigits;
 	int m_marginWidth;
 
-	void initUi( const QString& name, const QString &style = QString("19green") ); //!< to be called by ctors
+	void initUi( const QString & name, const QString & style = QString( "19green" ) ); //!< to be called by ctors
 
 } ;
 

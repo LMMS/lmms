@@ -65,7 +65,7 @@ public:
 	{
 		return m_controller->currentValue( _offset );
 	}
-	
+
 	ValueBuffer * valueBuffer()
 	{
 		return m_controller->valueBuffer();
@@ -107,7 +107,7 @@ protected:
 	Controller * m_controller;
 	QString m_targetName;
 	int m_controllerId;
-	
+
 	bool m_ownsController;
 
 	static ControllerConnectionVector s_connections;

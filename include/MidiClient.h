@@ -46,8 +46,8 @@ public:
 
 	// to be implemented by sub-classes
 	virtual void processOutEvent( const MidiEvent & _me,
-						const MidiTime & _time,
-						const MidiPort * _port ) = 0;
+				      const MidiTime & _time,
+				      const MidiPort * _port ) = 0;
 
 	// inheriting classes can re-implement this for being able to update
 	// their internal port-structures etc.
@@ -86,11 +86,11 @@ public:
 
 	// (un)subscribe given MidiPort to/from destination-port
 	virtual void subscribeReadablePort( MidiPort * _port,
-						const QString & _dest,
-						bool _subscribe = true );
+					    const QString & _dest,
+					    bool _subscribe = true );
 	virtual void subscribeWritablePort( MidiPort * _port,
-						const QString & _dest,
-						bool _subscribe = true );
+					    const QString & _dest,
+					    bool _subscribe = true );
 
 	// qobject-derived classes can use this for make a slot being
 	// connected to signal of non-raw-MIDI-client if port-lists change
@@ -141,7 +141,7 @@ protected:
 private:
 	// this does MIDI-event-process
 	void processParsedEvent();
-	virtual void processOutEvent( const MidiEvent& event, const MidiTime& time, const MidiPort* port );
+	virtual void processOutEvent( const MidiEvent & event, const MidiTime & time, const MidiPort * port );
 
 	// small helper function returning length of a certain event - this
 	// is necessary for parsing raw-MIDI-data
@@ -152,16 +152,16 @@ private:
 	struct midiParserData
 	{
 		uint8_t m_status;		// identifies the type of event, that
-					// is currently received ('Noteon',
-					// 'Pitch Bend' etc).
+		// is currently received ('Noteon',
+		// 'Pitch Bend' etc).
 		uint8_t m_channel;	// The channel of the event that is
-					// received (in case of a channel event)
+		// received (in case of a channel event)
 		uint32_t m_bytes;		// How many bytes have been read for
-					// the current event?
+		// the current event?
 		uint32_t m_bytesTotal;	// How many bytes does the current
-					// event type include?
+		// event type include?
 		uint32_t m_buffer[RAW_MIDI_PARSE_BUF_SIZE];
-					// buffer for incoming data
+		// buffer for incoming data
 		MidiEvent m_midiEvent;	// midi-event
 	} m_midiParseData;
 

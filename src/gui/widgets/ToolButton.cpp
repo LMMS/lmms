@@ -2,7 +2,7 @@
  * ToolButton.cpp - implementation of LMMS-tool-button for common (cool) look
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include "ToolButton.h"
 #include "ToolTip.h"
@@ -38,6 +38,7 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	{
 		connect( this, SIGNAL( clicked() ), _receiver, _slot );
 	}
+
 	ToolTip::add( this, _tooltip );
 	setIcon( _pixmap );
 }

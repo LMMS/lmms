@@ -35,13 +35,13 @@ class AudioFileDevice : public AudioDevice
 {
 public:
 	AudioFileDevice( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, const QString & _file,
-				const bool _use_vbr,
-				const bitrate_t _nom_bitrate,
-				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate,
-				const int _depth,
-				Mixer* mixer );
+			 const ch_cnt_t _channels, const QString & _file,
+			 const bool _use_vbr,
+			 const bitrate_t _nom_bitrate,
+			 const bitrate_t _min_bitrate,
+			 const bitrate_t _max_bitrate,
+			 const int _depth,
+			 Mixer * mixer );
 	virtual ~AudioFileDevice();
 
 	QString outputFile() const
@@ -51,7 +51,7 @@ public:
 
 
 protected:
-	int writeData( const void* data, int len );
+	int writeData( const void * data, int len );
 
 	inline bool useVBR() const
 	{
@@ -99,16 +99,16 @@ private:
 
 
 typedef AudioFileDevice * ( * AudioFileDeviceInstantiaton )
-					( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
-						bool & _success_ful,
-						const QString & _file,
-						const bool _use_vbr,
-						const bitrate_t _nom_bitrate,
-						const bitrate_t _min_bitrate,
-						const bitrate_t _max_bitrate,
-						const int _depth,
-						Mixer* mixer );
+( const sample_rate_t _sample_rate,
+  const ch_cnt_t _channels,
+  bool & _success_ful,
+  const QString & _file,
+  const bool _use_vbr,
+  const bitrate_t _nom_bitrate,
+  const bitrate_t _min_bitrate,
+  const bitrate_t _max_bitrate,
+  const int _depth,
+  Mixer * mixer );
 
 
 #endif

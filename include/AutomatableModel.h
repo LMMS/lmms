@@ -35,28 +35,28 @@
 
 // simple way to map a property of a view to a model
 #define mapPropertyFromModelPtr(type,getfunc,setfunc,modelname)	\
-		public:													\
-			type getfunc() const								\
-			{													\
-				return (type) modelname->value();				\
-			}													\
-		public slots:											\
-			void setfunc( const type val )						\
-			{													\
-				modelname->setValue( val );						\
-			}
+	public:													\
+	type getfunc() const								\
+	{													\
+		return (type) modelname->value();				\
+	}													\
+	public slots:											\
+	void setfunc( const type val )						\
+	{													\
+		modelname->setValue( val );						\
+	}
 
 #define mapPropertyFromModel(type,getfunc,setfunc,modelname)	\
-		public:													\
-			type getfunc() const								\
-			{													\
-				return (type) modelname.value();				\
-			}													\
-		public slots:											\
-			void setfunc( const type val )						\
-			{													\
-				modelname.setValue( (float) val );				\
-			}
+	public:													\
+	type getfunc() const								\
+	{													\
+		return (type) modelname.value();				\
+	}													\
+	public slots:											\
+	void setfunc( const type val )						\
+	{													\
+		modelname.setValue( (float) val );				\
+	}
 
 
 
@@ -84,13 +84,13 @@ public:
 	} ;
 
 	AutomatableModel( DataType type,
-						const float val = 0,
-						const float min = 0,
-						const float max = 0,
-						const float step = 0,
-						Model* parent = NULL,
-						const QString& displayName = QString(),
-						bool defaultConstructed = false );
+			  const float val = 0,
+			  const float min = 0,
+			  const float max = 0,
+			  const float step = 0,
+			  Model * parent = NULL,
+			  const QString & displayName = QString(),
+			  bool defaultConstructed = false );
 
 	virtual ~AutomatableModel();
 
@@ -106,19 +106,19 @@ public:
 		return isAutomated() || m_controllerConnection != NULL;
 	}
 
-	ControllerConnection* controllerConnection() const
+	ControllerConnection * controllerConnection() const
 	{
 		return m_controllerConnection;
 	}
 
 
-	void setControllerConnection( ControllerConnection* c );
+	void setControllerConnection( ControllerConnection * c );
 
 
 	template<class T>
 	static T castValue( const float v )
 	{
-		return (T)( v );
+		return ( T )( v );
 	}
 
 	template<bool>
@@ -195,7 +195,8 @@ public:
 	}
 
 	void setRange( const float min, const float max, const float step = 1 );
-	void setScaleType( ScaleType sc ) {
+	void setScaleType( ScaleType sc )
+	{
 		m_scaleType = sc;
 	}
 	void setScaleLogarithmic( bool setToTrue = true )
@@ -219,8 +220,8 @@ public:
 		m_centerValue = centerVal;
 	}
 
-	static void linkModels( AutomatableModel* m1, AutomatableModel* m2 );
-	static void unlinkModels( AutomatableModel* m1, AutomatableModel* m2 );
+	static void linkModels( AutomatableModel * m1, AutomatableModel * m2 );
+	static void unlinkModels( AutomatableModel * m1, AutomatableModel * m2 );
 
 	void unlinkAllModels();
 
@@ -232,11 +233,11 @@ public:
 	 *  Depending on the model, this can be done in an attribute or in a subnode.
 	 * @param name Name to store this model as.
 	 */
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element, const QString& name );
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element, const QString & name );
 
 	/*! \brief Loads settings (value, automation links and controller connections) of AutomatableModel from
 				specified DOM element using <name> as attribute/node name */
-	virtual void loadSettings( const QDomElement& element, const QString& name );
+	virtual void loadSettings( const QDomElement & element, const QString & name );
 
 	virtual QString nodeName() const
 	{
@@ -260,10 +261,11 @@ public:
 			m_valueChanged = false;
 			return true;
 		}
+
 		return false;
 	}
 
-	float globalAutomationValueAt( const MidiTime& time );
+	float globalAutomationValueAt( const MidiTime & time );
 
 	bool hasStrictStepSize() const
 	{
@@ -301,18 +303,18 @@ protected:
 
 
 private:
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		saveSettings( doc, element, "value" );
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	virtual void loadSettings( const QDomElement & element )
 	{
 		loadSettings( element, "value" );
 	}
 
-	void linkModel( AutomatableModel* model );
-	void unlinkModel( AutomatableModel* model );
+	void linkModel( AutomatableModel * model );
+	void unlinkModel( AutomatableModel * model );
 
 	//! @brief Scales @value from linear to logarithmic.
 	//! Value should be within [0,1]
@@ -320,7 +322,7 @@ private:
 
 	//! rounds @a value to @a where if it is close to it
 	//! @param value will be modified to rounded value
-	template<class T> void roundAt( T &value, const T &where ) const;
+	template<class T> void roundAt( T & value, const T & where ) const;
 
 
 	DataType m_dataType;
@@ -348,7 +350,7 @@ private:
 
 
 	//! NULL if not appended to controller, otherwise connection info
-	ControllerConnection* m_controllerConnection;
+	ControllerConnection * m_controllerConnection;
 
 
 	static float s_copiedValue;
@@ -377,22 +379,22 @@ signals:
 	{															\
 		return AutomatableModel::value<type>( frameOffset );	\
 	}															\
-																\
+	\
 	type initValue() const										\
 	{															\
 		return AutomatableModel::initValue<type>();				\
 	}															\
-																\
+	\
 	type minValue() const										\
 	{															\
 		return AutomatableModel::minValue<type>();				\
 	}															\
-																\
+	\
 	type maxValue() const										\
 	{															\
 		return AutomatableModel::maxValue<type>();				\
 	}															\
-
+	 
 
 // some typed AutomatableModel-definitions
 
@@ -400,14 +402,14 @@ class FloatModel : public AutomatableModel
 {
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
-				Model * parent = NULL,
-				const QString& displayName = QString(),
-				bool defaultConstructed = false ) :
+		    Model * parent = NULL,
+		    const QString & displayName = QString(),
+		    bool defaultConstructed = false ) :
 		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
 
-	defaultTypedMethods(float);
+	defaultTypedMethods( float );
 
 } ;
 
@@ -416,14 +418,14 @@ class IntModel : public AutomatableModel
 {
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
-				Model* parent = NULL,
-				const QString& displayName = QString(),
-				bool defaultConstructed = false ) :
+		  Model * parent = NULL,
+		  const QString & displayName = QString(),
+		  bool defaultConstructed = false ) :
 		AutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
 	{
 	}
 
-	defaultTypedMethods(int);
+	defaultTypedMethods( int );
 
 } ;
 
@@ -432,14 +434,14 @@ class BoolModel : public AutomatableModel
 {
 public:
 	BoolModel( const bool val = false,
-				Model* parent = NULL,
-				const QString& displayName = QString(),
-				bool defaultConstructed = false ) :
+		   Model * parent = NULL,
+		   const QString & displayName = QString(),
+		   bool defaultConstructed = false ) :
 		AutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
 	{
 	}
 
-	defaultTypedMethods(bool);
+	defaultTypedMethods( bool );
 
 } ;
 

@@ -41,11 +41,11 @@ inline QFont pointSize( QFont _f )
 {
 	static const float DPI = 96;
 #ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( ((float) SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF( ( ( float ) SIZE + 0.5f ) * DPI /
+			  QApplication::desktop()->logicalDpiY() );
 #else
-	_f.setPointSizeF( (float) SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF( ( float ) SIZE * DPI /
+			  QApplication::desktop()->logicalDpiY() );
 #endif
 	return( _f );
 }
@@ -55,11 +55,11 @@ inline QFont pointSizeF( QFont _f, float SIZE )
 {
 	static const float DPI = 96;
 #ifdef LMMS_BUILD_WIN32
-	_f.setPointSizeF( (SIZE+0.5f) * DPI /
-			QApplication::desktop()->logicalDpiY() );
+	_f.setPointSizeF( ( SIZE + 0.5f ) * DPI /
+			  QApplication::desktop()->logicalDpiY() );
 #else
 	_f.setPointSizeF( SIZE * DPI /
-			QApplication::desktop()->logicalDpiY() );
+			  QApplication::desktop()->logicalDpiY() );
 #endif
 	return( _f );
 }

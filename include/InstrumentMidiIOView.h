@@ -42,7 +42,7 @@ class InstrumentMidiIOView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	InstrumentMidiIOView( QWidget* parent );
+	InstrumentMidiIOView( QWidget * parent );
 	virtual ~InstrumentMidiIOView();
 
 
@@ -61,7 +61,7 @@ private:
 	LcdSpinBox * m_fixedOutputNoteSpinBox;
 	QToolButton * m_wpBtn;
 
-	LcdSpinBox* m_baseVelocitySpinBox;
+	LcdSpinBox * m_baseVelocitySpinBox;
 
 } ;
 
@@ -69,7 +69,7 @@ class InstrumentMiscView : public QWidget
 {
 	Q_OBJECT
 public:
-	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
+	InstrumentMiscView( InstrumentTrack * it, QWidget * parent );
 	~InstrumentMiscView();
 
 private:

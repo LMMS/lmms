@@ -32,31 +32,31 @@
 class EXPORT ModelView
 {
 public:
-	ModelView( Model* model, QWidget* widget );
+	ModelView( Model * model, QWidget * widget );
 	virtual ~ModelView();
 
-	virtual void setModel( Model* model, bool isOldModelValid = true );
+	virtual void setModel( Model * model, bool isOldModelValid = true );
 
-	Model* model()
+	Model * model()
 	{
 		return m_model;
 	}
 
-	const Model* model() const
+	const Model * model() const
 	{
 		return m_model;
 	}
 
 	template<class T>
-	T* castModel()
+	T * castModel()
 	{
-		return dynamic_cast<T*>( model() );
+		return dynamic_cast<T *>( model() );
 	}
 
 	template<class T>
-	const T* castModel() const
+	const T * castModel() const
 	{
-		return dynamic_cast<const T*>( model() );
+		return dynamic_cast<const T *>( model() );
 	}
 
 
@@ -66,7 +66,7 @@ protected:
 	{
 	}
 
-	QWidget* widget()
+	QWidget * widget()
 	{
 		return m_widget;
 	}
@@ -75,7 +75,7 @@ protected:
 
 
 private:
-	QWidget* m_widget;
+	QWidget * m_widget;
 	QPointer<Model> m_model;
 
 } ;
