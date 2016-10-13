@@ -31,9 +31,8 @@
 
 
 
-stereoEnhancerControlDialog::stereoEnhancerControlDialog(
-	stereoEnhancerControls * _controls ) :
-	EffectControlDialog( _controls )
+stereoEnhancerControlDialog::stereoEnhancerControlDialog(stereoEnhancerControls *_controls, QWidget *_parent) :
+        EffectControlDialog(_controls, _parent)
 {
 	QHBoxLayout * l = new QHBoxLayout( this );
 

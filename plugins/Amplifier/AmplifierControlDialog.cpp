@@ -31,8 +31,8 @@
 
 
 
-AmplifierControlDialog::AmplifierControlDialog( AmplifierControls* controls ) :
-	EffectControlDialog( controls )
+AmplifierControlDialog::AmplifierControlDialog(AmplifierControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

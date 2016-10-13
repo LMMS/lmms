@@ -56,9 +56,9 @@ public:
 		return( 5 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return( new MultitapEchoControlDialog( this ) );
+		return(new MultitapEchoControlDialog(this, NULL));
 	}
 
 private slots:

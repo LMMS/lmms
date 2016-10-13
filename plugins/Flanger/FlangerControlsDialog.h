@@ -33,7 +33,7 @@ class FlangerControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	FlangerControlsDialog( FlangerControls* controls );
+	FlangerControlsDialog(FlangerControls *controls, QWidget *_parent);
 	virtual ~FlangerControlsDialog()
 	{
 	}

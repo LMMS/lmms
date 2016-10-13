@@ -35,7 +35,7 @@ class SpectrumAnalyzerControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls );
+	SpectrumAnalyzerControlDialog(SpectrumAnalyzerControls *controls, QWidget *_parent);
 	virtual ~SpectrumAnalyzerControlDialog()
 	{
 	}

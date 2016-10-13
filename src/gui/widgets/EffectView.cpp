@@ -107,7 +107,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		connect( ctls_btn, SIGNAL( clicked() ),
 					this, SLOT( editControls() ) );
 
-		m_controlView = effect()->controls()->createView();
+		m_controlView = effect()->controls()->createView( _parent );
 		if( m_controlView )
 		{
 			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );

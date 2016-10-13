@@ -31,8 +31,8 @@
 #include "Effect.h"
 
 
-EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
-	QWidget( NULL ),
+EffectControlDialog::EffectControlDialog(EffectControls *_controls, QWidget *_parent) :
+	QWidget( _parent ),
 	ModelView( _controls, this ),
 	m_effectControls( _controls )
 {

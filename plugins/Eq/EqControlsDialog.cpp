@@ -38,8 +38,8 @@
 #include "LedCheckbox.h"
 
 
-EqControlsDialog::EqControlsDialog( EqControls *controls ) :
-	EffectControlDialog( controls ),
+EqControlsDialog::EqControlsDialog(EqControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent),
 	m_controls( controls )
 {
 	setAutoFillBackground( true );

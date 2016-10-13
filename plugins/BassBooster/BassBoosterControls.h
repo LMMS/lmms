@@ -54,9 +54,9 @@ public:
 		return 3;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new BassBoosterControlDialog( this );
+		return new BassBoosterControlDialog(this, NULL);
 	}
 
 

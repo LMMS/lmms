@@ -50,9 +50,9 @@ public:
 	virtual int controlCount(){
 		return 5;
 	}
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new DelayControlsDialog( this );
+		return new DelayControlsDialog(this, NULL);
 	}
 
 	float m_outPeakL;

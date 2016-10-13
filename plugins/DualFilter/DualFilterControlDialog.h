@@ -36,7 +36,7 @@ class DualFilterControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	DualFilterControlDialog( DualFilterControls* controls );
+	DualFilterControlDialog(DualFilterControls *controls, QWidget *_parent);
 	virtual ~DualFilterControlDialog()
 	{
 	}

@@ -57,9 +57,9 @@ public:
 		return( 4 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return( new waveShaperControlDialog( this ) );
+		return(new waveShaperControlDialog(this, NULL));
 	}
 
 

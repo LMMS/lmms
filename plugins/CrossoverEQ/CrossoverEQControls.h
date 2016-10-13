@@ -51,9 +51,9 @@ public:
 		return( 11 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return( new CrossoverEQControlDialog( this ) );
+		return(new CrossoverEQControlDialog(this, NULL));
 	}
 
 private slots:

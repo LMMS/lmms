@@ -35,7 +35,7 @@ class BassBoosterControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	BassBoosterControlDialog( BassBoosterControls* controls );
+	BassBoosterControlDialog(BassBoosterControls *controls, QWidget *_parent);
 	virtual ~BassBoosterControlDialog()
 	{
 	}

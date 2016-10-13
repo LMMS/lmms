@@ -1,5 +1,5 @@
 /*
- * CrossoverEQControlDialog.cpp - A native 4-band Crossover Equalizer 
+ * CrossoverEQControlDialog.cpp - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -35,8 +35,8 @@
 #include "Knob.h"
 #include "Fader.h"
 
-CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * controls ) :
-	EffectControlDialog( controls )
+CrossoverEQControlDialog::CrossoverEQControlDialog(CrossoverEQControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

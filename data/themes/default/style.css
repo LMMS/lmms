@@ -854,6 +854,11 @@ NesInstrumentView Knob {
 	qproperty-lineWidth: 2;
 }
 
+DualFilterControlDialog  {
+	background: red;
+  color: blue;
+}
+
 /* palette information  */
 
 LmmsPalette {

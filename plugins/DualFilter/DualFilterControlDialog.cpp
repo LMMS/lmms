@@ -42,8 +42,8 @@
 
 
 
-DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls ) :
-	EffectControlDialog( controls )
+DualFilterControlDialog::DualFilterControlDialog(DualFilterControls *controls, QWidget *_parent) :
+	EffectControlDialog( controls , _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

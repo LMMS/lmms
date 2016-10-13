@@ -55,9 +55,9 @@ public:
 		return 4;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new AmplifierControlDialog( this );
+		return new AmplifierControlDialog(this, NULL);
 	}
 
 

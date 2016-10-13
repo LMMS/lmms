@@ -50,9 +50,9 @@ public:
 	{
 		return 5;
 	}
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new FlangerControlsDialog( this );
+		return new FlangerControlsDialog(this, NULL);
 	}
 
 private slots:

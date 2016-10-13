@@ -33,8 +33,8 @@
 class DummyEffectControlDialog : public EffectControlDialog
 {
 public:
-	DummyEffectControlDialog( EffectControls * _controls ) :
-		EffectControlDialog( _controls )
+	DummyEffectControlDialog(EffectControls *_controls, QWidget *_parent) :
+            EffectControlDialog(_controls, _parent)
 	{
 	}
 
@@ -71,9 +71,9 @@ public:
 		return "DummyControls";
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new DummyEffectControlDialog( this );
+		return new DummyEffectControlDialog(this, nullptr);
 	}
 } ;
 

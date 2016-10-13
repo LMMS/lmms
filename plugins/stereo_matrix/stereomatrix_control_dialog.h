@@ -34,7 +34,7 @@ class stereoMatrixControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	stereoMatrixControlDialog( stereoMatrixControls * _controls );
+	stereoMatrixControlDialog(stereoMatrixControls *_controls, QWidget *_parent);
 	virtual ~stereoMatrixControlDialog()
 	{
 	}

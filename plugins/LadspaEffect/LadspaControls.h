@@ -54,9 +54,9 @@ public:
 		return "ladspacontrols";
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new LadspaControlDialog( this );
+		return new LadspaControlDialog(this, NULL);
 	}
 
 

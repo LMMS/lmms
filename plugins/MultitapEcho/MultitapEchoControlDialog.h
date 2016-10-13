@@ -35,7 +35,7 @@ class MultitapEchoControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	MultitapEchoControlDialog( MultitapEchoControls * controls );
+	MultitapEchoControlDialog(MultitapEchoControls *controls, QWidget *_parent);
 	virtual ~MultitapEchoControlDialog()
 	{
 	}

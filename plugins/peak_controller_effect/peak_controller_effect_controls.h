@@ -52,9 +52,9 @@ public:
 	{
 		return 1;
 	}
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new PeakControllerEffectControlDialog( this );
+		return new PeakControllerEffectControlDialog(this, NULL);
 	}
 
 
