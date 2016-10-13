@@ -729,6 +729,7 @@ void Knob::setPosition( const QPoint & _p )
 	const float oldValue = model()->value();
 
 
+
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
 		const float pos = model()->minValue() < 0
@@ -738,7 +739,8 @@ void Knob::setPosition( const QPoint & _p )
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
-			model()->setValue( oldValue - newValue );
+			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - newValue ) / step + 0.5 ) ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -747,12 +749,12 @@ void Knob::setPosition( const QPoint & _p )
 		}
 	}
 
-
 	else // linear code
 	{
 		if( qAbs( value ) >= step )
 		{
-			model()->setValue( oldValue - value );
+			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - value ) / step + 0.5 ) ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
