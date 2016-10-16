@@ -41,6 +41,7 @@ public:
 	{
 	}
 
+	void paintEvent(QPaintEvent *);
 } ;
 
 #endif

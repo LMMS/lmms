@@ -349,11 +349,13 @@ EffectSelectDialog QScrollArea {
 /* the inner boxes in LADSPA effect windows */
 
 EffectControlDialog QGroupBox {
-	background: #262b30;
-	margin-top: 1ex;
-	padding: 10px 2px 1px;
-	border-radius: 4px;
-	border: none;
+  background: qlineargradient( x1:0 y1:0, x2:0 y2:1, stop:0 #22282e, stop:1 #1c202a);
+	padding-top: 1ex;
+  border: none;
+  border-top-style: solid;
+  border-top-width: 1px;
+	border-radius: 1px;
+  border-top-color: rgba(255, 255, 255, 11%);
 }
 
 /* the inner box titles when present (channel 1, channel 2...) */
@@ -855,8 +857,13 @@ NesInstrumentView Knob {
 }
 
 DualFilterControlDialog  {
-	background: red;
-  color: blue;
+  background-color: #0f1114;
+}
+
+DualFilterControlDialog ComboBox {
+  min-height: 22px;
+  min-width: 10em;
+  font-size: 8pt;
 }
 
 /* palette information  */
