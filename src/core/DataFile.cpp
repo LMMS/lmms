@@ -868,8 +868,19 @@ void DataFile::upgrade_1_1_91()
 	for( int i = 0; !list.item( i ).isNull(); ++i )
 	{
 		QDomElement el = list.item( i ).toElement();
-		if ( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
+		if( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
 			el.setAttribute( "value", "vocoder" );
+		}
+	}
+
+	list = elementsByTagName( "crossoevereqcontrols" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		// invert the mute LEDs
+		for( int j = 1; j <= 4; ++j ){
+			QString a = QString( "mute%1" ).arg( j );
+			el.setAttribute( a, ( el.attribute( a ) == "0" ) ? "1" : "0" );
 		}
 	}
 }
@@ -1072,4 +1083,3 @@ void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
 		child = child.nextSiblingElement();
 	}
 }
-
