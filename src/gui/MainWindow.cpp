@@ -199,7 +199,7 @@ MainWindow::MainWindow() :
 
 	m_updateTimer.start( 1000 / 20, this );  // 20 fps
 
-	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
+	if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() )
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
@@ -1373,7 +1373,7 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject(true) )
 	{
 		// delete recovery file
-		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt()
+		if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt()
 			&& getSession() != Limited )
 		{
 			sessionCleanup();
@@ -1529,9 +1529,10 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ||
-				QApplication::mouseButtons() ) )
+	if( ( !ConfigManager::inst()->value( "ui", "disablerunningautosave" ).toInt() ||
+		! Engine::getSong()->isPlaying() ) &&
+		!( Engine::getSong()->isExporting() ||
+		QApplication::mouseButtons() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer
@@ -1551,7 +1552,7 @@ void MainWindow::autoSave()
 // from the timer where we need to do extra tests.
 void MainWindow::runAutoSave()
 {
-	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
+	if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() &&
 		getSession() != Limited )
 	{
 		autoSave();
