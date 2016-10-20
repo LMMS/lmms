@@ -27,7 +27,7 @@
 #include "embed.h"
 #include "lmms_math.h"
 
-EqHandle::EqHandle( int num, int x, int y )	:
+EqHandle::EqHandle( int num, int x, int y ):
 	m_numb( num ),
 	m_width( x ),
 	m_heigth( y ),
@@ -49,7 +49,7 @@ EqHandle::EqHandle( int num, int x, int y )	:
 
 QRectF EqHandle::boundingRect() const
 {
-	return QRectF( -11, -11, 23, 23 );
+	return QRectF( 0 - m_circlePixmap.width() / 2, 0 - m_circlePixmap.height() / 2, m_circlePixmap.width(), m_circlePixmap.height() );
 }
 
 
@@ -77,7 +77,7 @@ float EqHandle::xPixelToFreq( float x , int w )
 
 
 
-float EqHandle::gainToYPixel(float gain , int h, int pixelPerUnitHeight)
+float EqHandle::gainToYPixel( float gain , int h, int pixelPerUnitHeight )
 {
 	return h * 0.5 - gain * pixelPerUnitHeight;
 }
@@ -110,10 +110,8 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 	}
 
 	// graphics for the handles
-	QString fileName = "handle" + QString::number(m_numb+1);
-	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
-	QPixmap circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
-	painter->drawPixmap( 0 - (circlePixmap.width() / 2) - 1 , 0 - ( circlePixmap.height() / 2), circlePixmap );
+	loadPixmap();
+	painter->drawPixmap( 0 - ( m_circlePixmap.width() / 2 ) - 1 , 0 - ( m_circlePixmap.height() / 2 ), m_circlePixmap );
 
 	// on mouse hover draw an info box and change the pixmap of the handle
 	if ( isMouseHover() )
@@ -179,6 +177,13 @@ QPainterPath EqHandle::getCurvePath()
 		path.lineTo( x, y );
 	}
 	return path;
+}
+
+void EqHandle::loadPixmap()
+{
+	QString fileName = "handle" + QString::number(m_numb+1);
+	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
+	m_circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
 }
 
 

@@ -48,15 +48,14 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 
 	EqSpectrumView * inSpec = new EqSpectrumView( &controls->m_inFftBands, this );
 	inSpec->move( 51, 17 );
-	inSpec->color = QColor( 238, 154, 120, 80 );
+	inSpec->setColor( QColor( 238, 154, 120, 80 ) );
 
 	EqSpectrumView * outSpec = new EqSpectrumView( &controls->m_outFftBands, this );
-	outSpec->color = QColor( 145, 205, 22, 80 );
+	outSpec->setColor( QColor( 145, 205, 22, 80 ) );
 	outSpec->move( 51, 17 );
 
 	m_parameterWidget = new EqParameterWidget( this , controls );
 	m_parameterWidget->move( 51, 17 );
-//move
 
 	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255 ,255, 255), tr( "HP" ) ,0,0, &controls->m_hp12Model, &controls->m_hp24Model, &controls->m_hp48Model,0,0,0);
 	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255 ,255, 255), tr( "Low Shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR,0,0,0,0,0,0 );
@@ -123,10 +122,10 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		activeButton->move( distance - 2, 276 );
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
 		// Connects the knobs, Faders and buttons with the curve graphic
-		QObject::connect( m_parameterWidget->getBandModels( i )->freq , SIGNAL( dataChanged() ), m_parameterWidget, SLOT ( updateView() ) );
-		if ( m_parameterWidget->getBandModels( i )->gain ) QObject::connect( m_parameterWidget->getBandModels( i )->gain, SIGNAL( dataChanged() ), m_parameterWidget, SLOT ( updateView() ));
-		QObject::connect( m_parameterWidget->getBandModels( i )->res, SIGNAL( dataChanged() ), m_parameterWidget , SLOT ( updateView() ) );
-		QObject::connect( m_parameterWidget->getBandModels( i )->active, SIGNAL( dataChanged() ), m_parameterWidget , SLOT ( updateView() ) );
+		QObject::connect( m_parameterWidget->getBandModels( i )->freq , SIGNAL( dataChanged() ), m_parameterWidget, SLOT ( updateHandle() ) );
+		if ( m_parameterWidget->getBandModels( i )->gain ) QObject::connect( m_parameterWidget->getBandModels( i )->gain, SIGNAL( dataChanged() ), m_parameterWidget, SLOT ( updateHandle() ));
+		QObject::connect( m_parameterWidget->getBandModels( i )->res, SIGNAL( dataChanged() ), m_parameterWidget , SLOT ( updateHandle() ) );
+		QObject::connect( m_parameterWidget->getBandModels( i )->active, SIGNAL( dataChanged() ), m_parameterWidget , SLOT ( updateHandle() ) );
 
 		m_parameterWidget->changeHandle( i );
 		distance = distance + 44;
@@ -142,7 +141,6 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	outSpecButton->setCheckable(true);
 	outSpecButton->setModel( &controls->m_analyseOutModel );
 	outSpecButton->move( 302, 240 );
-//move
 
 	//hp filter type
 	PixmapButton * hp12Button = new PixmapButton( this , NULL );
@@ -154,42 +152,42 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	hp24Button->setModel(m_parameterWidget->getBandModels( 0 )->hp24 );
 	hp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	hp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
-//move
+
 	hp24Button->move( 79 , 328 );
 	PixmapButton * hp48Button = new PixmapButton( this , NULL );
 	hp48Button->setModel( m_parameterWidget->getBandModels(0)->hp48 );
 	hp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	hp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
-//move
+
 	hp48Button->move( 79, 358 );
 	//LP filter type
 	PixmapButton * lp12Button = new PixmapButton( this , NULL );
 	lp12Button->setModel( m_parameterWidget->getBandModels( 7 )->lp12 );
 	lp12Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "12dB" ) );
 	lp12Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "12dBoff" ) );
-//move
+
 	lp12Button->move( 387, 298 );
 	PixmapButton * lp24Button = new PixmapButton( this , NULL );
 	lp24Button->setModel( m_parameterWidget->getBandModels( 7 )->lp24 );
 	lp24Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "24dB" ) );
 	lp24Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "24dBoff" ) );
-//move
+
 	lp24Button->move( 387, 328 );
 
 	PixmapButton * lp48Button = new PixmapButton( this , NULL );
 	lp48Button->setModel( m_parameterWidget->getBandModels( 7 )->lp48 );
 	lp48Button->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "48dB" ) );
 	lp48Button->setInactiveGraphic(  PLUGIN_NAME::getIconPixmap( "48dBoff" ) );
-//move
+
 	lp48Button->move( 387, 358 );
 	// the curve has to change its appearance
-	QObject::connect( m_parameterWidget->getBandModels( 0 )->hp12 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateView()));
-	QObject::connect( m_parameterWidget->getBandModels( 0 )->hp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateView()));
-	QObject::connect( m_parameterWidget->getBandModels( 0 )->hp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateView()));
+	QObject::connect( m_parameterWidget->getBandModels( 0 )->hp12 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
+	QObject::connect( m_parameterWidget->getBandModels( 0 )->hp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
+	QObject::connect( m_parameterWidget->getBandModels( 0 )->hp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 
-	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp12 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateView()));
-	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateView()));
-	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateView()));
+	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp12 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
+	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp24 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
+	QObject::connect( m_parameterWidget->getBandModels( 7 )->lp48 , SIGNAL ( dataChanged() ), m_parameterWidget, SLOT( updateHandle()));
 
 	automatableButtonGroup *lpBtnGrp = new automatableButtonGroup(this,tr ( "lp grp" ) );
 	lpBtnGrp->addButton( lp12Button );
