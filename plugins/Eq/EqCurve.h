@@ -52,8 +52,8 @@ public:
 
 	static float freqToXPixel( float freq, int w );
 	static float xPixelToFreq( float x , int w );
-	static float gainToYPixel( float gain, int h, int pixelPerUnitHeight );
-	static float yPixelToGain( float y, int h, int pixelPerUnitHeight );
+	static float gainToYPixel( float gain, int h, float pixelPerUnitHeight );
+	static float yPixelToGain( float y, int h, float pixelPerUnitHeight );
 
 	QRectF boundingRect() const;
 	QPainterPath getCurvePath();

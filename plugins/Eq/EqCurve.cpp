@@ -77,7 +77,7 @@ float EqHandle::xPixelToFreq( float x , int w )
 
 
 
-float EqHandle::gainToYPixel( float gain , int h, int pixelPerUnitHeight )
+float EqHandle::gainToYPixel(float gain , int h, float pixelPerUnitHeight )
 {
 	return h * 0.5 - gain * pixelPerUnitHeight;
 }
@@ -85,7 +85,7 @@ float EqHandle::gainToYPixel( float gain , int h, int pixelPerUnitHeight )
 
 
 
-float EqHandle::yPixelToGain( float y , int h, int pixelPerUnitHeight )
+float EqHandle::yPixelToGain(float y , int h, float pixelPerUnitHeight )
 {
 	return ( ( h * 0.5 ) - y ) / pixelPerUnitHeight;
 }
