@@ -532,9 +532,8 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 	font-size: 10px;
 }
 
-
 FxLine {
-	background: #ffffff;/*#14161A;*/
+	background: #14161A;
 	color: #d1d8e4;
 	qproperty-backgroundActive: #3B424A;
 	qproperty-strokeOuterActive: #262B30;
