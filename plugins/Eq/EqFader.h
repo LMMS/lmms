@@ -33,19 +33,18 @@
 #include "TextFloat.h"
 
 
-
 class EqFader : public Fader
 {
 
 public:
 	Q_OBJECT
 public:
-	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * back, QPixmap * leds, QPixmap * knob,  float* lPeak, float* rPeak ) :
-		Fader( model, name, parent, back, leds, knob )
+	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * backg, QPixmap * leds, QPixmap * knobpi,  float* lPeak, float* rPeak ) :
+		Fader( model, name, parent, backg, leds, knobpi )
 	{
-		setMinimumSize( 23, 116 );
-		setMaximumSize( 23, 116 );
-		resize( 23, 116 );
+		setMinimumSize( 23, 80 );
+		setMaximumSize( 23, 80 );
+		resize( 23, 80 );
 		m_lPeak = lPeak;
 		m_rPeak = rPeak;
 		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );

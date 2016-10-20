@@ -109,10 +109,12 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		emit positionChanged();
 	}
 
+	// graphics for the handles
 	QString fileName = "handle" + QString::number(m_numb+1);
 	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
 	QPixmap circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
-	painter->drawPixmap( -12, -12, circlePixmap );
+	painter->drawPixmap( 0 - (circlePixmap.width() / 2) - 1 , 0 - ( circlePixmap.height() / 2), circlePixmap );
+
 	// on mouse hover draw an info box and change the pixmap of the handle
 	if ( isMouseHover() )
 	{
@@ -131,8 +133,8 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		{
 			rectX = rectX - ( 40 - ( m_width - EqHandle::x() ) );
 		}
-
-		painter->drawPixmap( -12, -12, PLUGIN_NAME::getIconPixmap( "handlehover" ) );
+		QPixmap hover = PLUGIN_NAME::getIconPixmap( "handlehover" );
+		painter->drawPixmap( 0 - ( hover.width() / 2) - 1, 0 - ( hover.height() / 2 ), hover );
 		QRectF textRect = QRectF ( rectX, rectY, 80, 30 );
 		QRectF textRect2 = QRectF ( rectX+1, rectY+1, 80, 30 );
 		QString freq = QString::number( xPixelToFreq( EqHandle::x(), m_width ) );
@@ -146,9 +148,9 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 			res = tr( "BW: " ) +  QString::number( getResonance() );
 		}
 
-		painter->setPen( QColor( 255, 255, 255 ) );
+		painter->setPen( Qt::black );
 		painter->drawRect( textRect );
-		painter->fillRect( textRect, QBrush( QColor( 128, 128, 255 , 64 ) ) );
+		painter->fillRect( textRect, QBrush( QColor( 6, 106, 43, 242 ) ) );
 
 		painter->setPen ( QColor( 0, 0, 0 ) );
 		painter->drawText( textRect2, Qt::AlignCenter,
@@ -798,17 +800,7 @@ void EqCurve::paint( QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	{
 		if ( m_handle->at(i)->isMouseHover() )
 		{
-			switch ( i+1 )
-			{
-				case 1:  curveColor = QColor( 163, 23, 23, 10*m_alpha/4 );break;
-				case 2:  curveColor = QColor( 229,108,0, 10*m_alpha/4 );break;
-				case 3:  curveColor = QColor( 255,240,0, 10*m_alpha/4 );break;
-				case 4:  curveColor = QColor( 12, 255, 0, 10*m_alpha/4 );break;
-				case 5:  curveColor = QColor( 0, 252, 255, 10*m_alpha/4 );break;
-				case 6:  curveColor = QColor( 59, 96, 235, 10*m_alpha/4 );break;
-				case 7:  curveColor = QColor( 112, 73, 255, 10*m_alpha/4 );break;
-				case 8:  curveColor = QColor( 255, 71, 227, 10*m_alpha/4 );
-			}
+			curveColor = QColor( qRgba( 6, 106, 43, 242 ));
 			QPen pen ( curveColor);
 			pen.setWidth( 2 );
 			painter->setPen( pen );
