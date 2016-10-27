@@ -26,10 +26,10 @@
 #ifndef AEFFECTX_H
 #define AEFFECTX_H
 
-#define CCONST(a, b, c, d)( ( ( (int) a ) << 24 ) |		\
-				( ( (int) b ) << 16 ) |		\
-				( ( (int) c ) << 8 ) |		\
-				( ( (int) d ) << 0 ) )
+#define CCONST(a, b, c, d)( ( ( (int32_t) a ) << 24 ) |		\
+				( ( (int32_t) b ) << 16 ) |		\
+				( ( (int32_t) c ) << 8 ) |		\
+				( ( (int32_t) d ) << 0 ) )
 
 const int audioMasterAutomate = 0;
 const int audioMasterVersion = 1;
@@ -146,17 +146,17 @@ class VstMidiEvent
 {
 public:
 	// 00
-	int type;
+	int32_t type;
 	// 04
-	int byteSize;
+	int32_t byteSize;
 	// 08
-	int deltaFrames;
+	int32_t deltaFrames;
 	// 0c?
-	int flags;
+	int32_t flags;
 	// 10?
-	int noteLength;
+	int32_t noteLength;
 	// 14?
-	int noteOffset;
+	int32_t noteOffset;
 	// 18
 	char midiData[4];
 	// 1c?
@@ -186,7 +186,7 @@ class VstEvents
 {
 public:
 	// 00
-	int numEvents;
+	int32_t numEvents;
 	// 04
 	void *reserved;
 	// 08
@@ -200,25 +200,25 @@ class AEffect
 public:
 	// Never use virtual functions!!!
 	// 00-03
-	int magic;
+	int32_t magic;
 	// dispatcher 04-07
-	intptr_t (* dispatcher)( AEffect * , int , int , intptr_t, void * , float );
+	intptr_t (* dispatcher)( AEffect * , int32_t , int32_t , intptr_t, void * , float );
 	// process, quite sure 08-0b
-	void (* process)( AEffect * , float * * , float * * , int );
+	void (* process)( AEffect * , float * * , float * * , int32_t );
 	// setParameter 0c-0f
-	void (* setParameter)( AEffect * , int , float );
+	void (* setParameter)( AEffect * , int32_t , float );
 	// getParameter 10-13
-	float (* getParameter)( AEffect * , int );
+	float (* getParameter)( AEffect * , int32_t );
 	// programs 14-17
-	int numPrograms;
+	int32_t numPrograms;
 	// Params 18-1b
-	int numParams;
+	int32_t numParams;
 	// Input 1c-1f
-	int numInputs;
+	int32_t numInputs;
 	// Output 20-23
-	int numOutputs;
+	int32_t numOutputs;
 	// flags 24-27
-	int flags;
+	int32_t flags;
 	// Fill somewhere 28-2b
 	void *ptr1;
 	void *ptr2;
