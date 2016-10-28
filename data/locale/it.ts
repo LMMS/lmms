@@ -614,6 +614,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <source>Clone Steps</source>
         <translation>Clona gli step</translation>
     </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation>Aggiungi traccia campione</translation>
+    </message>
 </context>
 <context>
     <name>BBTCOView</name>
@@ -906,6 +910,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Re&amp;name this controller</source>
         <translation>Ri&amp;nomina questo controller</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
     </message>
 </context>
 <context>
@@ -2152,44 +2160,48 @@ Assicurarsi di avere i permessi in scrittura per il file e per la directory cont
 <context>
     <name>FlangerControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Delay</translation>
-    </message>
-    <message>
         <source>Delay Time:</source>
         <translation>Tempo di Ritardo:</translation>
-    </message>
-    <message>
-        <source>Lfo Hz</source>
-        <translation>Lfo Hz</translation>
-    </message>
-    <message>
-        <source>Lfo:</source>
-        <translation>Frequenza Lfo:</translation>
-    </message>
-    <message>
-        <source>Amt</source>
-        <translation>Q.tà</translation>
-    </message>
-    <message>
-        <source>Amt:</source>
-        <translation>Quantità:</translation>
-    </message>
-    <message>
-        <source>Regen</source>
-        <translation>Regen</translation>
     </message>
     <message>
         <source>Feedback Amount:</source>
         <translation>Quantità di Feedback:</translation>
     </message>
     <message>
-        <source>Noise</source>
-        <translation>Rumore</translation>
-    </message>
-    <message>
         <source>White Noise Amount:</source>
         <translation>Quantità di Rumore Bianco:</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>RITARDO</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>FREQUENZA</translation>
+    </message>
+    <message>
+        <source>Rate:</source>
+        <translation>Frequenza:</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Quantità:</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>FDBK</translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation>RUMORE</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation>INVERTI</translation>
     </message>
 </context>
 <context>
@@ -2247,14 +2259,6 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
 </context>
 <context>
     <name>FxMixerView</name>
-    <message>
-        <source>Rename FX channel</source>
-        <translation>Rinomina il canale FX</translation>
-    </message>
-    <message>
-        <source>Enter the new name for this FX channel</source>
-        <translation>Inserire il nuovo nome di questo canale FX</translation>
-    </message>
     <message>
         <source>FX-Mixer</source>
         <translation>Mixer FX</translation>
@@ -2454,6 +2458,18 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <source>Down and up</source>
         <translation>Giù e su</translation>
     </message>
+    <message>
+        <source>Skip rate</source>
+        <translation>Frequanza di Salto</translation>
+    </message>
+    <message>
+        <source>Miss rate</source>
+        <translation>Frequanza di Sbaglio</translation>
+    </message>
+    <message>
+        <source>Cycle steps</source>
+        <translation>Note ruotate</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
@@ -2524,6 +2540,46 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     <message>
         <source>Mode:</source>
         <translation>Modo:</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SALTA</translation>
+    </message>
+    <message>
+        <source>Skip rate:</source>
+        <translation>Frequanza di Salto:</translation>
+    </message>
+    <message>
+        <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
+        <translation>Con la funzione di salto, l&apos;arpeggiatore metterà in pausa uno step in modo casuale. Alla posizione minima non verrà applicata alcuna variazione. Aumentando il valore, invece, si arriva gradualmente ad una completa casualità dell&apos;effetto.</translation>
+    </message>
+    <message>
+        <source>MISS</source>
+        <translation>SBAGLIA</translation>
+    </message>
+    <message>
+        <source>Miss rate:</source>
+        <translation>Frequanza di Sbaglio:</translation>
+    </message>
+    <message>
+        <source>The miss function will make the arpeggiator miss the intended note.</source>
+        <translation>La funzione di sbaglio farà &quot;sbagliare&quot; l&apos;arpeggiatore, che suonerà un&apos;altra nota rispetto a quella normalmente prevista.</translation>
+    </message>
+    <message>
+        <source>CYCLE</source>
+        <translation>RUOTA</translation>
+    </message>
+    <message>
+        <source>Cycle notes:</source>
+        <translation>Note ruotate:</translation>
+    </message>
+    <message>
+        <source>note(s)</source>
+        <translation>nota(e)</translation>
+    </message>
+    <message>
+        <source>Jumps over n steps in the arpeggio and cycles around if we&apos;re over the note range. If the total note range is evenly divisible by the number of steps jumped over you will get stuck in a shorter arpeggio or even on one note.</source>
+        <translation>Salta n note dell&apos;arpeggio e torna indietro quando supera l&apos;ampiezza. Se il numero di note totali è divisibile per il numero di note saltate, l&apos;arpeggio risulterà più piccolo, eventualmente di una sola nota.</translation>
     </message>
 </context>
 <context>
@@ -2907,6 +2963,14 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     <message>
         <source>5</source>
         <translation>Quinta</translation>
+    </message>
+    <message>
+        <source>Phrygian dominant</source>
+        <translation>Frigia dominante</translation>
+    </message>
+    <message>
+        <source>Persian</source>
+        <translation>Persiana</translation>
     </message>
 </context>
 <context>
@@ -3878,18 +3942,6 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     <message>
         <source>Launch a default session and delete the restored files. This is not reversible.</source>
         <translation>Fai partire una sessione normale, cancellando il file di recupero in modo irreversibile.</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Esci</translation>
-    </message>
-    <message>
-        <source>Shut down LMMS with no further action.</source>
-        <translation>Chiudi LMMS senza effettuare alcuna azione.</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Esci</translation>
     </message>
     <message>
         <source>Preparing plugin browser</source>
@@ -5350,12 +5402,12 @@ Vi sono due forme speciali: &quot;Random&quot; e &quot;Random morbido&quot; sono
         <translation>DCAD</translation>
     </message>
     <message>
-        <source>TRES</source>
-        <translation>SOGL</translation>
-    </message>
-    <message>
         <source>Treshold:</source>
         <translation>Soglia:</translation>
+    </message>
+    <message>
+        <source>TRSH</source>
+        <translation>SCARTA</translation>
     </message>
 </context>
 <context>
@@ -6056,10 +6108,6 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Grafica dello sfondo</translation>
     </message>
     <message>
-        <source>FL Studio installation directory</source>
-        <translation>Directory di installazione di FL Studio</translation>
-    </message>
-    <message>
         <source>STK rawwave directory</source>
         <translation>Directory per i file rawwave STK</translation>
     </message>
@@ -6140,10 +6188,6 @@ Latenza: %2 ms</translation>
     <message>
         <source>Choose artwork-theme directory</source>
         <translation>Seleziona la directory del tema grafico</translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
-        <translation>Seleziona la directory di installazione di FL Studio</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
@@ -6263,10 +6307,6 @@ Ricorda di salvare il tuo progetto anche manualmente.</translation>
         <translation>Sequenze MIDI</translation>
     </message>
     <message>
-        <source>FL Studio projects</source>
-        <translation>Progetti FL Studio</translation>
-    </message>
-    <message>
         <source>Hydrogen projects</source>
         <translation>Progetti Hydrogen</translation>
     </message>
@@ -6380,20 +6420,20 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
         <translation>Impossibile aprire il file %1 per la scrittura. Probabilmente non disponi dei permessi necessari alla scrittura di questo file. Assicurati di avere tali permessi e prova di nuovo.</translation>
     </message>
     <message>
-        <source>Project Version Mismatch</source>
-        <translation>Incompatibilità di versione</translation>
-    </message>
-    <message>
-        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
-        <translation>Questo %1 è stato creato con LMMS versione %2, ma ora è in uso la versione %3</translation>
-    </message>
-    <message>
         <source>template</source>
         <translation>modello</translation>
     </message>
     <message>
         <source>project</source>
         <translation>progetto</translation>
+    </message>
+    <message>
+        <source>Version difference</source>
+        <translation>Differenza di versione</translation>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS %2.</source>
+        <translation>%1 creato con LMMS %2.</translation>
     </message>
 </context>
 <context>
@@ -6498,10 +6538,6 @@ Assicurati di avere almeno i permessi di lettura del file e prova di nuovo.</tra
     <message>
         <source>Maximize</source>
         <translation>Massimizza</translation>
-    </message>
-    <message>
-        <source>Minimize</source>
-        <translation>Minimizza</translation>
     </message>
     <message>
         <source>Restore</source>
@@ -6704,10 +6740,6 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     <message>
         <source>Importing MIDI-file...</source>
         <translation>Importazione del file MIDI...</translation>
-    </message>
-    <message>
-        <source>Importing FLP-file...</source>
-        <translation>Importazione del file FLP...</translation>
     </message>
 </context>
 <context>
@@ -9073,10 +9105,6 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     <message>
         <source>List installed LADSPA plugins</source>
         <translation>Elenca i plugin LADSPA installati</translation>
-    </message>
-    <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation>Filtro per importare progetti di FL Studio in LMMS</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
