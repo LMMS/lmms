@@ -55,7 +55,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	inGain->move( 12, 25 );
 	inGain->setModel( & controls->m_inGain );
 	inGain->setLabel( tr( "GAIN" ) );
-	inGain->setHintText( tr( "Input Gain:" ) + " ", " dBV" );
+	inGain->setHintText( tr( "Input Gain:" ) + " ", " dBFS" );
 	
 	Knob * inNoise = new Knob( knobBright_26, this );
 	inNoise->move( 12, 70 );
@@ -69,7 +69,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	outGain->move( 176, 25 );
 	outGain->setModel( & controls->m_outGain );
 	outGain->setLabel( tr( "GAIN" ) );
-	outGain->setHintText( tr( "Output Gain:" ) + " ", " dBV" );
+	outGain->setHintText( tr( "Output Gain:" ) + " ", " dBFS" );
 	
 	Knob * outClip = new Knob( knobBright_26, this );
 	outClip->move( 176, 70 );

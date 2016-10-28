@@ -107,7 +107,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	if( m_delayControls.m_outGainModel.isValueChanged() )
 	{
-		m_outGain = dbvToAmp( m_delayControls.m_outGainModel.value() );
+		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 	int sampleLength;
 	for( fpp_t f = 0; f < frames; ++f )
