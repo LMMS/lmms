@@ -54,7 +54,10 @@ class TimeLineWidget;
 class PianoRoll : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor barLineColor READ barLineColor WRITE setBarLineColor )
+	Q_PROPERTY( QColor beatLineColor READ beatLineColor WRITE setBeatLineColor )
+	Q_PROPERTY( QColor lineColor16th READ lineColor16th WRITE setLineColor16th )
+	Q_PROPERTY( QColor lineColor32nd READ lineColor32nd WRITE setLineColor32nd )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
@@ -110,8 +113,14 @@ public:
 	int quantization() const;
 	
 	// qproperty acces functions
-	QColor gridColor() const;
-	void setGridColor( const QColor & c );
+	QColor barLineColor() const;
+	void setBarLineColor( const QColor & c );
+	QColor beatLineColor() const;
+	void setBeatLineColor( const QColor & c );
+	QColor lineColor16th() const;
+	void setLineColor16th( const QColor & c );
+	QColor lineColor32nd() const;
+	void setLineColor32nd( const QColor & c );
 	QColor noteModeColor() const;
 	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
@@ -373,7 +382,10 @@ private:
 	friend class PianoRollWindow;
 
 	// qproperty fields
-	QColor m_gridColor;
+	QColor m_barLineColor;
+	QColor m_beatLineColor;
+	QColor m_lineColor16th;
+	QColor m_lineColor32nd;
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_barColor;

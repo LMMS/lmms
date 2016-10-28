@@ -189,7 +189,10 @@ PianoRoll::PianoRoll() :
 	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
-	m_gridColor( 0, 0, 0 ),
+	m_barLineColor( 0, 0, 0 ),
+	m_beatLineColor( 0, 0, 0 ),
+	m_lineColor16th( 0, 0, 0 ),
+	m_lineColor32nd( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
 	m_barColor( 0, 0, 0 ),
@@ -726,11 +729,29 @@ void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 
 /** \brief qproperty access implementation */
 
-QColor PianoRoll::gridColor() const
-{ return m_gridColor; }
+QColor PianoRoll::barLineColor() const
+{ return m_barLineColor; }
 
-void PianoRoll::setGridColor( const QColor & c )
-{ m_gridColor = c; }
+void PianoRoll::setBarLineColor( const QColor & c )
+{ m_barLineColor = c; }
+
+QColor PianoRoll::beatLineColor() const
+{ return m_beatLineColor; }
+
+void PianoRoll::setBeatLineColor( const QColor & c )
+{ m_beatLineColor = c; }
+
+QColor PianoRoll::lineColor16th() const
+{ return m_lineColor16th; }
+
+void PianoRoll::setLineColor16th( const QColor & c )
+{ m_lineColor16th = c; }
+
+QColor PianoRoll::lineColor32nd() const
+{ return m_lineColor32nd; }
+
+void PianoRoll::setLineColor32nd( const QColor & c )
+{ m_lineColor32nd = c; }
 
 QColor PianoRoll::noteModeColor() const
 { return m_noteModeColor; }
@@ -2578,18 +2599,31 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 {
 	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
 
-	QColor horizCol = QColor( gridColor() );
-	QColor vertCol = QColor( gridColor() );
-
 	QStyleOption opt;
 	opt.initFrom( this );
 	QPainter p( this );
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
 	QBrush bgColor = p.background();
+	QColor horizCol = QColor( lineColor16th() );
+	QColor horizColAccent = QColor( beatLineColor() );
 
 	// fill with bg color
 	p.fillRect( 0, 0, width(), height(), bgColor );
+	
+	// alternating shades for better contrast
+	// count the bars which disappear on left by scrolling
+	int barCount = m_currentPosition / MidiTime::ticksPerTact();
+	int leftBars = m_currentPosition / m_ppt;
+
+	for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+	{
+		if ( (barCount + leftBars)  % 2 != 0 )
+		{
+				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
+		}
+	}
 
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
@@ -2696,18 +2730,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			y -= WHITE_KEY_BIG_HEIGHT;
 		}
 
+		// Draw horizontal grid lines 	
 		// Draw the C line in a more prominent color
 		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 		{
-			horizCol.setAlpha( 192 );
+			p.setPen( horizColAccent );
 		}
 		else
 		{
-			horizCol.setAlpha( 64 );
-		}
-
-		// draw key-line
-		p.setPen( horizCol );
+			p.setPen( horizCol );
+		}		
 		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
 
 		// Compute the corrections for the note names
@@ -2870,20 +2902,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	bool show32nds = ( m_zoomingModel.value() > 3 );
 
-	// alternating shades for better contrast
-	// count the bars which disappear on left by scrolling
-	int barCount = m_currentPosition / MidiTime::ticksPerTact();
-	int leftBars = m_currentPosition / m_ppt;
-
-	for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
-	{
-		if ( (barCount + leftBars)  % 2 != 0 )
-		{
-				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
-					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
-		}
-	}
-
 	// we need float here as odd time signatures might produce rounding
 	// errors else and thus an unusable grid
 	for( float x = WHITE_KEY_WIDTH - offset; x < width();
@@ -2891,35 +2909,30 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		if( x >= WHITE_KEY_WIDTH )
 		{
-			// every tact-start needs to be a bright line
+			// every bar-start needs to be a bright line
 			if( tact_16th % spt == 0 )
 			{
-	 			p.setPen( gridColor() );
+	 			p.setPen( barLineColor() );
 			}
 			// normal line
 			else if( tact_16th % 4 == 0 )
 			{
-				vertCol.setAlpha( 160 );
-				p.setPen( vertCol );
+				p.setPen( beatLineColor() );
 			}
 			// weak line
 			else
 			{
-				vertCol.setAlpha( 128 );
-				p.setPen( vertCol );
+				p.setPen( lineColor16th() );
 			}
 
-			p.drawLine( (int) x, PR_TOP_MARGIN, (int) x, height() -
-							PR_BOTTOM_MARGIN );
+			p.drawLine( (int) x, PR_TOP_MARGIN, (int) x, height() - PR_BOTTOM_MARGIN );
 
 			// extra 32nd's line
 			if( show32nds )
 			{
-				vertCol.setAlpha( 80 );
-				p.setPen( vertCol );
+				p.setPen( lineColor32nd() );
 				p.drawLine( (int)(x + pp16th / 2) , PR_TOP_MARGIN,
-						(int)(x + pp16th / 2), height() -
-						PR_BOTTOM_MARGIN );
+						(int)(x + pp16th / 2), height() - PR_BOTTOM_MARGIN );
 			}
 		}
 	}
@@ -3085,15 +3098,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	// set alpha for horizontal lines
+	// set alpha for horizontal line colors
 	horizCol.setAlpha( 64 );
+	horizColAccent.setAlpha( 64 );
 
 	// horizontal line for the key under the cursor
 	if( hasValidPattern() )
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
 		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
-					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, horizCol );
+					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, horizColAccent );
 	}
 
 	// bar to resize note edit area

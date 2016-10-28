@@ -114,9 +114,8 @@ QMenu::indicator:selected {
 }
 
 PianoRoll {
-	background-color: #040506;
-	qproperty-backgroundShade: rgba(255, 255, 255, 15);
-	qproperty-gridColor: #4f5964;
+	background-color: #141616;
+	qproperty-backgroundShade: rgba(255, 255, 255, 4);
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
 	qproperty-noteOpacity: 165;
@@ -124,6 +123,11 @@ PianoRoll {
 	qproperty-selectedNoteColor: #006b65;
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: #06170E;
+	/* Grid colors */
+	qproperty-barLineColor: #437053;
+	qproperty-beatLineColor: #2a6548;
+	qproperty-lineColor16th: #292929;
+	qproperty-lineColor32nd: #1f1f1f;
 	/* Text on the white piano keys */
 	qproperty-textColor: #000;
 	qproperty-textColorLight: #0bd556;
