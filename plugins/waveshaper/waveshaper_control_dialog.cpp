@@ -44,10 +44,10 @@ waveShaperControlDialog::waveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 224, 300 );
+	setFixedSize( 224, 274 );
 
 	Graph * waveGraph = new Graph( this, Graph::LinearNonCyclicStyle, 204, 205 );
-	waveGraph -> move( 10, 32 );
+	waveGraph -> move( 10, 6 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
 	waveGraph -> setAutoFillBackground( true );
 	pal = QPalette();
@@ -60,7 +60,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 	Knob * inputKnob = new Knob( knobBright_26, this);
 	inputKnob -> setVolumeKnob( true );
 	inputKnob -> setVolumeRatio( 1.0 );
-	inputKnob -> move( 14, 251 );
+	inputKnob -> move( 14, 221 );
 	inputKnob->setModel( &_controls->m_inputModel );
 	inputKnob->setLabel( tr( "INPUT" ) );
 	inputKnob->setHintText( tr( "Input gain:" ) , "" );
@@ -68,34 +68,34 @@ waveShaperControlDialog::waveShaperControlDialog(
 	Knob * outputKnob = new Knob( knobBright_26, this );
 	outputKnob -> setVolumeKnob( true );
 	outputKnob -> setVolumeRatio( 1.0 );
-	outputKnob -> move( 54, 251 );
+	outputKnob -> move( 54, 221 );
 	outputKnob->setModel( &_controls->m_outputModel );
 	outputKnob->setLabel( tr( "OUTPUT" ) );
 	outputKnob->setHintText( tr( "Output gain:" ), "" );
 
 	PixmapButton * resetButton = new PixmapButton( this, tr("Reset waveform") );
-	resetButton -> move( 164, 251 );
+	resetButton -> move( 164, 222 );
 	resetButton -> resize( 12, 48 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	ToolTip::add( resetButton, tr( "Click here to reset the wavegraph back to default" ) );
 
 	PixmapButton * smoothButton = new PixmapButton( this, tr("Smooth waveform") );
-	smoothButton -> move( 164, 267 );
+	smoothButton -> move( 164, 238 );
 	smoothButton -> resize( 12, 48 );
 	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
 	ToolTip::add( smoothButton, tr( "Click here to apply smoothing to wavegraph" ) );
 
 	PixmapButton * addOneButton = new PixmapButton( this, tr("Increase graph amplitude by 1dB") );
-	addOneButton -> move( 133, 251 );
+	addOneButton -> move( 133, 222 );
 	addOneButton -> resize( 12, 29 );
 	addOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_active" ) );
 	addOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "add1_inactive" ) );
 	ToolTip::add( addOneButton, tr( "Click here to increase wavegraph amplitude by 1dB" ) );
 
 	PixmapButton * subOneButton = new PixmapButton( this, tr("Decrease graph amplitude by 1dB") );
-	subOneButton -> move( 133, 267 );
+	subOneButton -> move( 133, 238 );
 	subOneButton -> resize( 12, 29 );
 	subOneButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_active" ) );
 	subOneButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "sub1_inactive" ) );
@@ -103,7 +103,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 
 	LedCheckBox * clipInputToggle = new LedCheckBox( "Clip input", this,
 							tr( "Clip input" ), LedCheckBox::Green );
-	clipInputToggle -> move( 133, 283 );
+	clipInputToggle -> move( 133, 253 );
 	clipInputToggle -> setModel( &_controls -> m_clipModel );
 	ToolTip::add( clipInputToggle, tr( "Clip input signal to 0dB" ) );
 
