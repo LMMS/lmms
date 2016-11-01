@@ -43,11 +43,44 @@ class InstrumentFunctionNoteStacking : public Model, public JournallingObject
 
 public:
 	static const int MAX_CHORD_POLYPHONY = 13;
+ //   static const int BOUNDARY_CHORD = -100;
 
 private:
-	typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
+
+    //R: the new structure of the arpeggio note: key, volume, panning, active, silenced
+    struct chord_arp_note_struct{
+       int8_t key; //the semitone
+       volume_t vol; //its volume
+       panning_t pan; //the panning
+       boolean active;  //the note is played -> true: yes, false: skipped
+       boolean silenced; //the note is processed but silenced -> true: normally played, false: muted
+
+       inline chord_arp_note operator=(chord_arp_note a) {
+           key=a.key;
+           vol=a.vol;
+           pan=a.pan;
+           active=a.active;
+           silenced=a.silenced;
+           return a;
+       }
+
+
+       inline chord_arp_note operator==(chord_arp_note a) {
+          if (a.key==key && a.vol== vol && a.pan== pan && a.active== active && a.silenced== silenced)
+             return true;
+          else
+             return false;
+       }
+    } chord_arp_note;
+
+    //R: a qvector to hold the new data
+    typedef QVector <chord_arp_note> ChordSemiTones;
+
+    //typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
+
 
 public:
+
 	InstrumentFunctionNoteStacking( Model * _parent );
 	virtual ~InstrumentFunctionNoteStacking();
 
@@ -90,7 +123,7 @@ public:
 			return size() == 0;
 		}
 
-		bool hasSemiTone( int8_t semiTone ) const;
+        bool hasSemiTone( chord_arp_note semiTone ) const;
 
 		int8_t last() const
 		{
