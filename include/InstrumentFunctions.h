@@ -125,7 +125,7 @@ public:
 
         bool hasSemiTone( chord_arp_note semiTone ) const;
 
-		int8_t last() const
+        chord_arp_note last() const
 		{
 			return m_semiTones[size() - 1];
 		}
@@ -135,7 +135,7 @@ public:
 			return m_name;
 		}
 
-		int8_t operator [] ( int n ) const
+        chord_arp_note operator [] ( int n ) const
 		{
 			return m_semiTones[n];
 		}

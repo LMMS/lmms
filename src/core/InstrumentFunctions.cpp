@@ -34,129 +34,36 @@
 
 
 
+//Volume (uint8_t): 0->200 Panning (int8_t): -100 -> +100
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
 {
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 4, 7, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Majb5" ), { 0, 4, 6, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "minor" ), { 0, 3, 7, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "minb5" ), { 0, 3, 6, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "sus2" ), { 0, 2, 7, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "sus4" ), { 0, 5, 7, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "aug" ), { 0, 4, 8, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "augsus4" ), { 0, 5, 8, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "tri" ), { 0, 3, 6, 9, BOUNDARY_CHORD } },
-	
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6" ), { 0, 4, 7, 9, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6sus4" ), { 0, 5, 7, 9, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6add9" ), { 0, 4, 7, 9, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m6" ), { 0, 3, 7, 9, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m6add9" ), { 0, 3, 7, 9, 14, BOUNDARY_CHORD } },
-
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7" ), { 0, 4, 7, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7sus4" ), { 0, 5, 7, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#5" ), { 0, 4, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7b5" ), { 0, 4, 6, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#9" ), { 0, 4, 7, 10, 15, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7b9" ), { 0, 4, 7, 10, 13, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#5#9" ), { 0, 4, 8, 10, 15, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#5b9" ), { 0, 4, 8, 10, 13, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7b5b9" ), { 0, 4, 6, 10, 13, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7add11" ), { 0, 4, 7, 10, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7add13" ), { 0, 4, 7, 10, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "7#11" ), { 0, 4, 7, 10, 18, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7" ), { 0, 4, 7, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7b5" ), { 0, 4, 6, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7#5" ), { 0, 4, 8, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7#11" ), { 0, 4, 7, 11, 18, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj7add13" ), { 0, 4, 7, 11, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7" ), { 0, 3, 7, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7b5" ), { 0, 3, 6, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7b9" ), { 0, 3, 7, 10, 13, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7add11" ), { 0, 3, 7, 10, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m7add13" ), { 0, 3, 7, 10, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj7" ), { 0, 3, 7, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj7add11" ), { 0, 3, 7, 11, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj7add13" ), { 0, 3, 7, 11, 21, BOUNDARY_CHORD } },
-
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9" ), { 0, 4, 7, 10, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9sus4" ), { 0, 5, 7, 10, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "add9" ), { 0, 4, 7, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9#5" ), { 0, 4, 8, 10, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9b5" ), { 0, 4, 6, 10, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9#11" ), { 0, 4, 7, 10, 14, 18, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "9b13" ), { 0, 4, 7, 10, 14, 20, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9" ), { 0, 4, 7, 11, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9sus4" ), { 0, 5, 7, 11, 15, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9#5" ), { 0, 4, 8, 11, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj9#11" ), { 0, 4, 7, 11, 14, 18, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m9" ), { 0, 3, 7, 10, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "madd9" ), { 0, 3, 7, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m9b5" ), { 0, 3, 6, 10, 14, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m9-Maj7" ), { 0, 3, 7, 11, 14, BOUNDARY_CHORD } },
-
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "11" ), { 0, 4, 7, 10, 14, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "11b9" ), { 0, 4, 7, 10, 13, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj11" ), { 0, 4, 7, 11, 14, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m11" ), { 0, 3, 7, 10, 14, 17, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj11" ), { 0, 3, 7, 11, 14, 17, BOUNDARY_CHORD } },
-
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13" ), { 0, 4, 7, 10, 14, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13#9" ), { 0, 4, 7, 10, 15, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13b9" ), { 0, 4, 7, 10, 13, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "13b5b9" ), { 0, 4, 6, 10, 13, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Maj13" ), { 0, 4, 7, 11, 14, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m13" ), { 0, 3, 7, 10, 14, 21, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "m-Maj13" ), { 0, 3, 7, 11, 14, 21, BOUNDARY_CHORD } },
-
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major" ), { 0, 2, 4, 5, 7, 9, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Harmonic minor" ), { 0, 2, 3, 5, 7, 8, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Melodic minor" ), { 0, 2, 3, 5, 7, 9, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Whole tone" ), { 0, 2, 4, 6, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Diminished" ), { 0, 2, 3, 5, 6, 8, 9, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major pentatonic" ), { 0, 2, 4, 7, 9, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor pentatonic" ), { 0, 3, 5, 7, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Jap in sen" ), { 0, 1, 5, 7, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Major bebop" ), { 0, 2, 4, 5, 7, 8, 9, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dominant bebop" ), { 0, 2, 4, 5, 7, 9, 10, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Blues" ), { 0, 3, 5, 6, 7, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Arabic" ), { 0, 1, 4, 5, 7, 8, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Enigmatic" ), { 0, 1, 4, 6, 8, 10, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan" ), { 0, 1, 3, 5, 7, 9, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan minor" ), { 0, 1, 3, 5, 7, 8, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Hungarian minor" ), { 0, 2, 3, 6, 7, 8, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Locrian" ), { 0, 1, 3, 5, 6, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Chromatic" ), { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Half-Whole Diminished" ), { 0, 1, 3, 4, 6, 7, 9, 10, BOUNDARY_CHORD } },
-
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, BOUNDARY_CHORD } },
-    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, BOUNDARY_CHORD } },
-
+    /*
+    The data for the semitone: {a,b,c,d,e}
+    a: key
+    b: volume - from 0 to 200 (or in percentage??)
+    c: panning - from -100 to 100 (or in percentage??)
+    d: active (true/false) - if the note is skipped
+    e: silenced (true/false) - if the note is played or there is silence
+    */
+    { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), {{ 0, -1, -1, 1, 1 } ,{ }} },
     { QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Batman" ), { 0, 0, -2, -2, -5, -5, -2, -2, BOUNDARY_CHORD } }
 } ;
 
 
 
-
+/**
+ * <p>Gets data into Chord!</p>
+ * @brief InstrumentFunctionNoteStacking::Chord::Chord
+ * @param n
+ * @param semi_tones
+ */
 InstrumentFunctionNoteStacking::Chord::Chord( const char * n, const ChordSemiTones & semi_tones ) :
-	m_name( InstrumentFunctionNoteStacking::tr( n ) )
+    m_name( InstrumentFunctionNoteStacking::tr( n ) ) //assegnazione diretta, inizializzazione
 {
-	for( m_size = 0; m_size < MAX_CHORD_POLYPHONY; m_size++ )
-	{
-        if( semi_tones[m_size] == BOUNDARY_CHORD  )
-		{
-			break;
-		}
+    //poglej ce dela, sicer bos moral implementirat iterator;
+    //probaj tudi m_semiTones=&semi_tones
+    m_semiTones=semi_tones;
 
-		m_semiTones[m_size] = semi_tones[m_size];
-	}
 }
 
 
@@ -176,7 +83,11 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( chord_arp_note semi_ton
 
 
 
-
+/**
+ * <p>Gets data from the table above</p>
+ * TLE NAREDIS PROGRAMSKO LOGIKO zamenjaj stvari gor!
+ * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
+ */
 InstrumentFunctionNoteStacking::ChordTable::ChordTable() :
 	QVector<Chord>()
 {
