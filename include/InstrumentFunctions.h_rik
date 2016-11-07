@@ -41,20 +41,19 @@ public:
   //	static const int MAX_CHORD_POLYPHONY = 13;
   //   static const int BOUNDARY_CHORD = -100;
 
+private:
   // The idea is to trick other modules of the program to think of the new
   // structure as of an array of int8_t keys
 
   // R: the new structure of the arpeggio note: key, volume, panning, active,
   // silenced.
   //   It is going to replace the bare key note
-
   struct ChordSemiTone {
     int8_t key;   // the semitone
     volume_t vol; // its volume : in percentage of the volume, from 0% (silence)
-                  // to 200% or more, to emboss volume. There should be a
+                  // to 200% or more, to amboss volume. There should be a
                   // control for volumes too high;
-    panning_t pan; // the panning from -100 to +100
-
+    panning_t pan;     // the panning from -100 to +100
     bool active;       // the note is played -> true: yes, false: skipped
     bool silenced;     // the note is processed but silenced -> true: normally
                        // played, false: muted
@@ -121,9 +120,9 @@ public:
       key = (int8_t)l[0].toInt();
       vol = (volume_t)l[1].toInt();
       pan = (panning_t)l[2].toInt();
-      active = (bool)l[3].toShort();
-      silenced = (bool)l[4].toShort();
-      bare = (bool)l[5].toShort();
+      active = (bool)l[2].toShort();
+      silenced = (bool)l[2].toShort();
+      bare = (bool)l[2].toShort();
     }
 
     /**
@@ -161,7 +160,6 @@ public:
     }
   };
 
-private:
   // redefining QVector to return an integer from the operator as to fake an
   // array of int8_t note key!
   struct ChordSemiTones : public QVector<ChordSemiTone> {
@@ -175,9 +173,6 @@ private:
     ChordSemiTones(QString s) {
       QStringList l = s.remove(' ').split(';');
       foreach (QString s, l) {
-        if (s.isEmpty()) {
-          break;
-        }
         // reads the data into semitone and pushes back into vector
         ChordSemiTone *cst = new ChordSemiTone(s);
         push_back(*cst);
@@ -225,19 +220,15 @@ public:
      */
     Chord(const char *n, const QString s);
 
-    Chord(QString n, const QString s);
-
     /**
      * The original constructor, you can use it!
      * @brief Chord
      * @param n
      * @param semi_tones
      */
-    Chord(const char *n, const ChordSemiTones semi_tones);
+    Chord(const char *n, const ChordSemiTones &semi_tones){};
 
-    Chord(QString n, const ChordSemiTones semi_tones);
-
-    int size() const { return m_semiTones.size(); }
+    int size() const { return m_size; }
 
     bool isScale() const { return size() > 6; }
 
@@ -250,7 +241,7 @@ public:
      * @brief last
      * @return
      */
-    const int8_t &last() const { return m_semiTones.last().key; }
+    const int8_t last() const { return m_semiTones[size() - 1]; }
 
     const QString &getName() const { return m_name; }
 
@@ -276,7 +267,7 @@ public:
 
   struct ChordTable : public QVector<Chord> {
   private:
-    ChordTable();
+    ChordTable(){};
 
     // This Klinc to implement the static QVector of data
     struct Init : public QVector<Chord> {
