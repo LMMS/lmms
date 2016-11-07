@@ -770,12 +770,12 @@ void Knob::enterValue()
 	bool ok;
 	float new_val;
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
 			this, windowTitle(),
 			tr( "Please enter a new value between "
-					"-96.0 dBV and 6.0 dBV:" ),
+					"-96.0 dBFS and 6.0 dBFS:" ),
 				20.0 * log10( model()->value() / 100.0 ),
 							-96.0, 6.0, 4, &ok );
 		if( new_val <= -96.0 )
@@ -784,7 +784,7 @@ void Knob::enterValue()
 		}
 		else
 		{
-			new_val = dbvToAmp( new_val ) * 100.0;
+			new_val = dbfsToAmp( new_val ) * 100.0;
 		}
 	}
 	else
@@ -825,9 +825,9 @@ void Knob::friendlyUpdate()
 QString Knob::displayValue() const
 {
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
-		return m_description.trimmed() + QString( " %1 dBV" ).
+		return m_description.trimmed() + QString( " %1 dBFS" ).
 				arg( 20.0 * log10( model()->value() / volumeRatio() ),
 								3, 'f', 2 );
 	}
@@ -858,9 +858,3 @@ void Knob::displayHelp()
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
 }
-
-
-
-
-
-
