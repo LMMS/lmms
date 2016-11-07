@@ -72,12 +72,12 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	EqFader *inGainFader = new EqFader( &controls->m_inGainModel, tr( "In Gain" ), this, &controls->m_inPeakL, &controls->m_inPeakR );
 	mainLayout->addWidget( inGainFader, 0, 0 );
 	inGainFader->setDisplayConversion( false );
-	inGainFader->setHintText( tr( "Gain" ), "dBv");
+	inGainFader->setHintText( tr( "Gain" ), "dBFS");
 
 	EqFader *outGainFader = new EqFader( &controls->m_outGainModel, tr( "Out Gain" ), this, &controls->m_outPeakL, &controls->m_outPeakR );
 	mainLayout->addWidget( outGainFader, 0, 9 );
 	outGainFader->setDisplayConversion( false );
-	outGainFader->setHintText( tr( "Gain" ), "dBv" );
+	outGainFader->setHintText( tr( "Gain" ), "dBFS" );
 
 	// Gain Fader for each Filter exepts the pass filter
 	for( int i = 1; i < m_parameterWidget->bandCount() - 1; i++ )

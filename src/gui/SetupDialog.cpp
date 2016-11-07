@@ -98,8 +98,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disabled" ).toInt() ),
 	m_warnAfterSetup( !ConfigManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
-	m_displaydBV( ConfigManager::inst()->value( "app", 
-		      				"displaydbv" ).toInt() ),
+	m_displaydBFS( ConfigManager::inst()->value( "app", 
+		      				"displaydbfs" ).toInt() ),
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_disableBackup( !ConfigManager::inst()->value( "app",
 							"disablebackup" ).toInt() ),
@@ -236,13 +236,13 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleWarnAfterSetup( bool ) ) );
 
 
-	LedCheckBox * dbv = new LedCheckBox( tr( "Display volume as dBV " ),
+	LedCheckBox * dbfs = new LedCheckBox( tr( "Display volume as dBFS " ),
 								misc_tw );
 	labelNumber++;
-	dbv->move( XDelta, YDelta*labelNumber );
-	dbv->setChecked( m_displaydBV );
-	connect( dbv, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleDisplaydBV( bool ) ) );
+	dbfs->move( XDelta, YDelta*labelNumber );
+	dbfs->setChecked( m_displaydBFS );
+	connect( dbfs, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisplaydBFS( bool ) ) );
 
 
 	LedCheckBox * mmpz = new LedCheckBox(
@@ -999,8 +999,8 @@ void SetupDialog::accept()
 					QString::number( !m_toolTips ) );
 	ConfigManager::inst()->setValue( "app", "nomsgaftersetup",
 					QString::number( !m_warnAfterSetup ) );
-	ConfigManager::inst()->setValue( "app", "displaydbv",
-					QString::number( m_displaydBV ) );
+	ConfigManager::inst()->setValue( "app", "displaydbfs",
+					QString::number( m_displaydBFS ) );
 	ConfigManager::inst()->setValue( "app", "nommpz",
 						QString::number( !m_MMPZ ) );
 	ConfigManager::inst()->setValue( "app", "disablebackup",
@@ -1147,9 +1147,9 @@ void SetupDialog::toggleWarnAfterSetup( bool _enabled )
 
 
 
-void SetupDialog::toggleDisplaydBV( bool _enabled )
+void SetupDialog::toggleDisplaydBFS( bool _enabled )
 {
-	m_displaydBV = _enabled;
+	m_displaydBFS = _enabled;
 }
 
 

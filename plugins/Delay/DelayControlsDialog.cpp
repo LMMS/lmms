@@ -75,7 +75,7 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	outFader->setMaximumHeight( 196 );
 	outFader->move( 263, 42 );
 	outFader->setDisplayConversion( false );
-	outFader->setHintText( tr( "Gain" ), "dBv" );
+	outFader->setHintText( tr( "Gain" ), "dBFS" );
 
 	XyPad * pad = new XyPad( this, &controls->m_feedbackModel, &controls->m_delayTimeModel );
 	pad->resize( 196, 196 );
