@@ -54,13 +54,9 @@ InstrumentFunctionNoteStacking::Chord::Chord(QString n, QString s) {
   m_semiTones = ChordSemiTones(s);
 }
 
-// Volume (uint8_t): 0->200 Panning (int8_t): -100 -> +100
-// Initializing the chord table
-InstrumentFunctionNoteStacking::ChordTable::Init
-    InstrumentFunctionNoteStacking::ChordTable::s_initializer;
-
 /**
- * Implementation of the ChordTable::Init::Init() struct inline procedure
+ * Initializing the inbound static ChordTable vector
+ *
  * @brief InstrumentFunctionNoteStacking::ChordTable::Init::Init
  */
 InstrumentFunctionNoteStacking::ChordTable::Init::Init() {
@@ -252,12 +248,19 @@ InstrumentFunctionNoteStacking::ChordTable::Init::Init() {
 
       "5$ 0,100,0,1,0,0; 7,100,0,1,0,0;|"
 
-      "Vera 477044$ 4,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; 0,100,0,1,0,0; 4,100,0,1,0,0; 4,100,0,1,0,0;|"
-      "Rik 00224422$ 0,100,0,1,0,0; 0,100,0,1,0,0; 2,100,0,1,0,0; 2,100,0,1,0,0; 4,100,0,1,0,0; 4,100,0,1,0,0; 2,100,0,1,0,0; 2,100,0,1,0,0;|"
-      "Rik 00335522$ 0,100,0,1,0,0; 0,100,0,1,0,0; 3,100,0,1,0,0; 3,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 2,100,0,1,0,0; 2,100,0,1,0,0;|"
+      "Vera 477044$ 4,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; "
+      "0,100,0,1,0,0; 4,100,0,1,0,0; 4,100,0,1,0,0;|"
+      "Rik 00224422$ 0,100,0,1,0,0; 0,100,0,1,0,0; 2,100,0,1,0,0; "
+      "2,100,0,1,0,0; 4,100,0,1,0,0; 4,100,0,1,0,0; 2,100,0,1,0,0; "
+      "2,100,0,1,0,0;|"
+      "Rik 00335522$ 0,100,0,1,0,0; 0,100,0,1,0,0; 3,100,0,1,0,0; "
+      "3,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 2,100,0,1,0,0; "
+      "2,100,0,1,0,0;|"
       "Rik 0245$ 0,100,0,1,0,0; 2,100,0,1,0,0; 4,100,0,1,0,0; 5,100,0,1,0,0;|"
-      "Rik 0-2-45$ 0,100,0,1,0,0; -2,100,0,1,0,0; -4,100,0,1,0,0; 5,100,0,1,0,0;|"
-      "Rik 07294_11_4$ 0,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; 9,100,0,1,0,0; 4,100,0,1,0,0; 11,100,0,1,0,0; 4,100,0,1,0,0;|"
+      "Rik 0-2-45$ 0,100,0,1,0,0; -2,100,0,1,0,0; -4,100,0,1,0,0; "
+      "5,100,0,1,0,0;|"
+      "Rik 07294_11_4$ 0,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; "
+      "9,100,0,1,0,0; 4,100,0,1,0,0; 11,100,0,1,0,0; 4,100,0,1,0,0;|"
       "Rik 08$ 0,100,0,1,0,0; 8,100,0,1,0,0;|"
       "Rik 07$ 0,100,0,1,0,0; 7,100,0,1,0,0;|"
       "Rik 06$ 0,100,0,1,0,0; 6,100,0,1,0,0;|"
@@ -265,27 +268,51 @@ InstrumentFunctionNoteStacking::ChordTable::Init::Init() {
       "Rik 058$ 0,100,0,1,0,0; 5,100,0,1,0,0; 8,100,0,1,0,0;|"
       "Rik 085$ 0,100,0,1,0,0; 8,100,0,1,0,0; 5,100,0,1,0,0;|"
       "Rik 04_10$ 0,100,0,1,0,0; 4,100,0,1,0,0; 10,100,0,1,0,0;|"
-      "Rik 0_12_57$ 0,100,0,1,0,0; 12,100,0,1,0,0; 5,100,0,1,0,0; 7,100,0,1,0,0;|"
-      "Rik 0_12_75$ 0,100,0,1,0,0; 12,100,0,1,0,0; 7,100,0,1,0,0; 5,100,0,1,0,0;|"
-      "Rik 085_12$ 0,100,0,1,0,0; 8,100,0,1,0,0; 5,100,0,1,0,0; 12,100,0,1,0,0;|"
+      "Rik 0_12_57$ 0,100,0,1,0,0; 12,100,0,1,0,0; 5,100,0,1,0,0; "
+      "7,100,0,1,0,0;|"
+      "Rik 0_12_75$ 0,100,0,1,0,0; 12,100,0,1,0,0; 7,100,0,1,0,0; "
+      "5,100,0,1,0,0;|"
+      "Rik 085_12$ 0,100,0,1,0,0; 8,100,0,1,0,0; 5,100,0,1,0,0; "
+      "12,100,0,1,0,0;|"
       "Rik 0735$ 0,100,0,1,0,0; 7,100,0,1,0,0; 3,100,0,1,0,0; 5,100,0,1,0,0;|"
-      "Rik 0.-2.0.2.1$ 0,100,0,1,0,0; -2,100,0,1,0,0; 0,100,0,1,0,0; 2,100,0,1,0,0; 1,100,0,1,0,0;|"
-      "Rik 0.-5.-3.-3.-3.-5$ 0,100,0,1,0,0; -5,100,0,1,0,0; -3,100,0,1,0,0; -3,100,0,1,0,0; -3,100,0,1,0,0; -5,100,0,1,0,0;|"
-      "Rik 0.0.3.3.5.5.2.2$ 0,100,0,1,0,0; 0,100,0,1,0,0; 3,100,0,1,0,0; 3,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 2,100,0,1,0,0; 2,100,0,1,0,0;|"
-      "Rik 0.3.5.2$ 0,100,0,1,0,0; 3,100,0,1,0,0; 5,100,0,1,0,0; 2,100,0,1,0,0;|"
+      "Rik 0.-2.0.2.1$ 0,100,0,1,0,0; -2,100,0,1,0,0; 0,100,0,1,0,0; "
+      "2,100,0,1,0,0; 1,100,0,1,0,0;|"
+      "Rik 0.-5.-3.-3.-3.-5$ 0,100,0,1,0,0; -5,100,0,1,0,0; -3,100,0,1,0,0; "
+      "-3,100,0,1,0,0; -3,100,0,1,0,0; -5,100,0,1,0,0;|"
+      "Rik 0.0.3.3.5.5.2.2$ 0,100,0,1,0,0; 0,100,0,1,0,0; 3,100,0,1,0,0; "
+      "3,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 2,100,0,1,0,0; "
+      "2,100,0,1,0,0;|"
+      "Rik 0.3.5.2$ 0,100,0,1,0,0; 3,100,0,1,0,0; 5,100,0,1,0,0; "
+      "2,100,0,1,0,0;|"
       "Rik 0.16$ 0,100,0,1,0,0; 16,100,0,1,0,0;|"
-      "Rik 0 10 7 10$ 0,100,0,1,0,0; 10,100,0,1,0,0; 7,100,0,1,0,0; 10,100,0,1,0,0;|"
-      "Rik 0 16 10 11$ 0,100,0,1,0,0; 16,100,0,1,0,0; 10,100,0,1,0,0; 11,100,0,1,0,0;|"
-      "Rik 0.7.-1.3$ 0,100,0,1,0,0; 7,100,0,1,0,0; -1,100,0,1,0,0; 3,100,0,1,0,0;|"
-      "Rik 0.7.-1.3.-3.1$ 0,100,0,1,0,0; 7,100,0,1,0,0; -1,100,0,1,0,0; 3,100,0,1,0,0; -3,100,0,1,0,0; 1,100,0,1,0,0;|"
-      "Rik 0.0.0.-3.4.4.4$ 1,100,0,1,0,0; 1,100,0,1,0,0; 1,100,0,1,0,0; -2,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 0,100,0,1,0,0;|"
-      "Rik 3.0.0.7.7.2.2.3$ 3,100,0,1,0,0; 0,100,0,1,0,0; 0,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; 2,100,0,1,0,0; 3,100,0,1,0,0;|"
-      "Rik 0.7.2.3$ 0,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; 3,100,0,1,0,0;|"
-      "Rik 0.7.2.5$ 0,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; 5,100,0,1,0,0;|"
-      "Rik 0.7.3.5$ 0,100,0,1,0,0; 7,100,0,1,0,0; 3,100,0,1,0,0; 5,100,0,1,0,0;|"
-      "Rik 3.3.3.0.0.7.7.2$ 3,100,0,1,0,0; 3,100,0,1,0,0; 3,100,0,1,0,0; 0,100,0,1,0,0; 0,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0;|"
-      "Rik 0.-1.-1.3.3.-7$ 0,100,0,1,0,0; -1,100,0,1,0,0; -1,100,0,1,0,0; 3,100,0,1,0,0; 3,100,0,1,0,0; -7,100,0,1,0,0;|"
-      "Rik 0.-1.-1.4.4.7.7.6$ 0,100,0,1,0,0; -1,100,0,1,0,0; -1,100,0,1,0,0; 4,100,0,1,0,0; 4,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; 6,100,0,1,0,0;|"
+      "Rik 0 10 7 10$ 0,100,0,1,0,0; 10,100,0,1,0,0; 7,100,0,1,0,0; "
+      "10,100,0,1,0,0;|"
+      "Rik 0 16 10 11$ 0,100,0,1,0,0; 16,100,0,1,0,0; 10,100,0,1,0,0; "
+      "11,100,0,1,0,0;|"
+      "Rik 0.7.-1.3$ 0,100,0,1,0,0; 7,100,0,1,0,0; -1,100,0,1,0,0; "
+      "3,100,0,1,0,0;|"
+      "Rik 0.7.-1.3.-3.1$ 0,100,0,1,0,0; 7,100,0,1,0,0; -1,100,0,1,0,0; "
+      "3,100,0,1,0,0; -3,100,0,1,0,0; 1,100,0,1,0,0;|"
+      "Rik 0.0.0.-3.4.4.4$ 1,100,0,1,0,0; 1,100,0,1,0,0; 1,100,0,1,0,0; "
+      "-2,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; 5,100,0,1,0,0; "
+      "0,100,0,1,0,0;|"
+      "Rik 3.0.0.7.7.2.2.3$ 3,100,0,1,0,0; 0,100,0,1,0,0; 0,100,0,1,0,0; "
+      "7,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; 2,100,0,1,0,0; "
+      "3,100,0,1,0,0;|"
+      "Rik 0.7.2.3$ 0,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; "
+      "3,100,0,1,0,0;|"
+      "Rik 0.7.2.5$ 0,100,0,1,0,0; 7,100,0,1,0,0; 2,100,0,1,0,0; "
+      "5,100,0,1,0,0;|"
+      "Rik 0.7.3.5$ 0,100,0,1,0,0; 7,100,0,1,0,0; 3,100,0,1,0,0; "
+      "5,100,0,1,0,0;|"
+      "Rik 3.3.3.0.0.7.7.2$ 3,100,0,1,0,0; 3,100,0,1,0,0; 3,100,0,1,0,0; "
+      "0,100,0,1,0,0; 0,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; "
+      "2,100,0,1,0,0;|"
+      "Rik 0.-1.-1.3.3.-7$ 0,100,0,1,0,0; -1,100,0,1,0,0; -1,100,0,1,0,0; "
+      "3,100,0,1,0,0; 3,100,0,1,0,0; -7,100,0,1,0,0;|"
+      "Rik 0.-1.-1.4.4.7.7.6$ 0,100,0,1,0,0; -1,100,0,1,0,0; -1,100,0,1,0,0; "
+      "4,100,0,1,0,0; 4,100,0,1,0,0; 7,100,0,1,0,0; 7,100,0,1,0,0; "
+      "6,100,0,1,0,0;|"
 
       "Phrygian dominant$ 0,100,0,1,0,0; 1,100,0,1,0,0; 4,100,0,1,0,0; "
       "5,100,0,1,0,0; 7,100,0,1,0,0; 8,100,0,1,0,0; 10,100,0,1,0,0;|"
@@ -293,32 +320,61 @@ InstrumentFunctionNoteStacking::ChordTable::Init::Init() {
       "Persian$ 0,100,0,1,0,0; 1,100,0,1,0,0; 4,100,0,1,0,0; 5,100,0,1,0,0; "
       "6,100,0,1,0,0; 8,100,0,1,0,0; 11,100,0,1,0,0;|"
 
-      "pino$ 0,100,0,1,0,0; 3,100,50,1,0,0; 5,100,-100,1,0,0; -1,100,100,1,0,0|";
+      "pino$ 0,100,0,1,0,0; 3,100,50,1,0,0; 5,100,-100,1,0,0; "
+      "-1,100,100,1,0,0|"
+
+      "RikPan 0.0.0.-3.4.4.4$ 0,100,0,1,0,0; 0,50,40,1,0,0; 0,80,-40,1,0,0; "
+      "-3,120,70,1,0,0; 4,100,-70,1,0,0; 4,30,0,1,0,0; 4,60,90,1,0,0; "
+      "0,100,-90,1,0,0;|"
+      "RikPan 3.0.0.7.7.2.2.3$ 3,100,60,1,0,0; 0,100,-60,1,0,0; 0,60,0,1,0,0; "
+      "7,60,0,1,0,0; 7,110,-80,1,0,0; 2,80,80,1,0,0; 2,90,70,1,0,0; "
+      "3,90,-70,1,0,0;|";
 
   // Getting the list of chordes
   QStringList l0 = notes.remove(' ').split('|'); // Splitting each chord
   foreach (QString s, l0) {
-    if (s.isEmpty()) {
+    if (s.isEmpty()) { // eliminating the string originated by the last
+                       // character
       break;
     }
-    QStringList l1 = s.split('$'); // l[0]: name l[1]:string of the list
 
-    const QString c = l1[0].toUtf8().constData();
+    // l[0]: name l[1]:string of the list
+    QStringList l1 = s.split('$');
+
+    // getting semitones from string contructor
     ChordSemiTones cs = ChordSemiTones(l1[1]);
+    // using "tr" to allow translation
     Chord chord = Chord(tr(l1[0].toUtf8().constData()), cs);
+
+    // populating the inbound static structure
     push_back(chord);
   }
 };
 
+/**
+ * Recalling the function Init which gets the static vector data by expliciting
+ * the function variable (??)
+ *
+ * @brief InstrumentFunctionNoteStacking::ChordTable::s_initializer
+ */
+InstrumentFunctionNoteStacking::ChordTable::Init
+    InstrumentFunctionNoteStacking::ChordTable::s_initializer;
+
+/**
+ * The constructor transfers the initialized inbound static data to the
+ * vector itself
+ *
+ * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
+ */
 InstrumentFunctionNoteStacking::ChordTable::ChordTable() : QVector<Chord>() {
-  // Swaps this vector with the static one;
+  // Swaps the Chordable uninitialized vector with the static ChordTable one;
   swap(s_initializer);
 }
 
 /**
- * <p>Checks if the chord contains the semitone; To be considered equal the
- * semitone must have the same key, volume, panning etc. values.</p>
- * <p>It relies on the operator function == of the struct ChordNote_struct</p>
+ * The original function maintained, it only checks for the same key, other
+ * characteristics are neglected to maintain compatibility with other modules
+ *
  * @brief InstrumentFunctionNoteStacking::Chord::hasSemiTone
  * @param semi_tone
  * @return
@@ -326,6 +382,7 @@ InstrumentFunctionNoteStacking::ChordTable::ChordTable() : QVector<Chord>() {
 bool InstrumentFunctionNoteStacking::Chord::hasSemiTone(
     int8_t semi_tone) const {
   for (int i = 0; i < size(); ++i) {
+    // Using overloaded operator [] to return int8_t
     if (semi_tone == m_semiTones[i]) {
       return true;
     }
@@ -360,7 +417,7 @@ InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking() {}
 void InstrumentFunctionNoteStacking::processNote(NotePlayHandle *_n) {
   // Getting base note key
   const int base_note_key = _n->key();
-  // Getting volume and panning
+  // Getting base note volume and panning
   const volume_t base_note_vol = _n->getVolume();
   const panning_t base_note_pan = _n->getPanning();
   //
@@ -387,12 +444,17 @@ void InstrumentFunctionNoteStacking::processNote(NotePlayHandle *_n) {
       Chord c = chord_table[selected_chord];
       // process all notes in the chord
       foreach (ChordSemiTone cst, c.getChordSemiTones()) {
-        if (cst.active) { // if the note is active process it, otherwise skip!
+        if (cst.active) { // if the note is active process it, otherwise skip
+
           // getting the base note key
           const int sub_note_key = sub_note_key_base + cst.key;
+
+          // the new volume and panning
           volume_t sub_note_vol;
           panning_t sub_note_pan;
-          if (cst.bare) { // forget other settings but key
+
+          if (cst.bare) { // forget other settings but key, get the original
+                          // data
             sub_note_vol = base_note_vol;
             sub_note_pan = base_note_pan;
           } else {
@@ -402,8 +464,8 @@ void InstrumentFunctionNoteStacking::processNote(NotePlayHandle *_n) {
               sub_note_pan = 0;
             } else { // all modifications active, add interval to sub-note-key,
                      // volume, panning
-              sub_note_vol = base_note_vol * (cst.vol / 100);
-              sub_note_pan = base_note_pan + (cst.pan / base_note_vol * 100);
+              sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
+              sub_note_pan = cst.pan;
             }
           }
           // maybe we're out of range -> let's get outta
@@ -641,8 +703,8 @@ void InstrumentFunctionArpeggio::processNote(NotePlayHandle *_n) {
           sub_note_pan = 0;
         } else { // all modifications active, add interval to sub-note-key,
                  // volume, panning
-          sub_note_vol = base_note_vol * (cst.vol / 100);
-          sub_note_pan = base_note_pan + (cst.pan / base_note_vol * 100);
+          sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
+          sub_note_pan = cst.pan;
         }
       }
 

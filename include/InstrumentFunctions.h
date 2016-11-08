@@ -38,21 +38,21 @@ class InstrumentFunctionNoteStacking : public Model, public JournallingObject {
   Q_OBJECT
 
 public:
+  // We don't need those anymore
   //	static const int MAX_CHORD_POLYPHONY = 13;
   //   static const int BOUNDARY_CHORD = -100;
 
-  // The idea is to trick other modules of the program to think of the new
-  // structure as of an array of int8_t keys
-
-  // R: the new structure of the arpeggio note: key, volume, panning, active,
-  // silenced.
-  //   It is going to replace the bare key note
-
+  /**
+  * The new structure substitutes the int8_t key values. It now holds data
+  * for volume and panning, too. In future we could manipulate the single
+  * arpeggio note length
+  *
+  * @brief The ChordSemiTone struct
+  */
   struct ChordSemiTone {
     int8_t key;   // the semitone
     volume_t vol; // its volume : in percentage of the volume, from 0% (silence)
-                  // to 200% or more, to emboss volume. There should be a
-                  // control for volumes too high;
+    // to 200% or more, to emboss volume. No control for high volumes yet;
     panning_t pan; // the panning from -100 to +100
 
     bool active;       // the note is played -> true: yes, false: skipped
@@ -63,7 +63,7 @@ public:
     //        false: the note has all data, volume, panning, silenced...
 
     /**
-     * The constructor which parses a string to get data!
+     * The constructor which parses a string to get data
      * @brief ChordSemiTone
      * @param s
      */
@@ -72,7 +72,8 @@ public:
     }
 
     /**
-     * The constructor which gets all the data. It's already not bare
+     * The constructor which gets all the data. The bare parameter is already
+     * set to false
      * @brief ChordSemiTone
      * @param k key
      * @param v volume
@@ -103,8 +104,7 @@ public:
     }
 
     /**
-     * Reads data into chord semitone, through a string in sight of future
-     * external editor.
+     * Reads data into chord semitone, through a string
      * The format read will be three digits to get key, volume, panning, then
      * three bool (1 or 0) for the boolean fields
      *
@@ -112,7 +112,16 @@ public:
      * except key are ingored
      *
      * @brief readData
-     * @param d : a string like 1,2,3,1,1,0
+     * @param d : a string like 3,100,0,1,0,0
+     *  - key,
+     *  - volume (0-200 in percentage of the original volume. 100 is the
+     * original
+     * volume),
+     *  - panning (from -100 to 100),
+     *  - active (true: the note is played, false: omitted),
+     *  - silenced (true: the note is played but without sound),
+     *  - bare (true: all data ignored except key)
+     *
      * @return
      */
     void parseString(QString d) {
@@ -138,21 +147,28 @@ public:
     }
 
     /**
-     * Setting up the bareness of the note: if it only has the key value or the
-     * whole data
-     * true: treat it as it has only the key value
-     * false: all data present (volume, pan etc.)
+     * Comparison towards a ChordSemitone entity, checks for same key, vol, pan,
+     * active, silenced, bare
+     * @brief operator ==
+     * @param a
+     * @return
      */
-    void setBare(bool b) { bare = b; }
-
     inline bool operator==(ChordSemiTone a) {
-      if (a.key == key && a.vol == vol && a.pan == pan && a.active == active &&
-          a.silenced == silenced)
+      if (a.key == key && a.bare == bare && a.vol == vol && a.pan == pan &&
+          a.active == active && a.silenced == silenced)
         return true;
       else
         return false;
     }
 
+    /**
+     * Comparison towards int8_t integers (key), held compatibility with other
+     * modules
+     *
+     * @brief operator ==
+     * @param a
+     * @return
+     */
     inline bool operator==(int8_t a) {
       if (key == a) {
         return true;
@@ -162,8 +178,13 @@ public:
   };
 
 private:
-  // redefining QVector to return an integer from the operator as to fake an
-  // array of int8_t note key!
+  /*
+   * Originally ChordSemiTones was an array of int8_t keys
+   *  - typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
+   * And the MAX_CHORD_POLYPHONY was defining its maximum length of 13 elements.
+   *
+   * Now it's a QVector, with an overloaded []operator to maintain compatibility
+   */
   struct ChordSemiTones : public QVector<ChordSemiTone> {
 
     /**
@@ -175,10 +196,11 @@ private:
     ChordSemiTones(QString s) {
       QStringList l = s.remove(' ').split(';');
       foreach (QString s, l) {
-        if (s.isEmpty()) {
+        if (s.isEmpty()) { // to eliminate the eventual empty QString
+                           // derived from the last delimiter
           break;
         }
-        // reads the data into semitone and pushes back into vector
+        // reads the data into semitone and pushes it into vector
         ChordSemiTone *cst = new ChordSemiTone(s);
         push_back(*cst);
       }
@@ -190,13 +212,16 @@ private:
      */
     ChordSemiTones() {}
 
+    /**
+     * Compatibility towards other modules, return the int8_t key
+     * @brief operator []
+     * @param index
+     * @return
+     */
     int8_t inline operator[](int index) const {
       return at(index).key; // returns the key of the note
     }
   };
-
-  // The original data, held for compatibility woth other modules
-  //    typedef int8_t ChordSemiTones [MAX_CHORD_POLYPHONY];
 
 public:
   InstrumentFunctionNoteStacking(Model *_parent);
@@ -219,16 +244,23 @@ public:
     Chord() : m_size(0) {}
 
     /**
+     * The constructor from const. chars
+     *
+     * @brief Chord
+     * @param n
+     * @param s
+     */
+    Chord(const char *n, const QString s);
+
+    /**
      * The constructor which gets the string as parameter
      * @brief Chord
      * @param n
      */
-    Chord(const char *n, const QString s);
-
     Chord(QString n, const QString s);
 
     /**
-     * The original constructor, you can use it!
+     * The original constructor, the
      * @brief Chord
      * @param n
      * @param semi_tones
