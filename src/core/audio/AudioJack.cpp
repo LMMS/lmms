@@ -41,7 +41,7 @@
 #include "AudioPort.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-
+#include "MidiJack.h"
 
 
 
@@ -52,6 +52,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 								_mixer ),
 	m_client( NULL ),
 	m_active( false ),
+	m_midiClient( NULL ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
@@ -123,7 +124,15 @@ void AudioJack::restartAfterZombified()
 
 
 
+AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
+{
+	if( m_client == NULL )
+		return NULL;
 
+	m_midiClient = midiClient;
+
+	return this;
+}
 
 bool AudioJack::initJackClient()
 {
@@ -331,6 +340,14 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
+	// do midi processing first so that midi input can
+	// add to the following sound processing
+	if( m_midiClient && _nframes > 0 )
+	{
+		m_midiClient->JackMidiRead(_nframes);
+		m_midiClient->JackMidiWrite(_nframes);
+	}
+
 	for( int c = 0; c < channels(); ++c )
 	{
 		m_tempOutBufs[c] =
