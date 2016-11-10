@@ -42,8 +42,9 @@
 
 class QLineEdit;
 
-class MidiJack : public MidiClientRaw, public QThread
+class MidiJack : public QThread, public MidiClientRaw
 {
+        Q_OBJECT
 public:
 	MidiJack();
 	virtual ~MidiJack();
