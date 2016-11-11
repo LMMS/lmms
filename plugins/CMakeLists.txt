@@ -49,7 +49,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		LadspaEffect
 		lb302
 		MidiImport
-		MidiExport
+		# MidiExport - temporarily disabled, MIDI export is broken
 		MultitapEcho
 		monstro
 		nes
