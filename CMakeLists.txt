@@ -589,6 +589,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
 "* Sndio                       : ${STATUS_SNDIO}\n"
+"* JACK                        : ${STATUS_JACK}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
 "* AppleMidi                   : ${STATUS_APPLEMIDI}\n"
 )

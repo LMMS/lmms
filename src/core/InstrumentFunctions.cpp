@@ -23,6 +23,7 @@
  */
 
 #include <QDomElement>
+#include <QStringList>
 
 #include "Engine.h"
 #include "InstrumentFunctions.h"

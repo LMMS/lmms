@@ -271,11 +271,17 @@ public:
 
 		Chord(QString n, const ChordSemiTones semi_tones);
 
-		int size() const { return m_semiTones.size(); }
+		int size() const {
+			return m_semiTones.size();
+		}
 
-		bool isScale() const { return size() > 6; }
+		bool isScale() const {
+			return size() > 6;
+		}
 
-		bool isEmpty() const { return size() == 0; }
+		bool isEmpty() const {
+			return size() == 0;
+		}
 
 		bool hasSemiTone(int8_t semiTone) const;
 
@@ -284,11 +290,17 @@ public:
 		 * @brief last
 		 * @return
 		 */
-		const int8_t &last() const { return m_semiTones.last().key; }
+		const int8_t &last() const {
+			return m_semiTones.last().key;
+		}
 
-		const QString &getName() const { return m_name; }
+		const QString &getName() const {
+			return m_name;
+		}
 
-		const ChordSemiTones getChordSemiTones() const { return m_semiTones; }
+		const ChordSemiTones getChordSemiTones() const {
+			return m_semiTones;
+		}
 
 		// returns the key, compatibility!
 		int8_t operator[](int n) const {
@@ -369,7 +381,9 @@ public:
 	virtual void saveSettings(QDomDocument &_doc, QDomElement &_parent);
 	virtual void loadSettings(const QDomElement &_this);
 
-	inline virtual QString nodeName() const { return "arpeggiator"; }
+	inline virtual QString nodeName() const {
+		return "arpeggiator";
+	}
 
 private:
 	enum ArpModes { FreeMode, SortMode, SyncMode };
