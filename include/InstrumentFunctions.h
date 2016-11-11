@@ -60,8 +60,8 @@ public:
 		bool active; // the note is played -> true: yes, false: skipped
 		bool silenced; // the note is processed but silenced -> true: normally
 		// played, false: muted
-		bool bare = false; // The note only has the key value. True: bare, we will
-		// discard al the rest, taking data from the base note
+		bool bare; // The note only has the key value. True: bare, we will
+		// discard all the rest, taking data from the base note
 		// false: the note has all data, volume, panning, silenced...
 
 		/**
@@ -89,7 +89,7 @@ public:
 			pan = p;
 			active = a;
 			silenced = s;
-			// bare=false; already false, not needed
+			bare = false;
 		}
 
 		ChordSemiTone() {}
