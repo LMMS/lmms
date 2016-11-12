@@ -23,6 +23,7 @@
  */
 
 #include <QMouseEvent>
+#include <QMessageBox>
 
 #include "TimeDisplayWidget.h"
 #include "GuiApplication.h"
@@ -30,6 +31,7 @@
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
+#include "CaptionMenu.h"
 
 
 
@@ -49,7 +51,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "click to change time units" ) );
+    ToolTip::add( this, tr( "left click to change time units, \nright click to jump to specified time" ) );
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
@@ -107,9 +109,9 @@ void TimeDisplayWidget::updateTime()
 			break;
 
 		case BarsTicks:
-			int tick;
-			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
-			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
+            qint64 tick;
+            tick = ( static_cast<qint64>(s->getMilliseconds()) * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
+            m_majorLCD.setValue( (tick / s->ticksPerTact() ) + 1);
 			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
 						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
 			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
@@ -136,4 +138,31 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 			setDisplayMode( MinutesSeconds );
 		}
 	}
+}
+
+void TimeDisplayWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+    CaptionMenu contextMenu( tr("Timeline") );
+    contextMenu.addAction( tr("Go to...") );
+    QAction* action  = contextMenu.exec( QCursor::pos() );
+    if (action)
+    {
+        Song* s = Engine::getSong();
+         m_timeinputbox = new TimeInputDialog( this );
+         m_timeinputbox->setTimeModel( this->m_displayMode );
+         m_timeinputbox->setMilliSeconds( s->getMilliseconds() );
+         m_timeinputbox->show();
+         connect(m_timeinputbox, SIGNAL(accepted()), this, SLOT(timeJump()));
+    }
+    return;
+}
+
+void TimeDisplayWidget::timeJump()
+{
+    Song* s = Engine::getSong();
+    if (s->isPlaying()) {
+        s->setPlayPos( m_timeinputbox->getTicks(), s->playMode());
+    }else{
+        s->setPlayPos( m_timeinputbox->getTicks(), Song::PlayModes::Mode_PlaySong);
+    }
 }

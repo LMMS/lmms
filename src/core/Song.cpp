@@ -563,7 +563,7 @@ void Song::updateLength()
 
 
 
-void Song::setPlayPos( tick_t ticks, PlayModes playMode )
+void Song::setPlayPos( qint64 ticks, PlayModes playMode )
 {
 	m_elapsedTicks += m_playPos[playMode].getTicks() - ticks;
 	m_elapsedMilliSeconds += 
