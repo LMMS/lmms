@@ -124,10 +124,10 @@ PianoRoll {
 	qproperty-barColor: #078f3a;
 	qproperty-markedSemitoneColor: #06170E;
 	/* Grid colors */
-	qproperty-barLineColor: #437053;
+	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2a6548;
-	qproperty-lineColor16th: #292929;
-	qproperty-lineColor32nd: #1f1f1f;
+	qproperty-barLineColor: #437053;
+	
 	/* Text on the white piano keys */
 	qproperty-textColor: #000;
 	qproperty-textColorLight: #0bd556;
