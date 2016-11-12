@@ -58,10 +58,11 @@ static int JackMidiProcessCallback(jack_nframes_t nframes, void *arg)
 
 static void JackMidiShutdown(void *arg)
 {
-	// TODO: support translations here
-	const QString mess_short = "JACK server down";
-	const QString mess_long = "The JACK server seems to have been shutdown.";
-	QMessageBox::information( gui->mainWindow(), mess_short, mess_long );
+        //: When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)
+	QString msg_short = MidiJack::tr("JACK server down");
+        //: When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)
+	QString msg_long = MidiJack::tr("The JACK server seems to be shuted down.");
+	QMessageBox::information( gui->mainWindow(), msg_short, msg_long );
 }
 
 MidiJack::MidiJack() :
