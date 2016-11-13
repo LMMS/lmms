@@ -26,6 +26,7 @@
 #include <QMessageBox>
 
 #include "TimeDisplayWidget.h"
+#include "TimeInputDialog.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
@@ -138,7 +139,9 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 
 void TimeDisplayWidget::contextMenuEvent( QContextMenuEvent *event )
 {
+	//: The "Timeline" here is the caption of the context menu of the widget that displays the time
 	CaptionMenu contextMenu( tr( "Timeline" ) );
+	//: This is an item on the menu, which provides the ability to jump (navigate) to a user specified time
 	contextMenu.addAction( tr( "Go to..." ) );
 	QAction* action  = contextMenu.exec( QCursor::pos() );
 	if ( action ) {
