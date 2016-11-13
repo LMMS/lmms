@@ -308,11 +308,12 @@ void MainWindow::finalize()
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
-	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
+	// temporarily disabled broken MIDI export				
+	/*project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					Engine::getSong(),
 					SLOT( exportProjectMidi() ),
-					Qt::CTRL + Qt::Key_M );
+					Qt::CTRL + Qt::Key_M );*/
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
