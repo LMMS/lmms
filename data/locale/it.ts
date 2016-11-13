@@ -3440,8 +3440,8 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Modalità logaritmica</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>Inserire un nuovo valore tra -96.0 dBV e 6.0 dBV:</translation>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Inserire un nuovo valore tra -96.0 dBFS e 6.0 dBFS:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -4040,8 +4040,8 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>In questo modo verrà modificato il tuo progetto di default corrente.</translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
-        <translation>Volume in dBV</translation>
+        <source>Volume as dBFS</source>
+        <translation>Volume in dBFS</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -6048,8 +6048,8 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Dopo aver modificato le impostazioni, mostra un avviso al riavvio</translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
-        <translation>Mostra il volume in dBV </translation>
+        <source>Display volume as dBFS </source>
+        <translation>Mostra il volume in dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>

@@ -3441,8 +3441,8 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
         <translation>Establecer como Logarítmico</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>Por favor ingresa un nuevo valor entre -96.0 dBV y 6.0 dBV:</translation>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Por favor ingresa un nuevo valor entre -96.0 dBFS y 6.0 dBFS:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -4041,8 +4041,8 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
         <translation>Esta acción sobreescribirá tu actual plantilla por defecto.</translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
-        <translation>Volumen en dBV</translation>
+        <source>Volume as dBFS</source>
+        <translation>Volumen en dBFS</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -6049,8 +6049,8 @@ Razón: &quot;%2&quot;</translation>
         <translation>Mostrar advertencia de reinicio luego de cambiar la configuración</translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
-        <translation>Mostrar volumen en dBV</translation>
+        <source>Display volume as dBFS </source>
+        <translation>Mostrar volumen en dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>

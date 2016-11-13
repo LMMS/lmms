@@ -131,7 +131,7 @@ void MultitapEchoControls::ampSamplesChanged( int begin, int end )
 	const float * samples = m_ampGraph.samples();
 	for( int i = begin; i <= end; ++i )
 	{
-		m_effect->m_amp[i] = dbvToAmp( samples[i] );
+		m_effect->m_amp[i] = dbfsToAmp( samples[i] );
 	}
 }
 
