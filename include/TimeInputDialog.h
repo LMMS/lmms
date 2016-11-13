@@ -35,7 +35,7 @@ namespace Ui
 {
 class TimeInputDialog;
 }
-
+class TimeDisplayWidget;
 class TimeInputDialog : public QDialog
 {
     Q_OBJECT

@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
+#include "TimeDisplayWidget.h"
 #include "TimeInputDialog.h"
 
 TimeInputDialog::TimeInputDialog( QWidget *parent ) :
@@ -42,16 +42,16 @@ void TimeInputDialog::setTimeModel( int time_mode )
 	m_timemode = time_mode;
 	switch ( m_timemode ) {
 	case MinutesSeconds:
-		ui->majorLabel->setText( tr( "MIN" ) );
-		ui->minorLabel->setText( tr( "SEC" ) );
-		ui->milliLabel->setText( tr( "MSEC" ) );
+		ui->majorLabel->setText( TimeDisplayWidget::tr( "MIN" ) );
+		ui->minorLabel->setText( TimeDisplayWidget::tr( "SEC" ) );
+		ui->milliLabel->setText( TimeDisplayWidget::tr( "MSEC" ) );
 		setSpinRange( range( 0, 9999 ), range( 0, 59 ), range( 0, 999 ) );
 		break;
 
 	case BarsTicks:
-		ui->majorLabel->setText( tr( "BAR" ) );
-		ui->minorLabel->setText( tr( "BEAT" ) );
-		ui->milliLabel->setText( tr( "TICK" ) );
+		ui->majorLabel->setText( TimeDisplayWidget::tr( "BAR" ) );
+		ui->minorLabel->setText( TimeDisplayWidget::tr( "BEAT" ) );
+		ui->milliLabel->setText( TimeDisplayWidget::tr( "TICK" ) );
 		setSpinRange( range( 1, 9999 ), range( 1, s->getTimeSigModel().getNumerator() ), range( 0, s->ticksPerTact() / s->getTimeSigModel().getNumerator() - 1 ) );
 		break;
 

@@ -30,9 +30,8 @@
 #include <QHBoxLayout>
 
 #include "LcdWidget.h"
-#include "TimeInputDialog.h"
 
-
+class TimeInputDialog;
 class TimeDisplayWidget : public QWidget
 {
 	Q_OBJECT

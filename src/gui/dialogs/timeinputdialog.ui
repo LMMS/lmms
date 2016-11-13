@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Input a New Time</string>
+   <string extracomment="The title of the dialog that allows the user to input the time">Input a New Time</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
