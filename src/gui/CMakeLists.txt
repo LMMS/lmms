@@ -81,7 +81,7 @@ SET(LMMS_SRCS
 	gui/widgets/TempoSyncKnob.cpp
 	gui/widgets/TextFloat.cpp
 	gui/widgets/TimeDisplayWidget.cpp
-        gui/widgets/TimeInputDialog.cpp
+	gui/widgets/TimeInputDialog.cpp
 	gui/widgets/ToolButton.cpp
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
@@ -94,7 +94,7 @@ set(LMMS_UIS
 	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui
 	gui/dialogs/export_project.ui
-        gui/dialogs/timeinputdialog.ui
+	gui/dialogs/timeinputdialog.ui
 	gui/Forms/EffectSelectDialog.ui
 
 	PARENT_SCOPE
