@@ -51,13 +51,13 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-    ToolTip::add( this, tr( "left click to change time units, \nright click to jump to specified time" ) );
+	ToolTip::add( this, tr( "left click to change time units, \nright click to jump to specified time" ) );
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+		 this, SLOT( updateTime() ) );
 }
 
 
@@ -75,21 +75,21 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 {
 	m_displayMode = displayMode;
 
-	switch( m_displayMode )
-	{
-		case MinutesSeconds:
-			m_majorLCD.setLabel( tr( "MIN" ) );
-			m_minorLCD.setLabel( tr( "SEC" ) );
-			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
-			break;
+	switch( m_displayMode ) {
+	case MinutesSeconds:
+		m_majorLCD.setLabel( tr( "MIN" ) );
+		m_minorLCD.setLabel( tr( "SEC" ) );
+		m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
+		break;
 
-		case BarsTicks:
-			m_majorLCD.setLabel( tr( "BAR" ) );
-			m_minorLCD.setLabel( tr( "BEAT" ) );
-			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
-			break;
+	case BarsTicks:
+		m_majorLCD.setLabel( tr( "BAR" ) );
+		m_minorLCD.setLabel( tr( "BEAT" ) );
+		m_milliSecondsLCD.setLabel( tr( "TICK" ) );
+		break;
 
-		default: break;
+	default:
+		break;
 	}
 }
 
@@ -100,25 +100,25 @@ void TimeDisplayWidget::updateTime()
 {
 	Song* s = Engine::getSong();
 
-	switch( m_displayMode )
-	{
-		case MinutesSeconds:
-			m_majorLCD.setValue( s->getMilliseconds() / 60000 );
-			m_minorLCD.setValue( ( s->getMilliseconds() / 1000 ) % 60 );
-			m_milliSecondsLCD.setValue( s->getMilliseconds() % 1000 );
-			break;
+	switch( m_displayMode ) {
+	case MinutesSeconds:
+		m_majorLCD.setValue( s->getMilliseconds() / 60000 );
+		m_minorLCD.setValue( ( s->getMilliseconds() / 1000 ) % 60 );
+		m_milliSecondsLCD.setValue( s->getMilliseconds() % 1000 );
+		break;
 
-		case BarsTicks:
-            qint64 tick;
-            tick = ( static_cast<qint64>(s->getMilliseconds()) * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
-            m_majorLCD.setValue( (tick / s->ticksPerTact() ) + 1);
-			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
-						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
-							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
-			break;
+	case BarsTicks:
+		qint64 tick;
+		tick = ( static_cast<qint64>( s->getMilliseconds() ) * s->getTempo() * ( DefaultTicksPerTact / 4 ) ) / 60000 ;
+		m_majorLCD.setValue( ( tick / s->ticksPerTact() ) + 1 );
+		m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
+				     ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
+		m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
+					    ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+		break;
 
-		default: break;
+	default:
+		break;
 	}
 }
 
@@ -127,42 +127,37 @@ void TimeDisplayWidget::updateTime()
 
 void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 {
-	if( mouseEvent->button() == Qt::LeftButton )
-	{
-		if( m_displayMode == MinutesSeconds )
-		{
+	if( mouseEvent->button() == Qt::LeftButton ) {
+		if( m_displayMode == MinutesSeconds ) {
 			setDisplayMode( BarsTicks );
-		}
-		else
-		{
+		} else {
 			setDisplayMode( MinutesSeconds );
 		}
 	}
 }
 
-void TimeDisplayWidget::contextMenuEvent(QContextMenuEvent *event)
+void TimeDisplayWidget::contextMenuEvent( QContextMenuEvent *event )
 {
-    CaptionMenu contextMenu( tr("Timeline") );
-    contextMenu.addAction( tr("Go to...") );
-    QAction* action  = contextMenu.exec( QCursor::pos() );
-    if (action)
-    {
-        Song* s = Engine::getSong();
-         m_timeinputbox = new TimeInputDialog( this );
-         m_timeinputbox->setTimeModel( this->m_displayMode );
-         m_timeinputbox->setMilliSeconds( s->getMilliseconds() );
-         m_timeinputbox->show();
-         connect(m_timeinputbox, SIGNAL(accepted()), this, SLOT(timeJump()));
-    }
-    return;
+	CaptionMenu contextMenu( tr( "Timeline" ) );
+	contextMenu.addAction( tr( "Go to..." ) );
+	QAction* action  = contextMenu.exec( QCursor::pos() );
+	if ( action ) {
+		Song* s = Engine::getSong();
+		m_timeinputbox = new TimeInputDialog( this );
+		m_timeinputbox->setTimeModel( this->m_displayMode );
+		m_timeinputbox->setMilliSeconds( s->getMilliseconds() );
+		m_timeinputbox->show();
+		connect( m_timeinputbox, SIGNAL( accepted() ), this, SLOT( timeJump() ) );
+	}
+	return;
 }
 
 void TimeDisplayWidget::timeJump()
 {
-    Song* s = Engine::getSong();
-    if (s->isPlaying()) {
-        s->setPlayPos( m_timeinputbox->getTicks(), s->playMode());
-    }else{
-        s->setPlayPos( m_timeinputbox->getTicks(), Song::PlayModes::Mode_PlaySong);
-    }
+	Song* s = Engine::getSong();
+	if ( s->isPlaying() ) {
+		s->setPlayPos( m_timeinputbox->getTicks(), s->playMode() );
+	} else {
+		s->setPlayPos( m_timeinputbox->getTicks(), Song::PlayModes::Mode_PlaySong );
+	}
 }

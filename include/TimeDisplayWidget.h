@@ -43,17 +43,16 @@ public:
 
 protected:
 	virtual void mousePressEvent( QMouseEvent* mouseEvent );
-    virtual void contextMenuEvent( QContextMenuEvent *event );
+	virtual void contextMenuEvent( QContextMenuEvent *event );
 
 
 private slots:
 	void updateTime();
-    void timeJump();
+	void timeJump();
 
 
 private:
-	enum DisplayModes
-	{
+	enum DisplayModes {
 		MinutesSeconds,
 		BarsTicks,
 		DisplayModeCount
@@ -67,7 +66,7 @@ private:
 	LcdWidget m_majorLCD;
 	LcdWidget m_minorLCD;
 	LcdWidget m_milliSecondsLCD;
-    TimeInputDialog* m_timeinputbox;
+	TimeInputDialog* m_timeinputbox;
 
 } ;
 

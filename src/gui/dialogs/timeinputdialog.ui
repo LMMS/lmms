@@ -22,7 +22,7 @@
      <item>
       <widget class="QLabel" name="majorLabel">
        <property name="text">
-        <string>m</string>
+        <string/>
        </property>
        <property name="scaledContents">
         <bool>false</bool>
@@ -38,7 +38,7 @@
      <item>
       <widget class="QLabel" name="minorLabel">
        <property name="text">
-        <string>i</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -57,7 +57,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>s</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
