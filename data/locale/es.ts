@@ -4110,6 +4110,19 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
     </message>
 </context>
 <context>
+    <name>MidiJack</name>
+    <message>
+        <source>JACK server down</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
+        <translation>Ha fallado el servidor JACK</translation>
+    </message>
+    <message>
+        <source>The JACK server seems to be shuted down.</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
+        <translation>Parece ser que el servidor JACK está apagado.</translation>
+    </message>
+</context>
+<context>
     <name>MidiPort</name>
     <message>
         <source>Input channel</source>
