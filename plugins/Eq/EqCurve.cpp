@@ -145,10 +145,13 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		{
 			res = tr( "BW: " ) +  QString::number( getResonance() );
 		}
-
+		
+		QFont painterFont = painter->font();
+		painterFont.setPointSizeF( painterFont.pointSizeF() * 0.7 );
+		painter->setFont( painterFont );
 		painter->setPen( Qt::black );
 		painter->drawRect( textRect );
-		painter->fillRect( textRect, QBrush( QColor( 6, 106, 43, 242 ) ) );
+		painter->fillRect( textRect, QBrush( QColor( 6, 106, 43, 180 ) ) );
 
 		painter->setPen ( QColor( 0, 0, 0 ) );
 		painter->drawText( textRect2, Qt::AlignCenter,
