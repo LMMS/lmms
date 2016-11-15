@@ -24,16 +24,18 @@
 
 
 #include "EqControlsDialog.h"
-#include "EqControls.h"
-#include "embed.h"
-#include "Fader.h"
-#include "EqFader.h"
-#include "Engine.h"
-#include "AutomatableButton.h"
-#include "LedCheckbox.h"
+
 #include <QGraphicsView>
 #include <QLayout>
 #include <QWidget>
+
+#include "AutomatableButton.h"
+#include "embed.h"
+#include "Engine.h"
+#include "EqControls.h"
+#include "EqFader.h"
+#include "Fader.h"
+#include "LedCheckbox.h"
 
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
@@ -121,6 +123,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		activeButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( iconInactiveFileName.toLatin1() ) );
 		activeButton->move( distance - 2, 276 );
 		activeButton->setModel( m_parameterWidget->getBandModels( i )->active );
+
 		// Connects the knobs, Faders and buttons with the curve graphic
 		QObject::connect( m_parameterWidget->getBandModels( i )->freq , SIGNAL( dataChanged() ), m_parameterWidget, SLOT ( updateHandle() ) );
 		if ( m_parameterWidget->getBandModels( i )->gain ) QObject::connect( m_parameterWidget->getBandModels( i )->gain, SIGNAL( dataChanged() ), m_parameterWidget, SLOT ( updateHandle() ));

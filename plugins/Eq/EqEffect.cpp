@@ -171,12 +171,12 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	if( m_eqControls.m_outGainModel.isValueChanged() )
 	{
-		m_outGain = dbvToAmp(m_eqControls.m_outGainModel.value());
+		m_outGain = dbfsToAmp(m_eqControls.m_outGainModel.value());
 	}
 
 	if( m_eqControls.m_inGainModel.isValueChanged() )
 	{
-		m_inGain = dbvToAmp(m_eqControls.m_inGainModel.value());
+		m_inGain = dbfsToAmp(m_eqControls.m_inGainModel.value());
 	}
 
 	m_eqControls.m_inProgress = true;

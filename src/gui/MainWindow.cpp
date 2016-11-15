@@ -308,11 +308,12 @@ void MainWindow::finalize()
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
-	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
+	// temporarily disabled broken MIDI export				
+	/*project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					Engine::getSong(),
 					SLOT( exportProjectMidi() ),
-					Qt::CTRL + Qt::Key_M );
+					Qt::CTRL + Qt::Key_M );*/
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
@@ -1200,10 +1201,10 @@ void MainWindow::updateViewMenu()
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
 	QAction *qa;
-	qa = new QAction(tr( "Volume as dBV" ), this);
-	qa->setData("displaydbv");
+	qa = new QAction(tr( "Volume as dBFS" ), this);
+	qa->setData("displaydbfs");
 	qa->setCheckable( true );
-	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() );
+	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
 	m_viewMenu->addAction(qa);
 
 	// Maybe this is impossible?
@@ -1244,9 +1245,9 @@ void MainWindow::updateConfig( QAction * _who )
 	QString tag = _who->data().toString();
 	bool checked = _who->isChecked();
 
-	if( tag == "displaydbv" )
+	if( tag == "displaydbfs" )
 	{
-		ConfigManager::inst()->setValue( "app", "displaydbv",
+		ConfigManager::inst()->setValue( "app", "displaydbfs",
 						 QString::number(checked) );
 	}
 	else if ( tag == "tooltips" )
