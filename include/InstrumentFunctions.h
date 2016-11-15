@@ -66,9 +66,9 @@ public:
 		// discard al the rest, taking data from the base note
 		// false: the note has all data, volume, panning, silenced...
 
-		ChordSemiTone(QString s)
+		ChordSemiTone( QString s )
 		{
-			parseString(s); // the parseString Function
+			parseString( s ); // the parseString Function
 		}
 
 		/**
@@ -82,7 +82,7 @@ public:
 		* @param s silenced
 		* @param b bare
 		*/
-		ChordSemiTone(int8_t k, volume_t v, panning_t p, bool a, bool s, bool b)
+		ChordSemiTone( int8_t k, volume_t v, panning_t p, bool a, bool s, bool b )
 		{
 			key = k;
 			vol = v;
@@ -95,7 +95,7 @@ public:
 		ChordSemiTone() {}
 
 		// the operator of assignment of the chord note (all of it)
-		inline ChordSemiTone operator=(ChordSemiTone a)
+		inline ChordSemiTone operator=( ChordSemiTone a )
 		{
 			key = a.key;
 			vol = a.vol;
@@ -124,7 +124,7 @@ public:
 		*
 		* @return
 		*/
-		void parseString(QString d)
+		void parseString( QString d )
 		{
 			QStringList l = d.remove(' ').split(','); // trims and splits the string
 			key = (int8_t)l[0].toInt();
@@ -139,7 +139,7 @@ public:
 		* Assignment of only the key
 		* @param a: the key to assign;
 		*/
-		inline int8_t operator=(int8_t a)
+		inline int8_t operator=( int8_t a )
 		{
 			key = a;
 			bare = true; // the note has only the key component, we discard all the rest
@@ -153,7 +153,7 @@ public:
 		* @param a
 		* @return
 		*/
-		inline bool operator==(ChordSemiTone a)
+		inline bool operator==( ChordSemiTone a )
 		{
 			if (a.key == key && a.bare == bare && a.vol == vol && a.pan == pan &&
 					a.active == active && a.silenced == silenced)
@@ -174,9 +174,10 @@ public:
 		* @param a
 		* @return
 		*/
-		inline bool operator==(int8_t a)
+		inline bool operator==( int8_t a )
 		{
-			if (key == a) {
+			if (key == a) 
+				{
 					return true;
 				}
 			return false;
@@ -226,7 +227,8 @@ private:
 		* @param index
 		* @return
 		*/
-		int8_t inline operator[](int index) const {
+		int8_t inline operator[]( int index ) const 
+		{
 			return at(index).key; // returns the key of the note
 		}
 	};
@@ -260,13 +262,13 @@ public:
 
 		Chord( const char * n, const ChordSemiTones & semi_tones );
 
-		Chord( const char *n, const ChordSemiTones semi_tones);
+		Chord( const char *n, const ChordSemiTones semi_tones );
 
-		Chord( const char *n, const QString s);
+		Chord( const char *n, const QString s );
 
 		Chord( QString n, const QString s);
 
-		Chord( QString n, const ChordSemiTones semi_tones);
+		Chord( QString n, const ChordSemiTones semi_tones );
 
 		int size() const
 		{
@@ -283,7 +285,7 @@ public:
 			return size() == 0;
 		}
 
-		bool hasSemiTone(int8_t semiTone) const;
+		bool hasSemiTone( int8_t semiTone ) const;
 
 		const int8_t &last() const
 		{
@@ -295,7 +297,8 @@ public:
 			return m_name;
 		}
 
-		int8_t operator[](int n) const {
+		int8_t operator[]( int n ) const 
+		{
 			// recalling the ChordSemiTones overloaded operator [], which returns the
 			// key, for the sake of compatibility
 			return m_semiTones[n];
@@ -313,7 +316,8 @@ public:
 		* @param i
 		* @return
 		*/
-		const ChordSemiTone at(int i) const {
+		const ChordSemiTone at( int i ) const 
+		{
 			return m_semiTones.at(i); // The note
 		}
 	};

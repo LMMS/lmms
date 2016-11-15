@@ -33,25 +33,25 @@
 #include "PresetPreviewPlayHandle.h"
 
 
-InstrumentFunctionNoteStacking::Chord::Chord(const char *n, const ChordSemiTones semi_tones)
+InstrumentFunctionNoteStacking::Chord::Chord( const char * n, const ChordSemiTones semi_tones )
 {
-	m_name = QString(*n);
+	m_name = QString( *n );
 	m_semiTones = semi_tones;
 }
 
-InstrumentFunctionNoteStacking::Chord::Chord(QString n, const ChordSemiTones semi_tones)
+InstrumentFunctionNoteStacking::Chord::Chord( QString n, const ChordSemiTones semi_tones )
 {
 	m_name = n;
 	m_semiTones = semi_tones;
 }
 
-InstrumentFunctionNoteStacking::Chord::Chord(const char *n, QString s)
+InstrumentFunctionNoteStacking::Chord::Chord( const char * n, QString s )
 {
-	m_name = QString(*n);
+	m_name = QString( *n );
 	m_semiTones = ChordSemiTones(s);
 }
 
-InstrumentFunctionNoteStacking::Chord::Chord(QString n, QString s)
+InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
 {
 	m_name = n;
 	m_semiTones = ChordSemiTones(s);
@@ -348,7 +348,7 @@ InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
 
 
 
-void InstrumentFunctionNoteStacking::processNote(NotePlayHandle *_n) 
+void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n ) 
 {
 	// Getting base note key
 	const int base_note_key = _n->key();
@@ -499,7 +499,7 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 
 
 
-void InstrumentFunctionArpeggio::processNote(NotePlayHandle *_n) 
+void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n ) 
 {
 	// getting base note key
 	const int base_note_key = _n->key();
