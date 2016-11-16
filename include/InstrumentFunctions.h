@@ -53,7 +53,8 @@ public:
 	*
 	* @brief The ChordSemiTone struct
 	*/
-	struct ChordSemiTone {
+	struct ChordSemiTone
+	{
 		int8_t key; // the semitone
 		volume_t vol; // its volume : in percentage of the volume, from 0% (silence)
 		// to 200% or more, to emboss volume. No control for high volumes yet;
@@ -192,7 +193,8 @@ private:
 	*
 	* Now it's a QVector, with an overloaded [] operator to maintain compatibility
 	*/
-	struct ChordSemiTones : public QVector<ChordSemiTone> {
+	struct ChordSemiTones : public QVector<ChordSemiTone>
+	{
 
 		/**
 		* Takes the string, divides it and pushes the single ChordSemitone;
@@ -200,7 +202,7 @@ private:
 		* @brief ChordSemiTones
 		* @param s
 		*/
-		ChordSemiTones(QString s)
+		ChordSemiTones( QString s )
 		{
 			QStringList l = s.remove(' ').split(';');
 			foreach (QString s, l)
@@ -234,7 +236,6 @@ private:
 	};
 
 public:
-public:
 	InstrumentFunctionNoteStacking( Model * _parent );
 	virtual ~InstrumentFunctionNoteStacking();
 
@@ -266,7 +267,7 @@ public:
 
 		Chord( const char *n, const QString s );
 
-		Chord( QString n, const QString s);
+		Chord( QString n, const QString s );
 
 		Chord( QString n, const ChordSemiTones semi_tones );
 
