@@ -319,11 +319,12 @@ public:
 		*/
 		const ChordSemiTone at( int i ) const 
 		{
-			return m_semiTones.at(i); // The note
+			return m_semiTones.at( i ); // The note
 		}
 	};
 
-	struct ChordTable : public QVector<Chord> {
+	struct ChordTable : public QVector<Chord> 
+	{
 	private:
 		ChordTable();
 
