@@ -54,7 +54,7 @@ waveShaperControlDialog::waveShaperControlDialog(
 	pal.setBrush( backgroundRole(),
 			PLUGIN_NAME::getIconPixmap("wavegraph") );
 	waveGraph->setPalette( pal );
-	waveGraph->setGraphColor( QColor( 170, 255, 255 ) );
+	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
 	waveGraph -> setMaximumSize( 204, 205 );
 
 	Knob * inputKnob = new Knob( knobBright_26, this);
@@ -75,14 +75,14 @@ waveShaperControlDialog::waveShaperControlDialog(
 
 	PixmapButton * resetButton = new PixmapButton( this, tr("Reset waveform") );
 	resetButton -> move( 164, 222 );
-	resetButton -> resize( 12, 48 );
+	resetButton -> resize( 12, 46 );
 	resetButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_active" ) );
 	resetButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reset_inactive" ) );
 	ToolTip::add( resetButton, tr( "Click here to reset the wavegraph back to default" ) );
 
 	PixmapButton * smoothButton = new PixmapButton( this, tr("Smooth waveform") );
 	smoothButton -> move( 164, 238 );
-	smoothButton -> resize( 12, 48 );
+	smoothButton -> resize( 12, 46 );
 	smoothButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_active" ) );
 	smoothButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "smooth_inactive" ) );
 	ToolTip::add( smoothButton, tr( "Click here to apply smoothing to wavegraph" ) );

@@ -385,7 +385,7 @@ void Graph::paintEvent( QPaintEvent * )
 	if( m_mouseDown )
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
-		p.setPen( QColor( 0xAA, 0xFF, 0x00, 0x70 ) );
+		p.setPen( QColor( 0x70, 0x7C, 0x91 ) );
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}
