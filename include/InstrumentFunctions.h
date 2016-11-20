@@ -27,6 +27,8 @@
 
 #include <QStringList>
 
+#include "ConfigManager.h"
+
 #include "JournallingObject.h"
 #include "lmms_basics.h"
 #include "AutomatableModel.h"
@@ -241,7 +243,6 @@ public:
 
 	void processNote( NotePlayHandle* n );
 
-
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
@@ -332,7 +333,7 @@ public:
 			const char *m_name;
 			ChordSemiTones m_semiTones;
 
-			Init(); // The init constructor will initialize the static variable
+            Init(); // The init constructor will initialize the static variable
 		};
 
 //		static Init s_initTable[]; // Old initializer
@@ -341,8 +342,17 @@ public:
 
 
 	public:
-		static const ChordTable & getInstance()
+
+        /**
+         * Reads data from the predefined file
+         * @brief readXML
+         */
+        static void readXML();
+
+        static const ChordTable & getInstance()
 		{
+            readXML();
+
 			static ChordTable inst;
 			return inst;
 		}
