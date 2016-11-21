@@ -68,7 +68,7 @@ InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
  */
 void InstrumentFunctionNoteStacking::ChordTable::readXML()
 {
-    QString path= ConfigManager::inst()->dataDir();
+    QString path= ConfigManager::inst()->workingDir();
 //    QString path= "pinko";
 
     QFile *xmlFile = new QFile(path);
@@ -77,7 +77,7 @@ void InstrumentFunctionNoteStacking::ChordTable::readXML()
 //        QMessageBox::critical(NULL,"Load XML File Problem",
 //                              "Couldn't open xmlfile.xml to load settings for download",
 //                              QMessageBox::Ok);
-        qDebug(path.toLatin1());
+        qDebug("path: "+path.toLatin1());
         return;
     }
     QXmlStreamReader *xmlReader = new QXmlStreamReader(xmlFile);
