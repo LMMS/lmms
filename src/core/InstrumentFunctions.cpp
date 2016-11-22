@@ -68,8 +68,8 @@ InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
  */
 void InstrumentFunctionNoteStacking::ChordTable::readXML()
 {
-    QString path= ConfigManager::inst()->workingDir();
-//    QString path= "pinko";
+//    QString path= ConfigManager::inst()->workingDir();
+    QString path= "/home/riki/git_from/rikislav/lmms/data/presets/arpeggio.xml";
 
     QFile *xmlFile = new QFile(path);
     if (!xmlFile->open(QIODevice::ReadOnly | QIODevice::Text))
