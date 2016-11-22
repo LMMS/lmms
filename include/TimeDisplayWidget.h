@@ -30,6 +30,7 @@
 #include <QHBoxLayout>
 
 #include "LcdWidget.h"
+#include "Song.h"
 
 class TimeInputDialog;
 class TimeDisplayWidget : public QWidget
@@ -43,7 +44,7 @@ public:
 protected:
 	virtual void mousePressEvent( QMouseEvent* mouseEvent );
 	virtual void contextMenuEvent( QContextMenuEvent *event );
-
+	virtual void wheelEvent( QWheelEvent *event );
 
 private slots:
 	void updateTime();
@@ -51,7 +52,8 @@ private slots:
 
 
 private:
-	enum DisplayModes {
+	enum DisplayModes
+	{
 		MinutesSeconds,
 		BarsTicks,
 		DisplayModeCount
@@ -66,6 +68,7 @@ private:
 	LcdWidget m_minorLCD;
 	LcdWidget m_milliSecondsLCD;
 	TimeInputDialog* m_timeinputbox;
+	Song* s;
 
 } ;
 
