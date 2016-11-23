@@ -334,7 +334,7 @@ public:
 			const char *m_name;
 			ChordSemiTones m_semiTones;
 
-            Init(); // The init constructor will initialize the static variable
+			Init(); // The init constructor will initialize the static variable
 		};
 
 //		static Init s_initTable[]; // Old initializer
