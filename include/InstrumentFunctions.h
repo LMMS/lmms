@@ -348,11 +348,11 @@ public:
          * Reads data from the predefined file
          * @brief readXML
          */
-        static void readXML();
+//				static void readXML(){};
 
         static const ChordTable & getInstance()
 		{
-            readXML();
+//            readXML();
 
 			static ChordTable inst;
 			return inst;

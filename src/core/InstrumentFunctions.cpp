@@ -24,8 +24,9 @@
 
 #include <QDomElement>
 #include <QFile>
-#include <QMessageBox>
-#include <QXmlStreamReader>
+#include <QDomDocument>
+#include <QDomNodeList>
+#include <QDomNode>
 
 #include "ConfigManager.h"
 #include "InstrumentFunctions.h"
@@ -57,8 +58,8 @@ InstrumentFunctionNoteStacking::Chord::Chord( const char * n, QString s )
 
 InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
 {
-    m_name = n;
-    m_semiTones = ChordSemiTones(s);
+	m_name = n;
+	m_semiTones = ChordSemiTones(s);
 }
 
 /**
@@ -66,68 +67,48 @@ InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
  *
  * @brief InstrumentFunctionNoteStacking::readXML
  */
-void InstrumentFunctionNoteStacking::ChordTable::readXML()
-{
-//    QString path= ConfigManager::inst()->workingDir();
-    QString path= "/home/riki/git_from/rikislav/lmms/data/presets/arpeggio.xml";
+//void InstrumentFunctionNoteStacking::ChordTable::readXML()
+//{
+//	//    QString path= ConfigManager::inst()->workingDir();
+//	//	QString path= "/home/riki/git_from/rikislav/lmms/data/presets/arpeggio.xml";
+//	QString path= "/home/riki/GIT_DOWNLOADS/lmms/data/presets/arpeggio_small.xml";
 
-    QFile *xmlFile = new QFile(path);
-    if (!xmlFile->open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-//        QMessageBox::critical(NULL,"Load XML File Problem",
-//                              "Couldn't open xmlfile.xml to load settings for download",
-//                              QMessageBox::Ok);
-        qDebug("path: "+path.toLatin1());
-        return;
-    }
-    QXmlStreamReader *xmlReader = new QXmlStreamReader(xmlFile);
-    //Parse the XML until we reach end of it
+//	QDomDocument doc;
+//	QFile file(path);
+//	if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file))
+//		return;
 
-    int i=0;
-    while(!xmlReader->atEnd() && !xmlReader->hasError())
-    {
-        // Read next element
-        QXmlStreamReader::TokenType token = xmlReader->readNext();
-        //If token is just StartDocument - go to next
-        if(token == QXmlStreamReader::StartDocument)
-        {
-            qDebug("xml startDocument");
-        }
-        //If token is StartElement - read it
-        if(token == QXmlStreamReader::StartElement)
-        {
+//	//Getting the whole object
+//	QDomNodeList chords = doc.elementsByTagName("chords");
+//	//for each row of chords
+//	for (int i = 0; i < chords.size(); i++)
+//	{
+//		QDomNode n = chords.item(i);
+//		//get the first chord
+//		QDomNode chord = n.firstChildElement("chord");
+//		//its name
+//		QDomElement name = chord.firstChildElement("name");
+//		//and the corresponding key sequence
+//		QDomElement key_sequence = n.firstChildElement("key_sequence");
+//		//getting the keys inside as list of nodes
+//		QDomNodeList keys=key_sequence.elementsByTagName("key");
+//		for (int i = 0; i < keys.size(); i++)
+//		{
+//			QDomElement key=keys.item(i).firstChildElement("key");
+//			QString t=key.text();
+////			qDebug("e " + key.text().toLatin1());
+//		}
+//		QString nm=name.text();
+////		qDebug("name " + name.text().toLatin1());
+////		qDebug("chord " + chord.text().toLatin1());
+////		qDebug("key " + key.text().toLatin1());
+//		if (name.isNull() || chord.isNull())
+//		{
+//			continue;
+//		}
 
-            if(xmlReader->name() == "name")
-            {
-                qDebug("xml name: ");
-            }
-
-            if(xmlReader->name() == "id")
-            {
-//                qDebug() << xmlReader->readElementText();
-                qDebug("xml has name: ");
-            }
-        }
-        i++;
-        if (i>1000)
-        {
-            break;
-        }
-    }
-
-    if(xmlReader->hasError())
-    {
-//        QMessageBox::critical(NULL,
-//                              "xmlFile.xml Parse Error",xmlReader->errorString(),
-//                              QMessageBox::Ok);
-        qDebug("xml has error: ");
-        return;
-    }
-
-    //close reader and flush file
-    xmlReader->clear();
-    xmlFile->close();
-}
+//	}
+//}
 
 /**
  * Initializing the inbound static ChordTable vector. Up to now the function reads data from a QString variable
@@ -137,7 +118,7 @@ void InstrumentFunctionNoteStacking::ChordTable::readXML()
  */
 InstrumentFunctionNoteStacking::ChordTable::Init::Init()
 {
-/*
+	/*
  * Char delimiter for name: $
  * Chord delimiter : |
  * Semitone data: a,b,c,d,e,f;
@@ -319,28 +300,28 @@ InstrumentFunctionNoteStacking::ChordTable::Init::Init()
 			"0,100,0,1,1,0; "
 			"-5,100,50,1,0,0; -5,100,-50,1,0,0;|";
 
-		// Getting the list of chords
-		QStringList l0 = notes.remove(' ').split('|'); // Splitting each chord
-		QStringList l1; //the list
-		foreach (QString s, l0)
-		{
-				if (s.isEmpty()) 
-					{	// eliminating the string originated by the last
-						// character
-						break;
-					}
-
-				// l[0]: name l[1]:string of the list
-				l1 = s.split('$');
-
-				// getting semitones from string contructor
-				ChordSemiTones cs = ChordSemiTones(l1.at(1));
-				// using "tr" to allow translation
-				Chord chord = Chord(tr(l1.at(0).toUtf8().constData()), cs);
-
-				// populating the inbound static structure
-				push_back(chord);
+	// Getting the list of chords
+	QStringList l0 = notes.remove(' ').split('|'); // Splitting each chord
+	QStringList l1; //the list
+	foreach (QString s, l0)
+	{
+		if (s.isEmpty())
+		{	// eliminating the string originated by the last
+			// character
+			break;
 		}
+
+		// l[0]: name l[1]:string of the list
+		l1 = s.split('$');
+
+		// getting semitones from string contructor
+		ChordSemiTones cs = ChordSemiTones(l1.at(1));
+		// using "tr" to allow translation
+		Chord chord = Chord(tr(l1.at(0).toUtf8().constData()), cs);
+
+		// populating the inbound static structure
+		push_back(chord);
+	}
 };
 
 /**
@@ -439,68 +420,68 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 				_n->instrumentTrack()->isArpeggioEnabled() == false)) &&
 			_n->totalFramesPlayed() == 0 && m_chordsEnabledModel.value() == true &&
 			!_n->isReleased())
+	{
+
+		// get the selected chord then insert sub-notes for the chord
+		const int selected_chord = m_chordsModel.value();
+
+		for (int octave_cnt = 0; octave_cnt < m_chordRangeModel.value();++octave_cnt)
 		{
+			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
 
-			// get the selected chord then insert sub-notes for the chord
-			const int selected_chord = m_chordsModel.value();
+			Chord c = chord_table[selected_chord];
+			// process all notes in the chord
+			foreach (ChordSemiTone cst, c.getChordSemiTones())
+			{
+				if (cst.active)
+				{ // if the note is active process it, otherwise skip
 
-			for (int octave_cnt = 0; octave_cnt < m_chordRangeModel.value();++octave_cnt)
-				{
-					const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
+					// getting the base note key
+					const int sub_note_key = sub_note_key_base + cst.key;
 
-					Chord c = chord_table[selected_chord];
-					// process all notes in the chord
-					foreach (ChordSemiTone cst, c.getChordSemiTones())
+					// the new volume and panning
+					volume_t sub_note_vol;
+					panning_t sub_note_pan;
+
+					if (cst.bare)
+					{ // forget other settings but key, get the original
+						// data
+						sub_note_vol = base_note_vol;
+						sub_note_pan = base_note_pan;
+					}
+					else
+					{
+						// The note is silenced: playing it with no volume
+						if (cst.silenced)
 						{
-							if (cst.active)
-								{ // if the note is active process it, otherwise skip
-
-									// getting the base note key
-									const int sub_note_key = sub_note_key_base + cst.key;
-
-									// the new volume and panning
-									volume_t sub_note_vol;
-									panning_t sub_note_pan;
-
-									if (cst.bare)
-										{ // forget other settings but key, get the original
-											// data
-											sub_note_vol = base_note_vol;
-											sub_note_pan = base_note_pan;
-										}
-									else
-										{
-											// The note is silenced: playing it with no volume
-											if (cst.silenced)
-												{
-													sub_note_vol = 0;
-													sub_note_pan = 0;
-												}
-											else
-												{ // all modifications active, add interval to sub-note-key,
-													// volume, panning
-													sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
-													sub_note_pan = cst.pan;
-												}
-										}
-									// maybe we're out of range -> let's get outta
-									// here!
-									if (sub_note_key > NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
-										{
-											break;
-										}
-									// create copy of base-note
-									Note note_copy(_n->length(), 0, sub_note_key, sub_note_vol, sub_note_pan, _n->detuning());
-
-									// create sub-note-play-handle, only note is
-									// different
-									Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
-																									 _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy, _n,
-																									 -1, NotePlayHandle::OriginNoteStacking));
-								}
+							sub_note_vol = 0;
+							sub_note_pan = 0;
 						}
+						else
+						{ // all modifications active, add interval to sub-note-key,
+							// volume, panning
+							sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
+							sub_note_pan = cst.pan;
+						}
+					}
+					// maybe we're out of range -> let's get outta
+					// here!
+					if (sub_note_key > NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
+					{
+						break;
+					}
+					// create copy of base-note
+					Note note_copy(_n->length(), 0, sub_note_key, sub_note_vol, sub_note_pan, _n->detuning());
+
+					// create sub-note-play-handle, only note is
+					// different
+					Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
+																					 _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy, _n,
+																					 -1, NotePlayHandle::OriginNoteStacking));
 				}
+			}
 		}
+	}
 }
 
 
@@ -580,9 +561,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const panning_t base_note_pan = _n->getPanning();
 
 	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
-		_n->origin() == NotePlayHandle::OriginNoteStacking ||
-		!m_arpEnabledModel.value() ||
-		( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
+			_n->origin() == NotePlayHandle::OriginNoteStacking ||
+			!m_arpEnabledModel.value() ||
+			( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
 	{
 		return;
 	}
@@ -616,182 +597,182 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
 	int cur_frame = ( ( m_arpModeModel.value() != FreeMode ) ?
-						cnphv.first()->totalFramesPlayed() :
-						_n->totalFramesPlayed() ) + arp_frames - 1;
+											cnphv.first()->totalFramesPlayed() :
+											_n->totalFramesPlayed() ) + arp_frames - 1;
 	// used for loop
 	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
-		while( frames_processed < Engine::mixer()->framesPerPeriod() )
+	while( frames_processed < Engine::mixer()->framesPerPeriod() )
+	{
+		const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
+		// does current arp-note fill whole audio-buffer?
+		if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() )
 		{
-			const f_cnt_t remaining_frames_for_cur_arp = arp_frames - ( cur_frame % arp_frames );
-			// does current arp-note fill whole audio-buffer?
-			if( remaining_frames_for_cur_arp > Engine::mixer()->framesPerPeriod() )
+			// then we don't have to do something!
+			break;
+		}
+
+		frames_processed += remaining_frames_for_cur_arp;
+
+		// init with zero
+		int cur_arp_idx = 0;
+
+		// in sorted mode: is it our turn or do we have to be quiet for
+		// now?
+		if( m_arpModeModel.value() == SortMode &&
+				( ( cur_frame / arp_frames ) % total_range ) / range != (f_cnt_t) _n->index() )
+		{
+			// update counters
+			frames_processed += arp_frames;
+			cur_frame += arp_frames;
+			continue;
+		}
+
+		// Skip notes randomly
+		if( m_arpSkipModel.value() )
+		{
+
+			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
 			{
-				// then we don't have to do something!
-				break;
-			}
-
-			frames_processed += remaining_frames_for_cur_arp;
-
-			// init with zero
-			int cur_arp_idx = 0;
-
-			// in sorted mode: is it our turn or do we have to be quiet for
-			// now?
-			if( m_arpModeModel.value() == SortMode &&
-					( ( cur_frame / arp_frames ) % total_range ) / range != (f_cnt_t) _n->index() )
-			{
+				if( cur_arp_idx == 0 )
+				{
+					_n->setMasterNote();
+				}
 				// update counters
 				frames_processed += arp_frames;
 				cur_frame += arp_frames;
 				continue;
 			}
-
-			// Skip notes randomly
-			if( m_arpSkipModel.value() )
-			{
-
-				if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
-				{
-					if( cur_arp_idx == 0 )
-					{
-						_n->setMasterNote();
-					}
-					// update counters
-					frames_processed += arp_frames;
-					cur_frame += arp_frames;
-					continue;
-				}
-			}
-
-			int dir = m_arpDirectionModel.value();
-
-			// Miss notes randomly. We intercept int dir and abuse it
-			// after need.  :)
-
-			if( m_arpMissModel.value() )
-			{
-				if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpMissModel.value() )
-				{
-					dir = ArpDirRandom;
-				}
-			}
-
-			// process according to arpeggio-direction...
-			if( dir == ArpDirUp )
-			{
-				cur_arp_idx = ( cur_frame / arp_frames ) % range;
-			}
-			else if( dir == ArpDirDown )
-			{
-				cur_arp_idx = range - ( cur_frame / arp_frames ) %
-									range - 1;
-			}
-			else if( dir == ArpDirUpAndDown && range > 1 )
-			{
-				// imagine, we had to play the arp once up and then
-				// once down -> makes 2 * range possible notes...
-				// because we don't play the lower and upper notes
-				// twice, we have to subtract 2
-				cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
-				// if greater than range, we have to play down...
-				// looks like the code for arp_dir==DOWN... :)
-				if( cur_arp_idx >= range )
-				{
-					cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
-				}
-			}
-			else if( dir == ArpDirDownAndUp && range > 1 )
-			{
-				// copied from ArpDirUpAndDown above
-				cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
-				// if greater than range, we have to play down...
-				// looks like the code for arp_dir==DOWN... :)
-				if( cur_arp_idx >= range )
-				{
-					cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
-				}
-				// inverts direction
-				cur_arp_idx = range - cur_arp_idx - 1;
-			}
-			else if( dir == ArpDirRandom )
-			{
-				// just pick a random chord-index
-				cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
-			}
-
-			// Cycle notes
-			if( m_arpCycleModel.value() && dir != ArpDirRandom )
-			{
-				cur_arp_idx *= m_arpCycleModel.value() + 1;
-				cur_arp_idx %= range;
-			}
-
-			// cst: getting the processed semitone
-			InstrumentFunctionNoteStacking::ChordSemiTone cst =
-					chord_table[selected_arp].at(cur_arp_idx % cur_chord_size);
-
-			if (cst.active)
-				{ // The note is active, process all
-
-					// now calculate final key for our arp-note
-					const int sub_note_key = base_note_key +
-																	 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
-																	 cst.key;
-					volume_t sub_note_vol;
-					panning_t sub_note_pan;
-					// if the note is bare we don't intervene into panning, volume etc...
-					if (cst.bare)
-						{
-							sub_note_vol = base_note_vol;
-							sub_note_pan = base_note_pan;
-						}
-					else
-						{
-							// The note is silenced: playing it with no volume
-							if (cst.silenced)
-								{
-									sub_note_vol = 0;
-									sub_note_pan = 0;
-								}
-							else
-								{ // all modifications active, add interval to sub-note-key,
-									// volume, panning
-									sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
-									sub_note_pan = cst.pan;
-								}
-						}
-
-					// range-checking
-					if (sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
-						{
-							continue;
-						}
-
-					float vol_level = 1.0f;
-					if (_n->isReleased())
-						{
-							vol_level = _n->volumeLevel(cur_frame + gated_frames);
-						}
-
-					// create new arp-note
-
-					// create sub-note-play-handle, only ptr to note is different
-					// and is_arp_note=true
-					Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
-																					 _n->instrumentTrack(),
-																					 frames_processed, gated_frames,
-																					 Note(MidiTime(0), MidiTime(0), sub_note_key,
-																								(volume_t)qRound(sub_note_vol * vol_level), sub_note_pan,
-																								_n->detuning()),
-																					 _n, -1, NotePlayHandle::OriginArpeggio));
-
-					// update counters
-					frames_processed += arp_frames;
-					cur_frame += arp_frames;
-
-				} // end cst.active block
 		}
+
+		int dir = m_arpDirectionModel.value();
+
+		// Miss notes randomly. We intercept int dir and abuse it
+		// after need.  :)
+
+		if( m_arpMissModel.value() )
+		{
+			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpMissModel.value() )
+			{
+				dir = ArpDirRandom;
+			}
+		}
+
+		// process according to arpeggio-direction...
+		if( dir == ArpDirUp )
+		{
+			cur_arp_idx = ( cur_frame / arp_frames ) % range;
+		}
+		else if( dir == ArpDirDown )
+		{
+			cur_arp_idx = range - ( cur_frame / arp_frames ) %
+										range - 1;
+		}
+		else if( dir == ArpDirUpAndDown && range > 1 )
+		{
+			// imagine, we had to play the arp once up and then
+			// once down -> makes 2 * range possible notes...
+			// because we don't play the lower and upper notes
+			// twice, we have to subtract 2
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			// if greater than range, we have to play down...
+			// looks like the code for arp_dir==DOWN... :)
+			if( cur_arp_idx >= range )
+			{
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+			}
+		}
+		else if( dir == ArpDirDownAndUp && range > 1 )
+		{
+			// copied from ArpDirUpAndDown above
+			cur_arp_idx = ( cur_frame / arp_frames ) % ( range * 2 - 2 );
+			// if greater than range, we have to play down...
+			// looks like the code for arp_dir==DOWN... :)
+			if( cur_arp_idx >= range )
+			{
+				cur_arp_idx = range - cur_arp_idx % ( range - 1 ) - 1;
+			}
+			// inverts direction
+			cur_arp_idx = range - cur_arp_idx - 1;
+		}
+		else if( dir == ArpDirRandom )
+		{
+			// just pick a random chord-index
+			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
+		}
+
+		// Cycle notes
+		if( m_arpCycleModel.value() && dir != ArpDirRandom )
+		{
+			cur_arp_idx *= m_arpCycleModel.value() + 1;
+			cur_arp_idx %= range;
+		}
+
+		// cst: getting the processed semitone
+		InstrumentFunctionNoteStacking::ChordSemiTone cst =
+				chord_table[selected_arp].at(cur_arp_idx % cur_chord_size);
+
+		if (cst.active)
+		{ // The note is active, process all
+
+			// now calculate final key for our arp-note
+			const int sub_note_key = base_note_key +
+															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
+															 cst.key;
+			volume_t sub_note_vol;
+			panning_t sub_note_pan;
+			// if the note is bare we don't intervene into panning, volume etc...
+			if (cst.bare)
+			{
+				sub_note_vol = base_note_vol;
+				sub_note_pan = base_note_pan;
+			}
+			else
+			{
+				// The note is silenced: playing it with no volume
+				if (cst.silenced)
+				{
+					sub_note_vol = 0;
+					sub_note_pan = 0;
+				}
+				else
+				{ // all modifications active, add interval to sub-note-key,
+					// volume, panning
+					sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
+					sub_note_pan = cst.pan;
+				}
+			}
+
+			// range-checking
+			if (sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
+			{
+				continue;
+			}
+
+			float vol_level = 1.0f;
+			if (_n->isReleased())
+			{
+				vol_level = _n->volumeLevel(cur_frame + gated_frames);
+			}
+
+			// create new arp-note
+
+			// create sub-note-play-handle, only ptr to note is different
+			// and is_arp_note=true
+			Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
+																			 _n->instrumentTrack(),
+																			 frames_processed, gated_frames,
+																			 Note(MidiTime(0), MidiTime(0), sub_note_key,
+																						(volume_t)qRound(sub_note_vol * vol_level), sub_note_pan,
+																						_n->detuning()),
+																			 _n, -1, NotePlayHandle::OriginArpeggio));
+
+			// update counters
+			frames_processed += arp_frames;
+			cur_frame += arp_frames;
+
+		} // end cst.active block
+	}
 }
 
 
@@ -826,7 +807,7 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
-/*
+	/*
 	// Keep compatibility with version 0.2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
 	{
