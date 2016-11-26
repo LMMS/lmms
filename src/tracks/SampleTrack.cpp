@@ -107,6 +107,7 @@ SampleTCO::~SampleTCO()
 void SampleTCO::changeLength( const MidiTime & _length )
 {
 	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
+	playbackPositionChanged();
 }
 
 
@@ -188,6 +189,14 @@ MidiTime SampleTCO::sampleLength() const
 void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
 {
 	m_sampleBuffer->setStartFrame( startFrame );
+}
+
+
+
+
+void SampleTCO::setSamplePlayLength(f_cnt_t length)
+{
+	m_sampleBuffer->setEndFrame( length );
 }
 
 
@@ -539,12 +548,14 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			TrackContentObject * tco = getTCO( i );
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 			float framesPerTick = Engine::framesPerTick();
-			if( _start >= sTco->startPosition() && _start <= sTco->endPosition() )
+			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
 				if( sTco->isPlaying() == false )
 				{
 					f_cnt_t sampleStart = ( _start * framesPerTick ) - ( sTco->startPosition() * framesPerTick );
+					f_cnt_t sampleLength = ( sTco->endPosition() * framesPerTick ) - ( sTco->startPosition() * framesPerTick );
 					sTco->setSampleStartFrame( sampleStart );
+					sTco->setSamplePlayLength( sampleLength );
 					tcos.push_back( sTco );
 					sTco->setIsPlaying( true );
 				}

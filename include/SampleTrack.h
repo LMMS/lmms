@@ -60,6 +60,7 @@ public:
 
 	MidiTime sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
+	void setSamplePlayLength( f_cnt_t length );
 	virtual TrackContentObjectView * createView( TrackView * _tv );
 
 
