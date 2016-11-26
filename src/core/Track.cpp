@@ -1692,6 +1692,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 
 	m_soloBtn->show();
 	ToolTip::add( m_soloBtn, tr( "Solo" ) );
+	connect( m_muteBtn, SIGNAL( clicked() ), this->m_trackView->getTrack(), SIGNAL( muteBtnClicked() ) );
 
 	connect( this, SIGNAL( trackRemovalScheduled( TrackView * ) ),
 			m_trackView->trackContainerView(),

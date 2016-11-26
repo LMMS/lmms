@@ -59,20 +59,25 @@ public:
 	}
 
 	MidiTime sampleLength() const;
-
+	void setSampleStartFrame( f_cnt_t startFrame );
 	virtual TrackContentObjectView * createView( TrackView * _tv );
 
+
+	bool isPlaying() const;
+	void setIsPlaying(bool isPlaying);
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength( bpm_t = 0 );
 	void toggleRecord();
+	void playbackPositionChanged();
 
 
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
+	bool m_isPlaying;
 
 
 	friend class SampleTCOView;

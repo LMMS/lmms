@@ -612,6 +612,7 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
+	void muteBtnClicked();
 
 } ;
 

@@ -34,6 +34,7 @@
 #include <QPushButton>
 
 #include "gui_templates.h"
+#include "GuiApplication.h"
 #include "Song.h"
 #include "embed.h"
 #include "Engine.h"
@@ -42,7 +43,9 @@
 #include "BBTrack.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
+#include "SongEditor.h"
 #include "StringPairDrag.h"
+#include "TimeLineWidget.h"
 #include "Knob.h"
 #include "MainWindow.h"
 #include "Mixer.h"
@@ -53,10 +56,10 @@
 #include "panning_constants.h"
 #include "volume.h"
 
-
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
-	m_sampleBuffer( new SampleBuffer )
+	m_sampleBuffer( new SampleBuffer ),
+	m_isPlaying( false )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -66,6 +69,16 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
+	//care about positionmarker
+	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
+	connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
+	//care about loops
+	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
+	//care about mute TCOs
+	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
+	//care about mute track
+	connect( getTrack(), SIGNAL( muteBtnClicked() ), this, SLOT( playbackPositionChanged() ) );
+
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::BBContainer:
@@ -137,6 +150,25 @@ void SampleTCO::toggleRecord()
 
 
 
+void SampleTCO::playbackPositionChanged()
+{
+	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
+	m_isPlaying = false;
+}
+
+bool SampleTCO::isPlaying() const
+{
+	return m_isPlaying;
+}
+
+void SampleTCO::setIsPlaying(bool isPlaying)
+{
+	m_isPlaying = isPlaying;
+}
+
+
+
+
 void SampleTCO::updateLength( bpm_t )
 {
 	changeLength( sampleLength() );
@@ -148,6 +180,14 @@ void SampleTCO::updateLength( bpm_t )
 MidiTime SampleTCO::sampleLength() const
 {
 	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
+}
+
+
+
+
+void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
+{
+	m_sampleBuffer->setStartFrame( startFrame );
 }
 
 
@@ -497,9 +537,21 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		for( int i = 0; i < numOfTCOs(); ++i )
 		{
 			TrackContentObject * tco = getTCO( i );
-			if( tco->startPosition() == _start )
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
+			float framesPerTick = Engine::framesPerTick();
+			if( _start >= sTco->startPosition() && _start <= sTco->endPosition() )
 			{
-				tcos.push_back( tco );
+				if( sTco->isPlaying() == false )
+				{
+					f_cnt_t sampleStart = ( _start * framesPerTick ) - ( sTco->startPosition() * framesPerTick );
+					sTco->setSampleStartFrame( sampleStart );
+					tcos.push_back( sTco );
+					sTco->setIsPlaying( true );
+				}
+			}
+			else
+			{
+				sTco->setIsPlaying( false );
 			}
 		}
 	}

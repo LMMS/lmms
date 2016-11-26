@@ -269,6 +269,7 @@ void Song::processNextBuffer()
 				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+			emit updateSampleTracks();
 		}
 	}
 

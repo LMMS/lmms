@@ -241,6 +241,7 @@ private:
 signals:
 	void positionChanged( const MidiTime & _t );
 	void loopPointStateLoaded( int _n );
+	void positionMarkerMoved();
 
 } ;
 
