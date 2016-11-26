@@ -321,9 +321,9 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() && m_displayConversion )
+	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_displayConversion )
 	{
-		s_textFloat->setText( QString("Volume: %1 dBV").
+		s_textFloat->setText( QString("Volume: %1 dBFS").
 				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );
 	}
 	else
@@ -369,8 +369,8 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 	int width = m_back->width() / 2;
 	int center = m_back->width() - width;
 
-	float const maxDB(ampToDbv(m_fMaxPeak));
-	float const minDB(ampToDbv(m_fMinPeak));
+	float const maxDB(ampToDbfs(m_fMaxPeak));
+	float const minDB(ampToDbfs(m_fMinPeak));
 
 	// We will need to divide by the span between min and max several times. It's more
 	// efficient to calculate the reciprocal once and then to multiply.
@@ -378,12 +378,12 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw left levels
-	float const leftSpan = ampToDbv(m_fPeakValue_L) - minDB;
+	float const leftSpan = ampToDbfs(m_fPeakValue_L) - minDB;
 	int peak_L = height * leftSpan * fullSpanReciprocal;
 	QRect drawRectL( 0, height - peak_L, width, peak_L ); // Source and target are identical
 	painter.drawPixmap( drawRectL, *m_leds, drawRectL );
 
-	float const persistentLeftPeakDBFS = ampToDbv(m_persistentPeak_L);
+	float const persistentLeftPeakDBFS = ampToDbfs(m_persistentPeak_L);
 	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background
@@ -400,12 +400,12 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw right levels
-	float const rightSpan = ampToDbv(m_fPeakValue_R) - minDB;
+	float const rightSpan = ampToDbfs(m_fPeakValue_R) - minDB;
 	int peak_R = height * rightSpan * fullSpanReciprocal;
 	QRect const drawRectR( center, height - peak_R, width, peak_R ); // Source and target are identical
 	painter.drawPixmap( drawRectR, *m_leds, drawRectR );
 
-	float const persistentRightPeakDBFS = ampToDbv(m_persistentPeak_R);
+	float const persistentRightPeakDBFS = ampToDbfs(m_persistentPeak_R);
 	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background

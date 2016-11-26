@@ -1214,6 +1214,7 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 class fxLineLcdSpinBox : public LcdSpinBox
 {
+        Q_OBJECT
 	public:
 		fxLineLcdSpinBox( int _num_digits, QWidget * _parent,
 				const QString & _name ) :
@@ -1820,3 +1821,5 @@ void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
 }
+
+#include "InstrumentTrack.moc"

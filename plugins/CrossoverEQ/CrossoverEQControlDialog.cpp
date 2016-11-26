@@ -72,25 +72,25 @@ CrossoverEQControlDialog::CrossoverEQControlDialog( CrossoverEQControls * contro
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain1->move( 7, 56 );
 	gain1->setDisplayConversion( false );
-	gain1->setHintText( tr( "Band 1 Gain:" ), " dBV" );
+	gain1->setHintText( tr( "Band 1 Gain:" ), " dBFS" );
 	
 	Fader * gain2 = new Fader( &controls->m_gain2, "Band 2 Gain", this, 
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain2->move( 47, 56 );
 	gain2->setDisplayConversion( false );
-	gain2->setHintText( tr( "Band 2 Gain:" ), " dBV" );
+	gain2->setHintText( tr( "Band 2 Gain:" ), " dBFS" );
 	
 	Fader * gain3 = new Fader( &controls->m_gain3, "Band 3 Gain", this, 
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain3->move( 87, 56 );
 	gain3->setDisplayConversion( false );
-	gain3->setHintText( tr( "Band 3 Gain:" ), " dBV" );
+	gain3->setHintText( tr( "Band 3 Gain:" ), " dBFS" );
 	
 	Fader * gain4 = new Fader( &controls->m_gain4, "Band 4 Gain", this, 
 		&m_fader_bg, &m_fader_empty, &m_fader_knob );
 	gain4->move( 127, 56 );
 	gain4->setDisplayConversion( false );
-	gain4->setHintText( tr( "Band 4 Gain:" ), " dBV" );
+	gain4->setHintText( tr( "Band 4 Gain:" ), " dBFS" );
 	
 	// leds
 	LedCheckBox * mute1 = new LedCheckBox( "", this, tr( "Band 1 Mute" ), LedCheckBox::Green );
