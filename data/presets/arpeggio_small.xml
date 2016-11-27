@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <chords>
-<chord><name>octave</name><key_sequence><key>0,100,0,1,0,0</key></key_sequence></chord>
+	<chord>
+		<name>octave</name>
+		<keys>
+			<key>0,100,0,1,0,0</key>
+		</keys>
+	</chord>
+	<chord>
+		<name>Major</name>
+		<keys>
+				<key>0,100,0,1,0,0</key>
+				<key>4,100,0,1,0,0</key>
+				<key>7,100,0,1,0,0</key>
+		</keys>
+	</chord>
+	<chord>
+		<name>Sest</name>
+		<keys>
+			<key>0,100,0,1,0,0</key>
+			<key>6,100,0,1,0,0</key>
+		</keys>
+	</chord>
 </chords>

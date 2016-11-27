@@ -160,13 +160,13 @@ public:
 		{
 			if (a.key == key && a.bare == bare && a.vol == vol && a.pan == pan &&
 					a.active == active && a.silenced == silenced)
-				{
-					return true;
-				}
+			{
+				return true;
+			}
 			else
-				{
-					return false;
-				}
+			{
+				return false;
+			}
 		}
 
 		/**
@@ -179,10 +179,10 @@ public:
 		*/
 		inline bool operator==( int8_t a )
 		{
-			if (key == a) 
-				{
-					return true;
-				}
+			if (key == a)
+			{
+				return true;
+			}
 			return false;
 		}
 	};
@@ -208,15 +208,15 @@ private:
 		{
 			QStringList l = s.remove(' ').split(';');
 			foreach (QString s, l)
-				{
-					if (s.isEmpty())
-						{ // to eliminate the eventual empty QString derived from the last delimiter
-							break;
-						}
-					// reads the data into semitone and pushes it into vector
-					ChordSemiTone *cst = new ChordSemiTone(s);
-					push_back(*cst);
+			{
+				if (s.isEmpty())
+				{ // to eliminate the eventual empty QString derived from the last delimiter
+					break;
 				}
+				// reads the data into semitone and pushes it into vector
+				ChordSemiTone *cst = new ChordSemiTone(s);
+				push_back(*cst);
+			}
 		}
 
 		/**
@@ -231,7 +231,7 @@ private:
 		* @param index
 		* @return
 		*/
-		int8_t inline operator[]( int index ) const 
+		int8_t inline operator[]( int index ) const
 		{
 			return at(index).key; // returns the key of the note
 		}
@@ -264,13 +264,15 @@ public:
 
 		Chord( const char * n, const ChordSemiTones & semi_tones );
 
-		Chord( const char *n, const ChordSemiTones semi_tones );
+		Chord( const char * n, const ChordSemiTones semi_tones );
 
-		Chord( const char *n, const QString s );
+		Chord( const char * n, const QString s );
 
 		Chord( QString n, const QString s );
 
 		Chord( QString n, const ChordSemiTones semi_tones );
+
+		Chord( QString n, const ChordSemiTones * semi_tones );
 
 		int size() const
 		{
@@ -299,7 +301,7 @@ public:
 			return m_name;
 		}
 
-		int8_t operator[]( int n ) const 
+		int8_t operator[]( int n ) const
 		{
 			// recalling the ChordSemiTones overloaded operator [], which returns the
 			// key, for the sake of compatibility
@@ -318,13 +320,13 @@ public:
 		* @param i
 		* @return
 		*/
-		const ChordSemiTone at( int i ) const 
+		const ChordSemiTone at( int i ) const
 		{
 			return m_semiTones.at( i ); // The note
 		}
 	};
 
-	struct ChordTable : public QVector<Chord> 
+	struct ChordTable : public QVector<Chord>
 	{
 	private:
 		ChordTable();
@@ -334,26 +336,24 @@ public:
 			const char *m_name;
 			ChordSemiTones m_semiTones;
 
+			/**
+	 * Reads data from the predefined file
+	 * @brief readXML
+	 */
+			void readXML();
 			Init(); // The init constructor will initialize the static variable
 		};
 
-//		static Init s_initTable[]; // Old initializer
+		//		static Init s_initTable[]; // Old initializer
 
 		static Init s_initializer; // This is now going to get the data
 
 
 	public:
 
-        /**
-         * Reads data from the predefined file
-         * @brief readXML
-         */
-//				static void readXML(){};
 
-        static const ChordTable & getInstance()
+		static const ChordTable & getInstance()
 		{
-//            readXML();
-
 			static ChordTable inst;
 			return inst;
 		}

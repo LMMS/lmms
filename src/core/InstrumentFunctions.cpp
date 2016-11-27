@@ -28,7 +28,7 @@
 #include <QDomNodeList>
 #include <QDomNode>
 
-#include "ConfigManager.h"
+//#include "ConfigManager.h"
 #include "InstrumentFunctions.h"
 #include "embed.h"
 #include "Engine.h"
@@ -62,53 +62,102 @@ InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
 	m_semiTones = ChordSemiTones(s);
 }
 
+InstrumentFunctionNoteStacking::Chord::Chord( QString n, const ChordSemiTones * semi_tones )
+{
+	m_name = n;
+	m_semiTones = * semi_tones;
+}
+
+
 /**
  * Gets data from the standard xml file!
  *
  * @brief InstrumentFunctionNoteStacking::readXML
  */
-//void InstrumentFunctionNoteStacking::ChordTable::readXML()
-//{
-//	//    QString path= ConfigManager::inst()->workingDir();
-//	//	QString path= "/home/riki/git_from/rikislav/lmms/data/presets/arpeggio.xml";
-//	QString path= "/home/riki/GIT_DOWNLOADS/lmms/data/presets/arpeggio_small.xml";
+void InstrumentFunctionNoteStacking::ChordTable::Init::readXML()
+{
+	//    QString path= ConfigManager::inst()->workingDir();
+	//	QString path= "/home/riki/git_from/rikislav/lmms/data/presets/arpeggio.xml";
 
-//	QDomDocument doc;
-//	QFile file(path);
-//	if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file))
-//		return;
+	//Path to the xml file
+	QString m_path= "/home/riki/GIT_DOWNLOADS/lmms/data/presets/arpeggio_small.xml";
 
-//	//Getting the whole object
-//	QDomNodeList chords = doc.elementsByTagName("chords");
-//	//for each row of chords
-//	for (int i = 0; i < chords.size(); i++)
-//	{
-//		QDomNode n = chords.item(i);
-//		//get the first chord
-//		QDomNode chord = n.firstChildElement("chord");
-//		//its name
-//		QDomElement name = chord.firstChildElement("name");
-//		//and the corresponding key sequence
-//		QDomElement key_sequence = n.firstChildElement("key_sequence");
-//		//getting the keys inside as list of nodes
-//		QDomNodeList keys=key_sequence.elementsByTagName("key");
-//		for (int i = 0; i < keys.size(); i++)
-//		{
-//			QDomElement key=keys.item(i).firstChildElement("key");
-//			QString t=key.text();
-////			qDebug("e " + key.text().toLatin1());
-//		}
-//		QString nm=name.text();
-////		qDebug("name " + name.text().toLatin1());
-////		qDebug("chord " + chord.text().toLatin1());
-////		qDebug("key " + key.text().toLatin1());
-//		if (name.isNull() || chord.isNull())
-//		{
-//			continue;
-//		}
+	//The xml document
+	QDomDocument m_doc;
 
-//	}
-//}
+	//The xml file itself
+	QFile file(m_path);
+
+	//the lists of chords and keys
+	QDomNodeList m_chords_list,m_key_list;
+
+	//The xml chord and single key nodes
+	QDomNode m_chords_node,m_keys_node,m_key_node;
+
+	//The xml single element
+	QDomElement m_chord_element,m_key_element;
+
+	//placeholders for name and sngle key texts
+	QString m_name,m_key;
+
+	//placeholder for the chord semitone
+	ChordSemiTone * m_semitone;
+
+	//The semitones vector
+	ChordSemiTones * m_semitones;
+
+	//The single chord
+	Chord  * m_chord;
+
+	//The chord table
+	ChordTable * m_chord_table = new ChordTable();
+
+	//Check for file
+	if (!file.open(QIODevice::ReadOnly) || !m_doc.setContent(&file))
+		return;
+
+	//Getting the list of chords available in the object
+	m_chords_list = m_doc.elementsByTagName("chord");
+	//for each row of chords
+	for (int i = 0; i < m_chords_list.size(); i++)
+	{
+		//Initializing the semitones vector
+		m_semitones=new ChordSemiTones();
+
+
+		//getting the single chord node
+		m_chords_node = m_chords_list.item(i);
+		//getting the "name" element
+		m_chord_element = m_chords_node.firstChildElement("name");
+		m_name=m_chord_element.text();
+		//and the and the node representing the key sequence of the chord
+		m_keys_node = m_chords_node.firstChildElement("keys");
+		//getting the keys inside the element as a list
+		m_key_list=m_keys_node.childNodes();
+
+		//processing the keys
+		for (int i = 0; i < m_key_list.size(); i++)
+		{
+			//getting the single key node
+			m_key_node =m_key_list.item(i);
+			//and its element
+			m_key_element=m_key_node.toElement();
+			//and the string of the chord
+			m_key=m_key_element.text();
+			//initializing the single semitone from the key
+			m_semitone=new ChordSemiTone(m_key);
+			//pushing it to the semitones vector
+			m_semitones->push_back(*m_semitone);
+		}
+
+		//creating the new chord
+		m_chord= new Chord(m_name,m_semitones);
+
+		//adding it to the chordtable structure
+		m_chord_table->push_back(*m_chord);
+		push_back(*m_chord);
+	}
+}
 
 /**
  * Initializing the inbound static ChordTable vector. Up to now the function reads data from a QString variable
@@ -118,6 +167,8 @@ InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
  */
 InstrumentFunctionNoteStacking::ChordTable::Init::Init()
 {
+	readXML();
+	return;
 	/*
  * Char delimiter for name: $
  * Chord delimiter : |
