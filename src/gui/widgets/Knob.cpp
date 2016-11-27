@@ -30,7 +30,6 @@
 #include <QPainter>
 #include <QPalette>
 #include <QWhatsThis>
-
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -110,18 +109,20 @@ void Knob::initUi( const QString & _name )
 	// drawKnob method uses the line color to draw the lines. By assigning the palette colors
 	// as the line colors here the knob lines will be drawn in this color unless the stylesheet
 	// overrides that color.
-	switch (knobNum())
+	switch ( knobNum() )
 	{
-	case knobSmall_17:
-	case knobBright_26:
-	case knobDark_28:
-		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText ));
-		break;
-	case knobVintage_32:
-		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
-		break;
-	default:
-		break;
+		case knobSmall_17:
+		case knobBright_26:
+		case knobDark_28:
+			setlineColor( QApplication::palette().color( QPalette::Active, QPalette::WindowText ) );
+			break;
+
+		case knobVintage_32:
+			setlineColor( QApplication::palette().color( QPalette::Active, QPalette::Shadow ) );
+			break;
+
+		default:
+			break;
 	}
 
 	doConnections();
@@ -135,22 +136,27 @@ void Knob::onKnobNumUpdated()
 	if( m_knobNum != knobStyled )
 	{
 		QString knobFilename;
-		switch (m_knobNum)
+
+		switch ( m_knobNum )
 		{
-		case knobDark_28:
-			knobFilename = "knob01";
-			break;
-		case knobBright_26:
-			knobFilename = "knob02";
-			break;
-		case knobSmall_17:
-			knobFilename = "knob03";
-			break;
-		case knobVintage_32:
-			knobFilename = "knob05";
-			break;
-		case knobStyled: // only here to stop the compiler from complaining
-			break;
+			case knobDark_28:
+				knobFilename = "knob01";
+				break;
+
+			case knobBright_26:
+				knobFilename = "knob02";
+				break;
+
+			case knobSmall_17:
+				knobFilename = "knob03";
+				break;
+
+			case knobVintage_32:
+				knobFilename = "knob05";
+				break;
+
+			case knobStyled: // only here to stop the compiler from complaining
+				break;
 		}
 
 		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
@@ -177,12 +183,32 @@ Knob::~Knob()
 void Knob::setLabel( const QString & txt )
 {
 	m_label = txt;
+
 	if( m_knobPixmap )
 	{
 		setFixedSize( qMax<int>( m_knobPixmap->width(),
-					QFontMetrics( pointSizeF( font(), 6.5) ).width( m_label ) ),
-						m_knobPixmap->height() + 10 );
+					 QFontMetrics( pointSizeF( font(), 6.5 ) ).width( m_label ) ),
+			      m_knobPixmap->height() + 10 );
 	}
+
+	update();
+}
+
+void Knob::setHtmlLabel( const QString &htmltxt )
+{
+	m_label = htmltxt;
+	isHtmlLabel = true;
+	// Put the rendered HTML content into cache
+	td_renderer = new QTextDocument();
+
+	td_renderer->setHtml( QString( "<font color=\"%1\">%2</font>" ).arg( textColor().name(), m_label ) );
+
+	if( m_knobPixmap )
+	{
+		setFixedSize( m_knobPixmap->width(),
+			      m_knobPixmap->height() + 15 );
+	}
+
 	update();
 }
 
@@ -368,7 +394,7 @@ QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRad
 	const float sa = -sin( rarc );
 
 	return QLineF( _mid.x() - sa*_innerRadius, _mid.y() - ca*_innerRadius,
-					_mid.x() - sa*_radius, _mid.y() - ca*_radius );
+		       _mid.x() - sa*_radius, _mid.y() - ca*_radius );
 }
 
 
@@ -376,15 +402,18 @@ QLineF Knob::calculateLine( const QPointF & _mid, float _radius, float _innerRad
 bool Knob::updateAngle()
 {
 	int angle = 0;
+
 	if( model() && model()->maxValue() != model()->minValue() )
 	{
 		angle = angleFromValue( model()->inverseScaledValue( model()->value() ), model()->minValue(), model()->maxValue(), m_totalAngle );
 	}
+
 	if( qAbs( angle - m_angle ) > 3 )
 	{
 		m_angle = angle;
 		return true;
 	}
+
 	return false;
 }
 
@@ -418,18 +447,19 @@ void Knob::drawKnob( QPainter * _p )
 			gradient.setColorAt( 1, m_outerColor );
 
 			p.setPen( QPen( gradient, lineWidth(),
-						Qt::SolidLine, Qt::RoundCap ) );
+					Qt::SolidLine, Qt::RoundCap ) );
 		}
-		else {
+		else
+		{
 			QPen pen = p.pen();
-			pen.setWidth( (int) lineWidth() );
+			pen.setWidth( static_cast<int>( lineWidth() ) );
 			pen.setCapStyle( Qt::RoundCap );
 
 			p.setPen( pen );
 		}
 
 		p.drawLine( calculateLine( centerPoint(), outerRadius(),
-							innerRadius() ) );
+					   innerRadius() ) );
 		p.end();
 		_p->drawImage( 0, 0, m_cache );
 		return;
@@ -441,8 +471,8 @@ void Knob::drawKnob( QPainter * _p )
 	mid = QPoint( width() / 2, m_knobPixmap->height() / 2 );
 
 	p.drawPixmap( static_cast<int>(
-				width() / 2 - m_knobPixmap->width() / 2 ), 0,
-				*m_knobPixmap );
+			      width() / 2 - m_knobPixmap->width() / 2 ), 0,
+		      *m_knobPixmap );
 
 	p.setRenderHint( QPainter::Antialiasing );
 
@@ -452,10 +482,12 @@ void Knob::drawKnob( QPainter * _p )
 	const int arcRectSize = m_knobPixmap->width() - arcLineWidth;
 
 	QColor col;
+
 	if( m_knobNum == knobVintage_32 )
 	{	col = QApplication::palette().color( QPalette::Active, QPalette::Shadow ); }
 	else
 	{	col = QApplication::palette().color( QPalette::Active, QPalette::WindowText ); }
+
 	col.setAlpha( 70 );
 
 	p.setPen( QPen( col, 2 ) );
@@ -469,34 +501,38 @@ void Knob::drawKnob( QPainter * _p )
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
+
 		case knobBright_26:
 		{
 			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
+
 		case knobDark_28:
 		{
 			p.setPen( QPen( lineColor(), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
-									0.0 );
+						      0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
 			QLineF ln = calculateLine( mid, re, rb );
 			ln.translate( 1, 1 );
 			p.drawLine( ln );
 			break;
 		}
+
 		case knobVintage_32:
 		{
 			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
+
 		case knobStyled:
 			break;
 	}
 
-	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, (90-centerAngle)*16, -16*(m_angle-centerAngle) );
+	p.drawArc( mid.x() - arcRectSize/2, 1, arcRectSize, arcRectSize, ( 90-centerAngle )*16, -16*( m_angle-centerAngle ) );
 
 	p.end();
 
@@ -516,6 +552,7 @@ float Knob::getValue( const QPoint & _p )
 		value /= 4.0f;
 		value = qBound( -4.0f, value, 4.0f );
 	}
+
 	return value * pageSize();
 }
 
@@ -533,8 +570,8 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
 	contextMenu.addAction( QPixmap(),
-		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
-		this, SLOT( toggleScale() ) );
+			       model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
+			       this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
 	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
@@ -552,7 +589,7 @@ void Knob::toggleScale()
 void Knob::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	StringPairDrag::processDragEnterEvent( _dee, "float_value,"
-							"automatable_model" );
+					       "automatable_model" );
 }
 
 
@@ -562,6 +599,7 @@ void Knob::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString val = StringPairDrag::decodeValue( _de );
+
 	if( type == "float_value" )
 	{
 		model()->setValue( val.toFloat() );
@@ -570,8 +608,9 @@ void Knob::dropEvent( QDropEvent * _de )
 	else if( type == "automatable_model" )
 	{
 		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
-				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
+						 Engine::projectJournal()->
+						 journallingObject( val.toInt() ) );
+
 		if( mod != NULL )
 		{
 			AutomatableModel::linkModels( model(), mod );
@@ -590,6 +629,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 			! ( _me->modifiers() & Qt::ShiftModifier ) )
 	{
 		AutomatableModel *thisModel = model();
+
 		if( thisModel )
 		{
 			thisModel->addJournalCheckPoint();
@@ -598,7 +638,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 
 		const QPoint & p = _me->pos();
 		m_origMousePos = p;
-		m_mouseOffset = QPoint(0, 0);
+		m_mouseOffset = QPoint( 0, 0 );
 		m_leftOver = 0.0f;
 
 		emit sliderPressed();
@@ -606,7 +646,7 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		QApplication::setOverrideCursor( Qt::BlankCursor );
 		s_textFloat->setText( displayValue() );
 		s_textFloat->moveGlobal( this,
-				QPoint( width() + 2, 0 ) );
+					 QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
 		m_buttonPressed = true;
 	}
@@ -614,8 +654,8 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 			gui->mainWindow()->isShiftPressed() == true )
 	{
 		new StringPairDrag( "float_value",
-					QString::number( model()->value() ),
-							QPixmap(), this );
+				    QString::number( model()->value() ),
+				    QPixmap(), this );
 	}
 	else
 	{
@@ -647,6 +687,7 @@ void Knob::mouseReleaseEvent( QMouseEvent* event )
 	if( event && event->button() == Qt::LeftButton )
 	{
 		AutomatableModel *thisModel = model();
+
 		if( thisModel )
 		{
 			thisModel->restoreJournallingState();
@@ -688,21 +729,25 @@ void Knob::paintEvent( QPaintEvent * _me )
 	QPainter p( this );
 
 	drawKnob( &p );
+
 	if( !m_label.isEmpty() )
 	{
-		p.setFont( pointSizeF( p.font(), 6.5 ) );
-/*		p.setPen( QColor( 64, 64, 64 ) );
-		p.drawText( width() / 2 -
-			p.fontMetrics().width( m_label ) / 2 + 1,
-				height() - 1, m_label );*/
-		p.setPen( textColor() );
-		p.drawText( width() / 2 -
-				p.fontMetrics().width( m_label ) / 2,
-				height() - 2, m_label );
+		if ( !isHtmlLabel )
+		{
+			p.setFont( pointSizeF( p.font(), 6.5 ) );
+			p.setPen( textColor() );
+			p.drawText( width() / 2 -
+				    p.fontMetrics().width( m_label ) / 2,
+				    height() - 2, m_label );
+		}
+		else
+		{
+			td_renderer->setDefaultFont( pointSizeF( p.font(), 6.5 ) );
+			p.translate( width() / 2 - td_renderer->idealWidth() / 2 ,  ( height() - td_renderer->pageSize().height() ) / 2 );
+			td_renderer->drawContents( &p );
+		}
 	}
 }
-
-
 
 
 void Knob::wheelEvent( QWheelEvent * _we )
@@ -732,10 +777,11 @@ void Knob::setPosition( const QPoint & _p )
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
 		const float pos = model()->minValue() < 0
-			? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
-			: ( oldValue - model()->minValue() ) / model()->range();
+				  ? oldValue / qMax( qAbs( model()->maxValue() ), qAbs( model()->minValue() ) )
+				  : ( oldValue - model()->minValue() ) / model()->range();
 		const float ratio = 0.1f + qAbs( pos ) * 15.f;
 		float newValue = value * ratio;
+
 		if( qAbs( newValue ) >= step )
 		{
 			model()->setValue( oldValue - newValue );
@@ -769,15 +815,17 @@ void Knob::enterValue()
 {
 	bool ok;
 	float new_val;
+
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
+			ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
-			this, windowTitle(),
-			tr( "Please enter a new value between "
-					"-96.0 dBFS and 6.0 dBFS:" ),
-				20.0 * log10( model()->value() / 100.0 ),
-							-96.0, 6.0, 4, &ok );
+				  this, windowTitle(),
+				  tr( "Please enter a new value between "
+				      "-96.0 dBFS and 6.0 dBFS:" ),
+				  20.0 * log10( model()->value() / 100.0 ),
+				  -96.0, 6.0, 4, &ok );
+
 		if( new_val <= -96.0 )
 		{
 			new_val = 0.0f;
@@ -790,14 +838,14 @@ void Knob::enterValue()
 	else
 	{
 		new_val = QInputDialog::getDouble(
-				this, windowTitle(),
-				tr( "Please enter a new value between "
-						"%1 and %2:" ).
-						arg( model()->minValue() ).
-						arg( model()->maxValue() ),
-					model()->value(),
-					model()->minValue(),
-					model()->maxValue(), 4, &ok );
+				  this, windowTitle(),
+				  tr( "Please enter a new value between "
+				      "%1 and %2:" ).
+				  arg( model()->minValue() ).
+				  arg( model()->maxValue() ),
+				  model()->value(),
+				  model()->minValue(),
+				  model()->maxValue(), 4, &ok );
 	}
 
 	if( ok )
@@ -812,8 +860,8 @@ void Knob::enterValue()
 void Knob::friendlyUpdate()
 {
 	if( model()->controllerConnection() == NULL ||
-		model()->controllerConnection()->getController()->frequentUpdates() == false ||
-				Controller::runningFrames() % (256*4) == 0 )
+			model()->controllerConnection()->getController()->frequentUpdates() == false ||
+			Controller::runningFrames() % ( 256*4 ) == 0 )
 	{
 		update();
 	}
@@ -825,14 +873,15 @@ void Knob::friendlyUpdate()
 QString Knob::displayValue() const
 {
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
+			ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		return m_description.trimmed() + QString( " %1 dBFS" ).
-				arg( 20.0 * log10( model()->value() / volumeRatio() ),
-								3, 'f', 2 );
+		       arg( 20.0 * log10( model()->value() / volumeRatio() ),
+			    3, 'f', 2 );
 	}
+
 	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->value() ) + m_unit;
+	       arg( model()->value() ) + m_unit;
 }
 
 
@@ -843,10 +892,10 @@ void Knob::doConnections()
 	if( model() != NULL )
 	{
 		QObject::connect( model(), SIGNAL( dataChanged() ),
-					this, SLOT( friendlyUpdate() ) );
+				  this, SLOT( friendlyUpdate() ) );
 
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
-						this, SLOT( update() ) );
+				  this, SLOT( update() ) );
 	}
 }
 
@@ -856,5 +905,5 @@ void Knob::doConnections()
 void Knob::displayHelp()
 {
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
+			      whatsThis() );
 }
