@@ -615,7 +615,24 @@ void graphModel::smooth()
 	}
 	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 2 ) + temp[0] ) * 0.25f;
 
-	emit samplesChanged(0, length()-1);
+    emit samplesChanged(0, length()-1);
+}
+
+void graphModel::convolve(const float *_convolution, const int _length,const int _offset)
+{
+    QVector<float> temp = m_samples;
+    float sum;
+    for ( int i=0; i <  length() ; i++ )
+    {
+        sum=0;
+        for ( int j=0; j<_length  ; j++ )
+        {
+            sum+=_convolution[j]*temp[(i+j)%length()];
+        }
+        m_samples[(i+_offset)%length()] = sum;
+    }
+    emit samplesChanged(0, length()-1);
+
 }
 
 void graphModel::smoothNonCyclic()
