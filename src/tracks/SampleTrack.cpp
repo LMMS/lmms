@@ -78,6 +78,10 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute track
 	connect( getTrack(), SIGNAL( muteBtnClicked() ), this, SLOT( playbackPositionChanged() ) );
+	//care about TCO length
+	connect( this, SIGNAL( lengthChanged() ), this, SLOT( playbackPositionChanged() ) );
+	//care about TCO position
+	connect( this, SIGNAL( positionChanged() ), this, SLOT( playbackPositionChanged() ) );
 
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -107,7 +111,6 @@ SampleTCO::~SampleTCO()
 void SampleTCO::changeLength( const MidiTime & _length )
 {
 	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
-	playbackPositionChanged();
 }
 
 

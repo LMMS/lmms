@@ -68,6 +68,7 @@
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
+#include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "templates.h"
 #include "TextFloat.h"
@@ -280,6 +281,7 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 
 	connect( m_tco, SIGNAL( lengthChanged() ),
 			this, SLOT( updateLength() ) );
+	connect( gui->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
