@@ -151,8 +151,8 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 	{
 		m_startPosition = pos;
 		Engine::getSong()->updateLength();
+		emit positionChanged();
 	}
-	emit positionChanged();
 }
 
 
@@ -171,8 +171,8 @@ void TrackContentObject::changeLength( const MidiTime & length )
 	{
 		m_length = length;
 		Engine::getSong()->updateLength();
+		emit lengthChanged();
 	}
-	emit lengthChanged();
 }
 
 
@@ -286,6 +286,8 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setModel( m_tco );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
+	updateLength();
+	updatePosition();
 }
 
 
