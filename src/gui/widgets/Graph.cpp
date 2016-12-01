@@ -159,20 +159,7 @@ void Graph::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton )
 	{
-		if ( !( _me->modifiers() & Qt::ShiftModifier ) )
-		{
-			// get position
-			int x = _me->x();
-			int y = _me->y();
-
-			changeSampleAt( x, y );
-
-			// toggle mouse state
-			m_mouseDown = true;
-			setCursor( Qt::BlankCursor );
-			m_lastCursorX = x;
-		}
-		else
+		if ( _me->modifiers() & Qt::ShiftModifier )
 		{
 			//when shift-clicking, draw a line from last position to current
 			//position
@@ -181,6 +168,39 @@ void Graph::mousePressEvent( QMouseEvent * _me )
 
 			drawLineAt( x, y, m_lastCursorX );
 
+			m_mouseDown = true;
+			setCursor( Qt::BlankCursor );
+			m_lastCursorX = x;
+		}
+		else if ( _me->modifiers() & Qt::ControlModifier )
+		{
+			//when control-clicking, draw a line from 0 to current and a line
+			//from current to max value
+
+			int x = _me->x();
+			int y = _me->y();
+
+			changeSampleAt( 0, height() - 1 );
+			changeSampleAt( width() - 1, 0 );
+			drawLineAt(x, y, 0);
+			drawLineAt(x, y, width() - 1);
+
+			// toggle mouse state
+			m_mouseDown = true;
+			setCursor( Qt::BlankCursor );
+			m_lastCursorX = x;
+
+		}
+		else
+		{
+
+			// get position
+			int x = _me->x();
+			int y = _me->y();
+
+			changeSampleAt( x, y );
+
+			// toggle mouse state
 			m_mouseDown = true;
 			setCursor( Qt::BlankCursor );
 			m_lastCursorX = x;
