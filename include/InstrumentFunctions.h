@@ -326,7 +326,7 @@ public:
 		}
 	};
 
-	struct ChordTable : public QVector<Chord>
+	struct  ChordTable : public QVector<Chord>
 	{
 	private:
 		ChordTable();
@@ -337,10 +337,10 @@ public:
 			ChordSemiTones m_semiTones;
 
 			/**
-	 * Reads data from the predefined file
-	 * @brief readXML
-	 */
-			void readXML();
+			 * Reads data from the predefined file
+			 * @brief readXML
+			 */
+			bool readXML();
 			Init(); // The init constructor will initialize the static variable
 		};
 
