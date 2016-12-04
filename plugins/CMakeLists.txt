@@ -32,6 +32,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 	SET(PLUGIN_LIST
 		${MINIMAL_LIST}
 		Amplifier
+		Arpeggiator
 		BassBooster
 		bit_invader
 		Bitcrush
