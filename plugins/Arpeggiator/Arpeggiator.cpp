@@ -62,6 +62,13 @@ ArpeggiatorEffect::ArpeggiatorEffect( Model * parent, const Descriptor::SubPlugi
 	m_sampleRate( Engine::mixer()->processingSampleRate() ),
 	m_filter( m_sampleRate )
 {
+//	m_parent=parent;
+//	m_effectchain= effectChain();
+
+	Model *m= parent;
+	Plugin *p=this;
+	Effect *e=this;
+
 	m_buffer = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() * OS_RATE );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
@@ -106,8 +113,6 @@ bool ArpeggiatorEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	{
 		return( false );
 	}
-
-	NotePlayHandle::
 
 	// update values
 	if( m_needsUpdate || m_controls.m_rateEnabled.isValueChanged() )

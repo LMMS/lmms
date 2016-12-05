@@ -32,6 +32,12 @@
 #include "ValueBuffer.h"
 #include "lmms_math.h"
 #include "BasicFilters.h"
+#include "lmms_basics.h"
+#include "InstrumentTrack.h"
+#include "Mixer.h"
+#include "Model.h"
+#include "NotePlayHandle.h"
+
 
 class ArpeggiatorEffect : public Effect
 {
@@ -46,11 +52,22 @@ public:
 	}
 	
 private:
+//Moje
+	NotePlayHandle * m_noteplayhandle;
+//	Model * m_parent;
+//	Mixer * m_mixer;
+//	EffectChain * m_effectchain;
+//Moje
+
 	void sampleRateChanged();
 	float depthCrush( float in );
 	float noise( float amt );
 
+
+
 	ArpeggiatorControls m_controls;
+
+
 	
 	sampleFrame * m_buffer;
 	float m_sampleRate;
