@@ -69,6 +69,8 @@ ArpeggiatorEffect::ArpeggiatorEffect( Model * parent, const Descriptor::SubPlugi
 	Plugin *p=this;
 	Effect *e=this;
 
+	Model *pm= m->parentModel();
+
 	m_buffer = MM_ALLOC( sampleFrame, Engine::mixer()->framesPerPeriod() * OS_RATE );
 	m_filter.setLowpass( m_sampleRate * ( CUTOFF_RATIO * OS_RATIO ) );
 	m_needsUpdate = true;
