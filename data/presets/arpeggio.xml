@@ -134,4 +134,5 @@
 <chord><name>Pan2_3.0.0.7.7.2.2.3</name><keys><key>3,100,60,1,0,0</key><key>0,100,-60,1,0,0</key><key>0,60,0,1,0,0</key><key>7,60,0,1,0,0</key><key>7,110,-80,1,0,0</key><key>2,80,80,1,0,0</key><key>2,90,70,1,0,0</key><key>3,90,-70,1,0,0</key></keys></chord>
 <chord><name>Pan3_0.0.-1.-1.4.4</name><keys><key>0,100,0,1,0,0</key><key>0,50,0,1,0,0</key><key>-1,100,100,1,0,0</key><key>-1,100,-100,1,0,0</key><key>4,100,50,1,0,0</key><key>4,100,-50,1,0,0</key></keys></chord>
 <chord><name>Pan4_0.0.S.-2.-2.S.-5.-5</name><keys><key>0,100,0,1,0,0</key><key>0,100,0,1,0,0</key><key>0,100,0,1,1,0</key><key>-2,130,50,1,0,0</key><key>-2,130,-50,1,0,0</key><key>0,100,0,1,1,0</key><key>-5,100,50,1,0,0</key><key>-5,100,-50,1,0,0</key></keys></chord>
+<chord><name>POLDEK</name><keys><key>0,100,0,1,0,0</key></keys></chord>
 </chords>

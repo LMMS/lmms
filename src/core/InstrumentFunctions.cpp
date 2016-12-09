@@ -29,7 +29,7 @@
 #include <QDomNodeList>
 #include <QDomNode>
 
-//#include "ConfigManager.h"
+#include "ConfigManager.h"
 
 #include "InstrumentFunctions.h"
 #include "embed.h"
@@ -86,10 +86,10 @@ bool InstrumentFunctionNoteStacking::ChordTable::Init::readXML()
 
 	QString pp=QDir::home().absolutePath();
 
-//	ConfigManager* confMgr = ConfigManager::inst();
-//	QString pp=confMgr->factoryPresetsDir();
+	ConfigManager* confMgr = ConfigManager::inst();
+	QString pa=confMgr->factoryPresetsDir();
 
-//	pp=ConfigManager::inst()->userPresetsDir();
+	pp=ConfigManager::inst()->userPresetsDir();
 
 	//The xml document
 	QDomDocument m_doc;
@@ -232,8 +232,35 @@ InstrumentFunctionNoteStacking::ChordTable::Init::Init()
  *
  * @brief InstrumentFunctionNoteStacking::ChordTable::s_initializer
  */
-InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initializer;
+//InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initializer;
 
+InstrumentFunctionNoteStacking::ChordTable *InstrumentFunctionNoteStacking::ChordTable::m_chordtable;
+
+/**
+ * The constructor initializes to NULL the initializer so it can be filled with data on demand;
+ * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
+ */
+InstrumentFunctionNoteStacking::ChordTable::ChordTable(){
+	m_chordtable=NULL;
+}
+
+//reads data from XML and reinitializes the vector
+void InstrumentFunctionNoteStacking::ChordTable::readDataFromXML(){
+	Init *m_init=new Init(); //reads data From XML
+	swapInit(*m_init); //swap vectors
+}
+
+//swaps the vector reference with the initializer
+void InstrumentFunctionNoteStacking::ChordTable::swapInit(Init initializer){
+	if (m_chordtable==NULL){
+		m_chordtable=new ChordTable();
+		m_chordtable->swap(initializer);
+	} else {
+		delete m_chordtable;
+		m_chordtable=new ChordTable();
+		m_chordtable->swap(initializer);
+	}
+}
 
 bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) const
 {
@@ -256,11 +283,11 @@ bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) cons
  *
  * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
  */
-InstrumentFunctionNoteStacking::ChordTable::ChordTable() : QVector<Chord>() 
-{
-	// Swaps the Chordable uninitialized vector with the static ChordTable one;
-	swap(s_initializer);
-}
+//InstrumentFunctionNoteStacking::ChordTable::ChordTable() : QVector<Chord>()
+//{
+//	// Swaps the Chordable uninitialized vector with the static ChordTable one;
+//	swap(s_initializer);
+//}
 
 
 
@@ -452,7 +479,7 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 
 
 
-void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n ) 
+void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 {
 	// getting base note key
 	const int base_note_key = _n->key();

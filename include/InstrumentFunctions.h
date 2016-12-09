@@ -341,21 +341,29 @@ public:
 			 * @brief readXML
 			 */
 			bool readXML();
-			Init(); // The init constructor will initialize the static variable
+			// The init constructor will initialize the static variable by reading data from
+			//the XML presets
+			Init();
 		};
 
-		//		static Init s_initTable[]; // Old initializer
-
-		static Init s_initializer; // This is now going to get the data
-
+		static ChordTable *m_chordtable;// This is now holding the data
 
 	public:
 
 
-		static const ChordTable & getInstance()
+		//swaps the m_chordtable vector pointer with the Init structure parameter
+		static void swapInit(Init initializer);
+
+		//reads data from the presets file and reinitializes the ChordTable m_chordtable pointer;
+		static void readDataFromXML();
+
+		static ChordTable &getInstance()
 		{
-			static ChordTable inst;
-			return inst;
+			if (m_chordtable==NULL){
+				Init *m_init=new Init();
+				swapInit(*m_init);
+			}
+			return *m_chordtable;
 		}
 
 		const Chord & getByName( const QString & name, bool is_scale = false ) const;
@@ -376,6 +384,8 @@ private:
 	BoolModel m_chordsEnabledModel;
 	ComboBoxModel m_chordsModel;
 	FloatModel m_chordRangeModel;
+
+
 
 
 	friend class InstrumentFunctionNoteStackingView;
