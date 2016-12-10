@@ -78,18 +78,10 @@ InstrumentFunctionNoteStacking::Chord::Chord( QString n, const ChordSemiTones * 
  */
 bool InstrumentFunctionNoteStacking::ChordTable::Init::readXML()
 {
-	//    QString path= ConfigManager::inst()->workingDir();
-	//	QString path= "/home/riki/git_from/rikislav/lmms/data/presets/arpeggio.xml";
-
-	//Path to the xml file
-	QString m_path= "/home/riki/GIT_DOWNLOADS/lmms/data/presets/arpeggio.xml";
-
-	QString pp=QDir::home().absolutePath();
 
 	ConfigManager* confMgr = ConfigManager::inst();
-	QString pa=confMgr->factoryPresetsDir();
-
-	pp=ConfigManager::inst()->userPresetsDir();
+	//Path to the presets file
+	QString m_path= confMgr->factoryPresetsDir()+"Arpeggio/arpeggio.xpf";
 
 	//The xml document
 	QDomDocument m_doc;
@@ -165,7 +157,7 @@ bool InstrumentFunctionNoteStacking::ChordTable::Init::readXML()
 		m_chord= new Chord(m_name,m_semitones);
 
 		//adding it to the chordtable structure
-		m_chord_table->push_back(*m_chord);
+//		m_chord_table->push_back(*m_chord);
 		push_back(*m_chord);
 	}
 	return true;
@@ -248,18 +240,17 @@ InstrumentFunctionNoteStacking::ChordTable::ChordTable(){
 void InstrumentFunctionNoteStacking::ChordTable::readDataFromXML(){
 	Init *m_init=new Init(); //reads data From XML
 	swapInit(*m_init); //swap vectors
+	//emits the signal it has loaded the data!
 }
 
 //swaps the vector reference with the initializer
 void InstrumentFunctionNoteStacking::ChordTable::swapInit(Init initializer){
-	if (m_chordtable==NULL){
-		m_chordtable=new ChordTable();
-		m_chordtable->swap(initializer);
-	} else {
+	if (m_chordtable!=NULL)
+	{
 		delete m_chordtable;
-		m_chordtable=new ChordTable();
-		m_chordtable->swap(initializer);
 	}
+	m_chordtable=new ChordTable();
+	m_chordtable->swap(initializer);
 }
 
 bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) const
@@ -412,7 +403,23 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 }
 
 
+void InstrumentFunctionNoteStacking::loadChordTable()
+{
+	//loads the table from the xml
+	InstrumentFunctionNoteStacking::ChordTable::readDataFromXML();
 
+	int v=m_chordsModel.value();
+	//clears the chord dropdown
+	m_chordsModel.clear();
+	const ChordTable & chord_table = ChordTable::getInstance();
+	for( int i = 0; i < chord_table.size(); ++i )
+	{
+		m_chordsModel.addItem( chord_table[i].getName() );
+	}
+	m_chordsModel.setValue(v);
+	//emits the signal data has changed;
+	emit dataChanged();
+}
 
 
 void InstrumentFunctionNoteStacking::saveSettings( QDomDocument & _doc, QDomElement & _this )
@@ -467,9 +474,24 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), new PixmapLoader( "arp_sort" ) );
 	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
+
 }
 
 
+//reloads the chordtable into the widget model!
+void InstrumentFunctionArpeggio::reloadChordTable()
+{
+	//getting the existing value
+	int v = m_arpModel.value();
+	m_arpModel.clear();
+	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	for( int i = 0; i < chord_table.size(); ++i )
+	{
+		m_arpModel.addItem( chord_table[i].getName() );
+	}
+	//setting back the value
+	m_arpModel.setValue(v);
+}
 
 
 InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()

@@ -34,6 +34,7 @@ class ComboBox;
 class GroupBox;
 class Knob;
 class TempoSyncKnob;
+class PixmapButton;
 
 class InstrumentFunctionArpeggio;
 class InstrumentFunctionNoteStacking;
@@ -56,6 +57,12 @@ private:
 	GroupBox * m_chordsGroupBox;
 	ComboBox * m_chordsComboBox;
 	Knob * m_chordRangeKnob;
+	//the button to open the chord table editor
+	PixmapButton * m_openeditorBtn;
+
+private slots:
+	//The open editor button action
+	void editButtonPressed();
 
 } ;
 

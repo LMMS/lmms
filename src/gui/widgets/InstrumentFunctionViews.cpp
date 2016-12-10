@@ -66,12 +66,26 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 			"The selected chord will be played within specified "
 			"number of octaves." ) );
 
+	m_openeditorBtn = new PixmapButton( this, tr( "Edit Chord Table" ) );
+	m_openeditorBtn->setActiveGraphic( embed::getIconPixmap( "edit_script_btn_on" ) );
+	m_openeditorBtn->setInactiveGraphic( embed::getIconPixmap( "edit_script_btn_off" ) );
+	ToolTip::add( m_openeditorBtn,
+			tr( "Click here to edit the chord table." ) );
+
+	//connecting button with action
+	connect(m_openeditorBtn, SIGNAL (clicked()),this, SLOT (editButtonPressed()));
+
 	mainLayout->addWidget( chordLabel, 0, 0 );
 	mainLayout->addWidget( m_chordsComboBox, 1, 0 );
 	mainLayout->addWidget( m_chordRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_openeditorBtn, 2, 0);
 }
 
-
+//the edit button action
+void InstrumentFunctionNoteStackingView::editButtonPressed()
+{
+ m_cc->loadChordTable();
+}
 
 
 InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
@@ -208,8 +222,6 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
 }
-
-
 
 
 InstrumentFunctionArpeggioView::~InstrumentFunctionArpeggioView()

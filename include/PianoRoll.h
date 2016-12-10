@@ -193,6 +193,9 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
+	//Updates the models related to ChordTable when it changes
+	void updateChordTable();
+
 
 signals:
 	void currentPatternChanged();

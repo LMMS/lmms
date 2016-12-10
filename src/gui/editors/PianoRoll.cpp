@@ -431,6 +431,7 @@ PianoRoll::PianoRoll() :
 
 	m_chordModel.setValue( 0 );
 
+
 	// change can update m_semiToneMarkerMenu
 	connect( &m_chordModel, SIGNAL( dataChanged() ),
 					this, SLOT( updateSemiToneMarkerMenu() ) );
@@ -450,7 +451,48 @@ PianoRoll::PianoRoll() :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 }
 
+//Updates the chordtable models when it changes
+void PianoRoll::updateChordTable()
+{
+	// reloads the scale model
+	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
+			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
+	//getting the selected value
+	int v = m_scaleModel.value();
+	//clearing the list
+	m_scaleModel.clear();
+
+	m_scaleModel.addItem( tr("No scale") );
+	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	{
+		if( chord.isScale() )
+		{
+			m_scaleModel.addItem( chord.getName() );
+		}
+	}
+	//getting back the previously selected value
+	m_scaleModel.setValue( v );
+
+
+	// Reload changed chord model
+
+	//getting the selected value
+	v= m_chordModel.value();
+	//clearing the model
+	m_chordModel.clear();
+
+	m_chordModel.addItem( tr("No chord") );
+	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	{
+		if( ! chord.isScale() )
+		{
+			m_chordModel.addItem( chord.getName() );
+		}
+	}
+
+	m_chordModel.setValue( v );
+}
 
 void PianoRoll::reset()
 {
@@ -623,6 +665,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	// set new data
 	m_pattern = newPattern;
+
 	m_currentPosition = 0;
 	m_currentNote = NULL;
 	m_startKey = INITIAL_START_KEY;
@@ -667,6 +710,10 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+
+	//on chord Table change we reload the chord and scale combo boxes models
+	connect( m_pattern->instrumentTrack(),SIGNAL(chordTableChanged()),this,SLOT (updateChordTable()));
+
 
 	update();
 	emit currentPatternChanged();

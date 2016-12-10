@@ -241,7 +241,11 @@ public:
 	InstrumentFunctionNoteStacking( Model * _parent );
 	virtual ~InstrumentFunctionNoteStacking();
 
+
 	void processNote( NotePlayHandle* n );
+
+	//reads the chord table from the xml file and emits the signal it has read it
+	void loadChordTable();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -385,9 +389,6 @@ private:
 	ComboBoxModel m_chordsModel;
 	FloatModel m_chordRangeModel;
 
-
-
-
 	friend class InstrumentFunctionNoteStackingView;
 
 } ;
@@ -414,6 +415,8 @@ public:
 
 	void processNote( NotePlayHandle* n );
 
+	//reloads the chord table into the widget model, for example when data changes
+	void reloadChordTable();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -447,7 +450,7 @@ private:
 	friend class InstrumentTrack;
 	friend class InstrumentFunctionArpeggioView;
 
-} ;
+};
 
 
 #endif

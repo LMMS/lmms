@@ -214,6 +214,8 @@ signals:
 	void midiNoteOff( const Note& );
 	void nameChanged();
 	void newNote();
+	//emitted on changes of InstrumentFunctionNoteStacking::chordtable.
+	void chordTableChanged();
 
 
 protected:
@@ -228,6 +230,7 @@ protected slots:
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();
+	void updateChordTable();
 
 
 private:
