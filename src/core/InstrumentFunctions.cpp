@@ -110,9 +110,6 @@ bool InstrumentFunctionNoteStacking::ChordTable::Init::readXML()
 	//The single chord
 	Chord  * m_chord;
 
-	//The chord table
-	ChordTable * m_chord_table = new ChordTable();
-
 	//Check for file
 	if (!file.open(QIODevice::ReadOnly) || !m_doc.setContent(&file))
 	{
