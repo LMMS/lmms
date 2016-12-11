@@ -160,6 +160,9 @@ protected slots:
 
 	void adjustUiAfterProjectLoad();
 
+signals:
+	void playTriggered();
+
 private:
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;

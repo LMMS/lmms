@@ -346,6 +346,7 @@ void Song::processNextBuffer()
 					m_elapsedMilliSeconds = 
 						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) / 
 							getTempo();
+					emit updateSampleTracks();
 				}
 			}
 			else
@@ -577,6 +578,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 	if( isPlaying() ) 
 	{
 		emit playbackPositionChanged();
+		emit updateSampleTracks();
 	}
 }
 

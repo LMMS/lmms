@@ -69,6 +69,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
 					this, SLOT( updateLength( bpm_t ) ) );
+
 	//care about positionmarker
 	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
 	connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
@@ -77,11 +78,13 @@ SampleTCO::SampleTCO( Track * _track ) :
 	//care about mute TCOs
 	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute track
-	connect( getTrack(), SIGNAL( muteBtnClicked() ), this, SLOT( playbackPositionChanged() ) );
+	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
 	//care about TCO length
 	connect( this, SIGNAL( lengthChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( playbackPositionChanged() ) );
+	//playbutton clicked or space key
+	connect( gui->songEditor(), SIGNAL( playTriggered() ), this, SLOT( playbackPositionChanged() ) );
 
 	switch( getTrack()->trackContainer()->type() )
 	{

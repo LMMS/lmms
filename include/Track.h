@@ -577,6 +577,8 @@ public:
 		return m_processingLock.tryLock();
 	}
 
+	BoolModel* getMutedModel();
+
 public slots:
 	virtual void setName( const QString & newName )
 	{
@@ -612,7 +614,6 @@ signals:
 	void destroyedTrack();
 	void nameChanged();
 	void trackContentObjectAdded( TrackContentObject * );
-	void muteBtnClicked();
 
 } ;
 

@@ -115,6 +115,11 @@ Editor::~Editor()
 
 }
 
+QAction *Editor::playAction() const
+{
+    return m_playAction;
+}
+
 
 
 

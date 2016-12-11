@@ -711,6 +711,7 @@ QSize SongEditorWindow::sizeHint() const
 
 void SongEditorWindow::play()
 {
+	emit playTriggered();
 	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
 	{
 		Engine::getSong()->playSong();
