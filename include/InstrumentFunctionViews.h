@@ -27,6 +27,8 @@
 
 #include "ModelView.h"
 
+#include "ToolPluginView.h"
+
 #include <QWidget>
 
 class QLabel;
@@ -59,6 +61,7 @@ private:
 	Knob * m_chordRangeKnob;
 	//the button to open the chord table editor
 	PixmapButton * m_openeditorBtn;
+	PluginView * m_chordTableEditor;
 
 private slots:
 	//The open editor button action

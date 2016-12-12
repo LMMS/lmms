@@ -38,6 +38,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		carlabase
 		carlapatchbay
 		carlarack
+		chordtable_editor
 		CrossoverEQ
 		Delay
 		DualFilter

@@ -36,7 +36,8 @@
 #include "PixmapButton.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
-
+#include "plugins/chordtable_editor/chordtable_editor.h"
+#include "plugins/bit_invader/bit_invader.h"
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
@@ -44,8 +45,10 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob( new Knob( knobBright_26 ) )
-{
+	m_chordRangeKnob( new Knob( knobBright_26 ) ),
+	m_chordTableEditor (ToolPlugin::instantiate( "chordtableeditor", NULL )
+					->createView(this))
+	{
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );
 	topLayout->addWidget( m_chordsGroupBox );
@@ -84,7 +87,17 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 //the edit button action
 void InstrumentFunctionNoteStackingView::editButtonPressed()
 {
- m_cc->loadChordTable();
+ //m_cc=InstrumentFunctionNoteStacking
+	m_cc->loadChordTable();
+
+	m_chordTableEditor->show();
+	m_chordTableEditor->parentWidget()->show();
+	m_chordTableEditor->setFocus();
+//	ChordEditorTool ctt(ct);
+
+//PluginView *rc = ctt.instantiateView(NULL);
+//rc->activateWindow();
+
 }
 
 

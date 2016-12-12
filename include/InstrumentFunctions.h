@@ -38,7 +38,7 @@
 
 class InstrumentTrack;
 class NotePlayHandle;
-
+class Model;
 
 
 
@@ -332,8 +332,10 @@ public:
 
 	struct  ChordTable : public QVector<Chord>
 	{
-	private:
+	public:
 		ChordTable();
+	private:
+//		ChordTable();
 
 		struct Init : public QVector<Chord>
 		{
