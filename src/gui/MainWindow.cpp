@@ -957,13 +957,29 @@ bool MainWindow::saveProjectAs()
 		sfd.setDirectory( ConfigManager::inst()->userProjectsDir() );
 	}
 
+	// Don't write over file with suffix if no suffix is provided.
+	QString suffix = ConfigManager::inst()->value( "app",
+							"nommpz" ).toInt() == 0
+						? "mmpz"
+						: "mmp" ;
+	sfd.setDefaultSuffix( suffix );
+
 	if( sfd.exec () == FileDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() && sfd.selectedFiles()[0] != "" )
 	{
 		QString fname = sfd.selectedFiles()[0] ;
-		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) && !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
+		if( sfd.selectedNameFilter().contains( "(*.mpt)" ) )
 		{
-			fname += ".mpt";
+			// Remove the default suffix
+			fname.remove( "." + suffix );
+			if( !sfd.selectedFiles()[0].endsWith( ".mpt" ) )
+			{
+				if( VersionedSaveDialog::fileExistsQuery( fname + ".mpt",
+						tr( "Save project template" ) ) )
+				{
+					fname += ".mpt";
+				}
+			}
 		}
 		Engine::getSong()->guiSaveProjectAs( fname );
 		if( getSession() == Recover )
