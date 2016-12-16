@@ -909,5 +909,11 @@ int main( int argc, char * * argv )
 	// cleanup memory managers
 	MemoryManager::cleanup();
 
+	// ProjectRenderer::updateConsoleProgress() doesn't return line after render
+	if( coreOnly )
+	{
+		printf( "\n" );
+	}
+
 	return ret;
 }
