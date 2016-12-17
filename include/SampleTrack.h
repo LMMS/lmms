@@ -70,7 +70,7 @@ public:
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
-	void updateLength( bpm_t = 0 );
+	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
 

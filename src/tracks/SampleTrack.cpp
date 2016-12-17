@@ -68,7 +68,9 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength( bpm_t ) ) );
+					this, SLOT( updateLength() ) );
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
+					this, SLOT( updateLength() ) );
 
 	//care about positionmarker
 	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
@@ -113,7 +115,10 @@ SampleTCO::~SampleTCO()
 
 void SampleTCO::changeLength( const MidiTime & _length )
 {
-	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), DefaultTicksPerTact ) );
+	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+	float den = Engine::getSong()->getTimeSigModel().getDenominator();
+	int ticksPerTact = DefaultTicksPerTact * ( nom / den );
+	TrackContentObject::changeLength( qMax( static_cast<int>( _length ), ticksPerTact ) );
 }
 
 
@@ -176,7 +181,7 @@ void SampleTCO::setIsPlaying(bool isPlaying)
 
 
 
-void SampleTCO::updateLength( bpm_t )
+void SampleTCO::updateLength()
 {
 	changeLength( sampleLength() );
 }
@@ -449,10 +454,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 					/ (float) m_tco->length().getTact() :
 								pixelsPerTact();
 
+	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+	float den = Engine::getSong()->getTimeSigModel().getDenominator();
+	float ticksPerTact = DefaultTicksPerTact * ( nom / den );
+
 	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt
-						/ DefaultTicksPerTact ), 1 ),
-						rect().bottom() - 2 * spacing );
+			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	// disable antialiasing for borders, since its not needed

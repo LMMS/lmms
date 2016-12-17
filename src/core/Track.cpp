@@ -168,12 +168,9 @@ void TrackContentObject::movePosition( const MidiTime & pos )
  */
 void TrackContentObject::changeLength( const MidiTime & length )
 {
-	if( m_length != length )
-	{
-		m_length = length;
-		Engine::getSong()->updateLength();
-		emit lengthChanged();
-	}
+	m_length = length;
+	Engine::getSong()->updateLength();
+	emit lengthChanged();
 }
 
 
