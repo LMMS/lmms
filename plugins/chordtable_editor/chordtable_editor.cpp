@@ -39,6 +39,7 @@
 #include "TabBar.h"
 #include "TabButton.h"
 #include "ComboBox.h"
+#include "Model.h"
 
 #include "embed.cpp"
 
@@ -71,16 +72,18 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 }
 
 
-
+//---------------------------------------------
+//---------------------------------------------
+//---------------------------------------------
 
 chordtableEditor::chordtableEditor() :
 	ToolPlugin( &chordtableeditor_plugin_descriptor, NULL ),
-	m_chordtable(&InstrumentFunctionNoteStacking::ChordTable::getInstance())
+	m_chordTable(&InstrumentFunctionNoteStacking::ChordTable::getInstance())
 {
 	m_chordsModel= new ComboBoxModel( this, tr( "Chord type" ) );
-	for( int i = 0; i < m_chordtable->size(); ++i )
+	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
-		m_chordsModel->addItem( m_chordtable->at(i).getName() );
+		m_chordsModel->addItem( m_chordTable->at(i).getName() );
 	}
 
 }
@@ -102,7 +105,9 @@ QString chordtableEditor::nodeName() const
 
 
 
-
+//---------------------------------------------
+//---------------------------------------------
+//---------------------------------------------
 
 
 chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
@@ -112,6 +117,10 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) ); //menjaj icono!!
 	setWindowTitle( tr( "ChordTable Editor" ) );
+
+	setAutoFillBackground( true );
+	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+
 
 	//the top level all including dialog;
 	QVBoxLayout* topLayout = new QVBoxLayout( this );
@@ -124,32 +133,44 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 
 	QSizePolicy gp=m_chordsComboBox->sizePolicy();
 	gp.setVerticalPolicy(QSizePolicy::Fixed);
-	m_chordsComboBox->setMinimumSize(120,20);
+	m_chordsComboBox->setMinimumSize(120,22);
 	m_chordsComboBox->setSizePolicy(gp);
 
-	QPushButton *button1 = new QPushButton("One");
+	//combobox data
+	m_chordsComboBox->setModel(m_chordTableEditor->m_chordsModel);
+	QPushButton *button1 = new QPushButton(tr("New chord"));
+	QPushButton *button2 = new QPushButton(tr("Delete chord"));
 
+	//adding combo and button
 	upperLayout->addWidget(m_chordsComboBox);
 	upperLayout->addStretch();
+	upperLayout->addWidget(button2);
 	upperLayout->addWidget(button1);
 
 	//the lower area
-
 	 QWidget *lowerWidget=new QWidget(this);
 	 lowerWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
 	 lowerWidget->setMinimumSize(400,300);
 	 QHBoxLayout *lowerLayout= new QHBoxLayout(lowerWidget);
+//	 lowerLayout->setSizeConstraint( QLayout::SetMinimumSize );
+//	 lowerLayout->setSpacing( 0 );
+//	 lowerLayout->setMargin( 0 );
 	 lowerWidget->setLayout(lowerLayout);
 
+	//the first node de prova!!
+	InstrumentFunctionNoteStacking::Chord cc=m_chordTableEditor->m_chordTable->at(0);
+	InstrumentFunctionNoteStacking::ChordSemiTone st=cc.at(0);
+	chordNoteModel *cm= new chordNoteModel(m_chordTableEditor, &st);
+	chordNoteWidget *cn= new chordNoteWidget(cm,this);
+	lowerLayout->addWidget(cn);
 
 //setting the main layout
 	 topLayout->addWidget(upperWidget);
-	 topLayout->addWidget(lowerWidget);
 	 topLayout->addStretch();
+	 topLayout->addWidget(lowerWidget);
 
 //--------------
 
-	m_chordsComboBox->setModel(m_chordTableEditor->m_chordsModel);
 
 
 	setWhatsThis( tr(
@@ -183,6 +204,26 @@ chordtableEditorView::~chordtableEditorView()
 }
 
 
+//---------------------------------------------
+//---------------------------------------------
+//---------------------------------------------
 
+chordNoteModel::chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::ChordSemiTone *_semiTone) :
+	Model(_parent)
+{
+
+}
+//---------------------------------------------
+//---------------------------------------------
+//---------------------------------------------
+
+
+chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
+	QWidget(_parent),
+	ModelView(_model,_parent)
+{
+	setAutoFillBackground( true );
+	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+}
 
 
