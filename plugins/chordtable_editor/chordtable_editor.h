@@ -28,6 +28,7 @@
 #define _CHORDTABLE_EDITOR_H
 
 #include <QLabel>
+#include <QFrame>
 
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
@@ -41,7 +42,13 @@ class LcdWidget;
 class QVBoxLayout;
 class chordtableEditor;
 class chordNoteModel;
+class LedCheckBox;
 
+//new constants for key notes in arpeggios, used by the Int Automated model
+const int KeyMax = ( 0 + 20 );
+const int KeyMin = - KeyMax;
+const int KeyCenter = 0;
+const int DefaultKey = 0;
 
 //the widget for the single semitone
 class chordNoteWidget : public QWidget, public ModelView
@@ -51,14 +58,21 @@ public:
 	chordNoteWidget(chordNoteModel * _model, QWidget *_parent);
 	~chordNoteWidget(){}
 
+	chordNoteModel * m_chordNoteModel;
 	Knob *m_volumeKnob;
 	Knob *m_panKnob;
 	//
 	QLabel *m_keyLabel;
+	LcdWidget *m_keyLcd;
 	AutomatableSlider *m_keySlider;
-	LcdWidget *m_activeLcd;
-	LcdWidget *m_silencedLcd;
-	LcdWidget *m_bareLcd;
+	LedCheckBox *m_activeLed;
+	LedCheckBox *m_silencedLed;
+	LedCheckBox *m_bareLed;
+
+public slots:
+
+	//changes m_keyLCD value
+	void setKeyLabel(int i);
 
 };
 
@@ -90,6 +104,13 @@ public:
 
 	//The chordsemitone it's referring to
 	InstrumentFunctionNoteStacking::ChordSemiTone *m_semiTone;
+
+	FloatModel m_volumeModel;
+	FloatModel m_panningModel;
+	IntModel m_keyModel;
+	BoolModel m_activeModel;
+	BoolModel m_silencedModel;
+	BoolModel m_bareModel;
 
 	//Single note data
 //	int8_t m_key; // the semitone

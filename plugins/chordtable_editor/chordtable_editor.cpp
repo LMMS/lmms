@@ -30,20 +30,26 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QGroupBox>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QVBoxLayout>
 
 
 #include "gui_templates.h"
+#include "Knob.h"
 #include "TabBar.h"
 #include "TabButton.h"
 #include "ComboBox.h"
+#include "AutomatableSlider.h"
 #include "Model.h"
+#include "volume.h"
+#include "panning.h"
+#include "ToolTip.h"
+#include "LcdWidget.h"
+#include "LedCheckbox.h"
 
 #include "embed.cpp"
-
-
 
 extern "C"
 {
@@ -152,6 +158,7 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	 lowerWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
 	 lowerWidget->setMinimumSize(400,300);
 	 QHBoxLayout *lowerLayout= new QHBoxLayout(lowerWidget);
+	 lowerLayout->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
 //	 lowerLayout->setSizeConstraint( QLayout::SetMinimumSize );
 //	 lowerLayout->setSpacing( 0 );
 //	 lowerLayout->setMargin( 0 );
@@ -161,8 +168,11 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	InstrumentFunctionNoteStacking::Chord cc=m_chordTableEditor->m_chordTable->at(0);
 	InstrumentFunctionNoteStacking::ChordSemiTone st=cc.at(0);
 	chordNoteModel *cm= new chordNoteModel(m_chordTableEditor, &st);
+	chordNoteModel *cm1= new chordNoteModel(m_chordTableEditor, &st);
 	chordNoteWidget *cn= new chordNoteWidget(cm,this);
+	chordNoteWidget *cn1= new chordNoteWidget(cm1,this);
 	lowerLayout->addWidget(cn);
+	lowerLayout->addWidget(cn1);
 
 //setting the main layout
 	 topLayout->addWidget(upperWidget);
@@ -209,7 +219,14 @@ chordtableEditorView::~chordtableEditorView()
 //---------------------------------------------
 
 chordNoteModel::chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::ChordSemiTone *_semiTone) :
-	Model(_parent)
+	Model(_parent),
+	m_semiTone( _semiTone	),
+	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
+	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
+	m_keyModel(KeyCenter,KeyMin,KeyMax,this, tr("Key")),
+	m_activeModel(true,this,tr("Active")),
+	m_silencedModel(false,this,tr("Silenced")),
+	m_bareModel(false,this,tr("Bare"))
 {
 
 }
@@ -220,10 +237,105 @@ chordNoteModel::chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::C
 
 chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 	QWidget(_parent),
-	ModelView(_model,_parent)
+	ModelView(_model,_parent),
+	m_chordNoteModel( castModel<chordNoteModel>() )
 {
+	QVBoxLayout *m_vLayout= new QVBoxLayout(this);
+	setLayout(m_vLayout);
+
+	QFrame *frame=new QFrame;
+	frame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+	frame->setLineWidth(2);
+
+	m_vLayout->addWidget(frame);
+
+	QVBoxLayout *vl = new QVBoxLayout(frame);
+	frame->setLayout(vl);
+
+
 	setAutoFillBackground( true );
-	setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
+	setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+
+
+	m_volumeKnob = new Knob( knobDark_28, this );
+	m_volumeKnob->setLabel( tr( "Volume" ) );
+	m_volumeKnob->setModel(&m_chordNoteModel->m_volumeModel);
+//	m_volumeKnob->move( 27, 5 );
+	m_volumeKnob->setEnabled( true );
+	m_volumeKnob->setHintText( tr( "Volume knob:" ), "" );
+	m_volumeKnob->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
+					"the input signal and the effect signal that "
+					"forms the output." ) );
+
+	m_panKnob = new Knob( knobDark_28, this );
+	m_panKnob->setLabel( tr( "Panning" ) );
+	m_panKnob->setModel(&m_chordNoteModel->m_panningModel);
+//	m_panKnob->move( 27, 5 );
+	m_panKnob->setEnabled( true );
+	m_panKnob->setHintText( tr( "Panning knob:" ), "" );
+	m_panKnob->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
+					"the input signal and the effect signal that "
+					"forms the output." ) );
+
+	//----------------
+	m_keySlider = new AutomatableSlider( this, tr( "Key note" ) );
+	m_keySlider->setModel( &m_chordNoteModel->m_keyModel );
+	m_keySlider->setOrientation( Qt::Vertical );
+	m_keySlider->setPageStep( 1 );
+	m_keySlider->setTickPosition( QSlider::TicksLeft );
+	m_keySlider->setFixedSize( 26, 60 );
+	m_keySlider->setTickInterval( 50 );
+	ToolTip::add( m_keySlider, tr( "Key note" ) );
+	m_keySlider->setWhatsThis( tr("The key note"));
+
+	m_keyLcd= new LcdWidget( 3, this );
+	m_keyLcd->setValue( m_chordNoteModel->m_keyModel.value());
+	connect( m_keySlider, SIGNAL( logicValueChanged( int ) ), this,	SLOT( setKeyLabel( int ) ) );
+
+	m_activeLed= new LedCheckBox(this, tr("Active"));
+	m_activeLed->setModel(&m_chordNoteModel->m_activeModel);
+	m_activeLed->setWhatsThis( tr("If the note is active or gets omitted"));
+	m_activeLed->setEnabled(true);
+	ToolTip::add( m_activeLed, tr( "Active note" ) );
+
+	m_silencedLed= new LedCheckBox(this, tr("Silenced"));
+	m_silencedLed->setModel(&m_chordNoteModel->m_silencedModel);
+	m_silencedLed->setWhatsThis( tr("If the note is silenced"));
+	m_silencedLed->setEnabled(true);
+	ToolTip::add( m_silencedLed, tr( "Silenced note" ) );
+
+	m_bareLed= new LedCheckBox(this, tr("Bare"));
+	m_bareLed->setModel(&m_chordNoteModel->m_bareModel);
+	m_bareLed->setWhatsThis( tr("If the arpeggio ignores the note volume or panning "));
+	m_bareLed->setEnabled(true);
+	ToolTip::add( m_bareLed, tr( "Bare note" ) );
+
+
+//	connect( m_keySlider, SIGNAL( sliderPressed() ), this,
+//			SLOT( showMasterVolumeFloat()) );
+//	connect( m_keySlider, SIGNAL( logicSliderMoved( int ) ), this,
+//			SLOT( updateMasterVolumeFloat( int ) ) );
+//	connect( m_keySlider, SIGNAL( sliderReleased() ), this,
+//			SLOT( hideMasterVolumeFloat() ) );
+	//----------------
+
+
+	vl->addWidget(m_volumeKnob);
+	vl->addWidget(m_panKnob);
+	vl->addWidget(m_keyLcd);
+	vl->addWidget(m_keySlider);
+	vl->addWidget(m_activeLed);
+	vl->addWidget(m_silencedLed);
+	vl->addWidget(m_bareLed);
+
 }
 
+void chordNoteWidget::setKeyLabel(int i)
+{
+	if (m_keyLcd)
+	{
+		m_keyLcd->setValue(i);
+		m_keyLcd->update();
+	}
+}
 
