@@ -883,6 +883,21 @@ void DataFile::upgrade_1_1_91()
 			el.setAttribute( a, ( el.attribute( a ) == "0" ) ? "1" : "0" );
 		}
 	}
+
+	list = elementsByTagName( "arpeggiator" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		// Swap elements ArpDirRandom and ArpDirDownAndUp
+		if( el.attribute( "arpdir" ) == "3" )
+		{
+			el.setAttribute( "arpdir", "4" );
+		}
+		else if( el.attribute( "arpdir" ) == "4" )
+		{
+			el.setAttribute( "arpdir", "3" );
+		}
+	}
 }
 
 
