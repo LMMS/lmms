@@ -901,6 +901,32 @@ void DataFile::upgrade_1_1_91()
 }
 
 
+void DataFile::upgrade_1_2_0_rc3()
+{
+	// Upgrade from earlier bbtrack beat note behaviour of adding
+	// steps if a note is placed after the last step.
+	QDomNodeList list = elementsByTagName( "bbtrack" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		list = elementsByTagName( "pattern" );
+		for( int i = 0; !list.item( i ).isNull(); ++i )
+		{
+			int patternLength, steps;
+			QDomElement el = list.item( i ).toElement();
+			for( int i = 0; !list.item( i ).isNull(); ++i )
+			{
+				if( el.attribute( "len" ) != "" )
+				{
+					patternLength = el.attribute( "len" ).toInt();
+					steps = patternLength / 12;
+					el.setAttribute( "steps", steps );
+				}
+			}
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -976,6 +1002,10 @@ void DataFile::upgrade()
 	if( version < "1.1.91-0" )
 	{
 		upgrade_1_1_91();
+	}
+	if( version < "1.2.0-rc3" )
+	{
+		upgrade_1_2_0_rc3();
 	}
 
 	// update document meta data
