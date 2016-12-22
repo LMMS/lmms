@@ -196,20 +196,21 @@ MidiTime Pattern::beatPatternLength() const
 		if( ( *it )->length() < 0 )
 		{
 			max_length = qMax<tick_t>( max_length,
-				( *it )->pos() +
-					MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() );
+				( *it )->pos() + 1 );
 		}
 	}
 
 	if( m_steps != MidiTime::stepsPerTact() )
 	{
 		max_length = m_steps * MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() ;
+						MidiTime::stepsPerTact();
 	}
 
 	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
 }
+
+
+
 
 Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
