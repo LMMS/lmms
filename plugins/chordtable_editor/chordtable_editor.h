@@ -40,6 +40,7 @@ class Knob;
 class AutomatableSlider;
 class LcdWidget;
 class QVBoxLayout;
+class QHBoxLayout;
 class chordtableEditor;
 class chordNoteModel;
 class LedCheckBox;
@@ -125,6 +126,11 @@ public:
 	// discard al the rest, taking data from the base note
 	// false: the note has all data, volume, panning, silenced...
 
+public slots:
+	//transfer model data to the m_semiTone
+	void changeData();
+
+
 } ;
 
 //---------------------------------------------------
@@ -140,17 +146,25 @@ public:
 
 
 public slots:
-
+	//loads the chord into the widget
+	void loadChord();
 
 private:
 
+	//the existing chordtable
 	chordtableEditor * m_chordTableEditor;
+	//the chosen chord
+	InstrumentFunctionNoteStacking::Chord m_Chord;
 
 	QVector<chordNoteWidget *> m_chordnoteWidgets;
 
 
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;
+
+	//the widget layout where to put all the chordNoteWidgets
+	QHBoxLayout *m_chordsWidgetLayout;
+	QWidget *m_chordsWidget;
 
 
 	//The combobox of the available chord combinations

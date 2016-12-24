@@ -352,7 +352,8 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 				{ // if the note is active process it, otherwise skip
 
 					// getting the base note key
-					const int sub_note_key = sub_note_key_base + cst.key;
+//					const int sub_note_key = sub_note_key_base + cst.key;
+					const int sub_note_key = sub_note_key_base + cst.key->value();
 
 					// the new volume and panning
 					volume_t sub_note_vol;
@@ -662,9 +663,12 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		{ // The note is active, process all
 
 			// now calculate final key for our arp-note
+//			const int sub_note_key = base_note_key +
+//															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
+//															 cst.key;
 			const int sub_note_key = base_note_key +
 															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
-															 cst.key;
+															 cst.key->value();
 			volume_t sub_note_vol;
 			panning_t sub_note_pan;
 			// if the note is bare we don't intervene into panning, volume etc...

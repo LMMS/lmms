@@ -57,7 +57,8 @@ public:
 	*/
 	struct ChordSemiTone
 	{
-		int8_t key; // the semitone
+//		int8_t key; // the semitone
+		IntModel *key = new IntModel(0,0,100,NULL,"ChordNote Key"); //  the semitone
 		volume_t vol; // its volume : in percentage of the volume, from 0% (silence)
 		// to 200% or more, to emboss volume. No control for high volumes yet;
 		panning_t pan; // the panning from -100 to +100
@@ -87,7 +88,8 @@ public:
 		*/
 		ChordSemiTone( int8_t k, volume_t v, panning_t p, bool a, bool s, bool b )
 		{
-			key = k;
+			key->setValue(k);
+			//			key = k;
 			vol = v;
 			pan = p;
 			active = a;
@@ -130,7 +132,8 @@ public:
 		void parseString( QString d )
 		{
 			QStringList l = d.remove(' ').split(','); // trims and splits the string
-			key = (int8_t)l[0].toInt();
+//			key = (int8_t)l[0].toInt();
+			key->setValue(l[0].toInt());
 			vol = (volume_t)l[1].toInt();
 			pan = (panning_t)l[2].toInt();
 			active = (bool)l[3].toShort();
@@ -144,7 +147,8 @@ public:
 		*/
 		inline int8_t operator=( int8_t a )
 		{
-			key = a;
+//			key = a;
+			key->setValue(a);
 			bare = true; // the note has only the key component, we discard all the rest
 			return a;
 		}
@@ -179,7 +183,8 @@ public:
 		*/
 		inline bool operator==( int8_t a )
 		{
-			if (key == a)
+//			if (key == a)
+				if (key->value() == a)
 			{
 				return true;
 			}
@@ -197,7 +202,6 @@ private:
 	*/
 	struct ChordSemiTones : public QVector<ChordSemiTone>
 	{
-
 		/**
 		* Takes the string, divides it and pushes the single ChordSemitone;
 		* boundary char is ";"
@@ -225,6 +229,7 @@ private:
 		*/
 		ChordSemiTones() {}
 
+
 		/**
 		* Compatibility towards other modules, return the int8_t key
 		* @brief operator []
@@ -233,7 +238,7 @@ private:
 		*/
 		int8_t inline operator[]( int index ) const
 		{
-			return at(index).key; // returns the key of the note
+			return at(index).key->value(); // returns the key of the note
 		}
 	};
 
@@ -297,7 +302,7 @@ public:
 
 		const int8_t &last() const
 		{
-			return m_semiTones.last().key;
+			return m_semiTones.last().key->value();
 		}
 
 		const QString &getName() const
