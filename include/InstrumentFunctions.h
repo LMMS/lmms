@@ -563,4 +563,210 @@ private:
 };
 
 
+
+class ChordSemiTone : public Model , public JournallingObject
+{
+	Q_OBJECT
+public:
+
+	IntModel *key = new IntModel(KeyDefault,KeyMin,KeyMax,NULL,"Key"); //  the semitone
+	FloatModel *vol = new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, NULL, tr( "Volume" ) ); // its volume : in percentage of the volume, from 0% (silence)
+	// to 200% or more, to emboss volume. No control for high volumes yet;
+	FloatModel *pan = new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, NULL, tr( "Panning" )); // the panning from -100 to +100
+
+	BoolModel *active= new BoolModel(true,NULL,tr("Active")); // the note is played -> true: yes, false: skipped
+	BoolModel *silenced= new BoolModel(true,NULL,tr("Silenced")); // the note is processed but silenced -> true: normally
+	// played, false: muted
+	BoolModel *bare= new BoolModel(true,NULL,tr("Bare")); // The note only has the key value. True: bare, we will
+	// discard al the rest, taking data from the base note
+	// false: the note has all data, volume, panning, silenced...
+
+
+	ChordSemiTone(Model *_parent);
+	virtual ~ChordSemiTone() {}
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline virtual QString nodeName() const
+	{
+		return "chordSemiTone";
+	}
+
+	/**
+	* Assignment of only the key
+	* @param a: the key to assign;
+	*/
+	inline int8_t operator=( int8_t a )
+	{
+		//			key = a;
+		key->setValue(a);
+		bare->setValue(true); // the note has only the key component, we discard all the rest
+		return a;
+	}
+
+	/**
+	* Comparison towards a ChordSemitone entity, checks for same key, vol, pan,
+	* active, silenced, bare
+	* @brief operator ==
+	* @param a
+	* @return
+	*/
+	inline bool operator==( ChordSemiTone a )
+	{
+		if (a.key == key && a.bare == bare && a.vol == vol && a.pan == pan &&
+				a.active == active && a.silenced == silenced)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	* Comparison towards int8_t integers (key), maintained compatibility with other
+	* modules
+	*
+	* @brief operator ==
+	* @param a
+	* @return
+	*/
+	inline bool operator==( int8_t a )
+	{
+		//			if (key == a)
+		if (key->value() == a)
+		{
+			return true;
+		}
+		return false;
+	}
+
+private:
+
+};
+
+
+class ChordSemiTones : public Model, public JournallingObject, public QVector<ChordSemiTone*>
+{
+	Q_OBJECT
+public:
+	ChordSemiTones(Model *_parent);
+	virtual ~ChordSemiTones() {}
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline virtual QString nodeName() const
+	{
+		return "chordSemiTones";
+	}
+
+	/**
+	* Compatibility towards other modules, return the int8_t key
+	* @brief operator []
+	* @param index
+	* @return
+	*/
+	int8_t inline operator[]( int index ) const
+	{
+		return at(index)->key->value(); // returns the key of the note
+	}
+
+
+};
+
+class Chord : public Model, public JournallingObject
+{
+	Q_OBJECT
+public:
+
+	ChordSemiTones *m_chordSemiTones;
+	QString m_name;
+
+	Chord(Model *_parent);
+	virtual ~Chord() {}
+
+	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
+	virtual void loadSettings( const QDomElement & _this );
+
+	inline virtual QString nodeName() const
+	{
+		return "Chord";
+	}
+
+	int size() const
+	{
+		return m_chordSemiTones->size();
+	}
+
+	bool isScale() const
+	{
+		return size() > 6;
+	}
+
+	bool isEmpty() const
+	{
+		return size() == 0;
+	}
+
+	bool hasSemiTone( int8_t semiTone ) const;
+
+	const int8_t &last() const
+	{
+		return m_chordSemiTones->last()->key->value();
+	}
+
+	const QString &getName() const
+	{
+		return m_name;
+	}
+
+	int8_t operator[]( int n ) const
+	{
+		// recalling the ChordSemiTones overloaded operator [], which returns the
+		// key, for the sake of compatibility
+		return (*m_chordSemiTones)[n];
+	}
+
+	const ChordSemiTones *getChordSemiTones() const
+	{
+		return m_chordSemiTones;
+	}
+
+
+	/**
+	* In opposition to the overloaded [] this gets the ChordSemiTone object
+	* @brief at
+	* @param i
+	* @return
+	*/
+	const ChordSemiTone *at( int i ) const
+	{
+		return m_chordSemiTones->at( i ); // The note
+	}
+
+};
+
+class ChordTable : public Model, public JournallingObject, public QVector<Chord*>
+{
+	Q_OBJECT
+public:
+	ChordTable(Model *_parent);
+	virtual ~ChordTable() {}
+
+	const Chord & getByName( const QString & name, bool is_scale = false ) const;
+
+	const Chord & getScaleByName( const QString & name ) const
+	{
+		return getByName( name, true );
+	}
+
+	const Chord & getChordByName( const QString & name ) const
+	{
+		return getByName( name, false );
+	}
+};
+
 #endif
