@@ -61,7 +61,8 @@ private:
 	Knob * m_chordRangeKnob;
 	//the button to open the chord table editor
 	PixmapButton * m_openeditorBtn;
-	PluginView * m_chordTableEditor;
+	//the plugin View
+	PluginView * m_chordTableEditorView;
 
 private slots:
 	//The open editor button action

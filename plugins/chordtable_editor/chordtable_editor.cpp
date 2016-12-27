@@ -270,27 +270,16 @@ chordtableEditorView::~chordtableEditorView()
 //---------------------------------------------
 
 chordNoteModel::chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::ChordSemiTone *_semiTone) :
-	Model(_parent),
-	m_volumeModel( _semiTone->vol, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
-	m_panningModel( _semiTone->pan, PanningLeft, PanningRight, 0.1f, this, tr( "Panning" ) ),
-	m_keyModel(_semiTone->key->value(),KeyMin,KeyMax,this, tr("Key")),
-	m_activeModel(_semiTone->active,this,tr("Active")),
-	m_silencedModel(_semiTone->silenced,this,tr("Silenced")),
-	m_bareModel(_semiTone->bare,this,tr("Bare"))
+	Model(_parent)
 {
 	m_semiTone=_semiTone;
-	connect(&m_volumeModel,SIGNAL(dataChanged()),this,SLOT(changeData()));
-	connect(&m_keyModel,SIGNAL(dataChanged()),this,SLOT(changeData()));
+	connect(_semiTone->key,SIGNAL(dataChanged()),this,SLOT(changeData()));
+	connect(_semiTone->vol,SIGNAL(dataChanged()),this,SLOT(changeData()));
 }
 
 //NON SEMBRA CAMBIARE I DATI DELLA CHORDTABLE
 void chordNoteModel::changeData(){
-	m_semiTone->vol=m_volumeModel.value();
-	m_semiTone->key=m_keyModel.value();
-	m_semiTone->pan=m_panningModel.value();
-	m_semiTone->active=m_activeModel.value();
-	m_semiTone->silenced=m_silencedModel.value();
-	m_semiTone->bare=m_bareModel.value();
+	InstrumentFunctionNoteStacking::ChordSemiTone *csm=m_semiTone;
 }
 
 //---------------------------------------------
@@ -331,7 +320,7 @@ gridLayout->setVerticalSpacing( 10 );
 
 	m_volumeKnob = new Knob( knobDark_28, this );
 	m_volumeKnob->setLabel( tr( "Volume" ) );
-	m_volumeKnob->setModel(&m_chordNoteModel->m_volumeModel);
+	m_volumeKnob->setModel(m_chordNoteModel->m_semiTone->vol);
 //	m_volumeKnob->move( 27, 5 );
 	m_volumeKnob->setEnabled( true );
 	m_volumeKnob->setHintText( tr( "Volume knob:" ), "" );
@@ -341,7 +330,7 @@ gridLayout->setVerticalSpacing( 10 );
 
 	m_panKnob = new Knob( knobDark_28, this );
 	m_panKnob->setLabel( tr( "Panning" ) );
-	m_panKnob->setModel(&m_chordNoteModel->m_panningModel);
+	m_panKnob->setModel(m_chordNoteModel->m_semiTone->pan);
 //	m_panKnob->move( 27, 5 );
 	m_panKnob->setEnabled( true );
 	m_panKnob->setHintText( tr( "Panning knob:" ), "" );
@@ -351,7 +340,7 @@ gridLayout->setVerticalSpacing( 10 );
 
 	//----------------
 	m_keySlider = new AutomatableSlider( this, tr( "Key note" ) );
-	m_keySlider->setModel( &m_chordNoteModel->m_keyModel );
+	m_keySlider->setModel(m_chordNoteModel->m_semiTone->key );
 	m_keySlider->setOrientation( Qt::Vertical );
 	m_keySlider->setPageStep( 1 );
 	m_keySlider->setTickPosition( QSlider::TicksLeft );
@@ -361,11 +350,11 @@ gridLayout->setVerticalSpacing( 10 );
 	m_keySlider->setWhatsThis( tr("The key note"));
 
 	m_keyLcd= new LcdWidget( 3, this );
-	m_keyLcd->setValue( m_chordNoteModel->m_keyModel.value());
+	m_keyLcd->setValue( m_chordNoteModel->m_semiTone->key->value());
 	connect( m_keySlider, SIGNAL( logicValueChanged( int ) ), this,	SLOT( setKeyLabel( int ) ) );
 
 	m_activeLed= new LedCheckBox(this, tr("Active"));
-	m_activeLed->setModel(&m_chordNoteModel->m_activeModel);
+	m_activeLed->setModel(m_chordNoteModel->m_semiTone->active);
 	m_activeLed->setWhatsThis( tr("If the note is active or gets omitted"));
 	m_activeLed->setEnabled(true);
 	ToolTip::add( m_activeLed, tr( "Active note" ) );
@@ -374,7 +363,7 @@ gridLayout->setVerticalSpacing( 10 );
 	m_activeLabel->setFont( pointSize<8>( m_activeLabel->font() ) );
 
 	m_silencedLed= new LedCheckBox(this, tr("Silenced"));
-	m_silencedLed->setModel(&m_chordNoteModel->m_silencedModel);
+	m_silencedLed->setModel(m_chordNoteModel->m_semiTone->silenced);
 	m_silencedLed->setWhatsThis( tr("If the note is silenced"));
 	m_silencedLed->setEnabled(true);
 	ToolTip::add( m_silencedLed, tr( "Silenced note" ) );
@@ -383,7 +372,7 @@ gridLayout->setVerticalSpacing( 10 );
 	m_silencedLabel->setFont( pointSize<8>( m_silencedLabel->font() ) );
 
 	m_bareLed= new LedCheckBox(this, tr("Bare"));
-	m_bareLed->setModel(&m_chordNoteModel->m_bareModel);
+	m_bareLed->setModel(m_chordNoteModel->m_semiTone->bare);
 	m_bareLed->setWhatsThis( tr("If the arpeggio ignores the note volume or panning "));
 	m_bareLed->setEnabled(true);
 	ToolTip::add( m_bareLed, tr( "Bare note" ) );

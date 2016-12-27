@@ -223,14 +223,14 @@ InstrumentFunctionNoteStacking::ChordTable::Init::Init()
  */
 //InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initializer;
 
-InstrumentFunctionNoteStacking::ChordTable *InstrumentFunctionNoteStacking::ChordTable::m_chordtable;
+InstrumentFunctionNoteStacking::ChordTable *InstrumentFunctionNoteStacking::ChordTable::m_chordTable;
 
 /**
  * The constructor initializes to NULL the initializer so it can be filled with data on demand;
  * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
  */
 InstrumentFunctionNoteStacking::ChordTable::ChordTable(){
-	m_chordtable=NULL;
+	m_chordTable=NULL;
 }
 
 //reads data from XML and reinitializes the vector
@@ -242,12 +242,12 @@ void InstrumentFunctionNoteStacking::ChordTable::readDataFromXML(){
 
 //swaps the vector reference with the initializer
 void InstrumentFunctionNoteStacking::ChordTable::swapInit(Init initializer){
-	if (m_chordtable!=NULL)
+	if (m_chordTable!=NULL)
 	{
-		delete m_chordtable;
+		delete m_chordTable;
 	}
-	m_chordtable=new ChordTable();
-	m_chordtable->swap(initializer);
+	m_chordTable=new ChordTable();
+	m_chordTable->swap(initializer);
 }
 
 bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) const
@@ -348,7 +348,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 			// process all notes in the chord
 			foreach (ChordSemiTone cst, c.getChordSemiTones())
 			{
-				if (cst.active)
+				if (cst.active->value())
 				{ // if the note is active process it, otherwise skip
 
 					// getting the base note key
@@ -359,7 +359,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 					volume_t sub_note_vol;
 					panning_t sub_note_pan;
 
-					if (cst.bare)
+					if (cst.bare->value())
 					{ // forget other settings but key, get the original
 						// data
 						sub_note_vol = base_note_vol;
@@ -368,7 +368,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 					else
 					{
 						// The note is silenced: playing it with no volume
-						if (cst.silenced)
+						if (cst.silenced->value())
 						{
 							sub_note_vol = 0;
 							sub_note_pan = 0;
@@ -376,8 +376,8 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 						else
 						{ // all modifications active, add interval to sub-note-key,
 							// volume, panning
-							sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
-							sub_note_pan = cst.pan;
+							sub_note_vol = base_note_vol * ((float)cst.vol->value() / (float)100);
+							sub_note_pan = cst.pan->value();
 						}
 					}
 					// maybe we're out of range -> let's get outta
@@ -404,7 +404,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 void InstrumentFunctionNoteStacking::loadChordTable()
 {
 	//loads the table from the xml
-	InstrumentFunctionNoteStacking::ChordTable::readDataFromXML();
+//	InstrumentFunctionNoteStacking::ChordTable::readDataFromXML();
 
 	int v=m_chordsModel.value();
 	//clears the chord dropdown
@@ -659,7 +659,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		InstrumentFunctionNoteStacking::ChordSemiTone cst =
 				chord_table[selected_arp].at(cur_arp_idx % cur_chord_size);
 
-		if (cst.active)
+		if (cst.active->value())
 		{ // The note is active, process all
 
 			// now calculate final key for our arp-note
@@ -672,7 +672,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			volume_t sub_note_vol;
 			panning_t sub_note_pan;
 			// if the note is bare we don't intervene into panning, volume etc...
-			if (cst.bare)
+			if (cst.bare->value())
 			{
 				sub_note_vol = base_note_vol;
 				sub_note_pan = base_note_pan;
@@ -680,7 +680,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			else
 			{
 				// The note is silenced: playing it with no volume
-				if (cst.silenced)
+				if (cst.silenced->value())
 				{
 					sub_note_vol = 0;
 					sub_note_pan = 0;
@@ -688,8 +688,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				else
 				{ // all modifications active, add interval to sub-note-key,
 					// volume, panning
-					sub_note_vol = base_note_vol * ((float)cst.vol / (float)100);
-					sub_note_pan = cst.pan;
+					sub_note_vol = base_note_vol * ((float)cst.vol->value() / (float)100);
+					sub_note_pan = cst.pan->value();
 				}
 			}
 

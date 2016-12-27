@@ -29,6 +29,10 @@
 
 #include "ConfigManager.h"
 
+#include "Model.h"
+#include "volume.h"
+#include "panning.h"
+
 #include "JournallingObject.h"
 #include "lmms_basics.h"
 #include "AutomatableModel.h"
@@ -40,6 +44,10 @@ class InstrumentTrack;
 class NotePlayHandle;
 class Model;
 
+//new constants for key notes in arpeggios, used by the Int Automated model
+const int KeyMax = ( 0 + 20 );
+const int KeyMin = - KeyMax;
+const int KeyDefault = 0;
 
 
 class InstrumentFunctionNoteStacking : public Model, public JournallingObject
@@ -57,21 +65,24 @@ public:
 	*/
 	struct ChordSemiTone
 	{
-//		int8_t key; // the semitone
-		IntModel *key = new IntModel(0,0,100,NULL,"ChordNote Key"); //  the semitone
-		volume_t vol; // its volume : in percentage of the volume, from 0% (silence)
+		IntModel *key = new IntModel(KeyDefault,KeyMin,KeyMax,NULL,"Key"); //  the semitone
+		FloatModel *vol = new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, NULL, tr( "Volume" ) ); // its volume : in percentage of the volume, from 0% (silence)
 		// to 200% or more, to emboss volume. No control for high volumes yet;
-		panning_t pan; // the panning from -100 to +100
+		FloatModel *pan = new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, NULL, tr( "Panning" )); // the panning from -100 to +100
 
-		bool active; // the note is played -> true: yes, false: skipped
-		bool silenced; // the note is processed but silenced -> true: normally
+		BoolModel *active= new BoolModel(true,NULL,tr("Active")); // the note is played -> true: yes, false: skipped
+		BoolModel *silenced= new BoolModel(true,NULL,tr("Silenced")); // the note is processed but silenced -> true: normally
 		// played, false: muted
-		bool bare; // The note only has the key value. True: bare, we will
+		BoolModel *bare= new BoolModel(true,NULL,tr("Bare")); // The note only has the key value. True: bare, we will
 		// discard al the rest, taking data from the base note
 		// false: the note has all data, volume, panning, silenced...
 
+		//reference to the parent model for propagation
+		//		InstrumentFunctionNoteStacking *outerclass= NULL;
+
 		ChordSemiTone( QString s )
 		{
+			//			outerclass=parent;
 			parseString( s ); // the parseString Function
 		}
 
@@ -88,13 +99,14 @@ public:
 		*/
 		ChordSemiTone( int8_t k, volume_t v, panning_t p, bool a, bool s, bool b )
 		{
+			//			outerclass=parent;
 			key->setValue(k);
 			//			key = k;
-			vol = v;
-			pan = p;
-			active = a;
-			silenced = s;
-			bare=b;
+			vol->setValue(v);
+			pan->setValue(p);
+			active->setValue( a);
+			silenced->setValue( s);
+			bare->setValue(b);
 		}
 
 		ChordSemiTone() {}
@@ -132,13 +144,13 @@ public:
 		void parseString( QString d )
 		{
 			QStringList l = d.remove(' ').split(','); // trims and splits the string
-//			key = (int8_t)l[0].toInt();
+			//			key = (int8_t)l[0].toInt();
 			key->setValue(l[0].toInt());
-			vol = (volume_t)l[1].toInt();
-			pan = (panning_t)l[2].toInt();
-			active = (bool)l[3].toShort();
-			silenced = (bool)l[4].toShort();
-			bare = (bool)l[5].toShort();
+			vol->setValue(l[1].toFloat());
+			pan->setValue(l[2].toFloat());
+			active->setValue(l[3].toShort());
+			silenced->setValue(l[4].toShort());
+			bare->setValue(l[5].toShort());
 		}
 
 		/**
@@ -147,9 +159,9 @@ public:
 		*/
 		inline int8_t operator=( int8_t a )
 		{
-//			key = a;
+			//			key = a;
 			key->setValue(a);
-			bare = true; // the note has only the key component, we discard all the rest
+			bare->setValue(true); // the note has only the key component, we discard all the rest
 			return a;
 		}
 
@@ -183,12 +195,35 @@ public:
 		*/
 		inline bool operator==( int8_t a )
 		{
-//			if (key == a)
-				if (key->value() == a)
+			//			if (key == a)
+			if (key->value() == a)
 			{
 				return true;
 			}
 			return false;
+		}
+
+		//sets the model to all model data. Decided to do so not to complicate things
+		void setModel(InstrumentFunctionNoteStacking *model)
+		{
+			key->setParent(model);
+			pan->setParent(model);
+			vol->setParent(model);
+			silenced->setParent(model);
+			active->setParent(model);
+			bare->setParent(model);
+		}
+
+		//checks if the model has been set to all model data
+		bool isModelSet()
+		{
+			if (key->parentModel()==NULL || vol->parentModel()==NULL ||
+					pan->parentModel()==NULL || active->parentModel()==NULL ||
+					silenced->parentModel()==NULL || bare->parentModel()==NULL)
+			{
+				return false;
+			}
+			return true;
 		}
 	};
 
@@ -202,6 +237,11 @@ private:
 	*/
 	struct ChordSemiTones : public QVector<ChordSemiTone>
 	{
+
+
+		//reference to the parent model for propagation
+		//		InstrumentFunctionNoteStacking *outerclass= NULL;
+
 		/**
 		* Takes the string, divides it and pushes the single ChordSemitone;
 		* boundary char is ";"
@@ -210,6 +250,7 @@ private:
 		*/
 		ChordSemiTones( QString s )
 		{
+			//			outerclass=parent;
 			QStringList l = s.remove(' ').split(';');
 			foreach (QString s, l)
 			{
@@ -223,11 +264,15 @@ private:
 			}
 		}
 
+
 		/**
 		* Empty constructor
 		* @brief ChordSemiTones
 		*/
-		ChordSemiTones() {}
+		ChordSemiTones()
+		{
+
+		}
 
 
 		/**
@@ -239,6 +284,32 @@ private:
 		int8_t inline operator[]( int index ) const
 		{
 			return at(index).key->value(); // returns the key of the note
+		}
+
+		//Checks if the model is set for all semitones
+		bool isModelSet()
+		{
+			InstrumentFunctionNoteStacking::ChordSemiTone *st=NULL;
+			for(int i=0;i<this->size(),i++;)
+			{
+				*st=at(i);
+				if (st->isModelSet())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		//Sets the model to all underlying semitones
+		void setModel(InstrumentFunctionNoteStacking *model)
+		{
+			InstrumentFunctionNoteStacking::ChordSemiTone *st=NULL;
+			for(int i=0;i<this->size(),i++;)
+			{
+				*st=at(i);
+				st->setModel(model);
+			}
 		}
 	};
 
@@ -269,7 +340,8 @@ public:
 
 	public:
 
-		Chord() : m_size( 0 ) {}
+		Chord() : m_size( 0 )
+		{}
 
 		Chord( const char * n, const ChordSemiTones & semi_tones );
 
@@ -333,6 +405,19 @@ public:
 		{
 			return m_semiTones.at( i ); // The note
 		}
+
+		//Checks if the model is set for all the chord semitones
+		bool isModelSet()
+		{
+			return m_semiTones.isModelSet();
+		}
+
+		//Sets the model to all underlying chord semitones
+		void setModel(InstrumentFunctionNoteStacking *model)
+		{
+			m_semiTones.setModel(model);
+		}
+
 	};
 
 	struct  ChordTable : public QVector<Chord>
@@ -340,12 +425,23 @@ public:
 	public:
 		ChordTable();
 	private:
-//		ChordTable();
 
 		struct Init : public QVector<Chord>
 		{
 			const char *m_name;
 			ChordSemiTones m_semiTones;
+
+			//Checks if the model is set for all the chord semitones
+			bool isModelSet()
+			{
+				return m_semiTones.isModelSet();
+			}
+
+			//Sets the model to all underlying chord semitones
+			void setModel(InstrumentFunctionNoteStacking *model)
+			{
+				m_semiTones.setModel(model);
+			}
 
 			/**
 			 * Reads data from the predefined file
@@ -357,7 +453,7 @@ public:
 			Init();
 		};
 
-		static ChordTable *m_chordtable;// This is now holding the data
+		static ChordTable *m_chordTable;// This is now holding the data
 
 	public:
 
@@ -370,11 +466,16 @@ public:
 
 		static ChordTable &getInstance()
 		{
-			if (m_chordtable==NULL){
+			if (m_chordTable==NULL)
+			{
 				Init *m_init=new Init();
+				if (m_init->isModelSet())
+				{
+					int zz=0;
+				}
 				swapInit(*m_init);
 			}
-			return *m_chordtable;
+			return *m_chordTable;
 		}
 
 		const Chord & getByName( const QString & name, bool is_scale = false ) const;
@@ -388,7 +489,9 @@ public:
 		{
 			return getByName( name, false );
 		}
-	};
+	} chord_table;
+
+
 
 
 private:

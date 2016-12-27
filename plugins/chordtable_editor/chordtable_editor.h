@@ -45,12 +45,6 @@ class chordtableEditor;
 class chordNoteModel;
 class LedCheckBox;
 
-//new constants for key notes in arpeggios, used by the Int Automated model
-const int KeyMax = ( 0 + 20 );
-const int KeyMin = - KeyMax;
-const int KeyCenter = 0;
-const int DefaultKey = 0;
-
 //the widget for the single semitone
 class chordNoteWidget : public QWidget, public ModelView
 {
@@ -106,13 +100,6 @@ public:
 	//The chordsemitone it's referring to
 	InstrumentFunctionNoteStacking::ChordSemiTone *m_semiTone;
 
-	FloatModel m_volumeModel;
-	FloatModel m_panningModel;
-	IntModel m_keyModel;
-	BoolModel m_activeModel;
-	BoolModel m_silencedModel;
-	BoolModel m_bareModel;
-
 	//Single note data
 //	int8_t m_key; // the semitone
 //	volume_t m_vol; // its volume : in percentage of the volume, from 0% (silence)
@@ -143,7 +130,6 @@ class chordtableEditorView : public ToolPluginView
 public:
 	chordtableEditorView( ToolPlugin * _tool );
 	virtual ~chordtableEditorView();
-
 
 public slots:
 	//loads the chord into the widget
