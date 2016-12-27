@@ -3,7 +3,7 @@
  *                    sample-file-browser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -118,7 +118,7 @@ FileBrowser::~FileBrowser()
 
 
 
-bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
+bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 {
 	// call with item=NULL to filter the entire tree
 	bool anyMatched = false;
@@ -169,7 +169,6 @@ bool FileBrowser::filterItems(const QString & filter, QTreeWidgetItem * item)
 
 
 
-
 void FileBrowser::reloadTree( void )
 {
 	const QString text = m_filterEdit->text();
@@ -180,22 +179,37 @@ void FileBrowser::reloadTree( void )
 	{
 		addItems( *it );
 	}
-	for(int i = 0; i < m_l->topLevelItemCount(); ++i)
+	expandItems();
+	m_filterEdit->setText( text );
+	filterItems( text );
+}
+
+
+
+void FileBrowser::expandItems( QTreeWidgetItem * item )
+{
+    int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+	for( int i = 0; i < numChildren; ++i )
 	{
+		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
 		if ( m_recurse )
 		{
-			m_l->topLevelItem( i )->setExpanded( true);
+			it->setExpanded( true );
 		}
-		Directory *d = dynamic_cast<Directory *> ( m_l->topLevelItem( i ) );
+		Directory *d = dynamic_cast<Directory *> ( it );
 		if( d )
 		{
 			d->update();
 			d->setExpanded( false );
 		}
+		if( m_recurse && it->childCount() )
+		{
+			expandItems(it);
+		}
 	}
-	m_filterEdit->setText( text );
-	filterItems( text );
 }
+
+
 
 void FileBrowser::giveFocusToFilter()
 {
@@ -206,6 +220,7 @@ void FileBrowser::giveFocusToFilter()
 		m_filterEdit->selectAll();
 	}
 }
+
 
 
 void FileBrowser::addItems(const QString & path )
@@ -408,7 +423,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "gig" ) && 
+		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "gig" ) &&
 			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
@@ -794,8 +809,6 @@ bool Directory::addItems(const QString & path )
 							path, m_filter ) );
 					orphan = false;
 					m_dirCount++;
-					//recurse for each dir
-					addItems( path + cur_file + QDir::separator() );
 					break;
 				}
 				else if( cur_file == d->text( 0 ) )
@@ -896,8 +909,8 @@ void FileItem::initPixmaps( void )
 		s_soundfontFilePixmap = new QPixmap( embed::getIconPixmap(
 						"soundfont_file", 16, 16 ) );
 	}
-	
-	if ( s_vstPluginFilePixmap == NULL ) 
+
+	if ( s_vstPluginFilePixmap == NULL )
 	{
 		s_vstPluginFilePixmap = new QPixmap( embed::getIconPixmap(
 						"vst_plugin_file", 16, 16 ) );
