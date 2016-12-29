@@ -35,7 +35,7 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 
-
+#include "Engine.h"
 #include "gui_templates.h"
 #include "Knob.h"
 #include "TabBar.h"
@@ -78,30 +78,28 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 }
 
 
-//---------------------------------------------
-//---------------------------------------------
-//---------------------------------------------
+/*****************************************************************************************************
+ *
+ * The chordtableEditor class
+ *
+******************************************************************************************************/
 
 chordtableEditor::chordtableEditor() :
-	ToolPlugin( &chordtableeditor_plugin_descriptor, NULL ),
-	m_chordTable(&InstrumentFunctionNoteStacking::ChordTable::getInstance())
+	ToolPlugin( &chordtableeditor_plugin_descriptor, NULL )
 {
+	m_chordTable = Engine::chordTable();
 	m_chordsModel= new ComboBoxModel( this, tr( "Chord type" ) );
 	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
-		m_chordsModel->addItem( m_chordTable->at(i).getName() );
+		m_chordsModel->addItem( m_chordTable->at(i)->getName() );
 	}
 
 }
 
 
-
-
 chordtableEditor::~chordtableEditor()
 {
 }
-
-
 
 
 QString chordtableEditor::nodeName() const
@@ -111,14 +109,17 @@ QString chordtableEditor::nodeName() const
 
 
 
-//---------------------------------------------
-//---------------------------------------------
-//---------------------------------------------
+/*****************************************************************************************************
+ *
+ * The chordtableEditorView class
+ *
+******************************************************************************************************/
 
 
 chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	ToolPluginView( _tool  ),
 	m_chordTableEditor( castModel<chordtableEditor>() ),
+	m_Chord(NULL),
 	m_chordsComboBox( new ComboBox() )
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) ); //menjaj icono!!
@@ -251,9 +252,13 @@ void chordtableEditorView::loadChord()
 	m_chordsWidget->setUpdatesEnabled(true);
 
 	//adding the widgets from the menu
-	foreach(InstrumentFunctionNoteStacking::ChordSemiTone m_chordSemiTone,m_Chord.getChordSemiTones())
+
+	ChordSemiTone *m_chordSemiTone;
+
+	for (int i=0;i<m_Chord->getChordSemiTones()->size();i++)
 	{
-		chordNoteModel *m_chordNoteModel= new chordNoteModel(m_chordTableEditor, &m_chordSemiTone);
+		m_chordSemiTone=m_Chord->getChordSemiTones()->at(i);
+		chordNoteModel *m_chordNoteModel= new chordNoteModel(m_chordTableEditor, m_chordSemiTone);
 		chordNoteWidget *m_chordNoteWidget= new chordNoteWidget(m_chordNoteModel,this);
 //		lowerInsideLayout->addWidget(m_chordNoteWidget);
 		m_chordsWidgetLayout->addWidget(m_chordNoteWidget);
@@ -265,11 +270,13 @@ chordtableEditorView::~chordtableEditorView()
 }
 
 
-//---------------------------------------------
-//---------------------------------------------
-//---------------------------------------------
+/*****************************************************************************************************
+ *
+ * The chordNoteModel class
+ *
+******************************************************************************************************/
 
-chordNoteModel::chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::ChordSemiTone *_semiTone) :
+chordNoteModel::chordNoteModel(Model *_parent, ChordSemiTone *_semiTone) :
 	Model(_parent)
 {
 	m_semiTone=_semiTone;
@@ -279,13 +286,14 @@ chordNoteModel::chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::C
 
 //NON SEMBRA CAMBIARE I DATI DELLA CHORDTABLE
 void chordNoteModel::changeData(){
-	InstrumentFunctionNoteStacking::ChordSemiTone *csm=m_semiTone;
+	ChordSemiTone *csm=m_semiTone;
 }
 
-//---------------------------------------------
-//---------------------------------------------
-//---------------------------------------------
-
+/*****************************************************************************************************
+ *
+ * The chordNoteWidget class
+ *
+******************************************************************************************************/
 
 chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 	QWidget(_parent),
@@ -404,15 +412,8 @@ gridLayout->setVerticalSpacing( 10 );
 	gridLayout->addWidget(m_bareLabel,6,0,1,1,Qt::AlignCenter);
 	gridLayout->addWidget(m_bareLed,6,1,1,1,Qt::AlignCenter);
 
-//	gridLayout->addWidget(m_volumeKnob,0,0,0,2);
-//	gridLayout->addWidget(m_panKnob,1,0,0,2);
-//	gridLayout->addWidget(m_keyLcd,2,0,0,2);
-//	gridLayout->addWidget(m_keySlider,3,0,3,2);
-//	gridLayout->addWidget(m_activeLed,7,0,0,0);
-//	gridLayout->addWidget(m_silencedLed,8,0,0,0);
-//	gridLayout->addWidget(m_bareLed,9,0,0,0);
-
 }
+
 
 void chordNoteWidget::setKeyLabel(int i)
 {

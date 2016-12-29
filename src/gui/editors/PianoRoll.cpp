@@ -402,15 +402,14 @@ PianoRoll::PianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 	// Set up scale model
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	m_chordTable = Engine::chordTable();
 
 	m_scaleModel.addItem( tr("No scale") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for( const Chord *chord : *m_chordTable )
 	{
-		if( chord.isScale() )
+		if( chord->isScale() )
 		{
-			m_scaleModel.addItem( chord.getName() );
+			m_scaleModel.addItem( chord->getName() );
 		}
 	}
 
@@ -421,11 +420,11 @@ PianoRoll::PianoRoll() :
 
 	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for( const Chord *chord : *m_chordTable )
 	{
-		if( ! chord.isScale() )
+		if( ! chord->isScale() )
 		{
-			m_chordModel.addItem( chord.getName() );
+			m_chordModel.addItem( chord->getName() );
 		}
 	}
 
@@ -455,8 +454,8 @@ PianoRoll::PianoRoll() :
 void PianoRoll::updateChordTable()
 {
 	// reloads the scale model
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	delete (m_chordTable);
+	m_chordTable =  Engine::chordTable();
 
 	//getting the selected value
 	int v = m_scaleModel.value();
@@ -464,7 +463,7 @@ void PianoRoll::updateChordTable()
 	m_scaleModel.clear();
 
 	m_scaleModel.addItem( tr("No scale") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for( const Chord& chord : *m_chordTable )
 	{
 		if( chord.isScale() )
 		{
@@ -483,7 +482,7 @@ void PianoRoll::updateChordTable()
 	m_chordModel.clear();
 
 	m_chordModel.addItem( tr("No chord") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for( const Chord& chord : *m_chordTable )
 	{
 		if( ! chord.isScale() )
 		{
@@ -554,7 +553,7 @@ void PianoRoll::changeNoteEditMode( int i )
 void PianoRoll::markSemiTone( int i )
 {
 	const int key = getKey( mapFromGlobal( m_semiToneMarkerMenu->pos() ).y() );
-	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
+	const Chord * chord = nullptr;
 
 	switch( static_cast<SemiToneMarkerAction>( i ) )
 	{
@@ -597,14 +596,12 @@ void PianoRoll::markSemiTone( int i )
 			break;
 		}
 		case stmaMarkCurrentScale:
-			chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-					.getScaleByName( m_scaleModel.currentText() );
+		chord = &m_chordTable->getScaleByName( m_scaleModel.currentText() );
 		case stmaMarkCurrentChord:
 		{
 			if( ! chord )
 			{
-				chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+				chord =  &m_chordTable->getChordByName( m_chordModel.currentText() );
 			}
 
 			if( chord->isEmpty() )
@@ -1507,8 +1504,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_pattern->addNote( new_note );
 
-					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+					const Chord & chord = m_chordTable->getChordByName( m_chordModel.currentText() );
 
 					if( ! chord.isEmpty() )
 					{
@@ -3968,12 +3964,8 @@ void PianoRoll::quantizeNotes()
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	const InstrumentFunctionNoteStacking::Chord& scale =
-			chord_table.getScaleByName( m_scaleModel.currentText() );
-	const InstrumentFunctionNoteStacking::Chord& chord =
-			chord_table.getChordByName( m_chordModel.currentText() );
+	const Chord& scale = m_chordTable->getScaleByName( m_scaleModel.currentText() );
+	const Chord& chord = m_chordTable->getChordByName( m_chordModel.currentText() );
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );

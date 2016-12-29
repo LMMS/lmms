@@ -39,271 +39,21 @@
 #include "NotePlayHandle.h"
 #include "PresetPreviewPlayHandle.h"
 
-
-InstrumentFunctionNoteStacking::Chord::Chord( const char * n, const ChordSemiTones semi_tones )
-{
-	m_name = QString( *n );
-	m_semiTones = semi_tones;
-}
-
-InstrumentFunctionNoteStacking::Chord::Chord( QString n, const ChordSemiTones semi_tones )
-{
-	m_name = n;
-	m_semiTones = semi_tones;
-}
-
-InstrumentFunctionNoteStacking::Chord::Chord( const char * n, QString s )
-{
-	m_name = QString( *n );
-	m_semiTones = ChordSemiTones(s);
-}
-
-InstrumentFunctionNoteStacking::Chord::Chord( QString n, QString s )
-{
-	m_name = n;
-	m_semiTones = ChordSemiTones(s);
-}
-
-InstrumentFunctionNoteStacking::Chord::Chord( QString n, const ChordSemiTones * semi_tones )
-{
-	m_name = n;
-	m_semiTones = * semi_tones;
-}
-
-
-/**
- * Gets data from the standard xml file!
+/*****************************************************************************************************
  *
- * @brief InstrumentFunctionNoteStacking::readXML
- */
-bool InstrumentFunctionNoteStacking::ChordTable::Init::readXML()
-{
-
-	ConfigManager* confMgr = ConfigManager::inst();
-	//Path to the presets file
-	QString m_path= confMgr->factoryPresetsDir()+"Arpeggio/arpeggio.xpf";
-
-	//The xml document
-	QDomDocument m_doc;
-
-	//The xml file itself
-	QFile file(m_path);
-
-	//the lists of chords and keys
-	QDomNodeList m_chords_list,m_key_list;
-
-	//The xml chord and single key nodes
-	QDomNode m_chords_node,m_keys_node,m_key_node;
-
-	//The xml single element
-	QDomElement m_chord_element,m_key_element;
-
-	//placeholders for name and sngle key texts
-	QString m_name,m_key;
-
-	//placeholder for the chord semitone
-	ChordSemiTone * m_semitone;
-
-	//The semitones vector
-	ChordSemiTones * m_semitones;
-
-	//The single chord
-	Chord  * m_chord;
-
-	//Check for file
-	if (!file.open(QIODevice::ReadOnly) || !m_doc.setContent(&file))
-	{
-		return false;
-	}
-
-	//Getting the list of chords available in the object
-	m_chords_list = m_doc.elementsByTagName("chord");
-	//for each row of chords
-	for (int i = 0; i < m_chords_list.size(); i++)
-	{
-		//Initializing the semitones vector
-		m_semitones=new ChordSemiTones();
-
-
-		//getting the single chord node
-		m_chords_node = m_chords_list.item(i);
-		//getting the "name" element
-		m_chord_element = m_chords_node.firstChildElement("name");
-		m_name=m_chord_element.text();
-		//and the and the node representing the key sequence of the chord
-		m_keys_node = m_chords_node.firstChildElement("keys");
-		//getting the keys inside the element as a list
-		m_key_list=m_keys_node.childNodes();
-
-		//processing the keys
-		for (int i = 0; i < m_key_list.size(); i++)
-		{
-			//getting the single key node
-			m_key_node =m_key_list.item(i);
-			//and its element
-			m_key_element=m_key_node.toElement();
-			//and the string of the chord
-			m_key=m_key_element.text();
-			//initializing the single semitone from the key
-			m_semitone=new ChordSemiTone(m_key);
-			//pushing it to the semitones vector
-			m_semitones->push_back(*m_semitone);
-		}
-
-		//creating the new chord
-		m_chord= new Chord(m_name,m_semitones);
-
-		//adding it to the chordtable structure
-//		m_chord_table->push_back(*m_chord);
-		push_back(*m_chord);
-	}
-	return true;
-}
-
-/**
- * Initializing the inbound static ChordTable vector. Up to now the function reads data from a QString variable
- * TODO: read data from a text file, then implementing an editor
+ * The InstrumentFunctionNoteStacking class
  *
- * @brief InstrumentFunctionNoteStacking::ChordTable::Init::Init
- */
-InstrumentFunctionNoteStacking::ChordTable::Init::Init()
-{
-	if (readXML()){
-		return;
-	};
-
-/*
- * Char delimiter for name: $
- * Chord delimiter : |
- * Semitone data: a,b,c,d,e,f;
- * a: key (distance in semitones from the original note, can be negative)
- * b: volume - from 0 to 200 (the uint, but here in percentage??) - value accepted from 0 to 200%; 100 same value
- * c: panning - from -100 to 100 (or in percentage??)- from -100 to 100%; 0 centers
- * d: active (true/false) - if the note is skipped (false)
- * e: silenced (true/false) - if the note is played (false) or there is silence (true)
- * f: bare (true/false) - if the note only holds the key, all other data is
- * ignored
- */
-	QString notes =
-			"octave$ 0,100,0,1,0,0;|"
-			"Major$ 0,100,0,1,0,0; 4,100,0,1,0,0; 7,100,0,1,0,0;|"
-			"Majb5$ 0,100,0,1,0,0; 4,100,0,1,0,0; 6,100,0,1,0,0;|"
-			"minor$ 0,100,0,1,0,0; 3,100,0,1,0,0; 7,100,0,1,0,0;|"
-			"minb5$ 0,100,0,1,0,0; 3,100,0,1,0,0; 6,100,0,1,0,0;|";
-
-	// Getting the list of chords
-	QStringList l0 = notes.remove(' ').split('|'); // Splitting each chord
-	QStringList l1; //the list
-	foreach (QString s, l0)
-	{
-		if (s.isEmpty())
-		{	// eliminating the string originated by the last
-			// character
-			break;
-		}
-
-		// l[0]: name l[1]:string of the list
-		l1 = s.split('$');
-
-		// getting semitones from string contructor
-		ChordSemiTones cs = ChordSemiTones(l1.at(1));
-		// using "tr" to allow translation
-		Chord chord = Chord(tr(l1.at(0).toUtf8().constData()), cs);
-
-		// populating the inbound static structure
-		push_back(chord);
-	}
-};
-
-/**
- * Recalling the function Init which gets the static vector data by expliciting
- * the function variable (??)
- *
- * @brief InstrumentFunctionNoteStacking::ChordTable::s_initializer
- */
-//InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initializer;
-
-InstrumentFunctionNoteStacking::ChordTable *InstrumentFunctionNoteStacking::ChordTable::m_chordTable;
-
-/**
- * The constructor initializes to NULL the initializer so it can be filled with data on demand;
- * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
- */
-InstrumentFunctionNoteStacking::ChordTable::ChordTable(){
-	m_chordTable=NULL;
-}
-
-//reads data from XML and reinitializes the vector
-void InstrumentFunctionNoteStacking::ChordTable::readDataFromXML(){
-	Init *m_init=new Init(); //reads data From XML
-	swapInit(*m_init); //swap vectors
-	//emits the signal it has loaded the data!
-}
-
-//swaps the vector reference with the initializer
-void InstrumentFunctionNoteStacking::ChordTable::swapInit(Init initializer){
-	if (m_chordTable!=NULL)
-	{
-		delete m_chordTable;
-	}
-	m_chordTable=new ChordTable();
-	m_chordTable->swap(initializer);
-}
-
-bool InstrumentFunctionNoteStacking::Chord::hasSemiTone( int8_t semi_tone ) const
-{
-	for( int i = 0; i < size(); ++i )
-	{
-		if( semi_tone == m_semiTones[i] )
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-/**
- * The constructor transfers the initialized inbound static data to the
- * vector itself
- *
- * @brief InstrumentFunctionNoteStacking::ChordTable::ChordTable
- */
-//InstrumentFunctionNoteStacking::ChordTable::ChordTable() : QVector<Chord>()
-//{
-//	// Swaps the Chordable uninitialized vector with the static ChordTable one;
-//	swap(s_initializer);
-//}
-
-
-
-const InstrumentFunctionNoteStacking::Chord & InstrumentFunctionNoteStacking::ChordTable::getByName( const QString & name, bool is_scale ) const
-{
-	for( int i = 0; i < size(); i++ )
-	{
-		if( at( i ).getName() == name && is_scale == at( i ).isScale() )
-			return at( i );
-	}
-
-	static Chord empty;
-	return empty;
-}
-
-
-
-
+******************************************************************************************************/
 InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent ) :
 	Model( _parent, tr( "Chords" ) ),
 	m_chordsEnabledModel( false, this ),
 	m_chordsModel( this, tr( "Chord type" ) ),
 	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
 {
-	const ChordTable & chord_table = ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+	m_chordTable = Engine::chordTable();
+	for( int i = 0; i < m_chordTable->size(); i++ )
 	{
-		m_chordsModel.addItem( chord_table[i].getName() );
+		m_chordsModel.addItem( m_chordTable->at(i)->getName() );
 	}
 }
 
@@ -315,7 +65,6 @@ InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
 }
 
 
-
 void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n ) 
 {
 	// Getting base note key
@@ -324,7 +73,6 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 	const volume_t base_note_vol = _n->getVolume();
 	const panning_t base_note_pan = _n->getPanning();
 	//
-	const ChordTable &chord_table = ChordTable::getInstance();
 	// we add chord-subnotes to note if either the note is a base-note and
 	// arpeggio is not used or the note is part of an arpeggio
 	// at the same time we only add sub-notes if nothing of the note was
@@ -344,22 +92,24 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 		{
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
 
-			Chord c = chord_table[selected_chord];
+			Chord *c = m_chordTable->at(selected_chord);
+			ChordSemiTone *cst;
 			// process all notes in the chord
-			foreach (ChordSemiTone cst, c.getChordSemiTones())
+			for (int i=0;i<c->getChordSemiTones()->size();i++)
 			{
-				if (cst.active->value())
+				cst=c->getChordSemiTones()->at(i);
+				if (cst->active->value())
 				{ // if the note is active process it, otherwise skip
 
 					// getting the base note key
-//					const int sub_note_key = sub_note_key_base + cst.key;
-					const int sub_note_key = sub_note_key_base + cst.key->value();
+					//					const int sub_note_key = sub_note_key_base + cst.key;
+					const int sub_note_key = sub_note_key_base + cst->key->value();
 
 					// the new volume and panning
 					volume_t sub_note_vol;
 					panning_t sub_note_pan;
 
-					if (cst.bare->value())
+					if (cst->bare->value())
 					{ // forget other settings but key, get the original
 						// data
 						sub_note_vol = base_note_vol;
@@ -368,7 +118,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 					else
 					{
 						// The note is silenced: playing it with no volume
-						if (cst.silenced->value())
+						if (cst->silenced->value())
 						{
 							sub_note_vol = 0;
 							sub_note_pan = 0;
@@ -376,8 +126,8 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 						else
 						{ // all modifications active, add interval to sub-note-key,
 							// volume, panning
-							sub_note_vol = base_note_vol * ((float)cst.vol->value() / (float)100);
-							sub_note_pan = cst.pan->value();
+							sub_note_vol = base_note_vol * ((float)cst->vol->value() / (float)100);
+							sub_note_pan = cst->pan->value();
 						}
 					}
 					// maybe we're out of range -> let's get outta
@@ -398,25 +148,6 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 			}
 		}
 	}
-}
-
-
-void InstrumentFunctionNoteStacking::loadChordTable()
-{
-	//loads the table from the xml
-//	InstrumentFunctionNoteStacking::ChordTable::readDataFromXML();
-
-	int v=m_chordsModel.value();
-	//clears the chord dropdown
-	m_chordsModel.clear();
-	const ChordTable & chord_table = ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
-	{
-		m_chordsModel.addItem( chord_table[i].getName() );
-	}
-	m_chordsModel.setValue(v);
-	//emits the signal data has changed;
-	emit dataChanged();
 }
 
 
@@ -441,6 +172,11 @@ void InstrumentFunctionNoteStacking::loadSettings( const QDomElement & _this )
 
 
 
+/*****************************************************************************************************
+ *
+ * The InstrumentFunctionArpeggio class
+ *
+******************************************************************************************************/
 
 
 InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
@@ -456,10 +192,11 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
 {
-	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+
+	m_chordTable = Engine::chordTable();
+	for( int i = 0; i < m_chordTable->size(); i++ )
 	{
-		m_arpModel.addItem( chord_table[i].getName() );
+		m_arpModel.addItem( m_chordTable->at(i)->getName() );
 	}
 
 	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
@@ -482,10 +219,12 @@ void InstrumentFunctionArpeggio::reloadChordTable()
 	//getting the existing value
 	int v = m_arpModel.value();
 	m_arpModel.clear();
-	const InstrumentFunctionNoteStacking::ChordTable & chord_table = InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	for( int i = 0; i < chord_table.size(); ++i )
+	delete(m_chordTable);
+	m_chordTable= Engine::chordTable();
+
+	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
-		m_arpModel.addItem( chord_table[i].getName() );
+		m_arpModel.addItem( m_chordTable->at(i)->getName() );
 	}
 	//setting back the value
 	m_arpModel.setValue(v);
@@ -531,8 +270,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 	}
 
-	const InstrumentFunctionNoteStacking::ChordTable &chord_table =	InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	const int cur_chord_size = chord_table[selected_arp].size();
+	const int cur_chord_size = m_chordTable->at(selected_arp)->size();
 	const int range = (int)(cur_chord_size * m_arpRangeModel.value());
 	const int total_range = range * cnphv.size();
 
@@ -656,23 +394,22 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		// cst: getting the processed semitone
-		InstrumentFunctionNoteStacking::ChordSemiTone cst =
-				chord_table[selected_arp].at(cur_arp_idx % cur_chord_size);
+		ChordSemiTone *cst =		m_chordTable->at(selected_arp)->at(cur_arp_idx % cur_chord_size);
 
-		if (cst.active->value())
+		if (cst->active->value())
 		{ // The note is active, process all
 
 			// now calculate final key for our arp-note
-//			const int sub_note_key = base_note_key +
-//															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
-//															 cst.key;
+			//			const int sub_note_key = base_note_key +
+			//															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
+			//															 cst.key;
 			const int sub_note_key = base_note_key +
 															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
-															 cst.key->value();
+															 cst->key->value();
 			volume_t sub_note_vol;
 			panning_t sub_note_pan;
 			// if the note is bare we don't intervene into panning, volume etc...
-			if (cst.bare->value())
+			if (cst->bare->value())
 			{
 				sub_note_vol = base_note_vol;
 				sub_note_pan = base_note_pan;
@@ -680,7 +417,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			else
 			{
 				// The note is silenced: playing it with no volume
-				if (cst.silenced->value())
+				if (cst->silenced->value())
 				{
 					sub_note_vol = 0;
 					sub_note_pan = 0;
@@ -688,8 +425,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				else
 				{ // all modifications active, add interval to sub-note-key,
 					// volume, panning
-					sub_note_vol = base_note_vol * ((float)cst.vol->value() / (float)100);
-					sub_note_pan = cst.pan->value();
+					sub_note_vol = base_note_vol * ((float)cst->vol->value() / (float)100);
+					sub_note_pan = cst->pan->value();
 				}
 			}
 
@@ -767,4 +504,321 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	}*/
 
 	m_arpModeModel.loadSettings( _this, "arpmode" );
+}
+
+/*****************************************************************************************************
+ *
+ * The ChordSemiTone class
+ *
+******************************************************************************************************/
+ChordSemiTone::ChordSemiTone(Model *_parent) :
+	Model(_parent)
+{
+
+}
+
+ChordSemiTone::ChordSemiTone(Model *_parent, QString _string) :
+	Model(_parent)
+{
+	//populates data from string
+	parseString(_string);
+}
+
+void ChordSemiTone::saveSettings(QDomDocument &_doc, QDomElement &_parent)
+{
+	key->saveSettings(_doc,_parent,"key");
+	vol->saveSettings(_doc,_parent,"vol");
+	pan->saveSettings(_doc,_parent,"pan");
+	active->saveSettings(_doc,_parent,"active");
+	silenced->saveSettings(_doc,_parent,"silenced");
+	bare->saveSettings(_doc,_parent,"bare");
+}
+
+void ChordSemiTone::loadSettings(const QDomElement &_this)
+{
+	key->loadSettings(_this,"key");
+	vol->loadSettings(_this,"vol");
+	pan->loadSettings(_this,"pan");
+	active->loadSettings(_this,"active");
+	silenced->loadSettings(_this,"silenced");
+	bare->loadSettings(_this,"bare");
+}
+
+void ChordSemiTone::parseString(QString _string)
+{
+	QStringList l = _string.remove(' ').split(','); // trims and splits the string
+	key->setValue(l[0].toInt());
+	vol->setValue(l[1].toFloat());
+	pan->setValue(l[2].toFloat());
+	active->setValue(l[3].toShort());
+	silenced->setValue(l[4].toShort());
+	bare->setValue(l[5].toShort());
+}
+
+/*****************************************************************************************************
+ *
+ * The ChordSemiTones class
+ *
+******************************************************************************************************/
+
+ChordSemiTones::ChordSemiTones(Model *_parent) :
+	Model(_parent)
+{
+
+}
+
+ChordSemiTones::ChordSemiTones(Model *_parent, QString _string) :
+	Model(_parent)
+{
+	parseString(_string);
+}
+
+void ChordSemiTones::parseString(QString _string)
+{
+	//clears the vector;
+	this->clear();
+	//elaborates the input string
+	QStringList l = _string.remove(' ').split(';');
+	foreach (QString s, l)
+	{
+		if (s.isEmpty())
+		{ // to eliminate the eventual empty QString derived from the last delimiter
+			break;
+		}
+		// reads the data into semitone and pushes it into the vector
+		ChordSemiTone *cst = new ChordSemiTone(this);
+		push_back(cst);
+	}
+}
+
+
+void ChordSemiTones::saveSettings(QDomDocument &_doc, QDomElement &_parent)
+{
+	ChordSemiTone *cst;
+	for(int i=0;i<this->size();i++)
+	{
+		cst=this->at(i);
+		QDomElement semitone = _doc.createElement( QString( "semitone" ) );
+		_parent.appendChild( semitone );
+		cst->saveSettings(_doc,semitone);
+	}
+}
+
+
+void ChordSemiTones::loadSettings(const QDomElement &_this)
+{
+	//clearing the vector
+	clear();
+
+	ChordSemiTone *cst;
+
+	//getting the first chordsemitone data
+	QDomNode node = _this.firstChild();
+	while (!node.isNull())
+	{
+		QDomElement semitone = node.toElement();
+		cst=new ChordSemiTone(this);
+		cst->loadSettings(semitone);
+
+		//storing the semitone
+		push_back(cst);
+
+		node = node.nextSibling();
+	}
+}
+
+/*****************************************************************************************************
+ *
+ * The Chord class
+ *
+******************************************************************************************************/
+Chord::Chord(Model *_parent) :
+	Model (_parent),
+	m_chordSemiTones( new ChordSemiTones(_parent)),
+	m_name("empty")
+{
+
+}
+
+Chord::Chord(Model *_parent, QString _name, QString _string) :
+	Model (_parent)
+{
+	m_name =_name;
+	m_chordSemiTones = new ChordSemiTones(_parent,_string);
+}
+
+Chord::Chord(Model *_parent, QString _name, ChordSemiTones *_semitones) :
+	Model (_parent)
+{
+	m_name =_name;
+	m_chordSemiTones = _semitones;
+}
+
+void Chord::saveSettings(QDomDocument &_doc, QDomElement &_parent)
+{
+	QDomElement chord = _doc.createElement( QString( "Chord" ) );
+	_parent.appendChild( chord );
+	chord.setAttribute( "name", m_name );
+	m_chordSemiTones->saveSettings(_doc,chord);
+}
+
+//ZA VIDIT, TLE KAJ NE BO SLO
+void Chord::loadSettings(const QDomElement &_this)
+{
+	m_name=_this.attribute("name");
+	QDomElement chords=_this.firstChild().toElement();
+	m_chordSemiTones->loadSettings(chords);
+}
+
+bool Chord::hasSemiTone(int8_t semiTone) const
+{
+	for( int i = 0; i < size(); ++i )
+	{
+		if( semiTone == m_chordSemiTones->at(i)->key->value() )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+/*****************************************************************************************************
+ *
+ * The ChordTable class
+ *
+******************************************************************************************************/
+
+
+ChordTable::ChordTable(Model *_parent) :
+	Model( _parent )
+{
+	//reads data
+	readXML();
+}
+
+void ChordTable::saveSettings(QDomDocument &_doc, QDomElement &_parent)
+{
+}
+
+void ChordTable::loadSettings(const QDomElement &_this)
+{
+
+}
+
+bool ChordTable::readXML()
+{
+	ConfigManager* confMgr = ConfigManager::inst();
+	//Path to the presets file
+	QString m_path= confMgr->factoryPresetsDir()+"Arpeggio/arpeggio.xpf";
+
+	//The xml document
+	QDomDocument m_doc;
+
+	//The xml file itself
+	QFile file(m_path);
+
+	//the lists of chords and keys
+	QDomNodeList m_chords_list,m_key_list;
+
+	//The xml chord and single key nodes
+	QDomNode m_chords_node,m_keys_node,m_key_node;
+
+	//The xml single element
+	QDomElement m_chord_element,m_key_element;
+
+	//placeholders for name and sngle key texts
+	QString m_nameString,m_keyString;
+
+	//placeholder for the chord semitone
+	ChordSemiTone * m_semitone;
+
+	//The semitones vector
+	ChordSemiTones * m_semitones;
+
+	//The single chord
+	Chord  * m_chord;
+
+	//Check for file
+	if (!file.open(QIODevice::ReadOnly) || !m_doc.setContent(&file))
+	{
+		return false;
+	}
+
+	//Getting the list of chords available in the object
+	m_chords_list = m_doc.elementsByTagName("chord");
+	//for each row of chords
+	for (int i = 0; i < m_chords_list.size(); i++)
+	{
+		//Initializing the semitones vector
+		m_semitones=new ChordSemiTones(this);
+
+
+		//getting the single chord node
+		m_chords_node = m_chords_list.item(i);
+		//getting the "name" element
+		m_chord_element = m_chords_node.firstChildElement("name");
+		m_nameString=m_chord_element.text();
+		//and the and the node representing the key sequence of the chord
+		m_keys_node = m_chords_node.firstChildElement("keys");
+		//getting the keys inside the element as a list
+		m_key_list=m_keys_node.childNodes();
+
+		//processing the keys
+		for (int i = 0; i < m_key_list.size(); i++)
+		{
+			//getting the single key node
+			m_key_node =m_key_list.item(i);
+			//and its element
+			m_key_element=m_key_node.toElement();
+			//and the string of the chord
+			m_keyString=m_key_element.text();
+			//initializing the single semitone from the key
+			m_semitone=new ChordSemiTone(this, m_keyString);
+			//pushing it to the semitones vector
+			m_semitones->push_back(m_semitone);
+		}
+
+		//creating the new chord
+		m_chord= new Chord(this, m_nameString,m_semitones);
+
+		//adding it to the chordtable structure
+		push_back(m_chord);
+	}
+	return true;
+}
+
+const Chord &ChordTable::getByName(const QString &name, bool is_scale) const
+{
+	for( int i = 0; i < size(); i++ )
+	{
+		if( at( i )->getName() == name && is_scale == at( i )->isScale() )
+			return *at( i );
+	}
+
+	static Chord empty(NULL);
+	return empty;
+}
+
+Chord &ChordTable::getByName(const QString &name, bool is_scale)
+{
+	for( int i = 0; i < size(); i++ )
+	{
+		if( at( i )->getName() == name && is_scale == at( i )->isScale() )
+			return *at( i );
+	}
+
+	static Chord empty(NULL);
+	return empty;
+
+}
+
+//Initializes the ChordTable instance as null
+ChordTable *ChordTable::instance=NULL;
+
+ChordTable *ChordTable::getInstance(Model *_parent)
+{
+	if (instance==NULL){
+		instance=new ChordTable(_parent);
+	}
+	return instance;
 }

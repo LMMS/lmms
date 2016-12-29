@@ -45,7 +45,12 @@ class chordtableEditor;
 class chordNoteModel;
 class LedCheckBox;
 
-//the widget for the single semitone
+
+/*****************************************************************************************************
+ *
+ * The chordNoteWidget class
+ *
+******************************************************************************************************/
 class chordNoteWidget : public QWidget, public ModelView
 {
 	Q_OBJECT
@@ -72,12 +77,16 @@ public slots:
 };
 
 
-//the model behind the single chord semitone
+/*****************************************************************************************************
+ *
+ * The chordNoteModel class
+ *
+******************************************************************************************************/
 class chordNoteModel : public Model
 {
 	Q_OBJECT
 public:
-	chordNoteModel(Model *_parent, InstrumentFunctionNoteStacking::ChordSemiTone *_semiTone);
+	chordNoteModel(Model *_parent, ChordSemiTone *_semiTone);
 	~chordNoteModel(){}
 
 	virtual chordNoteWidget * instantiateView( QWidget * _parent)
@@ -98,20 +107,7 @@ public:
 
 
 	//The chordsemitone it's referring to
-	InstrumentFunctionNoteStacking::ChordSemiTone *m_semiTone;
-
-	//Single note data
-//	int8_t m_key; // the semitone
-//	volume_t m_vol; // its volume : in percentage of the volume, from 0% (silence)
-//	// to 200% or more, to emboss volume. No control for high volumes yet;
-//	panning_t m_pan; // the panning from -100 to +100
-
-//	bool m_active; // the note is played -> true: yes, false: skipped
-//	bool m_silenced; // the note is processed but silenced -> true: normally
-//	// played, false: muted
-//	bool m_bare; // The note only has the key value. True: bare, we will
-	// discard al the rest, taking data from the base note
-	// false: the note has all data, volume, panning, silenced...
+	ChordSemiTone *m_semiTone;
 
 public slots:
 	//transfer model data to the m_semiTone
@@ -124,6 +120,11 @@ public slots:
 
 
 
+/*****************************************************************************************************
+ *
+ * The chordtableEditorView class
+ *
+******************************************************************************************************/
 class chordtableEditorView : public ToolPluginView
 {
 	Q_OBJECT
@@ -139,8 +140,9 @@ private:
 
 	//the existing chordtable
 	chordtableEditor * m_chordTableEditor;
+
 	//the chosen chord
-	InstrumentFunctionNoteStacking::Chord m_Chord;
+	Chord * m_Chord;
 
 	QVector<chordNoteWidget *> m_chordnoteWidgets;
 
@@ -159,6 +161,11 @@ private:
 } ;
 
 
+/*****************************************************************************************************
+ *
+ * The chordtableEditor class
+ *
+******************************************************************************************************/
 class chordtableEditor : public ToolPlugin
 {
 public:
@@ -183,8 +190,7 @@ public:
 		Q_UNUSED(element)
 	}
 
-	InstrumentFunctionNoteStacking::ChordTable * m_chordTable;
-	InstrumentFunctionNoteStacking::Chord * m_chord;
+	ChordTable * m_chordTable;
 
 	//single chord notes
 	QList <chordNoteModel> * m_notes;

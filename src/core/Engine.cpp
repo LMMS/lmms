@@ -35,6 +35,7 @@
 #include "PluginFactory.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include "InstrumentFunctions.h"
 
 #include "GuiApplication.h"
 
@@ -46,6 +47,8 @@ Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
+
+ChordTable * LmmsCore::s_chordTable = NULL;
 
 
 
@@ -66,6 +69,8 @@ void LmmsCore::init( bool renderOnly )
 	s_bbTrackContainer = new BBTrackContainer;
 
 	s_ladspaManager = new Ladspa2LMMS;
+
+	s_chordTable = new ChordTable(NULL);
 
 	s_projectJournal->setJournalling( true );
 
