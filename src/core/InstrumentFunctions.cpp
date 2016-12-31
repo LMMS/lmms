@@ -665,8 +665,8 @@ void Chord::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 //ZA VIDIT, TLE KAJ NE BO SLO
 void Chord::loadSettings(const QDomElement &_this)
 {
-	m_name=_this.attribute("name");
 	QDomElement chords=_this.firstChild().toElement();
+	m_name=chords.attribute("name");
 	m_chordSemiTones->loadSettings(chords);
 }
 
@@ -698,11 +698,37 @@ ChordTable::ChordTable(Model *_parent) :
 
 void ChordTable::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 {
+	Chord *chord;
+	for(int i=0;i<this->size();i++)
+	{
+		chord=this->at(i);
+		QDomElement chord_element = _doc.createElement( QString( "chord" ) );
+		_parent.appendChild( chord_element );
+		chord->saveSettings(_doc,chord_element);
+	}
+
 }
 
 void ChordTable::loadSettings(const QDomElement &_this)
 {
+	//clearing the vector
+	clear();
 
+	Chord *chord;
+
+	//getting the first chordsemitone data
+	QDomNode node = _this.firstChild();
+	while (!node.isNull())
+	{
+		QDomElement chord_element = node.toElement();
+		chord=new Chord(this);
+		chord->loadSettings(chord_element);
+
+		//storing the semitone
+		push_back(chord);
+
+		node = node.nextSibling();
+	}
 }
 
 bool ChordTable::readXML()
@@ -821,4 +847,10 @@ ChordTable *ChordTable::getInstance(Model *_parent)
 		instance=new ChordTable(_parent);
 	}
 	return instance;
+}
+
+void ChordTable::reset()
+{
+	clear();
+	readXML();
 }

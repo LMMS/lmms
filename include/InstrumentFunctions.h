@@ -190,59 +190,6 @@ public:
 		return "chordSemiTone";
 	}
 
-	/**
-	* Assignment of only the key
-	* @param a: the key to assign;
-	*/
-	inline int8_t operator=( int8_t a )
-	{
-		//			key = a;
-		key->setValue(a);
-		bare->setValue(true); // the note has only the key component, we discard all the rest
-		return a;
-	}
-
-	/**
-	* Comparison towards a ChordSemitone entity, checks for same key, vol, pan,
-	* active, silenced, bare
-	* @brief operator ==
-	* @param a
-	* @return
-	*/
-	inline bool operator==( ChordSemiTone a )
-	{
-		if (a.key == key && a.bare == bare && a.vol == vol && a.pan == pan &&
-				a.active == active && a.silenced == silenced)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
-	* Comparison towards int8_t integers (key), maintained compatibility with other
-	* modules
-	*
-	* @brief operator ==
-	* @param a
-	* @return
-	*/
-	inline bool operator==( int8_t a )
-	{
-		//			if (key == a)
-		if (key->value() == a)
-		{
-			return true;
-		}
-		return false;
-	}
-
-
-private:
-
 };
 
 
@@ -272,19 +219,6 @@ public:
 	{
 		return "chordSemiTones";
 	}
-
-	/**
-	* Compatibility towards other modules, return the int8_t key
-	* @brief operator []
-	* @param index
-	* @return
-	*/
-	int8_t inline operator[]( int index ) const
-	{
-		return at(index)->key->value(); // returns the key of the note
-	}
-
-
 
 };
 
@@ -335,7 +269,7 @@ public:
 
 	bool hasSemiTone( int8_t semiTone ) const;
 
-	const int8_t &last() const
+	int8_t last() const
 	{
 		return m_chordSemiTones->last()->key->value();
 	}
@@ -347,9 +281,8 @@ public:
 
 	int8_t operator[]( int n ) const
 	{
-		// recalling the ChordSemiTones overloaded operator [], which returns the
-		// key, for the sake of compatibility
-		return (*m_chordSemiTones)[n];
+		// returning the key
+		return m_chordSemiTones->at(n)->key->value();
 	}
 
 	const ChordSemiTones *getChordSemiTones() const
@@ -426,6 +359,11 @@ public:
 	static ChordTable *getInstance(Model *_parent);
 private:
 	static ChordTable *instance;
+
+public slots:
+
+	//reloads the chordtable from the file
+	void reset();
 
 };
 

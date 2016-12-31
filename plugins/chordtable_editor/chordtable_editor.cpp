@@ -153,12 +153,18 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 
 	QPushButton *button1 = new QPushButton(tr("New chord"));
 	QPushButton *button2 = new QPushButton(tr("Delete chord"));
+	QPushButton *button3 = new QPushButton(tr("Reset chords"));
+
+	connect(button3, SIGNAL (clicked()), this, SLOT (reset()));
 
 	//adding combo and button
 	upperLayout->addWidget(m_chordsComboBox);
 	upperLayout->addStretch();
+	upperLayout->addWidget(button3);
 	upperLayout->addWidget(button2);
 	upperLayout->addWidget(button1);
+
+
 
 	//the lower area
 	 QWidget *lowerWidget=new QWidget(this);
@@ -254,7 +260,6 @@ void chordtableEditorView::loadChord()
 	//adding the widgets from the menu
 
 	ChordSemiTone *m_chordSemiTone;
-
 	for (int i=0;i<m_Chord->getChordSemiTones()->size();i++)
 	{
 		m_chordSemiTone=m_Chord->getChordSemiTones()->at(i);
@@ -263,6 +268,12 @@ void chordtableEditorView::loadChord()
 //		lowerInsideLayout->addWidget(m_chordNoteWidget);
 		m_chordsWidgetLayout->addWidget(m_chordNoteWidget);
 	}
+}
+
+void chordtableEditorView::reset()
+{
+	m_chordTableEditor->m_chordTable->reset();
+	loadChord();
 }
 
 chordtableEditorView::~chordtableEditorView()
@@ -286,7 +297,7 @@ chordNoteModel::chordNoteModel(Model *_parent, ChordSemiTone *_semiTone) :
 
 //NON SEMBRA CAMBIARE I DATI DELLA CHORDTABLE
 void chordNoteModel::changeData(){
-	ChordSemiTone *csm=m_semiTone;
+//	ChordSemiTone *csm=m_semiTone;
 }
 
 /*****************************************************************************************************

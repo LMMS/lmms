@@ -59,10 +59,10 @@ private:
 	GroupBox * m_chordsGroupBox;
 	ComboBox * m_chordsComboBox;
 	Knob * m_chordRangeKnob;
-	//the button to open the chord table editor
-	PixmapButton * m_openeditorBtn;
-	//the plugin View
-	PluginView * m_chordTableEditorView;
+//	//the button to open the chord table editor
+//	PixmapButton * m_openeditorBtn;
+//	//the plugin View
+//	PluginView * m_chordTableEditorView;
 
 private slots:
 	//The open editor button action

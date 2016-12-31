@@ -135,6 +135,7 @@ public:
 public slots:
 	//loads the chord into the widget
 	void loadChord();
+	void reset();
 
 private:
 
@@ -157,6 +158,8 @@ private:
 
 	//The combobox of the available chord combinations
 	ComboBox * m_chordsComboBox;
+
+
 
 } ;
 
