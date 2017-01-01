@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -59,7 +59,7 @@ Plugin::Descriptor PLUGIN_EXPORT chordtableeditor_plugin_descriptor =
 	STRINGIFY( PLUGIN_NAME ),
 	"ChordTable Plugin Editor",
 	QT_TRANSLATE_NOOP( "ChordTable Editor",
-				"Edits the Chordtable" ),
+	"Edits the Chordtable" ),
 	"Riki SLuga <jaz/at/rikis/dot/net>",
 	0x0100,
 	Plugin::Tool,
@@ -151,10 +151,11 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	//Connecting the changing of data to the combobox
 	connect(m_chordTableEditor->m_chordsModel,SIGNAL(dataChanged()),this,SLOT(loadChord()));
 
-	QPushButton *button1 = new QPushButton(tr("New chord"));
+	QPushButton *button1 = new QPushButton(tr("Add SemiTone"));
 	QPushButton *button2 = new QPushButton(tr("Delete chord"));
 	QPushButton *button3 = new QPushButton(tr("Reset chords"));
 
+	connect(button1, SIGNAL (clicked()), this, SLOT (addChordSemiTone()));
 	connect(button3, SIGNAL (clicked()), this, SLOT (reset()));
 
 	//adding combo and button
@@ -164,60 +165,56 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	upperLayout->addWidget(button2);
 	upperLayout->addWidget(button1);
 
-
-
 	//the lower area
-	 QWidget *lowerWidget=new QWidget(this);
-	 lowerWidget->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-//	 lowerWidget->setMinimumSize(500,350);
+	QWidget *lowerWidget=new QWidget(this);
+	//	 lowerWidget->setMinimumSize(540,400);
 
-	 QHBoxLayout *lowerWidgetLayout=new QHBoxLayout(lowerWidget);
-	 lowerWidget->setLayout(lowerWidgetLayout);
-	 lowerWidget->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+	QHBoxLayout *lowerWidgetLayout=new QHBoxLayout(lowerWidget);
+	lowerWidget->setLayout(lowerWidgetLayout);
 
-	 //the lower widget scroll area
-	 m_scrollArea = new QScrollArea(lowerWidget);
-//	 m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-//	 m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
-//	 m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
-//	 m_scrollArea->setFrameStyle( QFrame::NoFrame );
+	//the lower widget scroll area
+	m_scrollArea = new QScrollArea(lowerWidget);
+	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
+	m_scrollArea->setFrameStyle( QFrame::NoFrame );
+	lowerWidgetLayout->addWidget(m_scrollArea);
 
-	 lowerWidgetLayout->addWidget(m_scrollArea);
-	 QHBoxLayout *scrollLayout= new QHBoxLayout(m_scrollArea);
-	 m_scrollArea->setLayout(scrollLayout);
+	//The widget inside the scroll area
+	m_chordsWidget = new QWidget(m_scrollArea);
+	m_scrollArea->setWidget(m_chordsWidget);
+
+	m_chordsWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+	//	 m_chordsWidget->setStyleSheet("background-color:#f00;");
+	//	 m_chordsWidget->setMinimumSize(20,20);
+	//	 m_chordsWidgetLayout->setSizeConstraint(QLayout::SetMaximumSize);
+	m_chordsWidgetLayout= new QHBoxLayout;
+
+	m_chordsWidgetLayout->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
+	m_chordsWidgetLayout->setSpacing(4);
+	m_chordsWidgetLayout->setMargin(0);
+	m_chordsWidgetLayout->setSizeConstraint(QLayout::SetFixedSize);
 
 
-
-	 //The widget inside the scroll area
-	 m_chordsWidget = new QWidget(m_scrollArea);
-	 m_chordsWidget->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-
-	 scrollLayout->addWidget(m_chordsWidget);
-
-	 m_chordsWidgetLayout= new QHBoxLayout(m_chordsWidget);
-	 m_chordsWidgetLayout->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
-//	 lowerLayout->setSizeConstraint( QLayout::SetMinimumSize );
-//	 lowerLayout->setSpacing( 0 );
-//	 lowerLayout->setMargin( 0 );
-	 m_chordsWidget->setLayout(m_chordsWidgetLayout);
+	m_chordsWidget->setLayout(m_chordsWidgetLayout);
 
 	//the first node de prova!!
-	 loadChord();
+	loadChord();
 
 	//setting the main layout
-	 topLayout->addWidget(upperWidget);
-//	 topLayout->addStretch();
-	 topLayout->addWidget(lowerWidget);
+	topLayout->addWidget(upperWidget);
+	//	 topLayout->addStretch();
+	topLayout->addWidget(lowerWidget);
 
-//--------------
+	//--------------
 
 
 
 	setWhatsThis( tr(
-"This dialog displays information on all of the LADSPA plugins LMMS was "
-"able to locate. The plugins are divided into five categories based "
-"upon an interpretation of the port types and names.\n\n"
-) );
+									"This dialog displays information on all of the LADSPA plugins LMMS was "
+									"able to locate. The plugins are divided into five categories based "
+									"upon an interpretation of the port types and names.\n\n"
+									) );
 
 
 	hide();
@@ -225,10 +222,10 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	{
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(QLayout::SetDefaultConstraint );
-		parentWidget()->setMinimumSize(500,400);
+		parentWidget()->setMinimumSize(580,430);
 		
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
-//		flags |= Qt::MSWindowsFixedSizeDialogHint;
+		//		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		flags &= ~Qt::WindowMaximizeButtonHint;
 		parentWidget()->setWindowFlags( flags );
 	}
@@ -239,40 +236,70 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 
 void chordtableEditorView::loadChord()
 {
+
 	//taking selected value from the comboboxmodel
 	int i= m_chordTableEditor->m_chordsModel->value();
 	//getting the address of the selected chord
 	m_Chord=m_chordTableEditor->m_chordTable->at(i);
 
-	//Deleting all the widgets of the layout Qt4 style
-//	QLayoutItem *wItem;
-//	while ((wItem = m_chordsWidget->layout()->takeAt(0)) != 0)
-//	{
-//		m_chordsWidget->layout()->removeItem(wItem);
-//		delete wItem;
-//	}
+	//connects changes to chord structure to reloading this view by recalling this function;
+	connect(m_Chord,SIGNAL(emitStructureEdited()),this,SLOT(loadChord()));
 
 	//Deleting all the widgets of the layout - Qt5 style
+
 	m_chordsWidget->setUpdatesEnabled(false);
-	qDeleteAll(m_chordsWidget->findChildren<QWidget*>("", Qt::FindDirectChildrenOnly));
+	QList<QWidget*> widgets= m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly);
+	foreach(QWidget * widget, widgets)
+	{
+		m_chordsWidgetLayout->removeWidget(widget);
+		delete widget;
+	}
+
+//	qDeleteAll(m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly));
 	m_chordsWidget->setUpdatesEnabled(true);
 
 	//adding the widgets from the menu
 
 	ChordSemiTone *m_chordSemiTone;
+	chordNoteModel *m_chordNoteModel;
+	chordNoteWidget *m_chordNoteWidget;
 	for (int i=0;i<m_Chord->getChordSemiTones()->size();i++)
 	{
 		m_chordSemiTone=m_Chord->getChordSemiTones()->at(i);
-		chordNoteModel *m_chordNoteModel= new chordNoteModel(m_chordTableEditor, m_chordSemiTone);
-		chordNoteWidget *m_chordNoteWidget= new chordNoteWidget(m_chordNoteModel,this);
-//		lowerInsideLayout->addWidget(m_chordNoteWidget);
+		m_chordNoteModel= new chordNoteModel(m_chordTableEditor, m_chordSemiTone,i);
+		m_chordNoteWidget= new chordNoteWidget(m_chordNoteModel,m_chordsWidget);
+		//Connects the nested delete pushbutton to the remove chordnote slot
+		connect(m_chordNoteWidget,SIGNAL(emitDeletePosition(int)),this,SLOT(removeSemiTone(int)));
+		//Connects the nested clone pushbutton to the clone the chordnote
+		connect(m_chordNoteWidget,SIGNAL(emitClonePosition(int)),this,SLOT(cloneSemiTone(int)));
+		//		lowerInsideLayout->addWidget(m_chordNoteWidget);
 		m_chordsWidgetLayout->addWidget(m_chordNoteWidget);
 	}
+	m_chordsWidget->adjustSize();
 }
 
 void chordtableEditorView::reset()
 {
 	m_chordTableEditor->m_chordTable->reset();
+	loadChord();
+}
+
+void chordtableEditorView::removeSemiTone(int i)
+{
+	m_Chord->removeSemiTone(i);
+	loadChord();
+}
+
+void chordtableEditorView::addChordSemiTone()
+{
+	m_Chord->addSemiTone();
+	loadChord();
+}
+
+void chordtableEditorView::cloneSemiTone(int i)
+{
+	ChordSemiTone *cst = new ChordSemiTone(m_Chord->at(i));
+	m_Chord->insertSemiTone(cst,i);
 	loadChord();
 }
 
@@ -287,18 +314,28 @@ chordtableEditorView::~chordtableEditorView()
  *
 ******************************************************************************************************/
 
-chordNoteModel::chordNoteModel(Model *_parent, ChordSemiTone *_semiTone) :
-	Model(_parent)
+chordNoteModel::chordNoteModel(Model *_parent, ChordSemiTone *_semiTone,int _position) :
+	Model(_parent),
+	m_semiTone(_semiTone),
+	m_position(_position)
 {
-	m_semiTone=_semiTone;
-	connect(_semiTone->key,SIGNAL(dataChanged()),this,SLOT(changeData()));
-	connect(_semiTone->vol,SIGNAL(dataChanged()),this,SLOT(changeData()));
+	//	connect(_semiTone->key,SIGNAL(dataChanged()),this,SLOT(changeData()));
+	//	connect(_semiTone->vol,SIGNAL(dataChanged()),this,SLOT(changeData()));
+}
+
+//the position of the semitone in the semitones vector
+int chordNoteModel::position() const
+{
+	return m_position;
+}
+
+void chordNoteModel::setPosition(int position)
+{
+	m_position = position;
 }
 
 //NON SEMBRA CAMBIARE I DATI DELLA CHORDTABLE
-void chordNoteModel::changeData(){
-//	ChordSemiTone *csm=m_semiTone;
-}
+
 
 /*****************************************************************************************************
  *
@@ -311,51 +348,60 @@ chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 	ModelView(_model,_parent),
 	m_chordNoteModel( castModel<chordNoteModel>() )
 {
+	setObjectName(QStringLiteral("chordNoteWidget"));
+	//the position in the vector
+	m_position=m_chordNoteModel->position();
+	setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
+
 	QVBoxLayout *m_vLayout= new QVBoxLayout(this);
+	m_vLayout->setSizeConstraint(QLayout::SetFixedSize);
 	setLayout(m_vLayout);
+//	setFixedSize(100,290);
+
+	m_vLayout->setSizeConstraint(QLayout::SetMaximumSize);
+
 
 	QFrame *frame=new QFrame;
 	frame->setFrameStyle(QFrame::Panel | QFrame::Raised);
 	frame->setLineWidth(2);
-	frame->setMinimumWidth(62);
-	frame->setMinimumHeight(250);
+	//	frame->setMinimumWidth(100);
+	//	frame->setMinimumHeight(280);
 
 	m_vLayout->addWidget(frame);
 
 	QGridLayout* gridLayout = new QGridLayout( frame );
 	gridLayout->setAlignment(Qt::AlignHCenter);
-//	gridLayout->setContentsMargins( 8, 18, 8, 8 );
-//	gridLayout->setRowStretch( 4, 3);
-//	gridLayout->setColumnStretch(0,2);
-gridLayout->setHorizontalSpacing( 10 );
-gridLayout->setVerticalSpacing( 10 );
+	//	gridLayout->setContentsMargins( 8, 18, 8, 8 );
+	//	gridLayout->setRowStretch( 4, 3);
+	//	gridLayout->setColumnStretch(0,2);
+	gridLayout->setHorizontalSpacing( 10 );
+	gridLayout->setVerticalSpacing( 10 );
 
 	frame->setLayout(gridLayout);
 
-
-	setAutoFillBackground( true );
+	//	setAutoFillBackground( true );
 	setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 
 
 	m_volumeKnob = new Knob( knobDark_28, this );
 	m_volumeKnob->setLabel( tr( "Volume" ) );
 	m_volumeKnob->setModel(m_chordNoteModel->m_semiTone->vol);
-//	m_volumeKnob->move( 27, 5 );
+	//	m_volumeKnob->move( 27, 5 );
 	m_volumeKnob->setEnabled( true );
 	m_volumeKnob->setHintText( tr( "Volume knob:" ), "" );
 	m_volumeKnob->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
-					"the input signal and the effect signal that "
-					"forms the output." ) );
+																	"the input signal and the effect signal that "
+																	"forms the output." ) );
 
 	m_panKnob = new Knob( knobDark_28, this );
 	m_panKnob->setLabel( tr( "Panning" ) );
 	m_panKnob->setModel(m_chordNoteModel->m_semiTone->pan);
-//	m_panKnob->move( 27, 5 );
+	//	m_panKnob->move( 27, 5 );
 	m_panKnob->setEnabled( true );
 	m_panKnob->setHintText( tr( "Panning knob:" ), "" );
 	m_panKnob->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
-					"the input signal and the effect signal that "
-					"forms the output." ) );
+															 "the input signal and the effect signal that "
+															 "forms the output." ) );
 
 	//----------------
 	m_keySlider = new AutomatableSlider( this, tr( "Key note" ) );
@@ -399,13 +445,6 @@ gridLayout->setVerticalSpacing( 10 );
 	QLabel* m_bareLabel = new QLabel( tr( "Bar.:" ) );
 	m_bareLabel->setFont( pointSize<8>( m_bareLabel->font() ) );
 
-
-//	connect( m_keySlider, SIGNAL( sliderPressed() ), this,
-//			SLOT( showMasterVolumeFloat()) );
-//	connect( m_keySlider, SIGNAL( logicSliderMoved( int ) ), this,
-//			SLOT( updateMasterVolumeFloat( int ) ) );
-//	connect( m_keySlider, SIGNAL( sliderReleased() ), this,
-//			SLOT( hideMasterVolumeFloat() ) );
 	//----------------
 
 
@@ -423,6 +462,34 @@ gridLayout->setVerticalSpacing( 10 );
 	gridLayout->addWidget(m_bareLabel,6,0,1,1,Qt::AlignCenter);
 	gridLayout->addWidget(m_bareLed,6,1,1,1,Qt::AlignCenter);
 
+	//Connect it while instantiating this class!!
+	m_cloneButton = new QPushButton(tr("Clone"));
+	m_cloneButton->setWhatsThis( tr("Clones the SemiTone"));
+	ToolTip::add( m_cloneButton, tr( "Clones the SemiTone" ) );
+	//connects the pushBUtton to emitting position signal
+	connect(m_cloneButton,SIGNAL(clicked()),this,SLOT(emitClonePosition()));
+
+	gridLayout->addWidget(m_cloneButton,7,0,1,2,Qt::AlignCenter);
+
+	//the first widget is the one
+	m_delButton = new QPushButton(tr("Del"));
+	m_delButton->setParent(this);
+
+	if ( m_position == 0 )
+	{
+		m_delButton->setEnabled(false);
+		m_delButton->setWhatsThis( tr("Delete disabled for base note"));
+		ToolTip::add( m_delButton, tr( "Delete disabled for base note" ) );
+	}
+	else
+	{
+		m_delButton->setWhatsThis( tr("Deletes the SemiTone"));
+		ToolTip::add( m_delButton, tr( "Deletes the SemiTone" ) );
+		//connects the pushBUtton to emitting position signal
+		connect(m_delButton,SIGNAL(clicked()),this,SLOT(emitDeletePosition()));
+	}
+	gridLayout->addWidget(m_delButton,8,0,1,2,Qt::AlignCenter);
+
 }
 
 
@@ -433,5 +500,17 @@ void chordNoteWidget::setKeyLabel(int i)
 		m_keyLcd->setValue(i);
 		m_keyLcd->update();
 	}
+}
+
+
+
+int chordNoteWidget::position() const
+{
+	return m_position;
+}
+
+void chordNoteWidget::setPosition(int position)
+{
+	m_position = position;
 }
 

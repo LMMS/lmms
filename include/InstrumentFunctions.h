@@ -28,8 +28,6 @@
 #include <QStringList>
 
 #include "ConfigManager.h"
-
-#include "Model.h"
 #include "volume.h"
 #include "panning.h"
 
@@ -46,7 +44,7 @@ class Model;
 class ChordTable;
 
 //new constants for key notes in arpeggios, used by the Int Automated model
-const int KeyMax = ( 0 + 20 );
+const int KeyMax = ( 0 + 30 );
 const int KeyMin = - KeyMax;
 const int KeyDefault = 0;
 
@@ -76,6 +74,7 @@ public:
 	}
 
 private:
+
 	ChordTable *m_chordTable;
 	BoolModel m_chordsEnabledModel;
 	ComboBoxModel m_chordsModel;
@@ -159,20 +158,19 @@ class ChordSemiTone : public Model , public JournallingObject
 	Q_OBJECT
 public:
 
-	IntModel *key = new IntModel(KeyDefault,KeyMin,KeyMax,NULL,"Key"); //  the semitone
-	FloatModel *vol = new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, NULL, tr( "Volume" ) ); // its volume : in percentage of the volume, from 0% (silence)
-	// to 200% or more, to emboss volume. No control for high volumes yet;
-	FloatModel *pan = new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, NULL, tr( "Panning" )); // the panning from -100 to +100
-
-	BoolModel *active= new BoolModel(true,NULL,tr("Active")); // the note is played -> true: yes, false: skipped
-	BoolModel *silenced= new BoolModel(true,NULL,tr("Silenced")); // the note is processed but silenced -> true: normally
-	// played, false: muted
-	BoolModel *bare= new BoolModel(true,NULL,tr("Bare")); // The note only has the key value. True: bare, we will
-	// discard al the rest, taking data from the base note
-	// false: the note has all data, volume, panning, silenced...
-
+	IntModel *key; //  the semitone
+	FloatModel *vol;
+	FloatModel *pan;
+	// the note is played -> true: yes, false: skipped
+	BoolModel *active;
+	// the note is processed but silenced -> true: normally played, false: muted
+	BoolModel *silenced;
+	// The note only has the key value. True: bare, we will discard al the rest, taking data from the base note
+	BoolModel *bare;
 
 	ChordSemiTone(Model *_parent);
+
+	ChordSemiTone(ChordSemiTone *_copy);
 
 	//constructs the object from a given string by calling the parseString function
 	ChordSemiTone(Model *_parent,QString _string);
@@ -302,15 +300,32 @@ public:
 	* @param i
 	* @return
 	*/
-	const ChordSemiTone *at( int i ) const
-	{
-		return m_chordSemiTones->at( i ); // The note
-	}
+//	const ChordSemiTone *at( int i ) const
+//	{
+//		return m_chordSemiTones->at( i ); // The note
+//	}
 
 	ChordSemiTone *at( int i )
 	{
 		return m_chordSemiTones->at( i ); // The note
 	}
+
+	//Adds at the end a standard semitone
+	void addSemiTone();
+
+	//inserts the semitone in the stated position
+	void insertSemiTone(ChordSemiTone *csm, int position);
+
+	//deletes the semitone
+	void removeSemiTone(int i);
+	//deletes the semitone
+	void removeSemiTone(ChordSemiTone *csm);
+
+signals:
+
+	//whenever a semitone is added/deleted
+	void emitStructureEdited();
+
 
 };
 

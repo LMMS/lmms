@@ -35,6 +35,7 @@
 #include "InstrumentFunctions.h"
 
 class ComboBox;
+class QPushButton;
 class QScrollArea;
 class Knob;
 class AutomatableSlider;
@@ -69,10 +70,41 @@ public:
 	LedCheckBox *m_silencedLed;
 	LedCheckBox *m_bareLed;
 
+	QPushButton *m_delButton;
+	QPushButton *m_cloneButton;
+
+
+	//the position of the semitone in the vector
+	int position() const;
+	void setPosition(int position);
+
 public slots:
 
 	//changes m_keyLCD value
 	void setKeyLabel(int i);
+
+	//emits the position of the semitone in the vector
+	void emitDeletePosition()
+	{
+		emit emitDeletePosition(m_position);
+	}
+
+	//emits the position of the semitone in the vector
+	void emitClonePosition()
+	{
+		emit emitClonePosition(m_position);
+	}
+
+private:
+
+	//the position of the semitone in the vector
+	int m_position;
+
+signals:
+
+	//emits the positions of the semitone in the vector when edited/pushed etc..
+	void emitDeletePosition(int i);
+	void emitClonePosition(int i);
 
 };
 
@@ -86,7 +118,7 @@ class chordNoteModel : public Model
 {
 	Q_OBJECT
 public:
-	chordNoteModel(Model *_parent, ChordSemiTone *_semiTone);
+	chordNoteModel(Model *_parent, ChordSemiTone *_semiTone, int _position);
 	~chordNoteModel(){}
 
 	virtual chordNoteWidget * instantiateView( QWidget * _parent)
@@ -109,10 +141,13 @@ public:
 	//The chordsemitone it's referring to
 	ChordSemiTone *m_semiTone;
 
-public slots:
-	//transfer model data to the m_semiTone
-	void changeData();
+	int position() const;
+	void setPosition(int position);
 
+private:
+
+	//the position in the vector if there's one, -1 if not present
+	int m_position;
 
 } ;
 
@@ -135,7 +170,12 @@ public:
 public slots:
 	//loads the chord into the widget
 	void loadChord();
+	//loads the preset chordtable
 	void reset();
+	//removes the semitone which sent the signal
+	void removeSemiTone(int i);
+	void addChordSemiTone();
+	void cloneSemiTone(int i);
 
 private:
 
@@ -194,9 +234,6 @@ public:
 	}
 
 	ChordTable * m_chordTable;
-
-	//single chord notes
-	QList <chordNoteModel> * m_notes;
 
 	ComboBoxModel * m_chordsModel;
 

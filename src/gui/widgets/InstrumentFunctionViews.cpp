@@ -86,43 +86,11 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 //	mainLayout->addWidget( m_openeditorBtn, 2, 0);
 }
 
-//the edit button action
-void InstrumentFunctionNoteStackingView::editButtonPressed()
-{
-	//m_cc=InstrumentFunctionNoteStacking
-//	if (m_chordTableEditorView==NULL)
-//	{
-//		m_chordTableEditorView = ToolPlugin::instantiate( "chordtableeditor", m_cc )
-//														 ->createView(this);
-//	}
-//	m_cc->loadChordTable();
-
-//	m_chordTableEditorView->show();
-//	m_chordTableEditorView->parentWidget()->show();
-//	m_chordTableEditorView->setFocus();
-
-	PluginView *mc=ToolPlugin::instantiate( "chordtableeditor", m_cc )
-								 ->createView(this);
-	mc->show();
-	mc->parentWidget()->show();
-	mc->setFocus();
-
-
-	//chordtableEditor cte(m_cc);
-
-	//PluginView *rc = ctt.instantiateView(NULL);
-	//rc->activateWindow();
-
-}
-
 
 InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
 {
 	delete m_chordsGroupBox;
 }
-
-
-
 
 void InstrumentFunctionNoteStackingView::modelChanged()
 {

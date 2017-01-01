@@ -27,8 +27,6 @@
 
 #include "ModelView.h"
 
-#include "ToolPluginView.h"
-
 #include <QWidget>
 
 class QLabel;
@@ -36,7 +34,6 @@ class ComboBox;
 class GroupBox;
 class Knob;
 class TempoSyncKnob;
-class PixmapButton;
 
 class InstrumentFunctionArpeggio;
 class InstrumentFunctionNoteStacking;
@@ -59,14 +56,8 @@ private:
 	GroupBox * m_chordsGroupBox;
 	ComboBox * m_chordsComboBox;
 	Knob * m_chordRangeKnob;
-//	//the button to open the chord table editor
-//	PixmapButton * m_openeditorBtn;
-//	//the plugin View
-//	PluginView * m_chordTableEditorView;
 
 private slots:
-	//The open editor button action
-	void editButtonPressed();
 
 } ;
 

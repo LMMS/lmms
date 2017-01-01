@@ -512,13 +512,42 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
  *
 ******************************************************************************************************/
 ChordSemiTone::ChordSemiTone(Model *_parent) :
-	Model(_parent)
+	Model(_parent),
+	key( new IntModel(KeyDefault,KeyMin,KeyMax,_parent,"Key")),
+	vol(new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume" ) )),
+	pan(new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning" ))),
+	active( new BoolModel(true,_parent,tr("Active"))),
+	silenced(new BoolModel(true,_parent,tr("Silenced"))),
+	bare( new BoolModel(true,_parent,tr("Bare")))
 {
 
 }
 
+ChordSemiTone::ChordSemiTone(ChordSemiTone *_copy) :
+	Model( _copy->parentModel()),
+	key( new IntModel(KeyDefault,KeyMin,KeyMax,_copy->parentModel(),"Key")),
+	vol(new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, _copy->parentModel(), tr( "Volume" ) )),
+	pan(new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _copy->parentModel(), tr( "Panning" ))),
+	active( new BoolModel(true,_copy->parentModel(),tr("Active"))),
+	silenced(new BoolModel(true,_copy->parentModel(),tr("Silenced"))),
+	bare( new BoolModel(true,_copy->parentModel(),tr("Bare")))
+{
+	key->setValue(_copy->key->value());
+	vol->setValue(_copy->vol->value());
+	pan->setValue(_copy->pan->value());
+	active->setValue(_copy->active->value());
+	silenced->setValue(_copy->silenced->value());
+	bare->setValue(_copy->bare->value());
+}
+
 ChordSemiTone::ChordSemiTone(Model *_parent, QString _string) :
-	Model(_parent)
+	Model(_parent),
+	key( new IntModel(KeyDefault,KeyMin,KeyMax,_parent,"Key")),
+	vol(new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume" ) )),
+	pan(new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning" ))),
+	active( new BoolModel(true,_parent,tr("Active"))),
+	silenced(new BoolModel(true,_parent,tr("Silenced"))),
+	bare( new BoolModel(true,_parent,tr("Bare")))
 {
 	//populates data from string
 	parseString(_string);
@@ -680,6 +709,35 @@ bool Chord::hasSemiTone(int8_t semiTone) const
 		}
 	}
 	return false;
+}
+
+
+void Chord::addSemiTone()
+{
+	ChordSemiTone *csm=new ChordSemiTone(m_chordSemiTones);
+	m_chordSemiTones->push_back(csm);
+
+	//signals the structure has changed
+	//	emit emitStructureEdited();
+}
+
+void Chord::insertSemiTone(ChordSemiTone *csm, int position)
+{
+	m_chordSemiTones->insert(position,csm);
+}
+
+void Chord::removeSemiTone(int i)
+{
+	m_chordSemiTones->removeAt(i);
+	//signals the structure has changed
+	//	emit emitStructureEdited();
+}
+
+void Chord::removeSemiTone(ChordSemiTone *csm)
+{
+	m_chordSemiTones->removeOne(csm);
+	//signals the structure has changed
+	//	emit emitStructureEdited();
 }
 
 /*****************************************************************************************************

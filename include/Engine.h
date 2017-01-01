@@ -117,6 +117,7 @@ public:
 	{
 		return s_chordTable;
 	}
+
 signals:
 	void initProgress(const QString &msg);
 
