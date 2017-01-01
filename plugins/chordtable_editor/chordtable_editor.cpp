@@ -46,11 +46,13 @@
 #include "ToolTip.h"
 #include "LcdWidget.h"
 #include "LedCheckbox.h"
-#include "SongEditor.h"
 #include "GuiApplication.h"
 #include "Engine.h"
+#include "SongEditor.h"
 
 #include "embed.cpp"
+
+class Song;
 
 extern "C"
 {
