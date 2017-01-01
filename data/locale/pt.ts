@@ -167,7 +167,7 @@ Esteban Viveros</translation>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>Bom este botão você pode aumentar a proporção.Quando você coloca um valor de 100% sua amostra não mudará. De outro maneira ela será amplificada para mais ou para menos (o arquivo original da amostra não será modificado!)</translation>
+        <translation>Com este botão você pode aumentar a proporção.Quando você coloca um valor de 100% sua amostra não mudará. De outro maneira ela será amplificada para mais ou para menos (o arquivo original da amostra não será modificado!)</translation>
     </message>
     <message>
         <source>Disable loop</source>
