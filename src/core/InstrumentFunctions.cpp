@@ -718,7 +718,7 @@ void Chord::insertSemiTone(ChordSemiTone *csm, int position)
 
 void Chord::removeSemiTone(int i)
 {
-	m_chordSemiTones->removeAt(i);
+	m_chordSemiTones->remove(i);
 	//signals the structure has changed
 	//	emit emitStructureEdited();
 }
@@ -849,6 +849,11 @@ bool ChordTable::readXML()
 		push_back(m_chord);
 	}
 	return true;
+}
+
+void ChordTable::saveXML()
+{
+
 }
 
 const Chord &ChordTable::getByName(const QString &name, bool is_scale) const

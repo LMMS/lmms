@@ -360,6 +360,7 @@ public:
 	 * @brief readXML
 	 */
 	bool readXML();
+	void saveXML();
 
 	const Chord &getByName( const QString & name, bool is_scale = false ) const;
 	Chord &getByName( const QString & name, bool is_scale = false );
