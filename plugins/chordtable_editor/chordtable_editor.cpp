@@ -27,7 +27,6 @@
 
 #include "chordtable_editor.h"
 
-
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QGroupBox>
@@ -35,7 +34,6 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 
-#include "Engine.h"
 #include "gui_templates.h"
 #include "Knob.h"
 #include "TabBar.h"
@@ -48,6 +46,9 @@
 #include "ToolTip.h"
 #include "LcdWidget.h"
 #include "LedCheckbox.h"
+#include "SongEditor.h"
+#include "GuiApplication.h"
+#include "Engine.h"
 
 #include "embed.cpp"
 
@@ -170,6 +171,7 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	//	 lowerWidget->setMinimumSize(540,400);
 
 	QHBoxLayout *lowerWidgetLayout=new QHBoxLayout(lowerWidget);
+//	lowerWidgetLayout->setSizeConstraint(QLayout::SetFixedSize);
 	lowerWidget->setLayout(lowerWidgetLayout);
 
 	//the lower widget scroll area
@@ -201,6 +203,9 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	//the first node de prova!!
 	loadChord();
 
+	lowerWidget->setMinimumHeight(m_chordsWidget->height()+20);
+
+
 	//setting the main layout
 	topLayout->addWidget(upperWidget);
 	//	 topLayout->addStretch();
@@ -222,8 +227,10 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	{
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(QLayout::SetDefaultConstraint );
-		parentWidget()->setMinimumSize(580,430);
-		
+//		parentWidget()->setMinimumSize(600,500);
+		parentWidget()->adjustSize();
+		parentWidget()->setMinimumWidth(500);
+
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		//		flags |= Qt::MSWindowsFixedSizeDialogHint;
 		flags &= ~Qt::WindowMaximizeButtonHint;
@@ -280,12 +287,14 @@ void chordtableEditorView::loadChord()
 
 void chordtableEditorView::reset()
 {
+	Engine::getSong()->stop();
 	m_chordTableEditor->m_chordTable->reset();
 	loadChord();
 }
 
 void chordtableEditorView::removeSemiTone(int i)
 {
+	Engine::getSong()->stop();
 	m_Chord->removeSemiTone(i);
 	loadChord();
 }

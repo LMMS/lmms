@@ -57,13 +57,9 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 	}
 }
 
-
-
-
 InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
 {
 }
-
 
 void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n ) 
 {
@@ -150,16 +146,12 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 	}
 }
 
-
 void InstrumentFunctionNoteStacking::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	m_chordsEnabledModel.saveSettings( _doc, _this, "chord-enabled" );
 	m_chordsModel.saveSettings( _doc, _this, "chord" );
 	m_chordRangeModel.saveSettings( _doc, _this, "chordrange" );
 }
-
-
-
 
 void InstrumentFunctionNoteStacking::loadSettings( const QDomElement & _this )
 {
@@ -168,17 +160,11 @@ void InstrumentFunctionNoteStacking::loadSettings( const QDomElement & _this )
 	m_chordRangeModel.loadSettings( _this, "chordrange" );
 }
 
-
-
-
-
 /*****************************************************************************************************
  *
  * The InstrumentFunctionArpeggio class
  *
 ******************************************************************************************************/
-
-
 InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	Model( _parent, tr( "Arpeggio" ) ),
 	m_arpEnabledModel( false ),
@@ -209,7 +195,6 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );
 	m_arpModeModel.addItem( tr( "Sort" ), new PixmapLoader( "arp_sort" ) );
 	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
-
 }
 
 
@@ -511,16 +496,25 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
  * The ChordSemiTone class
  *
 ******************************************************************************************************/
+QString ChordSemiTone::name() const
+{
+	return m_name;
+}
+
+void ChordSemiTone::setName(const QString &name)
+{
+	m_name = name;
+}
+
 ChordSemiTone::ChordSemiTone(Model *_parent) :
 	Model(_parent),
 	key( new IntModel(KeyDefault,KeyMin,KeyMax,_parent,"Key")),
 	vol(new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume" ) )),
 	pan(new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning" ))),
 	active( new BoolModel(true,_parent,tr("Active"))),
-	silenced(new BoolModel(true,_parent,tr("Silenced"))),
-	bare( new BoolModel(true,_parent,tr("Bare")))
+	silenced(new BoolModel(false,_parent,tr("Silenced"))),
+	bare( new BoolModel(false,_parent,tr("Bare")))
 {
-
 }
 
 ChordSemiTone::ChordSemiTone(ChordSemiTone *_copy) :
@@ -529,8 +523,8 @@ ChordSemiTone::ChordSemiTone(ChordSemiTone *_copy) :
 	vol(new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, _copy->parentModel(), tr( "Volume" ) )),
 	pan(new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _copy->parentModel(), tr( "Panning" ))),
 	active( new BoolModel(true,_copy->parentModel(),tr("Active"))),
-	silenced(new BoolModel(true,_copy->parentModel(),tr("Silenced"))),
-	bare( new BoolModel(true,_copy->parentModel(),tr("Bare")))
+	silenced(new BoolModel(false,_copy->parentModel(),tr("Silenced"))),
+	bare( new BoolModel(false,_copy->parentModel(),tr("Bare")))
 {
 	key->setValue(_copy->key->value());
 	vol->setValue(_copy->vol->value());
@@ -546,8 +540,8 @@ ChordSemiTone::ChordSemiTone(Model *_parent, QString _string) :
 	vol(new FloatModel(DefaultVolume,MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume" ) )),
 	pan(new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning" ))),
 	active( new BoolModel(true,_parent,tr("Active"))),
-	silenced(new BoolModel(true,_parent,tr("Silenced"))),
-	bare( new BoolModel(true,_parent,tr("Bare")))
+	silenced(new BoolModel(false,_parent,tr("Silenced"))),
+	bare( new BoolModel(false,_parent,tr("Bare")))
 {
 	//populates data from string
 	parseString(_string);
@@ -555,6 +549,7 @@ ChordSemiTone::ChordSemiTone(Model *_parent, QString _string) :
 
 void ChordSemiTone::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 {
+	_parent.setAttribute("C_name",m_name);
 	key->saveSettings(_doc,_parent,"key");
 	vol->saveSettings(_doc,_parent,"vol");
 	pan->saveSettings(_doc,_parent,"pan");
@@ -565,6 +560,7 @@ void ChordSemiTone::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 
 void ChordSemiTone::loadSettings(const QDomElement &_this)
 {
+	m_name=_this.attribute("C_name");
 	key->loadSettings(_this,"key");
 	vol->loadSettings(_this,"vol");
 	pan->loadSettings(_this,"pan");
@@ -593,7 +589,6 @@ void ChordSemiTone::parseString(QString _string)
 ChordSemiTones::ChordSemiTones(Model *_parent) :
 	Model(_parent)
 {
-
 }
 
 ChordSemiTones::ChordSemiTones(Model *_parent, QString _string) :
@@ -620,7 +615,6 @@ void ChordSemiTones::parseString(QString _string)
 	}
 }
 
-
 void ChordSemiTones::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 {
 	ChordSemiTone *cst;
@@ -632,7 +626,6 @@ void ChordSemiTones::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 		cst->saveSettings(_doc,semitone);
 	}
 }
-
 
 void ChordSemiTones::loadSettings(const QDomElement &_this)
 {
@@ -651,7 +644,6 @@ void ChordSemiTones::loadSettings(const QDomElement &_this)
 
 		//storing the semitone
 		push_back(cst);
-
 		node = node.nextSibling();
 	}
 }
@@ -666,7 +658,6 @@ Chord::Chord(Model *_parent) :
 	m_chordSemiTones( new ChordSemiTones(_parent)),
 	m_name("empty")
 {
-
 }
 
 Chord::Chord(Model *_parent, QString _name, QString _string) :
@@ -711,7 +702,6 @@ bool Chord::hasSemiTone(int8_t semiTone) const
 	return false;
 }
 
-
 void Chord::addSemiTone()
 {
 	ChordSemiTone *csm=new ChordSemiTone(m_chordSemiTones);
@@ -733,20 +723,11 @@ void Chord::removeSemiTone(int i)
 	//	emit emitStructureEdited();
 }
 
-void Chord::removeSemiTone(ChordSemiTone *csm)
-{
-	m_chordSemiTones->removeOne(csm);
-	//signals the structure has changed
-	//	emit emitStructureEdited();
-}
-
 /*****************************************************************************************************
  *
  * The ChordTable class
  *
 ******************************************************************************************************/
-
-
 ChordTable::ChordTable(Model *_parent) :
 	Model( _parent )
 {
@@ -764,7 +745,6 @@ void ChordTable::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 		_parent.appendChild( chord_element );
 		chord->saveSettings(_doc,chord_element);
 	}
-
 }
 
 void ChordTable::loadSettings(const QDomElement &_this)
@@ -893,7 +873,6 @@ Chord &ChordTable::getByName(const QString &name, bool is_scale)
 
 	static Chord empty(NULL);
 	return empty;
-
 }
 
 //Initializes the ChordTable instance as null

@@ -158,6 +158,10 @@ class ChordSemiTone : public Model , public JournallingObject
 	Q_OBJECT
 public:
 
+	//the name which propagates from the chord and position for automation
+	//TODO : to be implemented!!
+	QString m_name;
+
 	IntModel *key; //  the semitone
 	FloatModel *vol;
 	FloatModel *pan;
@@ -188,6 +192,8 @@ public:
 		return "chordSemiTone";
 	}
 
+	QString name() const;
+	void setName(const QString &name);
 };
 
 
@@ -318,8 +324,6 @@ public:
 
 	//deletes the semitone
 	void removeSemiTone(int i);
-	//deletes the semitone
-	void removeSemiTone(ChordSemiTone *csm);
 
 signals:
 
