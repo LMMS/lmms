@@ -456,7 +456,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * ( nom / den );
+	float ticksPerTact = DefaultTicksPerTact * nom / den;
 
 	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
@@ -565,8 +565,8 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			{
 				if( sTco->isPlaying() == false )
 				{
-					f_cnt_t sampleStart = ( _start * framesPerTick ) - ( sTco->startPosition() * framesPerTick );
-					f_cnt_t tcoFrameLength = ( sTco->endPosition() * framesPerTick ) - ( sTco->startPosition() * framesPerTick );
+					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
+					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
@@ -574,10 +574,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 					//we only play within the sampleBuffer limits
 					if( sampleStart < sTco->sampleBuffer()->frames() )
 					{
-					sTco->setSampleStartFrame( sampleStart );
-					sTco->setSamplePlayLength( samplePlayLength );
-					tcos.push_back( sTco );
-					sTco->setIsPlaying( true );
+						sTco->setSampleStartFrame( sampleStart );
+						sTco->setSamplePlayLength( samplePlayLength );
+						tcos.push_back( sTco );
+						sTco->setIsPlaying( true );
 					}
 				}
 			}
