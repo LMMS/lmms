@@ -67,6 +67,7 @@
 #endif
 
 
+#include <inttypes.h>
 #include <vector>
 #include <string>
 
@@ -711,6 +712,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
+#ifdef USE_LINUX_EMBEDDER
 static void assert_dup2( int oldfd, int newfd )
 {
 	if( dup2( oldfd, newfd ) == -1 )
@@ -719,6 +721,7 @@ static void assert_dup2( int oldfd, int newfd )
 		exit( EXIT_FAILURE );
 	}
 }
+#endif
 
 
 
@@ -838,7 +841,7 @@ void RemoteVstPlugin::initEditor()
 			close_check( outfd[1] );
 
 			char * widStr = new char[2 * sizeof m_windowID + 1];
-			sprintf( widStr, "%x", m_windowID );
+			sprintf( widStr, "%" PRIxPTR, m_windowID );
 			char * widthStr
 				= new char[2 * sizeof m_windowWidth + 1];
 			sprintf( widthStr, "%x", m_windowWidth );
@@ -867,8 +870,8 @@ void RemoteVstPlugin::initEditor()
 	char * commandLine = new char[sizeof EMBEDDER_NAME " " + strlen( name )
 		+ 1 + 2 * sizeof m_windowID + 1 + 2 * sizeof m_windowWidth + 1
 		+ 2 * sizeof m_windowHeight];
-	sprintf( commandLine, EMBEDDER_NAME " %s %x %x %x", name, m_windowID,
-						m_windowWidth, m_windowHeight );
+	sprintf( commandLine, EMBEDDER_NAME " %s %" PRIxPTR " %x %x", name,
+				m_windowID, m_windowWidth, m_windowHeight );
 
 	// Set up the pipes
 /*
