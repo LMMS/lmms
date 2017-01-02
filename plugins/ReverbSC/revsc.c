@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "soundpipe.h"
+#include "base.h"
+#include "revsc.h"
 
 #define DEFAULT_SRATE   44100.0
 #define MIN_SRATE       5000.0

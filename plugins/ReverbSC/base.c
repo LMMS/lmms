@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "soundpipe.h"
+#include "base.h"
 
 int sp_create(sp_data **spp)
 {

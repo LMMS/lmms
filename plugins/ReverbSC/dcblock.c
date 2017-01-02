@@ -11,7 +11,8 @@
  */
 
 #include <stdlib.h>
-#include "soundpipe.h"
+#include "base.h"
+#include "dcblock.h"
 
 int sp_dcblock_create(sp_dcblock **p)
 {
