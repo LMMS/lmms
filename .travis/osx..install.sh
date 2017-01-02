@@ -3,9 +3,9 @@
 PACKAGES="cmake pkgconfig fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node fltk"
 
 if [ $QT5 ]; then
-	PACKAGES="$PACKAGES qt55"
+	PACKAGES="$PACKAGES homebrew/versions/qt55"
 else
-	PACKAGES="$PACKAGES qt"
+	PACKAGES="$PACKAGES cartr/qt4/qt"
 fi
 
 brew install $PACKAGES
