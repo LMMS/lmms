@@ -66,7 +66,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		patman
 		peak_controller_effect
 		GigPlayer
-        ReverbSC
+		ReverbSC
 		sfxr
 		sid
 		SpectrumAnalyzer
