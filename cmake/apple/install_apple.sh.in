@@ -53,6 +53,9 @@ fi
  
 # Remove any old .app bundles
 rm -Rf "$APP"
+
+# Copy/overwrite Info.plist
+\cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
  
 # Create new bundle, copy our built code to it
 mkdir -p "$APP"
