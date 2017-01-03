@@ -67,7 +67,7 @@
 #endif
 
 
-#include <inttypes.h>
+#include <cinttypes>
 #include <vector>
 #include <string>
 
