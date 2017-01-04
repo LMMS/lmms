@@ -345,7 +345,7 @@ static void runMultivoiceChorus(LADSPA_Handle instance, unsigned long sample_cou
 	        if (count % 16 < laws) {
 	                unsigned int t = count % 16;
 	                // Calculate sinus phases
-	                float n_ph = (float)(law_p - abs(next_peak_pos[t] - count))/law_p;
+	                float n_ph = (float)(law_p - labs(next_peak_pos[t] - count))/law_p;
 	                float p_ph = n_ph + 0.5f;
 	                if (p_ph > 1.0f) {
 	                        p_ph -= 1.0f;
@@ -488,7 +488,7 @@ static void runAddingMultivoiceChorus(LADSPA_Handle instance, unsigned long samp
 	        if (count % 16 < laws) {
 	                unsigned int t = count % 16;
 	                // Calculate sinus phases
-	                float n_ph = (float)(law_p - abs(next_peak_pos[t] - count))/law_p;
+	                float n_ph = (float)(law_p - labs(next_peak_pos[t] - count))/law_p;
 	                float p_ph = n_ph + 0.5f;
 	                if (p_ph > 1.0f) {
 	                        p_ph -= 1.0f;

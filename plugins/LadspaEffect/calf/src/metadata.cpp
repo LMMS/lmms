@@ -29,6 +29,8 @@ using namespace calf_plugins;
 
 const char *calf_plugins::calf_copyright_info = "(C) 2001-2009 Krzysztof Foltman, Thor Harald Johanssen, Markus Schmidt and others; license: LGPL";
 
+namespace calf_plugins {
+
 ////////////////////////////////////////////////////////////////////////////
 
 CALF_PORT_NAMES(flanger) = {"In L", "In R", "Out L", "Out R"};
@@ -1105,7 +1107,7 @@ const char *const *monosynth_metadata::get_configure_vars() const
 
 CALF_PLUGIN_INFO(organ) = { 0x8481, "Organ", "Calf Organ", "Krzysztof Foltman", calf_plugins::calf_copyright_info, "SynthesizerPlugin" };
 
-plugin_command_info *organ_metadata::get_commands()
+plugin_command_info *organ_metadata::get_commands() const
 {
     static plugin_command_info cmds[] = {
         { "cmd_panic", "Panic!", "Stop all sounds and reset all controllers" },
@@ -1438,6 +1440,8 @@ wavetable_metadata::wavetable_metadata()
 }
 
 ////////////////////////////////////////////////////////////////////////////
+
+}; // namespace calf_plugins
 
 calf_plugins::plugin_registry::plugin_registry()
 {

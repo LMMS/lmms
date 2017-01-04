@@ -842,6 +842,8 @@ protected:
     Alg_event_ptr write_track_name(std::ostream &file, int n, 
                                    Alg_events &events);
 public:
+    using Alg_track::paste;
+
     int channel_offset_per_track; // used to encode track_num into channel
     Alg_tracks track_list;       // array of Alg_events
     Alg_time_sigs time_sig;

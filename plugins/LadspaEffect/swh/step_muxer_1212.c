@@ -100,7 +100,6 @@ static void activateStepMuxer(LADSPA_Handle instance) {
 	}
 	current_ch = 0;
 	last_clock = 0.0f;
-	sample_rate = sample_rate;
 	plugin_data->ch_gain = ch_gain;
 	plugin_data->ch_state = ch_state;
 	plugin_data->current_ch = current_ch;

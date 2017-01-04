@@ -370,25 +370,12 @@ public:
         next_task = (unsigned)-1;
         eob = false;
     }
-    inline bool is_next_tick() {
-        if (time < next_task)
-            return true;
-        do_tasks();
-    }
     inline void next_tick() {
         time++;
     }
     void set(int pos, task *t) {
         timeline.insert(std::pair<unsigned int, task *>(time+pos, t));
         next_task = timeline.begin()->first;
-    }
-    void do_tasks() {
-        std::multimap<unsigned int, task *>::iterator i = timeline.begin();
-        while(i != timeline.end() && i->first == time) {
-            i->second->execute(this);
-            i->second->dispose();
-            timeline.erase(i);
-        }
     }
     bool is_eob() {
         return eob;

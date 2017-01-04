@@ -278,6 +278,10 @@ static LADSPA_Handle instantiateVocoder(
 	LADSPA_Data sample_rate;
 
 #line 75 "vocoder_1337.xml"
+	memset(&bands_carrier, 0, sizeof bands_carrier);
+	memset(&bands_formant, 0, sizeof bands_formant);
+	memset(&bands_out, 0, sizeof bands_out);
+
 	sample_rate = s_rate;
 	main_vol = 1.0 * AMPLIFIER;
 

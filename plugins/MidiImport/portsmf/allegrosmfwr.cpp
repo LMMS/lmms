@@ -57,13 +57,11 @@ private:
 
     Alg_seq_ptr seq;
 
-    int num_tracks; // number of tracks not counting tempo track
     int division; // divisions per quarter note, default = 120
     int initial_tempo;
 
     int timesig_num; // numerator of time signature
     int timesig_den; // denominator of time signature
-    double timesig_when; // time of time signature
 
     int keysig;          // number of sharps (+) or flats (-), -99 for undefined
     char keysig_mode; // 'M' or 'm' for major/minor

@@ -243,6 +243,8 @@ static LADSPA_Handle instantiateVynil(
 	buffer_s = malloc(sizeof(LADSPA_Data) * buffer_size);
 	buffer_mask = buffer_size - 1;
 	buffer_pos = 0;
+	click_buffer_omega.all = 0;
+	click_buffer_pos.all = 0;
 	click_gain = 0;
 	phi = 0.0f; /* Angular phase */
 

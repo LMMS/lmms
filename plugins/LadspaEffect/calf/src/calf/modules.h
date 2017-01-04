@@ -89,13 +89,14 @@ public:
     using audio_module<Metadata>::ins;
     using audio_module<Metadata>::outs;
     using audio_module<Metadata>::params;
+    using FilterClass::calculate_filter;
     
     dsp::inertia<dsp::exponential_ramp> inertia_cutoff, inertia_resonance, inertia_gain;
     dsp::once_per_n timer;
     bool is_active;    
     mutable volatile int last_generation, last_calculated_generation;
     
-    filter_module_with_inertia(float **ins, float **outs, float **params)
+    filter_module_with_inertia()
     : inertia_cutoff(dsp::exponential_ramp(128), 20)
     , inertia_resonance(dsp::exponential_ramp(128), 20)
     , inertia_gain(dsp::exponential_ramp(128), 1.0)
@@ -193,7 +194,7 @@ class filter_audio_module:
     mutable float old_cutoff, old_resonance, old_mode;
 public:    
     filter_audio_module()
-    : filter_module_with_inertia<dsp::biquad_filter_module, filter_metadata>(ins, outs, params)
+    : filter_module_with_inertia<dsp::biquad_filter_module, filter_metadata>()
     {
         last_generation = 0;
         old_mode = old_resonance = old_cutoff = -1;

@@ -79,7 +79,6 @@ static void activatePitchScale(LADSPA_Handle instance) {
 	memset(buffers->gAnaFreq, 0, FRAME_LENGTH*sizeof(float));
 	memset(buffers->gAnaMagn, 0, FRAME_LENGTH*sizeof(float));
 	buffers->gRover = 0;
-	sample_rate = sample_rate;
 
 	/* do one run to make sure the plans are set up */
 	pitch_scale(buffers, 1.0, FRAME_LENGTH, 4, FRAME_LENGTH, sample_rate, buffers->gInFIFO, buffers->gOutFIFO, 0, 0.0f);

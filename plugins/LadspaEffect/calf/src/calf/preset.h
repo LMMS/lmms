@@ -27,7 +27,7 @@
 
 namespace calf_plugins {
 
-class plugin_ctl_iface;
+struct plugin_ctl_iface;
     
 /// Contents of single preset
 struct plugin_preset

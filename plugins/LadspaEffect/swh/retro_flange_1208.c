@@ -321,7 +321,7 @@ static void runRetroFlange(LADSPA_Handle instance, unsigned long sample_count) {
 	                prev_law_pos = count + law_p;
 	        }
 	
-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
+	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
 	        p_ph = n_ph + 0.5f;
 	        if (p_ph > 1.0f) {
 	                p_ph -= 1.0f;
@@ -446,7 +446,7 @@ static void runAddingRetroFlange(LADSPA_Handle instance, unsigned long sample_co
 	                prev_law_pos = count + law_p;
 	        }
 	
-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
+	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
 	        p_ph = n_ph + 0.5f;
 	        if (p_ph > 1.0f) {
 	                p_ph -= 1.0f;
