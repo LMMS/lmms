@@ -390,7 +390,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 		QString trackName = QString( tr( "Track" ) + " %1" ).arg( t );
 		Alg_track_ptr trk = seq->track( t );
 		pd.setValue( t + preTrackSteps );
-		int prevCC = 0;
+		int rpn_msb = -1;
+		int rpn_lsb = -1;
 
 		for( int c = 0; c < 129; c++ )
 		{
@@ -509,6 +510,16 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 								break;
 
+							case 6:
+								if ( rpn_lsb == 0 && rpn_msb == 0 )
+								{
+									objModel = ch->it->pitchRangeModel();
+									cc = ceil( cc * 127.0f );
+									printf( "%f: Pitch range changed to: %f\n", evt->time, cc );
+								}
+
+								break;
+
 							case 7:
 								objModel = ch->it->volumeModel();
 								cc *= 100.0f;
@@ -519,37 +530,13 @@ bool MidiImport::readSMF( TrackContainer* tc )
 								cc = cc * 200.f - 100.0f;
 								break;
 
-							case 6:
-								if ( prevCC == 201 )
-								{
-									objModel = ch->it->pitchRangeModel();
-									cc = floor( cc * 128.0f );
-									printf( "%f: Pitch range changed to: %f\n", evt->time, cc );
-								}
-
-								break;
-
 							case 100:
-								if( prevCC == 101 && cc == 0.0f )
-								{
-									prevCC = 201;
-								}
-								else
-								{
-									prevCC = 100;
-								}
+								rpn_msb = cc;
 
 								continue;
 
 							case 101:
-								if( prevCC == 100 && cc == 0.0f )
-								{
-									prevCC = 201;
-								}
-								else
-								{
-									prevCC = 101;
-								}
+								rpn_lsb = cc;
 
 								continue;
 
