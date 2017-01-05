@@ -195,7 +195,7 @@ private:
 	ComboBoxModel m_zoomingYModel;
 	ComboBoxModel m_quantizeModel;
 
-	static const QVector<double> m_zoomXLevels;
+	static const QVector<float> m_zoomXLevels;
 
 	FloatModel * m_tensionModel;
 
