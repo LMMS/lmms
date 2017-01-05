@@ -381,6 +381,7 @@ signals:
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
+	void updateSampleTracks();
 
 } ;
 
