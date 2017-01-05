@@ -152,6 +152,7 @@ void SampleTCO::setSampleFile( const QString & _sf )
 	updateLength();
 
 	emit sampleChanged();
+	emit playbackPositionChanged();
 }
 
 
@@ -311,7 +312,7 @@ void SampleTCOView::updateSample()
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
-					  tr( "double-click to select sample" ) );
+					tr( "double-click to select sample" ) );
 }
 
 
