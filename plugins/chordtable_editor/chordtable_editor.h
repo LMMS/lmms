@@ -29,6 +29,7 @@
 
 #include <QLabel>
 #include <QFrame>
+#include <QComboBox>
 
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
@@ -45,7 +46,7 @@ class QHBoxLayout;
 class chordtableEditor;
 class chordNoteModel;
 class LedCheckBox;
-
+class QLineEdit;
 
 /*****************************************************************************************************
  *
@@ -141,6 +142,7 @@ public:
 	//The chordsemitone it's referring to
 	ChordSemiTone *m_semiTone;
 
+	//the position of the semitone in the semitones vector
 	int position() const;
 	void setPosition(int position);
 
@@ -170,20 +172,35 @@ public:
 public slots:
 	//loads the chord into the widget
 	void loadChord();
+	//reloads the combo box
+	void reloadCombo();
 	//loads the preset chordtable
-	void reset();
+	void resetChords();
 	//removes the semitone which sent the signal
 	void removeSemiTone(int i);
 	void addChordSemiTone();
+	//clones the semitone which sent the signal
 	void cloneSemiTone(int i);
+	void saveFile();
+	void openFile();
+	void newChord();
+	void cloneChord();
+	void removeChord();
+	//when the text of the chord Name changes
+	void changeText(QString _text);
 
 private:
 
-	//the existing chordtable
 	chordtableEditor * m_chordTableEditor;
+	//the existing chordtable
+	ChordTable * m_chordTable;
 
 	//the chosen chord
-	Chord * m_Chord;
+	Chord * m_chord;
+
+	//the chord name
+	QLineEdit * m_nameLineEdit;
+
 
 	QVector<chordNoteWidget *> m_chordnoteWidgets;
 
@@ -199,7 +216,8 @@ private:
 	//The combobox of the available chord combinations
 	ComboBox * m_chordsComboBox;
 
-
+signals:
+	void lineEditChange();
 
 } ;
 
@@ -211,6 +229,8 @@ private:
 ******************************************************************************************************/
 class chordtableEditor : public ToolPlugin
 {
+	Q_OBJECT
+
 public:
 	chordtableEditor();
 	virtual ~chordtableEditor();
@@ -224,6 +244,8 @@ public:
 
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
 	{
+
+
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}
@@ -234,12 +256,14 @@ public:
 	}
 
 	ChordTable * m_chordTable;
+	ComboBoxModel * m_chordsComboModel;
 
-	ComboBoxModel * m_chordsModel;
+public slots:
+
+	//reloads data from the chordTable;
+	void reloadComboModel();
 
 } ;
-
-//-----------------------------------------------------------------------
 
 
 #endif

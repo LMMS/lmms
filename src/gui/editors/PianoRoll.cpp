@@ -454,8 +454,8 @@ PianoRoll::PianoRoll() :
 void PianoRoll::updateChordTable()
 {
 	// reloads the scale model
-	delete (m_chordTable);
-	m_chordTable =  Engine::chordTable();
+	//	delete (m_chordTable);
+//	m_chordTable =  Engine::chordTable();
 
 	//getting the selected value
 	int v = m_scaleModel.value();
@@ -463,11 +463,13 @@ void PianoRoll::updateChordTable()
 	m_scaleModel.clear();
 
 	m_scaleModel.addItem( tr("No scale") );
-	for( const Chord& chord : *m_chordTable )
+	Chord *chord;
+	for(int i=0;i<m_chordTable->size();i++ )
 	{
-		if( chord.isScale() )
+		chord=m_chordTable->at(i);
+		if( chord->isScale() )
 		{
-			m_scaleModel.addItem( chord.getName() );
+			m_scaleModel.addItem( chord->getName() );
 		}
 	}
 	//getting back the previously selected value
@@ -482,11 +484,12 @@ void PianoRoll::updateChordTable()
 	m_chordModel.clear();
 
 	m_chordModel.addItem( tr("No chord") );
-	for( const Chord& chord : *m_chordTable )
+	for(int i=0;i<m_chordTable->size();i++ )
 	{
-		if( ! chord.isScale() )
+		chord=m_chordTable->at(i);
+		if( !chord->isScale() )
 		{
-			m_chordModel.addItem( chord.getName() );
+			m_chordModel.addItem( chord->getName() );
 		}
 	}
 
@@ -709,8 +712,8 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( m_pattern->instrumentTrack(),SIGNAL(chordTableChanged()),this,SLOT (updateChordTable()));
-
+//	connect( m_pattern->instrumentTrack(),SIGNAL(chordTableChanged()),this,SLOT (updateChordTable()));
+	connect( Engine::chordTable(),SIGNAL(chordsNameChanged()),this,SLOT (updateChordTable()));
 
 	update();
 	emit currentPatternChanged();

@@ -597,6 +597,17 @@ ChordSemiTones::ChordSemiTones(Model *_parent, QString _string) :
 	parseString(_string);
 }
 
+ChordSemiTones::ChordSemiTones(ChordSemiTones *_copy) :
+	Model(_copy->parentModel())
+{
+	ChordSemiTone *csm;
+	for (int i=0;i<_copy->size();i++)
+	{
+		csm= new ChordSemiTone(_copy->at(i));
+		push_back(csm);
+	}
+}
+
 void ChordSemiTones::parseString(QString _string)
 {
 	//clears the vector;
@@ -630,7 +641,10 @@ void ChordSemiTones::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 void ChordSemiTones::loadSettings(const QDomElement &_this)
 {
 	//clearing the vector
-	clear();
+	//	clear();
+
+	//the vector element counter
+	int i=0;
 
 	ChordSemiTone *cst;
 
@@ -639,12 +653,28 @@ void ChordSemiTones::loadSettings(const QDomElement &_this)
 	while (!node.isNull())
 	{
 		QDomElement semitone = node.toElement();
-		cst=new ChordSemiTone(this);
-		cst->loadSettings(semitone);
 
-		//storing the semitone
-		push_back(cst);
+		//if the vector is empty creates new semitone, otherwise it uses the existing one.
+		if (i<size())
+		{
+			cst=at(i);
+			cst->loadSettings(semitone);
+		} else
+		{
+			cst=new ChordSemiTone(this);
+			cst->loadSettings(semitone);
+			push_back(cst);
+		}
+		i++;
 		node = node.nextSibling();
+	}
+	//removing the extra semitones if they are present
+	if (i<size())
+	{
+		for (int j=size()-1;j>=i;j--)
+		{
+			remove(j);
+		}
 	}
 }
 
@@ -672,6 +702,13 @@ Chord::Chord(Model *_parent, QString _name, ChordSemiTones *_semitones) :
 {
 	m_name =_name;
 	m_chordSemiTones = _semitones;
+}
+
+Chord::Chord(Chord *_copy,QString _name) :
+	Model(_copy->parentModel())
+{
+	m_name = _name;
+	m_chordSemiTones= new ChordSemiTones(_copy->m_chordSemiTones);
 }
 
 void Chord::saveSettings(QDomDocument &_doc, QDomElement &_parent)
@@ -706,21 +743,22 @@ void Chord::addSemiTone()
 {
 	ChordSemiTone *csm=new ChordSemiTone(m_chordSemiTones);
 	m_chordSemiTones->push_back(csm);
-
-	//signals the structure has changed
-	//	emit emitStructureEdited();
+	//emits the data changed signal
+	emit Engine::chordTable()->dataChanged();
 }
 
 void Chord::insertSemiTone(ChordSemiTone *csm, int position)
 {
 	m_chordSemiTones->insert(position,csm);
+	//emits the data changed signal
+	emit Engine::chordTable()->dataChanged();
 }
 
 void Chord::removeSemiTone(int i)
 {
 	m_chordSemiTones->remove(i);
-	//signals the structure has changed
-	//	emit emitStructureEdited();
+	//emits the data changed signal
+	emit Engine::chordTable()->dataChanged();
 }
 
 /*****************************************************************************************************
@@ -731,8 +769,9 @@ void Chord::removeSemiTone(int i)
 ChordTable::ChordTable(Model *_parent) :
 	Model( _parent )
 {
-	//reads data
-	readXML();
+	//reads the preset original data, emits the data changed signal
+loadFactoryPreset();
+//	readXML();
 }
 
 void ChordTable::saveSettings(QDomDocument &_doc, QDomElement &_parent)
@@ -750,7 +789,9 @@ void ChordTable::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 void ChordTable::loadSettings(const QDomElement &_this)
 {
 	//clearing the vector
-	clear();
+//	clear();
+
+	int i=0;
 
 	Chord *chord;
 
@@ -759,21 +800,39 @@ void ChordTable::loadSettings(const QDomElement &_this)
 	while (!node.isNull())
 	{
 		QDomElement chord_element = node.toElement();
-		chord=new Chord(this);
-		chord->loadSettings(chord_element);
 
-		//storing the semitone
-		push_back(chord);
-
+		//if the vector is empty creates new chord, otherwise it uses the existing one.
+		if (i<this->size())
+		{
+			chord=at(i);
+			chord->loadSettings(chord_element);
+		} else
+		{
+			chord=new Chord(this);
+			chord->loadSettings(chord_element);
+			push_back(chord);
+		}
+		i++;
 		node = node.nextSibling();
 	}
+	//removing the extra chords if they are present
+	if (i<size())
+	{
+		for (int j=size()-1;j>=i;j--)
+		{
+			remove(j);
+		}
+	}
+	//emits the data changed signal
+	emit dataChanged();
+
 }
 
 bool ChordTable::readXML()
 {
 	ConfigManager* confMgr = ConfigManager::inst();
 	//Path to the presets file
-	QString m_path= confMgr->factoryPresetsDir()+"Arpeggio/arpeggio.xpf";
+	QString m_path= confMgr->factoryPresetsDir()+"ChordTable/arpeggio.xpf";
 
 	//The xml document
 	QDomDocument m_doc;
@@ -802,6 +861,7 @@ bool ChordTable::readXML()
 	//The single chord
 	Chord  * m_chord;
 
+	QString f=file.fileName();
 	//Check for file
 	if (!file.open(QIODevice::ReadOnly) || !m_doc.setContent(&file))
 	{
@@ -851,9 +911,47 @@ bool ChordTable::readXML()
 	return true;
 }
 
-void ChordTable::saveXML()
-{
 
+void ChordTable::loadFactoryPreset()
+{
+	ConfigManager* confMgr = ConfigManager::inst();
+	//Path to the presets file
+	QString m_path= confMgr->factoryPresetsDir()+"ChordTable/ChordTable.ctd";
+
+	DataFile dataFile( m_path );
+	QDomElement content= dataFile.content();
+
+	//already emits the data changed signal
+	loadSettings( dataFile.content() );
+
+}
+
+void ChordTable::cloneChord(int i)
+{
+	Chord *cst;
+	if (i==-1 || i>size())
+	{ //adding a new Chord
+		cst=new Chord(this);
+		cst->m_name=tr("New Chord");
+		cst->addSemiTone();
+	} else
+	{ //cloning the Chord
+		cst=new Chord(at(i),at(i)->m_name+" " +tr("copy"));
+	}
+	push_back(cst);
+	//emits the data changed signal
+	emit dataChanged();
+}
+
+void ChordTable::removeChord(int i)
+{
+	//removes chord from the vector
+	if (i<size())
+	{
+		remove(i);
+		//emits the data changed signal
+		emit dataChanged();
+	}
 }
 
 const Chord &ChordTable::getByName(const QString &name, bool is_scale) const
@@ -868,17 +966,6 @@ const Chord &ChordTable::getByName(const QString &name, bool is_scale) const
 	return empty;
 }
 
-Chord &ChordTable::getByName(const QString &name, bool is_scale)
-{
-	for( int i = 0; i < size(); i++ )
-	{
-		if( at( i )->getName() == name && is_scale == at( i )->isScale() )
-			return *at( i );
-	}
-
-	static Chord empty(NULL);
-	return empty;
-}
 
 //Initializes the ChordTable instance as null
 ChordTable *ChordTable::instance=NULL;
@@ -891,8 +978,9 @@ ChordTable *ChordTable::getInstance(Model *_parent)
 	return instance;
 }
 
+//loads the factory preset
 void ChordTable::reset()
 {
-	clear();
-	readXML();
+	//already emits the signal
+	loadFactoryPreset();
 }

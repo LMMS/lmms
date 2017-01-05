@@ -41,6 +41,7 @@ public:
 	enum Types
 	{
 		UnknownType,
+		ChordTable,
 		SongProject,
 		SongProjectTemplate,
 		InstrumentTrackSettings,

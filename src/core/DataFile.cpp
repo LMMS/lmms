@@ -55,6 +55,7 @@ DataFile::typeDescStruct
 		DataFile::s_types[DataFile::TypeCount] =
 {
 	{ DataFile::UnknownType, "unknown" },
+	{ DataFile::ChordTable, "chord-table" },
 	{ DataFile::SongProject, "song" },
 	{ DataFile::SongProjectTemplate, "songtemplate" },
 	{ DataFile::InstrumentTrackSettings, "instrumenttracksettings" },
@@ -173,6 +174,12 @@ bool DataFile::validate( QString extension )
 {
 	switch( m_type )
 	{
+	case Type::ChordTable:
+		if( extension == "ctd" )
+		{
+			return true;
+		}
+		break;
 	case Type::SongProject:
 		if( extension == "mmp" || extension == "mmpz" )
 		{

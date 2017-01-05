@@ -109,6 +109,8 @@ void LmmsCore::destroy()
 
 	deleteHelper( &s_song );
 
+	deleteHelper ( &s_chordTable);
+
 	delete ConfigManager::inst();
 }
 

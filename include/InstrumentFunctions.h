@@ -42,6 +42,7 @@ class InstrumentTrack;
 class NotePlayHandle;
 class Model;
 class ChordTable;
+class Chord;
 
 //new constants for key notes in arpeggios, used by the Int Automated model
 const int KeyMax = ( 0 + 30 );
@@ -158,6 +159,8 @@ class ChordSemiTone : public Model , public JournallingObject
 	Q_OBJECT
 public:
 
+	//the parent chord
+	Chord *m_chord;
 	//the name which propagates from the chord and position for automation
 	//TODO : to be implemented!!
 	QString m_name;
@@ -174,6 +177,7 @@ public:
 
 	ChordSemiTone(Model *_parent);
 
+	//Creates a new semitone which gets data from the argument
 	ChordSemiTone(ChordSemiTone *_copy);
 
 	//constructs the object from a given string by calling the parseString function
@@ -211,6 +215,9 @@ public:
 	//Calls parseString
 	ChordSemiTones(Model *_parent,QString _string);
 
+	//creates a new vector with data resembling the argument
+	ChordSemiTones(ChordSemiTones *_copy);
+
 	virtual ~ChordSemiTones() {}
 
 	//parses the string into data by adding the Semitones to the vector after clearing it
@@ -245,6 +252,9 @@ public:
 	Chord(Model *_parent, QString _name, QString _string);
 
 	Chord(Model *_parent, QString _name, ChordSemiTones * _semitones );
+
+	//Creates a copy of the chord, changing name too;
+	Chord(Chord *_copy,QString _name);
 
 	virtual ~Chord() {}
 
@@ -325,12 +335,6 @@ public:
 	//deletes the semitone
 	void removeSemiTone(int i);
 
-signals:
-
-	//whenever a semitone is added/deleted
-	void emitStructureEdited();
-
-
 };
 
 
@@ -355,15 +359,20 @@ public:
 		return "ChordTable";
 	}
 
-	/**
-	 * Reads data from the predefined file
-	 * @brief readXML
-	 */
+	//old function, not used in the new version which makes use of the available xml functions.
 	bool readXML();
-	void saveXML();
+
+	//loads the factory preset
+	void loadFactoryPreset();
+
+	//adds or clones a chord to the chord table. If -1 adds a chord else clones the given
+	void cloneChord(int i=-1);
+
+	//removes the chord and emits the datachanged signal;
+	void removeChord(int i);
+
 
 	const Chord &getByName( const QString & name, bool is_scale = false ) const;
-	Chord &getByName( const QString & name, bool is_scale = false );
 
 	const Chord & getScaleByName( const QString & name ) const
 	{
@@ -384,6 +393,10 @@ public slots:
 
 	//reloads the chordtable from the file
 	void reset();
+
+signals:
+	//emitted only when chord names are changed to reflect in piano roll
+	void chordsNameChanged();
 
 };
 

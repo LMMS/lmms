@@ -33,6 +33,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QVBoxLayout>
+#include <QLineEdit>
 
 #include "gui_templates.h"
 #include "Knob.h"
@@ -49,6 +50,8 @@
 #include "GuiApplication.h"
 #include "Engine.h"
 #include "SongEditor.h"
+#include "FileDialog.h"
+
 
 #include "embed.cpp"
 
@@ -91,12 +94,9 @@ chordtableEditor::chordtableEditor() :
 	ToolPlugin( &chordtableeditor_plugin_descriptor, NULL )
 {
 	m_chordTable = Engine::chordTable();
-	m_chordsModel= new ComboBoxModel( this, tr( "Chord type" ) );
-	for( int i = 0; i < m_chordTable->size(); ++i )
-	{
-		m_chordsModel->addItem( m_chordTable->at(i)->getName() );
-	}
-
+	m_chordsComboModel= new ComboBoxModel( this, tr( "Chord type" ) );
+	//loads data into comboModel
+	reloadComboModel();
 }
 
 
@@ -108,6 +108,17 @@ chordtableEditor::~chordtableEditor()
 QString chordtableEditor::nodeName() const
 {
 	return chordtableeditor_plugin_descriptor.name;
+}
+
+void chordtableEditor::reloadComboModel()
+{
+	int i=m_chordsComboModel->value();
+	m_chordsComboModel->clear();
+	for( int i = 0; i < m_chordTable->size(); ++i )
+	{
+		m_chordsComboModel->addItem( m_chordTable->at(i)->getName() );
+	}
+	m_chordsComboModel->setValue(i);
 }
 
 
@@ -122,7 +133,8 @@ QString chordtableEditor::nodeName() const
 chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	ToolPluginView( _tool  ),
 	m_chordTableEditor( castModel<chordtableEditor>() ),
-	m_Chord(NULL),
+	m_chordTable( m_chordTableEditor->m_chordTable ),
+	m_chord(NULL),
 	m_chordsComboBox( new ComboBox() )
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) ); //menjaj icono!!
@@ -148,32 +160,62 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	m_chordsComboBox->setSizePolicy(gp);
 
 	//combobox data
-	m_chordsComboBox->setModel(m_chordTableEditor->m_chordsModel);
+	m_chordsComboBox->setModel(m_chordTableEditor->m_chordsComboModel);
 
+	//Connecting combobox signal to widget data
+	connect(m_chordTableEditor->m_chordsComboModel,SIGNAL(dataChanged()),this,SLOT(loadChord()));
 
 	//Connecting the changing of data to the combobox
-	connect(m_chordTableEditor->m_chordsModel,SIGNAL(dataChanged()),this,SLOT(loadChord()));
+	connect(m_chordTable,SIGNAL(dataChanged()),this,SLOT(loadChord()));
+	connect(m_chordTable,SIGNAL(dataChanged()),m_chordTableEditor,SLOT(reloadComboModel()));
 
 	QPushButton *button1 = new QPushButton(tr("Add SemiTone"));
 	QPushButton *button2 = new QPushButton(tr("Delete chord"));
 	QPushButton *button3 = new QPushButton(tr("Reset chords"));
+	QPushButton *button4 = new QPushButton(tr("Save File"));
+	QPushButton *button5 = new QPushButton(tr("Open File"));
+	QPushButton *button6 = new QPushButton(tr("New chord"));
+	QPushButton *button7 = new QPushButton(tr("Clone chord"));
 
 	connect(button1, SIGNAL (clicked()), this, SLOT (addChordSemiTone()));
-	connect(button3, SIGNAL (clicked()), this, SLOT (reset()));
+	connect(button2, SIGNAL (clicked()), this, SLOT (removeChord()));
+	connect(button3, SIGNAL (clicked()), this, SLOT (resetChords()));
+	connect(button4, SIGNAL (clicked()), this, SLOT (saveFile()));
+	connect(button5, SIGNAL (clicked()), this, SLOT (openFile()));
+	connect(button6, SIGNAL (clicked()), this, SLOT (newChord()));
+	connect(button7, SIGNAL (clicked()), this, SLOT (cloneChord()));
+
+	// setup line edit for changing instrument track name
+	m_nameLineEdit = new QLineEdit;
+	m_nameLineEdit->setFont( pointSize<9>( m_nameLineEdit->font() ) );
+	connect( m_nameLineEdit, SIGNAL( textChanged( const QString & ) ),
+				this, SLOT( changeText( const QString & ) ) );
+	//lineedit change
+	connect(this, SIGNAL( lineEditChange()),this,SLOT(reloadCombo()));
+//	connect( m_nameLineEdit, SIGNAL( editingFinished() ),
+//				this, SLOT( changeText( const QString & ) ) );
+
+	m_nameLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+	upperLayout->addWidget(m_nameLineEdit);
 
 	//adding combo and button
 	upperLayout->addWidget(m_chordsComboBox);
 	upperLayout->addStretch();
+	upperLayout->addWidget(button7);
+	upperLayout->addWidget(button6);
+	upperLayout->addWidget(button5);
+	upperLayout->addWidget(button4);
 	upperLayout->addWidget(button3);
 	upperLayout->addWidget(button2);
 	upperLayout->addWidget(button1);
 
+
+
+
 	//the lower area
 	QWidget *lowerWidget=new QWidget(this);
-	//	 lowerWidget->setMinimumSize(540,400);
 
 	QHBoxLayout *lowerWidgetLayout=new QHBoxLayout(lowerWidget);
-//	lowerWidgetLayout->setSizeConstraint(QLayout::SetFixedSize);
 	lowerWidget->setLayout(lowerWidgetLayout);
 
 	//the lower widget scroll area
@@ -189,13 +231,10 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	m_scrollArea->setWidget(m_chordsWidget);
 
 	m_chordsWidget->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
-	//	 m_chordsWidget->setStyleSheet("background-color:#f00;");
-	//	 m_chordsWidget->setMinimumSize(20,20);
-	//	 m_chordsWidgetLayout->setSizeConstraint(QLayout::SetMaximumSize);
 	m_chordsWidgetLayout= new QHBoxLayout;
 
 	m_chordsWidgetLayout->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
-	m_chordsWidgetLayout->setSpacing(4);
+	m_chordsWidgetLayout->setSpacing(2);
 	m_chordsWidgetLayout->setMargin(0);
 	m_chordsWidgetLayout->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -218,9 +257,7 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 
 
 	setWhatsThis( tr(
-									"This dialog displays information on all of the LADSPA plugins LMMS was "
-									"able to locate. The plugins are divided into five categories based "
-									"upon an interpretation of the port types and names.\n\n"
+									"This dialog allows editing and automation of the chord table."
 									) );
 
 
@@ -229,9 +266,9 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	{
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint(QLayout::SetDefaultConstraint );
-//		parentWidget()->setMinimumSize(600,500);
+		//		parentWidget()->setMinimumSize(600,500);
 		parentWidget()->adjustSize();
-		parentWidget()->setMinimumWidth(500);
+		parentWidget()->setMinimumSize(750,470);
 
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		//		flags |= Qt::MSWindowsFixedSizeDialogHint;
@@ -245,17 +282,22 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 
 void chordtableEditorView::loadChord()
 {
-
 	//taking selected value from the comboboxmodel
-	int i= m_chordTableEditor->m_chordsModel->value();
+	int i= m_chordTableEditor->m_chordsComboModel->value();
+	//eliminating problems while deleting last chord
+	if (i>=m_chordTable->size())
+	{
+		i=m_chordTable->size()-1;
+	}
 	//getting the address of the selected chord
-	m_Chord=m_chordTableEditor->m_chordTable->at(i);
+	m_chord=m_chordTable->at(i);
+	//setting chord name to the editline
+	m_nameLineEdit->blockSignals(true);
+	m_nameLineEdit->setText(m_chord->m_name);
+	m_nameLineEdit->blockSignals(false);
 
-	//connects changes to chord structure to reloading this view by recalling this function;
-	connect(m_Chord,SIGNAL(emitStructureEdited()),this,SLOT(loadChord()));
 
-	//Deleting all the widgets of the layout - Qt5 style
-
+	//finding and deleting all widget children
 	m_chordsWidget->setUpdatesEnabled(false);
 	QList<QWidget*> widgets= m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly);
 	foreach(QWidget * widget, widgets)
@@ -263,8 +305,7 @@ void chordtableEditorView::loadChord()
 		m_chordsWidgetLayout->removeWidget(widget);
 		delete widget;
 	}
-
-//	qDeleteAll(m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly));
+	//	qDeleteAll(m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly));
 	m_chordsWidget->setUpdatesEnabled(true);
 
 	//adding the widgets from the menu
@@ -272,9 +313,9 @@ void chordtableEditorView::loadChord()
 	ChordSemiTone *m_chordSemiTone;
 	chordNoteModel *m_chordNoteModel;
 	chordNoteWidget *m_chordNoteWidget;
-	for (int i=0;i<m_Chord->getChordSemiTones()->size();i++)
+	for (int i=0;i<m_chord->getChordSemiTones()->size();i++)
 	{
-		m_chordSemiTone=m_Chord->getChordSemiTones()->at(i);
+		m_chordSemiTone=m_chord->getChordSemiTones()->at(i);
 		m_chordNoteModel= new chordNoteModel(m_chordTableEditor, m_chordSemiTone,i);
 		m_chordNoteWidget= new chordNoteWidget(m_chordNoteModel,m_chordsWidget);
 		//Connects the nested delete pushbutton to the remove chordnote slot
@@ -284,39 +325,144 @@ void chordtableEditorView::loadChord()
 		//		lowerInsideLayout->addWidget(m_chordNoteWidget);
 		m_chordsWidgetLayout->addWidget(m_chordNoteWidget);
 	}
+
 	m_chordsWidget->adjustSize();
 }
 
-void chordtableEditorView::reset()
+void chordtableEditorView::reloadCombo()
+{
+	m_chordTableEditor->reloadComboModel();
+	//emits signal combo model data has changed
+	emit Engine::chordTable()->chordsNameChanged();
+}
+
+void chordtableEditorView::resetChords()
 {
 	Engine::getSong()->stop();
-	m_chordTableEditor->m_chordTable->reset();
-	loadChord();
+	//setting combomodel value to 0;
+	m_chordTableEditor->m_chordsComboModel->setValue(0);
+	m_chordTable->reset();
+	reloadCombo();
 }
 
 void chordtableEditorView::removeSemiTone(int i)
 {
 	Engine::getSong()->stop();
-	m_Chord->removeSemiTone(i);
-	loadChord();
+	m_chord->removeSemiTone(i);
 }
 
 void chordtableEditorView::addChordSemiTone()
 {
-	m_Chord->addSemiTone();
-	loadChord();
+	m_chord->addSemiTone();
 }
 
 void chordtableEditorView::cloneSemiTone(int i)
 {
-	ChordSemiTone *cst = new ChordSemiTone(m_Chord->at(i));
-	m_Chord->insertSemiTone(cst,i);
-	loadChord();
+	ChordSemiTone *cst = new ChordSemiTone(m_chord->at(i));
+	m_chord->insertSemiTone(cst,i);
+}
+
+void chordtableEditorView::saveFile()
+{
+	FileDialog sfd( this, tr( "Save preset" ), "", tr( "Chord Table XML preset file (*.ctd)" ) );
+
+	QString presetRoot = ConfigManager::inst()->userPresetsDir();
+	if( !QDir( presetRoot ).exists() )
+	{
+		QDir().mkdir( presetRoot );
+	}
+	if( !QDir( presetRoot + "ChordTable" ).exists() )
+	{
+		QDir( presetRoot ).mkdir( "ChordTable" );
+	}
+
+	sfd.setAcceptMode( FileDialog::AcceptSave );
+	sfd.setDirectory( presetRoot + "ChordTable" );
+	sfd.setFileMode( FileDialog::AnyFile );
+	QString fname = "ChordTable";
+	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]"))+".ctd" );
+
+	if( sfd.exec() == QDialog::Accepted &&
+			!sfd.selectedFiles().isEmpty() &&
+			!sfd.selectedFiles().first().isEmpty() )
+	{
+		//		DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeSave );
+
+		DataFile dataFile( DataFile::ChordTable );
+		m_chordTable->saveSettings( dataFile, dataFile.content() );
+		QString f = sfd.selectedFiles()[0];
+		dataFile.writeFile( f );
+	}
+}
+
+void chordtableEditorView::openFile()
+{
+	Engine::getSong()->stop();
+	FileDialog sfd( this, tr( "Open preset" ), "", tr( "Chord Table XML preset file (*.ctd)" ) );
+
+	QString presetRoot = ConfigManager::inst()->userPresetsDir();
+	if( !QDir( presetRoot ).exists() )
+	{
+		QDir().mkdir( presetRoot );
+	}
+	if( !QDir( presetRoot + "ChordTable" ).exists() )
+	{
+		QDir( presetRoot ).mkdir( "ChordTable" );
+	}
+
+	sfd.setAcceptMode( FileDialog::AcceptOpen );
+	sfd.setDirectory( presetRoot + "ChordTable" );
+	sfd.setFileMode( FileDialog::AnyFile );
+	QString fname = "";
+	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]"))+".ctd" );
+
+	if( sfd.exec() == QDialog::Accepted &&
+			!sfd.selectedFiles().isEmpty() &&
+			!sfd.selectedFiles().first().isEmpty() )
+	{
+		//		DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
+
+		QString f = sfd.selectedFiles()[0];
+		DataFile dataFile( f );
+
+		m_chordTable->loadSettings( dataFile.content() );
+	}
+}
+
+void chordtableEditorView::newChord()
+{
+	Engine::getSong()->stop();
+	m_chordTable->cloneChord(-1);
+	reloadCombo();
+	m_chordsComboBox->model()->setValue(m_chordTable->size());
+}
+
+void chordtableEditorView::cloneChord()
+{
+	Engine::getSong()->stop();
+	m_chordTable->cloneChord(m_chordsComboBox->model()->value());
+	reloadCombo();
+	m_chordsComboBox->model()->setValue(m_chordTable->size());
+}
+
+void chordtableEditorView::removeChord()
+{
+	Engine::getSong()->stop();
+	m_chordTable->removeChord(m_chordsComboBox->model()->value());
+	reloadCombo();
+}
+
+void chordtableEditorView::changeText(QString _text)
+{
+	m_chord->m_name=_text;
+	emit lineEditChange();
 }
 
 chordtableEditorView::~chordtableEditorView()
 {
 }
+
+
 
 
 /*****************************************************************************************************
@@ -367,7 +513,7 @@ chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 	QVBoxLayout *m_vLayout= new QVBoxLayout(this);
 	m_vLayout->setSizeConstraint(QLayout::SetFixedSize);
 	setLayout(m_vLayout);
-//	setFixedSize(100,290);
+	//	setFixedSize(100,290);
 
 	m_vLayout->setSizeConstraint(QLayout::SetMaximumSize);
 
@@ -489,6 +635,9 @@ chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 	if ( m_position == 0 )
 	{
 		m_delButton->setEnabled(false);
+		m_delButton->setStyleSheet(QString::fromUtf8("QPushButton:disabled"
+		"{ color: gray }"
+		));
 		m_delButton->setWhatsThis( tr("Delete disabled for base note"));
 		ToolTip::add( m_delButton, tr( "Delete disabled for base note" ) );
 	}
