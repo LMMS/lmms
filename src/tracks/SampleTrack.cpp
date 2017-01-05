@@ -82,7 +82,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	//care about mute track
 	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
 	//care about TCO position
-	connect( this, SIGNAL( positionChanged() ), this, SLOT( playbackPositionChanged() ) );
+	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
 	//playbutton clicked or space key
 	connect( gui->songEditor(), SIGNAL( playTriggered() ), this, SLOT( playbackPositionChanged() ) );
 
@@ -98,6 +98,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 			setAutoResize( false );
 			break;
 	}
+	updateTrackTcos();
 }
 
 
@@ -169,6 +170,18 @@ void SampleTCO::playbackPositionChanged()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
 	m_isPlaying = false;
+}
+
+
+
+
+void SampleTCO::updateTrackTcos()
+{
+	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	if( sampletrack)
+	{
+		sampletrack->updateTcos();
+	}
 }
 
 bool SampleTCO::isPlaying() const
@@ -298,7 +311,7 @@ void SampleTCOView::updateSample()
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
-					tr( "double-click to select sample" ) );
+					  tr( "double-click to select sample" ) );
 }
 
 
@@ -392,6 +405,14 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
+		if( _me->button() == Qt::MiddleButton && _me->modifiers() == Qt::ControlModifier )
+		{
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
+			if( sTco )
+			{
+				sTco->updateTrackTcos();
+			}
+		}
 		TrackContentObjectView::mousePressEvent( _me );
 	}
 }
@@ -401,11 +422,14 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 
 void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 {
-	SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
+	if( _me->button() == Qt::MiddleButton && !_me->modifiers() )
+	{
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
 		if( sTco )
 		{
 			sTco->playbackPositionChanged();
 		}
+	}
 	TrackContentObjectView::mouseReleaseEvent( _me );
 }
 

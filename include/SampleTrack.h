@@ -73,6 +73,7 @@ public slots:
 	void updateLength();
 	void toggleRecord();
 	void playbackPositionChanged();
+	void updateTrackTcos();
 
 
 private:
