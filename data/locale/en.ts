@@ -227,6 +227,9 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation type="unfinished"></translation>
@@ -2245,6 +2248,9 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation type="unfinished"></translation>
@@ -4026,6 +4032,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <source>Enable note labels in piano roll</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Save project template</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -4061,25 +4071,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>unnamed_midi_controller</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MidiImport</name>
-    <message>
-        <source>Setup incomplete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You did not compile LMMS with support for SoundFont2 player, which is used to add default sound to imported MIDI files. Therefore no sound will be played back after importing this MIDI file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Track</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6238,6 +6229,21 @@ Remember to also save your project manually.</source>
     </message>
 </context>
 <context>
+    <name>SmfImport</name>
+    <message>
+        <source>Setup incomplete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You did not compile LMMS with support for SoundFont2 player, which is used to add default sound to imported MIDI files. Therefore no sound will be played back after importing this MIDI file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Song</name>
     <message>
         <source>Tempo</source>
@@ -6313,6 +6319,18 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>LMMS Error report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overture projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cakewalk projects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save project</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6703,8 +6721,11 @@ Please make sure you have read-permission to the file and the directory containi
         <source>Please wait...</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>TrackContainer::TrackContainer</name>
     <message>
-        <source>Importing MIDI-file...</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6964,6 +6985,10 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Decrement version number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7713,6 +7738,13 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here for a user-defined shape.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>commonReader</name>
+    <message>
+        <source>Track</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9085,10 +9117,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Filter for importing MIDI-files into LMMS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
 This chip was used in the Commodore 64 computer.</source>
         <translation type="unfinished"></translation>
@@ -9211,6 +9239,10 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter for importing MIDI-like files into LMMS</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

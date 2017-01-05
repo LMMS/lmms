@@ -65,6 +65,9 @@ set(LMMS_SRCS
 	core/TrackContainer.cpp
 	core/VstSyncController.cpp
 
+        core/SmfMidiCC.cpp
+        core/SmfMidiChannel.cpp
+
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp
 	core/audio/AudioFileDevice.cpp

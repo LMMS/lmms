@@ -1187,6 +1187,10 @@ void Song::importProject()
 			ConfigManager::inst()->userProjectsDir(),
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
+			tr("Overture projects") +
+			" (*.ove);;" +
+			tr("Cakewalk projects") +
+			" (*.wrk);;" +
 			tr("Hydrogen projects") +
 			" (*.h2song);;" +
 			tr("All file types") +
