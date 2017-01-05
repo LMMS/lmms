@@ -9,7 +9,6 @@
 04 apr 03 -- fixed bug in add_track that caused infinite loop
 */
 
-#include "debug.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
@@ -147,7 +146,7 @@ void Alg_parameters::insert_real(Alg_parameters **list, char *name, double r)
     *list = a;
     a->parm.set_attr(symbol_table.insert_string(name));
     a->parm.r = r;
-    assert(a->parm.attr_type() == 'r');
+    abort_unless(a->parm.attr_type() == 'r');
 }
 
 
@@ -158,7 +157,7 @@ void Alg_parameters::insert_string(Alg_parameters **list, char *name, char *s)
     a->parm.set_attr(symbol_table.insert_string(name));
     // string is deleted when parameter is deleted
     a->parm.s = heapify(s);
-    assert(a->parm.attr_type() == 's');
+    abort_unless(a->parm.attr_type() == 's');
 }
 
 
@@ -168,7 +167,7 @@ void Alg_parameters::insert_integer(Alg_parameters **list, char *name, long i)
     *list = a;
     a->parm.set_attr(symbol_table.insert_string(name));
     a->parm.i = i;
-    assert(a->parm.attr_type() == 'i');
+    abort_unless(a->parm.attr_type() == 'i');
 }
 
 
@@ -178,7 +177,7 @@ void Alg_parameters::insert_logical(Alg_parameters **list, char *name, bool l)
     *list = a;
     a->parm.set_attr(symbol_table.insert_string(name));
     a->parm.l = l;
-    assert(a->parm.attr_type() == 'l');
+    abort_unless(a->parm.attr_type() == 'l');
 }
 
 
@@ -188,7 +187,7 @@ void Alg_parameters::insert_atom(Alg_parameters **list, char *name, char *s)
     *list = a;
     a->parm.set_attr(symbol_table.insert_string(name));
     a->parm.a = symbol_table.insert_string(s);
-    assert(a->parm.attr_type() == 'a');
+    abort_unless(a->parm.attr_type() == 'a');
 }
 
 
@@ -209,7 +208,7 @@ Alg_parameters *Alg_parameters::remove_key(Alg_parameters **list, const char *na
 
 Alg_parameter_ptr Alg_parameters::find(Alg_attribute *attr)
 {
-    assert(attr);
+    abort_unless(attr);
     Alg_parameters_ptr temp = this;
     while (temp) {
         if (temp->parm.attr == *attr) {
@@ -271,9 +270,9 @@ void Alg_event::set_parameter(Alg_parameter_ptr new_parameter)
 
 void Alg_event::set_string_value(char *a, char *value)
 {
-    assert(a); // must be non-null
+    abort_unless(a); // must be non-null
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(attr[0] == 's');
+    abort_unless(attr[0] == 's');
     Alg_parameter parm;
     parm.set_attr(attr);
     parm.s = value;
@@ -284,12 +283,12 @@ void Alg_event::set_string_value(char *a, char *value)
 
 void Alg_event::set_real_value(char *a, double value)
 {
-    assert(a); // must be non-null
+    abort_unless(a); // must be non-null
     // attr is like a, but it has the type code prefixed for
     // fast lookup, and it is a unique string in symbol_table
     // e.g. a="attackr" -> attr="rattackr"
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(attr[0] == 'r');
+    abort_unless(attr[0] == 'r');
     Alg_parameter parm;
     parm.set_attr(attr);
     parm.r = value;
@@ -300,9 +299,9 @@ void Alg_event::set_real_value(char *a, double value)
 
 void Alg_event::set_logical_value(char *a, bool value)
 {
-    assert(a); // must be non-null
+    abort_unless(a); // must be non-null
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(attr[0] == 'l');
+    abort_unless(attr[0] == 'l');
     Alg_parameter parm;
     parm.set_attr(attr);
     parm.l = value;
@@ -313,9 +312,9 @@ void Alg_event::set_logical_value(char *a, bool value)
 
 void Alg_event::set_integer_value(char *a, long value)
 {
-    assert(a); // must be non-null
+    abort_unless(a); // must be non-null
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(attr[0] == 'i');
+    abort_unless(attr[0] == 'i');
     Alg_parameter parm;
     parm.set_attr(attr);
     parm.i = value;
@@ -326,9 +325,9 @@ void Alg_event::set_integer_value(char *a, long value)
 
 void Alg_event::set_atom_value(char *a, char *value)
 {
-    assert(a); // must be non-null
+    abort_unless(a); // must be non-null
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(attr[0] == 'a');
+    abort_unless(attr[0] == 'a');
     Alg_parameter parm;
     parm.set_attr(attr);
     parm.a = value;
@@ -339,7 +338,7 @@ void Alg_event::set_atom_value(char *a, char *value)
 
 float Alg_event::get_pitch()
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     return note->pitch;
 }
@@ -347,7 +346,7 @@ float Alg_event::get_pitch()
 
 float Alg_event::get_loud()
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     return note->loud;
 }
@@ -355,7 +354,7 @@ float Alg_event::get_loud()
 
 double Alg_event::get_start_time()
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     return note->time;
 }
@@ -363,7 +362,7 @@ double Alg_event::get_start_time()
 
 double Alg_event::get_end_time()
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     return note->time + note->dur;
 }
@@ -371,7 +370,7 @@ double Alg_event::get_end_time()
 
 double Alg_event::get_duration()
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     return note->dur;
 }
@@ -379,14 +378,14 @@ double Alg_event::get_duration()
 
 void Alg_event::set_pitch(float p)
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     note->pitch = p;
 }
 
 void Alg_event::set_loud(float l)
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note *note = (Alg_note *) this;
     note->loud = l;
 }
@@ -394,7 +393,7 @@ void Alg_event::set_loud(float l)
 
 void Alg_event::set_duration(double d)
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     note->dur = d;
 }
@@ -402,8 +401,8 @@ void Alg_event::set_duration(double d)
 
 bool Alg_event::has_attribute(char *a)
 {
-    assert(is_note());
-    assert(a); // must be non-null
+    abort_unless(is_note());
+    abort_unless(a); // must be non-null
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
     Alg_parameter_ptr parm = note->parameters->find(&attr);
@@ -413,19 +412,19 @@ bool Alg_event::has_attribute(char *a)
 
 char Alg_event::get_attribute_type(char *a)
 {
-    assert(is_note());
-    assert(a);
+    abort_unless(is_note());
+    abort_unless(a);
     return a[strlen(a) - 1];
 }
 
 
 char *Alg_event::get_string_value(char *a, char *value)
 {
-    assert(is_note());
-    assert(a); // must be non-null
+    abort_unless(is_note());
+    abort_unless(a); // must be non-null
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(a[0] == 's'); // must be of type string
+    abort_unless(a[0] == 's'); // must be of type string
     Alg_parameter_ptr parm = note->parameters->find(&attr);
     if (parm) return parm->s;
     return value;
@@ -434,11 +433,11 @@ char *Alg_event::get_string_value(char *a, char *value)
 
 double Alg_event::get_real_value(char *a, double value)
 {	
-    assert(is_note());
-    assert(a);
+    abort_unless(is_note());
+    abort_unless(a);
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(a[0] == 'r'); // must be of type real
+    abort_unless(a[0] == 'r'); // must be of type real
     Alg_parameter_ptr parm = note->parameters->find(&attr);
     if (parm) return parm->r;
     return value;
@@ -447,11 +446,11 @@ double Alg_event::get_real_value(char *a, double value)
 
 bool Alg_event::get_logical_value(char *a, bool value)
 {	
-    assert(is_note());
-    assert(a);
+    abort_unless(is_note());
+    abort_unless(a);
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(a[0] == 'l'); // must be of type logical
+    abort_unless(a[0] == 'l'); // must be of type logical
     Alg_parameter_ptr parm = note->parameters->find(&attr);
     if (parm) return parm->l;
     return value;
@@ -460,11 +459,11 @@ bool Alg_event::get_logical_value(char *a, bool value)
 
 long Alg_event::get_integer_value(char *a, long value)
 {	
-    assert(is_note());
-    assert(a);
+    abort_unless(is_note());
+    abort_unless(a);
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(a[0] == 'i'); // must be of type integer
+    abort_unless(a[0] == 'i'); // must be of type integer
     Alg_parameter_ptr parm = note->parameters->find(&attr);
     if (parm) return parm->i;
     return value;
@@ -473,11 +472,11 @@ long Alg_event::get_integer_value(char *a, long value)
 
 char *Alg_event::get_atom_value(char *a, char *value)
 {	
-    assert(is_note());
-    assert(a);
+    abort_unless(is_note());
+    abort_unless(a);
     Alg_note* note = (Alg_note *) this;
     Alg_attribute attr = symbol_table.insert_string(a);
-    assert(a[0] == 'a'); // must be of type atom
+    abort_unless(a[0] == 'a'); // must be of type atom
     Alg_parameter_ptr parm = note->parameters->find(&attr);
     if (parm) return parm->a;
     // if default is a string, convert to an atom (unique
@@ -489,7 +488,7 @@ char *Alg_event::get_atom_value(char *a, char *value)
 
 void Alg_event::delete_attribute(char *a)
 {
-    assert(is_note());
+    abort_unless(is_note());
     Alg_note* note = (Alg_note *) this;
     Alg_parameters::remove_key(&(note->parameters), a);
 }
@@ -498,7 +497,7 @@ void Alg_event::delete_attribute(char *a)
 const char *Alg_event::get_attribute()
 // Note: this returns a string, not an Alg_attribute
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
     return update->parameter.attr_name();
 }
@@ -506,7 +505,7 @@ const char *Alg_event::get_attribute()
 
 char Alg_event::get_update_type()
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
     return update->parameter.attr_type();
 }
@@ -514,45 +513,45 @@ char Alg_event::get_update_type()
 
 char *Alg_event::get_string_value()
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
-    assert(get_update_type() == 's');
+    abort_unless(get_update_type() == 's');
     return update->parameter.a;
 }
 
 
 double Alg_event::get_real_value()
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
-    assert(get_update_type() == 'r');
+    abort_unless(get_update_type() == 'r');
     return update->parameter.r;
 }
 
 
 bool Alg_event::get_logical_value()
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
-    assert(get_update_type() == 'l');
+    abort_unless(get_update_type() == 'l');
     return update->parameter.l;
 }
 
 
 long Alg_event::get_integer_value()
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
-    assert(get_update_type() == 'i');
+    abort_unless(get_update_type() == 'i');
     return update->parameter.i;
 }
 
 
 char *Alg_event::get_atom_value()
 {
-    assert(is_update());
+    abort_unless(is_update());
     Alg_update* update = (Alg_update *) this;
-    assert(get_update_type() == 'a');
+    abort_unless(get_update_type() == 'a');
     return update->parameter.a;
 }
 
@@ -666,7 +665,7 @@ void Alg_events::insert(Alg_event_ptr event)
 
 Alg_event_ptr Alg_events::uninsert(long index)
 {
-    assert(0 <= index && index < len);
+    abort_unless(0 <= index && index < len);
     Alg_event_ptr event = events[index];
     memmove(events + index, events + index + 1,
             sizeof(Alg_event_ptr) * (len - index - 1));
@@ -710,7 +709,7 @@ Alg_event_list::Alg_event_list(Alg_track *owner)
 
 Alg_event_ptr &Alg_event_list::operator [](int i) 
 {
-    assert(i >= 0 && i < len);
+    abort_unless(i >= 0 && i < len);
     return events[i];
 }
 
@@ -731,7 +730,7 @@ void Alg_event_list::set_start_time(Alg_event *event, double t)
 	Alg_track_ptr track_ptr = Alg_track_ptr();
     if (type == 'e') { // this is an Alg_event_list
         // make sure the owner has not changed its event set
-        assert(events_owner && 
+        abort_unless(events_owner &&
                sequence_number == events_owner->sequence_number);
         // do the update on the owner
         events_owner->set_start_time(event, t);
@@ -755,7 +754,7 @@ void Alg_event_list::set_start_time(Alg_event *event, double t)
             }
         }
     }
-    assert(false); // event not found seq or track!
+    abort_unless(false); // event not found seq or track!
   found_event:
     // at this point, track[index] == event
     // we could be clever and figure out exactly what notes to move
@@ -780,7 +779,7 @@ void Alg_beats::expand()
 
 void Alg_beats::insert(long i, Alg_beat_ptr beat)
 {
-    assert(i >= 0 && i <= len);
+    abort_unless(i >= 0 && i <= len);
     if (maxlen <= len) {
         expand();
     }
@@ -793,8 +792,8 @@ void Alg_beats::insert(long i, Alg_beat_ptr beat)
 Alg_time_map::Alg_time_map(Alg_time_map *map)
 {
     refcount = 0;
-    assert(map->beats[0].beat == 0 && map->beats[0].time == 0);
-    assert(map->beats.len > 0);
+    abort_unless(map->beats[0].beat == 0 && map->beats[0].time == 0);
+    abort_unless(map->beats.len > 0);
     // new_beats[0] = map->beats[0]; 
        // this is commented because
        // both new_beats[0] and map->beats[0] should be (0, 0)
@@ -1274,7 +1273,7 @@ void Alg_track::serialize(void **buffer, long *bytes)
     //               zero pad to ALIGN
     //
     // The format for a track is given within the Seq format above
-    assert(get_type() == 't');
+    abort_unless(get_type() == 't');
     ser_buf.init_for_write();
     serialize_track();
     *buffer = ser_buf.to_heap(bytes); 
@@ -1283,7 +1282,7 @@ void Alg_track::serialize(void **buffer, long *bytes)
 
 void Alg_seq::serialize(void **buffer, long *bytes)
 {	
-    assert(get_type() == 's');
+    abort_unless(get_type() == 's');
     ser_buf.init_for_write();
     serialize_seq();
     *buffer = ser_buf.to_heap(bytes); 
@@ -1387,7 +1386,7 @@ void Alg_track::serialize_track()
             }
             ser_buf.store_long(parm_num_offset, parm_num);
         } else {
-            assert(event->is_update());
+            abort_unless(event->is_update());
             Alg_update *update = (Alg_update *) event;
             serialize_parameter(&(update->parameter));
         }
@@ -1435,19 +1434,19 @@ void Alg_track::serialize_parameter(Alg_parameter *parm)
 
 Alg_track *Alg_track::unserialize(void *buffer, long len)
 {
-    assert(len > 8);
+    abort_unless(len > 8);
     ser_buf.init_for_read(buffer, len);
     bool alg = ser_buf.get_char() == 'A' &&
                ser_buf.get_char() == 'L' &&
                ser_buf.get_char() == 'G';
-    assert(alg);
+    abort_unless(alg);
     char c = ser_buf.get_char();
     if (c == 'S') {
         Alg_seq *seq = new Alg_seq;
         seq->unserialize_seq();
         return seq;
     } else {
-        assert(c == 'T');
+        abort_unless(c == 'T');
         Alg_track *track = new Alg_track;
         track->unserialize_track();
         return track;
@@ -1459,7 +1458,7 @@ void Alg_seq::unserialize_seq()
 {
     ser_buf.check_input_buffer(28);
     long len = ser_buf.get_int32();
-    assert(ser_buf.get_len() >= len);
+    abort_unless(ser_buf.get_len() >= len);
     channel_offset_per_track = ser_buf.get_int32();
     units_are_seconds = (bool) ser_buf.get_int32();
     time_map = new Alg_time_map();
@@ -1492,20 +1491,20 @@ void Alg_seq::unserialize_seq()
     // assume seq started at beginning of buffer. len measures
     // bytes after 'ALGS' header, so add 4 bytes and compare to
     // current buffer position -- they should agree
-    assert(ser_buf.get_posn() == len + 4);
+    abort_unless(ser_buf.get_posn() == len + 4);
 }
 
 
 void Alg_track::unserialize_track()
 {
     ser_buf.check_input_buffer(32);
-    assert(ser_buf.get_char() == 'A');
-    assert(ser_buf.get_char() == 'L');
-    assert(ser_buf.get_char() == 'G');
-    assert(ser_buf.get_char() == 'T');
+    abort_unless(ser_buf.get_char() == 'A');
+    abort_unless(ser_buf.get_char() == 'L');
+    abort_unless(ser_buf.get_char() == 'G');
+    abort_unless(ser_buf.get_char() == 'T');
     long offset = ser_buf.get_posn(); // stored length does not include 'ALGT'
     long bytes = ser_buf.get_int32();
-    assert(bytes <= ser_buf.get_len() - offset);
+    abort_unless(bytes <= ser_buf.get_len() - offset);
     units_are_seconds = (bool) ser_buf.get_int32();
     beat_dur = ser_buf.get_double();
     real_dur = ser_buf.get_double();
@@ -1537,7 +1536,7 @@ void Alg_track::unserialize_track()
             }
             append(note);
         } else {
-            assert(type == 'u');
+            abort_unless(type == 'u');
             Alg_update *update = create_update(time, channel, key);
             update->set_selected(selected);
             unserialize_parameter(&(update->parameter));
@@ -1545,7 +1544,7 @@ void Alg_track::unserialize_track()
         }
         ser_buf.get_pad();
     }
-    assert(offset + bytes == ser_buf.get_posn());
+    abort_unless(offset + bytes == ser_buf.get_posn());
 }
 
 
@@ -1736,12 +1735,13 @@ Alg_track_ptr Alg_track::copy(double t, double len, bool all)
 
 void Alg_track::paste(double t, Alg_event_list *seq)
 {
-    assert(get_type() == 't');
+    abort_unless(get_type() == 't');
     // seq can be an Alg_event_list, an Alg_track, or an Alg_seq
     // if it is an Alg_event_list, units_are_seconds must match
     bool prev_units_are_seconds = false;
     if (seq->get_type() == 'e') {
-        assert(seq->get_owner()->get_units_are_seconds() == units_are_seconds);
+        abort_unless(seq->get_owner()->get_units_are_seconds()
+            == units_are_seconds);
     } else { // make it match
         Alg_track_ptr tr = (Alg_track_ptr) seq;
         prev_units_are_seconds = tr->get_units_are_seconds();
@@ -2168,7 +2168,7 @@ void Alg_tracks::add_track(int track_num, Alg_time_map_ptr time_map,
     // If highest previous track is not at track_num-1, then
     // create tracks at len, len+1, ..., track_num.
 {
-    assert(track_num >= 0);
+    abort_unless(track_num >= 0);
     if (track_num == maxlen) {
         // use eponential growth to insert tracks sequentially
         expand();
@@ -2265,7 +2265,7 @@ void Alg_seq::seq_from_track(Alg_track_ref tr)
             to_track->append(event);
         }
     } else {
-        assert(false); // expected track or sequence
+        abort_unless(false); // expected track or sequence
     }
 }
 
@@ -2278,7 +2278,7 @@ int Alg_seq::tracks()
 
 Alg_track_ptr Alg_seq::track(int i)
 {
-    assert(0 <= i && i < track_list.length());
+    abort_unless(0 <= i && i < track_list.length());
     return &(track_list[i]);
 }
 
@@ -2297,7 +2297,7 @@ Alg_event_ptr &Alg_seq::operator[](int i)
         }
         tr++;
     }
-	assert(false); // out of bounds
+	abort_unless(false); // out of bounds
 }
 
 
@@ -2338,7 +2338,7 @@ void Alg_seq::convert_to_seconds()
 Alg_track_ptr Alg_seq::cut_from_track(int track_num, double start, 
                                       double dur, bool all)
 {
-    assert(track_num >= 0 && track_num < tracks());
+    abort_unless(track_num >= 0 && track_num < tracks());
     Alg_track_ptr tr = track(track_num);
     return tr->cut(start, dur, all);
 }
@@ -2544,7 +2544,7 @@ void Alg_seq::paste(double start, Alg_seq *seq)
     // paste in time signatures
     time_sig.paste(start, seq);
     set_dur(get_beat_dur() + seq->get_dur());
-    assert(!seq->units_are_seconds && !units_are_seconds);
+    abort_unless(!seq->units_are_seconds && !units_are_seconds);
     if (units_should_be_seconds) {
         convert_to_seconds();
     }
@@ -2557,7 +2557,7 @@ void Alg_seq::paste(double start, Alg_seq *seq)
 void Alg_seq::merge(double t, Alg_event_list_ptr seq)
 {
     // seq must be an Alg_seq:
-    assert(seq->get_type() == 's');
+    abort_unless(seq->get_type() == 's');
     Alg_seq_ptr s = (Alg_seq_ptr) seq;
     for (int i = 0; i < s->tracks(); i++) {
         if (tracks() <= i) add_track(i);

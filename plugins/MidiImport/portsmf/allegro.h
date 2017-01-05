@@ -48,9 +48,14 @@
 
 #ifndef __ALLEGRO__
 #define __ALLEGRO__
-#include "debug.h"
+
+#include <stdlib.h>
 
 #include "lmmsconfig.h"
+
+static inline void abort_unless(bool expr) {
+    if (!expr) abort();
+}
 
 #define ALG_EPS 0.000001 // epsilon
 #define ALG_DEFAULT_BPM 100.0 // default tempo
@@ -204,7 +209,7 @@ public:
     void set_integer_value(char *attr, long value);
     void set_atom_value(char *attr, char *atom);
 
-    // Some note methods. These fail (via assert()) if this is not a note:
+    // Some note methods. These fail (via abort_unless()) if this is not a note:
     //
     float get_pitch();// get pitch in steps -- use this even for MIDI
     float get_loud(); // get loudness (MIDI velocity)
@@ -307,7 +312,7 @@ public:
     double last_note_off;
     virtual int length() { return len; }
     Alg_event_ptr &operator[](int i) {
-        assert(i >= 0 && i < len);
+        abort_unless(i >= 0 && i < len);
         return events[i];
     }
     Alg_events() {
@@ -421,7 +426,7 @@ public:
     long len;
     Alg_beat_ptr beats;
     Alg_beat &operator[](int i) {
-        assert(i >= 0 && i < len);
+        abort_unless(i >= 0 && i < len);
         return beats[i];
     }
     Alg_beats() {
@@ -504,16 +509,16 @@ public:
     long get_len() { return len; }
     // store_long writes a long at a given offset
     void store_long(long offset, long value) {
-        assert(offset <= get_posn() - 4);
+        abort_unless(offset <= get_posn() - 4);
         long *loc = (long *) (buffer + offset);
         *loc = value;
     }
     void check_buffer(long needed);
     void set_string(char *s) { 
         char *fence = buffer + len;
-        assert(ptr < fence);
-        while ((*ptr++ = *s++)) assert(ptr < fence);
-       // assert((char *)(((long) (ptr + 7)) & ~7) <= fence);
+        abort_unless(ptr < fence);
+        while ((*ptr++ = *s++)) abort_unless(ptr < fence);
+       // abort_unless((char *)(((long) (ptr + 7)) & ~7) <= fence);
         pad(); }
     void set_int32(long v) { *((long *) ptr) = v; ptr += 4; }
     void set_double(double v) { *((double *) ptr) = v; ptr += 8; }
@@ -541,8 +546,8 @@ public:
     double get_double() { double d = *((double *) ptr); ptr += sizeof(double); 
                           return d; }
     char *get_string() { char *s = ptr; char *fence = buffer + len;
-                         assert(ptr < fence);
-                         while (*ptr++) assert(ptr < fence);
+                         abort_unless(ptr < fence);
+                         while (*ptr++) abort_unless(ptr < fence);
                          get_pad();
                          return s; }
 #ifdef LMMS_BUILD_WIN64
@@ -551,7 +556,7 @@ public:
     void get_pad() { while (((long) ptr) & 7) ptr++; }
 #endif
     void check_input_buffer(long needed) {
-        assert(get_posn() + needed <= len); }
+        abort_unless(get_posn() + needed <= len); }
 } *Serial_buffer_ptr;
 
 typedef class Alg_seq *Alg_seq_ptr;
@@ -573,7 +578,7 @@ public:
     void serialize_track();
     void unserialize_track();
     virtual Alg_event_ptr &operator[](int i) {
-        assert(i >= 0 && i < len);
+        abort_unless(i >= 0 && i < len);
         return events[i];
     }
     Alg_track() { units_are_seconds = false; time_map = NULL; 
@@ -776,7 +781,7 @@ public:
         time_sigs = NULL;
     }
     Alg_time_sig &operator[](int i) { // fetch a time signature
-        assert(i >= 0 && i < len);
+        abort_unless(i >= 0 && i < len);
         return time_sigs[i];
     }
     ~Alg_time_sigs() {
@@ -803,7 +808,7 @@ private:
 public:
     Alg_track_ptr *tracks; // tracks is array of pointers
     Alg_track &operator[](int i) {
-        assert(i >= 0 && i < len);
+        abort_unless(i >= 0 && i < len);
         return *tracks[i];
     }
     long length() { return len; }
@@ -925,7 +930,8 @@ public:
     // add_event takes a pointer to an event on the heap. The event is not
     // copied, and this Alg_seq becomes the owner and freer of the event.
     void add_event(Alg_event_ptr event, int track_num);
-    void add(Alg_event_ptr event) { assert(false); } // call add_event instead
+    // call add_event instead
+    void add(Alg_event_ptr event) { abort_unless(false); }
     // warning: set_tempo may change representation from seconds to beats
     bool set_tempo(double bpm, double start_beat, double end_beat);
     void set_time_sig(double beat, double num, double den);

@@ -19,6 +19,6 @@ sudo apt-get install -y $PACKAGES
 
 # Fix header
 if [ -e /usr/include/gig.h ]; then
-	LANG= sudo sed -ir 's/^( +)(DLS::[:A-Za-z]+;)/\1using \2/' \
+	LANG= sudo sed -ri 's/^( +)(DLS::[:A-Za-z]+;)/\1using \2/' \
 		/usr/include/gig.h
 fi

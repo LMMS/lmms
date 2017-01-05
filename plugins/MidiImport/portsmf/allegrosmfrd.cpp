@@ -3,7 +3,6 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
-#include "debug.h"
 #include <string>
 #include <fstream>
 #include "allegro.h"
@@ -195,7 +194,7 @@ double Alg_midifile_reader::get_time()
 
 void Alg_midifile_reader::Mf_on(int chan, int key, int vel)
 {
-    assert(!seq->get_units_are_seconds());
+    abort_unless(!seq->get_units_are_seconds());
     if (vel == 0) {
         Mf_off(chan, key, vel);
         return;
@@ -436,7 +435,7 @@ void Alg_midifile_reader::Mf_text(int type, int len, char *msg)
 // parse file into a seq. 
 Alg_error alg_smf_read(istream &file, Alg_seq_ptr new_seq)
 {
-    assert(new_seq);
+    abort_unless(new_seq);
     Alg_midifile_reader ar(file, new_seq);
     bool err = ar.parse();
     ar.seq->set_real_dur(ar.seq->get_time_map()->

@@ -40,7 +40,6 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MidiTime.h"
-#include "debug.h"
 #include "embed.h"
 #include "Song.h"
 
