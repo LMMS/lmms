@@ -150,6 +150,8 @@ public:
 		return "sampletrack";
 	}
 
+public slots:
+	void updateTcos();
 
 private:
 	FloatModel m_volumeModel;

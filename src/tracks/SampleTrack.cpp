@@ -105,6 +105,11 @@ SampleTCO::SampleTCO( Track * _track ) :
 
 SampleTCO::~SampleTCO()
 {
+	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
+	if( sampletrack)
+	{
+		sampletrack->updateTcos();
+	}
 	sharedObject::unref( m_sampleBuffer );
 }
 
@@ -681,6 +686,19 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
+}
+
+
+
+
+void SampleTrack::updateTcos()
+{
+	for( int i = 0; i < numOfTCOs(); ++i )
+	{
+		TrackContentObject * tco = getTCO( i );
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
+		sTco->playbackPositionChanged();
+	}
 }
 
 
