@@ -81,8 +81,6 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute track
 	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
-	//care about TCO length
-	connect( this, SIGNAL( lengthChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//playbutton clicked or space key
@@ -391,6 +389,19 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 	{
 		TrackContentObjectView::mousePressEvent( _me );
 	}
+}
+
+
+
+
+void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
+{
+	SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
+		if( sTco )
+		{
+			sTco->playbackPositionChanged();
+		}
+	TrackContentObjectView::mouseReleaseEvent( _me );
 }
 
 
