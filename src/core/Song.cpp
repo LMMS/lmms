@@ -269,6 +269,7 @@ void Song::processNextBuffer()
 				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+			emit updateSampleTracks();
 		}
 	}
 
@@ -338,17 +339,17 @@ void Song::processNextBuffer()
 				// if looping-mode is enabled and we have got
 				// past the looping range, return to the 
 				// beginning of the range
-				if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
-				{
-					emit updateSampleTracks();
-				}
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
 
-					m_elapsedMilliSeconds = 
-						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) / 
+					m_elapsedMilliSeconds =
+						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) /
 							getTempo();
+				}
+				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
+				{
+					emit updateSampleTracks();
 				}
 			}
 			else
