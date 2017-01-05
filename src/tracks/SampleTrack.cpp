@@ -572,7 +572,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 					//else we play the sample to the end but nothing more
 					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
 					//we only play within the sampleBuffer limits
-					if( sampleStart < sTco->sampleBuffer()->frames() )
+					if( sampleStart < sampleBufferLength )
 					{
 						sTco->setSampleStartFrame( sampleStart );
 						sTco->setSamplePlayLength( samplePlayLength );
