@@ -577,6 +577,8 @@ public:
 		return m_processingLock.tryLock();
 	}
 
+	BoolModel* getMutedModel();
+
 public slots:
 	virtual void setName( const QString & newName )
 	{

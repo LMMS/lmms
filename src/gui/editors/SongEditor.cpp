@@ -610,6 +610,14 @@ bool SongEditor::allowRubberband() const
 
 
 
+ComboBoxModel *SongEditor::zoomingModel() const
+{
+	return m_zoomingModel;
+}
+
+
+
+
 SongEditorWindow::SongEditorWindow(Song* song) :
 	Editor(Engine::mixer()->audioDev()->supportsCapture()),
 	m_editor(new SongEditor(song))
@@ -703,6 +711,7 @@ QSize SongEditorWindow::sizeHint() const
 
 void SongEditorWindow::play()
 {
+	emit playTriggered();
 	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
 	{
 		Engine::getSong()->playSong();

@@ -71,6 +71,8 @@ public:
 	void saveSettings( QDomDocument& doc, QDomElement& element );
 	void loadSettings( const QDomElement& element );
 
+	ComboBoxModel *zoomingModel() const;
+
 public slots:
 	void scrolled( int new_pos );
 
@@ -157,6 +159,9 @@ protected slots:
 	void stop();
 
 	void adjustUiAfterProjectLoad();
+
+signals:
+	void playTriggered();
 
 private:
 	QAction* m_addBBTrackAction;
