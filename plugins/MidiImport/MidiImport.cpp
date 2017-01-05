@@ -79,14 +79,7 @@ MidiImport::MidiImport( const QString & _file ) :
 	ImportFilter( _file, &midiimport_plugin_descriptor ),
 	m_events(),
 	m_timingDivision( 0 ),
-	pd( QProgressDialog( TrackContainer::tr( "Importing MIDI-file..." ),
-		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow()) )
 {
-	m_seq = new drumstick::QSmf(this);
-
-	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
-	pd.setWindowModality(Qt::WindowModal);
-	pd.setMinimumDuration( 0 );
 
 }
 
@@ -156,14 +149,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	QString filename = file().fileName();
 	closeFile();
 
-	m_tc = tc;
 
-	const int preTrackSteps = 2;
-
-	pd.setValue( 0 );
-
-	Alg_seq_ptr seq = new Alg_seq(filename.toLocal8Bit(), true);
-	seq->convert_to_beats();
 
 	m_seq->readFromFile( fileName );
 
@@ -177,9 +163,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	AutomationPattern * timeSigDenominatorPat = 
 		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
 	
-	// TODO: adjust these to Time.Sig changes
-	double beatsPerTact = 4; 
-	double ticksPerBeat = DefaultTicksPerTact / beatsPerTact;
 
 	// Time-sig changes
 	Alg_time_sigs * timeSigs = &seq->time_sig;
