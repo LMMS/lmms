@@ -473,9 +473,9 @@ void Midifile_reader::msgenlarge()
 
     /* copy old message into larger new one */
     if ( oldmess != 0 ) {
-        register char *p = newmess;
-        register char *q = oldmess;
-        register char *endq = &oldmess[oldleng];
+        char *p = newmess;
+        char *q = oldmess;
+        char *endq = &oldmess[oldleng];
 
         for ( ; q!=endq ; p++,q++ )
             *p = *q;

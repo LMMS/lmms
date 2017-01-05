@@ -165,7 +165,7 @@ static void activateVocoder(LADSPA_Handle instance) {
 	float main_vol = plugin_data->main_vol;
 	int num_bands = plugin_data->num_bands;
 	LADSPA_Data sample_rate = plugin_data->sample_rate;
-#line 83 "vocoder_1337.xml"
+#line 87 "vocoder_1337.xml"
 	int i;
 	for (i = 0; i < MAX_BANDS; i++)
 	{
@@ -182,7 +182,7 @@ static void activateVocoder(LADSPA_Handle instance) {
 }
 
 static void cleanupVocoder(LADSPA_Handle instance) {
-#line 92 "vocoder_1337.xml"
+#line 96 "vocoder_1337.xml"
 	Vocoder *plugin_data = (Vocoder *)instance;
 	free(plugin_data->ctrl_band_levels);
 	free(instance);
@@ -384,7 +384,7 @@ static void runVocoder(LADSPA_Handle instance, unsigned long sample_count) {
 	int num_bands = plugin_data->num_bands;
 	LADSPA_Data sample_rate = plugin_data->sample_rate;
 
-#line 96 "vocoder_1337.xml"
+#line 100 "vocoder_1337.xml"
 	int i, j, numbands, pan;
 	float a;
 	LADSPA_Data x, c;
@@ -590,7 +590,7 @@ static void runAddingVocoder(LADSPA_Handle instance, unsigned long sample_count)
 	int num_bands = plugin_data->num_bands;
 	LADSPA_Data sample_rate = plugin_data->sample_rate;
 
-#line 96 "vocoder_1337.xml"
+#line 100 "vocoder_1337.xml"
 	int i, j, numbands, pan;
 	float a;
 	LADSPA_Data x, c;

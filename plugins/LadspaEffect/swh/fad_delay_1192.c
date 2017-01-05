@@ -99,7 +99,7 @@ static void activateFadDelay(LADSPA_Handle instance) {
 }
 
 static void cleanupFadDelay(LADSPA_Handle instance) {
-#line 47 "fad_delay_1192.xml"
+#line 46 "fad_delay_1192.xml"
 	FadDelay *plugin_data = (FadDelay *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -194,7 +194,7 @@ static void runFadDelay(LADSPA_Handle instance, unsigned long sample_count) {
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 51 "fad_delay_1192.xml"
+#line 50 "fad_delay_1192.xml"
 	long int pos;
 	float increment = (float)buffer_size / ((float)sample_rate *
 	                                        f_max(fabs(delay), 0.01));
@@ -266,7 +266,7 @@ static void runAddingFadDelay(LADSPA_Handle instance, unsigned long sample_count
 	float phase = plugin_data->phase;
 	long sample_rate = plugin_data->sample_rate;
 
-#line 51 "fad_delay_1192.xml"
+#line 50 "fad_delay_1192.xml"
 	long int pos;
 	float increment = (float)buffer_size / ((float)sample_rate *
 	                                        f_max(fabs(delay), 0.01));

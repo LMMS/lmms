@@ -63,7 +63,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 }
 
 static void cleanupFmOsc(LADSPA_Handle instance) {
-#line 37 "fm_osc_1415.xml"
+#line 35 "fm_osc_1415.xml"
 	FmOsc *plugin_data = (FmOsc *)instance;
 	blo_h_tables_free(plugin_data->tables);
 	blo_h_free(plugin_data->osc);

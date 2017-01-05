@@ -23,12 +23,12 @@ IF(QT5)
 ELSE()
 	QT4_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
 ENDIF()
-INCLUDE_DIRECTORIES(
-	"${CMAKE_CURRENT_BINARY_DIR}"
-	"${CMAKE_BINARY_DIR}"
-	"${CMAKE_BINARY_DIR}/include"
-	"${CMAKE_SOURCE_DIR}"
+INCLUDE_DIRECTORIES(BEFORE
 	"${CMAKE_SOURCE_DIR}/include"
+	"${CMAKE_SOURCE_DIR}"
+	"${CMAKE_BINARY_DIR}/include"
+	"${CMAKE_BINARY_DIR}"
+	"${CMAKE_CURRENT_BINARY_DIR}"
 )
 
 IF(WIN32)
@@ -82,6 +82,47 @@ IF(LMMS_BUILD_LINUX)
 ENDIF()
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+# Fix qvector.h
+SET(LOCAL_QVECTOR_H)
+IF(QT5)
+	SET(SYSTEM_QVECTOR_H)
+	FOREACH(DIR ${Qt5Core_INCLUDE_DIRS})
+		IF(NOT EXISTS "${DIR}")
+			CONTINUE()
+		ENDIF()
+		EXECUTE_PROCESS(
+			COMMAND find "${DIR}" -name qvector.h
+			COMMAND head -n 1
+			OUTPUT_VARIABLE SYSTEM_QVECTOR_H
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+		IF(SYSTEM_QVECTOR_H)
+			BREAK()
+		ENDIF()
+	ENDFOREACH()
+	IF(SYSTEM_QVECTOR_H)
+		EXECUTE_PROCESS(
+			COMMAND grep
+"memmove(abegin, aend, (d->size - itemsToErase - itemsUntouched) \\* sizeof(T));"
+				"${SYSTEM_QVECTOR_H}"
+			OUTPUT_VARIABLE BAD_HEADER)
+		IF(BAD_HEADER)
+			SET(LOCAL_QVECTOR_H qvector.h)
+			ADD_CUSTOM_COMMAND(
+				OUTPUT qvector.h
+				COMMAND mkdir -p QtCore
+				COMMAND sed
+"/memmove(abegin, aend, (d->size - itemsToErase - itemsUntouched) \\* sizeof(T));/ {\
+	s/abegin/static_cast<void *>(&)/;\
+	s/aend/static_cast<void *>(&)/\
+}"
+					"${SYSTEM_QVECTOR_H}" > QtCore/qvector.h
+				COMMAND cp -a QtCore/qvector.h .
+				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+				VERBATIM)
+		ENDIF()
+	ENDIF()
+ENDIF()
+
 # ADD_LIBRARY's OBJECT is only supported in CMake >=2.8.8
 IF(CMAKE_VERSION VERSION_GREATER "2.8.7")
 
@@ -107,7 +148,8 @@ ELSE()
 	)
 ENDIF()
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_RCC_OUT} ${LMMS_UI_OUT} lmmsconfig.h lmms.1.gz")
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
+	"${LMMS_RCC_OUT};${LMMS_UI_OUT};lmmsconfig.h;lmms.1.gz")
 
 IF(LMMS_BUILD_WIN32)
 	SET(EXTRA_LIBRARIES "-lwinmm")

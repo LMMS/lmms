@@ -88,7 +88,7 @@ static void activatePitchScale(LADSPA_Handle instance) {
 }
 
 static void cleanupPitchScale(LADSPA_Handle instance) {
-#line 83 "pitch_scale_1193.xml"
+#line 82 "pitch_scale_1193.xml"
 	PitchScale *plugin_data = (PitchScale *)instance;
 	free (plugin_data->buffers->gInFIFO);
 	free (plugin_data->buffers->gOutFIFO);

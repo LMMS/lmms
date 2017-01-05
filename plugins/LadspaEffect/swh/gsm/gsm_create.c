@@ -4,7 +4,6 @@
  * details.  THERE IS ABSOLUTELY NO WARRANTY FOR THIS SOFTWARE.
  */
 
-
 #include	"config.h"
 
 #ifdef	HAS_STRING_H
