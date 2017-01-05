@@ -47,6 +47,7 @@
 
 #include "portsmf/allegro.h"
 #include "smfMidiCC.h"
+#include "smfMidiChannel.h"
 
 #define makeID(_c0, _c1, _c2, _c3) \
 		( 0 | \
@@ -77,9 +78,15 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 MidiImport::MidiImport( const QString & _file ) :
 	ImportFilter( _file, &midiimport_plugin_descriptor ),
 	m_events(),
-	m_timingDivision( 0 )
+	m_timingDivision( 0 ),
+	pd( QProgressDialog( TrackContainer::tr( "Importing MIDI-file..." ),
+		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow()) )
 {
 	m_seq = new drumstick::QSmf(this);
+
+	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
+	pd.setWindowModality(Qt::WindowModal);
+	pd.setMinimumDuration( 0 );
 
 }
 
@@ -88,6 +95,7 @@ MidiImport::MidiImport( const QString & _file ) :
 
 MidiImport::~MidiImport()
 {
+	delete m_seq;
 }
 
 
@@ -151,11 +159,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	m_tc = tc;
 
 	const int preTrackSteps = 2;
-	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
-		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow() );
-	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
-	pd.setWindowModality(Qt::WindowModal);
-	pd.setMinimumDuration( 0 );
 
 	pd.setValue( 0 );
 
@@ -168,10 +171,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	pd.setMaximum( m_seq->getTracks() + preTrackSteps );
 	pd.setValue( 1 );
 	
-	// 128 CC + Pitch Bend
-	smfMidiCC ccs[129];
-	smfMidiChannel chs[256];
-
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
 	AutomationPattern * timeSigNumeratorPat = 
 		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );

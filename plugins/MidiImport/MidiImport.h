@@ -28,10 +28,14 @@
 #include <QString>
 #include <QPair>
 #include <QVector>
+#include <QProgressDialog>
 #include <drumstick.h>
 
 #include "MidiEvent.h"
 #include "ImportFilter.h"
+
+#include "smfMidiCC.h"
+#include "smfMidiChannel.h"
 
 const double defaultPitchRange = 2.0f;
 
@@ -150,6 +154,12 @@ private:
 
 	drumstick::QSmf *m_seq;
 	TrackContainer *m_tc;
+	QProgressDialog pd;
+
+	// 128 CC + Pitch Bend
+	smfMidiCC ccs[129];
+	smfMidiChannel chs[256];
+
 } ;
 
 
