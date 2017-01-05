@@ -28,10 +28,12 @@
 #include <QString>
 #include <QPair>
 #include <QVector>
+#include <drumstick.h>
 
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
+const double defaultPitchRange = 2.0f;
 
 class MidiImport : public ImportFilter
 {
@@ -45,6 +47,30 @@ public:
 		return( NULL );
 	}
 
+public slots:
+	void headerEvent(int format, int ntrks, int division);
+	void trackStartEvent();
+	void trackEndEvent();
+	void endOfTrackEvent();
+	void noteOnEvent(int chan, int pitch, int vol);
+	void noteOffEvent(int chan, int pitch, int vol);
+	void keyPressEvent(int chan, int pitch, int press);
+	void ctlChangeEvent(int chan, int ctl, int value);
+	void pitchBendEvent(int chan, int value);
+	void programEvent(int chan, int patch);
+	void chanPressEvent(int chan, int press);
+	void sysexEvent(const QByteArray& data);
+	void seqSpecificEvent(const QByteArray& data);
+	void metaMiscEvent(int typ, const QByteArray& data);
+	void seqNum(int seq);
+	void forcedChannel(int channel);
+	void forcedPort(int port);
+	void textEvent(int typ, const QString& data);
+	void smpteEvent(int b0, int b1, int b2, int b3, int b4);
+	void timeSigEvent(int b0, int b1, int b2, int b3);
+	void keySigEvent(int b0, int b1);
+	void tempoEvent(int tempo);
+	void errorHandler(const QString& errorStr);
 
 private:
 	virtual bool tryImport( TrackContainer* tc );
@@ -122,6 +148,8 @@ private:
 	EventVector m_events;
 	int m_timingDivision;
 
+	drumstick::QSmf *m_seq;
+	TrackContainer *m_tc;
 } ;
 
 

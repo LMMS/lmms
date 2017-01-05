@@ -1,6 +1,7 @@
 INCLUDE(BuildPlugin)
 
 BUILD_PLUGIN(midiimport MidiImport.cpp MidiImport.h
+        smfMidiCC.cpp smfMidiCC.h smfMidiChannel.cpp smfMidiChannel.h
 	portsmf/allegro.cpp portsmf/allegro.h portsmf/allegrosmfwr.cpp
 	portsmf/allegrord.cpp portsmf/allegrowr.cpp portsmf/allegrosmfrd.cpp
 	portsmf/mfmidi.cpp portsmf/mfmidi.h portsmf/strparse.cpp

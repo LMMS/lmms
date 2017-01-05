@@ -183,6 +183,12 @@ IF(NOT SNDFILE_FOUND)
 	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
 ENDIF(NOT SNDFILE_FOUND)
 
+# check for drumstick-file
+PKG_CHECK_MODULES(DRUMSTICK_FILE REQUIRED drumstick-file>=1.1.0)
+IF(NOT DRUMSTICK_FILE_FOUND)
+        MESSAGE(FATAL_ERROR "LMMS requires libdrumstick-file and drumstick-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
+ENDIF(NOT DRUMSTICK_FILE_FUND)
+
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
 	SET(STATUS_CALF "OK")

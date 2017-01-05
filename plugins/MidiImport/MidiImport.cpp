@@ -28,6 +28,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <drumstick.h>
 
 #include "MidiImport.h"
 #include "TrackContainer.h"
@@ -45,6 +46,7 @@
 #include "Song.h"
 
 #include "portsmf/allegro.h"
+#include "smfMidiCC.h"
 
 #define makeID(_c0, _c1, _c2, _c3) \
 		( 0 | \
@@ -77,6 +79,8 @@ MidiImport::MidiImport( const QString & _file ) :
 	m_events(),
 	m_timingDivision( 0 )
 {
+	m_seq = new drumstick::QSmf(this);
+
 }
 
 
@@ -139,152 +143,16 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 }
 
-
-
-
-class smfMidiCC
-{
-
-public:
-	smfMidiCC() :
-		at( NULL ),
-		ap( NULL ),
-		lastPos( 0 )
-	{ }
-	
-	AutomationTrack * at;
-	AutomationPattern * ap;
-	MidiTime lastPos;
-	
-	smfMidiCC & create( TrackContainer* tc, QString tn )
-	{
-		if( !at )
-		{
-			// Keep LMMS responsive, for now the import runs 
-			// in the main thread. This should probably be 
-			// removed if that ever changes.
-			qApp->processEvents();
-			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
-		}
-		if( tn != "") {
-			at->setName( tn );
-		}
-		return *this;
-	}
-
-
-	void clear()
-	{
-		at = NULL;
-		ap = NULL;
-		lastPos = 0;
-	}
-
-
-	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value )
-	{
-		if( !ap || time > lastPos + DefaultTicksPerTact )
-		{
-			MidiTime pPos = MidiTime( time.getTact(), 0 );
-			ap = dynamic_cast<AutomationPattern*>(
-				at->createTCO(0) );
-			ap->movePosition( pPos );
-			ap->addObject( objModel );
-		}
-
-		lastPos = time;
-		time = time - ap->startPosition();
-		ap->putValue( time, value, false );
-		ap->changeLength( MidiTime( time.getTact() + 1, 0 ) ); 
-
-		return *this;
-	}
-};
-
-
-
-class smfMidiChannel
-{
-
-public:
-	smfMidiChannel() :
-		it( NULL ),
-		p( NULL ),
-		it_inst( NULL ),
-		isSF2( false ),
-		hasNotes( false ),
-		lastEnd( 0 )
-	{ }
-	
-	InstrumentTrack * it;
-	Pattern* p;
-	Instrument * it_inst;
-	bool isSF2; 
-	bool hasNotes;
-	MidiTime lastEnd;
-	QString trackName;
-	
-	smfMidiChannel * create( TrackContainer* tc, QString tn )
-	{
-		if( !it ) {
-			// Keep LMMS responsive
-			qApp->processEvents();
-			it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
-
-#ifdef LMMS_HAVE_FLUIDSYNTH
-			it_inst = it->loadInstrument( "sf2player" );
-		
-			if( it_inst )
-			{
-				isSF2 = true;
-				it_inst->loadFile( ConfigManager::inst()->defaultSoundfont() );
-				it_inst->childModel( "bank" )->setValue( 0 );
-				it_inst->childModel( "patch" )->setValue( 0 );
-			}
-			else
-			{
-				it_inst = it->loadInstrument( "patman" );
-			}	
-#else
-			it_inst = it->loadInstrument( "patman" );
-#endif
-			trackName = tn;
-			if( trackName != "") {
-				it->setName( tn );
-			}
-			lastEnd = 0;
-			// General MIDI default
-			it->pitchRangeModel()->setInitValue( 2 );
-		}
-		return this;
-	}
-
-
-	void addNote( Note & n )
-	{
-		if( !p || n.pos() > lastEnd + DefaultTicksPerTact )
-		{
-			MidiTime pPos = MidiTime( n.pos().getTact(), 0 );
-			p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
-			p->movePosition( pPos );
-		}
-		hasNotes = true;
-		lastEnd = n.pos() + n.length();
-		n.setPos( n.pos( p->startPosition() ) );
-		p->addNote( n, false );
-	}
-
-};
-
-
 bool MidiImport::readSMF( TrackContainer* tc )
 {
 	QString filename = file().fileName();
 	closeFile();
 
+	m_tc = tc;
+
 	const int preTrackSteps = 2;
 	QProgressDialog pd( TrackContainer::tr( "Importing MIDI-file..." ),
-	TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow() );
+		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow() );
 	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
 	pd.setMinimumDuration( 0 );
@@ -294,7 +162,10 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	Alg_seq_ptr seq = new Alg_seq(filename.toLocal8Bit(), true);
 	seq->convert_to_beats();
 
-	pd.setMaximum( seq->tracks()  + preTrackSteps );
+	m_seq->readFromFile( fileName );
+
+	//pd.setMaximum( seq->tracks()  + preTrackSteps );
+	pd.setMaximum( m_seq->getTracks() + preTrackSteps );
 	pd.setValue( 1 );
 	
 	// 128 CC + Pitch Bend
@@ -600,6 +471,18 @@ void MidiImport::error()
 	printf( "MidiImport::readTrack(): invalid MIDI data (offset %#x)\n",
 						(unsigned int) file().pos() );
 }
+
+
+// Slots
+
+void MidiImport::errorHandler( const QString& errorStr )
+{
+	printf( "MidiImport::readSMF(): got error %s\n"
+			errorStr.toStdString());
+}
+
+
+
 
 
 
