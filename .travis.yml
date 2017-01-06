@@ -33,7 +33,7 @@ deploy:
     on:
         tags: true
         all_branches: true
-        condition: "($TARGET_OS = win*) && ($QT5 = true)"
+        condition: "(${TARGET_OS} == win*) && (${QT5} == true)"
     repo: LMMS/lmms
 notifications:
     webhooks:
