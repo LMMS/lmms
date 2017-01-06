@@ -119,10 +119,14 @@ void midiReader::CCHandler(int chan, int ctl, int value){
 // Slots below.
 void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
 {
-	// TODO: from MidiImport.cpp
-	timeSigNumeratorPat->putValue(0, b0);
-	timeSigDenominatorPat->putValue(0, 1<<b1)
-
+	if(/* m_seq->getCurrentTime() == 0*/ true ){
+		printf("Another timesig at %f\n", m_seq->getCurrentTime()/ticksPerBeat/10);
+		timeSigNumeratorPat->putValue(m_seq->getCurrentTime()/10, b0);
+		timeSigDenominatorPat->putValue(0, 1<<b1)
+	}
+	else
+	{
+	}
 	pd.setValue(2);
 }
 
@@ -130,7 +134,9 @@ void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
 void midiReader::tempoEvent(int tempo)
 {
 	AutomationPattern * tap = m_tc->tempoAutomationPattern();
-	// TODO: form MidiImport.cpp
+	if( tap ) {
+		tap->clear();
+	}
 }
 
 void midiReader::errorHandler(const QString &errorStr)
