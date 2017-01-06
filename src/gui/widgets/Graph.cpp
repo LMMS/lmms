@@ -385,7 +385,7 @@ void Graph::paintEvent( QPaintEvent * )
 	if( m_mouseDown )
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
-		p.setPen( QColor( 0xAA, 0xFF, 0x00, 0x70 ) );
+		p.setPen( QColor( 0x70, 0x7C, 0x91 ) );
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}
@@ -641,12 +641,12 @@ void graphModel::smoothNonCyclic()
 	QVector<float> temp = m_samples;
 
 	// Smoothing
-	m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
+	//m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
 	for ( int i=1; i < ( length()-1 ); i++ )
 	{
 		m_samples[i] = ( temp[i-1] + ( temp[i] * 2 ) + temp[i+1] ) * 0.25f;
 	}
-	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
+	//m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
 
 	emit samplesChanged(0, length()-1);
 }

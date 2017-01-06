@@ -10,7 +10,7 @@ SET(MACOSX_BUNDLE_MIMETYPE_ICON         "project.icns")
 SET(MACOSX_BUNDLE_MIMETYPE_ID           "io.lmms")
 SET(MACOSX_BUNDLE_PROJECT_URL           "${PROJECT_URL}")
 
-CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_INSTALL_PREFIX}/Info.plist")
+CONFIGURE_FILE("lmms.plist.in"          "${CMAKE_BINARY_DIR}/Info.plist")
 CONFIGURE_FILE("install_apple.sh.in"    "${CMAKE_BINARY_DIR}/install_apple.sh" @ONLY)
 CONFIGURE_FILE("package_apple.json.in"  "${CMAKE_BINARY_DIR}/package_apple.json" @ONLY)
 
