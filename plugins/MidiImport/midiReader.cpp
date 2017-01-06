@@ -122,7 +122,7 @@ void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
 	if(/* m_seq->getCurrentTime() == 0*/ true ){
 		printf("Another timesig at %f\n", m_seq->getCurrentTime()/ticksPerBeat/10);
 		timeSigNumeratorPat->putValue(m_seq->getCurrentTime()/10, b0);
-		timeSigDenominatorPat->putValue(0, 1<<b1)
+		timeSigDenominatorPat->putValue(m_seq->getCurrentTime()/10, 1<<b1);
 	}
 	else
 	{
@@ -136,6 +136,7 @@ void midiReader::tempoEvent(int tempo)
 	AutomationPattern * tap = m_tc->tempoAutomationPattern();
 	if( tap ) {
 		tap->clear();
+		tap->putValue(m_seq->getCurrentTime()/10, 60000000/tempo);
 	}
 }
 
