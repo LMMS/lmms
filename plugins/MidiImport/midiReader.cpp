@@ -51,6 +51,18 @@ midiReader::midiReader( TrackContainer* tc ) :
 	pd.setMinimumDuration( 0 )
 	pd.setValue(0);
 
+
+	timeSigMM = Engine::getSong()->getTimeSigModel();
+	timeSigNumeratorPat = AutomationPattern::globalAutomationPattern(
+				&timeSigMM.numeratorModel());
+	timeSigDenominatorPat = AutomationPattern::globalAutomationPattern(
+				&timeSigMM.denominatorModel());
+
+	beatsPerTact = 4;
+	ticksPerBeat = DefaultBeatsPerTact / beatsPerTact;
+
+
+	// Connect to slots.
 	connect(m_seq, SIGNAL(signalSMFTimeSig(int,int,int,int)),
 			this, SLOT(timeSigEvent(int,int,int,int));
 
@@ -85,14 +97,6 @@ midiReader::midiReader( TrackContainer* tc ) :
 			this, SLOT(trackEndEvent());
 
 
-	timeSigMM = Engine::getSong()->getTimeSigModel();
-	timeSigNumeratorPat = AutomationPattern::globalAutomationPattern(
-				&timeSigMM.numeratorModel());
-	timeSigDenominatorPat = AutomationPattern::globalAutomationPattern(
-				&timeSigMM.denominatorModel());
-
-	beatsPerTact = 4;
-	ticksPerBeat = DefaultBeatsPerTact / beatsPerTact;
 
 }
 

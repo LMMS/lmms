@@ -88,7 +88,7 @@ MidiImport::MidiImport( const QString & _file ) :
 
 MidiImport::~MidiImport()
 {
-	delete m_seq;
+
 }
 
 
@@ -149,13 +149,6 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	QString filename = file().fileName();
 	closeFile();
 
-
-
-	m_seq->readFromFile( fileName );
-
-	//pd.setMaximum( seq->tracks()  + preTrackSteps );
-	pd.setMaximum( m_seq->getTracks() + preTrackSteps );
-	pd.setValue( 1 );
 	
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
 	AutomationPattern * timeSigNumeratorPat = 
