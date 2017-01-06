@@ -61,7 +61,6 @@ midiReader::midiReader( TrackContainer* tc ) :
 	beatsPerTact = 4;
 	ticksPerBeat = DefaultBeatsPerTact / beatsPerTact;
 
-
 	// Connect to slots.
 	connect(m_seq, SIGNAL(signalSMFTimeSig(int,int,int,int)),
 			this, SLOT(timeSigEvent(int,int,int,int));
@@ -162,6 +161,14 @@ void midiReader::programEvent(int chan, int patch)
 
 void midiReader::noteOnEvent(int chan, int pitch, int vol)
 {
+	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
+	smfMidiChannel * ch;
+	if (!chs[chan].created)
+		ch = chs[chan].create( tc, trackName );
+	else
+		ch = chs[chan];
+
+	// TODO: Note duration.
 
 }
 
@@ -177,12 +184,12 @@ void midiReader::textEvent(int typ, const QString &data)
 
 void midiReader::trackStartEvent()
 {
-
+	// It seems no need to use this.
 }
 
 void midiReader::trackEndEvent()
 {
-
+	// It seems no need to use this.
 }
 
 void midiReader::headerEvent(int format, int ntrks, int division) {

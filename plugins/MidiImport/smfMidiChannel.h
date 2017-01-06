@@ -46,6 +46,7 @@ public:
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
+	bool created;
 	MidiTime lastEnd;
 	QString trackName;
 	

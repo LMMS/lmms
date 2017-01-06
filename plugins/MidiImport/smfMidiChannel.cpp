@@ -37,6 +37,7 @@ smfMidiChannel::smfMidiChannel() :
 	it_inst( NULL ),
 	isSF2( false ),
 	hasNotes( false ),
+	created( false ),
 	lastEnd( 0 )
 { }
 
@@ -45,6 +46,7 @@ smfMidiChannel * smfMidiChannel::create( TrackContainer* tc, QString tn )
 	if( !it ) {
 		// Keep LMMS responsive
 		qApp->processEvents();
+		created = true;
 		it = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, tc ) );
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
