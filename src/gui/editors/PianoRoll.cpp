@@ -34,7 +34,6 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QSignalMapper>
-#include <initializer_list>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN

@@ -113,7 +113,7 @@ IF(QT5)
 				COMMAND sed
 "/memmove(abegin, aend, (d->size - itemsToErase - itemsUntouched) \\* sizeof(T));/ {\
 	s/abegin/static_cast<void *>(&)/;\
-	s/aend/static_cast<void *>(&)/\
+	s/aend/static_cast<void *>(&)/;\
 }"
 					"${SYSTEM_QVECTOR_H}" > QtCore/qvector.h
 				COMMAND cp -a QtCore/qvector.h .
