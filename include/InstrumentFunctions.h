@@ -69,10 +69,17 @@ public:
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
 
+
+
 	inline virtual QString nodeName() const
 	{
 		return "chordcreator";
 	}
+
+public slots:
+	//reloads the chords combo model
+	void updateChordTable();
+
 
 private:
 
@@ -80,6 +87,7 @@ private:
 	BoolModel m_chordsEnabledModel;
 	ComboBoxModel m_chordsModel;
 	FloatModel m_chordRangeModel;
+
 
 	friend class InstrumentFunctionNoteStackingView;
 
@@ -110,8 +118,6 @@ public:
 
 	void processNote( NotePlayHandle* n );
 
-	//reloads the chord table into the widget model, for example when data changes
-	void reloadChordTable();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -121,6 +127,9 @@ public:
 		return "arpeggiator";
 	}
 
+public slots:
+	//reloads the chord table into the widget model, for example when data changes
+	void updateChordTable();
 
 private:
 	enum ArpModes
@@ -159,12 +168,6 @@ class ChordSemiTone : public Model , public JournallingObject
 	Q_OBJECT
 public:
 
-	//the parent chord
-	Chord *m_chord;
-	//the name which propagates from the chord and position for automation
-	//TODO : to be implemented!!
-	QString m_name;
-
 	IntModel *key; //  the semitone
 	FloatModel *vol;
 	FloatModel *pan;
@@ -175,13 +178,20 @@ public:
 	// The note only has the key value. True: bare, we will discard al the rest, taking data from the base note
 	BoolModel *bare;
 
-	ChordSemiTone(Model *_parent);
+	//The semitone will always belong to a chord
+	ChordSemiTone(Chord *_parent);
 
 	//Creates a new semitone which gets data from the argument
 	ChordSemiTone(ChordSemiTone *_copy);
 
 	//constructs the object from a given string by calling the parseString function
-	ChordSemiTone(Model *_parent,QString _string);
+	ChordSemiTone(Chord *_parent,QString _string);
+
+	//return the parent chord
+	Chord *getChord()
+	{
+		return qobject_cast<Chord*>(parent());
+	}
 
 	virtual ~ChordSemiTone() {}
 
@@ -195,66 +205,31 @@ public:
 	{
 		return "chordSemiTone";
 	}
-
-	QString name() const;
-	void setName(const QString &name);
 };
-
-
-/*****************************************************************************************************
- *
- * The ChordSemiTones class
- *
-******************************************************************************************************/
-class ChordSemiTones : public Model, public JournallingObject, public QVector<ChordSemiTone*>
-{
-	Q_OBJECT
-public:
-	ChordSemiTones(Model *_parent);
-
-	//Calls parseString
-	ChordSemiTones(Model *_parent,QString _string);
-
-	//creates a new vector with data resembling the argument
-	ChordSemiTones(ChordSemiTones *_copy);
-
-	virtual ~ChordSemiTones() {}
-
-	//parses the string into data by adding the Semitones to the vector after clearing it
-	void parseString( QString _string );
-
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
-
-	inline virtual QString nodeName() const
-	{
-		return "chordSemiTones";
-	}
-
-};
-
 
 /*****************************************************************************************************
  *
  * The Chord class
  *
 ******************************************************************************************************/
-class Chord : public Model, public JournallingObject
+class Chord : public Model, public JournallingObject, public QVector<ChordSemiTone*>
 {
 	Q_OBJECT
 public:
-
-	ChordSemiTones *m_chordSemiTones;
+	//the chord Name;
 	QString m_name;
 
+	//creates an empty chord
 	Chord(Model *_parent);
 
+	//creates a chord by parsing the semitone string
 	Chord(Model *_parent, QString _name, QString _string);
 
-	Chord(Model *_parent, QString _name, ChordSemiTones * _semitones );
+	//creates a new Chord without semitones
+	Chord(Model *_parent, QString _name );
 
 	//Creates a copy of the chord, changing name too;
-	Chord(Chord *_copy,QString _name);
+	Chord(Chord *_copy, QString _name);
 
 	virtual ~Chord() {}
 
@@ -266,26 +241,28 @@ public:
 		return "Chord";
 	}
 
-	int size() const
-	{
-		return m_chordSemiTones->size();
-	}
 
 	bool isScale() const
 	{
-		return m_chordSemiTones->size() > 6;
+		return size() > 6;
 	}
 
 	bool isEmpty() const
 	{
-		return m_chordSemiTones->size() == 0;
+		return size() == 0;
 	}
 
 	bool hasSemiTone( int8_t semiTone ) const;
 
+	//returns the key of the last chordsemitone
 	int8_t last() const
 	{
-		return m_chordSemiTones->last()->key->value();
+		if (size()>0)
+		{
+			return at(size()-1)->key->value();
+		} else {
+			return 0;
+		}
 	}
 
 	const QString &getName() const
@@ -296,35 +273,9 @@ public:
 	int8_t operator[]( int n ) const
 	{
 		// returning the key
-		return m_chordSemiTones->at(n)->key->value();
+		return at(n)->key->value();
 	}
 
-	const ChordSemiTones *getChordSemiTones() const
-	{
-		return m_chordSemiTones;
-	}
-
-	ChordSemiTones *getChordSemiTones()
-	{
-		return m_chordSemiTones;
-	}
-
-
-	/**
-	* In opposition to the overloaded [] this gets the ChordSemiTone object
-	* @brief at
-	* @param i
-	* @return
-	*/
-//	const ChordSemiTone *at( int i ) const
-//	{
-//		return m_chordSemiTones->at( i ); // The note
-//	}
-
-	ChordSemiTone *at( int i )
-	{
-		return m_chordSemiTones->at( i ); // The note
-	}
 
 	//Adds at the end a standard semitone
 	void addSemiTone();
@@ -334,6 +285,10 @@ public:
 
 	//deletes the semitone
 	void removeSemiTone(int i);
+
+	//parses the string into data by adding the Semitones to the vector after clearing it
+	void parseString( QString _string );
+
 
 };
 

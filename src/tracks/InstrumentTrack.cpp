@@ -141,7 +141,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
-	connect( &m_noteStacking, SIGNAL( dataChanged () ), this, SLOT( updateChordTable() ) );
+//	connect( &m_noteStacking, SIGNAL( dataChanged () ), this, SLOT( updateChordTable() ) );
 }
 
 
@@ -560,17 +560,6 @@ void InstrumentTrack::updateEffectChannel()
 {
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
-
-
-//updates the chords when signal received
-void InstrumentTrack::updateChordTable()
-{
-	//reloading arpeggio
- m_arpeggio.reloadChordTable();
- //emiting the change to influence Piano Roll chord and scale combobox
- emit chordTableChanged();
-}
-
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {

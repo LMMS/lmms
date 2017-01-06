@@ -235,6 +235,10 @@ PianoRoll::PianoRoll() :
 	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 
+	//on chord Table change we reload the chord and scale combo boxes models
+	connect( Engine::chordTable(),SIGNAL(chordsNameChanged()),this,SLOT (updateChordTable()));
+
+
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
 	signalMapper->setMapping( markAllOctaveSemitonesAction, static_cast<int>( stmaMarkAllOctaveSemiTones ) );
 	signalMapper->setMapping( markScaleAction, static_cast<int>( stmaMarkCurrentScale ) );
@@ -453,10 +457,6 @@ PianoRoll::PianoRoll() :
 //Updates the chordtable models when it changes
 void PianoRoll::updateChordTable()
 {
-	// reloads the scale model
-	//	delete (m_chordTable);
-//	m_chordTable =  Engine::chordTable();
-
 	//getting the selected value
 	int v = m_scaleModel.value();
 	//clearing the list
@@ -710,10 +710,6 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
 	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
-
-	//on chord Table change we reload the chord and scale combo boxes models
-//	connect( m_pattern->instrumentTrack(),SIGNAL(chordTableChanged()),this,SLOT (updateChordTable()));
-	connect( Engine::chordTable(),SIGNAL(chordsNameChanged()),this,SLOT (updateChordTable()));
 
 	update();
 	emit currentPatternChanged();

@@ -313,9 +313,9 @@ void chordtableEditorView::loadChord()
 	ChordSemiTone *m_chordSemiTone;
 	chordNoteModel *m_chordNoteModel;
 	chordNoteWidget *m_chordNoteWidget;
-	for (int i=0;i<m_chord->getChordSemiTones()->size();i++)
+	for (int i=0;i<m_chord->size();i++)
 	{
-		m_chordSemiTone=m_chord->getChordSemiTones()->at(i);
+		m_chordSemiTone=m_chord->at(i);
 		m_chordNoteModel= new chordNoteModel(m_chordTableEditor, m_chordSemiTone,i);
 		m_chordNoteWidget= new chordNoteWidget(m_chordNoteModel,m_chordsWidget);
 		//Connects the nested delete pushbutton to the remove chordnote slot
