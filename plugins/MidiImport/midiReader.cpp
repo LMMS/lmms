@@ -175,3 +175,7 @@ void midiReader::trackEndEvent()
 {
 
 }
+
+void midiReader::headerEvent(int format, int ntrks, int division) {
+
+}
