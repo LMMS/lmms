@@ -434,7 +434,6 @@ PianoRoll::PianoRoll() :
 
 	m_chordModel.setValue( 0 );
 
-
 	// change can update m_semiToneMarkerMenu
 	connect( &m_chordModel, SIGNAL( dataChanged() ),
 					this, SLOT( updateSemiToneMarkerMenu() ) );
@@ -665,7 +664,6 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	// set new data
 	m_pattern = newPattern;
-
 	m_currentPosition = 0;
 	m_currentNote = NULL;
 	m_startKey = INITIAL_START_KEY;

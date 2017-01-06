@@ -215,6 +215,7 @@ signals:
 	void nameChanged();
 	void newNote();
 
+
 protected:
 	virtual QString nodeName() const
 	{
@@ -227,6 +228,7 @@ protected slots:
 	void updatePitch();
 	void updatePitchRange();
 	void updateEffectChannel();
+
 
 private:
 	MidiPort m_midiPort;

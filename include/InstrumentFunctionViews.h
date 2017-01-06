@@ -57,8 +57,6 @@ private:
 	ComboBox * m_chordsComboBox;
 	Knob * m_chordRangeKnob;
 
-private slots:
-
 } ;
 
 

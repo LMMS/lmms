@@ -36,8 +36,7 @@
 #include "PixmapButton.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
-#include "plugins/chordtable_editor/chordtable_editor.h"
-#include "plugins/bit_invader/bit_invader.h"
+
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
 	QWidget( parent ),
@@ -46,10 +45,6 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
 	m_chordRangeKnob( new Knob( knobBright_26 ) )
-//	m_chordTableEditorView ( NULL )
-//cc reference to instrumentfunctionnotestacking
-//	m_chordTableEditorView (ToolPlugin::instantiate( "chordtableeditor", cc )
-//					->createView(this))
 {
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );
@@ -67,30 +62,25 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
 	m_chordRangeKnob->setWhatsThis(
-				tr( "Use this knob for setting the chord range in octaves. "
-						"The selected chord will be played within specified "
-						"number of octaves." ) );
-
-//	m_openeditorBtn = new PixmapButton( this, tr( "Edit Chord Table" ) );
-//	m_openeditorBtn->setActiveGraphic( embed::getIconPixmap( "edit_script_btn_on" ) );
-//	m_openeditorBtn->setInactiveGraphic( embed::getIconPixmap( "edit_script_btn_off" ) );
-//	ToolTip::add( m_openeditorBtn,
-//								tr( "Click here to edit the chord table." ) );
-
-	//connecting button with action
-//	connect(m_openeditorBtn, SIGNAL (clicked()),this, SLOT (editButtonPressed()));
+		tr( "Use this knob for setting the chord range in octaves. "
+			"The selected chord will be played within specified "
+			"number of octaves." ) );
 
 	mainLayout->addWidget( chordLabel, 0, 0 );
 	mainLayout->addWidget( m_chordsComboBox, 1, 0 );
 	mainLayout->addWidget( m_chordRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
-//	mainLayout->addWidget( m_openeditorBtn, 2, 0);
 }
+
+
 
 
 InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
 {
 	delete m_chordsGroupBox;
 }
+
+
+
 
 void InstrumentFunctionNoteStackingView::modelChanged()
 {
@@ -132,64 +122,64 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->setVerticalSpacing( 1 );
 
 	m_arpGroupBox->setWhatsThis(
-				tr( "An arpeggio is a method playing (especially plucked) "
-						"instruments, which makes the music much livelier. "
-						"The strings of such instruments (e.g. harps) are "
-						"plucked like chords. The only difference is that "
-						"this is done in a sequential order, so the notes are "
-						"not played at the same time. Typical arpeggios are "
-						"major or minor triads, but there are a lot of other "
-						"possible chords, you can select." ) );
+		tr( "An arpeggio is a method playing (especially plucked) "
+			"instruments, which makes the music much livelier. "
+			"The strings of such instruments (e.g. harps) are "
+			"plucked like chords. The only difference is that "
+			"this is done in a sequential order, so the notes are "
+			"not played at the same time. Typical arpeggios are "
+			"major or minor triads, but there are a lot of other "
+			"possible chords, you can select." ) );
 
 
 	m_arpRangeKnob->setLabel( tr( "RANGE" ) );
 	m_arpRangeKnob->setHintText( tr( "Arpeggio range:" ), " " + tr( "octave(s)" ) );
 	m_arpRangeKnob->setWhatsThis(
-				tr( "Use this knob for setting the arpeggio range in octaves. "
-						"The selected arpeggio will be played within specified "
-						"number of octaves." ) );
+		tr( "Use this knob for setting the arpeggio range in octaves. "
+			"The selected arpeggio will be played within specified "
+			"number of octaves." ) );
 
 
 	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
 	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
 	m_arpCycleKnob->setWhatsThis(
-				tr( "Jumps over n steps in the arpeggio and cycles around "
-						"if we're over the note range. If the total note range is evenly "
-						"divisible by the number of steps jumped over you will get stuck "
-						"in a shorter arpeggio or even on one note." ) );
+		tr( "Jumps over n steps in the arpeggio and cycles around "
+			"if we're over the note range. If the total note range is evenly "
+			"divisible by the number of steps jumped over you will get stuck "
+			"in a shorter arpeggio or even on one note." ) );
 
 
 	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
 	m_arpSkipKnob->setHintText( tr( "Skip rate:" ), tr( "%" ) );
 	m_arpSkipKnob->setWhatsThis(
-				tr( "The skip function will make the arpeggiator pause one step "
-						"randomly. From its start in full counter clockwise "
-						"position and no effect it will gradually progress to "
-						"full amnesia at maximum setting.") );
+		tr( "The skip function will make the arpeggiator pause one step "
+			"randomly. From its start in full counter clockwise "
+			"position and no effect it will gradually progress to "
+			"full amnesia at maximum setting.") );
 
 
 	m_arpMissKnob->setLabel( tr( "MISS" ) );
 	m_arpMissKnob->setHintText( tr( "Miss rate:" ), tr( "%" ) );
 	m_arpMissKnob->setWhatsThis(
-				tr( "The miss function will make the arpeggiator miss the "
-						"intended note.") );
+		tr( "The miss function will make the arpeggiator miss the "
+			"intended note.") );
 
 
 	m_arpTimeKnob->setLabel( tr( "TIME" ) );
 	m_arpTimeKnob->setHintText( tr( "Arpeggio time:" ), " " + tr( "ms" ) );
 	m_arpTimeKnob->setWhatsThis(
-				tr( "Use this knob for setting the arpeggio time in "
-						"milliseconds. The arpeggio time specifies how long "
-						"each arpeggio-tone should be played." ) );
+		tr( "Use this knob for setting the arpeggio time in "
+			"milliseconds. The arpeggio time specifies how long "
+			"each arpeggio-tone should be played." ) );
 
 
 	m_arpGateKnob->setLabel( tr( "GATE" ) );
 	m_arpGateKnob->setHintText( tr( "Arpeggio gate:" ), tr( "%" ) );
 	m_arpGateKnob->setWhatsThis(
-				tr( "Use this knob for setting the arpeggio gate. The "
-						"arpeggio gate specifies the percent of a whole "
-						"arpeggio-tone that should be played. With this you "
-						"can make cool staccato arpeggios." ) );
+		tr( "Use this knob for setting the arpeggio gate. The "
+			"arpeggio gate specifies the percent of a whole "
+			"arpeggio-tone that should be played. With this you "
+			"can make cool staccato arpeggios." ) );
 
 
 	QLabel* arpChordLabel = new QLabel( tr( "Chord:" ) );
@@ -218,6 +208,8 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
 }
+
+
 
 
 InstrumentFunctionArpeggioView::~InstrumentFunctionArpeggioView()

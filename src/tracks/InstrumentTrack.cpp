@@ -141,7 +141,6 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
-//	connect( &m_noteStacking, SIGNAL( dataChanged () ), this, SLOT( updateChordTable() ) );
 }
 
 
@@ -560,6 +559,9 @@ void InstrumentTrack::updateEffectChannel()
 {
 	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
+
+
+
 
 int InstrumentTrack::masterKey( int _midi_key ) const
 {

@@ -70,7 +70,7 @@ void LmmsCore::init( bool renderOnly )
 
 	s_ladspaManager = new Ladspa2LMMS;
 
-	s_chordTable = new ChordTable(NULL);
+	s_chordTable = new ChordTable( NULL );
 
 	s_projectJournal->setJournalling( true );
 
@@ -109,7 +109,7 @@ void LmmsCore::destroy()
 
 	deleteHelper( &s_song );
 
-	deleteHelper ( &s_chordTable);
+	deleteHelper ( &s_chordTable );
 
 	delete ConfigManager::inst();
 }

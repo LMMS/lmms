@@ -102,8 +102,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 				{ // if the note is active process it, otherwise skip
 
 					// getting the base note key
-					//					const int sub_note_key = sub_note_key_base + cst.key;
-					const int sub_note_key = sub_note_key_base + cst->key->value();
+					int sub_note_key = sub_note_key_base + cst->key->value();
 
 					// the new volume and panning
 					volume_t sub_note_vol;
@@ -141,6 +140,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle *_n )
 
 					// create sub-note-play-handle, only note is
 					// different
+
 					Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
 																					 _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy, _n,
 																					 -1, NotePlayHandle::OriginNoteStacking));
@@ -219,7 +219,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 }
 
 
-//reloads the chordtable into the widget model!
+//reloads the chordtable into the widget model
 void InstrumentFunctionArpeggio::updateChordTable()
 {
 	//getting the existing value
@@ -251,16 +251,16 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const panning_t base_note_pan = _n->getPanning();
 
 	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
-			_n->origin() == NotePlayHandle::OriginNoteStacking ||
-			!m_arpEnabledModel.value() ||
-			( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
+		_n->origin() == NotePlayHandle::OriginNoteStacking ||
+		!m_arpEnabledModel.value() ||
+		( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
 	{
 		return;
 	}
 
 	const int selected_arp = m_arpModel.value();
 
-	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack(_n->instrumentTrack());
+	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
 
 	if( m_arpModeModel.value() != FreeMode && cnphv.size() == 0 )
 	{
@@ -279,15 +279,15 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
-	const f_cnt_t arp_frames = (f_cnt_t)(m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate());
-	const f_cnt_t gated_frames = (f_cnt_t)(m_arpGateModel.value() * arp_frames / 100.0f);
+	const f_cnt_t arp_frames = (f_cnt_t)( m_arpTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate() );
+	const f_cnt_t gated_frames = (f_cnt_t)( m_arpGateModel.value() * arp_frames / 100.0f );
 
 	// used for calculating remaining frames for arp-note, we have to add
 	// arp_frames-1, otherwise the first arp-note will not be setup
 	// correctly... -> arp_frames frames silence at the start of every note!
 	int cur_frame = ( ( m_arpModeModel.value() != FreeMode ) ?
-											cnphv.first()->totalFramesPlayed() :
-											_n->totalFramesPlayed() ) + arp_frames - 1;
+						cnphv.first()->totalFramesPlayed() :
+						_n->totalFramesPlayed() ) + arp_frames - 1;
 	// used for loop
 	f_cnt_t frames_processed = ( m_arpModeModel.value() != FreeMode ) ? cnphv.first()->noteOffset() : _n->noteOffset();
 
@@ -355,7 +355,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		else if( dir == ArpDirDown )
 		{
 			cur_arp_idx = range - ( cur_frame / arp_frames ) %
-										range - 1;
+								range - 1;
 		}
 		else if( dir == ArpDirUpAndDown && range > 1 )
 		{
@@ -400,8 +400,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// cst: getting the processed semitone
 		ChordSemiTone *cst =		m_chordTable->at(selected_arp)->at(cur_arp_idx % cur_chord_size);
 
+		// The note is active, process all data
 		if (cst->active->value())
-		{ // The note is active, process all
+		{
 
 			// now calculate final key for our arp-note
 			//			const int sub_note_key = base_note_key +
@@ -424,7 +425,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				if (cst->silenced->value())
 				{
 					sub_note_vol = 0;
-					sub_note_pan = 0;
+//					sub_note_pan = 0;
 				}
 				else
 				{ // all modifications active, add interval to sub-note-key,
@@ -498,13 +499,13 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
-	/*
+/*
 	// Keep compatibility with version 0.2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
 	{
-		m_arpTimeKnob->setSyncMode(
-		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
-						 "arpsyncmode" ).toInt() );
+	 	m_arpTimeKnob->setSyncMode( 
+ 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
+ 						 "arpsyncmode" ).toInt() );
 	}*/
 
 	m_arpModeModel.loadSettings( _this, "arpmode" );

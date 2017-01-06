@@ -156,7 +156,7 @@ private:
 	friend class InstrumentTrack;
 	friend class InstrumentFunctionArpeggioView;
 
-};
+} ;
 
 /*****************************************************************************************************
  *
