@@ -120,6 +120,8 @@ void midiReader::CCHandler(int chan, int ctl, int value){
 void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
 {
 	// TODO: from MidiImport.cpp
+	timeSigNumeratorPat->putValue(0, b0);
+	timeSigDenominatorPat->putValue(0, 1<<b1)
 
 	pd.setValue(2);
 }
