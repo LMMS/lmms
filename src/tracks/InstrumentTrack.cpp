@@ -1575,6 +1575,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
 	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
+	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&

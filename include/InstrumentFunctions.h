@@ -108,8 +108,8 @@ public:
 		ArpDirUp,
 		ArpDirDown,
 		ArpDirUpAndDown,
-		ArpDirRandom,
 		ArpDirDownAndUp,
+		ArpDirRandom,
 		NumArpDirections
 	} ;
 

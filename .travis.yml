@@ -6,7 +6,8 @@ matrix:
     include:
         - env: TARGET_OS=win32
         - env: TARGET_OS=win64
-        - os: osx 
+        - os: osx
+          osx_image: xcode8.2
         - env: QT5=True
         - env: QT5=True TARGET_OS=win32
         - env: QT5=True TARGET_OS=win64
@@ -28,10 +29,11 @@ deploy:
     api_key:
         secure: d4a+x4Gugpss7JK2DcHjyBZDmEFFh4iVfKDfITSD50T6Mc6At4LMgojvEu+6qT6IyOY2vm3UVT6fhyeuWDTRDwW9tfFlaHVA0h8aTRD+eAXOA7pQ8rEMwQO3+WCKuKTfEqUkpL4wxhww8dpkv54tqeIs0S4TBqz9tk8UhzU7XbE=
     file: lmms-${TRAVIS_TAG:1}-$TARGET_OS.exe
+    skip_cleanup: true
     on:
         tags: true
         all_branches: true
-        condition: "$TARGET_OS != linux"
+        condition: '("$TARGET_OS" = win??) && "$QT5"'
     repo: LMMS/lmms
 notifications:
     webhooks:

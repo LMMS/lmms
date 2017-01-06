@@ -205,8 +205,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
 	m_arpDirectionModel.addItem( tr( "Down" ), new PixmapLoader( "arp_down" ) );
 	m_arpDirectionModel.addItem( tr( "Up and down" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
 	m_arpDirectionModel.addItem( tr( "Down and up" ), new PixmapLoader( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
 	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );

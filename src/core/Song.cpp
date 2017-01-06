@@ -66,6 +66,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "PeakController.h"
+#include "VersionedSaveDialog.h"
 
 
 tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
@@ -269,6 +270,7 @@ void Song::processNextBuffer()
 				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+			emit updateSampleTracks();
 		}
 	}
 
@@ -342,9 +344,13 @@ void Song::processNextBuffer()
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
 
-					m_elapsedMilliSeconds = 
-						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) / 
+					m_elapsedMilliSeconds =
+						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) /
 							getTempo();
+				}
+				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
+				{
+					emit updateSampleTracks();
 				}
 			}
 			else
@@ -576,6 +582,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 	if( isPlaying() ) 
 	{
 		emit playbackPositionChanged();
+		emit updateSampleTracks();
 	}
 }
 
@@ -1307,9 +1314,11 @@ void Song::exportProject( bool multiExport )
 	efd.setAcceptMode( FileDialog::AcceptSave );
 
 
-	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
+					 !efd.selectedFiles()[0].isEmpty() )
 	{
 		QString suffix = "";
+		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{
 			int stx = efd.selectedNameFilter().indexOf( "(*." );
@@ -1327,7 +1336,12 @@ void Song::exportProject( bool multiExport )
 			}
 		}
 
-		const QString exportFileName = efd.selectedFiles()[0] + suffix;
+		if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+				tr( "Save project" ) ) )
+		{
+			exportFileName += suffix;
+		}
+
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
 		epd.exec();
 	}
@@ -1365,6 +1379,7 @@ void Song::exportProjectMidi()
 		base_filename = tr( "untitled" );
 	}
 	efd.selectFile( base_filename + ".mid" );
+	efd.setDefaultSuffix( "mid");
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
 	efd.setAcceptMode( FileDialog::AcceptSave );
