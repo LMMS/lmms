@@ -52,10 +52,7 @@
 #include "SongEditor.h"
 #include "FileDialog.h"
 
-
 #include "embed.cpp"
-
-class Song;
 
 extern "C"
 {
@@ -166,8 +163,8 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 	connect(m_chordTableEditor->m_chordsComboModel,SIGNAL(dataChanged()),this,SLOT(loadChord()));
 
 	//Connecting the changing of data to the combobox
-	connect(m_chordTable,SIGNAL(dataChanged()),this,SLOT(loadChord()));
-	connect(m_chordTable,SIGNAL(dataChanged()),m_chordTableEditor,SLOT(reloadComboModel()));
+	connect(m_chordTable,SIGNAL(chordTableChanged()),this,SLOT(loadChord()));
+	connect(m_chordTable,SIGNAL(chordTableChanged()),m_chordTableEditor,SLOT(reloadComboModel()));
 
 	QPushButton *button1 = new QPushButton(tr("Add SemiTone"));
 	QPushButton *button2 = new QPushButton(tr("Delete chord"));
@@ -333,7 +330,7 @@ void chordtableEditorView::reloadCombo()
 {
 	m_chordTableEditor->reloadComboModel();
 	//emits signal combo model data has changed
-	emit Engine::chordTable()->chordsNameChanged();
+	emit Engine::chordTable()->chordNameChanged();
 }
 
 void chordtableEditorView::resetChords()
@@ -476,8 +473,6 @@ chordNoteModel::chordNoteModel(Model *_parent, ChordSemiTone *_semiTone,int _pos
 	m_semiTone(_semiTone),
 	m_position(_position)
 {
-	//	connect(_semiTone->key,SIGNAL(dataChanged()),this,SLOT(changeData()));
-	//	connect(_semiTone->vol,SIGNAL(dataChanged()),this,SLOT(changeData()));
 }
 
 //the position of the semitone in the semitones vector
@@ -490,9 +485,6 @@ void chordNoteModel::setPosition(int position)
 {
 	m_position = position;
 }
-
-//NON SEMBRA CAMBIARE I DATI DELLA CHORDTABLE
-
 
 /*****************************************************************************************************
  *

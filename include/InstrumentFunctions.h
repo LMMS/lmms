@@ -351,7 +351,9 @@ public slots:
 
 signals:
 	//emitted only when chord names are changed to reflect in piano roll
-	void chordsNameChanged();
+	void chordNameChanged();
+	//emitted when the chord table has changed
+	void chordTableChanged();
 
 };
 

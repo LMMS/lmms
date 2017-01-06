@@ -700,21 +700,21 @@ void Chord::addSemiTone()
 	ChordSemiTone *csm=new ChordSemiTone(this);
 	push_back(csm);
 	//emits the data changed signal
-	emit Engine::chordTable()->dataChanged();
+	emit Engine::chordTable()->chordTableChanged();
 }
 
 void Chord::insertSemiTone(ChordSemiTone *csm, int position)
 {
 	insert(position,csm);
 	//emits the data changed signal
-	emit Engine::chordTable()->dataChanged();
+	emit Engine::chordTable()->chordTableChanged();
 }
 
 void Chord::removeSemiTone(int i)
 {
 	remove(i);
 	//emits the data changed signal
-	emit Engine::chordTable()->dataChanged();
+	emit Engine::chordTable()->chordTableChanged();
 }
 
 void Chord::parseString(QString _string)
@@ -798,9 +798,9 @@ void ChordTable::loadSettings(const QDomElement &_this)
 		}
 	}
 	//emits the data changed signal
-	emit dataChanged();
+	emit chordTableChanged();
 	//emits the chordTable names are changed
-	emit chordsNameChanged();
+	emit chordNameChanged();
 
 }
 
@@ -909,9 +909,9 @@ void ChordTable::cloneChord(int i)
 	}
 	push_back(cst);
 	//emits the data changed signal
-	emit dataChanged();
+	emit chordTableChanged();
 	//emits the chordTable names are changed
-	emit chordsNameChanged();
+	emit chordNameChanged();
 }
 
 void ChordTable::removeChord(int i)
@@ -921,9 +921,9 @@ void ChordTable::removeChord(int i)
 	{
 		remove(i);
 		//emits the data changed signal
-		emit dataChanged();
+		emit chordTableChanged();
 		//emits the chordTable names are changed
-		emit chordsNameChanged();
+		emit chordNameChanged();
 	}
 }
 
