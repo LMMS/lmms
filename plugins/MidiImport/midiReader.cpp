@@ -179,5 +179,6 @@ void midiReader::trackEndEvent()
 }
 
 void midiReader::headerEvent(int format, int ntrks, int division) {
-
+	m_division = division;
+	m_tracks = ntrks;
 }

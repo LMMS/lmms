@@ -91,6 +91,8 @@ private:
 	double beatsPerTact;
 	double ticksPerBeat;
 
+	int m_tracks;
+	int m_division;
 };
 
 #endif
