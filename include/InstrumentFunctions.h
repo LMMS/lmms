@@ -339,8 +339,16 @@ public:
 		return getByName( name, false );
 	}
 
+
 	//getting the instance of the class. Guarantees only one instance of the class
 	static ChordTable *getInstance(Model *_parent);
+
+	//the compiler before qt5 treats signals as private
+	void emitChordTableChangedSignal()
+	{
+		emit chordTableChanged();
+	}
+
 private:
 	static ChordTable *instance;
 

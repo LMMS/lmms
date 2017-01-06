@@ -236,7 +236,7 @@ PianoRoll::PianoRoll() :
 	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( Engine::chordTable(),SIGNAL(chordsNameChanged()),this,SLOT (updateChordTable()));
+	connect( Engine::chordTable(),SIGNAL(chordNameChanged()),this,SLOT (updateChordTable()));
 
 
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );

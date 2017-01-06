@@ -57,7 +57,7 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 	}
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( m_chordTable,SIGNAL(chordsNameChanged()),this,SLOT (updateChordTable()));
+	connect( m_chordTable,SIGNAL(chordNameChanged()),this,SLOT (updateChordTable()));
 
 }
 
@@ -214,7 +214,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( m_chordTable,SIGNAL(chordsNameChanged()),this,SLOT (updateChordTable()));
+	connect( m_chordTable,SIGNAL(chordNameChanged()),this,SLOT (updateChordTable()));
 
 }
 
@@ -700,21 +700,21 @@ void Chord::addSemiTone()
 	ChordSemiTone *csm=new ChordSemiTone(this);
 	push_back(csm);
 	//emits the data changed signal
-	emit Engine::chordTable()->chordTableChanged();
+	Engine::chordTable()->emitChordTableChangedSignal();
 }
 
 void Chord::insertSemiTone(ChordSemiTone *csm, int position)
 {
 	insert(position,csm);
 	//emits the data changed signal
-	emit Engine::chordTable()->chordTableChanged();
+	Engine::chordTable()->emitChordTableChangedSignal();
 }
 
 void Chord::removeSemiTone(int i)
 {
 	remove(i);
 	//emits the data changed signal
-	emit Engine::chordTable()->chordTableChanged();
+	Engine::chordTable()->emitChordTableChangedSignal();
 }
 
 void Chord::parseString(QString _string)
