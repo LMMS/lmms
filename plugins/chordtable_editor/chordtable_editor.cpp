@@ -296,7 +296,8 @@ void chordtableEditorView::loadChord()
 
 	//finding and deleting all widget children
 	m_chordsWidget->setUpdatesEnabled(false);
-	QList<QWidget*> widgets= m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly);
+	//the option 0 is Qt::FindDirectChildrenOnly which is not accepted by the compiler
+	QList<QWidget*> widgets= m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", 0);
 	foreach(QWidget * widget, widgets)
 	{
 		m_chordsWidgetLayout->removeWidget(widget);
@@ -330,7 +331,7 @@ void chordtableEditorView::reloadCombo()
 {
 	m_chordTableEditor->reloadComboModel();
 	//emits signal combo model data has changed
-	emit Engine::chordTable()->chordNameChanged();
+	Engine::chordTable()->emitChordNameChanged();
 }
 
 void chordtableEditorView::resetChords()

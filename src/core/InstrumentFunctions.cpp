@@ -425,7 +425,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				if (cst->silenced->value())
 				{
 					sub_note_vol = 0;
-//					sub_note_pan = 0;
+					sub_note_pan = 0;
 				}
 				else
 				{ // all modifications active, add interval to sub-note-key,

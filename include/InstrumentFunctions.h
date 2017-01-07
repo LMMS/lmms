@@ -348,6 +348,11 @@ public:
 	{
 		emit chordTableChanged();
 	}
+	//tricking compiler
+	void emitChordNameChanged()
+	{
+		emit chordNameChanged();
+	}
 
 private:
 	static ChordTable *instance;
