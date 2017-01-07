@@ -74,6 +74,7 @@ smfMidiCC & smfMidiCC::putValue( MidiTime time, AutomatableModel * objModel, flo
 
 	lastPos = time;
 	time = time - ap->startPosition();
+	printf("!%d\n", time);
 	ap->putValue( time, value, false );
 	ap->changeLength( MidiTime( time.getTact() + 1, 0 ) ); 
 

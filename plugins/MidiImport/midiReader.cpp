@@ -142,18 +142,16 @@ void midiReader::read(QString &fileName)
 void midiReader::CCHandler(int chan, int ctl, int value)
 {
 	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
-	smfMidiChannel * ch = chs[chan].create( m_tc, trackName);
-	int rpn_msb[2] = PITCH_RANGE_RPN_CODE;
-	int rpn_lsb[2] = PITCH_RANGE_RPN_CODE;
+	smfMidiChannel * ch = chs[chan].create( m_tc, trackName );
+	AutomatableModel * objModel = NULL;
+	int * rpn;
 	int rpn_data[2];
 
-	int rpn_msb_i = -1;
-	int rpn_lsb_i = -1;
-
+	bool flag_rpn_msb = false;
+	bool flag_rpn_lsb = false;
 
 	if( ctl <= 129 )
 	{
-		AutomatableModel * objModel = NULL;
 		switch( ctl )
 		{
 		case 0:
@@ -165,10 +163,25 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 			break;
 
 		case 6:
-			rpn_msb_i = rpn_msbs.indexOf(rpn_msb);
-			rpn_lsb_i = rpn_lsbs.indexOf(rpn_lsb);
+			for(int c=0; c < rpn_msbs.size(); c++)
+			{
+				rpn = rpn_msbs[c];
+				if(rpn[0] == chan && rpn[1] == 0)
+				{
+					flag_rpn_msb = true;
+					rpn_msbs.removeAt(c);
+				}
+			}
+			for(int c=0; c < rpn_lsbs.size(); c++) {
+				rpn = rpn_lsbs[c];
+				if(rpn[0] == chan && rpn[1] == 0)
+				{
+					flag_rpn_lsb = true;
+					rpn_lsbs.removeAt(c);
+				}
+			}
 
-			if(rpn_msb_i != -1 && rpn_lsb_i != -1)
+			if(flag_rpn_lsb && flag_rpn_msb)
 			{
 				objModel = ch->it->pitchRangeModel();
 				pitchBendMultiply = value;
@@ -216,7 +229,7 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 
 		if( objModel )
 		{
-			if( m_seq->getCurrentTime() )
+			if( m_seq->getCurrentTime() == 0 )
 				objModel->setInitValue( value );
 			else
 			{
@@ -224,7 +237,7 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 				{
 					ccs[ctl].create( m_tc, trackName + " > " + objModel->displayName());
 				}
-				ccs[ctl].putValue( m_seq->getCurrentTime()*tickRate, objModel, value);
+				ccs[ctl].putValue( m_seq->getCurrentTime()*tickRate, objModel, value );
 			}
 		}
 	}
@@ -252,7 +265,7 @@ void midiReader::addNoteEvent(int chan, int pitch, int vol=0)
 					note[time] * tickRate,
 					note[note_pitch] - 12,
 					note[note_vol] );
-			printf("Note: length=%d start=%d pitch=%d vol=%d", ticks, note[time]*tickRate, note[note_pitch] - 12, note[note_vol]);
+			printf("Note: length=%d start=%d pitch=%d vol=%d\n", ticks, note[time]*tickRate, note[note_pitch] - 12, note[note_vol]);
 			note_list.removeAt(c);
 			ch->addNote( n );
 			break;
