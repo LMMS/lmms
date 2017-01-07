@@ -61,6 +61,10 @@ midiReader::midiReader( TrackContainer* tc ) :
 	beatsPerTact = 4;
 	ticksPerBeat = DefaultBeatsPerTact / beatsPerTact;
 
+	if(note_list.size() != 0) {
+		note_list.clear();
+	}
+
 	// Connect to slots.
 	connect(m_seq, SIGNAL(signalSMFTimeSig(int,int,int,int)),
 			this, SLOT(timeSigEvent(int,int,int,int));
@@ -161,14 +165,40 @@ void midiReader::programEvent(int chan, int patch)
 
 void midiReader::noteOnEvent(int chan, int pitch, int vol)
 {
+	const int time = 0;
+	const int channel = time + 1;
+	const int note_pitch = channel + 1;
+	const int note_vol = channel + 1;
 	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
 	smfMidiChannel * ch;
+
+	if(vol != 0){
+		int[4] note = {m_seq->getCurrentTime(), chan, pitch};
+		note_list << note;
+		return;
+	}
+
 	if (!chs[chan].created)
 		ch = chs[chan].create( tc, trackName );
 	else
 		ch = chs[chan];
 
-	// TODO: Note duration.
+	for(int c=0; c<note_list.size(); c++)
+	{
+		int[4] note = note_list[c];
+		if(note[channel] == chan && note[note_pitch] == pitch
+				&& m_seq->getCurrentTime() >= note[time])
+		{
+			int ticks = m_seq->getCurrentTime() - note[time];
+			Note n( (ticks < 1 ? 1 : ticks ),
+					note[time]/10,
+					note[note_pitch],
+					note[note_vol] );
+			ch->addNote( n );
+			note_list.removeAt(c);
+			break;
+		}
+	}
 
 }
 

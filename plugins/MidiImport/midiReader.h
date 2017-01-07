@@ -93,6 +93,12 @@ private:
 
 	int m_tracks;
 	int m_division;
+
+	/*
+	 * record note event.
+	 * tick, channel, pitch, vol.
+	 */
+	QList<int[4]> note_list;
 };
 
 #endif
