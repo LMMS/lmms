@@ -21,16 +21,12 @@ ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 # build ZynAddSubFX with full optimizations
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
 
-# Enable C++11, but only for ZynAddSubFx.cpp
-set_property(SOURCE ZynAddSubFx.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " -std=c++0x ")
-	
-IF(LMMS_BUILD_APPLE)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-ENDIF()
-
-# link system-libraries when on win32
 IF(LMMS_BUILD_WIN32)
+	# link system-libraries
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
+	# fix X11 headers errors caused by bug with mingw + c++11
+	REMOVE_DEFINITIONS(-std=c++0x)
+	ADD_DEFINITIONS(-std=gnu++0x) 
 ENDIF(LMMS_BUILD_WIN32)
 
 SET(FLTK_SKIP_OPENGL TRUE)
