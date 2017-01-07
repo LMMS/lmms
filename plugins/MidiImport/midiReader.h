@@ -40,6 +40,7 @@
 const double defaultPitchRange = 2.0f;
 const int preTrackSteps = 2;
 const int pitchBendEvent = 128;
+const int ticksForQuarterNote = 120;
 
 class midiReader : public QObject
 {
@@ -90,6 +91,7 @@ private:
 
 	double beatsPerTact;
 	double ticksPerBeat;
+	double midiTickToLmmsTickRate;
 
 	int m_tracks;
 	int m_division;

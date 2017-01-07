@@ -40,7 +40,8 @@
 midiReader::midiReader( TrackContainer* tc ) :
 	pd( QProgressDialog( TrackContainer::tr( "Importing MIDI-file..." ),
 		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow()) ),
-	m_tc( tc )
+	m_tc( tc ),
+	beatsPerTact( 4 )
 
 {
 
@@ -58,8 +59,8 @@ midiReader::midiReader( TrackContainer* tc ) :
 	timeSigDenominatorPat = AutomationPattern::globalAutomationPattern(
 				&timeSigMM.denominatorModel());
 
-	beatsPerTact = 4;
 	ticksPerBeat = DefaultBeatsPerTact / beatsPerTact;
+	midiTickToLmmsTickRate = ticksForQuarterNote / ticksPerBeat;
 
 	if(note_list.size() != 0) {
 		note_list.clear();
@@ -122,7 +123,8 @@ void midiReader::CCHandler(int chan, int ctl, int value){
 // Slots below.
 void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
 {
-	if(/* m_seq->getCurrentTime() == 0*/ true ){
+	if(/* m_seq->getCurrentTime() == 0*/ true )
+	{
 		printf("Another timesig at %f\n", m_seq->getCurrentTime()/ticksPerBeat/10);
 		timeSigNumeratorPat->putValue(m_seq->getCurrentTime()/10, b0);
 		timeSigDenominatorPat->putValue(m_seq->getCurrentTime()/10, 1<<b1);
@@ -189,7 +191,7 @@ void midiReader::noteOnEvent(int chan, int pitch, int vol)
 		if(note[channel] == chan && note[note_pitch] == pitch
 				&& m_seq->getCurrentTime() >= note[time])
 		{
-			int ticks = m_seq->getCurrentTime() - note[time];
+			int ticks = (m_seq->getCurrentTime() - note[time]) * 5 / 2;
 			Note n( (ticks < 1 ? 1 : ticks ),
 					note[time]/10,
 					note[note_pitch],
