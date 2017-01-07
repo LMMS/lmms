@@ -46,12 +46,10 @@ public:
 	Instrument * it_inst;
 	bool isSF2; 
 	bool hasNotes;
-	bool created;
 	MidiTime lastEnd;
 	QString trackName;
 	
 	smfMidiChannel * create( TrackContainer* tc, QString tn );
-
 
 	void addNote( Note & n );
 

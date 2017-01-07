@@ -34,8 +34,6 @@
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
-const int preTrackSteps = 2;
-
 class MidiImport : public ImportFilter
 {
 	Q_OBJECT

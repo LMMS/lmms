@@ -37,10 +37,10 @@
 #include "smfMidiChannel.h"
 
 
-const double defaultPitchRange = 2.0f;
+const int defaultPitchRange = 2;
 const int preTrackSteps = 2;
-const int pitchBendEvent = 128;
-const int ticksForQuarterNote = 120;
+const int pitchBendEventId = 128;
+const int programEventId = 129;
 
 class midiReader : public QObject
 {
@@ -51,38 +51,41 @@ public:
 	void read(QString &fileName );
 public slots:
 	void headerEvent(int format, int ntrks, int division);
-	void trackStartEvent();
-	void trackEndEvent();
-	void endOfTrackEvent();
+	//void trackStartEvent();
+	//void trackEndEvent();
+	//void endOfTrackEvent();
 	void noteOnEvent(int chan, int pitch, int vol);
 	void noteOffEvent(int chan, int pitch, int vol);
-	void keyPressEvent(int chan, int pitch, int press);
+	//void keyPressEvent(int chan, int pitch, int press);
 	void ctlChangeEvent(int chan, int ctl, int value);
 	void pitchBendEvent(int chan, int value);
 	void programEvent(int chan, int patch);
-	void chanPressEvent(int chan, int press);
-	void sysexEvent(const QByteArray& data);
-	void seqSpecificEvent(const QByteArray& data);
-	void metaMiscEvent(int typ, const QByteArray& data);
-	void seqNum(int seq);
-	void forcedChannel(int channel);
-	void forcedPort(int port);
-	void textEvent(int typ, const QString& data);
-	void smpteEvent(int b0, int b1, int b2, int b3, int b4);
+	//void chanPressEvent(int chan, int press);
+	//void sysexEvent(const QByteArray& data);
+	//void seqSpecificEvent(const QByteArray& data);
+	//void metaMiscEvent(int typ, const QByteArray& data);
+	//void seqNum(int seq);
+	//void forcedChannel(int channel);
+	//void forcedPort(int port);
+	//void textEvent(int typ, const QString& data);
+	//void smpteEvent(int b0, int b1, int b2, int b3, int b4);
 	void timeSigEvent(int b0, int b1, int b2, int b3);
-	void keySigEvent(int b0, int b1);
+	//void keySigEvent(int b0, int b1);
 	void tempoEvent(int tempo);
 	void errorHandler(const QString& errorStr);
 
 private:
 	void CCHandler(int chan, int ctl, int value);
+	void addNoteEvent(int chan, int pitch, int vol);
+
+	smfMidiChannel * getChannel(int chan);
 
 	drumstick::QSmf *m_seq;
 	TrackContainer *m_tc;
 	QProgressDialog pd;
 
-	// 128 CC + Pitch Bend
-	smfMidiCC ccs[129];
+	// 128 CC + Pitch Bend + Program
+	smfMidiCC ccs[130];
 	smfMidiChannel chs[256];
 
 	MeterModel & timeSigMM;
@@ -91,16 +94,24 @@ private:
 
 	double beatsPerTact;
 	double ticksPerBeat;
-	double midiTickToLmmsTickRate;
+	double tickRate;  // convert midi tick to lmms tick.
 
 	int m_tracks;
 	int m_division;
+	int pitchBendMultiply;
 
 	/*
 	 * record note event.
-	 * tick, channel, pitch, vol.
+	 * 	tick, channel, pitch, vol.
 	 */
-	QList<int[4]> note_list;
+	QList<int*> note_list;
+
+	/*
+	 * record rpn event.
+	 * 	chan, value
+	 */
+	QList<int*> rpn_msbs;
+	QList<int*> rpn_lsbs;
 };
 
 #endif

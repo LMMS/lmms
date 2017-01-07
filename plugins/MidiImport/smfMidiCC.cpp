@@ -37,7 +37,7 @@ smfMidiCC::smfMidiCC() :
 	lastPos( 0 )
 { }
 
-smfMidiCC & smfMidiC::create( TrackContainer* tc, QString tn )
+smfMidiCC & smfMidiCC::create( TrackContainer* tc, QString tn )
 {
 	if( !at )
 	{

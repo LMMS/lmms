@@ -28,7 +28,6 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <drumstick.h>
 
 #include "MidiImport.h"
 #include "TrackContainer.h"
@@ -45,9 +44,9 @@
 #include "embed.h"
 #include "Song.h"
 
-#include "portsmf/allegro.h"
 #include "smfMidiCC.h"
 #include "smfMidiChannel.h"
+#include "midiReader.h"
 
 #define makeID(_c0, _c1, _c2, _c3) \
 		( 0 | \
@@ -78,7 +77,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 MidiImport::MidiImport( const QString & _file ) :
 	ImportFilter( _file, &midiimport_plugin_descriptor ),
 	m_events(),
-	m_timingDivision( 0 ),
+	m_timingDivision( 0 )
 {
 
 }
@@ -149,245 +148,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	QString filename = file().fileName();
 	closeFile();
 
-	
-	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	AutomationPattern * timeSigNumeratorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
-	AutomationPattern * timeSigDenominatorPat = 
-		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
-	
-
-	// Time-sig changes
-	Alg_time_sigs * timeSigs = &seq->time_sig;
-	for( int s = 0; s < timeSigs->length(); ++s )
-	{
-		Alg_time_sig timeSig = (*timeSigs)[s];
-		// Initial timeSig, set song-default value
-		if(/* timeSig.beat == 0*/ true )
-		{
-			// TODO set song-global default value
-			printf("Another timesig at %f\n", timeSig.beat);
-			timeSigNumeratorPat->putValue( timeSig.beat*ticksPerBeat, timeSig.num );
-			timeSigDenominatorPat->putValue( timeSig.beat*ticksPerBeat, timeSig.den );
-		}
-		else
-		{
-		}
-
-	}
-
-	pd.setValue( 2 );
-
-	// Tempo stuff
-	AutomationPattern * tap = tc->tempoAutomationPattern();
-	if( tap )
-	{
-		tap->clear();
-		Alg_time_map * timeMap = seq->get_time_map();
-		Alg_beats & beats = timeMap->beats;
-		for( int i = 0; i < beats.len - 1; i++ )
-		{
-			Alg_beat_ptr b = &(beats[i]);
-			double tempo = ( beats[i + 1].beat - b->beat ) /
-						   ( beats[i + 1].time - beats[i].time );
-			tap->putValue( b->beat * ticksPerBeat, tempo * 60.0 );
-		}
-		if( timeMap->last_tempo_flag )
-		{
-			Alg_beat_ptr b = &( beats[beats.len - 1] );
-			tap->putValue( b->beat * ticksPerBeat, timeMap->last_tempo * 60.0 );
-		}
-	}
-
-	// Song events
-	for( int e = 0; e < seq->length(); ++e )
-	{
-		Alg_event_ptr evt = (*seq)[e];
-
-		if( evt->is_update() )
-		{
-			printf("Unhandled SONG update: %d %f %s\n", 
-					evt->get_type_code(), evt->time, evt->get_attribute() );
-		}
-	}
-
-	// Tracks
-	for( int t = 0; t < seq->tracks(); ++t )
-	{
-		QString trackName = QString( tr( "Track" ) + " %1" ).arg( t );
-		Alg_track_ptr trk = seq->track( t );
-		pd.setValue( t + preTrackSteps );
-
-		for( int c = 0; c < 129; c++ )
-		{
-			ccs[c].clear();
-		}
-
-		// Now look at events
-		for( int e = 0; e < trk->length(); ++e )
-		{
-			Alg_event_ptr evt = (*trk)[e];
-
-			if( evt->chan == -1 )
-			{
-				bool handled = false;
-                if( evt->is_update() )
-				{
-					QString attr = evt->get_attribute();
-                    if( attr == "tracknames" && evt->get_update_type() == 's' ) {
-						trackName = evt->get_string_value();
-						handled = true;
-					}
-				}
-                if( !handled ) {
-                    // Write debug output
-                    printf("MISSING GLOBAL HANDLER\n");
-                    printf("     Chn: %d, Type Code: %d, Time: %f", (int) evt->chan,
-                           evt->get_type_code(), evt->time );
-                    if ( evt->is_update() )
-                    {
-                        printf( ", Update Type: %s", evt->get_attribute() );
-                        if ( evt->get_update_type() == 'a' )
-                        {
-                            printf( ", Atom: %s", evt->get_atom_value() );
-                        }
-                    }
-                    printf( "\n" );
-				}
-			}
-			else if( evt->is_note() && evt->chan < 256 )
-			{
-				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
-				Alg_note_ptr noteEvt = dynamic_cast<Alg_note_ptr>( evt );
-				int ticks = noteEvt->get_duration() * ticksPerBeat;
-				Note n( (ticks < 1 ? 1 : ticks ),
-						noteEvt->get_start_time() * ticksPerBeat,
-						noteEvt->get_identifier() - 12,
-						noteEvt->get_loud());
-				ch->addNote( n );
-				
-			}
-			
-			else if( evt->is_update() )
-			{
-				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
-
-				double time = evt->time*ticksPerBeat;
-				QString update( evt->get_attribute() );
-
-				if( update == "programi" )
-				{
-					long prog = evt->get_integer_value();
-					if( ch->isSF2 )
-					{
-						ch->it_inst->childModel( "bank" )->setValue( 0 );
-						ch->it_inst->childModel( "patch" )->setValue( prog );
-					}
-					else {
-						const QString num = QString::number( prog );
-						const QString filter = QString().fill( '0', 3 - num.length() ) + num + "*.pat";
-						const QString dir = "/usr/share/midi/"
-								"freepats/Tone_000/";
-						const QStringList files = QDir( dir ).
-						entryList( QStringList( filter ) );
-						if( ch->it_inst && !files.empty() )
-						{
-							ch->it_inst->loadFile( dir+files.front() );
-						}
-					}
-				}
-
-				else if( update.startsWith( "control" ) || update == "bendr" )
-				{
-					int ccid = update.mid( 7, update.length()-8 ).toInt();
-					if( update == "bendr" )
-					{
-						ccid = 128;
-					}
-					if( ccid <= 128 )
-					{
-						double cc = evt->get_real_value();
-						AutomatableModel * objModel = NULL;
-
-						switch( ccid ) 
-						{
-							case 0:
-								if( ch->isSF2 && ch->it_inst )
-								{
-									objModel = ch->it_inst->childModel( "bank" );
-									printf("BANK SELECT %f %d\n", cc, (int)(cc*127.0));
-									cc *= 127.0f;
-								}
-								break;
-
-							case 7:
-								objModel = ch->it->volumeModel();
-								cc *= 100.0f;
-								break;
-
-							case 10:
-								objModel = ch->it->panningModel();
-								cc = cc * 200.f - 100.0f;
-								break;
-
-							case 128:
-								objModel = ch->it->pitchModel();
-								cc = cc * 100.0f;
-								break;
-							default:
-								//TODO: something useful for other CCs
-								break;
-						}
-
-						if( objModel )
-						{
-							if( time == 0 && objModel )
-							{
-								objModel->setInitValue( cc );
-							}
-							else
-							{
-								if( ccs[ccid].at == NULL ) {
-									ccs[ccid].create( tc, trackName + " > " + (
-										  objModel != NULL ? 
-										  objModel->displayName() : 
-										  QString("CC %1").arg(ccid) ) );
-								}
-								ccs[ccid].putValue( time, objModel, cc );
-							}
-						}
-					}
-				}
-				else {
-					printf("Unhandled update: %d %d %f %s\n", (int) evt->chan, 
-							evt->get_type_code(), evt->time, evt->get_attribute() );
-				}
-			}
-		}
-	}
-
-	delete seq;
-	
-	
-	for( int c=0; c < 256; ++c )
-	{
-		if( !chs[c].hasNotes && chs[c].it )
-		{
-			printf(" Should remove empty track\n");
-			// must delete trackView first - but where is it?
-			//tc->removeTrack( chs[c].it );
-			//it->deleteLater();
-		}
-	}
-
-	// Set channel 10 to drums as per General MIDI's orders
-	if( chs[9].hasNotes && chs[9].it_inst && chs[9].isSF2 )
-	{
-		// AFAIK, 128 should be the standard bank for drums in SF2.
-		// If not, this has to be made configurable.
-		chs[9].it_inst->childModel( "bank" )->setValue( 128 );
-		chs[9].it_inst->childModel( "patch" )->setValue( 0 );
-	}
+	midiReader mr(tc);
+	mr.read(filename);
 
 	return true;
 }
@@ -446,19 +208,6 @@ void MidiImport::error()
 	printf( "MidiImport::readTrack(): invalid MIDI data (offset %#x)\n",
 						(unsigned int) file().pos() );
 }
-
-
-// Slots
-
-void MidiImport::errorHandler( const QString& errorStr )
-{
-	printf( "MidiImport::readSMF(): got error %s\n"
-			errorStr.toStdString());
-}
-
-
-
-
 
 
 extern "C"
