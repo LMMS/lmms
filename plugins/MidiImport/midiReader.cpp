@@ -125,7 +125,6 @@ midiReader::midiReader( TrackContainer* tc ) :
 
 midiReader::~midiReader()
 {
-	pd.setValue(pd.maximum()-preTrackSteps);
 	printf("destroy midiReader\n");
 	delete m_seq;
 
@@ -274,6 +273,8 @@ void midiReader::addNoteEvent(int chan, int pitch, int vol=0)
 			break;
 		}
 	}
+	if(pd.value() <= chan+preTrackSteps)
+		pd.setValue(chan+preTrackSteps);
 }
 
 // Slots below.
@@ -293,7 +294,7 @@ void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
 	else
 	{
 	}
-	pd.setValue(2);
+	pd.setValue(preTrackSteps);
 }
 
 void midiReader::tempoEvent(int tempo)
