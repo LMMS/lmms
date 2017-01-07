@@ -49,7 +49,7 @@
 #include "LedCheckbox.h"
 #include "GuiApplication.h"
 #include "Engine.h"
-#include "SongEditor.h"
+#include "Song.h"
 #include "FileDialog.h"
 
 #include "embed.cpp"
