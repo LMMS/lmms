@@ -80,23 +80,21 @@ private:
 
 	smfMidiChannel * getChannel(int chan);
 
+	QProgressDialog pd;
 	drumstick::QSmf *m_seq;
 	TrackContainer *m_tc;
-	QProgressDialog pd;
 
 	// 128 CC + Pitch Bend + Program
 	smfMidiCC ccs[130];
 	smfMidiChannel chs[256];
 
-	MeterModel & timeSigMM;
-	AutomatableModel * timeSigNumeratorPat;
-	AutomatableModel * timeSigDenominatorPat;
+	AutomationPattern * timeSigNumeratorPat;
+	AutomationPattern * timeSigDenominatorPat;
 
 	double beatsPerTact;
 	double ticksPerBeat;
 	double tickRate;  // convert midi tick to lmms tick.
 
-	int m_tracks;
 	int m_division;
 	int pitchBendMultiply;
 
@@ -104,7 +102,7 @@ private:
 	 * record note event.
 	 * 	tick, channel, pitch, vol.
 	 */
-	QList<int*> note_list;
+	QList<long*> note_list;
 
 	/*
 	 * record rpn event.

@@ -1,8 +1,5 @@
 INCLUDE(BuildPlugin)
 
-SET(CMAKE_CXX_FLAGS "-fexceptions")
+SET(CMAKE_CXX_FLAGS "-fexceptions -ldrumstick-file")
 
-BUILD_PLUGIN(midiimport MidiImport.cpp MidiImport.h
-        smfMidiCC.cpp smfMidiCC.h smfMidiChannel.cpp smfMidiChannel.h
-        midiReader.cpp midiReader.h
-        MOCFILES MidiImport.h)
+BUILD_PLUGIN(midiimport MidiImport.cpp smfMidiCC.cpp smfMidiChannel.cpp midiReader.cpp MOCFILES MidiImport.h midiReader.h )

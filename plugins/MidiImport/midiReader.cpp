@@ -23,15 +23,18 @@
  */
 
 #include <QString>
-#include <QProgressDialog>
 #include <QApplication>
+#include <QMessageBox>
+#include <QProgressDialog>
 #include <drumstick.h>
 
+#include "GuiApplication.h"
 #include "TrackContainer.h"
 #include "Engine.h"
 #include "Song.h"
 #include "AutomationPattern.h"
 #include "MidiTime.h"
+#include "MainWindow.h"
 
 #include "smfMidiCC.h"
 #include "smfMidiChannel.h"
@@ -41,24 +44,23 @@
 #define PITCH_RANGE_RPN_CODE {chan, 0}
 
 midiReader::midiReader( TrackContainer* tc ) :
-	pd( QProgressDialog( TrackContainer::tr( "Importing MIDI-file..." ),
-		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow()) ),
 	m_tc( tc ),
 	beatsPerTact( 4 ),
-	m_divistion( 120 ),
-	pitchBendMultiply( defaultPitchRange );
+	m_division( 120 ),
+	pitchBendMultiply( defaultPitchRange ),
+	pd(TrackContainer::tr( "Importing MIDI-file..." ),
+		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow())
 
 {
-
 	m_seq = new drumstick::QSmf(this);
 
 	pd.setWindowTitle( TrackContainer::tr( "Please wait..." ) );
 	pd.setWindowModality(Qt::WindowModal);
-	pd.setMinimumDuration( 0 )
+	pd.setMinimumDuration( 0 );
 	pd.setValue(0);
 
 
-	timeSigMM = Engine::getSong()->getTimeSigModel();
+	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
 	timeSigNumeratorPat = AutomationPattern::globalAutomationPattern(
 				&timeSigMM.numeratorModel());
 	timeSigDenominatorPat = AutomationPattern::globalAutomationPattern(
@@ -83,10 +85,10 @@ midiReader::midiReader( TrackContainer* tc ) :
 			this, SLOT(tempoEvent(int)));
 
 	connect(m_seq, SIGNAL(signalSMFError(QString)),
-			this, SLOT(errorHandler(QString));
+			this, SLOT(errorHandler(QString)));
 
 	connect(m_seq, SIGNAL(signalSMFCtlChange(int,int,int)),
-			this, SLOT(ctlChangeEvent(int,int,int))));
+			this, SLOT(ctlChangeEvent(int,int,int)));
 
 	connect(m_seq, SIGNAL(signalSMFPitchBend(int,int)),
 			this, SLOT(pitchBendEvent(int,int)));
@@ -104,7 +106,7 @@ midiReader::midiReader( TrackContainer* tc ) :
 			this, SLOT(textEvent(int,QString)));
 
 	connect(m_seq, SIGNAL(signalSMFTrackStart()),
-			this, SLOT(trackStartEvent());
+			this, SLOT(trackStartEvent()));
 
 	connect(m_seq, SIGNAL(signalSMFTrackEnd()),
 			this, SLOT(trackEndEvent()));
@@ -118,7 +120,7 @@ midiReader::midiReader( TrackContainer* tc ) :
 
 midiReader::~midiReader()
 {
-	printf("destroy midiReader\n")
+	printf("destroy midiReader\n");
 	delete m_seq;
 
 	for( int c=0; c<256; c++){
@@ -134,14 +136,21 @@ midiReader::~midiReader()
 void midiReader::read(QString &fileName)
 {
 	m_seq->readFromFile(fileName);
-	pd.setMaximum( m_seq->getTracks() + preTrackSteps );
-	pd.setValue(1);
+	pd.setValue( pd.maximum() );
 }
 
 void midiReader::CCHandler(int chan, int ctl, int value)
 {
 	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
-	smfMidiChannel * ch = chs[chan].create( tc, trackName);
+	smfMidiChannel * ch = chs[chan].create( m_tc, trackName);
+	int rpn_msb[2] = PITCH_RANGE_RPN_CODE;
+	int rpn_lsb[2] = PITCH_RANGE_RPN_CODE;
+	int rpn_data[2];
+
+	int rpn_msb_i = -1;
+	int rpn_lsb_i = -1;
+
+
 	if( ctl <= 129 )
 	{
 		AutomatableModel * objModel = NULL;
@@ -156,11 +165,8 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 			break;
 
 		case 6:
-			int[2] rpn_msb = PITCH_RANGE_RPN_CODE;
-			int[2] rpn_lsb = PITCH_RANGE_RPN_CODE;
-
-			int rpn_msb_i = rpn_msbs.indexOf(rpn_msb);
-			int rpn_lsb_i = rpn_lsbs.indexOf(rpn_lsb);
+			rpn_msb_i = rpn_msbs.indexOf(rpn_msb);
+			rpn_lsb_i = rpn_lsbs.indexOf(rpn_lsb);
 
 			if(rpn_msb_i != -1 && rpn_lsb_i != -1)
 			{
@@ -180,18 +186,20 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 
 		// RPN LSB
 		case 100:
-			int[2] data = {chan, value};
-			rpn_lsbs << data;
+			rpn_data[0] = chan;
+			rpn_data[1] = value;
+			rpn_lsbs << rpn_data;
 			break;
 
 		// RPN MSB
 		case 101:
-			int[2] data = {chan, value};
-			rpn_msbs << data;
+			rpn_data[0] = chan;
+			rpn_data[1] = value;
+			rpn_msbs << rpn_data;
 			break;
 
 		case 128:
-			objModel = ch->it->pianoModel();
+			objModel = ch->it->pitchModel();
 			value = value * 100 / 8192 * pitchBendMultiply;
 			break;
 
@@ -214,9 +222,9 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 			{
 				if( ccs[ctl].at == NULL )
 				{
-					ccs[ctl].create( tc, trackName + " > " + objModel->displayName());
+					ccs[ctl].create( m_tc, trackName + " > " + objModel->displayName());
 				}
-				ccs[ccid].putValue( m_seq->getCurrentTime()*tickRate, objModel, value);
+				ccs[ctl].putValue( m_seq->getCurrentTime()*tickRate, objModel, value);
 			}
 		}
 	}
@@ -230,11 +238,12 @@ void midiReader::addNoteEvent(int chan, int pitch, int vol=0)
 	const int note_vol = channel + 1;
 
 	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
-	smfMidiChannel * ch = chs[chan].create( tc, trackName );
+	smfMidiChannel * ch = chs[chan].create( m_tc, trackName );
 
 	for(int c=0; c<note_list.size(); c++)
 	{
-		int[4] note = note_list[c];
+		long *note;
+		note = note_list[c];
 		if(note[channel] == chan && note[note_pitch] == pitch
 				&& m_seq->getCurrentTime() >= note[time])
 		{
@@ -243,6 +252,7 @@ void midiReader::addNoteEvent(int chan, int pitch, int vol=0)
 					note[time] * tickRate,
 					note[note_pitch] - 12,
 					note[note_vol] );
+			printf("Note: length=%d start=%d pitch=%d vol=%d", ticks, note[time]*tickRate, note[note_pitch] - 12, note[note_vol]);
 			note_list.removeAt(c);
 			ch->addNote( n );
 			break;
@@ -298,7 +308,7 @@ void midiReader::pitchBendEvent(int chan, int value)
 void midiReader::noteOnEvent(int chan, int pitch, int vol)
 {
 	if(vol != 0){
-		int[4] note = {m_seq->getCurrentTime(), chan, pitch};
+		long note[4]= {m_seq->getCurrentTime(), chan, pitch, vol};
 		note_list << note;
 		return;
 	}
@@ -315,10 +325,10 @@ void midiReader::noteOffEvent(int chan, int pitch, int vol)
 
 void midiReader::headerEvent(int format, int ntrks, int division)
 {
-	m_tracks = ntrks;
 	m_division = division;
 
 	tickRate = ticksPerBeat / m_division;
+	pd.setMaximum( ntrks + preTrackSteps );
 }
 
 void midiReader::programEvent(int chan, int patch)
