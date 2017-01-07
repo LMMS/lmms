@@ -42,7 +42,7 @@ public:
 	AutomationPattern * ap;
 	MidiTime lastPos;
 	
-	smfMidiCC & create( TrackContainer* tc, QString tn );
+	smfMidiCC & create(TrackContainer* tc, QString tn );
 	smfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value );
 	void clear();
 };

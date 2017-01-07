@@ -42,11 +42,18 @@
 #include "midiReader.h"
 
 #define PITCH_RANGE_RPN_CODE {chan, 0}
+#define CC_RPN_SEND rpn_data[0] = chan; \
+	rpn_data[1] = value;
+
+#define NOTE_EVENT_DEFINITION const int time = 0; \
+	const int channel = time + 1; \
+	const int note_pitch = channel + 1; \
+	const int note_vol = note_pitch + 1;
+
 
 midiReader::midiReader( TrackContainer* tc ) :
 	m_tc( tc ),
 	beatsPerTact( 4 ),
-	m_division( 120 ),
 	pitchBendMultiply( defaultPitchRange ),
 	pd(TrackContainer::tr( "Importing MIDI-file..." ),
 		TrackContainer::tr( "Cancel" ), 0, preTrackSteps, gui->mainWindow())
@@ -66,7 +73,7 @@ midiReader::midiReader( TrackContainer* tc ) :
 	timeSigDenominatorPat = AutomationPattern::globalAutomationPattern(
 				&timeSigMM.denominatorModel());
 
-	ticksPerBeat = DefaultBeatsPerTact / beatsPerTact;
+	ticksPerBeat = DefaultTicksPerTact / beatsPerTact;
 
 	if(note_list.size() != 0)
 		note_list.clear();
@@ -76,6 +83,9 @@ midiReader::midiReader( TrackContainer* tc ) :
 
 	if(rpn_lsbs.size() != 0)
 		rpn_lsbs.clear();
+
+	AutomationPattern * tap = m_tc->tempoAutomationPattern();
+	tap->clear();
 
 	// Connect to slots.
 	connect(m_seq, SIGNAL(signalSMFTimeSig(int,int,int,int)),
@@ -105,21 +115,17 @@ midiReader::midiReader( TrackContainer* tc ) :
 	connect(m_seq, SIGNAL(signalSMFText(int,QString)),
 			this, SLOT(textEvent(int,QString)));
 
-	connect(m_seq, SIGNAL(signalSMFTrackStart()),
-			this, SLOT(trackStartEvent()));
-
-	connect(m_seq, SIGNAL(signalSMFTrackEnd()),
-			this, SLOT(trackEndEvent()));
-
 	connect(m_seq, SIGNAL(signalSMFProgram(int,int)),
 			this, SLOT(programEvent(int,int)));
 
-
+	connect(m_seq, SIGNAL(signalSMFHeader(int,int,int)),
+			this, SLOT(headerEvent(int,int,int)));
 
 }
 
 midiReader::~midiReader()
 {
+	pd.setValue(pd.maximum()-preTrackSteps);
 	printf("destroy midiReader\n");
 	delete m_seq;
 
@@ -127,8 +133,8 @@ midiReader::~midiReader()
 		if( !chs[c].hasNotes && chs[c].it ) {
 			printf(" Should remove empty track\n");
 			// must delete trackView first - but where is it?
-			//tc->removeTrack( chs[c].it );
-			//it->deleteLater();
+			//m_tc->removeTrack( chs[c].it );
+			//chs[c].it->deleteLater();
 		}
 	}
 }
@@ -141,11 +147,10 @@ void midiReader::read(QString &fileName)
 
 void midiReader::CCHandler(int chan, int ctl, int value)
 {
-	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
+	QString trackName = QString( tr( "Track" ) + " %1").arg(chan+1);
 	smfMidiChannel * ch = chs[chan].create( m_tc, trackName );
 	AutomatableModel * objModel = NULL;
-	int * rpn;
-	int rpn_data[2];
+	int * rpn_data = new int[2];
 
 	bool flag_rpn_msb = false;
 	bool flag_rpn_lsb = false;
@@ -165,19 +170,21 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 		case 6:
 			for(int c=0; c < rpn_msbs.size(); c++)
 			{
-				rpn = rpn_msbs[c];
-				if(rpn[0] == chan && rpn[1] == 0)
+				rpn_data = rpn_msbs[c];
+				if(rpn_data[0] == chan && rpn_data[1] == 0)
 				{
 					flag_rpn_msb = true;
 					rpn_msbs.removeAt(c);
+					delete rpn_data;
 				}
 			}
 			for(int c=0; c < rpn_lsbs.size(); c++) {
-				rpn = rpn_lsbs[c];
-				if(rpn[0] == chan && rpn[1] == 0)
+				rpn_data = rpn_lsbs[c];
+				if(rpn_data[0] == chan && rpn_data[1] == 0)
 				{
 					flag_rpn_lsb = true;
 					rpn_lsbs.removeAt(c);
+					delete rpn_data;
 				}
 			}
 
@@ -199,15 +206,13 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 
 		// RPN LSB
 		case 100:
-			rpn_data[0] = chan;
-			rpn_data[1] = value;
+			CC_RPN_SEND
 			rpn_lsbs << rpn_data;
 			break;
 
 		// RPN MSB
 		case 101:
-			rpn_data[0] = chan;
-			rpn_data[1] = value;
+			CC_RPN_SEND
 			rpn_msbs << rpn_data;
 			break;
 
@@ -233,11 +238,11 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 				objModel->setInitValue( value );
 			else
 			{
-				if( ccs[ctl].at == NULL )
+				if( ccs[chan][ctl].at == NULL )
 				{
-					ccs[ctl].create( m_tc, trackName + " > " + objModel->displayName());
+					ccs[chan][ctl].create( m_tc, trackName + " > " + objModel->displayName());
 				}
-				ccs[ctl].putValue( m_seq->getCurrentTime()*tickRate, objModel, value );
+				ccs[chan][ctl].putValue( m_seq->getCurrentTime()*tickRate , objModel, value );
 			}
 		}
 	}
@@ -245,29 +250,27 @@ void midiReader::CCHandler(int chan, int ctl, int value)
 
 void midiReader::addNoteEvent(int chan, int pitch, int vol=0)
 {
-	const int time = 0;
-	const int channel = time + 1;
-	const int note_pitch = channel + 1;
-	const int note_vol = channel + 1;
+	NOTE_EVENT_DEFINITION
 
-	QString trackName = QString( tr( "Track" ) + " %1").arg(chan);
+	QString trackName = QString( tr( "Track" ) + " %1").arg(chan+1);
 	smfMidiChannel * ch = chs[chan].create( m_tc, trackName );
 
 	for(int c=0; c<note_list.size(); c++)
 	{
-		long *note;
+		int *note;
 		note = note_list[c];
+
 		if(note[channel] == chan && note[note_pitch] == pitch
 				&& m_seq->getCurrentTime() >= note[time])
 		{
-			int ticks = (m_seq->getCurrentTime() - note[time]) * tickRate;
+			double ticks = (m_seq->getCurrentTime() - note[time]) * tickRate;
 			Note n( (ticks < 1 ? 1 : ticks ),
-					note[time] * tickRate,
+					(double)note[time] * tickRate,
 					note[note_pitch] - 12,
 					note[note_vol] );
-			printf("Note: length=%d start=%d pitch=%d vol=%d\n", ticks, note[time]*tickRate, note[note_pitch] - 12, note[note_vol]);
 			note_list.removeAt(c);
 			ch->addNote( n );
+			delete note;
 			break;
 		}
 	}
@@ -297,8 +300,7 @@ void midiReader::tempoEvent(int tempo)
 {
 	AutomationPattern * tap = m_tc->tempoAutomationPattern();
 	if( tap ) {
-		tap->clear();
-		tap->putValue(m_seq->getCurrentTime() * tickRate, 60000000/tempo);
+		tap->putValue((double)m_seq->getCurrentTime() * tickRate, 60000000.f/(float)tempo);
 	}
 }
 
@@ -320,8 +322,14 @@ void midiReader::pitchBendEvent(int chan, int value)
 
 void midiReader::noteOnEvent(int chan, int pitch, int vol)
 {
+	NOTE_EVENT_DEFINITION
+
 	if(vol != 0){
-		long note[4]= {m_seq->getCurrentTime(), chan, pitch, vol};
+		int *note = new int[4];
+		note[time] = m_seq->getCurrentTime();
+		note[channel] = chan;
+		note[note_pitch] = pitch;
+		note[note_vol] = vol;
 		note_list << note;
 		return;
 	}
@@ -338,9 +346,7 @@ void midiReader::noteOffEvent(int chan, int pitch, int vol)
 
 void midiReader::headerEvent(int format, int ntrks, int division)
 {
-	m_division = division;
-
-	tickRate = ticksPerBeat / m_division;
+	tickRate = ticksPerBeat / (double)division;
 	pd.setMaximum( ntrks + preTrackSteps );
 }
 

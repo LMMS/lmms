@@ -85,7 +85,7 @@ private:
 	TrackContainer *m_tc;
 
 	// 128 CC + Pitch Bend + Program
-	smfMidiCC ccs[130];
+	smfMidiCC ccs[256][130];
 	smfMidiChannel chs[256];
 
 	AutomationPattern * timeSigNumeratorPat;
@@ -95,14 +95,13 @@ private:
 	double ticksPerBeat;
 	double tickRate;  // convert midi tick to lmms tick.
 
-	int m_division;
 	int pitchBendMultiply;
 
 	/*
 	 * record note event.
 	 * 	tick, channel, pitch, vol.
 	 */
-	QList<long*> note_list;
+	QList<int*> note_list;
 
 	/*
 	 * record rpn event.
