@@ -298,12 +298,12 @@ void chordtableEditorView::loadChord()
 	m_chordsWidget->setUpdatesEnabled(false);
 	//the option 0 is Qt::FindDirectChildrenOnly which is not accepted by the compiler
 	QList<QWidget*> widgets= m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", 0);
-	foreach(QWidget * widget, widgets)
-	{
-		m_chordsWidgetLayout->removeWidget(widget);
-		delete widget;
-	}
-	//	qDeleteAll(m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly));
+//	foreach(QWidget * widget, widgets)
+//	{
+//		m_chordsWidgetLayout->removeWidget(widget);
+//		delete widget;
+//	}
+	qDeleteAll(m_chordsWidget->findChildren<QWidget*>("chordNoteWidget", Qt::FindDirectChildrenOnly));
 	m_chordsWidget->setUpdatesEnabled(true);
 
 	//adding the widgets from the menu
