@@ -61,6 +61,7 @@
 
 #include <signal.h>
 
+#include "MainApplication.h"
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
@@ -261,7 +262,7 @@ int main( int argc, char * * argv )
 
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new QApplication( argc, argv ) ;
+					new MainApplication( argc, argv );
 
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
 	ProjectRenderer::OutputSettings os( 44100, false, 160,
@@ -838,6 +839,12 @@ int main( int argc, char * * argv )
 		if( fullscreen )
 		{
 			gui->mainWindow()->showMaximized();
+		}
+
+		// Handle macOS-style FileOpen QEvents
+		QString queuedFile = static_cast<MainApplication *>( app )->queuedFile();
+		if ( !queuedFile.isEmpty() ) {
+			fileToLoad = queuedFile;
 		}
 
 		if( !fileToLoad.isEmpty() )
