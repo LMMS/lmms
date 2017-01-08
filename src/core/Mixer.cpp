@@ -50,6 +50,7 @@
 // platform-specific midi-interface-classes
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
+#include "MidiJack.h"
 #include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
@@ -348,7 +349,9 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 					 currentPlayMode == Song::Mode_PlayBB;
 
 	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
-		p != last_metro_pos )
+		p != last_metro_pos &&
+			// Stop crash with metronome if empty project
+				Engine::getSong()->countTracks() )
 	{
 		tick_t ticksPerTact = MidiTime::ticksPerTact();
 		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
@@ -972,6 +975,19 @@ MidiClient * Mixer::tryMidiClients()
 			return malsar;
 		}
 		delete malsar;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if( client_name == MidiJack::name() || client_name == "" )
+	{
+		MidiJack * mjack = new MidiJack;
+		if( mjack->isRunning() )
+		{
+			m_midiClientName = MidiJack::name();
+			return mjack;
+		}
+		delete mjack;
 	}
 #endif
 

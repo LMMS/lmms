@@ -49,7 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 
 }
 
-const float DYN_NOISE_FLOOR = 0.00001f; // -100dBV noise floor
+const float DYN_NOISE_FLOOR = 0.00001f; // -100dBFS noise floor
 const double DNF_LOG = 5.0;
 
 dynProcEffect::dynProcEffect( Model * _parent,

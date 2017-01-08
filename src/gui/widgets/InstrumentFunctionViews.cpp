@@ -103,6 +103,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	m_arpGroupBox( new GroupBox( tr( "ARPEGGIO" ) ) ),
 	m_arpComboBox( new ComboBox() ),
 	m_arpRangeKnob( new Knob( knobBright_26 ) ),
+	m_arpCycleKnob( new Knob( knobBright_26 ) ),
 	m_arpSkipKnob( new Knob( knobBright_26 ) ),
 	m_arpMissKnob( new Knob( knobBright_26 ) ),
 	m_arpTimeKnob( new TempoSyncKnob( knobBright_26 ) ),
@@ -137,6 +138,15 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 		tr( "Use this knob for setting the arpeggio range in octaves. "
 			"The selected arpeggio will be played within specified "
 			"number of octaves." ) );
+
+
+	m_arpCycleKnob->setLabel( tr( "CYCLE" ) );
+	m_arpCycleKnob->setHintText( tr( "Cycle notes:" ) + " ", " " + tr( "note(s)" ) );
+	m_arpCycleKnob->setWhatsThis(
+		tr( "Jumps over n steps in the arpeggio and cycles around "
+			"if we're over the note range. If the total note range is evenly "
+			"divisible by the number of steps jumped over you will get stuck "
+			"in a shorter arpeggio or even on one note." ) );
 
 
 	m_arpSkipKnob->setLabel( tr( "SKIP" ) );
@@ -189,6 +199,7 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
 
 	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCycleKnob, 0, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
@@ -215,6 +226,7 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpGroupBox->setModel( &m_a->m_arpEnabledModel );
 	m_arpComboBox->setModel( &m_a->m_arpModel );
 	m_arpRangeKnob->setModel( &m_a->m_arpRangeModel );
+	m_arpCycleKnob->setModel( &m_a->m_arpCycleModel );
 	m_arpSkipKnob->setModel( &m_a->m_arpSkipModel );
 	m_arpMissKnob->setModel( &m_a->m_arpMissModel );
 	m_arpTimeKnob->setModel( &m_a->m_arpTimeModel );

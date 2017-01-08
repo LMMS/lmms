@@ -477,7 +477,7 @@ void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeou
 void PianoRoll::showVolTextFloat(volume_t vol, const QPoint &pos, int timeout)
 {
 	//! \todo display velocity for MIDI-based instruments
-	// possibly dBV values too? not sure if it makes sense for note volumes...
+	// possibly dBFS values too? not sure if it makes sense for note volumes...
 	showTextFloat( tr("Velocity: %1%").arg( vol ), pos, timeout );
 }
 

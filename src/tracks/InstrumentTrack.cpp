@@ -1214,6 +1214,7 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 class fxLineLcdSpinBox : public LcdSpinBox
 {
+        Q_OBJECT
 	public:
 		fxLineLcdSpinBox( int _num_digits, QWidget * _parent,
 				const QString & _name ) :
@@ -1576,6 +1577,7 @@ void InstrumentTrackWindow::saveSettingsBtnClicked()
 	sfd.setFileMode( FileDialog::AnyFile );
 	QString fname = m_track->name();
 	sfd.selectFile( fname.remove(QRegExp("[^a-zA-Z0-9_\\-\\d\\s]")) );
+	sfd.setDefaultSuffix( "xpf");
 
 	if( sfd.exec() == QDialog::Accepted &&
 		!sfd.selectedFiles().isEmpty() &&
@@ -1820,3 +1822,5 @@ void InstrumentTrackWindow::viewPrevInstrument()
 {
 	viewInstrumentInDirection(-1);
 }
+
+#include "InstrumentTrack.moc"

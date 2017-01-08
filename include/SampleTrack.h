@@ -59,20 +59,27 @@ public:
 	}
 
 	MidiTime sampleLength() const;
-
+	void setSampleStartFrame( f_cnt_t startFrame );
+	void setSamplePlayLength( f_cnt_t length );
 	virtual TrackContentObjectView * createView( TrackView * _tv );
 
+
+	bool isPlaying() const;
+	void setIsPlaying(bool isPlaying);
 
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
-	void updateLength( bpm_t = 0 );
+	void updateLength();
 	void toggleRecord();
+	void playbackPositionChanged();
+	void updateTrackTcos();
 
 
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
+	bool m_isPlaying;
 
 
 	friend class SampleTCOView;
@@ -102,6 +109,7 @@ public slots:
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _cme );
 	virtual void mousePressEvent( QMouseEvent * _me );
+	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mouseDoubleClickEvent( QMouseEvent * );
@@ -143,6 +151,8 @@ public:
 		return "sampletrack";
 	}
 
+public slots:
+	void updateTcos();
 
 private:
 	FloatModel m_volumeModel;

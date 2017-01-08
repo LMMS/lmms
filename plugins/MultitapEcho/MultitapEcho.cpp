@@ -103,7 +103,7 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	// get processing vars
 	const int steps = m_controls.m_steps.value();
 	const float stepLength = m_controls.m_stepLength.value();
-	const float dryGain = dbvToAmp( m_controls.m_dryGain.value() );
+	const float dryGain = dbfsToAmp( m_controls.m_dryGain.value() );
 	const bool swapInputs = m_controls.m_swapInputs.value();
 	
 	// check if number of stages has changed

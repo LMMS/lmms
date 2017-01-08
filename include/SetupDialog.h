@@ -98,7 +98,7 @@ private slots:
 
 	void toggleToolTips( bool _enabled );
 	void toggleWarnAfterSetup( bool _enabled );
-	void toggleDisplaydBV( bool _enabled );
+	void toggleDisplaydBFS( bool _enabled );
 	void toggleMMPZ( bool _enabled );
 	void toggleDisableBackup( bool _enabled );
 	void toggleOpenLastProject( bool _enabled );
@@ -136,7 +136,7 @@ private:
 
 	bool m_toolTips;
 	bool m_warnAfterSetup;
-	bool m_displaydBV;
+	bool m_displaydBFS;
 	bool m_MMPZ;
 	bool m_disableBackup;
 	bool m_openLastProject;
