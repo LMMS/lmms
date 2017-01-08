@@ -277,7 +277,7 @@ QString AutomatableModel::displayValue( const float val ) const
 {
 	switch( m_dataType )
 	{
-		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
+		case Float: return QString::number( castValue<float>( scaledValue( static_cast<float>( static_cast<int>( val / m_step + 0.5 ) ) * m_step ) ) );
 		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
 		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
 	}

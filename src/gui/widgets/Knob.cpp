@@ -51,7 +51,6 @@
 #include "templates.h"
 #include "TextFloat.h"
 
-
 TextFloat * Knob::s_textFloat = NULL;
 
 
@@ -771,6 +770,17 @@ void Knob::enterValue()
 {
 	bool ok;
 	float new_val;
+	//cout digits
+	const float step = model()->step<float>();
+	float steptemp = step;
+	int digits = 0;
+	while ( steptemp < 1 )
+	{
+		steptemp = steptemp / 0.1f;
+		digits++;
+	}
+
+	float roundedValue = static_cast<float>( static_cast<int>( model()->value() / step + 0.5 ) ) * step;
 	if( isVolumeKnob() &&
 		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
@@ -778,8 +788,8 @@ void Knob::enterValue()
 			this, windowTitle(),
 			tr( "Please enter a new value between "
 					"-96.0 dBFS and 6.0 dBFS:" ),
-				20.0 * log10( model()->value() / 100.0 ),
-							-96.0, 6.0, 4, &ok );
+				20.0 * log10( roundedValue / 100.0 ),
+							-96.0, 6.0, digits, &ok );
 		if( new_val <= -96.0 )
 		{
 			new_val = 0.0f;
@@ -797,13 +807,14 @@ void Knob::enterValue()
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
 						arg( model()->maxValue() ),
-					model()->value(),
+					roundedValue,
 					model()->minValue(),
-					model()->maxValue(), 4, &ok );
+					model()->maxValue(), digits, &ok );
 	}
 
 	if( ok )
 	{
+		new_val = static_cast<float>( static_cast<int>( ( new_val ) / step + 0.5 ) ) * step;
 		model()->setValue( new_val );
 	}
 }
@@ -826,15 +837,17 @@ void Knob::friendlyUpdate()
 
 QString Knob::displayValue() const
 {
+	const float step = model()->step<float>();
+	float value = static_cast<float>( static_cast<int>( ( model()->value() ) / step + 0.5 ) ) * step;
 	if( isVolumeKnob() &&
 		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		return m_description.trimmed() + QString( " %1 dBFS" ).
-				arg( 20.0 * log10( model()->value() / volumeRatio() ),
+				arg( 20.0 * log10( value / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->value() ) + m_unit;
+					arg( value ) + m_unit;
 }
 
 
