@@ -79,6 +79,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		waveshaper
 		vibed
 		zynaddsubfx
+		xpressive
 	)
 
 	IF(NOT LMMS_BUILD_APPLE)
