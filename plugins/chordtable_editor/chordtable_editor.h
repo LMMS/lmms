@@ -35,6 +35,7 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 #include "InstrumentFunctions.h"
+#include "AutomatableSlider.h"
 
 class ComboBox;
 class QPushButton;

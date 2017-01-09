@@ -51,6 +51,7 @@
 #include "Engine.h"
 #include "Song.h"
 #include "FileDialog.h"
+#include "InstrumentFunctions.h"
 
 #include "embed.cpp"
 
