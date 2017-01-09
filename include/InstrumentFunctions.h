@@ -187,13 +187,14 @@ public:
 	//constructs the object from a given string by calling the parseString function
 	ChordSemiTone(Chord *_parent,QString _string);
 
+	virtual ~ChordSemiTone();
+
 	//return the parent chord
 	Chord *getChord()
 	{
 		return qobject_cast<Chord*>(parent());
 	}
 
-	virtual ~ChordSemiTone() {}
 
 	//parses a string into data
 	void parseString( QString _string );
@@ -231,7 +232,7 @@ public:
 	//Creates a copy of the chord, changing name too;
 	Chord(Chord *_copy, QString _name);
 
-	virtual ~Chord() {}
+	virtual ~Chord();
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );

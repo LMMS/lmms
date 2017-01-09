@@ -557,6 +557,16 @@ ChordSemiTone::ChordSemiTone(Chord *_parent, QString _string) :
 	parseString(_string);
 }
 
+ChordSemiTone::~ChordSemiTone()
+{
+	delete bare;
+	delete silenced;
+	delete active;
+	delete pan;
+	delete vol;
+	delete key;
+}
+
 void ChordSemiTone::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 {
 	key->saveSettings(_doc,_parent,"key");
@@ -625,6 +635,14 @@ Chord::Chord(Chord *_copy,QString _name) :
 	}
 }
 
+Chord::~Chord()
+{
+	for(int i=0;i<this->size();i++)
+	{
+		delete at(i);
+	}
+}
+
 void Chord::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 {
 	_parent.setAttribute( "name", m_name );
@@ -677,7 +695,9 @@ void Chord::loadSettings(const QDomElement &_this)
 	{
 		for (int j=size()-1;j>=i;j--)
 		{
+			cst=at(j);
 			remove(j);
+			delete cst;
 		}
 	}
 
@@ -712,7 +732,9 @@ void Chord::insertSemiTone(ChordSemiTone *csm, int position)
 
 void Chord::removeSemiTone(int i)
 {
+	ChordSemiTone *cst=at(i);
 	remove(i);
+	delete cst;
 	//emits the data changed signal
 	Engine::chordTable()->emitChordTableChangedSignal();
 }
@@ -762,8 +784,6 @@ void ChordTable::saveSettings(QDomDocument &_doc, QDomElement &_parent)
 
 void ChordTable::loadSettings(const QDomElement &_this)
 {
-	//clearing the vector
-//	clear();
 
 	int i=0;
 
@@ -794,7 +814,9 @@ void ChordTable::loadSettings(const QDomElement &_this)
 	{
 		for (int j=size()-1;j>=i;j--)
 		{
+			chord = at(j);
 			remove(j);
+			delete chord;
 		}
 	}
 	//emits the data changed signal
@@ -919,7 +941,9 @@ void ChordTable::removeChord(int i)
 	//removes chord from the vector
 	if (i<size())
 	{
+		Chord *c=at(i);
 		remove(i);
+		delete c;
 		//emits the data changed signal
 		emit chordTableChanged();
 		//emits the chordTable names are changed
