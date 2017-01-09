@@ -217,7 +217,6 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 {
 	bool ok;
 	float newValue;
-	//cout digits
 	// TODO: dbV handling
 	if( m_displayConversion )
 	{
