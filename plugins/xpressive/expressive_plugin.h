@@ -82,7 +82,7 @@ class exprSynth
 	MM_OPERATORS
 public:
 	exprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3,ExprFront *_exprO1,ExprFront *_exprO2, NotePlayHandle * _nph,
-			const sample_rate_t _sample_rate,const FloatModel* _pan1,const FloatModel* _pan2);
+			const sample_rate_t _sample_rate,const FloatModel* _pan1,const FloatModel* _pan2,float _rel_trans);
 	virtual ~exprSynth();
 
 	void renderOutput( fpp_t _frames, sampleFrame * _buf );
@@ -98,6 +98,8 @@ private:
 	NotePlayHandle* nph;
 	const sample_rate_t sample_rate;
 	const FloatModel *pan1,*pan2;
+	float rel_transition;
+	float rel_inc;
 
 } ;
 
@@ -156,6 +158,7 @@ private:
 	FloatModel m_smoothW3;
 	FloatModel m_panning1;
 	FloatModel m_panning2;
+	FloatModel m_relTransition;
 	float m_A1,m_A2,m_A3;
 	WaveSample m_W1, m_W2, m_W3;
 
@@ -200,6 +203,7 @@ private:
 
 	Knob * m_generalPurposeKnob[3];
 	Knob * m_panningKnob[2];
+	Knob * m_relKnob;
 	Knob * m_smoothKnob;
 	QPlainTextEdit * m_expressionEditor;
 
@@ -209,8 +213,8 @@ private:
 	PixmapButton * m_w3Btn;
 	PixmapButton * m_o1Btn;
 	PixmapButton * m_o2Btn;
-	PixmapButton * m_holdBtn;
-	PixmapButton * m_relBtn;
+	//PixmapButton * m_holdBtn;
+	//PixmapButton * m_relBtn;
 	PixmapButton * m_sinWaveBtn;
 	PixmapButton * m_triangleWaveBtn;
 	PixmapButton * m_sqrWaveBtn;

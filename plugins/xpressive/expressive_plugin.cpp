@@ -87,14 +87,14 @@ float getGraphValue(void* g ,float x)
 }*/
 
 exprSynth::exprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3, ExprFront *_exprO1, ExprFront *_exprO2,
-					NotePlayHandle *_nph, const sample_rate_t _sample_rate,const FloatModel* _pan1,const FloatModel* _pan2)
-	:exprO1(_exprO1),exprO2(_exprO2),W1(gW1),W2(gW2),W3(gW3),nph(_nph),sample_rate(_sample_rate),pan1(_pan1),pan2(_pan2)
+					NotePlayHandle *_nph, const sample_rate_t _sample_rate, const FloatModel* _pan1, const FloatModel* _pan2, float _rel_trans)
+	:exprO1(_exprO1),exprO2(_exprO2),W1(gW1),W2(gW2),W3(gW3),nph(_nph),sample_rate(_sample_rate),pan1(_pan1),pan2(_pan2),rel_transition(_rel_trans)
 {
 	frequency=_nph->frequency();
 	note_sample=0;
 	note_sample_sec=0;
 	released=0;
-
+	rel_inc=1000.0/(sample_rate*rel_transition);//rel_transition in ms. compute how much increment in each frame
 	exprO1->add_cyclic_vector("W1",W1->samples,W1->length);
 	exprO1->add_cyclic_vector("W2",W2->samples,W2->length);
 	exprO1->add_cyclic_vector("W3",W3->samples,W3->length);
@@ -135,8 +135,10 @@ void exprSynth::renderOutput(fpp_t _frames, sampleFrame *_buf)
 {
 
 	float o1,o2,pn1,pn2;
-	released=nph->isReleased();
+
 	for (fpp_t frame = 0; frame < _frames ; ++frame) {
+		if (nph->isReleased() && released < 1)
+			released=fmin(released+rel_inc,1);
 		o1=exprO1->evaluate();
 		o2=exprO2->evaluate();
 		pn1=pan1->value()*0.5;
@@ -181,6 +183,7 @@ expressive::expressive(InstrumentTrack * _instrument_track) :
 		m_smoothW3(0, 0.0f, 70.0f, 1.0f, this, tr("W3 smoothing")),
 		m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("PAN1")),
 		m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("PAN2")),
+		m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("REL TRANS")),
 		m_W1(GRAPH_LENGTH),m_W2(GRAPH_LENGTH),m_W3(GRAPH_LENGTH),
 		m_exprValid(false, this)
 {
@@ -220,6 +223,7 @@ void expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 	m_parameterA3.saveSettings(_doc,_this,"A3");
 	m_panning1.saveSettings(_doc,_this,"PAN1");
 	m_panning2.saveSettings(_doc,_this,"PAN2");
+	m_relTransition.saveSettings(_doc,_this,"RELTRANS");
 
 }
 
@@ -239,6 +243,7 @@ void expressive::loadSettings(const QDomElement & _this) {
 	m_parameterA3.loadSettings(_this,"A3");
 	m_panning1.loadSettings(_this,"PAN1");
 	m_panning2.loadSettings(_this,"PAN2");
+	m_relTransition.loadSettings(_this,"RELTRANS");
 
 	int size = 0;
 	char * dst = 0;
@@ -288,7 +293,7 @@ void expressive::playNote(NotePlayHandle * _n, sampleFrame * _working_buffer) {
 		exprO2->add_variable("A2",m_A2);
 		exprO2->add_variable("A3",m_A3);
 		_n->m_pluginData = new exprSynth(&m_W1,&m_W2,&m_W3,exprO1,exprO2,_n,
-				Engine::mixer()->processingSampleRate(),&m_panning1,&m_panning2);
+				Engine::mixer()->processingSampleRate(),&m_panning1,&m_panning2,m_relTransition.value());
 	}
 
 
@@ -340,7 +345,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	const int ROW_KNOBSA3 = 26 + 64;
 	const int ROW_KNOBSP1 = 126;
 	const int ROW_KNOBSP2 = 126 + 32;
-	//const int ROW_KNOBSTR = 126 + 64;
+	const int ROW_KNOBREL = 126 + 64;
 	const int ROW_WAVEBTN = 234;
 
 	setAutoFillBackground(true);
@@ -494,10 +499,22 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_panningKnob[1]->setHintText(tr("O2 panning:"), "");
 	m_panningKnob[1]->move(COL_KNOBS, ROW_KNOBSP2);
 
+	m_relKnob = new expressiveKnob(this);
+	m_relKnob->setHintText(tr("Release transition:"), "ms");
+	m_relKnob->move(COL_KNOBS, ROW_KNOBREL);
+
+
 
 	m_smoothKnob=new Knob(this);
 	m_smoothKnob->setHintText(tr("Smoothness"), "");
 	m_smoothKnob->move(100, 220);
+
+	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this,
+			SLOT(expressionChanged()));
+	connect(m_generalPurposeKnob[1], SIGNAL(sliderMoved(float)), this,
+			SLOT(expressionChanged()));
+	connect(m_generalPurposeKnob[2], SIGNAL(sliderMoved(float)), this,
+			SLOT(expressionChanged()));
 
 	connect(m_expressionEditor, SIGNAL(textChanged()), this,
 			SLOT(expressionChanged()));
@@ -525,6 +542,18 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	updateLayout();
 }
 
+static void clearGraph(graphModel * g)
+{
+	int length = g->length();
+	float * samples = new float[length];
+
+	int i;
+	for (i = 0; i < length; i++) {
+		samples[i] = 0;
+	}
+	g->setSamples(samples);
+	delete[] samples;
+}
 
 void expressiveView::expressionChanged() {
 	expressive * e = castModel<expressive>();
@@ -611,11 +640,15 @@ void expressiveView::expressionChanged() {
 		else
 		{
 			e->m_exprValid.setValue(1);
+			if (output_expr)
+				clearGraph(raw_graph);
 		}
 	}
 	else
 	{
 		e->m_exprValid.setValue(0);
+		if (output_expr)
+			clearGraph(raw_graph);
 	}
 }
 
@@ -692,6 +725,7 @@ void expressiveView::modelChanged() {
 
 	m_panningKnob[0]->setModel( &b->m_panning1 );
 	m_panningKnob[1]->setModel( &b->m_panning2 );
+	m_relKnob->setModel( &b->m_relTransition );
 	m_selectedGraphGroup->setModel(&b->m_selectedGraph);
 
 	updateLayout();
