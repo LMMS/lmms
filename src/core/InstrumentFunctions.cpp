@@ -39,6 +39,11 @@
 #include "NotePlayHandle.h"
 #include "PresetPreviewPlayHandle.h"
 
+class ChordTable;
+class Chord;
+class ChordSemiTone;
+class AutomatableSlider;
+
 /*****************************************************************************************************
  *
  * The InstrumentFunctionNoteStacking class
