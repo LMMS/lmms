@@ -486,7 +486,7 @@ chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 	ModelView(_model,_parent),
 	m_chordNoteModel( castModel<chordNoteModel>() )
 {
-	setObjectName(QStringLiteral("chordNoteWidget"));
+	setObjectName("chordNoteWidget");
 	//the position in the vector
 	m_position=m_chordNoteModel->position();
 	setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding);
