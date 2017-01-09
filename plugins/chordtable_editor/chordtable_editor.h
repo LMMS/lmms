@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QFrame>
 #include <QComboBox>
+#include <QGridLayout>
 
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
@@ -58,13 +59,16 @@ class chordNoteWidget : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	chordNoteWidget(chordNoteModel * _model, QWidget *_parent);
-	~chordNoteWidget(){}
+	~chordNoteWidget();
+
+	QVBoxLayout * m_vLayout;
+	QFrame *m_Frame;
+	QGridLayout *m_gridLayout;
 
 	chordNoteModel * m_chordNoteModel;
 	Knob *m_volumeKnob;
 	Knob *m_panKnob;
 	//
-	QLabel *m_keyLabel;
 	LcdWidget *m_keyLcd;
 	AutomatableSlider *m_keySlider;
 	LedCheckBox *m_activeLed;
