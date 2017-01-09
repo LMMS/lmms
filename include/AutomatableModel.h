@@ -406,7 +406,8 @@ public:
 		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
-
+	float getRoundedValue() const;
+	float getDigitCount();
 	defaultTypedMethods(float);
 
 } ;
