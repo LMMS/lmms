@@ -51,7 +51,8 @@
 #include "MainWindow.h"
 
 
-QPixmap * PatternView::s_stepBtnOn = NULL;
+QPixmap * PatternView::s_stepBtnOn0 = NULL;
+QPixmap * PatternView::s_stepBtnOn200 = NULL;
 QPixmap * PatternView::s_stepBtnOff = NULL;
 QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
@@ -608,10 +609,16 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
-	if( s_stepBtnOn == NULL )
+	if( s_stepBtnOn0 == NULL )
 	{
-		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
-							"step_btn_on_100" ) );
+		s_stepBtnOn0 = new QPixmap( embed::getIconPixmap(
+							"step_btn_on_0" ) );
+	}
+
+	if( s_stepBtnOn200 == NULL )
+	{
+		s_stepBtnOn200 = new QPixmap( embed::getIconPixmap(
+							"step_btn_on_200" ) );
 	}
 
 	if( s_stepBtnOff == NULL )
@@ -992,7 +999,8 @@ void PatternView::paintEvent( QPaintEvent * )
 	else if( beatPattern &&	( fixedTCOs() || ppt >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
 	{
-		QPixmap stepon;
+		QPixmap stepon0;
+		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
@@ -1000,8 +1008,12 @@ void PatternView::paintEvent( QPaintEvent * )
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
 
 		// scale step graphics to fit the beat pattern length
-		stepon = s_stepBtnOn->scaled( w / steps,
-					      s_stepBtnOn->height(),
+		stepon0 = s_stepBtnOn0->scaled( w / steps,
+					      s_stepBtnOn0->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepon200 = s_stepBtnOn200->scaled( w / steps,
+					      s_stepBtnOn200->height(),
 					      Qt::IgnoreAspectRatio,
 					      Qt::SmoothTransformation );
 		stepoff = s_stepBtnOff->scaled( w / steps,
@@ -1025,9 +1037,16 @@ void PatternView::paintEvent( QPaintEvent * )
 			{
 				const int vol = n->getVolume();
 				p.drawPixmap( x, y, stepoffl );
-				p.setOpacity( sqrt( vol / 200.0 ) );
-				p.drawPixmap( x, y, stepon );
-				p.setOpacity( 1 );
+				if( vol > 0 )
+				{
+						p.setOpacity( sqrt( vol / 200.0 ) );
+						p.drawPixmap( x, y, stepon200 );
+						p.setOpacity( 1 );
+				}
+				else
+				{
+						p.drawPixmap( x, y, stepon0 );
+				}
 			}
 			else if( ( it / 4 ) % 2 )
 			{
