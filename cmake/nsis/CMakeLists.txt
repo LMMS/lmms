@@ -58,7 +58,9 @@ SET(CPACK_NSIS_MUI_ICON                 "${CPACK_NSIS_MUI_ICON}" PARENT_SCOPE)
 CONFIGURE_FILE("lmms.rc.in"             "${CMAKE_BINARY_DIR}/lmms.rc")
 CONFIGURE_FILE("zynaddsubfx.rc.in"      "${CMAKE_BINARY_DIR}/plugins/zynaddsubfx/zynaddsubfx.rc")
 
-FILE(GLOB RAWWAVES "${CMAKE_INSTALL_PREFIX}/share/stk/rawwaves/*.raw")
-LIST(SORT RAWWAVES)
-INSTALL(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
+IF(LMMS_HAVE_STK)
+	FILE(GLOB RAWWAVES "${MINGW_PREFIX}/share/stk/rawwaves/*.raw")
+	LIST(SORT RAWWAVES)
+	INSTALL(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
+ENDIF()
 
