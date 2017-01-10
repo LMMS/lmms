@@ -35,7 +35,6 @@
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
 #include "InstrumentFunctions.h"
-#include "AutomatableSlider.h"
 
 class ComboBox;
 class QPushButton;
@@ -49,6 +48,9 @@ class chordtableEditor;
 class chordNoteModel;
 class LedCheckBox;
 class QLineEdit;
+class Chord;
+class ChordTable;
+class ChordSemiTone;
 
 /*****************************************************************************************************
  *
