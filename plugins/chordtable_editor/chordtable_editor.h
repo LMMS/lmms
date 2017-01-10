@@ -24,33 +24,35 @@
  *
  */
 
-#ifndef _CHORDTABLE_EDITOR_H
-#define _CHORDTABLE_EDITOR_H
+#ifndef CHORDTABLE_EDITOR_H
+#define CHORDTABLE_EDITOR_H
 
 #include <QLabel>
 #include <QFrame>
 #include <QComboBox>
 #include <QGridLayout>
+#include <QLineEdit>
 
 #include "ToolPlugin.h"
 #include "ToolPluginView.h"
-#include "InstrumentFunctions.h"
+//#include "InstrumentFunctions.h"
 
-class ComboBox;
-class QPushButton;
-class QScrollArea;
-class Knob;
-class AutomatableSlider;
-class LcdWidget;
-class QVBoxLayout;
-class QHBoxLayout;
-class chordtableEditor;
-class chordNoteModel;
-class LedCheckBox;
-class QLineEdit;
+class ChordSemiTone;
 class Chord;
 class ChordTable;
-class ChordSemiTone;
+class QVBoxLayout;
+class QHBoxLayout;
+class QPushButton;
+class QScrollArea;
+class chordtableEditor;
+class ComboBox;
+class ComboBoxModel;
+class AutomatableSlider;
+class Knob;
+class LcdWidget;
+class chordNoteModel;
+class LedCheckBox;
+//class QLineEdit;
 
 /*****************************************************************************************************
  *
