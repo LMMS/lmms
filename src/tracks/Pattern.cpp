@@ -1038,12 +1038,9 @@ void PatternView::paintEvent( QPaintEvent * )
 				const int vol = n->getVolume();
 				p.drawPixmap( x, y, stepoffl );
 				p.drawPixmap( x, y, stepon0 );
-				if( vol > 0 )
-				{
-						p.setOpacity( sqrt( vol / 200.0 ) );
-						p.drawPixmap( x, y, stepon200 );
-						p.setOpacity( 1 );
-				}
+				p.setOpacity( sqrt( vol / 200.0 ) );
+				p.drawPixmap( x, y, stepon200 );
+				p.setOpacity( 1 );
 			}
 			else if( ( it / 4 ) % 2 )
 			{
