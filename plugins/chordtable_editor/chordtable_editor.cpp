@@ -55,6 +55,10 @@
 
 #include "embed.cpp"
 
+class ChordSemiTone;
+class Chord;
+class ChordTable;
+
 
 extern "C"
 {
@@ -65,14 +69,13 @@ Plugin::Descriptor PLUGIN_EXPORT chordtableeditor_plugin_descriptor =
 	"ChordTable Plugin Editor",
 	QT_TRANSLATE_NOOP( "ChordTable Editor",
 	"Edits the Chordtable" ),
-	"Riki SLuga <jaz/at/rikis/dot/net>",
+	"Riki Sluga <jaz/at/rikis/dot/net>",
 	0x0100,
 	Plugin::Tool,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
-
 
 // necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
