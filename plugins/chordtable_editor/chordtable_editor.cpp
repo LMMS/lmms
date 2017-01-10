@@ -55,6 +55,12 @@
 
 #include "embed.cpp"
 
+class Chord;
+class ChordTable;
+class ChordSemiTone;
+class AutomatableSlider;
+
+
 extern "C"
 {
 
