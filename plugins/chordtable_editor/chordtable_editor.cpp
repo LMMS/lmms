@@ -55,9 +55,9 @@
 
 #include "embed.cpp"
 
-class ChordSemiTone;
-class Chord;
-class ChordTable;
+//class ChordSemiTone;
+//class Chord;
+//class ChordTable;
 
 
 extern "C"
