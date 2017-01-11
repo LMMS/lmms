@@ -46,6 +46,7 @@ AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :
 	outSuccessful = false;
 	m_soundio = NULL;
 	m_outstream = NULL;
+	m_outBuf = NULL;
 	m_disconnectErr = 0;
 	m_outBufFrameIndex = 0;
 	m_outBufFramesTotal = 0;
@@ -195,7 +196,8 @@ void AudioSoundIo::onBackendDisconnect(int err)
 AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
-	soundio_destroy(m_soundio);
+	if (m_soundio)
+		soundio_destroy(m_soundio);
 }
 
 void AudioSoundIo::startProcessing()
@@ -215,11 +217,17 @@ void AudioSoundIo::startProcessing()
 
 void AudioSoundIo::stopProcessing()
 {
-	soundio_outstream_destroy(m_outstream);
-	m_outstream = NULL;
+	if (m_outstream)
+	{
+		soundio_outstream_destroy(m_outstream);
+		m_outstream = NULL;
+	}
 
-	delete[] m_outBuf;
-	m_outBuf = NULL;
+	if (m_outBuf)
+	{
+		delete[] m_outBuf;
+		m_outBuf = NULL;
+	}
 }
 
 void AudioSoundIo::errorCallback(int err)
