@@ -43,8 +43,8 @@ const int	W2_EXPR = 1;
 const int	W3_EXPR = 2;
 const int	O1_EXPR = 3;
 const int	O2_EXPR = 4;
-const int	HOLD_EXPR = 5;
-const int	RELEASE_EXPR = 6;
+//const int	HOLD_EXPR = 5;
+//const int	RELEASE_EXPR = 6;
 const int	NUM_EXPRS = 7;
 
 
@@ -91,7 +91,7 @@ public:
 private:
 	ExprFront *exprO1, *exprO2;
 	const WaveSample *W1, *W2, *W3;
-	quint64 note_sample;
+	unsigned int note_sample;
 	float note_sample_sec;
 	float frequency;
 	float released;
@@ -169,8 +169,26 @@ private:
 	friend class expressiveView;
 } ;
 
+class expressiveHelpView: public QTextEdit
+{
+	Q_OBJECT
+public:
+	static expressiveHelpView *getInstance()
+	{
+		if (!instance)
+		{
+			instance=new expressiveHelpView();
+		}
+		return instance;
+	}
 
+private:
+	expressiveHelpView();
+	static expressiveHelpView * instance;
+	static QString HelpText;
 
+};
+class SubWindow;
 class expressiveView : public InstrumentView
 {
 	Q_OBJECT
@@ -178,7 +196,7 @@ public:
 	expressiveView( Instrument * _instrument,
 					QWidget * _parent );
 
-	virtual ~expressiveView() {};
+	virtual ~expressiveView();
 protected:
 
 
@@ -195,6 +213,7 @@ protected slots:
 	void moogSawWaveClicked();
 	void expWaveClicked();
 	void usrWaveClicked();
+	void helpClicked();
 	void expressionChanged( );
 	void smoothChanged( );
 
@@ -227,8 +246,10 @@ private:
 	static QPixmap * s_artwork;
 
 	Graph * m_graph;
+	graphModel * m_raw_graph;
 	LedCheckBox * m_expressionValidToggle;
-
+	bool m_output_expr;
+	bool m_wave_expr;
 } ;
 
 

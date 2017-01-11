@@ -24,11 +24,13 @@
 
 #ifndef EXPRFRONT_H_
 #define EXPRFRONT_H_
-
+#include <cmath>
 class ExprFrontData;
 
 inline float positiveFraction(float x)
 {
+	if (std::isnan(x) || std::isinf(x))
+		return 0;
 	if (x<0)
 	{
 		x+=static_cast<int>(1-x);
@@ -47,6 +49,7 @@ public:
 	bool add_variable(const char * name, float & ref);
 	bool add_constant(const char * name, float  ref);
 	bool add_cyclic_vector(const char *name, const float *data, size_t length);
+	void setIntegrate(const unsigned int *frameCounter,unsigned int sample_rate);
 private:
 	ExprFrontData *m_data;
 	bool m_valid;

@@ -25,7 +25,10 @@
 #include "expressive_plugin.h"
 
 #include <QDomElement>
-#include <QDebug>
+//#include <QDebug>
+#include "SubWindow.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 #include "exprfront.h"
 
 #include "base64.h"
@@ -53,61 +56,24 @@ Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
 		Plugin::Instrument, new PluginPixmapLoader("logo"), NULL, NULL };
 
 }
-/*
-float getWaveValue(void* w ,float x)
-{
-	x=positiveFraction(x);
-	x=static_cast<WaveSample*>(w)->length*x;
-
-	int ix=(int)x;
-
-	//return static_cast<WaveSample*>(w)->samples[ix];
-
-	float xfrc=fraction(x);
-	if (xfrc==0)
-	{
-		return static_cast<WaveSample*>(w)->samples[ix];
-	}
-	int ixnext=(ix+1)%static_cast<WaveSample*>(w)->length;
-	return linearInterpolate(static_cast<WaveSample*>(w)->samples[ix], static_cast<WaveSample*>(w)->samples[ixnext], xfrc);
-}
-float getGraphValue(void* g ,float x)
-{
-	x=positiveFraction(x);
-	x=static_cast<graphModel*>(g)->length()*x;
-	float xfrc=fraction(x);
-	int ix=(int)x;
-
-	if (xfrc==0)
-	{
-		return static_cast<graphModel*>(g)->samples()[ix];
-	}
-	int ixnext=(ix+1)%static_cast<graphModel*>(g)->length();
-	return linearInterpolate(static_cast<graphModel*>(g)->samples()[ix], static_cast<graphModel*>(g)->samples()[ixnext], xfrc);
-}*/
 
 exprSynth::exprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3, ExprFront *_exprO1, ExprFront *_exprO2,
 					NotePlayHandle *_nph, const sample_rate_t _sample_rate, const FloatModel* _pan1, const FloatModel* _pan2, float _rel_trans)
 	:exprO1(_exprO1),exprO2(_exprO2),W1(gW1),W2(gW2),W3(gW3),nph(_nph),sample_rate(_sample_rate),pan1(_pan1),pan2(_pan2),rel_transition(_rel_trans)
 {
-	frequency=_nph->frequency();
 	note_sample=0;
+
 	note_sample_sec=0;
 	released=0;
+	frequency=nph->frequency();
 	rel_inc=1000.0/(sample_rate*rel_transition);//rel_transition in ms. compute how much increment in each frame
 	exprO1->add_cyclic_vector("W1",W1->samples,W1->length);
 	exprO1->add_cyclic_vector("W2",W2->samples,W2->length);
 	exprO1->add_cyclic_vector("W3",W3->samples,W3->length);
-	//exprO1->add_function("W1",(void*)W1,getWaveValue);
-	//exprO1->add_function("W2",(void*)W2,getWaveValue);
-	//exprO1->add_function("W3",(void*)W3,getWaveValue);
 
 	exprO2->add_cyclic_vector("W1",W1->samples,W1->length);
 	exprO2->add_cyclic_vector("W2",W2->samples,W2->length);
 	exprO2->add_cyclic_vector("W3",W3->samples,W3->length);
-	//exprO2->add_function("W1",(void*)W1,getWaveValue);
-	//exprO2->add_function("W2",(void*)W2,getWaveValue);
-	//exprO2->add_function("W3",(void*)W3,getWaveValue);
 
 	exprO1->add_variable("t",note_sample_sec);
 	exprO1->add_variable("f",frequency);
@@ -116,6 +82,9 @@ exprSynth::exprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSam
 
 	exprO1->add_variable("rel",released);
 	exprO2->add_variable("rel",released);
+
+	exprO1->setIntegrate(&note_sample,_sample_rate);
+	exprO2->setIntegrate(&note_sample,_sample_rate);
 
 	exprO1->compile();
 	exprO2->compile();
@@ -135,7 +104,8 @@ void exprSynth::renderOutput(fpp_t _frames, sampleFrame *_buf)
 {
 
 	float o1,o2,pn1,pn2;
-
+	float new_freq=nph->frequency();
+	float freq_inc=(new_freq-frequency)/_frames;
 	for (fpp_t frame = 0; frame < _frames ; ++frame) {
 		if (nph->isReleased() && released < 1)
 			released=fmin(released+rel_inc,1);
@@ -147,8 +117,9 @@ void exprSynth::renderOutput(fpp_t _frames, sampleFrame *_buf)
 		_buf[frame][1] = ( pn1+0.5)*o1+( pn2+0.5)*o2;
 		note_sample++;
 		note_sample_sec=note_sample/(float)sample_rate;
-
+		frequency+=freq_inc;
 	}
+	frequency=new_freq;
 }
 /*
  * nice test:
@@ -165,6 +136,7 @@ O2 -> trianglew(2t*f)*(0.5+0.5sinew(12*A1*t))+sinew(t*f)*(0.5+0.5sinew(12*A1*t+0
  *
  ***********************************************************************/
 #define GRAPH_LENGTH 4096
+
 expressive::expressive(InstrumentTrack * _instrument_track) :
 		Instrument(_instrument_track, &xpressive_plugin_descriptor), m_graphO1(
 			 -1.0f, 1.0f, 360, this), m_graphO2(-1.0f, 1.0f, 360, this),
@@ -187,8 +159,8 @@ expressive::expressive(InstrumentTrack * _instrument_track) :
 		m_W1(GRAPH_LENGTH),m_W2(GRAPH_LENGTH),m_W3(GRAPH_LENGTH),
 		m_exprValid(false, this)
 {
-	m_outputExpression[0]="sinew(t*f)";
-	m_outputExpression[1]="saww(t*f)";
+	m_outputExpression[0]="sinew(integrate(f*(1+0.05sinew(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4sinew((2.5+2A1)t))^2)";
+	m_outputExpression[1]="expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
 }
 
 expressive::~expressive() {
@@ -282,8 +254,14 @@ void expressive::playNote(NotePlayHandle * _n, sampleFrame * _working_buffer) {
 
 		ExprFront * exprO1=new ExprFront(m_outputExpression[0].constData());
 		ExprFront * exprO2=new ExprFront(m_outputExpression[1].constData());
+		/*qDebug()<<"key="<<_n->key();
+		qDebug()<<"v="<<_n->getVolume()/100.0;
+		qDebug()<<"bnote="<<_n->instrumentTrack()->baseNote();*/
 		exprO1->add_constant("key",_n->key());
 		exprO2->add_constant("key",_n->key());
+		exprO1->add_constant("bnote",_n->instrumentTrack()->baseNote());
+		exprO2->add_constant("bnote",_n->instrumentTrack()->baseNote());
+
 		exprO1->add_constant("v",_n->getVolume()/255.0);
 		exprO2->add_constant("v",_n->getVolume()/255.0);
 		exprO1->add_variable("A1",m_A1);
@@ -335,6 +313,7 @@ public:
 	}
 };
 
+
 expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 		InstrumentView(_instrument, _parent)
 
@@ -372,6 +351,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	PixmapButton * m_w3Btn;
 	PixmapButton * m_o1Btn;
 	PixmapButton * m_o2Btn;
+	PixmapButton * m_helpBtn;
 	//PixmapButton * m_holdBtn;
 	//PixmapButton * m_relBtn;
 	m_w1Btn = new PixmapButton(this, NULL);
@@ -403,6 +383,12 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_o2Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("o2_active"));
 	m_o2Btn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("o2_inactive"));
 	ToolTip::add(m_o2Btn, tr("Select OUTPUT 2"));
+
+	m_helpBtn = new PixmapButton(this, NULL);
+	m_helpBtn->move(139, 111);
+	m_helpBtn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("help_active"));
+	m_helpBtn->setInactiveGraphic(PLUGIN_NAME::getIconPixmap("help_inactive"));
+	ToolTip::add(m_helpBtn, tr("Open help window"));
 
 	m_selectedGraphGroup = new automatableButtonGroup(this);
 	m_selectedGraphGroup->addButton(m_w1Btn);
@@ -532,6 +518,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	connect(m_whiteNoiseWaveBtn, SIGNAL(clicked()), this,
 			SLOT(noiseWaveClicked()));
 	connect(m_usrWaveBtn, SIGNAL(clicked()), this, SLOT(usrWaveClicked()));
+	connect(m_helpBtn, SIGNAL(clicked()), this, SLOT(helpClicked()));
 
 	connect(m_w1Btn, SIGNAL(clicked()), this, SLOT(updateLayout()));
 	connect(m_w2Btn, SIGNAL(clicked()), this, SLOT(updateLayout()));
@@ -540,6 +527,10 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	connect(m_o2Btn, SIGNAL(clicked()), this, SLOT(updateLayout()));
 
 	updateLayout();
+}
+
+expressiveView::~expressiveView()
+{
 }
 
 static void clearGraph(graphModel * g)
@@ -559,34 +550,23 @@ void expressiveView::expressionChanged() {
 	expressive * e = castModel<expressive>();
 	QByteArray text = m_expressionEditor->toPlainText().toAscii();
 
-	bool output_expr=false;
-	bool wave_expr=false;
-	graphModel * raw_graph=0;
+
+
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->m_wavesExpression[0] = text;
-		wave_expr=true;
-		raw_graph=&(e->m_rawgraphW1);
 		break;
 	case W2_EXPR:
 		e->m_wavesExpression[1] = text;
-		wave_expr=true;
-		raw_graph=&(e->m_rawgraphW2);
 		break;
 	case W3_EXPR:
 		e->m_wavesExpression[2] = text;
-		wave_expr=true;
-		raw_graph=&(e->m_rawgraphW3);
 		break;
 	case O1_EXPR:
-		output_expr=true;
 		e->m_outputExpression[0] = text;
-		raw_graph=&(e->m_graphO1);
 		break;
 	case O2_EXPR:
-		output_expr=true;
 		e->m_outputExpression[1] = text;
-		raw_graph=&(e->m_graphO2);
 		break;
 	}
 
@@ -594,8 +574,11 @@ void expressiveView::expressionChanged() {
 	{
 		ExprFront expr(text.constData());
 		float t,f=10,key=2,rel=0,v=0.5;
+		unsigned int i;
+		unsigned int sample_rate=m_raw_graph->length();
 		expr.add_variable("t", t);
-		if (output_expr)
+
+		if (m_output_expr)
 		{
 			expr.add_constant("f", f);
 			expr.add_constant("key", key);
@@ -604,31 +587,29 @@ void expressiveView::expressionChanged() {
 			expr.add_constant("A1", e->m_parameterA1.value());
 			expr.add_constant("A2", e->m_parameterA2.value());
 			expr.add_constant("A3", e->m_parameterA3.value());
-			//expr.add_function("W1",(void*)&e->m_graphW1,getGraphValue);
-			//expr.add_function("W2",(void*)&e->m_graphW2,getGraphValue);
-			//expr.add_function("W3",(void*)&e->m_graphW3,getGraphValue);
 			expr.add_cyclic_vector("W1",e->m_graphW1.samples(),e->m_graphW1.length());
 			expr.add_cyclic_vector("W2",e->m_graphW2.samples(),e->m_graphW2.length());
 			expr.add_cyclic_vector("W3",e->m_graphW3.samples(),e->m_graphW3.length());
+			//sample_rate=Engine::mixer()->processingSampleRate();
+			//qDebug()<<"sample_rate "<<sample_rate;
 		}
+		expr.setIntegrate(&i,sample_rate);
 
 		bool parse_ok=expr.compile();
 
 		if (parse_ok) {
 			e->m_exprValid.setValue(0);
-			int length = raw_graph->length();
+			int length = m_raw_graph->length();
 			float * samples = new float[length];
-
-			int i;
 			for (i = 0; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
 				if (isinff(samples[i]) != 0 || isnan(samples[i]) != 0)
 					samples[i] = 0;
 			}
-			raw_graph->setSamples(samples);
+			m_raw_graph->setSamples(samples);
 			delete[] samples;
-			if (wave_expr)
+			if (m_wave_expr)
 			{
 				smoothChanged();
 			}
@@ -640,15 +621,15 @@ void expressiveView::expressionChanged() {
 		else
 		{
 			e->m_exprValid.setValue(1);
-			if (output_expr)
-				clearGraph(raw_graph);
+			if (m_output_expr)
+				clearGraph(m_raw_graph);
 		}
 	}
 	else
 	{
 		e->m_exprValid.setValue(0);
-		if (output_expr)
-			clearGraph(raw_graph);
+		if (m_output_expr)
+			clearGraph(m_raw_graph);
 	}
 }
 
@@ -685,22 +666,18 @@ void expressiveView::smoothChanged()
 
 	expressive * e = castModel<expressive>();
 	float smoothness=0;
-	graphModel * raw_graph=0;
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		smoothness=e->m_smoothW1.value();
-		raw_graph=&(e->m_rawgraphW1);
 		break;
 	case W2_EXPR:
 		smoothness=e->m_smoothW2.value();
-		raw_graph=&(e->m_rawgraphW2);
 		break;
 	case W3_EXPR:
 		smoothness=e->m_smoothW3.value();
-		raw_graph=&(e->m_rawgraphW3);
 		break;
 	}
-	expressive::smooth(smoothness,raw_graph,m_graph->model());
+	expressive::smooth(smoothness,m_raw_graph,m_graph->model());
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->m_W1.copyFrom(m_graph->model());
@@ -733,36 +710,48 @@ void expressiveView::modelChanged() {
 
 void expressiveView::updateLayout() {
 	expressive * e = castModel<expressive>();
+	m_output_expr=false;
+	m_wave_expr=false;
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
+		m_wave_expr=true;
 		m_graph->setModel(&e->m_graphW1, true);
+		m_raw_graph=&(e->m_rawgraphW1);
 		m_expressionEditor->setPlainText(e->m_wavesExpression[0]);
 		m_smoothKnob->setModel(&e->m_smoothW1);
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		break;
 	case W2_EXPR:
+		m_wave_expr=true;
 		m_graph->setModel(&e->m_graphW2, true);
+		m_raw_graph=&(e->m_rawgraphW2);
 		m_expressionEditor->setPlainText(e->m_wavesExpression[1]);
 		m_smoothKnob->setModel(&e->m_smoothW2);
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		break;
 	case W3_EXPR:
+		m_wave_expr=true;
 		m_graph->setModel(&e->m_graphW3, true);
+		m_raw_graph=&(e->m_rawgraphW3);
 		m_expressionEditor->setPlainText(e->m_wavesExpression[2]);
 		m_smoothKnob->setModel(&e->m_smoothW3);
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		break;
 	case O1_EXPR:
+		m_output_expr=true;
 		m_graph->setModel(&e->m_graphO1, true);
+		m_raw_graph=&(e->m_graphO1);
 		m_expressionEditor->setPlainText(e->m_outputExpression[0]);
 		m_smoothKnob->hide();
 		m_usrWaveBtn->hide();
 		break;
 	case O2_EXPR:
+		m_output_expr=true;
 		m_graph->setModel(&e->m_graphO2, true);
+		m_raw_graph=&(e->m_graphO2);
 		m_expressionEditor->setPlainText(e->m_outputExpression[1]);
 		m_smoothKnob->hide();
 		m_usrWaveBtn->hide();
@@ -771,64 +760,107 @@ void expressiveView::updateLayout() {
 }
 
 void expressiveView::sinWaveClicked() {
-	//m_graph->model()->setWaveToSine();
-	m_expressionEditor->setPlainText("sinew(t)");
+	if (m_output_expr)
+		m_expressionEditor->appendPlainText("sinew(t*f)");
+	else
+		m_expressionEditor->appendPlainText("sinew(t)");
 	Engine::getSong()->setModified();
 }
 
 void expressiveView::triangleWaveClicked() {
-	//m_graph->model()->setWaveToTriangle();
-	m_expressionEditor->setPlainText("trianglew(t)");
+	if (m_output_expr)
+		m_expressionEditor->appendPlainText("trianglew(t*f)");
+	else
+		m_expressionEditor->appendPlainText("trianglew(t)");
 	Engine::getSong()->setModified();
 }
 
 void expressiveView::sawWaveClicked() {
-	m_expressionEditor->setPlainText("saww(t)");
-	//m_graph->model()->setWaveToSaw();
+	if (m_output_expr)
+		m_expressionEditor->appendPlainText("saww(t*f)");
+	else
+		m_expressionEditor->appendPlainText("saww(t)");
 	Engine::getSong()->setModified();
 }
 
 void expressiveView::sqrWaveClicked() {
-	//m_graph->model()->setWaveToSquare();
-	m_expressionEditor->setPlainText("squarew(t)");
+	if (m_output_expr)
+		m_expressionEditor->appendPlainText("squarew(t*f)");
+	else
+		m_expressionEditor->appendPlainText("squarew(t)");
 	Engine::getSong()->setModified();
 }
 
 void expressiveView::noiseWaveClicked() {
-	m_expressionEditor->setPlainText("rand");
-	//m_graph->model()->setWaveToNoise();
+	m_expressionEditor->appendPlainText("rand");
 	Engine::getSong()->setModified();
 }
 
 void expressiveView::moogSawWaveClicked()
 {
-	m_expressionEditor->setPlainText("moogsaww(t)");
+	if (m_output_expr)
+		m_expressionEditor->appendPlainText("moogsaww(t*f)");
+	else
+		m_expressionEditor->appendPlainText("moogsaww(t)");
 	Engine::getSong()->setModified();
 }
 void expressiveView::expWaveClicked()
 {
-	m_expressionEditor->setPlainText("expw(t)");
+	if (m_output_expr)
+		m_expressionEditor->appendPlainText("expw(t*f)");
+	else
+		m_expressionEditor->appendPlainText("expw(t)");
 	Engine::getSong()->setModified();
 }
 
 void expressiveView::usrWaveClicked() {
 	m_expressionEditor->setPlainText("");
-	expressive * e = castModel<expressive>();
-	graphModel * raw_graph=0;
-	switch (m_selectedGraphGroup->model()->value()) {
-	case W1_EXPR:
-		raw_graph=&(e->m_rawgraphW1);
-		break;
-	case W2_EXPR:
-		raw_graph=&(e->m_rawgraphW2);
-		break;
-	case W3_EXPR:
-		raw_graph=&(e->m_rawgraphW3);
-		break;
-	}
-	QString fileName = raw_graph->setWaveToUser();
+	QString fileName = m_raw_graph->setWaveToUser();
 	smoothChanged();
 	Engine::getSong()->setModified();
+}
+
+expressiveHelpView* expressiveHelpView::instance=0;
+
+QString expressiveHelpView::HelpText=
+"<b>O1, O2</b> - Two output waves. panning is controled by PN1 and PN2.<br>"
+"<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
+"These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
+"<h4>Available variables:</h4><br>"
+"<b>t</b> - time in seconds.<br>"
+"<b>f</b> - note's pitched frequency. available only in the output expressions.<br>"
+"<b>key</b> - note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. available only in the output expressions.<br>"
+"<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
+"<b>v</b> - note's volume. note that the output is already multiplied by the volume. available only in the output expressions.<br>"
+"<b>rel</b> - gives 0.0 while the key is holded, and 1.0 after the key release. available only in the output expressions.<br>"
+"The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
+"<b>A1, A2, A3</b> - general purpose knobs. you can reference them only in O1 and O2. In range [-1,1].<br>"
+"<h4>Available functions:</h4><br>"
+"<b>W1, W2, W3</b> - as mentioned before. you can reference them only in O1 and O2.<br>"
+"<b>cent(x)</b> - gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
+"<b>integrate(x)</b> - integrates x by delta t.<br>"
+"If you use notes with automated frequency, you should use:<br>"
+"sinew(integrate(f)) instead of sinew(t*f)<br>"
+"Please note that in each expression you can use only 20 instances of this function.<br>"
+"<b>randv(x)</b> - A random vector. each cell is reference by an integer index in the range [0,2^31]<br>"
+"Each evaluation of an expression results in different random vector.<br>"
+"Although, it remains consistent in the lifetime of a single wave.<br>"
+"If you want a single random values you can use randv(0),randv(1)... <br>"
+"and every reference to randv(a) will give you the same value."
+"If you want a random wave you can use randv(t*samples_per_second).<br>"
+"Each random value is in the range [-1,1).<br>"
+"<b>sinew(x)</b> - a sine wave with period of 1 (in contrast to real sine wave which have a period of 2*pi).<br>"
+"<b>trianglew(x)</b> - a triangle wave with period of 1.<br>"
+"<b>squarew(x)</b> - a square wave with period of 1.<br>"
+"<b>saww(x)</b> - a saw wave with period of 1.<br>"
+"<b>clamp(min_val,x,max_val)</b> - if x is in range of (min_val,max_val) returns x. otherwise if it's greater than max_val returns max_val, else returns min_val.<br>"
+"<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
+"hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
+"avg, sgn, mod, etc. are also available.</b><br>"
+"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>";
+void expressiveView::helpClicked() {	
+	expressiveHelpView::getInstance()->show();
+
 }
 
 extern "C" {
@@ -841,3 +873,13 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main(Model *, void * _data) {
 }
 
 
+
+expressiveHelpView::expressiveHelpView():QTextEdit(HelpText)
+{
+	setWindowTitle ( "X-Pressive Help" );
+	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
+	gui->mainWindow()->addWindowedWidget( this );
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
+	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
+	parentWidget()->setFixedSize( 300, 500);
+}
