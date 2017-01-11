@@ -87,5 +87,15 @@ void SmfMidiChannel::addNote( Note & n )
 	hasNotes = true;
 	lastEnd = n.pos() + n.length();
 	n.setPos( n.pos( p->startPosition() ) );
-	p->addNote( n, false );
+    p->addNote( n, false );
+}
+
+void SmfMidiChannel::setName( QString tn )
+{
+    if ( !tn.length() )
+    {
+        it->setName( QT_TRANSLATE_NOOP("TrackContainer", "Track") );
+        return;
+    }
+    it->setName( tn );
 }

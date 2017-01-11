@@ -227,9 +227,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation type="unfinished"></translation>
@@ -2248,9 +2245,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation type="unfinished"></translation>
@@ -5806,6 +5800,13 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>QGuiApplication</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QWidget</name>
     <message>
         <source>Name: </source>
@@ -6721,11 +6722,12 @@ Please make sure you have read-permission to the file and the directory containi
         <source>Please wait...</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>TrackContainer::TrackContainer</name>
     <message>
-        <source>Cancel</source>
+        <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7744,7 +7746,7 @@ Please make sure you have read-permission to the file and the directory containi
 <context>
     <name>commonReader</name>
     <message>
-        <source>Track</source>
+        <source>Importing %1 file...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -42,97 +42,106 @@
 #include "wrkReader.h"
 
 wrkReader::wrkReader( TrackContainer* tc ) :
-	commonReader(tc, "Importing Cakewalk file..."),
-	m_seq(new drumstick::QWrk)
+	commonReader( tc, commonReader::tr( "Importing %1 file..." ).arg( "Cakewalk" ) ),
+	m_seq( new drumstick::QWrk )
 {
 	// Connect to slots.
-	connect(m_seq, SIGNAL(signalWRKError(QString)),
-			this, SLOT(errorHandler(QString)));
-	connect(m_seq, SIGNAL(signalWRKTimeBase(int)),
-			this, SLOT(timeBase(int)));
-	connect(m_seq, SIGNAL(signalWRKNote(int,long,int,int,int,int)),
-			this, SLOT(noteEvent(int,long,int,int,int,int)));
-	connect(m_seq, SIGNAL(signalWRKCtlChange(int,long,int,int,int)),
-			this, SLOT(ctlChangeEvent(int,long,int,int,int)));
-	connect(m_seq, SIGNAL(signalWRKPitchBend(int,long,int,int)),
-			this, SLOT(pitchBendEvent(int,long,int,int)));
-	connect(m_seq, SIGNAL(signalWRKProgram(int,long,int,int)),
-			this, SLOT(programEvent(int,long,int,int)));
-	connect(m_seq, SIGNAL(signalWRKTimeSig(int,int,int)),
-			this, SLOT(timeSigEvent(int,int,int)));
-	connect(m_seq, SIGNAL(signalWRKTempo(long,int)),
-			this, SLOT(tempoEvent(long,int)));
-	connect(m_seq, SIGNAL(signalWRKTrackVol(int,int)),
-			this, SLOT(trackVol(int,int)));
-	connect(m_seq, SIGNAL(signalWRKTrackBank(int,int)),
-			this, SLOT(trackBank(int,int)));
+	connect( m_seq, SIGNAL( signalWRKError( QString ) ),
+		 this, SLOT( errorHandler( QString ) ) );
+	connect( m_seq, SIGNAL( signalWRKTimeBase( int ) ),
+		 this, SLOT( timeBase( int ) ) );
+	connect( m_seq, SIGNAL( signalWRKNote( int, long, int, int, int, int ) ),
+		 this, SLOT( noteEvent( int, long, int, int, int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKCtlChange( int, long, int, int, int ) ),
+		 this, SLOT( ctlChangeEvent( int, long, int, int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKPitchBend( int, long, int, int ) ),
+		 this, SLOT( pitchBendEvent( int, long, int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKProgram( int, long, int, int ) ),
+		 this, SLOT( programEvent( int, long, int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKTimeSig( int, int, int ) ),
+		 this, SLOT( timeSigEvent( int, int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKTempo( long, int ) ),
+		 this, SLOT( tempoEvent( long, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKTrackVol( int, int ) ),
+		 this, SLOT( trackVol( int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKTrackBank( int, int ) ),
+		 this, SLOT( trackBank( int, int ) ) );
+	connect( m_seq, SIGNAL( signalWRKTrackName( int, const QString ) ),
+		 this, SLOT() );
 }
 
 wrkReader::~wrkReader()
 {
-	printf("destroy wrkReader\n");
+	printf( "destroy wrkReader\n" );
 	delete m_seq;
 }
 
-void wrkReader::read(QString &fileName)
+void wrkReader::read( QString &fileName )
 {
-	m_seq->readFromFile(fileName);
+	m_seq->readFromFile( fileName );
 }
 
 // Slots below.
 
-void wrkReader::timeSigEvent(int bar, int num, int den)
+void wrkReader::timeSigEvent( int bar, int num, int den )
 {
 	int tick = bar * num * ticksPerBeat;
-	timeSigHandler(tick, num, den);
+	timeSigHandler( tick, num, den );
 }
 
-void wrkReader::tempoEvent(long time, int tempo)
+void wrkReader::tempoEvent( long time, int tempo )
 {
-	tempoHandler(time, tempo/100);
+	tempoHandler( time, tempo / 100 );
 }
 
-void wrkReader::errorHandler(const QString &errorStr)
+void wrkReader::errorHandler( const QString &errorStr )
 {
 	printf( "MidiImport::readSMF(): got error %s\n",
-			errorStr.toStdString().c_str()  );
+		errorStr.toStdString().c_str()  );
 }
 
-void wrkReader::ctlChangeEvent(int track, long tick, int chan, int ctl, int value)
+void wrkReader::ctlChangeEvent( int track, long tick, int chan, int ctl, int value )
 {
-	CCHandler(tick, track, ctl, value);
+	CCHandler( tick, track, ctl, value );
 }
 
-void wrkReader::pitchBendEvent(int track, long tick, int chan, int value)
+void wrkReader::pitchBendEvent( int track, long tick, int chan, int value )
 {
-	CCHandler(tick, track, pitchBendEventId, value);
+	CCHandler( tick, track, pitchBendEventId, value );
 }
 
-void wrkReader::noteEvent(int track, long time, int chan, int pitch, int vol, int dur)
+void wrkReader::noteEvent( int track, long time, int chan, int pitch, int vol, int dur )
 {
-	addNoteEvent(time, chan, pitch, vol, dur, track);
+	addNoteEvent( time, chan, pitch, vol, dur, track );
 }
 
-void wrkReader::programEvent(int track, long tick, int chan, int patch)
+void wrkReader::programEvent( int track, long tick, int chan, int patch )
 {
-	programHandler(tick, chan, patch, track);
+	programHandler( tick, chan, patch, track );
 }
 
-void wrkReader::trackPatch(int track, int patch){
+void wrkReader::trackPatch( int track, int patch )
+{
 	//programHandler(0, chan, patch, track);
 }
 
-void wrkReader::trackBank(int track, int bank)
+void wrkReader::trackBank( int track, int bank )
 {
 	//CCHandler(0, track, 0, bank);
 }
 
-void wrkReader::trackVol(int track, int vol)
+void wrkReader::trackName( int track, QString name )
 {
-	CCHandler(0, track, volumeEventId, vol);
+	trackStartHandler();
+	textHandler( 3, name, track );
 }
 
-void wrkReader::timeBase(int quarter)
+void wrkReader::trackVol( int track, int vol )
 {
-	timeBaseHandler(quarter);
+	CCHandler( 0, track, volumeEventId, vol );
+}
+
+void wrkReader::timeBase( int quarter )
+{
+	timeBaseHandler( quarter );
 }

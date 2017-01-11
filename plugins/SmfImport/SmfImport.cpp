@@ -50,26 +50,26 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT smfimport_plugin_descriptor =
-{
-	STRINGIFY( PLUGIN_NAME ),
-	"SMF Import",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Filter for importing MIDI-like files into LMMS" ),
-	"Tony Chyi <tonychee1989/at/gmail/dot/com>",
-	0x0100,
-	Plugin::ImportFilter,
-	NULL,
-	NULL,
-	NULL
-} ;
+	Plugin::Descriptor PLUGIN_EXPORT smfimport_plugin_descriptor =
+	{
+		STRINGIFY( PLUGIN_NAME ),
+		"SMF Import",
+		QT_TRANSLATE_NOOP( "pluginBrowser",
+		"Filter for importing MIDI-like files into LMMS" ),
+		"Tony Chyi <tonychee1989/at/gmail/dot/com>",
+		0x0100,
+		Plugin::ImportFilter,
+		NULL,
+		NULL,
+		NULL
+	} ;
 
 }
 
 
 
-SmfImport::SmfImport(const QString &_file):
-	ImportFilter(_file, &smfimport_plugin_descriptor)
+SmfImport::SmfImport( const QString &_file ):
+	ImportFilter( _file, &smfimport_plugin_descriptor )
 {
 
 }
@@ -79,36 +79,40 @@ SmfImport::~SmfImport()
 	closeFile();
 }
 
-bool SmfImport::tryImport(TrackContainer *tc)
+bool SmfImport::tryImport( TrackContainer *tc )
 {
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
+
 	if( gui != NULL && ConfigManager::inst()->defaultSoundfont().isEmpty() )
 	{
 		QMessageBox::information( gui->mainWindow(),
-			tr( "Setup incomplete" ),
-			tr( "You do not have set up a default soundfont in "
-				"the settings dialog (Edit->Settings). "
-				"Therefore no sound will be played back after "
-				"importing this MIDI file. You should download "
-				"a General MIDI soundfont, specify it in "
-				"settings dialog and try again." ) );
+					  tr( "Setup incomplete" ),
+					  tr( "You do not have set up a default soundfont in "
+					      "the settings dialog (Edit->Settings). "
+					      "Therefore no sound will be played back after "
+					      "importing this MIDI file. You should download "
+					      "a General MIDI soundfont, specify it in "
+					      "settings dialog and try again." ) );
 	}
+
 #else
+
 	if( gui )
 	{
 		QMessageBox::information( gui->mainWindow(),
-			tr( "Setup incomplete" ),
-			tr( "You did not compile LMMS with support for "
-				"SoundFont2 player, which is used to add default "
-				"sound to imported MIDI files. "
-				"Therefore no sound will be played back after "
-				"importing this MIDI file." ) );
+					  tr( "Setup incomplete" ),
+					  tr( "You did not compile LMMS with support for "
+					      "SoundFont2 player, which is used to add default "
+					      "sound to imported MIDI files. "
+					      "Therefore no sound will be played back after "
+					      "importing this MIDI file." ) );
 	}
+
 	return false;
 #endif
 
-	if( openFile() == false )
+	if( !openFile() )
 	{
 		return false;
 	}
@@ -118,47 +122,47 @@ bool SmfImport::tryImport(TrackContainer *tc)
 	switch( readID() )
 	{
 		case makeID( 'M', 'T', 'h', 'd' ):
-			printf( "SmfImport::tryImport(): found MThd\n");
+			printf( "SmfImport::tryImport(): found MThd\n" );
 			return readSMF( tc );
 
 		case makeID( 'R', 'I', 'F', 'F' ):
-			printf( "SmfImport::tryImport(): found RIFF\n");
+			printf( "SmfImport::tryImport(): found RIFF\n" );
 			return readRIFF( tc );
 
 		case makeID( 'O', 'V', 'S', 'C' ):
-			printf("SmfImport::tryImport(): found OVSC\n");
+			printf( "SmfImport::tryImport(): found OVSC\n" );
 			return readOve( tc );
 
-		case makeID( 'C', 'A', 'K', 'E'):
-			printf("SmfImport::tryImport(): found CAKEWALK\n");
+		case makeID( 'C', 'A', 'K', 'E' ):
+			printf( "SmfImport::tryImport(): found CAKEWALK\n" );
 			return readWrk( tc );
 
 		default:
 			printf( "MidiImport::tryImport(): not a Standard MIDI "
-								"file\n" );
+				"file\n" );
 			return false;
 	}
 
 }
 
-bool SmfImport::readWrk(TrackContainer *tc)
+bool SmfImport::readWrk( TrackContainer *tc )
 {
-	wrkReader mr(tc);
-	mr.read(filename);
+	wrkReader mr( tc );
+	mr.read( filename );
 	return true;
 }
 
-bool SmfImport::readOve( TrackContainer *tc)
+bool SmfImport::readOve( TrackContainer *tc )
 {
-	oveReader mr(tc);
-	mr.read(filename);
+	oveReader mr( tc );
+	mr.read( filename );
 	return true;
 }
 
-bool SmfImport::readSMF( TrackContainer *tc)
+bool SmfImport::readSMF( TrackContainer *tc )
 {
-	midiReader mr(tc);
-	mr.read(filename);
+	midiReader mr( tc );
+	mr.read( filename );
 	return true;
 }
 
@@ -171,8 +175,8 @@ bool SmfImport::readRIFF( TrackContainer* tc )
 	if( readID() != makeID( 'R', 'M', 'I', 'D' ) )
 	{
 invalid_format:
-			qWarning( "MidiImport::readRIFF(): invalid file format" );
-			return false;
+		qWarning( "MidiImport::readRIFF(): invalid file format" );
+		return false;
 	}
 
 	// search for "data" chunk
@@ -180,20 +184,24 @@ invalid_format:
 	{
 		const int id = readID();
 		const int len = read32LE();
+
 		if( file().atEnd() )
 		{
 data_not_found:
-				qWarning( "MidiImport::readRIFF(): data chunk not found" );
-				return false;
+			qWarning( "MidiImport::readRIFF(): data chunk not found" );
+			return false;
 		}
+
 		if( id == makeID( 'd', 'a', 't', 'a' ) )
 		{
-				break;
+			break;
 		}
+
 		if( len < 0 )
 		{
-				goto data_not_found;
+			goto data_not_found;
 		}
+
 		skip( ( len + 1 ) & ~1 );
 	}
 
@@ -202,6 +210,7 @@ data_not_found:
 	{
 		goto invalid_format;
 	}
+
 	return readSMF( tc );
 }
 
@@ -215,11 +224,11 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
-{
-	return new SmfImport( QString::fromUtf8(
-									static_cast<const char *>( _data ) ) );
-}
+	Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+	{
+		return new SmfImport( QString::fromUtf8(
+					      static_cast<const char *>( _data ) ) );
+	}
 
 
 }

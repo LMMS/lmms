@@ -52,6 +52,7 @@ public:
 	SmfMidiChannel * create( TrackContainer* tc, QString tn );
 
 	void addNote( Note & n );
+    void setName(QString tn );
 
 };
 

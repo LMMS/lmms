@@ -35,38 +35,43 @@
 
 class SmfImport : public ImportFilter
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-	SmfImport(const QString & _file);
+	SmfImport( const QString & _file );
 	virtual ~SmfImport();
 
-	virtual PluginView * instantiateView(QWidget *)
+	virtual PluginView * instantiateView( QWidget * )
 	{
 		return NULL;
 	}
 
 private:
-	virtual bool tryImport(TrackContainer *tc);
+	virtual bool tryImport( TrackContainer *tc );
 
 	bool readSMF( TrackContainer* tc );
 	bool readRIFF( TrackContainer* tc );
-	bool readOve( TrackContainer* tc);
-	bool readWrk( TrackContainer* tc);
+	bool readOve( TrackContainer* tc );
+	bool readWrk( TrackContainer* tc );
 
 	void error();
 
 	inline int readInt( int _bytes )
 	{
 		int c, value = 0;
+
 		do
 		{
 			c = readByte();
+
 			if( c == -1 )
 			{
 				return( -1 );
 			}
+
 			value = ( value << 8 ) | c;
-		} while( --_bytes );
+		}
+		while( --_bytes );
+
 		return( value );
 	}
 	inline int read32LE()
@@ -81,26 +86,31 @@ private:
 	{
 		int c = readByte();
 		int value = c & 0x7f;
+
 		if( c & 0x80 )
 		{
 			c = readByte();
 			value = ( value << 7 ) | ( c & 0x7f );
+
 			if( c & 0x80 )
 			{
 				c = readByte();
 				value = ( value << 7 ) | ( c & 0x7f );
+
 				if( c & 0x80 )
 				{
 					c = readByte();
 					value = ( value << 7 ) | c;
+
 					if( c & 0x80 )
 					{
 						return -1;
 					}
 				}
 			}
-			}
-			return( !file().atEnd() ? value : -1 );
+		}
+
+		return( !file().atEnd() ? value : -1 );
 	}
 
 	inline int readID()

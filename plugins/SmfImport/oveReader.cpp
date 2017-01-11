@@ -42,130 +42,135 @@
 #include "oveReader.h"
 
 oveReader::oveReader( TrackContainer* tc ) :
-	commonReader(tc, "Importing Overture file..."),
-	m_seq(new drumstick::QOve)
+	commonReader( tc, commonReader::tr( "Importing %1 file..." ).arg( "Overture" ) ),
+	m_seq( new drumstick::QOve )
 {
 	// Connect to slots.
-	connect(m_seq, SIGNAL(signalOVEError(QString)),
-			this, SLOT(errorHandler(QString)));
+	connect( m_seq, SIGNAL( signalOVEError( QString ) ),
+		 this, SLOT( errorHandler( QString ) ) );
 
-	connect(m_seq, SIGNAL(signalOVEHeader(int,int)),
-			this, SLOT(fileHeader(int,int)));
+	connect( m_seq, SIGNAL( signalOVEHeader( int, int ) ),
+		 this, SLOT( fileHeader( int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVENoteOn(int,long,int,int,int)),
-			this, SLOT(noteOnEvent(int,long,int,int,int)));
+	connect( m_seq, SIGNAL( signalOVENoteOn( int, long, int, int, int ) ),
+		 this, SLOT( noteOnEvent( int, long, int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVENoteOff(int,long,int,int,int)),
-			this, SLOT(noteOffEvent(int,long,int,int,int)));
+	connect( m_seq, SIGNAL( signalOVENoteOff( int, long, int, int, int ) ),
+		 this, SLOT( noteOffEvent( int, long, int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVECtlChange(int,long,int,int,int)),
-			this, SLOT(ctlChangeEvent(int,long,int,int,int)));
+	connect( m_seq, SIGNAL( signalOVECtlChange( int, long, int, int, int ) ),
+		 this, SLOT( ctlChangeEvent( int, long, int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVEPitchBend(int,long,int,int)),
-			this, SLOT(ctlChangeEvent(int,long,int,int,int)));
+	connect( m_seq, SIGNAL( signalOVEPitchBend( int, long, int, int ) ),
+		 this, SLOT( ctlChangeEvent( int, long, int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVEProgram(int,long,int,int)),
-			this, SLOT(programEvent(int,long,int,int)));
+	connect( m_seq, SIGNAL( signalOVEProgram( int, long, int, int ) ),
+		 this, SLOT( programEvent( int, long, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVETimeSig(int,long,int,int)),
-			this, SLOT(timeSigEvent(int,long,int,int)));
+	connect( m_seq, SIGNAL( signalOVETimeSig( int, long, int, int ) ),
+		 this, SLOT( timeSigEvent( int, long, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVETempo(long,int)),
-			this, SLOT(tempoEvent(long,int)));
+	connect( m_seq, SIGNAL( signalOVETempo( long, int ) ),
+		 this, SLOT( tempoEvent( long, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVETrackPatch(int,int,int)),
-			this, SLOT(trackPatch(int,int,int)));
+	connect( m_seq, SIGNAL( signalOVETrackPatch( int, int, int ) ),
+		 this, SLOT( trackPatch( int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVETrackVol(int,int,int)),
-			this, SLOT(trackVol(int,int,int)));
+	connect( m_seq, SIGNAL( signalOVETrackVol( int, int, int ) ),
+		 this, SLOT( trackVol( int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalOVETrackBank(int,int,int)),
-			this, SLOT(trackBank(int,int,int)));
+	connect( m_seq, SIGNAL( signalOVETrackBank( int, int, int ) ),
+		 this, SLOT( trackBank( int, int, int ) ) );
+
+	connect( m_seq, SIGNAL( signalOVENewTrack( QString, int, int, int, int, int, bool, bool, bool ) ),
+		 this, SLOT( trackStart( QString, int, int, int, int, int, bool, bool, bool ) ) );
 
 }
 
 oveReader::~oveReader()
 {
-	printf("destroy oveReader\n");
+	printf( "destroy oveReader\n" );
 	delete m_seq;
 }
 
-void oveReader::read(QString &fileName)
+void oveReader::read( QString &fileName )
 {
-	m_seq->readFromFile(fileName);
+	m_seq->readFromFile( fileName );
 }
 
 // Slots below.
-void oveReader::timeSigEvent(int bar, long tick, int num, int den)
+void oveReader::timeSigEvent( int bar, long tick, int num, int den )
 {
-	timeSigHandler(tick, num, den);
+	timeSigHandler( tick, num, den );
 }
 
-void oveReader::tempoEvent(long tick, int tempo)
+void oveReader::tempoEvent( long tick, int tempo )
 {
-	tempoHandler(tick, tempo/100);
+	tempoHandler( tick, tempo / 100 );
 }
 
-void oveReader::errorHandler(const QString &errorStr)
+void oveReader::errorHandler( const QString &errorStr )
 {
 	printf( "MidiImport::readSMF(): got error %s\n",
-			errorStr.toStdString().c_str()  );
+		errorStr.toStdString().c_str()  );
 }
 
-void oveReader::ctlChangeEvent(int track, long tick, int chan, int ctl, int value)
+void oveReader::ctlChangeEvent( int track, long tick, int chan, int ctl, int value )
 {
-	CCHandler(tick, track, ctl, value);
+	CCHandler( tick, track, ctl, value );
 }
 
-void oveReader::pitchBendEvent(int track, long tick, int chan, int value)
+void oveReader::pitchBendEvent( int track, long tick, int chan, int value )
 {
-	CCHandler(tick, track, pitchBendEventId, value);
+	CCHandler( tick, track, pitchBendEventId, value );
 }
 
-void oveReader::noteOnEvent(int track, long tick, int chan, int pitch, int vol)
+void oveReader::noteOnEvent( int track, long tick, int chan, int pitch, int vol )
 {
 
-	if(vol != 0){
-		insertNoteEvent(tick, chan, pitch, vol, track);
+	if( vol )
+	{
+		insertNoteEvent( tick, chan, pitch, vol, track );
 	}
 	else
 	{
-		addNoteEvent(tick, chan, pitch, track);
+		addNoteEvent( tick, chan, pitch, track );
 	}
 }
 
-void oveReader::noteOffEvent(int track, long tick, int chan, int pitch, int vol)
+void oveReader::noteOffEvent( int track, long tick, int chan, int pitch, int vol )
 {
-	addNoteEvent(tick, chan, pitch, track);
+	addNoteEvent( tick, chan, pitch, track );
 }
 
-/*void oveReader::headerEvent(int format, int ntrks, int division)
+void oveReader::programEvent( int track, long tick, int chan, int patch )
 {
-	tickRate = ticksPerBeat / (double)division;
-	pd.setMaximum( ntrks + preTrackSteps );
-}*/
-
-void oveReader::programEvent(int track, long tick, int chan, int patch)
-{
-	programHandler(tick, chan, patch, track);
+	programHandler( tick, chan, patch, track );
 }
 
-void oveReader::trackPatch(int track, int chan, int patch){
-	programHandler(0, chan, patch, track);
+void oveReader::trackPatch( int track, int chan, int patch )
+{
+	programHandler( 0, chan, patch, track );
 }
 
-void oveReader::trackBank(int track, int chan, int bank)
+void oveReader::trackBank( int track, int chan, int bank )
 {
-	CCHandler(0, track, bankEventId, bank);
+	CCHandler( 0, track, bankEventId, bank );
 }
 
-void oveReader::trackVol(int track, int chan, int vol)
+void oveReader::trackStart( const QString &name, int track, int channel, int pitch, int velocity, int port, bool selected, bool muted, bool loop )
 {
-	CCHandler(0, track, volumeEventId, vol);
+	trackStartHandler();
+	textHandler( 3, name, track );
 }
 
-void oveReader::fileHeader(int quarter, int trackCount)
+void oveReader::trackVol( int track, int chan, int vol )
 {
-	timeBaseHandler(quarter);
-	pd.setMaximum(trackCount + preTrackSteps);
+	CCHandler( 0, track, volumeEventId, vol );
+}
+
+void oveReader::fileHeader( int quarter, int trackCount )
+{
+	timeBaseHandler( quarter );
+	pd.setMaximum( trackCount + preTrackSteps );
 }

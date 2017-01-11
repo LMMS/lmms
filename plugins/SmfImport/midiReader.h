@@ -32,19 +32,21 @@ class midiReader : public commonReader
 {
 	Q_OBJECT
 public:
-	midiReader(TrackContainer *tc);
+	midiReader( TrackContainer *tc );
 	~midiReader();
-	void read(QString &fileName);
+	void read( QString &fileName );
 public slots:
-	void headerEvent(int format, int ntrks, int division);
-	void noteOnEvent(int chan, int pitch, int vol);
-	void noteOffEvent(int chan, int pitch, int vol);
-	void ctlChangeEvent(int chan, int ctl, int value);
-	void pitchBendEvent(int chan, int value);
-	void programEvent(int chan, int patch);
-	void timeSigEvent(int b0, int b1, int b2, int b3);
-	void tempoEvent(int tempo);
-	void errorHandler(const QString& errorStr);
+	void headerEvent( int format, int ntrks, int division );
+	void noteOnEvent( int chan, int pitch, int vol );
+	void noteOffEvent( int chan, int pitch, int vol );
+	void ctlChangeEvent( int chan, int ctl, int value );
+	void pitchBendEvent( int chan, int value );
+	void programEvent( int chan, int patch );
+	void timeSigEvent( int b0, int b1, int b2, int b3 );
+	void tempoEvent( int tempo );
+	void textEvent( int text_type, const QString& data );
+	void startTrackEvent();
+	void errorHandler( const QString& errorStr );
 private:
 	drumstick::QSmf *m_seq;
 };

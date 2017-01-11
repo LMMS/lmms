@@ -31,22 +31,25 @@ class oveReader : public commonReader
 {
 	Q_OBJECT
 public:
-	oveReader(TrackContainer *tc);
+	oveReader( TrackContainer *tc );
 	~oveReader();
-	void read(QString &fileName);
+	void read( QString &fileName );
 public slots:
-	void errorHandler(const QString& errorStr);
-	void fileHeader(int quarter, int trackCount);
-	void noteOnEvent(int track, long tick, int chan, int pitch, int vol);
-	void noteOffEvent(int track, long tick, int chan, int pitch, int vol);
-	void ctlChangeEvent(int track, long tick, int chan, int ctl, int value);
-	void pitchBendEvent(int track, long tick, int chan, int value);
-	void programEvent(int track, long tick, int chan, int patch);
-	void timeSigEvent(int bar, long tick, int num, int den);
-	void tempoEvent(long tick, int tempo);
-	void trackPatch(int track, int chan, int patch);
-	void trackVol(int track, int chan, int vol);
-	void trackBank(int track, int chan, int bank);
+	void errorHandler( const QString& errorStr );
+	void fileHeader( int quarter, int trackCount );
+	void noteOnEvent( int track, long tick, int chan, int pitch, int vol );
+	void noteOffEvent( int track, long tick, int chan, int pitch, int vol );
+	void ctlChangeEvent( int track, long tick, int chan, int ctl, int value );
+	void pitchBendEvent( int track, long tick, int chan, int value );
+	void programEvent( int track, long tick, int chan, int patch );
+	void timeSigEvent( int bar, long tick, int num, int den );
+	void tempoEvent( long tick, int tempo );
+	void trackPatch( int track, int chan, int patch );
+	void trackVol( int track, int chan, int vol );
+	void trackBank( int track, int chan, int bank );
+	void trackStart( const QString& name, int track, int channel, int pitch, int velocity,
+			 int port, bool selected, bool muted, bool loop );
+
 private:
 	drumstick::QOve *m_seq;
 };

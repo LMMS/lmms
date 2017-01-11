@@ -42,48 +42,54 @@
 #include "midiReader.h"
 
 midiReader::midiReader( TrackContainer* tc ) :
-	commonReader(tc, "Importing MIDI-file..." ),
-	m_seq(new drumstick::QSmf)
+	commonReader( tc, commonReader::tr( "Importing %1 file..." ).arg( "MIDI" ) ),
+	m_seq( new drumstick::QSmf )
 {
 	// Connect to slots.
-	connect(m_seq, SIGNAL(signalSMFTimeSig(int,int,int,int)),
-			this, SLOT(timeSigEvent(int,int,int,int)));
+	connect( m_seq, SIGNAL( signalSMFTimeSig( int, int, int, int ) ),
+		 this, SLOT( timeSigEvent( int, int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFTempo(int)),
-			this, SLOT(tempoEvent(int)));
+	connect( m_seq, SIGNAL( signalSMFTempo( int ) ),
+		 this, SLOT( tempoEvent( int ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFError(QString)),
-			this, SLOT(errorHandler(QString)));
+	connect( m_seq, SIGNAL( signalSMFText( int, QString ) ),
+		 this, SLOT( textEvent( int, QString ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFCtlChange(int,int,int)),
-			this, SLOT(ctlChangeEvent(int,int,int)));
+	connect( m_seq, SIGNAL( signalSMFError( QString ) ),
+		 this, SLOT( errorHandler( QString ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFPitchBend(int,int)),
-			this, SLOT(pitchBendEvent(int,int)));
+	connect( m_seq, SIGNAL( signalSMFCtlChange( int, int, int ) ),
+		 this, SLOT( ctlChangeEvent( int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFNoteOn(int,int,int)),
-			this, SLOT(noteOnEvent(int,int,int)));
+	connect( m_seq, SIGNAL( signalSMFPitchBend( int, int ) ),
+		 this, SLOT( pitchBendEvent( int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFNoteOff(int,int,int)),
-			this, SLOT(noteOffEvent(int,int,int)));
+	connect( m_seq, SIGNAL( signalSMFNoteOn( int, int, int ) ),
+		 this, SLOT( noteOnEvent( int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFProgram(int,int)),
-			this, SLOT(programEvent(int,int)));
+	connect( m_seq, SIGNAL( signalSMFNoteOff( int, int, int ) ),
+		 this, SLOT( noteOffEvent( int, int, int ) ) );
 
-	connect(m_seq, SIGNAL(signalSMFHeader(int,int,int)),
-			this, SLOT(headerEvent(int,int,int)));
+	connect( m_seq, SIGNAL( signalSMFProgram( int, int ) ),
+		 this, SLOT( programEvent( int, int ) ) );
+
+	connect( m_seq, SIGNAL( signalSMFHeader( int, int, int ) ),
+		 this, SLOT( headerEvent( int, int, int ) ) );
+
+	connect( m_seq, SIGNAL( signalSMFTrackStart() ), this,
+		 SLOT( startTrackEvent() ) );
 
 }
 
 midiReader::~midiReader()
 {
-	printf("destroy midiReader\n");
+	printf( "destroy midiReader\n" );
 	delete m_seq;
 }
 
-void midiReader::read(QString &fileName)
+void midiReader::read( QString &fileName )
 {
-	m_seq->readFromFile(fileName);
+	m_seq->readFromFile( fileName );
 }
 
 // Slots below.
@@ -92,55 +98,69 @@ void midiReader::read(QString &fileName)
 // b1: Denominator (exponent in a power of two)
 // b2: Number of MIDI clocks per metronome click
 // b3: Number of notated 32nd notes per 24 MIDI clocks
-void midiReader::timeSigEvent(int b0, int b1, int b2, int b3)
+void midiReader::timeSigEvent( int b0, int b1, int b2, int b3 )
 {
-	timeSigHandler(m_seq->getCurrentTime(), b0, 1<<b1);
+	timeSigHandler( m_seq->getCurrentTime(), b0, 1 << b1 );
 }
 
-void midiReader::tempoEvent(int tempo)
+void midiReader::tempoEvent( int tempo )
 {
-	tempoHandler(m_seq->getCurrentTime(), 60000000/tempo);
+	tempoHandler( m_seq->getCurrentTime(), 60000000 / tempo );
 }
 
-void midiReader::errorHandler(const QString &errorStr)
+void midiReader::textEvent( int text_type, const QString &data )
+{
+	if ( data.length() )
+	{
+		textHandler( text_type, data );
+	}
+}
+
+void midiReader::startTrackEvent()
+{
+	trackStartHandler();
+}
+
+void midiReader::errorHandler( const QString &errorStr )
 {
 	printf( "MidiImport::readSMF(): got error %s at %ld\n",
-			errorStr.toStdString().c_str(), m_seq->getCurrentTime() );
+		errorStr.toStdString().c_str(), m_seq->getCurrentTime() );
 }
 
-void midiReader::ctlChangeEvent(int chan, int ctl, int value)
+void midiReader::ctlChangeEvent( int chan, int ctl, int value )
 {
-	CCHandler(m_seq->getCurrentTime(), chan, ctl, value);
+	CCHandler( m_seq->getCurrentTime(), chan, ctl, value );
 }
 
-void midiReader::pitchBendEvent(int chan, int value)
+void midiReader::pitchBendEvent( int chan, int value )
 {
-	CCHandler(m_seq->getCurrentTime(), chan, pitchBendEventId, value);
+	CCHandler( m_seq->getCurrentTime(), chan, pitchBendEventId, value );
 }
 
-void midiReader::noteOnEvent(int chan, int pitch, int vol)
+void midiReader::noteOnEvent( int chan, int pitch, int vol )
 {
-	if(vol != 0){
-		insertNoteEvent(m_seq->getCurrentTime(), chan, pitch, vol);
+	if( vol )
+	{
+		insertNoteEvent( m_seq->getCurrentTime(), chan, pitch, vol );
 	}
 	else
 	{
-		addNoteEvent(m_seq->getCurrentTime(), chan, pitch);
+		addNoteEvent( m_seq->getCurrentTime(), chan, pitch );
 	}
 }
 
-void midiReader::noteOffEvent(int chan, int pitch, int vol)
+void midiReader::noteOffEvent( int chan, int pitch, int vol )
 {
-	addNoteEvent(m_seq->getCurrentTime(), chan, pitch);
+	addNoteEvent( m_seq->getCurrentTime(), chan, pitch );
 }
 
-void midiReader::headerEvent(int format, int ntrks, int division)
+void midiReader::headerEvent( int format, int ntrks, int division )
 {
-	timeBaseHandler(division);
+	timeBaseHandler( division );
 	pd.setMaximum( ntrks + preTrackSteps );
 }
 
-void midiReader::programEvent(int chan, int patch)
+void midiReader::programEvent( int chan, int patch )
 {
-	programHandler(m_seq->getCurrentTime(), chan, patch);
+	programHandler( m_seq->getCurrentTime(), chan, patch );
 }

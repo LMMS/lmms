@@ -31,21 +31,22 @@ class wrkReader : public commonReader
 {
 	Q_OBJECT
 public:
-	wrkReader(TrackContainer *tc);
+	wrkReader( TrackContainer *tc );
 	~wrkReader();
-	void read(QString &fileName);
+	void read( QString &fileName );
 public slots:
-	void errorHandler(const QString& errorStr);
-	void timeBase(int timebase);
-	void noteEvent(int track, long time, int chan, int pitch, int vol, int dur);
-	void ctlChangeEvent(int track, long time, int chan, int ctl, int value);
-	void pitchBendEvent(int track, long time, int chan, int value);
-	void programEvent(int track, long time, int chan, int patch);
-	void timeSigEvent(int bar, int num, int den);
-	void tempoEvent(long time, int tempo);
-	void trackPatch(int track, int patch);
-	void trackVol(int track, int vol);
-	void trackBank(int track, int bank);
+	void errorHandler( const QString& errorStr );
+	void timeBase( int timebase );
+	void noteEvent( int track, long time, int chan, int pitch, int vol, int dur );
+	void ctlChangeEvent( int track, long time, int chan, int ctl, int value );
+	void pitchBendEvent( int track, long time, int chan, int value );
+	void programEvent( int track, long time, int chan, int patch );
+	void timeSigEvent( int bar, int num, int den );
+	void tempoEvent( long time, int tempo );
+	void trackPatch( int track, int patch );
+	void trackVol( int track, int vol );
+	void trackBank( int track, int bank );
+	void trackName( int track, QString name );
 
 private:
 	drumstick::QWrk *m_seq;
