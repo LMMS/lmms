@@ -38,6 +38,7 @@
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
+#include "ChordTable.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"

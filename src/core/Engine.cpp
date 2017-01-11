@@ -24,6 +24,7 @@
 
 
 #include "Engine.h"
+#include "ChordTable.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"

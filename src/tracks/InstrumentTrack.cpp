@@ -40,6 +40,7 @@
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
+#include "ChordTable.h"
 #include "AudioPort.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"

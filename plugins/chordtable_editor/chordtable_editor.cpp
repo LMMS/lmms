@@ -27,21 +27,21 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QGroupBox>
+//#include <QGroupBox>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QVBoxLayout>
-#include <QLineEdit>
+//#include <QLineEdit>
 
 #include "gui_templates.h"
 #include "Knob.h"
-#include "TabBar.h"
-#include "TabButton.h"
+//#include "TabBar.h"
+//#include "TabButton.h"
 #include "ComboBox.h"
 #include "AutomatableSlider.h"
 #include "Model.h"
-#include "volume.h"
-#include "panning.h"
+//#include "volume.h"
+//#include "panning.h"
 #include "ToolTip.h"
 #include "LcdWidget.h"
 #include "LedCheckbox.h"
@@ -49,9 +49,10 @@
 #include "Engine.h"
 #include "Song.h"
 #include "FileDialog.h"
-#include "InstrumentFunctions.h"
+//#include "InstrumentFunctions.h"
 
 #include "chordtable_editor.h"
+#include "ChordTable.h"
 
 #include "embed.cpp"
 

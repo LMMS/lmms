@@ -70,6 +70,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "TextFloat.h"
+#include "ChordTable.h"
 
 
 #if QT_VERSION < 0x040800
