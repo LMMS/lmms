@@ -107,7 +107,6 @@ bool SmfImport::tryImport(TrackContainer *tc)
 	}
 	return false;
 #endif
-	return true;
 
 	if( openFile() == false )
 	{

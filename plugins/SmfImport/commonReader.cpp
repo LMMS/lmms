@@ -210,7 +210,7 @@ void commonReader::programHandler(long tick, int chan, int patch,
 {
 	CHECK_TRACK
 
-	QString trackName = QString( tr( "Track" ) + " %1").arg(chan+1);
+	QString trackName = QString( tr( "Track" ) + " %1").arg(track+1);
 	SmfMidiChannel * ch = chs[track].create( m_tc, trackName );
 
 	if( ch->isSF2 )
