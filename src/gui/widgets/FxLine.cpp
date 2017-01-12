@@ -186,8 +186,8 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 
 QString FxLine::elideName( const QString & name )
 {
-	const int maxTextHeight = 70;
-	QFontMetrics metrics( font() );
+	const int maxTextHeight = 60;
+	QFontMetrics metrics( m_renameLineEdit->font() );
 	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
 	return elidedName;
 }
