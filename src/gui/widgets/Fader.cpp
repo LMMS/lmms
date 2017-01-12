@@ -174,7 +174,9 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
-		model()->setValue( m_startValue + delta );
+		const float step = model()->step<float>();
+		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
+		model()->setValue( newValue );
 
 		updateTextFloat();
 	}
@@ -215,7 +217,6 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 {
 	bool ok;
 	float newValue;
-
 	// TODO: dbV handling
 	if( m_displayConversion )
 	{
@@ -223,9 +224,9 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() * 100 ).
 							arg( model()->maxValue() * 100 ),
-						model()->value() * 100,
+						model()->getRoundedValue() * 100,
 						model()->minValue() * 100,
-						model()->maxValue() * 100, 4, &ok ) * 0.01f;
+						model()->maxValue() * 100, model()->getDigitCount(), &ok ) * 0.01f;
 	}
 	else
 	{
@@ -233,9 +234,9 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() ).
 							arg( model()->maxValue() ),
-						model()->value(),
+						model()->getRoundedValue(),
 						model()->minValue(),
-						model()->maxValue(), 4, &ok );
+						model()->maxValue(), model()->getDigitCount(), &ok );
 	}
 
 	if( ok )
