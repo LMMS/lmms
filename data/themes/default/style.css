@@ -494,7 +494,7 @@ SideBar QToolButton:pressed {
 }
 
 SideBar QToolButton:checked {
-	background: none;
+	background: #2f353b;
 	border: none;
 	font-size: 12px;
 }
