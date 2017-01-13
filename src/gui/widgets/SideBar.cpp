@@ -112,6 +112,7 @@ void SideBar::appendTab( SideBarWidget *widget )
 	SideBarButton *button = new SideBarButton( orientation(), this );
 	button->setText( widget->title() );
 	button->setIcon( widget->icon() );
+	button->setLayoutDirection( Qt::RightToLeft );
 	button->setCheckable( true );
 	m_widgets[button] = widget;
 	m_btnGroup.addButton( button );
