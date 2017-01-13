@@ -197,7 +197,10 @@ AudioSoundIo::~AudioSoundIo()
 {
 	stopProcessing();
 	if (m_soundio)
+	{
 		soundio_destroy(m_soundio);
+		m_soundio = NULL;
+	}
 }
 
 void AudioSoundIo::startProcessing()
@@ -448,7 +451,11 @@ AudioSoundIo::setupWidget::~setupWidget()
 {
 	bool ok = disconnect( &m_backendModel, SIGNAL( dataChanged() ), &m_setupUtil, SLOT( reconnectSoundIo() ) );
 	assert(ok);
-	soundio_destroy(m_soundio);
+	if (m_soundio)
+	{
+		soundio_destroy(m_soundio);
+		m_soundio = NULL;
+	}
 }
 
 void AudioSoundIo::setupWidget::saveSettings()
