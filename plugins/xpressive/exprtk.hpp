@@ -2,14 +2,14 @@
  ******************************************************************
  *           C++ Mathematical Expression Toolkit Library          *
  *                                                                *
- * Author: Arash Partow (1999-2016)                               *
+ * Author: Arash Partow (1999-2017)                               *
  * URL: http://www.partow.net/programming/exprtk/index.html       *
  *                                                                *
- * Copyright notice:                                              *
+ * Copyright notice for use with the LMMS project:                *
  * Free use of the C++ Mathematical Expression Toolkit Library is *
  * permitted under the guidelines and in accordance with the most *
- * current version of the Common Public License.                  *
- * http://www.opensource.org/licenses/cpl1.0.php                  *
+ * current version of the Boost Software License, Version 1.0.    *
+ * https://opensource.org/licenses/BSL-1.0                        *
  *                                                                *
  * Example expressions:                                           *
  * (00) (y + x / y) * (x - y / x)                                 *
