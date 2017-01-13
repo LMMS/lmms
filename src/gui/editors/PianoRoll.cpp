@@ -362,7 +362,7 @@ PianoRoll::PianoRoll() :
 					this, SLOT( zoomingChanged() ) );
 
 	// Set up quantization model
-	m_quantizeModel.addItem( tr( "Note lock" ) );
+	m_quantizeModel.addItem( tr( "Note Lock" ) );
 	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
@@ -378,7 +378,7 @@ PianoRoll::PianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 	// Set up note length model
-	m_noteLenModel.addItem( tr( "Last note" ),
+	m_noteLenModel.addItem( tr( "Last Note" ),
 					new PixmapLoader( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
@@ -405,7 +405,7 @@ PianoRoll::PianoRoll() :
 	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
 			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
-	m_scaleModel.addItem( tr("No scale") );
+	m_scaleModel.addItem( tr("No Scale") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
 	{
 		if( chord.isScale() )
@@ -420,7 +420,7 @@ PianoRoll::PianoRoll() :
 						this, SLOT( updateSemiToneMarkerMenu() ) );
 
 	// Set up chord model
-	m_chordModel.addItem( tr("No chord") );
+	m_chordModel.addItem( tr("No Chord") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
 	{
 		if( ! chord.isScale() )
