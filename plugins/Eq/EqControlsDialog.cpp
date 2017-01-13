@@ -49,15 +49,15 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	setFixedSize( 500, 500 );
 
 	EqSpectrumView * inSpec = new EqSpectrumView( &controls->m_inFftBands, this );
-	inSpec->move( 51, 17 );
+	inSpec->move( 26, 17 );
 	inSpec->setColor( QColor( 54, 45, 142, 200 ) );
 
 	EqSpectrumView * outSpec = new EqSpectrumView( &controls->m_outFftBands, this );
 	outSpec->setColor( QColor( 9, 166, 156, 200 ) );
-	outSpec->move( 51, 17 );
+	outSpec->move( 26, 17 );
 
 	m_parameterWidget = new EqParameterWidget( this , controls );
-	m_parameterWidget->move( 51, 17 );
+	m_parameterWidget->move( 26, 17 );
 
 	setBand( 0, &controls->m_hpActiveModel, &controls->m_hpFeqModel, &controls->m_hpResModel, 0, QColor(255 ,255, 255), tr( "HP" ) ,0,0, &controls->m_hp12Model, &controls->m_hp24Model, &controls->m_hp48Model,0,0,0);
 	setBand( 1, &controls->m_lowShelfActiveModel, &controls->m_lowShelfFreqModel, &controls->m_lowShelfResModel, &controls->m_lowShelfGainModel, QColor(255 ,255, 255), tr( "Low Shelf" ), &controls->m_lowShelfPeakL , &controls->m_lowShelfPeakR,0,0,0,0,0,0 );
