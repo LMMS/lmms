@@ -51,8 +51,8 @@
 #include "FileDialog.h"
 //#include "InstrumentFunctions.h"
 
-#include "chordtable_editor.h"
 #include "ChordTable.h"
+#include "chordtable_editor.h"
 
 #include "embed.cpp"
 
