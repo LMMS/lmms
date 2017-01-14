@@ -1,14 +1,14 @@
 /*
  * InstrumentFunctions.h - models for instrument-functions-tab
  *
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright ( c ) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 2 of the License, or ( at your option ) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,7 +16,7 @@
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public
- * License along with this program (see COPYING); if not, write to the
+ * License along with this program ( see COPYING ); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
  *
@@ -28,18 +28,9 @@
 #include <QStringList>
 
 #include "ConfigManager.h"
-//#include "volume.h"
-//#include "panning.h"
-
 #include "JournallingObject.h"
-//#include "lmms_basics.h"
 #include "AutomatableModel.h"
-//#include "TempoSyncKnobModel.h"
-//#include "ComboBoxModel.h"
 
-
-//class InstrumentTrack;
-//class NotePlayHandle;
 class Model;
 class Chord;
 class ChordTable;
@@ -49,41 +40,37 @@ const int KeyMax = ( 0 + 30 );
 const int KeyMin = - KeyMax;
 const int KeyDefault = 0;
 
-/*****************************************************************************************************
- *
- * The ChordSemiTone class
- *
-******************************************************************************************************/
+
 class EXPORT ChordSemiTone : public Model , public JournallingObject
 {
 	Q_OBJECT
 public:
 
-	IntModel *key; //  the semitone
-	FloatModel *vol;
-	FloatModel *pan;
+	IntModel * key; // the semitone
+	FloatModel * vol;
+	FloatModel * pan;
 	// the note is played -> true: yes, false: skipped
-	BoolModel *active;
+	BoolModel * active;
 	// the note is processed but silenced -> true: normally played, false: muted
-	BoolModel *silenced;
+	BoolModel * silenced;
 	// The note only has the key value. True: bare, we will discard al the rest, taking data from the base note
-	BoolModel *bare;
+	BoolModel * bare;
 
 	//The semitone will always belong to a chord
-	ChordSemiTone(Chord *_parent);
+	ChordSemiTone( Chord * _parent );
 
 	//Creates a new semitone which gets data from the argument
-	ChordSemiTone(ChordSemiTone *_copy);
+	ChordSemiTone( ChordSemiTone * _copy );
 
 	//constructs the object from a given string by calling the parseString function
-	ChordSemiTone(Chord *_parent,QString _string);
+	ChordSemiTone( Chord * _parent,QString _string );
 
 	virtual ~ChordSemiTone();
 
 	//return the parent chord
-	Chord *getChord()
+	Chord * getChord()
 	{
-		return qobject_cast<Chord*>(parent());
+		return qobject_cast<Chord * >( parent() );
 	}
 
 
@@ -99,12 +86,7 @@ public:
 	}
 };
 
-/*****************************************************************************************************
- *
- * The Chord class
- *
-******************************************************************************************************/
-class EXPORT Chord : public Model, public JournallingObject, public QVector<ChordSemiTone*>
+class EXPORT Chord : public Model, public JournallingObject, public QVector<ChordSemiTone * >
 {
 	Q_OBJECT
 public:
@@ -112,16 +94,16 @@ public:
 	QString m_name;
 
 	//creates an empty chord
-	Chord(Model *_parent);
+	Chord( Model * _parent );
 
 	//creates a chord by parsing the semitone string
-	Chord(Model *_parent, QString _name, QString _string);
+	Chord( Model * _parent, QString _name, QString _string );
 
 	//creates a new Chord without semitones
-	Chord(Model *_parent, QString _name );
+	Chord( Model * _parent, QString _name );
 
 	//Creates a copy of the chord, changing name too;
-	Chord(Chord *_copy, QString _name);
+	Chord( Chord * _copy, QString _name );
 
 	virtual ~Chord();
 
@@ -132,7 +114,6 @@ public:
 	{
 		return "Chord";
 	}
-
 
 	bool isScale() const
 	{
@@ -149,9 +130,9 @@ public:
 	//returns the key of the last chordsemitone
 	int8_t last() const
 	{
-		if (size()>0)
+		if ( size() > 0 )
 		{
-			return at(size()-1)->key->value();
+			return at( size() - 1 )->key->value();
 		} else {
 			return 0;
 		}
@@ -165,7 +146,7 @@ public:
 	int8_t operator[]( int n ) const
 	{
 		// returning the key
-		return at(n)->key->value();
+		return at( n )->key->value();
 	}
 
 
@@ -173,29 +154,22 @@ public:
 	void addSemiTone();
 
 	//inserts the semitone in the stated position
-	void insertSemiTone(ChordSemiTone *csm, int position);
+	void insertSemiTone( ChordSemiTone * csm, int position );
 
 	//deletes the semitone
-	void removeSemiTone(int i);
+	void removeSemiTone( int i );
 
 	//parses the string into data by adding the Semitones to the vector after clearing it
 	void parseString( QString _string );
-
-
 };
 
 
 
-/*****************************************************************************************************
- *
- * The ChordTable class
- *
-******************************************************************************************************/
-class EXPORT ChordTable : public Model, public JournallingObject, public QVector<Chord*>
+class EXPORT ChordTable : public Model, public JournallingObject, public QVector<Chord * >
 {
 	Q_OBJECT
 public:
-	ChordTable(Model *_parent);
+	ChordTable( Model * _parent );
 	virtual ~ChordTable() {}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
@@ -213,10 +187,10 @@ public:
 	void loadFactoryPreset();
 
 	//adds or clones a chord to the chord table. If -1 adds a chord else clones the given
-	void cloneChord(int i=-1);
+	void cloneChord( int i = -1 );
 
 	//removes the chord and emits the datachanged signal;
-	void removeChord(int i);
+	void removeChord( int i );
 
 
 	const Chord &getByName( const QString & name, bool is_scale = false ) const;
@@ -232,9 +206,6 @@ public:
 	}
 
 
-	//getting the instance of the class. Guarantees only one instance of the class
-	static ChordTable *getInstance(Model *_parent);
-
 	//the compiler before qt5 treats signals as private
 	void emitChordTableChangedSignal()
 	{
@@ -245,9 +216,6 @@ public:
 	{
 		emit chordNameChanged();
 	}
-
-private:
-	static ChordTable *instance;
 
 public slots:
 
