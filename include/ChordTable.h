@@ -54,7 +54,7 @@ const int KeyDefault = 0;
  * The ChordSemiTone class
  *
 ******************************************************************************************************/
-class ChordSemiTone : public Model , public JournallingObject
+class EXPORT ChordSemiTone : public Model , public JournallingObject
 {
 	Q_OBJECT
 public:
