@@ -29,7 +29,6 @@
 
 #include <QLabel>
 #include <QFrame>
-//#include <QComboBox>
 #include <QGridLayout>
 #include <QLineEdit>
 
@@ -239,7 +238,7 @@ signals:
  * The chordtableEditor class
  *
 ******************************************************************************************************/
-class chordtableEditor : public ToolPlugin
+class EXPORT chordtableEditor : public ToolPlugin
 {
 	Q_OBJECT
 
