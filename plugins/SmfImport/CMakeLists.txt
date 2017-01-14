@@ -16,4 +16,4 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
 BUILD_PLUGIN(smfimport SmfImport.cpp commonReader.cpp midiReader.cpp oveReader.cpp wrkReader.cpp
     MOCFILES SmfImport.h commonReader.h midiReader.h oveReader.h wrkReader.h )
 
-TARGET_LINK_LIBRARIES(smfimport ${DRUMSTICK_LIBRARIES})
+TARGET_LINK_LIBRARIES(smfimport ${DRUMSTICK_FILE_LIBRARIES})
