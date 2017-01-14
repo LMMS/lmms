@@ -238,7 +238,7 @@ signals:
  * The chordtableEditor class
  *
 ******************************************************************************************************/
-class EXPORT chordtableEditor : public ToolPlugin
+class chordtableEditor : public ToolPlugin
 {
 	Q_OBJECT
 

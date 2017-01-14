@@ -29,7 +29,7 @@
 
 #include "Plugin.h"
 
-class EXPORT ToolPlugin : public Plugin
+class ToolPlugin : public Plugin
 {
 public:
 	ToolPlugin( const Descriptor * _descriptor, Model * _parent );
