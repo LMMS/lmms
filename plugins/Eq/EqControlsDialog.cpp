@@ -50,10 +50,10 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 
 	EqSpectrumView * inSpec = new EqSpectrumView( &controls->m_inFftBands, this );
 	inSpec->move( 26, 17 );
-	inSpec->setColor( QColor( 54, 45, 142, 200 ) );
+	inSpec->setColor( QColor( 54, 45, 142, 150 ) );
 
 	EqSpectrumView * outSpec = new EqSpectrumView( &controls->m_outFftBands, this );
-	outSpec->setColor( QColor( 9, 166, 156, 200 ) );
+	outSpec->setColor( QColor( 9, 166, 156, 150 ) );
 	outSpec->move( 26, 17 );
 
 	m_parameterWidget = new EqParameterWidget( this , controls );
