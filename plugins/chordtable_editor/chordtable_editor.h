@@ -14,7 +14,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public
@@ -61,46 +61,46 @@ class chordNoteWidget : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	chordNoteWidget(chordNoteModel * _model, QWidget *_parent);
+	chordNoteWidget( chordNoteModel * _model, QWidget * _parent );
 	~chordNoteWidget();
 
 	QVBoxLayout * m_vLayout;
-	QFrame *m_Frame;
-	QGridLayout *m_gridLayout;
+	QFrame * m_Frame;
+	QGridLayout * m_gridLayout;
 
 	chordNoteModel * m_chordNoteModel;
-	Knob *m_volumeKnob;
-	Knob *m_panKnob;
+	Knob * m_volumeKnob;
+	Knob * m_panKnob;
 	//
-	LcdWidget *m_keyLcd;
-	AutomatableSlider *m_keySlider;
-	LedCheckBox *m_activeLed;
-	LedCheckBox *m_silencedLed;
-	LedCheckBox *m_bareLed;
+	LcdWidget * m_keyLcd;
+	AutomatableSlider * m_keySlider;
+	LedCheckBox * m_activeLed;
+	LedCheckBox * m_silencedLed;
+	LedCheckBox * m_bareLed;
 
-	QPushButton *m_delButton;
-	QPushButton *m_cloneButton;
+	QPushButton * m_delButton;
+	QPushButton * m_cloneButton;
 
 
 	//the position of the semitone in the vector
 	int position() const;
-	void setPosition(int position);
+	void setPosition( int position );
 
 public slots:
 
 	//changes m_keyLCD value
-	void setKeyLabel(int i);
+	void setKeyLabel( int i );
 
 	//emits the position of the semitone in the vector
 	void emitDeletePosition()
 	{
-		emit emitDeletePosition(m_position);
+		emit emitDeletePosition( m_position );
 	}
 
 	//emits the position of the semitone in the vector
 	void emitClonePosition()
 	{
-		emit emitClonePosition(m_position);
+		emit emitClonePosition( m_position );
 	}
 
 private:
@@ -111,8 +111,8 @@ private:
 signals:
 
 	//emits the positions of the semitone in the vector when edited/pushed etc..
-	void emitDeletePosition(int i);
-	void emitClonePosition(int i);
+	void emitDeletePosition( int i );
+	void emitClonePosition( int i );
 
 };
 
@@ -126,32 +126,32 @@ class chordNoteModel : public Model
 {
 	Q_OBJECT
 public:
-	chordNoteModel(Model *_parent, ChordSemiTone *_semiTone, int _position);
+	chordNoteModel( Model * _parent, ChordSemiTone * _semiTone, int _position );
 	~chordNoteModel(){}
 
-	virtual chordNoteWidget * instantiateView( QWidget * _parent)
+	virtual chordNoteWidget * instantiateView( QWidget * _parent )
 	{
-		return new chordNoteWidget( this,  _parent);
+		return new chordNoteWidget( this, _parent );
 	}
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
-		Q_UNUSED(doc)
-		Q_UNUSED(element)
+		Q_UNUSED( doc )
+		Q_UNUSED( element )
 	}
 
-	virtual void loadSettings( const QDomElement& element )
+	virtual void loadSettings( const QDomElement & element )
 	{
-		Q_UNUSED(element)
+		Q_UNUSED( element )
 	}
 
 
 	//The chordsemitone it's referring to
-	ChordSemiTone *m_semiTone;
+	ChordSemiTone * m_semiTone;
 
 	//the position of the semitone in the semitones vector
 	int position() const;
-	void setPosition(int position);
+	void setPosition( int position );
 
 private:
 
@@ -169,7 +169,7 @@ private:
  * The chordtableEditorView class
  *
 ******************************************************************************************************/
-class EXPORT ChordTableEditorView : public ToolPluginView
+class ChordTableEditorView : public ToolPluginView
 {
 	Q_OBJECT
 public:
@@ -184,17 +184,17 @@ public slots:
 	//loads the preset chordtable
 	void resetChords();
 	//removes the semitone which sent the signal
-	void removeSemiTone(int i);
+	void removeSemiTone( int i );
 	void addChordSemiTone();
 	//clones the semitone which sent the signal
-	void cloneSemiTone(int i);
+	void cloneSemiTone( int i );
 	void saveFile();
 	void openFile();
 	void newChord();
 	void cloneChord();
 	void removeChord();
 	//when the text of the chord Name changes
-	void changeText(QString _text);
+	void changeText( QString _text );
 
 	//sets the combobox to the selected chord
 	void setChordSelection( int i );
@@ -220,8 +220,8 @@ private:
 	QVBoxLayout * m_scrollAreaLayout;
 
 	//the widget layout where to put all the chordNoteWidgets
-	QHBoxLayout *m_chordsWidgetLayout;
-	QWidget *m_chordsWidget;
+	QHBoxLayout * m_chordsWidgetLayout;
+	QWidget * m_chordsWidget;
 
 
 	//The combobox of the available chord combinations
@@ -253,15 +253,15 @@ public:
 
 	virtual QString nodeName() const;
 
-	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
-		Q_UNUSED(doc)
-		Q_UNUSED(element)
+		Q_UNUSED( doc )
+		Q_UNUSED( element )
 	}
 
 	virtual void loadSettings( const QDomElement& element )
 	{
-		Q_UNUSED(element)
+		Q_UNUSED( element )
 	}
 
 	ChordTable * m_chordTable;

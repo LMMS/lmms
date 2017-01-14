@@ -40,7 +40,6 @@ class MainWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
-class ChordTableEditorView;
 
 class EXPORT GuiApplication : public QObject
 {
@@ -92,7 +91,6 @@ private:
 	ProjectNotes* m_projectNotes;
 	ControllerRackView* m_controllerRackView;
 	QLabel* m_loadingProgressLabel;
-
 };
 
 #define gui GuiApplication::instance()

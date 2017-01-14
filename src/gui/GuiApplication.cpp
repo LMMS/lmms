@@ -39,13 +39,11 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
-#include "ToolPlugin.h"
 #include "ToolPluginView.h"
 
 #include <QApplication>
 #include <QMessageBox>
 #include <QSplashScreen>
-
 
 GuiApplication* GuiApplication::s_instance = nullptr;
 
@@ -56,7 +54,6 @@ GuiApplication* GuiApplication::instance()
 
 void GuiApplication::setChordTableEditorView(PluginView *_view)
 {
-//	m_chordTableEditorView = qobject_cast<ChordTableEditorView *>( _view );
 	m_chordTableEditorView =  _view;
 }
 

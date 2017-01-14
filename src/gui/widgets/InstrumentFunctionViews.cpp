@@ -37,10 +37,6 @@
 #include "PixmapButton.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
-#include "plugins/chordtable_editor/chordtable_editor.h"
-
-class ChordTableEditorView;
-
 
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
@@ -81,7 +77,6 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	mainLayout->addWidget( editButton, 0, 1, 1 , 1 );
 	mainLayout->setColumnStretch( 2, 4 );
 	mainLayout->addWidget( m_chordsComboBox, 1, 0, 1, 2 );
-//	mainLayout->addWidget( m_chordRangeKnob, 0, 3, 2, 1, Qt::AlignHCenter );
 	mainLayout->addWidget( m_chordRangeKnob, 0, 3, 2, 1 );
 }
 
