@@ -2,7 +2,7 @@
  * FileBrowser.h - include file for FileBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -55,6 +55,7 @@ public:
 
 private slots:
 	void reloadTree( void );
+	void expandItems( QTreeWidgetItem * item=NULL );
 	// call with item=NULL to filter the entire tree
 	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
 	void giveFocusToFilter();

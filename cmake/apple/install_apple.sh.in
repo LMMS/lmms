@@ -1,24 +1,18 @@
 #!/bin/bash
-#title         :install_apple.sh
-#description   :Creates Apple ".app" bundle for LMMS
-#author        :Tres Finocchiaro
-#date          :20140504
-#version       :1.1
-#usage         :bash create_applet_installer.sh
-#notes         :See also https://github.com/LMMS
-#notes         :Troubleshooting try: export DYLD_PRINT_LIBRARIES=1; export VERBOSE=1;
-#requires      :deploymacqt
-#=========================================================================================
+# Creates Apple ".app" bundle for @PROJECT_NAME_UCASE@
+# Note:
+#   Examine linkings using `otool -L somelib.so`
+#   Debug the loading of dynamic libraries using `export DYLD_PRINT_LIBRARIES=1`
+
 # STK rawwaves directory
 STK_RAWWAVE=$HOME/stk-*/rawwaves
+
+if [ ! -d "$STK_RAWWAVE" ]; then
+   STK_RAWWAVE=$(brew --prefix stk)/share/stk/rawwaves
+fi
  
 # Place to create ".app" bundle
 APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
- 
-# MacPorts installs libreadline with wrong permissions
-LIBREADLINE="libreadline.6.2.dylib"
- 
-#=========================================================================================
 
 MSG_COLOR='\x1B[1;36m'
 COLOR_RESET='\x1B[0m'
@@ -37,56 +31,49 @@ if [ $? -ne 0 ]; then
   fi
 fi
  
-# MacPorts only - check for u+w permissions on libreadline
-if [ -f "@APPLE_PREFIX@/lib/$LIBREADLINE" ]; then
-  CHECKREADLINE=$(stat -f "%p" @APPLE_PREFIX@/lib/$LIBREADLINE)
-  CHECKREADLINE=${CHECKREADLINE:3:1}
-  if [ "${CHECKREADLINE}" != "7" ]; then
-    echo -e "\n\n\t\t\t\t***********\n\t\t\t\t* WARNING *\n\t\t\t\t***********"
-    echo -e "File $LIBREADLINE is not marked as user writable."
-    echo -e "This will break macdeployqt's linking process after it is copied."
-    echo -e "A sudo password is required to elevate and fix using chmod u+w."
-    echo -e "\nPLEASE ENTER SUDO PASSWORD:"
-    sudo chmod u+w "@APPLE_PREFIX@/lib/$LIBREADLINE"
-  fi
-fi
- 
 # Remove any old .app bundles
 rm -Rf "$APP"
 
 # Copy/overwrite Info.plist
 \cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
  
-# Create new bundle, copy our built code to it
-mkdir -p "$APP"
-cd "@CMAKE_INSTALL_PREFIX@"
-mkdir "$APP/Contents"
-cp -R * "$APP/Contents"
- 
-# Manually copy STK rawwaves
+# Create .app bundle containing contents from CMAKE_INSTALL_PREFIX
+mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/Frameworks"
+mkdir -p "$APP/Contents/Resources"
 mkdir -p "$APP/Contents/share/stk/rawwaves"
+cd "@CMAKE_INSTALL_PREFIX@"
+cp -R * "$APP/Contents"
+cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
 cp $STK_RAWWAVE/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
  
 # Make all libraries writable for macdeployqt
 cd "$APP"
 find . -type f -print0 | xargs -0 chmod u+w
- 
-# Move lmms binary to the proper location
-mkdir -p "$APP/Contents/MacOS"
-mv "$APP/Contents/bin/lmms" "$APP/Contents/MacOS/lmms"
-rm -rf "$APP/Contents/bin"
- 
-# Move libraries to proper locations
-mkdir -p "$APP/Contents/Frameworks"
-mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" \
-   "$APP/Contents/MacOS/RemoteZynAddSubFx"
-   
-rm "$APP/Contents/Frameworks/libZynAddSubFxCore.dylib" > /dev/null 2>&1
 
+lmmsbin="MacOS/@CMAKE_PROJECT_NAME@"
+zynlib="lib/lmms/libzynaddsubfx.so"
+zynfmk="Frameworks/libZynAddSubFxCore.dylib"
+zynbin="MacOS/RemoteZynAddSubFx"
+ 
+# Move lmms binary
+mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/$lmmsbin"
+ 
 # Fix zyn linking 
+mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" "$APP/Contents/$zynbin"
+mv "$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib" "$APP/Contents/$zynfmk"
+
 install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
-   @loader_path/../lib/lmms/libZynAddSubFxCore.dylib \
-  "$APP/Contents/MacOS/RemoteZynAddSubFx"
+   @loader_path/../$zynfmk \
+  "$APP/Contents/$zynbin"
+
+install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
+   @loader_path/../../$zynfmk \
+  "$APP/Contents/$zynlib"
+  
+# Link lmms binary
+_executables="${_executables} -executable=$APP/Contents/$zynbin"
+_executables="${_executables} -executable=$APP/Contents/$zynfmk"
  
 # Build a list of shared objects in target/lib/lmms
 for file in "$APP/Contents/lib/lmms/"*.so; do
@@ -99,16 +86,10 @@ for file in "$APP/Contents/lib/lmms/ladspa/"*.so; do
    _thisfile="$APP/Contents/lib/lmms/ladspa/${file##*/}"
    _executables="${_executables} -executable=$_thisfile"
 done
- 
-# Additional binaries that require linking
-_executables="${_executables} -executable=$APP/Contents/MacOS/RemoteZynAddSubFx"
-_executables="${_executables} -executable=$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib"
 
-# Build our App Package using "macdeployqt"
+# Finalize .app
 macdeployqt "$APP" $_executables
 
-# OS X Specific Artwork
-mkdir -p "$APP/Contents/Resources"
-cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
-
+# Cleanup
+rm -rf "$APP/Contents/bin"
 echo -e "\nFinished.\n\n"

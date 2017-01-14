@@ -275,9 +275,10 @@ float AutomatableModel::inverseScaledValue( float value ) const
 
 QString AutomatableModel::displayValue( const float val ) const
 {
+	const FloatModel *floatmodel = dynamic_cast<const FloatModel*>( this );
 	switch( m_dataType )
 	{
-		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
+		case Float: return QString::number( castValue<float>( scaledValue( floatmodel->getRoundedValue() ) ) );
 		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
 		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
 	}
@@ -713,6 +714,23 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	}
 }
 
+float FloatModel::getRoundedValue() const
+{
+	return static_cast<float>( static_cast<int>( value() / step<float>() + 0.5 ) ) * step<float>();
+}
 
 
+
+
+float FloatModel::getDigitCount()
+{
+	float steptemp = step<float>();
+	int digits = 0;
+	while ( steptemp < 1 )
+	{
+		steptemp = steptemp / 0.1f;
+		digits++;
+	}
+	return digits;
+}
 

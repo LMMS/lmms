@@ -50,7 +50,7 @@ static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor
 
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
-	SideBarWidget( tr( "Instrument plugins" ),
+	SideBarWidget( tr( "Instrument Plugins" ),
 				embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
 {
 	setWindowTitle( tr( "Instrument browser" ) );
