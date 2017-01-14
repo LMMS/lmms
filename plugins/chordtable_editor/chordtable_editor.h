@@ -29,7 +29,7 @@
 
 #include <QLabel>
 #include <QFrame>
-#include <QComboBox>
+//#include <QComboBox>
 #include <QGridLayout>
 #include <QLineEdit>
 
@@ -196,6 +196,10 @@ public slots:
 	void removeChord();
 	//when the text of the chord Name changes
 	void changeText(QString _text);
+
+	//sets the combobox to the selected chord
+	void setChordSelection( int i );
+
 
 private:
 

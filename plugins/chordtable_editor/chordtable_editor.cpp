@@ -432,10 +432,15 @@ void chordtableEditorView::removeChord()
 	reloadCombo();
 }
 
-void chordtableEditorView::changeText(QString _text)
+void chordtableEditorView::changeText( QString _text )
 {
 	m_chord->m_name=_text;
 	emit lineEditChange();
+}
+
+void chordtableEditorView::setChordSelection( int i )
+{
+	m_chordsComboBox->model()->setValue( i );
 }
 
 chordtableEditorView::~chordtableEditorView()
@@ -620,10 +625,7 @@ chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 
 chordNoteWidget::~chordNoteWidget()
 {
-	//Any of these cause segmentation fault.... Double destructor?
-
 	delete m_volumeKnob;
-
 	delete m_keyLcd;
 	delete m_keySlider;
 	delete m_activeLed;
@@ -646,8 +648,6 @@ void chordNoteWidget::setKeyLabel(int i)
 		m_keyLcd->update();
 	}
 }
-
-
 
 int chordNoteWidget::position() const
 {
