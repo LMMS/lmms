@@ -104,7 +104,7 @@ public:
  * The Chord class
  *
 ******************************************************************************************************/
-class Chord : public Model, public JournallingObject, public QVector<ChordSemiTone*>
+class EXPORT Chord : public Model, public JournallingObject, public QVector<ChordSemiTone*>
 {
 	Q_OBJECT
 public:
@@ -191,7 +191,7 @@ public:
  * The ChordTable class
  *
 ******************************************************************************************************/
-class ChordTable : public Model, public JournallingObject, public QVector<Chord*>
+class EXPORT ChordTable : public Model, public JournallingObject, public QVector<Chord*>
 {
 	Q_OBJECT
 public:
