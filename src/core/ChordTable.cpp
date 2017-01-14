@@ -110,7 +110,7 @@ void ChordSemiTone::loadSettings( const QDomElement &_this )
 
 void ChordSemiTone::parseString( QString _string )
 {
-	QStringList l = _string.remove( ' ' ).split( ', ' ); // trims and splits the string
+	QStringList l = _string.remove( ' ' ).split( ',' ); // trims and splits the string
 	key->setValue( l[0].toInt() );
 	vol->setValue( l[1].toFloat() );
 	pan->setValue( l[2].toFloat() );

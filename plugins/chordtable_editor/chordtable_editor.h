@@ -52,7 +52,6 @@ class Knob;
 class LcdWidget;
 class chordNoteModel;
 class LedCheckBox;
-//class QLineEdit;
 
 /*****************************************************************************************************
  *
@@ -253,8 +252,6 @@ public:
 
 	virtual void saveSettings( QDomDocument& doc, QDomElement& element )
 	{
-
-
 		Q_UNUSED(doc)
 		Q_UNUSED(element)
 	}

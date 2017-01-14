@@ -292,7 +292,7 @@ private:
 	static TextFloat * s_textFloat;
 
 	//The chordtable for scales and chords models
-	ChordTable *m_chordTable;
+	ChordTable * m_chordTable;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;

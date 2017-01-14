@@ -410,7 +410,7 @@ PianoRoll::PianoRoll() :
 	m_chordTable = Engine::chordTable();
 
 	m_scaleModel.addItem( tr("No scale") );
-	for( const Chord *chord : *m_chordTable )
+	for( const Chord * chord : * m_chordTable )
 	{
 		if( chord->isScale() )
 		{
@@ -425,7 +425,7 @@ PianoRoll::PianoRoll() :
 
 	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
-	for( const Chord *chord : *m_chordTable )
+	for( const Chord * chord : *m_chordTable )
 	{
 		if( ! chord->isScale() )
 		{
@@ -599,12 +599,12 @@ void PianoRoll::markSemiTone( int i )
 			break;
 		}
 		case stmaMarkCurrentScale:
-		chord = &m_chordTable->getScaleByName( m_scaleModel.currentText() );
+		chord = & m_chordTable->getScaleByName( m_scaleModel.currentText() );
 		case stmaMarkCurrentChord:
 		{
 			if( ! chord )
 			{
-				chord =  &m_chordTable->getChordByName( m_chordModel.currentText() );
+				chord =  & m_chordTable->getChordByName( m_chordModel.currentText() );
 			}
 
 			if( chord->isEmpty() )
@@ -3962,8 +3962,8 @@ void PianoRoll::quantizeNotes()
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	const Chord& scale = m_chordTable->getScaleByName( m_scaleModel.currentText() );
-	const Chord& chord = m_chordTable->getChordByName( m_chordModel.currentText() );
+	const Chord & scale = m_chordTable->getScaleByName( m_scaleModel.currentText() );
+	const Chord & chord = m_chordTable->getChordByName( m_chordModel.currentText() );
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );

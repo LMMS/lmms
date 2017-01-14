@@ -36,7 +36,6 @@
 #include "PluginFactory.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
-#include "InstrumentFunctions.h"
 
 #include "GuiApplication.h"
 

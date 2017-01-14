@@ -45,6 +45,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		carlabase
 		carlapatchbay
 		carlarack
+		chordtable_editor
 		CrossoverEQ
 		Delay
 		DualFilter
@@ -79,7 +80,6 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		waveshaper
 		vibed
 		zynaddsubfx
-		chordtable_editor
 	)
 
 	IF(NOT LMMS_BUILD_APPLE)
