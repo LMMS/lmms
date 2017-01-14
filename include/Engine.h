@@ -118,9 +118,9 @@ public:
 		return s_chordTable;
 	}
 
+
 signals:
 	void initProgress(const QString &msg);
-
 
 private:
 	// small helper function which sets the pointer to NULL before actually deleting

@@ -47,6 +47,8 @@ public:
 	InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent = NULL );
 	virtual ~InstrumentFunctionNoteStackingView();
 
+public slots:
+	void showChordTableEditor();
 
 private:
 	virtual void modelChanged();
@@ -70,6 +72,8 @@ public:
 	InstrumentFunctionArpeggioView( InstrumentFunctionArpeggio* arp, QWidget* parent = NULL );
 	virtual ~InstrumentFunctionArpeggioView();
 
+public slots:
+	void showChordTableEditor();
 
 private:
 	virtual void modelChanged();

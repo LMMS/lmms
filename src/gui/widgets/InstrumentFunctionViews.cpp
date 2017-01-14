@@ -27,6 +27,7 @@
 
 #include "InstrumentFunctions.h"
 #include "InstrumentFunctionViews.h"
+#include "GuiApplication.h"
 #include "ComboBox.h"
 #include "embed.h"
 #include "Engine.h"
@@ -36,6 +37,10 @@
 #include "PixmapButton.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
+#include "plugins/chordtable_editor/chordtable_editor.h"
+
+class ChordTableEditorView;
+
 
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :
@@ -59,6 +64,12 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	QLabel* chordLabel = new QLabel( tr( "Chord:" ) );
 	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
 
+	QPushButton * editButton= new QPushButton(tr("Edit"));
+	editButton->setFont( pointSize<8>( editButton->font() ) );
+
+	connect( editButton, SIGNAL( clicked() ),this, SLOT( showChordTableEditor() ));
+
+
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
 	m_chordRangeKnob->setWhatsThis(
@@ -66,9 +77,12 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 			"The selected chord will be played within specified "
 			"number of octaves." ) );
 
-	mainLayout->addWidget( chordLabel, 0, 0 );
-	mainLayout->addWidget( m_chordsComboBox, 1, 0 );
-	mainLayout->addWidget( m_chordRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( chordLabel, 0, 0, 1 ,1 );
+	mainLayout->addWidget( editButton, 0, 1, 1 , 1 );
+	mainLayout->setColumnStretch( 2, 4 );
+	mainLayout->addWidget( m_chordsComboBox, 1, 0, 1, 2 );
+//	mainLayout->addWidget( m_chordRangeKnob, 0, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_chordRangeKnob, 0, 3, 2, 1 );
 }
 
 
@@ -77,6 +91,14 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
 {
 	delete m_chordsGroupBox;
+}
+
+void InstrumentFunctionNoteStackingView::showChordTableEditor()
+{
+	gui->getChordTableEditorView()->show();
+	gui->getChordTableEditorView()->parentWidget()->show();
+	gui->getChordTableEditorView()->setFocus();
+	gui->emitGenericSignal(m_cc->m_chordsModel.value());
 }
 
 
@@ -191,19 +213,26 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 	QLabel* arpModeLabel = new QLabel( tr( "Mode:" ) );
 	arpModeLabel->setFont( pointSize<8>( arpModeLabel->font() ) );
 
-	mainLayout->addWidget( arpChordLabel, 0, 0 );
-	mainLayout->addWidget( m_arpComboBox, 1, 0 );
-	mainLayout->addWidget( arpDirectionLabel, 3, 0 );
-	mainLayout->addWidget( m_arpDirectionComboBox, 4, 0 );
-	mainLayout->addWidget( arpModeLabel, 6, 0 );
-	mainLayout->addWidget( m_arpModeComboBox, 7, 0 );
+	QPushButton * editButton= new QPushButton(tr("Edit"));
+	editButton->setFont( pointSize<8>( editButton->font() ) );
 
-	mainLayout->addWidget( m_arpRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpCycleKnob, 0, 2, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpSkipKnob, 3, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpMissKnob, 3, 2, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpGateKnob, 6, 1, 2, 1, Qt::AlignHCenter );
-	mainLayout->addWidget( m_arpTimeKnob, 6, 2, 2, 1, Qt::AlignHCenter );
+	connect( editButton, SIGNAL( clicked() ),this, SLOT( showChordTableEditor() ));
+
+	mainLayout->addWidget( arpChordLabel, 0, 0, 1, 1);
+	mainLayout->addWidget( m_arpComboBox, 1, 0, 1, 2 );
+	mainLayout->addWidget( arpDirectionLabel, 3, 0, 1, 1 );
+	mainLayout->addWidget( m_arpDirectionComboBox, 4, 0, 1, 2 );
+	mainLayout->addWidget( arpModeLabel, 6, 0 );
+	mainLayout->addWidget( m_arpModeComboBox, 7, 0, 1, 2 );
+
+	mainLayout->addWidget( editButton, 0, 1);
+
+	mainLayout->addWidget( m_arpRangeKnob, 0, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpCycleKnob, 0, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpSkipKnob, 3, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpMissKnob, 3, 3, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpGateKnob, 6, 2, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_arpTimeKnob, 6, 3, 2, 1, Qt::AlignHCenter );
 
 	mainLayout->setRowMinimumHeight( 2, 10 );
 	mainLayout->setRowMinimumHeight( 5, 10 );
@@ -235,7 +264,10 @@ void InstrumentFunctionArpeggioView::modelChanged()
 	m_arpModeComboBox->setModel( &m_a->m_arpModeModel );
 }
 
-
-
-
-
+void InstrumentFunctionArpeggioView::showChordTableEditor()
+{
+	gui->getChordTableEditorView()->show();
+	gui->getChordTableEditorView()->parentWidget()->show();
+	gui->getChordTableEditorView()->setFocus();
+	gui->emitGenericSignal(m_a->m_arpModel.value());
+}

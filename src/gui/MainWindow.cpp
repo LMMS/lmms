@@ -70,6 +70,8 @@
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
+#include "plugins/chordtable_editor/chordtable_editor.h"
+
 
 
 
@@ -356,11 +358,18 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
+	PluginView *tp;
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
-						   ->createView(this) );
+		tp = ToolPlugin::instantiate( desc->name, /*this*/NULL )->createView(this);
+		if ( !strcmp(desc->name, "chordtableeditor") )
+		{
+			gui->setChordTableEditorView( tp );
+		}
+		m_tools.push_back( tp );
+
+
 	}
 	if( !m_toolsMenu->isEmpty() )
 	{

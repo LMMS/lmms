@@ -170,12 +170,12 @@ private:
  * The chordtableEditorView class
  *
 ******************************************************************************************************/
-class chordtableEditorView : public ToolPluginView
+class EXPORT ChordTableEditorView : public ToolPluginView
 {
 	Q_OBJECT
 public:
-	chordtableEditorView( ToolPlugin * _tool );
-	virtual ~chordtableEditorView();
+	ChordTableEditorView( ToolPlugin * _tool );
+	virtual ~ChordTableEditorView();
 
 public slots:
 	//loads the chord into the widget
@@ -249,7 +249,7 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * )
 	{
-		return new chordtableEditorView( this );
+		return new ChordTableEditorView( this );
 	}
 
 	virtual QString nodeName() const;

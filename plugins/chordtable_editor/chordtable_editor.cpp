@@ -56,7 +56,7 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT chordtableeditor_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"ChordTable Plugin Editor",
+	"ChordTable Editor",
 	QT_TRANSLATE_NOOP( "ChordTable Editor",
 	"Edits the Chordtable" ),
 	"Riki Sluga <jaz/at/rikis/dot/net>",
@@ -122,14 +122,14 @@ void chordtableEditor::reloadComboModel()
 ******************************************************************************************************/
 
 
-chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
+ChordTableEditorView::ChordTableEditorView( ToolPlugin * _tool ) :
 	ToolPluginView( _tool  ),
 	m_chordTableEditor( castModel<chordtableEditor>() ),
 	m_chordTable( m_chordTableEditor->m_chordTable ),
 	m_chord(NULL),
 	m_chordsComboBox( new ComboBox() )
 {
-	setWindowIcon( embed::getIconPixmap( "controller" ) ); //menjaj icono!!
+	setWindowIcon( PluginPixmapLoader( "logo" ).pixmap() ); //menjaj icono!!
 	setWindowTitle( tr( "ChordTable Editor" ) );
 
 	setAutoFillBackground( true );
@@ -239,6 +239,7 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 
 	//--------------
 
+	connect( gui, SIGNAL(genericSignal(int)), this,SLOT(setChordSelection(int)));
 
 
 	setWhatsThis( tr(
@@ -265,7 +266,7 @@ chordtableEditorView::chordtableEditorView( ToolPlugin * _tool ) :
 }
 
 
-void chordtableEditorView::loadChord()
+void ChordTableEditorView::loadChord()
 {
 
 	//taking selected value from the comboboxmodel
@@ -309,14 +310,14 @@ void chordtableEditorView::loadChord()
 	m_chordsWidget->adjustSize();
 }
 
-void chordtableEditorView::reloadCombo()
+void ChordTableEditorView::reloadCombo()
 {
 	m_chordTableEditor->reloadComboModel();
 	//emits signal combo model data has changed
 	Engine::chordTable()->emitChordNameChanged();
 }
 
-void chordtableEditorView::resetChords()
+void ChordTableEditorView::resetChords()
 {
 	Engine::getSong()->stop();
 	//setting combomodel value to 0;
@@ -325,24 +326,24 @@ void chordtableEditorView::resetChords()
 	reloadCombo();
 }
 
-void chordtableEditorView::removeSemiTone(int i)
+void ChordTableEditorView::removeSemiTone(int i)
 {
 	Engine::getSong()->stop();
 	m_chord->removeSemiTone(i);
 }
 
-void chordtableEditorView::addChordSemiTone()
+void ChordTableEditorView::addChordSemiTone()
 {
 	m_chord->addSemiTone();
 }
 
-void chordtableEditorView::cloneSemiTone(int i)
+void ChordTableEditorView::cloneSemiTone(int i)
 {
 	ChordSemiTone *cst = new ChordSemiTone(m_chord->at(i));
 	m_chord->insertSemiTone(cst,i);
 }
 
-void chordtableEditorView::saveFile()
+void ChordTableEditorView::saveFile()
 {
 	FileDialog sfd( this, tr( "Save preset" ), "", tr( "Chord Table XML preset file (*.ctd)" ) );
 
@@ -375,7 +376,7 @@ void chordtableEditorView::saveFile()
 	}
 }
 
-void chordtableEditorView::openFile()
+void ChordTableEditorView::openFile()
 {
 	Engine::getSong()->stop();
 	FileDialog sfd( this, tr( "Open preset" ), "", tr( "Chord Table XML preset file (*.ctd)" ) );
@@ -409,7 +410,7 @@ void chordtableEditorView::openFile()
 	}
 }
 
-void chordtableEditorView::newChord()
+void ChordTableEditorView::newChord()
 {
 	Engine::getSong()->stop();
 	m_chordTable->cloneChord(-1);
@@ -417,7 +418,7 @@ void chordtableEditorView::newChord()
 	m_chordsComboBox->model()->setValue(m_chordTable->size());
 }
 
-void chordtableEditorView::cloneChord()
+void ChordTableEditorView::cloneChord()
 {
 	Engine::getSong()->stop();
 	m_chordTable->cloneChord(m_chordsComboBox->model()->value());
@@ -425,25 +426,25 @@ void chordtableEditorView::cloneChord()
 	m_chordsComboBox->model()->setValue(m_chordTable->size());
 }
 
-void chordtableEditorView::removeChord()
+void ChordTableEditorView::removeChord()
 {
 	Engine::getSong()->stop();
 	m_chordTable->removeChord(m_chordsComboBox->model()->value());
 	reloadCombo();
 }
 
-void chordtableEditorView::changeText( QString _text )
+void ChordTableEditorView::changeText( QString _text )
 {
 	m_chord->m_name=_text;
 	emit lineEditChange();
 }
 
-void chordtableEditorView::setChordSelection( int i )
+void ChordTableEditorView::setChordSelection( int i )
 {
 	m_chordsComboBox->model()->setValue( i );
 }
 
-chordtableEditorView::~chordtableEditorView()
+ChordTableEditorView::~ChordTableEditorView()
 {
 }
 
@@ -625,6 +626,7 @@ chordNoteWidget::chordNoteWidget(chordNoteModel * _model, QWidget *_parent) :
 
 chordNoteWidget::~chordNoteWidget()
 {
+	//don't think this is necessary, the parent widget deletes the children automatically
 	delete m_volumeKnob;
 	delete m_keyLcd;
 	delete m_keySlider;

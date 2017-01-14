@@ -28,6 +28,7 @@
 #include <QtCore/QObject>
 
 #include "export.h"
+#include "PluginView.h"
 
 class QLabel;
 
@@ -39,6 +40,7 @@ class MainWindow;
 class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
+class ChordTableEditorView;
 
 class EXPORT GuiApplication : public QObject
 {
@@ -58,6 +60,18 @@ public:
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
+	void setChordTableEditorView(PluginView * _view);
+	PluginView* getChordTableEditorView() { return m_chordTableEditorView; }
+
+	void emitGenericSignal(int i)
+	{
+		emit genericSignal(i);
+	}
+signals:
+	//a signal used as a workaround for communication between plugins/classes etc.
+	void genericSignal(int i);
+
+
 public slots:
 	void displayInitProgress(const QString &msg);
 
@@ -66,6 +80,8 @@ private slots:
 
 private:
 	static GuiApplication* s_instance;
+
+	PluginView * m_chordTableEditorView;
 
 	MainWindow* m_mainWindow;
 	FxMixerView* m_fxMixerView;
@@ -76,6 +92,7 @@ private:
 	ProjectNotes* m_projectNotes;
 	ControllerRackView* m_controllerRackView;
 	QLabel* m_loadingProgressLabel;
+
 };
 
 #define gui GuiApplication::instance()
