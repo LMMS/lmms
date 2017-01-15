@@ -1,26 +1,27 @@
 /*
- * InstrumentFunctions.cpp - models for instrument-function-tab
- *
- * Copyright ( c ) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- *
- * This file is part of LMMS - http://lmms.io
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or ( at your option ) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program ( see COPYING ); if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA.
- *
- */
+* ChordTable.h - The notestacking/arpeggio chord classes
+*
+* Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+* Copyright (c) 2016-2017 Riki Sluga <rikislav/at/gmail.com>
+*
+* This file is part of LMMS - http://lmms.io
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* General Public License for more details.
+*
+* You should have received a copy of the GNU General Public
+* License along with this program ( see COPYING ); if not, write to the
+* Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+* Boston, MA 02110-1301 USA.
+*
+*/
 
 #include <QDir>
 #include <QFile>
@@ -37,26 +38,26 @@
  *
  * The ChordSemiTone class
  *
-******************************************************************************************************/
-ChordSemiTone::ChordSemiTone( Chord *_parent ) :
+ ******************************************************************************************************/
+ChordSemiTone::ChordSemiTone( Chord * _parent ) :
 	Model( _parent ),
-	key( new IntModel( KeyDefault, KeyMin, KeyMax, _parent, tr( "Key " )+_parent->m_name ) ),
-	vol( new FloatModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume " )+_parent->m_name ) ),
-	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning " )+_parent->m_name ) ),
-	active( new BoolModel( true, _parent, tr( "Active " )+_parent->m_name ) ),
-	silenced( new BoolModel( false, _parent, tr( "Silenced " )+_parent->m_name ) ),
-	bare( new BoolModel( false, _parent, tr( "Bare " )+_parent->m_name ) )
+	key( new IntModel( KeyDefault, KeyMin, KeyMax, _parent, tr( "Key " ) + _parent->m_name ) ),
+	vol( new FloatModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume " ) + _parent->m_name ) ),
+	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning " ) + _parent->m_name ) ),
+	active( new BoolModel( true, _parent, tr( "Active " ) + _parent->m_name ) ),
+	silenced( new BoolModel( false, _parent, tr( "Silenced " ) + _parent->m_name ) ),
+	bare( new BoolModel( false, _parent, tr( "Bare " ) + _parent->m_name ) )
 {
 }
 
-ChordSemiTone::ChordSemiTone( ChordSemiTone *_copy ) :
+ChordSemiTone::ChordSemiTone( ChordSemiTone * _copy ) :
 	Model( _copy->parentModel() ),
-	key( new IntModel( KeyDefault, KeyMin, KeyMax, _copy->getChord(), tr( "Key " )+_copy->getChord()->m_name ) ),
-	vol( new FloatModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, _copy->getChord(), tr( "Volume " )+_copy->getChord()->m_name ) ),
-	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _copy->getChord(), tr( "Panning " )+_copy->getChord()->m_name ) ),
-	active( new BoolModel( true, _copy->getChord(), tr( "Active " )+_copy->getChord()->m_name ) ),
-	silenced( new BoolModel( false, _copy->getChord(), tr( "Silenced " )+_copy->getChord()->m_name ) ),
-	bare( new BoolModel( false, _copy->getChord(), tr( "Bare " )+_copy->getChord()->m_name ) )
+	key( new IntModel( KeyDefault, KeyMin, KeyMax, _copy->getChord(), tr( "Key " ) + _copy->getChord()->m_name ) ),
+	vol( new FloatModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, _copy->getChord(), tr( "Volume " ) + _copy->getChord()->m_name ) ),
+	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _copy->getChord(), tr( "Panning " ) + _copy->getChord()->m_name ) ),
+	active( new BoolModel( true, _copy->getChord(), tr( "Active " ) + _copy->getChord()->m_name ) ),
+	silenced( new BoolModel( false, _copy->getChord(), tr( "Silenced " ) + _copy->getChord()->m_name ) ),
+	bare( new BoolModel( false, _copy->getChord(), tr( "Bare " ) + _copy->getChord()->m_name ) )
 {
 	key->setValue( _copy->key->value() );
 	vol->setValue( _copy->vol->value() );
@@ -66,20 +67,21 @@ ChordSemiTone::ChordSemiTone( ChordSemiTone *_copy ) :
 	bare->setValue( _copy->bare->value() );
 }
 
-ChordSemiTone::ChordSemiTone( Chord *_parent, QString _string ) :
+ChordSemiTone::ChordSemiTone( Chord * _parent, QString _string ) :
 	Model( _parent ),
-	key( new IntModel( KeyDefault, KeyMin, KeyMax, _parent, tr( "Key " )+_parent->m_name ) ),
-	vol( new FloatModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume " )+_parent->m_name ) ),
-	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning " )+_parent->m_name ) ),
-	active( new BoolModel( true, _parent, tr( "Active " )+_parent->m_name ) ),
-	silenced( new BoolModel( false, _parent, tr( "Silenced " )+_parent->m_name ) ),
-	bare( new BoolModel( false, _parent, tr( "Bare " )+_parent->m_name ) )
+	key( new IntModel( KeyDefault, KeyMin, KeyMax, _parent, tr( "Key " ) + _parent->m_name ) ),
+	vol( new FloatModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, _parent, tr( "Volume " ) + _parent->m_name ) ),
+	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning " ) + _parent->m_name ) ),
+	active( new BoolModel( true, _parent, tr( "Active " ) + _parent->m_name ) ),
+	silenced( new BoolModel( false, _parent, tr( "Silenced " ) + _parent->m_name ) ),
+	bare( new BoolModel( false, _parent, tr( "Bare " ) + _parent->m_name ) )
 {
 	parseString( _string );
 }
 
 ChordSemiTone::~ChordSemiTone()
 {
+	//should already be deleted by their parent object
 	delete bare;
 	delete silenced;
 	delete active;
@@ -123,33 +125,33 @@ void ChordSemiTone::parseString( QString _string )
  *
  * The Chord class
  *
-******************************************************************************************************/
-Chord::Chord( Model *_parent ) :
+ ******************************************************************************************************/
+Chord::Chord( Model * _parent ) :
 	Model ( _parent ),
 	m_name( "empty" )
 {
 }
 
-Chord::Chord( Model *_parent, QString _name, QString _string ) :
+Chord::Chord( Model * _parent, QString _name, QString _string ) :
 	Model ( _parent )
 {
 	m_name =_name;
 	parseString( _string );
 }
 
-Chord::Chord( Model *_parent, QString _name ) :
+Chord::Chord( Model * _parent, QString _name ) :
 	Model ( _parent )
 {
 	m_name =_name;
 }
 
 
-Chord::Chord( Chord *_copy, QString _name ) :
+Chord::Chord( Chord * _copy, QString _name ) :
 	Model( _copy->parentModel() )
 {
 	m_name = _name;
-	ChordSemiTone *csm;
-	for ( int i=0;i<_copy->size();i++ )
+	ChordSemiTone * csm;
+	for ( int i=0;i<_copy->size(); i++ )
 	{
 		csm= new ChordSemiTone( _copy->at( i ) );
 		push_back( csm );
@@ -158,7 +160,8 @@ Chord::Chord( Chord *_copy, QString _name ) :
 
 Chord::~Chord()
 {
-	for( int i=0;i<this->size();i++ )
+	//unnecessary?
+	for( int i=0;i<this->size(); i++ )
 	{
 		delete at( i );
 	}
@@ -167,8 +170,8 @@ Chord::~Chord()
 void Chord::saveSettings( QDomDocument &_doc, QDomElement &_parent )
 {
 	_parent.setAttribute( "name", m_name );
-	ChordSemiTone *cst;
-	for( int i=0;i<this->size();i++ )
+	ChordSemiTone * cst;
+	for( int i=0; i < this->size(); i++ )
 	{
 		QDomElement semitone = _doc.createElement( QString( "semitone" ) );
 		_parent.appendChild( semitone );
@@ -192,12 +195,12 @@ void Chord::loadSettings( const QDomElement &_this )
 	QDomElement semitone;
 
 	//the chord to be read into
-	ChordSemiTone *cst;
+	ChordSemiTone * cst;
 	while ( !node.isNull() )
 	{
 		semitone = node.toElement();
 		//if the vector is empty creates new semitone, otherwise it uses the existing one.
-		if ( i<size() )
+		if ( i  < size() )
 		{
 			cst=at( i );
 			cst->loadSettings( semitone );
@@ -207,11 +210,11 @@ void Chord::loadSettings( const QDomElement &_this )
 			cst->loadSettings( semitone );
 			push_back( cst );
 		}
-		i++;
+		 i++ ;
 		node = node.nextSibling();
 	}
 	//removing the extra semitones if they are present
-	if ( i<size() )
+	if ( i < size() )
 	{
 		for ( int j = size() - 1; j >= i; j-- )
 		{
@@ -272,7 +275,7 @@ void Chord::parseString( QString _string )
 			break;
 		}
 		// reads the data into semitone and pushes it into the vector
-		ChordSemiTone *cst = new ChordSemiTone( this );
+		ChordSemiTone * cst = new ChordSemiTone( this );
 		push_back( cst );
 	}
 }
@@ -281,7 +284,7 @@ void Chord::parseString( QString _string )
  *
  * The ChordTable class
  *
-******************************************************************************************************/
+ ******************************************************************************************************/
 ChordTable::ChordTable( Model * _parent ) :
 	Model( _parent )
 {
@@ -326,11 +329,11 @@ void ChordTable::loadSettings( const QDomElement &_this )
 			chord->loadSettings( chord_element );
 			push_back( chord );
 		}
-		i++;
+		 i++ ;
 		node = node.nextSibling();
 	}
 	//removing the extra chords if they are present
-	if ( i<size() )
+	if ( i < size() )
 	{
 		for ( int j = size()-1; j >= i; j-- )
 		{
@@ -424,7 +427,7 @@ bool ChordTable::readXML()
 
 void ChordTable::loadFactoryPreset()
 {
-	ConfigManager* confMgr = ConfigManager::inst();
+	ConfigManager * confMgr = ConfigManager::inst();
 
 	QString m_path = confMgr->factoryPresetsDir() + "ChordTable/ChordTable.ctd";
 

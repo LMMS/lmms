@@ -60,11 +60,11 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	QLabel* chordLabel = new QLabel( tr( "Chord:" ) );
 	chordLabel->setFont( pointSize<8>( chordLabel->font() ) );
 
-	QPushButton * editButton= new QPushButton(tr("Edit"));
+	QPushButton* editButton= new QPushButton( tr("Edit") );
 	editButton->setFont( pointSize<8>( editButton->font() ) );
+	editButton->setWhatsThis( tr( "Opens the ChordTable editor." ) );
 
 	connect( editButton, SIGNAL( clicked() ),this, SLOT( showChordTableEditor() ));
-
 
 	m_chordRangeKnob->setLabel( tr( "RANGE" ) );
 	m_chordRangeKnob->setHintText( tr( "Chord range:" ), " " + tr( "octave(s)" ) );
@@ -73,6 +73,7 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 			"The selected chord will be played within specified "
 			"number of octaves." ) );
 
+	//TO DO: understand better gridlayout to improve appearance
 	mainLayout->addWidget( chordLabel, 0, 0, 1 ,1 );
 	mainLayout->addWidget( editButton, 0, 1, 1 , 1 );
 	mainLayout->setColumnStretch( 2, 4 );
@@ -93,7 +94,7 @@ void InstrumentFunctionNoteStackingView::showChordTableEditor()
 	gui->getChordTableEditorView()->show();
 	gui->getChordTableEditorView()->parentWidget()->show();
 	gui->getChordTableEditorView()->setFocus();
-	gui->emitGenericSignal(m_cc->m_chordsModel.value());
+	gui->emitGenericSignal_1(m_cc->m_chordsModel.value());
 }
 
 
@@ -210,10 +211,11 @@ InstrumentFunctionArpeggioView::InstrumentFunctionArpeggioView( InstrumentFuncti
 
 	QPushButton * editButton= new QPushButton(tr("Edit"));
 	editButton->setFont( pointSize<8>( editButton->font() ) );
+	editButton->setWhatsThis( tr( "Opens the ChordTable editor." ) );
 
 	connect( editButton, SIGNAL( clicked() ),this, SLOT( showChordTableEditor() ));
 
-	mainLayout->addWidget( arpChordLabel, 0, 0, 1, 1);
+	mainLayout->addWidget( arpChordLabel, 0, 0, 1, 1 );
 	mainLayout->addWidget( m_arpComboBox, 1, 0, 1, 2 );
 	mainLayout->addWidget( arpDirectionLabel, 3, 0, 1, 1 );
 	mainLayout->addWidget( m_arpDirectionComboBox, 4, 0, 1, 2 );
@@ -264,5 +266,5 @@ void InstrumentFunctionArpeggioView::showChordTableEditor()
 	gui->getChordTableEditorView()->show();
 	gui->getChordTableEditorView()->parentWidget()->show();
 	gui->getChordTableEditorView()->setFocus();
-	gui->emitGenericSignal(m_a->m_arpModel.value());
+	gui->emitGenericSignal_1(m_a->m_arpModel.value());
 }

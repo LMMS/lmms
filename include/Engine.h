@@ -122,6 +122,7 @@ public:
 signals:
 	void initProgress(const QString &msg);
 
+
 private:
 	// small helper function which sets the pointer to NULL before actually deleting
 	// the object it refers to

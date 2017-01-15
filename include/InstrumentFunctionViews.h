@@ -48,6 +48,7 @@ public:
 	virtual ~InstrumentFunctionNoteStackingView();
 
 public slots:
+	//To display the chordTableEditorPlugin
 	void showChordTableEditor();
 
 private:
@@ -73,6 +74,7 @@ public:
 	virtual ~InstrumentFunctionArpeggioView();
 
 public slots:
+	//To display the chordTableEditorPlugin
 	void showChordTableEditor();
 
 private:

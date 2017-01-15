@@ -365,6 +365,7 @@ void MainWindow::finalize()
 		tp = ToolPlugin::instantiate( desc->name, /*this*/NULL )->createView(this);
 		if ( !strcmp(desc->name, "chordtableeditor") )
 		{
+			//setting up the gui reference to the ChordTable editor plugin
 			gui->setChordTableEditorView( tp );
 		}
 		m_tools.push_back( tp );

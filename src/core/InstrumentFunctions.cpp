@@ -47,8 +47,7 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 	}
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( m_chordTable,SIGNAL(chordNameChanged()),this,SLOT (updateChordTable()));
-
+	connect( m_chordTable, SIGNAL( chordNameChanged() ), this, SLOT ( updateChordTable() ) );
 }
 
 InstrumentFunctionNoteStacking::~InstrumentFunctionNoteStacking()
@@ -62,33 +61,30 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 	// Getting base note volume and panning
 	const volume_t base_note_vol = _n->getVolume();
 	const panning_t base_note_pan = _n->getPanning();
-	//
-	// we add chord-subnotes to note if either the note is a base-note and
-	// arpeggio is not used or the note is part of an arpeggio
+	// we add chord-subnotes to note if either note is a base-note and
+	// arpeggio is not used or note is part of an arpeggio
 	// at the same time we only add sub-notes if nothing of the note was
 	// played yet, because otherwise we would add chord-subnotes every
 	// time an audio-buffer is rendered...
-	if ((_n->origin() == NotePlayHandle::OriginArpeggio ||
-			 (_n->hasParent() == false &&
-				_n->instrumentTrack()->isArpeggioEnabled() == false)) &&
-			_n->totalFramesPlayed() == 0 && m_chordsEnabledModel.value() == true &&
-			!_n->isReleased())
+	if( ( _n->origin() == NotePlayHandle::OriginArpeggio || ( _n->hasParent() == false && _n->instrumentTrack()->isArpeggioEnabled() == false ) ) &&
+			_n->totalFramesPlayed() == 0 &&
+			m_chordsEnabledModel.value() == true && ! _n->isReleased() )
 	{
-
-		// get the selected chord then insert sub-notes for the chord
+		// then insert sub-notes for chord
 		const int selected_chord = m_chordsModel.value();
 
-		for (int octave_cnt = 0; octave_cnt < m_chordRangeModel.value();++octave_cnt)
+		for( int octave_cnt = 0; octave_cnt < m_chordRangeModel.value(); ++octave_cnt )
 		{
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
 
 			Chord *c = m_chordTable->at(selected_chord);
 			ChordSemiTone *cst;
+
 			// process all notes in the chord
-			for (int i=0;i<c->size();i++)
+			for ( int i = 0; i < c->size(); ++i )
 			{
-				cst=c->at(i);
-				if (cst->active->value())
+				cst=c->at( i );
+				if ( cst->active->value() )
 				{ // if the note is active process it, otherwise skip
 
 					// getting the base note key
@@ -98,47 +94,48 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 					volume_t sub_note_vol;
 					panning_t sub_note_pan;
 
-					if (cst->bare->value())
-					{ // forget other settings but key, get the original
-						// data
+					if ( cst->bare->value() )
+					{ // forget other settings but key, get the original data
 						sub_note_vol = base_note_vol;
 						sub_note_pan = base_note_pan;
 					}
 					else
 					{
 						// The note is silenced: playing it with no volume
-						if (cst->silenced->value())
+						if ( cst->silenced->value() )
 						{
 							sub_note_vol = 0;
 							sub_note_pan = 0;
 						}
 						else
-						{ // all modifications active, add interval to sub-note-key,
-							// volume, panning
-							sub_note_vol = base_note_vol * ((float)cst->vol->value() / (float)100);
+						{ // all modifications active, add interval to sub-note-key, volume, panning
+							sub_note_vol = base_note_vol * ( (float)cst->vol->value() / (float)100 );
 							sub_note_pan = cst->pan->value();
 						}
 					}
 					// maybe we're out of range -> let's get outta
 					// here!
-					if (sub_note_key > NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
+					if ( sub_note_key > NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns() )
 					{
 						break;
 					}
 					// create copy of base-note
-					Note note_copy(_n->length(), 0, sub_note_key, sub_note_vol, sub_note_pan, _n->detuning());
+					Note note_copy( _n->length(), 0, sub_note_key, sub_note_vol, sub_note_pan, _n->detuning() );
 
-					// create sub-note-play-handle, only note is
-					// different
+					// create sub-note-play-handle, only note is different
 
-					Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
-																					 _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy, _n,
-																					 -1, NotePlayHandle::OriginNoteStacking));
+					Engine::mixer()->addPlayHandle( 
+							NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
+										_n, -1, NotePlayHandle::OriginNoteStacking )
+							);
 				}
 			}
 		}
 	}
 }
+
+
+
 
 void InstrumentFunctionNoteStacking::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
@@ -146,6 +143,9 @@ void InstrumentFunctionNoteStacking::saveSettings( QDomDocument & _doc, QDomElem
 	m_chordsModel.saveSettings( _doc, _this, "chord" );
 	m_chordRangeModel.saveSettings( _doc, _this, "chordrange" );
 }
+
+
+
 
 void InstrumentFunctionNoteStacking::loadSettings( const QDomElement & _this )
 {
@@ -161,10 +161,10 @@ void InstrumentFunctionNoteStacking::updateChordTable()
 	m_chordsModel.clear();
 	for( int i = 0; i < m_chordTable->size(); i++ )
 	{
-		m_chordsModel.addItem( m_chordTable->at(i)->getName() );
+		m_chordsModel.addItem( m_chordTable->at( i )->getName() );
 	}
 	//setting back the value
-	m_chordsModel.setValue(v);
+	m_chordsModel.setValue( v );
 }
 
 
@@ -183,9 +183,9 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 {
 
 	m_chordTable = Engine::chordTable();
-	for( int i = 0; i < m_chordTable->size(); i++ )
+	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
-		m_arpModel.addItem( m_chordTable->at(i)->getName() );
+		m_arpModel.addItem( m_chordTable->at( i )->getName() );
 	}
 
 	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
@@ -200,7 +200,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( m_chordTable,SIGNAL(chordNameChanged()),this,SLOT (updateChordTable()));
+	connect( m_chordTable, SIGNAL( chordNameChanged() ), this, SLOT ( updateChordTable() ) );
 
 }
 
@@ -214,10 +214,10 @@ void InstrumentFunctionArpeggio::updateChordTable()
 
 	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
-		m_arpModel.addItem( m_chordTable->at(i)->getName() );
+		m_arpModel.addItem( m_chordTable->at( i )->getName() );
 	}
 	//setting back the value
-	m_arpModel.setValue(v);
+	m_arpModel.setValue( v );
 }
 
 
@@ -244,6 +244,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		return;
 	}
 
+
 	const int selected_arp = m_arpModel.value();
 
 	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );
@@ -260,8 +261,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 	}
 
-	const int cur_chord_size = m_chordTable->at(selected_arp)->size();
-	const int range = (int)(cur_chord_size * m_arpRangeModel.value());
+	const int cur_chord_size = m_chordTable->at( selected_arp )->size();
+	const int range = (int)( cur_chord_size * m_arpRangeModel.value() );
 	const int total_range = range * cnphv.size();
 
 	// number of frames that every note should be played
@@ -384,23 +385,21 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		}
 
 		// cst: getting the processed semitone
-		ChordSemiTone *cst = m_chordTable->at(selected_arp)->at(cur_arp_idx % cur_chord_size);
+		ChordSemiTone * cst = m_chordTable->at( selected_arp )->at( cur_arp_idx % cur_chord_size );
 
 		// The note is active, process all data
-		if (cst->active->value())
+		if ( cst->active->value() )
 		{
 
 			// now calculate final key for our arp-note
-			//			const int sub_note_key = base_note_key +
-			//															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
+			//			const int sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave +
 			//															 cst.key;
-			const int sub_note_key = base_note_key +
-															 (cur_arp_idx / cur_chord_size) * KeysPerOctave +
+			const int sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave +
 															 cst->key->value();
 			volume_t sub_note_vol;
 			panning_t sub_note_pan;
 			// if the note is bare we don't intervene into panning, volume etc...
-			if (cst->bare->value())
+			if ( cst->bare->value() )
 			{
 				sub_note_vol = base_note_vol;
 				sub_note_pan = base_note_pan;
@@ -408,7 +407,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			else
 			{
 				// The note is silenced: playing it with no volume
-				if (cst->silenced->value())
+				if ( cst->silenced->value() )
 				{
 					sub_note_vol = 0;
 					sub_note_pan = 0;
@@ -416,34 +415,32 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				else
 				{ // all modifications active, add interval to sub-note-key,
 					// volume, panning
-					sub_note_vol = base_note_vol * ((float)cst->vol->value() / (float)100);
+					sub_note_vol = base_note_vol * ( (float)cst->vol->value() / (float)100 );
 					sub_note_pan = cst->pan->value();
 				}
 			}
 
 			// range-checking
-			if (sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns())
+			if ( sub_note_key >= NumKeys || sub_note_key < 0 || Engine::mixer()->criticalXRuns() )
 			{
 				continue;
 			}
 
 			float vol_level = 1.0f;
-			if (_n->isReleased())
+			if ( _n->isReleased() )
 			{
-				vol_level = _n->volumeLevel(cur_frame + gated_frames);
+				vol_level = _n->volumeLevel( cur_frame + gated_frames );
 			}
 
 			// create new arp-note
 
 			// create sub-note-play-handle, only ptr to note is different
 			// and is_arp_note=true
-			Engine::mixer()->addPlayHandle(NotePlayHandleManager::acquire(
-																			 _n->instrumentTrack(),
-																			 frames_processed, gated_frames,
-																			 Note(MidiTime(0), MidiTime(0), sub_note_key,
-																						(volume_t)qRound(sub_note_vol * vol_level), sub_note_pan,
-																						_n->detuning()),
-																			 _n, -1, NotePlayHandle::OriginArpeggio));
+			Engine::mixer()->addPlayHandle( NotePlayHandleManager::acquire( _n->instrumentTrack(),
+																			frames_processed, gated_frames,
+																			Note(MidiTime( 0 ), MidiTime( 0 ), sub_note_key,
+																			(volume_t)qRound( sub_note_vol * vol_level ), sub_note_pan,
+																			_n->detuning() ),_n, -1, NotePlayHandle::OriginArpeggio ) );
 
 			// update counters
 			frames_processed += arp_frames;

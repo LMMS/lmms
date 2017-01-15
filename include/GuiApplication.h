@@ -59,16 +59,21 @@ public:
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
-	void setChordTableEditorView(PluginView * _view);
+	//As at present the editor is a toolPlugin we initiate it 
+	//while loading in gui/MainWindow.cpp:368
+	void setChordTableEditorView( PluginView * _view );
+
 	PluginView* getChordTableEditorView() { return m_chordTableEditorView; }
 
-	void emitGenericSignal(int i)
+	//the convenience method which emits the signal below
+	void emitGenericSignal_1(int i)
 	{
-		emit genericSignal(i);
+		emit genericSignal_1( i );
 	}
+
 signals:
-	//a signal used as a workaround for communication between plugins/classes etc.
-	void genericSignal(int i);
+	//lazy workaround for easy communication
+	void genericSignal_1( int i );
 
 
 public slots:
@@ -80,7 +85,7 @@ private slots:
 private:
 	static GuiApplication* s_instance;
 
-	PluginView * m_chordTableEditorView;
+	PluginView* m_chordTableEditorView;
 
 	MainWindow* m_mainWindow;
 	FxMixerView* m_fxMixerView;

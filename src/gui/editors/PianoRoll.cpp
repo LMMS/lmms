@@ -237,7 +237,7 @@ PianoRoll::PianoRoll() :
 	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 
 	//on chord Table change we reload the chord and scale combo boxes models
-	connect( Engine::chordTable(),SIGNAL(chordNameChanged()),this,SLOT (updateChordTable()));
+	connect( Engine::chordTable(), SIGNAL(chordNameChanged()), this, SLOT (updateChordTable()));
 
 
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
@@ -425,7 +425,7 @@ PianoRoll::PianoRoll() :
 
 	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
-	for( const Chord * chord : *m_chordTable )
+	for( const Chord * chord : * m_chordTable )
 	{
 		if( ! chord->isScale() )
 		{
@@ -475,8 +475,7 @@ void PianoRoll::updateChordTable()
 	//getting back the previously selected value
 	m_scaleModel.setValue( v );
 
-
-	// Reload changed chord model
+	// Reloading changed chord model
 
 	//getting the selected value
 	v= m_chordModel.value();
@@ -492,7 +491,6 @@ void PianoRoll::updateChordTable()
 			m_chordModel.addItem( chord->getName() );
 		}
 	}
-
 	m_chordModel.setValue( v );
 }
 

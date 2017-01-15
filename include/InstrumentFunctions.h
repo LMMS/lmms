@@ -25,25 +25,14 @@
 #ifndef INSTRUMENT_FUNCTIONS_H
 #define INSTRUMENT_FUNCTIONS_H
 
-#include <QStringList>
-
-#include "ConfigManager.h"
-#include "volume.h"
-#include "panning.h"
-
 #include "JournallingObject.h"
-#include "lmms_basics.h"
-#include "AutomatableModel.h"
 #include "TempoSyncKnobModel.h"
 #include "ComboBoxModel.h"
-
 
 class InstrumentTrack;
 class NotePlayHandle;
 class Model;
 class ChordTable;
-class Chord;
-
 
 
 class InstrumentFunctionNoteStacking : public Model, public JournallingObject
@@ -57,10 +46,9 @@ public:
 
 	void processNote( NotePlayHandle* n );
 
+
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
-
-
 
 	inline virtual QString nodeName() const
 	{
@@ -73,7 +61,6 @@ public slots:
 
 
 private:
-
 	ChordTable *m_chordTable;
 	BoolModel m_chordsEnabledModel;
 	ComboBoxModel m_chordsModel;
@@ -116,7 +103,7 @@ public:
 	}
 
 public slots:
-	//reloads the chord table into the widget model when data changes
+	//reloads the chords combo model
 	void updateChordTable();
 
 private:

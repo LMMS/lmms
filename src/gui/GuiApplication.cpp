@@ -39,7 +39,7 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
-#include "ToolPluginView.h"
+#include "PluginView.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -59,7 +59,7 @@ void GuiApplication::setChordTableEditorView(PluginView *_view)
 
 
 GuiApplication::GuiApplication() :
-	m_chordTableEditorView( NULL )
+	m_chordTableEditorView( NULL ) //awaiting initialization
 {
 	// prompt the user to create the LMMS working directory (e.g. ~/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&

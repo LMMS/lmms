@@ -71,7 +71,7 @@ public:
 	chordNoteModel * m_chordNoteModel;
 	Knob * m_volumeKnob;
 	Knob * m_panKnob;
-	//
+
 	LcdWidget * m_keyLcd;
 	AutomatableSlider * m_keySlider;
 	LedCheckBox * m_activeLed;
@@ -134,6 +134,7 @@ public:
 		return new chordNoteWidget( this, _parent );
 	}
 
+	//Don't need this
 	virtual void saveSettings( QDomDocument & doc, QDomElement & element )
 	{
 		Q_UNUSED( doc )
@@ -175,6 +176,9 @@ class ChordTableEditorView : public ToolPluginView
 public:
 	ChordTableEditorView( ToolPlugin * _tool );
 	virtual ~ChordTableEditorView();
+
+	//displays a confirmation dialogue
+	int confirmDialog( QString _title, QString _text );
 
 public slots:
 	//loads the chord into the widget
@@ -222,7 +226,6 @@ private:
 	//the widget layout where to put all the chordNoteWidgets
 	QHBoxLayout * m_chordsWidgetLayout;
 	QWidget * m_chordsWidget;
-
 
 	//The combobox of the available chord combinations
 	ComboBox * m_chordsComboBox;

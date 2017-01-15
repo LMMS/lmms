@@ -52,7 +52,6 @@ ChordTable * LmmsCore::s_chordTable = NULL;
 
 
 
-
 void LmmsCore::init( bool renderOnly )
 {
 	LmmsCore *engine = inst();
