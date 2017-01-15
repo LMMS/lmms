@@ -355,7 +355,7 @@ float EqEffect::peakBand( float minF, float maxF, EqAnalyser *fft, int sr )
 		}
 	}
 
-	return ( peak + 100 ) / 100;
+	return ( peak + 60 ) / 100;
 }
 
 
