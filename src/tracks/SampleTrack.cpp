@@ -557,7 +557,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 SampleTrack::SampleTrack( TrackContainer* tc ) :
 	Track( Track::SampleTrack, tc ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
+	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
 							tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
