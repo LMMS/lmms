@@ -320,7 +320,7 @@ void ChordTableEditorView::resetChords()
 {
 	if ( confirmDialog( tr( "Resetting chords" ), tr( "All the chords and their automation are being reset "
 																										"to their factory values. All the newly created chords "
-																										"will be deleted. Are you sure?" ) ) == QMessageBox::Ok )
+																										"will be deleted. \nAre you sure?" ) ) == QMessageBox::Ok )
 	{
 		Engine::getSong()->stop();
 		//setting combomodel value to 0;
@@ -386,7 +386,7 @@ void ChordTableEditorView::saveFile()
 void ChordTableEditorView::openFile()
 {
 	if ( confirmDialog( tr( "Open File" ), tr( "By opening a new file all changes to this ChordTable"
-																						 " will be lost. Are you sure?" ) ) == QMessageBox::Ok )
+																						 " will be lost. \nAre you sure?" ) ) == QMessageBox::Ok )
 	{
 
 		Engine::getSong()->stop();
@@ -440,7 +440,7 @@ void ChordTableEditorView::cloneChord()
 
 void ChordTableEditorView::removeChord()
 {
-	if ( confirmDialog( tr( "Remove Chord" ), tr( "This chord will be removed. Are you sure?" ) ) == QMessageBox::Ok )
+	if ( confirmDialog( tr( "Remove Chord" ), tr( "This chord will be removed. \nAre you sure?" ) ) == QMessageBox::Ok )
 	{
 		Engine::getSong()->stop();
 		m_chordTable->removeChord( m_chordsComboBox->model()->value() );
@@ -467,8 +467,8 @@ int ChordTableEditorView::confirmDialog(QString _title, QString _text)
 {
 	QMessageBox msgBox;
 	msgBox.setIcon( QMessageBox::Warning );
-	msgBox.setText(_title);
-	msgBox.setInformativeText(_text);
+	msgBox.setWindowTitle(_title);
+	msgBox.setText(_text);
 	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 	msgBox.setDefaultButton(QMessageBox::Ok);
 	return msgBox.exec();
@@ -489,7 +489,7 @@ chordNoteModel::chordNoteModel( Model *_parent, ChordSemiTone *_semiTone, int _p
 {
 }
 
-//the position of the semitone in the semitones vector
+//the position of the SemiTone in the semitones vector
 int chordNoteModel::position() const
 {
 	return m_position;
@@ -517,11 +517,11 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	m_position = m_chordNoteModel->position();
 	setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
-	m_vLayout = new QVBoxLayout( _parent );
+	m_vLayout = new QVBoxLayout( this );
 	m_vLayout->setSizeConstraint( QLayout::SetFixedSize );
 	setLayout( m_vLayout );
 
-	m_Frame = new QFrame( _parent );
+	m_Frame = new QFrame( this );
 	m_Frame->setFrameStyle( QFrame::Panel | QFrame::Raised );
 	m_Frame->setLineWidth( 2 );
 	m_vLayout->addWidget( m_Frame );
@@ -540,18 +540,19 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	m_volumeKnob->setModel( m_chordNoteModel->m_semiTone->vol );
 	m_volumeKnob->setEnabled( true );
 	m_volumeKnob->setHintText( tr( "Volume knob:" ), "" );
-	m_volumeKnob->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
-																	"the input signal and the effect signal that "
-																	"forms the output." ) );
+	m_volumeKnob->setWhatsThis( tr( "This automatable knob sets the volume "
+																	"of the corresponding semitone. \n"
+																	"It is expressed in percentage related to the volume"
+																	" of the base note: a value of 100 means 2x the volume"
+																	" of the base note." ) );
 
 	m_panKnob = new Knob( knobDark_28, m_Frame );
 	m_panKnob->setLabel( tr( "Panning" ) );
 	m_panKnob->setModel( m_chordNoteModel->m_semiTone->pan );
 	m_panKnob->setEnabled( true );
 	m_panKnob->setHintText( tr( "Panning knob:" ), "" );
-	m_panKnob->setWhatsThis( tr( "The Wet/Dry knob sets the ratio between "
-															 "the input signal and the effect signal that "
-															 "forms the output." ) );
+	m_panKnob->setWhatsThis( tr( "This automatable knob sets the panning of the "
+															 "corresponding semitone" ) );
 
 	//----------------
 	m_keySlider = new AutomatableSlider( m_Frame, tr( "Key note" ) );
@@ -561,18 +562,24 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	m_keySlider->setTickPosition( QSlider::TicksLeft );
 	m_keySlider->setFixedSize( 26, 60 );
 	m_keySlider->setTickInterval( 50 );
-	ToolTip::add( m_keySlider, tr( "Key note" ) );
-	m_keySlider->setWhatsThis( tr( "The key note" ) );
+	ToolTip::add( m_keySlider, tr( "Key note slider" ) );
+	m_keySlider->setWhatsThis( tr( "This automatable slider sets the arpeggio semitone" ) );
 
 	m_keyLcd = new LcdWidget( 3, m_Frame );
 	m_keyLcd->setValue( m_chordNoteModel->m_semiTone->key->value() );
+	ToolTip::add( m_keyLcd, tr( "The key note value" ) );
+	m_keyLcd->setWhatsThis( tr( "The distance in semitones from the base note" ) );
 	connect( m_keySlider, SIGNAL( logicValueChanged( int ) ), this,	SLOT( setKeyLabel( int ) ) );
 
+	//TODO: until the "Active" action isn't fixed the led won't work
 	m_activeLed = new LedCheckBox( m_Frame, tr( "Active" ) );
 	m_activeLed->setModel( m_chordNoteModel->m_semiTone->active );
-	m_activeLed->setWhatsThis( tr( "If the note is active or gets omitted" ) );
-	m_activeLed->setEnabled( true );
-	ToolTip::add( m_activeLed, tr( "Active note" ) );
+	m_activeLed->setWhatsThis( tr( "It toggles the note to active state (it's played) or to inactive state (it's skipped)/n/n"
+																 "FUNCTION TEMPORARILY DISABLED" ) );
+	m_activeLed->setEnabled( false );
+	//disabling signals to prevent action
+	m_activeLed->blockSignals( true );
+	ToolTip::add( m_activeLed, tr( "Active note status - FUNCTION DISABLED" ) );
 
 	QLabel * m_activeLabel = new QLabel( tr( "Act.:" ) );
 	m_activeLabel->setParent( m_Frame );
@@ -580,7 +587,7 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 
 	m_silencedLed = new LedCheckBox( m_Frame, tr( "Silenced" ) );
 	m_silencedLed->setModel( m_chordNoteModel->m_semiTone->silenced );
-	m_silencedLed->setWhatsThis( tr( "If the note is silenced" ) );
+	m_silencedLed->setWhatsThis( tr( "while playing the note is taken into account but silenced, also during automation" ) );
 	m_silencedLed->setEnabled( true );
 	ToolTip::add( m_silencedLed, tr( "Silenced note" ) );
 
@@ -590,7 +597,7 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 
 	m_bareLed = new LedCheckBox( m_Frame, tr( "Bare" ) );
 	m_bareLed->setModel( m_chordNoteModel->m_semiTone->bare );
-	m_bareLed->setWhatsThis( tr( "If the arpeggio ignores the note volume or panning " ) );
+	m_bareLed->setWhatsThis( tr( "Only the key SemiTone is processed. Silence toggle, Volume and panning discarded, also during automation" ) );
 	m_bareLed->setEnabled( true );
 	ToolTip::add( m_bareLed, tr( "Bare note" ) );
 
@@ -601,29 +608,29 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	//----------------
 
 
-	m_gridLayout->addWidget( m_volumeKnob, 0,0,1,2,Qt::AlignCenter );
-	m_gridLayout->addWidget( m_panKnob,1,0,1,2,Qt::AlignCenter );
-	m_gridLayout->addWidget( m_keyLcd,2,0,1,2,Qt::AlignCenter );
-	m_gridLayout->addWidget( m_keySlider,3,0,1,2,Qt::AlignCenter );
+	m_gridLayout->addWidget( m_volumeKnob, 0, 0, 1, 2, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_panKnob, 1, 0, 1, 2, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_keyLcd, 2, 0, 1, 2, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_keySlider, 3, 0, 1, 2, Qt::AlignCenter );
 
-	m_gridLayout->addWidget( m_activeLabel,4,0,1,1,Qt::AlignCenter );
-	m_gridLayout->addWidget( m_activeLed,4,1,1,1,Qt::AlignCenter );
+	m_gridLayout->addWidget( m_activeLabel, 4, 0, 1, 1, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_activeLed, 4, 1, 1, 1, Qt::AlignCenter );
 
-	m_gridLayout->addWidget( m_silencedLabel,5,0,1,1,Qt::AlignCenter );
-	m_gridLayout->addWidget( m_silencedLed,5,1,1,1,Qt::AlignCenter );
+	m_gridLayout->addWidget( m_silencedLabel, 5, 0, 1, 1, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_silencedLed, 5, 1, 1, 1, Qt::AlignCenter );
 
-	m_gridLayout->addWidget( m_bareLabel,6,0,1,1,Qt::AlignCenter );
-	m_gridLayout->addWidget( m_bareLed,6,1,1,1,Qt::AlignCenter );
+	m_gridLayout->addWidget( m_bareLabel, 6, 0, 1, 1, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_bareLed, 6, 1, 1, 1, Qt::AlignCenter );
 
 	//Connect it while instantiating this class!!
 	m_cloneButton = new QPushButton( tr( "Clone" ) );
 	m_cloneButton->setParent( m_Frame );
-	m_cloneButton->setWhatsThis( tr( "Clones the SemiTone" ) );
+	m_cloneButton->setWhatsThis( tr( "Duplicates the SemiTone next to the original" ) );
 	ToolTip::add( m_cloneButton, tr( "Clones the SemiTone" ) );
 	//connects the pushBUtton to emitting position signal
 	connect( m_cloneButton, SIGNAL( clicked() ), this, SLOT( emitClonePosition() ) );
 
-	m_gridLayout->addWidget( m_cloneButton,7,0,1,2,Qt::AlignCenter );
+	m_gridLayout->addWidget( m_cloneButton, 7, 0, 1, 2, Qt::AlignCenter );
 
 	//the first widget is the one
 	m_delButton = new QPushButton( tr( "Del" ) );
@@ -635,7 +642,7 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 		m_delButton->setStyleSheet( QString::fromUtf8( "QPushButton:disabled"
 																								 "{ color: gray }"
 																								 ) );
-		m_delButton->setWhatsThis( tr( "Delete disabled for base note" ) );
+		m_delButton->setWhatsThis( tr( "The base note can't be deleted." ) );
 		ToolTip::add( m_delButton, tr( "Delete disabled for base note" ) );
 	}
 	else
@@ -645,7 +652,7 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 		//connects the pushBUtton to emitting position signal
 		connect( m_delButton, SIGNAL( clicked() ), this, SLOT( emitDeletePosition() ) );
 	}
-	m_gridLayout->addWidget( m_delButton,8,0,1,2,Qt::AlignCenter );
+	m_gridLayout->addWidget( m_delButton, 8, 0, 1, 2, Qt::AlignCenter );
 
 }
 
