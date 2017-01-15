@@ -252,6 +252,7 @@ ChordTableEditorView::ChordTableEditorView( ToolPlugin * _tool ) :
 		parentWidget()->hide();
 		parentWidget()->layout()->setSizeConstraint( QLayout::SetDefaultConstraint );
 		parentWidget()->setMinimumSize( 750,470 );
+		parentWidget()->adjustSize();
 
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
 		//		flags |= Qt::MSWindowsFixedSizeDialogHint;
