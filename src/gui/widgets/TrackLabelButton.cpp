@@ -146,7 +146,8 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		QToolButton::mousePressEvent( _me );
+		m_mousePos = _me->globalPos();
+		_me->ignore();
 	}
 }
 
@@ -156,6 +157,19 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	rename();
+}
+
+
+
+
+void TrackLabelButton::mouseReleaseEvent(QMouseEvent *_me)
+{
+	if( _me->globalPos() == m_mousePos )
+	{
+		QToolButton::mousePressEvent( _me );
+	}
+	QToolButton::mouseReleaseEvent( _me );
+	_me->ignore();
 }
 
 
