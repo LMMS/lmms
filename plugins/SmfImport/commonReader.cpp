@@ -387,7 +387,7 @@ void commonReader::addNoteEvent( long tick, int chan, int pitch, int vol,
 	QString trackName = TrackContainer::tr( "Track %1" ).arg( track + 1 );
 	SmfMidiChannel * ch = chs[track].create( m_tc, trackName );
 	double realDur = dur * tickRate;
-	Note n( ( realDur < 1 ? 1 : realDur ), static_cast<double>( tick ) * tickRate, pitch - 12, vol );
+	Note n( ( realDur < 1 ? 1 : realDur ), static_cast<double>( tick ) * tickRate, pitch - 12, vol * 200 / 127 );
 	ch->addNote( n );
 
 }
