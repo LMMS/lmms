@@ -59,7 +59,7 @@ private:
 	TrackView * m_trackView;
 	QString m_iconName;
 	QLineEdit * m_renameLineEdit;
-	QPoint m_mousePos;
+	QRect m_buttonRect;
 
 } ;
 
