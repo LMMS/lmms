@@ -132,11 +132,6 @@ protected:
 	static void smooth(float smoothness,const graphModel * in,graphModel * out);
 protected slots:
 
-	void samplesChanged( int, int );
-
-
-	void normalize();
-
 
 private:
 	graphModel  m_graphO1;
@@ -202,8 +197,6 @@ protected:
 
 protected slots:
 	void updateLayout();
-
-	void normalizeToggled( bool value );
 
 	void sinWaveClicked();
 	void triangleWaveClicked();

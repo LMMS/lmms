@@ -420,6 +420,8 @@ ExprFront::ExprFront(const char * expr)
 	m_data->expression_string=expr;
 	m_data->symbol_table.add_pi();
 
+	m_data->symbol_table.add_constant("e",F_E);
+
 	m_data->symbol_table.add_function("sinew",sin_wave_func);
 	m_data->symbol_table.add_function("squarew",square_wave_func);
 	m_data->symbol_table.add_function("trianglew",triangle_wave_func);

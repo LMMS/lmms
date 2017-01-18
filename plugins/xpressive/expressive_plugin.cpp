@@ -44,6 +44,7 @@
 #include "templates.h"
 #include "ToolTip.h"
 #include "Song.h"
+#include "lmms_constants.h"
 //#include "interpolation.h"
 
 #include "embed.cpp"
@@ -201,11 +202,11 @@ void expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 void expressive::loadSettings(const QDomElement & _this) {
 
-	m_outputExpression[0]=_this.attribute( "O1").toAscii();
-	m_outputExpression[1]=_this.attribute( "O2").toAscii();
-	m_wavesExpression[0]=_this.attribute( "W1").toAscii();
-	m_wavesExpression[1]=_this.attribute( "W2").toAscii();
-	m_wavesExpression[2]=_this.attribute( "W3").toAscii();
+	m_outputExpression[0]=_this.attribute( "O1").toLatin1();
+	m_outputExpression[1]=_this.attribute( "O2").toLatin1();
+	m_wavesExpression[0]=_this.attribute( "W1").toLatin1();
+	m_wavesExpression[1]=_this.attribute( "W2").toLatin1();
+	m_wavesExpression[2]=_this.attribute( "W3").toLatin1();
 
 	m_smoothW1.loadSettings(_this,"smoothW1");
 	m_smoothW2.loadSettings(_this,"smoothW2");
@@ -548,7 +549,7 @@ static void clearGraph(graphModel * g)
 
 void expressiveView::expressionChanged() {
 	expressive * e = castModel<expressive>();
-	QByteArray text = m_expressionEditor->toPlainText().toAscii();
+	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
 
 
@@ -590,8 +591,6 @@ void expressiveView::expressionChanged() {
 			expr.add_cyclic_vector("W1",e->m_graphW1.samples(),e->m_graphW1.length());
 			expr.add_cyclic_vector("W2",e->m_graphW2.samples(),e->m_graphW2.length());
 			expr.add_cyclic_vector("W3",e->m_graphW3.samples(),e->m_graphW3.length());
-			//sample_rate=Engine::mixer()->processingSampleRate();
-			//qDebug()<<"sample_rate "<<sample_rate;
 		}
 		expr.setIntegrate(&i,sample_rate);
 
@@ -642,7 +641,7 @@ void expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		guass_size|=1;
 		int guass_center=guass_size/2;
 		float delta=smoothness;
-		float a=1/(sqrtf(2*M_PI)*delta);
+		float a=1/(sqrtf(2*F_PI)*delta);
 		float *guassian =new float [guass_size];
 		float sum=0;
 		float temp=0;
@@ -650,7 +649,7 @@ void expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 		for (i=0;i<guass_size;i++)
 		{
 			temp=(i-guass_center)/delta;
-			sum+=guassian[i]=a*pow(M_E,-0.5*temp*temp);
+			sum+=guassian[i]=a*powf(F_E,-0.5*temp*temp);
 		}
 		for (i=0;i<guass_size;i++)
 		{
