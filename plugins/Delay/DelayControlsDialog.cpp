@@ -50,10 +50,10 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	sampleDelayKnob->setHintText( tr( "Delay Time" ) + " ", " s" );
 
 	Knob * feedbackKnob = new Knob( knobBright_26, this );
-	feedbackKnob->move( 8, 58 );
+	feedbackKnob->move( 11, 58 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel);
-	feedbackKnob->setLabel( tr( "REGEN" ) );
+	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr ( "Feedback Amount" ) + " " , "" );
 
 	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
