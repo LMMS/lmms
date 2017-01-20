@@ -43,9 +43,13 @@ IF(LMMS_HOST_X86_64)
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
-	# Wine development for Ubuntu
+	# Development
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-devel/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-devel/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+	ENDIF()
+	# Staging
+	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-staging/lib64/wine/libwinecrt0.a.*")
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-staging/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
 ENDIF(LMMS_HOST_X86_64)
 
