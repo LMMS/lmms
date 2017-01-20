@@ -7,8 +7,8 @@
 #  WINE_DEFINITIONS - Compiler switches required for using wine
 #
 
-FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATH_SUFFIXES wine)
-FIND_LIBRARY(WINE_LIBRARY NAMES wine PATH_SUFFIXES wine i386-linux-gnu/wine)
+FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATHS /opt/wine-devel/include PATH_SUFFIXES wine)
+FIND_LIBRARY(WINE_LIBRARY NAMES wine PATHS /opt/wine-devel/lib PATH_SUFFIXES wine i386-linux-gnu/wine)
 FIND_PROGRAM(WINE_CXX NAMES wineg++ winegcc winegcc64 winegcc32)
 
 set(WINE_INCLUDE_DIRS ${WINE_INCLUDE_DIR} )
