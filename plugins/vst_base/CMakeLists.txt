@@ -53,13 +53,25 @@ SET(WINE_CXX_FLAGS "" CACHE STRING "Extra flags passed to wineg++")
 
 STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKER_FLAGS} " " ${WINE_CXX_FLAGS})
 ADD_CUSTOM_COMMAND(
-		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
-		COMMAND ${WINE_CXX}
-		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows -I/opt/wine-devel/include -L/opt/wine-devel/lib "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer ${WINE_BUILD_FLAGS} -o ../RemoteVstPlugin
-		COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
-		TARGET vstbase
-		OUTPUTS ../RemoteVstPlugin
-		)
+	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
+	COMMAND ${WINE_CXX}
+	ARGS "-I\"${CMAKE_BINARY_DIR}\""
+		"-I\"${CMAKE_SOURCE_DIR}/include\""
+		"-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\""
+		"-I\"${CMAKE_INSTALL_PREFIX}/include\""
+		-I/usr/include/wine/windows
+		-I/opt/wine-devel/include
+		-L/opt/wine-devel/lib
+		-I/opt/wine-staging/include
+		-I/opt/wine-staging/lib
+		"\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\""
+		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
+		${WINE_BUILD_FLAGS}
+		-o ../RemoteVstPlugin
+	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
+	TARGET vstbase
+	OUTPUTS ../RemoteVstPlugin
+	)
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ../RemoteVstPlugin.exe.so)
 INSTALL(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin" "${CMAKE_CURRENT_BINARY_DIR}/../RemoteVstPlugin.exe.so" DESTINATION "${PLUGIN_DIR}")
