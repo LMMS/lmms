@@ -737,7 +737,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == NULL )
 	{
-		debugMessage( "mainEntry prodecure returned NULL\n" );
+		debugMessage( "mainEntry procedure returned NULL\n" );
 		return false;
 	}
 
