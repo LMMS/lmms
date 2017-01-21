@@ -145,13 +145,13 @@ void midiReader::noteOnEvent( int chan, int pitch, int vol )
 	}
 	else
 	{
-		addNoteEvent( m_seq->getCurrentTime(), chan, pitch );
+		addNoteEvent( m_seq->getCurrentTime(), chan, pitch, vol );
 	}
 }
 
 void midiReader::noteOffEvent( int chan, int pitch, int vol )
 {
-	addNoteEvent( m_seq->getCurrentTime(), chan, pitch );
+	addNoteEvent( m_seq->getCurrentTime(), chan, pitch, vol );
 }
 
 void midiReader::headerEvent( int format, int ntrks, int division )

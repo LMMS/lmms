@@ -348,12 +348,16 @@ void commonReader::insertNoteEvent( long tick, int chan, int pitch,
 	note_list << note;
 }
 
-void commonReader::addNoteEvent( long tick, int chan,
-				 int pitch, int track )
+void commonReader::addNoteEvent(long tick, int chan,
+				 int pitch, int vol, int track )
 {
 	NOTE_EVENT_DEFINITION
 	CHECK_TRACK
 
+	if( !note_list.size() && vol )
+	{
+		addNoteEvent( tick, chan, pitch, vol, 1, track );
+	}
 
 	for( int c = 0; c < note_list.size(); c++ )
 	{

@@ -134,13 +134,13 @@ void oveReader::noteOnEvent( int track, long tick, int chan, int pitch, int vol 
 	}
 	else
 	{
-		addNoteEvent( tick, chan, pitch, track );
+		addNoteEvent( tick, chan, pitch, vol, track );
 	}
 }
 
 void oveReader::noteOffEvent( int track, long tick, int chan, int pitch, int vol )
 {
-	addNoteEvent( tick, chan, pitch, track );
+	addNoteEvent( tick, chan, pitch, vol, track );
 }
 
 void oveReader::programEvent( int track, long tick, int chan, int patch )

@@ -70,11 +70,10 @@ protected:
 
 	void insertNoteEvent( long tick, int chan, int pitch, int vol, int track = noTrack );
 
-	void addNoteEvent( long tick, int chan, int pitch, int track = noTrack );
-	void addNoteEvent( long tick, int chan, int pitch, int vol, int dur, int track = noTrack );
+	void addNoteEvent( long tick, int chan, int pitch, int vol, int track = noTrack );
+	void addNoteEvent( long tick, int chan, int pitch, int vol, int dur, int track );
 
 
-	QProgressDialog pd;
 	TrackContainer *m_tc;
 
 	// 128 CC + Pitch Bend + Program
@@ -91,6 +90,8 @@ protected:
 	int pitchBendMultiply;
 	int m_currentTrack = -2;
 	QPair<int, QString> m_currentTrackName;
+
+	QProgressDialog pd;
 
 	/*
 	 * record note event.
