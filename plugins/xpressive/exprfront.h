@@ -48,7 +48,7 @@ public:
 	float evaluate();
 	bool add_variable(const char * name, float & ref);
 	bool add_constant(const char * name, float  ref);
-	bool add_cyclic_vector(const char *name, const float *data, size_t length);
+	bool add_cyclic_vector(const char *name, const float *data, size_t length, bool interp = false);
 	void setIntegrate(const unsigned int *frameCounter,unsigned int sample_rate);
 private:
 	ExprFrontData *m_data;

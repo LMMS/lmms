@@ -638,12 +638,12 @@ void graphModel::convolve(const float *_convolution, const int _conv_length, con
 {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
-	int graph_length = length();
+	const int graph_length = length();
 	float sum;
-	for ( int i=0; i <  graph_length ; i++ )
+	for ( int i = 0; i <  graph_length; i++ )
 	{
 		sum = 0;
-		for ( int j=0; j < _conv_length  ; j++ )
+		for ( int j = 0; j < _conv_length; j++ )
 		{
 			sum += _convolution[j] * temp[( i + j ) % graph_length];
 		}

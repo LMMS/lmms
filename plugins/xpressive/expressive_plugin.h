@@ -43,8 +43,6 @@ const int	W2_EXPR = 1;
 const int	W3_EXPR = 2;
 const int	O1_EXPR = 3;
 const int	O2_EXPR = 4;
-//const int	HOLD_EXPR = 5;
-//const int	RELEASE_EXPR = 6;
 const int	NUM_EXPRS = 7;
 
 
@@ -65,7 +63,7 @@ public:
 		samples=new float[length];
 		memcpy(samples,graph->samples(),length*sizeof(float));
 	}
-	void copyFrom(const graphModel * graph)
+	inline void copyFrom(const graphModel * graph)
 	{
 		memcpy(samples,graph->samples(),length*sizeof(float));
 	}
@@ -73,8 +71,10 @@ public:
 	{
 		delete [] samples;
 	}
+	inline void setInterpolate(bool _interpolate) {interpolate=_interpolate;}
 	float * samples;
 	int length;
+	bool interpolate;
 };
 class exprSynth
 {
@@ -92,7 +92,9 @@ private:
 	ExprFront *exprO1, *exprO2;
 	const WaveSample *W1, *W2, *W3;
 	unsigned int note_sample;
+	unsigned int note_rel_sample;
 	float note_sample_sec;
+	float note_rel_sec;
 	float frequency;
 	float released;
 	NotePlayHandle* nph;
@@ -151,6 +153,9 @@ private:
 	FloatModel m_smoothW1;
 	FloatModel m_smoothW2;
 	FloatModel m_smoothW3;
+	BoolModel m_interpolateW1;
+	BoolModel m_interpolateW2;
+	BoolModel m_interpolateW3;
 	FloatModel m_panning1;
 	FloatModel m_panning2;
 	FloatModel m_relTransition;
@@ -241,6 +246,7 @@ private:
 	Graph * m_graph;
 	graphModel * m_raw_graph;
 	LedCheckBox * m_expressionValidToggle;
+	LedCheckBox * m_waveInterpolate;
 	bool m_output_expr;
 	bool m_wave_expr;
 } ;

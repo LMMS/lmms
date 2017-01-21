@@ -63,18 +63,19 @@ exprSynth::exprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSam
 	:exprO1(_exprO1),exprO2(_exprO2),W1(gW1),W2(gW2),W3(gW3),nph(_nph),sample_rate(_sample_rate),pan1(_pan1),pan2(_pan2),rel_transition(_rel_trans)
 {
 	note_sample=0;
-
+	note_rel_sample=0;
+	note_rel_sec=0;
 	note_sample_sec=0;
 	released=0;
 	frequency=nph->frequency();
 	rel_inc=1000.0/(sample_rate*rel_transition);//rel_transition in ms. compute how much increment in each frame
-	exprO1->add_cyclic_vector("W1",W1->samples,W1->length);
-	exprO1->add_cyclic_vector("W2",W2->samples,W2->length);
-	exprO1->add_cyclic_vector("W3",W3->samples,W3->length);
+	exprO1->add_cyclic_vector("W1",W1->samples,W1->length,W1->interpolate);
+	exprO1->add_cyclic_vector("W2",W2->samples,W2->length,W2->interpolate);
+	exprO1->add_cyclic_vector("W3",W3->samples,W3->length,W3->interpolate);
 
-	exprO2->add_cyclic_vector("W1",W1->samples,W1->length);
-	exprO2->add_cyclic_vector("W2",W2->samples,W2->length);
-	exprO2->add_cyclic_vector("W3",W3->samples,W3->length);
+	exprO2->add_cyclic_vector("W1",W1->samples,W1->length,W1->interpolate);
+	exprO2->add_cyclic_vector("W2",W2->samples,W2->length,W2->interpolate);
+	exprO2->add_cyclic_vector("W3",W3->samples,W3->length,W3->interpolate);
 
 	exprO1->add_variable("t",note_sample_sec);
 	exprO1->add_variable("f",frequency);
@@ -83,6 +84,9 @@ exprSynth::exprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSam
 
 	exprO1->add_variable("rel",released);
 	exprO2->add_variable("rel",released);
+
+	exprO1->add_variable("trel",note_rel_sec);
+	exprO2->add_variable("trel",note_rel_sec);
 
 	exprO1->setIntegrate(&note_sample,_sample_rate);
 	exprO2->setIntegrate(&note_sample,_sample_rate);
@@ -104,20 +108,25 @@ float sin_wave(float);
 void exprSynth::renderOutput(fpp_t _frames, sampleFrame *_buf)
 {
 
-	float o1,o2,pn1,pn2;
-	float new_freq=nph->frequency();
-	float freq_inc=(new_freq-frequency)/_frames;
+	float o1,o2;
+	const float pn1=pan1->value()*0.5;
+	const float pn2=pan2->value()*0.5;
+	const float new_freq=nph->frequency();
+	const float freq_inc=(new_freq-frequency)/_frames;
+	const bool is_released = nph->isReleased();
+	if(is_released && note_rel_sample==0)
+		note_rel_sample=note_sample;
 	for (fpp_t frame = 0; frame < _frames ; ++frame) {
-		if (nph->isReleased() && released < 1)
+		if (is_released && released < 1)
 			released=fmin(released+rel_inc,1);
 		o1=exprO1->evaluate();
 		o2=exprO2->evaluate();
-		pn1=pan1->value()*0.5;
-		pn2=pan2->value()*0.5;
 		_buf[frame][0] = (-pn1+0.5)*o1+(-pn2+0.5)*o2;
 		_buf[frame][1] = ( pn1+0.5)*o1+( pn2+0.5)*o2;
 		note_sample++;
 		note_sample_sec=note_sample/(float)sample_rate;
+		if (is_released)
+			note_rel_sec=(note_sample-note_rel_sample)/(float)sample_rate;
 		frequency+=freq_inc;
 	}
 	frequency=new_freq;
@@ -154,6 +163,9 @@ expressive::expressive(InstrumentTrack * _instrument_track) :
 		m_smoothW1(0, 0.0f, 70.0f, 1.0f, this, tr("W1 smoothing")),
 		m_smoothW2(0, 0.0f, 70.0f, 1.0f, this, tr("W2 smoothing")),
 		m_smoothW3(0, 0.0f, 70.0f, 1.0f, this, tr("W3 smoothing")),
+		m_interpolateW1(false, this),
+		m_interpolateW2(false, this),
+		m_interpolateW3(false, this),
 		m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("PAN1")),
 		m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("PAN2")),
 		m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("REL TRANS")),
@@ -191,6 +203,9 @@ void expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 	m_smoothW1.saveSettings(_doc,_this,"smoothW1");
 	m_smoothW2.saveSettings(_doc,_this,"smoothW2");
 	m_smoothW3.saveSettings(_doc,_this,"smoothW3");
+	m_interpolateW1.saveSettings(_doc,_this,"interpolateW1");
+	m_interpolateW2.saveSettings(_doc,_this,"interpolateW2");
+	m_interpolateW3.saveSettings(_doc,_this,"interpolateW3");
 	m_parameterA1.saveSettings(_doc,_this,"A1");
 	m_parameterA2.saveSettings(_doc,_this,"A2");
 	m_parameterA3.saveSettings(_doc,_this,"A3");
@@ -211,6 +226,9 @@ void expressive::loadSettings(const QDomElement & _this) {
 	m_smoothW1.loadSettings(_this,"smoothW1");
 	m_smoothW2.loadSettings(_this,"smoothW2");
 	m_smoothW3.loadSettings(_this,"smoothW3");
+	m_interpolateW1.loadSettings(_this,"interpolateW1");
+	m_interpolateW2.loadSettings(_this,"interpolateW2");
+	m_interpolateW3.loadSettings(_this,"interpolateW3");
 	m_parameterA1.loadSettings(_this,"A1");
 	m_parameterA2.loadSettings(_this,"A2");
 	m_parameterA3.loadSettings(_this,"A3");
@@ -271,6 +289,9 @@ void expressive::playNote(NotePlayHandle * _n, sampleFrame * _working_buffer) {
 		exprO2->add_variable("A1",m_A1);
 		exprO2->add_variable("A2",m_A2);
 		exprO2->add_variable("A3",m_A3);
+		m_W1.setInterpolate(m_interpolateW1.value());
+		m_W2.setInterpolate(m_interpolateW2.value());
+		m_W3.setInterpolate(m_interpolateW3.value());
 		_n->m_pluginData = new exprSynth(&m_W1,&m_W2,&m_W3,exprO1,exprO2,_n,
 				Engine::mixer()->processingSampleRate(),&m_panning1,&m_panning2,m_relTransition.value());
 	}
@@ -301,8 +322,8 @@ PluginView * expressive::instantiateView(QWidget * _parent) {
 
 class expressiveKnob: public Knob {
 public:
-	expressiveKnob(QWidget * _parent) :
-			Knob(knobStyled, _parent) {
+	void setStyle()
+	{
 		setFixedSize(29, 29);
 		setCenterPointX(14.5);
 		setCenterPointY(14.5);
@@ -312,6 +333,15 @@ public:
 		setTotalAngle(300.0);
 		setLineWidth(3);
 	}
+	expressiveKnob(QWidget * _parent, const QString & _name) :
+			Knob(knobStyled, _parent,_name) {
+		setStyle();
+	}
+	expressiveKnob(QWidget * _parent) :
+			Knob(knobStyled, _parent) {
+		setStyle();
+	}
+
 };
 
 
@@ -456,6 +486,9 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	ToolTip::add(m_whiteNoiseWaveBtn, tr("Click here for white-noise."));
 
 
+	m_waveInterpolate  = new LedCheckBox("Interpolate", this, tr("WaveInterpolate"),
+										 LedCheckBox::Green);
+	m_waveInterpolate->move(120, 230);
 
 	m_expressionValidToggle = new LedCheckBox("", this, tr("ExpressionValid"),
 			LedCheckBox::Red);
@@ -466,35 +499,35 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_expressionEditor->move(9, 128);
 	m_expressionEditor->resize(180, 90);
 
-	m_generalPurposeKnob[0] = new expressiveKnob(this);
+	m_generalPurposeKnob[0] = new expressiveKnob(this,"A1");
 	m_generalPurposeKnob[0]->setHintText(tr("General purpose 1:"), "");
 	m_generalPurposeKnob[0]->move(COL_KNOBS, ROW_KNOBSA1);
 
-	m_generalPurposeKnob[1] = new expressiveKnob(this);
+	m_generalPurposeKnob[1] = new expressiveKnob(this,"A2");
 	m_generalPurposeKnob[1]->setHintText(tr("General purpose 2:"), "");
 	m_generalPurposeKnob[1]->move(COL_KNOBS, ROW_KNOBSA2);
 
-	m_generalPurposeKnob[2] = new expressiveKnob(this);
+	m_generalPurposeKnob[2] = new expressiveKnob(this,"A3");
 	m_generalPurposeKnob[2]->setHintText(tr("General purpose 3:"), "");
 	m_generalPurposeKnob[2]->move(COL_KNOBS, ROW_KNOBSA3);
 
-	m_panningKnob[0] = new expressiveKnob(this);
+	m_panningKnob[0] = new expressiveKnob(this,"O1 panning");
 	m_panningKnob[0]->setHintText(tr("O1 panning:"), "");
 	m_panningKnob[0]->move(COL_KNOBS, ROW_KNOBSP1);
 
-	m_panningKnob[1] = new expressiveKnob(this);
+	m_panningKnob[1] = new expressiveKnob(this,"O2 panning");
 	m_panningKnob[1]->setHintText(tr("O2 panning:"), "");
 	m_panningKnob[1]->move(COL_KNOBS, ROW_KNOBSP2);
 
-	m_relKnob = new expressiveKnob(this);
+	m_relKnob = new expressiveKnob(this,"Release transition");
 	m_relKnob->setHintText(tr("Release transition:"), "ms");
 	m_relKnob->move(COL_KNOBS, ROW_KNOBREL);
 
 
 
-	m_smoothKnob=new Knob(this);
+	m_smoothKnob=new Knob(this,"Smoothness");
 	m_smoothKnob->setHintText(tr("Smoothness"), "");
-	m_smoothKnob->move(100, 220);
+	m_smoothKnob->move(80, 220);
 
 	connect(m_generalPurposeKnob[0], SIGNAL(sliderMoved(float)), this,
 			SLOT(expressionChanged()));
@@ -536,7 +569,7 @@ expressiveView::~expressiveView()
 
 static void clearGraph(graphModel * g)
 {
-	int length = g->length();
+	const int length = g->length();
 	float * samples = new float[length];
 
 	int i;
@@ -574,16 +607,18 @@ void expressiveView::expressionChanged() {
 	if (text.size()>0)
 	{
 		ExprFront expr(text.constData());
-		float t,f=10,key=2,rel=0,v=0.5;
+		const float t=0,f=10,key=5,v=0.5;
 		unsigned int i;
-		unsigned int sample_rate=m_raw_graph->length();
+		const unsigned int sample_rate=m_raw_graph->length();
 		expr.add_variable("t", t);
 
 		if (m_output_expr)
 		{
 			expr.add_constant("f", f);
 			expr.add_constant("key", key);
-			expr.add_constant("rel", rel);
+			expr.add_constant("rel", 0);
+			expr.add_constant("trel", 0);
+			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
 			expr.add_constant("v", v);
 			expr.add_constant("A1", e->m_parameterA1.value());
 			expr.add_constant("A2", e->m_parameterA2.value());
@@ -594,12 +629,12 @@ void expressiveView::expressionChanged() {
 		}
 		expr.setIntegrate(&i,sample_rate);
 
-		bool parse_ok=expr.compile();
+		const bool parse_ok=expr.compile();
 
 		if (parse_ok) {
 			e->m_exprValid.setValue(0);
-			int length = m_raw_graph->length();
-			float * samples = new float[length];
+			const int length = m_raw_graph->length();
+			float * const samples = new float[length];
 			for (i = 0; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
@@ -637,25 +672,24 @@ void expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 	out->setSamples(in->samples());
 	if (smoothness>0)
 	{
-		int guass_size=smoothness*5;
-		guass_size|=1;
-		int guass_center=guass_size/2;
-		float delta=smoothness;
-		float a=1/(sqrtf(2*F_PI)*delta);
-		float *guassian =new float [guass_size];
-		float sum=0;
-		float temp=0;
+		const int guass_size = (smoothness * 5) | 1;
+		const int guass_center = guass_size/2;
+		const float delta = smoothness;
+		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);
+		float * const guassian = new float [guass_size];
+		float sum = 0.0f;
+		float temp = 0.0f;
 		int i;
-		for (i=0;i<guass_size;i++)
+		for (i = 0; i < guass_size; i++ )
 		{
-			temp=(i-guass_center)/delta;
-			sum+=guassian[i]=a*powf(F_E,-0.5*temp*temp);
+			temp = (i - guass_center) / delta;
+			sum += guassian[i] = a * powf(F_E, -0.5f * temp * temp);
 		}
-		for (i=0;i<guass_size;i++)
+		for (i = 0; i < guass_size; i++ )
 		{
-			guassian[i]=guassian[i]/sum;
+			guassian[i] = guassian[i] / sum;
 		}
-		out->convolve(guassian,guass_size,guass_center);
+		out->convolve(guassian, guass_size, guass_center);
 		delete [] guassian;
 	}
 }
@@ -718,8 +752,10 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->m_rawgraphW1);
 		m_expressionEditor->setPlainText(e->m_wavesExpression[0]);
 		m_smoothKnob->setModel(&e->m_smoothW1);
+		m_waveInterpolate->setModel(&e->m_interpolateW1);
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
+		m_waveInterpolate->show();
 		break;
 	case W2_EXPR:
 		m_wave_expr=true;
@@ -727,8 +763,10 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->m_rawgraphW2);
 		m_expressionEditor->setPlainText(e->m_wavesExpression[1]);
 		m_smoothKnob->setModel(&e->m_smoothW2);
+		m_waveInterpolate->setModel(&e->m_interpolateW2);
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
+		m_waveInterpolate->show();
 		break;
 	case W3_EXPR:
 		m_wave_expr=true;
@@ -736,8 +774,10 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->m_rawgraphW3);
 		m_expressionEditor->setPlainText(e->m_wavesExpression[2]);
 		m_smoothKnob->setModel(&e->m_smoothW3);
+		m_waveInterpolate->setModel(&e->m_interpolateW3);
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
+		m_waveInterpolate->show();
 		break;
 	case O1_EXPR:
 		m_output_expr=true;
@@ -746,6 +786,7 @@ void expressiveView::updateLayout() {
 		m_expressionEditor->setPlainText(e->m_outputExpression[0]);
 		m_smoothKnob->hide();
 		m_usrWaveBtn->hide();
+		m_waveInterpolate->hide();
 		break;
 	case O2_EXPR:
 		m_output_expr=true;
@@ -754,6 +795,7 @@ void expressiveView::updateLayout() {
 		m_expressionEditor->setPlainText(e->m_outputExpression[1]);
 		m_smoothKnob->hide();
 		m_usrWaveBtn->hide();
+		m_waveInterpolate->hide();
 		break;
 	}
 }
@@ -832,6 +874,7 @@ QString expressiveHelpView::HelpText=
 "<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
 "<b>v</b> - note's volume. note that the output is already multiplied by the volume. available only in the output expressions.<br>"
 "<b>rel</b> - gives 0.0 while the key is holded, and 1.0 after the key release. available only in the output expressions.<br>"
+"<b>trel</b> - time after release. While the note is holded, it gives 0.0. then it start counting seconds.<br>"
 "The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
 "<b>A1, A2, A3</b> - general purpose knobs. you can reference them only in O1 and O2. In range [-1,1].<br>"
 "<h4>Available functions:</h4><br>"
@@ -840,7 +883,6 @@ QString expressiveHelpView::HelpText=
 "<b>integrate(x)</b> - integrates x by delta t.<br>"
 "If you use notes with automated frequency, you should use:<br>"
 "sinew(integrate(f)) instead of sinew(t*f)<br>"
-"Please note that in each expression you can use only 20 instances of this function.<br>"
 "<b>randv(x)</b> - A random vector. each cell is reference by an integer index in the range [0,2^31]<br>"
 "Each evaluation of an expression results in different random vector.<br>"
 "Although, it remains consistent in the lifetime of a single wave.<br>"

@@ -63,33 +63,41 @@ struct freefunc1 : public exprtk::ifunction<T>
 template <typename T>
 struct IntegrateFunction : public exprtk::ifunction<T>
 {
-	static const int MAX_COUNTERS=20;
-	using exprtk::ifunction<T>::operator();
 
-	IntegrateFunction(const unsigned int* frame, unsigned int sample_rate)
+	using exprtk::ifunction<T>::operator();
+	virtual ~IntegrateFunction()
+	{
+		delete [] m_counters;
+	}
+
+	IntegrateFunction(const unsigned int* frame, unsigned int sample_rate,unsigned int _max_counters)
 	: exprtk::ifunction<T>(1),
 	m_frame(frame),
 	m_sample_rate(sample_rate),
+	  m_max_counters(_max_counters),
 	  m_nCounters(0),
 	  m_nCountersCalls(0),
 	  m_cc(0)
-	{}
+	{
+		m_counters=new double[_max_counters];
+	}
 
 	inline T operator()(const T& x)
 	{
 		if (*m_frame == 0)
 		{
-			m_counters[m_nCounters]=0;
 			++m_nCountersCalls;
-			if (m_nCounters==MAX_COUNTERS-1)
+			if (m_nCountersCalls>m_max_counters)
 			{
 				return 0;
 			}
+			m_counters[m_nCounters]=0;
+
 			m_cc=m_nCounters;
 			++m_nCounters;
 		}
 
-		T res=x;
+		T res = 0;
 		if (m_cc<m_nCounters)
 		{
 			res=m_counters[m_cc];
@@ -98,12 +106,14 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 		m_cc=(m_cc+1)%m_nCountersCalls;
 		return res/m_sample_rate;
 	}
-	const unsigned int* m_frame;
-	unsigned int m_sample_rate;
+
+	const unsigned int* const m_frame;
+	const unsigned int m_sample_rate;
+	const unsigned int m_max_counters;
 	unsigned int m_nCounters;
 	unsigned int m_nCountersCalls;
 	unsigned int m_cc;
-	double m_counters[MAX_COUNTERS];
+	double *m_counters;
 };
 
 template <typename T>
@@ -113,29 +123,37 @@ struct WaveValueFunction : public exprtk::ifunction<T>
 
 	WaveValueFunction(const T* v, std::size_t s)
 	: exprtk::ifunction<T>(1),
-	vec(v),
-	size(s)
+	m_vec(v),
+	m_size(s)
 	{}
 
 	inline T operator()(const T& index)
 	{
-		T x=positiveFraction(index);
-		x=size*x;
-
-		int ix=(int)x;
-		//to disable interpolation uncomment:
-		//return static_cast<WaveSample*>(w)->samples[ix];
-
-		float xfrc=fraction(x);
-		if (xfrc==0)
-		{
-			return vec[ix];
-		}
-		int ixnext=(ix+1)%size;
-		return linearInterpolate(vec[ix], vec[ixnext], xfrc);
+		return m_vec[(int) ( positiveFraction(index) * m_size )];
 	}
-	const T* vec;
-	std::size_t size;
+	const T* m_vec;
+	const std::size_t m_size;
+};
+template <typename T>
+struct WaveValueFunctionInterpolate : public exprtk::ifunction<T>
+{
+	using exprtk::ifunction<T>::operator();
+
+	WaveValueFunctionInterpolate(const T* v, std::size_t s)
+	: exprtk::ifunction<T>(1),
+	m_vec(v),
+	m_size(s)
+	{}
+
+	inline T operator()(const T& index)
+	{
+		const T x = positiveFraction(index) * m_size;
+		const int ix=(int)x;
+		const float xfrc=fraction(x);
+		return linearInterpolate(m_vec[ix], m_vec[(ix+1)%m_size], xfrc);
+	}
+	const T* m_vec;
+	const std::size_t m_size;
 };
 static const unsigned int random_data[257]={
 0xd76a33ec, 0x4a767724, 0xb34ebd08 ,0xf4024196,
@@ -205,11 +223,27 @@ static const unsigned int random_data[257]={
 0xa66f8b47
 };
 
+inline unsigned int rotate(unsigned int x, const int b)
+{
+	if (b > -32 && b < 32)
+	{
+		if (b<0)
+		{
+			x= ( x >> (-b) ) | ( x << (32+b) );
+		}
+		else
+		{
+			x= ( x << b ) | ( x >> (32-b) );
+		}
+	}
+	return x;
+}
+
 struct RandomVectorFunction : public exprtk::ifunction<float>
 {
 	using exprtk::ifunction<float>::operator();
 
-	RandomVectorFunction(int seed)
+	RandomVectorFunction(const unsigned int seed)
 	: exprtk::ifunction<float>(1),
 	m_rseed(seed)
 	{exprtk::disable_has_side_effects(*this);}
@@ -218,14 +252,16 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 	{
 		if (index<0 || std::isnan(index) || std::isinf(index))
 			return 0;
-		const int data_size=sizeof(random_data)/sizeof(int);
-		int xi=(int)index;
-		int si=m_rseed%data_size;
-		int sa=m_rseed/data_size;
-		int res=random_data[(xi+si)%data_size]^random_data[(xi/data_size+sa)%data_size];
-		return res/(float)(1<<31);
+		const unsigned int xi=(unsigned int)index;
+		const unsigned int si=m_rseed%data_size;
+		const unsigned int sa=m_rseed/data_size;
+		unsigned int res=rotate(random_data[(xi+si)%data_size]^random_data[(xi/data_size+sa)%data_size],sa%31+1);
+		res^=rotate(random_data[(3*xi+si)%data_size]^random_data[(xi/data_size+2*sa)%data_size],xi%31+1);
+		return static_cast<int>(res)/(float)(1<<31);
 	}
-	int m_rseed;
+
+	const int data_size=sizeof(random_data)/sizeof(int);
+	const unsigned int m_rseed;
 };
 
 namespace SimpleRandom {
@@ -243,6 +279,8 @@ namespace SimpleRandom {
 
 static freefunc0<float,SimpleRandom::float_random_with_engine,false> simple_rand;
 
+//The following was an experiment for new RandomVector based on C++11 random facilities.
+//it failed because the complexity of generator.discard(N) is O(N), instead of O(1)
 /*namespace RandomVector {
 	template <typename T>
 	std::uniform_real_distribution<T> dist(-1.0, 1.0);
@@ -281,6 +319,8 @@ public:
 	{
 		for (int i=0; i<cyclics.size();++i)
 			delete cyclics[i];
+		for (int i=0; i<cyclics_interp.size();++i)
+			delete cyclics_interp[i];
 		if (integ_func)
 			delete integ_func;
 	}
@@ -289,6 +329,7 @@ public:
 	expression_t expression;
 	std::string expression_string;
 	std::vector<WaveValueFunction<float>* > cyclics;
+	std::vector<WaveValueFunctionInterpolate<float>* > cyclics_interp;
 	RandomVectorFunction rand_vec;
 	IntegrateFunction<float> *integ_func;
 };
@@ -466,18 +507,47 @@ bool ExprFront::add_constant(const char *name, float ref)
 	return m_data->symbol_table.add_constant(name, ref);
 }
 
-bool ExprFront::add_cyclic_vector(const char *name, const float *data, size_t length)
+bool ExprFront::add_cyclic_vector(const char *name, const float *data, size_t length, bool interp)
 {
-	WaveValueFunction<float> *wvf=new WaveValueFunction<float>(data,length);
-	m_data->cyclics.push_back(wvf);
-	return m_data->symbol_table.add_function(name,*wvf);
+	if (interp)
+	{
+		WaveValueFunctionInterpolate<float> *wvf=new WaveValueFunctionInterpolate<float>(data,length);
+		m_data->cyclics_interp.push_back(wvf);
+		return m_data->symbol_table.add_function(name,*wvf);
+	}
+	else
+	{
+		WaveValueFunction<float> *wvf=new WaveValueFunction<float>(data,length);
+		m_data->cyclics.push_back(wvf);
+		return m_data->symbol_table.add_function(name,*wvf);
+	}
 }
-void ExprFront::setIntegrate(const unsigned int *frameCounter, unsigned int sample_rate)
+size_t find_occurances(const std::string& haystack, const char * const needle)
+{
+	size_t last_pos=0;
+	size_t count = 0;
+	size_t len=strlen(needle);
+	while (1)
+	{
+		last_pos=haystack.find(needle,last_pos);
+		if (last_pos==std::string::npos)
+			break;
+		++count;
+		last_pos+=len;
+	}
+	return count;
+}
+
+void ExprFront::setIntegrate(const unsigned int *const frameCounter, const unsigned int sample_rate)
 {
 	if (m_data->integ_func==NULL)
 	{
-		m_data->integ_func=new IntegrateFunction<float>(frameCounter,sample_rate);
-		m_data->symbol_table.add_function("integrate",*m_data->integ_func);
+		const unsigned int ointeg = find_occurances(m_data->expression_string,"integrate");
+		if ( ointeg > 0 )
+		{
+			m_data->integ_func = new IntegrateFunction<float>(frameCounter,sample_rate,ointeg);
+			m_data->symbol_table.add_function("integrate",*m_data->integ_func);
+		}
 	}
 
 }
