@@ -90,6 +90,8 @@ void ImportFilter::import( const QString & _file_to_import,
 					QMessageBox::Ok,
 					QMessageBox::NoButton );
 	}
+
+	Engine::updateFramesPerTick();
 }
 
 
