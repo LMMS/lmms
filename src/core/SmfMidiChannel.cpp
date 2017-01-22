@@ -84,10 +84,21 @@ void SmfMidiChannel::addNote( Note & n )
 		p = dynamic_cast<Pattern*>( it->createTCO( 0 ) );
 		p->movePosition( pPos );
 	}
+	else if( p && n.pos() < p->startPosition() )
+	{
+		// Find the suitable Pattern.
+		for( TrackContentObject *tco : it->getTCOs() )
+		{
+			// If there is any tco have larger index and less startPosition?
+			// So, no break.
+			if( tco->startPosition() <= n.pos() )
+				p = dynamic_cast<Pattern*>( tco );
+		}
+	}
 	hasNotes = true;
 	lastEnd = n.pos() + n.length();
 	n.setPos( n.pos( p->startPosition() ) );
-    p->addNote( n, false );
+	p->addNote( n, false );
 }
 
 void SmfMidiChannel::setName( QString tn )

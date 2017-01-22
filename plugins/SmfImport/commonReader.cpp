@@ -131,8 +131,11 @@ void commonReader::CCHandler( long tick, int track, int ctl, int value )
 			case bankEventId:
 				if( ch->isSF2 && ch->it_inst )
 				{
-					objModel = ch->it_inst->childModel( "bank" );
-					printf( "Tick=%ld: BANK SELECT %d\n", tick, value );
+					if( track != 9 )
+					{
+						objModel = ch->it_inst->childModel( "bank" );
+						printf( "Tick=%ld: BANK SELECT %d\n", tick, value );
+					}
 				}
 
 				break;
@@ -318,7 +321,7 @@ void commonReader::textHandler( int text_type, const QString &data , int track )
 		// How to handle markers & cue points?
 
 		default:
-			printf( "Unknown Text Event: %d %s", text_type, data.toStdString().c_str() );
+			printf( "Unknown Text Event: %d %s\n", text_type, data.toStdString().c_str() );
 	}
 
 }
