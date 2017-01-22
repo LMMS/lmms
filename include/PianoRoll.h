@@ -110,8 +110,8 @@ public:
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
 	int quantization() const;
-	
-	// qproperty acces functions
+
+	// qproperty access functions
 	QColor barLineColor() const;
 	void setBarLineColor( const QColor & c );
 	QColor beatLineColor() const;
