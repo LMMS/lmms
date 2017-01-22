@@ -2609,7 +2609,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	// fill with bg color
 	p.fillRect( 0, 0, width(), height(), bgColor );
-	
+
 	// set font-size to 8
 	p.setFont( pointSize<8>( p.font() ) );
 
@@ -2714,18 +2714,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// update y-pos
 			y -= WHITE_KEY_BIG_HEIGHT;
 		}
-
-	/*	// Draw horizontal grid lines 	
-		// Draw the C line in a more prominent color
-		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
-		{
-			p.setPen( horizColAccent );
-		}
-		else
-		{
-			p.setPen( horizCol );
-		}		
-		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );*/
 
 		// Compute the corrections for the note names
 		int yCorrectionForNoteLabels = 0;
@@ -2882,16 +2870,15 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
 			}
 		}
-		
-		// Draw the vertical quantization lines
-		
+
+		// Draw the grid
 		int q, x, tick;
-		
+
 		if ( m_zoomingModel.value() > 3 ) {
 			// If we're over 400% zoom, we allow all quantization level grids
 			q = quantization();
 		}
-		else if (quantization() % 3 != 0)
+		else if ( quantization() % 3 != 0 )
 		{
 			// If we're under 400% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
@@ -2901,28 +2888,34 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			// If we're under 400% zoom, we allow quantization grid up to 1/32 for normal notes
 			q = quantization() < 6 ? 6 : quantization();
 		}
-		printf("%d\n", quantization());
-		
-		
+
+		// First we draw the vertical quantization lines
 		for( tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick( tick );
-		 	x<=width();
+		 	x <= width();
 		 	tick += q, x = xCoordOfTick( tick ) )
 		{
 			p.setPen( lineColor() );
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
-		
-		//key_line_y = keyAreaBottom() - 1;
-		key = m_startKey;
+
 		// Draw horizontal lines
-		for( int y = keyAreaBottom() + y_offset; y > PR_TOP_MARGIN;
+		key = m_startKey;
+		for( int y = keyAreaBottom() - 1; y > PR_TOP_MARGIN;
 				y -= KEY_LINE_HEIGHT )
 		{
-			printf("%d\n", keyAreaBottom() );
-			p.setPen( lineColor() );	
+			if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
+			{
+				// C note gets accented
+				p.setPen( beatLineColor() );
+			}
+			else
+			{
+				p.setPen( lineColor() );
+			}
 			p.drawLine( WHITE_KEY_WIDTH, y, width(), y );
+			++key;
 		}
-		
+
 		// Draw the vertical beat lines
 		int ticksPerBeat = DefaultTicksPerTact /
 			Engine::getSong()->getTimeSigModel().getDenominator();
@@ -2930,28 +2923,28 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		// triplet mode occurs if the note quantization isn't a multiple of 3
 		if( quantization() % 3 != 0 )
 		{
-			ticksPerBeat = static_cast<int>(ticksPerBeat * 2.0/3.0);
+			ticksPerBeat = static_cast<int>( ticksPerBeat * 2.0/3.0 );
 		}
 
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
 				 x = xCoordOfTick( tick );
-			 x<=width();
+			 x <= width();
 			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
 		{
 			p.setPen( beatLineColor() );
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
-		
+
 		// Draw the vertical bar lines
 		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
 				 x = xCoordOfTick( tick );
-			 x<=width();
+			 x <= width();
 			 tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
 		{
 			p.setPen( barLineColor() );
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
-	}	
+	}
 
 
 	// following code draws all notes in visible area

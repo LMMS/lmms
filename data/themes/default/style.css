@@ -127,7 +127,7 @@ PianoRoll {
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2a6548;
 	qproperty-barLineColor: #437053;
-	
+
 	/* Text on the white piano keys */
 	qproperty-textColor: #000;
 	qproperty-textColorLight: #0bd556;
