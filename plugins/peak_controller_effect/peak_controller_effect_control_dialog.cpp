@@ -42,7 +42,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(), QBrush(  embed::getIconPixmap( "peakartwork" ) ) );
+	pal.setBrush( backgroundRole(), QBrush(  embed::getIconPixmap( "peak_controller_artwork" ) ) );
 	setPalette( pal );
 	setFixedSize( 240, 80 );
 

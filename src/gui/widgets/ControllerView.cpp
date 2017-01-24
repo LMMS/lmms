@@ -67,10 +67,10 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	setLineWidth( 0 );
 	setContentsMargins( 0, 0, 0, 0 );
 	setWhatsThis( tr( "Controllers are able to automate the value of a knob, slider, and other controls."  ) );
-		
+
 	m_controllerDlg = getController()->createDialog( this );
 	m_controllerDlg->move( 1, m_titleBarHeight );
-	
+
 	m_nameLineEdit = new QLineEdit( this );
 	m_nameLineEdit->setText( _model->name() );
 	m_nameLineEdit->setReadOnly( true );
@@ -80,7 +80,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 	setFixedWidth( m_controllerDlg->width() + 2 );
 	setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
-	
+
 	m_collapse = new QPushButton( embed::getIconPixmap( "stepper-down" ), QString::null, this );
 	m_collapse->resize( buttonsize );
 	m_collapse->setFocusPolicy( Qt::NoFocus );
