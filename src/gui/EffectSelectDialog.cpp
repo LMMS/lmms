@@ -215,18 +215,6 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
         textWidgetLayout->setMargin( 4 );
         textWidgetLayout->setSpacing( 0 );
 
-        std::string stdName(descriptor.name);
-        if ( stdName != "ladspaeffect" )
-        {
-            QLabel *label = new QLabel(m_descriptionWidget);
-            QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
-            labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "pluginBrowser", descriptor.description ) + "</p>";
-            labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
-
-            label->setText(labelText);
-            textWidgetLayout->addWidget(label);
-        }
-
         if ( m_currentSelection.desc->subPluginFeatures )
         {
             QWidget *subWidget = new QWidget(textualInfoWidget);
@@ -244,6 +232,16 @@ void EffectSelectDialog::rowChanged( const QModelIndex & _idx,
             }
 
             textWidgetLayout->addWidget(subWidget);
+        }
+        else
+        {
+            QLabel *label = new QLabel(m_descriptionWidget);
+            QString labelText = "<p><b>" + tr("Name") + ":</b> " + QString::fromUtf8(descriptor.displayName) + "</p>";
+            labelText += "<p><b>" + tr("Description") + ":</b> " + qApp->translate( "pluginBrowser", descriptor.description ) + "</p>";
+            labelText += "<p><b>" + tr("Author") + ":</b> " + QString::fromUtf8(descriptor.author) + "</p>";
+
+            label->setText(labelText);
+            textWidgetLayout->addWidget(label);
         }
 
         ui->scrollArea->setWidget( m_descriptionWidget );

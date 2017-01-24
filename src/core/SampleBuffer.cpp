@@ -151,9 +151,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
 
 SampleBuffer::~SampleBuffer()
 {
-	if( m_origData != NULL )
-		MM_FREE( m_origData );
-
+	MM_FREE( m_origData );
 	MM_FREE( m_data );
 }
 
@@ -384,6 +382,7 @@ f_cnt_t SampleBuffer::decodeSampleSF( const char * _f,
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
+	sf_info.format = 0;
 	f_cnt_t frames = 0;
 	bool sf_rr = false;
 
@@ -912,27 +911,22 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	const float y_space = h*0.5f;
 	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
 
-	if( nb_frames < 60000 )
-	{
-		_p.setRenderHint( QPainter::Antialiasing );
-		QColor c = _p.pen().color();
-		_p.setPen( QPen( c, 0.7 ) );
-	}
 	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
-	QPoint * l = new QPoint[nb_frames / fpp + 1];
-	QPoint * r = new QPoint[nb_frames / fpp + 1];
+	QPointF * l = new QPointF[nb_frames / fpp + 1];
+	QPointF * r = new QPointF[nb_frames / fpp + 1];
 	int n = 0;
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
 	const int last = focus_on_range ? _to_frame : m_frames;
 	for( int frame = first; frame < last; frame += fpp )
 	{
-		l[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
-			(int)( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
-		r[n] = QPoint( xb + ( (frame - first) * double( w ) / nb_frames ),
-			(int)( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
+		l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+			( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
+		r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+			( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
 		++n;
 	}
+	_p.setRenderHint( QPainter::Antialiasing );
 	_p.drawPolyline( l, nb_frames / fpp );
 	_p.drawPolyline( r, nb_frames / fpp );
 	delete[] l;

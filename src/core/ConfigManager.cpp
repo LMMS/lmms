@@ -136,6 +136,16 @@ void ConfigManager::upgrade_1_1_90()
 	}
 }
 
+	
+void ConfigManager::upgrade_1_1_91()
+{		
+	// rename displaydbv to displaydbfs
+	if ( !value( "app", "displaydbv" ).isNull() ) {
+		setValue( "app", "displaydbfs", value( "app", "displaydbv" ) );
+		deleteValue( "app", "displaydbv" );
+	}
+}
+
 
 void ConfigManager::upgrade()
 {
@@ -147,13 +157,18 @@ void ConfigManager::upgrade()
 
 	ProjectVersion createdWith = m_version;
 	
-	if ( createdWith.setCompareType(Build) < "1.1.90" )
+	if ( createdWith.setCompareType(ProjectVersion::Build) < "1.1.90" )
 	{
 		upgrade_1_1_90();
 	}
 	
+	if ( createdWith.setCompareType(ProjectVersion::Build) < "1.1.91" )
+	{
+		upgrade_1_1_91();
+	}
+	
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
-	if ( createdWith.setCompareType(Minor) != LMMS_VERSION )
+	if ( createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION )
 	{
 		m_artworkDir = defaultArtworkDir();
 	}
@@ -546,5 +561,3 @@ void ConfigManager::saveConfigFile()
 	outfile.write( xml.toUtf8() );
 	outfile.close();
 }
-
-

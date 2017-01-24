@@ -66,6 +66,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "PeakController.h"
+#include "VersionedSaveDialog.h"
 
 
 tick_t MidiTime::s_ticksPerTact = DefaultTicksPerTact;
@@ -85,6 +86,7 @@ Song::Song() :
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
+	m_loadOnLaunch( true ),
 	m_recording( false ),
 	m_exporting( false ),
 	m_exportLoop( false ),
@@ -268,6 +270,7 @@ void Song::processNextBuffer()
 				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+			emit updateSampleTracks();
 		}
 	}
 
@@ -341,9 +344,13 @@ void Song::processNextBuffer()
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
 
-					m_elapsedMilliSeconds = 
-						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) / 
+					m_elapsedMilliSeconds =
+						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) /
 							getTempo();
+				}
+				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
+				{
+					emit updateSampleTracks();
 				}
 			}
 			else
@@ -575,6 +582,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 	if( isPlaying() ) 
 	{
 		emit playbackPositionChanged();
+		emit updateSampleTracks();
 	}
 }
 
@@ -911,6 +919,7 @@ void Song::createNewProject()
 	QCoreApplication::sendPostedEvents();
 
 	m_modified = false;
+	m_loadOnLaunch = false;
 
 	if( gui->mainWindow() )
 	{
@@ -928,11 +937,11 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 	// saving...
 	m_fileName = m_oldFileName = "";
 	// update window title
+	m_loadOnLaunch = false;
 	if( gui->mainWindow() )
 	{
 		gui->mainWindow()->resetWindowTitle();
 	}
-
 }
 
 
@@ -947,16 +956,23 @@ void Song::loadProject( const QString & fileName )
 
 	Engine::projectJournal()->setJournalling( false );
 
+	m_oldFileName = m_fileName;
 	m_fileName = fileName;
-	m_oldFileName = fileName;
 
 	DataFile dataFile( m_fileName );
 	// if file could not be opened, head-node is null and we create
 	// new project
-	if( dataFile.validate( fileName.right( fileName.lastIndexOf(".") ) ) )
+	if( dataFile.head().isNull() )
 	{
+		if( m_loadOnLaunch )
+		{
+			createNewProject();
+		}
+		m_fileName = m_oldFileName;
 		return;
 	}
+
+	m_oldFileName = m_fileName;
 
 	clearProject();
 
@@ -1074,6 +1090,7 @@ void Song::loadProject( const QString & fileName )
 
 	m_loadingProject = false;
 	m_modified = false;
+	m_loadOnLaunch = false;
 
 	if( gui && gui->mainWindow() )
 	{
@@ -1180,6 +1197,7 @@ void Song::importProject()
 	{
 		ImportFilter::import( ofd.selectedFiles()[0], this );
 	}
+	m_loadOnLaunch = false;
 }
 
 
@@ -1217,9 +1235,9 @@ void Song::restoreControllerStates( const QDomElement & element )
 
 void Song::removeAllControllers()
 {
-	for (int i = 0; i < m_controllers.size(); ++i)
+	while (m_controllers.size() != 0)
 	{
-		removeController(m_controllers.at(i));
+		removeController(m_controllers.at(0));
 	}
 
 	m_controllers.clear();
@@ -1284,9 +1302,11 @@ void Song::exportProject( bool multiExport )
 	efd.setAcceptMode( FileDialog::AcceptSave );
 
 
-	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
+					 !efd.selectedFiles()[0].isEmpty() )
 	{
 		QString suffix = "";
+		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{
 			int stx = efd.selectedNameFilter().indexOf( "(*." );
@@ -1304,7 +1324,12 @@ void Song::exportProject( bool multiExport )
 			}
 		}
 
-		const QString exportFileName = efd.selectedFiles()[0] + suffix;
+		if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+				tr( "Save project" ) ) )
+		{
+			exportFileName += suffix;
+		}
+
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
 		epd.exec();
 	}
@@ -1342,6 +1367,7 @@ void Song::exportProjectMidi()
 		base_filename = tr( "untitled" );
 	}
 	efd.selectFile( base_filename + ".mid" );
+	efd.setDefaultSuffix( "mid");
 	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
 	efd.setAcceptMode( FileDialog::AcceptSave );

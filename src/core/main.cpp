@@ -176,6 +176,27 @@ void printHelp()
 
 
 
+void fileCheck( QString &file )
+{
+	QFileInfo fileToCheck( file );
+
+	if( !fileToCheck.size() )
+	{
+		printf( "The file %s does not have any content.\n",
+				file.toUtf8().constData() );
+		exit( EXIT_FAILURE );
+	}
+	else if( fileToCheck.isDir() )
+	{
+		printf( "%s is a directory.\n",
+				file.toUtf8().constData() );
+		exit( EXIT_FAILURE );
+	}
+}
+
+
+
+
 int main( int argc, char * * argv )
 {
 	// initialize memory managers
@@ -567,6 +588,15 @@ int main( int argc, char * * argv )
 		}
 	}
 
+	// Test file argument before continuing
+	if( !fileToLoad.isEmpty() )
+	{
+		fileCheck( fileToLoad );
+	}
+	else if( !fileToImport.isEmpty() )
+	{
+		fileCheck( fileToImport );
+	}
 
 	ConfigManager::inst()->loadConfigFile(configFile);
 
@@ -636,15 +666,13 @@ int main( int argc, char * * argv )
 		Engine::init( true );
 		destroyEngine = true;
 
-		QFileInfo fileInfo( fileToLoad );
-		if ( !fileInfo.exists() )
-		{
-			printf("The file %s does not exist!\n", fileToLoad.toStdString().c_str());
-			exit( 1 );
-		}
-
 		printf( "Loading project...\n" );
 		Engine::getSong()->loadProject( fileToLoad );
+		if( Engine::getSong()->isEmpty() )
+		{
+			printf("The project %s is empty, aborting!\n", fileToLoad.toUtf8().constData() );
+			exit( EXIT_FAILURE );
+		}
 		printf( "Done\n" );
 
 		Engine::getSong()->setExportLoop( renderLoop );
@@ -718,10 +746,6 @@ int main( int argc, char * * argv )
 				"    <td><b>%6</b></td>"
 				"    <td>%7</td>"
 				"  </tr>"
-				"  <tr>"
-				"    <td><b>%8</b></td>"
-				"    <td>%9</td>"
-				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
 				MainWindow::tr( "There is a recovery file present. "
@@ -738,35 +762,49 @@ int main( int argc, char * * argv )
 					"present recover file from being overwritten." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
-					"the restored files. This is not reversible." ),
-				MainWindow::tr( "Quit" ),
-				MainWindow::tr( "Shut down LMMS with no further action." )
+					"the restored files. This is not reversible." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
 			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
+			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
-			mb.setStandardButtons( 	QMessageBox::Ok |
-							QMessageBox::Discard );
-
-			mb.setButtonText( QMessageBox::Ok,
-							MainWindow::tr( "Recover" ) );
-
-			QAbstractButton * recover;
-			QAbstractButton * discard;
+			QPushButton * recover;
+			QPushButton * discard;
 			QPushButton * ignore;
 			QPushButton * exit;
+			
+			#if QT_VERSION >= 0x050000
+				// setting all buttons to the same roles allows us 
+				// to have a custom layout
+				discard = mb.addButton( MainWindow::tr( "Discard" ),
+									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
 
-			recover = mb.QMessageBox::button( QMessageBox::Ok );
-			discard = mb.QMessageBox::button( QMessageBox::Discard );
-			ignore = mb.addButton( MainWindow::tr( "Ignore" ),
-								QMessageBox::NoRole );
-			ignore->setIcon( embed::getIconPixmap( "no_entry" ) );
-			exit = mb.addButton( MainWindow::tr( "Exit" ),
-								QMessageBox::RejectRole );
-			exit->setIcon( embed::getIconPixmap( "exit" ) );
+			# else 
+				// in qt4 the button order is reversed
+				recover = mb.addButton( MainWindow::tr( "Recover" ),
+									QMessageBox::AcceptRole );
+				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
+									QMessageBox::AcceptRole );
+				discard = mb.addButton( MainWindow::tr( "Discard" ),
+									QMessageBox::AcceptRole );
 
-			mb.setDefaultButton( QMessageBox::Ok );
+			#endif
+			
+			// have a hidden exit button
+			exit = mb.addButton( "", QMessageBox::RejectRole);
+			exit->setVisible(false);
+			
+			// set icons
+			recover->setIcon( embed::getIconPixmap( "recover" ) );
+			discard->setIcon( embed::getIconPixmap( "discard" ) );
+			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
+
+			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
 
 			mb.exec();
@@ -774,7 +812,7 @@ int main( int argc, char * * argv )
 			{
 				gui->mainWindow()->sessionCleanup();
 			}
-			else if( mb.clickedButton() == recover ) // ::Recover
+			else if( mb.clickedButton() == recover ) // Recover
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
@@ -870,6 +908,12 @@ int main( int argc, char * * argv )
 
 	// cleanup memory managers
 	MemoryManager::cleanup();
+
+	// ProjectRenderer::updateConsoleProgress() doesn't return line after render
+	if( coreOnly )
+	{
+		printf( "\n" );
+	}
 
 	return ret;
 }

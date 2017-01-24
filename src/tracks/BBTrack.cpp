@@ -251,6 +251,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	// bar lines
 	const int lineSize = 3;
+	p.setPen( c.darker( 200 ) );
 
 	tact_t t = Engine::getBBTrackContainer()->lengthOfBB( m_bbTCO->bbTrackIndex() );
 	if( m_bbTCO->length() > MidiTime::ticksPerTact() && t > 0 )
@@ -259,9 +260,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 								x < width() - 2;
 			x += static_cast<int>( t * pixelsPerTact() ) )
 		{
-			p.setPen( c.light( 80 ) );
 			p.drawLine( x, TCO_BORDER_WIDTH, x, TCO_BORDER_WIDTH + lineSize );
-			p.setPen( c.light( 120 ) );
 			p.drawLine( x, rect().bottom() - ( TCO_BORDER_WIDTH + lineSize ),
 			 	x, rect().bottom() - TCO_BORDER_WIDTH );
 		}
@@ -412,6 +411,7 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 	s_infoMap[this] = bbNum;
 
 	setName( tr( "Beat/Bassline %1" ).arg( bbNum ) );
+	Engine::getBBTrackContainer()->createTCOsForBB( bbNum );
 	Engine::getBBTrackContainer()->setCurrentBB( bbNum );
 	Engine::getBBTrackContainer()->updateComboBox();
 
@@ -425,8 +425,9 @@ BBTrack::BBTrack( TrackContainer* tc ) :
 BBTrack::~BBTrack()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( this,
-				PlayHandle::TypeNotePlayHandle
-				| PlayHandle::TypeInstrumentPlayHandle );
+					PlayHandle::TypeNotePlayHandle
+					| PlayHandle::TypeInstrumentPlayHandle
+					| PlayHandle::TypeSamplePlayHandle );
 
 	const int bb = s_infoMap[this];
 	Engine::getBBTrackContainer()->removeBB( bb );
@@ -548,7 +549,6 @@ void BBTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	{
 		const int src = _this.attribute( "clonebbt" ).toInt();
 		const int dst = s_infoMap[this];
-		Engine::getBBTrackContainer()->createTCOsForBB( dst );
 		TrackContainer::TrackList tl =
 					Engine::getBBTrackContainer()->tracks();
 		// copy TCOs of all tracks from source BB (at bar "src") to destination
@@ -665,4 +665,3 @@ void BBTrackView::clickedTrackLabel()
 	Engine::getBBTrackContainer()->setCurrentBB( m_bbTrack->index() );
 	gui->getBBEditor()->show();
 }
-

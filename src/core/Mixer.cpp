@@ -50,6 +50,7 @@
 // platform-specific midi-interface-classes
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
+#include "MidiJack.h"
 #include "MidiOss.h"
 #include "MidiSndio.h"
 #include "MidiWinMM.h"
@@ -77,6 +78,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_writeBuf( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
+	m_newPlayHandles( PlayHandle::MaxNumber ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
@@ -347,7 +349,9 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 					 currentPlayMode == Song::Mode_PlayBB;
 
 	if( playModeSupportsMetronome && m_metronomeActive && !song->isExporting() &&
-		p != last_metro_pos )
+		p != last_metro_pos &&
+			// Stop crash with metronome if empty project
+				Engine::getSong()->countTracks() )
 	{
 		tick_t ticksPerTact = MidiTime::ticksPerTact();
 		if ( p.getTicks() % (ticksPerTact / 1 ) == 0 )
@@ -419,7 +423,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	{
 		m_playHandles += e->value;
 		LocklessListElement * next = e->next;
-		delete e;
+		m_newPlayHandles.free( e );
 		e = next;
 	}
 
@@ -683,7 +687,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 				{
 					m_newPlayHandles.setFirst( e->next );
 				}
-				delete e;
+				m_newPlayHandles.free( e );
 				removedFromList = true;
 				break;
 			}
@@ -971,6 +975,19 @@ MidiClient * Mixer::tryMidiClients()
 			return malsar;
 		}
 		delete malsar;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if( client_name == MidiJack::name() || client_name == "" )
+	{
+		MidiJack * mjack = new MidiJack;
+		if( mjack->isRunning() )
+		{
+			m_midiClientName = MidiJack::name();
+			return mjack;
+		}
+		delete mjack;
 	}
 #endif
 

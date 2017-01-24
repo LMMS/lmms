@@ -165,8 +165,8 @@ public:
 		ArpDirUp,
 		ArpDirDown,
 		ArpDirUpAndDown,
-		ArpDirRandom,
 		ArpDirDownAndUp,
+		ArpDirRandom,
 		NumArpDirections
 	} ;
 
@@ -196,6 +196,9 @@ private:
 	BoolModel m_arpEnabledModel;
 	ComboBoxModel m_arpModel;
 	FloatModel m_arpRangeModel;
+	FloatModel m_arpCycleModel;
+	FloatModel m_arpSkipModel;
+	FloatModel m_arpMissModel;
 	TempoSyncKnobModel m_arpTimeModel;
 	FloatModel m_arpGateModel;
 	ComboBoxModel m_arpDirectionModel;

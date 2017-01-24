@@ -23,10 +23,11 @@
  */
 
 
-#include <QLayout>
-#include <QPushButton>
 #include <QFontMetrics>
+#include <QLayout>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
 
 #include "VersionedSaveDialog.h"
 
@@ -137,3 +138,25 @@ void VersionedSaveDialog::decrementVersion()
 }
 
 
+
+
+bool VersionedSaveDialog::fileExistsQuery( QString FileName, QString WindowTitle )
+{
+	bool fileExists = false;
+	if( QFile( FileName ).exists() )
+	{
+		QMessageBox mb;
+		mb.setWindowTitle( WindowTitle );
+		mb.setText( FileName + tr( " already exists. "
+			"Do you want to replace it?" ) );
+		mb.setIcon( QMessageBox::Warning );
+		mb.setStandardButtons(
+			QMessageBox::Yes | QMessageBox::No );
+
+		if( mb.exec() == QMessageBox::Yes )
+		{
+			fileExists = true;
+		}
+	}
+	return fileExists;
+}

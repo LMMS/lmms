@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 
-PACKAGES="cmake pkgconfig fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node"
+PACKAGES="cmake pkgconfig fftw libogg libvorbis libsndfile libsamplerate jack sdl stk fluid-synth portaudio node fltk"
 
 if [ $QT5 ]; then
-	PACKAGES="$PACKAGES qt55"
+	PACKAGES="$PACKAGES homebrew/versions/qt55"
 else
-	PACKAGES="$PACKAGES qt"
+	PACKAGES="$PACKAGES cartr/qt4/qt"
 fi
 
-brew reinstall $PACKAGES
+brew install $PACKAGES
 
 sudo npm install -g appdmg
-
-# Workaround per Homebrew bug #44806
-brew reinstall fltk
-if [ $? -ne 0 ]; then
-  echo "Warning: fltk installation failed, trying workaround..."
-  brew reinstall --devel https://raw.githubusercontent.com/dpo/homebrew/ec46018128dde5bf466b013a6c7086d0880930a3/Library/Formula/fltk.rb
-fi

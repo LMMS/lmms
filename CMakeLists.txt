@@ -31,13 +31,17 @@ SET(PROJECT_EMAIL       "lmms-devel@lists.sourceforge.net")
 SET(PROJECT_DESCRIPTION "${PROJECT_NAME_UCASE} - Free music production software")
 SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
-SET(VERSION_MINOR       "1")
-SET(VERSION_PATCH       "91")
-#SET(VERSION_SUFFIX     "")
-SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-IF(VERSION_SUFFIX)
-	SET(VERSION     "${VERSION}-${VERSION_SUFFIX}")
-ENDIF(VERSION_SUFFIX)
+SET(VERSION_MINOR       "2")
+SET(VERSION_RELEASE     "0")
+SET(VERSION_STAGE       "rc2")
+SET(VERSION_BUILD       "0")
+SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
+IF(VERSION_STAGE)
+	SET(VERSION     "${VERSION}-${VERSION_STAGE}")
+ENDIF()
+IF(VERSION_BUILD)
+	SET(VERSION     "${VERSION}.${VERSION_BUILD}")
+ENDIF()
 
 # Override version information for non-base builds
 INCLUDE(VersionInfo)
@@ -84,7 +88,6 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_SOUNDIO OFF)
-	SET(WANT_SYSTEM_SR OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
@@ -458,9 +461,13 @@ FILE(REMOVE include/lmmsconfig.h)
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
 
-# Get list of all committers from git history, ordered by number of commits
+# Get list of all committers from git history, ordered by number of commits.
+# The CONTRIBUTORS file is used by AboutDialog. This information can be provided
+# with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
+# this file for version 1.1.3, the command is:
+# 	git shortlog -sne v1.1.3 | cut -c8-
 FIND_PACKAGE(Git)
-IF(GIT_FOUND)
+IF(GIT_FOUND AND NOT CONTRIBUTORS)
 	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
 	EXECUTE_PROCESS(
 		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
@@ -468,7 +475,7 @@ IF(GIT_FOUND)
 		OUTPUT_FILE "${CONTRIBUTORS}"
 		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 		TIMEOUT 1)
-ENDIF(GIT_FOUND)
+ENDIF()
 
 # embedded resources stuff
 IF(WIN32 OR WIN64)
@@ -502,9 +509,10 @@ ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(cmake/postinstall)
 
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/doc/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
+				COMMAND gzip -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
 				DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
-				COMMENT "Generating lmms.1.gz")
+				COMMENT "Generating lmms.1.gz"
+				VERBATIM)
 
 
 ADD_CUSTOM_TARGET(manpage ALL
@@ -582,6 +590,7 @@ MESSAGE(
 "* ALSA                        : ${STATUS_ALSA}\n"
 "* OSS                         : ${STATUS_OSS}\n"
 "* Sndio                       : ${STATUS_SNDIO}\n"
+"* JACK                        : ${STATUS_JACK}\n"
 "* WinMM                       : ${STATUS_WINMM}\n"
 "* AppleMidi                   : ${STATUS_APPLEMIDI}\n"
 )
@@ -619,4 +628,3 @@ MESSAGE(
 "\n\n")
 
 INCLUDE(InstallRequiredSystemLibraries)
-

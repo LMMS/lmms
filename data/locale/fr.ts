@@ -614,6 +614,10 @@ Si vous êtes intéressé par la traduction de LMMS dans une nouvelle langue ou 
         <source>Clone Steps</source>
         <translation>Cloner des pas</translation>
     </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation>Ajouter une piste d&apos;échantillon</translation>
+    </message>
 </context>
 <context>
     <name>BBTCOView</name>
@@ -900,8 +904,16 @@ Si vous êtes intéressé par la traduction de LMMS dans une nouvelle langue ou 
         <translation>Entrez un nouveau nom pour ce contrôleur</translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
+        <source>&amp;Remove this controller</source>
         <translation>Supp&amp;rimer ce contrôleur</translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
+        <translation>Re&amp;nommer ce contrôleur</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
     </message>
 </context>
 <context>
@@ -1284,6 +1296,10 @@ Si vous êtes intéressé par la traduction de LMMS dans une nouvelle langue ou 
     <message>
         <source>Name</source>
         <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Type</translation>
     </message>
     <message>
         <source>Description</source>
@@ -2144,44 +2160,48 @@ Veuillez vérifier que vous avez les droits d&apos;accès en écriture à ce fic
 <context>
     <name>FlangerControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Délai</translation>
-    </message>
-    <message>
         <source>Delay Time:</source>
         <translation>Temps de délai :</translation>
-    </message>
-    <message>
-        <source>Lfo Hz</source>
-        <translation>LFO Hz</translation>
-    </message>
-    <message>
-        <source>Lfo:</source>
-        <translation>LFO :</translation>
-    </message>
-    <message>
-        <source>Amt</source>
-        <translation>Niv</translation>
-    </message>
-    <message>
-        <source>Amt:</source>
-        <translation>Niv. :</translation>
-    </message>
-    <message>
-        <source>Regen</source>
-        <translation>Régén</translation>
     </message>
     <message>
         <source>Feedback Amount:</source>
         <translation>Niveau de réinjection :</translation>
     </message>
     <message>
-        <source>Noise</source>
-        <translation>Bruit</translation>
-    </message>
-    <message>
         <source>White Noise Amount:</source>
         <translation>Niveau de bruit blanc :</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>DE RETARD</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>TAUX</translation>
+    </message>
+    <message>
+        <source>Rate:</source>
+        <translation>Taux :</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>AMNT</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Montant :</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>FDBK</translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation>BRUIT</translation>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation>Inverser</translation>
     </message>
 </context>
 <context>
@@ -2239,14 +2259,6 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
 </context>
 <context>
     <name>FxMixerView</name>
-    <message>
-        <source>Rename FX channel</source>
-        <translation>Renommer le canal d&apos;effet</translation>
-    </message>
-    <message>
-        <source>Enter the new name for this FX channel</source>
-        <translation>Entrer le nouveau nom pour ce canal d&apos;effet</translation>
-    </message>
     <message>
         <source>FX-Mixer</source>
         <translation>Mélangeur d&apos;effets</translation>
@@ -2446,6 +2458,18 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
         <source>Down and up</source>
         <translation>Descendant et ascendant</translation>
     </message>
+    <message>
+        <source>Skip rate</source>
+        <translation>Taux de saut</translation>
+    </message>
+    <message>
+        <source>Miss rate</source>
+        <translation>Taux de manqué</translation>
+    </message>
+    <message>
+        <source>Cycle steps</source>
+        <translation>Pas de cycle</translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
@@ -2516,6 +2540,46 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
     <message>
         <source>Mode:</source>
         <translation>Mode :</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation>SAUT</translation>
+    </message>
+    <message>
+        <source>Skip rate:</source>
+        <translation>Taux de saut :</translation>
+    </message>
+    <message>
+        <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
+        <translation>La fonction de saut fera que l&apos;arpéggiateur mettra un pas en pause au hasard. Il commencera en position anti-horaire complète et, sans effet, il progressera graduellement vers une amnésie complète à son paramétrage maximum.</translation>
+    </message>
+    <message>
+        <source>MISS</source>
+        <translation>MANQUÉ</translation>
+    </message>
+    <message>
+        <source>Miss rate:</source>
+        <translation>Taux de manqué :</translation>
+    </message>
+    <message>
+        <source>The miss function will make the arpeggiator miss the intended note.</source>
+        <translation>La fonction manqué fera que l&apos;arpégiateur manquera la note attendue.</translation>
+    </message>
+    <message>
+        <source>CYCLE</source>
+        <translation>CYCLE</translation>
+    </message>
+    <message>
+        <source>Cycle notes:</source>
+        <translation>Notes de cycle :</translation>
+    </message>
+    <message>
+        <source>note(s)</source>
+        <translation>note(s)</translation>
+    </message>
+    <message>
+        <source>Jumps over n steps in the arpeggio and cycles around if we&apos;re over the note range. If the total note range is evenly divisible by the number of steps jumped over you will get stuck in a shorter arpeggio or even on one note.</source>
+        <translation>Saute de n pas dans l&apos;arpège et les cycles si nous sommes au délà de la gamme de note. Si la gamme de note totale est divisible en parts égales par le nombre de pas au dessus desquels on saute, vous serez coincé dans un arpège plus court ou bien même dans une note.</translation>
     </message>
 </context>
 <context>
@@ -2899,6 +2963,14 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
     <message>
         <source>5</source>
         <translation>5</translation>
+    </message>
+    <message>
+        <source>Phrygian dominant</source>
+        <translation>Phrygien dominant</translation>
+    </message>
+    <message>
+        <source>Persian</source>
+        <translation>Persien</translation>
     </message>
 </context>
 <context>
@@ -3368,8 +3440,8 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
         <translation>Mode logarithmique</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>Veuillez entrer une valeur entre -96,0 dBV et 6,0 dBV :</translation>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Veuillez entrer une valeur entre -96,0 dBV et 6,0 dBFS:</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -3508,10 +3580,6 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
         <translation>Utilisez ce bouton pour régler la vitesse du LFO. Plus la valeur est importante, plus l&apos;oscillateur oscille vite et plus l&apos;effet est rapide.</translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation>AMT</translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation>Niveau de modulation :</translation>
     </message>
@@ -3568,6 +3636,10 @@ Double-cliquez pour choisir un fichier.</translation>
     <message>
         <source>Click here for a moog saw-wave.</source>
         <translation>Cliquez ici pour une onde Moog en dents-de-scie.</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>AMNT</translation>
     </message>
 </context>
 <context>
@@ -3872,18 +3944,6 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>Lancer une session par défaut et effacer les fichiers de récupération. Ceci n&apos;est pas réversible.</translation>
     </message>
     <message>
-        <source>Quit</source>
-        <translation>Quitter</translation>
-    </message>
-    <message>
-        <source>Shut down LMMS with no further action.</source>
-        <translation>Fermer LMMS sans davantage d&apos;action.</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Sortir</translation>
-    </message>
-    <message>
         <source>Preparing plugin browser</source>
         <translation>Préparation du navigateur de greffons</translation>
     </message>
@@ -3906,10 +3966,6 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     <message>
         <source>Save as default template</source>
         <translation>Sauvegardder en tant que omdèle par défaut</translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>Exporter en &amp;MIDI...</translation>
     </message>
     <message>
         <source>&amp;View</source>
@@ -3980,8 +4036,8 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>Ceci ré-écrira votre modèle par défaut actuel.</translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
-        <translation>Volume en dBV</translation>
+        <source>Volume as dBFS</source>
+        <translation>Volume en dBFS</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -4046,6 +4102,19 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     <message>
         <source>Track</source>
         <translation>Piste</translation>
+    </message>
+</context>
+<context>
+    <name>MidiJack</name>
+    <message>
+        <source>JACK server down</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
+        <translation>Le serveur JACK est arrêté</translation>
+    </message>
+    <message>
+        <source>The JACK server seems to be shuted down.</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
+        <translation>Le serveur JACK semble avoir été coupé</translation>
     </message>
 </context>
 <context>
@@ -5342,12 +5411,12 @@ PM signifie Modulation de Phase : la phase de l&apos;oscillateur 3 est modulée 
         <translation>DCAY</translation>
     </message>
     <message>
-        <source>TRES</source>
-        <translation>SEUIL</translation>
-    </message>
-    <message>
         <source>Treshold:</source>
         <translation>Seuil :</translation>
+    </message>
+    <message>
+        <source>TRSH</source>
+        <translation>TRSH</translation>
     </message>
 </context>
 <context>
@@ -5594,6 +5663,10 @@ PM signifie Modulation de Phase : la phase de l&apos;oscillateur 3 est modulée 
         <source>Piano-Roll - no pattern</source>
         <translation>Piano virtuel - pas de motif</translation>
     </message>
+    <message>
+        <source>Quantize</source>
+        <translation>Quantifier</translation>
+    </message>
 </context>
 <context>
     <name>PianoView</name>
@@ -5642,7 +5715,7 @@ Raison : &quot;%2&quot;</translation>
     <name>PluginFactory</name>
     <message>
         <source>Plugin not found.</source>
-        <translation>Greffon introuvable</translation>
+        <translation>Greffon introuvable.</translation>
     </message>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
@@ -5984,8 +6057,8 @@ Raison : &quot;%2&quot;</translation>
         <translation>Invitation à redémarrer après modification de la configuration</translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
-        <translation>Afficher le volume en dBV</translation>
+        <source>Display volume as dBFS </source>
+        <translation>Afficher le volume en dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
@@ -6042,10 +6115,6 @@ Raison : &quot;%2&quot;</translation>
     <message>
         <source>Background artwork</source>
         <translation>Thème graphique d&apos;arrière-plan</translation>
-    </message>
-    <message>
-        <source>FL Studio installation directory</source>
-        <translation>Répertoire d&apos;installation de FL Studio</translation>
     </message>
     <message>
         <source>STK rawwave directory</source>
@@ -6128,10 +6197,6 @@ Latence : %2 ms</translation>
     <message>
         <source>Choose artwork-theme directory</source>
         <translation>Choisissez le répertoire des thèmes graphiques</translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
-        <translation>Choisissez le répertoire d&apos;installation de FL Studio</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
@@ -6251,10 +6316,6 @@ Rappelez-vous de sauvegarder également votre projet manuellement.</translation>
         <translation>Séquences MIDI</translation>
     </message>
     <message>
-        <source>FL Studio projects</source>
-        <translation>Projets FL Studio</translation>
-    </message>
-    <message>
         <source>Hydrogen projects</source>
         <translation>Projets Hydrogen</translation>
     </message>
@@ -6368,20 +6429,20 @@ Veuillez vérifier que vous avez au moins les droits en lecture pour ce fichier 
         <translation>Ne peux pas ouvrir %1 en écriture. Vous n&apos;avez probablement pas les droits pour écrire dans ce fichier. Assurez vous que vous avez les droits d&apos;accès en écriture pour ce fichier et essayez à nouveau.</translation>
     </message>
     <message>
-        <source>Project Version Mismatch</source>
-        <translation>Version de projet différente</translation>
-    </message>
-    <message>
-        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
-        <translation>Ce %1 a été créé avec la version %2 de LMMS mais la version installée est %3</translation>
-    </message>
-    <message>
         <source>template</source>
         <translation>modèle</translation>
     </message>
     <message>
         <source>project</source>
         <translation>projet</translation>
+    </message>
+    <message>
+        <source>Version difference</source>
+        <translation>Différence de version</translation>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS %2.</source>
+        <translation>Ce %1 a été créé avec LMMS %2.</translation>
     </message>
 </context>
 <context>
@@ -6475,6 +6536,21 @@ Veuillez vérifier que vous avez au moins les droits en lecture pour ce fichier 
     <message>
         <source>Channel mode</source>
         <translation>Mode du canal</translation>
+    </message>
+</context>
+<context>
+    <name>SubWindow</name>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation>Maximiser</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation>Restorer</translation>
     </message>
 </context>
 <context>
@@ -6673,10 +6749,6 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     <message>
         <source>Importing MIDI-file...</source>
         <translation>Importation du fichier MIDI...</translation>
-    </message>
-    <message>
-        <source>Importing FLP-file...</source>
-        <translation>Importation du fichier FLP...</translation>
     </message>
 </context>
 <context>
@@ -8705,7 +8777,7 @@ En double-cliquant sur ces greffons vous ferez apparaître des informations sur 
     </message>
     <message>
         <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
-        <translation>Le bouton d&apos;aléation ajoute du hasard à tous les boutons sauf les boutons d&apos;harmoniques, de volume principal, et de distorsion</translation>
+        <translation>Le bouton d&apos;aléation ajoute du hasard à tous les boutons sauf les boutons d&apos;harmoniques, de volume principal, et de distorsion.</translation>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
@@ -9042,10 +9114,6 @@ En double-cliquant sur ces greffons vous ferez apparaître des informations sur 
     <message>
         <source>List installed LADSPA plugins</source>
         <translation>Liste des greffons LADSPA installés</translation>
-    </message>
-    <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation>Filtre pour l&apos;importation de projets FL Studio dans LMMS</translation>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>

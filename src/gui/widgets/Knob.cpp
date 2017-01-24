@@ -51,7 +51,6 @@
 #include "templates.h"
 #include "TextFloat.h"
 
-
 TextFloat * Knob::s_textFloat = NULL;
 
 
@@ -729,6 +728,7 @@ void Knob::setPosition( const QPoint & _p )
 	const float oldValue = model()->value();
 
 
+
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
 		const float pos = model()->minValue() < 0
@@ -738,7 +738,8 @@ void Knob::setPosition( const QPoint & _p )
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
-			model()->setValue( oldValue - newValue );
+			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - newValue ) / step + 0.5 ) ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -747,12 +748,12 @@ void Knob::setPosition( const QPoint & _p )
 		}
 	}
 
-
 	else // linear code
 	{
 		if( qAbs( value ) >= step )
 		{
-			model()->setValue( oldValue - value );
+			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - value ) / step + 0.5 ) ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -769,22 +770,23 @@ void Knob::enterValue()
 {
 	bool ok;
 	float new_val;
+
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
 			this, windowTitle(),
 			tr( "Please enter a new value between "
-					"-96.0 dBV and 6.0 dBV:" ),
-				20.0 * log10( model()->value() / 100.0 ),
-							-96.0, 6.0, 4, &ok );
+					"-96.0 dBFS and 6.0 dBFS:" ),
+				20.0 * log10( model()->getRoundedValue() / 100.0 ),
+							-96.0, 6.0, model()->getDigitCount(), &ok );
 		if( new_val <= -96.0 )
 		{
 			new_val = 0.0f;
 		}
 		else
 		{
-			new_val = dbvToAmp( new_val ) * 100.0;
+			new_val = dbfsToAmp( new_val ) * 100.0;
 		}
 	}
 	else
@@ -795,9 +797,9 @@ void Knob::enterValue()
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
 						arg( model()->maxValue() ),
-					model()->value(),
+					model()->getRoundedValue(),
 					model()->minValue(),
-					model()->maxValue(), 4, &ok );
+					model()->maxValue(), model()->getDigitCount(), &ok );
 	}
 
 	if( ok )
@@ -825,14 +827,14 @@ void Knob::friendlyUpdate()
 QString Knob::displayValue() const
 {
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
-		return m_description.trimmed() + QString( " %1 dBV" ).
-				arg( 20.0 * log10( model()->value() / volumeRatio() ),
+		return m_description.trimmed() + QString( " %1 dBFS" ).
+				arg( 20.0 * log10( model()->getRoundedValue() / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->value() ) + m_unit;
+					arg( model()->getRoundedValue() ) + m_unit;
 }
 
 
@@ -858,9 +860,3 @@ void Knob::displayHelp()
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
 }
-
-
-
-
-
-

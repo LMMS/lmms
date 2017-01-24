@@ -614,6 +614,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Clone Steps</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BBTCOView</name>
@@ -905,6 +909,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Re&amp;name this controller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LFO</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2139,31 +2147,7 @@ Please make sure you have write-permission to the file and the directory contain
 <context>
     <name>FlangerControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delay Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lfo Hz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lfo:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Amt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Amt:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Regen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2171,11 +2155,39 @@ Please make sure you have write-permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Noise</source>
+        <source>White Noise Amount:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>White Noise Amount:</source>
+        <source>DELAY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2229,14 +2241,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
 </context>
 <context>
     <name>FxMixerView</name>
-    <message>
-        <source>Rename FX channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter the new name for this FX channel</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
@@ -2436,6 +2440,18 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Down and up</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Skip rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miss rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle steps</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
@@ -2505,6 +2521,46 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MISS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miss rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The miss function will make the arpeggiator miss the intended note.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CYCLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle notes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>note(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jumps over n steps in the arpeggio and cycles around if we&apos;re over the note range. If the total note range is evenly divisible by the number of steps jumped over you will get stuck in a shorter arpeggio or even on one note.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2888,6 +2944,14 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phrygian dominant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Persian</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3358,7 +3422,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3859,18 +3923,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Quit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shut down LMMS with no further action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Preparing plugin browser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3892,10 +3944,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Save as default template</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3967,7 +4015,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
+        <source>Volume as dBFS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4032,6 +4080,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MidiJack</name>
+    <message>
+        <source>JACK server down</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The JACK server seems to be shuted down.</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5313,11 +5374,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>TRES</source>
+        <source>Treshold:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Treshold:</source>
+        <source>TRSH</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5958,7 +6019,7 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
+        <source>Display volume as dBFS </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6015,10 +6076,6 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Background artwork</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FL Studio installation directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6100,10 +6157,6 @@ Latency: %2 ms</source>
     </message>
     <message>
         <source>Choose artwork-theme directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6452,10 +6505,6 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>Maximize</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Minimize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

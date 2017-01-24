@@ -62,12 +62,12 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	
 	ampGraph->setAutoFillBackground( true );
 	ampGraph->setPalette( pal );
-	ampGraph->setGraphColor( QColor( 48, 255, 117 ) );
+	ampGraph->setGraphColor( QColor( 11, 213, 86) );
 	ampGraph -> setMaximumSize( 204, 105 );
 	
 	lpGraph->setAutoFillBackground( true );
 	lpGraph->setPalette( pal );
-	lpGraph->setGraphColor( QColor( 255, 48, 117 ) );
+	lpGraph->setGraphColor( QColor( 0, 200, 187) );
 	lpGraph -> setMaximumSize( 204, 105 );
 	
 	// steps spinbox
@@ -88,7 +88,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setLabel( tr( "Dry" ) );
-	dryGain->setHintText( tr( "Dry Gain:" ) , " dBV" );
+	dryGain->setHintText( tr( "Dry Gain:" ) , " dBFS" );
 
 	Knob * stages = new Knob( knobBright_26, this );
 	stages->move( 200, 245 );

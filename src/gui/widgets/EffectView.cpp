@@ -120,8 +120,12 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 				m_subWindow->setFixedSize( m_subWindow->size() );
 
-				connect( m_controlView, SIGNAL( closed() ),
-						 this, SLOT( closeEffects() ) );
+			Qt::WindowFlags flags = m_subWindow->windowFlags();
+			flags &= ~Qt::WindowMaximizeButtonHint;
+			m_subWindow->setWindowFlags( flags );
+
+			connect( m_controlView, SIGNAL( closed() ),
+					this, SLOT( closeEffects() ) );
 
 				m_subWindow->hide();
 			}

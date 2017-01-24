@@ -27,11 +27,9 @@
 
 #include "EffectControls.h"
 #include "EqControlsDialog.h"
-#include "Knob.h"
 
 
 class EqEffect;
-
 
 class EqControls : public EffectControls
 {
@@ -53,7 +51,7 @@ public:
 
 	virtual int controlCount()
 	{
-		return 39;
+		return 42;
 	}
 
 	virtual EffectControlDialog* createView()
@@ -79,7 +77,7 @@ public:
 	bool visable();
 
 private:
-	EqEffect* m_effect;
+	EqEffect *m_effect;
 
 	FloatModel m_inGainModel;
 	FloatModel m_outGainModel;

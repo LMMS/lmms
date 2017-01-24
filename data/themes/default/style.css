@@ -8,18 +8,18 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 }
 
 QMdiArea {
-	background-color: #121314;
+	background-color: #111314;
 }
 
 AutomationEditor {
 	background-color: #040506;
 	color: #ffffff;
-	qproperty-vertexColor: #7f0a1d;
-	qproperty-gridColor: #2d3339;
-	qproperty-crossColor: #FE143A;
+	qproperty-vertexColor: #6749C2;
+	qproperty-gridColor: #190F38;
+	qproperty-crossColor: #9875FF;
 
 	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
-                     stop:0 rgba(83,7,19,255),  stop:1 rgba(127,10,29,50));
+                     stop:0 rgba(69,42,153,255),  stop:1 rgba(81,48,179,50));
 										 qproperty-scaleColor: #262b30;
 }
 
@@ -30,6 +30,11 @@ QLineEdit {
 	border: 1px;
 	background: #101213;
 	color: #d1d8e4;
+}
+
+QLineEdit:read-only {
+	border-style: none;
+	background: transparent;
 }
 
 /* text box when it wants text */
@@ -265,6 +270,12 @@ TrackContainerView QFrame{
 	background-color: #262b30;
 }
 
+/* background for track controls */
+TrackView > QWidget{
+	background-color: #3B424A;
+}
+
+
 /* autoscroll, loop, stop behaviour toggle buttons */
 
 /* track background colors */
@@ -412,23 +423,22 @@ QToolButton:checked  {
 	border-top: 1px solid #1b1f22;
 	border-bottom: 1px solid #4a515e;
 	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1b1f22, stop:1 #13161a);
-	background-image: url(resources:shadow_c.png);
+	background-image: url(resources:shadow_p.png);
 }
 
 /* track label buttons - the part that contains the icon and track title */
 
 TrackLabelButton {
-	border: 1px solid #262b30;
-	background-color: #262b30;
-	border-radius: none;
+	background-color: #3B424A;
+	border: 1px solid #3B424A;
 	font-size: 11px;
 	font-weight: normal;
 	padding: 2px 1px;
 }
 
 TrackLabelButton:hover {
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #333940, stop:1 #262b30);
-	border: 1px solid #262b30;
+	background: #3B424A;
+	border: 1px solid #515B66;
 	border-radius: none;
 	font-size: 11px;
 	font-weight: normal;
@@ -436,16 +446,18 @@ TrackLabelButton:hover {
 }
 
 TrackLabelButton:pressed {
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #262B30, stop:1 #1E2326);
+	background: #262B30;
+	border-radius: none;
 	font-size: 11px;
 	font-weight: normal;
 	padding: 2px 1px;
 }
 
 TrackLabelButton:checked {
-	border: 1px solid #2f353b;
-	background: #14171a;
-	background-image: url(resources:track_shadow_c.png);
+	border: 1px solid #485059;
+	background: #1C1F24;
+	background-image: url(resources:track_shadow_p.png);
+	border-radius: none;
 	font-size: 11px;
 	font-weight: normal;
 	padding: 2px 1px;
@@ -454,7 +466,7 @@ TrackLabelButton:checked {
 TrackLabelButton:checked:pressed {
 	border: 1px solid #2f353b;
 	background: #0e1012;
-	background-image: url(resources:track_shadow_c.png);
+	background-image: url(resources:track_shadow_p.png);
 	font-size: 11px;
 	padding: 2px 1px;
 	font-weight: solid;
@@ -464,7 +476,7 @@ TrackLabelButton:checked:pressed {
 
 SideBar {
 	subcontrol-position: center;
-	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1D2122,  stop:1 #111314);
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #1D2122,  stop:1 #262B30);
 }
 
 SideBar QToolButton {
@@ -498,17 +510,17 @@ PluginDescList {
 }
 
 PluginDescWidget {
-	border-top: 1px solid #323940;
+	border-top: 1px solid #3E474F;
 	border-bottom: 1px solid #101314;
 	border-radius: 2px;
-	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #262B30, stop:1 #1E2326);
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2E343B, stop:1 #1E2326);
 	color: #d1d8e4;
 	font-weight: bold;
 	margin: 0px;
 }
 
 PluginDescWidget:hover {
-	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #262B30, stop:1 #1E2326);
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2E343B, stop:1 #1E2326);
 	color: #d1d8e4;
 }
 
@@ -527,7 +539,7 @@ FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushBut
 FxLine {
 	background: #14161A;
 	color: #d1d8e4;
-	qproperty-backgroundActive: qlineargradient(spread:reflect, x2:0, y1:0, x2:0, y2:1, stop:0 #21242B, stop:1 #14161A);
+	qproperty-backgroundActive: #3B424A;
 	qproperty-strokeOuterActive: #262B30;
 	qproperty-strokeOuterInactive: #262B30;
 	qproperty-strokeInnerActive: #0C0D0F;
@@ -536,8 +548,9 @@ FxLine {
 
 /* persistent peak markers for fx peak meters */
 Fader {
-	qproperty-peakGreen: #0BD556;
-	qproperty-peakRed: #660505;
+	qproperty-peakGreen: #0ad45c;
+	qproperty-peakYellow: #d6ec52;
+	qproperty-peakRed: #c12038;
 }
 
 TimeLineWidget {
@@ -586,8 +599,9 @@ TrackContainerView QLabel
 /* common pattern colors */
 TrackContentObjectView   {
 	qproperty-mutedColor: rgb(255,255,255,100);
-	qproperty-mutedBackgroundColor: #0A0B0D;
+	qproperty-mutedBackgroundColor: #373d48;
 	qproperty-selectedColor: #006B65;
+	qproperty-BBPatternBackground: #373d48;
 	qproperty-textColor: #fff;
 	qproperty-textShadowColor: rgb(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
@@ -601,14 +615,14 @@ PatternView {
 
 /* sample track pattern */
 SampleTCOView {
-	background-color: #261657;
-	color: #100A26;
+	background-color: #DE7C05;
+	color: #FFE8CD;
 }
 
 /* automation pattern */
 AutomationPatternView {
-	background-color: #4D0818;
-	color: rgba(0,0,0,130);
+	background-color: #663DE1;
+	color: rgba(255,255,255,90);
 }
 
 /* bb-pattern */
@@ -618,10 +632,10 @@ BBTCOView {
 
 /* Subwindows in MDI-Area */
 SubWindow {
-	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #3D454F, stop:1 #262B30);
-	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #202329, stop:1 #14171A);
+	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #090909, stop:0.05 #3D454F, stop:1 #262B30);
+	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #090909, stop:0.05 #636c7a, stop:1 #343840);
 	qproperty-textShadowColor: #000;
-	qproperty-borderColor: #323940;
+	qproperty-borderColor: #5c6b7a;
 }
 
 /* Subwindow title text */

@@ -35,6 +35,12 @@ QLineEdit {
 	color: #e0e0e0;
 }
 
+
+QLineEdit:read-only {
+	border-style: none;
+	background: transparent;
+}
+
 /* text box when it wants text */
 
 QLineEdit:focus {
@@ -573,6 +579,7 @@ TrackContentObjectView   {
 	qproperty-mutedColor: rgb( 128, 128, 128 );
 	qproperty-mutedBackgroundColor: rgb( 80, 80, 80 );
 	qproperty-selectedColor: rgb( 0, 125, 255 );
+	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */

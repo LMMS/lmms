@@ -63,19 +63,15 @@ public:
 
 	void init();
 
-
-	virtual MidiTime length() const;
-	MidiTime beatPatternLength() const;
+	void updateLength();
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( const Note * _note_to_del );
+	void removeNote( Note * _note_to_del );
 
 	Note * noteAtStep( int _step );
 
-	Note * rearrangeNote( const Note * _note_to_proc,
-						const bool _quant_pos = true );
 	void rearrangeAllNotes();
 	void clearNotes();
 
@@ -84,15 +80,14 @@ public:
 		return m_notes;
 	}
 
-	void setStep( int _step, bool _enabled );
+	Note * addStepNote( int step );
+	void setStep( int step, bool enabled );
 
 	// pattern-type stuff
 	inline PatternTypes type() const
 	{
 		return m_patternType;
 	}
-	void setType( PatternTypes _new_pattern_type );
-	void checkType();
 
 
 	// next/previous track based on position in the containing track
@@ -122,7 +117,6 @@ public:
 
 
 protected:
-	void ensureBeatNotes();
 	void updateBBTrack();
 
 
@@ -135,6 +129,11 @@ protected slots:
 
 
 private:
+	MidiTime beatPatternLength() const;
+
+	void setType( PatternTypes _new_pattern_type );
+	void checkType();
+
 	void resizeToFirstTrack();
 
 	InstrumentTrack * m_instrumentTrack;

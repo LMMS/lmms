@@ -84,6 +84,7 @@ public slots:
 	void addSteps();
 	void cloneSteps();
 	void removeSteps();
+	void addSampleTrack();
 	void addAutomationTrack();
 
 protected slots:

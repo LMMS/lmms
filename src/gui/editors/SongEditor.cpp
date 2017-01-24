@@ -75,7 +75,7 @@ void positionLine::paintEvent( QPaintEvent * pe )
 }
 
 const QVector<double> SongEditor::m_zoomLevels =
-		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
+		{ 16.0f, 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
 
 
 SongEditor::SongEditor( Song * song ) :
@@ -610,6 +610,14 @@ bool SongEditor::allowRubberband() const
 
 
 
+ComboBoxModel *SongEditor::zoomingModel() const
+{
+	return m_zoomingModel;
+}
+
+
+
+
 SongEditorWindow::SongEditorWindow(Song* song) :
 	Editor(Engine::mixer()->audioDev()->supportsCapture()),
 	m_editor(new SongEditor(song))
@@ -703,6 +711,7 @@ QSize SongEditorWindow::sizeHint() const
 
 void SongEditorWindow::play()
 {
+	emit playTriggered();
 	if( Engine::getSong()->playMode() != Song::Mode_PlaySong )
 	{
 		Engine::getSong()->playSong();

@@ -97,6 +97,7 @@ public:
 	static tick_t ticksPerTact( const TimeSig &sig );
 	static int stepsPerTact();
 	static void setTicksPerTact( tick_t tpt );
+	static MidiTime stepPosition( int step );
 
 private:
 	tick_t m_ticks;

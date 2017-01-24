@@ -59,12 +59,10 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
-#ifdef LMMS_BUILD_WIN32
-#ifdef LMMS_BUILD_WIN64
+#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
 #include "basename.c"
 #else
 #include <libgen.h>
-#endif
 #endif
 
 
@@ -739,7 +737,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == NULL )
 	{
-		debugMessage( "mainEntry prodecure returned NULL\n" );
+		debugMessage( "mainEntry procedure returned NULL\n" );
 		return false;
 	}
 

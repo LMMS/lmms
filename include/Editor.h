@@ -43,7 +43,7 @@ class Editor : public QMainWindow
 	Q_OBJECT
 public:
 	void setPauseIcon(bool displayPauseIcon=true);
-
+	QAction *playAction() const;
 protected:
 	DropToolBar * addDropToolBarToTop(QString const & windowTitle);
 	DropToolBar * addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle);

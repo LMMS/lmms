@@ -40,46 +40,46 @@ DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 300, 200 );
+	setFixedSize( 300, 208 );
 
 	TempoSyncKnob* sampleDelayKnob = new TempoSyncKnob( knobBright_26, this );
-	sampleDelayKnob->move( 13,10 );
+	sampleDelayKnob->move( 10,14 );
 	sampleDelayKnob->setVolumeKnob( false );
 	sampleDelayKnob->setModel( &controls->m_delayTimeModel );
-	sampleDelayKnob->setLabel( tr( "Delay" ) );
+	sampleDelayKnob->setLabel( tr( "DELAY" ) );
 	sampleDelayKnob->setHintText( tr( "Delay Time" ) + " ", " s" );
 
 	Knob * feedbackKnob = new Knob( knobBright_26, this );
-	feedbackKnob->move( 13, 55 );
+	feedbackKnob->move( 11, 58 );
 	feedbackKnob->setVolumeKnob( true) ;
 	feedbackKnob->setModel( &controls->m_feedbackModel);
-	feedbackKnob->setLabel( tr( "Regen" ) );
+	feedbackKnob->setLabel( tr( "FDBK" ) );
 	feedbackKnob->setHintText( tr ( "Feedback Amount" ) + " " , "" );
 
 	TempoSyncKnob * lfoFreqKnob = new TempoSyncKnob( knobBright_26, this );
-	lfoFreqKnob->move( 13, 100 );
+	lfoFreqKnob->move( 11, 119 );
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoTimeModel );
-	lfoFreqKnob->setLabel( tr( "Rate" ) );
+	lfoFreqKnob->setLabel( tr( "RATE" ) );
 	lfoFreqKnob->setHintText( tr ( "Lfo") + " ", " s" );
 
 	TempoSyncKnob * lfoAmtKnob = new TempoSyncKnob( knobBright_26, this );
-	lfoAmtKnob->move( 13, 145 );
+	lfoAmtKnob->move( 11, 159 );
 	lfoAmtKnob->setVolumeKnob( false );
 	lfoAmtKnob->setModel( &controls->m_lfoAmountModel );
-	lfoAmtKnob->setLabel( tr( "Lfo" ) );
+	lfoAmtKnob->setLabel( tr( "AMNT" ) );
 	lfoAmtKnob->setHintText( tr ( "Lfo Amt" ) + " " , " s" );
 
 	EqFader * outFader = new EqFader( &controls->m_outGainModel,tr( "Out Gain" ),
 									  this, &controls->m_outPeakL, &controls->m_outPeakR );
 	outFader->setMaximumHeight( 196 );
-	outFader->move( 263, 42 );
+	outFader->move( 263, 45 );
 	outFader->setDisplayConversion( false );
-	outFader->setHintText( tr( "Gain" ), "dBv" );
+	outFader->setHintText( tr( "Gain" ), "dBFS" );
 
 	XyPad * pad = new XyPad( this, &controls->m_feedbackModel, &controls->m_delayTimeModel );
-	pad->resize( 196, 196 );
-	pad->move( 50, 2 );
+	pad->resize( 200, 200 );
+	pad->move( 50, 5 );
 }
 
 
@@ -103,6 +103,8 @@ void XyPad::paintEvent(QPaintEvent *event)
 	QPainter painter( this );
 		//Draw Frequecy maker lines
 		painter.setPen( QPen( QColor( 200, 200, 200, 200 ), 8, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+		painter.setRenderHint( QPainter::Antialiasing, true );
+
 		float xRange = m_xModel->maxValue() - m_xModel->minValue();
 		float xInc = xRange / width();
 		int xPos = ( m_xModel->value() - m_xModel->minValue() ) / xInc;

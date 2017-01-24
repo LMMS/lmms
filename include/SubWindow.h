@@ -64,12 +64,12 @@ protected:
 	virtual void moveEvent( QMoveEvent * event );
 	virtual void resizeEvent( QResizeEvent * event );
 	virtual void paintEvent( QPaintEvent * pe );
+	virtual void changeEvent( QEvent * event );
 	
 private:
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
 	QPushButton * m_closeBtn;
-	QPushButton * m_minimizeBtn;
 	QPushButton * m_maximizeBtn;
 	QPushButton * m_restoreBtn;
 	QBrush m_activeColor;
@@ -82,6 +82,7 @@ private:
 
 	static void elideText( QLabel *label, QString text );
 	bool isMaximized();
+	void adjustTitleBar();
 };
 
 #endif

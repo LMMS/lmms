@@ -63,6 +63,7 @@ class EXPORT Fader : public QWidget, public FloatModelView
 public:
 	Q_PROPERTY( QColor peakGreen READ peakGreen WRITE setPeakGreen )
 	Q_PROPERTY( QColor peakRed READ peakRed WRITE setPeakRed )
+	Q_PROPERTY( QColor peakYellow READ peakYellow WRITE setPeakYellow )
 	Q_PROPERTY( bool levelsDisplayedInDBFS READ getLevelsDisplayedInDBFS WRITE setLevelsDisplayedInDBFS )
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
@@ -89,9 +90,12 @@ public:
 	QColor const & peakRed() const;
 	void setPeakRed( const QColor & c );
 
+	QColor const & peakYellow() const;
+	void setPeakYellow( const QColor & c );
+
 	inline bool getLevelsDisplayedInDBFS() const { return m_levelsDisplayedInDBFS; }
 	inline void setLevelsDisplayedInDBFS(bool value = true) { m_levelsDisplayedInDBFS = value; }
-	
+
 	void setDisplayConversion( bool b )
 	{
 		m_displayConversion = b;
@@ -113,7 +117,7 @@ private:
 	virtual void wheelEvent( QWheelEvent *ev );
 	virtual void paintEvent( QPaintEvent *ev );
 
-	inline bool clips(float const & value) const { return value > 1.0f; }
+	inline bool clips(float const & value) const { return value >= 1.0f; }
 
 	void paintDBFSLevels(QPaintEvent *ev, QPainter & painter);
 	void paintLinearLevels(QPaintEvent *ev, QPainter & painter);
@@ -161,6 +165,7 @@ private:
 
 	QColor m_peakGreen;
 	QColor m_peakRed;
+	QColor m_peakYellow;
 } ;
 
 

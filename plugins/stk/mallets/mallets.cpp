@@ -578,8 +578,9 @@ void malletsInstrumentView::modelChanged()
 void malletsInstrumentView::changePreset()
 {
 	malletsInstrument * inst = castModel<malletsInstrument>();
+	inst->instrumentTrack()->silenceAllNotes();
 	int _preset = inst->m_presetsModel.value();
-	
+
 	if( _preset < 9 )
 	{
 		m_tubeBellWidget->hide();
@@ -597,7 +598,7 @@ void malletsInstrumentView::changePreset()
 		m_modalBarWidget->hide();
 		m_tubeBellWidget->hide();
 		m_bandedWGWidget->show();
-	}		
+	}
 }
 
 
@@ -619,6 +620,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+		Stk::showWarnings( false );
 	
 		m_voice = new ModalBar();
 	
@@ -666,6 +668,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+		Stk::showWarnings( false );
 	
 		m_voice = new TubeBell();
 	
@@ -711,6 +714,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+		Stk::showWarnings( false );
 
 		m_voice = new BandedWG();
 	

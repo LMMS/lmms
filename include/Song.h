@@ -340,6 +340,7 @@ private:
 	QString m_fileName;
 	QString m_oldFileName;
 	bool m_modified;
+	bool m_loadOnLaunch;
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
@@ -380,6 +381,7 @@ signals:
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
+	void updateSampleTracks();
 
 } ;
 

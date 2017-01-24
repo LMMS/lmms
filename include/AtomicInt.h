@@ -6,20 +6,40 @@
 
 #include <QtCore/QAtomicInt>
 
-#if QT_VERSION >= 0x050000 && QT_VERSION <= 0x050300
+#if QT_VERSION < 0x050300
 
 class AtomicInt : public QAtomicInt
 {
 public:
-	AtomicInt(int value=0) : QAtomicInt(value) {};
+	AtomicInt( int value = 0 ) :
+		QAtomicInt( value )
+	{
+	}
 
-	operator int() const {return loadAcquire();}
+	int fetchAndAndOrdered( int valueToAnd )
+	{
+		int value;
+		do
+		{
+			value = (int)*this;
+		}
+		while( !testAndSetOrdered( value, value & valueToAnd ) );
+		return value;
+	}
+
+#if QT_VERSION >= 0x050000 && QT_VERSION < 0x050300
+	operator int() const
+	{
+		return loadAcquire();
+	}
+#endif
+
 };
 
 #else
 
 typedef QAtomicInt AtomicInt;
 
-#endif // QT_VERSION >= 0x050000 && QT_VERSION <= 0x050300
+#endif // QT_VERSION < 0x050300
 
 #endif

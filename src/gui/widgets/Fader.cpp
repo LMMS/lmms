@@ -79,7 +79,8 @@ Fader::Fader( FloatModel * _model, const QString & _name, QWidget * _parent ) :
 	m_moveStartPoint( -1 ),
 	m_startValue( 0 ),
 	m_peakGreen( 0, 0, 0 ),
-	m_peakRed( 0, 0, 0 )
+	m_peakRed( 0, 0, 0 ),
+	m_peakYellow( 0, 0, 0 )
 {
 	if( s_textFloat == NULL )
 	{
@@ -173,7 +174,9 @@ void Fader::mouseMoveEvent( QMouseEvent *mouseEvent )
 
 		float delta = dy * ( model()->maxValue() - model()->minValue() ) / (float) ( height() - ( *m_knob ).height() );
 
-		model()->setValue( m_startValue + delta );
+		const float step = model()->step<float>();
+		float newValue = static_cast<float>( static_cast<int>( ( m_startValue + delta ) / step + 0.5 ) ) * step;
+		model()->setValue( newValue );
 
 		updateTextFloat();
 	}
@@ -214,7 +217,6 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 {
 	bool ok;
 	float newValue;
-
 	// TODO: dbV handling
 	if( m_displayConversion )
 	{
@@ -222,9 +224,9 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() * 100 ).
 							arg( model()->maxValue() * 100 ),
-						model()->value() * 100,
+						model()->getRoundedValue() * 100,
 						model()->minValue() * 100,
-						model()->maxValue() * 100, 4, &ok ) * 0.01f;
+						model()->maxValue() * 100, model()->getDigitCount(), &ok ) * 0.01f;
 	}
 	else
 	{
@@ -232,9 +234,9 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() ).
 							arg( model()->maxValue() ),
-						model()->value(),
+						model()->getRoundedValue(),
 						model()->minValue(),
-						model()->maxValue(), 4, &ok );
+						model()->maxValue(), model()->getDigitCount(), &ok );
 	}
 
 	if( ok )
@@ -320,9 +322,9 @@ void Fader::setPeak_R( float fPeak )
 // update tooltip showing value and adjust position while changing fader value
 void Fader::updateTextFloat()
 {
-	if( ConfigManager::inst()->value( "app", "displaydbv" ).toInt() && m_displayConversion )
+	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_displayConversion )
 	{
-		s_textFloat->setText( QString("Volume: %1 dBV").
+		s_textFloat->setText( QString("Volume: %1 dBFS").
 				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );
 	}
 	else
@@ -368,8 +370,8 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 	int width = m_back->width() / 2;
 	int center = m_back->width() - width;
 
-	float const maxDB(ampToDbv(m_fMaxPeak));
-	float const minDB(ampToDbv(m_fMinPeak));
+	float const maxDB(ampToDbfs(m_fMaxPeak));
+	float const minDB(ampToDbfs(m_fMinPeak));
 
 	// We will need to divide by the span between min and max several times. It's more
 	// efficient to calculate the reciprocal once and then to multiply.
@@ -377,31 +379,45 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw left levels
-	float const leftSpan = ampToDbv(m_fPeakValue_L) - minDB;
+	float const leftSpan = ampToDbfs(m_fPeakValue_L) - minDB;
 	int peak_L = height * leftSpan * fullSpanReciprocal;
 	QRect drawRectL( 0, height - peak_L, width, peak_L ); // Source and target are identical
 	painter.drawPixmap( drawRectL, *m_leds, drawRectL );
 
-	float const persistentLeftPeakDBFS = ampToDbv(m_persistentPeak_L);
+	float const persistentLeftPeakDBFS = ampToDbfs(m_persistentPeak_L);
 	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
+	// the LED's have a  4px padding and we don't want the peaks
+	// to draw on the fader background
+	if( persistentPeak_L <= 4 )
+	{
+		persistentPeak_L = 4;
+	}
 	if( persistentLeftPeakDBFS > minDB )
 	{
-		QColor const & peakColor = clips(m_persistentPeak_L) ? peakRed() : peakGreen();
+		QColor const & peakColor = clips(m_persistentPeak_L) ? peakRed() :
+			persistentLeftPeakDBFS >= -6 ? peakYellow() : peakGreen();
 		painter.fillRect( QRect( 2, persistentPeak_L, 7, 1 ), peakColor );
 	}
 
 
 	// Draw right levels
-	float const rightSpan = ampToDbv(m_fPeakValue_R) - minDB;
+	float const rightSpan = ampToDbfs(m_fPeakValue_R) - minDB;
 	int peak_R = height * rightSpan * fullSpanReciprocal;
 	QRect const drawRectR( center, height - peak_R, width, peak_R ); // Source and target are identical
 	painter.drawPixmap( drawRectR, *m_leds, drawRectR );
 
-	float const persistentRightPeakDBFS = ampToDbv(m_persistentPeak_R);
+	float const persistentRightPeakDBFS = ampToDbfs(m_persistentPeak_R);
 	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
+	// the LED's have a  4px padding and we don't want the peaks
+	// to draw on the fader background
+	if( persistentPeak_R <= 4 )
+	{
+		persistentPeak_R = 4;
+	}
 	if( persistentRightPeakDBFS > minDB )
 	{
-		QColor const & peakColor = clips(m_persistentPeak_R) ? peakRed() : peakGreen();
+		QColor const & peakColor = clips(m_persistentPeak_R) ? peakRed() :
+			persistentRightPeakDBFS >= -6 ? peakYellow() : peakGreen();
 		painter.fillRect( QRect( 14, persistentPeak_R, 7, 1 ), peakColor );
 	}
 }
@@ -449,6 +465,11 @@ QColor const & Fader::peakRed() const
 	return m_peakRed;
 }
 
+QColor const & Fader::peakYellow() const
+{
+	return m_peakYellow;
+}
+
 void Fader::setPeakGreen( const QColor & c )
 {
 	m_peakGreen = c;
@@ -459,5 +480,7 @@ void Fader::setPeakRed( const QColor & c )
 	m_peakRed = c;
 }
 
-
-
+void Fader::setPeakYellow( const QColor & c )
+{
+	m_peakYellow = c;
+}

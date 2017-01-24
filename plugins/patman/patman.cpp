@@ -156,6 +156,10 @@ void patmanInstrument::playNote( NotePlayHandle * _n,
 		instrumentTrack()->processAudioBuffer( _working_buffer,
 								frames + offset, _n );
 	}
+	else
+	{
+		memset( _working_buffer, 0, ( frames + offset ) * sizeof( sampleFrame ) );
+	}
 }
 
 

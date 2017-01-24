@@ -39,11 +39,14 @@
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "lmms_basics.h"
 #include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+
+static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
 
 
@@ -794,6 +797,47 @@ void DataFile::upgrade_0_4_0_rc2()
 }
 
 
+void DataFile::upgrade_1_0_99()
+{
+	jo_id_t last_assigned_id = 0;
+	
+	QList<jo_id_t> idList;
+	findIds(documentElement(), idList);
+	
+	QDomNodeList list = elementsByTagName("ladspacontrols");
+	for(int i = 0; !list.item(i).isNull(); ++i)
+	{
+		for(QDomNode node = list.item(i).firstChild(); !node.isNull();
+			node = node.nextSibling())
+		{
+			QDomElement el = node.toElement();
+			QDomNode data_child = el.namedItem("data");
+			if(!data_child.isElement())
+			{
+				if (el.attribute("scale_type") == "log")
+				{
+					QDomElement me = createElement("data");
+					me.setAttribute("value", el.attribute("data"));
+					me.setAttribute("scale_type", "log");
+					
+					jo_id_t id;
+					for(id = last_assigned_id + 1;
+						idList.contains(id); id++)
+					{
+					}
+					
+					last_assigned_id = id;
+					idList.append(id);
+					me.setAttribute("id", id);
+					el.appendChild(me);
+					
+				}
+			}
+		}
+	}	
+}
+
+
 void DataFile::upgrade_1_1_0()
 {
 	QDomNodeList list = elementsByTagName("fxchannel");
@@ -824,8 +868,34 @@ void DataFile::upgrade_1_1_91()
 	for( int i = 0; !list.item( i ).isNull(); ++i )
 	{
 		QDomElement el = list.item( i ).toElement();
-		if ( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
+		if( el.attribute( "name" ) == "plugin" && el.attribute( "value" ) == "vocoder-lmms" ) {
 			el.setAttribute( "value", "vocoder" );
+		}
+	}
+
+	list = elementsByTagName( "crossoevereqcontrols" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		// invert the mute LEDs
+		for( int j = 1; j <= 4; ++j ){
+			QString a = QString( "mute%1" ).arg( j );
+			el.setAttribute( a, ( el.attribute( a ) == "0" ) ? "1" : "0" );
+		}
+	}
+
+	list = elementsByTagName( "arpeggiator" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		// Swap elements ArpDirRandom and ArpDirDownAndUp
+		if( el.attribute( "arpdir" ) == "3" )
+		{
+			el.setAttribute( "arpdir", "4" );
+		}
+		else if( el.attribute( "arpdir" ) == "4" )
+		{
+			el.setAttribute( "arpdir", "3" );
 		}
 	}
 }
@@ -895,11 +965,15 @@ void DataFile::upgrade()
 	{
 		upgrade_0_4_0_rc2();
 	}
-	if( version < ProjectVersion("1.1.0", CompareType::Release) )
+	if( version < "1.0.99-0" )
+	{
+		upgrade_1_0_99();
+	}
+	if( version < "1.1.0-0" )
 	{
 		upgrade_1_1_0();
 	}
-	if( version < ProjectVersion("1.1.91", CompareType::Release) )
+	if( version < "1.1.91-0" )
 	{
 		upgrade_1_1_91();
 	}
@@ -970,12 +1044,13 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	{
 		// compareType defaults to Build,so it doesn't have to be set here
 		ProjectVersion createdWith = root.attribute( "creatorversion" );
-		ProjectVersion openedWith = LMMS_VERSION;;
+		ProjectVersion openedWith = LMMS_VERSION;
 
 		if ( createdWith != openedWith )
 		{
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
-			if ( createdWith.setCompareType(Minor) != openedWith)
+			if( createdWith.setCompareType( ProjectVersion::Minor )
+								!= openedWith )
 			{
 				if( gui != nullptr && root.attribute( "type" ) == "song" )
 				{
@@ -997,7 +1072,8 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 			}
 
 			// the upgrade needs to happen after the warning as it updates the project version.
-			if( createdWith.setCompareType(Build) < openedWith )
+			if( createdWith.setCompareType( ProjectVersion::Build )
+								< openedWith )
 			{
 				upgrade();
 			}
@@ -1006,4 +1082,19 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 
 	m_content = root.elementsByTagName( typeName( m_type ) ).
 							item( 0 ).toElement();
+}
+
+
+void findIds(const QDomElement& elem, QList<jo_id_t>& idList)
+{
+	if(elem.hasAttribute("id"))
+	{
+		idList.append(elem.attribute("id").toInt());
+	}
+	QDomElement child = elem.firstChildElement();
+	while(!child.isNull()) 
+	{
+		findIds(child, idList);
+		child = child.nextSiblingElement();
+	}
 }
