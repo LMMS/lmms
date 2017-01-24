@@ -71,11 +71,16 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_controllerDlg = getController()->createDialog( this );
 	m_controllerDlg->move( 1, m_titleBarHeight );
 
+	controllerTypeLabel = new QLabel( this );
+	controllerTypeLabel->setText( QString( getController()->type() == Controller::LfoController ? QString( "LFO: " ) : QString( "PEAK: " ) ) );
+	controllerTypeLabel->move( 3, 3 );
+	controllerTypeLabel->show();
+
 	m_nameLineEdit = new QLineEdit( this );
 	m_nameLineEdit->setText( _model->name() );
 	m_nameLineEdit->setReadOnly( true );
 	m_nameLineEdit->setAttribute( Qt::WA_TransparentForMouseEvents );
-	m_nameLineEdit->move( 3, 3 );
+	m_nameLineEdit->move( controllerTypeLabel->sizeHint().width() + 3, 2 );
 	connect( m_nameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 
 	setFixedWidth( m_controllerDlg->width() + 2 );

@@ -26,6 +26,7 @@
 #define CONTROLLER_VIEW_H
 
 #include <QFrame>
+#include <QLabel>
 
 #include "AutomatableModel.h"
 #include "Controller.h"
@@ -84,6 +85,7 @@ private:
 	ControllerDialog * m_controllerDlg;
 	const int m_titleBarHeight;
 	bool m_show;
+	QLabel * controllerTypeLabel;
 	QLineEdit * m_nameLineEdit;
 	QPushButton * m_collapse;
 	Controller * m_modelC;
