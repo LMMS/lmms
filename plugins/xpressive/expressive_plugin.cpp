@@ -383,8 +383,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	PixmapButton * m_o1Btn;
 	PixmapButton * m_o2Btn;
 	PixmapButton * m_helpBtn;
-	//PixmapButton * m_holdBtn;
-	//PixmapButton * m_relBtn;
+
 	m_w1Btn = new PixmapButton(this, NULL);
 	m_w1Btn->move(9, 111);
 	m_w1Btn->setActiveGraphic(PLUGIN_NAME::getIconPixmap("w1_active"));
@@ -567,18 +566,6 @@ expressiveView::~expressiveView()
 {
 }
 
-static void clearGraph(graphModel * g)
-{
-	const int length = g->length();
-	float * samples = new float[length];
-
-	int i;
-	for (i = 0; i < length; i++) {
-		samples[i] = 0;
-	}
-	g->setSamples(samples);
-	delete[] samples;
-}
 
 void expressiveView::expressionChanged() {
 	expressive * e = castModel<expressive>();
@@ -607,7 +594,8 @@ void expressiveView::expressionChanged() {
 	if (text.size()>0)
 	{
 		ExprFront expr(text.constData());
-		const float t=0,f=10,key=5,v=0.5;
+		float t=0;
+		const float f=10,key=5,v=0.5;
 		unsigned int i;
 		const unsigned int sample_rate=m_raw_graph->length();
 		expr.add_variable("t", t);
@@ -656,14 +644,14 @@ void expressiveView::expressionChanged() {
 		{
 			e->m_exprValid.setValue(1);
 			if (m_output_expr)
-				clearGraph(m_raw_graph);
+				m_raw_graph->clear();
 		}
 	}
 	else
 	{
 		e->m_exprValid.setValue(0);
 		if (m_output_expr)
-			clearGraph(m_raw_graph);
+			m_raw_graph->clear();
 	}
 }
 
@@ -672,7 +660,7 @@ void expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 	out->setSamples(in->samples());
 	if (smoothness>0)
 	{
-		const int guass_size = (smoothness * 5) | 1;
+		const int guass_size = (int)(smoothness * 5) | 1;
 		const int guass_center = guass_size/2;
 		const float delta = smoothness;
 		const float a= 1.0f / (sqrtf(2.0f * F_PI) * delta);

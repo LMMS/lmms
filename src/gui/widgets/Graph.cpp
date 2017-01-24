@@ -693,7 +693,7 @@ void graphModel::invert()
 void graphModel::shiftPhase( int _deg )
 {
 	// calculate offset in samples
-	int offset = ( _deg * length() ) / 360; //multiply first because integers 
+	const int offset = ( _deg * length() ) / 360; //multiply first because integers
 	
 	// store values in temporary array
 	QVector<float> temp = m_samples;
@@ -707,6 +707,14 @@ void graphModel::shiftPhase( int _deg )
 	}
 	
 	emit samplesChanged( 0, length()-1 );
+}
+
+void graphModel::clear()
+{
+	const int graph_length = length();
+	for( int i = 0; i < graph_length; i++ )
+		m_samples[i] = 0;
+	emit samplesChanged( 0, graph_length -1 );
 }
 
 

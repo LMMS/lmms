@@ -230,8 +230,6 @@ private:
 	PixmapButton * m_w3Btn;
 	PixmapButton * m_o1Btn;
 	PixmapButton * m_o2Btn;
-	//PixmapButton * m_holdBtn;
-	//PixmapButton * m_relBtn;
 	PixmapButton * m_sinWaveBtn;
 	PixmapButton * m_triangleWaveBtn;
 	PixmapButton * m_sqrWaveBtn;

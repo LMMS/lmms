@@ -279,35 +279,6 @@ namespace SimpleRandom {
 
 static freefunc0<float,SimpleRandom::float_random_with_engine,false> simple_rand;
 
-//The following was an experiment for new RandomVector based on C++11 random facilities.
-//it failed because the complexity of generator.discard(N) is O(N), instead of O(1)
-/*namespace RandomVector {
-	template <typename T>
-	std::uniform_real_distribution<T> dist(-1.0, 1.0);
-	template <typename T>
-	struct WithEngine : public exprtk::ifunction<T>
-	{
-		using exprtk::ifunction<T>::operator();
-
-		WithEngine(int seed)
-		: exprtk::ifunction<T>(1),
-		m_rseed(seed)
-		{
-			exprtk::disable_has_side_effects(*this);
-		}
-
-		inline T operator()(const T& index)
-		{
-			if (index<0)
-				return 0;
-			std::mt19937 generator (m_rseed);
-			generator.discard((int)index);
-			return dist<T>(generator);
-		}
-		int m_rseed;
-	};
-}*/
-
 class ExprFrontData
 {
 public:
