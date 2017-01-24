@@ -65,6 +65,8 @@ OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
 
+OPTION(FIX_SYSTEM_HEADERS "Copy system headers and fix them" OFF)
+
 
 IF(LMMS_BUILD_APPLE)
 	SET(WANT_ALSA OFF)

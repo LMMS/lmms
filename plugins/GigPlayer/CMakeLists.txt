@@ -14,7 +14,7 @@ if(LMMS_HAVE_GIG)
 
 	# Fix gig.h
 	SET(LOCAL_GIG_H)
-	IF(EXISTS /usr/include/gig.h)
+	IF(FIX_SYSTEM_HEADERS AND EXISTS /usr/include/gig.h)
 		EXECUTE_PROCESS(
 			COMMAND grep -E "^ +DLS::[:A-Za-z]+;" /usr/include/gig.h
 			OUTPUT_VARIABLE BAD_HEADER)
