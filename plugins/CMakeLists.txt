@@ -56,7 +56,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		LadspaEffect
 		lb302
 		SmfImport  # For Midi, Overture and Cakewalk files.
-		# MidiExport - temporarily disabled, MIDI export is broken
+                MidiExport # temporarily disabled, MIDI export is broken
 		MultitapEcho
 		monstro
 		nes

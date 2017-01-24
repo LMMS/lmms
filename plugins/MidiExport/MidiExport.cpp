@@ -28,8 +28,10 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <drumstick.h>
 
 #include "MidiExport.h"
+#include "midiWriter.h"
 #include "Engine.h"
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
@@ -70,96 +72,10 @@ MidiExport::~MidiExport()
 
 bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename  )
 {
-	QFile f(filename);
-	f.open(QIODevice::WriteOnly);
-	QDataStream midiout(&f);
-
-	InstrumentTrack* instTrack;
-	QDomElement element;
-
-
-	int nTracks = 0;
-	const int BUFFER_SIZE = 50*1024;
-	uint8_t buffer[BUFFER_SIZE];
-	uint32_t size;
-
-	for( const Track* track : tracks ) if( track->type() == Track::InstrumentTrack ) nTracks++;
-
-	// midi header
-	MidiFile::MIDIHeader header(nTracks);
-	size = header.writeToBuffer(buffer);
-	midiout.writeRawData((char *)buffer, size);
-
-	// midi tracks
-	for( Track* track : tracks )
-	{
-		DataFile dataFile( DataFile::SongProject );
-		MidiFile::MIDITrack<BUFFER_SIZE> mtrack;
-	
-		if( track->type() != Track::InstrumentTrack ) continue;
-
-		//qDebug() << "exporting " << track->name();
-	
-	
-		mtrack.addName(track->name().toStdString(), 0);
-		//mtrack.addProgramChange(0, 0);
-		mtrack.addTempo(tempo, 0);
-	
-		instTrack = dynamic_cast<InstrumentTrack *>( track );
-		element = instTrack->saveState( dataFile, dataFile.content() );
-	
-		// instrumentTrack
-		//     - instrumentTrack
-		//     - pattern
-		int   base_pitch   = 0;
-		double base_volume = 1.0;
-		int    base_time = 0;
-	
-	
-		for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
-		{
-			//QDomText txt = n.toText();
-			//qDebug() << ">> child node " << n.nodeName();
-		
-			if (n.nodeName() == "instrumenttrack")
-			{
-				// TODO interpret pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57"
-				QDomElement it = n.toElement();
-				base_pitch  = it.attribute("pitch", "0").toInt();
-				base_volume = it.attribute("volume", "100").toDouble()/100.0;
-			}
-		
-			if (n.nodeName() == "pattern")
-			{
-				base_time = n.toElement().attribute("pos", "0").toInt();
-				// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
-				for(QDomNode nn = n.firstChild(); !nn.isNull(); nn = nn.nextSibling())
-				{
-					QDomElement note = nn.toElement();
-					if (note.attribute("len", "0") == "0" || note.attribute("vol", "0") == "0") continue;
-					#if 0
-					qDebug() << ">>>> key " << note.attribute( "key", "0" ) 
-						<< " " << note.attribute("len", "0") << " @" 
-						<< note.attribute("pos", "0");
-					#endif
-					mtrack.addNote(
-						note.attribute("key", "0").toInt()+base_pitch
-						, 100 * base_volume * (note.attribute("vol", "100").toDouble()/100)
-						, (base_time+note.attribute("pos", "0").toDouble())/48
-						, (note.attribute("len", "0")).toDouble()/48);
-				}
-			}
-		
-		}
-		size = mtrack.writeToBuffer(buffer);
-		midiout.writeRawData((char *)buffer, size);
-	} // for each track
-	
+	midiWriter s_mr( tracks );
+	s_mr.writeFile( filename );
 	return true;
-
 }
-
-
 
 
 void MidiExport::error()

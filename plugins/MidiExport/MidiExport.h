@@ -28,8 +28,6 @@
 #include <QString>
 
 #include "ExportFilter.h"
-#include "MidiFile.hpp"
-
 
 
 class MidiExport: public ExportFilter

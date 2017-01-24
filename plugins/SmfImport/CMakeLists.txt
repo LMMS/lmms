@@ -6,6 +6,7 @@ IF(WANT_QT5)
 ELSE()
     PKG_CHECK_MODULES(DRUMSTICK_FILE REQUIRED drumstick-file>=0.5.0)
 ENDIF()
+
 IF(NOT DRUMSTICK_FILE_FOUND)
     IF(WANT_QT5)
 	    MESSAGE(FATAL_ERROR "LMMS requires libdrumstick-file and libdrumstick-dev >= 1.0.0 with Qt5 - please install, remove CMakeCache.txt and try again!")
