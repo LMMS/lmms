@@ -87,7 +87,8 @@ ControllerRackView::ControllerRackView( ) :
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 680, 310 );
-	subWin->resize(400, 200);
+	subWin->resize( 350, 200 );
+	subWin->setFixedWidth( 350 );
 }
 
 

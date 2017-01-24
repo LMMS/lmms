@@ -146,7 +146,8 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		QToolButton::mousePressEvent( _me );
+		m_buttonRect = QRect( this->mapToGlobal( pos() ), size() );
+		_me->ignore();
 	}
 }
 
@@ -156,6 +157,19 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	rename();
+}
+
+
+
+
+void TrackLabelButton::mouseReleaseEvent(QMouseEvent *_me)
+{
+	if( m_buttonRect.contains( _me->globalPos(), true ) )
+	{
+		QToolButton::mousePressEvent( _me );
+	}
+	QToolButton::mouseReleaseEvent( _me );
+	_me->ignore();
 }
 
 
