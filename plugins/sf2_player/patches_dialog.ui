@@ -38,9 +38,6 @@
   <property name="windowTitle" >
    <string>Qsynth: Channel Preset</string>
   </property>
-  <property name="windowIcon" >
-   <iconset/>
-  </property>
   <layout class="QVBoxLayout" >
    <item>
     <widget class="QSplitter" name="m_splitter" >
