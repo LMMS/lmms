@@ -41,6 +41,7 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
+#include "debug.h"
 #include "embed.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "ExportProjectDialog.h"
@@ -285,6 +286,7 @@ void Song::processNextBuffer()
 		// did we play a tick?
 		if( currentFrame >= framesPerTick )
 		{
+			assert( framesPerTick > 0 );
 			int ticks = m_playPos[m_playMode].getTicks() + 
 				( int )( currentFrame / framesPerTick );
 
