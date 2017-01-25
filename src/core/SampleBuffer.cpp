@@ -200,15 +200,39 @@ void SampleBuffer::update( bool _keep_settings )
 		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
 		m_frames = 0;
 
+		bool fileLoadError = false;
 		const QFileInfo fileInfo( file );
 		if( fileInfo.size() > 100*1024*1024 )
 		{
-			qWarning( "refusing to load sample files bigger "
-								"than 100 MB" );
+			fileLoadError = true;
 		}
 		else
 		{
+			SNDFILE * snd_file;
+			SF_INFO sf_info;
+			sf_info.format = 0;
+			if( ( snd_file = sf_open( f, SFM_READ, &sf_info ) ) != NULL )
+			{
+				f_cnt_t frames = sf_info.frames;
+				int rate = sf_info.samplerate;
+				if( frames / rate > 60 * 60 ) // 60 minutes
+				{
+					fileLoadError = true;
+				}
+				sf_close( snd_file );
+			}
+		}
 
+		if( fileLoadError )
+		{
+			QMessageBox::information( NULL,
+					"Fail to open file",
+					"Audio files are limited to 100 MB "
+					"in size and 1 hour of playing time",
+						QMessageBox::Ok );
+		}
+		else
+		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
 			// causing some OGG files to be distorted -> try with OGG Vorbis
@@ -237,22 +261,21 @@ void SampleBuffer::update( bool _keep_settings )
 			}
 
 			delete[] f;
+		}
 
-			if ( m_frames == 0 )  // if still no frames, bail
-			{
-				// sample couldn't be decoded, create buffer containing
-				// one sample-frame
-				m_data = MM_ALLOC( sampleFrame, 1 );
-				memset( m_data, 0, sizeof( *m_data ) );
-				m_frames = 1;
-				m_loopStartFrame = m_startFrame = 0;
-				m_loopEndFrame = m_endFrame = 1;
-			}
-			else // otherwise normalize sample rate
-			{
-				normalizeSampleRate( samplerate, _keep_settings );
-			}
-
+		if ( m_frames == 0 || fileLoadError )  // if still no frames, bail
+		{
+			// sample couldn't be decoded, create buffer containing
+			// one sample-frame
+			m_data = MM_ALLOC( sampleFrame, 1 );
+			memset( m_data, 0, sizeof( *m_data ) );
+			m_frames = 1;
+			m_loopStartFrame = m_startFrame = 0;
+			m_loopEndFrame = m_endFrame = 1;
+		}
+		else // otherwise normalize sample rate
+		{
+			normalizeSampleRate( samplerate, _keep_settings );
 		}
 	}
 	else
