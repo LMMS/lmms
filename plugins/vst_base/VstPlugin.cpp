@@ -35,6 +35,8 @@
 #if QT_VERSION < 0x050000
 #include <QX11EmbedContainer>
 #include <QX11Info>
+#else
+#include <QWindow>
 #endif
 #else
 #include <QLayout>
@@ -59,7 +61,8 @@ class vstSubWin : public QMdiSubWindow
 {
 public:
 	vstSubWin( QWidget * _parent ) :
-		QMdiSubWindow( _parent )
+		QMdiSubWindow( _parent ),
+		m_acceptedMousePress(false)
 	{
 		setAttribute( Qt::WA_DeleteOnClose, false );
 	}
@@ -68,13 +71,38 @@ public:
 	{
 	}
 
-	virtual void closeEvent( QCloseEvent * e )
+	virtual void closeEvent( QCloseEvent * e ) override
 	{
 		// ignore close-events - for some reason otherwise the VST GUI
 		// remains hidden when re-opening
 		hide();
 		e->ignore();
 	}
+
+	virtual bool eventFilter(QObject *object, QEvent *event) override
+	{
+		if (event->type() == QEvent::MouseMove ||
+			event->type() == QEvent::MouseButtonPress ||
+			event->type() == QEvent::MouseButtonRelease)
+		{
+			if (event->type() != QEvent::MouseButtonPress && !m_acceptedMousePress) {
+				return true;
+			}
+
+			auto* mouseEvent = static_cast<QMouseEvent*>(event);
+			if (childrenRect().contains(mouseEvent->pos())) {
+				return true;
+			}
+
+		}
+
+		bool accepted = QMdiSubWindow::eventFilter(object, event);
+		m_acceptedMousePress = accepted && event->type() == QEvent::MouseButtonPress;
+		return accepted;
+	}
+
+private:
+	bool m_acceptedMousePress;
 } ;
 
 
@@ -232,38 +260,36 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
-	m_pluginWidget = new QWidget( _parent );
-	m_pluginWidget->setFixedSize( m_pluginGeometry );
-	m_pluginWidget->setWindowTitle( name() );
 	if( _parent == NULL )
 	{
 		vstSubWin * sw = new vstSubWin(
 					gui->mainWindow()->workspace() );
-		if( isEffect )
+
+
+#if QT_VERSION < 0x050000
+		QX11EmbedContainer * container = new QX11EmbedContainer( sw );
+		container->embedClient( m_pluginWindowID );
+#else
+		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
+		QWidget* container = QWidget::createWindowContainer(vw, sw);
+#endif
+
+		if (isEffect)
 		{
 			sw->setAttribute( Qt::WA_TranslucentBackground );
 			sw->setWindowFlags( Qt::FramelessWindowHint );
-			sw->setWidget( m_pluginWidget );
-#if QT_VERSION < 0x050000
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->show();
-#endif
-		} 
+		}
 		else
 		{
 			sw->setWindowFlags( Qt::WindowCloseButtonHint );
-			sw->setWidget( m_pluginWidget );
-
-#if QT_VERSION < 0x050000
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->move( 4, 24 );
-			xe->show();
-#endif
+			container->move( 4, 24 );
 		}
+
+		sw->setWidget( container );
+
+		container->setFixedSize( m_pluginGeometry );
+		container->setWindowTitle( name() );
+		m_pluginWidget = container;
 	}
 
 #endif
