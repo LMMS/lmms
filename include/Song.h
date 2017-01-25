@@ -35,11 +35,13 @@
 #include "Controller.h"
 #include "MeterModel.h"
 #include "VstSyncController.h"
+#include "Groove.h"
 
 
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
+class Groove;
 
 
 const bpm_t MinTempo = 10;
@@ -205,6 +207,11 @@ public:
 		return m_globalAutomationTrack;
 	}
 
+	Groove * globalGroove()
+	{
+		return m_globalGroove;
+	}
+
 	// file management
 	void createNewProject();
 	void createNewProjectFromTemplate( const QString & templ );
@@ -212,6 +219,7 @@ public:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 	bool saveProjectFile( const QString & filename );
+	void setGlobalGroove(Groove * groove);
 
 	const QString & projectFileName() const
 	{
@@ -301,7 +309,6 @@ private:
 	Song( const Song & );
 	virtual ~Song();
 
-
 	inline tact_t currentTact() const
 	{
 		return m_playPos[m_playMode].getTact();
@@ -327,6 +334,7 @@ private:
 
 
 	AutomationTrack * m_globalAutomationTrack;
+	Groove * m_globalGroove;
 
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;

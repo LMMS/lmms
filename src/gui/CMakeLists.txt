@@ -56,6 +56,7 @@ SET(LMMS_SRCS
 	gui/widgets/Fader.cpp
 	gui/widgets/FxLine.cpp
 	gui/widgets/Graph.cpp
+	gui/widgets/GrooveView.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
