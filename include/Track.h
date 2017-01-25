@@ -429,6 +429,9 @@ private slots:
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();
+	QMenu * grooveMenu();
+	void enableGroove();
+	void disableGroove();
 
 private:
 	static QPixmap * s_grip;

@@ -19,6 +19,9 @@ set(LMMS_SRCS
 	core/EnvelopeAndLfoParameters.cpp
 	core/fft_helpers.cpp
 	core/FxMixer.cpp
+	core/Groove.cpp
+	core/GrooveFactory.cpp
+	core/HydrogenSwing.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
 	core/Instrument.cpp
@@ -34,6 +37,7 @@ set(LMMS_SRCS
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
+	core/MidiSwing.cpp
 	core/Mixer.cpp
 	core/MixerProfiler.cpp
 	core/MixerWorkerThread.cpp

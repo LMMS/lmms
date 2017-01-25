@@ -46,6 +46,8 @@
 #include "ExportProjectDialog.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
+#include "GrooveFactory.h"
+#include "GrooveView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "ExportFilter.h"
@@ -78,6 +80,7 @@ Song::Song() :
 	m_globalAutomationTrack( dynamic_cast<AutomationTrack *>(
 				Track::create( Track::HiddenAutomationTrack,
 								this ) ) ),
+	m_globalGroove(GrooveFactory::create("none")),
 	m_tempoModel( DefaultTempo, MinTempo, MaxTempo, this, tr( "Tempo" ) ),
 	m_timeSigModel( this ),
 	m_oldTicksPerTact( DefaultTicksPerTact ),
@@ -130,6 +133,7 @@ Song::~Song()
 {
 	m_playing = false;
 	delete m_globalAutomationTrack;
+	delete m_globalGroove;
 }
 
 
@@ -1129,6 +1133,10 @@ bool Song::saveProjectFile( const QString & filename )
 	return dataFile.writeFile( filename );
 }
 
+void Song::setGlobalGroove(Groove * groove)
+{
+	m_globalGroove = groove;
+}
 
 
 // save current song and update the gui

@@ -49,6 +49,7 @@
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "FxMixerView.h"
+#include "GrooveView.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "lmmsversion.h"
@@ -554,6 +555,15 @@ void MainWindow::finalize()
 								m_toolBar );
 	controllers_window->setShortcut( Qt::Key_F11 );
 
+	// groove view
+	ToolButton * groove_view = new ToolButton(
+					embed::getIconPixmap( "note_double_whole" ),
+					tr ( "Groove" ) +
+							" (F12)",
+					this, SLOT( toggleGrooveView() ),
+							m_toolBar);
+	groove_view->setShortcut( Qt::Key_F12 );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -561,6 +571,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+	m_toolBarLayout->addWidget( groove_view, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1173,6 +1184,10 @@ void MainWindow::toggleFxMixerWin()
 	toggleWindow( gui->fxMixerView() );
 }
 
+void MainWindow::toggleGrooveView( void )
+{
+	toggleWindow( gui->grooveView() );
+}
 
 void MainWindow::updateViewMenu()
 {
