@@ -32,7 +32,7 @@
 
 class MidiExport: public ExportFilter
 {
-// 	Q_OBJECT
+	Q_OBJECT
 public:
 	MidiExport( );
 	~MidiExport();
@@ -45,12 +45,8 @@ public:
 	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename );
 	
 private:
-	
-
 	void error( void );
-
-
-} ;
+};
 
 
 #endif

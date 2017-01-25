@@ -28,7 +28,6 @@
 #include <QObject>
 #include <QString>
 #include <QProgressDialog>
-#include <drumstick.h>
 
 #include "TrackContainer.h"
 #include "MeterModel.h"

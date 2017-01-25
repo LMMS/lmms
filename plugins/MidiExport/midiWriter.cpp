@@ -22,8 +22,10 @@
  *
  */
 
+#include <QSet>
+#include <QList>
 #include <QObject>
-#include <drumstick.h>
+#include <drumstick/qsmf.h>
 
 #include "AutomationTrack.h"
 #include "Engine.h"
@@ -303,7 +305,7 @@ void midiWriter::insertTimeSigEvent()
 	AutomationPattern::timeMap & timeSigDen_map = timeSigDenPat->getTimeMap();
 	AutomationPattern::timeMap::const_iterator i;
 
-	QList< int > TimeList;
+	QList<int> TimeList;
 
 	// Step 1, fetch time point from Num and Den.
 	for( i=timeSigNum_map.constBegin(); i!=timeSigNum_map.constEnd(); ++i )

@@ -27,15 +27,13 @@
 
 #include <QApplication>
 
+#include "export.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"
 #include "Instrument.h"
 #include "MidiTime.h"
 
-
-
-
-class SmfMidiChannel
+class EXPORT SmfMidiChannel
 {
 
 public:

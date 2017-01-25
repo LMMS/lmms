@@ -25,6 +25,8 @@
 #ifndef OVE_READER_H
 #define OVE_READER_H
 
+#include <drumstick/qove.h>
+
 #include "commonReader.h"
 
 class oveReader : public commonReader

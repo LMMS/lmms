@@ -26,7 +26,7 @@
 #define MIDI_WRITER_H
 
 #include <QObject>
-#include <drumstick.h>
+#include <drumstick/qsmf.h>
 
 #include "AutomationPattern.h"
 #include "Engine.h"

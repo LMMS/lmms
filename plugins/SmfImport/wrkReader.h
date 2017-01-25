@@ -25,6 +25,8 @@
 #ifndef WRK_READER_H
 #define WRK_READER_H
 
+#include <drumstick/qwrk.h>
+
 #include "commonReader.h"
 
 class wrkReader : public commonReader

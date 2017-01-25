@@ -26,7 +26,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <drumstick.h>
+#include <drumstick/qove.h>
 
 #include "GuiApplication.h"
 #include "TrackContainer.h"

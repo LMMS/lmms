@@ -25,7 +25,7 @@
 #ifndef MIDI_READER_H
 #define MIDI_READER_H
 
-#include <drumstick.h>
+#include <drumstick/qsmf.h>
 
 #include "commonReader.h"
 class midiReader : public commonReader

@@ -27,7 +27,6 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <drumstick.h>
 
 #include "GuiApplication.h"
 #include "TrackContainer.h"
@@ -56,7 +55,7 @@ commonReader::commonReader( TrackContainer *tc, const QString hintText ):
 	m_tc( tc ),
 	beatsPerTact( 4 ),
 	pitchBendMultiply( defaultPitchRange ),
-	pd( hintText, QGuiApplication::tr( "Cancel" ),
+	pd( hintText, TrackContainer::tr( "Cancel" ),
 	    0, preTrackSteps, gui->mainWindow() )
 {
 	m_currentTrackName.first = -1;

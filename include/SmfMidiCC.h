@@ -27,12 +27,13 @@
 
 #include <QApplication>
 
+#include "export.h"
 #include "TrackContainer.h"
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
 #include "MidiTime.h"
 
-class SmfMidiCC
+class EXPORT SmfMidiCC
 {
 
 public:
