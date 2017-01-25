@@ -28,11 +28,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QProgressDialog>
-<<<<<<< HEAD
-#include <drumstick.h>
-=======
 #include <drumstick/qsmf.h>
->>>>>>> travis-t
 
 #include "MidiExport.h"
 #include "midiWriter.h"
