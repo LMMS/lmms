@@ -14,6 +14,7 @@
 #define         __USE_ISOC9X    1
 
 #include <math.h>
+#include <float.h>
 
 #include "ladspa.h"
 
@@ -836,7 +837,7 @@ static void __attribute__((constructor)) swh_init() {
 		 D_("Release time (s)");
 		port_range_hints[DYSONCOMPRESS_RELEASE_TIME].HintDescriptor =
 		 LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE | LADSPA_HINT_DEFAULT_LOW;
-		port_range_hints[DYSONCOMPRESS_RELEASE_TIME].LowerBound = 0;
+		port_range_hints[DYSONCOMPRESS_RELEASE_TIME].LowerBound = FLT_MIN;
 		port_range_hints[DYSONCOMPRESS_RELEASE_TIME].UpperBound = 1;
 
 		/* Parameters for Fast compression ratio */
