@@ -3,23 +3,22 @@
 #ifndef GROOVEVIEW_H
 #define GROOVEVIEW_H
 
-#include <QtCore/QObject>
+#include <QWidget>
+#include <QCloseEvent>
 
-#include <QtGui/QWidget>
-#include <QtGui/QComboBox>
-#include <QtGui/QPushButton>
-#include <QtGui/QVBoxLayout>
+#include <QComboBox>
+#include <QVBoxLayout>
 
 #include "Groove.h"
 #include "SerializingObject.h"
 
 class GrooveView : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-	explicit GrooveView(QWidget * parent = 0);
-    virtual ~GrooveView();
-
+	GrooveView();
+	virtual ~GrooveView();
+	
 	void clear();
 
 signals:

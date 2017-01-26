@@ -1,18 +1,12 @@
 
-#include <QObject>
+#include <QApplication>
+#include <QLayout>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QMdiArea>
 
 #include <QtXml/QDomElement>
-
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtGui/QWidget>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QComboBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QPushButton>
-#include <QtGui/QMdiArea>
-#include <QtGui/QLabel>
 
 #include "embed.h"
 #include "Engine.h"
@@ -25,15 +19,17 @@
 #include "MidiSwing.h"
 #include "GrooveView.h"
 
-GrooveView::GrooveView(QWidget *parent) :
-	QWidget(parent)
+//GrooveView::GrooveView(QWidget *parent) :
+//	QWidget(parent)
+GrooveView::GrooveView( ) :
+	QWidget()
 {
 	setMinimumWidth( 250 );
 	setMinimumHeight( 210 );
 	setMaximumWidth( 250 );
 	resize( 250, 220 );
 
-	setWindowIcon( embed::getIconPixmap( "groove" ) ); // TODO Icon
+	setWindowIcon( embed::getIconPixmap( "note_double_whole" ) );
 	setWindowTitle( tr( "Groove" ) );
 
 	m_dropDown = new QComboBox(this);
@@ -48,7 +44,8 @@ GrooveView::GrooveView(QWidget *parent) :
 	m_layout->addWidget( new QLabel("Select groove") );
 	this->setLayout( m_layout );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->workspace()->addSubWindow( this );
+	//QMdiSubWindow * subWin = gui->mainWindow()->workspace()->addSubWindow( this );
+	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 
 	// No maximize button
 	Qt::WindowFlags flags = subWin->windowFlags();
