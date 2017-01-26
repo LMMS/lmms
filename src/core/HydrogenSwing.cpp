@@ -118,12 +118,11 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 
 
 	// The Hydrogen Swing algorthym.
-	// guessed by turning the knob and watching the possitions change in audacity.
-	// basically we delay (shift) notes on the the 2nd and 3rd quarter of the beat forward a bit.
+	// Guessed by turning the knob and watching the possitions change in Audacity.
+	// Basically we delay (shift) notes on the the 2nd and 3rd quarter of the beat.
 
 	int pos_in_eigth = -1;
 	if ( pos_in_beat >= 12 && pos_in_beat < 18 ) {  // 1st half of second quarter
-		//add a 0 - 6 tick shift
 		pos_in_eigth = pos_in_beat - 12;  // 0-5
 	}
 	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 ) { // 1st half of third quarter
@@ -145,17 +144,18 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 
 			f_cnt_t new_offset = (frames_to_shift % m_frames_per_tick) + _offset;
 
-			printf("m_swingFactor=%f, ticks_to_shift=%f, tick_offset=%d, _offset=%d, new_offset = %d\n",
-					m_swingFactor,    ticks_to_shift,    tick_offset,    _offset,    new_offset);
+//			printf("m_swingFactor=%f, ticks_to_shift=%f, tick_offset=%d, _offset=%d, new_offset = %d\n",
+//					m_swingFactor,    ticks_to_shift,    tick_offset,    _offset,    new_offset);
 
 			return new_offset;
 		}
-		else { // this note does not play in this tick
+		else { 
+			// this note does not play in this tick
 			return -1;
 		}
 	}
 
-	// else no groove
+	// else no groove adjustments
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
 }
 
@@ -210,4 +210,3 @@ void HydrogenSwingView::valueChanged(float _f) // this value passed is gibberish
 {
 	m_hy_swing->setAmount((int)m_nobModel->value());
 }
-

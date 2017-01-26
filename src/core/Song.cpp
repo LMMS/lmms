@@ -1019,6 +1019,22 @@ void Song::loadProject( const QString & fileName )
 		}
 	}
 
+	node = dataFile.content().firstChildElement( "groove" );
+	if( !node.isNull() )
+	{
+		QDomElement ge = dataFile.content().firstChildElement( "groove" );
+		m_globalGroove = GrooveFactory::create(ge.attribute("type"));
+		m_globalGroove->restoreState( ge.firstChildElement(ge.attribute("type")) );
+		
+	}
+	else 
+	{
+		m_globalGroove = GrooveFactory::create("none");
+	}
+	if ( gui ) {
+		gui->grooveView()->update();
+	}
+		
 	node = dataFile.content().firstChild();
 	while( !node.isNull() )
 	{
@@ -1118,6 +1134,12 @@ bool Song::saveProjectFile( const QString & filename )
 	saveState( dataFile, dataFile.content() );
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
+
+	QDomElement ge = dataFile.createElement( "groove" );
+	ge.setAttribute("type", m_globalGroove->nodeName());
+	dataFile.content().appendChild( ge );
+	m_globalGroove->saveState( dataFile, ge );
+
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
 	if( gui )
 	{
