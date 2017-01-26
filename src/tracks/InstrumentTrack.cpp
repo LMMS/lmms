@@ -657,7 +657,8 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
-
+		
+		// TODO add this back if groove is straight, perhap have groove supply max shift so we can skip some notes if not all
 /*
 		if( cur_start > 0 )
 		{
@@ -719,7 +720,7 @@ void InstrumentTrack::disableGroove()
 }
 void InstrumentTrack::enableGroove()
 {
-
+	m_grooveOn = true;
 }
 
 TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
