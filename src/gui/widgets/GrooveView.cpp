@@ -132,4 +132,3 @@ void GrooveView::setView(Groove * groove)
 	m_layout->addWidget( view );
 }
 
-

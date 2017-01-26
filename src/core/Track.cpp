@@ -1876,6 +1876,7 @@ void TrackOperationsWidget::updateMenu()
 
 		toMenu->addSeparator();
 		toMenu->addMenu( trackView->midiMenu() );
+		toMenu->addMenu( grooveMenu() );
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
