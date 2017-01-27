@@ -1529,7 +1529,7 @@ void MainWindow::showTool( QAction * _idx )
 void MainWindow::browseHelp()
 {
 	// file:// alternative for offline help
-	QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
+	QString url = "https://lmms.io/documentation/";
 	QDesktopServices::openUrl( url );
 	// TODO: Handle error
 }
