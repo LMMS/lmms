@@ -102,7 +102,7 @@
            <item>
             <widget class="QComboBox" name="bitrateCB">
              <property name="currentIndex">
-              <number>2</number>
+              <number>5</number>
              </property>
              <item>
               <property name="text">
@@ -236,7 +236,7 @@
         <item>
          <widget class="QComboBox" name="interpolationCB">
           <property name="currentIndex">
-           <number>2</number>
+           <number>3</number>
           </property>
           <item>
            <property name="text">
