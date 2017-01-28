@@ -1,6 +1,5 @@
 /*
- * HydrogenSwing.cpp - Swing algo that varies adjustments form 0-127
- *              The algorythm mimics Hydrogen drum machines swing feature.
+ * GrooveExperiments.cpp - Try to find new groove algos that sound interesting
  *
  * Copyright (c) 2004-2014 teknopaul <teknopaul/at/users.sourceforge.net>
  *
@@ -28,7 +27,7 @@
 
 #include "Engine.h"
 #include "Groove.h"
-#include "HydrogenSwing.h"
+#include "GrooveExperiments.h"
 #include "Knob.h"
 #include "lmms_basics.h"
 #include "MidiTime.h"
@@ -38,23 +37,22 @@
 
 #include "stdio.h"
 
-
-HydrogenSwing::HydrogenSwing(QObject * _parent) :
+GrooveExperiments::GrooveExperiments(QObject * _parent) :
 	QObject( _parent ),
 	Groove()
 {
-	m_swingAmount = 0;
-	m_swingFactor = 0;
+	m_shiftAmount = 0;
+	m_shiftFactor = 0;
 	init();
 	update();
 }
 
-HydrogenSwing::~HydrogenSwing()
+GrooveExperiments::~GrooveExperiments()
 {
 }
 
 
-void HydrogenSwing::init()
+void GrooveExperiments::init()
 {
 
 	Song * s = Engine::getSong();
@@ -65,43 +63,42 @@ void HydrogenSwing::init()
 
 }
 
-int HydrogenSwing::amount()
+int GrooveExperiments::amount()
 {
-	return m_swingAmount;
+	return m_shiftAmount;
 }
 
-void HydrogenSwing::update()
+void GrooveExperiments::update()
 {
 	m_frames_per_tick =  Engine::framesPerTick();
 }
 
-void HydrogenSwing::setAmount(int _amount)
+void GrooveExperiments::setAmount(int _amount)
 {
 
 	if (_amount > 0 && _amount <= 127)
 	{
-		m_swingAmount = _amount;
-		m_swingFactor =  (((float)m_swingAmount) / 127.0);
-		emit swingAmountChanged(m_swingAmount);
+		m_shiftAmount = _amount;
+		m_shiftFactor =  (((float)m_shiftAmount) / 127.0);
+		emit shiftAmountChanged(m_shiftAmount);
 	}
 	else if (_amount  == 0)
 	{
-		m_swingAmount = 0;
-		m_swingFactor =  0.0;
-		emit swingAmountChanged(m_swingAmount);
+		m_shiftAmount = 0;
+		m_shiftFactor =  0.0;
+		emit shiftAmountChanged(m_shiftAmount);
 	}
 	else
 	{
-		m_swingAmount = 127;
-		m_swingFactor =  1.0;
-		emit swingAmountChanged(m_swingAmount);
+		m_shiftAmount = 127;
+		m_shiftFactor =  1.0;
+		emit shiftAmountChanged(m_shiftAmount);
 	}
 
 }
 
 
-int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset,
-					 Note * _n, Pattern * _p )
+int GrooveExperiments::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset, Note * _n, Pattern * _p )
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
 	if ( m_frames_per_tick == 0 )
@@ -109,8 +106,8 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 		m_frames_per_tick =  Engine::framesPerTick(); // e.g. 500 at 120BPM 4/4
 	}
 
-	// only ever delay notes by 7 ticks, so if the tick is earlier don't play
-	if ( _n->pos().getTicks() + 7 < _cur_start->getTicks())
+	// only ever delay notes by 12 ticks, so if the tick is earlier don't play
+	if ( _n->pos().getTicks() + 12 < _cur_start->getTicks())
 	{
 		return -1;
 	}
@@ -122,26 +119,17 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 	int pos_in_beat =  _n->pos().getTicks() % 48;
 
 
-	// The Hydrogen Swing algorthym.
-	// Guessed by turning the knob and watching the possitions change in Audacity.
-	// Basically we delay (shift) notes on the the 2nd and 4th quarter of the beat.
-
 	int pos_in_eigth = -1;
-	if ( pos_in_beat >= 12 && pos_in_beat < 18 )
+	if ( pos_in_beat >= 36 && pos_in_beat < 48 )
 	{
-		// 1st half of second quarter
-		pos_in_eigth = pos_in_beat - 12;  // 0-5
-	}
-	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 )
-	{
-		// 1st half of third quarter
-		pos_in_eigth = pos_in_beat - 36;  // 0-5
+		// third quarter
+		pos_in_eigth = pos_in_beat - 36;  // 0-11
 	}
 
 	if ( pos_in_eigth >= 0 ) 
 	{
 
-		float ticks_to_shift = ((pos_in_eigth - 6) * -m_swingFactor);
+		float ticks_to_shift = ((pos_in_eigth - 12) * -m_shiftFactor);
 		
 		f_cnt_t frames_to_shift = (int)(ticks_to_shift * m_frames_per_tick);
 		
@@ -166,15 +154,15 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
 }
 
-void HydrogenSwing::saveSettings( QDomDocument & _doc, QDomElement & _element )
+void GrooveExperiments::saveSettings( QDomDocument & _doc, QDomElement & _element )
 {
-	_element.setAttribute("swingAmount", m_swingAmount);
+	_element.setAttribute("shiftAmount", m_shiftAmount);
 }
 
-void HydrogenSwing::loadSettings( const QDomElement & _this )
+void GrooveExperiments::loadSettings( const QDomElement & _this )
 {
 	bool ok;
-	int amount =  _this.attribute("swingAmount").toInt(&ok);
+	int amount =  _this.attribute("shiftAmount").toInt(&ok);
 	if (ok)
 	{
 		setAmount(amount);
@@ -185,43 +173,44 @@ void HydrogenSwing::loadSettings( const QDomElement & _this )
 	}
 }
 
-QWidget * HydrogenSwing::instantiateView( QWidget * _parent )
+QWidget * GrooveExperiments::instantiateView( QWidget * _parent )
 {
-	return new HydrogenSwingView(this, _parent);
+	return new GrooveExperimentsView(this, _parent);
 }
 
 
 
 // VIEW //
 
-HydrogenSwingView::HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * _parent) :
+GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments * _ge, QWidget * _parent) :
 	QWidget( _parent )
 {
 	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
-	m_nob = new Knob(knobBright_26, this, "swingFactor");
+	m_nob = new Knob(knobBright_26, this, "Shift");
 	m_nob->setModel( m_nobModel );
-	m_nob->setLabel( tr( "Swinginess" ) );
+	m_nob->setLabel( tr( "Shiftyness" ) );
 	m_nob->setEnabled(true);
-	m_nobModel->setValue(_hy_swing->amount());
+	m_nobModel->setValue(_ge->amount());
 
-	m_hy_swing = _hy_swing;
+	m_ge = _ge;
 
 	connect(m_nob, SIGNAL(sliderMoved(float)), this, SLOT(valueChanged(float)));
 	connect(m_nobModel, SIGNAL( dataChanged() ), this, SLOT(modelChanged()) );
+
 }
 
-HydrogenSwingView::~HydrogenSwingView()
+GrooveExperimentsView::~GrooveExperimentsView()
 {
 	delete m_nob;
 	delete m_nobModel;
 }
 
-void HydrogenSwingView::modelChanged()
+void GrooveExperimentsView::modelChanged()
 {
 	m_hy_swing->setAmount((int)m_nobModel->value());
 }
 
-void HydrogenSwingView::valueChanged(float _f) // this value passed is gibberish
+void GrooveExperimentsView::valueChanged(float _f) // this value passed is gibberish
 {
-	m_hy_swing->setAmount((int)m_nobModel->value());
+	m_ge->setAmount((int)m_nobModel->value());
 }

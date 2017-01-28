@@ -1,6 +1,6 @@
 /*
- * HydrogenSwing.cpp - Swing algo that varies adjustments form 0-127
- *              The algorythm mimics Hydrogen drum machines swing feature.
+ * HalfSwing.cpp - Swing algo that varies adjustments form 0-127
+ *              The algorythm is just the latter half of the HydrogenSwing groove..
  *
  * Copyright (c) 2004-2014 teknopaul <teknopaul/at/users.sourceforge.net>
  *
@@ -28,7 +28,7 @@
 
 #include "Engine.h"
 #include "Groove.h"
-#include "HydrogenSwing.h"
+#include "HalfSwing.h"
 #include "Knob.h"
 #include "lmms_basics.h"
 #include "MidiTime.h"
@@ -39,7 +39,7 @@
 #include "stdio.h"
 
 
-HydrogenSwing::HydrogenSwing(QObject * _parent) :
+HalfSwing::HalfSwing(QObject * _parent) :
 	QObject( _parent ),
 	Groove()
 {
@@ -49,12 +49,12 @@ HydrogenSwing::HydrogenSwing(QObject * _parent) :
 	update();
 }
 
-HydrogenSwing::~HydrogenSwing()
+HalfSwing::~HalfSwing()
 {
 }
 
 
-void HydrogenSwing::init()
+void HalfSwing::init()
 {
 
 	Song * s = Engine::getSong();
@@ -65,17 +65,17 @@ void HydrogenSwing::init()
 
 }
 
-int HydrogenSwing::amount()
+int HalfSwing::amount()
 {
 	return m_swingAmount;
 }
 
-void HydrogenSwing::update()
+void HalfSwing::update()
 {
 	m_frames_per_tick =  Engine::framesPerTick();
 }
 
-void HydrogenSwing::setAmount(int _amount)
+void HalfSwing::setAmount(int _amount)
 {
 
 	if (_amount > 0 && _amount <= 127)
@@ -100,7 +100,7 @@ void HydrogenSwing::setAmount(int _amount)
 }
 
 
-int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset,
+int HalfSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset,
 					 Note * _n, Pattern * _p )
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
@@ -122,17 +122,11 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 	int pos_in_beat =  _n->pos().getTicks() % 48;
 
 
-	// The Hydrogen Swing algorthym.
-	// Guessed by turning the knob and watching the possitions change in Audacity.
-	// Basically we delay (shift) notes on the the 2nd and 4th quarter of the beat.
+	// The Half Swing algorthym.
+	// Basically we delay (shift) notes on the the 4th quarter of the beat.
 
 	int pos_in_eigth = -1;
-	if ( pos_in_beat >= 12 && pos_in_beat < 18 )
-	{
-		// 1st half of second quarter
-		pos_in_eigth = pos_in_beat - 12;  // 0-5
-	}
-	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 )
+	if ( pos_in_beat >= 36 && pos_in_beat < 42 )
 	{
 		// 1st half of third quarter
 		pos_in_eigth = pos_in_beat - 36;  // 0-5
@@ -166,12 +160,12 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
 }
 
-void HydrogenSwing::saveSettings( QDomDocument & _doc, QDomElement & _element )
+void HalfSwing::saveSettings( QDomDocument & _doc, QDomElement & _element )
 {
 	_element.setAttribute("swingAmount", m_swingAmount);
 }
 
-void HydrogenSwing::loadSettings( const QDomElement & _this )
+void HalfSwing::loadSettings( const QDomElement & _this )
 {
 	bool ok;
 	int amount =  _this.attribute("swingAmount").toInt(&ok);
@@ -185,16 +179,16 @@ void HydrogenSwing::loadSettings( const QDomElement & _this )
 	}
 }
 
-QWidget * HydrogenSwing::instantiateView( QWidget * _parent )
+QWidget * HalfSwing::instantiateView( QWidget * _parent )
 {
-	return new HydrogenSwingView(this, _parent);
+	return new HalfSwingView(this, _parent);
 }
 
 
 
 // VIEW //
 
-HydrogenSwingView::HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * _parent) :
+HalfSwingView::HalfSwingView(HalfSwing * _hy_swing, QWidget * _parent) :
 	QWidget( _parent )
 {
 	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
@@ -208,20 +202,21 @@ HydrogenSwingView::HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * _paren
 
 	connect(m_nob, SIGNAL(sliderMoved(float)), this, SLOT(valueChanged(float)));
 	connect(m_nobModel, SIGNAL( dataChanged() ), this, SLOT(modelChanged()) );
+
 }
 
-HydrogenSwingView::~HydrogenSwingView()
+HalfSwingView::~HalfSwingView()
 {
 	delete m_nob;
 	delete m_nobModel;
 }
 
-void HydrogenSwingView::modelChanged()
+void HalfSwingView::modelChanged()
 {
 	m_hy_swing->setAmount((int)m_nobModel->value());
 }
 
-void HydrogenSwingView::valueChanged(float _f) // this value passed is gibberish
+void HalfSwingView::valueChanged(float _f) // this value passed is gibberish
 {
 	m_hy_swing->setAmount((int)m_nobModel->value());
 }

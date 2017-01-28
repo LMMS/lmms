@@ -20,7 +20,9 @@ set(LMMS_SRCS
 	core/fft_helpers.cpp
 	core/FxMixer.cpp
 	core/Groove.cpp
+	core/GrooveExperiments.cpp
 	core/GrooveFactory.cpp
+	core/HalfSwing.cpp
 	core/HydrogenSwing.cpp
 	core/ImportFilter.cpp
 	core/InlineAutomation.cpp
