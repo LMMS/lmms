@@ -1,5 +1,5 @@
-#ifndef HYDROGENSWING_H
-#define HYDROGENSWING_H
+#ifndef GROOVEEXPERIMENTS_H
+#define GROOVEEXPERIMENTS_H
 
 #include <QtCore/QObject>
 
@@ -11,15 +11,15 @@
 #include "Pattern.h"
 
 /**
- * A groove that mimics Hydrogen drum machine's swing feature
+ * A groove thats new
  */
-class HydrogenSwing : public QObject, public Groove
+class GrooveExperiments : public QObject, public Groove
 {
 	Q_OBJECT
 public:
-	HydrogenSwing(QObject *parent=0 );
+	GrooveExperiments(QObject *parent=0 );
 
-	virtual ~HydrogenSwing();
+	virtual ~GrooveExperiments();
 
 	void init();
 	int amount();
@@ -30,7 +30,7 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _element );
 	inline virtual QString nodeName() const
 	{
-		return "hydrogen";
+		return "experiment";
 	}
 
 
@@ -38,7 +38,7 @@ public:
 	QWidget * instantiateView( QWidget * _parent );
 
 signals:
-	void swingAmountChanged(int _newAmount);
+	void shiftAmountChanged(int _newAmount);
 
 
 public slots:
@@ -48,27 +48,27 @@ public slots:
 
 private:
 	int m_frames_per_tick;
-	int m_swingAmount;
-	float m_swingFactor;// =  (m_swingAmount / 127.0)
+	int m_shiftAmount;
+	float m_shiftFactor;// =  (m_shiftAmount / 127.0)
 
 } ;
 
-class HydrogenSwingView : public QWidget
+class GrooveExperimentsView : public QWidget
 {
 	Q_OBJECT
 public:
-	HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * parent=0 );
-	~HydrogenSwingView();
+	GrooveExperimentsView(GrooveExperiments * _m_ge, QWidget * parent=0 );
+	~GrooveExperimentsView();
 
 public slots:
 	void modelChanged();
 	void valueChanged(float);
 
 private:
-	HydrogenSwing * m_hy_swing;
+	GrooveExperiments * m_ge;
 	FloatModel * m_nobModel;
 	Knob * m_nob;
 
 } ;
 
-#endif // HYDROGENSWING_H
+#endif // GROOVEEXPERIMENTS_H

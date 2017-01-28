@@ -55,11 +55,15 @@ int MidiSwing::isInTick(MidiTime * _cur_start, Note * _n, Pattern * _p )
 	// the Midi Swing algorthym.
 
 	int pos_in_eigth = -1;
-	if ( pos_in_beat >= 12 && pos_in_beat < 18 ) {  // 1st half of second quarter
+	if ( pos_in_beat >= 12 && pos_in_beat < 18 ) 
+	{  
+		// 1st half of second quarter
 		//add a 0 - 24 tick shift
 		pos_in_eigth = pos_in_beat - 12;  // 0-5
 	}
-	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 ) { // 1st half of third quarter
+	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 )
+	{ 
+		// 1st half of third quarter
 		pos_in_eigth = pos_in_beat - 36;  // 0-5
 	}
 

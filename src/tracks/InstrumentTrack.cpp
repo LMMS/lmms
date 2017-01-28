@@ -703,17 +703,20 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 // TODO track specific grooves (might sound a bit wierd)
 Groove * InstrumentTrack::groove()
 {
-	if (m_grooveOn) {
+	if (m_grooveOn)
+	{
 		return m_groove;
 	}
-	else {
+	else
+	{
 		return m_noGroove;
 	}
 }
 
 void InstrumentTrack::disableGroove()
 {
-	if (m_noGroove == NULL) {
+	if (m_noGroove == NULL)
+	{
 		m_noGroove = new Groove();
 	}
 	m_grooveOn = false;

@@ -1,5 +1,5 @@
-#ifndef HYDROGENSWING_H
-#define HYDROGENSWING_H
+#ifndef HALFSWING_H
+#define HALFSWING_H
 
 #include <QtCore/QObject>
 
@@ -11,15 +11,15 @@
 #include "Pattern.h"
 
 /**
- * A groove that mimics Hydrogen drum machine's swing feature
+ * A groove thatjust latter half of the HydrogenSwing algo.
  */
-class HydrogenSwing : public QObject, public Groove
+class HalfSwing : public QObject, public Groove
 {
 	Q_OBJECT
 public:
-	HydrogenSwing(QObject *parent=0 );
+	HalfSwing(QObject *parent=0 );
 
-	virtual ~HydrogenSwing();
+	virtual ~HalfSwing();
 
 	void init();
 	int amount();
@@ -30,10 +30,8 @@ public:
 	void saveSettings( QDomDocument & _doc, QDomElement & _element );
 	inline virtual QString nodeName() const
 	{
-		return "hydrogen";
+		return "half";
 	}
-
-
 
 	QWidget * instantiateView( QWidget * _parent );
 
@@ -53,22 +51,22 @@ private:
 
 } ;
 
-class HydrogenSwingView : public QWidget
+class HalfSwingView : public QWidget
 {
 	Q_OBJECT
 public:
-	HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * parent=0 );
-	~HydrogenSwingView();
+	HalfSwingView(HalfSwing * _hy_swing, QWidget * parent=0 );
+	~HalfSwingView();
 
 public slots:
 	void modelChanged();
 	void valueChanged(float);
 
 private:
-	HydrogenSwing * m_hy_swing;
+	HalfSwing * m_hy_swing;
 	FloatModel * m_nobModel;
 	Knob * m_nob;
 
 } ;
 
-#endif // HYDROGENSWING_H
+#endif // HALFSWING_H
