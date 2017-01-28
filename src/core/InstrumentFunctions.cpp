@@ -24,6 +24,8 @@
 
 #include <QDomElement>
 
+#include <QtDebug>
+
 #include "InstrumentFunctions.h"
 #include "ChordTable.h"
 #include "embed.h"
@@ -32,6 +34,7 @@
 #include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PresetPreviewPlayHandle.h"
+
 
 
 InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent ) :
@@ -88,7 +91,25 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 				{ // if the note is active process it, otherwise skip
 
 					// getting the base note key
-					int sub_note_key = sub_note_key_base + cst->key->value();
+					int sub_note_key;
+
+					//considering random function
+					if ( cst->rand->value() )
+					{
+						int rd = abs( cst->key->value() );
+						if ( rd == 0 )
+						{
+							sub_note_key = sub_note_key_base;
+						} else
+						{
+							sub_note_key = sub_note_key_base - rd + ( rand() % ( 2 * rd ));
+						}
+
+					} else
+					{
+						sub_note_key = sub_note_key_base + cst->key->value();
+					}
+
 
 					// the new volume and panning
 					volume_t sub_note_vol;
@@ -110,7 +131,24 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 						else
 						{ // all modifications active, add interval to sub-note-key, volume, panning
 							sub_note_vol = base_note_vol * ( (float)cst->vol->value() / (float)100 );
-							sub_note_pan = cst->pan->value();
+
+							//if random make the panning random
+							if (cst->rand->value())
+							{
+								//random value according to the pan value
+								int rd = abs( cst->pan->value() );
+								if ( rd != 0 )
+								{
+									sub_note_pan = ( rand() % ( 2 * rd ) ) - rd;
+								} else
+								{
+									sub_note_pan = 0;
+								}
+							} else
+							{
+								sub_note_pan = cst->pan->value();
+							}
+
 						}
 					}
 					// maybe we're out of range -> let's get outta
@@ -119,6 +157,11 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 					{
 						break;
 					}
+
+//					qDebug("Stack Pan: %d",sub_note_pan);
+//					qDebug("Stack Key: %d",sub_note_key);
+
+
 					// create copy of base-note
 					Note note_copy( _n->length(), 0, sub_note_key, sub_note_vol, sub_note_pan, _n->detuning() );
 
@@ -394,8 +437,29 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			// now calculate final key for our arp-note
 			//			const int sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave +
 			//															 cst.key;
-			const int sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave +
-															 cst->key->value();
+
+			//the arpeggio key
+			int sub_note_key;
+
+			//considering the random option
+			if ( cst->rand->value() )
+			{
+				//getting the range for the random semitone
+				int nr = abs( cst->key->value() );
+				//preventing divide by 0
+				if ( nr==0 )
+				{
+					sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave;
+				} else
+				{
+					//we can use directly rand as srand has already been initialized
+					sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave - nr +
+																	 rand() % ( 2 * nr );
+				}
+			} else {
+				sub_note_key = base_note_key + ( cur_arp_idx / cur_chord_size ) * KeysPerOctave +
+																cst->key->value();
+			}
 			volume_t sub_note_vol;
 			panning_t sub_note_pan;
 			// if the note is bare we don't intervene into panning, volume etc...
@@ -416,7 +480,21 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				{ // all modifications active, add interval to sub-note-key,
 					// volume, panning
 					sub_note_vol = base_note_vol * ( (float)cst->vol->value() / (float)100 );
-					sub_note_pan = cst->pan->value();
+					//random key and panning!!
+					if ( cst->rand->value() )
+					{
+						int rd = abs( cst->pan->value() );
+						if ( rd == 0 )
+						{
+							sub_note_pan = 0;
+						} else
+						{
+							sub_note_pan = rand() % ( 2 * rd ) - rd;
+						}
+					} else
+					{
+						sub_note_pan = cst->pan->value();
+					}
 				}
 			}
 
@@ -433,6 +511,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			}
 
 			// create new arp-note
+//			qDebug("Pan: %d",sub_note_pan);
+//			qDebug("Key: %d",sub_note_key);
 
 			// create sub-note-play-handle, only ptr to note is different
 			// and is_arp_note=true

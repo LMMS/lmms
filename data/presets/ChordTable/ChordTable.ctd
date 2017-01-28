@@ -1,986 +1,986 @@
 <?xml version="1.0"?>
 <!DOCTYPE lmms-project>
-<lmms-project type="chord-table" creatorversion="1.1.90.502" version="1.0" creator="LMMS">
+<lmms-project creator="LMMS" version="1.0" type="chord-table" creatorversion="1.2.0-rc2.117">
   <head/>
   <chord-table>
     <chord name="octave">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
     </chord>
     <chord name="Major">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="Majb5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
     </chord>
     <chord name="minor">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="minb5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
     </chord>
     <chord name="sus2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="sus4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="aug">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
     </chord>
     <chord name="augsus4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
     </chord>
     <chord name="tri">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
     </chord>
     <chord name="6">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
     </chord>
     <chord name="6sus4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
     </chord>
     <chord name="6add9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="m6">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
     </chord>
     <chord name="m6add9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="7sus4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="7#5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="7b5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="7#9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="15"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="15"/>
     </chord>
     <chord name="7b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
     </chord>
     <chord name="7#5#9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="15"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="15"/>
     </chord>
     <chord name="7#5b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
     </chord>
     <chord name="7b5b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
     </chord>
     <chord name="7add11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="7add13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="7#11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="18"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="18"/>
     </chord>
     <chord name="Maj7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Maj7b5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Maj7#5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Maj7#11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="18"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="18"/>
     </chord>
     <chord name="Maj7add13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="m7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="m7b5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="m7b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
     </chord>
     <chord name="m7add11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="m7add13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="m-Maj7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="m-Maj7add11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="m-Maj7add13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="9sus4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="add9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="9#5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="9b5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="9#11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="18"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="18"/>
     </chord>
     <chord name="9b13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="20"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="20"/>
     </chord>
     <chord name="Maj9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="Maj9sus4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="15"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="15"/>
     </chord>
     <chord name="Maj9#5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="Maj9#11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="18"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="18"/>
     </chord>
     <chord name="m9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="madd9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="m9b5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="m9-Maj7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
     </chord>
     <chord name="11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="11b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="Maj11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="m11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="m-Maj11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="17"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="17"/>
     </chord>
     <chord name="13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="13#9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="15"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="15"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="13b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="13b5b9">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="13"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="13"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="Maj13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="m13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="m-Maj13">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="14"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="21"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="14"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="21"/>
     </chord>
     <chord name="Major">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Harmonicminor">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Melodicminor">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Wholetone">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Diminished">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Majorpentatonic">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
     </chord>
     <chord name="Minorpentatonic">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Japinsen">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Majorbebop">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Dominantbebop">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Blues">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Arabic">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Enigmatic">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Neopolitan">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Neopolitanminor">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Hungarianminor">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Dorian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Phrygolydian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Lydian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Mixolydian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Aeolian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Locrian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Minor">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Chromatic">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="Half-WholeDiminished">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="Phrygiandominant">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="Persian">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="4.7.7.0.4.4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
     </chord>
     <chord name="0.0.2.2.4.4.2.2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
     </chord>
     <chord name="0.0.3.3.5.5.2.2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
     </chord>
     <chord name="0.2.4.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="0.-2.-4.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="0.7.2.9.4.11.4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="9"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
     </chord>
     <chord name="0.8">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
     </chord>
     <chord name="0.7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="0.6">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
     </chord>
     <chord name="0.3.7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="0.5.8">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
     </chord>
     <chord name="0.8.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="0.4.10">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="0.12.5.7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="12"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="12"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
     </chord>
     <chord name="0.12.7.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="12"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="12"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="0.8.5.12">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="8"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="12"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="8"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="12"/>
     </chord>
     <chord name="0.7.3.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="0.-2.0.2.1">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
     </chord>
     <chord name="0.-5.-3.-3.-3.-5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-5"/>
     </chord>
     <chord name="0.0.3.3.5.5.2.2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
     </chord>
     <chord name="0.3.5.2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
     </chord>
     <chord name="0.16">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="16"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="16"/>
     </chord>
     <chord name="0.10.7.10">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
     </chord>
     <chord name="0.16.10.11">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="16"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="10"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="11"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="16"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="10"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="11"/>
     </chord>
     <chord name="0.7.-1.3">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
     </chord>
     <chord name="0.7.-1.3.-3.1">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
     </chord>
     <chord name="0.0.0.-3.4.4.4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
     </chord>
     <chord name="3.0.0.7.7.2.2.3">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
     </chord>
     <chord name="0.7.2.3">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
     </chord>
     <chord name="0.7.2.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="0.7.3.5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="5"/>
     </chord>
     <chord name="3.3.3.0.0.7.7.2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="2"/>
     </chord>
     <chord name="0.-1.-1.3.3.-7">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-7"/>
     </chord>
     <chord name="0.-1.-1.4.4.7.7.6">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="6"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="6"/>
     </chord>
     <chord name="RBatman0.0.-2.-2.-5.-5.-2.-2">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="-80" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="80" vol="70" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="-80" vol="70" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="80" vol="100" active="1" key="-5"/>
-      <semitone silenced="0" bare="0" pan="-80" vol="100" active="1" key="-5"/>
-      <semitone silenced="0" bare="0" pan="50" vol="80" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="-50" vol="80" active="1" key="-2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="-80" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="80" vol="70" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="-80" vol="70" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="80" vol="100" bare="0" silenced="0" key="-5"/>
+      <semitone active="1" rand="0" pan="-80" vol="100" bare="0" silenced="0" key="-5"/>
+      <semitone active="1" rand="0" pan="50" vol="80" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="-50" vol="80" bare="0" silenced="0" key="-2"/>
     </chord>
     <chord name="Pan1_0.0.0.-3.4.4.4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="80" vol="70" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="-80" vol="70" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="70" vol="120" active="1" key="-3"/>
-      <semitone silenced="0" bare="0" pan="-70" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="70" vol="80" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="90" vol="60" active="1" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="80" vol="70" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="-80" vol="70" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="70" vol="120" bare="0" silenced="0" key="-3"/>
+      <semitone active="1" rand="0" pan="-70" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="70" vol="80" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="90" vol="60" bare="0" silenced="0" key="4"/>
     </chord>
     <chord name="Pan2_3.0.0.7.7.2.2.3">
-      <semitone silenced="0" bare="0" pan="60" vol="100" active="1" key="3"/>
-      <semitone silenced="0" bare="0" pan="-60" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="60" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="60" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="-80" vol="110" active="1" key="7"/>
-      <semitone silenced="0" bare="0" pan="80" vol="80" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="70" vol="90" active="1" key="2"/>
-      <semitone silenced="0" bare="0" pan="-70" vol="90" active="1" key="3"/>
+      <semitone active="1" rand="0" pan="60" vol="100" bare="0" silenced="0" key="3"/>
+      <semitone active="1" rand="0" pan="-60" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="60" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="60" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="-80" vol="110" bare="0" silenced="0" key="7"/>
+      <semitone active="1" rand="0" pan="80" vol="80" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="70" vol="90" bare="0" silenced="0" key="2"/>
+      <semitone active="1" rand="0" pan="-70" vol="90" bare="0" silenced="0" key="3"/>
     </chord>
     <chord name="Pan3_0.0.-1.-1.4.4">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="50" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="100" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="-100" vol="100" active="1" key="-1"/>
-      <semitone silenced="0" bare="0" pan="50" vol="100" active="1" key="4"/>
-      <semitone silenced="0" bare="0" pan="-50" vol="100" active="1" key="4"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="50" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="100" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="-100" vol="100" bare="0" silenced="0" key="-1"/>
+      <semitone active="1" rand="0" pan="50" vol="100" bare="0" silenced="0" key="4"/>
+      <semitone active="1" rand="0" pan="-50" vol="100" bare="0" silenced="0" key="4"/>
     </chord>
     <chord name="Pan4_0.0.S.-2.-2.S.-5.-5">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="1" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="50" vol="130" active="1" key="-2"/>
-      <semitone silenced="0" bare="0" pan="-50" vol="130" active="1" key="-2"/>
-      <semitone silenced="1" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="50" vol="100" active="1" key="-5"/>
-      <semitone silenced="0" bare="0" pan="-50" vol="100" active="1" key="-5"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="1" key="0"/>
+      <semitone active="1" rand="0" pan="50" vol="130" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="-50" vol="130" bare="0" silenced="0" key="-2"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="1" key="0"/>
+      <semitone active="1" rand="0" pan="50" vol="100" bare="0" silenced="0" key="-5"/>
+      <semitone active="1" rand="0" pan="-50" vol="100" bare="0" silenced="0" key="-5"/>
     </chord>
     <chord name="BEDAK">
-      <semitone silenced="0" bare="0" pan="0" vol="100" active="1" key="0"/>
-      <semitone silenced="0" bare="0" pan="60" vol="50" active="1" key="9"/>
+      <semitone active="1" rand="0" pan="0" vol="100" bare="0" silenced="0" key="0"/>
+      <semitone active="1" rand="0" pan="60" vol="50" bare="0" silenced="0" key="9"/>
     </chord>
   </chord-table>
 </lmms-project>
