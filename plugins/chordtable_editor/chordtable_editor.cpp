@@ -106,6 +106,7 @@ QString chordtableEditor::nodeName() const
 void chordtableEditor::reloadComboModel()
 {
 	int i=m_chordsComboModel->value();
+	qDebug("combo: %d",i);
 	m_chordsComboModel->clear();
 	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
@@ -243,6 +244,8 @@ ChordTableEditorView::ChordTableEditorView( ToolPlugin * _tool ) :
 	//changes the combobox in the plugin
 	connect( gui, SIGNAL( genericSignal_1( int ) ), this, SLOT( setChordSelection( int ) ) );
 
+	//loads the Chord
+	loadChord();
 
 	setWhatsThis( tr( "This dialog allows editing and automation of the chord table." ) );
 
