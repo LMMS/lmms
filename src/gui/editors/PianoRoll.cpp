@@ -105,7 +105,7 @@ const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
 // width of area used for resizing (the grip at the end of a note)
-const int RESIZE_AREA_WIDTH = 4;
+const int RESIZE_AREA_WIDTH = 9;
 
 // width of line for setting volume/panning of note
 const int NOTE_EDIT_LINE_WIDTH = 3;
