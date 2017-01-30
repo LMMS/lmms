@@ -620,8 +620,10 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+#ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
-	
+#endif
+
 		m_voice = new ModalBar();
 	
 		m_voice->controlChange( 16, _control16 );
@@ -668,8 +670,10 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+#ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
-	
+#endif
+
 		m_voice = new TubeBell();
 	
 		m_voice->controlChange( 1, _control1 );
@@ -714,7 +718,9 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+#ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
+#endif
 
 		m_voice = new BandedWG();
 	
