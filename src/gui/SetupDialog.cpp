@@ -1217,7 +1217,6 @@ void SetupDialog::toggleAutoSave( bool _enabled )
 {
 	m_disableAutoSave = _enabled;
 	m_saveIntervalSlider->setEnabled( _enabled );
-	//m_runningAutoSave->setEnabled( _enabled );
 	m_runningAutoSave->setVisible( _enabled );
 	setAutoSaveInterval( m_saveIntervalSlider->value() );
 }
@@ -1535,7 +1534,7 @@ void SetupDialog::displaySaveIntervalHelp()
 	QWhatsThis::showText( QCursor::pos(),
 			tr( "Set the time between automatic backup to %1.\n"
 			"Remember to also save your project manually. "
-			"You can also choose to allow saving while playing, "
+			"You can also choose to disable saving while playing, "
 			"something some older systems find difficult." ).arg(
 			ConfigManager::inst()->recoveryFile() ) );
 }
