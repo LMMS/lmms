@@ -677,24 +677,22 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( m_runningAutoSave, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleRunningAutoSave( bool ) ) );
 
-	if( ! m_disableAutoSave )
-	{
-		m_saveIntervalSlider->setEnabled( false );
-		m_runningAutoSave->setHidden( true );
-	}
-
 	QPushButton * autoSaveResetBtn = new QPushButton(
 			embed::getIconPixmap( "reload" ), "", auto_save_tw );
 	autoSaveResetBtn->setGeometry( 290, 70, 28, 28 );
 	connect( autoSaveResetBtn, SIGNAL( clicked() ), this,
 						SLOT( resetAutoSave() ) );
-	ToolTip::add( bufsize_reset_btn, tr( "Reset to default-value" ) );
+	ToolTip::add( autoSaveResetBtn, tr( "Reset to default-value" ) );
 
 	QPushButton * saveIntervalBtn = new QPushButton(
 			embed::getIconPixmap( "help" ), "", auto_save_tw );
 	saveIntervalBtn->setGeometry( 320, 70, 28, 28 );
 	connect( saveIntervalBtn, SIGNAL( clicked() ), this,
 						SLOT( displaySaveIntervalHelp() ) );
+
+	m_saveIntervalSlider->setEnabled( m_disableAutoSave );
+	m_runningAutoSave->setVisible( m_disableAutoSave );
+
 
 	perf_layout->addWidget( auto_save_tw );
 	perf_layout->addSpacing( 10 );
@@ -835,7 +833,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	audio_layout->addSpacing( 20 );
 	audio_layout->addWidget( asw );
 	audio_layout->addStretch();
-
 
 
 
@@ -1215,11 +1212,13 @@ void SetupDialog::toggleSmoothScroll( bool _enabled )
 
 
 
+
 void SetupDialog::toggleAutoSave( bool _enabled )
 {
 	m_disableAutoSave = _enabled;
 	m_saveIntervalSlider->setEnabled( _enabled );
-	m_runningAutoSave->setHidden( ! _enabled );
+	//m_runningAutoSave->setEnabled( _enabled );
+	m_runningAutoSave->setVisible( _enabled );
 	setAutoSaveInterval( m_saveIntervalSlider->value() );
 }
 
@@ -1230,6 +1229,7 @@ void SetupDialog::toggleRunningAutoSave( bool _enabled )
 {
 	m_disableRunningAutoSave = _enabled;
 }
+
 
 
 
