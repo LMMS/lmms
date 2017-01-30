@@ -173,6 +173,7 @@ void SampleBuffer::update( bool _keep_settings )
 		MM_FREE( m_data );
 	}
 
+	bool fileLoadError = false;
 	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
 	{
 		// TODO: reverse- and amplification-property is not covered
@@ -200,7 +201,6 @@ void SampleBuffer::update( bool _keep_settings )
 		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
 		m_frames = 0;
 
-		bool fileLoadError = false;
 		const QFileInfo fileInfo( file );
 		if( fileInfo.size() > 100*1024*1024 )
 		{
@@ -223,15 +223,7 @@ void SampleBuffer::update( bool _keep_settings )
 			}
 		}
 
-		if( fileLoadError )
-		{
-			QMessageBox::information( NULL,
-					"Fail to open file",
-					"Audio files are limited to 100 MB "
-					"in size and 1 hour of playing time",
-						QMessageBox::Ok );
-		}
-		else
+		if( ! fileLoadError )
 		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
@@ -296,6 +288,15 @@ void SampleBuffer::update( bool _keep_settings )
 	}
 
 	emit sampleUpdated();
+
+	if( fileLoadError )
+	{
+		QMessageBox::information( NULL,
+				"Fail to open file",
+				"Audio files are limited to 100 MB "
+				"in size and 1 hour of playing time",
+					QMessageBox::Ok );
+	}
 }
 
 
