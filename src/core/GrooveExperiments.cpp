@@ -207,7 +207,7 @@ GrooveExperimentsView::~GrooveExperimentsView()
 
 void GrooveExperimentsView::modelChanged()
 {
-	m_hy_swing->setAmount((int)m_nobModel->value());
+	m_ge->setAmount((int)m_nobModel->value());
 }
 
 void GrooveExperimentsView::valueChanged(float _f) // this value passed is gibberish
