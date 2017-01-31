@@ -24,8 +24,10 @@
  */
 
 
+#include <QDebug>
 #include <QMessageBox>
 
+#include "debug.h"
 #include "LadspaEffect.h"
 #include "DataFile.h"
 #include "AudioDevice.h"
@@ -241,6 +243,15 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 					for( fpp_t frame = 0; 
 						frame < frames; ++frame )
 					{
+						if (	LADSPA_DEBUG &&
+							( isnan( pp->buffer[frame] ) ||
+							isinf( pp->buffer[frame] ) ) )
+						{
+							qDebug() << "name: " << m_descriptor->Label;
+							assert( ! isnan( pp->buffer[frame] ) );
+							assert( ! isinf( pp->buffer[frame] ) );
+						}
+
 						_buf[frame][channel] = d * _buf[frame][channel] + w * pp->buffer[frame];
 						out_sum += _buf[frame][channel] * _buf[frame][channel];
 					}

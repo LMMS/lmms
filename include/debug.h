@@ -32,8 +32,10 @@
 // additional range-checkings) should be compiled
 
 #ifdef LMMS_DEBUG
+#define LADSPA_DEBUG TRUE
 	#include <assert.h>
 #else
+#define LADSPA_DEBUG FALSE
 	#define assert(x) ((void)(x))
 #endif
 #include <cstdio>
