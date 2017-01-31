@@ -55,7 +55,7 @@ class HalfSwingView : public QWidget
 {
 	Q_OBJECT
 public:
-	HalfSwingView(HalfSwing * _hy_swing, QWidget * parent=0 );
+	HalfSwingView(HalfSwing * _half_swing, QWidget * parent=0 );
 	~HalfSwingView();
 
 public slots:
@@ -63,7 +63,7 @@ public slots:
 	void valueChanged(float);
 
 private:
-	HalfSwing * m_hy_swing;
+	HalfSwing * m_half_swing;
 	FloatModel * m_nobModel;
 	Knob * m_nob;
 

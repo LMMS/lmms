@@ -188,7 +188,7 @@ QWidget * HalfSwing::instantiateView( QWidget * _parent )
 
 // VIEW //
 
-HalfSwingView::HalfSwingView(HalfSwing * _hy_swing, QWidget * _parent) :
+HalfSwingView::HalfSwingView(HalfSwing * _half_swing, QWidget * _parent) :
 	QWidget( _parent )
 {
 	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
@@ -196,9 +196,9 @@ HalfSwingView::HalfSwingView(HalfSwing * _hy_swing, QWidget * _parent) :
 	m_nob->setModel( m_nobModel );
 	m_nob->setLabel( tr( "Swinginess" ) );
 	m_nob->setEnabled(true);
-	m_nobModel->setValue(_hy_swing->amount());
+	m_nobModel->setValue(_half_swing->amount());
 
-	m_hy_swing = _hy_swing;
+	m_half_swing = _half_swing;
 
 	connect(m_nob, SIGNAL(sliderMoved(float)), this, SLOT(valueChanged(float)));
 	connect(m_nobModel, SIGNAL( dataChanged() ), this, SLOT(modelChanged()) );
@@ -213,10 +213,10 @@ HalfSwingView::~HalfSwingView()
 
 void HalfSwingView::modelChanged()
 {
-	m_hy_swing->setAmount((int)m_nobModel->value());
+	m_half_swing->setAmount((int)m_nobModel->value());
 }
 
 void HalfSwingView::valueChanged(float _f) // this value passed is gibberish
 {
-	m_hy_swing->setAmount((int)m_nobModel->value());
+	m_half_swing->setAmount((int)m_nobModel->value());
 }
