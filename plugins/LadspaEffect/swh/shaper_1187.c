@@ -115,8 +115,8 @@ static void runShaper(LADSPA_Handle instance, unsigned long sample_count) {
 	
 	if (shapep < 1.0f && shapep > -1.0f) {
 	        shape = 1.0f;
-	} else if (shape < 0) {
-	        shape = -1.0f / shape;
+	} else if (shapep < 0) {
+	        shape = -1.0f / shapep;
 	} else {
 	        shape = shapep;
 	}
@@ -160,8 +160,8 @@ static void runAddingShaper(LADSPA_Handle instance, unsigned long sample_count) 
 	
 	if (shapep < 1.0f && shapep > -1.0f) {
 	        shape = 1.0f;
-	} else if (shape < 0) {
-	        shape = -1.0f / shape;
+	} else if (shapep < 0) {
+	        shape = -1.0f / shapep;
 	} else {
 	        shape = shapep;
 	}
