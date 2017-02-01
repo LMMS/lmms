@@ -161,6 +161,7 @@ public slots:
 	QString setWaveToUser( );
 
 	void smooth();
+    void convolve(const float * _convolution, const int _length, const int _offset);
 	void smoothNonCyclic();
 	void normalize();
 	void invert();

@@ -110,6 +110,7 @@ AutomationEditor::AutomationEditor() :
 	m_scaleColor( Qt::SolidPattern ),
 	m_crossColor( 0, 0, 0 )
 {
+    setLayoutDirection ( Qt::LeftToRight );
 	connect( this, SIGNAL( currentPatternChanged() ),
 				this, SLOT( updateAfterPatternChange() ),
 				Qt::QueuedConnection );

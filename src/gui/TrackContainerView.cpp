@@ -67,6 +67,7 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 {
 	m_tc->setHook( this );
 
+    setLayoutDirection(Qt::LeftToRight);
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
