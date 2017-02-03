@@ -85,6 +85,7 @@ private slots:
 private:
 	static GuiApplication* s_instance;
 
+	//will be initialized by MainWindow.finalize - tools menu section
 	PluginView* m_chordTableEditorView;
 
 	MainWindow* m_mainWindow;
