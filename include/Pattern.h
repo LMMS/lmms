@@ -186,14 +186,14 @@ protected:
 
 
 private:
-	static QPixmap * s_stepBtnOn;
-	static QPixmap * s_stepBtnOverlay;
+	static QPixmap * s_stepBtnOn0;
+	static QPixmap * s_stepBtnOn200;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
-	
+
 	QStaticText m_staticTextName;
 } ;
 
