@@ -1832,7 +1832,7 @@ void TrackOperationsWidget::disableGroove()
 	//engine::getMixer()->unlock();
 }
 
-/*! \brief Turns off the groove
+/*! \brief Turns on the groove
  *
  */
 void TrackOperationsWidget::enableGroove()

@@ -24,6 +24,8 @@
 
 #include "SongEditor.h"
 
+#include <QDebug>
+
 #include <QTimeLine>
 #include <QAction>
 #include <QButtonGroup>
@@ -55,7 +57,6 @@
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
-
 
 
 positionLine::positionLine( QWidget * parent ) :
@@ -344,9 +345,35 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
 		}
 	}
+	// above don't work onmy machine below does
 	else if( ke->key() == Qt::Key_Home )
 	{
-		m_song->setPlayPos( 0, Song::Mode_PlaySong );
+		MidiTime mTime = MidiTime(0, 0);
+		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+		m_timeLine->updatePosition( mTime );
+		this->scrollToPos( mTime );
+	}
+	else if( ke->key() == Qt::Key_PageUp || ke->key() == Qt::Key_MediaPrevious  )
+	{
+		int tact = m_song->m_playPos[Song::Mode_PlaySong].getTact() - 1;
+		MidiTime mTime = MidiTime(tact > 0 ? tact : 0, 0);
+		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+		m_timeLine->updatePosition( mTime );
+		this->scrollToPos( mTime );
+	}
+	else if( ke->key() == Qt::Key_PageDown || ke->key() == Qt::Key_MediaNext )
+	{
+		MidiTime mTime = MidiTime(m_song->m_playPos[Song::Mode_PlaySong].getTact() + 1, 0);
+		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+		m_timeLine->updatePosition( mTime );
+		this->scrollToPos( mTime );
+	}
+	else if( ke->key() == Qt::Key_End )
+	{
+		MidiTime mTime = MidiTime(m_song->length(), 0);
+		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+		m_timeLine->updatePosition( mTime );
+		this->scrollToPos( mTime );
 	}
 	else
 	{
@@ -608,6 +635,36 @@ bool SongEditor::allowRubberband() const
 }
 
 
+void SongEditor::scrollToPos( const MidiTime & t )
+{
+	int widgetWidth, trackOpWidth;
+	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
+	{
+		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
+		trackOpWidth = TRACK_OP_WIDTH_COMPACT;
+	}
+	else
+	{
+		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
+		trackOpWidth = TRACK_OP_WIDTH;
+	}
+
+	m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
+	const int w = width() - widgetWidth
+						- trackOpWidth
+						- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
+	if( t > m_currentPosition + w * MidiTime::ticksPerTact() /
+						pixelsPerTact() )
+	{
+		animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
+	}
+	else if( t < m_currentPosition )
+	{
+		animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
+	}
+	m_scrollBack = false;
+}
+
 
 
 ComboBoxModel *SongEditor::zoomingModel() const
@@ -750,3 +807,4 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
 	m_editor->scrolled(0);
 }
+
