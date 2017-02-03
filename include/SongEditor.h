@@ -107,7 +107,7 @@ private:
 	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
-
+	void scrollToPos( const MidiTime & t );
 
 	Song * m_song;
 

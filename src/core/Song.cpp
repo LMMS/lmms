@@ -591,8 +591,6 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 }
 
 
-
-
 void Song::togglePause()
 {
 	if( m_paused == true )
