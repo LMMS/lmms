@@ -71,7 +71,7 @@ public:
 			const IntModel * _mod_algo_model,
 			const float & _freq,
 			const float & _detuning,
-			const double & _phase_offset,
+			const float & _phase_offset,
 			const float & _volume,
 			Oscillator * _m_subOsc = NULL );
 	virtual ~Oscillator()
@@ -160,10 +160,10 @@ private:
 	const float & m_freq;
 	const float & m_detuning;
 	const float & m_volume;
-	const double & m_ext_phaseOffset;
+	const float & m_ext_phaseOffset;
 	Oscillator * m_subOsc;
-	double m_phaseOffset;
-	double m_phase;
+	float m_phaseOffset;
+	float m_phase;
 	const SampleBuffer * m_userWave;
 
 
