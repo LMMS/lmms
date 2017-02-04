@@ -191,10 +191,13 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_grooveView = nullptr;
 	}
+<<<<<<< HEAD
 	else if (obj == m_studioControllerView)
 	{
 		m_studioControllerView = nullptr;
 	}
+=======
+>>>>>>> 8e2f06baabdf024f3acfcd69ff11a4e72552ca9c
 	else if (obj == m_songEditor)
 	{
 		m_songEditor = nullptr;
