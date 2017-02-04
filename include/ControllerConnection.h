@@ -87,7 +87,7 @@ public:
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
-
+	
 	static inline const QString classNodeName()
 	{
 		return "connection";

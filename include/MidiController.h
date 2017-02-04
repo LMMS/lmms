@@ -53,6 +53,7 @@ public:
 	}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
+	virtual void saveControllerSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
 	virtual QString nodeName() const;
 

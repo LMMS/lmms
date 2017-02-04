@@ -345,35 +345,23 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
 		}
 	}
-	// above don't work onmy machine below does
+	
+	// above don't work on my machine below does
 	else if( ke->key() == Qt::Key_Home )
 	{
-		MidiTime mTime = MidiTime(0, 0);
-		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-		m_timeLine->updatePosition( mTime );
-		this->scrollToPos( mTime );
+		gui->songEditor()->home();
 	}
 	else if( ke->key() == Qt::Key_PageUp || ke->key() == Qt::Key_MediaPrevious  )
 	{
-		int tact = m_song->m_playPos[Song::Mode_PlaySong].getTact() - 1;
-		MidiTime mTime = MidiTime(tact > 0 ? tact : 0, 0);
-		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-		m_timeLine->updatePosition( mTime );
-		this->scrollToPos( mTime );
+		gui->songEditor()->prev();
 	}
 	else if( ke->key() == Qt::Key_PageDown || ke->key() == Qt::Key_MediaNext )
 	{
-		MidiTime mTime = MidiTime(m_song->m_playPos[Song::Mode_PlaySong].getTact() + 1, 0);
-		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-		m_timeLine->updatePosition( mTime );
-		this->scrollToPos( mTime );
+		gui->songEditor()->next();
 	}
 	else if( ke->key() == Qt::Key_End )
 	{
-		MidiTime mTime = MidiTime(m_song->length(), 0);
-		m_song->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-		m_timeLine->updatePosition( mTime );
-		this->scrollToPos( mTime );
+		gui->songEditor()->end();
 	}
 	else
 	{
@@ -782,21 +770,59 @@ void SongEditorWindow::play()
 
 void SongEditorWindow::record()
 {
-	m_editor->m_song->record();
+	Engine::getSong()->record();
 }
 
 
 void SongEditorWindow::recordAccompany()
 {
-	m_editor->m_song->playAndRecord();
+	Engine::getSong()->playAndRecord();
 }
 
 
 void SongEditorWindow::stop()
 {
-	m_editor->m_song->stop();
+	Engine::getSong()->stop();
 	gui->pianoRoll()->stopRecording();
 }
+
+
+void SongEditorWindow::home()
+{
+	MidiTime mTime = MidiTime(0, 0);
+	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+	m_editor->m_timeLine->updatePosition( mTime );
+	m_editor->scrollToPos( mTime );	
+}
+
+
+void SongEditorWindow::next()
+{
+	MidiTime mTime = MidiTime(Engine::getSong()->getPlayPos(Song::Mode_PlaySong).getTact() + 1, 0);
+	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+	m_editor->m_timeLine->updatePosition( mTime );
+	m_editor->scrollToPos( mTime );
+}
+
+
+void SongEditorWindow::prev()
+{
+	int tact = Engine::getSong()->getPlayPos(Song::Mode_PlaySong).getTact() - 1;
+	MidiTime mTime = MidiTime(tact > 0 ? tact : 0, 0);
+	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+	m_editor->m_timeLine->updatePosition( mTime );
+	m_editor->scrollToPos( mTime );
+}
+
+
+void SongEditorWindow::end()
+{
+	MidiTime mTime = MidiTime(Engine::getSong()->length(), 0);
+	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
+	m_editor->m_timeLine->updatePosition( mTime );
+	m_editor->scrollToPos( mTime );
+}
+
 
 void SongEditorWindow::adjustUiAfterProjectLoad()
 {

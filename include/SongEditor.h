@@ -152,11 +152,18 @@ public:
 
 	SongEditor* m_editor;
 
-protected slots:
+public slots:
 	void play();
 	void record();
-	void recordAccompany();
 	void stop();
+	void home();
+	void next();
+	void prev();
+	void end();
+	
+	
+protected slots:
+	void recordAccompany();
 
 	void adjustUiAfterProjectLoad();
 

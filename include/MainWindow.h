@@ -169,6 +169,7 @@ public slots:
 	void togglePianoRollWin();
 	void toggleControllerRack();
 	void toggleGrooveView();
+	void toggleStudioControllerView();
 
 	void updatePlayPauseIcons();
 

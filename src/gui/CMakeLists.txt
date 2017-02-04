@@ -43,6 +43,7 @@ SET(LMMS_SRCS
 	gui/editors/SongEditor.cpp
 
 	gui/widgets/AutomatableButton.cpp
+	gui/widgets/AutomatableControlButton.cpp
 	gui/widgets/AutomatableSlider.cpp
 	gui/widgets/CaptionMenu.cpp
 	gui/widgets/ComboBox.cpp
@@ -77,6 +78,7 @@ SET(LMMS_SRCS
 	gui/widgets/SendButtonIndicator.cpp
 	gui/widgets/SideBar.cpp
 	gui/widgets/SideBarWidget.cpp
+	gui/widgets/StudioControllerView.cpp
 	gui/widgets/TabBar.cpp
 	gui/widgets/TabWidget.cpp
 	gui/widgets/TempoSyncKnob.cpp

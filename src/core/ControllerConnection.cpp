@@ -26,6 +26,7 @@
 
 #include <QDomElement>
 #include <QObject>
+#include <QDebug>
 
 
 #include "Song.h"
@@ -187,8 +188,6 @@ void ControllerConnection::saveSettings( QDomDocument & _doc, QDomElement & _thi
 		}
 	}
 }
-
-
 
 
 void ControllerConnection::loadSettings( const QDomElement & _this )

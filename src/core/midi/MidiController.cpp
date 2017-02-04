@@ -26,6 +26,7 @@
 #include <QDomElement>
 #include <QObject>
 #include <QVector>
+#include <QDebug>
 
 #include "Song.h"
 #include "Engine.h"
@@ -128,7 +129,13 @@ void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 }
 
-
+void MidiController::saveControllerSettings( QDomDocument & _doc, QDomElement & _this )
+{
+	qWarning("inputChannel...");
+	_this.setAttribute("channel", m_midiPort.inputChannel());
+	qWarning("inputController...");
+	_this.setAttribute("controller", m_midiPort.inputController());
+}
 
 
 void MidiController::loadSettings( const QDomElement & _this )

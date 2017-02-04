@@ -270,6 +270,7 @@ public slots:
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
+	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void importProject();
 	void exportProject( bool multiExport = false );
@@ -325,8 +326,6 @@ private:
 			m_playPos[m_playMode].currentFrame();
 	}
 	
-	void setPlayPos( tick_t ticks, PlayModes playMode );
-
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
