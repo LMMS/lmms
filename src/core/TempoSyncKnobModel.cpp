@@ -140,19 +140,7 @@ void TempoSyncKnobModel::loadSettings( const QDomElement & _this,
 {
 	FloatModel::loadSettings( _this, _name );
 	m_custom.loadSettings( _this, _name );
-
-
 	setSyncMode( ( TempoSyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
-
-	if( _this.hasAttribute( _name + "_syncmode" ) )
-	{
-		setSyncMode( ( TempoSyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
-	}
-	else
-	{
-		setSyncMode( ( TempoSyncMode ) _this.attribute( "syncmode" ).toInt() );
-	}
-
 }
 
 
