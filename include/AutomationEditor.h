@@ -106,6 +106,8 @@ public:
 		MOVE
 	};
 
+
+
 public slots:
 	void update();
 	void updateAfterPatternChange();
@@ -137,6 +139,7 @@ protected:
 protected slots:
 	void play();
 	void stop();
+
 
 	void horScrolled( int new_pos );
 	void verScrolled( int new_pos );
@@ -170,6 +173,7 @@ private:
 		SELECT_VALUES,
 		MOVE_SELECTION
 	} ;
+
 
 	// some constants...
 	static const int SCROLLBAR_SIZE = 12;
@@ -286,6 +290,7 @@ public:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 
 	void open(AutomationPattern* pattern);
+	void openBar(AutomationPattern* pattern, int offset);
 
 	AutomationEditor* m_editor;
 

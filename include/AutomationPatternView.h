@@ -29,6 +29,7 @@
 
 #include "Track.h"
 
+
 class AutomationPattern;
 
 
@@ -44,7 +45,11 @@ public:
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
+<<<<<<< 0f7d19268118f583b26e755918aed652a11065d6
 	virtual void update();
+=======
+	void openToBar();
+>>>>>>> Scroll to arbitrary point from song editor, except on first open
 
 
 protected slots:

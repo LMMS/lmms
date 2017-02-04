@@ -79,6 +79,10 @@ void AutomationPatternView::openInAutomationEditor()
 	if(gui) gui->automationEditor()->open(m_pat);
 }
 
+void AutomationPatternView::openToBar()
+{
+	if(gui) gui->automationEditor()->openBar(m_pat, 99999);
+}
 
 void AutomationPatternView::update()
 {
@@ -168,10 +172,19 @@ void AutomationPatternView::flipX()
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
+	//Open to specific bar
+	QAction * b = new QAction( embed::getIconPixmap( "automation" ), 
+				tr( "Open to specific bar" ), _cm );
+	_cm->insertAction( _cm->actions()[0], b );
+	connect(b, SIGNAL(triggered()), this, SLOT(openToBar()));
+
+	//Open in Automation editor
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
+
+	//Delete/Cut/Copy/Paste/Mute
 	_cm->insertSeparator( _cm->actions()[1] );
 
 	_cm->addSeparator();

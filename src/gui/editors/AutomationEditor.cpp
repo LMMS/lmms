@@ -2562,6 +2562,29 @@ void AutomationEditorWindow::open(AutomationPattern* pattern)
 	show();
 	setFocus();
 }
+void AutomationEditorWindow::openBar(AutomationPattern* pattern, int offset)
+{
+	//doesn't work at all first time automation is opened
+	//m_editor->horScrolled(offset); //resizeEvent( NULL ); //emit currentPatternChanged(); //m_editor->horScrolled(offset);
+	//open(pattern);
+	//m_editor->m_leftRightScroll->setValue( offset );
+	open(pattern);
+	m_editor->m_leftRightScroll->setMinimum( offset );
+	m_editor->m_leftRightScroll->setMinimum( 0 );
+	//m_editor->horScrolled(offset);
+	//m_editor->updatePosition(MidiTime(offset) );
+	//clearCurrentPattern();
+	//open(pattern);
+	//resizeEvent( NULL );
+	//emit currentPatternChanged();
+	//update();
+	//m_editor->update();
+	//m_editor->zoomingXChanged();
+	//m_editor->m_timeLine->pos() -= 16;
+	//m_editor->m_timeLine->updatePosition();
+	//m_editor->updateTopBottomLevels();
+	
+}
 
 QSize AutomationEditorWindow::sizeHint() const
 {
