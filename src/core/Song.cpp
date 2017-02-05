@@ -1187,6 +1187,10 @@ void Song::importProject()
 			ConfigManager::inst()->userProjectsDir(),
 			tr("MIDI sequences") +
 			" (*.mid *.midi *.rmi);;" +
+			tr("Overture projects") +
+			" (*.ove);;" +
+			tr("Cakewalk projects") +
+			" (*.wrk);;" +
 			tr("Hydrogen projects") +
 			" (*.h2song);;" +
 			tr("All file types") +
@@ -1347,6 +1351,20 @@ void Song::exportProjectMidi()
 					"Song Editor first!" ) );
 		return;
 	}
+
+	QMessageBox::StandardButton readyToExport;
+	readyToExport = QMessageBox::question( gui->mainWindow(),
+										   tr( "Hint of MIDI export" ),
+										   tr( "To export midi from LMMS, "
+											   "Please ensure the following things.\n\n"
+											   "1. Instrument of tracks to export should be "
+											   "set to Sf2 Player.\n"
+											   "2. Bassline or Beats will not be exported.\n"
+											   "3. 16 tracks or less will be better.\n\n"
+											   "Continue?"),
+										   QMessageBox::Yes | QMessageBox::No );
+	if( readyToExport == QMessageBox::No )
+		return;
 
 	FileDialog efd( gui->mainWindow() );
 	

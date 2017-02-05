@@ -1,10 +1,10 @@
 /*
- * MidiExport.h - support for Exporting MIDI-files
+ * smfMidiCC.h - support for importing MIDI files
  *
- * Author: Mohamed Abdel Maksoud <mohamed at amaksoud.com>
+ * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -22,31 +22,30 @@
  *
  */
 
-#ifndef _MIDI_EXPORT_H
-#define _MIDI_EXPORT_H
+#ifndef SMF_MIDI_CC_H
+#define SMF_MIDI_CC_H
 
-#include <QString>
+#include <QApplication>
 
-#include "ExportFilter.h"
+#include "export.h"
+#include "TrackContainer.h"
+#include "AutomationTrack.h"
+#include "AutomationPattern.h"
+#include "MidiTime.h"
 
-
-class MidiExport: public ExportFilter
+class EXPORT SmfMidiCC
 {
-	Q_OBJECT
+
 public:
-	MidiExport( );
-	~MidiExport();
-
-	virtual PluginView * instantiateView( QWidget * )
-	{
-		return( NULL );
-	}
-
-	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename );
+	SmfMidiCC();
 	
-private:
-	void error( void );
+	AutomationTrack * at;
+	AutomationPattern * ap;
+	MidiTime lastPos;
+	
+	SmfMidiCC & create(TrackContainer* tc, QString tn );
+	SmfMidiCC & putValue( MidiTime time, AutomatableModel * objModel, float value );
+	void clear();
 };
-
 
 #endif

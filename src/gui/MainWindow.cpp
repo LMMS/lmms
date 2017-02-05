@@ -308,12 +308,13 @@ void MainWindow::finalize()
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
-	// temporarily disabled broken MIDI export				
-	/*project_menu->addAction( embed::getIconPixmap( "midi_file" ),
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					Engine::getSong(),
 					SLOT( exportProjectMidi() ),
-					Qt::CTRL + Qt::Key_M );*/
+					Qt::CTRL + Qt::Key_M );
+#endif
 
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),

@@ -11,7 +11,7 @@ PACKAGES="$PACKAGES libjack0"
 if [ $QT5 ]; then
 	PACKAGES="$PACKAGES qtbase5-dev qttools5-dev-tools qttools5-dev"
 else
-	PACKAGES="$PACKAGES libqt4-dev"
+	PACKAGES="$PACKAGES libqt4-dev libdrumstick-dev"
 fi
 
 sudo apt-get install -y $PACKAGES

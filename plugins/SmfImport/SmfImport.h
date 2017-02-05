@@ -1,7 +1,7 @@
 /*
- * MidiImport.h - support for importing MIDI-files
+ * SmfImport.cpp - support for importing SMF-liked files
  *
- * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2016-2017 Tony Chyi <tonychee1989/at/gmail.com>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -22,52 +22,56 @@
  *
  */
 
-#ifndef _MIDI_IMPORT_H
-#define _MIDI_IMPORT_H
+#ifndef SMF_IMPORT_H
+#define SMF_IMPORT_H
 
 #include <QString>
 #include <QPair>
 #include <QVector>
+#include <QProgressDialog>
 
 #include "MidiEvent.h"
 #include "ImportFilter.h"
 
-
-class MidiImport : public ImportFilter
+class SmfImport : public ImportFilter
 {
 	Q_OBJECT
 public:
-	MidiImport( const QString & _file );
-	virtual ~MidiImport();
+	SmfImport( const QString & _file );
+	virtual ~SmfImport();
 
 	virtual PluginView * instantiateView( QWidget * )
 	{
-		return( NULL );
+		return NULL;
 	}
 
-
 private:
-	virtual bool tryImport( TrackContainer* tc );
+	virtual bool tryImport( TrackContainer *tc );
 
 	bool readSMF( TrackContainer* tc );
 	bool readRIFF( TrackContainer* tc );
-	bool readTrack( int _track_end, QString & _track_name );
+	bool readOve( TrackContainer* tc );
+	bool readWrk( TrackContainer* tc );
 
-	void error( void );
-
+	void error();
 
 	inline int readInt( int _bytes )
 	{
 		int c, value = 0;
+
 		do
 		{
 			c = readByte();
+
 			if( c == -1 )
 			{
 				return( -1 );
 			}
+
 			value = ( value << 8 ) | c;
-		} while( --_bytes );
+		}
+		while( --_bytes );
+
 		return( value );
 	}
 	inline int read32LE()
@@ -82,26 +86,31 @@ private:
 	{
 		int c = readByte();
 		int value = c & 0x7f;
+
 		if( c & 0x80 )
 		{
 			c = readByte();
 			value = ( value << 7 ) | ( c & 0x7f );
+
 			if( c & 0x80 )
 			{
 				c = readByte();
 				value = ( value << 7 ) | ( c & 0x7f );
+
 				if( c & 0x80 )
 				{
 					c = readByte();
 					value = ( value << 7 ) | c;
+
 					if( c & 0x80 )
 					{
 						return -1;
 					}
 				}
 			}
-	        }
-        	return( !file().atEnd() ? value : -1 );
+		}
+
+		return( !file().atEnd() ? value : -1 );
 	}
 
 	inline int readID()
@@ -117,12 +126,7 @@ private:
 		}
 	}
 
-
-	typedef QVector<QPair<int, MidiEvent> > EventVector;
-	EventVector m_events;
-	int m_timingDivision;
-
-} ;
-
+	QString filename;
+};
 
 #endif
