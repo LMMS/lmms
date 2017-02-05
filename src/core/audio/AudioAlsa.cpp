@@ -54,6 +54,12 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 {
 	_success_ful = false;
 
+	if( setenv( "PULSE_ALSA_HOOK_CONF", "/dev/null", 0 ) )
+	{
+		fprintf( stderr,
+		"Could not avoid possible interception by PulseAudio\n" );
+	}
+
 	int err;
 
 	if( ( err = snd_pcm_open( &m_handle,
