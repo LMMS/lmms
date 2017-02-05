@@ -9,7 +9,7 @@
  * Copyright (C) 2005-2008 Christian Schoenebeck
  * Copyright (C) 2009-2010 Christian Schoenebeck and Grigor Iliev
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
