@@ -1060,7 +1060,7 @@ void MainWindow::help()
 				  tr( "Currently there's no help "
 						  "available in LMMS.\n"
 						  "Please visit "
-						  "http://lmms.sf.net/wiki "
+						  "https://lmms.io/documentation/ "
 						  "for documentation on LMMS." ),
 				  QMessageBox::Ok );
 }
