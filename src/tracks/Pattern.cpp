@@ -309,6 +309,7 @@ void Pattern::rearrangeAllNotes()
 
 
 
+
 void Pattern::clearNotes()
 {
 	instrumentTrack()->lock();
@@ -497,7 +498,8 @@ void Pattern::clear()
 
 void Pattern::addSteps()
 {
-	m_steps += MidiTime::stepsPerTact();
+	Song* s = Engine::getSong();
+	m_steps += s->getTimeSigModel().getNumerator() * s->getTimeSigModel().getDenominator();
 	updateLength();
 	emit dataChanged();
 }
@@ -531,7 +533,8 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int n = MidiTime::stepsPerTact();
+	Song* s = Engine::getSong();
+	int n = s->getTimeSigModel().getNumerator() * s->getTimeSigModel().getDenominator();
 	if( n < m_steps )
 	{
 		for( int i = m_steps - n; i < m_steps; ++i )
