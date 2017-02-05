@@ -227,7 +227,9 @@ void AudioPulseAudio::run()
 	// connect the context
 	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
 
-	m_connectedSemaphore.acquire();
+	while (!m_connectedSemaphore.tryAcquire()) {
+		pa_mainloop_iterate(mainLoop, 1, NULL);
+	}
 
 	// run the main loop
 	if( m_connected )

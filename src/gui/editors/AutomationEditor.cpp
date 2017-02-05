@@ -118,6 +118,9 @@ AutomationEditor::AutomationEditor() :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
+
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
 	connect( m_tensionModel, SIGNAL( dataChanged() ),
 				this, SLOT( setTension() ) );
