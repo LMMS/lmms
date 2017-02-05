@@ -2,7 +2,7 @@
  * Song.h - class song - the root of the model-tree
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -55,8 +55,7 @@ class EXPORT Song : public TrackContainer
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
 public:
-	enum PlayModes
-	{
+	enum PlayModes {
 		Mode_None,
 		Mode_PlaySong,
 		Mode_PlayBB,
@@ -113,18 +112,18 @@ public:
 
 	inline int ticksPerTact() const
 	{
-		return MidiTime::ticksPerTact(m_timeSigModel);
+		return MidiTime::ticksPerTact( m_timeSigModel );
 	}
 
 	// Returns the beat position inside the bar, 0-based
 	inline int getBeat() const
 	{
-		return getPlayPos().getBeatWithinBar(m_timeSigModel);
+		return getPlayPos().getBeatWithinBar( m_timeSigModel );
 	}
 	// the remainder after bar and beat are removed
 	inline int getBeatTicks() const
 	{
-		return getPlayPos().getTickWithinBeat(m_timeSigModel);
+		return getPlayPos().getTickWithinBeat( m_timeSigModel );
 	}
 	inline int getTicks() const
 	{
@@ -187,7 +186,7 @@ public:
 	}
 	inline const PlayPos & getPlayPos() const
 	{
-		return getPlayPos(m_playMode);
+		return getPlayPos( m_playMode );
 	}
 
 	void updateLength();
@@ -240,7 +239,7 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
-	
+
 
 	const ControllerVector & controllers() const
 	{
@@ -278,6 +277,8 @@ public slots:
 
 	void addBBTrack();
 
+	void setPlayPos( qint64 ticks, PlayModes playMode );
+
 
 private slots:
 	void insertBar();
@@ -311,14 +312,12 @@ private:
 	{
 		return m_playPos[m_playMode].getTicks();
 	}
-	
+
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
-			m_playPos[m_playMode].currentFrame();
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() +
+		       m_playPos[m_playMode].currentFrame();
 	}
-	
-	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );

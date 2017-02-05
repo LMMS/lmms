@@ -6597,10 +6597,6 @@ Remember to also save your project manually.</source>
 <context>
     <name>TimeDisplayWidget</name>
     <message>
-        <source>click to change time units</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>MIN</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6622,6 +6618,29 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>TICK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>left click to change time units, 
+right click to jump to specified time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeline</source>
+        <extracomment>The &quot;Timeline&quot; here is the caption of the context menu of the widget that displays the time</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to...</source>
+        <extracomment>This is an item on the menu, which provides the ability to jump (navigate) to a user specified time</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TimeInputDialog</name>
+    <message>
+        <source>Input a New Time</source>
+        <extracomment>The title of the dialog that allows the user to input the time</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

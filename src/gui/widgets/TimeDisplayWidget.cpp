@@ -23,13 +23,15 @@
  */
 
 #include <QMouseEvent>
+#include <QMessageBox>
 
 #include "TimeDisplayWidget.h"
+#include "TimeInputDialog.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "Engine.h"
 #include "ToolTip.h"
-#include "Song.h"
+#include "CaptionMenu.h"
 
 
 
@@ -49,24 +51,20 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "click to change time units" ) );
+	ToolTip::add( this, tr( "left click to change time units, \nright click to jump to specified time" ) );
+	s = Engine::getSong();
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
 
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
-					this, SLOT( updateTime() ) );
+		 this, SLOT( updateTime() ) );
 }
-
-
 
 
 TimeDisplayWidget::~TimeDisplayWidget()
 {
 }
-
-
-
 
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
@@ -87,17 +85,14 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
 			break;
 
-		default: break;
+		default:
+			break;
 	}
 }
 
 
-
-
 void TimeDisplayWidget::updateTime()
 {
-	Song* s = Engine::getSong();
-
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
@@ -107,20 +102,19 @@ void TimeDisplayWidget::updateTime()
 			break;
 
 		case BarsTicks:
-			int tick;
-			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
-			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
+			qint64 tick;
+			tick = ( static_cast<qint64>( s->getMilliseconds() ) * s->getTempo() * ( DefaultTicksPerTact / 4 ) ) / 60000 ;
+			m_majorLCD.setValue( ( tick / s->ticksPerTact() ) + 1 );
 			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
-						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
+					     ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
 			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
-							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+						    ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
 			break;
 
-		default: break;
+		default:
+			break;
 	}
 }
-
-
 
 
 void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
@@ -135,5 +129,58 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 		{
 			setDisplayMode( MinutesSeconds );
 		}
+	}
+}
+
+
+void TimeDisplayWidget::contextMenuEvent( QContextMenuEvent *event )
+{
+	//: The "Timeline" here is the caption of the context menu of the widget that displays the time
+	CaptionMenu contextMenu( tr( "Timeline" ) );
+	//: This is an item on the menu, which provides the ability to jump (navigate) to a user specified time
+	contextMenu.addAction( tr( "Go to..." ) );
+	QAction* action  = contextMenu.exec( QCursor::pos() );
+
+	if ( action )
+	{
+		m_timeinputbox = new TimeInputDialog( this );
+		m_timeinputbox->setTimeModel( this->m_displayMode );
+		m_timeinputbox->setMilliSeconds( s->getMilliseconds() );
+		m_timeinputbox->show();
+		connect( m_timeinputbox, SIGNAL( accepted() ), this, SLOT( timeJump() ) );
+	}
+
+	return;
+}
+
+
+void TimeDisplayWidget::wheelEvent( QWheelEvent *event )
+{
+	qint64 tick = ( static_cast<qint64>( s->getMilliseconds() ) * s->getTempo() * ( DefaultTicksPerTact / 4 ) ) / 60000 ;
+	qint64 playPos = tick + event->delta();
+	playPos = playPos > 0 ? playPos : 1;
+
+	if ( s->isPlaying() )
+	{
+		s->setPlayPos( playPos, s->playMode() );
+	}
+	else
+	{
+		s->setPlayPos( playPos, Song::PlayModes::Mode_PlaySong );
+	}
+
+	event->accept();
+}
+
+
+void TimeDisplayWidget::timeJump()
+{
+	if ( s->isPlaying() )
+	{
+		s->setPlayPos( m_timeinputbox->getTicks(), s->playMode() );
+	}
+	else
+	{
+		s->setPlayPos( m_timeinputbox->getTicks(), Song::PlayModes::Mode_PlaySong );
 	}
 }
