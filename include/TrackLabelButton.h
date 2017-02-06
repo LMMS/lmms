@@ -44,6 +44,7 @@ public:
 public slots:
 	void rename();
 	void renameFinished();
+	void nameChanged();
 
 
 protected:

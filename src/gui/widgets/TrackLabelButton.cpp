@@ -64,8 +64,17 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	}
 
 	setIconSize( QSize( 24, 24 ) );
-	setText( " " );
+	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
+	{
+		setText( " " );
+		setToolTip( m_trackView->getTrack()->displayName() );
+	}
+	else
+	{
+		setText( elideName( m_trackView->getTrack()->displayName() ) );
+	}
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ),this, SLOT( nameChanged() ) );
 }
 
 
@@ -109,11 +118,26 @@ void TrackLabelButton::renameFinished()
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
-		if( m_renameLineEdit->text() != "" && m_renameLineEdit->text() != m_trackView->getTrack()->name() )
+		if( m_renameLineEdit->text() != "" )
 		{
-			m_trackView->getTrack()->setName( m_renameLineEdit->text() );
-			Engine::getSong()->setModified();
+			if( m_renameLineEdit->text() != m_trackView->getTrack()->name() )
+			{
+				setText( elideName( m_renameLineEdit->text() ) );
+				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+				Engine::getSong()->setModified();
+			}
 		}
+	}
+}
+
+
+
+
+void TrackLabelButton::nameChanged()
+{
+	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
+	{
+		setText( elideName( m_trackView->getTrack()->name() ) );
 	}
 }
 
@@ -133,6 +157,7 @@ void TrackLabelButton::dropEvent( QDropEvent * _de )
 	m_trackView->dropEvent( _de );
 	setChecked( true );
 }
+
 
 
 
@@ -191,15 +216,6 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 				setIcon( pl->pixmap() );
 			}
 		}
-	}
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		setText( " " );
-		setToolTip( m_trackView->getTrack()->displayName() );
-	}
-	else
-	{
-		setText( elideName( m_trackView->getTrack()->displayName() ) );
 	}
 	QToolButton::paintEvent( _pe );
 }
