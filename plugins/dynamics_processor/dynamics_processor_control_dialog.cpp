@@ -44,7 +44,7 @@ dynProcControlDialog::dynProcControlDialog(
 	pal.setBrush( backgroundRole(),
 				PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 224, 323 );
+	setFixedSize( 224, 319 );
 
 	Graph * waveGraph = new Graph( this, Graph::LinearNonCyclicStyle, 204, 205 );
 	waveGraph -> move( 10, 6 );
