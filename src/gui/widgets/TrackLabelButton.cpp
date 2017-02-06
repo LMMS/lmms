@@ -109,9 +109,8 @@ void TrackLabelButton::renameFinished()
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
-		if( m_renameLineEdit->text() != text() )
+		if( m_renameLineEdit->text() != "" && m_renameLineEdit->text() != m_trackView->getTrack()->name() )
 		{
-			setText( m_renameLineEdit->text() );
 			m_trackView->getTrack()->setName( m_renameLineEdit->text() );
 			Engine::getSong()->setModified();
 		}
@@ -186,7 +185,18 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 	}
 	else
 	{
-		setText( m_trackView->getTrack()->displayName() );
+		setText( elideName( m_trackView->getTrack()->displayName() ) );
 	}
 	QToolButton::paintEvent( _pe );
+}
+
+
+
+
+QString TrackLabelButton::elideName( const QString &name )
+{
+	const int maxTextWidth = 120;
+	QFontMetrics metrics( font() );
+	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextWidth );
+	return elidedName;
 }

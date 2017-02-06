@@ -58,6 +58,7 @@ private:
 	TrackView * m_trackView;
 	QString m_iconName;
 	QLineEdit * m_renameLineEdit;
+	QString elideName( const QString & name );
 
 } ;
 
