@@ -176,8 +176,8 @@ private:
 	QString m_backgroundArtwork;
 
 	bool m_smoothScroll;
-	bool m_disableAutoSave;
-	bool m_disableRunningAutoSave;
+	bool m_enableAutoSave;
+	bool m_enableRunningAutoSave;
 	int m_saveInterval;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
