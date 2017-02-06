@@ -494,7 +494,7 @@ SideBar QToolButton:pressed {
 }
 
 SideBar QToolButton:checked {
-        background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #4b525b,  stop:1 #2f333a);
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #4b525b, stop:1 #2f333a);
 	border: none;
 	font-size: 12px;
 }
