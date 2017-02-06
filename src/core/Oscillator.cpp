@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,7 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 				const IntModel * _mod_algo_model,
 				const float & _freq,
 				const float & _detuning,
-				const double & _phase_offset,
+				const float & _phase_offset,
 				const float & _volume,
 			Oscillator * _sub_osc ) :
 	m_waveShapeModel( _wave_shape_model ),
@@ -310,7 +310,7 @@ void Oscillator::updateFM( sampleFrame * _ab, const fpp_t _frames,
 // should be called every time phase-offset is changed...
 inline void Oscillator::recalcPhase()
 {
-	if( !typeInfo<double>::isEqual( m_phaseOffset, m_ext_phaseOffset ) )
+	if( !typeInfo<float>::isEqual( m_phaseOffset, m_ext_phaseOffset ) )
 	{
 		m_phase -= m_phaseOffset;
 		m_phaseOffset = m_ext_phaseOffset;
@@ -325,10 +325,10 @@ inline void Oscillator::recalcPhase()
 
 inline bool Oscillator::syncOk( float _osc_coeff )
 {
-	const double v1 = m_phase;
+	const float v1 = m_phase;
 	m_phase += _osc_coeff;
 	// check whether m_phase is in next period
-	return( floor( m_phase ) > floor( v1 ) );
+	return( floorf( m_phase ) > floorf( v1 ) );
 }
 
 

@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -186,8 +186,8 @@ void FxLine::drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool 
 
 QString FxLine::elideName( const QString & name )
 {
-	const int maxTextHeight = 70;
-	QFontMetrics metrics( font() );
+	const int maxTextHeight = 60;
+	QFontMetrics metrics( m_renameLineEdit->font() );
 	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextHeight );
 	return elidedName;
 }

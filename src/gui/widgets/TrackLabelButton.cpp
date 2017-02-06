@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -145,7 +145,8 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		QToolButton::mousePressEvent( _me );
+		m_buttonRect = QRect( this->mapToGlobal( pos() ), size() );
+		_me->ignore();
 	}
 }
 
@@ -155,6 +156,19 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	rename();
+}
+
+
+
+
+void TrackLabelButton::mouseReleaseEvent(QMouseEvent *_me)
+{
+	if( m_buttonRect.contains( _me->globalPos(), true ) )
+	{
+		QToolButton::mousePressEvent( _me );
+	}
+	QToolButton::mouseReleaseEvent( _me );
+	_me->ignore();
 }
 
 

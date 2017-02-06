@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * Code partly taken from (X)FST:
  * 		Copyright (c) 2004 Paul Davis
@@ -737,7 +737,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	m_plugin = mainEntry( hostCallback );
 	if( m_plugin == NULL )
 	{
-		debugMessage( "mainEntry prodecure returned NULL\n" );
+		debugMessage( "mainEntry procedure returned NULL\n" );
 		return false;
 	}
 

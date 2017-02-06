@@ -6,7 +6,7 @@
  * Copyright (c) 2008-2013 Paul Giblock <pgib/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -76,7 +76,7 @@ QPixmap * AutomationEditor::s_toolYFlip = NULL;
 QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 const QVector<double> AutomationEditor::m_zoomXLevels =
-		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
+		{ 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
 
 
 
@@ -117,6 +117,9 @@ AutomationEditor::AutomationEditor() :
 						this, SLOT( update() ) );
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
+
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
 
 	m_tensionModel = new FloatModel(1.0, 0.0, 1.0, 0.01);
 	connect( m_tensionModel, SIGNAL( dataChanged() ),

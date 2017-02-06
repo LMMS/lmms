@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -227,7 +227,9 @@ void AudioPulseAudio::run()
 	// connect the context
 	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
 
-	m_connectedSemaphore.acquire();
+	while (!m_connectedSemaphore.tryAcquire()) {
+		pa_mainloop_iterate(mainLoop, 1, NULL);
+	}
 
 	// run the main loop
 	if( m_connected )

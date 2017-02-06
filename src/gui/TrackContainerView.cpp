@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -66,7 +66,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_origin()
 {
 	m_tc->setHook( this );
-
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );

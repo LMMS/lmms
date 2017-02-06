@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -104,7 +104,7 @@ const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
 // width of area used for resizing (the grip at the end of a note)
-const int RESIZE_AREA_WIDTH = 4;
+const int RESIZE_AREA_WIDTH = 9;
 
 // width of line for setting volume/panning of note
 const int NOTE_EDIT_LINE_WIDTH = 3;
@@ -153,7 +153,7 @@ PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 const QVector<double> PianoRoll::m_zoomLevels =
-			{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
+			{ 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
 
 
 PianoRoll::PianoRoll() :

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -557,7 +557,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 SampleTrack::SampleTrack( TrackContainer* tc ) :
 	Track( Track::SampleTrack, tc ),
-	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 1.0, this,
+	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
 							tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),

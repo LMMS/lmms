@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -725,7 +725,7 @@ int main( int argc, char * * argv )
 		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
 				QFileInfo( recoveryFile ).isFile();
 		bool autoSaveEnabled =
-			ConfigManager::inst()->value( "ui", "enableautosave" ).toInt();
+			!ConfigManager::inst()->value( "ui", "disableautosave" ).toInt();
 		if( recoveryFilePresent )
 		{
 			QMessageBox mb;
