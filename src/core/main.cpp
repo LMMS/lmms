@@ -725,7 +725,7 @@ int main( int argc, char * * argv )
 		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
 				QFileInfo( recoveryFile ).isFile();
 		bool autoSaveEnabled =
-			!ConfigManager::inst()->value( "ui", "disableautosave" ).toInt();
+			ConfigManager::inst()->value( "ui", "enableautosave" ).toInt();
 		if( recoveryFilePresent )
 		{
 			QMessageBox mb;
