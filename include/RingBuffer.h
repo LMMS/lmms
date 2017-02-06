@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
- 
+
+
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
@@ -57,16 +57,16 @@ public:
 
 // utility functions
 
-/** \brief Clears the ringbuffer of any data and resets the position to 0 
+/** \brief Clears the ringbuffer of any data and resets the position to 0
  */
 	void reset();
-	
-/** \brief Changes the size of the ringbuffer. Clears all data. 
- * 	\param size New size in frames 
+
+/** \brief Changes the size of the ringbuffer. Clears all data.
+ * 	\param size New size in frames
  */
 	void changeSize( f_cnt_t size );
 
-/** \brief Changes the size of the ringbuffer. Clears all data. 
+/** \brief Changes the size of the ringbuffer. Clears all data.
  * 	\param size New size in milliseconds
  */
 	void changeSize( float size );
@@ -96,7 +96,7 @@ public:
 
 // read functions
 
-/** \brief Destructively reads a period-sized buffer from the current position, writes it 
+/** \brief Destructively reads a period-sized buffer from the current position, writes it
  * 	to a specified destination, and advances the position by one period
  * 	\param dst Destination pointer
  */
@@ -104,7 +104,7 @@ public:
 
 // note: ringbuffer position is unaffected by all other read functions beside pop()
 
-/** \brief Reads a period-sized buffer from the ringbuffer and writes it to a specified destination 
+/** \brief Reads a period-sized buffer from the ringbuffer and writes it to a specified destination
  * 	\param dst Destination pointer
  * 	\param offset Offset in frames against current position, may be negative
  */
@@ -139,12 +139,12 @@ public:
  * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
  */
 	void write( sampleFrame * src, f_cnt_t offset=0, f_cnt_t length=0 );
-	
+
 /** \brief Writes a buffer of sampleframes to the ringbuffer at specified position
  * 	\param src Pointer to the source buffer
  * 	\param offset Offset in milliseconds against current position, may *NOT* be negative
  * 	\param length Length of the source buffer, if zero, period size is used - must not be higher than the size of the ringbuffer!
- */	
+ */
 	void write( sampleFrame * src, float offset, f_cnt_t length=0 );
 
 /** \brief Mixes a buffer of sampleframes additively to the ringbuffer at specified position
@@ -200,7 +200,7 @@ public:
 
 protected slots:
 	void updateSamplerate();
-	
+
 private:
 	inline f_cnt_t msToFrames( float ms )
 	{
