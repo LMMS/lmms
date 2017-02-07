@@ -106,7 +106,7 @@ QString chordtableEditor::nodeName() const
 void chordtableEditor::reloadComboModel()
 {
 	int i=m_chordsComboModel->value();
-	qDebug("combo: %d",i);
+
 	m_chordsComboModel->clear();
 	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
