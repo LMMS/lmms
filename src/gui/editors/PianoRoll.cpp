@@ -81,6 +81,7 @@ typedef AutomationPattern::timeMap timeMap;
 
 
 // some constants...
+const int INITIAL_PIANOROLL_WIDTH = 860;
 const int INITIAL_PIANOROLL_HEIGHT = 480;
 
 const int SCROLLBAR_SIZE = 12;
@@ -4374,7 +4375,7 @@ void PianoRollWindow::loadSettings( const QDomElement & de )
 
 QSize PianoRollWindow::sizeHint() const
 {
-	return { m_toolBar->sizeHint().width() + 10, INITIAL_PIANOROLL_HEIGHT };
+	return { INITIAL_PIANOROLL_WIDTH, INITIAL_PIANOROLL_HEIGHT };
 }
 
 
