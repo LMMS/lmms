@@ -54,6 +54,7 @@ protected:
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re );
 
 
 private:

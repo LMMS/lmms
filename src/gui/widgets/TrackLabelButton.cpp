@@ -62,19 +62,9 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 		m_renameLineEdit->hide();
 		connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 	}
-
 	setIconSize( QSize( 24, 24 ) );
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		setText( " " );
-		setToolTip( m_trackView->getTrack()->displayName() );
-	}
-	else
-	{
-		setText( elideName( m_trackView->getTrack()->displayName() ) );
-	}
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
-	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ),this, SLOT( nameChanged() ) );
+	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ), this, SLOT( nameChanged() ) );
 }
 
 
@@ -135,10 +125,7 @@ void TrackLabelButton::renameFinished()
 
 void TrackLabelButton::nameChanged()
 {
-	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
-	{
-		setText( elideName( m_trackView->getTrack()->name() ) );
-	}
+	setText( elideName( m_trackView->getTrack()->name() ) );
 }
 
 
@@ -223,9 +210,24 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 
 
 
+void TrackLabelButton::resizeEvent(QResizeEvent *_re)
+{
+	setText( elideName( m_trackView->getTrack()->displayName() ) );
+}
+
+
+
+
 QString TrackLabelButton::elideName( const QString &name )
 {
-	const int maxTextWidth = 120;
+	const int spacing = 16;
+	const int maxTextWidth = width() - spacing - iconSize().width();
+	if( maxTextWidth < 1 )
+	{
+		setToolTip( m_trackView->getTrack()->displayName() );
+		return QString( " " );
+	}
+	setToolTip( "" );
 	QFontMetrics metrics( font() );
 	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextWidth );
 	return elidedName;
