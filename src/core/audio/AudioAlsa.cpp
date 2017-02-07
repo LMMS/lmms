@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -53,6 +53,12 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	m_convertEndian( false )
 {
 	_success_ful = false;
+
+	if( setenv( "PULSE_ALSA_HOOK_CONF", "/dev/null", 0 ) )
+	{
+		fprintf( stderr,
+		"Could not avoid possible interception by PulseAudio\n" );
+	}
 
 	int err;
 
