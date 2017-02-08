@@ -24,6 +24,7 @@
  */
 
 
+#include "DataFile_priv.h"
 #include "DataFile.h"
 
 #include <math.h>
