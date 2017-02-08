@@ -1582,8 +1582,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_action = ActionMoveNote;
 
 					// set move-cursor
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
+//					QCursor c( Qt::SizeAllCursor );
+//					QApplication::setOverrideCursor( c );
 
 					// if they're holding shift, copy all selected notes
 					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
@@ -1979,7 +1979,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 {
-	if( ! hasValidPattern() )
+	if( !hasValidPattern() )
 	{
 		update();
 		return;
