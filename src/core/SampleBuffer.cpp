@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "SampleBuffer.h"
 
 
@@ -58,6 +57,7 @@
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
+#include "GuiApplication.h"
 #include "interpolation.h"
 #include "Mixer.h"
 #include "templates.h"
@@ -223,7 +223,7 @@ void SampleBuffer::update( bool _keep_settings )
 			}
 		}
 
-		if( ! fileLoadError )
+		if( !fileLoadError )
 		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
@@ -291,11 +291,19 @@ void SampleBuffer::update( bool _keep_settings )
 
 	if( fileLoadError )
 	{
-		QMessageBox::information( NULL,
-				"Fail to open file",
-				"Audio files are limited to 100 MB "
-				"in size and 1 hour of playing time",
+		QString message = "Audio files are limited to 100 MB "
+				"in size and 1 hour of playing time";
+		if( gui )
+		{
+			QMessageBox::information( NULL,
+				"Fail to open file", message,
 					QMessageBox::Ok );
+		}
+		else
+		{
+			fprintf( stderr, "%s\n", message.toUtf8().constData() );
+			exit( EXIT_FAILURE );
+		}
 	}
 }
 
