@@ -2604,7 +2604,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	style()->drawPrimitive( QStyle::PE_Widget, &opt, &p, this );
 
 	QBrush bgColor = p.background();
-	
+
 	// fill with bg color
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
@@ -2855,36 +2855,21 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// draw the grid
 	if( hasValidPattern() )
 	{
-		// Draw alternating shades on bars
-		// count the bars which disappear on left by scrolling
-		int barCount = m_currentPosition / MidiTime::ticksPerTact();
-		int leftBars = m_currentPosition / m_ppt;
-
-		for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
-		{
-			if ( (barCount + leftBars)  % 2 != 0 )
-			{
-				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
-					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
-			}
-		}
-
-		// Draw the grid
 		int q, x, tick;
 
 		if ( m_zoomingModel.value() > 3 )
 		{
-			// If we're over 400% zoom, we allow all quantization level grids
+			// If we're over 100% zoom, we allow all quantization level grids
 			q = quantization();
 		}
 		else if ( quantization() % 3 != 0 )
 		{
-			// If we're under 400% zoom, we allow quantization grid up to 1/24 for triplets
+			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
 			q = quantization() < 8 ? 8 : quantization();
 		}
 		else {
-			// If we're under 400% zoom, we allow quantization grid up to 1/32 for normal notes
+			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes
 			q = quantization() < 6 ? 6 : quantization();
 		}
 
@@ -2913,6 +2898,21 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			p.drawLine( WHITE_KEY_WIDTH, y, width(), y );
 			++key;
 		}
+
+		// Draw alternating shades on bars
+		// count the bars which disappear on left by scrolling
+		int barCount = m_currentPosition / MidiTime::ticksPerTact();
+		int leftBars = m_currentPosition / m_ppt;
+
+		for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		{
+			if ( (barCount + leftBars)  % 2 != 0 )
+			{
+				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
+			}
+		}
+
 
 		// Draw the vertical beat lines
 		int ticksPerBeat = DefaultTicksPerTact /
@@ -3105,7 +3105,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	// set line colors
 	QColor editAreaCol = QColor( lineColor() );
 	QColor currentKeyCol = QColor( beatLineColor() );
-	
+
 	editAreaCol.setAlpha( 64 );
 	currentKeyCol.setAlpha( 64 );
 

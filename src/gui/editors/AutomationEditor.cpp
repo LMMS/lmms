@@ -104,7 +104,9 @@ AutomationEditor::AutomationEditor() :
 	m_y_auto( true ),
 	m_editMode( DRAW ),
 	m_scrollBack( false ),
-	m_gridColor( 0,0,0 ),
+	m_barLineColor( 0, 0, 0 ),
+	m_beatLineColor( 0, 0, 0 ),
+	m_lineColor( 0, 0, 0 ),
 	m_graphColor( Qt::SolidPattern ),
 	m_vertexColor( 0,0,0 ),
 	m_scaleColor( Qt::SolidPattern ),
@@ -247,30 +249,54 @@ void AutomationEditor::loadSettings( const QDomElement & dom_parent)
 
 // qproperty access methods
 
-QColor AutomationEditor::gridColor() const
-{ return m_gridColor; }
+QColor AutomationEditor::barLineColor() const
+{ return m_barLineColor; }
+
+void AutomationEditor::setBarLineColor( const QColor & c )
+{ m_barLineColor = c; }
+
+QColor AutomationEditor::beatLineColor() const
+{ return m_beatLineColor; }
+
+void AutomationEditor::setBeatLineColor( const QColor & c )
+{ m_beatLineColor = c; }
+
+QColor AutomationEditor::lineColor() const
+{ return m_lineColor; }
+
+void AutomationEditor::setLineColor( const QColor & c )
+{ m_lineColor = c; }
+
 QBrush AutomationEditor::graphColor() const
 { return m_graphColor; }
-QColor AutomationEditor::vertexColor() const
-{ return m_vertexColor; }
-QBrush AutomationEditor::scaleColor() const
-{ return m_scaleColor; }
-QColor AutomationEditor::crossColor() const
-{ return m_crossColor; }
-QColor AutomationEditor::backgroundShade() const
-{ return m_backgroundShade; }
-void AutomationEditor::setGridColor( const QColor & c )
-{ m_gridColor = c; }
+
 void AutomationEditor::setGraphColor( const QBrush & c )
 { m_graphColor = c; }
+
+QColor AutomationEditor::vertexColor() const
+{ return m_vertexColor; }
+
 void AutomationEditor::setVertexColor( const QColor & c )
 { m_vertexColor = c; }
+
+QBrush AutomationEditor::scaleColor() const
+{ return m_scaleColor; }
+
 void AutomationEditor::setScaleColor( const QBrush & c )
 { m_scaleColor = c; }
+
+QColor AutomationEditor::crossColor() const
+{ return m_crossColor; }
+
 void AutomationEditor::setCrossColor( const QColor & c )
 { m_crossColor = c; }
+
+QColor AutomationEditor::backgroundShade() const
+{ return m_backgroundShade; }
+
 void AutomationEditor::setBackgroundShade( const QColor & c )
 { m_backgroundShade = c; }
+
 
 
 
@@ -1099,72 +1125,47 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	p.setClipRect( VALUES_WIDTH, TOP_MARGIN, width() - VALUES_WIDTH,
 								grid_height  );
 
-	// alternating shades for better contrast
-	// count the bars which disappear on left by scrolling
-	int barCount = m_currentPosition / MidiTime::ticksPerTact();
-	int leftBars = m_currentPosition / m_ppt;
-
-	for ( int x = VALUES_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
-	{
-		if ( (barCount + leftBars)  % 2 != 0 )
-		{
-			p.fillRect( x - m_currentPosition, TOP_MARGIN, m_ppt,
-				height() - ( SCROLLBAR_SIZE + TOP_MARGIN ), backgroundShade() );
-		}
-	}
-
 	// draw vertical raster
-	QColor lineColor = QColor( gridColor() );
+
 	if( m_pattern )
 	{
-		int tick, x;
+		int tick, x, q;
 		int x_line_end = (int)( m_y_auto || m_topLevel < m_maxLevel ?
 			TOP_MARGIN :
-			grid_bottom - ( m_topLevel - m_bottomLevel )
-								* m_y_delta );
+			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
+
+		if ( m_zoomingXModel.value() > 3 )
+		{
+			// If we're over 100% zoom, we allow all quantization level grids
+			q = AutomationPattern::quantization();
+		}
+		else if ( AutomationPattern::quantization() % 3 != 0 )
+		{
+			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
+			// to ensure a dense doesn't fill out the background
+			q = AutomationPattern::quantization() < 8 ? 8 : AutomationPattern::quantization();
+		}
+		else {
+			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes
+			q = AutomationPattern::quantization() < 6 ? 6 : AutomationPattern::quantization();
+		}
+
 		// 3 independent loops, because quantization might not divide evenly into
 		// exotic denominators (e.g. 7/11 time), which are allowed ATM.
 		// First quantization grid...
-		for( tick = m_currentPosition - m_currentPosition % AutomationPattern::quantization(),
+		for( tick = m_currentPosition - m_currentPosition % q,
 				 x = xCoordOfTick( tick );
 			 x<=width();
-			 tick += AutomationPattern::quantization(), x = xCoordOfTick( tick ) )
+			 tick += q, x = xCoordOfTick( tick ) )
 		{
-			lineColor.setAlpha( 80 );
-			p.setPen( lineColor );
-			p.drawLine( x, grid_bottom, x, x_line_end );
-		}
-		// Then beat grid
-		int ticksPerBeat = DefaultTicksPerTact /
-			Engine::getSong()->getTimeSigModel().getDenominator();
-		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
-		{
-			lineColor.setAlpha( 160 );
-			p.setPen( lineColor );
-			p.drawLine( x, grid_bottom, x, x_line_end );
-		}
-		// and finally bars
-		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
-				 x = xCoordOfTick( tick );
-			 x<=width();
-			 tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
-		{
-			lineColor.setAlpha( 255 );
-			p.setPen( lineColor );
+			p.setPen( lineColor() );
 			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 
 		/// \todo move this horizontal line drawing code into the same loop as the value ticks?
 		if( m_y_auto )
 		{
-			lineColor.setAlpha( 160 );
-			QPen pen( lineColor );
-			p.setPen( pen );
-			p.drawLine( VALUES_WIDTH, grid_bottom, width(),
-								grid_bottom );
+			QPen pen( beatLineColor() );
 			pen.setStyle( Qt::DotLine );
 			p.setPen( pen );
 			float y_delta = ( grid_bottom - TOP_MARGIN ) / 8.0f;
@@ -1180,21 +1181,61 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			for( int level = (int)m_bottomLevel; level <= m_topLevel; level++)
 			{
 				y =  yCoordOfLevel( (float)level );
-				if( level % 5 == 0 )
+				if( level % 10 == 0 )
 				{
-					lineColor.setAlpha( 160 );
-					p.setPen( lineColor );
+					p.setPen( beatLineColor() );
 				}
 				else
 				{
-					lineColor.setAlpha( 80 );
-					p.setPen( lineColor );
+					p.setPen( lineColor() );
 				}
-
 				// draw level line
-				p.drawLine( VALUES_WIDTH, (int) y, width(),
-								(int) y );
+				p.drawLine( VALUES_WIDTH, (int) y, width(), (int) y );
 			}
+		}
+
+		// alternating shades for better contrast
+		// count the bars which disappear on left by scrolling
+		int barCount = m_currentPosition / MidiTime::ticksPerTact();
+		int leftBars = m_currentPosition / m_ppt;
+
+		for ( int x = VALUES_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		{
+			if ( (barCount + leftBars)  % 2 != 0 )
+			{
+				p.fillRect( x - m_currentPosition, TOP_MARGIN, m_ppt,
+					height() - ( SCROLLBAR_SIZE + TOP_MARGIN ), backgroundShade() );
+			}
+		}
+
+		// Draw the beat grid
+		int ticksPerBeat = DefaultTicksPerTact /
+			Engine::getSong()->getTimeSigModel().getDenominator();
+
+		// triplet mode occurs if the note quantization isn't a multiple of 3
+		// note that the automation editor does not support triplets yet
+		if( AutomationPattern::quantization() % 3 != 0 )
+		{
+			ticksPerBeat = static_cast<int>( ticksPerBeat * 2.0/3.0 );
+		}
+
+		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
+				 x = xCoordOfTick( tick );
+			 x<=width();
+			 tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		{
+			p.setPen( beatLineColor() );
+			p.drawLine( x, grid_bottom, x, x_line_end );
+		}
+
+		// and finally bars
+		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
+				 x = xCoordOfTick( tick );
+			 x<=width();
+			 tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
+		{
+			p.setPen( barLineColor() );
+			p.drawLine( x, grid_bottom, x, x_line_end );
 		}
 	}
 

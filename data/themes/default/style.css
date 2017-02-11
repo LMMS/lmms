@@ -12,12 +12,16 @@ QMdiArea {
 }
 
 AutomationEditor {
-	background-color: #040506;
 	color: #ffffff;
-	qproperty-vertexColor: #6749C2;
+	background-color: #040506;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
+	qproperty-vertexColor: #6749C2;
 	qproperty-gridColor: #4f5964;
 	qproperty-crossColor: #9875FF;
+	/* Grid colors */
+	qproperty-lineColor: #292929;
+	qproperty-beatLineColor: #2a6548;
+	qproperty-barLineColor: #437053;
 
 	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
   	stop:0 rgba(69,42,153,255),  stop:1 rgba(81,48,179,50));
@@ -115,7 +119,7 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: #141616;
-	qproperty-backgroundShade: rgba(255, 255, 255, 4);
+	qproperty-backgroundShade: rgba(255, 255, 255, 10);
 	qproperty-noteModeColor: #0bd556;
 	qproperty-noteColor: #0bd556;
 	qproperty-noteOpacity: 165;
