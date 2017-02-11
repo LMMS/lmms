@@ -414,6 +414,14 @@ struct harmonic_cent
 	}
 };
 static freefunc1<float,harmonic_cent,true> harmonic_cent_func;
+struct harmonic_semitone
+{
+	static inline float process(float x)
+	{
+		return powf(2,x/12);
+	}
+};
+static freefunc1<float,harmonic_semitone,true> harmonic_semitone_func;
 
 struct float_random
 {
@@ -443,6 +451,7 @@ ExprFront::ExprFront(const char * expr)
 	m_data->symbol_table.add_function("expw",exp_wave_func);
 	m_data->symbol_table.add_function("expnw",exp2_wave_func);
 	m_data->symbol_table.add_function("cent",harmonic_cent_func);
+	m_data->symbol_table.add_function("semitone",harmonic_semitone_func);
 	m_data->symbol_table.add_function("rand",simple_rand);
 	m_data->symbol_table.add_function("randv",m_data->rand_vec);
 }

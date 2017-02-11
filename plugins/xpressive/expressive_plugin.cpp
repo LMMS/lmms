@@ -280,6 +280,8 @@ void expressive::playNote(NotePlayHandle * _n, sampleFrame * _working_buffer) {
 		exprO2->add_constant("key",_n->key());
 		exprO1->add_constant("bnote",_n->instrumentTrack()->baseNote());
 		exprO2->add_constant("bnote",_n->instrumentTrack()->baseNote());
+		exprO1->add_constant("srate",Engine::mixer()->processingSampleRate());
+		exprO2->add_constant("srate",Engine::mixer()->processingSampleRate());
 
 		exprO1->add_constant("v",_n->getVolume()/255.0);
 		exprO2->add_constant("v",_n->getVolume()/255.0);
@@ -616,6 +618,7 @@ void expressiveView::expressionChanged() {
 			expr.add_cyclic_vector("W3",e->m_graphW3.samples(),e->m_graphW3.length());
 		}
 		expr.setIntegrate(&i,sample_rate);
+		expr.add_constant("srate",sample_rate);
 
 		const bool parse_ok=expr.compile();
 
@@ -860,6 +863,7 @@ QString expressiveHelpView::HelpText=
 "<b>f</b> - note's pitched frequency. available only in the output expressions.<br>"
 "<b>key</b> - note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. available only in the output expressions.<br>"
 "<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
+"<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
 "<b>v</b> - note's volume. note that the output is already multiplied by the volume. available only in the output expressions.<br>"
 "<b>rel</b> - gives 0.0 while the key is holded, and 1.0 after the key release. available only in the output expressions.<br>"
 "<b>trel</b> - time after release. While the note is holded, it gives 0.0. then it start counting seconds.<br>"
@@ -868,7 +872,9 @@ QString expressiveHelpView::HelpText=
 "<h4>Available functions:</h4><br>"
 "<b>W1, W2, W3</b> - as mentioned before. you can reference them only in O1 and O2.<br>"
 "<b>cent(x)</b> - gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
-"<b>integrate(x)</b> - integrates x by delta t.<br>"
+"100 cents equals one semitone<br>"
+"<b>semitone(x)</b> - gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
+"<b>integrate(x)</b> - integrates x by delta t (it sums values and divides them by sample rate).<br>"
 "If you use notes with automated frequency, you should use:<br>"
 "sinew(integrate(f)) instead of sinew(t*f)<br>"
 "<b>randv(x)</b> - A random vector. each cell is reference by an integer index in the range [0,2^31]<br>"
@@ -886,7 +892,13 @@ QString expressiveHelpView::HelpText=
 "<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
 "hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
 "avg, sgn, mod, etc. are also available.</b><br>"
-"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>";
+"<b>Operands + - * / % ^ &gt; &lt; &gt;= &lt;= == != &amp; | are also available.</b><br>"
+"<b>Amplitude Modulation</b> - W1(t*f)*(1+W2(t*f))<br>"
+"<b>Ring Modulation</b> - W1(t * f)*W2(t * f)<br>"
+"<b>Mix Modulation</b> - 0.5*( W1(t * f) + W2(t * f) )<br>"
+"<b>Frequency Modulation</b> - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )<br>"
+"<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>"
+		;
 void expressiveView::helpClicked() {	
 	expressiveHelpView::getInstance()->show();
 
