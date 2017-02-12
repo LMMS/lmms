@@ -13,18 +13,17 @@ QMdiArea {
 
 AutomationEditor {
 	color: #ffffff;
-	background-color: #040506;
+	background-color: #141616;
 	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-vertexColor: #6749C2;
-	qproperty-gridColor: #4f5964;
-	qproperty-crossColor: #9875FF;
+	qproperty-crossColor: rgba(215, 210, 254, 150);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
-	qproperty-beatLineColor: #2a6548;
-	qproperty-barLineColor: #437053;
+	qproperty-beatLineColor: #4a3bba;
+	qproperty-barLineColor: #8173fe;
 
 	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
-  	stop:0 rgba(69,42,153,255),  stop:1 rgba(81,48,179,50));
+  	stop:0 rgba(69,42,153,180),  stop:1 rgba(69,42,153,100));
 	qproperty-scaleColor: #262b30;
 }
 
@@ -129,8 +128,8 @@ PianoRoll {
 	qproperty-markedSemitoneColor: #06170E;
 	/* Grid colors */
 	qproperty-lineColor: #292929;
-	qproperty-beatLineColor: #2a6548;
-	qproperty-barLineColor: #437053;
+	qproperty-beatLineColor: #2d6b45;
+	qproperty-barLineColor: #42a065;
 
 	/* Text on the white piano keys */
 	qproperty-textColor: #000;
