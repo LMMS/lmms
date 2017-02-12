@@ -58,6 +58,6 @@ void PlayHandle::doProcessing()
 
 void PlayHandle::releaseBuffer()
 {
-	if( m_playHandleBuffer ) BufferManager::release( m_playHandleBuffer );
+	BufferManager::release( m_playHandleBuffer );
 	m_playHandleBuffer = NULL;
 }
