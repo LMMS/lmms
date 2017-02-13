@@ -315,7 +315,16 @@ void MainWindow::finalize()
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );*/
 
+//
+// Conditional compilation to workaround Qt5 bug that fails to remove
+// separator at end of menu when the Quit menu item is relocated to
+// Application Menu on Mac OS X / macOS. For details see:
+//  * <https://github.com/LMMS/lmms/issues/3345>
+//  * <https://bugreports.qt.io/browse/QTBUG-40071>
+//
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000))
 	project_menu->addSeparator();
+#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
