@@ -40,8 +40,8 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
         <translation>Lizenz</translation>
     </message>
     <message>
-        <source>Copyright (c) 2004-2014, LMMS developers</source>
-        <translation>Copyright (c) 2004-2014, LMMS-Entwickler</translation>
+        <source>Copyright (c) 2004-2015, LMMS developers</source>
+        <translation>Copyright (c) 2004-2015, LMMS-Entwickler</translation>
     </message>
     <message>
         <source>LMMS</source>
