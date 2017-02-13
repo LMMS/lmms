@@ -122,6 +122,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 
 #if QT_VERSION >= 0x050000
 #define setResizeMode setSectionResizeMode
+	ui->filterEdit->setClearButtonEnabled( true );
 #endif
 	ui->pluginList->verticalHeader()->setResizeMode(
 						QHeaderView::ResizeToContents );
