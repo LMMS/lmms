@@ -52,9 +52,9 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor barLineColor READ barLineColor WRITE setBarLineColor )
-	Q_PROPERTY( QColor beatLineColor READ beatLineColor WRITE setBeatLineColor )
-	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
+	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
+	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
+	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
 	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
 	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
 	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)

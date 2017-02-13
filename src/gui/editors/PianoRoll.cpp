@@ -2591,7 +2591,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 int PianoRoll::xCoordOfTick(int tick )
 {
 	return WHITE_KEY_WIDTH + ( ( tick - m_currentPosition )
-						* m_ppt / MidiTime::ticksPerTact() );
+		* m_ppt / MidiTime::ticksPerTact() );
 }
 
 void PianoRoll::paintEvent(QPaintEvent * pe )

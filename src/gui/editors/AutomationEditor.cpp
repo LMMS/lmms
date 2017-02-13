@@ -1303,11 +1303,11 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				{
 					is_selected = true;
 				}
-				
+
 				float *values = m_pattern->valuesAfter( it.key() );
 				for( int i = 0; i < (it+1).key() - it.key(); i++ )
 				{
-					
+
 					drawLevelTick( p, it.key() + i, values[i],
 									is_selected );
 				}
@@ -1403,7 +1403,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 int AutomationEditor::xCoordOfTick(int tick )
 {
 	return VALUES_WIDTH + ( ( tick - m_currentPosition )
-						* m_ppt / MidiTime::ticksPerTact() );
+		* m_ppt / MidiTime::ticksPerTact() );
 }
 
 
