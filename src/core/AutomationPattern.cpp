@@ -237,18 +237,13 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 
 
 
-void AutomationPattern::removeValue( const MidiTime & _time,
-									 const bool _quant_pos )
+void AutomationPattern::removeValue( const MidiTime & time )
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos ?
-				Note::quantized( _time, quantization() ) :
-				_time;
-
-	m_timeMap.remove( newTime );
-	m_tangents.remove( newTime );
-	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
+	m_timeMap.remove( time );
+	m_tangents.remove( time );
+	timeMap::const_iterator it = m_timeMap.lowerBound( time );
 	if( it != m_timeMap.begin() )
 	{
 		--it;
@@ -267,7 +262,7 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 
 
 /**
- * @brief Set the position of the point that is being draged.
+ * @brief Set the position of the point that is being dragged.
  *        Calling this function will also automatically set m_dragging to true,
  *        which applyDragValue() have to be called to m_dragging.
  * @param the time(x position) of the point being dragged
@@ -648,7 +643,7 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 			}
 			else if( valueAt( time ) != value )
 			{
-				removeValue( time, false );
+				removeValue( time );
 			}
 		}
 	}
