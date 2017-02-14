@@ -127,7 +127,7 @@ void TempoSyncKnobModel::calculateTempoSyncTime( bpm_t _bpm )
 void TempoSyncKnobModel::saveSettings( QDomDocument & _doc, QDomElement & _this,
 							const QString & _name )
 {
- 	_this.setAttribute( "syncmode", (int) syncMode() );
+	_this.setAttribute( _name + "_syncmode", (int) syncMode() );
 	m_custom.saveSettings( _doc, _this, _name );
 	FloatModel::saveSettings( _doc, _this, _name );
 }
@@ -140,7 +140,7 @@ void TempoSyncKnobModel::loadSettings( const QDomElement & _this,
 {
 	FloatModel::loadSettings( _this, _name );
 	m_custom.loadSettings( _this, _name );
-	setSyncMode( ( TempoSyncMode ) _this.attribute( "syncmode" ).toInt() );
+	setSyncMode( ( TempoSyncMode ) _this.attribute( _name + "_syncmode" ).toInt() );
 }
 
 

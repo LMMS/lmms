@@ -126,6 +126,7 @@ private:
 	void upgrade_1_1_0();
 	void upgrade_1_1_91();
 	void upgrade_1_2_0_rc3();
+	void upgrade_1_2_0_rc2_42();
 
 	void upgrade();
 
