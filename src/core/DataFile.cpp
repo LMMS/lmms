@@ -929,6 +929,49 @@ void DataFile::upgrade_1_2_0_rc3()
 }
 
 
+static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
+{
+	if( el.hasAttribute( "syncmode" ) )
+	{
+		int syncmode = el.attribute( "syncmode" ).toInt();
+		QStringList names;
+		QDomNamedNodeMap atts = el.attributes();
+		for( uint i = 0; i < atts.length(); i++ )
+		{
+			QString name = atts.item( i ).nodeName();
+			if( name.endsWith( "_numerator" ) )
+			{
+				names << name.remove( "_numerator" )
+								+ "_syncmode";
+			}
+		}
+		for( QStringList::iterator it = names.begin(); it < names.end();
+									++it )
+		{
+			el.setAttribute( *it, syncmode );
+		}
+	}
+
+	QDomElement child = el.firstChildElement();
+	while ( !child.isNull() )
+	{
+		upgradeElement_1_2_0_rc2_42( child );
+		child = child.nextSiblingElement();
+	}
+}
+
+
+void DataFile::upgrade_1_2_0_rc2_42()
+{
+	QDomElement el = firstChildElement();
+	while ( !el.isNull() )
+	{
+		upgradeElement_1_2_0_rc2_42( el );
+		el = el.nextSiblingElement();
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -1008,6 +1051,7 @@ void DataFile::upgrade()
 	if( version < "1.2.0-rc3" )
 	{
 		upgrade_1_2_0_rc3();
+		upgrade_1_2_0_rc2_42();
 	}
 
 	// update document meta data
