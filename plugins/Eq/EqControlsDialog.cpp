@@ -88,7 +88,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 	{
 		EqFader * gainFader = new EqFader( m_parameterWidget->getBandModels( i )->gain, tr( "" ), this, faderBg, faderLeds, faderKnob, m_parameterWidget->getBandModels( i )->peakL, m_parameterWidget->getBandModels( i )->peakR );
 		gainFader->move( distance, 295 );
-		distance = distance + 44;
+		distance += 44;
 		gainFader->setMinimumHeight(80);
 		gainFader->resize(gainFader->width() , 80);
 		gainFader->setDisplayConversion( false );
@@ -131,7 +131,7 @@ EqControlsDialog::EqControlsDialog( EqControls *controls ) :
 		QObject::connect( m_parameterWidget->getBandModels( i )->active, SIGNAL( dataChanged() ), m_parameterWidget , SLOT ( updateHandle() ) );
 
 		m_parameterWidget->changeHandle( i );
-		distance = distance + 44;
+		distance += 44;
 	}
 
 

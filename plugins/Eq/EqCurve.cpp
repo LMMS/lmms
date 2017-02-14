@@ -49,7 +49,7 @@ EqHandle::EqHandle( int num, int x, int y ):
 
 QRectF EqHandle::boundingRect() const
 {
-	return QRectF( 0 - m_circlePixmap.width() / 2, 0 - m_circlePixmap.height() / 2, m_circlePixmap.width(), m_circlePixmap.height() );
+	return QRectF( - m_circlePixmap.width() / 2, - m_circlePixmap.height() / 2, m_circlePixmap.width(), m_circlePixmap.height() );
 }
 
 
@@ -111,7 +111,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 	// graphics for the handles
 	loadPixmap();
-	painter->drawPixmap( 0 - ( m_circlePixmap.width() / 2 ) - 1 , 0 - ( m_circlePixmap.height() / 2 ), m_circlePixmap );
+	painter->drawPixmap( - ( m_circlePixmap.width() / 2 ) - 1 , - ( m_circlePixmap.height() / 2 ), m_circlePixmap );
 
 	// on mouse hover draw an info box and change the pixmap of the handle
 	if ( isMouseHover() )
@@ -132,7 +132,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 			rectX = rectX - ( 40 - ( m_width - EqHandle::x() ) );
 		}
 		QPixmap hover = PLUGIN_NAME::getIconPixmap( "handlehover" );
-		painter->drawPixmap( 0 - ( hover.width() / 2) - 1, 0 - ( hover.height() / 2 ), hover );
+		painter->drawPixmap( - ( hover.width() / 2) - 1, - ( hover.height() / 2 ), hover );
 		QRectF textRect = QRectF ( rectX, rectY, 80, 30 );
 		QRectF textRect2 = QRectF ( rectX+1, rectY+1, 80, 30 );
 		QString freq = QString::number( xPixelToFreq( EqHandle::x(), m_width ) );
@@ -145,7 +145,7 @@ void EqHandle::paint( QPainter *painter, const QStyleOptionGraphicsItem *option,
 		{
 			res = tr( "BW: " ) +  QString::number( getResonance() );
 		}
-		
+
 		QFont painterFont = painter->font();
 		painterFont.setPointSizeF( painterFont.pointSizeF() * 0.7 );
 		painter->setFont( painterFont );
