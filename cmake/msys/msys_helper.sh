@@ -75,18 +75,18 @@ if [ $? -ne 0 ]; then
 	pushd $HOME/fltk-$fltkver
 
 	info "  - Compiling fltk $fltkver..."
-	./configure
+	./configure --prefix=$mingw_root
 
 	make
 
 	info "  - Installing fltk..."
-	make install DESTDIR=$mingw_root
+	make install
 
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install fltk -- Zyn needs this.  Exiting."
 	fi
 	
-	ln -s $mingw_root/usr/local/bin/fluid.exe $mingw_root/bin/fluid.exe 	
+#	ln -s $mingw_root/usr/local/bin/fluid.exe $mingw_root/bin/fluid.exe 	
 else
 	warn "  - Skipping, fluid binary already exists" 
 fi
