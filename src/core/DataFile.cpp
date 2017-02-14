@@ -905,15 +905,17 @@ void DataFile::upgrade_1_2_0_rc3()
 {
 	// Upgrade from earlier bbtrack beat note behaviour of adding
 	// steps if a note is placed after the last step.
-	QDomNodeList list = elementsByTagName( "bbtrack" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
+	QDomNodeList bbtracks = elementsByTagName( "bbtrack" );
+	for( int i = 0; !bbtracks.item( i ).isNull(); ++i )
 	{
-		list = elementsByTagName( "pattern" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		QDomNodeList patterns = bbtracks.item( i
+				).toElement().elementsByTagName(
+								"pattern" );
+		for( int j = 0; !patterns.item( j ).isNull(); ++j )
 		{
 			int patternLength, steps;
-			QDomElement el = list.item( i ).toElement();
-			for( int i = 0; !list.item( i ).isNull(); ++i )
+			QDomElement el = patterns.item( j ).toElement();
+			for( int k = 0; !patterns.item( k ).isNull(); ++k )
 			{
 				if( el.attribute( "len" ) != "" )
 				{
