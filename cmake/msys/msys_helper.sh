@@ -256,6 +256,8 @@ if [ ! -e $mingw_root/lib/libstk.dll ]; then
 	# extension on a Windows dll.  Yes I verified it twice -EAS
 	mv $mingw_root/lib/libstk.so $mingw_root/lib/libstk.dll
 	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/lib/libstk-$stkver.dll
+	ln -s $mingw_root/lib/libstk.dll $mingw_root/bin
+	ln -s $mingw_root/lib/libstk-$stkver.dll $mingw_root/bin
 	
 	popd
 else
@@ -263,8 +265,16 @@ else
 fi
 
 # make a symlink to make cmake happy
-if [ ! -e /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config ]; then 
-	ln -s /usr/bin/pkg-config /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config
+if [ $mingw_root = "/mingw64" ]; then
+	if [ ! -e /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config ]; then 
+		ln -s /usr/bin/pkg-config /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config
+	fi
+fi
+if [ $mingw_root = "/mingw32" ]; then
+
+	if [ ! -e /opt/mingw32/bin/i686-w64-mingw32-pkg-config ]; then 
+		ln -s /usr/bin/pkg-config /opt/mingw32/bin/i686-w64-mingw32-pkg-config
+	fi
 fi
 
 info "Cleaning up..."
