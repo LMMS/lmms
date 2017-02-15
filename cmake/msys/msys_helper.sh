@@ -64,6 +64,7 @@ fltkver="1.3.3"
 oggver="1.3.2"
 vorbisver="1.3.5"
 flacver="1.3.2"
+gigver="4.0.0"
 
 info "Downloading and building fltk $fltkver"
 
@@ -198,7 +199,34 @@ if [ ! -e $mingw_root/lib/libFLAC.dll.a ]; then
 	
 	popd
 else
-	warn "  - Skipping, libvorbis binary already exists" 
+	warn "  - Skipping, libvorbis flac already exists" 
+fi
+
+info "Downloading and building libgig $gigver"
+
+if [ ! -e $mingw_root/lib/libgig/libgig.dll.a ]; then 
+	wget http://download.linuxsampler.org/packages/libgig-$gigver.tar.bz2 -O $HOME/gig-source.tar.xz
+	if [ $? -ne 0 ]; then
+		err "ERROR: Could not download libgig.  Exiting."	
+	fi
+	tar xf $HOME/gig-source.tar.xz -C $HOME/
+	pushd $HOME/libgig-$gigver
+
+	info "  - Compiling libgig $gigver..."
+	./configure --prefix=$mingw_root
+
+	make
+
+	info "  - Installing libgig..."
+	make install
+
+	if [ $? -ne 0 ]; then
+        	err "ERROR: Could not build/install libgig -- gigplayer needs this.  Exiting."
+	fi
+	
+	popd
+else
+	warn "  - Skipping, libgig binary already exists" 
 fi
 
 
@@ -207,4 +235,5 @@ rm -rf $HOME/fltk-$fltkver
 rm -rf $HOME/libogg-$oggver
 rm -rf $HOME/libvorbis-$vorbisver
 rm -rf $HOME/flac-$flacver
+rm -rf $HOME/libgig-$gigver
 info "Done."
