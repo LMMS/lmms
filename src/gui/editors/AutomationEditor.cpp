@@ -1959,9 +1959,10 @@ void AutomationEditor::zoomingYChanged()
 
 void AutomationEditor::setQuantization()
 {
-	int quantization = m_quantizeModel.value() < 7
-			? 1 << m_quantizeModel.value()
-			: ( 1 << ( m_quantizeModel.value() - 7 ) ) * 3;
+	int quantization = m_quantizeModel.value();
+	quantization = quantization < 7
+			? 1 << quantization
+			: ( 1 << ( quantization - 7 ) ) * 3;
 	quantization = DefaultTicksPerTact / quantization;
 	AutomationPattern::setQuantization(quantization);
 }
