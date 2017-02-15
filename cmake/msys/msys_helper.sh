@@ -65,6 +65,7 @@ oggver="1.3.2"
 vorbisver="1.3.5"
 flacver="1.3.2"
 gigver="4.0.0"
+stkver="4.5.1"
 
 info "Downloading and building fltk $fltkver"
 
@@ -229,6 +230,39 @@ else
 	warn "  - Skipping, libgig binary already exists" 
 fi
 
+info "Downloading and building stk $stkver"
+
+if [ ! -e $mingw_root/lib/stkfile ]; then 
+	wget http://ccrma.stanford.edu/software/stk/release/stk-$stkver.tar.gz -O $HOME/stk-source.tar.xz
+	if [ $? -ne 0 ]; then
+		err "ERROR: Could not download stk.  Exiting."
+	fi
+	tar xf $HOME/stk-source.tar.xz -C $HOME/
+	pushd $HOME/stk-$stkver
+
+	info "  - Compiling stk $stkver..."
+	./configure --prefix=$mingw_root
+
+	make
+
+	info "  - Installing stk..."
+	make install
+
+	if [ $? -ne 0 ]; then
+        	err "ERROR: Could not build/install stk -- mallotstk needs this.  Exiting."
+	fi
+	mv $mingw_root/lib/libstk.so $mingw_root/lib/libstk.dll
+	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/lib/libstk-$stkver.dll
+	
+	popd
+else
+	warn "  - Skipping, stk binary already exists" 
+fi
+
+# make a symlink to make cmake happy
+if [ ! -e /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config ]; then 
+	ln -s /usr/bin/pkg-config /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config
+fi
 
 info "Cleaning up..."
 rm -rf $HOME/fltk-$fltkver
@@ -236,4 +270,5 @@ rm -rf $HOME/libogg-$oggver
 rm -rf $HOME/libvorbis-$vorbisver
 rm -rf $HOME/flac-$flacver
 rm -rf $HOME/libgig-$gigver
+rm -rf $HOME/stk-$stkver
 info "Done."
