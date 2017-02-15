@@ -63,6 +63,7 @@ fi
 fltkver="1.3.3"
 oggver="1.3.2"
 vorbisver="1.3.5"
+flacver="1.3.2"
 
 info "Downloading and building fltk $fltkver"
 
@@ -133,7 +134,7 @@ fi
 info "Downloading and building libvorbis $vorbisver"
 
 if [ ! -e $mingw_root/lib/libvorbis.dll.a ]; then 
-	wget http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz -O $HOME/libvorbis-source.tar.xz
+	wget http://downloads.xiph.org/releases/vorbis/libvorbis-$vorbisver.tar.xz -O $HOME/libvorbis-source.tar.xz
 	if [ $? -ne 0 ]; then
 		err "ERROR: Could not download libogg.  Exiting."	
 	fi
@@ -165,9 +166,45 @@ else
 	warn "  - Skipping, libvorbis binary already exists" 
 fi
 
+info "Downloading and building flac $flacver"
+
+if [ ! -e $mingw_root/lib/libFLAC.dll.a ]; then 
+	wget http://downloads.xiph.org/releases/flac/flac-$flacver.tar.xz -O $HOME/flac-source.tar.xz
+	if [ $? -ne 0 ]; then
+		err "ERROR: Could not download flac.  Exiting."	
+	fi
+	tar xf $HOME/flac-source.tar.xz -C $HOME/
+	pushd $HOME/flac-$flacver
+
+	info "  - Compiling flac $flacver..."
+	./configure --prefix=$mingw_root
+
+	make
+
+	info "  - Installing flac..."
+	make install
+
+	# for some reason libgig needs this
+	./configure --prefix=/opt$mingw_root
+
+	make
+
+	info "  - Installing flac..."
+	make install
+
+	if [ $? -ne 0 ]; then
+        	err "ERROR: Could not build/install flac -- lmms needs this.  Exiting."
+	fi
+	
+	popd
+else
+	warn "  - Skipping, libvorbis binary already exists" 
+fi
+
 
 info "Cleaning up..."
 rm -rf $HOME/fltk-$fltkver
 rm -rf $HOME/libogg-$oggver
 rm -rf $HOME/libvorbis-$vorbisver
+rm -rf $HOME/flac-$flacver
 info "Done."
