@@ -253,7 +253,7 @@ if [ ! -e $mingw_root/lib/libstk.dll ]; then
 	fi
 
 	# Because some yutz over at Stanford decided to put an .so 
-	# extension on a Windows dll.  Yes I verified it twice
+	# extension on a Windows dll.  Yes I verified it twice -EAS
 	mv $mingw_root/lib/libstk.so $mingw_root/lib/libstk.dll
 	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/lib/libstk-$stkver.dll
 	
