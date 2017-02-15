@@ -562,7 +562,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 					MidiTime new_time =
 						m_pattern->setDragValue( value_pos,
-									level );
+									level, true,
+							mouseEvent->modifiers() &
+								Qt::ControlModifier );
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this
@@ -702,7 +704,9 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// moved properly according to new starting-
 				// time in the time map of pattern
 				m_pattern->setDragValue( MidiTime( pos_ticks ),
-								level );
+								level, true,
+							mouseEvent->modifiers() &
+								Qt::ControlModifier );
 			}
 
 			Engine::getSong()->setModified();
