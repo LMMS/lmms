@@ -62,6 +62,7 @@ fi
 
 fltkver="1.3.3"
 oggver="1.3.2"
+vorbisver="1.3.5"
 
 info "Downloading and building fltk $fltkver"
 
@@ -88,11 +89,10 @@ if [ $? -ne 0 ]; then
 	fi
 	
 #	ln -s $mingw_root/usr/local/bin/fluid.exe $mingw_root/bin/fluid.exe 	
+	popd
 else
 	warn "  - Skipping, fluid binary already exists" 
 fi
-
-popd
 
 info "Downloading and building libogg $oggver"
 
@@ -121,16 +121,53 @@ if [ ! -e $mingw_root/lib/libogg.dll.a ]; then
 	make install
 
 	if [ $? -ne 0 ]; then
-        	err "ERROR: Could not build/install fltk -- Zyn needs this.  Exiting."
+        	err "ERROR: Could not build/install fltk -- lmms needs this.  Exiting."
 	fi
 	
+	popd
 else
 	warn "  - Skipping, libogg binary already exists" 
 fi
 
-popd
+
+info "Downloading and building libvorbis $vorbisver"
+
+if [ ! -e $mingw_root/lib/libvorbis.dll.a ]; then 
+	wget http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz -O $HOME/libvorbis-source.tar.xz
+	if [ $? -ne 0 ]; then
+		err "ERROR: Could not download libogg.  Exiting."	
+	fi
+	tar xf $HOME/libvorbis-source.tar.xz -C $HOME/
+	pushd $HOME/libvorbis-$vorbisver
+
+	info "  - Compiling libvorbis $vorbisver..."
+	./configure --prefix=$mingw_root
+
+	make
+
+	info "  - Installing libvorbis..."
+	make install
+
+	# for some reason libgig needs this
+	./configure --prefix=/opt$mingw_root
+
+	make
+
+	info "  - Installing libvorbis..."
+	make install
+
+	if [ $? -ne 0 ]; then
+        	err "ERROR: Could not build/install libvorbis -- lmms needs this.  Exiting."
+	fi
+	
+	popd
+else
+	warn "  - Skipping, libvorbis binary already exists" 
+fi
+
 
 info "Cleaning up..."
 rm -rf $HOME/fltk-$fltkver
 rm -rf $HOME/libogg-$oggver
+rm -rf $HOME/libvorbis-$vorbisver
 info "Done."
