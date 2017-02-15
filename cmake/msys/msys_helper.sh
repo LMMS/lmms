@@ -80,7 +80,7 @@ if [ $? -ne 0 ]; then
 	pushd $HOME/fltk-$fltkver
 
 	info "  - Compiling fltk $fltkver..."
-	./configure --prefix=$mingw_root
+	./configure --prefix=$mingw_root --enable-shared
 
 	make
 
