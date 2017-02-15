@@ -132,4 +132,5 @@ popd
 
 info "Cleaning up..."
 rm -rf $HOME/fltk-$fltkver
+rm -rf $HOME/libogg-$oggver
 info "Done."
