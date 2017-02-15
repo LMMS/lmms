@@ -61,6 +61,7 @@ else
 fi
 
 fltkver="1.3.3"
+oggver="1.3.2"
 
 info "Downloading and building fltk $fltkver"
 
@@ -89,6 +90,42 @@ if [ $? -ne 0 ]; then
 #	ln -s $mingw_root/usr/local/bin/fluid.exe $mingw_root/bin/fluid.exe 	
 else
 	warn "  - Skipping, fluid binary already exists" 
+fi
+
+popd
+
+info "Downloading and building libogg $oggver"
+
+if [ ! -e $mingw_root/lib/libogg.dll.a ]; then 
+	wget http://downloads.xiph.org/releases/ogg/libogg-$oggver.tar.xz -O $HOME/libogg-source.tar.xz
+	if [ $? -ne 0 ]; then
+		err "ERROR: Could not download libogg.  Exiting."	
+	fi
+	tar xf $HOME/libogg-source.tar.xz -C $HOME/
+	pushd $HOME/libogg-$oggver
+
+	info "  - Compiling libogg $oggver..."
+	./configure --prefix=$mingw_root
+
+	make
+
+	info "  - Installing libogg..."
+	make install
+
+	# for some reason libgig needs this
+	./configure --prefix=/opt$mingw_root
+
+	make
+
+	info "  - Installing libogg..."
+	make install
+
+	if [ $? -ne 0 ]; then
+        	err "ERROR: Could not build/install fltk -- Zyn needs this.  Exiting."
+	fi
+	
+else
+	warn "  - Skipping, libogg binary already exists" 
 fi
 
 popd
