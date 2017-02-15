@@ -252,12 +252,17 @@ if [ ! -e $mingw_root/lib/libstk.dll ]; then
         	err "ERROR: Could not build/install stk -- mallotstk needs this.  Exiting."
 	fi
 
-	# Because some yutz over at Stanford decided to put an .so 
-	# extension on a Windows dll.  Yes I verified it twice -EAS
-	mv $mingw_root/lib/libstk.so $mingw_root/lib/libstk.dll
-	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/lib/libstk-$stkver.dll
-	ln -s $mingw_root/lib/libstk.dll $mingw_root/bin
-	ln -s $mingw_root/lib/libstk-$stkver.dll $mingw_root/bin
+	mv $mingw_root/lib/libstk.so $mingw_root/bin/libstk.dll
+	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/bin/libstk-$stkver.dll
+
+	dlltool -z libstk.def --export-all-symbol $mingw_root/bin/libstk.dll
+	dlltool -z libstk-$stkver.def --export-all-symbol $mingw_root/bin/libstk-$stkver.dll
+
+	dlltool -d libstk.def -l libstk.dll.a
+	dlltool -d libstk-$stkver.def -l libstk-$stkver.dll.a
+
+	mv libstk.dll.a $mingw_root/lib
+	mv libstk-$stkver.dll.a $mingw_root/lib
 	
 	popd
 else
