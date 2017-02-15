@@ -134,6 +134,7 @@ AutomationEditor::AutomationEditor() :
 		m_quantizeModel.addItem( "1/" +
 					QString::number( (1 << i) * 3 ) );
 	}
+	m_quantizeModel.addItem( "1/192" );
 
 	if( s_toolYFlip == NULL )
 	{
@@ -1960,11 +1961,20 @@ void AutomationEditor::zoomingYChanged()
 void AutomationEditor::setQuantization()
 {
 	int quantization = m_quantizeModel.value();
-	quantization = quantization < 7
-			? 1 << quantization
-			: ( 1 << ( quantization - 7 ) ) * 3;
+	if( quantization < 7 )
+	{
+		quantization = 1 << quantization;
+	}
+	else if( quantization < 12 )
+	{
+		quantization = ( 1 << ( quantization - 7 ) ) * 3;
+	}
+	else
+	{
+		quantization = DefaultTicksPerTact;
+	}
 	quantization = DefaultTicksPerTact / quantization;
-	AutomationPattern::setQuantization(quantization);
+	AutomationPattern::setQuantization( quantization );
 }
 
 
