@@ -232,7 +232,7 @@ fi
 
 info "Downloading and building stk $stkver"
 
-if [ ! -e $mingw_root/lib/stkfile ]; then 
+if [ ! -e $mingw_root/lib/libstk.dll ]; then 
 	wget http://ccrma.stanford.edu/software/stk/release/stk-$stkver.tar.gz -O $HOME/stk-source.tar.xz
 	if [ $? -ne 0 ]; then
 		err "ERROR: Could not download stk.  Exiting."
@@ -251,6 +251,9 @@ if [ ! -e $mingw_root/lib/stkfile ]; then
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install stk -- mallotstk needs this.  Exiting."
 	fi
+
+	# Because some yutz over at Stanford decided to put an .so 
+	# extension on a Windows dll.  Yes I verified it twice
 	mv $mingw_root/lib/libstk.so $mingw_root/lib/libstk.dll
 	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/lib/libstk-$stkver.dll
 	
