@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016-2017 Orr Dvori
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,19 +37,20 @@ inline float positiveFraction(float x)
 	}
 	return x-static_cast<int>(x);
 }
+
 class ExprFront
 {
 public:
 	typedef float (*ff1data_functor)(void*, float);
-	ExprFront(const char * expr);
+	ExprFront(const char* expr);
 	~ExprFront();
 	bool compile();
-	inline bool isValid(){return m_valid;}
+	inline bool isValid() { return m_valid; }
 	float evaluate();
-	bool add_variable(const char * name, float & ref);
-	bool add_constant(const char * name, float  ref);
-	bool add_cyclic_vector(const char *name, const float *data, size_t length, bool interp = false);
-	void setIntegrate(const unsigned int *frameCounter,unsigned int sample_rate);
+	bool add_variable(const char* name, float & ref);
+	bool add_constant(const char* name, float  ref);
+	bool add_cyclic_vector(const char* name, const float* data, size_t length, bool interp = false);
+	void setIntegrate(const unsigned int* frameCounter, unsigned int sample_rate);
 private:
 	ExprFrontData *m_data;
 	bool m_valid;

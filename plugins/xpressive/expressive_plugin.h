@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016-2017 Orr Dvori
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -43,95 +43,92 @@ const int	W2_EXPR = 1;
 const int	W3_EXPR = 2;
 const int	O1_EXPR = 3;
 const int	O2_EXPR = 4;
-const int	NUM_EXPRS = 7;
+const int	NUM_EXPRS = 5;
 
 
 class ExprFront;
+class SubWindow;
+
 class WaveSample
 {
 public:
-	WaveSample(int _length)
+	WaveSample(int length)
 	{
-		length=_length;
-		samples=new float[length];
-		for(int i=0;i<length;++i)
-			samples[i]=0;
+		m_length = length;
+		m_samples = new float[m_length];
+		for(int i = 0 ; i < m_length ; ++i)
+			m_samples[i] = 0;
 	}
 	WaveSample(const graphModel * graph)
 	{
-		length=graph->length();
-		samples=new float[length];
-		memcpy(samples,graph->samples(),length*sizeof(float));
+		m_length = graph->length();
+		m_samples = new float[m_length];
+		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
 	}
 	inline void copyFrom(const graphModel * graph)
 	{
-		memcpy(samples,graph->samples(),length*sizeof(float));
+		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
 	}
 	~WaveSample()
 	{
-		delete [] samples;
+		delete [] m_samples;
 	}
-	inline void setInterpolate(bool _interpolate) {interpolate=_interpolate;}
-	float * samples;
-	int length;
-	bool interpolate;
+	inline void setInterpolate(bool _interpolate) { m_interpolate = _interpolate; }
+	float *m_samples;
+	int m_length;
+	bool m_interpolate;
 };
-class exprSynth
+class ExprSynth
 {
 
 	MM_OPERATORS
 public:
-	exprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3,ExprFront *_exprO1,ExprFront *_exprO2, NotePlayHandle * _nph,
-			const sample_rate_t _sample_rate,const FloatModel* _pan1,const FloatModel* _pan2,float _rel_trans);
-	virtual ~exprSynth();
+	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2, NotePlayHandle* nph,
+			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
+	virtual ~ExprSynth();
 
-	void renderOutput( fpp_t _frames, sampleFrame * _buf );
+	void renderOutput(fpp_t frames, sampleFrame* buf );
 
 
 private:
-	ExprFront *exprO1, *exprO2;
-	const WaveSample *W1, *W2, *W3;
-	unsigned int note_sample;
-	unsigned int note_rel_sample;
-	float note_sample_sec;
-	float note_rel_sec;
-	float frequency;
-	float released;
-	NotePlayHandle* nph;
-	const sample_rate_t sample_rate;
-	const FloatModel *pan1,*pan2;
-	float rel_transition;
-	float rel_inc;
+	ExprFront *m_exprO1, *m_exprO2;
+	const WaveSample *m_W1, *m_W2, *m_W3;
+	unsigned int m_note_sample;
+	unsigned int m_note_rel_sample;
+	float m_note_sample_sec;
+	float m_note_rel_sec;
+	float m_frequency;
+	float m_released;
+	NotePlayHandle* m_nph;
+	const sample_rate_t m_sample_rate;
+	const FloatModel *m_pan1,*m_pan2;
+	float m_rel_transition;
+	float m_rel_inc;
 
 } ;
 
-class expressive : public Instrument
+class Expressive : public Instrument
 {
 	Q_OBJECT
 public:
-	expressive(InstrumentTrack * _instrument_track );
-	virtual ~expressive();
+	Expressive(InstrumentTrack* instrument_track );
+	virtual ~Expressive();
 
-	virtual void playNote( NotePlayHandle * _n,
-						sampleFrame * _working_buffer );
-	virtual void deleteNotePluginData( NotePlayHandle * _n );
+	virtual void playNote(NotePlayHandle* nph,
+						sampleFrame* working_buffer );
+	virtual void deleteNotePluginData( NotePlayHandle* nph );
 
 
-	virtual void saveSettings( QDomDocument & _doc,
-							QDomElement & _parent );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument& _doc,
+							QDomElement& _this );
+	virtual void loadSettings( const QDomElement& _this );
 
 	virtual QString nodeName() const;
 
-	virtual f_cnt_t desiredReleaseFrames() const
-	{
-		return( 64 );
-	}
-
-	virtual PluginView * instantiateView( QWidget * _parent );
+	virtual PluginView* instantiateView( QWidget * parent );
 
 protected:
-	static void smooth(float smoothness,const graphModel * in,graphModel * out);
+	static void smooth(float smoothness,const graphModel* in,graphModel* out);
 protected slots:
 
 
@@ -173,28 +170,32 @@ class expressiveHelpView: public QTextEdit
 {
 	Q_OBJECT
 public:
-	static expressiveHelpView *getInstance()
+	static expressiveHelpView* getInstance()
 	{
-		if (!instance)
+		if (!s_instance)
 		{
-			instance=new expressiveHelpView();
+			s_instance = new expressiveHelpView();
 		}
-		return instance;
+		return s_instance;
+	}
+	static void finalize()
+	{
+		if (s_instance) { delete s_instance; }
 	}
 
 private:
 	expressiveHelpView();
-	static expressiveHelpView * instance;
-	static QString HelpText;
+	static expressiveHelpView *s_instance;
+	static QString s_helpText;
 
 };
-class SubWindow;
+
 class expressiveView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	expressiveView( Instrument * _instrument,
-					QWidget * _parent );
+	expressiveView( Instrument* _instrument,
+					QWidget* _parent );
 
 	virtual ~expressiveView();
 protected:
@@ -218,33 +219,33 @@ protected slots:
 private:
 	virtual void modelChanged();
 
-	Knob * m_generalPurposeKnob[3];
-	Knob * m_panningKnob[2];
-	Knob * m_relKnob;
-	Knob * m_smoothKnob;
+	Knob *m_generalPurposeKnob[3];
+	Knob *m_panningKnob[2];
+	Knob *m_relKnob;
+	Knob *m_smoothKnob;
 	QPlainTextEdit * m_expressionEditor;
 
-	automatableButtonGroup * m_selectedGraphGroup;
-	PixmapButton * m_w1Btn;
-	PixmapButton * m_w2Btn;
-	PixmapButton * m_w3Btn;
-	PixmapButton * m_o1Btn;
-	PixmapButton * m_o2Btn;
-	PixmapButton * m_sinWaveBtn;
-	PixmapButton * m_triangleWaveBtn;
-	PixmapButton * m_sqrWaveBtn;
-	PixmapButton * m_sawWaveBtn;
-	PixmapButton * m_whiteNoiseWaveBtn;
-	PixmapButton * m_usrWaveBtn;
-	PixmapButton * m_moogWaveBtn;
-	PixmapButton * m_expWaveBtn;
+	automatableButtonGroup *m_selectedGraphGroup;
+	PixmapButton *m_w1Btn;
+	PixmapButton *m_w2Btn;
+	PixmapButton *m_w3Btn;
+	PixmapButton *m_o1Btn;
+	PixmapButton *m_o2Btn;
+	PixmapButton *m_sinWaveBtn;
+	PixmapButton *m_triangleWaveBtn;
+	PixmapButton *m_sqrWaveBtn;
+	PixmapButton *m_sawWaveBtn;
+	PixmapButton *m_whiteNoiseWaveBtn;
+	PixmapButton *m_usrWaveBtn;
+	PixmapButton *m_moogWaveBtn;
+	PixmapButton *m_expWaveBtn;
 
-	static QPixmap * s_artwork;
+	static QPixmap *s_artwork;
 
-	Graph * m_graph;
-	graphModel * m_raw_graph;
-	LedCheckBox * m_expressionValidToggle;
-	LedCheckBox * m_waveInterpolate;
+	Graph *m_graph;
+	graphModel *m_raw_graph;
+	LedCheckBox *m_expressionValidToggle;
+	LedCheckBox *m_waveInterpolate;
 	bool m_output_expr;
 	bool m_wave_expr;
 } ;

@@ -145,7 +145,7 @@ public:
 		return( m_samples.data() );
 	}
 
-	void convolve(const float *_convolution, const int _conv_length, const int _center_offset);
+	void convolve(const float *convolution, const int convolutionLength, const int centerOffset);
 
 public slots:
 	void setRange( float _min, float _max );

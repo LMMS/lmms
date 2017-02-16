@@ -634,22 +634,22 @@ void graphModel::smoothNonCyclic()
 }
 
 //makes a cyclic convolution.
-void graphModel::convolve(const float *_convolution, const int _conv_length, const int _center_offset)
+void graphModel::convolve(const float *convolution, const int convolutionLength, const int centerOffset)
 {
 	// store values in temporary array
 	QVector<float> temp = m_samples;
-	const int graph_length = length();
+	const int graphLength = length();
 	float sum;
-	for ( int i = 0; i <  graph_length; i++ )
+	for ( int i = 0; i <  graphLength; i++ )
 	{
 		sum = 0;
-		for ( int j = 0; j < _conv_length; j++ )
+		for ( int j = 0; j < convolutionLength; j++ )
 		{
-			sum += _convolution[j] * temp[( i + j ) % graph_length];
+			sum += convolution[j] * temp[( i + j ) % graphLength];
 		}
-		m_samples[( i + _center_offset ) % graph_length] = sum;
+		m_samples[( i + centerOffset ) % graphLength] = sum;
 	}
-	emit samplesChanged(0, graph_length - 1);
+	emit samplesChanged(0, graphLength - 1);
 }
 
 void graphModel::normalize()
@@ -714,7 +714,7 @@ void graphModel::clear()
 	const int graph_length = length();
 	for( int i = 0; i < graph_length; i++ )
 		m_samples[i] = 0;
-	emit samplesChanged( 0, graph_length -1 );
+	emit samplesChanged( 0, graph_length - 1 );
 }
 
 

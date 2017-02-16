@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016-2017 Orr Dvori
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,29 +25,29 @@
 #include "expressive_plugin.h"
 
 #include <QDomElement>
-//#include <QDebug>
-#include "SubWindow.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
-#include "exprfront.h"
 
-#include "base64.h"
 #include "Engine.h"
 #include "Graph.h"
+#include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
+#include "MainWindow.h"
 #include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
-#include "templates.h"
-#include "ToolTip.h"
 #include "Song.h"
+#include "SubWindow.h"
+#include "ToolTip.h"
+
+#include "base64.h"
 #include "lmms_constants.h"
-//#include "interpolation.h"
+#include "templates.h"
 
 #include "embed.cpp"
+
+#include "exprfront.h"
 
 extern "C" {
 
@@ -58,78 +58,85 @@ Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
 
 }
 
-exprSynth::exprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3, ExprFront *_exprO1, ExprFront *_exprO2,
-					NotePlayHandle *_nph, const sample_rate_t _sample_rate, const FloatModel* _pan1, const FloatModel* _pan2, float _rel_trans)
-	:exprO1(_exprO1),exprO2(_exprO2),W1(gW1),W2(gW2),W3(gW3),nph(_nph),sample_rate(_sample_rate),pan1(_pan1),pan2(_pan2),rel_transition(_rel_trans)
+ExprSynth::ExprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3,
+	ExprFront *exprO1, ExprFront *exprO2,
+	NotePlayHandle *nph, const sample_rate_t sample_rate,
+	const FloatModel* pan1, const FloatModel* pan2, float rel_trans):
+	m_exprO1(exprO1),
+	m_exprO2(exprO2),
+	m_W1(gW1),
+	m_W2(gW2),
+	m_W3(gW3),
+	m_nph(nph),
+	m_sample_rate(sample_rate),
+	m_pan1(pan1),
+	m_pan2(pan2),
+	m_rel_transition(rel_trans)
 {
-	note_sample=0;
-	note_rel_sample=0;
-	note_rel_sec=0;
-	note_sample_sec=0;
-	released=0;
-	frequency=nph->frequency();
-	rel_inc=1000.0/(sample_rate*rel_transition);//rel_transition in ms. compute how much increment in each frame
-	exprO1->add_cyclic_vector("W1",W1->samples,W1->length,W1->interpolate);
-	exprO1->add_cyclic_vector("W2",W2->samples,W2->length,W2->interpolate);
-	exprO1->add_cyclic_vector("W3",W3->samples,W3->length,W3->interpolate);
+	m_note_sample = 0;
+	m_note_rel_sample = 0;
+	m_note_rel_sec = 0;
+	m_note_sample_sec = 0;
+	m_released = 0;
+	m_frequency = m_nph->frequency();
+	m_rel_inc = 1000.0 / (m_sample_rate * m_rel_transition);//rel_transition in ms. compute how much increment in each frame
 
-	exprO2->add_cyclic_vector("W1",W1->samples,W1->length,W1->interpolate);
-	exprO2->add_cyclic_vector("W2",W2->samples,W2->length,W2->interpolate);
-	exprO2->add_cyclic_vector("W3",W3->samples,W3->length,W3->interpolate);
-
-	exprO1->add_variable("t",note_sample_sec);
-	exprO1->add_variable("f",frequency);
-	exprO2->add_variable("t",note_sample_sec);
-	exprO2->add_variable("f",frequency);
-
-	exprO1->add_variable("rel",released);
-	exprO2->add_variable("rel",released);
-
-	exprO1->add_variable("trel",note_rel_sec);
-	exprO2->add_variable("trel",note_rel_sec);
-
-	exprO1->setIntegrate(&note_sample,_sample_rate);
-	exprO2->setIntegrate(&note_sample,_sample_rate);
-
-	exprO1->compile();
-	exprO2->compile();
+	auto init_expression_step2 = [this](ExprFront * e) {
+		e->add_cyclic_vector("W1", m_W1->m_samples,m_W1->m_length, m_W1->m_interpolate);
+		e->add_cyclic_vector("W2", m_W2->m_samples,m_W2->m_length, m_W2->m_interpolate);
+		e->add_cyclic_vector("W3", m_W3->m_samples,m_W3->m_length, m_W3->m_interpolate);
+		e->add_variable("t", m_note_sample_sec);
+		e->add_variable("f", m_frequency);
+		e->add_variable("rel",m_released);
+		e->add_variable("trel",m_note_rel_sec);
+		e->setIntegrate(&m_note_sample,m_sample_rate);
+		e->compile();
+	};
+	init_expression_step2(m_exprO1);
+	init_expression_step2(m_exprO2);
 
 }
 
-exprSynth::~exprSynth()
+ExprSynth::~ExprSynth()
 {
-	if (exprO1)
-		delete exprO1;
-	if (exprO2)
-		delete exprO2;
+	if (m_exprO1)
+	{
+		delete m_exprO1;
+	}
+	if (m_exprO2)
+	{
+		delete m_exprO2;
+	}
 }
-float saw_wave(float);
-float sin_wave(float);
-void exprSynth::renderOutput(fpp_t _frames, sampleFrame *_buf)
+
+void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 {
 
 	float o1,o2;
-	const float pn1=pan1->value()*0.5;
-	const float pn2=pan2->value()*0.5;
-	const float new_freq=nph->frequency();
-	const float freq_inc=(new_freq-frequency)/_frames;
-	const bool is_released = nph->isReleased();
-	if(is_released && note_rel_sample==0)
-		note_rel_sample=note_sample;
-	for (fpp_t frame = 0; frame < _frames ; ++frame) {
-		if (is_released && released < 1)
-			released=fmin(released+rel_inc,1);
-		o1=exprO1->evaluate();
-		o2=exprO2->evaluate();
-		_buf[frame][0] = (-pn1+0.5)*o1+(-pn2+0.5)*o2;
-		_buf[frame][1] = ( pn1+0.5)*o1+( pn2+0.5)*o2;
-		note_sample++;
-		note_sample_sec=note_sample/(float)sample_rate;
-		if (is_released)
-			note_rel_sec=(note_sample-note_rel_sample)/(float)sample_rate;
-		frequency+=freq_inc;
+	const float pn1=m_pan1->value()*0.5;
+	const float pn2=m_pan2->value()*0.5;
+	const float new_freq=m_nph->frequency();
+	const float freq_inc=(new_freq-m_frequency)/frames;
+	const bool is_released = m_nph->isReleased();
+	if (is_released && m_note_rel_sample == 0)
+	{
+		m_note_rel_sample = m_note_sample;
 	}
-	frequency=new_freq;
+	for (fpp_t frame = 0; frame < frames ; ++frame)
+	{
+		if (is_released && m_released < 1)
+			m_released=fmin(m_released+m_rel_inc,1);
+		o1=m_exprO1->evaluate();
+		o2=m_exprO2->evaluate();
+		buf[frame][0] = (-pn1 + 0.5)*o1+(-pn2 + 0.5)*o2;
+		buf[frame][1] = ( pn1 + 0.5)*o1+( pn2 + 0.5)*o2;
+		m_note_sample++;
+		m_note_sample_sec = m_note_sample/(float)m_sample_rate;
+		if (is_released)
+			m_note_rel_sec = (m_note_sample-m_note_rel_sample)/(float)m_sample_rate;
+		m_frequency += freq_inc;
+	}
+	m_frequency = new_freq;
 }
 /*
  * nice test:
@@ -140,46 +147,49 @@ O2 -> trianglew(2t*f)*(0.5+0.5sinew(12*A1*t))+sinew(t*f)*(0.5+0.5sinew(12*A1*t+0
 
 /***********************************************************************
  *
- *	class expressive
+ *	class Expressive
  *
  *	lmms - plugin
  *
  ***********************************************************************/
 #define GRAPH_LENGTH 4096
 
-expressive::expressive(InstrumentTrack * _instrument_track) :
-		Instrument(_instrument_track, &xpressive_plugin_descriptor), m_graphO1(
-			 -1.0f, 1.0f, 360, this), m_graphO2(-1.0f, 1.0f, 360, this),
-		m_graphW1(-1.0f, 1.0f, GRAPH_LENGTH, this),
-		m_graphW2(-1.0f, 1.0f, GRAPH_LENGTH, this),
-		m_graphW3(-1.0f, 1.0f, GRAPH_LENGTH, this),
-		m_rawgraphW1(-1.0f, 1.0f, GRAPH_LENGTH, this),
-		m_rawgraphW2(-1.0f, 1.0f, GRAPH_LENGTH, this),
-		m_rawgraphW3(-1.0f, 1.0f, GRAPH_LENGTH, this),
-		m_selectedGraph(0, 0, 6, this, tr("Selected graph")),
-		m_parameterA1(1, -1.0f, 1.0f, 0.01f, this, tr("A1")),
-		m_parameterA2(1, -1.0f, 1.0f, 0.01f, this, tr("A2")),
-		m_parameterA3(1, -1.0f, 1.0f, 0.01f, this, tr("A3")),
-		m_smoothW1(0, 0.0f, 70.0f, 1.0f, this, tr("W1 smoothing")),
-		m_smoothW2(0, 0.0f, 70.0f, 1.0f, this, tr("W2 smoothing")),
-		m_smoothW3(0, 0.0f, 70.0f, 1.0f, this, tr("W3 smoothing")),
-		m_interpolateW1(false, this),
-		m_interpolateW2(false, this),
-		m_interpolateW3(false, this),
-		m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("PAN1")),
-		m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("PAN2")),
-		m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("REL TRANS")),
-		m_W1(GRAPH_LENGTH),m_W2(GRAPH_LENGTH),m_W3(GRAPH_LENGTH),
-		m_exprValid(false, this)
+Expressive::Expressive(InstrumentTrack* instrument_track) :
+	Instrument(instrument_track, &xpressive_plugin_descriptor),
+	m_graphO1(-1.0f, 1.0f, 360, this),
+	m_graphO2(-1.0f, 1.0f, 360, this),
+	m_graphW1(-1.0f, 1.0f, GRAPH_LENGTH, this),
+	m_graphW2(-1.0f, 1.0f, GRAPH_LENGTH, this),
+	m_graphW3(-1.0f, 1.0f, GRAPH_LENGTH, this),
+	m_rawgraphW1(-1.0f, 1.0f, GRAPH_LENGTH, this),
+	m_rawgraphW2(-1.0f, 1.0f, GRAPH_LENGTH, this),
+	m_rawgraphW3(-1.0f, 1.0f, GRAPH_LENGTH, this),
+	m_selectedGraph(0, 0, 6, this, tr("Selected graph")),
+	m_parameterA1(1, -1.0f, 1.0f, 0.01f, this, tr("A1")),
+	m_parameterA2(1, -1.0f, 1.0f, 0.01f, this, tr("A2")),
+	m_parameterA3(1, -1.0f, 1.0f, 0.01f, this, tr("A3")),
+	m_smoothW1(0, 0.0f, 70.0f, 1.0f, this, tr("W1 smoothing")),
+	m_smoothW2(0, 0.0f, 70.0f, 1.0f, this, tr("W2 smoothing")),
+	m_smoothW3(0, 0.0f, 70.0f, 1.0f, this, tr("W3 smoothing")),
+	m_interpolateW1(false, this),
+	m_interpolateW2(false, this),
+	m_interpolateW3(false, this),
+	m_panning1( 1, -1.0f, 1.0f, 0.01f, this, tr("PAN1")),
+	m_panning2(-1, -1.0f, 1.0f, 0.01f, this, tr("PAN2")),
+	m_relTransition(50.0f, 0.0f, 500.0f, 1.0f, this, tr("REL TRANS")),
+	m_W1(GRAPH_LENGTH),
+	m_W2(GRAPH_LENGTH),
+	m_W3(GRAPH_LENGTH),
+	m_exprValid(false, this)
 {
 	m_outputExpression[0]="sinew(integrate(f*(1+0.05sinew(12t))))*(2^(-(1.1+A2)*t)*(0.4+0.1(1+A3)+0.4sinew((2.5+2A1)t))^2)";
 	m_outputExpression[1]="expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
 }
 
-expressive::~expressive() {
+Expressive::~Expressive() {
 }
 
-void expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
+void Expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 	// Save plugin version
 	_this.setAttribute("version", "0.1");
@@ -188,16 +198,16 @@ void expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 	_this.setAttribute("W1", QString(m_wavesExpression[0]));
 	// Save sample shape base64-encoded
 	QString sampleString;
-	base64::encode( (const char *)m_rawgraphW1.samples(),
+	base64::encode( (const char*)m_rawgraphW1.samples(),
 		 m_rawgraphW1.length() * sizeof(float), sampleString );
 	_this.setAttribute( "W1sample", sampleString );
 
 	_this.setAttribute("W2", QString(m_wavesExpression[1]));
-	base64::encode( (const char *)m_rawgraphW2.samples(),
+	base64::encode( (const char*)m_rawgraphW2.samples(),
 		 m_rawgraphW2.length() * sizeof(float), sampleString );
 	_this.setAttribute( "W2sample", sampleString );
 	_this.setAttribute("W3", QString(m_wavesExpression[2]));
-	base64::encode( (const char *)m_rawgraphW3.samples(),
+	base64::encode( (const char*)m_rawgraphW3.samples(),
 		 m_rawgraphW3.length() * sizeof(float), sampleString );
 	_this.setAttribute( "W3sample", sampleString );
 	m_smoothW1.saveSettings(_doc,_this,"smoothW1");
@@ -215,7 +225,7 @@ void expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 }
 
-void expressive::loadSettings(const QDomElement & _this) {
+void Expressive::loadSettings(const QDomElement & _this) {
 
 	m_outputExpression[0]=_this.attribute( "O1").toLatin1();
 	m_outputExpression[1]=_this.attribute( "O2").toLatin1();
@@ -260,66 +270,57 @@ void expressive::loadSettings(const QDomElement & _this) {
 }
 
 
-QString expressive::nodeName() const {
+QString Expressive::nodeName() const {
 	return (xpressive_plugin_descriptor.name);
 }
 
-void expressive::playNote(NotePlayHandle * _n, sampleFrame * _working_buffer) {
+void Expressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A1=m_parameterA1.value();
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
 
-	if (_n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL) {
+	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL) {
 
-		ExprFront * exprO1=new ExprFront(m_outputExpression[0].constData());
-		ExprFront * exprO2=new ExprFront(m_outputExpression[1].constData());
-		/*qDebug()<<"key="<<_n->key();
-		qDebug()<<"v="<<_n->getVolume()/100.0;
-		qDebug()<<"bnote="<<_n->instrumentTrack()->baseNote();*/
-		exprO1->add_constant("key",_n->key());
-		exprO2->add_constant("key",_n->key());
-		exprO1->add_constant("bnote",_n->instrumentTrack()->baseNote());
-		exprO2->add_constant("bnote",_n->instrumentTrack()->baseNote());
-		exprO1->add_constant("srate",Engine::mixer()->processingSampleRate());
-		exprO2->add_constant("srate",Engine::mixer()->processingSampleRate());
+		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData());
+		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData());
 
-		exprO1->add_constant("v",_n->getVolume()/255.0);
-		exprO2->add_constant("v",_n->getVolume()/255.0);
-		exprO1->add_variable("A1",m_A1);
-		exprO1->add_variable("A2",m_A2);
-		exprO1->add_variable("A3",m_A3);
-		exprO2->add_variable("A1",m_A1);
-		exprO2->add_variable("A2",m_A2);
-		exprO2->add_variable("A3",m_A3);
+		auto init_expression_step1 = [this, nph](ExprFront* e) {
+			e->add_constant("key", nph->key());
+			e->add_constant("bnote", nph->instrumentTrack()->baseNote());
+			e->add_constant("srate", Engine::mixer()->processingSampleRate());
+			e->add_constant("v", nph->getVolume() / 255.0);
+			e->add_variable("A1", m_A1);
+			e->add_variable("A2", m_A2);
+			e->add_variable("A3", m_A3);
+		};
+		init_expression_step1(exprO1);
+		init_expression_step1(exprO2);
+
 		m_W1.setInterpolate(m_interpolateW1.value());
 		m_W2.setInterpolate(m_interpolateW2.value());
 		m_W3.setInterpolate(m_interpolateW3.value());
-		_n->m_pluginData = new exprSynth(&m_W1,&m_W2,&m_W3,exprO1,exprO2,_n,
-				Engine::mixer()->processingSampleRate(),&m_panning1,&m_panning2,m_relTransition.value());
+		nph->m_pluginData = new ExprSynth(&m_W1, &m_W2, &m_W3, exprO1, exprO2, nph,
+				Engine::mixer()->processingSampleRate(), &m_panning1, &m_panning2, m_relTransition.value());
 	}
 
 
 
 
-	exprSynth * ps = static_cast<exprSynth *>(_n->m_pluginData);
-	const fpp_t frames = _n->framesLeftForCurrentPeriod();
-	const f_cnt_t offset = _n->noteOffset();
+	ExprSynth *ps = static_cast<ExprSynth*>(nph->m_pluginData);
+	const fpp_t frames = nph->framesLeftForCurrentPeriod();
+	const f_cnt_t offset = nph->noteOffset();
 
-	ps->renderOutput(frames,_working_buffer+offset);
+	ps->renderOutput(frames, working_buffer + offset);
 
-
-
-	//applyRelease(_working_buffer, _n);
-
-	instrumentTrack()->processAudioBuffer(_working_buffer, frames + offset, _n);
+	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, nph);
 }
 
-void expressive::deleteNotePluginData(NotePlayHandle * _n) {
-	delete static_cast<exprSynth *>(_n->m_pluginData);
+void Expressive::deleteNotePluginData(NotePlayHandle* nph) {
+	delete static_cast<ExprSynth *>(nph->m_pluginData);
 }
 
-PluginView * expressive::instantiateView(QWidget * _parent) {
-	return (new expressiveView(this, _parent));
+PluginView * Expressive::instantiateView(QWidget* parent) {
+	return (new expressiveView(this, parent));
 }
 
 class expressiveKnob: public Knob {
@@ -348,7 +349,7 @@ public:
 
 
 expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
-		InstrumentView(_instrument, _parent)
+	InstrumentView(_instrument, _parent)
 
 {
 	const int COL_KNOBS = 194;
@@ -429,7 +430,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_selectedGraphGroup->addButton(m_o1Btn);
 	m_selectedGraphGroup->addButton(m_o2Btn);
 
-	expressive * e = castModel<expressive>();
+	Expressive *e = castModel<Expressive>();
 	m_selectedGraphGroup->setModel(&e->m_selectedGraph);
 
 	m_sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
@@ -570,7 +571,7 @@ expressiveView::~expressiveView()
 
 
 void expressiveView::expressionChanged() {
-	expressive * e = castModel<expressive>();
+	Expressive * e = castModel<Expressive>();
 	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
 
@@ -658,7 +659,7 @@ void expressiveView::expressionChanged() {
 	}
 }
 
-void expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
+void Expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 {
 	out->setSamples(in->samples());
 	if (smoothness>0)
@@ -688,7 +689,7 @@ void expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 void expressiveView::smoothChanged()
 {
 
-	expressive * e = castModel<expressive>();
+	Expressive * e = castModel<Expressive>();
 	float smoothness=0;
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
@@ -701,7 +702,7 @@ void expressiveView::smoothChanged()
 		smoothness=e->m_smoothW3.value();
 		break;
 	}
-	expressive::smooth(smoothness,m_raw_graph,m_graph->model());
+	Expressive::smooth(smoothness,m_raw_graph,m_graph->model());
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->m_W1.copyFrom(m_graph->model());
@@ -717,7 +718,7 @@ void expressiveView::smoothChanged()
 }
 
 void expressiveView::modelChanged() {
-	expressive * b = castModel<expressive>();
+	Expressive * b = castModel<Expressive>();
 
 	m_expressionValidToggle->setModel(&b->m_exprValid);
 	m_generalPurposeKnob[0]->setModel(&b->m_parameterA1);
@@ -733,7 +734,7 @@ void expressiveView::modelChanged() {
 }
 
 void expressiveView::updateLayout() {
-	expressive * e = castModel<expressive>();
+	Expressive * e = castModel<Expressive>();
 	m_output_expr=false;
 	m_wave_expr=false;
 	switch (m_selectedGraphGroup->model()->value()) {
@@ -852,9 +853,9 @@ void expressiveView::usrWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-expressiveHelpView* expressiveHelpView::instance=0;
+expressiveHelpView* expressiveHelpView::s_instance=0;
 
-QString expressiveHelpView::HelpText=
+QString expressiveHelpView::s_helpText=
 "<b>O1, O2</b> - Two output waves. panning is controled by PN1 and PN2.<br>"
 "<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
 "These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
@@ -882,7 +883,7 @@ QString expressiveHelpView::HelpText=
 "Although, it remains consistent in the lifetime of a single wave.<br>"
 "If you want a single random values you can use randv(0),randv(1)... <br>"
 "and every reference to randv(a) will give you the same value."
-"If you want a random wave you can use randv(t*samples_per_second).<br>"
+"If you want a random wave you can use randv(t*srate).<br>"
 "Each random value is in the range [-1,1).<br>"
 "<b>sinew(x)</b> - a sine wave with period of 1 (in contrast to real sine wave which have a period of 2*pi).<br>"
 "<b>trianglew(x)</b> - a triangle wave with period of 1.<br>"
@@ -899,23 +900,8 @@ QString expressiveHelpView::HelpText=
 "<b>Frequency Modulation</b> - [vol1]*W1( integrate( f + srate*[vol2]*W2( integrate(f) ) ) )<br>"
 "<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>"
 		;
-void expressiveView::helpClicked() {	
-	expressiveHelpView::getInstance()->show();
 
-}
-
-extern "C" {
-
-// necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main(Model *, void * _data) {
-	return (new expressive(static_cast<InstrumentTrack *>(_data)));
-}
-
-}
-
-
-
-expressiveHelpView::expressiveHelpView():QTextEdit(HelpText)
+expressiveHelpView::expressiveHelpView():QTextEdit(s_helpText)
 {
 	setWindowTitle ( "X-Pressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
@@ -924,3 +910,26 @@ expressiveHelpView::expressiveHelpView():QTextEdit(HelpText)
 	parentWidget()->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	parentWidget()->setFixedSize( 300, 500);
 }
+
+void expressiveView::helpClicked() {
+	expressiveHelpView::getInstance()->show();
+
+}
+
+__attribute__((destructor)) static void module_destroy()
+{
+	expressiveHelpView::finalize();
+}
+
+extern "C" {
+
+// necessary for getting instance out of shared lib
+Plugin * PLUGIN_EXPORT lmms_plugin_main(Model *, void * _data) {
+	return (new Expressive(static_cast<InstrumentTrack *>(_data)));
+}
+
+}
+
+
+
+
