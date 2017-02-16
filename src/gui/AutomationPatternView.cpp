@@ -40,6 +40,7 @@
 #include "Engine.h"
 
 
+
 QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
@@ -81,7 +82,8 @@ void AutomationPatternView::openInAutomationEditor()
 
 void AutomationPatternView::openToBar()
 {
-	if(gui) gui->automationEditor()->openBar(m_pat, 99999);
+
+	if(gui) gui->automationEditor()->openBar(m_pat, m_pat->startPosition());
 }
 
 void AutomationPatternView::update()
@@ -174,7 +176,7 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
 	//Open to specific bar
 	QAction * b = new QAction( embed::getIconPixmap( "automation" ), 
-				tr( "Open to specific bar" ), _cm );
+				tr( "Open to Playhead" ), _cm );
 	_cm->insertAction( _cm->actions()[0], b );
 	connect(b, SIGNAL(triggered()), this, SLOT(openToBar()));
 

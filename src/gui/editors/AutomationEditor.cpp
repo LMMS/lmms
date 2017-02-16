@@ -2562,27 +2562,52 @@ void AutomationEditorWindow::open(AutomationPattern* pattern)
 	show();
 	setFocus();
 }
-void AutomationEditorWindow::openBar(AutomationPattern* pattern, int offset)
+
+void AutomationEditorWindow::openBar(AutomationPattern* pattern, MidiTime position)
 {
-	//doesn't work at all first time automation is opened
-	//m_editor->horScrolled(offset); //resizeEvent( NULL ); //emit currentPatternChanged(); //m_editor->horScrolled(offset);
-	//open(pattern);
-	//m_editor->m_leftRightScroll->setValue( offset );
+	//How many bars we need to scroll. Playhead position - pattern start position
+	int offset = 0;
+	if (position.getTact() < Engine::getSong()->getTacts()) { offset = Engine::getSong()->getTacts() - position.getTact(); }
+
+	//Open the pattern
 	open(pattern);
-	m_editor->m_leftRightScroll->setMinimum( offset );
-	m_editor->m_leftRightScroll->setMinimum( 0 );
-	//m_editor->horScrolled(offset);
-	//m_editor->updatePosition(MidiTime(offset) );
-	//clearCurrentPattern();
-	//open(pattern);
+ 
+	//We need the playmode to be Mode_PlaySong for our scroll, and set it abck to what it was once we're done
+	int songPlayMode = Engine::getSong()->playMode();
+	//TODO find out the best way to expose playmode
+	Engine::getSong()->dontPlaySong();
+
+
+	//playMode()
+
+	//This scrolls to the right part
+	//12 scroll values per 16th note
+	m_editor->m_leftRightScroll->setValue( offset * 12 * 16 );
+
+	
+	//Trying to scroll to the right bit or at least not lose Song Editor position
+
+	//m_editor->updateAfterPatternChange();
 	//resizeEvent( NULL );
-	//emit currentPatternChanged();
 	//update();
 	//m_editor->update();
-	//m_editor->zoomingXChanged();
-	//m_editor->m_timeLine->pos() -= 16;
-	//m_editor->m_timeLine->updatePosition();
-	//m_editor->updateTopBottomLevels();
+	//m_editor->updatePosition(MidiTime( scrollTo ));
+	//m_editor->m_timeLine->updatePosition(MidiTime( scrollTo ));
+	//emit currentPatternChanged();
+
+	//m_editor->m_leftRightScroll->triggerAction(QAbstractSlider::SliderSingleStepSub);
+	//Nothing seems to update the view except user input. It's some sort of black magic.
+	TextFloat::displayMessage("Shift + scroll up then down");;
+
+	//Issues v2. Can open by clicking "open to bar" twice, but playhead resets.
+	//Need to use song editor fuctions to either:
+	//A. Store the scrollback mode for pause, set it to stay, do our play pause, then reset it to what it was
+	//B. Do our thing, lose playhead position, and then put it back where it should be
+
+	//Issues:
+	//Need to play before opening works
+	//View doesn't scroll on its own
+	//Opens to playhead instead of mouse position. Maybe leave this way?
 	
 }
 

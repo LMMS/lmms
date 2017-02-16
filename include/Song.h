@@ -287,8 +287,10 @@ public:
 	}
 
 
+
 public slots:
 	void playSong();
+	void dontPlaySong();
 	void record();
 	void playAndRecord();
 	void playBB();
@@ -310,6 +312,7 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
+
 
 
 private slots:

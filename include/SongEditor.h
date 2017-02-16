@@ -74,6 +74,7 @@ public:
 
 	ComboBoxModel *zoomingModel() const;
 
+
 public slots:
 	void scrolled( int new_pos );
 

@@ -502,6 +502,14 @@ void Song::playSong()
 
 
 
+void Song::dontPlaySong()
+{
+	m_playMode = Mode_PlaySong;
+}
+
+
+
+
 void Song::record()
 {
 	m_recording = true;
