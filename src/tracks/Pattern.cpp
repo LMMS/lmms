@@ -933,13 +933,10 @@ void PatternView::paintEvent( QPaintEvent * )
 			for( NoteVector::Iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 			{
-				if( ( *it )->length() > 0 )
-				{
-					max_key = qMax( max_key, ( *it )->key() );
-					min_key = qMin( min_key, ( *it )->key() );
-					central_key += ( *it )->key();
-					++total_notes;
-				}
+				max_key = qMax( max_key, ( *it )->key() );
+				min_key = qMin( min_key, ( *it )->key() );
+				central_key += ( *it )->key();
+				++total_notes;
 			}
 
 			if( total_notes > 0 )
@@ -974,17 +971,18 @@ void PatternView::paintEvent( QPaintEvent * )
 					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
 
 					// check that note isn't out of bounds, and has a length
-					if( ( *it )->length() > 0 &&
-							y_pos >= TCO_BORDER_WIDTH &&
-							y_pos <= max_ht )
+					if( y_pos >= TCO_BORDER_WIDTH &&
+								y_pos <= max_ht )
 					{
 						// calculate start and end x-coords of the line to be drawn
+						int length = ( *it )->length();
+						length = length > 0 ? length : 4;
 						const int x1 = x_base +
 							static_cast<int>
-							( ( *it )->pos() * ( ppt  / MidiTime::ticksPerTact() ) );
+							( ( *it )->pos() * ( ppt / MidiTime::ticksPerTact() ) );
 						const int x2 = x_base +
 							static_cast<int>
-							( ( ( *it )->pos() + ( *it )->length() ) * ( ppt  / MidiTime::ticksPerTact() ) );
+							( ( ( *it )->pos() + length ) * ( ppt / MidiTime::ticksPerTact() ) );
 
 						// check bounds, draw line
 						if( x1 < width() - TCO_BORDER_WIDTH )
