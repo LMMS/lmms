@@ -505,9 +505,47 @@ void Song::playSong()
 //TODO rename and/or find a better way to expose these, maybe reorder
 void Song::dontPlaySong()
 {
+	//No other mode works
 	m_playMode = Mode_PlaySong;
 }
 
+void Song::badFunctionName(int modeint)
+{
+	//This makes scrolling fail somehow...
+	//m_playMode = static_cast<PlayModes>(modeint); 
+	//Technically haven't tested all values for the switch but... (see comment below)
+	switch( modeint )
+	{
+		case 1:
+			m_playMode = Mode_None;
+			break;
+
+		case 2:
+			m_playMode = Mode_PlaySong;
+			break;
+
+		case 3:
+			m_playMode = Mode_PlayBB;
+			break;
+
+		case 4:
+			m_playMode = Mode_PlayPattern;
+			break;
+
+		case 5:
+			m_playMode = Mode_PlayAutomationPattern;
+			break;
+
+		case 6:
+			m_playMode = Mode_Count;
+			break;
+
+		default:
+			m_playMode = Mode_None;			
+	}
+	//Any play mode set manuall here doesn't matter, so it should be fine
+	//m_playMode = Mode_PlaySong;
+}
 
 
 

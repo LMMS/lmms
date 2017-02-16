@@ -2572,21 +2572,19 @@ void AutomationEditorWindow::openBar(AutomationPattern* pattern, MidiTime positi
 	//Open the pattern
 	open(pattern);
  
-	//We need the playmode to be Mode_PlaySong for our scroll, and set it abck to what it was once we're done
+	//We need the playmode to be Mode_PlaySong for our scroll, 
+	//and (TODO) should set it back to what it was once we're done
 	int songPlayMode = Engine::getSong()->playMode();
 	//TODO find out the best way to expose playmode
 	Engine::getSong()->dontPlaySong();
-
-
-	//playMode()
 
 	//This scrolls to the right part
 	//12 scroll values per 16th note
 	m_editor->m_leftRightScroll->setValue( offset * 12 * 16 );
 
-	
-	//Trying to scroll to the right bit or at least not lose Song Editor position
+	//Engine::getSong()->badFunctionName(songPlayMode);
 
+	//Various attempts at scrolling the viewport without user input
 	//m_editor->updateAfterPatternChange();
 	//resizeEvent( NULL );
 	//update();
@@ -2594,20 +2592,13 @@ void AutomationEditorWindow::openBar(AutomationPattern* pattern, MidiTime positi
 	//m_editor->updatePosition(MidiTime( scrollTo ));
 	//m_editor->m_timeLine->updatePosition(MidiTime( scrollTo ));
 	//emit currentPatternChanged();
-
 	//m_editor->m_leftRightScroll->triggerAction(QAbstractSlider::SliderSingleStepSub);
-	//Nothing seems to update the view except user input. It's some sort of black magic.
-	TextFloat::displayMessage("Shift + scroll up then down");;
-
-	//Issues v2. Can open by clicking "open to bar" twice, but playhead resets.
-	//Need to use song editor fuctions to either:
-	//A. Store the scrollback mode for pause, set it to stay, do our play pause, then reset it to what it was
-	//B. Do our thing, lose playhead position, and then put it back where it should be
+	TextFloat::displayMessage("Shift + scroll up then down");
 
 	//Issues:
-	//Need to play before opening works
+	//"Open to bar" doesn't work on first press. Changing playmodes might be bad, in which case it's back to square one.
 	//View doesn't scroll on its own
-	//Opens to playhead instead of mouse position. Maybe leave this way?
+	//Opens to playhead instead of mouse position. This is fine, imo
 	
 }
 
