@@ -502,6 +502,7 @@ void Song::playSong()
 
 
 
+//TODO rename and/or find a better way to expose these, maybe reorder
 void Song::dontPlaySong()
 {
 	m_playMode = Mode_PlaySong;

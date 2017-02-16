@@ -287,9 +287,9 @@ public:
 	}
 
 
-
 public slots:
 	void playSong();
+	//TODO rename or find better way to expose these. Maybe place elsewhere
 	void dontPlaySong();
 	void record();
 	void playAndRecord();
@@ -312,7 +312,6 @@ public slots:
 	void clearProject();
 
 	void addBBTrack();
-
 
 
 private slots:

@@ -40,7 +40,6 @@
 #include "Engine.h"
 
 
-
 QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
 AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
@@ -82,7 +81,6 @@ void AutomationPatternView::openInAutomationEditor()
 
 void AutomationPatternView::openToBar()
 {
-
 	if(gui) gui->automationEditor()->openBar(m_pat, m_pat->startPosition());
 }
 

@@ -29,7 +29,6 @@
 
 #include "Track.h"
 
-
 class AutomationPattern;
 
 
