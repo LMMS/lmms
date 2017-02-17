@@ -75,6 +75,10 @@ GuiApplication::GuiApplication()
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;
 
+#ifdef LMMS_BUILD_APPLE
+	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, true);
+#endif
+
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
 	splashScreen.show();

@@ -893,6 +893,10 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 		{
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
+#ifdef LMMS_BUILD_APPLE
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 			shownInMenu++;
 			if( shownInMenu >= 15 )
 			{
@@ -1482,6 +1486,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 
 	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
@@ -1499,6 +1507,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 }
 
