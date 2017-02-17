@@ -1,49 +1,49 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="gl" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ar" version="2.1">
 <context>
     <name>AboutDialog</name>
     <message>
         <source>About LMMS</source>
-        <translation>Sobre o LMMS</translation>
+        <translation>حول إل إم إم إس</translation>
     </message>
     <message>
         <source>Version %1 (%2/%3, Qt %4, %5)</source>
-        <translation>Versión %1 (%2/%3, Qt %4, %5)</translation>
+        <translation>إصدار %1 (%2/%3, Qt %4, %5)</translation>
     </message>
     <message>
         <source>About</source>
-        <translation>Sobre</translation>
+        <translation>حول</translation>
     </message>
     <message>
         <source>LMMS - easy music production for everyone</source>
-        <translation>LMMS - produción musical fácil para calquera</translation>
+        <translation>إل إم إم إس - إنتاج موسيقى سهل للجميع</translation>
     </message>
     <message>
         <source>Authors</source>
-        <translation>Autores</translation>
+        <translation>المؤلفون</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation>Tradución</translation>
+        <translation>الترجمة</translation>
     </message>
     <message>
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>Este idioma non está traducido (ou é inglés nativo).
+        <translation>اللغة الحالية غير مترجمة (أو الإنجليزية)
 
-Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións existentes, síntase á vontade axudándonos! Simplemente contacte co mantedor!</translation>
+إذا كنت مهتما بترجمة إل إم إم إس للغة أخرى أو ترغب ترغب بتحسين ترجمة لغة موجودة مسبقا، أنت بك لكي تساعدنا! ببساطة تواصل مع المصين!</translation>
     </message>
     <message>
         <source>License</source>
-        <translation>Licenza</translation>
+        <translation>الرخصة</translation>
     </message>
     <message>
         <source>LMMS</source>
-        <translation>LMMS</translation>
+        <translation>إل إم إم إس</translation>
     </message>
     <message>
         <source>Involved</source>
-        <translation type="unfinished"/>
+        <translation>المشاركون</translation>
     </message>
     <message>
         <source>Contributors ordered by number of commits:</source>
@@ -51,7 +51,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Copyright © %1</source>
-        <translation type="unfinished"/>
+        <translation>حقوق النشر © %1</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -62,23 +62,23 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>AmplifierControlDialog</name>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>صوت</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>مستوى الصوت:</translation>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning:</source>
-        <translation>Panorámica:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LEFT</source>
-        <translation type="unfinished"/>
+        <translation>يسار</translation>
     </message>
     <message>
         <source>Left gain:</source>
@@ -86,7 +86,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>RIGHT</source>
-        <translation type="unfinished"/>
+        <translation>يمين</translation>
     </message>
     <message>
         <source>Right gain:</source>
@@ -97,11 +97,11 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>AmplifierControls</name>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Left gain</source>
@@ -116,46 +116,46 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>AudioAlsaSetupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>CANLES</translation>
+        <translation>قنوات</translation>
     </message>
 </context>
 <context>
     <name>AudioFileProcessorView</name>
     <message>
         <source>Open other sample</source>
-        <translation>Abrir outra mostra</translation>
+        <translation>افتح عينة أخرى</translation>
     </message>
     <message>
         <source>Click here, if you want to open another audio-file. A dialog will appear where you can select your file. Settings like looping-mode, start and end-points, amplify-value, and so on are not reset. So, it may not sound like the original sample.</source>
-        <translation>Prema aquí se desexa abrir outro ficheiro de son. Aparecerá un diálogo no que se pode escoller un ficheiro. As opcións tipo modo de bucle, puntos iniciais e final, valor da amplificación, etc. non se reinician. Polo tanto, pode non soar igual que a mostra orixinal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation>Inverter a mostra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>If you enable this button, the whole sample is reversed. This is useful for cool effects, e.g. a reversed crash.</source>
-        <translation>Ao activar este botón invértese a mostra completa. Isto é útil para efectos gaioleiros, como un crash invertido.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Amplify:</source>
-        <translation>Amplificar:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the amplify ratio. When you set a value of 100% your sample isn&apos;t changed. Otherwise it will be amplified up or down (your actual sample-file isn&apos;t touched!)</source>
-        <translation>Con este botón pódese indicar a relación de amplificación. Cando se indica un valor de 100%, a mostra fica como estaba. Se non, amplifícase para arriba ou para abaixo (o ficheiro mesmo coa mostra non se toca!)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Startpoint:</source>
-        <translation>Punto inicial:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Endpoint:</source>
-        <translation>Punto final:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
@@ -167,7 +167,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Disable loop</source>
-        <translation type="unfinished"/>
+        <translation>عدم تكرار</translation>
     </message>
     <message>
         <source>This button disables looping. The sample plays only once from start to end. </source>
@@ -213,19 +213,19 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>AudioJack</name>
     <message>
         <source>JACK client restarted</source>
-        <translation>Reiniciouse o cliente de JACK</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation>LMMS foi expulsado por JACK por algunha razón. En consecuencia, reiniciouse a infraestrutura de JACK do LMMS. Terá que realizar as conexións manualmente de novo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>JACK server down</source>
-        <translation>O servidor de JACK non está a funcionar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation>Semella que o servidor de JACK foi apagado e non foi posíbel iniciar unha instancia nova. En consecuencia, o LMMS non pode preseguir. Hai que gravar este proxecto e reiniciar o JACK e o LMMS.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>CLIENT-NAME</source>
@@ -233,108 +233,108 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>CANLES</translation>
+        <translation>قنوات</translation>
     </message>
 </context>
 <context>
     <name>AudioOss::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>CANLES</translation>
+        <translation>قنوات</translation>
     </message>
 </context>
 <context>
     <name>AudioPortAudio::setupWidget</name>
     <message>
         <source>BACKEND</source>
-        <translation>INFRAESTRUTURA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
 </context>
 <context>
     <name>AudioPulseAudio::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>CANLES</translation>
+        <translation>قنوات</translation>
     </message>
 </context>
 <context>
     <name>AudioSdl::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
 </context>
 <context>
     <name>AudioSndio::setupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
     <message>
         <source>CHANNELS</source>
-        <translation>CANLES</translation>
+        <translation>قنوات</translation>
     </message>
 </context>
 <context>
     <name>AudioSoundIo::setupWidget</name>
     <message>
         <source>BACKEND</source>
-        <translation>INFRAESTRUTURA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
 </context>
 <context>
     <name>AutomatableModel</name>
     <message>
         <source>&amp;Reset (%1%2)</source>
-        <translation>&amp;Reiniciar (%1%2)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Copy value (%1%2)</source>
-        <translation>&amp;Copiar o valor (%1%2)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Paste value (%1%2)</source>
-        <translation>A&amp;pegar o valor (%1%2)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit song-global automation</source>
-        <translation>Editar a automatización global da canción</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connected to %1</source>
-        <translation>Ligado a %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connected to controller</source>
-        <translation>Ligado ao controlador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit connection...</source>
-        <translation>Editar a conexión...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove connection</source>
-        <translation>Eliminar a conexión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connect to controller...</source>
-        <translation>Ligar a un controlador...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove song-global automation</source>
@@ -349,15 +349,15 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>AutomationEditor</name>
     <message>
         <source>Please open an automation pattern with the context menu of a control!</source>
-        <translation>Abra un padrón de automatización co menú de contexto dun control!</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Values copied</source>
-        <translation>Valores copiados</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>All selected values were copied to the clipboard.</source>
-        <translation>Copiáronse todos os valores escollidos no porta-retallos.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -526,11 +526,11 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Reset name</source>
-        <translation>Restaurar o nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Change name</source>
-        <translation>Mudar o nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1 Connections</source>
@@ -568,7 +568,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Mostrar/Agochar o Editor de ritmos e liña do baixo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
@@ -596,11 +596,11 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Remove steps</source>
-        <translation>Eliminar pasos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Add steps</source>
-        <translation>Engadir pasos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Beat selector</source>
@@ -627,11 +627,11 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Reset name</source>
-        <translation>Restaurar o nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Change name</source>
-        <translation>Mudar o nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Change color</source>
@@ -669,7 +669,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Gain:</source>
-        <translation>Ganancia:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RATIO</source>
@@ -688,7 +688,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ratio</source>
@@ -735,7 +735,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Rate</source>
-        <translation>Taxa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rate Enabled</source>
@@ -782,7 +782,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>CaptionMenu</name>
     <message>
         <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Help (not available)</source>
@@ -793,7 +793,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>CarlaInstrumentView</name>
     <message>
         <source>Show GUI</source>
-        <translation>Mostrar a interface gráfica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
@@ -804,77 +804,77 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>Controller</name>
     <message>
         <source>Controller %1</source>
-        <translation>Controlador %1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ControllerConnectionDialog</name>
     <message>
         <source>Connection Settings</source>
-        <translation>Configuración da conexión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIDI CONTROLLER</source>
-        <translation>CONTROLADOR DE MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Input channel</source>
-        <translation>Canle de entrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>CHANNEL</source>
-        <translation>CANLE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Input controller</source>
-        <translation>Controlador de entrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>CONTROLLER</source>
-        <translation>CONTROLADOR</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Auto Detect</source>
-        <translation>Detectar automaticamente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
-        <translation>Dispositivos MIDI dos que recibir acontecementos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>USER CONTROLLER</source>
-        <translation>CONTROLADOR DO USUARIO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MAPPING FUNCTION</source>
-        <translation>FUNCIÓN DE ASIGNACIÓN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>حسناً</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LMMS</source>
-        <translation>LMMS</translation>
+        <translation>إل إم إم إس</translation>
     </message>
     <message>
         <source>Cycle Detected.</source>
-        <translation>Detectouse un ciclo.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ControllerRackView</name>
     <message>
         <source>Controller Rack</source>
-        <translation>Bastidor de controladores</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Add</source>
-        <translation>Engadir</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Confirm Delete</source>
@@ -889,19 +889,19 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>ControllerView</name>
     <message>
         <source>Controls</source>
-        <translation>Controles</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Controllers are able to automate the value of a knob, slider, and other controls.</source>
-        <translation>Os controladores poden automatizar o valor dun botón xiratorio ou linear e outros controles.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rename controller</source>
-        <translation>Renomear o controlador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enter the new name for this controller</source>
-        <translation>Introduza o novo nome deste controlador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Remove this controller</source>
@@ -913,7 +913,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>LFO</source>
-        <translation>LFO</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1026,7 +1026,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DELAY</source>
@@ -1069,15 +1069,15 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Cutoff frequency</source>
-        <translation>Frecuencia de corte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RESO</source>
-        <translation>RESO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Resonance</source>
-        <translation>Resonancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>GAIN</source>
@@ -1085,7 +1085,7 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIX</source>
@@ -1144,63 +1144,63 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     </message>
     <message>
         <source>LowPass</source>
-        <translation>Pasa-baixas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>HiPass</source>
-        <translation>Pasa-altas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation>Pasa-faixa csg</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation>Pasa-faixa czpg</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Notch</source>
-        <translation>Entalle</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allpass</source>
-        <translation>Pasa-todo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Moog</source>
-        <translation>Moog</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation>2x Pasa-baixas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation>RC pasa-baixa 12dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation>RC pasa-faixa 12dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation>RC pasa-alta 12dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation>RC pasa-baixa 24dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation>RC pasa-faixa 24dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation>RC pasa-alta 24dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation>Filtro de formante vocal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>2x Moog</source>
@@ -1258,56 +1258,56 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>Effect</name>
     <message>
         <source>Effect enabled</source>
-        <translation>Efecto activado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wet/Dry mix</source>
-        <translation>Mestura húmida/seca</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gate</source>
-        <translation>Porta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Decaemento</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EffectChain</name>
     <message>
         <source>Effects enabled</source>
-        <translation>Efectos activados</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EffectRackView</name>
     <message>
         <source>EFFECTS CHAIN</source>
-        <translation>CADEA DE EFECTOS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Add effect</source>
-        <translation>Engadir un efecto</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EffectSelectDialog</name>
     <message>
         <source>Add effect</source>
-        <translation>Engadir un efecto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Type</source>
-        <translation>Tipo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Description</source>
-        <translation>Descrición</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Author</source>
@@ -1318,51 +1318,51 @@ Se lle interesa traducir o LMMS a outro idioma ou desexa mellorar as traducións
     <name>EffectView</name>
     <message>
         <source>Toggles the effect on or off.</source>
-        <translation>Conmuta a activación do efecto.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>On/Off</source>
-        <translation>Activar/Desactivar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>W/D</source>
-        <translation>H/S</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation>Nivel de humidade:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation>O botón Húmido/Seco indica a relación entre o sinal de entrada e o sinal de efecto que forma a saída.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DECAY</source>
-        <translation>DECAE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Time:</source>
-        <translation>Tempo:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
-        <translation>O botón Decaemento controla cantos búferes de silencio han de pasar antes de que o engadido pare de procesar. Valores máis pequenos reducen o esforzo da CPU a risco de recortar a cola nos efectos de demora e reverberación.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>GATE</source>
-        <translation>PORTA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gate:</source>
-        <translation>Porta:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
-        <translation>O botón Porta controla o nivel do sinal que se considere como «silencio» mentres se decide cando parar de procesar os sinais.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Controls</source>
-        <translation>Controles</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Effect plugins function as a chained series of effects where the signal will be processed from top to bottom.
@@ -1378,153 +1378,141 @@ The Gate knob controls the 'given threshold' for the effect's auto shutdown.  Th
 The Controls button opens a dialog for editing the effect's parameters.
 
 Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
-        <translation>Os engadidos de efectos funcionan como unha serie encadeada de efectos na que o sinal se procesa desde arriba para abaixo.
-
-O interruptor Activar/Desactivar permite omitir un engadido dado en calquera momento.
-
-O botón Húmido/Seco controla o balance entre o sinal de entrada eo sinal producido que é a saída resultante do efecto.  A entrada da etapa é a saída da etapa anterior. Polo tanto, o sinal «seco» dos efectos de abaixo na cadea contén todos os efectos previos.
-
-O botón Decaemento controla como se continúa a procesar o sinal despois de relaxar as notas. O efecto para o procesamento dos sinais cando o volume baixa por debaixo dun limiar dado durante un tempo dado. Este botón indica o «tempo dado». Tempos maiores requiren máis CPU, polo que este número debería ser baixo para a maioría dos efectos. Haino que subir para os efectos que producen períodos de silencio longos, como por exemplo as demoras.
-
-O botón Porta controla o «limiar dado» do apagado automático do efecto. O reloxo do «tempo dado» comeza así que o nivel do sinal procesado cae por debaixo do nivel indicado con este botón.
-
-O botón Controles abre un diálogo para editar os parámetros do efecto.
-
-Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar a orden na que se procesan os efectos ou eliminar un efecto de vez.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move &amp;up</source>
-        <translation>S&amp;ubir</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move &amp;down</source>
-        <translation>&amp;Baixar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
-        <translation>Elimina&amp;r este engadido</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EnvelopeAndLfoParameters</name>
     <message>
         <source>Predelay</source>
-        <translation>Tempo de reverberación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Attack</source>
-        <translation>Ataque</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hold</source>
-        <translation>Retención</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Decaemento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sustain</source>
-        <translation>Sustentación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Release</source>
-        <translation>Relaxamento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulation</source>
-        <translation>Modulación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Predelay</source>
-        <translation>Tempo de reverberación do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Attack</source>
-        <translation>Ataque do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO speed</source>
-        <translation>Velocidade do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Modulation</source>
-        <translation>Modulación do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Wave Shape</source>
-        <translation>Forma da onda do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Freq x 100</source>
-        <translation>Freq x 100</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulate Env-Amount</source>
-        <translation>Modular a cantidade de env</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EnvelopeAndLfoView</name>
     <message>
         <source>DEL</source>
-        <translation>TMP REV</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Predelay:</source>
-        <translation>Tempo de reverberación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
-        <translation>Empregue este botón para indicar o tempo de reverberación desta envolvente. Canto maior for este valor maior será o intervalo até que comece a envolvente en si.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ATT</source>
-        <translation>ATAQ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Attack:</source>
-        <translation>Ataque:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
-        <translation>Empregue este botón para indicar o tempo de ataque da envolvente escollida. Canto maior for o valor máis tempo lle levará á envolvente aumentar até o nivel de ataque. Escolla un valor pequeno para instrumentos como os pianos e un valor grande para as cordas.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>HOLD</source>
-        <translation>RETEN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hold:</source>
-        <translation>Retención:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
-        <translation>Empregue este botón para indicar o tempo de retención da envolvente escollida. Canto maior for este valor máis tempo mantén a envolvente o nivel de ataque antes de comezar a diminuír até o nivel de sustentación.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DEC</source>
-        <translation>DEC</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay:</source>
-        <translation>Decaemento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation>Empregue este botón para indicar o tempo de decaemento da envolvente escollida. Canto maior for este valor máis tempo lle levará á envolvente para diminuír desde o nivel de ataque até o nivel de sustentación. Escolla un valor pequenos para instrumentos como o piano.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SUST</source>
-        <translation>SUST</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation>Sustentación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation>Empregue este botón para indicar o nivel de sustentación da envolvente escollida. Canto maior for este valor máis alto é o nivel no que fica a envolvente antes de baixar até cero.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>REL</source>
@@ -1532,99 +1520,99 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
     <message>
         <source>Release:</source>
-        <translation>Relaxamento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation>Empregue este botón para indicar o tempo de relaxamento da envolvente escollida. Canto maior for este valor máis tempo lle leva diminuír desde o nivel de sustentación até cero. Escolla un valor grande para instrumentos como as cordas.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>AMT</source>
-        <translation>CANTIDADE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation>Cantidade de modulación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
-        <translation>Empregue este botón para indicar a cantidade de modulación da envolvente escollida. Canto maior for este valor maior máis se verá influenciado o tamaño correspondente (p.ex. o volume ou a frecuencia de corte) por esta envolvente.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO predelay:</source>
-        <translation>Tempo de reverberación do LFO:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
-        <translation>Empregue este botón para indicar o tempo de reverberación deste LFO. Canto maior for este valor, maior será o intervalo até que o LFO comece a oscilar.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO- attack:</source>
-        <translation>Ataque do LFO:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current LFO. The bigger this value the longer the LFO needs to increase its amplitude to maximum.</source>
-        <translation>Empregue este botón para indicar o tempo de ataque do LFO escollido. Canto maior for este valor máis tempo lle levará ao LFO para aumentar a súa amplitude até o máximo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SPD</source>
-        <translation>SPD</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO speed:</source>
-        <translation>Velocidade do LFO:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
-        <translation>Empregue este botón para indicar a velocidade do LFO escollido. Canto maior for este valor máis rápido oscila o LFO e máis rápido é o efecto.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation>Empregue este botón para indicar a cantidade de modulación do LFO escollido. Canto maior for este valor máis se verá influenciado o tamaño escollido (p.ex. o volume ou a frecuencia de corte) por este LFO.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
-        <translation>Prema aquí para unha onda senoidal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Prema aquí para unha onda triangular.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a saw-wave for current.</source>
-        <translation>Prema aquí para unha onda de dente de serra.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Prema aquí para unha onda cadrada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
-        <translation>Prema aquí para unha onda definida polo usuario. Posteriormente, arrastre un ficheiro de mostra correspondente sobre o gráfico de LFO.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FREQ x 100</source>
-        <translation>FREQ x 100</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here if the frequency of this LFO should be multiplied by 100.</source>
-        <translation>Prema aquí se desexa multiplicar por 100 a frecuencia deste LFO.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>multiply LFO-frequency by 100</source>
-        <translation>multiplicar a frecuencia de LFO por 100</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MODULATE ENV-AMOUNT</source>
-        <translation>MODULAR CANT. ENVO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to make the envelope-amount controlled by this LFO.</source>
-        <translation>Prema aquí para facer que a cantidade de envolvente sexa controlada por este LFO.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>control envelope-amount by this LFO</source>
-        <translation>controlar a cantidade de envolvente con este LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ms/LFO:</source>
@@ -1632,11 +1620,11 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
     <message>
         <source>Hint</source>
-        <translation>Suxestión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Drag a sample from somewhere and drop it in this window.</source>
-        <translation>Arrastre un exemplo doutro sitio e sólteo sobre esta xanela.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for random wave.</source>
@@ -1854,7 +1842,7 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Out Gain</source>
@@ -1904,135 +1892,135 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     <name>ExportProjectDialog</name>
     <message>
         <source>Export project</source>
-        <translation>Exportar o proxecto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output</source>
-        <translation>Saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File format:</source>
-        <translation>Formato de ficheiro:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Samplerate:</source>
-        <translation>Taxa de mostraxe:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>44100 Hz</source>
-        <translation>44100 Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>48000 Hz</source>
-        <translation>48000 Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>88200 Hz</source>
-        <translation>88200 Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>96000 Hz</source>
-        <translation>96000 Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>192000 Hz</source>
-        <translation>192000 Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bitrate:</source>
-        <translation>Taxa de bits:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>64 KBit/s</source>
-        <translation>64 KBit/s</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>128 KBit/s</source>
-        <translation>128 KBit/s</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>160 KBit/s</source>
-        <translation>160 KBit/s</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>192 KBit/s</source>
-        <translation>192 KBit/s</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>256 KBit/s</source>
-        <translation>256 KBit/s</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>320 KBit/s</source>
-        <translation>320 KBit/s</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Depth:</source>
-        <translation>Profundidade:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>16 Bit Integer</source>
-        <translation>Enteiro de 16 bits</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>32 Bit Float</source>
-        <translation>Vírgula flutuante de 32 bits</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Teña en conta que non todos os parámetros de enriba se poden aplicar a todos os formatos de ficheiro.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Quality settings</source>
-        <translation>Configuración da calidade</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Interpolation:</source>
-        <translation>Interpolación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zero Order Hold</source>
-        <translation>Retención de orde cero</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sinc Fastest</source>
-        <translation>Whittaker–Shannon máis rápida</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sinc Medium (recommended)</source>
-        <translation>Whittaker–Shannon media (recomendada)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sinc Best (very slow!)</source>
-        <translation>Whittaker–Shannon mellor (moi lenta!)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Oversampling (use with care!):</source>
-        <translation>Sobresampleado (usar con coidado!):</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>1x (None)</source>
-        <translation>1x (Ningún)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>2x</source>
-        <translation>2x</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>4x</source>
-        <translation>4x</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>8x</source>
-        <translation>8x</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Start</source>
-        <translation>Comezar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Export as loop (remove end silence)</source>
@@ -2044,7 +2032,7 @@ Ao premer co botón dereito aparece un menú de contexto no que se pode cambiar 
     </message>
     <message>
         <source>Could not open file</source>
-        <translation>Non foi posíbel abrir o ficheiro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Export project to %1</source>
@@ -2141,7 +2129,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Noise</source>
-        <translation>Ruído</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invert</source>
@@ -2236,18 +2224,18 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>FxMixer</name>
     <message>
         <source>Master</source>
-        <translation>Global</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX %1</source>
-        <translation>Efecto %1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>FxMixerView</name>
     <message>
         <source>FX-Mixer</source>
-        <translation>Mesturador de efectos especiais</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX Fader %1</source>
@@ -2281,15 +2269,15 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>GigInstrument</name>
     <message>
         <source>Bank</source>
-        <translation>Banco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Patch</source>
-        <translation>Parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2304,7 +2292,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Choose the patch</source>
-        <translation>Escoller o parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to change which patch of the GIG file to use</source>
@@ -2324,7 +2312,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Factor to multiply samples by</source>
@@ -2438,7 +2426,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Sync</source>
-        <translation>Sincronizar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Down and up</source>
@@ -2469,7 +2457,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>RANGE</source>
-        <translation>INTERVALO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Arpeggio range:</source>
@@ -2477,7 +2465,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>octave(s)</source>
-        <translation>oitava(s)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
@@ -2501,7 +2489,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>GATE</source>
-        <translation>PORTA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Arpeggio gate:</source>
@@ -2572,175 +2560,175 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentFunctionNoteStacking</name>
     <message>
         <source>octave</source>
-        <translation>oitava</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Major</source>
-        <translation>Maior</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Majb5</source>
-        <translation>Majb5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>minor</source>
-        <translation>menor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>minb5</source>
-        <translation>minb5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>sus2</source>
-        <translation>sus2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>sus4</source>
-        <translation>sus4</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>aug</source>
-        <translation>aum</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>augsus4</source>
-        <translation>augsus4</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>tri</source>
-        <translation>tri</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>6</source>
-        <translation>6</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>6sus4</source>
-        <translation>6sus4</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>6add9</source>
-        <translation>6add9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m6</source>
-        <translation>m6</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m6add9</source>
-        <translation>m6add9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7</source>
-        <translation>7</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7sus4</source>
-        <translation>7sus4</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7#5</source>
-        <translation>7#5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7b5</source>
-        <translation>7b5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7#9</source>
-        <translation>7#9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7b9</source>
-        <translation>7b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7#5#9</source>
-        <translation>7#5#9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7#5b9</source>
-        <translation>7#5b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7b5b9</source>
-        <translation>7b5b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7add11</source>
-        <translation>7add11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7add13</source>
-        <translation>7add13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>7#11</source>
-        <translation>7#11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj7</source>
-        <translation>Maj7</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj7b5</source>
-        <translation>Maj7b5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj7#5</source>
-        <translation>Maj7#5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj7#11</source>
-        <translation>Maj7#11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj7add13</source>
-        <translation>Maj7add13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m7</source>
-        <translation>m7</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m7b5</source>
-        <translation>m7b5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m7b9</source>
-        <translation>m7b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m7add11</source>
-        <translation>m7add11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m7add13</source>
-        <translation>m7add13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m-Maj7</source>
-        <translation>m-Maj7</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m-Maj7add11</source>
-        <translation>m-Maj7add11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m-Maj7add13</source>
-        <translation>m-Maj7add13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>9</source>
-        <translation>9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>9sus4</source>
-        <translation>9sus4</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>add9</source>
-        <translation>add9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>9#5</source>
@@ -2748,7 +2736,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>9b5</source>
-        <translation>9b5</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>9#11</source>
@@ -2756,7 +2744,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>9b13</source>
-        <translation>9b13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj9</source>
@@ -2776,7 +2764,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>m9</source>
-        <translation>m9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>madd9</source>
@@ -2796,7 +2784,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>11b9</source>
-        <translation>11b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj11</source>
@@ -2804,7 +2792,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>m11</source>
-        <translation>m11</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m-Maj11</source>
@@ -2820,11 +2808,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>13b9</source>
-        <translation>13b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>13b5b9</source>
-        <translation>13b5b9</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maj13</source>
@@ -2832,7 +2820,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>m13</source>
-        <translation>m13</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>m-Maj13</source>
@@ -2840,27 +2828,27 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Harmonic minor</source>
-        <translation>Harmónico menor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Melodic minor</source>
-        <translation>Melódico menor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Whole tone</source>
-        <translation>Un ton</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Diminished</source>
-        <translation>Diminuído</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Major pentatonic</source>
-        <translation>Pentatónico maior</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Minor pentatonic</source>
-        <translation>Pentatónico menor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Jap in sen</source>
@@ -2868,71 +2856,71 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Major bebop</source>
-        <translation>Maior de bebop</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Dominant bebop</source>
-        <translation>Dominante de bebop</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Blues</source>
-        <translation>Blues</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Arabic</source>
-        <translation>Árabe</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enigmatic</source>
-        <translation>Enigmático</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Neopolitan</source>
-        <translation>Napolitano</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Neopolitan minor</source>
-        <translation>Napolitano menor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hungarian minor</source>
-        <translation>Húngaro menor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Dorian</source>
-        <translation>Dorio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Phrygolydian</source>
-        <translation>Frixio-lidio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Lydian</source>
-        <translation>Lidio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Mixolydian</source>
-        <translation>Mixolidio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Aeolian</source>
-        <translation>Eolio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Locrian</source>
-        <translation>Locrio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chords</source>
-        <translation>Acordes</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chord type</source>
-        <translation>Tipo de acorde</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chord range</source>
-        <translation>Intervalo do acorde</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Minor</source>
@@ -2963,19 +2951,19 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentFunctionNoteStackingView</name>
     <message>
         <source>RANGE</source>
-        <translation>INTERVALO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chord range:</source>
-        <translation>Intervalo do acorde:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>octave(s)</source>
-        <translation>oitava(s)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
-        <translation>Empregue este botón para indicar a tesitura do acorde en oitavas. O acorde escollido tocarase dentro do número indicado de oitavas.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>STACKING</source>
@@ -2990,31 +2978,31 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentMidiIOView</name>
     <message>
         <source>ENABLE MIDI INPUT</source>
-        <translation>ACTIVAR A ENTRADA DE MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>CHANNEL</source>
-        <translation>CANLE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>VELOCITY</source>
-        <translation>VELOCIDADE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ENABLE MIDI OUTPUT</source>
-        <translation>ACTIVAR A SAÍDA DE MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PROGRAM</source>
-        <translation>PROGRAMA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIDI devices to receive MIDI events from</source>
-        <translation>Dispositivos MIDI dos que recibir acontecementos MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIDI devices to send MIDI events to</source>
-        <translation>Dispositivos MIDI aos que enviar acontecementos MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>NOTE</source>
@@ -3048,99 +3036,99 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentSoundShaping</name>
     <message>
         <source>VOLUME</source>
-        <translation>VOLUME</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>CUTOFF</source>
-        <translation>FREC. CORTE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Cutoff frequency</source>
-        <translation>Frecuencia de corte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RESO</source>
-        <translation>RESO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Resonance</source>
-        <translation>Resonancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Envelopes/LFOs</source>
-        <translation>Envolventes/LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Filter type</source>
-        <translation>Tipo de filtro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Q/Resonance</source>
-        <translation>Q/Resonancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LowPass</source>
-        <translation>Pasa-baixas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>HiPass</source>
-        <translation>Pasa-altas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation>Pasa-faixa csg</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation>Pasa-faixa czpg</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Notch</source>
-        <translation>Entalle</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allpass</source>
-        <translation>Pasa-todo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Moog</source>
-        <translation>Moog</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation>2x Pasa-baixas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation>RC pasa-baixa 12dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation>RC pasa-faixa 12dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation>RC pasa-alta 12dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation>RC pasa-baixa 24dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation>RC pasa-faixa 24dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation>RC pasa-alta 24dB</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation>Filtro de formante vocal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>2x Moog</source>
@@ -3175,39 +3163,39 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentSoundShapingView</name>
     <message>
         <source>TARGET</source>
-        <translation>DESTINO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation>Estas lapelas conteñen envolventes. Son moi importantes para modificar un son dado que son case sempre necesarias para as sínteses subtractivas. Por exemplo, se se ten unha envolvente de volume pódese indicar cando se desexa que o son teña un volume determinado. Se se desexan crear cordas brandas o son ten que entrar e saír moi suavemente. Isto pódese facer indicando tempos de ataque e relaxamento longos. É o mesmo para outros destinos de envolvente, como panning, frecuencia de corte do filtro empregado e así por diante. Fedelle! Seguro que pode crear sons interesantes a partir dunha onde de dente de serra con unhas imples envolventes...!</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FILTER</source>
-        <translation>FILTRO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Here you can select the built-in filter you want to use for this instrument-track. Filters are very important for changing the characteristics of a sound.</source>
-        <translation>Aquí pódese escoller o filtro incorporado que se desexe empregar para esta pista de instrumento. Os filtros son moi importantes para cambiar as características dun son.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hz</source>
-        <translation>Hz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
-        <translation>Empregue este botón para indicar a frecuencia de corte do filtro escollido. A frecuencia de corte indica a frecuencia á que un filtro corta o sinal. Por exemplo, un filtro pasa-baixas corta todas as frecuencias que ultrapasen a frecuencia de corte. Un filtro pasa-altas corta todas as frecuencias por debaixo da frecuencia de corte, e así por diante...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>RESO</source>
-        <translation>RESO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Resonance:</source>
-        <translation>Resonancia:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
-        <translation>Empregue este botón para indicar a Q/Resonancia do filtro escollido. A Q/Resonancia indícalle ao filtro canto se desexa amplificar as frecuencias próximas á de corte.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FREQ</source>
@@ -3226,27 +3214,27 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentTrack</name>
     <message>
         <source>unnamed_track</source>
-        <translation>pista_sen_nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pitch</source>
-        <translation>Altura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX channel</source>
-        <translation>Canle de efectos especiais</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Default preset</source>
-        <translation>Predefinido</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the volume of the opened channel.</source>
@@ -3254,7 +3242,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Base note</source>
-        <translation>Nota base</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pitch range</source>
@@ -3269,39 +3257,39 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentTrackView</name>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>مستوى الصوت:</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>صوت</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning:</source>
-        <translation>Panorámica:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Input</source>
-        <translation>Entrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output</source>
-        <translation>Saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX %1: %2</source>
@@ -3312,79 +3300,79 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>InstrumentTrackWindow</name>
     <message>
         <source>GENERAL SETTINGS</source>
-        <translation>CONFIGURACIÓN XERAL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Instrument volume</source>
-        <translation>Volume do instrumento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>مستوى الصوت:</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>صوت</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning:</source>
-        <translation>Panorámica:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pitch</source>
-        <translation>Altura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pitch:</source>
-        <translation>Altura:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>cents</source>
-        <translation>cents</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PITCH</source>
-        <translation>ALTURA</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX channel</source>
-        <translation>Canlde de FX</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ENV/LFO</source>
-        <translation>ENV/LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FUNC</source>
-        <translation>FUNC</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX</source>
-        <translation>FX</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MIDI</source>
-        <translation>MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save preset</source>
-        <translation>Gardar as predefinicións</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>XML preset file (*.xpf)</source>
-        <translation>Ficheiro de predefinicións en XML (*.xpf)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PLUGIN</source>
-        <translation>ENGADIDO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pitch range (semitones)</source>
@@ -3392,7 +3380,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>RANGE</source>
-        <translation>INTERVALO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save current instrument track settings in a preset file</source>
@@ -3438,40 +3426,40 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>LadspaControl</name>
     <message>
         <source>Link channels</source>
-        <translation>Ligar canles</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LadspaControlDialog</name>
     <message>
         <source>Link Channels</source>
-        <translation>Ligar canles</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel </source>
-        <translation>Canle </translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LadspaControlView</name>
     <message>
         <source>Link channels</source>
-        <translation>Ligar canles</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Value:</source>
-        <translation>Valor:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sorry, no help available.</source>
-        <translation>Desculpe, non hai axuda dispoñíbel.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LadspaEffect</name>
     <message>
         <source>Unknown LADSPA plugin %1 requested.</source>
-        <translation>Solicitouse un engadido de LADSPA, %1, que é descoñecido.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3504,114 +3492,114 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>LfoController</name>
     <message>
         <source>LFO Controller</source>
-        <translation>Controlador de LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Base value</source>
-        <translation>Valor base</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Oscillator speed</source>
-        <translation>Velocidade do oscilador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Oscillator amount</source>
-        <translation>Cantidade de oscilador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Oscillator phase</source>
-        <translation>Fase do oscilador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Oscillator waveform</source>
-        <translation>Forma de onda do oscilador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Frequency Multiplier</source>
-        <translation>Multiplicador de frecuencia</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>LfoControllerDialog</name>
     <message>
         <source>LFO</source>
-        <translation>LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Controller</source>
-        <translation>Controlador de LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>BASE</source>
-        <translation>BASE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Base amount:</source>
-        <translation>Cantidade base:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>todo</source>
-        <translation>por facer</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SPD</source>
-        <translation>SPD</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO-speed:</source>
-        <translation>Velocidade de SPD:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting speed of the LFO. The bigger this value the faster the LFO oscillates and the faster the effect.</source>
-        <translation>Empregue este botón para indicar a velocidade do oscilador de frecuencia baixa (LFO). Canto maior sexa este valor, máis rápido oscila o LFO e máis rápido resulta o efecto.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation>Cantidade de modulación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
-        <translation>Empregue este botón para indicar a cantidade de modulación do LFO. Canto maior for este valor, máis se verá influenciado o control conectado (p.ex. volume ou frecuencia de corte) polo LFO.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PHS</source>
-        <translation>FASE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Phase offset:</source>
-        <translation>Desprazamento da fase:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>degrees</source>
-        <translation>graos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the phase offset of the LFO. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation>Con este botón pódese indicar o desprazamento da fase do oscilador de frecuencia baixa (LFO). Iso significa que se pode mover o punto dunha oscilación no que o oscilador comeza a oscilar. Se, por exemplo, se ten unha onda senoidal e un desprazamento de fase de 180 graos, a onda baixo primeiro. Cunha onda cadrada é o mesmo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
-        <translation>Prema aquí para unha onda senoidal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Prema aquí para unha onda triangular.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation>Prema aquí para unha onda de dente de serra.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Prema aquí para unha onda cadrada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Prema aquí para unha onda exponencial.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for white-noise.</source>
-        <translation>Prema aquí para ruído branco.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a user-defined shape.
@@ -3650,170 +3638,169 @@ Double click to pick a file.</source>
     <name>MainWindow</name>
     <message>
         <source>Could not save config-file</source>
-        <translation>Non foi posíbel gravar o ficheiro de configuración</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Could not save configuration file %1. You're probably not permitted to write to this file.
 Please make sure you have write-access to the file and try again.</source>
-        <translation>Non foi posíbel gravar o ficheiro de configuración %1. Probabelmente non se lle permita escribir neste ficheiro. Asegúrese de dispor de acceso para escribir neste ficheiro e ténteo de novo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>&amp;Novo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Open...</source>
-        <translation>&amp;Abrir...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Save</source>
-        <translation>&amp;Gardar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save &amp;As...</source>
-        <translation>Gr&amp;avar como...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Import...</source>
-        <translation>Importar...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>E&amp;xport...</source>
-        <translation>E&amp;xportar...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Quit</source>
-        <translation>&amp;Saír</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation>&amp;Editar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Settings</source>
-        <translation>Configuración</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Tools</source>
-        <translation>Ferramen&amp;tas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>&amp;Axuda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Help</source>
-        <translation>Axuda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>What&apos;s this?</source>
-        <translation>Que é isto?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>About</source>
-        <translation>Sobre</translation>
+        <translation>حول</translation>
     </message>
     <message>
         <source>Create new project</source>
-        <translation>Crear un proxecto novo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Create new project from template</source>
-        <translation>Crear un proxecto novo a partir dun modelo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open existing project</source>
-        <translation>Abrir un projecto existente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Recently opened projects</source>
-        <translation>Proxecto aberto recentemente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save current project</source>
-        <translation>Gravar este proxecto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Export current project</source>
-        <translation>Exportar este proxecto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Song Editor</source>
-        <translation>Mostrar/Agochar o editor de cancións</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
-        <translation>Premendo este botón pódese mostrar ou agochar o Editor de Cancións. Coa axuda do Editor de Cancións pódese editar listas de reprodución e indicar cando tocar unha pista. Tamén se poden inserir e mover mostras (p.ex. mostras de rap) directamente na lista de reprodución.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Mostrar/Agochar o Editor de ritmos e liña do baixo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation>Premendo este botón pódese mostrar ou agochar o Editor de ritmos e liña do baixo. Este Editor de ritmos e liña do baixo é necesario para crear ritmos e para abrir, engadir e eliminar canles, así como para recortar, copiar e pegar ritmos e padróns de liñas do baixo e para outras cousas semellantes.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Piano Roll</source>
-        <translation>Mostrar/Agochar a pianola</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melodies in an easy way.</source>
-        <translation>Prema aquí para mostrar ou agochar a pianola. Coa axuda da pianola pódense editar melodías facilmente.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Automation Editor</source>
-        <translation>Mostrar/Agochar o Editor de automatización</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
-        <translation>Prema aquí para mostrar ou agochar o Editor de automatización. Coa axuda do Editor de automatización pódense editar os valores dinámicos facilmente.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>FX Mixer</source>
-        <translation>Mostrar/Agochar os Mesturador de efectos especiais</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Prema aquí para mostrar ou agochar o Mesturador de efectos especiais. O Mesturador de efectos especiais é unha ferramenta potente para xestionar os efectos das cancións. Pódense inserir efectos nas diferentes canles de efectos.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Project Notes</source>
-        <translation>Mostrar/Agochar as notas do proxecto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation>Prema aquí para mostrar ou agochar a xanela coas notas do proxecto. Nela pódense apuntar as notas do proxecto.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Controller Rack</source>
-        <translation>Mostrar/Agochar o bastidor de controladores</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Untitled</source>
-        <translation>Sen título</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LMMS %1</source>
-        <translation>LMMS %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Project not saved</source>
-        <translation>Proxecto non gardado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The current project was modified since last saving. Do you want to save it now?</source>
-        <translation>Este proxecto foi modificado desde que se gardou a última vez. Desexa gardalo agora?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Help not available</source>
-        <translation>Non hai axuda dispoñíbel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Currently there's no help available in LMMS.
 Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
-        <translation>De momento non hai axuda dispoñíbel no LMMS.
-Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LMMS (*.mmp *.mmpz)</source>
@@ -4040,52 +4027,52 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     <name>MeterDialog</name>
     <message>
         <source>Meter Numerator</source>
-        <translation>Numerador do compás</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Meter Denominator</source>
-        <translation>Denominador do compás</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>TIME SIG</source>
-        <translation>COMPÁS</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>MeterModel</name>
     <message>
         <source>Numerator</source>
-        <translation>Numerador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Denominator</source>
-        <translation>Denominador</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>MidiController</name>
     <message>
         <source>MIDI Controller</source>
-        <translation>Controlador de MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>unnamed_midi_controller</source>
-        <translation>controlador_de_midi_sen_nome</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>MidiImport</name>
     <message>
         <source>Setup incomplete</source>
-        <translation>A configuración está incompleta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
-        <translation>Non se indicou unha fonte de son por omisión no diálogo de configuración (Editar-&gt;Configuración). En consecuencia, non se ha de reproducir ningún son unha vez importado este ficheiro de MIDI. Debería descargar unha fonte de son de General MIDI, indicala no diálogo de configuración e tentar de novo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You did not compile LMMS with support for SoundFont2 player, which is used to add default sound to imported MIDI files. Therefore no sound will be played back after importing this MIDI file.</source>
-        <translation>O LMMS non foi compilado para que admitise un reprodutor de SoundFont2, que se utiliza para engadir un son por omisión aos ficheiros de MIDI. En consecuencia, non se ha de reproducir ningún son unha vez importado este ficheiro de MIDI.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Track</source>
@@ -4097,7 +4084,7 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     <message>
         <source>JACK server down</source>
         <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
-        <translation>O servidor de JACK non está a funcionar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The JACK server seems to be shuted down.</source>
@@ -4109,39 +4096,39 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     <name>MidiPort</name>
     <message>
         <source>Input channel</source>
-        <translation>Canle de entrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output channel</source>
-        <translation>Canle de saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Input controller</source>
-        <translation>Controlador de entrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output controller</source>
-        <translation>Controlador de saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Fixed input velocity</source>
-        <translation>Velocidade de entrada fixa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Fixed output velocity</source>
-        <translation>Velocidade de saída fixa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output MIDI program</source>
-        <translation>Programa MIDI de saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Receive MIDI-events</source>
-        <translation>Recibir acontecementos de MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Send MIDI-events</source>
-        <translation>Enviar acontecementos de MIDI</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Fixed output note</source>
@@ -4156,7 +4143,7 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     <name>MidiSetupWidget</name>
     <message>
         <source>DEVICE</source>
-        <translation>DISPOSITIVO</translation>
+        <translation>جهاز</translation>
     </message>
 </context>
 <context>
@@ -4543,7 +4530,7 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Onda senoidal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bandlimited Triangle wave</source>
@@ -4603,11 +4590,11 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Onda triangular</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Onda de dente de serra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ramp wave</source>
@@ -4615,7 +4602,7 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Onda cadrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Moog saw wave</source>
@@ -4806,11 +4793,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Coarse detune</source>
@@ -4874,11 +4861,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Attack</source>
-        <translation>Ataque</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rate</source>
-        <translation>Taxa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Phase</source>
@@ -4890,19 +4877,19 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Hold</source>
-        <translation>Retención</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Decaemento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sustain</source>
-        <translation>Sustentación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Release</source>
-        <translation>Relaxamento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Slope</source>
@@ -4910,7 +4897,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Modulation amount</source>
-        <translation>Cantidade de modulación</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5028,14 +5015,14 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Vibrato</source>
-        <translation>Vibrato</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>NesInstrumentView</name>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Coarse detune</source>
@@ -5143,50 +5130,50 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Vibrato</source>
-        <translation>Vibrato</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>OscillatorObject</name>
     <message>
         <source>Osc %1 volume</source>
-        <translation>Volume do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 panning</source>
-        <translation>Panorámica do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
-        <translation>Desafinación bruta do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 fine detuning left</source>
-        <translation>Desafinación fina esquerda do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 fine detuning right</source>
-        <translation>Desafinación fina dereita do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 phase-offset</source>
-        <translation>Desprazamento da fase do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 stereo phase-detuning</source>
-        <translation>Desafinación de fase en estéreo do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 wave shape</source>
-        <translation>Forma da onda do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulation type %1</source>
-        <translation>Tipo de modulación %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 waveform</source>
-        <translation>Forma de onda do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 harmonic</source>
@@ -5205,7 +5192,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Bank</source>
-        <translation>Banco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Program selector</source>
@@ -5213,93 +5200,93 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Patch</source>
-        <translation>Parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>حسناً</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>PatmanView</name>
     <message>
         <source>Open other patch</source>
-        <translation>Abrir outro parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to open another patch-file. Loop and Tune settings are not reset.</source>
-        <translation>Prema aquí para abrir outro ficheiro de parche. A configuración dos bucles e a afinación non se restauran.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Loop</source>
-        <translation>Bucle</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Loop mode</source>
-        <translation>Modo de bucle</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Here you can toggle the Loop mode. If enabled, PatMan will use the loop information available in the file.</source>
-        <translation>Aquí pódese alternar entre modos de bucle. Cando está activado, o PatMan emprega a información sobre o bucle dispoñíbel no ficheiro.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tune</source>
-        <translation>Afinación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tune mode</source>
-        <translation>Modo de afinación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Here you can toggle the Tune mode. If enabled, PatMan will tune the sample to match the note&apos;s frequency.</source>
-        <translation>Aquí pódese alternar entre modos de afinación. Cando está activado o Patman afina a mostra para que coincida coa frecuencia da nota.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No file selected</source>
-        <translation>Non escolleu ningún ficheiro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open patch file</source>
-        <translation>Abrir un ficheiro de parches</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Patch-Files (*.pat)</source>
-        <translation>Ficheiros de parches (*.pat)</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>PatternView</name>
     <message>
         <source>Open in piano-roll</source>
-        <translation>Abrir na pianola</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Clear all notes</source>
-        <translation>Limpar todas as notas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reset name</source>
-        <translation>Restaurar o nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Change name</source>
-        <translation>Mudar o nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Add steps</source>
-        <translation>Engadir pasos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Remove steps</source>
-        <translation>Eliminar pasos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>use mouse wheel to set velocity of a step</source>
@@ -5318,7 +5305,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PeakController</name>
     <message>
         <source>Peak Controller</source>
-        <translation>Controlador de picos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Peak Controller Bug</source>
@@ -5333,34 +5320,34 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PeakControllerDialog</name>
     <message>
         <source>PEAK</source>
-        <translation>PICO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Controller</source>
-        <translation>Controlador do LFO</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>PeakControllerEffectControlDialog</name>
     <message>
         <source>BASE</source>
-        <translation>BASE</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Base amount:</source>
-        <translation>Cantidade base:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulation amount:</source>
-        <translation>Cantidade de modulación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Attack:</source>
-        <translation>Ataque:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Release:</source>
-        <translation>Relaxamento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>AMNT</source>
@@ -5395,23 +5382,23 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PeakControllerEffectControls</name>
     <message>
         <source>Base value</source>
-        <translation>Valor base</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulation amount</source>
-        <translation>Cantidade de modulación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Mute output</source>
-        <translation>Silenciar a saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Attack</source>
-        <translation>Ataque</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Release</source>
-        <translation>Relaxamento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Abs Value</source>
@@ -5430,23 +5417,23 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PianoRoll</name>
     <message>
         <source>Please open a pattern by double-clicking on it!</source>
-        <translation>Abra un padrón facendo duplo clic nel!</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Last note</source>
-        <translation>Última nota</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Note lock</source>
-        <translation>Bloqueo de notas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Note Velocity</source>
-        <translation>Volume das notas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Note Panning</source>
-        <translation>Panormámica das notas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Mark/unmark current semitone</source>
@@ -5644,28 +5631,27 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PianoView</name>
     <message>
         <source>Base note</source>
-        <translation>Nota base</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>Plugin</name>
     <message>
         <source>Plugin not found</source>
-        <translation>Non se atopou o engadido</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The plugin &quot;%1&quot; wasn't found or could not be loaded!
 Reason: &quot;%2&quot;</source>
-        <translation>Non se atopou o engadido «%1» ou non foi posíbel cargalo!
-Razón: «%2»</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error while loading plugin</source>
-        <translation>Produciuse un erro ao cargar o engadido</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to load plugin &quot;%1&quot;!</source>
-        <translation>Fallou a carga do engadido «%1»!</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5817,58 +5803,58 @@ Razón: «%2»</translation>
     <name>ProjectRenderer</name>
     <message>
         <source>WAV-File (*.wav)</source>
-        <translation>Ficheiro wav (*.wav)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
-        <translation>Ficheiro OGG comprimido (*.ogg)</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>QWidget</name>
     <message>
         <source>Name: </source>
-        <translation>Nome: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maker: </source>
-        <translation>Creador: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Copyright: </source>
-        <translation>Copyright: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Requires Real Time: </source>
-        <translation>Require tempo real: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Si</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No</source>
-        <translation>Non</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Real Time Capable: </source>
-        <translation>Capacidade de tempo real: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation>En sitio rachado: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channels In: </source>
-        <translation>Canles de entrada: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channels Out: </source>
-        <translation>Canles de saída: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File: </source>
-        <translation>Ficheiro: </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File: %1</source>
@@ -5964,11 +5950,11 @@ Razón: «%2»</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5983,19 +5969,19 @@ Razón: «%2»</translation>
     </message>
     <message>
         <source>VOL</source>
-        <translation>VOL</translation>
+        <translation>صوت</translation>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning:</source>
-        <translation>Panorámica:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>PAN</source>
-        <translation>PAN</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6130,11 +6116,11 @@ Razón: «%2»</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>حسناً</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Restart LMMS</source>
@@ -6342,24 +6328,24 @@ Remember to also save your project manually. You can choose to disable saving wh
     <name>SongEditor</name>
     <message>
         <source>Could not open file</source>
-        <translation>Non foi posíbel abrir o ficheiro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Could not write file</source>
-        <translation>Non foi posíbel escribir no ficheiro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Could not open file %1. You probably have no permissions to read this file.
  Please make sure to have at least read permissions to the file and try again.</source>
-        <translation>Non foi posíbel abrir o ficheiro %1. Probabelmente vostede non teña permiso para ler este ficheiro. Asegúrese de ter cando menos permiso para ler o ficheiro e ténteo de novo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error in file</source>
-        <translation>Hai un erro no ficheiro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The file %1 seems to contain errors and therefore can&apos;t be loaded.</source>
-        <translation>Parece que o ficheiro %1 contén erros e por iso non se pode cargar.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tempo</source>
@@ -6545,75 +6531,75 @@ Remember to also save your project manually. You can choose to disable saving wh
     <name>TempoSyncKnob</name>
     <message>
         <source>Tempo Sync</source>
-        <translation>Sincronización do tempo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No Sync</source>
-        <translation>Non sincronizar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Eight beats</source>
-        <translation>Oito tempos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Whole note</source>
-        <translation>Redonda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Half note</source>
-        <translation>Branca</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Quarter note</source>
-        <translation>Negra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>8th note</source>
-        <translation>Corchea</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>16th note</source>
-        <translation>Semicorchea</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>32nd note</source>
-        <translation>Fusa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Custom...</source>
-        <translation>Personalizada...</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Custom </source>
-        <translation>Personalizada </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to Eight Beats</source>
-        <translation>Sincronizado a oito tempos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to Whole Note</source>
-        <translation>Sincronizado á redonda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to Half Note</source>
-        <translation>Sincronizado á branca</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to Quarter Note</source>
-        <translation>Sincronizado á negra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to 8th Note</source>
-        <translation>Sincronizado á corchea</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to 16th Note</source>
-        <translation>Sincronizado á semicorchea</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synced to 32nd Note</source>
-        <translation>Sincronizado á fusa</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6671,7 +6657,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Hint</source>
-        <translation>Suxestión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
@@ -6719,7 +6705,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please wait...</source>
@@ -6745,7 +6731,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Hint</source>
-        <translation>Suxestión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Press &lt;%1&gt; and drag to make a copy.</source>
@@ -6839,143 +6825,143 @@ Please make sure you have read-permission to the file and the directory containi
     <name>TripleOscillatorView</name>
     <message>
         <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation>Empregar a modulación de fase para modular o oscilador 2 co oscilador 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation>Empregar a modulación de amplitude para modular o oscilador 2 co oscilador 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Mix output of oscillator 1 &amp; 2</source>
-        <translation>Misturar a saída dos osciladores 1 e 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synchronize oscillator 1 with oscillator 2</source>
-        <translation>Sincronizar o oscilador 1 co oscilador 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation>Empregar a modulación de frecuencia para modular o oscilador 2 co oscilador 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation>Empregar a modulación de fase para modular o oscilador 3 co oscilador 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation>Empregar a modulación de amplitude para modular o oscilador 3 co oscilador 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Mix output of oscillator 2 &amp; 3</source>
-        <translation>Misturar a saída dos osciladores 2 e 3</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
-        <translation>Sincronizar o oscilador 2 co oscilador 3</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation>Empregar a modulación de frecuencia para modular o oscilador 3 co oscilador 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 volume:</source>
-        <translation>Volume do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the volume of oscillator %1. When setting a value of 0 the oscillator is turned off. Otherwise you can hear the oscillator as loud as you set it here.</source>
-        <translation>Con este botón pódese indicar o volume do oscilador %1. Ao indicar un valor de 0 o oscilador apágase. Caso contrario pódese ouvir o oscilador tan alto como se indique aquí.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 panning:</source>
-        <translation>Panorámica do oscilador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the panning of the oscillator %1. A value of -100 means 100% left and a value of 100 moves oscillator-output right.</source>
-        <translation>Con este botón pódese indicar o panorama («panning») do oscilador %1. Un valor de -100 significa 100% esquerda e un valor de 100 move a saída do oscilador para a dereita.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 coarse detuning:</source>
-        <translation>Desafinación bruta do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>semitones</source>
-        <translation>semitóns</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
-        <translation>Con este botón pódese definir a desafinación bruta do oscilador %1. Pódese desafinar o oscilador 24 semitóns (2 oitavas) para arriba e para abaixo. Isto é útil para crear sons cun acorde.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
-        <translation>Desafinación fina esquerda do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>cents</source>
-        <translation>cents</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the left channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation>Con este botón pódese indicar a desafinación fina do oscilador %1 pola canle esquerda. A desafinación fina ten como intervalo -100 cents e +100 cents. Isto é útil para crear sons «gordos».</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 fine detuning right:</source>
-        <translation>Desafinación fina dereita do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the right channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation>Con este botón pódese indicar a desafinación fina do oscilador %1 pola canle dereita. A desafinación fina ten como intervalo -100 cents e +100 cents. Isto é útil para crear sons «gordos».</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 phase-offset:</source>
-        <translation>Desprazamento da fase do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>degrees</source>
-        <translation>graos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the phase-offset of oscillator %1. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation>Con este botón pódese indicar o desprazamento de fase do oscilador %1. Iso significa que se pode mover o punto dunha oscilación no que o oscilador comeza a oscilar. Por exemplo, se se ten unha onda senoidal e un desprazamento de fase de 180 graos, a onda vai primeiro para abaixo. O mesmo acontece cunha onda cadrada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 stereo phase-detuning:</source>
-        <translation>Desafinación de fase en estéreo do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo sounds.</source>
-        <translation>Conte este botón pódese indicar a desafinación de fase en estéreo do oscilador %1. A desafinación de fase en estéreo indica o tamaño da diferenza entre o desprazamento de fase das canles esquerda e dereita. Isto é moi bon para crear sons con estéreo amplo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
-        <translation>Empregar unha onda senoidal para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a triangle-wave for current oscillator.</source>
-        <translation>Empregar unha onda triangular para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
-        <translation>Empregar unha onda de dente de serra para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Empregar unha onda cadrada para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a moog-like saw-wave for current oscillator.</source>
-        <translation>Empregar unha onda de dente de serra tipo Moog para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use an exponential wave for current oscillator.</source>
-        <translation>Empregar unha onda exponencial para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
-        <translation>Empregar ruído branco para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
-        <translation>Empregar unha forma de onda predefinida para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6997,39 +6983,39 @@ Please make sure you have read-permission to the file and the directory containi
     <name>VestigeInstrumentView</name>
     <message>
         <source>Open other VST-plugin</source>
-        <translation>Abrir outro engadido de VST</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
-        <translation>Prema aquí se desexa abrir outro engadido de VST. Ao premer este botón aparece un diálogo para abrir ficheiros no que se pode escoller o ficheiro.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show/hide GUI</source>
-        <translation>Mostrar/Agochar a interface gráfica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
-        <translation>Prema aquí para mostrar ou agochar a interface gráfica de usuario do engadido de VST.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Turn off all notes</source>
-        <translation>Apagar todas as notas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open VST-plugin</source>
-        <translation>Abrir o engadido de VST</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DLL-files (*.dll)</source>
-        <translation>Ficheiros DLL (.*dll)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>EXE-files (*.exe)</source>
-        <translation>Ficheiros EXE (*.exe)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>No VST-plugin loaded</source>
-        <translation>Non se cargou ningún engadido de VST</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Control VST-plugin from LMMS host</source>
@@ -7057,7 +7043,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation>Gardar as predefinicións</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
@@ -7135,7 +7121,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Save preset</source>
-        <translation>Gardar as predefinicións</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
@@ -7154,7 +7140,7 @@ Please make sure you have read-permission to the file and the directory containi
     <name>VstPlugin</name>
     <message>
         <source>Loading plugin</source>
-        <translation>A cargar un engadido</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open Preset</source>
@@ -7376,7 +7362,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
-        <translation>Debuxe aquí a súa propia forma de onda arrastrando o rato polo gráfico.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Load waveform</source>
@@ -7404,7 +7390,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Normalize</source>
-        <translation>Normalizar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click to normalize</source>
@@ -7420,7 +7406,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Suave</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click to smooth</source>
@@ -7428,7 +7414,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Onda senoidal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click for sine wave</source>
@@ -7436,7 +7422,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Onda triangular</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click for triangle wave</source>
@@ -7448,7 +7434,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Onda cadrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click for square wave</source>
@@ -7456,11 +7442,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Panning</source>
-        <translation>Panorámica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Freq. multiplier</source>
@@ -7542,11 +7528,11 @@ Please make sure you have read-permission to the file and the directory containi
     <name>ZynAddSubFxView</name>
     <message>
         <source>Show GUI</source>
-        <translation>Mostrar a interface gráfica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
-        <translation>Prema aquí para mostrar ou agochar a interface gráfica deusuario de ZynAddSubFX.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Portamento:</source>
@@ -7613,19 +7599,19 @@ Please make sure you have read-permission to the file and the directory containi
     <name>audioFileProcessor</name>
     <message>
         <source>Amplify</source>
-        <translation>Amplificar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Start of sample</source>
-        <translation>Inicio da mostra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>End of sample</source>
-        <translation>Final da mostra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverse sample</source>
-        <translation>Inverter a mostra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Stutter</source>
@@ -7637,7 +7623,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Loop mode</source>
-        <translation>Modo de bucle</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Interpolation mode</source>
@@ -7671,75 +7657,75 @@ Please make sure you have read-permission to the file and the directory containi
     <name>bitInvaderView</name>
     <message>
         <source>Sample Length</source>
-        <translation>Lonxitude da mostra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Onda senoidal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Onda triangular</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Onda de dente de serra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Onda cadrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation>Onda de ruído branco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>User defined wave</source>
-        <translation>Onda definida polo usuario</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Suave</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation>Prema aquí para unha forma de onda suave.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Interpolation</source>
-        <translation>Interpolación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Normalize</source>
-        <translation>Normalizar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
-        <translation>Debuxe aquí a súa propia forma de onda arrastrando o rato polo gráfico.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click for a sine-wave.</source>
-        <translation>Prema para unha onda senoidal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Prema aquí para unha onda triangular.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation>Prema aquí para unha onda de dente de serra.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Prema aquí para unha onda cadrada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for white-noise.</source>
-        <translation>Prema aquí para ruído branco.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a user-defined shape.</source>
-        <translation>Prema aquí para unha forma definida polo usuario.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -7871,22 +7857,22 @@ Please make sure you have read-permission to the file and the directory containi
     <name>graphModel</name>
     <message>
         <source>Graph</source>
-        <translation>Gráfico</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>kickerInstrument</name>
     <message>
         <source>Start frequency</source>
-        <translation>Frecuencia inicial</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>End frequency</source>
-        <translation>Frecuencia final</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Length</source>
@@ -7906,7 +7892,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Noise</source>
-        <translation>Ruído</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click</source>
@@ -7929,15 +7915,15 @@ Please make sure you have read-permission to the file and the directory containi
     <name>kickerInstrumentView</name>
     <message>
         <source>Start frequency:</source>
-        <translation>Frecuencia inicial:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>End frequency:</source>
-        <translation>Frecuencia final:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gain:</source>
-        <translation>Ganancia:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Frequency Slope:</source>
@@ -7972,23 +7958,23 @@ Please make sure you have read-permission to the file and the directory containi
     <name>ladspaBrowserView</name>
     <message>
         <source>Available Effects</source>
-        <translation>Efectos dispoñíbeis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unavailable Effects</source>
-        <translation>Efectos non dispoñíbeis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Instruments</source>
-        <translation>Instrumentos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Analysis Tools</source>
-        <translation>Ferramentas de análise</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Don&apos;t know</source>
-        <translation>Non sei</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>This dialog displays information on all of the LADSPA plugins LMMS was able to locate. The plugins are divided into five categories based upon an interpretation of the port types and names.
@@ -8004,239 +7990,227 @@ Analysis Tools are plugins for which only input channels were identified.
 Don't Knows are plugins for which no input or output channels were identified.
 
 Double clicking any of the plugins will bring up information on the ports.</source>
-        <translation>Este diálogo mostra información sobre todos os engadidos de LADSPA que o LMMS deu localizado. Os engadidos divídense en cinco categorías baseándose nunha interpretación dos tipos e nomes dos portos.
-
-Os efectos dispoñíbeis son os que se poden empregar co LMMS. Para que o LMMS poida utilizar un efecto ten que ser, en primeiro lugar e o máis importante, un efecto, o que quere dicir que ten que ter tanto canles de entrada como canles de saída. O LMMS identifica unha canle de entrada como un porto de taxa de son que conteña «in» no nome. As canles de saída identifícanse coas letras «out». Alén disto, o efecto ten que ter o mesmo número de entradas que de saídas e ter capacidade de tempo real.
-
-Os efectos non dispoñíbeis son os que foron identificados como efectos mais que non tiñan o mesmo número de canles de entrada que de saída ou non tiñan capacidade de tempo real.
-
-Os instrumentos son engadidos nos que só se identificaron canles de saída
-.
-As ferramentas de análise son engadidos nos que só se identificaron canles de entrada.
-
-Os «non sei» son engadidos nos que non se identificaron canles de entrada nin de saída.
-
-Facendo duplo clic sobre calquera dos engadidos mostra información sobre os portos.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Type:</source>
-        <translation>Tipo:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ladspaDescription</name>
     <message>
         <source>Plugins</source>
-        <translation>Engadidos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Description</source>
-        <translation>Descrición</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>ladspaPortDialog</name>
     <message>
         <source>Ports</source>
-        <translation>Portos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rate</source>
-        <translation>Taxa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Direction</source>
-        <translation>Dirección</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Type</source>
-        <translation>Tipo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Min &lt; Default &lt; Max</source>
-        <translation>Mín &lt; Predefinido &lt; Máx</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Logarithmic</source>
-        <translation>Logarítmica</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SR Dependent</source>
-        <translation>Dependente de SR</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Audio</source>
-        <translation>Son</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Control</source>
-        <translation>Control</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Input</source>
-        <translation>Entrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output</source>
-        <translation>Saída</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggled</source>
-        <translation>Conmutado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Integer</source>
-        <translation>Enteiro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Float</source>
-        <translation>Vírgula flutuante</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Yes</source>
-        <translation>Si</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lb302Synth</name>
     <message>
         <source>VCF Cutoff Frequency</source>
-        <translation>Frecuencia de corte do VCF</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>VCF Resonance</source>
-        <translation>Resonancia do VCF</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>VCF Envelope Mod</source>
-        <translation>Modo de envolvente do VCF</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>VCF Envelope Decay</source>
-        <translation>Decaemento da envolvente do VCF</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Distortion</source>
-        <translation>Distorsión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Waveform</source>
-        <translation>Forma da onda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Slide Decay</source>
-        <translation>Decamento ao escorregar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Slide</source>
-        <translation>Escorregar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Accent</source>
-        <translation>Acento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Dead</source>
-        <translation>Morte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>24dB/oct Filter</source>
-        <translation>Filtro de 24dB/oitava</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>lb302SynthView</name>
     <message>
         <source>Cutoff Freq:</source>
-        <translation>Frec. de corte:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Resonance:</source>
-        <translation>Resonancia:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Env Mod:</source>
-        <translation>Mod env:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay:</source>
-        <translation>Decaemento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
-        <translation>Filtro tipo 303, 24dB/oitava, 3 polos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Slide Decay:</source>
-        <translation>Decamento ao escorregar:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>DIST:</source>
-        <translation>DIST:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Onda de dente de serra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation>Prema aquí para unha onda de dente de serra.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Onda triangular</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Prema aquí para unha onda triangular.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Onda cadrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Prema aquí para unha onda cadrada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rounded square wave</source>
-        <translation>Onda cadrada arredondada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a square-wave with a rounded end.</source>
-        <translation>Prema aquí para unha onda cadrada con final arredondado.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Moog wave</source>
-        <translation>Onda tipo Moog</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for a moog-like wave.</source>
-        <translation>Prema aquí para unha onda tipo Moog.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Onda senoidal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click for a sine-wave.</source>
-        <translation>Prema para unha onda senoidal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation>Onda de ruído branco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Prema aquí para unha onda exponencial.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here for white-noise.</source>
-        <translation>Prema aquí para ruído branco.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bandlimited saw wave</source>
@@ -8275,79 +8249,79 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     <name>malletsInstrument</name>
     <message>
         <source>Hardness</source>
-        <translation>Dureza</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Position</source>
-        <translation>Posición</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vibrato Gain</source>
-        <translation>Ganancia do vibrato</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vibrato Freq</source>
-        <translation>Frecuencia do vibrato</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Stick Mix</source>
-        <translation>Mestura de paus</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulator</source>
-        <translation>Modulador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation>Transición por esvaecemento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Speed</source>
-        <translation>Velocidade do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Depth</source>
-        <translation>Profundidade do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ADSR</source>
-        <translation>ADSR</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pressure</source>
-        <translation>Presión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Motion</source>
-        <translation>Movemento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Speed</source>
-        <translation>Velocidade</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bowed</source>
-        <translation>Con arco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Spread</source>
-        <translation>Propagar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Marimba</source>
-        <translation>Marimba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vibraphone</source>
-        <translation>Vibráfono</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Agogo</source>
-        <translation>Agogó</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wood1</source>
-        <translation>Madeira1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reso</source>
@@ -8355,150 +8329,150 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     </message>
     <message>
         <source>Wood2</source>
-        <translation>Madeira2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Beats</source>
-        <translation>Golpes</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Two Fixed</source>
-        <translation>Dous fixos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Clump</source>
-        <translation>Esmagar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tubular Bells</source>
-        <translation>Campás tubulares</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Uniform Bar</source>
-        <translation>Lámina uniforme</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tuned Bar</source>
-        <translation>Lámina afinada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Glass</source>
-        <translation>Vidro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tibetan Bowl</source>
-        <translation>Cunca tibetana</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>malletsInstrumentView</name>
     <message>
         <source>Instrument</source>
-        <translation>Instrumento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Spread</source>
-        <translation>Propagar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Spread:</source>
-        <translation>Propagar:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hardness</source>
-        <translation>Dureza</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hardness:</source>
-        <translation>Dureza:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Position</source>
-        <translation>Posición</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Position:</source>
-        <translation>Posición:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vib Gain</source>
-        <translation>Gan. vib.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vib Gain:</source>
-        <translation>Gan. vib.:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vib Freq</source>
-        <translation>Frec. vib.:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vib Freq:</source>
-        <translation>Frec. vib.:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Stick Mix</source>
-        <translation>Mestura de paus</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Stick Mix:</source>
-        <translation>Mestura de paus:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulator</source>
-        <translation>Modulador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Modulator:</source>
-        <translation>Modulador:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Crossfade</source>
-        <translation>Transición por esvaecemento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Crossfade:</source>
-        <translation>Transición por esvaecemento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Speed</source>
-        <translation>Velocidade do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Speed:</source>
-        <translation>Velocidade do LFO:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Depth</source>
-        <translation>Profundidade do LFO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LFO Depth:</source>
-        <translation>Profundidade do LFO:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ADSR</source>
-        <translation>ADSR</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ADSR:</source>
-        <translation>ADSR:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pressure</source>
-        <translation>Presión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pressure:</source>
-        <translation>Presión:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Speed</source>
-        <translation>Velocidade</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Speed:</source>
-        <translation>Velocidade:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Missing files</source>
@@ -8575,7 +8549,7 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     <name>opl2instrument</name>
     <message>
         <source>Patch</source>
-        <translation>Parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Op 1 Attack</source>
@@ -8694,15 +8668,15 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     <name>opl2instrumentView</name>
     <message>
         <source>Attack</source>
-        <translation>Ataque</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Decaemento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Release</source>
-        <translation>Relaxamento</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Frequency multiplier</source>
@@ -8713,42 +8687,42 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     <name>organicInstrument</name>
     <message>
         <source>Distortion</source>
-        <translation>Distorsión</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>organicInstrumentView</name>
     <message>
         <source>Distortion:</source>
-        <translation>Distorsión:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>مستوى الصوت:</translation>
     </message>
     <message>
         <source>Randomise</source>
-        <translation>Aleatorio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 waveform:</source>
-        <translation>Forma de onda do osciloscopio %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 volume:</source>
-        <translation>Volume do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Osc %1 panning:</source>
-        <translation>Panorámica do oscilador %1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>cents</source>
-        <translation>cents</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The distortion knob adds distortion to the output of the instrument. </source>
@@ -8775,266 +8749,266 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     <name>papuInstrument</name>
     <message>
         <source>Sweep time</source>
-        <translation>Tempo da varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sweep direction</source>
-        <translation>Dirección da varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sweep RtShift amount</source>
-        <translation>Cantidade de Cambio de varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave Pattern Duty</source>
-        <translation>Padrón de onda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 1 volume</source>
-        <translation>Volume da canle 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume sweep direction</source>
-        <translation>Dirección da varredura do volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation>Lonxitude de cada paso en varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 2 volume</source>
-        <translation>Volume da canle 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 3 volume</source>
-        <translation>Volume da canle 3</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 4 volume</source>
-        <translation>Volume da canle 4</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Right Output level</source>
-        <translation>Nivel da saída dereita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Left Output level</source>
-        <translation>Nivel da saída esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 1 to SO2 (Left)</source>
-        <translation>Canle 1 a SO1 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 2 to SO2 (Left)</source>
-        <translation>Canle 2 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 3 to SO2 (Left)</source>
-        <translation>Canle 3 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 4 to SO2 (Left)</source>
-        <translation>Canle 4 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 1 to SO1 (Right)</source>
-        <translation>Canle 1 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 2 to SO1 (Right)</source>
-        <translation>Canle 2 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 3 to SO1 (Right)</source>
-        <translation>Canle 3 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel 4 to SO1 (Right)</source>
-        <translation>Canle 4 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Treble</source>
-        <translation>Agudos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bass</source>
-        <translation>Graves</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shift Register width</source>
-        <translation>Cambiar a largura do rexistro</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>papuInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
-        <translation>Tempo da varredura:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sweep Time</source>
-        <translation>Tempo da varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sweep RtShift amount:</source>
-        <translation>Cantidade de cambio de varredura:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sweep RtShift amount</source>
-        <translation>Cantidade de cambio de varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave pattern duty:</source>
-        <translation>Padrón de onda de deber:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave Pattern Duty</source>
-        <translation>Padrón de onda de deber</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square Channel 1 Volume:</source>
-        <translation>Volume da canle cadrada 1:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Length of each step in sweep:</source>
-        <translation>Lonxitude de cada paso en varredura:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation>Lonxitude de cada paso en varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave pattern duty</source>
-        <translation>Padrón de onda de deber</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square Channel 2 Volume:</source>
-        <translation>Volume da canle cadrada 2:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square Channel 2 Volume</source>
-        <translation>Volume da canle cadrada 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave Channel Volume:</source>
-        <translation>Volume da canle de ondas:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave Channel Volume</source>
-        <translation>Volume da canle de ondas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Noise Channel Volume:</source>
-        <translation>Volume da canle de ruído:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Noise Channel Volume</source>
-        <translation>Volume da canle de ruído</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SO1 Volume (Right):</source>
-        <translation>Volume de SO1 (Dereita):</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SO1 Volume (Right)</source>
-        <translation>Volume de SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SO2 Volume (Left):</source>
-        <translation>Volume de SO2 (Esquerda):</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SO2 Volume (Left)</source>
-        <translation>Volume de SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Treble:</source>
-        <translation>Agudos:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Treble</source>
-        <translation>Agudos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bass:</source>
-        <translation>Graves:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Bass</source>
-        <translation>Graves</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sweep Direction</source>
-        <translation>Dirección da varredura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume Sweep Direction</source>
-        <translation>Dirección da varredura do volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shift Register Width</source>
-        <translation>Cambiar a largura do rexistro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel1 to SO1 (Right)</source>
-        <translation>Canle 1 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel2 to SO1 (Right)</source>
-        <translation>Canle 1 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel3 to SO1 (Right)</source>
-        <translation>Canle 3 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel4 to SO1 (Right)</source>
-        <translation>Canle 4 a SO1 (Dereita)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel1 to SO2 (Left)</source>
-        <translation>Canle 1 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel2 to SO2 (Left)</source>
-        <translation>Canle 2 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel3 to SO2 (Left)</source>
-        <translation>Canle 3 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Channel4 to SO2 (Left)</source>
-        <translation>Canle 4 a SO2 (Esquerda)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wave Pattern</source>
-        <translation>Padrón de onda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The amount of increase or decrease in frequency</source>
-        <translation>A cantidade de aumento ou redución da frecuencia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The rate at which increase or decrease in frequency occurs</source>
-        <translation>A taxa á que se produce o aumento ou a redución da frecuencia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The duty cycle is the ratio of the duration (time) that a signal is ON versus the total period of the signal.</source>
-        <translation>O ciclo de deber é a relación entre a duración (tempo) durante a que un sinal está ACTIVO fronte ao período total do sinal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square Channel 1 Volume</source>
-        <translation>Volume da canle cadrada 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The delay between step change</source>
-        <translation>A demora entre cambios de paso</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Draw the wave here</source>
-        <translation>Debuxe a onda aquí</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -9049,7 +9023,7 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     </message>
     <message>
         <source>Bank</source>
-        <translation>Banco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Program selector</source>
@@ -9057,96 +9031,95 @@ Facendo duplo clic sobre calquera dos engadidos mostra información sobre os por
     </message>
     <message>
         <source>Patch</source>
-        <translation>Parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name</source>
-        <translation>Nome</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>حسناً</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>pluginBrowser</name>
     <message>
         <source>no description</source>
-        <translation>sen descrición</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incomplete monophonic imitation tb303</source>
-        <translation>Imitación monofónica incompleta tb303</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Plugin for freely manipulating stereo output</source>
-        <translation>Engadido para manipular libremente a saída en estéreo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Plugin for controlling knobs with sound peaks</source>
-        <translation>Engadido para controlar botóns con picos de son</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Plugin for enhancing stereo separation of a stereo input file</source>
-        <translation>Engadido para mellorar a separación en estéreo dun ficheiro de entrada en estéreo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>List installed LADSPA plugins</source>
-        <translation>Enumerar os engadidos de LADSPA instalados</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>GUS-compatible patch instrument</source>
-        <translation>Instrumento de parcheo compatíbel con GUS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Additive Synthesizer for organ-like sounds</source>
-        <translation>Sintetizador aditivo para sons tipo órgano</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation>Cousas melodiosas nas que bater</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
-        <translation>Hóspede de VST para empregar engadidos de VST(i) co LMMS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vibrating string modeler</source>
-        <translation>Modelador de cordas vibrantes</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>plugin for using arbitrary LADSPA-effects inside LMMS.</source>
-        <translation>engadido para empregar efectos de LADSPA arbitrarios no LMMS.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Filter for importing MIDI-files into LMMS</source>
-        <translation>Filtro para importar ficheiros MIDI ao LMMS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
 This chip was used in the Commodore 64 computer.</source>
-        <translation>Emulación dos SID MOS6581 e o MOS8580.
-Este chip empregábase no computador Commodore 64.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Player for SoundFont files</source>
-        <translation>Reprodutor de ficheiros SoundFont</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Emulation of GameBoy (TM) APU</source>
-        <translation>Emulación da APU da GameBoy (TM)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Customizable wavetable synthesizer</source>
-        <translation>Sintetizador de táboa de ondas personalizábel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Embedded ZynAddSubFX</source>
-        <translation>ZynAddSubFX incorporado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>2-operator FM Synth</source>
@@ -9257,55 +9230,55 @@ Este chip empregábase no computador Commodore 64.</translation>
     <name>sf2Instrument</name>
     <message>
         <source>Bank</source>
-        <translation>Banco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Patch</source>
-        <translation>Parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb</source>
-        <translation>Reverberación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Roomsize</source>
-        <translation>Tamaño da sala de reverberación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Damping</source>
-        <translation>Tampón de reverberación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Width</source>
-        <translation>Largura da reverberación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Level</source>
-        <translation>Nivel de reverberación</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus</source>
-        <translation>Coro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Lines</source>
-        <translation>Liñas do coro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Level</source>
-        <translation>Nivel do coro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Speed</source>
-        <translation>Velocidade do coro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Depth</source>
-        <translation>Profundidade do coro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A soundfont %1 could not be loaded.</source>
@@ -9316,75 +9289,75 @@ Este chip empregábase no computador Commodore 64.</translation>
     <name>sf2InstrumentView</name>
     <message>
         <source>Open other SoundFont file</source>
-        <translation>Abrir outro ficheiro de SoundFont</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to open another SF2 file</source>
-        <translation>Prema aquí para abrir outro ficheiro de SF2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Choose the patch</source>
-        <translation>Escoller o parche</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Gain</source>
-        <translation>Ganancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Apply reverb (if supported)</source>
-        <translation>Aplicar reverberación (se o admitir)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>This button enables the reverb effect. This is useful for cool effects, but only works on files that support it.</source>
-        <translation>Este botón activa o efecto de reverberación. Isto é útil para efectos gaioleiros, mais só funciona cos ficheiros que o admiten.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Roomsize:</source>
-        <translation>Tamaño da sala de reverberación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Damping:</source>
-        <translation>Tampón de reverberación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Width:</source>
-        <translation>Largura da reverberación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reverb Level:</source>
-        <translation>Nivel de reverberación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Apply chorus (if supported)</source>
-        <translation>Aplicar un coro (se o admitir)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
-        <translation>Este botón activa o efecto de coro. Isto é útil para efectos de echo gaioleiros, mais só funciona cos ficheiros que o admiten.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Lines:</source>
-        <translation>Liñas de coro:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Level:</source>
-        <translation>Nivel do coro:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Speed:</source>
-        <translation>Velocidade do coro:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chorus Depth:</source>
-        <translation>Profundidade do coro:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open SoundFont file</source>
-        <translation>Abrir un ficheiro de SoundFont</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SoundFont2 Files (*.sf2)</source>
-        <translation>Ficheiros de SoundFont2 (*.sf2)</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -9398,359 +9371,359 @@ Este chip empregábase no computador Commodore 64.</translation>
     <name>sidInstrument</name>
     <message>
         <source>Cutoff</source>
-        <translation>Corte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Resonance</source>
-        <translation>Resonancia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Filter type</source>
-        <translation>Tipo de filtro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice 3 off</source>
-        <translation>Voz 3 apagada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Volume</source>
-        <translation>Volume</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Chip model</source>
-        <translation>Modelo de chip</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>sidInstrumentView</name>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>مستوى الصوت:</translation>
     </message>
     <message>
         <source>Resonance:</source>
-        <translation>Resonancia:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Cutoff frequency:</source>
-        <translation>Frecuencia de corte:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>High-Pass filter </source>
-        <translation>Filtro pasa-alta </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Band-Pass filter </source>
-        <translation>Filtro pasa-faixa </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Low-Pass filter </source>
-        <translation>Filtro pasa-baixa </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice3 Off </source>
-        <translation>Voz3 apagada </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MOS6581 SID </source>
-        <translation>SID MOS6581 </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>MOS8580 SID </source>
-        <translation>SID MOS6580 </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Attack:</source>
-        <translation>Ataque:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Attack rate determines how rapidly the output of Voice %1 rises from zero to peak amplitude.</source>
-        <translation>A taxa de ataque determina como de rápido sobe a Voz %1 desde cero á amplitude de pico.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay:</source>
-        <translation>Decaemento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decay rate determines how rapidly the output falls from the peak amplitude to the selected Sustain level.</source>
-        <translation>A taxa de decaemento determina como de rápido cae a saída desde a amplitude de pico ao nivel de Sustentación escollido.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation>Sustentación:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Output of Voice %1 will remain at the selected Sustain amplitude as long as the note is held.</source>
-        <translation>A saída da voz %1 fica na amplitude de sustentación indicada mentres se manteña a nota.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Release:</source>
-        <translation>Relaxamento:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The output of of Voice %1 will fall from Sustain amplitude to zero amplitude at the selected Release rate.</source>
-        <translation>A saída da voz %1 cae desde a amplitude de sustentación até cero na relación de relaxamento escollida.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pulse Width:</source>
-        <translation>Largura do pulso:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Pulse Width resolution allows the width to be smoothly swept with no discernable stepping. The Pulse waveform on Oscillator %1 must be selected to have any audible effect.</source>
-        <translation>A resolución da largura do pulso permite varrer a largura suavemente sen que sexa posíbel discernir os pasos. Hai que escoller a forma de onda pulso no oscilador %1 para que se ouza un efecto audíbel.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Coarse:</source>
-        <translation>Crú:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Coarse detuning allows to detune Voice %1 one octave up or down.</source>
-        <translation>A desafinación crúa permite desafinar a voz %1 unha oitava para arriba ou para abaixo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pulse Wave</source>
-        <translation>Onda de pulso</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Triangle Wave</source>
-        <translation>Onda triangular</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SawTooth</source>
-        <translation>Dente de serra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Noise</source>
-        <translation>Ruído</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sync</source>
-        <translation>Sincronizar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sync synchronizes the fundamental frequency of Oscillator %1 with the fundamental frequency of Oscillator %2 producing &quot;Hard Sync&quot; effects.</source>
-        <translation>Sincroniza a frecuencia fundamental do oscilador %1 coa frecuencia fundamental do oscilador %2, producindo efectos de «sincronización dura».</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ring-Mod</source>
-        <translation>Modo anel</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ring-mod replaces the Triangle Waveform output of Oscillator %1 with a &quot;Ring Modulated&quot; combination of Oscillators %1 and %2.</source>
-        <translation>O modo anel substitúe a saída da onda de forma triangular do oscilador %1 cunha combinación «modulada en anel» dos osciladores %1 e %2.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Filtered</source>
-        <translation>Filtrado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>When Filtered is on, Voice %1 will be processed through the Filter. When Filtered is off, Voice %1 appears directly at the output, and the Filter has no effect on it.</source>
-        <translation>Cando Filtrado está activado, a voz %1 procésase a través do filtro. Cando Filtrado está desactivado, a voz %1 aparece directamente na saída e o filtro non ten ningún efecto sobre ela.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Test</source>
-        <translation>Proba</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Test, when set, resets and locks Oscillator %1 at zero until Test is turned off.</source>
-        <translation>Proba, cando escollido, restaura e bloquea o oscilador %1 a cero até que remate a proba.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>stereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
-        <translation>LARGO</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Width:</source>
-        <translation>Largura:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>stereoEnhancerControls</name>
     <message>
         <source>Width</source>
-        <translation>Largura</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>stereoMatrixControlDialog</name>
     <message>
         <source>Left to Left Vol:</source>
-        <translation>Volume esquerda para esquerda:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Left to Right Vol:</source>
-        <translation>Volume esquerda para dereita:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Right to Left Vol:</source>
-        <translation>Volume dereita para esquerda:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Right to Right Vol:</source>
-        <translation>Volume dereita para dereita:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>stereoMatrixControls</name>
     <message>
         <source>Left to Left</source>
-        <translation>Esquerda para esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Left to Right</source>
-        <translation>Esquerda para dereita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Right to Left</source>
-        <translation>Dereita para esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Right to Right</source>
-        <translation>Dereita para dereita</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>vestigeInstrument</name>
     <message>
         <source>Loading plugin</source>
-        <translation>A cargar un engadido</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please wait while loading VST-plugin...</source>
-        <translation>Agarde mentres se carga o engadido de VST...</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>vibed</name>
     <message>
         <source>String %1 volume</source>
-        <translation>Volume da corda %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>String %1 stiffness</source>
-        <translation>Tensión da corda %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pick %1 position</source>
-        <translation>Posición da púa %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pickup %1 position</source>
-        <translation>Posición do captador %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pan %1</source>
-        <translation>Pan %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Detune %1</source>
-        <translation>Desafinar %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Fuzziness %1 </source>
-        <translation>Difuso %1 </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Length %1</source>
-        <translation>Lonxitude %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Impulse %1</source>
-        <translation>Impulso %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Octave %1</source>
-        <translation>Oitava %1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>vibedView</name>
     <message>
         <source>Volume:</source>
-        <translation>Volume:</translation>
+        <translation>مستوى الصوت:</translation>
     </message>
     <message>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
-        <translation>O botón «V» indica o volume da corda escollida.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>String stiffness:</source>
-        <translation>Tensión da corda:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
-        <translation>O botón «S» indica a tensión da corda escollida. A tensión da corda afecta ao tempo durante o que esta soa. Canto menor sexa, máis tempo ha de soar.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pick position:</source>
-        <translation>Posición da púa:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
-        <translation>O botón «P» indica a posición na que se pulsa a corda escollida. Canto menor sexa, máis próxima estará da ponte.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pickup position:</source>
-        <translation>Posición do captador:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
-        <translation>O botón «PU» indica a posición desde a que se recollen as vibracións da corda escollida. Canto menor sexa, máis próximo será da ponte.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Pan:</source>
-        <translation>Pan:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
-        <translation>O botón Pan determina o lugar que ocupa a cadea escollida no campo estéreo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Detune:</source>
-        <translation>Desafinar:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
-        <translation>O botón Desafinar modifica a altura da corda escollida. Indicar menos de cero fai que a corda soe plana.  Con máis de cero a corda soará viva.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Fuzziness:</source>
-        <translation>Difuso:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
-        <translation>O botón Slap engádelle algo de distorsión tipo «fuzz» á corda escollida que se nota máis durante o ataque, aínda que tamén se pode usar para facer que a corda soe máis «metálica».</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Length:</source>
-        <translation>Lonxitude:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
-        <translation>O botón Lonxitude indica a lonxitude da corda escollida. As cordas máis longas soan durante máis tempo e con máis brillo; porén, tamén consumen máis ciclos da CPU.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Impulse or initial state</source>
-        <translation>Impulso ou estado inicial</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
-        <translation>O selector «Imp» determina se hai que tratar a forma de onda do gráfico como un impulso impartido na corda pola púba ou o estado inicial da corda.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Octave</source>
-        <translation>Oitava</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
-        <translation>O selector Oitava emprégase para escoller con que harmónico da nota soa a corda. Por exemplo, «-2» significa que a corda soa dúas oitavas por debaixo da fundamental, «F» significa que a corda soa na fundamental e «6» significa que a cadea soa seix oitavas por riba da fundamental.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Impulse Editor</source>
-        <translation>Editor de impulsos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The waveform editor provides control over the initial state or impulse that is used to start the string vibrating.  The buttons to the right of the graph will initialize the waveform to the selected type.  The '?' button will load a waveform from a file--only the first 128 samples will be loaded.
@@ -9760,13 +9733,7 @@ The waveform can also be drawn in the graph.
 The 'S' button will smooth the waveform.
 
 The &apos;N&apos; button will normalize the waveform.</source>
-        <translation>O editor de formas de onda permite controlar o estado inicial ou impulso usado para facer que a corda comece a vibrar. Os botóns que hai á dereita da gráfica inicializan a forma de onda no tipo escollido. O botón «?» carga unha forma de onda desde un ficheiro - só se cargan as primeiras 128 mostras.
-
-A forma de onda tamén se pode debuxar na gráfica.
-
-O botón «S» suaviza a forma de onda.
-
-O botón «N» normaliza a forma de onda.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Vibed models up to nine independently vibrating strings.  The 'String' selector allows you to choose which string is being edited.  The 'Imp' selector chooses whether the graph represents an impulse or the initial state of the string.  The 'Octave' selector chooses which harmonic the string should vibrate at.
@@ -9780,144 +9747,134 @@ The 'V' knob controls the volume.  The 'S' knob controls the string's stiffness.
 The 'Length' knob controls the length of the string.
 
 The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
-        <translation>Vibed modela até nove cordas vibrando independentemente. O selector «Corda» permite escoller a corda que se desexe editar. O selector «Imp» escolle se o gráfico representa un impulso ou o estado inicial da corda. O selector «Oitava» escolle o harmónico co que debería vibrar a corda.
-
-A gráfica permite controlar o estado inicial ou o impulso usados para pór a corda en movemento.
-
-O botón «V» controla o volume.  O botón «S» controla a tensión.da corda.  O botón «P» controla a posición da púa.  O botón «PU» controla a posición de observación.
-
-«Pan» e «Detune» non deberían precisar explicación.  O botón «Slap» engádelle un pouco de distorsión tipo «fuzz» ao son da corda.
-
-O botón «Lonxitude» controla a lonxitude da corda.
-
-O LED do recanto inferior dereito do editor da forma da onda determina se a corda está activa no instrumento.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enable waveform</source>
-        <translation>Activar a forma de onda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to enable/disable waveform.</source>
-        <translation>Prema aquí para activar/desactivar a forma da onda.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>String</source>
-        <translation>Corda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The String selector is used to choose which string the controls are editing.  A Vibed instrument can contain up to nine independently vibrating strings.  The LED in the lower right corner of the waveform editor indicates whether the selected string is active.</source>
-        <translation>O selector Corda emprégase para escoller a corda que editan os controles. Un instrumento de Vibed pode conter até nove cordas vibrando independentemente.  O LED do recanto inferior dereito do editor da forma da onda indica se a corda escollida esstá activada.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sine wave</source>
-        <translation>Onda senoidal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Triangle wave</source>
-        <translation>Onda triangular</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Saw wave</source>
-        <translation>Onda de dente de serra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Onda cadrada</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>White noise wave</source>
-        <translation>Onda de ruído branco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>User defined wave</source>
-        <translation>Onda definida polo usuario</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Smooth</source>
-        <translation>Suave</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation>Prema aquí para unha forma de onda suave.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Normalize</source>
-        <translation>Normalizar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Click here to normalize waveform.</source>
-        <translation>Prema aquí para normalizar a forma da onda.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
-        <translation>Empregar unha onda senoidal para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a triangle-wave for current oscillator.</source>
-        <translation>Empregar unha onda triangular para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
-        <translation>Empregar unha onda de dente de serra para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Empregar unha onda cadrada para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
-        <translation>Empregar ruído branco para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Use a user-defined waveform for current oscillator.</source>
-        <translation>Empregar unha forma de onda predefinida para este oscilador.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>voiceObject</name>
     <message>
         <source>Voice %1 pulse width</source>
-        <translation>Largo do pulso da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 attack</source>
-        <translation>Ataque da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 decay</source>
-        <translation>Decamento da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 sustain</source>
-        <translation>Sustentación da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 release</source>
-        <translation>Relaxamento da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 coarse detuning</source>
-        <translation>Desafinación bruta da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 wave shape</source>
-        <translation>Fonda da onda da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 sync</source>
-        <translation>Sincronización da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 ring modulate</source>
-        <translation>Modulación de anel da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 filtered</source>
-        <translation>Filtrado da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Voice %1 test</source>
-        <translation>Proba da voz %1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
