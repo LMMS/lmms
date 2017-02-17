@@ -61,7 +61,7 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -2071,7 +2071,8 @@ Rechtsklikken zal een contextmenu laten verschijnen waar u de volgorde kunt wijz
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"/>
+        <translation>Kon bestand %1 niet openen om te schrijven.
+Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die het bestand bevat en probeer het opnieuw!</translation>
     </message>
 </context>
 <context>
@@ -4047,7 +4048,7 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
     </message>
     <message>
         <source>Save project template</source>
-        <translation type="unfinished"/>
+        <translation>Projectsjabloon opslaan</translation>
     </message>
 </context>
 <context>
@@ -5712,7 +5713,7 @@ Reden: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Instrument Plugins</source>
-        <translation type="unfinished"/>
+        <translation>Instrument-plugins</translation>
     </message>
 </context>
 <context>
@@ -6268,24 +6269,25 @@ Latentie: %2 ms</translation>
     </message>
     <message>
         <source>Enable auto-save</source>
-        <translation type="unfinished"/>
+        <translation>Automatisch opslaan inschakelen</translation>
     </message>
     <message>
         <source>Allow auto-save while playing</source>
-        <translation type="unfinished"/>
+        <translation>Automatisch opslaan toestaan tijdens afspelen</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"/>
+        <translation>Uitgeschakeld</translation>
     </message>
     <message>
         <source>Auto-save interval: %1</source>
-        <translation type="unfinished"/>
+        <translation>Interval automatisch opslaan: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
 Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
-        <translation type="unfinished"/>
+        <translation>Stelt de tijd tussen reservekopieën op %1.
+Onthoud om uw project ook manueel op te slaan. U kunt kiezen om opslaan uit te schakelen tijdens afspelen, iets wat oudere systemen moeilijk vinden.</translation>
     </message>
 </context>
 <context>
@@ -6368,7 +6370,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Save project</source>
-        <translation type="unfinished"/>
+        <translation>Project opslaan</translation>
     </message>
 </context>
 <context>
@@ -7026,7 +7028,7 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
     <message>
         <source> already exists. Do you want to replace it?</source>
-        <translation type="unfinished"/>
+        <translation>bestaat reeds. Wilt u het vervangen?</translation>
     </message>
 </context>
 <context>
