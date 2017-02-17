@@ -42,10 +42,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Involved</source>
         <translation type="unfinished"></translation>
     </message>
@@ -55,6 +51,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Copyright © %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -227,6 +227,9 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation type="unfinished"></translation>
@@ -1005,10 +1008,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>DelayControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Lfo Amt</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1017,15 +1016,7 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Regen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Feedback Amount</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1038,6 +1029,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AMNT</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1868,18 +1875,6 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source> Octave</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Frequency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Resonance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>EqHandle</name>
@@ -2043,11 +2038,6 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export project to %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2061,6 +2051,11 @@ Please make sure you have write-permission to the file and the directory contain
     </message>
     <message>
         <source>Rendering: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2245,6 +2240,9 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation type="unfinished"></translation>
@@ -3422,11 +3420,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <source>Please enter a new value between %1 and %2:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please enter a new value between %1 and %2:</source>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3947,10 +3945,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export &amp;MIDI...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4019,15 +4013,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4084,6 +4082,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MidiJack</name>
+    <message>
+        <source>JACK server down</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The JACK server seems to be shuted down.</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5652,15 +5663,15 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>PluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Instrument browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6010,10 +6021,6 @@ Reason: &quot;%2&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Compress project files per default</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6087,10 +6094,6 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Smooth scroll in Song Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable auto save feature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6219,12 +6222,28 @@ Latency: %2 ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto save interval: %1 %2</source>
+        <source>Display volume as dBFS </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto-save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow auto-save while playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-save interval: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
-Remember to also save your project manually.</source>
+Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6304,6 +6323,10 @@ Remember to also save your project manually.</source>
     </message>
     <message>
         <source>LMMS Error report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save project</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6955,6 +6978,10 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Decrement version number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
