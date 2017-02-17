@@ -221,6 +221,9 @@ if [ ! -e $mingw_root/lib/libgig/libgig.dll.a ]; then
 	info "  - Installing libgig..."
 	make install
 
+	mv $mingw_root/lib/bin/libakai-0.dll $mingw_root/bin
+	mv $mingw_root/lib/bin/libgig-7.dll $mingw_root/bin
+
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install libgig -- gigplayer needs this.  Exiting."
 	fi
