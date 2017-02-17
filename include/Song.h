@@ -289,9 +289,6 @@ public:
 
 public slots:
 	void playSong();
-	//TODO rename or find better way to expose these. Probably place elsewhere
-	void dontPlaySong();
-	void badFunctionName(int modeint);
 	void record();
 	void playAndRecord();
 	void playBB();

@@ -48,8 +48,12 @@ public slots:
 	virtual void update();
 =======
 	void openToBar();
+<<<<<<< 0afdaae455b5083e4dc91619bc89ced14d59bae7
 >>>>>>> Scroll to arbitrary point from song editor, except on first open
 
+=======
+	void allowOpenToBar();
+>>>>>>> Check for correct playmode
 
 protected slots:
 	void resetName();

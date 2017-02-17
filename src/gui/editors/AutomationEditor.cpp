@@ -2571,18 +2571,10 @@ void AutomationEditorWindow::openBar(AutomationPattern* pattern, MidiTime positi
 
 	//Open the pattern
 	open(pattern);
- 
-	//We need the playmode to be Mode_PlaySong for our scroll, 
-	//and (TODO) should set it back to what it was once we're done
-	int songPlayMode = Engine::getSong()->playMode();
-	//TODO find out the best way to expose playmode
-	Engine::getSong()->dontPlaySong();
 
 	//This scrolls to the right part
 	//12 scroll values per 16th note
 	m_editor->m_leftRightScroll->setValue( offset * 12 * 16 );
-
-	//Engine::getSong()->badFunctionName(songPlayMode);
 
 	//Various attempts at scrolling the viewport without user input
 	//m_editor->updateAfterPatternChange();

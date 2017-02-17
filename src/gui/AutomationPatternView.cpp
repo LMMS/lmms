@@ -79,6 +79,9 @@ void AutomationPatternView::openInAutomationEditor()
 	if(gui) gui->automationEditor()->open(m_pat);
 }
 
+
+
+
 void AutomationPatternView::openToBar()
 {
 	if(gui) gui->automationEditor()->openBar(m_pat, m_pat->startPosition());
@@ -90,6 +93,22 @@ void AutomationPatternView::update()
 
 	TrackContentObjectView::update();
 }
+
+
+
+
+void AutomationPatternView::allowOpenToBar()
+{
+	if(Engine::getSong()->playMode() == 1)
+	{ 
+		TextFloat::displayMessage("Right Playmode, allow");
+	}//_cm.a.setEnabled(true); }
+	else
+	{
+		TextFloat::displayMessage("Disallow/Gray Out");
+	}//_cm.a.setEnabled(false); } 
+}
+
 
 
 
@@ -176,6 +195,10 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	QAction * b = new QAction( embed::getIconPixmap( "automation" ), 
 				tr( "Open to Playhead" ), _cm );
 	_cm->insertAction( _cm->actions()[0], b );
+
+	//Call a function when playbackState changes
+	connect(Engine::getSong(), SIGNAL(playbackStateChanged()), this, SLOT( allowOpenToBar() ));
+
 	connect(b, SIGNAL(triggered()), this, SLOT(openToBar()));
 
 	//Open in Automation editor
