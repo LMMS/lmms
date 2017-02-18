@@ -383,15 +383,6 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
 
-	// ### TODO:
-/*	// Keep compatibility with version 2.1 file format
-	if( _this.hasAttribute( "lfosyncmode" ) )
-	{
-		m_lfoSpeedKnob->setSyncMode(
-		( TempoSyncKnob::TtempoSyncMode ) _this.attribute(
-						"lfosyncmode" ).toInt() );
-	}*/
-
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
 	updateSampleVars();
