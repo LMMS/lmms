@@ -31,8 +31,11 @@
 #include <cstdlib>
 #include <random>
 
-#include "lmms_math.h"
+#include "expressive_plugin.h"
+
 #include "interpolation.h"
+#include "lmms_math.h"
+#include "NotePlayHandle.h"
 
 #include "exprtk.hpp"
 
@@ -73,8 +76,8 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 		delete [] m_counters;
 	}
 
-	IntegrateFunction(const unsigned int* frame, unsigned int sample_rate,unsigned int max_counters)
-	: exprtk::ifunction<T>(1),
+	IntegrateFunction(const unsigned int* frame, unsigned int sample_rate,unsigned int max_counters) :
+	exprtk::ifunction<T>(1),
 	m_frame(frame),
 	m_sample_rate(sample_rate),
 	m_max_counters(max_counters),
@@ -246,15 +249,17 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 {
 	using exprtk::ifunction<float>::operator();
 
-	RandomVectorFunction(const unsigned int seed)
-	: exprtk::ifunction<float>(1),
+	RandomVectorFunction(const unsigned int seed) :
+	exprtk::ifunction<float>(1),
 	m_rseed(seed)
-	{exprtk::disable_has_side_effects(*this);}
+	{ exprtk::disable_has_side_effects(*this); }
 
 	inline float operator()(const float& index)
 	{
 		if (index < 0 || std::isnan(index) || std::isinf(index))
+		{
 			return 0;
+		}
 		const unsigned int xi = (unsigned int)index;
 		const unsigned int si = m_rseed % data_size;
 		const unsigned int sa = m_rseed / data_size;
@@ -291,11 +296,17 @@ public:
 	~ExprFrontData()
 	{
 		for (int i = 0; i < m_cyclics.size() ; ++i)
+		{
 			delete m_cyclics[i];
-		for (int i = 0; i < m_cyclics_interp.size() ;++i)
+		}
+		for (int i = 0; i < m_cyclics_interp.size() ; ++i)
+		{
 			delete m_cyclics_interp[i];
+		}
 		if (m_integ_func)
+		{
 			delete m_integ_func;
+		}
 	}
 
 	symbol_table_t m_symbol_table;
@@ -322,10 +333,8 @@ struct square_wave
 	static inline float process(float x)
 	{
 		x = positiveFraction(x);
-		if (x >= 0.5f)
-			return -1.0f;
-		else
-			return 1.0f;
+		if (x >= 0.5f) { return -1.0f; }
+		else { return 1.0f; }
 	}
 };
 static freefunc1<float,square_wave,true> square_wave_func;
@@ -335,10 +344,12 @@ struct triangle_wave
 	{
 		x=positiveFraction(x);
 		if (x < 0.25f)
+		{
 			return x * 4.0f;
+		}
 		else
 		{
-			if (x < 0.75f) {	return 2.0f - x * 4.0f; }
+			if (x < 0.75f) { return 2.0f - x * 4.0f; }
 
 			else { return x * 4.0f - 4.0f; }
 		}
@@ -523,4 +534,74 @@ void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsig
 		}
 	}
 
+}
+
+void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
+{
+	bool o1_valid = m_exprO1->isValid();
+	bool o2_valid = m_exprO2->isValid();
+	if (!o1_valid && !o2_valid)
+	{
+		return;
+	}
+	float o1 = 0, o2 = 0;
+	float pn1 = m_pan1->value() * 0.5;
+	float pn2 = m_pan2->value() * 0.5;
+	const float new_freq = m_nph->frequency();
+	const float freq_inc = (new_freq - m_frequency) / frames;
+	const bool is_released = m_nph->isReleased();
+
+	expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
+	expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
+	if (is_released && m_note_rel_sample == 0)
+	{
+		m_note_rel_sample = m_note_sample;
+	}
+	if (o1_valid && o2_valid)
+	{
+		for (fpp_t frame = 0; frame < frames ; ++frame)
+		{
+			if (is_released && m_released < 1)
+			{
+				m_released = fmin(m_released+m_rel_inc, 1);
+			}
+			o1 = o1_rawExpr->value();
+			o2 = o2_rawExpr->value();
+			buf[frame][0] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
+			buf[frame][1] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;
+			m_note_sample++;
+			m_note_sample_sec = m_note_sample / (float)m_sample_rate;
+			if (is_released)
+			{
+				m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate;
+			}
+			m_frequency += freq_inc;
+		}
+	}
+	else
+	{
+		if (o2_valid)
+		{
+			o1_rawExpr = o2_rawExpr;
+			pn1 = pn2;
+		}
+		for (fpp_t frame = 0; frame < frames ; ++frame)
+		{
+			if (is_released && m_released < 1)
+			{
+				m_released = fmin(m_released+m_rel_inc, 1);
+			}
+			o1 = o1_rawExpr->value();
+			buf[frame][0] = (-pn1 + 0.5) * o1;
+			buf[frame][1] = ( pn1 + 0.5) * o1;
+			m_note_sample++;
+			m_note_sample_sec = m_note_sample / (float)m_sample_rate;
+			if (is_released)
+			{
+				m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate;
+			}
+			m_frequency += freq_inc;
+		}
+	}
+	m_frequency = new_freq;
 }

@@ -24,7 +24,10 @@
 
 #ifndef EXPRFRONT_H_
 #define EXPRFRONT_H_
+
 #include <cmath>
+#include <cstddef>
+
 class ExprFrontData;
 
 inline float positiveFraction(float x)
@@ -51,6 +54,7 @@ public:
 	bool add_constant(const char* name, float  ref);
 	bool add_cyclic_vector(const char* name, const float* data, size_t length, bool interp = false);
 	void setIntegrate(const unsigned int* frameCounter, unsigned int sample_rate);
+	ExprFrontData* getData() { return m_data; }
 private:
 	ExprFrontData *m_data;
 	bool m_valid;

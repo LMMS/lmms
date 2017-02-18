@@ -109,35 +109,6 @@ ExprSynth::~ExprSynth()
 	}
 }
 
-void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
-{
-
-	float o1,o2;
-	const float pn1=m_pan1->value()*0.5;
-	const float pn2=m_pan2->value()*0.5;
-	const float new_freq=m_nph->frequency();
-	const float freq_inc=(new_freq-m_frequency)/frames;
-	const bool is_released = m_nph->isReleased();
-	if (is_released && m_note_rel_sample == 0)
-	{
-		m_note_rel_sample = m_note_sample;
-	}
-	for (fpp_t frame = 0; frame < frames ; ++frame)
-	{
-		if (is_released && m_released < 1)
-			m_released=fmin(m_released+m_rel_inc,1);
-		o1=m_exprO1->evaluate();
-		o2=m_exprO2->evaluate();
-		buf[frame][0] = (-pn1 + 0.5)*o1+(-pn2 + 0.5)*o2;
-		buf[frame][1] = ( pn1 + 0.5)*o1+( pn2 + 0.5)*o2;
-		m_note_sample++;
-		m_note_sample_sec = m_note_sample/(float)m_sample_rate;
-		if (is_released)
-			m_note_rel_sec = (m_note_sample-m_note_rel_sample)/(float)m_sample_rate;
-		m_frequency += freq_inc;
-	}
-	m_frequency = new_freq;
-}
 /*
  * nice test:
 O1 -> trianglew(2t*f)*(0.5+0.5sinew(12*A1*t+0.5))+sinew(t*f)*(0.5+0.5sinew(12*A1*t))
