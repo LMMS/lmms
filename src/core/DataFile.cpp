@@ -901,6 +901,7 @@ void DataFile::upgrade_1_1_91()
 }
 
 
+
 void DataFile::upgrade_1_2_0_rc3()
 {
 	// Upgrade from earlier bbtrack beat note behaviour of adding
@@ -923,6 +924,25 @@ void DataFile::upgrade_1_2_0_rc3()
 					steps = patternLength / 12;
 					el.setAttribute( "steps", steps );
 				}
+			}
+		}
+	}
+
+	// Upgrade from 0.4.15 envelope "sus" setting to "sustain"
+	// Moved from EnvelopeAndLfoParameters.cpp
+	QList<QString> envelope;
+	envelope << "elvol" << "elcut" << "elres";
+	for( int i = 0; i < envelope.size(); ++i )
+	{
+		QDomNodeList list = elementsByTagName( envelope[ i ] );
+		for( int j = 0; !list.item( j ).isNull(); ++j )
+		{
+			QDomElement el = list.item( j ).toElement();
+			if( el.hasAttribute( "sus" ) )
+			{
+				float sustain = el.attribute( "sus" ).toFloat();
+				sustain = 1.0f - sustain;
+				el.setAttribute( "sustain", sustain );
 			}
 		}
 	}

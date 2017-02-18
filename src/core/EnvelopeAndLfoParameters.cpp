@@ -372,17 +372,6 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	m_lfoAmountModel.loadSettings( _this, "lamt" );
 	m_x100Model.loadSettings( _this, "x100" );
 	m_controlEnvAmountModel.loadSettings( _this, "ctlenvamt" );
-
-/*	 ### TODO:
-	Old reversed sustain kept for backward compatibility
-	with 4.15 file format*/
-
-	if( _this.hasAttribute( "sus" ) )
-	{
-		m_sustainModel.loadSettings( _this, "sus" );
-		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
-	}
-
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 
 	updateSampleVars();
