@@ -20,8 +20,8 @@ temp_file=/tmp/ppa_listing_$$
 temp_temp_file=/tmp/ppa_listing_temp_$$
 
 skip_files="binutils openssl flac libgig libogg libvorbis x-bootstrap zlib"
-skip_files="$skip_files x-runtime gcc qt_4 qt5 fltk x-stk pkgconfig" 
-skip_files="$skip_files libjpeg glib2 libpng"
+skip_files="$skip_files x-runtime gcc qt_4 qt5 x-stk pkgconfig" 
+skip_files="$skip_files glib2 libpng"
 
 echo "Connecting to $PPA_HOST to get list of packages..."
 wget -qO- $PPA_URL |grep "Filename:" > $temp_file
