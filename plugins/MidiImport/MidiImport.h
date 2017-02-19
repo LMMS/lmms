@@ -28,10 +28,11 @@
 #include <QString>
 #include <QPair>
 #include <QVector>
+#include <QProgressDialog>
+#include <drumstick.h>
 
 #include "MidiEvent.h"
 #include "ImportFilter.h"
-
 
 class MidiImport : public ImportFilter
 {
@@ -44,7 +45,6 @@ public:
 	{
 		return( NULL );
 	}
-
 
 private:
 	virtual bool tryImport( TrackContainer* tc );
