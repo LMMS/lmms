@@ -32,7 +32,7 @@
 
 class QAtomicInt;
 
-const int BM_INITIAL_BUFFERS = 512;
+const int BM_INITIAL_BUFFERS = 1024;
 //const int BM_INCREMENT = 64;
 
 class EXPORT BufferManager
