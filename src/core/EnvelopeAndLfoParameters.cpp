@@ -389,8 +389,8 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
-	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
-				( m_x5Model.value() ? 5.0f : 1.0f ) *
+	const float x5modifier = m_x5Model.value() ? 5.0f : 1.0f;
+	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT * x5modifier *
 				Engine::mixer()->processingSampleRate();
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
