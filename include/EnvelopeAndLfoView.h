@@ -79,6 +79,7 @@ private:
 	Knob * m_sustainKnob;
 	Knob * m_releaseKnob;
 	Knob * m_amountKnob;
+	LedCheckBox * m_x5Cb;
 
 	// LFO stuff
 	Knob * m_lfoPredelayKnob;

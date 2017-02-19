@@ -151,7 +151,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_releaseKnob = new Knob( knobBright_26, this );
 	m_releaseKnob->setLabel( tr( "REL" ) );
 	m_releaseKnob->move( RELEASE_KNOB_X, ENV_KNOBS_Y );
-    m_releaseKnob->setHintText( tr( "Release:" ), "" );
+	m_releaseKnob->setHintText( tr( "Release:" ), "" );
 	m_releaseKnob->setWhatsThis(
 		tr( "Use this knob for setting release-time of the current "
 			"envelope. The bigger this value the longer the "
@@ -160,9 +160,19 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 			"strings." ) );
 
 
+	m_x5Cb = new LedCheckBox( tr( "x 5" ), this );
+	m_x5Cb->setFont( pointSizeF( m_x5Cb->font(), 6.5 ) );
+	m_x5Cb->move( AMOUNT_KNOB_X - 5, ENV_GRAPH_Y /*+ 36*/ );
+	m_x5Cb->setWhatsThis(
+		tr( "Modifies the envelope time by 5. At high setting you "
+			"will use up the available buffers at a very high "
+			"rate if you're not careful." ) );
+	ToolTip::add( m_x5Cb, tr( "Multiply envelope time by 5" ) );
+
+
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMT" ) );
-	m_amountKnob->move( AMOUNT_KNOB_X, ENV_GRAPH_Y );
+	m_amountKnob->move( AMOUNT_KNOB_X, ENV_KNOBS_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 	m_amountKnob->setWhatsThis(
 		tr( "Use this knob for setting modulation amount of the "
