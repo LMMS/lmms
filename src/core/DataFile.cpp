@@ -946,6 +946,45 @@ void DataFile::upgrade_1_2_0_rc3()
 			}
 		}
 	}
+	// Upgrade to envelope with x 5 modifier check box
+	// use same list 'envelope' from previous upgrade^
+	for( int i = 0; i < envelope.size(); ++i )
+	{
+		QDomNodeList list = elementsByTagName( envelope[ i ] );
+		for( int j = 0; !list.item( j ).isNull(); ++j )
+		{
+			bool x5modifier = false;
+			float attr;
+			//QDomNodeList list = elementsByTagName( attributes[ j ] );
+			QList<QString> attributes;
+			attributes << "pdel" << "att" << "hold" << "dec" << "rel";
+			QDomElement el = list.item( j ).toElement();
+			for( int k = 0; k < attributes.size(); ++k )
+			{
+				if( el.attribute( attributes[ k ] ) != "" )
+				{
+					attr = el.attribute( attributes[ k ] ).toFloat();
+					if( attr > 0.25 )
+					{
+						x5modifier = true;
+						el.setAttribute( "x5", true );
+					}
+				}
+			}
+			float env;
+			for( int k = 0; k < attributes.size(); ++k )
+			{
+				//QDomElement el = list.item( k ).toElement();
+				env = el.attribute( attributes[ k ] ).toFloat();
+				env *= 4.0f;
+				if( x5modifier )
+				{
+					env /= 5.0f;
+				}
+				el.setAttribute( attributes[ k ], env );
+			}
+		}
+	}
 }
 
 
