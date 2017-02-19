@@ -129,7 +129,7 @@ private:
 	FloatModel m_sustainModel;
 	FloatModel m_releaseModel;
 	FloatModel m_amountModel;
-
+	BoolModel m_x5Model;
 	float  m_sustainLevel;
 	float  m_amount;
 	float  m_valueForZeroAmount;

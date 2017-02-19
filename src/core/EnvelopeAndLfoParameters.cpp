@@ -98,6 +98,7 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Sustain" ) ),
 	m_releaseModel( 0.1, 0.0, 1.0, 0.001, this, tr( "Release" ) ),
 	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Modulation" ) ),
+	m_x5Model( false, this, tr( "Env x 5" ) ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
@@ -142,6 +143,9 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 			this, SLOT( updateSampleVars() ) );
 	connect( &m_amountModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ) );
+	connect( &m_x5Model, SIGNAL( dataChanged() ),
+			this, SLOT( updateSampleVars() ) );
+
 
 	connect( &m_lfoPredelayModel, SIGNAL( dataChanged() ),
 			this, SLOT( updateSampleVars() ) );
@@ -178,6 +182,7 @@ EnvelopeAndLfoParameters::~EnvelopeAndLfoParameters()
 	m_sustainModel.disconnect( this );
 	m_releaseModel.disconnect( this );
 	m_amountModel.disconnect( this );
+	m_x5Model.disconnect( this );
 	m_lfoPredelayModel.disconnect( this );
 	m_lfoAttackModel.disconnect( this );
 	m_lfoSpeedModel.disconnect( this );
@@ -343,6 +348,7 @@ void EnvelopeAndLfoParameters::saveSettings( QDomDocument & _doc,
 	m_sustainModel.saveSettings( _doc, _parent, "sustain" );
 	m_releaseModel.saveSettings( _doc, _parent, "rel" );
 	m_amountModel.saveSettings( _doc, _parent, "amt" );
+	m_x5Model.saveSettings( _doc, _parent, "x5" );
 	m_lfoWaveModel.saveSettings( _doc, _parent, "lshp" );
 	m_lfoPredelayModel.saveSettings( _doc, _parent, "lpdel" );
 	m_lfoAttackModel.saveSettings( _doc, _parent, "latt" );
@@ -365,6 +371,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 	m_sustainModel.loadSettings( _this, "sustain" );
 	m_releaseModel.loadSettings( _this, "rel" );
 	m_amountModel.loadSettings( _this, "amt" );
+	m_x5Model.loadSettings( _this, "x5" );
 	m_lfoWaveModel.loadSettings( _this, "lshp" );
 	m_lfoPredelayModel.loadSettings( _this, "lpdel" );
 	m_lfoAttackModel.loadSettings( _this, "latt" );
@@ -383,6 +390,7 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
+				( m_x5Model.value() ? 5.0f : 1.0f ) *
 				Engine::mixer()->processingSampleRate();
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(

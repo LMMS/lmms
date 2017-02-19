@@ -336,6 +336,7 @@ void EnvelopeAndLfoView::modelChanged()
 	m_sustainKnob->setModel( &m_params->m_sustainModel );
 	m_releaseKnob->setModel( &m_params->m_releaseModel );
 	m_amountKnob->setModel( &m_params->m_amountModel );
+	m_x5Cb->setModel( &m_params->m_x5Model );
 	m_lfoPredelayKnob->setModel( &m_params->m_lfoPredelayModel );
 	m_lfoAttackKnob->setModel( &m_params->m_lfoAttackModel );
 	m_lfoSpeedKnob->setModel( &m_params->m_lfoSpeedModel );
