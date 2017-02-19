@@ -315,7 +315,10 @@ void MainWindow::finalize()
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );*/
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
+#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
@@ -390,7 +393,10 @@ void MainWindow::finalize()
 					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
+#endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
