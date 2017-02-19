@@ -51,10 +51,10 @@ extern const float SECS_PER_LFO_OSCILLATION;
 const int ENV_GRAPH_X = 6;
 const int ENV_GRAPH_Y = 6;
 
-const int ENV_KNOBS_Y = 43;
+const int ENV_KNOBS_Y = 45;
 const int ENV_KNOBS_LBL_Y = ENV_KNOBS_Y+35;
-const int KNOB_X_SPACING = 32;
-const int PREDELAY_KNOB_X = 6;
+const int KNOB_X_SPACING = 33;
+const int PREDELAY_KNOB_X = 7;
 const int ATTACK_KNOB_X = PREDELAY_KNOB_X+KNOB_X_SPACING;
 const int HOLD_KNOB_X = ATTACK_KNOB_X+KNOB_X_SPACING;
 const int DECAY_KNOB_X = HOLD_KNOB_X+KNOB_X_SPACING;
