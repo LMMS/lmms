@@ -44,6 +44,7 @@ public:
 public slots:
 	void rename();
 	void renameFinished();
+	void nameChanged();
 
 
 protected:
@@ -53,6 +54,7 @@ protected:
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void resizeEvent( QResizeEvent * _re );
 
 
 private:
@@ -60,6 +62,7 @@ private:
 	QString m_iconName;
 	QLineEdit * m_renameLineEdit;
 	QRect m_buttonRect;
+	QString elideName( const QString &name );
 
 } ;
 
