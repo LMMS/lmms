@@ -350,6 +350,7 @@ private:
 
 	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
+	bool m_mouseInPianoRoll; //true if mouse is the edit area
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
@@ -359,6 +360,7 @@ private:
 	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
+	void setMousePointer();
 
 	// turn a selection rectangle into selected notes
 	void computeSelectedNotes( bool shift );
@@ -381,6 +383,7 @@ private:
 	QColor m_markedSemitoneColor;
 	int m_noteOpacity;
 	bool m_noteBorders;
+	QPixmap * m_cursor;
 
 signals:
 	void positionChanged( const MidiTime & );

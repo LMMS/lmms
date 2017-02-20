@@ -189,6 +189,7 @@ PianoRoll::PianoRoll() :
 	m_editMode( ModeDraw ),
 	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
+	m_mouseInPianoRoll( false ),
 	m_scrollBack( false ),
 	m_gridColor( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
@@ -200,7 +201,8 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
-	m_noteBorders( true )
+	m_noteBorders( true ),
+	m_cursor( NULL )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -1258,6 +1260,9 @@ void PianoRoll::leaveEvent(QEvent * e )
 		QApplication::restoreOverrideCursor();
 	}
 
+	m_mouseDownRight = false;
+	m_mouseInPianoRoll = false;
+	update();
 	QWidget::leaveEvent( e );
 	s_textFloat->hide();
 }
@@ -1578,8 +1583,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					m_action = ActionMoveNote;
 
 					// set move-cursor
-					QCursor c( Qt::SizeAllCursor );
-					QApplication::setOverrideCursor( c );
+//					QCursor c( Qt::SizeAllCursor );
+//					QApplication::setOverrideCursor( c );
 
 					// if they're holding shift, copy all selected notes
 					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
@@ -1975,29 +1980,42 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 {
-	if( ! hasValidPattern() )
+	if( !hasValidPattern() )
 	{
 		update();
 		return;
 	}
 
+	if( me->x() > WHITE_KEY_WIDTH
+			&& me->x() < width() - PR_RIGHT_MARGIN - 2
+			&& me->y() < height() - PR_BOTTOM_MARGIN - m_notesEditHeight )
+	{
+		m_mouseInPianoRoll = true;
+	}
+	else
+	{
+		m_mouseInPianoRoll = false;
+	}
+
+	setMousePointer();
+
 	if( m_action == ActionNone && me->buttons() == 0 )
 	{
 		if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
 		{
-			QApplication::setOverrideCursor(
-					QCursor( Qt::SizeVerCursor ) );
+			setCursor( Qt::SizeVerCursor );
 			return;
 		}
 	}
 	else if( m_action == ActionResizeNoteEditArea )
 	{
 		// change m_notesEditHeight and then repaint
+		setCursor( Qt::SizeVerCursor );
 		m_notesEditHeight = tLimit<int>(
 					m_oldNotesEditHeight - ( me->y() - m_moveStartY ),
 					NOTE_EDIT_MIN_HEIGHT,
 					height() - PR_TOP_MARGIN - NOTE_EDIT_RESIZE_BAR -
-									PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
+					PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
 		repaint();
 		return;
 	}
@@ -3081,32 +3099,40 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.fillRect( QRect( 0, keyAreaBottom(),
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), horizCol );
 
-	const QPixmap * cursor = NULL;
+	m_cursor = NULL;
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
-		case ModeDraw:
-			if( m_mouseDownRight )
-			{
-				cursor = s_toolErase;
-			}
-			else if( m_action == ActionMoveNote )
-			{
-				cursor = s_toolMove;
-			}
-			else
-			{
-				cursor = s_toolDraw;
-			}
-			break;
-		case ModeErase: cursor = s_toolErase; break;
-		case ModeSelect: cursor = s_toolSelect; break;
-		case ModeEditDetuning: cursor = s_toolOpen; break;
-	}
-	if( cursor != NULL )
-	{
-		p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 8, 8 ),
-								*cursor );
+	case ModeDraw:
+		if( m_mouseDownRight )
+		{
+			m_cursor = s_toolErase;
+		}
+		else if( m_action == ActionMoveNote )
+		{
+			m_cursor = s_toolMove;
+		}
+		else
+		{
+			m_cursor = s_toolDraw;
+		}
+		setMousePointer();
+		break;
+	case ModeErase: m_cursor = s_toolErase; break;
+	case ModeSelect:
+		m_cursor = NULL;
+		if( m_mouseInPianoRoll )
+		{
+			p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 13, 13 ), *s_toolSelect );
+		}
+		break;
+	case ModeEditDetuning:
+		m_cursor = NULL;
+		if( m_mouseInPianoRoll )
+		{
+			p.drawPixmap( mapFromGlobal( QCursor::pos() ) + QPoint( 13, 13 ), *s_toolOpen );
+		}
+		break;
 	}
 }
 
@@ -3989,6 +4015,21 @@ Note * PianoRoll::noteUnderMouse()
 	}
 
 	return NULL;
+}
+
+
+
+
+void PianoRoll::setMousePointer()
+{
+	if( m_cursor && m_mouseInPianoRoll )
+	{
+		setCursor( QCursor( *m_cursor, 0, m_cursor->height() ) );
+	}
+	else
+	{
+		setCursor( Qt::ArrowCursor );
+	}
 }
 
 
