@@ -45,7 +45,6 @@
 #include "Engine.h"
 #include "debug.h"
 #include "ToolTip.h"
-
 #include "LcdSpinBox.h"
 #include "FileDialog.h"
 
@@ -124,8 +123,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_disableAutoSave( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() ),
-	m_disableRunningAutoSave( !ConfigManager::inst()->value( "ui", "disablerunningautosave" ).toInt() ),
+	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
+	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave" ).toInt() ),
 	m_saveInterval(	ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() < 1 ?
 					MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
 			ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() ),
@@ -666,14 +665,14 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_autoSave = new LedCheckBox(
 			tr( "Enable auto-save" ), auto_save_tw );
 	m_autoSave->move( 10, 70 );
-	m_autoSave->setChecked( m_disableAutoSave );
+	m_autoSave->setChecked( m_enableAutoSave );
 	connect( m_autoSave, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAutoSave( bool ) ) );
 
 	m_runningAutoSave = new LedCheckBox(
 			tr( "Allow auto-save while playing" ), auto_save_tw );
 	m_runningAutoSave->move( 20, 90 );
-	m_runningAutoSave->setChecked( m_disableRunningAutoSave );
+	m_runningAutoSave->setChecked( m_enableRunningAutoSave );
 	connect( m_runningAutoSave, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleRunningAutoSave( bool ) ) );
 
@@ -690,8 +689,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( saveIntervalBtn, SIGNAL( clicked() ), this,
 						SLOT( displaySaveIntervalHelp() ) );
 
-	m_saveIntervalSlider->setEnabled( m_disableAutoSave );
-	m_runningAutoSave->setVisible( m_disableAutoSave );
+	m_saveIntervalSlider->setEnabled( m_enableAutoSave );
+	m_runningAutoSave->setVisible( m_enableAutoSave );
 
 
 	perf_layout->addWidget( auto_save_tw );
@@ -1027,12 +1026,12 @@ void SetupDialog::accept()
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
-	ConfigManager::inst()->setValue( "ui", "disableautosave",
-					QString::number( !m_disableAutoSave ) );
+	ConfigManager::inst()->setValue( "ui", "enableautosave",
+					QString::number( m_enableAutoSave ) );
 	ConfigManager::inst()->setValue( "ui", "saveinterval",
 					QString::number( m_saveInterval ) );
-	ConfigManager::inst()->setValue( "ui", "disablerunningautosave",
-					QString::number( !m_disableRunningAutoSave ) );
+	ConfigManager::inst()->setValue( "ui", "enablerunningautosave",
+					QString::number( m_enableRunningAutoSave ) );
 	ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	ConfigManager::inst()->setValue( "ui", "compacttrackbuttons",
@@ -1215,7 +1214,7 @@ void SetupDialog::toggleSmoothScroll( bool _enabled )
 
 void SetupDialog::toggleAutoSave( bool _enabled )
 {
-	m_disableAutoSave = _enabled;
+	m_enableAutoSave = _enabled;
 	m_saveIntervalSlider->setEnabled( _enabled );
 	m_runningAutoSave->setVisible( _enabled );
 	setAutoSaveInterval( m_saveIntervalSlider->value() );
@@ -1226,9 +1225,8 @@ void SetupDialog::toggleAutoSave( bool _enabled )
 
 void SetupDialog::toggleRunningAutoSave( bool _enabled )
 {
-	m_disableRunningAutoSave = _enabled;
+	m_enableRunningAutoSave = _enabled;
 }
-
 
 
 
@@ -1512,7 +1510,7 @@ void SetupDialog::setAutoSaveInterval( int value )
 	m_saveIntervalSlider->setValue( m_saveInterval );
 	QString minutes = m_saveInterval > 1 ? tr( "minutes" ) : tr( "minute" );
 	minutes = QString( "%1 %2" ).arg( QString::number( m_saveInterval ), minutes );
-	minutes = m_disableAutoSave ?  minutes : tr( "Disabled" );
+	minutes = m_enableAutoSave ?  minutes : tr( "Disabled" );
 	m_saveIntervalLbl->setText( tr( "Auto-save interval: %1" ).arg( minutes ) );
 }
 
@@ -1534,7 +1532,7 @@ void SetupDialog::displaySaveIntervalHelp()
 	QWhatsThis::showText( QCursor::pos(),
 			tr( "Set the time between automatic backup to %1.\n"
 			"Remember to also save your project manually. "
-			"You can also choose to disable saving while playing, "
+			"You can choose to disable saving while playing, "
 			"something some older systems find difficult." ).arg(
 			ConfigManager::inst()->recoveryFile() ) );
 }

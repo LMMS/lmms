@@ -89,6 +89,7 @@ void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 
 void BufferManager::release( sampleFrame * buf )
 {
+	if (buf == nullptr) return;
 	int i = s_releasedIndex.fetchAndAddOrdered( 1 );
 	s_released[ i ] = buf;
 	//qDebug( "released buffer: %p - index %d", buf, i );

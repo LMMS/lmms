@@ -86,6 +86,9 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	opl->setSpacing( 0 );
 
 	m_filterEdit = new QLineEdit( ops );
+#if QT_VERSION >= 0x050000
+	m_filterEdit->setClearButtonEnabled( true );
+#endif
 	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
 			this, SLOT( filterItems( const QString & ) ) );
 

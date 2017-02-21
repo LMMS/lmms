@@ -37,7 +37,7 @@
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
-	m_displayWidth ( 400 ),
+	m_displayWidth ( 450 ),
 	m_displayHeigth ( 200 ),
 	m_controls ( controls )
 

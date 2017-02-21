@@ -201,7 +201,7 @@ MainWindow::MainWindow() :
 
 	m_updateTimer.start( 1000 / 20, this );  // 20 fps
 
-	if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() )
+	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
@@ -317,7 +317,10 @@ void MainWindow::finalize()
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );*/
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
+#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
@@ -400,7 +403,10 @@ void MainWindow::finalize()
 					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
+#endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
@@ -903,6 +909,10 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 		{
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
+#ifdef LMMS_BUILD_APPLE
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 			shownInMenu++;
 			if( shownInMenu >= 15 )
 			{
@@ -1383,7 +1393,7 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject(true) )
 	{
 		// delete recovery file
-		if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt()
+		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt()
 			&& getSession() != Limited )
 		{
 			sessionCleanup();
@@ -1492,6 +1502,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 
 	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
@@ -1509,6 +1523,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 }
 
@@ -1539,10 +1557,11 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( ( !ConfigManager::inst()->value( "ui", "disablerunningautosave" ).toInt() ||
-		! Engine::getSong()->isPlaying() ) &&
-		!( Engine::getSong()->isExporting() ||
-		QApplication::mouseButtons() ) )
+	if( !Engine::getSong()->isExporting() &&
+		!QApplication::mouseButtons() &&
+			( ConfigManager::inst()->value( "ui",
+					"enablerunningautosave" ).toInt() ||
+				! Engine::getSong()->isPlaying() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer
@@ -1562,7 +1581,7 @@ void MainWindow::autoSave()
 // from the timer where we need to do extra tests.
 void MainWindow::runAutoSave()
 {
-	if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() &&
+	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() &&
 		getSession() != Limited )
 	{
 		autoSave();

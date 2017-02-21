@@ -52,8 +52,8 @@ public:
 
 	static float freqToXPixel( float freq, int w );
 	static float xPixelToFreq( float x , int w );
-	static float gainToYPixel( float gain, int h, int pixelPerUnitHeight );
-	static float yPixelToGain( float y, int h, int pixelPerUnitHeight );
+	static float gainToYPixel( float gain, int h, float pixelPerUnitHeight );
+	static float yPixelToGain( float y, int h, float pixelPerUnitHeight );
 
 	QRectF boundingRect() const;
 	QPainterPath getCurvePath();
@@ -94,6 +94,7 @@ protected:
 
 private:
 	double calculateGain( const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 );
+	void loadPixmap();
 
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
@@ -111,7 +112,7 @@ private:
 	bool m_mousePressed;
 	bool m_active;
 	bool m_handleMoved;
-
+	QPixmap m_circlePixmap;
 private slots:
 	void handleMoved();
 

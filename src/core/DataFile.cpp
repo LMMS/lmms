@@ -912,15 +912,17 @@ void DataFile::upgrade_1_2_0_rc3()
 {
 	// Upgrade from earlier bbtrack beat note behaviour of adding
 	// steps if a note is placed after the last step.
-	QDomNodeList list = elementsByTagName( "bbtrack" );
-	for( int i = 0; !list.item( i ).isNull(); ++i )
+	QDomNodeList bbtracks = elementsByTagName( "bbtrack" );
+	for( int i = 0; !bbtracks.item( i ).isNull(); ++i )
 	{
-		list = elementsByTagName( "pattern" );
-		for( int i = 0; !list.item( i ).isNull(); ++i )
+		QDomNodeList patterns = bbtracks.item( i
+				).toElement().elementsByTagName(
+								"pattern" );
+		for( int j = 0; !patterns.item( j ).isNull(); ++j )
 		{
 			int patternLength, steps;
-			QDomElement el = list.item( i ).toElement();
-			for( int i = 0; !list.item( i ).isNull(); ++i )
+			QDomElement el = patterns.item( j ).toElement();
+			for( int k = 0; !patterns.item( k ).isNull(); ++k )
 			{
 				if( el.attribute( "len" ) != "" )
 				{
@@ -930,6 +932,49 @@ void DataFile::upgrade_1_2_0_rc3()
 				}
 			}
 		}
+	}
+}
+
+
+static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
+{
+	if( el.hasAttribute( "syncmode" ) )
+	{
+		int syncmode = el.attribute( "syncmode" ).toInt();
+		QStringList names;
+		QDomNamedNodeMap atts = el.attributes();
+		for( uint i = 0; i < atts.length(); i++ )
+		{
+			QString name = atts.item( i ).nodeName();
+			if( name.endsWith( "_numerator" ) )
+			{
+				names << name.remove( "_numerator" )
+								+ "_syncmode";
+			}
+		}
+		for( QStringList::iterator it = names.begin(); it < names.end();
+									++it )
+		{
+			el.setAttribute( *it, syncmode );
+		}
+	}
+
+	QDomElement child = el.firstChildElement();
+	while ( !child.isNull() )
+	{
+		upgradeElement_1_2_0_rc2_42( child );
+		child = child.nextSiblingElement();
+	}
+}
+
+
+void DataFile::upgrade_1_2_0_rc2_42()
+{
+	QDomElement el = firstChildElement();
+	while ( !el.isNull() )
+	{
+		upgradeElement_1_2_0_rc2_42( el );
+		el = el.nextSiblingElement();
 	}
 }
 
@@ -1013,6 +1058,7 @@ void DataFile::upgrade()
 	if( version < "1.2.0-rc3" )
 	{
 		upgrade_1_2_0_rc3();
+		upgrade_1_2_0_rc2_42();
 	}
 
 	// update document meta data

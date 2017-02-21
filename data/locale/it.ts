@@ -42,10 +42,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>LMMS</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Involved</source>
         <translation>Coinvolti</translation>
     </message>
@@ -56,6 +52,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Copyright © %1</source>
         <translation>Copyright © %1</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1005,10 +1005,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
 <context>
     <name>DelayControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Delay</translation>
-    </message>
-    <message>
         <source>Lfo Amt</source>
         <translation>Quantità Lfo</translation>
     </message>
@@ -1017,16 +1013,8 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Tempo di ritardo</translation>
     </message>
     <message>
-        <source>Regen</source>
-        <translation>Regen</translation>
-    </message>
-    <message>
         <source>Feedback Amount</source>
         <translation>Quantità di Feedback</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation>Frequenza</translation>
     </message>
     <message>
         <source>Lfo</source>
@@ -1039,6 +1027,22 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Gain</source>
         <translation>Guadagno</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>RITARDO</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>FDBK</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>FREQUENZA</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
     </message>
 </context>
 <context>
@@ -1880,18 +1884,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <source> Octave</source>
         <translation>Ottave</translation>
     </message>
-    <message>
-        <source>Frequency</source>
-        <translation>Frequenza</translation>
-    </message>
-    <message>
-        <source>Resonance</source>
-        <translation>Risonanza</translation>
-    </message>
-    <message>
-        <source>Bandwidth</source>
-        <translation>Larghezza di Banda</translation>
-    </message>
 </context>
 <context>
     <name>EqHandle</name>
@@ -2055,12 +2047,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <translation>Non è stato possibile aprire il file</translation>
     </message>
     <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>Impossibile aprire in scrittura il file %1.
-Assicurarsi di avere i permessi in scrittura per il file e per la directory contenente il file e riprovare!</translation>
-    </message>
-    <message>
         <source>Export project to %1</source>
         <translation>Esporta il progetto in %1</translation>
     </message>
@@ -2075,6 +2061,11 @@ Assicurarsi di avere i permessi in scrittura per il file e per la directory cont
     <message>
         <source>Rendering: %1%</source>
         <translation>Renderizzazione: %1%</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2918,7 +2909,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     </message>
     <message>
         <source>Phrygolydian</source>
-        <translation>Phrygolydian</translation>
+        <translation>Frigia</translation>
     </message>
     <message>
         <source>Lydian</source>
@@ -3968,10 +3959,6 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Salva come progetto default</translation>
     </message>
     <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>Esporta &amp;MIDI...</translation>
-    </message>
-    <message>
         <source>&amp;View</source>
         <translation>&amp;Visualizza</translation>
     </message>
@@ -4050,6 +4037,10 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     <message>
         <source>Enable note labels in piano roll</source>
         <translation>Abilita l&apos;etichetta delle note nel piano roll</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5703,16 +5694,16 @@ Motivo: &quot;%2&quot;</translation>
 <context>
     <name>PluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Plugin strumentali</translation>
-    </message>
-    <message>
         <source>Instrument browser</source>
         <translation>Browser strumenti</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
         <translation>È possibile trascinare uno strumento nel Song-Editor, nel Beat+Bassline Editor o direttamente in un canale esistente.</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6141,10 +6132,6 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Scorrimento morbido nel Song-Editor</translation>
     </message>
     <message>
-        <source>Enable auto save feature</source>
-        <translation>Abilita la funzione di salvataggio automatico</translation>
-    </message>
-    <message>
         <source>Show playback cursor in AudioFileProcessor</source>
         <translation>Mostra il cursore di riproduzione dentro AudioFileProcessor</translation>
     </message>
@@ -6271,14 +6258,25 @@ Latenza: %2 ms</translation>
         <translation>minuto</translation>
     </message>
     <message>
-        <source>Auto save interval: %1 %2</source>
-        <translation>Intervallo di auto-salvataggio: %1 %2</translation>
+        <source>Enable auto-save</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Allow auto-save while playing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Auto-save interval: %1</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
-Remember to also save your project manually.</source>
-        <translation>Imposta l&apos;intervallo del backup automatico a %1.
-Ricorda di salvare il tuo progetto anche manualmente.</translation>
+Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6358,6 +6356,10 @@ Ricorda di salvare il tuo progetto anche manualmente.</translation>
     <message>
         <source>LMMS Error report</source>
         <translation>Informazioni sull&apos;errore di LMMS</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -7012,6 +7014,10 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     <message>
         <source>Decrement version number</source>
         <translation>Riduci numero versione</translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
