@@ -1134,12 +1134,12 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			TOP_MARGIN :
 			grid_bottom - ( m_topLevel - m_bottomLevel ) * m_y_delta );
 
-		if ( m_zoomingXModel.value() > 3 )
+		if( m_zoomingXModel.value() > 3 )
 		{
 			// If we're over 100% zoom, we allow all quantization level grids
 			q = AutomationPattern::quantization();
 		}
-		else if ( AutomationPattern::quantization() % 3 != 0 )
+		else if( AutomationPattern::quantization() % 3 != 0 )
 		{
 			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
@@ -1199,9 +1199,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		int barCount = m_currentPosition / MidiTime::ticksPerTact();
 		int leftBars = m_currentPosition / m_ppt;
 
-		for ( int x = VALUES_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		for( int x = VALUES_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
 		{
-			if ( (barCount + leftBars)  % 2 != 0 )
+			if( ( barCount + leftBars )  % 2 != 0 )
 			{
 				p.fillRect( x - m_currentPosition, TOP_MARGIN, m_ppt,
 					height() - ( SCROLLBAR_SIZE + TOP_MARGIN ), backgroundShade() );

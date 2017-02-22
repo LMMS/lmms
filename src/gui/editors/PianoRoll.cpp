@@ -2717,7 +2717,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int yCorrectionForNoteLabels = 0;
 
 		int keyCode = key % KeysPerOctave;
-		switch (keyCode)
+		switch( keyCode )
 		{
 		case 0:
 		case 5:
@@ -2734,7 +2734,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		}
 
-		if ( Piano::isWhiteKey( key ) )
+		if( Piano::isWhiteKey( key ) )
 		{
 			// Draw note names if activated in the preferences, C notes are always drawn
 			if ( key % 12 == 0 || drawNoteNames )
@@ -2857,12 +2857,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	{
 		int q, x, tick;
 
-		if ( m_zoomingModel.value() > 3 )
+		if( m_zoomingModel.value() > 3 )
 		{
 			// If we're over 100% zoom, we allow all quantization level grids
 			q = quantization();
 		}
-		else if ( quantization() % 3 != 0 )
+		else if( quantization() % 3 != 0 )
 		{
 			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
 			// to ensure a dense doesn't fill out the background
@@ -2904,9 +2904,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int barCount = m_currentPosition / MidiTime::ticksPerTact();
 		int leftBars = m_currentPosition / m_ppt;
 
-		for ( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
 		{
-			if ( (barCount + leftBars)  % 2 != 0 )
+			if( ( barCount + leftBars )  % 2 != 0 )
 			{
 				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
 					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
