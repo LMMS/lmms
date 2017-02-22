@@ -190,7 +190,9 @@ PianoRoll::PianoRoll() :
 	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
-	m_gridColor( 0, 0, 0 ),
+	m_barLineColor( 0, 0, 0 ),
+	m_beatLineColor( 0, 0, 0 ),
+	m_lineColor( 0, 0, 0 ),
 	m_noteModeColor( 0, 0, 0 ),
 	m_noteColor( 0, 0, 0 ),
 	m_barColor( 0, 0, 0 ),
@@ -200,7 +202,8 @@ PianoRoll::PianoRoll() :
 	m_textShadow( 0, 0, 0 ),
 	m_markedSemitoneColor( 0, 0, 0 ),
 	m_noteOpacity( 255 ),
-	m_noteBorders( true )
+	m_noteBorders( true ),
+	m_backgroundShade( 0, 0, 0 )
 {
 	// gui names of edit modes
 	m_nemStr.push_back( tr( "Note Velocity" ) );
@@ -726,11 +729,23 @@ void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 
 /** \brief qproperty access implementation */
 
-QColor PianoRoll::gridColor() const
-{ return m_gridColor; }
+QColor PianoRoll::barLineColor() const
+{ return m_barLineColor; }
 
-void PianoRoll::setGridColor( const QColor & c )
-{ m_gridColor = c; }
+void PianoRoll::setBarLineColor( const QColor & c )
+{ m_barLineColor = c; }
+
+QColor PianoRoll::beatLineColor() const
+{ return m_beatLineColor; }
+
+void PianoRoll::setBeatLineColor( const QColor & c )
+{ m_beatLineColor = c; }
+
+QColor PianoRoll::lineColor() const
+{ return m_lineColor; }
+
+void PianoRoll::setLineColor( const QColor & c )
+{ m_lineColor = c; }
 
 QColor PianoRoll::noteModeColor() const
 { return m_noteModeColor; }
@@ -791,6 +806,12 @@ bool PianoRoll::noteBorders() const
 
 void PianoRoll::setNoteBorders( const bool b )
 { m_noteBorders = b; }
+
+QColor PianoRoll::backgroundShade() const
+{ return m_backgroundShade; }
+
+void PianoRoll::setBackgroundShade( const QColor & c )
+{ m_backgroundShade = c; }
 
 
 
@@ -2568,12 +2589,15 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 	Engine::getSong()->setModified();
 }
 
+int PianoRoll::xCoordOfTick(int tick )
+{
+	return WHITE_KEY_WIDTH + ( ( tick - m_currentPosition )
+		* m_ppt / MidiTime::ticksPerTact() );
+}
+
 void PianoRoll::paintEvent(QPaintEvent * pe )
 {
 	bool drawNoteNames = ConfigManager::inst()->value( "ui", "printnotelabels").toInt();
-
-	QColor horizCol = QColor( gridColor() );
-	QColor vertCol = QColor( gridColor() );
 
 	QStyleOption opt;
 	opt.initFrom( this );
@@ -2690,25 +2714,11 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			y -= WHITE_KEY_BIG_HEIGHT;
 		}
 
-		// Draw the C line in a more prominent color
-		if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
-		{
-			horizCol.setAlpha( 192 );
-		}
-		else
-		{
-			horizCol.setAlpha( 64 );
-		}
-
-		// draw key-line
-		p.setPen( horizCol );
-		p.drawLine( WHITE_KEY_WIDTH, key_line_y, width(), key_line_y );
-
 		// Compute the corrections for the note names
 		int yCorrectionForNoteLabels = 0;
 
 		int keyCode = key % KeysPerOctave;
-		switch (keyCode)
+		switch( keyCode )
 		{
 		case 0:
 		case 5:
@@ -2725,7 +2735,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		}
 
-		if ( Piano::isWhiteKey( key ) )
+		if( Piano::isWhiteKey( key ) )
 		{
 			// Draw note names if activated in the preferences, C notes are always drawn
 			if ( key % 12 == 0 || drawNoteNames )
@@ -2843,67 +2853,95 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 				width() - WHITE_KEY_WIDTH,
 				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN );
 
-	// draw vertical raster
-
-	// triplet mode occurs if the note duration isn't a multiple of 3
-	bool triplets = ( quantization() % 3 != 0 );
-
-	int spt = MidiTime::stepsPerTact();
-	float pp16th = (float)m_ppt / spt;
-	int bpt = DefaultBeatsPerTact;
-	if ( triplets ) {
-		spt = static_cast<int>(1.5 * spt);
-		bpt = static_cast<int>(bpt * 2.0/3.0);
-		pp16th *= 2.0/3.0;
-	}
-
-	int tact_16th = m_currentPosition / bpt;
-
-	const int offset = ( m_currentPosition % bpt ) *
-			m_ppt / MidiTime::ticksPerTact();
-
-	bool show32nds = ( m_zoomingModel.value() > 3 );
-
-	// we need float here as odd time signatures might produce rounding
-	// errors else and thus an unusable grid
-	for( float x = WHITE_KEY_WIDTH - offset; x < width();
-						x += pp16th, ++tact_16th )
+	// draw the grid
+	if( hasValidPattern() )
 	{
-		if( x >= WHITE_KEY_WIDTH )
+		int q, x, tick;
+
+		if( m_zoomingModel.value() > 3 )
 		{
-			// every tact-start needs to be a bright line
-			if( tact_16th % spt == 0 )
+			// If we're over 100% zoom, we allow all quantization level grids
+			q = quantization();
+		}
+		else if( quantization() % 3 != 0 )
+		{
+			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
+			// to ensure a dense doesn't fill out the background
+			q = quantization() < 8 ? 8 : quantization();
+		}
+		else {
+			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes
+			q = quantization() < 6 ? 6 : quantization();
+		}
+
+		// First we draw the vertical quantization lines
+		for( tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick( tick );
+			x <= width(); tick += q, x = xCoordOfTick( tick ) )
+		{
+			p.setPen( lineColor() );
+			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
+		}
+
+		// Draw horizontal lines
+		key = m_startKey;
+		for( int y = keyAreaBottom() - 1; y > PR_TOP_MARGIN;
+				y -= KEY_LINE_HEIGHT )
+		{
+			if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 			{
-	 			p.setPen( gridColor() );
+				// C note gets accented
+				p.setPen( beatLineColor() );
 			}
-			// normal line
-			else if( tact_16th % 4 == 0 )
-			{
-				vertCol.setAlpha( 160 );
-				p.setPen( vertCol );
-			}
-			// weak line
 			else
 			{
-				vertCol.setAlpha( 128 );
-				p.setPen( vertCol );
+				p.setPen( lineColor() );
 			}
+			p.drawLine( WHITE_KEY_WIDTH, y, width(), y );
+			++key;
+		}
 
-			p.drawLine( (int) x, PR_TOP_MARGIN, (int) x, height() -
-							PR_BOTTOM_MARGIN );
+		// Draw alternating shades on bars
+		// count the bars which disappear on left by scrolling
+		int barCount = m_currentPosition / MidiTime::ticksPerTact();
+		int leftBars = m_currentPosition / m_ppt;
 
-			// extra 32nd's line
-			if( show32nds )
+		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		{
+			if( ( barCount + leftBars )  % 2 != 0 )
 			{
-				vertCol.setAlpha( 80 );
-				p.setPen( vertCol );
-				p.drawLine( (int)(x + pp16th / 2) , PR_TOP_MARGIN,
-						(int)(x + pp16th / 2), height() -
-						PR_BOTTOM_MARGIN );
+				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
 			}
 		}
-	}
 
+
+		// Draw the vertical beat lines
+		int ticksPerBeat = DefaultTicksPerTact /
+			Engine::getSong()->getTimeSigModel().getDenominator();
+
+		// triplet mode occurs if the note quantization isn't a multiple of 3
+		if( quantization() % 3 != 0 )
+		{
+			ticksPerBeat = static_cast<int>( ticksPerBeat * 2.0/3.0 );
+		}
+
+		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
+			x = xCoordOfTick( tick ); x <= width();
+			tick += ticksPerBeat, x = xCoordOfTick( tick ) )
+		{
+			p.setPen( beatLineColor() );
+			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
+		}
+
+		// Draw the vertical bar lines
+		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
+			x = xCoordOfTick( tick ); x <= width();
+			tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
+		{
+			p.setPen( barLineColor() );
+			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
+		}
+	}
 
 
 	// following code draws all notes in visible area
@@ -3065,21 +3103,25 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		m_leftRightScroll->setPageStep( l );
 	}
 
-	// set alpha for horizontal lines
-	horizCol.setAlpha( 64 );
+	// set line colors
+	QColor editAreaCol = QColor( lineColor() );
+	QColor currentKeyCol = QColor( beatLineColor() );
+
+	editAreaCol.setAlpha( 64 );
+	currentKeyCol.setAlpha( 64 );
 
 	// horizontal line for the key under the cursor
 	if( hasValidPattern() )
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
 		p.fillRect( 10, keyAreaBottom() + 3 - KEY_LINE_HEIGHT *
-					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, horizCol );
+					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, currentKeyCol );
 	}
 
 	// bar to resize note edit area
 	p.setClipRect( 0, 0, width(), height() );
 	p.fillRect( QRect( 0, keyAreaBottom(),
-					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), horizCol );
+					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), editAreaCol );
 
 	const QPixmap * cursor = NULL;
 	// draw current edit-mode-icon below the cursor

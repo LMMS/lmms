@@ -52,11 +52,14 @@ class TimeLineWidget;
 class AutomationEditor : public QWidget, public JournallingObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QColor gridColor READ gridColor WRITE setGridColor)
+	Q_PROPERTY(QColor barLineColor READ barLineColor WRITE setBarLineColor)
+	Q_PROPERTY(QColor beatLineColor READ beatLineColor WRITE setBeatLineColor)
+	Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
 	Q_PROPERTY(QColor vertexColor READ vertexColor WRITE setVertexColor)
 	Q_PROPERTY(QBrush scaleColor READ scaleColor WRITE setScaleColor)
 	Q_PROPERTY(QBrush graphColor READ graphColor WRITE setGraphColor)
 	Q_PROPERTY(QColor crossColor READ crossColor WRITE setCrossColor)
+	Q_PROPERTY(QColor backgroundShade READ backgroundShade WRITE setBackgroundShade)
 public:
 	void setCurrentPattern(AutomationPattern * new_pattern);
 
@@ -78,16 +81,22 @@ public:
 	}
 
 	// qproperty access methods
-	QColor gridColor() const;
+	QColor barLineColor() const;
+	void setBarLineColor(const QColor & c);
+	QColor beatLineColor() const;
+	void setBeatLineColor(const QColor & c);
+	QColor lineColor() const;
+	void setLineColor(const QColor & c);
 	QBrush graphColor() const;
+	void setGraphColor(const QBrush & c);
 	QColor vertexColor() const;
+	void setVertexColor(const QColor & c);
 	QBrush scaleColor() const;
+	void setScaleColor(const QBrush & c);
 	QColor crossColor() const;
-	void setGridColor(const QColor& c);
-	void setGraphColor(const QBrush& c);
-	void setVertexColor(const QColor& c);
-	void setScaleColor(const QBrush& c);
-	void setCrossColor(const QColor& c);
+	void setCrossColor(const QColor & c);
+	QColor backgroundShade() const;
+	void setBackgroundShade(const QColor & c);
 
 	enum EditModes
 	{
@@ -239,11 +248,14 @@ private:
 	void drawAutomationPoint( QPainter & p, timeMap::iterator it );
 	bool inBBEditor();
 
-	QColor m_gridColor;
+	QColor m_barLineColor;
+	QColor m_beatLineColor;
+	QColor m_lineColor;
 	QBrush m_graphColor;
 	QColor m_vertexColor;
 	QBrush m_scaleColor;
 	QColor m_crossColor;
+	QColor m_backgroundShade;
 
 	friend class AutomationEditorWindow;
 
