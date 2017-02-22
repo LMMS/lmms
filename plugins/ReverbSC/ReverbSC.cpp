@@ -78,8 +78,8 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	}
 
 	double outSum = 0.0;
-	const float d = (dryLevel() + 1) * 0.5;
-	const float w = (wetLevel() + 1) * 0.5;
+	const float d = dryLevel();
+	const float w = wetLevel();
 
 	SPFLOAT tmpL, tmpR;
 	SPFLOAT dcblkL, dcblkR;
