@@ -50,39 +50,53 @@ AutomationTrack::~AutomationTrack()
 
 
 
-bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool AutomationTrack::play( const MidiTime & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
 	if( isMuted() )
-	{
+{
 		return false;
 	}
 
-	tcoVector tcos;
+	int tco_begin = 0, tco_end = numOfTCOs();
+	MidiTime time_end = time_start + static_cast<int>(_frames / Engine::framesPerTick());
+
 	if( _tco_num >= 0 )
 	{
-		TrackContentObject * tco = getTCO( _tco_num );
-		tcos.push_back( tco );
-	}
-	else
-	{
-		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / Engine::framesPerTick()) );
+		tco_begin = _tco_num;
+		tco_end = _tco_num + 1;
 	}
 
-	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
+	// TCOs that we'll process later, sorted by start position
+	QVector<TrackContentObject*> tcos;
+	tcos.reserve(tco_end - tco_begin);
+
+	for (int i = tco_begin; i < tco_end; i++)
 	{
-		AutomationPattern * p = dynamic_cast<AutomationPattern *>( *it );
-		if( p == NULL || ( *it )->isMuted() )
+		TrackContentObject* tco = getTCO(i);
+
+		// Skip this TCO if it's muted or not contained in the time period we're processing
+		if( tco == NULL || tco->isMuted() || tco->startPosition() > time_end)
 		{
 			continue;
 		}
-		MidiTime cur_start = _start;
-		if( _tco_num < 0 )
+
+		tcos.insert(std::upper_bound(tcos.begin(), tcos.end(), tco, TrackContentObject::comparePosition),
+					tco);
+	}
+
+	for( TrackContentObject* tco : tcos )
+	{
+		auto p = dynamic_cast<AutomationPattern *>(tco);
+
+		if (_tco_num < 0)
 		{
-			cur_start -= p->startPosition();
+			p->processMidiTime(time_start - p->startPosition());
 		}
-		p->processMidiTime( cur_start );
+		else
+		{
+			p->processMidiTime(time_start);
+		}
 	}
 	return false;
 }
