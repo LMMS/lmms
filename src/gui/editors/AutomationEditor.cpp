@@ -713,7 +713,10 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == ERASE ) )
 		{
-			int resolution = 1 + m_zoomingXModel.value() * 2;
+			// int resolution needed to improve the sensitivity of
+			// the erase manoeuvre with zoom levels < 100%
+			int resolution = 1 + m_zoomingXModel.value() * m_zoomingXModel.value();
+			resolution *= m_zoomingXModel.value() > 3 ? 2 : 1;
 			for( int i = -resolution; i < resolution; ++i )
 			{
 				m_pattern->removeValue( MidiTime( pos_ticks + i ) );
