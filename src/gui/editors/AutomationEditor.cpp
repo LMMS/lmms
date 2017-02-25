@@ -139,6 +139,9 @@ AutomationEditor::AutomationEditor() :
 	}
 	m_quantizeModel.addItem( "1/192" );
 
+	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
+	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
+
 	if( s_toolYFlip == NULL )
 	{
 		s_toolYFlip = new QPixmap( embed::getIconPixmap(
@@ -149,9 +152,6 @@ AutomationEditor::AutomationEditor() :
 		s_toolXFlip = new QPixmap( embed::getIconPixmap(
 							"flip_x" ) );
 	}
-
-	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
-	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
