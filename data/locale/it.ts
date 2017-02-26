@@ -55,7 +55,7 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -227,6 +227,9 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation>Il server JACK sembra essere stato spento e non sono partite nuove istanze. Quindi LMMS non è in grado di procedere. Salva il progetto attivo e fai ripartire JACK ed LMMS.</translation>
     </message>
+</context>
+<context>
+    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation>NOME DEL CLIENT</translation>
@@ -2065,7 +2068,8 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile scrivere sul file %1.
+Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
     </message>
 </context>
 <context>
@@ -2254,6 +2258,9 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <source>FX-Mixer</source>
         <translation>Mixer FX</translation>
     </message>
+</context>
+<context>
+    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation>Volume FX %1</translation>
@@ -3431,12 +3438,12 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Modalità logaritmica</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Inserire un nuovo valore tra -96.0 dBFS e 6.0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Inserire un valore compreso tra %1 e %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Inserire un nuovo valore tra -96.0 dBFS e 6.0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -4027,10 +4034,6 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>In questo modo verrà modificato il tuo progetto di default corrente.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volume in dBFS</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Scorrimento morbido</translation>
     </message>
@@ -4040,7 +4043,11 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     </message>
     <message>
         <source>Save project template</source>
-        <translation type="unfinished"/>
+        <translation>Salva come modello di progetto</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volume in dBFS</translation>
     </message>
 </context>
 <context>
@@ -5703,7 +5710,7 @@ Motivo: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Instrument Plugins</source>
-        <translation type="unfinished"/>
+        <translation>Plugin Strumentali</translation>
     </message>
 </context>
 <context>
@@ -6052,10 +6059,6 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Dopo aver modificato le impostazioni, mostra un avviso al riavvio</translation>
     </message>
     <message>
-        <source>Display volume as dBFS </source>
-        <translation>Mostra il volume in dBFS</translation>
-    </message>
-    <message>
         <source>Compress project files per default</source>
         <translation>Per impostazione predefinita, comprimi i file di progetto</translation>
     </message>
@@ -6258,25 +6261,30 @@ Latenza: %2 ms</translation>
         <translation>minuto</translation>
     </message>
     <message>
+        <source>Display volume as dBFS </source>
+        <translation>Mostra il volume in dBFS</translation>
+    </message>
+    <message>
         <source>Enable auto-save</source>
-        <translation type="unfinished"/>
+        <translation>Abiita funzione di salvataggio automatico</translation>
     </message>
     <message>
         <source>Allow auto-save while playing</source>
-        <translation type="unfinished"/>
+        <translation>Consenti il salvataggio automatico durante la riproduzione</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"/>
+        <translation>Disabilitato</translation>
     </message>
     <message>
         <source>Auto-save interval: %1</source>
-        <translation type="unfinished"/>
+        <translation>Intervallo di salvataggio automatico: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
 Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
-        <translation type="unfinished"/>
+        <translation>Imposta il tempo tra i salvataggi automatici a %1.
+Ricorda di salvare i progetti manualmente. Puoi disabilitare il salvataggio automatico durante la riproduzione, in quanto potrebbe pesare troppo su un sistema datato.</translation>
     </message>
 </context>
 <context>
@@ -6359,7 +6367,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Save project</source>
-        <translation type="unfinished"/>
+        <translation>Salva progetto</translation>
     </message>
 </context>
 <context>
@@ -7017,7 +7025,7 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     </message>
     <message>
         <source> already exists. Do you want to replace it?</source>
-        <translation type="unfinished"/>
+        <translation>Esiste già. Vuoi sovrascriverlo?</translation>
     </message>
 </context>
 <context>
