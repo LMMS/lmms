@@ -316,34 +316,30 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		}
 
 		float *values = m_pat->valuesAfter( it.key() );
-		for( int i = it.key(); i < (it + 1).key(); i++ )
+
+		QPainterPath path;
+		QPoint origin = QPoint(x_base + it.key() * ppt / MidiTime::ticksPerTact(),0.0f);
+		path.moveTo(origin);
+		path.moveTo(QPoint(x_base + it.key() * ppt / MidiTime::ticksPerTact(),values[0]));
+		for( int i = it.key() + 1; i < (it + 1).key(); i++ )
 		{
-			float x1value = values[i - it.key()];
-			float x2value = values[i - it.key() + 1];
-			if (i+1 == (it + 1).key()) x2value = x1value; //Catches last value not being there
-
-			const float x1 = x_base + i * ppt /
-						MidiTime::ticksPerTact();
-			const float x2 = x_base + (i + 1) * ppt /
-						MidiTime::ticksPerTact();
+			const float x1 = x_base + i * ppt / MidiTime::ticksPerTact();
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
+			float value = values[i - it.key()];
+			path.lineTo(QPoint(x1,value));
 
-			//Creates Polygon
-			QPainterPath path;
-			path.moveTo(QPoint(x1,0));
-			path.lineTo(QPoint(x1,x1value));
-			path.lineTo(QPoint(x2,x2value));
-			path.lineTo(QPoint(x2,0));
-			path.lineTo(QPoint(x1,0));
+		}
+		path.lineTo(x_base + ((it + 1).key()) * ppt / MidiTime::ticksPerTact(),values[(it + 1).key() - 1 - it.key()]);
+		path.lineTo(x_base + ((it + 1).key()) * ppt / MidiTime::ticksPerTact(),0.0f);
+		path.lineTo(origin);
 
-			if( gradient() )
-			{
-				p.fillPath(path,lin2grad);
-			}
-			else
-			{
-				p.fillPath(path,col);
-			}
+		if( gradient() )
+		{
+			p.fillPath(path,lin2grad);
+		}
+		else
+		{
+			p.fillPath(path,col);
 		}
 		delete [] values;
 	}
