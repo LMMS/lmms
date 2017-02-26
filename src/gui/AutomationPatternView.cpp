@@ -318,15 +318,15 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		float *values = m_pat->valuesAfter( it.key() );
 
 		QPainterPath path;
-		QPoint origin = QPoint(x_base + it.key() * ppt / MidiTime::ticksPerTact(),0.0f);
+		QPointF origin = QPointF(x_base + it.key() * ppt / MidiTime::ticksPerTact(),0.0f);
 		path.moveTo(origin);
-		path.moveTo(QPoint(x_base + it.key() * ppt / MidiTime::ticksPerTact(),values[0]));
+		path.moveTo(QPointF(x_base + it.key() * ppt / MidiTime::ticksPerTact(),values[0]));
 		for( int i = it.key() + 1; i < (it + 1).key(); i++ )
 		{
 			const float x1 = x_base + i * ppt / MidiTime::ticksPerTact();
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 			float value = values[i - it.key()];
-			path.lineTo(QPoint(x1,value));
+			path.lineTo(QPointF(x1,value));
 
 		}
 		path.lineTo(x_base + ((it + 1).key()) * ppt / MidiTime::ticksPerTact(),values[(it + 1).key() - 1 - it.key()]);
