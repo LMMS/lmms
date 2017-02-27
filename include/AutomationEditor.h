@@ -125,7 +125,7 @@ protected:
 
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
-	int yCoordOfLevel( float level );
+	float yCoordOfLevel( float level );
 	inline void drawLevelTick( QPainter & p, int tick,
 					float value, bool is_selected );
 	void removeSelection();

@@ -1329,12 +1329,26 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				}
 
 				float *values = m_pattern->valuesAfter( it.key() );
-				for( int i = 0; i < (it+1).key() - it.key(); i++ )
-				{
 
-					drawLevelTick( p, it.key() + i, values[i],
-									is_selected );
+				float nextValue;
+				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
+					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
+				else
+					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
+
+				p.setRenderHints( QPainter::Antialiasing, true );
+				QPainterPath path;
+				path.moveTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
+				for( int i = 0; i < ( it + 1 ).key() - it.key(); i++ )
+				{	path.lineTo( QPointF( xCoordOfTick( it.key() + i ), yCoordOfLevel( values[i] ) ) );
+					//drawLevelTick( p, it.key() + i, values[i], is_selected );
+					
 				}
+				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
+				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
+				path.lineTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
+				p.fillPath( path, graphColor() );
+				p.setRenderHints( QPainter::Antialiasing, false );
 				delete [] values;
 
 				// Draw circle
@@ -1433,19 +1447,16 @@ int AutomationEditor::xCoordOfTick(int tick )
 
 
 
-int AutomationEditor::yCoordOfLevel(float level )
+float AutomationEditor::yCoordOfLevel(float level )
 {
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	if( m_y_auto )
 	{
-		return (int)( grid_bottom - ( grid_bottom - TOP_MARGIN )
-						* ( level - m_minLevel )
-						/ ( m_maxLevel - m_minLevel ) );
+		return ( grid_bottom - ( grid_bottom - TOP_MARGIN ) * ( level - m_minLevel ) / ( m_maxLevel - m_minLevel ) );
 	}
 	else
 	{
-		return (int)( grid_bottom - ( level - m_bottomLevel )
-								* m_y_delta );
+		return ( grid_bottom - ( level - m_bottomLevel ) * m_y_delta );
 	}
 }
 
