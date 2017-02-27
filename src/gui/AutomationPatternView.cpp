@@ -319,27 +319,27 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 		QPainterPath path;
 		QPointF origin = QPointF(x_base + it.key() * ppTact,0.0f);
-		path.moveTo(origin);
-		path.moveTo(QPointF(x_base + it.key() * ppTact,values[0]));
-		for( int i = it.key() + 1; i < (it + 1).key(); i++ )
+		path.moveTo( origin );
+		path.moveTo( QPointF( x_base + it.key() * ppTact,values[0] ) );
+		for( int i = it.key() + 1; i < ( it + 1 ).key(); i++ )
 		{
 			const float x1 = x_base + i * ppTact;
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
-			float value = values[i - it.key()];
-			path.lineTo(QPointF(x1,value));
+			float value = values[ i - it.key() ];
+			path.lineTo( QPointF( x1,value ) );
 
 		}
-		path.lineTo(x_base + ((it + 1).key()) * ppTact,values[(it + 1).key() - 1 - it.key()]);
-		path.lineTo(x_base + ((it + 1).key()) * ppTact,0.0f);
-		path.lineTo(origin);
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTact,values[ ( it + 1 ).key() - 1 - it.key() ] );
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTact,0.0f );
+		path.lineTo( origin );
 
 		if( gradient() )
 		{
-			p.fillPath(path,lin2grad);
+			p.fillPath( path, lin2grad );
 		}
 		else
 		{
-			p.fillPath(path,col);
+			p.fillPath( path, col );
 		}
 		delete [] values;
 	}
