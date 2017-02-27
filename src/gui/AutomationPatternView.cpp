@@ -318,7 +318,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		float *values = m_pat->valuesAfter( it.key() );
 
 		QPainterPath path;
-		QPointF origin = QPointF(x_base + it.key() * ppTick,0.0f);
+		QPointF origin = QPointF( x_base + it.key() * ppTick, 0.0f );
 		path.moveTo( origin );
 		path.moveTo( QPointF( x_base + it.key() * ppTick,values[0] ) );
 		float x;
