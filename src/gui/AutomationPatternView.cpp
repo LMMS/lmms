@@ -280,7 +280,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
-	const float ppTact  = ppt / MidiTime::ticksPerTact();
+	const float ppTick  = ppt / MidiTime::ticksPerTact();
 
 	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );
@@ -301,7 +301,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	{
 		if( it+1 == m_pat->getTimeMap().end() )
 		{
-			const float x1 = x_base + it.key() * ppTact;
+			const float x1 = x_base + it.key() * ppTick;
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 			if( gradient() )
@@ -318,19 +318,20 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		float *values = m_pat->valuesAfter( it.key() );
 
 		QPainterPath path;
-		QPointF origin = QPointF(x_base + it.key() * ppTact,0.0f);
+		QPointF origin = QPointF(x_base + it.key() * ppTick,0.0f);
 		path.moveTo( origin );
-		path.moveTo( QPointF( x_base + it.key() * ppTact,values[0] ) );
+		path.moveTo( QPointF( x_base + it.key() * ppTick,values[0] ) );
+		float x;
 		for( int i = it.key() + 1; i < ( it + 1 ).key(); i++ )
 		{
-			const float x1 = x_base + i * ppTact;
-			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
+			x = x_base + i * ppTick;
+			if( x > ( width() - TCO_BORDER_WIDTH ) ) break;
 			float value = values[ i - it.key() ];
-			path.lineTo( QPointF( x1,value ) );
+			path.lineTo( QPointF( x, value ) );
 
 		}
-		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTact,values[ ( it + 1 ).key() - 1 - it.key() ] );
-		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTact,0.0f );
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, values[ ( it + 1 ).key() - 1 - it.key() ] );
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, 0.0f );
 		path.lineTo( origin );
 
 		if( gradient() )
