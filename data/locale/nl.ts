@@ -3439,12 +3439,12 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
         <translation>Logaritmisch instellen</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Voer een nieuwe waarde in tussen -96,0 dBFS en 6,0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Voer een nieuwe waarde in tussen %1 en %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Voer een nieuwe waarde in tussen -96,0 dBFS en 6,0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -4035,10 +4035,6 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
         <translation>Dit zal uw huidig standaard-sjabloon overschrijven.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volume als dBFS</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Vloeiend scrollen</translation>
     </message>
@@ -4049,6 +4045,10 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
     <message>
         <source>Save project template</source>
         <translation>Projectsjabloon opslaan</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volume als dBFS</translation>
     </message>
 </context>
 <context>
@@ -5916,6 +5916,60 @@ Reden: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Invoer</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Invoer-gain:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grootte</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Grootte:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Kleur</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Kleur:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Uitvoer</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Uitvoer-gain:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Invoer-gain</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grootte</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Kleur</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Uitvoer-gain</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -6060,10 +6114,6 @@ Reden: &quot;%2&quot;</translation>
     <message>
         <source>Show restart warning after changing settings</source>
         <translation>Waarschuwing voor herstarten weergeven na wijzigen van instellingen</translation>
-    </message>
-    <message>
-        <source>Display volume as dBFS </source>
-        <translation>Volume weergeven als dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
@@ -6266,6 +6316,10 @@ Latentie: %2 ms</translation>
     <message>
         <source>minute</source>
         <translation>minuut</translation>
+    </message>
+    <message>
+        <source>Display volume as dBFS </source>
+        <translation>Volume weergeven als dBFS</translation>
     </message>
     <message>
         <source>Enable auto-save</source>
@@ -9289,6 +9343,10 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filter voor exporteren van MIDI-bestanden van LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Reverb-algoritme door Sean Costello</translation>
     </message>
 </context>
 <context>
