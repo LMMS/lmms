@@ -344,7 +344,8 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	{
 		const int tx = x_base + static_cast<int>( ppt * t ) - 2;
 		p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
-		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ), tx, rect().bottom() - TCO_BORDER_WIDTH );
+		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
+					tx, rect().bottom() - TCO_BORDER_WIDTH );
 	}
 
 	// recording icon for when recording automation
