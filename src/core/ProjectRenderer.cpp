@@ -167,8 +167,8 @@ void ProjectRenderer::run()
 #endif
 #endif
 
-
 	Engine::getSong()->startExport();
+	Engine::getSong()->updateLength();
     //skip first empty buffer
     Engine::mixer()->nextBuffer();
 
