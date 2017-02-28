@@ -37,7 +37,7 @@
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
 
-#include "exprtk.hpp"
+#include "exprtk.patched.hpp"
 
 typedef exprtk::symbol_table<float> symbol_table_t;
 typedef exprtk::expression<float> expression_t;
