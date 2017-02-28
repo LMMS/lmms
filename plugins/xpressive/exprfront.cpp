@@ -511,13 +511,16 @@ size_t find_occurances(const std::string& haystack, const char* const needle)
 	size_t last_pos = 0;
 	size_t count = 0;
 	const size_t len = strlen(needle);
-	while (last_pos+len>haystack.length())
+	if (len > 0)
 	{
-		last_pos = haystack.find(needle,last_pos);
-		if (last_pos == std::string::npos)
-			break;
-		++count;
-		last_pos += len;
+		while (last_pos + len <= haystack.length())
+		{
+			last_pos = haystack.find(needle, last_pos);
+			if (last_pos == std::string::npos)
+				break;
+			++count;
+			last_pos += len;
+		}
 	}
 	return count;
 }
