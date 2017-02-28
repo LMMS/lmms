@@ -19676,7 +19676,8 @@ namespace exprtk
          if (index < error_list_.size())
             return error_list_[index];
          else
-            throw std::invalid_argument("parser::get_error() - Invalid error index specificed");
+            return parser_error::type();
+            //throw std::invalid_argument("parser::get_error() - Invalid error index specificed");
       }
 
       inline std::string error() const
