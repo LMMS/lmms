@@ -340,15 +340,12 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	const int lineSize = 3;
 	p.setPen( c.darker( 300 ) );
 
-	for( tact_t t = 1; t < m_pat->timeMapLength().getTact(); ++t )
+	for( tact_t t = 1; t < width() - TCO_BORDER_WIDTH; ++t )
 	{
 		const int tx = x_base + static_cast<int>( ppt * t ) - 2;
-		if( tx < ( width() - TCO_BORDER_WIDTH * 2 ) )
-		{
-			p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
-			p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
-						tx, rect().bottom() - TCO_BORDER_WIDTH );
-		}
+		p.drawLine( tx, TCO_BORDER_WIDTH, tx, TCO_BORDER_WIDTH + lineSize );
+		p.drawLine( tx,	rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
+					tx, rect().bottom() - TCO_BORDER_WIDTH );
 	}
 
 	// recording icon for when recording automation
