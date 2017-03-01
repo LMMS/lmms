@@ -2907,14 +2907,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		// Draw alternating shades on bars
 		// count the bars which disappear on left by scrolling
-		int barCount = m_currentPosition / MidiTime::ticksPerTact();
-		int leftBars = m_currentPosition / m_ppt;
 
-		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
+		int barCount = m_currentPosition / MidiTime::ticksPerTact();
+		int leftBars = m_currentPosition * zoomFactor / m_ppt;
+
+		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition * zoomFactor; x += m_ppt, ++barCount )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
-				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+				p.fillRect( x - m_currentPosition * zoomFactor, PR_TOP_MARGIN, m_ppt,
 					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
 			}
 		}
