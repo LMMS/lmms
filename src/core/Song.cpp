@@ -555,6 +555,12 @@ void Song::updateLength()
 	for( TrackList::const_iterator it = tracks().begin();
 						it != tracks().end(); ++it )
 	{
+		if( Engine::getSong()->isExporting() &&
+				( *it )->isMuted() )
+		{
+			continue;
+		}
+
 		const tact_t cur = ( *it )->length();
 		if( cur > m_length )
 		{

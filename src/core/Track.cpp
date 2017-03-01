@@ -2421,6 +2421,12 @@ tact_t Track::length() const
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
+		if( Engine::getSong()->isExporting() &&
+				( *it )->isMuted() )
+		{
+			continue;
+		}
+
 		const tick_t cur = ( *it )->endPosition();
 		if( cur > last )
 		{
