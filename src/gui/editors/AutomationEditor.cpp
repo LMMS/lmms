@@ -132,6 +132,13 @@ AutomationEditor::AutomationEditor() :
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
+	for( int i = 0; i < 5; ++i )
+	{
+		m_quantizeModel.addItem( "1/" +
+					QString::number( (1 << i) * 3 ) );
+	}
+	m_quantizeModel.addItem( "1/192" );
+
 	if( s_toolYFlip == NULL )
 	{
 		s_toolYFlip = new QPixmap( embed::getIconPixmap(
@@ -2015,8 +2022,21 @@ void AutomationEditor::zoomingYChanged()
 
 void AutomationEditor::setQuantization()
 {
-	int quantization = DefaultTicksPerTact / (1 << m_quantizeModel.value());;
-	AutomationPattern::setQuantization(quantization);
+	int quantization = m_quantizeModel.value();
+	if( quantization < 7 )
+	{
+		quantization = 1 << quantization;
+	}
+	else if( quantization < 12 )
+	{
+		quantization = ( 1 << ( quantization - 7 ) ) * 3;
+	}
+	else
+	{
+		quantization = DefaultTicksPerTact;
+	}
+	quantization = DefaultTicksPerTact / quantization;
+	AutomationPattern::setQuantization( quantization );
 }
 
 
