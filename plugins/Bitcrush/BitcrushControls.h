@@ -50,9 +50,9 @@ public:
 		return( 9 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return( new BitcrushControlDialog( this ) );
+		return(new BitcrushControlDialog(this, NULL));
 	}
 
 private slots:

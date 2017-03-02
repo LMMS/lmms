@@ -33,9 +33,8 @@
 
 
 
-stereoMatrixControlDialog::stereoMatrixControlDialog(
-	stereoMatrixControls * _controls ) :
-	EffectControlDialog( _controls )
+stereoMatrixControlDialog::stereoMatrixControlDialog(stereoMatrixControls *_controls, QWidget *_parent) :
+        EffectControlDialog(_controls, _parent)
 {
 
 	setFixedSize( 160, 185 );

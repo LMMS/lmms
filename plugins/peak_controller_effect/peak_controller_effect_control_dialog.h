@@ -37,8 +37,8 @@ class PeakControllerEffectControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	PeakControllerEffectControlDialog(
-				PeakControllerEffectControls * _controls );
+	PeakControllerEffectControlDialog(PeakControllerEffectControls *_controls,
+                                          QWidget *_parent);
 	virtual ~PeakControllerEffectControlDialog()
 	{
 	}

@@ -55,9 +55,9 @@ public:
 		return 11;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new DualFilterControlDialog( this );
+		return new DualFilterControlDialog(this, _parent);
 	}
 
 

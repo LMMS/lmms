@@ -36,7 +36,7 @@ class dynProcControlDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	dynProcControlDialog( dynProcControls * _controls );
+	dynProcControlDialog(dynProcControls *_controls, QWidget *_parent);
 	virtual ~dynProcControlDialog()
 	{
 	}

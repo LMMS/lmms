@@ -48,7 +48,7 @@ public:
 	}
 
 	virtual int controlCount() = 0;
-	virtual EffectControlDialog * createView() = 0;
+	virtual EffectControlDialog *createView(QWidget *_parent) = 0;
 
 
 	void setViewVisible( bool _visible )

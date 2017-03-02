@@ -54,9 +54,9 @@ public:
 		return 42;
 	}
 
-	virtual EffectControlDialog* createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new EqControlsDialog( this );
+		return new EqControlsDialog(this, NULL);
 	}
 
 	float m_inPeakL;

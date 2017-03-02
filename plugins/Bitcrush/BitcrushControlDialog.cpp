@@ -34,8 +34,8 @@
 #include "LedCheckbox.h"
 #include "Knob.h"
 
-BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
-	EffectControlDialog( controls )
+BitcrushControlDialog::BitcrushControlDialog(BitcrushControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

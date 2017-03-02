@@ -45,7 +45,7 @@ class EqControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	EqControlsDialog( EqControls * controls );
+	EqControlsDialog(EqControls *controls, QWidget *_parent);
 	virtual ~EqControlsDialog()
 	{
 	}

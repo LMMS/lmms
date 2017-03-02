@@ -31,8 +31,8 @@
 
 
 
-FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
-	EffectControlDialog( controls )
+FlangerControlsDialog::FlangerControlsDialog(FlangerControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

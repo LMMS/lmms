@@ -35,9 +35,8 @@
 #include "LedCheckbox.h"
 
 
-dynProcControlDialog::dynProcControlDialog(
-					dynProcControls * _controls ) :
-	EffectControlDialog( _controls )
+dynProcControlDialog::dynProcControlDialog(dynProcControls *_controls, QWidget *_parent) :
+        EffectControlDialog(_controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

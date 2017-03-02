@@ -64,9 +64,9 @@ public:
 		return( 6 );
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return( new dynProcControlDialog( this ) );
+		return(new dynProcControlDialog(this, NULL));
 	}
 
 

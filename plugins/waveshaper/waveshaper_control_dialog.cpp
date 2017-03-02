@@ -35,9 +35,8 @@
 #include "LedCheckbox.h"
 
 
-waveShaperControlDialog::waveShaperControlDialog(
-					waveShaperControls * _controls ) :
-	EffectControlDialog( _controls )
+waveShaperControlDialog::waveShaperControlDialog(waveShaperControls *_controls, QWidget *_parent) :
+        EffectControlDialog(_controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

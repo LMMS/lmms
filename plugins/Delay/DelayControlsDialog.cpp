@@ -33,8 +33,8 @@
 
 
 
-DelayControlsDialog::DelayControlsDialog( DelayControls *controls ) :
-	EffectControlDialog( controls )
+DelayControlsDialog::DelayControlsDialog(DelayControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

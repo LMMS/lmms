@@ -24,64 +24,83 @@
  */
 
 #include <QLayout>
+#include <QtGui/QStyleOption>
+#include <QtGui/QPainter>
+#include <QtGui/QGroupBox>
 
 #include "DualFilterControlDialog.h"
 #include "DualFilterControls.h"
-#include "embed.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
 #include "ToolTip.h"
 #include "gui_templates.h"
 
-#define makeknob( name, x, y, model, label, hint, unit ) 	\
-	Knob * name = new Knob( knobBright_26, this); 			\
-	name -> move( x, y );									\
-	name ->setModel( &controls-> model );					\
-	name ->setLabel( label );							\
-	name ->setHintText( hint, unit );
+#define makeknob( name, model, label, hint, unit, volume, container )   \
+	Knob * name = new Knob( knobBright_26, this); 			            \
+	name ->setModel( &controls-> model );					            \
+	name ->setLabel( label );							                \
+	name ->setHintText( hint, unit );                                   \
+    name ->setVolumeKnob( volume );                                     \
+    container ->addWidget(name);
 
 
-
-DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls ) :
-	EffectControlDialog( controls )
+DualFilterControlDialog::DualFilterControlDialog(DualFilterControls *controls, QWidget *_parent) :
+	EffectControlDialog( controls , _parent)
 {
-	setAutoFillBackground( true );
-	QPalette pal;
-	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
-	setPalette( pal );
-	setFixedSize( 150, 220 );
+    // filter1
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    QGroupBox *filter1GroupBox = new QGroupBox( this );
+    QVBoxLayout *filter1GroupBoxLayout = new QVBoxLayout;
+    QHBoxLayout *filter1KnobsLayout = new QHBoxLayout;
+    filter1GroupBoxLayout->addLayout(filter1KnobsLayout);
+    filter1GroupBox->setLayout(filter1GroupBoxLayout);
+    mainLayout->addWidget(filter1GroupBox);
 
-	makeknob( cut1Knob, 33, 30, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res1Knob, 75, 30, m_res1Model, tr( "RESO" ), tr( "Resonance" ), "" )
-	makeknob( gain1Knob, 117, 30, m_gain1Model, tr( "GAIN" ), tr( "Gain" ), "%" )
-	makeknob( mixKnob, 62, 100, m_mixModel, tr( "MIX" ), tr( "Mix" ), "" )
-	makeknob( cut2Knob, 33, 145, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res2Knob, 75, 145, m_res2Model, tr( "RESO" ), tr( "Resonance" ), "" )
-	makeknob( gain2Knob, 117, 145, m_gain2Model, tr( "GAIN" ), tr( "Gain" ), "%" )
+    makeknob( mixKnob, m_mixModel, tr( "MIX" ), tr( "Mix" ), "", false, mainLayout)
 
-	gain1Knob-> setVolumeKnob( true );
-	gain2Knob-> setVolumeKnob( true );
+    // filter 2
+    QGroupBox *filter2GroupBox = new QGroupBox( this );
+    QVBoxLayout *filter2GroupBoxLayout = new QVBoxLayout;
+    QHBoxLayout *filter2KnobsLayout = new QHBoxLayout;
+    filter2GroupBoxLayout->addLayout(filter2KnobsLayout);
+    filter2GroupBox->setLayout(filter2GroupBoxLayout);
+    mainLayout->addWidget(filter2GroupBox);
 
-	LedCheckBox * enabled1Toggle = new LedCheckBox( "", this,
-				tr( "Filter 1 enabled" ), LedCheckBox::Green );
-	LedCheckBox * enabled2Toggle = new LedCheckBox( "", this,
-				tr( "Filter 2 enabled" ), LedCheckBox::Green );
+    this->setLayout(mainLayout);
 
-	enabled1Toggle -> move( 5, 30 );
-	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
-	ToolTip::add( enabled1Toggle, tr( "Click to enable/disable Filter 1" ) );
-	enabled2Toggle -> move( 5, 145 );
-	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
-	ToolTip::add( enabled2Toggle, tr( "Click to enable/disable Filter 2" ) );
+    // filter 1 controls
+    makeknob( cut1Knob, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency:" ), tr( "Hz" ), false, filter1KnobsLayout)
+    makeknob( res1Knob, m_res1Model, tr( "RESO" ), tr( "Resonance:" ), tr( "" ), false, filter1KnobsLayout)
+    makeknob( gain1Knob, m_gain1Model, tr( "GAIN" ), tr( "Gain:" ), tr( "%" ), true, filter1KnobsLayout)
 
-	ComboBox * m_filter1ComboBox = new ComboBox( this );
-	m_filter1ComboBox->setGeometry( 5, 70, 140, 22 );
-	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
-	m_filter1ComboBox->setModel( &controls->m_filter1Model );
+    ComboBox * m_filter1ComboBox = new ComboBox( this );
+    m_filter1ComboBox->setModel( &controls->m_filter1Model );
+    filter1GroupBoxLayout->addWidget(m_filter1ComboBox);
 
-	ComboBox * m_filter2ComboBox = new ComboBox( this );
-	m_filter2ComboBox->setGeometry( 5, 185, 140, 22 );
-	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
-	m_filter2ComboBox->setModel( &controls->m_filter2Model );
+    LedCheckBox * filter1Toggle = new LedCheckBox( "", this, tr( "Filter 1 enabled" ), LedCheckBox::Green );
+	filter1Toggle -> move( 11,11 );
+    filter1Toggle -> setModel( &controls -> m_enabled1Model );
+    ToolTip::add( filter1Toggle, tr( "Click to enable/disable Filter 1" ) );
+
+    // filter 2 controls
+    makeknob( cut2Knob, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency:" ), tr( "Hz" ), false, filter2KnobsLayout)
+    makeknob( res2Knob, m_res2Model, tr( "RESO" ), tr( "Resonance:" ), tr( "" ), false, filter2KnobsLayout)
+    makeknob( gain2Knob, m_gain2Model, tr( "GAIN" ), tr( "Gain:" ), tr( "%" ), true, filter2KnobsLayout)
+
+    ComboBox * m_filter2ComboBox = new ComboBox( this );
+    m_filter2ComboBox->setModel( &controls->m_filter2Model );
+    filter2GroupBoxLayout->addWidget(m_filter2ComboBox);
+
+    LedCheckBox * filter2Toggle = new LedCheckBox( "", this, tr( "Filter 2 enabled" ), LedCheckBox::Green );
+	filter2Toggle -> move( 228, 11 );
+    filter2Toggle -> setModel( &controls -> m_enabled2Model );
+    ToolTip::add( filter2Toggle, tr( "Click to enable/disable Filter 2" ) );
 }
 
+void DualFilterControlDialog::paintEvent(QPaintEvent *)
+{
+    QStyleOption opt;
+    opt.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+}

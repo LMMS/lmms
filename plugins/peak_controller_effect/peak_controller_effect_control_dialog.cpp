@@ -35,9 +35,9 @@
 #include "embed.h"
 
 
-PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
-				PeakControllerEffectControls * _controls ) :
-	EffectControlDialog( _controls )
+PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(PeakControllerEffectControls *_controls,
+																	 QWidget *_parent) :
+        EffectControlDialog(_controls, _parent)
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setAutoFillBackground( true );

@@ -54,9 +54,9 @@ public:
 		return 1;
 	}
 
-	virtual EffectControlDialog * createView()
+	virtual EffectControlDialog *createView(QWidget *_parent)
 	{
-		return new SpectrumAnalyzerControlDialog( this );
+		return new SpectrumAnalyzerControlDialog(this, NULL);
 	}
 
 

@@ -35,8 +35,8 @@
 
 
 
-LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
-	EffectControlDialog( _ctl ),
+LadspaControlDialog::LadspaControlDialog(LadspaControls *_ctl, QWidget *_parent) :
+        EffectControlDialog(_ctl, _parent),
 	m_effectLayout( NULL ),
 	m_stereoLink( NULL )
 {

@@ -34,7 +34,7 @@ class DelayControlsDialog : public EffectControlDialog
 {
 	Q_OBJECT
 public:
-	DelayControlsDialog( DelayControls* controls );
+	DelayControlsDialog(DelayControls *controls, QWidget *_parent);
 	virtual ~DelayControlsDialog()
 	{
 	}

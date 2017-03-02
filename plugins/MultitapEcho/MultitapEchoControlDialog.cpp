@@ -37,8 +37,8 @@
 #include "LcdSpinBox.h"
 
 
-MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * controls ) :
-	EffectControlDialog( controls )
+MultitapEchoControlDialog::MultitapEchoControlDialog(MultitapEchoControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent)
 {
 	setAutoFillBackground( true );
 	QPalette pal;

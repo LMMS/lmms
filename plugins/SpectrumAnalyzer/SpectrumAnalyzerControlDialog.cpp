@@ -143,8 +143,8 @@ private:
 
 
 
-SpectrumAnalyzerControlDialog::SpectrumAnalyzerControlDialog( SpectrumAnalyzerControls* controls ) :
-	EffectControlDialog( controls ),
+SpectrumAnalyzerControlDialog::SpectrumAnalyzerControlDialog(SpectrumAnalyzerControls *controls, QWidget *_parent) :
+        EffectControlDialog(controls, _parent),
 	m_controls( controls ),
 	m_logXAxis( PLUGIN_NAME::getIconPixmap( "log_x_axis" ) ),
 	m_logYAxis( PLUGIN_NAME::getIconPixmap( "log_y_axis" ) )

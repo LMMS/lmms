@@ -37,7 +37,7 @@ class EXPORT EffectControlDialog : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
-	EffectControlDialog( EffectControls * _controls );
+    EffectControlDialog(EffectControls *_controls, QWidget *_parent);
 	virtual ~EffectControlDialog();
 
 
