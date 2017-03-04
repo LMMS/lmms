@@ -76,14 +76,17 @@ public:
 	MidiTime timeMapLength() const;
 	void updateLength();
 
-	MidiTime putValue( const MidiTime & _time, const float _value,
-						const bool _quant_pos = true );
+	MidiTime putValue( const MidiTime & time,
+				const float value,
+				const bool quantPos = true,
+				const bool controlKey = false );
 
-	void removeValue( const MidiTime & _time,
-					  const bool _quant_pos = true );
+	void removeValue( const MidiTime & time );
 
-	MidiTime setDragValue( const MidiTime & _time, const float _value,
-						   const bool _quant_pos = true );
+	MidiTime setDragValue( const MidiTime & time,
+				const float value,
+				const bool quantPos = true,
+				const bool controlKey = false );
 
 	void applyDragValue();
 
