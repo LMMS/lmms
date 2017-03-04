@@ -132,6 +132,17 @@ AutomationEditor::AutomationEditor() :
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
 	}
+	for( int i = 0; i < 5; ++i )
+	{
+		m_quantizeModel.addItem( "1/" +
+					QString::number( ( 1 << i ) * 3 ) );
+	}
+	m_quantizeModel.addItem( "1/192" );
+
+	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
+					this, SLOT( setQuantization() ) );
+	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
+
 	if( s_toolYFlip == NULL )
 	{
 		s_toolYFlip = new QPixmap( embed::getIconPixmap(
@@ -142,9 +153,6 @@ AutomationEditor::AutomationEditor() :
 		s_toolXFlip = new QPixmap( embed::getIconPixmap(
 							"flip_x" ) );
 	}
-
-	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
-	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
 	// add time-line
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
@@ -555,7 +563,9 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 					MidiTime new_time =
 						m_pattern->setDragValue( value_pos,
-									level );
+									level, true,
+							mouseEvent->modifiers() &
+								Qt::ControlModifier );
 
 					// reset it so that it can be used for
 					// ops (move, resize) after this
@@ -695,7 +705,9 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				// moved properly according to new starting-
 				// time in the time map of pattern
 				m_pattern->setDragValue( MidiTime( pos_ticks ),
-								level );
+								level, true,
+							mouseEvent->modifiers() &
+								Qt::ControlModifier );
 			}
 
 			Engine::getSong()->setModified();
@@ -706,7 +718,14 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == ERASE ) )
 		{
-			m_pattern->removeValue( MidiTime( pos_ticks ) );
+			// int resolution needed to improve the sensitivity of
+			// the erase manoeuvre with zoom levels < 100%
+			int zoom = m_zoomingXModel.value();
+			int resolution = 1 + zoom * zoom;
+			for( int i = -resolution; i < resolution; ++i )
+			{
+				m_pattern->removeValue( MidiTime( pos_ticks + i ) );
+			}
 		}
 		else if( mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
@@ -2015,8 +2034,22 @@ void AutomationEditor::zoomingYChanged()
 
 void AutomationEditor::setQuantization()
 {
-	int quantization = DefaultTicksPerTact / (1 << m_quantizeModel.value());;
-	AutomationPattern::setQuantization(quantization);
+	int quantization = m_quantizeModel.value();
+	if( quantization < 7 )
+	{
+		quantization = 1 << quantization;
+	}
+	else if( quantization < 12 )
+	{
+		quantization = 1 << ( quantization - 7 );
+		quantization *= 3;
+	}
+	else
+	{
+		quantization = DefaultTicksPerTact;
+	}
+	quantization = DefaultTicksPerTact / quantization;
+	AutomationPattern::setQuantization( quantization );
 }
 
 
@@ -2325,7 +2358,12 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
-
+	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
+	m_quantizeComboBox->setWhatsThis( tr( "Quantization. Sets the smallest "
+				"step size for the Automation Point. By default "
+				"this also sets the length, clearing out other "
+				"points in the range. Press <Ctrl> to override "
+				"this behaviour." ) );
 
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
