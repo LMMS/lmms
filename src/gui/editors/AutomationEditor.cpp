@@ -721,8 +721,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			// int resolution needed to improve the sensitivity of
 			// the erase manoeuvre with zoom levels < 100%
 			int zoom = m_zoomingXModel.value();
-			int resolution = 1 + ( zoom * zoom );
-			resolution *= zoom > 3 ? 2 : 1;
+			int resolution = 3 + zoom * zoom;
 			for( int i = -resolution; i < resolution; ++i )
 			{
 				m_pattern->removeValue( MidiTime( pos_ticks + i ) );
@@ -2359,7 +2358,12 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
-
+	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
+	m_quantizeComboBox->setWhatsThis( tr( "Quantization. Sets the smallest "
+				"step size for the Automation Point. By default "
+				"this also sets the length, clearing out other "
+				"points in the range. Press <Ctrl> to override "
+				"this behaviour." ) );
 
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
