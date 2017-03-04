@@ -721,7 +721,7 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 			// int resolution needed to improve the sensitivity of
 			// the erase manoeuvre with zoom levels < 100%
 			int zoom = m_zoomingXModel.value();
-			int resolution = 3 + zoom * zoom;
+			int resolution = 1 + zoom * zoom;
 			for( int i = -resolution; i < resolution; ++i )
 			{
 				m_pattern->removeValue( MidiTime( pos_ticks + i ) );
