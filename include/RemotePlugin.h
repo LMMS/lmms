@@ -94,6 +94,7 @@ typedef int32_t key_t;
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
+#include <unistd.h>
 #endif
 
 #endif
