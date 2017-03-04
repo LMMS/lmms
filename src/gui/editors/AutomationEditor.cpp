@@ -135,11 +135,12 @@ AutomationEditor::AutomationEditor() :
 	for( int i = 0; i < 5; ++i )
 	{
 		m_quantizeModel.addItem( "1/" +
-					QString::number( (1 << i) * 3 ) );
+					QString::number( ( 1 << i ) * 3 ) );
 	}
 	m_quantizeModel.addItem( "1/192" );
 
-	connect(&m_quantizeModel, SIGNAL(dataChanged()), this, SLOT(setQuantization()));
+	connect( &m_quantizeModel, SIGNAL(dataChanged() ),
+					this, SLOT( setQuantization() ) );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/8" ) );
 
 	if( s_toolYFlip == NULL )
