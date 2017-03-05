@@ -48,6 +48,7 @@ public:
 		return &m_reverbSCControls;
 	}
 
+	void changeSampleRate();
 
 private:
 	ReverbSCControls m_reverbSCControls;

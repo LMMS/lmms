@@ -125,6 +125,25 @@ bool ReverbSCEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	return isRunning();
 }
+	
+void ReverbSCEffect::changeSampleRate()
+{
+	// Change sr variable in Soundpipe. does not need to be destroyed
+	sp->sr = Engine::mixer()->processingSampleRate();
+
+	sp_revsc_destroy(&revsc);
+	sp_dcblock_destroy(&dcblk[0]);
+	sp_dcblock_destroy(&dcblk[1]);
+
+	sp_revsc_create(&revsc);
+	sp_revsc_init(sp, revsc);
+
+	sp_dcblock_create(&dcblk[0]);
+	sp_dcblock_create(&dcblk[1]);
+	
+	sp_dcblock_init(sp, dcblk[0]);
+	sp_dcblock_init(sp, dcblk[1]);
+}
 
 extern "C"
 {
