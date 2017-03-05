@@ -157,7 +157,7 @@ public:
 		}
 	} ;
 
-	void initDevices();
+	void initDevices( bool renderOnly );
 	void clear();
 
 
