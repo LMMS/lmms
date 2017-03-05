@@ -131,6 +131,7 @@ void ReverbSCEffect::changeSampleRate()
 	// Change sr variable in Soundpipe. does not need to be destroyed
 	sp->sr = Engine::mixer()->processingSampleRate();
 
+	mutex.lock();
 	sp_revsc_destroy(&revsc);
 	sp_dcblock_destroy(&dcblk[0]);
 	sp_dcblock_destroy(&dcblk[1]);
@@ -143,6 +144,7 @@ void ReverbSCEffect::changeSampleRate()
 	
 	sp_dcblock_init(sp, dcblk[0]);
 	sp_dcblock_init(sp, dcblk[1]);
+	mutex.unlock();
 }
 
 extern "C"
