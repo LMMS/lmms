@@ -12,13 +12,13 @@ BUILD_PLUGIN(
 	ReverbSCControlDialog.cpp 
 	base.c
 	revsc.c
+	base.h
+	revsc.h
+	dcblock.h
 	dcblock.c
 	ReverbSC.h
 	MOCFILES 
 	ReverbSCControls.h 
 	ReverbSCControlDialog.h 
-	base.h
-	revsc.h
-	dcblock.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 )
