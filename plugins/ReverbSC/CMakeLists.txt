@@ -13,8 +13,8 @@ BUILD_PLUGIN(
 	base.c
 	revsc.c
 	dcblock.c
-	MOCFILES 
 	ReverbSC.h
+	MOCFILES 
 	ReverbSCControls.h 
 	ReverbSCControlDialog.h 
 	base.h
