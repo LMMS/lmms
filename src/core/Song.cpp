@@ -386,13 +386,7 @@ void Song::processNextBuffer()
 
 		if( ( f_cnt_t ) currentFrame == 0 )
 		{
-			if( m_playMode == Mode_PlaySong )
-			{
-				m_globalAutomationTrack->play(
-						m_playPos[m_playMode],
-						framesToPlay,
-						framesPlayed, tcoNum );
-			}
+			processAutomations(trackList, m_playPos[m_playMode], framesToPlay, tcoNum);
 
 			// loop through all tracks and play them
 			for( int i = 0; i < trackList.size(); ++i )
@@ -412,6 +406,68 @@ void Song::processNextBuffer()
 				/ getTempo();
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
+	}
+}
+
+void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fpp_t frames, int tcoNum)
+{
+	QVector<AutomationTrack*> tracks;
+
+	if(m_playMode == Mode_PlaySong)
+	{
+		tracks << m_globalAutomationTrack;
+	}
+	for( Track* track : tracklist)
+	{
+		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
+		{
+			tracks << dynamic_cast<AutomationTrack*>(track);
+		}
+	}
+
+	MidiTime time_end = timeStart + static_cast<int>(frames / Engine::framesPerTick());
+
+	QVector<TrackContentObject*> tcos;
+	for (Track* track: tracks)
+	{
+		if(track->isMuted())
+		{
+			continue;
+		}
+
+		int tco_begin = 0, tco_end = track->numOfTCOs();
+		if( tcoNum >= 0 )
+		{
+			tco_begin = tcoNum;
+			tco_end = tcoNum + 1;
+		}
+
+		for (int i = tco_begin; i < tco_end; i++)
+		{
+			TrackContentObject* tco = track->getTCO(i);
+
+			// Skip this TCO if it's muted or not contained in the time period we're processing
+			if( tco == NULL || tco->isMuted() || tco->startPosition() > time_end)
+			{
+				continue;
+			}
+
+			tcos.insert(std::upper_bound(tcos.begin(), tcos.end(), tco, TrackContentObject::comparePosition), tco);
+		}
+	}
+
+	for(TrackContentObject* tco : tcos)
+	{
+		auto p = dynamic_cast<AutomationPattern *>(tco);
+
+		if (tcoNum < 0)
+		{
+			p->processMidiTime(timeStart - p->startPosition());
+		}
+		else
+		{
+			p->processMidiTime(timeStart);
+		}
 	}
 }
 

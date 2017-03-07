@@ -53,51 +53,6 @@ AutomationTrack::~AutomationTrack()
 bool AutomationTrack::play( const MidiTime & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
-	if( isMuted() )
-{
-		return false;
-	}
-
-	int tco_begin = 0, tco_end = numOfTCOs();
-	MidiTime time_end = time_start + static_cast<int>(_frames / Engine::framesPerTick());
-
-	if( _tco_num >= 0 )
-	{
-		tco_begin = _tco_num;
-		tco_end = _tco_num + 1;
-	}
-
-	// TCOs that we'll process later, sorted by start position
-	QVector<TrackContentObject*> tcos;
-	tcos.reserve(tco_end - tco_begin);
-
-	for (int i = tco_begin; i < tco_end; i++)
-	{
-		TrackContentObject* tco = getTCO(i);
-
-		// Skip this TCO if it's muted or not contained in the time period we're processing
-		if( tco == NULL || tco->isMuted() || tco->startPosition() > time_end)
-		{
-			continue;
-		}
-
-		tcos.insert(std::upper_bound(tcos.begin(), tcos.end(), tco, TrackContentObject::comparePosition),
-					tco);
-	}
-
-	for( TrackContentObject* tco : tcos )
-	{
-		auto p = dynamic_cast<AutomationPattern *>(tco);
-
-		if (_tco_num < 0)
-		{
-			p->processMidiTime(time_start - p->startPosition());
-		}
-		else
-		{
-			p->processMidiTime(time_start);
-		}
-	}
 	return false;
 }
 

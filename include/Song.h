@@ -97,6 +97,7 @@ public:
 
 
 	void processNextBuffer();
+	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames, int tcoNum);
 
 	inline int getMilliseconds() const
 	{
