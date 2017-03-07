@@ -202,7 +202,7 @@ void SampleBuffer::update( bool _keep_settings )
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
-		if( fileInfo.size() > 100*1024*1024 )
+		if( fileInfo.size() > 300*1024*1024 )
 		{
 			fileLoadError = true;
 		}
@@ -215,7 +215,7 @@ void SampleBuffer::update( bool _keep_settings )
 			{
 				f_cnt_t frames = sf_info.frames;
 				int rate = sf_info.samplerate;
-				if( frames / rate > 60 * 60 ) // 60 minutes
+				if( frames / rate > 90 * 60 ) // 90 minutes
 				{
 					fileLoadError = true;
 				}
