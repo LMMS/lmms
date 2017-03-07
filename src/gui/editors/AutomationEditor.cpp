@@ -103,6 +103,8 @@ AutomationEditor::AutomationEditor() :
 	m_y_delta( DEFAULT_Y_DELTA ),
 	m_y_auto( true ),
 	m_editMode( DRAW ),
+	m_mouseDownLeft( false ),
+	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_barLineColor( 0, 0, 0 ),
 	m_beatLineColor( 0, 0, 0 ),
@@ -539,6 +541,15 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				++it;
 			}
 
+			if( mouseEvent->button() == Qt::LeftButton )
+			{
+				m_mouseDownLeft = true;
+			}
+			else if( mouseEvent->button() == Qt::RightButton )
+			{
+				m_mouseDownRight = true;
+			}
+
 			// left button??
 			if( mouseEvent->button() == Qt::LeftButton &&
 							m_editMode == DRAW )
@@ -649,6 +660,15 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 {
+	if( mouseEvent->button() == Qt::LeftButton )
+	{
+		m_mouseDownLeft = false;
+	}
+	else if ( mouseEvent->button() == Qt::RightButton )
+	{
+		m_mouseDownRight = false;
+	}
+
 	if( m_editMode == DRAW )
 	{
 		if( m_action == MOVE_VALUE )
@@ -1412,7 +1432,17 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 	// draw current edit-mode-icon below the cursor
 	switch( m_editMode )
 	{
-		case DRAW: cursor = s_toolDraw; break;
+		case DRAW:
+			if( m_mouseDownRight )
+			{
+				cursor = s_toolErase;
+			}
+			else
+			{
+				cursor = s_toolDraw;
+			}
+
+			break;
 		case ERASE: cursor = s_toolErase; break;
 		case SELECT: cursor = s_toolSelect; break;
 		case MOVE: cursor = s_toolMove; break;
