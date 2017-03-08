@@ -86,6 +86,7 @@ void CrossoverEQControls::loadSettings( const QDomElement & elem )
 	m_mute4.loadSettings( elem, "mute4" );
 	
 	m_effect->m_needsUpdate = true;
+	m_effect->clearFilterHistories();
 }
 
 void CrossoverEQControls::xover12Changed()
