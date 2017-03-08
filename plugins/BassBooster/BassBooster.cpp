@@ -98,8 +98,8 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 			gain = gainBuffer->value( f );
 		}
 		//float gain = gainBuffer ? gainBuffer[f] : gain;
-		m_bbFX.leftFX().setGain( const_gain );
-		m_bbFX.rightFX().setGain( const_gain);
+		m_bbFX.leftFX().setGain( gain );
+		m_bbFX.rightFX().setGain( gain);
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 
 		sample_t s[2] = { buf[f][0], buf[f][1] };
