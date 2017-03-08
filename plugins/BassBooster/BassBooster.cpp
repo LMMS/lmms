@@ -83,45 +83,30 @@ bool BassBoosterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	if( m_bbControls.m_gainModel.isValueChanged() ) { changeGain(); }
 	if( m_bbControls.m_ratioModel.isValueChanged() ) { changeRatio(); }
 
-	float gain = m_bbControls.m_gainModel.value();
-	ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
-	int gainInc = gainBuffer ? 1 : 0;
-	float *gainPtr = gainBuffer ? &( gainBuffer->values()[ 0 ] ) : &gain;
+	const float const_gain = m_bbControls.m_gainModel.value();
+	const ValueBuffer *gainBuffer = m_bbControls.m_gainModel.valueBuffer();
 
 	double outSum = 0.0;
 	const float d = dryLevel();
 	const float w = wetLevel();
-	if( gainBuffer )
+
+	for( fpp_t f = 0; f < frames; ++f )
 	{
-		//process period using sample exact data
-		for( fpp_t f = 0; f < frames; ++f )
-		{
-			m_bbFX.leftFX().setGain( *gainPtr );
-			m_bbFX.rightFX().setGain( *gainPtr );
-			outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
-
-			sample_t s[2] = { buf[f][0], buf[f][1] };
-			m_bbFX.nextSample( s[0], s[1] );
-
-			buf[f][0] = d * buf[f][0] + w * s[0];
-			buf[f][1] = d * buf[f][1] + w * s[1];
-			gainPtr += gainInc;
+		float gain = const_gain;
+		if (gainBuffer) {
+			//process period using sample exact data
+			gain = gainBuffer->value( f );
 		}
-	} else
-	{
-		//process period without sample exact data
-		m_bbFX.leftFX().setGain( *gainPtr );
-		m_bbFX.rightFX().setGain( *gainPtr );
-		for( fpp_t f = 0; f < frames; ++f )
-		{
-			outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
+		//float gain = gainBuffer ? gainBuffer[f] : gain;
+		m_bbFX.leftFX().setGain( const_gain );
+		m_bbFX.rightFX().setGain( const_gain);
+		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 
-			sample_t s[2] = { buf[f][0], buf[f][1] };
-			m_bbFX.nextSample( s[0], s[1] );
+		sample_t s[2] = { buf[f][0], buf[f][1] };
+		m_bbFX.nextSample( s[0], s[1] );
 
-			buf[f][0] = d * buf[f][0] + w * s[0];
-			buf[f][1] = d * buf[f][1] + w * s[1];
-		}
+		buf[f][0] = d * buf[f][0] + w * s[0];
+		buf[f][1] = d * buf[f][1] + w * s[1];
 	}
 
 	checkGate( outSum / frames );

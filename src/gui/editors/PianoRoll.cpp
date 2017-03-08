@@ -64,7 +64,6 @@
 #include "Pattern.h"
 #include "Piano.h"
 #include "PixmapButton.h"
-#include "Song.h"
 #include "SongEditor.h"
 #include "templates.h"
 #include "TextFloat.h"

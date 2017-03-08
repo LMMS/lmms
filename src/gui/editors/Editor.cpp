@@ -24,6 +24,8 @@
 
 #include "Editor.h"
 
+#include "Song.h"
+
 #include "MainWindow.h"
 #include "embed.h"
 
