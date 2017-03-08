@@ -371,7 +371,9 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		case MovePositionMarker:
 			m_pos.setTicks( t.getTicks() );
-			Engine::getSong()->setMilliSeconds(((((t.getTicks()))*60*1000/48)/Engine::getSong()->getTempo()));
+			Engine::getSong()->setMilliSeconds( ( t.getTicks() *
+					( 60 * 1000 / 48 ) ) /
+						Engine::getSong()->getTempo() );
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			positionMarkerMoved();
