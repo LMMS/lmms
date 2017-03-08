@@ -547,14 +547,21 @@ void ConfigManager::saveConfigFile()
 	QFile outfile( m_lmmsRcFile );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			MainWindow::tr( "Could not save config-file" ),
-			MainWindow::tr( "Could not save configuration file %1. "
-					"You're probably not permitted to "
-					"write to this file.\n"
-					"Please make sure you have write-"
-					"access to the file and try again." ).
-							arg( m_lmmsRcFile  ) );
+		QString title, message;
+		title = MainWindow::tr( "Could not open file" );
+		message = MainWindow::tr( "Could not open file %1 "
+					"for writing.\nPlease make "
+					"sure you have write "
+					"permission to the file and "
+					"the directory containing the "
+					"file and try again!"
+						).arg( m_lmmsRcFile );
+		if( gui )
+		{
+			QMessageBox::critical( NULL, title, message,
+						QMessageBox::Ok,
+						QMessageBox::NoButton );
+		}
 		return;
 	}
 
