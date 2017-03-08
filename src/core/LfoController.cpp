@@ -86,7 +86,6 @@ LfoController::~LfoController()
 void LfoController::updateValueBuffer()
 {
 	m_phaseOffset = m_phaseModel.value() / 360.0;
-	float * values = m_valueBuffer.values();
 	float phase = m_currentPhase + m_phaseOffset;
 
 	// roll phase up until we're in sync with period counter
@@ -103,13 +102,13 @@ void LfoController::updateValueBuffer()
 	int amountInc = amountBuffer ? 1 : 0;
 	float *amountPtr = amountBuffer ? &(amountBuffer->values()[ 0 ] ) : &amount;
 
-	for( int i = 0; i < m_valueBuffer.length(); i++ )
+	for( float& f : m_valueBuffer )
 	{
 		const float currentSample = m_sampleFunction != NULL
 			? m_sampleFunction( phase )
 			: m_userDefSampleBuffer->userWaveSample( phase );
 
-		values[i] = qBound( 0.0f, m_baseModel.value() + ( *amountPtr * currentSample / 2.0f ), 1.0f );
+		f = qBound( 0.0f, m_baseModel.value() + ( *amountPtr * currentSample / 2.0f ), 1.0f );
 
 		phase += 1.0 / m_duration;
 		amountPtr += amountInc;
