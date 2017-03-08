@@ -31,7 +31,7 @@
 #include <string.h>
 #include "MemoryManager.h"
 
-class ValueBuffer : public std::vector<float>
+class EXPORT ValueBuffer : public std::vector<float>
 {
 	MM_OPERATORS
 public:
