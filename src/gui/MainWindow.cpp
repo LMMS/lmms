@@ -922,7 +922,6 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
-		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
 	runAutoSave();
