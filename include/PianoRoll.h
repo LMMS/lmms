@@ -358,7 +358,6 @@ private:
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 
-	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
