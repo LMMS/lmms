@@ -56,7 +56,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -2066,7 +2066,8 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"/>
+        <translation>El archivo %1 no puede abrirse para escritura.
+Asegúrate de tener permisos de escritura tanto del archivo como del directorio que lo contiene e inténtalo de nuevo.</translation>
     </message>
 </context>
 <context>
@@ -3432,12 +3433,12 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
         <translation>Establecer como Logarítmico</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Por favor ingresa un nuevo valor entre -96.0 dBFS y 6.0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Por favor ingresa un nuevo valor entre %1 y %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Por favor ingresa un nuevo valor entre -96.0 dBFS y 6.0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -4028,10 +4029,6 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
         <translation>Esta acción sobreescribirá tu actual plantilla por defecto.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volumen en dBFS</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Desplazamiento suave</translation>
     </message>
@@ -4041,7 +4038,11 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
     </message>
     <message>
         <source>Save project template</source>
-        <translation type="unfinished"/>
+        <translation>Guardar plantilla de proyecto</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volumen en dBFS</translation>
     </message>
 </context>
 <context>
@@ -5704,7 +5705,7 @@ Razón: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Instrument Plugins</source>
-        <translation type="unfinished"/>
+        <translation>Instrumentos</translation>
     </message>
 </context>
 <context>
@@ -5907,6 +5908,60 @@ Razón: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Entrada</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Ganancia de Entrada:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Tamaño:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Color:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Salida</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Ganancia de Salida:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Ganancia de entrada</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Ganancia de salida</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -6051,10 +6106,6 @@ Razón: &quot;%2&quot;</translation>
     <message>
         <source>Show restart warning after changing settings</source>
         <translation>Mostrar advertencia de reinicio luego de cambiar la configuración</translation>
-    </message>
-    <message>
-        <source>Display volume as dBFS </source>
-        <translation>Mostrar volumen en dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
@@ -6259,25 +6310,30 @@ Latencia: %2 ms</translation>
         <translation>minuto</translation>
     </message>
     <message>
+        <source>Display volume as dBFS </source>
+        <translation>Mostrar volumen en dBFS</translation>
+    </message>
+    <message>
         <source>Enable auto-save</source>
-        <translation type="unfinished"/>
+        <translation>Habilitar Auto-Guardado</translation>
     </message>
     <message>
         <source>Allow auto-save while playing</source>
-        <translation type="unfinished"/>
+        <translation>Permitir auto-guardado durante la reproducción</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"/>
+        <translation>Inhabilitado</translation>
     </message>
     <message>
         <source>Auto-save interval: %1</source>
-        <translation type="unfinished"/>
+        <translation>Intervalo de auto-guardado: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
 Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
-        <translation type="unfinished"/>
+        <translation>Define el tiempo entre auto-guardados en %1.
+Recuerda también guardar tu proyecto manualmente. Puedes elegir no guardar automáticamente durante la reproducción, lo cual algunos sistemas anteriores encuentran difícil de realizar.  </translation>
     </message>
 </context>
 <context>
@@ -6360,7 +6416,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Save project</source>
-        <translation type="unfinished"/>
+        <translation>Guardar proyecto</translation>
     </message>
 </context>
 <context>
@@ -7018,7 +7074,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source> already exists. Do you want to replace it?</source>
-        <translation type="unfinished"/>
+        <translation>¡Ya existe! ¿Deseas reemplazarlo?</translation>
     </message>
 </context>
 <context>
@@ -9279,6 +9335,10 @@ Este chip fue usado en las computadoras Commodore 64.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filtro para exportar archivos MIDI desde LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Algoritmo de reverberación por Sean Costello</translation>
     </message>
 </context>
 <context>
