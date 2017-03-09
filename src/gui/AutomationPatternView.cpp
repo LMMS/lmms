@@ -38,6 +38,8 @@
 #include "TextFloat.h"
 #include "ToolTip.h"
 
+#include "Engine.h"
+
 
 QPixmap * AutomationPatternView::s_pat_rec = NULL;
 
