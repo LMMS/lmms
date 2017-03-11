@@ -293,6 +293,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 0.5, col );
 	lin2grad.setColorAt( 0, col.darker( 150 ) );
 
+	p.setRenderHints( QPainter::Antialiasing, true );
 	for( AutomationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
@@ -317,25 +318,37 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		float *values = m_pat->valuesAfter( it.key() );
 		for( int i = it.key(); i < (it + 1).key(); i++ )
 		{
-			float value = values[i - it.key()];
+			float x1value = values[i - it.key()];
+			float x2value = values[i - it.key() + 1];
+			if (i+1 == (it + 1).key()) x2value = x1value; //Catches last value not being there
+
 			const float x1 = x_base + i * ppt /
 						MidiTime::ticksPerTact();
 			const float x2 = x_base + (i + 1) * ppt /
 						MidiTime::ticksPerTact();
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 
+			//Creates Polygon
+			QPainterPath path;
+			path.moveTo(QPoint(x1,0));
+			path.lineTo(QPoint(x1,x1value));
+			path.lineTo(QPoint(x2,x2value));
+			path.lineTo(QPoint(x2,0));
+			path.lineTo(QPoint(x1,0));
+
 			if( gradient() )
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, value ), lin2grad );
+				p.fillPath(path,lin2grad);
 			}
 			else
 			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, value ), col );
+				p.fillPath(path,col);
 			}
 		}
 		delete [] values;
 	}
 
+	p.setRenderHints( QPainter::Antialiasing, false );
 	p.resetMatrix();
 	
 	// bar lines
