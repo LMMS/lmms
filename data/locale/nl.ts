@@ -508,6 +508,14 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
         <source>Model is already connected to this pattern.</source>
         <translation>Model is reeds verbonden met dit patroon.</translation>
     </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Kwantisatie</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Kwantisatie. Stelt de kleinste stap in voor het automatiseringspunt. Standaard stelt dit ook de lengte in; andere punten in het bereik worden gewist. Druk op &lt;Ctrl&gt; om dit gedrag te overriden.</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -3663,16 +3671,6 @@ Dubbelklikken om een bestand te selecteren.</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Could not save config-file</source>
-        <translation>Kon config-bestand niet opslaan</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Kon configuratiebestand %1 niet opslaan. U heeft waarschijnlijk geen toestemming om naar dit bestand te schrijven.
-Verzeker u ervan dat u schrijfbevoegdheid heeft voor het bestand en probeer het opnieuw.</translation>
-    </message>
-    <message>
         <source>&amp;New</source>
         <translation>&amp;Nieuw</translation>
     </message>
@@ -4049,6 +4047,16 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
     <message>
         <source>Volume as dBFS</source>
         <translation>Volume als dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Kan bestand niet openen</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Kon bestand %1 niet openen om te schrijven.
+Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die het bestand bevat en probeer het opnieuw!</translation>
     </message>
 </context>
 <context>
