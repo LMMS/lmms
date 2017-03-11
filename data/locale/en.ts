@@ -502,6 +502,14 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Model is already connected to this pattern.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Quantization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -3637,15 +3645,6 @@ Double click to pick a file.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Could not save config-file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You&apos;re probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;New</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4020,6 +4019,15 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Volume as dBFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
