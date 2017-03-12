@@ -1456,7 +1456,7 @@ int AutomationEditor::xCoordOfTick(int tick )
 
 float AutomationEditor::yCoordOfLevel(float level )
 {
-	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	int grid_bottom = height() - SCROLLBAR_SIZE;
 	if( m_y_auto )
 	{
 		return ( grid_bottom - ( grid_bottom - TOP_MARGIN ) * ( level - m_minLevel ) / ( m_maxLevel - m_minLevel ) );
