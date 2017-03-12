@@ -1334,13 +1334,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 				float nextValue;
 				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
-				{
 					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
-				}
 				else
-				{
 					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
-				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
 				QPainterPath path;
