@@ -125,9 +125,8 @@ protected:
 
 	float getLevel( int y );
 	int xCoordOfTick( int tick );
-	int yCoordOfLevel( float level );
-	inline void drawLevelTick( QPainter & p, int tick,
-					float value, bool is_selected );
+	float yCoordOfLevel( float level );
+	inline void drawLevelTick( QPainter & p, int tick, float value);// bool is_selected ); //NEEDS Change in CSS
 	void removeSelection();
 	void selectAll();
 	void getSelectedValues(timeMap & selected_values );

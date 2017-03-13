@@ -22,8 +22,7 @@ AutomationEditor {
 	qproperty-beatLineColor: #4a3bba;
 	qproperty-barLineColor: #8173fe;
 
-	qproperty-graphColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1,
-  	stop:0 rgba(69,42,153,180),  stop:1 rgba(69,42,153,100));
+	qproperty-graphColor: rgba(69,42,153,180);
 	qproperty-scaleColor: #262b30;
 }
 
