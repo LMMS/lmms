@@ -280,6 +280,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	const float y_scale = max - min;
 	const float h = ( height() - 2 * TCO_BORDER_WIDTH ) / y_scale;
+	const float ppTick  = ppt / MidiTime::ticksPerTact();
 
 	p.translate( 0.0f, max * height() / y_scale - TCO_BORDER_WIDTH );
 	p.scale( 1.0f, -h );
@@ -293,14 +294,14 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	lin2grad.setColorAt( 0.5, col );
 	lin2grad.setColorAt( 0, col.darker( 150 ) );
 
+	p.setRenderHints( QPainter::Antialiasing, true );
 	for( AutomationPattern::timeMap::const_iterator it =
 						m_pat->getTimeMap().begin();
 					it != m_pat->getTimeMap().end(); ++it )
 	{
 		if( it+1 == m_pat->getTimeMap().end() )
 		{
-			const float x1 = x_base + it.key() * ppt /
-						MidiTime::ticksPerTact();
+			const float x1 = x_base + it.key() * ppTick;
 			const float x2 = (float)( width() - TCO_BORDER_WIDTH );
 			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 			if( gradient() )
@@ -315,27 +316,36 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 		}
 
 		float *values = m_pat->valuesAfter( it.key() );
-		for( int i = it.key(); i < (it + 1).key(); i++ )
-		{
-			float value = values[i - it.key()];
-			const float x1 = x_base + i * ppt /
-						MidiTime::ticksPerTact();
-			const float x2 = x_base + (i + 1) * ppt /
-						MidiTime::ticksPerTact();
-			if( x1 > ( width() - TCO_BORDER_WIDTH ) ) break;
 
-			if( gradient() )
-			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, value ), lin2grad );
-			}
-			else
-			{
-				p.fillRect( QRectF( x1, 0.0f, x2 - x1, value ), col );
-			}
+		QPainterPath path;
+		QPointF origin = QPointF( x_base + it.key() * ppTick, 0.0f );
+		path.moveTo( origin );
+		path.moveTo( QPointF( x_base + it.key() * ppTick,values[0] ) );
+		float x;
+		for( int i = it.key() + 1; i < ( it + 1 ).key(); i++ )
+		{
+			x = x_base + i * ppTick;
+			if( x > ( width() - TCO_BORDER_WIDTH ) ) break;
+			float value = values[ i - it.key() ];
+			path.lineTo( QPointF( x, value ) );
+
+		}
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, values[ ( it + 1 ).key() - 1 - it.key() ] );
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, 0.0f );
+		path.lineTo( origin );
+
+		if( gradient() )
+		{
+			p.fillPath( path, lin2grad );
+		}
+		else
+		{
+			p.fillPath( path, col );
 		}
 		delete [] values;
 	}
 
+	p.setRenderHints( QPainter::Antialiasing, false );
 	p.resetMatrix();
 	
 	// bar lines

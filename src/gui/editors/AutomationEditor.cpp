@@ -1284,7 +1284,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( validPattern() )
 	{
-		int len_ticks = 4;
+		//NEEDS Change in CSS
+		//int len_ticks = 4;
 		timeMap & time_map = m_pattern->getTimeMap();
 
 		//Don't bother doing/rendering anything if there is no automation points
@@ -1307,8 +1308,9 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				{
 					break;
 				}
-
-				bool is_selected = false;
+				
+				//NEEDS Change in CSS
+				/*bool is_selected = false;
 				// if we're in move-mode, we may only draw
 				// values in selected area, that have originally
 				// been selected and not values that are now in
@@ -1326,15 +1328,34 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 					it.key() + len_ticks <= sel_pos_end )
 				{
 					is_selected = true;
-				}
+				}*/
 
 				float *values = m_pattern->valuesAfter( it.key() );
-				for( int i = 0; i < (it+1).key() - it.key(); i++ )
-				{
 
-					drawLevelTick( p, it.key() + i, values[i],
-									is_selected );
+				float nextValue;
+				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
+				{
+					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
 				}
+				else
+				{
+					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
+				}
+
+				p.setRenderHints( QPainter::Antialiasing, true );
+				QPainterPath path;
+				path.moveTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
+				for( int i = 0; i < ( it + 1 ).key() - it.key(); i++ )
+				{	path.lineTo( QPointF( xCoordOfTick( it.key() + i ), yCoordOfLevel( values[i] ) ) );
+					//NEEDS Change in CSS
+					//drawLevelTick( p, it.key() + i, values[i], is_selected ); 
+					
+				}
+				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
+				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
+				path.lineTo( QPointF( xCoordOfTick( it.key() ), yCoordOfLevel( 0 ) ) );
+				p.fillPath( path, graphColor() );
+				p.setRenderHints( QPainter::Antialiasing, false );
 				delete [] values;
 
 				// Draw circle
@@ -1349,7 +1370,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				// TODO: Find out if the section after the last control
 				// point is able to be selected and if so set this
 				// boolean correctly
-				drawLevelTick( p, i, it.value(), false );
+				drawLevelTick( p, i, it.value()); ////NEEDS Change in CSS:, false );
 			}
 			// Draw circle(the last one)
 			drawAutomationPoint(p, it);
@@ -1433,27 +1454,25 @@ int AutomationEditor::xCoordOfTick(int tick )
 
 
 
-int AutomationEditor::yCoordOfLevel(float level )
+float AutomationEditor::yCoordOfLevel(float level )
 {
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	if( m_y_auto )
 	{
-		return (int)( grid_bottom - ( grid_bottom - TOP_MARGIN )
-						* ( level - m_minLevel )
-						/ ( m_maxLevel - m_minLevel ) );
+		return ( grid_bottom - ( grid_bottom - TOP_MARGIN ) * ( level - m_minLevel ) / ( m_maxLevel - m_minLevel ) );
 	}
 	else
 	{
-		return (int)( grid_bottom - ( level - m_bottomLevel )
-								* m_y_delta );
+		return ( grid_bottom - ( level - m_bottomLevel ) * m_y_delta );
 	}
 }
 
 
 
 
-void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value,
-							bool is_selected )
+				//NEEDS Change in CSS
+void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
+				//			bool is_selected )
 {
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	const int x = xCoordOfTick( tick );
@@ -1481,9 +1500,14 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value,
 			rect_height = (int)( value * m_y_delta );
 		}
 
-		QBrush currentColor = is_selected
+		//NEEDS Change in CSS
+		/*QBrush currentColor = is_selected
 			? QBrush( QColor( 0x00, 0x40, 0xC0 ) )
 			: graphColor();
+
+		*/
+
+		QBrush currentColor = graphColor();
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
