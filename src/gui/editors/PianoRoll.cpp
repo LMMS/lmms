@@ -186,7 +186,6 @@ PianoRoll::PianoRoll() :
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
-	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_barLineColor( 0, 0, 0 ),
@@ -1922,7 +1921,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if( me->button() & Qt::LeftButton )
 	{
-		m_mouseDownLeft = false;
 		mustRepaint = true;
 
 		if( m_action == ActionSelectNotes && m_editMode == ModeSelect )
