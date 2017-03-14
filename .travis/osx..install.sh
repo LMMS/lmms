@@ -8,6 +8,6 @@ else
 	PACKAGES="$PACKAGES cartr/qt4/qt"
 fi
 
-brew install $PACKAGES
+brew install $PACKAGES ccache
 
 sudo npm install -g appdmg

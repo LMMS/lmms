@@ -2,6 +2,7 @@ language: cpp
 compiler: gcc
 dist: trusty
 sudo: required
+cache: ccache
 matrix:
     include:
         - env: TARGET_OS=win32
