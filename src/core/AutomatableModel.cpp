@@ -24,9 +24,10 @@
 
 #include "AutomatableModel.h"
 
+#include "lmms_math.h"
+
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
-#include "lmms_math.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
 

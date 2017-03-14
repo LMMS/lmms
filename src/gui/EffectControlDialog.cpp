@@ -28,7 +28,6 @@
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
-#include "Effect.h"
 
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :

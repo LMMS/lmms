@@ -24,6 +24,7 @@
  *
  */
 
+#include <cmath>
 
 #include <QGroupBox>
 #include <QLayout>

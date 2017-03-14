@@ -25,9 +25,7 @@
 
 
 #include "MemoryManager.h"
-#include <QtGlobal>
 #include <QReadWriteLock>
-#include <stdint.h>
 
 
 MemoryPoolVector MemoryManager::s_memoryPools;

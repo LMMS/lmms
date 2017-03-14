@@ -26,19 +26,12 @@
 #include "FxLine.h"
 
 #include <QGraphicsProxyWidget>
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QLineEdit>
 #include <QWhatsThis>
 
 #include "CaptionMenu.h"
-#include "embed.h"
-#include "Engine.h"
 #include "FxMixer.h"
-#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
-#include "SendButtonIndicator.h"
 #include "Song.h"
 
 

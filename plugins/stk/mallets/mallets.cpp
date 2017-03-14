@@ -33,6 +33,7 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"

@@ -25,9 +25,6 @@
 
 #include "BufferManager.h"
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QAtomicInt>
-
 #include "MemoryManager.h"
 
 sampleFrame ** BufferManager::s_available;

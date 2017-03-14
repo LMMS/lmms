@@ -32,7 +32,6 @@
 #include "Track.h"
 #include "MemoryManager.h"
 
-class QAtomicInt;
 class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;

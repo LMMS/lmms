@@ -26,7 +26,6 @@
 
 #include "InstrumentView.h"
 #include "embed.h"
-#include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "StringPairDrag.h"
 

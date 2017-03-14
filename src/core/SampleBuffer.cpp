@@ -30,10 +30,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
-#include <QReadLocker>
 
-
-#include <cstring>
 
 #include <sndfile.h>
 
@@ -53,17 +50,13 @@
 
 #include "base64.h"
 #include "ConfigManager.h"
-#include "debug.h"
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "interpolation.h"
 #include "Mixer.h"
-#include "templates.h"
 
 #include "FileDialog.h"
-#include "MemoryManager.h"
 
 
 SampleBuffer::SampleBuffer( const QString & _audio_file,

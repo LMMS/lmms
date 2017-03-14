@@ -31,8 +31,6 @@
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "Mixer.h"
-#include "ConfigManager.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"

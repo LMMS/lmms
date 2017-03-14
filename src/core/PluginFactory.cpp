@@ -27,10 +27,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
-#include <QtCore/QFileInfo>
 #include <QtCore/QLibrary>
-
-#include "Plugin.h"
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");

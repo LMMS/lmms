@@ -35,7 +35,6 @@
 #include "gui_templates.h"
 #include "templates.h"
 #include "ComboBox.h"
-#include "LcdSpinBox.h"
 #include "Mixer.h"
 
 AudioSoundIo::AudioSoundIo( bool & outSuccessful, Mixer * _mixer ) :

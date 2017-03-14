@@ -22,7 +22,6 @@
  *
  */
 
-#include <QFileInfo>
 #include <QDebug>
 #include <QDir>
 
@@ -30,7 +29,6 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
-#include "debug.h"
 
 RenderManager::RenderManager(
 		const Mixer::qualitySettings & qualitySettings,

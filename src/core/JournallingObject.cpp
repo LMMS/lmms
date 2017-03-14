@@ -24,8 +24,6 @@
 
 #include <QDomElement>
 
-#include <cstdio>
-
 #include "JournallingObject.h"
 #include "AutomatableModel.h"
 #include "ProjectJournal.h"

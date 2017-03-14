@@ -23,8 +23,9 @@
  *
  */
 
-
 #include "MidiApple.h"
+
+#ifdef LMMS_BUILD_APPLE
 
 #include <QtAlgorithms>
 #include <algorithm>
@@ -32,8 +33,6 @@
 #include "ConfigManager.h"
 #include "MidiPort.h"
 #include "Note.h"
-
-#ifdef LMMS_BUILD_APPLE
 
 #include <CoreMIDI/CoreMIDI.h>
 

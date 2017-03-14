@@ -28,24 +28,20 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QSlider>
 #include <QWhatsThis>
 #include <QScrollArea>
 
 #include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
-#include "TabWidget.h"
 #include "gui_templates.h"
 #include "Mixer.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
 #include "debug.h"
 #include "ToolTip.h"
-#include "LcdSpinBox.h"
 #include "FileDialog.h"
 
 

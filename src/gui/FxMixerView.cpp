@@ -32,15 +32,14 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QPushButton>
-#include <QToolButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
 
+#include "lmms_math.h"
+
 #include "FxMixerView.h"
 #include "Knob.h"
-#include "Engine.h"
-#include "embed.h"
 #include "FxLine.h"
 #include "FxMixer.h"
 #include "GuiApplication.h"
@@ -50,7 +49,6 @@
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
-#include "lmms_math.h"
 
 FxMixerView::FxMixerView() :
 	QWidget(),

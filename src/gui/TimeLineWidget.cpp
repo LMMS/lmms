@@ -34,8 +34,6 @@
 
 #include "TimeLineWidget.h"
 #include "embed.h"
-#include "Engine.h"
-#include "templates.h"
 #include "NStateButton.h"
 #include "GuiApplication.h"
 #include "TextFloat.h"

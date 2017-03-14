@@ -31,14 +31,11 @@
 #include "gui_templates.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "embed.h"
 #include "Engine.h"
 #include "ToolTip.h"
 #include "Song.h"
 
 #include "BufferManager.h"
-#include "ConfigManager.h"
-
 
 
 VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,

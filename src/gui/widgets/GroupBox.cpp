@@ -29,8 +29,6 @@
 #define __USE_XOPEN
 #endif
 
-#include <math.h>
-
 #include "GroupBox.h"
 #include "embed.h"
 #include "gui_templates.h"

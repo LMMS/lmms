@@ -28,10 +28,8 @@
 
 
 #include "Song.h"
-#include "Engine.h"
 #include "Mixer.h"
 #include "LfoController.h"
-#include "lmms_math.h"
 
 
 LfoController::LfoController( Model * _parent ) :

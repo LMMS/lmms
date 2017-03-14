@@ -27,21 +27,17 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QPainter>
 
 #include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
 
 #include "PeakController.h"
-#include "ControllerDialog.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
-#include "PixmapButton.h"
 
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :
