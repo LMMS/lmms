@@ -2,7 +2,10 @@ language: cpp
 compiler: gcc
 dist: trusty
 sudo: required
-cache: ccache
+cache:
+  ccache: true
+  directories:
+    - apt_mingw_cache
 matrix:
     include:
         - env: TARGET_OS=win32
