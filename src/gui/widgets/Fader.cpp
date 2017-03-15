@@ -379,12 +379,12 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw left levels
-	float const leftSpan = ampToDbfs(m_fPeakValue_L) - minDB;
+	float const leftSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_L)) - minDB;
 	int peak_L = height * leftSpan * fullSpanReciprocal;
 	QRect drawRectL( 0, height - peak_L, width, peak_L ); // Source and target are identical
 	painter.drawPixmap( drawRectL, *m_leds, drawRectL );
 
-	float const persistentLeftPeakDBFS = ampToDbfs(m_persistentPeak_L);
+	float const persistentLeftPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_L));
 	int persistentPeak_L = height * (1 - (persistentLeftPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background
@@ -401,12 +401,12 @@ void Fader::paintDBFSLevels(QPaintEvent * ev, QPainter & painter)
 
 
 	// Draw right levels
-	float const rightSpan = ampToDbfs(m_fPeakValue_R) - minDB;
+	float const rightSpan = ampToDbfs(qMax<float>(0.0001, m_fPeakValue_R)) - minDB;
 	int peak_R = height * rightSpan * fullSpanReciprocal;
 	QRect const drawRectR( center, height - peak_R, width, peak_R ); // Source and target are identical
 	painter.drawPixmap( drawRectR, *m_leds, drawRectR );
 
-	float const persistentRightPeakDBFS = ampToDbfs(m_persistentPeak_R);
+	float const persistentRightPeakDBFS = ampToDbfs(qMax<float>(0.0001, m_persistentPeak_R));
 	int persistentPeak_R = height * (1 - (persistentRightPeakDBFS - minDB) * fullSpanReciprocal);
 	// the LED's have a  4px padding and we don't want the peaks
 	// to draw on the fader background
