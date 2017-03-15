@@ -21,3 +21,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PACKAGES="nsis cloog-isl libmpc3 qt4-linguist-tools mingw32 $MINGW_PACKAGES"
 
 sudo apt-get install -y $PACKAGES
+
+# ccache 3.2 is needed because mingw32-x-gcc is version 4.9, which causes cmake
+# to use @file command line passing, which in turn ccache 3.1.9 doesn't support
+pushd /tmp
+wget http://archive.ubuntu.com/ubuntu/pool/main/c/ccache/ccache_3.2.3-1_amd64.deb
+sudo dpkg -i ccache_3.2.3-1_amd64.deb
+popd

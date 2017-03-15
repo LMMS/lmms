@@ -23,5 +23,4 @@ export MINGW_PACKAGES
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $DIR/linux.win.download.sh win64
 
-
 sudo apt-get install -y $MINGW_PACKAGES

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-export CMAKE_OPTS="-DUSE_WERROR=ON"
+export CMAKE_OPTS="-DUSE_WERROR=ON -DUSE_CCACHE=ON"
 ../cmake/build_mingw64.sh
