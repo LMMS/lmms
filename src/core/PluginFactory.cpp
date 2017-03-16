@@ -180,26 +180,25 @@ void PluginFactory::discoverPlugins()
 	DescriptorMap descriptors;
 	PluginInfoList pluginInfos;
 	m_pluginByExt.clear();
-    QStringList directoryList;
+	QStringList directoryList;
 	QString env_path;
 
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
 	// all libraries twice we ensure that libZynAddSubFxCore is found.
 
-    directoryList.push_back( "plugins:" );
-    directoryList.push_back( QDir::homePath() + "/lmms/plugins/lmms" );
+	directoryList.push_back( "plugins:" );
+	directoryList.push_back( QDir::homePath() + "/lmms/plugins/lmms" );
 
 	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty()) {
-        directoryList.push_back( env_path );
-    }
+		directoryList.push_back( env_path );
+	}
 
-    for(QStringList::iterator it = directoryList.begin(); 
-            it != directoryList.end(); 
-            ++it) {
+	for(QStringList::iterator it = directoryList.begin(); 
+		it != directoryList.end(); ++it) {
+		QDir dir( (*it) );
+		loadPluginDirectory(dir, &pluginInfos, &descriptors);
+	}
 
-        QDir dir( (*it) );
-        loadPluginDirectory(dir, &pluginInfos, &descriptors);
-    }
 	for (PluginInfo* info : m_pluginInfos)
 	{
 		delete info->library;
