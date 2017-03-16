@@ -74,6 +74,9 @@ public:
 	/// It can be retrieved by calling this function.
 	QString errorString(QString pluginName) const;
 
+    void loadPluginDirectory(QDir directory, PluginInfoList *pluginInfos, DescriptorMap *descriptors);
+
+
 public slots:
 	void discoverPlugins();
 
