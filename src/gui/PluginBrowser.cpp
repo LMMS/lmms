@@ -24,17 +24,13 @@
 
 #include "PluginBrowser.h"
 
-#include <algorithm> // for std::sort
-
 #include <QLabel>
 #include <QPainter>
-#include <QCursor>
 #include <QMouseEvent>
 #include <QScrollArea>
 #include <QStyleOption>
 
 #include "embed.h"
-#include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"

@@ -32,6 +32,7 @@
 #include <QPushButton>
 
 #include "ZynAddSubFx.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "Knob.h"
 #include "LedCheckbox.h"

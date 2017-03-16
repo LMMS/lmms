@@ -1,5 +1,7 @@
 #include "ValueBuffer.h"
 
+#include "interpolation.h"
+
 ValueBuffer::ValueBuffer()
 {}
 

@@ -27,8 +27,6 @@
 #include <QPainter>
 
 #include "SideBarWidget.h"
-#include "gui_templates.h"
-
 
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,

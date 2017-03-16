@@ -30,9 +30,7 @@
 
 
 #include "Song.h"
-#include "Engine.h"
 #include "Mixer.h"
-#include "Controller.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "LfoController.h"

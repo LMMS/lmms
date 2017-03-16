@@ -24,8 +24,6 @@
 
 #include <QDomElement>
 #include <QDir>
-#include <QFile>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
 #include <QtCore/QTextStream>
@@ -35,6 +33,7 @@
 #include "ProjectVersion.h"
 #include "GuiApplication.h"
 
+#include "lmmsversion.h"
 
 static inline QString ensureTrailingSlash( const QString & s )
 {
@@ -175,6 +174,11 @@ void ConfigManager::upgrade()
 
 	// Bump the version, now that we are upgraded
 	m_version = LMMS_VERSION;
+}
+
+QString ConfigManager::defaultVersion() const
+{
+	return LMMS_VERSION;
 }
 
 bool ConfigManager::hasWorkingDir() const

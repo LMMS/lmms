@@ -30,7 +30,6 @@
 #include "embed.h"
 
 #include <QAction>
-#include <QActionGroup>
 #include <QMdiArea>
 #include <QShortcut>
 

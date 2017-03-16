@@ -28,7 +28,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMouseEvent>
-#include <QPainter>
 #include <QWidget>
 
 #include "EqControls.h"

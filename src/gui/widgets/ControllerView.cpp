@@ -39,7 +39,6 @@
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"

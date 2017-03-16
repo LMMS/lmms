@@ -25,10 +25,6 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include "denormals.h"
-
-#include "lmmsconfig.h"
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>

@@ -25,7 +25,6 @@
  */
 
 #include <QApplication>
-#include <QButtonGroup>
 #include <QClipboard>
 #include <QKeyEvent>
 #include <QLabel>
@@ -34,8 +33,6 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QWheelEvent>
-#include <QString>
 #include <QSignalMapper>
 
 #ifndef __USE_XOPEN
@@ -43,7 +40,6 @@
 #endif
 
 #include <math.h>
-#include <algorithm>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
@@ -59,16 +55,10 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "MidiEvent.h"
-#include "DataFile.h"
 #include "Pattern.h"
-#include "Piano.h"
-#include "PixmapButton.h"
 #include "SongEditor.h"
-#include "templates.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "TextFloat.h"
 
 
 #if QT_VERSION < 0x040800

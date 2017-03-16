@@ -27,8 +27,6 @@
 
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPixmap>
-#include <QWheelEvent>
 
 #include "gui_templates.h"
 

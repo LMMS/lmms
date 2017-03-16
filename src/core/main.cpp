@@ -31,7 +31,6 @@
 
 #include <QFileInfo>
 #include <QLocale>
-#include <QDate>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
@@ -44,11 +43,7 @@
 #endif
 
 #ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
+#include "sched.h"
 #endif
 
 #ifdef LMMS_HAVE_PROCESS_H
@@ -71,7 +66,6 @@
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
-#include "DataFile.h"
 #include "Song.h"
 #include "SetupDialog.h"
 

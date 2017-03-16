@@ -28,8 +28,6 @@
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
-#include <QtCore/QRect>
-#include <QtCore/QWriteLocker>
 
 #include <samplerate.h>
 
@@ -42,6 +40,7 @@
 
 
 class QPainter;
+class QRect;
 
 // values for buffer margins, used for various libsamplerate interpolation modes
 // the array positions correspond to the converter_type parameter values in libsamplerate

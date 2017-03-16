@@ -29,11 +29,9 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QFontMetrics>
 #include <QStyleOptionFrameV2>
 
 #include "LcdWidget.h"
-#include "Engine.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "MainWindow.h"

@@ -33,7 +33,6 @@
 
 #include "InstrumentTrack.h"
 #include "BBTrackContainer.h"
-#include "ValueBuffer.h"
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),

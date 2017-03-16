@@ -27,15 +27,13 @@
 
 #include "ProjectRenderer.h"
 #include "Song.h"
-#include "Engine.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
 
 #ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
+#include "sched.h"
 #endif
-#include <QMutexLocker>
 
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {

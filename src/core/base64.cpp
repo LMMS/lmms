@@ -23,13 +23,10 @@
  *
  */
 
-
-
 #include "base64.h"
 
 #include <QBuffer>
 #include <QDataStream>
-#include <QVariant>
 
 namespace base64
 {

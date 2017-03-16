@@ -38,7 +38,6 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
-#include "TabWidget.h"
 #include "GroupBox.h"
 #include "Song.h"
 #include "ToolButton.h"

@@ -23,17 +23,12 @@
  */
 
 #include <QFileInfo>
-#include <QMutexLocker>
 
 #include "PresetPreviewPlayHandle.h"
-#include "debug.h"
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "MidiPort.h"
 #include "Mixer.h"
-#include "DataFile.h"
-#include "NotePlayHandle.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"

@@ -39,9 +39,6 @@
 #include "Piano.h"
 
 #include "InstrumentTrack.h"
-#include "MidiEvent.h"
-#include "MidiEventProcessor.h"
-#include "Note.h"
 
 
 /*! The black / white order of keys as they appear on the keyboard.
