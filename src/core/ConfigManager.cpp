@@ -417,7 +417,16 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 			if( value( "paths", "artwork" ) != "" )
 			{
 				m_artworkDir = value( "paths", "artwork" );
-				if( !QDir( m_artworkDir ).exists() )
+#ifdef LMMS_BUILD_WIN32
+				// Detect a QDir/QFile hang on Windows
+				// see issue #3417 on github
+				bool badPath = ( m_artworkDir == "/" || m_artworkDir == "\\" );
+#else
+				bool badPath = false;
+#endif
+
+				if( badPath || !QDir( m_artworkDir ).exists() ||
+						!QFile( m_artworkDir + "/style.css" ).exists() )
 				{
 					m_artworkDir = defaultArtworkDir();
 				}
