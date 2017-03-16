@@ -27,15 +27,12 @@
 #include "ComboBox.h"
 
 #include <QApplication>
-#include <QCursor>
 #include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPixmap>
 #include <QStyleOptionFrame>
 
 #include "CaptionMenu.h"
-#include "Engine.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "MainWindow.h"

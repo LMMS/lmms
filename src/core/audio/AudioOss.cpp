@@ -35,7 +35,6 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -45,9 +44,6 @@
 #endif
 #ifdef LMMS_HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
 #endif
 
 #ifdef LMMS_HAVE_SYS_SOUNDCARD_H

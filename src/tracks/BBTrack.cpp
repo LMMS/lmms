@@ -23,7 +23,6 @@
  */
 #include "BBTrack.h"
 
-#include <QDomElement>
 #include <QColorDialog>
 #include <QMenu>
 #include <QPainter>
@@ -39,7 +38,6 @@
 #include "RenameDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "templates.h"
 #include "TrackLabelButton.h"
 
 

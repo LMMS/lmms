@@ -25,12 +25,9 @@
 
 #include "AutomatableSlider.h"
 
-#include <QCursor>
 #include <QMouseEvent>
 
 #include "CaptionMenu.h"
-#include "embed.h"
-#include "Engine.h"
 #include "MainWindow.h"
 
 

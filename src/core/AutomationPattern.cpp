@@ -32,7 +32,8 @@
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
-#include "embed.h"
+
+#include <cmath>
 
 int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;

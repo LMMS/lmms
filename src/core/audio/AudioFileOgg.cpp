@@ -32,7 +32,6 @@
 
 
 #include <vorbis/vorbisenc.h>
-#include <cstring>
 
 #include "Mixer.h"
 

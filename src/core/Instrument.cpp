@@ -25,8 +25,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "DummyInstrument.h"
-#include "NotePlayHandle.h"
-#include "Engine.h"
 
 
 Instrument::Instrument( InstrumentTrack * _instrument_track,

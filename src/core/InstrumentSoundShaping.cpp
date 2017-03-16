@@ -32,8 +32,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
-#include "NotePlayHandle.h"
-
 
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;

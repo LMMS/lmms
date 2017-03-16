@@ -39,6 +39,7 @@
 #include "StringPairDrag.h"
 #include "ToolTip.h"
 #include "FileDialog.h"
+#include "ConfigManager.h"
 
 #include "embed.cpp"
 

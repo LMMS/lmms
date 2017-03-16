@@ -28,7 +28,6 @@
 #include <QMenu>
 
 #include "AutomationEditor.h"
-#include "AutomationPattern.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"

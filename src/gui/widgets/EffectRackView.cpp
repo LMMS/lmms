@@ -27,7 +27,6 @@
 #include <QLayout>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QVBoxLayout>
 
 #include "EffectRackView.h"
 #include "EffectSelectDialog.h"

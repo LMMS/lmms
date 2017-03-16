@@ -26,7 +26,6 @@
 #include <QApplication>
 #include <QStyle>
 #include "LmmsPalette.h"
-#include "LmmsStyle.h"
 
 
 LmmsPalette::LmmsPalette( QWidget * parent, QStyle * stylearg ) : 

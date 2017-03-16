@@ -26,7 +26,6 @@
 #include <QMouseEvent>
 
 #include "NStateButton.h"
-#include "embed.h"
 #include "ToolTip.h"
 
 

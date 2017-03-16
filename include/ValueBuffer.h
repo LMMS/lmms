@@ -26,10 +26,10 @@
 #ifndef VALUE_BUFFER_H
 #define VALUE_BUFFER_H
 
-#include <QtGlobal>
-#include "interpolation.h"
-#include <string.h>
+#include <vector>
+
 #include "MemoryManager.h"
+#include "export.h"
 
 class EXPORT ValueBuffer : public std::vector<float>
 {

@@ -26,7 +26,6 @@
 #include <QDomElement>
 
 #include "Effect.h"
-#include "Engine.h"
 #include "EffectChain.h"
 #include "EffectControls.h"
 #include "EffectView.h"

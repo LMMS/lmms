@@ -33,9 +33,6 @@
 #include "LcdSpinBox.h"
 #include "gui_templates.h"
 
-#include <iostream>
-
-
 
 AudioAlsaSetupWidget::AudioAlsaSetupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioAlsa::name(), _parent ),

@@ -35,7 +35,6 @@
 
 #include "export.h"
 #include "MemoryManager.h"
-#include "lmmsversion.h"
 
 class LmmsCore;
 
@@ -135,10 +134,7 @@ public:
 		return dataDir() + SAMPLES_PATH;
 	}
 
-	QString defaultVersion() const
-	{
-		return LMMS_VERSION;
-	}
+	QString defaultVersion() const;
 
 	QString defaultArtworkDir() const
 	{

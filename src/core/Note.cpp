@@ -29,10 +29,6 @@
 
 #include "Note.h"
 #include "DetuningHelper.h"
-#include "templates.h"
-
-
-
 
 
 Note::Note( const MidiTime & length, const MidiTime & pos,

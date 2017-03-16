@@ -23,12 +23,7 @@
  */
 
 #include "MidiWinMM.h"
-#include "ConfigManager.h"
-#include "Engine.h"
-#include "gui_templates.h"
-#include "MidiPort.h"
 #include "Note.h"
-
 
 #ifdef LMMS_BUILD_WIN32
 

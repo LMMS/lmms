@@ -30,7 +30,6 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
@@ -42,7 +41,6 @@
 #include "AudioDummy.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
@@ -50,11 +48,7 @@
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "InstrumentTrack.h"
-#include "lmmsversion.h"
-#include "Mixer.h"
 #include "PianoRoll.h"
-#include "PianoView.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
@@ -62,14 +56,12 @@
 #include "ProjectNotes.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
-#include "Song.h"
 #include "SongEditor.h"
-#include "SubWindow.h"
-#include "templates.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
+#include "lmmsversion.h"
 
 
 

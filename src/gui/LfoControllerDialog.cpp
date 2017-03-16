@@ -26,20 +26,17 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QPainter>
 
 #include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
 
 
 #include "LfoController.h"
-#include "ControllerDialog.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "PixmapButton.h"

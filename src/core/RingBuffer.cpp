@@ -26,7 +26,6 @@
 #include "RingBuffer.h"
 #include "Engine.h"
 #include "Mixer.h"
-#include <string.h>
 #include "MixHelpers.h"
 
  

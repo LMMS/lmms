@@ -24,12 +24,11 @@
 
 #include "MixerWorkerThread.h"
 
+#include "denormals.h"
 #include <QMutex>
 #include <QWaitCondition>
 #include "ThreadableJob.h"
 #include "Mixer.h"
-
-#include "denormals.h"
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;

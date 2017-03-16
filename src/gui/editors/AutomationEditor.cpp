@@ -27,8 +27,9 @@
 
 #include "AutomationEditor.h"
 
+#include <cmath>
+
 #include <QApplication>
-#include <QButtonGroup>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
@@ -36,16 +37,11 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QWheelEvent>
 #include <QToolTip>
-#include <QSignalMapper>
-
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
-
-#include <math.h>
 
 #include "ActionGroup.h"
 #include "SongEditor.h"
@@ -53,8 +49,6 @@
 #include "GuiApplication.h"
 #include "embed.h"
 #include "Engine.h"
-#include "PixmapButton.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "TimeLineWidget.h"
 #include "ToolTip.h"
@@ -63,7 +57,6 @@
 #include "BBTrackContainer.h"
 #include "PianoRoll.h"
 #include "debug.h"
-#include "MeterModel.h"
 #include "StringPairDrag.h"
 #include "ProjectJournal.h"
 

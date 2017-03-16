@@ -30,8 +30,6 @@
 #include <QLabel>
 #include <QMessageBox>
 
-#include <stdlib.h>
-
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "templates.h"

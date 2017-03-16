@@ -42,12 +42,10 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "templates.h"
 #include "ComboBox.h"
-#include "LcdSpinBox.h"
 #include "Mixer.h"
 
 

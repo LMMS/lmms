@@ -24,17 +24,18 @@
 
 #include "Mixer.h"
 
+#include "denormals.h"
+
+#include "lmmsconfig.h"
+
 #include "AudioPort.h"
 #include "FxMixer.h"
 #include "MixerWorkerThread.h"
 #include "Song.h"
 #include "EnvelopeAndLfoParameters.h"
 #include "NotePlayHandle.h"
-#include "Engine.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "GuiApplication.h"
-#include "PianoRoll.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -57,10 +58,7 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#include "MemoryHelper.h"
 #include "BufferManager.h"
-
-
 
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
