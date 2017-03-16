@@ -173,6 +173,10 @@ void SampleBuffer::update( bool _keep_settings )
 		MM_FREE( m_data );
 	}
 
+	// File size and sample length limits
+	const int fileSizeMax = 300; // MB
+	const int sampleLengthMax = 90; // Minutes
+
 	bool fileLoadError = false;
 	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
 	{
@@ -202,7 +206,7 @@ void SampleBuffer::update( bool _keep_settings )
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
-		if( fileInfo.size() > 300*1024*1024 )
+		if( fileInfo.size() > fileSizeMax * 1024 * 1024 )
 		{
 			fileLoadError = true;
 		}
@@ -215,7 +219,7 @@ void SampleBuffer::update( bool _keep_settings )
 			{
 				f_cnt_t frames = sf_info.frames;
 				int rate = sf_info.samplerate;
-				if( frames / rate > 90 * 60 ) // 90 minutes
+				if( frames / rate > sampleLengthMax * 60 )
 				{
 					fileLoadError = true;
 				}
@@ -291,13 +295,14 @@ void SampleBuffer::update( bool _keep_settings )
 
 	if( fileLoadError )
 	{
-		QString message = "Audio files are limited to 100 MB "
-				"in size and 1 hour of playing time";
+		QString title = tr( "Fail to open file" );
+		QString message = tr( "Audio files are limited to %1 MB "
+				"in size and %2 minutes of playing time"
+				).arg( fileSizeMax ).arg( sampleLengthMax );
 		if( gui )
 		{
 			QMessageBox::information( NULL,
-				"Fail to open file", message,
-					QMessageBox::Ok );
+				title, message,	QMessageBox::Ok );
 		}
 		else
 		{
