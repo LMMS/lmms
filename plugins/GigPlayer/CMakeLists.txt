@@ -13,6 +13,7 @@ if(LMMS_HAVE_GIG)
 	endif(LMMS_BUILD_WIN32)
 
 	# Fix gig.h
+	# See https://github.com/LMMS/lmms/pull/3208
 	SET(LOCAL_GIG_H)
 	IF(FIX_SYSTEM_HEADERS AND EXISTS /usr/include/gig.h)
 		EXECUTE_PROCESS(
