@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,9 +24,10 @@
 
 #include "AutomatableModel.h"
 
+#include "lmms_math.h"
+
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
-#include "lmms_math.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
 

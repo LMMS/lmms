@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,20 +26,15 @@
 
 #include <QAction>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QLayout>
-#include <QMdiArea>
 
 #include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "ConfigManager.h"
-#include "DataFile.h"
 #include "StringPairDrag.h"
 
-#include "TrackContainer.h"
 #include "Pattern.h"
 
 

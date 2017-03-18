@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -63,12 +63,6 @@ MidiTime::MidiTime( const tick_t ticks ) :
 {
 }
 
-MidiTime::MidiTime( const MidiTime& time ) :
-	m_ticks( time.m_ticks )
-{
-}
-
-
 MidiTime MidiTime::toNearestTact() const
 {
 	if( m_ticks % s_ticksPerTact >= s_ticksPerTact/2 )
@@ -82,13 +76,6 @@ MidiTime MidiTime::toNearestTact() const
 MidiTime MidiTime::toAbsoluteTact() const
 {
 	return getTact() * s_ticksPerTact;
-}
-
-
-MidiTime& MidiTime::operator=( const MidiTime& time )
-{
-	m_ticks = time.m_ticks;
-	return *this;
 }
 
 

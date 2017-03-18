@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 #include "Track.h"
 
 #include <assert.h>
-#include <cstdio>
 
 #include <QLayout>
 #include <QMenu>
@@ -60,20 +59,14 @@
 #include "GuiApplication.h"
 #include "FxMixerView.h"
 #include "gui_templates.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "DataFile.h"
-#include "PixmapButton.h"
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
-#include "ToolTip.h"
-#include "TrackContainer.h"
 
 
 /*! The width of the resize grip in pixels
@@ -2421,6 +2414,12 @@ tact_t Track::length() const
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
+		if( Engine::getSong()->isExporting() &&
+				( *it )->isMuted() )
+		{
+			continue;
+		}
+
 		const tick_t cur = ( *it )->endPosition();
 		if( cur > last )
 		{

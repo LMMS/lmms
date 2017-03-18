@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,15 +27,13 @@
 
 #include "ProjectRenderer.h"
 #include "Song.h"
-#include "Engine.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
 
 #ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
+#include "sched.h"
 #endif
-#include <QMutexLocker>
 
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
@@ -167,8 +165,8 @@ void ProjectRenderer::run()
 #endif
 #endif
 
-
 	Engine::getSong()->startExport();
+	Engine::getSong()->updateLength();
     //skip first empty buffer
     Engine::mixer()->nextBuffer();
 

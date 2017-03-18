@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,10 +33,7 @@
 #include "EffectView.h"
 #include "DummyEffect.h"
 #include "CaptionMenu.h"
-#include "EffectControls.h"
-#include "EffectControlDialog.h"
 #include "embed.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
 #include "Knob.h"

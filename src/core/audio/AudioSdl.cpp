@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,13 +30,9 @@
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "Mixer.h"
-#include "templates.h"
-
-
 
 
 AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :

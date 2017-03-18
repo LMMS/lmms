@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,7 +37,6 @@
 #include "FileBrowser.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
-#include "debug.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
@@ -47,7 +46,6 @@
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "DataFile.h"
 #include "PluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
@@ -86,6 +84,9 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	opl->setSpacing( 0 );
 
 	m_filterEdit = new QLineEdit( ops );
+#if QT_VERSION >= 0x050000
+	m_filterEdit->setClearButtonEnabled( true );
+#endif
 	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
 			this, SLOT( filterItems( const QString & ) ) );
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,17 +23,12 @@
  */
 
 #include <QFileInfo>
-#include <QMutexLocker>
 
 #include "PresetPreviewPlayHandle.h"
-#include "debug.h"
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "MidiPort.h"
 #include "Mixer.h"
-#include "DataFile.h"
-#include "NotePlayHandle.h"
 #include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"

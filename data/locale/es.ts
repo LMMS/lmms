@@ -43,10 +43,6 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
         <translation>LMMS</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Involved</source>
         <translation>Han contribuído</translation>
     </message>
@@ -57,6 +53,10 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <message>
         <source>Copyright © %1</source>
         <translation>Copyright © %1</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1006,10 +1006,6 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
 <context>
     <name>DelayControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Retraso</translation>
-    </message>
-    <message>
         <source>Lfo Amt</source>
         <translation>Lfo cant</translation>
     </message>
@@ -1018,16 +1014,8 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
         <translation>Tiempo de retraso</translation>
     </message>
     <message>
-        <source>Regen</source>
-        <translation>Intensidad</translation>
-    </message>
-    <message>
         <source>Feedback Amount</source>
         <translation>Cantidad de realimentacion</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation>Tasa (rate)</translation>
     </message>
     <message>
         <source>Lfo</source>
@@ -1040,6 +1028,22 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <message>
         <source>Gain</source>
         <translation>Ganancia</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>RETRASO</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>RETRO</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>TASA</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>CANT</translation>
     </message>
 </context>
 <context>
@@ -1881,18 +1885,6 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
         <source> Octave</source>
         <translation>Octava</translation>
     </message>
-    <message>
-        <source>Frequency</source>
-        <translation>Frecuencia</translation>
-    </message>
-    <message>
-        <source>Resonance</source>
-        <translation>Resonancia</translation>
-    </message>
-    <message>
-        <source>Bandwidth</source>
-        <translation>AnchoDeBanda</translation>
-    </message>
 </context>
 <context>
     <name>EqHandle</name>
@@ -2056,12 +2048,6 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
         <translation>No se puede abrir el archivo</translation>
     </message>
     <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>El archivo %1 no puede abrirse para escritura.
-¡Asegúrate de tener permisos de escritura tanto del archivo como del directorio que lo contiene e inténtalo nuevamente!</translation>
-    </message>
-    <message>
         <source>Export project to %1</source>
         <translation>Exportar proyecto a %1</translation>
     </message>
@@ -2076,6 +2062,12 @@ Please make sure you have write-permission to the file and the directory contain
     <message>
         <source>Rendering: %1%</source>
         <translation>Renderizando: %1%</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>El archivo %1 no puede abrirse para escritura.
+Asegúrate de tener permisos de escritura tanto del archivo como del directorio que lo contiene e inténtalo de nuevo.</translation>
     </message>
 </context>
 <context>
@@ -3441,12 +3433,12 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
         <translation>Establecer como Logarítmico</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Por favor ingresa un nuevo valor entre -96.0 dBFS y 6.0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Por favor ingresa un nuevo valor entre %1 y %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Por favor ingresa un nuevo valor entre -96.0 dBFS y 6.0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -3969,10 +3961,6 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
         <translation>Guardar como plantilla por defecto</translation>
     </message>
     <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>Exportar &amp;MIDI...</translation>
-    </message>
-    <message>
         <source>&amp;View</source>
         <translation>&amp;Ver</translation>
     </message>
@@ -4041,16 +4029,20 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
         <translation>Esta acción sobreescribirá tu actual plantilla por defecto.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volumen en dBFS</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Desplazamiento suave</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
         <translation>Nombres de notas en piano roll</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation>Guardar plantilla de proyecto</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volumen en dBFS</translation>
     </message>
 </context>
 <context>
@@ -5704,16 +5696,16 @@ Razón: &quot;%2&quot;</translation>
 <context>
     <name>PluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Instrumentos</translation>
-    </message>
-    <message>
         <source>Instrument browser</source>
         <translation>Explorador de Instrumentos</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
         <translation>Arrastra un instrumento al Editor de Canción, al Editor de Ritmo+Bajo o sobre una pista de instrumento existente.</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>Instrumentos</translation>
     </message>
 </context>
 <context>
@@ -5916,6 +5908,60 @@ Razón: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Entrada</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Ganancia de Entrada:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Tamaño:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Color:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Salida</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Ganancia de Salida:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Ganancia de entrada</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Ganancia de salida</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -6062,10 +6108,6 @@ Razón: &quot;%2&quot;</translation>
         <translation>Mostrar advertencia de reinicio luego de cambiar la configuración</translation>
     </message>
     <message>
-        <source>Display volume as dBFS </source>
-        <translation>Mostrar volumen en dBFS</translation>
-    </message>
-    <message>
         <source>Compress project files per default</source>
         <translation>Comprimir archivos de proyecto por defecto</translation>
     </message>
@@ -6140,10 +6182,6 @@ Razón: &quot;%2&quot;</translation>
     <message>
         <source>Smooth scroll in Song Editor</source>
         <translation>Avance suave en Editor de Canción</translation>
-    </message>
-    <message>
-        <source>Enable auto save feature</source>
-        <translation>Habilitar Auto-Guardado</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
@@ -6272,14 +6310,30 @@ Latencia: %2 ms</translation>
         <translation>minuto</translation>
     </message>
     <message>
-        <source>Auto save interval: %1 %2</source>
-        <translation>Guardar automáticamente cada: %1 %2</translation>
+        <source>Display volume as dBFS </source>
+        <translation>Mostrar volumen en dBFS</translation>
+    </message>
+    <message>
+        <source>Enable auto-save</source>
+        <translation>Habilitar Auto-Guardado</translation>
+    </message>
+    <message>
+        <source>Allow auto-save while playing</source>
+        <translation>Permitir auto-guardado durante la reproducción</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Inhabilitado</translation>
+    </message>
+    <message>
+        <source>Auto-save interval: %1</source>
+        <translation>Intervalo de auto-guardado: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
-Remember to also save your project manually.</source>
+Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
         <translation>Define el tiempo entre auto-guardados en %1.
-Recuerda también guardar tu proyecto manualmente.</translation>
+Recuerda también guardar tu proyecto manualmente. Puedes elegir no guardar automáticamente durante la reproducción, lo cual algunos sistemas anteriores encuentran difícil de realizar.  </translation>
     </message>
 </context>
 <context>
@@ -6359,6 +6413,10 @@ Recuerda también guardar tu proyecto manualmente.</translation>
     <message>
         <source>LMMS Error report</source>
         <translation>Reporte de errores LMMS</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation>Guardar proyecto</translation>
     </message>
 </context>
 <context>
@@ -7013,6 +7071,10 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Decrement version number</source>
         <translation>Disminuír el número de versión</translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
+        <translation>¡Ya existe! ¿Deseas reemplazarlo?</translation>
     </message>
 </context>
 <context>
@@ -9273,6 +9335,10 @@ Este chip fue usado en las computadoras Commodore 64.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filtro para exportar archivos MIDI desde LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Algoritmo de reverberación por Sean Costello</translation>
     </message>
 </context>
 <context>

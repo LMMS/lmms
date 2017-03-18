@@ -56,6 +56,8 @@ public:
 	BoolModel * active;
 	// the note is processed but silenced -> true: normally played, false: muted
 	BoolModel * silenced;
+	// random: the note will be a random value within the abs(key) range
+	BoolModel * rand;
 	// The note only has the key value. True: bare, we will discard al the rest, taking data from the base note
 	BoolModel * bare;
 

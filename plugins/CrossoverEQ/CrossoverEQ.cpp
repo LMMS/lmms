@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -95,23 +95,17 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
 	{
 		m_lp1.setLowpass( m_controls.m_xover12.value() );
-		m_lp1.clearHistory();
 		m_hp2.setHighpass( m_controls.m_xover12.value() );
-		m_hp2.clearHistory();
 	}
 	if( m_needsUpdate || m_controls.m_xover23.isValueChanged() )
 	{
 		m_lp2.setLowpass( m_controls.m_xover23.value() );
-		m_lp2.clearHistory();
 		m_hp3.setHighpass( m_controls.m_xover23.value() );
-		m_hp3.clearHistory();
 	}
 	if( m_needsUpdate || m_controls.m_xover34.isValueChanged() )
 	{
 		m_lp3.setLowpass( m_controls.m_xover34.value() );
-		m_lp3.clearHistory();
 		m_hp4.setHighpass( m_controls.m_xover34.value() );
-		m_hp4.clearHistory();
 	}
 	
 	// gain values update
@@ -204,6 +198,16 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	checkGate( outSum );
 	
 	return isRunning();
+}
+
+void CrossoverEQEffect::clearFilterHistories()
+{
+	m_lp1.clearHistory();
+	m_lp2.clearHistory();
+	m_lp3.clearHistory();
+	m_hp2.clearHistory();
+	m_hp3.clearHistory();
+	m_hp4.clearHistory();
 }
 
 

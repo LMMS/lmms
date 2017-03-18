@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,33 +24,26 @@
 
 #include "TrackContainerView.h"
 
-#include <algorithm>
+#include <cmath>
 
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
-#include <QProgressDialog>
-#include <QScrollBar>
 #include <QWheelEvent>
-
 
 #include "TrackContainer.h"
 #include "BBTrack.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "debug.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
-#include "InstrumentTrack.h"
-#include "DataFile.h"
-#include "Rubberband.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "Track.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
+using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
@@ -66,7 +59,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_origin()
 {
 	m_tc->setHook( this );
-
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );

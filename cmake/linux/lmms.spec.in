@@ -26,7 +26,7 @@ Release:	%{release}
 Summary:	powerful sequencer-, synthesizer- and sample-studio for Linux
 Summary(de):	Leistungsfaehiges Sequenzer-, Synthesizer- und Sample-Studio fuer Linux
 License:	GPL
-URL:		http://lmms.io/
+URL:		https://lmms.io/
 Group:		Applications/Multimedia
 Provides:	lmms = %{version}-%{release}
 BuildRequires:	gcc gcc-c++ libstdc++-devel autoconf automake libtool make

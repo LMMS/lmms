@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -88,7 +88,7 @@ public:
 	{
 		return m_patternType;
 	}
-
+	void checkType();
 
 	// next/previous track based on position in the containing track
 	Pattern * previousPattern() const;
@@ -132,7 +132,6 @@ private:
 	MidiTime beatPatternLength() const;
 
 	void setType( PatternTypes _new_pattern_type );
-	void checkType();
 
 	void resizeToFirstTrack();
 
@@ -186,14 +185,14 @@ protected:
 
 
 private:
-	static QPixmap * s_stepBtnOn;
-	static QPixmap * s_stepBtnOverlay;
+	static QPixmap * s_stepBtnOn0;
+	static QPixmap * s_stepBtnOn200;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
-	
+
 	QStaticText m_staticTextName;
 } ;
 

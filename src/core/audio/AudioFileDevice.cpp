@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 
 #include "AudioFileDevice.h"
 #include "ExportProjectDialog.h"
+#include "GuiApplication.h"
 
 
 AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
@@ -50,17 +51,27 @@ AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
 
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
 	{
-		QMessageBox::critical( NULL,
-			ExportProjectDialog::tr( "Could not open file" ),
-			ExportProjectDialog::tr( "Could not open file %1 "
+		QString title, message;
+		title = ExportProjectDialog::tr( "Could not open file" );
+		message = ExportProjectDialog::tr( "Could not open file %1 "
 						"for writing.\nPlease make "
-						"sure you have write-"
+						"sure you have write "
 						"permission to the file and "
 						"the directory containing the "
-						"file and try again!" ).arg(
-									_file ),
-					QMessageBox::Ok,
-					QMessageBox::NoButton );
+						"file and try again!"
+								).arg( _file );
+
+		if( gui )
+		{
+			QMessageBox::critical( NULL, title, message,
+						QMessageBox::Ok,
+						QMessageBox::NoButton );
+		}
+		else
+		{
+			fprintf( stderr, "%s\n", message.toUtf8().constData() );
+			exit( EXIT_FAILURE );
+		}
 	}
 }
 

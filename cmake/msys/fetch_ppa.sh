@@ -17,9 +17,19 @@ PPA_URL=$PPA_ROOT/dists/$PPA_DISTRO/main/binary-$PPA_ARCH/Packages
 ppa_dir=./ppa/
 
 temp_file=/tmp/ppa_listing_$$
+temp_temp_file=/tmp/ppa_listing_temp_$$
+
+skip_files="binutils openssl flac libgig libogg libvorbis x-bootstrap zlib"
+skip_files="$skip_files x-runtime gcc qt_4 qt5 x-stk pkgconfig" 
+skip_files="$skip_files glib2 libpng"
 
 echo "Connecting to $PPA_HOST to get list of packages..."
 wget -qO- $PPA_URL |grep "Filename:" > $temp_file
+
+for j in $skip_files ; do
+	grep -v $j $temp_file > $temp_temp_file
+	mv $temp_temp_file $temp_file
+done
 
 line_count=`wc -l $temp_file |awk '{print $1}'`
 

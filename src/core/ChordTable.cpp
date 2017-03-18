@@ -46,6 +46,7 @@ ChordSemiTone::ChordSemiTone( Chord * _parent ) :
 	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning " ) + _parent->m_name ) ),
 	active( new BoolModel( true, _parent, tr( "Active " ) + _parent->m_name ) ),
 	silenced( new BoolModel( false, _parent, tr( "Silenced " ) + _parent->m_name ) ),
+	rand( new BoolModel( false, _parent, tr( "Random " ) + _parent->m_name ) ),
 	bare( new BoolModel( false, _parent, tr( "Bare " ) + _parent->m_name ) )
 {
 }
@@ -57,6 +58,7 @@ ChordSemiTone::ChordSemiTone( ChordSemiTone * _copy ) :
 	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _copy->getChord(), tr( "Panning " ) + _copy->getChord()->m_name ) ),
 	active( new BoolModel( true, _copy->getChord(), tr( "Active " ) + _copy->getChord()->m_name ) ),
 	silenced( new BoolModel( false, _copy->getChord(), tr( "Silenced " ) + _copy->getChord()->m_name ) ),
+	rand( new BoolModel( false, _copy->getChord(), tr( "Random " ) + _copy->getChord()->m_name ) ),
 	bare( new BoolModel( false, _copy->getChord(), tr( "Bare " ) + _copy->getChord()->m_name ) )
 {
 	key->setValue( _copy->key->value() );
@@ -64,6 +66,7 @@ ChordSemiTone::ChordSemiTone( ChordSemiTone * _copy ) :
 	pan->setValue( _copy->pan->value() );
 	active->setValue( _copy->active->value() );
 	silenced->setValue( _copy->silenced->value() );
+	rand->setValue( _copy->rand->value() );
 	bare->setValue( _copy->bare->value() );
 }
 
@@ -74,6 +77,7 @@ ChordSemiTone::ChordSemiTone( Chord * _parent, QString _string ) :
 	pan( new FloatModel( PanningCenter, PanningLeft, PanningRight, 0.1f, _parent, tr( "Panning " ) + _parent->m_name ) ),
 	active( new BoolModel( true, _parent, tr( "Active " ) + _parent->m_name ) ),
 	silenced( new BoolModel( false, _parent, tr( "Silenced " ) + _parent->m_name ) ),
+	rand( new BoolModel( false, _parent, tr( "Random " ) + _parent->m_name ) ),
 	bare( new BoolModel( false, _parent, tr( "Bare " ) + _parent->m_name ) )
 {
 	parseString( _string );
@@ -83,6 +87,7 @@ ChordSemiTone::~ChordSemiTone()
 {
 	//should already be deleted by their parent object
 	delete bare;
+	delete rand;
 	delete silenced;
 	delete active;
 	delete pan;
@@ -96,6 +101,7 @@ void ChordSemiTone::saveSettings( QDomDocument &_doc, QDomElement &_parent )
 	vol->saveSettings( _doc, _parent, "vol" );
 	pan->saveSettings( _doc, _parent, "pan" );
 	active->saveSettings( _doc, _parent, "active" );
+	rand->saveSettings( _doc, _parent, "rand" );
 	silenced->saveSettings( _doc, _parent, "silenced" );
 	bare->saveSettings( _doc, _parent, "bare" );
 }
@@ -106,6 +112,7 @@ void ChordSemiTone::loadSettings( const QDomElement &_this )
 	vol->loadSettings( _this, "vol" );
 	pan->loadSettings( _this, "pan" );
 	active->loadSettings( _this, "active" );
+	rand->loadSettings( _this, "rand" );
 	silenced->loadSettings( _this, "silenced" );
 	bare->loadSettings( _this, "bare" );
 }
@@ -117,6 +124,7 @@ void ChordSemiTone::parseString( QString _string )
 	vol->setValue( l[1].toFloat() );
 	pan->setValue( l[2].toFloat() );
 	active->setValue( l[3].toShort() );
+	rand->setValue( false ); //don't mess with the predefined chords
 	silenced->setValue( l[4].toShort() );
 	bare->setValue( l[5].toShort() );
 }

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,7 +22,6 @@
  *
  */
 
-
 #include "SampleBuffer.h"
 
 
@@ -31,10 +30,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
-#include <QReadLocker>
 
-
-#include <cstring>
 
 #include <sndfile.h>
 
@@ -54,16 +50,13 @@
 
 #include "base64.h"
 #include "ConfigManager.h"
-#include "debug.h"
 #include "DrumSynth.h"
 #include "endian_handling.h"
 #include "Engine.h"
-#include "interpolation.h"
+#include "GuiApplication.h"
 #include "Mixer.h"
-#include "templates.h"
 
 #include "FileDialog.h"
-#include "MemoryManager.h"
 
 
 SampleBuffer::SampleBuffer( const QString & _audio_file,
@@ -173,6 +166,11 @@ void SampleBuffer::update( bool _keep_settings )
 		MM_FREE( m_data );
 	}
 
+	// File size and sample length limits
+	const int fileSizeMax = 300; // MB
+	const int sampleLengthMax = 90; // Minutes
+
+	bool fileLoadError = false;
 	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
 	{
 		// TODO: reverse- and amplification-property is not covered
@@ -201,14 +199,29 @@ void SampleBuffer::update( bool _keep_settings )
 		m_frames = 0;
 
 		const QFileInfo fileInfo( file );
-		if( fileInfo.size() > 100*1024*1024 )
+		if( fileInfo.size() > fileSizeMax * 1024 * 1024 )
 		{
-			qWarning( "refusing to load sample files bigger "
-								"than 100 MB" );
+			fileLoadError = true;
 		}
 		else
 		{
+			SNDFILE * snd_file;
+			SF_INFO sf_info;
+			sf_info.format = 0;
+			if( ( snd_file = sf_open( f, SFM_READ, &sf_info ) ) != NULL )
+			{
+				f_cnt_t frames = sf_info.frames;
+				int rate = sf_info.samplerate;
+				if( frames / rate > sampleLengthMax * 60 )
+				{
+					fileLoadError = true;
+				}
+				sf_close( snd_file );
+			}
+		}
 
+		if( !fileLoadError )
+		{
 #ifdef LMMS_HAVE_OGGVORBIS
 			// workaround for a bug in libsndfile or our libsndfile decoder
 			// causing some OGG files to be distorted -> try with OGG Vorbis
@@ -237,22 +250,21 @@ void SampleBuffer::update( bool _keep_settings )
 			}
 
 			delete[] f;
+		}
 
-			if ( m_frames == 0 )  // if still no frames, bail
-			{
-				// sample couldn't be decoded, create buffer containing
-				// one sample-frame
-				m_data = MM_ALLOC( sampleFrame, 1 );
-				memset( m_data, 0, sizeof( *m_data ) );
-				m_frames = 1;
-				m_loopStartFrame = m_startFrame = 0;
-				m_loopEndFrame = m_endFrame = 1;
-			}
-			else // otherwise normalize sample rate
-			{
-				normalizeSampleRate( samplerate, _keep_settings );
-			}
-
+		if ( m_frames == 0 || fileLoadError )  // if still no frames, bail
+		{
+			// sample couldn't be decoded, create buffer containing
+			// one sample-frame
+			m_data = MM_ALLOC( sampleFrame, 1 );
+			memset( m_data, 0, sizeof( *m_data ) );
+			m_frames = 1;
+			m_loopStartFrame = m_startFrame = 0;
+			m_loopEndFrame = m_endFrame = 1;
+		}
+		else // otherwise normalize sample rate
+		{
+			normalizeSampleRate( samplerate, _keep_settings );
 		}
 	}
 	else
@@ -273,6 +285,24 @@ void SampleBuffer::update( bool _keep_settings )
 	}
 
 	emit sampleUpdated();
+
+	if( fileLoadError )
+	{
+		QString title = tr( "Fail to open file" );
+		QString message = tr( "Audio files are limited to %1 MB "
+				"in size and %2 minutes of playing time"
+				).arg( fileSizeMax ).arg( sampleLengthMax );
+		if( gui )
+		{
+			QMessageBox::information( NULL,
+				title, message,	QMessageBox::Ok );
+		}
+		else
+		{
+			fprintf( stderr, "%s\n", message.toUtf8().constData() );
+			exit( EXIT_FAILURE );
+		}
+	}
 }
 
 

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,6 @@
  */
 
 #include <QDir>
-#include <QFile>
 #include <QQueue>
 #include <QApplication>
 #include <QCloseEvent>
@@ -36,26 +35,21 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QWidget>
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
-#include "AudioPort.h"
 #include "AutomationPattern.h"
 #include "BBTrack.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
-#include "debug.h"
 #include "EffectChain.h"
 #include "EffectRackView.h"
 #include "embed.h"
-#include "Engine.h"
 #include "FileBrowser.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "InstrumentSoundShaping.h"
 #include "InstrumentSoundShapingView.h"
 #include "FadeButton.h"
 #include "gui_templates.h"
@@ -71,20 +65,14 @@
 #include "MidiPortMenu.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
-#include "DataFile.h"
-#include "NotePlayHandle.h"
 #include "Pattern.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "TabWidget.h"
-#include "ToolTip.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
-#include "ValueBuffer.h"
-#include "volume.h"
 
 
 const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",

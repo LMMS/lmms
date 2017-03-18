@@ -106,6 +106,7 @@ QString chordtableEditor::nodeName() const
 void chordtableEditor::reloadComboModel()
 {
 	int i=m_chordsComboModel->value();
+
 	m_chordsComboModel->clear();
 	for( int i = 0; i < m_chordTable->size(); ++i )
 	{
@@ -243,6 +244,8 @@ ChordTableEditorView::ChordTableEditorView( ToolPlugin * _tool ) :
 	//changes the combobox in the plugin
 	connect( gui, SIGNAL( genericSignal_1( int ) ), this, SLOT( setChordSelection( int ) ) );
 
+	//loads the Chord
+	loadChord();
 
 	setWhatsThis( tr( "This dialog allows editing and automation of the chord table." ) );
 
@@ -253,7 +256,7 @@ ChordTableEditorView::ChordTableEditorView( ToolPlugin * _tool ) :
 		parentWidget()->hide();
 //		parentWidget()->layout()->setSizeConstraint( QLayout::SetDefaultConstraint );
 		parentWidget()->layout()->setSizeConstraint( QLayout::SetNoConstraint );
-		parentWidget()->setMinimumSize( 750,480 );
+		parentWidget()->setMinimumSize( 750,500 );
 		parentWidget()->adjustSize();
 
 		Qt::WindowFlags flags = parentWidget()->windowFlags();
@@ -591,6 +594,17 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	m_silencedLed->setEnabled( true );
 	ToolTip::add( m_silencedLed, tr( "Silenced note" ) );
 
+	QLabel * m_randomLabel = new QLabel( tr( "Rand:" ) );
+	m_randomLabel->setParent( m_Frame );
+	m_randomLabel->setFont( pointSize<8>( m_randomLabel->font() ) );
+
+	m_randomLed = new LedCheckBox( m_Frame, tr( "Random" ) );
+	m_randomLed->setModel( m_chordNoteModel->m_semiTone->rand );
+	m_randomLed->setWhatsThis( tr( "The chord semitone will be a random value from the -key to +key value.\n"
+																 "The panning will also be random, ranging from -pan to +pan value." ) );
+	m_randomLed->setEnabled( true );
+	ToolTip::add( m_randomLed, tr( "Random note" ) );
+
 	QLabel * m_silencedLabel = new QLabel( tr( "Sil.:" ) );
 	m_silencedLabel->setParent( m_Frame );
 	m_silencedLabel->setFont( pointSize<8>( m_silencedLabel->font() ) );
@@ -619,8 +633,11 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	m_gridLayout->addWidget( m_silencedLabel, 5, 0, 1, 1, Qt::AlignCenter );
 	m_gridLayout->addWidget( m_silencedLed, 5, 1, 1, 1, Qt::AlignCenter );
 
-	m_gridLayout->addWidget( m_bareLabel, 6, 0, 1, 1, Qt::AlignCenter );
-	m_gridLayout->addWidget( m_bareLed, 6, 1, 1, 1, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_randomLabel, 6, 0, 1, 1, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_randomLed, 6, 1, 1, 1, Qt::AlignCenter );
+
+	m_gridLayout->addWidget( m_bareLabel, 7, 0, 1, 1, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_bareLed, 7, 1, 1, 1, Qt::AlignCenter );
 
 	//Connect it while instantiating this class!!
 	m_cloneButton = new QPushButton( tr( "Clone" ) );
@@ -630,7 +647,7 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 	//connects the pushBUtton to emitting position signal
 	connect( m_cloneButton, SIGNAL( clicked() ), this, SLOT( emitClonePosition() ) );
 
-	m_gridLayout->addWidget( m_cloneButton, 7, 0, 1, 2, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_cloneButton, 8, 0, 1, 2, Qt::AlignCenter );
 
 	//the first widget is the one
 	m_delButton = new QPushButton( tr( "Del" ) );
@@ -652,7 +669,7 @@ chordNoteWidget::chordNoteWidget( chordNoteModel * _model, QWidget *_parent ) :
 		//connects the pushBUtton to emitting position signal
 		connect( m_delButton, SIGNAL( clicked() ), this, SLOT( emitDeletePosition() ) );
 	}
-	m_gridLayout->addWidget( m_delButton, 8, 0, 1, 2, Qt::AlignCenter );
+	m_gridLayout->addWidget( m_delButton, 9, 0, 1, 2, Qt::AlignCenter );
 
 }
 

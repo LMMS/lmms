@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Shane Ambler <develop/at/shaneware.biz>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,13 +27,7 @@
 #ifdef LMMS_HAVE_JACK
 
 #include <QCompleter>
-#include <QDirModel>
 #include <QMessageBox>
-#include <QTranslator>
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
 
 #include "ConfigManager.h"
 #include "gui_templates.h"

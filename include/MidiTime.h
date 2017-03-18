@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -62,12 +62,10 @@ class EXPORT MidiTime
 public:
 	MidiTime( const tact_t tact, const tick_t ticks );
 	MidiTime( const tick_t ticks = 0 );
-	MidiTime( const MidiTime& time );
 
 	MidiTime toNearestTact() const;
 	MidiTime toAbsoluteTact() const;
 
-	MidiTime& operator=( const MidiTime& time );
 	MidiTime& operator+=( const MidiTime& time );
 	MidiTime& operator-=( const MidiTime& time );
 

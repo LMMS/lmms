@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Ryan Roden-Corrent <ryan/at/rcorre.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,7 +22,6 @@
  *
  */
 
-#include <QFileInfo>
 #include <QDebug>
 #include <QDir>
 
@@ -30,7 +29,6 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
-#include "debug.h"
 
 RenderManager::RenderManager(
 		const Mixer::qualitySettings & qualitySettings,

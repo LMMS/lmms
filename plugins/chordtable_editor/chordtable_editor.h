@@ -76,6 +76,7 @@ public:
 	AutomatableSlider * m_keySlider;
 	LedCheckBox * m_activeLed;
 	LedCheckBox * m_silencedLed;
+	LedCheckBox * m_randomLed;
 	LedCheckBox * m_bareLed;
 
 	QPushButton * m_delButton;

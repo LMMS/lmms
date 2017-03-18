@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,16 +26,12 @@
 
 #include <QTimeLine>
 #include <QAction>
-#include <QButtonGroup>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QScrollBar>
-
-#include <math.h>
 
 #include "ActionGroup.h"
 #include "AutomatableSlider.h"
@@ -75,7 +71,7 @@ void positionLine::paintEvent( QPaintEvent * pe )
 }
 
 const QVector<double> SongEditor::m_zoomLevels =
-		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
+		{ 16.0f, 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
 
 
 SongEditor::SongEditor( Song * song ) :

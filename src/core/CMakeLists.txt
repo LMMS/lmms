@@ -64,6 +64,7 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 
 	core/audio/AudioAlsa.cpp
