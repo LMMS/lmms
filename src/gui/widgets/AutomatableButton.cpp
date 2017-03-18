@@ -25,12 +25,9 @@
 
 #include "AutomatableButton.h"
 
-#include <QCursor>
 #include <QMouseEvent>
 
 #include "CaptionMenu.h"
-#include "Engine.h"
-#include "embed.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 

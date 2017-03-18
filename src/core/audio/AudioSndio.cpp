@@ -2,8 +2,6 @@
 
 /* license */
 
-#include "AudioSndio.h"
-
 #ifdef LMMS_HAVE_SNDIO
 
 #include <QtCore/QFileInfo>

@@ -39,7 +39,6 @@
 #include "ToolTip.h"
 #include "InstrumentTrack.h"
 #include "LedCheckbox.h"
-#include "QLabel"
 
 
 InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :

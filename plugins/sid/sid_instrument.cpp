@@ -27,6 +27,7 @@
 #include <QPainter>
 #include <QDomElement>
 
+#include <cmath>
 #include <cstdio>
 
 #include "sid.h"

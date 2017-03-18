@@ -27,17 +27,12 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QFontMetrics>
 #include <QStyleOptionFrameV2>
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
-#include "Engine.h"
-#include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
-#include "templates.h"
 #include "MainWindow.h"
 
 

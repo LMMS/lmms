@@ -29,12 +29,9 @@
 #include "InstrumentFunctionViews.h"
 #include "GuiApplication.h"
 #include "ComboBox.h"
-#include "embed.h"
-#include "Engine.h"
 #include "GroupBox.h"
 #include "gui_templates.h"
 #include "Knob.h"
-#include "PixmapButton.h"
 #include "TempoSyncKnob.h"
 #include "ToolTip.h"
 

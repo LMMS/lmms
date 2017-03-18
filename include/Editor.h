@@ -25,12 +25,10 @@
 #ifndef EDITOR_COMMON_H
 #define EDITOR_COMMON_H
 
-#include <QAction>
 #include <QMainWindow>
 #include <QToolBar>
 
-#include "TimeLineWidget.h"
-#include "ToolButton.h"
+class QAction;
 
 class DropToolBar;
 

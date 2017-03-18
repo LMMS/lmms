@@ -26,7 +26,6 @@
 #include <QTimer>
 #include <QApplication>
 #include <QPainter>
-#include <QPixmap>
 
 #include "embed.h"
 #include "FadeButton.h"

@@ -25,12 +25,13 @@
 #ifndef PLAY_HANDLE_H
 #define PLAY_HANDLE_H
 
-#include <QtCore/QThread>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtCore/QMutex>
 
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
+
+class QThread;
 
 class Track;
 class AudioPort;

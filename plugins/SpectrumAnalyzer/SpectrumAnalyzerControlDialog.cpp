@@ -22,6 +22,8 @@
  *
  */
 
+#include <cmath>
+
 #include <QLayout>
 #include <QPainter>
 

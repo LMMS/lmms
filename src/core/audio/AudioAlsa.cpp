@@ -24,7 +24,6 @@
 
 #include <QComboBox>
 #include <QLineEdit>
-#include <QLabel>
 
 #include "AudioAlsa.h"
 
@@ -33,13 +32,8 @@
 #include "endian_handling.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "LcdSpinBox.h"
 #include "Mixer.h"
 #include "gui_templates.h"
-#include "templates.h"
-
-#include <iostream>
-#include <vector>
 
 
 AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :

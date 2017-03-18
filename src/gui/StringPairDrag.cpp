@@ -27,7 +27,6 @@
 
 #include <QMimeData>
 #include <QDragEnterEvent>
-#include <QDropEvent>
 
 
 #include "StringPairDrag.h"

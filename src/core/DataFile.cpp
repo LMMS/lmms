@@ -32,19 +32,18 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QTextStream>
 
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "lmms_basics.h"
-#include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+
+#include "lmmsversion.h"
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 

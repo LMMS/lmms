@@ -28,12 +28,10 @@
 #include <QApplication>
 #include <QFrame>
 #include <QPainter>
-#include <QPixmapCache>
 #include <QStyleFactory>
 #include <QStyleOption>
 
 #include "LmmsStyle.h"
-#include "LmmsPalette.h"
 
 QPalette * LmmsStyle::s_palette = NULL;
 

@@ -29,8 +29,6 @@
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "MidiEvent.h"
-#include "MidiPort.h"
 #include "Mixer.h"
 #include "Song.h"
 

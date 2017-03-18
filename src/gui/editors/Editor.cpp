@@ -24,11 +24,12 @@
 
 #include "Editor.h"
 
+#include "Song.h"
+
 #include "MainWindow.h"
 #include "embed.h"
 
 #include <QAction>
-#include <QActionGroup>
 #include <QMdiArea>
 #include <QShortcut>
 

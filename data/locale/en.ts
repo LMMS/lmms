@@ -227,9 +227,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation type="unfinished"></translation>
@@ -503,6 +500,14 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quantization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2240,9 +2245,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX-Mixer</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation type="unfinished"></translation>
@@ -3643,15 +3645,6 @@ Double click to pick a file.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Could not save config-file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You&apos;re probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;New</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4026,6 +4019,15 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Volume as dBFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5871,6 +5873,60 @@ Reason: &quot;%2&quot;</source>
     <name>RenameDialog</name>
     <message>
         <source>Rename...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9229,6 +9285,10 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -32,7 +32,6 @@
 #include <QFontDatabase>
 #include <QLineEdit>
 #include <QMdiArea>
-#include <QTextCursor>
 #include <QTextEdit>
 #include <QToolBar>
 #include <QDomCDATASection>

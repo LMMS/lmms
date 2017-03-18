@@ -26,9 +26,7 @@
 #include <QImage>
 #include <QHash>
 #include <QImageReader>
-#include <QList>
 #include "embed.h"
-#include "ConfigManager.h"
 
 #ifndef PLUGIN_NAME
 namespace embed

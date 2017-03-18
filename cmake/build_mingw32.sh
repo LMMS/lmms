@@ -8,7 +8,7 @@ else
 	CMAKE_OPTS="$CMAKE_OPTS -DLMMS_BUILD_MSYS=1"
 fi
 
-export PATH=$PATH:$MINGW/bin
+export PATH=$MINGW/bin:$PATH
 export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -mfpmath=sse"
 export CXXFLAGS="$CFLAGS"
 

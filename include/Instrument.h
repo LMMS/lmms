@@ -27,7 +27,6 @@
 #define INSTRUMENT_H
 
 #include <QString>
-#include <QtGlobal>
 #include "export.h"
 #include "lmms_basics.h"
 #include "MemoryManager.h"

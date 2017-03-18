@@ -2,8 +2,6 @@
 
 /* license */
 
-#include "MidiSndio.h"
-
 #ifdef LMMS_HAVE_SNDIO
 
 #include <QtGui/QLabel>

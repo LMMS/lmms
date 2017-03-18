@@ -28,11 +28,8 @@
 
 #include <fstream>
 #include <cstring>
-#include <limits>
 
 #include <math.h>     //sin(), exp(), etc.
-#include <stdio.h>    //sscanf(), sprintf()
-#include <stdlib.h>   //RAND_MAX
 
 #ifdef LMMS_BUILD_WIN32
 #define powf pow

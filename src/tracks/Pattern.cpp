@@ -24,28 +24,20 @@
  */
 #include "Pattern.h"
 
-#include <QDomElement>
 #include <QTimer>
 #include <QMenu>
-#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QProgressBar>
 #include <QPushButton>
-#include <QtAlgorithms>
 
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "PianoRoll.h"
-#include "TrackContainer.h"
 #include "RenameDialog.h"
 #include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
-#include "Song.h"
-#include "ToolTip.h"
 #include "BBTrackContainer.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
@@ -369,7 +361,9 @@ void Pattern::checkType()
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
-		if( ( *it )->length() > 0 )
+		if( ( *it )->length() > 0 ||
+			( *it )->pos() % ( MidiTime::ticksPerTact() /
+						MidiTime::stepsPerTact() ) )
 		{
 			setType( MelodyPattern );
 			return;

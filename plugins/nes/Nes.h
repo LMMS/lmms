@@ -25,6 +25,8 @@
 #ifndef NES_H
 #define NES_H
 
+#include <cmath>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "AutomatableModel.h"
