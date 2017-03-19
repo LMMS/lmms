@@ -447,7 +447,7 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 			TrackContentObject* tco = track->getTCO(i);
 
 			// Skip this TCO if it's muted or not contained in the time period we're processing
-			if( tco == NULL || tco->isMuted() || tco->startPosition() > time_end)
+			if( tco->isMuted() || tco->startPosition() > time_end)
 			{
 				continue;
 			}
