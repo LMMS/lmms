@@ -42,25 +42,21 @@ bool MainApplication::event(QEvent* event)
 		case QEvent::FileOpen:
 		{
 			QFileOpenEvent * fileEvent = static_cast<QFileOpenEvent *>(event);
-			if(event)
+			// Handle the project file
+			m_queuedFile = fileEvent->file();
+			if(Engine::getSong())
 			{
-				// Handle the project file
-				m_queuedFile = fileEvent->file();
-				if(Engine::getSong())
+				if(gui->mainWindow()->mayChangeProject(true))
 				{
-					if(gui->mainWindow()->mayChangeProject(true))
-					{
-						qDebug() << "Loading file " << m_queuedFile;
-						Engine::getSong()->loadProject(m_queuedFile);
-					}
+					qDebug() << "Loading file " << m_queuedFile;
+					Engine::getSong()->loadProject(m_queuedFile);
 				}
-				else
-				{
-					qDebug() << "Queuing file " << m_queuedFile;
-				}
-				return true;
 			}
-			// Fall through to default
+			else
+			{
+				qDebug() << "Queuing file " << m_queuedFile;
+			}
+			return true;
 		}
 		default:
 			return QApplication::event(event);
