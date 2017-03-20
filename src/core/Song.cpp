@@ -1419,17 +1419,8 @@ void Song::setModified()
 
 void Song::addController( Controller * controller )
 {
-	if( controller )
+	if( controller && !m_controllers.contains( controller ) )
 	{
-		if( m_controllers.contains( controller ) )
-		{
-			int index = m_controllers.indexOf( controller );
-			if( index != -1 )
-			{
-				m_controllers.remove( index );
-				emit controllerRemoved( controller );
-			}
-		}
 		m_controllers.append( controller );
 		emit controllerAdded( controller );
 
