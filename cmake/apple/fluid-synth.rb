@@ -1,3 +1,6 @@
+# Copyright (c) 2009-present, Homebrew contributors
+# License: BSD 2-Clause
+
 class FluidSynth < Formula
   desc "Real-time software synthesizer based on the SoundFont 2 specs"
   homepage "http://www.fluidsynth.org"
