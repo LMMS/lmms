@@ -121,16 +121,11 @@ QString PluginFactory::errorString(QString pluginName) const
 	return m_errors.value(pluginName, notfound);
 }
 
-void PluginFactory::discoverPlugins()
+void PluginFactory::loadPluginDirectory(QDir directory, PluginInfoList *pluginInfos, DescriptorMap *descriptors)
 {
-	DescriptorMap descriptors;
-	PluginInfoList pluginInfos;
-	m_pluginByExt.clear();
+	const QFileInfoList& files = directory.entryInfoList(nameFilters);
 
-	const QFileInfoList& files = QDir("plugins:").entryInfoList(nameFilters);
 
-	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
-	// all libraries twice we ensure that libZynAddSubFxCore is found.
 	for (const QFileInfo& file : files)
 	{
 		QLibrary(file.absoluteFilePath()).load();
@@ -166,16 +161,40 @@ void PluginFactory::discoverPlugins()
 		info->file = file;
 		info->library = library;
 		info->descriptor = pluginDescriptor;
-		pluginInfos << info;
+		*pluginInfos << info;
 
 		for (const QString& ext : QString(info->descriptor->supportedFileTypes).split(','))
 		{
 			m_pluginByExt.insert(ext, info);
 		}
 
-		descriptors.insert(info->descriptor->type, info->descriptor);
+		descriptors->insert(info->descriptor->type, info->descriptor);
+	}
+}
+
+void PluginFactory::discoverPlugins()
+{
+	DescriptorMap descriptors;
+	PluginInfoList pluginInfos;
+	m_pluginByExt.clear();
+	QStringList directoryList;
+	QString env_path;
+
+	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
+	// all libraries twice we ensure that libZynAddSubFxCore is found.
+
+	directoryList.push_back( "plugins:" );
+	directoryList.push_back( QDir::homePath() + "/lmms/plugins/lmms" );
+
+	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty()) {
+		directoryList.push_back( env_path );
 	}
 
+	for(QStringList::iterator it = directoryList.begin(); 
+		it != directoryList.end(); ++it) {
+		QDir dir( (*it) );
+		loadPluginDirectory(dir, &pluginInfos, &descriptors);
+	}
 
 	for (PluginInfo* info : m_pluginInfos)
 	{
