@@ -201,10 +201,18 @@ Mixer::~Mixer()
 
 
 
-void Mixer::initDevices()
+void Mixer::initDevices( bool renderOnly )
 {
-	m_audioDev = tryAudioDevices();
-	m_midiClient = tryMidiClients();
+	bool success_ful = false;
+	if( renderOnly ) {
+		m_audioDev = new AudioDummy( success_ful, this );
+		m_audioDevName = AudioDummy::name();
+		m_midiClient = new MidiDummy;
+		m_midiClientName = MidiDummy::name();
+	} else {
+		m_audioDev = tryAudioDevices();
+		m_midiClient = tryMidiClients();
+	}
 }
 
 
