@@ -69,7 +69,7 @@ static __thread bool s_renderingThread;
 
 
 Mixer::Mixer( bool renderOnly ) :
-	m_renderOnly( true ),
+	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
