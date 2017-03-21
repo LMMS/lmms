@@ -150,7 +150,7 @@ void PluginFactory::discoverPlugins()
 
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
-			qWarning(library->errorString().toLocal8Bit());
+			qWarning("%s", library->errorString().toLocal8Bit().data());
 			continue;
 		}
 		if (library->resolve("lmms_plugin_main") == nullptr) {
