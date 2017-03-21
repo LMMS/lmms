@@ -69,6 +69,7 @@ static __thread bool s_renderingThread;
 
 
 Mixer::Mixer( bool renderOnly ) :
+	m_renderOnly( true ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
@@ -201,10 +202,10 @@ Mixer::~Mixer()
 
 
 
-void Mixer::initDevices( bool renderOnly )
+void Mixer::initDevices()
 {
 	bool success_ful = false;
-	if( renderOnly ) {
+	if( m_renderOnly ) {
 		m_audioDev = new AudioDummy( success_ful, this );
 		m_audioDevName = AudioDummy::name();
 		m_midiClient = new MidiDummy;

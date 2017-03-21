@@ -66,7 +66,7 @@ void LmmsCore::init( bool renderOnly )
 	s_projectJournal->setJournalling( true );
 
 	emit engine->initProgress(tr("Opening audio and midi devices"));
-	s_mixer->initDevices( renderOnly );
+	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;

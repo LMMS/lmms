@@ -153,7 +153,7 @@ public:
 		}
 	} ;
 
-	void initDevices( bool renderOnly );
+	void initDevices();
 	void clear();
 
 
@@ -350,7 +350,7 @@ private:
 
 	void runChangesInModel();
 
-
+	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
 
