@@ -19,6 +19,8 @@ ADD_EXECUTABLE(tests
 	$<TARGET_OBJECTS:lmmsobjs>
 
 	src/core/ProjectVersionTest.cpp
+
+	src/tracks/AutomationTrackTest.cpp
 )
 TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})
