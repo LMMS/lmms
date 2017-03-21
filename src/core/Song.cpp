@@ -427,6 +427,7 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 
 	MidiTime time_end = timeStart + static_cast<int>(frames / Engine::framesPerTick());
 
+	// Collect all relevant patterns, sorted by start position
 	QVector<TrackContentObject*> tcos;
 	for (Track* track: tracks)
 	{

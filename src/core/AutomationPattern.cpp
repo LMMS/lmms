@@ -638,7 +638,7 @@ void AutomationPattern::processMidiTime( const MidiTime & time )
 	}
 	else
 	{
-		if( time >= 0 && ! m_objects.isEmpty() )
+		if( time >= 0 && time < length() && ! m_objects.isEmpty() )
 		{
 			const float value = static_cast<float>( firstObject()->value<float>() );
 			if( value != m_lastRecordedValue )
