@@ -31,6 +31,7 @@
 #include <QMessageBox>
 #include <QApplication>
 
+#include <functional>
 #include <math.h>
 
 #include "AutomationTrack.h"
@@ -424,50 +425,63 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 			tracks << dynamic_cast<AutomationTrack*>(track);
 		}
 	}
+	std::remove_if(tracks.begin(), tracks.end(), std::mem_fn(&Track::isMuted));
 
-	MidiTime time_end = timeStart + static_cast<int>(frames / Engine::framesPerTick());
+	Track::tcoVector tcos;
+	AutomatedValueMap values;
 
-	// Collect all relevant patterns, sorted by start position
-	QVector<TrackContentObject*> tcos;
-	for (Track* track: tracks)
+	if (tcoNum < 0)
 	{
-		if(track->isMuted())
+		// Collect all relevant patterns, sorted by start position
+		MidiTime timeEnd = timeStart + static_cast<int>(frames / Engine::framesPerTick());
+		for (AutomationTrack* track: tracks)
 		{
-			continue;
+			track->getTCOsInRange(tcos, 0, timeEnd);
+		}
+		std::remove_if(tcos.begin(), tcos.end(), std::mem_fn(&TrackContentObject::isMuted));
+
+		values = automatedValuesAt(tcos, timeStart);
+	}
+	else
+	{
+		if (tracklist.size() != 1)
+		{
+			qCritical() << "processAutomations called with specified tcoNum but more than one track";
+			return;
 		}
 
-		int tco_begin = 0, tco_end = track->numOfTCOs();
-		if( tcoNum >= 0 )
+		Track* track = tracklist.at(1);
+		TrackContentObject* tco = track->getTCO(tcoNum);
+		auto p = dynamic_cast<AutomationPattern *>(tco);
+
+		for (AutomatableModel* object : p->objects())
 		{
-			tco_begin = tcoNum;
-			tco_end = tcoNum + 1;
+			values[object] = p->valueAt(timeStart);
 		}
+		tcos << tco;
+	}
 
-		for (int i = tco_begin; i < tco_end; i++)
+	QSet<const AutomatableModel*> recordedModels;
+	// Process recording
+	for (TrackContentObject* tco : tcos)
+	{
+		auto p = dynamic_cast<AutomationPattern *>(tco);
+		MidiTime relTime = timeStart - p->startPosition();
+		if (p->isRecording() && relTime >= 0 && relTime < p->length())
 		{
-			TrackContentObject* tco = track->getTCO(i);
+			const AutomatableModel* recordedModel = p->firstObject();
+			p->recordValue(relTime, recordedModel->value<float>());
 
-			// Skip this TCO if it's muted or not contained in the time period we're processing
-			if( tco->isMuted() || tco->startPosition() > time_end)
-			{
-				continue;
-			}
-
-			tcos.insert(std::upper_bound(tcos.begin(), tcos.end(), tco, TrackContentObject::comparePosition), tco);
+			recordedModels << recordedModel;
 		}
 	}
 
-	for(TrackContentObject* tco : tcos)
+	// Apply values
+	for (auto it = values.cbegin(); it != values.cend(); it++)
 	{
-		auto p = dynamic_cast<AutomationPattern *>(tco);
-
-		if (tcoNum < 0)
+		if (! recordedModels.contains(it.key()))
 		{
-			p->processMidiTime(timeStart - p->startPosition());
-		}
-		else
-		{
-			p->processMidiTime(timeStart);
+			it.key()->setAutomatedValue(it.value());
 		}
 	}
 }
@@ -836,6 +850,30 @@ bpm_t Song::getTempo()
 AutomationPattern * Song::tempoAutomationPattern()
 {
 	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
+}
+
+AutomatedValueMap Song::automatedValuesAt(const Track::tcoVector &tcos, MidiTime time)
+{
+	AutomatedValueMap valueMap;
+
+	for(TrackContentObject* tco : tcos)
+	{
+		AutomationPattern* p = dynamic_cast<AutomationPattern *>(tco);
+		if (!p) {
+			qCritical() << "automatedValuesAt: tco passed is not an automation pattern";
+			continue;
+		}
+
+		MidiTime relTime = time - p->startPosition();
+		float value = p->valueAt(relTime);
+
+		for (AutomatableModel* model : p->objects())
+		{
+			valueMap[model] = value;
+		}
+	}
+
+	return valueMap;
 }
 
 

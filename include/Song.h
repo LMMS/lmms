@@ -31,7 +31,6 @@
 #include <QtCore/QVector>
 
 #include "TrackContainer.h"
-#include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
 #include "VstSyncController.h"
@@ -97,7 +96,6 @@ public:
 
 
 	void processNextBuffer();
-	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames, int tcoNum);
 
 	inline int getMilliseconds() const
 	{
@@ -205,6 +203,8 @@ public:
 	{
 		return m_globalAutomationTrack;
 	}
+
+	static AutomatedValueMap automatedValuesAt(const Track::tcoVector& tcos, MidiTime time);
 
 	// file management
 	void createNewProject();
@@ -326,6 +326,7 @@ private:
 
 	void removeAllControllers();
 
+	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames, int tcoNum);
 
 	AutomationTrack * m_globalAutomationTrack;
 

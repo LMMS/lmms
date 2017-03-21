@@ -444,6 +444,7 @@ public:
 
 } ;
 
+using AutomatedValueMap = QMap<AutomatableModel*, float>;
 
 #endif
 

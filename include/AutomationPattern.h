@@ -59,6 +59,7 @@ public:
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
 	const AutomatableModel * firstObject() const;
+	const objectVector& objects() const;
 
 	// progression-type stuff
 	inline ProgressionTypes progressionType() const
@@ -81,6 +82,8 @@ public:
 
 	void removeValue( const MidiTime & _time,
 					  const bool _quant_pos = true );
+
+	void recordValue(MidiTime time, float value);
 
 	MidiTime setDragValue( const MidiTime & _time, const float _value,
 						   const bool _quant_pos = true );
@@ -139,8 +142,6 @@ public:
 
 	static const QString classNodeName() { return "automationpattern"; }
 	QString nodeName() const { return classNodeName(); }
-
-	void processMidiTime( const MidiTime & _time );
 
 	virtual TrackContentObjectView * createView( TrackView * _tv );
 
