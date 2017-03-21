@@ -67,6 +67,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		peak_controller_effect
 		GigPlayer
 		ReverbSC
+		sf2_player
 		sfxr
 		sid
 		SpectrumAnalyzer
@@ -82,12 +83,6 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		zynaddsubfx
 	)
 
-	IF(NOT LMMS_BUILD_APPLE)
-		SET(PLUGIN_LIST
-			${PLUGIN_LIST}
-			sf2_player
-		)
-	ENDIF()
 ENDIF("${PLUGIN_LIST}" STREQUAL "")
 
 FOREACH(PLUGIN ${PLUGIN_LIST})
