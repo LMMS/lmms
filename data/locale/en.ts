@@ -5976,6 +5976,14 @@ Reason: &quot;%2&quot;</source>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SampleTCOView</name>
