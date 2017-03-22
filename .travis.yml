@@ -3,9 +3,9 @@ compiler: gcc
 dist: trusty
 sudo: required
 cache:
-    ccache: true
     directories:
         - apt_mingw_cache
+        - $HOME/.ccache
 matrix:
     include:
         - env: TARGET_OS=win32
@@ -23,6 +23,8 @@ install:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.install.sh
 before_script:
     - mkdir build && cd build
+    - export CMAKE_FLAGS="-DWANT_QT5=$QT5 -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+    - if [ -z "$TRAVIS_TAG" ]; then export CMAKE_FLAGS="$CMAKE_FLAGS -DUSE_CCACHE=ON"; fi
 script:
     - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.script.sh
     - make -j4
