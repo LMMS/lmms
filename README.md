@@ -1,4 +1,4 @@
-#![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
+# ![LMMS Logo](http://lmms.sourceforge.net/Lmms_logo.png) LMMS
 
 [![Build status](https://img.shields.io/travis/LMMS/lmms.svg?maxAge=3600)](https://travis-ci.org/LMMS/lmms)
 [![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)
