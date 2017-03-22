@@ -8,7 +8,7 @@ else
 	PACKAGES="$PACKAGES cartr/qt4/qt"
 fi
 
-brew install $PACKAGES
+brew install $PACKAGES ccache
 
 # Recompile fluid-synth without CoreAudio per issues #649
 # Changes to fluid-synth.rb must be pushed to URL prior to use
