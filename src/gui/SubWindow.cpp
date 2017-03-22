@@ -2,9 +2,11 @@
  * SubWindow.cpp - Implementation of QMdiSubWindow that correctly tracks
  *   the geometry that windows should be restored to.
  *   Workaround for https://bugreports.qt.io/browse/QTBUG-256
+ *   This implementation adds a custom themed title bar to
+ *   the subwindow.
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
- *
+ * Copyright (c) 2016 Steffen Baranowsky <baramgb@freenet.de>
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -93,6 +95,12 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 
 
 
+/**
+ * @brief SubWindow::paintEvent
+ * 
+ *  This draws our new title bar with custom colors
+ *  and draws a window icon on the left upper corner.
+ */
 void SubWindow::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
@@ -117,6 +125,12 @@ void SubWindow::paintEvent( QPaintEvent * )
 
 
 
+/**
+ * @brief SubWindow::changeEvent
+ * 
+ * Triggers if the window title changes and calls adjustTitleBar().
+ * @param event
+ */
 void SubWindow::changeEvent( QEvent *event )
 {
 	QMdiSubWindow::changeEvent( event );
@@ -131,6 +145,16 @@ void SubWindow::changeEvent( QEvent *event )
 
 
 
+/**
+ * @brief SubWindow::elideText
+ * 
+ *  Stores the given text into the given label.
+ *  Shorts the text if it's too big for the labels width
+ *  ans adds three dots (...)
+ * 
+ * @param label - holds a pointer to the QLabel
+ * @param text  - the text which will be stored (and if needed breaked down) into the QLabel.
+ */
 void SubWindow::elideText( QLabel *label, QString text )
 {
 	QFontMetrics metrix( label->font() );
@@ -142,6 +166,15 @@ void SubWindow::elideText( QLabel *label, QString text )
 
 
 
+/**
+ * @brief SubWindow::isMaximized
+ * 
+ * This function checks if the subwindow is maximized.
+ * QMdiSubWindow::isMaximized() doesn't work on MacOS.
+ * Therefore we need our own implementation for checking this
+ * @return true if the subwindow is maximized at the moment.
+ *         false if it's not.
+ */
 bool SubWindow::isMaximized()
 {
 #ifdef LMMS_BUILD_APPLE
@@ -214,7 +247,15 @@ void SubWindow::setBorderColor( const QColor &c )
 
 
 
-
+/**
+ * @brief SubWindow::moveEvent
+ * 
+ *  overides the QMdiSubWindow::moveEvent() for saving the position
+ *  of the subwindow into m_trackedNormalGeom. This position
+ *  will be saved with the project because of an Qt bug wich doesn't
+ *  save the right position. look at: https://bugreports.qt.io/browse/QTBUG-256
+ * @param event
+ */
 void SubWindow::moveEvent( QMoveEvent * event )
 {
 	QMdiSubWindow::moveEvent( event );
@@ -229,6 +270,14 @@ void SubWindow::moveEvent( QMoveEvent * event )
 
 
 
+/**
+ * @brief SubWindow::adjustTitleBar
+ * 
+ *  Our title bar needs buttons for maximize/restore and close in the right upper corner.
+ *  We check if the subwindow is maximizable and put the buttons on the right positions.
+ *  At next we calculate the width of the title label and call elideText() for adding
+ *  the window title to m_windowTitle (which is a QLabel)
+ */
 void SubWindow::adjustTitleBar()
 {
 	// button adjustments
@@ -288,6 +337,20 @@ void SubWindow::adjustTitleBar()
 
 
 
+/**
+ * @brief SubWindow::resizeEvent
+ * 
+ *  On every rezise event we have to adjust our title label.
+ * 
+ *  At next we give the event to QMdiSubWindow::resizeEvent() which handles 
+ *  the event on its behavior.
+ * 
+ *  At last we store the current size into m_trackedNormalGeom. This size
+ *  will be saved with the project because of an Qt bug wich doesn't
+ *  save the right size. look at: https://bugreports.qt.io/browse/QTBUG-256
+ * 
+ * @param event
+ */
 void SubWindow::resizeEvent( QResizeEvent * event )
 {
 	adjustTitleBar();
