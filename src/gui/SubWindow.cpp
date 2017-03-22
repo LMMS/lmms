@@ -192,6 +192,12 @@ bool SubWindow::isMaximized()
 
 
 
+/**
+ * @brief SubWindow::getTrueNormalGeometry
+ * 
+ *  same as QWidet::normalGeometry, but works properly under X11
+ *  see https://bugreports.qt.io/browse/QTBUG-256
+ */
 QRect SubWindow::getTrueNormalGeometry() const
 {
 	return m_trackedNormalGeom;
