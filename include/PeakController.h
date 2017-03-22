@@ -25,15 +25,12 @@
 #ifndef PEAK_CONTROLLER_H
 #define PEAK_CONTROLLER_H
 
-#include <QWidget>
-
 #include "Model.h"
-#include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
 
-class automatableButtonGroup;
-class Knob;
+class QWidget;
+
 class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;

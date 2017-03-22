@@ -27,7 +27,6 @@
 
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "lmmsconfig.h"
 #include "Mixer.h"
 #include "VstSyncController.h"
 #include "RemotePlugin.h"

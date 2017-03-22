@@ -30,8 +30,6 @@
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "Engine.h"
-
 
 
 TextFloat::TextFloat() :

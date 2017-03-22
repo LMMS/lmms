@@ -26,16 +26,12 @@
 
 #include <QTimeLine>
 #include <QAction>
-#include <QButtonGroup>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLayout>
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QScrollBar>
-
-#include <math.h>
 
 #include "ActionGroup.h"
 #include "AutomatableSlider.h"

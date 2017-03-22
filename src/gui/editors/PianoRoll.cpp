@@ -25,7 +25,6 @@
  */
 
 #include <QApplication>
-#include <QButtonGroup>
 #include <QClipboard>
 #include <QKeyEvent>
 #include <QLabel>
@@ -34,8 +33,6 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QWheelEvent>
-#include <QString>
 #include <QSignalMapper>
 
 #ifndef __USE_XOPEN
@@ -43,7 +40,6 @@
 #endif
 
 #include <math.h>
-#include <algorithm>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
@@ -59,17 +55,10 @@
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "MidiEvent.h"
-#include "DataFile.h"
 #include "Pattern.h"
-#include "Piano.h"
-#include "PixmapButton.h"
-#include "Song.h"
 #include "SongEditor.h"
-#include "templates.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
-#include "TextFloat.h"
 
 
 #if QT_VERSION < 0x040800
@@ -187,7 +176,6 @@ PianoRoll::PianoRoll() :
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
-	m_mouseDownLeft( false ),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_barLineColor( 0, 0, 0 ),
@@ -1923,7 +1911,6 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if( me->button() & Qt::LeftButton )
 	{
-		m_mouseDownLeft = false;
 		mustRepaint = true;
 
 		if( m_action == ActionSelectNotes && m_editMode == ModeSelect )
@@ -2472,6 +2459,11 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 					note->setPos( MidiTime( pos_ticks ) );
 					note->setKey( key_num );
+					// If dragging beat notes check if pattern should be MelodyPattern
+					if( note->length() < 0 )
+					{
+						m_pattern->checkType();
+					}
 				}
 			}
 		}
@@ -2902,14 +2894,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		// Draw alternating shades on bars
 		// count the bars which disappear on left by scrolling
-		int barCount = m_currentPosition / MidiTime::ticksPerTact();
-		int leftBars = m_currentPosition / m_ppt;
 
-		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition; x += m_ppt, ++barCount )
+		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
+		int barCount = m_currentPosition / MidiTime::ticksPerTact();
+		int leftBars = m_currentPosition * zoomFactor / m_ppt;
+
+		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition * zoomFactor; x += m_ppt, ++barCount )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
-				p.fillRect( x - m_currentPosition, PR_TOP_MARGIN, m_ppt,
+				p.fillRect( x - m_currentPosition * zoomFactor, PR_TOP_MARGIN, m_ppt,
 					height() - ( PR_BOTTOM_MARGIN + PR_TOP_MARGIN ), backgroundShade() );
 			}
 		}

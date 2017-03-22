@@ -30,9 +30,7 @@
 
 
 #include "Song.h"
-#include "Engine.h"
 #include "Mixer.h"
-#include "Controller.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "LfoController.h"
@@ -136,11 +134,7 @@ ValueBuffer * Controller::valueBuffer()
 
 void Controller::updateValueBuffer()
 {
-	float * values = m_valueBuffer.values();
-	for( int i = 0; i < m_valueBuffer.length(); i++ )
-	{
-		values[i] = 0.5f;
-	}
+	m_valueBuffer.fill(0.5f);
 	m_bufferLastUpdated = s_periods;
 }
 

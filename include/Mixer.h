@@ -25,10 +25,6 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include "denormals.h"
-
-#include "lmmsconfig.h"
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
@@ -354,7 +350,7 @@ private:
 
 	void runChangesInModel();
 
-
+	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
 

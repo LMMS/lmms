@@ -28,7 +28,6 @@
 #include "gui_templates.h"
 #include "Song.h"
 #include "MidiPort.h"
-#include "MidiTime.h"
 #include "Note.h"
 
 

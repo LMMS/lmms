@@ -25,10 +25,8 @@
 
 #include <QDomElement>
 #include <QObject>
-#include <QVector>
 
 #include "Song.h"
-#include "Engine.h"
 #include "Mixer.h"
 #include "MidiClient.h"
 #include "MidiController.h"
@@ -39,7 +37,8 @@ MidiController::MidiController( Model * _parent ) :
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
 			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
-	m_lastValue( 0.0f )
+	m_lastValue( 0.0f ),
+	m_previousValue( 0.0f )
 {
 	setSampleExact( true );
 	connect( &m_midiPort, SIGNAL( modeChanged() ),

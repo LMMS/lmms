@@ -27,13 +27,7 @@
 #ifdef LMMS_HAVE_JACK
 
 #include <QCompleter>
-#include <QDirModel>
 #include <QMessageBox>
-#include <QTranslator>
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
 
 #include "ConfigManager.h"
 #include "gui_templates.h"

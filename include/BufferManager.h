@@ -30,8 +30,6 @@
 #include "export.h"
 #include "lmms_basics.h"
 
-class QAtomicInt;
-
 const int BM_INITIAL_BUFFERS = 512;
 //const int BM_INCREMENT = 64;
 

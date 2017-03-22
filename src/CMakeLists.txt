@@ -96,6 +96,9 @@ IF(CMAKE_VERSION VERSION_GREATER "2.8.7")
 		$<TARGET_OBJECTS:lmmsobjs>
 		"${WINRC}"
 	)
+
+    SET(iwyu include-what-you-use -Xiwyu --mapping_file=/usr/share/include-what-you-use/qt5_4.imp)
+    #SET_PROPERTY(TARGET lmmsobjs PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu})
 ELSE()
 	ADD_EXECUTABLE(lmms
 		core/main.cpp
@@ -120,6 +123,10 @@ ENDIF()
 if(LMMS_HAVE_OSS AND LMMS_BUILD_OPENBSD)
     SET(EXTRA_LIBRARIES "-lossaudio")
 endif()
+
+IF(LMMS_BUILD_HAIKU)
+	SET(EXTRA_LIBRARIES "-lnetwork")
+ENDIF()
 
 SET(LMMS_REQUIRED_LIBS
 	${CMAKE_THREAD_LIBS_INIT}

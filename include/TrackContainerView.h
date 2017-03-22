@@ -29,7 +29,7 @@
 #include <QtCore/QVector>
 #include <QScrollArea>
 #include <QWidget>
-
+#include <QThread>
 
 #include "Track.h"
 #include "JournallingObject.h"

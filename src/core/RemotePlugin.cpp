@@ -32,13 +32,8 @@
 #include "RemotePlugin.h"
 #include "Mixer.h"
 #include "Engine.h"
-#include "ConfigManager.h"
 
 #include <QDir>
-
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <QtCore/QUuid>
@@ -504,9 +499,3 @@ bool RemotePlugin::processMessage( const message & _m )
 
 	return true;
 }
-
-
-
-
-
-

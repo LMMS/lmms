@@ -24,7 +24,6 @@
  */
 #include "SampleTrack.h"
 
-#include <QDomElement>
 #include <QDropEvent>
 #include <QMenu>
 #include <QLayout>
@@ -37,9 +36,7 @@
 #include "GuiApplication.h"
 #include "Song.h"
 #include "embed.h"
-#include "Engine.h"
 #include "ToolTip.h"
-#include "AudioPort.h"
 #include "BBTrack.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
@@ -49,12 +46,8 @@
 #include "Knob.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "GuiApplication.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
-#include "ConfigManager.h"
-#include "panning_constants.h"
-#include "volume.h"
 
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),

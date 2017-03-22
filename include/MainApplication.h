@@ -1,10 +1,9 @@
 /*
- * ValueBuffer.h - a container class for passing buffers of model values around
+ * MainApplication.h - Main QApplication handler
  *
- * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
- * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2017-2017 Tres Finocchiaro <tres.finocchiaro/at/gmail.com>
  *
- * This file is part of LMMS - https://lmms.io
+ * This file is part of LMMS - http://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,31 +22,22 @@
  *
  */
 
-#ifndef VALUE_BUFFER_H
-#define VALUE_BUFFER_H
+#ifndef MAINAPPLICATION_H
+#define MAINAPPLICATION_H
 
-#include <vector>
+#include <QApplication>
 
-#include "MemoryManager.h"
-#include "export.h"
-
-class EXPORT ValueBuffer : public std::vector<float>
+class MainApplication : public QApplication
 {
-	MM_OPERATORS
 public:
-	ValueBuffer();
-	ValueBuffer(int length);
-
-	void fill(float value);
-
-	float value(int offset ) const;
-
-	const float * values() const;
-	float * values();
-	
-	int length() const;
-
-	void interpolate(float start, float end);
+	MainApplication(int& argc, char** argv);
+	bool event(QEvent* event);
+	inline QString& queuedFile()
+	{
+	    return m_queuedFile;
+	}
+private:
+	QString m_queuedFile;
 };
 
-#endif
+#endif // MAINAPPLICATION_H

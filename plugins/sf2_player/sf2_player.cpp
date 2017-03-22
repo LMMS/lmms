@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <QDomDocument>
 
+#include "ConfigManager.h"
 #include "FileDialog.h"
 #include "sf2_player.h"
 #include "Engine.h"

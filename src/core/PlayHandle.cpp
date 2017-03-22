@@ -25,6 +25,8 @@
 #include "PlayHandle.h"
 #include "BufferManager.h"
 
+#include <QtCore/QThread>
+
 
 PlayHandle::PlayHandle( const Type type, f_cnt_t offset ) :
 		m_type( type ),

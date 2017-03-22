@@ -28,7 +28,6 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
-#include <QResizeEvent>
 #include <QScrollBar>
 
 #include "embed.h"

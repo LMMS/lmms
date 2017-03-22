@@ -19,6 +19,7 @@ SET(LMMS_SRCS
 	gui/LfoControllerDialog.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
+	gui/MainApplication.cpp
 	gui/MainWindow.cpp
 	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp

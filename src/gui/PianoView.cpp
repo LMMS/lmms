@@ -36,29 +36,22 @@
  * \todo write isWhite inline function and replace throughout
  */
 
+#include <cmath>
 
 #include <QCursor>
 #include <QKeyEvent>
-#include <QMouseEvent>
 #include <QPainter>
 #include <QVBoxLayout>
-
 
 #include "PianoView.h"
 #include "Piano.h"
 #include "CaptionMenu.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
-#include "MidiEvent.h"
-#include "templates.h"
-#include "update_event.h"
-
-
 
 
 /*! The scale of C Major - white keys only.

@@ -27,10 +27,8 @@
 #include "ToolPluginView.h"
 
 #include <QIcon>
-#include <QMdiArea>
 
 #include "embed.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 

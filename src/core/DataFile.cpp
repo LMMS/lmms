@@ -32,19 +32,18 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QTextStream>
 
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "lmms_basics.h"
-#include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+
+#include "lmmsversion.h"
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
@@ -915,14 +914,11 @@ void DataFile::upgrade_1_2_0_rc3()
 		{
 			int patternLength, steps;
 			QDomElement el = patterns.item( j ).toElement();
-			for( int k = 0; !patterns.item( k ).isNull(); ++k )
+			if( el.attribute( "len" ) != "" )
 			{
-				if( el.attribute( "len" ) != "" )
-				{
-					patternLength = el.attribute( "len" ).toInt();
-					steps = patternLength / 12;
-					el.setAttribute( "steps", steps );
-				}
+				patternLength = el.attribute( "len" ).toInt();
+				steps = patternLength / 12;
+				el.setAttribute( "steps", steps );
 			}
 		}
 	}

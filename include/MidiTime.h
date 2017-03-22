@@ -62,12 +62,10 @@ class EXPORT MidiTime
 public:
 	MidiTime( const tact_t tact, const tick_t ticks );
 	MidiTime( const tick_t ticks = 0 );
-	MidiTime( const MidiTime& time );
 
 	MidiTime toNearestTact() const;
 	MidiTime toAbsoluteTact() const;
 
-	MidiTime& operator=( const MidiTime& time );
 	MidiTime& operator+=( const MidiTime& time );
 	MidiTime& operator-=( const MidiTime& time );
 

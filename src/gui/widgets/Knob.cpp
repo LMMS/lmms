@@ -28,7 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPalette>
 #include <QWhatsThis>
 
 #ifndef __USE_XOPEN
@@ -41,14 +40,12 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
 
 TextFloat * Knob::s_textFloat = NULL;

@@ -26,20 +26,15 @@
 
 #include <QAction>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QLayout>
-#include <QMdiArea>
 
 #include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "ConfigManager.h"
-#include "DataFile.h"
 #include "StringPairDrag.h"
 
-#include "TrackContainer.h"
 #include "Pattern.h"
 
 

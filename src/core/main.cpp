@@ -31,7 +31,6 @@
 
 #include <QFileInfo>
 #include <QLocale>
-#include <QDate>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
@@ -44,11 +43,7 @@
 #endif
 
 #ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
+#include "sched.h"
 #endif
 
 #ifdef LMMS_HAVE_PROCESS_H
@@ -61,6 +56,7 @@
 
 #include <signal.h>
 
+#include "MainApplication.h"
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
@@ -71,7 +67,6 @@
 #include "MainWindow.h"
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
-#include "DataFile.h"
 #include "Song.h"
 #include "SetupDialog.h"
 
@@ -251,7 +246,7 @@ int main( int argc, char * * argv )
 		}
 	}
 
-#ifndef LMMS_BUILD_WIN32
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_HAIKU)
 	if ( ( getuid() == 0 || geteuid() == 0 ) && !allowRoot )
 	{
 		printf( "LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n" );
@@ -261,7 +256,7 @@ int main( int argc, char * * argv )
 
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new QApplication( argc, argv ) ;
+					new MainApplication( argc, argv );
 
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
 	ProjectRenderer::OutputSettings os( 44100, false, 160,
@@ -838,6 +833,12 @@ int main( int argc, char * * argv )
 		if( fullscreen )
 		{
 			gui->mainWindow()->showMaximized();
+		}
+
+		// Handle macOS-style FileOpen QEvents
+		QString queuedFile = static_cast<MainApplication *>( app )->queuedFile();
+		if ( !queuedFile.isEmpty() ) {
+			fileToLoad = queuedFile;
 		}
 
 		if( !fileToLoad.isEmpty() )

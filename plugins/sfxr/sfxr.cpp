@@ -35,6 +35,7 @@ float frnd(float range)
 	return (float)rnd(10000)/10000*range;
 }
 
+#include <cmath>
 
 #include <QDomElement>
 

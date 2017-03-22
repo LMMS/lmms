@@ -24,33 +24,26 @@
 
 #include "TrackContainerView.h"
 
-#include <algorithm>
+#include <cmath>
 
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
-#include <QProgressDialog>
-#include <QScrollBar>
 #include <QWheelEvent>
-
 
 #include "TrackContainer.h"
 #include "BBTrack.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "debug.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
-#include "InstrumentTrack.h"
-#include "DataFile.h"
-#include "Rubberband.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "Track.h"
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 
+using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),

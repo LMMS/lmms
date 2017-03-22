@@ -30,8 +30,6 @@
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
-#include "ValueBuffer.h"
-#include "panning.h"
 
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,

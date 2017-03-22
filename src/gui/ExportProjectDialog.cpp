@@ -31,8 +31,6 @@
 #include "Song.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
-#include "BBTrackContainer.h"
-#include "BBTrack.h"
 
 
 ExportProjectDialog::ExportProjectDialog( const QString & _file_name,

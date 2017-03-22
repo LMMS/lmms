@@ -23,6 +23,7 @@
  *
  */
 
+#include <cmath>
 
 #include <QPainter>
 #include <QDomElement>

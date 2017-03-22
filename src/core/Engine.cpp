@@ -31,12 +31,8 @@
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
-#include "Plugin.h"
-#include "PluginFactory.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
-
-#include "GuiApplication.h"
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;

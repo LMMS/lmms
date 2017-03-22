@@ -27,8 +27,6 @@
 
 #include <QDataStream>
 
-#include "ConfigManager.h"
-
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;
 QString BandLimitedWave::s_wavetableDir = "";

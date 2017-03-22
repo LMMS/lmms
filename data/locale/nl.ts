@@ -508,6 +508,14 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
         <source>Model is already connected to this pattern.</source>
         <translation>Model is reeds verbonden met dit patroon.</translation>
     </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Kwantisatie</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Kwantisatie. Stelt de kleinste stap in voor het automatiseringspunt. Standaard stelt dit ook de lengte in; andere punten in het bereik worden gewist. Druk op &lt;Ctrl&gt; om dit gedrag te overriden.</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -3439,12 +3447,12 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
         <translation>Logaritmisch instellen</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Voer een nieuwe waarde in tussen -96,0 dBFS en 6,0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Voer een nieuwe waarde in tussen %1 en %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Voer een nieuwe waarde in tussen -96,0 dBFS en 6,0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -3662,16 +3670,6 @@ Dubbelklikken om een bestand te selecteren.</translation>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Could not save config-file</source>
-        <translation>Kon config-bestand niet opslaan</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Kon configuratiebestand %1 niet opslaan. U heeft waarschijnlijk geen toestemming om naar dit bestand te schrijven.
-Verzeker u ervan dat u schrijfbevoegdheid heeft voor het bestand en probeer het opnieuw.</translation>
-    </message>
     <message>
         <source>&amp;New</source>
         <translation>&amp;Nieuw</translation>
@@ -4035,10 +4033,6 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
         <translation>Dit zal uw huidig standaard-sjabloon overschrijven.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volume als dBFS</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Vloeiend scrollen</translation>
     </message>
@@ -4049,6 +4043,20 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
     <message>
         <source>Save project template</source>
         <translation>Projectsjabloon opslaan</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volume als dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Kan bestand niet openen</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Kon bestand %1 niet openen om te schrijven.
+Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die het bestand bevat en probeer het opnieuw!</translation>
     </message>
 </context>
 <context>
@@ -5916,6 +5924,60 @@ Reden: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Invoer</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Invoer-gain:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grootte</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Grootte:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Kleur</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Kleur:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Uitvoer</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Uitvoer-gain:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Invoer-gain</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grootte</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Kleur</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Uitvoer-gain</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -6060,10 +6122,6 @@ Reden: &quot;%2&quot;</translation>
     <message>
         <source>Show restart warning after changing settings</source>
         <translation>Waarschuwing voor herstarten weergeven na wijzigen van instellingen</translation>
-    </message>
-    <message>
-        <source>Display volume as dBFS </source>
-        <translation>Volume weergeven als dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
@@ -6266,6 +6324,10 @@ Latentie: %2 ms</translation>
     <message>
         <source>minute</source>
         <translation>minuut</translation>
+    </message>
+    <message>
+        <source>Display volume as dBFS </source>
+        <translation>Volume weergeven als dBFS</translation>
     </message>
     <message>
         <source>Enable auto-save</source>
@@ -9289,6 +9351,10 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filter voor exporteren van MIDI-bestanden van LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Reverb-algoritme door Sean Costello</translation>
     </message>
 </context>
 <context>

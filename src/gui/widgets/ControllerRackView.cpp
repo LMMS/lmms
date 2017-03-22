@@ -28,11 +28,8 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QScrollBar>
-#include <QVBoxLayout>
 #include <QMdiArea>
 #include <QMessageBox>
-#include <QVBoxLayout>
 
 #include "Song.h"
 #include "embed.h"

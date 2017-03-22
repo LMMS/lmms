@@ -44,6 +44,8 @@ public:
 	{
 		return &m_controls;
 	}
+
+	void clearFilterHistories();
 	
 private:
 	CrossoverEQControls m_controls;
