@@ -37,6 +37,11 @@
 	QStringList nameFilters("lib*.so");
 #endif
 
+qint64 qHash(const QFileInfo& fi)
+{
+	return qHash(fi.absoluteFilePath());
+}
+
 PluginFactory* PluginFactory::s_instance = nullptr;
 
 PluginFactory::PluginFactory()
@@ -77,7 +82,6 @@ PluginFactory::PluginFactory()
 
 PluginFactory::~PluginFactory()
 {
-
 }
 
 PluginFactory* PluginFactory::instance()
@@ -131,10 +135,10 @@ void PluginFactory::discoverPlugins()
 	PluginInfoList pluginInfos;
 	m_pluginByExt.clear();
 
-	QFileInfoList files;
+	QSet<QFileInfo> files;
 	for (const QString& searchPath : QDir::searchPaths("plugins"))
 	{
-		files << QDir(searchPath).entryInfoList(nameFilters);
+		files.unite(QDir(searchPath).entryInfoList(nameFilters).toSet());
 	}
 
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
