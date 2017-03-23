@@ -87,12 +87,17 @@ private slots:
 		p2.movePosition(100);
 		p2.addObject(&model);
 
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2},   0)[&model], 0.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2},   5)[&model], 0.5f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2},  10)[&model], 1.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2},  50)[&model], 1.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2}, 100)[&model], 0.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2}, 150)[&model], 0.5f);
+		AutomationPattern p3(nullptr);
+		p3.addObject(&model);
+		//XXX: Why is this even necessary?
+		p3.clear();
+
+		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},   0)[&model], 0.0f);
+		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},   5)[&model], 0.5f);
+		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},  10)[&model], 1.0f);
+		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},  50)[&model], 1.0f);
+		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3}, 100)[&model], 0.0f);
+		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3}, 150)[&model], 0.5f);
 	}
 } AutomationTrackTest;
 

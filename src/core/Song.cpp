@@ -863,6 +863,10 @@ AutomatedValueMap Song::automatedValuesAt(const Track::tcoVector &tcos, MidiTime
 			continue;
 		}
 
+		if (! p->hasAutomation()) {
+			continue;
+		}
+
 		MidiTime relTime = time - p->startPosition();
 		float value = p->valueAt(relTime);
 
