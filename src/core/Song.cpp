@@ -436,19 +436,20 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 	{
 		if (tracklist.size() != 1)
 		{
-			qCritical() << "processAutomations called with specified tcoNum but more than one track";
-			return;
+			qWarning() << "processAutomations called with specified tcoNum but not exactly one track";
 		}
 
-		Track* track = tracklist.at(1);
-		TrackContentObject* tco = track->getTCO(tcoNum);
-		auto p = dynamic_cast<AutomationPattern *>(tco);
-
-		for (AutomatableModel* object : p->objects())
+		for (AutomationTrack* track: tracks)
 		{
-			values[object] = p->valueAt(timeStart);
+			TrackContentObject* tco = track->getTCO(tcoNum);
+			auto p = dynamic_cast<AutomationPattern *>(tco);
+
+			for (AutomatableModel* object : p->objects())
+			{
+				values[object] = p->valueAt(timeStart);
+			}
+			tcos << tco;
 		}
-		tcos << tco;
 	}
 
 	QSet<const AutomatableModel*> recordedModels;
