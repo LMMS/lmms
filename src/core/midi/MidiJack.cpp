@@ -65,15 +65,16 @@ MidiJack::MidiJack() :
 	m_output_port( NULL ),
 	m_quit( false )
 {
-	// if jack is used for audio then we share the connection
+	// if jack is currently used for audio then we share the connection
 	// AudioJack creates and maintains the jack connection
 	// and also handles the callback, we pass it our address
 	// so that we can also process during the callback
 
-	if(Engine::mixer()->audioDevName() == AudioJack::name() )
+	m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
+	if( m_jackAudio )
 	{
 		// if a jack connection has been created for audio we use that
-		m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev())->addMidiClient(this);
+		m_jackAudio->addMidiClient(this);
 	}else{
 		m_jackAudio = NULL;
 		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),

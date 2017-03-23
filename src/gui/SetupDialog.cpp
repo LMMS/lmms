@@ -808,6 +808,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 
+	// If no preferred audio device is saved, save the current one
 	QString audioDevName = 
 		ConfigManager::inst()->value( "mixer", "audiodev" );
 	if( audioDevName.length() == 0 )
