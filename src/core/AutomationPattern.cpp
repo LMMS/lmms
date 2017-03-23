@@ -208,7 +208,7 @@ void AutomationPattern::updateLength()
 MidiTime AutomationPattern::putValue( const MidiTime & time,
 					const float value,
 					const bool quantPos,
-					const bool controlKey )
+					const bool ignoreSurroundingPoints )
 {
 	cleanObjects();
 
@@ -221,7 +221,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 
 	// Remove control points that are covered by the new points
 	// quantization value. Control Key to override
-	if( ! controlKey )
+	if( ! ignoreSurroundingPoints )
 	{
 		for( int i = newTime + 1; i < newTime + quantization(); ++i )
 		{

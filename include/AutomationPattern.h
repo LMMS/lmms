@@ -79,7 +79,7 @@ public:
 	MidiTime putValue( const MidiTime & time,
 				const float value,
 				const bool quantPos = true,
-				const bool controlKey = false );
+				const bool ignoreSurroundingPoints = false );
 
 	void removeValue( const MidiTime & time );
 
