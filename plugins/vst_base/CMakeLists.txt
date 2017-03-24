@@ -31,17 +31,6 @@ BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCF
 
 IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 
-SET(WINE_INCLUDES_AND_LIBS -I/usr/include/wine/windows)
-
-# Development
-IF(EXISTS "/opt/wine-devel/lib64/libwine.so")
-	SET(WINE_INCLUDES_AND_LIBS -I/opt/wine-devel/include -L/opt/wine-devel/lib)
-ENDIF()
-# Staging
-IF(EXISTS "/opt/wine-staging/lib64/libwine.so")
-	SET(WINE_INCLUDES_AND_LIBS -I/opt/wine-staging/include -L/opt/wine-staging/lib)
-ENDIF()
-
 IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32)
 
@@ -66,6 +55,8 @@ ENDIF(LMMS_HOST_X86_64)
 
 SET(WINE_CXX_FLAGS "" CACHE STRING "Extra flags passed to wineg++")
 
+STRING(REPLACE "include/wine" "include" WINE_INCLUDE_DIR ${WINE_INCLUDE_DIR})
+STRING(REPLACE "lib/libwine.so" "lib" WINE_LIBRARY ${WINE_LIBRARY})
 STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKER_FLAGS} " " ${WINE_CXX_FLAGS})
 ADD_CUSTOM_COMMAND(
 	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
@@ -74,7 +65,8 @@ ADD_CUSTOM_COMMAND(
 		"-I\"${CMAKE_SOURCE_DIR}/include\""
 		"-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\""
 		"-I\"${CMAKE_INSTALL_PREFIX}/include\""
-		${WINE_INCLUDES_AND_LIBS}
+		"-I\"${WINE_INCLUDE_DIR}\""
+		"-L\"${WINE_LIBRARY}\""
 		"\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\""
 		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
 		${WINE_BUILD_FLAGS}
