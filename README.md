@@ -3,7 +3,7 @@
 [![Build status](https://img.shields.io/travis/LMMS/lmms.svg?maxAge=3600)](https://travis-ci.org/LMMS/lmms)
 [![Latest stable release](https://img.shields.io/github/release/LMMS/lmms.svg?maxAge=3600)](https://lmms.io/download)
 [![Overall downloads on Github](https://img.shields.io/github/downloads/LMMS/lmms/total.svg?maxAge=3600)](https://github.com/LMMS/lmms/releases)
-[![Join the chat at Discord](https://img.shields.io/badge/chat%20on-discord-7289DA.svg)](https://discord.gg/5kSc32Z)
+[![Join the chat at Discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/5kSc32Z)
 [![Localise on transifex](https://img.shields.io/badge/localise-on_transifex-green.svg)](https://www.transifex.com/lmms/lmms/)
 
 What is LMMS?
@@ -15,12 +15,12 @@ the creation of melodies and beats, the synthesis and mixing of sounds, and
 arranging of samples. You can have fun with your MIDI-keyboard and much more;
 all in a user-friendly and modern interface.
 
-[Homepage](http://lmms.io)<br>
+[Homepage](https://lmms.io)<br>
 [Downloads/Releases](https://github.com/LMMS/lmms/releases)<br>
 [Developer Wiki](https://github.com/LMMS/lmms/wiki)<br>
-[Artist & User Wiki/Documentation](http://lmms.io/documentation)<br>
-[Sound Demos](http://lmms.io/showcase/)<br>
-[LMMS Sharing Platform](http://lmms.io/lsp/) Share your songs!
+[Artist & User Wiki/Documentation](https://lmms.io/documentation)<br>
+[Sound Demos](https://lmms.io/showcase/)<br>
+[LMMS Sharing Platform](https://lmms.io/lsp/) Share your songs!
 
 Features
 ---------

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,12 +28,10 @@
 #include <QApplication>
 #include <QFrame>
 #include <QPainter>
-#include <QPixmapCache>
 #include <QStyleFactory>
 #include <QStyleOption>
 
 #include "LmmsStyle.h"
-#include "LmmsPalette.h"
 
 QPalette * LmmsStyle::s_palette = NULL;
 

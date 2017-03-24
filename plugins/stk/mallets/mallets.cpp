@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2016 Oskar Wallgren <oskarwallgren13/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,6 +33,7 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
@@ -620,8 +621,10 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+#ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
-	
+#endif
+
 		m_voice = new ModalBar();
 	
 		m_voice->controlChange( 16, _control16 );
@@ -668,8 +671,10 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+#ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
-	
+#endif
+
 		m_voice = new TubeBell();
 	
 		m_voice->controlChange( 1, _control1 );
@@ -714,7 +719,9 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
 						.toLatin1().constData() );
+#ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
+#endif
 
 		m_voice = new BandedWG();
 	

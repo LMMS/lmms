@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -125,6 +125,8 @@ private:
 	void upgrade_1_0_99();
 	void upgrade_1_1_0();
 	void upgrade_1_1_91();
+	void upgrade_1_2_0_rc3();
+	void upgrade_1_2_0_rc2_42();
 
 	void upgrade();
 

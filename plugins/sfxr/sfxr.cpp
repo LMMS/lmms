@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Wong Cho Ching
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,6 +35,7 @@ float frnd(float range)
 	return (float)rnd(10000)/10000*range;
 }
 
+#include <cmath>
 
 #include <QDomElement>
 

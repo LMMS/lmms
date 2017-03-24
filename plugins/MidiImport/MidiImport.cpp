@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -352,6 +352,10 @@ bool MidiImport::readSMF( TrackContainer* tc )
 			tap->putValue( b->beat * ticksPerBeat, timeMap->last_tempo * 60.0 );
 		}
 	}
+
+	// Update the tempo to avoid crash when playing a project imported
+	// via the command line
+	Engine::updateFramesPerTick();
 
 	// Song events
 	for( int e = 0; e < seq->length(); ++e )

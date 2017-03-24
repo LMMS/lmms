@@ -3440,8 +3440,8 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
         <translation>Mode logarithmique</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Veuillez entrer une valeur entre -96,0 dBV et 6,0 dBFS:</translation>
+        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
+        <translation>Veuillez entrer une valeur entre -96,0 dBV et 6,0 dBV :</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -3968,6 +3968,10 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>Sauvegardder en tant que omdèle par défaut</translation>
     </message>
     <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Exporter en &amp;MIDI...</translation>
+    </message>
+    <message>
         <source>&amp;View</source>
         <translation>&amp;Afficher</translation>
     </message>
@@ -4036,8 +4040,8 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
         <translation>Ceci ré-écrira votre modèle par défaut actuel.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volume en dBFS</translation>
+        <source>Volume as dBV</source>
+        <translation>Volume en dBV</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -4102,19 +4106,6 @@ Veuillez visiter http://lmms.sf.net/wiki pour la documentation de LMMS.</transla
     <message>
         <source>Track</source>
         <translation>Piste</translation>
-    </message>
-</context>
-<context>
-    <name>MidiJack</name>
-    <message>
-        <source>JACK server down</source>
-        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
-        <translation>Le serveur JACK est arrêté</translation>
-    </message>
-    <message>
-        <source>The JACK server seems to be shuted down.</source>
-        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
-        <translation>Le serveur JACK semble avoir été coupé</translation>
     </message>
 </context>
 <context>
@@ -6057,8 +6048,8 @@ Raison : &quot;%2&quot;</translation>
         <translation>Invitation à redémarrer après modification de la configuration</translation>
     </message>
     <message>
-        <source>Display volume as dBFS </source>
-        <translation>Afficher le volume en dBFS</translation>
+        <source>Display volume as dBV </source>
+        <translation>Afficher le volume en dBV</translation>
     </message>
     <message>
         <source>Compress project files per default</source>

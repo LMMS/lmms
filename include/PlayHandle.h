@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,13 @@
 #ifndef PLAY_HANDLE_H
 #define PLAY_HANDLE_H
 
-#include <QtCore/QThread>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtCore/QMutex>
 
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
+
+class QThread;
 
 class Track;
 class AudioPort;

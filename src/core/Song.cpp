@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,9 +29,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QApplication>
-
-#include <math.h>
 
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
@@ -49,20 +46,13 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "ExportFilter.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "FileDialog.h"
-#include "MidiClient.h"
-#include "DataFile.h"
-#include "NotePlayHandle.h"
 #include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
-#include "ProjectRenderer.h"
-#include "RenameDialog.h"
 #include "SongEditor.h"
-#include "templates.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "PeakController.h"
@@ -555,6 +545,12 @@ void Song::updateLength()
 	for( TrackList::const_iterator it = tracks().begin();
 						it != tracks().end(); ++it )
 	{
+		if( Engine::getSong()->isExporting() &&
+				( *it )->isMuted() )
+		{
+			continue;
+		}
+
 		const tact_t cur = ( *it )->length();
 		if( cur > m_length )
 		{

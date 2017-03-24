@@ -4,7 +4,7 @@
  * Copyright (c) 1998-2000 Paul Kellett (mda-vst.com)
  * Copyright (c) 2007 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,11 +28,8 @@
 
 #include <fstream>
 #include <cstring>
-#include <limits>
 
 #include <math.h>     //sin(), exp(), etc.
-#include <stdio.h>    //sscanf(), sprintf()
-#include <stdlib.h>   //RAND_MAX
 
 #ifdef LMMS_BUILD_WIN32
 #define powf pow

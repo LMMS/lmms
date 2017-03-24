@@ -4,7 +4,7 @@
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  * Copyright (c) 2015 Steffen Baranowsky <BaraMGB/at/freenet/dot/de>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMouseEvent>
-#include <QPainter>
 #include <QWidget>
 
 #include "EqControls.h"
@@ -37,7 +36,7 @@
 
 EqParameterWidget::EqParameterWidget( QWidget *parent, EqControls * controls ) :
 	QWidget( parent ),
-	m_displayWidth ( 400 ),
+	m_displayWidth ( 450 ),
 	m_displayHeigth ( 200 ),
 	m_controls ( controls )
 

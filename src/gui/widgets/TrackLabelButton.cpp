@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -62,10 +62,9 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 		m_renameLineEdit->hide();
 		connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 	}
-
 	setIconSize( QSize( 24, 24 ) );
-	setText( " " );
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ), this, SLOT( nameChanged() ) );
 }
 
 
@@ -109,13 +108,24 @@ void TrackLabelButton::renameFinished()
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
-		if( m_renameLineEdit->text() != text() )
+		if( m_renameLineEdit->text() != "" )
 		{
-			setText( m_renameLineEdit->text() );
-			m_trackView->getTrack()->setName( m_renameLineEdit->text() );
-			Engine::getSong()->setModified();
+			if( m_renameLineEdit->text() != m_trackView->getTrack()->name() )
+			{
+				setText( elideName( m_renameLineEdit->text() ) );
+				m_trackView->getTrack()->setName( m_renameLineEdit->text() );
+				Engine::getSong()->setModified();
+			}
 		}
 	}
+}
+
+
+
+
+void TrackLabelButton::nameChanged()
+{
+	setText( elideName( m_trackView->getTrack()->name() ) );
 }
 
 
@@ -138,6 +148,7 @@ void TrackLabelButton::dropEvent( QDropEvent * _de )
 
 
 
+
 void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::RightButton )
@@ -146,7 +157,8 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 	}
 	else
 	{
-		QToolButton::mousePressEvent( _me );
+		m_buttonRect = QRect( this->mapToGlobal( pos() ), size() );
+		_me->ignore();
 	}
 }
 
@@ -156,6 +168,19 @@ void TrackLabelButton::mousePressEvent( QMouseEvent * _me )
 void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 {
 	rename();
+}
+
+
+
+
+void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
+{
+	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
+	{
+		QToolButton::mousePressEvent( _me );
+	}
+	QToolButton::mouseReleaseEvent( _me );
+	_me->ignore();
 }
 
 
@@ -179,14 +204,31 @@ void TrackLabelButton::paintEvent( QPaintEvent * _pe )
 			}
 		}
 	}
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		setText( " " );
-		setToolTip( m_trackView->getTrack()->displayName() );
-	}
-	else
-	{
-		setText( m_trackView->getTrack()->displayName() );
-	}
 	QToolButton::paintEvent( _pe );
+}
+
+
+
+
+void TrackLabelButton::resizeEvent(QResizeEvent *_re)
+{
+	setText( elideName( m_trackView->getTrack()->displayName() ) );
+}
+
+
+
+
+QString TrackLabelButton::elideName( const QString &name )
+{
+	const int spacing = 16;
+	const int maxTextWidth = width() - spacing - iconSize().width();
+	if( maxTextWidth < 1 )
+	{
+		setToolTip( m_trackView->getTrack()->displayName() );
+		return QString( " " );
+	}
+	setToolTip( "" );
+	QFontMetrics metrics( font() );
+	QString elidedName = metrics.elidedText( name, Qt::ElideRight, maxTextWidth );
+	return elidedName;
 }

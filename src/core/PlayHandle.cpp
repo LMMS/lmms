@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,6 +25,8 @@
 #include "PlayHandle.h"
 #include "BufferManager.h"
 
+#include <QtCore/QThread>
+
 
 PlayHandle::PlayHandle( const Type type, f_cnt_t offset ) :
 		m_type( type ),
@@ -38,6 +40,7 @@ PlayHandle::PlayHandle( const Type type, f_cnt_t offset ) :
 
 PlayHandle::~PlayHandle()
 {
+	BufferManager::release(m_playHandleBuffer);
 }
 
 
@@ -57,6 +60,6 @@ void PlayHandle::doProcessing()
 
 void PlayHandle::releaseBuffer()
 {
-	if( m_playHandleBuffer ) BufferManager::release( m_playHandleBuffer );
+	BufferManager::release( m_playHandleBuffer );
 	m_playHandleBuffer = NULL;
 }

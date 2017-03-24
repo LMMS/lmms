@@ -18,15 +18,11 @@ INCLUDE(FindPkgConfig)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-# Timestamp available since cmake 2.8.11
-IF(CMAKE_VERSION VERSION_LESS "2.8.11")
-	EXECUTE_PROCESS(COMMAND date +%Y OUTPUT_VARIABLE PROJECT_YEAR OUTPUT_STRIP_TRAILING_WHITESPACE)
-ELSE()
-	STRING(TIMESTAMP        PROJECT_YEAR "%Y")
-ENDIF()
+# Updated by maintenance tasks
+SET(PROJECT_YEAR 2015)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
-SET(PROJECT_URL         "http://lmms.io")
+SET(PROJECT_URL         "https://lmms.io")
 SET(PROJECT_EMAIL       "lmms-devel@lists.sourceforge.net")
 SET(PROJECT_DESCRIPTION "${PROJECT_NAME_UCASE} - Free music production software")
 SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
@@ -461,22 +457,6 @@ FILE(REMOVE include/lmmsconfig.h)
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
 
-# Get list of all committers from git history, ordered by number of commits.
-# The CONTRIBUTORS file is used by AboutDialog. This information can be provided
-# with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
-# this file for version 1.1.3, the command is:
-# 	git shortlog -sne v1.1.3 | cut -c8-
-FIND_PACKAGE(Git)
-IF(GIT_FOUND AND NOT CONTRIBUTORS)
-	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
-	EXECUTE_PROCESS(
-		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
-		COMMAND cut -c8-
-		OUTPUT_FILE "${CONTRIBUTORS}"
-		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-		TIMEOUT 1)
-ENDIF()
-
 # embedded resources stuff
 IF(WIN32 OR WIN64)
 	# compile buildtools native
@@ -509,9 +489,10 @@ ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(cmake/postinstall)
 
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
-				COMMAND gzip -c "\"${CMAKE_SOURCE_DIR}/doc/lmms.1\"" > "\"${CMAKE_BINARY_DIR}/lmms.1.gz\""
+				COMMAND gzip -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
 				DEPENDS "${CMAKE_SOURCE_DIR}/doc/lmms.1"
-				COMMENT "Generating lmms.1.gz")
+				COMMENT "Generating lmms.1.gz"
+				VERBATIM)
 
 
 ADD_CUSTOM_TARGET(manpage ALL

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,7 +34,6 @@
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
@@ -74,6 +73,10 @@ GuiApplication::GuiApplication()
 
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;
+
+#ifdef LMMS_BUILD_APPLE
+	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, true);
+#endif
 
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );

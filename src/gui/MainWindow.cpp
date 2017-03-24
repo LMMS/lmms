@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
@@ -42,7 +41,6 @@
 #include "AudioDummy.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
@@ -50,11 +48,7 @@
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "InstrumentTrack.h"
-#include "lmmsversion.h"
-#include "Mixer.h"
 #include "PianoRoll.h"
-#include "PianoView.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
@@ -62,14 +56,12 @@
 #include "ProjectNotes.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
-#include "Song.h"
 #include "SongEditor.h"
-#include "SubWindow.h"
-#include "templates.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
+#include "lmmsversion.h"
 
 
 
@@ -315,7 +307,10 @@ void MainWindow::finalize()
 					SLOT( exportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );*/
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
+#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
@@ -390,7 +385,10 @@ void MainWindow::finalize()
 					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
+#endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
@@ -893,6 +891,10 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 		{
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
+#ifdef LMMS_BUILD_APPLE
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 			shownInMenu++;
 			if( shownInMenu >= 15 )
 			{
@@ -912,7 +914,6 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
-		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
 	runAutoSave();
@@ -1482,6 +1483,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 
 	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
@@ -1499,6 +1504,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 }
 
@@ -1519,7 +1528,7 @@ void MainWindow::showTool( QAction * _idx )
 void MainWindow::browseHelp()
 {
 	// file:// alternative for offline help
-	QString url = "http://lmms.sf.net/wiki/index.php?title=Main_Page";
+	QString url = "https://lmms.io/documentation/";
 	QDesktopServices::openUrl( url );
 	// TODO: Handle error
 }
@@ -1529,9 +1538,11 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( !( Engine::getSong()->isPlaying() ||
-			Engine::getSong()->isExporting() ||
-				QApplication::mouseButtons() ) )
+	if( !Engine::getSong()->isExporting() &&
+		!QApplication::mouseButtons() &&
+			( ConfigManager::inst()->value( "ui",
+					"enablerunningautosave" ).toInt() ||
+				! Engine::getSong()->isPlaying() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer

@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2005-2007 Danny McRae <khjklujn/at/yahoo.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,34 +24,27 @@
  */
 #include "Pattern.h"
 
-#include <QDomElement>
 #include <QTimer>
 #include <QMenu>
-#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QProgressBar>
 #include <QPushButton>
-#include <QtAlgorithms>
 
 #include "InstrumentTrack.h"
-#include "templates.h"
 #include "gui_templates.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "PianoRoll.h"
-#include "TrackContainer.h"
 #include "RenameDialog.h"
 #include "SampleBuffer.h"
 #include "AudioSampleRecorder.h"
-#include "Song.h"
-#include "ToolTip.h"
 #include "BBTrackContainer.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
 
 
-QPixmap * PatternView::s_stepBtnOn = NULL;
+QPixmap * PatternView::s_stepBtnOn0 = NULL;
+QPixmap * PatternView::s_stepBtnOn200 = NULL;
 QPixmap * PatternView::s_stepBtnOff = NULL;
 QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
@@ -195,20 +188,21 @@ MidiTime Pattern::beatPatternLength() const
 		if( ( *it )->length() < 0 )
 		{
 			max_length = qMax<tick_t>( max_length,
-				( *it )->pos() +
-					MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() );
+				( *it )->pos() + 1 );
 		}
 	}
 
 	if( m_steps != MidiTime::stepsPerTact() )
 	{
 		max_length = m_steps * MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() ;
+						MidiTime::stepsPerTact();
 	}
 
 	return MidiTime( max_length ).nextFullTact() * MidiTime::ticksPerTact();
 }
+
+
+
 
 Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 {
@@ -367,7 +361,9 @@ void Pattern::checkType()
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
-		if( ( *it )->length() > 0 )
+		if( ( *it )->length() > 0 ||
+			( *it )->pos() % ( MidiTime::ticksPerTact() /
+						MidiTime::stepsPerTact() ) )
 		{
 			setType( MelodyPattern );
 			return;
@@ -608,10 +604,16 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
-	if( s_stepBtnOn == NULL )
+	if( s_stepBtnOn0 == NULL )
 	{
-		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
-							"step_btn_on_100" ) );
+		s_stepBtnOn0 = new QPixmap( embed::getIconPixmap(
+							"step_btn_on_0" ) );
+	}
+
+	if( s_stepBtnOn200 == NULL )
+	{
+		s_stepBtnOn200 = new QPixmap( embed::getIconPixmap(
+							"step_btn_on_200" ) );
 	}
 
 	if( s_stepBtnOff == NULL )
@@ -925,13 +927,10 @@ void PatternView::paintEvent( QPaintEvent * )
 			for( NoteVector::Iterator it = m_pat->m_notes.begin();
 					it != m_pat->m_notes.end(); ++it )
 			{
-				if( ( *it )->length() > 0 )
-				{
-					max_key = qMax( max_key, ( *it )->key() );
-					min_key = qMin( min_key, ( *it )->key() );
-					central_key += ( *it )->key();
-					++total_notes;
-				}
+				max_key = qMax( max_key, ( *it )->key() );
+				min_key = qMin( min_key, ( *it )->key() );
+				central_key += ( *it )->key();
+				++total_notes;
 			}
 
 			if( total_notes > 0 )
@@ -966,17 +965,18 @@ void PatternView::paintEvent( QPaintEvent * )
 					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
 
 					// check that note isn't out of bounds, and has a length
-					if( ( *it )->length() > 0 &&
-							y_pos >= TCO_BORDER_WIDTH &&
-							y_pos <= max_ht )
+					if( y_pos >= TCO_BORDER_WIDTH &&
+								y_pos <= max_ht )
 					{
 						// calculate start and end x-coords of the line to be drawn
+						int length = ( *it )->length();
+						length = length > 0 ? length : 4;
 						const int x1 = x_base +
 							static_cast<int>
-							( ( *it )->pos() * ( ppt  / MidiTime::ticksPerTact() ) );
+							( ( *it )->pos() * ( ppt / MidiTime::ticksPerTact() ) );
 						const int x2 = x_base +
 							static_cast<int>
-							( ( ( *it )->pos() + ( *it )->length() ) * ( ppt  / MidiTime::ticksPerTact() ) );
+							( ( ( *it )->pos() + length ) * ( ppt / MidiTime::ticksPerTact() ) );
 
 						// check bounds, draw line
 						if( x1 < width() - TCO_BORDER_WIDTH )
@@ -992,7 +992,8 @@ void PatternView::paintEvent( QPaintEvent * )
 	else if( beatPattern &&	( fixedTCOs() || ppt >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
 	{
-		QPixmap stepon;
+		QPixmap stepon0;
+		QPixmap stepon200;
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
@@ -1000,8 +1001,12 @@ void PatternView::paintEvent( QPaintEvent * )
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
 
 		// scale step graphics to fit the beat pattern length
-		stepon = s_stepBtnOn->scaled( w / steps,
-					      s_stepBtnOn->height(),
+		stepon0 = s_stepBtnOn0->scaled( w / steps,
+					      s_stepBtnOn0->height(),
+					      Qt::IgnoreAspectRatio,
+					      Qt::SmoothTransformation );
+		stepon200 = s_stepBtnOn200->scaled( w / steps,
+					      s_stepBtnOn200->height(),
 					      Qt::IgnoreAspectRatio,
 					      Qt::SmoothTransformation );
 		stepoff = s_stepBtnOff->scaled( w / steps,
@@ -1025,8 +1030,9 @@ void PatternView::paintEvent( QPaintEvent * )
 			{
 				const int vol = n->getVolume();
 				p.drawPixmap( x, y, stepoffl );
+				p.drawPixmap( x, y, stepon0 );
 				p.setOpacity( sqrt( vol / 200.0 ) );
-				p.drawPixmap( x, y, stepon );
+				p.drawPixmap( x, y, stepon200 );
 				p.setOpacity( 1 );
 			}
 			else if( ( it / 4 ) % 2 )

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,15 +32,14 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QPushButton>
-#include <QToolButton>
 #include <QScrollArea>
 #include <QStyle>
 #include <QKeyEvent>
 
+#include "lmms_math.h"
+
 #include "FxMixerView.h"
 #include "Knob.h"
-#include "Engine.h"
-#include "embed.h"
 #include "FxLine.h"
 #include "FxMixer.h"
 #include "GuiApplication.h"
@@ -50,7 +49,6 @@
 #include "InstrumentTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
-#include "lmms_math.h"
 
 FxMixerView::FxMixerView() :
 	QWidget(),

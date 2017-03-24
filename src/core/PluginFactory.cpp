@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,10 +27,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
-#include <QtCore/QFileInfo>
 #include <QtCore/QLibrary>
-
-#include "Plugin.h"
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");

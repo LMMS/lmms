@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,12 +23,7 @@
  */
 
 #include "MidiWinMM.h"
-#include "ConfigManager.h"
-#include "Engine.h"
-#include "gui_templates.h"
-#include "MidiPort.h"
 #include "Note.h"
-
 
 #ifdef LMMS_BUILD_WIN32
 
