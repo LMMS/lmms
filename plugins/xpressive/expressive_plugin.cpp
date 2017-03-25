@@ -47,7 +47,7 @@
 
 #include "embed.cpp"
 
-#include "exprfront.h"
+#include "exprsynth.h"
 
 extern "C" {
 
@@ -58,56 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(
 
 }
 
-ExprSynth::ExprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3,
-	ExprFront *exprO1, ExprFront *exprO2,
-	NotePlayHandle *nph, const sample_rate_t sample_rate,
-	const FloatModel* pan1, const FloatModel* pan2, float rel_trans):
-	m_exprO1(exprO1),
-	m_exprO2(exprO2),
-	m_W1(gW1),
-	m_W2(gW2),
-	m_W3(gW3),
-	m_nph(nph),
-	m_sample_rate(sample_rate),
-	m_pan1(pan1),
-	m_pan2(pan2),
-	m_rel_transition(rel_trans)
-{
-	m_note_sample = 0;
-	m_note_rel_sample = 0;
-	m_note_rel_sec = 0;
-	m_note_sample_sec = 0;
-	m_released = 0;
-	m_frequency = m_nph->frequency();
-	m_rel_inc = 1000.0 / (m_sample_rate * m_rel_transition);//rel_transition in ms. compute how much increment in each frame
 
-	auto init_expression_step2 = [this](ExprFront * e) {
-		e->add_cyclic_vector("W1", m_W1->m_samples,m_W1->m_length, m_W1->m_interpolate);
-		e->add_cyclic_vector("W2", m_W2->m_samples,m_W2->m_length, m_W2->m_interpolate);
-		e->add_cyclic_vector("W3", m_W3->m_samples,m_W3->m_length, m_W3->m_interpolate);
-		e->add_variable("t", m_note_sample_sec);
-		e->add_variable("f", m_frequency);
-		e->add_variable("rel",m_released);
-		e->add_variable("trel",m_note_rel_sec);
-		e->setIntegrate(&m_note_sample,m_sample_rate);
-		e->compile();
-	};
-	init_expression_step2(m_exprO1);
-	init_expression_step2(m_exprO2);
-
-}
-
-ExprSynth::~ExprSynth()
-{
-	if (m_exprO1)
-	{
-		delete m_exprO1;
-	}
-	if (m_exprO2)
-	{
-		delete m_exprO2;
-	}
-}
 
 /*
  * nice test:
@@ -402,7 +353,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_selectedGraphGroup->addButton(m_o2Btn);
 
 	Expressive *e = castModel<Expressive>();
-	m_selectedGraphGroup->setModel(&e->m_selectedGraph);
+	m_selectedGraphGroup->setModel(&e->selectedGraph());
 
 	m_sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
 	m_sinWaveBtn->move(10, ROW_WAVEBTN);
@@ -549,19 +500,19 @@ void expressiveView::expressionChanged() {
 
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
-		e->m_wavesExpression[0] = text;
+		e->wavesExpression(0) = text;
 		break;
 	case W2_EXPR:
-		e->m_wavesExpression[1] = text;
+		e->wavesExpression(1) = text;
 		break;
 	case W3_EXPR:
-		e->m_wavesExpression[2] = text;
+		e->wavesExpression(2) = text;
 		break;
 	case O1_EXPR:
-		e->m_outputExpression[0] = text;
+		e->outputExpression(0) = text;
 		break;
 	case O2_EXPR:
-		e->m_outputExpression[1] = text;
+		e->outputExpression(1) = text;
 		break;
 	}
 
@@ -582,12 +533,12 @@ void expressiveView::expressionChanged() {
 			expr.add_constant("trel", 0);
 			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
 			expr.add_constant("v", v);
-			expr.add_constant("A1", e->m_parameterA1.value());
-			expr.add_constant("A2", e->m_parameterA2.value());
-			expr.add_constant("A3", e->m_parameterA3.value());
-			expr.add_cyclic_vector("W1",e->m_graphW1.samples(),e->m_graphW1.length());
-			expr.add_cyclic_vector("W2",e->m_graphW2.samples(),e->m_graphW2.length());
-			expr.add_cyclic_vector("W3",e->m_graphW3.samples(),e->m_graphW3.length());
+			expr.add_constant("A1", e->parameterA1().value());
+			expr.add_constant("A2", e->parameterA2().value());
+			expr.add_constant("A3", e->parameterA3().value());
+			expr.add_cyclic_vector("W1",e->graphW1().samples(),e->graphW1().length());
+			expr.add_cyclic_vector("W2",e->graphW2().samples(),e->graphW2().length());
+			expr.add_cyclic_vector("W3",e->graphW3().samples(),e->graphW3().length());
 		}
 		expr.setIntegrate(&i,sample_rate);
 		expr.add_constant("srate",sample_rate);
@@ -595,7 +546,7 @@ void expressiveView::expressionChanged() {
 		const bool parse_ok=expr.compile();
 
 		if (parse_ok) {
-			e->m_exprValid.setValue(0);
+			e->exprValid().setValue(0);
 			const int length = m_raw_graph->length();
 			float * const samples = new float[length];
 			for (i = 0; i < length; i++) {
@@ -617,14 +568,14 @@ void expressiveView::expressionChanged() {
 		}
 		else
 		{
-			e->m_exprValid.setValue(1);
+			e->exprValid().setValue(1);
 			if (m_output_expr)
 				m_raw_graph->clear();
 		}
 	}
 	else
 	{
-		e->m_exprValid.setValue(0);
+		e->exprValid().setValue(0);
 		if (m_output_expr)
 			m_raw_graph->clear();
 	}
@@ -657,32 +608,34 @@ void Expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 	}
 }
 
+
+
 void expressiveView::smoothChanged()
 {
-
+	
 	Expressive * e = castModel<Expressive>();
 	float smoothness=0;
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
-		smoothness=e->m_smoothW1.value();
+		smoothness=e->smoothW1().value();
 		break;
 	case W2_EXPR:
-		smoothness=e->m_smoothW2.value();
+		smoothness=e->smoothW2().value();
 		break;
 	case W3_EXPR:
-		smoothness=e->m_smoothW3.value();
+		smoothness=e->smoothW3().value();
 		break;
 	}
 	Expressive::smooth(smoothness,m_raw_graph,m_graph->model());
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
-		e->m_W1.copyFrom(m_graph->model());
+		e->W1().copyFrom(m_graph->model());
 		break;
 	case W2_EXPR:
-		e->m_W2.copyFrom(m_graph->model());
+		e->W2().copyFrom(m_graph->model());
 		break;
 	case W3_EXPR:
-		e->m_W3.copyFrom(m_graph->model());
+		e->W3().copyFrom(m_graph->model());
 		break;
 	}
 	Engine::getSong()->setModified();
@@ -691,15 +644,15 @@ void expressiveView::smoothChanged()
 void expressiveView::modelChanged() {
 	Expressive * b = castModel<Expressive>();
 
-	m_expressionValidToggle->setModel(&b->m_exprValid);
-	m_generalPurposeKnob[0]->setModel(&b->m_parameterA1);
-	m_generalPurposeKnob[1]->setModel(&b->m_parameterA2);
-	m_generalPurposeKnob[2]->setModel(&b->m_parameterA3);
+	m_expressionValidToggle->setModel( &b->exprValid() );
+	m_generalPurposeKnob[0]->setModel( &b->parameterA1() );
+	m_generalPurposeKnob[1]->setModel( &b->parameterA2() );
+	m_generalPurposeKnob[2]->setModel( &b->parameterA3() );
 
-	m_panningKnob[0]->setModel( &b->m_panning1 );
-	m_panningKnob[1]->setModel( &b->m_panning2 );
-	m_relKnob->setModel( &b->m_relTransition );
-	m_selectedGraphGroup->setModel(&b->m_selectedGraph);
+	m_panningKnob[0]->setModel( &b->panning1() );
+	m_panningKnob[1]->setModel( &b->panning2() );
+	m_relKnob->setModel( &b->relTransition() );
+	m_selectedGraphGroup->setModel( &b->selectedGraph() );
 
 	updateLayout();
 }
@@ -711,51 +664,51 @@ void expressiveView::updateLayout() {
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		m_wave_expr=true;
-		m_graph->setModel(&e->m_graphW1, true);
-		m_raw_graph=&(e->m_rawgraphW1);
-		m_expressionEditor->setPlainText(e->m_wavesExpression[0]);
-		m_smoothKnob->setModel(&e->m_smoothW1);
-		m_waveInterpolate->setModel(&e->m_interpolateW1);
+		m_graph->setModel(&e->graphW1(), true);
+		m_raw_graph=&(e->rawgraphW1());
+		m_expressionEditor->setPlainText(e->wavesExpression(0));
+		m_smoothKnob->setModel(&e->smoothW1());
+		m_waveInterpolate->setModel(&e->interpolateW1());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		m_waveInterpolate->show();
 		break;
 	case W2_EXPR:
 		m_wave_expr=true;
-		m_graph->setModel(&e->m_graphW2, true);
-		m_raw_graph=&(e->m_rawgraphW2);
-		m_expressionEditor->setPlainText(e->m_wavesExpression[1]);
-		m_smoothKnob->setModel(&e->m_smoothW2);
-		m_waveInterpolate->setModel(&e->m_interpolateW2);
+		m_graph->setModel(&e->graphW2(), true);
+		m_raw_graph=&(e->rawgraphW2());
+		m_expressionEditor->setPlainText(e->wavesExpression(1));
+		m_smoothKnob->setModel(&e->smoothW2());
+		m_waveInterpolate->setModel(&e->interpolateW2());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		m_waveInterpolate->show();
 		break;
 	case W3_EXPR:
 		m_wave_expr=true;
-		m_graph->setModel(&e->m_graphW3, true);
-		m_raw_graph=&(e->m_rawgraphW3);
-		m_expressionEditor->setPlainText(e->m_wavesExpression[2]);
-		m_smoothKnob->setModel(&e->m_smoothW3);
-		m_waveInterpolate->setModel(&e->m_interpolateW3);
+		m_graph->setModel(&e->graphW3(), true);
+		m_raw_graph=&(e->rawgraphW3());
+		m_expressionEditor->setPlainText(e->wavesExpression(2));
+		m_smoothKnob->setModel(&e->smoothW3());
+		m_waveInterpolate->setModel(&e->interpolateW3());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
 		m_waveInterpolate->show();
 		break;
 	case O1_EXPR:
 		m_output_expr=true;
-		m_graph->setModel(&e->m_graphO1, true);
-		m_raw_graph=&(e->m_graphO1);
-		m_expressionEditor->setPlainText(e->m_outputExpression[0]);
+		m_graph->setModel(&e->graphO1(), true);
+		m_raw_graph=&(e->graphO1());
+		m_expressionEditor->setPlainText(e->outputExpression(0));
 		m_smoothKnob->hide();
 		m_usrWaveBtn->hide();
 		m_waveInterpolate->hide();
 		break;
 	case O2_EXPR:
 		m_output_expr=true;
-		m_graph->setModel(&e->m_graphO2, true);
-		m_raw_graph=&(e->m_graphO2);
-		m_expressionEditor->setPlainText(e->m_outputExpression[1]);
+		m_graph->setModel(&e->graphO2(), true);
+		m_raw_graph=&(e->graphO2());
+		m_expressionEditor->setPlainText(e->outputExpression(1));
 		m_smoothKnob->hide();
 		m_usrWaveBtn->hide();
 		m_waveInterpolate->hide();
@@ -827,40 +780,41 @@ void expressiveView::usrWaveClicked() {
 expressiveHelpView* expressiveHelpView::s_instance=0;
 
 QString expressiveHelpView::s_helpText=
-"<b>O1, O2</b> - Two output waves. panning is controled by PN1 and PN2.<br>"
+"<b>O1, O2</b> - Two output waves. Panning is controled by PN1 and PN2.<br>"
 "<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
 "These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
 "<h4>Available variables:</h4><br>"
-"<b>t</b> - time in seconds.<br>"
-"<b>f</b> - note's pitched frequency. available only in the output expressions.<br>"
-"<b>key</b> - note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. available only in the output expressions.<br>"
+"<b>t</b> - Time in seconds.<br>"
+"<b>f</b> - Note's pitched frequency. Available only in the output expressions.<br>"
+"<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output expressions.<br>"
 "<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
-"<b>v</b> - note's volume. note that the output is already multiplied by the volume. available only in the output expressions.<br>"
-"<b>rel</b> - gives 0.0 while the key is holded, and 1.0 after the key release. available only in the output expressions.<br>"
-"<b>trel</b> - time after release. While the note is holded, it gives 0.0. then it start counting seconds.<br>"
+"<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
+"<b>rel</b> - Gives 0.0 while the key is holded, and 1.0 after the key release. Available only in the output expressions.<br>"
+"<b>trel</b> - Time after release. While the note is holded, it gives 0.0. Afterwards, it start counting seconds.<br>"
 "The time it takes to shift from 0.0 to 1.0 after key release is determined by the REL knob<br>"
-"<b>A1, A2, A3</b> - general purpose knobs. you can reference them only in O1 and O2. In range [-1,1].<br>"
+"<b>A1, A2, A3</b> - General purpose knobs. You can reference them only in O1 and O2. In range [-1,1].<br>"
 "<h4>Available functions:</h4><br>"
-"<b>W1, W2, W3</b> - as mentioned before. you can reference them only in O1 and O2.<br>"
-"<b>cent(x)</b> - gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
+"<b>W1, W2, W3</b> - As mentioned before. You can reference them only in O1 and O2.<br>"
+"<b>cent(x)</b> - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
 "100 cents equals one semitone<br>"
-"<b>semitone(x)</b> - gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
-"<b>integrate(x)</b> - integrates x by delta t (it sums values and divides them by sample rate).<br>"
+"<b>semitone(x)</b> - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
+"<b>last(n)</b> - Gives you the last n'th evaluated sample. The argument n must be in the range [1,500], or else, it will return 0.<br>"
+"<b>integrate(x)</b> - Integrates x by delta t (It sums values and divides them by sample rate).<br>"
 "If you use notes with automated frequency, you should use:<br>"
 "sinew(integrate(f)) instead of sinew(t*f)<br>"
-"<b>randv(x)</b> - A random vector. each cell is reference by an integer index in the range [0,2^31]<br>"
+"<b>randv(x)</b> - A random vector. Each cell is reference by an integer index in the range [0,2^31]<br>"
 "Each evaluation of an expression results in different random vector.<br>"
 "Although, it remains consistent in the lifetime of a single wave.<br>"
 "If you want a single random values you can use randv(0),randv(1)... <br>"
 "and every reference to randv(a) will give you the same value."
 "If you want a random wave you can use randv(t*srate).<br>"
 "Each random value is in the range [-1,1).<br>"
-"<b>sinew(x)</b> - a sine wave with period of 1 (in contrast to real sine wave which have a period of 2*pi).<br>"
-"<b>trianglew(x)</b> - a triangle wave with period of 1.<br>"
-"<b>squarew(x)</b> - a square wave with period of 1.<br>"
-"<b>saww(x)</b> - a saw wave with period of 1.<br>"
-"<b>clamp(min_val,x,max_val)</b> - if x is in range of (min_val,max_val) returns x. otherwise if it's greater than max_val returns max_val, else returns min_val.<br>"
+"<b>sinew(x)</b> - A sine wave with period of 1 (In contrast to real sine wave which have a period of 2*pi).<br>"
+"<b>trianglew(x)</b> - A triangle wave with period of 1.<br>"
+"<b>squarew(x)</b> - A square wave with period of 1.<br>"
+"<b>saww(x)</b> - A saw wave with period of 1.<br>"
+"<b>clamp(min_val,x,max_val)</b> - If x is in range of (min_val,max_val) it returns x. Otherwise if it's greater than max_val it returns max_val, else returns min_val.<br>"
 "<b>abs, sin, cos, tan, cot, asin, acos, atan, atan2, sinh, cosh, tanh, asinh, acosh, atanh, sinc, "
 "hypot, exp, log, log2, log10, logn, pow, sqrt, min, max, floor, ceil, round, trunc, frac, "
 "avg, sgn, mod, etc. are also available.</b><br>"

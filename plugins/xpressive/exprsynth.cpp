@@ -23,7 +23,7 @@
  */
 
 
-#include "exprfront.h"
+#include "exprsynth.h"
 
 #include <string>
 #include <vector>
@@ -37,7 +37,8 @@
 #include "lmms_math.h"
 #include "NotePlayHandle.h"
 
-#include "exprtk.patched.hpp"
+
+#include "exprtk.hpp"
 
 typedef exprtk::symbol_table<float> symbol_table_t;
 typedef exprtk::expression<float> expression_t;
@@ -86,6 +87,7 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 	m_cc(0)
 	{
 		m_counters=new double[max_counters];
+		clearArray(m_counters,max_counters);
 	}
 
 	inline T operator()(const T& x)
@@ -97,8 +99,6 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 			{
 				return 0;
 			}
-			m_counters[m_nCounters] = 0;
-
 			m_cc = m_nCounters;
 			++m_nCounters;
 		}
@@ -120,6 +120,56 @@ struct IntegrateFunction : public exprtk::ifunction<T>
 	unsigned int m_nCountersCalls;
 	unsigned int m_cc;
 	double *m_counters;
+};
+
+template <typename T>
+struct LastSampleFunction : public exprtk::ifunction<T>
+{
+
+	using exprtk::ifunction<T>::operator();
+	virtual ~LastSampleFunction()
+	{
+		delete [] m_samples;
+	}
+
+	LastSampleFunction(unsigned int history_size) :
+	exprtk::ifunction<T>(1),
+	m_history_size(history_size),
+	m_pivot_last(history_size - 1)
+	{
+		m_samples = new T[history_size];
+		clearArray(m_samples, history_size);
+	}
+
+	inline T operator()(const T& x)
+	{
+		if (!std::isnan(x) && !std::isinf(x))
+		{
+			const int ix=(int)x;
+			if (ix>=1 && ix<=m_history_size)
+			{
+				return m_samples[(ix + m_pivot_last) % m_history_size];
+			}
+		}
+		return 0;
+	}
+	void setLastSample(const T& sample)
+	{
+		if (!std::isnan(sample) && !std::isinf(sample))
+		{
+			m_samples[m_pivot_last] = sample;
+		}
+		if (m_pivot_last == 0)
+		{
+			m_pivot_last = m_history_size - 1;
+		}
+		else {
+			--m_pivot_last;
+		}
+	}
+	unsigned int m_history_size;
+	unsigned int m_pivot_last;
+	T *m_samples;
 };
 
 template <typename T>
@@ -229,9 +279,9 @@ static const unsigned int random_data[257]={
 0xa66f8b47
 };
 
-inline unsigned int rotate(unsigned int x, const int b)
+inline unsigned int rotateLeft(unsigned int x, const int b)
 {
-	if (b > -32 && b < 32)
+	if (b > -32 && b < 32 && b != 0)
 	{
 		if (b < 0)
 		{
@@ -263,8 +313,8 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 		const unsigned int xi = (unsigned int)index;
 		const unsigned int si = m_rseed % data_size;
 		const unsigned int sa = m_rseed / data_size;
-		unsigned int res=rotate(random_data[(xi + si) % data_size] ^ random_data[(xi / data_size + sa) % data_size],sa % 31 + 1);
-		res ^= rotate(random_data[(3 * xi + si) % data_size] ^ random_data[(xi / data_size + 2 * sa) % data_size],xi % 31 + 1);
+		unsigned int res=rotateLeft(random_data[(xi + si) % data_size] ^ random_data[(xi / data_size + sa) % data_size],sa % 31 + 1);
+		res ^= rotateLeft(random_data[(3 * xi + si) % data_size] ^ random_data[(xi / data_size + 2 * sa) % data_size],xi % 31 + 1);
 		return static_cast<int>(res) / (float)(1 << 31);
 	}
 
@@ -291,7 +341,8 @@ class ExprFrontData
 public:
 	ExprFrontData():
 	m_rand_vec(SimpleRandom::generator()),
-	m_integ_func(NULL)
+	m_integ_func(NULL),
+	m_last_func(500)
 	{}
 	~ExprFrontData()
 	{
@@ -316,6 +367,7 @@ public:
 	std::vector<WaveValueFunctionInterpolate<float>* > m_cyclics_interp;
 	RandomVectorFunction m_rand_vec;
 	IntegrateFunction<float> *m_integ_func;
+	LastSampleFunction<float> m_last_func;
 };
 
 
@@ -458,6 +510,7 @@ ExprFront::ExprFront(const char * expr)
 	m_data->m_symbol_table.add_function("semitone", harmonic_semitone_func);
 	m_data->m_symbol_table.add_function("rand", simple_rand);
 	m_data->m_symbol_table.add_function("randv", m_data->m_rand_vec);
+	m_data->m_symbol_table.add_function("last", m_data->m_last_func);
 }
 ExprFront::~ExprFront()
 {
@@ -479,7 +532,9 @@ bool ExprFront::compile()
 float ExprFront::evaluate()
 {
 	if (!m_valid) return 0;
-	return m_data->m_expression.value();
+	float res = m_data->m_expression.value();
+	m_data->m_last_func.setLastSample(res);
+	return res;
 }
 bool ExprFront::add_variable(const char* name, float& ref)
 {
@@ -536,7 +591,57 @@ void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsig
 			m_data->m_symbol_table.add_function("integrate",*m_data->m_integ_func);
 		}
 	}
+}
 
+ExprSynth::ExprSynth(const WaveSample *gW1, const WaveSample *gW2, const WaveSample *gW3,
+	ExprFront *exprO1, ExprFront *exprO2,
+	NotePlayHandle *nph, const sample_rate_t sample_rate,
+	const FloatModel* pan1, const FloatModel* pan2, float rel_trans):
+	m_exprO1(exprO1),
+	m_exprO2(exprO2),
+	m_W1(gW1),
+	m_W2(gW2),
+	m_W3(gW3),
+	m_nph(nph),
+	m_sample_rate(sample_rate),
+	m_pan1(pan1),
+	m_pan2(pan2),
+	m_rel_transition(rel_trans)
+{
+	m_note_sample = 0;
+	m_note_rel_sample = 0;
+	m_note_rel_sec = 0;
+	m_note_sample_sec = 0;
+	m_released = 0;
+	m_frequency = m_nph->frequency();
+	m_rel_inc = 1000.0 / (m_sample_rate * m_rel_transition);//rel_transition in ms. compute how much increment in each frame
+
+	auto init_expression_step2 = [this](ExprFront * e) {
+		e->add_cyclic_vector("W1", m_W1->m_samples,m_W1->m_length, m_W1->m_interpolate);
+		e->add_cyclic_vector("W2", m_W2->m_samples,m_W2->m_length, m_W2->m_interpolate);
+		e->add_cyclic_vector("W3", m_W3->m_samples,m_W3->m_length, m_W3->m_interpolate);
+		e->add_variable("t", m_note_sample_sec);
+		e->add_variable("f", m_frequency);
+		e->add_variable("rel",m_released);
+		e->add_variable("trel",m_note_rel_sec);
+		e->setIntegrate(&m_note_sample,m_sample_rate);
+		e->compile();
+	};
+	init_expression_step2(m_exprO1);
+	init_expression_step2(m_exprO2);
+
+}
+
+ExprSynth::~ExprSynth()
+{
+	if (m_exprO1)
+	{
+		delete m_exprO1;
+	}
+	if (m_exprO2)
+	{
+		delete m_exprO2;
+	}
 }
 
 void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
@@ -556,6 +661,8 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 
 	expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
 	expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
+	LastSampleFunction<float> * last_func1 = &m_exprO1->getData()->m_last_func;
+	LastSampleFunction<float> * last_func2 = &m_exprO2->getData()->m_last_func;
 	if (is_released && m_note_rel_sample == 0)
 	{
 		m_note_rel_sample = m_note_sample;
@@ -570,6 +677,8 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 			}
 			o1 = o1_rawExpr->value();
 			o2 = o2_rawExpr->value();
+			last_func1->setLastSample(o1);
+			last_func2->setLastSample(o2);
 			buf[frame][0] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
 			buf[frame][1] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;
 			m_note_sample++;
@@ -583,9 +692,11 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 	}
 	else
 	{
+		
 		if (o2_valid)
 		{
 			o1_rawExpr = o2_rawExpr;
+			last_func1 = last_func2;
 			pn1 = pn2;
 		}
 		for (fpp_t frame = 0; frame < frames ; ++frame)
@@ -595,6 +706,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 				m_released = fmin(m_released+m_rel_inc, 1);
 			}
 			o1 = o1_rawExpr->value();
+			last_func1->setLastSample(o1);
 			buf[frame][0] = (-pn1 + 0.5) * o1;
 			buf[frame][1] = ( pn1 + 0.5) * o1;
 			m_note_sample++;

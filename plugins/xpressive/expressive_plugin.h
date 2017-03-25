@@ -26,14 +26,16 @@
 #ifndef EXPRESSIVE_PLUGIN_H
 #define EXPRESSIVE_PLUGIN_H
 
+#include <QPlainTextEdit>
+
+#include "Graph.h"
 #include "Instrument.h"
 #include "InstrumentView.h"
-#include "Graph.h"
 #include "Knob.h"
-#include <QPlainTextEdit>
-#include "PixmapButton.h"
 #include "LedCheckbox.h"
-#include "MemoryManager.h"
+#include "PixmapButton.h"
+
+#include "exprsynth.h"
 
 class oscillator;
 class expressiveView;
@@ -49,63 +51,7 @@ const int	NUM_EXPRS = 5;
 class ExprFront;
 class SubWindow;
 
-class WaveSample
-{
-public:
-	WaveSample(int length)
-	{
-		m_length = length;
-		m_samples = new float[m_length];
-		for(int i = 0 ; i < m_length ; ++i)
-			m_samples[i] = 0;
-	}
-	WaveSample(const graphModel * graph)
-	{
-		m_length = graph->length();
-		m_samples = new float[m_length];
-		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
-	}
-	inline void copyFrom(const graphModel * graph)
-	{
-		memcpy(m_samples, graph->samples(), m_length * sizeof(float));
-	}
-	~WaveSample()
-	{
-		delete [] m_samples;
-	}
-	inline void setInterpolate(bool _interpolate) { m_interpolate = _interpolate; }
-	float *m_samples;
-	int m_length;
-	bool m_interpolate;
-};
-class ExprSynth
-{
 
-	MM_OPERATORS
-public:
-	ExprSynth(const WaveSample* gW1, const WaveSample* gW2, const WaveSample* gW3, ExprFront* exprO1, ExprFront* exprO2, NotePlayHandle* nph,
-			const sample_rate_t sample_rate, const FloatModel* pan1, const FloatModel* pan2, float rel_trans);
-	virtual ~ExprSynth();
-
-	void renderOutput(fpp_t frames, sampleFrame* buf );
-
-
-private:
-	ExprFront *m_exprO1, *m_exprO2;
-	const WaveSample *m_W1, *m_W2, *m_W3;
-	unsigned int m_note_sample;
-	unsigned int m_note_rel_sample;
-	float m_note_sample_sec;
-	float m_note_rel_sec;
-	float m_frequency;
-	float m_released;
-	NotePlayHandle* m_nph;
-	const sample_rate_t m_sample_rate;
-	const FloatModel *m_pan1,*m_pan2;
-	float m_rel_transition;
-	float m_rel_inc;
-
-} ;
 
 class Expressive : public Instrument
 {
@@ -127,8 +73,37 @@ public:
 
 	virtual PluginView* instantiateView( QWidget * parent );
 
-protected:
+	graphModel& graphO1() { return m_graphO1; }
+	graphModel& graphO2() { return m_graphO2; }
+	graphModel& graphW1() { return m_graphW1; }
+	graphModel& graphW2() { return m_graphW2; }
+	graphModel& graphW3() { return m_graphW3; }
+	graphModel &rawgraphW1() { return m_rawgraphW1; }
+	graphModel& rawgraphW2() { return m_rawgraphW2; }
+	graphModel& rawgraphW3() { return m_rawgraphW3; }
+	IntModel& selectedGraph() { return m_selectedGraph; }
+	QByteArray& wavesExpression(int i) { return m_wavesExpression[i]; }
+	QByteArray& outputExpression(int i) { return m_outputExpression[i]; }
+
+	FloatModel& parameterA1() { return m_parameterA1; }
+	FloatModel& parameterA2() { return m_parameterA2; }
+	FloatModel& parameterA3() { return m_parameterA3; }
+	FloatModel& smoothW1() { return m_smoothW1; }
+	FloatModel& smoothW2() { return m_smoothW2; }
+	FloatModel& smoothW3() { return m_smoothW3; }
+	BoolModel& interpolateW1() { return m_interpolateW1; }
+	BoolModel& interpolateW2() { return m_interpolateW2; }
+	BoolModel& interpolateW3() { return m_interpolateW3; }
+	FloatModel& panning1() { return m_panning1; }
+	FloatModel& panning2() { return m_panning2; }
+	FloatModel& relTransition() { return m_relTransition; }
+	WaveSample& W1() { return m_W1; }
+	WaveSample& W2() { return m_W2; }
+	WaveSample& W3() { return m_W3; }
+	BoolModel& exprValid() { return m_exprValid; }
 	static void smooth(float smoothness,const graphModel* in,graphModel* out);
+protected:
+	
 protected slots:
 
 
@@ -159,36 +134,10 @@ private:
 	float m_A1,m_A2,m_A3;
 	WaveSample m_W1, m_W2, m_W3;
 
-
-	
 	BoolModel m_exprValid;
 	
-	friend class expressiveView;
 } ;
 
-class expressiveHelpView: public QTextEdit
-{
-	Q_OBJECT
-public:
-	static expressiveHelpView* getInstance()
-	{
-		if (!s_instance)
-		{
-			s_instance = new expressiveHelpView();
-		}
-		return s_instance;
-	}
-	static void finalize()
-	{
-		if (s_instance) { delete s_instance; }
-	}
-
-private:
-	expressiveHelpView();
-	static expressiveHelpView *s_instance;
-	static QString s_helpText;
-
-};
 
 class expressiveView : public InstrumentView
 {
@@ -250,6 +199,28 @@ private:
 	bool m_wave_expr;
 } ;
 
+class expressiveHelpView: public QTextEdit
+{
+	Q_OBJECT
+public:
+	static expressiveHelpView* getInstance()
+	{
+		if (!s_instance)
+		{
+			s_instance = new expressiveHelpView();
+		}
+		return s_instance;
+	}
+	static void finalize()
+	{
+		if (s_instance) { delete s_instance; }
+	}
 
+private:
+	expressiveHelpView();
+	static expressiveHelpView *s_instance;
+	static QString s_helpText;
+
+};
 
 #endif

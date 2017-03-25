@@ -1,0 +1,64 @@
+57,58c57,69
+< 
+< 
+---
+> #ifdef NDEBUG
+> #define xAssert(COND, STR) do{}while(0)
+> #else
+> #ifdef STRINGIFY
+> #undef STRINGIFY
+> #endif
+> #ifdef TOSTRING
+> #undef TOSTRING
+> #endif
+> #define STRINGIFY(x) #x
+> #define TOSTRING(x) STRINGIFY(x)
+> #define xAssert(COND, STR) do{if (!(COND)) {perror(__FILE__ ":" TOSTRING(__LINE__) ": " "exprtk exception: " STR);}}while(0)
+> #endif
+2731,2734c2742
+<             if (stride > 4)
+<             {
+<                throw std::invalid_argument("token_scanner() - Invalid stride value");
+<             }
+---
+>             xAssert(stride <= 4, "token_scanner() - Invalid stride value");
+2854,2857c2862
+<             if (stride > 5)
+<             {
+<                throw std::invalid_argument("token_inserter() - Invalid stride value");
+<             }
+---
+>             xAssert(stride <= 5, "token_inserter() - Invalid stride value");
+4207c4212
+< 
+---
+>    #ifndef exprtk_disable_return
+4212a4218
+>    #endif
+4261a4268
+>       #ifndef exprtk_disable_return
+4263a4271
+>       #endif
+11520a11529
+>       #ifndef exprtk_disable_return
+11620a11630
+>       #endif
+19515a19526
+>             #ifndef exprtk_disable_return
+19522a19534
+>             #endif
+19684c19696,19699
+<             throw std::invalid_argument("parser::get_error() - Invalid error index specificed");
+---
+>          {
+>             xAssert(false, "parser::get_error() - Invalid error index specificed");
+>             return parser_error::type();
+>          }
+24458a24474
+>          #ifndef exprtk_disable_return
+24462a24479
+>          #endif
+26457a26475
+>          #ifndef exprtk_disable_return
+26500a26519
+>          #endif
