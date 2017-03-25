@@ -29,7 +29,6 @@
 #include "EqFader.h"
 #include "interpolation.h"
 #include "lmms_math.h"
-#include "MainWindow.h"
 
 
 extern "C"
