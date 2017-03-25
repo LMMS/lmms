@@ -26,8 +26,8 @@
 
 #include <QtXml/QDomElement>
 
+#include "EqControlsDialog.h"
 #include "EqEffect.h"
-
 
 
 
@@ -147,6 +147,11 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_hpTypeModel.loadSettings( _this, "HP" );
 	m_analyseInModel.loadSettings( _this, "AnalyseIn" );
 	m_analyseOutModel.loadSettings( _this, "AnalyseOut" );
+}
+
+EffectControlDialog*EqControls::createView()
+{
+	return new EqControlsDialog( this );
 }
 
 
