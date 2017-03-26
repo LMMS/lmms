@@ -24,7 +24,7 @@
  */
 
 #include "Bitcrush.h"
-#include "embed.cpp"
+#include "embed.h"
 
 const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;

@@ -20,5 +20,8 @@ BUILD_PLUGIN(
 	MOCFILES 
 	ReverbSCControls.h 
 	ReverbSCControlDialog.h 
-	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
+	base.h
+	revsc.h
+	dcblock.h
+	EMBEDDED_RESOURCES artwork.png logo.png
 )

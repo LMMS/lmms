@@ -24,7 +24,7 @@
 
 #include "FlangerEffect.h"
 #include "Engine.h"
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -37,7 +37,7 @@ Plugin::Descriptor PLUGIN_EXPORT flanger_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;

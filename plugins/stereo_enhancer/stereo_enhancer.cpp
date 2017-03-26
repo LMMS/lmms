@@ -25,7 +25,7 @@
 
 #include "stereo_enhancer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereoenhancer_plugin_descriptor =
 	"Lou Herard <lherard/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;

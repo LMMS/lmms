@@ -32,6 +32,7 @@
 #include <QMenu>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
@@ -47,7 +48,7 @@
 #include "ToolTip.h"
 #include "FileDialog.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
