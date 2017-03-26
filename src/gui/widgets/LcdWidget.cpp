@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,11 +29,9 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QFontMetrics>
 #include <QStyleOptionFrameV2>
 
 #include "LcdWidget.h"
-#include "Engine.h"
 #include "embed.h"
 #include "gui_templates.h"
 #include "MainWindow.h"
@@ -44,7 +42,9 @@
 //! @todo: in C++11, we can use delegating ctors
 #define DEFAULT_LCDWIDGET_INITIALIZER_LIST \
 	QWidget( parent ), \
-	m_label()
+	m_label(), \
+	m_textColor( 255, 255, 255 ), \
+	m_textShadowColor( 64, 64, 64 )
 
 LcdWidget::LcdWidget( QWidget* parent, const QString& name ) :
 	DEFAULT_LCDWIDGET_INITIALIZER_LIST,
@@ -104,6 +104,32 @@ void LcdWidget::setValue( int value )
 	m_display = s;
 
 	update();
+}
+
+
+
+
+QColor LcdWidget::textColor() const
+{
+	return m_textColor;
+}
+
+void LcdWidget::setTextColor( const QColor & c )
+{
+	m_textColor = c;
+}
+
+
+
+
+QColor LcdWidget::textShadowColor() const
+{
+	return m_textShadowColor;
+}
+
+void LcdWidget::setTextShadowColor( const QColor & c )
+{
+	m_textShadowColor = c;
 }
 
 
@@ -182,11 +208,11 @@ void LcdWidget::paintEvent( QPaintEvent* )
 	if( !m_label.isEmpty() )
 	{
 		p.setFont( pointSizeF( p.font(), 6.5 ) );
-		p.setPen( QColor( 64, 64, 64 ) );
+		p.setPen( textShadowColor() );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2 + 1,
 						height(), m_label );
-		p.setPen( QColor( 255, 255, 255 ) );
+		p.setPen( textColor() );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2,
 						height() - 1, m_label );
@@ -197,18 +223,18 @@ void LcdWidget::paintEvent( QPaintEvent* )
 
 
 
-void LcdWidget::setLabel( const QString & _txt )
+void LcdWidget::setLabel( const QString& label )
 {
-	m_label = _txt;
+	m_label = label;
 	updateSize();
 }
 
 
 
 
-void LcdWidget::setMarginWidth( int _width )
+void LcdWidget::setMarginWidth( int width )
 {
-	m_marginWidth = _width;
+	m_marginWidth = width;
 
 	updateSize();
 }

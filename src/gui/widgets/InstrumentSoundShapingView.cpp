@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -76,7 +76,7 @@ InstrumentSoundShapingView::InstrumentSoundShapingView( QWidget * _parent ) :
 	{
 		m_envLfoViews[i] = new EnvelopeAndLfoView( m_targetsTabWidget );
 		m_targetsTabWidget->addTab( m_envLfoViews[i],
-						tr( __targetNames[i][0].toUtf8().constData() ) );
+						tr( InstrumentSoundShaping::targetNames[i][0].toUtf8().constData() ) );
 	}
 
 

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,8 @@
 #ifndef SONG_EDITOR_H
 #define SONG_EDITOR_H
 
+#include <QVector>
+
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -45,10 +47,10 @@ class TimeLineWidget;
 class positionLine : public QWidget
 {
 public:
-	positionLine( QWidget * _parent );
+	positionLine( QWidget * parent );
 
 private:
-	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void paintEvent( QPaintEvent * pe );
 
 } ;
 
@@ -63,43 +65,46 @@ public:
 		SelectMode
 	};
 
-	SongEditor( Song * _song );
+	SongEditor( Song * song );
 	~SongEditor();
 
 	void saveSettings( QDomDocument& doc, QDomElement& element );
 	void loadSettings( const QDomElement& element );
 
-public slots:
-	void scrolled( int _new_pos );
+	ComboBoxModel *zoomingModel() const;
 
-	void setEditMode(EditMode mode);
+public slots:
+	void scrolled( int new_pos );
+
+	void setEditMode( EditMode mode );
 	void setEditModeDraw();
 	void setEditModeSelect();
 
+	void updatePosition( const MidiTime & t );
+
 protected:
-	virtual void closeEvent( QCloseEvent * _ce );
+	virtual void closeEvent( QCloseEvent * ce );
 
 private slots:
 	void setHighQuality( bool );
 
-	void setMasterVolume( int _new_val );
+	void setMasterVolume( int new_val );
 	void showMasterVolumeFloat();
-	void updateMasterVolumeFloat( int _new_val );
+	void updateMasterVolumeFloat( int new_val );
 	void hideMasterVolumeFloat();
 
-	void setMasterPitch( int _new_val );
+	void setMasterPitch( int new_val );
 	void showMasterPitchFloat();
-	void updateMasterPitchFloat( int _new_val );
+	void updateMasterPitchFloat( int new_val );
 	void hideMasterPitchFloat();
 
-	void updateScrollBar( int );
-	void updatePosition( const MidiTime & _t );
+	void updateScrollBar(int len);
 
 	void zoomingChanged();
 
 private:
-	virtual void keyPressEvent( QKeyEvent * _ke );
-	virtual void wheelEvent( QWheelEvent * _we );
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
 
@@ -123,6 +128,8 @@ private:
 
 	ComboBoxModel* m_zoomingModel;
 
+	static const QVector<double> m_zoomLevels;
+
 	bool m_scrollBack;
 	bool m_smoothScroll;
 
@@ -132,11 +139,14 @@ private:
 
 } ;
 
+
+
+
 class SongEditorWindow : public Editor
 {
 	Q_OBJECT
 public:
-	SongEditorWindow(Song* song);
+	SongEditorWindow( Song* song );
 
 	QSize sizeHint() const;
 
@@ -149,6 +159,9 @@ protected slots:
 	void stop();
 
 	void adjustUiAfterProjectLoad();
+
+signals:
+	void playTriggered();
 
 private:
 	QAction* m_addBBTrackAction;

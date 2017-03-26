@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,7 @@ class TextFloat;
 
 enum knobTypes
 {
-	knobDark_28, knobBright_26, knobSmall_17, knobGreen_17, knobVintage_32, knobStyled
+	knobDark_28, knobBright_26, knobSmall_17, knobVintage_32, knobStyled
 } ;
 
 
@@ -65,6 +65,8 @@ class EXPORT Knob : public QWidget, public FloatModelView
 	mapPropertyFromModel(float,volumeRatio,setVolumeRatio,m_volumeRatio);
 
 	Q_PROPERTY(knobTypes knobNum READ knobNum WRITE setknobNum)
+	
+	Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
 
 	void initUi( const QString & _name ); //!< to be called by ctors
 	void onKnobNumUpdated(); //!< to be called when you updated @a m_knobNum
@@ -81,35 +83,38 @@ public:
 		setDescription( _txt_before );
 		setUnit( _txt_after );
 	}
-	void setLabel( const QString & _txt );
+	void setLabel( const QString & txt );
 
-	void setTotalAngle( float _angle );
+	void setTotalAngle( float angle );
 
 	// Begin styled knob accessors
 	float innerRadius() const;
-	void setInnerRadius( float _r );
+	void setInnerRadius( float r );
 
 	float outerRadius() const;
-	void setOuterRadius( float _r );
+	void setOuterRadius( float r );
 
 	knobTypes knobNum() const;
-	void setknobNum( knobTypes _k );
+	void setknobNum( knobTypes k );
 
 	QPointF centerPoint() const;
 	float centerPointX() const;
-	void setCenterPointX( float _c );
+	void setCenterPointX( float c );
 	float centerPointY() const;
-	void setCenterPointY( float _c );
+	void setCenterPointY( float c );
 
 	float lineWidth() const;
-	void setLineWidth( float _w );
+	void setLineWidth( float w );
 
 	QColor outerColor() const;
-	void setOuterColor( const QColor & _c );
+	void setOuterColor( const QColor & c );
 	QColor lineColor() const;
-	void setlineColor( const QColor & _c );
+	void setlineColor( const QColor & c );
 	QColor arcColor() const;
-	void setarcColor( const QColor & _c );
+	void setarcColor( const QColor & c );
+	
+	QColor textColor() const;
+	void setTextColor( const QColor & c );
 
 
 signals:
@@ -186,6 +191,8 @@ private:
 	QColor m_outerColor;
 	QColor m_lineColor; //!< unused yet
 	QColor m_arcColor; //!< unused yet
+	
+	QColor m_textColor;
 
 	knobTypes m_knobNum;
 

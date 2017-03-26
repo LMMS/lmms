@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Raine M. Ekman <raine/at/iki/fi>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,7 +24,6 @@
 
 // TODO:
 // - Better voice allocation: long releases get cut short :(
-// - .sbi (or similar) file loading into models
 // - RT safety = get rid of mutex = make emulator code thread-safe
 
 // - Extras:
@@ -33,13 +32,6 @@
 //   - Unison: 2,3,4, or 9 voices with configurable spread?
 //   - Portamento (needs mono mode?)
 //     - Pre-bend/post-bend in poly mode could use portamento speed?
-//   - SBI file import?
-
-// - Envelope times in ms for UI: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
-//   - attack 0.0, 0.23194, 0.46388, 0.92776, 1.85552, 3.71104, 7.42208, 14.84416,
-//           29.68832, 59.37664, 118.75328, 237.50656, 475.01312, 950.02624, 1900.05248, 3800.10496
-//   -decay/release 0.0, 1.2622, 2.5244, 5.0488, 10.0976, 20.1952, 40.3904, 80.7808, 161.5616,
-//                323.1232, 646.2464, 1292.4928, 2584.9856, 5169.9712, 10339.9424, 20679.8848
 
 #include "opl2instrument.h"
 #include "mididata.h"
@@ -48,6 +40,7 @@
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 
 #include <QDomDocument>
 #include <QFile>
@@ -141,9 +134,6 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	vib_depth_mdl(false, this, tr( "Vibrato Depth" )   ),
 	trem_depth_mdl(false, this, tr( "Tremolo Depth" )   )
 {
-	// Connect the plugin to the mixer...
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
 
 	// Create an emulator - samplerate, 16 bit, mono
 	emulatorMutex.lock();
@@ -220,11 +210,17 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	MOD_CON( fm_mdl );
 	MOD_CON( vib_depth_mdl );
 	MOD_CON( trem_depth_mdl );
+
+	// Connect the plugin to the mixer...
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	Engine::mixer()->addPlayHandle( iph );
 }
 
 opl2instrument::~opl2instrument() {
 	delete theEmulator;
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	delete [] renderbuffer;
 }
 
@@ -268,10 +264,10 @@ void opl2instrument::setVoiceVelocity(int voice, int vel) {
 // Pop least recently used voice
 int opl2instrument::popVoice() {
 	int tmp = voiceLRU[0];
-	for( int i=0; i<8; ++i) {
+	for( int i=0; i<OPL2_VOICES-1; ++i) {
 		voiceLRU[i] = voiceLRU[i+1];
 	}
-	voiceLRU[8] = OPL2_NO_VOICE;
+	voiceLRU[OPL2_VOICES-1] = OPL2_NO_VOICE;
 #ifdef false
 	printf("<-- %d %d %d %d %d %d %d %d %d \n", voiceLRU[0],voiceLRU[1],voiceLRU[2],
 	       voiceLRU[3],voiceLRU[4],voiceLRU[5],voiceLRU[6],voiceLRU[7],voiceLRU[8]);
@@ -281,8 +277,8 @@ int opl2instrument::popVoice() {
 // Push voice into first free slot
 int opl2instrument::pushVoice(int v) {
 	int i;
-	assert(voiceLRU[8]==OPL2_NO_VOICE);
-	for(i=8; i>0; --i) {
+	assert(voiceLRU[OPL2_VOICES-1]==OPL2_NO_VOICE);
+	for(i=OPL2_VOICES-1; i>0; --i) {
 		if( voiceLRU[i-1] != OPL2_NO_VOICE ) {
 			break;
 		}
@@ -493,7 +489,7 @@ void opl2instrument::loadSettings( const QDomElement & _this )
 // Load a patch into the emulator
 void opl2instrument::loadPatch(const unsigned char inst[14]) {
 	emulatorMutex.lock();
-	for(int v=0; v<9; ++v) {
+	for(int v=0; v<OPL2_VOICES; ++v) {
 		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
 		theEmulator->write(0x23+adlib_opadd[v],inst[1]); // op2
 		// theEmulator->write(0x40+adlib_opadd[v],inst[2]); // op1 KSL/Output Level - these are handled by noteon/aftertouch code
@@ -573,7 +569,7 @@ void opl2instrument::updatePatch() {
 			   (vib_depth_mdl.value() ? 64 : 0 ));
 
 	// have to do this, as the level knobs might've changed
-	for( int voice = 0; voice < 9 ; ++voice) {
+	for( int voice = 0; voice < OPL2_VOICES ; ++voice) {
 		if(voiceNote[voice] && OPL2_VOICE_FREE == 0) {
 			setVoiceVelocity(voice, velocities[voiceNote[voice]] );
 		}
@@ -685,12 +681,6 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
         InstrumentView( _instrument, _parent )
 {
-	/* Unnecessary?
-	   m_patch = new LcdSpinBox( 3, this , "PRESET");
-	   m_patch->setLabel( "PRESET" );
-	   m_patch->move( 100, 1 );
-	   m_patch->setEnabled( true );
-	*/
 
 #define KNOB_GEN(knobname, hinttext, hintunit,xpos,ypos) \
 	knobname = new Knob( knobStyled, this );\
@@ -770,7 +760,60 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
         setPalette( pal );
 }
 opl2instrumentView::~opl2instrumentView() {
-	// Nobody else seems to delete their knobs and buttons?
+	// Knobs are QWidgets and our children, so they're 
+	// destroyed automagically
+}
+
+// Returns text for time knob formatted nicely
+inline QString opl2instrumentView::knobHintHelper(float n) {
+	if(n>1000) {
+		return QString::number(n/1000, 'f', 0)+ " s";
+	} else if(n>10) {
+		return QString::number(n, 'f', 0)+ " ms";
+	} else {
+		return QString::number(n, 'f', 1)+ " ms";
+	}
+}
+
+void opl2instrumentView::updateKnobHints()
+{
+	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
+	// Here some rounding has been applied.
+	const float attack_times[16] = { 
+		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 
+		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
+		950.0, 1900.0, 3800.0 
+	};
+
+	const float dr_times[16] = { 
+		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 
+		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 
+		5200.0, 10000.0, 20000.0 
+	};
+	
+	const int fmultipliers[16] = {
+		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
+	};
+
+	opl2instrument * m = castModel<opl2instrument>();
+	
+
+	op1_a_kn->setHintText( tr( "Attack" ),
+						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
+	op2_a_kn->setHintText( tr( "Attack" ),
+						   " (" + knobHintHelper(attack_times[(int)m->op2_a_mdl.value()]) + ")");
+	op1_d_kn->setHintText( tr( "Decay" ),
+						   " (" + knobHintHelper(dr_times[(int)m->op1_d_mdl.value()]) + ")");
+	op2_d_kn->setHintText( tr( "Decay" ),
+						   " (" + knobHintHelper(dr_times[(int)m->op2_d_mdl.value()]) + ")");
+	op1_r_kn->setHintText( tr( "Release" ),
+						   " (" + knobHintHelper(dr_times[(int)m->op1_r_mdl.value()]) + ")");
+	op2_r_kn->setHintText( tr( "Release" ),
+						   " (" + knobHintHelper(dr_times[(int)m->op2_r_mdl.value()]) + ")");
+	op1_mul_kn->setHintText( tr( "Frequency multiplier" ),
+			       " (" + QString::number(fmultipliers[(int)m->op1_mul_mdl.value()]) + " semitones)");
+	op2_mul_kn->setHintText( tr( "Frequency multiplier" ),
+			       " (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
 }
 
 void opl2instrumentView::modelChanged()
@@ -790,10 +833,6 @@ void opl2instrumentView::modelChanged()
 	op1_perc_btn->setModel( &m->op1_perc_mdl );
 	op1_trem_btn->setModel( &m->op1_trem_mdl );
 	op1_vib_btn->setModel( &m->op1_vib_mdl );
-	/* op1_w0_btn->setModel( &m->op1_w0_mdl );
-	op1_w1_btn->setModel( &m->op1_w1_mdl );
-	op1_w2_btn->setModel( &m->op1_w2_mdl );
-	op1_w3_btn->setModel( &m->op1_w3_mdl ); */
 	op1_waveform->setModel( &m->op1_waveform_mdl );
 
 
@@ -808,15 +847,27 @@ void opl2instrumentView::modelChanged()
 	op2_perc_btn->setModel( &m->op2_perc_mdl );
 	op2_trem_btn->setModel( &m->op2_trem_mdl );
 	op2_vib_btn->setModel( &m->op2_vib_mdl );
-	/* op2_w0_btn->setModel( &m->op2_w0_mdl );
-	op2_w1_btn->setModel( &m->op2_w1_mdl );
-	op2_w2_btn->setModel( &m->op2_w2_mdl );
-	op2_w3_btn->setModel( &m->op2_w3_mdl ); */
 	op2_waveform->setModel( &m->op2_waveform_mdl );
 
 	fm_btn->setModel( &m->fm_mdl );
 	vib_depth_btn->setModel( &m->vib_depth_mdl );
 	trem_depth_btn->setModel( &m->trem_depth_mdl );
+
+
+	// All knobs needing a user friendly unit
+	connect( &m->op1_a_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_a_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+
+	connect( &m->op1_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+
+	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+
+	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+
+	updateKnobHints();
 
 }
 

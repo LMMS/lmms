@@ -1,9 +1,9 @@
 /*
- * audio_alsa.cpp - device-class which implements ALSA-PCM-output
+ * AudioAlsa.cpp - device-class which implements ALSA-PCM-output
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,8 @@
  *
  */
 
+#include <QComboBox>
 #include <QLineEdit>
-#include <QLabel>
 
 #include "AudioAlsa.h"
 
@@ -32,10 +32,8 @@
 #include "endian_handling.h"
 #include "ConfigManager.h"
 #include "Engine.h"
-#include "LcdSpinBox.h"
+#include "Mixer.h"
 #include "gui_templates.h"
-#include "templates.h"
-
 
 
 AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
@@ -49,6 +47,12 @@ AudioAlsa::AudioAlsa( bool & _success_ful, Mixer*  _mixer ) :
 	m_convertEndian( false )
 {
 	_success_ful = false;
+
+	if( setenv( "PULSE_ALSA_HOOK_CONF", "/dev/null", 0 ) )
+	{
+		fprintf( stderr,
+		"Could not avoid possible interception by PulseAudio\n" );
+	}
 
 	int err;
 
@@ -139,6 +143,59 @@ QString AudioAlsa::probeDevice()
 
 
 
+/**
+ * @brief Creates a list of all available devices.
+ *
+ * Uses the hints API of ALSA to collect all devices. This also includes plug
+ * devices. The reason to collect these and not the raw hardware devices
+ * (e.g. hw:0,0) is that hardware devices often have a very limited number of
+ * supported formats, etc. Plugs on the other hand are software components that
+ * map all types of formats and inputs to the hardware and therefore they are
+ * much more flexible and more what we want.
+ *
+ * Further helpful info http://jan.newmarch.name/LinuxSound/Sampled/Alsa/.
+ *
+ * @return A collection of devices found on the system.
+ */
+AudioAlsa::DeviceInfoCollection AudioAlsa::getAvailableDevices()
+{
+	DeviceInfoCollection deviceInfos;
+
+	char **hints;
+
+	/* Enumerate sound devices */
+	int err = snd_device_name_hint(-1, "pcm", (void***)&hints);
+	if (err != 0)
+	{
+		return deviceInfos;
+	}
+
+	char** n = hints;
+	while (*n != NULL)
+	{
+		char *name = snd_device_name_get_hint(*n, "NAME");
+		char *description = snd_device_name_get_hint(*n, "DESC");
+
+		if (name != 0 && description != 0)
+		{
+			deviceInfos.push_back(DeviceInfo(QString(name), QString(description)));
+		}
+
+		free(name);
+		free(description);
+
+		n++;
+	}
+
+	//Free the hint buffer
+	snd_device_name_free_hint((void**)hints);
+
+	return deviceInfos;
+}
+
+
+
+
 int AudioAlsa::handleError( int _err )
 {
 	if( _err == -EPIPE )
@@ -188,11 +245,7 @@ void AudioAlsa::startProcessing()
 
 void AudioAlsa::stopProcessing()
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 
@@ -491,52 +544,4 @@ int AudioAlsa::setSWParams()
 	return 0;	// all ok
 }
 
-
-
-
-
-AudioAlsa::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioAlsa::name(), _parent )
-{
-	m_device = new QLineEdit( AudioAlsa::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-
-	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
-	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
-	m->setStep( 2 );
-	m->setValue( ConfigManager::inst()->value( "audioalsa",
-							"channels" ).toInt() );
-
-	m_channels = new LcdSpinBox( 1, this );
-	m_channels->setModel( m );
-	m_channels->setLabel( tr( "CHANNELS" ) );
-	m_channels->move( 180, 20 );
-
-}
-
-
-
-
-AudioAlsa::setupWidget::~setupWidget()
-{
-	delete m_channels->model();
-}
-
-
-
-
-void AudioAlsa::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue( "audioalsa", "device",
-							m_device->text() );
-	ConfigManager::inst()->setValue( "audioalsa", "channels",
-				QString::number( m_channels->value<int>() ) );
-}
-
-
 #endif
-

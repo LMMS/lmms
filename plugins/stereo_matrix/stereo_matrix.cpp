@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,13 +34,13 @@ extern "C"
 Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"Stereophonic Matrix",
+	"Stereo Matrix",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Plugin for freely manipulating stereo output" ),
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader(),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -121,4 +121,3 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 }
 
 }
-

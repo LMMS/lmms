@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -97,6 +97,7 @@ static void activateTransient(LADSPA_Handle instance) {
 	medi_track = 0.1;
 	slow_track = 0.1;
 	count = 0;
+	sample_rate = sample_rate;
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_pos = buffer_pos;
 	plugin_data->count = count;
@@ -143,7 +144,7 @@ static void connectPortTransient(
 static LADSPA_Handle instantiateTransient(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Transient *plugin_data = (Transient *)malloc(sizeof(Transient));
+	Transient *plugin_data = (Transient *)calloc(1, sizeof(Transient));
 	float *buffer = NULL;
 	int buffer_pos;
 	long count;
@@ -369,14 +370,13 @@ static void runAddingTransient(LADSPA_Handle instance, unsigned long sample_coun
 	plugin_data->slow_buffer_sum = slow_buffer_sum;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -464,12 +464,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (transientDescriptor) {
 		free((LADSPA_PortDescriptor *)transientDescriptor->PortDescriptors);
 		free((char **)transientDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)transientDescriptor->PortRangeHints);
 		free(transientDescriptor);
 	}
+	transientDescriptor = NULL;
 
 }

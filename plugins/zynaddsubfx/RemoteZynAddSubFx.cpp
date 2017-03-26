@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,8 +44,13 @@
 class RemoteZynAddSubFx : public RemotePluginClient, public LocalZynAddSubFx
 {
 public:
+#ifdef SYNC_WITH_SHM_FIFO
 	RemoteZynAddSubFx( int _shm_in, int _shm_out ) :
 		RemotePluginClient( _shm_in, _shm_out ),
+#else
+	RemoteZynAddSubFx( const char * socketPath ) :
+		RemotePluginClient( socketPath ),
+#endif
 		LocalZynAddSubFx(),
 		m_guiSleepTime( 100 ),
 		m_guiExit( false )
@@ -261,7 +266,11 @@ void RemoteZynAddSubFx::guiThread()
 
 int main( int _argc, char * * _argv )
 {
+#ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 3 )
+#else
+	if( _argc < 2 )
+#endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
@@ -276,8 +285,12 @@ int main( int _argc, char * * _argv )
 #endif
 
 
+#ifdef SYNC_WITH_SHM_FIFO
 	RemoteZynAddSubFx * remoteZASF =
 		new RemoteZynAddSubFx( atoi( _argv[1] ), atoi( _argv[2] ) );
+#else
+	RemoteZynAddSubFx * remoteZASF = new RemoteZynAddSubFx( _argv[1] );
+#endif
 
 	remoteZASF->run();
 

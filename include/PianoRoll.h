@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 #ifndef PIANO_ROLL_H
 #define PIANO_ROLL_H
 
+#include <QVector>
 #include <QWidget>
 #include <QInputDialog>
 
@@ -53,10 +54,20 @@ class TimeLineWidget;
 class PianoRoll : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor barLineColor READ barLineColor WRITE setBarLineColor )
+	Q_PROPERTY( QColor beatLineColor READ beatLineColor WRITE setBeatLineColor )
+	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
+	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textColorLight READ textColorLight WRITE setTextColorLight )
+	Q_PROPERTY( QColor textShadow READ textShadow WRITE setTextShadow )
+	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
+	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
+	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
+	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
 public:
 	enum EditModes
 	{
@@ -68,6 +79,11 @@ public:
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
 	void reset();
+
+	// functions to display the hover-text labeling a note's volume/panning
+	void showTextFloat(const QString &text, const QPoint &pos, int timeout=-1);
+	void showVolTextFloat(volume_t vol, const QPoint &pos, int timeout=-1);
+	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentPattern( Pattern* newPattern );
 
@@ -94,16 +110,36 @@ public:
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
 	int quantization() const;
-	
-	// qproperty acces functions
-	QColor gridColor() const;
-	void setGridColor( const QColor & c );
+
+	// qproperty access functions
+	QColor barLineColor() const;
+	void setBarLineColor( const QColor & c );
+	QColor beatLineColor() const;
+	void setBeatLineColor( const QColor & c );
+	QColor lineColor() const;
+	void setLineColor( const QColor & c );
 	QColor noteModeColor() const;
 	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
 	void setNoteColor( const QColor & c );
 	QColor barColor() const;
 	void setBarColor( const QColor & c );
+	QColor selectedNoteColor() const;
+	void setSelectedNoteColor( const QColor & c );
+	QColor textColor() const;
+	void setTextColor( const QColor & c );
+	QColor textColorLight() const;
+	void setTextColorLight( const QColor & c );
+	QColor textShadow() const;
+	void setTextShadow( const QColor & c );
+	QColor markedSemitoneColor() const;
+	void setMarkedSemitoneColor( const QColor & c );
+	int noteOpacity() const;
+	void setNoteOpacity( const int i );
+	bool noteBorders() const;
+	void setNoteBorders( const bool b );
+	QColor backgroundShade() const;
+	void setBackgroundShade( const QColor & c );
 
 
 protected:
@@ -117,13 +153,17 @@ protected:
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void resizeEvent( QResizeEvent * re );
 	virtual void wheelEvent( QWheelEvent * we );
+	virtual void focusOutEvent( QFocusEvent * );
 
 	int getKey( int y ) const;
-	static inline void drawNoteRect( QPainter & p, int x, int y,
-					int  width, Note * n, const QColor & noteCol );
+	static void drawNoteRect( QPainter & p, int x, int y,
+					int  width, const Note * n, const QColor & noteCol,
+					const QColor & selCol, const int noteOpc, const bool borderless );
 	void removeSelection();
 	void selectAll();
-	void getSelectedNotes( NoteVector & selected_notes );
+	NoteVector getSelectedNotes();
+	void selectNotesOnKey();
+	int xCoordOfTick( int tick );
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -152,6 +192,7 @@ protected slots:
 
 	void zoomingChanged();
 	void quantizeChanged();
+	void quantizeNotes();
 
 	void updateSemiToneMarkerMenu();
 
@@ -191,8 +232,10 @@ private:
 	{
 		stmaUnmarkAll,
 		stmaMarkCurrentSemiTone,
+		stmaMarkAllOctaveSemiTones,
 		stmaMarkCurrentScale,
 		stmaMarkCurrentChord,
+		stmaCopyAllNotesOnKey
 	};
 
 	enum PianoRollKeyTypes
@@ -224,12 +267,14 @@ private:
 	void testPlayKey( int _key, int _vol, int _pan );
 	void pauseTestNotes(bool pause = true );
 
-	inline int noteEditTop() const;
-	inline int keyAreaBottom() const;
-	inline int noteEditBottom() const;
-	inline int keyAreaTop() const;
-	inline int noteEditRight() const;
-	inline int noteEditLeft() const;
+	QList<int> getAllOctavesForKey( int keyToMirror ) const;
+
+	int noteEditTop() const;
+	int keyAreaBottom() const;
+	int noteEditBottom() const;
+	int keyAreaTop() const;
+	int noteEditRight() const;
+	int noteEditLeft() const;
 
 	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
 
@@ -258,6 +303,7 @@ private:
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
 
+	static const QVector<double> m_zoomLevels;
 
 	Pattern* m_pattern;
 	QScrollBar * m_leftRightScroll;
@@ -312,15 +358,14 @@ private:
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 
-	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
 	bool m_scrollBack;
 
-	void copy_to_clipboard(const NoteVector & notes ) const;
+	void copyToClipboard(const NoteVector & notes ) const;
 
-	void drawDetuningInfo( QPainter & _p, Note * _n, int _x, int _y );
+	void drawDetuningInfo( QPainter & _p, const Note * _n, int _x, int _y ) const;
 	bool mouseOverNote();
 	Note * noteUnderMouse();
 
@@ -331,19 +376,29 @@ private:
 	// did we start a mouseclick with shift pressed
 	bool m_startedWithShift;
 
-	friend class Engine;
 	friend class PianoRollWindow;
 
 	// qproperty fields
-	QColor m_gridColor;
+	QColor m_barLineColor;
+	QColor m_beatLineColor;
+	QColor m_lineColor;
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_barColor;
+	QColor m_selectedNoteColor;
+	QColor m_textColor;
+	QColor m_textColorLight;
+	QColor m_textShadow;
+	QColor m_markedSemitoneColor;
+	int m_noteOpacity;
+	bool m_noteBorders;
+	QColor m_backgroundShade;
 
 signals:
 	void positionChanged( const MidiTime & );
-
 } ;
+
+
 
 
 class PianoRollWindow : public Editor, SerializingObject
@@ -383,7 +438,13 @@ public:
 signals:
 	void currentPatternChanged();
 
+
+private slots:
+	void patternRenamed();
+
 private:
+	void focusInEvent(QFocusEvent * event);
+
 	PianoRoll* m_editor;
 
 	ComboBox * m_zoomingComboBox;
@@ -396,4 +457,3 @@ private:
 
 
 #endif
-

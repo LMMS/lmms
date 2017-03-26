@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPalette>
 #include <QWhatsThis>
 
 #ifndef __USE_XOPEN
@@ -41,16 +40,13 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
-
 
 TextFloat * Knob::s_textFloat = NULL;
 
@@ -65,7 +61,9 @@ TextFloat * Knob::s_textFloat = NULL;
 	m_volumeKnob( false ), \
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
 	m_buttonPressed( false ), \
-	m_angle( -10 )
+	m_angle( -10 ), \
+	m_lineWidth( 0 ), \
+	m_textColor( 255, 255, 255 )
 
 Knob::Knob( knobTypes _knob_num, QWidget * _parent, const QString & _name ) :
 	DEFAULT_KNOB_INITIALIZER_LIST,
@@ -100,6 +98,28 @@ void Knob::initUi( const QString & _name )
 	setInnerRadius( 1.0f );
 	setOuterRadius( 10.0f );
 	setFocusPolicy( Qt::ClickFocus );
+
+	// This is a workaround to enable style sheets for knobs which are not styled knobs.
+	//
+	// It works as follows: the palette colors that are assigned as the line color previously
+	// had been hard coded in the drawKnob method for the different knob types. Now the
+	// drawKnob method uses the line color to draw the lines. By assigning the palette colors
+	// as the line colors here the knob lines will be drawn in this color unless the stylesheet
+	// overrides that color.
+	switch (knobNum())
+	{
+	case knobSmall_17:
+	case knobBright_26:
+	case knobDark_28:
+		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::WindowText ));
+		break;
+	case knobVintage_32:
+		setlineColor(QApplication::palette().color( QPalette::Active, QPalette::Shadow ));
+		break;
+	default:
+		break;
+	}
+
 	doConnections();
 }
 
@@ -110,8 +130,27 @@ void Knob::onKnobNumUpdated()
 {
 	if( m_knobNum != knobStyled )
 	{
-		m_knobPixmap = new QPixmap( embed::getIconPixmap( QString( "knob0" +
-			QString::number( m_knobNum + 1 ) ).toUtf8().constData() ) );
+		QString knobFilename;
+		switch (m_knobNum)
+		{
+		case knobDark_28:
+			knobFilename = "knob01";
+			break;
+		case knobBright_26:
+			knobFilename = "knob02";
+			break;
+		case knobSmall_17:
+			knobFilename = "knob03";
+			break;
+		case knobVintage_32:
+			knobFilename = "knob05";
+			break;
+		case knobStyled: // only here to stop the compiler from complaining
+			break;
+		}
+
+		// If knobFilename is still empty here we should get the fallback pixmap of size 1x1
+		m_knobPixmap = new QPixmap( embed::getIconPixmap( knobFilename.toUtf8().constData() ) );
 
 		setFixedSize( m_knobPixmap->width(), m_knobPixmap->height() );
 	}
@@ -131,9 +170,9 @@ Knob::~Knob()
 
 
 
-void Knob::setLabel( const QString & _txt )
+void Knob::setLabel( const QString & txt )
 {
-	m_label = _txt;
+	m_label = txt;
 	if( m_knobPixmap )
 	{
 		setFixedSize( qMax<int>( m_knobPixmap->width(),
@@ -146,15 +185,15 @@ void Knob::setLabel( const QString & _txt )
 
 
 
-void Knob::setTotalAngle( float _angle )
+void Knob::setTotalAngle( float angle )
 {
-	if( _angle < 10.0 )
+	if( angle < 10.0 )
 	{
 		m_totalAngle = 10.0;
 	}
 	else
 	{
-		m_totalAngle = _angle;
+		m_totalAngle = angle;
 	}
 
 	update();
@@ -170,9 +209,9 @@ float Knob::innerRadius() const
 
 
 
-void Knob::setInnerRadius( float _r )
+void Knob::setInnerRadius( float r )
 {
-	m_innerRadius = _r;
+	m_innerRadius = r;
 }
 
 
@@ -184,9 +223,9 @@ float Knob::outerRadius() const
 
 
 
-void Knob::setOuterRadius( float _r )
+void Knob::setOuterRadius( float r )
 {
-	m_outerRadius = _r;
+	m_outerRadius = r;
 }
 
 
@@ -200,11 +239,11 @@ knobTypes Knob::knobNum() const
 
 
 
-void Knob::setknobNum( knobTypes _k )
+void Knob::setknobNum( knobTypes k )
 {
-	if( m_knobNum != _k )
+	if( m_knobNum != k )
 	{
-		m_knobNum = _k;
+		m_knobNum = k;
 		onKnobNumUpdated();
 	}
 }
@@ -226,9 +265,9 @@ float Knob::centerPointX() const
 
 
 
-void Knob::setCenterPointX( float _c )
+void Knob::setCenterPointX( float c )
 {
-	m_centerPoint.setX( _c );
+	m_centerPoint.setX( c );
 }
 
 
@@ -240,9 +279,9 @@ float Knob::centerPointY() const
 
 
 
-void Knob::setCenterPointY( float _c )
+void Knob::setCenterPointY( float c )
 {
-	m_centerPoint.setY( _c );
+	m_centerPoint.setY( c );
 }
 
 
@@ -254,9 +293,9 @@ float Knob::lineWidth() const
 
 
 
-void Knob::setLineWidth( float _w )
+void Knob::setLineWidth( float w )
 {
-	m_lineWidth = _w;
+	m_lineWidth = w;
 }
 
 
@@ -268,9 +307,9 @@ QColor Knob::outerColor() const
 
 
 
-void Knob::setOuterColor( const QColor & _c )
+void Knob::setOuterColor( const QColor & c )
 {
-	m_outerColor = _c;
+	m_outerColor = c;
 }
 
 
@@ -282,9 +321,9 @@ QColor Knob::lineColor() const
 
 
 
-void Knob::setlineColor( const QColor & _c )
+void Knob::setlineColor( const QColor & c )
 {
-	m_lineColor = _c;
+	m_lineColor = c;
 }
 
 
@@ -296,11 +335,25 @@ QColor Knob::arcColor() const
 
 
 
-void Knob::setarcColor( const QColor & _c )
+void Knob::setarcColor( const QColor & c )
 {
-	m_arcColor = _c;
+	m_arcColor = c;
 }
 
+
+
+
+QColor Knob::textColor() const
+{
+	return m_textColor;
+}
+
+
+
+void Knob::setTextColor( const QColor & c )
+{
+	m_textColor = c;
+}
 
 
 
@@ -408,20 +461,19 @@ void Knob::drawKnob( QPainter * _p )
 	{
 		case knobSmall_17:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2 ) );
 			break;
 		}
 		case knobBright_26:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-5 ) );
 			break;
 		}
 		case knobDark_28:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active, QPalette::WindowText ), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			const float rb = qMax<float>( ( radius - 10 ) / 3.0,
 									0.0 );
 			const float re = qMax<float>( ( radius - 4 ), 0.0 );
@@ -430,17 +482,9 @@ void Knob::drawKnob( QPainter * _p )
 			p.drawLine( ln );
 			break;
 		}
-		case knobGreen_17:
-		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::BrightText), 2 ) );
-			p.drawLine( calculateLine( mid, radius ) );
-			break;
-		}
 		case knobVintage_32:
 		{
-			p.setPen( QPen( QApplication::palette().color( QPalette::Active,
-							QPalette::Shadow), 2 ) );
+			p.setPen( QPen( lineColor(), 2 ) );
 			p.drawLine( calculateLine( mid, radius-2, 2 ) );
 			break;
 		}
@@ -496,6 +540,7 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 void Knob::toggleScale()
 {
 	model()->setScaleLogarithmic( ! model()->isScaleLogarithmic() );
+	update();
 }
 
 
@@ -646,7 +691,7 @@ void Knob::paintEvent( QPaintEvent * _me )
 		p.drawText( width() / 2 -
 			p.fontMetrics().width( m_label ) / 2 + 1,
 				height() - 1, m_label );*/
-		p.setPen( QColor( 255, 255, 255 ) );
+		p.setPen( textColor() );
 		p.drawText( width() / 2 -
 				p.fontMetrics().width( m_label ) / 2,
 				height() - 2, m_label );
@@ -680,6 +725,7 @@ void Knob::setPosition( const QPoint & _p )
 	const float oldValue = model()->value();
 
 
+
 	if( model()->isScaleLogarithmic() ) // logarithmic code
 	{
 		const float pos = model()->minValue() < 0
@@ -689,7 +735,8 @@ void Knob::setPosition( const QPoint & _p )
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
-			model()->setValue( oldValue - newValue );
+			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - newValue ) / step + 0.5 ) ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -698,12 +745,12 @@ void Knob::setPosition( const QPoint & _p )
 		}
 	}
 
-
 	else // linear code
 	{
 		if( qAbs( value ) >= step )
 		{
-			model()->setValue( oldValue - value );
+			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - value ) / step + 0.5 ) ) * step;
+			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
 		else
@@ -720,22 +767,23 @@ void Knob::enterValue()
 {
 	bool ok;
 	float new_val;
+
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
 			this, windowTitle(),
 			tr( "Please enter a new value between "
-					"-96.0 dBV and 6.0 dBV:" ),
-				20.0 * log10( model()->value() / 100.0 ),
-							-96.0, 6.0, 4, &ok );
+					"-96.0 dBFS and 6.0 dBFS:" ),
+				20.0 * log10( model()->getRoundedValue() / 100.0 ),
+							-96.0, 6.0, model()->getDigitCount(), &ok );
 		if( new_val <= -96.0 )
 		{
 			new_val = 0.0f;
 		}
 		else
 		{
-			new_val = dbvToAmp( new_val ) * 100.0;
+			new_val = dbfsToAmp( new_val ) * 100.0;
 		}
 	}
 	else
@@ -746,9 +794,9 @@ void Knob::enterValue()
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
 						arg( model()->maxValue() ),
-					model()->value(),
+					model()->getRoundedValue(),
 					model()->minValue(),
-					model()->maxValue(), 4, &ok );
+					model()->maxValue(), model()->getDigitCount(), &ok );
 	}
 
 	if( ok )
@@ -776,14 +824,14 @@ void Knob::friendlyUpdate()
 QString Knob::displayValue() const
 {
 	if( isVolumeKnob() &&
-		ConfigManager::inst()->value( "app", "displaydbv" ).toInt() )
+		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
-		return m_description.trimmed() + QString( " %1 dBV" ).
-				arg( 20.0 * log10( model()->value() / volumeRatio() ),
+		return m_description.trimmed() + QString( " %1 dBFS" ).
+				arg( 20.0 * log10( model()->getRoundedValue() / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).
-					arg( model()->value() ) + m_unit;
+					arg( model()->getRoundedValue() ) + m_unit;
 }
 
 
@@ -809,9 +857,3 @@ void Knob::displayHelp()
 	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
 								whatsThis() );
 }
-
-
-
-
-
-

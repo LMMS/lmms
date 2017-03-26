@@ -19,11 +19,13 @@
 
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
-int bIsFirstTime = 1;
-void __attribute__((constructor)) swh_init(); // forward declaration
+int bIsFirstTime = 1; 
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
-#define _WINDOWS_DLL_EXPORT_
+#define _WINDOWS_DLL_EXPORT_ 
 #endif
+
+#line 10 "allpass_1895.xml"
 
 #include "ladspa-util.h"
 
@@ -153,18 +155,19 @@ static void activateAllpass_n(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 56 "allpass_1895.xml"
 	unsigned int minsize, size;
-
+    
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
 	  minsize = sample_rate * *plugin_data->max_delay;
 	else if (plugin_data->delay_time)
 	  minsize = sample_rate * *plugin_data->delay_time;
 	else
 	  minsize = sample_rate; /* 1 second default */
-
+    
 	size = 1;
 	while (size < minsize) size <<= 1;
-
+    
 	/* calloc sets the buffer to zero. */
 	buffer = calloc(size, sizeof(LADSPA_Data));
 	if (buffer)
@@ -184,6 +187,7 @@ static void activateAllpass_n(LADSPA_Handle instance) {
 }
 
 static void cleanupAllpass_n(LADSPA_Handle instance) {
+#line 78 "allpass_1895.xml"
 	Allpass_n *plugin_data = (Allpass_n *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -218,17 +222,26 @@ static void connectPortAllpass_n(
 static LADSPA_Handle instantiateAllpass_n(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Allpass_n *plugin_data = (Allpass_n *)malloc(sizeof(Allpass_n));
+	Allpass_n *plugin_data = (Allpass_n *)calloc(1, sizeof(Allpass_n));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data feedback = 0;
-	LADSPA_Data last_decay_time = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data feedback;
+	LADSPA_Data last_decay_time;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 44 "allpass_1895.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	feedback = 0;
+	last_decay_time = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -276,7 +289,8 @@ static void runAllpass_n(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 82 "allpass_1895.xml"
+	int i;
 
 	ignore(max_delay);
 
@@ -286,7 +300,7 @@ static void runAllpass_n(LADSPA_Handle instance, unsigned long sample_count) {
 	  plugin_data->delay_samples = delay_samples = CALC_DELAY (delay_time);
 	  plugin_data->feedback = feedback = calc_feedback (delay_time, decay_time);
 	}
-
+	
 	if (delay_time == last_delay_time) {
 	  long read_phase = write_phase - (long)delay_samples;
 	  LADSPA_Data *readptr = buffer + (read_phase & buffer_mask);
@@ -417,7 +431,8 @@ static void runAddingAllpass_n(LADSPA_Handle instance, unsigned long sample_coun
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 82 "allpass_1895.xml"
+	int i;
 
 	ignore(max_delay);
 
@@ -530,6 +545,7 @@ static void activateAllpass_l(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 56 "allpass_1895.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -561,6 +577,7 @@ static void activateAllpass_l(LADSPA_Handle instance) {
 }
 
 static void cleanupAllpass_l(LADSPA_Handle instance) {
+#line 78 "allpass_1895.xml"
 	Allpass_l *plugin_data = (Allpass_l *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -595,17 +612,26 @@ static void connectPortAllpass_l(
 static LADSPA_Handle instantiateAllpass_l(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Allpass_l *plugin_data = (Allpass_l *)malloc(sizeof(Allpass_l));
+	Allpass_l *plugin_data = (Allpass_l *)calloc(1, sizeof(Allpass_l));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data feedback = 0;
-	LADSPA_Data last_decay_time = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data feedback;
+	LADSPA_Data last_decay_time;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 44 "allpass_1895.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	feedback = 0;
+	last_decay_time = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -636,6 +662,9 @@ static void runAllpass_l(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -650,7 +679,10 @@ static void runAllpass_l(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 82 "allpass_1895.xml"
+	int i;
+
+	ignore(max_delay);
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -729,6 +761,9 @@ static void runAddingAllpass_l(LADSPA_Handle instance, unsigned long sample_coun
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -743,7 +778,10 @@ static void runAddingAllpass_l(LADSPA_Handle instance, unsigned long sample_coun
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 82 "allpass_1895.xml"
+	int i;
+
+	ignore(max_delay);
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -811,6 +849,7 @@ static void activateAllpass_c(LADSPA_Handle instance) {
 	LADSPA_Data last_delay_time = plugin_data->last_delay_time;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
+#line 56 "allpass_1895.xml"
 	unsigned int minsize, size;
     
 	if (plugin_data->max_delay && *plugin_data->max_delay > 0)
@@ -842,6 +881,7 @@ static void activateAllpass_c(LADSPA_Handle instance) {
 }
 
 static void cleanupAllpass_c(LADSPA_Handle instance) {
+#line 78 "allpass_1895.xml"
 	Allpass_c *plugin_data = (Allpass_c *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -876,17 +916,26 @@ static void connectPortAllpass_c(
 static LADSPA_Handle instantiateAllpass_c(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Allpass_c *plugin_data = (Allpass_c *)malloc(sizeof(Allpass_c));
+	Allpass_c *plugin_data = (Allpass_c *)calloc(1, sizeof(Allpass_c));
 	LADSPA_Data *buffer = NULL;
-	unsigned int buffer_mask = 0;
-	LADSPA_Data delay_samples = 0;
-	LADSPA_Data feedback = 0;
-	LADSPA_Data last_decay_time = 0;
-	LADSPA_Data last_delay_time = 0;
-	unsigned int sample_rate = 0;
-	long write_phase = 0;
+	unsigned int buffer_mask;
+	LADSPA_Data delay_samples;
+	LADSPA_Data feedback;
+	LADSPA_Data last_decay_time;
+	LADSPA_Data last_delay_time;
+	unsigned int sample_rate;
+	long write_phase;
 
+#line 44 "allpass_1895.xml"
 	sample_rate = s_rate;
+
+	// Uninitialized variables
+	buffer_mask = 0;
+	delay_samples = 0;
+	feedback = 0;
+	last_decay_time = 0;
+	last_delay_time = 0;
+	write_phase = 0;
 
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_mask = buffer_mask;
@@ -917,6 +966,9 @@ static void runAllpass_c(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -931,7 +983,10 @@ static void runAllpass_c(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 82 "allpass_1895.xml"
+	int i;
+
+	ignore(max_delay);
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -1013,6 +1068,9 @@ static void runAddingAllpass_c(LADSPA_Handle instance, unsigned long sample_coun
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const out = plugin_data->out;
 
+	/* Max Delay (s) (float value) */
+	const LADSPA_Data max_delay = *(plugin_data->max_delay);
+
 	/* Delay Time (s) (float value) */
 	const LADSPA_Data delay_time = *(plugin_data->delay_time);
 
@@ -1027,7 +1085,10 @@ static void runAddingAllpass_c(LADSPA_Handle instance, unsigned long sample_coun
 	unsigned int sample_rate = plugin_data->sample_rate;
 	long write_phase = plugin_data->write_phase;
 
-	unsigned int i;
+#line 82 "allpass_1895.xml"
+	int i;
+
+	ignore(max_delay);
 
 	if (write_phase == 0) {
 	  plugin_data->last_delay_time = delay_time;
@@ -1088,14 +1149,13 @@ static void runAddingAllpass_c(LADSPA_Handle instance, unsigned long sample_coun
 	plugin_data->write_phase = write_phase;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -1346,24 +1406,27 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (allpass_nDescriptor) {
 		free((LADSPA_PortDescriptor *)allpass_nDescriptor->PortDescriptors);
 		free((char **)allpass_nDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)allpass_nDescriptor->PortRangeHints);
 		free(allpass_nDescriptor);
 	}
+	allpass_nDescriptor = NULL;
 	if (allpass_lDescriptor) {
 		free((LADSPA_PortDescriptor *)allpass_lDescriptor->PortDescriptors);
 		free((char **)allpass_lDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)allpass_lDescriptor->PortRangeHints);
 		free(allpass_lDescriptor);
 	}
+	allpass_lDescriptor = NULL;
 	if (allpass_cDescriptor) {
 		free((LADSPA_PortDescriptor *)allpass_cDescriptor->PortDescriptors);
 		free((char **)allpass_cDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)allpass_cDescriptor->PortRangeHints);
 		free(allpass_cDescriptor);
 	}
+	allpass_cDescriptor = NULL;
 
 }

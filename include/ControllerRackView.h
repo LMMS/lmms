@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,8 +34,10 @@
 
 class QPushButton;
 class QScrollArea;
+class QVBoxLayout;
 
 class ControllerView;
+class Controller;
 
 
 class ControllerRackView : public QWidget, public SerializingObject
@@ -56,12 +58,13 @@ public:
 
 public slots:
 	void deleteController( ControllerView * _view );
+	void onControllerAdded( Controller * );
+	void onControllerRemoved( Controller * );
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 
 private slots:
-	virtual void update();
 	void addController();
 
 
@@ -69,8 +72,12 @@ private:
 	QVector<ControllerView *> m_controllerViews;
 
 	QScrollArea * m_scrollArea;
+	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
 
+	// Stores the index of where to insert the next ControllerView.
+	// Needed so that the StretchItem always stays at the last position.
+	int m_nextIndex;
 } ;
 
 #endif

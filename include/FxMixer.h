@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@
 #define FX_MIXER_H
 
 #include "Model.h"
-#include "Mixer.h"
 #include "EffectChain.h"
 #include "JournallingObject.h"
 #include "ThreadableJob.h"
@@ -194,11 +193,6 @@ public:
 		return m_fxChannels.size();
 	}
 
-	inline QVector<FxChannel *> fxChannels() const
-	{
-		return m_fxChannels;
-	}
-
 	FxRouteVector m_fxRoutes;
 
 private:
@@ -207,12 +201,8 @@ private:
 
 	// make sure we have at least num channels
 	void allocateChannelsTo(int num);
-	QMutex m_sendsMutex;
 
 	int m_lastSoloed;
-
-	friend class MixerWorkerThread;
-	friend class FxMixerView;
 
 } ;
 

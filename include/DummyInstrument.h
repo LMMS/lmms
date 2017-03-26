@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,6 +28,11 @@
 
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "Engine.h"
+
+#include <string.h>
+
+#include "Mixer.h"
 
 
 class DummyInstrument : public Instrument
@@ -42,8 +47,10 @@ public:
 	{
 	}
 
-	virtual void playNote( NotePlayHandle *, sampleFrame * )
+	virtual void playNote( NotePlayHandle *, sampleFrame * buffer )
 	{
+		memset( buffer, 0, sizeof( sampleFrame ) *
+			Engine::mixer()->framesPerPeriod() );
 	}
 
 	virtual void saveSettings( QDomDocument &, QDomElement & )

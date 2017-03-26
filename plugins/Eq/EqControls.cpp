@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,8 +22,10 @@
  *
  */
 
-#include <QtXml/QDomElement>
 #include "EqControls.h"
+
+#include <QtXml/QDomElement>
+
 #include "EqEffect.h"
 
 
@@ -34,13 +36,13 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_effect( effect ),
 	m_inGainModel( 0.0, -60.0, 20.0, 0.01, this, tr( "Input gain") ),
 	m_outGainModel( -.0, -60.0, 20.0, 0.01, this, tr( "Output gain" ) ),
-	m_lowShelfGainModel(  0.0 , -40, 40, 0.001, this, tr( "Low shelf gain" ) ),
-	m_para1GainModel(  0.0 , -40, 40, 0.001, this, tr( "Peak 1 gain" ) ),
-	m_para2GainModel(  0.0 , -40, 40, 0.001, this, tr( "Peak 2 gain" ) ),
-	m_para3GainModel(   0.0 , -40, 40, 0.001, this, tr( "Peak 3 gain" ) ),
-	m_para4GainModel(   0.0 , -40, 40, 0.001, this, tr( "Peak 4 gain" ) ),
-	m_highShelfGainModel(  0.0 , -40, 40, 0.001, this, tr( "High Shelf gain" ) ),
-	m_hpResModel( 0.707,0.003, 10.0 , 0.001, this, tr( "HP res" )  ),
+	m_lowShelfGainModel(  0.0 , -18, 18, 0.001, this, tr( "Low shelf gain" ) ),
+	m_para1GainModel( 0.0 , -18, 18, 0.001, this, tr( "Peak 1 gain" ) ),
+	m_para2GainModel( 0.0 , -18, 18, 0.001, this, tr( "Peak 2 gain" ) ),
+	m_para3GainModel( 0.0 , -18, 18, 0.001, this, tr( "Peak 3 gain" ) ),
+	m_para4GainModel( 0.0 , -18, 18, 0.001, this, tr( "Peak 4 gain" ) ),
+	m_highShelfGainModel( 0.0 , -18, 18, 0.001, this, tr( "High Shelf gain" ) ),
+	m_hpResModel( 0.707,0.003, 10.0 , 0.001, this, tr( "HP res" ) ),
 	m_lowShelfResModel( 1.4,0.55, 10.0 , 0.001, this , tr( "Low Shelf res" ) ),
 	m_para1BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 1 BW" ) ),
 	m_para2BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 2 BW" ) ),
@@ -48,17 +50,17 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_para4BwModel( 0.3, 0.1, 4 , 0.001, this , tr( "Peak 4 BW" ) ),
 	m_highShelfResModel( 1.4, 0.55, 10.0 , 0.001, this , tr( "High Shelf res" ) ),
 	m_lpResModel( 0.707,0.003, 10.0 , 0.001, this , tr( "LP res" ) ),
-	m_hpFeqModel( 31.0, 30.0, 20000, 0.001, this , tr( "HP freq" ) ),
-	m_lowShelfFreqModel( 80.0, 25.0, 20000, 0.001, this , tr( "Low Shelf freq" ) ),
-	m_para1FreqModel( 120.0, 27.0, 20000, 0.001, this , tr( "Peak 1 freq" ) ),
-	m_para2FreqModel( 250.0, 27.0, 20000, 0.001, this, tr( "Peak 2 freq" )  ),
-	m_para3FreqModel( 2000.0, 27.0, 20000, 0.001, this , tr( "Peak 3 freq" ) ),
-	m_para4FreqModel( 4000.0, 27.0, 20000, 0.001, this , tr( "Peak 4 freq" ) ),
-	m_highShelfFreqModel( 12000.0, 27.0, 20000, 0.001, this , tr( "High shelf freq" ) ),
-	m_lpFreqModel( 18000.0, 27.0, 20000, 0.001, this , tr( "LP freq" ) ),
+	m_hpFeqModel( 31.0, 20.0, 20000, 0.001, this , tr( "HP freq" ) ),
+	m_lowShelfFreqModel( 80.0, 20.0, 20000, 0.001, this , tr( "Low Shelf freq" ) ),
+	m_para1FreqModel( 120.0, 20.0, 20000, 0.001, this , tr( "Peak 1 freq" ) ),
+	m_para2FreqModel( 250.0, 20.0, 20000, 0.001, this, tr( "Peak 2 freq" )  ),
+	m_para3FreqModel( 2000.0, 20.0, 20000, 0.001, this , tr( "Peak 3 freq" ) ),
+	m_para4FreqModel( 4000.0, 20.0, 20000, 0.001, this , tr( "Peak 4 freq" ) ),
+	m_highShelfFreqModel( 12000.0, 20.0, 20000, 0.001, this , tr( "High shelf freq" ) ),
+	m_lpFreqModel( 18000.0, 20.0, 20000, 0.001, this , tr( "LP freq" ) ),
 	m_hpActiveModel( false, this , tr( "HP active" ) ),
 	m_lowShelfActiveModel( false, this , tr( "Low shelf active" ) ),
-	m_para1ActiveModel(false, this , tr( "Peak 1 active" ) ),
+	m_para1ActiveModel( false, this , tr( "Peak 1 active" ) ),
 	m_para2ActiveModel( false, this , tr( "Peak 2 active" ) ),
 	m_para3ActiveModel( false, this , tr( "Peak 3 active" ) ),
 	m_para4ActiveModel( false, this , tr( "Peak 4 active" ) ),
@@ -70,8 +72,10 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_hp12Model( false, this , tr( "HP 12" ) ),
 	m_hp24Model( false, this , tr( "HP 24" ) ),
 	m_hp48Model( false, this , tr( "HP 48" ) ),
-	m_lpTypeModel( 0,0,2,this, tr( "low pass type") ) ,
-	m_hpTypeModel( 0,0,2,this, tr( "high pass type") )
+	m_lpTypeModel( 0,0,2, this, tr( "low pass type" ) ) ,
+	m_hpTypeModel( 0,0,2, this, tr( "high pass type" ) ),
+	m_analyseInModel( true, this , tr( "Analyse IN" ) ),
+	m_analyseOutModel( true, this, tr( "Analyse OUT" ) )
 {
 	m_hpFeqModel.setScaleLogarithmic( true );
 	m_lowShelfFreqModel.setScaleLogarithmic( true );
@@ -93,9 +97,6 @@ EqControls::EqControls( EqEffect *effect ) :
 	m_para4PeakL = 0; m_para4PeakR = 0;
 	m_highShelfPeakL = 0; m_highShelfPeakR = 0;
 	m_inProgress = false;
-	m_analyseIn = true;
-	m_analyseOut = true;
-
 	m_inGainModel.setScaleLogarithmic( true );
 }
 
@@ -105,21 +106,21 @@ EqControls::EqControls( EqEffect *effect ) :
 void EqControls::loadSettings( const QDomElement &_this )
 {
 	m_inGainModel.loadSettings( _this, "Inputgain" );
-	m_outGainModel.loadSettings( _this, "Outputgain");
+	m_outGainModel.loadSettings( _this, "Outputgain" );
 	m_lowShelfGainModel.loadSettings( _this , "Lowshelfgain" );
 	m_para1GainModel.loadSettings( _this, "Peak1gain" );
 	m_para2GainModel.loadSettings( _this, "Peak2gain" );
 	m_para3GainModel.loadSettings( _this, "Peak3gain" );
 	m_para4GainModel.loadSettings( _this, "Peak4gain" );
-	m_highShelfGainModel.loadSettings( _this , "HighShelfgain");
-	m_hpResModel.loadSettings( _this ,"HPres");
+	m_highShelfGainModel.loadSettings( _this , "HighShelfgain" );
+	m_hpResModel.loadSettings( _this ,"HPres" );
 	m_lowShelfResModel.loadSettings( _this, "LowShelfres" );
 	m_para1BwModel.loadSettings( _this ,"Peak1bw" );
 	m_para2BwModel.loadSettings( _this ,"Peak2bw" );
 	m_para3BwModel.loadSettings( _this ,"Peak3bw" );
 	m_para4BwModel.loadSettings( _this ,"Peak4bw" );
 	m_highShelfResModel.loadSettings( _this, "HighShelfres" );
-	m_lpResModel.loadSettings( _this, "LPres");
+	m_lpResModel.loadSettings( _this, "LPres" );
 	m_hpFeqModel.loadSettings( _this, "HPfreq" );
 	m_lowShelfFreqModel.loadSettings( _this, "LowShelffreq" );
 	m_para1FreqModel.loadSettings( _this, "Peak1freq" );
@@ -130,10 +131,10 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_lpFreqModel.loadSettings( _this, "LPfreq" );
 	m_hpActiveModel.loadSettings( _this, "HPactive" );
 	m_lowShelfActiveModel.loadSettings( _this, "Lowshelfactive" );
-	m_para1ActiveModel.loadSettings( _this, "Peak1active");
-	m_para2ActiveModel.loadSettings( _this, "Peak2active");
-	m_para3ActiveModel.loadSettings( _this, "Peak3active");
-	m_para4ActiveModel.loadSettings( _this, "Peak4active");
+	m_para1ActiveModel.loadSettings( _this, "Peak1active" );
+	m_para2ActiveModel.loadSettings( _this, "Peak2active" );
+	m_para3ActiveModel.loadSettings( _this, "Peak3active" );
+	m_para4ActiveModel.loadSettings( _this, "Peak4active" );
 	m_highShelfActiveModel.loadSettings( _this, "Highshelfactive" );
 	m_lpActiveModel.loadSettings( _this, "LPactive" );
 	m_lp12Model.loadSettings( _this , "LP12" );
@@ -144,6 +145,8 @@ void EqControls::loadSettings( const QDomElement &_this )
 	m_hp48Model.loadSettings( _this , "HP48" );
 	m_lpTypeModel.loadSettings( _this, "LP" );
 	m_hpTypeModel.loadSettings( _this, "HP" );
+	m_analyseInModel.loadSettings( _this, "AnalyseIn" );
+	m_analyseOutModel.loadSettings( _this, "AnalyseOut" );
 }
 
 
@@ -151,7 +154,6 @@ void EqControls::loadSettings( const QDomElement &_this )
 
 void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 {
-
 	m_inGainModel.saveSettings( doc, parent, "Inputgain" );
 	m_outGainModel.saveSettings( doc, parent, "Outputgain");
 	m_lowShelfGainModel.saveSettings( doc, parent , "Lowshelfgain" );
@@ -159,15 +161,15 @@ void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_para2GainModel.saveSettings( doc, parent, "Peak2gain" );
 	m_para3GainModel.saveSettings( doc, parent, "Peak3gain" );
 	m_para4GainModel.saveSettings( doc, parent, "Peak4gain" );
-	m_highShelfGainModel.saveSettings( doc, parent, "HighShelfgain");
-	m_hpResModel.saveSettings( doc, parent ,"HPres");
+	m_highShelfGainModel.saveSettings( doc, parent, "HighShelfgain" );
+	m_hpResModel.saveSettings( doc, parent ,"HPres" );
 	m_lowShelfResModel.saveSettings( doc, parent, "LowShelfres" );
 	m_para1BwModel.saveSettings( doc, parent,"Peak1bw" );
 	m_para2BwModel.saveSettings( doc, parent,"Peak2bw" );
 	m_para3BwModel.saveSettings( doc, parent,"Peak3bw" );
 	m_para4BwModel.saveSettings( doc, parent,"Peak4bw" );
 	m_highShelfResModel.saveSettings( doc, parent, "HighShelfres" );
-	m_lpResModel.saveSettings( doc, parent, "LPres");
+	m_lpResModel.saveSettings( doc, parent, "LPres" );
 	m_hpFeqModel.saveSettings( doc, parent, "HPfreq" );
 	m_lowShelfFreqModel.saveSettings( doc, parent, "LowShelffreq" );
 	m_para1FreqModel.saveSettings( doc, parent, "Peak1freq" );
@@ -192,5 +194,6 @@ void EqControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 	m_hp48Model.saveSettings( doc, parent, "HP48" );
 	m_lpTypeModel.saveSettings( doc, parent, "LP" );
 	m_hpTypeModel.saveSettings( doc, parent, "HP" );
+	m_analyseInModel.saveSettings( doc, parent, "AnalyseIn" );
+	m_analyseOutModel.saveSettings( doc, parent, "AnalyseOut" );
 }
-

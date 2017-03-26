@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,34 +25,15 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-// denormals stripping
-#ifdef __SSE__
-#include <xmmintrin.h>
-#endif
-#ifdef __SSE3__
-#include <pmmintrin.h>
-#endif
-
-#include "lmmsconfig.h"
-
-#ifndef LMMS_USE_3RDPARTY_LIBSRC
-#include <samplerate.h>
-#else
-#ifndef OUT_OF_TREE_BUILD
-#include "src/3rdparty/samplerate/samplerate.h"
-#else
-#include <samplerate.h>
-#endif
-#endif
-
-
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtCore/QWaitCondition>
+#include <samplerate.h>
 
 
 #include "lmms_basics.h"
+#include "LocklessList.h"
 #include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
@@ -63,6 +44,7 @@ class MidiClient;
 class AudioPort;
 
 
+const fpp_t MINIMUM_BUFFER_SIZE = 32;
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
 
 const int BYTES_PER_SAMPLE = sizeof( sample_t );
@@ -176,9 +158,16 @@ public:
 
 
 	// audio-device-stuff
+
+	// Returns the current audio device's name. This is not necessarily
+	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const
 	{
 		return m_audioDevName;
+	}
+	inline bool audioDevStartFailed() const
+	{
+		return m_audioDevStartFailed;
 	}
 
 	void setAudioDevice( AudioDevice * _dev );
@@ -195,9 +184,9 @@ public:
 	// audio-port-stuff
 	inline void addAudioPort( AudioPort * _port )
 	{
-		lock();
+		requestChangeInModel();
 		m_audioPorts.push_back( _port );
-		unlock();
+		doneChangeInModel();
 	}
 
 	void removeAudioPort( AudioPort * _port );
@@ -225,20 +214,13 @@ public:
 		return m_playHandles;
 	}
 
-	void removePlayHandles( Track * _track, bool removeIPHs = true );
-
-	bool hasNotePlayHandles();
+	void removePlayHandlesOfTypes( Track * _track, const quint8 types );
 
 
 	// methods providing information for other classes
 	inline fpp_t framesPerPeriod() const
 	{
 		return m_framesPerPeriod;
-	}
-
-	inline const surroundSampleFrame * currentReadBuffer() const
-	{
-		return m_readBuf;
 	}
 
 
@@ -289,49 +271,7 @@ public:
 	}
 
 
-	// methods needed by other threads to alter knob values, waveforms, etc
-	void lock()
-	{
-		m_globalMutex.lock();
-	}
-
-	void unlock()
-	{
-		m_globalMutex.unlock();
-	}
-
-	void lockInputFrames()
-	{
-		m_inputFramesMutex.lock();
-	}
-
-	void unlockInputFrames()
-	{
-		m_inputFramesMutex.unlock();
-	}
-
-	void lockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.lock();
-	}
-
-	void unlockPlayHandleRemoval()
-	{
-		m_playHandleRemovalMutex.unlock();
-	}
-
-	// audio-buffer-mgm
-	static void clearAudioBuffer( sampleFrame * _ab,
-						const f_cnt_t _frames,
-						const f_cnt_t _offset = 0 );
-#ifndef LMMS_DISABLE_SURROUND
-	static void clearAudioBuffer( surroundSampleFrame * _ab,
-						const f_cnt_t _frames,
-						const f_cnt_t _offset = 0 );
-#endif
-
-	static float peakValueLeft( sampleFrame * _ab, const f_cnt_t _frames );
-	static float peakValueRight( sampleFrame * _ab, const f_cnt_t _frames );
+	void getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const;
 
 
 	bool criticalXRuns() const;
@@ -360,11 +300,17 @@ public:
 
 	void changeQuality( const struct qualitySettings & _qs );
 
+	inline bool isMetronomeActive() const { return m_metronomeActive; }
+	inline void setMetronomeActive(bool value = true) { m_metronomeActive = value; }
+
+	void requestChangeInModel();
+	void doneChangeInModel();
+
 
 signals:
 	void qualitySettingsChanged();
 	void sampleRateChanged();
-	void nextAudioBuffer();
+	void nextAudioBuffer( const surroundSampleFrame * buffer );
 
 
 private:
@@ -385,10 +331,12 @@ private:
 
 		virtual void run();
 
+		void write( surroundSampleFrame * buffer );
+
 	} ;
 
 
-	Mixer();
+	Mixer( bool renderOnly );
 	virtual ~Mixer();
 
 	void startProcessing( bool _needs_fifo = true );
@@ -401,13 +349,15 @@ private:
 
 	const surroundSampleFrame * renderNextBuffer();
 
+	void clearInternal();
 
+	void runChangesInModel();
+
+	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
 
 	fpp_t m_framesPerPeriod;
-
-	sampleFrame * m_workingBuf;
 
 	sampleFrame * m_inputBuffer[2];
 	f_cnt_t m_inputBufferFrames[2];
@@ -423,46 +373,53 @@ private:
 	int m_writeBuffer;
 	int m_poolDepth;
 
-	surroundSampleFrame m_maxClip;
-	surroundSampleFrame m_previousSample;
-	fpp_t m_halfStart[SURROUND_CHANNELS];
-	bool m_oldBuffer[SURROUND_CHANNELS];
-	bool m_newBuffer[SURROUND_CHANNELS];
-
+	// worker thread stuff
 	QVector<MixerWorkerThread *> m_workers;
 	int m_numWorkers;
-	QWaitCondition m_queueReadyWaitCond;
 
-	PlayHandleList m_newPlayHandles;	// place where new playhandles are added temporarily
-	QMutex m_playHandleMutex;			// mutex used only for adding playhandles
-
+	// playhandle stuff
 	PlayHandleList m_playHandles;
+	// place where new playhandles are added temporarily
+	LocklessList<PlayHandle *> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
+
 
 	struct qualitySettings m_qualitySettings;
 	float m_masterGain;
 
+	bool m_isProcessing;
 
+	// audio device stuff
 	AudioDevice * m_audioDev;
 	AudioDevice * m_oldAudioDev;
 	QString m_audioDevName;
+	bool m_audioDevStartFailed;
 
-
+	// MIDI device stuff
 	MidiClient * m_midiClient;
 	QString m_midiClientName;
 
-
-	QMutex m_globalMutex;
-	QMutex m_inputFramesMutex;
-
-	QMutex m_playHandleRemovalMutex;
-
+	// FIFO stuff
 	fifo * m_fifo;
 	fifoWriter * m_fifoWriter;
 
 	MixerProfiler m_profiler;
 
-	friend class Engine;
+	bool m_metronomeActive;
+
+	bool m_clearSignal;
+
+	bool m_changesSignal;
+	unsigned int m_changes;
+	QMutex m_changesMutex;
+	QMutex m_doChangesMutex;
+	QMutex m_waitChangesMutex;
+	QWaitCondition m_changesMixerCondition;
+	QWaitCondition m_changesRequestCondition;
+
+	bool m_waitingForWrite;
+
+	friend class LmmsCore;
 	friend class MixerWorkerThread;
 
 } ;

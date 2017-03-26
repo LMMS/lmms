@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -49,24 +49,14 @@ public:
 
 	inline static QString name()
 	{
-		return( QT_TRANSLATE_NOOP( "setupWidget",
+		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
 			"OSS Raw-MIDI (Open Sound System)" ) );
 	}
 
-
-	class setupWidget : public MidiClientRaw::setupWidget
+	inline static QString configSection()
 	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-
-	} ;
-
+		return "midioss";
+	}
 
 protected:
 	virtual void sendByte( const unsigned char c );

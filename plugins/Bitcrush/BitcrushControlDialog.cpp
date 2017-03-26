@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -55,7 +55,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	inGain->move( 12, 25 );
 	inGain->setModel( & controls->m_inGain );
 	inGain->setLabel( tr( "GAIN" ) );
-	inGain->setHintText( tr( "Input Gain:" ) + " ", " dBV" );
+	inGain->setHintText( tr( "Input Gain:" ) + " ", " dBFS" );
 	
 	Knob * inNoise = new Knob( knobBright_26, this );
 	inNoise->move( 12, 70 );
@@ -69,7 +69,7 @@ BitcrushControlDialog::BitcrushControlDialog( BitcrushControls * controls ) :
 	outGain->move( 176, 25 );
 	outGain->setModel( & controls->m_outGain );
 	outGain->setLabel( tr( "GAIN" ) );
-	outGain->setHintText( tr( "Output Gain:" ) + " ", " dBV" );
+	outGain->setHintText( tr( "Output Gain:" ) + " ", " dBFS" );
 	
 	Knob * outClip = new Knob( knobBright_26, this );
 	outClip->move( 176, 70 );

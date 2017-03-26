@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -131,15 +131,15 @@ bool BitcrushEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	}
 	if( m_needsUpdate || m_controls.m_inGain.isValueChanged() )
 	{
-		m_inGain = dbvToAmp( m_controls.m_inGain.value() );
+		m_inGain = dbfsToAmp( m_controls.m_inGain.value() );
 	}
 	if( m_needsUpdate || m_controls.m_outGain.isValueChanged() )
 	{
-		m_outGain = dbvToAmp( m_controls.m_outGain.value() );
+		m_outGain = dbfsToAmp( m_controls.m_outGain.value() );
 	}
 	if( m_needsUpdate || m_controls.m_outClip.isValueChanged() )
 	{
-		m_outClip = dbvToAmp( m_controls.m_outClip.value() );
+		m_outClip = dbfsToAmp( m_controls.m_outClip.value() );
 	}
 	m_needsUpdate = false;
 	

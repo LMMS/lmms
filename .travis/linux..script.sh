@@ -1,1 +1,3 @@
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_WERROR=ON ..
+#!/usr/bin/env bash
+
+cmake -DUSE_WERROR=ON $CMAKE_FLAGS ..

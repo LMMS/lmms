@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,34 +31,32 @@
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 #include "ProjectJournal.h"
-#include "Plugin.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
 
-#include "GuiApplication.h"
-
-float Engine::s_framesPerTick;
-Mixer* Engine::s_mixer = NULL;
-FxMixer * Engine::s_fxMixer = NULL;
-BBTrackContainer * Engine::s_bbTrackContainer = NULL;
-Song * Engine::s_song = NULL;
-ProjectJournal * Engine::s_projectJournal = NULL;
-Ladspa2LMMS * Engine::s_ladspaManager = NULL;
-DummyTrackContainer * Engine::s_dummyTC = NULL;
-QMap<QString, QString> Engine::s_pluginFileHandling;
+float LmmsCore::s_framesPerTick;
+Mixer* LmmsCore::s_mixer = NULL;
+FxMixer * LmmsCore::s_fxMixer = NULL;
+BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
+Song * LmmsCore::s_song = NULL;
+ProjectJournal * LmmsCore::s_projectJournal = NULL;
+Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 
 
 
-void Engine::init()
+void LmmsCore::init( bool renderOnly )
 {
+	LmmsCore *engine = inst();
+
+	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
 
-	initPluginFileHandling();
-
+	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
-	s_mixer = new Mixer;
+	s_mixer = new Mixer( renderOnly );
 	s_song = new Song;
 	s_fxMixer = new FxMixer;
 	s_bbTrackContainer = new BBTrackContainer;
@@ -67,18 +65,20 @@ void Engine::init()
 
 	s_projectJournal->setJournalling( true );
 
+	emit engine->initProgress(tr("Opening audio and midi devices"));
 	s_mixer->initDevices();
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
+	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
 }
 
 
 
 
-void Engine::destroy()
+void LmmsCore::destroy()
 {
 	s_projectJournal->stopAllJournalling();
 	s_mixer->stopProcessing();
@@ -90,8 +90,8 @@ void Engine::destroy()
 	deleteHelper( &s_bbTrackContainer );
 	deleteHelper( &s_dummyTC );
 
-	deleteHelper( &s_mixer );
 	deleteHelper( &s_fxMixer );
+	deleteHelper( &s_mixer );
 
 	deleteHelper( &s_ladspaManager );
 
@@ -103,42 +103,13 @@ void Engine::destroy()
 	delete ConfigManager::inst();
 }
 
-bool Engine::hasGUI()
-{
-	return gui != nullptr;
-}
 
 
 
-
-void Engine::updateFramesPerTick()
+void LmmsCore::updateFramesPerTick()
 {
 	s_framesPerTick = s_mixer->processingSampleRate() * 60.0f * 4 /
 				DefaultTicksPerTact / s_song->getTempo();
 }
 
-
-
-
-void Engine::initPluginFileHandling()
-{
-	Plugin::DescriptorList pluginDescriptors;
-	Plugin::getDescriptorsOfAvailPlugins( pluginDescriptors );
-	for( Plugin::DescriptorList::ConstIterator it = pluginDescriptors.begin();
-										it != pluginDescriptors.end(); ++it )
-	{
-		if( it->type == Plugin::Instrument )
-		{
-			const QStringList & ext =
-				QString( it->supportedFileTypes ).
-							split( QChar( ',' ) );
-			for( QStringList::const_iterator itExt = ext.begin();
-						itExt != ext.end(); ++itExt )
-			{
-				s_pluginFileHandling[*itExt] = it->name;
-			}
-		}
-	}
-}
-
-
+LmmsCore * LmmsCore::s_instanceOfMe = NULL;

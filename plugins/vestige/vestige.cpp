@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,6 +39,7 @@
 #include "InstrumentTrack.h"
 #include "VstPlugin.h"
 #include "MainWindow.h"
+#include "Mixer.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
 #include "StringPairDrag.h"
@@ -79,6 +80,7 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_subWindow( NULL ),
+	m_scrollArea( NULL ),
 	vstKnobs( NULL ),
 	knobFModel( NULL ),
 	p_subWindow( NULL )
@@ -103,7 +105,9 @@ vestigeInstrument::~vestigeInstrument()
 		knobFModel = NULL;
 	}
 
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	closePlugin();
 }
 
@@ -641,7 +645,7 @@ void VestigeInstrumentView::openPlugin()
 		{
 			return;
 		}
-		Engine::mixer()->lock();
+		Engine::mixer()->requestChangeInModel();
 
 		if (m_vi->p_subWindow != NULL) {
 			delete m_vi->p_subWindow;
@@ -649,7 +653,7 @@ void VestigeInstrumentView::openPlugin()
 		}
 
 		m_vi->loadFile( ofd.selectedFiles()[0] );
-		Engine::mixer()->unlock();
+		Engine::mixer()->doneChangeInModel();
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
@@ -875,7 +879,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	widget = new QWidget(this);
 	l = new QGridLayout( this );
 
-	m_vi->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow |
+	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow |
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::MinimumExpanding );
 	m_vi->m_subWindow->setFixedWidth( 960 );
@@ -884,7 +888,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
-	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+	m_vi->m_subWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 
 
 	l->setContentsMargins( 20, 10, 10, 10 );

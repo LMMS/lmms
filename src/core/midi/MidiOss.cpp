@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,16 +26,6 @@
 #include "MidiOss.h"
 
 #ifdef LMMS_HAVE_OSS
-
-
-#include <QLabel>
-#include <QLineEdit>
-
-
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
-
 
 #include "ConfigManager.h"
 #include "gui_templates.h"
@@ -109,38 +99,6 @@ void MidiOss::run()
 		parseData( c );
 	}
 }
-
-
-
-
-
-MidiOss::setupWidget::setupWidget( QWidget * _parent ) :
-	MidiClientRaw::setupWidget( MidiOss::name(), _parent )
-{
-	m_device = new QLineEdit( MidiOss::probeDevice(), this );
-	m_device->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * dev_lbl = new QLabel( tr( "DEVICE" ), this );
-	dev_lbl->setFont( pointSize<7>( dev_lbl->font() ) );
-	dev_lbl->setGeometry( 10, 40, 160, 10 );
-}
-
-
-
-
-MidiOss::setupWidget::~setupWidget()
-{
-}
-
-
-
-
-void MidiOss::setupWidget::saveSettings()
-{
-	ConfigManager::inst()->setValue( "midioss", "device",
-							m_device->text() );
-}
-
 
 
 #endif

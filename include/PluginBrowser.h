@@ -1,9 +1,9 @@
 /*
- * plugin_browser.h - include file for pluginBrowser
+ * PluginBrowser.h - include file for pluginBrowser
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,9 +32,6 @@
 #include "Plugin.h"
 
 
-class trackContainer;
-
-
 class PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
@@ -55,9 +52,6 @@ class PluginDescList : public QWidget
 	Q_OBJECT
 public:
 	PluginDescList(QWidget* parent);
-
-private:
-	Plugin::DescriptorList m_pluginDescriptors;
 };
 
 

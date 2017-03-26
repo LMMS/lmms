@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,11 +29,10 @@
 
 #ifdef LMMS_HAVE_PULSEAUDIO
 
-#include "endian_handling.h"
 #include "ConfigManager.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 #include "gui_templates.h"
-#include "templates.h"
 #include "Engine.h"
 
 
@@ -104,11 +103,7 @@ void AudioPulseAudio::startProcessing()
 
 void AudioPulseAudio::stopProcessing()
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 
@@ -190,6 +185,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 										PA_STREAM_ADJUST_LATENCY,
 										NULL,	// volume
 										NULL );
+			_this->signalConnected( true );
 			break;
 		}
 
@@ -199,6 +195,7 @@ static void context_state_callback(pa_context *c, void *userdata)
 		case PA_CONTEXT_FAILED:
 		default:
 			qCritical( "Connection failure: %s\n", pa_strerror( pa_context_errno( c ) ) );
+			_this->signalConnected( false );
 	}
 }
 
@@ -222,19 +219,38 @@ void AudioPulseAudio::run()
 		return;
 	}
 
+	m_connected = false;
+
 	pa_context_set_state_callback( context, context_state_callback, this  );
 	// connect the context
 	pa_context_connect( context, NULL, (pa_context_flags) 0, NULL );
 
-	// run the main loop
-	int ret = 0;
-	m_quit = false;
-	while( m_quit == false && pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
-	{
+	while (!m_connectedSemaphore.tryAcquire()) {
+		pa_mainloop_iterate(mainLoop, 1, NULL);
 	}
 
-	pa_stream_disconnect( m_s );
-	pa_stream_unref( m_s );
+	// run the main loop
+	if( m_connected )
+	{
+		int ret = 0;
+		m_quit = false;
+		while( m_quit == false
+			&& pa_mainloop_iterate( mainLoop, 1, &ret ) >= 0 )
+		{
+		}
+
+		pa_stream_disconnect( m_s );
+		pa_stream_unref( m_s );
+	}
+	else
+	{
+		const fpp_t fpp = mixer()->framesPerPeriod();
+		surroundSampleFrame * temp = new surroundSampleFrame[fpp];
+		while( getNextBuffer( temp ) )
+		{
+		}
+		delete[] temp;
+	}
 
 	pa_context_disconnect( context );
 	pa_context_unref( context );
@@ -279,8 +295,20 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 
 
 
+void AudioPulseAudio::signalConnected( bool connected )
+{
+	if( !m_connected )
+	{
+		m_connected = connected;
+		m_connectedSemaphore.release();
+	}
+}
+
+
+
+
 AudioPulseAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioPulseAudio::name(), _parent )
+	AudioDeviceSetupWidget( AudioPulseAudio::name(), _parent )
 {
 	m_device = new QLineEdit( AudioPulseAudio::probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

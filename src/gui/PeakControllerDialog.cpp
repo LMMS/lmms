@@ -1,10 +1,10 @@
 /*
- * PeakController_Dialog.cpp - per-controller-specific view for changing a
+ * PeakControllerDialog.cpp - per-controller-specific view for changing a
  * controller's settings
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,21 +27,17 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QPainter>
 
 #include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
 
 #include "PeakController.h"
-#include "ControllerDialog.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
-#include "PixmapButton.h"
 
 
 PeakControllerDialog::PeakControllerDialog( Controller * _model, QWidget * _parent ) :

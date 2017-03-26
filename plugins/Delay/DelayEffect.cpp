@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader(),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -107,7 +107,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 	if( m_delayControls.m_outGainModel.isValueChanged() )
 	{
-		m_outGain = dbvToAmp( m_delayControls.m_outGainModel.value() );
+		m_outGain = dbfsToAmp( m_delayControls.m_outGainModel.value() );
 	}
 	int sampleLength;
 	for( fpp_t f = 0; f < frames; ++f )
@@ -118,7 +118,7 @@ bool DelayEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		m_delay->setFeedback( *feedbackPtr );
 		m_lfo->setFrequency( *lfoTimePtr );
 		sampleLength = *lengthPtr * Engine::mixer()->processingSampleRate();
-		m_currentLength = linearInterpolate( sampleLength, m_currentLength, 0.9999 );
+		m_currentLength = sampleLength;
 		m_delay->setLength( m_currentLength + ( *amplitudePtr * ( float )m_lfo->tick() ) );
 		m_delay->tick( buf[f] );
 

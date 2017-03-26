@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -310,7 +310,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
         m_vi->m_scrollArea = new QScrollArea( widget );
 	l = new QGridLayout( widget );
 
-	m_vi->m_subWindow = gui->mainWindow()->workspace()->addSubWindow(new QMdiSubWindow, Qt::SubWindow | 
+	m_vi->m_subWindow = gui->mainWindow()->addWindowedWidget(NULL, Qt::SubWindow | 
 			Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 	m_vi->m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 	m_vi->m_subWindow->setFixedSize( 960, 300);

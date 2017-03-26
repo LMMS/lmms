@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -111,7 +111,7 @@ static void connectPortFreqTracker(
 static LADSPA_Handle instantiateFreqTracker(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	FreqTracker *plugin_data = (FreqTracker *)malloc(sizeof(FreqTracker));
+	FreqTracker *plugin_data = (FreqTracker *)calloc(1, sizeof(FreqTracker));
 	int cross_time;
 	LADSPA_Data f;
 	LADSPA_Data fo;
@@ -240,14 +240,13 @@ static void runAddingFreqTracker(LADSPA_Handle instance, unsigned long sample_co
 	plugin_data->cross_time = cross_time;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -319,12 +318,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (freqTrackerDescriptor) {
 		free((LADSPA_PortDescriptor *)freqTrackerDescriptor->PortDescriptors);
 		free((char **)freqTrackerDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)freqTrackerDescriptor->PortRangeHints);
 		free(freqTrackerDescriptor);
 	}
+	freqTrackerDescriptor = NULL;
 
 }

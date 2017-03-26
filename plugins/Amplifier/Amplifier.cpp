@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT amplifier_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader(),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -75,10 +75,10 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	const float d = dryLevel();
 	const float w = wetLevel();
 	
-	ValueBuffer * volBuf = m_ampControls.m_volumeModel.valueBuffer();
-	ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
-	ValueBuffer * leftBuf = m_ampControls.m_leftModel.valueBuffer();
-	ValueBuffer * rightBuf = m_ampControls.m_rightModel.valueBuffer();
+	const ValueBuffer * volBuf = m_ampControls.m_volumeModel.valueBuffer();
+	const ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
+	const ValueBuffer * leftBuf = m_ampControls.m_leftModel.valueBuffer();
+	const ValueBuffer * rightBuf = m_ampControls.m_rightModel.valueBuffer();
 
 	for( fpp_t f = 0; f < frames; ++f )
 	{
@@ -90,8 +90,8 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		// vol knob
 		if( volBuf )
 		{
-			s[0] *= volBuf->values()[ f ] * 0.01f;
-			s[1] *= volBuf->values()[ f ] * 0.01f;
+			s[0] *= volBuf->value( f ) * 0.01f;
+			s[1] *= volBuf->value( f ) * 0.01f;
 		}
 		else
 		{
@@ -101,7 +101,7 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		// convert pan values to left/right values
 		const float pan = panBuf 
-			? panBuf->values()[ f ] 
+			? panBuf->value( f ) 
 			: m_ampControls.m_panModel.value();
 		const float left1 = pan <= 0
 			? 1.0
@@ -112,10 +112,10 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 
 		// second stage amplification
 		const float left2 = leftBuf
-			? leftBuf->values()[ f ] 
+			? leftBuf->value( f ) 
 			: m_ampControls.m_leftModel.value();
 		const float right2 = rightBuf
-			? rightBuf->values()[ f ] 
+			? rightBuf->value( f ) 
 			: m_ampControls.m_rightModel.value();
 			
 		s[0] *= left1 * left2 * 0.01;

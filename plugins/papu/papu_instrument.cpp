@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,6 +23,7 @@
  *
  */
 
+#include <cmath>
 
 #include <QPainter>
 #include <QDomElement>
@@ -32,6 +33,7 @@
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"

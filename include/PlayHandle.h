@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,13 @@
 #ifndef PLAY_HANDLE_H
 #define PLAY_HANDLE_H
 
-#include <QtCore/QThread>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtCore/QMutex>
 
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
+
+class QThread;
 
 class Track;
 class AudioPort;
@@ -40,13 +41,17 @@ class PlayHandle : public ThreadableJob
 public:
 	enum Types
 	{
-		TypeNotePlayHandle,
-		TypeInstrumentPlayHandle,
-		TypeSamplePlayHandle,
-		TypePresetPreviewHandle,
-		TypeCount
+		TypeNotePlayHandle = 0x01,
+		TypeInstrumentPlayHandle = 0x02,
+		TypeSamplePlayHandle = 0x04,
+		TypePresetPreviewHandle = 0x08
 	} ;
 	typedef Types Type;
+
+	enum
+	{
+		MaxNumber = 1024
+	} ;
 
 	PlayHandle( const Type type, f_cnt_t offset = 0 );
 

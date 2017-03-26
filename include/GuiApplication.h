@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,11 @@
 #ifndef GUIAPPLICATION_H
 #define GUIAPPLICATION_H
 
+#include <QtCore/QObject>
+
 #include "export.h"
+
+class QLabel;
 
 class AutomationEditorWindow;
 class BBEditor;
@@ -36,8 +40,9 @@ class PianoRollWindow;
 class ProjectNotes;
 class SongEditorWindow;
 
-class EXPORT GuiApplication
+class EXPORT GuiApplication : public QObject
 {
+	Q_OBJECT;
 public:
 	explicit GuiApplication();
 	~GuiApplication();
@@ -53,6 +58,12 @@ public:
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
+public slots:
+	void displayInitProgress(const QString &msg);
+
+private slots:
+	void childDestroyed(QObject *obj);
+
 private:
 	static GuiApplication* s_instance;
 
@@ -64,6 +75,7 @@ private:
 	PianoRollWindow* m_pianoRoll;
 	ProjectNotes* m_projectNotes;
 	ControllerRackView* m_controllerRackView;
+	QLabel* m_loadingProgressLabel;
 };
 
 #define gui GuiApplication::instance()

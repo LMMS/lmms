@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,14 +30,19 @@ class ProjectVersionTest : QTestSuite
 {
 	Q_OBJECT
 private slots:
-	void test()
+	void ProjectVersionComparisonTests()
 	{
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Minor) > "1.0.3");
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Major) < "2.1.0");
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Release) > "0.2.1");
-		Q_ASSERT(ProjectVersion("1.1.4", CompareType::Release) < "1.1.10");
-		Q_ASSERT(ProjectVersion("1.1.0", CompareType::Minor) == "1.1.5");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) > "1.0.3");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Major) < "2.1.0");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Release) > "0.2.1");
+		QVERIFY(ProjectVersion("1.1.4", ProjectVersion::Release) < "1.1.10");
+		QVERIFY(ProjectVersion("1.1.0", ProjectVersion::Minor) == "1.1.5");
+		QVERIFY( ! ( ProjectVersion("3.1.0", ProjectVersion::Minor) < "2.2.5" ) );
+		QVERIFY( ! ( ProjectVersion("2.5.0", ProjectVersion::Release) < "2.2.5" ) );
+		QVERIFY(ProjectVersion("1.1.0") > "1.1.0-alpha");
+		QVERIFY(ProjectVersion("1.1.0-alpha") < "1.1.0-beta");
+		QVERIFY(ProjectVersion("1.2.0-rc1") < "1.2.0-rc2");
 	}
-} instance;
+} ProjectVersionTests;
 
 #include "ProjectVersionTest.moc"

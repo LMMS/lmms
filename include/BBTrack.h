@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QStaticText>
 
 #include "Track.h"
 
@@ -107,14 +108,16 @@ protected slots:
 
 
 protected:
-	void paintEvent( QPaintEvent * );
-	void mouseDoubleClickEvent( QMouseEvent * _me );
+	virtual void paintEvent( QPaintEvent * pe );
+	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void constructContextMenu( QMenu * );
 
 
 private:
 	BBTCO * m_bbTCO;
-
+	QPixmap m_paintPixmap;
+	
+	QStaticText m_staticTextName;
 } ;
 
 

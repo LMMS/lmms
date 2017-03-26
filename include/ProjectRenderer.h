@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,6 +27,7 @@
 
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
+#include "Mixer.h"
 
 
 class ProjectRenderer : public QThread
@@ -64,6 +65,14 @@ public:
 		}
 	} ;
 
+	struct FileEncodeDevice
+	{
+		ExportFileFormats m_fileFormat;
+		const char * m_description;
+		const char * m_extension;
+		AudioFileDeviceInstantiaton m_getDevInst;
+	} ;
+
 
 	ProjectRenderer( const Mixer::qualitySettings & _qs,
 				const OutputSettings & _os,
@@ -79,6 +88,9 @@ public:
 	static ExportFileFormats getFileFormatFromExtension(
 							const QString & _ext );
 
+	static QString getFileExtensionFromFormat( ExportFileFormats fmt );
+
+	static const FileEncodeDevice fileEncodeDevices[];
 
 public slots:
 	void startProcessing();
@@ -102,17 +114,5 @@ private:
 	volatile bool m_abort;
 
 } ;
-
-
-struct FileEncodeDevice
-{
-	ProjectRenderer::ExportFileFormats m_fileFormat;
-	const char * m_description;
-	const char * m_extension;
-	AudioFileDeviceInstantiaton m_getDevInst;
-} ;
-
-
-extern FileEncodeDevice __fileEncodeDevices[];
 
 #endif

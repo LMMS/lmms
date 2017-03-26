@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2008 Danny McRae <khjklujn/at/users.sourceforge.net>
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 
 #include "EffectChain.h"
 #include "Effect.h"
-#include "Engine.h"
 #include "DummyEffect.h"
 #include "MixHelpers.h"
 #include "Song.h"
@@ -57,17 +56,17 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "enabled", m_enabledModel.value() );
 	_this.setAttribute( "numofeffects", m_effects.count() );
 
-	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); it++ )
+	for( Effect* effect : m_effects)
 	{
-		if( dynamic_cast<DummyEffect *>( *it ) )
+		if( DummyEffect* dummy = dynamic_cast<DummyEffect*>(effect) )
 		{
-			_this.appendChild( dynamic_cast<DummyEffect *>( *it )->originalPluginData() );
+			_this.appendChild( dummy->originalPluginData() );
 		}
 		else
 		{
-			QDomElement ef = ( *it )->saveState( _doc, _this );
-			ef.setAttribute( "name", ( *it )->descriptor()->name );
-			ef.appendChild( ( *it )->key().saveXML( _doc ) );
+			QDomElement ef = effect->saveState( _doc, _this );
+			ef.setAttribute( "name", QString::fromUtf8( effect->descriptor()->name ) );
+			ef.appendChild( effect->key().saveXML( _doc ) );
 		}
 	}
 }
@@ -78,6 +77,8 @@ void EffectChain::saveSettings( QDomDocument & _doc, QDomElement & _this )
 void EffectChain::loadSettings( const QDomElement & _this )
 {
 	clear();
+
+	// TODO This method should probably also lock the mixer
 
 	m_enabledModel.setValue( _this.attribute( "enabled" ).toInt() );
 
@@ -94,7 +95,7 @@ void EffectChain::loadSettings( const QDomElement & _this )
 			const QString name = effectData.attribute( "name" );
 			EffectKey key( effectData.elementsByTagName( "key" ).item( 0 ).toElement() );
 
-			Effect* e = Effect::instantiate( name, this, &key );
+			Effect* e = Effect::instantiate( name.toUtf8(), this, &key );
 
 			if( e != NULL && e->isOkay() && e->nodeName() == node.nodeName() )
 			{
@@ -120,9 +121,9 @@ void EffectChain::loadSettings( const QDomElement & _this )
 
 void EffectChain::appendEffect( Effect * _effect )
 {
-	Engine::mixer()->lock();
+	Engine::mixer()->requestChangeInModel();
 	m_effects.append( _effect );
-	Engine::mixer()->unlock();
+	Engine::mixer()->doneChangeInModel();
 
 	emit dataChanged();
 }
@@ -132,10 +133,17 @@ void EffectChain::appendEffect( Effect * _effect )
 
 void EffectChain::removeEffect( Effect * _effect )
 {
-	Engine::mixer()->lock();
-	m_effects.erase( qFind( m_effects.begin(), m_effects.end(), _effect ) );
-	Engine::mixer()->unlock();
+	Engine::mixer()->requestChangeInModel();
 
+	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
+	if( found == m_effects.end() )
+	{
+		Engine::mixer()->doneChangeInModel();
+		return;
+	}
+	m_effects.erase( found );
+
+	Engine::mixer()->doneChangeInModel();
 	emit dataChanged();
 }
 
@@ -211,20 +219,6 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 				MixHelpers::sanitize( _buf, _frames );
 			}
 		}
-
-#ifdef LMMS_DEBUG
-		for( int f = 0; f < _frames; ++f )
-		{
-			if( fabs( _buf[f][0] ) > 5 || fabs( _buf[f][1] ) > 5 )
-			{
-				it = m_effects.end()-1;
-				printf( "numerical overflow after processing "
-					"plugin \"%s\"\n", ( *it )->
-					descriptor()->name);
-				break;
-			}
-		}
-#endif
 	}
 
 	return moreEffects;
@@ -254,15 +248,15 @@ void EffectChain::clear()
 {
 	emit aboutToClear();
 
+	Engine::mixer()->requestChangeInModel();
+
 	m_enabledModel.setValue( false );
-	for( int i = 0; i < m_effects.count(); ++i )
+	while( m_effects.count() )
 	{
-		delete m_effects[i];
+		Effect * e = m_effects[m_effects.count() - 1];
+		m_effects.pop_back();
+		delete e;
 	}
-	m_effects.clear();
+
+	Engine::mixer()->doneChangeInModel();
 }
-
-
-
-
-

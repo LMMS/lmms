@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,9 +24,12 @@
 
 #include "AutomatableModel.h"
 
+#include "lmms_math.h"
+
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
-#include "lmms_math.h"
+#include "Mixer.h"
+#include "ProjectJournal.h"
 
 float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;
@@ -97,7 +100,7 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		// scale type also needs an extra value
 		// => it must be appended as a node
 		QDomElement me = doc.createElement( name );
-		me.setAttribute( "id", id() );
+		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
 		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
 		element.appendChild( me );
@@ -193,14 +196,20 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 				}
 			}
 	}
-	else if( element.hasAttribute( name ) )
-	// attribute => read the element's value from the attribute list
-	{
-		setInitValue( element.attribute( name ).toFloat() );
-	}
 	else
 	{
-		reset();
+
+		setScaleType( Linear );
+
+		if( element.hasAttribute( name ) )
+			// attribute => read the element's value from the attribute list
+		{
+			setInitValue( element.attribute( name ).toFloat() );
+		}
+		else
+		{
+			reset();
+		}
 	}
 }
 
@@ -213,7 +222,7 @@ void AutomatableModel::setValue( const float value )
 	++m_setValueDepth;
 	const float old_val = m_value;
 
-	m_value = fittedValue( value, true );
+	m_value = fittedValue( value );
 	if( old_val != m_value )
 	{
 		// add changes to history so user can undo it
@@ -369,11 +378,11 @@ void AutomatableModel::setStep( const float step )
 
 
 
-float AutomatableModel::fittedValue( float value, bool forceStep ) const
+float AutomatableModel::fittedValue( float value ) const
 {
 	value = tLimit<float>( value, m_minValue, m_maxValue );
 
-	if( m_step != 0 && ( m_hasStrictStepSize || forceStep ) )
+	if( m_step != 0 && m_hasStrictStepSize )
 	{
 		value = nearbyintf( value / m_step ) * m_step;
 	}
@@ -450,7 +459,7 @@ void AutomatableModel::unlinkModels( AutomatableModel* model1, AutomatableModel*
 
 void AutomatableModel::unlinkAllModels()
 {
-	foreach( AutomatableModel* model, m_linkedModels )
+	for( AutomatableModel* model : m_linkedModels )
 	{
 		unlinkModels( this, model );
 	}
@@ -575,7 +584,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		float * nvalues = m_valueBuffer.values();
 		for( int i = 0; i < vb->length(); i++ )
 		{
-			nvalues[i] = fittedValue( values[i], false );
+			nvalues[i] = fittedValue( values[i] );
 		}
 		m_lastUpdatedPeriod = s_periodCounter;
 		m_hasSampleExactData = true;
@@ -705,6 +714,23 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 	}
 }
 
+float FloatModel::getRoundedValue() const
+{
+	return static_cast<float>( static_cast<int>( value() / step<float>() + 0.5 ) ) * step<float>();
+}
 
 
+
+
+float FloatModel::getDigitCount()
+{
+	float steptemp = step<float>();
+	int digits = 0;
+	while ( steptemp < 1 )
+	{
+		steptemp = steptemp / 0.1f;
+		digits++;
+	}
+	return digits;
+}
 

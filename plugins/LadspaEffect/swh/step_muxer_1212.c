@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -100,6 +100,7 @@ static void activateStepMuxer(LADSPA_Handle instance) {
 	}
 	current_ch = 0;
 	last_clock = 0.0f;
+	sample_rate = sample_rate;
 	plugin_data->ch_gain = ch_gain;
 	plugin_data->ch_state = ch_state;
 	plugin_data->current_ch = current_ch;
@@ -163,7 +164,7 @@ static void connectPortStepMuxer(
 static LADSPA_Handle instantiateStepMuxer(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	StepMuxer *plugin_data = (StepMuxer *)malloc(sizeof(StepMuxer));
+	StepMuxer *plugin_data = (StepMuxer *)calloc(1, sizeof(StepMuxer));
 	float *ch_gain = NULL;
 	int *ch_state = NULL;
 	int current_ch;
@@ -396,14 +397,13 @@ static void runAddingStepMuxer(LADSPA_Handle instance, unsigned long sample_coun
 	plugin_data->last_clock = last_clock;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -531,12 +531,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (stepMuxerDescriptor) {
 		free((LADSPA_PortDescriptor *)stepMuxerDescriptor->PortDescriptors);
 		free((char **)stepMuxerDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)stepMuxerDescriptor->PortRangeHints);
 		free(stepMuxerDescriptor);
 	}
+	stepMuxerDescriptor = NULL;
 
 }

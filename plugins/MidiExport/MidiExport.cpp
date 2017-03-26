@@ -3,7 +3,7 @@
  *
  * Author: Mohamed Abdel Maksoud <mohamed at amaksoud.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -83,7 +83,7 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 	uint8_t buffer[BUFFER_SIZE];
 	uint32_t size;
 
-	foreach( Track* track, tracks ) if( track->type() == Track::InstrumentTrack ) nTracks++;
+	for( const Track* track : tracks ) if( track->type() == Track::InstrumentTrack ) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
@@ -91,7 +91,7 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 	midiout.writeRawData((char *)buffer, size);
 
 	// midi tracks
-	foreach( Track* track, tracks )
+	for( Track* track : tracks )
 	{
 		DataFile dataFile( DataFile::SongProject );
 		MidiFile::MIDITrack<BUFFER_SIZE> mtrack;

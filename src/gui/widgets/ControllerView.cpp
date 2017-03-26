@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2011-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 #include <QPainter>
 #include <QInputDialog>
 #include <QWhatsThis>
+#include <QLayout>
 
 #include "ControllerView.h"
 
@@ -38,7 +39,6 @@
 #include "ControllerDialog.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "GuiApplication.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
@@ -46,27 +46,39 @@
 
 
 ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
-	QWidget( _parent ),
+	QFrame( _parent ),
 	ModelView( _model, this ),
-	m_bg( embed::getIconPixmap( "controller_bg" ) ),
 	m_subWindow( NULL ),
 	m_controllerDlg( NULL ),
 	m_show( true )
 {
-	setFixedSize( 210, 32 );
+	this->setFrameStyle( QFrame::StyledPanel );
+	this->setFrameShadow( QFrame::Raised );
 
-	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
-	
-	QFont f = ctls_btn->font();
-	ctls_btn->setFont( pointSize<8>( f ) );
-	ctls_btn->setGeometry( 140, 2, 50, 14 );
-	connect( ctls_btn, SIGNAL( clicked() ), 
-				this, SLOT( editControls() ) );
+	QVBoxLayout *vBoxLayout = new QVBoxLayout(this);
+
+	QHBoxLayout *hBox = new QHBoxLayout();
+	vBoxLayout->addLayout(hBox);
+
+	QLabel *label = new QLabel( "<b>" + _model->displayName() + "</b>", this);
+	QSizePolicy sizePolicy = label->sizePolicy();
+	sizePolicy.setHorizontalStretch(1);
+	label->setSizePolicy(sizePolicy);
+
+	hBox->addWidget(label);
+
+	QPushButton * controlsButton = new QPushButton( tr( "Controls" ), this );
+	connect( controlsButton, SIGNAL( clicked() ), SLOT( editControls() ) );
+
+	hBox->addWidget(controlsButton);
+
+	m_nameLabel = new QLabel(_model->name(), this);
+	vBoxLayout->addWidget(m_nameLabel);
+
 
 	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
 
-	m_subWindow = gui->mainWindow()->workspace()->addSubWindow( 
-                m_controllerDlg );
+	m_subWindow = gui->mainWindow()->addWindowedWidget( m_controllerDlg );
 	
 	Qt::WindowFlags flags = m_subWindow->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
@@ -91,7 +103,10 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 ControllerView::~ControllerView()
 {
-	delete m_subWindow;
+	if (m_subWindow)
+	{
+		delete m_subWindow;
+	}
 }
 
 
@@ -127,32 +142,7 @@ void ControllerView::deleteController()
 	emit( deleteController( this ) );
 }
 
-
-
-void ControllerView::paintEvent( QPaintEvent * )
-{
-	QPainter p( this );
-	p.drawPixmap( 0, 0, m_bg );
-
-	QFont f = pointSizeF( font(), 7.5f );
-	f.setBold( true );
-	p.setFont( f );
-
-	Controller * c = castModel<Controller>();
-
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawText( 7, 13, c->displayName() );
-	p.setPen( Qt::white );
-	p.drawText( 6, 12, c->displayName() );
-
-	f.setBold( false );
-	p.setFont( f );
-	p.drawText( 8, 26, c->name() );
-}
-
-
-
-void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+void ControllerView::renameController()
 {
 	bool ok;
 	Controller * c = castModel<Controller>();
@@ -163,8 +153,18 @@ void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 	if( ok && !new_name.isEmpty() )
 	{
 		c->setName( new_name );
-		update();
+		if( getController()->type() == Controller::LfoController )
+		{
+			m_controllerDlg->setWindowTitle( tr( "LFO" ) + " (" + new_name + ")" );
+		}
+		m_nameLabel->setText( new_name );
 	}
+}
+
+
+void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
+{
+	renameController();
 }
 
 
@@ -179,14 +179,14 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
-						tr( "&Remove this plugin" ),
+						tr( "&Remove this controller" ),
 						this, SLOT( deleteController() ) );
+	contextMenu->addAction( tr("Re&name this controller"), this, SLOT( renameController() ));
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 }
-
 
 
 void ControllerView::displayHelp()

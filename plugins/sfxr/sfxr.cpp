@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Wong Cho Ching
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,6 +35,7 @@ float frnd(float range)
 	return (float)rnd(10000)/10000*range;
 }
 
+#include <cmath>
 
 #include <QDomElement>
 
@@ -49,6 +50,7 @@ float frnd(float range)
 #include "Song.h"
 #include "MidiEvent.h"
 #include "MidiTime.h"
+#include "Mixer.h"
 
 #include "embed.h"
 
@@ -133,9 +135,10 @@ void SfxrSynth::resetSample( bool restart )
 		env_vol=0.0f;
 		env_stage=0;
 		env_time=0;
-		env_length[0]=(int)(s->m_attModel.value()*s->m_attModel.value()*100000.0f);
-		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*100000.0f);
-		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*100000.0f);
+
+		env_length[0]=(int)(s->m_attModel.value()*s->m_attModel.value()*99999.0f)+1;
+		env_length[1]=(int)(s->m_holdModel.value()*s->m_holdModel.value()*99999.0f)+1;
+		env_length[2]=(int)(s->m_decModel.value()*s->m_decModel.value()*99999.0f)+1;
 
 		fphase=pow(s->m_phaserOffsetModel.value(), 2.0f)*1020.0f;
 		if(s->m_phaserOffsetModel.value()<0.0f) fphase=-fphase;
@@ -337,8 +340,8 @@ sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_changeAmtModel(0.0f, this, "Change Amount"),
 	m_changeSpeedModel(0.0f, this, "Change Speed"),
 
-	m_sqrDutyModel(0.0f, this, "Squre Duty"),
-	m_sqrSweepModel(0.0f, this, "Squre Sweep"),
+	m_sqrDutyModel(0.0f, this, "Square Duty"),
+	m_sqrSweepModel(0.0f, this, "Duty Sweep"),
 
 	m_repeatSpeedModel(0.0f, this, "Repeat Speed"),
 
@@ -633,8 +636,8 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 	m_changeAmtKnob		->setObjectName( "changeKnob" );
 	m_changeSpeedKnob	->setObjectName( "changeKnob" );
 
-	createKnob(m_sqrDutyKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Duty(Square wave only)");
-    createKnob(m_sqrSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Squre Sweep(Square wave only)");
+	createKnob(m_sqrDutyKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*3, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Square Duty (Square wave only)");
+    createKnob(m_sqrSweepKnob, 	KNOBS_BASE_X+KNOB_BLOCK_SIZE_X*4, KNOBS_BASE_Y+KNOB_BLOCK_SIZE_Y*2, "Duty Sweep (Square wave only)");
 
 	m_sqrDutyKnob	->setObjectName( "sqrKnob" );
 	m_sqrSweepKnob	->setObjectName( "sqrKnob" );

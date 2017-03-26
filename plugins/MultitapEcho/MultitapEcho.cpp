@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -103,7 +103,7 @@ bool MultitapEchoEffect::processAudioBuffer( sampleFrame * buf, const fpp_t fram
 	// get processing vars
 	const int steps = m_controls.m_steps.value();
 	const float stepLength = m_controls.m_stepLength.value();
-	const float dryGain = dbvToAmp( m_controls.m_dryGain.value() );
+	const float dryGain = dbfsToAmp( m_controls.m_dryGain.value() );
 	const bool swapInputs = m_controls.m_swapInputs.value();
 	
 	// check if number of stages has changed

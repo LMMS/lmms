@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,38 +26,34 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QPainter>
 
 #include "CaptionMenu.h"
 #include "gui_templates.h"
 #include "embed.h"
-#include "Engine.h"
 #include "LedCheckbox.h"
 #include "MainWindow.h"
 #include "ToolTip.h"
 
 
 #include "LfoController.h"
-#include "ControllerDialog.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
 #include "PixmapButton.h"
 
-const int CD_ENV_KNOBS_LBL_Y = 20;
+const int CD_ENV_KNOBS_LBL_Y = 11;
 const int CD_KNOB_X_SPACING = 32;
 
 const int CD_LFO_SHAPES_X = 6;
-const int CD_LFO_SHAPES_Y = 36;
+const int CD_LFO_SHAPES_Y = CD_ENV_KNOBS_LBL_Y + 4;
 
-const int CD_LFO_GRAPH_X = 6;
-const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y+15;
+const int CD_LFO_GRAPH_Y = CD_ENV_KNOBS_LBL_Y+3;
 const int CD_LFO_CD_KNOB_Y = CD_LFO_GRAPH_Y-2;
-const int CD_LFO_BASE_CD_KNOB_X = CD_LFO_SHAPES_X + 64;
+const int CD_LFO_BASE_CD_KNOB_X = CD_LFO_SHAPES_X + 68;
 const int CD_LFO_SPEED_CD_KNOB_X = CD_LFO_BASE_CD_KNOB_X+CD_KNOB_X_SPACING;
 const int CD_LFO_AMOUNT_CD_KNOB_X = CD_LFO_SPEED_CD_KNOB_X+CD_KNOB_X_SPACING;
 const int CD_LFO_PHASE_CD_KNOB_X = CD_LFO_AMOUNT_CD_KNOB_X+CD_KNOB_X_SPACING;
-const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X+CD_KNOB_X_SPACING;
+const int CD_LFO_MULTIPLIER_X = CD_LFO_PHASE_CD_KNOB_X+CD_KNOB_X_SPACING+3;
 
 LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent ) :
 	ControllerDialog( _model, _parent )
@@ -68,7 +64,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	title.append( ")" );
 	setWindowTitle( title );
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
-	setFixedSize( 240, 80 );
+	setFixedSize( 240, 58 );
 	
 	ToolTip::add( this, tr( "LFO Controller" ) );
 
@@ -90,7 +86,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 
 	m_amountKnob = new Knob( knobBright_26, this );
-	m_amountKnob->setLabel( tr( "AMT" ) );
+	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
 	m_amountKnob->setWhatsThis(
@@ -202,21 +198,21 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 
 	PixmapButton * x1 = new PixmapButton( this, NULL );
-	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y );
+	x1->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y +7);
 	x1->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x1_active" ) );
 	x1->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x1_inactive" ) );
 
 	PixmapButton * x100 = new PixmapButton( this, NULL );
-	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 15 );
+	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8 );
 	x100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_x100_active" ) );
 	x100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x100_inactive" ) );
 
 	PixmapButton * d100 = new PixmapButton( this, NULL );
-	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 15 );
+	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22 );
 	d100->setActiveGraphic( embed::getIconPixmap(
 						"lfo_d100_active" ) );
 	d100->setInactiveGraphic( embed::getIconPixmap(
@@ -232,8 +228,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 
 	setAutoFillBackground( true );
 	QPalette pal;
-	pal.setBrush( backgroundRole(),
-					embed::getIconPixmap( "lfo_controller_artwork" ) );
+	pal.setBrush( backgroundRole(), embed::getIconPixmap( "lfo_controller_artwork" ) );
 	setPalette( pal );
 
 }
@@ -243,7 +238,6 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 LfoControllerDialog::~LfoControllerDialog()
 {
 	m_userWaveBtn->disconnect( this );
-	//delete m_subWindow;
 }
 
 
@@ -286,13 +280,6 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 	*/
 }
 
-
-/*
-void lfoControllerDialog::paintEvent( QPaintEvent * _pe )
-{
-	QWidget::paintEvent( _pe );
-}
-*/
 
 
 void LfoControllerDialog::modelChanged()

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,6 +37,11 @@ stereoMatrixControls::stereoMatrixControls( stereoMatrixEffect * _eff ) :
 		m_rlModel( 0.0f, -1.0f, 1.0f, 0.01f, this, tr( "Right to Left" ) ),
 		m_rrModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Right to Right" ) )
 {
+	m_llModel.setCenterValue( 0 );
+	m_lrModel.setCenterValue( 0 );
+	m_rlModel.setCenterValue( 0 );
+	m_rrModel.setCenterValue( 0 );
+
 	connect( &m_llModel, SIGNAL( dataChanged() ),
 			this, SLOT( changeMatrix() ) );
 	connect( &m_lrModel, SIGNAL( dataChanged() ),
@@ -76,8 +81,3 @@ void stereoMatrixControls::saveSettings( QDomDocument & _doc,
 	m_rlModel.saveSettings( _doc, _this, "r-l" );
 	m_rrModel.saveSettings( _doc, _this, "r-r" );
 }
-
-
-
-
-

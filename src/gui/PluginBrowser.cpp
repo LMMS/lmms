@@ -1,9 +1,9 @@
 /*
- * plugin_browser.cpp - implementation of the plugin-browser
+ * PluginBrowser.cpp - implementation of the plugin-browser
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,32 +22,31 @@
  *
  */
 
+#include "PluginBrowser.h"
+
 #include <QLabel>
 #include <QPainter>
-#include <QCursor>
 #include <QMouseEvent>
 #include <QScrollArea>
-
-#include "PluginBrowser.h"
-#include <algorithm> // for std::sort
+#include <QStyleOption>
 
 #include "embed.h"
-#include "debug.h"
 #include "templates.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"
+#include "PluginFactory.h"
 
 
-bool pluginBefore( const Plugin::Descriptor& d1, const Plugin::Descriptor& d2 )
+static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
 {
-	return qstricmp( d1.displayName, d2.displayName ) < 0 ? true : false;
+	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
 }
 
 
 
 
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
-	SideBarWidget( tr( "Instrument plugins" ),
+	SideBarWidget( tr( "Instrument Plugins" ),
 				embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
 {
 	setWindowTitle( tr( "Instrument browser" ) );
@@ -66,7 +65,6 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 					"Beat+Bassline Editor or into an "
 					"existing instrument track." ),
 								m_view );
-	hint->setFont( pointSize<8>( hint->font() ) );
 	hint->setWordWrap( true );
 
 	QScrollArea* scrollarea = new QScrollArea( m_view );
@@ -93,18 +91,13 @@ PluginDescList::PluginDescList(QWidget *parent) :
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
-	Plugin::getDescriptorsOfAvailPlugins( m_pluginDescriptors );
-	std::sort(m_pluginDescriptors.begin(), m_pluginDescriptors.end(), pluginBefore);
-
-	for( Plugin::DescriptorList::const_iterator it = m_pluginDescriptors.constBegin();
-		it != m_pluginDescriptors.constEnd(); ++it )
+	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
+	std::sort(descs.begin(), descs.end(), pluginBefore);
+	for (const Plugin::Descriptor* desc : descs)
 	{
-		if( it->type == Plugin::Instrument )
-		{
-			PluginDescWidget* p = new PluginDescWidget( *it, this );
-			p->show();
-			layout->addWidget(p);
-		}
+		PluginDescWidget* p = new PluginDescWidget( *desc, this );
+		p->show();
+		layout->addWidget(p);
 	}
 
 	setLayout(layout);
@@ -139,25 +132,30 @@ PluginDescWidget::~PluginDescWidget()
 
 
 
-void PluginDescWidget::paintEvent( QPaintEvent * )
+void PluginDescWidget::paintEvent( QPaintEvent * e )
 {
-	const QColor fill_color = m_mouseOver ? QColor( 224, 224, 224 ) :
-						QColor( 192, 192, 192 );
 
 	QPainter p( this );
-	p.fillRect( rect(), fill_color );
 
+	// Paint everything according to the style sheet
+	QStyleOption o;
+	o.initFrom( this );
+	style()->drawPrimitive( QStyle::PE_Widget, &o, &p, this );
+
+	// Draw the rest
 	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
 								( 60 - 24 );
 	const QSize logo_size( s, s );
 	QPixmap logo = m_logo.scaled( logo_size, Qt::KeepAspectRatio,
 						Qt::SmoothTransformation );
-	p.setPen( QColor( 64, 64, 64 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	p.drawPixmap( 4, 4, logo );
 
-	QFont f = pointSize<8>( p.font() );
-	f.setBold( true );
+	QFont f = p.font();
+	if ( m_mouseOver )
+	{
+		f.setBold( true );
+	}
+
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
@@ -165,11 +163,11 @@ void PluginDescWidget::paintEvent( QPaintEvent * )
 	if( height() > 24 || m_mouseOver )
 	{
 		f.setBold( false );
-		p.setFont( pointSize<8>( f ) );
+		p.setFont( f );
 		QRect br;
 		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
-							Qt::TextWordWrap,
-			PluginBrowser::tr( m_pluginDescriptor.description ),
+								Qt::TextWordWrap,
+								qApp->translate( "pluginBrowser", m_pluginDescriptor.description ),
 								&br );
 		if( m_mouseOver )
 		{
@@ -234,7 +232,7 @@ void PluginDescWidget::updateHeight()
 
 	if( !m_updateTimer.isActive() )
 	{
-		m_updateTimer.start( 15 );
+		m_updateTimer.start( 10 );
 	}
 }
 

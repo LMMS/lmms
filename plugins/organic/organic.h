@@ -1,9 +1,9 @@
 /*
  * organic.h - additive synthesizer for organ-like sounds
  *
- * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
+ * Copyright (c) 2006-2015 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,6 +39,7 @@ class Knob;
 class NotePlayHandle;
 class PixmapButton;
 
+const int NUM_OSCILLATORS = 8;
 const int NUM_HARMONICS = 18;
 const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
 	"Octave below",
@@ -63,9 +64,9 @@ const QString HARMONIC_NAMES[NUM_HARMONICS] =  {
 	
 const QString WAVEFORM_NAMES[6] = {
 	"Sine wave",
-	"Triangle wave",
 	"Saw wave",
 	"Square wave",
+	"Triangle wave",
 	"Moog saw wave",
 	"Exponential wave"
 	};
@@ -153,6 +154,8 @@ private:
 		MM_OPERATORS
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
+		float phaseOffsetLeft[NUM_OSCILLATORS];
+		float phaseOffsetRight[NUM_OSCILLATORS];		
 	} ;
 
 	const IntModel m_modulationAlgo;

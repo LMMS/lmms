@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -137,9 +137,8 @@ public:
 		SubPluginFeatures * subPluginFeatures;
 
 	} ;
-
 	// typedef a list so we can easily work with list of plugin descriptors
-	typedef QList<Descriptor> DescriptorList;
+	typedef QList<Descriptor*> DescriptorList;
 
 	// contructor of a plugin
 	Plugin( const Descriptor * descriptor, Model * parent );
@@ -176,9 +175,6 @@ public:
 	// returns an instance of a plugin whose name matches to given one
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
 	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
-
-	// fills given list with descriptors of all available plugins
-	static void getDescriptorsOfAvailPlugins( DescriptorList & pluginDescriptors );
 
 	// create a view for the model 
 	PluginView * createView( QWidget * parent );

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,12 @@
 class EqFilter : public StereoBiQuad
 {
 public:
-	EqFilter()
+	EqFilter() :
+		m_sampleRate(0),
+		m_freq(0),
+		m_res(0),
+		m_gain(0),
+		m_bw(0)
 	{
 
 	}
@@ -94,29 +99,18 @@ public:
 
 	virtual inline void setParameters( float sampleRate, float freq, float res, float gain )
 	{
-		bool hasChanged = false;
-		if( sampleRate != m_sampleRate )
+		bool hasChanged = ( sampleRate != m_sampleRate ||
+		                    freq != m_freq ||
+		                    res != m_res ||
+		                    gain != m_gain );
+		if ( hasChanged )
 		{
 			m_sampleRate = sampleRate;
-			hasChanged = true;
-		}
-		if ( freq != m_freq )
-		{
 			m_freq = freq;
-			hasChanged = true;
-		}
-		if ( res != m_res )
-		{
 			m_res = res;
-			hasChanged = true;
-		}
-		if ( gain != m_gain )
-		{
 			m_gain = gain;
-			hasChanged = true;
+			calcCoefficents();
 		}
-
-		if ( hasChanged ) { calcCoefficents(); }
 	}
 
 

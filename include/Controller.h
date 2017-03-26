@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,9 +28,9 @@
 #define CONTROLLER_H
 
 #include "Engine.h"
-#include "Mixer.h"
 #include "Model.h"
 #include "JournallingObject.h"
+#include "templates.h"
 #include "ValueBuffer.h"
 
 class ControllerDialog;

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,6 +36,7 @@
 #include "Engine.h"
 #include "Song.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "interpolation.h"
 #include "gui_templates.h"
@@ -717,7 +718,7 @@ void AudioFileProcessorView::paintEvent( QPaintEvent * )
 
 void AudioFileProcessorView::sampleUpdated( void )
 {
-	newWaveView();
+	m_waveView->updateSampleRange();
 	m_waveView->update();
 	update();
 }
@@ -734,7 +735,7 @@ void AudioFileProcessorView::openAudioFile( void )
 	{
 		castModel<audioFileProcessor>()->setAudioFile( af );
 		Engine::getSong()->setModified();
-		newWaveView();
+		m_waveView->updateSampleRange();
 	}
 }
 
@@ -760,6 +761,16 @@ void AudioFileProcessorView::modelChanged( void )
 
 
 
+void AudioFileProcessorWaveView::updateSampleRange()
+{
+	if( m_sampleBuffer.frames() > 1 )
+	{
+		const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
+		m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
+		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
+	}
+}
+
 AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf ) :
 	QWidget( _parent ),
 	m_sampleBuffer( buf ),
@@ -780,12 +791,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	setFixedSize( _w, _h );
 	setMouseTracking( true );
 
-	if( m_sampleBuffer.frames() > 1 )
-	{
-		const f_cnt_t marging = ( m_sampleBuffer.endFrame() - m_sampleBuffer.startFrame() ) * 0.1;
-		m_from = qMax( 0, m_sampleBuffer.startFrame() - marging );
-		m_to = qMin( m_sampleBuffer.endFrame() + marging, m_sampleBuffer.frames() );
-	}
+	updateSampleRange();
 
 	m_graph.fill( Qt::transparent );
 	update();

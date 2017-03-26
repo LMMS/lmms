@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,12 +26,15 @@
 #ifndef FX_LINE_H
 #define FX_LINE_H
 
+#include <QGraphicsView>
+#include <QLineEdit>
 #include <QWidget>
-#include <QLabel>
 
 #include "Knob.h"
 #include "LcdWidget.h"
 #include "SendButtonIndicator.h"
+
+
 
 class FxMixerView;
 class SendButtonIndicator;
@@ -41,6 +44,10 @@ class FxLine : public QWidget
 	Q_OBJECT
 public:
 	Q_PROPERTY( QBrush backgroundActive READ backgroundActive WRITE setBackgroundActive )
+	Q_PROPERTY( QColor strokeOuterActive READ strokeOuterActive WRITE setStrokeOuterActive )
+	Q_PROPERTY( QColor strokeOuterInactive READ strokeOuterInactive WRITE setStrokeOuterInactive )
+	Q_PROPERTY( QColor strokeInnerActive READ strokeInnerActive WRITE setStrokeInnerActive )
+	Q_PROPERTY( QColor strokeInnerInactive READ strokeInnerInactive WRITE setStrokeInnerInactive )
 	FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex);
 	~FxLine();
 
@@ -57,27 +64,47 @@ public:
 
 	QBrush backgroundActive() const;
 	void setBackgroundActive( const QBrush & c );
+	
+	QColor strokeOuterActive() const;
+	void setStrokeOuterActive( const QColor & c );
+	
+	QColor strokeOuterInactive() const;
+	void setStrokeOuterInactive( const QColor & c );
+	
+	QColor strokeInnerActive() const;
+	void setStrokeInnerActive( const QColor & c );
+	
+	QColor strokeInnerInactive() const;
+	void setStrokeInnerInactive( const QColor & c );
 
 	static const int FxLineHeight;
 
 private:
-	static void drawFxLine( QPainter* p, const FxLine *fxLine, const QString& name, bool isActive, bool sendToThis, bool receiveFromThis );
+	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
+	QString elideName( const QString & name );
 
 	FxMixerView * m_mv;
 	LcdWidget* m_lcd;
 	int m_channelIndex;
 	QBrush m_backgroundActive;
+	QColor m_strokeOuterActive;
+	QColor m_strokeOuterInactive;
+	QColor m_strokeInnerActive;
+	QColor m_strokeInnerInactive;
 	static QPixmap * s_sendBgArrow;
 	static QPixmap * s_receiveBgArrow;
+	bool m_inRename;
+	QLineEdit * m_renameLineEdit;
+	QGraphicsView * m_view;
 
 private slots:
 	void renameChannel();
+	void renameFinished();
 	void removeChannel();
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
 	void displayHelp();
-
 };
 
 

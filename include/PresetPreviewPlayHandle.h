@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,6 +37,11 @@ class EXPORT PresetPreviewPlayHandle : public PlayHandle
 public:
 	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );
 	virtual ~PresetPreviewPlayHandle();
+
+	virtual inline bool affinityMatters() const
+	{
+		return true;
+	}
 
 	virtual void play( sampleFrame* buffer );
 	virtual bool isFinished() const;

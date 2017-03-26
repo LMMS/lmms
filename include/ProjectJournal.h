@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -45,6 +45,9 @@ public:
 	void undo();
 	void redo();
 
+	bool canUndo() const;
+	bool canRedo() const;
+
 	void addJournalCheckPoint( JournallingObject *jo );
 
 	bool isJournalling() const
@@ -72,6 +75,8 @@ public:
 	{
 		reallocID( _id, NULL );
 	}
+
+	static jo_id_t idToSave( jo_id_t id );
 
 	void clearJournal();
 	void stopAllJournalling();

@@ -1,6 +1,6 @@
 /* Generated file, do not edit */
 
-#define IMPULSES      21
+#define IMPULSES 21
 
 #include "impulses/01-unit.h"
 #include "impulses/02-steves-flat.h"
@@ -25,9 +25,9 @@
 #include "impulses/21-matchless-chieftain-sm57-off.h"
 
 #ifdef __clang__
-void mk_imps(fftw_real **impulse_freq)
+static void mk_imps(fftw_real **impulse_freq)
 #else
-inline void mk_imps(fftw_real **impulse_freq)
+static inline void mk_imps(fftw_real **impulse_freq)
 #endif
 {
 	int c = 0;

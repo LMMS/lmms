@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -33,11 +33,7 @@ void __attribute__((constructor)) swh_init(); // forward declaration
 
 inline int partition(LADSPA_Data array[], int left, int right);
 
-#ifdef __clang__
 void q_sort(LADSPA_Data array[], int left, int right) {
-#else
-inline void q_sort(LADSPA_Data array[], int left, int right) {
-#endif
         float pivot = partition(array, left, right);
 
         if (left < pivot) {
@@ -164,7 +160,7 @@ static void connectPortSifter(
 static LADSPA_Handle instantiateSifter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Sifter *plugin_data = (Sifter *)malloc(sizeof(Sifter));
+	Sifter *plugin_data = (Sifter *)calloc(1, sizeof(Sifter));
 	LADSPA_Data *b1 = NULL;
 	long b1ptr;
 	LADSPA_Data *b2 = NULL;
@@ -359,14 +355,13 @@ static void runAddingSifter(LADSPA_Handle instance, unsigned long sample_count) 
 	plugin_data->b2ptr = b2ptr;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -438,12 +433,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (sifterDescriptor) {
 		free((LADSPA_PortDescriptor *)sifterDescriptor->PortDescriptors);
 		free((char **)sifterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sifterDescriptor->PortRangeHints);
 		free(sifterDescriptor);
 	}
+	sifterDescriptor = NULL;
 
 }

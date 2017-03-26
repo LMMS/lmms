@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -47,7 +47,10 @@ public:
 
 #include <portaudio.h>
 
+#include <QtCore/QSemaphore>
+
 #include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 
 #if defined paNeverDropInput || defined paNonInterleaved
 #	define PORTAUDIO_V19
@@ -77,7 +80,7 @@ public:
 		unsigned long _framesPerBuffer );
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );

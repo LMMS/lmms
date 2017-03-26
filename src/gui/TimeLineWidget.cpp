@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,8 +34,6 @@
 
 #include "TimeLineWidget.h"
 #include "embed.h"
-#include "Engine.h"
-#include "templates.h"
 #include "NStateButton.h"
 #include "GuiApplication.h"
 #include "TextFloat.h"
@@ -47,15 +45,21 @@
 #endif
 
 
-QPixmap * TimeLineWidget::s_timeLinePixmap = NULL;
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
-QPixmap * TimeLineWidget::s_loopPointBeginPixmap = NULL;
-QPixmap * TimeLineWidget::s_loopPointEndPixmap = NULL;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 			Song::PlayPos & pos, const MidiTime & begin,
 							QWidget * parent ) :
 	QWidget( parent ),
+	m_inactiveLoopColor( 52, 63, 53, 64 ),
+	m_inactiveLoopBrush( QColor( 255, 255, 255, 32 ) ),
+	m_inactiveLoopInnerColor( 255, 255, 255, 32 ),
+	m_activeLoopColor( 52, 63, 53, 255 ),
+	m_activeLoopBrush( QColor( 55, 141, 89 ) ),
+	m_activeLoopInnerColor( 74, 155, 100, 255 ),
+	m_loopRectangleVerticalPadding( 1 ),
+	m_barLineColor( 192, 192, 192 ),
+	m_barNumberColor( m_barLineColor.darker( 120 ) ),
 	m_autoScroll( AutoScrollEnabled ),
 	m_loopPoints( LoopPointsDisabled ),
 	m_behaviourAtStop( BackToZero ),
@@ -73,30 +77,14 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_loopPos[0] = 0;
 	m_loopPos[1] = DefaultTicksPerTact;
 
-	if( s_timeLinePixmap == NULL )
-	{
-		s_timeLinePixmap = new QPixmap( embed::getIconPixmap(
-								"timeline" ) );
-	}
 	if( s_posMarkerPixmap == NULL )
 	{
 		s_posMarkerPixmap = new QPixmap( embed::getIconPixmap(
 							"playpos_marker" ) );
 	}
-	if( s_loopPointBeginPixmap == NULL )
-	{
-		s_loopPointBeginPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point_b" ) );
-	}
-	if( s_loopPointEndPixmap == NULL )
-	{
-		s_loopPointEndPixmap = new QPixmap( embed::getIconPixmap(
-							"loop_point_e" ) );
-	}
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	move( 0, yoff );
-	setFixedHeight( s_timeLinePixmap->height() );
 
 	m_xOffset -= s_posMarkerPixmap->width() / 2;
 
@@ -230,46 +218,71 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	QColor bg_color = QApplication::palette().color( QPalette::Active,
-							QPalette::Background );
-	QLinearGradient g( 0, 0, 0, height() );
-	g.setColorAt( 0, bg_color.lighter( 150 ) );
-	g.setColorAt( 1, bg_color.darker( 150 ) );
-	p.fillRect( 0, 0, width(), height(), g );
+	// Draw background
+	p.fillRect( 0, 0, width(), height(), p.background() );
 
+	// Clip so that we only draw everything starting from the offset
 	p.setClipRect( m_xOffset, 0, width() - m_xOffset, height() );
-	p.setPen( QColor( 0, 0, 0 ) );
 
-	p.setOpacity( loopPointsEnabled() ? 0.9 : 0.2 );
-	p.drawPixmap( markerX( loopBegin() )+2, 2, *s_loopPointBeginPixmap );
-	p.drawPixmap( markerX( loopEnd() )+2, 2, *s_loopPointEndPixmap );
-	p.setOpacity( 1.0 );
+	// Draw the loop rectangle
+	int const & loopRectMargin = getLoopRectangleVerticalPadding();
+	int const loopRectHeight = this->height() - 2 * loopRectMargin;
+	int const loopStart = markerX( loopBegin() ) + 8;
+	int const loopEndR = markerX( loopEnd() ) + 9;
+	int const loopRectWidth = loopEndR - loopStart;
 
+	bool const loopPointsActive = loopPointsEnabled();
 
-	tact_t tact_num = m_begin.getTact();
-	int x = m_xOffset + s_posMarkerPixmap->width() / 2 -
+	// Draw the main rectangle (inner fill only)
+	QRect outerRectangle( loopStart, loopRectMargin, loopRectWidth - 1, loopRectHeight - 1 );
+	p.fillRect( outerRectangle, loopPointsActive ? getActiveLoopBrush() : getInactiveLoopBrush());
+
+	// Draw the bar lines and numbers
+	// Activate hinting on the font
+	QFont font = p.font();
+	font.setHintingPreference( QFont::PreferFullHinting );
+	p.setFont(font);
+	int const fontAscent = p.fontMetrics().ascent();
+	int const fontHeight = p.fontMetrics().height();
+
+	QColor const & barLineColor = getBarLineColor();
+	QColor const & barNumberColor = getBarNumberColor();
+
+	tact_t barNumber = m_begin.getTact();
+	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppt ) / MidiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
-	p.setPen( QColor( 192, 192, 192 ) );
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
-		const int cx = x + qRound( i * m_ppt );
-		p.drawLine( cx, 5, cx, height() - 6 );
-		++tact_num;
-		if( ( tact_num - 1 ) %
+		++barNumber;
+		if( ( barNumber - 1 ) %
 			qMax( 1, qRound( 1.0f / 3.0f *
 				MidiTime::ticksPerTact() / m_ppt ) ) == 0 )
 		{
-			const QString s = QString::number( tact_num );
-			p.drawText( cx + qRound( ( m_ppt - p.fontMetrics().
-							width( s ) ) / 2 ),
-				height() - p.fontMetrics().height() / 2, s );
+			const int cx = x + qRound( i * m_ppt );
+			p.setPen( barLineColor );
+			p.drawLine( cx, 5, cx, height() - 6 );
+
+			const QString s = QString::number( barNumber );
+			p.setPen( barNumberColor );
+			p.drawText( cx + 5, ((height() - fontHeight) / 2) + fontAscent, s );
 		}
 	}
 
+	// Draw the main rectangle (outer border)
+	p.setPen( loopPointsActive ? getActiveLoopColor() : getInactiveLoopColor() );
+	p.setBrush( Qt::NoBrush );
+	p.drawRect( outerRectangle );
+
+	// Draw the inner border outline (no fill)
+	QRect innerRectangle = outerRectangle.adjusted( 1, 1, -1, -1 );
+	p.setPen( loopPointsActive ? getActiveLoopInnerColor() : getInactiveLoopInnerColor() );
+	p.setBrush( Qt::NoBrush );
+	p.drawRect( innerRectangle );
+
+	// Draw the position marker
 	p.setOpacity( 0.6 );
-	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(),
-							*s_posMarkerPixmap );
+	p.drawPixmap( m_posMarkerX, height() - s_posMarkerPixmap->height(), *s_posMarkerPixmap );
 }
 
 
@@ -321,14 +334,24 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> to disable magnetic loop points." ),
+					tr( "Press <%1> to disable magnetic loop points." ).arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"),
+						#else
+						"Ctrl"),
+						#endif
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 	else if( m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift> to move the begin loop point; Press <Ctrl> to disable magnetic loop points." ),
+					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(
+						#ifdef LMMS_BUILD_APPLE
+						"⌘"),
+						#else
+						"Ctrl"),
+						#endif
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 
@@ -346,9 +369,12 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		case MovePositionMarker:
 			m_pos.setTicks( t.getTicks() );
-			Engine::getSong()->setMilliSeconds(((((t.getTicks()))*60*1000/48)/Engine::getSong()->getTempo()));
+			Engine::getSong()->setMilliSeconds( ( t.getTicks() *
+					( 60 * 1000 / 48 ) ) /
+						Engine::getSong()->getTempo() );
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
+			positionMarkerMoved();
 			break;
 
 		case MoveLoopBegin:
@@ -398,6 +424,3 @@ void TimeLineWidget::mouseReleaseEvent( QMouseEvent* event )
 	if ( m_action == SelectSongTCO ) { emit selectionFinished(); }
 	m_action = NoAction;
 }
-
-
-

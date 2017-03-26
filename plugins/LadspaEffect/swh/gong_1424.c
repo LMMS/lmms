@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -250,7 +250,7 @@ static void connectPortGong(
 static LADSPA_Handle instantiateGong(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Gong *plugin_data = (Gong *)malloc(sizeof(Gong));
+	Gong *plugin_data = (Gong *)calloc(1, sizeof(Gong));
 	int maxsize_i;
 	int maxsize_o;
 	float *out = NULL;
@@ -608,14 +608,13 @@ static void runAddingGong(LADSPA_Handle instance, unsigned long sample_count) {
 	}
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -947,12 +946,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (gongDescriptor) {
 		free((LADSPA_PortDescriptor *)gongDescriptor->PortDescriptors);
 		free((char **)gongDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)gongDescriptor->PortRangeHints);
 		free(gongDescriptor);
 	}
+	gongDescriptor = NULL;
 
 }

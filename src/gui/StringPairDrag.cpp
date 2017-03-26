@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,6 @@
 
 #include <QMimeData>
 #include <QDragEnterEvent>
-#include <QDropEvent>
 
 
 #include "StringPairDrag.h"
@@ -52,7 +51,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	}
 	QString txt = _key + ":" + _value;
 	QMimeData * m = new QMimeData();
-	m->setData( mimeType(), txt.toLatin1() );
+	m->setData( mimeType(), txt.toUtf8() );
 	setMimeData( m );
 	start( Qt::IgnoreAction );
 }
@@ -95,7 +94,7 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 {
-	return( QString( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
 }
 
 
@@ -103,7 +102,7 @@ QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 
 QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
 {
-	return( QString( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
+	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
 }
 
 

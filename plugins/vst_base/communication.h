@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -63,7 +63,6 @@ enum VstRemoteMessageIDs
 	IdVstGetParameterCount,
 	IdVstGetParameterDump,
 	IdVstSetParameterDump,
-	IdVstGetParameterProperties,
 	IdVstProgramNames,
 	IdVstCurrentProgram,
 	IdVstCurrentProgramName,
@@ -84,8 +83,7 @@ enum VstRemoteMessageIDs
 	IdVstPluginUniqueID,
 	IdVstSetParameter,
 	IdVstParameterCount,
-	IdVstParameterDump,
-	IdVstParameterProperties
+	IdVstParameterDump
 
 } ;
 

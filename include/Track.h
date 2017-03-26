@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -54,14 +54,13 @@ class TrackContainerView;
 class TrackContentWidget;
 class TrackView;
 
-typedef QWidget trackSettingsWidget;
 
 const int DEFAULT_SETTINGS_WIDGET_WIDTH = 224;
 const int TRACK_OP_WIDTH = 78;
 // This shaves 150-ish pixels off track buttons,
 // ruled from config: ui.compacttrackbuttons
 const int DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT = 96;
-const int TRACK_OP_WIDTH_COMPACT = 60;
+const int TRACK_OP_WIDTH_COMPACT = 62;
 
 /*! The minimum track height in pixels
  *
@@ -191,8 +190,13 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_OBJECT
 
 // theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
+	Q_PROPERTY( QColor mutedColor READ mutedColor WRITE setMutedColor )
+	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
+	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
+	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
 
 public:
 	TrackContentObjectView( TrackContentObject * tco, TrackView * tv );
@@ -204,16 +208,31 @@ public:
 	{
 		return m_tco;
 	}
-// qproperty access func
-	QColor fgColor() const;
+	// qproperty access func
+	QColor mutedColor() const;
+	QColor mutedBackgroundColor() const;
+	QColor selectedColor() const;
 	QColor textColor() const;
-	void setFgColor( const QColor & c );
+	QColor textShadowColor() const;
+	QColor BBPatternBackground() const;
+	bool gradient() const;
+	void setMutedColor( const QColor & c );
+	void setMutedBackgroundColor( const QColor & c );
+	void setSelectedColor( const QColor & c );
 	void setTextColor( const QColor & c );
+	void setTextShadowColor( const QColor & c );
+	void setBBPatternBackground( const QColor & c );
+	void setGradient( const bool & b );
 
+	// access needsUpdate member variable
+	bool needsUpdate();
+	void setNeedsUpdate( bool b );
+	
 public slots:
 	virtual bool close();
 	void cut();
 	void remove();
+	virtual void update();
 
 protected:
 	virtual void constructContextMenu( QMenu * )
@@ -227,6 +246,11 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void mouseMoveEvent( QMouseEvent * me );
 	virtual void mouseReleaseEvent( QMouseEvent * me );
+	virtual void resizeEvent( QResizeEvent * re )
+	{
+		m_needsUpdate = true;
+		selectableObject::resizeEvent( re );
+	}
 
 	float pixelsPerTact();
 
@@ -267,9 +291,15 @@ private:
 	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
 
 // qproperty fields
-	QColor m_fgColor;
+	QColor m_mutedColor;
+	QColor m_mutedBackgroundColor;
+	QColor m_selectedColor;
 	QColor m_textColor;
+	QColor m_textShadowColor;
+	QColor m_BBPatternBackground;
+	bool m_gradient;
 
+ 	bool m_needsUpdate;
 	inline void setInitialMousePos( QPoint pos )
 	{
 		m_initialMousePos = pos;
@@ -291,6 +321,8 @@ class TrackContentWidget : public QWidget, public JournallingObject
 	// qproperties for track background gradients
 	Q_PROPERTY( QBrush darkerColor READ darkerColor WRITE setDarkerColor )
 	Q_PROPERTY( QBrush lighterColor READ lighterColor WRITE setLighterColor )
+	Q_PROPERTY( QBrush gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QBrush embossColor READ embossColor WRITE setEmbossColor )
 
 public:
 	TrackContentWidget( TrackView * parent );
@@ -318,9 +350,13 @@ public:
 
 	QBrush darkerColor() const;
 	QBrush lighterColor() const;
+	QBrush gridColor() const;
+	QBrush embossColor() const;
 
 	void setDarkerColor( const QBrush & c );
 	void setLighterColor( const QBrush & c );
+	void setGridColor( const QBrush & c );
+	void setEmbossColor( const QBrush & c);
 
 public slots:
 	void update();
@@ -365,6 +401,8 @@ private:
 	// qproperty fields
 	QBrush m_darkerColor;
 	QBrush m_lighterColor;
+	QBrush m_gridColor;
+	QBrush m_embossColor;
 } ;
 
 
@@ -441,7 +479,7 @@ public:
 	static Track * create( TrackTypes tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
-	void clone();
+	Track * clone();
 
 
 	// pure virtual functions
@@ -487,6 +525,8 @@ public:
 	void getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
 							const MidiTime & end );
 	void swapPositionOfTCOs( int tcoNum1, int tcoNum2 );
+
+	void createTCOsForBB( int bb );
 
 
 	void insertTact( const MidiTime & pos );
@@ -536,6 +576,8 @@ public:
 	{
 		return m_processingLock.tryLock();
 	}
+
+	BoolModel* getMutedModel();
 
 public slots:
 	virtual void setName( const QString & newName )
@@ -605,7 +647,7 @@ public:
 		return &m_trackOperationsWidget;
 	}
 
-	inline trackSettingsWidget * getTrackSettingsWidget()
+	inline QWidget * getTrackSettingsWidget()
 	{
 		return &m_trackSettingsWidget;
 	}
@@ -668,7 +710,7 @@ private:
 	TrackContainerView * m_trackContainerView;
 
 	TrackOperationsWidget m_trackOperationsWidget;
-	trackSettingsWidget m_trackSettingsWidget;
+	QWidget m_trackSettingsWidget;
 	TrackContentWidget m_trackContentWidget;
 
 	Actions m_action;

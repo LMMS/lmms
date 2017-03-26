@@ -2,8 +2,8 @@
  * FileBrowser.h - include file for FileBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
- * This file is part of LMMS - http://lmms.io
+ *
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -53,14 +53,14 @@ public:
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
 	virtual ~FileBrowser();
 
-
-public slots:
-	void filterItems( const QString & filter );
+private slots:
 	void reloadTree( void );
-
+	void expandItems( QTreeWidgetItem * item=NULL );
+	// call with item=NULL to filter the entire tree
+	bool filterItems( const QString & filter, QTreeWidgetItem * item=NULL );
+	void giveFocusToFilter();
 
 private:
-	bool filterItems( QTreeWidgetItem * item, const QString & filter );
 	virtual void keyPressEvent( QKeyEvent * ke );
 
 	void addItems( const QString & path );
@@ -180,7 +180,6 @@ public:
 		SoundFontFile,
 		PatchFile,
 		MidiFile,
-		FlpFile,
 		VstPluginFile,
 		UnknownFile,
 		NumFileTypes
@@ -200,10 +199,9 @@ public:
 							const QString & path );
 	FileItem( const QString & name, const QString & path );
 
-	inline QString fullName( void ) const
+	QString fullName() const
 	{
-		return( QDir::cleanPath( m_path ) + QDir::separator() +
-								text( 0 ) );
+		return QFileInfo(m_path, text(0)).absoluteFilePath();
 	}
 
 	inline FileTypes type( void ) const
@@ -230,7 +228,6 @@ private:
 	static QPixmap * s_soundfontFilePixmap;
 	static QPixmap * s_vstPluginFilePixmap;
 	static QPixmap * s_midiFilePixmap;
-	static QPixmap * s_flpFilePixmap;
 	static QPixmap * s_unknownFilePixmap;
 
 	QString m_path;

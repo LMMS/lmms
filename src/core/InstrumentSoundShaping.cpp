@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,8 +31,7 @@
 #include "EnvelopeAndLfoParameters.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "NotePlayHandle.h"
-
+#include "Mixer.h"
 
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;
@@ -42,7 +41,7 @@ const float RES_PRECISION = 1000.0f;
 
 // names for env- and lfo-targets - first is name being displayed to user
 // and second one is used internally, e.g. for saving/restoring settings
-const QString __targetNames[InstrumentSoundShaping::NumTargets][3] =
+const QString InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTargets][3] =
 {
 	{ InstrumentSoundShaping::tr( "VOLUME" ), "vol",
 			InstrumentSoundShaping::tr( "Volume" ) },
@@ -76,7 +75,7 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 										value_for_zero_amount, 
 										this );
 		m_envLfoParameters[i]->setDisplayName(
-			tr( __targetNames[i][2].toUtf8().constData() ) );
+			tr( targetNames[i][2].toUtf8().constData() ) );
 	}
 
 	m_filterModel.addItem( tr( "LowPass" ), new PixmapLoader( "filter_lp" ) );
@@ -331,7 +330,7 @@ void InstrumentSoundShaping::saveSettings( QDomDocument & _doc, QDomElement & _t
 	{
 		m_envLfoParameters[i]->saveState( _doc, _this ).setTagName(
 			m_envLfoParameters[i]->nodeName() +
-				QString( __targetNames[i][1] ).toLower() );
+				QString( targetNames[i][1] ).toLower() );
 	}
 }
 
@@ -354,7 +353,7 @@ void InstrumentSoundShaping::loadSettings( const QDomElement & _this )
 			{
 				if( node.nodeName() ==
 					m_envLfoParameters[i]->nodeName() +
-					QString( __targetNames[i][1] ).
+					QString( targetNames[i][1] ).
 								toLower() )
 				{
 					m_envLfoParameters[i]->restoreState( node.toElement() );

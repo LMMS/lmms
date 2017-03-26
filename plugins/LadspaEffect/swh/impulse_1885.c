@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -96,7 +96,7 @@ static void connectPortImpulse_fc(
 static LADSPA_Handle instantiateImpulse_fc(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Impulse_fc *plugin_data = (Impulse_fc *)malloc(sizeof(Impulse_fc));
+	Impulse_fc *plugin_data = (Impulse_fc *)calloc(1, sizeof(Impulse_fc));
 	float phase;
 	LADSPA_Data sample_rate;
 
@@ -186,14 +186,13 @@ static void runAddingImpulse_fc(LADSPA_Handle instance, unsigned long sample_cou
 	plugin_data->phase = phase;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -257,12 +256,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (impulse_fcDescriptor) {
 		free((LADSPA_PortDescriptor *)impulse_fcDescriptor->PortDescriptors);
 		free((char **)impulse_fcDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)impulse_fcDescriptor->PortRangeHints);
 		free(impulse_fcDescriptor);
 	}
+	impulse_fcDescriptor = NULL;
 
 }

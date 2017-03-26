@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,30 +23,13 @@
  *
  */
 
-
-
 #include "base64.h"
 
 #include <QBuffer>
-#include <QVariant>
+#include <QDataStream>
 
 namespace base64
 {
-
-
-QString encode( const QVariant & _data )
-{
-	QBuffer buf;
-	buf.open( QBuffer::WriteOnly );
-	QDataStream out( &buf );
-	out << _data;
-	QByteArray data = buf.buffer();
-	QString dst;
-	encode( data.constData(), data.size(), dst );
-	return( dst );
-}
-
-
 
 
 QVariant decode( const QString & _b64, QVariant::Type _force_type )

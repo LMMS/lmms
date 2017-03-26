@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,15 +25,12 @@
 
 #include "BufferManager.h"
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QAtomicInt>
-
 #include "MemoryManager.h"
 
 sampleFrame ** BufferManager::s_available;
-QAtomicInt BufferManager::s_availableIndex = 0;
+AtomicInt BufferManager::s_availableIndex = 0;
 sampleFrame ** BufferManager::s_released;
-QAtomicInt BufferManager::s_releasedIndex = 0;
+AtomicInt BufferManager::s_releasedIndex = 0;
 //QReadWriteLock BufferManager::s_mutex;
 int BufferManager::s_size;
 
@@ -71,8 +68,25 @@ sampleFrame * BufferManager::acquire()
 }
 
 
+void BufferManager::clear( sampleFrame * ab, const f_cnt_t frames,
+							const f_cnt_t offset )
+{
+	memset( ab + offset, 0, sizeof( *ab ) * frames );
+}
+
+
+#ifndef LMMS_DISABLE_SURROUND
+void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
+							const f_cnt_t offset )
+{
+	memset( ab + offset, 0, sizeof( *ab ) * frames );
+}
+#endif
+
+
 void BufferManager::release( sampleFrame * buf )
 {
+	if (buf == nullptr) return;
 	int i = s_releasedIndex.fetchAndAddOrdered( 1 );
 	s_released[ i ] = buf;
 	//qDebug( "released buffer: %p - index %d", buf, i );

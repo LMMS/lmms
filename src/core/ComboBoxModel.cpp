@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -39,7 +39,7 @@ void ComboBoxModel::addItem( const QString& item, PixmapLoader* loader )
 void ComboBoxModel::clear()
 {
 	setRange( 0, 0 );
-	foreach( const Item& i, m_items )
+	for( const Item& i : m_items )
 	{
 		delete i.second;
 	}

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 #include "Track.h"
 
 #include <assert.h>
-#include <cstdio>
 
 #include <QLayout>
 #include <QMenu>
@@ -60,28 +59,19 @@
 #include "GuiApplication.h"
 #include "FxMixerView.h"
 #include "gui_templates.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
-#include "DataFile.h"
-#include "PixmapButton.h"
+#include "Mixer.h"
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
+#include "SongEditor.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
-#include "ToolTip.h"
-#include "TrackContainer.h"
 
 
 /*! The width of the resize grip in pixels
  */
 const int RESIZE_GRIP_WIDTH = 4;
-
-/*! The size of the track buttons in pixels
- */
-const int TRACK_OP_BTN_WIDTH = 20;
-const int TRACK_OP_BTN_HEIGHT = 14;
 
 
 /*! A pointer for that text bubble used when moving segments, etc.
@@ -108,7 +98,7 @@ TrackContentObject::TrackContentObject( Track * track ) :
 	m_name( QString::null ),
 	m_startPosition(),
 	m_length(),
-	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Mute" ) ),
 	m_selectViewOnCreate( false )
 {
 	if( getTrack() )
@@ -155,8 +145,8 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 	{
 		m_startPosition = pos;
 		Engine::getSong()->updateLength();
+		emit positionChanged();
 	}
-	emit positionChanged();
 }
 
 
@@ -171,11 +161,8 @@ void TrackContentObject::movePosition( const MidiTime & pos )
  */
 void TrackContentObject::changeLength( const MidiTime & length )
 {
-	if( m_length != length )
-	{
-		m_length = length;
-		Engine::getSong()->updateLength();
-	}
+	m_length = length;
+	Engine::getSong()->updateLength();
 	emit lengthChanged();
 }
 
@@ -256,8 +243,14 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	m_initialMousePos( QPoint( 0, 0 ) ),
 	m_initialMouseGlobalPos( QPoint( 0, 0 ) ),
 	m_hint( NULL ),
-	m_fgColor( 0, 0, 0 ),
-	m_textColor( 0, 0, 0 )
+	m_mutedColor( 0, 0, 0 ),
+	m_mutedBackgroundColor( 0, 0, 0 ),
+	m_selectedColor( 0, 0, 0 ),
+	m_textColor( 0, 0, 0 ),
+	m_textShadowColor( 0, 0, 0 ),
+	m_BBPatternBackground( 0, 0, 0 ),
+	m_gradient( true ),
+	m_needsUpdate( true )
 {
 	if( s_textFloat == NULL )
 	{
@@ -269,21 +262,24 @@ TrackContentObjectView::TrackContentObjectView( TrackContentObject * tco,
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setFocusPolicy( Qt::StrongFocus );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
-	move( 0, 1 );
+	move( 0, 0 );
 	show();
 
-	setFixedHeight( tv->getTrackContentWidget()->height() - 2 );
+	setFixedHeight( tv->getTrackContentWidget()->height() - 1);
 	setAcceptDrops( true );
 	setMouseTracking( true );
 
 	connect( m_tco, SIGNAL( lengthChanged() ),
 			this, SLOT( updateLength() ) );
+	connect( gui->songEditor()->m_editor->zoomingModel(), SIGNAL( dataChanged() ), this, SLOT( updateLength() ) );
 	connect( m_tco, SIGNAL( positionChanged() ),
 			this, SLOT( updatePosition() ) );
 	connect( m_tco, SIGNAL( destroyedTCO() ), this, SLOT( close() ) );
 	setModel( m_tco );
 
 	m_trackView->getTrackContentWidget()->addTCOView( this );
+	updateLength();
+	updatePosition();
 }
 
 
@@ -305,6 +301,23 @@ TrackContentObjectView::~TrackContentObjectView()
 }
 
 
+/*! \brief Update a TrackContentObjectView
+ *
+ *  TCO's get drawn only when needed, 
+ *  and when a TCO is updated, 
+ *  it needs to be redrawn.
+ *
+ */
+void TrackContentObjectView::update()
+{
+	if( fixedTCOs() )
+	{
+		updateLength();
+	}
+	m_needsUpdate = true;
+	selectableObject::update();
+}
+
 
 
 /*! \brief Does this trackContentObjectView have a fixed TCO?
@@ -324,21 +337,54 @@ bool TrackContentObjectView::fixedTCOs()
 
 // qproperty access functions, to be inherited & used by TCOviews
 //! \brief CSS theming qproperty access method
-QColor TrackContentObjectView::fgColor() const
-{ return m_fgColor; }
+QColor TrackContentObjectView::mutedColor() const
+{ return m_mutedColor; }
 
-//! \brief CSS theming qproperty access method
+QColor TrackContentObjectView::mutedBackgroundColor() const
+{ return m_mutedBackgroundColor; }
+
+QColor TrackContentObjectView::selectedColor() const
+{ return m_selectedColor; }
+
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
 
-//! \brief CSS theming qproperty access method
-void TrackContentObjectView::setFgColor( const QColor & c )
-{ m_fgColor = QColor( c ); }
+QColor TrackContentObjectView::textShadowColor() const
+{ return m_textShadowColor; }
+
+QColor TrackContentObjectView::BBPatternBackground() const
+{ return m_BBPatternBackground; }
+
+bool TrackContentObjectView::gradient() const
+{ return m_gradient; }
 
 //! \brief CSS theming qproperty access method
+void TrackContentObjectView::setMutedColor( const QColor & c )
+{ m_mutedColor = QColor( c ); }
+
+void TrackContentObjectView::setMutedBackgroundColor( const QColor & c )
+{ m_mutedBackgroundColor = QColor( c ); }
+
+void TrackContentObjectView::setSelectedColor( const QColor & c )
+{ m_selectedColor = QColor( c ); }
+
 void TrackContentObjectView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
 
+void TrackContentObjectView::setTextShadowColor( const QColor & c )
+{ m_textShadowColor = QColor( c ); }
+
+void TrackContentObjectView::setBBPatternBackground( const QColor & c )
+{ m_BBPatternBackground = QColor( c ); }
+
+void TrackContentObjectView::setGradient( const bool & b )
+{ m_gradient = b; }
+
+// access needsUpdate member variable
+bool TrackContentObjectView::needsUpdate()
+{ return m_needsUpdate; }
+void TrackContentObjectView::setNeedsUpdate( bool b )
+{ m_needsUpdate = b; }
 
 /*! \brief Close a trackContentObjectView
  *
@@ -656,8 +702,13 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			s_textFloat->setTitle( tr( "Current position" ) );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> and drag to make "
-							"a copy." ),
+					tr( "Press <%1> and drag to make "
+							"a copy." ).arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 		else if( !m_tco->getAutoResize() )
@@ -669,8 +720,13 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			s_textFloat->setTitle( tr( "Current length" ) );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <Ctrl> for free "
-							"resizing." ),
+					tr( "Press <%1> for free "
+							"resizing." ).arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 //		s_textFloat->reparent( this );
@@ -938,7 +994,12 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<Ctrl> + middle click)" ),
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(
+					#ifdef LMMS_BUILD_APPLE
+					"⌘"),
+					#else
+					"Ctrl"),
+					#endif
 						m_tco, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
 
@@ -991,7 +1052,9 @@ TrackContentWidget::TrackContentWidget( TrackView * parent ) :
 	QWidget( parent ),
 	m_trackView( parent ),
 	m_darkerColor( Qt::SolidPattern ),
-	m_lighterColor( Qt::SolidPattern )
+	m_lighterColor( Qt::SolidPattern ),
+	m_gridColor( Qt::SolidPattern ),
+	m_embossColor( Qt::SolidPattern )
 {
 	setAcceptDrops( true );
 
@@ -1035,21 +1098,22 @@ void TrackContentWidget::updateBackground()
 	pmp.fillRect( w, 0, w , h, lighterColor() );
 
 	// draw lines
-	pmp.setPen( QPen( QColor( 0, 0, 0, 160 ), 1 ) );
-	// horizontal line
-	pmp.drawLine( 0, h-1, w*2, h-1 );
-
 	// vertical lines
+	pmp.setPen( QPen( gridColor(), 1 ) );	
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
 
-	pmp.setPen( QPen( QColor( 140, 140, 140, 64 ), 1 ) );
+	pmp.setPen( QPen( embossColor(), 1 ) );
 	for( float x = 1.0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
+	
+	// horizontal line
+	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
 
@@ -1110,7 +1174,7 @@ void TrackContentWidget::update()
 	for( tcoViewVector::iterator it = m_tcoViews.begin();
 				it != m_tcoViews.end(); ++it )
 	{
-		( *it )->setFixedHeight( height() - 2 );
+		( *it )->setFixedHeight( height() - 1 );
 		( *it )->update();
 	}
 	QWidget::update();
@@ -1524,6 +1588,14 @@ QBrush TrackContentWidget::lighterColor() const
 { return m_lighterColor; }
 
 //! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::gridColor() const
+{ return m_gridColor; }
+
+//! \brief CSS theming qproperty access method
+QBrush TrackContentWidget::embossColor() const
+{ return m_embossColor; }
+
+//! \brief CSS theming qproperty access method
 void TrackContentWidget::setDarkerColor( const QBrush & c )
 { m_darkerColor = c; }
 
@@ -1531,6 +1603,13 @@ void TrackContentWidget::setDarkerColor( const QBrush & c )
 void TrackContentWidget::setLighterColor( const QBrush & c )
 { m_lighterColor = c; }
 
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setGridColor( const QBrush & c )
+{ m_gridColor = c; }
+
+//! \brief CSS theming qproperty access method
+void TrackContentWidget::setEmbossColor( const QBrush & c )
+{ m_embossColor = c; }
 
 
 // ===========================================================================
@@ -1557,8 +1636,13 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 							"track_op_grip" ) );
 	}
 
-	ToolTip::add( this, tr( "Press <Ctrl> while clicking on move-grip "
-				"to begin a new drag'n'drop-action." ) );
+	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
+				"to begin a new drag'n'drop-action." ).arg(
+					#ifdef LMMS_BUILD_APPLE
+					"⌘") );
+					#else
+					"Ctrl") );
+					#endif
 
 	QMenu * toMenu = new QMenu( this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
@@ -1688,13 +1772,23 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 
 
-
 /*! \brief Clone this track
  *
  */
 void TrackOperationsWidget::cloneTrack()
 {
-	m_trackView->getTrack()->clone();
+	TrackContainerView *tcView = m_trackView->trackContainerView();
+
+	Track *newTrack = m_trackView->getTrack()->clone();
+	TrackView *newTrackView = tcView->createTrackView( newTrack );
+
+	int index = tcView->trackViews().indexOf( m_trackView );
+	int i = tcView->trackViews().size();
+	while ( i != index + 1 )
+	{
+		tcView->moveTrackView( newTrackView, i - 1 );
+		i--;
+	}
 }
 
 
@@ -1738,7 +1832,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-						
+	
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -1810,7 +1904,7 @@ Track::Track( TrackTypes type, TrackContainer * tc ) :
 	m_trackContainer( tc ),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
 	m_name(),                       /*!< The track's name */
-	m_mutedModel( false, this, tr( "Muted" ) ),
+	m_mutedModel( false, this, tr( "Mute" ) ),
 					 /*!< For controlling track muting */
 	m_soloModel( false, this, tr( "Solo" ) ),
 					/*!< For controlling track soloing */
@@ -1858,6 +1952,8 @@ Track::~Track()
  */
 Track * Track::create( TrackTypes tt, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = NULL;
 
 	switch( tt )
@@ -1873,7 +1969,15 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
 		default: break;
 	}
 
+	if( tc == Engine::getBBTrackContainer() && t )
+	{
+		t->createTCOsForBB( Engine::getBBTrackContainer()->numOfBBs()
+									- 1 );
+	}
+
 	tc->updateAfterTrackAdd();
+
+	Engine::mixer()->doneChangeInModel();
 
 	return t;
 }
@@ -1888,6 +1992,8 @@ Track * Track::create( TrackTypes tt, TrackContainer * tc )
  */
 Track * Track::create( const QDomElement & element, TrackContainer * tc )
 {
+	Engine::mixer()->requestChangeInModel();
+
 	Track * t = create(
 		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
 									tc );
@@ -1895,6 +2001,9 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 	{
 		t->restoreState( element );
 	}
+
+	Engine::mixer()->doneChangeInModel();
+
 	return t;
 }
 
@@ -1904,12 +2013,12 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 /*! \brief Clone a track from this track
  *
  */
-void Track::clone()
+Track * Track::clone()
 {
 	QDomDocument doc;
 	QDomElement parent = doc.createElement( "clone" );
 	saveState( doc, parent );
-	create( parent.firstChild().toElement(), m_trackContainer );
+	return create( parent.firstChild().toElement(), m_trackContainer );
 }
 
 
@@ -2231,6 +2340,20 @@ void Track::swapPositionOfTCOs( int tcoNum1, int tcoNum2 )
 
 
 
+void Track::createTCOsForBB( int bb )
+{
+	while( numOfTCOs() < bb + 1 )
+	{
+		MidiTime position = MidiTime( numOfTCOs(), 0 );
+		TrackContentObject * tco = createTCO( position );
+		tco->movePosition( position );
+		tco->changeLength( MidiTime( 1, 0 ) );
+	}
+}
+
+
+
+
 /*! \brief Move all the trackContentObjects after a certain time later by one bar.
  *
  *  \param pos The time at which we want to insert the bar.
@@ -2291,6 +2414,12 @@ tact_t Track::length() const
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
+		if( Engine::getSong()->isExporting() &&
+				( *it )->isMuted() )
+		{
+			continue;
+		}
+
 		const tick_t cur = ( *it )->endPosition();
 		if( cur > last )
 		{
@@ -2349,6 +2478,14 @@ void Track::toggleSolo()
 			( *it )->setMuted( ( *it )->m_mutedBeforeSolo );
 		}
 	}
+}
+
+
+
+
+BoolModel *Track::getMutedModel()
+{
+	return &m_mutedModel;
 }
 
 
@@ -2533,9 +2670,9 @@ void TrackView::dropEvent( QDropEvent * de )
 		// value contains our XML-data so simply create a
 		// DataFile which does the rest for us...
 		DataFile dataFile( value.toUtf8() );
-		m_track->lock();
+		Engine::mixer()->requestChangeInModel();
 		m_track->restoreState( dataFile.content().firstChild().toElement() );
-		m_track->unlock();
+		Engine::mixer()->doneChangeInModel();
 		de->accept();
 	}
 }
@@ -2721,6 +2858,3 @@ void TrackView::createTCOView( TrackContentObject * tco )
 	}
 	tco->selectViewOnCreate( false );
 }
-
-
-

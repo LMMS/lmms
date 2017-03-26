@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -84,12 +84,6 @@ void BBTrackContainer::updateAfterTrackAdd()
 	if( numOfBBs() == 0 && !Engine::getSong()->isLoadingProject() )
 	{
 		Engine::getSong()->addBBTrack();
-	}
-
-	// make sure, new track(s) have TCOs for every beat/bassline
-	for( int i = 0; i < qMax<int>( 1, numOfBBs() ); ++i )
-	{
-		createTCOsForBB( i );
 	}
 }
 
@@ -221,9 +215,6 @@ void BBTrackContainer::updateComboBox()
 
 void BBTrackContainer::currentBBChanged()
 {
-	// first make sure, all channels have a TCO at current BB
-	createTCOsForBB( currentBB() );
-
 	// now update all track-labels (the current one has to become white,
 	// the others gray)
 	TrackList tl = Engine::getSong()->tracks();
@@ -241,21 +232,10 @@ void BBTrackContainer::currentBBChanged()
 
 void BBTrackContainer::createTCOsForBB( int _bb )
 {
-	if( numOfBBs() == 0 || Engine::getSong()->isLoadingProject() )
-	{
-		return;
-	}
-
 	TrackList tl = tracks();
 	for( int i = 0; i < tl.size(); ++i )
 	{
-		while( tl[i]->numOfTCOs() < _bb + 1 )
-		{
-			MidiTime position = MidiTime( tl[i]->numOfTCOs(), 0 );
-			TrackContentObject * tco = tl[i]->createTCO( position );
-			tco->movePosition( position );
-			tco->changeLength( MidiTime( 1, 0 ) );
-		}
+		tl[i]->createTCOsForBB( _bb );
 	}
 }
 

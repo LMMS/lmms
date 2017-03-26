@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,7 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	EffectControlDialog( _controls )
 {
 
-	setFixedSize( 105, 115);
+	setFixedSize( 160, 185 );
 
 	setAutoFillBackground( true );
 	QPalette pal;
@@ -47,24 +47,23 @@ stereoMatrixControlDialog::stereoMatrixControlDialog(
 	setPalette( pal );
 
 
-	Knob * llKnob = new Knob( knobSmall_17, this );
+	Knob * llKnob = new Knob( knobBright_26, this );
 	llKnob->setModel( &_controls->m_llModel );
 	llKnob->setHintText( tr( "Left to Left Vol:" ) , "" );
-	llKnob->move( 40, 60 );
+	llKnob->move( 10, 79 );
 
-	Knob * lrKnob = new Knob( knobSmall_17, this );
+	Knob * lrKnob = new Knob( knobBright_26, this );
 	lrKnob->setModel( &_controls->m_lrModel );
 	lrKnob->setHintText( tr( "Left to Right Vol:" ) , "" );
-	lrKnob->move( 40+28, 60);
+	lrKnob->move( 48, 79 );
 
-	Knob * rlKnob = new Knob( knobSmall_17, this );
+	Knob * rlKnob = new Knob( knobBright_26, this );
 	rlKnob->setModel( &_controls->m_rlModel );
 	rlKnob->setHintText( tr( "Right to Left Vol:" ) , "" );
-	rlKnob->move( 40, 60+28 );
+	rlKnob->move( 85, 79 );
 
-	Knob * rrKnob = new Knob( knobSmall_17, this );
+	Knob * rrKnob = new Knob( knobBright_26, this );
 	rrKnob->setModel( &_controls->m_rrModel );
 	rrKnob->setHintText( tr( "Right to Right Vol:" ) , "" );
-	rrKnob->move( 40+28, 60+28 );
+	rrKnob->move( 123, 79 );
 }
-

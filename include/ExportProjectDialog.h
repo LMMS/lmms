@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,7 +32,7 @@
 #include "ui_export_project.h"
 
 #include "ProjectRenderer.h"
-
+#include "RenderManager.h"
 
 class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 {
@@ -50,26 +50,17 @@ protected:
 private slots:
 	void startBtnClicked( void );
 	void updateTitleBar( int );
-	void render(ProjectRenderer* renderer);
-	void multiRender();
-	ProjectRenderer* prepRender();
-	void popRender();
 	void accept();
+	void startExport();
 
 private:
 	QString m_fileName;
 	QString m_dirName;
 	QString m_fileExtension;
-	typedef QVector<ProjectRenderer*> RenderVector;
-	RenderVector m_renderers;
 	bool m_multiExport;
 
-	typedef QVector<Track*> TrackVector;
-	TrackVector m_unmuted;
-	TrackVector m_unmutedBB;
 	ProjectRenderer::ExportFileFormats m_ft;
-	TrackVector m_tracksToRender;
-	ProjectRenderer* m_activeRenderer;
+	RenderManager* m_renderManager;
 } ;
 
 #endif

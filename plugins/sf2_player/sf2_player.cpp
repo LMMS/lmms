@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail/dot/com>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,14 +28,17 @@
 #include <QLabel>
 #include <QDomDocument>
 
+#include "ConfigManager.h"
 #include "FileDialog.h"
 #include "sf2_player.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
+#include "SampleBuffer.h"
 #include "Song.h"
 
 #include "patches_dialog.h"
@@ -119,9 +122,6 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
-	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
-	Engine::mixer()->addPlayHandle( iph );
-
 	loadFile( ConfigManager::inst()->defaultSoundfont() );
 
 	updateSampleRate();
@@ -153,13 +153,17 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	connect( &m_chorusSpeed, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 	connect( &m_chorusDepth, SIGNAL( dataChanged() ), this, SLOT( updateChorus() ) );
 
+	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
+	Engine::mixer()->addPlayHandle( iph );
 }
 
 
 
 sf2Instrument::~sf2Instrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	freeFont();
 	delete_fluid_synth( m_synth );
 	delete_fluid_settings( m_settings );
@@ -485,7 +489,6 @@ void sf2Instrument::updateSampleRate()
 
 		// synth program change (set bank and patch)
 		updatePatch();
-		updateGain();
 	}
 	else
 	{
@@ -526,6 +529,12 @@ void sf2Instrument::updateSampleRate()
 	updateChorus();
 	updateReverbOn();
 	updateChorusOn();
+	updateGain();
+
+	// Reset last MIDI pitch properties, which will be set to the correct values
+	// upon playing the next note
+	m_lastMidiPitch = -1;
+	m_lastMidiPitchRange = -1;
 }
 
 
@@ -569,16 +578,15 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		m_playingNotes.append( _n );
 		m_playingNotesMutex.unlock();
 	}
-	else if( _n->isReleased() ) // note is released during this period
+	else if( _n->isReleased() && ! _n->instrumentTrack()->isSustainPedalPressed() ) // note is released during this period
 	{
 		SF2PluginData * pluginData = static_cast<SF2PluginData *>( _n->m_pluginData );
 		pluginData->offset = _n->framesBeforeRelease();
 		pluginData->isNew = false;
-		
+
 		m_playingNotesMutex.lock();
 		m_playingNotes.append( _n );
 		m_playingNotesMutex.unlock();
-
 	}
 }
 
@@ -708,16 +716,20 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 			}
 			else // otherwise remove the handle
 			{
+				m_playingNotesMutex.lock();
 				m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
+				m_playingNotesMutex.unlock();
 			}
 		}
 		else
 		{
 			noteOff( currentData );
+			m_playingNotesMutex.lock();
 			m_playingNotes.remove( m_playingNotes.indexOf( currentNote ) );
+			m_playingNotesMutex.unlock();
 		}
 	}
-	
+
 	if( currentFrame < frames )
 	{
 		renderFrames( frames - currentFrame, _working_buffer + currentFrame );
@@ -777,6 +789,12 @@ void sf2Instrument::deleteNotePluginData( NotePlayHandle * _n )
 									// do it here
 	{
 		noteOff( pluginData );
+		m_playingNotesMutex.lock();
+		if( m_playingNotes.indexOf( _n ) >= 0 )
+		{
+			m_playingNotes.remove( m_playingNotes.indexOf( _n ) );
+		}
+		m_playingNotesMutex.unlock();
 	}
 	delete pluginData;
 }
@@ -929,7 +947,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->move( 14, 226 );
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
-	ToolTip::add( m_reverbButton, tr( "Apply chorus (if supported)" ) );
+	ToolTip::add( m_chorusButton, tr( "Apply chorus (if supported)" ) );
 	m_chorusButton->setWhatsThis(
 		tr( "This button enables the chorus effect. "
 			"This is useful for cool echo effects, but only works on "
@@ -1069,7 +1087,7 @@ void sf2InstrumentView::showFileDialog()
 		QString f = k->m_filename;
 		if( QFileInfo( f ).isRelative() )
 		{
-			f = ConfigManager::inst()->userSamplesDir() + f;
+			f = ConfigManager::inst()->sf2Dir() + f;
 			if( QFileInfo( f ).exists() == false )
 			{
 				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
@@ -1080,7 +1098,7 @@ void sf2InstrumentView::showFileDialog()
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->userSamplesDir() );
+		ofd.setDirectory( ConfigManager::inst()->sf2Dir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );

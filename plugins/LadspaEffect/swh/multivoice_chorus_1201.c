@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -182,7 +182,7 @@ static void connectPortMultivoiceChorus(
 static LADSPA_Handle instantiateMultivoiceChorus(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	MultivoiceChorus *plugin_data = (MultivoiceChorus *)malloc(sizeof(MultivoiceChorus));
+	MultivoiceChorus *plugin_data = (MultivoiceChorus *)calloc(1, sizeof(MultivoiceChorus));
 	long count;
 	unsigned int delay_mask;
 	unsigned int delay_pos;
@@ -527,14 +527,13 @@ static void runAddingMultivoiceChorus(LADSPA_Handle instance, unsigned long samp
 	plugin_data->delay_pos = delay_pos;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -656,12 +655,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (multivoiceChorusDescriptor) {
 		free((LADSPA_PortDescriptor *)multivoiceChorusDescriptor->PortDescriptors);
 		free((char **)multivoiceChorusDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)multivoiceChorusDescriptor->PortRangeHints);
 		free(multivoiceChorusDescriptor);
 	}
+	multivoiceChorusDescriptor = NULL;
 
 }

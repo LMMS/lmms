@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -79,6 +79,7 @@ static void activatePitchScale(LADSPA_Handle instance) {
 	memset(buffers->gAnaFreq, 0, FRAME_LENGTH*sizeof(float));
 	memset(buffers->gAnaMagn, 0, FRAME_LENGTH*sizeof(float));
 	buffers->gRover = 0;
+	sample_rate = sample_rate;
 
 	/* do one run to make sure the plans are set up */
 	pitch_scale(buffers, 1.0, FRAME_LENGTH, 4, FRAME_LENGTH, sample_rate, buffers->gInFIFO, buffers->gOutFIFO, 0, 0.0f);
@@ -130,7 +131,7 @@ static void connectPortPitchScale(
 static LADSPA_Handle instantiatePitchScale(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	PitchScale *plugin_data = (PitchScale *)malloc(sizeof(PitchScale));
+	PitchScale *plugin_data = (PitchScale *)calloc(1, sizeof(PitchScale));
 	sbuffers *buffers = NULL;
 	long sample_rate;
 
@@ -240,14 +241,13 @@ static void runAddingPitchScale(LADSPA_Handle instance, unsigned long sample_cou
 	                                OVER_SAMP);
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -326,12 +326,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (pitchScaleDescriptor) {
 		free((LADSPA_PortDescriptor *)pitchScaleDescriptor->PortDescriptors);
 		free((char **)pitchScaleDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)pitchScaleDescriptor->PortRangeHints);
 		free(pitchScaleDescriptor);
 	}
+	pitchScaleDescriptor = NULL;
 
 }

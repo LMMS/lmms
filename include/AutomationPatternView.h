@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,6 +25,8 @@
 #ifndef AUTOMATION_PATTERN_VIEW_H
 #define AUTOMATION_PATTERN_VIEW_H
 
+#include <QStaticText>
+
 #include "Track.h"
 
 class AutomationPattern;
@@ -34,9 +36,6 @@ class AutomationPatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
-// theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 
 public:
 	AutomationPatternView( AutomationPattern * _pat, TrackView * _parent );
@@ -45,7 +44,6 @@ public:
 public slots:
 	/// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
-	virtual void update();
 
 
 protected slots:
@@ -59,12 +57,7 @@ protected slots:
 protected:
 	virtual void constructContextMenu( QMenu * );
 	virtual void mouseDoubleClickEvent(QMouseEvent * me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re )
-	{
-		m_needsUpdate = true;
-		TrackContentObjectView::resizeEvent( _re );
-	}
+	virtual void paintEvent( QPaintEvent * pe );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 
@@ -72,7 +65,8 @@ protected:
 private:
 	AutomationPattern * m_pat;
 	QPixmap m_paintPixmap;
-	bool m_needsUpdate;
+	
+	QStaticText m_staticTextName;
 	
 	static QPixmap * s_pat_rec;
 

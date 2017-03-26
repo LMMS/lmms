@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,8 +27,6 @@
 #include <QPainter>
 
 #include "SideBarWidget.h"
-#include "gui_templates.h"
-
 
 
 SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
@@ -55,21 +53,22 @@ SideBarWidget::~SideBarWidget()
 
 void SideBarWidget::paintEvent( QPaintEvent * )
 {
-	const int TITLE_FONT_HEIGHT = 13;
-
 	QPainter p( this );
 	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
 
 	QFont f = p.font();
 	f.setBold( true );
-	p.setFont( pointSize<TITLE_FONT_HEIGHT>( f ) );
+	f.setUnderline( true );
+	f.setPointSize( f.pointSize() + 2 );
+	p.setFont( f );
 
 	p.setPen( palette().highlightedText().color() );
 
 	const int tx = m_icon.width()+4;
-	const int ty = 2+TITLE_FONT_HEIGHT;
+
+	QFontMetrics metrics( f );
+	const int ty = metrics.ascent();
 	p.drawText( tx, ty, m_title );
-	p.drawLine( tx, ty+4, width()-4, ty+4 );
 
 	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
 }

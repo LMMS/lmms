@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,10 +27,9 @@
 #include "EffectChain.h"
 #include "FxMixer.h"
 #include "Engine.h"
+#include "Mixer.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
-#include "ValueBuffer.h"
-#include "panning.h"
 
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
@@ -111,12 +110,12 @@ void AudioPort::doProcessing()
 
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
-	m_portBuffer = BufferManager::acquire(); // get buffer for processing
-
-	Engine::mixer()->clearAudioBuffer( m_portBuffer, fpp ); // clear the audioport buffer so we can use it
+	// get a buffer for processing and clear it
+	m_portBuffer = BufferManager::acquire();
+	BufferManager::clear( m_portBuffer, fpp );
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
-	foreach( PlayHandle * ph, m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
+	for( PlayHandle * ph : m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
 	{
 		if( ph->buffer() )
 		{

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -52,12 +52,14 @@ class InstrumentMidiIOView;
 class InstrumentMiscView;
 class Knob;
 class LcdSpinBox;
+class LeftRightNav;
 class midiPortMenu;
 class DataFile;
 class PluginView;
 class TabWidget;
 class TrackLabelButton;
 class LedCheckBox;
+class QLabel;
 
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -205,13 +207,13 @@ public:
 		return &m_effectChannelModel;
 	}
 
-	void setIndicator( FadeButton *fb );
 
 signals:
 	void instrumentChanged();
 	void midiNoteOn( const Note& );
 	void midiNoteOff( const Note& );
 	void nameChanged();
+	void newNote();
 
 
 protected:
@@ -225,13 +227,13 @@ protected slots:
 	void updateBaseNote();
 	void updatePitch();
 	void updatePitchRange();
+	void updateEffectChannel();
 
 
 private:
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
-	QMutex m_notesMutex;
 
 	int m_runningMidiNotes[NumKeys];
 	QMutex m_midiNotesMutex;
@@ -254,8 +256,6 @@ private:
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
 
-	FadeButton *m_fb;
-
 
 	Instrument * m_instrument;
 	InstrumentSoundShaping m_soundShaping;
@@ -268,7 +268,6 @@ private:
 	friend class InstrumentTrackView;
 	friend class InstrumentTrackWindow;
 	friend class NotePlayHandle;
-	friend class FlpImport;
 	friend class InstrumentMiscView;
 
 } ;
@@ -416,20 +415,25 @@ protected:
 
 protected slots:
 	void saveSettingsBtnClicked();
-
+	void viewNextInstrument();
+	void viewPrevInstrument();
 
 private:
 	virtual void modelChanged();
+	void viewInstrumentInDirection(int d);
 
 	InstrumentTrack * m_track;
 	InstrumentTrackView * m_itv;
 
 	// widgets on the top of an instrument-track-window
 	QLineEdit * m_nameLineEdit;
+	LeftRightNav * m_leftRightNav;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	Knob * m_pitchKnob;
+	QLabel * m_pitchLabel;
 	LcdSpinBox* m_pitchRangeSpinBox;
+	QLabel * m_pitchRangeLabel;
 	LcdSpinBox * m_effectChannelNumber;
 
 

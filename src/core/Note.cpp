@@ -1,9 +1,9 @@
 /*
- * note.cpp - implementation of class note
+ * Note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,10 +29,6 @@
 
 #include "Note.h"
 #include "DetuningHelper.h"
-#include "templates.h"
-
-
-
 
 
 Note::Note( const MidiTime & length, const MidiTime & pos,
@@ -115,7 +111,7 @@ void Note::setPos( const MidiTime & pos )
 
 void Note::setKey( const int key )
 {
-	const int k = qBound( 0, key, NumKeys );
+	const int k = qBound( 0, key, NumKeys - 1 );
 	m_key = k;
 }
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,9 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <QtCore/QMap>
+#include <QtCore/QString>
+#include <QtCore/QObject>
+
 
 #include "export.h"
 
@@ -39,13 +41,24 @@ class Song;
 class Ladspa2LMMS;
 
 
-class EXPORT Engine
-{
-public:
-	static void init();
-	static void destroy();
+// Note: This class is called 'LmmsCore' instead of 'Engine' because of naming
+// conflicts caused by ZynAddSubFX. See https://github.com/LMMS/lmms/issues/2269
+// and https://github.com/LMMS/lmms/pull/2118 for more details.
+//
+// The workaround was to rename Lmms' Engine so that it has a different symbol
+// name in the object files, but typedef it back to 'Engine' and keep it inside
+// of Engine.h so that the rest of the codebase can be oblivious to this issue
+// (and it could be fixed without changing every single file).
 
-	static bool hasGUI();
+class LmmsCore;
+typedef LmmsCore Engine;
+
+class EXPORT LmmsCore : public QObject
+{
+	Q_OBJECT
+public:
+	static void init( bool renderOnly );
+	static void destroy();
 
 	// core
 	static Mixer *mixer()
@@ -89,10 +102,17 @@ public:
 	}
 	static void updateFramesPerTick();
 
-	static const QMap<QString, QString> & pluginFileHandling()
+	static inline LmmsCore * inst()
 	{
-		return s_pluginFileHandling;
+		if( s_instanceOfMe == NULL )
+		{
+			s_instanceOfMe = new LmmsCore();
+		}
+		return s_instanceOfMe;
 	}
+
+signals:
+	void initProgress(const QString &msg);
 
 
 private:
@@ -118,14 +138,12 @@ private:
 
 	static Ladspa2LMMS * s_ladspaManager;
 
-	static QMap<QString, QString> s_pluginFileHandling;
-
-	static void initPluginFileHandling();
+	// even though most methods are static, an instance is needed for Qt slots/signals
+	static LmmsCore * s_instanceOfMe;
 
 	friend class GuiApplication;
 };
 
 
-
-
 #endif
+

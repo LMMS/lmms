@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,10 +32,10 @@
 DelayControls::DelayControls( DelayEffect* effect ):
 	EffectControls( effect ),
 	m_effect ( effect ),
-	m_delayTimeModel( 0.5, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
+	m_delayTimeModel( 0.5, 0.01, 5.0, 0.0001, 20000.0, this, tr( "Delay Samples" )) ,
 	m_feedbackModel(0.0f,0.0f,1.0f,0.01f,this,tr( "Feedback" ) ),
-	m_lfoTimeModel(2.0, 0.01, 20.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
-	m_lfoAmountModel(0.0, 0.0, 2.0, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) ),
+	m_lfoTimeModel(2.0, 0.01, 5.0, 0.0001, 20000.0, this, tr( "Lfo Frequency" ) ),
+	m_lfoAmountModel(0.0, 0.0, 0.5, 0.0001, 2000.0, this, tr ( "Lfo Amount" ) ),
 	m_outGainModel( 0.0, -60.0, 20.0, 0.01, this, tr( "Output gain" ) )
 {
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ) );

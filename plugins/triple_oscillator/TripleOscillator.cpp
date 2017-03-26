@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,6 +33,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
@@ -440,8 +441,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 	pm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"pm_inactive" ) );
 	ToolTip::add( pm_osc1_btn, tr( "Use phase modulation for "
-					"modulating oscillator 2 with "
-					"oscillator 1" ) );
+					"modulating oscillator 1 with "
+					"oscillator 2" ) );
 
 	PixmapButton * am_osc1_btn = new PixmapButton( this, NULL );
 	am_osc1_btn->move( mod_x + 35, mod1_y );
@@ -450,8 +451,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 	am_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
 	ToolTip::add( am_osc1_btn, tr( "Use amplitude modulation for "
-					"modulating oscillator 2 with "
-					"oscillator 1" ) );
+					"modulating oscillator 1 with "
+					"oscillator 2" ) );
 
 	PixmapButton * mix_osc1_btn = new PixmapButton( this, NULL );
 	mix_osc1_btn->move( mod_x + 70, mod1_y );
@@ -477,8 +478,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 	fm_osc1_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
 	ToolTip::add( fm_osc1_btn, tr( "Use frequency modulation for "
-					"modulating oscillator 2 with "
-					"oscillator 1" ) );
+					"modulating oscillator 1 with "
+					"oscillator 2" ) );
 
 	m_mod1BtnGrp = new automatableButtonGroup( this );
 	m_mod1BtnGrp->addButton( pm_osc1_btn );
@@ -496,8 +497,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 	pm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"pm_inactive" ) );
 	ToolTip::add( pm_osc2_btn, tr( "Use phase modulation for "
-					"modulating oscillator 3 with "
-					"oscillator 2" ) );
+					"modulating oscillator 2 with "
+					"oscillator 3" ) );
 
 	PixmapButton * am_osc2_btn = new PixmapButton( this, NULL );
 	am_osc2_btn->move( mod_x + 35, mod2_y );
@@ -506,8 +507,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 	am_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"am_inactive" ) );
 	ToolTip::add( am_osc2_btn, tr( "Use amplitude modulation for "
-					"modulating oscillator 3 with "
-					"oscillator 2" ) );
+					"modulating oscillator 2 with "
+					"oscillator 3" ) );
 
 	PixmapButton * mix_osc2_btn = new PixmapButton( this, NULL );
 	mix_osc2_btn->move( mod_x + 70, mod2_y );
@@ -533,8 +534,8 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 	fm_osc2_btn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"fm_inactive" ) );
 	ToolTip::add( fm_osc2_btn, tr( "Use frequency modulation for "
-					"modulating oscillator 3 with "
-					"oscillator 2" ) );
+					"modulating oscillator 2 with "
+					"oscillator 3" ) );
 
 	m_mod2BtnGrp = new automatableButtonGroup( this );
 

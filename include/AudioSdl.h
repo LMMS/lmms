@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,6 +33,7 @@
 #include <SDL/SDL_audio.h>
 
 #include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 
 class QLineEdit;
 
@@ -50,7 +51,7 @@ public:
 	}
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent );
@@ -81,8 +82,7 @@ private:
 
 	bool m_convertEndian;
 
-	volatile bool m_stopped;
-	QSemaphore m_stopSemaphore;
+	bool m_stopped;
 
 } ;
 

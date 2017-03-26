@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -44,6 +44,7 @@ public:
 
 	// Returns true if file name was changed, returns false if it wasn't
 	static bool changeFileNameVersion( QString &fileName, bool increment );
+	static bool fileExistsQuery( QString FileName, QString WindowTitle );
 
 public slots:
 	void incrementVersion();

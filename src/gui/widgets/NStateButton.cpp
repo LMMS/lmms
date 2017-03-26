@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2006 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@
 #include <QMouseEvent>
 
 #include "NStateButton.h"
-#include "embed.h"
 #include "ToolTip.h"
 
 
@@ -58,8 +57,6 @@ void NStateButton::addState( const QPixmap & _pm, const QString & _tooltip )
 	// first inserted pixmap?
 	if( m_states.size() == 1 )
 	{
-		// then resize ourself
-		setFixedSize( _pm.width() + 6, _pm.height() + 6 );
 		// and set state to first pixmap
 		changeState( 0 );
 	}
@@ -96,10 +93,3 @@ void NStateButton::mousePressEvent( QMouseEvent * _me )
 	}
 	ToolButton::mousePressEvent( _me );
 }
-
-
-
-
-
-
-

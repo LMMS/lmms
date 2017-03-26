@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -36,7 +36,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"Dual Filter",
-	QT_TRANSLATE_NOOP( "pluginBrowser", "A native amplifier plugin" ),
+	QT_TRANSLATE_NOOP( "pluginBrowser", "A Dual filter plugin" ),
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
@@ -153,7 +153,7 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 			if( ( ( *cut1Ptr != m_currentCut1 ||
 				*res1Ptr != m_currentRes1 ) ) || m_filter1changed )
 			{
-				m_filter1->calcFilterCoeffs( *cut1Ptr, *res2Ptr );
+				m_filter1->calcFilterCoeffs( *cut1Ptr, *res1Ptr );
 				m_filter1changed = false;
 				m_currentCut1 = *cut1Ptr;
 				m_currentRes1 = *res1Ptr;

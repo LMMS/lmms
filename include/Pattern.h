@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 #include <QDialog>
 #include <QtCore/QThread>
 #include <QPixmap>
+#include <QStaticText>
 
 
 #include "Note.h"
@@ -62,19 +63,15 @@ public:
 
 	void init();
 
-
-	virtual MidiTime length() const;
-	MidiTime beatPatternLength() const;
+	void updateLength();
 
 	// note management
 	Note * addNote( const Note & _new_note, const bool _quant_pos = true );
 
-	void removeNote( const Note * _note_to_del );
+	void removeNote( Note * _note_to_del );
 
 	Note * noteAtStep( int _step );
 
-	Note * rearrangeNote( const Note * _note_to_proc,
-						const bool _quant_pos = true );
 	void rearrangeAllNotes();
 	void clearNotes();
 
@@ -83,16 +80,15 @@ public:
 		return m_notes;
 	}
 
-	void setStep( int _step, bool _enabled );
+	Note * addStepNote( int step );
+	void setStep( int step, bool enabled );
 
 	// pattern-type stuff
 	inline PatternTypes type() const
 	{
 		return m_patternType;
 	}
-	void setType( PatternTypes _new_pattern_type );
 	void checkType();
-
 
 	// next/previous track based on position in the containing track
 	Pattern * previousPattern() const;
@@ -121,7 +117,6 @@ public:
 
 
 protected:
-	void ensureBeatNotes();
 	void updateBBTrack();
 
 
@@ -134,6 +129,12 @@ protected slots:
 
 
 private:
+	MidiTime beatPatternLength() const;
+
+	void setType( PatternTypes _new_pattern_type );
+
+	void resizeToFirstTrack();
+
 	InstrumentTrack * m_instrumentTrack;
 
 	PatternTypes m_patternType;
@@ -159,9 +160,6 @@ class PatternView : public TrackContentObjectView
 {
 	Q_OBJECT
 
-// theming qproperties
-	Q_PROPERTY( QColor fgColor READ fgColor WRITE setFgColor )
-	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 public:
 	PatternView( Pattern* pattern, TrackView* parent );
 	virtual ~PatternView();
@@ -182,24 +180,20 @@ protected:
 	virtual void constructContextMenu( QMenu * );
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re )
-	{
-		m_needsUpdate = true;
-		TrackContentObjectView::resizeEvent( _re );
-	}
+	virtual void paintEvent( QPaintEvent * pe );
 	virtual void wheelEvent( QWheelEvent * _we );
 
 
 private:
-	static QPixmap * s_stepBtnOn;
-	static QPixmap * s_stepBtnOverlay;
+	static QPixmap * s_stepBtnOn0;
+	static QPixmap * s_stepBtnOn200;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
-	bool m_needsUpdate;
+
+	QStaticText m_staticTextName;
 } ;
 
 

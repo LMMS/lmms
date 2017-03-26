@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,20 +26,15 @@
 
 #include <QAction>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QLayout>
-#include <QMdiArea>
 
 #include "ComboBox.h"
 #include "BBTrackContainer.h"
 #include "embed.h"
 #include "MainWindow.h"
 #include "Song.h"
-#include "ConfigManager.h"
-#include "DataFile.h"
 #include "StringPairDrag.h"
 
-#include "TrackContainer.h"
 #include "Pattern.h"
 
 
@@ -62,12 +57,12 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 					  "compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
-			     + 2 * TCO_BORDER_WIDTH + 264 );
+			     + 2 * TCO_BORDER_WIDTH + 384 );
 	}
 	else
 	{
 		setMinimumWidth( TRACK_OP_WIDTH + DEFAULT_SETTINGS_WIDGET_WIDTH
-			     + 2 * TCO_BORDER_WIDTH + 264 );
+			     + 2 * TCO_BORDER_WIDTH + 384 );
 	}
 
 
@@ -82,33 +77,46 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 		tr( "Click here to stop playing of current "
 							"beat/bassline." ) );
 
+
+	// Beat selector
+	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
+
 	m_bbComboBox = new ComboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
 	m_bbComboBox->setModel( &tc->m_bbComboBoxModel );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addWidget( m_bbComboBox );
+	beatSelectionToolBar->addWidget( m_bbComboBox );
 
-	m_toolBar->addSeparator();
-	m_toolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
+
+	// Track actions
+	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
+
+
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
 						 Engine::getSong(), SLOT(addBBTrack()));
-	m_toolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
+	trackAndStepActionsToolBar->addAction(
+				embed::getIconPixmap("add_sample_track"),
+				tr("Add sample-track"), m_trackContainerView,
+				SLOT(addSampleTrack()));
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
 						 m_trackContainerView, SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	m_toolBar->addWidget(stretch);
+	trackAndStepActionsToolBar->addWidget(stretch);
 
-	m_toolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
+
+	// Step actions
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
 						 m_trackContainerView, SLOT(removeSteps()));
-	m_toolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
+	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
 						 m_trackContainerView, SLOT( addSteps()));
-	m_toolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
+	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
 						  m_trackContainerView, SLOT( cloneSteps() ) );
-	m_toolBar->addSeparator();
 
 	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
 			m_trackContainerView, SLOT( updatePosition() ) );
+
 
 	QAction* viewNext = new QAction(this);
 	connect(viewNext, SIGNAL(triggered()), m_bbComboBox, SLOT(selectNext()));
@@ -201,6 +209,14 @@ void BBTrackContainerView::removeSteps()
 
 
 
+void BBTrackContainerView::addSampleTrack()
+{
+	(void) Track::create( Track::SampleTrack, model() );
+}
+
+
+
+
 void BBTrackContainerView::addAutomationTrack()
 {
 	(void) Track::create( Track::AutomationTrack, model() );
@@ -211,7 +227,7 @@ void BBTrackContainerView::addAutomationTrack()
 
 void BBTrackContainerView::removeBBView(int bb)
 {
-	foreach( TrackView* view, trackViews() )
+	for( TrackView* view : trackViews() )
 	{
 		view->getTrackContentWidget()->removeTCOView( bb );
 	}
@@ -221,7 +237,7 @@ void BBTrackContainerView::removeBBView(int bb)
 
 void BBTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
 {
-	MainWindow::saveWidgetState(parentWidget(), element);
+	MainWindow::saveWidgetState(parentWidget(), element, QSize( 640, 400 ) );
 }
 
 void BBTrackContainerView::loadSettings(const QDomElement& element)

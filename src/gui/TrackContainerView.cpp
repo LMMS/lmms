@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -22,31 +22,28 @@
  *
  */
 
+#include "TrackContainerView.h"
+
+#include <cmath>
 
 #include <QApplication>
 #include <QLayout>
 #include <QMdiArea>
-#include <QProgressDialog>
-#include <QScrollBar>
 #include <QWheelEvent>
 
-
-#include "TrackContainerView.h"
 #include "TrackContainer.h"
 #include "BBTrack.h"
 #include "MainWindow.h"
-#include "debug.h"
+#include "Mixer.h"
 #include "FileBrowser.h"
 #include "ImportFilter.h"
 #include "Instrument.h"
-#include "InstrumentTrack.h"
-#include "DataFile.h"
-#include "Rubberband.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "Track.h"
 #include "GuiApplication.h"
+#include "PluginFactory.h"
 
+using namespace std;
 
 TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	QWidget(),
@@ -62,7 +59,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	m_origin()
 {
 	m_tc->setHook( this );
-
+	//keeps the direction of the widget, undepended on the locale
+	setLayoutDirection( Qt::LeftToRight );
 	QVBoxLayout * layout = new QVBoxLayout( this );
 	layout->setMargin( 0 );
 	layout->setSpacing( 0 );
@@ -156,47 +154,72 @@ void TrackContainerView::removeTrackView( TrackView * _tv )
 
 
 
-void TrackContainerView::moveTrackViewUp( TrackView * _tv )
+void TrackContainerView::moveTrackView( TrackView * trackView, int indexTo )
 {
-	for( int i = 1; i < m_trackViews.size(); ++i )
-	{
-		TrackView * t = m_trackViews[i];
-		if( t == _tv )
-		{
-			BBTrack::swapBBTracks( t->getTrack(),
-					m_trackViews[i - 1]->getTrack() );
-			m_scrollLayout->removeWidget( t );
-			m_scrollLayout->insertWidget( i - 1, t );
-			qSwap( m_tc->m_tracks[i-1], m_tc->m_tracks[i] );
-			m_trackViews.swap( i - 1, i );
-			realignTracks();
-			break;
-		}
-	}
+	// Can't move out of bounds
+	if ( indexTo >= m_trackViews.size() || indexTo < 0 ) { return; }
+
+	// Does not need to move to itself
+	int indexFrom = m_trackViews.indexOf( trackView );
+	if ( indexFrom == indexTo ) { return; }
+
+	BBTrack::swapBBTracks( trackView->getTrack(),
+			m_trackViews[indexTo]->getTrack() );
+
+	m_scrollLayout->removeWidget( trackView );
+	m_scrollLayout->insertWidget( indexTo, trackView );
+
+	Track * track = m_tc->m_tracks[indexFrom];
+
+	m_tc->m_tracks.remove( indexFrom );
+	m_tc->m_tracks.insert( indexTo, track );
+	m_trackViews.move( indexFrom, indexTo );
+
+	realignTracks();
 }
 
 
 
 
-void TrackContainerView::moveTrackViewDown( TrackView * _tv )
+void TrackContainerView::moveTrackViewUp( TrackView * trackView )
 {
-	for( int i = 0; i < m_trackViews.size()-1; ++i )
-	{
-		TrackView * t = m_trackViews[i];
-		if( t == _tv )
-		{
-			BBTrack::swapBBTracks( t->getTrack(),
-					m_trackViews[i + 1]->getTrack() );
-			m_scrollLayout->removeWidget( t );
-			m_scrollLayout->insertWidget( i + 1, t );
-			qSwap( m_tc->m_tracks[i], m_tc->m_tracks[i+1] );
-			m_trackViews.swap( i, i + 1 );
-			realignTracks();
-			break;
-		}
-	}
+	int index = m_trackViews.indexOf( trackView );
+
+	moveTrackView( trackView, index - 1 );
 }
 
+
+
+
+void TrackContainerView::moveTrackViewDown( TrackView * trackView )
+{
+	int index = m_trackViews.indexOf( trackView );
+
+	moveTrackView( trackView, index + 1 );
+}
+
+void TrackContainerView::scrollToTrackView( TrackView * _tv )
+{
+	if (!m_trackViews.contains(_tv))
+	{
+		qWarning("TrackContainerView::scrollToTrackView: TrackView is not owned by this");
+	}
+	else
+	{
+		int currentScrollTop = m_scrollArea->verticalScrollBar()->value();
+		int scrollAreaHeight = m_scrollArea->size().height();
+		int trackViewTop = _tv->pos().y();
+		int trackViewBottom = trackViewTop + _tv->size().height();
+
+		// displayed_location = widget_location - currentScrollTop
+		// want to make sure that the widget top has displayed location > 0,
+		// and widget bottom < scrollAreaHeight
+		// trackViewTop - scrollY > 0 && trackViewBottom - scrollY < scrollAreaHeight
+		// therefore scrollY < trackViewTop && scrollY > trackViewBottom - scrollAreaHeight
+		int newScroll = std::max( trackViewBottom-scrollAreaHeight, std::min(currentScrollTop, trackViewTop) );
+		m_scrollArea->verticalScrollBar()->setValue(newScroll);
+	}
+}
 
 
 
@@ -219,11 +242,18 @@ void TrackContainerView::realignTracks()
 
 
 
-void TrackContainerView::createTrackView( Track * _t )
+TrackView * TrackContainerView::createTrackView( Track * _t )
 {
 	//m_tc->addJournalCheckPoint();
 
-	_t->createView( this );
+	// Avoid duplicating track views
+	for( trackViewList::iterator it = m_trackViews.begin();
+						it != m_trackViews.end(); ++it )
+	{
+		if ( ( *it )->getTrack() == _t ) { return ( *it ); }
+	}
+
+	return _t->createView( this );
 }
 
 
@@ -237,7 +267,9 @@ void TrackContainerView::deleteTrackView( TrackView * _tv )
 	removeTrackView( _tv );
 	delete _tv;
 
-	t->deleteLater();
+	Engine::mixer()->requestChangeInModel();
+	delete t;
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -352,8 +384,7 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 				Track::create( Track::InstrumentTrack,
 								m_tc ) );
 		Instrument * i = it->loadInstrument(
-			Engine::pluginFileHandling()[FileItem::extension(
-								value )]);
+			pluginFactory->pluginSupportingExtension(FileItem::extension(value)).name());
 		i->loadFile( value );
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();

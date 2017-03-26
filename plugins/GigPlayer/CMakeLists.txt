@@ -14,6 +14,6 @@ if(LMMS_HAVE_GIG)
 
 	LINK_DIRECTORIES(${GIG_LIBRARY_DIRS} ${SAMPLERATE_LIBRARY_DIRS})
 	LINK_LIBRARIES(${GIG_LIBRARIES} ${SAMPLERATE_LIBRARIES})
-	BUILD_PLUGIN(gigplayer GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui MOCFILES GigPlayer.h PatchesDialog.h UICFILES PatchesDialog.ui EMBEDDED_RESOURCES GLOB "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+	BUILD_PLUGIN(gigplayer GigPlayer.cpp GigPlayer.h PatchesDialog.cpp PatchesDialog.h PatchesDialog.ui MOCFILES GigPlayer.h PatchesDialog.h UICFILES PatchesDialog.ui EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
 endif(LMMS_HAVE_GIG)
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2008 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,6 +33,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Oscillator.h"
 #include "PixmapButton.h"
@@ -81,7 +82,7 @@ organicInstrument::organicInstrument( InstrumentTrack * _instrument_track ) :
 	m_fx1Model( 0.0f, 0.0f, 0.99f, 0.01f , this, tr( "Distortion" ) ),
 	m_volModel( 100.0f, 0.0f, 200.0f, 1.0f, this, tr( "Volume" ) )
 {
-	m_numOscillators = 8;
+	m_numOscillators = NUM_OSCILLATORS;
 
 	m_osc = new OscillatorObject*[ m_numOscillators ];
 	for (int i=0; i < m_numOscillators; i++)
@@ -235,15 +236,14 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 		Oscillator * oscs_l[m_numOscillators];
 		Oscillator * oscs_r[m_numOscillators];
 
+		_n->m_pluginData = new oscPtr;
+
 		for( int i = m_numOscillators - 1; i >= 0; --i )
 		{
-			
-			m_osc[i]->m_phaseOffsetLeft = rand()
-							/ ( RAND_MAX + 1.0f );
-			m_osc[i]->m_phaseOffsetRight = rand()
-							/ ( RAND_MAX + 1.0f );
-			
-
+			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i] 
+				= rand() / ( RAND_MAX + 1.0f );
+			static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i] 
+				= rand() / ( RAND_MAX + 1.0f );
 			
 			// initialise ocillators
 			
@@ -255,7 +255,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i],
 						m_osc[i]->m_volumeLeft );
 				// create right oscillator
 				oscs_r[i] = new Oscillator(
@@ -263,7 +263,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i],
 						m_osc[i]->m_volumeRight );
 			}
 			else
@@ -274,7 +274,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i],
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
 				// create right oscillator
@@ -283,7 +283,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i],
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
 			}
@@ -291,7 +291,6 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 				
 		}
 
-		_n->m_pluginData = new oscPtr;
 		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = oscs_l[0];
 		static_cast<oscPtr *>( _n->m_pluginData )->oscRight = oscs_r[0];
 	}
@@ -330,6 +329,7 @@ void organicInstrument::deleteNotePluginData( NotePlayHandle * _n )
 						_n->m_pluginData )->oscLeft );
 	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
 						_n->m_pluginData )->oscRight );
+	
 	delete static_cast<oscPtr *>( _n->m_pluginData );
 }
 
@@ -557,9 +557,9 @@ void organicInstrumentView::updateKnobHint()
 		const float harm = oi->m_osc[i]->m_harmModel.value();
 		const float wave = oi->m_osc[i]->m_oscModel.value();
 		
-		m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ), " (" +
+		m_oscKnobs[i].m_harmKnob->setHintText( tr( "Osc %1 harmonic:" ).arg( i + 1 ), " (" +
 			HARMONIC_NAMES[ static_cast<int>( harm ) ] + ")" );
-		m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ), " (" +
+		m_oscKnobs[i].m_oscKnob->setHintText( tr( "Osc %1 waveform:" ).arg( i + 1 ), " (" +
 			WAVEFORM_NAMES[ static_cast<int>( wave ) ] + ")" );
 	}
 }

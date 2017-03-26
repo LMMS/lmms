@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,34 +40,19 @@ public:
 
 	inline static QString name()
 	{
-		return( QT_TRANSLATE_NOOP( "setupWidget",
+		return( QT_TRANSLATE_NOOP( "MidiSetupWidget",
 			"Dummy (no MIDI support)" ) );
 	}
 
-
-	class setupWidget : public MidiClient::setupWidget
+	inline static QString probeDevice()
 	{
-	public:
-		setupWidget( QWidget * _parent ) :
-			MidiClientRaw::setupWidget( MidiDummy::name(), _parent )
-		{
-		}
+		return QString::Null(); // no midi device name
+	}
 
-		virtual ~setupWidget()
-		{
-		}
-
-		virtual void saveSettings()
-		{
-		}
-
-		virtual void show()
-		{
-			parentWidget()->hide();
-			QWidget::show();
-		}
-
-	} ;
+	inline static QString configSection()
+	{
+		return QString::Null(); // no configuration settings
+	}
 
 
 protected:

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,8 +30,6 @@
 #include <QLabel>
 #include <QMessageBox>
 
-#include <stdlib.h>
-
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "templates.h"
@@ -40,7 +38,8 @@
 #include "LcdSpinBox.h"
 #include "AudioPort.h"
 #include "MainWindow.h"
-
+#include "Mixer.h"
+#include "MidiJack.h"
 
 
 
@@ -51,6 +50,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 								_mixer ),
 	m_client( NULL ),
 	m_active( false ),
+	m_midiClient( NULL ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
@@ -122,7 +122,15 @@ void AudioJack::restartAfterZombified()
 
 
 
+AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
+{
+	if( m_client == NULL )
+		return NULL;
 
+	m_midiClient = midiClient;
+
+	return this;
+}
 
 bool AudioJack::initJackClient()
 {
@@ -330,6 +338,14 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
+	// do midi processing first so that midi input can
+	// add to the following sound processing
+	if( m_midiClient && _nframes > 0 )
+	{
+		m_midiClient->JackMidiRead(_nframes);
+		m_midiClient->JackMidiWrite(_nframes);
+	}
+
 	for( int c = 0; c < channels(); ++c )
 	{
 		m_tempOutBufs[c] =
@@ -425,7 +441,7 @@ void AudioJack::shutdownCallback( void * _udata )
 
 
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioJack::name(), _parent )
+	AudioDeviceSetupWidget( AudioJack::name(), _parent )
 {
 	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )

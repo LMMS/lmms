@@ -2,9 +2,9 @@
  * kicker.cpp - drum synthesizer
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * Copyright (c) 2014 Hannu Haahti <grejppi/at/gmail.com>
+ * Copyright (c) 2014 grejppi <grejppi/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "KickerOsc.h"
 
@@ -71,7 +72,7 @@ kickerInstrument::kickerInstrument( InstrumentTrack * _instrument_track ) :
 	m_slopeModel( 0.06f, 0.001f, 1.0f, 0.001f, this, tr( "Frequency Slope" ) ),
 	m_startNoteModel( true, this, tr( "Start from note" ) ),
 	m_endNoteModel( false, this, tr( "End to note" ) ),
-	m_versionModel( 0, 0, KICKER_PRESET_VERSION, this, "" )
+	m_versionModel( KICKER_PRESET_VERSION, 0, KICKER_PRESET_VERSION, this, "" )
 {
 }
 
@@ -137,7 +138,7 @@ void kickerInstrument::loadSettings( const QDomElement & _this )
 	// Try to maintain backwards compatibility
 	if( !_this.hasAttribute( "version" ) )
 	{
-
+		m_startNoteModel.setValue( false );
 		m_decayModel.setValue( m_decayModel.value() * 1.33f );
 		m_envModel.setValue( 1.0f );
 		m_slopeModel.setValue( 1.0f );

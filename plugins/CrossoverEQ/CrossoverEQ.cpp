@@ -5,7 +5,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -95,41 +95,35 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
 	{
 		m_lp1.setLowpass( m_controls.m_xover12.value() );
-		m_lp1.clearHistory();
 		m_hp2.setHighpass( m_controls.m_xover12.value() );
-		m_hp2.clearHistory();
 	}
 	if( m_needsUpdate || m_controls.m_xover23.isValueChanged() )
 	{
 		m_lp2.setLowpass( m_controls.m_xover23.value() );
-		m_lp2.clearHistory();
 		m_hp3.setHighpass( m_controls.m_xover23.value() );
-		m_hp3.clearHistory();
 	}
 	if( m_needsUpdate || m_controls.m_xover34.isValueChanged() )
 	{
 		m_lp3.setLowpass( m_controls.m_xover34.value() );
-		m_lp3.clearHistory();
 		m_hp4.setHighpass( m_controls.m_xover34.value() );
-		m_hp4.clearHistory();
 	}
 	
 	// gain values update
 	if( m_needsUpdate || m_controls.m_gain1.isValueChanged() )
 	{
-		m_gain1 = dbvToAmp( m_controls.m_gain1.value() );
+		m_gain1 = dbfsToAmp( m_controls.m_gain1.value() );
 	}
 	if( m_needsUpdate || m_controls.m_gain2.isValueChanged() )
 	{
-		m_gain2 = dbvToAmp( m_controls.m_gain2.value() );
+		m_gain2 = dbfsToAmp( m_controls.m_gain2.value() );
 	}
 	if( m_needsUpdate || m_controls.m_gain3.isValueChanged() )
 	{
-		m_gain3 = dbvToAmp( m_controls.m_gain3.value() );
+		m_gain3 = dbfsToAmp( m_controls.m_gain3.value() );
 	}
 	if( m_needsUpdate || m_controls.m_gain4.isValueChanged() )
 	{
-		m_gain4 = dbvToAmp( m_controls.m_gain4.value() );
+		m_gain4 = dbfsToAmp( m_controls.m_gain4.value() );
 	}
 	
 	// mute values update
@@ -152,7 +146,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 
 	// run band 1
-	if( ! mute1 )
+	if( mute1 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -162,7 +156,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 	
 	// run band 2
-	if( ! mute2 )
+	if( mute2 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -172,7 +166,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 	
 	// run band 3
-	if( ! mute3 )
+	if( mute3 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -182,7 +176,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	}
 	
 	// run band 4
-	if( ! mute4 )
+	if( mute4 )
 	{
 		for( int f = 0; f < frames; ++f )
 		{
@@ -204,6 +198,16 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	checkGate( outSum );
 	
 	return isRunning();
+}
+
+void CrossoverEQEffect::clearFilterHistories()
+{
+	m_lp1.clearHistory();
+	m_lp2.clearHistory();
+	m_lp3.clearHistory();
+	m_hp2.clearHistory();
+	m_hp3.clearHistory();
+	m_hp4.clearHistory();
 }
 
 

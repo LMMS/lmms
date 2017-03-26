@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,11 +24,12 @@
 
 #include "Editor.h"
 
+#include "Song.h"
+
 #include "MainWindow.h"
 #include "embed.h"
 
 #include <QAction>
-#include <QActionGroup>
 #include <QMdiArea>
 #include <QShortcut>
 
@@ -40,6 +41,28 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 		m_playAction->setIcon(embed::getIconPixmap("pause"));
 	else
 		m_playAction->setIcon(embed::getIconPixmap("play"));
+}
+
+DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
+{
+	return addDropToolBar(Qt::TopToolBarArea, windowTitle);
+}
+
+DropToolBar * Editor::addDropToolBar(Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+{
+	return addDropToolBar(this, whereToAdd, windowTitle);
+}
+
+DropToolBar * Editor::addDropToolBar(QWidget * parent, Qt::ToolBarArea whereToAdd, QString const & windowTitle)
+{
+	DropToolBar *toolBar = new DropToolBar(parent);
+	addToolBar(whereToAdd, toolBar);
+	toolBar->setMovable(false);
+	toolBar->setFloatable(false);
+	toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+	toolBar->setWindowTitle(windowTitle);
+
+	return toolBar;
 }
 
 void Editor::togglePlayStop()
@@ -57,8 +80,7 @@ Editor::Editor(bool record) :
 	m_recordAccompanyAction(nullptr),
 	m_stopAction(nullptr)
 {
-	m_toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-	m_toolBar->setMovable(false);
+	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
 
 	auto addButton = [this](QAction* action, QString objectName) {
 		m_toolBar->addAction(action);
@@ -79,9 +101,6 @@ Editor::Editor(bool record) :
 	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
 	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
 
-	// Add toolbar to window
-	addToolBar(Qt::TopToolBarArea, m_toolBar);
-
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
 	if (record)
@@ -95,6 +114,11 @@ Editor::Editor(bool record) :
 Editor::~Editor()
 {
 
+}
+
+QAction *Editor::playAction() const
+{
+	return m_playAction;
 }
 
 

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,12 +26,12 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
+#include "AtomicInt.h"
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
 #include "MemoryManager.h"
 
-class QAtomicInt;
 class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;
@@ -195,6 +195,12 @@ public:
 		return m_subNotes.size() > 0 || m_hadChildren;
 	}
 
+	void setMasterNote()
+	{
+		m_hadChildren = true;
+		setUsesBuffer( false );
+	}
+
 	/*! Returns whether note is muted */
 	bool isMuted() const
 	{
@@ -205,11 +211,13 @@ public:
 	void mute();
 
 	/*! Returns index of NotePlayHandle in vector of note-play-handles
-        belonging to this instrument track - used by arpeggiator */
+	    belonging to this instrument track - used by arpeggiator.
+	    Ignores child note-play-handles, returns -1 when called on one */
 	int index() const;
 
-	/*! returns list of note-play-handles belonging to given instrument track,
-	    if allPlayHandles = true, also released note-play-handles are returned */
+	/*! Returns list of note-play-handles belonging to given instrument track.
+	    If allPlayHandles = true, also released note-play-handles and children
+	    are returned */
 	static ConstNotePlayHandleList nphsOfInstrumentTrack( const InstrumentTrack* Track, bool allPlayHandles = false );
 
 	/*! Returns whether given NotePlayHandle instance is equal to *this */
@@ -335,7 +343,7 @@ public:
 private:
 	static NotePlayHandle ** s_available;
 	static QReadWriteLock s_mutex;
-	static QAtomicInt s_availableIndex;
+	static AtomicInt s_availableIndex;
 	static int s_size;
 };
 

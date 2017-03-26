@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,8 +29,7 @@
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "MidiEvent.h"
-#include "MidiPort.h"
+#include "Mixer.h"
 #include "Song.h"
 
 
@@ -301,17 +300,6 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		}
 	}
 
-	// play sub-notes (e.g. chords)
-	// handled by mixer now
-/*	foreach( NotePlayHandle * n, m_subNotes )
-	{
-		n->play( _working_buffer );
-		if( n->isFinished() )
-		{
-			NotePlayHandleManager::release( n );
-		}
-	}*/
-
 	// update internal data
 	m_totalFramesPlayed += framesThisPeriod;
 	unlock();
@@ -369,7 +357,7 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	m_released = true;
 
 	// first note-off all sub-notes
-	foreach( NotePlayHandle * n, m_subNotes )
+	for( NotePlayHandle * n : m_subNotes )
 	{
 		n->lock();
 		n->noteOff( _s );
@@ -449,17 +437,17 @@ int NotePlayHandle::index() const
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
 		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
-		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() )
+		if( nph == NULL || nph->m_instrumentTrack != m_instrumentTrack || nph->isReleased() || nph->hasParent() )
 		{
 			continue;
 		}
 		if( nph == this )
 		{
-			break;
+			return idx;
 		}
 		++idx;
 	}
-	return idx;
+	return -1;
 }
 
 
@@ -473,7 +461,7 @@ ConstNotePlayHandleList NotePlayHandle::nphsOfInstrumentTrack( const InstrumentT
 	for( PlayHandleList::ConstIterator it = playHandles.begin(); it != playHandles.end(); ++it )
 	{
 		const NotePlayHandle * nph = dynamic_cast<const NotePlayHandle *>( *it );
-		if( nph != NULL && nph->m_instrumentTrack == _it && ( nph->isReleased() == false || _all_ph == true ) )
+		if( nph != NULL && nph->m_instrumentTrack == _it && ( ( nph->isReleased() == false && nph->hasParent() == false ) || _all_ph == true ) )
 		{
 			cnphv.push_back( nph );
 		}
@@ -559,7 +547,7 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 
 NotePlayHandle ** NotePlayHandleManager::s_available;
 QReadWriteLock NotePlayHandleManager::s_mutex;
-QAtomicInt NotePlayHandleManager::s_availableIndex;
+AtomicInt NotePlayHandleManager::s_availableIndex;
 int NotePlayHandleManager::s_size;
 
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -56,13 +56,13 @@ public:
 		do
 		{
 			nphsLeft = false;
-			foreach( const NotePlayHandle * cnph, nphv )
+			for( const NotePlayHandle * constNotePlayHandle : nphv )
 			{
-				NotePlayHandle * nph = const_cast<NotePlayHandle *>( cnph );
-				if( nph->state() != ThreadableJob::Done && ! nph->isFinished() )
+				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
+				if( notePlayHandle->state() != ThreadableJob::Done && ! notePlayHandle->isFinished() )
 				{
 					nphsLeft = true;
-					nph->process();
+					notePlayHandle->process();
 				}
 			}
 		}
@@ -84,7 +84,6 @@ public:
 
 private:
 	Instrument* m_instrument;
-	InstrumentTrack * m_instrumentTrack;
 
 } ;
 

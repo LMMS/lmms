@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * lb302FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  *
@@ -27,6 +27,10 @@
  * Boston, MA 02110-1301 USA.
  *
  */
+
+// Need to include this first to ensure we get M_PI in MinGW with C++11
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include "lb302.h"
 #include "AutomatableButton.h"
@@ -469,7 +473,11 @@ int lb302Synth::process(sampleFrame *outbuf, const int size)
 	float samp;
 
 	// Hold on to the current VCF, and use it throughout this period
+#if QT_VERSION >= 0x050000
+	lb302Filter *filter = vcf.loadAcquire();
+#else
 	lb302Filter *filter = vcf;
+#endif
 
 	if( release_frame == 0 || ! m_playingNote ) 
 	{

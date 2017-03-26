@@ -30,6 +30,7 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
+	core/LocklessAllocator.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
@@ -45,11 +46,13 @@ set(LMMS_SRCS
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp
+	core/PluginFactory.cpp
 	core/PresetPreviewPlayHandle.cpp
 	core/ProjectJournal.cpp
 	core/ProjectRenderer.cpp
 	core/ProjectVersion.cpp
 	core/RemotePlugin.cpp
+	core/RenderManager.cpp
 	core/RingBuffer.cpp
 	core/SampleBuffer.cpp
 	core/SamplePlayHandle.cpp
@@ -60,6 +63,7 @@ set(LMMS_SRCS
 	core/ToolPlugin.cpp
 	core/Track.cpp
 	core/TrackContainer.cpp
+	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
 
 	core/audio/AudioAlsa.cpp
@@ -69,8 +73,10 @@ set(LMMS_SRCS
 	core/audio/AudioFileWave.cpp
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
+	core/audio/AudioSndio.cpp
 	core/audio/AudioPort.cpp
 	core/audio/AudioPortAudio.cpp
+	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp
 	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
@@ -79,8 +85,12 @@ set(LMMS_SRCS
 	core/midi/MidiAlsaSeq.cpp
 	core/midi/MidiClient.cpp
 	core/midi/MidiController.cpp
+	core/midi/MidiJack.cpp
 	core/midi/MidiOss.cpp
+	core/midi/MidiSndio.cpp
+	core/midi/MidiApple.cpp
 	core/midi/MidiPort.cpp
+	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
 	PARENT_SCOPE

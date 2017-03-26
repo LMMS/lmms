@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -508,6 +508,8 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 		osc_frames *= 100.0f;
 	}
 
+	// userWaveSample() may be used, called out of loop for efficiency
+	m_params->m_userWave.dataReadLock();
 	float old_y = 0;
 	for( int x = 0; x <= LFO_GRAPH_W; ++x )
 	{
@@ -558,6 +560,7 @@ void EnvelopeAndLfoView::paintEvent( QPaintEvent * )
 						graph_y_base + cur_y ) );
 		old_y = cur_y;
 	}
+	m_params->m_userWave.dataUnlock();
 
 	p.setPen( QColor( 201, 201, 225 ) );
 	int ms_per_osc = static_cast<int>( SECS_PER_LFO_OSCILLATION *

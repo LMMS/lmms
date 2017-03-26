@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,6 +34,11 @@
 class EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
+	
+	// theming qproperties
+	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
+	
 public:
 	LcdWidget( QWidget* parent, const QString& name = QString::null );
 	LcdWidget( int numDigits, QWidget* parent, const QString& name = QString::null );
@@ -54,13 +59,19 @@ public:
 
 	inline int numDigits() const { return m_numDigits; }
 	inline void setNumDigits( int n ) { m_numDigits = n; updateSize(); }
+	
+	QColor textColor() const;
+	void setTextColor( const QColor & c );
+	
+	QColor textShadowColor() const;
+	void setTextShadowColor( const QColor & c );
 
 public slots:
-	virtual void setMarginWidth( int _width );
+	virtual void setMarginWidth( int width );
 
 
 protected:
-	virtual void paintEvent( QPaintEvent * _me );
+	virtual void paintEvent( QPaintEvent * pe );
 
 	virtual void updateSize();
 
@@ -80,6 +91,9 @@ private:
 
 	QString m_label;
 	QPixmap* m_lcdPixmap;
+
+	QColor m_textColor;
+	QColor m_textShadowColor;
 
 	int m_cellWidth;
 	int m_cellHeight;

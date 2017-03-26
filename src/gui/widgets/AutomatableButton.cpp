@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,12 +25,9 @@
 
 #include "AutomatableButton.h"
 
-#include <QCursor>
 #include <QMouseEvent>
 
 #include "CaptionMenu.h"
-#include "Engine.h"
-#include "embed.h"
 #include "MainWindow.h"
 #include "StringPairDrag.h"
 
@@ -236,7 +233,7 @@ void automatableButtonGroup::activateButton( AutomatableButton * _btn )
 					m_buttons.indexOf( _btn ) != -1 )
 	{
 		model()->setValue( m_buttons.indexOf( _btn ) );
-		foreach( AutomatableButton * btn, m_buttons )
+		for( AutomatableButton * btn : m_buttons )
 		{
 			btn->update();
 		}
@@ -261,7 +258,7 @@ void automatableButtonGroup::updateButtons()
 {
 	model()->setRange( 0, m_buttons.size() - 1 );
 	int i = 0;
-	foreach( AutomatableButton * btn, m_buttons )
+	for( AutomatableButton * btn : m_buttons )
 	{
 		btn->model()->setValue( i == model()->value() );
 		++i;

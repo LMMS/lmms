@@ -2,7 +2,7 @@
 *
 * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
 *
-* This file is part of LMMS - http://lmms.io
+* This file is part of LMMS - https://lmms.io
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,14 +23,14 @@
 
 #ifndef EQFADER_H
 #define EQFADER_H
-#include "Fader.h"
-#include "EffectControls.h"
-#include "MainWindow.h"
-#include "GuiApplication.h"
-#include "qwidget.h"
-#include "TextFloat.h"
-#include "qlist.h"
+#include <QList>
+#include <QWidget>
 
+#include "EffectControls.h"
+#include "Fader.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
+#include "TextFloat.h"
 
 
 class EqFader : public Fader
@@ -39,8 +39,22 @@ class EqFader : public Fader
 public:
 	Q_OBJECT
 public:
-	EqFader( FloatModel * model, const QString & name, QWidget * parent, float* lPeak, float* rPeak ) :
-		Fader( model, name, parent)
+	EqFader( FloatModel * model, const QString & name, QWidget * parent, QPixmap * backg, QPixmap * leds, QPixmap * knobpi,  float* lPeak, float* rPeak ) :
+		Fader( model, name, parent, backg, leds, knobpi )
+	{
+		setMinimumSize( 23, 80 );
+		setMaximumSize( 23, 80 );
+		resize( 23, 80 );
+		m_lPeak = lPeak;
+		m_rPeak = rPeak;
+		connect( gui->mainWindow(), SIGNAL( periodicUpdate() ), this, SLOT( updateVuMeters() ) );
+		m_model = model;
+		setPeak_L( 0 );
+		setPeak_R( 0 );
+	}
+
+	EqFader( FloatModel * model, const QString & name, QWidget * parent,  float* lPeak, float* rPeak ) :
+		Fader( model, name, parent )
 	{
 		setMinimumSize( 23, 116 );
 		setMaximumSize( 23, 116 );
@@ -52,7 +66,6 @@ public:
 		setPeak_L( 0 );
 		setPeak_R( 0 );
 	}
-
 
 
 

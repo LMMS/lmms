@@ -4,7 +4,7 @@
  * Copyright (c) 2006-2007 Andreas Brandmaier <andy/at/brandmaier/dot/de>
  *               2008 Paul Giblock            <drfaygo/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,7 +31,6 @@
 #include "StringPairDrag.h"
 #include "SampleBuffer.h"
 #include "Oscillator.h"
-#include "Engine.h"
 
 
 Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
@@ -385,7 +384,7 @@ void Graph::paintEvent( QPaintEvent * )
 	if( m_mouseDown )
 	{
 		QPoint cursor = mapFromGlobal( QCursor::pos() );
-		p.setPen( QColor( 0xAA, 0xFF, 0x00, 0x70 ) );
+		p.setPen( QColor( 0x70, 0x7C, 0x91 ) );
 		p.drawLine( 2, cursor.y(), width()-2, cursor.y() );
 		p.drawLine( cursor.x(), 2, cursor.x(), height()-2 );
 	}
@@ -585,11 +584,13 @@ QString graphModel::setWaveToUser()
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
+		sampleBuffer->dataReadLock();
 		for( int i = 0; i < length(); i++ )
 		{
 			m_samples[i] = sampleBuffer->userWaveSample(
 					i / static_cast<float>( length() ) );
 		}
+		sampleBuffer->dataUnlock();
 	}
 
 	sharedObject::unref( sampleBuffer );
@@ -622,12 +623,12 @@ void graphModel::smoothNonCyclic()
 	QVector<float> temp = m_samples;
 
 	// Smoothing
-	m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
+	//m_samples[0] = ( ( temp[0] * 3 ) + temp[1] ) * 0.25f;
 	for ( int i=1; i < ( length()-1 ); i++ )
 	{
 		m_samples[i] = ( temp[i-1] + ( temp[i] * 2 ) + temp[i+1] ) * 0.25f;
 	}
-	m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
+	//m_samples[length()-1] = ( temp[length()-2] + ( temp[length()-1] * 3 ) ) * 0.25f;
 
 	emit samplesChanged(0, length()-1);
 }

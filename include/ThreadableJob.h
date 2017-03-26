@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,7 @@
 #ifndef THREADABLE_JOB_H
 #define THREADABLE_JOB_H
 
-#include <QtCore/QAtomicInt>
+#include "AtomicInt.h"
 
 #include "lmms_basics.h"
 
@@ -82,7 +82,7 @@ public:
 protected:
 	virtual void doProcessing() = 0;
 
-	QAtomicInt m_state;
+	AtomicInt m_state;
 
 } ;
 

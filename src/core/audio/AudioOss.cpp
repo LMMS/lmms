@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,9 +32,9 @@
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
+#include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -44,9 +44,6 @@
 #endif
 #ifdef LMMS_HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
 #endif
 
 #ifdef LMMS_HAVE_SYS_SOUNDCARD_H
@@ -254,11 +251,7 @@ void AudioOss::startProcessing()
 
 void AudioOss::stopProcessing()
 {
-	if( isRunning() )
-	{
-		wait( 1000 );
-		terminate();
-	}
+	stopProcessingThread( this );
 }
 
 
@@ -329,7 +322,7 @@ void AudioOss::run()
 
 
 AudioOss::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioOss::name(), _parent )
+	AudioDeviceSetupWidget( AudioOss::name(), _parent )
 {
 	m_device = new QLineEdit( probeDevice(), this );
 	m_device->setGeometry( 10, 20, 160, 20 );

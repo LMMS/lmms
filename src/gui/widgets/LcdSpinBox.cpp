@@ -1,10 +1,10 @@
 /*
- * lcd_spinbox.cpp - class LcdSpinBox, an improved QLCDNumber
+ * LcdSpinBox.cpp - class LcdSpinBox, an improved QLCDNumber
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Paul Giblock <pgllama/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,17 +27,12 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QFontMetrics>
 #include <QStyleOptionFrameV2>
 #include <QInputDialog>
 
 #include "LcdSpinBox.h"
 #include "CaptionMenu.h"
-#include "Engine.h"
-#include "embed.h"
 #include "GuiApplication.h"
-#include "gui_templates.h"
-#include "templates.h"
 #include "MainWindow.h"
 
 

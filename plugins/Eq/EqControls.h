@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,11 +27,9 @@
 
 #include "EffectControls.h"
 #include "EqControlsDialog.h"
-#include "Knob.h"
 
 
 class EqEffect;
-
 
 class EqControls : public EffectControls
 {
@@ -41,16 +39,21 @@ public:
 	virtual ~EqControls()
 	{
 	}
+
 	virtual void saveSettings ( QDomDocument& doc, QDomElement& parent );
+
 	virtual void loadSettings ( const QDomElement &_this );
+
 	inline virtual QString nodeName() const
 	{
 		return "Eq";
 	}
+
 	virtual int controlCount()
 	{
-		return 39;
+		return 42;
 	}
+
 	virtual EffectControlDialog* createView()
 	{
 		return new EqControlsDialog( this );
@@ -66,22 +69,15 @@ public:
 	float m_para3PeakL, m_para3PeakR;
 	float m_para4PeakL, m_para4PeakR;
 	float m_highShelfPeakL, m_highShelfPeakR;
-	bool m_analyseIn;
-	bool m_analyseOut;
 
 	EqAnalyser m_inFftBands;
 	EqAnalyser m_outFftBands;
 
 	bool m_inProgress;
-
 	bool visable();
 
-
-
-
-
 private:
-	EqEffect* m_effect;
+	EqEffect *m_effect;
 
 	FloatModel m_inGainModel;
 	FloatModel m_outGainModel;
@@ -130,9 +126,10 @@ private:
 	IntModel m_lpTypeModel;
 	IntModel m_hpTypeModel;
 
+	BoolModel m_analyseInModel;
+	BoolModel m_analyseOutModel;
+
 	friend class EqControlsDialog;
 	friend class EqEffect;
-
 };
-
 #endif // EQCONTROLS_H

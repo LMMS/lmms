@@ -5,7 +5,7 @@
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,9 +30,7 @@
 
 
 #include "Song.h"
-#include "Engine.h"
 #include "Mixer.h"
-#include "Controller.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
 #include "LfoController.h"
@@ -95,11 +93,6 @@ Controller::~Controller()
 		s_controllers.remove( idx );
 	}
 
-	if( Engine::getSong() )
-	{
-		Engine::getSong()->removeController( this );
-	}
-
 	m_valueBuffer.clear();
 	// Remove connections by destroyed signal
 }
@@ -141,11 +134,7 @@ ValueBuffer * Controller::valueBuffer()
 
 void Controller::updateValueBuffer()
 {
-	float * values = m_valueBuffer.values();
-	for( int i = 0; i < m_valueBuffer.length(); i++ )
-	{
-		values[i] = 0.5f;
-	}
+	m_valueBuffer.fill(0.5f);
 	m_bufferLastUpdated = s_periods;
 }
 

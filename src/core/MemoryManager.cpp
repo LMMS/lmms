@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,9 +25,7 @@
 
 
 #include "MemoryManager.h"
-#include <QtGlobal>
 #include <QReadWriteLock>
-#include <stdint.h>
 
 
 MemoryPoolVector MemoryManager::s_memoryPools;
@@ -50,6 +48,11 @@ bool MemoryManager::init()
 
 void * MemoryManager::alloc( size_t size )
 {
+	if( !size )
+	{
+		return NULL;
+	}
+
 	int requiredChunks = size / MM_CHUNK_SIZE + ( size % MM_CHUNK_SIZE > 0 ? 1 : 0 );
 
 	MemoryPool * mp = NULL;
@@ -105,10 +108,9 @@ void * MemoryManager::alloc( size_t size )
 
 void MemoryManager::free( void * ptr )
 {
-	if( ptr == NULL )
+	if( !ptr )
 	{
-		qDebug( "MemoryManager: Null pointer deallocation attempted" );
-		return; // let's not try to deallocate null pointers, ok?
+		return; // Null pointer deallocations are OK but do not need to be handled
 	}
 
 	// fetch info on the ptr and remove

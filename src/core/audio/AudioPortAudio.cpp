@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  * Copyright (c) 2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -42,12 +42,11 @@ void AudioPortAudioSetupUtil::updateChannels()
 #include <QLineEdit>
 
 #include "Engine.h"
-#include "debug.h"
 #include "ConfigManager.h"
 #include "gui_templates.h"
 #include "templates.h"
 #include "ComboBox.h"
-#include "LcdSpinBox.h"
+#include "Mixer.h"
 
 
 AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
@@ -389,7 +388,7 @@ void AudioPortAudioSetupUtil::updateChannels()
 
 
 AudioPortAudio::setupWidget::setupWidget( QWidget * _parent ) :
-	AudioDevice::setupWidget( AudioPortAudio::name(), _parent )
+	AudioDeviceSetupWidget( AudioPortAudio::name(), _parent )
 {
 	m_backend = new ComboBox( this, "BACKEND" );
 	m_backend->setGeometry( 64, 15, 260, 20 );

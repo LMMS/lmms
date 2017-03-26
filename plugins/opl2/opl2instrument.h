@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 Raine M. Ekman <raine/at/iki/fi>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -63,7 +63,7 @@ public:
 	void loadSettings( const QDomElement & _this );
 	void loadPatch(const unsigned char inst[14]);
 	void tuneEqual(int center, float Hz);
-        virtual void loadFile( const QString& file );
+	virtual void loadFile( const QString& file );
 
 	IntModel m_patchModel;
 
@@ -118,9 +118,9 @@ private:
 	QString storedname;
 	fpp_t frameCount;
 	short *renderbuffer;
-	int voiceNote[9];
+	int voiceNote[OPL2_VOICES];
 	// Least recently used voices
-	int voiceLRU[9];
+	int voiceLRU[OPL2_VOICES];
 	// 0 - no note, >0 - note on velocity
 	int velocities[128];
 	// These include both octave and Fnumber
@@ -146,7 +146,7 @@ class opl2instrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-        opl2instrumentView( Instrument * _instrument, QWidget * _parent );
+	opl2instrumentView( Instrument * _instrument, QWidget * _parent );
 	virtual ~opl2instrumentView();
 	LcdSpinBox *m_patch;
 	void modelChanged();
@@ -192,8 +192,11 @@ public:
 	PixmapButton *vib_depth_btn;
 	PixmapButton *trem_depth_btn;
 
+	private slots:
+	void updateKnobHints();
 
-
+ private:
+	QString knobHintHelper(float n);
 
 };
 

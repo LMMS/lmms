@@ -337,7 +337,7 @@ float equalizerNband_audio_module<BaseClass, use_hplp>::freq_gain(int index, dou
     return ret;
 }
 
-template class equalizerNband_audio_module<equalizer5band_metadata, false>;
-template class equalizerNband_audio_module<equalizer8band_metadata, true>;
-template class equalizerNband_audio_module<equalizer12band_metadata, true>;
+template class calf_plugins::equalizerNband_audio_module<equalizer5band_metadata, false>;
+template class calf_plugins::equalizerNband_audio_module<equalizer8band_metadata, true>;
+template class calf_plugins::equalizerNband_audio_module<equalizer12band_metadata, true>;
 

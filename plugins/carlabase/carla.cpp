@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,6 +32,7 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
+#include "Mixer.h"
 
 #include <QApplication>
 #include <QFileDialog>
@@ -188,7 +189,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
 CarlaInstrument::~CarlaInstrument()
 {
-    Engine::mixer()->removePlayHandles( instrumentTrack() );
+    Engine::mixer()->removePlayHandlesOfTypes(instrumentTrack(), PlayHandle::TypeNotePlayHandle | PlayHandle::TypeInstrumentPlayHandle);
 
     if (fHost.resourceDir != NULL)
     {
@@ -262,6 +263,9 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
         break;
     case NATIVE_HOST_OPCODE_UI_UNAVAILABLE:
         handleUiClosed();
+        break;
+    case NATIVE_HOST_OPCODE_HOST_IDLE:
+        qApp->processEvents();
         break;
     }
 

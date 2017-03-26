@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,16 +23,13 @@
  */
 
 #include <QFileInfo>
-#include <QMutexLocker>
 
 #include "PresetPreviewPlayHandle.h"
-#include "debug.h"
 #include "Engine.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
-#include "MidiPort.h"
-#include "DataFile.h"
-#include "NotePlayHandle.h"
+#include "Mixer.h"
+#include "PluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
 
@@ -117,6 +114,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 {
 	s_previewTC->lockData();
 
+	setUsesBuffer( false );
+
 	if( s_previewTC->previewNote() != NULL )
 	{
 		s_previewTC->previewNote()->mute();
@@ -134,8 +133,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		if( i == NULL || !i->descriptor()->supportsFileType( ext ) )
 		{
 			i = s_previewTC->previewInstrumentTrack()->
-				loadInstrument(
-					Engine::pluginFileHandling()[ext] );
+				loadInstrument(pluginFactory->pluginSupportingExtension(ext).name());
 		}
 		if( i != NULL )
 		{
@@ -185,6 +183,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	s_previewTC->setPreviewNote( m_previewNote );
 
+	Engine::mixer()->addPlayHandle( m_previewNote );
+
 	s_previewTC->unlockData();
 	Engine::projectJournal()->setJournalling( j );
 }
@@ -201,7 +201,7 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 		// then set according state
 		s_previewTC->setPreviewNote( NULL );
 	}
-	NotePlayHandleManager::release( m_previewNote );
+	m_previewNote->noteOff();
 	s_previewTC->unlockData();
 }
 
@@ -210,7 +210,8 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 
 void PresetPreviewPlayHandle::play( sampleFrame * _working_buffer )
 {
-	m_previewNote->play( _working_buffer );
+	// Do nothing; the preview instrument is played by m_previewNote, which
+	// has been added to the mixer
 }
 
 
@@ -271,7 +272,10 @@ ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(
 
 bool PresetPreviewPlayHandle::isPreviewing()
 {
-	return s_previewTC->isPreviewing();
+	if (s_previewTC) {
+		return s_previewTC->isPreviewing();
+	}
+	return false;
 }
 
 

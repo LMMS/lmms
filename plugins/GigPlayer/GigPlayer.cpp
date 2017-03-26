@@ -9,7 +9,7 @@
  * Copyright (C) 2005-2008 Christian Schoenebeck
  * Copyright (C) 2009-2010 Christian Schoenebeck and Grigor Iliev
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -40,8 +40,10 @@
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
+#include "Mixer.h"
 #include "NotePlayHandle.h"
 #include "Knob.h"
+#include "SampleBuffer.h"
 #include "Song.h"
 #include "ConfigManager.h"
 #include "endian_handling.h"
@@ -101,7 +103,9 @@ GigInstrument::GigInstrument( InstrumentTrack * _instrument_track ) :
 
 GigInstrument::~GigInstrument()
 {
-	Engine::mixer()->removePlayHandles( instrumentTrack() );
+	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
+				PlayHandle::TypeNotePlayHandle
+				| PlayHandle::TypeInstrumentPlayHandle );
 	freeInstance();
 }
 
@@ -207,7 +211,7 @@ void GigInstrument::openFile( const QString & _gigFile, bool updateTrackName )
 
 		try
 		{
-			m_instance = new GigInstance( _gigFile );
+			m_instance = new GigInstance( SampleBuffer::tryToMakeAbsolute( _gigFile ) );
 			m_filename = SampleBuffer::tryToMakeRelative( _gigFile );
 		}
 		catch( ... )
@@ -1060,29 +1064,18 @@ void GigInstrumentView::showFileDialog()
 
 	QStringList types;
 	types << tr( "GIG Files (*.gig)" );
-	ofd.setFilters( types );
+	ofd.setNameFilters( types );
 
 	QString dir;
 	if( k->m_filename != "" )
 	{
-		QString f = k->m_filename;
-
-		if( QFileInfo( f ).isRelative() )
-		{
-			f = ConfigManager::inst()->userSamplesDir() + f;
-
-			if( QFileInfo( f ).exists() == false )
-			{
-				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
-			}
-		}
-
+		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
 	else
 	{
-		ofd.setDirectory( ConfigManager::inst()->userSamplesDir() );
+		ofd.setDirectory( ConfigManager::inst()->gigDir() );
 	}
 
 	m_fileDialogButton->setEnabled( false );

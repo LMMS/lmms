@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,31 +28,31 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QSlider>
 #include <QWhatsThis>
+#include <QScrollArea>
 
 #include "SetupDialog.h"
 #include "TabBar.h"
 #include "TabButton.h"
-#include "TabWidget.h"
 #include "gui_templates.h"
 #include "Mixer.h"
+#include "MainWindow.h"
 #include "ProjectJournal.h"
-#include "ConfigManager.h"
 #include "embed.h"
 #include "Engine.h"
 #include "debug.h"
 #include "ToolTip.h"
-#include "LedCheckbox.h"
-#include "LcdSpinBox.h"
 #include "FileDialog.h"
 
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
+#include "AudioAlsaSetupWidget.h"
 #include "AudioJack.h"
 #include "AudioOss.h"
+#include "AudioSndio.h"
 #include "AudioPortAudio.h"
+#include "AudioSoundIo.h"
 #include "AudioPulseAudio.h"
 #include "AudioSdl.h"
 #include "AudioDummy.h"
@@ -60,8 +60,11 @@
 // platform-specific midi-interface-classes
 #include "MidiAlsaRaw.h"
 #include "MidiAlsaSeq.h"
+#include "MidiJack.h"
 #include "MidiOss.h"
+#include "MidiSndio.h"
 #include "MidiWinMM.h"
+#include "MidiApple.h"
 #include "MidiDummy.h"
 
 
@@ -91,11 +94,13 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 							"disabled" ).toInt() ),
 	m_warnAfterSetup( !ConfigManager::inst()->value( "app",
 						"nomsgaftersetup" ).toInt() ),
-	m_displaydBV( ConfigManager::inst()->value( "app", 
-		      				"displaydbv" ).toInt() ),
+	m_displaydBFS( ConfigManager::inst()->value( "app", 
+		      				"displaydbfs" ).toInt() ),
 	m_MMPZ( !ConfigManager::inst()->value( "app", "nommpz" ).toInt() ),
 	m_disableBackup( !ConfigManager::inst()->value( "app",
 							"disablebackup" ).toInt() ),
+	m_openLastProject( ConfigManager::inst()->value( "app",
+							"openlastproject" ).toInt() ),
 	m_hqAudioDev( ConfigManager::inst()->value( "mixer",
 							"hqaudio" ).toInt() ),
 	m_lang( ConfigManager::inst()->value( "app",
@@ -103,8 +108,9 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_workingDir( QDir::toNativeSeparators( ConfigManager::inst()->workingDir() ) ),
 	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
 	m_artworkDir( QDir::toNativeSeparators( ConfigManager::inst()->artworkDir() ) ),
-	m_flDir( QDir::toNativeSeparators( ConfigManager::inst()->flDir() ) ),
 	m_ladDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
+	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
+	m_sf2Dir( QDir::toNativeSeparators( ConfigManager::inst()->sf2Dir() ) ),
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_defaultSoundfont( QDir::toNativeSeparators( ConfigManager::inst()->defaultSoundfont() ) ),
 #endif
@@ -114,6 +120,10 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
+	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave" ).toInt() ),
+	m_saveInterval(	ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() < 1 ?
+					MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
+			ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() ),
 	m_oneInstrumentTrackWindow( ConfigManager::inst()->value( "ui",
 					"oneinstrumenttrackwindow" ).toInt() ),
 	m_compactTrackButtons( ConfigManager::inst()->value( "ui",
@@ -132,6 +142,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
+	setFixedSize( 452, 520 );
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -222,13 +233,13 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				this, SLOT( toggleWarnAfterSetup( bool ) ) );
 
 
-	LedCheckBox * dbv = new LedCheckBox( tr( "Display volume as dBV " ),
+	LedCheckBox * dbfs = new LedCheckBox( tr( "Display volume as dBFS " ),
 								misc_tw );
 	labelNumber++;
-	dbv->move( XDelta, YDelta*labelNumber );
-	dbv->setChecked( m_displaydBV );
-	connect( dbv, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleDisplaydBV( bool ) ) );
+	dbfs->move( XDelta, YDelta*labelNumber );
+	dbfs->setChecked( m_displaydBFS );
+	connect( dbfs, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleDisplaydBFS( bool ) ) );
 
 
 	LedCheckBox * mmpz = new LedCheckBox(
@@ -313,6 +324,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( disableBackup, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleDisableBackup( bool ) ) );
 
+	LedCheckBox * openLastProject = new LedCheckBox(
+				tr( "Reopen last project on start" ),
+								misc_tw );
+	labelNumber++;
+	openLastProject->move( XDelta, YDelta*labelNumber );
+	openLastProject->setChecked( m_openLastProject );
+	connect( openLastProject, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleOpenLastProject( bool ) ) );
+
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
@@ -378,15 +398,34 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
 	labelWidget( paths, tr( "Paths" ) );
+	QLabel * title = new QLabel( tr( "Directories" ), paths );
+	QFont f = title->font();
+	f.setBold( true );
+	title->setFont( pointSize<12>( f ) );
+
+
+	QScrollArea *pathScroll = new QScrollArea( paths );
+
+	QWidget *pathSelectors = new QWidget( ws );
+	QVBoxLayout *pathSelectorLayout = new QVBoxLayout;
+	pathScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+	pathScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	pathScroll->resize( 362, pathsHeight - 50  );
+	pathScroll->move( 0, 30 );
+	pathSelectors->resize( 360, pathsHeight - 50 );
+
+	const int txtLength = 284;
+	const int btnStart = 297;
+
 
 	// working-dir
 	TabWidget * lmms_wd_tw = new TabWidget( tr(
 					"LMMS working directory" ).toUpper(),
-								paths );
+								pathSelectors );
 	lmms_wd_tw->setFixedHeight( 48 );
 
 	m_wdLineEdit = new QLineEdit( m_workingDir, lmms_wd_tw );
-	m_wdLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_wdLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_wdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 				SLOT( setWorkingDir( const QString & ) ) );
 
@@ -394,37 +433,19 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 							"", lmms_wd_tw );
 	workingdir_select_btn->setFixedSize( 24, 24 );
-	workingdir_select_btn->move( 320, 16 );
+	workingdir_select_btn->move( btnStart, 16 );
 	connect( workingdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openWorkingDir() ) );
 
-	// vst-dir
-	TabWidget * vst_tw = new TabWidget( tr(
-					"VST-plugin directory" ).toUpper(),
-								paths );
-	vst_tw->setFixedHeight( 48 );
-
-	m_vdLineEdit = new QLineEdit( m_vstDir, vst_tw );
-	m_vdLineEdit->setGeometry( 10, 20, 300, 16 );
-	connect( m_vdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
-					SLOT( setVSTDir( const QString & ) ) );
-
-	QPushButton * vstdir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
-								"", vst_tw );
-	vstdir_select_btn->setFixedSize( 24, 24 );
-	vstdir_select_btn->move( 320, 16 );
-	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
-						SLOT( openVSTDir() ) );
 
 	// artwork-dir
 	TabWidget * artwork_tw = new TabWidget( tr(
-					"Artwork directory" ).toUpper(),
-								paths );
+					"Themes directory" ).toUpper(),
+								pathSelectors );
 	artwork_tw->setFixedHeight( 48 );
 
 	m_adLineEdit = new QLineEdit( m_artworkDir, artwork_tw );
-	m_adLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_adLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_adLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 				SLOT( setArtworkDir( const QString & ) ) );
 
@@ -432,7 +453,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 							"", artwork_tw );
 	artworkdir_select_btn->setFixedSize( 24, 24 );
-	artworkdir_select_btn->move( 320, 16 );
+	artworkdir_select_btn->move( btnStart, 16 );
 	connect( artworkdir_select_btn, SIGNAL( clicked() ), this,
 						SLOT( openArtworkDir() ) );
 
@@ -445,7 +466,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	m_baLineEdit = new QLineEdit( m_backgroundArtwork, 
 			backgroundArtwork_tw );
-	m_baLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_baLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_baLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 			SLOT( setBackgroundArtwork( const QString & ) ) );
 
@@ -453,50 +474,88 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 			embed::getIconPixmap( "project_open", 16, 16 ),
 			"", backgroundArtwork_tw );
 	backgroundartworkdir_select_btn->setFixedSize( 24, 24 );
-	backgroundartworkdir_select_btn->move( 320, 16 );
+	backgroundartworkdir_select_btn->move( btnStart, 16 );
 	connect( backgroundartworkdir_select_btn, SIGNAL( clicked() ), this,
 					SLOT( openBackgroundArtwork() ) );
 
+	// vst-dir
+	TabWidget * vst_tw = new TabWidget( tr(
+					"VST-plugin directory" ).toUpper(),
+								pathSelectors );
+	vst_tw->setFixedHeight( 48 );
 
+	m_vdLineEdit = new QLineEdit( m_vstDir, vst_tw );
+	m_vdLineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_vdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setVSTDir( const QString & ) ) );
 
-
-
-	// FL Studio-dir
-	TabWidget * fl_tw = new TabWidget( tr(
-				"FL Studio installation directory" ).toUpper(),
-								paths );
-	fl_tw->setFixedHeight( 48 );
-
-	m_fdLineEdit = new QLineEdit( m_flDir, fl_tw );
-	m_fdLineEdit->setGeometry( 10, 20, 300, 16 );
-	connect( m_fdLineEdit, SIGNAL( textChanged( const QString & ) ), this,
-					SLOT( setFLDir( const QString & ) ) );
-
-	QPushButton * fldir_select_btn = new QPushButton(
+	QPushButton * vstdir_select_btn = new QPushButton(
 				embed::getIconPixmap( "project_open", 16, 16 ),
-								"", fl_tw );
-	fldir_select_btn->setFixedSize( 24, 24 );
-	fldir_select_btn->move( 320, 16 );
-	connect( fldir_select_btn, SIGNAL( clicked() ), this,
-						SLOT( openFLDir() ) );
+								"", vst_tw );
+	vstdir_select_btn->setFixedSize( 24, 24 );
+	vstdir_select_btn->move( btnStart, 16 );
+	connect( vstdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openVSTDir() ) );
+
+	// gig-dir
+	TabWidget * gig_tw = new TabWidget( tr(
+					"GIG directory" ).toUpper(),
+								pathSelectors );
+	gig_tw->setFixedHeight( 48 );
+
+	m_gigLineEdit = new QLineEdit( m_gigDir, gig_tw );
+	m_gigLineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_gigLineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setGIGDir( const QString & ) ) );
+
+	QPushButton * gigdir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", gig_tw );
+	gigdir_select_btn->setFixedSize( 24, 24 );
+	gigdir_select_btn->move( btnStart, 16 );
+	connect( gigdir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openGIGDir() ) );
+
+	// sf2-dir
+	TabWidget * sf2_tw = new TabWidget( tr(
+					"SF2 directory" ).toUpper(),
+								pathSelectors );
+	sf2_tw->setFixedHeight( 48 );
+
+	m_sf2LineEdit = new QLineEdit( m_sf2Dir, sf2_tw );
+	m_sf2LineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_sf2LineEdit, SIGNAL( textChanged( const QString & ) ), this,
+					SLOT( setSF2Dir( const QString & ) ) );
+
+	QPushButton * sf2dir_select_btn = new QPushButton(
+				embed::getIconPixmap( "project_open", 16, 16 ),
+								"", sf2_tw );
+	sf2dir_select_btn->setFixedSize( 24, 24 );
+	sf2dir_select_btn->move( btnStart, 16 );
+	connect( sf2dir_select_btn, SIGNAL( clicked() ), this,
+						SLOT( openSF2Dir() ) );
+
+
+
 	// LADSPA-dir
 	TabWidget * lad_tw = new TabWidget( tr(
-			"LADSPA plugin paths" ).toUpper(),
+			"LADSPA plugin directories" ).toUpper(),
 							paths );
 	lad_tw->setFixedHeight( 48 );
 
 	m_ladLineEdit = new QLineEdit( m_ladDir, lad_tw );
-	m_ladLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_ladLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_ladLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 		SLOT( setLADSPADir( const QString & ) ) );
 
 	QPushButton * laddir_select_btn = new QPushButton(
-				embed::getIconPixmap( "project_open", 16, 16 ),
+				embed::getIconPixmap( "add_folder", 16, 16 ),
 								"", lad_tw );
 	laddir_select_btn->setFixedSize( 24, 24 );
-	laddir_select_btn->move( 320, 16 );
+	laddir_select_btn->move( btnStart, 16 );
 	connect( laddir_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openLADSPADir() ) );
+
 
 #ifdef LMMS_HAVE_STK
 	// STK-dir
@@ -506,7 +565,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	stk_tw->setFixedHeight( 48 );
 
 	m_stkLineEdit = new QLineEdit( m_stkDir, stk_tw );
-	m_stkLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_stkLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_stkLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 SLOT( setSTKDir( const QString & ) ) );
 
@@ -514,7 +573,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 			embed::getIconPixmap( "project_open", 16, 16 ),
 								"", stk_tw );
 	stkdir_select_btn->setFixedSize( 24, 24 );
-	stkdir_select_btn->move( 320, 16 );
+	stkdir_select_btn->move( btnStart, 16 );
 	connect( stkdir_select_btn, SIGNAL( clicked() ), this,
 		 SLOT( openSTKDir() ) );
 #endif
@@ -526,7 +585,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	sf_tw->setFixedHeight( 48 );
 
 	m_sfLineEdit = new QLineEdit( m_defaultSoundfont, sf_tw );
-	m_sfLineEdit->setGeometry( 10, 20, 300, 16 );
+	m_sfLineEdit->setGeometry( 10, 20, txtLength, 16 );
 	connect( m_sfLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 		 		SLOT( setDefaultSoundfont( const QString & ) ) );
 
@@ -534,48 +593,110 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 				embed::getIconPixmap( "project_open", 16, 16 ),
 								"", sf_tw );
 	sf_select_btn->setFixedSize( 24, 24 );
-	sf_select_btn->move( 320, 16 );
+	sf_select_btn->move( btnStart, 16 );
 	connect( sf_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openDefaultSoundfont() ) );
 #endif	
 
+	pathSelectors->setLayout( pathSelectorLayout );
 
-	dir_layout->addWidget( lmms_wd_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( vst_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( artwork_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( backgroundArtwork_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( fl_tw );
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( lad_tw );
+	pathSelectorLayout->addWidget( lmms_wd_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( gig_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( sf2_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( vst_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( lad_tw );
 #ifdef LMMS_HAVE_STK
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( stk_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( stk_tw );
 #endif	
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	dir_layout->addSpacing( 10 );
-	dir_layout->addWidget( sf_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( sf_tw );
 #endif	
-	dir_layout->addStretch();
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addWidget( artwork_tw );
+	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addStretch();
+	pathSelectorLayout->addWidget( backgroundArtwork_tw );
+	pathSelectorLayout->addSpacing( 10 );
 
+	dir_layout->addWidget( pathSelectors );
 
+	pathScroll->setWidget( pathSelectors );
+	pathScroll->setWidgetResizable( true );
 
 
 
 	QWidget * performance = new QWidget( ws );
-	performance->setFixedSize( 360, 240 );
+	performance->setFixedSize( 360, 200 );
 	QVBoxLayout * perf_layout = new QVBoxLayout( performance );
 	perf_layout->setSpacing( 0 );
 	perf_layout->setMargin( 0 );
 	labelWidget( performance, tr( "Performance settings" ) );
 
+
+	TabWidget * auto_save_tw = new TabWidget(
+			tr( "Auto save" ).toUpper(), performance );
+	auto_save_tw->setFixedHeight( 110 );
+
+	m_saveIntervalSlider = new QSlider( Qt::Horizontal, auto_save_tw );
+	m_saveIntervalSlider->setRange( 1, 20 );
+	m_saveIntervalSlider->setTickPosition( QSlider::TicksBelow );
+	m_saveIntervalSlider->setPageStep( 1 );
+	m_saveIntervalSlider->setTickInterval( 1 );
+	m_saveIntervalSlider->setGeometry( 10, 16, 340, 18 );
+	m_saveIntervalSlider->setValue( m_saveInterval );
+
+	connect( m_saveIntervalSlider, SIGNAL( valueChanged( int ) ), this,
+						SLOT( setAutoSaveInterval( int ) ) );
+
+	m_saveIntervalLbl = new QLabel( auto_save_tw );
+	m_saveIntervalLbl->setGeometry( 10, 40, 200, 24 );
+	setAutoSaveInterval( m_saveIntervalSlider->value() );
+
+	m_autoSave = new LedCheckBox(
+			tr( "Enable auto-save" ), auto_save_tw );
+	m_autoSave->move( 10, 70 );
+	m_autoSave->setChecked( m_enableAutoSave );
+	connect( m_autoSave, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleAutoSave( bool ) ) );
+
+	m_runningAutoSave = new LedCheckBox(
+			tr( "Allow auto-save while playing" ), auto_save_tw );
+	m_runningAutoSave->move( 20, 90 );
+	m_runningAutoSave->setChecked( m_enableRunningAutoSave );
+	connect( m_runningAutoSave, SIGNAL( toggled( bool ) ),
+				this, SLOT( toggleRunningAutoSave( bool ) ) );
+
+	QPushButton * autoSaveResetBtn = new QPushButton(
+			embed::getIconPixmap( "reload" ), "", auto_save_tw );
+	autoSaveResetBtn->setGeometry( 290, 70, 28, 28 );
+	connect( autoSaveResetBtn, SIGNAL( clicked() ), this,
+						SLOT( resetAutoSave() ) );
+	ToolTip::add( autoSaveResetBtn, tr( "Reset to default-value" ) );
+
+	QPushButton * saveIntervalBtn = new QPushButton(
+			embed::getIconPixmap( "help" ), "", auto_save_tw );
+	saveIntervalBtn->setGeometry( 320, 70, 28, 28 );
+	connect( saveIntervalBtn, SIGNAL( clicked() ), this,
+						SLOT( displaySaveIntervalHelp() ) );
+
+	m_saveIntervalSlider->setEnabled( m_enableAutoSave );
+	m_runningAutoSave->setVisible( m_enableAutoSave );
+
+
+	perf_layout->addWidget( auto_save_tw );
+	perf_layout->addSpacing( 10 );
+
+
 	TabWidget * ui_fx_tw = new TabWidget( tr( "UI effects vs. "
 						"performance" ).toUpper(),
 								performance );
-	ui_fx_tw->setFixedHeight( 80 );
+	ui_fx_tw->setFixedHeight( 70 );
 
 	LedCheckBox * smoothScroll = new LedCheckBox(
 			tr( "Smooth scroll in Song Editor" ), ui_fx_tw );
@@ -584,19 +705,10 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	connect( smoothScroll, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleSmoothScroll( bool ) ) );
 
-
-	LedCheckBox * autoSave = new LedCheckBox(
-			tr( "Enable auto save feature" ), ui_fx_tw );
-	autoSave->move( 10, 40 );
-	autoSave->setChecked( m_enableAutoSave );
-	connect( autoSave, SIGNAL( toggled( bool ) ),
-				this, SLOT( toggleAutoSave( bool ) ) );
-
-
 	LedCheckBox * animAFP = new LedCheckBox(
 				tr( "Show playback cursor in AudioFileProcessor" ),
 								ui_fx_tw );
-	animAFP->move( 10, 60 );
+	animAFP->move( 10, 40 );
 	animAFP->setChecked( m_animateAFP );
 	connect( animAFP, SIGNAL( toggled( bool ) ),
 				this, SLOT( toggleAnimateAFP( bool ) ) );
@@ -646,7 +758,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_ALSA
 	m_audioIfaceSetupWidgets[AudioAlsa::name()] =
-					new AudioAlsa::setupWidget( asw );
+					new AudioAlsaSetupWidget( asw );
 #endif
 
 #ifdef LMMS_HAVE_PULSEAUDIO
@@ -659,6 +771,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 					new AudioPortAudio::setupWidget( asw );
 #endif
 
+#ifdef LMMS_HAVE_SOUNDIO
+	m_audioIfaceSetupWidgets[AudioSoundIo::name()] =
+					new AudioSoundIo::setupWidget( asw );
+#endif
+
 #ifdef LMMS_HAVE_SDL
 	m_audioIfaceSetupWidgets[AudioSdl::name()] =
 					new AudioSdl::setupWidget( asw );
@@ -667,6 +784,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_OSS
 	m_audioIfaceSetupWidgets[AudioOss::name()] =
 					new AudioOss::setupWidget( asw );
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	m_audioIfaceSetupWidgets[AudioSndio::name()] =
+					new AudioSndio::setupWidget( asw );
 #endif
 	m_audioIfaceSetupWidgets[AudioDummy::name()] =
 					new AudioDummy::setupWidget( asw );
@@ -686,6 +808,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 
+	// If no preferred audio device is saved, save the current one
 	QString audioDevName = 
 		ConfigManager::inst()->value( "mixer", "audiodev" );
 	if( audioDevName.length() == 0 )
@@ -706,7 +829,6 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	audio_layout->addSpacing( 20 );
 	audio_layout->addWidget( asw );
 	audio_layout->addStretch();
-
 
 
 
@@ -742,23 +864,38 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 #ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
-					new MidiAlsaSeq::setupWidget( msw );
+					MidiSetupWidget::create<MidiAlsaSeq>( msw );
 	m_midiIfaceSetupWidgets[MidiAlsaRaw::name()] =
-					new MidiAlsaRaw::setupWidget( msw );
+					MidiSetupWidget::create<MidiAlsaRaw>( msw );
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	m_midiIfaceSetupWidgets[MidiJack::name()] =
+					MidiSetupWidget::create<MidiJack>( msw );
 #endif
 
 #ifdef LMMS_HAVE_OSS
 	m_midiIfaceSetupWidgets[MidiOss::name()] =
-					new MidiOss::setupWidget( msw );
+					MidiSetupWidget::create<MidiOss>( msw );
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	m_midiIfaceSetupWidgets[MidiSndio::name()] =
+					MidiSetupWidget::create<MidiSndio>( msw );
 #endif
 
 #ifdef LMMS_BUILD_WIN32
 	m_midiIfaceSetupWidgets[MidiWinMM::name()] =
-					new MidiWinMM::setupWidget( msw );
+					MidiSetupWidget::create<MidiWinMM>( msw );
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    m_midiIfaceSetupWidgets[MidiApple::name()] =
+                    MidiSetupWidget::create<MidiApple>( msw );
 #endif
 
 	m_midiIfaceSetupWidgets[MidiDummy::name()] =
-					new MidiDummy::setupWidget( msw );
+					MidiSetupWidget::create<MidiDummy>( msw );
 
 
 	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
@@ -874,18 +1011,24 @@ void SetupDialog::accept()
 					QString::number( !m_toolTips ) );
 	ConfigManager::inst()->setValue( "app", "nomsgaftersetup",
 					QString::number( !m_warnAfterSetup ) );
-	ConfigManager::inst()->setValue( "app", "displaydbv",
-					QString::number( m_displaydBV ) );
+	ConfigManager::inst()->setValue( "app", "displaydbfs",
+					QString::number( m_displaydBFS ) );
 	ConfigManager::inst()->setValue( "app", "nommpz",
 						QString::number( !m_MMPZ ) );
 	ConfigManager::inst()->setValue( "app", "disablebackup",
 					QString::number( !m_disableBackup ) );
+	ConfigManager::inst()->setValue( "app", "openlastproject",
+					QString::number( m_openLastProject ) );
 	ConfigManager::inst()->setValue( "mixer", "hqaudio",
 					QString::number( m_hqAudioDev ) );
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
 	ConfigManager::inst()->setValue( "ui", "enableautosave",
 					QString::number( m_enableAutoSave ) );
+	ConfigManager::inst()->setValue( "ui", "saveinterval",
+					QString::number( m_saveInterval ) );
+	ConfigManager::inst()->setValue( "ui", "enablerunningautosave",
+					QString::number( m_enableRunningAutoSave ) );
 	ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	ConfigManager::inst()->setValue( "ui", "compacttrackbuttons",
@@ -903,16 +1046,17 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 
 
-	ConfigManager::inst()->setWorkingDir( m_workingDir );
-	ConfigManager::inst()->setVSTDir( m_vstDir );
-	ConfigManager::inst()->setArtworkDir( m_artworkDir );
-	ConfigManager::inst()->setFLDir( m_flDir );
-	ConfigManager::inst()->setLADSPADir( m_ladDir );
+	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
+	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
+	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
+	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
+	ConfigManager::inst()->setArtworkDir(QDir::fromNativeSeparators(m_artworkDir));
+	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	ConfigManager::inst()->setDefaultSoundfont( m_defaultSoundfont );
 #endif
 #ifdef LMMS_HAVE_STK
-	ConfigManager::inst()->setSTKDir( m_stkDir );
+	ConfigManager::inst()->setSTKDir(QDir::fromNativeSeparators(m_stkDir));
 #endif	
 	ConfigManager::inst()->setBackgroundArtwork( m_backgroundArtwork );
 
@@ -1017,9 +1161,9 @@ void SetupDialog::toggleWarnAfterSetup( bool _enabled )
 
 
 
-void SetupDialog::toggleDisplaydBV( bool _enabled )
+void SetupDialog::toggleDisplaydBFS( bool _enabled )
 {
-	m_displaydBV = _enabled;
+	m_displaydBFS = _enabled;
 }
 
 
@@ -1041,6 +1185,14 @@ void SetupDialog::toggleDisableBackup( bool _enabled )
 
 
 
+void SetupDialog::toggleOpenLastProject( bool _enabled )
+{
+	m_openLastProject = _enabled;
+}
+
+
+
+
 void SetupDialog::toggleHQAudioDev( bool _enabled )
 {
 	m_hqAudioDev = _enabled;
@@ -1056,12 +1208,22 @@ void SetupDialog::toggleSmoothScroll( bool _enabled )
 
 
 
+
 void SetupDialog::toggleAutoSave( bool _enabled )
 {
 	m_enableAutoSave = _enabled;
+	m_saveIntervalSlider->setEnabled( _enabled );
+	m_runningAutoSave->setVisible( _enabled );
+	setAutoSaveInterval( m_saveIntervalSlider->value() );
 }
 
 
+
+
+void SetupDialog::toggleRunningAutoSave( bool _enabled )
+{
+	m_enableRunningAutoSave = _enabled;
+}
 
 
 
@@ -1128,6 +1290,28 @@ void SetupDialog::openWorkingDir()
 	}
 }
 
+void SetupDialog::openGIGDir()
+{
+	QString new_dir = FileDialog::getExistingDirectory( this,
+				tr( "Choose your GIG directory" ),
+							m_gigDir );
+	if( new_dir != QString::null )
+	{
+		m_gigLineEdit->setText( new_dir );
+	}
+}
+
+void SetupDialog::openSF2Dir()
+{
+	QString new_dir = FileDialog::getExistingDirectory( this,
+				tr( "Choose your SF2 directory" ),
+							m_sf2Dir );
+	if( new_dir != QString::null )
+	{
+		m_sf2LineEdit->setText( new_dir );
+	}
+}
+
 
 
 
@@ -1158,6 +1342,16 @@ void SetupDialog::setVSTDir( const QString & _vd )
 	m_vstDir = _vd;
 }
 
+void SetupDialog::setGIGDir(const QString &_gd)
+{
+	m_gigDir = _gd;
+}
+
+void SetupDialog::setSF2Dir(const QString &_sfd)
+{
+	m_sf2Dir = _sfd;
+}
+
 
 
 
@@ -1183,20 +1377,6 @@ void SetupDialog::setArtworkDir( const QString & _ad )
 
 
 
-void SetupDialog::openFLDir()
-{
-	QString new_dir = FileDialog::getExistingDirectory( this,
-				tr( "Choose FL Studio installation directory" ),
-							m_flDir );
-	if( new_dir != QString::null )
-	{
-		m_fdLineEdit->setText( new_dir );
-	}
-}
-
-
-
-
 void SetupDialog::openLADSPADir()
 {
 	QString new_dir = FileDialog::getExistingDirectory( this,
@@ -1215,7 +1395,6 @@ void SetupDialog::openLADSPADir()
 		}
 	}
 }
-
 
 
 
@@ -1284,14 +1463,6 @@ void SetupDialog::openBackgroundArtwork()
 
 
 
-void SetupDialog::setFLDir( const QString & _fd )
-{
-	m_flDir = _fd;
-}
-
-
-
-
 void SetupDialog::setLADSPADir( const QString & _fd )
 {
 	m_ladDir = _fd;
@@ -1325,6 +1496,42 @@ void SetupDialog::setBackgroundArtwork( const QString & _ba )
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
 #endif
+}
+
+
+
+
+void SetupDialog::setAutoSaveInterval( int value )
+{
+	m_saveInterval = value;
+	m_saveIntervalSlider->setValue( m_saveInterval );
+	QString minutes = m_saveInterval > 1 ? tr( "minutes" ) : tr( "minute" );
+	minutes = QString( "%1 %2" ).arg( QString::number( m_saveInterval ), minutes );
+	minutes = m_enableAutoSave ?  minutes : tr( "Disabled" );
+	m_saveIntervalLbl->setText( tr( "Auto-save interval: %1" ).arg( minutes ) );
+}
+
+
+
+
+void SetupDialog::resetAutoSave()
+{
+	setAutoSaveInterval( MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES );
+	m_autoSave->setChecked( true );
+	m_runningAutoSave->setChecked( true );
+}
+
+
+
+
+void SetupDialog::displaySaveIntervalHelp()
+{
+	QWhatsThis::showText( QCursor::pos(),
+			tr( "Set the time between automatic backup to %1.\n"
+			"Remember to also save your project manually. "
+			"You can choose to disable saving while playing, "
+			"something some older systems find difficult." ).arg(
+			ConfigManager::inst()->recoveryFile() ) );
 }
 
 
@@ -1386,7 +1593,3 @@ void SetupDialog::displayMIDIHelp()
 					"controls to setup the selected "
 					"MIDI-interface." ) );
 }
-
-
-
-

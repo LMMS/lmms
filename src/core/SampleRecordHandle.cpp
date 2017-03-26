@@ -2,8 +2,8 @@
  * SampleRecordHandle.cpp - implementation of class SampleRecordHandle
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
- * 
- * This file is part of LMMS - http://lmms.io
+ *
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,7 +27,7 @@
 #include "BBTrack.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "Pattern.h"
+#include "Mixer.h"
 #include "SampleBuffer.h"
 #include "SampleTrack.h"
 #include "debug.h"

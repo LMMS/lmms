@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -49,13 +49,13 @@ public:
 protected slots:
 	void acceptSelection();
 	void rowChanged( const QModelIndex &, const QModelIndex & );
+	void sortAgain();
 	void updateSelection();
 
 
 private:
 	Ui::EffectSelectDialog * ui;
 
-	Plugin::DescriptorList m_pluginDescriptors;
 	EffectKeyList m_effectKeys;
 	EffectKey m_currentSelection;
 

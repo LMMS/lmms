@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2013 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -54,9 +54,14 @@ public:
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget",
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget",
 			"ALSA-Sequencer (Advanced Linux Sound "
 							"Architecture)" );
+	}
+
+	inline static QString configSection()
+	{
+		return "Midialsaseq";
 	}
 
 
@@ -105,20 +110,6 @@ public:
 		connect( this, SIGNAL( writablePortsChanged() ),
 							_receiver, _member );
 	}
-
-
-	class setupWidget : public MidiClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings();
-
-	private:
-		QLineEdit * m_device;
-
-	} ;
 
 
 private slots:

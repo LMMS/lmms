@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2014 Wong Cho Ching
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -263,8 +263,8 @@ private:
 	Knob * m_changeAmtKnob; //Change Amount
 	Knob * m_changeSpeedKnob; //Change Speed
 
-	Knob * m_sqrDutyKnob; //Squre Duty
-    Knob * m_sqrSweepKnob; //Squre Sweep
+	Knob * m_sqrDutyKnob; //Square Wave Duty
+    Knob * m_sqrSweepKnob; //Square Wave Duty Sweep
 
 	Knob * m_repeatSpeedKnob; //Repeat Speed
 
@@ -278,8 +278,8 @@ private:
 	Knob * m_hpFilCutSweepKnob; //HP Filter Cutoff Sweep
 
 	automatableButtonGroup * m_waveBtnGroup;
-	PixmapButton * m_sqrWaveBtn; //NOTE: This button has Squre Duty
-								//and Squre Speed configurable
+	PixmapButton * m_sqrWaveBtn; //NOTE: This button has Square Duty
+								//and Square Speed configurable
 	PixmapButton * m_sawWaveBtn;
 	PixmapButton * m_sinWaveBtn;
 	PixmapButton * m_noiseWaveBtn;

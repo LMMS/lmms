@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -261,6 +261,7 @@ public:
 	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 
+	void updateSampleRange();
 private:
 	void zoom( const bool _out = false );
 	void slide( int _px );

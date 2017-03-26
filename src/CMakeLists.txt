@@ -1,8 +1,18 @@
+CONFIGURE_FILE("lmmsconfig.h.in"        "${CMAKE_BINARY_DIR}/lmmsconfig.h")
+CONFIGURE_FILE("lmmsversion.h.in"       "${CMAKE_BINARY_DIR}/lmmsversion.h")
+
 SET(LMMS_SRCS "")
 SET(LMMS_UIS "")
 
 SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+# Enable C++11
+ADD_DEFINITIONS(-std=c++0x)
+
+IF(LMMS_BUILD_APPLE)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+ENDIF()
 
 ADD_SUBDIRECTORY(core)
 ADD_SUBDIRECTORY(gui)
@@ -33,9 +43,9 @@ ENDIF()
 
 INCLUDE(GenQrc)
 ADD_GEN_QRC(LMMS_RCC_OUT lmms.qrc
-	../AUTHORS
-	../COPYING
-	${CONTRIBUTORS}
+	"${CMAKE_SOURCE_DIR}/doc/AUTHORS"
+	"${CMAKE_SOURCE_DIR}/LICENSE.txt"
+	"${CMAKE_SOURCE_DIR}/doc/CONTRIBUTORS"
 )
 
 # Paths relative to lmms executable
@@ -46,6 +56,7 @@ INCLUDE_DIRECTORIES(
 	${JACK_INCLUDE_DIRS}
 	${SAMPLERATE_INCLUDE_DIRS}
 	${SNDFILE_INCLUDE_DIRS}
+	${SNDIO_INCLUDE_DIRS}
 )
 
 IF(NOT ("${SDL_INCLUDE_DIR}" STREQUAL ""))
@@ -64,13 +75,15 @@ IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
 ENDIF()
 
-# Enable C++11
-ADD_DEFINITIONS("-std=c++0x")
+# Use libraries in non-standard directories (e.g., another version of Qt)
+IF(LMMS_BUILD_LINUX)
+	LINK_LIBRARIES(-Wl,--enable-new-dtags)
+	SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+ENDIF()
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # ADD_LIBRARY's OBJECT is only supported in CMake >=2.8.8
-IF(CMAKE_MAJOR_VERSION GREATER 2 OR
-   CMAKE_MINOR_VERSION GREATER 8 OR
-   CMAKE_PATCH_VERSION GREATER 7)
+IF(CMAKE_VERSION VERSION_GREATER "2.8.7")
 
 	ADD_LIBRARY(lmmsobjs OBJECT
 		${LMMS_SRCS}
@@ -100,12 +113,26 @@ IF(LMMS_BUILD_WIN32)
 	SET(EXTRA_LIBRARIES "-lwinmm")
 ENDIF()
 
+IF(LMMS_BUILD_APPLE)
+	SET(EXTRA_LIBRARIES "-framework CoreMIDI")
+ENDIF()
+
+if(LMMS_HAVE_OSS AND LMMS_BUILD_OPENBSD)
+    SET(EXTRA_LIBRARIES "-lossaudio")
+endif()
+
+IF(LMMS_BUILD_HAIKU)
+	SET(EXTRA_LIBRARIES "-lnetwork")
+ENDIF()
+
 SET(LMMS_REQUIRED_LIBS
 	${CMAKE_THREAD_LIBS_INIT}
 	${QT_LIBRARIES}
 	${ASOUND_LIBRARY}
 	${SDL_LIBRARY}
 	${PORTAUDIO_LIBRARIES}
+	${SOUNDIO_LIBRARY}
+	${SNDIO_LIBRARY}
 	${PULSEAUDIO_LIBRARIES}
 	${JACK_LIBRARIES}
 	${OGGVORBIS_LIBRARIES}
@@ -120,43 +147,10 @@ TARGET_LINK_LIBRARIES(lmms
 	${LMMS_REQUIRED_LIBS}
 )
 
-IF(QT5)
-	TARGET_LINK_LIBRARIES(lmms
-		Qt5::Widgets
-		Qt5::Xml
-)
+# Required libs for debug msys builds
+IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+	TARGET_LINK_LIBRARIES(lmms QtCore4 QtGui4 QtXml4)
 ENDIF()
-
-
-#
-# rules for building localizations
-#
-FILE(GLOB lmms_LOCALES ${CMAKE_SOURCE_DIR}/data/locale/*.ts)
-SET(ts_targets "")
-SET(qm_targets "")
-FOREACH(_ts_file ${lmms_LOCALES})
-	STRING(REPLACE "${CMAKE_SOURCE_DIR}/data/locale/" "" _ts_target "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_file "${_ts_file}")
-	STRING(REPLACE ".ts" ".qm" _qm_target "${_ts_target}")
-	ADD_CUSTOM_TARGET(${_ts_target}
-		COMMAND "${QT_LUPDATE_EXECUTABLE}" -locations none -no-obsolete -I ${CMAKE_SOURCE_DIR}/include/ ${LMMS_SRCS} ${LMMS_INCLUDES} ${LMMS_UIS} `find "\"${CMAKE_SOURCE_DIR}/plugins/\"" -type f -name '*.cpp' -or -name '*.h'` -ts "\"${_ts_file}\""
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-	ADD_CUSTOM_TARGET(${_qm_target}
-		COMMAND "${QT_LRELEASE_EXECUTABLE}" "\"${_ts_file}\"" -qm "\"${_qm_file}\""
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-	LIST(APPEND ts_targets "${_ts_target}")
-	LIST(APPEND qm_targets "${_qm_target}")
-ENDFOREACH(_ts_file ${lmms_LOCALES})
-
-ADD_CUSTOM_TARGET(update-locales)
-FOREACH(_item ${ts_targets})
-	ADD_DEPENDENCIES(update-locales "${_item}")
-ENDFOREACH(_item ${ts_targets})
-
-ADD_CUSTOM_TARGET(finalize-locales ALL)
-FOREACH(_item ${qm_targets})
-	ADD_DEPENDENCIES(finalize-locales "${_item}")
-ENDFOREACH(_item ${qm_targets})
 
 # Install
 IF(LMMS_BUILD_WIN32)
@@ -164,14 +158,32 @@ IF(LMMS_BUILD_WIN32)
 		LINK_FLAGS "${LINK_FLAGS} -mwindows"
 		ENABLE_EXPORTS ON
 	)
-	ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
+	IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+		ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
+	ENDIF()
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
-	INSTALL(FILES
+
+	IF(QT5)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/Qt5Core.dll"
+					"${MINGW_PREFIX}/bin/Qt5Gui.dll"
+					"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
+					"${MINGW_PREFIX}/bin/Qt5Xml.dll"
+				DESTINATION .)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
+				DESTINATION ./platforms)
+	ELSE()
+		INSTALL(FILES
 					"${MINGW_PREFIX}/bin/QtCore4.dll"
 					"${MINGW_PREFIX}/bin/QtGui4.dll"
 					"${MINGW_PREFIX}/bin/QtSvg4.dll"
 					"${MINGW_PREFIX}/bin/QtXml4.dll"
+				DESTINATION .)
+	ENDIF()
+
+	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
@@ -179,11 +191,8 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
 					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
-					"${MINGW_PREFIX}/bin/libfltk.dll"
-					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
-					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
 					"${MINGW_PREFIX}/bin/SDL.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
@@ -191,6 +200,37 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/zlib1.dll"
 					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
 				DESTINATION .)
+	IF(LMMS_BUILD_MSYS)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
+					"${MINGW_PREFIX}/bin/libstdc++-6.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(FLTK_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libfltk.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(FLUIDSYNTH_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libfluidsynth.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(GIG_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libgig-6.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(PORTAUDIO_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
+				DESTINATION .)
+	ENDIF()
+	IF(SOUNDIO_FOUND)
+		INSTALL(FILES
+					"${MINGW_PREFIX}/lib/libsoundio.dll"
+				DESTINATION .)
+	ENDIF()
 
 ELSE(LMMS_BUILD_WIN32)
 	IF(NOT LMMS_BUILD_APPLE)

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,10 +34,10 @@
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
+#include "Mixer.h"
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "ComboBox.h"
-#include "TabWidget.h"
 #include "GroupBox.h"
 #include "Song.h"
 #include "ToolButton.h"

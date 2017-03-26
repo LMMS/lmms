@@ -1,9 +1,10 @@
+
 /*
  * SetupDialog.h - dialog for setting up LMMS
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,9 +29,13 @@
 #include <QDialog>
 #include <QtCore/QMap>
 
+#include "LedCheckbox.h"
 #include "lmmsconfig.h"
 #include "AudioDevice.h"
 #include "MidiClient.h"
+#include "MidiSetupWidget.h"
+
+#include "AudioDeviceSetupWidget.h"
 
 
 class QComboBox;
@@ -39,7 +44,6 @@ class QLineEdit;
 class QSlider;
 
 class TabBar;
-
 
 class SetupDialog : public QDialog
 {
@@ -71,12 +75,18 @@ private slots:
 	// path settings widget
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
+	void setGIGDir( const QString & _gd );
+	void setSF2Dir( const QString & _sfd );
 	void setArtworkDir( const QString & _ad );
-	void setFLDir( const QString & _fd );
 	void setLADSPADir( const QString & _ld );
 	void setSTKDir( const QString & _sd );
 	void setDefaultSoundfont( const QString & _sf );
 	void setBackgroundArtwork( const QString & _ba );
+
+	// performance settings widget
+	void setAutoSaveInterval( int time );
+	void resetAutoSave();
+	void displaySaveIntervalHelp();
 
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
@@ -89,15 +99,17 @@ private slots:
 
 	void toggleToolTips( bool _enabled );
 	void toggleWarnAfterSetup( bool _enabled );
-	void toggleDisplaydBV( bool _enabled );
+	void toggleDisplaydBFS( bool _enabled );
 	void toggleMMPZ( bool _enabled );
 	void toggleDisableBackup( bool _enabled );
+	void toggleOpenLastProject( bool _enabled );
 	void toggleHQAudioDev( bool _enabled );
 
 	void openWorkingDir();
 	void openVSTDir();
+	void openGIGDir();
+	void openSF2Dir();
 	void openArtworkDir();
-	void openFLDir();
 	void openLADSPADir();
 	void openSTKDir();
 	void openDefaultSoundfont();
@@ -105,6 +117,7 @@ private slots:
 
 	void toggleSmoothScroll( bool _enabled );
 	void toggleAutoSave( bool _enabled );
+	void toggleRunningAutoSave( bool _enabled );
 	void toggleOneInstrumentTrackWindow( bool _enabled );
 	void toggleCompactTrackButtons( bool _enabled );
 	void toggleSyncVSTPlugins( bool _enabled );
@@ -125,9 +138,10 @@ private:
 
 	bool m_toolTips;
 	bool m_warnAfterSetup;
-	bool m_displaydBV;
+	bool m_displaydBFS;
 	bool m_MMPZ;
 	bool m_disableBackup;
+	bool m_openLastProject;
 	bool m_hqAudioDev;
 	QString m_lang;
 	QStringList m_languages;
@@ -136,8 +150,9 @@ private:
 	QLineEdit * m_wdLineEdit;
 	QLineEdit * m_vdLineEdit;
 	QLineEdit * m_adLineEdit;
-	QLineEdit * m_fdLineEdit;
 	QLineEdit * m_ladLineEdit;
+	QLineEdit * m_gigLineEdit;
+	QLineEdit * m_sf2LineEdit;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QLineEdit * m_sfLineEdit;
 #endif
@@ -149,8 +164,9 @@ private:
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_artworkDir;
-	QString m_flDir;
 	QString m_ladDir;
+	QString m_gigDir;
+	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_defaultSoundfont;
 #endif
@@ -161,6 +177,13 @@ private:
 
 	bool m_smoothScroll;
 	bool m_enableAutoSave;
+	bool m_enableRunningAutoSave;
+	int m_saveInterval;
+	QSlider * m_saveIntervalSlider;
+	QLabel * m_saveIntervalLbl;
+	LedCheckBox * m_autoSave;
+	LedCheckBox * m_runningAutoSave;
+
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;
 	bool m_syncVSTPlugins;
@@ -169,8 +192,8 @@ private:
 	bool m_displayWaveform;
 	bool m_disableAutoQuit;
 
-	typedef QMap<QString, AudioDevice::setupWidget *> AswMap;
-	typedef QMap<QString, MidiClient::setupWidget *> MswMap;
+	typedef QMap<QString, AudioDeviceSetupWidget *> AswMap;
+	typedef QMap<QString, MidiSetupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 
 	QComboBox * m_audioInterfaces;

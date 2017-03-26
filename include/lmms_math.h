@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -34,7 +34,7 @@
 #include <cmath>
 using namespace std;
 
-#if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) || defined(LMMS_BUILD_HAIKU)
+#if defined (LMMS_BUILD_WIN32) || defined (LMMS_BUILD_APPLE) || defined(LMMS_BUILD_HAIKU)  || defined (__FreeBSD__) || defined(__OpenBSD__)
 #ifndef isnanf
 #define isnanf(x)	isnan(x)
 #endif
@@ -243,10 +243,10 @@ static inline float linearToLogScale( float min, float max, float value )
 
 
 
-//! @brief Converts linear amplitude (0-1.0) to dBV scale. Handles zeroes as -inf.
-//! @param amp Linear amplitude, where 1.0 = 0dBV. 
-//! @return Amplitude in dBV. -inf for 0 amplitude.
-static inline float safeAmpToDbv( float amp )
+//! @brief Converts linear amplitude (0-1.0) to dBFS scale. Handles zeroes as -inf.
+//! @param amp Linear amplitude, where 1.0 = 0dBFS. 
+//! @return Amplitude in dBFS. -inf for 0 amplitude.
+static inline float safeAmpToDbfs( float amp )
 {
 	return amp == 0.0f
 		? -INFINITY
@@ -254,32 +254,32 @@ static inline float safeAmpToDbv( float amp )
 }
 
 
-//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0. Handles infinity as zero.
-//! @param dbv The dBV value to convert: all infinites are treated as -inf and result in 0
+//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0. Handles infinity as zero.
+//! @param dbfs The dBFS value to convert: all infinites are treated as -inf and result in 0
 //! @return Linear amplitude
-static inline float safeDbvToAmp( float dbv )
+static inline float safeDbfsToAmp( float dbfs )
 {
-	return isinff( dbv )
+	return isinff( dbfs )
 		? 0.0f
-		: exp10f( dbv * 0.05f );
+		: exp10f( dbfs * 0.05f );
 }
 
 
-//! @brief Converts linear amplitude (>0-1.0) to dBV scale. 
-//! @param amp Linear amplitude, where 1.0 = 0dBV. ** Must be larger than zero! **
-//! @return Amplitude in dBV. 
-static inline float ampToDbv( float amp )
+//! @brief Converts linear amplitude (>0-1.0) to dBFS scale. 
+//! @param amp Linear amplitude, where 1.0 = 0dBFS. ** Must be larger than zero! **
+//! @return Amplitude in dBFS. 
+static inline float ampToDbfs( float amp )
 {
 	return log10f( amp ) * 20.0f;
 }
 
 
-//! @brief Converts dBV-scale to linear amplitude with 0dBV = 1.0
-//! @param dbv The dBV value to convert. ** Must be a real number - not inf/nan! **
+//! @brief Converts dBFS-scale to linear amplitude with 0dBFS = 1.0
+//! @param dbfs The dBFS value to convert. ** Must be a real number - not inf/nan! **
 //! @return Linear amplitude
-static inline float dbvToAmp( float dbv )
+static inline float dbfsToAmp( float dbfs )
 {
-	return exp10f( dbv * 0.05f );
+	return exp10f( dbfs * 0.05f );
 }
 
 

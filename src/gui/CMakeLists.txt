@@ -2,6 +2,8 @@ SET(LMMS_SRCS
 	${LMMS_SRCS}
 	gui/AboutDialog.cpp
 	gui/ActionGroup.cpp
+	gui/AudioAlsaSetupWidget.cpp
+	gui/AudioDeviceSetupWidget.cpp
 	gui/AutomatableModelView.cpp
 	gui/AutomationPatternView.cpp
 	gui/ControllerConnectionDialog.cpp
@@ -17,13 +19,17 @@ SET(LMMS_SRCS
 	gui/LfoControllerDialog.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp
+	gui/MainApplication.cpp
 	gui/MainWindow.cpp
+	gui/MidiSetupWidget.cpp
 	gui/ModelView.cpp
 	gui/PeakControllerDialog.cpp
 	gui/PianoView.cpp
 	gui/PluginBrowser.cpp
+	gui/RowTableView.cpp
 	gui/SetupDialog.cpp
 	gui/StringPairDrag.cpp
+	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
 	gui/ToolPluginView.cpp
 	gui/TrackContainerView.cpp
@@ -55,6 +61,7 @@ SET(LMMS_SRCS
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
+	gui/widgets/LeftRightNav.cpp
 	gui/widgets/Knob.cpp
 	gui/widgets/LadspaControlView.cpp
 	gui/widgets/LcdSpinBox.cpp

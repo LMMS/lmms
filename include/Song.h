@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,6 +24,8 @@
 
 #ifndef SONG_H
 #define SONG_H
+
+#include <utility>
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
@@ -57,7 +59,6 @@ public:
 	{
 		Mode_None,
 		Mode_PlaySong,
-		Mode_PlayTrack,
 		Mode_PlayBB,
 		Mode_PlayPattern,
 		Mode_PlayAutomationPattern,
@@ -75,7 +76,6 @@ public:
 		PlayPos( const int abs = 0 ) :
 			MidiTime( abs ),
 			m_timeLine( NULL ),
-			m_timeLineUpdate( true ),
 			m_currentFrame( 0.0f )
 		{
 		}
@@ -88,7 +88,6 @@ public:
 			return m_currentFrame;
 		}
 		TimeLineWidget * m_timeLine;
-		bool m_timeLineUpdate;
 
 	private:
 		float m_currentFrame;
@@ -114,22 +113,18 @@ public:
 
 	inline int ticksPerTact() const
 	{
-		return DefaultTicksPerTact *
-				m_timeSigModel.getNumerator() /
-					 m_timeSigModel.getDenominator();
+		return MidiTime::ticksPerTact(m_timeSigModel);
 	}
 
 	// Returns the beat position inside the bar, 0-based
 	inline int getBeat() const
 	{
-		return ( currentTick() - currentTact() * ticksPerTact() ) /
-			( ticksPerTact() / m_timeSigModel.getNumerator() );
+		return getPlayPos().getBeatWithinBar(m_timeSigModel);
 	}
 	// the remainder after bar and beat are removed
 	inline int getBeatTicks() const
 	{
-		return 	( currentTick() - currentTact() * ticksPerTact() ) %
-			( ticksPerTact() / m_timeSigModel.getNumerator() );
+		return getPlayPos().getTickWithinBeat(m_timeSigModel);
 	}
 	inline int getTicks() const
 	{
@@ -138,10 +133,6 @@ public:
 	inline f_cnt_t getFrames() const
 	{
 		return currentFrame();
-	}
-	inline bool isTempoAutomated()
-	{
-		return m_tempoModel.isAutomated();
 	}
 	inline bool isPaused() const
 	{
@@ -174,6 +165,7 @@ public:
 	}
 
 	bool isExportDone() const;
+	std::pair<MidiTime, MidiTime> getExportEndpoints() const;
 
 	inline void setRenderBetweenMarkers( bool renderBetweenMarkers )
 	{
@@ -188,6 +180,14 @@ public:
 	inline PlayPos & getPlayPos( PlayModes pm )
 	{
 		return m_playPos[pm];
+	}
+	inline const PlayPos & getPlayPos( PlayModes pm ) const
+	{
+		return m_playPos[pm];
+	}
+	inline const PlayPos & getPlayPos() const
+	{
+		return getPlayPos(m_playMode);
 	}
 
 	void updateLength();
@@ -258,7 +258,6 @@ public slots:
 	void playSong();
 	void record();
 	void playAndRecord();
-	void playTrack( Track * trackToPlay );
 	void playBB();
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
@@ -324,6 +323,8 @@ private:
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
+	void removeAllControllers();
+
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -339,6 +340,7 @@ private:
 	QString m_fileName;
 	QString m_oldFileName;
 	bool m_modified;
+	bool m_loadOnLaunch;
 
 	volatile bool m_recording;
 	volatile bool m_exporting;
@@ -355,7 +357,6 @@ private:
 	PlayPos m_playPos[Mode_Count];
 	tact_t m_length;
 
-	Track * m_trackToPlay;
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
@@ -366,7 +367,7 @@ private:
 	VstSyncController m_vstSyncController;
 
 
-	friend class Engine;
+	friend class LmmsCore;
 	friend class SongEditor;
 	friend class mainWindow;
 	friend class ControllerRackView;
@@ -378,6 +379,9 @@ signals:
 	void lengthChanged( int tacts );
 	void tempoChanged( bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
+	void controllerAdded( Controller * );
+	void controllerRemoved( Controller * );
+	void updateSampleTracks();
 
 } ;
 

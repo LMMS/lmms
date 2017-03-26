@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,7 @@
 #include "embed.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
-#include "NotePlayHandle.h"
+#include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
 
 
@@ -134,7 +134,9 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Chromatic" ), { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Half-Whole Diminished" ), { 0, 1, 3, 4, 6, 7, 9, 10, -1 } },
 	
-	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } }
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, -1 } }
 } ;
 
 
@@ -267,8 +269,6 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 			}
 		}
 	}
-
-
 }
 
 
@@ -302,6 +302,9 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpEnabledModel( false ),
 	m_arpModel( this, tr( "Arpeggio type" ) ),
 	m_arpRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Arpeggio range" ) ),
+	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
+	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
+	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
 	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
@@ -316,8 +319,8 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
 	m_arpDirectionModel.addItem( tr( "Down" ), new PixmapLoader( "arp_down" ) );
 	m_arpDirectionModel.addItem( tr( "Up and down" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
 	m_arpDirectionModel.addItem( tr( "Down and up" ), new PixmapLoader( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
 	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );
@@ -407,7 +410,36 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			continue;
 		}
 
-		const int dir = m_arpDirectionModel.value();
+		// Skip notes randomly
+		if( m_arpSkipModel.value() )
+		{
+
+			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
+			{
+				if( cur_arp_idx == 0 )
+				{
+					_n->setMasterNote();
+				}
+				// update counters
+				frames_processed += arp_frames;
+				cur_frame += arp_frames;
+				continue;
+			}
+		}
+
+		int dir = m_arpDirectionModel.value();
+
+		// Miss notes randomly. We intercept int dir and abuse it
+		// after need.  :)
+
+		if( m_arpMissModel.value() )
+		{
+			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpMissModel.value() )
+			{
+				dir = ArpDirRandom;
+			}
+		}
+
 		// process according to arpeggio-direction...
 		if( dir == ArpDirUp )
 		{
@@ -449,6 +481,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		{
 			// just pick a random chord-index
 			cur_arp_idx = (int)( range * ( (float) rand() / (float) RAND_MAX ) );
+		}
+
+		// Cycle notes
+		if( m_arpCycleModel.value() && dir != ArpDirRandom )
+		{
+			cur_arp_idx *= m_arpCycleModel.value() + 1;
+			cur_arp_idx %= range;
 		}
 
 		// now calculate final key for our arp-note
@@ -496,6 +535,9 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpEnabledModel.saveSettings( _doc, _this, "arp-enabled" );
 	m_arpModel.saveSettings( _doc, _this, "arp" );
 	m_arpRangeModel.saveSettings( _doc, _this, "arprange" );
+	m_arpCycleModel.saveSettings( _doc, _this, "arpcycle" );
+	m_arpSkipModel.saveSettings( _doc, _this, "arpskip" );
+	m_arpMissModel.saveSettings( _doc, _this, "arpmiss" );
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionModel.saveSettings( _doc, _this, "arpdir" );
@@ -511,6 +553,9 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpEnabledModel.loadSettings( _this, "arp-enabled" );
 	m_arpModel.loadSettings( _this, "arp" );
 	m_arpRangeModel.loadSettings( _this, "arprange" );
+	m_arpCycleModel.loadSettings( _this, "arpcycle" );
+	m_arpSkipModel.loadSettings( _this, "arpskip" );
+	m_arpMissModel.loadSettings( _this, "arpmiss" );
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );

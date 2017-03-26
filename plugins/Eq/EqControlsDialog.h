@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,57 +25,42 @@
 #ifndef EQCONTROLSDIALOG_H
 #define EQCONTROLSDIALOG_H
 
+#include <QLabel>
+#include <QPushButton>
+
 #include "EffectControlDialog.h"
+#include "EqParameterWidget.h"
+#include "EqSpectrumView.h"
 #include "Fader.h"
 #include "Knob.h"
 #include "LedCheckbox.h"
-#include "EqParameterWidget.h"
 #include "MainWindow.h"
-#include "qpushbutton.h"
-#include "EqSpectrumView.h"
+#include "PixmapButton.h"
+
 
 
 class EqControls;
 
 class EqControlsDialog : public EffectControlDialog
 {
-
+	Q_OBJECT
 public:
-	EqControlsDialog( EqControls* controls );
+	EqControlsDialog( EqControls * controls );
 	virtual ~EqControlsDialog()
 	{
 	}
 
-	EqBand * setBand(EqControls *controls);
-
-private slots:
-	void updateVuMeters();
+	EqBand * setBand( EqControls * controls );
 
 private:
 	EqControls * m_controls;
-
-	Fader* m_inGainFader;
-	Fader* m_outGainFader;
-	Fader* m_gainFader;
-	Knob* m_resKnob;
-	Knob* m_freqKnob;
-	LedCheckBox* m_activeBox;
-	LedCheckBox* m_lp12Box;
-	LedCheckBox* m_lp24Box;
-	LedCheckBox* m_lp48Box;
-	LedCheckBox* m_hp12Box;
-	LedCheckBox* m_hp24Box;
-	LedCheckBox* m_hp48Box;
-	LedCheckBox* m_analyzeBox;
-	EqParameterWidget* m_parameterWidget;
-	EqSpectrumView* m_inSpec;
-	EqSpectrumView* m_outSpec;
+	EqParameterWidget * m_parameterWidget;
 
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
-	EqBand* setBand( int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color, QString name, float* peakL, float* peakR)
+	EqBand *setBand( int index, BoolModel *active, FloatModel *freq, FloatModel *res, FloatModel *gain, QColor color, QString name, float *peakL, float *peakR, BoolModel *hp12, BoolModel *hp24, BoolModel *hp48, BoolModel *lp12, BoolModel *lp24, BoolModel *lp48 )
 	{
-		EqBand* filterModels = m_parameterWidget->getBandModels( index );
+		EqBand *filterModels = m_parameterWidget->getBandModels( index );
 		filterModels->active = active;
 		filterModels->freq = freq;
 		filterModels->res = res;
@@ -83,12 +68,16 @@ private:
 		filterModels->gain = gain;
 		filterModels->peakL = peakL;
 		filterModels->peakR = peakR;
+		filterModels->hp12 = hp12;
+		filterModels->hp24 = hp24;
+		filterModels->hp48 = hp48;
+		filterModels->lp12 = lp12;
+		filterModels->lp24 = lp24;
+		filterModels->lp48 = lp48;
 		return filterModels;
 	}
 
 	int m_originalHeight;
 };
-
-
 
 #endif // EQCONTROLSDIALOG_H

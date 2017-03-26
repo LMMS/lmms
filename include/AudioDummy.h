@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,9 @@
 #define AUDIO_DUMMY_H
 
 #include "AudioDevice.h"
+#include "AudioDeviceSetupWidget.h"
 #include "MicroTimer.h"
+#include "Mixer.h"
 
 
 class AudioDummy : public AudioDevice, public QThread
@@ -49,11 +51,11 @@ public:
 	}
 
 
-	class setupWidget : public AudioDevice::setupWidget
+	class setupWidget : public AudioDeviceSetupWidget
 	{
 	public:
 		setupWidget( QWidget * _parent ) :
-			AudioDevice::setupWidget( AudioDummy::name(), _parent )
+			AudioDeviceSetupWidget( AudioDummy::name(), _parent )
 		{
 		}
 
@@ -82,11 +84,7 @@ private:
 
 	virtual void stopProcessing()
 	{
-		if( isRunning() )
-		{
-			wait( 1000 );
-			terminate();
-		}
+		stopProcessingThread( this );
 	}
 
 	virtual void run()
@@ -100,7 +98,10 @@ private:
 			{
 				break;
 			}
-			delete[] b;
+			if( mixer()->hasFifoWriter() )
+			{
+				delete[] b;
+			}
 
 			const int microseconds = static_cast<int>( mixer()->framesPerPeriod() * 1000000.0f / mixer()->processingSampleRate() - timer.elapsed() );
 			if( microseconds > 0 )

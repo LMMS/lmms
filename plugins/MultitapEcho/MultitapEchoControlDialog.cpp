@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -62,12 +62,12 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	
 	ampGraph->setAutoFillBackground( true );
 	ampGraph->setPalette( pal );
-	ampGraph->setGraphColor( QColor( 48, 255, 117 ) );
+	ampGraph->setGraphColor( QColor( 11, 213, 86) );
 	ampGraph -> setMaximumSize( 204, 105 );
 	
 	lpGraph->setAutoFillBackground( true );
 	lpGraph->setPalette( pal );
-	lpGraph->setGraphColor( QColor( 255, 48, 117 ) );
+	lpGraph->setGraphColor( QColor( 0, 200, 187) );
 	lpGraph -> setMaximumSize( 204, 105 );
 	
 	// steps spinbox
@@ -88,7 +88,7 @@ MultitapEchoControlDialog::MultitapEchoControlDialog( MultitapEchoControls * con
 	dryGain->move( 150, 245 );
 	dryGain->setModel( & controls->m_dryGain );
 	dryGain->setLabel( tr( "Dry" ) );
-	dryGain->setHintText( tr( "Dry Gain:" ) , " dBV" );
+	dryGain->setHintText( tr( "Dry Gain:" ) , " dBFS" );
 
 	Knob * stages = new Knob( knobBright_26, this );
 	stages->move( 200, 245 );

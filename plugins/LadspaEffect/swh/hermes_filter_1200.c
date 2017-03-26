@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -117,7 +117,7 @@ inline void setup_f_svf(sv_filter *sv, const float fs, const float fc) {
 
 /* Run one sample through the SV filter. Filter is by andy@vellocet */
 
-inline float run_svf(sv_filter *sv, float in) {
+static inline float run_svf(sv_filter *sv, float in) {
         float out;
         int i;
 
@@ -144,7 +144,7 @@ inline float run_svf(sv_filter *sv, float in) {
         return out;
 }
 
-inline int wave_tbl(const float wave) {
+static inline int wave_tbl(const float wave) {
         switch (f_round(wave)) {
                 case 0:
                 return BLO_SINE;
@@ -569,7 +569,7 @@ static void connectPortHermesFilter(
 static LADSPA_Handle instantiateHermesFilter(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	HermesFilter *plugin_data = (HermesFilter *)malloc(sizeof(HermesFilter));
+	HermesFilter *plugin_data = (HermesFilter *)calloc(1, sizeof(HermesFilter));
 	long count;
 	float **dela_data = NULL;
 	int *dela_pos = NULL;
@@ -817,6 +817,7 @@ static void runHermesFilter(LADSPA_Handle instance, unsigned long sample_count) 
 	float lfo2_phase = plugin_data->lfo2_phase;
 	blo_h_osc * osc1_d = plugin_data->osc1_d;
 	blo_h_osc * osc2_d = plugin_data->osc2_d;
+	blo_h_tables * tables = plugin_data->tables;
 	sv_filter * xover_b1_data = plugin_data->xover_b1_data;
 	sv_filter * xover_b2_data = plugin_data->xover_b2_data;
 
@@ -925,6 +926,8 @@ static void runHermesFilter(LADSPA_Handle instance, unsigned long sample_count) 
 	dela_fb[0] = dela1_fb;
 	dela_fb[1] = dela2_fb;
 	dela_fb[2] = dela3_fb;
+	
+	tables = tables; // To shut up gcc
 	
 	for (pos = 0; pos < sample_count; pos++) {
 	        count++; // Count of number of samples processed
@@ -1201,6 +1204,7 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	float lfo2_phase = plugin_data->lfo2_phase;
 	blo_h_osc * osc1_d = plugin_data->osc1_d;
 	blo_h_osc * osc2_d = plugin_data->osc2_d;
+	blo_h_tables * tables = plugin_data->tables;
 	sv_filter * xover_b1_data = plugin_data->xover_b1_data;
 	sv_filter * xover_b2_data = plugin_data->xover_b2_data;
 
@@ -1310,6 +1314,8 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	dela_fb[1] = dela2_fb;
 	dela_fb[2] = dela3_fb;
 	
+	tables = tables; // To shut up gcc
+	
 	for (pos = 0; pos < sample_count; pos++) {
 	        count++; // Count of number of samples processed
 	
@@ -1397,14 +1403,13 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	plugin_data->lfo2_phase = lfo2_phase;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -1992,12 +1997,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (hermesFilterDescriptor) {
 		free((LADSPA_PortDescriptor *)hermesFilterDescriptor->PortDescriptors);
 		free((char **)hermesFilterDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)hermesFilterDescriptor->PortRangeHints);
 		free(hermesFilterDescriptor);
 	}
+	hermesFilterDescriptor = NULL;
 
 }

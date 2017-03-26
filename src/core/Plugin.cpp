@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,20 +25,18 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
-#include <QtGui/QMessageBox>
+#include <QMessageBox>
 
 #include "Plugin.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
-#include "Mixer.h"
-#include "ConfigManager.h"
 #include "DummyPlugin.h"
 #include "AutomatableModel.h"
 #include "Song.h"
 
 
-static PixmapLoader __dummyLoader;
+static PixmapLoader dummyLoader;
 
 static Plugin::Descriptor dummyPluginDescriptor =
 {
@@ -48,7 +46,7 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Undefined,
-	&__dummyLoader,
+	&dummyLoader,
 	NULL
 } ;
 
@@ -91,28 +89,28 @@ AutomatableModel * Plugin::childModel( const QString & )
 
 
 
-
-Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
+#include "PluginFactory.h"
+Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 								void * data )
 {
-	QLibrary pluginLibrary( ConfigManager::inst()->pluginDir() + pluginName );
-	if( pluginLibrary.load() == false )
+	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	if( pi.isNull() )
 	{
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			QMessageBox::information( NULL,
 				tr( "Plugin not found" ),
 				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginLibrary.errorString() ),
+						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
 				QMessageBox::Ok | QMessageBox::Default );
 		}
 		return new DummyPlugin();
 	}
 
-	InstantiationHook instantiationHook = ( InstantiationHook )pluginLibrary.resolve( "lmms_plugin_main" );
+	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
 	if( instantiationHook == NULL )
 	{
-		if( Engine::hasGUI() )
+		if( gui )
 		{
 			QMessageBox::information( NULL,
 				tr( "Error while loading plugin" ),
@@ -132,50 +130,6 @@ Plugin * Plugin::instantiate( const QString & pluginName, Model * parent,
 void Plugin::collectErrorForUI( QString errMsg )
 {
 	Engine::getSong()->collectError( errMsg );
-}
-
-
-
-
-void Plugin::getDescriptorsOfAvailPlugins( DescriptorList& pluginDescriptors )
-{
-	QDir directory( ConfigManager::inst()->pluginDir() );
-#ifdef LMMS_BUILD_WIN32
-	QFileInfoList list = directory.entryInfoList( QStringList( "*.dll" ) );
-#else
-	QFileInfoList list = directory.entryInfoList( QStringList( "lib*.so" ) );
-#endif
-	foreach( const QFileInfo& f, list )
-	{
-		QLibrary( f.absoluteFilePath() ).load();
-	}
-
-	foreach( const QFileInfo& f, list )
-	{
-		QLibrary pluginLibrary( f.absoluteFilePath() );
-		if( pluginLibrary.load() == false ||
-			pluginLibrary.resolve( "lmms_plugin_main" ) == NULL )
-		{
-			continue;
-		}
-
-		QString descriptorName = f.baseName() + "_plugin_descriptor";
-		if( descriptorName.left( 3 ) == "lib" )
-		{
-			descriptorName = descriptorName.mid( 3 );
-		}
-
-		Descriptor* pluginDescriptor = (Descriptor *) pluginLibrary.resolve( descriptorName.toUtf8().constData() );
-		if( pluginDescriptor == NULL )
-		{
-			qWarning() << tr( "LMMS plugin %1 does not have a plugin descriptor named %2!" ).
-								arg( f.absoluteFilePath() ).arg( descriptorName );
-			continue;
-		}
-
-		pluginDescriptors += *pluginDescriptor;
-	}
-
 }
 
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -255,7 +255,7 @@ public:
 	// has to be accessed by more than one object, then this function shouldn't be used.
 	bool isValueChanged()
 	{
-		if( m_valueChanged )
+		if( m_valueChanged || valueBuffer() )
 		{
 			m_valueChanged = false;
 			return true;
@@ -297,7 +297,7 @@ protected:
 	//! max() and aligned according to the step size (step size 0.05 -> value
 	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
 	//! doing your own calculations.
-	float fittedValue( float value, bool forceStep = false ) const;
+	float fittedValue( float value ) const;
 
 
 private:
@@ -406,7 +406,8 @@ public:
 		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
-
+	float getRoundedValue() const;
+	float getDigitCount();
 	defaultTypedMethods(float);
 
 } ;

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -37,8 +37,8 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	QWidget(),
 	m_displayMode( MinutesSeconds ),
 	m_spinBoxesLayout( this ),
-	m_majorLCD( 3, this ),
-	m_minorLCD( 3, this ),
+	m_majorLCD( 4, this ),
+	m_minorLCD( 2, this ),
 	m_milliSecondsLCD( 3, this )
 {
 	m_spinBoxesLayout.setSpacing( 0 );
@@ -76,15 +76,15 @@ void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
-			m_majorLCD.setLabel( "MIN" );
-			m_minorLCD.setLabel( "SEC" );
-			m_milliSecondsLCD.setLabel( "MSEC" );
+			m_majorLCD.setLabel( tr( "MIN" ) );
+			m_minorLCD.setLabel( tr( "SEC" ) );
+			m_milliSecondsLCD.setLabel( tr( "MSEC" ) );
 			break;
 
 		case BarsTicks:
-			m_majorLCD.setLabel( "BAR" );
-			m_minorLCD.setLabel( "BEAT" );
-			m_milliSecondsLCD.setLabel( "TICK" );
+			m_majorLCD.setLabel( tr( "BAR" ) );
+			m_minorLCD.setLabel( tr( "BEAT" ) );
+			m_milliSecondsLCD.setLabel( tr( "TICK" ) );
 			break;
 
 		default: break;
@@ -137,9 +137,3 @@ void TimeDisplayWidget::mousePressEvent( QMouseEvent* mouseEvent )
 		}
 	}
 }
-
-
-
-
-
-

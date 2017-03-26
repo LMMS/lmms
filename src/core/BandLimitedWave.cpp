@@ -1,10 +1,10 @@
 /*
- * BandLimitedWave.h - helper functions for band-limited
+ * BandLimitedWave.cpp - helper functions for band-limited
  *                    	waveform generation
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,7 +25,7 @@
 
 #include "BandLimitedWave.h"
 
-#include "ConfigManager.h"
+#include <QDataStream>
 
 WaveMipMap BandLimitedWave::s_waveforms[4] = {  };
 bool BandLimitedWave::s_wavesGenerated = false;
@@ -67,7 +67,7 @@ void BandLimitedWave::generateWaves()
 	int i;
 
 // set wavetable directory
-	s_wavetableDir = ConfigManager::inst()->dataDir() + "wavetables/";
+	s_wavetableDir = "data:wavetables/";
 
 // set wavetable files
 	QFile saw_file( s_wavetableDir + "saw.bin" );

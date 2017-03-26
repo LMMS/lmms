@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock <p/at/pgiblock.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -108,6 +108,25 @@ private:
 	static QString typeName( Type type );
 
 	void cleanMetaNodes( QDomElement de );
+
+	// helper upgrade routines
+	void upgrade_0_2_1_20070501();
+	void upgrade_0_2_1_20070508();
+	void upgrade_0_3_0_rc2();
+	void upgrade_0_3_0();
+	void upgrade_0_4_0_20080104();
+	void upgrade_0_4_0_20080118();
+	void upgrade_0_4_0_20080129();
+	void upgrade_0_4_0_20080409();
+	void upgrade_0_4_0_20080607();
+	void upgrade_0_4_0_20080622();
+	void upgrade_0_4_0_beta1();
+	void upgrade_0_4_0_rc2();
+	void upgrade_1_0_99();
+	void upgrade_1_1_0();
+	void upgrade_1_1_91();
+	void upgrade_1_2_0_rc3();
+	void upgrade_1_2_0_rc2_42();
 
 	void upgrade();
 

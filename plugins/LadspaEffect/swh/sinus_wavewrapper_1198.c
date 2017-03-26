@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -83,7 +83,7 @@ static void connectPortSinusWavewrapper(
 static LADSPA_Handle instantiateSinusWavewrapper(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	SinusWavewrapper *plugin_data = (SinusWavewrapper *)malloc(sizeof(SinusWavewrapper));
+	SinusWavewrapper *plugin_data = (SinusWavewrapper *)calloc(1, sizeof(SinusWavewrapper));
 	plugin_data->run_adding_gain = 1.0f;
 
 	return (LADSPA_Handle)plugin_data;
@@ -159,14 +159,13 @@ static void runAddingSinusWavewrapper(LADSPA_Handle instance, unsigned long samp
 	}
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -244,12 +243,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (sinusWavewrapperDescriptor) {
 		free((LADSPA_PortDescriptor *)sinusWavewrapperDescriptor->PortDescriptors);
 		free((char **)sinusWavewrapperDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)sinusWavewrapperDescriptor->PortRangeHints);
 		free(sinusWavewrapperDescriptor);
 	}
+	sinusWavewrapperDescriptor = NULL;
 
 }

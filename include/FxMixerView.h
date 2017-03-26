@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,8 +30,6 @@
 #include <QStackedLayout>
 #include <QScrollArea>
 
-#include "FxLine.h"
-#include "FxMixer.h"
 #include "ModelView.h"
 #include "Engine.h"
 #include "Fader.h"
@@ -52,6 +50,8 @@ public:
 	{
 	public:
 		FxChannelView(QWidget * _parent, FxMixerView * _mv, int _chIndex );
+
+		void setChannelIndex( int index );
 
 		FxLine * m_fxLine;
 		PixmapButton * m_muteBtn;
@@ -97,6 +97,7 @@ public:
 
 	// move the channel to the left or right
 	void moveChannelLeft(int index);
+	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
 	// make sure the display syncs up with the fx mixer.

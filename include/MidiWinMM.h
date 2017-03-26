@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -45,12 +45,20 @@ public:
 	MidiWinMM();
 	virtual ~MidiWinMM();
 
-	static QString probeDevice();
+	inline static QString probeDevice()
+	{
+		return QString::Null(); // no midi device name
+	}
 
 
 	inline static QString name()
 	{
-		return QT_TRANSLATE_NOOP( "setupWidget", "WinMM MIDI" );
+		return QT_TRANSLATE_NOOP( "MidiSetupWidget", "WinMM MIDI" );
+	}
+
+	inline static QString configSection()
+	{
+		return QString::Null(); // no configuration settings
 	}
 
 
@@ -102,19 +110,6 @@ public:
 	{
 		return false;
 	}
-
-
-	class setupWidget : public MidiClient::setupWidget
-	{
-	public:
-		setupWidget( QWidget * _parent );
-		virtual ~setupWidget();
-
-		virtual void saveSettings()
-		{
-		}
-
-	} ;
 
 
 private:// slots:

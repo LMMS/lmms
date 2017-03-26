@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,7 +26,6 @@
 #include <QTimer>
 #include <QApplication>
 #include <QPainter>
-#include <QPixmap>
 
 #include "embed.h"
 #include "FadeButton.h"
@@ -83,7 +82,7 @@ void FadeButton::customEvent( QEvent * )
 void FadeButton::paintEvent( QPaintEvent * _pe )
 {
 	QColor col = m_normalColor;
-	if( m_stateTimer.elapsed() < FadeDuration )
+	if( ! m_stateTimer.isNull() && m_stateTimer.elapsed() < FadeDuration )
 	{
 		const float state = 1 - m_stateTimer.elapsed() / FadeDuration;
 		const int r = (int)( m_normalColor.red() *

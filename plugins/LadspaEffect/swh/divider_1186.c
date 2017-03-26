@@ -20,7 +20,7 @@
 #ifdef WIN32
 #define _WINDOWS_DLL_EXPORT_ __declspec(dllexport)
 int bIsFirstTime = 1; 
-void __attribute__((constructor)) swh_init(); // forward declaration
+static void __attribute__((constructor)) swh_init(); // forward declaration
 #else
 #define _WINDOWS_DLL_EXPORT_ 
 #endif
@@ -89,7 +89,7 @@ static void connectPortDivider(
 static LADSPA_Handle instantiateDivider(
  const LADSPA_Descriptor *descriptor,
  unsigned long s_rate) {
-	Divider *plugin_data = (Divider *)malloc(sizeof(Divider));
+	Divider *plugin_data = (Divider *)calloc(1, sizeof(Divider));
 	LADSPA_Data amp;
 	float count;
 	LADSPA_Data lamp;
@@ -249,14 +249,13 @@ static void runAddingDivider(LADSPA_Handle instance, unsigned long sample_count)
 	plugin_data->out = out;
 }
 
-void __attribute__((constructor)) swh_init() {
+static void __attribute__((constructor)) swh_init() {
 	char **port_names;
 	LADSPA_PortDescriptor *port_descriptors;
 	LADSPA_PortRangeHint *port_range_hints;
 
 #ifdef ENABLE_NLS
 #define D_(s) dgettext(PACKAGE, s)
-	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, PACKAGE_LOCALE_DIR);
 #else
 #define D_(s) (s)
@@ -331,12 +330,13 @@ void __attribute__((constructor)) swh_init() {
 	}
 }
 
-void  __attribute__((destructor)) swh_fini() {
+static void __attribute__((destructor)) swh_fini() {
 	if (dividerDescriptor) {
 		free((LADSPA_PortDescriptor *)dividerDescriptor->PortDescriptors);
 		free((char **)dividerDescriptor->PortNames);
 		free((LADSPA_PortRangeHint *)dividerDescriptor->PortRangeHints);
 		free(dividerDescriptor);
 	}
+	dividerDescriptor = NULL;
 
 }

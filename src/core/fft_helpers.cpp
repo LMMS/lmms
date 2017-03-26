@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -134,7 +134,7 @@ int compressbands(float *absspec_buffer, float *compressedband, int num_old, int
 
 	ratio=(float)usefromold/(float)num_new;
 
-	// foreach new subband
+	// for each new subband
 	for ( i=0; i<num_new; i++ )
 	{
 		compressedband[i]=0;
@@ -204,7 +204,7 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 
 		if ( (j_min<0)||(j_max<0) )
 		{
-			fprintf(stderr, "Error: calc13octaveband31() in %s line %d failed.\n", __FILE__, __LINE__);
+			fprintf(stderr, "Error: calc13octaveband31() in fft_helpers.cpp line %d failed.\n", __LINE__);
 			return -1;
 		}
 

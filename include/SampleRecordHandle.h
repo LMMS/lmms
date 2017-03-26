@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008 Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,10 +29,11 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
-#include "Mixer.h"
-#include "SampleBuffer.h"
+#include "MidiTime.h"
+#include "PlayHandle.h"
 
 class BBTrack;
+class SampleBuffer;
 class SampleTCO;
 class Track;
 

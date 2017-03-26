@@ -1,0 +1,77 @@
+FIND_PACKAGE(Git)
+IF(GIT_FOUND AND NOT FORCE_VERSION)
+	# Look for git tag information (e.g. Tagged: "v1.0.0", Non-tagged: "v1.0.0-123-a1b2c3d")
+	EXECUTE_PROCESS(
+		COMMAND "${GIT_EXECUTABLE}" describe --tags --match v[0-9].[0-9].[0-9]*
+		OUTPUT_VARIABLE GIT_TAG
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+		TIMEOUT 10
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+	STRING(REPLACE "-" ";" TAG_LIST "${GIT_TAG}")
+	LIST(LENGTH TAG_LIST TAG_LIST_LENGTH)
+	IF(TAG_LIST_LENGTH GREATER 0)
+		LIST(GET TAG_LIST 0 FORCE_VERSION)
+		STRING(REPLACE "v" "" FORCE_VERSION "${FORCE_VERSION}")
+	ENDIF()
+	IF(TAG_LIST_LENGTH EQUAL 2)
+		LIST(GET TAG_LIST 1 VERSION_STAGE)
+		SET(FORCE_VERSION "${FORCE_VERSION}-${VERSION_STAGE}")
+	ELSEIF(TAG_LIST_LENGTH EQUAL 3)
+		LIST(GET TAG_LIST 1 EXTRA_COMMITS)
+		SET(FORCE_VERSION "${FORCE_VERSION}.${EXTRA_COMMITS}")
+	ELSEIF(TAG_LIST_LENGTH EQUAL 4)
+		LIST(GET TAG_LIST 1 VERSION_STAGE)
+		LIST(GET TAG_LIST 2 EXTRA_COMMITS)
+		SET(FORCE_VERSION
+			"${FORCE_VERSION}-${VERSION_STAGE}.${EXTRA_COMMITS}")
+	ENDIF()
+ENDIF()
+
+IF(FORCE_VERSION STREQUAL "internal")
+	# Use release info from /CMakeLists.txt
+ELSEIF(FORCE_VERSION)
+	STRING(REPLACE "." ";" VERSION_LIST "${FORCE_VERSION}")
+	LIST(LENGTH VERSION_LIST VERSION_LENGTH)
+	LIST(GET VERSION_LIST 0 VERSION_MAJOR)
+	LIST(GET VERSION_LIST 1 VERSION_MINOR)
+	LIST(GET VERSION_LIST 2 VERSION_RELEASE)
+	SET(VERSION_STAGE "")
+	SET(VERSION_BUILD 0)
+	IF(VERSION_LENGTH GREATER 3)
+		LIST(GET VERSION_LIST 3 VERSION_BUILD)
+	ENDIF()
+
+	STRING(REPLACE "-" ";" VERSION_LIST "${VERSION_RELEASE}")
+	LIST(LENGTH VERSION_LIST VERSION_LENGTH)
+	IF(VERSION_LENGTH GREATER 1)
+		LIST(GET VERSION_LIST 0 VERSION_RELEASE)
+		LIST(GET VERSION_LIST 1 VERSION_STAGE)
+	ENDIF()
+
+	SET(VERSION             "${FORCE_VERSION}")
+ELSEIF(GIT_FOUND)
+	MESSAGE(
+"Could not get project version.  Using release info from /CMakeLists.txt"
+	)
+ELSE()
+	MESSAGE("Git not found.  Using release info from /CMakeLists.txt")
+ENDIF()
+
+
+
+MESSAGE("\n"
+	"Configuring ${PROJECT_NAME_UCASE}\n"
+	"--------------------------\n"
+	"* Project version             : ${VERSION}\n"
+	"*   Major version             : ${VERSION_MAJOR}\n"
+	"*   Minor version             : ${VERSION_MINOR}\n"
+	"*   Release version           : ${VERSION_RELEASE}\n"
+	"*   Stage version             : ${VERSION_STAGE}\n"
+	"*   Build version             : ${VERSION_BUILD}\n"
+        "*\n\n"
+	"Optional Version Usage:\n"
+	"--------------------------\n"
+	"*   Override version:           -DFORCE_VERSION=x.x.x-x\n"
+	"*   Ignore Git information:     -DFORCE_VERSION=internal\n"
+)
+
