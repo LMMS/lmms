@@ -2869,10 +2869,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		// First we draw the vertical quantization lines
 		for( tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick( tick );
 			x <= width(); tick += q, x = xCoordOfTick( tick ) )
-        {
+		{
 			p.setPen( lineColor() );
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
-        }
+		}
 
 		// Draw horizontal lines
 		key = m_startKey;
@@ -2917,9 +2917,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			x = xCoordOfTick( tick ); x <= width();
 			tick += ticksPerBeat, x = xCoordOfTick( tick ) )
 		{
-            p.setPen( beatLineColor() );
-            p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
-        }
+			p.setPen( beatLineColor() );
+			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
+		}
 
 		// Draw the vertical bar lines
 		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
