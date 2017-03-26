@@ -8,10 +8,11 @@ PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev  libogg-dev
 # Help with unmet dependencies
 PACKAGES="$PACKAGES libjack0"
 
-if [ $QT5 ]; then
+if [ "$QT5" ]; then
 	PACKAGES="$PACKAGES qtbase5-dev qttools5-dev-tools qttools5-dev"
 else
 	PACKAGES="$PACKAGES libqt4-dev"
 fi
 
+# shellcheck disable=SC2086
 sudo apt-get install -y $PACKAGES
