@@ -20,5 +20,5 @@ BUILD_PLUGIN(
 	base.h
 	revsc.h
 	dcblock.h
-	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
+	EMBEDDED_RESOURCES artwork.png logo.png
 )

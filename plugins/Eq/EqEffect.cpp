@@ -24,7 +24,7 @@
 
 #include "EqEffect.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "Engine.h"
 #include "EqFader.h"
 #include "interpolation.h"
@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;

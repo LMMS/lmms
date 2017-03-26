@@ -24,7 +24,7 @@
  */
 
 #include "MultitapEcho.h"
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

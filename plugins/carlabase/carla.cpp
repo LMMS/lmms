@@ -42,7 +42,7 @@
 
 #include <cstring>
 
-#include "embed.cpp"
+#include "embed.h"
 
 // this doesn't seem to be defined anywhere
 static const double ticksPerBeat = 48.0;
