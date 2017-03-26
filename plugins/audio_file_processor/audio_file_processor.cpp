@@ -44,7 +44,7 @@
 #include "StringPairDrag.h"
 #include "DataFile.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

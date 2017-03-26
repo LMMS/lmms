@@ -25,7 +25,7 @@
 
 #include "stereo_matrix.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -40,7 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT stereomatrix_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
