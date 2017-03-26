@@ -487,7 +487,7 @@ IF(USE_CCACHE)
     ELSE()
         MESSAGE(WARNING "USE_CCACHE enabled, but no ccache found")
     ENDIF()
-ENDIF(CCACHE_FOUND)
+ENDIF()
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
