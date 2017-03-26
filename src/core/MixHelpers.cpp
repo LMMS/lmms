@@ -77,7 +77,7 @@ bool sanitize( sampleFrame * src, int frames )
 	{
 		for( int c = 0; c < 2; ++c )
 		{
-			if( isinff( src[f][c] ) || isnanf( src[f][c] ) )
+			if( isinf( src[f][c] ) || isnan( src[f][c] ) )
 			{
 				src[f][c] = 0.0f;
 				found = true;
@@ -166,8 +166,8 @@ void addSanitizedMultipliedByBuffer( sampleFrame* dst, const sampleFrame* src, f
 {
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += ( isinff( src[f][0] ) || isnanf( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
-		dst[f][1] += ( isinff( src[f][1] ) || isnanf( src[f][1] ) ) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
+		dst[f][0] += ( isinf( src[f][0] ) || isnan( src[f][0] ) ) ? 0.0f : src[f][0] * coeffSrc * coeffSrcBuf->values()[f];
+		dst[f][1] += ( isinf( src[f][1] ) || isnan( src[f][1] ) ) ? 0.0f : src[f][1] * coeffSrc * coeffSrcBuf->values()[f];
 	}
 }
 
@@ -175,10 +175,10 @@ void addSanitizedMultipliedByBuffers( sampleFrame* dst, const sampleFrame* src, 
 {
 	for( int f = 0; f < frames; ++f )
 	{
-		dst[f][0] += ( isinff( src[f][0] ) || isnanf( src[f][0] ) )
+		dst[f][0] += ( isinf( src[f][0] ) || isnan( src[f][0] ) )
 			? 0.0f
 			: src[f][0] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
-		dst[f][1] += ( isinff( src[f][1] ) || isnanf( src[f][1] ) )
+		dst[f][1] += ( isinf( src[f][1] ) || isnan( src[f][1] ) )
 			? 0.0f
 			: src[f][1] * coeffSrcBuf1->values()[f] * coeffSrcBuf2->values()[f];
 	}
@@ -192,8 +192,8 @@ struct AddSanitizedMultipliedOp
 
 	void operator()( sampleFrame& dst, const sampleFrame& src ) const
 	{
-		dst[0] += ( isinff( src[0] ) || isnanf( src[0] ) ) ? 0.0f : src[0] * m_coeff;
-		dst[1] += ( isinff( src[1] ) || isnanf( src[1] ) ) ? 0.0f : src[1] * m_coeff;
+		dst[0] += ( isinf( src[0] ) || isnan( src[0] ) ) ? 0.0f : src[0] * m_coeff;
+		dst[1] += ( isinf( src[1] ) || isnan( src[1] ) ) ? 0.0f : src[1] * m_coeff;
 	}
 
 	const float m_coeff;
