@@ -107,6 +107,7 @@ IF(FIX_SYSTEM_HEADERS AND QT5)
 				"${SYSTEM_QVECTOR_H}"
 			OUTPUT_VARIABLE BAD_HEADER)
 		IF(BAD_HEADER)
+			MESSAGE("-- Bad qvector.h, rewriting...")
 			SET(LOCAL_QVECTOR_H qvector.h)
 			ADD_CUSTOM_COMMAND(
 				OUTPUT qvector.h
