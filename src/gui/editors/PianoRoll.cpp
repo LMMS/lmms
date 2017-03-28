@@ -2913,12 +2913,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		int ticksPerBeat = DefaultTicksPerTact /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
-		// triplet mode occurs if the note quantization isn't a multiple of 3
-		if( quantization() % 3 != 0 )
-		{
-			ticksPerBeat = static_cast<int>( ticksPerBeat * 2.0/3.0 );
-		}
-
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
 			x = xCoordOfTick( tick ); x <= width();
 			tick += ticksPerBeat, x = xCoordOfTick( tick ) )
