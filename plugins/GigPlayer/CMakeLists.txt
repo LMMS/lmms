@@ -20,7 +20,7 @@ if(LMMS_HAVE_GIG)
 			COMMAND grep -E "^ +DLS::[:A-Za-z]+;" /usr/include/gig.h
 			OUTPUT_VARIABLE BAD_HEADER)
 		IF(BAD_HEADER)
-			MESSAGE("-- Bad gig.h, rewriting...")
+			MESSAGE("-- Bad gig.h, adding rule to fix it")
 			SET(LOCAL_GIG_H gig.h)
 			ADD_CUSTOM_COMMAND(
 				OUTPUT gig.h

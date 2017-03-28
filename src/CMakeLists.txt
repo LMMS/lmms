@@ -107,7 +107,7 @@ IF(FIX_SYSTEM_HEADERS AND QT5)
 				"${SYSTEM_QVECTOR_H}"
 			OUTPUT_VARIABLE BAD_HEADER)
 		IF(BAD_HEADER)
-			MESSAGE("-- Bad qvector.h, rewriting...")
+			MESSAGE("-- Bad qvector.h, adding rule to fix it")
 			SET(LOCAL_QVECTOR_H qvector.h)
 			ADD_CUSTOM_COMMAND(
 				OUTPUT qvector.h
@@ -133,6 +133,7 @@ IF(CMAKE_VERSION VERSION_GREATER "2.8.7")
 		${LMMS_INCLUDES}
 		${LMMS_UI_OUT}
 		${LMMS_RCC_OUT}
+		${LOCAL_QVECTOR_H}
 	)
 	ADD_EXECUTABLE(lmms
 		core/main.cpp
@@ -146,12 +147,14 @@ ELSE()
 		${LMMS_INCLUDES}
 		${LMMS_UI_OUT}
 		${LMMS_RCC_OUT}
+		${LOCAL_QVECTOR_H}
 		"${WINRC}"
 	)
 ENDIF()
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
-	"${LMMS_RCC_OUT};${LMMS_UI_OUT};lmmsconfig.h;lmms.1.gz")
+	"${LMMS_RCC_OUT};${LMMS_UI_OUT};lmmsconfig.h;lmms.1.gz;QtCore;\
+qvector.h")
 
 IF(LMMS_BUILD_WIN32)
 	SET(EXTRA_LIBRARIES "-lwinmm")
