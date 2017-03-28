@@ -42,7 +42,8 @@
 TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
 	m_trackView( _tv ),
-	m_iconName()
+	m_iconName(),
+	m_onRenaming( false )
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAcceptDrops( true );
@@ -79,6 +80,7 @@ TrackLabelButton::~TrackLabelButton()
 
 void TrackLabelButton::rename()
 {
+	m_onRenaming = true;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		QString txt = m_trackView->getTrack()->name();
@@ -89,6 +91,7 @@ void TrackLabelButton::rename()
 			m_trackView->getTrack()->setName( txt );
 			Engine::getSong()->setModified();
 		}
+		m_onRenaming = false;
 	}
 	else
 	{
@@ -105,6 +108,7 @@ void TrackLabelButton::rename()
 
 void TrackLabelButton::renameFinished()
 {
+	m_onRenaming = false;
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
@@ -175,7 +179,7 @@ void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 {
-	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
+	if( m_buttonRect.contains( _me->globalPos(), true ) && !m_onRenaming )
 	{
 		QToolButton::mousePressEvent( _me );
 	}

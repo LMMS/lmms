@@ -62,6 +62,7 @@ private:
 	QString m_iconName;
 	QLineEdit * m_renameLineEdit;
 	QRect m_buttonRect;
+	bool m_onRenaming;
 	QString elideName( const QString &name );
 
 } ;
