@@ -21,27 +21,27 @@ if [ $? -ne 0 ]; then
 fi
 
 info "Preparing the git directory..."
-mkdir $HOME/.git; touch $HOME/.git/config > /dev/null &2>1
+mkdir "$HOME/.git"; touch "$HOME/.git/config" > /dev/null &2>1
 git config --global http.sslverify false
 
 info "Cloning the repository..."
-if [ -d ./lmms ]; then 
+if [ -d ./lmms ]; then
 	warn "  - Skipping, ./lmms already exists"
-else 
+else
 	git clone -b $branch https://github.com/$fork/lmms.git
 fi
 
 
 info "Fetching ppa using cmake/msys/fetch_ppas.sh..."
-if [ -d $HOME/ppa ]; then
+if [ -d "$HOME/ppa" ]; then
         warn "  - Skipping, $HOME/ppa already exists"
 else
-	./lmms/cmake/msys/fetch_ppa.sh	
+	./lmms/cmake/msys/fetch_ppa.sh
 fi
 
 
 info "Extracting debs to $HOME/ppa/opt/, etc..."
-if [ -d $HOME/ppa/opt ]; then
+if [ -d "$HOME/ppa/opt" ]; then
         warn "  - Skipping, $HOME/ppa/opt already exists"
 else
         ./lmms/cmake/msys/extract_debs.sh
@@ -49,15 +49,15 @@ fi
 
 info "Preparing library merge, making all qt headers writable..."
 chmod u+w /mingw64/include/qt4 -R
-chmod u+w /mingw32/include/qt4 -R 
+chmod u+w /mingw32/include/qt4 -R
 
 info "Merging mingw headers and libraries from ppa over existing system libraries..."
 find /mingw64 |grep sndfile.h
 
-if [ $? -ne 0 ]; then 
-	\cp -r $HOME/ppa/opt/mingw* /
-else 
-	warn "  - Skipping, sndfile.h has already been merged" 
+if [ $? -ne 0 ]; then
+	command cp -r "$HOME/ppa/opt/mingw"* /
+else
+	warn "  - Skipping, sndfile.h has already been merged"
 fi
 
 fltkver="1.3.3"
@@ -69,18 +69,18 @@ stkver="4.5.1"
 
 info "Downloading and building fltk $fltkver"
 
-mingw_root="/$(echo $MSYSTEM|tr '[:upper:]' '[:lower:]')"
+mingw_root="/$(echo "$MSYSTEM"|tr '[:upper:]' '[:lower:]')"
 which fluid
-if [ $? -ne 0 ]; then 
-	wget http://fltk.org/pub/fltk/$fltkver/fltk-$fltkver-source.tar.gz -O $HOME/fltk-source.tar.gz
+if [ $? -ne 0 ]; then
+	wget http://fltk.org/pub/fltk/$fltkver/fltk-$fltkver-source.tar.gz -O "$HOME/fltk-source.tar.gz"
 	if [ $? -ne 0 ]; then
-		err "ERROR: Could not download fltk.  Exiting."	
+		err "ERROR: Could not download fltk.  Exiting."
 	fi
-	tar zxf $HOME/fltk-source.tar.gz -C $HOME/
-	pushd $HOME/fltk-$fltkver
+	tar zxf "$HOME/fltk-source.tar.gz" -C "$HOME/"
+	pushd "$HOME/fltk-$fltkver"
 
 	info "  - Compiling fltk $fltkver..."
-	./configure --prefix=$mingw_root --enable-shared
+	./configure --prefix="$mingw_root" --enable-shared
 
 	make
 
@@ -90,25 +90,25 @@ if [ $? -ne 0 ]; then
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install fltk -- Zyn needs this.  Exiting."
 	fi
-	
-#	ln -s $mingw_root/usr/local/bin/fluid.exe $mingw_root/bin/fluid.exe 	
+
+#	ln -s $mingw_root/usr/local/bin/fluid.exe $mingw_root/bin/fluid.exe
 	popd
 else
-	warn "  - Skipping, fluid binary already exists" 
+	warn "  - Skipping, fluid binary already exists"
 fi
 
 info "Downloading and building libogg $oggver"
 
-if [ ! -e $mingw_root/lib/libogg.dll.a ]; then 
-	wget http://downloads.xiph.org/releases/ogg/libogg-$oggver.tar.xz -O $HOME/libogg-source.tar.xz
+if [ ! -e "$mingw_root/lib/libogg.dll.a" ]; then
+	wget http://downloads.xiph.org/releases/ogg/libogg-$oggver.tar.xz -O "$HOME/libogg-source.tar.xz"
 	if [ $? -ne 0 ]; then
-		err "ERROR: Could not download libogg.  Exiting."	
+		err "ERROR: Could not download libogg.  Exiting."
 	fi
-	tar xf $HOME/libogg-source.tar.xz -C $HOME/
-	pushd $HOME/libogg-$oggver
+	tar xf "$HOME/libogg-source.tar.xz" -C "$HOME/"
+	pushd "$HOME/libogg-$oggver"
 
 	info "  - Compiling libogg $oggver..."
-	./configure --prefix=$mingw_root
+	./configure --prefix="$mingw_root"
 
 	make
 
@@ -116,7 +116,7 @@ if [ ! -e $mingw_root/lib/libogg.dll.a ]; then
 	make install
 
 	# for some reason libgig needs this
-	./configure --prefix=/opt$mingw_root
+	./configure --prefix="/opt$mingw_root"
 
 	make
 
@@ -126,25 +126,25 @@ if [ ! -e $mingw_root/lib/libogg.dll.a ]; then
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install fltk -- lmms needs this.  Exiting."
 	fi
-	
+
 	popd
 else
-	warn "  - Skipping, libogg binary already exists" 
+	warn "  - Skipping, libogg binary already exists"
 fi
 
 
 info "Downloading and building libvorbis $vorbisver"
 
-if [ ! -e $mingw_root/lib/libvorbis.dll.a ]; then 
-	wget http://downloads.xiph.org/releases/vorbis/libvorbis-$vorbisver.tar.xz -O $HOME/libvorbis-source.tar.xz
+if [ ! -e "$mingw_root/lib/libvorbis.dll.a" ]; then
+	wget http://downloads.xiph.org/releases/vorbis/libvorbis-$vorbisver.tar.xz -O "$HOME/libvorbis-source.tar.xz"
 	if [ $? -ne 0 ]; then
-		err "ERROR: Could not download libogg.  Exiting."	
+		err "ERROR: Could not download libogg.  Exiting."
 	fi
-	tar xf $HOME/libvorbis-source.tar.xz -C $HOME/
-	pushd $HOME/libvorbis-$vorbisver
+	tar xf "$HOME/libvorbis-source.tar.xz" -C "$HOME/"
+	pushd "$HOME/libvorbis-$vorbisver"
 
 	info "  - Compiling libvorbis $vorbisver..."
-	./configure --prefix=$mingw_root
+	./configure --prefix="$mingw_root"
 
 	make
 
@@ -152,7 +152,7 @@ if [ ! -e $mingw_root/lib/libvorbis.dll.a ]; then
 	make install
 
 	# for some reason libgig needs this
-	./configure --prefix=/opt$mingw_root
+	./configure --prefix="/opt$mingw_root"
 
 	make
 
@@ -162,24 +162,24 @@ if [ ! -e $mingw_root/lib/libvorbis.dll.a ]; then
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install libvorbis -- lmms needs this.  Exiting."
 	fi
-	
+
 	popd
 else
-	warn "  - Skipping, libvorbis binary already exists" 
+	warn "  - Skipping, libvorbis binary already exists"
 fi
 
 info "Downloading and building flac $flacver"
 
-if [ ! -e $mingw_root/lib/libFLAC.dll.a ]; then 
-	wget http://downloads.xiph.org/releases/flac/flac-$flacver.tar.xz -O $HOME/flac-source.tar.xz
+if [ ! -e "$mingw_root/lib/libFLAC.dll.a" ]; then
+	wget http://downloads.xiph.org/releases/flac/flac-$flacver.tar.xz -O "$HOME/flac-source.tar.xz"
 	if [ $? -ne 0 ]; then
-		err "ERROR: Could not download flac.  Exiting."	
+		err "ERROR: Could not download flac.  Exiting."
 	fi
-	tar xf $HOME/flac-source.tar.xz -C $HOME/
-	pushd $HOME/flac-$flacver
+	tar xf "$HOME/flac-source.tar.xz" -C "$HOME/"
+	pushd "$HOME/flac-$flacver"
 
 	info "  - Compiling flac $flacver..."
-	./configure --prefix=$mingw_root
+	./configure --prefix="$mingw_root"
 
 	make
 
@@ -187,7 +187,7 @@ if [ ! -e $mingw_root/lib/libFLAC.dll.a ]; then
 	make install
 
 	# for some reason libgig needs this
-	./configure --prefix=/opt$mingw_root
+	./configure --prefix="/opt$mingw_root"
 
 	make
 
@@ -197,54 +197,54 @@ if [ ! -e $mingw_root/lib/libFLAC.dll.a ]; then
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install flac -- lmms needs this.  Exiting."
 	fi
-	
+
 	popd
 else
-	warn "  - Skipping, libvorbis flac already exists" 
+	warn "  - Skipping, libvorbis flac already exists"
 fi
 
 info "Downloading and building libgig $gigver"
 
-if [ ! -e $mingw_root/lib/libgig/libgig.dll.a ]; then 
-	wget http://download.linuxsampler.org/packages/libgig-$gigver.tar.bz2 -O $HOME/gig-source.tar.xz
+if [ ! -e "$mingw_root/lib/libgig/libgig.dll.a" ]; then
+	wget http://download.linuxsampler.org/packages/libgig-$gigver.tar.bz2 -O "$HOME/gig-source.tar.xz"
 	if [ $? -ne 0 ]; then
-		err "ERROR: Could not download libgig.  Exiting."	
+		err "ERROR: Could not download libgig.  Exiting."
 	fi
-	tar xf $HOME/gig-source.tar.xz -C $HOME/
-	pushd $HOME/libgig-$gigver
+	tar xf "$HOME/gig-source.tar.xz" -C "$HOME/"
+	pushd "$HOME/libgig-$gigver"
 
 	info "  - Compiling libgig $gigver..."
-	./configure --prefix=$mingw_root
+	./configure --prefix="$mingw_root"
 
 	make
 
 	info "  - Installing libgig..."
 	make install
 
-	mv $mingw_root/lib/bin/libakai-0.dll $mingw_root/bin
-	mv $mingw_root/lib/bin/libgig-7.dll $mingw_root/bin
+	mv "$mingw_root/lib/bin/libakai-0.dll" "$mingw_root/bin"
+	mv "$mingw_root/lib/bin/libgig-7.dll" "$mingw_root/bin"
 
 	if [ $? -ne 0 ]; then
         	err "ERROR: Could not build/install libgig -- gigplayer needs this.  Exiting."
 	fi
-	
+
 	popd
 else
-	warn "  - Skipping, libgig binary already exists" 
+	warn "  - Skipping, libgig binary already exists"
 fi
 
 info "Downloading and building stk $stkver"
 
-if [ ! -e $mingw_root/lib/libstk.dll ]; then 
-	wget http://ccrma.stanford.edu/software/stk/release/stk-$stkver.tar.gz -O $HOME/stk-source.tar.xz
+if [ ! -e "$mingw_root/lib/libstk.dll" ]; then
+	wget http://ccrma.stanford.edu/software/stk/release/stk-$stkver.tar.gz -O "$HOME/stk-source.tar.xz"
 	if [ $? -ne 0 ]; then
 		err "ERROR: Could not download stk.  Exiting."
 	fi
-	tar xf $HOME/stk-source.tar.xz -C $HOME/
-	pushd $HOME/stk-$stkver
+	tar xf "$HOME/stk-source.tar.xz" -C "$HOME/"
+	pushd "$HOME/stk-$stkver"
 
 	info "  - Compiling stk $stkver..."
-	./configure --prefix=$mingw_root
+	./configure --prefix="$mingw_root"
 
 	make
 
@@ -255,32 +255,32 @@ if [ ! -e $mingw_root/lib/libstk.dll ]; then
         	err "ERROR: Could not build/install stk -- mallotstk needs this.  Exiting."
 	fi
 
-	mv $mingw_root/lib/libstk.so $mingw_root/lib/libstk.dll
-	mv $mingw_root/lib/libstk-$stkver.so $mingw_root/lib/libstk-$stkver.dll
+	mv "$mingw_root/lib/libstk.so" "$mingw_root/lib/libstk.dll"
+	mv "$mingw_root/lib/libstk-$stkver.so" "$mingw_root/lib/libstk-$stkver.dll"
 
 	popd
 else
-	warn "  - Skipping, stk binary already exists" 
+	warn "  - Skipping, stk binary already exists"
 fi
 
 # make a symlink to make cmake happy
-if [ $mingw_root = "/mingw64" ]; then
-	if [ ! -e /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config ]; then 
+if [ "$mingw_root" = "/mingw64" ]; then
+	if [ ! -e /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config ]; then
 		ln -s /usr/bin/pkg-config /opt/mingw64/bin/x86_64-w64-mingw32-pkg-config
 	fi
 fi
-if [ $mingw_root = "/mingw32" ]; then
+if [ "$mingw_root" = "/mingw32" ]; then
 
-	if [ ! -e /opt/mingw32/bin/i686-w64-mingw32-pkg-config ]; then 
+	if [ ! -e /opt/mingw32/bin/i686-w64-mingw32-pkg-config ]; then
 		ln -s /usr/bin/pkg-config /opt/mingw32/bin/i686-w64-mingw32-pkg-config
 	fi
 fi
 
 info "Cleaning up..."
-rm -rf $HOME/fltk-$fltkver
-rm -rf $HOME/libogg-$oggver
-rm -rf $HOME/libvorbis-$vorbisver
-rm -rf $HOME/flac-$flacver
-rm -rf $HOME/libgig-$gigver
-rm -rf $HOME/stk-$stkver
+rm -rf "$HOME/fltk-$fltkver"
+rm -rf "$HOME/libogg-$oggver"
+rm -rf "$HOME/libvorbis-$vorbisver"
+rm -rf "$HOME/flac-$flacver"
+rm -rf "$HOME/libgig-$gigver"
+rm -rf "$HOME/stk-$stkver"
 info "Done."
