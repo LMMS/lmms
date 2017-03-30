@@ -42,14 +42,15 @@
 TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	QToolButton( _parent ),
 	m_trackView( _tv ),
-	m_iconName(),
-	m_onRenaming( false )
+	m_iconName()
 {
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 	setAcceptDrops( true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
-
+	m_renameLineEdit = new QLineEdit( this );
+	m_renameLineEdit->hide();
+	
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		setFixedSize( 32, 29 );
@@ -57,12 +58,11 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	else
 	{
 		setFixedSize( 160, 29 );
-		m_renameLineEdit = new QLineEdit( this );
 		m_renameLineEdit->move( 30, ( height() / 2 ) - ( m_renameLineEdit->sizeHint().height() / 2 ) );
 		m_renameLineEdit->setFixedWidth( width() - 33 );
-		m_renameLineEdit->hide();
 		connect( m_renameLineEdit, SIGNAL( editingFinished() ), this, SLOT( renameFinished() ) );
 	}
+	
 	setIconSize( QSize( 24, 24 ) );
 	connect( m_trackView->getTrack(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
 	connect( m_trackView->getTrack(), SIGNAL( nameChanged() ), this, SLOT( nameChanged() ) );
@@ -80,7 +80,6 @@ TrackLabelButton::~TrackLabelButton()
 
 void TrackLabelButton::rename()
 {
-	m_onRenaming = true;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		QString txt = m_trackView->getTrack()->name();
@@ -91,7 +90,6 @@ void TrackLabelButton::rename()
 			m_trackView->getTrack()->setName( txt );
 			Engine::getSong()->setModified();
 		}
-		m_onRenaming = false;
 	}
 	else
 	{
@@ -108,7 +106,6 @@ void TrackLabelButton::rename()
 
 void TrackLabelButton::renameFinished()
 {
-	m_onRenaming = false;
 	if( !( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() ) )
 	{
 		m_renameLineEdit->hide();
@@ -179,7 +176,7 @@ void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 {
-	if( m_buttonRect.contains( _me->globalPos(), true ) && !m_onRenaming )
+	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
 	{
 		QToolButton::mousePressEvent( _me );
 	}
