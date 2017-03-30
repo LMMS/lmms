@@ -71,6 +71,7 @@ MainWindow::MainWindow() :
 	m_recentlyOpenedProjectsMenu( NULL ),
 	m_toolsMenu( NULL ),
 	m_autoSaveTimer( this ),
+	m_recordCountDownTimer( this ),
 	m_viewMenu( NULL ),
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
@@ -209,9 +210,11 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
+	connect( &m_recordCountDownTimer, SIGNAL( timeout()), this, SLOT(decrementRecordCountDown()) );
+	connect( Engine::getSong(), SIGNAL( recordCoundDown()), this, SLOT(startRecordCountDown()) );
+	m_countDownValue = new LcdSpinBoxModel();
+	m_countDownValue->setRange( 0, 99 );
 }
-
-
 
 
 MainWindow::~MainWindow()
@@ -552,6 +555,12 @@ void MainWindow::finalize()
 								m_toolBar );
 	controllers_window->setShortcut( Qt::Key_F11 );
 
+	m_countDownClock = new LcdSpinBox(2, this, tr("Count Down Clock"));
+
+	m_countDownClock->setLabel( tr("SEC") );
+	m_countDownClock->setModel( m_countDownValue );
+	connect( m_countDownValue, SIGNAL(dataChanged()), this, SLOT( updateCountDownDuration() ) );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -559,6 +568,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+    m_toolBarLayout->addWidget( m_countDownClock, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1298,15 +1308,34 @@ void MainWindow::onToggleMetronome()
 	mixer->setMetronomeActive( m_metronomeToggle->isChecked() );
 }
 
+void MainWindow::startRecordCountDown()
+{
+	if ( !m_recordCountDownTimer.isActive() )
+	{
+		m_recordCountDownTimer.start( 1000 );
+	}
+}
 
+void MainWindow::decrementRecordCountDown()
+{
+	int currentReadOut = m_countDownValue->value();
+	if ( currentReadOut - 1 < 0) {
+		m_recordCountDownTimer.stop();
+		return;
+	}
+	m_countDownValue->setValue( currentReadOut - 1 );
+}
 
 
 void MainWindow::toggleControllerRack()
 {
-	toggleWindow( gui->getControllerRackView() );
+    toggleWindow( gui->getControllerRackView() );
 }
 
-
+void MainWindow::updateCountDownDuration()
+{
+	Engine::getSong()->setRecordDelay( m_countDownValue->value() );
+}
 
 
 void MainWindow::updatePlayPauseIcons()

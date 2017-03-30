@@ -89,6 +89,7 @@ Song::Song() :
 	m_errors( new QList<QString>() ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
+	m_recordDelay( 0 ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
 	m_elapsedMilliSeconds( 0 ),
@@ -1545,10 +1546,23 @@ void Song::removeController( Controller * controller )
 		delete controller;
 
 		this->setModified();
-	}
+    }
 }
 
+void Song::setRecordDelay(int time)
+{
+	m_recordDelay = time;
+}
 
+int Song::getRecordDelay()
+{
+	return m_recordDelay;
+}
+
+void Song::startRecordCountDown()
+{
+	emit recordCoundDown();
+}
 
 
 void Song::clearErrors()
