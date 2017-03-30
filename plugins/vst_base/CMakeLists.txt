@@ -55,8 +55,8 @@ ENDIF(LMMS_HOST_X86_64)
 
 SET(WINE_CXX_FLAGS "" CACHE STRING "Extra flags passed to wineg++")
 
-STRING(REPLACE "include/wine" "include" WINE_INCLUDE_DIR_REPLACED ${WINE_INCLUDE_DIR})
-STRING(REPLACE "lib/libwine.so" "lib" WINE_LIBRARY_REPLACED ${WINE_LIBRARY})
+STRING(REPLACE "include/wine" "include" WINE_INCLUDE_BASE_DIR ${WINE_INCLUDE_DIR})
+STRING(REPLACE "lib/libwine.so" "lib" WINE_LIBRARY_DIR ${WINE_LIBRARY})
 STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKER_FLAGS} " " ${WINE_CXX_FLAGS})
 ADD_CUSTOM_COMMAND(
 	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
@@ -65,8 +65,8 @@ ADD_CUSTOM_COMMAND(
 		"-I\"${CMAKE_SOURCE_DIR}/include\""
 		"-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\""
 		"-I\"${CMAKE_INSTALL_PREFIX}/include\""
-		"-I\"${WINE_INCLUDE_DIR_REPLACED}\""
-		"-L\"${WINE_LIBRARY_REPLACED}\""
+		"-I\"${WINE_INCLUDE_BASE_DIR}\""
+		"-L\"${WINE_LIBRARY_DIR}\""
 		"\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\""
 		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
 		${WINE_BUILD_FLAGS}
