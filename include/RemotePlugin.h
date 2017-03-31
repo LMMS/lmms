@@ -1217,7 +1217,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	if( waitForMessage( IdBufferSizeInformation ).id
 						!= IdBufferSizeInformation )
 	{
-		fprintf( stderr, "Could not get buffer size information.\n" );
+		fprintf( stderr, "Could not get buffer size information\n" );
 	}
 	sendMessage( IdHostInfoGotten );
 }

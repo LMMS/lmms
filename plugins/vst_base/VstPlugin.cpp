@@ -31,6 +31,16 @@
 #include <QCloseEvent>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#ifdef LMMS_BUILD_LINUX
+#if QT_VERSION < 0x050000
+#include <QX11EmbedContainer>
+#include <QX11Info>
+#else
+#include <QWindow>
+#endif
+#else
+#include <QLayout>
+#endif
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
@@ -44,6 +54,33 @@
 #include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
+
+
+#if QT_VERSION < 0x050000
+class vstSubWin : public QMdiSubWindow
+{
+public:
+	vstSubWin( QWidget * _parent ) :
+		QMdiSubWindow( _parent )
+	{
+		setAttribute( Qt::WA_DeleteOnClose, false );
+	}
+
+	virtual ~vstSubWin()
+	{
+	}
+
+	virtual void closeEvent( QCloseEvent * e )
+	{
+		// ignore close-events - for some reason otherwise the VST GUI
+		// remains hidden when re-opening
+		hide();
+		e->ignore();
+	}
+} ;
+#endif
+
+
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
@@ -168,15 +205,49 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
+#if QT_VERSION < 0x050000
 	m_pluginWidget = new QWidget( _parent );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
+	if( _parent == NULL )
+	{
+		vstSubWin * sw = new vstSubWin(
+					gui->mainWindow()->workspace() );
+		if( isEffect )
+		{
+			sw->setAttribute( Qt::WA_TranslucentBackground );
+			sw->setWindowFlags( Qt::FramelessWindowHint );
+			sw->setWidget( m_pluginWidget );
+			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
+			xe->embedClient( m_pluginWindowID );
+			xe->setFixedSize( m_pluginGeometry );
+			xe->show();
+		} 
+		else
+		{
+			sw->setWindowFlags( Qt::WindowCloseButtonHint );
+			sw->setWidget( m_pluginWidget );
+
+			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
+			xe->embedClient( m_pluginWindowID );
+			xe->setFixedSize( m_pluginGeometry );
+			xe->move( 4, 24 );
+			xe->show();
+		}
+	}
+#else
+	QWindow * window = QWindow::fromWinId( m_pluginWindowID );
+	m_pluginWidget = QWidget::createWindowContainer( window, _parent,
+								Qt::Window );
+	m_pluginWidget->setFixedSize( m_pluginGeometry );
+	m_pluginWidget->setWindowTitle( name() );
+	// TODO: Synchronize show
+	// Tell remote that it is embedded
+	// Wait for remote reply
+#endif
 #endif
 
-	if( m_pluginWidget )
-	{
-		m_pluginWidget->show();
-	}
+	m_pluginWidget->show();
 }
 
 
@@ -184,11 +255,22 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 
 void VstPlugin::hideEditor()
 {
-	//TODO: Drop m_pluginWidget, showEditor(), hideEditor()
 	QWidget * w = pluginWidget();
 	if( w )
 	{
 		w->hide();
+	}
+}
+
+
+
+
+void VstPlugin::toggleEditor()
+{
+	QWidget * w = m_pluginWidget;
+	if( w )
+	{
+		w->setVisible( !w->isVisible() );
 	}
 }
 
@@ -240,7 +322,6 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	//TODO: Replace with m_plugin->isVisible(), add IdIsUIVisble message
 	if( pluginWidget() != NULL )
 	{
 		_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
