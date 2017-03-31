@@ -272,7 +272,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
-	m_plugin->showUI();
+	m_plugin->showEditor( NULL, false );
 
 	if( set_ch_name )
 	{
@@ -753,7 +753,7 @@ void VestigeInstrumentView::toggleGUI( void )
 	{
 		return;
 	}
-	m_vi->m_plugin->toggleUI();
+	m_vi->m_plugin->toggleEditor();
 }
 
 
