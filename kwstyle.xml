@@ -1,0 +1,129 @@
+<!-- Max. line length -->
+<LineLength>250</LineLength>
+
+<!-- Internal var. regex -->
+<InternalVariables>
+  <regex>[ms]_[a-z]+([A-Z][a-z])*</regex>
+  <alignment>0</alignment>
+</InternalVariables>
+
+<!-- Internal var. which should be private or protected -->
+<InternalVariables>
+  <regex>[ms]_[a-z]+([A-Z][a-z])*</regex>
+  <alignment>0</alignment>
+  <private>0</private>
+</InternalVariables>
+
+<!-- Number of space before a semicolon -->
+<SemicolonSpace>0</SemicolonSpace>
+
+<!-- Intervnal var. declaration order -->
+<DeclarationOrder>
+  <public>0</public>
+  <protected>1</protected>
+  <private>2</private>
+</DeclarationOrder>
+
+<!-- Do we want a new line at the eof -->
+<EndOfFileNewLine>true</EndOfFileNewLine>
+
+<!-- The file shouldn't have tabulation -->
+<Tabs>1</Tabs>
+
+<!-- Max. number of space at the eol -->
+<Spaces>0</Spaces>
+
+<!-- Indentation pattern -->
+<Indent>
+  <type>SPACE</type>
+  <size>4</size>
+  <noHeader>true</noHeader>
+  <allowBlockLine>true</allowBlockLine>
+</Indent>
+
+<!-- TODO
+<Header>
+<location>/Web/headers/IGSTKSandbox</location>
+<checkSpacesEndOfLine>false</checkSpacesEndOfLine>
+<cvsFormat>true</cvsFormat>
+</Header>
+
+<IfNDefDefine>__[NameOfClass]_[Extension]</IfNDefDefine>
+-->
+
+<!-- typedefs regex and should they be aligned together-->
+<Typedefs>
+  <regex>([A-Z][a-z]*)+</regex>
+  <alignment>true</alignment>
+</Typedefs>
+
+<!-- TODO
+<Namespace>igstk</Namespace>
+
+<NameOfClass>
+  <name>[NameOfClass]</name>
+  <prefix>igstk</prefix>
+</NameOfClass>
+
+<Comments>
+  <begin>/**</begin>
+  <middle> *</middle>
+  <end>*/<end>
+  <emptyLineBeforeClass>true</emptyLineBeforeClass>
+  <checkWrongComment>true</checkWrongComment>
+  <checkMissingComment>true</checkMissingComment>
+</Comments>
+-->
+
+<!-- Max. number of successive empty lines -->
+<EmptyLines>1</EmptyLines>
+
+<!-- TODO
+<Template>T</Template>
+-->
+
+<!-- Space before and after operators -->
+<Operator>
+  <spaceBefore>1</spaceBefore>
+  <spaceAfter>1</spaceAfter>
+</Operator>
+
+<!-- TODO
+<BlackList>myBlackList.txt</BlackList>
+-->
+
+<!-- Struct regex -->
+<Struct>
+  <regex>([A-Z][a-z]*)+</regex>
+</Struct>
+
+<!-- TODO
+<StatementPerLine>
+  <maxNumber>1</maxNumber>
+  <checkInline>0</checkInline> // default is true
+</StatementPerLine>
+-->
+
+<!-- Max. number of var. per line ; TODO: check if this is about var. declaration or something else -->
+<VariablePerLine>
+  <maxNumber>1</maxNumber>
+</VariablePerLine>
+
+<!-- Check if we're using non-ASCII char. TODO: check why adding this prints files -->
+<BadCharacters>true</BadCharacters>
+
+<!-- Member functions regex and max size -->
+<MemberFunctions>
+  <regex>[a-z]([A-Z][a-z]*)*</regex>
+  <length>100</length>
+</MemberFunctions>
+
+<!-- Member functions regex and max size -->
+<Functions>
+  <regex>[a-z]([A-Z][a-z]*)*</regex>
+  <length>100</length>
+</Functions>
+
+<!-- TODO
+<ErrorThreshold>10</ErrorThreshold>
+-->
