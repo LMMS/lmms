@@ -54,6 +54,7 @@ public:
 
 	void showEditor( QWidget * _parent = NULL, bool isEffect = false );
 	void hideEditor();
+	void toggleEditor();
 
 	inline const QString & name() const
 	{
@@ -93,6 +94,7 @@ public:
 
 	inline QWidget * pluginWidget( bool _top_widget = true )
 	{
+#if QT_VERSION < 0x050000
 		if( _top_widget && m_pluginWidget )
 		{
 			if( m_pluginWidget->parentWidget() )
@@ -100,6 +102,7 @@ public:
 				return m_pluginWidget->parentWidget();
 			}
 		}
+#endif
 		return m_pluginWidget;
 	}
 

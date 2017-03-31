@@ -56,6 +56,8 @@ enum VstRemoteMessageIDs
 {
 	// vstPlugin -> remoteVstPlugin
 	IdVstLoadPlugin = IdUserBase,
+	// TODO: Drop IdVstPluginWindowInformation, Windows hack for Qt 4
+	IdVstPluginWindowInformation,
 	IdVstClosePlugin,
 	IdVstSetTempo,
 	IdVstSetLanguage,
@@ -72,9 +74,6 @@ enum VstRemoteMessageIDs
 	// remoteVstPlugin -> vstPlugin
 	IdVstFailedLoadingPlugin,
 	IdVstBadDllFormat,
-	// Window ID and geometry are only useful if external windows can be
-	// embedded in LMMS, which is not the case in Qt 5 because there are
-	// glitches. If Qt is not fixed, then drop these messages.
 	IdVstPluginWindowID,
 	IdVstPluginEditorGeometry,
 	IdVstPluginName,
