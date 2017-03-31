@@ -219,7 +219,9 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed, 
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
+#if QT_VERSION < 0x050000
 		l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
+#endif
 		l->setRowStretch( 5, 1 );
 		l->setColumnStretch( 1, 1 );
 
@@ -273,11 +275,11 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 	{
 		if( checked )
 		{
-			m_plugin->showUI();
+			m_plugin->showEditor( NULL, true );
 		}
 		else
 		{
-			m_plugin->hideUI();
+			m_plugin->hideEditor();
 		}
 	}
 }
