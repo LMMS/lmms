@@ -237,6 +237,8 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 	}
 #else
 	QWindow * window = QWindow::fromWinId( m_pluginWindowID );
+fprintf(stderr, "m_pluginWindowID %x\n", m_pluginWindowID);
+fprintf(stderr, "window %p\n", window);
 	m_pluginWidget = QWidget::createWindowContainer( window, _parent,
 								Qt::Window );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
