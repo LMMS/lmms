@@ -708,6 +708,7 @@ void RemoteVstPlugin::initEditor()
 	ShowWindow( m_window, SW_SHOWNORMAL );
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
+fprintf(stderr, "m_windowID %x\n", m_windowID);
 #else
 	// 64-bit versions of Windows use 32-bit handles for interoperability
 	m_windowID = (intptr_t) m_window;
