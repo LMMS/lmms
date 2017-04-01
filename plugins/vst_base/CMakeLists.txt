@@ -28,6 +28,7 @@ SET(REMOTE_VST_PLUGIN_FILEPATH "RemoteVstPlugin" CACHE STRING "Relative file pat
 
 ADD_DEFINITIONS(-DREMOTE_VST_PLUGIN_FILEPATH="${REMOTE_VST_PLUGIN_FILEPATH}")
 BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
+TARGET_LINK_LIBRARIES(vstbase x11embedcontainer)
 
 IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 

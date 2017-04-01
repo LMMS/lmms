@@ -32,10 +32,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #ifdef LMMS_BUILD_LINUX
-#if QT_VERSION < 0x050000
-#include <QX11EmbedContainer>
-#include <QX11Info>
-#endif
+#include "X11EmbedContainer.h"
 #else
 #include <QLayout>
 #endif
@@ -244,25 +241,21 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 			sw->setAttribute( Qt::WA_TranslucentBackground );
 			sw->setWindowFlags( Qt::FramelessWindowHint );
 			sw->setWidget( m_pluginWidget );
-#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->show();
-#endif
 		} 
 		else
 		{
 			sw->setWindowFlags( Qt::WindowCloseButtonHint );
 			sw->setWidget( m_pluginWidget );
 
-#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->move( 4, 24 );
 			xe->show();
-#endif
 		}
 	}
 
