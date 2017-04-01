@@ -90,6 +90,25 @@ SET(LMMS_SRCS
 	PARENT_SCOPE
 )
 
+IF(QT5)
+    add_library(x11embedcontainer STATIC
+        X11EmbedContainer
+    )
+    FIND_PACKAGE(Qt5Core COMPONENTS Private)
+    FIND_PACKAGE(Qt5Widgets COMPONENTS Private)
+    FIND_PACKAGE(Qt5X11Extras REQUIRED)
+
+	include_directories(${Qt5Core_PRIVATE_INCLUDE_DIRS})
+	include_directories(${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
+
+
+	target_link_Libraries(x11embedcontainer
+		 xcb xcb-util X11-xcb Qt5::X11Extras
+	)
+ELSE()
+    add_library(x11embedcontainer STATIC /dev/null)
+ENDIF()
+
 set(LMMS_UIS
 	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui
