@@ -204,7 +204,8 @@ public:
 		return m_globalAutomationTrack;
 	}
 
-	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const override;
+	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
 
 	// file management
 	void createNewProject();
