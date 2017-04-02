@@ -416,6 +416,8 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 			tracks << dynamic_cast<AutomationTrack*>(track);
 		}
 	}
+	// TODO: Since global automation track is never muted, this use of
+	// std::remove_if can be optimized. Related header may be dropped.
 	std::remove_if(tracks.begin(), tracks.end(), std::mem_fn(&Track::isMuted));
 
 	Track::tcoVector tcos;
