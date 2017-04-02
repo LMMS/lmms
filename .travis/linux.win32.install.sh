@@ -17,6 +17,9 @@ export MINGW_PACKAGES
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# TODO: SC1090 cases can be fixed if the included file does not provide elements
+# for the running script
+
 # shellcheck disable=SC1090
 . "$DIR/linux.win.download.sh" win32
 
