@@ -204,7 +204,7 @@ public:
 		return m_globalAutomationTrack;
 	}
 
-	static AutomatedValueMap automatedValuesAt(const Track::tcoVector& tcos, MidiTime time);
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const override;
 
 	// file management
 	void createNewProject();
@@ -326,7 +326,7 @@ private:
 
 	void removeAllControllers();
 
-	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames, int tcoNum);
+	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
 	AutomationTrack * m_globalAutomationTrack;
 

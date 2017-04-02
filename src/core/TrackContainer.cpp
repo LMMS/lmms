@@ -29,12 +29,16 @@
 #include <QDomElement>
 #include <QWriteLocker>
 
+#include "AutomationPattern.h"
+#include "AutomationTrack.h"
+#include "BBTrack.h"
+#include "BBTrackContainer.h"
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
-#include "GuiApplication.h"
-#include "MainWindow.h"
 #include "Song.h"
 
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 TrackContainer::TrackContainer() :
 	Model( NULL ),
@@ -234,6 +238,83 @@ bool TrackContainer::isEmpty() const
 
 
 
+AutomatedValueMap TrackContainer::automatedValuesAt(MidiTime time, int tcoNum) const
+{
+	return automatedValuesFromTracks(tracks(), time, tcoNum);
+}
+
+
+AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tracks, MidiTime time, int tcoNum)
+{
+	Track::tcoVector tcos;
+
+	for (Track* track: tracks)
+	{
+		if (track->isMuted()) {
+			continue;
+		}
+
+		switch(track->type())
+		{
+		case Track::AutomationTrack:
+		case Track::HiddenAutomationTrack:
+		case Track::BBTrack:
+			if (tcoNum < 0) {
+				track->getTCOsInRange(tcos, 0, time);
+			} else {
+				Q_ASSERT(track->numOfTCOs() > tcoNum);
+				tcos << track->getTCO(tcoNum);
+			}
+		}
+	}
+
+	AutomatedValueMap valueMap;
+
+	Q_ASSERT(std::is_sorted(tcos.begin(), tcos.end(), TrackContentObject::comparePosition));
+
+	for(TrackContentObject* tco : tcos)
+	{
+		if (tco->isMuted() || tco->startPosition() > time) {
+			continue;
+		}
+
+		if (auto* p = dynamic_cast<AutomationPattern *>(tco))
+		{
+			if (! p->hasAutomation()) {
+				continue;
+			}
+			MidiTime relTime = time - p->startPosition();
+			float value = p->valueAt(relTime);
+
+			for (AutomatableModel* model : p->objects())
+			{
+				valueMap[model] = value;
+			}
+		}
+		else if (auto* bb = dynamic_cast<BBTCO *>(tco))
+		{
+			auto bbIndex = dynamic_cast<class BBTrack*>(bb->getTrack())->index();
+			auto bbContainer = Engine::getBBTrackContainer();
+
+			MidiTime bbTime = time - tco->startPosition();
+			bbTime = std::min(bbTime, tco->length());
+			bbTime = bbTime % (bbContainer->lengthOfBB(bbIndex) * MidiTime::ticksPerTact());
+
+			auto bbValues = bbContainer->automatedValuesAt(bbTime, bbIndex);
+			for (auto it=bbValues.begin(); it != bbValues.end(); it++)
+			{
+				// override old values, bb track with the highest index takes precedence
+				valueMap[it.key()] = it.value();
+			}
+		}
+		else
+		{
+			continue;
+		}
+	}
+
+	return valueMap;
+};
 
 
 
