@@ -43,7 +43,6 @@
 
 #include "base64.h"
 #include "lmms_constants.h"
-#include "templates.h"
 
 #include "embed.cpp"
 
@@ -552,7 +551,7 @@ void expressiveView::expressionChanged() {
 			for (i = 0; i < length; i++) {
 				t = i / (float) length;
 				samples[i] = expr.evaluate();
-				if (isinff(samples[i]) != 0 || isnan(samples[i]) != 0)
+				if (std::isinf(samples[i]) != 0 || std::isnan(samples[i]) != 0)
 					samples[i] = 0;
 			}
 			m_raw_graph->setSamples(samples);
