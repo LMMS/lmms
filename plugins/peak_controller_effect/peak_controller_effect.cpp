@@ -30,7 +30,7 @@
 #include "peak_controller_effect.h"
 #include "lmms_math.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -44,7 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -67,7 +67,10 @@ PeakControllerEffect::PeakControllerEffect(
 	m_autoController( NULL )
 {
 	m_autoController = new PeakController( Engine::getSong(), this );
-	Engine::getSong()->addController( m_autoController );
+	if( !Engine::getSong()->isLoadingProject() )
+	{
+		Engine::getSong()->addController( m_autoController );
+	}
 	PeakController::s_effects.append( this );
 }
 

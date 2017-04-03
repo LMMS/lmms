@@ -29,17 +29,13 @@
 #include <QPushButton>
 
 #include "EffectControlDialog.h"
-#include "EqParameterWidget.h"
-#include "EqSpectrumView.h"
-#include "Fader.h"
-#include "Knob.h"
-#include "LedCheckbox.h"
-#include "MainWindow.h"
-#include "PixmapButton.h"
 
-
+class BoolModel;
+class FloatModel;
 
 class EqControls;
+class EqBand;
+class EqParameterWidget;
 
 class EqControlsDialog : public EffectControlDialog
 {
@@ -58,24 +54,7 @@ private:
 
 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
-	EqBand *setBand( int index, BoolModel *active, FloatModel *freq, FloatModel *res, FloatModel *gain, QColor color, QString name, float *peakL, float *peakR, BoolModel *hp12, BoolModel *hp24, BoolModel *hp48, BoolModel *lp12, BoolModel *lp24, BoolModel *lp48 )
-	{
-		EqBand *filterModels = m_parameterWidget->getBandModels( index );
-		filterModels->active = active;
-		filterModels->freq = freq;
-		filterModels->res = res;
-		filterModels->color = color;
-		filterModels->gain = gain;
-		filterModels->peakL = peakL;
-		filterModels->peakR = peakR;
-		filterModels->hp12 = hp12;
-		filterModels->hp24 = hp24;
-		filterModels->hp48 = hp48;
-		filterModels->lp12 = lp12;
-		filterModels->lp24 = lp24;
-		filterModels->lp48 = lp48;
-		return filterModels;
-	}
+	EqBand *setBand( int index, BoolModel *active, FloatModel *freq, FloatModel *res, FloatModel *gain, QColor color, QString name, float *peakL, float *peakR, BoolModel *hp12, BoolModel *hp24, BoolModel *hp48, BoolModel *lp12, BoolModel *lp24, BoolModel *lp48 );
 
 	int m_originalHeight;
 };

@@ -41,6 +41,7 @@
 #include "PluginView.h"
 
 #include <QApplication>
+#include <QDir>
 #include <QMessageBox>
 #include <QSplashScreen>
 
@@ -72,6 +73,10 @@ GuiApplication::GuiApplication() :
 		ConfigManager::inst()->createWorkingDir();
 	}
 	// Init style and palette
+	QDir::addSearchPath("artwork", ConfigManager::inst()->artworkDir());
+	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultArtworkDir());
+	QDir::addSearchPath("artwork", ":/artwork");
+
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 

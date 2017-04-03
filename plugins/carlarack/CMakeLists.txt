@@ -5,5 +5,5 @@ if(LMMS_HAVE_CARLA)
 	LINK_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/../carlabase"
                           ${CARLA_LIBRARY_DIRS})
 	LINK_LIBRARIES(carlabase)
-	BUILD_PLUGIN(carlarack carlarack.cpp EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+	BUILD_PLUGIN(carlarack carlarack.cpp EMBEDDED_RESOURCES logo.png)
 endif(LMMS_HAVE_CARLA)

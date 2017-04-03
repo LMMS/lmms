@@ -158,6 +158,9 @@ public:
 
 
 	// audio-device-stuff
+
+	// Returns the current audio device's name. This is not necessarily
+	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const
 	{
 		return m_audioDevName;
@@ -350,7 +353,7 @@ private:
 
 	void runChangesInModel();
 
-
+	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
 

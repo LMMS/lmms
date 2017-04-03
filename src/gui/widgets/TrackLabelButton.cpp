@@ -173,9 +173,9 @@ void TrackLabelButton::mouseDoubleClickEvent( QMouseEvent * _me )
 
 
 
-void TrackLabelButton::mouseReleaseEvent(QMouseEvent *_me)
+void TrackLabelButton::mouseReleaseEvent( QMouseEvent *_me )
 {
-	if( m_buttonRect.contains( _me->globalPos(), true ) )
+	if( m_buttonRect.contains( _me->globalPos(), true ) && m_renameLineEdit->isHidden() )
 	{
 		QToolButton::mousePressEvent( _me );
 	}

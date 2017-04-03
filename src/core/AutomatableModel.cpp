@@ -276,10 +276,9 @@ float AutomatableModel::inverseScaledValue( float value ) const
 
 QString AutomatableModel::displayValue( const float val ) const
 {
-	const FloatModel *floatmodel = dynamic_cast<const FloatModel*>( this );
 	switch( m_dataType )
 	{
-		case Float: return QString::number( castValue<float>( scaledValue( floatmodel->getRoundedValue() ) ) );
+		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
 		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
 		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
 	}

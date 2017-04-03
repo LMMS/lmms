@@ -110,16 +110,9 @@ AutomationPattern::~AutomationPattern()
 
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
-	if( _search_dup )
+	if( _search_dup && m_objects.contains(_obj) )
 	{
-		for( objectVector::iterator it = m_objects.begin();
-					it != m_objects.end(); ++it )
-		{
-			if( *it == _obj )
-			{				
-				return false;
-			}
-		}
+		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
@@ -184,6 +177,11 @@ const AutomatableModel * AutomationPattern::firstObject() const
 	return &_fm;
 }
 
+const AutomationPattern::objectVector& AutomationPattern::objects() const
+{
+	return m_objects;
+}
+
 
 
 
@@ -208,7 +206,7 @@ void AutomationPattern::updateLength()
 MidiTime AutomationPattern::putValue( const MidiTime & time,
 					const float value,
 					const bool quantPos,
-					const bool controlKey )
+					const bool ignoreSurroundingPoints )
 {
 	cleanObjects();
 
@@ -221,7 +219,7 @@ MidiTime AutomationPattern::putValue( const MidiTime & time,
 
 	// Remove control points that are covered by the new points
 	// quantization value. Control Key to override
-	if( ! controlKey )
+	if( ! ignoreSurroundingPoints )
 	{
 		for( int i = newTime + 1; i < newTime + quantization(); ++i )
 		{
@@ -268,6 +266,21 @@ void AutomationPattern::removeValue( const MidiTime & time )
 	}
 
 	emit dataChanged();
+}
+
+
+
+void AutomationPattern::recordValue(MidiTime time, float value)
+{
+	if( value != m_lastRecordedValue )
+	{
+		putValue( time, value, true );
+		m_lastRecordedValue = value;
+	}
+	else if( valueAt( time ) != value )
+	{
+		removeValue( time );
+	}
 }
 
 
@@ -624,44 +637,6 @@ const QString AutomationPattern::name() const
 	#endif
 }
 
-
-
-
-void AutomationPattern::processMidiTime( const MidiTime & time )
-{
-	if( ! isRecording() )
-	{
-		if( time >= 0 && hasAutomation() )
-		{
-			const float val = valueAt( time );
-			for( objectVector::iterator it = m_objects.begin();
-							it != m_objects.end(); ++it )
-			{
-				if( *it )
-				{
-					( *it )->setAutomatedValue( val );
-				}
-
-			}
-		}
-	}
-	else
-	{
-		if( time >= 0 && ! m_objects.isEmpty() )
-		{
-			const float value = static_cast<float>( firstObject()->value<float>() );
-			if( value != m_lastRecordedValue )
-			{
-				putValue( time, value, true );
-				m_lastRecordedValue = value;
-			}
-			else if( valueAt( time ) != value )
-			{
-				removeValue( time );
-			}
-		}
-	}
-}
 
 
 
