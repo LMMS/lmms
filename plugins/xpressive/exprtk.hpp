@@ -5,11 +5,11 @@
  * Author: Arash Partow (1999-2017)                               *
  * URL: http://www.partow.net/programming/exprtk/index.html       *
  *                                                                *
- * Copyright notice for use with the LMMS project:                *
+ * Copyright notice:                                              *
  * Free use of the C++ Mathematical Expression Toolkit Library is *
  * permitted under the guidelines and in accordance with the most *
- * current version of the Boost Software License, Version 1.0.    *
- * https://opensource.org/licenses/BSL-1.0                        *
+ * current version of the MIT License.                            *
+ * http://www.opensource.org/licenses/MIT                         *
  *                                                                *
  * Example expressions:                                           *
  * (00) (y + x / y) * (x - y / x)                                 *
@@ -2439,10 +2439,10 @@ namespace exprtk
                      Disallowed: .abc, abc.<white-space>, abc.<eof>, abc.<operator +,-,*,/...>
                   */
                   if (
-                       (s_itr_ != initial_itr)                  &&
-                       !is_end(s_itr_ + 1)                      &&
-                       details::is_letter_or_digit(*s_itr_ + 1) &&
-                       ('_' != (*s_itr_ + 1))
+                       (s_itr_ != initial_itr)                     &&
+                       !is_end(s_itr_ + 1)                         &&
+                       !details::is_letter_or_digit(*(s_itr_ + 1)) &&
+                       ('_' != (*(s_itr_ + 1)))
                      )
                      break;
                }
@@ -2459,21 +2459,23 @@ namespace exprtk
          {
             /*
                Attempt to match a valid numeric value in one of the following formats:
-               01. 123456
-               02. 123.456
-               03. 123.456e3
-               04. 123.456E3
-               05. 123.456e+3
-               06. 123.456E+3
-               07. 123.456e-3
-               08. 123.456E-3
-               09. .1234
-               10. .1234e3
-               11. .1234E+3
-               12. .1234e+3
-               13. .1234E-3
-               14. .1234e-3
+               (01) 123456
+               (02) 123456.
+               (03) 123.456
+               (04) 123.456e3
+               (05) 123.456E3
+               (06) 123.456e+3
+               (07) 123.456E+3
+               (08) 123.456e-3
+               (09) 123.456E-3
+               (00) .1234
+               (11) .1234e3
+               (12) .1234E+3
+               (13) .1234e+3
+               (14) .1234E-3
+               (15) .1234e-3
             */
+
             const char* initial_itr = s_itr_;
             bool dot_found          = false;
             bool e_found            = false;
@@ -4667,7 +4669,9 @@ namespace exprtk
                   case e_ncdf  : return numeric::ncdf (arg);
                   case e_frac  : return numeric::frac (arg);
                   case e_trunc : return numeric::trunc(arg);
-                  default      : return std::numeric_limits<T>::quiet_NaN();
+
+                  default      : exprtk_debug(("numeric::details::process_impl<T> - Invalid unary operation.\n"));
+                                 return std::numeric_limits<T>::quiet_NaN();
                }
             }
 
@@ -4705,7 +4709,9 @@ namespace exprtk
                   case e_hypot  : return hypot<T>   (arg0,arg1);
                   case e_shr    : return shr<T>     (arg0,arg1);
                   case e_shl    : return shl<T>     (arg0,arg1);
-                  default       : return std::numeric_limits<T>::quiet_NaN();
+
+                  default       : exprtk_debug(("numeric::details::process_impl<T> - Invalid binary operation.\n"));
+                                  return std::numeric_limits<T>::quiet_NaN();
                }
             }
 
@@ -4741,7 +4747,9 @@ namespace exprtk
                   case e_hypot  : return hypot<T>(arg0,arg1);
                   case e_shr    : return arg0 >> arg1;
                   case e_shl    : return arg0 << arg1;
-                  default       : return std::numeric_limits<T>::quiet_NaN();
+
+                  default       : exprtk_debug(("numeric::details::process_impl<IntType> - Invalid binary operation.\n"));
+                                  return std::numeric_limits<T>::quiet_NaN();
                }
             }
          }
@@ -15681,73 +15689,185 @@ namespace exprtk
    {
    public:
 
-      typedef T (*ff1_functor)(T);
-      typedef T (*ff2_functor)(T,T);
-      typedef T (*ff3_functor)(T,T,T);
-      typedef T (*ff4_functor)(T,T,T,T);
-      typedef T (*ff5_functor)(T,T,T,T,T);
-      typedef T (*ff6_functor)(T,T,T,T,T,T);
+      typedef T (*ff01_functor)(T);
+      typedef T (*ff02_functor)(T,T);
+      typedef T (*ff03_functor)(T,T,T);
+      typedef T (*ff04_functor)(T,T,T,T);
+      typedef T (*ff05_functor)(T,T,T,T,T);
+      typedef T (*ff06_functor)(T,T,T,T,T,T);
+      typedef T (*ff07_functor)(T,T,T,T,T,T,T);
+      typedef T (*ff08_functor)(T,T,T,T,T,T,T,T);
+      typedef T (*ff09_functor)(T,T,T,T,T,T,T,T,T);
+      typedef T (*ff10_functor)(T,T,T,T,T,T,T,T,T,T);
+      typedef T (*ff11_functor)(T,T,T,T,T,T,T,T,T,T,T);
+      typedef T (*ff12_functor)(T,T,T,T,T,T,T,T,T,T,T,T);
+      typedef T (*ff13_functor)(T,T,T,T,T,T,T,T,T,T,T,T,T);
+      typedef T (*ff14_functor)(T,T,T,T,T,T,T,T,T,T,T,T,T,T);
+      typedef T (*ff15_functor)(T,T,T,T,T,T,T,T,T,T,T,T,T,T,T);
 
    protected:
 
-      struct freefunc1 : public exprtk::ifunction<T>
+      struct freefunc01 : public exprtk::ifunction<T>
       {
          using exprtk::ifunction<T>::operator();
 
-         freefunc1(ff1_functor ff) : exprtk::ifunction<T>(1), f(ff) {}
+         freefunc01(ff01_functor ff) : exprtk::ifunction<T>(1), f(ff) {}
          inline T operator()(const T& v0)
          { return f(v0); }
-         ff1_functor f;
+         ff01_functor f;
       };
 
-      struct freefunc2 : public exprtk::ifunction<T>
+      struct freefunc02 : public exprtk::ifunction<T>
       {
          using exprtk::ifunction<T>::operator();
 
-         freefunc2(ff2_functor ff) : exprtk::ifunction<T>(2), f(ff) {}
+         freefunc02(ff02_functor ff) : exprtk::ifunction<T>(2), f(ff) {}
          inline T operator()(const T& v0, const T& v1)
          { return f(v0,v1); }
-         ff2_functor f;
+         ff02_functor f;
       };
 
-      struct freefunc3 : public exprtk::ifunction<T>
+      struct freefunc03 : public exprtk::ifunction<T>
       {
          using exprtk::ifunction<T>::operator();
 
-         freefunc3(ff3_functor ff) : exprtk::ifunction<T>(3), f(ff) {}
+         freefunc03(ff03_functor ff) : exprtk::ifunction<T>(3), f(ff) {}
          inline T operator()(const T& v0, const T& v1, const T& v2)
          { return f(v0,v1,v2); }
-         ff3_functor f;
+         ff03_functor f;
       };
 
-      struct freefunc4 : public exprtk::ifunction<T>
+      struct freefunc04 : public exprtk::ifunction<T>
       {
          using exprtk::ifunction<T>::operator();
 
-         freefunc4(ff4_functor ff) : exprtk::ifunction<T>(4), f(ff) {}
+         freefunc04(ff04_functor ff) : exprtk::ifunction<T>(4), f(ff) {}
          inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3)
          { return f(v0,v1,v2,v3); }
-         ff4_functor f;
+         ff04_functor f;
       };
 
-      struct freefunc5 : public exprtk::ifunction<T>
+      struct freefunc05 : public exprtk::ifunction<T>
       {
          using exprtk::ifunction<T>::operator();
 
-         freefunc5(ff5_functor ff) : exprtk::ifunction<T>(5), f(ff) {}
+         freefunc05(ff05_functor ff) : exprtk::ifunction<T>(5), f(ff) {}
          inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4)
          { return f(v0,v1,v2,v3,v4); }
-         ff5_functor f;
+         ff05_functor f;
       };
 
-      struct freefunc6 : public exprtk::ifunction<T>
+      struct freefunc06 : public exprtk::ifunction<T>
       {
          using exprtk::ifunction<T>::operator();
 
-         freefunc6(ff6_functor ff) : exprtk::ifunction<T>(6), f(ff) {}
+         freefunc06(ff06_functor ff) : exprtk::ifunction<T>(6), f(ff) {}
          inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4, const T& v5)
          { return f(v0,v1,v2,v3,v4,v5); }
-         ff6_functor f;
+         ff06_functor f;
+      };
+
+      struct freefunc07 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc07(ff07_functor ff) : exprtk::ifunction<T>(7), f(ff) {}
+         inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4,
+                             const T& v5, const T& v6)
+         { return f(v0,v1,v2,v3,v4,v5,v6); }
+         ff07_functor f;
+      };
+
+      struct freefunc08 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc08(ff08_functor ff) : exprtk::ifunction<T>(8), f(ff) {}
+         inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4,
+                             const T& v5, const T& v6, const T& v7)
+         { return f(v0,v1,v2,v3,v4,v5,v6,v7); }
+         ff08_functor f;
+      };
+
+      struct freefunc09 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc09(ff09_functor ff) : exprtk::ifunction<T>(9), f(ff) {}
+         inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4,
+                             const T& v5, const T& v6, const T& v7, const T& v8)
+         { return f(v0,v1,v2,v3,v4,v5,v6,v7,v8); }
+         ff09_functor f;
+      };
+
+      struct freefunc10 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc10(ff10_functor ff) : exprtk::ifunction<T>(10), f(ff) {}
+         inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4,
+                             const T& v5, const T& v6, const T& v7, const T& v8, const T& v9)
+         { return f(v0,v1,v2,v3,v4,v5,v6,v7,v8,v9); }
+         ff10_functor f;
+      };
+
+      struct freefunc11 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc11(ff11_functor ff) : exprtk::ifunction<T>(11), f(ff) {}
+         inline T operator()(const T& v0, const T& v1, const T& v2, const T& v3, const T& v4,
+                             const T& v5, const T& v6, const T& v7, const T& v8, const T& v9, const T& v10)
+         { return f(v0,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10); }
+         ff11_functor f;
+      };
+
+      struct freefunc12 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc12(ff12_functor ff) : exprtk::ifunction<T>(12), f(ff) {}
+         inline T operator()(const T& v00, const T& v01, const T& v02, const T& v03, const T& v04,
+                             const T& v05, const T& v06, const T& v07, const T& v08, const T& v09,
+                             const T& v10, const T& v11)
+         { return f(v00,v01,v02,v03,v04,v05,v06,v07,v08,v09,v10,v11); }
+         ff12_functor f;
+      };
+
+      struct freefunc13 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc13(ff13_functor ff) : exprtk::ifunction<T>(13), f(ff) {}
+         inline T operator()(const T& v00, const T& v01, const T& v02, const T& v03, const T& v04,
+                             const T& v05, const T& v06, const T& v07, const T& v08, const T& v09,
+                             const T& v10, const T& v11, const T& v12)
+         { return f(v00,v01,v02,v03,v04,v05,v06,v07,v08,v09,v10,v11,v12); }
+         ff13_functor f;
+      };
+
+      struct freefunc14 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc14(ff14_functor ff) : exprtk::ifunction<T>(14), f(ff) {}
+         inline T operator()(const T& v00, const T& v01, const T& v02, const T& v03, const T& v04,
+                             const T& v05, const T& v06, const T& v07, const T& v08, const T& v09,
+                             const T& v10, const T& v11, const T& v12, const T& v13)
+         { return f(v00,v01,v02,v03,v04,v05,v06,v07,v08,v09,v10,v11,v12,v13); }
+         ff14_functor f;
+      };
+
+      struct freefunc15 : public exprtk::ifunction<T>
+      {
+         using exprtk::ifunction<T>::operator();
+
+         freefunc15(ff15_functor ff) : exprtk::ifunction<T>(15), f(ff) {}
+         inline T operator()(const T& v00, const T& v01, const T& v02, const T& v03, const T& v04,
+                             const T& v05, const T& v06, const T& v07, const T& v08, const T& v09,
+                             const T& v10, const T& v11, const T& v12, const T& v13, const T& v14)
+         { return f(v00,v01,v02,v03,v04,v05,v06,v07,v08,v09,v10,v11,v12,v13,v14); }
+         ff15_functor f;
       };
 
       template <typename Type, typename RawType>
@@ -16596,101 +16716,33 @@ namespace exprtk
             return false;
       }
 
-      inline bool add_function(const std::string& function_name, ff1_functor function)
-      {
-         if (!valid())
-            return false;
-         else if (!valid_symbol(function_name))
-            return false;
-         else if (symbol_exists(function_name))
-            return false;
+      #define exprtk_define_freefunction(NN)                                                \
+      inline bool add_function(const std::string& function_name, ff##NN##_functor function) \
+      {                                                                                     \
+         if (!valid())                                                                      \
+            return false;                                                                   \
+         else if (!valid_symbol(function_name))                                             \
+            return false;                                                                   \
+         else if (symbol_exists(function_name))                                             \
+            return false;                                                                   \
+                                                                                            \
+         exprtk::ifunction<T>* ifunc = new freefunc##NN(function);                          \
+                                                                                            \
+         local_data().free_function_list_.push_back(ifunc);                                 \
+                                                                                            \
+         return add_function(function_name,(*local_data().free_function_list_.back()));     \
+      }                                                                                     \
 
-         exprtk::ifunction<T>* ifunc = new freefunc1(function);
+      exprtk_define_freefunction(01) exprtk_define_freefunction(02)
+      exprtk_define_freefunction(03) exprtk_define_freefunction(04)
+      exprtk_define_freefunction(05) exprtk_define_freefunction(06)
+      exprtk_define_freefunction(07) exprtk_define_freefunction(08)
+      exprtk_define_freefunction(09) exprtk_define_freefunction(10)
+      exprtk_define_freefunction(11) exprtk_define_freefunction(12)
+      exprtk_define_freefunction(13) exprtk_define_freefunction(14)
+      exprtk_define_freefunction(15)
 
-         local_data().free_function_list_.push_back(ifunc);
-
-         return add_function(function_name,(*local_data().free_function_list_.back()));
-      }
-
-      inline bool add_function(const std::string& function_name, ff2_functor function)
-      {
-         if (!valid())
-            return false;
-         else if (!valid_symbol(function_name))
-            return false;
-         else if (symbol_exists(function_name))
-            return false;
-
-         exprtk::ifunction<T>* ifunc = new freefunc2(function);
-
-         local_data().free_function_list_.push_back(ifunc);
-
-         return add_function(function_name,(*local_data().free_function_list_.back()));
-      }
-
-      inline bool add_function(const std::string& function_name, ff3_functor function)
-      {
-         if (!valid())
-            return false;
-         else if (!valid_symbol(function_name))
-            return false;
-         else if (symbol_exists(function_name))
-            return false;
-
-         exprtk::ifunction<T>* ifunc = new freefunc3(function);
-
-         local_data().free_function_list_.push_back(ifunc);
-
-         return add_function(function_name,(*local_data().free_function_list_.back()));
-      }
-
-      inline bool add_function(const std::string& function_name, ff4_functor function)
-      {
-         if (!valid())
-            return false;
-         else if (!valid_symbol(function_name))
-            return false;
-         else if (symbol_exists(function_name))
-            return false;
-
-         exprtk::ifunction<T>* ifunc = new freefunc4(function);
-
-         local_data().free_function_list_.push_back(ifunc);
-
-         return add_function(function_name,(*local_data().free_function_list_.back()));
-      }
-
-      inline bool add_function(const std::string& function_name, ff5_functor function)
-      {
-         if (!valid())
-            return false;
-         else if (!valid_symbol(function_name))
-            return false;
-         else if (symbol_exists(function_name))
-            return false;
-
-         exprtk::ifunction<T>* ifunc = new freefunc5(function);
-
-         local_data().free_function_list_.push_back(ifunc);
-
-         return add_function(function_name,(*local_data().free_function_list_.back()));
-      }
-
-      inline bool add_function(const std::string& function_name, ff6_functor function)
-      {
-         if (!valid())
-            return false;
-         else if (!valid_symbol(function_name))
-            return false;
-         else if (symbol_exists(function_name))
-            return false;
-
-         exprtk::ifunction<T>* ifunc = new freefunc6(function);
-
-         local_data().free_function_list_.push_back(ifunc);
-
-         return add_function(function_name,(*local_data().free_function_list_.back()));
-      }
+      #undef exprtk_define_freefunction
 
       inline bool add_reserved_function(const std::string& function_name, function_t& function)
       {
@@ -17672,6 +17724,15 @@ namespace exprtk
       }
    }
 
+   namespace details
+   {
+      template <typename Parser>
+      inline void disable_type_checking(Parser& p)
+      {
+         p.state_.type_check_enabled = false;
+      }
+   }
+
    template <typename T>
    class parser : public lexer::parser_helper
    {
@@ -18534,6 +18595,7 @@ namespace exprtk
       struct parser_state
       {
          parser_state()
+         : type_check_enabled(true)
          {
             reset();
          }
@@ -18565,6 +18627,7 @@ namespace exprtk
          bool parsing_break_stmt;
          bool return_stmt_present;
          bool side_effect_present;
+         bool type_check_enabled;
          std::size_t scope_depth;
       };
 
@@ -22775,7 +22838,10 @@ namespace exprtk
 
          std::size_t param_seq_index = 0;
 
-         if (!tc.verify(param_type_list, param_seq_index))
+         if (
+              state_.type_check_enabled &&
+              !tc.verify(param_type_list, param_seq_index)
+            )
          {
             set_error(
                make_error(parser_error::e_syntax,
@@ -24845,7 +24911,7 @@ namespace exprtk
                    (details::e_g2d   == operation) || (details::e_notl  == operation) ||
                    (details::e_sgn   == operation) || (details::e_erf   == operation) ||
                    (details::e_erfc  == operation) || (details::e_ncdf  == operation) ||
-                   (details::e_frac  == operation) || (details::e_trunc == operation);
+                   (details::e_frac  == operation) || (details::e_trunc == operation) ;
          }
 
          inline bool sf3_optimisable(const std::string& sf3id, trinary_functor_t& tfunc)
@@ -26377,8 +26443,9 @@ namespace exprtk
             alloc_type1* genfunc_node_ptr = static_cast<alloc_type1*>(result);
 
             if (
-                 !arg_list.empty()       &&
-                 !gf->has_side_effects() &&
+                 !arg_list.empty()                  &&
+                 !gf->has_side_effects()            &&
+                 parser_->state_.type_check_enabled &&
                  is_constant_foldable(arg_list)
                )
             {
@@ -33495,6 +33562,9 @@ namespace exprtk
       lexer::helper::bracket_checker      bracket_checker_;
       lexer::helper::numeric_checker      numeric_checker_;
       lexer::helper::sequence_validator   sequence_validator_;
+
+      template <typename ParserType>
+      friend void details::disable_type_checking(ParserType& p);
    };
 
    template <typename Allocator,
@@ -33532,6 +33602,45 @@ namespace exprtk
       return true;
    }
 
+   template <typename T,
+             typename Allocator,
+             template <typename, typename> class Sequence>
+   inline bool collect_variables(const std::string& expr_str,
+                                 exprtk::symbol_table<T>& extrnl_symbol_table,
+                                 Sequence<std::string, Allocator>& symbol_list)
+   {
+      typedef exprtk::symbol_table<T> symbol_table_t;
+      typedef exprtk::expression<T> expression_t;
+      typedef exprtk::parser<T> parser_t;
+      typedef typename parser_t::dependent_entity_collector::symbol_t symbol_t;
+
+      symbol_table_t symbol_table;
+      expression_t   expression;
+      parser_t       parser;
+
+      expression.register_symbol_table(symbol_table);
+      expression.register_symbol_table(extrnl_symbol_table);
+
+      parser.enable_unknown_symbol_resolver();
+      parser.dec().collect_variables() = true;
+
+      details::disable_type_checking(parser);
+
+      if (!parser.compile(expr_str, expression))
+         return false;
+
+      std::deque<symbol_t> symb_list;
+
+      parser.dec().symbols(symb_list);
+
+      for (std::size_t i = 0; i < symb_list.size(); ++i)
+      {
+         symbol_list.push_back(symb_list[i].first);
+      }
+
+      return true;
+   }
+
    template <typename Allocator,
              template <typename, typename> class Sequence>
    inline bool collect_functions(const std::string& expr_str,
@@ -33551,6 +33660,45 @@ namespace exprtk
 
       parser.enable_unknown_symbol_resolver();
       parser.dec().collect_functions() = true;
+
+      if (!parser.compile(expr_str, expression))
+         return false;
+
+      std::deque<symbol_t> symb_list;
+
+      parser.dec().symbols(symb_list);
+
+      for (std::size_t i = 0; i < symb_list.size(); ++i)
+      {
+         symbol_list.push_back(symb_list[i].first);
+      }
+
+      return true;
+   }
+
+   template <typename T,
+             typename Allocator,
+             template <typename, typename> class Sequence>
+   inline bool collect_functions(const std::string& expr_str,
+                                 exprtk::symbol_table<T>& extrnl_symbol_table,
+                                 Sequence<std::string, Allocator>& symbol_list)
+   {
+      typedef exprtk::symbol_table<T> symbol_table_t;
+      typedef exprtk::expression<T> expression_t;
+      typedef exprtk::parser<T> parser_t;
+      typedef typename parser_t::dependent_entity_collector::symbol_t symbol_t;
+
+      symbol_table_t symbol_table;
+      expression_t   expression;
+      parser_t       parser;
+
+      expression.register_symbol_table(symbol_table);
+      expression.register_symbol_table(extrnl_symbol_table);
+
+      parser.enable_unknown_symbol_resolver();
+      parser.dec().collect_functions() = true;
+
+      details::disable_type_checking(parser);
 
       if (!parser.compile(expr_str, expression))
          return false;
@@ -33622,14 +33770,16 @@ namespace exprtk
                        T& x,
                        const T& h = T(0.00000001))
    {
-      T x_init = x;
-      x = x_init + T(2) * h;
+      const T x_init = x;
+      const T _2h    = T(2) * h;
+
+      x = x_init + _2h;
       T y0 = e.value();
-      x = x_init + h;
+      x = x_init +   h;
       T y1 = e.value();
-      x = x_init - h;
+      x = x_init -   h;
       T y2 = e.value();
-      x = x_init - T(2) * h;
+      x = x_init - _2h;
       T y3 = e.value();
       x = x_init;
 
@@ -33641,15 +33791,17 @@ namespace exprtk
                               T& x,
                               const T& h = T(0.00001))
    {
+      const T x_init = x;
+      const T _2h    = T(2) * h;
+
       T y = e.value();
-      T x_init = x;
-      x = x_init + T(2) * h;
+      x = x_init + _2h;
       T y0 = e.value();
-      x = x_init + h;
+      x = x_init +   h;
       T y1 = e.value();
-      x = x_init - h;
+      x = x_init -   h;
       T y2 = e.value();
-      x = x_init - T(2) * h;
+      x = x_init - _2h;
       T y3 = e.value();
       x = x_init;
 
@@ -33661,14 +33813,16 @@ namespace exprtk
                              T& x,
                              const T& h = T(0.0001))
    {
-      T x_init = x;
-      x = x_init + T(2) * h;
+      const T x_init = x;
+      const T _2h    = T(2) * h;
+
+      x = x_init + _2h;
       T y0 = e.value();
-      x = x_init + h;
+      x = x_init +   h;
       T y1 = e.value();
-      x = x_init - h;
+      x = x_init -   h;
       T y2 = e.value();
-      x = x_init - T(2) * h;
+      x = x_init - _2h;
       T y3 = e.value();
       x = x_init;
 
@@ -33763,8 +33917,8 @@ namespace exprtk
       there will be an overhead with regards to their setup and
       teardown and hence should not be used in time critical
       sections of code.
-      Furthermore they only assume a small sub set of variables - no
-      string variables or user defined functions.
+      Furthermore they only assume a small sub set of variables,
+      no string variables or user defined functions.
    */
    template <typename T>
    inline bool compute(const std::string& expression_string, T& result)
@@ -35299,12 +35453,20 @@ namespace exprtk
 
       bool register_package(exprtk::symbol_table<T>& symtab)
       {
-              if (!symtab.add_function("print"   ,p))
-            return false;
-         else if (!symtab.add_function("println" ,pl))
-            return false;
-         else
-            return true;
+         #define exprtk_register_function(FunctionName,FunctionType)              \
+         if (!symtab.add_function(FunctionName,FunctionType))                     \
+         {                                                                        \
+            exprtk_debug((                                                        \
+              "exprtk::rtl::io::register_package - Failed to add function: %s\n", \
+              FunctionName));                                                     \
+            return false;                                                         \
+         }                                                                        \
+
+         exprtk_register_function("print"   , p)
+         exprtk_register_function("println" ,pl)
+         #undef exprtk_register_function
+
+         return true;
       }
    };
 
@@ -35482,6 +35644,9 @@ namespace exprtk
 
          file_mode get_file_mode(const std::string& access)
          {
+            if (access.empty() || access.size() > 2)
+               return e_error;
+
             std::size_t w_cnt = 0;
             std::size_t r_cnt = 0;
 
@@ -35491,6 +35656,7 @@ namespace exprtk
                {
                   case 'r' : r_cnt++; break;
                   case 'w' : w_cnt++; break;
+                  default  : return e_error;
                }
             }
 
@@ -35777,20 +35943,24 @@ namespace exprtk
 
       bool register_package(exprtk::symbol_table<T>& symtab)
       {
-              if (!symtab.add_function("open"   ,o))
-            return false;
-         else if (!symtab.add_function("close"  ,c))
-            return false;
-         else if (!symtab.add_function("write"  ,w))
-            return false;
-         else if (!symtab.add_function("read"   ,r))
-            return false;
-         else if (!symtab.add_function("getline",g))
-            return false;
-         else if (!symtab.add_function("eof"    ,e))
-            return false;
-         else
-            return true;
+         #define exprtk_register_function(FunctionName,FunctionType)                    \
+         if (!symtab.add_function(FunctionName,FunctionType))                           \
+         {                                                                              \
+            exprtk_debug((                                                              \
+              "exprtk::rtl::io::file::register_package - Failed to add function: %s\n", \
+              FunctionName));                                                           \
+            return false;                                                               \
+         }                                                                              \
+
+         exprtk_register_function("open"   ,o)
+         exprtk_register_function("close"  ,c)
+         exprtk_register_function("write"  ,w)
+         exprtk_register_function("read"   ,r)
+         exprtk_register_function("getline",g)
+         exprtk_register_function("eof"    ,e)
+         #undef exprtk_register_function
+
+         return true;
       }
    };
 
@@ -36449,7 +36619,7 @@ namespace exprtk
          vector_t vec(parameters[0]);
 
          T increment = scalar_t(parameters[1])();
-         T base      = ((1 == ps_index) || (3 == ps_index))? scalar_t(parameters[2])() : T(0);
+         T base      = ((1 == ps_index) || (3 == ps_index)) ? scalar_t(parameters[2])() : T(0);
 
          std::size_t r0 = 0;
          std::size_t r1 = vec.size() - 1;
@@ -36879,54 +37049,41 @@ namespace exprtk
 
       bool register_package(exprtk::symbol_table<T>& symtab)
       {
-              if (!symtab.add_function("all_true"     ,at))
-            return false;
-         else if (!symtab.add_function("all_false"    ,af))
-            return false;
-         else if (!symtab.add_function("any_true"     ,nt))
-            return false;
-         else if (!symtab.add_function("any_false"    ,nf))
-            return false;
-         else if (!symtab.add_function("count"        , c))
-            return false;
-         else if (!symtab.add_function("copy"        , cp))
-            return false;
-         else if (!symtab.add_function("rotate_left"  ,rl))
-            return false;
-         else if (!symtab.add_function("rol"          ,rl))
-            return false;
-         else if (!symtab.add_function("rotate_right" ,rr))
-            return false;
-         else if (!symtab.add_function("ror"          ,rr))
-            return false;
-         else if (!symtab.add_function("shftl"        ,sl))
-            return false;
-         else if (!symtab.add_function("shftr"        ,sr))
-            return false;
-         else if (!symtab.add_function("sort"         ,st))
-            return false;
-         else if (!symtab.add_function("nth_element"  ,ne))
-            return false;
-         else if (!symtab.add_function("iota"         ,ia))
-            return false;
-         else if (!symtab.add_function("sumk"         ,sk))
-            return false;
-         else if (!symtab.add_function("axpy"    ,b1_axpy))
-            return false;
-         else if (!symtab.add_function("axpby"  ,b1_axpby))
-            return false;
-         else if (!symtab.add_function("axpyz"  ,b1_axpyz))
-            return false;
-         else if (!symtab.add_function("axpbyz",b1_axpbyz))
-            return false;
-         else if (!symtab.add_function("axpbz"  ,b1_axpbz))
-            return false;
-         else if (!symtab.add_function("dot"          ,dt))
-            return false;
-         else if (!symtab.add_function("dotk"        ,dtk))
-            return false;
-         else
-            return true;
+         #define exprtk_register_function(FunctionName,FunctionType)                  \
+         if (!symtab.add_function(FunctionName,FunctionType))                         \
+         {                                                                            \
+            exprtk_debug((                                                            \
+              "exprtk::rtl::vecops::register_package - Failed to add function: %s\n", \
+              FunctionName));                                                         \
+            return false;                                                             \
+         }                                                                            \
+
+         exprtk_register_function("all_true"     ,at)
+         exprtk_register_function("all_false"    ,af)
+         exprtk_register_function("any_true"     ,nt)
+         exprtk_register_function("any_false"    ,nf)
+         exprtk_register_function("count"        , c)
+         exprtk_register_function("copy"        , cp)
+         exprtk_register_function("rotate_left"  ,rl)
+         exprtk_register_function("rol"          ,rl)
+         exprtk_register_function("rotate_right" ,rr)
+         exprtk_register_function("ror"          ,rr)
+         exprtk_register_function("shftl"        ,sl)
+         exprtk_register_function("shftr"        ,sr)
+         exprtk_register_function("sort"         ,st)
+         exprtk_register_function("nth_element"  ,ne)
+         exprtk_register_function("iota"         ,ia)
+         exprtk_register_function("sumk"         ,sk)
+         exprtk_register_function("axpy"    ,b1_axpy)
+         exprtk_register_function("axpby"  ,b1_axpby)
+         exprtk_register_function("axpyz"  ,b1_axpyz)
+         exprtk_register_function("axpbyz",b1_axpbyz)
+         exprtk_register_function("axpbz"  ,b1_axpbz)
+         exprtk_register_function("dot"          ,dt)
+         exprtk_register_function("dotk"        ,dtk)
+         #undef exprtk_register_function
+
+         return true;
       }
    };
 
@@ -36940,9 +37097,9 @@ namespace exprtk
    namespace information
    {
       static const char* library = "Mathematical Expression Toolkit";
-      static const char* version = "2.7182818284590452353602874713526624977572"
-                                   "470936999595749669676277240766303535475945";
-      static const char* date    = "20161212";
+      static const char* version = "2.718281828459045235360287471352662497757247"
+                                   "09369995957496696762772407663035354759457138";
+      static const char* date    = "20170107";
 
       static inline std::string data()
       {
