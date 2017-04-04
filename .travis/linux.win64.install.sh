@@ -21,9 +21,12 @@ MINGW_PACKAGES="mingw64-x-sdl mingw64-x-libvorbis mingw64-x-fluidsynth mingw64-x
 
 export MINGW_PACKAGES
 
+# TODO: Remove this line after removing sourcing, DIR is already set
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck disable=SC1090
-. "$DIR/linux.win.download.sh" win64
+if [ -z "$TRAVIS_TAG" ]; then
+	# shellcheck disable=SC1090
+	. "$DIR/linux.win.download.sh" win64
+fi
 
 # shellcheck disable=SC2086
 sudo apt-get install -y $MINGW_PACKAGES
