@@ -44,7 +44,7 @@
 #include "base64.h"
 #include "lmms_constants.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 #include "exprsynth.h"
 
@@ -210,6 +210,7 @@ void Expressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 			e->add_constant("bnote", nph->instrumentTrack()->baseNote());
 			e->add_constant("srate", Engine::mixer()->processingSampleRate());
 			e->add_constant("v", nph->getVolume() / 255.0);
+			e->add_constant("tempo", Engine::getSong()->getTempo());
 			e->add_variable("A1", m_A1);
 			e->add_variable("A2", m_A2);
 			e->add_variable("A3", m_A3);
@@ -532,6 +533,7 @@ void expressiveView::expressionChanged() {
 			expr.add_constant("trel", 0);
 			expr.add_constant("bnote",e->instrumentTrack()->baseNote());
 			expr.add_constant("v", v);
+			expr.add_constant("tempo", Engine::getSong()->getTempo());
 			expr.add_constant("A1", e->parameterA1().value());
 			expr.add_constant("A2", e->parameterA2().value());
 			expr.add_constant("A3", e->parameterA3().value());
@@ -788,6 +790,7 @@ QString expressiveHelpView::s_helpText=
 "<b>key</b> - Note's keyboard key. 0 denotes C0, 48 denotes C4, 96 denotes C8. Available only in the output expressions.<br>"
 "<b>bnote</b> - Base note. By default it is 57 which means A5, unless you change it.<br>"
 "<b>srate</b> - Sample rate. In wave expression it returns the wave's number of samples.<br>"
+"<b>tempo</b> - Song's Tempo. Available only in the output expressions.<br>"
 "<b>v</b> - Note's volume. Note that the output is already multiplied by the volume. Available only in the output expressions.<br>"
 "<b>rel</b> - Gives 0.0 while the key is holded, and 1.0 after the key release. Available only in the output expressions.<br>"
 "<b>trel</b> - Time after release. While the note is holded, it gives 0.0. Afterwards, it start counting seconds.<br>"
