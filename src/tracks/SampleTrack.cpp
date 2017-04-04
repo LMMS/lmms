@@ -48,7 +48,7 @@
 #include "Mixer.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
-
+#include <QDebug>
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
@@ -184,10 +184,21 @@ void SampleTCO::updateTrackTcos()
 	}
 }
 
+MidiTime SampleTCO::startTimeOffset() const
+{
+	return m_startTimeOffset;
+}
+
+
+
+
 bool SampleTCO::isPlaying() const
 {
 	return m_isPlaying;
 }
+
+
+
 
 void SampleTCO::setIsPlaying(bool isPlaying)
 {
@@ -266,6 +277,14 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
+}
+
+
+
+
+void SampleTCO::setStartTimeOffset( MidiTime startTime )
+{
+	m_startTimeOffset = startTime;
 }
 
 
@@ -366,6 +385,8 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
+
+
 
 
 
@@ -497,8 +518,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
-
-	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
+	
+	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	qDebug() << offset << (int) offset ;
+	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
@@ -601,6 +624,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			TrackContentObject * tco = getTCO( i );
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 			float framesPerTick = Engine::framesPerTick();
+			
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
 				if( sTco->isPlaying() == false )

@@ -58,6 +58,7 @@ public:
 		return m_sampleBuffer;
 	}
 
+	void setStartTimeOffset( MidiTime startTime );
 	MidiTime sampleLength() const;
 	void setSampleStartFrame( f_cnt_t startFrame );
 	void setSamplePlayLength( f_cnt_t length );
@@ -67,6 +68,8 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
+	MidiTime startTimeOffset() const;
+	
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
@@ -80,6 +83,7 @@ private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
+	MidiTime m_startTimeOffset;
 
 
 	friend class SampleTCOView;

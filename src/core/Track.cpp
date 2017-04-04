@@ -67,7 +67,7 @@
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
-
+#include <QDebug>
 
 /*! The width of the resize grip in pixels
  */
@@ -697,8 +697,25 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		m_tco->setJournalling( false );
 
 		setInitialMousePos( me->pos() );
-
-		if( me->x() < width() - RESIZE_GRIP_WIDTH )
+		if( me->x() < RESIZE_GRIP_WIDTH )
+		{
+			m_action = ResizeFront;
+			m_oldTime = m_tco->startPosition();
+			QCursor c( Qt::SizeHorCursor );
+			QApplication::setOverrideCursor( c );
+			s_textFloat->setTitle( tr( "Current length" ) );
+			delete m_hint;
+			m_hint = TextFloat::displayMessage( tr( "Hint" ),
+					tr( "Press <%1> for free "
+							"resizing." ).arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
+					embed::getIconPixmap( "hint" ), 0 );
+		}
+		else if( me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
 			m_action = Move;
 			m_oldTime = m_tco->startPosition();
@@ -908,6 +925,31 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 						MidiTime::ticksPerTact() ) );
 		s_textFloat->moveGlobal( this, QPoint( width() + 2,
 					height() + 2) );
+	}
+	else if( m_action == ResizeFront )
+	{
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		if( sTco )
+		{
+			
+			const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
+			
+			MidiTime t = qMax( 0, (int)
+							   m_trackView->trackContainerView()->currentPosition()+
+							   static_cast<int>( x * MidiTime::ticksPerTact() /
+												 ppt ) );
+			if( ! ( me->modifiers() & Qt::ControlModifier )
+					&& me->button() == Qt::NoButton )
+			{
+				t = t.toNearestTact();
+			}
+			MidiTime oldPos = m_tco->startPosition();
+			m_tco->movePosition( t );
+			m_trackView->getTrackContentWidget()->changePosition();
+			m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
+			sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+		}
+		
 	}
 	else
 	{
