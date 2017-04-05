@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="crossoverDist" id="1404" class="DistortionPlugin">
+    <name>Crossover distortion</name>
+    <p>This is a simulation of the distortion that happens in class B and AB power amps when the signal crosses 0.</p>
+    <p>For class B simulations the smooth value should be set to about 0.3 +/- 0.2 and for AB it should be set to near 1.0.</p>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float sig;
+      const float fade = fabs(amp * smooth) + 0.0001;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	sig = fabs(input[pos]) - amp;
+
+        if (sig < 0.0f) {
+          sig *= (1.0f + sig/fade) * smooth;
+        }
+
+	if (input[pos] < 0.0f) {
+	  buffer_write(output[pos], -sig);
+        } else {
+	  buffer_write(output[pos], sig);
+        }
+      }
+    ]]></callback>
+
+    <port label="amp" dir="input" type="control" hint="default_minimum">
+      <name>Crossover amplitude</name>
+      <p>Controls the point at which the output signal becomes linear.</p>
+      <range min="0" max="0.1"/>
+    </port>
+
+    <port label="smooth" dir="input" type="control" hint="default_maximum">
+      <name>Smoothing</name>
+      <p>Controls degree of smoothing of the crossover point.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+  </plugin>
+</ladspa>

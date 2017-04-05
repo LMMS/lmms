@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include <sys/types.h>
+      #include "ladspa-util.h"
+
+      #define INT_SCALE   16384.0f
+      /* INT_SCALE reciprocal includes factor of two scaling */
+      #define INT_SCALE_R 0.000030517578125f
+
+      #define MAX_AMP 1.0f
+      #define CLIP 0.8f
+      #define CLIP_A ((MAX_AMP - CLIP) * (MAX_AMP - CLIP))
+      #define CLIP_B (MAX_AMP - 2.0f * CLIP)
+    ]]></code>
+  </global>
+
+  <plugin label="giantFlange" id="1437" class="FlangerPlugin">
+    <name>Giant flange</name>
+    <p>This is a fairly normal flanger but with excessively long delay times.
+Requested by Patrick Shirkey.</p>
+    <p>To cut down the memory requirements the internal delay buffer only has
+15bits of resolution, so there is no headroom, if you feed in signals over 0dB
+it will clip the output. There is code to soften the effect of the clipping,
+but beware of it.</p>
+
+    <callback event="instantiate"><![CDATA[
+      int buffer_size = 32768;
+
+      fs = s_rate;
+      while (buffer_size < fs * 10.5f) {
+	buffer_size *= 2;
+      }
+      buffer = calloc(buffer_size, sizeof(int16_t));
+      buffer_mask = buffer_size - 1;
+      buffer_pos = 0;
+      x1 = 0.5f;
+      y1 = 0.0f;
+      x2 = 0.5f;
+      y2 = 0.0f;
+    ]]></callback>
+      
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, (buffer_mask + 1) * sizeof(int16_t));
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float omega1 = 6.2831852f * (freq1 / fs);
+      const float omega2 = 6.2831852f * (freq2 / fs);
+      float fb;
+      float d1, d2;
+      float d1out, d2out;
+      float fbs;
+
+      if (feedback > 99.0f) {
+	fb = 0.99f;
+      } else if (feedback < -99.0f) {
+	fb = -0.99f;
+      } else {
+	fb = feedback * 0.01f;
+      }
+
+      if (f_round(deldouble)) {
+        const float dr1 = delay1 * fs * 0.25f;
+        const float dr2 = delay2 * fs * 0.25f;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	/* Write input into delay line */
+	buffer[buffer_pos] = f_round(input[pos] * INT_SCALE);
+
+	/* Calcuate delays */
+	d1 = (x1 + 1.0f) * dr1;
+	d2 = (y2 + 1.0f) * dr2;
+
+	d1out = buffer[(buffer_pos - f_round(d1)) & buffer_mask] * INT_SCALE_R;
+	d2out = buffer[(buffer_pos - f_round(d2)) & buffer_mask] * INT_SCALE_R;
+
+	/* Add feedback, must be done afterwards for case where delay = 0 */
+	fbs = input[pos] + (d1out + d2out) * fb;
+	if(fbs < CLIP && fbs > -CLIP) {
+	  buffer[buffer_pos] = fbs * INT_SCALE;
+	} else if (fbs > 0.0f) {
+	  buffer[buffer_pos] = (MAX_AMP - (CLIP_A / (CLIP_B + fbs))) *
+					INT_SCALE;
+	} else {
+	  buffer[buffer_pos] =  (MAX_AMP - (CLIP_A / (CLIP_B - fbs))) *
+					-INT_SCALE;
+	}
+
+	/* Write output */
+	buffer_write(output[pos], LIN_INTERP(wet, input[pos], d1out + d2out));
+
+	if (pos % 2) {
+	  buffer_pos = (buffer_pos + 1) & buffer_mask;
+	}
+
+	/* Run LFOs */
+	x1 -= omega1 * y1;
+	y1 += omega1 * x1;
+	x2 -= omega2 * y2;
+	y2 += omega2 * x2;
+      }
+      } else {
+        const float dr1 = delay1 * fs * 0.5f;
+        const float dr2 = delay2 * fs * 0.5f;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	/* Write input into delay line */
+	buffer[buffer_pos] = f_round(input[pos] * INT_SCALE);
+
+	/* Calcuate delays */
+	d1 = (x1 + 1.0f) * dr1;
+	d2 = (y2 + 1.0f) * dr2;
+
+	d1out = buffer[(buffer_pos - f_round(d1)) & buffer_mask] * INT_SCALE_R;
+	d2out = buffer[(buffer_pos - f_round(d2)) & buffer_mask] * INT_SCALE_R;
+
+	/* Add feedback, must be done afterwards for case where delay = 0 */
+	fbs = input[pos] + (d1out + d2out) * fb;
+	if(fbs < CLIP && fbs > -CLIP) {
+		buffer[buffer_pos] = fbs * INT_SCALE;
+	} else if (fbs > 0.0f) {
+		buffer[buffer_pos] = (MAX_AMP - (CLIP_A / (CLIP_B + fbs))) *
+					INT_SCALE;
+	} else {
+		buffer[buffer_pos] =  (MAX_AMP - (CLIP_A / (CLIP_B - fbs))) *
+					-INT_SCALE;
+	}
+
+	/* Write output */
+	buffer_write(output[pos], LIN_INTERP(wet, input[pos], d1out + d2out));
+
+	buffer_pos = (buffer_pos + 1) & buffer_mask;
+
+	/* Run LFOs */
+	x1 -= omega1 * y1;
+	y1 += omega1 * x1;
+	x2 -= omega2 * y2;
+	y2 += omega2 * x2;
+      }
+      }
+
+      plugin_data->x1 = x1;
+      plugin_data->y1 = y1;
+      plugin_data->x2 = x2;
+      plugin_data->y2 = y2;
+      plugin_data->buffer_pos = buffer_pos;
+    ]]></callback>
+
+    <port label="deldouble" dir="input" type="control" hint="default_0,toggled">
+      <name>Double delay</name>
+      <p>doubles the length of the delays, this will reduce the sound quality.</p>
+    </port>
+
+    <port label="freq1" dir="input" type="control" hint="default_1">
+      <name>LFO frequency 1 (Hz)</name>
+      <p>The delay of the first LFO in seconds.</p>
+      <range min="0" max="30.0"/>
+    </port>
+
+    <port label="delay1" dir="input" type="control" hint="default_low">
+      <name>Delay 1 range (s)</name>
+      <p>The delay range of the first LFO in seconds.</p>
+      <range min="0" max="10.5"/>
+    </port>
+
+    <port label="freq2" dir="input" type="control" hint="default_1">
+      <name>LFO frequency 2 (Hz)</name>
+      <p>The delay of the second LFO in seconds.</p>
+      <range min="0" max="30.0"/>
+    </port>
+
+    <port label="delay2" dir="input" type="control" hint="default_0">
+      <name>Delay 2 range (s)</name>
+      <p>The delay range of the second LFO in seconds.</p>
+      <range min="0" max="10.5"/>
+    </port>
+
+    <port label="feedback" dir="input" type="control" hint="default_0">
+      <name>Feedback</name>
+      <p>The amount of the delays output that is mixed back into the delay.</p>
+      <range min="-100" max="100"/>
+    </port>
+
+    <port label="wet" dir="input" type="control" hint="default_0">
+      <name>Dry/Wet level</name>
+      <p>The amounts of the input and effect mixed to produce the output.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="buffer" type="int16_t *" />
+    <instance-data label="buffer_pos" type="unsigned int" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="x1" type="float" />
+    <instance-data label="y1" type="float" />
+    <instance-data label="x2" type="float" />
+    <instance-data label="y2" type="float" />
+  </plugin>
+</ladspa>

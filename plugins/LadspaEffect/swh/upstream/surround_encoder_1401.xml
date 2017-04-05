@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+
+#define D_SIZE 256
+#define NZEROS 200
+
+/* The non-zero taps of the Hilbert transformer */
+static float xcoeffs[] = {
+     +0.0008103736f, +0.0008457886f, +0.0009017196f, +0.0009793364f,
+     +0.0010798341f, +0.0012044365f, +0.0013544008f, +0.0015310235f,
+     +0.0017356466f, +0.0019696659f, +0.0022345404f, +0.0025318040f,
+     +0.0028630784f, +0.0032300896f, +0.0036346867f, +0.0040788644f,
+     +0.0045647903f, +0.0050948365f, +0.0056716186f, +0.0062980419f,
+     +0.0069773575f, +0.0077132300f, +0.0085098208f, +0.0093718901f,
+     +0.0103049226f, +0.0113152847f, +0.0124104218f, +0.0135991079f,
+     +0.0148917649f, +0.0163008758f, +0.0178415242f, +0.0195321089f,
+     +0.0213953037f, +0.0234593652f, +0.0257599469f, +0.0283426636f,
+     +0.0312667947f, +0.0346107648f, +0.0384804823f, +0.0430224431f,
+     +0.0484451086f, +0.0550553725f, +0.0633242001f, +0.0740128560f,
+     +0.0884368322f, +0.1090816773f, +0.1412745301f, +0.1988673273f,
+     +0.3326528346f, +0.9997730178f, -0.9997730178f, -0.3326528346f,
+     -0.1988673273f, -0.1412745301f, -0.1090816773f, -0.0884368322f,
+     -0.0740128560f, -0.0633242001f, -0.0550553725f, -0.0484451086f,
+     -0.0430224431f, -0.0384804823f, -0.0346107648f, -0.0312667947f,
+     -0.0283426636f, -0.0257599469f, -0.0234593652f, -0.0213953037f,
+     -0.0195321089f, -0.0178415242f, -0.0163008758f, -0.0148917649f,
+     -0.0135991079f, -0.0124104218f, -0.0113152847f, -0.0103049226f,
+     -0.0093718901f, -0.0085098208f, -0.0077132300f, -0.0069773575f,
+     -0.0062980419f, -0.0056716186f, -0.0050948365f, -0.0045647903f,
+     -0.0040788644f, -0.0036346867f, -0.0032300896f, -0.0028630784f,
+     -0.0025318040f, -0.0022345404f, -0.0019696659f, -0.0017356466f,
+     -0.0015310235f, -0.0013544008f, -0.0012044365f, -0.0010798341f,
+     -0.0009793364f, -0.0009017196f, -0.0008457886f, -0.0008103736f,
+};
+
+    ]]></code>
+  </global>
+
+  <plugin label="surroundEncoder" id="1401" class="UtilityPlugin">
+    <name>Surround matrix encoder</name>
+    <p>I haven't been able to test this plugin, so there may be bugs. I have successfully tested the algorithm, but the implementation is suspect.</p>
+    <p>\subsubsection{What does it do?}</p>
+    <p>It allows you to encode four channels of sound into a stereo compatible stream that will be decoded by a Dolby\footnote{"Dolby" is a trademark of Dolby Laboratories.} Surround/Pro-Logic decoder into Left, Right, Center and Surround signals.</p>
+    <p>This is not a proper implementation of Pro-logic, there is no Dolby B processing done on the surround channel, which would help, but would be using Dolby intellectual property.</p>
+    <p>\subsubsection{Caveats}</p>
+    <p>Obviously you can't wedge four channels into two without loss, so something has to give. You will probably notice significant cross-talk between the channels, but the decoder should do cross-talk correction, which will help a lot. A side effect of this is that it will make left-right panning unusual, the sources will dwell near the left and right speakers and zip across the centre channel. Because of this it is only really possible to master surround recordings through a pre-logic decoder. Do not attempt to use a conventional 5 point surround multichannel setup, it behaves very differently.</p>
+    <p>In addition to this, output from this process is not entirely mono compatible, in mono output the L, C and R will be preserved as per a stereo recording (centre will be mixed equally), but the surround channel will be totally lost.</p>
+    <p>Careful gain control on the output is required, as the level of the output will be greater than the L and R inputs, but different to the sum amplitude of the input signals.</p>
+    <p>Widely panned reverb fed to the L and R channels will often leak into the S channel, if this is not desired (often it is) reduce the width of the stereo image.</p>
+    <p>The encoding will survive some processes (eg. copying to CD, MD etc.), but may not survive conversion to MP3 or recording to tape with azimuth errors.</p>
+    <p>\subsubsection{Legalese}</p>
+    <p>This is a four channel matrix encoder, it happens to be compatible with Dolby Surround Pro-Logic.</p>
+    <p>This implementation does not convey a license nor imply a right under any patent, or any other industrial or intellectual property right of Dolby Laboratories.</p>
+
+    <callback event="instantiate">
+      buffer_size = (int)(0.0072f * s_rate);
+      buffer_pos = 0;
+      buffer = calloc(buffer_size, sizeof(LADSPA_Data));
+      
+      delay = calloc(D_SIZE, sizeof(LADSPA_Data));
+
+      dptr = 0;
+    </callback>
+
+    <callback event="activate">
+      memset(buffer, 0, buffer_size * sizeof(LADSPA_Data));
+    </callback>
+
+    <callback event="cleanup">
+      free(plugin_data->buffer);
+      
+      free(plugin_data->delay);
+    </callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      LADSPA_Data s_delayed;
+      unsigned int i;
+      float hilb;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        delay[dptr] = s[pos];
+	hilb = 0.0f;
+	for (i = 0; i < NZEROS/2; i++) {
+	  hilb += (xcoeffs[i] * delay[(dptr - i*2) & (D_SIZE - 1)]);
+	}
+	dptr = (dptr + 1) & (D_SIZE - 1);
+      
+      
+        s_delayed = buffer[buffer_pos];
+	buffer[buffer_pos++] = hilb;
+	buffer_pos %= buffer_size;
+
+        buffer_write(lt[pos], l[pos] + c[pos] * 0.707946f -
+                     s_delayed * 0.707946f);
+        buffer_write(rt[pos], r[pos] + c[pos] * 0.707946f +
+                     s_delayed * 0.707946f);
+      }
+      
+      plugin_data->dptr = dptr;
+
+      plugin_data->buffer_pos = buffer_pos;
+    ]]></callback>
+
+    <port label="l" dir="input" type="audio">
+      <name>L</name>
+      <p>Left channel input. Can be treated as per normal stereo recoding, except that the speaker should be at -22.5$^\circ$, rather than the normal stereo -30$^\circ$.</p>
+    </port>
+
+    <port label="r" dir="input" type="audio">
+      <name>R</name>
+      <p>Right channel input. As per left channel.</p>
+    </port>
+
+    <port label="c" dir="input" type="audio">
+      <name>C</name>
+      <p>Center channel input. Will be directly in front of the listener, stereo and mono compatible.</p>
+    </port>
+
+    <port label="s" dir="input" type="audio">
+      <name>S</name>
+      <p>Surround channel. Should sound from the rear speakers, may also leak into the left and right. Has slight delay and bandwidth reduction (cut below 100 Hz, and above 7 KHz) for leakage and noise reduction and enhanced psychoacoustic effects.</p>
+
+      <p>Not mono compatible.</p>
+    </port>
+
+    <port label="lt" dir="output" type="audio">
+      <name>Lt</name>
+    </port>
+
+    <port label="rt" dir="output" type="audio">
+      <name>Rt</name>
+    </port>
+
+    <instance-data label="buffer_size" type="unsigned int" />
+    <instance-data label="buffer_pos" type="unsigned int" />
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    
+    <instance-data label="delay" type="LADSPA_Data *" />
+    <instance-data label="dptr" type="unsigned int" />
+  </plugin>
+</ladspa>

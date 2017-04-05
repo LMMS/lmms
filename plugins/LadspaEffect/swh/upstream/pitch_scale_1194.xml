@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#include "util/pitchscale.h"
+
+			#define FRAME_LENGTH 4096
+			#define OVER_SAMP    16
+		</code>
+	</global>
+
+	<plugin label="pitchScaleHQ" id="1194" class="PitchPlugin">
+		<name>Higher Quality Pitch Scaler</name>
+                <p>A pitch shifter implementation that scales the harmonics appropriately with the base frequencies. It is an implementation of Stephen M. Sprengler's pitch scaler design. It gives reasonable, general purpose results for small changes, but won't give Antares or Eventide anything to worry about.</p>
+		<p>The FFT block size and oversampling has been kept at reasonable levels to keep the CPU usage low, but it is smoother than the other Pitch Scaler.</p>
+
+		<callback event="run">
+			pitch_scale(buffers, mult, FRAME_LENGTH, OVER_SAMP, sample_count, sample_rate, input, output, RUN_ADDING, run_adding_gain);
+			*(plugin_data->latency) = FRAME_LENGTH - (FRAME_LENGTH
+							/ OVER_SAMP);
+		</callback>
+
+		<callback event="instantiate">
+			int i;
+			float arg;
+
+			buffers = malloc(sizeof(sbuffers));
+			sample_rate = s_rate;
+			buffers->gInFIFO = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gOutFIFO = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gLastPhase = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gSumPhase = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gOutputAccum = malloc(2*FRAME_LENGTH * sizeof(float));
+			buffers->gAnaFreq = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gAnaMagn = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gSynFreq = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gSynMagn = malloc(FRAME_LENGTH * sizeof(float));
+			buffers->gWindow = malloc(FRAME_LENGTH * sizeof(float));
+
+			arg = 2.0f * M_PI / (float)(FRAME_LENGTH-1);
+			for (i=0; i &lt; FRAME_LENGTH; i++) {
+				// Blackman-Harris
+				buffers->gWindow[i] =  0.35875f - 0.48829f * cos(arg * (float)i) + 0.14128f * cos(2.0f * arg * (float)i) - 0.01168f * cos(3.0f * arg * (float)i);
+				// Gain correction
+				buffers->gWindow[i] *= 0.761f;
+
+			}
+
+		</callback>
+
+		<callback event="activate"><![CDATA[
+			memset(buffers->gInFIFO, 0, FRAME_LENGTH*sizeof(float));
+			memset(buffers->gOutFIFO, 0, FRAME_LENGTH*sizeof(float));
+			memset(buffers->gLastPhase, 0, FRAME_LENGTH*sizeof(float)/2);
+			memset(buffers->gSumPhase, 0, FRAME_LENGTH*sizeof(float)/2);
+			memset(buffers->gOutputAccum, 0, 2*FRAME_LENGTH*sizeof(float));
+			memset(buffers->gAnaFreq, 0, FRAME_LENGTH*sizeof(float));
+			memset(buffers->gAnaMagn, 0, FRAME_LENGTH*sizeof(float));
+			buffers->gRover = 0;
+			pitch_scale(buffers, 1.0, FRAME_LENGTH, 16, FRAME_LENGTH, sample_rate, buffers->gInFIFO, buffers->gOutFIFO, 0, 0.0f);
+		]]></callback>
+
+		<callback event="cleanup"><![CDATA[
+                        free (plugin_data->buffers->gInFIFO);
+                        free (plugin_data->buffers->gOutFIFO);
+                        free (plugin_data->buffers->gLastPhase);
+                        free (plugin_data->buffers->gSumPhase);
+                        free (plugin_data->buffers->gOutputAccum);
+                        free (plugin_data->buffers->gAnaFreq);
+                        free (plugin_data->buffers->gAnaMagn);
+                        free (plugin_data->buffers->gSynFreq);
+                        free (plugin_data->buffers->gSynMagn);
+                        free (plugin_data->buffers->gWindow);
+                        free (plugin_data->buffers);
+		]]></callback>
+
+		<port label="mult" dir="input" type="control" hint="default_1">
+			<name>Pitch co-efficient</name>
+			<range min="0.5" max="2"/>
+			<p>The pitch scaling factor, a value of 2.0 will increase the pitch by one octave, etc.</p>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+
+		<port label="latency" dir="output" type="control">
+			<name>latency</name>
+		</port>
+
+		<instance-data label="buffers" type="sbuffers *"/>
+
+		<instance-data label="sample_rate" type="long"/>
+	</plugin>
+</ladspa>

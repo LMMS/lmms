@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+
+my $pattern = shift @ARGV;
+
+my $reps = 4;
+
+open(RC, "timetest.rc");
+open(DATA, ">timetest.results");
+print("<table bgcolor=\"#000000\" border=\"1\" cellpadding=\"4\" cellspacing=\"0\">\n");
+print("<tr><th bgcolor=\"#FFFFFF\">Plugin</th><th bgcolor=\"#FFFFFF\">PIII MHz used to process<br>44.1k/16bit mono file</th><th bgcolor=\"#FFFFFF\">Cycles per sample</th></tr>\n");
+while(<RC>) {
+	next if /^\s*#/;
+	next if /^\s*$/;
+	next if ($pattern && !/$pattern/);
+	@stuff = split("\t");
+	$name = $stuff[0];
+	$line = $stuff[1];
+	chomp $line;
+	$line =~ /(\S+\.so)/;
+	$command = $line." 2>&1";
+	$cycles = 10000000000;
+	$pers = 100000;
+	my $count;
+	for $count (1..$reps+1) {
+		$out = `$command`;
+		chomp $out;
+		$out =~ /Plugin cycles: (\d+) \((\d+)\//;
+		if ($1 < $cycles) {
+			$cycles = $1;
+		}
+		if ($2 < $pers) {
+			$pers = $2;
+		}
+	}
+	$out =~ /UID: (\d+)/;
+	$UID = $1;
+	$cycles /= 1000000;
+	$doc = "http://plugin.org.uk/ladspa-swh/docs/ladspa-swh.html#id$UID";
+	print("<tr><td bgcolor=\"#FFFFFF\"><a href=\"$doc\">", $name, "</a></td><td bgcolor=\"#FFFFFF\" align=\"right\">", sprintf("%.2f", $cycles/8), "</td><td bgcolor=\"#FFFFFF\" align=\"right\">", sprintf("%.0f", $pers),"</td></tr>\n");
+	print DATA "$UID ".sprintf("%.2f", $cycles/8)." ".sprintf("%.0f", $pers)."\n";
+}
+print("</table>\n");

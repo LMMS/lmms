@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Jesse Chappell &lt;jesse at essej dot net&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+      #include <stdio.h>
+
+      #define MIN(a,b) ((a) < (b) ? (a) : (b))
+      #define CALC_DELAY(delaytime) \
+        (f_clamp (delaytime * sample_rate, 1.f, (float)(buffer_size + 1)))
+
+    ]]></code>
+  </global>
+
+
+  <plugin label="revdelay" id="1605" class="DelayPlugin">
+    <name>Reverse Delay (5s max)</name>
+     <p> A reverse delay not really modelled on any existing one.  You'll want to set
+         the Crossfade Samples parameter to something reasonably small (but more than 20)
+         for most applications, but you can try larger values if you start getting clicking.
+    </p>
+    
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+      buffer_size = 0;
+      delay_samples = 0;
+      last_delay_time = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="activate"><![CDATA[
+      unsigned int size;
+
+      size = sample_rate * 5 * 2; /* 5 second maximum */
+        
+      /* calloc sets the buffer to zero. */
+      buffer = calloc(size, sizeof(LADSPA_Data));
+
+      buffer_size = size;
+      write_phase = 0;
+      delay_samples = 0;
+    ]]></callback>
+    
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+    
+    <callback event="run"><![CDATA[
+      int i;
+      unsigned long delay2;
+      float dry = DB_CO(dry_level);
+      float wet = DB_CO(wet_level);
+      float fadescale;
+      unsigned long xfadesamp = xfade_samp;
+
+      if (write_phase == 0) {
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->delay_samples = delay_samples = CALC_DELAY (delay_time);
+      }
+
+      if (delay_time == last_delay_time) {
+        long idelay_samples = (long)delay_samples;
+        delay2 = idelay_samples * 2;
+
+        if (xfadesamp > idelay_samples) {
+            /* force it to half */
+            xfadesamp = idelay_samples / 2;
+        }
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase = delay2 - write_phase;
+          LADSPA_Data read;
+          LADSPA_Data insamp;
+
+          insamp = in[i];
+          read =  (wet * buffer[read_phase]) + (dry * insamp);
+
+          if ( (write_phase % idelay_samples) < xfadesamp) {
+            fadescale = (write_phase % idelay_samples) / (1.0 * xfadesamp);
+          }
+          else if ((write_phase % idelay_samples) > (idelay_samples - xfadesamp)) {
+            fadescale = (idelay_samples - (write_phase % idelay_samples)) / (1.0 * xfadesamp);
+          }
+          else {
+            fadescale = 1.0;
+          }
+
+          buffer[write_phase] = fadescale * (insamp + (feedback * read)); 
+	  buffer[write_phase] = flush_to_zero(buffer[write_phase]);
+                  
+	  buffer_write(out[i], read);
+          write_phase = (write_phase + 1) % delay2;
+        }
+      } else {
+        float next_delay_samples = CALC_DELAY (delay_time);
+        float delay_samples_slope = (next_delay_samples - delay_samples) / sample_count;
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase, idelay_samples;
+          LADSPA_Data read;
+          LADSPA_Data insamp;
+          insamp = in[i];
+
+          delay_samples += delay_samples_slope;
+          delay2 = (long) (delay_samples * 2);
+          write_phase = (write_phase + 1) % delay2;
+
+          read_phase = delay2 - write_phase;
+          idelay_samples = (long)delay_samples;
+          read = wet * buffer[read_phase]   + (dry * insamp);
+
+          if ((write_phase % idelay_samples) < xfade_samp) {
+            fadescale = (write_phase % idelay_samples) / (1.0 * xfade_samp);
+          }
+          else if ((write_phase % idelay_samples) > (idelay_samples - xfade_samp)) {
+            fadescale = (idelay_samples - (write_phase % idelay_samples)) / (1.0 * xfade_samp);
+          }
+          else {
+            fadescale = 1.0;
+          }
+
+          buffer[write_phase] = fadescale * (insamp + (feedback * read)); 
+	  buffer[write_phase] = flush_to_zero(buffer[write_phase]);
+
+	  buffer_write(out[i], read);
+        }
+
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->delay_samples = delay_samples;
+      }
+      
+      plugin_data->write_phase = write_phase;
+    ]]></callback>
+
+    <port label="in" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="out" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="delay_time" dir="input" type="control" hint="default_0">
+      <name>Delay Time (s)</name>
+      <range min="0" max="5.0"/>
+    </port>
+
+    <port label="dry_level" dir="input" type="control" hint="default_0">
+      <name>Dry Level (dB)</name>
+      <p>Controls the level of the dry input signal in dB's.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="wet_level" dir="input" type="control" hint="default_0">
+      <name>Wet Level (dB)</name>
+      <p>Controls the level of the delayed signal in dB's.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="feedback" dir="input" type="control" hint="default_0">
+      <name>Feedback</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="xfade_samp" dir="input" type="control" hint="default_low,integer">
+      <name>Crossfade samples</name>
+      <range min="0" max="5000"/>
+    </port>
+
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_size" type="unsigned int" />
+    <instance-data label="sample_rate" type="unsigned int" />
+    <instance-data label="delay_samples" type="LADSPA_Data" />
+    <instance-data label="write_phase" type="long" />
+    <instance-data label="last_delay_time" type="LADSPA_Data" />
+
+  </plugin>
+</ladspa>

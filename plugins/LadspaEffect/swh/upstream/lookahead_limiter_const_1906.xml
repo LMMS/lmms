@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+      #include "util/db.h"
+
+      /* Minimum buffer size in seconds */
+      #define BUFFER_TIME 0.15f
+    </code>
+  </global>
+
+  <plugin label="lookaheadLimiterConst" id="1906" class="LimiterPlugin">
+    <name>Lookahead limiter (fixed latency)</name>
+    <p>A lookahead limiter - similar to the original Lookahead Limiter, but
+with a constant latency of around 150ms and a reduced maximum lookahead
+time.</p>
+
+    <callback event="instantiate"><![CDATA[
+      buffer_len = 4096;
+      buffer_pos = 0;
+      fs = s_rate;
+
+      db_init();
+
+      /* Find size for power-of-two interleaved delay buffer */
+      while(buffer_len < s_rate * BUFFER_TIME) {
+	buffer_len *= 2;
+      }
+      buffer_mask = buffer_len * 2 - 1;
+      buffer = calloc(buffer_len * 2, sizeof(LADSPA_Data));
+      amp_buffer = calloc(buffer_len, sizeof(float));
+
+      peak = 0.0f;
+      peak_dist = 1;
+      atten = 0.0f;
+      last_delay = -1.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      int i;
+
+      memset(buffer, 0, buffer_len * 2 * sizeof(float));
+      for (i=0; i<buffer_len; i++) amp_buffer[i] = 1.0f;
+
+      buffer_pos = 0;
+      peak = 0.0f;
+      peak_dist = 1;
+      atten = 0.0f;
+      last_delay = -1.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float max = DB_CO(limit);
+      float sig, gain;
+      float delay = last_delay;
+      float delay_delta;
+      float a, b;
+
+      if (delay < 0.0f) {
+	delay = delay_s * fs;
+	delay_delta = 0.0f;
+      } else {
+        delay_delta = (delay_s * fs - last_delay) / (sample_count - 1);
+      }
+
+      for (pos = 0; pos < sample_count; pos++) {
+	delay += delay_delta;
+	buffer[(buffer_pos * 2) & buffer_mask] = in_1[pos];
+	buffer[(buffer_pos * 2 + 1) & buffer_mask] = in_2[pos];
+
+        a = fabs(buffer[((buffer_pos + f_round(delay)) * 2) & buffer_mask]);
+        b = fabs(buffer[((buffer_pos + f_round(delay)) * 2 + 1) & buffer_mask]);
+        sig = a > b ? a : b;
+/* XXX
+        sig = fabs(in_1[pos]) > fabs(in_2[pos]) ? fabs(in_1[pos]) :
+                fabs(in_2[pos]);
+*/
+
+        if (sig > max) {
+          const float rel = lin2db(sig) - limit;
+
+          if (rel / delay > peak / (float)peak_dist) {
+            peak_dist = delay;
+            peak = rel;
+          }
+        }
+
+	/* Incremenatlly approach the correct attenuation for the next peak */
+	atten -= (atten - peak) / (float)(peak_dist + 1);
+
+	if (peak_dist-- == 0) {
+		peak_dist = f_round(delay);
+		peak = 0.0f;
+	}
+
+	/* Cacluate the apropriate gain reduction and write it back into the
+	 * buffer */
+	gain = amp_buffer[(buffer_pos - f_round(delay)) & (buffer_len - 1)];
+	amp_buffer[(buffer_pos - f_round(delay)) & (buffer_len - 1)] =
+					 1.0f / db2lin(atten);
+
+gain=1.0f / db2lin(atten);
+
+        buffer_write(out_1[pos], buffer[(2 * (buffer_pos + 1)) &
+                                        buffer_mask] * gain);
+        buffer_write(out_2[pos], buffer[(2 * (buffer_pos + 1)+1) &
+                                        buffer_mask] * gain);
+
+	/* Ensure that the signal really can't be over the limit */
+
+#if 0
+XXX FIXME XXX
+	if (out_1[pos] < -max) {
+	  buffer_write(out_1[pos], -max);
+	} else if (out_1[pos] > max) {
+	  buffer_write(out_1[pos], max);
+	}
+	if (out_2[pos] < -max) {
+	  buffer_write(out_2[pos], -max);
+	} else if (out_2[pos] > max) {
+	  buffer_write(out_2[pos], max);
+	}
+#endif
+
+	buffer_pos++;
+      }
+
+      plugin_data->buffer_pos = buffer_pos;
+      plugin_data->peak = peak;
+      plugin_data->peak_dist = peak_dist;
+      plugin_data->atten = atten;
+      plugin_data->last_delay = delay;
+
+      *(plugin_data->attenuation) = atten;
+      *(plugin_data->latency) = buffer_len - 1;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+       free(plugin_data->buffer);
+       free(plugin_data->amp_buffer);
+    ]]></callback>
+
+    <port label="limit" dir="input" type="control" hint="default_0">
+      <name>Limit (dB)</name>
+      <p>The maximum output amplitude. Peaks over this level will be attenuated as smoothly as possible to bring them as close as possible to this level.</p>
+      <range min="-20" max="0"/>
+    </port>
+
+    <port label="delay_s" dir="input" type="control" hint="default_middle">
+      <name>Lookahead time (s)</name>
+      <p>The delay time used by the lookahead predictor. The longer the time the smoother the limiting will be, but will tend to make the changes in dynamic range more obvious.</p>
+      <range min="0.001" max="0.15"/>
+    </port>
+
+    <port label="attenuation" dir="output" type="control">
+      <name>Attenuation (dB)</name>
+      <p>The current limiting attenuation of the signal coming out of the delay
+buffer.</p>
+      <range min="0" max="12"/>
+    </port>
+
+    <port label="in_1" dir="input" type="audio">
+      <name>Input 1</name>
+    </port>
+
+    <port label="in_2" dir="input" type="audio">
+      <name>Input 2</name>
+    </port>
+
+    <port label="out_1" dir="output" type="audio">
+      <name>Output 1</name>
+    </port>
+
+    <port label="out_2" dir="output" type="audio">
+      <name>Output 2</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="amp_buffer" type="float *" />
+    <instance-data label="buffer_len" type="unsigned int" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="buffer_pos" type="unsigned int" />
+    <instance-data label="fs" type="unsigned int" />
+    <!-- running value for the attenuation -->
+    <instance-data label="atten" type="float" />
+    <!-- the next peak, relative to the limit -->
+    <instance-data label="peak" type="float" />
+    <!-- the number of sample until the next peak -->
+    <instance-data label="peak_dist" type="unsigned int" />
+    <instance-data label="last_delay" type="float" />
+  </plugin>
+</ladspa>

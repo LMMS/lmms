@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+
+      //#define DEBUG
+
+      #define NUM_CHUNKS 16
+      #define BUFFER_TIME 0.0053
+
+      #ifdef DEBUG
+	#include "stdio.h"
+      #endif
+    </code>
+  </global>
+
+  <plugin label="fastLookaheadLimiter" id="1913" class="LimiterPlugin">
+    <name>Fast Lookahead limiter</name>
+    <p>This is a limiter with an attack time of 5ms. It adds just over 5ms of
+latency to the input signal, but it guarantees that there will be no signals
+over the limit, and tries to get the minimum amount of distortion.</p>
+
+    <callback event="instantiate"><![CDATA[
+      fs = s_rate;
+      buffer_len = 128;
+      buffer_pos = 0;
+
+      /* Find size for power-of-two interleaved delay buffer */
+      while(buffer_len < fs * BUFFER_TIME * 2) {
+        buffer_len *= 2;
+      }
+      buffer = calloc(buffer_len, sizeof(float));
+      delay = (int)(0.005 * fs);
+
+      chunk_pos = 0;
+      chunk_num = 0;
+
+      /* find a chunk size (in smaples) thats roughly 0.5ms */
+      chunk_size = s_rate / 2000; 
+      chunks = calloc(NUM_CHUNKS, sizeof(float));
+
+      peak = 0.0f;
+      atten = 1.0f;
+      atten_lp = 1.0f;
+      delta = 0.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, NUM_CHUNKS * sizeof(float));
+
+      chunk_pos = 0;
+      chunk_num = 0;
+      peak = 0.0f;
+      atten = 1.0f;
+      atten_lp = 1.0f;
+      delta = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float max = DB_CO(limit);
+      const float trim = DB_CO(ingain);
+      float sig;
+      unsigned int i;
+
+      #ifdef DEBUG
+      float clip = 0.0, clipp = 0.0;
+      int clipc = 0;
+      #endif
+
+      for (pos = 0; pos < sample_count; pos++) {
+	if (chunk_pos++ == chunk_size) {
+	  /* we've got a full chunk */
+         
+	  delta = (1.0f - atten) / (fs * release);
+	  round_to_zero(&delta);
+	  for (i=0; i<10; i++) {
+	    const int p = (chunk_num - 9 + i) & (NUM_CHUNKS - 1);
+            const float this_delta = (max / chunks[p] - atten) /
+				      ((float)(i+1) * fs * 0.0005f + 1.0f);
+
+	    if (this_delta < delta) {
+	      delta = this_delta;
+	    }
+          }
+
+          chunks[chunk_num++ & (NUM_CHUNKS - 1)] = peak;
+	  peak = 0.0f;
+	  chunk_pos = 0;
+        }
+
+	buffer[(buffer_pos * 2) & (buffer_len - 1)] =     in_1[pos] * trim
+							+ 1.0e-30;
+	buffer[(buffer_pos * 2 + 1) & (buffer_len - 1)] = in_2[pos] * trim
+							+ 1.0e-30;
+
+	sig = fabs(in_1[pos]) > fabs(in_2[pos]) ? fabs(in_1[pos]) :
+		fabs(in_2[pos]);
+	sig += 1.0e-30;
+	if (sig * trim > peak) {
+	  peak = sig * trim;
+	}
+	//round_to_zero(&peak);
+	//round_to_zero(&sig);
+
+	atten += delta;
+	atten_lp = atten * 0.1f + atten_lp * 0.9f;
+	//round_to_zero(&atten_lp);
+	if (delta > 0.0f && atten > 1.0f) {
+	  atten = 1.0f;
+	  delta = 0.0f;
+	}
+
+	buffer_write(out_1[pos], buffer[(buffer_pos * 2 - delay * 2) &
+					(buffer_len - 1)] * atten_lp);
+	buffer_write(out_2[pos], buffer[(buffer_pos * 2 - delay * 2 + 1) &
+					(buffer_len - 1)] * atten_lp);
+	round_to_zero(&out_1[pos]);
+	round_to_zero(&out_2[pos]);
+
+	if (out_1[pos] < -max) {
+          #ifdef DEBUG
+	  clip += 20.0*log10(out_1[pos] / -max);
+	  clipc++;
+          if (fabs(out_1[pos] - max) > clipp) {
+            clipp = fabs(out_1[pos] / -max);
+          }
+          #endif
+	  buffer_write(out_1[pos], -max);
+	} else if (out_1[pos] > max) {
+          #ifdef DEBUG
+	  clip += 20.0*log10(out_1[pos] / max);
+	  clipc++;
+          if (fabs(out_1[pos] - max) > clipp) {
+            clipp = fabs(out_1[pos] / max);
+          }
+          #endif
+	  buffer_write(out_1[pos], max);
+	}
+	if (out_2[pos] < -max) {
+          #ifdef DEBUG
+	  clip += 20.0*log10(out_2[pos] / -max);
+	  clipc++;
+          if (fabs(out_2[pos] - max) > clipp) {
+            clipp = fabs(out_2[pos] / -max);
+          }
+          #endif
+	  buffer_write(out_2[pos], -max);
+	} else if (out_2[pos] > max) {
+          #ifdef DEBUG
+	  clip += 20.0*log10(out_2[pos] / max);
+	  clipc++;
+          if (fabs(out_2[pos] - max) > clipp) {
+            clipp = fabs(out_2[pos] / max);
+          }
+          #endif
+	  buffer_write(out_2[pos], max);
+	}
+
+	buffer_pos++;
+      }
+
+      #ifdef DEBUG
+      if (clipc > 0) {
+        printf("%d overs: %fdB avg, %fdB peak\n", clipc, clip/(float)clipc, 20.0*log10(clipp));
+      }
+      #endif
+
+      plugin_data->buffer_pos = buffer_pos;
+      plugin_data->peak = peak;
+      plugin_data->atten = atten;
+      plugin_data->atten_lp = atten_lp;
+      plugin_data->chunk_pos = chunk_pos;
+      plugin_data->chunk_num = chunk_num;
+
+      *(plugin_data->attenuation) = -CO_DB(atten);
+      *(plugin_data->latency) = delay;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+       free(plugin_data->buffer);
+       free(plugin_data->chunks);
+    ]]></callback>
+
+    <port label="ingain" dir="input" type="control" hint="default_0">
+      <name>Input gain (dB)</name>
+      <p>Gain that is applied to the input stage. Can be used to trim gain to
+bring it roughly under the limit or to push the signal against the limit.</p>
+      <range min="-20" max="20"/>
+    </port>
+
+    <port label="limit" dir="input" type="control" hint="default_0">
+      <name>Limit (dB)</name>
+      <p>The maximum output amplitude. Peaks over this level will be attenuated
+as smoothly as possible to bring them as close as possible to this level.</p>
+      <range min="-20" max="0"/>
+    </port>
+
+    <port label="release" dir="input" type="control" hint="default_low">
+      <name>Release time (s)</name>
+      <p>The time taken for the limiters attenuation to return to 0 dB's</p>
+      <range min="0.01" max="2.0"/>
+    </port>
+
+    <port label="attenuation" dir="output" type="control">
+      <name>Attenuation (dB)</name>
+      <p>The current attenuation of the signal coming out of the delay buffer.</p>
+      <range min="0" max="70"/>
+    </port>
+
+    <port label="in_1" dir="input" type="audio">
+      <name>Input 1</name>
+    </port>
+
+    <port label="in_2" dir="input" type="audio">
+      <name>Input 2</name>
+    </port>
+
+    <port label="out_1" dir="output" type="audio">
+      <name>Output 1</name>
+    </port>
+
+    <port label="out_2" dir="output" type="audio">
+      <name>Output 2</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_len" type="unsigned int" />
+    <instance-data label="buffer_pos" type="unsigned int" />
+    <instance-data label="fs" type="unsigned int" />
+    <instance-data label="atten" type="float" />
+    <instance-data label="atten_lp" type="float" />
+    <instance-data label="peak" type="float" />
+    <instance-data label="delta" type="float" />
+    <instance-data label="delay" type="unsigned int" />
+    <instance-data label="chunk_num" type="unsigned int" />
+    <instance-data label="chunk_pos" type="unsigned int" />
+    <instance-data label="chunk_size" type="unsigned int" />
+    <instance-data label="chunks" type="float *" />
+  </plugin>
+</ladspa>

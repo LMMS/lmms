@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#include "stdio.h"
+		</code>
+	</global>
+
+	<plugin label="debug" id="1184" class="UtilityPlugin">
+		<name>Debug Plugin</name>
+		<p>Prints some stats about the input stream to stdout. Not intended for general use.</p>
+
+		<callback event="instantiate">
+			printf("sample rate %ld\n", s_rate);
+		</callback>
+
+		<callback event="run">
+			static LADSPA_Data max, min, maxl, minl;
+			unsigned long pos;
+
+			if (reset) {
+				max = 0;
+				min = 0;
+				maxl = 0;
+				minl = 1;
+			}
+
+			for (pos = 0; pos &lt; sample_count; pos++) {
+				if (allvals) {
+					printf("%f\n", input[pos]);
+				}
+				max = fabs(input[pos]) &gt; max?fabs(input[pos]):max;
+				min = fabs(input[pos]) &lt; min?fabs(input[pos]):min;
+				maxl = input[pos] &gt; maxl?input[pos]:maxl;
+				minl = input[pos] &lt; minl?input[pos]:minl;
+				buffer_write(output[pos], input[pos]);
+			}
+			printf("amplitude (%f, %f)\t", min, max);
+			printf("level (%f, %f)\n", minl, maxl);
+		</callback>
+
+		<port label="allvals" dir="input" type="control">
+			<name>Diplay all values?</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="reset" dir="input" type="control">
+			<name>Reset counters?</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+	</plugin>
+</ladspa>

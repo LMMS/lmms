@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Andy Wingo &lt;wingo at pobox dot com&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+
+      #define LOG001 -6.9077552789f
+    ]]></code>
+  </global>
+
+  <!-- ******   IMPULSE-FC   ****** -->
+
+  <plugin label="impulse_fc" id="1885" class="UtilityPlugin">
+    <name>Nonbandlimited single-sample impulses (Frequency: Control)</name>
+    <p>Based on work by James McCartney in SuperCollider.</p>
+    
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+      phase = 0.f;
+    ]]></callback>
+    
+    <callback event="activate"><![CDATA[
+      phase = 0.f;
+    ]]></callback>
+    
+    <callback event="run"><![CDATA[
+      int i;
+      float phase_step = frequency / sample_rate;
+
+      for (i=0; i<sample_count; i++) {
+        if (phase > 1.f) {
+          phase -= 1.f;
+          buffer_write(out[i], 1.f);
+        } else {
+          buffer_write(out[i], 0.f);
+        }
+        phase += phase_step;
+      }
+
+      plugin_data->phase = phase;
+    ]]></callback>
+
+    <port label="frequency" dir="input" type="control" hint="default_1">
+      <name>Frequency (Hz)</name>
+      <range min="0"/>
+      <p>
+       Frequency for the impulses.
+      </p>
+    </port>
+
+    <port label="out" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="sample_rate" type="LADSPA_Data" />
+    <instance-data label="phase" type="float" />
+  </plugin>
+</ladspa>

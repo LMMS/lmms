@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <code><![CDATA[
+#include "ladspa-util.h"
+
+#define MAX_BSIZE 1000
+
+inline int partition(LADSPA_Data array[], int left, int right);
+
+void q_sort(LADSPA_Data array[], int left, int right) {
+	float pivot = partition(array, left, right);
+
+	if (left < pivot) {
+		q_sort(array, left, pivot-1);
+	}
+	if (right > pivot) {
+		q_sort(array, pivot+1, right);
+	}
+}
+
+inline int partition(LADSPA_Data array[], int left, int right) {
+	float pivot = array[left];
+
+	while (left < right) {
+		while (array[right] >= pivot && left < right) {
+			right--;
+		}
+		if (left != right) {
+			array[left] = array[right];
+			left++;
+		}
+		while (array[left] <= pivot && left < right) {
+			left++;
+		}
+		if (left != right) {
+			array[right] = array[left];
+			right--;
+		}
+	}
+	array[left] = pivot;
+
+	return left;
+}
+    ]]></code>
+  </global>
+
+  <plugin label="sifter" id="1210" class="TimePlugin,DistortionPlugin">
+    <name>Signal sifter</name>
+    <p>Sorts and mixes blocks of the input signal to give a "bumpy ramp" effect.</p>
+    <p>Certain types of input will produce silence on the output (mostly ones with only low frequency components).</p>
+    <p>This is a very odd effect, and doesn't really have any music applications, but can produce some interesting noises.</p>
+
+    <callback event="instantiate"><![CDATA[
+      long i;
+      float scla = (float)MAX_BSIZE * 0.5f;
+      float sclb = (float)MAX_BSIZE;
+
+      b1 = (LADSPA_Data *)calloc(MAX_BSIZE, sizeof(LADSPA_Data));
+      b2 = (LADSPA_Data *)calloc(MAX_BSIZE, sizeof(LADSPA_Data));
+      ob = (LADSPA_Data *)calloc(MAX_BSIZE, sizeof(LADSPA_Data));
+      rc = (LADSPA_Data *)calloc(MAX_BSIZE, sizeof(LADSPA_Data));
+
+      // Calculate raised cosine table, to build windowing function from
+      rc[0] = cos(((0.0f - scla) / sclb) * M_PI);
+      rc[0] *= rc[0];
+      for (i=1; i<MAX_BSIZE / 2; i++) {
+        rc[i] = cos((((float)i - scla) / sclb) * M_PI);
+        rc[i] *= rc[i];
+        rc[MAX_BSIZE - i] = rc[i];
+      }
+      rc[MAX_BSIZE / 2] = 1.0f;
+
+      b1ptr = 0;
+      b2ptr = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      b1ptr = 0;
+      b2ptr = 0;
+      memset(b1, 0, MAX_BSIZE * sizeof(LADSPA_Data));
+      memset(b2, 0, MAX_BSIZE * sizeof(LADSPA_Data));
+      memset(ob, 0, MAX_BSIZE * sizeof(LADSPA_Data));
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->b1);
+      free(plugin_data->b2);
+      free(plugin_data->ob);
+      free(plugin_data->rc);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos, i;
+long bsize = f_round(LIMIT(size, 1, MAX_BSIZE));
+
+for (pos = 0; pos < sample_count; pos++) {
+	if (b1ptr >= bsize) {
+		float wstep = (float)MAX_BSIZE / (float)b1ptr, wpos = 0.0f;
+
+		q_sort(b1, 0, b1ptr);
+		for (i=0; i<b1ptr; i++) {
+			ob[i] += b1[i] * rc[f_round(wpos)];
+			wpos += wstep;
+		}
+		b1ptr = 0;
+		b2ptr = (bsize+1) / 2;
+	}
+
+	if (b2ptr >= bsize) {
+		float wstep = (float)MAX_BSIZE / (float)b2ptr, wpos = 0.0f;
+		int offset = (b2ptr+1)/2;
+
+		q_sort(b2, 0, b2ptr);
+		for (i=0; i<offset; i++) {
+			ob[i + offset] += b2[i] * rc[f_round(wpos)];
+			wpos += wstep;
+		}
+		for (; i<b2ptr; i++) {
+			ob[i - offset] += b2[i] * rc[f_round(wpos)];
+			wpos += wstep;
+		}
+		b2ptr = 0;
+	}
+
+	if (bsize < 2) {
+		ob[b1ptr] = input[pos];
+	}
+
+	b1[b1ptr] = input[pos];
+	b2[b2ptr] = input[pos];
+	buffer_write(output[pos], ob[b1ptr]);
+	ob[b1ptr] = 0.0f;
+	b1ptr++;
+	b2ptr++;
+}
+
+plugin_data->b1ptr = b1ptr;
+plugin_data->b2ptr = b2ptr;
+    ]]></callback>
+
+    <port label="size" dir="input" type="control" hint="default_1">
+      <name>Sift size</name>
+      <range min="1" max="MAX_BSIZE"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="b1ptr" type="long"/>
+    <instance-data label="b2ptr" type="long"/>
+    <instance-data label="b1" type="LADSPA_Data *"/>
+    <instance-data label="b2" type="LADSPA_Data *"/>
+    <instance-data label="ob" type="LADSPA_Data *"/>
+    <instance-data label="rc" type="LADSPA_Data *"/>
+
+  </plugin>
+</ladspa>

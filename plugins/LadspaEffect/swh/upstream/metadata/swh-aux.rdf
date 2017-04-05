@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<!DOCTYPE rdf:RDF [
+        <!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+	<!ENTITY ladspa 'http://ladspa.org/ontology#'>
+        <!ENTITY rdfs 'http://www.w3.org/2000/01/rdf-schema#'>
+]>
+<rdf:RDF xmlns:rdf="&rdf;"
+         xmlns:ladspa="&ladspa;"
+         xmlns:rdfs="&rdfs;">
+
+  <rdfs:Class rdf:about="&ladspa;SpectralPlugin" ladspa:hasLabel="Spectral">
+    <rdfs:subClassOf rdf:resource="&ladspa;Plugin" />
+  </rdfs:Class>
+
+  <rdfs:Class rdf:about="&ladspa;NotchPlugin" ladspa:hasLabel="Notch">
+    <rdfs:subClassOf rdf:resource="&ladspa;FilterPlugin" />
+  </rdfs:Class>
+
+</rdf:RDF>

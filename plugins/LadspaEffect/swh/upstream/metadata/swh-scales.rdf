@@ -1,0 +1,263 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE rdf:RDF [
+        <!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+        <!ENTITY rdfs 'http://www.w3.org/2000/01/rdf-schema#'>
+        <!ENTITY dc 'http://purl.org/dc/elements/1.1/'>
+        <!ENTITY ladspa 'http://ladspa.org/ontology#'>
+]>
+<rdf:RDF xmlns:rdf="&rdf;"
+         xmlns:rdfs="&rdfs;"
+         xmlns:dc="&dc;"
+         xmlns:ladspa="&ladspa;">
+
+<ladspa:InputControlPort rdf:about="&ladspa;1416.0">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="sine" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="triangle" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="square" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="saw" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1432.1">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="up" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1185.0">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="none" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="half wave" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="full wave" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1415.0">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="sine" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="triangle" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="square" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="saw" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1410.7">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="gate" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="bypass" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1921.8">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="gate" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="bypass" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1922.8">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="gate" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="bypass" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1200.1">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="sine" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="triangle" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="saw" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="square" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="S&amp;H" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1200.3">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="sine" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="triangle" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="saw" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="square" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="S&amp;H" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1200.5">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="sine" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="triangle" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="saw" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="square" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="S&amp;H" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1200.7">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="sine" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="triangle" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="saw" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="square" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="S&amp;H" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1908.0">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="LP" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="BP" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="HP" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1188.0">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="none" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="AM" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="RM" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1189.0">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="none" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="AM" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="RM" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+<ladspa:InputControlPort rdf:about="&ladspa;1214.2">
+  <ladspa:hasScale>
+    <ladspa:Scale>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="0" ladspa:hasLabel="none" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="1" ladspa:hasLabel="LP" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="2" ladspa:hasLabel="HP" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="3" ladspa:hasLabel="BP" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="4" ladspa:hasLabel="BR" />
+      </ladspa:hasPoint>
+      <ladspa:hasPoint>
+        <ladspa:Point rdf:value="5" ladspa:hasLabel="AP" />
+      </ladspa:hasPoint>
+    </ladspa:Scale>
+  </ladspa:hasScale>
+</ladspa:InputControlPort>
+
+</rdf:RDF>

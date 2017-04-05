@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#define MAX_AMP 1.0f
+			#define CLIP 0.8f
+			#define CLIP_A ((MAX_AMP - CLIP) * (MAX_AMP - CLIP))
+			#define CLIP_B (MAX_AMP - 2.0f * CLIP)
+		</code>
+	</global>
+
+	<plugin label="declip" id="1195" class="WaveshaperPlugin">
+		<name>Declipper</name>
+		<p>Removes nasty clicks from input signals, not very kind to them though.</p>
+		<p>This code came from the music-dsp mailing list, but it was unattributed, if it's yours, please drop me a line and I'll credit you.</p>
+
+		<callback event="run"><![CDATA[
+			unsigned long pos;
+
+			for (pos = 0; pos < sample_count; pos++) {
+				const LADSPA_Data in = input[pos];
+
+				if((in < CLIP) && (in > -CLIP)) {
+					buffer_write(output[pos], in);
+				} else if (in > 0.0f) {
+					buffer_write(output[pos], MAX_AMP - (CLIP_A / (CLIP_B + in)));
+				} else {
+					buffer_write(output[pos], -(MAX_AMP - (CLIP_A / (CLIP_B - in))));
+				}
+			}
+		]]></callback>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+			<range min="-1" max="+1"/>
+		</port>
+	</plugin>
+</ladspa>

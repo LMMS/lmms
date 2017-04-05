@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="xfade" id="1915" class="MixerPlugin">
+    <name>Crossfade</name>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float coefB = (xfade + 1.0f) * 0.5f;
+      const float coefA = 1.0f - coefB;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer_write(outputL[pos], inputLA[pos] * coefA + inputLB[pos] * coefB);
+        buffer_write(outputR[pos], inputRA[pos] * coefA + inputRB[pos] * coefB);
+      }
+    ]]></callback>
+
+    <port label="xfade" dir="input" type="control" hint="default_0">
+      <name>Crossfade</name>
+      <p>Controls the degree to which the inputs are mixed into the output. A
+value of -1 means that the output is just the A input, and a value of 1.0
+means that it is just the B input.</p>
+      <range min="-1" max="1"/>
+    </port>
+
+    <port label="inputLA" dir="input" type="audio">
+      <name>Input A left</name>
+    </port>
+    <port label="inputRA" dir="input" type="audio">
+      <name>Input A right</name>
+    </port>
+
+    <port label="inputLB" dir="input" type="audio">
+      <name>Input B left</name>
+    </port>
+    <port label="inputRB" dir="input" type="audio">
+      <name>Input B right</name>
+    </port>
+
+    <port label="outputL" dir="output" type="audio">
+      <name>Output left</name>
+    </port>
+    <port label="outputR" dir="output" type="audio">
+      <name>Output right</name>
+    </port>
+  </plugin>
+
+  <plugin label="xfade4" id="1917" class="MixerPlugin">
+    <name>Crossfade (4 outs)</name>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float coefB = (xfade + 1.0f) * 0.5f;
+      const float coefA = 1.0f - coefB;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer_write(outputLA[pos], inputLA[pos] * coefA);
+        buffer_write(outputRA[pos], inputRA[pos] * coefA);
+        buffer_write(outputLB[pos], inputLB[pos] * coefB);
+        buffer_write(outputRB[pos], inputRB[pos] * coefB);
+      }
+    ]]></callback>
+
+    <port label="xfade" dir="input" type="control" hint="default_0">
+      <name>Crossfade</name>
+      <p>Controls the degree to which the inputs are mixed into the output. A
+value of -1 means that the output is just the A input, and a value of 1.0
+means that it is just the B input.</p>
+      <range min="-1" max="1"/>
+    </port>
+
+    <port label="inputLA" dir="input" type="audio">
+      <name>Input A left</name>
+    </port>
+    <port label="inputRA" dir="input" type="audio">
+      <name>Input A right</name>
+    </port>
+
+    <port label="inputLB" dir="input" type="audio">
+      <name>Input B left</name>
+    </port>
+    <port label="inputRB" dir="input" type="audio">
+      <name>Input B right</name>
+    </port>
+
+    <port label="outputLA" dir="output" type="audio">
+      <name>Output A left</name>
+    </port>
+    <port label="outputRA" dir="output" type="audio">
+      <name>Output A right</name>
+    </port>
+
+    <port label="outputLB" dir="output" type="audio">
+      <name>Output B left</name>
+    </port>
+    <port label="outputRB" dir="output" type="audio">
+      <name>Output B right</name>
+    </port>
+  </plugin>
+</ladspa>

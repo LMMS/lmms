@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="freqTracker" id="1418" class="FrequencyMeterPlugin">
+    <name>Frequency tracker</name>
+
+    <callback event="instantiate"><![CDATA[
+      fs = s_rate;
+      f = 0.0f;
+      fo = 0.0f;
+      cross_time = 0;
+      last_amp = 0.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      cross_time = 0;
+      f = 0.0f;
+      fo = 0.0f;
+      last_amp = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float xm1 = last_amp;
+      const float damp_lp = (1.0f - speed) * 0.9f;
+      const float damp_lpi = 1.0f - damp_lp;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	if (input[pos] < 0.0f && xm1 > 0.0f) {
+	  if (cross_time > 3.0f) {
+	    f = fs / ((float)cross_time * 2.0f);
+	  }
+	  cross_time = 0;
+	}
+	xm1 = input[pos];
+	cross_time++;
+	fo = fo * damp_lp + f * damp_lpi;
+	fo = flush_to_zero(fo);
+	buffer_write(freq[pos], fo);
+      }
+
+      plugin_data->last_amp = xm1;
+      plugin_data->fo = fo;
+      plugin_data->f = f;
+      plugin_data->cross_time = cross_time;
+    ]]></callback>
+
+    <port label="speed" dir="input" type="control" hint="default_middle">
+      <name>Tracking speed</name>
+      <p>This controls the level of damping applied to the output.</p>
+      <p>High values will make the frequency output jump around, low values will make it a bit slow to respond.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="freq" dir="output" type="audio">
+      <name>Frequency (Hz)</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+    <instance-data label="cross_time" type="int" />
+    <instance-data label="last_amp" type="LADSPA_Data" />
+    <instance-data label="f" type="LADSPA_Data" />
+    <instance-data label="fo" type="LADSPA_Data" />
+  </plugin>
+</ladspa>

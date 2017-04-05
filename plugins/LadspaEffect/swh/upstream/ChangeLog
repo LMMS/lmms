@@ -1,0 +1,257 @@
+2006-08-08  Steve Harris  <steve@plugin.org.uk>
+
+	* svf filter: possibly fixed denormal problems
+
+2006-08-08  Steve Harris  <steve@plugin.org.uk>
+
+	* fast lookadead limiter: Patch from Sampo to fix pumping problem
+	* iir.h: Tim Blechmann to fix denormal problems
+
+2005-09-23  Steve Harris  <steve@plugin.org.uk>
+
+	* configure.in: Added patch from Anand Kumria to fix build options on
+	  x86_64 and popwerpc64
+
+2005-04-29  Steve Harris  <steve@plugin.org.uk>
+
+	* crossover_dist_1404.xml: Added patch from Tim Blechmann that fixes
+	  NaN problems.
+
+2005-02-10  Steve Harris  <steve@plugin.org.uk>
+
+	* fad_delay_1192.xml, tape_delay_1211.xml: Minor improvement to sound
+	  quality
+
+2005-02-10  Steve Harris  <steve@plugin.org.uk>
+
+	* fast_lookahead_limiter_1913.xml, sc4_1882.xmli, sc4m_1916.xml:
+	  fixed denormal bugs that were causing problems in JAMin on P4's
+
+2004-12-22  Steve Harris  <steve@plugin.org.uk>
+
+	* mbeq_1197.xml: fixed buffer overrun bug reported by Sergei Steshenko
+
+2004-12-17  Steve Harris  <steve@plugin.org.uk>
+
+	* mbeq_1197.xml: removed some stale testing code
+
+2004-12-12  Steve Harris  <steve@plugin.org.uk>
+
+	* util/rms.h: Fixed rouding error buildup in RMS code, as reported and
+	  patched by Dan Mills and Joel White.
+
+2004-10-25  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (SUBDIRS): Add m4.
+	(SUBDIRS): Remove intl.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): Add config.rpath.
+	* configure.in (AC_OUTPUT): Add m4/Makefile.
+
+2004-10-24  Steve Harris  <steve@plugin.org.uk>
+
+	* Makefile.am: Changed build system to use libtool to build the
+	  libraries.
+
+>>>>>>> 1.33
+2004-10-21  Steve Harris  <steve@plugin.org.uk>
+
+	* mbeq_1197.xml: Fixed use a static variable with state between plugins.
+	  Caused last mbeq plugin created to hold pointers to the in/out
+	  buffers of the previous one, making them silent.
+
+2004-10-18  Steve Harris  <steve@plugin.org.uk>
+
+	* flanger_1191.xml: Add clipper to improve stabililty as suggested by
+	  Tim Blechmann. Add trap for the case where NaN's work thier way into
+	  the delay buffer.
+
+2004-09-13  Steve Harris  <steve@plugin.org.uk>
+
+	* revdelay_1605.xml: Fixed denormal problem, patch from Tim Blechmann
+
+2004-08-03  Steve Harris  <steve@plugin.org.uk>
+
+	* latency_1914.xml: Added new plugin. Doesnt do anything, just reports
+	  whatever latency you tell it do via. the standard control out port.
+          Requested by Jesse on IRC
+
+2004-07-17  Steve Harris  <steve@plugin.org.uk>
+
+	* surround_encoder_1401.xml: Patch from Prakash K. Cheemplavam to
+	  improve the effect.
+
+2004-07-17  Steve Harris  <steve@plugin.org.uk>
+
+	* fast_lookahead_limiter_1913.xml: New lookahead limiter, this one
+	  actually works.
+	* lookahead_limiter*.xml: Removed, were broken beyond repair.
+
+2004-06-23  Steve Harris  <steve@plugin.org.uk>
+
+	* flanger_1191.xml: fix for denormal problem (Tim Blechmann)
+	* ladspa-util.h: make denomal test fuzzier (Tim Blechmann)
+
+2004-04-01  Steve Harris  <steve@plugin.org.uk>
+
+	* ladspa-util.h: fixed pointer alising problems
+
+2004-02-24  Steve Harris  <steve@plugin.org.uk>
+
+	* vynil: removed a C99 style declaration - should build on older gcc's
+		 now
+
+2001-02-19  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed some typos (thanks to Frank Neumann)
+
+2001-02-12  Steve Harris  <steve@plugin.org.uk>
+
+* Added a tape multitap delay (not finished yet)
+
+2001-02-11  Steve Harris  <steve@plugin.org.uk>
+
+* Added a sifter (block sorter)
+
+2001-02-11  Steve Harris  <steve@plugin.org.uk>
+
+* Finished the retro flanger
+
+2001-04-14  Steve Harris  <steve@plugin.org.uk>
+
+* Added a multiplexer
+
+2001-06-10  Steve Harris  <steve@plugin.org.uk>
+
+* Added a foldover distorion, svf and gsm plugin.
+
+2001-06-13  Steve Harris  <steve@plugin.org.uk>
+
+* Speeling mistokes fixed (thanks to Frank Neumann)
+* fixed scale in GSM plugin
+
+2001-07-23  Steve Harris  <steve@plugin.org.uk>
+
+* Added gverb plugin and phasers
+* fixed some misc bugs
+* fixed autoconf cpu detection
+* added autoconf support for no FFT libs
+
+2001-10-18  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed float exception in LFO Phaser
+* Fixed int pivot bug in sifter.
+
+2003-01-08  Steve Harris  <steve@plugin.org.uk>
+
+* Realised I haven't updated this for over a year
+
+2003-01-09  Steve Harris  <steve@plugin.org.uk>
+
+* Bugfixes to GSM sim (Pascal Haakmat)
+* Bugfixes to FM osc (Pascal Haakmat)
+* Bugfixes to audio divider (Nathaniel Virgo)
+* Added another compressor, SC4, stereo, but no sidechain
+* Added lookahead brickwall limiter
+* Added L/C/R delay (requested by Marek Peteraj)
+* Added Giant flanger (kind of requested by Patrick Shirkey)
+* Added DJ Flanger (actually requested by Patrick Shirkey)
+* Should now compile on FreeBSD
+* Fixed syntax error in RDF metadata
+
+2003-01-10  Steve Harris  <steve@plugin.org.uk>
+
+* SC4 had wrong label
+* Fixed UID clash
+* Made autoconf keep old CFLAGS
+
+2003-01-10  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed UID clash
+
+2003-02-23  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed memory leak in gate
+* Fixed filter implementation in gate
+* Fixed key defaults in gate
+* Made passes=0 work in GSM
+* Added bandlimiting filter to GSM (less cruchy sounds)
+
+2003-02-24  Steve Harris  <steve@plugin.org.uk>
+
+* Removed stale code from surround encoder
+* Fixed memory leak in surround encoder
+
+2003-02-24  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed maths error in multiplexer
+* Fixed buffer overrun in sifter
+* Efficiency improvements to FAD delay
+* Fixed infinite loop in FAD delay.
+* Fixed (another) buffer overrun in FM oscillator
+* Performance improvement for FM oscillator
+* Fixed buffer overrun in multiband EQ
+* Fixed aliasing in Hermes
+
+* Fixed memory leaks in:
+	AM pitchshift
+	Analogue osc
+	Bode sifters
+	Comb
+	Comb splitter
+	Delayorama
+	Dyson compressor
+	FM oscilator
+	Giant flange
+	Gong
+	GVerb
+	Hermes filter
+	L/C/R delay
+	Multiband EQ
+	Plate reverb
+	Rate shifter
+	Retro flanger
+	Satan maximiser
+	SC*
+	Sifter
+	Single band parametric
+	Multiplexer
+	Tape delay
+
+	There are still known leaks in imp and the multiband EQ
+
+2003-03-04  Steve Harris  <steve@plugin.org.uk>
+
+* Made blo use SHM where available, to share table data
+
+2003-03-08  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed scaling offset in multiband EQ
+
+2003-05-10  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed error in peak calculation in peak limiter
+
+2003-05-18  Alexander Ehlert  <mag@glame.de>
+
+* Added highpass, lowpass, bandpass and notch IIR filters from Glame
+
+2003-06-01  Steve Harris  <steve@plugin.org.uk>
+
+* Fixed flanger (it was totaly b0rken)
+* Improved sound quality of retro flanger
+* Applied gcc 3.3 fixing patch from Anand Kumria
+* Tweaked LADSPA settings for Alexander Ehlert's IIRs 
+
+2003-11-10  Jesse Chappell  <jesse@essej.net>
+
+* Added reverse delay plugin
+
+2003-12-01  Steve Harris  <steve@plugin.org.uk>
+
+* Added LP and HP filters to the biquads
+* Added vinyl simualtor
+
+2003-12-03  Steve Harris  <steve@plugin.org.uk>
+
+* Added fixed latency limiter

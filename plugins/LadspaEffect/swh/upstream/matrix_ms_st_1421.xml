@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="matrixMSSt" id="1421" class="UtilityPlugin">
+    <name>Matrix: MS to Stereo</name>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer_write(left[pos], mid[pos] + side[pos] * width);
+        buffer_write(right[pos], mid[pos] - side[pos] * width);
+      }
+    ]]></callback>
+
+    <port label="width" dir="input" type="control" hint="default_1">
+      <name>Width</name>
+      <p>The width of the dematrixed stereo field. 1 will give you normal width, 0 will make it completely mono, &lt; 1 will make it narrower and &gt; 1 will make it wider.</p>
+      <range min="0" max="2" />
+    </port>
+
+    <port label="mid" dir="input" type="audio">
+      <name>Mid</name>
+    </port>
+    <port label="side" dir="input" type="audio">
+      <name>Side</name>
+    </port>
+
+    <port label="left" dir="output" type="audio">
+      <name>Left</name>
+    </port>
+    <port label="right" dir="output" type="audio">
+      <name>Right</name>
+    </port>
+  </plugin>
+</ladspa>

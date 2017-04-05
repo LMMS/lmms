@@ -1,0 +1,3 @@
+Fix denormal issue in LFO phaser (Sampo Savolainen <v2@iki.fi>)
+Synced sine osc (requested by Esben Stien)
+Gain in MBEQ is wrong (10dB down or so).

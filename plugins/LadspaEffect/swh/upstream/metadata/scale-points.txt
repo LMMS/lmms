@@ -1,0 +1,86 @@
+1416.0
+	1	sine
+	2	triangle
+	3	square
+	4	saw
+
+1432.1
+	-1	down
+	1	up
+
+1185.0
+	0	none
+	1	half wave
+	2	full wave
+
+1415.0
+	1	sine
+	2	triangle
+	3	square
+	4	saw
+
+1410.7
+	-1	key listen
+	 0	gate
+	 1	bypass
+
+1921.8
+	-1	key listen
+	 0	gate
+	 1	bypass
+
+1922.8
+	-1	key listen
+	 0	gate
+	 1	bypass
+
+1200.1
+	0 	 sine
+	1 	 triangle
+	2 	 saw
+	3 	 square
+	4 	 S&amp;H
+
+1200.3
+	0 	 sine
+	1 	 triangle
+	2 	 saw
+	3 	 square
+	4 	 S&amp;H
+
+1200.5
+	0 	 sine
+	1 	 triangle
+	2 	 saw
+	3 	 square
+	4 	 S&amp;H
+
+1200.7
+	0 	 sine
+	1 	 triangle
+	2 	 saw
+	3 	 square
+	4 	 S&amp;H
+
+1908.0
+	0	LP
+	1	BP
+	2	HP
+
+1188.0
+	0	none
+	1	AM
+	2	RM
+
+1189.0
+	0	none
+	1	AM
+	2	RM
+
+1214.2
+	0	none
+	1	LP
+	2	HP
+	3	BP
+	4	BR
+	5	AP

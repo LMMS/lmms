@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="gongBeater" id="1439" class="GeneratorPlugin">
+    <name>Gong beater</name>
+    <p>A plugin to simulator the action of a beater on a gong surface, used to trigger the gong physical model.</p>
+    <p>It is triggered by an impulse on the input, eg. from a mic or piezo placed near a solid surface, for an event sequencer.</p>
+
+    <callback event="instantiate"><![CDATA[
+      running = 0;
+      x = 0.5f;
+      y = 0.0f;
+      xm = 0.5f;
+      ym = 0.0f;
+      fs = (float)s_rate;
+      imp_level = 0.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      running = 0;
+      x = 0.5f;
+      y = 0.0f;
+      xm = 0.5f;
+      ym = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float imp_amp = DB_CO(imp_gain);
+      const float strike_amp = DB_CO(strike_gain);
+      const float omega = 6.2831852f / (strike_duration * fs);
+
+      pos = 0;
+      while (pos < sample_count) {
+        for (; !running && pos < sample_count; pos++) {
+	  if (fabs(input[pos]) > 0.05f) {
+	    running = strike_duration * fs;
+	    imp_level = fabs(input[pos]);
+	  }
+          buffer_write(output[pos], input[pos] * imp_amp);
+        }
+        for (; running && pos < sample_count; pos++, running--) {
+	  if (fabs(input[pos]) > imp_level) {
+	    imp_level = fabs(input[pos]);
+	  }
+	  x -= omega * y;
+	  y += omega * x;
+	  xm -= omega * 0.5f * ym;
+	  ym += omega * 0.5f * xm;
+
+	  buffer_write(output[pos], input[pos] * imp_amp + y * strike_amp *
+			    imp_level * 4.0f * ym);
+	}
+      }
+
+      plugin_data->x = x;
+      plugin_data->y = y;
+      plugin_data->xm = xm;
+      plugin_data->ym = ym;
+      plugin_data->running = running;
+      plugin_data->imp_level = imp_level;
+    ]]></callback>
+
+    <port label="imp_gain" dir="input" type="control" hint="default_minimum">
+      <name>Impulse gain (dB)</name>
+      <p>The gain of the input impulse mixed into the output, bringing this up allows you to make the outputted strike more impulsive, but may reduce the gongyness of the resulting output sound.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="strike_gain" dir="input" type="control" hint="default_maximum">
+      <name>Strike gain (dB)</name>
+      <p>The gain of the simulated pressure wave mixed into the output, bringing this up allows you to make the outputted strike more pure. The final output level is also proportional to the amplitude of the trigger.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="strike_duration" dir="input" type="control" hint="default_middle">
+      <name>Strike duration (s)</name>
+      <p>The duration of the pressure wave used to simulate the action of the beater on the gong surface. The longer the duration the more sonorous the resulting gong sound.</p>
+      <range min="0.001" max="0.2"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="x" type="float" />
+    <instance-data label="y" type="float" />
+    <instance-data label="xm" type="float" />
+    <instance-data label="ym" type="float" />
+    <instance-data label="running" type="unsigned int" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="imp_level" type="float" />
+  </plugin>
+</ladspa>

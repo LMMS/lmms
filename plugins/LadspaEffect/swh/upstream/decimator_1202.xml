@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <code><![CDATA[
+      #include <math.h>
+      #include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="decimator" id="1202" class="DistortionPlugin">
+    <name>Decimator</name>
+    <p>Decimates (reduces the effective sample rate), and reduces the bit depth of the input signal, allows non integer values for smooth transitions between clean and lofi signals.</p>
+
+    <callback event="instantiate">
+sample_rate = s_rate;
+count = 0.0f;
+last_out = 0.0f;
+    </callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos;
+float step, stepr, delta, ratio;
+double dummy;
+
+if (bits >= 31.0f || bits < 1.0f) {
+	step = 0.0f;
+	stepr = 1.0f;
+} else {
+	step = pow(0.5f, bits - 0.999f);
+	stepr = 1/step;
+}
+
+if (fs >= sample_rate) {
+	ratio = 1.0f;
+} else {
+	ratio = fs/sample_rate;
+}
+
+for (pos = 0; pos < sample_count; pos++) {
+	count += ratio;
+
+	if (count >= 1.0f) {
+		count -= 1.0f;
+		delta = modf((input[pos] + (input[pos]<0?-1.0:1.0)*step*0.5) * stepr, &dummy) * step;
+		last_out = input[pos] - delta;
+		buffer_write(output[pos], last_out);
+	} else {
+		buffer_write(output[pos], last_out);
+	}
+}
+
+plugin_data->last_out = last_out;
+plugin_data->count = count;
+    ]]></callback>
+
+    <port label="bits" dir="input" type="control" hint="default_maximum">
+      <name>Bit depth</name>
+      <range min="1" max="24"/>
+      <p>The bit depth that the signal will be reduced to.</p>
+    </port>
+
+    <port label="fs" dir="input" type="control" hint="sample_rate,default_maximum">
+      <name>Sample rate (Hz)</name>
+      <range min="0.001" max="1"/>
+      <p>The sample rate that the signal will be resampled at.</p>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+      <range min="-1.0" max="+1.0"/>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+      <range min="-1.0" max="+1.0"/>
+    </port>
+
+    <instance-data label="sample_rate" type="long"/>
+    <instance-data label="count" type="float"/>
+    <instance-data label="last_out" type="LADSPA_Data"/>
+  </plugin>
+</ladspa>

@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include <limits.h>
+
+      #include "ladspa-util.h"
+      #include "util/biquad.h"
+
+      typedef union {
+	LADSPA_Data fp;
+	int         in;
+      } pcast;
+    ]]></code>
+  </global>
+
+  <plugin label="pointerCastDistortion" id="1910" class="DistortionPlugin">
+    <name>Pointer cast distortion</name>
+    <p>This distortion is created by treating the floating point representation
+of the input signal as a 0.32 1's complement fixedpoint integer. Its very
+unmusical but supprisingly recognisable. I'm not sure that its useful for
+anything, but it can make interesting noises.</p>
+
+    <callback event="instantiate"><![CDATA[
+      filt = malloc(sizeof(biquad));
+      fs = s_rate;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      biquad_init(filt);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float filt_scale = cutoff < 50.0f ? cutoff / 50.0f : 1.0f;
+
+      lp_set_params(filt, cutoff, 1.0f, fs);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	pcast val;
+	float sign, filt_val, dist_val;
+
+	filt_val = biquad_run(filt, input[pos]) * filt_scale;
+	sign = filt_val < 0.0f ? -1.0f : 1.0f;
+	val.fp = fabs(filt_val);
+	dist_val = sign * (LADSPA_Data)val.in / (LADSPA_Data)INT_MAX +
+		   (input[pos] - filt_val);
+        buffer_write(output[pos], LIN_INTERP(wet, input[pos], dist_val));
+      }
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->filt);
+    ]]></callback>
+
+    <port label="cutoff" dir="input" type="control" hint="logarithmic,sample_rate,default_low">
+      <name>Effect cutoff freq (Hz)</name>
+      <p>Controls the frequencies that will be passed to the effect.</p>
+      <range min="0.0001" max="0.3"/>
+    </port>
+
+    <port label="wet" dir="input" type="control" hint="default_0">
+      <name>Dry/wet mix</name>
+      <p>Controls the ammunt of distorting mixed into the output.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+    <instance-data label="filt" type="biquad *" />
+  </plugin>
+</ladspa>

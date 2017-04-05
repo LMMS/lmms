@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+	</global>
+
+	<plugin label="diode" id="1185" class="DistortionPlugin">
+		<name>Diode Processor</name>
+		<p>Mangles the signal as if it had been passed through a diode rectifier network.</p>
+		<p>You should probably follow this with a DC offset remover, unless you want the offset.</p>
+
+		<callback event="run"><![CDATA[
+unsigned long pos;
+
+if (mode >= 0.0f && mode < 1.0f) {
+	for (pos = 0; pos < sample_count; pos++) {
+		buffer_write(output[pos], ((1.0f-mode) * input[pos]) +
+		 (mode * (input[pos] > 0.0f ? input[pos] : 0.0f)));
+	}
+} else if (mode >= 1.0f && mode < 2.0f) {
+	float fac = mode - 1.0f;
+	for (pos = 0; pos < sample_count; pos++) {
+		buffer_write(output[pos], ((1.0f-fac) * (input[pos] > 0 ?
+		 input[pos] : 0.0)) + (fac * fabs(input[pos])));
+	}
+} else if (mode >= 2) {
+	float fac = mode < 3 ? mode - 2 : 1.0;
+	for (pos = 0; pos < sample_count; pos++) {
+		buffer_write(output[pos], (1.0-fac) * fabs(input[pos]));
+	}
+} else {
+	for (pos = 0; pos < sample_count; pos++) {
+		buffer_write(output[pos], input[pos]);
+	}
+}
+		]]></callback>
+
+		<port label="mode" dir="input" type="control" hint="default_0">
+			<name>Mode (0 for none, 1 for half wave, 2 for full wave)</name>
+			<p>The mode parameter is continuously variable from thru to half-wave rectification to full-wave to silence.</p>
+			<range min="0" max="3"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+	</plugin>
+</ladspa>

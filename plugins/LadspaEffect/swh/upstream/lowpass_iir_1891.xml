@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Alexander Ehlert &lt;mag@glame.de&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#include "config.h"
+			#include "util/iir.h"
+			#include "ladspa-util.h"
+                        
+		</code>
+	</global>
+
+	<plugin label="lowpass_iir" id="1891" class="LowpassPlugin">
+		<name>Glame Lowpass Filter</name>
+                <p> IIR lowpass filter based using chebishev coefficients. The filter allows you to tweak the number of stages used for
+                filtering. Every stage adds two more poles, which leads to a steeper dropoff. More stages need more CPU power. This
+                filter was ported from the glame multitrack editor to ladspa.
+                </p>
+
+                <callback event="instantiate">
+                  sample_rate = s_rate;
+                </callback>
+		<callback event="run">
+                  chebyshev(iirf, gt, 2*CLAMP((int)stages,1,10), IIR_STAGE_LOWPASS, cutoff/(float)sample_rate, 0.5f);
+                  iir_process_buffer_ns_5(iirf, gt, input, output, sample_count,RUN_ADDING);
+
+                  // Unused variable
+                  (void)(run_adding_gain);
+                </callback>
+
+                <callback event="activate">                  
+                  gt = init_iir_stage(IIR_STAGE_LOWPASS,10,3,2);
+                  iirf = init_iirf_t(gt);
+                  chebyshev(iirf, gt, 2*CLAMP(f_round(*(plugin_data->stages)),1,10), IIR_STAGE_LOWPASS, 
+                            *(plugin_data->cutoff)/(float)sample_rate, 0.5f);
+                </callback>
+
+                <callback event="cleanup">
+                  free_iirf_t(plugin_data->iirf, plugin_data->gt);
+                  free_iir_stage(plugin_data->gt);
+                </callback>
+
+                <port label="cutoff" dir="input" type="control" hint="default_high, sample_rate, logarithmic">
+			<name>Cutoff Frequency</name>
+ 			<range min="0.0001" max="0.45"/>
+		</port>
+                
+                <port label="stages" dir="input" type="control" hint="default_1, integer">
+			<name>Stages(2 poles per stage)</name>
+			<range min="1.0" max="10.0"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+            
+                <instance-data label="iirf" type="iirf_t*"/>
+                <instance-data label="gt" type="iir_stage_t*"/>  
+                <instance-data label="sample_rate" type="long"/>           
+
+	</plugin>
+</ladspa>

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "util/biquad.h"
+    </code>
+  </global>
+
+  <plugin label="singlePara" id="1203" class="ParaEQPlugin">
+    <name>Single band parametric</name>
+    <p>A single band of a parametric filter.</p>
+
+    <callback event="instantiate"><![CDATA[
+      fs = (float)s_rate;
+      filter = malloc(sizeof(biquad));
+      biquad_init(filter);
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      biquad_init(filter);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->filter);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      eq_set_params(filter, fc, gain, bw, fs);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	buffer_write(output[pos], biquad_run(filter, input[pos]));
+      }
+    ]]></callback>
+
+    <port label="gain" dir="input" type="control" hint="default_0">
+      <name>Gain (dB)</name>
+      <p>The attenuation/gain of the eq.</p>
+      <range min="-70" max="+30"/>
+    </port>
+
+    <port label="fc" dir="input" type="control" hint="sample_rate,default_440">
+      <name>Frequency (Hz)</name>
+      <p>The centre frequency (ie. point of most/least attenuation).</p>
+      <p>Beware of high values for Frequency and Bandwidth, if the high pitch (Frequency * 2$^{Bandwidth}$) goes over half the sample rate you will get aliasing.</p>
+      <p>Note: if your host offers you a frequency range between 0 and 0.4 then it's not rendering the input parameter correctly, the input frequency will actually be that number multiplied by the sample rate (e.g. 44.1kHz).</p>
+      <range min="0" max="0.4"/>
+    </port>
+
+    <port label="bw" dir="input" type="control" hint="default_1">
+      <name>Bandwidth (octaves)</name>
+      <p>The pitch difference from the centre before the attenuation has reached half the gain.</p>
+      <range min="0" max="4"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+      <range min="-1.0" max="+1.0"/>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+      <range min="-1.0" max="+1.0"/>
+    </port>
+
+    <instance-data label="fs" type="float"/>
+    <instance-data label="filter" type="biquad *"/>
+  </plugin>
+</ladspa>

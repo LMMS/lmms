@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <code><![CDATA[
+      #include <stdlib.h>
+      #include "ladspa-util.h"
+      #include "gsm/gsm.h"
+      #include "util/biquad.h"
+
+      #define SCALE 32768.0f
+      #define SCALE_R 0.0000305175f
+
+      int bits[] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+    ]]></code>
+  </global>
+
+  <plugin label="gsm" id="1215" class="DistortionPlugin">
+    <name>GSM simulator</name>
+    <p>Encodes and decodes a signal using the GSM voice compression system. Has the effect of making the signal sound like it is being sent over a European mobile phone network.</p>
+
+    <callback event="instantiate"><![CDATA[
+      count = 0;
+      resamp = s_rate / 8000;
+      fs = s_rate;
+      rsf = SCALE / (float)resamp;
+      src = malloc(sizeof(gsm_signal) * 160);
+      dst = malloc(sizeof(gsm_signal) * 163);
+      dry = malloc(sizeof(LADSPA_Data) * 160 * resamp);
+      handle = NULL;
+
+      blf = malloc(sizeof(biquad));
+      biquad_init(blf);
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      count = 0;
+      memset(src, 0, sizeof(gsm_signal) * 160);
+      memset(dst, 0, sizeof(gsm_signal) * 163);
+      memset(dry, 0, sizeof(LADSPA_Data) * 160 * resamp);
+      handle = gsm_create();
+      biquad_init(blf);
+      hs_set_params(blf, 3500.0f, -50.0f, 0.7f, fs);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->src);
+      free(plugin_data->dst);
+      free(plugin_data->dry);
+      free(plugin_data->blf);
+      if (plugin_data->handle) {
+        gsm_destroy(plugin_data->handle);
+      }
+    ]]></callback>
+
+    <callback event="run" unused-vars="fs"><![CDATA[
+      unsigned long pos;
+      gsm_frame frame;
+      int samp;
+      float part;
+      int error_rate = f_round(error);
+      int num_passes = f_round(passes);
+
+      for (pos = 0; pos < sample_count; pos++) {
+
+	// oversample into buffer down to aprox 8kHz, 13bit
+	src[count / resamp] += f_round(biquad_run(blf, input[pos]) * rsf);
+
+	// interpolate output, so it doesn't sound totaly awful
+	samp = count / resamp;
+	part = (float)count / (float)resamp - (float)samp;
+        buffer_write(output[pos], cube_interp(part, dst[samp], dst[samp+1], dst[samp+2], dst[samp+3]) * SCALE_R * drywet + dry[count] * (1.0f - drywet));
+
+	// Maintain delayed, dry buffer.
+	dry[count] = input[pos];
+
+	count++;
+
+	// If we have a full, downsampled buffer then run the encode +
+	// decode process.
+	if (count >= 160 * resamp) {
+		int i, j;
+		gsm_signal *in;
+
+		count = 0;
+		dst[0] = dst[160];
+		dst[1] = dst[161];
+		dst[2] = dst[162];
+
+		in = src;
+		for (j=0; j<num_passes; j++) {
+			gsm_encode(handle, in, frame);
+			for (i=0; i < error_rate; i++) {
+				frame[1 + (rand() % 32)] ^= bits[rand() % 8];
+			}
+			gsm_decode(handle, frame, dst+3);
+			in = dst+3;
+		}
+		if (num_passes == 0) {
+			for (j=0; j < 160; j++) {
+				dst[j + 3] = src[j];
+			}
+		}
+		memset(src, 0, sizeof(gsm_signal) * 160);
+	}
+      }
+
+      plugin_data->count = count;
+
+      *(plugin_data->latency) = 160 * resamp;
+    ]]></callback>
+
+    <port label="drywet" dir="input" type="control" hint="default_1">
+      <name>Dry/wet mix</name>
+      <range min="0" max="1"/>
+      <p>Controls the dry/wet mix, 0 will give you the dry signal (but with the appropriate amount of delay), 1 will give you a totally wet signal.</p>
+    </port>
+
+    <port label="passes" dir="input" type="control" hint="integer,default_1">
+      <name>Number of passes</name>
+      <range min="0" max="10"/>
+      <p>The number of times the signal is sent through the encode/decode process. Increases the CPU consumption almost linearly, and it will become more peaky so less friendly to realtime processing.</p>
+    </port>
+
+    <port label="error" dir="input" type="control" hint="default_0">
+      <name>Error rate (bits/block)</name>
+      <range min="0" max="30"/>
+      <p>The number of simulated bits that get changed during the transmission process.</p>
+      <p>I really wanted to reduce the bandwidth to get that "shouting down a drainpipe" effect, but I'm not sure how the reduced bandwidth is dealt with by real phones. I suspect it's heavily patented technology.</p>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="count" type="int" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="rsf" type="float" />
+    <instance-data label="resamp" type="int" />
+    <instance-data label="handle" type="gsm" />
+    <instance-data label="dry" type="LADSPA_Data *" />
+    <instance-data label="src" type="gsm_signal *" />
+    <instance-data label="dst" type="gsm_signal *" />
+    <instance-data label="blf" type="biquad *" />
+  </plugin>
+</ladspa>

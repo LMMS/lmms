@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+      #include "util/biquad.h"
+
+      #define BANDS 3
+
+      #define PEAK_BW	  0.3f /* Peak EQ bandwidth (octaves) */
+      #define SHELF_SLOPE 1.5f /* Shelf EQ slope (arb. units) */
+    </code>
+  </global>
+
+  <plugin label="dj_eq_mono" id="1907" class="EQPlugin">
+    <name>DJ EQ (mono)</name>
+    <p>The design for this plugin is taken from the Allen \&amp; Heath Xone 32
+DJ mixer. It was suggested by Patrick Shirkey. Mono version requested by Adam King</p>
+
+    <callback event="instantiate"><![CDATA[
+fs = s_rate;
+
+filters = calloc(BANDS, sizeof(biquad));
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+	biquad_init(&filters[0]);
+	eq_set_params(&filters[0], 100.0f, 0.0f, PEAK_BW, fs);
+	biquad_init(&filters[1]);
+	eq_set_params(&filters[1], 1000.0f, 0.0f, PEAK_BW, fs);
+	biquad_init(&filters[2]);
+	hs_set_params(&filters[2], 10000.0f, 0.0f, SHELF_SLOPE, fs);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float samp;
+
+      eq_set_params(&filters[0], 100.0f, lo, PEAK_BW, fs);
+      eq_set_params(&filters[1], 1000.0f, mid, PEAK_BW, fs);
+      hs_set_params(&filters[2], 10000.0f, hi, SHELF_SLOPE, fs);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	samp = biquad_run(&filters[0], input[pos]);
+        samp = biquad_run(&filters[1], samp);
+        samp = biquad_run(&filters[2], samp);
+        buffer_write(output[pos], samp);
+      }
+
+      *(plugin_data->latency) = 3; //XXX is this right?
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+       free(plugin_data->filters);
+    ]]></callback>
+
+    <port label="lo" dir="input" type="control" hint="default_0">
+      <name>Lo gain (dB)</name>
+      <p>Controls the gain of the low (100Hz) peak/dip band</p>
+      <range min="-70" max="+6"/>
+    </port>
+
+    <port label="mid" dir="input" type="control" hint="default_0">
+      <name>Mid gain (dB)</name>
+      <p>Controls the gain of the mid (1000Hz) peak/dip band</p>
+      <range min="-70" max="+6"/>
+    </port>
+
+    <port label="hi" dir="input" type="control" hint="default_0">
+      <name>Hi gain (dB)</name>
+      <p>Controls the gain of the high (10000Hz) shelf band</p>
+      <range min="-70" max="+6"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="fs" type="float"/>
+    <instance-data label="filters" type="biquad *"/>
+  </plugin>
+
+  <plugin label="dj_eq" id="1901" class="EQPlugin">
+    <name>DJ EQ</name>
+    <p>The design for this plugin is taken from the Allen \&amp; Heath Xone 32
+DJ mixer. It was suggested by Patrick Shirkey.</p>
+
+    <callback event="instantiate"><![CDATA[
+fs = s_rate;
+
+filters = calloc(BANDS * 2, sizeof(biquad));
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      int i;
+
+      for (i=0; i<2; i++) {
+	biquad_init(&filters[i*BANDS + 0]);
+	eq_set_params(&filters[i*BANDS + 0], 100.0f, 0.0f, PEAK_BW, fs);
+	biquad_init(&filters[i*BANDS + 1]);
+	eq_set_params(&filters[i*BANDS + 1], 1000.0f, 0.0f, PEAK_BW, fs);
+	biquad_init(&filters[i*BANDS + 2]);
+	hs_set_params(&filters[i*BANDS + 2], 10000.0f, 0.0f, SHELF_SLOPE, fs);
+      }
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      unsigned int i;
+      float samp;
+
+      for (i=0; i<2; i++) {
+        eq_set_params(&filters[i*BANDS + 0], 100.0f, lo, PEAK_BW, fs);
+        eq_set_params(&filters[i*BANDS + 1], 1000.0f, mid, PEAK_BW, fs);
+        hs_set_params(&filters[i*BANDS + 2], 10000.0f, hi, SHELF_SLOPE, fs);
+      }
+
+      for (pos = 0; pos < sample_count; pos++) {
+	samp = biquad_run(&filters[0], left_input[pos]);
+        samp = biquad_run(&filters[1], samp);
+        samp = biquad_run(&filters[2], samp);
+        buffer_write(left_output[pos], samp);
+
+	samp = biquad_run(&filters[3], right_input[pos]);
+        samp = biquad_run(&filters[4], samp);
+        samp = biquad_run(&filters[5], samp);
+        buffer_write(right_output[pos], samp);
+      }
+
+      *(plugin_data->latency) = 3; //XXX is this right?
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+       free(plugin_data->filters);
+    ]]></callback>
+
+    <port label="lo" dir="input" type="control" hint="default_0">
+      <name>Lo gain (dB)</name>
+      <p>Controls the gain of the low (100Hz) peak/dip band</p>
+      <range min="-70" max="+6"/>
+    </port>
+
+    <port label="mid" dir="input" type="control" hint="default_0">
+      <name>Mid gain (dB)</name>
+      <p>Controls the gain of the mid (1000Hz) peak/dip band</p>
+      <range min="-70" max="+6"/>
+    </port>
+
+    <port label="hi" dir="input" type="control" hint="default_0">
+      <name>Hi gain (dB)</name>
+      <p>Controls the gain of the high (10000Hz) shelf band</p>
+      <range min="-70" max="+6"/>
+    </port>
+
+    <port label="left_input" dir="input" type="audio">
+      <name>Input L</name>
+    </port>
+    <port label="right_input" dir="input" type="audio">
+      <name>Input R</name>
+    </port>
+
+    <port label="left_output" dir="output" type="audio">
+      <name>Output L</name>
+    </port>
+
+    <port label="right_output" dir="output" type="audio">
+      <name>Output R</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="fs" type="float"/>
+    <instance-data label="filters" type="biquad *"/>
+  </plugin>
+</ladspa>

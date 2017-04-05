@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "util/waveguide_nl.h"
+
+      #define LP_INNER 0.96f
+      #define LP_OUTER 0.983f
+
+      #define RUN_WG(n, junct_a, junct_b) waveguide_nl_process_lin(w[n], junct_a - out[n*2+1], junct_b - out[n*2], out+n*2, out+n*2+1)
+    </code>
+  </global>
+
+  <plugin label="plate" id="1423" class="ReverbPlugin">
+    <name>Plate reverb</name>
+    <p>A physical model of a steel plate reverb.</p>
+    <p>Based on Josep Comajuncosas' gong model, it uses 8 linear waveguides to model the plate.</p>
+
+    <callback event="instantiate"><![CDATA[
+      w = malloc(8 * sizeof(waveguide_nl *));
+      w[0] = waveguide_nl_new(2389, LP_INNER, 0.04f, 0.0f);
+      w[1] = waveguide_nl_new(4742, LP_INNER, 0.17f, 0.0f);
+      w[2] = waveguide_nl_new(4623, LP_INNER, 0.52f, 0.0f);
+      w[3] = waveguide_nl_new(2142, LP_INNER, 0.48f, 0.0f);
+      w[4] = waveguide_nl_new(5597, LP_OUTER, 0.32f, 0.0f);
+      w[5] = waveguide_nl_new(3692, LP_OUTER, 0.89f, 0.0f);
+      w[6] = waveguide_nl_new(5611, LP_OUTER, 0.28f, 0.0f);
+      w[7] = waveguide_nl_new(3703, LP_OUTER, 0.29f, 0.0f);
+
+      out = calloc(32, sizeof(float));
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      unsigned int i;
+
+      for (i = 0; i < 8; i++) {
+	waveguide_nl_reset(w[i]);
+      }
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float scale = powf(time * 0.117647f, 1.34f);
+      const float lpscale = 1.0f - damping * 0.93;
+
+      for (pos=0; pos<8; pos++) {
+	waveguide_nl_set_delay(w[pos], w[pos]->size * scale);
+      }
+      for (pos=0; pos<4; pos++) {
+	waveguide_nl_set_fc(w[pos], LP_INNER * lpscale);
+      }
+      for (; pos<8; pos++) {
+	waveguide_nl_set_fc(w[pos], LP_OUTER * lpscale);
+      }
+
+      for (pos = 0; pos < sample_count; pos++) {
+	const float alpha = (out[0] + out[2] + out[4] + out[6]) * 0.5f
+			    + input[pos];
+	const float beta = (out[1] + out[9] + out[14]) * 0.666666666f;
+	const float gamma = (out[3] + out[8] + out[11]) * 0.666666666f;
+	const float delta = (out[5] + out[10] + out[13]) * 0.666666666f;
+	const float epsilon = (out[7] + out[12] + out[15]) * 0.666666666f;
+
+	RUN_WG(0, beta, alpha);
+	RUN_WG(1, gamma, alpha);
+	RUN_WG(2, delta, alpha);
+	RUN_WG(3, epsilon, alpha);
+	RUN_WG(4, beta, gamma);
+	RUN_WG(5, gamma, delta);
+	RUN_WG(6, delta, epsilon);
+	RUN_WG(7, epsilon, beta);
+
+        buffer_write(outputl[pos], beta * wet + input[pos] * (1.0f - wet));
+        buffer_write(outputr[pos], gamma * wet + input[pos] * (1.0f - wet));
+      }
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      unsigned int i;
+
+      for (i = 0; i < 8; i++) {
+	waveguide_nl_free(plugin_data->w[i]);
+      }
+      free(plugin_data->w);
+      free(plugin_data->out);
+    ]]></callback>
+
+    <port label="time" dir="input" type="control" hint="default_middle">
+      <name>Reverb time</name>
+      <p>Controls the RT60 time of the reverb. Actually controls the size of the plate. The mapping between plate size and RT60 time is just a heuristic, so it's not very accurate.</p>
+      <range min="0.01" max="8.5"/>
+    </port>
+
+    <port label="damping" dir="input" type="control" hint="default_low">
+      <name>Damping</name>
+      <p>Controls the degree that the surface of the plate is damped.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="wet" dir="input" type="control" hint="default_low">
+      <name>Dry/wet mix</name>
+      <p>Controls the balance between the dry and wet signals.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="outputl" dir="output" type="audio">
+      <name>Left output</name>
+    </port>
+
+    <port label="outputr" dir="output" type="audio">
+      <name>Right output</name>
+    </port>
+
+    <instance-data label="w" type="waveguide_nl **" />
+    <instance-data label="out" type="float *" />
+  </plugin>
+</ladspa>

@@ -1,0 +1,517 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Andy Wingo &lt;wingo at pobox dot com&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+
+      #define MIN(a,b) ((a) < (b) ? (a) : (b))
+      #define CALC_DELAY(delaytime) \
+        (f_clamp (delaytime * sample_rate, 1.f, (float)(buffer_mask + 1)))
+
+      #define LOG001 -6.9077552789f
+
+      static inline float
+      calc_feedback (float delaytime, float decaytime)
+      {
+        if (delaytime == 0.f)
+          return 0.f;
+        else if (decaytime > 0.f)
+          return exp(LOG001 * delaytime / decaytime);
+	else if (decaytime < 0.f)
+          return -exp(LOG001 * delaytime / -decaytime);
+        else
+          return 0.f;
+      }
+    ]]></code>
+  </global>
+
+  <!-- ******   COMB-N   ****** -->
+
+  <plugin label="comb_n" id="1889" class="DelayPlugin">
+    <name>Comb delay line, noninterpolating</name>
+    <p>Based on work by James McCartney in SuperCollider.</p>
+    
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+
+      // Uninitialized variables
+      buffer_mask = 0;
+      delay_samples = 0;
+      feedback = 0;
+      last_decay_time = 0;
+      last_delay_time = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="activate"><![CDATA[
+      unsigned int minsize, size;
+   
+      if (plugin_data->max_delay && *plugin_data->max_delay > 0)
+        minsize = sample_rate * *plugin_data->max_delay;
+      else if (plugin_data->delay_time)
+        minsize = sample_rate * *plugin_data->delay_time;
+      else
+        minsize = sample_rate; /* 1 second default */
+    
+      size = 1;
+      while (size < minsize) size <<= 1;
+    
+      /* calloc sets the buffer to zero. */
+      buffer = calloc(size, sizeof(LADSPA_Data));
+      if (buffer)
+        buffer_mask = size - 1;
+      else
+        buffer_mask = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+    
+    <callback event="run"><![CDATA[
+      int i;
+
+      i = max_delay; /* stop gcc complaining */
+
+      if (write_phase == 0) {
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->delay_samples = delay_samples = CALC_DELAY (delay_time);
+        plugin_data->feedback = feedback = calc_feedback (delay_time, decay_time);
+      }
+      
+      if (delay_time == last_delay_time) {
+        long read_phase = write_phase - (long)delay_samples;
+        LADSPA_Data *readptr = buffer + (read_phase & buffer_mask);
+        LADSPA_Data *writeptr = buffer + (write_phase & buffer_mask);
+        LADSPA_Data *lastptr = buffer + buffer_mask + 1;
+
+        if (decay_time == last_decay_time) {
+          long remain = sample_count;
+
+          while (remain) {
+            long read_space = lastptr - readptr;
+            long write_space = lastptr - writeptr;
+            long to_process = MIN (MIN (read_space, remain), write_space);
+
+            if (to_process == 0)
+              return; // buffer not allocated.
+
+            remain -= to_process;
+
+            for (i=0; i<to_process; i++) {
+              LADSPA_Data read = *(readptr++);
+              *(writeptr++) = read * feedback + in[i];
+	      buffer_write(out[i], read);
+            }
+
+            if (readptr == lastptr) readptr = buffer;
+            if (writeptr == lastptr) writeptr = buffer;
+          }
+        } else {
+          float next_feedback = calc_feedback (delay_time, decay_time);
+          float feedback_slope = (next_feedback - feedback) / sample_count;
+          long remain = sample_count;
+
+          while (remain) {
+            long read_space = lastptr - readptr;
+            long write_space = lastptr - writeptr;
+            long to_process = MIN (MIN (read_space, remain), write_space);
+
+            if (to_process == 0)
+              return; // buffer not allocated.
+
+            remain -= to_process;
+
+            for (i=0; i<to_process; i++) {
+              LADSPA_Data read = *(readptr++);
+              *(writeptr++) = read * feedback + in[i];
+	      buffer_write(out[i], read);
+              feedback += feedback_slope;
+            }
+
+            if (readptr == lastptr) readptr = buffer;
+            if (writeptr == lastptr) writeptr = buffer;
+          }
+
+          plugin_data->last_decay_time = decay_time;
+          plugin_data->feedback = feedback;
+        }
+
+        write_phase += sample_count;
+      } else {
+        float next_delay_samples = CALC_DELAY (delay_time);
+        float delay_samples_slope = (next_delay_samples - delay_samples) / sample_count;
+        float next_feedback = calc_feedback (delay_time, decay_time);
+        float feedback_slope = (next_feedback - feedback) / sample_count;
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase;
+          LADSPA_Data read;
+
+          delay_samples += delay_samples_slope;
+          write_phase++;
+          read_phase = write_phase - (long)delay_samples;
+          read = buffer[read_phase & buffer_mask];
+
+          buffer[write_phase & buffer_mask] = read * feedback + in[i];
+	  buffer_write(out[i], read);
+
+          feedback += feedback_slope;
+        }
+
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->feedback = feedback;
+        plugin_data->delay_samples = delay_samples;
+      }
+      
+      plugin_data->write_phase = write_phase;
+    ]]></callback>
+
+    <port label="in" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="out" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="max_delay" dir="input" type="control" hint="default_1">
+      <name>Max Delay (s)</name>
+      <range min="0"/>
+      <p>
+       Maximum delay. Used to set the delay buffer size upon activation. Cannot
+       be modulated. Note that if you do not connect to this port before
+       activation, it will default to 1 second. 
+      </p>
+    </port>
+
+    <port label="delay_time" dir="input" type="control" hint="default_0">
+      <name>Delay Time (s)</name>
+      <range min="0"/>
+    </port>
+
+    <port label="decay_time" dir="input" type="control" hint="default_0">
+      <name>Decay Time (s)</name>
+      <range min="0"/>
+      <p>
+       Time for the echoes to decay by 60 decibels. If this time is negative
+       then the feedback coefficient will be negative, thus emphasizing only odd
+       harmonics at an octave lower.
+      </p>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="sample_rate" type="unsigned int" />
+    <instance-data label="delay_samples" type="LADSPA_Data" />
+    <instance-data label="write_phase" type="long" />
+    <instance-data label="feedback" type="LADSPA_Data" />
+    <instance-data label="last_delay_time" type="LADSPA_Data" />
+    <instance-data label="last_decay_time" type="LADSPA_Data" />
+  </plugin>
+
+  <!-- ******   COMB-L   ****** -->
+
+  <plugin label="comb_l" id="1887" class="DelayPlugin">
+    <name>Comb delay line, linear interpolation</name>
+    <p>Based on work by James McCartney in SuperCollider.</p>
+    
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+
+      // Uninitialized variables
+      buffer_mask = 0;
+      delay_samples = 0;
+      feedback = 0;
+      last_decay_time = 0;
+      last_delay_time = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="activate"><![CDATA[
+      unsigned int minsize, size;
+    
+      if (plugin_data->max_delay && *plugin_data->max_delay > 0)
+        minsize = sample_rate * *plugin_data->max_delay;
+      else if (plugin_data->delay_time)
+        minsize = sample_rate * *plugin_data->delay_time;
+      else
+        minsize = sample_rate; /* 1 second default */
+    
+      size = 1;
+      while (size < minsize) size <<= 1;
+    
+      /* calloc sets the buffer to zero. */
+      buffer = calloc(size, sizeof(LADSPA_Data));
+      if (buffer)
+        buffer_mask = size - 1;
+      else
+        buffer_mask = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+    
+    <callback event="run"><![CDATA[
+      int i;
+
+      i = max_delay;
+
+      if (write_phase == 0) {
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->delay_samples = delay_samples = CALC_DELAY (delay_time);
+        plugin_data->feedback = feedback = calc_feedback (delay_time, decay_time);
+      }
+      
+      if (delay_time == last_delay_time && decay_time == last_decay_time) {
+        long idelay_samples = (long)delay_samples;
+        LADSPA_Data frac = delay_samples - idelay_samples;
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase = write_phase - (long)delay_samples;
+          LADSPA_Data r1 = buffer[read_phase & buffer_mask];
+          LADSPA_Data r2 = buffer[(read_phase-1) & buffer_mask];
+          LADSPA_Data read = LIN_INTERP (frac, r1, r2);
+
+          buffer[write_phase & buffer_mask] = read * feedback + in[i];
+	  buffer_write(out[i], read);
+          write_phase++;
+        }
+      } else {
+        float next_delay_samples = CALC_DELAY (delay_time);
+        float delay_samples_slope = (next_delay_samples - delay_samples) / sample_count;
+        float next_feedback = calc_feedback (delay_time, decay_time);
+        float feedback_slope = (next_feedback - feedback) / sample_count;
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase, idelay_samples;
+          LADSPA_Data read, frac;
+
+          delay_samples += delay_samples_slope;
+          write_phase++;
+          read_phase = write_phase - (long)delay_samples;
+          idelay_samples = (long)delay_samples;
+          frac = delay_samples - idelay_samples;
+          read = LIN_INTERP (frac,
+                             buffer[read_phase & buffer_mask], 
+                             buffer[(read_phase-1) & buffer_mask]);
+          buffer[write_phase & buffer_mask] = read * feedback + in[i];
+	  buffer_write(out[i], read);
+
+          feedback += feedback_slope;
+        }
+
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->feedback = feedback;
+        plugin_data->delay_samples = delay_samples;
+      }
+      
+      plugin_data->write_phase = write_phase;
+    ]]></callback>
+
+    <port label="in" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="out" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="max_delay" dir="input" type="control" hint="default_1">
+      <name>Max Delay (s)</name>
+      <range min="0"/>
+      <p>
+       Maximum delay. Used to set the delay buffer size upon activation. Cannot
+       be modulated. Note that if you do not connect to this port before
+       activation, it will default to 1 second. 
+      </p>
+    </port>
+
+    <port label="delay_time" dir="input" type="control" hint="default_0">
+      <name>Delay Time (s)</name>
+      <range min="0"/>
+    </port>
+
+    <port label="decay_time" dir="input" type="control" hint="default_0">
+      <name>Decay Time (s)</name>
+      <range min="0"/>
+      <p>
+       Time for the echoes to decay by 60 decibels. If this time is negative
+       then the feedback coefficient will be negative, thus emphasizing only odd
+       harmonics at an octave lower.
+      </p>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="sample_rate" type="unsigned int" />
+    <instance-data label="delay_samples" type="LADSPA_Data" />
+    <instance-data label="write_phase" type="long" />
+    <instance-data label="feedback" type="LADSPA_Data" />
+    <instance-data label="last_delay_time" type="LADSPA_Data" />
+    <instance-data label="last_decay_time" type="LADSPA_Data" />
+  </plugin>
+
+  <!-- ******   COMB-C   ****** -->
+
+  <plugin label="comb_c" id="1888" class="DelayPlugin">
+    <name>Comb delay line, cubic spline interpolation</name>
+    <p>Based on work by James McCartney in SuperCollider.</p>
+    
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+
+      // Uninitialized variables
+      buffer_mask = 0;
+      delay_samples = 0;
+      feedback = 0;
+      last_decay_time = 0;
+      last_delay_time = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="activate"><![CDATA[
+      unsigned int minsize, size;
+    
+      if (plugin_data->max_delay && *plugin_data->max_delay > 0)
+        minsize = sample_rate * *plugin_data->max_delay;
+      else if (plugin_data->delay_time)
+        minsize = sample_rate * *plugin_data->delay_time;
+      else
+        minsize = sample_rate; /* 1 second default */
+    
+      size = 1;
+      while (size < minsize) size <<= 1;
+    
+      /* calloc sets the buffer to zero. */
+      buffer = calloc(size, sizeof(LADSPA_Data));
+      if (buffer)
+        buffer_mask = size - 1;
+      else
+        buffer_mask = 0;
+      write_phase = 0;
+    ]]></callback>
+    
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+    
+    <callback event="run"><![CDATA[
+      int i;
+
+      i = max_delay;
+
+      if (write_phase == 0) {
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->delay_samples = delay_samples = CALC_DELAY (delay_time);
+        plugin_data->feedback = feedback = calc_feedback (delay_time, decay_time);
+      }
+      
+      if (delay_time == last_delay_time && decay_time == last_decay_time) {
+        long idelay_samples = (long)delay_samples;
+        LADSPA_Data frac = delay_samples - idelay_samples;
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase = write_phase - (long)delay_samples;
+          LADSPA_Data read = cube_interp (frac,
+                                          buffer[(read_phase-1) & buffer_mask], 
+                                          buffer[read_phase & buffer_mask], 
+                                          buffer[(read_phase+1) & buffer_mask], 
+                                          buffer[(read_phase+2) & buffer_mask]);
+
+          buffer[write_phase++ & buffer_mask] = read * feedback + in[i];
+	  buffer_write(out[i], read);
+        }
+      } else {
+        float next_delay_samples = CALC_DELAY (delay_time);
+        float delay_samples_slope = (next_delay_samples - delay_samples) / sample_count;
+        float next_feedback = calc_feedback (delay_time, decay_time);
+        float feedback_slope = (next_feedback - feedback) / sample_count;
+
+        for (i=0; i<sample_count; i++) {
+          long read_phase, idelay_samples;
+          LADSPA_Data read, frac;
+
+          delay_samples += delay_samples_slope;
+          write_phase++;
+          read_phase = write_phase - (long)delay_samples;
+          idelay_samples = (long)delay_samples;
+          frac = delay_samples - idelay_samples;
+          read = cube_interp (frac,
+                              buffer[(read_phase-1) & buffer_mask], 
+                              buffer[read_phase & buffer_mask], 
+                              buffer[(read_phase+1) & buffer_mask], 
+                              buffer[(read_phase+2) & buffer_mask]);
+
+          buffer[write_phase & buffer_mask] = read * feedback + in[i];
+	  buffer_write(out[i], read);
+
+          feedback += feedback_slope;
+        }
+
+        plugin_data->last_delay_time = delay_time;
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->feedback = feedback;
+        plugin_data->delay_samples = delay_samples;
+      }
+      
+      plugin_data->write_phase = write_phase;
+    ]]></callback>
+
+    <port label="in" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="out" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="max_delay" dir="input" type="control" hint="default_1">
+      <name>Max Delay (s)</name>
+      <range min="0"/>
+      <p>
+       Maximum delay. Used to set the delay buffer size upon activation. Cannot
+       be modulated. Note that if you do not connect to this port before
+       activation, it will default to 1 second. 
+      </p>
+    </port>
+
+    <port label="delay_time" dir="input" type="control" hint="default_0">
+      <name>Delay Time (s)</name>
+      <range min="0"/>
+    </port>
+
+    <port label="decay_time" dir="input" type="control" hint="default_0">
+      <name>Decay Time (s)</name>
+      <range min="0"/>
+      <p>
+       Time for the echoes to decay by 60 decibels. If this time is negative
+       then the feedback coefficient will be negative, thus emphasizing only odd
+       harmonics at an octave lower.
+      </p>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="sample_rate" type="unsigned int" />
+    <instance-data label="delay_samples" type="LADSPA_Data" />
+    <instance-data label="write_phase" type="long" />
+    <instance-data label="feedback" type="LADSPA_Data" />
+    <instance-data label="last_delay_time" type="LADSPA_Data" />
+    <instance-data label="last_decay_time" type="LADSPA_Data" />
+  </plugin>
+</ladspa>

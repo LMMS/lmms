@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+
+#include <math.h>
+
+#include "ladspa-util.h"
+
+#define SIN_T_SIZE 1024
+#define D_SIZE 256
+#define NZEROS 200
+
+/* The non-zero taps of the Hilbert transformer */
+static float xcoeffs[] = {
+     +0.0008103736f, +0.0008457886f, +0.0009017196f, +0.0009793364f,
+     +0.0010798341f, +0.0012044365f, +0.0013544008f, +0.0015310235f,
+     +0.0017356466f, +0.0019696659f, +0.0022345404f, +0.0025318040f,
+     +0.0028630784f, +0.0032300896f, +0.0036346867f, +0.0040788644f,
+     +0.0045647903f, +0.0050948365f, +0.0056716186f, +0.0062980419f,
+     +0.0069773575f, +0.0077132300f, +0.0085098208f, +0.0093718901f,
+     +0.0103049226f, +0.0113152847f, +0.0124104218f, +0.0135991079f,
+     +0.0148917649f, +0.0163008758f, +0.0178415242f, +0.0195321089f,
+     +0.0213953037f, +0.0234593652f, +0.0257599469f, +0.0283426636f,
+     +0.0312667947f, +0.0346107648f, +0.0384804823f, +0.0430224431f,
+     +0.0484451086f, +0.0550553725f, +0.0633242001f, +0.0740128560f,
+     +0.0884368322f, +0.1090816773f, +0.1412745301f, +0.1988673273f,
+     +0.3326528346f, +0.9997730178f, -0.9997730178f, -0.3326528346f,
+     -0.1988673273f, -0.1412745301f, -0.1090816773f, -0.0884368322f,
+     -0.0740128560f, -0.0633242001f, -0.0550553725f, -0.0484451086f,
+     -0.0430224431f, -0.0384804823f, -0.0346107648f, -0.0312667947f,
+     -0.0283426636f, -0.0257599469f, -0.0234593652f, -0.0213953037f,
+     -0.0195321089f, -0.0178415242f, -0.0163008758f, -0.0148917649f,
+     -0.0135991079f, -0.0124104218f, -0.0113152847f, -0.0103049226f,
+     -0.0093718901f, -0.0085098208f, -0.0077132300f, -0.0069773575f,
+     -0.0062980419f, -0.0056716186f, -0.0050948365f, -0.0045647903f,
+     -0.0040788644f, -0.0036346867f, -0.0032300896f, -0.0028630784f,
+     -0.0025318040f, -0.0022345404f, -0.0019696659f, -0.0017356466f,
+     -0.0015310235f, -0.0013544008f, -0.0012044365f, -0.0010798341f,
+     -0.0009793364f, -0.0009017196f, -0.0008457886f, -0.0008103736f,
+};
+    ]]></code>
+  </global>
+
+  <plugin label="bodeShifterCV" id="1432" class="SpectralPlugin">
+    <name>Bode frequency shifter (CV)</name>
+    <p>See the non CV version for information.</p>
+    <p>This is more or less a copy of the Doepfer A126, \url{http://www.doepfer.de/a126.htm}.</p>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int i;
+
+      fs = (float)s_rate;
+
+      delay = calloc(D_SIZE, sizeof(LADSPA_Data));
+      sint  = calloc(SIN_T_SIZE + 4, sizeof(float));
+
+      dptr = 0;
+      phi = 0.0f;
+
+      for (i = 0; i < SIN_T_SIZE + 4; i++) {
+	sint[i] = sinf(2.0f * M_PI * (float)i / (float)SIN_T_SIZE);
+      }
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      unsigned int i;
+      float hilb, rm1, rm2;
+      int int_p;
+      float frac_p;
+      const float freq_fix = (float)SIN_T_SIZE * 1000.0f * f_clamp(atten, 0.0f, 10.0f) / fs;
+      const float base_ofs = (float)SIN_T_SIZE * f_clamp(shift_b, 0.0f, 10000.0f) / fs;
+      const float mixc = mix * 0.5f + 0.5f;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	delay[dptr] = input[pos];
+
+	/* Perform the Hilbert FIR convolution
+         * (probably FFT would be faster) */
+        hilb = 0.0f;
+        for (i = 0; i < NZEROS/2; i++) {
+          hilb += (xcoeffs[i] * delay[(dptr - i*2) & (D_SIZE - 1)]);
+        }
+
+	/* Calcuate the table positions for the sine modulator */
+	int_p = f_round(floor(phi));
+
+	/* Calculate ringmod1, the transformed input modulated with a shift Hz
+	 * sinewave. This creates a +180 degree sideband at source-shift Hz and
+	 * a 0 degree sindeband at source+shift Hz */
+	frac_p = phi - int_p;
+	rm1 = hilb * 0.63661978f * cube_interp(frac_p, sint[int_p],
+			sint[int_p+1], sint[int_p+2], sint[int_p+3]);
+
+	/* Calcuate the table positions for the cosine modulator */
+	int_p = (int_p + SIN_T_SIZE / 4) & (SIN_T_SIZE - 1);
+
+	/* Calculate ringmod2, the delayed input modulated with a shift Hz
+	 * cosinewave. This creates a 0 degree sideband at source+shift Hz
+	 * and a -180 degree sindeband at source-shift Hz */
+	rm2 = delay[(dptr - 99) & (D_SIZE - 1)] * cube_interp(frac_p,
+	      sint[int_p], sint[int_p+1], sint[int_p+2], sint[int_p+3]);
+
+	/* Output the sum and differences of the ringmods. The +/-180 degree
+	 * sidebands cancel (more of less) and just leave the shifted
+         * components */
+        buffer_write(dout[pos], (rm2 - rm1) * 0.5f);
+        buffer_write(uout[pos], (rm2 + rm1) * 0.5f);
+        buffer_write(mixout[pos], (dout[pos] - uout[pos]) * mixc + uout[pos]);
+
+	dptr = (dptr + 1) & (D_SIZE - 1);
+	phi += f_clamp(shift[pos], 0.0f, 10.0f) * freq_fix + base_ofs;
+	while (phi > SIN_T_SIZE) {
+	  phi -= SIN_T_SIZE;
+	}
+      }
+
+      plugin_data->dptr = dptr;
+      plugin_data->phi = phi;
+
+      *(plugin_data->latency) = 99;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->delay);
+      free(plugin_data->sint);
+    ]]></callback>
+
+    <port label="shift_b" dir="input" type="control" hint="default_0">
+      <name>Base shift</name>
+      <range min="0" max="5000"/>
+    </port>
+
+    <port label="mix" dir="input" type="control" hint="default_0">
+      <name>Mix (-1=down, +1=up)</name>
+      <range min="-1" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="atten" dir="input" type="control" hint="default_maximum">
+      <name>CV Attenuation</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="shift" dir="input" type="audio" hint="default_0">
+      <name>Shift CV</name>
+      <p>Controls the frequency shift applied to the input signal, in KHz.</p>
+      <range min="0" max="5"/>
+    </port>
+
+    <port label="dout" dir="output" type="audio">
+      <name>Down out</name>
+    </port>
+
+    <port label="uout" dir="output" type="audio">
+      <name>Up out</name>
+    </port>
+
+    <port label="mixout" dir="output" type="audio">
+      <name>Mix out</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="delay" type="LADSPA_Data *" />
+    <instance-data label="dptr" type="unsigned int" />
+    <instance-data label="phi" type="float" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="sint" type="float *" />
+  </plugin>
+</ladspa>

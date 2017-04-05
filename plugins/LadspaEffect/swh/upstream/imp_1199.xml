@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <code><![CDATA[
+      #include <string.h>
+
+      #include "config.h"
+
+      #ifdef FFTW3
+
+      #include <fftw3.h>
+
+      typedef fftwf_plan fft_plan;
+      typedef float fftw_real;
+      #define local_malloc(s) fftwf_malloc(s)
+      #define local_free(s) fftwf_free(s)
+
+      #else
+
+      #ifdef EXPLICIT_S
+      #include <srfftw.h>
+      #else
+      #include <rfftw.h>
+      #endif //EXPLICIT_S
+
+      typedef rfftw_plan fft_plan;
+      #define local_malloc(s) malloc(s)
+      #define local_free(s) free(s)
+
+      #endif //FFTW3
+
+      #include "ladspa-util.h"
+
+      #define MAX_FFT_LENGTH 16384
+      #define SEG_LENGTH     128
+
+      #define IMP_LENGTH(a) (sizeof(a) / sizeof(float))
+
+      #define MK_IMP(i) impulse2freq(c, i, IMP_LENGTH(i), impulse_freq[c]); c++
+
+      static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out);
+
+      #include "impulses/all.h"
+
+      fft_plan plan_rc[IMPULSES],
+               plan_cr[IMPULSES];
+
+      static fftw_real *real_in, *real_out, *comp_in, *comp_out;
+
+      unsigned int fft_length[IMPULSES];
+
+#ifdef __clang__
+      static void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+#else
+      static inline void impulse2freq(int id, float *imp, unsigned int length, fftw_real *out)
+#endif
+      {
+        fftw_real impulse_time[MAX_FFT_LENGTH];
+#ifdef FFTW3
+	fft_plan tmp_plan;
+#endif
+        unsigned int i, fftl = 128;
+
+	while (fftl < length+SEG_LENGTH) {
+		fftl *= 2;
+	}
+
+	fft_length[id] = fftl;
+#ifdef FFTW3
+	plan_rc[id] = fftwf_plan_r2r_1d(fftl, real_in, comp_out, FFTW_R2HC, FFTW_MEASURE);
+	plan_cr[id] = fftwf_plan_r2r_1d(fftl, comp_in, real_out, FFTW_HC2R, FFTW_MEASURE);
+	tmp_plan = fftwf_plan_r2r_1d(fftl, impulse_time, out, FFTW_R2HC, FFTW_MEASURE);
+#else
+        plan_rc[id] = rfftw_create_plan(fftl, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
+        plan_cr[id] = rfftw_create_plan(fftl, FFTW_COMPLEX_TO_REAL, FFTW_ESTIMATE);
+#endif
+
+        for (i=0; i<length; i++) {
+          impulse_time[i] = imp[i];
+        }
+		
+        int last = i;
+        for (i = 0; i<fftl; i++) {
+          if (i >=last) impulse_time[i] = 0.0f;
+        }
+#ifdef FFTW3
+	fftwf_execute(tmp_plan);
+	fftwf_destroy_plan(tmp_plan);
+#else
+        rfftw_one(plan_rc[id], impulse_time, out);
+#endif
+      }
+        
+    ]]></code>
+  </global>
+
+  <plugin label="imp" id="1199" class="SpectralPlugin">
+    <name>Impulse convolver</name>
+    <p><![CDATA[
+    This is a convolver for a set of fairly short impulses.
+
+    The set of impulses has to be compiled in, they are:
+
+    \begin{tabular}{|r|l|}
+    \hline
+    Id & Impulse \\
+    \hline \hline
+    1 & Unit impulse (identity) \\
+    2 & My flat (light natural reverb) \\
+    3 & Yamaha Marshall stack simulator \\
+    4 & Fender 68 Vibrolux (SM57 on axis) \\
+    5 & Fender 68 Vibrolux (SM57 off axis) \\
+    6 & Fender 68 Vibrolux (Audio-technica AT4050) \\
+    7 & Fender 68 Vibrolux (Neumann U87) \\
+    8 & Fender Bassman (SM57 on axis) \\
+    9 & Fender Bassman (SM57 off axis) \\
+    10 & Fender Bassman (Audio-technica AT4050) \\
+    11 & Fender Bassman (Neumann U87) \\
+    12 & Fender Superchamp (SM57 on axis) \\
+    13 & Fender Superchamp (SM57 off axis) \\
+    14 & Fender Superchamp (Audio-technica AT4050) \\
+    15 & Fender Superchamp (Neumann U87) \\
+    16 & Marshall JCM2000 (SM57 on axis) \\
+    17 & Marshall JCM2000 (SM57 off axis) \\
+    18 & Marshall Plexi (SM57 on axis) \\
+    19 & Marshall Plexi (SM57 off axis) \\
+    20 & Matchless Chieftan (SM57 on axis) \\
+    21 & Matchless Chieftan (SM57 off axis) \\
+    \hline
+    \end{tabular}
+
+    The first three were quickly grabbed by me using jack_impulse_grabber, and the others we collected by someone else, but unfortunately I've lost his email address and can't find him on the web :(
+    ]]></p>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int i;
+
+      impulse_freq = local_malloc(IMPULSES * sizeof(fftw_real *));
+      for (i=0; i<IMPULSES; i++) {
+        impulse_freq[i] = local_malloc(MAX_FFT_LENGTH * sizeof(fftw_real));
+      }
+
+      block_time = local_malloc(MAX_FFT_LENGTH * sizeof(fftw_real));
+      block_freq = local_malloc(MAX_FFT_LENGTH * sizeof(fftw_real));
+      op = local_malloc(MAX_FFT_LENGTH * sizeof(fftw_real));
+      overlap = local_malloc(MAX_FFT_LENGTH * sizeof(float));
+      opc = local_malloc(SEG_LENGTH * sizeof(LADSPA_Data));
+
+      /* transform the impulses */
+      real_in = block_time;
+      comp_out = block_freq;
+      comp_in = block_freq;
+      real_out = op;
+      mk_imps(impulse_freq);
+
+      in_ptr = 0;
+      out_ptr = 0;
+      count = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      memset(block_time, 0, MAX_FFT_LENGTH * sizeof(fftw_real));
+      memset(block_freq, 0, MAX_FFT_LENGTH * sizeof(fftw_real));
+      memset(op, 0, MAX_FFT_LENGTH * sizeof(fftw_real));
+      memset(overlap, 0, (MAX_FFT_LENGTH - SEG_LENGTH) * sizeof(float));
+      memset(opc, 0, SEG_LENGTH * sizeof(LADSPA_Data));
+
+      in_ptr = 0;
+      out_ptr = 0;
+      count = 0;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      local_free(plugin_data->block_time);
+      local_free(plugin_data->block_freq);
+      local_free(plugin_data->op);
+      local_free(plugin_data->overlap);
+      local_free(plugin_data->opc);
+      unsigned int i;
+      for (i=0; i<IMPULSES; i++) {
+        local_free(plugin_data->impulse_freq[i]);
+      }
+      local_free(plugin_data->impulse_freq);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long i, pos, ipos, limit;
+      unsigned int im;
+      unsigned int len;
+      fftw_real tmp;
+      fftw_real *imp_freq;
+      float coef;
+
+      im = f_round(impulse) - 1;
+      if (im >= IMPULSES) {
+        im = 0;
+      }
+
+      coef = pow(10.0f, gain * 0.05f) / (float)fft_length[im];
+
+      imp_freq = impulse_freq[im];
+
+      for (pos = 0; pos < sample_count; pos += SEG_LENGTH) {
+        limit = pos + SEG_LENGTH;
+
+        for (ipos = pos; ipos < sample_count && ipos<limit; ipos++) {
+          block_time[in_ptr++] = input[ipos];
+
+          if (in_ptr == SEG_LENGTH) {
+#ifdef FFTW3
+	    fftwf_execute(plan_rc[im]);
+#else
+            rfftw_one(plan_rc[im], block_time, block_freq);
+#endif
+ 
+            len = fft_length[im];
+            for (i=1; i<fft_length[im]/2; i++) {
+	      len--;
+              tmp = block_freq[i] * imp_freq[i] -
+               block_freq[len] * imp_freq[len];
+              block_freq[len] =
+               block_freq[i] * imp_freq[len] +
+               block_freq[len] * imp_freq[i];
+              block_freq[i] = tmp;
+            }
+
+            block_freq[0] = imp_freq[0] * block_freq[0];
+            block_freq[fft_length[im]/2] = imp_freq[fft_length[im]/2] * block_freq[fft_length[im]/2];
+
+#ifdef FFTW3
+	    fftwf_execute(plan_cr[im]);
+#else
+            rfftw_one(plan_cr[im], block_freq, op);
+#endif
+
+            for (i=0; i<fft_length[im]-SEG_LENGTH; i++) {
+              op[i] += overlap[i];
+            }
+            for (i=SEG_LENGTH; i<fft_length[im]; i++) {
+              overlap[i-SEG_LENGTH] = op[i];
+            }
+
+            in_ptr = 0;
+	    if (count == 0 && high_lat < 1.0f) {
+	      count = 1;
+	      plugin_data->count = 1;
+	      out_ptr = 0;
+	    }
+          }
+        }
+
+        for (ipos = pos; ipos < sample_count && ipos<limit; ipos++) {
+          buffer_write(output[ipos], opc[out_ptr++] * coef);
+          if (out_ptr == SEG_LENGTH) {
+            for (i=0; i<SEG_LENGTH; i++) {
+              opc[i] = op[i];
+            }
+            out_ptr = 0;
+          }
+        }
+      }
+
+      plugin_data->in_ptr = in_ptr;
+      plugin_data->out_ptr = out_ptr;
+
+      *(plugin_data->latency) = SEG_LENGTH;
+    ]]></callback>
+
+    <port label="impulse" dir="input" type="control" hint="integer,default_1">
+      <name>Impulse ID</name>
+      <p>Selects the impulse to convolve with. New impulses have to be compiled in.</p>
+      <range min="1" max="IMPULSES"/>
+    </port>
+
+    <port label="high_lat" dir="input" type="control" hint="integer,default_0">
+      <name>High latency mode</name>
+      <p>If you are running with blocks that are not whole powers of two long, or you are hearing distortion, try changing this to 1.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="gain" dir="input" type="control" hint="default_0">
+      <name>Gain (dB)</name>
+      <p>Controls the gain of the output signal in dB's.</p>
+      <range min="-90" max="+24"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="impulse_freq" type="fftw_real **" />
+    <instance-data label="block_time" type="fftw_real *" />
+    <instance-data label="block_freq" type="fftw_real *" />
+    <instance-data label="op" type="fftw_real *" />
+    <instance-data label="opc" type="LADSPA_Data *" />
+    <instance-data label="overlap" type="LADSPA_Data *" />
+    <instance-data label="in_ptr" type="unsigned long" />
+    <instance-data label="out_ptr" type="unsigned long" />
+    <instance-data label="count" type="unsigned int" />
+  </plugin>
+</ladspa>

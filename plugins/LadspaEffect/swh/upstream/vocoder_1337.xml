@@ -1,0 +1,345 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Achim Settelmeier &lt;settel-linux@sirlab.de&gt; (adapted by Josh Green and Hexasoft)"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "util/iir.h"
+
+      #define MAX_BANDS		16
+      #define AMPLIFIER		16.0
+
+      // 0 = formant, 1 = carrier, 2 = output, 3 = output2, 4 = bandcount, 5 = pan
+      #define START_BANDS	6				/* start of bands level */
+      #define PORT_COUNT	START_BANDS + MAX_BANDS		/* bands level */
+
+      struct bandpasses
+      {
+        LADSPA_Data c[MAX_BANDS], f[MAX_BANDS], att[MAX_BANDS];
+
+        LADSPA_Data freq[MAX_BANDS];
+        LADSPA_Data low1[MAX_BANDS], low2[MAX_BANDS];
+        LADSPA_Data mid1[MAX_BANDS], mid2[MAX_BANDS];
+        LADSPA_Data high1[MAX_BANDS], high2[MAX_BANDS];
+        LADSPA_Data y[MAX_BANDS];
+      };
+
+      void inline doBandpasses(struct bandpasses *bands, LADSPA_Data sample, int num_bands);
+
+      struct bands_out{
+        LADSPA_Data decay[MAX_BANDS];
+        LADSPA_Data oldval[MAX_BANDS];
+        LADSPA_Data level[MAX_BANDS];     /* 0.0 - 1.0 level of this output band */
+      };
+
+      const LADSPA_Data decay_table[] =
+      {
+        1/100.0,
+        1/100.0, 1/100.0, 1/100.0,
+        1/125.0, 1/125.0, 1/125.0,
+        1/166.0, 1/166.0, 1/166.0,
+        1/200.0, 1/200.0, 1/200.0,
+        1/250.0, 1/250.0, 1/250.0
+      };
+
+      void inline doBandpasses(struct bandpasses *bands, LADSPA_Data sample, int num_bands)
+      {
+        int i;
+        for (i=0; i < num_bands; i++)
+        {
+          bands->high1[i] = sample - bands->f[i] * bands->mid1[i] - bands->low1[i];
+          bands->mid1[i] += bands->high1[i] * bands->c[i];
+          bands->low1[i] += bands->mid1[i];
+
+          bands->high2[i] = bands->low1[i] - bands->f[i] * bands->mid2[i] - bands->low2[i];
+          bands->mid2[i] += bands->high2[i] * bands->c[i];
+          bands->low2[i] += bands->mid2[i];
+          bands->y[i]     = bands->high2[i] * bands->att[i];
+        }
+      }
+    ]]></code>
+  </global>
+
+  <!-- TODO: Get real LADSPA ID from ladspa.org, vocoder was previously "1337" -->
+  <plugin label="vocoder" id="1337" class="DistortionPlugin,GeneratorPlugin">
+    <name>Vocoder</name>
+    <p><![CDATA[
+    Makes a human voice sound synthetic; often used to speak like a robot, with a metallic and monotonous voice.  Using a human voice as the formant and an instrument as the carrier, creates an effect of an instrument speaking.
+    ]]></p>
+
+    <callback event="instantiate"><![CDATA[
+      memset(&bands_carrier, 0, sizeof bands_carrier);
+      memset(&bands_formant, 0, sizeof bands_formant);
+      memset(&bands_out, 0, sizeof bands_out);
+
+      sample_rate = s_rate;
+      main_vol = 1.0 * AMPLIFIER;
+
+      ctrl_band_levels = malloc(MAX_BANDS * sizeof(LADSPA_Data));
+      num_bands = -1;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      int i;
+      for (i = 0; i < MAX_BANDS; i++)
+      {
+        bands_out.oldval[i] = 0.0f;
+      }
+
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->ctrl_band_levels);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      int i, j, numbands, pan;
+      float a;
+      LADSPA_Data x, c;
+      float fl, fr;
+
+      // Bind band level controls
+      plugin_data->ctrl_band_levels[0] = band1;
+      plugin_data->ctrl_band_levels[1] = band2;
+      plugin_data->ctrl_band_levels[2] = band3;
+      plugin_data->ctrl_band_levels[3] = band4;
+      plugin_data->ctrl_band_levels[4] = band5;
+      plugin_data->ctrl_band_levels[5] = band6;
+      plugin_data->ctrl_band_levels[6] = band7;
+      plugin_data->ctrl_band_levels[7] = band8;
+      plugin_data->ctrl_band_levels[8] = band9;
+      plugin_data->ctrl_band_levels[9] = band10;
+      plugin_data->ctrl_band_levels[10] = band11;
+      plugin_data->ctrl_band_levels[11] = band12;
+      plugin_data->ctrl_band_levels[12] = band13;
+      plugin_data->ctrl_band_levels[13] = band14;
+      plugin_data->ctrl_band_levels[14] = band15;
+      plugin_data->ctrl_band_levels[15] = band16;
+
+      numbands = (int)(*plugin_data->ctrl_band_count);
+      if (numbands < 1 || numbands > MAX_BANDS) numbands = MAX_BANDS;
+
+      /* initialize bandpass information if num_bands control has changed,
+         or on first run */
+      if (plugin_data->num_bands != numbands)
+      {
+        plugin_data->num_bands = numbands;
+
+        memset(&plugin_data->bands_formant, 0, sizeof(struct bandpasses));
+        for(i=0; i < numbands; i++)
+        {
+          a = 16.0 * i/(double)numbands;  // stretch existing bands
+
+          if (a < 4.0)
+            plugin_data->bands_formant.freq[i] = 150 + 420 * a / 4.0;
+          else
+            plugin_data->bands_formant.freq[i] = 600 * pow (1.23, a - 4.0);
+
+            c = plugin_data->bands_formant.freq[i] * 2 * M_PI / plugin_data->sample_rate;
+            plugin_data->bands_formant.c[i] = c * c;
+
+            plugin_data->bands_formant.f[i] = 0.4/c;
+            plugin_data->bands_formant.att[i] =
+              1/(6.0 + ((exp (plugin_data->bands_formant.freq[i]
+			    / plugin_data->sample_rate) - 1) * 10));
+
+            plugin_data->bands_out.decay[i] = decay_table[(int)a];
+            plugin_data->bands_out.level[i] =
+	      CLAMP (plugin_data->ctrl_band_levels[i], 0.0, 1.0);
+        }
+        memcpy(&plugin_data->bands_carrier,
+          &plugin_data->bands_formant, sizeof(struct bandpasses));
+
+      }
+      else		       /* get current values of band level controls */
+      {
+        for (i = 0; i < numbands; i++)
+	  plugin_data->bands_out.level[i] = CLAMP (plugin_data->ctrl_band_levels[i],
+            0.0, 1.0);
+      }
+
+      for (i=0; i < sample_count; i++)
+      {
+        doBandpasses (&(plugin_data->bands_carrier),
+          plugin_data->port_carrier[i],
+          plugin_data->num_bands);
+        doBandpasses (&(plugin_data->bands_formant),
+	  plugin_data->port_formant[i],
+          plugin_data->num_bands);
+
+        LADSPA_Data sample = 0.0;
+        for (j=0; j < numbands; j++)
+	{
+	  plugin_data->bands_out.oldval[j] = plugin_data->bands_out.oldval[j]
+	    + (fabs (plugin_data->bands_formant.y[j])
+	       - plugin_data->bands_out.oldval[j])
+	    * plugin_data->bands_out.decay[j];
+	  x = plugin_data->bands_carrier.y[j] * plugin_data->bands_out.oldval[j];
+
+	  sample += x * plugin_data->bands_out.level[j];
+	}
+	/* treat paning + main volume */
+        pan = (int)(*plugin_data->ctrl_pan);
+        fl = fr = 1.0f;
+        if (pan != 0) { /* no paning, don't compute useless values */
+          if (pan > 0) { /* reduce left */
+            fl = (100.-pan)/100.;
+          } else {
+            fr = (100.+pan)/100.;
+          }
+        }
+        /* apply volume and paning */
+        plugin_data->port_output[i] = sample * plugin_data->main_vol * fl;
+        plugin_data->port_output2[i] = sample * plugin_data->main_vol * fr;
+      }
+
+      // Suppress unused warnings
+      (void)(sample_rate);
+      (void)(num_bands);
+      (void)(main_vol);
+      (void)(bands_formant);
+      (void)(bands_carrier);
+      (void)(bands_out);
+      (void)(ctrl_band_levels);
+      (void)(port_formant);
+      (void)(port_carrier);
+      (void)(port_output);
+      (void)(port_output2);
+      (void)(ctrl_band_count);
+      (void)(ctrl_pan);
+      (void)(run_adding_gain);
+
+    ]]></callback>
+
+    <port label="port_formant" dir="input" type="audio">
+      <name>Formant-in</name>
+      <p>Signal to use as formant, such as a human voice.</p>
+    </port>
+
+    <port label="port_carrier" dir="input" type="audio">
+      <name>Carrier-in</name>
+      <p>Signal to use as carrier. Use a saw wave, not a sine wave, as carrier should contain a broad wave spectrum, with several overtones.</p>
+    </port>
+
+    <port label="port_output" dir="output" type="audio">
+      <name>Output-out</name>
+      <p>Left output.</p>
+    </port>
+
+    <port label="port_output2" dir="output" type="audio">
+      <name>Output2-out</name>
+      <p>Right output.</p>
+    </port>
+
+    <port label="ctrl_band_count" dir="input" type="control" hint="integer">
+      <name>Number of bands</name>
+      <range min="1" max="MAX_BANDS"/>
+      <p>Number of frequency bands to divide the signals. Use as an equalizer.</p>
+    </port>
+
+    <port label="ctrl_pan" dir="input" type="control" hint="integer">
+      <name>Left/Right</name>
+      <range min="-100" max="+100"/>
+      <p>Pan between left and right outputs.</p>
+    </port>
+
+    <!-- Start band levels -->
+    <port label="band1" dir="input" type="control">
+      <name>Band 1 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band2" dir="input" type="control">
+      <name>Band 2 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band3" dir="input" type="control">
+      <name>Band 3 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band4" dir="input" type="control">
+      <name>Band 4 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band5" dir="input" type="control">
+      <name>Band 5 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band6" dir="input" type="control">
+      <name>Band 6 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band7" dir="input" type="control">
+      <name>Band 7 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band8" dir="input" type="control">
+      <name>Band 8 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band9" dir="input" type="control">
+      <name>Band 9 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band10" dir="input" type="control">
+      <name>Band 10 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band11" dir="input" type="control">
+      <name>Band 11 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band12" dir="input" type="control">
+      <name>Band 12 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band13" dir="input" type="control">
+      <name>Band 13 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band14" dir="input" type="control">
+      <name>Band 14 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band15" dir="input" type="control">
+      <name>Band 15 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="band16" dir="input" type="control">
+      <name>Band 16 Level</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <instance-data label="sample_rate" type="LADSPA_Data" />
+    <!-- Current number of bands -->
+    <instance-data label="num_bands" type="int" />
+    <!-- Main volume -->
+    <instance-data label="main_vol" type="float" />
+    <!-- All bands in one struct now -->
+    <instance-data label="bands_formant" type="struct bandpasses" />
+    <!-- All bands in one struct now -->
+    <instance-data label="bands_carrier" type="struct bandpasses" />
+    <!-- All bands in one struct now -->
+    <instance-data label="bands_out" type="struct bands_out" />
+    <!-- Level controls for each band -->
+    <instance-data label="ctrl_band_levels" type="LADSPA_Data *" />
+  </plugin>
+</ladspa>

@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #define FADE_IN  1
+      #define STABLE   2
+      #define FADE_OUT 3
+    ]]></code>
+  </global>
+
+  <plugin label="stepMuxer" id="1212" class="UtilityPlugin">
+    <name>Step Demuxer</name>
+    <p>Inputs up to 8 signals and switches between them on the output when the signal on the clock input goes high.</p>
+    <p>This plugin is untested, and may not work.</p>
+
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+      ch_state = malloc(sizeof(int) * 8);
+      ch_gain = malloc(sizeof(float) * 8);
+      current_ch = 0;
+      last_clock = 0.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      int i;
+
+      ch_state[0] = STABLE;
+      ch_gain[0] = 1.0f;
+      for (i = 1; i < 8; i++) {
+        ch_state[i] = STABLE;
+        ch_gain[i] = 0.0f;
+      }
+      current_ch = 0;
+      last_clock = 0.0f;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->ch_state);
+      free(plugin_data->ch_gain);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float fade_inc = 1.0f / (xfadet * sample_rate * 1000.0f);
+      float accum;
+      int ch;
+
+      for (pos = 0; pos < sample_count; pos++) {
+
+	// Calculate output value for this sample
+        accum = 0.0f;
+        accum += input0[pos] * ch_gain[0];
+        accum += input1[pos] * ch_gain[1];
+        accum += input2[pos] * ch_gain[2];
+        accum += input3[pos] * ch_gain[3];
+        accum += input4[pos] * ch_gain[4];
+        accum += input5[pos] * ch_gain[5];
+        accum += input6[pos] * ch_gain[6];
+        accum += input7[pos] * ch_gain[7];
+        buffer_write(output[pos], accum);
+
+	// Run crossfades
+        for (ch = 0; ch < 8; ch++) {
+
+          // Channel is still being faded in
+	  if (ch_state[ch] == FADE_IN) {
+	    ch_gain[ch] += fade_inc;
+            if (ch_gain[ch] >= 1.0f) {
+              ch_gain[ch] = 1.0f;
+              ch_state[ch] = STABLE;
+            }
+
+          // Channel is still being faded out
+          } else if (ch_state[ch] == FADE_OUT) {
+	    ch_gain[ch] -= fade_inc;
+            if (ch_gain[ch] <= 0.0f) {
+              ch_gain[ch] = 0.0f;
+              ch_state[ch] = STABLE;
+            }
+	  }
+        }
+
+	// Check for clock signal
+	if (last_clock <= 0.0f && clock[pos] > 0.0f) {
+	  ch_state[current_ch] = FADE_OUT;
+	  current_ch = (current_ch + 1) % 8;
+	  ch_state[current_ch] = FADE_IN;
+        }
+      }
+
+      // Save state data
+      plugin_data->current_ch = current_ch;
+      plugin_data->last_clock = last_clock;
+    ]]></callback>
+
+    <port label="xfadet" dir="input" type="control" hint="default_middle">
+      <name>Crossfade time (in ms)</name>
+      <range min="0" max="100"/>
+    </port>
+
+    <port label="clock" dir="input" type="audio">
+      <name>Clock</name>
+    </port>
+
+    <port label="input0" dir="input" type="audio">
+      <name>Input 1</name>
+    </port>
+
+    <port label="input1" dir="input" type="audio">
+      <name>Input 2</name>
+    </port>
+
+    <port label="input2" dir="input" type="audio">
+      <name>Input 3</name>
+    </port>
+
+    <port label="input3" dir="input" type="audio">
+      <name>Input 4</name>
+    </port>
+
+    <port label="input4" dir="input" type="audio">
+      <name>Input 5</name>
+    </port>
+
+    <port label="input5" dir="input" type="audio">
+      <name>Input 6</name>
+    </port>
+
+    <port label="input6" dir="input" type="audio">
+      <name>Input 7</name>
+    </port>
+
+    <port label="input7" dir="input" type="audio">
+      <name>Input 8</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="sample_rate" type="float"/>
+    <instance-data label="current_ch" type="int"/>
+    <instance-data label="last_clock" type="LADSPA_Data"/>
+    <instance-data label="ch_state" type="int *"/>
+    <instance-data label="ch_gain" type="float *"/>
+
+  </plugin>
+</ladspa>

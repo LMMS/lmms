@@ -1,0 +1,729 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code><![CDATA[
+#include "ladspa-util.h"
+#include "util/blo.h"
+
+// Return the value of the LDO's for given coeffs
+#define LFO(a,b) (a*lfo1 + b*lfo2)
+
+// Ampmod / ringmod two signals together with given depth
+#define RINGMOD(c,m,d) (c * ((d * 0.5f) * m + (2.0f - d)))
+
+// Stuff needed for the soft clipping code
+#define MAX_AMP 1.0f
+#define CLIP 0.8f
+#define CLIP_A ((MAX_AMP - CLIP) * (MAX_AMP - CLIP))
+#define CLIP_B (MAX_AMP - 2.0f * CLIP)
+
+// Constants to match filter types
+#define F_LP 1
+#define F_HP 2
+#define F_BP 3
+#define F_BR 4
+#define F_AP 5
+
+// Number of filter oversamples
+#define F_R 3
+
+// Magic number
+#define NOISE 23
+
+LADSPA_Data *sin_tbl, *tri_tbl, *saw_tbl, *squ_tbl;
+int tbl_ref_count = 0;
+long sample_rate;
+
+/* Structure to hold parameters for SV filter */
+
+typedef struct {
+	float f;     // 2.0*sin(PI*fs/(fc*r));
+	float q;     // 2.0*cos(pow(q, 0.1)*PI*0.5);
+	float qnrm;  // sqrt(m/2.0f+0.01f);
+	float h;     // high pass output
+	float b;     // band pass output
+	float l;     // low pass output
+	float p;     // peaking output (allpass with resonance)
+	float n;     // notch output
+	float *op;   // pointer to output value
+} sv_filter;
+
+inline float soft_clip(float sc_in) {
+	if ((sc_in < CLIP) && (sc_in > -CLIP)) {
+		return sc_in;
+	} else if (sc_in > 0.0f) {
+		return MAX_AMP - (CLIP_A / (CLIP_B + sc_in));
+	} else {
+		return -(MAX_AMP - (CLIP_A / (CLIP_B - sc_in)));
+	}
+}
+
+/* Store data in SVF struct, takes the sampling frequency, cutoff frequency
+   and Q, and fills in the structure passed */
+
+inline void setup_svf(sv_filter *sv, float fs, float fc, float q, int t) {
+	sv->f = 2.0f * sinf(M_PI * fc / (float)(fs * F_R));
+	sv->q = 2.0f * cosf(powf(q, 0.1f) * M_PI * 0.5f);
+	sv->qnrm = sqrtf(sv->q*0.5f + 0.01f);
+
+	switch(t) {
+	case F_LP:
+		sv->op = &(sv->l);
+		break;
+	case F_HP:
+		sv->op = &(sv->h);
+		break;
+	case F_BP:
+		sv->op = &(sv->b);
+		break;
+	case F_BR:
+		sv->op = &(sv->n);
+		break;
+	default:
+		sv->op = &(sv->p);
+	}
+}
+
+/* Change the frequency of a running SVF */
+
+inline void setup_f_svf(sv_filter *sv, const float fs, const float fc) {
+	sv->f = 2.0f * sin(M_PI * fc / ((float)(fs * F_R)));
+}
+
+/* Run one sample through the SV filter. Filter is by andy@vellocet */
+
+static inline float run_svf(sv_filter *sv, float in) {
+	float out;
+	int i;
+
+	in = sv->qnrm * in ;
+	for (i=0; i < F_R; i++) {
+		// only needed for pentium chips
+		in  = flush_to_zero(in);
+		sv->l = flush_to_zero(sv->l);
+		// very slight waveshape for extra stability
+		sv->b = sv->b - sv->b * sv->b * sv->b * 0.001f;
+
+		// regular state variable code here
+		// the notch and peaking outputs are optional
+		sv->h = in - sv->l - sv->q * sv->b;
+		sv->b = sv->b + sv->f * sv->h;
+		sv->l = sv->l + sv->f * sv->b;
+		sv->n = sv->l + sv->h;
+		sv->p = sv->l - sv->h;
+
+		out = *(sv->op);
+		in = out;
+	}
+
+	return out;
+}
+
+static inline int wave_tbl(const float wave) {
+	switch (f_round(wave)) {
+		case 0:
+		return BLO_SINE;
+		break;
+
+		case 1:
+		return BLO_TRI;
+		break;
+
+		case 2:
+		return BLO_SAW;
+		break;
+
+		case 3:
+		return BLO_SQUARE;
+		break;
+	}
+	return NOISE;
+}
+		]]></code>
+	</global>
+
+	<plugin label="hermesFilter" id="1200" class="FilterPlugin">
+		<name>Hermes Filter</name>
+		<p>This plugin is a simulation of a modern analogue synth called a Pro Tone, with some extra features bolted on, like a crossover. I tried to make it as comprehensive as possible, without requiring ludicrous amounts of CPU juice.</p>
+		<p>N.B. as far as I know, noone has tried to use this (I certainly haven't), so it may be full of bugs and what not. The parameters are all undocumented, but there is a diagram of the routing on the website. Without a custom interface however it would be very hard to use.</p>
+		<p>Historical note: the name is a bad pun, it comes from the name Hermes Trimegistus given to the Egyptian god Thoth by the greeks, it means Thrice Blessed, or something similar.</p>
+
+		<callback event="instantiate">
+long i;
+
+sample_rate = s_rate;
+count = 0;
+
+tables = blo_h_tables_new(1024);
+osc1_d = blo_h_new(tables, BLO_SINE, (float)s_rate);
+osc2_d = blo_h_new(tables, BLO_SINE, (float)s_rate);
+lfo1_d = blo_h_new(tables, BLO_SINE, (float)s_rate);
+lfo2_d = blo_h_new(tables, BLO_SINE, (float)s_rate);
+
+xover_b1_data = calloc(1, sizeof(sv_filter));
+xover_b2_data = calloc(1, sizeof(sv_filter));
+
+dela_data = malloc(3 * sizeof(float));
+dela_pos = malloc(3 * sizeof(int));
+filt_data = malloc(3 * sizeof(sv_filter *));
+for (i = 0; i &lt; 3; i++) {
+	dela_data[i] = malloc(sample_rate * 2 * sizeof(float));
+	dela_pos[i] = 0;
+	filt_data[i] = calloc(1, sizeof(sv_filter));
+}
+lfo1 = 0.0f;
+lfo2 = 0.0f;
+lfo1_phase = 0.0f;
+lfo2_phase = 0.0f;
+		</callback>
+
+		<callback event="activate">
+setup_svf(filt_data[0], 0, 0, 0, 0);
+setup_svf(filt_data[1], 0, 0, 0, 0);
+setup_svf(filt_data[2], 0, 0, 0, 0);
+setup_svf(xover_b1_data, sample_rate, 1000.0, 0.0, F_HP);
+setup_svf(xover_b2_data, sample_rate, 100.0, 0.0, F_LP);
+memset(dela_data[0], 0, sample_rate * 2 * sizeof(float));
+memset(dela_data[1], 0, sample_rate * 2 * sizeof(float));
+memset(dela_data[2], 0, sample_rate * 2 * sizeof(float));
+dela_pos[0] = 0;
+dela_pos[1] = 0;
+dela_pos[2] = 0;
+/*
+osc1_d->ph.all = 0;
+osc2_d->ph.all = 0;
+lfo1_d->ph.all = 0;
+lfo2_d->ph.all = 0;
+*/
+count = 0;
+lfo1 = 0.0f;
+lfo2 = 0.0f;
+lfo1_phase = 0.0f;
+lfo2_phase = 0.0f;
+		</callback>
+
+		<callback event="cleanup">
+free(plugin_data->filt_data[0]);
+free(plugin_data->filt_data[1]);
+free(plugin_data->filt_data[2]);
+free(plugin_data->dela_data[0]);
+free(plugin_data->dela_data[1]);
+free(plugin_data->dela_data[2]);
+free(plugin_data->filt_data);
+free(plugin_data->dela_data);
+free(plugin_data->dela_pos);
+free(plugin_data->xover_b1_data);
+free(plugin_data->xover_b2_data);
+
+blo_h_free(plugin_data->osc1_d);
+blo_h_free(plugin_data->osc2_d);
+blo_h_free(plugin_data->lfo1_d);
+blo_h_free(plugin_data->lfo2_d);
+blo_h_tables_free(plugin_data->tables);
+		</callback>
+
+		<callback event="run" unused-vars="tables"><![CDATA[
+unsigned long pos;
+int i;
+
+// dB gains converted to coefficients
+float osc1_gain, rm1_gain, osc2_gain, rm2_gain, in_gain, rm3_gain;
+
+// Output values for the oscilators etc.
+float osc1, osc2, in, rm1, rm2, rm3, mixer1;
+
+// Outputs from xover
+float xover[3], band_gain[3];
+
+// Output values for disortions
+float dist[3];
+
+// Stuff for distortions
+float drive[3];
+
+// Stuff for filters
+float filt[3];
+float filt_freq[3];
+float filt_res[3];
+float filt_lfo1[3];
+float filt_lfo2[3];
+int filt_t[3];
+
+// Values for delays
+float dela[3], dela_wet[3], dela_fb[3];
+int dela_offset[3];
+
+// Output of mixer2
+float mixer2;
+
+// X overs
+const float xover_ufreq = f_clamp(xover_ufreqp, 200.0f, (float)(sample_rate / 6));
+const float xover_lfreq = f_clamp(xover_lfreqp, 0.0f, xover_ufreq);
+setup_f_svf(xover_b1_data, sample_rate, xover_ufreq);
+setup_f_svf(xover_b2_data, sample_rate, xover_lfreq);
+
+// Calculate delay offsets
+dela_offset[0] = dela1_length * sample_rate;
+dela_offset[1] = dela2_length * sample_rate;
+dela_offset[2] = dela3_length * sample_rate;
+for (i = 0; i < 3; i++) {
+	if (dela_offset[i] > sample_rate * 2 || dela_offset[i] < 0) {
+		dela_offset[i] = 0;
+	}
+	dela[i] = 0.0f;
+	filt_t[i] = 0;
+}
+
+// Convert dB gains to coefficients
+osc1_gain = DB_CO(osc1_gain_db);
+osc2_gain = DB_CO(osc2_gain_db);
+in_gain   = DB_CO(in_gain_db);
+rm1_gain  = DB_CO(rm1_gain_db);
+rm2_gain  = DB_CO(rm2_gain_db);
+rm3_gain  = DB_CO(rm3_gain_db);
+band_gain[0] = DB_CO(band1_gain_db);
+band_gain[1] = DB_CO(band2_gain_db);
+band_gain[2] = DB_CO(band3_gain_db);
+
+osc1_d->wave = wave_tbl(osc1_wave);
+osc2_d->wave = wave_tbl(osc2_wave);
+lfo1_d->wave = wave_tbl(lfo1_wave);
+lfo2_d->wave = wave_tbl(lfo2_wave);
+
+blo_hd_set_freq(osc1_d, osc1_freq);
+blo_hd_set_freq(osc2_d, osc2_freq);
+blo_hd_set_freq(lfo1_d, lfo1_freq * 16);
+blo_hd_set_freq(lfo2_d, lfo2_freq * 16);
+
+#define SETUP_F(n,f,q,t) setup_svf(filt_data[n], sample_rate, f, q, (int)t)
+
+// Set filter stuff
+SETUP_F(0, filt1_freq, filt1_q, filt1_type);
+SETUP_F(1, filt2_freq, filt2_q, filt2_type);
+SETUP_F(2, filt3_freq, filt3_q, filt3_type);
+
+filt_freq[0] = filt1_freq;
+filt_freq[1] = filt2_freq;
+filt_freq[2] = filt3_freq;
+filt_res[0] = filt1_res;
+filt_res[1] = filt2_res;
+filt_res[2] = filt3_res;
+filt_lfo1[0] = filt1_lfo1;
+filt_lfo1[1] = filt2_lfo1;
+filt_lfo1[2] = filt3_lfo1;
+filt_lfo2[0] = filt1_lfo2;
+filt_lfo2[1] = filt2_lfo2;
+filt_lfo2[2] = filt3_lfo2;
+
+// Setup distortions
+drive[0] = drive1;
+drive[1] = drive2;
+drive[2] = drive3;
+
+// Setup delays
+dela_wet[0] = dela1_wet;
+dela_wet[1] = dela2_wet;
+dela_wet[2] = dela3_wet;
+dela_fb[0] = dela1_fb;
+dela_fb[1] = dela2_fb;
+dela_fb[2] = dela3_fb;
+
+for (pos = 0; pos < sample_count; pos++) {
+	count++; // Count of number of samples processed
+
+	// Calculate oscilator values for this sample
+
+	if (osc1_d->wave == NOISE) {
+		osc1 = rand() * (0.5f/(float)RAND_MAX) - 1.0f;
+	} else {
+		osc1 = blo_hd_run_lin(osc1_d);
+	}
+	if (osc2_d->wave == NOISE) {
+		osc2 = rand() * (0.5f/(float)RAND_MAX) - 1.0f;
+	} else {
+		osc2 = blo_hd_run_lin(osc2_d);
+	}
+
+	// Calculate LFO values every 16 samples
+	if ((count & 15) == 1) {
+		// Calculate lfo values
+		if (lfo1_d->wave == NOISE) {
+			lfo1_phase += lfo1_freq;
+			if (lfo1_phase >= sample_rate) {
+				lfo1_phase -= sample_rate;
+				lfo1 = rand() * (0.5f/(float)RAND_MAX) - 1.0f;
+			}
+		} else {
+			lfo1 = blo_hd_run_lin(lfo1_d);
+		}
+		if (lfo2_d->wave == NOISE) {
+			lfo2_phase += lfo1_freq;
+			if (lfo2_phase >= sample_rate) {
+				lfo2_phase -= sample_rate;
+				lfo2 = rand() * (0.5f/(float)RAND_MAX) - 1.0f;
+			}
+		} else {
+			lfo2 = blo_hd_run_lin(lfo2_d);
+		}
+	}
+
+	in = input[pos];
+	rm1 = RINGMOD(osc2, osc1, rm1_depth);
+	rm2 = RINGMOD(in, osc2, rm2_depth);
+	rm3 = RINGMOD(osc1, in, rm3_depth);
+
+	mixer1 = (osc1 * osc1_gain) + (osc2 * osc2_gain) + (in * in_gain) +
+	         (rm1 * rm1_gain) + (rm2 * rm2_gain) + (rm3 * rm3_gain);
+
+	mixer1 = soft_clip(mixer1);
+
+	// Higpass off the top band
+	xover[0] = run_svf(xover_b1_data, mixer1);
+	// Lowpass off the bottom band
+	xover[2] = run_svf(xover_b2_data, mixer1);
+	// The middle band is whats left
+	xover[1] = mixer1 - xover[0] - xover[2];
+
+	mixer2 = 0.0f;
+	for (i = 0; i < 3; i++) {
+		dist[i] = xover[i]*(fabs(xover[i]) + drive1)/(xover[i]*xover[i] + (drive[i]-1)*fabs(xover[i]) + 1.0f);
+
+		if (filt_t[i] == 0) {
+			filt[i] = dist[i];
+		} else {
+			if (count % 16 == 1) {
+				setup_f_svf(filt_data[i], sample_rate, filt_freq[i]+LFO(filt_lfo1[i], filt_lfo2[i]));
+			}
+			filt[i] = run_svf(filt_data[i], dist[i] + (filt_res[i] * (filt_data[i])->b));
+		}
+
+		dela[i] = (dela_data[i][dela_pos[i]] * dela_wet[i]) + filt[i];
+		dela_data[i][(dela_pos[i] + dela_offset[i]) %
+		 (2 * sample_rate)] = filt[i] + (dela[i] * dela_fb[i]);
+		dela_pos[i] = (dela_pos[i] + 1) % (2 * sample_rate);
+
+		mixer2 += band_gain[i] * dela[i];
+	}
+
+	buffer_write(output[pos], soft_clip(mixer2));
+}
+
+plugin_data->count = count;
+plugin_data->lfo1 = lfo1;
+plugin_data->lfo2 = lfo2;
+plugin_data->lfo1_phase = lfo1_phase;
+plugin_data->lfo2_phase = lfo2_phase;
+		]]></callback>
+
+		<!-- LFO control -->
+
+		<port label="lfo1_freq" dir="input" type="control" hint="default_low">
+			<name>LFO1 freq (Hz)</name>
+			<range min="0" max="1000"/>
+		</port>
+
+		<port label="lfo1_wave" dir="input" type="control" hint="integer,default_0">
+			<name>LFO1 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = s&amp;h)</name>
+			<range min="0" max="4"/>
+		</port>
+
+		<port label="lfo2_freq" dir="input" type="control" hint="default_low">
+			<name>LFO2 freq (Hz)</name>
+			<range min="0" max="1000"/>
+		</port>
+
+		<port label="lfo2_wave" dir="input" type="control" hint="integer,default_0">
+			<name>LFO2 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = s&amp;h)</name>
+			<range min="0" max="4"/>
+		</port>
+
+		<!-- osc control -->
+
+		<port label="osc1_freq" dir="input" type="control" hint="default_440">
+			<name>Osc1 freq (Hz)</name>
+			<range min="0" max="4000"/>
+		</port>
+
+		<port label="osc1_wave" dir="input" type="control" hint="integer,default_0">
+			<name>Osc1 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = noise)</name>
+			<range min="0" max="4"/>
+		</port>
+
+		<port label="osc2_freq" dir="input" type="control" hint="default_440">
+			<name>Osc2 freq (Hz)</name>
+			<range min="0" max="4000"/>
+		</port>
+
+		<port label="osc2_wave" dir="input" type="control" hint="integer,default_0">
+			<name>Osc2 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = noise)</name>
+			<range min="0" max="4"/>
+		</port>
+
+		<!-- ringmod control -->
+
+                <port label="rm1_depth" dir="input" type="control" hint="default_0">
+                        <name>Ringmod 1 depth (0=none, 1=AM, 2=RM)</name>
+                        <range min="0" max="2"/>
+                </port>
+
+                <port label="rm2_depth" dir="input" type="control" hint="default_0">
+                        <name>Ringmod 2 depth (0=none, 1=AM, 2=RM)</name>
+                        <range min="0" max="2"/>
+                </port>
+
+                <port label="rm3_depth" dir="input" type="control" hint="default_0">
+                        <name>Ringmod 3 depth (0=none, 1=AM, 2=RM)</name>
+                        <range min="0" max="2"/>
+                </port>
+
+		<!-- mixer1 control -->
+
+		<port label="osc1_gain_db" dir="input" type="control" hint="default_minimum">
+			<name>Osc1 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="rm1_gain_db" dir="input" type="control" hint="default_minimum">
+			<name>RM1 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="osc2_gain_db" dir="input" type="control" hint="default_minimum">
+			<name>Osc2 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="rm2_gain_db" dir="input" type="control" hint="default_minimum">
+			<name>RM2 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="in_gain_db" dir="input" type="control" hint="default_0">
+			<name>Input gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="rm3_gain_db" dir="input" type="control" hint="default_minimum">
+			<name>RM3 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<!-- xover control -->
+
+		<port label="xover_lfreqp" dir="input" type="control" hint="default_low">
+			<name>Xover lower freq</name>
+			<range min="50" max="6000"/>
+		</port>
+
+		<port label="xover_ufreqp" dir="input" type="control" hint="default_high">
+			<name>Xover upper freq</name>
+			<range min="1000" max="10000"/>
+		</port>
+
+		<!-- distortion control -->
+
+		<port label="drive1" dir="input" type="control" hint="default_0">
+			<name>Dist1 drive</name>
+			<range min="0" max="3"/>
+		</port>
+
+		<port label="drive2" dir="input" type="control" hint="default_0">
+			<name>Dist2 drive</name>
+			<range min="0" max="3"/>
+		</port>
+
+		<port label="drive3" dir="input" type="control" hint="default_0">
+			<name>Dist3 drive</name>
+			<range min="0" max="3"/>
+		</port>
+
+		<!-- filter control -->
+
+		<port label="filt1_type" dir="input" type="control" hint="integer,default_0">
+			<name>Filt1 type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)</name>
+			<range min="0" max="5"/>
+		</port>
+
+		<port label="filt1_freq" dir="input" type="control" hint="default_440">
+			<name>Filt1 freq</name>
+			<range min="0" max="8000"/>
+		</port>
+
+		<port label="filt1_q" dir="input" type="control" hint="default_0">
+			<name>Filt1 q</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="filt1_res" dir="input" type="control" hint="default_0">
+			<name>Filt1 resonance</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="filt1_lfo1" dir="input" type="control" hint="default_0">
+			<name>Filt1 LFO1 level</name>
+			<range min="-500" max="500"/>
+		</port>
+
+		<port label="filt1_lfo2" dir="input" type="control" hint="default_0">
+			<name>Filt1 LFO2 level</name>
+			<range min="-500" max="500"/>
+		</port>
+
+		<port label="filt2_type" dir="input" type="control" hint="integer,default_0">
+			<name>Filt2 type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)</name>
+			<range min="0" max="5"/>
+		</port>
+
+		<port label="filt2_freq" dir="input" type="control" hint="default_440">
+			<name>Filt2 freq</name>
+			<range min="0" max="8000"/>
+		</port>
+
+		<port label="filt2_q" dir="input" type="control" hint="default_0">
+			<name>Filt2 q</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="filt2_res" dir="input" type="control" hint="default_0">
+			<name>Filt2 resonance</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="filt2_lfo1" dir="input" type="control" hint="default_0">
+			<name>Filt2 LFO1 level</name>
+			<range min="-500" max="500"/>
+		</port>
+
+		<port label="filt2_lfo2" dir="input" type="control" hint="default_0">
+			<name>Filt2 LFO2 level</name>
+			<range min="-500" max="500"/>
+		</port>
+
+		<port label="filt3_type" dir="input" type="control" hint="integer,default_0">
+			<name>Filt3 type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)</name>
+			<range min="0" max="5"/>
+		</port>
+
+		<port label="filt3_freq" dir="input" type="control" hint="default_440">
+			<name>Filt3 freq</name>
+			<range min="0" max="8000"/>
+		</port>
+
+		<port label="filt3_q" dir="input" type="control" hint="default_0">
+			<name>Filt3 q</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="filt3_res" dir="input" type="control" hint="default_0">
+			<name>Filt3 resonance</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="filt3_lfo1" dir="input" type="control" hint="default_0">
+			<name>Filt3 LFO1 level</name>
+			<range min="-500" max="500"/>
+		</port>
+
+		<port label="filt3_lfo2" dir="input" type="control" hint="default_0">
+			<name>Filt3 LFO2 level</name>
+			<range min="-500" max="500"/>
+		</port>
+
+		<!-- delay control -->
+
+		<port label="dela1_length" dir="input" type="control" hint="default_0">
+			<name>Delay1 length (s)</name>
+			<range min="0" max="2"/>
+		</port>
+
+		<port label="dela1_fb" dir="input" type="control" hint="default_0">
+			<name>Delay1 feedback</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="dela1_wet" dir="input" type="control" hint="default_0">
+			<name>Delay1 wetness</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="dela2_length" dir="input" type="control" hint="default_0">
+			<name>Delay2 length (s)</name>
+			<range min="0" max="2"/>
+		</port>
+
+		<port label="dela2_fb" dir="input" type="control" hint="default_0">
+			<name>Delay2 feedback</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="dela2_wet" dir="input" type="control" hint="default_0">
+			<name>Delay2 wetness</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="dela3_length" dir="input" type="control" hint="default_0">
+			<name>Delay3 length (s)</name>
+			<range min="0" max="2"/>
+		</port>
+
+		<port label="dela3_fb" dir="input" type="control" hint="default_0">
+			<name>Delay3 feedback</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<port label="dela3_wet" dir="input" type="control" hint="default_0">
+			<name>Delay3 wetness</name>
+			<range min="0" max="1"/>
+		</port>
+
+		<!-- mixer2 -->
+
+		<port label="band1_gain_db" dir="input" type="control" hint="default_0">
+			<name>Band 1 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="band2_gain_db" dir="input" type="control" hint="default_0">
+			<name>Band 2 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<port label="band3_gain_db" dir="input" type="control" hint="default_0">
+			<name>Band 3 gain (dB)</name>
+			<range min="-70" max="+20"/>
+		</port>
+
+		<!-- audio i/o -->
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<instance-data label="tables" type="blo_h_tables *"/>
+		<instance-data label="osc1_d" type="blo_h_osc *"/>
+		<instance-data label="osc2_d" type="blo_h_osc *"/>
+		<instance-data label="lfo1_d" type="blo_h_osc *"/>
+		<instance-data label="lfo2_d" type="blo_h_osc *"/>
+		<instance-data label="lfo1" type="float"/>
+		<instance-data label="lfo2" type="float"/>
+		<instance-data label="lfo1_phase" type="float"/>
+		<instance-data label="lfo2_phase" type="float"/>
+		<instance-data label="filt_data" type="sv_filter **"/>
+		<instance-data label="xover_b1_data" type="sv_filter *"/>
+		<instance-data label="xover_b2_data" type="sv_filter *"/>
+		<instance-data label="dela_data" type="float **"/>
+		<instance-data label="dela_pos" type="int *"/>
+		<instance-data label="count" type="long"/>
+	</plugin>
+</ladspa>

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="artificialLatency" id="1914" class="UtilityPlugin">
+    <name>Artificial latency</name>
+    <p>Reports its  delay value as systemic latency. Does nothing else, *this is not a delay*.</p>
+    <p>Can be used to correct for latency between channels.</p>
+
+    <callback event="instantiate"><![CDATA[
+      fs = s_rate;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const int delay_fr = f_round(delay * 0.001 * fs);
+
+      if (input != output) {
+        for (pos = 0; pos < sample_count; pos++) {
+          buffer_write(output[pos], input[pos]);
+        }
+      }
+      *(plugin_data->latency) = (float)delay_fr;
+    ]]></callback>
+
+    <port label="delay" dir="input" type="control" hint="default_low">
+      <name>Delay (ms)</name>
+      <range min="0" max="10000"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+  </plugin>
+</ladspa>

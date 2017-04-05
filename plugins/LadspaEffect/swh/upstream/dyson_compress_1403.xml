@@ -1,0 +1,371 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+/*
+ * Copyright (c) 1996, John S. Dyson
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * This code (easily) runs realtime on a P5-166 w/EDO, Triton-II on FreeBSD.
+ *
+ * More info/comments: dyson@freebsd.org
+ *
+ * This program provides compression of a stereo 16bit audio stream,
+ * such as that contained by a 16Bit wav file.  Extreme measures have
+ * been taken to make the compression as subtile as possible.  One
+ * possible purpose for this code would be to master cassette tapes from
+ * CD's for playback in automobiles where dynamic range needs to be
+ * restricted.
+ *
+ * Suitably recoded for an embedded DSP, this would make a killer audio
+ * compressor for broadcast or recording.  When writing this code, I
+ * ignored the issues of roundoff error or trucation -- Pentiums have
+ * really nice FP processors :-).
+ */
+
+      #include <ladspa-util.h>
+
+      #define MAXLEVEL 0.9f
+      #define NFILT 12
+      #define NEFILT 17
+
+      /* These filters should filter at least the lowest audio freq */
+      #define RLEVELSQ0FILTER .001
+      #define RLEVELSQ1FILTER .010
+      /* These are the attack time for the rms measurement */
+      #define RLEVELSQ0FFILTER .001
+      #define RLEVELSQEFILTER .001
+    
+      #define RMASTERGAIN0FILTER .000003
+    
+      #define RPEAKGAINFILTER .001
+
+      #define MAXFASTGAIN 3
+      #define MAXSLOWGAIN 9
+
+      #define FLOORLEVEL 0.06
+
+      float hardlimit(float value, float knee, float limit) {
+        float ab = fabs(value);
+        if (ab >= limit) {
+          value = value > 0 ? limit : -limit;
+        }
+
+        return value;
+      }
+    ]]></code>
+  </global>
+
+  <plugin label="dysonCompress" id="1403" class="CompressorPlugin">
+    <name>Dyson compressor</name>
+
+    <callback event="instantiate"><![CDATA[
+      sample_rate = (float)s_rate;
+
+      mingain = 10000;
+      maxgain = 0;
+
+      rpeaklimitdelay = 2500;
+    
+      rgain = rmastergain0 = 1.0;
+      rlevelsq0 = 0;
+      rlevelsq1 = 0;
+      ndelay = (int)(1.0 / RLEVELSQ0FFILTER);
+
+      delay = calloc(ndelay, sizeof(LADSPA_Data));
+      rlevelsqn = calloc(NFILT + 1, sizeof(float));
+      rlevelsqe = calloc(NEFILT + 1, sizeof(float));
+    
+      rpeakgain0 = 1.0;
+      rpeakgain1 = 1.0;
+      rpeaklimitdelay = 0;
+      ndelayptr = 0;
+      lastrgain = 1.0;
+
+      extra_maxlevel = 0.0f;
+      peaklimitdelay = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      unsigned int i;
+
+      for (i=0; i<ndelay; i++) {
+        delay[i] = 0;
+      }
+      for (i=0; i<NFILT + 1; i++) {
+        rlevelsqn[i] = 0;
+      }
+      for (i=0; i<NEFILT + 1; i++) {
+        rlevelsqe[i] = 0;
+      }
+
+      mingain = 10000;
+      maxgain = 0;
+
+      rpeaklimitdelay = 2500;
+    
+      rgain = rmastergain0 = 1.0;
+      rlevelsq0 = 0;
+      rlevelsq1 = 0;
+    
+      rpeakgain0 = 1.0;
+      rpeakgain1 = 1.0;
+      rpeaklimitdelay = 0;
+      ndelayptr = 0;
+      lastrgain = 1.0;
+
+      extra_maxlevel = 0.0f;
+      peaklimitdelay = 0;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->delay);
+      free(plugin_data->rlevelsqn);
+      free(plugin_data->rlevelsqe);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float targetlevel = MAXLEVEL * DB_CO(peak_limit);
+      float rgainfilter = 1.0f / (release_time * sample_rate);
+      float fastgaincompressionratio = cfrate;
+      float compressionratio = crate;
+      float efilt;
+      float levelsqe;
+      float gain;
+      float tgain;
+      float d;
+      float fastgain;
+      float qgain;
+      float tslowgain;
+      float slowgain;
+      float npeakgain;
+      float new;
+      float nrgain;
+      float ngain;
+      float ngsq;
+      float tnrgain;
+      float sqrtrpeakgain;
+      float totalgain;
+      unsigned int i;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        // Ergh! this was originally meant to track a stereo signal
+        float levelsq0 = 2.0f * (input[pos] * input[pos]);
+
+        delay[ndelayptr] = input[pos];
+        ndelayptr++;
+
+        if (ndelayptr >= ndelay) {
+          ndelayptr = 0;
+        }
+
+        if (levelsq0 > rlevelsq0) {
+          rlevelsq0 = (levelsq0 * RLEVELSQ0FFILTER) +
+           rlevelsq0 * (1 - RLEVELSQ0FFILTER);
+        } else {
+          rlevelsq0 = (levelsq0 * RLEVELSQ0FILTER) +
+           rlevelsq0 * (1 - RLEVELSQ0FILTER);
+        }
+
+        if (rlevelsq0 <= FLOORLEVEL * FLOORLEVEL) {
+          goto skipagc;
+        }
+
+        if (rlevelsq0 > rlevelsq1) {
+          rlevelsq1 = rlevelsq0;
+        } else {
+          rlevelsq1 = rlevelsq0 * RLEVELSQ1FILTER +
+            rlevelsq1 * (1 - RLEVELSQ1FILTER);
+        }
+
+        rlevelsqn[0] = rlevelsq1;
+        for(i = 0; i < NFILT-1; i++) {
+          if (rlevelsqn[i] > rlevelsqn[i+1])
+            rlevelsqn[i+1] = rlevelsqn[i];
+          else
+            rlevelsqn[i+1] = rlevelsqn[i] * RLEVELSQ1FILTER +
+              rlevelsqn[i+1] * (1 - RLEVELSQ1FILTER);
+        }
+
+        efilt = RLEVELSQEFILTER;
+        levelsqe = rlevelsqe[0] = rlevelsqn[NFILT-1];
+        for(i = 0; i < NEFILT-1; i++) {
+          rlevelsqe[i+1] = rlevelsqe[i] * efilt +
+            rlevelsqe[i+1] * (1.0 - efilt);
+          if (rlevelsqe[i+1] > levelsqe)
+            levelsqe = rlevelsqe[i+1];
+          efilt *= 1.0f / 1.5f;
+        }
+
+        gain = targetlevel / sqrt(levelsqe);
+        if (compressionratio < 0.99f) {
+          if (compressionratio == 0.50f)
+            gain = sqrt(gain);
+          else
+            gain = f_exp(log(gain) * compressionratio);
+        }
+
+        if (gain < rgain)
+          rgain = gain * RLEVELSQEFILTER/2 +
+            rgain * (1 - RLEVELSQEFILTER/2);
+        else
+          rgain = gain * rgainfilter +
+            rgain * (1 - rgainfilter);
+
+        lastrgain = rgain;
+        if ( gain < lastrgain)
+          lastrgain = gain;
+
+      skipagc:;
+
+        tgain = lastrgain;
+    
+        d = delay[ndelayptr];
+    
+        fastgain = tgain;
+        if (fastgain > MAXFASTGAIN)
+          fastgain = MAXFASTGAIN;
+    
+        if (fastgain < 0.0001)
+          fastgain = 0.0001;
+
+        qgain = f_exp(log(fastgain) * fastgaincompressionratio);
+
+        tslowgain = tgain / qgain;
+        if (tslowgain > MAXSLOWGAIN)
+          tslowgain = MAXSLOWGAIN;
+        if (tslowgain < rmastergain0)
+          rmastergain0 = tslowgain;
+        else
+          rmastergain0 = tslowgain * RMASTERGAIN0FILTER +
+            (1 - RMASTERGAIN0FILTER) * rmastergain0;
+    
+        slowgain = rmastergain0;
+        npeakgain = slowgain * qgain;
+    
+        new = d * npeakgain;
+        if (fabs(new) >= MAXLEVEL)
+          nrgain = MAXLEVEL / fabs(new);
+        else
+          nrgain = 1.0;
+    
+        ngain = nrgain;
+    
+        ngsq = ngain * ngain;
+        if (ngsq <= rpeakgain0) {
+          rpeakgain0 = ngsq /* * 0.50 + rpeakgain0 * 0.50 */;
+          rpeaklimitdelay = peaklimitdelay;
+        } else if (rpeaklimitdelay == 0) {
+          if (nrgain > 1.0)
+            tnrgain = 1.0;
+          else
+            tnrgain = nrgain;
+          rpeakgain0 = tnrgain * RPEAKGAINFILTER +
+            (1.0 - RPEAKGAINFILTER) * rpeakgain0;
+        }
+
+        if (rpeakgain0 <= rpeakgain1) {
+          rpeakgain1 = rpeakgain0;
+          rpeaklimitdelay = peaklimitdelay;
+        } else if (rpeaklimitdelay == 0) {
+          rpeakgain1 = RPEAKGAINFILTER * rpeakgain0 +
+            (1.0 - RPEAKGAINFILTER) * rpeakgain1;
+        } else {
+          --rpeaklimitdelay;
+        }
+
+        sqrtrpeakgain = sqrt(rpeakgain1);
+        totalgain = npeakgain * sqrtrpeakgain;
+    
+        buffer_write(output[pos], new * sqrtrpeakgain);
+    
+        if (totalgain > maxgain)
+          maxgain = totalgain;
+        if (totalgain < mingain)
+          mingain = totalgain;
+        if (output[pos] > extra_maxlevel)
+          extra_maxlevel = output[pos];
+      }
+
+      plugin_data->ndelayptr = ndelayptr;
+      plugin_data->rlevelsq0 = rlevelsq0;
+      plugin_data->rlevelsq1 = rlevelsq1;
+      plugin_data->mingain = mingain;
+      plugin_data->maxgain = maxgain;
+      plugin_data->rpeaklimitdelay = rpeaklimitdelay;
+      plugin_data->rgain = rgain;
+      plugin_data->rmastergain0 = rmastergain0;
+      plugin_data->rpeakgain0 = rpeakgain0;
+      plugin_data->rpeakgain1 = rpeakgain1;
+      plugin_data->lastrgain = lastrgain;
+      plugin_data->extra_maxlevel = extra_maxlevel;
+    ]]></callback>
+
+    <port label="peak_limit" dir="input" type="control" hint="default_0">
+      <name>Peak limit (dB)</name>
+      <p>Controls the desired limit of the output signal in dB's.</p>
+      <range min="-30" max="0"/>
+    </port>
+
+    <port label="release_time" dir="input" type="control" hint="default_low">
+      <name>Release time (s)</name>
+      <p>Controls the time taken for the compressor to relax its gain control over the input signal.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="cfrate" dir="input" type="control" hint="default_middle">
+      <name>Fast compression ratio</name>
+      <p>I have no clear idea what this controls.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="crate" dir="input" type="control" hint="default_middle">
+      <name>Compression ratio</name>
+      <p>I have no clear idea what this controls.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="sample_rate" type="float"/>
+    <instance-data label="mingain" type="float"/>
+    <instance-data label="maxgain" type="float"/>
+    <instance-data label="rpeaklimitdelay" type="float"/>
+    <instance-data label="rgain" type="float"/>
+    <instance-data label="rlevelsq0" type="float"/>
+    <instance-data label="rlevelsq1" type="float"/>
+    <instance-data label="ndelay" type="float"/>
+    <instance-data label="delay" type="LADSPA_Data *"/>
+    <instance-data label="rlevelsqn" type="LADSPA_Data *"/>
+    <instance-data label="rlevelsqe" type="LADSPA_Data *"/>
+    <instance-data label="rmastergain0" type="float"/>
+    <instance-data label="rpeakgain0" type="float"/>
+    <instance-data label="rpeakgain1" type="float"/>
+    <instance-data label="peaklimitdelay" type="int"/>
+    <instance-data label="ndelayptr" type="unsigned int"/>
+    <instance-data label="lastrgain" type="float"/>
+    <instance-data label="extra_maxlevel" type="float"/>
+  </plugin>
+</ladspa>

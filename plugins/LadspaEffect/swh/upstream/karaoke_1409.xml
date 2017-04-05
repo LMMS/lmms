@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="karaoke" id="1409" class="UtilityPlugin">
+    <name>Karaoke</name>
+    <p>Attempts to strip the vocals from a stereo signal.</p>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float coef = pow(10.0f, gain * 0.05f) * 0.5f;
+      float m, s;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	m = lin[pos] + rin[pos];
+	s = lin[pos] - rin[pos];
+        buffer_write(lout[pos], m * coef + s * 0.5f);
+        buffer_write(rout[pos], m * coef - s * 0.5f);
+      }
+    ]]></callback>
+
+    <port label="gain" dir="input" type="control" hint="default_0">
+      <name>Vocal volume (dB)</name>
+      <p>Controls the attenuation of the vocal (centre channel) in dB's.</p>
+      <p>The greater the attenuation the greater the loss of stereo field.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="lin" dir="input" type="audio">
+      <name>Left in</name>
+    </port>
+
+    <port label="rin" dir="input" type="audio">
+      <name>Right in</name>
+    </port>
+
+    <port label="lout" dir="output" type="audio">
+      <name>Left out</name>
+    </port>
+
+    <port label="rout" dir="output" type="audio">
+      <name>Right out</name>
+    </port>
+  </plugin>
+</ladspa>

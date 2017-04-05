@@ -1,0 +1,1674 @@
+# translation of swh-plugins 0.4.15-1 to German
+# Copyright (C) 2009 Steve Harris
+# This file is distributed under the same license as the swh-plugins package.
+# Chris Leick <c.leick@vollbio.de>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: swh-plugins 0.4.15-1\n"
+"POT-Creation-Date: 2003-03-09 16:06+0000\n"
+"PO-Revision-Date: 2009-04-01 12:02+0100\n"
+"Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
+"Language-Team: German <debian-l10n-german@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: alias_1407.xml:51
+msgid "Aliasing"
+msgstr "Aliasing"
+
+#: alias_1407.xml:76
+msgid "Aliasing level"
+msgstr "Aliasing-Stufe"
+
+#: alias_1407.xml:86 amp_1181.xml:83 am_pitchshift_1433.xml:177
+#: bode_shifter_1431.xml:193 bode_shifter_cv_1432.xml:195
+#: chebstortion_1430.xml:187 comb_1190.xml:132 comb_splitter_1411.xml:126
+#: crossover_dist_1404.xml:103 dc_remove_1207.xml:80 debug_1184.xml:113
+#: decimator_1202.xml:127 declip_1195.xml:84 delayorama_1402.xml:355
+#: diode_1185.xml:98 divider_1186.xml:119 dj_flanger_1438.xml:189
+#: dyson_compress_1403.xml:406 fad_delay_1192.xml:154 flanger_1191.xml:234
+#: foldover_1213.xml:94 foverdrive_1196.xml:82 freq_tracker_1418.xml:111
+#: gate_1410.xml:248 giant_flange_1437.xml:278 gong_1424.xml:425
+#: gong_beater_1439.xml:151 gsm_1215.xml:194 gverb_1216.xml:196
+#: hard_limiter_1413.xml:110 harmonic_gen_1220.xml:248
+#: hermes_filter_1200.xml:991 imp_1199.xml:290 inv_1429.xml:70
+#: mbeq_1197.xml:380 mod_delay_1419.xml:123 multivoice_chorus_1201.xml:281
+#: phasers_1217.xml:247 phasers_1217.xml:381 phasers_1217.xml:485
+#: pitch_scale_1193.xml:91 pitch_scale_1194.xml:90 plate_1423.xml:160
+#: rate_shifter_1417.xml:125 retro_flange_1208.xml:238 ringmod_1188.xml:109
+#: ringmod_1188.xml:233 satan_maximiser_1408.xml:141 sc1_1425.xml:198
+#: sc2_1426.xml:202 shaper_1187.xml:93 sifter_1210.xml:203
+#: single_para_1203.xml:119 sinus_wavewrapper_1198.xml:84
+#: smooth_decimate_1414.xml:120 split_1406.xml:72 svf_1214.xml:167
+#: tape_delay_1211.xml:262 transient_1206.xml:177 triple_para_1204.xml:255
+#: valve_1209.xml:128 valve_rect_1405.xml:156 zm1_1428.xml:80
+msgid "Input"
+msgstr "Eingang"
+
+#: alias_1407.xml:93 amp_1181.xml:90 am_pitchshift_1433.xml:184
+#: analogue_osc_1416.xml:168 chebstortion_1430.xml:197 comb_1190.xml:139
+#: crossover_dist_1404.xml:110 dc_remove_1207.xml:87 debug_1184.xml:120
+#: decimator_1202.xml:137 declip_1195.xml:94 delayorama_1402.xml:362
+#: diode_1185.xml:105 divider_1186.xml:126 dj_flanger_1438.xml:196
+#: dyson_compress_1403.xml:413 fad_delay_1192.xml:161 flanger_1191.xml:241
+#: fm_osc_1415.xml:102 foldover_1213.xml:101 foverdrive_1196.xml:89
+#: gate_1410.xml:255 giant_flange_1437.xml:285 gong_1424.xml:432
+#: gong_beater_1439.xml:158 gsm_1215.xml:201 hard_limiter_1413.xml:117
+#: harmonic_gen_1220.xml:258 hermes_filter_1200.xml:1001 imp_1199.xml:297
+#: inv_1429.xml:77 mbeq_1197.xml:387 mod_delay_1419.xml:130
+#: multivoice_chorus_1201.xml:288 phasers_1217.xml:254 phasers_1217.xml:388
+#: phasers_1217.xml:492 pitch_scale_1193.xml:98 pitch_scale_1194.xml:97
+#: rate_shifter_1417.xml:132 retro_flange_1208.xml:245 ringmod_1188.xml:126
+#: ringmod_1188.xml:240 satan_maximiser_1408.xml:148 sc1_1425.xml:205
+#: sc2_1426.xml:209 shaper_1187.xml:103 sifter_1210.xml:210
+#: single_para_1203.xml:129 sinus_wavewrapper_1198.xml:94
+#: smooth_decimate_1414.xml:127 step_muxer_1212.xml:222 svf_1214.xml:177
+#: tape_delay_1211.xml:269 transient_1206.xml:187 triple_para_1204.xml:265
+#: valve_1209.xml:135 valve_rect_1405.xml:163 zm1_1428.xml:87
+msgid "Output"
+msgstr "Ausgang"
+
+#: amp_1181.xml:48
+msgid "Simple amplifier"
+msgstr "Einfacher Verstärker"
+
+#: amp_1181.xml:73
+msgid "Amps gain (dB)"
+msgstr "Verstärkung (dB)"
+
+#: am_pitchshift_1433.xml:132
+msgid "AM pitchshifter"
+msgstr "AM-Tonhöhenschieber"
+
+#: am_pitchshift_1433.xml:157
+msgid "Pitch shift"
+msgstr "Tonhöhenschieber"
+
+#: am_pitchshift_1433.xml:167
+msgid "Buffer size"
+msgstr "Puffergröße"
+
+#: analogue_osc_1416.xml:103
+msgid "Analogue Oscillator"
+msgstr "Analoger Oszillator"
+
+#: analogue_osc_1416.xml:128 fm_osc_1415.xml:82
+msgid "Waveform (1=sin, 2=tri, 3=squ, 4=saw)"
+msgstr ""
+"Wellenform (1=sinusförmig, 2=dreieckig, 3=quadratisch, 4=sägezahnförmig)"
+
+#: analogue_osc_1416.xml:138 fm_osc_1415.xml:92 freq_tracker_1418.xml:118
+#: ringmod_1188.xml:183 single_para_1203.xml:99
+msgid "Frequency (Hz)"
+msgstr "Frequenz (Hz)"
+
+#: analogue_osc_1416.xml:148
+msgid "Warmth"
+msgstr "Wärme"
+
+#: analogue_osc_1416.xml:158
+msgid "Instability"
+msgstr "Instabilität"
+
+#: bode_shifter_1431.xml:158
+msgid "Bode frequency shifter"
+msgstr "Bode-Frequenzschieber"
+
+#: bode_shifter_1431.xml:183
+msgid "Frequency shift"
+msgstr "Frequenzverschiebung"
+
+#: bode_shifter_1431.xml:200 bode_shifter_cv_1432.xml:222
+msgid "Down out"
+msgstr "Unten heraus"
+
+#: bode_shifter_1431.xml:207 bode_shifter_cv_1432.xml:229
+msgid "Up out"
+msgstr "Oben heraus"
+
+#: bode_shifter_cv_1432.xml:150
+# CV ist ein »kapazitiver Teiler«.
+# Siehe auch: http://www.guitar-letter.de/Knowledge/Grundlagen/DieLautstaer
+#             keeinstellunginderElektrogitarre.htm
+msgid "Bode frequency shifter (CV)"
+msgstr "Bode-Frequenzschieber (CV)"
+
+#: bode_shifter_cv_1432.xml:175
+msgid "Base shift"
+msgstr "Grundverschiebung"
+
+#: bode_shifter_cv_1432.xml:185
+msgid "Mix (-1=down, +1=up)"
+msgstr "Mix (-1=ab, +1=auf)"
+
+#: bode_shifter_cv_1432.xml:202
+msgid "CV Attenuation"
+msgstr "CV-Dämpfung"
+
+#: bode_shifter_cv_1432.xml:212
+msgid "Shift CV"
+msgstr "CV verschieben"
+
+#: bode_shifter_cv_1432.xml:236
+msgid "Mix out"
+msgstr "Mixen"
+
+#: chebstortion_1430.xml:152
+msgid "Chebyshev distortion"
+msgstr "Tschebyscheff-Amplitudenverzerrung"
+
+#: chebstortion_1430.xml:177 valve_rect_1405.xml:146
+msgid "Distortion"
+msgstr "Verzerrung"
+
+#: comb_1190.xml:87
+msgid "Comb Filter"
+msgstr "Kammfilter"
+
+#: comb_1190.xml:112 comb_splitter_1411.xml:116
+msgid "Band separation (Hz)"
+msgstr "Bandtrennung (Hz)"
+
+#: comb_1190.xml:122 flanger_1191.xml:224 giant_flange_1437.xml:258
+#: lcr_delay_1436.xml:241 phasers_1217.xml:227 phasers_1217.xml:465
+msgid "Feedback"
+msgstr "Feedback"
+
+#: comb_splitter_1411.xml:91
+msgid "Comb Splitter"
+msgstr "Kammspalter"
+
+#: comb_splitter_1411.xml:133 lookahead_limiter_1435.xml:200 split_1406.xml:82
+msgid "Output 1"
+msgstr "Ausgang 1"
+
+#: comb_splitter_1411.xml:140 lookahead_limiter_1435.xml:207 split_1406.xml:92
+msgid "Output 2"
+msgstr "Ausgang 2"
+
+#: crossover_dist_1404.xml:58
+msgid "Crossover distortion"
+msgstr "Übergangs-Amplitudenverzerrung"
+
+#: crossover_dist_1404.xml:83
+msgid "Crossover amplitude"
+msgstr "Übergangs-Amplitude"
+
+#: crossover_dist_1404.xml:93 smooth_decimate_1414.xml:110
+msgid "Smoothing"
+msgstr "Glätten"
+
+#: dc_remove_1207.xml:55
+msgid "DC Offset Remover"
+msgstr "DC-Versatz-Entferner"
+
+#: debug_1184.xml:68
+msgid "Debug Plugin"
+msgstr "Fehlersuch-Erweiterung"
+
+#: debug_1184.xml:93
+msgid "Display all values?"
+msgstr "Alle Werte anzeigen?"
+
+#: debug_1184.xml:103
+msgid "Reset counters?"
+msgstr "Zähler zurücksetzen?"
+
+#: decimator_1202.xml:82
+msgid "Decimator"
+msgstr "Dezimierer"
+
+#: decimator_1202.xml:107
+msgid "Bit depth"
+msgstr "Bit-Tiefe"
+
+#: decimator_1202.xml:117
+msgid "Sample rate (Hz)"
+msgstr "Abtastrate (Hz)"
+
+#: declip_1195.xml:59
+msgid "Declipper"
+msgstr "Begrenzungsentferner"
+
+#: delayorama_1402.xml:220
+msgid "Delayorama"
+msgstr ""
+
+#: delayorama_1402.xml:245
+msgid "Random seed"
+msgstr "Anfangswert für Zufallsgenerator"
+
+#: delayorama_1402.xml:255 hermes_filter_1200.xml:621
+msgid "Input gain (dB)"
+msgstr "Eingangsverstärkung (dB)"
+
+#: delayorama_1402.xml:265 dj_flanger_1438.xml:179
+msgid "Feedback (%)"
+msgstr "Feedback (%)"
+
+#: delayorama_1402.xml:275
+msgid "Number of taps"
+msgstr "Anzahl der Taps"
+
+#: delayorama_1402.xml:285
+msgid "First delay (s)"
+msgstr "Erste Verzögerung (s)"
+
+#: delayorama_1402.xml:295
+msgid "Delay range (s)"
+msgstr "Verzögerungsbereich (s)"
+
+#: delayorama_1402.xml:305
+msgid "Delay change"
+msgstr "Verzögerungsänderung"
+
+#: delayorama_1402.xml:315
+msgid "Delay random (%)"
+msgstr "Zufällige Verzögerung (%)"
+
+#: delayorama_1402.xml:325
+msgid "Amplitude change"
+msgstr "Amplitudenänderung"
+
+#: delayorama_1402.xml:335
+msgid "Amplitude random (%)"
+msgstr "Zufallsamplitude (%)"
+
+#: delayorama_1402.xml:345 gsm_1215.xml:164 plate_1423.xml:150
+msgid "Dry/wet mix"
+msgstr "Trockener/nasser Mix"
+
+#: diode_1185.xml:63
+msgid "Diode Processor"
+msgstr "Diodenprozessor"
+
+#: diode_1185.xml:88
+msgid "Mode (0 for none, 1 for half wave, 2 for full wave)"
+msgstr "Modus (0 für keine, 1 für halbe Welle, 2 für ganze Welle)"
+
+#: divider_1186.xml:84
+msgid "Audio Divider (Suboctave Generator)"
+msgstr "Audio-Teiler (Unteroktaven-Generator)"
+
+#: divider_1186.xml:109
+msgid "Denominator"
+msgstr "Nenner"
+
+#: dj_flanger_1438.xml:124
+msgid "DJ flanger"
+msgstr ""
+
+#: dj_flanger_1438.xml:149
+msgid "LFO sync"
+msgstr ""
+
+#: dj_flanger_1438.xml:159
+msgid "LFO period (s)"
+msgstr "LFO-Periode (s)"
+
+#: dj_flanger_1438.xml:169
+msgid "LFO depth (ms)"
+msgstr "LFO-Tiefe (ms)"
+
+#: dyson_compress_1403.xml:341
+msgid "Dyson compressor"
+msgstr "Dyson-Kompressor"
+
+#: dyson_compress_1403.xml:366
+msgid "Peak limit (dB)"
+msgstr "Spitzenbegrenzung (dB)"
+
+#: dyson_compress_1403.xml:376
+msgid "Release time (s)"
+msgstr "Abklingzeit (s)"
+
+#: dyson_compress_1403.xml:386
+msgid "Fast compression ratio"
+msgstr "Schnelles Verdichtungsverhältnis"
+
+#: dyson_compress_1403.xml:396
+msgid "Compression ratio"
+msgstr "Verdichtungsverhältnis"
+
+#: fad_delay_1192.xml:109
+msgid "Fractionally Addressed Delay Line"
+msgstr "Unterbrochen adressierte Verzögerungslinie"
+
+#: fad_delay_1192.xml:134
+msgid "Delay (seconds)"
+msgstr "Verzögerung (Sekunden)"
+
+#: fad_delay_1192.xml:144
+msgid "Feedback (dB)"
+msgstr "Feedback (dB)"
+
+#: flanger_1191.xml:169
+msgid "Flanger"
+msgstr ""
+
+#: flanger_1191.xml:194 multivoice_chorus_1201.xml:231
+msgid "Delay base (ms)"
+msgstr "Verzögerungsbasis (ms)"
+
+#: flanger_1191.xml:204
+msgid "Max slowdown (ms)"
+msgstr "Maximale Verzögerung (ms)"
+
+#: flanger_1191.xml:214 multivoice_chorus_1201.xml:261
+msgid "LFO frequency (Hz)"
+msgstr "LFO-Frequenz (Hz)"
+
+#: fm_osc_1415.xml:57
+msgid "FM Oscillator"
+msgstr "FM-Oszillator"
+
+#: foldover_1213.xml:49
+msgid "Foldover distortion"
+msgstr ""
+
+#: foldover_1213.xml:74
+msgid "Drive"
+msgstr ""
+
+#: foldover_1213.xml:84
+msgid "Skew"
+msgstr "Schräge"
+
+#: foverdrive_1196.xml:47
+msgid "Fast overdrive"
+msgstr "Schnell übersteuern"
+
+#: foverdrive_1196.xml:72
+msgid "Drive level"
+msgstr ""
+
+#: freq_tracker_1418.xml:76
+msgid "Frequency tracker"
+msgstr "Frequenz-Verfolger"
+
+#: freq_tracker_1418.xml:101
+msgid "Tracking speed"
+msgstr "Verfolgungsgeschwindigkeit"
+
+#: gate_1410.xml:143
+msgid "Gate"
+msgstr "Tor"
+
+#: gate_1410.xml:168
+msgid "LF key filter (Hz)"
+msgstr "LF-Schlüsselfilter (Hz)"
+
+#: gate_1410.xml:178
+msgid "HF key filter (Hz)"
+msgstr "HF-Schlüsselfilter (Hz)"
+
+#: gate_1410.xml:188
+msgid "Threshold (dB)"
+msgstr "Schwelle (dB)"
+
+#: gate_1410.xml:198
+msgid "Attack (ms)"
+msgstr "Anschlag (ms)"
+
+#: gate_1410.xml:208
+msgid "Hold (ms)"
+msgstr "Halten (ms)"
+
+#: gate_1410.xml:218
+msgid "Decay (ms)"
+msgstr "Ausklingen (ms)"
+
+#: gate_1410.xml:228
+msgid "Range (dB)"
+msgstr "Bereich (dB)"
+
+#: gate_1410.xml:238
+msgid "Output select (-1 = key listen, 0 = gate, 1 = bypass)"
+msgstr ""
+
+#: giant_flange_1437.xml:183
+msgid "Giant flange"
+msgstr ""
+
+#: giant_flange_1437.xml:208
+msgid "Double delay"
+msgstr "Doppelte Verzögerung"
+
+#: giant_flange_1437.xml:218
+msgid "LFO frequency 1 (Hz)"
+msgstr "LFO-Frequenz 1 (Hz)"
+
+#: giant_flange_1437.xml:228
+msgid "Delay 1 range (s)"
+msgstr "Verzögerung-1-Bereich (s)"
+
+#: giant_flange_1437.xml:238
+msgid "LFO frequency 2 (Hz)"
+msgstr "LFO-Frequenz 2 (Hz)"
+
+#: giant_flange_1437.xml:248
+msgid "Delay 2 range (s)"
+msgstr "Verzögerung-2-Bereich (s)"
+
+#: giant_flange_1437.xml:268 lcr_delay_1436.xml:281
+msgid "Dry/Wet level"
+msgstr "Trocken-/Nass-Stufe"
+
+#: gong_1424.xml:130
+msgid "Gong model"
+msgstr "Gongmodell"
+
+#: gong_1424.xml:155
+msgid "Inner damping"
+msgstr "Innere Dämpfung"
+
+#: gong_1424.xml:165
+msgid "Outer damping"
+msgstr "Äußere Dämpfung"
+
+#: gong_1424.xml:175
+msgid "Mic position"
+msgstr "Micro-Position"
+
+#: gong_1424.xml:185
+msgid "Inner size 1"
+msgstr "Innere Größe 1"
+
+#: gong_1424.xml:195
+msgid "Inner stiffness 1 +"
+msgstr "Innere Starre 1 +"
+
+#: gong_1424.xml:205
+msgid "Inner stiffness 1 -"
+msgstr "Innere Starre 1 -"
+
+#: gong_1424.xml:215
+msgid "Inner size 2"
+msgstr "Innere Größe 2"
+
+#: gong_1424.xml:225
+msgid "Inner stiffness 2 +"
+msgstr "Innere Starre 2 +"
+
+#: gong_1424.xml:235
+msgid "Inner stiffness 2 -"
+msgstr "Innere Starre 2 -"
+
+#: gong_1424.xml:245
+msgid "Inner size 3"
+msgstr "Innere Größe 3"
+
+#: gong_1424.xml:255
+msgid "Inner stiffness 3 +"
+msgstr "Innere Starre 3 +"
+
+#: gong_1424.xml:265
+msgid "Inner stiffness 3 -"
+msgstr "Innere Starre 3 -"
+
+#: gong_1424.xml:275
+msgid "Inner size 4"
+msgstr "Innere Größe 4"
+
+#: gong_1424.xml:285
+msgid "Inner stiffness 4 +"
+msgstr "Innere Starre 4 +"
+
+#: gong_1424.xml:295
+msgid "Inner stiffness 4 -"
+msgstr "Innere Starre 4 -"
+
+#: gong_1424.xml:305
+msgid "Outer size 1"
+msgstr "Äußere Größe 1"
+
+#: gong_1424.xml:315
+msgid "Outer stiffness 1 +"
+msgstr "Äußere Starre 1 +"
+
+#: gong_1424.xml:325
+msgid "Outer stiffness 1 -"
+msgstr "Äußere Starre 1 -"
+
+#: gong_1424.xml:335
+msgid "Outer size 2"
+msgstr "Äußere Größe 2"
+
+#: gong_1424.xml:345
+msgid "Outer stiffness 2 +"
+msgstr "Äußere Starre 2 +"
+
+#: gong_1424.xml:355
+msgid "Outer stiffness 2 -"
+msgstr "Äußere Starre 2 -"
+
+#: gong_1424.xml:365
+msgid "Outer size 3"
+msgstr "Äußere Größe 3"
+
+#: gong_1424.xml:375
+msgid "Outer stiffness 3 +"
+msgstr "Äußere Starre 3 +"
+
+#: gong_1424.xml:385
+msgid "Outer stiffness 3 -"
+msgstr "Äußere Starre 3 -"
+
+#: gong_1424.xml:395
+msgid "Outer size 4"
+msgstr "Äußere Größe 4"
+
+#: gong_1424.xml:405
+msgid "Outer stiffness 4 +"
+msgstr "Äußere Starre 4 +"
+
+#: gong_1424.xml:415
+msgid "Outer stiffness 4 -"
+msgstr "Äußere Starre 4 -"
+
+#: gong_beater_1439.xml:96
+msgid "Gong beater"
+msgstr "Gongschläger"
+
+#: gong_beater_1439.xml:121
+msgid "Impulse gain (dB)"
+msgstr "Impuls-Zunahme"
+
+#: gong_beater_1439.xml:131
+msgid "Strike gain (dB)"
+msgstr "Schlag-Zunahme (dB)"
+
+#: gong_beater_1439.xml:141
+msgid "Strike duration (s)"
+msgstr "Schlagdauer (s)"
+
+#: gsm_1215.xml:139
+msgid "GSM simulator"
+msgstr "GSM-Simulator"
+
+#: gsm_1215.xml:174
+msgid "Number of passes"
+msgstr "Anzahl der Durchgänge"
+
+#: gsm_1215.xml:184
+msgid "Error rate (bits/block)"
+msgstr "Fehlerquote (Bits/Block)"
+
+#: gverb_1216.xml:101
+msgid "GVerb"
+msgstr "GVerb"
+
+#: gverb_1216.xml:126
+msgid "Roomsize (m)"
+msgstr "Raumgröße (m)"
+
+#: gverb_1216.xml:136
+msgid "Reverb time (s)"
+msgstr "Hallzeit (s)"
+
+#: gverb_1216.xml:146 plate_1423.xml:140
+msgid "Damping"
+msgstr "Dämpfung"
+
+#: gverb_1216.xml:156
+msgid "Input bandwidth"
+msgstr "Eingangsbandbreite"
+
+#: gverb_1216.xml:166
+msgid "Dry signal level (dB)"
+msgstr "Trockene Sognalstufe (dB)"
+
+#: gverb_1216.xml:176
+msgid "Early reflection level (dB)"
+msgstr "Anfängliche Spiegelungsstufe (dB)"
+
+#: gverb_1216.xml:186
+msgid "Tail level (dB)"
+msgstr "Endstufe (dB)"
+
+#: gverb_1216.xml:203 plate_1423.xml:167 sc3_1427.xml:233 sc4_1434.xml:238
+msgid "Left output"
+msgstr "Linker Ausgang"
+
+#: gverb_1216.xml:210 plate_1423.xml:174 sc3_1427.xml:240 sc4_1434.xml:245
+msgid "Right output"
+msgstr "Rechter Ausgang"
+
+#: hard_limiter_1413.xml:55
+msgid "Hard Limiter"
+msgstr "Harter Begrenzer"
+
+#: hard_limiter_1413.xml:80
+msgid "dB limit"
+msgstr "dB-Begrenzung"
+
+#: hard_limiter_1413.xml:90
+msgid "Wet level"
+msgstr "Trockene Stufe"
+
+#: hard_limiter_1413.xml:100
+msgid "Residue level"
+msgstr "Reststufe"
+
+#: harmonic_gen_1220.xml:123
+msgid "Harmonic generator"
+msgstr "Obertongenerator"
+
+#: harmonic_gen_1220.xml:148
+msgid "Fundamental magnitude"
+msgstr "Grundlegende Größenordnung"
+
+#: harmonic_gen_1220.xml:158
+msgid "2nd harmonic magnitude"
+msgstr "2. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:168
+msgid "3rd harmonic magnitude"
+msgstr "3. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:178
+msgid "4th harmonic magnitude"
+msgstr "4. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:188
+msgid "5th harmonic magnitude"
+msgstr "5. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:198
+msgid "6th harmonic magnitude"
+msgstr "6. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:208
+msgid "7th harmonic magnitude"
+msgstr "7. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:218
+msgid "8th harmonic magnitude"
+msgstr "8. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:228
+msgid "9th harmonic magnitude"
+msgstr "9. Oberton-Größenordnung"
+
+#: harmonic_gen_1220.xml:238
+msgid "10th harmonic magnitude"
+msgstr "10. Oberton-Größenordnung"
+
+#: hermes_filter_1200.xml:446
+msgid "Hermes Filter"
+msgstr "Hermes-Filter"
+
+#: hermes_filter_1200.xml:471
+msgid "LFO1 freq (Hz)"
+msgstr "LFO1-Freq. (Hz)"
+
+#: hermes_filter_1200.xml:481
+msgid "LFO1 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = s&h)"
+msgstr ""
+"LFO1-Welle (0 = sinusförmig, 1 = dreieckig, 2 = sägezahnförmig, "
+"3 = quadratisch, 4 = s&h)"
+
+#: hermes_filter_1200.xml:491
+msgid "LFO2 freq (Hz)"
+msgstr "LFO2-Freq. (Hz)"
+
+#: hermes_filter_1200.xml:501
+msgid "LFO2 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = s&h)"
+msgstr ""
+"LFO2-Welle (0 = sinusförmig, 1 = dreieckig, 2 = sägezahnförmig, "
+"3 = quadratisch, 4 = s&h)"
+
+#: hermes_filter_1200.xml:511
+msgid "Osc1 freq (Hz)"
+msgstr "Osz1-Freq. (Hz)"
+
+#: hermes_filter_1200.xml:521
+msgid "Osc1 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = noise)"
+msgstr ""
+"Osz1-Welle (0 = sinusförmig, 1 = dreieckig, 2 = sägezahnförmig, "
+"3 = quadratisch, 4 = Rauschen)"
+
+#: hermes_filter_1200.xml:531
+msgid "Osc2 freq (Hz)"
+msgstr "Osz2-Freq. (Hz)"
+
+#: hermes_filter_1200.xml:541
+msgid "Osc2 wave (0 = sin, 1 = tri, 2 = saw, 3 = squ, 4 = noise)"
+msgstr ""
+"Osz2-Welle (0 = sinusförmig, 1 = dreieckig, 2 = sägezahnförmig, "
+"3 = quadratisch, 4 = Rauschen)"
+
+#: hermes_filter_1200.xml:551
+msgid "Ringmod 1 depth (0=none, 1=AM, 2=RM)"
+msgstr "Ringmod-1-Tiefe (0=keine, 1=AM, 2=RM)"
+
+#: hermes_filter_1200.xml:561
+msgid "Ringmod 2 depth (0=none, 1=AM, 2=RM)"
+msgstr "Ringmod-2-Tiefe (0=keine, 1=AM, 2=RM)"
+
+#: hermes_filter_1200.xml:571
+msgid "Ringmod 3 depth (0=none, 1=AM, 2=RM)"
+msgstr "Ringmod-3-Tiefe (0=keine, 1=AM, 2=RM)"
+
+#: hermes_filter_1200.xml:581
+msgid "Osc1 gain (dB)"
+msgstr "Osz1-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:591
+msgid "RM1 gain (dB)"
+msgstr "RM1-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:601
+msgid "Osc2 gain (dB)"
+msgstr "Osz2-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:611
+msgid "RM2 gain (dB)"
+msgstr "RM2-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:631
+msgid "RM3 gain (dB)"
+msgstr "RM3-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:641
+msgid "Xover lower freq"
+msgstr "Xover niedrigere Freq."
+
+#: hermes_filter_1200.xml:651
+msgid "Xover upper freq"
+msgstr "Xover höhere Freq."
+
+#: hermes_filter_1200.xml:661
+msgid "Dist1 drive"
+msgstr "Dist1-Schwung"
+
+#: hermes_filter_1200.xml:671
+msgid "Dist2 drive"
+msgstr "Dist2-Schwung"
+
+#: hermes_filter_1200.xml:681
+msgid "Dist3 drive"
+msgstr "Dist3-Schwung"
+
+#: hermes_filter_1200.xml:691
+msgid "Filt1 type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+msgstr "Filt1-Typ (0=kein, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+
+#: hermes_filter_1200.xml:701
+msgid "Filt1 freq"
+msgstr "Filt1-Freq."
+
+#: hermes_filter_1200.xml:711
+msgid "Filt1 q"
+msgstr "Filt1 q"
+
+#: hermes_filter_1200.xml:721
+msgid "Filt1 resonance"
+msgstr "Filt1 Resonanz"
+
+#: hermes_filter_1200.xml:731
+msgid "Filt1 LFO1 level"
+msgstr "Filt1-LFO1-Stufe"
+
+#: hermes_filter_1200.xml:741
+msgid "Filt1 LFO2 level"
+msgstr "Filt1-LFO2-Stufe"
+
+#: hermes_filter_1200.xml:751
+msgid "Filt2 type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+msgstr "Filt2-Typ (0=kein, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+
+#: hermes_filter_1200.xml:761
+msgid "Filt2 freq"
+msgstr "Filt2-Freq."
+
+#: hermes_filter_1200.xml:771
+msgid "Filt2 q"
+msgstr "Filt2 q"
+
+#: hermes_filter_1200.xml:781
+msgid "Filt2 resonance"
+msgstr "Filt2 Resonanz"
+
+#: hermes_filter_1200.xml:791
+msgid "Filt2 LFO1 level"
+msgstr "Filt2-LFO1-Stufe"
+
+#: hermes_filter_1200.xml:801
+msgid "Filt2 LFO2 level"
+msgstr "Filt2-LFO2-Stufe"
+
+#: hermes_filter_1200.xml:811
+msgid "Filt3 type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+msgstr "Filt3-Typ (0=kein, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+
+#: hermes_filter_1200.xml:821
+msgid "Filt3 freq"
+msgstr "Filt3-Freq."
+
+#: hermes_filter_1200.xml:831
+msgid "Filt3 q"
+msgstr "Filt3 q"
+
+#: hermes_filter_1200.xml:841
+msgid "Filt3 resonance"
+msgstr "Filt3 Resonanz"
+
+#: hermes_filter_1200.xml:851
+msgid "Filt3 LFO1 level"
+msgstr "Filt3-LFO1-Stufe"
+
+#: hermes_filter_1200.xml:861
+msgid "Filt3 LFO2 level"
+msgstr "Filt3-LFO2-Stufe"
+
+#: hermes_filter_1200.xml:871
+msgid "Delay1 length (s)"
+msgstr "Verzögerung1-Länge (s)"
+
+#: hermes_filter_1200.xml:881
+msgid "Delay1 feedback"
+msgstr "Verzögerung1-Feedback"
+
+#: hermes_filter_1200.xml:891
+msgid "Delay1 wetness"
+msgstr "Verzögerung1-Nässe"
+
+#: hermes_filter_1200.xml:901
+msgid "Delay2 length (s)"
+msgstr "Verzögerung2-Länge (s)"
+
+#: hermes_filter_1200.xml:911
+msgid "Delay2 feedback"
+msgstr "Verzögerung2-Feedback"
+
+#: hermes_filter_1200.xml:921
+msgid "Delay2 wetness"
+msgstr "Verzögerung2-Nässe"
+
+#: hermes_filter_1200.xml:931
+msgid "Delay3 length (s)"
+msgstr "Verzögerung3-Länge (s)"
+
+#: hermes_filter_1200.xml:941
+msgid "Delay3 feedback"
+msgstr "Verzögerung3-Feedback"
+
+#: hermes_filter_1200.xml:951
+msgid "Delay3 wetness"
+msgstr "Verzögerung3-Nässe"
+
+#: hermes_filter_1200.xml:961 triple_para_1204.xml:135
+msgid "Band 1 gain (dB)"
+msgstr "Band-1-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:971 triple_para_1204.xml:165
+msgid "Band 2 gain (dB)"
+msgstr "Band-2-Zunahme (dB)"
+
+#: hermes_filter_1200.xml:981 triple_para_1204.xml:195
+msgid "Band 3 gain (dB)"
+msgstr "Band-3-Zunahme (dB)"
+
+#: imp_1199.xml:235
+msgid "Impulse convolver"
+msgstr "Impuls-Zusammenroller"
+
+#: imp_1199.xml:260
+msgid "Impulse ID"
+msgstr "Impuls-ID"
+
+#: imp_1199.xml:270
+msgid "High latency mode"
+msgstr "Modus mit hoher Wartezeit"
+
+#: imp_1199.xml:280 single_para_1203.xml:89
+msgid "Gain (dB)"
+msgstr "Zunahme (dB)"
+
+#: inv_1429.xml:45
+msgid "Inverter"
+msgstr "Wechselrichter"
+
+#: karaoke_1409.xml:50
+msgid "Karaoke"
+msgstr "Karaoke"
+
+#: karaoke_1409.xml:75
+msgid "Vocal volume (dB)"
+msgstr "Stimmenlautstärke"
+
+#: karaoke_1409.xml:85
+msgid "Left in"
+msgstr "Links ein"
+
+#: karaoke_1409.xml:92
+msgid "Right in"
+msgstr "Rechts ein"
+
+#: karaoke_1409.xml:99
+msgid "Left out"
+msgstr "Links aus"
+
+#: karaoke_1409.xml:106
+msgid "Right out"
+msgstr "Rechts aus"
+
+#: lcr_delay_1436.xml:156
+msgid "L/C/R Delay"
+msgstr "L/C/R-Verzögerung"
+
+#: lcr_delay_1436.xml:181
+msgid "L delay (ms)"
+msgstr "L-Verzögerung (ms)"
+
+#: lcr_delay_1436.xml:191
+msgid "L level"
+msgstr "L-Stufe"
+
+#: lcr_delay_1436.xml:201
+msgid "C delay (ms)"
+msgstr "C-Verzögerung (ms)"
+
+#: lcr_delay_1436.xml:211
+msgid "C level"
+msgstr "C-Stufe"
+
+#: lcr_delay_1436.xml:221
+msgid "R delay (ms)"
+msgstr "R-Verzögerung (ms)"
+
+#: lcr_delay_1436.xml:231
+msgid "R level"
+msgstr "R-Stufe"
+
+#: lcr_delay_1436.xml:251
+msgid "High damp (%)"
+msgstr "Hohe Feuchtigkeit (%)"
+
+#: lcr_delay_1436.xml:261
+msgid "Low damp (%)"
+msgstr "Niedrige Feuchtigkeit (%)"
+
+#: lcr_delay_1436.xml:271
+msgid "Spread"
+msgstr "Ausbreitung"
+
+#: lcr_delay_1436.xml:291
+msgid "L input"
+msgstr "L-Eingang"
+
+#: lcr_delay_1436.xml:298
+msgid "R input"
+msgstr "R-Eingang"
+
+#: lcr_delay_1436.xml:305
+msgid "L output"
+msgstr "L-Ausgang"
+
+#: lcr_delay_1436.xml:312
+msgid "R output"
+msgstr "R-Ausgang"
+
+#: lookahead_limiter_1435.xml:131
+msgid "Lookahead limiter"
+msgstr "Vorgriff-Begrenzer"
+
+#: lookahead_limiter_1435.xml:156
+msgid "Limit (dB)"
+msgstr "Begrenzung (dB)"
+
+#: lookahead_limiter_1435.xml:166
+msgid "Lookahead delay"
+msgstr "Vorgriff-Verzögerung"
+
+#: lookahead_limiter_1435.xml:176
+msgid "Attenuation (dB)"
+msgstr "Dämpfung (dB)"
+
+#: lookahead_limiter_1435.xml:186 step_muxer_1212.xml:166
+msgid "Input 1"
+msgstr "Eingang 1"
+
+#: lookahead_limiter_1435.xml:193 step_muxer_1212.xml:173
+msgid "Input 2"
+msgstr "Eingang 2"
+
+#: matrix_ms_st_1421.xml:45
+msgid "Matrix: MS to Stereo"
+msgstr "Matrix: MS zu Stereo"
+
+#: matrix_ms_st_1421.xml:70 matrix_spatialiser_1422.xml:205
+msgid "Width"
+msgstr "Breite"
+
+#: matrix_ms_st_1421.xml:80 matrix_st_ms_1420.xml:84
+msgid "Mid"
+msgstr "Mittlere"
+
+#: matrix_ms_st_1421.xml:87 matrix_st_ms_1420.xml:91
+msgid "Side"
+msgstr "Seite"
+
+#: matrix_ms_st_1421.xml:94 matrix_st_ms_1420.xml:70
+msgid "Left"
+msgstr "Links"
+
+#: matrix_ms_st_1421.xml:101 matrix_st_ms_1420.xml:77
+msgid "Right"
+msgstr "Rechts"
+
+#: matrix_spatialiser_1422.xml:166
+msgid "Matrix Spatialiser"
+msgstr ""
+
+#: matrix_spatialiser_1422.xml:191
+msgid "Input L"
+msgstr "Eingang L"
+
+#: matrix_spatialiser_1422.xml:198
+msgid "Input R"
+msgstr "Eingang R"
+
+#: matrix_spatialiser_1422.xml:215
+msgid "Output L"
+msgstr "Ausgang L"
+
+#: matrix_spatialiser_1422.xml:222
+msgid "Output R"
+msgstr "Ausgang R"
+
+#: matrix_st_ms_1420.xml:45
+msgid "Matrix: Stereo to MS"
+msgstr "Matrix: Stereo zu MS"
+
+#: mbeq_1197.xml:205
+msgid "Multiband EQ"
+msgstr "Multiband EQ"
+
+#: mbeq_1197.xml:230
+msgid "50Hz gain (low shelving)"
+msgstr "50Hz Zunahme (niedrige Aufstellung)"
+
+#: mbeq_1197.xml:240
+msgid "100Hz gain"
+msgstr "100Hz Zunahme"
+
+#: mbeq_1197.xml:250
+msgid "156Hz gain"
+msgstr "156Hz Zunahme"
+
+#: mbeq_1197.xml:260
+msgid "220Hz gain"
+msgstr "220Hz Zunahme"
+
+#: mbeq_1197.xml:270
+msgid "311Hz gain"
+msgstr "311Hz Zunahme"
+
+#: mbeq_1197.xml:280
+msgid "440Hz gain"
+msgstr "440Hz Zunahme"
+
+#: mbeq_1197.xml:290
+msgid "622Hz gain"
+msgstr "622Hz Zunahme"
+
+#: mbeq_1197.xml:300
+msgid "880Hz gain"
+msgstr "880Hz Zunahme"
+
+#: mbeq_1197.xml:310
+msgid "1250Hz gain"
+msgstr "1250Hz Zunahme"
+
+#: mbeq_1197.xml:320
+msgid "1750Hz gain"
+msgstr "1750Hz Zunahme"
+
+#: mbeq_1197.xml:330
+msgid "2500Hz gain"
+msgstr "2500Hz Zunahme"
+
+#: mbeq_1197.xml:340
+msgid "3500Hz gain"
+msgstr "3500Hz Zunahme"
+
+#: mbeq_1197.xml:350
+msgid "5000Hz gain"
+msgstr "5000Hz Zunahme"
+
+#: mbeq_1197.xml:360
+msgid "10000Hz gain"
+msgstr "10000Hz Zunahme"
+
+#: mbeq_1197.xml:370
+msgid "20000Hz gain"
+msgstr "20000Hz Zunahme"
+
+#: mod_delay_1419.xml:78
+msgid "Modulatable delay"
+msgstr "Regelbare Verzögerung"
+
+#: mod_delay_1419.xml:103
+msgid "Base delay (s)"
+msgstr "Grundverzögerung (s)"
+
+#: mod_delay_1419.xml:113
+msgid "Delay (s)"
+msgstr "Verzögerung (s)"
+
+#: multivoice_chorus_1201.xml:196
+msgid "Multivoice Chorus"
+msgstr "Mehrstimmiger Chor"
+
+#: multivoice_chorus_1201.xml:221
+msgid "Number of voices"
+msgstr "Anzahl der Stimmen"
+
+#: multivoice_chorus_1201.xml:241
+msgid "Voice separation (ms)"
+msgstr "Stimmentrennung (ms)"
+
+#: multivoice_chorus_1201.xml:251
+msgid "Detune (%)"
+msgstr "Verstimmung (%)"
+
+#: multivoice_chorus_1201.xml:271
+msgid "Output attenuation (dB)"
+msgstr "Ausgangsdämpfung (dB)"
+
+#: phasers_1217.xml:182
+msgid "LFO Phaser"
+msgstr ""
+
+#: phasers_1217.xml:207
+msgid "LFO rate (Hz)"
+msgstr "LFO-Rate (Hz)"
+
+#: phasers_1217.xml:217
+msgid "LFO depth"
+msgstr "LFO-Tiefe"
+
+#: phasers_1217.xml:237 phasers_1217.xml:475
+msgid "Spread (octaves)"
+msgstr "Ausbreitung (Oktaven)"
+
+#: phasers_1217.xml:276
+msgid "4 x 4 pole allpass"
+msgstr "4 x 4 Pol-Allpass"
+
+#: phasers_1217.xml:301
+msgid "Frequency 1"
+msgstr "Frequenz 1"
+
+#: phasers_1217.xml:311
+msgid "Feedback 1"
+msgstr "Feedback 1"
+
+#: phasers_1217.xml:321
+msgid "Frequency 2"
+msgstr "Frequenz 2"
+
+#: phasers_1217.xml:331
+msgid "Feedback 2"
+msgstr "Feedback 2"
+
+#: phasers_1217.xml:341
+msgid "Frequency 3"
+msgstr "Frequenz 3"
+
+#: phasers_1217.xml:351
+msgid "Feedback 3"
+msgstr "Feedback 3"
+
+#: phasers_1217.xml:361
+msgid "Frequency 4"
+msgstr "Frequenz 4"
+
+#: phasers_1217.xml:371
+msgid "Feedback 4"
+msgstr "Feedback 4"
+
+#: phasers_1217.xml:410
+msgid "Auto phaser"
+msgstr ""
+
+#: phasers_1217.xml:435
+msgid "Attack time (s)"
+msgstr "Anschlagzeit (s)"
+
+#: phasers_1217.xml:445
+msgid "Decay time (s)"
+msgstr "Abklingzeit (s)"
+
+#: phasers_1217.xml:455
+msgid "Modulation depth"
+msgstr "Regeltiefe"
+
+#: pitch_scale_1193.xml:56
+msgid "Pitch Scaler"
+msgstr ""
+
+#: pitch_scale_1193.xml:81 pitch_scale_1194.xml:80
+msgid "Pitch co-efficient"
+msgstr ""
+
+#: pitch_scale_1194.xml:55
+msgid "Higher Quality Pitch Scaler"
+msgstr ""
+
+#: plate_1423.xml:105
+msgid "Plate reverb"
+msgstr "Blech-Hall"
+
+#: plate_1423.xml:130
+msgid "Reverb time"
+msgstr "Hallzeit"
+
+#: rate_shifter_1417.xml:90
+msgid "Rate shifter"
+msgstr "Anteil-Schieber"
+
+#: rate_shifter_1417.xml:115
+msgid "Rate"
+msgstr "Anteil"
+
+#: retro_flange_1208.xml:193
+msgid "Retro Flanger"
+msgstr ""
+
+#: retro_flange_1208.xml:218
+msgid "Average stall (ms)"
+msgstr ""
+
+#: retro_flange_1208.xml:228
+msgid "Flange frequency (Hz)"
+msgstr ""
+
+#: ringmod_1188.xml:74
+msgid "Ringmod with two inputs"
+msgstr "Ringmod mit zwei Eingängen"
+
+#: ringmod_1188.xml:99 ringmod_1188.xml:173
+msgid "Modulation depth (0=none, 1=AM, 2=RM)"
+msgstr "Regeltiefe (0=keine, 1=AM, 2=RM)"
+
+#: ringmod_1188.xml:116
+msgid "Modulator"
+msgstr "Regler"
+
+#: ringmod_1188.xml:148
+msgid "Ringmod with LFO"
+msgstr "Ringmod mit LFO"
+
+#: ringmod_1188.xml:193
+msgid "Sine level"
+msgstr "Sinus-Stufe"
+
+#: ringmod_1188.xml:203
+msgid "Triangle level"
+msgstr "Triangelstufe"
+
+#: ringmod_1188.xml:213
+msgid "Sawtooth level"
+msgstr "Sägezahnstufe"
+
+#: ringmod_1188.xml:223
+msgid "Square level"
+msgstr "Quadratstufe"
+
+#: satan_maximiser_1408.xml:96
+msgid "Barry's Satan Maximiser"
+msgstr "Barrys Satan-Maximierer"
+
+#: satan_maximiser_1408.xml:121
+msgid "Decay time (samples)"
+msgstr "Ausklingzeit (Muster)"
+
+#: satan_maximiser_1408.xml:131
+msgid "Knee point (dB)"
+msgstr "Kniepunkt (dB)"
+
+#: sc1_1425.xml:113
+msgid "SC1"
+msgstr "SC1"
+
+#: sc1_1425.xml:138 sc2_1426.xml:135 sc3_1427.xml:142 sc4_1434.xml:144
+msgid "Attack time (ms)"
+msgstr "Anschlagzeit (ms)"
+
+#: sc1_1425.xml:148 sc2_1426.xml:145 sc3_1427.xml:152 sc4_1434.xml:154
+msgid "Release time (ms)"
+msgstr "Freigabezeit (ms)"
+
+#: sc1_1425.xml:158 sc2_1426.xml:155 sc3_1427.xml:162 sc4_1434.xml:164
+msgid "Threshold level (dB)"
+msgstr "Schwellenstufe (dB)"
+
+#: sc1_1425.xml:168 sc2_1426.xml:165 sc3_1427.xml:172 sc4_1434.xml:174
+msgid "Ratio (1:n)"
+msgstr "Verhältnis (1:n)"
+
+#: sc1_1425.xml:178 sc2_1426.xml:175 sc3_1427.xml:182 sc4_1434.xml:184
+msgid "Knee radius (dB)"
+msgstr "Knieradius (dB)"
+
+#: sc1_1425.xml:188 sc2_1426.xml:185 sc3_1427.xml:192 sc4_1434.xml:194
+msgid "Makeup gain (dB)"
+msgstr "Aufbauzunahme (dB)"
+
+#: sc2_1426.xml:110
+msgid "SC2"
+msgstr "SC2"
+
+#: sc2_1426.xml:195 sc3_1427.xml:212
+msgid "Sidechain"
+msgstr ""
+
+#: sc3_1427.xml:117
+msgid "SC3"
+msgstr "SC3"
+
+#: sc3_1427.xml:202
+msgid "Chain balance"
+msgstr ""
+
+#: sc3_1427.xml:219 sc4_1434.xml:224
+msgid "Left input"
+msgstr "Linker Eingang"
+
+#: sc3_1427.xml:226 sc4_1434.xml:231
+msgid "Right input"
+msgstr "Rechter Eingang"
+
+#: sc4_1434.xml:119
+msgid "SC4"
+msgstr "SC4"
+
+#: sc4_1434.xml:204
+msgid "Amplitude (dB)"
+msgstr "Amplitude (dB)"
+
+#: sc4_1434.xml:214
+msgid "Gain reduction (dB)"
+msgstr "Zunahmeverminderung (dB)"
+
+#: shaper_1187.xml:58
+msgid "Wave shaper"
+msgstr "Wellenformer"
+
+#: shaper_1187.xml:83
+msgid "Waveshape"
+msgstr "Wellenform"
+
+#: sifter_1210.xml:168
+msgid "Signal sifter"
+msgstr "Signal-Schieber"
+
+#: sifter_1210.xml:193
+msgid "Sift size"
+msgstr "Schiebegröße"
+
+#: single_para_1203.xml:64
+msgid "Single band parametric"
+msgstr "Einzelband parametrisch"
+
+#: single_para_1203.xml:109
+msgid "Bandwidth (octaves)"
+msgstr "Bandbreite (Oktaven)"
+
+#: sinus_wavewrapper_1198.xml:49
+msgid "Sinus wavewrapper"
+msgstr "Sinuswellen-Hülle"
+
+#: sinus_wavewrapper_1198.xml:74
+msgid "Wrap degree"
+msgstr "Verhüllungsgrad"
+
+#: smooth_decimate_1414.xml:75
+msgid "Smooth Decimator"
+msgstr "Glatter Verminderer"
+
+#: smooth_decimate_1414.xml:100
+msgid "Resample rate"
+msgstr "Wiederabtast-Rate"
+
+#: split_1406.xml:47
+msgid "Mono to Stereo splitter"
+msgstr "Mono-zu-Stereo-Spalter"
+
+#: step_muxer_1212.xml:124
+msgid "Step Demuxer"
+msgstr ""
+
+#: step_muxer_1212.xml:149
+msgid "Crossfade time (in ms)"
+msgstr ""
+
+#: step_muxer_1212.xml:159
+msgid "Clock"
+msgstr "Takt"
+
+#: step_muxer_1212.xml:180
+msgid "Input 3"
+msgstr "Eingang 3"
+
+#: step_muxer_1212.xml:187
+msgid "Input 4"
+msgstr "Eingang 4"
+
+#: step_muxer_1212.xml:194
+msgid "Input 5"
+msgstr "Eingang 5"
+
+#: step_muxer_1212.xml:201
+msgid "Input 6"
+msgstr "Eingang 6"
+
+#: step_muxer_1212.xml:208
+msgid "Input 7"
+msgstr "Eingang 7"
+
+#: step_muxer_1212.xml:215
+msgid "Input 8"
+msgstr "Eingang 8"
+
+#: surround_encoder_1401.xml:97
+msgid "Surround matrix encoder"
+msgstr "Umgebungsmatrix-Geber"
+
+#: surround_encoder_1401.xml:122
+msgid "L"
+msgstr "L"
+
+#: surround_encoder_1401.xml:129
+msgid "R"
+msgstr "R"
+
+#: surround_encoder_1401.xml:136
+msgid "C"
+msgstr "C"
+
+#: surround_encoder_1401.xml:143
+msgid "S"
+msgstr "S"
+
+#: surround_encoder_1401.xml:150
+msgid "Lt"
+msgstr "Lt"
+
+#: surround_encoder_1401.xml:157
+msgid "Rt"
+msgstr "Rt"
+
+#: svf_1214.xml:142
+msgid "State Variable Filter"
+msgstr "Statusvariablenfilter"
+
+#: svf_1214.xml:187
+msgid "Filter type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+msgstr "Filtertyp (0=kein, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)"
+
+#: svf_1214.xml:197
+msgid "Filter freq"
+msgstr "Filter Freq."
+
+#: svf_1214.xml:207
+msgid "Filter Q"
+msgstr "Filter Q"
+
+#: svf_1214.xml:217
+msgid "Filter resonance"
+msgstr "Filterresonanz"
+
+#: tape_delay_1211.xml:137
+msgid "Tape Delay Simulation"
+msgstr "Bandverzögerungs-Simulation"
+
+#: tape_delay_1211.xml:162
+msgid "Tape speed (inches/sec, 1=normal)"
+msgstr "Bandgeschwindigkeit (Inch/Sek, 1=Normal)"
+
+#: tape_delay_1211.xml:172
+msgid "Dry level (dB)"
+msgstr "Trockenstufe (dB)"
+
+#: tape_delay_1211.xml:182
+msgid "Tap 1 distance (inches)"
+msgstr "Tap-1-Entfernung (Inch)"
+
+#: tape_delay_1211.xml:192
+msgid "Tap 1 level (dB)"
+msgstr "Tap-1-Stufe (dB)"
+
+#: tape_delay_1211.xml:202
+msgid "Tap 2 distance (inches)"
+msgstr "Tap-2-Entfernung (Inch)"
+
+#: tape_delay_1211.xml:212
+msgid "Tap 2 level (dB)"
+msgstr "Tap-2-Stufe (dB)"
+
+#: tape_delay_1211.xml:222
+msgid "Tap 3 distance (inches)"
+msgstr "Tap-3-Entfernung (Inch)"
+
+#: tape_delay_1211.xml:232
+msgid "Tap 3 level (dB)"
+msgstr "Tap-3-Stufe (dB)"
+
+#: tape_delay_1211.xml:242
+msgid "Tap 4 distance (inches)"
+msgstr "Tap-4-Entfernung (Inch)"
+
+#: tape_delay_1211.xml:252
+msgid "Tap 4 level (dB)"
+msgstr "Tap-4-Stufe (dB)"
+
+#: transient_1206.xml:132
+msgid "Transient mangler"
+msgstr ""
+
+#: transient_1206.xml:157
+msgid "Attack speed"
+msgstr "Anschlaggeschwindigkeit"
+
+#: transient_1206.xml:167
+msgid "Sustain time"
+msgstr "Ausklingzeit"
+
+#: triple_para_1204.xml:80
+msgid "Triple band parametric with shelves"
+msgstr ""
+
+#: triple_para_1204.xml:105
+msgid "Low-shelving gain (dB)"
+msgstr ""
+
+#: triple_para_1204.xml:115
+msgid "Low-shelving frequency (Hz)"
+msgstr ""
+
+#: triple_para_1204.xml:125
+msgid "Low-shelving slope"
+msgstr ""
+
+#: triple_para_1204.xml:145
+msgid "Band 1 frequency (Hz)"
+msgstr "Band-1-Frequenz (Hz)"
+
+#: triple_para_1204.xml:155
+msgid "Band 1 bandwidth (octaves)"
+msgstr "Band-1-Bandbreite (Oktaven)"
+
+#: triple_para_1204.xml:175
+msgid "Band 2 frequency (Hz)"
+msgstr "Band-2-Frequenz (Hz)"
+
+#: triple_para_1204.xml:185
+msgid "Band 2 bandwidth (octaves)"
+msgstr "Band-2-Bandbreite (Oktaven)"
+
+#: triple_para_1204.xml:205
+msgid "Band 3 frequency (Hz)"
+msgstr "Band-3-Frequenz (Hz)"
+
+#: triple_para_1204.xml:215
+msgid "Band 3 bandwidth (octaves)"
+msgstr "Band-3-Bandbreite (Oktaven)"
+
+#: triple_para_1204.xml:225
+msgid "High-shelving gain (dB)"
+msgstr ""
+
+#: triple_para_1204.xml:235
+msgid "High-shelving frequency (Hz)"
+msgstr ""
+
+#: triple_para_1204.xml:245
+msgid "High-shelving slope"
+msgstr ""
+
+#: valve_1209.xml:83
+msgid "Valve saturation"
+msgstr "Ventilsättigung"
+
+#: valve_1209.xml:108
+msgid "Distortion level"
+msgstr "Amplitudenverzerrungsstufe"
+
+#: valve_1209.xml:118
+msgid "Distortion character"
+msgstr "Amplitudenverzerrungscharakter"
+
+#: valve_rect_1405.xml:111
+msgid "Valve rectifier"
+msgstr "Ventilgleichrichter"
+
+#: valve_rect_1405.xml:136
+msgid "Sag level"
+msgstr "Durchhangstufe"
+
+#: wave_terrain_1412.xml:49
+msgid "Wave Terrain Oscillator"
+msgstr "Wellenbodenoszillator"
+
+#: wave_terrain_1412.xml:74
+msgid "x"
+msgstr "x"
+
+#: wave_terrain_1412.xml:81
+msgid "y"
+msgstr "y"
+
+#: wave_terrain_1412.xml:88
+msgid "z"
+msgstr "z"
+
+#: zm1_1428.xml:55
+msgid "z-1"
+msgstr "z-1"

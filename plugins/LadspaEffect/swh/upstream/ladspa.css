@@ -1,0 +1,122 @@
+/* CSS stylesheet */
+
+ladspa:before {
+  content: "LADSPA Plugin Details";
+  margin: 0.5em 0em;
+  display: block;
+  font-size: 16pt;
+  font-weight: bold;
+  font-family: helvetica;
+}
+
+ladspa {
+  display: block;
+  color: black;
+  margin: 0em 0.5em 0.5em 0.5em;
+  text-align: left;
+  font-size: 10pt;
+  background-color: white;
+}
+
+plugin > name {
+  display: block;
+  color: black;
+  margin: 0.5em 0em;
+  font-weight: bold;
+  font-family: helvetica;
+  font-size: 12pt;
+}
+
+plugin > name:after {
+  content: " (ID " counters(id, ".") ")";
+}
+
+port > name:before {
+  content: "Port: ";
+}
+
+port > name {
+  display: block;
+  color: black;
+  margin: 0.5em 0.5em;
+  font-weight: bold;
+  font-family: helvetica;
+  font-size: 12pt;
+}
+
+port > range:before {
+  display: block;
+  margin: 0.5em 1em;
+  content: "Range: " attr(min) " - " attr(max);
+  font-size: 10pt;
+}
+
+range {
+  display: block;
+}
+
+global {
+  font-size: 10pt;
+}
+
+port:after {
+  content: "Label: " attr(label) " (" attr(type) " " attr(dir) ")";
+  display: block;
+  margin: 0.5em 1em;
+  font-size: 10pt;
+}
+
+code:before {
+  margin: 0em -0.5em;
+  content: "Global code ";
+  display: block;
+  font-family: helvetica;
+  font-weight: bold;
+  font-size: 12pt;
+}
+
+code {
+  font-size: 10pt;
+  font-family: courier;
+  display: block;
+  white-space: pre;
+  margin: 0.5em 1em;
+}
+
+callback:before {
+  margin: 0em -0.5em;
+  content: "Callback: " attr(event);
+  display: block;
+  font-family: helvetica;
+  font-weight: bold;
+  font-size: 12pt;
+}
+
+callback {
+  font-size: 10pt;
+  font-family: courier;
+  display: block;
+  white-space: pre;
+  margin: 0.5em 1em;
+}
+
+meta.first {
+  display: block;
+  content: "Metadata";
+}
+
+meta:after {
+  margin: 0em 1em;
+  text-transform: capitalize;
+  content: attr(name) ": " attr(value);
+  display: block;
+}
+
+meta {
+  display: block;
+}
+
+p {
+  display: block;
+  margin: 0.5em 1em;
+}

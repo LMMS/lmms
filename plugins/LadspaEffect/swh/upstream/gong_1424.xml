@@ -1,0 +1,294 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "util/waveguide_nl.h"
+
+      #define RUN_WG(n, junct_a, junct_b) waveguide_nl_process(w[n], junct_a - out[n*2+1], junct_b - out[n*2], out+n*2, out+n*2+1)
+    </code>
+  </global>
+
+  <plugin label="gong" id="1424" class="SimulatorPlugin,GeneratorPlugin">
+    <name>Gong model</name>
+    <p>A physical model of a metal gong.</p>
+    <p>Based on Josep Comajuncosas' gong explorer, which was built in Sync Modular, it uses 8 linear waveguides with nonlinear filters to model the gong surface.</p>
+
+    <callback event="instantiate"><![CDATA[
+      /* Max delay length for inner waveguides */
+      maxsize_i = (float)s_rate * 0.03643242f;
+      /* Max delay length for outer waveguides */
+      maxsize_o = (float)s_rate * 0.05722782f;
+
+      /* The waveguide structures */
+      w = malloc(8 * sizeof(waveguide_nl *));
+      w[0] = waveguide_nl_new(maxsize_i, 0.5, 0.0f, 0.0f);
+      w[1] = waveguide_nl_new(maxsize_i, 0.5, 0.0f, 0.0f);
+      w[2] = waveguide_nl_new(maxsize_i, 0.5, 0.0f, 0.0f);
+      w[3] = waveguide_nl_new(maxsize_i, 0.5, 0.0f, 0.0f);
+      w[4] = waveguide_nl_new(maxsize_o, 0.5, 0.0f, 0.0f);
+      w[5] = waveguide_nl_new(maxsize_o, 0.5, 0.0f, 0.0f);
+      w[6] = waveguide_nl_new(maxsize_o, 0.5, 0.0f, 0.0f);
+      w[7] = waveguide_nl_new(maxsize_o, 0.5, 0.0f, 0.0f);
+
+      /* Buffers to hold the currect deflections */
+      out = calloc(32, sizeof(float));
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      unsigned int i;
+
+      for (i = 0; i < 8; i++) {
+        waveguide_nl_reset(w[i]);
+      }
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      /* The a coef of the inner lowpass */
+      const float lpi = 1.0f - damp_i * 0.1423f;
+      /* The a coef of the outer lowpass */
+      const float lpo = 1.0f - damp_o * 0.19543f;
+
+      /* Set the parameters of the waveguides */
+      waveguide_nl_set_delay(w[0], maxsize_i * scale0);
+      waveguide_nl_set_ap(w[0], apa0, apb0);
+      waveguide_nl_set_delay(w[1], maxsize_i * scale1);
+      waveguide_nl_set_ap(w[1], apa1, apb1);
+      waveguide_nl_set_delay(w[2], maxsize_i * scale2);
+      waveguide_nl_set_ap(w[2], apa2, apb2);
+      waveguide_nl_set_delay(w[3], maxsize_i * scale3);
+      waveguide_nl_set_ap(w[3], apa3, apb3);
+      waveguide_nl_set_delay(w[4], maxsize_o * scale4);
+      waveguide_nl_set_ap(w[4], apa4, apb4);
+      waveguide_nl_set_delay(w[5], maxsize_o * scale5);
+      waveguide_nl_set_ap(w[5], apa5, apb5);
+      waveguide_nl_set_delay(w[6], maxsize_o * scale6);
+      waveguide_nl_set_ap(w[6], apa6, apb6);
+      waveguide_nl_set_delay(w[7], maxsize_o * scale7);
+      waveguide_nl_set_ap(w[7], apa7, apb7);
+
+      for (pos=0; pos<4; pos++) {
+	waveguide_nl_set_fc(w[pos], lpi);
+      }
+      for (; pos<8; pos++) {
+	waveguide_nl_set_fc(w[pos], lpo);
+      }
+
+      for (pos = 0; pos < sample_count; pos++) {
+        /* Calcualte the deflections at the wavejunctions
+           alpha is the centre, beta is north, gamma is east,
+           delta is south and epsilon is west */
+	const float alpha = (out[0] + out[2] + out[4] + out[6]) * 0.5f
+			    + input[pos];
+	const float beta = (out[1] + out[9] + out[14]) * 0.666666666666f;
+	const float gamma = (out[3] + out[8] + out[11]) * 0.666666666666f;
+	const float delta = (out[5] + out[10] + out[13]) * 0.666666666666f;
+	const float epsilon = (out[7] + out[12] + out[15]) * 0.666666666666f;
+
+        /* Inject the energy at the junctions + reflections into the
+           waveguides (the macro gives the reflection calcs) */
+	RUN_WG(0, beta, alpha);
+	RUN_WG(1, gamma, alpha);
+	RUN_WG(2, delta, alpha);
+	RUN_WG(3, epsilon, alpha);
+	RUN_WG(4, beta, gamma);
+	RUN_WG(5, gamma, delta);
+	RUN_WG(6, delta, epsilon);
+	RUN_WG(7, epsilon, beta);
+
+        buffer_write(output[pos], (1.0f - micpos) * alpha + micpos * delta);
+      }
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      unsigned int i;
+
+      for (i = 0; i < 8; i++) {
+        waveguide_nl_free(plugin_data->w[i]);
+      }
+      free(plugin_data->w);
+      free(plugin_data->out);
+    ]]></callback>
+
+    <port label="damp_i" dir="input" type="control" hint="default_middle">
+      <name>Inner damping</name>
+      <p>Controls the degree of damping in the centre of the gong.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="damp_o" dir="input" type="control" hint="default_middle">
+      <name>Outer damping</name>
+      <p>Controls the degree of damping on the edge of the gong.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="micpos" dir="input" type="control" hint="default_low">
+      <name>Mic position</name>
+      <p>Controls the vertical position of the "microphone", 0 is the centre and 1 is the edge.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale0" dir="input" type="control" hint="default_middle">
+      <name>Inner size 1</name>
+      <p>The size of the upper, inner waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa0" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 1 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb0" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 1 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale1" dir="input" type="control" hint="default_middle">
+      <name>Inner size 2</name>
+      <p>The size of the right, inner waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa1" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 2 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb1" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 2 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale2" dir="input" type="control" hint="default_middle">
+      <name>Inner size 3</name>
+      <p>The size of the lower, inner waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa2" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 3 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb2" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 3 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale3" dir="input" type="control" hint="default_middle">
+      <name>Inner size 4</name>
+      <p>The size of the left, inner waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa3" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 4 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb3" dir="input" type="control" hint="default_middle">
+      <name>Inner stiffness 4 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale4" dir="input" type="control" hint="default_middle">
+      <name>Outer size 1</name>
+      <p>The size of the upper right, outer waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa4" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 1 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb4" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 1 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale5" dir="input" type="control" hint="default_middle">
+      <name>Outer size 2</name>
+      <p>The size of the lower right, outer waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa5" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 2 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb5" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 2 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale6" dir="input" type="control" hint="default_middle">
+      <name>Outer size 3</name>
+      <p>The size of the lower left, outer waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa6" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 3 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb6" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 3 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="scale7" dir="input" type="control" hint="default_middle">
+      <name>Outer size 4</name>
+      <p>The size of the upper left, outer waveguide.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apa7" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 4 +</name>
+      <p>The stiffness of the gong against deflections in the positive direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="apb7" dir="input" type="control" hint="default_middle">
+      <name>Outer stiffness 4 -</name>
+      <p>The stiffness of the gong against deflections in the negative direction.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="w" type="waveguide_nl **" />
+    <instance-data label="out" type="float *" />
+    <instance-data label="maxsize_i" type="int" />
+    <instance-data label="maxsize_o" type="int" />
+  </plugin>
+</ladspa>

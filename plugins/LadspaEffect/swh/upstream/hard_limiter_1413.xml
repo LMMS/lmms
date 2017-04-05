@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Marcus Andersson"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include <math.h>
+      #include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="hardLimiter" id="1413" class="LimiterPlugin,DistortionPlugin">
+    <name>Hard Limiter</name>
+    <p>Brick hard limiter with residue mixer.</p>
+
+    <callback event="run"><![CDATA[
+	unsigned long i;
+	for (i = 0; i < sample_count; i++)
+	{
+		float limit_g = pow(10, limit_db / 20);
+		float sign = input[i] < 0.0 ? -1.0 : 1.0;
+		float data = input[i] * sign;
+		float residue = data > limit_g ? data - limit_g : 0.0;
+		data -= residue;
+		buffer_write(output[i],
+			 sign * (wet_gain * data + res_gain * residue));
+	}
+    ]]></callback>
+
+    <port label="limit_db" dir="input" type="control" hint="default_0">
+      <name>dB limit</name>
+      <p></p>
+      <range min="-50.0" max="0.0"/>
+    </port>
+
+    <port label="wet_gain" dir="input" type="control" hint="default_1">
+      <name>Wet level</name>
+      <p>Output level for limited signal.</p>
+      <range min="0.0" max="1.0"/>
+    </port>
+
+    <port label="res_gain" dir="input" type="control" hint="default_0">
+      <name>Residue level</name>
+      <p>Output level for residue signal.</p>
+      <range min="0.0" max="1.0"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+  </plugin>
+</ladspa>

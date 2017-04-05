@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="smoothDecimate" id="1414" class="DistortionPlugin">
+    <name>Smooth Decimator</name>
+
+    <callback event="instantiate"><![CDATA[
+      buffer = calloc(8, sizeof(float));
+      buffer_pos = 0;
+      accum = 0.0f;
+      fs = (float)s_rate;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      buffer_pos = 0;
+      accum = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float smoothed;
+      float inc = (rate / fs);
+      inc = f_clamp(inc, 0.0f, 1.0f);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	accum += inc;
+	if (accum >= 1.0f) {
+	  accum -= 1.0f;
+	  buffer_pos = (buffer_pos + 1) & 7;
+	  buffer[buffer_pos] = input[pos];
+	}
+	smoothed = cube_interp(accum, buffer[(buffer_pos - 3) & 7],
+                                      buffer[(buffer_pos - 2) & 7],
+                                      buffer[(buffer_pos - 1) & 7],
+                                      buffer[buffer_pos]);
+	buffer_write(output[pos], LIN_INTERP(smooth, buffer[(buffer_pos - 3) & 7], smoothed));
+      }
+
+      plugin_data->accum = accum;
+      plugin_data->buffer_pos = buffer_pos;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <port label="rate" dir="input" type="control" hint="sample_rate,default_maximum">
+      <name>Resample rate</name>
+      <p>The rate at which the output signal will be resampled</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="smooth" dir="input" type="control" hint="default_maximum">
+      <name>Smoothing</name>
+      <p>The amount of smoothing on the output signal.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+    <instance-data label="accum" type="float" />
+    <instance-data label="buffer" type="float *" />
+    <instance-data label="buffer_pos" type="int" />
+  </plugin>
+</ladspa>

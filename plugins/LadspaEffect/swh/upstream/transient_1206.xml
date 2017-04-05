@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+#include "ladspa-util.h"
+
+#define BUFFER_SIZE 10240
+#define SSTAB 0.00001f
+#define ASTAB 0.02f
+    ]]></code>
+  </global>
+
+  <plugin label="transient" id="1206" class="DynamicsPlugin">
+    <name>Transient mangler</name>
+
+    <callback event="instantiate">
+buffer = calloc(BUFFER_SIZE, sizeof(float));
+fast_buffer_sum = 0.1;
+medi_buffer_sum = 0.1;
+slow_buffer_sum = 0.1;
+buffer_pos = 0;
+fast_track = 0.0;
+medi_track = 0.0;
+slow_track = 0.0;
+count = 0;
+sample_rate = s_rate;
+    </callback>
+
+    <callback event="activate">
+memset(buffer, '\0', BUFFER_SIZE * sizeof(float));
+fast_buffer_sum = 0.1;
+medi_buffer_sum = 0.1;
+slow_buffer_sum = 0.1;
+buffer_pos = 0;
+fast_track = 0.1;
+medi_track = 0.1;
+slow_track = 0.1;
+count = 0;
+    </callback>
+
+    <callback event="cleanup"><![CDATA[
+free(plugin_data->buffer);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos;
+const int fast_sum_size = (2 * sample_rate) / 1000;
+const int medi_sum_size = (25 * sample_rate) / 1000;
+const int slow_sum_size = (100 * sample_rate) / 1000;
+const float fast_track_lag = 1.5f / fast_sum_size;
+const float medi_track_lag = 1.0f / medi_sum_size;
+const float slow_track_lag = 1.3f / slow_sum_size;
+float ratio;
+LADSPA_Data in;
+
+for (pos = 0; pos < sample_count; pos++) {
+	in = input[pos];
+	buffer[buffer_pos] = fabs(in);
+	fast_buffer_sum += buffer[buffer_pos];
+	medi_buffer_sum += buffer[buffer_pos];
+	slow_buffer_sum += buffer[buffer_pos];
+	fast_buffer_sum -= buffer[MOD(buffer_pos - fast_sum_size, BUFFER_SIZE)];
+	medi_buffer_sum -= buffer[MOD(buffer_pos - medi_sum_size, BUFFER_SIZE)];
+	slow_buffer_sum -= buffer[MOD(buffer_pos - slow_sum_size, BUFFER_SIZE)];
+	if (count++ > slow_sum_size) {
+		fast_track += (fast_buffer_sum/fast_sum_size - fast_track)
+		 * fast_track_lag;
+		medi_track += (medi_buffer_sum/medi_sum_size - medi_track)
+		 * medi_track_lag;
+		slow_track += (slow_buffer_sum/slow_sum_size - slow_track)
+		 * slow_track_lag;
+	}
+
+	// Attack
+	ratio = (fast_track + ASTAB) / (medi_track + ASTAB);
+	if (ratio * attack > 1.0f) {
+		in *= ratio * attack;
+	} else if (ratio * attack < -1.0f) {
+		in /= ratio * -attack;
+	}
+
+	// Sustain
+	ratio = (slow_track + SSTAB) / (medi_track + SSTAB);
+	if (ratio * sustain > 1.0f) {
+		in *= ratio * sustain;
+	} else if (ratio * sustain < -1.0f) {
+		in /= ratio * -sustain;
+	}
+
+	buffer_write(output[pos], in);
+	buffer_pos = (buffer_pos + 1) % BUFFER_SIZE;
+}
+
+plugin_data->count = count;
+plugin_data->fast_track = fast_track;
+plugin_data->medi_track = medi_track;
+plugin_data->slow_track = slow_track;
+plugin_data->buffer_pos = buffer_pos;
+plugin_data->fast_buffer_sum = fast_buffer_sum;
+plugin_data->medi_buffer_sum = medi_buffer_sum;
+plugin_data->slow_buffer_sum = slow_buffer_sum;
+    ]]></callback>
+
+    <port label="attack" dir="input" type="control" hint="default_0">
+      <name>Attack speed</name>
+      <range min="-1" max="1"/>
+    </port>
+
+    <port label="sustain" dir="input" type="control" hint="default_0">
+      <name>Sustain time</name>
+      <range min="-1" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+      <range min="-1.0" max="1.0"/>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+      <range min="-1.0" max="1.0"/>
+    </port>
+
+    <instance-data label="count" type="long"/>
+
+    <!-- Current value of the env followers -->
+    <instance-data label="fast_track" type="float"/>
+    <instance-data label="medi_track" type="float"/>
+    <instance-data label="slow_track" type="float"/>
+
+    <!-- Ring buffer for tracking -->
+    <instance-data label="buffer" type="float *"/>
+    <instance-data label="buffer_pos" type="int"/>
+
+    <!-- Total amplitude inside sub buffers -->
+    <instance-data label="fast_buffer_sum" type="float"/>
+    <instance-data label="medi_buffer_sum" type="float"/>
+    <instance-data label="slow_buffer_sum" type="float"/>
+
+    <instance-data label="sample_rate" type="int"/>
+  </plugin>
+</ladspa>
