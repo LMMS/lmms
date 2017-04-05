@@ -325,6 +325,7 @@ SampleTCOView::~SampleTCOView()
 
 void SampleTCOView::updateSample()
 {
+	m_tco->setStartTimeOffset( 0 );
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
@@ -520,7 +521,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
 	
 	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
-	qDebug() << offset << (int) offset ;
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
@@ -528,11 +528,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
-	if( r.width() < width() - 1 )
+	if( r.width() + offset < width() - 1 )
 	{
 		p.drawLine( r.x(), r.y() + r.height() / 2,
 			rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
 	}
+	p.drawLine( 1, height() / 2, offset + 1, height() / 2 );
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );

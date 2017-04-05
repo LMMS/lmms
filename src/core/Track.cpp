@@ -697,9 +697,10 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		m_tco->setJournalling( false );
 
 		setInitialMousePos( me->pos() );
-		if( me->x() < RESIZE_GRIP_WIDTH )
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		if( me->x() < RESIZE_GRIP_WIDTH && sTco )
 		{
-			m_action = ResizeFront;
+			m_action = ResizeLeft;
 			m_oldTime = m_tco->startPosition();
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
@@ -926,12 +927,11 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		s_textFloat->moveGlobal( this, QPoint( width() + 2,
 					height() + 2) );
 	}
-	else if( m_action == ResizeFront )
+	else if( m_action == ResizeLeft )
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 		if( sTco )
 		{
-			
 			const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 			
 			MidiTime t = qMax( 0, (int)
@@ -944,10 +944,25 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				t = t.toNearestTact();
 			}
 			MidiTime oldPos = m_tco->startPosition();
-			m_tco->movePosition( t );
-			m_trackView->getTrackContentWidget()->changePosition();
-			m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
-			sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+			if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
+			{
+				m_tco->movePosition( t );
+				m_trackView->getTrackContentWidget()->changePosition();
+				m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
+				sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+				s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
+						arg( m_tco->length().getTact() ).
+						arg( m_tco->length().getTicks() %
+								MidiTime::ticksPerTact() ).
+						arg( m_tco->startPosition().getTact() + 1 ).
+						arg( m_tco->startPosition().getTicks() %
+								MidiTime::ticksPerTact() ).
+						arg( m_tco->endPosition().getTact() + 1 ).
+						arg( m_tco->endPosition().getTicks() %
+								MidiTime::ticksPerTact() ) );
+				s_textFloat->moveGlobal( this, QPoint( width() + 2,
+							height() + 2) );
+			}
 		}
 		
 	}
@@ -966,6 +981,24 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			}
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
+		}
+		else if( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() )
+		{
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+			if( sTco )
+			{
+				if( QApplication::overrideCursor() != NULL &&
+						QApplication::overrideCursor()->shape() !=
+						Qt::SizeHorCursor )
+				{
+					while( QApplication::overrideCursor() != NULL )
+					{
+						QApplication::restoreOverrideCursor();
+					}
+				}
+				QCursor c( Qt::SizeHorCursor );
+				QApplication::setOverrideCursor( c );
+			}
 		}
 		else
 		{

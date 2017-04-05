@@ -276,7 +276,7 @@ private:
 		Move,
 		MoveSelection,
 		Resize,
-		ResizeFront,
+		ResizeLeft,
 		CopySelection,
 		ToggleSelected
 	} ;
