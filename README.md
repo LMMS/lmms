@@ -37,8 +37,48 @@ Features
 Building
 ---------
 
-See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compiling-lmms) on our
+See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compile) on our
 wiki for information on how to build LMMS.
+
+Dependencies
+------------
+
+#### Build Toolchain
+| Supported | Toolchain | Version | Notes | 
+|-----------|-----------|---------|-------| 
+| ✔️ | [`cmake`](https://cmake.org/) | [`2.8.9`](../blob/master/CMakeLists.txt#L1) |  [`lmms>=master`](../tree/master) |
+| ✔️ | [`cmake`](https://cmake.org/) | [`2.8.7`](../blob/stable-1.2/CMakeLists.txt#L1) | [`lmms<=stable-1.2`](../tree/stable-1.2) |
+| ✔️ | [`cmake`](https://cmake.org/) | [`2.4.5`](../blob/stable-1.1/CMakeLists.txt#L1) | [`lmms<=stable-1.1`](../tree/stable-1.1) |
+
+#### Compiler
+| Supported | Compiler | Version |
+|-----------|----------|---------|
+| ✔️ | [`gcc/g++`](http://gcc.gnu.org/) | `c++11` |
+| ✔️ | [`clang`](http://gcc.gnu.org/) |  |
+| ✔️ | [`mingw-w64`](https://sourceforge.net/projects/mingw-w64/) |  | 
+| ❌  | [`msvc++`](https://visualstudio.com/vs/cplusplus/) | Not yet supported |
+
+#### Libraries
+| Required | Library | Version | Description | 
+|----------|---------|---------|-------------|
+| ✔️ | [`Qt4`](http://qt.io) | `>=4.3.0` | Qt framework with devel-files (4.4.x recommended) | 
+| ✔️ | [`Qt5`](http://qt.io) | `>=5.0.0` | Replaces Qt4, see [Using Qt5](#using-qt5) below. |
+| ✔️ | [`libsndfile`](http://www.mega-nerd.com/libsndfile/) |  | Reading and writing sound files |
+| ✔️ | [`fftw3`](http://www.fftw.org/) | | Fast fourier transform computing library |
+|   | [`libvorbis`](http://xiph.org/vorbis/) | | Audio encoding library |
+|   | [`libsamplerate`](http://www.mega-nerd.com/SRC/) | `>=0.1.7` | Audio sample rate converter |
+|   | [`libogg`](http://xiph.org/ogg/) | | Multimedia container format |
+|   | [`wine`](http://www.winehq.org/) | | Windows-on-Unix (needed for VST support) |
+|   | [`libstk`](http://ccrma.stanford.edu/software/stk/) | | Signal processing and algorithmic synthesis library |
+|   | [`libfluidsynth`](http://fluidsynth.sourceforge.net/) | | SoundFont synthesis library |
+|   | [`fltk`](http://www.fltk.org/) |  | Lightweight GUI library (needed by ZynAddSubFX) |
+|   | [`jack`](http://jackaudio.org/)|  | Software and hardware audio routing |
+|   | [`sdl`](http://www.libsdl.org/)|  | Audio interface library\* |
+|   | [`alsa`](http://www.alsa-project.org/) |  | Audio interface library\* |
+|   | [`libportaudio`](http://www.portaudio.com/)|  | Audio interface library\* | 
+|   | [`libsoundio`](http://libsound.io/)|  | Audio interface library* |
+
+   > \*One one or more required for audio playback
 
 
 Join LMMS-development
