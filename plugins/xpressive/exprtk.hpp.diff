@@ -28,34 +28,10 @@
 <             }
 ---
 >             xAssert(stride <= 5, "token_inserter() - Invalid stride value");
-4209a4219
->    #ifndef exprtk_disable_return
-4214a4225
->    #endif
-4263a4275
->       #ifndef exprtk_disable_return
-4265a4278
->       #endif
-11528a11542
->       #ifndef exprtk_disable_return
-11628a11643
->       #endif
-19578a19594
->             #ifndef exprtk_disable_return
-19585a19602
->             #endif
-19747c19764,19767
+19754c19763,19766
 <             throw std::invalid_argument("parser::get_error() - Invalid error index specificed");
 ---
 >          {
 >             xAssert(false, "parser::get_error() - Invalid error index specificed");
 >             return parser_error::type();
 >          }
-24524a24545
->          #ifndef exprtk_disable_return
-24528a24550
->          #endif
-26524a26547
->          #ifndef exprtk_disable_return
-26567a26591
->          #endif
