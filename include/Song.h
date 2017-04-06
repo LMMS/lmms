@@ -204,7 +204,8 @@ public:
 		return m_globalAutomationTrack;
 	}
 
-	static AutomatedValueMap automatedValuesAt(const Track::tcoVector& tcos, MidiTime time);
+	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
 
 	// file management
 	void createNewProject();
@@ -326,7 +327,7 @@ private:
 
 	void removeAllControllers();
 
-	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames, int tcoNum);
+	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
 	AutomationTrack * m_globalAutomationTrack;
 

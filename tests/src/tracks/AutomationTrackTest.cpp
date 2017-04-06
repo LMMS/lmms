@@ -28,6 +28,8 @@
 
 #include "AutomationPattern.h"
 #include "AutomationTrack.h"
+#include "BBTrack.h"
+#include "BBTrackContainer.h"
 #include "TrackContainer.h"
 
 #include "Engine.h"
@@ -69,35 +71,77 @@ private slots:
 		QCOMPARE(p.valueAt(150), 1.0f);
 	}
 
-	void testTrack()
+	void testPatterns()
 	{
 		FloatModel model;
 
-		AutomationPattern p1(nullptr);
+		auto song = Engine::getSong();
+		AutomationTrack track(song);
+
+		AutomationPattern p1(&track);
 		p1.setProgressionType(AutomationPattern::LinearProgression);
 		p1.putValue(0, 0.0, false);
 		p1.putValue(10, 1.0, false);
 		p1.movePosition(0);
 		p1.addObject(&model);
 
-		AutomationPattern p2(nullptr);
+		AutomationPattern p2(&track);
 		p2.setProgressionType(AutomationPattern::LinearProgression);
 		p2.putValue(0, 0.0, false);
 		p2.putValue(100, 1.0, false);
 		p2.movePosition(100);
 		p2.addObject(&model);
 
-		AutomationPattern p3(nullptr);
+		AutomationPattern p3(&track);
 		p3.addObject(&model);
 		//XXX: Why is this even necessary?
 		p3.clear();
 
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},   0)[&model], 0.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},   5)[&model], 0.5f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},  10)[&model], 1.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3},  50)[&model], 1.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3}, 100)[&model], 0.0f);
-		QCOMPARE(Song::automatedValuesAt({&p1, &p2, &p3}, 150)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt(  5)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt( 10)[&model], 1.0f);
+		QCOMPARE(song->automatedValuesAt( 50)[&model], 1.0f);
+		QCOMPARE(song->automatedValuesAt(100)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt(150)[&model], 0.5f);
+	}
+
+	void testBBTrack()
+	{
+		auto song = Engine::getSong();
+		auto bbContainer = Engine::getBBTrackContainer();
+		BBTrack bbTrack(song);
+		AutomationTrack automationTrack(bbContainer);
+		bbTrack.createTCOsForBB(bbTrack.index());
+
+		QVERIFY(automationTrack.numOfTCOs());
+		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack.getTCO(0));
+		QVERIFY(p1);
+
+		FloatModel model;
+
+		p1->setProgressionType(AutomationPattern::LinearProgression);
+		p1->putValue(0, 0.0, false);
+		p1->putValue(10, 1.0, false);
+		p1->addObject(&model);
+
+		QCOMPARE(bbContainer->automatedValuesAt( 0, bbTrack.index())[&model], 0.0f);
+		QCOMPARE(bbContainer->automatedValuesAt( 5, bbTrack.index())[&model], 0.5f);
+		QCOMPARE(bbContainer->automatedValuesAt(10, bbTrack.index())[&model], 1.0f);
+		QCOMPARE(bbContainer->automatedValuesAt(50, bbTrack.index())[&model], 1.0f);
+
+		BBTrack bbTrack2(song);
+		bbTrack.createTCOsForBB(bbTrack2.index());
+
+		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
+		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
+
+		BBTCO tco(&bbTrack);
+		tco.changeLength(MidiTime::ticksPerTact() * 2);
+		tco.movePosition(0);
+
+		QCOMPARE(song->automatedValuesAt(0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(MidiTime::ticksPerTact() + 5)[&model], 0.5f);
 	}
 } AutomationTrackTest;
 
