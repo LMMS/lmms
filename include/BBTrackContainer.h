@@ -48,7 +48,7 @@ public:
 		return "bbtrackcontainer";
 	}
 
-	tact_t lengthOfBB( int _bb );
+	tact_t lengthOfBB( int _bb ) const;
 	inline tact_t lengthOfCurrentBB()
 	{
 		return lengthOfBB( currentBB() );
@@ -62,6 +62,7 @@ public:
 	void fixIncorrectPositions();
 	void createTCOsForBB( int _bb );
 
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum) const override;
 
 public slots:
 	void play();
