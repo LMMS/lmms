@@ -379,7 +379,7 @@ void Song::processNextBuffer()
 
 		if( ( f_cnt_t ) currentFrame == 0 )
 		{
-			processAutomations(trackList, m_playPos[m_playMode], framesToPlay, tcoNum);
+			processAutomations(trackList, m_playPos[m_playMode], framesToPlay);
 
 			// loop through all tracks and play them
 			for( int i = 0; i < trackList.size(); ++i )
@@ -402,58 +402,45 @@ void Song::processNextBuffer()
 	}
 }
 
-void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fpp_t frames, int tcoNum)
+
+void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fpp_t)
 {
-	QVector<AutomationTrack*> tracks;
-
-	if(m_playMode == Mode_PlaySong)
-	{
-		tracks << m_globalAutomationTrack;
-	}
-	for( Track* track : tracklist)
-	{
-		if (track->type() == Track::AutomationTrack || track->type() == Track::HiddenAutomationTrack)
-		{
-			tracks << dynamic_cast<AutomationTrack*>(track);
-		}
-	}
-	std::remove_if(tracks.begin(), tracks.end(), std::mem_fn(&Track::isMuted));
-
-	Track::tcoVector tcos;
 	AutomatedValueMap values;
 
-	if (tcoNum < 0)
-	{
-		// Collect all relevant patterns, sorted by start position
-		MidiTime timeEnd = timeStart + static_cast<int>(frames / Engine::framesPerTick());
-		for (AutomationTrack* track: tracks)
-		{
-			track->getTCOsInRange(tcos, 0, timeEnd);
-		}
-
-		values = automatedValuesAt(tcos, timeStart);
-	}
-	else
-	{
-		if (tracklist.size() != 1)
-		{
-			qWarning() << "processAutomations called with specified tcoNum but not exactly one track";
-		}
-
-		for (AutomationTrack* track: tracks)
-		{
-			TrackContentObject* tco = track->getTCO(tcoNum);
-			auto p = dynamic_cast<AutomationPattern *>(tco);
-
-			for (AutomatableModel* object : p->objects())
-			{
-				values[object] = p->valueAt(timeStart);
-			}
-			tcos << tco;
-		}
-	}
-
 	QSet<const AutomatableModel*> recordedModels;
+
+	TrackContainer* container = this;
+	int tcoNum = -1;
+
+	switch (m_playMode)
+	{
+	case Mode_PlaySong:
+		break;
+	case Mode_PlayBB:
+	{
+		Q_ASSERT(tracklist.size() == 1);
+		Q_ASSERT(tracklist.at(0)->type() == Track::BBTrack);
+		auto bbTrack = dynamic_cast<BBTrack*>(tracklist.at(0));
+		auto bbContainer = Engine::getBBTrackContainer();
+		container = bbContainer;
+		tcoNum = bbTrack->index();
+	}
+		break;
+	default:
+		return;
+	}
+
+	values = container->automatedValuesAt(timeStart, tcoNum);
+	TrackList tracks = container->tracks();
+
+	Track::tcoVector tcos;
+	for (Track* track : tracks)
+	{
+		if (track->type() == Track::AutomationTrack) {
+			track->getTCOsInRange(tcos, 0, timeStart);
+		}
+	}
+
 	// Process recording
 	for (TrackContentObject* tco : tcos)
 	{
@@ -850,35 +837,10 @@ AutomationPattern * Song::tempoAutomationPattern()
 	return AutomationPattern::globalAutomationPattern( &m_tempoModel );
 }
 
-AutomatedValueMap Song::automatedValuesAt(const Track::tcoVector &tcos, MidiTime time)
+
+AutomatedValueMap Song::automatedValuesAt(MidiTime time, int tcoNum) const
 {
-	AutomatedValueMap valueMap;
-
-	for(TrackContentObject* tco : tcos)
-	{
-		if (tco->isMuted() || tco->startPosition() > time) {
-			continue;
-		}
-		AutomationPattern* p = dynamic_cast<AutomationPattern *>(tco);
-		if (!p) {
-			qCritical() << "automatedValuesAt: tco passed is not an automation pattern";
-			continue;
-		}
-
-		if (! p->hasAutomation()) {
-			continue;
-		}
-
-		MidiTime relTime = time - p->startPosition();
-		float value = p->valueAt(relTime);
-
-		for (AutomatableModel* model : p->objects())
-		{
-			valueMap[model] = value;
-		}
-	}
-
-	return valueMap;
+	return TrackContainer::automatedValuesFromTracks(TrackList(tracks()) << m_globalAutomationTrack, time, tcoNum);
 }
 
 
