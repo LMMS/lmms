@@ -48,7 +48,7 @@
 #include "Mixer.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
-#include <QDebug>
+
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
@@ -148,6 +148,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
+	setStartTimeOffset( 0 );
 	updateLength();
 
 	emit sampleChanged();
@@ -253,6 +254,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
+	_this.setAttribute( "off", startTimeOffset() );
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -277,6 +279,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
+	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 }
 
 
@@ -325,7 +328,6 @@ SampleTCOView::~SampleTCOView()
 
 void SampleTCOView::updateSample()
 {
-	m_tco->setStartTimeOffset( 0 );
 	update();
 	// set tooltip to filename so that user can see what sample this
 	// sample-tco contains
@@ -625,12 +627,11 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			TrackContentObject * tco = getTCO( i );
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 			float framesPerTick = Engine::framesPerTick();
-			
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
 				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( (_start - sTco->startPosition() ) - sTco->startTimeOffset() );
+					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
 					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end

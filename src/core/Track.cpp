@@ -67,7 +67,7 @@
 #include "SongEditor.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
-#include <QDebug>
+
 
 /*! The width of the resize grip in pixels
  */
@@ -1029,7 +1029,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 		setSelected( !isSelected() );
 	}
 
-	if( m_action == Move || m_action == Resize )
+	if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
 		m_tco->setJournalling( true );
 	}
