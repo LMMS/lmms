@@ -152,7 +152,7 @@ SampleBuffer::~SampleBuffer()
 
 void SampleBuffer::sampleRateChanged()
 {
-	update();
+	update( true );
 }
 
 
