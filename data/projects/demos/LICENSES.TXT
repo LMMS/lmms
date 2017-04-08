@@ -86,6 +86,6 @@
   - CC (by-nc)
   - https://lmms.io/lsp/index.php?action=show&file=4929
   
- * Jousboxx-BuzzerBeater.mmpz
+* Jousboxx-BuzzerBeater.mmpz
   - CC (by-sa)
   - https://lmms.io/lsp/?action=show&file=10488
