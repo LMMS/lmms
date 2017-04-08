@@ -59,8 +59,15 @@
 
 #include <QtCore/private/qobject_p.h>
 #include <QtWidgets/private/qwidget_p.h>
+#include <QtGui/private/qguiapplication_p.h>
+
+#include <QWindow>
+#include <QGuiApplication>
+#include <qpa/qplatformintegration.h>
 //#include <private/qt_x11_p.h>
-//#include <private/qwidget_p.h>
+
+#include <queue>
+#include <cstring>
 
 #define XK_MISCELLANY
 #define XK_LATIN1
@@ -92,139 +99,6 @@ static const int XRevertToParent = RevertToParent;
 
 QT_BEGIN_NAMESPACE
 
-/*!
-	\class QX11EmbedContainer
-	\ingroup advanced
-
-	\brief The QX11EmbedContainer class provides an XEmbed container
-	widget.
-
-	XEmbed is an X11 protocol that supports the embedding of a widget
-	from one application into another application.
-
-	An XEmbed \e container is the graphical location that embeds an
-	external \e {client widget}. A client widget is a window that is
-	embedded into a container.
-
-	When a widget has been embedded and the container receives tab
-	focus, focus is passed on to the widget. When the widget reaches
-	the end of its focus chain, focus is passed back to the
-	container. Window activation, accelerator support, modality and
-	drag and drop (XDND) are also handled.
-
-	QX11EmbedContainer is commonly used for writing panels or
-	toolbars that hold applets, or for \e swallowing X11
-	applications. When writing a panel application, one container
-	widget is created on the toolbar, and it can then either swallow
-	another widget using embed(), or allow an XEmbed widget to be
-	embedded into itself. The container's X11 window ID, which is
-	retrieved with winId(), must then be known to the client widget.
-	After embedding, the client's window ID can be retrieved with
-	clientWinId().
-
-	In the following example, a container widget is created as the
-	main widget. It then invokes an application called "playmovie",
-	passing its window ID as a command line argument. The "playmovie"
-	program is an XEmbed client widget. The widget embeds itself into
-	the container using the container's window ID.
-
-	\snippet doc/src/snippets/qx11embedcontainer/main.cpp 0
-
-	When the client widget is embedded, the container emits the
-	signal clientIsEmbedded(). The signal clientClosed() is emitted
-	when a widget is closed.
-
-	It is possible for QX11EmbedContainer to embed XEmbed widgets
-	from toolkits other than Qt, such as GTK+. Arbitrary (non-XEmbed)
-	X11 widgets can also be embedded, but the XEmbed-specific
-	features such as window activation and focus handling are then
-	lost.
-
-	The GTK+ equivalent of QX11EmbedContainer is GtkSocket. The
-	corresponding KDE 3 widget is called QXEmbed.
-
-	\sa QX11EmbedWidget, {XEmbed Specification}
-*/
-
-/*! \fn void QX11EmbedWidget::embedded()
-
-	This signal is emitted by the widget that has been embedded by an
-	XEmbed container.
-*/
-
-/*! \fn void QX11EmbedWidget::containerClosed()
-
-	This signal is emitted by the client widget when the container
-	closes the widget. This can happen if the container itself
-	closes, or if the widget is rejected.
-
-	The container can reject a widget for any reason, but the most
-	common cause of a rejection is when an attempt is made to embed a
-	widget into a container that already has an embedded widget.
-*/
-
-/*! \fn void QX11EmbedContainer::clientIsEmbedded()
-
-	This signal is emitted by the container when a client widget has
-	been embedded.
-*/
-
-/*! \fn void QX11EmbedContainer::clientClosed()
-
-	This signal is emitted by the container when the client widget
-	closes.
-*/
-
-/*!
-	\fn void QX11EmbedWidget::error(QX11EmbedWidget::Error error)
-
-	This signal is emitted if an error occurred as a result of
-	embedding into or communicating with a container. The specified
-	\a error describes the problem that occurred.
-
-	\sa QX11EmbedWidget::Error
-*/
-
-/*!
-	\fn QX11EmbedContainer::Error QX11EmbedContainer::error() const
-
-	Returns the last error that occurred.
-*/
-
-/*! \fn void QX11EmbedContainer::error(QX11EmbedContainer::Error error)
-
-	This signal is emitted if an error occurred when embedding or
-	communicating with a client. The specified \a error describes the
-	problem that occurred.
-
-	\sa QX11EmbedContainer::Error
-*/
-
-/*!
-	\enum QX11EmbedWidget::Error
-
-	\value Unknown An unrecognized error occurred.
-
-	\value InvalidWindowID The X11 window ID of the container was
-		invalid. This error is usually triggered by passing an invalid
-		window ID to embedInto().
-
-	\omitvalue Internal
-*/
-
-/*!
-	\enum QX11EmbedContainer::Error
-
-	\value Unknown An unrecognized error occurred.
-
-	\value InvalidWindowID The X11 window ID of the container was
-		invalid. This error is usually triggered by passing an invalid
-		window ID to embed().
-
-	\omitvalue Internal
-*/
-
-
 enum ATOM_ID : int {
 	_XEMBED
 	,_XEMBED_INFO
@@ -235,7 +109,7 @@ enum ATOM_ID : int {
 
 static const std::vector<std::pair<int, std::string>> atom_list({
 	{_XEMBED, "_XEMBED"},
-	{_XEMBED, "_XEMBED_INFO"},
+	{_XEMBED_INFO, "_XEMBED_INFO"},
 	{WM_PROTOCOLS, "WM_PROTOCOLS"},
 	{WM_DELETE_WINDOW, "WM_DELETE_WINDOW"},
 	{WM_STATE, "WM_STATE"},
@@ -246,26 +120,31 @@ static QMutex atoms_lock;
 
 void initAtoms()
 {
-	atoms_lock.lock();
-	std::vector<xcb_intern_atom_cookie_t> cookies;
-	cookies.reserve(atom_list.size());
+	QMutexLocker locker(&atoms_lock); Q_UNUSED(locker);
+
+	std::queue<xcb_intern_atom_cookie_t> cookies;
 
 	for (const auto& pair : atom_list)
 	{
-		cookies.push_back(xcb_intern_atom(QX11Info::connection(), false, pair.second.length(), pair.second.data()));
+		cookies.push(xcb_intern_atom(QX11Info::connection(), false, pair.second.length(), pair.second.data()));
 	}
 
 	for (const auto& pair : atom_list)
 	{
-		auto cookie = cookies.back();
+		auto cookie = cookies.front();
+		cookies.pop();
 
 		auto reply = xcb_intern_atom_reply(QX11Info::connection(), cookie, nullptr);
 		atoms[pair.first] = reply->atom;
-		free(reply);
 
-		cookies.pop_back();
+		Q_ASSERT(pair.second == XGetAtomName(QX11Info::display(), reply->atom));
+
+#ifdef QX11EMBED_DEBUG
+		qDebug() << "atom" << QString::fromStdString(pair.second)
+				 << XGetAtomName(QX11Info::display(), reply->atom) << reply->atom;
+#endif
+		free(reply);
 	}
-	atoms_lock.unlock();
 }
 
 xcb_atom_t ATOM(int atomID)
@@ -273,6 +152,33 @@ xcb_atom_t ATOM(int atomID)
 	return atoms.value(atomID);
 }
 
+
+struct xembed_info
+{
+	uint32_t version;
+	uint32_t flags;
+};
+
+xembed_info* get_xembed_info(xcb_window_t window)
+{
+	auto cookie = xcb_get_property(QX11Info::connection(), 0, window, ATOM(_XEMBED_INFO), ATOM(_XEMBED_INFO), 0, 2);
+	if (auto reply = xcb_get_property_reply(QX11Info::connection(), cookie, nullptr)) {
+		auto val_len = xcb_get_property_value_length(reply);
+		if (val_len < 2) {
+#ifdef QX11EMBED_DEBUG
+			qDebug() << "Client has malformed _XEMBED_INFO property, len is" << val_len;
+#endif
+			free(reply);
+			return nullptr;
+		}
+
+		void* result = malloc(sizeof(xembed_info));
+		memcpy(result, xcb_get_property_value(reply), sizeof(xembed_info));
+		return reinterpret_cast<xembed_info*>(result);
+	}
+
+	return nullptr;
+}
 
 // This is a hack to move topData() out from QWidgetPrivate to public.  We
 // need to to inspect window()'s embedded state.
@@ -347,6 +253,7 @@ static unsigned int XEmbedVersion()
 	return 0;
 }
 
+
 // Sends an XEmbed message.
 static void sendXEmbedMessage(WId window, long message,
 							  long detail = 0, long data1 = 0, long data2 = 0)
@@ -356,8 +263,7 @@ static void sendXEmbedMessage(WId window, long message,
 	XClientMessageEvent c;
 	memset(&c, 0, sizeof(c));
 	c.type = ClientMessage;
-
-	c.type = ATOM(_XEMBED);
+	c.message_type = ATOM(_XEMBED);
 	c.format = 32;
 	c.display = display;
 	c.window = window;
@@ -395,14 +301,6 @@ public:
 	}
 } static x11EventFilter;
 
-//
-struct functorData
-{
-	xcb_window_t id, rootWindow;
-	bool clearedWmState;
-	bool reparentedToRoot;
-};
-
 
 class QX11EmbedContainerPrivate : public QWidgetPrivate
 {
@@ -424,6 +322,7 @@ public:
 	void rejectClient(WId window);
 
 	void checkGrab();
+	void checkXembedInfo();
 
 	WId topLevelParentWinId() const;
 
@@ -482,6 +381,7 @@ QX11EmbedContainer::QX11EmbedContainer(QWidget *parent)
 
 	// Install X11 event filter.
 	QCoreApplication::instance()->installNativeEventFilter(&x11EventFilter);
+	QCoreApplication::instance()->installNativeEventFilter(this);
 
 	XSelectInput(QX11Info::display(), internalWinId(),
 				 KeyPressMask | KeyReleaseMask
@@ -500,6 +400,7 @@ QX11EmbedContainer::QX11EmbedContainer(QWidget *parent)
 	// Move input to our focusProxy if this widget is active, and not
 	// shaded by a modal dialog (in which case isActiveWindow() would
 	// still return true, but where we must not move input focus).
+
 	if (qApp->activeWindow() == window() && !d->isEmbedded())
 		d->moveInputToProxy();
 
@@ -529,7 +430,7 @@ QX11EmbedContainer::Error QX11EmbedContainer::error() const {
 	return d_func()->lastError;
 }
 
-bool QX11EmbedContainer::nativeEvent(const QByteArray &eventType, void *message, long *result)
+bool QX11EmbedContainer::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
 {
 	if (eventType == "xcb_generic_event_t") {
 		return x11Event(message, result);
@@ -537,6 +438,7 @@ bool QX11EmbedContainer::nativeEvent(const QByteArray &eventType, void *message,
 		return false;
 	}
 }
+
 
 
 /*! \reimp
@@ -629,6 +531,10 @@ void QX11EmbedContainer::embedClient(WId id)
 	default:
 		break;
 	}
+
+#ifdef QX11EMBED_DEBUG
+	qDebug() << "reparented client" << id << "into" << winId();
+#endif
 }
 
 /*! \internal
@@ -776,21 +682,27 @@ bool QX11EmbedContainer::eventFilter(QObject *o, QEvent *event)
 
 	Handles X11 events for the container.
 */
-bool QX11EmbedContainer::x11Event(void *e, long* result)
+bool QX11EmbedContainer::x11Event(void *message, long*)
 {
-	xcb_generic_event_t* event = reinterpret_cast<xcb_generic_event_t*>(e);
+	xcb_generic_event_t* e = reinterpret_cast<xcb_generic_event_t*>(message);
 	Q_D(QX11EmbedContainer);
 
-	switch (event->response_type & ~0x80) {
+	switch (e->response_type & ~0x80) {
 	case XCB_CREATE_NOTIFY:
+#ifdef QX11EMBED_DEBUG
+		qDebug() << "client created" << reinterpret_cast<xcb_create_notify_event_t*>(e)->window;
+#endif
 		// The client created an embedded window.
 		if (d->client)
-			d->rejectClient(reinterpret_cast<xcb_create_notify_event_t*>(event)->window);
+			d->rejectClient(reinterpret_cast<xcb_create_notify_event_t*>(e)->window);
 		else
-			d->acceptClient(reinterpret_cast<xcb_create_notify_event_t*>(event)->window);
+			d->acceptClient(reinterpret_cast<xcb_create_notify_event_t*>(e)->window);
 		break;
 	case XCB_DESTROY_NOTIFY:
-		if (reinterpret_cast<xcb_destroy_notify_event_t*>(event)->window == d->client) {
+		if (reinterpret_cast<xcb_destroy_notify_event_t*>(e)->window == d->client) {
+#ifdef QX11EMBED_DEBUG
+			qDebug() << "client died";
+#endif
 			// The client died.
 			d->client = 0;
 			d->clientIsXEmbed = false;
@@ -834,8 +746,8 @@ bool QX11EmbedContainer::x11Event(void *e, long* result)
 			// is an XEmbed client.
 			d->clientIsXEmbed = true;
 
-			Time msgtime = (Time) event->data.data32[0];
-			//TODO
+			//TODO: Port to Qt5, if needed
+			//Time msgtime = (Time) event->data.data32[0];
 			//if (msgtime > X11->time)
 			//X11->time = msgtime;
 
@@ -903,21 +815,50 @@ bool QX11EmbedContainer::x11Event(void *e, long* result)
 	}
 		break;
 	case XCB_BUTTON_PRESS:
-		if (!d->clientIsXEmbed) {
+	{
+		auto event = reinterpret_cast<xcb_key_press_event_t*>(e);
+		if (event->child == d->client && !d->clientIsXEmbed) {
 			setFocus(Qt::MouseFocusReason);
 			XAllowEvents(QX11Info::display(), ReplayPointer, CurrentTime);
 			return true;
 		}
+	}
 		break;
 	case XCB_BUTTON_RELEASE:
 		if (!d->clientIsXEmbed)
 			XAllowEvents(QX11Info::display(), SyncPointer, CurrentTime);
 		break;
+	case XCB_PROPERTY_NOTIFY:
+	{
+		auto event = reinterpret_cast<xcb_property_notify_event_t*>(e);
+
+		if (event->atom == ATOM(_XEMBED_INFO) && event->window == d->client) {
+			if (auto info = get_xembed_info(d->client)) {
+				if (info->flags & XEMBED_MAPPED) {
+#ifdef QX11EMBED_DEBUG
+					qDebug() << "mapping client per _xembed_info";
+#endif
+					XMapWindow(QX11Info::display(), d->client);
+					XRaiseWindow(QX11Info::display(), d->client);
+				} else {
+#ifdef QX11EMBED_DEBUG
+					qDebug() << "unmapping client per _xembed_info";
+#endif
+					XUnmapWindow(QX11Info::display(), d->client);
+				}
+
+				free(info);
+			}
+		}
+		break;
+	}
+	case XCB_CONFIGURE_NOTIFY:
+		return true;
 	default:
 		break;
 	}
 
-	return QWidget::nativeEvent("xcb_generic_event_t", e, result);
+	return false;
 }
 
 /*! \internal
@@ -929,38 +870,6 @@ void QX11EmbedContainer::resizeEvent(QResizeEvent *)
 	Q_D(QX11EmbedContainer);
 	if (d->client)
 		XResizeWindow(QX11Info::display(), d->client, width(), height());
-}
-
-/*! \internal
-
-	We use the QShowEvent to signal to our client that we want it to
-	map itself. We do this by changing its window property
-	XEMBED_INFO. The client will get an X11 PropertyNotify.
-*/
-void QX11EmbedContainer::showEvent(QShowEvent *)
-{
-	Q_D(QX11EmbedContainer);
-	if (d->client) {
-		long data[] = {XEMBED_VERSION, XEMBED_MAPPED};
-		XChangeProperty(QX11Info::display(), d->client, ATOM(_XEMBED_INFO), ATOM(_XEMBED_INFO), 32,
-						PropModeReplace, (unsigned char *) data, 2);
-	}
-}
-
-/*! \internal
-
-	We use the QHideEvent to signal to our client that we want it to
-	unmap itself. We do this by changing its window property
-	XEMBED_INFO. The client will get an X11 PropertyNotify.
-*/
-void QX11EmbedContainer::hideEvent(QHideEvent *)
-{
-	Q_D(QX11EmbedContainer);
-	if (d->client) {
-		long data[] = {XEMBED_VERSION, XEMBED_MAPPED};
-		XChangeProperty(QX11Info::display(), d->client, ATOM(_XEMBED_INFO), ATOM(_XEMBED_INFO), 32,
-						PropModeReplace, (unsigned char *) data, 2);
-	}
 }
 
 /*!
@@ -1010,6 +919,8 @@ void QX11EmbedContainerPrivate::acceptClient(WId window)
 	client = window;
 	q->setEnabled(true);
 
+	XSelectInput(QX11Info::display(), client, PropertyChangeMask);
+
 	// This tells Qt that we wish to forward DnD messages to
 	// our client.
 	if (!extra)
@@ -1018,12 +929,6 @@ void QX11EmbedContainerPrivate::acceptClient(WId window)
 	//extraData()->xDndProxy = client;
 
 	unsigned int version = XEmbedVersion();
-
-	Atom actual_type_return;
-	int actual_format_return;
-	unsigned long nitems_return = 0;
-	unsigned long bytes_after_return;
-	unsigned char *prop_return = 0;
 	unsigned int clientversion = 0;
 
 	// Add this client to our saveset, so if we crash, the client window
@@ -1034,20 +939,10 @@ void QX11EmbedContainerPrivate::acceptClient(WId window)
 
 	// XEmbed clients have an _XEMBED_INFO property in which we can
 	// fetch the version
-	if (XGetWindowProperty(QX11Info::display(), client, ATOM(_XEMBED_INFO), 0, 2, false,
-						   ATOM(_XEMBED_INFO), &actual_type_return, &actual_format_return,
-						   &nitems_return, &bytes_after_return, &prop_return) == Success) {
-
-		if (actual_type_return != None && actual_format_return != 0) {
-			// Clients with the _XEMBED_INFO property are XEMBED clients.
-			clientIsXEmbed = true;
-
-			long *p = (long *)prop_return;
-			if (nitems_return >= 2)
-				clientversion = (unsigned int)p[0];
-		}
-
-		XFree(prop_return);
+	if (auto info = get_xembed_info(client)) {
+		clientIsXEmbed = true;
+		clientversion = info->version;
+		free(info);
 	}
 
 	// Store client window's original size and placement.
@@ -1072,8 +967,7 @@ void QX11EmbedContainerPrivate::acceptClient(WId window)
 	// supported version number and that of the client (from
 	// _XEMBED_INFO property).
 	unsigned int minversion = version > clientversion ? clientversion : version;
-	sendXEmbedMessage(client, XEMBED_EMBEDDED_NOTIFY, q->internalWinId(), minversion);
-	XMapWindow(QX11Info::display(), client);
+	sendXEmbedMessage(client, XEMBED_EMBEDDED_NOTIFY, 0, q->internalWinId(), minversion);
 
 	// Resize it, but no smaller than its minimum size hint.
 	XResizeWindow(QX11Info::display(),

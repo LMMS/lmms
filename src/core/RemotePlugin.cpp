@@ -392,6 +392,20 @@ void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 	unlock();
 }
 
+void RemotePlugin::showUI()
+{
+	lock();
+	sendMessage( IdShowUI );
+	unlock();
+}
+
+void RemotePlugin::hideUI()
+{
+	lock();
+	sendMessage( IdHideUI );
+	unlock();
+}
+
 
 
 
