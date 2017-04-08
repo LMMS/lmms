@@ -130,7 +130,7 @@ private:
 
 	QString m_plugin;
 	QPointer<QWidget> m_pluginWidget;
-	WId m_pluginWindowID;
+	int m_pluginWindowID;
 	QSize m_pluginGeometry;
 
 	bool m_badDllFormat;
