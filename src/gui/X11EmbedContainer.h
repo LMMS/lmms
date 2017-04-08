@@ -48,10 +48,11 @@
 #include <QX11EmbedContainer>
 #else
 
+#include <QAbstractNativeEventFilter>
 #include <QtWidgets/QWidget>
 
 class QX11EmbedContainerPrivate;
-class Q_GUI_EXPORT QX11EmbedContainer : public QWidget
+class Q_GUI_EXPORT QX11EmbedContainer : public QWidget, public QAbstractNativeEventFilter
 {
 	Q_OBJECT
 public:
@@ -72,19 +73,18 @@ public:
 	};
 	Error error() const;
 
+public:
+	bool nativeEventFilter(const QByteArray &eventType, void *message, long *result);
+
 Q_SIGNALS:
 	void clientIsEmbedded();
 	void clientClosed();
 	void error(QX11EmbedContainer::Error);
 
 protected:
-	//bool x11Event(XEvent *);
-	bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 	bool eventFilter(QObject *, QEvent *) override;
 	void paintEvent(QPaintEvent *e) override;
 	void resizeEvent(QResizeEvent *);
-	void showEvent(QShowEvent *);
-	void hideEvent(QHideEvent *);
 	bool event(QEvent *);
 
 private:
