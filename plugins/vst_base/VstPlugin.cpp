@@ -229,7 +229,9 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
-	QX11EmbedContainer * xe = new QX11EmbedContainer;
+	vstSubWin * sw = new vstSubWin( gui->mainWindow()->workspace() );
+
+	QX11EmbedContainer * xe = new QX11EmbedContainer(sw);
 	m_pluginWidget = xe;
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
@@ -238,8 +240,6 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 
 	if( _parent == NULL )
 	{
-		vstSubWin * sw = new vstSubWin(
-					gui->mainWindow()->workspace() );
 		sw->setWidget( m_pluginWidget );
 
 		if( isEffect )
