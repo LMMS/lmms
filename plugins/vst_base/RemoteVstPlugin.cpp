@@ -648,7 +648,7 @@ void RemoteVstPlugin::initEditor()
 	wc.hInstance = hInst;
 	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
 	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
+	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = "LVSL";
 
