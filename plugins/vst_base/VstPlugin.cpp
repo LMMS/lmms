@@ -229,35 +229,31 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
-	m_pluginWidget = new QWidget( _parent );
+	QX11EmbedContainer * xe = new QX11EmbedContainer;
+	m_pluginWidget = xe;
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
+
+	connect(xe, SIGNAL(clientIsEmbedded()), this, SLOT(showUI()));
+
 	if( _parent == NULL )
 	{
 		vstSubWin * sw = new vstSubWin(
 					gui->mainWindow()->workspace() );
+		sw->setWidget( m_pluginWidget );
+
 		if( isEffect )
 		{
 			sw->setAttribute( Qt::WA_TranslucentBackground );
 			sw->setWindowFlags( Qt::FramelessWindowHint );
-			sw->setWidget( m_pluginWidget );
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->show();
-		} 
+		}
 		else
 		{
 			sw->setWindowFlags( Qt::WindowCloseButtonHint );
-			sw->setWidget( m_pluginWidget );
-
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->move( 4, 24 );
-			xe->show();
 		}
 	}
+	xe->embedClient( m_pluginWindowID );
+	xe->setFixedSize( m_pluginGeometry );
 
 #endif
 
