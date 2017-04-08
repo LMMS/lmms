@@ -356,8 +356,8 @@ QX11EmbedContainer::QX11EmbedContainer(QWidget *parent)
 	Q_D(QX11EmbedContainer);
 	//XSetErrorHandler(x11ErrorHandler);
 
+	//setAttribute(Qt::WA_DontCreateNativeAncestors);
 	setAttribute(Qt::WA_NativeWindow);
-	setAttribute(Qt::WA_DontCreateNativeAncestors);
 	createWinId();
 
 	setFocusPolicy(Qt::StrongFocus);
@@ -369,8 +369,8 @@ QX11EmbedContainer::QX11EmbedContainer(QWidget *parent)
 	// Everybody gets a focus proxy, but only one toplevel container's
 	// focus proxy is actually in use.
 	d->focusProxy = new QWidget(this);
+	//d->focusProxy->setAttribute(Qt::WA_DontCreateNativeAncestors);
 	d->focusProxy->setAttribute(Qt::WA_NativeWindow);
-	d->focusProxy->setAttribute(Qt::WA_DontCreateNativeAncestors);
 	d->focusProxy->createWinId();
 	d->focusProxy->winId();
 	d->focusProxy->setGeometry(-1, -1, 1, 1);
