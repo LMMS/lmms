@@ -90,7 +90,7 @@ SET(LMMS_SRCS
 	PARENT_SCOPE
 )
 
-IF(QT5)
+IF(QT5 AND LMMS_BUILD_LINUX)
     add_library(x11embedcontainer STATIC
         X11EmbedContainer
     )
