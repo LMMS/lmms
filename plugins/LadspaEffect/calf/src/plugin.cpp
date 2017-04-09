@@ -467,6 +467,8 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
     delete []descriptor.PortNames;
     delete []descriptor.PortDescriptors;
     delete []descriptor.PortRangeHints;
+	if (descriptor.Name)
+		free(const_cast<char *>(descriptor.Name));
 #if USE_DSSI
     if (presets)
         presets->clear();
@@ -474,6 +476,8 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
         preset_descs->clear();
     delete presets;
     delete preset_descs;
+	if (descriptor_for_dssi.Name)
+		free(const_cast<char *>(descriptor_for_dssi.Name));
 #endif
 }
 
