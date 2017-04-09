@@ -80,6 +80,7 @@ struct ladspa_plugin_metadata_set
     LADSPA_Descriptor descriptor;
     /// LADSPA descriptor for DSSI (uses a different name for the plugin, otherwise same as descriptor)
     LADSPA_Descriptor descriptor_for_dssi;
+    char *descriptorName;
 #if USE_DSSI
     /// Extended DSSI descriptor (points to descriptor_for_dssi for things like name/label/port info etc.)
     DSSI_Descriptor dssi_descriptor;
@@ -87,6 +88,7 @@ struct ladspa_plugin_metadata_set
 
     std::vector<plugin_preset> *presets;
     std::vector<DSSI_Program_Descriptor> *preset_descs;
+    char *descriptorForDssiName;
 #endif
     
     int input_count, output_count, param_count;
@@ -102,13 +104,11 @@ struct ladspa_plugin_metadata_set
 template<class Module>
 struct ladspa_wrapper
 {
-	const plugin_metadata_iface *_md;
     static ladspa_plugin_metadata_set output;
     
 private:
     ladspa_wrapper(const plugin_metadata_iface *md)
     {
-		_md = md;
         output.prepare(md, cb_instantiate);
     }
 
@@ -124,12 +124,6 @@ public:
         static ladspa_wrapper instance(new typename Module::metadata_class);
         return instance.output;
     }
-
-	~ladspa_wrapper()
-	{
-		if (_md)
-			delete _md;
-	}
 };
 
 };

@@ -334,9 +334,10 @@ void ladspa_plugin_metadata_set::prepare(const plugin_metadata_iface *md, LADSPA
     param_count = md->get_param_count(); // XXXKF ladspa_instance<Module>::real_param_count();
     
     const ladspa_plugin_info &plugin_info = md->get_plugin_info();
+    descriptorName = strdup((std::string(plugin_info.name) + " LAPSDA").c_str());
     descriptor.UniqueID = plugin_info.unique_id;
     descriptor.Label = plugin_info.label;
-    descriptor.Name = strdup((std::string(plugin_info.name) + " LADSPA").c_str());
+    descriptor.Name = descriptorName;
     descriptor.Maker = plugin_info.maker;
     descriptor.Copyright = plugin_info.copyright;
     descriptor.Properties = md->is_rt_capable() ? LADSPA_PROPERTY_HARD_RT_CAPABLE : 0;
@@ -422,7 +423,8 @@ void ladspa_plugin_metadata_set::prepare_dssi()
 #if USE_DSSI
     const ladspa_plugin_info &plugin_info = metadata->get_plugin_info();
     memcpy(&descriptor_for_dssi, &descriptor, sizeof(descriptor));
-    descriptor_for_dssi.Name = strdup((std::string(plugin_info.name) + " DSSI").c_str());
+    descriptorForDssiName = strdup((std::string(plugin_info.name) + " DSSI").c_str());
+    descriptor_for_dssi.Name = descriptorForDssiName;
     memset(&dssi_descriptor, 0, sizeof(dssi_descriptor));
     dssi_descriptor.DSSI_API_Version = 1;
     dssi_descriptor.LADSPA_Plugin = &descriptor_for_dssi;
@@ -467,8 +469,7 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
     delete []descriptor.PortNames;
     delete []descriptor.PortDescriptors;
     delete []descriptor.PortRangeHints;
-	if (descriptor.Name)
-		free(const_cast<char *>(descriptor.Name));
+    free(descriptorName);
 #if USE_DSSI
     if (presets)
         presets->clear();
@@ -476,8 +477,8 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
         preset_descs->clear();
     delete presets;
     delete preset_descs;
-	if (descriptor_for_dssi.Name)
-		free(const_cast<char *>(descriptor_for_dssi.Name));
+    free(descriptorForDssiName);
+    delete metadata;
 #endif
 }
 
