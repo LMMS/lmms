@@ -59,13 +59,6 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
-#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
-#include "basename.c"
-#else
-#include <libgen.h>
-#endif
-
-
 #include <vector>
 #include <string>
 
@@ -100,7 +93,6 @@ struct ERect
 #ifndef USE_QT_SHMEM
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -341,7 +333,6 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	RemotePluginClient( socketPath ),
 #endif
-	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
 	m_window( NULL ),
@@ -480,6 +471,11 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			{
 				initEditor();
 			}
+			break;
+
+		case IdIsUIVisible:
+			sendMessage( message( IdIsUIVisible )
+						.addInt( m_window ? 1 : 0 ) );
 			break;
 
 		case IdVstLoadPlugin:
@@ -682,8 +678,12 @@ void RemoteVstPlugin::initEditor()
 		m_registeredWindowClass = true;
 	}
 
-	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
+	m_window = CreateWindowEx( 0, "LVSL", pluginName(),
+#ifdef LMMS_EMBED_VST
 		WS_POPUP | WS_SYSMENU | WS_BORDER,
+#else
+		WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX,
+#endif
 		0, 0, 10, 10, NULL, NULL, hInst, NULL );
 	if( m_window == NULL )
 	{
@@ -708,7 +708,6 @@ void RemoteVstPlugin::initEditor()
 	ShowWindow( m_window, SW_SHOWNORMAL );
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
-fprintf(stderr, "m_windowID %x\n", m_windowID);
 #else
 	// 64-bit versions of Windows use 32-bit handles for interoperability
 	m_windowID = (intptr_t) m_window;
@@ -745,10 +744,6 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		}
 		return false;
 	}
-
-	char * tmp = strdup( _plugin_file.c_str() );
-	m_shortName = basename( tmp );
-	free( tmp );
 
 	typedef AEffect * ( __stdcall * mainEntryPointer )
 						( audioMasterCallback );
@@ -1843,6 +1838,13 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
 	while( quit == false && GetMessage( &msg, NULL, 0, 0 ) )
 	{
 		TranslateMessage( &msg );
+
+		if( msg.message == WM_SYSCOMMAND && msg.wParam == SC_CLOSE )
+		{
+			_this->destroyEditor();
+			continue;
+		}
+
 		DispatchMessage( &msg );
 
 		if( msg.message == WM_TIMER && _this->isInitialized() )

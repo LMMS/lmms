@@ -272,7 +272,11 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
+#ifdef LMMS_EMBED_VST
 	m_plugin->showEditor( NULL, false );
+#else
+	m_plugin->showUI();
+#endif
 
 	if( set_ch_name )
 	{
@@ -753,7 +757,11 @@ void VestigeInstrumentView::toggleGUI( void )
 	{
 		return;
 	}
+#ifdef LMMS_EMBED_VST
 	m_vi->m_plugin->toggleEditor();
+#else
+	m_vi->m_plugin->toggleUI();
+#endif
 }
 
 

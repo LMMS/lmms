@@ -30,6 +30,9 @@
 #include "RemotePlugin.h"
 
 
+//#define LMMS_EMBED_VST
+
+
 struct VstParameterDumpItem
 {
 	int32_t index;
