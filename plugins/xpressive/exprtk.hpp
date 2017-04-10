@@ -2344,7 +2344,7 @@ namespace exprtk
             else if ('~' == (*s_itr_))
             {
                token_t t;
-               t.set_symbol(s_itr_,s_itr_ + 1,base_itr_);
+               t.set_symbol(s_itr_, s_itr_ + 1, base_itr_);
                token_list_.push_back(t);
                ++s_itr_;
                return;
@@ -2352,7 +2352,7 @@ namespace exprtk
             else
             {
                token_t t;
-               t.set_error(token::e_error,s_itr_,s_itr_ + 2,base_itr_);
+               t.set_error(token::e_error, s_itr_, s_itr_ + 2, base_itr_);
                token_list_.push_back(t);
                ++s_itr_;
             }
@@ -2374,7 +2374,7 @@ namespace exprtk
 
                   if ((c0 == '<') && (c1 == '=') && (c2 == '>'))
                   {
-                     t.set_operator(token_t::e_swap,s_itr_,s_itr_ + 3,base_itr_);
+                     t.set_operator(token_t::e_swap, s_itr_, s_itr_ + 3, base_itr_);
                      token_list_.push_back(t);
                      s_itr_ += 3;
                      return;
@@ -2399,7 +2399,7 @@ namespace exprtk
 
                if (token_t::e_none != ttype)
                {
-                  t.set_operator(ttype,s_itr_,s_itr_ + 2,base_itr_);
+                  t.set_operator(ttype, s_itr_, s_itr_ + 2, base_itr_);
                   token_list_.push_back(t);
                   s_itr_ += 2;
                   return;
@@ -2407,17 +2407,17 @@ namespace exprtk
             }
 
             if ('<' == c0)
-               t.set_operator(token_t::e_lt ,s_itr_,s_itr_ + 1,base_itr_);
+               t.set_operator(token_t::e_lt ,s_itr_, s_itr_ + 1, base_itr_);
             else if ('>' == c0)
-               t.set_operator(token_t::e_gt ,s_itr_,s_itr_ + 1,base_itr_);
+               t.set_operator(token_t::e_gt ,s_itr_, s_itr_ + 1, base_itr_);
             else if (';' == c0)
-               t.set_operator(token_t::e_eof,s_itr_,s_itr_ + 1,base_itr_);
+               t.set_operator(token_t::e_eof,s_itr_, s_itr_ + 1, base_itr_);
             else if ('&' == c0)
-               t.set_symbol(s_itr_,s_itr_ + 1,base_itr_);
+               t.set_symbol(s_itr_, s_itr_ + 1, base_itr_);
             else if ('|' == c0)
-               t.set_symbol(s_itr_,s_itr_ + 1,base_itr_);
+               t.set_symbol(s_itr_, s_itr_ + 1, base_itr_);
             else
-               t.set_operator(token_t::token_type(c0),s_itr_,s_itr_ + 1,base_itr_);
+               t.set_operator(token_t::token_type(c0), s_itr_, s_itr_ + 1, base_itr_);
 
             token_list_.push_back(t);
             ++s_itr_;
@@ -2489,7 +2489,7 @@ namespace exprtk
                {
                   if (dot_found)
                   {
-                     t.set_error(token::e_err_number,initial_itr,s_itr_,base_itr_);
+                     t.set_error(token::e_err_number, initial_itr, s_itr_, base_itr_);
                      token_list_.push_back(t);
                      return;
                   }
@@ -2505,7 +2505,7 @@ namespace exprtk
 
                   if (is_end(s_itr_ + 1))
                   {
-                     t.set_error(token::e_err_number,initial_itr,s_itr_,base_itr_);
+                     t.set_error(token::e_err_number, initial_itr, s_itr_, base_itr_);
                      token_list_.push_back(t);
 
                      return;
@@ -2516,7 +2516,7 @@ namespace exprtk
                             !details::is_digit(c)
                           )
                   {
-                     t.set_error(token::e_err_number,initial_itr,s_itr_,base_itr_);
+                     t.set_error(token::e_err_number, initial_itr, s_itr_, base_itr_);
                      token_list_.push_back(t);
 
                      return;
@@ -2531,7 +2531,7 @@ namespace exprtk
                {
                   if (post_e_sign_found)
                   {
-                     t.set_error(token::e_err_number,initial_itr,s_itr_,base_itr_);
+                     t.set_error(token::e_err_number, initial_itr, s_itr_, base_itr_);
                      token_list_.push_back(t);
 
                      return;
@@ -2555,7 +2555,7 @@ namespace exprtk
                   ++s_itr_;
             }
 
-            t.set_numeric(initial_itr,s_itr_,base_itr_);
+            t.set_numeric(initial_itr, s_itr_, base_itr_);
             token_list_.push_back(t);
 
             return;
@@ -2569,7 +2569,7 @@ namespace exprtk
             // $fdd(x,x,x) = at least 11 chars
             if (std::distance(s_itr_,s_end_) < 11)
             {
-               t.set_error(token::e_err_sfunc,initial_itr,s_itr_,base_itr_);
+               t.set_error(token::e_err_sfunc, initial_itr, s_itr_, base_itr_);
                token_list_.push_back(t);
 
                return;
@@ -2582,7 +2582,7 @@ namespace exprtk
                    (details::is_digit(*(s_itr_ + 3))))
                )
             {
-               t.set_error(token::e_err_sfunc,initial_itr,s_itr_,base_itr_);
+               t.set_error(token::e_err_sfunc, initial_itr, s_itr_, base_itr_);
                token_list_.push_back(t);
 
                return;
@@ -2590,7 +2590,7 @@ namespace exprtk
 
             s_itr_ += 4; // $fdd = 4chars
 
-            t.set_symbol(initial_itr,s_itr_,base_itr_);
+            t.set_symbol(initial_itr, s_itr_, base_itr_);
             token_list_.push_back(t);
 
             return;
@@ -2604,7 +2604,7 @@ namespace exprtk
 
             if (std::distance(s_itr_,s_end_) < 2)
             {
-               t.set_error(token::e_err_string,s_itr_,s_end_,base_itr_);
+               t.set_error(token::e_err_string, s_itr_, s_end_, base_itr_);
                token_list_.push_back(t);
                return;
             }
@@ -2654,7 +2654,7 @@ namespace exprtk
 
                      if (!within_range || !x_seperator || !both_digits)
                      {
-                        t.set_error(token::e_err_string,initial_itr,s_itr_,base_itr_);
+                        t.set_error(token::e_err_string, initial_itr, s_itr_, base_itr_);
                         token_list_.push_back(t);
 
                         return;
@@ -2671,14 +2671,14 @@ namespace exprtk
 
             if (is_end(s_itr_))
             {
-               t.set_error(token::e_err_string,initial_itr,s_itr_,base_itr_);
+               t.set_error(token::e_err_string, initial_itr, s_itr_, base_itr_);
                token_list_.push_back(t);
 
                return;
             }
 
             if (!escaped_found)
-               t.set_string(initial_itr,s_itr_,base_itr_);
+               t.set_string(initial_itr, s_itr_, base_itr_);
             else
             {
                std::string parsed_string(initial_itr,s_itr_);
@@ -2878,16 +2878,16 @@ namespace exprtk
                   case 1 : insert_index = insert(g.token_list_[i],t);
                            break;
 
-                  case 2 : insert_index = insert(g.token_list_[i],g.token_list_[i + 1],t);
+                  case 2 : insert_index = insert(g.token_list_[i], g.token_list_[i + 1], t);
                            break;
 
-                  case 3 : insert_index = insert(g.token_list_[i],g.token_list_[i + 1],g.token_list_[i + 2],t);
+                  case 3 : insert_index = insert(g.token_list_[i], g.token_list_[i + 1], g.token_list_[i + 2], t);
                            break;
 
-                  case 4 : insert_index = insert(g.token_list_[i],g.token_list_[i + 1],g.token_list_[i + 2],g.token_list_[i + 3],t);
+                  case 4 : insert_index = insert(g.token_list_[i], g.token_list_[i + 1], g.token_list_[i + 2], g.token_list_[i + 3], t);
                            break;
 
-                  case 5 : insert_index = insert(g.token_list_[i],g.token_list_[i + 1],g.token_list_[i + 2],g.token_list_[i + 3],g.token_list_[i + 4],t);
+                  case 5 : insert_index = insert(g.token_list_[i], g.token_list_[i + 1], g.token_list_[i + 2], g.token_list_[i + 3], g.token_list_[i + 4], t);
                            break;
                }
 
@@ -4295,7 +4295,8 @@ namespace exprtk
          e_erf     , e_erfc    , e_ncdf    , e_frac    ,
          e_trunc   , e_assign  , e_addass  , e_subass  ,
          e_mulass  , e_divass  , e_modass  , e_in      ,
-         e_like    , e_ilike   , e_multi   , e_swap    ,
+         e_like    , e_ilike   , e_multi   , e_smulti  ,
+         e_swap    ,
 
          // Do not add new functions/operators after this point.
          e_sf00 = 1000, e_sf01 = 1001, e_sf02 = 1002, e_sf03 = 1003,
@@ -4784,36 +4785,37 @@ namespace exprtk
             e_for          , e_switch       , e_mswitch      , e_return       ,
             e_retenv       , e_variable     , e_stringvar    , e_stringconst  ,
             e_stringvarrng , e_cstringvarrng, e_strgenrange  , e_strconcat    ,
-            e_stringvarsize, e_strswap      , e_stringsize   , e_function     ,
-            e_vafunction   , e_genfunction  , e_strfunction  , e_strcondition ,
-            e_strccondition, e_add          , e_sub          , e_mul          ,
-            e_div          , e_mod          , e_pow          , e_lt           ,
-            e_lte          , e_gt           , e_gte          , e_eq           ,
-            e_ne           , e_and          , e_nand         , e_or           ,
-            e_nor          , e_xor          , e_xnor         , e_in           ,
-            e_like         , e_ilike        , e_inranges     , e_ipow         ,
-            e_ipowinv      , e_abs          , e_acos         , e_acosh        ,
-            e_asin         , e_asinh        , e_atan         , e_atanh        ,
-            e_ceil         , e_cos          , e_cosh         , e_exp          ,
-            e_expm1        , e_floor        , e_log          , e_log10        ,
-            e_log2         , e_log1p        , e_neg          , e_pos          ,
-            e_round        , e_sin          , e_sinc         , e_sinh         ,
-            e_sqrt         , e_tan          , e_tanh         , e_cot          ,
-            e_sec          , e_csc          , e_r2d          , e_d2r          ,
-            e_d2g          , e_g2d          , e_notl         , e_sgn          ,
-            e_erf          , e_erfc         , e_ncdf         , e_frac         ,
-            e_trunc        , e_uvouv        , e_vov          , e_cov          ,
-            e_voc          , e_vob          , e_bov          , e_cob          ,
-            e_boc          , e_vovov        , e_vovoc        , e_vocov        ,
-            e_covov        , e_covoc        , e_vovovov      , e_vovovoc      ,
-            e_vovocov      , e_vocovov      , e_covovov      , e_covocov      ,
-            e_vocovoc      , e_covovoc      , e_vococov      , e_sf3ext       ,
-            e_sf4ext       , e_nulleq       , e_strass       , e_vector       ,
-            e_vecelem      , e_rbvecelem    , e_rbveccelem   , e_vecdefass    ,
-            e_vecvalass    , e_vecvecass    , e_vecopvalass  , e_vecopvecass  ,
-            e_vecfunc      , e_vecvecswap   , e_vecvecineq   , e_vecvalineq   ,
-            e_valvecineq   , e_vecvecarith  , e_vecvalarith  , e_valvecarith  ,
-            e_vecunaryop   , e_break        , e_continue     , e_swap
+            e_stringvarsize, e_strswap      , e_stringsize   , e_stringvararg ,
+            e_function     , e_vafunction   , e_genfunction  , e_strfunction  ,
+            e_strcondition , e_strccondition, e_add          , e_sub          ,
+            e_mul          , e_div          , e_mod          , e_pow          ,
+            e_lt           , e_lte          , e_gt           , e_gte          ,
+            e_eq           , e_ne           , e_and          , e_nand         ,
+            e_or           , e_nor          , e_xor          , e_xnor         ,
+            e_in           , e_like         , e_ilike        , e_inranges     ,
+            e_ipow         , e_ipowinv      , e_abs          , e_acos         ,
+            e_acosh        , e_asin         , e_asinh        , e_atan         ,
+            e_atanh        , e_ceil         , e_cos          , e_cosh         ,
+            e_exp          , e_expm1        , e_floor        , e_log          ,
+            e_log10        , e_log2         , e_log1p        , e_neg          ,
+            e_pos          , e_round        , e_sin          , e_sinc         ,
+            e_sinh         , e_sqrt         , e_tan          , e_tanh         ,
+            e_cot          , e_sec          , e_csc          , e_r2d          ,
+            e_d2r          , e_d2g          , e_g2d          , e_notl         ,
+            e_sgn          , e_erf          , e_erfc         , e_ncdf         ,
+            e_frac         , e_trunc        , e_uvouv        , e_vov          ,
+            e_cov          , e_voc          , e_vob          , e_bov          ,
+            e_cob          , e_boc          , e_vovov        , e_vovoc        ,
+            e_vocov        , e_covov        , e_covoc        , e_vovovov      ,
+            e_vovovoc      , e_vovocov      , e_vocovov      , e_covovov      ,
+            e_covocov      , e_vocovoc      , e_covovoc      , e_vococov      ,
+            e_sf3ext       , e_sf4ext       , e_nulleq       , e_strass       ,
+            e_vector       , e_vecelem      , e_rbvecelem    , e_rbveccelem   ,
+            e_vecdefass    , e_vecvalass    , e_vecvecass    , e_vecopvalass  ,
+            e_vecopvecass  , e_vecfunc      , e_vecvecswap   , e_vecvecineq   ,
+            e_vecvalineq   , e_valvecineq   , e_vecvecarith  , e_vecvalarith  ,
+            e_valvecarith  , e_vecunaryop   , e_break        , e_continue     ,
+            e_swap
          };
 
          typedef T value_type;
@@ -8727,6 +8729,141 @@ namespace exprtk
 
          expression_ptr test_;
          expression_ptr consequent_;
+      };
+
+      template <typename T, typename VarArgFunction>
+      class str_vararg_node  : public expression_node <T>,
+                               public string_base_node<T>,
+                               public range_interface <T>
+      {
+      public:
+
+         typedef expression_node <T>*  expression_ptr;
+         typedef string_base_node<T>*    str_base_ptr;
+         typedef range_pack      <T>          range_t;
+         typedef range_t*                   range_ptr;
+         typedef range_interface<T>          irange_t;
+         typedef irange_t*                 irange_ptr;
+
+         template <typename Allocator,
+                   template <typename,typename> class Sequence>
+         str_vararg_node(const Sequence<expression_ptr,Allocator>& arg_list)
+         : final_node_(arg_list.back()),
+           final_deletable_(branch_deletable(final_node_)),
+           initialised_(false),
+           str_base_ptr_ (0),
+           str_range_ptr_(0)
+         {
+            if (0 == final_node_)
+               return;
+            else if (!is_generally_string_node(final_node_))
+               return;
+
+            str_base_ptr_ = dynamic_cast<str_base_ptr>(final_node_);
+
+            if (0 == str_base_ptr_)
+               return;
+
+            str_range_ptr_ = dynamic_cast<irange_ptr>(final_node_);
+
+            if (0 == str_range_ptr_)
+               return;
+
+            initialised_ = str_base_ptr_  && str_range_ptr_;
+
+            if (arg_list.size() > 1)
+            {
+               const std::size_t arg_list_size = arg_list.size() - 1;
+
+               arg_list_.resize(arg_list_size);
+               delete_branch_.resize(arg_list_size);
+
+               for (std::size_t i = 0; i < arg_list_size; ++i)
+               {
+                  if (arg_list[i])
+                  {
+                          arg_list_[i] = arg_list[i];
+                     delete_branch_[i] = static_cast<unsigned char>(branch_deletable(arg_list_[i]) ? 1 : 0);
+                  }
+                  else
+                  {
+                     arg_list_.clear();
+                     delete_branch_.clear();
+                     return;
+                  }
+               }
+            }
+         }
+
+        ~str_vararg_node()
+         {
+            if (final_node_ && final_deletable_)
+            {
+               delete final_node_;
+               final_node_ = 0;
+            }
+
+            for (std::size_t i = 0; i < arg_list_.size(); ++i)
+            {
+               if (arg_list_[i] && delete_branch_[i])
+               {
+                  delete arg_list_[i];
+                  arg_list_[i] = 0;
+               }
+            }
+         }
+
+         inline T value() const
+         {
+            if (!arg_list_.empty())
+            {
+               VarArgFunction::process(arg_list_);
+            }
+
+            final_node_->value();
+
+            return std::numeric_limits<T>::quiet_NaN();
+         }
+
+         std::string str() const
+         {
+            return str_base_ptr_->str();
+         }
+
+         const char* base() const
+         {
+            return str_base_ptr_->base();
+         }
+
+         std::size_t size() const
+         {
+            return str_base_ptr_->size();
+         }
+
+         range_t& range_ref()
+         {
+            return str_range_ptr_->range_ref();
+         }
+
+         const range_t& range_ref() const
+         {
+            return str_range_ptr_->range_ref();
+         }
+
+         inline typename expression_node<T>::node_type type() const
+         {
+            return expression_node<T>::e_stringvararg;
+         }
+
+      private:
+
+         expression_ptr final_node_;
+         bool           final_deletable_;
+         bool           initialised_;
+         str_base_ptr   str_base_ptr_;
+         irange_ptr     str_range_ptr_;
+         std::vector<expression_ptr> arg_list_;
+         std::vector<unsigned char> delete_branch_;
       };
       #endif
 
@@ -15079,6 +15216,12 @@ namespace exprtk
       }
 
       template <typename T>
+      inline bool is_string_vararg_node(const expression_node<T>* node)
+      {
+         return node && (expression_node<T>::e_stringvararg == node->type());
+      }
+
+      template <typename T>
       inline bool is_genricstring_range_node(const expression_node<T>* node)
       {
          return node && (expression_node<T>::e_strgenrange == node->type());
@@ -15100,7 +15243,8 @@ namespace exprtk
                case expression_node<T>::e_strconcat     :
                case expression_node<T>::e_strfunction   :
                case expression_node<T>::e_strcondition  :
-               case expression_node<T>::e_strccondition : return true;
+               case expression_node<T>::e_strccondition :
+               case expression_node<T>::e_stringvararg  : return true;
                default                                  : return false;
             }
          }
@@ -21909,7 +22053,8 @@ namespace exprtk
                 typename Allocator2,
                 template <typename,typename> class Sequence>
       inline expression_node_ptr simplify(Sequence<expression_node_ptr,Allocator1>& expression_list,
-                                          Sequence<bool,Allocator2>& side_effect_list)
+                                          Sequence<bool,Allocator2>& side_effect_list,
+                                          const bool specialise_on_final_type = false)
       {
          if (expression_list.empty())
             return error_node();
@@ -21980,6 +22125,8 @@ namespace exprtk
 
          if (1 == expression_list.size())
             return expression_list[0];
+         else if (specialise_on_final_type && is_generally_string_node(expression_list.back()))
+            return expression_generator_.vararg_function(details::e_smulti,expression_list);
          else
             return expression_generator_.vararg_function(details::e_multi,expression_list);
       }
@@ -22056,7 +22203,7 @@ namespace exprtk
                break;
          }
 
-         result = simplify(arg_list,side_effect_list);
+         result = simplify(arg_list,side_effect_list,source.empty());
 
          sdd.delete_ptr = (0 == result);
          return result;
@@ -24536,6 +24683,7 @@ namespace exprtk
          {
             return parse_swap_statement();
          }
+         #ifndef exprtk_disable_return_statement
          else if (
                    details::imatch(current_token().value,symbol_return) &&
                    settings_.control_struct_enabled(current_token().value)
@@ -24543,6 +24691,7 @@ namespace exprtk
          {
             return parse_return_statement();
          }
+         #endif
          else if (symtab_store_.valid() || !sem_.empty())
          {
             return parse_symtab_symbol();
@@ -26345,22 +26494,30 @@ namespace exprtk
             else if (all_nodes_variables(arg_list))
                return varnode_optimise_varargfunc(operation,arg_list);
 
-            switch (operation)
+            if (details::e_smulti == operation)
             {
-               #define case_stmt(op0,op1)                                                \
-               case op0 : return node_allocator_->                                       \
-                             allocate<details::vararg_node<Type,op1<Type> > >(arg_list); \
+               return node_allocator_->
+                 allocate<details::str_vararg_node<Type,details::vararg_multi_op<Type> > >(arg_list);
+            }
+            else
+            {
+               switch (operation)
+               {
+                  #define case_stmt(op0,op1)                                                \
+                  case op0 : return node_allocator_->                                       \
+                                allocate<details::vararg_node<Type,op1<Type> > >(arg_list); \
 
-               case_stmt(details::e_sum,  details::vararg_add_op  )
-               case_stmt(details::e_prod, details::vararg_mul_op  )
-               case_stmt(details::e_avg,  details::vararg_avg_op  )
-               case_stmt(details::e_min,  details::vararg_min_op  )
-               case_stmt(details::e_max,  details::vararg_max_op  )
-               case_stmt(details::e_mand, details::vararg_mand_op )
-               case_stmt(details::e_mor,  details::vararg_mor_op  )
-               case_stmt(details::e_multi,details::vararg_multi_op)
-               #undef case_stmt
-               default : return error_node();
+                  case_stmt(details::e_sum,  details::vararg_add_op  )
+                  case_stmt(details::e_prod, details::vararg_mul_op  )
+                  case_stmt(details::e_avg,  details::vararg_avg_op  )
+                  case_stmt(details::e_min,  details::vararg_min_op  )
+                  case_stmt(details::e_max,  details::vararg_max_op  )
+                  case_stmt(details::e_mand, details::vararg_mand_op )
+                  case_stmt(details::e_mor,  details::vararg_mor_op  )
+                  case_stmt(details::e_multi,details::vararg_multi_op)
+                  #undef case_stmt
+                  default : return error_node();
+               }
             }
          }
 
@@ -32935,14 +33092,16 @@ namespace exprtk
                                    details::is_string_concat_node     (branch[0]) ||
                                    details::is_string_function_node   (branch[0]) ||
                                    details::is_string_condition_node  (branch[0]) ||
-                                   details::is_string_ccondition_node (branch[0]) ;
+                                   details::is_string_ccondition_node (branch[0]) ||
+                                   details::is_string_vararg_node     (branch[0]) ;
 
             const bool b1_is_gen = details::is_string_assignment_node (branch[1]) ||
                                    details::is_genricstring_range_node(branch[1]) ||
                                    details::is_string_concat_node     (branch[1]) ||
                                    details::is_string_function_node   (branch[1]) ||
                                    details::is_string_condition_node  (branch[1]) ||
-                                   details::is_string_ccondition_node (branch[1]) ;
+                                   details::is_string_ccondition_node (branch[1]) ||
+                                   details::is_string_vararg_node     (branch[1]) ;
 
             if (details::e_add == opr)
             {
