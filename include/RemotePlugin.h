@@ -428,6 +428,7 @@ enum RemoteMessageIDs
 	IdShowUI,
 	IdHideUI,
 	IdToggleUI,
+	IdIsUIVisible,
 	IdSaveSettingsToString,
 	IdSaveSettingsToFile,
 	IdLoadSettingsFromString,
@@ -814,6 +815,15 @@ public:
 		lock();
 		sendMessage( IdToggleUI );
 		unlock();
+	}
+
+	int isUIVisible()
+	{
+		lock();
+		sendMessage( IdIsUIVisible );
+		unlock();
+		message m = waitForMessage( IdIsUIVisible );
+		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
 	}
 
 	inline bool failed() const

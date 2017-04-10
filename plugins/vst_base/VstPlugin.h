@@ -52,9 +52,11 @@ public:
 		return m_pluginWindowID != 0;
 	}
 
+#ifdef LMMS_EMBED_VST
 	void showEditor( QWidget * _parent = NULL, bool isEffect = false );
 	void hideEditor();
 	void toggleEditor();
+#endif
 
 	inline const QString & name() const
 	{
