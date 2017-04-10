@@ -478,8 +478,8 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
     delete presets;
     delete preset_descs;
     free(descriptorForDssiName);
-    delete metadata;
 #endif
+    delete metadata;
 }
 
 #endif
