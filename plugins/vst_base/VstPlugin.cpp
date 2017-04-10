@@ -177,6 +177,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 
+#ifdef LMMS_EMBED_VST
 void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 {
 	QWidget * w = pluginWidget();
@@ -237,8 +238,6 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 	}
 #else
 	QWindow * window = QWindow::fromWinId( m_pluginWindowID );
-fprintf(stderr, "m_pluginWindowID %x\n", m_pluginWindowID);
-fprintf(stderr, "window %p\n", window);
 	m_pluginWidget = QWidget::createWindowContainer( window, _parent,
 								Qt::Window );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
@@ -275,12 +274,14 @@ void VstPlugin::toggleEditor()
 		w->setVisible( !w->isVisible() );
 	}
 }
+#endif
 
 
 
 
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
+#ifdef LMMS_EMBED_VST
 	if( pluginWidget() != NULL )
 	{
 		if( _this.attribute( "guivisible" ).toInt() )
@@ -292,6 +293,16 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 			hideEditor();
 		}
 	}
+#else
+	if( _this.attribute( "guivisible" ).toInt() )
+	{
+		showUI();
+	}
+	else
+	{
+		hideUI();
+	}
+#endif
 
 	const int num_params = _this.attribute( "numparams" ).toInt();
 	// if it exists try to load settings chunk
@@ -324,10 +335,18 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+#ifdef LMMS_EMBED_VST
 	if( pluginWidget() != NULL )
 	{
 		_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
 	}
+#else
+	int visible = isUIVisible();
+	if ( visible != -1 )
+	{
+		_this.setAttribute( "guivisible", visible );
+	}
+#endif
 
 	// try to save all settings in a chunk
 	QByteArray chunk = saveChunk();
