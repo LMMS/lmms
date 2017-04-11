@@ -166,6 +166,9 @@ void TrackContentObject::changeLength( const MidiTime & length )
 	emit lengthChanged();
 }
 
+
+
+
 bool TrackContentObject::comparePosition(const TrackContentObject *a, const TrackContentObject *b)
 {
 	return a->startPosition() < b->startPosition();
@@ -219,6 +222,22 @@ void TrackContentObject::toggleMute()
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
 	emit dataChanged();
+}
+
+
+
+
+MidiTime TrackContentObject::startTimeOffset() const
+{
+	return m_startTimeOffset;
+}
+
+
+
+
+void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
+{
+	m_startTimeOffset = startTimeOffset;
 }
 
 
@@ -968,7 +987,9 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else
 	{
-		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
+		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco ) )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -981,24 +1002,6 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			}
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
-		}
-		else if( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() )
-		{
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-			if( sTco )
-			{
-				if( QApplication::overrideCursor() != NULL &&
-						QApplication::overrideCursor()->shape() !=
-						Qt::SizeHorCursor )
-				{
-					while( QApplication::overrideCursor() != NULL )
-					{
-						QApplication::restoreOverrideCursor();
-					}
-				}
-				QCursor c( Qt::SizeHorCursor );
-				QApplication::setOverrideCursor( c );
-			}
 		}
 		else
 		{
@@ -1031,6 +1034,7 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 
 	if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
+		// TODO: Fix m_tco->setJournalling() consistency
 		m_tco->setJournalling( true );
 	}
 	m_action = NoAction;

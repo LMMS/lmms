@@ -185,11 +185,6 @@ void SampleTCO::updateTrackTcos()
 	}
 }
 
-MidiTime SampleTCO::startTimeOffset() const
-{
-	return m_startTimeOffset;
-}
-
 
 
 
@@ -280,14 +275,6 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-}
-
-
-
-
-void SampleTCO::setStartTimeOffset( MidiTime startTime )
-{
-	m_startTimeOffset = startTime;
 }
 
 

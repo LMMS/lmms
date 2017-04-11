@@ -149,6 +149,9 @@ public:
 	/// Returns true if and only if a->startPosition() < b->startPosition()
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
+	MidiTime startTimeOffset() const;
+	void setStartTimeOffset(const MidiTime &startTimeOffset);
+
 public slots:
 	void copy();
 	void paste();
@@ -174,6 +177,7 @@ private:
 
 	MidiTime m_startPosition;
 	MidiTime m_length;
+	MidiTime m_startTimeOffset;
 
 	BoolModel m_mutedModel;
 	BoolModel m_soloModel;
