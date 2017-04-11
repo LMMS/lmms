@@ -119,11 +119,20 @@ public:
         return new ladspa_instance(new Module, &output, sample_rate);
     }
 
+	static typename Module::metadata_class *get_metadata() {
+		static typename Module::metadata_class *m = new typename Module::metadata_class;
+		return m;
+	}
+
     /// Get a wrapper singleton - used to prevent initialization order problems which were present in older versions
     static ladspa_plugin_metadata_set &get() { 
-        static ladspa_wrapper instance(new typename Module::metadata_class);
+        static ladspa_wrapper instance(get_metadata());
         return instance.output;
     }
+
+	~ladspa_wrapper() {
+		delete get_metadata();
+	}
 };
 
 };

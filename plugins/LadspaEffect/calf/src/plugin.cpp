@@ -479,7 +479,6 @@ ladspa_plugin_metadata_set::~ladspa_plugin_metadata_set()
     delete preset_descs;
     free(descriptorForDssiName);
 #endif
-    delete metadata;
 }
 
 #endif
