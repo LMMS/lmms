@@ -47,6 +47,7 @@ public:
 		setJournalling( false );
 		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, this ) );
 		m_previewInstrumentTrack->setJournalling( false );
+		m_previewInstrumentTrack->setPreviewMode( true );
 	}
 
 	virtual ~PreviewTrackContainer()
@@ -153,7 +154,6 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 		// without an instrument in preview track, it will segfault
 		if(dataFile->content().elementsByTagName( "vestige" ).length() == 0 )
 		{
-			s_previewTC->previewInstrumentTrack()->setPreviewMode( true );
 			s_previewTC->previewInstrumentTrack()->
 					loadTrackSpecificSettings(
 						dataFile->content().firstChild().toElement() );
