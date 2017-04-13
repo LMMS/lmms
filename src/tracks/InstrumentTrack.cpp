@@ -724,7 +724,10 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	m_pitchRangeModel.loadSettings( thisElement, "pitchrange" );
 	m_pitchModel.loadSettings( thisElement, "pitch" );
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1 );
-	m_effectChannelModel.loadSettings( thisElement, "fxch" );
+	if ( !m_previewMode )
+	{
+		m_effectChannelModel.loadSettings( thisElement, "fxch" );
+	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
 
@@ -786,6 +789,14 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	}
 	updatePitchRange();
 	unlock();
+}
+
+
+
+
+void InstrumentTrack::setPreviewMode( const bool value )
+{
+	m_previewMode = value;
 }
 
 
@@ -1774,7 +1785,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		idxOfNext = (idxOfNext + d + trackViews.size()) % trackViews.size();
 		newView = dynamic_cast<InstrumentTrackView*>(trackViews[idxOfNext]);
 		// the window that should be brought to focus is the FIRST InstrumentTrackView that comes after us
-		if (bringToFront == nullptr && newView != nullptr) 
+		if (bringToFront == nullptr && newView != nullptr)
 		{
 			bringToFront = newView;
 		}
@@ -1791,7 +1802,7 @@ void InstrumentTrackWindow::viewInstrumentInDirection(int d)
 		// save current window pos and then hide the window by unchecking its button in the track list
 		QPoint curPos = parentWidget()->pos();
 		m_itv->m_tlb->setChecked(false);
-		
+
 		// enable the new window by checking its track list button & moving it to where our window just was
 		newView->m_tlb->setChecked(true);
 		newView->getInstrumentTrackWindow()->parentWidget()->move(curPos);
