@@ -95,6 +95,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_notes(),
 	m_sustainPedalPressed( false ),
 	m_silentBuffersProcessed( false ),
+	m_previewMode( false ),
 	m_baseNoteModel( 0, 0, KeysPerOctave * NumOctaves - 1, this,
 							tr( "Base note" ) ),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this, tr( "Volume" ) ),
