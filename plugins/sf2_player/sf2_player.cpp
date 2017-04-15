@@ -545,7 +545,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 	{
 		return;
 	}
-	
+
 	const f_cnt_t tfp = _n->totalFramesPlayed();
 
 	if( tfp == 0 )
@@ -560,7 +560,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 			return;
 		}
 		const int baseVelocity = instrumentTrack()->midiPort()->baseVelocity();
-		
+
 		SF2PluginData * pluginData = new SF2PluginData;
 		pluginData->midiNote = midiNote;
 		pluginData->lastPanning = 0;
@@ -571,7 +571,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 		pluginData->noteOffSent = false;
 
 		_n->m_pluginData = pluginData;
-		
+
 		// insert the nph to the playing notes vector
 		m_playingNotesMutex.lock();
 		m_playingNotes.append( _n );
@@ -593,7 +593,7 @@ void sf2Instrument::playNote( NotePlayHandle * _n, sampleFrame * )
 void sf2Instrument::noteOn( SF2PluginData * n )
 {
 	m_synthMutex.lock();
-	
+
 	// get list of current voice IDs so we can easily spot the new
 	// voice after the fluid_synth_noteon() call
 	const int poly = fluid_synth_get_polyphony( m_synth );
@@ -644,7 +644,7 @@ void sf2Instrument::noteOff( SF2PluginData * n )
 		fluid_synth_noteoff( m_synth, m_channel, n->midiNote );
 		m_synthMutex.unlock();
 	}
-	
+
 }
 
 
@@ -696,7 +696,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 				currentNote = m_playingNotes[i];
 			}
 		}
-		
+
 		// process the current note:
 		// first see if we're synced in frame count
 		SF2PluginData * currentData = static_cast<SF2PluginData *>( currentNote->m_pluginData );
@@ -736,7 +736,7 @@ void sf2Instrument::play( sampleFrame * _working_buffer )
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames, NULL );
 }
 
-	
+
 void sf2Instrument::renderFrames( f_cnt_t frames, sampleFrame * buf )
 {
 	m_synthMutex.lock();
@@ -1083,15 +1083,7 @@ void sf2InstrumentView::showFileDialog()
 	QString dir;
 	if( k->m_filename != "" )
 	{
-		QString f = k->m_filename;
-		if( QFileInfo( f ).isRelative() )
-		{
-			f = ConfigManager::inst()->sf2Dir() + f;
-			if( QFileInfo( f ).exists() == false )
-			{
-				f = ConfigManager::inst()->factorySamplesDir() + k->m_filename;
-			}
-		}
+		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );
 		ofd.setDirectory( QFileInfo( f ).absolutePath() );
 		ofd.selectFile( QFileInfo( f ).fileName() );
 	}
