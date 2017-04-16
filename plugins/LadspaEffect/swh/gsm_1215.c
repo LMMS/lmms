@@ -224,7 +224,6 @@ static void runGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	int count = plugin_data->count;
 	LADSPA_Data * dry = plugin_data->dry;
 	gsm_signal * dst = plugin_data->dst;
-	float fs = plugin_data->fs;
 	gsm handle = plugin_data->handle;
 	int resamp = plugin_data->resamp;
 	float rsf = plugin_data->rsf;
@@ -237,8 +236,6 @@ static void runGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	float part;
 	int error_rate = f_round(error);
 	int num_passes = f_round(passes);
-
-	fs = fs; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 
@@ -322,7 +319,6 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	int count = plugin_data->count;
 	LADSPA_Data * dry = plugin_data->dry;
 	gsm_signal * dst = plugin_data->dst;
-	float fs = plugin_data->fs;
 	gsm handle = plugin_data->handle;
 	int resamp = plugin_data->resamp;
 	float rsf = plugin_data->rsf;
@@ -335,8 +331,6 @@ static void runAddingGsm(LADSPA_Handle instance, unsigned long sample_count) {
 	float part;
 	int error_rate = f_round(error);
 	int num_passes = f_round(passes);
-
-	fs = fs; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 

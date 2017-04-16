@@ -51,7 +51,7 @@ struct filter_metadata: public plugin_metadata<filter_metadata>
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = false, support_midi = false };
     PLUGIN_NAME_ID_LABEL("filter", "filter", "Filter")
     /// do not export mode and inertia as CVs, as those are settings and not parameters
-    bool is_cv(int param_no) { return param_no != par_mode && param_no != par_inertia; }
+    bool is_cv(int param_no) const { return param_no != par_mode && param_no != par_inertia; }
 };
 
 /// Filterclavier - metadata
@@ -61,7 +61,7 @@ struct filterclavier_metadata: public plugin_metadata<filterclavier_metadata>
     enum { in_count = 2, out_count = 2, ins_optional = 0, outs_optional = 0, rt_capable = true, require_midi = true, support_midi = true };
     PLUGIN_NAME_ID_LABEL("filterclavier", "filterclavier", "Filterclavier")
     /// do not export mode and inertia as CVs, as those are settings and not parameters
-    bool is_cv(int param_no) { return param_no != par_mode && param_no != par_inertia; }
+    bool is_cv(int param_no) const { return param_no != par_mode && param_no != par_inertia; }
 };
 
 struct reverb_metadata: public plugin_metadata<reverb_metadata>
@@ -499,7 +499,7 @@ struct organ_metadata: public organ_enums, public plugin_metadata<organ_metadata
     PLUGIN_NAME_ID_LABEL("organ", "organ", "Organ")
 
 public:
-    plugin_command_info *get_commands();
+    plugin_command_info *get_commands() const;
     const char *const *get_configure_vars() const;
 };
 

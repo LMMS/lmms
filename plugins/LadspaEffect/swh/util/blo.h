@@ -113,7 +113,7 @@ static inline void blo_hd_set_freq(blo_h_osc *this, const float f)
 	const float ff = fabs(f) + 0.00001f; // Prevent div by zero
 
 	this->om.all = f_round(f * this->ph_coef);
-	tab_num = abs(f_round(this->nyquist / ff - 0.5f));
+	tab_num = f_abs(f_round(this->nyquist / ff - 0.5f));
 	if (tab_num >= BLO_N_HARMONICS) {
 		tab_num = BLO_N_HARMONICS - 1;
 	} else if (tab_num < 0) {

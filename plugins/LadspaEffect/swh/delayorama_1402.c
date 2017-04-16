@@ -29,6 +29,7 @@ static void __attribute__((constructor)) swh_init(); // forward declaration
 
 #include <ladspa-util.h>
 
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define N_TAPS 128
 
 typedef struct {
@@ -120,7 +121,7 @@ static void activateDelayorama(LADSPA_Handle instance) {
 	unsigned int next_set = plugin_data->next_set;
 	unsigned int sample_rate = plugin_data->sample_rate;
 	tap **taps = plugin_data->taps;
-#line 52 "delayorama_1402.xml"
+#line 53 "delayorama_1402.xml"
 	memset(buffer, 0, buffer_size * sizeof(LADSPA_Data));
 
 	last_out = 0.0f;
@@ -152,7 +153,7 @@ static void activateDelayorama(LADSPA_Handle instance) {
 }
 
 static void cleanupDelayorama(LADSPA_Handle instance) {
-#line 66 "delayorama_1402.xml"
+#line 67 "delayorama_1402.xml"
 	Delayorama *plugin_data = (Delayorama *)instance;
 	free(plugin_data->taps[0]);
 	free(plugin_data->taps[1]);
@@ -232,7 +233,7 @@ static LADSPA_Handle instantiateDelayorama(
 	unsigned int sample_rate;
 	tap **taps = NULL;
 
-#line 25 "delayorama_1402.xml"
+#line 26 "delayorama_1402.xml"
 	sample_rate = s_rate;
 
 	buffer_pos = 0;
@@ -344,7 +345,7 @@ static void runDelayorama(LADSPA_Handle instance, unsigned long sample_count) {
 	unsigned int sample_rate = plugin_data->sample_rate;
 	tap ** taps = plugin_data->taps;
 
-#line 73 "delayorama_1402.xml"
+#line 74 "delayorama_1402.xml"
 	unsigned long pos;
 	float coef = DB_CO(gain);
 	unsigned int i;
@@ -421,7 +422,7 @@ static void runDelayorama(LADSPA_Handle instance, unsigned long sample_count) {
 	  for (i=0; i<ntaps; i++) {
 	    g_rand = (1.0f-gain_rand) + (float)rand() / (float)RAND_MAX * 2.0f * gain_rand;
 	    d_rand = (1.0f-delay_rand) + (float)rand() / (float)RAND_MAX * 2.0f * delay_rand;
-	    taps[next_set][i].delay = LIMIT((unsigned int)(delay_base + delay_sum * delay_fix * d_rand), 0, buffer_size-1);
+	    taps[next_set][i].delay = MIN((unsigned int)(delay_base + delay_sum * delay_fix * d_rand), buffer_size-1);
 	    taps[next_set][i].gain = gain * g_rand;
 
 	    delay_sum += delay;
@@ -541,7 +542,7 @@ static void runAddingDelayorama(LADSPA_Handle instance, unsigned long sample_cou
 	unsigned int sample_rate = plugin_data->sample_rate;
 	tap ** taps = plugin_data->taps;
 
-#line 73 "delayorama_1402.xml"
+#line 74 "delayorama_1402.xml"
 	unsigned long pos;
 	float coef = DB_CO(gain);
 	unsigned int i;
@@ -618,7 +619,7 @@ static void runAddingDelayorama(LADSPA_Handle instance, unsigned long sample_cou
 	  for (i=0; i<ntaps; i++) {
 	    g_rand = (1.0f-gain_rand) + (float)rand() / (float)RAND_MAX * 2.0f * gain_rand;
 	    d_rand = (1.0f-delay_rand) + (float)rand() / (float)RAND_MAX * 2.0f * delay_rand;
-	    taps[next_set][i].delay = LIMIT((unsigned int)(delay_base + delay_sum * delay_fix * d_rand), 0, buffer_size-1);
+	    taps[next_set][i].delay = MIN((unsigned int)(delay_base + delay_sum * delay_fix * d_rand), buffer_size-1);
 	    taps[next_set][i].gain = gain * g_rand;
 
 	    delay_sum += delay;

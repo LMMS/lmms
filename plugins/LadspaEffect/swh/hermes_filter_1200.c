@@ -817,7 +817,6 @@ static void runHermesFilter(LADSPA_Handle instance, unsigned long sample_count) 
 	float lfo2_phase = plugin_data->lfo2_phase;
 	blo_h_osc * osc1_d = plugin_data->osc1_d;
 	blo_h_osc * osc2_d = plugin_data->osc2_d;
-	blo_h_tables * tables = plugin_data->tables;
 	sv_filter * xover_b1_data = plugin_data->xover_b1_data;
 	sv_filter * xover_b2_data = plugin_data->xover_b2_data;
 
@@ -926,8 +925,6 @@ static void runHermesFilter(LADSPA_Handle instance, unsigned long sample_count) 
 	dela_fb[0] = dela1_fb;
 	dela_fb[1] = dela2_fb;
 	dela_fb[2] = dela3_fb;
-	
-	tables = tables; // To shut up gcc
 	
 	for (pos = 0; pos < sample_count; pos++) {
 	        count++; // Count of number of samples processed
@@ -1204,7 +1201,6 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	float lfo2_phase = plugin_data->lfo2_phase;
 	blo_h_osc * osc1_d = plugin_data->osc1_d;
 	blo_h_osc * osc2_d = plugin_data->osc2_d;
-	blo_h_tables * tables = plugin_data->tables;
 	sv_filter * xover_b1_data = plugin_data->xover_b1_data;
 	sv_filter * xover_b2_data = plugin_data->xover_b2_data;
 
@@ -1313,8 +1309,6 @@ static void runAddingHermesFilter(LADSPA_Handle instance, unsigned long sample_c
 	dela_fb[0] = dela1_fb;
 	dela_fb[1] = dela2_fb;
 	dela_fb[2] = dela3_fb;
-	
-	tables = tables; // To shut up gcc
 	
 	for (pos = 0; pos < sample_count; pos++) {
 	        count++; // Count of number of samples processed

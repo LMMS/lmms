@@ -7,4 +7,4 @@ if [ "$QT5" ]; then
 fi
 
 # shellcheck disable=SC2086
-cmake $CMAKE_FLAGS -DUSE_WERROR=OFF ..
+cmake $CMAKE_FLAGS -DFIX_SYSTEM_HEADERS=ON ..

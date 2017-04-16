@@ -124,7 +124,7 @@ static void activateVynil(LADSPA_Handle instance) {
 	biquad *noise_filt = plugin_data->noise_filt;
 	float phi = plugin_data->phi;
 	unsigned int sample_cnt = plugin_data->sample_cnt;
-#line 75 "vynil_1905.xml"
+#line 77 "vynil_1905.xml"
 	memset(buffer_m, 0, sizeof(LADSPA_Data) * (buffer_mask + 1));
 	memset(buffer_s, 0, sizeof(LADSPA_Data) * (buffer_mask + 1));
 	buffer_pos = 0;
@@ -158,7 +158,7 @@ static void activateVynil(LADSPA_Handle instance) {
 }
 
 static void cleanupVynil(LADSPA_Handle instance) {
-#line 179 "vynil_1905.xml"
+#line 181 "vynil_1905.xml"
 	Vynil *plugin_data = (Vynil *)instance;
 	free(plugin_data->buffer_m);
 	free(plugin_data->buffer_s);
@@ -243,6 +243,8 @@ static LADSPA_Handle instantiateVynil(
 	buffer_s = malloc(sizeof(LADSPA_Data) * buffer_size);
 	buffer_mask = buffer_size - 1;
 	buffer_pos = 0;
+	click_buffer_omega.all = 0;
+	click_buffer_pos.all = 0;
 	click_gain = 0;
 	phi = 0.0f; /* Angular phase */
 
@@ -343,7 +345,7 @@ static void runVynil(LADSPA_Handle instance, unsigned long sample_count) {
 	float phi = plugin_data->phi;
 	unsigned int sample_cnt = plugin_data->sample_cnt;
 
-#line 90 "vynil_1905.xml"
+#line 92 "vynil_1905.xml"
 	unsigned long pos;
 	float deflec = def;
 	float deflec_target = def_target;
@@ -491,7 +493,7 @@ static void runAddingVynil(LADSPA_Handle instance, unsigned long sample_count) {
 	float phi = plugin_data->phi;
 	unsigned int sample_cnt = plugin_data->sample_cnt;
 
-#line 90 "vynil_1905.xml"
+#line 92 "vynil_1905.xml"
 	unsigned long pos;
 	float deflec = def;
 	float deflec_target = def_target;

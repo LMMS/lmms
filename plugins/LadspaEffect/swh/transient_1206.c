@@ -97,7 +97,6 @@ static void activateTransient(LADSPA_Handle instance) {
 	medi_track = 0.1;
 	slow_track = 0.1;
 	count = 0;
-	sample_rate = sample_rate;
 	plugin_data->buffer = buffer;
 	plugin_data->buffer_pos = buffer_pos;
 	plugin_data->count = count;
@@ -112,7 +111,7 @@ static void activateTransient(LADSPA_Handle instance) {
 }
 
 static void cleanupTransient(LADSPA_Handle instance) {
-#line 49 "transient_1206.xml"
+#line 48 "transient_1206.xml"
 	Transient *plugin_data = (Transient *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -215,7 +214,7 @@ static void runTransient(LADSPA_Handle instance, unsigned long sample_count) {
 	float slow_buffer_sum = plugin_data->slow_buffer_sum;
 	float slow_track = plugin_data->slow_track;
 
-#line 53 "transient_1206.xml"
+#line 52 "transient_1206.xml"
 	unsigned long pos;
 	const int fast_sum_size = (2 * sample_rate) / 1000;
 	const int medi_sum_size = (25 * sample_rate) / 1000;
@@ -311,7 +310,7 @@ static void runAddingTransient(LADSPA_Handle instance, unsigned long sample_coun
 	float slow_buffer_sum = plugin_data->slow_buffer_sum;
 	float slow_track = plugin_data->slow_track;
 
-#line 53 "transient_1206.xml"
+#line 52 "transient_1206.xml"
 	unsigned long pos;
 	const int fast_sum_size = (2 * sample_rate) / 1000;
 	const int medi_sum_size = (25 * sample_rate) / 1000;

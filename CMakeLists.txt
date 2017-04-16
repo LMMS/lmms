@@ -65,6 +65,8 @@ OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
 
+OPTION(FIX_SYSTEM_HEADERS "Copy system headers and fix them" OFF)
+
 
 IF(LMMS_BUILD_APPLE)
 	SET(WANT_ALSA OFF)
@@ -465,6 +467,8 @@ ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 ENDIF(WIN32)
 
+INCLUDE(CheckCCompilerFlag)
+
 # use ccache
 OPTION(USE_CCACHE "Use ccache for compilation" OFF)
 IF(USE_CCACHE)
@@ -473,6 +477,12 @@ IF(USE_CCACHE)
         MESSAGE(STATUS "Using ccache found in PATH")
         SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
         SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
+        CHECK_C_COMPILER_FLAG(-Qunused-arguments C_HAVE_QUNUSED_ARGUMENTS)
+        IF(${C_HAVE_QUNUSED_ARGUMENTS})
+            SET(CCACHE_CLANG_FLAGS "-Qunused-arguments -fcolor-diagnostics")
+            SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CCACHE_CLANG_FLAGS}")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CCACHE_CLANG_FLAGS}")
+        ENDIF()
     ELSE()
         MESSAGE(WARNING "USE_CCACHE enabled, but no ccache found")
     ENDIF()

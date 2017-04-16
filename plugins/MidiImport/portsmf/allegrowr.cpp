@@ -1,6 +1,5 @@
 // allegrowr.cpp -- write sequence to an Allegro file (text)
 
-#include "debug.h"
 #include "stdlib.h"
 #include <iostream>
 #include <fstream>
@@ -159,7 +158,7 @@ void Alg_seq::write(ostream &file, bool in_secs)
                     p = p->next;
                 }
             } else { // an update
-                assert(e->is_update());
+                abort_unless(e->is_update());
                 Alg_update_ptr u = (Alg_update_ptr) e;
                 if (u->get_identifier() != -1) {
                     file << " K" << u->get_identifier();

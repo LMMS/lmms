@@ -100,7 +100,6 @@ static void activateStepMuxer(LADSPA_Handle instance) {
 	}
 	current_ch = 0;
 	last_clock = 0.0f;
-	sample_rate = sample_rate;
 	plugin_data->ch_gain = ch_gain;
 	plugin_data->ch_state = ch_state;
 	plugin_data->current_ch = current_ch;
@@ -110,7 +109,7 @@ static void activateStepMuxer(LADSPA_Handle instance) {
 }
 
 static void cleanupStepMuxer(LADSPA_Handle instance) {
-#line 45 "step_muxer_1212.xml"
+#line 44 "step_muxer_1212.xml"
 	StepMuxer *plugin_data = (StepMuxer *)instance;
 	free(plugin_data->ch_state);
 	free(plugin_data->ch_gain);
@@ -236,7 +235,7 @@ static void runStepMuxer(LADSPA_Handle instance, unsigned long sample_count) {
 	LADSPA_Data last_clock = plugin_data->last_clock;
 	float sample_rate = plugin_data->sample_rate;
 
-#line 50 "step_muxer_1212.xml"
+#line 49 "step_muxer_1212.xml"
 	unsigned long pos;
 	float fade_inc = 1.0f / (xfadet * sample_rate * 1000.0f);
 	float accum;
@@ -343,7 +342,7 @@ static void runAddingStepMuxer(LADSPA_Handle instance, unsigned long sample_coun
 	LADSPA_Data last_clock = plugin_data->last_clock;
 	float sample_rate = plugin_data->sample_rate;
 
-#line 50 "step_muxer_1212.xml"
+#line 49 "step_muxer_1212.xml"
 	unsigned long pos;
 	float fade_inc = 1.0f / (xfadet * sample_rate * 1000.0f);
 	float accum;

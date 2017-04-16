@@ -163,6 +163,8 @@ static inline float f_sin_sq(float angle)
 
 #define f_round(f) lrintf(f)
 
+#define f_abs(j) labs(j)
+
 #else
 
 // Round float to int using IEEE int* hack
@@ -175,6 +177,8 @@ static inline int f_round(float f)
 
 	return p.i - 0x4b400000;
 }
+
+#define f_abs(j) abs(j)
 
 #endif
 

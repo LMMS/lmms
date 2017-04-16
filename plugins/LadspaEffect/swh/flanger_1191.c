@@ -266,7 +266,7 @@ static void runFlanger(LADSPA_Handle instance, unsigned long sample_count) {
 	
 	        // Calculate position in delay table
 	        d_base = LIN_INTERP(frac, old_d_base, new_d_base);
-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
+	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
 	        p_ph = n_ph + 0.5f;
 	        while (p_ph > 1.0f) {
 	                p_ph -= 1.0f;
@@ -392,7 +392,7 @@ static void runAddingFlanger(LADSPA_Handle instance, unsigned long sample_count)
 	
 	        // Calculate position in delay table
 	        d_base = LIN_INTERP(frac, old_d_base, new_d_base);
-	        n_ph = (float)(law_p - abs(next_law_pos - count))/(float)law_p;
+	        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
 	        p_ph = n_ph + 0.5f;
 	        while (p_ph > 1.0f) {
 	                p_ph -= 1.0f;

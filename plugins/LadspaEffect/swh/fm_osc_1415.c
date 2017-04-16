@@ -63,7 +63,7 @@ const LADSPA_Descriptor *ladspa_descriptor(unsigned long index) {
 }
 
 static void cleanupFmOsc(LADSPA_Handle instance) {
-#line 37 "fm_osc_1415.xml"
+#line 35 "fm_osc_1415.xml"
 	FmOsc *plugin_data = (FmOsc *)instance;
 	blo_h_tables_free(plugin_data->tables);
 	blo_h_free(plugin_data->osc);
@@ -127,13 +127,10 @@ static void runFmOsc(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const output = plugin_data->output;
 	blo_h_osc * osc = plugin_data->osc;
-	blo_h_tables * tables = plugin_data->tables;
 
 #line 25 "fm_osc_1415.xml"
 	unsigned long pos;
 	osc->wave = LIMIT(f_round(wave) - 1, 0, BLO_N_WAVES-1);
-
-	tables = tables; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 	  blo_hd_set_freq(osc, fm[pos]);
@@ -165,13 +162,10 @@ static void runAddingFmOsc(LADSPA_Handle instance, unsigned long sample_count) {
 	/* Output (array of floats of length sample_count) */
 	LADSPA_Data * const output = plugin_data->output;
 	blo_h_osc * osc = plugin_data->osc;
-	blo_h_tables * tables = plugin_data->tables;
 
 #line 25 "fm_osc_1415.xml"
 	unsigned long pos;
 	osc->wave = LIMIT(f_round(wave) - 1, 0, BLO_N_WAVES-1);
-
-	tables = tables; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 	  blo_hd_set_freq(osc, fm[pos]);

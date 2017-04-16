@@ -39,10 +39,10 @@ namespace calf_plugins {
 class gain_reduction_audio_module
 {
 private:
-    float linSlope, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop;
+    float linSlope, detected, kneeStart, linKneeStart, kneeStop;
     float compressedKneeStop, adjKneeStart, thres;
     float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_comp;
-    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection, old_stereo_link;
+    mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_mute, old_detection;
     mutable volatile int last_generation;
     uint32_t srate;
     bool is_active;
@@ -69,7 +69,7 @@ public:
 /// Main gate routine by Damien called by various audio modules
 class expander_audio_module {
 private:
-    float linSlope, peak, detected, kneeSqrt, kneeStart, linKneeStart, kneeStop, linKneeStop;
+    float linSlope, detected, kneeStart, linKneeStart, kneeStop, linKneeStop;
     float compressedKneeStop, adjKneeStart, range, thres, attack_coeff, release_coeff;
     float attack, release, threshold, ratio, knee, makeup, detection, stereo_link, bypass, mute, meter_out, meter_gate;
     mutable float old_threshold, old_ratio, old_knee, old_makeup, old_bypass, old_range, old_trigger, old_mute, old_detection, old_stereo_link;
@@ -142,7 +142,7 @@ private:
     mutable float f1_freq_old, f2_freq_old, f1_level_old, f2_level_old;
     mutable float f1_freq_old1, f2_freq_old1, f1_level_old1, f2_level_old1;
     CalfScModes sc_mode;
-    mutable CalfScModes sc_mode_old, sc_mode_old1;
+    mutable CalfScModes sc_mode_old1;
     float f1_active, f2_active;
     stereo_in_out_metering<sidechaincompressor_metadata> meters;
     gain_reduction_audio_module compressor;

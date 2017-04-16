@@ -24,6 +24,7 @@
 #include "Util.h"
 #include <vector>
 #include <cassert>
+#include <cstdlib>
 #include <math.h>
 #include <stdio.h>
 #ifndef WIN32
@@ -88,7 +89,7 @@ float getdetune(unsigned char type,
             findet = fabs(fdetune / 8192.0f) * 10.0f;
             break;
         case 3:
-            cdet   = fabs(cdetune * 100);
+            cdet   = std::abs(cdetune * 100);
             findet = powf(10, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
             break;
         case 4:

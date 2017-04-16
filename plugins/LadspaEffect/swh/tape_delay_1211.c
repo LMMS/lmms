@@ -116,7 +116,6 @@ static void activateTapeDelay(LADSPA_Handle instance) {
 	last_in = 0.0f;
 	last2_in = 0.0f;
 	last3_in = 0.0f;
-	sample_rate = sample_rate;
 	z0 = 0.0f;
 	z1 = 0.0f;
 	z2 = 0.0f;
@@ -136,7 +135,7 @@ static void activateTapeDelay(LADSPA_Handle instance) {
 }
 
 static void cleanupTapeDelay(LADSPA_Handle instance) {
-#line 55 "tape_delay_1211.xml"
+#line 54 "tape_delay_1211.xml"
 	TapeDelay *plugin_data = (TapeDelay *)instance;
 	free(plugin_data->buffer);
 	free(instance);
@@ -297,7 +296,7 @@ static void runTapeDelay(LADSPA_Handle instance, unsigned long sample_count) {
 	LADSPA_Data z1 = plugin_data->z1;
 	LADSPA_Data z2 = plugin_data->z2;
 
-#line 59 "tape_delay_1211.xml"
+#line 58 "tape_delay_1211.xml"
 	unsigned int pos;
 	float increment = f_clamp(speed, 0.0f, 40.0f);
 	float lin_int, lin_inc;
@@ -418,7 +417,7 @@ static void runAddingTapeDelay(LADSPA_Handle instance, unsigned long sample_coun
 	LADSPA_Data z1 = plugin_data->z1;
 	LADSPA_Data z2 = plugin_data->z2;
 
-#line 59 "tape_delay_1211.xml"
+#line 58 "tape_delay_1211.xml"
 	unsigned int pos;
 	float increment = f_clamp(speed, 0.0f, 40.0f);
 	float lin_int, lin_inc;

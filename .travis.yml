@@ -17,6 +17,8 @@ matrix:
         - env: QT5=True TARGET_OS=win64
         - os: osx
           env: QT5=True
+        - compiler: clang
+          env: QT5=True
 before_install:
    - . ${TRAVIS_BUILD_DIR}/.travis/${TRAVIS_OS_NAME}.${TARGET_OS}.before_install.sh
 install:

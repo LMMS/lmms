@@ -339,7 +339,7 @@ int filter_audio_module::get_changed_offsets(int index, int generation, int &sub
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 filterclavier_audio_module::filterclavier_audio_module() 
-: filter_module_with_inertia<biquad_filter_module, filterclavier_metadata>(ins, outs, params)
+: filter_module_with_inertia<biquad_filter_module, filterclavier_metadata>()
 , min_gain(1.0)
 , max_gain(32.0)
 , last_note(-1)

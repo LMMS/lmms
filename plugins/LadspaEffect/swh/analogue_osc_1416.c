@@ -175,7 +175,6 @@ static void runAnalogueOsc(LADSPA_Handle instance, unsigned long sample_count) {
 	float otm2 = plugin_data->otm2;
 	unsigned int rnda = plugin_data->rnda;
 	unsigned int rndb = plugin_data->rndb;
-	blo_h_tables * tables = plugin_data->tables;
 
 #line 42 "analogue_osc_1416.xml"
 	unsigned long pos;
@@ -187,8 +186,6 @@ static void runAnalogueOsc(LADSPA_Handle instance, unsigned long sample_count) {
 	osc->wave = LIMIT(f_round(wave) - 1, 0, BLO_N_WAVES-1);
 	osc->nyquist = fs * (0.47f - f_clamp(warm, 0.0f, 1.0f) * 0.41f);
 	blo_hd_set_freq(osc, freq);
-
-	tables = tables; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 	  x = blo_hd_run_cub(osc);
@@ -254,7 +251,6 @@ static void runAddingAnalogueOsc(LADSPA_Handle instance, unsigned long sample_co
 	float otm2 = plugin_data->otm2;
 	unsigned int rnda = plugin_data->rnda;
 	unsigned int rndb = plugin_data->rndb;
-	blo_h_tables * tables = plugin_data->tables;
 
 #line 42 "analogue_osc_1416.xml"
 	unsigned long pos;
@@ -266,8 +262,6 @@ static void runAddingAnalogueOsc(LADSPA_Handle instance, unsigned long sample_co
 	osc->wave = LIMIT(f_round(wave) - 1, 0, BLO_N_WAVES-1);
 	osc->nyquist = fs * (0.47f - f_clamp(warm, 0.0f, 1.0f) * 0.41f);
 	blo_hd_set_freq(osc, freq);
-
-	tables = tables; // So gcc doesn't think it's unused
 
 	for (pos = 0; pos < sample_count; pos++) {
 	  x = blo_hd_run_cub(osc);

@@ -34,6 +34,10 @@
 #ifdef LMMS_DEBUG
 	#include <assert.h>
 #else
+	// TODO: assert is a standard macro, we should choose another name
+	#ifdef assert
+		#undef assert
+	#endif
 	#define assert(x) ((void)(x))
 #endif
 #include <cstdio>

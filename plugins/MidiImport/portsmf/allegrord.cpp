@@ -1,4 +1,3 @@
-#include "debug.h"
 #include "stdlib.h"
 #include "string.h"
 #include "ctype.h"
@@ -79,7 +78,7 @@ Alg_reader::Alg_reader(istream *a_file, Alg_seq_ptr new_seq)
 Alg_error alg_read(istream &file, Alg_seq_ptr new_seq)
     // read a sequence from allegro file
 {
-    assert(new_seq);
+    abort_unless(new_seq);
     Alg_reader alg_reader(&file, new_seq);
     bool err = alg_reader.parse();
     return (err ? alg_error_syntax : alg_no_error);
