@@ -47,6 +47,7 @@ public:
 		setJournalling( false );
 		m_previewInstrumentTrack = dynamic_cast<InstrumentTrack *>( Track::create( Track::InstrumentTrack, this ) );
 		m_previewInstrumentTrack->setJournalling( false );
+		m_previewInstrumentTrack->setPreviewMode( true );
 	}
 
 	virtual ~PreviewTrackContainer()
