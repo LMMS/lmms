@@ -29,6 +29,6 @@ sudo apt-get install -y $PACKAGES
 # to use @file command line passing, which in turn ccache 3.1.9 doesn't support
 pushd /tmp
 wget http://archive.ubuntu.com/ubuntu/pool/main/c/ccache/ccache_3.2.4-1_amd64.deb
-sha256sum -c $TRAVIS_BUILD_DIR/.travis/ccache.sha256
+sha256sum -c "$TRAVIS_BUILD_DIR/.travis/ccache.sha256"
 sudo dpkg -i ccache_3.2.4-1_amd64.deb
 popd
