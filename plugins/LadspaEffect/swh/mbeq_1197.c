@@ -286,11 +286,10 @@ static LADSPA_Handle instantiateMbeq(
 	
 	// Create raised cosine window table
 	for (i=0; i < FFT_LENGTH; i++) {
-	        window[i] = -0.5f*cos(2.0f*M_PI*(double)i/(double)FFT_LENGTH)+0.5f;
-	        window[i] *= 2.0f;
+	        window[i] = -0.5f * cos(2.0f*M_PI*(double)i/(double)FFT_LENGTH) + 0.5f;
 	}
 	
-	// Create db->coeffiecnt lookup table
+	// Create db->coefficient lookup table
 	db_table = malloc(1000 * sizeof(float));
 	for (i=0; i < 1000; i++) {
 	        db = ((float)i/10) - 70;
@@ -472,8 +471,12 @@ static void runMbeq(LADSPA_Handle instance, unsigned long sample_count) {
 	
 	                // Window into the output accumulator
 	                for (i = 0; i < FFT_LENGTH; i++) {
-	                        out_accum[i] += 0.9186162f * window[i] * real[i]/(FFT_LENGTH * OVER_SAMP);
+	                        // correction factor for window measured from white noise
+	                        // reduce intermediate output by (number of coefficients) * OVER_SAMP
+	                        out_accum[i] += real[i] * window[i] * 1.27519f /
+	                                        ((FFT_LENGTH/2) * OVER_SAMP);
 	                }
+	
 	                for (i = 0; i < step_size; i++) {
 	                        out_fifo[i] = out_accum[i];
 	                }
