@@ -89,6 +89,7 @@ PianoView::PianoView( QWidget * _parent ) :
 	m_piano( NULL ),                /*!< Our piano Model */
 	m_startKey( Key_C + Octave_3*KeysPerOctave ), /*!< The first key displayed? */
 	m_lastKey( -1 )                 /*!< The last key displayed? */
+	m_lshiftPressed(false)		/* sustain pedal emulating */
 {
 	if( s_whiteKeyPm == NULL )
 	{
@@ -595,6 +596,9 @@ void PianoView::mouseMoveEvent( QMouseEvent * _me )
  */
 void PianoView::keyPressEvent( QKeyEvent * _ke )
 {
+#ifdef LMMS_BUILD_LINUX
+	if( _ke->nativeScanCode()==50 ) m_lshiftPressed=true;// left shift (sustain pedal emulating)
+#endif
 	const int key_num = getKeyFromKeyEvent( _ke ) +
 				( DefaultOctave - 1 ) * KeysPerOctave;
 
@@ -624,6 +628,19 @@ void PianoView::keyPressEvent( QKeyEvent * _ke )
  */
 void PianoView::keyReleaseEvent( QKeyEvent * _ke )
 {
+#ifdef LMMS_BUILD_LINUX
+	if( _ke->nativeScanCode()==50 ) // left shift (sustain pedal emulating)
+	{
+		for( int i = 0; i < NumKeys; ++i )
+		{
+			m_piano->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
+			m_piano->setKeyState( i, false );
+		}
+		m_lshiftPressed = false;
+		return;
+	}
+	if(m_lshiftPressed) return;
+#endif	
 	const int key_num = getKeyFromKeyEvent( _ke ) +
 				( DefaultOctave - 1 ) * KeysPerOctave;
 	if( _ke->isAutoRepeat() == false && key_num > -1 )

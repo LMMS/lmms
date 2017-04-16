@@ -113,6 +113,9 @@ void Piano::handleKeyPress( int key, int midiVelocity )
 	}
 	if( isValidKey( key ) )
 	{
+		// if this key was already pressed, previously, stop it
+		if(m_pressedKeys[key])
+			m_midiEvProc->processInEvent( MidiEvent( MidiNoteOff, -1, key, 0 ) );
 		m_midiEvProc->processInEvent( MidiEvent( MidiNoteOn, -1, key, midiVelocity ) );
 		m_pressedKeys[key] = true;
 	}
