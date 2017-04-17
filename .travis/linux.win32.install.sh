@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -e
 
 if [ "$QT5" ]; then
@@ -15,10 +16,7 @@ MINGW_PACKAGES="mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x
 
 export MINGW_PACKAGES
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# shellcheck disable=SC1090
-. "$DIR/linux.win.download.sh" win32
+"$TRAVIS_BUILD_DIR/.travis/linux.win.download.sh" win32
 
 PACKAGES="nsis cloog-isl libmpc3 qt4-linguist-tools mingw32 $MINGW_PACKAGES"
 
@@ -29,6 +27,6 @@ sudo apt-get install -y $PACKAGES
 # to use @file command line passing, which in turn ccache 3.1.9 doesn't support
 pushd /tmp
 wget http://archive.ubuntu.com/ubuntu/pool/main/c/ccache/ccache_3.2.4-1_amd64.deb
-sha256sum -c $TRAVIS_BUILD_DIR/.travis/ccache.sha256
+sha256sum -c "$TRAVIS_BUILD_DIR/.travis/ccache.sha256"
 sudo dpkg -i ccache_3.2.4-1_amd64.deb
 popd

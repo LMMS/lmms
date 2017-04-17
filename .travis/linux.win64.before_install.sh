@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-. .travis/linux.win32.before_install.sh
+set -e
+
+"$TRAVIS_BUILD_DIR/.travis/linux.win32.before_install.sh"
