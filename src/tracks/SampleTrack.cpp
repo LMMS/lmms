@@ -196,7 +196,7 @@ bool SampleTCO::isPlaying() const
 
 
 
-void SampleTCO::setIsPlaying(bool isPlaying)
+void SampleTCO::setIsPlaying( bool isPlaying )
 {
 	m_isPlaying = isPlaying;
 }
@@ -206,7 +206,7 @@ void SampleTCO::setIsPlaying(bool isPlaying)
 
 void SampleTCO::updateLength()
 {
-	changeLength( sampleLength() );
+	changeLength( sampleLength() + startTimeOffset() );
 }
 
 
@@ -220,7 +220,7 @@ MidiTime SampleTCO::sampleLength() const
 
 
 
-void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
+void SampleTCO::setSampleStartFrame( f_cnt_t startFrame )
 {
 	m_sampleBuffer->setStartFrame( startFrame );
 }
@@ -228,7 +228,7 @@ void SampleTCO::setSampleStartFrame(f_cnt_t startFrame)
 
 
 
-void SampleTCO::setSamplePlayLength(f_cnt_t length)
+void SampleTCO::setSamplePlayLength( f_cnt_t length )
 {
 	m_sampleBuffer->setEndFrame( length );
 }
@@ -431,7 +431,7 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 
 
 
-void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
+void SampleTCOView::mouseReleaseEvent( QMouseEvent *_me )
 {
 	if( _me->button() == Qt::MiddleButton && !_me->modifiers() )
 	{
