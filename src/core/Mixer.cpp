@@ -835,7 +835,21 @@ AudioDevice * Mixer::tryAudioDevices()
 
 
 #ifdef LMMS_HAVE_ALSA
-	if( dev_name == AudioAlsa::name() || dev_name == "" )
+	bool tryAlsa = true;
+
+#ifdef LMMS_HAVE_PULSEAUDIO
+	if( AudioAlsa::probeDevice() == "default" &&
+		QFile( "/usr/share/alsa/alsa.conf.d/pulse.conf" ).exists() )
+	{
+		tryAlsa = false;
+		if( dev_name == AudioAlsa::name() )
+		{
+			dev_name = AudioPulseAudio::name();
+		}
+	}
+#endif
+
+	if( tryAlsa && ( dev_name == AudioAlsa::name() || dev_name == "" ) )
 	{
 		dev = new AudioAlsa( success_ful, this );
 		if( success_ful )
