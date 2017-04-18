@@ -24,10 +24,10 @@ echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 # Locate macdeployqt, assume homebrew & Qt5
 which macdeployqt > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-  brew --prefix qt55 > /dev/null 2>&1
+  brew --prefix qt@5.5 > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     # Prefer Qt 5.5 (QTBUG-53533)
-    PATH=$PATH:$(brew --prefix qt55)/bin
+    PATH=$PATH:$(brew --prefix qt@5.5)/bin
   else
     # Fallback Qt 5.6+
   	PATH=$PATH:$(brew --prefix qt5)/bin
