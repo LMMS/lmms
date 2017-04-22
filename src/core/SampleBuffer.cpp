@@ -34,6 +34,9 @@
 
 #include <sndfile.h>
 
+// FIXME TODO
+#include <QDebug>
+
 #define OV_EXCLUDE_STATIC_CALLBACKS
 #ifdef LMMS_HAVE_OGGVORBIS
 #include <vorbis/vorbisfile.h>
@@ -1411,25 +1414,33 @@ void SampleBuffer::setReversed( bool _on )
 
 
 
-QString SampleBuffer::tryToMakeRelative( const QString & _file )
+QString SampleBuffer::tryToMakeRelative( const QString & file )
 {
-	if( QFileInfo( _file ).isRelative() == false )
+	if( QFileInfo( file ).isRelative() == false )
 	{
-		QString f = QString( _file ).replace( QDir::separator(), '/' );
-		QString fsd = ConfigManager::inst()->factorySamplesDir();
-		QString usd = ConfigManager::inst()->userSamplesDir();
-		fsd.replace( QDir::separator(), '/' );
-		usd.replace( QDir::separator(), '/' );
-		if( f.startsWith( fsd ) )
-		{
-			return QString( f ).mid( fsd.length() );
+		QString f = QString( file ).replace( QDir::separator(), '/' );
+
+		// First, look in factory samples
+		// Isolate "samples/" from "data:/samples/"
+		QString samplesSuffix = ConfigManager::inst()->factorySamplesDir().mid( ConfigManager::inst()->dataDir().length() );
+
+		// Iterate over all valid "data:/" searchPaths
+		foreach ( const QString& path, QDir::searchPaths( "data" ) ) {
+			QString samplesPath = QString( path + samplesSuffix ).replace( QDir::separator(), '/' );
+			if ( f.startsWith( samplesPath ) ) {
+				return QString( f ).mid( samplesPath.length() );
+			}
 		}
-		else if( f.startsWith( usd ) )
+
+		// Next, look in user samples
+		QString usd = ConfigManager::inst()->userSamplesDir();
+		usd.replace( QDir::separator(), '/' );
+		if( f.startsWith( usd ) )
 		{
 			return QString( f ).mid( usd.length() );
 		}
 	}
-	return _file;
+	return file;
 }
 
 
