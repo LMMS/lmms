@@ -1422,9 +1422,11 @@ QString SampleBuffer::tryToMakeRelative( const QString & file )
 		QString samplesSuffix = ConfigManager::inst()->factorySamplesDir().mid( ConfigManager::inst()->dataDir().length() );
 
 		// Iterate over all valid "data:/" searchPaths
-		foreach ( const QString& path, QDir::searchPaths( "data" ) ) {
+		foreach ( const QString& path, QDir::searchPaths( "data" ) )
+		{
 			QString samplesPath = QString( path + samplesSuffix ).replace( QDir::separator(), '/' );
-			if ( f.startsWith( samplesPath ) ) {
+			if ( f.startsWith( samplesPath ) )
+			{
 				return QString( f ).mid( samplesPath.length() );
 			}
 		}
