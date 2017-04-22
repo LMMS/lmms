@@ -34,9 +34,6 @@
 
 #include <sndfile.h>
 
-// FIXME TODO
-#include <QDebug>
-
 #define OV_EXCLUDE_STATIC_CALLBACKS
 #ifdef LMMS_HAVE_OGGVORBIS
 #include <vorbis/vorbisfile.h>
