@@ -48,7 +48,7 @@
 #include "ChordTable.h"
 #include "chordtable_editor.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
