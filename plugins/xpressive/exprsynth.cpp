@@ -38,8 +38,9 @@
 #include "NotePlayHandle.h"
 
 
-#include "exprtk.patched.hpp"
+#include "exprtk.hpp"
 
+#define WARN_EXPRTK qWarning("ExprTk exception")
 typedef exprtk::symbol_table<float> symbol_table_t;
 typedef exprtk::expression<float> expression_t;
 typedef exprtk::parser<float> parser_t;
@@ -491,75 +492,130 @@ static freefunc1<float,harmonic_semitone,true> harmonic_semitone_func;
 ExprFront::ExprFront(const char * expr)
 {
 	m_valid = false;
-	m_data = new ExprFrontData();
-
-	m_data->m_expression_string = expr;
-	m_data->m_symbol_table.add_pi();
-
-	m_data->m_symbol_table.add_constant("e", F_E);
-
-	m_data->m_symbol_table.add_function("sinew", sin_wave_func);
-	m_data->m_symbol_table.add_function("squarew", square_wave_func);
-	m_data->m_symbol_table.add_function("trianglew", triangle_wave_func);
-	m_data->m_symbol_table.add_function("saww", saw_wave_func);
-	m_data->m_symbol_table.add_function("moogsaww", moogsaw_wave_func);
-	m_data->m_symbol_table.add_function("moogw", moog_wave_func);
-	m_data->m_symbol_table.add_function("expw", exp_wave_func);
-	m_data->m_symbol_table.add_function("expnw", exp2_wave_func);
-	m_data->m_symbol_table.add_function("cent", harmonic_cent_func);
-	m_data->m_symbol_table.add_function("semitone", harmonic_semitone_func);
-	m_data->m_symbol_table.add_function("rand", simple_rand);
-	m_data->m_symbol_table.add_function("randv", m_data->m_rand_vec);
-	m_data->m_symbol_table.add_function("last", m_data->m_last_func);
+	try
+	{
+		m_data = new ExprFrontData();
+	
+		m_data->m_expression_string = expr;
+		m_data->m_symbol_table.add_pi();
+	
+		m_data->m_symbol_table.add_constant("e", F_E);
+	
+		m_data->m_symbol_table.add_function("sinew", sin_wave_func);
+		m_data->m_symbol_table.add_function("squarew", square_wave_func);
+		m_data->m_symbol_table.add_function("trianglew", triangle_wave_func);
+		m_data->m_symbol_table.add_function("saww", saw_wave_func);
+		m_data->m_symbol_table.add_function("moogsaww", moogsaw_wave_func);
+		m_data->m_symbol_table.add_function("moogw", moog_wave_func);
+		m_data->m_symbol_table.add_function("expw", exp_wave_func);
+		m_data->m_symbol_table.add_function("expnw", exp2_wave_func);
+		m_data->m_symbol_table.add_function("cent", harmonic_cent_func);
+		m_data->m_symbol_table.add_function("semitone", harmonic_semitone_func);
+		m_data->m_symbol_table.add_function("rand", simple_rand);
+		m_data->m_symbol_table.add_function("randv", m_data->m_rand_vec);
+		m_data->m_symbol_table.add_function("last", m_data->m_last_func);
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
 }
 ExprFront::~ExprFront()
 {
-	delete m_data;
+	try
+	{
+		delete m_data;
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
 }
 
 bool ExprFront::compile()
 {
-	m_data->m_expression.register_symbol_table(m_data->m_symbol_table);
-
-	parser_t::settings_store sstore;
-	sstore.disable_all_logic_ops();
-	sstore.disable_all_assignment_ops();
-	sstore.disable_all_control_structures();
-	parser_t parser(sstore);
-
-	return m_valid=parser.compile(m_data->m_expression_string, m_data->m_expression);
+	m_valid = false;
+	try
+	{
+		m_data->m_expression.register_symbol_table(m_data->m_symbol_table);
+		parser_t::settings_store sstore;
+		sstore.disable_all_logic_ops();
+		sstore.disable_all_assignment_ops();
+		sstore.disable_all_control_structures();
+		parser_t parser(sstore);
+	
+		m_valid=parser.compile(m_data->m_expression_string, m_data->m_expression);
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
+	return m_valid;
 }
 float ExprFront::evaluate()
 {
-	if (!m_valid) return 0;
-	float res = m_data->m_expression.value();
-	m_data->m_last_func.setLastSample(res);
-	return res;
+	try
+	{
+		if (!m_valid) return 0;
+		float res = m_data->m_expression.value();
+		m_data->m_last_func.setLastSample(res);
+		return res;
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
+	return 0;
+	
 }
 bool ExprFront::add_variable(const char* name, float& ref)
 {
-	return m_data->m_symbol_table.add_variable(name, ref);
+	try
+	{
+		return m_data->m_symbol_table.add_variable(name, ref);
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
+	return false;
 }
 
 bool ExprFront::add_constant(const char* name, float ref)
 {
-	return m_data->m_symbol_table.add_constant(name, ref);
+	try
+	{
+		return m_data->m_symbol_table.add_constant(name, ref);
+	}
+	catch(...)
+	{
+		WARN_EXPRTK;
+	}
+	return false;
 }
 
 bool ExprFront::add_cyclic_vector(const char* name, const float* data, size_t length, bool interp)
 {
-	if (interp)
+	try
 	{
-		WaveValueFunctionInterpolate<float> *wvf = new WaveValueFunctionInterpolate<float>(data, length);
-		m_data->m_cyclics_interp.push_back(wvf);
-		return m_data->m_symbol_table.add_function(name, *wvf);
+		if (interp)
+		{
+			WaveValueFunctionInterpolate<float> *wvf = new WaveValueFunctionInterpolate<float>(data, length);
+			m_data->m_cyclics_interp.push_back(wvf);
+			return m_data->m_symbol_table.add_function(name, *wvf);
+		}
+		else
+		{
+			WaveValueFunction<float> *wvf = new WaveValueFunction<float>(data, length);
+			m_data->m_cyclics.push_back(wvf);
+			return m_data->m_symbol_table.add_function(name, *wvf);
+		}
 	}
-	else
+	catch(...)
 	{
-		WaveValueFunction<float> *wvf = new WaveValueFunction<float>(data, length);
-		m_data->m_cyclics.push_back(wvf);
-		return m_data->m_symbol_table.add_function(name, *wvf);
+		WARN_EXPRTK;
 	}
+	return false;
 }
 size_t find_occurances(const std::string& haystack, const char* const needle)
 {
@@ -588,7 +644,14 @@ void ExprFront::setIntegrate(const unsigned int* const frameCounter, const unsig
 		if ( ointeg > 0 )
 		{
 			m_data->m_integ_func = new IntegrateFunction<float>(frameCounter,sample_rate,ointeg);
-			m_data->m_symbol_table.add_function("integrate",*m_data->m_integ_func);
+			try
+			{
+				m_data->m_symbol_table.add_function("integrate",*m_data->m_integ_func);
+			}
+			catch(...)
+			{
+				WARN_EXPRTK;
+			}
 		}
 	}
 }
@@ -646,77 +709,84 @@ ExprSynth::~ExprSynth()
 
 void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 {
-	bool o1_valid = m_exprO1->isValid();
-	bool o2_valid = m_exprO2->isValid();
-	if (!o1_valid && !o2_valid)
+	try
 	{
-		return;
-	}
-	float o1 = 0, o2 = 0;
-	float pn1 = m_pan1->value() * 0.5;
-	float pn2 = m_pan2->value() * 0.5;
-	const float new_freq = m_nph->frequency();
-	const float freq_inc = (new_freq - m_frequency) / frames;
-	const bool is_released = m_nph->isReleased();
-
-	expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
-	expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
-	LastSampleFunction<float> * last_func1 = &m_exprO1->getData()->m_last_func;
-	LastSampleFunction<float> * last_func2 = &m_exprO2->getData()->m_last_func;
-	if (is_released && m_note_rel_sample == 0)
-	{
-		m_note_rel_sample = m_note_sample;
-	}
-	if (o1_valid && o2_valid)
-	{
-		for (fpp_t frame = 0; frame < frames ; ++frame)
+		bool o1_valid = m_exprO1->isValid();
+		bool o2_valid = m_exprO2->isValid();
+		if (!o1_valid && !o2_valid)
 		{
-			if (is_released && m_released < 1)
-			{
-				m_released = fmin(m_released+m_rel_inc, 1);
-			}
-			o1 = o1_rawExpr->value();
-			o2 = o2_rawExpr->value();
-			last_func1->setLastSample(o1);
-			last_func2->setLastSample(o2);
-			buf[frame][0] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
-			buf[frame][1] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;
-			m_note_sample++;
-			m_note_sample_sec = m_note_sample / (float)m_sample_rate;
-			if (is_released)
-			{
-				m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate;
-			}
-			m_frequency += freq_inc;
+			return;
 		}
+		float o1 = 0, o2 = 0;
+		float pn1 = m_pan1->value() * 0.5;
+		float pn2 = m_pan2->value() * 0.5;
+		const float new_freq = m_nph->frequency();
+		const float freq_inc = (new_freq - m_frequency) / frames;
+		const bool is_released = m_nph->isReleased();
+	
+		expression_t *o1_rawExpr = &(m_exprO1->getData()->m_expression);
+		expression_t *o2_rawExpr = &(m_exprO2->getData()->m_expression);
+		LastSampleFunction<float> * last_func1 = &m_exprO1->getData()->m_last_func;
+		LastSampleFunction<float> * last_func2 = &m_exprO2->getData()->m_last_func;
+		if (is_released && m_note_rel_sample == 0)
+		{
+			m_note_rel_sample = m_note_sample;
+		}
+		if (o1_valid && o2_valid)
+		{
+			for (fpp_t frame = 0; frame < frames ; ++frame)
+			{
+				if (is_released && m_released < 1)
+				{
+					m_released = fmin(m_released+m_rel_inc, 1);
+				}
+				o1 = o1_rawExpr->value();
+				o2 = o2_rawExpr->value();
+				last_func1->setLastSample(o1);
+				last_func2->setLastSample(o2);
+				buf[frame][0] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
+				buf[frame][1] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;
+				m_note_sample++;
+				m_note_sample_sec = m_note_sample / (float)m_sample_rate;
+				if (is_released)
+				{
+					m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate;
+				}
+				m_frequency += freq_inc;
+			}
+		}
+		else
+		{
+			
+			if (o2_valid)
+			{
+				o1_rawExpr = o2_rawExpr;
+				last_func1 = last_func2;
+				pn1 = pn2;
+			}
+			for (fpp_t frame = 0; frame < frames ; ++frame)
+			{
+				if (is_released && m_released < 1)
+				{
+					m_released = fmin(m_released+m_rel_inc, 1);
+				}
+				o1 = o1_rawExpr->value();
+				last_func1->setLastSample(o1);
+				buf[frame][0] = (-pn1 + 0.5) * o1;
+				buf[frame][1] = ( pn1 + 0.5) * o1;
+				m_note_sample++;
+				m_note_sample_sec = m_note_sample / (float)m_sample_rate;
+				if (is_released)
+				{
+					m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate;
+				}
+				m_frequency += freq_inc;
+			}
+		}
+		m_frequency = new_freq;
 	}
-	else
+	catch(...)
 	{
-		
-		if (o2_valid)
-		{
-			o1_rawExpr = o2_rawExpr;
-			last_func1 = last_func2;
-			pn1 = pn2;
-		}
-		for (fpp_t frame = 0; frame < frames ; ++frame)
-		{
-			if (is_released && m_released < 1)
-			{
-				m_released = fmin(m_released+m_rel_inc, 1);
-			}
-			o1 = o1_rawExpr->value();
-			last_func1->setLastSample(o1);
-			buf[frame][0] = (-pn1 + 0.5) * o1;
-			buf[frame][1] = ( pn1 + 0.5) * o1;
-			m_note_sample++;
-			m_note_sample_sec = m_note_sample / (float)m_sample_rate;
-			if (is_released)
-			{
-				m_note_rel_sec = (m_note_sample - m_note_rel_sample) / (float)m_sample_rate;
-			}
-			m_frequency += freq_inc;
-		}
+		WARN_EXPRTK;
 	}
-	m_frequency = new_freq;
 }
