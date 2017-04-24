@@ -2459,11 +2459,6 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 					note->setPos( MidiTime( pos_ticks ) );
 					note->setKey( key_num );
-					// If dragging beat notes check if pattern should be MelodyPattern
-					if( note->length() < 0 )
-					{
-						m_pattern->checkType();
-					}
 				}
 			}
 		}
