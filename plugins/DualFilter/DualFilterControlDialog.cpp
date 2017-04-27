@@ -49,15 +49,15 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 150, 220 );
+	setFixedSize( 373, 109 );
 
-	makeknob( cut1Knob, 33, 30, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res1Knob, 75, 30, m_res1Model, tr( "RESO" ), tr( "Resonance" ), "" )
-	makeknob( gain1Knob, 117, 30, m_gain1Model, tr( "GAIN" ), tr( "Gain" ), "%" )
-	makeknob( mixKnob, 62, 100, m_mixModel, tr( "MIX" ), tr( "Mix" ), "" )
-	makeknob( cut2Knob, 33, 145, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res2Knob, 75, 145, m_res2Model, tr( "RESO" ), tr( "Resonance" ), "" )
-	makeknob( gain2Knob, 117, 145, m_gain2Model, tr( "GAIN" ), tr( "Gain" ), "%" )
+	makeknob( cut1Knob, 24, 26, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
+	makeknob( res1Knob, 74, 26, m_res1Model, tr( "RESO" ), tr( "Resonance" ), "" )
+	makeknob( gain1Knob, 124, 26, m_gain1Model, tr( "GAIN" ), tr( "Gain" ), "%" )
+	makeknob( mixKnob, 173, 37, m_mixModel, tr( "MIX" ), tr( "Mix" ), "" )
+	makeknob( cut2Knob, 222, 26, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
+	makeknob( res2Knob, 272, 26, m_res2Model, tr( "RESO" ), tr( "Resonance" ), "" )
+	makeknob( gain2Knob, 322, 26, m_gain2Model, tr( "GAIN" ), tr( "Gain" ), "%" )
 
 	gain1Knob-> setVolumeKnob( true );
 	gain2Knob-> setVolumeKnob( true );
@@ -67,20 +67,20 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	LedCheckBox * enabled2Toggle = new LedCheckBox( "", this,
 				tr( "Filter 2 enabled" ), LedCheckBox::Green );
 
-	enabled1Toggle -> move( 5, 30 );
+	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
 	ToolTip::add( enabled1Toggle, tr( "Click to enable/disable Filter 1" ) );
-	enabled2Toggle -> move( 5, 145 );
+	enabled2Toggle -> move( 210, 11 );
 	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
 	ToolTip::add( enabled2Toggle, tr( "Click to enable/disable Filter 2" ) );
 
 	ComboBox * m_filter1ComboBox = new ComboBox( this );
-	m_filter1ComboBox->setGeometry( 5, 70, 140, 22 );
+	m_filter1ComboBox->setGeometry( 19, 70, 137, 22 );
 	m_filter1ComboBox->setFont( pointSize<8>( m_filter1ComboBox->font() ) );
 	m_filter1ComboBox->setModel( &controls->m_filter1Model );
 
 	ComboBox * m_filter2ComboBox = new ComboBox( this );
-	m_filter2ComboBox->setGeometry( 5, 185, 140, 22 );
+	m_filter2ComboBox->setGeometry( 217, 70, 137, 22 );
 	m_filter2ComboBox->setFont( pointSize<8>( m_filter2ComboBox->font() ) );
 	m_filter2ComboBox->setModel( &controls->m_filter2Model );
 }
