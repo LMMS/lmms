@@ -64,11 +64,20 @@ bool AudioFileWave::startEncoding()
 	m_si.sections = 1;
 	m_si.seekable = 0;
 
+	m_si.format = SF_FORMAT_WAV;
+
 	switch( depth() )
 	{
-		case 32: m_si.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT; break;
-		case 16:
-		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
+	case 32:
+		m_si.format |= SF_FORMAT_FLOAT;
+		break;
+	case 24:
+		m_si.format |= SF_FORMAT_PCM_24;
+		break;
+	case 16:
+	default:
+		m_si.format |= SF_FORMAT_PCM_16;
+		break;
 	}
 	m_sf = sf_open(
 #ifdef LMMS_BUILD_WIN32
@@ -88,7 +97,7 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {
-	if( depth() == 32 )
+	if( depth() == 32 || depth() == 24 )
 	{
 		float *  buf = new float[_frames*channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
