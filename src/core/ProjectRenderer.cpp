@@ -76,14 +76,30 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
 		return;
 	}
 
-	bool success_ful = false;
+	int depth;
+	switch (_os.depth)
+	{
+	case Depth_16Bit:
+		depth = 16;
+		break;
+	case Depth_24Bit:
+		depth = 24;
+		break;
+	case Depth_32Bit:
+		depth = 32;
+		break;
+	default:
+		// If this line is reached the enum has been extended without taking care here
+		Q_ASSERT(false);
+	}
+
+	bool successful = false;
 	m_fileDev = fileEncodeDevices[_file_format].m_getDevInst(
-				_os.samplerate, DEFAULT_CHANNELS, success_ful,
+				_os.samplerate, DEFAULT_CHANNELS, successful,
 				_out_file, _os.vbr,
 				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 : 16,
-							Engine::mixer() );
-	if( success_ful == false )
+				depth, Engine::mixer() );
+	if( !successful )
 	{
 		delete m_fileDev;
 		m_fileDev = NULL;
