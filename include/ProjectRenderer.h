@@ -44,6 +44,7 @@ public:
 	enum Depths
 	{
 		Depth_16Bit,
+		Depth_24Bit,
 		Depth_32Bit,
 		NumDepths
 	} ;
