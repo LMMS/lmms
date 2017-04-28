@@ -71,12 +71,19 @@ public:
 	int titleBarHeight() const;
 	int frameWidth() const;
 
+public slots:
+	void detach();
+	void attach();
+
 protected:
 	// hook the QWidget move/resize events to update the tracked geometry
 	void moveEvent( QMoveEvent * event ) override;
 	void resizeEvent( QResizeEvent * event ) override;
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
+	void showEvent( QShowEvent* event ) override;
+
+	bool isDetached() const;
 
 	QPushButton* addTitleButton(const std::string& iconName, const QString& toolTip);
 
@@ -89,6 +96,7 @@ private:
 	QPushButton * m_closeBtn;
 	QPushButton * m_maximizeBtn;
 	QPushButton * m_restoreBtn;
+	QPushButton * m_detachBtn;
 	QBrush m_activeColor;
 	QColor m_textShadowColor;
 	QColor m_borderColor;
