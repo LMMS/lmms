@@ -425,9 +425,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_managePluginButton->setCheckable( false );
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
-	m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_managePluginButton->setActiveGraphic( embed::getIconPixmap(
 							"track_op_menu_active" ) );
-	m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_managePluginButton->setInactiveGraphic( embed::getIconPixmap(
 							"track_op_menu" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
@@ -441,9 +441,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
 	m_openPresetButton->move( 200, 224 );
-	m_openPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_openPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"project_open", 20, 20 ) );
-	m_openPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_openPresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_open", 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
@@ -457,9 +457,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setCheckable( false );
 	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
@@ -475,9 +475,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
 	m_savePresetButton->move( 224, 224 );
-	m_savePresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_savePresetButton->setActiveGraphic( embed::getIconPixmap(
 							"project_save", 20, 20  ) );
-	m_savePresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_savePresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_save", 20, 20  ) );
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
@@ -491,9 +491,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setCheckable( false );
 	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
@@ -514,7 +514,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
 
-	m_selPresetButton->setIcon( PLUGIN_NAME::getIconPixmap( "stepper-down" ) );
+	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 	m_selPresetButton->setWhatsThis(
 		tr( "Click here to select presets that are currently loaded in VST." ) );
 
@@ -534,7 +534,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
