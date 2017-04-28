@@ -259,7 +259,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	TextFloat * tf = TextFloat::displayMessage(
 			tr( "Loading plugin" ),
 			tr( "Please wait while loading VST-plugin..." ),
-			embed::getIconPixmap( "logo", 24, 24 ), 0 );
+			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 
 	m_pluginMutex.lock();
 	m_plugin = new VstPlugin( m_pluginDLL );
@@ -657,7 +657,7 @@ void VestigeInstrumentView::openPlugin()
 		if( m_vi->m_plugin && m_vi->m_plugin->pluginWidget() )
 		{
 			m_vi->m_plugin->pluginWidget()->setWindowIcon(
-									embed::getIconPixmap( "logo" ) );
+									PLUGIN_NAME::getIconPixmap( "logo" ) );
 		}
 	}
 }
@@ -887,7 +887,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( m_vi->instrumentTrack()->name()
 								+ tr( " - VST plugin control" ) );
-	m_vi->m_subWindow->setWindowIcon( embed::getIconPixmap( "logo" ) );
+	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
 	m_vi->m_subWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 
 
