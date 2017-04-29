@@ -171,7 +171,35 @@ void ExportProjectDialog::startExport()
 }
 
 
+ProjectRenderer::ExportFileFormats convertIndexToExportFileFormat(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return ProjectRenderer::WaveFile;
+	case 1:
+		return ProjectRenderer::OggFile;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
 
+	return ProjectRenderer::NumFileFormats;
+}
+
+
+void ExportProjectDialog::onFileFormatChanged(int index)
+{
+	ProjectRenderer::ExportFileFormats exportFormat =
+			convertIndexToExportFileFormat(index);
+
+	bool bitRateControlsEnabled = exportFormat == ProjectRenderer::OggFile;
+	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
+
+	bitrateWidget->setVisible(bitRateControlsEnabled);
+
+	depthWidget->setVisible(bitDepthControlEnabled);
+}
 
 void ExportProjectDialog::startBtnClicked()
 {
