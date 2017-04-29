@@ -140,7 +140,9 @@ void ExportProjectDialog::startExport()
 	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
 	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };
 
-	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], false);
+	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
+
+	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], useVariableBitRate);
 	OutputSettings os = OutputSettings(
 			samplerates[ samplerateCB->currentIndex() ],
 			bitRateSettings,
