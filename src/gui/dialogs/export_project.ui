@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>412</height>
+    <width>715</width>
+    <height>447</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -81,6 +81,47 @@
          </widget>
         </item>
         <item>
+         <widget class="QWidget" name="depthWidget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+          <layout class="QVBoxLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelBitDepth">
+             <property name="text">
+              <string>Depth:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="depthCB">
+             <item>
+              <property name="text">
+               <string>16 Bit Integer</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>24 Bit Float</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>32 Bit Float</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QWidget" name="bitrateWidget" native="true">
           <layout class="QVBoxLayout">
            <property name="spacing">
@@ -90,7 +131,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="labelBitRate">
              <property name="text">
               <string>Bitrate:</string>
              </property>
@@ -134,67 +175,6 @@
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="depthWidget" native="true">
-          <layout class="QVBoxLayout">
-           <property name="margin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Depth:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="depthCB">
-             <item>
-              <property name="text">
-               <string>16 Bit Integer</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>24 Bit Float</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>32 Bit Float</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>1</width>
-            <height>10</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Please note that not all of the parameters above apply for all file formats.</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item>
@@ -368,8 +348,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>293</y>
+     <x>511</x>
+     <y>372</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
@@ -377,5 +357,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>fileFormatCB</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ExportProjectDialog</receiver>
+   <slot>onFileFormatChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onFileFormatChanged(int)</slot>
+ </slots>
 </ui>
