@@ -46,7 +46,8 @@ LadspaControlDialog::LadspaControlDialog( LadspaControls * _ctl ) :
 	m_effectLayout( nullptr ),
 	m_stereoLink( nullptr )
 {
-	auto mainLay = new QVBoxLayout(this);
+	QVBoxLayout * mainLay = new QVBoxLayout( this );
+	mainLay->setSizeConstraint(QLayout::SetFixedSize);
 
 	m_effectLayout = new QHBoxLayout();
 	mainLay->addLayout( m_effectLayout );
