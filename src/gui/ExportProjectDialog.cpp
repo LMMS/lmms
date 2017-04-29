@@ -31,6 +31,7 @@
 #include "Song.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "OutputSettings.h"
 
 
 ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
@@ -137,13 +138,13 @@ void ExportProjectDialog::startExport()
 					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
 	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
-	const int bitrates[6] = { 64, 128, 160, 192, 256, 320 };
+	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };
 
-	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
+	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], false);
+	OutputSettings os = OutputSettings(
 			samplerates[ samplerateCB->currentIndex() ],
-			false,
-			bitrates[ bitrateCB->currentIndex() ],
-			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
+			bitRateSettings,
+			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ) );
 
 	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
 
