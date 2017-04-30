@@ -101,6 +101,9 @@
            </item>
            <item>
             <widget class="QComboBox" name="depthCB">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
              <item>
               <property name="text">
                <string>16 Bit Integer</string>
