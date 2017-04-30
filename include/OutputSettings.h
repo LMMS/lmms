@@ -2,6 +2,7 @@
  * OutputSettings.h - Stores the settings for file rendering
  *
  * Copyright (c) 2008-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2017 Michael Gregorius <michael.gregorius.git/at/arcor[dot]de>
  *
  * This file is part of LMMS - https://lmms.io
  *
