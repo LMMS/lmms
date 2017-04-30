@@ -41,11 +41,9 @@ mkdir $ppa_dir
 
 while read -r j
 do
-	if [ "$j" = "Filename:" ] ; then
-		continue
-	fi
 	echo "Downloading $j..."
-	wget -O "$ppa_dir$(basename "$j")" "$PPA_ROOT/$j"
+	echo "$PPA_ROOT/$j"
+	wget -O "$ppa_dir$(basename "$j")" "$(echo "$PPA_ROOT/$j" | sed 's/\/Filename: /\//gi')"
 done < $temp_file
 
 
