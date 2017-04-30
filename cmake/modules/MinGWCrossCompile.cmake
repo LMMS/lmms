@@ -14,10 +14,6 @@ IF(LMMS_BUILD_MSYS)
 	SET(CMAKE_C_COMPILER            ${MINGW_PREFIX}/bin/gcc)
 	SET(CMAKE_CXX_COMPILER          ${MINGW_PREFIX}/bin/g++)
 
-	# Force pkg-config to look for .pc files in $MINGW_PREFIX
-	SET(ENV{PKG_CONFIG_PATH}        ${MINGW_PREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH})
-	SET(ENV{PKG_CONFIG_PATH}	${MINGW_PREFIX}/share/pkgconfig:$ENV{PKG_CONFIG_PATH})
-
 	# For 32-bit vst support
 	IF(WIN64)
 		# Specify the 32-bit cross compiler
@@ -89,7 +85,6 @@ IF(NOT DEFINED ENV{MINGW_DEBUG_INFO})
 	MESSAGE("* CMAKE_RC_COMPILER                    : ${CMAKE_RC_COMPILER}")
 	MESSAGE("* WINDRES                              : ${WINDRES}")
 	MESSAGE("* ENV{PKG_CONFIG}                      : $ENV{PKG_CONFIG}")
-	MESSAGE("* ENV{PKG_CONFIG_PATH}                 : $ENV{PKG_CONFIG_PATH}")
 	MESSAGE("* MINGW_TOOL_PREFIX32                  : ${MINGW_TOOL_PREFIX32}")
 	MESSAGE("* CMAKE_C_COMPILER32                   : ${CMAKE_C_COMPILER32}")
 	MESSAGE("* CMAKE_CXX_COMPILER32                 : ${CMAKE_CXX_COMPILER32}")
