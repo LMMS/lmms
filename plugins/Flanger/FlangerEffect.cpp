@@ -94,7 +94,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
 	bool invertFeedback = m_flangerControls.m_invertFeedbackModel.value();
-	m_lfo->setFrequency(  m_flangerControls.m_lfoFrequencyModel.value() );
+	m_lfo->setFrequency(  1.0/m_flangerControls.m_lfoFrequencyModel.value() );
 	m_lDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	m_rDelay->setFeedback( m_flangerControls.m_feedbackModel.value() );
 	sample_t dryS[2];
