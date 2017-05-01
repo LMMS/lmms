@@ -107,8 +107,8 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 		dryS[0] = buf[f][0];
 		dryS[1] = buf[f][1];
 		m_lfo->tick(&leftLfo, &rightLfo);
-		m_lDelay->setLength( ( float )length + ( amplitude * leftLfo ) );
-		m_rDelay->setLength( ( float )length+ ( amplitude * rightLfo ) );
+		m_lDelay->setLength( ( float )length + amplitude * (leftLfo+1.0)  );
+		m_rDelay->setLength( ( float )length + amplitude * (rightLfo+1.0)  );
 		if(invertFeedback)
 		{
 			m_lDelay->tick( &buf[f][1] );
