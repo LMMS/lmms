@@ -4,7 +4,7 @@ set -e
 
 if [ "$QT5" ]; then
         # Workaround; No FindQt5.cmake module exists
-        CMAKE_PREFIX_PATH="$(brew --prefix qt55)"
+        CMAKE_PREFIX_PATH="$(brew --prefix qt@5.5)"
         export CMAKE_PREFIX_PATH
 fi
 
