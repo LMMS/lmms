@@ -1,9 +1,8 @@
 /* eqspectrumview.cpp - implementation of EqSpectrumView class.
 *
-* Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
+* Copyright (c) 2014-2017, David French <dave/dot/french3/at/googlemail/dot/com>
 *
 * This file is part of LMMS - https://lmms.io
-*
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
 * License as published by the Free Software Foundation; either
@@ -38,6 +37,20 @@ EqAnalyser::EqAnalyser() :
 	m_inProgress=false;
 	m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( FFT_BUFFER_SIZE + 1 ) * sizeof( fftwf_complex ) );
 	m_fftPlan = fftwf_plan_dft_r2c_1d( FFT_BUFFER_SIZE*2, m_buffer, m_specBuf, FFTW_MEASURE );
+
+	//initialize Blackman-Harris window, constants taken from
+	//https://en.wikipedia.org/wiki/Window_function#A_list_of_window_functions
+	const float a0 = 0.35875;
+	const float a1 = 0.48829;
+	const float a2 = 0.14128;
+	const float a3 = 0.01168;
+
+	for(int i = 0; i < FFT_BUFFER_SIZE; i++)
+	{
+		m_fftWindow[i] = ( a0 - a1 * cosf( 2 * F_PI * i / (float)FFT_BUFFER_SIZE - 1 )
+									  + a2 * cosf( 4 * F_PI * i / (float)FFT_BUFFER_SIZE-1)
+									  - a3 * cos( 6 * F_PI * i / (float)FFT_BUFFER_SIZE - 1.0 ));
+	}
 	clear();
 }
 
@@ -83,6 +96,12 @@ void EqAnalyser::analyze( sampleFrame *buf, const fpp_t frames )
 		m_sampleRate = Engine::mixer()->processingSampleRate();
 		const int LOWEST_FREQ = 0;
 		const int HIGHEST_FREQ = m_sampleRate / 2;
+
+		//apply FFT window
+		for( int i = 0; i < FFT_BUFFER_SIZE; i++ )
+		{
+			m_buffer[i] = m_buffer[i] * m_fftWindow[i];
+		}
 
 		fftwf_execute( m_fftPlan );
 		absspec( m_specBuf, m_absSpecBuf, FFT_BUFFER_SIZE+1 );
