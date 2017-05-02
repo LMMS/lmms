@@ -204,6 +204,28 @@ void SampleTCO::setIsPlaying( bool isPlaying )
 
 
 
+MidiTime SampleTCO::startTimeOffset() const
+{
+	float stoF = m_startTimeOffset / Engine::framesPerTick();
+	MidiTime sto = m_startTimeOffset / Engine::framesPerTick();
+	if( stoF < (float) sto )
+	{
+		sto = sto-1;
+	}
+	return sto;
+}
+
+
+
+
+void SampleTCO::setStartTimeOffset( const MidiTime &startTimeOffset )
+{
+	m_startTimeOffset = startTimeOffset * Engine::framesPerTick();
+}
+
+
+
+
 void SampleTCO::updateLength()
 {
 	changeLength( sampleLength() + startTimeOffset() );

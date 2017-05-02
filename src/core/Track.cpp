@@ -68,7 +68,6 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-
 /*! The width of the resize grip in pixels
  */
 const int RESIZE_GRIP_WIDTH = 4;
@@ -963,7 +962,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				t = t.toNearestTact();
 			}
 			MidiTime oldPos = m_tco->startPosition();
-			if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
+			if( t >= sTco->startPosition() + sTco->startTimeOffset() && m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
 			{
 				m_tco->movePosition( t );
 				m_trackView->getTrackContentWidget()->changePosition();
