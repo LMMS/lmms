@@ -78,6 +78,7 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	}
 	else
 	{
+		// TODO: Fix possible collision
 		m_effect->m_effectId = rand();
 	}
 
