@@ -67,8 +67,6 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
-	MidiTime startTimeOffset() const;
-	void setStartTimeOffset(const MidiTime &startTimeOffset);
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
@@ -76,13 +74,14 @@ public slots:
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackTcos();
+	void tempoChanged();
 
 
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
-	f_cnt_t m_startTimeOffset;
+	float m_currentFramesPerTick;
 
 	friend class SampleTCOView;
 

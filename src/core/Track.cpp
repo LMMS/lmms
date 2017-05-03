@@ -952,22 +952,25 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		{
 			const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
 			
-			MidiTime t = qMax( 0, (int)
-							   m_trackView->trackContainerView()->currentPosition()+
+			MidiTime t = (int) m_trackView->trackContainerView()->currentPosition() +
 							   static_cast<int>( x * MidiTime::ticksPerTact() /
-												 ppt ) );
+												 ppt );
 			if( ! ( me->modifiers() & Qt::ControlModifier )
 					&& me->button() == Qt::NoButton )
 			{
 				t = t.toNearestTact();
 			}
-			MidiTime oldPos = m_tco->startPosition();
-			if( t >= sTco->startPosition() + sTco->startTimeOffset() && m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
+			if( t < sTco->startPosition() - sTco->startTimeOffset() )
+			{
+				t = sTco->startPosition() - sTco->startTimeOffset();
+			}
+			MidiTime offset = t - m_tco->startPosition();
+			if( m_tco->length() - offset >= MidiTime::ticksPerTact() )
 			{
 				m_tco->movePosition( t );
 				m_trackView->getTrackContentWidget()->changePosition();
-				m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
-				sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+				m_tco->changeLength( m_tco->length() - offset );
+				sTco->setStartTimeOffset( sTco->startTimeOffset() + offset );
 				s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 						arg( m_tco->length().getTact() ).
 						arg( m_tco->length().getTicks() %

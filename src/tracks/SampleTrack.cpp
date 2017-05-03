@@ -52,7 +52,8 @@
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
-	m_isPlaying( false )
+	m_isPlaying( false ),
+	m_currentFramesPerTick( Engine::framesPerTick() )
 {
 	saveJournallingState( false );
 	setSampleFile( "" );
@@ -61,9 +62,9 @@ SampleTCO::SampleTCO( Track * _track ) :
 	// we need to receive bpm-change-events, because then we have to
 	// change length of this TCO
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),
-					this, SLOT( updateLength() ) );
+					this, SLOT( tempoChanged() ) );
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
-					this, SLOT( updateLength() ) );
+					this, SLOT( tempoChanged() ) );
 
 	//care about positionmarker
 	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
@@ -188,6 +189,17 @@ void SampleTCO::updateTrackTcos()
 
 
 
+void SampleTCO::tempoChanged()
+{
+	float newStartTimeOffset = ( startTimeOffset() * m_currentFramesPerTick ) / Engine::framesPerTick();
+	setStartTimeOffset( qRound( newStartTimeOffset ) );
+	m_currentFramesPerTick = Engine::framesPerTick();
+	updateLength();
+}
+
+
+
+
 bool SampleTCO::isPlaying() const
 {
 	return m_isPlaying;
@@ -204,31 +216,9 @@ void SampleTCO::setIsPlaying( bool isPlaying )
 
 
 
-MidiTime SampleTCO::startTimeOffset() const
-{
-	float stoF = m_startTimeOffset / Engine::framesPerTick();
-	MidiTime sto = m_startTimeOffset / Engine::framesPerTick();
-	if( stoF < (float) sto )
-	{
-		sto = sto-1;
-	}
-	return sto;
-}
-
-
-
-
-void SampleTCO::setStartTimeOffset( const MidiTime &startTimeOffset )
-{
-	m_startTimeOffset = startTimeOffset * Engine::framesPerTick();
-}
-
-
-
-
 void SampleTCO::updateLength()
 {
-	changeLength( sampleLength() + startTimeOffset() );
+	changeLength( sampleLength() - startTimeOffset() );
 }
 
 
@@ -532,19 +522,18 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
 	
 	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
-	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
+	QRect r = QRect( TCO_BORDER_WIDTH - offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
 
-	if( r.width() + offset < width() - 1 )
+	if( r.width() - offset < width() - 1 )
 	{
 		p.drawLine( r.x(), r.y() + r.height() / 2,
 			rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
 	}
-	p.drawLine( 1, height() / 2, offset + 1, height() / 2 );
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );
@@ -638,10 +627,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			float framesPerTick = Engine::framesPerTick();
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
+				if( sTco->isPlaying() == false && _start > sTco->startPosition() - sTco->startTimeOffset() )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
+					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() + sTco->startTimeOffset() );
+					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() + sTco->startTimeOffset() );
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
