@@ -26,7 +26,7 @@
 
 #include "SampleBuffer.h"
 
-#include <QDebug>
+#include <QDir>
 
 class RelativePathsTest : QTestSuite
 {
