@@ -1,7 +1,7 @@
 /*
- * ProjectVersionTest.cpp
+ * RelativePathsTest.cpp
  *
- * Copyright (c) 2015 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2017 Tres Finocchiaro <tres/dot/finocchiaro/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
