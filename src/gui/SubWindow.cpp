@@ -29,9 +29,11 @@
 #include "SubWindow.h"
 
 #include <QMdiArea>
+#include <QMetaMethod>
 #include <QMoveEvent>
 #include <QPainter>
 #include <QScrollBar>
+#include <QWindow>
 
 #include "embed.h"
 
@@ -261,8 +263,9 @@ void SubWindow::detach()
 	auto pos = mapToGlobal(widget()->pos());
 	widget()->setWindowFlags(Qt::Window);
 	widget()->show();
-	widget()->move(pos);
 	hide();
+
+	widget()->windowHandle()->setPosition(pos);
 }
 
 void SubWindow::attach()
@@ -270,11 +273,18 @@ void SubWindow::attach()
 	if (! isDetached()) {
 		return;
 	}
-	auto pos = widget()->pos();
+	auto frame = widget()->windowHandle()->frameGeometry();
+
 	widget()->setWindowFlags(Qt::Widget);
 	widget()->show();
 	show();
-	move(mdiArea()->mapFromGlobal(pos));
+
+	// Delay moving & resizing using event queue. Ensures that this widget is
+	// visible first, so that resizing works.
+	QObject o; connect(&o, &QObject::destroyed, this, [this, frame]() {
+		move(mdiArea()->mapFromGlobal(frame.topLeft()));
+		resize(frame.size());
+	}, Qt::QueuedConnection);
 }
 
 
