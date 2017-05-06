@@ -12,6 +12,7 @@ SET(CPACK_PACKAGE_FILE_NAME             "${CMAKE_PROJECT_NAME}-${VERSION}-win32"
 SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmpz\\\" \\\"${PROJECT_NAME_UCASE} Project (compressed)\\\"
+  WriteRegDWORD HKLM \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\SideBySide\\\" \\\"PreferExternalManifest\\\" \\\"1\\\"
   " PARENT_SCOPE)
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
@@ -64,3 +65,4 @@ IF(LMMS_HAVE_STK)
 	INSTALL(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
 ENDIF()
 
+INSTALL(FILES "lmms.exe.manifest" DESTINATION .)
