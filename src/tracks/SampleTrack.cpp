@@ -521,7 +521,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
 	
-	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	int offset = ceilf( m_tco->startTimeOffset() * ppt / ticksPerTact );
 	QRect r = QRect( TCO_BORDER_WIDTH - offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
