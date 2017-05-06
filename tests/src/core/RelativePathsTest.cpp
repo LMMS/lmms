@@ -24,6 +24,7 @@
 
 #include "QTestSuite.h"
 
+#include "ConfigManager.h"
 #include "SampleBuffer.h"
 
 #include <QDir>
@@ -34,8 +35,13 @@ class RelativePathsTest : QTestSuite
 private slots:
 	void RelativePathComparisonTests()
 	{
-		QVERIFY(SampleBuffer::tryToMakeRelative(QDir::currentPath() + "/data/samples/drums/kick01.ogg") == "drums/kick01.ogg");
-		QVERIFY(SampleBuffer::tryToMakeAbsolute("drums/kick01.ogg") == QDir::currentPath() + "/data/samples/drums/kick01.ogg");
+		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
+		QVERIFY(fi.exists());
+
+		QString absPath = fi.absoluteFilePath();
+		QString relPath = "drums/kick01.ogg";
+		QCOMPARE(SampleBuffer::tryToMakeRelative(absPath), relPath);
+		QCOMPARE(SampleBuffer::tryToMakeAbsolute(relPath), absPath);
 	}
 } RelativePathTests;
 
