@@ -40,6 +40,7 @@
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
+#include "SampleBuffer.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
 
@@ -1048,6 +1049,39 @@ void DataFile::upgrade()
 	{
 		upgrade_1_2_0_rc3();
 		upgrade_1_2_0_rc2_42();
+	}
+
+	// Fix relative samples
+	QDomNodeList instruments = elementsByTagName( "instrument" );
+	for( int i = 0; !instruments.item( i ).isNull(); ++i )
+	{
+		QDomElement child = instruments.item( i ).toElement().firstChildElement();
+		while( !child.isNull() ) 
+		{
+			qDebug() << "##### TAGNAME: " << child.tagName();
+			QString src = child.attribute( "src" );
+			if ( QFileInfo( src ).isAbsolute() ) {
+				qDebug() << "##### SRC:" << child.attribute( "src" );
+				child.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
+			}
+			child = child.nextSiblingElement();
+		}
+	}
+
+	// Fix relative samples for sampletrack edge-case
+	QDomNodeList sampletracks = elementsByTagName( "sampletco" );
+	for( int i = 0; !sampletracks.item( i ).isNull(); ++i )
+	{
+		QDomElement sampletrack = sampletracks.item( i ).toElement();
+		qDebug() << "##### TAGNAME: " << sampletrack.tagName();
+		if( !sampletrack.isNull() ) 
+		{
+			qDebug() << "##### SRC:" << sampletrack.attribute( "src" );
+			QString src = sampletrack.attribute( "src" );
+			if ( QFileInfo( src ).isAbsolute() ) {
+				sampletrack.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
+			}
+		}
 	}
 
 	// update document meta data
