@@ -1052,34 +1052,35 @@ void DataFile::upgrade()
 	}
 
 	// Fix relative samples
-	QDomNodeList instruments = elementsByTagName( "instrument" );
-	for( int i = 0; !instruments.item( i ).isNull(); ++i )
+	QDomNodeList list = elementsByTagName( "instrument" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
 	{
-		QDomElement child = instruments.item( i ).toElement().firstChildElement();
-		while( !child.isNull() ) 
+		QDomElement el = list.item( i ).toElement().firstChildElement();
+		qDebug() << "##### PARENT: " << list.item( i ).toElement().tagName();
+		while( !el.isNull() ) 
 		{
-			qDebug() << "##### TAGNAME: " << child.tagName();
-			QString src = child.attribute( "src" );
+			qDebug() << "##### CHILD: " << el.tagName();
+			QString src = el.attribute( "src" );
 			if ( QFileInfo( src ).isAbsolute() ) {
-				qDebug() << "##### SRC:" << child.attribute( "src" );
-				child.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
+				qDebug() << "##### SRC: " << el.attribute( "src" );
+				el.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
 			}
-			child = child.nextSiblingElement();
+			el = el.nextSiblingElement();
 		}
 	}
 
 	// Fix relative samples for sampletrack edge-case
-	QDomNodeList sampletracks = elementsByTagName( "sampletco" );
-	for( int i = 0; !sampletracks.item( i ).isNull(); ++i )
+	list = elementsByTagName( "sampletco" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
 	{
-		QDomElement sampletrack = sampletracks.item( i ).toElement();
-		qDebug() << "##### TAGNAME: " << sampletrack.tagName();
-		if( !sampletrack.isNull() ) 
+		QDomElement el = list.item( i ).toElement();
+		qDebug() << "##### TAGNAME: " << el.tagName();
+		if( !el.isNull() ) 
 		{
-			qDebug() << "##### SRC:" << sampletrack.attribute( "src" );
-			QString src = sampletrack.attribute( "src" );
+			qDebug() << "##### SRC: " << el.attribute( "src" );
+			QString src = el.attribute( "src" );
 			if ( QFileInfo( src ).isAbsolute() ) {
-				sampletrack.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
+				el.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
 			}
 		}
 	}
