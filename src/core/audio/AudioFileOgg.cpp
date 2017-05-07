@@ -36,21 +36,14 @@
 #include "Mixer.h"
 
 
-AudioFileOgg::AudioFileOgg( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels,
-				bool & _success_ful,
-				const QString & _file,
-				const bool _use_vbr,
-				const bitrate_t _nom_bitrate,
-				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate,
-				const int _depth,
-				Mixer*  _mixer ) :
-	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-				_nom_bitrate, _min_bitrate, _max_bitrate,
-								_depth, _mixer )
+AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
+				const ch_cnt_t channels,
+				bool & successful,
+				const QString & file,
+				Mixer* mixer ) :
+	AudioFileDevice( outputSettings, channels, file, mixer )
 {
-	m_ok = _success_ful = outputFileOpened() && startEncoding();
+	m_ok = successful = outputFileOpened() && startEncoding();
 }
 
 
@@ -89,17 +82,17 @@ bool AudioFileOgg::startEncoding()
 	vc.vendor = NULL;
 
 	m_channels = channels();
-	// vbr enabled?
-	if( useVBR() == 0 )
+
+	bool useVariableBitRate = getOutputSettings().getBitRateSettings().isVariableBitRate();
+	bitrate_t minimalBitrate = nominalBitrate();
+	bitrate_t maximumBitrate = nominalBitrate();
+
+	if( useVariableBitRate )
 	{
-		m_minBitrate = nominalBitrate();	// min for vbr
-		m_maxBitrate = nominalBitrate();	// max for vbr
+		minimalBitrate = minBitrate();		// min for vbr
+		maximumBitrate = maxBitrate();		// max for vbr
 	}
-	else
-	{
-		m_minBitrate = minBitrate();		// min for vbr
-		m_maxBitrate = maxBitrate();		// max for vbr
-	}
+
 
 	m_rate 		= sampleRate();		// default-samplerate
 	if( m_rate > 48000 )
@@ -114,9 +107,9 @@ bool AudioFileOgg::startEncoding()
 	vorbis_info_init( &m_vi );
 
 	if( vorbis_encode_setup_managed( &m_vi, m_channels, m_rate,
-			( m_maxBitrate > 0 )? m_maxBitrate * 1000 : -1,
+			( maximumBitrate > 0 )? maximumBitrate * 1000 : -1,
 						nominalBitrate() * 1000, 
-			( m_minBitrate > 0 )? m_minBitrate * 1000 : -1 ) )
+			( minimalBitrate > 0 )? minimalBitrate * 1000 : -1 ) )
 	{
 		printf( "Mode initialization failed: invalid parameters for "
 								"bitrate\n" );
@@ -125,14 +118,14 @@ bool AudioFileOgg::startEncoding()
 		return false;
 	}
 
-	if( useVBR() == false )
-	{
-		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
-	}
-	else if( useVBR() == true )
+	if( useVariableBitRate )
 	{
 		// Turn off management entirely (if it was turned on).
 		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, NULL );
+	}
+	else
+	{
+		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
 	}
 
 	vorbis_encode_setup_init( &m_vi );
