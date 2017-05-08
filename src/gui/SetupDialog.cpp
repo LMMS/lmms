@@ -119,8 +119,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
-	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave" ).toInt() ),
+	m_enableAutoSave( !ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
+	m_enableRunningAutoSave( !ConfigManager::inst()->value( "ui", "enablerunningautosave" ).toInt() ),
 	m_saveInterval(	ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() < 1 ?
 					MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
 			ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() ),
@@ -1024,11 +1024,11 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "ui", "smoothscroll",
 					QString::number( m_smoothScroll ) );
 	ConfigManager::inst()->setValue( "ui", "enableautosave",
-					QString::number( m_enableAutoSave ) );
+					QString::number( !m_enableAutoSave ) );
 	ConfigManager::inst()->setValue( "ui", "saveinterval",
 					QString::number( m_saveInterval ) );
 	ConfigManager::inst()->setValue( "ui", "enablerunningautosave",
-					QString::number( m_enableRunningAutoSave ) );
+					QString::number( !m_enableRunningAutoSave ) );
 	ConfigManager::inst()->setValue( "ui", "oneinstrumenttrackwindow",
 					QString::number( m_oneInstrumentTrackWindow ) );
 	ConfigManager::inst()->setValue( "ui", "compacttrackbuttons",
