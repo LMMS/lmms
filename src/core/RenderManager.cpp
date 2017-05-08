@@ -30,9 +30,10 @@
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
 
+
 RenderManager::RenderManager(
 		const Mixer::qualitySettings & qualitySettings,
-		const ProjectRenderer::OutputSettings & outputSettings,
+		const OutputSettings & outputSettings,
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
