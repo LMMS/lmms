@@ -58,8 +58,8 @@ ReverbSCEffect::ReverbSCEffect( Model* parent, const Descriptor::SubPluginFeatur
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
 	
-	sp_dcblock_init(sp, dcblk[0]);
-	sp_dcblock_init(sp, dcblk[1]);
+	sp_dcblock_init(sp, dcblk[0], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[1], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
 }
 
 ReverbSCEffect::~ReverbSCEffect()
@@ -142,8 +142,8 @@ void ReverbSCEffect::changeSampleRate()
 	sp_dcblock_create(&dcblk[0]);
 	sp_dcblock_create(&dcblk[1]);
 	
-	sp_dcblock_init(sp, dcblk[0]);
-	sp_dcblock_init(sp, dcblk[1]);
+	sp_dcblock_init(sp, dcblk[0], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
+	sp_dcblock_init(sp, dcblk[1], Engine::mixer()->currentQualitySettings().sampleRateMultiplier() );
 	mutex.unlock();
 }
 
