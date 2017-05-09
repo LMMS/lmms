@@ -1975,10 +1975,6 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2061,6 +2057,14 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2236,6 +2240,18 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>FX %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Solo</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
