@@ -1993,10 +1993,6 @@ Rechtsklikken zal een contextmenu laten verschijnen waar u de volgorde kunt wijz
         <translation>32-bit float</translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Merk op dat niet alle bovenstaande parameters op alle bestandsformaten van toepassing zijn.</translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation>Kwaliteitsinstellingen</translation>
     </message>
@@ -2081,6 +2077,14 @@ Rechtsklikken zal een contextmenu laten verschijnen waar u de volgorde kunt wijz
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>Kon bestand %1 niet openen om te schrijven.
 Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die het bestand bevat en probeer het opnieuw!</translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation>24-bit integer</translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation>Variabele bitrate gebruiken</translation>
     </message>
 </context>
 <context>
@@ -2262,6 +2266,18 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
     <message>
         <source>FX %1</source>
         <translation>FX %1</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Volume</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Dempen</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Solo</translation>
     </message>
 </context>
 <context>
@@ -6022,6 +6038,14 @@ Reden: &quot;%2&quot;</translation>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Alle audiobestanden (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation>Bestand openen mislukt</translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation>Audiobestanden zijn beperkt tot %1 MB in grootte en %2 minuten speeltijd</translation>
     </message>
 </context>
 <context>
