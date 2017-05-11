@@ -318,6 +318,16 @@ const QString & ConfigManager::value( const QString & cls,
 
 
 
+const QString & ConfigManager::value( const QString & cls,
+				      const QString & attribute,
+				      const QString & defaultVal ) const
+{
+	const QString & val = value( cls, attribute );
+	return val.isEmpty() ? defaultVal : val;
+}
+
+
+
 
 void ConfigManager::setValue( const QString & cls,
 				const QString & attribute,
