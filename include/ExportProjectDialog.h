@@ -53,6 +53,8 @@ private slots:
 	void accept();
 	void startExport();
 
+	void onFileFormatChanged(int);
+
 private:
 	QString m_fileName;
 	QString m_dirName;

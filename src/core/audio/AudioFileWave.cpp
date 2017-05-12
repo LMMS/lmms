@@ -28,21 +28,14 @@
 #include "Mixer.h"
 
 
-AudioFileWave::AudioFileWave( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels, bool & _success_ful,
-				const QString & _file,
-				const bool _use_vbr,
-				const bitrate_t _nom_bitrate,
-				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate,
-				const int _depth,
-				Mixer*  _mixer ) :
-	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-			_nom_bitrate, _min_bitrate, _max_bitrate,
-								_depth, _mixer ),
+AudioFileWave::AudioFileWave( OutputSettings const & outputSettings,
+				const ch_cnt_t channels, bool & successful,
+				const QString & file,
+				Mixer* mixer ) :
+	AudioFileDevice( outputSettings, channels, file, mixer ),
 	m_sf( NULL )
 {
-	_success_ful = outputFileOpened() && startEncoding();
+	successful = outputFileOpened() && startEncoding();
 }
 
 
@@ -64,11 +57,20 @@ bool AudioFileWave::startEncoding()
 	m_si.sections = 1;
 	m_si.seekable = 0;
 
-	switch( depth() )
+	m_si.format = SF_FORMAT_WAV;
+
+	switch( getOutputSettings().getBitDepth() )
 	{
-		case 32: m_si.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT; break;
-		case 16:
-		default: m_si.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; break;
+	case OutputSettings::Depth_32Bit:
+		m_si.format |= SF_FORMAT_FLOAT;
+		break;
+	case OutputSettings::Depth_24Bit:
+		m_si.format |= SF_FORMAT_PCM_24;
+		break;
+	case OutputSettings::Depth_16Bit:
+	default:
+		m_si.format |= SF_FORMAT_PCM_16;
+		break;
 	}
 	m_sf = sf_open(
 #ifdef LMMS_BUILD_WIN32
@@ -88,7 +90,9 @@ void AudioFileWave::writeBuffer( const surroundSampleFrame * _ab,
 						const fpp_t _frames,
 						const float _master_gain )
 {
-	if( depth() == 32 )
+	OutputSettings::BitDepth bitDepth = getOutputSettings().getBitDepth();
+
+	if( bitDepth == OutputSettings::Depth_32Bit || bitDepth == OutputSettings::Depth_24Bit )
 	{
 		float *  buf = new float[_frames*channels()];
 		for( fpp_t frame = 0; frame < _frames; ++frame )
