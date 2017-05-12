@@ -60,35 +60,32 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 
 
 
-ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & _qs,
-					const OutputSettings & _os,
-					ExportFileFormats _file_format,
-					const QString & _out_file ) :
+ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings,
+					const OutputSettings & outputSettings,
+					ExportFileFormats exportFileFormat,
+					const QString & outputFilename ) :
 	QThread( Engine::mixer() ),
 	m_fileDev( NULL ),
-	m_qualitySettings( _qs ),
+	m_qualitySettings( qualitySettings ),
 	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
-	if( fileEncodeDevices[_file_format].m_getDevInst == NULL )
-	{
-		return;
-	}
+	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[exportFileFormat].m_getDevInst;
 
-	bool success_ful = false;
-	m_fileDev = fileEncodeDevices[_file_format].m_getDevInst(
-				_os.samplerate, DEFAULT_CHANNELS, success_ful,
-				_out_file, _os.vbr,
-				_os.bitrate, _os.bitrate - 64, _os.bitrate + 64,
-				_os.depth == Depth_32Bit ? 32 : 16,
-							Engine::mixer() );
-	if( success_ful == false )
+	if (audioEncoderFactory)
 	{
-		delete m_fileDev;
-		m_fileDev = NULL;
-	}
+		bool successful = false;
 
+		m_fileDev = audioEncoderFactory(
+					outputFilename, outputSettings, DEFAULT_CHANNELS,
+					Engine::mixer(), successful );
+		if( !successful )
+		{
+			delete m_fileDev;
+			m_fileDev = NULL;
+		}
+	}
 }
 
 

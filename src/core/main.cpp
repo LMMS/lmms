@@ -65,6 +65,7 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
+#include "OutputSettings.h"
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
 #include "Song.h"
@@ -259,8 +260,7 @@ int main( int argc, char * * argv )
 					new MainApplication( argc, argv );
 
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
-	ProjectRenderer::OutputSettings os( 44100, false, 160,
-						ProjectRenderer::Depth_16Bit );
+	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
 	// second of two command-line parsing stages
@@ -414,7 +414,7 @@ int main( int argc, char * * argv )
 			sample_rate_t sr = QString( argv[i] ).toUInt();
 			if( sr >= 44100 && sr <= 192000 )
 			{
-				os.samplerate = sr;
+				os.setSampleRate(sr);
 			}
 			else
 			{
@@ -439,7 +439,9 @@ int main( int argc, char * * argv )
 
 			if( br >= 64 && br <= 384 )
 			{
-				os.bitrate = br;
+				OutputSettings::BitRateSettings bitRateSettings = os.getBitRateSettings();
+				bitRateSettings.setBitRate(br);
+				os.setBitRateSettings(bitRateSettings);
 			}
 			else
 			{
@@ -450,7 +452,7 @@ int main( int argc, char * * argv )
 		}
 		else if( arg =="--float" || arg == "-a" )
 		{
-			os.depth = ProjectRenderer::Depth_32Bit;
+			os.setBitDepth(OutputSettings::Depth_32Bit);
 		}
 		else if( arg == "--interpolation" || arg == "-i" )
 		{

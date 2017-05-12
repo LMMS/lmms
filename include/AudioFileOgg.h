@@ -38,33 +38,21 @@
 class AudioFileOgg : public AudioFileDevice
 {
 public:
-	AudioFileOgg( const sample_rate_t _sample_rate,
+	AudioFileOgg( OutputSettings const & outputSettings,
 			const ch_cnt_t _channels,
 			bool & _success_ful,
 			const QString & _file,
-			const bool _use_vbr,
-			const bitrate_t _nom_bitrate,
-			const bitrate_t _min_bitrate,
-			const bitrate_t _max_bitrate,
-			const int _depth,
 			Mixer* mixer );
 	virtual ~AudioFileOgg();
 
-	static AudioFileDevice * getInst( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
-						bool & _success_ful,
-						const QString & _file,
-						const bool _use_vbr,
-						const bitrate_t _nom_bitrate,
-						const bitrate_t _min_bitrate,
-						const bitrate_t _max_bitrate,
-						const int _depth,
-						Mixer* mixer )
+	static AudioFileDevice * getInst( const QString & outputFilename,
+					  OutputSettings const & outputSettings,
+					  const ch_cnt_t channels,
+					  Mixer* mixer,
+					  bool & successful )
 	{
-		return new AudioFileOgg( _sample_rate, _channels, _success_ful,
-						_file, _use_vbr, _nom_bitrate,
-						_min_bitrate, _max_bitrate,
-							_depth, mixer );
+		return new AudioFileOgg( outputSettings, channels, successful,
+						outputFilename, mixer );
 	}
 
 
@@ -77,14 +65,32 @@ private:
 	void finishEncoding();
 	inline int writePage();
 
+	inline bitrate_t nominalBitrate() const
+	{
+		return getOutputSettings().getBitRateSettings().getBitRate();
+	}
 
+	inline bitrate_t minBitrate() const
+	{
+		if (nominalBitrate() > 64)
+		{
+			return nominalBitrate() - 64;
+		}
+		else
+		{
+			return 64;
+		}
+	}
+
+	inline bitrate_t maxBitrate() const
+	{
+		return nominalBitrate() + 64;
+	}
+
+private:
 	bool m_ok;
 	ch_cnt_t m_channels;
 	sample_rate_t m_rate;
-
-	// Various bitrate/quality options
-	bitrate_t m_minBitrate;
-	bitrate_t m_maxBitrate;
 
 	uint32_t m_serialNo;
 

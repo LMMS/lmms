@@ -31,6 +31,7 @@
 #include "Song.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "OutputSettings.h"
 
 
 ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
@@ -137,13 +138,15 @@ void ExportProjectDialog::startExport()
 					static_cast<Mixer::qualitySettings::Oversampling>(oversamplingCB->currentIndex()) );
 
 	const int samplerates[5] = { 44100, 48000, 88200, 96000, 192000 };
-	const int bitrates[6] = { 64, 128, 160, 192, 256, 320 };
+	const bitrate_t bitrates[6] = { 64, 128, 160, 192, 256, 320 };
 
-	ProjectRenderer::OutputSettings os = ProjectRenderer::OutputSettings(
+	bool useVariableBitRate = checkBoxVariableBitRate->isChecked();
+
+	OutputSettings::BitRateSettings bitRateSettings(bitrates[ bitrateCB->currentIndex() ], useVariableBitRate);
+	OutputSettings os = OutputSettings(
 			samplerates[ samplerateCB->currentIndex() ],
-			false,
-			bitrates[ bitrateCB->currentIndex() ],
-			static_cast<ProjectRenderer::Depths>( depthCB->currentIndex() ) );
+			bitRateSettings,
+			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ) );
 
 	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
 
@@ -170,7 +173,35 @@ void ExportProjectDialog::startExport()
 }
 
 
+ProjectRenderer::ExportFileFormats convertIndexToExportFileFormat(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return ProjectRenderer::WaveFile;
+	case 1:
+		return ProjectRenderer::OggFile;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
 
+	return ProjectRenderer::NumFileFormats;
+}
+
+
+void ExportProjectDialog::onFileFormatChanged(int index)
+{
+	ProjectRenderer::ExportFileFormats exportFormat =
+			convertIndexToExportFileFormat(index);
+
+	bool bitRateControlsEnabled = exportFormat == ProjectRenderer::OggFile;
+	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
+
+	bitrateWidget->setVisible(bitRateControlsEnabled);
+
+	depthWidget->setVisible(bitDepthControlEnabled);
+}
 
 void ExportProjectDialog::startBtnClicked()
 {
