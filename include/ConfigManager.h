@@ -219,7 +219,7 @@ public:
 					const QString & attribute ) const;
 	const QString & value( const QString & cls,
 					const QString & attribute,
-					const QString & defaultVal) const;
+					const QString & defaultVal ) const;
 	void setValue( const QString & cls, const QString & attribute,
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);

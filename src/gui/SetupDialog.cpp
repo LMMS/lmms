@@ -131,7 +131,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_syncVSTPlugins( ConfigManager::inst()->value( "ui",
 							"syncvstplugins" ).toInt() ),
 	m_animateAFP(ConfigManager::inst()->value( "ui",
-						   "animateafp", "1").toInt() ),
+						   "animateafp", "1" ).toInt() ),
 	m_printNoteLabels(ConfigManager::inst()->value( "ui",
 						   "printnotelabels").toInt() ),
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
