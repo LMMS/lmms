@@ -253,7 +253,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	m_plugin = new VstPlugin( m_pluginDLL );
 	if( m_plugin->failed() )
 	{
-        m_pluginDLL = "";
+		m_pluginDLL = "";
 		m_pluginMutex.unlock();
 		closePlugin();
 		delete tf;
