@@ -148,7 +148,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
-	updateLength();
+	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -199,7 +199,7 @@ void SampleTCO::setIsPlaying(bool isPlaying)
 
 void SampleTCO::updateLength()
 {
-	changeLength( sampleLength() );
+	emit sampleChanged();
 }
 
 
@@ -504,12 +504,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
-
-	if( r.width() < width() - 1 )
-	{
-		p.drawLine( r.x(), r.y() + r.height() / 2,
-			rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
-	}
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );
