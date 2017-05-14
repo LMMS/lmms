@@ -67,6 +67,7 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
+
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
@@ -74,14 +75,13 @@ public slots:
 	void toggleRecord();
 	void playbackPositionChanged();
 	void updateTrackTcos();
-	void tempoChanged();
 
 
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
-	float m_currentFramesPerTick;
+
 
 	friend class SampleTCOView;
 
