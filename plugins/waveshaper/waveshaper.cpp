@@ -26,7 +26,7 @@
 
 #include "waveshaper.h"
 #include "lmms_math.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "interpolation.h"
 
 
@@ -42,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;

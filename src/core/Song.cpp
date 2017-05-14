@@ -1360,13 +1360,14 @@ void Song::exportProject( bool multiExport )
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
+	QString suffix = "wav";
+	efd.setDefaultSuffix( suffix );
 	efd.setAcceptMode( FileDialog::AcceptSave );
-
 
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
 					 !efd.selectedFiles()[0].isEmpty() )
 	{
-		QString suffix = "";
+
 		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{
@@ -1378,17 +1379,16 @@ void Song::exportProject( bool multiExport )
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
+				exportFileName.remove( "." + suffix );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
-					suffix = "";
+					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+							tr( "Save project" ) ) )
+					{
+						exportFileName += suffix;
+					}
 				}
 			}
-		}
-
-		if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
-				tr( "Save project" ) ) )
-		{
-			exportFileName += suffix;
 		}
 
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );

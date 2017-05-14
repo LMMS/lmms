@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
+
 set -e
 
 # First, install 32-bit deps
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $DIR/linux.win32.install.sh
+"$TRAVIS_BUILD_DIR/.travis/linux.win32.install.sh"
 
-
-if [ $QT5 ]; then
+if [ "$QT5" ]; then
 	MINGW_PACKAGES="mingw64-x-qt5base"
 else
 	MINGW_PACKAGES="mingw64-x-qt"
@@ -20,7 +19,7 @@ MINGW_PACKAGES="mingw64-x-sdl mingw64-x-libvorbis mingw64-x-fluidsynth mingw64-x
 
 export MINGW_PACKAGES
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $DIR/linux.win.download.sh win64
+"$TRAVIS_BUILD_DIR/.travis/linux.win.download.sh" win64
 
+# shellcheck disable=SC2086
 sudo apt-get install -y $MINGW_PACKAGES

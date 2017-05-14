@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
 
 PROJECT(lmms)
 
@@ -455,17 +455,6 @@ FILE(REMOVE include/lmmsconfig.h)
 
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
-
-# embedded resources stuff
-IF(WIN32 OR WIN64)
-	# compile buildtools native
-	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
-	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
-ELSE(WIN32 OR WIN64)
-	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
-	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
-ENDIF(WIN32 OR WIN64)
 
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
