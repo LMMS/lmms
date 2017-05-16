@@ -446,7 +446,7 @@ static void runMbeq(LADSPA_Handle instance, unsigned long sample_count) {
 	
 	                // Window input FIFO
 	                for (i=0; i < FFT_LENGTH; i++) {
-	                        real[i] = in_fifo[i] * window[i];
+							real[i] = in_fifo[i];
 	                }
 	
 	                // Run the real->complex transform
