@@ -295,8 +295,8 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_graph->setGraphColor(QColor(255, 255, 255));
 	m_graph->setEnabled(false);
 
-	ToolTip::add(m_graph, tr("Draw your own waveform here "
-			"by dragging your mouse on this graph."));
+	/*ToolTip::add(m_graph, tr("Draw your own waveform here "
+			"by dragging your mouse on this graph."));*/
 
 	pal = QPalette();
 	pal.setBrush(backgroundRole(), PLUGIN_NAME::getIconPixmap("wavegraph"));
@@ -464,6 +464,8 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 			SLOT(expressionChanged()));
 	connect(m_smoothKnob, SIGNAL(sliderMoved(float)), this,
 			SLOT(smoothChanged()));
+	connect(m_graph, SIGNAL(drawn()), this,
+			SLOT(graphDrawn()));
 
 	connect(m_sinWaveBtn, SIGNAL(clicked()), this, SLOT(sinWaveClicked()));
 	connect(m_triangleWaveBtn, SIGNAL(clicked()), this,
@@ -496,8 +498,6 @@ void expressiveView::expressionChanged() {
 	Expressive * e = castModel<Expressive>();
 	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
-
-
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->wavesExpression(0) = text;
@@ -515,6 +515,8 @@ void expressiveView::expressionChanged() {
 		e->outputExpression(1) = text;
 		break;
 	}
+	if (m_wave_expr)
+		m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && text.size() == 0);
 
 	if (text.size()>0)
 	{
@@ -640,6 +642,25 @@ void expressiveView::smoothChanged()
 		break;
 	}
 	Engine::getSong()->setModified();
+	m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && m_expressionEditor->toPlainText().size() == 0);
+}
+
+void expressiveView::graphDrawn()
+{
+	m_raw_graph->setSamples(m_graph->model()->samples());
+	Expressive * e = castModel<Expressive>();
+	switch (m_selectedGraphGroup->model()->value()) {
+	case W1_EXPR:
+		e->W1().copyFrom(m_graph->model());
+		break;
+	case W2_EXPR:
+		e->W2().copyFrom(m_graph->model());
+		break;
+	case W3_EXPR:
+		e->W3().copyFrom(m_graph->model());
+		break;
+	}
+	Engine::getSong()->setModified();
 }
 
 void expressiveView::modelChanged() {
@@ -669,6 +690,7 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->rawgraphW1());
 		m_expressionEditor->setPlainText(e->wavesExpression(0));
 		m_smoothKnob->setModel(&e->smoothW1());
+		m_graph->setEnabled((e->smoothW1().value() == 0 && e->wavesExpression(0).size() == 0));
 		m_waveInterpolate->setModel(&e->interpolateW1());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
@@ -680,6 +702,7 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->rawgraphW2());
 		m_expressionEditor->setPlainText(e->wavesExpression(1));
 		m_smoothKnob->setModel(&e->smoothW2());
+		m_graph->setEnabled((e->smoothW2().value() == 0 && e->wavesExpression(1).size() == 0));
 		m_waveInterpolate->setModel(&e->interpolateW2());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
@@ -691,6 +714,7 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->rawgraphW3());
 		m_expressionEditor->setPlainText(e->wavesExpression(2));
 		m_smoothKnob->setModel(&e->smoothW3());
+		m_graph->setEnabled((e->smoothW3().value() == 0 && e->wavesExpression(2).size() == 0));
 		m_waveInterpolate->setModel(&e->interpolateW3());
 		m_smoothKnob->show();
 		m_usrWaveBtn->show();
@@ -702,6 +726,7 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->graphO1());
 		m_expressionEditor->setPlainText(e->outputExpression(0));
 		m_smoothKnob->hide();
+		m_graph->setEnabled(false);
 		m_usrWaveBtn->hide();
 		m_waveInterpolate->hide();
 		break;
@@ -711,6 +736,7 @@ void expressiveView::updateLayout() {
 		m_raw_graph=&(e->graphO2());
 		m_expressionEditor->setPlainText(e->outputExpression(1));
 		m_smoothKnob->hide();
+		m_graph->setEnabled(false);
 		m_usrWaveBtn->hide();
 		m_waveInterpolate->hide();
 		break;

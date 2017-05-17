@@ -78,7 +78,7 @@ public:
 	graphModel& graphW1() { return m_graphW1; }
 	graphModel& graphW2() { return m_graphW2; }
 	graphModel& graphW3() { return m_graphW3; }
-	graphModel &rawgraphW1() { return m_rawgraphW1; }
+	graphModel& rawgraphW1() { return m_rawgraphW1; }
 	graphModel& rawgraphW2() { return m_rawgraphW2; }
 	graphModel& rawgraphW3() { return m_rawgraphW3; }
 	IntModel& selectedGraph() { return m_selectedGraph; }
@@ -164,6 +164,7 @@ protected slots:
 	void helpClicked();
 	void expressionChanged( );
 	void smoothChanged( );
+	void graphDrawn( );
 
 private:
 	virtual void modelChanged();

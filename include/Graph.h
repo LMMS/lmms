@@ -79,7 +79,8 @@ public:
 		update();
 	}
 
-
+signals:
+	void drawn();
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void dropEvent( QDropEvent * _de );
