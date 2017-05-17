@@ -2890,8 +2890,8 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		// Draw alternating shades on bars
 		// count the bars which disappear on left by scrolling
 
-		float timeSignature = (float) Engine::getSong()->getTimeSigModel().getNumerator()
-				/ (float) Engine::getSong()->getTimeSigModel().getDenominator();
+		float timeSignature = static_cast<float>( Engine::getSong()->getTimeSigModel().getNumerator() )
+				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
 		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerTact();
 		int barCount = leftBars;
