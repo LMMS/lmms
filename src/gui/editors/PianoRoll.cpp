@@ -2887,16 +2887,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			++key;
 		}
 
-		// Draw alternating shades on bars
-		// count the bars which disappear on left by scrolling
 
+		// Draw alternating shades on bars
 		float timeSignature = static_cast<float>( Engine::getSong()->getTimeSigModel().getNumerator() )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
+		//the bars which disappears at the left side by scrolling
 		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerTact();
-		int barCount = leftBars;
 
-		for( int x = WHITE_KEY_WIDTH; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppt, ++barCount )
+		//iterates the visible bars and draw the shading on uneven bars
+		for( int x = WHITE_KEY_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppt, ++barCount )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{

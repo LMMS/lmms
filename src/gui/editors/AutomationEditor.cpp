@@ -1233,16 +1233,16 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 		}
 
-		// alternating shades for better contrast
-		// count the bars which disappear on left by scrolling
 
+		// alternating shades for better contrast
 		float timeSignature = static_cast<float>( Engine::getSong()->getTimeSigModel().getNumerator() )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
+		//the bars which disappears at the left side by scrolling
 		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerTact();
-		int barCount = leftBars;
 
-		for( int x = VALUES_WIDTH; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppt, ++barCount )
+		//iterates the visible bars and draw the shading on uneven bars
+		for( int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppt, ++barCount )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
