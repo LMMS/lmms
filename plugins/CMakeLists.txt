@@ -81,6 +81,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		waveshaper
 		vibed
 		zynaddsubfx
+		xpressive
 	)
 
 ENDIF("${PLUGIN_LIST}" STREQUAL "")
