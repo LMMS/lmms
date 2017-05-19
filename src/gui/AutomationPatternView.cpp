@@ -246,6 +246,9 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	QPainter p( &m_paintPixmap );
 
+	// Enabling antialiasing does not hurt as we cache in a pixmap anyway
+	p.setRenderHint(QPainter::Antialiasing);
+
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
 	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
