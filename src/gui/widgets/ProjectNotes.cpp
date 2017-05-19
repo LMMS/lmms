@@ -67,7 +67,7 @@ ProjectNotes::ProjectNotes() :
 	setupActions();
 
 	setCentralWidget( m_edit );
-	setWindowTitle( tr( "Project notes" ) );
+	setWindowTitle( tr( "Project Notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
 	gui->mainWindow()->addWindowedWidget( this );
@@ -89,7 +89,7 @@ ProjectNotes::~ProjectNotes()
 
 void ProjectNotes::clear()
 {
-	m_edit->setHtml( tr( "Put down your project notes here." ) );
+	m_edit->setHtml( tr( "Enter Your Project Notes Here" ) );
 	m_edit->selectAll();
 	m_edit->setTextColor( QColor( 224, 224, 224 ) );
 	QTextCursor cursor = m_edit->textCursor();
