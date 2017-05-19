@@ -248,7 +248,7 @@ void MainWindow::finalize()
 					this, SLOT( createNewProject() ),
 					QKeySequence::New );
 
-	m_templatesMenu = new QMenu( tr("New from template"), this );
+	m_templatesMenu = new QMenu( tr("New From Template"), this );
 	connect( m_templatesMenu, SIGNAL( aboutToShow() ), SLOT( fillTemplatesMenu() ) );
 	connect( m_templatesMenu, SIGNAL( triggered( QAction * ) ),
 		 SLOT( createNewProjectFromTemplate( QAction * ) ) );
@@ -277,11 +277,11 @@ void MainWindow::finalize()
 					this, SLOT( saveProjectAs() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_S );
 	project_menu->addAction( embed::getIconPixmap( "project_save" ),
-					tr( "Save as New &Version" ),
+					tr( "Save As New &Version" ),
 					this, SLOT( saveProjectAsNewVersion() ),
 					Qt::CTRL + Qt::ALT + Qt::Key_S );
 
-	project_menu->addAction( tr( "Save as default template" ),
+	project_menu->addAction( tr( "Save As Default Template" ),
 				     this, SLOT( saveProjectAsDefaultTemplate() ) );
 
 	project_menu->addSeparator();
@@ -1218,7 +1218,7 @@ void MainWindow::updateViewMenu()
 	// that is safe to change on the fly. There is probably some
 	// more elegant way to do this.
 	QAction *qa;
-	qa = new QAction(tr( "Volume as dBFS" ), this);
+	qa = new QAction(tr( "Volume As dBFS" ), this);
 	qa->setData("displaydbfs");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() );
@@ -1232,7 +1232,7 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addAction(qa);
 	*/
 
-	qa = new QAction(tr( "Smooth scroll" ), this);
+	qa = new QAction(tr( "Smooth Scroll" ), this);
 	qa->setData("smoothscroll");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() );
@@ -1246,7 +1246,7 @@ void MainWindow::updateViewMenu()
 	m_viewMenu->addAction(qa);
 	*/
 
-	qa = new QAction(tr( "Enable note labels in piano roll" ), this);
+	qa = new QAction(tr( "Enable Note Labels In Piano Roll" ), this);
 	qa->setData("printnotelabels");
 	qa->setCheckable( true );
 	qa->setChecked( ConfigManager::inst()->value( "ui", "printnotelabels" ).toInt() );
