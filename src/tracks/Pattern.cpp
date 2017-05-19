@@ -43,8 +43,7 @@
 #include "MainWindow.h"
 
 
-QPixmap * PatternView::s_stepBtnOn0 = NULL;
-QPixmap * PatternView::s_stepBtnOn200 = NULL;
+QPixmap * PatternView::s_stepBtnOn = NULL;
 QPixmap * PatternView::s_stepBtnOff = NULL;
 QPixmap * PatternView::s_stepBtnOffLight = NULL;
 
@@ -94,6 +93,8 @@ Pattern::Pattern( const Pattern& other ) :
 			break;
 	}
 }
+
+
 
 
 Pattern::~Pattern()
@@ -289,11 +290,13 @@ Note * Pattern::noteAtStep( int _step )
 
 
 
+
 void Pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
 	qSort(m_notes.begin(), m_notes.end(), Note::lessThan );
 }
+
 
 
 
@@ -487,10 +490,14 @@ void Pattern::clear()
 
 void Pattern::addSteps()
 {
-	m_steps += MidiTime::stepsPerTact();
+	Song* s = Engine::getSong();
+	m_steps += s->getTimeSigModel().getNumerator() * s->getTimeSigModel().getDenominator();
 	updateLength();
 	emit dataChanged();
 }
+
+
+
 
 void Pattern::cloneSteps()
 {
@@ -518,7 +525,8 @@ void Pattern::cloneSteps()
 
 void Pattern::removeSteps()
 {
-	int n = MidiTime::stepsPerTact();
+	Song* s = Engine::getSong();
+	int n = s->getTimeSigModel().getNumerator() * s->getTimeSigModel().getDenominator();
 	if( n < m_steps )
 	{
 		for( int i = m_steps - n; i < m_steps; ++i )
@@ -576,22 +584,10 @@ bool Pattern::empty()
 
 void Pattern::changeTimeSignature()
 {
-	MidiTime last_pos = MidiTime::ticksPerTact() - 1;
-	for( NoteVector::ConstIterator cit = m_notes.begin();
-						cit != m_notes.end(); ++cit )
-	{
-		if( ( *cit )->length() < 0 && ( *cit )->pos() > last_pos )
-		{
-			last_pos = ( *cit )->pos()+MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact();
-		}
-	}
-	last_pos = last_pos.nextFullTact() * MidiTime::ticksPerTact();
-	m_steps = qMax<tick_t>( MidiTime::stepsPerTact(),
-				last_pos.getTact() * MidiTime::stepsPerTact() );
+	Song* s = Engine::getSong();
+	m_steps = s->getTimeSigModel().getNumerator() * s->getTimeSigModel().getDenominator();
 	updateLength();
 }
-
 
 
 
@@ -604,16 +600,10 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
 
-	if( s_stepBtnOn0 == NULL )
+	if( s_stepBtnOn == NULL )
 	{
-		s_stepBtnOn0 = new QPixmap( embed::getIconPixmap(
-							"step_btn_on_0" ) );
-	}
-
-	if( s_stepBtnOn200 == NULL )
-	{
-		s_stepBtnOn200 = new QPixmap( embed::getIconPixmap(
-							"step_btn_on_200" ) );
+		s_stepBtnOn = new QPixmap( embed::getIconPixmap(
+							"step_btn_on_100" ) );
 	}
 
 	if( s_stepBtnOff == NULL )
@@ -636,12 +626,9 @@ PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 
 
 
-
-
 PatternView::~PatternView()
 {
 }
-
 
 
 
@@ -787,6 +774,9 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 		TrackContentObjectView::mousePressEvent( _me );
 	}
 }
+
+
+
 
 void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 {
@@ -992,8 +982,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	else if( beatPattern &&	( fixedTCOs() || ppt >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
 	{
-		QPixmap stepon0;
-		QPixmap stepon200;
+		QPixmap stepon;
 		QPixmap stepoff;
 		QPixmap stepoffl;
 		const int steps = qMax( 1,
@@ -1001,12 +990,8 @@ void PatternView::paintEvent( QPaintEvent * )
 		const int w = width() - 2 * TCO_BORDER_WIDTH;
 
 		// scale step graphics to fit the beat pattern length
-		stepon0 = s_stepBtnOn0->scaled( w / steps,
-					      s_stepBtnOn0->height(),
-					      Qt::IgnoreAspectRatio,
-					      Qt::SmoothTransformation );
-		stepon200 = s_stepBtnOn200->scaled( w / steps,
-					      s_stepBtnOn200->height(),
+		stepon = s_stepBtnOn->scaled( w / steps,
+					      s_stepBtnOn->height(),
 					      Qt::IgnoreAspectRatio,
 					      Qt::SmoothTransformation );
 		stepoff = s_stepBtnOff->scaled( w / steps,
@@ -1025,17 +1010,16 @@ void PatternView::paintEvent( QPaintEvent * )
 			// figure out x and y coordinates for step graphic
 			const int x = TCO_BORDER_WIDTH + static_cast<int>( it * w / steps );
 			const int y = height() - s_stepBtnOff->height() - 1;
-
+	        Song* s = Engine::getSong();
 			if( n )
 			{
 				const int vol = n->getVolume();
 				p.drawPixmap( x, y, stepoffl );
-				p.drawPixmap( x, y, stepon0 );
 				p.setOpacity( sqrt( vol / 200.0 ) );
-				p.drawPixmap( x, y, stepon200 );
+				p.drawPixmap( x, y, stepon );
 				p.setOpacity( 1 );
 			}
-			else if( ( it / 4 ) % 2 )
+			else if( ( it / s->getTimeSigModel().getDenominator() ) % 2 )
 			{
 				p.drawPixmap( x, y, stepoffl );
 			}
