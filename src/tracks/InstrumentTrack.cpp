@@ -80,7 +80,7 @@ const char * volume_help = QT_TRANSLATE_NOOP( "InstrumentTrack",
 						"the volume of the opened "
 						"channel.");
 
-const int INSTRUMENT_WIDTH	= 256;
+const int INSTRUMENT_WIDTH	= 254;
 const int INSTRUMENT_HEIGHT	= INSTRUMENT_WIDTH;
 const int PIANO_HEIGHT		= 80;
 const int INSTRUMENT_WINDOW_CACHE_SIZE = 8;
@@ -1440,7 +1440,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	m_tabWidget->addTab( m_ssView, tr( "Envelope, filter & LFO" ), "env_lfo_tab", 1 );
-	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "functions_tab", 2 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "func_tab", 2 );
 	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
 	m_tabWidget->addTab( m_midiView, tr( "MIDI settings" ), "midi_tab", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );

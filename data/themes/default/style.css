@@ -138,11 +138,11 @@ PianoRoll {
 
 TabWidget {
 	background-color: #262b30;
-	qproperty-tabText: rgb(32, 48, 64);
-	qproperty-tabTitleText: rgb(255, 255, 255);
-	qproperty-tabSelected: rgb(160, 160, 160);
-	qproperty-tabBackground: rgb(60, 67, 75);
-	qproperty-tabBorder: rgb(60, 67, 75);
+	qproperty-tabText: rgba(255, 255, 255, 180);
+	qproperty-tabTitleText: #fff;
+	qproperty-tabSelected: #323940;
+	qproperty-tabBackground: #181b1f;
+	qproperty-tabBorder: #181b1f;
 }
 
 GroupBox {
