@@ -1411,7 +1411,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	generalSettingsLayout->addLayout( basicControlsLayout );
 
 
-	m_tabWidget = new TabWidget( "", this, true ); 
+	m_tabWidget = new TabWidget( "", this, true );
 	m_tabWidget->setFixedHeight( INSTRUMENT_HEIGHT + GRAPHIC_TAB_HEIGHT - 6 );
 
 
@@ -1439,11 +1439,11 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_miscView = new InstrumentMiscView( m_track, m_tabWidget );
 
 
-	m_tabWidget->addTab( m_ssView, tr( "ENV/LFO" ), tr( "ENV/LFO" ), "env_lfo_tab", 1 );
-	m_tabWidget->addTab( instrumentFunctions, tr( "FUNC" ), tr( "FUNC" ), "functions_tab", 2 );
-	m_tabWidget->addTab( m_effectView, tr( "FX" ), tr( "FX" ), "fx_tab", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), tr( "MIDI" ), "midi_tab", 4 );
-	m_tabWidget->addTab( m_miscView, tr( "MISC" ),  tr( "MISC" ), "misc_tab", 5 );
+	m_tabWidget->addTab( m_ssView, tr( "Envelope, filter & LFO" ), "env_lfo_tab", 1 );
+	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "functions_tab", 2 );
+	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI settings" ), "midi_tab", 4 );
+	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 
 	// setup piano-widget
 	m_pianoView = new PianoView( this );
@@ -1617,7 +1617,7 @@ void InstrumentTrackWindow::updateInstrumentView()
 	if( m_track->m_instrument != NULL )
 	{
 		m_instrumentView = m_track->m_instrument->createView( m_tabWidget );
-		m_tabWidget->addTab( m_instrumentView, tr( "PLUGIN" ), tr( "PLUGIN" ), "plugin_tab", 0 );
+		m_tabWidget->addTab( m_instrumentView, tr( "Plugin" ), "plugin_tab", 0 );
 		m_tabWidget->setActiveTab( 0 );
 
 		m_ssView->setFunctionsHidden( m_track->m_instrument->flags().testFlag( Instrument::IsSingleStreamed ) );

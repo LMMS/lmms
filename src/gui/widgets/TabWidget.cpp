@@ -67,7 +67,7 @@ TabWidget::~TabWidget()
 }
 
 
-void TabWidget::addTab( QWidget * w, const QString & name, const QString & tooltip, const char *Pixmap, int idx )
+void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, int idx )
 {
 	setFont( pointSize<8>( font() ) );
 
@@ -83,7 +83,7 @@ void TabWidget::addTab( QWidget * w, const QString & name, const QString & toolt
 	int tab_width = fontMetrics().width( name ) + 10;
 
 	// Register new tab
-	widgetDesc d = { w, Pixmap, name, tooltip, tab_width };
+	widgetDesc d = { w, pixmap, name, tab_width };
 	m_widgets[idx] = d;
 
 	// Position tab's window
@@ -156,7 +156,7 @@ bool TabWidget::event(QEvent *event)
 		if ( idx != -1 )
 		{
 			// Display tab's tooltip
-			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].tooltip );
+			QToolTip::showText( helpEvent->globalPos(), m_widgets[idx].name );
 		}
 		else
 		{
@@ -254,7 +254,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			( *it ).nwidth = tab_width;
 
 			// Get artwork
-      QPixmap artwork( embed::getIconPixmap( ( *it ).Pixmap ) );
+      QPixmap artwork( embed::getIconPixmap( ( *it ).pixmap ) );
 
 			// Highlight active tab
 			if( it.key() == m_activeTab )
