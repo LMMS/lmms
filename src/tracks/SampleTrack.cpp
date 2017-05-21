@@ -71,6 +71,8 @@ SampleTCO::SampleTCO( Track * _track ) :
 	{
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
 	}
+	//on Export Song set isPlaying to false
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about loops
 	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute TCOs
