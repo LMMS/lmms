@@ -69,7 +69,7 @@ QPixmap * AutomationEditor::s_toolYFlip = NULL;
 QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 const QVector<double> AutomationEditor::m_zoomXLevels =
-		{ 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
 
@@ -1303,7 +1303,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin(); 
+			timeMap::iterator it = time_map.begin();
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1320,7 +1320,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				{
 					break;
 				}
-				
+
 				//NEEDS Change in CSS
 				/*bool is_selected = false;
 				// if we're in move-mode, we may only draw
@@ -1360,8 +1360,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				for( int i = 0; i < ( it + 1 ).key() - it.key(); i++ )
 				{	path.lineTo( QPointF( xCoordOfTick( it.key() + i ), yCoordOfLevel( values[i] ) ) );
 					//NEEDS Change in CSS
-					//drawLevelTick( p, it.key() + i, values[i], is_selected ); 
-					
+					//drawLevelTick( p, it.key() + i, values[i], is_selected );
+
 				}
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
@@ -1537,12 +1537,12 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
-	
+
 	else
 	{
 		printf("not in range\n");
 	}
-	
+
 }
 
 
@@ -1605,7 +1605,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 			y--;
 		}
 		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y ); 
+		m_zoomingYModel.setValue( y );
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
@@ -1627,11 +1627,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		int x = m_zoomingXModel.value();
 		if( we->delta() > 0 )
 		{
-			x--;
+			x++;
 		}
 		if( we->delta() < 0 )
 		{
-			x++;
+			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 		m_zoomingXModel.setValue( x );

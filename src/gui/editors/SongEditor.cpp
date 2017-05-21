@@ -71,7 +71,7 @@ void positionLine::paintEvent( QPaintEvent * pe )
 }
 
 const QVector<double> SongEditor::m_zoomLevels =
-		{ 16.0f, 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 
 SongEditor::SongEditor( Song * song ) :
@@ -361,11 +361,11 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 		if( we->delta() > 0 )
 		{
-			z--;
+			z++;
 		}
 		if( we->delta() < 0 )
 		{
-			z++;
+			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 		// update combobox with zooming-factor
