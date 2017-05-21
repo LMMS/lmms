@@ -61,11 +61,13 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 
 }
 
+
 TabWidget::~TabWidget()
 {
 }
 
-void TabWidget::addTab( QWidget * w, const QString & name, const QString & tooltip, const char *activePixmap, const char *inactivePixmap, int idx )
+
+void TabWidget::addTab( QWidget * w, const QString & name, const QString & tooltip, const char *Pixmap, int idx )
 {
 	setFont( pointSize<8>( font() ) );
 
@@ -81,7 +83,7 @@ void TabWidget::addTab( QWidget * w, const QString & name, const QString & toolt
 	int tab_width = fontMetrics().width( name ) + 10;
 
 	// Register new tab
-	widgetDesc d = { w, activePixmap, inactivePixmap, name, tooltip, tab_width } ;
+	widgetDesc d = { w, Pixmap, name, tooltip, tab_width };
 	m_widgets[idx] = d;
 
 	// Position tab's window
@@ -167,7 +169,7 @@ bool TabWidget::event(QEvent *event)
 	}
 
 	// not a Tooltip event, let's propagate it to the other event handlers
-	return QWidget::event(event);	
+	return QWidget::event(event);
 }
 
 
@@ -179,7 +181,7 @@ void TabWidget::mousePressEvent( QMouseEvent * me )
 	QPoint pos = me->pos();
 	int idx = findTabAtPos( &pos );
 
-	// When found, activate tab that has been clicked 
+	// When found, activate tab that has been clicked
 	if ( idx != -1 )
 	{
 		setActiveTab( idx );
@@ -247,12 +249,12 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 
 		// Draw a text tab or a artwork tab.
 		if ( m_usePixmap )
-		{	
+		{
 			// Fixes tab's width, because original size is only correct for text tabs
 			( *it ).nwidth = tab_width;
 
 			// Get artwork
-                	QPixmap artwork( embed::getIconPixmap( ( *it ).inactivePixmap ) );
+      QPixmap artwork( embed::getIconPixmap( ( *it ).Pixmap ) );
 
 			// Highlight active tab
 			if( it.key() == m_activeTab )
@@ -361,4 +363,3 @@ void TabWidget::setTabBorder( const QColor & c )
 {
 	m_tabBorder = c;
 }
-

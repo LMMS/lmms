@@ -39,7 +39,7 @@ public:
 	TabWidget( const QString & _caption, QWidget * _parent, bool usePixmap = false );
 	virtual ~TabWidget();
 
-	void addTab( QWidget *_w, const QString &_name, const QString &_tooltip = NULL, const char *activePixmap = NULL, const char *inactivePixmap = NULL, int _idx = -1 );
+	void addTab( QWidget *_w, const QString &_name, const QString &_tooltip = NULL, const char *Pixmap = NULL, int _idx = -1 );
 
 	void setActiveTab( int _idx );
 
@@ -80,8 +80,7 @@ private:
 	struct widgetDesc
 	{
 		QWidget       * w;	   	// ptr to widget
-		const char    *activePixmap; 	// artwork for the widget 
-		const char    *inactivePixmap; 	// artwork for the widget 
+		const char    *Pixmap; 	// artwork for the widget
 		QString       name;	   	// name for widget
 		QString       tooltip;	   	// name for widget
 		int           nwidth;	   	// width of name when painting (only valid for text tab)
