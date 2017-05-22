@@ -71,7 +71,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	{
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
 	}
-	//on Export Song set isPlaying to false
+	//playbutton clicked or space key / on Export Song set isPlaying to false
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about loops
 	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
@@ -81,11 +81,6 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
-	//playbutton clicked or space key
-	if( gui )
-	{
-		connect( gui->songEditor(), SIGNAL( playTriggered() ), this, SLOT( playbackPositionChanged() ) );
-	}
 
 	switch( getTrack()->trackContainer()->type() )
 	{
