@@ -363,7 +363,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		{
 			z++;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			z--;
 		}

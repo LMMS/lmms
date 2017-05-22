@@ -3255,7 +3255,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			q--;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			q++;
 		}
@@ -3269,7 +3269,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			l--;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			l++;
 		}
@@ -3283,7 +3283,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			z++;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			z--;
 		}

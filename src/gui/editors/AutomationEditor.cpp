@@ -1600,7 +1600,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		{
 			y++;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			y--;
 		}
@@ -1614,7 +1614,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		{
 			q--;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			q++;
 		}
@@ -1629,7 +1629,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		{
 			x++;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			x--;
 		}
