@@ -68,12 +68,31 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 	m_fixedInputVelocitySpinBox->setLabel( tr( "VELOCITY" ) );
 	m_fixedInputVelocitySpinBox->setEnabled( false );
 	midiInputLayout->addWidget( m_fixedInputVelocitySpinBox );
+
+	m_lowerInputNoteLimitSpinBox = new LcdSpinBox( 3, m_midiInputGroupBox );
+	m_lowerInputNoteLimitSpinBox->setDisplayOffset( 1 );
+	m_lowerInputNoteLimitSpinBox->addTextForValue( 0, "---" );
+	m_lowerInputNoteLimitSpinBox->setLabel( tr( "NOTE MIN" ) );
+	m_lowerInputNoteLimitSpinBox->setEnabled( false );
+	midiInputLayout->addWidget( m_lowerInputNoteLimitSpinBox );
+
+	m_upperInputNoteLimitSpinBox = new LcdSpinBox( 3, m_midiInputGroupBox );
+	m_upperInputNoteLimitSpinBox->setDisplayOffset( 1 );
+	m_upperInputNoteLimitSpinBox->addTextForValue( 0, "---" );
+	m_upperInputNoteLimitSpinBox->setLabel( tr( "NOTE MAX" ) );
+	m_upperInputNoteLimitSpinBox->setEnabled( false );
+	midiInputLayout->addWidget( m_upperInputNoteLimitSpinBox );
 	midiInputLayout->addStretch();
 
 	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
-			m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
+		m_inputChannelSpinBox, SLOT( setEnabled( bool ) ) );
 	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
 		m_fixedInputVelocitySpinBox, SLOT( setEnabled( bool ) ) );
+
+	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+		m_lowerInputNoteLimitSpinBox, SLOT( setEnabled( bool ) ) );
+	connect( m_midiInputGroupBox->ledButton(), SIGNAL( toggled( bool ) ),
+		m_upperInputNoteLimitSpinBox, SLOT( setEnabled( bool ) ) );
 
 
 
@@ -148,7 +167,7 @@ InstrumentMidiIOView::InstrumentMidiIOView( QWidget* parent ) :
 
 	QLabel* baseVelocityHelp = new QLabel( tr( "Specify the velocity normalization base for MIDI-based instruments at 100% note velocity" ) );
 	baseVelocityHelp->setWordWrap( true );
-    baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
+	baseVelocityHelp->setFont( pointSize<8>( baseVelocityHelp->font() ) );
 
 	baseVelocityLayout->addWidget( baseVelocityHelp );
 
@@ -181,6 +200,8 @@ void InstrumentMidiIOView::modelChanged()
 	m_midiInputGroupBox->setModel( &mp->m_readableModel );
 	m_inputChannelSpinBox->setModel( &mp->m_inputChannelModel );
 	m_fixedInputVelocitySpinBox->setModel( &mp->m_fixedInputVelocityModel );
+	m_lowerInputNoteLimitSpinBox->setModel( &mp->m_lowerInputNoteLimitModel );
+	m_upperInputNoteLimitSpinBox->setModel( &mp->m_upperInputNoteLimitModel );
 
 	m_midiOutputGroupBox->setModel( &mp->m_writableModel );
 	m_outputChannelSpinBox->setModel( &mp->m_outputChannelModel );
