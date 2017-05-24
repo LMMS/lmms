@@ -254,7 +254,7 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			( *it ).nwidth = tab_width;
 
 			// Get artwork
-      QPixmap artwork( embed::getIconPixmap( ( *it ).pixmap ) );
+			QPixmap artwork( embed::getIconPixmap( ( *it ).pixmap ) );
 
 			// Highlight active tab
 			if( it.key() == m_activeTab )
