@@ -464,29 +464,6 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 	}
 }
 
-bool Song::isExportDone() const
-{
-	if ( m_renderBetweenMarkers )
-	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				m_playPos[Mode_PlaySong].m_timeLine->loopEnd().getTicks();
-	}
-
-	if( m_exportLoop )
-	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				length() * ticksPerTact();
-	}
-	else
-	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				( length() + 1 ) * ticksPerTact();
-	}
-}
-
 std::pair<MidiTime, MidiTime> Song::getExportEndpoints() const
 {
 	if ( m_renderBetweenMarkers )
