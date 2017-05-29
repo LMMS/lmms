@@ -757,7 +757,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const &
 	_de.setAttribute( "x", normalGeom.x() );
 	_de.setAttribute( "y", normalGeom.y() );
 
-	QSize sizeToStore = visible ? normalGeom.size() : sizeIfInvisible;
+	QSize sizeToStore = normalGeom.size();
 	_de.setAttribute( "width", sizeToStore.width() );
 	_de.setAttribute( "height", sizeToStore.height() );
 }
@@ -769,8 +769,8 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
 	QRect r( qMax( 1, _de.attribute( "x" ).toInt() ),
 			qMax( 1, _de.attribute( "y" ).toInt() ),
-			qMax( 100, _de.attribute( "width" ).toInt() ),
-			qMax( 100, _de.attribute( "height" ).toInt() ) );
+			qMax( _w->sizeHint().width(), _de.attribute( "width" ).toInt() ),
+			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
 		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
