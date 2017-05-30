@@ -734,7 +734,7 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible )
+void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de)
 {
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
 	// we really care about the position of the *window* - not the position of the widget within its window

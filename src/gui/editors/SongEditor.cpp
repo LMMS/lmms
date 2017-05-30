@@ -262,7 +262,7 @@ SongEditor::~SongEditor()
 
 void SongEditor::saveSettings( QDomDocument& doc, QDomElement& element )
 {
-	MainWindow::saveWidgetState(parentWidget(), element, QSize( 640, 400 ));
+	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
 void SongEditor::loadSettings( const QDomElement& element )
