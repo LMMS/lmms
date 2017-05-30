@@ -2,7 +2,7 @@
  * TabWidget.cpp - tabwidget for LMMS
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -244,11 +244,10 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 
 	// Draw all tabs
 	p.setPen( tabText() );
-        for( widgetStack::iterator it = first ; it != last ; ++it )
-        {
-
+	for( widgetStack::iterator it = first ; it != last ; ++it )
+	{
 		// Draw a text tab or a artwork tab.
-		if ( m_usePixmap )
+		if( m_usePixmap )
 		{
 			// Fixes tab's width, because original size is only correct for text tabs
 			( *it ).nwidth = tab_width;
@@ -263,12 +262,13 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 			}
 
 			// Draw artwork
-                	p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - artwork.width() ) / 2, 1, artwork );
-		} else
+			p.drawPixmap(tab_x_offset + ( ( *it ).nwidth - artwork.width() ) / 2, 1, artwork );
+		}
+		else
 		{
 			// Highlight tab when active
 			if( it.key() == m_activeTab )
-	                {
+			{
 				p.fillRect( tab_x_offset, 2, ( *it ).nwidth - 6, m_tabbarHeight - 4, tabSelected() );
 			}
 
@@ -287,8 +287,10 @@ void TabWidget::paintEvent( QPaintEvent * pe )
 // Switch between tabs with mouse wheel
 void TabWidget::wheelEvent( QWheelEvent * we )
 {
-	if (we->y() > m_tabheight)
+	if( we->y() > m_tabheight )
+	{
 		return;
+  }
 
 	we->accept();
 	int dir = ( we->delta() < 0 ) ? 1 : -1;
@@ -311,7 +313,7 @@ QColor TabWidget::tabTitleText() const
 }
 
 // Set the color to be used to draw a TabWidget's title text (if any)
-void TabWidget::setTabTitleText( const QColor & c ) 
+void TabWidget::setTabTitleText( const QColor & c )
 {
 	m_tabTitleText = c;
 }
@@ -323,7 +325,7 @@ QColor TabWidget::tabText() const
 }
 
 // Set the color to be used to draw a TabWidget's text (if any)
-void TabWidget::setTabText( const QColor & c ) 
+void TabWidget::setTabText( const QColor & c )
 {
 	m_tabText = c;
 }
@@ -335,7 +337,7 @@ QColor TabWidget::tabSelected() const
 }
 
 // Set the color to be used to highlight a TabWidget'selected tab (if any)
-void TabWidget::setTabSelected( const QColor & c ) 
+void TabWidget::setTabSelected( const QColor & c )
 {
 	m_tabSelected = c;
 }
@@ -347,7 +349,7 @@ QColor TabWidget::tabBackground() const
 }
 
 // Set the color to be used for the TabWidget's background
-void TabWidget::setTabBackground( const QColor & c ) 
+void TabWidget::setTabBackground( const QColor & c )
 {
 	m_tabBackground = c;
 }
@@ -359,7 +361,7 @@ QColor TabWidget::tabBorder() const
 }
 
 // Set the color to be used for the TabWidget's borders
-void TabWidget::setTabBorder( const QColor & c ) 
+void TabWidget::setTabBorder( const QColor & c )
 {
 	m_tabBorder = c;
 }

@@ -79,26 +79,26 @@ protected:
 private:
 	struct widgetDesc
 	{
-		QWidget       * w;	   	// ptr to widget
-		const char    *pixmap; 	// artwork for the widget
-		QString       name;	   	// name for widget
-		int           nwidth;	   	// width of name when painting (only valid for text tab)
+		QWidget * w;         // ptr to widget
+		const char * pixmap; // artwork for the widget
+		QString name;        // name for widget
+		int nwidth;          // width of name when painting (only valid for text tab)
 	} ;
 	typedef QMap<int, widgetDesc> widgetStack;
 
 	widgetStack m_widgets;
 
 	int 	m_activeTab;
-	QString m_caption;
-	quint8 	m_tabbarHeight;	// The height of the tab bar
-	quint8 	m_tabheight;	// The height of the tabs
-	bool	m_usePixmap;	// true if the tabs are to be displayed with icons. False for text tabs.
+	QString m_caption;      // Tab caption, used as the tooltip text on icon tabs
+	quint8 	m_tabbarHeight; // The height of the tab bar
+	quint8 	m_tabheight;    // The height of the tabs
+	bool	m_usePixmap;      // true if the tabs are to be displayed with icons. False for text tabs.
 
-	QColor m_tabText;	// The color of the tabs' text.
-	QColor m_tabTitleText;	// The color of the TabWidget's title text.
-	QColor m_tabSelected;	// The highlighting color for the selected tab.
-	QColor m_tabBackground;	// The TabWidget's background color.
-	QColor m_tabBorder;	// The TabWidget's borders color.
+	QColor m_tabText;       // The color of the tabs' text.
+	QColor m_tabTitleText;  // The color of the TabWidget's title text.
+	QColor m_tabSelected;   // The highlighting color for the selected tab.
+	QColor m_tabBackground; // The TabWidget's background color.
+	QColor m_tabBorder;     // The TabWidget's borders color.
 } ;
 
 #endif
