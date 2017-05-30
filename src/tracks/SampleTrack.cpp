@@ -169,7 +169,8 @@ void SampleTCO::toggleRecord()
 void SampleTCO::playbackPositionChanged()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	m_isPlaying = false;
+	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
+	st->setPlayingTcos( false );
 }
 
 
@@ -716,6 +717,19 @@ void SampleTrack::updateTcos()
 		TrackContentObject * tco = getTCO( i );
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 		sTco->playbackPositionChanged();
+	}
+}
+
+
+
+
+void SampleTrack::setPlayingTcos( bool isPlaying )
+{
+	for( int i = 0; i < numOfTCOs(); ++i )
+	{
+		TrackContentObject * tco = getTCO( i );
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
+		sTco->setIsPlaying( isPlaying );
 	}
 }
 
