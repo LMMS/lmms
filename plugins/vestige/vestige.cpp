@@ -41,6 +41,7 @@
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
+#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
@@ -173,17 +174,6 @@ void vestigeInstrument::setParameter( void )
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if( QFileInfo( m_pluginDLL ).isAbsolute() )
-	{
-		QString f = QString( m_pluginDLL ).replace( QDir::separator(), '/' );
-		QString vd = QString( ConfigManager::inst()->vstDir() ).replace( QDir::separator(), '/' );
-        	QString relativePath;
-		if( !( relativePath = f.section( vd, 1, 1 ) ).isEmpty() )
-		{
-			m_pluginDLL = relativePath;
-		}
-	}
-
 	_this.setAttribute( "plugin", m_pluginDLL );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
@@ -253,8 +243,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		closePlugin();
 	}
-
-	m_pluginDLL = _file;
+	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
 	TextFloat * tf = TextFloat::displayMessage(
 			tr( "Loading plugin" ),
 			tr( "Please wait while loading VST-plugin..." ),
@@ -268,6 +257,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 		delete tf;
 		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( m_pluginDLL ) );
+		m_pluginDLL = "";
 		return;
 	}
 
@@ -613,29 +603,22 @@ void VestigeInstrumentView::openPlugin()
 {
 	FileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
-	QString dir;
-	if( m_vi->m_pluginDLL != "" )
-	{
-		dir = QFileInfo( m_vi->m_pluginDLL ).absolutePath();
-	}
-	else
-	{
-		dir = ConfigManager::inst()->vstDir();
-	}
-	// change dir to position of previously opened file
-	ofd.setDirectory( dir );
-	ofd.setFileMode( FileDialog::ExistingFiles );
-
 	// set filters
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
 		;
 	ofd.setNameFilters( types );
+
 	if( m_vi->m_pluginDLL != "" )
 	{
-		// select previously opened file
-		ofd.selectFile( QFileInfo( m_vi->m_pluginDLL ).fileName() );
+		QString f = SampleBuffer::tryToMakeAbsolute( m_vi->m_pluginDLL );
+		ofd.setDirectory( QFileInfo( f ).absolutePath() );
+		ofd.selectFile( QFileInfo( f ).fileName() );
+	}
+	else
+	{
+		ofd.setDirectory( ConfigManager::inst()->vstDir() );
 	}
 
 	if ( ofd.exec () == QDialog::Accepted )
