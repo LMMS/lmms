@@ -41,8 +41,6 @@ GroupBox::GroupBox( const QString & _caption, QWidget * _parent ) :
 	m_caption( _caption ),
 	m_titleBarHeight( 11 )
 {
-	update();
-
 	m_led = new PixmapButton( this, _caption );
 	m_led->setCheckable( true );
 	m_led->move( 3, 0 );
@@ -88,9 +86,9 @@ void GroupBox::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
 
-        // Draw background
-        p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
-        
+	// Draw background
+	p.fillRect( 0, 0, width() - 1, height() - 1, p.background() );
+
 	// outer rect
 	p.setPen( p.background().color().dark( 150 ) );
 	p.drawRect( 0, 0, width() - 1, height() - 1 );
