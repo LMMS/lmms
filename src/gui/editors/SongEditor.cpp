@@ -705,7 +705,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	zoomToolBar->addWidget( m_zoomingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
-	connect( this, SIGNAL(resized() ), m_editor, SLOT( updatePositionLine() ) );
+	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
 }
 
 QSize SongEditorWindow::sizeHint() const
