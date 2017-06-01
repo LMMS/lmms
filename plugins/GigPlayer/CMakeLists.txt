@@ -2,6 +2,9 @@ if(LMMS_HAVE_GIG)
 	INCLUDE(BuildPlugin)
 	INCLUDE_DIRECTORIES(${GIG_INCLUDE_DIRS})
 
+	# Disable C++11
+	REMOVE_DEFINITIONS(-std=c++0x)
+
 	# Required for not crashing loading files with libgig
 	SET(GCC_COVERAGE_COMPILE_FLAGS "-fexceptions")
 	add_definitions(${GCC_COVERAGE_COMPILE_FLAGS})
