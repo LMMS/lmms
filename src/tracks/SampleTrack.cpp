@@ -712,12 +712,8 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 void SampleTrack::updateTcos()
 {
-	for( int i = 0; i < numOfTCOs(); ++i )
-	{
-		TrackContentObject * tco = getTCO( i );
-		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-		sTco->playbackPositionChanged();
-	}
+	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	setPlayingTcos( false );
 }
 
 
