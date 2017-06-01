@@ -67,7 +67,6 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
-
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );

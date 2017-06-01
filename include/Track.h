@@ -150,7 +150,7 @@ public:
 	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
 	MidiTime startTimeOffset() const;
-	void setStartTimeOffset(const MidiTime &startTimeOffset);
+	void setStartTimeOffset( const MidiTime &startTimeOffset );
 
 public slots:
 	void copy();
