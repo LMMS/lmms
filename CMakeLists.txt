@@ -399,6 +399,7 @@ IF(LMMS_BUILD_OPENBSD AND SNDIO_FOUND)
 	SET(STATUS_SNDIO "OK")
 ELSE()
 	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	SET(SNDIO_LIBRARY "")
 ENDIF()
 
 # check for WINE
