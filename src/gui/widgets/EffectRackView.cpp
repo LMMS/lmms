@@ -59,7 +59,7 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	effectsLayout->addWidget( m_scrollArea );
 
 	QPushButton* addButton = new QPushButton;
-	addButton->setText( tr( "Add Effect" ) );
+	addButton->setText( tr( "Add effect" ) );
 
 	effectsLayout->addWidget( addButton );
 
