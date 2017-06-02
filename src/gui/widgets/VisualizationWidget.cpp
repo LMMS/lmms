@@ -177,7 +177,7 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 	{
 		p.setPen( QColor( 192, 192, 192 ) );
 		p.setFont( pointSize<7>( p.font() ) );
-		p.drawText( 6, height()-5, tr( "Click To Enable" ) );
+		p.drawText( 6, height()-5, tr( "Click to enable" ) );
 	}
 }
 
