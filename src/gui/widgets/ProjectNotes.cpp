@@ -90,7 +90,7 @@ ProjectNotes::~ProjectNotes()
 
 void ProjectNotes::clear()
 {
-	m_edit->setHtml( tr( "Enter Project Notes Here" ) );
+	m_edit->setHtml( tr( "Enter project notes here" ) );
 	m_edit->selectAll();
 	m_edit->setTextColor( QColor( 224, 224, 224 ) );
 	QTextCursor cursor = m_edit->textCursor();
