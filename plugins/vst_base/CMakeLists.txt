@@ -51,7 +51,8 @@ STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKE
 ADD_CUSTOM_COMMAND(
 		SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 		COMMAND ${WINE_CXX}
-		ARGS "-I\"${CMAKE_BINARY_DIR}\"" "-I\"${CMAKE_SOURCE_DIR}/include\"" "-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\"" "-I\"${CMAKE_INSTALL_PREFIX}/include\"" -I/usr/include/wine/windows "\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\"" -ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer ${WINE_BUILD_FLAGS} -o ../RemoteVstPlugin
+		ARGS -I${CMAKE_BINARY_DIR} -I${CMAKE_SOURCE_DIR}/include -I${CMAKE_INSTALL_PREFIX}/include/wine/windows -I${CMAKE_INSTALL_PREFIX}/include -I/usr/include/wine/windows ${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp -ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer ${WINE_BUILD_FLAGS} -o ../RemoteVstPlugin
+		# Ensure correct file extension
 		COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 		TARGET vstbase
 		OUTPUTS ../RemoteVstPlugin
