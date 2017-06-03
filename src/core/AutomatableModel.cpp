@@ -716,7 +716,7 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 
 float FloatModel::getRoundedValue() const
 {
-	return floorf( value() * powf( 10.0f, getDigitCount() ) + 0.5f ) / powf( 10.0f, getDigitCount() );
+	return qRound( value() / step<float>() ) * step<float>();
 }
 
 
@@ -728,7 +728,7 @@ int FloatModel::getDigitCount() const
 	int digits = 0;
 	while ( steptemp < 1 )
 	{
-		steptemp = steptemp / 0.1f;
+		steptemp = steptemp * 10.0f;
 		digits++;
 	}
 	return digits;
