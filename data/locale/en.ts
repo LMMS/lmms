@@ -722,10 +722,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>NOIS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Input Noise:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -742,19 +738,11 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Rate Enabled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable samplerate-crushing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Depth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -770,19 +758,27 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>STD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stereo difference:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Levels</source>
+        <source>Levels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Levels:</source>
+        <source>NOISE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>STEREO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QUANT</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2171,10 +2167,6 @@ Please make sure you have write permission to the file and the directory contain
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rate:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>AMNT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2192,6 +2184,10 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Invert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3371,19 +3367,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ENV/LFO</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FUNC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MIDI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3392,10 +3376,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>XML preset file (*.xpf)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PLUGIN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3415,15 +3395,35 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MISC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use these controls to view and edit the next/previous track in the song editor.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>SAVE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Envelope, filter &amp; LFO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chord stacking &amp; arpeggio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3914,14 +3914,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Discard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3991,10 +3983,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Recover session. Please save your work!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automatic backup disabled. Remember to save your work!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5707,14 +5695,6 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>ProjectNotes</name>
     <message>
-        <source>Project notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Put down your project notes here.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Edit Actions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5820,6 +5800,14 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Color...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter project notes here</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
