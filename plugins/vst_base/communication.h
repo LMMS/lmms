@@ -56,6 +56,7 @@ enum VstRemoteMessageIDs
 {
 	// vstPlugin -> remoteVstPlugin
 	IdVstLoadPlugin = IdUserBase,
+	// TODO: Drop IdVstPluginWindowInformation, Windows hack for Qt 4
 	IdVstPluginWindowInformation,
 	IdVstClosePlugin,
 	IdVstSetTempo,

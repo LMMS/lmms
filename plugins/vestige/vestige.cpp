@@ -753,19 +753,7 @@ void VestigeInstrumentView::toggleGUI( void )
 	{
 		return;
 	}
-	QWidget * w = m_vi->m_plugin->pluginWidget();
-	if( w == NULL )
-	{
-		return;
-	}
-	if( w->isHidden() )
-	{
-		w->show();
-	}
-	else
-	{
-		w->hide();
-	}
+	m_vi->m_plugin->toggleEditor();
 }
 
 

@@ -131,6 +131,7 @@ public:
 
 	void init( const std::string & _plugin_file );
 	void initEditor();
+	void destroyEditor();
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
@@ -301,6 +302,7 @@ private:
 	int m_windowHeight;
 
 	bool m_initialized;
+	bool m_registeredWindowClass;
 
 	pthread_mutex_t m_pluginLock;
 
@@ -347,6 +349,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
+	m_registeredWindowClass( false ),
 	m_pluginLock(),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
@@ -357,7 +360,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_in( NULL ),
 	m_shmID( -1 ),
 	m_vstSyncData( NULL )
-
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
 
@@ -423,14 +425,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 RemoteVstPlugin::~RemoteVstPlugin()
 {
-	if( m_window != NULL )
-	{
-		pluginDispatch( effEditClose );
-#ifdef LMMS_BUILD_LINUX
-		CloseWindow( m_window );
-#endif
-		m_window = NULL;
-	}
+	destroyEditor();
 	pluginDispatch( effMainsChanged, 0, 0 );
 	pluginDispatch( effClose );
 #ifndef USE_QT_SHMEM
@@ -468,10 +463,30 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
+		case IdShowUI:
+			initEditor();
+			break;
+
+		case IdHideUI:
+			destroyEditor();
+			break;
+
+		case IdToggleUI:
+			if( m_window )
+			{
+				destroyEditor();
+			}
+			else
+			{
+				initEditor();
+			}
+			break;
+
 		case IdVstLoadPlugin:
 			init( _m.getString() );
 			break;
 
+// TODO: Drop Windows hack for Qt 4
 #ifdef LMMS_BUILD_WIN32
 		case IdVstPluginWindowInformation:
 		{
@@ -619,9 +634,20 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
+static void close_check( int fd )
+{
+	if( close( fd ) )
+	{
+		perror( "close" );
+	}
+}
+
+
+
+
 void RemoteVstPlugin::initEditor()
 {
-	if( !( m_plugin->flags & effFlagsHasEditor ) )
+	if( m_window || !( m_plugin->flags & effFlagsHasEditor ) )
 	{
 		return;
 	}
@@ -635,38 +661,30 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	WNDCLASS wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = DefWindowProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInst;
-	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "LVSL";
-
-	if( !RegisterClass( &wc ) )
+	if( !m_registeredWindowClass )
 	{
-		return;
+		WNDCLASS wc;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = DefWindowProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInst;
+		wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+		wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+		wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = "LVSL";
+
+		if( !RegisterClass( &wc ) )
+		{
+			return;
+		}
+		m_registeredWindowClass = true;
 	}
 
-#ifdef LMMS_BUILD_LINUX
-	//m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-	//		       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
-	//		       0, 0, 10, 10, NULL, NULL, hInst, NULL );
-
-	m_window = CreateWindowEx( 0 , "LVSL", m_shortName.c_str(),
-	   WS_POPUP | WS_SYSMENU | WS_BORDER , 0, 0, 10, 10, NULL, NULL, hInst, NULL);
-#else
-	m_windowID = 1;	// arbitrary value on win32 to signal
-			// vstPlugin-class that we have an editor
-
 	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-					WS_CHILD, 0, 0, 10, 10,
-					m_window, NULL, hInst, NULL );
-#endif
+		WS_POPUP | WS_SYSMENU | WS_BORDER,
+		0, 0, 10, 10, NULL, NULL, hInst, NULL );
 	if( m_window == NULL )
 	{
 		debugMessage( "initEditor(): cannot create editor window\n" );
@@ -688,11 +706,29 @@ void RemoteVstPlugin::initEditor()
 	pluginDispatch( effEditTop );
 
 	ShowWindow( m_window, SW_SHOWNORMAL );
-	UpdateWindow( m_window );
-
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
+fprintf(stderr, "m_windowID %x\n", m_windowID);
+#else
+	// 64-bit versions of Windows use 32-bit handles for interoperability
+	m_windowID = (intptr_t) m_window;
 #endif
+}
+
+
+
+
+void RemoteVstPlugin::destroyEditor()
+{
+	if( m_window == NULL )
+	{
+		return;
+	}
+
+	pluginDispatch( effEditClose );
+	// Destroying the window takes some time in Wine 1.8.5
+	DestroyWindow( m_window );
+	m_window = NULL;
 }
 
 
@@ -989,7 +1025,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
 			}
-			close( fd );
+			close_check( fd );
 		}
 	}
 }
@@ -1327,7 +1363,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
-	close( fd );
+	close_check( fd );
 	pluginDispatch( 24, 0, _len, chunk );
 
 	delete[] buf;
