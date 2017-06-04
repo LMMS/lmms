@@ -3918,31 +3918,33 @@ int PianoRoll::quantization() const
 
 void PianoRoll::quantizeNotes()
 {
-	NoteVector notes = getSelectedNotes();
+	if( m_pattern != NULL ) {
+		NoteVector notes = getSelectedNotes();
 
-	if (notes.empty())
-	{
-		for (Note* n : m_pattern->notes())
+		if( notes.empty() )
 		{
-			notes.push_back(n);
-		}
-	}
-
-	for (Note* n : notes)
-	{
-		if (n->length() == MidiTime(0))
-		{
-			continue;
+			for( Note* n : m_pattern->notes() )
+			{
+				notes.push_back(n);
+			}
 		}
 
-		Note copy(*n);
-		m_pattern->removeNote(n);
-		copy.quantizePos(quantization());
-		m_pattern->addNote(copy);
-	}
+		for( Note* n : notes )
+		{
+			if (n->length() == MidiTime(0))
+			{
+				continue;
+			}
 
-	update();
-	gui->songEditor()->update();
+			Note copy(*n);
+			m_pattern->removeNote(n);
+			copy.quantizePos(quantization());
+			m_pattern->addNote(copy);
+		}
+
+		update();
+		gui->songEditor()->update();
+	}
 }
 
 
