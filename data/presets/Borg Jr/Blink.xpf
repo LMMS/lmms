@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.1.90-g1f32fdc" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Blink" solo="0">
+    <instrumenttrack pan="-32.7" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="38.6">
+      <instrument name="borgjrstk">
+        <borgjrstk lfo_speed="13.3" lfo_depth="3.3" adsr="98.1" crossfade="127.9" spread="40" modulator="17.7" preset="2"/>
+      </instrument>
+      <eldata fres="2.63" ftype="0" fcut="1414" fwet="1">
+        <elvol lspd_denominator="4" sustain="0.525" pdel="0" userwavefile="" dec="0.412" lamt="0" syncmode="0" latt="0" rel="0.564" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.144" pdel="0" userwavefile="" dec="0.341" lamt="0" syncmode="0" latt="0" rel="0.533" amt="1" x100="0" att="0" lpdel="0" hold="0" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="100" arprange="1" arptime_denominator="4" syncmode="0" arpmode="0" arp-enabled="0" arp="0" arptime_numerator="4" arpdir="0" arpgate="100"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+      <fxchain numofeffects="1" enabled="1">
+        <effect autoquit_numerator="4" autoquit_denominator="4" syncmode="0" autoquit="1" gate="0" name="ladspaeffect" wet="1" on="1">
+          <ladspacontrols ports="9">
+            <port07>
+              <data scale_type="log" value="2.43272" id="6012257"/>
+            </port07>
+            <port08>
+              <data scale_type="log" value="6324.75" id="4059385"/>
+            </port08>
+            <port09 data="2"/>
+            <port010 data="0.5"/>
+            <port011 data="0.5"/>
+            <port012 data="1.4825"/>
+            <port013 data="0"/>
+            <port014>
+              <data scale_type="log" value="631.867" id="7439014"/>
+            </port014>
+            <port015>
+              <data scale_type="log" value="3556.44" id="3283505"/>
+            </port015>
+          </ladspacontrols>
+          <key>
+            <attribute value="calf" name="file"/>
+            <attribute value="Reverb" name="plugin"/>
+          </key>
+        </effect>
+      </fxchain>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>

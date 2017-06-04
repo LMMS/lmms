@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE lmms-project>
+<lmms-project version="1.0" creator="LMMS" creatorversion="1.1.90-g6084882" type="instrumenttracksettings">
+  <head/>
+  <instrumenttracksettings muted="0" type="0" name="Fnrd" solo="0">
+    <instrumenttrack pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57" vol="100">
+      <instrument name="borgjrstk">
+        <borgjrstk lfo_speed="4.4" lfo_depth="38.6" adsr="128" crossfade="1.4" spread="0" modulator="74.7" preset="3"/>
+      </instrument>
+      <eldata fres="0.32" ftype="0" fwet="1">
+        <fcut scale_type="log" value="479" id="225919"/>
+        <elvol lspd_denominator="4" sustain="0.098" pdel="0" userwavefile="" dec="0.342" lamt="0" syncmode="0" latt="0" rel="0.432" amt="1" x100="0" att="0.007" lpdel="0" hold="0.032" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elcut lspd_denominator="4" sustain="0.195" pdel="0" userwavefile="" dec="0.218" lamt="0" syncmode="0" latt="0" rel="0.077" amt="1" x100="0" att="0.079" lpdel="0" hold="0.065" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+        <elres lspd_denominator="4" sustain="0.5" pdel="0" userwavefile="" dec="0.5" lamt="0" syncmode="0" latt="0" rel="0.1" amt="0" x100="0" att="0" lpdel="0" hold="0.5" lshp="0" lspd="0.1" ctlenvamt="0" lspd_numerator="4"/>
+      </eldata>
+      <chordcreator chord="0" chordrange="1" chord-enabled="0"/>
+      <arpeggiator arptime="107" arprange="2" arptime_denominator="4" syncmode="6" arpmode="0" arp-enabled="1" arp="90" arptime_numerator="4" arpdir="3" arpgate="200"/>
+      <midiport inputcontroller="0" fixedoutputvelocity="-1" inputchannel="0" outputcontroller="0" writable="0" outputchannel="1" fixedinputvelocity="-1" fixedoutputnote="-1" outputprogram="1" basevelocity="63" readable="0"/>
+      <fxchain numofeffects="0" enabled="0"/>
+    </instrumenttrack>
+  </instrumenttracksettings>
+</lmms-project>
