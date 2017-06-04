@@ -276,8 +276,9 @@ void ConfigManager::createWorkingDir()
 void ConfigManager::addRecentlyOpenedProject( const QString & file )
 {
 	QFileInfo recentFile( file );
-	if( recentFile.suffix().toLower() == "mmp" ||
-			recentFile.suffix().toLower() == "mmpz" )
+	if( ( recentFile.suffix().toLower() == "mmp" ||
+			recentFile.suffix().toLower() == "mmpz" ) &&
+				file != recoveryFile() )
 	{
 		m_recentlyOpenedProjects.removeAll( file );
 		if( m_recentlyOpenedProjects.size() > 50 )

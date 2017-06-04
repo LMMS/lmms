@@ -29,6 +29,10 @@
 
 #include "denormals.h"
 
+#include <QCryptographicHash>
+#include <QDebug>
+#include <QDirIterator>
+#include <QFile>
 #include <QFileInfo>
 #include <QLocale>
 #include <QTimer>
@@ -193,6 +197,23 @@ void fileCheck( QString &file )
 
 
 
+QString createRandomFileName()
+{
+	QByteArray hashString;
+	for( int x = 0; x < 16; x++ )
+	{
+		hashString.append( rand() % 256 );
+	}
+
+	QString randFileName;
+	randFileName = QString( QCryptographicHash::hash( hashString, QCryptographicHash::Md5 ).toHex() );
+	randFileName.truncate( 8 );
+	return randFileName;
+}
+
+
+
+
 int main( int argc, char * * argv )
 {
 	// initialize memory managers
@@ -211,6 +232,8 @@ int main( int argc, char * * argv )
 	bool renderLoop = false;
 	bool renderTracks = false;
 	QString fileToLoad, fileToImport, renderOut, profilerOutputFile, configFile;
+
+	QString filename="Data.txt";
 
 	// first of two command-line parsing stages
 	for( int i = 1; i < argc; ++i )
@@ -717,15 +740,35 @@ int main( int argc, char * * argv )
 		srand( getpid() + time( 0 ) );
 
 		// recover a file?
-		QString recoveryFile = ConfigManager::inst()->recoveryFile();
+		QString recoveryFile;
+		int numRecoveryFiles = 0;
+		QDateTime created;
+		created.setTime_t( 0 );
+		QDirIterator it( ConfigManager::inst()->workingDir(),
+					QStringList() << "*.recover.mmp", QDir::Files | QDir::NoSymLinks );
+		while( it.hasNext() )
+		{
+			it.next();
+			numRecoveryFiles++;
+			if( QFileInfo( it.filePath() ).created() > created )
+			{
+				created = QFileInfo( it.filePath() ).created();
+				recoveryFile = it.filePath();
+			}
+		}
 
-		bool recoveryFilePresent = QFileInfo( recoveryFile ).exists() &&
-				QFileInfo( recoveryFile ).isFile();
-		bool autoSaveEnabled =
-			ConfigManager::inst()->value( "ui", "enableautosave" ).toInt();
-		if( recoveryFilePresent )
+		if( numRecoveryFiles )
 		{
 			QMessageBox mb;
+			QString oneFile = MainWindow::tr( "There is a recover file present. "
+					"It looks like the last session did not end "
+					"properly. Do you want to recover the "
+					"project of this session?" );
+			QString manyRecoverFiles = MainWindow::tr(
+					"There is more than one recover file "
+					"present. Do you want to open the "
+					"latest one?" );
+			QString message = numRecoveryFiles > 1 ? manyRecoverFiles : oneFile;
 			mb.setWindowTitle( MainWindow::tr( "Project recovery" ) );
 			mb.setText( QString(
 				"<html>"
@@ -745,21 +788,14 @@ int main( int argc, char * * argv )
 				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
-				MainWindow::tr( "There is a recovery file present. "
-					"It looks like the last session did not end "
-					"properly or another instance of LMMS is "
-					"already running. Do you want to recover the "
-					"project of this session?" ),
+				message,
 				MainWindow::tr( "Recover" ),
-				MainWindow::tr( "Recover the file. Please don't run "
-					"multiple instances of LMMS when you do this." ),
+				MainWindow::tr( "Recover the file." ),
 				MainWindow::tr( "Ignore" ),
-				MainWindow::tr( "Launch LMMS as usual but with "
-					"automatic backup disabled to prevent the "
-					"present recover file from being overwritten." ),
+				MainWindow::tr( "Launch a default session." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
-					"the restored files. This is not reversible." )
+					"the recover file. This is not reversible." )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
@@ -795,7 +831,7 @@ int main( int argc, char * * argv )
 			// have a hidden exit button
 			exit = mb.addButton( "", QMessageBox::RejectRole);
 			exit->setVisible(false);
-			
+
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
@@ -807,6 +843,10 @@ int main( int argc, char * * argv )
 			mb.exec();
 			if( mb.clickedButton() == discard )
 			{
+				if( !recoveryFile.isEmpty() )
+				{
+					QFile::remove( recoveryFile );
+				}
 				gui->mainWindow()->sessionCleanup();
 			}
 			else if( mb.clickedButton() == recover ) // Recover
@@ -816,10 +856,7 @@ int main( int argc, char * * argv )
 			}
 			else if( mb.clickedButton() == ignore )
 			{
-				if( autoSaveEnabled )
-				{
-					gui->mainWindow()->setSession( MainWindow::SessionState::Limited );
-				}
+				fileToLoad = "";
 			}
 			else // Exit
 			{
@@ -827,10 +864,29 @@ int main( int argc, char * * argv )
 			}
 		}
 
-		// first show the Main Window and then try to load given file
+		// Create unique recover file
+		QString session;
+		if( ( fileToLoad == recoveryFile ) && !fileToLoad.isEmpty() )
+		{
+			// Don't create a recover file for a recover file.
+			QFileInfo file( fileToLoad );
+			QString fileName = file.fileName();
+			fileName.remove( ".recover.mmp" );
+			ConfigManager::inst()->
+				setUniqueSessionName( fileName );
+		}
+		else
+		{
+			session = createRandomFileName();
+			while( QFileInfo(ConfigManager::inst()->workingDir()
+					+ session + ".recover.mmp" ).exists() ||
+						session.isEmpty() )
+			{
+				session = createRandomFileName();
+			}
+			ConfigManager::inst()->setUniqueSessionName( session );
+		}
 
-		// [Settel] workaround: showMaximized() doesn't work with
-		// FVWM2 unless the window is already visible -> show() first
 		gui->mainWindow()->show();
 		if( fullscreen )
 		{
@@ -863,14 +919,11 @@ int main( int argc, char * * argv )
 			}
 		}
 		// If enabled, open last project if there is one. Else, create
-		// a new one. Also skip recently opened file if limited session to
-		// lower the chance of opening an already opened file.
+		// a new one.
 		else if( ConfigManager::inst()->
 				value( "app", "openlastproject" ).toInt() &&
 			!ConfigManager::inst()->
-				recentlyOpenedProjects().isEmpty() &&
-			gui->mainWindow()->getSession() !=
-				MainWindow::SessionState::Limited )
+				recentlyOpenedProjects().isEmpty() )
 		{
 			QString f = ConfigManager::inst()->
 					recentlyOpenedProjects().first();
@@ -893,8 +946,7 @@ int main( int argc, char * * argv )
 		// Finally we start the auto save timer and also trigger the
 		// autosave one time as recover.mmp is a signal to possible other
 		// instances of LMMS.
-		if( autoSaveEnabled &&
-			gui->mainWindow()->getSession() != MainWindow::SessionState::Limited )
+		if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 		{
 			gui->mainWindow()->autoSaveTimerReset();
 			gui->mainWindow()->autoSave();
