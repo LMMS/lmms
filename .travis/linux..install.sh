@@ -16,5 +16,10 @@ else
 	PACKAGES="$PACKAGES libqt4-dev"
 fi
 
+# TODO: ShellCheck is not smart enough and will raise false positives.
+# ShellCheck comments are workarounds and should be dropped when ShellCheck in
+# the testing environment is fixed.
+# See https://github.com/LMMS/lmms/issues/3473
+
 # shellcheck disable=SC2086
 sudo apt-get install -y $PACKAGES
