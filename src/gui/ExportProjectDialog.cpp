@@ -58,7 +58,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	int cbIndex = 0;
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].m_getDevInst != NULL )
+		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
 		{
 			// get the extension of this format
 			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
@@ -181,6 +181,8 @@ ProjectRenderer::ExportFileFormats convertIndexToExportFileFormat(int index)
 		return ProjectRenderer::WaveFile;
 	case 1:
 		return ProjectRenderer::OggFile;
+	case 2:
+		return ProjectRenderer::MP3File;
 	default:
 		Q_ASSERT(false);
 		break;
@@ -195,11 +197,16 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	ProjectRenderer::ExportFileFormats exportFormat =
 			convertIndexToExportFileFormat(index);
 
-	bool bitRateControlsEnabled = exportFormat == ProjectRenderer::OggFile;
+	bool sampleRateControlsVisible = exportFormat != ProjectRenderer::MP3File;
+
+	bool bitRateControlsEnabled =
+			(exportFormat == ProjectRenderer::OggFile ||
+			 exportFormat == ProjectRenderer::MP3File);
+
 	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
 
+	sampleRateWidget->setVisible(sampleRateControlsVisible);
 	bitrateWidget->setVisible(bitRateControlsEnabled);
-
 	depthWidget->setVisible(bitDepthControlEnabled);
 }
 

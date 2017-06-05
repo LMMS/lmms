@@ -51,6 +51,7 @@ OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
+OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
@@ -69,9 +70,11 @@ OPTION(WANT_QT5		"Build with Qt5" OFF)
 
 IF(LMMS_BUILD_APPLE)
 	SET(WANT_ALSA OFF)
+	SET(WANT_MP3LAME OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
 	SET(STATUS_ALSA "<not supported on this platform>")
+	SET(STATUS_MP3LAME "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_APPLEMIDI "OK")
 ELSE(LMMS_BUILD_APPLE)
@@ -82,12 +85,14 @@ ENDIF(LMMS_BUILD_APPLE)
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
+	SET(WANT_MP3LAME OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_JACK "<not supported on this platform>")
+	SET(STATUS_MP3LAME "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_WINMM "OK")
@@ -305,6 +310,19 @@ IF(NOT LMMS_HAVE_PULSEAUDIO)
 	SET(PULSEAUDIO_LIBRARIES "")
 ENDIF(NOT LMMS_HAVE_PULSEAUDIO)
 
+
+# check for MP3/Lame-libraries
+IF(WANT_MP3LAME)
+	FIND_PACKAGE(Lame)
+	IF(LAME_FOUND)
+		SET(LMMS_HAVE_MP3LAME TRUE)
+		SET(STATUS_MP3LAME "OK")
+	ELSE(LAME_FOUND)
+		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
+	ENDIF(LAME_FOUND)
+ELSE(WANT_MP3LAME)
+	SET(STATUS_MP3LAME "Disabled for build")
+ENDIF(WANT_MP3LAME)
 
 # check for OGG/Vorbis-libraries
 IF(WANT_OGGVORBIS)
@@ -593,6 +611,7 @@ MESSAGE(
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
+"* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
 
 MESSAGE(

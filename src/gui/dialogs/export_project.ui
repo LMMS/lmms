@@ -45,39 +45,48 @@
          <widget class="QComboBox" name="fileFormatCB"/>
         </item>
         <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Samplerate:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="samplerateCB">
-          <item>
-           <property name="text">
-            <string>44100 Hz</string>
+         <widget class="QWidget" name="sampleRateWidget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="margin">
+            <number>0</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>48000 Hz</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>88200 Hz</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>96000 Hz</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>192000 Hz</string>
-           </property>
-          </item>
+           <item>
+            <widget class="QLabel" name="labelSampleRate">
+             <property name="text">
+              <string>Samplerate:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="samplerateCB">
+             <item>
+              <property name="text">
+               <string>44100 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>48000 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>88200 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>96000 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>192000 Hz</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
