@@ -52,7 +52,7 @@ private:
 	sample_t* m_buffer;
 	int m_maxLength;
 	float m_length;
-	int m_index;
+	int m_writeIndex;
 	float m_feedback;
 	float m_maxTime;
 };

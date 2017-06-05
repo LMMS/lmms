@@ -586,6 +586,14 @@ void SongEditor::updatePosition( const MidiTime & t )
 
 
 
+void SongEditor::updatePositionLine()
+{
+	m_positionLine->setFixedHeight( height() );
+}
+
+
+
+
 void SongEditor::zoomingChanged()
 {
 	setPixelsPerTact( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_TACT );
@@ -697,11 +705,20 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	zoomToolBar->addWidget( m_zoomingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
+	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
 }
 
 QSize SongEditorWindow::sizeHint() const
 {
 	return {600, 300};
+}
+
+
+
+
+void SongEditorWindow::resizeEvent(QResizeEvent *event)
+{
+	emit resized();
 }
 
 

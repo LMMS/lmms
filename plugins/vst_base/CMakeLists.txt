@@ -37,7 +37,7 @@ IF(LMMS_HOST_X86_64)
 	# workaround for broken wineg++ in WINE 1.4 (shipped e.g. with Ubuntu Precise)
 	EXEC_PROGRAM( ${WINE_CXX} ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
 	IF("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -L/usr/lib/i386-linux-gnu/wine/ -luser32 -lkernel32 -lgdi32)
 	ENDIF()
 	# The following check works on Fedora systems
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
