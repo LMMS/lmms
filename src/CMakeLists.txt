@@ -199,6 +199,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
 					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
+					"${MINGW_PREFIX}/bin/libmp3lame-0.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
