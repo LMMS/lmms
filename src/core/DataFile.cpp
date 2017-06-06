@@ -40,6 +40,7 @@
 #include "GuiApplication.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
+#include "SampleBuffer.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
 
@@ -1118,6 +1119,9 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 		ProjectVersion createdWith = root.attribute( "creatorversion" );
 		ProjectVersion openedWith = LMMS_VERSION;
 
+		// fix incorrectly saved paths (e.g. incorrectly set lmms working dir)
+		fixPaths();
+
 		if ( createdWith != openedWith )
 		{
 			// only one compareType needs to be set, and we can compare on one line because setCompareType returns ProjectVersion
@@ -1155,6 +1159,45 @@ void DataFile::loadData( const QByteArray & _data, const QString & _sourceFile )
 	m_content = root.elementsByTagName( typeName( m_type ) ).
 							item( 0 ).toElement();
 }
+
+
+
+/*
+ * Fix project portability by attempting to fix absolute paths. This can happen
+ * from a misconfigured lmms working directory or any projects created with 
+ * 1.2.0-rc1 or 1.2.0-rc2
+ */
+void DataFile::fixPaths() {
+	// Fix relative instrument samples (AudioFileProcessor, SF2Player...)
+	QDomNodeList list = elementsByTagName( "instrument" );
+	for( int i = 0; i < list.count(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement().firstChildElement();
+		while( !el.isNull() ) 
+		{
+			QString src = el.attribute( "src" );
+			if ( QFileInfo( src ).isAbsolute() ) {
+				el.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
+			}
+			el = el.nextSiblingElement();
+		}
+	}
+
+	// Fix relative track samples (SampleTrack)
+	list = elementsByTagName( "sampletco" );
+	for( int i = 0; i < list.count(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if( !el.isNull() ) 
+		{
+			QString src = el.attribute( "src" );
+			if ( QFileInfo( src ).isAbsolute() ) {
+				el.setAttribute( "src", SampleBuffer::tryToMakeRelative( src ) );
+			}
+		}
+	}
+}
+
 
 
 void findIds(const QDomElement& elem, QList<jo_id_t>& idList)

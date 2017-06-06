@@ -129,6 +129,7 @@ private:
 	void upgrade_1_2_0_rc2_42();
 
 	void upgrade();
+	void fixPaths();
 
 	void loadData( const QByteArray & _data, const QString & _sourceFile );
 
