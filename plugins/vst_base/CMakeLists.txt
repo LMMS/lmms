@@ -69,6 +69,7 @@ ADD_CUSTOM_COMMAND(
 		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
 		${WINE_BUILD_FLAGS}
 		-o ../RemoteVstPlugin
+	# Ensure correct file extension
 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
 	OUTPUTS ../RemoteVstPlugin
