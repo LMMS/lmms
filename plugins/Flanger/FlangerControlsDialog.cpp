@@ -52,7 +52,7 @@ FlangerControlsDialog::FlangerControlsDialog( FlangerControls *controls ) :
 	lfoFreqKnob->setVolumeKnob( false );
 	lfoFreqKnob->setModel( &controls->m_lfoFrequencyModel );
 	lfoFreqKnob->setLabel( tr( "RATE" ) );
-	lfoFreqKnob->setHintText( tr ( "Rate:" ) , "Hz" );
+	lfoFreqKnob->setHintText( tr ( "Period:" ) , " Sec" );
 
 	Knob * lfoAmtKnob = new Knob( knobBright_26, this );
 	lfoAmtKnob->move( 85,10 );

@@ -71,6 +71,8 @@ SampleTCO::SampleTCO( Track * _track ) :
 	{
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
 	}
+	//playbutton clicked or space key / on Export Song set isPlaying to false
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about loops
 	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute TCOs
@@ -79,11 +81,6 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
-	//playbutton clicked or space key
-	if( gui )
-	{
-		connect( gui->songEditor(), SIGNAL( playTriggered() ), this, SLOT( playbackPositionChanged() ) );
-	}
 
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -148,7 +145,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
-	updateLength();
+	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
 
 	emit sampleChanged();
 	emit playbackPositionChanged();
@@ -199,7 +196,7 @@ void SampleTCO::setIsPlaying(bool isPlaying)
 
 void SampleTCO::updateLength()
 {
-	changeLength( sampleLength() );
+	emit sampleChanged();
 }
 
 
@@ -504,12 +501,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
-
-	if( r.width() < width() - 1 )
-	{
-		p.drawLine( r.x(), r.y() + r.height() / 2,
-			rect().right() - TCO_BORDER_WIDTH, r.y() + r.height() / 2 );
-	}
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );

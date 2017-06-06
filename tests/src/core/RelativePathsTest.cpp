@@ -1,7 +1,7 @@
 /*
- * GroupBox.h - LMMS-groupbox
+ * RelativePathsTest.cpp
  *
- * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2017 Tres Finocchiaro <tres/dot/finocchiaro/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -22,55 +22,27 @@
  *
  */
 
+#include "QTestSuite.h"
 
-#ifndef GROUP_BOX_H
-#define GROUP_BOX_H
+#include "ConfigManager.h"
+#include "SampleBuffer.h"
 
-#include <QWidget>
+#include <QDir>
 
-#include "AutomatableModelView.h"
-#include "PixmapButton.h"
-
-
-class QPixmap;
-
-
-class GroupBox : public QWidget, public BoolModelView
+class RelativePathsTest : QTestSuite
 {
 	Q_OBJECT
-public:
-	GroupBox( const QString & _caption, QWidget * _parent = NULL );
-	virtual ~GroupBox();
-
-	virtual void modelChanged();
-
-	PixmapButton * ledButton()
+private slots:
+	void RelativePathComparisonTests()
 	{
-		return m_led;
+		QFileInfo fi(ConfigManager::inst()->factorySamplesDir() + "/drums/kick01.ogg");
+		QVERIFY(fi.exists());
+
+		QString absPath = fi.absoluteFilePath();
+		QString relPath = "drums/kick01.ogg";
+		QCOMPARE(SampleBuffer::tryToMakeRelative(absPath), relPath);
+		QCOMPARE(SampleBuffer::tryToMakeAbsolute(relPath), absPath);
 	}
+} RelativePathTests;
 
-	int titleBarHeight() const
-	{
-		return m_titleBarHeight;
-	}
-
-
-protected:
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-
-
-private:
-	void updatePixmap();
-
-	PixmapButton * m_led;
-	QString m_caption;
-	const int m_titleBarHeight;
-
-} ;
-
-
-typedef BoolModel groupBoxModel;
-
-
-#endif
+#include "RelativePathsTest.moc"

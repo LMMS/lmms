@@ -38,6 +38,7 @@ ReverbSCControls::ReverbSCControls( ReverbSCEffect* effect ) :
 	m_colorModel( 10000.0f, 100.0f, 15000.0f, 0.1f, this, tr( "Color" ) ),
 	m_outputGainModel( 0.0f, -60.0f, 15, 0.1f, this, tr( "Output Gain" ) )
 {
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changeSampleRate() ));
 }
 
 void ReverbSCControls::changeControl()
@@ -60,3 +61,7 @@ void ReverbSCControls::saveSettings( QDomDocument& doc, QDomElement& _this )
 	m_outputGainModel.saveSettings( doc, _this, "output_gain" ); 
 }
 
+void ReverbSCControls::changeSampleRate()
+{
+	m_effect->changeSampleRate();
+}

@@ -12,9 +12,12 @@ BUILD_PLUGIN(
 	ReverbSCControlDialog.cpp 
 	base.c
 	revsc.c
+	base.h
+	revsc.h
+	dcblock.h
 	dcblock.c
-	MOCFILES 
 	ReverbSC.h
+	MOCFILES 
 	ReverbSCControls.h 
 	ReverbSCControlDialog.h 
 	base.h

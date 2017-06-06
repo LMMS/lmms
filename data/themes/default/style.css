@@ -136,6 +136,19 @@ PianoRoll {
 	qproperty-textShadow: #fff;
 }
 
+TabWidget {
+	background-color: #262b30;
+	qproperty-tabText: rgba(255, 255, 255, 180);
+	qproperty-tabTitleText: #fff;
+	qproperty-tabSelected: #323940;
+	qproperty-tabBackground: #181b1f;
+	qproperty-tabBorder: #181b1f;
+}
+
+GroupBox {
+	background-color: #262b30;
+}
+
 /* main toolbar oscilloscope - can have transparent bg now */
 
 VisualizationWidget  {
