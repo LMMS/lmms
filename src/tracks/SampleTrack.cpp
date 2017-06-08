@@ -166,7 +166,8 @@ void SampleTCO::toggleRecord()
 void SampleTCO::playbackPositionChanged()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	m_isPlaying = false;
+	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
+	st->setPlayingTcos( false );
 }
 
 
@@ -708,11 +709,20 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 void SampleTrack::updateTcos()
 {
+	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	setPlayingTcos( false );
+}
+
+
+
+
+void SampleTrack::setPlayingTcos( bool isPlaying )
+{
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		TrackContentObject * tco = getTCO( i );
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-		sTco->playbackPositionChanged();
+		sTco->setIsPlaying( isPlaying );
 	}
 }
 
