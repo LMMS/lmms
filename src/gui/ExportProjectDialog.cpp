@@ -128,7 +128,20 @@ void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-
+OutputSettings::StereoMode mapToStereoMode(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return OutputSettings::StereoMode_Stereo;
+	case 1:
+		return OutputSettings::StereoMode_JointStereo;
+	case 2:
+		return OutputSettings::StereoMode_Mono;
+	default:
+		return OutputSettings::StereoMode_Stereo;
+	}
+}
 
 void ExportProjectDialog::startExport()
 {
@@ -146,7 +159,8 @@ void ExportProjectDialog::startExport()
 	OutputSettings os = OutputSettings(
 			samplerates[ samplerateCB->currentIndex() ],
 			bitRateSettings,
-			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ) );
+			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
+			mapToStereoMode(stereoModeComboBox->currentIndex()) );
 
 	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
 
@@ -197,6 +211,8 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	ProjectRenderer::ExportFileFormats exportFormat =
 			convertIndexToExportFileFormat(index);
 
+	bool stereoModeVisible = exportFormat == ProjectRenderer::MP3File;
+
 	bool sampleRateControlsVisible = exportFormat != ProjectRenderer::MP3File;
 
 	bool bitRateControlsEnabled =
@@ -205,6 +221,7 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
 
+	stereoModeWidget->setVisible(stereoModeVisible);
 	sampleRateWidget->setVisible(sampleRateControlsVisible);
 	bitrateWidget->setVisible(bitRateControlsEnabled);
 	depthWidget->setVisible(bitDepthControlEnabled);

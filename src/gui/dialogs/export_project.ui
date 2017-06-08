@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>715</width>
-    <height>447</height>
+    <height>491</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -126,6 +126,44 @@
              <item>
               <property name="text">
                <string>32 Bit Float</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="stereoModeWidget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelStereoMode_3">
+             <property name="text">
+              <string>Stereo mode:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="stereoModeComboBox">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Stereo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Joint Stereo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mono</string>
               </property>
              </item>
             </widget>

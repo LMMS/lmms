@@ -89,9 +89,28 @@ void AudioFileMP3::flushRemainingBuffers()
 	writeData(&encodingBuffer[0], bytesWritten);
 }
 
+MPEG_mode mapToMPEG_mode(OutputSettings::StereoMode stereoMode)
+{
+	switch (stereoMode)
+	{
+	case OutputSettings::StereoMode_Stereo:
+		return STEREO;
+	case OutputSettings::StereoMode_JointStereo:
+		return JOINT_STEREO;
+	case OutputSettings::StereoMode_Mono:
+		return MONO;
+	default:
+		return NOT_SET;
+	}
+}
+
 bool AudioFileMP3::initEncoder()
 {
 	m_lame = lame_init();
+
+	// Handle stereo/joint/mono settings
+	OutputSettings::StereoMode stereoMode = getOutputSettings().getStereoMode();
+	lame_set_mode(m_lame, mapToMPEG_mode(stereoMode));
 
 	// Handle variable bit rate settings
 	OutputSettings::BitRateSettings bitRateSettings = getOutputSettings().getBitRateSettings();
