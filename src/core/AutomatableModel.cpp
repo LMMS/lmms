@@ -716,19 +716,19 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 
 float FloatModel::getRoundedValue() const
 {
-	return static_cast<float>( static_cast<int>( value() / step<float>() + 0.5 ) ) * step<float>();
+	return qRound( value() / step<float>() ) * step<float>();
 }
 
 
 
 
-float FloatModel::getDigitCount()
+int FloatModel::getDigitCount() const
 {
 	float steptemp = step<float>();
 	int digits = 0;
 	while ( steptemp < 1 )
 	{
-		steptemp = steptemp / 0.1f;
+		steptemp = steptemp * 10.0f;
 		digits++;
 	}
 	return digits;
