@@ -852,7 +852,8 @@ int main( int argc, char * * argv )
 					recentlyOpenedProjects().first();
 			QFileInfo recentFile( f );
 
-			if ( recentFile.exists() )
+			if ( recentFile.exists() &&
+				recentFile.suffix().toLower() != "mpt" )
 			{
 				Engine::getSong()->loadProject( f );
 			}
