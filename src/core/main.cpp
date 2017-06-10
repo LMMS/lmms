@@ -847,7 +847,7 @@ int main( int argc, char * * argv )
 				value( "app", "openlastproject" ).toInt() &&
 			!ConfigManager::inst()->
 				recentlyOpenedProjects().isEmpty() &&
-						!recoveryFilePresent )
+				!recoveryFilePresent )
 		{
 			QString f = ConfigManager::inst()->
 					recentlyOpenedProjects().first();
