@@ -282,8 +282,8 @@ void ConfigManager::addRecentlyOpenedProject( const QString & file )
 {
 	QFileInfo recentFile( file );
 	if( recentFile.suffix().toLower() == "mmp" ||
-			recentFile.suffix().toLower() == "mmpz" ||
-				recentFile.suffix().toLower() == "mpt" )
+		recentFile.suffix().toLower() == "mmpz" ||
+		recentFile.suffix().toLower() == "mpt" )
 	{
 		m_recentlyOpenedProjects.removeAll( file );
 		if( m_recentlyOpenedProjects.size() > 50 )
