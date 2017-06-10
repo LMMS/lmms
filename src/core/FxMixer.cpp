@@ -32,6 +32,7 @@
 #include "Song.h"
 
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "BBTrackContainer.h"
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
@@ -312,6 +313,22 @@ void FxMixer::deleteChannel( int index )
 				inst->effectChannelModel()->setValue(val-1);
 			}
 		}
+		else if( t->type() == Track::SampleTrack )
+		{
+			SampleTrack* strk = dynamic_cast<SampleTrack *>( t );
+			int val = strk->effectChannelModel()->value(0);
+			if( val == index )
+			{
+				// we are deleting this track's fx send
+				// send to master
+				strk->effectChannelModel()->setValue(0);
+			}
+			else if( val > index )
+			{
+				// subtract 1 to make up for the missing channel
+				strk->effectChannelModel()->setValue(val-1);
+			}
+		}
 	}
 
 	FxChannel * ch = m_fxChannels[index];
@@ -384,6 +401,19 @@ void FxMixer::moveChannelLeft( int index )
 				else if( val == b )
 				{
 					inst->effectChannelModel()->setValue(a);
+				}
+			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				int val = strk->effectChannelModel()->value(0);
+				if( val == a )
+				{
+					strk->effectChannelModel()->setValue(b);
+				}
+				else if( val == b )
+				{
+					strk->effectChannelModel()->setValue(a);
 				}
 			}
 		}
@@ -787,4 +817,3 @@ void FxMixer::validateChannelName( int index, int oldIndex )
 		m_fxChannels[index]->m_name = tr( "FX %1" ).arg( index );
 	}
 }
-

@@ -56,6 +56,7 @@ SET(LMMS_SRCS
 	gui/widgets/FadeButton.cpp
 	gui/widgets/Fader.cpp
 	gui/widgets/FxLine.cpp
+	gui/widgets/FxLineLcdSpinBox.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
 	gui/widgets/InstrumentFunctionViews.cpp

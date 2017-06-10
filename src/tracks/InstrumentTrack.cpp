@@ -47,6 +47,7 @@
 #include "EffectRackView.h"
 #include "embed.h"
 #include "FileBrowser.h"
+#include "FxLineLcdSpinBox.h"
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
@@ -1212,52 +1213,6 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 
 
 
-class fxLineLcdSpinBox : public LcdSpinBox
-{
-        Q_OBJECT
-	public:
-		fxLineLcdSpinBox( int _num_digits, QWidget * _parent,
-				const QString & _name ) :
-			LcdSpinBox( _num_digits, _parent, _name ) {}
-
-	protected:
-		virtual void mouseDoubleClickEvent ( QMouseEvent * _me )
-		{
-			gui->fxMixerView()->setCurrentFxLine( model()->value() );
-
-			gui->fxMixerView()->parentWidget()->show();
-			gui->fxMixerView()->show();// show fxMixer window
-			gui->fxMixerView()->setFocus();// set focus to fxMixer window
-			//engine::getFxMixerView()->raise();
-		}
-
-		virtual void contextMenuEvent( QContextMenuEvent* event )
-		{
-			// for the case, the user clicked right while pressing left mouse-
-			// button, the context-menu appears while mouse-cursor is still hidden
-			// and it isn't shown again until user does something which causes
-			// an QApplication::restoreOverrideCursor()-call...
-			mouseReleaseEvent( NULL );
-
-			QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-
-			// This condition is here just as a safety check, fxLineLcdSpinBox is aways
-			// created inside a TabWidget inside an InstrumentTrackWindow
-			if ( InstrumentTrackWindow* window = dynamic_cast<InstrumentTrackWindow*>( (QWidget *)this->parent()->parent() ) )
-			{
-				QMenu *fxMenu = window->instrumentTrackView()->createFxMenu( tr( "Assign to:" ), tr( "New FX Channel" ) );
-				contextMenu->addMenu( fxMenu );
-
-				contextMenu->addSeparator();
-			}
-			addDefaultActions( contextMenu );
-			contextMenu->exec( QCursor::pos() );
-		}
-
-};
-
-
-
 // #### ITW:
 InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	QWidget(),
@@ -1381,7 +1336,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new fxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
+	m_effectChannelNumber = new FxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
 
 	basicControlsLayout->addWidget( m_effectChannelNumber, 0, 6 );
 	basicControlsLayout->setAlignment( m_effectChannelNumber, widgetAlignment );
