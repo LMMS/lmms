@@ -846,7 +846,8 @@ int main( int argc, char * * argv )
 		else if( ConfigManager::inst()->
 				value( "app", "openlastproject" ).toInt() &&
 			!ConfigManager::inst()->
-				recentlyOpenedProjects().isEmpty() )
+				recentlyOpenedProjects().isEmpty() &&
+			!recoveryFilePresent )
 		{
 			QString f = ConfigManager::inst()->
 					recentlyOpenedProjects().first();
