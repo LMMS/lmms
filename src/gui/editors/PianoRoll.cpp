@@ -143,7 +143,7 @@ PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
 
 const QVector<double> PianoRoll::m_zoomLevels =
-			{ 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
 PianoRoll::PianoRoll() :
@@ -3256,7 +3256,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			q--;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			q++;
 		}
@@ -3270,7 +3270,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		{
 			l--;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			l++;
 		}
@@ -3282,11 +3282,11 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		int z = m_zoomingModel.value();
 		if( we->delta() > 0 )
 		{
-			z--;
-		}
-		if( we->delta() < 0 )
-		{
 			z++;
+		}
+		else if( we->delta() < 0 )
+		{
+			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel.size() - 1 );
 		// update combobox with zooming-factor
