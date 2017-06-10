@@ -26,8 +26,11 @@
 #define SAMPLE_TRACK_H
 
 #include <QDialog>
+#include <QLayout>
 
 #include "AudioPort.h"
+#include "FxMixer.h"
+#include "FxLineLcdSpinBox.h"
 #include "Track.h"
 
 class EffectRackView;
@@ -140,6 +143,11 @@ public:
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
+	inline IntModel * effectChannelModel()
+	{
+		return &m_effectChannelModel;
+	}
+
 	inline AudioPort * audioPort()
 	{
 		return &m_audioPort;
@@ -153,10 +161,12 @@ public:
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
+	void updateEffectChannel();
 
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
+	IntModel m_effectChannelModel;
 	AudioPort m_audioPort;
 
 
@@ -192,6 +202,7 @@ private:
 	QWidget * m_effWindow;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
+	LcdSpinBox * m_effectChannelNumber;
 
 } ;
 

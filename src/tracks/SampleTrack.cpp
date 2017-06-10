@@ -468,7 +468,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
 	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
+	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor()
 		: painter.background().color() );
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
@@ -512,7 +512,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
@@ -528,7 +528,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	// recording sample tracks is not possible at the moment 
+	// recording sample tracks is not possible at the moment
 
 	/* if( m_tco->isRecord() )
 	{
@@ -559,10 +559,14 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 							tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
+	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
 	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
+	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels()-1, 1);
+
+	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
 }
 
 
@@ -690,6 +694,7 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
+	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
 }
 
 
@@ -712,6 +717,8 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 	}
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
+	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels() - 1 );
+	m_effectChannelModel.loadSettings( _this, "fxch" );
 }
 
 
@@ -734,6 +741,14 @@ void SampleTrack::setPlayingTcos( bool isPlaying )
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 		sTco->setIsPlaying( isPlaying );
 	}
+}
+
+
+
+
+void SampleTrack::updateEffectChannel()
+{
+	m_audioPort.setNextFxChannel( m_effectChannelModel.value() );
 }
 
 
@@ -776,10 +791,21 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_panningKnob->setLabel( tr( "PAN" ) );
 	m_panningKnob->show();
 
+	QGridLayout * layout = new QGridLayout();
+	QWidget * layoutWrap = new QWidget();
+	layoutWrap->setLayout( layout );
+
+	m_effectChannelNumber = new FxLineLcdSpinBox( 2, NULL, tr( "FX channel" ) );
+	m_effectChannelNumber->setModel( &_t->m_effectChannelModel );
+	layout->addWidget( m_effectChannelNumber, 0, 1 );
+
+	layout->addWidget( new QLabel( "Someone with more time on their hands\nplease implement the knobs here" ), 0, 0 );
+
 	m_effectRack = new EffectRackView( _t->audioPort()->effects() );
 	m_effectRack->setFixedSize( 240, 242 );
+	layout->addWidget( m_effectRack, 1, 0 );
 
-	m_effWindow = gui->mainWindow()->addWindowedWidget( m_effectRack );
+	m_effWindow = gui->mainWindow()->addWindowedWidget( layoutWrap );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
  	m_effWindow->setWindowTitle( _t->name() );
