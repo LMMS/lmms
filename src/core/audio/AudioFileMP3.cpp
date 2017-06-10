@@ -112,21 +112,12 @@ bool AudioFileMP3::initEncoder()
 	OutputSettings::StereoMode stereoMode = getOutputSettings().getStereoMode();
 	lame_set_mode(m_lame, mapToMPEG_mode(stereoMode));
 
-	// Handle variable bit rate settings
+	// Handle bit rate settings
 	OutputSettings::BitRateSettings bitRateSettings = getOutputSettings().getBitRateSettings();
 	int bitRate = static_cast<int>(bitRateSettings.getBitRate());
-	if (bitRateSettings.isVariableBitRate())
-	{
-		// Handle like the Ogg Vorbis case for now
-		lame_set_VBR(m_lame, vbr_default);
-		lame_set_VBR_min_bitrate_kbps(m_lame, std::max(64, bitRate - 64));
-		lame_set_VBR_max_bitrate_kbps(m_lame, std::min(320, bitRate + 64));
-	}
-	else
-	{
-		lame_set_VBR(m_lame, vbr_off);
-		lame_set_brate(m_lame, bitRate);
-	}
+
+	lame_set_VBR(m_lame, vbr_off);
+	lame_set_brate(m_lame, bitRate);
 
 	// Add a comment
 	id3tag_set_comment(m_lame, "Created with LMMS");

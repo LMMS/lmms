@@ -221,9 +221,14 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
 
+	bool variableBitrateVisible = exportFormat != ProjectRenderer::MP3File;
+
 	stereoModeWidget->setVisible(stereoModeVisible);
 	sampleRateWidget->setVisible(sampleRateControlsVisible);
+
 	bitrateWidget->setVisible(bitRateControlsEnabled);
+	checkBoxVariableBitRate->setVisible(variableBitrateVisible);
+
 	depthWidget->setVisible(bitDepthControlEnabled);
 }
 
