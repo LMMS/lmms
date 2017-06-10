@@ -846,13 +846,15 @@ int main( int argc, char * * argv )
 		else if( ConfigManager::inst()->
 				value( "app", "openlastproject" ).toInt() &&
 			!ConfigManager::inst()->
-				recentlyOpenedProjects().isEmpty() )
+				recentlyOpenedProjects().isEmpty() &&
+				!recoveryFilePresent )
 		{
 			QString f = ConfigManager::inst()->
 					recentlyOpenedProjects().first();
 			QFileInfo recentFile( f );
 
-			if ( recentFile.exists() )
+			if ( recentFile.exists() &&
+				recentFile.suffix().toLower() != "mpt" )
 			{
 				Engine::getSong()->loadProject( f );
 			}
