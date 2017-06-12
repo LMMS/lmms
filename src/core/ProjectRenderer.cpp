@@ -30,6 +30,7 @@
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
+#include "AudioFileMP3.h"
 
 #ifdef LMMS_HAVE_SCHED_H
 #include "sched.h"
@@ -46,6 +47,15 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
+#else
+					NULL
+#endif
+									},
+	{ ProjectRenderer::MP3File,
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "Compressed MP3-File (*.mp3)" ),
+					".mp3",
+#ifdef LMMS_HAVE_MP3LAME
+					&AudioFileMP3::getInst
 #else
 					NULL
 #endif
