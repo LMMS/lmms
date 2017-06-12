@@ -1316,7 +1316,8 @@ void Song::exportProject( bool multiExport )
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats )
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats &&
+		       ProjectRenderer::fileEncodeDevices[idx].isAvailable())
 		{
 			types << tr( ProjectRenderer::fileEncodeDevices[idx].m_description );
 			++idx;
