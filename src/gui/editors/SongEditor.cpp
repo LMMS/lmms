@@ -71,7 +71,7 @@ void positionLine::paintEvent( QPaintEvent * pe )
 }
 
 const QVector<double> SongEditor::m_zoomLevels =
-		{ 16.0f, 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
 
 
 SongEditor::SongEditor( Song * song ) :
@@ -361,11 +361,11 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 
 		if( we->delta() > 0 )
 		{
-			z--;
-		}
-		if( we->delta() < 0 )
-		{
 			z++;
+		}
+		else if( we->delta() < 0 )
+		{
+			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
 		// update combobox with zooming-factor
@@ -586,6 +586,14 @@ void SongEditor::updatePosition( const MidiTime & t )
 
 
 
+void SongEditor::updatePositionLine()
+{
+	m_positionLine->setFixedHeight( height() );
+}
+
+
+
+
 void SongEditor::zoomingChanged()
 {
 	setPixelsPerTact( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_TACT );
@@ -697,11 +705,20 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	zoomToolBar->addWidget( m_zoomingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
+	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
 }
 
 QSize SongEditorWindow::sizeHint() const
 {
 	return {600, 300};
+}
+
+
+
+
+void SongEditorWindow::resizeEvent(QResizeEvent *event)
+{
+	emit resized();
 }
 
 

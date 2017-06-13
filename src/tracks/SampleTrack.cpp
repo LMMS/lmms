@@ -71,6 +71,8 @@ SampleTCO::SampleTCO( Track * _track ) :
 	{
 		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
 	}
+	//playbutton clicked or space key / on Export Song set isPlaying to false
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
 	//care about loops
 	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
 	//care about mute TCOs
@@ -79,11 +81,6 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
-	//playbutton clicked or space key
-	if( gui )
-	{
-		connect( gui->songEditor(), SIGNAL( playTriggered() ), this, SLOT( playbackPositionChanged() ) );
-	}
 
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -169,7 +166,8 @@ void SampleTCO::toggleRecord()
 void SampleTCO::playbackPositionChanged()
 {
 	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	m_isPlaying = false;
+	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
+	st->setPlayingTcos( false );
 }
 
 
@@ -711,11 +709,20 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 
 void SampleTrack::updateTcos()
 {
+	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+	setPlayingTcos( false );
+}
+
+
+
+
+void SampleTrack::setPlayingTcos( bool isPlaying )
+{
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		TrackContentObject * tco = getTCO( i );
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-		sTco->playbackPositionChanged();
+		sTco->setIsPlaying( isPlaying );
 	}
 }
 

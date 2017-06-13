@@ -876,8 +876,8 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
 
-//	The file history goes 30 deep but we only show the 15
-//	most recent ones that we can open.
+//	The file history goes 50 deep but we only show the 15
+//	most recent ones that we can open and omit .mpt files.
 	int shownInMenu = 0;
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
@@ -885,6 +885,11 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 		if ( recentFile.exists() && 
 				*it != ConfigManager::inst()->recoveryFile() )
 		{
+			if( recentFile.suffix().toLower() == "mpt" )
+			{
+				continue;
+			}
+
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
 #ifdef LMMS_BUILD_APPLE

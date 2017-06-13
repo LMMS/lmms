@@ -464,29 +464,6 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 	}
 }
 
-bool Song::isExportDone() const
-{
-	if ( m_renderBetweenMarkers )
-	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				m_playPos[Mode_PlaySong].m_timeLine->loopEnd().getTicks();
-	}
-
-	if( m_exportLoop )
-	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				length() * ticksPerTact();
-	}
-	else
-	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				( length() + 1 ) * ticksPerTact();
-	}
-}
-
 std::pair<MidiTime, MidiTime> Song::getExportEndpoints() const
 {
 	if ( m_renderBetweenMarkers )
@@ -1339,7 +1316,8 @@ void Song::exportProject( bool multiExport )
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats )
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats &&
+		       ProjectRenderer::fileEncodeDevices[idx].isAvailable())
 		{
 			types << tr( ProjectRenderer::fileEncodeDevices[idx].m_description );
 			++idx;
@@ -1360,13 +1338,14 @@ void Song::exportProject( bool multiExport )
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
+	QString suffix = "wav";
+	efd.setDefaultSuffix( suffix );
 	efd.setAcceptMode( FileDialog::AcceptSave );
-
 
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
 					 !efd.selectedFiles()[0].isEmpty() )
 	{
-		QString suffix = "";
+
 		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{
@@ -1378,17 +1357,16 @@ void Song::exportProject( bool multiExport )
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
+				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
-					suffix = "";
+					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+							tr( "Save project" ) ) )
+					{
+						exportFileName += suffix;
+					}
 				}
 			}
-		}
-
-		if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
-				tr( "Save project" ) ) )
-		{
-			exportFileName += suffix;
 		}
 
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
