@@ -189,13 +189,13 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 	{
 		subbands[i]=0;
 
-		// calculate bandwith for subband
+		// calculate bandwidth for subband
 		frequency=onethirdoctavecenterfr[i];
 
-		bandwith=(pow(2, 1.0/3.0)-1)*frequency;
+		bandwidth=(pow(2, 1.0/3.0)-1)*frequency;
 
-		f_min=frequency-bandwith/2.0;
-		f_max=frequency+bandwith/2.0;
+		f_min=frequency-bandwidth/2.0;
+		f_max=frequency+bandwidth/2.0;
 
 		j_min=(int)(f_min/max_frequency*(float)num_spec);
 
