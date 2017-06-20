@@ -647,7 +647,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 	setInitialMousePos( me->pos() );
 	if( me->button() == Qt::LeftButton )
 	{
-		if( me->modifiers() & Qt::ShiftModifier )
+		if( me->modifiers() & Qt::ControlModifier )
 		{
 			if( isSelected() )
 			{
@@ -806,7 +806,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		}
 	}
 
-	if( me->modifiers() & Qt::ShiftModifier )
+	if( me->modifiers() & Qt::ControlModifier )
 	{
 		delete m_hint;
 		m_hint = NULL;
@@ -865,7 +865,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			t = ( *it )->startPosition() +
 				static_cast<int>( dx *MidiTime::ticksPerTact() /
 					 ppt )-smallest_pos;
-			if( ! ( me->modifiers() & Qt::AltModifier )
+			if( ! ( me->modifiers() & Qt::ControlModifier )
 					   && me->button() == Qt::NoButton )
 			{
 				t = t.toNearestTact();
