@@ -29,6 +29,7 @@
 
 #include <QVector>
 
+#include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -81,6 +82,7 @@ public slots:
 	void setEditModeSelect();
 
 	void updatePosition( const MidiTime & t );
+	void selectAllTcos( bool select );
 
 protected:
 	virtual void closeEvent( QCloseEvent * ce );
@@ -104,6 +106,7 @@ private slots:
 
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );
+
 	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
@@ -134,6 +137,7 @@ private:
 	bool m_smoothScroll;
 
 	EditMode m_mode;
+	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 
 	friend class SongEditorWindow;
 
@@ -164,12 +168,17 @@ signals:
 	void playTriggered();
 
 private:
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 
+	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
 	QAction* m_selectModeAction;
+	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
 };

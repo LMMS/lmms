@@ -85,11 +85,7 @@ public:
 
 	inline QVector<selectableObject *> selectedObjects()
 	{
-		if( allowRubberband() == true )
-		{
-			return( m_rubberBand->selectedObjects() );
-		}
-		return( QVector<selectableObject *>() );
+		return( m_rubberBand->selectedObjects() );
 	}
 
 
@@ -125,6 +121,8 @@ public:
 		return( "trackcontainerview" );
 	}
 
+
+	RubberBand *rubberBand() const;
 
 public slots:
 	void realignTracks();

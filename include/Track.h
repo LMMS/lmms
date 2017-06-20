@@ -364,7 +364,6 @@ public slots:
 	void update();
 	void changePosition( const MidiTime & newPos = MidiTime( -1 ) );
 
-
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * dee );
 	virtual void dropEvent( QDropEvent * de );
