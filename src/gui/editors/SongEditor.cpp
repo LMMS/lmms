@@ -783,7 +783,7 @@ void SongEditorWindow::keyPressEvent( QKeyEvent *ke )
 	{
 		m_crtlAction = m_editModeGroup->checkedAction();
 		m_selectModeAction->setChecked( true );
-		m_selectModeAction->triggered( true );
+		m_selectModeAction->trigger();
 	}
 }
 
@@ -797,7 +797,7 @@ void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
 		if( m_crtlAction )
 		{
 			m_crtlAction->setChecked( true );
-			m_crtlAction->triggered( true );
+			m_crtlAction->trigger();
 		}
 	}
 }
