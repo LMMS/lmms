@@ -73,17 +73,16 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	m_recurse( recurse )
 {
 	setWindowTitle( tr( "Browser" ) );
-	m_l = new FileBrowserTreeWidget( contentParent() );
-	addContentWidget( m_l );
 
-	QWidget * ops = new QWidget( contentParent() );
-	ops->setFixedHeight( 24 );
+	QWidget * searchWidget = new QWidget( contentParent() );
+	searchWidget->setFixedHeight( 24 );
 
-	QHBoxLayout * opl = new QHBoxLayout( ops );
-	opl->setMargin( 0 );
-	opl->setSpacing( 0 );
+	QHBoxLayout * searchWidgetLayout = new QHBoxLayout( searchWidget );
+	searchWidgetLayout->setMargin( 0 );
+	searchWidgetLayout->setSpacing( 0 );
 
-	m_filterEdit = new QLineEdit( ops );
+	m_filterEdit = new QLineEdit( searchWidget );
+	m_filterEdit->setPlaceholderText( tr("Search") );
 #if QT_VERSION >= 0x050000
 	m_filterEdit->setClearButtonEnabled( true );
 #endif
@@ -92,14 +91,17 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
-						QString::null, ops );
+						QString::null, searchWidget );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
-	opl->addWidget( m_filterEdit );
-	opl->addSpacing( 5 );
-	opl->addWidget( reload_btn );
+	searchWidgetLayout->addWidget( m_filterEdit );
+	searchWidgetLayout->addSpacing( 5 );
+	searchWidgetLayout->addWidget( reload_btn );
 
-	addContentWidget( ops );
+	addContentWidget( searchWidget );
+
+	m_fileBrowserTreeWidget = new FileBrowserTreeWidget( contentParent() );
+	addContentWidget( m_fileBrowserTreeWidget );
 
 	// Whenever the FileBrowser has focus, Ctrl+F should direct focus to its filter box.
 	QShortcut *filterFocusShortcut = new QShortcut( QKeySequence( QKeySequence::Find ), this, SLOT(giveFocusToFilter()) );
@@ -124,10 +126,10 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 	// call with item=NULL to filter the entire tree
 	bool anyMatched = false;
 
-	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+	int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for( int i = 0; i < numChildren; ++i )
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
+		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 
 		// is directory?
 		if( it->childCount() )
@@ -174,7 +176,7 @@ void FileBrowser::reloadTree( void )
 {
 	const QString text = m_filterEdit->text();
 	m_filterEdit->clear();
-	m_l->clear();
+	m_fileBrowserTreeWidget->clear();
 	QStringList paths = m_directories.split( '*' );
 	for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
 	{
@@ -189,10 +191,10 @@ void FileBrowser::reloadTree( void )
 
 void FileBrowser::expandItems( QTreeWidgetItem * item )
 {
-    int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+    int numChildren = item ? item->childCount() : m_fileBrowserTreeWidget->topLevelItemCount();
 	for( int i = 0; i < numChildren; ++i )
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
+		QTreeWidgetItem * it = item ? item->child( i ) : m_fileBrowserTreeWidget->topLevelItem(i);
 		if ( m_recurse )
 		{
 			it->setExpanded( true );
@@ -228,7 +230,7 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_l->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
+		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
 		return;
 	}
 
@@ -241,15 +243,15 @@ void FileBrowser::addItems(const QString & path )
 		if( cur_file[0] != '.' )
 		{
 			bool orphan = true;
-			for( int i = 0; i < m_l->topLevelItemCount(); ++i )
+			for( int i = 0; i < m_fileBrowserTreeWidget->topLevelItemCount(); ++i )
 			{
 				Directory * d = dynamic_cast<Directory *>(
-						m_l->topLevelItem( i ) );
+						m_fileBrowserTreeWidget->topLevelItem( i ) );
 				if( d == NULL || cur_file < d->text( 0 ) )
 				{
 					Directory *dd = new Directory( cur_file, path,
 												   m_filter );
-					m_l->insertTopLevelItem( i,dd );
+					m_fileBrowserTreeWidget->insertTopLevelItem( i,dd );
 					dd->update();
 					orphan = false;
 					break;
@@ -267,7 +269,7 @@ void FileBrowser::addItems(const QString & path )
 				Directory *d = new Directory( cur_file,
 											  path, m_filter );
 				d->update();
-				m_l->addTopLevelItem( d );
+				m_fileBrowserTreeWidget->addTopLevelItem( d );
 			}
 		}
 	}
@@ -281,13 +283,13 @@ void FileBrowser::addItems(const QString & path )
 		{
 			// TODO: don't insert instead of removing, order changed
 			// remove existing file-items
-			QList<QTreeWidgetItem *> existing = m_l->findItems(
+			QList<QTreeWidgetItem *> existing = m_fileBrowserTreeWidget->findItems(
 					cur_file, Qt::MatchFixedString );
 			if( !existing.empty() )
 			{
 				delete existing.front();
 			}
-			(void) new FileItem( m_l, cur_file, path );
+			(void) new FileItem( m_fileBrowserTreeWidget, cur_file, path );
 		}
 	}
 }
