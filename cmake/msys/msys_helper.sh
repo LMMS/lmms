@@ -15,8 +15,8 @@ function warn() { echo -e "\n${yellow}$1${plain}"; }
 function err() { echo -e "\n${red}$1${plain}"; exit 1;}
 
 info "Checking for mingw environment"
-env |grep MINGW
-if [ $? -ne 0 ]; then
+
+if ! env | grep MINGW; then
 	err "  - Failed. Please relaunch using MinGW shell"
 fi
 
@@ -52,9 +52,8 @@ chmod u+w /mingw64/include/qt4 -R
 chmod u+w /mingw32/include/qt4 -R
 
 info "Merging mingw headers and libraries from ppa over existing system libraries..."
-find /mingw64 |grep sndfile.h
 
-if [ $? -ne 0 ]; then
+if ! find /mingw64 | grep sndfile.h; then
 	command cp -r "$HOME/ppa/opt/mingw"* /
 else
 	warn "  - Skipping, sndfile.h has already been merged"
@@ -70,10 +69,8 @@ stkver="4.5.1"
 info "Downloading and building fltk $fltkver"
 
 mingw_root="/$(echo "$MSYSTEM"|tr '[:upper:]' '[:lower:]')"
-which fluid
-if [ $? -ne 0 ]; then
-	wget http://fltk.org/pub/fltk/$fltkver/fltk-$fltkver-source.tar.gz -O "$HOME/fltk-source.tar.gz"
-	if [ $? -ne 0 ]; then
+if ! which fluid; then
+	if ! wget http://fltk.org/pub/fltk/$fltkver/fltk-$fltkver-source.tar.gz -O "$HOME/fltk-source.tar.gz"; then
 		err "ERROR: Could not download fltk.  Exiting."
 	fi
 	tar zxf "$HOME/fltk-source.tar.gz" -C "$HOME/"
@@ -85,9 +82,8 @@ if [ $? -ne 0 ]; then
 	make
 
 	info "  - Installing fltk..."
-	make install
 
-	if [ $? -ne 0 ]; then
+	if ! make install; then
         	err "ERROR: Could not build/install fltk -- Zyn needs this.  Exiting."
 	fi
 
@@ -100,8 +96,7 @@ fi
 info "Downloading and building libogg $oggver"
 
 if [ ! -e "$mingw_root/lib/libogg.dll.a" ]; then
-	wget http://downloads.xiph.org/releases/ogg/libogg-$oggver.tar.xz -O "$HOME/libogg-source.tar.xz"
-	if [ $? -ne 0 ]; then
+	if ! wget http://downloads.xiph.org/releases/ogg/libogg-$oggver.tar.xz -O "$HOME/libogg-source.tar.xz"; then
 		err "ERROR: Could not download libogg.  Exiting."
 	fi
 	tar xf "$HOME/libogg-source.tar.xz" -C "$HOME/"
@@ -121,9 +116,8 @@ if [ ! -e "$mingw_root/lib/libogg.dll.a" ]; then
 	make
 
 	info "  - Installing libogg..."
-	make install
 
-	if [ $? -ne 0 ]; then
+	if ! make install; then
         	err "ERROR: Could not build/install fltk -- lmms needs this.  Exiting."
 	fi
 
@@ -136,8 +130,7 @@ fi
 info "Downloading and building libvorbis $vorbisver"
 
 if [ ! -e "$mingw_root/lib/libvorbis.dll.a" ]; then
-	wget http://downloads.xiph.org/releases/vorbis/libvorbis-$vorbisver.tar.xz -O "$HOME/libvorbis-source.tar.xz"
-	if [ $? -ne 0 ]; then
+	if ! wget http://downloads.xiph.org/releases/vorbis/libvorbis-$vorbisver.tar.xz -O "$HOME/libvorbis-source.tar.xz"; then
 		err "ERROR: Could not download libogg.  Exiting."
 	fi
 	tar xf "$HOME/libvorbis-source.tar.xz" -C "$HOME/"
@@ -157,9 +150,8 @@ if [ ! -e "$mingw_root/lib/libvorbis.dll.a" ]; then
 	make
 
 	info "  - Installing libvorbis..."
-	make install
 
-	if [ $? -ne 0 ]; then
+	if ! make install; then
         	err "ERROR: Could not build/install libvorbis -- lmms needs this.  Exiting."
 	fi
 
@@ -171,8 +163,7 @@ fi
 info "Downloading and building flac $flacver"
 
 if [ ! -e "$mingw_root/lib/libFLAC.dll.a" ]; then
-	wget http://downloads.xiph.org/releases/flac/flac-$flacver.tar.xz -O "$HOME/flac-source.tar.xz"
-	if [ $? -ne 0 ]; then
+	if ! wget http://downloads.xiph.org/releases/flac/flac-$flacver.tar.xz -O "$HOME/flac-source.tar.xz"; then
 		err "ERROR: Could not download flac.  Exiting."
 	fi
 	tar xf "$HOME/flac-source.tar.xz" -C "$HOME/"
@@ -192,9 +183,8 @@ if [ ! -e "$mingw_root/lib/libFLAC.dll.a" ]; then
 	make
 
 	info "  - Installing flac..."
-	make install
 
-	if [ $? -ne 0 ]; then
+	if ! make install; then
         	err "ERROR: Could not build/install flac -- lmms needs this.  Exiting."
 	fi
 
@@ -206,8 +196,7 @@ fi
 info "Downloading and building libgig $gigver"
 
 if [ ! -e "$mingw_root/lib/libgig/libgig.dll.a" ]; then
-	wget http://download.linuxsampler.org/packages/libgig-$gigver.tar.bz2 -O "$HOME/gig-source.tar.xz"
-	if [ $? -ne 0 ]; then
+	if ! wget http://download.linuxsampler.org/packages/libgig-$gigver.tar.bz2 -O "$HOME/gig-source.tar.xz"; then
 		err "ERROR: Could not download libgig.  Exiting."
 	fi
 	tar xf "$HOME/gig-source.tar.xz" -C "$HOME/"
@@ -222,9 +211,8 @@ if [ ! -e "$mingw_root/lib/libgig/libgig.dll.a" ]; then
 	make install
 
 	mv "$mingw_root/lib/bin/libakai-0.dll" "$mingw_root/bin"
-	mv "$mingw_root/lib/bin/libgig-7.dll" "$mingw_root/bin"
 
-	if [ $? -ne 0 ]; then
+	if ! mv "$mingw_root/lib/bin/libgig-7.dll" "$mingw_root/bin"; then
         	err "ERROR: Could not build/install libgig -- gigplayer needs this.  Exiting."
 	fi
 
@@ -236,8 +224,7 @@ fi
 info "Downloading and building stk $stkver"
 
 if [ ! -e "$mingw_root/lib/libstk.dll" ]; then
-	wget http://ccrma.stanford.edu/software/stk/release/stk-$stkver.tar.gz -O "$HOME/stk-source.tar.xz"
-	if [ $? -ne 0 ]; then
+	if ! wget http://ccrma.stanford.edu/software/stk/release/stk-$stkver.tar.gz -O "$HOME/stk-source.tar.xz"; then
 		err "ERROR: Could not download stk.  Exiting."
 	fi
 	tar xf "$HOME/stk-source.tar.xz" -C "$HOME/"
@@ -249,9 +236,8 @@ if [ ! -e "$mingw_root/lib/libstk.dll" ]; then
 	make
 
 	info "  - Installing stk..."
-	make install
 
-	if [ $? -ne 0 ]; then
+	if ! make install; then
         	err "ERROR: Could not build/install stk -- mallotstk needs this.  Exiting."
 	fi
 
