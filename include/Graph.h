@@ -79,7 +79,8 @@ public:
 		update();
 	}
 
-
+signals:
+	void drawn();
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void dropEvent( QDropEvent * _de );
@@ -145,6 +146,8 @@ public:
 		return( m_samples.data() );
 	}
 
+	void convolve(const float *convolution, const int convolutionLength, const int centerOffset);
+
 public slots:
 	void setRange( float _min, float _max );
 
@@ -165,6 +168,7 @@ public slots:
 	void normalize();
 	void invert();
 	void shiftPhase( int _deg );
+	void clear();
 
 signals:
 	void lengthChanged();
