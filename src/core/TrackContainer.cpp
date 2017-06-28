@@ -93,7 +93,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
-						_this.childNodes().count(),
+						Engine::getSong()->getLoadingTrackCount(),
 						gui->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
@@ -102,8 +102,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		else
 		{
 			start_val = pd->value();
-			pd->setMaximum( pd->maximum() +
-						_this.childNodes().count() );
 		}
 	}
 
