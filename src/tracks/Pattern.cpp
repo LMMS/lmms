@@ -1070,27 +1070,31 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-
 	bool isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
 
-	if( !isDefaultName && m_staticTextName.text() != m_pat->name() )
+	if (!beatPattern && !isDefaultName)
 	{
-		m_staticTextName.setText( m_pat->name() );
-	}
+		p.setRenderHint( QPainter::TextAntialiasing );
 
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
+		QFont font;
+		font.setHintingPreference( QFont::PreferFullHinting );
+		font.setPointSize( 8 );
+		p.setFont( font );
 
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
+		const int textTop = TCO_BORDER_WIDTH + 1;
+		const int textLeft = TCO_BORDER_WIDTH + 3;
 
-	if( !isDefaultName )
-	{
-		p.setPen( textShadowColor() );
-		p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
+		QFontMetrics fontMetrics(font);
+		QString elidedPatternName = fontMetrics.elidedText(m_pat->name(), Qt::ElideMiddle, width() - 2 * textLeft);
+
+		QColor transparentBlack(0, 0, 0, 75);
+		p.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), transparentBlack);
+
+		if( m_staticTextName.text() != elidedPatternName )
+		{
+			m_staticTextName.setText( elidedPatternName );
+		}
+
 		p.setPen( textColor() );
 		p.drawStaticText( textLeft, textTop, m_staticTextName );
 	}
