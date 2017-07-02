@@ -46,6 +46,7 @@ QLineEdit:focus {
 	border: 1px solid #0bd556;
 }
 
+
 QToolTip {
 	border-radius: 4px;
 	background: #040506;
@@ -56,6 +57,7 @@ TextFloat {
 	background: #040506;
 	color: #d1d8e4;
 }
+
 
 QMenu {
 	border-top: 2px solid #08993E;

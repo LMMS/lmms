@@ -24,8 +24,8 @@ AutomationEditor {
 
 	qproperty-graphColor: rgba(153, 175, 255, 200);
 	qproperty-scaleColor: qlineargradient(spread:reflect,
-										 x1:0, y1:0.5, x2:1, y2:0.5,
-										 stop:0 #333, stop:1 #202020);
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #333, stop:1 #202020);
 }
 
 /* text box */
@@ -37,6 +37,7 @@ QLineEdit {
 	color: #e0e0e0;
 }
 
+
 QLineEdit:read-only {
 	border-style: none;
 	background: transparent;
@@ -47,6 +48,7 @@ QLineEdit:read-only {
 QLineEdit:focus {
 	border: 1px solid rgba(0,0,0, 128);
 }
+
 
 QToolTip {
 	border-radius: 4px;
@@ -167,72 +169,72 @@ CPULoadWidget {
 /* scrollbar: trough */
 
 QScrollBar:horizontal {
-	border: 1px solid #131313;
-	background: rgb( 50,50,50 );
-	height: 14px;
-	margin: 0px 13px;
+    border: 1px solid #131313;
+    background: rgb( 50,50,50 );
+    height: 14px;
+    margin: 0px 13px;
 }
 QScrollBar:vertical {
-	border: 1px solid #131313;
-	background: rgb( 50,50,50 );
-	width: 14px;
-	margin: 13px 0px;
+    border: 1px solid #131313;
+    background: rgb( 50,50,50 );
+    width: 14px;
+    margin: 13px 0px;
 }
 
 /* scrollbar: trough clicky things */
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-	background: none;
+    background: none;
 }
 
 QScrollBar::add-page:horizontal:pressed, QScrollBar::sub-page:horizontal:pressed,
 QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
-	background: rgba(0,0,0,50);
+    background: rgba(0,0,0,50);
 }
 
 /* scrollbar: handles (sliders) */
 
 QScrollBar::handle:horizontal {
-	background: qlineargradient(spread:reflect,
-									 x1:0.5, y1:0, x2:0.5, y2:1,
-									 stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
-	border: 1px outset #888;
-	border-radius: 2px;
-	min-width: 24px;
+    background: qlineargradient(spread:reflect,
+                     x1:0.5, y1:0, x2:0.5, y2:1,
+                     stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
+    border: 1px outset #888;
+    border-radius: 2px;
+    min-width: 24px;
 }
 
 QScrollBar::handle:horizontal:hover {
-	background: qlineargradient(spread:reflect,
-									 x1:0.5, y1:0, x2:0.5, y2:1,
-									 stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
+    background: qlineargradient(spread:reflect,
+                     x1:0.5, y1:0, x2:0.5, y2:1,
+                     stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
 }
 
 QScrollBar::handle:horizontal:pressed {
-	background: qlineargradient(spread:reflect,
-									 x1:0.5, y1:0, x2:0.5, y2:1,
-									 stop:0 #747474, stop:1 #c9c9c9);
+    background: qlineargradient(spread:reflect,
+                     x1:0.5, y1:0, x2:0.5, y2:1,
+                     stop:0 #747474, stop:1 #c9c9c9);
 }
 
 QScrollBar::handle:vertical {
-	background: qlineargradient(spread:reflect,
-									 x1:0, y1:0.5, x2:1, y2:0.5,
-									 stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
-	border: 1px outset #888;
-	border-radius: 2px;
-	min-height: 24px;
+    background: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #969696, stop:0.5 #c9c9c9, stop:1 #aaa);
+    border: 1px outset #888;
+    border-radius: 2px;
+    min-height: 24px;
 }
 
 QScrollBar::handle:vertical:hover {
-	background: qlineargradient(spread:reflect,
-									 x1:0, y1:0.5, x2:1, y2:0.5,
-									 stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
+    background: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #969696, stop:0.5 #f0f0f0, stop:1 #aaa);
 }
 
 QScrollBar::handle:vertical:pressed {
-	background: qlineargradient(spread:reflect,
-									 x1:0, y1:0.5, x2:1, y2:0.5,
-									 stop:0 #747474, stop:1 #c9c9c9);
+    background: qlineargradient(spread:reflect,
+                     x1:0, y1:0.5, x2:1, y2:0.5,
+                     stop:0 #747474, stop:1 #c9c9c9);
 }
 
 QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
@@ -244,16 +246,16 @@ QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
 /* arrow buttons */
 
 QScrollBar::add-line, QScrollBar::sub-line {
-	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #c9c9c9, stop:1 #969696 );
-	border-radius: 1px;
-	border: 1px solid #131313;
-	subcontrol-origin: margin;
+    background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #c9c9c9, stop:1 #969696 );
+    border-radius: 1px;
+    border: 1px solid #131313;
+    subcontrol-origin: margin;
 }
 
-QScrollBar::add-line:horizontal   {    subcontrol-position: right; width: 12px;}
-QScrollBar::sub-line:horizontal   {   subcontrol-position: left; width: 12px;}
-QScrollBar::add-line:vertical     {   subcontrol-position: bottom; height: 12px;}
-QScrollBar::sub-line:vertical     {   subcontrol-position: top; height: 12px;}
+QScrollBar::add-line:horizontal 	{  	subcontrol-position: right; width: 12px;}
+QScrollBar::sub-line:horizontal 	{ 	subcontrol-position: left; width: 12px;}
+QScrollBar::add-line:vertical 		{ 	subcontrol-position: bottom; height: 12px;}
+QScrollBar::sub-line:vertical 		{ 	subcontrol-position: top; height: 12px;}
 
 QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
 	background: qradialgradient(cx:0.3, cy:0.3, radius:0.8, fx:0.3, fy:0.3, stop:0 #e0e0e0, stop:0.5 #c9c9c9, stop:1 #969696 );
@@ -271,10 +273,10 @@ QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
 
 QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal,
 QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-		border: none;
-		background-color: none;
-		width: 5px;
-		height: 5px;
+    border: none;
+    background-color: none;
+    width: 5px;
+    height: 5px;
 }
 
 QScrollBar::left-arrow:horizontal { background-image: url(resources:sbarrow_left.png);}
@@ -308,6 +310,7 @@ TrackContentWidget {
 	qproperty-gridColor: rgba( 0, 0, 0, 160 );
 	qproperty-embossColor: rgba( 140, 140, 140, 64 );
 }
+
 
 /* gear button in tracks */
 
@@ -343,7 +346,7 @@ TrackOperationsWidget > QPushButton::menu-indicator:checked
 
 /* actually has no effect yet so disabled */
 /*trackWidget {
-/*  border-bottom: 1px solid rgb(0, 0, 0);*//*
+/*	border-bottom: 1px solid rgb(0, 0, 0);*//*
 	background-color: rgb(0, 0, 0);
 }*/
 
@@ -555,38 +558,37 @@ FxLine {
 	color: #e0e0e0;
 	qproperty-backgroundActive: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:0,
 								stop:0 #7b838d, stop:1 #6b7581 );
-	qproperty-strokeOuterActive: rgb( 0, 0, 0 );
-	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );  
-	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );  
-	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );          
+	qproperty-strokeOuterActive: rgb( 0, 0, 0 );	
+	qproperty-strokeOuterInactive: rgba( 0, 0, 0, 50 );	
+	qproperty-strokeInnerActive: rgba( 255, 255, 255, 100 );	
+	qproperty-strokeInnerInactive: rgba( 255, 255, 255, 50 );					
 }
 
 /* persistent peak markers for fx peak meters */
 Fader {
 	qproperty-peakGreen: rgb( 74, 253, 133);
-	qproperty-peakYellow: rgb(224, 222, 18);
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
 TimeLineWidget {
-	/* font-size only supports px and pt. */
+        /* font-size only supports px and pt. */
 	font-size: 7pt;
 	/* lengths also support em. This will make sure that the height
-		 will always change in the same proportion as the font size
-		 defined above.
-		 If you want a fixed size set min and max to the same value. */
+	   will always change in the same proportion as the font size
+	   defined above.
+	   If you want a fixed size set min and max to the same value. */
 	min-height: 1.5em;
 	max-height: 1.5em;
 
-				background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
-																		 stop: 0 #8796a7, stop: 1.0 #3e454e );
+        background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
+	                                   stop: 0 #8796a7, stop: 1.0 #3e454e );
 
-				qproperty-inactiveLoopColor: rgba( 52, 63, 53, 64 );
+        qproperty-inactiveLoopColor: rgba( 52, 63, 53, 64 );
 	qproperty-inactiveLoopBrush: rgba( 255, 255, 255, 32 );
 	qproperty-inactiveLoopInnerColor: rgba( 255, 255, 255, 32 );
 	qproperty-activeLoopColor: rgba( 52, 63, 53, 255 );
 	qproperty-activeLoopBrush: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,
-																							stop: 0 #378d59, stop: 1.0 #297e36 );
+	                                            stop: 0 #378d59, stop: 1.0 #297e36 );
 	qproperty-activeLoopInnerColor: rgba( 74, 155, 100, 255 );
 	qproperty-barLineColor: rgb( 192, 192, 192 );
 	qproperty-barNumberColor: rgb( 192, 192, 192 );
@@ -761,37 +763,37 @@ sfxrInstrumentView Knob {
 }
 
 sfxrInstrumentView Knob#envKnob {
-	color:  #263352;
+	color:	#263352;
 	qproperty-outerColor: #4b66a4;
 }
 
 sfxrInstrumentView Knob#freqKnob {
-	color:  #1e4a22;
+	color:	#1e4a22;
 	qproperty-outerColor: #3c9544;
 }
 
 sfxrInstrumentView Knob#changeKnob {
-	color:  #591c1c;
+	color:	#591c1c;
 	qproperty-outerColor: #b23737;
 }
 
 sfxrInstrumentView Knob#sqrKnob {
-	color:  #3b2714;
+	color:	#3b2714;
 	qproperty-outerColor: #724c27;
 }
 
 sfxrInstrumentView Knob#repeatKnob {
-	color:  #292929;
+	color:	#292929;
 	qproperty-outerColor: #515151;
 }
 
 sfxrInstrumentView Knob#phaserKnob {
-	color:  #144c4d;
+	color:	#144c4d;
 	qproperty-outerColor: #299899;
 }
 
 sfxrInstrumentView Knob#filterKnob {
-	color:  #47224c;
+	color:	#47224c;
 	qproperty-outerColor: #8e4397;
 }
 
