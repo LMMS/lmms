@@ -86,7 +86,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
-	int start_val = 0;
 	if( !journalRestore && gui != nullptr )
 	{
 		if( pd == NULL )
@@ -98,10 +97,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
-		}
-		else
-		{
-			start_val = pd->value();
 		}
 	}
 
