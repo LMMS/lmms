@@ -567,6 +567,7 @@ FxLine {
 /* persistent peak markers for fx peak meters */
 Fader {
 	qproperty-peakGreen: rgb( 74, 253, 133);
+	qproperty-peakYellow: rgb(224, 222, 18);
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
