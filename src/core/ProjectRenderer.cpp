@@ -103,6 +103,8 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 ProjectRenderer::~ProjectRenderer()
 {
+	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
+	Engine::mixer()->changeQuality( m_oldQualitySettings );
 }
 
 
@@ -201,12 +203,8 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->stopExport();
 
-	const QString f = m_fileDev->outputFile();
-
-	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
-
 	// if the user aborted export-process, the file has to be deleted
+	const QString f = m_fileDev->outputFile();
 	if( m_abort )
 	{
 		QFile( f ).remove();
