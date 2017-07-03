@@ -1057,14 +1057,16 @@ void Song::loadProject( const QString & fileName )
 
 	QDomNodeList tclist=dataFile.content().elementsByTagName("trackcontainer");
 	m_nLoadingTrack=0;
-	for( int i=0,n=tclist.count(); i<n; ++i ){
+	for( int i=0,n=tclist.count(); i<n; ++i )
+	{
 		QDomNode nd=tclist.at(i).firstChild();
 		while(!nd.isNull()){
 			if( nd.isElement() && nd.nodeName() == "track" )
 			{
 				++m_nLoadingTrack;
 				if( nd.toElement().attribute("type").toInt() == Track::BBTrack ){
-					n += nd.toElement().elementsByTagName("bbtrack").at(0).toElement().firstChildElement().childNodes().count();
+					n += nd.toElement().elementsByTagName("bbtrack").at(0)
+						.toElement().firstChildElement().childNodes().count();
 				}
 				nd=nd.nextSibling();
 			}
