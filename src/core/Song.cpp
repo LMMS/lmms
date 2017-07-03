@@ -1060,11 +1060,13 @@ void Song::loadProject( const QString & fileName )
 	for( int i=0,n=tclist.count(); i<n; ++i )
 	{
 		QDomNode nd=tclist.at(i).firstChild();
-		while(!nd.isNull()){
+		while(!nd.isNull())
+		{
 			if( nd.isElement() && nd.nodeName() == "track" )
 			{
 				++m_nLoadingTrack;
-				if( nd.toElement().attribute("type").toInt() == Track::BBTrack ){
+				if( nd.toElement().attribute("type").toInt() == Track::BBTrack )
+				{
 					n += nd.toElement().elementsByTagName("bbtrack").at(0)
 						.toElement().firstChildElement().childNodes().count();
 				}
