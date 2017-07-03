@@ -122,9 +122,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
-			QString trackName = node.toElement().hasAttribute( "name" ) ? node.toElement().attribute( "name" ) :
-															   node.firstChild().toElement().attribute( "name" );
-			pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).arg( pd->value() ).arg( Engine::getSong()->getLoadingTrackCount() ) );
+			QString trackName = node.toElement().hasAttribute( "name" ) ?
+						node.toElement().attribute( "name" ) :
+						node.firstChild().toElement().attribute( "name" );
+			if( pd != NULL )
+			{
+				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
+						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
+			}
 			Track::create( node.toElement(), this );
 		}
 		node = node.nextSibling();
@@ -132,7 +137,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	if( pd != NULL )
 	{
-		pd->setValue( start_val + _this.childNodes().count() );
 		if( was_null )
 		{
 			delete pd;
