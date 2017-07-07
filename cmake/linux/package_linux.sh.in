@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Creates Linux ".AppImage" for @PROJECT_NAME_UCASE@
+
+set -e
+
+USERBIN="$HOME/bin"
+LINUXDEPLOYQT="$USERBIN/linuxdeployqt"
+APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
+
+# TODO: Since DESTDIR is set at build time, the true install location is unknown.
+INSTALL="@CMAKE_BINARY_DIR@/../target"
+
+# linuxdeployqt assumes installations contain /usr/ prefixes.
+# 1. Make a directory containing /usr
+#    > mkdir -p ../target/usr
+# 2. Configure the install prefix for /usr only without "target"
+#    > cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DWANT_QT5=True
+# 3. Use the DESTDIR variables to install to "target" instead
+#    > make DESTDIR=../target/ -j4 install
+make DESTDIR=../target/ -j4 install
+case "@CMAKE_INSTALL_PREFIX@" in 
+  */usr);;
+  *) echo "ERROR: linuxdeployqt requires CMAKE_INSTALL_PREFIX=/usr
+       Re-run cmake and use e.g. 'make DESTDIR=../target/' instead."; exit 1;;
+esac
+
+mkdir -p "$USERBIN"
+
+# Fetch portable linuxdeployqt
+# TODO: Cache and only updated as needed
+wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O "$LINUXDEPLOYQT"
+chmod +x "$LINUXDEPLOYQT"
+
+# Make skeleton AppDir
+rm -rf "$APPDIR"
+mkdir -p "$APPDIR"
+
+# Clone install to AppDir
+cp -R "$INSTALL" "$APPDIR"
+
+# Prepare the launcher
+mv "$APPDIR/usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" "$APPDIR"
+mv "$APPDIR/usr/share/pixmaps/@CMAKE_PROJECT_NAME@.png" "$APPDIR"
+
+# Cleanup orphaned directories
+rmdir "$APPDIR/usr/share/applications/"
+rmdir "$APPDIR/usr/share/pixmaps/"
+
+# Workaround per https://github.com/probonopd/linuxdeployqt/issues/52
+# export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/pulseaudio/:$LD_LIBRARY_PATH
+# ^--- Shouldn't be needed anymore via https://github.com/probonopd/linuxdeployqt/commit/9a93e030cff2cb10e9e672ebb3360d30b3099c6d
+export LD_LIBRARY_PATH="$APPDIR/usr/lib/lmms/":$LD_LIBRARY_PATH
+
+# Bundle both qt and non-qt dependencies into appimage format
+"$LINUXDEPLOYQT" "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -bundle-non-qt-libs
+
+# Run a second time with appimage flag to fix liking
+# TODO: This was reported as a linuxdeployqt "known issue" and can be removed once fixed
+# https://github.com/probonopd/lmms/commit/dc9fd086e344e842613ab45623ed96246ab58e77#commitcomment-22187275
+!! -appimage
+
+# Manually fix RemoteZynAddSubFx Qt5 linking
+# FIXME: RemoteZynAddSubFx will still be linked to the system version e.g. /opt/qt5
+# and will crash if launched on system without Qt5 natively installed.
+
