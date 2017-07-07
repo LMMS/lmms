@@ -71,6 +71,33 @@
 #include "Song.h"
 #include "SetupDialog.h"
 
+#ifdef LMMS_DEBUG_FPE
+#include <fenv.h> // For feenableexcept
+#include <execinfo.h> // For backtrace and backtrace_symbols_fd
+#include <unistd.h> // For STDERR_FILENO
+#include <csignal> // To register the signal handler
+#endif
+
+
+#ifdef LMMS_DEBUG_FPE
+void signalHandler( int signum ) {
+
+	// Get a back trace
+	void *array[10];
+	size_t size;
+
+	// get void*'s for all entries on the stack
+	size = backtrace(array, 10);
+
+	backtrace_symbols_fd(array, size, STDERR_FILENO);
+
+	// cleanup and close up stuff here
+	// terminate program
+
+	exit(signum);
+}
+#endif
+
 static inline QString baseName( const QString & file )
 {
 	return QFileInfo( file ).absolutePath() + "/" +
@@ -195,6 +222,18 @@ void fileCheck( QString &file )
 
 int main( int argc, char * * argv )
 {
+#ifdef LMMS_DEBUG_FPE
+	// Enable exceptions for certain floating point results
+	feenableexcept( FE_INVALID   |
+			FE_DIVBYZERO |
+			FE_OVERFLOW  |
+			FE_UNDERFLOW);
+
+	// Install the trap handler
+	// register signal SIGFPE and signal handler
+	signal(SIGFPE, signalHandler);
+#endif
+
 	// initialize memory managers
 	MemoryManager::init();
 	NotePlayHandleManager::init();

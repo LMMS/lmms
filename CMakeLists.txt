@@ -64,6 +64,7 @@ OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
+OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -420,6 +421,17 @@ IF(LMMS_BUILD_WIN32)
 	SET(STATUS_VST "OK")
 ENDIF(LMMS_BUILD_WIN32)
 
+IF(WANT_DEBUG_FPE)
+	IF(LMMS_BUILD_LINUX)
+		SET(LMMS_DEBUG_FPE TRUE)
+		SET (STATUS_DEBUG_FPE "Enabled")
+	ELSE()
+		SET (STATUS_DEBUG_FPE "Wanted but disabled due to unsupported platform")
+	ENDIF()
+ELSE()
+	SET (STATUS_DEBUG_FPE "Disabled")
+ENDIF(WANT_DEBUG_FPE)
+
 
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
@@ -597,6 +609,12 @@ MESSAGE(
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
 "* GIG player                  : ${STATUS_GIG}\n"
+)
+
+MESSAGE(
+"Developer options\n"
+"-----------------------------------------\n"
+"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
 )
 
 MESSAGE(
