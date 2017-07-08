@@ -14,9 +14,12 @@ APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
 
 mkdir -p "$HOME/bin"
 
-	echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
+# Assumes there's a version of linuxdeployqt for your architecture
+# If this assumption is wrong:
+#  git clone https://github.com/probonopd/linuxdeployqt && cd linuxdeployqt && qmake && make && mv bin/linuxdeployqt ~/bin/
+echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
 # Fetch portable linuxdeployqt if cache is older than 10 days
-if which linuxdeployqt > /dev/null 2>&1; then
+if which linuxdeployqt > /dev/null d2>&1; then
 	echo "     [skipping] The system already provides this utility"
 elif ! find "$LINUXDEPLOYQT" -mtime -10  > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
@@ -42,15 +45,31 @@ echo "     [success]"
 # Fix Zyn linking
 mv "$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" "$APPDIR/usr/bin"
 
+# Backup our desktop file for now, it will confuse linuxdeployqt
+mv "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@_bak.desktop"
+
+# Write a fake desktop file
+echo "[Desktop Entry]
+Type=Application
+Name=@CMAKE_PROJECT_NAME@
+Exec=lmms
+Icon=lmms.png
+MimeType=MimeType=application/x-lmms-project;
+Terminal=false" > "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
+chmod +x "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
+
 echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 # Bundle both qt and non-qt dependencies into appimage format
-"$LINUXDEPLOYQT" "$APPDIR/usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/bin/RemoteZynAddSubFx" -bundle-non-qt-libs
+"$LINUXDEPLOYQT" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/bin/RemoteZynAddSubFx" -bundle-non-qt-libs
 echo "     [success]"
 
 echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
 # Run a second time with appimage flag to fix liking
-"$LINUXDEPLOYQT" "$APPDIR/usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -appimage
+"$LINUXDEPLOYQT" "{$APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -appimage
 echo "     [success]"
+
+# Restore our desktop file
+mv "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@_bak.desktop" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
 
 echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 mv *.AppImage "@APPIMAGE_FILE@"
