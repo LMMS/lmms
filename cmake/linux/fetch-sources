@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+BINDIR="$1"
+BUNDLE_FILE="$2"
+[ "$BINDIR" -a "$BUNDLE_FILE" ]
+
+cd "$BINDIR"
+[ -e download.log ]
+
+rm -fr bundled-source
+mkdir bundled-source
+cd bundled-source
+
+grep "^Get:" ../download.log |
+sed -re "s/.* ([^ ]+) [^ ]+ ([^ ]+) \[.*/\1=\2/" |
+xargs apt-get -d source
+
+cd ..
+tar zcf "$BUNDLE_FILE" bundled-source

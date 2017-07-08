@@ -1,0 +1,47 @@
+#!/bin/sh
+set -e
+[ "$1" ]
+
+VERSION="$1"
+
+if [ $(id -u) -eq 0 ]
+then
+	DIR=/opt/lmms-$VERSION
+	PREFIX=/usr
+	umask 022
+	chmod -R +rX *
+else
+	DIR="$HOME"/.lmms-$VERSION
+	PREFIX="$HOME"/.local
+fi
+echo Installing to $DIR
+mkdir -p "$DIR"
+
+rm -fr "$DIR"/bin "$DIR"/etc "$DIR"/lib "$DIR"/usr
+mv bin etc lib usr "$DIR"
+
+sed -e "/^Exec=/ s#lmms#\"$DIR\"/bin/lmms-launcher#" -i lmms-$VERSION.desktop
+
+ICONDIR="$PREFIX"/share/icons
+mkdir -p "$ICONDIR"
+mv lmms-$VERSION.png "$ICONDIR"
+
+MENUDIR="$PREFIX"/share/applications
+mkdir -p "$MENUDIR"
+mv lmms-$VERSION.desktop "$MENUDIR"
+if [ "$(which update-desktop-database)" ]
+then
+	update-desktop-database "$MENUDIR"
+fi
+
+MIMEDIR="$PREFIX"/share/mime/packages
+if [ ! \( -e "$MIMEDIR"/lmms.xml -o -e /usr/share/mime/packages/lmms.xml -o \
+	-e /usr/local/share/mime/packages/lmms.xml \) ]
+then
+	mkdir -p "$MIMEDIR"
+	mv lmms.xml "$MIMEDIR"
+	if [ "$(which update-mime-database)" ]
+	then
+		update-mime-database "$PREFIX"/share/mime
+	fi
+fi
