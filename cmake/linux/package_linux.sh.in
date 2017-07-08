@@ -9,87 +9,50 @@ GREEN="\\x1B[1;32m"
 YELLOW="\\x1B[1;33m"
 PLAIN="\\x1B[0m"
 
-USERBIN="$HOME/bin"
-LINUXDEPLOYQT="$USERBIN/linuxdeployqt"
+LINUXDEPLOYQT="$HOME/bin/linuxdeployqt"
 APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
 
-# TODO: Since DESTDIR is set at build time, the true install location is unknown.
-INSTALL="@CMAKE_BINARY_DIR@/../target"
+mkdir -p "$HOME/bin"
 
-# linuxdeployqt assumes installations contain /usr/ prefixes.
-# 1. Make a directory containing /usr
-#    > mkdir -p ../target/usr
-# 2. Configure the install prefix for /usr only without "target"
-#    > cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DWANT_QT5=True
-# 3. Use the DESTDIR variables to install to "target" instead
-#    > make DESTDIR=../target/ -j4 install
-make DESTDIR=../target/ -j4 install
-case "@CMAKE_INSTALL_PREFIX@" in 
-  */usr);;
-  *) echo -e "${RED}ERROR: linuxdeployqt requires install prefix of /usr: 
-	Needs:  mkdir ../target/usr	
-	Needs:  CMAKE_INSTALL_PREFIX=/usr
-	Needs:  make DESTDIR=../target
-
-	Wrong:  CMAKE_INSTALL_PREFIX=@CMAKE_INSTALL_PREFIX@	
-${PLAIN}"; exit 1;;
-esac
-
-mkdir -p "$USERBIN"
-
-# Fetch portable linuxdeployqt
-# TODO: Cache and only updated as needed
-echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
-wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O "$LINUXDEPLOYQT" -q
-chmod +x "$LINUXDEPLOYQT"
-echo "     [success]"
+	echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
+# Fetch portable linuxdeployqt if cache is older than 10 days
+if which linuxdeployqt > /dev/null 2>&1; then
+	echo "     [skipping] The system already provides this utility"
+elif ! find "$LINUXDEPLOYQT" -mtime -10  > /dev/null 2>&1; then
+	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
+	echo "     Trying ($(uname -p)): ${url}"
+	wget "$url" -O "$LINUXDEPLOYQT" -q || rm "$LINUXDEPLOYQT" && false
+	chmod +x "$LINUXDEPLOYQT"
+	echo "     [success]"
+else
+	echo "     [skipping] Downloaded version is less than 10 days old"
+fi
 
 # Make skeleton AppDir
 echo -e "${GREEN}Creating ${APPDIR}...${PLAIN}"
 rm -rf "$APPDIR"
-mkdir -p "$APPDIR"
+mkdir -p "$APPDIR/usr"
 echo "     [success]"
 
 # Clone install to AppDir
-echo -e "${GREEN}Copying ${INSTALL} to ${APPDIR}...${PLAIN}"
-cp -R "$INSTALL/usr" "$APPDIR"
+echo -e "${GREEN}Copying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}...${PLAIN}"
+cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
 echo "     [success]"
 
-# Prepare the launcher
-echo -e "${GREEN}Setting up shortcuts...${PLAIN}"
-mv "$APPDIR/usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" "$APPDIR"
-mv "$APPDIR/usr/share/pixmaps/@CMAKE_PROJECT_NAME@.png" "$APPDIR"
-echo "     [success]"
-
-echo -e "${GREEN}Cleaning up...${PLAIN}"
-# Cleanup orphaned directories
-rmdir "$APPDIR/usr/share/applications/"
-rmdir "$APPDIR/usr/share/pixmaps/"
-echo "     [success]"
-
-# Workaround per https://github.com/probonopd/linuxdeployqt/issues/52
-# export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/pulseaudio/:$LD_LIBRARY_PATH
-# ^--- Shouldn't be needed anymore via https://github.com/probonopd/linuxdeployqt/commit/9a93e030cff2cb10e9e672ebb3360d30b3099c6d
-export LD_LIBRARY_PATH="$APPDIR/usr/lib/lmms/":$LD_LIBRARY_PATH
+# Fix Zyn linking
+mv "$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" "$APPDIR/usr/bin"
 
 echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 # Bundle both qt and non-qt dependencies into appimage format
-"$LINUXDEPLOYQT" "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -bundle-non-qt-libs
+"$LINUXDEPLOYQT" "$APPDIR/usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/bin/RemoteZynAddSubFx" -bundle-non-qt-libs
 echo "     [success]"
 
 echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
 # Run a second time with appimage flag to fix liking
-# TODO: This was reported as a linuxdeployqt "known issue" and can be removed once fixed
-# https://github.com/probonopd/lmms/commit/dc9fd086e344e842613ab45623ed96246ab58e77#commitcomment-22187275
-"$LINUXDEPLOYQT" "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -appimage
+"$LINUXDEPLOYQT" "$APPDIR/usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -appimage
 echo "     [success]"
-
 
 echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 mv *.AppImage "@APPIMAGE_FILE@"
-
-# Manually fix RemoteZynAddSubFx Qt5 linking
-# FIXME: RemoteZynAddSubFx will still be linked to the system version e.g. /opt/qt5
-# and will crash if launched on system without Qt5 natively installed.
 
 echo -e "${GREEN}Finished${PLAIN}"
