@@ -84,7 +84,7 @@ cp "${APPDIR}usr/share/pixmaps/lmms.png" "${APPDIR}"
 # Create the AppRun launcher stub
 echo "#!/usr/bin/env bash
 DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" && pwd )\"
-export LD_LIBRARY_PATH=\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
 QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/@CMAKE_PROJECT_NAME@.real \"\$@\"" > "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
 chmod +x "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
 
