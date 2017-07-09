@@ -16,7 +16,14 @@ mkdir -p "$HOME/bin"
 
 # Assumes there's a version of linuxdeployqt for your architecture
 # If this assumption is wrong:
-#  git clone https://github.com/probonopd/linuxdeployqt && cd linuxdeployqt && qmake && make && mv bin/linuxdeployqt ~/bin/
+#  sudo apt-get install autoconf
+#  Compile linuxdeployqt
+#  cd ~ && git clone https://github.com/probonopd/linuxdeployqt && cd linuxdeployqt && qmake && make && mv bin/linuxdeployqt ~/bin/
+#  Download appimagekit
+#  wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$(uname -p).AppImage" -O ~/bin/appimagetool && chmod +x ~/bin/appimagetool
+#  Compile patchelf
+#  cd ~ && git clone https://github.com/NixOS/patchelf && ./bootstrap.sh && ./configure && make && mv src/patchelf ~/bin/
+
 echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
 # Fetch portable linuxdeployqt if cache is older than 10 days
 if which linuxdeployqt > /dev/null d2>&1; then
@@ -43,33 +50,35 @@ cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
 echo "     [success]"
 
 # Fix Zyn linking
-mv "$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" "$APPDIR/usr/bin"
+export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
+ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
+mv "$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" "$ZYNBIN"
 
-# Backup our desktop file for now, it will confuse linuxdeployqt
-mv "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@_bak.desktop"
+# FIXME: Remove our launcher, it will confuse linuxdeployqt
+rm "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
 
 # Write a fake desktop file
 echo "[Desktop Entry]
 Type=Application
 Name=@CMAKE_PROJECT_NAME@
 Exec=lmms
-Icon=lmms.png
+Icon=lmms
 MimeType=MimeType=application/x-lmms-project;
 Terminal=false" > "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
 chmod +x "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
 
 echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 # Bundle both qt and non-qt dependencies into appimage format
-"$LINUXDEPLOYQT" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/bin/RemoteZynAddSubFx" -bundle-non-qt-libs
+"$LINUXDEPLOYQT" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$ZYNBIN" -bundle-non-qt-libs
 echo "     [success]"
+
+# FIXME: Shouldn't need to copy this icon manually
+cp "${APPDIR}usr/share/pixmaps/lmms.png" "${APPDIR}"
 
 echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
 # Run a second time with appimage flag to fix liking
-"$LINUXDEPLOYQT" "{$APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" -appimage
+"$LINUXDEPLOYQT" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$ZYNBIN" -appimage
 echo "     [success]"
-
-# Restore our desktop file
-mv "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@_bak.desktop" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
 
 echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 mv *.AppImage "@APPIMAGE_FILE@"
