@@ -17,5 +17,3 @@ ADD_CUSTOM_TARGET(appimage
 	COMMAND "${CMAKE_BINARY_DIR}/package_linux.sh"
 	COMMENT "Generating AppImage")
 ADD_DEPENDENCIES(appimage removeappimage)
-
-# see also ../postinstall/CMakeLists.txt
