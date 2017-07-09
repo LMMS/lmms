@@ -31,7 +31,7 @@ if which linuxdeployqt > /dev/null d2>&1; then
 elif ! find "$LINUXDEPLOYQT" -mtime -10  > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
 	echo "     Trying ($(uname -p)): ${url}"
-	wget "$url" -O "$LINUXDEPLOYQT" -q || rm "$LINUXDEPLOYQT" && false
+	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
 	chmod +x "$LINUXDEPLOYQT"
 	echo "     [success]"
 else
