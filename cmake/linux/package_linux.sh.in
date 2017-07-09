@@ -74,9 +74,6 @@ echo "     [success]"
 # FIXME: linuxdeployqt should copy this automatically
 cp "${APPDIR}usr/share/pixmaps/lmms.png" "${APPDIR}"
 
-# Remove symlink
-rm -f "${APPDIR}AppRun"
-
 # Create the AppRun launcher stub
 echo "#!/usr/bin/env bash
 export LD_LIBRARY_PATH=../usr/lib/lmms/:\$LD_LIBRARY_PATH
