@@ -11,6 +11,7 @@ PLAIN="\\x1B[0m"
 
 LINUXDEPLOYQT="$HOME/bin/linuxdeployqt"
 APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
+DESKTOPFILE="${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
 
 mkdir -p "$HOME/bin"
 
@@ -41,45 +42,54 @@ fi
 # Make skeleton AppDir
 echo -e "${GREEN}Creating ${APPDIR}...${PLAIN}"
 rm -rf "$APPDIR"
+# FIXME
+#shellcheck disable=SC2203
+rm -f "@CMAKE_BINARY_DIR@/*.AppImage"
 mkdir -p "$APPDIR/usr"
 echo "     [success]"
 
 # Clone install to AppDir
 echo -e "${GREEN}Copying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}...${PLAIN}"
 cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
+
+# Create a wrapper script which calls the lmms executable
+mv "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@" "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@.real"
 echo "     [success]"
 
-# Fix Zyn linking
+# Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
-ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
-mv "$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx" "$ZYNBIN"
 
-# FIXME: Remove our launcher, it will confuse linuxdeployqt
-rm "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
+# Ensure linuxdeployqt can properly relink additional executables
+ZYNLIB="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx"
+VSTLIB="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteVstPlugin.exe.so"
 
-# Write a fake desktop file
-echo "[Desktop Entry]
-Type=Application
-Name=@CMAKE_PROJECT_NAME@
-Exec=lmms
-Icon=lmms
-MimeType=MimeType=application/x-lmms-project;
-Terminal=false" > "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
-chmod +x "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
+# Patch the desktop file
+sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
 echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 # Bundle both qt and non-qt dependencies into appimage format
-"$LINUXDEPLOYQT" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$ZYNBIN" -bundle-non-qt-libs
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNLIB" -executable="$VSTLIB" -bundle-non-qt-libs
 echo "     [success]"
 
-# FIXME: Shouldn't need to copy this icon manually
+# FIXME: linuxdeployqt should copy this automatically
 cp "${APPDIR}usr/share/pixmaps/lmms.png" "${APPDIR}"
 
+# Remove symlink
+rm -f "${APPDIR}AppRun"
+
+# Create the AppRun launcher stub
+echo "#!/usr/bin/env bash
+export LD_LIBRARY_PATH=../usr/lib/lmms/:\$LD_LIBRARY_PATH
+QT_X11_NO_NATIVE_MENUBAR=1 usr/bin/@CMAKE_PROJECT_NAME@.real \"\$@\"" > "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
+chmod +x "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
+
 echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
-# Run a second time with appimage flag to fix liking
-"$LINUXDEPLOYQT" "${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop" -executable="$ZYNBIN" -appimage
+# Run a second time with appimage to create AppImage
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNLIB" -executable="$VSTLIB" -appimage
 echo "     [success]"
 
+# FIXME
+#shellcheck disable=SC2203
 echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 mv *.AppImage "@APPIMAGE_FILE@"
 
