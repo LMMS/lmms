@@ -63,15 +63,22 @@ export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 ZYNLIB="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx"
 VSTLIB="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteVstPlugin.exe.so"
 
+VSTBIN="$APPDIR/usr/bin/RemoteVstPlugin.exe.so"
+ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
+
+# Temporarily move executables to linuxdeployqt-friendly location
+mv "$ZYNLIB" "$ZYNBIN"
+mv "$VSTLIB" "$VSTBIN"
+
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
 echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 # Bundle both qt and non-qt dependencies into appimage format
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNLIB" -executable="$VSTLIB" -bundle-non-qt-libs
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs
 echo "     [success]"
 
-# FIXME: linuxdeployqt should copy this automatically
+# Per https://github.com/probonopd/linuxdeployqt/issues/145
 cp "${APPDIR}usr/share/pixmaps/lmms.png" "${APPDIR}"
 
 # Create the AppRun launcher stub
@@ -81,14 +88,18 @@ export LD_LIBRARY_PATH=\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
 QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/@CMAKE_PROJECT_NAME@.real \"\$@\"" > "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
 chmod +x "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
 
+# Restore executables' location
+mv "$ZYNBIN" "$ZYNLIB"
+mv "$VSTBIN" "$VSTLIB"
+
 echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
 # Run a second time with appimage to create AppImage
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNLIB" -executable="$VSTLIB" -appimage
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -appimage
 echo "     [success]"
 
+echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 # FIXME
 #shellcheck disable=SC2203
-echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 mv *.AppImage "@APPIMAGE_FILE@"
 
 echo -e "${GREEN}Finished${PLAIN}"
