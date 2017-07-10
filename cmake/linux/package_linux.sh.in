@@ -27,7 +27,8 @@ if which linuxdeployqt > /dev/null d2>&1; then
 	echo "     [skipping] The system already provides this utility"
 elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD|grep -q "." > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
-	echo "     Trying ($(uname -p)): ${url}"
+	echo "     Couldn't find linuxdeployqt newer than $DAYSOLD days old"
+	echo "     Downloading ($(uname -p)): ${url}"
 	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
 	chmod +x "$LINUXDEPLOYQT"
 	echo "     [success]"
@@ -38,10 +39,6 @@ fi
 # Make skeleton AppDir
 echo -e "${GREEN}Creating ${APPDIR}...${PLAIN}"
 rm -rf "$APPDIR"
-# FIXME
-# Per https://github.com/probonopd/linuxdeployqt/issues/146
-#shellcheck disable=SC2203
-rm -f "@CMAKE_BINARY_DIR@/*.AppImage"
 mkdir -p "$APPDIR/usr"
 echo "     [success]"
 

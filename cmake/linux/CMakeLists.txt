@@ -10,7 +10,7 @@ CONFIGURE_FILE("package_linux.sh.in"    "${CMAKE_BINARY_DIR}/package_linux.sh" @
 
 FILE(REMOVE "${APPIMAGE_FILE}")
 ADD_CUSTOM_TARGET(removeappimage
-	COMMAND touch "${APPIMAGE_FILE}" && rm "${APPIMAGE_FILE}"
+	COMMAND rm -f "${APPIMAGE_FILE}"
 	COMMENT "Removing old AppImage")
 ADD_CUSTOM_TARGET(appimage 
 	COMMAND chmod +x "${CMAKE_BINARY_DIR}/package_linux.sh"
