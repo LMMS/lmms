@@ -596,6 +596,7 @@ TrackContentObjectView   {
 PatternView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
+	font-size: 11px;
 }
 
 /* sample track pattern */
