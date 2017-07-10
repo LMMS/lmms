@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 # Creates Linux ".AppImage" for @PROJECT_NAME_UCASE@
+#
+# Depends:  linuxdeployqt
+#
+# Notes:    Will attempt to fetch linuxdeployqt automatically (x86_64 only)
+#           See Also: https://github.com/probonopd/linuxdeployqt/blob/master/BUILDING.md
 
 set -e
 
@@ -15,34 +20,26 @@ DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 
 mkdir -p "$HOME/bin"
 
-# Assumes there's a version of linuxdeployqt for your architecture
-# If this assumption is wrong:
-#  sudo apt-get install autoconf
-#  Compile linuxdeployqt
-#  cd ~ && git clone https://github.com/probonopd/linuxdeployqt && cd linuxdeployqt && qmake && make && mv bin/linuxdeployqt ~/bin/
-#  Download appimagekit
-#  wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-$(uname -p).AppImage" -O ~/bin/appimagetool && chmod +x ~/bin/appimagetool
-#  Compile patchelf
-#  cd ~ && git clone https://github.com/NixOS/patchelf && ./bootstrap.sh && ./configure && make && mv src/patchelf ~/bin/
-
+# Fetch portable linuxdeployqt if cache is older than $DAYSOLD
 echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
-# Fetch portable linuxdeployqt if cache is older than 10 days
+DAYSOLD=2
 if which linuxdeployqt > /dev/null d2>&1; then
 	echo "     [skipping] The system already provides this utility"
-elif ! find "$LINUXDEPLOYQT" -mtime -10  > /dev/null 2>&1; then
+elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD|grep -q "." > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
 	echo "     Trying ($(uname -p)): ${url}"
 	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
 	chmod +x "$LINUXDEPLOYQT"
 	echo "     [success]"
 else
-	echo "     [skipping] Downloaded version is less than 10 days old"
+	echo "     [skipping] Downloaded version is less than $DAYSOLD days old"
 fi
 
 # Make skeleton AppDir
 echo -e "${GREEN}Creating ${APPDIR}...${PLAIN}"
 rm -rf "$APPDIR"
 # FIXME
+# Per https://github.com/probonopd/linuxdeployqt/issues/146
 #shellcheck disable=SC2203
 rm -f "@CMAKE_BINARY_DIR@/*.AppImage"
 mkdir -p "$APPDIR/usr"
@@ -59,27 +56,23 @@ echo "     [success]"
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
-# Ensure linuxdeployqt can properly relink additional executables
+# Executables in the lib directory
 ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
 VSTLIB="$APPDIR/usr/lib/lmms/RemoteVstPlugin.exe.so"
 
+# Temporarily move executables
 VSTBIN="$APPDIR/usr/bin/RemoteVstPlugin.exe.so"
 ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
-
-# Temporarily move executables to linuxdeployqt-friendly location
 mv "$ZYNLIB" "$ZYNBIN"
 mv "$VSTLIB" "$VSTBIN"
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
-echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 # Bundle both qt and non-qt dependencies into appimage format
+echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 "$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs
 echo "     [success]"
-
-# Per https://github.com/probonopd/linuxdeployqt/issues/145
-# cp "${DATA_DIR}/icons/hicolor/scalable/apps/lmms.svg" "${APPDIR}"
 
 # Create the AppRun launcher stub
 echo "#!/usr/bin/env bash
@@ -88,17 +81,17 @@ export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
 QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
 chmod +x "${APPDIR}usr/bin/lmms"
 
-# Restore executables' location
+# Move executables back to lib directory
 mv "$ZYNBIN" "$ZYNLIB"
 mv "$VSTBIN" "$VSTLIB"
 
+# Run a second time to create AppImage
 echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
-# Run a second time with appimage to create AppImage
 "$LINUXDEPLOYQT" "$DESKTOPFILE" -appimage
 echo "     [success]"
-
 echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
 # FIXME
+# Per https://github.com/probonopd/linuxdeployqt/issues/146
 #shellcheck disable=SC2203
 mv *.AppImage "@APPIMAGE_FILE@"
 
