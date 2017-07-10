@@ -1076,15 +1076,14 @@ void PatternView::paintEvent( QPaintEvent * )
 	{
 		p.setRenderHint( QPainter::TextAntialiasing );
 
-		QFont font;
-		font.setHintingPreference( QFont::PreferFullHinting );
-		font.setPointSize( 8 );
-		p.setFont( font );
+		QFont labelFont = this->font();
+		labelFont.setHintingPreference( QFont::PreferFullHinting );
+		p.setFont( labelFont );
 
 		const int textTop = TCO_BORDER_WIDTH + 1;
 		const int textLeft = TCO_BORDER_WIDTH + 3;
 
-		QFontMetrics fontMetrics(font);
+		QFontMetrics fontMetrics(labelFont);
 		QString elidedPatternName = fontMetrics.elidedText(m_pat->name(), Qt::ElideMiddle, width() - 2 * textLeft);
 
 		QColor transparentBlack(0, 0, 0, 75);
@@ -1110,7 +1109,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
-	// draw the 'muted' pixmap only if the pattern was manualy muted
+	// draw the 'muted' pixmap only if the pattern was manually muted
 	if( m_pat->isMuted() )
 	{
 		const int spacing = TCO_BORDER_WIDTH;
