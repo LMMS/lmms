@@ -45,10 +45,15 @@ echo "     [success]"
 # Clone install to AppDir
 echo -e "${GREEN}Copying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}...${PLAIN}"
 cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
+echo "     [success]"
 
 # Create a wrapper script which calls the lmms executable
 mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
-echo "     [success]"
+echo "#!/usr/bin/env bash
+DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" && pwd )\"
+export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
+QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
+chmod +x "${APPDIR}usr/bin/lmms"
 
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
@@ -70,13 +75,6 @@ sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 "$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs
 echo "     [success]"
-
-# Create the AppRun launcher stub
-echo "#!/usr/bin/env bash
-DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" && pwd )\"
-export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
-QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
-chmod +x "${APPDIR}usr/bin/lmms"
 
 # Move executables back to lib directory
 mv "$ZYNBIN" "$ZYNLIB"
