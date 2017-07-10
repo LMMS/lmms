@@ -11,7 +11,7 @@ PLAIN="\\x1B[0m"
 
 LINUXDEPLOYQT="$HOME/bin/linuxdeployqt"
 APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
-DESKTOPFILE="${APPDIR}usr/share/applications/@CMAKE_PROJECT_NAME@.desktop"
+DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 
 mkdir -p "$HOME/bin"
 
@@ -53,15 +53,15 @@ echo -e "${GREEN}Copying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}...${PLAIN}"
 cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
 
 # Create a wrapper script which calls the lmms executable
-mv "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@" "$APPDIR/usr/bin/@CMAKE_PROJECT_NAME@.real"
+mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
 echo "     [success]"
 
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can properly relink additional executables
-ZYNLIB="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteZynAddSubFx"
-VSTLIB="$APPDIR/usr/lib/@CMAKE_PROJECT_NAME@/RemoteVstPlugin.exe.so"
+ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
+VSTLIB="$APPDIR/usr/lib/lmms/RemoteVstPlugin.exe.so"
 
 VSTBIN="$APPDIR/usr/bin/RemoteVstPlugin.exe.so"
 ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
@@ -79,14 +79,14 @@ echo -e "${GREEN}Bundling dependencies...${PLAIN}"
 echo "     [success]"
 
 # Per https://github.com/probonopd/linuxdeployqt/issues/145
-cp "${APPDIR}usr/share/pixmaps/lmms.png" "${APPDIR}"
+# cp "${DATA_DIR}/icons/hicolor/scalable/apps/lmms.svg" "${APPDIR}"
 
 # Create the AppRun launcher stub
 echo "#!/usr/bin/env bash
 DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" && pwd )\"
 export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
-QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/@CMAKE_PROJECT_NAME@.real \"\$@\"" > "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
-chmod +x "${APPDIR}usr/bin/@CMAKE_PROJECT_NAME@"
+QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
+chmod +x "${APPDIR}usr/bin/lmms"
 
 # Restore executables' location
 mv "$ZYNBIN" "$ZYNLIB"
