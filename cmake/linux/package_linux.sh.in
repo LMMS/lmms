@@ -39,6 +39,13 @@ function skipped {
 	echo -e "   ${PLAIN}[${YELLOW}skipped${PLAIN}] ${1}"
 }
 
+
+# Check for problematic install locations
+INSTALL=$(echo "@CMAKE_INSTALL_PREFIX@" | sed 's/\/*$//g')
+if [ "$INSTALL" == "/usr/local" ] || [ "$INSTALL" == "/usr" ] ; then
+	error "Incompatible CMAKE_INSTALL_PREFIX for creating AppImage: @CMAKE_INSTALL_PREFIX@"
+fi
+
 echo -e "\nWriting verbose output to \"${LOGFILE}\""
 
 # Fetch portable linuxdeployqt if cache is older than $DAYSOLD
