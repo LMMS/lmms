@@ -8,44 +8,66 @@
 
 set -e
 
+LINUXDEPLOYQT="$HOME/bin/linuxdeployqt"
+VERBOSITY=2 # 3=debug
+LOGFILE="@CMAKE_BINARY_DIR@/linuxdeployqt.log"
+APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
+DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
+STRIP=""
+
+# Don't strip for debug builds
+if [[ "@CMAKE_BUILD_TYPE@" == *"Debug"* ]]; then
+	STRIP="-no-strip"
+fi
+
 # Console colors
 RED="\\x1B[1;31m"
 GREEN="\\x1B[1;32m"
 YELLOW="\\x1B[1;33m"
 PLAIN="\\x1B[0m"
 
-LINUXDEPLOYQT="$HOME/bin/linuxdeployqt"
-APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
-DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
+function error {
+	echo -e "   ${PLAIN}[${RED}error${PLAIN}] ${1}"
+	return 1
+}
 
-mkdir -p "$HOME/bin"
+function success {
+	echo -e "   ${PLAIN}[${GREEN}success${PLAIN}] ${1}"
+}
+
+function skipped {
+	echo -e "   ${PLAIN}[${YELLOW}skipped${PLAIN}] ${1}"
+}
+
+echo -e "\nWriting verbose output to \"${LOGFILE}\""
 
 # Fetch portable linuxdeployqt if cache is older than $DAYSOLD
-echo -e "${GREEN}Downloading linuxdeployqt to ${LINUXDEPLOYQT}${PLAIN}..."
+echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
+mkdir -p "$HOME/bin"
 DAYSOLD=2
 if which linuxdeployqt > /dev/null d2>&1; then
-	echo "     [skipping] The system already provides this utility"
-elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD|grep -q "." > /dev/null 2>&1; then
+	skipped "System already provides this utility"
+elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
-	echo "     Couldn't find linuxdeployqt newer than $DAYSOLD days old"
-	echo "     Downloading ($(uname -p)): ${url}"
+	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
+	echo "   [.......] Downloading ($(uname -p)): ${url}"
 	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
 	chmod +x "$LINUXDEPLOYQT"
-	echo "     [success]"
+	success "Downloaded $LINUXDEPLOYQT"
 else
-	echo "     [skipping] Downloaded version is less than $DAYSOLD days old"
+	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
 fi
 
 # Make skeleton AppDir
-echo -e "${GREEN}Creating ${APPDIR}...${PLAIN}"
+echo -e "\nCreating ${APPDIR}..."
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr"
-echo "     [success]"
+success "Created ${APPDIR}"
 
 # Clone install to AppDir
-echo -e "${GREEN}Copying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}...${PLAIN}"
+echo -e "\nCopying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}..."
 cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
-echo "     [success]"
+success "${APPDIR}"
 
 # Create a wrapper script which calls the lmms executable
 mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
@@ -72,22 +94,25 @@ mv "$VSTLIB" "$VSTBIN"
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
 # Bundle both qt and non-qt dependencies into appimage format
-echo -e "${GREEN}Bundling dependencies...${PLAIN}"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs
-echo "     [success]"
+echo -e "\nBundling and relinking system dependencies..."
+echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+success "Bundled and relinked dependencies"
 
 # Move executables back to lib directory
 mv "$ZYNBIN" "$ZYNLIB"
 mv "$VSTBIN" "$VSTLIB"
 
 # Run a second time to create AppImage
-echo -e "${GREEN}Finishing the AppImage...${PLAIN}"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -appimage
-echo "     [success]"
-echo -e "${GREEN}Moving to @APPIMAGE_FILE@...${PLAIN}"
+echo -e "\nFinishing the AppImage..."
+echo -e "\n\n#### linuxdeployqt pass 2 ####" > "$LOGFILE"
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+success "Created .AppImage"
+
+echo -e "\nMoving to @APPIMAGE_FILE@..."
 # FIXME
 # Per https://github.com/probonopd/linuxdeployqt/issues/146
-#shellcheck disable=SC2203
-mv *.AppImage "@APPIMAGE_FILE@"
+mv ./*.AppImage "@APPIMAGE_FILE@"
+success "Created @APPIMAGE_FILE@"
 
-echo -e "${GREEN}Finished${PLAIN}"
+echo -e "\nFinished"
