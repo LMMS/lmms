@@ -15,8 +15,8 @@ APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
 DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 STRIP=""
 
-# Don't strip for debug builds
-if [[ "@CMAKE_BUILD_TYPE@" == *"Debug"* ]]; then
+# Don't strip for Debug|RelWithDebInfo builds
+if [[ "@CMAKE_BUILD_TYPE@" == *"Deb"* ]]; then
 	STRIP="-no-strip"
 fi
 
