@@ -74,6 +74,7 @@ success "Created ${APPDIR}"
 # Clone install to AppDir
 echo -e "\nCopying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}..."
 cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
+rm -rf "$APPDIR/usr/include"
 success "${APPDIR}"
 
 # Create a wrapper script which calls the lmms executable
