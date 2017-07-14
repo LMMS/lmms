@@ -9,6 +9,7 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0003 NEW)
 	IF (CMAKE_MAJOR_VERSION GREATER 2)
 		CMAKE_POLICY(SET CMP0026 OLD)
+		CMAKE_POLICY(SET CMP0050 OLD)
 	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
 
@@ -29,7 +30,7 @@ SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
 SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc2")
+SET(VERSION_STAGE       "rc3")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -50,6 +51,7 @@ OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
+OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
@@ -305,6 +307,21 @@ IF(NOT LMMS_HAVE_PULSEAUDIO)
 	SET(PULSEAUDIO_LIBRARIES "")
 ENDIF(NOT LMMS_HAVE_PULSEAUDIO)
 
+
+# check for MP3/Lame-libraries
+IF(WANT_MP3LAME)
+	FIND_PACKAGE(Lame)
+	IF(LAME_FOUND)
+		SET(LMMS_HAVE_MP3LAME TRUE)
+		SET(STATUS_MP3LAME "OK")
+	ELSE(LAME_FOUND)
+		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
+		SET(LAME_LIBRARIES "")
+		SET(LAME_INCLUDE_DIRS "")
+	ENDIF(LAME_FOUND)
+ELSE(WANT_MP3LAME)
+	SET(STATUS_MP3LAME "Disabled for build")
+ENDIF(WANT_MP3LAME)
 
 # check for OGG/Vorbis-libraries
 IF(WANT_OGGVORBIS)
@@ -593,6 +610,7 @@ MESSAGE(
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
+"* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
 
 MESSAGE(

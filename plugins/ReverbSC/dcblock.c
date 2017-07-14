@@ -10,6 +10,7 @@
  *
  */
 
+#include <math.h>
 #include <stdlib.h>
 #include "base.h"
 #include "dcblock.h"
@@ -26,11 +27,11 @@ int sp_dcblock_destroy(sp_dcblock **p)
     return SP_OK;
 }
 
-int sp_dcblock_init(sp_data *sp, sp_dcblock *p)
+int sp_dcblock_init(sp_data *sp, sp_dcblock *p, int oversampling )
 {
     p->outputs = 0.0;
     p->inputs = 0.0;
-    p->gain = 0.99;
+    p->gain = pow( 0.99, 1.0f / oversampling );
     if (p->gain == 0.0 || p->gain>=1.0 || p->gain<=-1.0)
       p->gain = 0.99;
     return SP_OK;
