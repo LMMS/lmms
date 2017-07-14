@@ -30,6 +30,9 @@
 #include "RemotePlugin.h"
 
 
+//#define LMMS_EMBED_VST
+
+
 struct VstParameterDumpItem
 {
 	int32_t index;
@@ -56,6 +59,7 @@ enum VstRemoteMessageIDs
 {
 	// vstPlugin -> remoteVstPlugin
 	IdVstLoadPlugin = IdUserBase,
+	// TODO: Drop IdVstPluginWindowInformation, Windows hack for Qt 4
 	IdVstPluginWindowInformation,
 	IdVstClosePlugin,
 	IdVstSetTempo,

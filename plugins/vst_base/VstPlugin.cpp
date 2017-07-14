@@ -35,6 +35,8 @@
 #if QT_VERSION < 0x050000
 #include <QX11EmbedContainer>
 #include <QX11Info>
+#else
+#include <QWindow>
 #endif
 #else
 #include <QLayout>
@@ -52,9 +54,9 @@
 #include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
-#include <QLayout>
 
 
+#if QT_VERSION < 0x050000
 class vstSubWin : public QMdiSubWindow
 {
 public:
@@ -76,6 +78,7 @@ public:
 		e->ignore();
 	}
 } ;
+#endif
 
 
 
@@ -135,27 +138,13 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 {
 	init( remoteVstPluginExecutable, false );
 
+	waitForHostInfoGotten();
+	if( failed() )
+	{
+		return;
+	}
+
 	lock();
-#ifdef LMMS_BUILD_WIN32
-	QWidget * helper = new QWidget;
-	QHBoxLayout * l = new QHBoxLayout( helper );
-	QWidget * target = new QWidget( helper );
-	l->setSpacing( 0 );
-	l->setMargin( 0 );
-	l->addWidget( target );
-
-	static int k = 0;
-	const QString t = QString( "vst%1%2" ).arg( GetCurrentProcessId()<<10 ).
-								arg( ++k );
-	helper->setWindowTitle( t );
-
-	// we've to call that for making sure, Qt created the windows
-	(void) helper->winId();
-	(void) target->winId();
-
-	sendMessage( message( IdVstPluginWindowInformation ).
-					addString( QSTR_TO_STDSTR( t ) ) );
-#endif
 
 	VstHostLanguages hlang = LanguageEnglish;
 	switch( QLocale::system().language() )
@@ -183,27 +172,12 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 	waitForInitDone();
 
 	unlock();
-
-#ifdef LMMS_BUILD_WIN32
-	if( !failed() && m_pluginWindowID )
-	{
-		target->setFixedSize( m_pluginGeometry );
-		vstSubWin * sw = new vstSubWin(
-					gui->mainWindow()->workspace() );
-		sw->setWidget( helper );
-		helper->setWindowTitle( name() );
-		m_pluginWidget = helper;
-	}
-	else
-	{
-		delete helper;
-	}
-#endif
 }
 
 
 
 
+#ifdef LMMS_EMBED_VST
 void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 {
 	QWidget * w = pluginWidget();
@@ -232,6 +206,7 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
+#if QT_VERSION < 0x050000
 	m_pluginWidget = new QWidget( _parent );
 	m_pluginWidget->setFixedSize( m_pluginGeometry );
 	m_pluginWidget->setWindowTitle( name() );
@@ -244,34 +219,36 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 			sw->setAttribute( Qt::WA_TranslucentBackground );
 			sw->setWindowFlags( Qt::FramelessWindowHint );
 			sw->setWidget( m_pluginWidget );
-#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->show();
-#endif
 		} 
 		else
 		{
 			sw->setWindowFlags( Qt::WindowCloseButtonHint );
 			sw->setWidget( m_pluginWidget );
 
-#if QT_VERSION < 0x050000
 			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
 			xe->embedClient( m_pluginWindowID );
 			xe->setFixedSize( m_pluginGeometry );
 			xe->move( 4, 24 );
 			xe->show();
-#endif
 		}
 	}
-
+#else
+	QWindow * window = QWindow::fromWinId( m_pluginWindowID );
+	m_pluginWidget = QWidget::createWindowContainer( window, _parent,
+								Qt::Window );
+	m_pluginWidget->setFixedSize( m_pluginGeometry );
+	m_pluginWidget->setWindowTitle( name() );
+	// TODO: Synchronize show
+	// Tell remote that it is embedded
+	// Wait for remote reply
+#endif
 #endif
 
-	if( m_pluginWidget )
-	{
-		m_pluginWidget->show();
-	}
+	m_pluginWidget->show();
 }
 
 
@@ -289,8 +266,22 @@ void VstPlugin::hideEditor()
 
 
 
+void VstPlugin::toggleEditor()
+{
+	QWidget * w = m_pluginWidget;
+	if( w )
+	{
+		w->setVisible( !w->isVisible() );
+	}
+}
+#endif
+
+
+
+
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
+#ifdef LMMS_EMBED_VST
 	if( pluginWidget() != NULL )
 	{
 		if( _this.attribute( "guivisible" ).toInt() )
@@ -302,6 +293,16 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 			hideEditor();
 		}
 	}
+#else
+	if( _this.attribute( "guivisible" ).toInt() )
+	{
+		showUI();
+	}
+	else
+	{
+		hideUI();
+	}
+#endif
 
 	const int num_params = _this.attribute( "numparams" ).toInt();
 	// if it exists try to load settings chunk
@@ -334,10 +335,18 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
+#ifdef LMMS_EMBED_VST
 	if( pluginWidget() != NULL )
 	{
 		_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
 	}
+#else
+	int visible = isUIVisible();
+	if ( visible != -1 )
+	{
+		_this.setAttribute( "guivisible", visible );
+	}
+#endif
 
 	// try to save all settings in a chunk
 	QByteArray chunk = saveChunk();
