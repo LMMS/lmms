@@ -85,6 +85,7 @@ SET(LMMS_SRCS
 	gui/widgets/ToolButton.cpp
 	gui/widgets/ToolTip.cpp
 	gui/widgets/TrackLabelButton.cpp
+	gui/widgets/TrackRenameLineEdit.cpp
 	gui/widgets/VisualizationWidget.cpp
 
 	PARENT_SCOPE
