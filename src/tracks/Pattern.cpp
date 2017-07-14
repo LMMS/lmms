@@ -42,6 +42,8 @@
 #include "StringPairDrag.h"
 #include "MainWindow.h"
 
+#include <limits>
+
 
 QPixmap * PatternView::s_stepBtnOn0 = NULL;
 QPixmap * PatternView::s_stepBtnOn200 = NULL;
@@ -856,7 +858,10 @@ void PatternView::wheelEvent( QWheelEvent * _we )
 }
 
 
-
+static int computeNoteRange(int minKey, int maxKey)
+{
+	return (maxKey - minKey) + 1;
+}
 
 void PatternView::paintEvent( QPaintEvent * )
 {
@@ -901,90 +906,118 @@ void PatternView::paintEvent( QPaintEvent * )
 		p.fillRect( rect(), c );
 	}
 
+	// Check whether we will paint a text box and compute its potential height
+	// This is needed so we can paint the notes beneath it.
+	bool const isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
+	bool const drawTextBox = !beatPattern && !isDefaultName;
+
+	int textBoxHeight = 0;
+	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textLeft = TCO_BORDER_WIDTH + 3;
+	if (drawTextBox)
+	{
+		QFont labelFont = this->font();
+		labelFont.setHintingPreference( QFont::PreferFullHinting );
+
+		QFontMetrics fontMetrics(labelFont);
+		textBoxHeight = fontMetrics.height() + 2 * textTop;
+	}
+
 	// Compute pixels per tact
 	const int baseWidth = fixedTCOs() ? parentWidget()->width() : width();
 	const float pixelsPerTact = ( baseWidth - 2 * TCO_BORDER_WIDTH ) / (float) m_pat->length().getTact();
-	const float pixelsPerTick = pixelsPerTact / MidiTime::ticksPerTact();
+
+	// Length of one tact/beat in the [0,1] x [0,1] coordinate system
+	const float tactLength = 1. / m_pat->length().getTact();
+	const float tickLength = tactLength / MidiTime::ticksPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
 
 	// melody pattern paint event
-	if( m_pat->m_patternType == Pattern::MelodyPattern )
+	NoteVector const & noteCollection = m_pat->m_notes;
+	if( m_pat->m_patternType == Pattern::MelodyPattern && !noteCollection.empty() )
 	{
-		if( m_pat->m_notes.size() > 0 )
+		// Compute the minimum and maximum key in the pattern
+		// so that we know how much there is to draw.
+		int maxKey = std::numeric_limits<int>::min();
+		int minKey = std::numeric_limits<int>::max();
+
+		for (Note const * note : noteCollection)
 		{
-			// first determine the central tone so that we can
-			// display the area where most of the m_notes are
-			// also calculate min/max tones so the tonal range can be
-			// properly stretched accross the pattern vertically
+			int const key = note->key();
+			maxKey = qMax( maxKey, key );
+			minKey = qMin( minKey, key );
+		}
 
-			int central_key = 0;
-			int max_key = 0;
-			int min_key = 9999999;
-			int total_notes = 0;
+		// set colour based on mute status
+		QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
+		p.setPen( noteColor.darker() );
 
-			for (Note const * note : m_pat->m_notes)
+		p.setRenderHint(QPainter::Antialiasing);
+
+		p.save();
+
+		// Transform such that [0, 1] x [0, 1] paints in the correct area
+		float distanceToTop = textBoxHeight;
+
+		// This moves the notes smoothly under the text
+		int widgetHeight = height();
+		int fullyAtTopAtLimit = MINIMAL_TRACK_HEIGHT;
+		int fullyBelowAtLimit = 4 * fullyAtTopAtLimit;
+		if (widgetHeight <= fullyBelowAtLimit)
+		{
+			if (widgetHeight <= fullyAtTopAtLimit)
 			{
-				int const key = note->key();
-				max_key = qMax( max_key, key );
-				min_key = qMin( min_key, key );
-				central_key += key;
-				++total_notes;
+				distanceToTop = 0;
 			}
-
-			if( total_notes > 0 )
+			else
 			{
-				central_key /= total_notes;
-				const int keyrange = qMax( qMax( max_key - central_key, central_key - min_key ), 1 );
-
-				// debug code
-				// qDebug( "keyrange: %d", keyrange );
-
-				// determine height of the pattern view, sans borders
-				const int ht = (height() - 1 - TCO_BORDER_WIDTH * 2) -1;
-
-				// determine maximum height value for drawing bounds checking
-				const int max_ht = height() - 1 - TCO_BORDER_WIDTH;
-
-				const int numberOfPotentialNotes = std::max((max_key - min_key) + 1, 12);
-				const int noteHeight = static_cast<float>(max_ht) / numberOfPotentialNotes;
-
-				// set colour based on mute status
-				QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
-				p.setPen( noteColor );
-
-				// scan through all the notes and draw them on the pattern
-				for (Note const * currentNote : m_pat->m_notes)
-				{
-					// calculate relative y-position
-					const float y_key =
-						( float( central_key - currentNote->key() ) / keyrange + 1.0f ) / 2;
-					// multiply that by pattern height
-					const int y_pos = static_cast<int>( TCO_BORDER_WIDTH + y_key * ht ) + 1;
-
-					// debug code
-					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
-
-					// check that note isn't out of bounds, and has a length
-					if( y_pos >= TCO_BORDER_WIDTH && y_pos <= max_ht )
-					{
-						// calculate start and end x-coords of the line to be drawn
-						int length = currentNote->length();
-						length = length > 0 ? length : 4;
-
-						const int x1 = x_base + static_cast<int>( currentNote->pos() * pixelsPerTick );
-						const int x2 = x_base + static_cast<int>( ( currentNote->pos() + length ) * pixelsPerTick );
-
-						// check bounds, draw line
-						if( x1 < width() - TCO_BORDER_WIDTH )
-						{
-							//p.drawLine( x1, y_pos, qMin( x2, width() - TCO_BORDER_WIDTH ), y_pos );
-							p.fillRect( x1, y_pos - noteHeight / 2, qMin( x2, width() - TCO_BORDER_WIDTH ) - x1, noteHeight, noteColor );
-						}
-					}
-				}
+				float const a = 1. / (fullyAtTopAtLimit - fullyBelowAtLimit);
+				float const b = - float(fullyBelowAtLimit) / (fullyAtTopAtLimit - fullyBelowAtLimit);
+				float const scale = a * widgetHeight + b;
+				distanceToTop = (1. - scale) * textBoxHeight;
 			}
 		}
+
+		p.translate(0., distanceToTop);
+		p.scale(width(), height() - distanceToTop);
+
+		int const minimalNoteRange = 12; // Always paint at least one octave
+		int const actualNoteRange = computeNoteRange(minKey, maxKey);
+
+		if (actualNoteRange < minimalNoteRange)
+		{
+			int missingNumberOfNotes = minimalNoteRange - actualNoteRange;
+			minKey = std::max(0, minKey - missingNumberOfNotes / 2);
+			maxKey = maxKey + missingNumberOfNotes / 2;
+			if (missingNumberOfNotes % 2 == 1)
+			{
+				// Put more range at the top to bias drawing towards the bottom
+				++maxKey;
+			}
+		}
+
+		int const adjustedNoteRange = computeNoteRange(minKey, maxKey);
+		float const noteHeight = 1. / adjustedNoteRange;
+
+		// scan through all the notes and draw them on the pattern
+		for (Note const * currentNote : noteCollection)
+		{
+			// Map to 0, 1, 2, ...
+			int mappedNoteKey = currentNote->key() - minKey;
+			int invertedMappedNoteKey = adjustedNoteRange - mappedNoteKey - 1;
+
+			float const noteStartX = currentNote->pos() * tickLength;
+			float const noteLength = currentNote->length() * tickLength;
+
+			float const noteStartY = invertedMappedNoteKey * noteHeight;
+
+			QRectF noteRectF( noteStartX, noteStartY, noteLength, noteHeight);
+			p.fillRect( noteRectF, noteColor );
+			p.drawRect( noteRectF );
+		}
+
+		p.restore();
 	}
 
 	// beat pattern paint event
@@ -1069,24 +1102,23 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// pattern name
-	bool isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
-
-	if (!beatPattern && !isDefaultName)
+	if (drawTextBox)
 	{
 		paintTextLabel(m_pat->name(), p);
 	}
 
-	// inner border
 	if( !beatPattern )
 	{
+		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 			rect().bottom() - TCO_BORDER_WIDTH );
 
-	// outer border
-	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
-	p.drawRect( 0, 0, rect().right(), rect().bottom() );
+		// outer border
+		p.setPen( current ? c.lighter( 130 ) : c.darker( 300 ) );
+		p.drawRect( rect() );
 	}
+
 	// draw the 'muted' pixmap only if the pattern was manually muted
 	if( m_pat->isMuted() )
 	{
