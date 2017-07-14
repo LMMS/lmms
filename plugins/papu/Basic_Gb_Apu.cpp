@@ -14,15 +14,11 @@ more details. You should have received a copy of the GNU Lesser General
 Public License along with this module; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
 
-gb_time_t const frame_length = 70224;
+blip_time_t const frame_length = 70224;
 
 Basic_Gb_Apu::Basic_Gb_Apu()
 {
 	time = 0;
-	
-	// Adjust frequency equalization to make it sound like a tiny speaker
-	apu.treble_eq( -20.0 ); // lower values muffle it more
-	buf.bass_freq( 461 ); // higher values simulate smaller speaker
 }
 
 Basic_Gb_Apu::~Basic_Gb_Apu()
@@ -36,12 +32,12 @@ blargg_err_t Basic_Gb_Apu::set_sample_rate( long rate )
 	return buf.set_sample_rate( rate );
 }
 
-void Basic_Gb_Apu::write_register( gb_addr_t addr, int data )
+void Basic_Gb_Apu::write_register( blip_time_t addr, int data )
 {
 	apu.write_register( clock(), addr, data );
 }
 
-int Basic_Gb_Apu::read_register( gb_addr_t addr )
+int Basic_Gb_Apu::read_register( blip_time_t addr )
 {
 	return apu.read_register( clock(), addr );
 }
@@ -49,8 +45,8 @@ int Basic_Gb_Apu::read_register( gb_addr_t addr )
 void Basic_Gb_Apu::end_frame()
 {
 	time = 0;
-	bool stereo = apu.end_frame( frame_length );
-	buf.end_frame( frame_length, stereo );
+	apu.end_frame( frame_length );
+	buf.end_frame( frame_length );
 }
 
 long Basic_Gb_Apu::samples_avail() const
