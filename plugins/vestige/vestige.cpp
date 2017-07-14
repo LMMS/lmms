@@ -415,9 +415,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
 	m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu_active" ) );
+							"controls_active" ) );
 	m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu" ) );
+							"controls" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
 	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
