@@ -92,6 +92,7 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
 						QString::null, searchWidget );
+	reload_btn->setToolTip( tr( "Refresh list" ) );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
 	searchWidgetLayout->addWidget( m_filterEdit );
