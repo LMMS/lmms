@@ -88,9 +88,9 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_managePluginButton->setCheckable( false );
 		m_managePluginButton->setCursor( Qt::PointingHandCursor );
 		m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu" ) );
+							"controls_active" ) );
 		m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu" ) );
+							"controls" ) );
 		connect( m_managePluginButton, SIGNAL( clicked() ),  _ctl,
 						SLOT( managePlugin() ) );
 		ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
@@ -98,8 +98,8 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_managePluginButton->setWhatsThis(
 			tr( "Click here, if you want to control VST-plugin from host." ) );
 
-		m_managePluginButton->setMinimumWidth( 21 );
-		m_managePluginButton->setMaximumWidth( 21 );
+		m_managePluginButton->setMinimumWidth( 26 );
+		m_managePluginButton->setMaximumWidth( 26 );
 		m_managePluginButton->setMinimumHeight( 21 );
 		m_managePluginButton->setMaximumHeight( 21 );
 
@@ -216,7 +216,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		space1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 		QFont f( "Arial", 10 );
 
-		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed, 
+		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed,
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
 		l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
@@ -250,8 +250,8 @@ void VstEffectControlDialog::paintEvent( QPaintEvent * )
 {
 	if( m_plugin != NULL && tbLabel != NULL )
 	{
-		tbLabel->setText( tr( "Effect by: " ) + m_plugin->vendorString() + 
-			tr( "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />" ) + 
+		tbLabel->setText( tr( "Effect by: " ) + m_plugin->vendorString() +
+			tr( "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />" ) +
 			m_plugin->currentProgramName() );
 	}
 }
