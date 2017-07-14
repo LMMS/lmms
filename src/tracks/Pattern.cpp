@@ -879,7 +879,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
-	bool muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
+	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 
@@ -901,11 +901,10 @@ void PatternView::paintEvent( QPaintEvent * )
 		p.fillRect( rect(), c );
 	}
 
-	const float ppt = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_pat->length().getTact() :
-				( width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_pat->length().getTact();
+	// Compute pixels per tact
+	const int baseWidth = fixedTCOs() ? parentWidget()->width() : width();
+	const float pixelsPerTact = ( baseWidth - 2 * TCO_BORDER_WIDTH ) / (float) m_pat->length().getTact();
+	const float pixelsPerTick = pixelsPerTact / MidiTime::ticksPerTact();
 
 	const int x_base = TCO_BORDER_WIDTH;
 
@@ -924,18 +923,18 @@ void PatternView::paintEvent( QPaintEvent * )
 			int min_key = 9999999;
 			int total_notes = 0;
 
-			for( NoteVector::Iterator it = m_pat->m_notes.begin();
-					it != m_pat->m_notes.end(); ++it )
+			for (Note const * note : m_pat->m_notes)
 			{
-				max_key = qMax( max_key, ( *it )->key() );
-				min_key = qMin( min_key, ( *it )->key() );
-				central_key += ( *it )->key();
+				int const key = note->key();
+				max_key = qMax( max_key, key );
+				min_key = qMin( min_key, key );
+				central_key += key;
 				++total_notes;
 			}
 
 			if( total_notes > 0 )
 			{
-				central_key = central_key / total_notes;
+				central_key /= total_notes;
 				const int keyrange = qMax( qMax( max_key - central_key, central_key - min_key ), 1 );
 
 				// debug code
@@ -947,17 +946,19 @@ void PatternView::paintEvent( QPaintEvent * )
 				// determine maximum height value for drawing bounds checking
 				const int max_ht = height() - 1 - TCO_BORDER_WIDTH;
 
+				const int numberOfPotentialNotes = std::max((max_key - min_key) + 1, 12);
+				const int noteHeight = static_cast<float>(max_ht) / numberOfPotentialNotes;
+
 				// set colour based on mute status
-				p.setPen( muted ? mutedColor() : painter.pen().brush().color() );
+				QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
+				p.setPen( noteColor );
 
 				// scan through all the notes and draw them on the pattern
-				for( NoteVector::Iterator it =
-							m_pat->m_notes.begin();
-					it != m_pat->m_notes.end(); ++it )
+				for (Note const * currentNote : m_pat->m_notes)
 				{
 					// calculate relative y-position
 					const float y_key =
-						( float( central_key - ( *it )->key() ) / keyrange + 1.0f ) / 2;
+						( float( central_key - currentNote->key() ) / keyrange + 1.0f ) / 2;
 					// multiply that by pattern height
 					const int y_pos = static_cast<int>( TCO_BORDER_WIDTH + y_key * ht ) + 1;
 
@@ -965,23 +966,21 @@ void PatternView::paintEvent( QPaintEvent * )
 					// if( ( *it )->length() > 0 ) qDebug( "key %d, central_key %d, y_key %f, y_pos %d", ( *it )->key(), central_key, y_key, y_pos );
 
 					// check that note isn't out of bounds, and has a length
-					if( y_pos >= TCO_BORDER_WIDTH &&
-								y_pos <= max_ht )
+					if( y_pos >= TCO_BORDER_WIDTH && y_pos <= max_ht )
 					{
 						// calculate start and end x-coords of the line to be drawn
-						int length = ( *it )->length();
+						int length = currentNote->length();
 						length = length > 0 ? length : 4;
-						const int x1 = x_base +
-							static_cast<int>
-							( ( *it )->pos() * ( ppt / MidiTime::ticksPerTact() ) );
-						const int x2 = x_base +
-							static_cast<int>
-							( ( ( *it )->pos() + length ) * ( ppt / MidiTime::ticksPerTact() ) );
+
+						const int x1 = x_base + static_cast<int>( currentNote->pos() * pixelsPerTick );
+						const int x2 = x_base + static_cast<int>( ( currentNote->pos() + length ) * pixelsPerTick );
 
 						// check bounds, draw line
 						if( x1 < width() - TCO_BORDER_WIDTH )
-							p.drawLine( x1, y_pos,
-										qMin( x2, width() - TCO_BORDER_WIDTH ), y_pos );
+						{
+							//p.drawLine( x1, y_pos, qMin( x2, width() - TCO_BORDER_WIDTH ), y_pos );
+							p.fillRect( x1, y_pos - noteHeight / 2, qMin( x2, width() - TCO_BORDER_WIDTH ) - x1, noteHeight, noteColor );
+						}
 					}
 				}
 			}
@@ -989,7 +988,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || ppt >= 96
+	else if( beatPattern &&	( fixedTCOs() || pixelsPerTact >= 96
 			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
 	{
 		QPixmap stepon0;
@@ -1060,12 +1059,12 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	for( tact_t t = 1; t < m_pat->length().getTact(); ++t )
 	{
-		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
+		p.drawLine( x_base + static_cast<int>( pixelsPerTact * t ) - 1,
 				TCO_BORDER_WIDTH, x_base + static_cast<int>(
-						ppt * t ) - 1, TCO_BORDER_WIDTH + lineSize );
-		p.drawLine( x_base + static_cast<int>( ppt * t ) - 1,
+						pixelsPerTact * t ) - 1, TCO_BORDER_WIDTH + lineSize );
+		p.drawLine( x_base + static_cast<int>( pixelsPerTact * t ) - 1,
 				rect().bottom() - ( lineSize + TCO_BORDER_WIDTH ),
-				x_base + static_cast<int>( ppt * t ) - 1,
+				x_base + static_cast<int>( pixelsPerTact * t ) - 1,
 				rect().bottom() - TCO_BORDER_WIDTH );
 	}
 
