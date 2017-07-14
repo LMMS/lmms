@@ -70,8 +70,7 @@ inline int AudioFileOgg::writePage()
 bool AudioFileOgg::startEncoding()
 {
 	vorbis_comment vc;
-	const char * comments = "Cool=This song has been made using Linux "
-							"MultiMedia Studio";
+	const char * comments = "Cool=This song has been made using LMMS";
 	int comment_length = strlen( comments );
 	char * user_comments = new char[comment_length + 1];
 	strcpy( user_comments, comments );
@@ -100,7 +99,7 @@ bool AudioFileOgg::startEncoding()
 		m_rate = 48000;
 		setSampleRate( 48000 );
 	}
-	m_serialNo 	= 0;			// track-num?
+
 	m_comments 	= &vc;			// comments for ogg-file
 
 	// Have vorbisenc choose a mode for us
@@ -135,6 +134,10 @@ bool AudioFileOgg::startEncoding()
 	vorbis_analysis_init( &m_vd, &m_vi );
 	vorbis_block_init( &m_vd, &m_vb );
 
+	// We give our ogg file a random serial number and avoid
+	// 0 and UINT32_MAX which can get you into trouble.
+	qsrand( time( 0 ) );
+	m_serialNo = 0xD0000000 + qrand() % 0x0FFFFFFF;
 	ogg_stream_init( &m_os, m_serialNo );
 
 	// Now, build the three header packets and send through to the stream

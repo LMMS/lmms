@@ -48,12 +48,14 @@ public:
 		return &m_reverbSCControls;
 	}
 
+	void changeSampleRate();
 
 private:
 	ReverbSCControls m_reverbSCControls;
 	sp_data *sp;
 	sp_revsc *revsc;
 	sp_dcblock *dcblk[2];
+	QMutex mutex;
 	friend class ReverbSCControls;
 } ;
 

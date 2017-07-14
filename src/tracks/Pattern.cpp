@@ -361,9 +361,7 @@ void Pattern::checkType()
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
-		if( ( *it )->length() > 0 ||
-			( *it )->pos() % ( MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() ) )
+		if( ( *it )->length() > 0 )
 		{
 			setType( MelodyPattern );
 			return;
