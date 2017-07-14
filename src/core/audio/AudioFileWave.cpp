@@ -79,7 +79,12 @@ bool AudioFileWave::startEncoding()
 					outputFile().toUtf8().constData(),
 #endif
 					SFM_WRITE, &m_si );
+
+	// Prevent fold overs when encountering clipped data
+	sf_command(m_sf, SFC_SET_CLIPPING, NULL, SF_TRUE);
+
 	sf_set_string ( m_sf, SF_STR_SOFTWARE, "LMMS" );
+
 	return true;
 }
 

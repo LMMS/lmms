@@ -75,6 +75,10 @@ IF(NOT ("${OGGVORBIS_INCLUDE_DIR}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${OGGVORBIS_INCLUDE_DIR}")
 ENDIF()
 
+IF(NOT ("${LAME_INCLUDE_DIRS}" STREQUAL ""))
+	INCLUDE_DIRECTORIES("${LAME_INCLUDE_DIRS}")
+ENDIF()
+
 # Use libraries in non-standard directories (e.g., another version of Qt)
 IF(LMMS_BUILD_LINUX)
 	LINK_LIBRARIES(-Wl,--enable-new-dtags)
@@ -136,6 +140,7 @@ SET(LMMS_REQUIRED_LIBS
 	${PULSEAUDIO_LIBRARIES}
 	${JACK_LIBRARIES}
 	${OGGVORBIS_LIBRARIES}
+	${LAME_LIBRARIES}
 	${SAMPLERATE_LIBRARIES}
 	${SNDFILE_LIBRARIES}
 	${EXTRA_LIBRARIES}
@@ -191,6 +196,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
 					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
+					"${MINGW_PREFIX}/bin/libmp3lame-0.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
