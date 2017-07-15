@@ -948,21 +948,23 @@ void PatternView::paintEvent( QPaintEvent * )
 			minKey = qMin( minKey, key );
 		}
 
-		// set colour based on mute status
-		bool const drawAsLines = height() < 64;
-		QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
+		// If needed adjust the note range so that we always have paint a certain interval
+		int const minimalNoteRange = 12; // Always paint at least one octave
+		int const actualNoteRange = computeNoteRange(minKey, maxKey);
 
-		p.save();
+		if (actualNoteRange < minimalNoteRange)
+		{
+			int missingNumberOfNotes = minimalNoteRange - actualNoteRange;
+			minKey = std::max(0, minKey - missingNumberOfNotes / 2);
+			maxKey = maxKey + missingNumberOfNotes / 2;
+			if (missingNumberOfNotes % 2 == 1)
+			{
+				// Put more range at the top to bias drawing towards the bottom
+				++maxKey;
+			}
+		}
 
-		if (drawAsLines)
-		{
-			p.setPen( noteColor );
-		}
-		else
-		{
-			p.setPen( noteColor.darker() );
-			p.setRenderHint(QPainter::Antialiasing);
-		}
+		int const adjustedNoteRange = computeNoteRange(minKey, maxKey);
 
 		// Transform such that [0, 1] x [0, 1] paints in the correct area
 		float distanceToTop = textBoxHeight;
@@ -987,26 +989,33 @@ void PatternView::paintEvent( QPaintEvent * )
 		}
 
 		int const notesBorder = 4; // Border for the notes towards the top and bottom in pixels
+
+		// The relavant painting code starts here
+		p.save();
+
 		p.translate(0., distanceToTop + notesBorder);
 		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
 
+		// set colour based on mute status
+		QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
 
-		int const minimalNoteRange = 12; // Always paint at least one octave
-		int const actualNoteRange = computeNoteRange(minKey, maxKey);
-
-		if (actualNoteRange < minimalNoteRange)
+		bool const drawAsLines = height() < 64;
+		if (drawAsLines)
 		{
-			int missingNumberOfNotes = minimalNoteRange - actualNoteRange;
-			minKey = std::max(0, minKey - missingNumberOfNotes / 2);
-			maxKey = maxKey + missingNumberOfNotes / 2;
-			if (missingNumberOfNotes % 2 == 1)
-			{
-				// Put more range at the top to bias drawing towards the bottom
-				++maxKey;
-			}
+			p.setPen( noteColor );
+		}
+		else
+		{
+			p.setPen( noteColor.darker() );
+			p.setRenderHint(QPainter::Antialiasing);
 		}
 
-		int const adjustedNoteRange = computeNoteRange(minKey, maxKey);
+		// Needed for Qt5 although the documentation for QPainter::setPen(QColor) as it's used above
+		// states that it should already set a width of 0.
+		QPen pen = p.pen();
+		pen.setWidth(0);
+		p.setPen(pen);
+
 		float const noteHeight = 1. / adjustedNoteRange;
 
 		// scan through all the notes and draw them on the pattern
