@@ -274,6 +274,9 @@ static void sendXEmbedMessage(WId window, long message,
 	c.data.l[3] = data1;
 	c.data.l[4] = data2;
 
+#ifdef QX11EMBED_DEBUG
+	qDebug() << "Sending XEMBED message" << message <<  detail << data1 << data2;
+#endif
 	XSendEvent(display, window, false, NoEventMask, (XEvent *) &c);
 }
 
@@ -990,6 +993,9 @@ void QX11EmbedContainerPrivate::acceptClient(WId window)
 	else
 		sendXEmbedMessage(client, XEMBED_FOCUS_OUT);
 
+	// This is from the original Qt implementation. Disabled for now because it appears
+	// to cause the mouse being grabbed permanently in some environments
+	/*
 	if (!clientIsXEmbed) {
 		checkGrab();
 		if (q->hasFocus()) {
@@ -999,6 +1005,7 @@ void QX11EmbedContainerPrivate::acceptClient(WId window)
 		if (!isEmbedded())
 			moveInputToProxy();
 	}
+	*/
 
 	emit q->clientIsEmbedded();
 }
