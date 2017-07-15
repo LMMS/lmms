@@ -155,6 +155,10 @@ f_cnt_t MidiTime::frames( const float framesPerTick ) const
 	return 0;
 }
 
+double MidiTime::getTimeInMilliseconds(bpm_t beatsPerMinute) const
+{
+	return ticksToMilliseconds(getTicks(), beatsPerMinute);
+}
 
 MidiTime MidiTime::fromFrames( const f_cnt_t frames, const float framesPerTick )
 {
@@ -190,4 +194,10 @@ void MidiTime::setTicksPerTact( tick_t tpt )
 MidiTime MidiTime::stepPosition( int step )
 {
 	return step * ticksPerTact() / stepsPerTact();
+}
+
+double MidiTime::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
+{
+	// 60 * 1000 / 48 = 1250
+	return ( ticks * 1250 ) / beatsPerMinute;
 }
