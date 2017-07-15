@@ -48,6 +48,7 @@
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "EffectRackView.h"
+#include "FxMixerView.h"
 #include "TabWidget.h"
 #include "TrackLabelButton.h"
 
@@ -807,6 +808,44 @@ SampleTrackView::~SampleTrackView()
 
 
 
+QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
+{
+	int channelIndex = model()->effectChannelModel()->value();
+
+	FxChannel *fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+
+	// If title allows interpolation, pass channel index and name
+	if ( title.contains( "%2" ) )
+	{
+		title = title.arg( channelIndex ).arg( fxChannel->m_name );
+	}
+
+	QMenu *fxMenu = new QMenu( title );
+
+	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
+
+	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
+	fxMenu->addSeparator();
+
+	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
+	{
+		FxChannel * currentChannel = Engine::fxMixer()->effectChannel( i );
+
+		if ( currentChannel != fxChannel )
+		{
+			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
+			QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
+			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
+		}
+	}
+
+	connect(fxMenuSignalMapper, SIGNAL(mapped(int)), this, SLOT(assignFxLine(int)));
+
+	return fxMenu;
+}
+
+
+
 
 void SampleTrackView::showEffects()
 {
@@ -903,7 +942,7 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * _stv) :
 
 
 	// setup spinbox for selecting FX-channel
-	m_effectChannelNumber = new FxLineLcdSpinBox(2, NULL, tr("FX channel"));
+	m_effectChannelNumber = new FxLineLcdSpinBox(2, NULL, tr("FX channel"), m_stv);
 
 	basicControlsLayout->addWidget(m_effectChannelNumber, 0, 3);
 	basicControlsLayout->setAlignment(m_effectChannelNumber, widgetAlignment);
@@ -977,6 +1016,29 @@ void SampleTrackWindow::modelChanged()
 	m_effectChannelNumber->setModel(&m_track->m_effectChannelModel);
 
 	updateName();
+}
+
+
+
+/*! \brief Create and assign a new FX Channel for this track */
+void SampleTrackView::createFxLine()
+{
+	int channelIndex = gui->fxMixerView()->addNewChannel();
+
+	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+
+	assignFxLine(channelIndex);
+}
+
+
+
+
+/*! \brief Assign a specific FX Channel for this track */
+void SampleTrackView::assignFxLine(int channelIndex)
+{
+	model()->effectChannelModel()->setValue( channelIndex );
+
+	gui->fxMixerView()->setCurrentFxLine( channelIndex );
 }
 
 

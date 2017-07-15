@@ -666,6 +666,10 @@ public:
 
 	virtual void update();
 
+	// Create a menu for assigning/creating channels for this track
+	// Currently instrument track and sample track supports it
+	virtual QMenu * createFxMenu( QString title, QString newFxLabel );
+
 
 public slots:
 	virtual bool close();

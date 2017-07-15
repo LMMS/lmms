@@ -205,6 +205,9 @@ public:
 	}
 
 
+	virtual QMenu * createFxMenu( QString title, QString newFxLabel );
+
+
 public slots:
 	void showEffects();
 
@@ -217,13 +220,15 @@ protected:
 	}
 
 
+private slots:
+	void assignFxLine( int channelIndex );
+	void createFxLine();
+
+
 private:
-	EffectRackView * m_effectRack;
-	QWidget * m_effWindow;
 	SampleTrackWindow * m_window;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
-	LcdSpinBox * m_effectChannelNumber;
 
 	TrackLabelButton * m_tlb;
 

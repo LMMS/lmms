@@ -27,21 +27,25 @@
 
 #include "LcdSpinBox.h"
 
-class InstrumentTrackWindow;
+class TrackView;
 
 
 class FxLineLcdSpinBox : public LcdSpinBox
 {
 	Q_OBJECT
 public:
-	FxLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name) :
-		LcdSpinBox(numDigits, parent, name)
+	FxLineLcdSpinBox(int numDigits, QWidget * parent, const QString& name, TrackView * tv = NULL) :
+		LcdSpinBox(numDigits, parent, name), m_tv( tv )
 	{}
 	virtual ~FxLineLcdSpinBox() {}
+
 
 protected:
 	virtual void mouseDoubleClickEvent(QMouseEvent* event);
 	virtual void contextMenuEvent(QContextMenuEvent* event);
+
+private:
+	TrackView * m_tv;
 
 };
 
