@@ -361,9 +361,7 @@ void Pattern::checkType()
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
-		if( ( *it )->length() > 0 ||
-			( *it )->pos() % ( MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() ) )
+		if( ( *it )->length() > 0 )
 		{
 			setType( MelodyPattern );
 			return;
@@ -1070,27 +1068,30 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-
 	bool isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
 
-	if( !isDefaultName && m_staticTextName.text() != m_pat->name() )
+	if (!beatPattern && !isDefaultName)
 	{
-		m_staticTextName.setText( m_pat->name() );
-	}
+		p.setRenderHint( QPainter::TextAntialiasing );
 
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
+		QFont labelFont = this->font();
+		labelFont.setHintingPreference( QFont::PreferFullHinting );
+		p.setFont( labelFont );
 
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
+		const int textTop = TCO_BORDER_WIDTH + 1;
+		const int textLeft = TCO_BORDER_WIDTH + 3;
 
-	if( !isDefaultName )
-	{
-		p.setPen( textShadowColor() );
-		p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
+		QFontMetrics fontMetrics(labelFont);
+		QString elidedPatternName = fontMetrics.elidedText(m_pat->name(), Qt::ElideMiddle, width() - 2 * textLeft);
+
+		QColor transparentBlack(0, 0, 0, 75);
+		p.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), transparentBlack);
+
+		if( m_staticTextName.text() != elidedPatternName )
+		{
+			m_staticTextName.setText( elidedPatternName );
+		}
+
 		p.setPen( textColor() );
 		p.drawStaticText( textLeft, textTop, m_staticTextName );
 	}
@@ -1106,7 +1107,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
-	// draw the 'muted' pixmap only if the pattern was manualy muted
+	// draw the 'muted' pixmap only if the pattern was manually muted
 	if( m_pat->isMuted() )
 	{
 		const int spacing = TCO_BORDER_WIDTH;

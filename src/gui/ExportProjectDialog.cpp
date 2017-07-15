@@ -58,7 +58,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	int cbIndex = 0;
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
-		if( ProjectRenderer::fileEncodeDevices[i].m_getDevInst != NULL )
+		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
 		{
 			// get the extension of this format
 			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
@@ -128,7 +128,20 @@ void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 }
 
 
-
+OutputSettings::StereoMode mapToStereoMode(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return OutputSettings::StereoMode_Stereo;
+	case 1:
+		return OutputSettings::StereoMode_JointStereo;
+	case 2:
+		return OutputSettings::StereoMode_Mono;
+	default:
+		return OutputSettings::StereoMode_Stereo;
+	}
+}
 
 void ExportProjectDialog::startExport()
 {
@@ -146,7 +159,8 @@ void ExportProjectDialog::startExport()
 	OutputSettings os = OutputSettings(
 			samplerates[ samplerateCB->currentIndex() ],
 			bitRateSettings,
-			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ) );
+			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
+			mapToStereoMode(stereoModeComboBox->currentIndex()) );
 
 	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
 
@@ -181,6 +195,8 @@ ProjectRenderer::ExportFileFormats convertIndexToExportFileFormat(int index)
 		return ProjectRenderer::WaveFile;
 	case 1:
 		return ProjectRenderer::OggFile;
+	case 2:
+		return ProjectRenderer::MP3File;
 	default:
 		Q_ASSERT(false);
 		break;
@@ -195,10 +211,23 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	ProjectRenderer::ExportFileFormats exportFormat =
 			convertIndexToExportFileFormat(index);
 
-	bool bitRateControlsEnabled = exportFormat == ProjectRenderer::OggFile;
+	bool stereoModeVisible = exportFormat == ProjectRenderer::MP3File;
+
+	bool sampleRateControlsVisible = exportFormat != ProjectRenderer::MP3File;
+
+	bool bitRateControlsEnabled =
+			(exportFormat == ProjectRenderer::OggFile ||
+			 exportFormat == ProjectRenderer::MP3File);
+
 	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
 
+	bool variableBitrateVisible = exportFormat != ProjectRenderer::MP3File;
+
+	stereoModeWidget->setVisible(stereoModeVisible);
+	sampleRateWidget->setVisible(sampleRateControlsVisible);
+
 	bitrateWidget->setVisible(bitRateControlsEnabled);
+	checkBoxVariableBitRate->setVisible(variableBitrateVisible);
 
 	depthWidget->setVisible(bitDepthControlEnabled);
 }

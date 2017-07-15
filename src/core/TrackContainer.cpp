@@ -86,24 +86,17 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	static QProgressDialog * pd = NULL;
 	bool was_null = ( pd == NULL );
-	int start_val = 0;
 	if( !journalRestore && gui != nullptr )
 	{
 		if( pd == NULL )
 		{
 			pd = new QProgressDialog( tr( "Loading project..." ),
 						tr( "Cancel" ), 0,
-						_this.childNodes().count(),
+						Engine::getSong()->getLoadingTrackCount(),
 						gui->mainWindow() );
 			pd->setWindowModality( Qt::ApplicationModal );
 			pd->setWindowTitle( tr( "Please wait..." ) );
 			pd->show();
-		}
-		else
-		{
-			start_val = pd->value();
-			pd->setMaximum( pd->maximum() +
-						_this.childNodes().count() );
 		}
 	}
 
@@ -124,6 +117,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 		if( node.isElement() &&
 			!node.toElement().attribute( "metadata" ).toInt() )
 		{
+			QString trackName = node.toElement().hasAttribute( "name" ) ?
+						node.toElement().attribute( "name" ) :
+						node.firstChild().toElement().attribute( "name" );
+			if( pd != NULL )
+			{
+				pd->setLabelText( tr("Loading Track %1 (%2/Total %3)").arg( trackName ).
+						  arg( pd->value() + 1 ).arg( Engine::getSong()->getLoadingTrackCount() ) );
+			}
 			Track::create( node.toElement(), this );
 		}
 		node = node.nextSibling();
@@ -131,7 +132,6 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 	if( pd != NULL )
 	{
-		pd->setValue( start_val + _this.childNodes().count() );
 		if( was_null )
 		{
 			delete pd;

@@ -97,6 +97,10 @@ public:
 
 	void processNextBuffer();
 
+	inline int getLoadingTrackCount() const
+	{
+		return m_nLoadingTrack;
+	}
 	inline int getMilliseconds() const
 	{
 		return m_elapsedMilliSeconds;
@@ -339,6 +343,7 @@ private:
 
 	ControllerVector m_controllers;
 
+	int m_nLoadingTrack;
 
 	QString m_fileName;
 	QString m_oldFileName;
