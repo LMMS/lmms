@@ -36,6 +36,9 @@
 class EffectRackView;
 class Knob;
 class SampleBuffer;
+class SampleTrackWindow;
+class TrackLabelButton;
+class QLineEdit;
 
 
 class SampleTCO : public TrackContentObject
@@ -173,6 +176,7 @@ private:
 
 
 	friend class SampleTrackView;
+	friend class SampleTrackWindow;
 
 } ;
 
@@ -184,6 +188,21 @@ class SampleTrackView : public TrackView
 public:
 	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
 	virtual ~SampleTrackView();
+
+	SampleTrackWindow * getSampleTrackWindow()
+	{
+		return m_window;
+	}
+
+	SampleTrack * model()
+	{
+		return castModel<SampleTrack>();
+	}
+
+	const SampleTrack * model() const
+	{
+		return castModel<SampleTrack>();
+	}
 
 
 public slots:
@@ -201,9 +220,72 @@ protected:
 private:
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
+	SampleTrackWindow * m_window;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
 	LcdSpinBox * m_effectChannelNumber;
+
+	TrackLabelButton * m_tlb;
+
+
+	friend class SampleTrackWindow;
+
+} ;
+
+
+
+class SampleTrackWindow : public QWidget, public ModelView,
+								public SerializingObjectHook
+{
+	Q_OBJECT
+public:
+	SampleTrackWindow(SampleTrackView * _tv);
+	virtual ~SampleTrackWindow();
+
+	SampleTrack * model()
+	{
+		return castModel<SampleTrack>();
+	}
+
+	const SampleTrack * model() const
+	{
+		return castModel<SampleTrack>();
+	}
+
+	void setSampleTrackView(SampleTrackView * _tv);
+
+	SampleTrackView *sampleTrackView()
+	{
+		return m_stv;
+	}
+
+
+public slots:
+	void textChanged(const QString & _new_name);
+	void toggleVisibility(bool _on);
+	void updateName();
+
+
+protected:
+	// capture close-events for toggling sample-track-button
+	virtual void closeEvent(QCloseEvent * _ce);
+
+	virtual void saveSettings(QDomDocument & _doc, QDomElement & _this);
+	virtual void loadSettings(const QDomElement & _this);
+
+private:
+	virtual void modelChanged();
+
+	SampleTrack * m_track;
+	SampleTrackView * m_stv;
+
+	// widgets on the top of an sample-track-window
+	QLineEdit * m_nameLineEdit;
+	Knob * m_volumeKnob;
+	Knob * m_panningKnob;
+	FxLineLcdSpinBox * m_effectChannelNumber;
+
+	EffectRackView * m_effectRack;
 
 } ;
 
