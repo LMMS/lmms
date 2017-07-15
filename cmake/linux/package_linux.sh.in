@@ -52,7 +52,7 @@ echo -e "\nWriting verbose output to \"${LOGFILE}\""
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
 mkdir -p "$HOME/bin"
 DAYSOLD=2
-if which linuxdeployqt > /dev/null d2>&1; then
+if which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
 elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
@@ -82,6 +82,11 @@ mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
 echo "#!/usr/bin/env bash
 DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" && pwd )\"
 export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
+# Prevent segfault on VirualBox
+if lsmod |grep vboxguest > /dev/null 2>&1; then
+   echo "VirtualBox detected.  Forcing libgl software rendering."
+   export LIBGL_ALWAYS_SOFTWARE=1;
+fi
 QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
 chmod +x "${APPDIR}usr/bin/lmms"
 
