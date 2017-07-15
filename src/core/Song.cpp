@@ -258,8 +258,7 @@ void Song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			m_elapsedMilliSeconds = 
-				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
+			setToTime(tl->loopBegin());
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 			emit updateSampleTracks();
@@ -316,8 +315,7 @@ void Song::processNextBuffer()
 					ticks %= ( maxTact * MidiTime::ticksPerTact() );
 
 					// wrap milli second counter
-					m_elapsedMilliSeconds = 
-						( ticks * 60 * 1000 / 48 ) / getTempo();
+					setToTimeByTicks(ticks);
 
 					m_vstSyncController.setAbsolutePosition( ticks );
 				}
@@ -335,10 +333,7 @@ void Song::processNextBuffer()
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
-
-					m_elapsedMilliSeconds =
-						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) /
-							getTempo();
+					setToTime(tl->loopBegin());
 				}
 				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
 				{
@@ -393,9 +388,7 @@ void Song::processNextBuffer()
 		framesPlayed += framesToPlay;
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
-		m_elapsedMilliSeconds += 
-			( ( framesToPlay / framesPerTick ) * 60 * 1000 / 48 ) 
-				/ getTempo();
+		m_elapsedMilliSeconds += MidiTime::ticksToMilliseconds( framesToPlay / framesPerTick, getTempo());
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
 	}
@@ -603,10 +596,9 @@ void Song::updateLength()
 
 void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 {
-	m_elapsedTicks += m_playPos[playMode].getTicks() - ticks;
-	m_elapsedMilliSeconds += 
-		( ( ( ( ticks - m_playPos[playMode].getTicks() ) ) * 60 * 1000 / 48) / 
-			getTempo() );
+	tick_t ticksFromPlayMode = m_playPos[playMode].getTicks();
+	m_elapsedTicks += ticksFromPlayMode - ticks;
+	m_elapsedMilliSeconds += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 
@@ -673,9 +665,8 @@ void Song::stop()
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
-					m_elapsedMilliSeconds = 
-						( ( ( tl->savedPos().getTicks() ) * 60 * 1000 / 48 ) / 
-							getTempo() );
+					setToTime(tl->savedPos());
+
 					if( gui && gui->songEditor() &&
 							( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 					{
