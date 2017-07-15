@@ -85,6 +85,9 @@ export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
 QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
 chmod +x "${APPDIR}usr/bin/lmms"
 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+unset LD_LIBRARY_PATH
+
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
@@ -100,9 +103,6 @@ mv "$VSTLIB" "$VSTBIN"
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
-
-# Per https://github.com/probonopd/linuxdeployqt/issues/129 
-unset LD_LIBRARY_PATH
 
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
