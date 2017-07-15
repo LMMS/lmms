@@ -101,6 +101,9 @@ mv "$VSTLIB" "$VSTBIN"
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+unset LD_LIBRARY_PATH
+
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
