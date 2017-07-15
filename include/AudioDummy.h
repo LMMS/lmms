@@ -93,7 +93,8 @@ private:
 		while( true )
 		{
 			timer.reset();
-			const surroundSampleFrame* b = mixer()->nextBuffer();
+			const surroundSampleFrame* b = new surroundSampleFrame[ mixer()->framesPerPeriod() ];
+			b = mixer()->nextBuffer();
 			if( !b )
 			{
 				break;
