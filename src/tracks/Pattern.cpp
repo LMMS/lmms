@@ -882,18 +882,17 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	QPainter p( &m_paintPixmap );
 
-	QLinearGradient lingrad( 0, 0, 0, height() );
-	QColor c;
 	bool const muted = m_pat->getTrack()->isMuted() || m_pat->isMuted();
 	bool current = gui->pianoRoll()->currentPattern() == m_pat;
 	bool beatPattern = m_pat->m_patternType == Pattern::BeatPattern;
 
 	// state: selected, normal, beat pattern, muted
-	c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
+	QColor c = isSelected() ? selectedColor() : ( ( !muted && !beatPattern )
 		? painter.background().color() : ( beatPattern
 		? BBPatternBackground() : mutedBackgroundColor() ) );
 
 	// invert the gradient for the background in the B&B editor
+	QLinearGradient lingrad( 0, 0, 0, height() );
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
 	lingrad.setColorAt( beatPattern ? 1 : 0, c );
 
@@ -907,7 +906,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// Check whether we will paint a text box and compute its potential height
-	// This is needed so we can paint the notes beneath it.
+	// This is needed so we can paint the notes underneath it.
 	bool const isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
 	bool const drawTextBox = !beatPattern && !isDefaultName;
 
@@ -950,12 +949,20 @@ void PatternView::paintEvent( QPaintEvent * )
 		}
 
 		// set colour based on mute status
+		bool const drawAsLines = height() < 64;
 		QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
-		p.setPen( noteColor.darker() );
-
-		p.setRenderHint(QPainter::Antialiasing);
 
 		p.save();
+
+		if (drawAsLines)
+		{
+			p.setPen( noteColor );
+		}
+		else
+		{
+			p.setPen( noteColor.darker() );
+			p.setRenderHint(QPainter::Antialiasing);
+		}
 
 		// Transform such that [0, 1] x [0, 1] paints in the correct area
 		float distanceToTop = textBoxHeight;
@@ -979,8 +986,10 @@ void PatternView::paintEvent( QPaintEvent * )
 			}
 		}
 
-		p.translate(0., distanceToTop);
-		p.scale(width(), height() - distanceToTop);
+		int const notesBorder = 4; // Border for the notes towards the top and bottom in pixels
+		p.translate(0., distanceToTop + notesBorder);
+		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
+
 
 		int const minimalNoteRange = 12; // Always paint at least one octave
 		int const actualNoteRange = computeNoteRange(minKey, maxKey);
@@ -1013,8 +1022,16 @@ void PatternView::paintEvent( QPaintEvent * )
 			float const noteStartY = invertedMappedNoteKey * noteHeight;
 
 			QRectF noteRectF( noteStartX, noteStartY, noteLength, noteHeight);
-			p.fillRect( noteRectF, noteColor );
-			p.drawRect( noteRectF );
+			if (drawAsLines)
+			{
+				p.drawLine(QPointF(noteStartX, noteStartY + 0.5 * noteHeight),
+					   QPointF(noteStartX + noteLength, noteStartY + 0.5 * noteHeight));
+			}
+			else
+			{
+				p.fillRect( noteRectF, noteColor );
+				p.drawRect( noteRectF );
+			}
 		}
 
 		p.restore();
@@ -1128,8 +1145,5 @@ void PatternView::paintEvent( QPaintEvent * )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	p.end();
-
 	painter.drawPixmap( 0, 0, m_paintPixmap );
-
 }
