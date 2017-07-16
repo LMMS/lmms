@@ -354,6 +354,11 @@ QColor TrackContentObjectView::selectedColor() const
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
 
+QColor TrackContentObjectView::textBackgroundColor() const
+{
+	return m_textBackgroundColor;
+}
+
 QColor TrackContentObjectView::textShadowColor() const
 { return m_textShadowColor; }
 
@@ -375,6 +380,11 @@ void TrackContentObjectView::setSelectedColor( const QColor & c )
 
 void TrackContentObjectView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
+
+void TrackContentObjectView::setTextBackgroundColor( const QColor & c )
+{
+	m_textBackgroundColor = c;
+}
 
 void TrackContentObjectView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
@@ -646,8 +656,7 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 	QFontMetrics fontMetrics(labelFont);
 	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
 
-	QColor transparentBlack(0, 0, 0, 75);
-	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), transparentBlack);
+	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	painter.setPen( textColor() );
 	painter.drawText( textLeft, textTop + fontMetrics.ascent(), elidedPatternName );

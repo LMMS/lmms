@@ -613,6 +613,7 @@ TrackContentObjectView   {
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
 	
