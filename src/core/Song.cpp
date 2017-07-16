@@ -90,10 +90,10 @@ Song::Song() :
 	m_length( 0 ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
-	m_elapsedMilliSeconds( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
+	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
@@ -387,7 +387,7 @@ void Song::processNextBuffer()
 		framesPlayed += framesToPlay;
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
-		m_elapsedMilliSeconds += MidiTime::ticksToMilliseconds( framesToPlay / framesPerTick, getTempo());
+		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
 	}
@@ -597,7 +597,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 {
 	tick_t ticksFromPlayMode = m_playPos[playMode].getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
+	m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 
@@ -651,8 +651,8 @@ void Song::stop()
 		switch( tl->behaviourAtStop() )
 		{
 			case TimeLineWidget::BackToZero:
-				m_playPos[m_playMode].setTicks( 0 );
-				m_elapsedMilliSeconds = 0;
+				m_playPos[m_playMode].setTicks(0);
+				m_elapsedMilliSeconds[m_playMode] = 0;
 				if( gui && gui->songEditor() &&
 						( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 				{
@@ -663,7 +663,7 @@ void Song::stop()
 			case TimeLineWidget::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
-					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
+					m_playPos[m_playMode].setTicks(tl->savedPos().getTicks());
 					setToTime(tl->savedPos());
 
 					if( gui && gui->songEditor() &&
@@ -683,9 +683,12 @@ void Song::stop()
 	else
 	{
 		m_playPos[m_playMode].setTicks( 0 );
-		m_elapsedMilliSeconds = 0;
+		m_elapsedMilliSeconds[m_playMode] = 0;
 	}
 	m_playing = false;
+
+	m_elapsedMilliSeconds[Mode_None] = m_elapsedMilliSeconds[m_playMode];
+	m_playPos[Mode_None].setTicks(m_playPos[m_playMode].getTicks());
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 

@@ -101,9 +101,11 @@ void TimeDisplayWidget::updateTime()
 	switch( m_displayMode )
 	{
 		case MinutesSeconds:
-			m_majorLCD.setValue( s->getMilliseconds() / 60000 );
-			m_minorLCD.setValue( ( s->getMilliseconds() / 1000 ) % 60 );
-			m_milliSecondsLCD.setValue( s->getMilliseconds() % 1000 );
+			int msec;
+			msec = s->getMilliseconds();
+			m_majorLCD.setValue(msec / 60000);
+			m_minorLCD.setValue((msec / 1000) % 60);
+			m_milliSecondsLCD.setValue(msec % 1000);
 			break;
 
 		case BarsTicks:
