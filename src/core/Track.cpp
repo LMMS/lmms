@@ -627,6 +627,32 @@ DataFile TrackContentObjectView::createTCODataFiles(
 	return dataFile;
 }
 
+void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & painter)
+{
+	if (text.trimmed() == "")
+	{
+		return;
+	}
+
+	painter.setRenderHint( QPainter::TextAntialiasing );
+
+	QFont labelFont = this->font();
+	labelFont.setHintingPreference( QFont::PreferFullHinting );
+	painter.setFont( labelFont );
+
+	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textLeft = TCO_BORDER_WIDTH + 3;
+
+	QFontMetrics fontMetrics(labelFont);
+	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
+
+	QColor transparentBlack(0, 0, 0, 75);
+	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), transparentBlack);
+
+	painter.setPen( textColor() );
+	painter.drawText( textLeft, textTop + fontMetrics.ascent(), elidedPatternName );
+}
+
 /*! \brief Handle a mouse press on this trackContentObjectView.
  *
  *  Handles the various ways in which a trackContentObjectView can be

@@ -263,6 +263,8 @@ protected:
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
+	virtual void paintTextLabel(QString const & text, QPainter & painter);
+
 
 protected slots:
 	void updateLength();

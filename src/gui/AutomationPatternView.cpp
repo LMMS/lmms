@@ -369,25 +369,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 	}
 	
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-	
-	if(  m_staticTextName.text() != m_pat->name() )
-	{
-		m_staticTextName.setText( m_pat->name() );
-	}
-	
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
-	
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
-	
-	p.setPen( textShadowColor() );
-	p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
-	p.setPen( textColor() );
-	p.drawStaticText( textLeft, textTop, m_staticTextName );
+	paintTextLabel(m_pat->name(), p);
 	
 	// inner border
 	p.setPen( c.lighter( current ? 160 : 130 ) );
