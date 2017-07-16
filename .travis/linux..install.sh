@@ -5,7 +5,7 @@ PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev  libogg-dev
 	libfluidsynth-dev portaudio19-dev g++-multilib libfltk1.3-dev
 	libgig-dev libsoundio-dev"
 
-VST_PACKAGES="wine-dev libqt5x11extras5-dev qtbase5-private-dev libxcb-util-dev libxcb-keysyms1-dev"
+VST_PACKAGES="wine-dev libqt5x11extras5-dev qtbase5-private-dev libxcb-util0-dev libxcb-keysyms1-dev"
 
 # Help with unmet dependencies
 PACKAGES="$PACKAGES $VST_PACKAGES libjack0"
