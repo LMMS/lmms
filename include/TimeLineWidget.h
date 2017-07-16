@@ -27,16 +27,17 @@
 #define TIMELINE_H
 
 #include <QWidget>
+#include <QToolButton>
 
 #include "Song.h"
 
-
 class QPixmap;
 class QToolBar;
+class QToolButton;
+class MidiTime;
 class NStateButton;
-class TextFloat;
 class SongEditor;
-
+class TextFloat;
 
 class TimeLineWidget : public QWidget, public JournallingObject
 {
@@ -50,6 +51,9 @@ public:
 	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
 	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
+	Q_PROPERTY( QColor selectedLoopColor READ getSelectedLoopColor WRITE setSelectedLoopColor )
+	Q_PROPERTY( QBrush selectedLoopBrush READ getSelectedLoopBrush WRITE setSelectedLoopBrush )
+	Q_PROPERTY( QColor selectedLoopInnerColor READ getSelectedLoopInnerColor WRITE setSelectedLoopInnerColor )
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 
 	enum AutoScrollStates
@@ -71,6 +75,7 @@ public:
 		KeepStopPosition
 	} ;
 
+	static const int NB_LOOPS=8;
 
 	TimeLineWidget( int xoff, int yoff, float ppt, Song::PlayPos & pos,
 				const MidiTime & begin, QWidget * parent );
@@ -100,6 +105,15 @@ public:
 	inline QColor const & getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
 	inline void setActiveLoopInnerColor(QColor const & activeLoopInnerColor) { m_activeLoopInnerColor = activeLoopInnerColor; }
 
+	inline QColor const & getSelectedLoopColor() const { return m_selectedLoopColor; }
+	inline void setSelectedLoopColor(QColor const & selectedLoopColor) { m_selectedLoopColor = selectedLoopColor; }
+
+	inline QBrush const & getSelectedLoopBrush() const { return m_selectedLoopBrush; }
+	inline void setSelectedLoopBrush(QBrush const & selectedLoopBrush) { m_selectedLoopBrush = selectedLoopBrush; }
+
+	inline QColor const & getSelectedLoopInnerColor() const { return m_selectedLoopInnerColor; }
+	inline void setSelectedLoopInnerColor(QColor const & selectedLoopInnerColor) { m_selectedLoopInnerColor = selectedLoopInnerColor; }
+
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
@@ -118,21 +132,41 @@ public:
 		return m_behaviourAtStop;
 	}
 
-	bool loopPointsEnabled() const
+	inline int currentLoop()
 	{
-		return m_loopPoints == LoopPointsEnabled;
+		return m_currentLoop;
 	}
 
-	inline const MidiTime & loopBegin() const
+	void setCurrentLoop(int n);
+	int  findLoop(const MidiTime & t);
+
+	bool loopPointsEnabled(int n=-1) const
 	{
-		return ( m_loopPos[0] < m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
+		if(n==-1) n=m_currentLoop;
+		Q_ASSERT ((n>=0)&&(n<NB_LOOPS));
+
+		return (n == m_currentLoop) &&
+			(m_loopPoints == LoopPointsEnabled);
 	}
 
-	inline const MidiTime & loopEnd() const
+	inline const MidiTime & loopBegin(int n=-1) const
 	{
-		return ( m_loopPos[0] > m_loopPos[1] ) ?
-						m_loopPos[0] : m_loopPos[1];
+		if(n==-1) n=m_currentLoop;
+		Q_ASSERT ((n>=0)&&(n<NB_LOOPS));
+
+		return ( m_loopPos[2*n+0] < m_loopPos[2*n+1] )
+			? m_loopPos[2*n+0]
+			: m_loopPos[2*n+1];
+	}
+
+	inline const MidiTime & loopEnd(int n=-1) const
+	{
+		if(n==-1) n=m_currentLoop;
+		Q_ASSERT ((n>=0)&&(n<NB_LOOPS));
+
+		return ( m_loopPos[2*n+0] > m_loopPos[2*n+1] )
+			? m_loopPos[2*n+0]
+			: m_loopPos[2*n+1];
 	}
 
 	inline void savePos( const MidiTime & _pos )
@@ -182,9 +216,13 @@ public slots:
 	void toggleLoopPoints( int _n );
 	void toggleBehaviourAtStop( int _n );
 
+	void selectLoop(QAction * _a);
+	void selectLoop(const MidiTime & t);
+
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void paintLoop(const int num, QPainter& p, const int cy);
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
@@ -196,10 +234,12 @@ private:
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
-
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
+	QColor m_selectedLoopColor;
+	QBrush m_selectedLoopBrush;
+	QColor m_selectedLoopInnerColor;
 
 	int m_loopRectangleVerticalPadding;
 
@@ -217,10 +257,12 @@ private:
 	float m_ppt;
 	Song::PlayPos & m_pos;
 	const MidiTime & m_begin;
-	MidiTime m_loopPos[2];
+	MidiTime m_loopPos[2*NB_LOOPS];
 
 	MidiTime m_savedPos;
 
+	int m_currentLoop;
+	QToolButton * m_loopButton;
 
 	TextFloat * m_hint;
 	int m_initalXSelect;
