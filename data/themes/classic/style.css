@@ -615,13 +615,14 @@ TrackContentObjectView   {
 	qproperty-textColor: rgb( 255, 255, 255 );
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	
+	font-size: 11px;
 }
 
 /* instrument pattern */
 PatternView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
-	font-size: 11px;
 }
 
 /* sample track pattern */
