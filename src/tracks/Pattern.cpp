@@ -1074,28 +1074,7 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	if (!beatPattern && !isDefaultName)
 	{
-		p.setRenderHint( QPainter::TextAntialiasing );
-
-		QFont labelFont = this->font();
-		labelFont.setHintingPreference( QFont::PreferFullHinting );
-		p.setFont( labelFont );
-
-		const int textTop = TCO_BORDER_WIDTH + 1;
-		const int textLeft = TCO_BORDER_WIDTH + 3;
-
-		QFontMetrics fontMetrics(labelFont);
-		QString elidedPatternName = fontMetrics.elidedText(m_pat->name(), Qt::ElideMiddle, width() - 2 * textLeft);
-
-		QColor transparentBlack(0, 0, 0, 75);
-		p.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), transparentBlack);
-
-		if( m_staticTextName.text() != elidedPatternName )
-		{
-			m_staticTextName.setText( elidedPatternName );
-		}
-
-		p.setPen( textColor() );
-		p.drawStaticText( textLeft, textTop, m_staticTextName );
+		paintTextLabel(m_pat->name(), p);
 	}
 
 	// inner border
