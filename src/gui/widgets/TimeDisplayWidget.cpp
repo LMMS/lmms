@@ -108,12 +108,12 @@ void TimeDisplayWidget::updateTime()
 
 		case BarsTicks:
 			int tick;
-			tick = ( s->getMilliseconds() * s->getTempo() * (DefaultTicksPerTact / 4 ) ) / 60000 ;
-			m_majorLCD.setValue( (int)(tick / s->ticksPerTact() ) + 1);
-			m_minorLCD.setValue( ( tick % s->ticksPerTact() ) /
-						 ( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1 );
-			m_milliSecondsLCD.setValue( ( tick % s->ticksPerTact() ) %
-							( s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) );
+			tick = s->getPlayPos().getTicks();
+			m_majorLCD.setValue((int)(tick / s->ticksPerTact()) + 1);
+			m_minorLCD.setValue((tick % s->ticksPerTact()) /
+						 (s->ticksPerTact() / s->getTimeSigModel().getNumerator() ) +1);
+			m_milliSecondsLCD.setValue((tick % s->ticksPerTact()) %
+							(s->ticksPerTact() / s->getTimeSigModel().getNumerator()));
 			break;
 
 		default: break;
