@@ -1,0 +1,159 @@
+/* macro-absraction of the JACK API
+ *
+ * see weak_libjack.c for details, in general arguments are:
+ *
+ * [required], [return type], [name], [arguments], [code or return value]
+ *
+ * This file is included multiple times with different macro definitions
+ * do not add header guards.
+ * see https://en.wikibooks.org/wiki/C_Programming/Preprocessor#X-Macros
+ */
+
+#ifdef USE_WEAK_JACK
+
+/* <jack/jack.h> */
+JCFUN(1, int,            client_close, 0)
+JCFUN(1, char*,          get_client_name, NULL)
+JVFUN(0,                 on_shutdown, (jack_client_t *c, JackShutdownCallback s, void *a), (c,s,a),)
+JVFUN(0,                 on_info_shutdown, (jack_client_t *c, JackInfoShutdownCallback s, void *a), (c,s,a),)
+
+JPFUN(1, int,            set_process_callback, (jack_client_t *c, JackProcessCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_freewheel_callback, (jack_client_t *c, JackFreewheelCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_buffer_size_callback, (jack_client_t *c, JackBufferSizeCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_sample_rate_callback, (jack_client_t *c, JackSampleRateCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_port_registration_callback, (jack_client_t *c, JackPortRegistrationCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_port_connect_callback, (jack_client_t *c, JackPortConnectCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_graph_order_callback, (jack_client_t *c, JackGraphOrderCallback g, void *a), (c,g,a), -1)
+JPFUN(1, int,            set_xrun_callback, (jack_client_t *c, JackXRunCallback g, void *a), (c,g,a), -1)
+JPFUN(1, int,            set_latency_callback, (jack_client_t *c, JackLatencyCallback g, void *a), (c,g,a), -1)
+JVFUN(1,                 set_error_function, (void (*f)(const char *)), (f),)
+JVFUN(1,                 set_info_function, (void (*f)(const char *)), (f),)
+
+JCFUN(1, int,            activate, -1)
+JCFUN(1, int,            deactivate, -1)
+
+JPFUN(1, int,            client_name_size, (), (), 32)
+
+JCFUN(1, jack_nframes_t, get_sample_rate, 0)
+JCFUN(1, jack_nframes_t, get_buffer_size, 0)
+JPFUN(1, jack_nframes_t, frames_since_cycle_start, (const jack_client_t *c), (c), 0)
+JPFUN(1, jack_nframes_t, frame_time, (const jack_client_t *c), (c), 0)
+JPFUN(1, jack_nframes_t, last_frame_time, (const jack_client_t *c), (c), 0)
+JPFUN(1, jack_time_t,    get_time, (void), (), 0)
+JCFUN(1, float,          cpu_load, 0)
+JCFUN(1, int,            is_realtime, 0)
+
+JPFUN(1, int,            set_freewheel, (jack_client_t *c, int o), (c,o), 0)
+JPFUN(1, int,            set_buffer_size, (jack_client_t *c, jack_nframes_t b), (c,b), 0)
+
+JCFUN(0, int,            recompute_total_latencies, 0)
+JPFUN(0, jack_nframes_t, port_get_total_latency, (jack_client_t *c, jack_port_t *p), (c,p), 0)
+JVFUN(0,                 port_get_latency_range, (jack_port_t *p, jack_latency_callback_mode_t m, jack_latency_range_t *r), (p,m,r), if (r) {r->min = r->max = 0;})
+JVFUN(0,                 port_set_latency_range, (jack_port_t *p, jack_latency_callback_mode_t m, jack_latency_range_t *r), (p,m,r),)
+
+JPFUN(1, void*,          port_get_buffer, (jack_port_t *p, jack_nframes_t n), (p,n), NULL)
+JPFUN(1, int,            port_request_monitor, (jack_port_t *p, int o), (p,o), 0)
+JPFUN(1, int,            port_ensure_monitor, (jack_port_t *p, int o), (p,o), 0)
+JPFUN(1, int,            port_monitoring_input, (jack_port_t *p), (p), 0)
+
+JPFUN(1, const char*,    port_name, (const jack_port_t *p), (p), NULL)
+JPFUN(1, const char*,    port_short_name, (const jack_port_t *p), (p), NULL)
+JPFUN(1, int,            port_flags, (const jack_port_t *p), (p), 0)
+JPFUN(1, const char**,   get_ports,(jack_client_t *c, const char *p, const char *t, unsigned long f), (c,p,t,f), NULL)
+JPFUN(1, int,            port_name_size, (void), (), 0)
+JPFUN(1, int,            port_type_size, (void), (), 0)
+JPFUN(1, size_t,         port_type_get_buffer_size, (jack_client_t *c, const char *t), (c,t), 0)
+JPFUN(1, jack_port_t*,   port_by_name, (jack_client_t *c, const char *n), (c,n), NULL)
+JPFUN(1, jack_port_t*,   port_by_id, (jack_client_t *c, jack_port_id_t i), (c,i), NULL)
+JPFUN(1, jack_port_t*,   port_register, (jack_client_t *c, const char *n, const char *t, unsigned long f, unsigned long b), (c,n,t,f,b), NULL)
+JPFUN(1, int,            port_unregister, (jack_client_t *c, jack_port_t *p), (c,p), 0)
+JPFUN(1, const char *,   port_type, (const jack_port_t *p), (p), 0)
+JPFUN(1, const char **,  port_get_connections, (const jack_port_t *p), (p), 0)
+JPFUN(1, const char **,  port_get_all_connections, (const jack_client_t *c, const jack_port_t *p), (c,p), 0)
+JPFUN(1, int,            port_set_name, (jack_port_t *p, const char *n), (p,n), -1)
+JXFUN(0, int,            port_rename, (jack_client_t *c, jack_port_t *p, const char *n), (c,p,n), return jack_port_set_name (p,n);)
+JPFUN(1, int,            port_get_aliases, (const jack_port_t *port, char* const aliases[2]), (port,aliases), 0)
+JPFUN(1, int,            port_disconnect, (jack_client_t *c, jack_port_t *p), (c,p), 0)
+JPFUN(1, int,            connect, (jack_client_t *c, const char *s, const char *d), (c,s,d), -1)
+JPFUN(1, int,            disconnect, (jack_client_t *c, const char *s, const char *d), (c,s,d), -1)
+JVFUN(0,                 free, (void *p), (p), free(p);)
+
+JCFUN(1, jack_nframes_t, cycle_wait, 0)
+JVFUN(1,                 cycle_signal, (jack_client_t *c, int s), (c,s),)
+JPFUN(1, int,            set_process_thread, (jack_client_t *c, JackThreadCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_thread_init_callback, (jack_client_t *c, JackThreadInitCallback p, void *a), (c,p,a), -1)
+
+JPFUN(1, int,            transport_locate, (jack_client_t *c, jack_nframes_t f), (c,f), 0)
+JVFUN(1,                 transport_start, (jack_client_t *c), (c),)
+JVFUN(1,                 transport_stop, (jack_client_t *c), (c),)
+JPFUN(1, jack_nframes_t, get_current_transport_frame, (const jack_client_t *c), (c), 0)
+JXFUN(1, jack_transport_state_t, transport_query, (const jack_client_t *c, jack_position_t *p), (c,p), memset(p, 0, sizeof(jack_position_t)); return JackTransportStopped;)
+JPFUN(1, int,            set_sync_callback, (jack_client_t *c, JackSyncCallback p, void *a), (c,p,a), -1)
+JPFUN(1, int,            set_timebase_callback, (jack_client_t *c, int l, JackTimebaseCallback p, void *a), (c,l,p,a), -1)
+JCFUN(1, int,            release_timebase, 0)
+
+/* <jack/midiport.h> */
+JPFUN(1, uint32_t,       midi_get_event_count, (void* p), (p), 0)
+JPFUN(1, int,            midi_event_get, (jack_midi_event_t *e, void *p, uint32_t i), (e,p,i), -1)
+JPFUN(1, int,            midi_event_write, (void *b, jack_nframes_t t, const jack_midi_data_t *d, size_t s), (b,t,d,s), -1)
+JVFUN(1,                 midi_clear_buffer, (void *b), (b),)
+
+/* <jack/session.h> */
+JPFUN(0, int,            set_session_callback, (jack_client_t *c, JackSessionCallback s, void *a), (c,s,a), -1)
+JPFUN(0, int,            session_reply, (jack_client_t *c, jack_session_event_t *e), (c,e), -1)
+JVFUN(0,                 session_event_free, (jack_session_event_t *e), (e), )
+
+/* <jack/ringbuffer.h> */
+JPFUN(1, jack_ringbuffer_t *, ringbuffer_create, (size_t s), (s), NULL)
+JVFUN(1,                 ringbuffer_free, (jack_ringbuffer_t *rb), (rb), )
+JVFUN(1,                 ringbuffer_reset, (jack_ringbuffer_t *rb), (rb), )
+JVFUN(1,                 ringbuffer_read_advance, (jack_ringbuffer_t *rb, size_t c), (rb,c), )
+JVFUN(1,                 ringbuffer_write_advance, (jack_ringbuffer_t *rb, size_t c), (rb,c), )
+JPFUN(1, size_t,         ringbuffer_read_space, (const jack_ringbuffer_t *rb), (rb), 0)
+JPFUN(1, size_t,         ringbuffer_write_space, (const jack_ringbuffer_t *rb), (rb), 0)
+JPFUN(1, size_t,         ringbuffer_read, (jack_ringbuffer_t *rb, char *d, size_t c), (rb,d,c), 0)
+JPFUN(1, size_t,         ringbuffer_write, (jack_ringbuffer_t *rb, const char *s, size_t c), (rb,s,c), 0)
+JPFUN(0, int,            ringbuffer_mlock, (jack_ringbuffer_t *rb), (rb), 0)
+JVFUN(0,                 ringbuffer_get_read_vector, (const jack_ringbuffer_t *rb, jack_ringbuffer_data_t *v), (rb,v), if (v) {v->buf=NULL; v->len=0;} )
+JVFUN(0,                 ringbuffer_get_write_vector, (const jack_ringbuffer_t *rb, jack_ringbuffer_data_t *v), (rb,v), if (v) {v->buf=NULL; v->len=0;} )
+JPFUN(0, size_t,         ringbuffer_peek, (jack_ringbuffer_t *rb, char *d, size_t c), (rb,d,c), 0)
+
+/* <jack/thread.h> */
+JCFUN(0, int,            client_real_time_priority, 0)
+JCFUN(0, int,            client_max_real_time_priority, 0)
+JPFUN(0, int,            acquire_real_time_scheduling, (jack_native_thread_t t, int p), (t,p), 0)
+JPFUN(0, int,            drop_real_time_scheduling, (jack_native_thread_t t), (t), 0)
+JPFUN(0, int,            client_stop_thread, (jack_client_t* c, jack_native_thread_t t), (c,t), 0)
+JPFUN(0, int,            client_kill_thread, (jack_client_t* c, jack_native_thread_t t), (c,t), 0)
+#ifndef _WIN32
+JVFUN(0,                 set_thread_creator, (jack_thread_creator_t c), (c),)
+#endif
+JPFUN(1, int,            client_create_thread, \
+		(jack_client_t* c, jack_native_thread_t *t, int p, int r, void *(*f)(void*), void *a), (c,t,p,r,f,a), 0)
+
+#ifndef NO_JACK_METADATA
+/* <jack/uuid.h>  - TODO*/
+
+/* <jack/jack.h> */
+JPFUN(0, char *,         get_uuid_for_client_name, (jack_client_t* c, const char* n), (c,n), NULL)
+JPFUN(0, char *,         get_client_name_by_uuid, (jack_client_t* c, const char* u), (c,u), NULL)
+JPFUN(0, jack_uuid_t,    port_uuid, (const jack_port_t *p), (p), 0)
+
+/* <jack/metadata.h> */
+JPFUN(0, int,            set_property, (jack_client_t* c, jack_uuid_t s, const char* k, const char* v, const char* t), (c,s,k,v,t), -1)
+JXFUN(0, int,            get_property, (jack_uuid_t s, const char* k, char** v, char** t), (s,k,v,t), if (v) *v=NULL; if (t) *t=NULL; return -1;)
+JVFUN(0,                 free_description, (jack_description_t* d, int f), (d,f),)
+JXFUN(0, int,            get_properties, (jack_uuid_t s, jack_description_t* d), (s,d), if (d) {d->properties = NULL; d->property_cnt = 0;} return -1;)
+JXFUN(0, int,            get_all_properties, (jack_description_t** d), (d), if (d) *d=NULL; return -1;)
+JPFUN(0, int,            remove_property, (jack_client_t* c, jack_uuid_t s, const char* k), (c,s,k), -1)
+JPFUN(0, int,            remove_properties, (jack_client_t* c, jack_uuid_t s), (c,s), -1)
+JPFUN(0, int,            remove_all_properties, (jack_client_t* c), (c), -1)
+JPFUN(0, int,            set_property_change_callback, (jack_client_t *c, JackPropertyChangeCallback s, void *a), (c,s,a), -1)
+#endif
+
+/* <jack/statistics.h> */
+JCFUN(1, float,          get_max_delayed_usecs, 0.0)
+JCFUN(1, float,          get_xrun_delayed_usecs, 0.0)
+JVFUN(0,                 reset_max_delayed_usecs, (jack_client_t *c), (c),)
+
+#endif // end USE_WEAK_JACK

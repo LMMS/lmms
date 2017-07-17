@@ -83,7 +83,7 @@ static struct WeakJack {
 #define JXFUN(ERR, RTYPE, NAME, DEF, ARGS, CODE)   func_t _ ## NAME ;
 #define JVFUN(ERR, NAME, DEF, ARGS, CODE)          func_t _ ## NAME ;
 
-#include "weak_libjack.def"
+#include "AudioWeakJack.def"
 
 #undef JCFUN
 #undef JPFUN
@@ -134,7 +134,7 @@ static void init_weak_jack(void)
 #define JXFUN(ERR, RTYPE, NAME, DEF, ARGS, CODE)  MAPSYM(NAME, ERR)
 #define JVFUN(ERR, NAME, DEF, ARGS, CODE)         MAPSYM(NAME, ERR)
 
-#include "weak_libjack.def"
+#include "AudioWeakJack.def"
 
 #undef JCFUN
 #undef JPFUN
@@ -263,7 +263,7 @@ jack_client_t * WJACK_no_client_open (const char *client_name, jack_options_t op
 		} \
 	}
 
-#include "weak_libjack.def"
+#include "AudioWeakJack.def"
 
 #undef JCFUN
 #undef JPFUN
