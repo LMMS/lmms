@@ -56,12 +56,15 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_inactiveLoopColor(        52,  83,  53,  64 ),
 	m_inactiveLoopBrush(QColor(255, 255, 255,  32 )),
 	m_inactiveLoopInnerColor(  255, 255, 255,  32 ),
+	m_inactiveLoopTextColor(     0,   0,   0, 255 ),
 	m_activeLoopColor(          83,  52,  53, 255 ),
 	m_activeLoopBrush(QColor(  141,  55,  96, 128 )),
 	m_activeLoopInnerColor(    155,  74, 100, 255 ),
+	m_activeLoopTextColor(     255,   0,   0, 255 ),
 	m_selectedLoopColor(        52,  83,  53, 255 ),
 	m_selectedLoopBrush(QColor( 55, 141,  96, 128 )),
 	m_selectedLoopInnerColor(   74, 155, 100, 255 ),
+	m_selectedLoopTextColor(     0, 255,   0, 255 ),
 	m_loopRectangleVerticalPadding( 1 ),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
@@ -306,11 +309,12 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int const x0 = m_xOffset + s_posMarkerPixmap->width() / 2;
 	int const h0 = height();
 	int const w0 = width();
+	QColor const bg=p.background();
 	// Draw background
-	p.fillRect( 0, 0, x0, h0, p.background() );
-	p.fillRect( w0-12, 0, 12, h0, p.background() );
- 	p.setClipRect( x0, 0, w0 - x0 - 12, h0 );//12=sb width TODO!
-	p.fillRect( x0, 0, w0-12, h0, QColor(0,0,0));
+	p.fillRect( 0, 0, x0, h0, bg.lighter() );
+	p.fillRect( w0-12, 0, 12, h0, bg.lighter());
+	p.setClipRect( x0, 0, w0 - x0 - 12, h0 );//12=sb width TODO!
+	p.fillRect( x0, 0, w0-12, h0, bg );
 
 	// Activate hinting on the font
 	QFont font = p.font();
@@ -388,8 +392,8 @@ void TimeLineWidget::paintLoop(int const n, QPainter& p, int const cy)
 	p.drawRect( innerRectangle );
 
 	p.setPen( loopPointsActive
-		  ? (loopSelected ? QColor(0,255,0,255) : QColor(255,0,0,255))
-		  : QColor(0,0,0,255) );
+		  ? (loopSelected ? getSelectedLoopTextColor() : getActiveLoopTextColor())
+		  : getInactiveLoopTextColor() );
 	p.setBrush( Qt::NoBrush );
 	p.drawText( innerRectangle.x() + 2, cy, QString((char)(65+n)) );
 }

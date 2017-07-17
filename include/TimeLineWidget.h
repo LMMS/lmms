@@ -45,16 +45,22 @@ class TimeLineWidget : public QWidget, public JournallingObject
 public:
 	Q_PROPERTY( QColor barLineColor READ getBarLineColor WRITE setBarLineColor )
 	Q_PROPERTY( QColor barNumberColor READ getBarNumberColor WRITE setBarNumberColor )
+	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+
 	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
 	Q_PROPERTY( QBrush inactiveLoopBrush READ getInactiveLoopBrush WRITE setInactiveLoopBrush )
 	Q_PROPERTY( QColor inactiveLoopInnerColor READ getInactiveLoopInnerColor WRITE setInactiveLoopInnerColor )
+	Q_PROPERTY( QColor inactiveLoopTextColor READ getInactiveLoopTextColor WRITE setInactiveLoopTextColor )
+
 	Q_PROPERTY( QColor activeLoopColor READ getActiveLoopColor WRITE setActiveLoopColor )
 	Q_PROPERTY( QBrush activeLoopBrush READ getActiveLoopBrush WRITE setActiveLoopBrush )
 	Q_PROPERTY( QColor activeLoopInnerColor READ getActiveLoopInnerColor WRITE setActiveLoopInnerColor )
+	Q_PROPERTY( QColor activeLoopTextColor READ getActiveLoopTextColor WRITE setActiveLoopTextColor )
+
 	Q_PROPERTY( QColor selectedLoopColor READ getSelectedLoopColor WRITE setSelectedLoopColor )
 	Q_PROPERTY( QBrush selectedLoopBrush READ getSelectedLoopBrush WRITE setSelectedLoopBrush )
 	Q_PROPERTY( QColor selectedLoopInnerColor READ getSelectedLoopInnerColor WRITE setSelectedLoopInnerColor )
-	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+	Q_PROPERTY( QColor selectedLoopTextColor READ getSelectedLoopTextColor WRITE setSelectedLoopTextColor )
 
 	enum AutoScrollStates
 	{
@@ -87,6 +93,10 @@ public:
 	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
 	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
 
+	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
+	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
+
+
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
 	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
 
@@ -95,6 +105,9 @@ public:
 
 	inline QColor const & getInactiveLoopInnerColor() const { return m_inactiveLoopInnerColor; }
 	inline void setInactiveLoopInnerColor(QColor const & inactiveLoopInnerColor) { m_inactiveLoopInnerColor = inactiveLoopInnerColor; }
+
+	inline QColor const & getInactiveLoopTextColor() const { return m_inactiveLoopTextColor; }
+	inline void setInactiveLoopTextColor(QColor const & inactiveLoopTextColor) { m_inactiveLoopTextColor = inactiveLoopTextColor; }
 
 	inline QColor const & getActiveLoopColor() const { return m_activeLoopColor; }
 	inline void setActiveLoopColor(QColor const & activeLoopColor) { m_activeLoopColor = activeLoopColor; }
@@ -105,6 +118,9 @@ public:
 	inline QColor const & getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
 	inline void setActiveLoopInnerColor(QColor const & activeLoopInnerColor) { m_activeLoopInnerColor = activeLoopInnerColor; }
 
+	inline QColor const & getActiveLoopTextColor() const { return m_activeLoopTextColor; }
+	inline void setActiveLoopTextColor(QColor const & activeLoopTextColor) { m_activeLoopTextColor = activeLoopTextColor; }
+
 	inline QColor const & getSelectedLoopColor() const { return m_selectedLoopColor; }
 	inline void setSelectedLoopColor(QColor const & selectedLoopColor) { m_selectedLoopColor = selectedLoopColor; }
 
@@ -114,8 +130,8 @@ public:
 	inline QColor const & getSelectedLoopInnerColor() const { return m_selectedLoopInnerColor; }
 	inline void setSelectedLoopInnerColor(QColor const & selectedLoopInnerColor) { m_selectedLoopInnerColor = selectedLoopInnerColor; }
 
-	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
-	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
+	inline QColor const & getSelectedLoopTextColor() const { return m_selectedLoopTextColor; }
+	inline void setSelectedLoopTextColor(QColor const & selectedLoopTextColor) { m_selectedLoopTextColor = selectedLoopTextColor; }
 
 	inline Song::PlayPos & pos()
 	{
@@ -234,12 +250,15 @@ private:
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
+	QColor m_inactiveLoopTextColor;
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
+	QColor m_activeLoopTextColor;
 	QColor m_selectedLoopColor;
 	QBrush m_selectedLoopBrush;
 	QColor m_selectedLoopInnerColor;
+	QColor m_selectedLoopTextColor;
 
 	int m_loopRectangleVerticalPadding;
 
