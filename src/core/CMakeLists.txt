@@ -93,6 +93,10 @@ set(LMMS_SRCS
 	core/midi/MidiPort.cpp
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
-
-	PARENT_SCOPE
 )
+
+IF(LMMS_HAVE_WEAKJACK)
+	set(LMMS_SRCS ${LMMS_SRCS} core/audio/WeakJack.c)
+ENDIF()
+
+set(LMMS_SRC ${LMMS_SRC} PARENT_SCOPE)

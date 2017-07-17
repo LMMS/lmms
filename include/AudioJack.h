@@ -28,7 +28,11 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
+#ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
+#else
+#include "AudioWeakJack.h"
+#endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
