@@ -244,7 +244,7 @@ class SampleTrackWindow : public QWidget, public ModelView,
 {
 	Q_OBJECT
 public:
-	SampleTrackWindow(SampleTrackView * _tv);
+	SampleTrackWindow(SampleTrackView * tv);
 	virtual ~SampleTrackWindow();
 
 	SampleTrack * model()
@@ -257,7 +257,7 @@ public:
 		return castModel<SampleTrack>();
 	}
 
-	void setSampleTrackView(SampleTrackView * _tv);
+	void setSampleTrackView(SampleTrackView * tv);
 
 	SampleTrackView *sampleTrackView()
 	{
@@ -266,17 +266,17 @@ public:
 
 
 public slots:
-	void textChanged(const QString & _new_name);
-	void toggleVisibility(bool _on);
+	void textChanged(const QString & new_name);
+	void toggleVisibility(bool on);
 	void updateName();
 
 
 protected:
 	// capture close-events for toggling sample-track-button
-	virtual void closeEvent(QCloseEvent * _ce);
+	virtual void closeEvent(QCloseEvent * ce);
 
-	virtual void saveSettings(QDomDocument & _doc, QDomElement & _this);
-	virtual void loadSettings(const QDomElement & _this);
+	virtual void saveSettings(QDomDocument & doc, QDomElement & element);
+	virtual void loadSettings(const QDomElement & element);
 
 private:
 	virtual void modelChanged();

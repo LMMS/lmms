@@ -812,29 +812,29 @@ QMenu * SampleTrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	int channelIndex = model()->effectChannelModel()->value();
 
-	FxChannel *fxChannel = Engine::fxMixer()->effectChannel( channelIndex );
+	FxChannel *fxChannel = Engine::fxMixer()->effectChannel(channelIndex);
 
 	// If title allows interpolation, pass channel index and name
-	if ( title.contains( "%2" ) )
+	if (title.contains("%2"))
 	{
-		title = title.arg( channelIndex ).arg( fxChannel->m_name );
+		title = title.arg(channelIndex).arg(fxChannel->m_name);
 	}
 
-	QMenu *fxMenu = new QMenu( title );
+	QMenu *fxMenu = new QMenu(title);
 
 	QSignalMapper * fxMenuSignalMapper = new QSignalMapper(fxMenu);
 
-	fxMenu->addAction( newFxLabel, this, SLOT( createFxLine() ) );
+	fxMenu->addAction(newFxLabel, this, SLOT(createFxLine()));
 	fxMenu->addSeparator();
 
 	for (int i = 0; i < Engine::fxMixer()->numChannels(); ++i)
 	{
-		FxChannel * currentChannel = Engine::fxMixer()->effectChannel( i );
+		FxChannel * currentChannel = Engine::fxMixer()->effectChannel(i);
 
-		if ( currentChannel != fxChannel )
+		if (currentChannel != fxChannel)
 		{
-			QString label = tr( "FX %1: %2" ).arg( currentChannel->m_channelIndex ).arg( currentChannel->m_name );
-			QAction * action = fxMenu->addAction( label, fxMenuSignalMapper, SLOT( map() ) );
+			QString label = tr("FX %1: %2").arg(currentChannel->m_channelIndex).arg(currentChannel->m_name);
+			QAction * action = fxMenu->addAction(label, fxMenuSignalMapper, SLOT(map()));
 			fxMenuSignalMapper->setMapping(action, currentChannel->m_channelIndex);
 		}
 	}
@@ -864,11 +864,11 @@ void SampleTrackView::modelChanged()
 
 
 
-SampleTrackWindow::SampleTrackWindow(SampleTrackView * _stv) :
+SampleTrackWindow::SampleTrackWindow(SampleTrackView * tv) :
 	QWidget(),
 	ModelView(NULL, this),
-	m_track(_stv->model()),
-	m_stv(_stv)
+	m_track(tv->model()),
+	m_stv(tv)
 {
 	// init own layout + widgets
 	setFocusPolicy(Qt::StrongFocus);
@@ -954,14 +954,14 @@ SampleTrackWindow::SampleTrackWindow(SampleTrackView * _stv) :
 
 	generalSettingsLayout->addLayout(basicControlsLayout);
 
-	m_effectRack = new EffectRackView(_stv->model()->audioPort()->effects());
+	m_effectRack = new EffectRackView(tv->model()->audioPort()->effects());
 	m_effectRack->setFixedSize(240, 242);
 
 	vlayout->addWidget(generalSettingsWidget);
 	vlayout->addWidget(m_effectRack);
 
 
-	setModel(_stv->model());
+	setModel(tv->model());
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget(this);
 	Qt::WindowFlags flags = subWin->windowFlags();
@@ -988,14 +988,14 @@ SampleTrackWindow::~SampleTrackWindow()
 
 
 
-void SampleTrackWindow::setSampleTrackView(SampleTrackView* view)
+void SampleTrackWindow::setSampleTrackView(SampleTrackView* tv)
 {
-	if(m_stv && view)
+	if(m_stv && tv)
 	{
 		m_stv->m_tlb->setChecked(false);
 	}
 
-	m_stv = view;
+	m_stv = tv;
 }
 
 
@@ -1025,7 +1025,7 @@ void SampleTrackView::createFxLine()
 {
 	int channelIndex = gui->fxMixerView()->addNewChannel();
 
-	Engine::fxMixer()->effectChannel( channelIndex )->m_name = getTrack()->name();
+	Engine::fxMixer()->effectChannel(channelIndex)->m_name = getTrack()->name();
 
 	assignFxLine(channelIndex);
 }
@@ -1036,9 +1036,9 @@ void SampleTrackView::createFxLine()
 /*! \brief Assign a specific FX Channel for this track */
 void SampleTrackView::assignFxLine(int channelIndex)
 {
-	model()->effectChannelModel()->setValue( channelIndex );
+	model()->effectChannelModel()->setValue(channelIndex);
 
-	gui->fxMixerView()->setCurrentFxLine( channelIndex );
+	gui->fxMixerView()->setCurrentFxLine(channelIndex);
 }
 
 
@@ -1055,9 +1055,9 @@ void SampleTrackWindow::updateName()
 
 
 
-void SampleTrackWindow::textChanged(const QString& newName)
+void SampleTrackWindow::textChanged(const QString& new_name)
 {
-	m_track->setName(newName);
+	m_track->setName(new_name);
 	Engine::getSong()->setModified();
 }
 
@@ -1080,9 +1080,9 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 
 
-void SampleTrackWindow::closeEvent(QCloseEvent* event)
+void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	event->ignore();
+	ce->ignore();
 
 	if(gui->mainWindow()->workspace())
 	{
@@ -1099,15 +1099,17 @@ void SampleTrackWindow::closeEvent(QCloseEvent* event)
 
 
 
-void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement & thisElement)
+void SampleTrackWindow::saveSettings(QDomDocument& doc, QDomElement & element)
 {
+	Q_UNUSED(doc)
+	Q_UNUSED(element)
 }
 
 
 
-void SampleTrackWindow::loadSettings(const QDomElement& thisElement)
+void SampleTrackWindow::loadSettings(const QDomElement& element)
 {
-	MainWindow::restoreWidgetState(this, thisElement);
+	MainWindow::restoreWidgetState(this, element);
 	if(isVisible())
 	{
 		m_stv->m_tlb->setChecked(true);

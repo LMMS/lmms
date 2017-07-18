@@ -668,7 +668,7 @@ public:
 
 	// Create a menu for assigning/creating channels for this track
 	// Currently instrument track and sample track supports it
-	virtual QMenu * createFxMenu( QString title, QString newFxLabel );
+	virtual QMenu * createFxMenu(QString title, QString newFxLabel);
 
 
 public slots:

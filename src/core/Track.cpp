@@ -1842,12 +1842,12 @@ void TrackOperationsWidget::updateMenu()
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
 	}
-	if(QMenu *fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
+	if (QMenu *fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
 	{
 		toMenu->addMenu(fxMenu);
 	}
 
-	if(InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))
+	if (InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))
 	{
 		toMenu->addSeparator();
 		toMenu->addMenu(trackView->midiMenu());
@@ -2602,7 +2602,7 @@ void TrackView::update()
 /*! \brief Create a menu for assigning/creating channels for this track.
  *
  */
-QMenu * TrackView::createFxMenu( QString title, QString newFxLabel )
+QMenu * TrackView::createFxMenu(QString title, QString newFxLabel)
 {
 	Q_UNUSED(title)
 	Q_UNUSED(newFxLabel)
