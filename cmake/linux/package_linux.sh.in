@@ -80,15 +80,19 @@ success "${APPDIR}"
 
 # Create a wrapper script which calls the lmms executable
 mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
-echo "#!/usr/bin/env bash
-DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" && pwd )\"
+# shellcheck disable=SC1083
+cat >"${APPDIR}usr/bin/lmms" <<EOL
+#!/usr/bin/env bash
+DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
 export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
 # Prevent segfault on VirualBox
 if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
    export LIBGL_ALWAYS_SOFTWARE=1;
 fi
-QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real \"\$@\"" > "${APPDIR}usr/bin/lmms"
+QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real "\$@"
+EOL
+
 chmod +x "${APPDIR}usr/bin/lmms"
 
 # Per https://github.com/probonopd/linuxdeployqt/issues/129 
