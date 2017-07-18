@@ -663,8 +663,11 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 
 	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
+	int const finalTextTop = textTop + fontMetrics.ascent();
+	painter.setPen(textShadowColor());
+	painter.drawText( textLeft + 1, finalTextTop + 1, elidedPatternName );
 	painter.setPen( textColor() );
-	painter.drawText( textLeft, textTop + fontMetrics.ascent(), elidedPatternName );
+	painter.drawText( textLeft, finalTextTop, elidedPatternName );
 }
 
 /*! \brief Handle a mouse press on this trackContentObjectView.
