@@ -52,7 +52,7 @@ echo -e "\nWriting verbose output to \"${LOGFILE}\""
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
 mkdir -p "$HOME/bin"
 DAYSOLD=2
-if which linuxdeployqt > /dev/null 2>&1; then
+if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
 elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
@@ -60,6 +60,7 @@ elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/nul
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
 	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
 	chmod +x "$LINUXDEPLOYQT"
+	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
 else
 	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
