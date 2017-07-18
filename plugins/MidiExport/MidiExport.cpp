@@ -68,7 +68,8 @@ MidiExport::~MidiExport()
 
 
 
-bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename  )
+bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
+			const TrackContainer::TrackList &tracks_BB, int tempo, const QString &filename)
 {
 	QFile f(filename);
 	f.open(QIODevice::WriteOnly);
@@ -79,7 +80,6 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 
 
 	int nTracks = 0;
-	const int BUFFER_SIZE = 50*1024;
 	uint8_t buffer[BUFFER_SIZE];
 	uint32_t size;
 
@@ -132,22 +132,8 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 			if (n.nodeName() == "pattern")
 			{
 				base_time = n.toElement().attribute("pos", "0").toInt();
-				// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
-				for(QDomNode nn = n.firstChild(); !nn.isNull(); nn = nn.nextSibling())
-				{
-					QDomElement note = nn.toElement();
-					if (note.attribute("len", "0") == "0" || note.attribute("vol", "0") == "0") continue;
-					#if 0
-					qDebug() << ">>>> key " << note.attribute( "key", "0" ) 
-						<< " " << note.attribute("len", "0") << " @" 
-						<< note.attribute("pos", "0");
-					#endif
-					mtrack.addNote(
-						note.attribute("key", "0").toInt()+base_pitch
-						, 100 * base_volume * (note.attribute("vol", "100").toDouble()/100)
-						, (base_time+note.attribute("pos", "0").toDouble())/48
-						, (note.attribute("len", "0")).toDouble()/48);
-				}
+
+				writePattern(mtrack, n, base_pitch, base_volume, base_time);
 			}
 		
 		}
@@ -159,6 +145,27 @@ bool MidiExport::tryExport( const TrackContainer::TrackList &tracks, int tempo, 
 
 }
 
+
+
+void MidiExport::writePattern(MidiFile::MIDITrack<BUFFER_SIZE> &mtrack, QDomNode n, int base_pitch, double base_volume, int base_time)
+{
+	// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
+	for(QDomNode nn = n.firstChild(); !nn.isNull(); nn = nn.nextSibling())
+	{
+		QDomElement note = nn.toElement();
+		if (note.attribute("len", "0") == "0" || note.attribute("vol", "0") == "0") continue;
+		#if 0
+		qDebug() << ">>>> key " << note.attribute("key", "0")
+			<< " " << note.attribute("len", "0") << " @"
+			<< note.attribute("pos", "0");
+		#endif
+		mtrack.addNote(
+			note.attribute("key", "0").toInt()+base_pitch
+			, 100 * base_volume * (note.attribute("vol", "100").toDouble()/100)
+			, (base_time+note.attribute("pos", "0").toDouble())/48
+			, (note.attribute("len", "0")).toDouble()/48);
+	}
+}
 
 
 

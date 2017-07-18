@@ -31,6 +31,7 @@
 #include "MidiFile.hpp"
 
 
+const int BUFFER_SIZE = 50*1024;
 
 class MidiExport: public ExportFilter
 {
@@ -44,10 +45,12 @@ public:
 		return( NULL );
 	}
 
-	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename );
+	virtual bool tryExport(const TrackContainer::TrackList &tracks,
+				const TrackContainer::TrackList &tracks_BB, int tempo, const QString &filename);
 	
 private:
-	
+	void writePattern(MidiFile::MIDITrack<BUFFER_SIZE> & mtrack, QDomNode n,
+			int base_pitch, double base_volume, int base_time);
 
 	void error( void );
 

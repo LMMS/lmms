@@ -1445,14 +1445,15 @@ void Song::exportProjectMidi()
 		
 		// instantiate midi export plugin
 		TrackContainer::TrackList tracks;
-		tracks += Engine::getSong()->tracks();
-		tracks += Engine::getBBTrackContainer()->tracks();
+		TrackContainer::TrackList tracks_BB;
+		tracks = Engine::getSong()->tracks();
+		tracks_BB = Engine::getBBTrackContainer()->tracks();
 		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
 		if (exf==NULL) {
 			qDebug() << "failed to load midi export filter!";
 			return;
 		}
-		exf->tryExport(tracks, Engine::getSong()->getTempo(), export_filename);
+		exf->tryExport(tracks, tracks_BB, Engine::getSong()->getTempo(), export_filename);
 	}
 }
 
