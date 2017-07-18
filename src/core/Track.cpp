@@ -656,6 +656,11 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 	QFontMetrics fontMetrics(labelFont);
 	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
 
+	if (elidedPatternName.length() < 2)
+	{
+		elidedPatternName = text.trimmed();
+	}
+
 	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
 
 	painter.setPen( textColor() );
