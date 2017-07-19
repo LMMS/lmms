@@ -98,6 +98,8 @@ public:
 	}
 	void setColor( QColor _new_color );
 
+public slots:
+	virtual void update();
 
 protected slots:
 	void openInBBEditor();
