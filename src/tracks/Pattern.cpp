@@ -652,16 +652,7 @@ PatternView::~PatternView()
 
 void PatternView::update()
 {
-	if ( m_pat->m_patternType == Pattern::BeatPattern )
-	{
-		ToolTip::add( this,
-			tr( "use mouse wheel to set velocity of a step" ) );
-	}
-	else
-	{
-		ToolTip::add( this,
-			tr( "double-click to open in Piano Roll" ) );
-	}
+	ToolTip::add(this, m_pat->name());
 
 	TrackContentObjectView::update();
 }

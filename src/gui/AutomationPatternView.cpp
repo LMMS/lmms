@@ -55,8 +55,7 @@ AutomationPatternView::AutomationPatternView( AutomationPattern * _pattern,
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
-	ToolTip::add( this, tr( "double-click to open this pattern in "
-						"automation editor" ) );
+	ToolTip::add(this, m_pat->name());
 	setStyle( QApplication::style() );
 	
 	if( s_pat_rec == NULL ) { s_pat_rec = new QPixmap( embed::getIconPixmap(
@@ -80,6 +79,13 @@ void AutomationPatternView::openInAutomationEditor()
 	if(gui) gui->automationEditor()->open(m_pat);
 }
 
+
+void AutomationPatternView::update()
+{
+	ToolTip::add(this, m_pat->name());
+
+	TrackContentObjectView::update();
+}
 
 
 
