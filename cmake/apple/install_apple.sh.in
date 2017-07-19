@@ -4,13 +4,11 @@
 #   Examine linkings using `otool -L somelib.so`
 #   Debug the loading of dynamic libraries using `export DYLD_PRINT_LIBRARIES=1`
 
-# STK rawwaves directory
-STK_RAWWAVE=$HOME/stk-*/rawwaves
+set -e
 
-if [ ! -d "$STK_RAWWAVE" ]; then
-   STK_RAWWAVE=$(brew --prefix stk)/share/stk/rawwaves
-fi
- 
+# STK rawwaves directory
+STK_RAWWAVE=$(brew --prefix stk)/share/stk/rawwaves
+
 # Place to create ".app" bundle
 APP="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.app"
 
@@ -18,35 +16,32 @@ MSG_COLOR='\x1B[1;36m'
 COLOR_RESET='\x1B[0m'
 echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 
-# Locate macdeployqt, assume homebrew & Qt5
-which macdeployqt > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-  brew --prefix qt55 > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    # Prefer Qt 5.5 (QTBUG-53533)
-    export PATH=$PATH:$(brew --prefix qt55)/bin
-  else
-    # Fallback Qt 5.6+
-  	export PATH=$PATH:$(brew --prefix qt5)/bin
-  fi
+# Prefer Qt 5.5 (QTBUG-53533)
+qtpath=$(brew --prefix qt@5.5)/bin
+
+# Fallback Qt 5.6+
+if [ ! -d "$qtpath" ]; then
+  qtpath=$(brew--prefix qt5)/bin
 fi
- 
+
+export PATH=$PATH:$qtpath
+
 # Remove any old .app bundles
 rm -Rf "$APP"
 
 # Copy/overwrite Info.plist
-\cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
- 
+command cp  "@CMAKE_BINARY_DIR@/Info.plist" "@CMAKE_INSTALL_PREFIX@/"
+
 # Create .app bundle containing contents from CMAKE_INSTALL_PREFIX
 mkdir -p "$APP/Contents/MacOS"
 mkdir -p "$APP/Contents/Frameworks"
 mkdir -p "$APP/Contents/Resources"
 mkdir -p "$APP/Contents/share/stk/rawwaves"
 cd "@CMAKE_INSTALL_PREFIX@"
-cp -R * "$APP/Contents"
+cp -R ./* "$APP/Contents"
 cp "@CMAKE_SOURCE_DIR@/cmake/apple/"*.icns "$APP/Contents/Resources/"
-cp $STK_RAWWAVE/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
- 
+cp "$STK_RAWWAVE"/*.raw "$APP/Contents/share/stk/rawwaves" > /dev/null 2>&1
+
 # Make all libraries writable for macdeployqt
 cd "$APP"
 find . -type f -print0 | xargs -0 chmod u+w
@@ -55,11 +50,11 @@ lmmsbin="MacOS/@CMAKE_PROJECT_NAME@"
 zynlib="lib/lmms/libzynaddsubfx.so"
 zynfmk="Frameworks/libZynAddSubFxCore.dylib"
 zynbin="MacOS/RemoteZynAddSubFx"
- 
+
 # Move lmms binary
 mv "$APP/Contents/bin/@CMAKE_PROJECT_NAME@" "$APP/Contents/$lmmsbin"
- 
-# Fix zyn linking 
+
+# Fix zyn linking
 mv "$APP/Contents/lib/lmms/RemoteZynAddSubFx" "$APP/Contents/$zynbin"
 mv "$APP/Contents/lib/lmms/libZynAddSubFxCore.dylib" "$APP/Contents/$zynfmk"
 
@@ -70,17 +65,17 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
 install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
    @loader_path/../../$zynfmk \
   "$APP/Contents/$zynlib"
-  
+
 # Link lmms binary
 _executables="${_executables} -executable=$APP/Contents/$zynbin"
 _executables="${_executables} -executable=$APP/Contents/$zynfmk"
- 
+
 # Build a list of shared objects in target/lib/lmms
 for file in "$APP/Contents/lib/lmms/"*.so; do
    _thisfile="$APP/Contents/lib/lmms/${file##*/}"
    _executables="${_executables} -executable=$_thisfile"
 done
- 
+
 # Build a list of shared objects in target/lib/lmms/ladspa
 for file in "$APP/Contents/lib/lmms/ladspa/"*.so; do
    _thisfile="$APP/Contents/lib/lmms/ladspa/${file##*/}"
@@ -88,6 +83,7 @@ for file in "$APP/Contents/lib/lmms/ladspa/"*.so; do
 done
 
 # Finalize .app
+# shellcheck disable=SC2086
 macdeployqt "$APP" $_executables
 
 # Cleanup

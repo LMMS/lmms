@@ -1,28 +1,29 @@
-
-// Gb_Snd_Emu 0.1.4. http://www.slack.net/~ant/libs/
+// Gb_Snd_Emu 0.1.5. http://www.slack.net/~ant/
 
 #include "Gb_Apu.h"
 
 #include <string.h>
 
-/* Copyright (C) 2003-2005 Shay Green. This module is free software; you
+/* Copyright (C) 2003-2006 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
 General Public License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version. This
 module is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
-more details. You should have received a copy of the GNU Lesser General
-Public License along with this module; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA */
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+details. You should have received a copy of the GNU Lesser General Public
+License along with this module; if not, write to the Free Software Foundation,
+Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
-#include BLARGG_SOURCE_BEGIN
+#include "blargg_source.h"
+
+unsigned const vol_reg    = 0xFF24;
+unsigned const status_reg = 0xFF26;
 
 Gb_Apu::Gb_Apu()
 {
 	square1.synth = &square_synth;
 	square2.synth = &square_synth;
-	square1.has_sweep = true;
 	wave.synth  = &other_synth;
 	noise.synth = &other_synth;
 	
@@ -31,12 +32,20 @@ Gb_Apu::Gb_Apu()
 	oscs [2] = &wave;
 	oscs [3] = &noise;
 	
+	for ( int i = 0; i < osc_count; i++ )
+	{
+		Gb_Osc& osc = *oscs [i];
+		osc.regs = &regs [i * 5];
+		osc.output = 0;
+		osc.outputs [0] = 0;
+		osc.outputs [1] = 0;
+		osc.outputs [2] = 0;
+		osc.outputs [3] = 0;
+	}
+	
+	set_tempo( 1.0 );
 	volume( 1.0 );
 	reset();
-}
-
-Gb_Apu::~Gb_Apu()
-{
 }
 
 void Gb_Apu::treble_eq( const blip_eq_t& eq )
@@ -45,11 +54,15 @@ void Gb_Apu::treble_eq( const blip_eq_t& eq )
 	other_synth.treble_eq( eq );
 }
 
-void Gb_Apu::volume( double vol )
+void Gb_Apu::osc_output( int index, Blip_Buffer* center, Blip_Buffer* left, Blip_Buffer* right )
 {
-	vol *= 0.60 / osc_count;
-	square_synth.volume( vol );
-	other_synth.volume( vol );
+	require( (unsigned) index < osc_count );
+	require( (center && left && right) || (!center && !left && !right) );
+	Gb_Osc& osc = *oscs [index];
+	osc.outputs [1] = right;
+	osc.outputs [2] = left;
+	osc.outputs [3] = center;
+	osc.output = osc.outputs [osc.output_select];
 }
 
 void Gb_Apu::output( Blip_Buffer* center, Blip_Buffer* left, Blip_Buffer* right )
@@ -58,44 +71,62 @@ void Gb_Apu::output( Blip_Buffer* center, Blip_Buffer* left, Blip_Buffer* right 
 		osc_output( i, center, left, right );
 }
 
+void Gb_Apu::update_volume()
+{
+	// TODO: doesn't handle differing left/right global volume (support would
+	// require modification to all oscillator code)
+	int data = regs [vol_reg - start_addr];
+	double vol = (max( data & 7, data >> 4 & 7 ) + 1) * volume_unit;
+	square_synth.volume( vol );
+	other_synth.volume( vol );
+}
+
+static unsigned char const powerup_regs [0x20] = {
+	0x80,0x3F,0x00,0xFF,0xBF, // square 1
+	0xFF,0x3F,0x00,0xFF,0xBF, // square 2
+	0x7F,0xFF,0x9F,0xFF,0xBF, // wave
+	0xFF,0xFF,0x00,0x00,0xBF, // noise
+	0x00, // left/right enables
+	0x77, // master volume
+	0x80, // power
+	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
+};
+
+void Gb_Apu::set_tempo( double t )
+{
+	frame_period = 4194304 / 256; // 256 Hz
+	if ( t != 1.0 )
+		frame_period = blip_time_t (frame_period / t);
+}
+
 void Gb_Apu::reset()
 {
 	next_frame_time = 0;
-	last_time = 0;
-	frame_count = 0;
-	stereo_found = false;
+	last_time       = 0;
+	frame_count     = 0;
 	
 	square1.reset();
 	square2.reset();
 	wave.reset();
 	noise.reset();
+	noise.bits = 1;
+	wave.wave_pos = 0;
 	
-	memset( regs, 0, sizeof regs );
+	// avoid click at beginning
+	regs [vol_reg - start_addr] = 0x77;
+	update_volume();
+	
+	regs [status_reg - start_addr] = 0x01; // force power
+	write_register( 0, status_reg, 0x00 );
+	
+	static unsigned char const initial_wave [] = {
+		0x84,0x40,0x43,0xAA,0x2D,0x78,0x92,0x3C, // wave table
+		0x60,0x59,0x59,0xB0,0x34,0xB8,0x2E,0xDA
+	};
+	memcpy( wave.wave, initial_wave, sizeof wave.wave );
 }
 
-void Gb_Apu::osc_output( int index, Blip_Buffer* center, Blip_Buffer* left, Blip_Buffer* right )
-{
-	require( (unsigned) index < osc_count );
-	
-	Gb_Osc& osc = *oscs [index];
-	if ( center && !left && !right )
-	{
-		// mono
-		left = center;
-		right = center;
-	}
-	else
-	{
-		// must be silenced or stereo
-		require( (!left && !right) || (left && right) );
-	}
-	osc.outputs [1] = right;
-	osc.outputs [2] = left;
-	osc.outputs [3] = center;
-	osc.output = osc.outputs [osc.output_select];
-}
-
-void Gb_Apu::run_until( gb_time_t end_time )
+void Gb_Apu::run_until( blip_time_t end_time )
 {
 	require( end_time >= last_time ); // end_time must not be before previous time
 	if ( end_time == last_time )
@@ -103,17 +134,28 @@ void Gb_Apu::run_until( gb_time_t end_time )
 	
 	while ( true )
 	{
-		gb_time_t time = next_frame_time;
+		blip_time_t time = next_frame_time;
 		if ( time > end_time )
 			time = end_time;
 		
 		// run oscillators
-		for ( int i = 0; i < osc_count; ++i ) {
+		for ( int i = 0; i < osc_count; ++i )
+		{
 			Gb_Osc& osc = *oscs [i];
-			if ( osc.output ) {
-				if ( osc.output != osc.outputs [3] )
-					stereo_found = true;
-				osc.run( last_time, time );
+			if ( osc.output )
+			{
+				osc.output->set_modified(); // TODO: misses optimization opportunities?
+				int playing = false;
+				if ( osc.enabled && osc.volume &&
+						(!(osc.regs [4] & osc.len_enabled_mask) || osc.length) )
+					playing = -1;
+				switch ( i )
+				{
+				case 0: square1.run( last_time, time, playing ); break;
+				case 1: square2.run( last_time, time, playing ); break;
+				case 2: wave   .run( last_time, time, playing ); break;
+				case 3: noise  .run( last_time, time, playing ); break;
+				}
 			}
 		}
 		last_time = time;
@@ -121,7 +163,7 @@ void Gb_Apu::run_until( gb_time_t end_time )
 		if ( time == end_time )
 			break;
 		
-		next_frame_time += 4194304 / 256; // 256 Hz
+		next_frame_time += frame_period;
 		
 		// 256 Hz actions
 		square1.clock_length();
@@ -130,7 +172,8 @@ void Gb_Apu::run_until( gb_time_t end_time )
 		noise.clock_length();
 		
 		frame_count = (frame_count + 1) & 3;
-		if ( frame_count == 0 ) {
+		if ( frame_count == 0 )
+		{
 			// 64 Hz actions
 			square1.clock_envelope();
 			square2.clock_envelope();
@@ -142,7 +185,7 @@ void Gb_Apu::run_until( gb_time_t end_time )
 	}
 }
 
-bool Gb_Apu::end_frame( gb_time_t end_time )
+void Gb_Apu::end_frame( blip_time_t end_time )
 {
 	if ( end_time > last_time )
 		run_until( end_time );
@@ -152,13 +195,9 @@ bool Gb_Apu::end_frame( gb_time_t end_time )
 	
 	assert( last_time >= end_time );
 	last_time -= end_time;
-	
-	bool result = stereo_found;
-	stereo_found = false;
-	return result;
 }
 
-void Gb_Apu::write_register( gb_time_t time, gb_addr_t addr, int data )
+void Gb_Apu::write_register( blip_time_t time, unsigned addr, int data )
 {
 	require( (unsigned) data < 0x100 );
 	
@@ -168,48 +207,39 @@ void Gb_Apu::write_register( gb_time_t time, gb_addr_t addr, int data )
 	
 	run_until( time );
 	
+	int old_reg = regs [reg];
 	regs [reg] = data;
 	
-	if ( addr < 0xff24 )
+	if ( addr < vol_reg )
 	{
-		// oscillator
-		int index = reg / 5;
-		oscs [index]->write_register( reg - index * 5, data ); 
+		write_osc( reg / 5, reg, data );
 	}
-	// added
-	else if ( addr == 0xff24 )
+	else if ( addr == vol_reg && data != old_reg ) // global volume
 	{
-		int global_volume = data & 7;
-		int old_volume = square1.global_volume;
-		if ( old_volume != global_volume )
+		// return all oscs to 0
+		for ( int i = 0; i < osc_count; i++ )
 		{
-			int any_enabled = false;
-			for ( int i = 0; i < osc_count; i++ )
-			{
-				Gb_Osc& osc = *oscs [i];
-				if ( osc.enabled )
-				{
-					if ( osc.last_amp )
-					{
-						int new_amp = osc.last_amp * global_volume / osc.global_volume;
-						if ( osc.output )
-							square_synth.offset( time, new_amp - osc.last_amp, osc.output );
-						osc.last_amp = new_amp;
-					}
-					any_enabled |= osc.volume;
-				}
-				osc.global_volume = global_volume;
-			}
-			
-			if ( !any_enabled && square1.outputs [3] )
-				square_synth.offset( time, (global_volume - old_volume) * 15 * 2, square1.outputs [3] );
+			Gb_Osc& osc = *oscs [i];
+			int amp = osc.last_amp;
+			osc.last_amp = 0;
+			if ( amp && osc.enabled && osc.output )
+				other_synth.offset( time, -amp, osc.output );
 		}
+		
+		if ( wave.outputs [3] )
+			other_synth.offset( time, 30, wave.outputs [3] );
+		
+		update_volume();
+		
+		if ( wave.outputs [3] )
+			other_synth.offset( time, -30, wave.outputs [3] );
+		
+		// oscs will update with new amplitude when next run
 	}
-	
-	else if ( addr == 0xff25 || addr == 0xff26 )
+	else if ( addr == 0xFF25 || addr == status_reg )
 	{
-		int mask = (regs [0xff26 - start_addr] & 0x80) ? ~0 : 0;
-		int flags = regs [0xff25 - start_addr] & mask;
+		int mask = (regs [status_reg - start_addr] & 0x80) ? ~0 : 0;
+		int flags = regs [0xFF25 - start_addr] & mask;
 		
 		// left/right assignments
 		for ( int i = 0; i < osc_count; i++ )
@@ -220,42 +250,57 @@ void Gb_Apu::write_register( gb_time_t time, gb_addr_t addr, int data )
 			Blip_Buffer* old_output = osc.output;
 			osc.output_select = (bits >> 3 & 2) | (bits & 1);
 			osc.output = osc.outputs [osc.output_select];
-			if ( osc.output != old_output && osc.last_amp )
+			if ( osc.output != old_output )
 			{
-				if ( old_output )
-					square_synth.offset( time, -osc.last_amp, old_output );
+				int amp = osc.last_amp;
 				osc.last_amp = 0;
+				if ( amp && old_output )
+					other_synth.offset( time, -amp, old_output );
+			}
+		}
+		
+		if ( addr == status_reg && data != old_reg )
+		{
+			if ( !(data & 0x80) )
+			{
+				for ( unsigned i = 0; i < sizeof powerup_regs; i++ )
+				{
+					if ( i != status_reg - start_addr )
+						write_register( time, i + start_addr, powerup_regs [i] );
+				}
+			}
+			else
+			{
+				//debug_printf( "APU powered on\n" );
 			}
 		}
 	}
-	else if ( addr >= 0xff30 )
+	else if ( addr >= 0xFF30 )
 	{
-		int index = (addr & 0x0f) * 2;
+		int index = (addr & 0x0F) * 2;
 		wave.wave [index] = data >> 4;
-		wave.wave [index + 1] = data & 0x0f;
+		wave.wave [index + 1] = data & 0x0F;
 	}
 }
 
-int Gb_Apu::read_register( gb_time_t time, gb_addr_t addr )
+int Gb_Apu::read_register( blip_time_t time, unsigned addr )
 {
-	// function now takes actual address, i.e. 0xFFXX
-	require( start_addr <= addr && addr < end_addr );
-	
 	run_until( time );
 	
-	int data = regs [addr - start_addr];
+	int index = addr - start_addr;
+	require( (unsigned) index < register_count );
+	int data = regs [index];
 	
-	if ( addr == 0xff26 )
+	if ( addr == status_reg )
 	{
-		data &= 0xf0;
+		data = (data & 0x80) | 0x70;
 		for ( int i = 0; i < osc_count; i++ )
 		{
 			const Gb_Osc& osc = *oscs [i];
-			if ( osc.enabled && (osc.length || !osc.length_enabled) )
+			if ( osc.enabled && (osc.length || !(osc.regs [4] & osc.len_enabled_mask)) )
 				data |= 1 << i;
 		}
 	}
 	
 	return data;
 }
-

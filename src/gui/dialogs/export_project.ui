@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>412</height>
+    <width>715</width>
+    <height>491</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -45,39 +45,130 @@
          <widget class="QComboBox" name="fileFormatCB"/>
         </item>
         <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Samplerate:</string>
-          </property>
+         <widget class="QWidget" name="sampleRateWidget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelSampleRate">
+             <property name="text">
+              <string>Samplerate:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="samplerateCB">
+             <item>
+              <property name="text">
+               <string>44100 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>48000 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>88200 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>96000 Hz</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>192000 Hz</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="samplerateCB">
-          <item>
-           <property name="text">
-            <string>44100 Hz</string>
+         <widget class="QWidget" name="depthWidget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+          <layout class="QVBoxLayout">
+           <property name="margin">
+            <number>0</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>48000 Hz</string>
+           <item>
+            <widget class="QLabel" name="labelBitDepth">
+             <property name="text">
+              <string>Depth:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="depthCB">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>16 Bit Integer</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>24 Bit Integer</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>32 Bit Float</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="stereoModeWidget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="margin">
+            <number>0</number>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>88200 Hz</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>96000 Hz</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>192000 Hz</string>
-           </property>
-          </item>
+           <item>
+            <widget class="QLabel" name="labelStereoMode_3">
+             <property name="text">
+              <string>Stereo mode:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="stereoModeComboBox">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Stereo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Joint Stereo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mono</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
@@ -86,20 +177,11 @@
            <property name="spacing">
             <number>6</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="labelBitRate">
              <property name="text">
               <string>Bitrate:</string>
              </property>
@@ -142,72 +224,14 @@
              </item>
             </widget>
            </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="depthWidget" native="true">
-          <layout class="QVBoxLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
            <item>
-            <widget class="QLabel" name="label_6">
+            <widget class="QCheckBox" name="checkBoxVariableBitRate">
              <property name="text">
-              <string>Depth:</string>
+              <string>Use variable bitrate</string>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QComboBox" name="depthCB">
-             <item>
-              <property name="text">
-               <string>16 Bit Integer</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>32 Bit Float</string>
-              </property>
-             </item>
-            </widget>
-           </item>
           </layout>
-         </widget>
-        </item>
-        <item>
-         <spacer>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>1</width>
-            <height>10</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Please note that not all of the parameters above apply for all file formats.</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item>
@@ -381,8 +405,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>293</y>
+     <x>511</x>
+     <y>372</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
@@ -390,5 +414,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>fileFormatCB</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ExportProjectDialog</receiver>
+   <slot>onFileFormatChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onFileFormatChanged(int)</slot>
+ </slots>
 </ui>

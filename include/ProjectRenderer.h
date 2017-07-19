@@ -28,6 +28,7 @@
 #include "AudioFileDevice.h"
 #include "lmmsconfig.h"
 #include "Mixer.h"
+#include "OutputSettings.h"
 
 
 class ProjectRenderer : public QThread
@@ -38,35 +39,14 @@ public:
 	{
 		WaveFile,
 		OggFile,
+		MP3File,
 		NumFileFormats
-	} ;
-
-	enum Depths
-	{
-		Depth_16Bit,
-		Depth_32Bit,
-		NumDepths
-	} ;
-
-	struct OutputSettings
-	{
-		sample_rate_t samplerate;
-		bool vbr;
-		int bitrate;
-		Depths depth;
-
-		OutputSettings( sample_rate_t _sr, bool _vbr, int _bitrate,
-								Depths _d ) :
-			samplerate( _sr ),
-			vbr( _vbr ),
-			bitrate( _bitrate ),
-			depth( _d )
-		{
-		}
 	} ;
 
 	struct FileEncodeDevice
 	{
+		bool isAvailable() const { return m_getDevInst != nullptr; }
+
 		ExportFileFormats m_fileFormat;
 		const char * m_description;
 		const char * m_extension;
