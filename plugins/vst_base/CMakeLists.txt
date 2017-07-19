@@ -43,6 +43,10 @@ IF(LMMS_HOST_X86_64)
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
+	# Wine stable
+	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-stable/lib64/wine/libwinecrt0.a.*")
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-stable/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+	ENDIF()
 	# Wine development
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-devel/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-devel/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
