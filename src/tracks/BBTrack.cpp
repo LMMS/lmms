@@ -38,6 +38,7 @@
 #include "RenameDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 
@@ -381,6 +382,12 @@ void BBTCOView::setColor( QColor new_color )
 }
 
 
+void BBTCOView::update()
+{
+	ToolTip::add(this, m_bbTCO->name());
+
+	TrackContentObjectView::update();
+}
 
 
 
