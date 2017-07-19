@@ -91,8 +91,10 @@ SET(LMMS_SRCS
 )
 
 IF(QT5 AND LMMS_BUILD_LINUX)
+    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include/")
     add_library(x11embedcontainer STATIC
-        X11EmbedContainer
+        "${CMAKE_SOURCE_DIR}/src/gui/X11EmbedContainer.cpp"
+        "${CMAKE_SOURCE_DIR}/include/X11EmbedContainer.h"
     )
     FIND_PACKAGE(Qt5Core COMPONENTS Private)
     FIND_PACKAGE(Qt5Widgets COMPONENTS Private)
@@ -101,10 +103,11 @@ IF(QT5 AND LMMS_BUILD_LINUX)
 	include_directories(${Qt5Core_PRIVATE_INCLUDE_DIRS})
 	include_directories(${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
 
-
 	target_link_Libraries(x11embedcontainer
-		 xcb xcb-util X11-xcb Qt5::X11Extras
+		 xcb xcb-util X11-xcb Qt5::X11Extras X11
 	)
+
+    SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS} x11embedcontainer PARENT_SCOPE)
 ELSE()
     add_library(x11embedcontainer STATIC /dev/null)
 ENDIF()
