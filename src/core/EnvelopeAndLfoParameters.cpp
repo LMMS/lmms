@@ -34,6 +34,8 @@
 extern const float SECS_PER_ENV_SEGMENT = 5.0f;
 // how long should be one LFO-oscillation maximal?
 extern const float SECS_PER_LFO_OSCILLATION = 20.0f;
+// minimum number of frames for ENV/LFO stages that mustn't be '0'
+const f_cnt_t minimumFrames = 1;
 
 
 EnvelopeAndLfoParameters::LfoInstances * EnvelopeAndLfoParameters::s_lfoInstances = NULL;
@@ -272,7 +274,7 @@ inline void EnvelopeAndLfoParameters::fillLfoLevel( float * _buf,
 	}
 
 	fpp_t offset = 0;
-	const float lafI = 1.0f / m_lfoAttackFrames;
+	const float lafI = 1.0f / qMax( minimumFrames, m_lfoAttackFrames );
 	for( ; offset < _frames && _frame < m_lfoAttackFrames; ++offset,
 								++_frame )
 	{
@@ -404,20 +406,23 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 {
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 				Engine::mixer()->processingSampleRate();
+
 	// TODO: Remove the expKnobVals, time should be linear
 	const f_cnt_t predelay_frames = static_cast<f_cnt_t>(
 							frames_per_env_seg *
 					expKnobVal( m_predelayModel.value() ) );
 
-	const f_cnt_t attack_frames = static_cast<f_cnt_t>( frames_per_env_seg *
-					expKnobVal( m_attackModel.value() ) );
+	const f_cnt_t attack_frames = qMax( minimumFrames,
+					static_cast<f_cnt_t>( frames_per_env_seg *
+					expKnobVal( m_attackModel.value() ) ) );
 
 	const f_cnt_t hold_frames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_holdModel.value() ) );
 
-	const f_cnt_t decay_frames = static_cast<f_cnt_t>( frames_per_env_seg *
+	const f_cnt_t decay_frames = qMax( minimumFrames,
+					static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_decayModel.value() *
-						( 1 - m_sustainModel.value() ) ) );
+					( 1 - m_sustainModel.value() ) ) ) );
 
 	m_sustainLevel = m_sustainModel.value();
 	m_amount = m_amountModel.value();
@@ -434,10 +439,11 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 								decay_frames;
 	m_rFrames = static_cast<f_cnt_t>( frames_per_env_seg *
 					expKnobVal( m_releaseModel.value() ) );
+	m_rFrames = qMax( minimumFrames, m_rFrames );
 
 	if( static_cast<int>( floorf( m_amount * 1000.0f ) ) == 0 )
 	{
-		m_rFrames = 0;
+		m_rFrames = minimumFrames;
 	}
 
 	// if the buffers are too small, make bigger ones - so we only alloc new memory when necessary
