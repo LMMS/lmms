@@ -99,6 +99,7 @@ public:
 	static void setTicksPerTact( tick_t tpt );
 	static MidiTime stepPosition( int step );
 	static double ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute);
+	static double ticksToMilliseconds(double ticks, bpm_t beatsPerMinute);
 
 private:
 	tick_t m_ticks;
