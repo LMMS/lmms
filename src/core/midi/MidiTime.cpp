@@ -198,6 +198,11 @@ MidiTime MidiTime::stepPosition( int step )
 
 double MidiTime::ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute)
 {
+	return MidiTime::ticksToMilliseconds(static_cast<double>(ticks), beatsPerMinute);
+}
+
+double MidiTime::ticksToMilliseconds(double ticks, bpm_t beatsPerMinute)
+{
 	// 60 * 1000 / 48 = 1250
 	return ( ticks * 1250 ) / beatsPerMinute;
 }
