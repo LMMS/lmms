@@ -82,6 +82,7 @@ public slots:
 	void setEditModeSelect();
 
 	void updatePosition( const MidiTime & t );
+	void updatePositionLine();
 	void selectAllTcos( bool select );
 
 protected:
@@ -106,7 +107,6 @@ private slots:
 
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );
-
 	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
@@ -156,6 +156,9 @@ public:
 
 	SongEditor* m_editor;
 
+protected:
+	virtual void resizeEvent( QResizeEvent * event );
+
 protected slots:
 	void play();
 	void record();
@@ -166,6 +169,7 @@ protected slots:
 
 signals:
 	void playTriggered();
+	void resized();
 
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );

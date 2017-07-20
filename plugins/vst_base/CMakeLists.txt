@@ -34,20 +34,24 @@ IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32)
 
-	# workaround for broken wineg++ in WINE 1.4 (shipped e.g. with Ubuntu Precise)
 	EXEC_PROGRAM( ${WINE_CXX} ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
+	# workaround for broken wineg++ in WINE 1.4 (shipped e.g. with Ubuntu Precise)
 	IF("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -L/usr/lib/i386-linux-gnu/wine/ -luser32 -lkernel32 -lgdi32)
 	ENDIF()
 	# The following check works on Fedora systems
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
-	# Development
+	# Wine stable
+	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-stable/lib64/wine/libwinecrt0.a.*")
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-stable/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+	ENDIF()
+	# Wine development
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-devel/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-devel/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
-	# Staging
+	# Wine staging
 	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-staging/lib64/wine/libwinecrt0.a.*")
 		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-staging/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
 	ENDIF()
@@ -61,16 +65,15 @@ STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKE
 ADD_CUSTOM_COMMAND(
 	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 	COMMAND ${WINE_CXX}
-	ARGS "-I\"${CMAKE_BINARY_DIR}\""
-		"-I\"${CMAKE_SOURCE_DIR}/include\""
-		"-I\"${CMAKE_INSTALL_PREFIX}/include/wine/windows\""
-		"-I\"${CMAKE_INSTALL_PREFIX}/include\""
-		"-I\"${WINE_INCLUDE_BASE_DIR}\""
-		"-L\"${WINE_LIBRARY_DIR}\""
-		"\"${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp\""
+	ARGS -I${CMAKE_BINARY_DIR}
+		-I${CMAKE_SOURCE_DIR}/include
+		-I${WINE_INCLUDE_BASE_DIR}
+		-L${WINE_LIBRARY_DIR}
+		${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
 		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
 		${WINE_BUILD_FLAGS}
 		-o ../RemoteVstPlugin
+	# Ensure correct file extension
 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
 	OUTPUTS ../RemoteVstPlugin

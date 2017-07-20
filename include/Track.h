@@ -196,6 +196,7 @@ class TrackContentObjectView : public selectableObject, public ModelView
 	Q_PROPERTY( QColor mutedBackgroundColor READ mutedBackgroundColor WRITE setMutedBackgroundColor )
 	Q_PROPERTY( QColor selectedColor READ selectedColor WRITE setSelectedColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
+	Q_PROPERTY( QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor )
 	Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
 	Q_PROPERTY( QColor BBPatternBackground READ BBPatternBackground WRITE setBBPatternBackground )
 	Q_PROPERTY( bool gradient READ gradient WRITE setGradient )
@@ -215,6 +216,7 @@ public:
 	QColor mutedBackgroundColor() const;
 	QColor selectedColor() const;
 	QColor textColor() const;
+	QColor textBackgroundColor() const;
 	QColor textShadowColor() const;
 	QColor BBPatternBackground() const;
 	bool gradient() const;
@@ -222,6 +224,7 @@ public:
 	void setMutedBackgroundColor( const QColor & c );
 	void setSelectedColor( const QColor & c );
 	void setTextColor( const QColor & c );
+	void setTextBackgroundColor( const QColor & c );
 	void setTextShadowColor( const QColor & c );
 	void setBBPatternBackground( const QColor & c );
 	void setGradient( const bool & b );
@@ -263,6 +266,8 @@ protected:
 
 	DataFile createTCODataFiles(const QVector<TrackContentObjectView *> & tcos) const;
 
+	virtual void paintTextLabel(QString const & text, QPainter & painter);
+
 
 protected slots:
 	void updateLength();
@@ -297,6 +302,7 @@ private:
 	QColor m_mutedBackgroundColor;
 	QColor m_selectedColor;
 	QColor m_textColor;
+	QColor m_textBackgroundColor;
 	QColor m_textShadowColor;
 	QColor m_BBPatternBackground;
 	bool m_gradient;

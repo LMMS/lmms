@@ -97,14 +97,26 @@ public:
 
 	void processNextBuffer();
 
+	inline int getLoadingTrackCount() const
+	{
+		return m_nLoadingTrack;
+	}
+
 	inline int getMilliseconds() const
 	{
 		return m_elapsedMilliSeconds;
 	}
-	inline void setMilliSeconds( float ellapsedMilliSeconds )
+
+	inline void setToTime( MidiTime const & midiTime )
 	{
-		m_elapsedMilliSeconds = ellapsedMilliSeconds;
+		m_elapsedMilliSeconds = midiTime.getTimeInMilliseconds(getTempo());
 	}
+
+	inline void setToTimeByTicks(tick_t ticks)
+	{
+		m_elapsedMilliSeconds = MidiTime::ticksToMilliseconds(ticks, getTempo());
+	}
+
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -339,6 +351,7 @@ private:
 
 	ControllerVector m_controllers;
 
+	int m_nLoadingTrack;
 
 	QString m_fileName;
 	QString m_oldFileName;

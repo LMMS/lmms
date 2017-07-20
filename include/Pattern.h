@@ -88,7 +88,7 @@ public:
 	{
 		return m_patternType;
 	}
-	void checkType();
+
 
 	// next/previous track based on position in the containing track
 	Pattern * previousPattern() const;
@@ -132,6 +132,7 @@ private:
 	MidiTime beatPatternLength() const;
 
 	void setType( PatternTypes _new_pattern_type );
+	void checkType();
 
 	void resizeToFirstTrack();
 

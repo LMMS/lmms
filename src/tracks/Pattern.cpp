@@ -361,9 +361,7 @@ void Pattern::checkType()
 	NoteVector::Iterator it = m_notes.begin();
 	while( it != m_notes.end() )
 	{
-		if( ( *it )->length() > 0 ||
-			( *it )->pos() % ( MidiTime::ticksPerTact() /
-						MidiTime::stepsPerTact() ) )
+		if( ( *it )->length() > 0 )
 		{
 			setType( MelodyPattern );
 			return;
@@ -872,8 +870,10 @@ void PatternView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size()
-		? QPixmap( size() ) : m_paintPixmap;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	{
+		m_paintPixmap = QPixmap(size());
+	}
 
 	QPainter p( &m_paintPixmap );
 
@@ -1070,29 +1070,11 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-
 	bool isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
 
-	if( !isDefaultName && m_staticTextName.text() != m_pat->name() )
+	if (!beatPattern && !isDefaultName)
 	{
-		m_staticTextName.setText( m_pat->name() );
-	}
-
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
-
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
-
-	if( !isDefaultName )
-	{
-		p.setPen( textShadowColor() );
-		p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
-		p.setPen( textColor() );
-		p.drawStaticText( textLeft, textTop, m_staticTextName );
+		paintTextLabel(m_pat->name(), p);
 	}
 
 	// inner border
@@ -1106,7 +1088,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	p.setPen( ( current && !beatPattern ) ? c.lighter( 130 ) : c.darker( 300 ) );
 	p.drawRect( 0, 0, rect().right(), rect().bottom() );
 	}
-	// draw the 'muted' pixmap only if the pattern was manualy muted
+	// draw the 'muted' pixmap only if the pattern was manually muted
 	if( m_pat->isMuted() )
 	{
 		const int spacing = TCO_BORDER_WIDTH;

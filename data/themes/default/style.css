@@ -136,6 +136,19 @@ PianoRoll {
 	qproperty-textShadow: #fff;
 }
 
+TabWidget {
+	background-color: #262b30;
+	qproperty-tabText: rgba(255, 255, 255, 180);
+	qproperty-tabTitleText: #fff;
+	qproperty-tabSelected: #323940;
+	qproperty-tabBackground: #181b1f;
+	qproperty-tabBorder: #181b1f;
+}
+
+GroupBox {
+	background-color: #262b30;
+}
+
 /* main toolbar oscilloscope - can have transparent bg now */
 
 VisualizationWidget  {
@@ -607,8 +620,11 @@ TrackContentObjectView   {
 	qproperty-selectedColor: #006B65;
 	qproperty-BBPatternBackground: #373d48;
 	qproperty-textColor: #fff;
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb(0,0,0,200);
 	qproperty-gradient: false; /* boolean property, set true to have a gradient */
+	
+	font-size: 11px;
 }
 
 /* instrument pattern */

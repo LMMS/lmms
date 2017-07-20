@@ -354,6 +354,11 @@ QColor TrackContentObjectView::selectedColor() const
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
 
+QColor TrackContentObjectView::textBackgroundColor() const
+{
+	return m_textBackgroundColor;
+}
+
 QColor TrackContentObjectView::textShadowColor() const
 { return m_textShadowColor; }
 
@@ -375,6 +380,11 @@ void TrackContentObjectView::setSelectedColor( const QColor & c )
 
 void TrackContentObjectView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
+
+void TrackContentObjectView::setTextBackgroundColor( const QColor & c )
+{
+	m_textBackgroundColor = c;
+}
 
 void TrackContentObjectView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
@@ -625,6 +635,39 @@ DataFile TrackContentObjectView::createTCODataFiles(
 	dataFile.content().appendChild( metadata );
 
 	return dataFile;
+}
+
+void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & painter)
+{
+	if (text.trimmed() == "")
+	{
+		return;
+	}
+
+	painter.setRenderHint( QPainter::TextAntialiasing );
+
+	QFont labelFont = this->font();
+	labelFont.setHintingPreference( QFont::PreferFullHinting );
+	painter.setFont( labelFont );
+
+	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textLeft = TCO_BORDER_WIDTH + 3;
+
+	QFontMetrics fontMetrics(labelFont);
+	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
+
+	if (elidedPatternName.length() < 2)
+	{
+		elidedPatternName = text.trimmed();
+	}
+
+	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
+
+	int const finalTextTop = textTop + fontMetrics.ascent();
+	painter.setPen(textShadowColor());
+	painter.drawText( textLeft + 1, finalTextTop + 1, elidedPatternName );
+	painter.setPen( textColor() );
+	painter.drawText( textLeft, finalTextTop, elidedPatternName );
 }
 
 /*! \brief Handle a mouse press on this trackContentObjectView.
@@ -2139,10 +2182,10 @@ void Track::loadSettings( const QDomElement & element )
 		node = node.nextSibling();
 	}
 
-	if( element.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT &&
-		element.attribute( "height" ).toInt() <= DEFAULT_TRACK_HEIGHT )	// workaround for #3585927, tobydox/2012-11-11
+	int storedHeight = element.attribute( "height" ).toInt();
+	if( storedHeight >= MINIMAL_TRACK_HEIGHT )
 	{
-		m_height = element.attribute( "height" ).toInt();
+		m_height = storedHeight;
 	}
 }
 

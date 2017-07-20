@@ -139,6 +139,19 @@ PianoRoll {
 	qproperty-textShadow: rgb( 240, 240, 240 );
 }
 
+TabWidget {
+	background-color: #5b6571;
+	qproperty-tabText: rgba(255, 255, 255, 180);
+	qproperty-tabTitleText: #fff;
+	qproperty-tabSelected: #61666b;
+	qproperty-tabBackground: #3c434b;
+	qproperty-tabBorder: #3c434b;
+}
+
+GroupBox {
+	background-color: #5b6571;
+}
+
 /* main toolbar oscilloscope - can have transparent bg now */
 
 VisualizationWidget  {
@@ -279,6 +292,11 @@ QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarr
 
 TrackContainerView QFrame{
 	background-color: #49515b;
+}
+
+/* background for track controls */
+TrackView > QWidget {
+	background-color: #5b6571;
 }
 
 /* autoscroll, loop, stop behaviour toggle buttons */
@@ -523,6 +541,12 @@ PluginDescWidget:hover {
 	background-color: #e0e0e0;
 }
 
+/* piano widget */
+
+PianoView {
+	background-color: #14171a;
+}
+
 /* font sizes for text buttons */
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
@@ -543,6 +567,7 @@ FxLine {
 /* persistent peak markers for fx peak meters */
 Fader {
 	qproperty-peakGreen: rgb( 74, 253, 133);
+	qproperty-peakYellow: rgb(224, 222, 18);
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
@@ -588,8 +613,11 @@ TrackContentObjectView   {
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	
+	font-size: 11px;
 }
 
 /* instrument pattern */
