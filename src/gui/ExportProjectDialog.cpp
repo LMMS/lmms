@@ -194,9 +194,13 @@ ProjectRenderer::ExportFileFormats convertIndexToExportFileFormat(int index)
 	case 0:
 		return ProjectRenderer::WaveFile;
 	case 1:
+#ifdef LMMS_HAVE_OGGVORBIS
 		return ProjectRenderer::OggFile;
 	case 2:
+#endif
+#ifdef LMMS_HAVE_MP3LAME
 		return ProjectRenderer::MP3File;
+#endif // If neither ogg nor mp3 are available, index 1 is OOB; fall through to default case
 	default:
 		Q_ASSERT(false);
 		break;
