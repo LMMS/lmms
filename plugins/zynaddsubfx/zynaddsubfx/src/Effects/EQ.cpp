@@ -43,7 +43,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, in
     cleanup();
 }
 
-EQ::~EQ
+EQ::~EQ()
 {
     for(int i = 0; i < MAX_EQ_BANDS; ++i) {
         delete filter[i].l;
