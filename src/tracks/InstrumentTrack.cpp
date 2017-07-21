@@ -315,21 +315,18 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 					{
 						for (NotePlayHandle*& nph : m_notes)
 						{
-							if (nph != NULL)
+							if (nph && nph->isReleased())
 							{
-								if (nph->isReleased())
+								if( nph->origin() ==
+									nph->OriginMidiInput)
 								{
-									if( nph->origin() ==
-										nph->OriginMidiInput)
-									{
-										nph->setLength(
-										MidiTime( static_cast<f_cnt_t>(
-										nph->totalFramesPlayed() /
-										Engine::framesPerTick() ) ) );
-										midiNoteOff( *nph );
-									}
-									nph = NULL;
+									nph->setLength(
+									MidiTime( static_cast<f_cnt_t>(
+									nph->totalFramesPlayed() /
+									Engine::framesPerTick() ) ) );
+									midiNoteOff( *nph );
 								}
+								nph = NULL;
 							}
 						}
 					}
