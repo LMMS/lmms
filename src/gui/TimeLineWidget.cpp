@@ -304,15 +304,16 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
-	int const n=m_currentLoop;
-
-	int const x0 = m_xOffset + s_posMarkerPixmap->width() / 2;
-	int const h0 = height();
-	int const w0 = width();
-	QColor const bg=p.background();
+	const int n  = m_currentLoop;
+	const int x0 = m_xOffset + s_posMarkerPixmap->width() / 2;
+	const int h0 = height();
+	const int w0 = width();
+	const QBrush &  bg = p.background();
+	QBrush    bglight = bg;
+	bglight.setColor(bglight.color().lighter());
 	// Draw background
-	p.fillRect( 0, 0, x0, h0, bg.lighter() );
-	p.fillRect( w0-12, 0, 12, h0, bg.lighter());
+	p.fillRect( 0, 0, x0, h0, bglight );
+	p.fillRect( w0-12, 0, 12, h0, bglight );
 	p.setClipRect( x0, 0, w0 - x0 - 12, h0 );//12=sb width TODO!
 	p.fillRect( x0, 0, w0-12, h0, bg );
 

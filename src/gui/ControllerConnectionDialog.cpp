@@ -31,6 +31,7 @@
 
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
+#include "HwScreenWidget.h"
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -84,6 +85,15 @@ public:
 		MidiController* c = new MidiController( parent );
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
+
+		c->m_midiPort.setWidgetType( m_midiPort.widgetType() );
+                c->m_midiPort.setMinInputValue( m_midiPort.minInputValue() );
+                c->m_midiPort.setMaxInputValue( m_midiPort.maxInputValue() );
+                c->m_midiPort.setStepInputValue( m_midiPort.stepInputValue() );
+                c->m_midiPort.setBaseInputValue( m_midiPort.baseInputValue() );
+                c->m_midiPort.setSlopeInputValue( m_midiPort.slopeInputValue() );
+                c->m_midiPort.setDeltaInputValue( m_midiPort.deltaInputValue() );
+
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
 		c->updateName();
 
@@ -110,6 +120,14 @@ public slots:
 	{
 		m_midiPort.setInputChannel( 0 );
 		m_midiPort.setInputController( 0 );
+
+		m_midiPort.setWidgetType(       4 );
+		m_midiPort.setMinInputValue(    0 );
+		m_midiPort.setMaxInputValue(  127 );
+		m_midiPort.setStepInputValue(   1 );
+		m_midiPort.setBaseInputValue(   0 );
+		m_midiPort.setSlopeInputValue(  1 );
+		m_midiPort.setDeltaInputValue(  0 );
 	}
 
 
@@ -137,31 +155,32 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	setModal( true );
 
 	// Midi stuff
+        int xg=8,yg=8;
 	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
-	m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
+	m_midiGroupBox->setGeometry( xg, yg, 240, 108 );
 	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
-	
+
+        int xw=8,yw=24;
 	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
 			tr( "Input channel" ) );
 	m_midiChannelSpinBox->addTextForValue( 0, "--" );
 	m_midiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_midiChannelSpinBox->move( 8, 24 );
+	m_midiChannelSpinBox->move( xw, yw );
+	xw+=68;
+
+	/*
+	HwScreenWidget* p=new HwScreenWidget(m_midiGroupBox,12,2,"label");
+	p->setText("0AZ1BY23456789\nabcdefghij");//"Hello\nWorld!");
+	p->move(108,8);
+	*/
 
 	m_midiControllerSpinBox = new LcdSpinBox( 3, m_midiGroupBox,
 			tr( "Input controller" ) );
 	m_midiControllerSpinBox->addTextForValue( 0, "---" );
 	m_midiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
-	m_midiControllerSpinBox->move( 68, 24 );
-	
-
-	m_midiAutoDetectCheckBox =
-			new LedCheckBox( tr("Auto Detect"),
-				m_midiGroupBox, tr("Auto Detect") );
-	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
-	m_midiAutoDetectCheckBox->move( 8, 60 );
-	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
-			this, SLOT( autoDetectToggled() ) );
+	m_midiControllerSpinBox->move( xw, yw );
+        xw+=68+32;
 
 	// when using with non-raw-clients we can provide buttons showing
 	// our port-menus when being clicked
@@ -174,15 +193,80 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
-		rp_btn->setGeometry( 160, 24, 32, 32 );
+		rp_btn->setGeometry( xw, yw, 32, 32 );
 		rp_btn->setMenu( m_readablePorts );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
 	}
 
+	xw=8; yw+=40;
+	m_midiAutoDetectCheckBox =
+			new LedCheckBox( tr("Auto Detect"),
+				m_midiGroupBox, tr("Auto Detect") );
+	m_midiAutoDetectCheckBox->setModel( &m_midiAutoDetect );
+	m_midiAutoDetectCheckBox->move( xw, yw );
+	connect( &m_midiAutoDetect, SIGNAL( dataChanged() ),
+			this, SLOT( autoDetectToggled() ) );
+
+	xw=8; yw+=16;
+	m_midiWidgetTypeComboBox = new ComboBox( m_midiGroupBox, tr( "Widget Type" ) );
+	m_midiWidgetTypeComboBox->setGeometry( xw, yw, 224, 22 );
+
+        xg+=248;
+        m_controllerBehavior = new TabWidget( tr( "BEHAVIOR" ), this );
+	m_controllerBehavior->setGeometry( xg, yg, 240, 108 );
+        xg=8;
+        yg+=116;
+
+        xw=8;
+        yw=24;
+        m_midiMinValueSpinBox = new LcdSpinBox( 3, m_controllerBehavior,
+			tr( "Minimal value" ) );
+	//m_midiMinValueSpinBox->addTextForValue( 0, "---" );
+	m_midiMinValueSpinBox->setLabel( tr( "MIN" ) );
+	m_midiMinValueSpinBox->move( xw, yw );
+        xw+=68;
+
+        m_midiMaxValueSpinBox = new LcdSpinBox( 3, m_controllerBehavior,
+			tr( "Maximal value" ) );
+	//m_midiMaxValueSpinBox->addTextForValue( 0, "---" );
+	m_midiMaxValueSpinBox->setLabel( tr( "MAX" ) );
+	m_midiMaxValueSpinBox->move( xw, yw );
+        xw+=68;
+
+        m_midiStepValueSpinBox = new LcdSpinBox( 3, m_controllerBehavior,
+			tr( "Step value" ) );
+	m_midiStepValueSpinBox->addTextForValue( 1, "---" );
+	m_midiStepValueSpinBox->setLabel( tr( "STEP" ) );
+	m_midiStepValueSpinBox->move( xw, yw );
+        xw=8;
+        yw+=40;
+
+        m_midiBaseValueSpinBox = new LcdSpinBox( 3, m_controllerBehavior,
+			tr( "Base value" ) );
+	m_midiBaseValueSpinBox->addTextForValue( 0, "---" );
+	m_midiBaseValueSpinBox->setLabel( tr( "BASE" ) );
+	m_midiBaseValueSpinBox->move( xw, yw );
+        xw+=68;
+
+        m_midiSlopeValueSpinBox = new LcdSpinBox( 3, m_controllerBehavior,
+			tr( "Slope value" ) );
+	m_midiSlopeValueSpinBox->addTextForValue( 1, "---" );
+	m_midiSlopeValueSpinBox->setLabel( tr( "SLOPE" ) );
+	m_midiSlopeValueSpinBox->move( xw, yw );
+        xw+=68;
+
+        m_midiDeltaValueSpinBox = new LcdSpinBox( 3, m_controllerBehavior,
+			tr( "Delta value" ) );
+	m_midiDeltaValueSpinBox->addTextForValue( 0, "---" );
+	m_midiDeltaValueSpinBox->setLabel( tr( "DELTA" ) );
+	m_midiDeltaValueSpinBox->move( xw, yw );
+        xw=8;
+        yw+=40;
 
 	// User stuff
 	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
-	m_userGroupBox->setGeometry( 8, 100, 240, 60 );
+	m_userGroupBox->setGeometry( xg, yg, 240, 60 );
+        xg+=248;
 	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( userToggled() ) );
 
@@ -194,11 +278,12 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 		Controller * c = Engine::getSong()->controllers().at( i );
 		m_userController->model()->addItem( c->name() );
 	}
-	
 
 	// Mapping functions
 	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
-	m_mappingBox->setGeometry( 8, 170, 240, 64 );
+	m_mappingBox->setGeometry( xg, yg, 240, 64 );
+        xg=8;
+        yg+=68;
 	m_mappingFunction = new QLineEdit( m_mappingBox );
 	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
 	m_mappingFunction->setText( "input" );
@@ -207,35 +292,34 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	// Buttons
 	QWidget * buttons = new QWidget( this );
-	buttons->setGeometry( 8, 240, 240, 32 );
+	buttons->setGeometry( xg, yg, 488, 32 );
+	yg+=40;
 
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
 	btn_layout->setSpacing( 0 );
 	btn_layout->setMargin( 0 );
-	
-	QPushButton * select_btn = new QPushButton( 
+
+	QPushButton * select_btn = new QPushButton(
 					embed::getIconPixmap( "add" ),
 					tr( "OK" ), buttons );
-	connect( select_btn, SIGNAL( clicked() ), 
+	connect( select_btn, SIGNAL( clicked() ),
 				this, SLOT( selectController() ) );
-	
-	QPushButton * cancel_btn = new QPushButton( 
+
+	QPushButton * cancel_btn = new QPushButton(
 					embed::getIconPixmap( "cancel" ),
 					tr( "Cancel" ), buttons );
 	connect( cancel_btn, SIGNAL( clicked() ),
 				this, SLOT( reject() ) );
 
 	btn_layout->addStretch();
-	btn_layout->addSpacing( 10 );
 	btn_layout->addWidget( select_btn );
-	btn_layout->addSpacing( 10 );
+	btn_layout->addSpacing( 8 );
 	btn_layout->addWidget( cancel_btn );
-	btn_layout->addSpacing( 10 );
 
-	setFixedSize( 256, 280 );
+	setFixedSize( 504, yg );
 
 	// Crazy MIDI View stuff
-	
+
 	// TODO, handle by making this a model for the Dialog "view"
 	ControllerConnection * cc = NULL;
 	if( m_targetModel )
@@ -249,10 +333,18 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 				m_midiGroupBox->model()->setValue( true );
 				// ensure controller is created
 				midiToggled();
-			
+
 				MidiController * cont = (MidiController*)( cc->getController() );
 				m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
 				m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
+
+                                m_midiWidgetTypeComboBox->model()->setValue(cont->m_midiPort.widgetType());
+                                m_midiMinValueSpinBox->model()->setValue(cont->m_midiPort.minInputValue());
+                                m_midiMaxValueSpinBox->model()->setValue(cont->m_midiPort.maxInputValue());
+                                m_midiStepValueSpinBox->model()->setValue(cont->m_midiPort.stepInputValue());
+                                m_midiBaseValueSpinBox->model()->setValue(cont->m_midiPort.baseInputValue());
+                                m_midiSlopeValueSpinBox->model()->setValue(cont->m_midiPort.slopeInputValue());
+                                m_midiDeltaValueSpinBox->model()->setValue(cont->m_midiPort.deltaInputValue());
 
 				m_midiController->subscribeReadablePorts( static_cast<MidiController*>( cc->getController() )->m_midiPort.readablePorts() );
 			}
@@ -299,9 +391,9 @@ void ControllerConnectionDialog::selectController()
 		{
 			MidiController * mc;
 			mc = m_midiController->copyToMidiController( Engine::getSong() );
-	
+
 			/*
-			if( m_targetModel->getTrack() && 
+			if( m_targetModel->getTrack() &&
 					!m_targetModel->getTrack()->displayName().isEmpty() )
 			{
 				mc->m_midiPort.setName( QString( "%1 (%2)" ).
@@ -318,12 +410,12 @@ void ControllerConnectionDialog::selectController()
 		}
 	}
 	// User
-	else 
+	else
 	{
-		if( m_userGroupBox->model()->value() > 0 && 
+		if( m_userGroupBox->model()->value() > 0 &&
 				Engine::getSong()->controllers().size() )
 		{
-			m_controller = Engine::getSong()->controllers().at( 
+			m_controller = Engine::getSong()->controllers().at(
 					m_userController->model()->value() );
 		}
 
@@ -332,7 +424,7 @@ void ControllerConnectionDialog::selectController()
 			QMessageBox::warning(this, tr("LMMS"), tr("Cycle Detected."));
 			return;
 		}
-	
+
 	}
 
 	accept();
@@ -365,6 +457,14 @@ void ControllerConnectionDialog::midiToggled()
 			m_midiChannelSpinBox->setModel( &m_midiController->m_midiPort.m_inputChannelModel );
 			m_midiControllerSpinBox->setModel( &m_midiController->m_midiPort.m_inputControllerModel );
 
+                        m_midiWidgetTypeComboBox->setModel( &m_midiController->m_midiPort.m_widgetTypeModel );
+                        m_midiMinValueSpinBox->setModel( &m_midiController->m_midiPort.m_minInputValueModel );
+                        m_midiMaxValueSpinBox->setModel( &m_midiController->m_midiPort.m_maxInputValueModel );
+                        m_midiStepValueSpinBox->setModel( &m_midiController->m_midiPort.m_stepInputValueModel );
+                        m_midiBaseValueSpinBox->setModel( &m_midiController->m_midiPort.m_baseInputValueModel );
+                        m_midiSlopeValueSpinBox->setModel( &m_midiController->m_midiPort.m_slopeInputValueModel );
+                        m_midiDeltaValueSpinBox->setModel( &m_midiController->m_midiPort.m_deltaInputValueModel );
+
 			if( m_readablePorts )
 			{
 				m_readablePorts->setModel( &m_midiController->m_midiPort );
@@ -378,6 +478,14 @@ void ControllerConnectionDialog::midiToggled()
 	m_midiChannelSpinBox->setEnabled( enabled );
 	m_midiControllerSpinBox->setEnabled( enabled );
 	m_midiAutoDetectCheckBox->setEnabled( enabled );
+
+        m_midiWidgetTypeComboBox->setEnabled( enabled );
+        m_midiMinValueSpinBox->setEnabled( enabled );
+        m_midiMaxValueSpinBox->setEnabled( enabled );
+        m_midiStepValueSpinBox->setEnabled( enabled );
+        m_midiBaseValueSpinBox->setEnabled( enabled );
+        m_midiSlopeValueSpinBox->setEnabled( enabled );
+        m_midiDeltaValueSpinBox->setEnabled( enabled );
 }
 
 

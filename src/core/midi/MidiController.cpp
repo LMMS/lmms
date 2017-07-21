@@ -82,26 +82,81 @@ void MidiController::updateName()
 
 void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
-	unsigned char controllerNum;
-	switch( event.type() )
+	unsigned char controllerNum = event.controllerNumber();
+
+	if( m_midiPort.inputController() == controllerNum + 1 &&
+	    ( m_midiPort.inputChannel() == event.channel() + 1 ||
+	      m_midiPort.inputChannel() == 0 ) )
 	{
-		case MidiControlChange:
-			controllerNum = event.controllerNumber();
+		int type = m_midiPort.widgetType();
+		if(type <= 0 || type >= 6) return;
 
-			if( m_midiPort.inputController() == controllerNum + 1 &&
-					( m_midiPort.inputChannel() == event.channel() + 1 ||
-					  m_midiPort.inputChannel() == 0 ) )
-			{
-				unsigned char val = event.controllerValue();
-				m_previousValue = m_lastValue;
-				m_lastValue = (float)( val ) / 127.0f;
-				emit valueChanged();
-			}
-			break;
+		int val = 0;
 
-		default:
+		//param( 1 );
+		if(event.type() == MidiControlChange)
+			val=event.controllerValue();
+		else
+		if(event.type() == MidiNoteOn)
+			val=event.velocity();
+		else
+		if(event.type() == MidiNoteOff)
+			val=event.velocity();
+		else
 			// Don't care - maybe add special cases for pitch and mod later
-			break;
+			qWarning("MidiController: in event Default");
+
+		if(type == 1) //Open Relay Button
+		{
+			     if(event.type() == MidiNoteOn ) val=0;
+			else if(event.type() == MidiNoteOff) ;//val=127;
+		}
+		else
+		if(type == 2) //Close Relay Button
+		{
+			     if(event.type() == MidiNoteOn ) ;//val=127;
+			else if(event.type() == MidiNoteOff) val=0;
+		}
+		else
+		if(type == 3) //Switch
+		{
+			if(event.type() == MidiNoteOn)
+			{
+				val=( m_switch ? val : 0 );
+				m_switch=(m_switch ? 0 : 1);
+			}
+			else return;
+		}
+
+		{
+			int base =m_midiPort.baseInputValue();
+			int slope=m_midiPort.slopeInputValue();
+			int delta=m_midiPort.deltaInputValue();
+			val=base+slope*(val-delta);
+
+			int step=m_midiPort.stepInputValue();
+			if(step>1) val=(int)((val+step/2)/step)*step;
+			if(val<m_midiPort.minInputValue()) val=m_midiPort.minInputValue();
+			if(val>m_midiPort.maxInputValue()) val=m_midiPort.maxInputValue();
+
+			if(val<0) val=0; //just for safety
+			if(val>127) val=127; //just for safety
+
+			m_previousValue = m_lastValue;
+			m_lastValue = (float)( val ) / 127.0f;
+		}
+
+		if(m_previousValue != m_lastValue)
+		{
+			if(type<=3) m_previousValue=m_lastValue;
+			updateValueBuffer();
+			emit valueChanged();
+		}
+		else
+		{
+			//qWarning("MidiController: emit dataUnchanged");
+			//emit dataUnchanged();
+		}
 	}
 }
 

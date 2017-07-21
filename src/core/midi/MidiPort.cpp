@@ -53,8 +53,23 @@ MidiPort::MidiPort( const QString& name,
 	m_outputProgramModel( 1, 1, MidiProgramCount, this, tr( "Output MIDI program" ) ),
 	m_baseVelocityModel( MidiMaxVelocity/2, 1, MidiMaxVelocity, this, tr( "Base velocity" ) ),
 	m_readableModel( false, this, tr( "Receive MIDI-events" ) ),
-	m_writableModel( false, this, tr( "Send MIDI-events" ) )
+	m_writableModel( false, this, tr( "Send MIDI-events" ) ),
+	m_widgetTypeModel     ( this, tr( "Widget type" ) ),
+        m_minInputValueModel  (  0, 0, 127, this, tr( "Min input value" ) ),
+        m_maxInputValueModel  (127, 0, 127, this, tr( "Max input value" ) ),
+        m_stepInputValueModel (  1, 1, 127, this, tr( "Step input value" ) ),
+        m_baseInputValueModel (  0, 0, 127, this, tr( "Base input value" ) ),
+        m_slopeInputValueModel(  1, 1,   7, this, tr( "Slope input value" ) ),
+        m_deltaInputValueModel(  0, 0, 127, this, tr( "Delta input value" ) )
 {
+	m_widgetTypeModel.addItem("Ignored");
+	m_widgetTypeModel.addItem("Open Relay");
+	m_widgetTypeModel.addItem("Close Relay");
+	m_widgetTypeModel.addItem("Switch");
+	m_widgetTypeModel.addItem("Knob/Fader");
+	m_widgetTypeModel.addItem("Pad/Key");
+	m_widgetTypeModel.setInitValue(4);
+
 	m_midiClient->addPort( this );
 
 	m_readableModel.setValue( m_mode == Input || m_mode == Duplex );
@@ -121,21 +136,23 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 		( inputChannel() == 0 || inputChannel()-1 == event.channel() ) )
 	{
 		MidiEvent inEvent = event;
+		/* not the place to filter or to fix the velocity
 		if( event.type() == MidiNoteOn ||
-			event.type() == MidiNoteOff ||
-			event.type() == MidiKeyPressure )
+		    event.type() == MidiNoteOff ||
+		    event.type() == MidiKeyPressure )
 		{
 			if( inEvent.key() < 0 || inEvent.key() >= NumKeys )
 			{
-				return;
+                          //return; //GDX
 			}
-
-			if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
-			{
-				inEvent.setVelocity( fixedInputVelocity() );
-			}
+                        //GDX
+                        if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
+                        {
+                          inEvent.setVelocity( fixedInputVelocity() );
+                        }
 		}
-
+		*/
+                //qWarning("MidiPort: in event");
 		m_midiEventProcessor->processInEvent( inEvent, time );
 	}
 }
@@ -149,9 +166,10 @@ void MidiPort::processOutEvent( const MidiEvent& event, const MidiTime& time )
 	if( isOutputEnabled() && realOutputChannel() == event.channel() )
 	{
 		MidiEvent outEvent = event;
-
+		//Same: fixing velocity probably not at the right place
 		if( fixedOutputVelocity() >= 0 && event.velocity() > 0 &&
-			( event.type() == MidiNoteOn || event.type() == MidiKeyPressure ) )
+			( event.type() == MidiNoteOn ||
+			  event.type() == MidiKeyPressure ) )
 		{
 			outEvent.setVelocity( fixedOutputVelocity() );
 		}
