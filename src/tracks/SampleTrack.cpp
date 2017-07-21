@@ -25,6 +25,7 @@
 #include "SampleTrack.h"
 
 #include <QDropEvent>
+#include <QFileInfo>
 #include <QMenu>
 #include <QLayout>
 #include <QMdiArea>
@@ -501,6 +502,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+
+	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
+	QString filename = fileInfo.fileName();
+	paintTextLabel(filename, p);
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
