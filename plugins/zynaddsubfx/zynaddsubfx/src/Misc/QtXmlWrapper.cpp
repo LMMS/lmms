@@ -47,8 +47,8 @@
 
 */
 
-#include <QDomDocument>
-#include <QDebug>
+#include <QtXml/QDomDocument>
+#include <QtCore/QDebug>
 #include "QtXmlWrapper.h"
 #include <string>
 #include <sstream>
