@@ -188,7 +188,6 @@ void ExportProjectDialog::startExport()
 	}
 }
 
-
 void ExportProjectDialog::onFileFormatChanged(int index)
 {
 	// Extract the format tag from the currently selected item,
@@ -200,17 +199,19 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 	);
 	Q_ASSERT(successful_conversion);
 
-	bool stereoModeVisible = exportFormat == ProjectRenderer::MP3File;
+	bool stereoModeVisible = (exportFormat == ProjectRenderer::MP3File);
 
-	bool sampleRateControlsVisible = exportFormat != ProjectRenderer::MP3File;
+	bool sampleRateControlsVisible = (exportFormat != ProjectRenderer::MP3File);
 
 	bool bitRateControlsEnabled =
 			(exportFormat == ProjectRenderer::OggFile ||
 			 exportFormat == ProjectRenderer::MP3File);
 
-	bool bitDepthControlEnabled = exportFormat == ProjectRenderer::WaveFile;
+	bool bitDepthControlEnabled =
+			(exportFormat == ProjectRenderer::WaveFile ||
+			 exportFormat == ProjectRenderer::FlacFile);
 
-	bool variableBitrateVisible = exportFormat != ProjectRenderer::MP3File;
+	bool variableBitrateVisible = !(exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile);
 
 	stereoModeWidget->setVisible(stereoModeVisible);
 	sampleRateWidget->setVisible(sampleRateControlsVisible);
