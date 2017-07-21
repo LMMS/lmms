@@ -102,9 +102,8 @@ unset LD_LIBRARY_PATH
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
 # Handle wine linking
-if [ -f "@WINE_LIBRARY_FIX@" ]; then
-   ldpath="$(dirname "$(readlink -f "@WINE_LIBRARY_FIX@")")"
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ldpath
+if [ -d "@WINE_LIBRARY_FIX@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_LIBRARY_FIX@"
 fi
 
 # Executables in the lib directory
