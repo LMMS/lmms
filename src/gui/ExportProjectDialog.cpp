@@ -66,8 +66,8 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			// add to combo box
 			fileFormatCB->addItem( ProjectRenderer::tr(
 				ProjectRenderer::fileEncodeDevices[i].m_description ),
-                QVariant(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) // format tag; later used for identification
-            );
+				QVariant(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) // format tag; later used for identification
+			);
 
 			// if this is our extension, select it
 			if( QString::compare( renderExt, fileExt,
@@ -191,14 +191,14 @@ void ExportProjectDialog::startExport()
 
 void ExportProjectDialog::onFileFormatChanged(int index)
 {
-    // Extract the format tag from the currently selected item,
-    // and adjust the UI properly.
-    QVariant format_tag = fileFormatCB->itemData(index);
-    bool successful_conversion = false;
+	// Extract the format tag from the currently selected item,
+	// and adjust the UI properly.
+	QVariant format_tag = fileFormatCB->itemData(index);
+	bool successful_conversion = false;
 	auto exportFormat = static_cast<ProjectRenderer::ExportFileFormats>(
-        format_tag.toInt(&successful_conversion)
-    );
-    Q_ASSERT(successful_conversion);
+		format_tag.toInt(&successful_conversion)
+	);
+	Q_ASSERT(successful_conversion);
 
 	bool stereoModeVisible = exportFormat == ProjectRenderer::MP3File;
 
@@ -225,25 +225,25 @@ void ExportProjectDialog::startBtnClicked()
 {
 	m_ft = ProjectRenderer::NumFileFormats;
 
-    //Get file format from current menu selection.
-    bool successful_conversion = false;
-    QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
-    m_ft = static_cast<ProjectRenderer::ExportFileFormats>(tag.toInt(&successful_conversion));
+	//Get file format from current menu selection.
+	bool successful_conversion = false;
+	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
+	m_ft = static_cast<ProjectRenderer::ExportFileFormats>(tag.toInt(&successful_conversion));
 
-    if( !successful_conversion )
-    {
-        QMessageBox::information( this, tr( "Error" ),
-                                  tr( "Error while determining file-encoder device. "
-                                          "Please try to choose a different output "
-                                          "format." ) );
-        reject();
-        return;
-    }
+	if( !successful_conversion )
+	{
+		QMessageBox::information( this, tr( "Error" ),
+								  tr( "Error while determining file-encoder device. "
+										  "Please try to choose a different output "
+										  "format." ) );
+		reject();
+		return;
+	}
 
-    // Find proper file extension.
+	// Find proper file extension.
 	for( int i = 0; i < ProjectRenderer::NumFileFormats; ++i )
 	{
-        if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
+		if (m_ft == ProjectRenderer::fileEncodeDevices[i].m_fileFormat)
 		{
 			m_fileExtension = QString( QLatin1String( ProjectRenderer::fileEncodeDevices[i].m_extension ) );
 			break;
