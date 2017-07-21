@@ -309,25 +309,22 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				{
 					m_sustainPedalPressed = true;
 				}
-				else
+				else if (isSustainPedalPressed())
 				{
-					if (isSustainPedalPressed())
+					for (NotePlayHandle*& nph : m_notes)
 					{
-						for (NotePlayHandle*& nph : m_notes)
+						if (nph && nph->isReleased())
 						{
-							if (nph && nph->isReleased())
+							if( nph->origin() ==
+								nph->OriginMidiInput)
 							{
-								if( nph->origin() ==
-									nph->OriginMidiInput)
-								{
-									nph->setLength(
+								nph->setLength(
 									MidiTime( static_cast<f_cnt_t>(
 									nph->totalFramesPlayed() /
 									Engine::framesPerTick() ) ) );
-									midiNoteOff( *nph );
-								}
-								nph = NULL;
+								midiNoteOff( *nph );
 							}
+							nph = NULL;
 						}
 					}
 					m_sustainPedalPressed = false;
