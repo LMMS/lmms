@@ -631,6 +631,11 @@ TrackContentObjectView   {
 PatternView {
 	background-color: #21A14F;
 	color: rgba(255,255,255,220);
+
+	qproperty-noteFillColor: rgba(255, 255, 255, 220);
+	qproperty-noteBorderColor: rgb(33, 161, 79);
+	qproperty-mutedNoteFillColor: rgba(100, 100, 100, 220);
+	qproperty-mutedNoteBorderColor: rgb(55, 61, 72);
 }
 
 /* sample track pattern */

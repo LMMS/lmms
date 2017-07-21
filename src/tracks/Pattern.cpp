@@ -599,7 +599,11 @@ void Pattern::changeTimeSignature()
 PatternView::PatternView( Pattern* pattern, TrackView* parent ) :
 	TrackContentObjectView( pattern, parent ),
 	m_pat( pattern ),
-	m_paintPixmap()
+	m_paintPixmap(),
+	m_noteFillColor(255, 255, 255, 220),
+	m_noteBorderColor(255, 255, 255, 220),
+	m_mutedNoteFillColor(100, 100, 100, 220),
+	m_mutedNoteBorderColor(100, 100, 100, 220)
 {
 	connect( gui->pianoRoll(), SIGNAL( currentPatternChanged() ),
 			this, SLOT( update() ) );
@@ -910,9 +914,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	bool const isDefaultName = m_pat->name() == m_pat->instrumentTrack()->name();
 	bool const drawTextBox = !beatPattern && !isDefaultName;
 
+	// TODO Warning! This might cause problems if TrackContentObjectView::paintTextLabel changes
 	int textBoxHeight = 0;
 	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 3;
 	if (drawTextBox)
 	{
 		QFont labelFont = this->font();
@@ -997,16 +1001,17 @@ void PatternView::paintEvent( QPaintEvent * )
 		p.scale(width(), height() - distanceToTop - 2 * notesBorder);
 
 		// set colour based on mute status
-		QColor const noteColor = muted ? mutedColor() : painter.pen().brush().color();
+		QColor noteFillColor = muted ? getMutedNoteFillColor() : getNoteFillColor();
+		QColor noteBorderColor = muted ? getMutedNoteBorderColor() : getNoteBorderColor();
 
 		bool const drawAsLines = height() < 64;
 		if (drawAsLines)
 		{
-			p.setPen( noteColor );
+			p.setPen(noteFillColor);
 		}
 		else
 		{
-			p.setPen( noteColor.darker() );
+			p.setPen(noteBorderColor);
 			p.setRenderHint(QPainter::Antialiasing);
 		}
 
@@ -1038,7 +1043,7 @@ void PatternView::paintEvent( QPaintEvent * )
 			}
 			else
 			{
-				p.fillRect( noteRectF, noteColor );
+				p.fillRect( noteRectF, noteFillColor );
 				p.drawRect( noteRectF );
 			}
 		}
