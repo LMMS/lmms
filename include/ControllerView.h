@@ -25,7 +25,8 @@
 #ifndef CONTROLLER_VIEW_H
 #define CONTROLLER_VIEW_H
 
-#include <QFrame>
+//#include <QFrame>
+#include <QWidget>
 
 #include "AutomatableModel.h"
 #include "Controller.h"
@@ -39,7 +40,7 @@ class QMdiSubWindow;
 class LedCheckBox;
 
 
-class ControllerView : public QFrame, public ModelView
+class ControllerView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -70,15 +71,17 @@ signals:
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void modelChanged();
 	virtual void mouseDoubleClickEvent( QMouseEvent * event );
 
 
 private:
+	QPixmap m_bg;
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
-	QLabel * m_nameLabel;
-	bool m_show;
+	//QLabel * m_nameLabel;
+	//bool m_show;
 
 } ;
 
