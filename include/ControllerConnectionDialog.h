@@ -83,6 +83,15 @@ private:
 	MidiPortMenu * m_readablePorts;
 	BoolModel m_midiAutoDetect;
 
+	ComboBox   * m_midiWidgetTypeComboBox;
+	LcdSpinBox * m_midiMinValueSpinBox;
+	LcdSpinBox * m_midiMaxValueSpinBox;
+	LcdSpinBox * m_midiStepValueSpinBox;
+	LcdSpinBox * m_midiBaseValueSpinBox;
+	LcdSpinBox * m_midiSlopeValueSpinBox;
+	LcdSpinBox * m_midiDeltaValueSpinBox;
+	TabWidget * m_controllerBehavior;
+
 	// User
 	GroupBox * m_userGroupBox;
 	ComboBox * m_userController;

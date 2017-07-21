@@ -33,7 +33,7 @@
 #include "Midi.h"
 #include "MidiTime.h"
 #include "AutomatableModel.h"
-
+#include "ComboBoxModel.h"
 
 class MidiClient;
 class MidiEvent;
@@ -56,7 +56,16 @@ class MidiPort : public Model, public SerializingObject
 	mapPropertyFromModel(int,baseVelocity,setBaseVelocity,m_baseVelocityModel);
 	mapPropertyFromModel(bool,isReadable,setReadable,m_readableModel);
 	mapPropertyFromModel(bool,isWritable,setWritable,m_writableModel);
-public:
+
+	mapPropertyFromModel(int,widgetType,setWidgetType,m_widgetTypeModel);
+	mapPropertyFromModel(int,minInputValue,setMinInputValue,m_minInputValueModel);
+	mapPropertyFromModel(int,maxInputValue,setMaxInputValue,m_maxInputValueModel);
+	mapPropertyFromModel(int,stepInputValue,setStepInputValue,m_stepInputValueModel);
+	mapPropertyFromModel(int,baseInputValue,setBaseInputValue,m_baseInputValueModel);
+	mapPropertyFromModel(int,slopeInputValue,setSlopeInputValue,m_slopeInputValueModel);
+	mapPropertyFromModel(int,deltaInputValue,setDeltaInputValue,m_deltaInputValueModel);
+
+ public:
 	typedef QMap<QString, bool> Map;
 
 	enum Modes
@@ -155,6 +164,14 @@ private:
 	IntModel m_baseVelocityModel;
 	BoolModel m_readableModel;
 	BoolModel m_writableModel;
+
+	ComboBoxModel m_widgetTypeModel;
+        IntModel m_minInputValueModel;
+        IntModel m_maxInputValueModel;
+        IntModel m_stepInputValueModel;
+        IntModel m_baseInputValueModel;
+        IntModel m_slopeInputValueModel;
+        IntModel m_deltaInputValueModel;
 
 	Map m_readablePorts;
 	Map m_writablePorts;
