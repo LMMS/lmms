@@ -47,14 +47,14 @@ public:
 	ControllerView( Controller * _controller, QWidget * _parent );
 	virtual ~ControllerView();
 
-	inline Controller * getController()
+	inline Controller * controller()
 	{
-		return( castModel<Controller>() );
+		return castModel<Controller>();
 	}
 
-	inline const Controller * getController() const
+	inline const Controller * controller() const
 	{
-		return( castModel<Controller>() );
+		return castModel<Controller>();
 	}
 
 
@@ -78,10 +78,9 @@ protected:
 
 private:
 	QPixmap m_bg;
+	LedCheckBox * m_bypass;
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
-	//QLabel * m_nameLabel;
-	//bool m_show;
 
 } ;
 

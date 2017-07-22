@@ -53,7 +53,7 @@ public:
 	virtual QSize sizeHint() const
 	{
 		QSize s = QToolButton::sizeHint();
-		s.setWidth( s.width() + 8 );
+		//s.setWidth( s.width() + 8 );
 		if( orientation() == Qt::Horizontal )
 		{
 			return s;
@@ -72,7 +72,7 @@ protected:
 		{
 			const QSize s = sizeHint();
 			p.rotate( 270 );
-			p.translate( -s.height(), 0 );
+			p.translate( -s.height(),0 );
 			opt.rect = QRect( 0, 0, s.height(), s.width() );
 		}
 		p.drawComplexControl( QStyle::CC_ToolButton, opt );
@@ -90,7 +90,7 @@ SideBar::SideBar( Qt::Orientation _orientation, QWidget * _parent ) :
 	m_btnGroup( this )
 {
 	setOrientation( _orientation );
-	setIconSize( QSize( 16, 16 ) );
+	setIconSize( QSize( 16,16 ) );//32x32
 
 	m_btnGroup.setExclusive( false );
 	connect( &m_btnGroup, SIGNAL( buttonClicked( QAbstractButton * ) ),
@@ -110,7 +110,7 @@ SideBar::~SideBar()
 void SideBar::appendTab( SideBarWidget *widget )
 {
 	SideBarButton *button = new SideBarButton( orientation(), this );
-	button->setText( " " + widget->title() );
+	button->setText( "  "+widget->title() );
 	button->setIcon( widget->icon() );
 	button->setLayoutDirection( Qt::RightToLeft );
 	button->setCheckable( true );

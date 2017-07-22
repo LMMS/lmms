@@ -102,7 +102,7 @@ void SubWindow::paintEvent( QPaintEvent * )
 	p.fillRect( rect, isActive ? activeColor() : p.pen().brush() );
 
 	// window border
-	p.setPen( borderColor() );
+	p.setPen( isActive ? activeColor().color() : borderColor() );
 
 	// bottom, left, and right lines
 	p.drawLine( 0, height() - 1, width(), height() - 1 );
