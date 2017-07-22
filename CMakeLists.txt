@@ -176,9 +176,9 @@ ELSE()
 ENDIF()
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF(NOT SNDFILE_FOUND)
 
 IF(WANT_CALF)
