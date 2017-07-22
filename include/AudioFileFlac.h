@@ -45,5 +45,4 @@ private:
 
 };
 
-
 #endif //AUDIO_FILE_FLAC_H

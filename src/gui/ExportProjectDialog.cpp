@@ -79,6 +79,25 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 			cbIndex++;
 		}
 	}
+	
+#ifdef LMMS_HAVE_SF_COMPLEVEL
+	int const MAX_LEVEL=8;
+	for(int i=0; i<=MAX_LEVEL; ++i)
+	{
+		QString info="";
+		if (i==0){ info="(fastest)"; }
+		if (i==4){ info="(default)"; }
+		if (i==MAX_LEVEL){ info="(smallest)"; }
+		
+		compLevelCB->addItem(
+			QString::number(i)+" "+info,
+			QVariant(i/static_cast<double>(MAX_LEVEL))
+		);
+	}
+	compLevelCB->setCurrentIndex(MAX_LEVEL/2);
+#else
+	compressionWidget->setVisible(false);
+#endif
 
 	connect( startButton, SIGNAL( clicked() ),
 			this, SLOT( startBtnClicked() ) );
@@ -164,6 +183,14 @@ void ExportProjectDialog::startExport()
 			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
 			mapToStereoMode(stereoModeComboBox->currentIndex()) );
 
+#ifdef LMMS_HAVE_SF_COMPLEVEL
+	if (compressionWidget->isVisible())
+	{
+		double level = compLevelCB->itemData(compLevelCB->currentIndex()).toDouble();
+		os.setCompressionLevel(level);
+	}
+#endif
+
 	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
@@ -213,6 +240,11 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 
 	bool variableBitrateVisible = !(exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile);
 
+#ifdef LMMS_HAVE_SF_COMPLEVEL
+	bool compressionLevelVisible = (exportFormat == ProjectRenderer::FlacFile);
+	compressionWidget->setVisible(compressionLevelVisible);
+#endif
+
 	stereoModeWidget->setVisible(stereoModeVisible);
 	sampleRateWidget->setVisible(sampleRateControlsVisible);
 
@@ -229,14 +261,16 @@ void ExportProjectDialog::startBtnClicked()
 	//Get file format from current menu selection.
 	bool successful_conversion = false;
 	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
-	m_ft = static_cast<ProjectRenderer::ExportFileFormats>(tag.toInt(&successful_conversion));
+	m_ft = static_cast<ProjectRenderer::ExportFileFormats>(
+			tag.toInt(&successful_conversion)
+	);
 
 	if( !successful_conversion )
 	{
 		QMessageBox::information( this, tr( "Error" ),
 								  tr( "Error while determining file-encoder device. "
-										  "Please try to choose a different output "
-										  "format." ) );
+									  "Please try to choose a different output "
+									  "format." ) );
 		reject();
 		return;
 	}

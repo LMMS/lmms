@@ -26,17 +26,19 @@ bool AudioFileFlac::startEncoding()
 
 	switch (getOutputSettings().getBitDepth())
 	{
-		case OutputSettings::Depth_16Bit:
-			m_sfinfo.format |= SF_FORMAT_PCM_16;
-			break;
 		case OutputSettings::Depth_24Bit:
+		case OutputSettings::Depth_32Bit:
+			// FLAC does not support 32bit sampling, so take it as 24.
 			m_sfinfo.format |= SF_FORMAT_PCM_24;
 			break;
-		case OutputSettings::Depth_32Bit:
-			return false; // FLAC does not support 32bit float or PCM
-			break;
-		default: ;
+		default:
+			m_sfinfo.format |= SF_FORMAT_PCM_16;
 	}
+
+#ifdef LMMS_HAVE_SF_COMPLEVEL
+	double compression = getOutputSettings().getCompressionLevel();
+	sf_command(m_sf,SFC_SET_COMPRESSION_LEVEL,&compression,sizeof(double));
+#endif
 
 	m_sf = sf_open(
 #ifdef LMMS_BUILD_WIN32
@@ -49,6 +51,7 @@ bool AudioFileFlac::startEncoding()
 	);
 
 	sf_command(m_sf,SFC_SET_CLIPPING,nullptr,SF_TRUE);
+
 	sf_set_string(m_sf,SF_STR_SOFTWARE,"LMMS");
 
 	return true;
@@ -58,7 +61,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 {
 	OutputSettings::BitDepth depth = getOutputSettings().getBitDepth();
 
-	if (depth == OutputSettings::Depth_24Bit) // Float encoding
+	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
 	{
 		float* buf = new float[frames*channels()];
 		for(fpp_t frame = 0; frame < frames; ++frame)
@@ -86,6 +89,7 @@ void AudioFileFlac::finishEncoding()
 {
 	if (m_sf)
 	{
+		sf_write_sync(m_sf);
 		sf_close(m_sf);
 	}
 }
