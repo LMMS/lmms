@@ -58,6 +58,7 @@ SET(LMMS_SRCS
 	gui/widgets/FxLine.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
+	gui/widgets/HwScreenWidget.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp

@@ -181,7 +181,7 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 		}
 		b->setMenu(m);
 		b->setText(QString("&").append(QString((char)(65+n))));
-		b->setMinimumSize(autoScroll->sizeHint());
+		//b->setMinimumSize(autoScroll->sizeHint());
 		connect(g, SIGNAL(triggered(QAction*)), this, SLOT(selectLoop(QAction*)));
 		_tool_bar->addWidget(b);
 	}
@@ -310,7 +310,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	const int w0 = width();
 	const QBrush &  bg = p.background();
 	QBrush    bglight = bg;
-	bglight.setColor(bglight.color().lighter());
+	bglight.setColor(parentWidget()->palette().color(QPalette::Background));
 	// Draw background
 	p.fillRect( 0, 0, x0, h0, bglight );
 	p.fillRect( w0-12, 0, 12, h0, bglight );
