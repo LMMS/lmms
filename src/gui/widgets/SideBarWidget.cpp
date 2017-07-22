@@ -37,7 +37,7 @@ SideBarWidget::SideBarWidget( const QString & _title, const QPixmap & _icon,
 {
 	m_contents = new QWidget( this );
 	m_layout = new QVBoxLayout( m_contents );
-	m_layout->setSpacing( 5 );
+	m_layout->setSpacing( 0 );//5
 	m_layout->setMargin( 0 );
 }
 
@@ -54,32 +54,36 @@ SideBarWidget::~SideBarWidget()
 void SideBarWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
-	p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
+	//p.fillRect( 0, 0, width(), 27, palette().highlight().color() );
+	p.fillRect( 0, 0, width(), height(), p.background());
 
 	QFont f = p.font();
+	/*
 	f.setBold( true );
 	f.setUnderline( true );
 	f.setPointSize( f.pointSize() + 2 );
 	p.setFont( f );
+	*/
+	
+	//p.setPen(p.color());// palette().highlightedText().color() );
 
-	p.setPen( palette().highlightedText().color() );
-
-	const int tx = m_icon.width()+4;
+	const int tx = m_icon.width()+12;
 
 	QFontMetrics metrics( f );
-	const int ty = metrics.ascent();
+	const int ty = m_icon.height()+0;//metrics.ascent();
 	p.drawText( tx, ty, m_title );
 
-	p.drawPixmap( 2, 2, m_icon.transformed( QTransform().rotate( -90 ) ) );
+	p.drawPixmap( 3, 3, m_icon.transformed( QTransform().rotate( 270 ) ) );
 }
 
 
 
 void SideBarWidget::resizeEvent( QResizeEvent * )
 {
-	const int MARGIN = 6;
-	m_contents->setGeometry( MARGIN, 40 + MARGIN, width() - MARGIN * 2,
-						height() - MARGIN * 2 - 40 );
+	const int MARGIN = 3;
+	const int HEAD   = 37;
+	m_contents->setGeometry( MARGIN, HEAD + MARGIN, width() - MARGIN * 2,
+						height() - MARGIN * 2 - HEAD );
 }
 
 

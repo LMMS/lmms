@@ -81,6 +81,15 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 
 	setFixedSize( 210, 60 );
 
+	// Disable controllers that are of type "DummyController"
+	bool isEnabled = true;//!dynamic_cast<DummyController *>( controller() );
+	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
+	m_bypass->move( 3, 3 );
+	m_bypass->setEnabled( isEnabled );
+	m_bypass->setWhatsThis( tr( "Toggles the effect on or off." ) );
+
+	ToolTip::add( m_bypass, tr( "On/Off" ) );
+
 	setModel( _model );
 
 	QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
@@ -89,7 +98,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	ctls_btn->setGeometry( 136, 8, 66, 41 );
 	connect( ctls_btn, SIGNAL( clicked() ),	this, SLOT( editControls() ) );
 
-	m_controllerDlg = getController()->createDialog( gui->mainWindow()->workspace() );
+	m_controllerDlg = controller()->createDialog( gui->mainWindow()->workspace() );
 
 	m_subWindow = gui->mainWindow()->addWindowedWidget( m_controllerDlg );
 
@@ -162,7 +171,7 @@ void ControllerView::deleteController()
 void ControllerView::renameController()
 {
 	bool ok;
-	Controller * c = castModel<Controller>();
+	Controller * c = controller();//castModel<Controller>();
 	QString new_name = QInputDialog::getText( this,
 			tr( "Rename controller" ),
 			tr( "Enter the new name for this controller" ),
@@ -170,7 +179,7 @@ void ControllerView::renameController()
 	if( ok && !new_name.isEmpty() )
 	{
 		c->setName( new_name );
-		if( getController()->type() == Controller::LfoController )
+		if( controller()->type() == Controller::LfoController )
 		{
 			m_controllerDlg->setWindowTitle( tr( "LFO" ) + " (" + new_name + ")" );
 		}
@@ -204,7 +213,7 @@ void ControllerView::paintEvent( QPaintEvent * )
 	//f.setBold( true );
 	p.setFont( f );
 
-	Controller * c = castModel<Controller>();
+	Controller * c = controller();//castModel<Controller>();
 	p.setPen( palette().shadow().color() );
 	p.drawText( 6, 33, c->name() );
 	p.setPen( palette().text().color() );
@@ -216,6 +225,7 @@ void ControllerView::paintEvent( QPaintEvent * )
 
 void ControllerView::modelChanged()
 {
+	m_bypass->setModel( &controller()->m_enabledModel );
 }
 
 

@@ -29,6 +29,7 @@
 
 #include "Engine.h"
 #include "Model.h"
+#include "AutomatableModel.h"
 #include "JournallingObject.h"
 #include "templates.h"
 #include "ValueBuffer.h"
@@ -100,6 +101,10 @@ public:
 		return( m_name );
 	}
 
+	inline bool isEnabled() const
+	{
+		return m_enabledModel.value();
+	}
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
 	virtual void loadSettings( const QDomElement & _this );
@@ -161,6 +166,8 @@ protected:
 	QString m_name;
 	ControllerTypes m_type;
 
+	BoolModel m_enabledModel;
+
 	static ControllerVector s_controllers;
 
 	static long s_periods;
@@ -170,6 +177,7 @@ signals:
 	// The value changed while the mixer isn't running (i.e: MIDI CC)
 	void valueChanged();
 
+	friend class ControllerView;
 	friend class ControllerDialog;
 
 } ;

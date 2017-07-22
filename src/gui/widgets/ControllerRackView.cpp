@@ -125,7 +125,7 @@ void ControllerRackView::loadSettings( const QDomElement & _this )
 
 void ControllerRackView::deleteController( ControllerView * _view )
 {
-	Controller * c = _view->getController();
+	Controller * c = _view->controller();
 
 	if( c->connectionCount() > 0 )
 	{
@@ -174,7 +174,7 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 	for ( QVector<ControllerView *>::const_iterator it = m_controllerViews.begin(); it != end; ++it)
 	{
 		ControllerView *currentControllerView = *it;
-		if ( currentControllerView->getController() == removedController )
+		if ( currentControllerView->controller() == removedController )
 		{
 			viewOfRemovedController = currentControllerView;
 			break;

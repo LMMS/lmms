@@ -50,7 +50,8 @@ Controller::Controller( ControllerTypes _type, Model * _parent,
 	m_valueBuffer( Engine::mixer()->framesPerPeriod() ),
 	m_bufferLastUpdated( -1 ),
 	m_connectionCount( 0 ),
-	m_type( _type )
+	m_type( _type ),
+	m_enabledModel( true, this, tr( "Controller enabled" ) )
 {
 	if( _type != DummyController && _type != MidiController )
 	{
@@ -102,7 +103,7 @@ Controller::~Controller()
 // Get current value, with an offset into the current buffer for sample exactness
 float Controller::currentValue( int _offset )
 {
-	if( _offset == 0 || isSampleExact() )
+	if(isEnabled() && ( _offset == 0 || isSampleExact() ))
 	{
 		m_currentValue = fittedValue( value( _offset ) );
 	}
@@ -114,11 +115,15 @@ float Controller::currentValue( int _offset )
 
 float Controller::value( int offset )
 {
-	if( m_bufferLastUpdated != s_periods )
+	if(isEnabled())
 	{
-		updateValueBuffer();
+		if( m_bufferLastUpdated != s_periods )
+		{
+			updateValueBuffer();
+		}
+		return m_valueBuffer.values()[ offset ];
 	}
-	return m_valueBuffer.values()[ offset ];
+	else return m_currentValue;
 }
 	
 
