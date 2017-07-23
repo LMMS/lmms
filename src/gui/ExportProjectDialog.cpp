@@ -80,14 +80,13 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 		}
 	}
 	
-#ifdef LMMS_HAVE_SF_COMPLEVEL
 	int const MAX_LEVEL=8;
 	for(int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
-		if (i==0){ info="(fastest)"; }
-		if (i==4){ info="(default)"; }
-		if (i==MAX_LEVEL){ info="(smallest)"; }
+		if (i==0){ info = tr("(fastest)", nullptr, QApplication::UnicodeUTF8); }
+		if (i==4){ info = tr("(default)", nullptr, QApplication::UnicodeUTF8); }
+		if (i==MAX_LEVEL){ info = tr("(smallest)", nullptr, QApplication::UnicodeUTF8); }
 		
 		compLevelCB->addItem(
 			QString::number(i)+" "+info,
@@ -95,7 +94,8 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 		);
 	}
 	compLevelCB->setCurrentIndex(MAX_LEVEL/2);
-#else
+#ifndef LMMS_HAVE_SF_COMPLEVEL
+	//Disable this widget; the setting would be ignored by the renderer.
 	compressionWidget->setVisible(false);
 #endif
 
