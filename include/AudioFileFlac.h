@@ -13,7 +13,7 @@
 class AudioFileFlac: public AudioFileDevice
 {
 public:
-	AudioFileFlac( OutputSettings const& outputSettings,
+	AudioFileFlac(OutputSettings const& outputSettings,
 			ch_cnt_t const channels,
 			bool& successful,
 			QString const& file,
@@ -22,7 +22,7 @@ public:
 
 	virtual ~AudioFileFlac();
 
-	static AudioFileDevice* getInst( QString const& outputFilename,
+	static AudioFileDevice* getInst(QString const& outputFilename,
 			OutputSettings const& outputSettings,
 			ch_cnt_t const channels,
 			Mixer* mixer,

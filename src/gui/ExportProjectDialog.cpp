@@ -183,13 +183,11 @@ void ExportProjectDialog::startExport()
 			static_cast<OutputSettings::BitDepth>( depthCB->currentIndex() ),
 			mapToStereoMode(stereoModeComboBox->currentIndex()) );
 
-#ifdef LMMS_HAVE_SF_COMPLEVEL
 	if (compressionWidget->isVisible())
 	{
 		double level = compLevelCB->itemData(compLevelCB->currentIndex()).toDouble();
 		os.setCompressionLevel(level);
 	}
-#endif
 
 	//Make sure we have the the correct file extension
 	//so there's no confusion about the codec in use.
