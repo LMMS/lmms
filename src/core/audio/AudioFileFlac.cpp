@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "AudioFileFlac.h"
 #include "endian_handling.h"
 #include "Mixer.h"
@@ -63,7 +65,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 
 	if (depth == OutputSettings::Depth_24Bit || depth == OutputSettings::Depth_32Bit) // Float encoding
 	{
-		float* buf = new float[frames*channels()];
+		std::unique_ptr<sample_t[]> buf{ new sample_t[frames*channels()] };
 		for(fpp_t frame = 0; frame < frames; ++frame)
 		{
 			for(ch_cnt_t channel=0; channel<channels(); ++channel)
@@ -71,15 +73,13 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 				buf[frame*channels()+channel] = _ab[frame][channel] * master_gain;
 			}
 		}
-		sf_writef_float(m_sf,buf,frames);
-		delete[] buf;
+		sf_writef_float(m_sf,static_cast<float*>(buf.get()),frames);
 	}
 	else // integer PCM encoding
 	{
-		int_sample_t* buf = new int_sample_t[frames*channels()];
-		convertToS16(_ab,frames,master_gain,buf,!isLittleEndian());
-		sf_writef_short(m_sf,static_cast<short*>(buf),frames);
-		delete[] buf;
+		std::unique_ptr<int_sample_t[]> buf{ new int_sample_t[frames*channels()] };
+		convertToS16(_ab,frames,master_gain,buf.get(),!isLittleEndian());
+		sf_writef_short(m_sf,static_cast<short*>(buf.get()),frames);
 	}
 
 }
