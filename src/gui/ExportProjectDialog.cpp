@@ -41,7 +41,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	m_fileName( _file_name ),
 	m_fileExtension(),
 	m_multiExport( multi_export ),
-	m_renderManager( NULL )
+	m_renderManager( nullptr )
 {
 	setupUi( this );
 	setWindowTitle( tr( "Export project to %1" ).arg(
@@ -104,24 +104,12 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 }
 
 
-
-
-ExportProjectDialog::~ExportProjectDialog()
-{
-	delete m_renderManager;
-}
-
-
-
-
 void ExportProjectDialog::reject()
 {
 	if( m_renderManager ) {
 		m_renderManager->abortProcessing();
 	}
-
-	delete m_renderManager;
-	m_renderManager = NULL;
+	m_renderManager.release();
 
 	QDialog::reject();
 }
@@ -130,9 +118,7 @@ void ExportProjectDialog::reject()
 
 void ExportProjectDialog::accept()
 {
-	delete m_renderManager;
-	m_renderManager = NULL;
-
+	m_renderManager.release();
 	QDialog::accept();
 }
 
@@ -196,18 +182,18 @@ void ExportProjectDialog::startExport()
 	{
 		output_name+=m_fileExtension;
 	}
-	m_renderManager = new RenderManager( qs, os, m_ft, output_name );
+	m_renderManager.reset(new RenderManager( qs, os, m_ft, output_name ));
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
 
-	connect( m_renderManager, SIGNAL( progressChanged( int ) ),
+	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
 			progressBar, SLOT( setValue( int ) ) );
-	connect( m_renderManager, SIGNAL( progressChanged( int ) ),
+	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
 			this, SLOT( updateTitleBar( int ) )) ;
-	connect( m_renderManager, SIGNAL( finished() ),
+	connect( m_renderManager.get(), SIGNAL( finished() ),
 			this, SLOT( accept() ) );
-	connect( m_renderManager, SIGNAL( finished() ),
+	connect( m_renderManager.get(), SIGNAL( finished() ),
 			gui->mainWindow(), SLOT( resetWindowTitle() ) );
 
 	if ( m_multiExport )
