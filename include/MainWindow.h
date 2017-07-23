@@ -105,8 +105,6 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	void runAutoSave();
-
 	enum SessionState
 	{
 		Normal,
