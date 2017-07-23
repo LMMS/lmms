@@ -191,7 +191,14 @@ void ExportProjectDialog::startExport()
 	}
 #endif
 
-	m_renderManager = new RenderManager( qs, os, m_ft, m_fileName );
+	//Make sure we have the the correct file extension
+	//so there's no confusion about the codec in use.
+	auto output_name = m_fileName;
+	if (!output_name.endsWith(m_fileExtension,Qt::CaseInsensitive))
+	{
+		output_name+=m_fileExtension;
+	}
+	m_renderManager = new RenderManager( qs, os, m_ft, output_name );
 
 	Engine::getSong()->setExportLoop( exportLoopCB->isChecked() );
 	Engine::getSong()->setRenderBetweenMarkers( renderMarkersCB->isChecked() );
