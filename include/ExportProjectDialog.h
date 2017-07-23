@@ -28,7 +28,6 @@
 #define EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
-#include <vector>
 #include <memory>
 #include "ui_export_project.h"
 
