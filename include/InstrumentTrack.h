@@ -314,9 +314,9 @@ public:
 
 
 protected:
+	virtual void resizeEvent( QResizeEvent * re );
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
-
 
 private slots:
 	void toggleInstrumentWindow( bool _on );

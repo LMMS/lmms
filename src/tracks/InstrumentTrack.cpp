@@ -1098,6 +1098,18 @@ InstrumentTrackWindow * InstrumentTrackView::getInstrumentTrackWindow()
 
 
 
+void InstrumentTrackView::resizeEvent( QResizeEvent * re )
+{
+	TrackView::resizeEvent(re);
+	/*
+	  I don't how to vertical align the content to the top
+	  m_tlb->setFixedHeight(height()-2);
+	*/
+}
+
+
+
+
 void InstrumentTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
 	InstrumentTrackWindow::dragEnterEventGeneric( _dee );
