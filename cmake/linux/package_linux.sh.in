@@ -105,13 +105,6 @@ export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
 VSTLIB="$APPDIR/usr/lib/lmms/RemoteVstPlugin.exe.so"
 
-# Handle non-standard wine locations
-if which wine > /dev/null 2>&1; then
-   libwine="$(ldd $VSTLIB |grep libwine.so|awk '{ print $3 }')"
-   ldpath="$(dirname "$(readlink -f "$libwine")")"
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ldpath
-fi
-
 # Temporarily move executables
 VSTBIN="$APPDIR/usr/bin/RemoteVstPlugin.exe.so"
 ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
