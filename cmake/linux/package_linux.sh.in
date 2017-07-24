@@ -120,9 +120,9 @@ echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
 "$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
 
-# Move executables back to lib directory
-mv "$ZYNBIN" "$ZYNLIB"
-mv "$VSTBIN" "$VSTLIB"
+# Create relative symbolic link to original location
+ln -sr "$ZYNBIN" "$ZYNLIB"
+ln -sr "$VSTBIN" "$VSTLIB"
 
 # Run a second time to create AppImage
 echo -e "\nFinishing the AppImage..."
