@@ -101,6 +101,14 @@ unset LD_LIBRARY_PATH
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
+# Handle alternative wine
+altwine=/usr/lib/wine/wine
+if [ -f $altwine ]; then
+   libwine="$(ldd $altwine |grep libwine.so|awk '{ print $3 }')"
+   ldpath="$(dirname "$(readlink -f "$libwine")")"
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ldpath
+fi
+
 # Executables in the lib directory
 ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
 VSTLIB="$APPDIR/usr/lib/lmms/RemoteVstPlugin.exe.so"
