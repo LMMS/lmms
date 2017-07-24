@@ -1,7 +1,8 @@
 /*
- * TrackLabelButton.h - class trackLabelButton
+ * TrackRenameLineEdit.h - class TrackRenameLineEdit
  *
  * Copyright (c) 2004-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2017 Alexandre Almeida <http://m374lx.users.sourceforge.net/>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,48 +24,23 @@
  */
 
 
-#ifndef TRACK_LABEL_BUTTON_H
-#define TRACK_LABEL_BUTTON_H
+#ifndef TRACK_RENAME_LINE_EDIT_H
+#define TRACK_RENAME_LINE_EDIT_H
 
-#include <QToolButton>
 #include <QLineEdit>
 
-class TrackView;
-
-class TrackRenameLineEdit;
-
-
-class TrackLabelButton : public QToolButton
+class TrackRenameLineEdit : public QLineEdit
 {
 	Q_OBJECT
 public:
-	TrackLabelButton( TrackView * _tv, QWidget * _parent );
-	virtual ~TrackLabelButton();
-
-
-public slots:
-	void rename();
-	void renameFinished();
-	void nameChanged();
-
-
+	TrackRenameLineEdit( QWidget * parent );
+	void show();
+	
 protected:
-	virtual void dragEnterEvent( QDragEnterEvent * _dee );
-	virtual void dropEvent( QDropEvent * _de );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
-	virtual void mouseReleaseEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-	virtual void resizeEvent( QResizeEvent * _re );
-
-
+	virtual void keyPressEvent( QKeyEvent * ke );
+	
 private:
-	TrackView * m_trackView;
-	QString m_iconName;
-	TrackRenameLineEdit * m_renameLineEdit;
-	QRect m_buttonRect;
-	QString elideName( const QString &name );
-
+	QString m_oldName;
 } ;
 
 #endif
