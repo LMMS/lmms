@@ -2724,6 +2724,12 @@ void TrackView::dropEvent( QDropEvent * de )
  */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
+	if(me->x()>10) //TODO: should be the width of the handle
+	{
+		QWidget::mousePressEvent( me );
+		return;
+	}
+	
 	// If previously dragged too small, restore on shift-leftclick
 	if( height() < DEFAULT_TRACK_HEIGHT &&
 		me->modifiers() & Qt::ShiftModifier &&
