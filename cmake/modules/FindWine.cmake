@@ -23,7 +23,7 @@ EXEC_PROGRAM(${WINE_CXX} ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTP
 IF("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
 	SET(WINE_LIBRARY_FIX "/usr/lib/i386-linux-gnu/wine/" )
 # Fedora systems 
-ELSEIF("${WINEBUILD_OUTPUT}" MATCHES ".*lib64/wine/libwinecrt0.a.*")
+ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
 	SET(WINE_LIBRARY_FIX "/usr/lib/i386/wine/")
 # Wine stable
 ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-stable/lib64/wine/libwinecrt0.a.*")
