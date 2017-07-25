@@ -34,8 +34,6 @@ ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-staging/lib64/wine/libwinecrt0.a
 	SET(WINE_LIBRARY_FIX "/opt/wine-staging/lib/wine/")
 ENDIF()
 
-MESSAGE("${WINE_LIBRARY_FIX}")
-
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Wine DEFAULT_MSG WINE_LIBRARIES WINE_INCLUDE_DIRS)
 
