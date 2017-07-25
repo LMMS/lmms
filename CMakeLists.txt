@@ -153,6 +153,9 @@ IF(WANT_QT5)
 		Qt5::Xml
 	)
 
+	# Resolve Qt5::qmake to full path for use in packaging scripts
+	GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
+
 	FIND_PACKAGE(Qt5Test)
 	SET(QT_QTTEST_LIBRARY Qt5::Test)
 ELSE()
