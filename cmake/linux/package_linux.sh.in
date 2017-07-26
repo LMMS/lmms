@@ -87,7 +87,6 @@ mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
 cat >"${APPDIR}usr/bin/lmms" <<EOL
 #!/usr/bin/env bash
 DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-export LD_LIBRARY_PATH=\$DIR/usr/lib:\$DIR/usr/lib/lmms/:\$LD_LIBRARY_PATH
 # Prevent segfault on VirualBox
 if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
@@ -109,33 +108,25 @@ if [ -d "@WINE_LIBRARY_FIX@" ]; then
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_LIBRARY_FIX@":"@WINE_LIBRARY_FIX@wine/"
 fi
 
-# Executables in the lib directory
-ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
-VSTLIB="$APPDIR/usr/lib/lmms/RemoteVstPlugin.exe.so"
-
-# Temporarily move executables
-VSTBIN="$APPDIR/usr/bin/RemoteVstPlugin.exe.so"
-ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
-mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB" "$VSTBIN"
-
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
+
+# Build a list of shared objects in target/lib/lmms
+for file in "$APPDIR/usr/lib/lmms/"*.so; do
+   thisfile="$APPDIR/usr/lib/lmms/${file##*/}"
+   executables="${executables} -executable=$thisfile"
+done
 
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
-
-# Create relative symbolic link to original location
-ln -sr "$ZYNBIN" "$ZYNLIB"
-ln -sr "$VSTBIN" "$VSTLIB"
 
 # Run a second time to create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n#### linuxdeployqt pass 2 ####" > "$LOGFILE"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Created .AppImage"
 
 echo -e "\nMoving to @APPIMAGE_FILE@..."
