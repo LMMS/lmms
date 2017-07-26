@@ -378,10 +378,13 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 	}
 
 	// inform attached components about MIDI finished (used for recording in Piano Roll)
-	if( m_origin == OriginMidiInput )
+	if (!instrumentTrack()->isSustainPedalPressed())
 	{
-		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
-		m_instrumentTrack->midiNoteOff( *this );
+		if( m_origin == OriginMidiInput )
+		{
+			setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
+			m_instrumentTrack->midiNoteOff( *this );
+		}
 	}
 }
 
