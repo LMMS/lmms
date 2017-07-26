@@ -35,7 +35,7 @@ class ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	enum ExportFileFormats
+	enum ExportFileFormats: int
 	{
 		WaveFile,
 		OggFile,
