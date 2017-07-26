@@ -1328,10 +1328,11 @@ void Song::exportProject( bool multiExport )
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats &&
-		       ProjectRenderer::fileEncodeDevices[idx].isAvailable())
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats)
 		{
-			types << tr( ProjectRenderer::fileEncodeDevices[idx].m_description );
+			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
+				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
+			}
 			++idx;
 		}
 		efd.setNameFilters( types );
