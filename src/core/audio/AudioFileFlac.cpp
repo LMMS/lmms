@@ -44,7 +44,7 @@ bool AudioFileFlac::startEncoding()
 
 	m_sf = sf_open(
 #ifdef LMMS_BUILD_WIN32
-		outputFile().toLocal8bit().constData(),
+		outputFile().toLocal8Bit().constData(),
 #else
 		outputFile().toUtf8().constData(),
 #endif
