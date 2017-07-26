@@ -87,6 +87,7 @@ mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
 cat >"${APPDIR}usr/bin/lmms" <<EOL
 #!/usr/bin/env bash
 DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+export LD_LIBRARY_PATH=\$DIR/usr/lib/:\$DIR/usr/lib/lmms:$LD_LIBRARY_PATH
 # Prevent segfault on VirualBox
 if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
@@ -108,6 +109,16 @@ if [ -d "@WINE_LIBRARY_FIX@" ]; then
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_LIBRARY_FIX@":"@WINE_LIBRARY_FIX@wine/"
 fi
 
+# Move executables so linuxdeployqt can find them
+ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
+VSTLIB="$APPDIR/usr/lib/lmms/RemoteVstPlugin.exe.so"
+
+ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
+VSTBIN="$APPDIR/usr/bin/RemoteVstPlugin.exe.so"
+
+mv "$ZYNLIB" "$ZYNBIN"
+mv "$VSTLIB" "$VSTBIN"
+
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
@@ -120,13 +131,20 @@ done
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
+
+# Link to original location so lmms can find them
+ln -sr "$ZYNBIN" "$ZYNLIB"
+ln -sr "$VSTBIN" "$VSTLIB"
+
+# Remove libwine to fix VST loading
+rm -f $APPDIR/usr/lib/libwine.so.1
 
 # Run a second time to create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n#### linuxdeployqt pass 2 ####" > "$LOGFILE"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Created .AppImage"
 
 echo -e "\nMoving to @APPIMAGE_FILE@..."
