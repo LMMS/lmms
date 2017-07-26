@@ -248,7 +248,7 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
-	if( m_released )
+	if( m_released && !instrumentTrack()->isSustainPedalPressed() )
 	{
 		f_cnt_t todo = framesThisPeriod;
 
