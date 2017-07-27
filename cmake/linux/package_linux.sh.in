@@ -106,7 +106,7 @@ export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
 # Handle wine linking
 if [ -d "@WINE_LIBRARY_FIX@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@WINE_LIBRARY_FIX@":"@WINE_LIBRARY_FIX@wine/"
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_LIBRARY_FIX@:@WINE_LIBRARY_FIX@wine/
 fi
 
 # Move executables so linuxdeployqt can find them
@@ -137,6 +137,7 @@ executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/pitch_scal
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
+# shellcheck disable=SC2086
 "$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
 
@@ -147,6 +148,7 @@ ln -sr  "$VSTBIN" "$VSTLIB"
 # Run a second time to create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n#### linuxdeployqt pass 2 ####" >> "$LOGFILE"
+# shellcheck disable=SC2086
 "$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Created .AppImage"
 
