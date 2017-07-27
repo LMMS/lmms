@@ -1128,12 +1128,12 @@ void Song::loadProject( const QString & fileName )
 	{
 		if ( gui )
 		{
-			QMessageBox::warning( NULL, tr("LMMS Error report"), *errorSummary(),
+			QMessageBox::warning( NULL, tr("LMMS Error report"), errorSummary(),
 							QMessageBox::Ok );
 		}
 		else
 		{
-			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
+			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
 		}
 	}
 
@@ -1524,17 +1524,17 @@ bool Song::hasErrors()
 
 
 
-QString* Song::errorSummary()
+QString Song::errorSummary()
 {
-	QString* errors = new QString();
+	QString errors;
 
 	for ( int i = 0 ; i < m_errors.length() ; i++ )
 	{
-		errors->append( m_errors.value( i ) + "\n" );
+		errors.append( m_errors.value( i ) + "\n" );
 	}
 
-	errors->prepend( "\n\n" );
-	errors->prepend( tr( "The following errors occured while loading: " ) );
+	errors.prepend( "\n\n" );
+	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
 }
