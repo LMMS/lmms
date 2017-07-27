@@ -67,7 +67,7 @@ public:
 	void clearErrors();
 	void collectError( const QString error );
 	bool hasErrors();
-	QString* errorSummary();
+	QString errorSummary();
 
 	class PlayPos : public MidiTime
 	{
