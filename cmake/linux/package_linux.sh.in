@@ -58,7 +58,7 @@ DAYSOLD=2
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
 elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
-	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
+	url="https://github.com/tresf/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
 	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
 	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
@@ -71,23 +71,23 @@ fi
 
 # Make skeleton AppDir
 echo -e "\nCreating ${APPDIR}..."
-rm -rf "$APPDIR"
-mkdir -p "$APPDIR/usr"
+rm -rf "${APPDIR}"
+mkdir -p "${APPDIR}usr"
 success "Created ${APPDIR}"
 
 # Clone install to AppDir
 echo -e "\nCopying @CMAKE_INSTALL_PREFIX@ to ${APPDIR}..."
-cp -R "@CMAKE_INSTALL_PREFIX@/." "$APPDIR/usr"
-rm -rf "$APPDIR/usr/include"
+cp -R "@CMAKE_INSTALL_PREFIX@/." "${APPDIR}usr"
+rm -rf "${APPDIR}usr/include"
 success "${APPDIR}"
 
 # Create a wrapper script which calls the lmms executable
-mv "$APPDIR/usr/bin/lmms" "$APPDIR/usr/bin/lmms.real"
+mv "${APPDIR}usr/bin/lmms" "${APPDIR}usr/bin/lmms.real"
 # shellcheck disable=SC1083
 cat >"${APPDIR}usr/bin/lmms" <<EOL
 #!/usr/bin/env bash
 DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$DIR/usr/lib/:\$DIR/usr/lib/lmms
+export LD_LIBRARY_PATH=\$DIR/usr/lib/:\$DIR/usr/lib/lmms:\$LD_LIBRARY_PATH
 # Prevent segfault on VirualBox
 if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
@@ -110,37 +110,38 @@ if [ -d "@WINE_LIBRARY_FIX@" ]; then
 fi
 
 # Move executables so linuxdeployqt can find them
-ZYNLIB="$APPDIR/usr/lib/lmms/RemoteZynAddSubFx"
-ZYNBIN="$APPDIR/usr/bin/RemoteZynAddSubFx"
+ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
+VSTLIB="${APPDIR}usr/lib/lmms/RemoteVstPlugin.exe.so"
+
+ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
+VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
+mv "$VSTLIB" "$VSTBIN"
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
 # Build a list of shared objects in target/lib/lmms
-for file in "$APPDIR/usr/lib/lmms/"*.so; do
-   if [[ $file == *.exe.so ]]; then
-      success "Skipping relinking $file"
-   else
-      thisfile="$APPDIR/usr/lib/lmms/${file##*/}"
-      executables="${executables} -executable=$thisfile"
-   fi
+for file in "${APPDIR}usr/lib/lmms/"*.so; do
+   thisfile="${APPDIR}usr/lib/lmms/${file##*/}"
+   executables="${executables} -executable=$thisfile"
 done
 
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
 
-# Restore to original location so lmms can find them
-mv "$ZYNBIN" "$ZYNLIB"
+# Link to original location so lmms can find them
+ln -sr  "$ZYNBIN" "$ZYNLIB"
+ln -sr  "$VSTBIN" "$VSTLIB"
 
 # Run a second time to create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n#### linuxdeployqt pass 2 ####" >> "$LOGFILE"
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Created .AppImage"
 
 echo -e "\nMoving to @APPIMAGE_FILE@..."
