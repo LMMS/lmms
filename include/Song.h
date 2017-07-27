@@ -367,7 +367,7 @@ private:
 
 	bool m_loadingProject;
 
-	QList<QString> * m_errors;
+	QList<QString> m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];

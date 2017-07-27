@@ -86,7 +86,6 @@ Song::Song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
-	m_errors( new QList<QString>() ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_patternToPlay( NULL ),
@@ -1506,21 +1505,21 @@ void Song::removeController( Controller * controller )
 
 void Song::clearErrors()
 {
-	m_errors->clear();
+	m_errors.clear();
 }
 
 
 
 void Song::collectError( const QString error )
 {
-	m_errors->append( error );
+	m_errors.append( error );
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( m_errors->length() > 0 );
+	return !m_errors.empty();
 }
 
 
@@ -1529,9 +1528,9 @@ QString* Song::errorSummary()
 {
 	QString* errors = new QString();
 
-	for ( int i = 0 ; i < m_errors->length() ; i++ )
+	for ( int i = 0 ; i < m_errors.length() ; i++ )
 	{
-		errors->append( m_errors->value( i ) + "\n" );
+		errors->append( m_errors.value( i ) + "\n" );
 	}
 
 	errors->prepend( "\n\n" );
