@@ -128,6 +128,12 @@ for file in "${APPDIR}usr/lib/lmms/"*.so; do
    executables="${executables} -executable=$thisfile"
 done
 
+# Fix ladspa linking
+executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/imp_1199.so"
+executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/imbeq_1197.so"
+executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/pitch_scale_1193.so"
+executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/pitch_scale_1194.so"
+
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
 echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
