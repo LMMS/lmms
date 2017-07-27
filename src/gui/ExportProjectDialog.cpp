@@ -84,9 +84,9 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	for(int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
-		if (i==0){ info = tr("(fastest)", nullptr, QApplication::UnicodeUTF8); }
-		if (i==4){ info = tr("(default)", nullptr, QApplication::UnicodeUTF8); }
-		if (i==MAX_LEVEL){ info = tr("(smallest)", nullptr, QApplication::UnicodeUTF8); }
+		if (i==0){ info = tr("(fastest)"); }
+		else if (i==4){ info = tr("(default)"); }
+		else if (i==MAX_LEVEL){ info = tr("(smallest)"); }
 		
 		compLevelCB->addItem(
 			QString::number(i)+" "+info,
