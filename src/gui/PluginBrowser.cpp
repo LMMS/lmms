@@ -114,7 +114,7 @@ PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
 	m_pluginDescriptor( _pd ),
 	m_logo( _pd.logo->pixmap() ),
 	m_mouseOver( false ),
-	m_targetHeight( 24 )
+	m_targetHeight( DEFAULT_HEIGHT )
 {
 	connect( &m_updateTimer, SIGNAL( timeout() ), SLOT( updateHeight() ) );
 	setFixedHeight( m_targetHeight );
@@ -160,7 +160,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
 
-	if( height() > 24 || m_mouseOver )
+	if( height() > DEFAULT_HEIGHT || m_mouseOver )
 	{
 		f.setBold( false );
 		p.setFont( f );
@@ -182,7 +182,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 void PluginDescWidget::enterEvent( QEvent * _e )
 {
 	m_mouseOver = true;
-	m_targetHeight = height() + 1;
+	m_targetHeight = height() + HEIGHT_INCREMENT;
 	updateHeight();
 	QWidget::enterEvent( _e );
 }
@@ -193,7 +193,7 @@ void PluginDescWidget::enterEvent( QEvent * _e )
 void PluginDescWidget::leaveEvent( QEvent * _e )
 {
 	m_mouseOver = false;
-	m_targetHeight = 24;
+	m_targetHeight = DEFAULT_HEIGHT;
 	updateHeight();
 	QWidget::leaveEvent( _e );
 }
@@ -218,11 +218,11 @@ void PluginDescWidget::updateHeight()
 {
 	if( m_targetHeight > height() )
 	{
-		setFixedHeight( height() + 1 );
+		setFixedHeight( height() + HEIGHT_INCREMENT );
 	}
 	else if( m_targetHeight < height() )
 	{
-		setFixedHeight( height() - 1 );
+		setFixedHeight( height() - HEIGHT_INCREMENT );
 	}
 	else
 	{

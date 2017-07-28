@@ -77,6 +77,9 @@ private slots:
 
 
 private:
+	constexpr static int DEFAULT_HEIGHT{24};
+	constexpr static int HEIGHT_INCREMENT{4};
+
 	QTimer m_updateTimer;
 
 	const Plugin::Descriptor & m_pluginDescriptor;
