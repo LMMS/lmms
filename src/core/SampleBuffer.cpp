@@ -926,6 +926,26 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 }
 
 
+f_cnt_t SampleBuffer::findClosestZero(f_cnt_t _index)
+{
+	sample_t vval =m_data[_index][0];
+	if(vval==0.f) return _index;
+
+	bool    vsign=signbit(vval);
+
+	f_cnt_t left=_index-1;
+	while((left>0)&&(signbit(m_data[left][0])==vsign)) left--;
+	left++;
+
+	f_cnt_t right=_index+1;
+	while((right<m_frames-1)&&(signbit(m_data[right][0])==vsign)) right++;
+	right--;
+
+	if(right-_index>_index-left) return left;
+	return right;
+}
+
+
 void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
 {

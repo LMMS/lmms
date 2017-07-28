@@ -87,10 +87,13 @@ MainWindow::MainWindow() :
 	hbox->setSpacing( 0 );
 	hbox->setMargin( 0 );
 
-	SideBar * sideBar = new SideBar( Qt::Vertical, w );
+	//SideBar * sideBar = new SideBar( Qt::Vertical, w );
+	SideBar * sideBar = new SideBar( Qt::Vertical, main_widget);
 
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( false );
+
+	m_workspace = new QMdiArea( splitter );
 
 	ConfigManager* confMgr = ConfigManager::inst();
 
@@ -147,8 +150,6 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, dirs_as_items) );
 
-	m_workspace = new QMdiArea( splitter );
-
 	// Load background
 	emit initProgress(tr("Loading background artwork"));
 	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
@@ -170,9 +171,8 @@ MainWindow::MainWindow() :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	hbox->addWidget( sideBar );
 	hbox->addWidget( splitter );
-
+	hbox->addWidget( sideBar );
 
 	// create global-toolbar at the top of our window
 	m_toolBar = new QWidget( main_widget );
