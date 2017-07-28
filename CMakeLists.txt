@@ -370,7 +370,7 @@ IF(WANT_JACK)
 	IF(JACK_FOUND)
 		IF(WANT_WEAKJACK)
 			SET(LMMS_HAVE_WEAKJACK TRUE)
-			SET(STATUS_JACK "OK (weak linking enabled)")
+			SET(STATUS_JACK "OK, weak linking enabled")
 			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
 			SET(JACK_LIBRARIES "dl")
