@@ -156,8 +156,10 @@ struct Event
 				writeBigEndian4(int(60000000.0 / tempo), fourbytes);
 				
 				//printf("tempo of %x translates to ", tempo);
+				/*
 				for (int i=0; i<3; i++) printf("%02x ", fourbytes[i+1]);
 				printf("\n");
+				*/
 				buffer[size++] = fourbytes[1];
 				buffer[size++] = fourbytes[2];
 				buffer[size++] = fourbytes[3];
@@ -186,7 +188,8 @@ struct Event
 	
 	// events are sorted by their time
 	inline bool operator < (const Event& b) const {
-		return this->time < b.time;
+		return this->time < b.time ||
+			(this->time == b.time && this->type > b.type);
 	}
 };
 
