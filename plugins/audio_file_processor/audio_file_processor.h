@@ -160,6 +160,7 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void mouseMoveEvent( QMouseEvent * _me );
+	virtual void mouseDoubleClickEvent ( QMouseEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _we );
 	virtual void paintEvent( QPaintEvent * _pe );
 

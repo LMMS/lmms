@@ -1802,19 +1802,35 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	QRect r=rect();
+	p.fillRect(r, palette().brush(QPalette::Background) );
 
-	if( m_trackView->isMovingTrack() == false )
+	if( m_trackView->isMovingTrack() )
 	{
-		p.drawPixmap( 2, 2, *s_grip );
-		m_trackOps->show();
-		m_muteBtn->show();
+		p.setPen(Qt::red);
+		p.drawLine(r.x(),r.y(),r.x(),r.y()+r.height()-1);
+	}
+
+	/*
+	  if( m_trackView->isMovingTrack() == false )
+	{
+	*/
+		int y=2;
+		while(y<height())
+		{
+			p.drawPixmap( 2, y, *s_grip );
+			y+=s_grip->height();
+		}
+	/*
+	  m_trackOps->show();
+	  //m_muteBtn->show();
 	}
 	else
 	{
 		m_trackOps->hide();
 		m_muteBtn->hide();
 	}
+	*/
 }
 
 
