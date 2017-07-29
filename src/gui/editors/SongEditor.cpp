@@ -147,7 +147,6 @@ SongEditor::SongEditor( Song * song ) :
 
 	gui->mainWindow()->addSpacingToToolBar( 10 );
 
-
 	QLabel * master_vol_lbl = new QLabel( tb );
 	master_vol_lbl->setPixmap( embed::getIconPixmap( "master_volume" ) );
 

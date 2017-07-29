@@ -72,13 +72,13 @@ FxMixerView::FxMixerView() :
 	QHBoxLayout * ml = new QHBoxLayout;
 
 	// Set margins
-	ml->setContentsMargins( 0, 4, 0, 0 );
-	
+	ml->setContentsMargins(4, style()->pixelMetric( QStyle::PM_ScrollBarExtent )+2 /*16*/, 4, 0 );
+
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
 	chLayout->setSizeConstraint( QLayout::SetMinimumSize );
-	chLayout->setSpacing( 0 );
+	chLayout->setSpacing( 4 );
 	chLayout->setMargin( 0 );
 	m_channelAreaWidget->setLayout(chLayout);
 
@@ -95,7 +95,7 @@ FxMixerView::FxMixerView() :
 	m_racksLayout->addWidget( m_fxChannelViews[0]->m_rackView );
 
 	FxChannelView * masterView = m_fxChannelViews[0];
-	ml->addWidget( masterView->m_fxLine, 0, Qt::AlignTop );
+	//TMP ml->addWidget( masterView->m_fxLine, 0, Qt::AlignTop );
 
 	QSize fxLineSize = masterView->m_fxLine->size();
 
@@ -125,7 +125,7 @@ FxMixerView::FxMixerView() :
 	channelArea->setWidget( m_channelAreaWidget );
 	channelArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 	channelArea->setFrameStyle( QFrame::NoFrame );
-	channelArea->setMinimumWidth( fxLineSize.width() * 6 );
+	channelArea->setMinimumWidth( fxLineSize.width() * 2 + 4 ); //typical w*8+7*4
 	channelArea->setFixedHeight( fxLineSize.height() +
 			style()->pixelMetric( QStyle::PM_ScrollBarExtent ) );
 	ml->addWidget( channelArea, 1, Qt::AlignTop );
@@ -133,14 +133,15 @@ FxMixerView::FxMixerView() :
 	// show the add new effect channel button
 	QPushButton * newChannelBtn = new QPushButton( embed::getIconPixmap( "new_channel" ), QString::null, this );
 	newChannelBtn->setObjectName( "newChannelBtn" );
-	newChannelBtn->setFixedSize( fxLineSize );
+	newChannelBtn->setFixedSize( QSize(fxLineSize.width(),fxLineSize.width()) );
 	connect( newChannelBtn, SIGNAL( clicked() ), this, SLOT( addNewChannel() ) );
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
+	ml->addWidget( masterView->m_fxLine, 0, Qt::AlignTop );
 
 	// add the stacked layout for the effect racks of fx channels 
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
-	
+
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
 	setLayout( ml );

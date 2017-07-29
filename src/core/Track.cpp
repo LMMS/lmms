@@ -1131,7 +1131,8 @@ TrackContentWidget::~TrackContentWidget()
 
 void TrackContentWidget::updateBackground()
 {
-	const int tactsPerBar = 4;
+	//const int tactsPerBar = 4;
+	const int tactsPerBar=Engine::getSong()->getTimeSigModel().getNumerator();
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 
 	// Assume even-pixels-per-tact. Makes sense, should be like this anyways

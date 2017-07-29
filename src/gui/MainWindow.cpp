@@ -890,8 +890,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 				continue;
 			}
 
-			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), *it );
+			m_recentlyOpenedProjectsMenu->addAction( embed::getIconPixmap( "project_file" ), *it );
 #ifdef LMMS_BUILD_APPLE
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
@@ -912,7 +911,14 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	if ( mayChangeProject(true) )
 	{
-		const QString & f = _action->text();
+		QString f = _action->text();
+		// workaround for KDE
+		QFileInfo recentFile(f);
+		if(!recentFile.exists()&&(f.indexOf('&')>0))
+		{
+			f=f.replace("&","");
+		}
+		//end
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
 		setCursor( Qt::ArrowCursor );
