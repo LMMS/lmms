@@ -62,6 +62,8 @@ public:
 	Q_PROPERTY( QColor selectedLoopInnerColor READ getSelectedLoopInnerColor WRITE setSelectedLoopInnerColor )
 	Q_PROPERTY( QColor selectedLoopTextColor READ getSelectedLoopTextColor WRITE setSelectedLoopTextColor )
 
+	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+
 	enum AutoScrollStates
 	{
 		AutoScrollEnabled,
@@ -132,6 +134,9 @@ public:
 
 	inline QColor const & getSelectedLoopTextColor() const { return m_selectedLoopTextColor; }
 	inline void setSelectedLoopTextColor(QColor const & selectedLoopTextColor) { m_selectedLoopTextColor = selectedLoopTextColor; }
+
+	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
+	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
 
 	inline Song::PlayPos & pos()
 	{
@@ -251,10 +256,12 @@ private:
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
 	QColor m_inactiveLoopTextColor;
+
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
 	QColor m_activeLoopTextColor;
+
 	QColor m_selectedLoopColor;
 	QBrush m_selectedLoopBrush;
 	QColor m_selectedLoopInnerColor;
