@@ -341,7 +341,8 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int bnmod=qMax( 1, qRound( 1.0f / 3.0f *
 				   MidiTime::ticksPerTact() / m_ppt ) );
 	*/
-	int bnmod=Engine::getSong()->getTimeSigModel().getNumerator();
+	int bnmod=4;// most common case
+	//int bnmod=Engine::getSong()->getTimeSigModel().getNumerator();
 	while((m_ppt>0)&&(bnmod>0)&&(bnmod%2==0)&&(bnmod*m_ppt>=128)) bnmod/=2;
 	while((m_ppt>0)&&(bnmod>0)&&(bnmod*m_ppt<48)) bnmod*=2;
 	for( int i = 0; x + i * m_ppt < width(); ++i )
