@@ -61,10 +61,6 @@ public:
 	Q_PROPERTY( QColor selectedLoopInnerColor READ getSelectedLoopInnerColor WRITE setSelectedLoopInnerColor )
 	Q_PROPERTY( QColor selectedLoopTextColor READ getSelectedLoopTextColor WRITE setSelectedLoopTextColor )
 
-	Q_PROPERTY( QColor selectedLoopColor READ getSelectedLoopColor WRITE setSelectedLoopColor )
-	Q_PROPERTY( QBrush selectedLoopBrush READ getSelectedLoopBrush WRITE setSelectedLoopBrush )
-	Q_PROPERTY( QColor selectedLoopInnerColor READ getSelectedLoopInnerColor WRITE setSelectedLoopInnerColor )
-
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
 
 	enum AutoScrollStates
@@ -123,12 +119,9 @@ public:
 	inline QColor const & getActiveLoopInnerColor() const { return m_activeLoopInnerColor; }
 	inline void setActiveLoopInnerColor(QColor const & activeLoopInnerColor) { m_activeLoopInnerColor = activeLoopInnerColor; }
 
-<<<<<<< HEAD
 	inline QColor const & getActiveLoopTextColor() const { return m_activeLoopTextColor; }
 	inline void setActiveLoopTextColor(QColor const & activeLoopTextColor) { m_activeLoopTextColor = activeLoopTextColor; }
 
-=======
->>>>>>> refs/remotes/origin/master
 	inline QColor const & getSelectedLoopColor() const { return m_selectedLoopColor; }
 	inline void setSelectedLoopColor(QColor const & selectedLoopColor) { m_selectedLoopColor = selectedLoopColor; }
 
@@ -138,13 +131,11 @@ public:
 	inline QColor const & getSelectedLoopInnerColor() const { return m_selectedLoopInnerColor; }
 	inline void setSelectedLoopInnerColor(QColor const & selectedLoopInnerColor) { m_selectedLoopInnerColor = selectedLoopInnerColor; }
 
-<<<<<<< HEAD
 	inline QColor const & getSelectedLoopTextColor() const { return m_selectedLoopTextColor; }
 	inline void setSelectedLoopTextColor(QColor const & selectedLoopTextColor) { m_selectedLoopTextColor = selectedLoopTextColor; }
-=======
+
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
->>>>>>> refs/remotes/origin/master
 
 	inline Song::PlayPos & pos()
 	{
@@ -263,24 +254,17 @@ private:
 	QColor m_inactiveLoopColor;
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
-<<<<<<< HEAD
 	QColor m_inactiveLoopTextColor;
+
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
 	QColor m_activeLoopTextColor;
+
 	QColor m_selectedLoopColor;
 	QBrush m_selectedLoopBrush;
 	QColor m_selectedLoopInnerColor;
 	QColor m_selectedLoopTextColor;
-=======
-	QColor m_activeLoopColor;
-	QBrush m_activeLoopBrush;
-	QColor m_activeLoopInnerColor;
-	QColor m_selectedLoopColor;
-	QBrush m_selectedLoopBrush;
-	QColor m_selectedLoopInnerColor;
->>>>>>> refs/remotes/origin/master
 
 	int m_loopRectangleVerticalPadding;
 
