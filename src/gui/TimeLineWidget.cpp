@@ -221,7 +221,6 @@ int TimeLineWidget::findLoop(const MidiTime& t)
 void TimeLineWidget::selectLoop(QAction * _a)
 {
 	int const n=_a->data().toInt();
-	//qWarning("select loop %d",n);
 	if((n<0) || (n>=NB_LOOPS)) return;
 	setCurrentLoop(n);
 }
@@ -338,20 +337,26 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	int const x = m_xOffset + s_posMarkerPixmap->width() / 2 -
 			( ( static_cast<int>( m_begin * m_ppt ) / MidiTime::ticksPerTact() ) % static_cast<int>( m_ppt ) );
 
+	/*
+	int bnmod=qMax( 1, qRound( 1.0f / 3.0f *
+				   MidiTime::ticksPerTact() / m_ppt ) );
+	*/
+	int bnmod=Engine::getSong()->getTimeSigModel().getNumerator();
+	while((m_ppt>0)&&(bnmod>0)&&(bnmod%2==0)&&(bnmod*m_ppt>=128)) bnmod/=2;
+	while((m_ppt>0)&&(bnmod>0)&&(bnmod*m_ppt<48)) bnmod*=2;
 	for( int i = 0; x + i * m_ppt < width(); ++i )
 	{
 		++barNumber;
-		if( ( barNumber - 1 ) %
-			qMax( 1, qRound( 1.0f / 3.0f *
-				MidiTime::ticksPerTact() / m_ppt ) ) == 0 )
+		if( ( barNumber - 1 ) % bnmod == 0 )
 		{
 			const int cx = x + qRound( i * m_ppt );
 			p.setPen( barLineColor );
 			p.drawLine( cx, 5, cx, height() - 6 );
 
-			const QString s = QString::number( barNumber );
+			const QString s = QString::number( barNumber-1 );
+			int const tw=p.fontMetrics().width(s);
 			p.setPen( barNumberColor );
-			p.drawText( cx + /*5*/13, barBaseY, s );
+			p.drawText( cx-tw-2 /*13*/, barBaseY, s );
 		}
 	}
 
