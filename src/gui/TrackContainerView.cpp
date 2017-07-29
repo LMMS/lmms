@@ -235,6 +235,7 @@ void TrackContainerView::realignTracks()
 						it != m_trackViews.end(); ++it )
 	{
 		( *it )->show();
+		( *it )->getTrackContentWidget()->updateBackground();
 		( *it )->update();
 	}
 }
@@ -310,10 +311,17 @@ bool TrackContainerView::allowRubberband() const
 void TrackContainerView::setPixelsPerTact( int _ppt )
 {
 	m_ppt = _ppt;
+	updateBackgrounds();
+}
 
+
+
+
+void TrackContainerView::updateBackgrounds()
+{
 	// tell all TrackContentWidgets to update their background tile pixmap
 	for( trackViewList::Iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
+	     it != m_trackViews.end(); ++it )
 	{
 		( *it )->getTrackContentWidget()->updateBackground();
 	}

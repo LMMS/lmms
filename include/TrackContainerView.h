@@ -153,6 +153,8 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
 
+	virtual void updateBackgrounds();
+
 	MidiTime m_currentPosition;
 
 

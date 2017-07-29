@@ -58,7 +58,7 @@ ControllerRackView::ControllerRackView( ) :
 
 	QWidget * scrollAreaWidget = new QWidget( m_scrollArea );
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
-	m_scrollAreaLayout->setSpacing(2);
+	m_scrollAreaLayout->setSpacing(0);//2
 	m_scrollAreaLayout->addStretch();
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
@@ -76,8 +76,8 @@ ControllerRackView::ControllerRackView( ) :
 	connect( song, SIGNAL( controllerRemoved( Controller* ) ), SLOT( onControllerRemoved( Controller* ) ) );
 
 	QVBoxLayout * layout = new QVBoxLayout();
-	layout->setMargin( 2 );
-	layout->setSpacing( 2 );
+	layout->setMargin( 0 );//2
+	layout->setSpacing( 0 );//2
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
