@@ -1072,7 +1072,9 @@ void PatternView::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
+	const int tactsPerBar=Engine::getSong()->getTimeSigModel().getNumerator();
+
+	for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
 			Note * n = m_pat->noteAtStep( it );
 
@@ -1089,7 +1091,7 @@ void PatternView::paintEvent( QPaintEvent * )
 				p.drawPixmap( x, y, stepon200 );
 				p.setOpacity( 1 );
 			}
-			else if( ( it / 4 ) % 2 )
+			else if( ( it / tactsPerBar ) % 2 )
 			{
 				p.drawPixmap( x, y, stepoffl );
 			}

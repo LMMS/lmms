@@ -56,6 +56,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_inactiveLoopColor(        52,  83,  53,  64 ),
 	m_inactiveLoopBrush(QColor(255, 255, 255,  32 )),
 	m_inactiveLoopInnerColor(  255, 255, 255,  32 ),
+<<<<<<< HEAD
 	m_inactiveLoopTextColor(     0,   0,   0, 255 ),
 	m_activeLoopColor(          83,  52,  53, 255 ),
 	m_activeLoopBrush(QColor(  141,  55,  96, 128 )),
@@ -65,6 +66,14 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_selectedLoopBrush(QColor( 55, 141,  96, 128 )),
 	m_selectedLoopInnerColor(   74, 155, 100, 255 ),
 	m_selectedLoopTextColor(     0, 255,   0, 255 ),
+=======
+	m_activeLoopColor(          83,  52,  53, 255 ),
+	m_activeLoopBrush(QColor(  141,  55,  96, 128 )),
+	m_activeLoopInnerColor(    155,  74, 100, 255 ),
+	m_selectedLoopColor(        52,  83,  53, 255 ),
+	m_selectedLoopBrush(QColor( 55, 141,  96, 128 )),
+	m_selectedLoopInnerColor(   74, 155, 100, 255 ),
+>>>>>>> refs/remotes/origin/master
 	m_loopRectangleVerticalPadding( 1 ),
 	m_barLineColor( 192, 192, 192 ),
 	m_barNumberColor( m_barLineColor.darker( 120 ) ),
@@ -181,7 +190,11 @@ void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 		}
 		b->setMenu(m);
 		b->setText(QString("&").append(QString((char)(65+n))));
+<<<<<<< HEAD
 		//b->setMinimumSize(autoScroll->sizeHint());
+=======
+		b->setMinimumSize(autoScroll->sizeHint());
+>>>>>>> refs/remotes/origin/master
 		connect(g, SIGNAL(triggered(QAction*)), this, SLOT(selectLoop(QAction*)));
 		_tool_bar->addWidget(b);
 	}
@@ -221,6 +234,10 @@ int TimeLineWidget::findLoop(const MidiTime& t)
 void TimeLineWidget::selectLoop(QAction * _a)
 {
 	int const n=_a->data().toInt();
+<<<<<<< HEAD
+=======
+	//qWarning("select loop %d",n);
+>>>>>>> refs/remotes/origin/master
 	if((n<0) || (n>=NB_LOOPS)) return;
 	setCurrentLoop(n);
 }
@@ -303,6 +320,7 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 {
 	QPainter p( this );
 
+<<<<<<< HEAD
 	const int n  = m_currentLoop;
 	const int x0 = m_xOffset + s_posMarkerPixmap->width() / 2;
 	const int h0 = height();
@@ -315,6 +333,18 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 	p.fillRect( w0-12, 0, 12, h0, bglight );
 	p.setClipRect( x0, 0, w0 - x0 - 12, h0 );//12=sb width TODO!
 	p.fillRect( x0, 0, w0-12, h0, bg );
+=======
+	int const n=m_currentLoop;
+
+	int const x0 = m_xOffset + s_posMarkerPixmap->width() / 2;
+	int const h0 = height();
+	int const w0 = width();
+	// Draw background
+	p.fillRect( 0, 0, x0, h0, p.background() );
+	p.fillRect( w0-12, 0, 12, h0, p.background() );
+ 	p.setClipRect( x0, 0, w0 - x0 - 12, h0 );//12=sb width TODO!
+	p.fillRect( x0, 0, w0-12, h0, QColor(0,0,0));
+>>>>>>> refs/remotes/origin/master
 
 	// Activate hinting on the font
 	QFont font = p.font();
@@ -356,7 +386,11 @@ void TimeLineWidget::paintEvent( QPaintEvent * )
 			const QString s = QString::number( barNumber-1 );
 			int const tw=p.fontMetrics().width(s);
 			p.setPen( barNumberColor );
+<<<<<<< HEAD
 			p.drawText( cx-tw-2 /*13*/, barBaseY, s );
+=======
+			p.drawText( cx + /*5*/13, barBaseY, s );
+>>>>>>> refs/remotes/origin/master
 		}
 	}
 
@@ -398,8 +432,13 @@ void TimeLineWidget::paintLoop(int const n, QPainter& p, int const cy)
 	p.drawRect( innerRectangle );
 
 	p.setPen( loopPointsActive
+<<<<<<< HEAD
 		  ? (loopSelected ? getSelectedLoopTextColor() : getActiveLoopTextColor())
 		  : getInactiveLoopTextColor() );
+=======
+		  ? (loopSelected ? QColor(0,255,0,255) : QColor(255,0,0,255))
+		  : QColor(0,0,0,255) );
+>>>>>>> refs/remotes/origin/master
 	p.setBrush( Qt::NoBrush );
 	p.drawText( innerRectangle.x() + 2, cy, QString((char)(65+n)) );
 }
