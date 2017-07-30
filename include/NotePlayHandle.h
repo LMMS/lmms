@@ -258,6 +258,11 @@ public:
 		m_frequencyNeedsUpdate = true;
 	}
 
+	bool isReleaseStarted() const
+	{
+		return m_releaseStarted;
+	}
+
 private:
 	class BaseDetuning
 	{
@@ -319,6 +324,8 @@ private:
 	Origin m_origin;
 
 	bool m_frequencyNeedsUpdate;				// used to update pitch
+
+	bool m_releaseStarted;
 } ;
 
 

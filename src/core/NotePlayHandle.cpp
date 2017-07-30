@@ -75,7 +75,8 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_songGlobalParentOffset( 0 ),
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin ),
-	m_frequencyNeedsUpdate( false )
+	m_frequencyNeedsUpdate( false ),
+	m_releaseStarted( false )
 {
 	lock();
 	if( hasParent() == false )
@@ -248,8 +249,11 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
-	if( m_released && !instrumentTrack()->isSustainPedalPressed() )
+	if( m_released && (!instrumentTrack()->isSustainPedalPressed() ||
+		m_releaseStarted) )
 	{
+		m_releaseStarted = true;
+
 		f_cnt_t todo = framesThisPeriod;
 
 		// if this note is base-note for arpeggio, always set
