@@ -120,7 +120,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave", "1" ).toInt() ),
-	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave", "1" ).toInt() ),
+	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave", "0" ).toInt() ),
 	m_saveInterval(	ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() < 1 ?
 					MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
 			ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() ),
@@ -1518,7 +1518,7 @@ void SetupDialog::resetAutoSave()
 {
 	setAutoSaveInterval( MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES );
 	m_autoSave->setChecked( true );
-	m_runningAutoSave->setChecked( true );
+	m_runningAutoSave->setChecked( false );
 }
 
 
