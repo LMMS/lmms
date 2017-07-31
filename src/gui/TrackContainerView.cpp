@@ -338,9 +338,33 @@ void TrackContainerView::computeHyperBarViews()
 	m_hyperBarViews.clear();
 	if(m_tc==Engine::getSong())
 	{
-		//QString s=Engine::getSong()->songStructure();
-		//QString s="I16A16B8AB";
-		//QVector<QColor>
+		QMap<QChar,QPair<int,QColor>> map;
+		map.insert('I',QPair<int,QColor>( 4,QColor(  0,255,  0,64)));
+		map.insert('A',QPair<int,QColor>(16,QColor(255,  0,  0,64)));
+		map.insert('B',QPair<int,QColor>( 8,QColor(  0,  0,255,64)));
+		map.insert('C',QPair<int,QColor>( 4,QColor(  0,255,255,64)));
+		map.insert('D',QPair<int,QColor>(12,QColor(255,  0,255,64)));
+		map.insert('E',QPair<int,QColor>( 2,QColor(128,255,  0,64)));
+		map.insert('F',QPair<int,QColor>( 3,QColor(  0,128,255,64)));
+		map.insert('G',QPair<int,QColor>( 4,QColor(255,  0,128,64)));
+		map.insert('H',QPair<int,QColor>( 5,QColor(255,128,  0,64)));
+		map.insert('J',QPair<int,QColor>( 6,QColor(  0,255,128,64)));
+		map.insert('K',QPair<int,QColor>( 7,QColor(128,  0,255,64)));
+		map.insert('M',QPair<int,QColor>( 8,QColor(255,192,128,64)));
+		map.insert('N',QPair<int,QColor>( 9,QColor(128,255,192,64)));
+		map.insert('P',QPair<int,QColor>(10,QColor(192,128,255,64)));
+		map.insert('Q',QPair<int,QColor>(11,QColor(255,128,192,64)));
+		map.insert('R',QPair<int,QColor>(13,QColor(192,255,128,64)));
+		map.insert('S',QPair<int,QColor>(14,QColor(128,192,255,64)));
+		map.insert('T',QPair<int,QColor>(15,QColor(160,160,160,64)));
+		map.insert('U',QPair<int,QColor>(18,QColor(160,160,160,64)));
+		map.insert('V',QPair<int,QColor>(20,QColor(160,160,160,64)));
+		map.insert('W',QPair<int,QColor>(24,QColor(160,160,160,64)));
+		map.insert('X',QPair<int,QColor>(28,QColor(160,160,160,64)));
+		map.insert('Y',QPair<int,QColor>(32,QColor(160,160,160,64)));
+		map.insert('Z',QPair<int,QColor>( 1,QColor(255,255,  0,64)));
+		map.insert('O',QPair<int,QColor>(16,QColor(  0,255,  0,64)));
+
 		/*
 		hyperBarViews().append(new HyperBarView( 5,QColor(0,255,0,64),"I"));
 		hyperBarViews().append(new HyperBarView(16,QColor(255,0,0,64),"A"));
@@ -353,6 +377,26 @@ void TrackContainerView::computeHyperBarViews()
 		hyperBarViews().append(new HyperBarView( 7,QColor(0,0,255,64),"B"));
 		hyperBarViews().append(new HyperBarView( 2,QColor(255,255,0,64),"O"));
 		*/
+
+		//QString s=Engine::getSong()->songStructure();
+		//QString s="I16A16B8AB";
+		QString s="IABABCBO";
+
+		for(int i=0;i<s.length();i++)
+		{
+			QChar   c  =s.at(i);
+			QString hbs=QString(c);
+			int     hbl=0;
+			QColor  hbc=QColor(255,255,255,64);
+			if(map.contains(c))
+			{
+				QPair<int,QColor> p=map.value(c);
+				hbl=p.first;
+				hbc=p.second;
+			}
+			hyperBarViews().append(new HyperBarView(hbl,hbc,c));
+		}
+
 		computeBarViews();
 	}
 }
