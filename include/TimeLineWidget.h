@@ -251,10 +251,12 @@ private:
 	QBrush m_inactiveLoopBrush;
 	QColor m_inactiveLoopInnerColor;
 	QColor m_inactiveLoopTextColor;
+
 	QColor m_activeLoopColor;
 	QBrush m_activeLoopBrush;
 	QColor m_activeLoopInnerColor;
 	QColor m_activeLoopTextColor;
+
 	QColor m_selectedLoopColor;
 	QBrush m_selectedLoopBrush;
 	QColor m_selectedLoopInnerColor;
