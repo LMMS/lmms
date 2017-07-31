@@ -62,7 +62,7 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name;\
 	public:    type getf() { return m_##name; }\
 	void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
@@ -77,21 +77,21 @@
 
 
 #define QQ_LOCAL_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 	void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 	void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_REF_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type * m_##name = &def_val;\
 	public:    type & getf() { return *m_##name; }\
 	void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
@@ -99,7 +99,7 @@
 
 
 #define QQ_LOCAL_RESETABLE_PROPERTY(type,name,getf,setf,resetf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 		   void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
@@ -107,7 +107,7 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_RESETABLE_PTR_PROPERTY(type,name,getf,setf,resetf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 		   void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
@@ -115,7 +115,7 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_RESETABLE_REF_PROPERTY(type,name,getf,setf,resetf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type * m_##name = &def_val;\
 	public:    type & getf() { return *m_##name; }\
 		   void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
@@ -150,16 +150,16 @@
 
 
 #define QQ_DELEGATED_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type getf1() { return delegate.getf2(); }\
 		  void setf1(const type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_DELEGATED_PTR_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type getf1() { return delegate.getf2(); }\
-		  void setf1(type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT wasModified(#name,new_val); } }\
-	 Q_SIGNAL void wasModified(const char*,type);\
+		  void setf1(type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT name##Changed(#name,new_val); } }\
+	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_DELEGATED_REF_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
 	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
@@ -169,19 +169,19 @@
 
 
 #define QQ_PTR_DELEGATED_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type getf1() { return delegate->getf2(); }\
 		  void setf1(const type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_PTR_DELEGATED_PTR_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type getf1() { return delegate->getf2(); }\
-		  void setf1(type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT wasModified(#name,new_val); } }\
-	 Q_SIGNAL void wasModified(const char*,type);\
+		  void setf1(type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(#name,new_val); } }\
+	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_PTR_DELEGATED_REF_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type & getf1() { return delegate->getf2(); }\
 		  void setf1(const type & new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\

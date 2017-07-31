@@ -45,6 +45,10 @@ class TimeLineWidget : public QWidget, public JournallingObject
 public:
 	Q_PROPERTY( QColor barLineColor READ getBarLineColor WRITE setBarLineColor )
 	Q_PROPERTY( QColor barNumberColor READ getBarNumberColor WRITE setBarNumberColor )
+<<<<<<< HEAD
+=======
+	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+>>>>>>> refs/remotes/origin/master
 
 	Q_PROPERTY( QColor inactiveLoopColor READ getInactiveLoopColor WRITE setInactiveLoopColor )
 	Q_PROPERTY( QBrush inactiveLoopBrush READ getInactiveLoopBrush WRITE setInactiveLoopBrush )
@@ -60,8 +64,11 @@ public:
 	Q_PROPERTY( QBrush selectedLoopBrush READ getSelectedLoopBrush WRITE setSelectedLoopBrush )
 	Q_PROPERTY( QColor selectedLoopInnerColor READ getSelectedLoopInnerColor WRITE setSelectedLoopInnerColor )
 	Q_PROPERTY( QColor selectedLoopTextColor READ getSelectedLoopTextColor WRITE setSelectedLoopTextColor )
+<<<<<<< HEAD
 
 	Q_PROPERTY( int loopRectangleVerticalPadding READ getLoopRectangleVerticalPadding WRITE setLoopRectangleVerticalPadding )
+=======
+>>>>>>> refs/remotes/origin/master
 
 	enum AutoScrollStates
 	{
@@ -93,6 +100,10 @@ public:
 
 	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
 	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
+
+	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
+	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
+
 
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
 	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
@@ -129,9 +140,12 @@ public:
 
 	inline QColor const & getSelectedLoopTextColor() const { return m_selectedLoopTextColor; }
 	inline void setSelectedLoopTextColor(QColor const & selectedLoopTextColor) { m_selectedLoopTextColor = selectedLoopTextColor; }
+<<<<<<< HEAD
 
 	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
 	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
+=======
+>>>>>>> refs/remotes/origin/master
 
 	inline Song::PlayPos & pos()
 	{
@@ -149,6 +163,16 @@ public:
 	}
 
 	inline int currentLoop()
+<<<<<<< HEAD
+	{
+		return m_currentLoop;
+	}
+
+	void setCurrentLoop(int n);
+	int  findLoop(const MidiTime & t);
+
+	bool loopPointsEnabled(int n=-1) const
+=======
 	{
 		return m_currentLoop;
 	}
@@ -166,10 +190,30 @@ public:
 	}
 
 	inline const MidiTime & loopBegin(int n=-1) const
+>>>>>>> refs/remotes/origin/master
 	{
 		if(n==-1) n=m_currentLoop;
 		Q_ASSERT ((n>=0)&&(n<NB_LOOPS));
 
+<<<<<<< HEAD
+		return (n == m_currentLoop) &&
+			(m_loopPoints == LoopPointsEnabled);
+	}
+
+	inline const MidiTime & loopBegin(int n=-1) const
+=======
+		return ( m_loopPos[2*n+0] < m_loopPos[2*n+1] )
+			? m_loopPos[2*n+0]
+			: m_loopPos[2*n+1];
+	}
+
+	inline const MidiTime & loopEnd(int n=-1) const
+>>>>>>> refs/remotes/origin/master
+	{
+		if(n==-1) n=m_currentLoop;
+		Q_ASSERT ((n>=0)&&(n<NB_LOOPS));
+
+<<<<<<< HEAD
 		return ( m_loopPos[2*n+0] < m_loopPos[2*n+1] )
 			? m_loopPos[2*n+0]
 			: m_loopPos[2*n+1];
@@ -180,6 +224,8 @@ public:
 		if(n==-1) n=m_currentLoop;
 		Q_ASSERT ((n>=0)&&(n<NB_LOOPS));
 
+=======
+>>>>>>> refs/remotes/origin/master
 		return ( m_loopPos[2*n+0] > m_loopPos[2*n+1] )
 			? m_loopPos[2*n+0]
 			: m_loopPos[2*n+1];
