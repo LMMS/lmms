@@ -1381,7 +1381,7 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
-			_ce->accept();
+			//_ce->accept();
 		}
 	}
 	else

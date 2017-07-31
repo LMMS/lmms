@@ -75,6 +75,7 @@ Song::Song() :
 	m_oldTicksPerTact( DefaultTicksPerTact ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
+	m_songStructure(""),
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),

@@ -254,7 +254,6 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
-	
 
 	const ControllerVector & controllers() const
 	{
@@ -267,6 +266,8 @@ public:
 		return m_timeSigModel;
 	}
 
+	inline QString& songStructure() { return m_songStructure; }
+	void setSongStructure(QString& _s);
 
 public slots:
 	void playSong();
@@ -348,6 +349,8 @@ private:
 	int m_oldTicksPerTact;
 	IntModel m_masterVolumeModel;
 	IntModel m_masterPitchModel;
+
+	QString m_songStructure;
 
 	ControllerVector m_controllers;
 

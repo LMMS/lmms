@@ -319,6 +319,8 @@ void TrackContainerView::setPixelsPerTact( int _ppt )
 
 void TrackContainerView::updateBackgrounds()
 {
+	computeHyperBarViews();
+
 	// tell all TrackContentWidgets to update their background tile pixmap
 	for( trackViewList::Iterator it = m_trackViews.begin();
 	     it != m_trackViews.end(); ++it )
@@ -329,6 +331,44 @@ void TrackContainerView::updateBackgrounds()
 
 
 
+void TrackContainerView::computeHyperBarViews()
+{
+	m_hyperBarViews.clear();
+	if(m_tc==Engine::getSong())
+	{
+		//QString s=Engine::getSong()->songStructure();
+		//QString s="I16A16B8AB";
+		//QVector<QColor>
+		hyperBarViews().append(new HyperBarView(12,Qt::green,"I"));
+		hyperBarViews().append(new HyperBarView(16,Qt::red,"A"));
+		hyperBarViews().append(new HyperBarView(8,Qt::blue,"B"));
+		hyperBarViews().append(new HyperBarView(16,Qt::red,"A"));
+		hyperBarViews().append(new HyperBarView(8,Qt::green,"B"));
+		computeBarViews();
+	}
+}
+
+void TrackContainerView::computeBarViews()
+{
+	m_barViews.clear();
+	if(m_tc==Engine::getSong())
+	{
+		for(int i=0;i<m_hyperBarViews.size();i++)
+		{
+			const QPointer<HyperBarView>& hbv=m_hyperBarViews.at(i);
+			for(int j=0;j<hbv->length();j++)
+			{
+				BarView::Types type=(j==0
+						     ? BarView::Types::START
+						     : (j==hbv->length()-1
+							? BarView::Types::END
+							: BarView::Types::MIDDLE));
+				bool sign=((j/4)%2==0);
+				m_barViews.append(new BarView(hbv,type,sign));
+			}
+		}
+	}
+}
 
 void TrackContainerView::clearAllTracks()
 {
