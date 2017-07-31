@@ -72,7 +72,8 @@ MidiExport::~MidiExport()
 
 
 bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
-			const TrackContainer::TrackList &tracks_BB, int tempo, const QString &filename)
+			const TrackContainer::TrackList &tracks_BB,
+			int tempo, int masterPitch, const QString &filename)
 {
 	QFile f(filename);
 	f.open(QIODevice::WriteOnly);
@@ -126,7 +127,13 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				if (n.nodeName() == "instrumenttrack")
 				{
 					QDomElement it = n.toElement();
-					base_pitch  = it.attribute("pitch", "0").toInt();
+					base_pitch = qRound(it.attribute("pitch", "0").toInt() / 100.0);
+					// transpose +12 semitones, workaround for #1857
+					base_pitch += (69 - it.attribute("basenote", "57").toInt());
+					if (it.attribute("usemasterpitch", "1").toInt())
+					{
+						base_pitch += masterPitch;
+					}
 					base_volume = it.attribute("volume", "100").toDouble()/100.0;
 				}
 
@@ -184,7 +191,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		instTrack = dynamic_cast<InstrumentTrack *>(track);
 		element = instTrack->saveState(dataFile, dataFile.content());
 
-		int   base_pitch   = 0;
+		int base_pitch = 0;
 		double base_volume = 1.0;
 
 		for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
@@ -192,8 +199,14 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			if (n.nodeName() == "instrumenttrack")
 			{
 				QDomElement it = n.toElement();
-				base_pitch = it.attribute("pitch", "0").toInt();
-				base_volume = it.attribute("volume", "100").toDouble()/100.0;
+				base_pitch = qRound(it.attribute("pitch", "0").toInt() / 100.0);
+				// transpose +12 semitones, workaround for #1857
+				base_pitch += (69 - it.attribute("basenote", "57").toInt());
+				if (it.attribute("usemasterpitch", "1").toInt())
+				{
+					base_pitch += masterPitch;
+				}
+				base_volume = it.attribute("volume", "100").toDouble() / 100.0;
 			}
 
 			if (n.nodeName() == "pattern")
@@ -259,9 +272,9 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 	{
 		QDomElement note = nn.toElement();
 		if (note.attribute("len", "0") == "0") continue;
-		// TODO interpret pan="0" fxch="0" usemasterpitch="1" pitchrange="1" pitch="0" basenote="57"
+		// TODO interpret pan="0" fxch="0" pitchrange="1"
 		MidiNote mnote;
-		mnote.pitch = note.attribute("key", "0").toInt() + base_pitch;
+		mnote.pitch = qMax(0, qMin(127, note.attribute("key", "0").toInt() + base_pitch));
 		mnote.volume = qMin(qRound(base_volume * note.attribute("vol", "100").toDouble()), 127);
 		mnote.time = base_time + note.attribute("pos", "0").toInt();
 		mnote.duration = note.attribute("len", "0").toInt();

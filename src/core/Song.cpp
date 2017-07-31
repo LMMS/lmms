@@ -1453,7 +1453,7 @@ void Song::exportProjectMidi()
 			qDebug() << "failed to load midi export filter!";
 			return;
 		}
-		exf->tryExport(tracks, tracks_BB, Engine::getSong()->getTempo(), export_filename);
+		exf->tryExport(tracks, tracks_BB, getTempo(), m_masterPitchModel.value(), export_filename);
 	}
 }
 

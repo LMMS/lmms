@@ -67,7 +67,7 @@ public:
 
 	virtual bool tryExport(const TrackContainer::TrackList &tracks,
 				const TrackContainer::TrackList &tracks_BB,
-				int tempo, const QString &filename);
+				int tempo, int masterPitch, const QString &filename);
 	
 private:
 	void writePattern(MidiNoteVector &pat, QDomNode n,
