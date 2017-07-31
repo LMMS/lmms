@@ -128,9 +128,6 @@ public:
 	inline QVector<QPointer<HyperBarView>>& hyperBarViews() { return m_hyperBarViews; }
 	inline QVector<QPointer<BarView>>& barViews() { return m_barViews; }
 
-	inline QVector<QPointer<HyperBarView>>& hyperBarViews() { return m_hyperBarViews; }
-	inline QVector<QPointer<BarView>>& barViews() { return m_barViews; }
-
 public slots:
 	void realignTracks();
 	TrackView * createTrackView( Track * _t );

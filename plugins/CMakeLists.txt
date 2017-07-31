@@ -47,7 +47,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		carlarack
 		ClickGDX
 		CrossoverEQ
-		csound_instr
+		# csound_instr - not ready
 		Delay
 		DualFilter
 		dynamics_processor
