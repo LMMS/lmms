@@ -126,6 +126,9 @@ public:
 	}
 
 
+	inline QVector<QPointer<HyperBarView>>& hyperBarViews() { return m_hyperBarViews; }
+	inline QVector<QPointer<BarView>>& barViews() { return m_barViews; }
+
 public slots:
 	void realignTracks();
 	TrackView * createTrackView( Track * _t );
@@ -154,6 +157,8 @@ protected:
 	virtual void resizeEvent( QResizeEvent * );
 
 	virtual void updateBackgrounds();
+	virtual void computeHyperBarViews();
+	virtual void computeBarViews();
 
 	MidiTime m_currentPosition;
 
@@ -191,6 +196,8 @@ private:
 	RubberBand * m_rubberBand;
 	QPoint m_origin;
 
+	QVector<QPointer<HyperBarView>> m_hyperBarViews;
+	QVector<QPointer<BarView>> m_barViews;
 
 signals:
 	void positionChanged( const MidiTime & _pos );

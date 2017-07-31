@@ -38,11 +38,7 @@
 	public:    const type & getf() { return val; }\
 
 
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
 #define QQ_READONLY_LOCAL_PROPERTY(type,name,getf)\
-=======
-#define QQ_READONLY_LOCAL_PROPERTY(type,name,getf)				\
->>>>>>> Simple macros to avoid boiler-plate code
 	Q_PROPERTY(type name READ getf STORED true)\
 	protected: type m_##name;\
 	public:    type getf() { return m_##name; }\
@@ -59,7 +55,6 @@
 
 
 #define QQ_LOCAL_PROPERTY(type,name,getf,setf)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
 	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed) \
 	protected: type m_##name;\
 	public:    type getf() { return m_##name; }\
@@ -67,86 +62,44 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name;\
 	public:    type getf() { return m_##name; }\
 	void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
-=======
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
-	protected: type m_##name;\
-	public:    type getf() { return m_##name; }\
-	           void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); Q_EMIT wasModified(); } }\
-	  Q_SIGNAL void name##Changed(type);\
-
-#define QQ_LOCAL_PTR_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
-	protected: type m_##name;\
-	public:    type getf() { return m_##name; }\
-	           void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); Q_EMIT wasModified(); } }\
->>>>>>> Simple macros to avoid boiler-plate code
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_REF_PROPERTY(type,name,getf,setf)\
 	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type * m_##name;\
 	public:    type & getf() { return *m_##name; }\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
 	void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
-=======
-	           void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); Q_EMIT wasModified(); } }\
->>>>>>> Simple macros to avoid boiler-plate code
 	  Q_SIGNAL void name##Changed(type &);\
 
 
 #define QQ_LOCAL_PROPERTY_DV(type,name,getf,setf,def_val)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 	void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 	void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_REF_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type * m_##name = &def_val;\
 	public:    type & getf() { return *m_##name; }\
 	void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
-=======
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
-	protected: type m_##name = def_val;\
-	public:    type getf() { return m_##name; }\
-	           void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); Q_EMIT wasModified(); } }\
-	  Q_SIGNAL void name##Changed(type);\
-
-#define QQ_LOCAL_PTR_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
-	protected: type m_##name = def_val;\
-	public:    type getf() { return m_##name; }\
-	           void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); Q_EMIT wasModified(); } }\
-	  Q_SIGNAL void name##Changed(type);\
-
-#define QQ_LOCAL_REF_PROPERTY_DV(type,name,getf,setf,def_val)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
-	protected: type * m_##name = &def_val;\
-	public:    type & getf() { return *m_##name; }\
-	           void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); Q_EMIT wasModified(); } }\
->>>>>>> Simple macros to avoid boiler-plate code
 	  Q_SIGNAL void name##Changed(type &);\
 
 
 #define QQ_LOCAL_RESETABLE_PROPERTY(type,name,getf,setf,resetf,def_val)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 		   void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
@@ -154,11 +107,7 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_RESETABLE_PTR_PROPERTY(type,name,getf,setf,resetf,def_val)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
 	protected: type m_##name = def_val;\
 	public:    type getf() { return m_##name; }\
 		   void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
@@ -166,11 +115,7 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_RESETABLE_REF_PROPERTY(type,name,getf,setf,resetf,def_val)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
 	protected: type * m_##name = &def_val;\
 	public:    type & getf() { return *m_##name; }\
 		   void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
@@ -205,78 +150,43 @@
 
 
 #define QQ_DELEGATED_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
 	public:   type getf1() { return delegate.getf2(); }\
 		  void setf1(const type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_DELEGATED_PTR_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
-	public:   type getf1() { return delegate.getf2(); }\
-		  void setf1(type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT wasModified(#name,new_val); } }\
-	 Q_SIGNAL void wasModified(const char*,type);\
-
-#define QQ_DELEGATED_REF_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type getf1() { return delegate.getf2(); }\
-		  void setf1(type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT name##Changed(new_val); } }\
+		  void setf1(type new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT name##Changed(#name,new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_DELEGATED_REF_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
+	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
 	public:   type & getf1() { return delegate.getf2(); }\
 		  void setf1(const type & new_val) { if(delegate.getf2()!=new_val) { delegate.setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 
 #define QQ_PTR_DELEGATED_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
 	public:   type getf1() { return delegate->getf2(); }\
 		  void setf1(const type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_PTR_DELEGATED_PTR_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
-	public:   type getf1() { return delegate->getf2(); }\
-		  void setf1(type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT wasModified(#name,new_val); } }\
-	 Q_SIGNAL void wasModified(const char*,type);\
-
-#define QQ_PTR_DELEGATED_REF_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
-	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY wasModified)\
-=======
 	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
 	public:   type getf1() { return delegate->getf2(); }\
-		  void setf1(type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(new_val); } }\
+		  void setf1(type new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(#name,new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 #define QQ_PTR_DELEGATED_REF_PROPERTY(type,name,getf1,setf1,delegate,getf2,setf2)\
 	Q_PROPERTY(type name READ getf1 WRITE setf1 STORED false NOTIFY name##Changed)\
->>>>>>> Simple macros to avoid boiler-plate code
 	public:   type & getf1() { return delegate->getf2(); }\
 		  void setf1(const type & new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
 
 
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
-=======
-#define QQ_OBJECT(classname)\
-	Q_OBJECT\
-        public:  Q_SIGNAL void wasModified();
-
->>>>>>> Simple macros to avoid boiler-plate code
 /***
   Usage:
     - Using default value is possible but not advised
@@ -290,11 +200,7 @@
 
 class Field : public QObject
 {
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
 	Q_OBJECT
-=======
-	QQ_OBJECT(Field)
->>>>>>> Simple macros to avoid boiler-plate code
 };
 
 const static QString HELLO="Hello";
@@ -304,11 +210,7 @@ static QObject OBJET;
 
 class Sandbox : public QObject
 {
-<<<<<<< a5433d807b1c19427640022fd1f38dedc6641a5f
 	Q_OBJECT
-=======
-	QQ_OBJECT(Sandbox)
->>>>>>> Simple macros to avoid boiler-plate code
 
 	QQ_CONSTANT_PROPERTY(int    ,wc,wc,10)
 	QQ_CONSTANT_PROPERTY(QColor ,xc,xc,Qt::white)
