@@ -85,6 +85,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
 			this, SLOT( createTrackView( Track * ) ),
 			Qt::QueuedConnection );
+
+	computeHyperBarViews();
 }
 
 
@@ -339,20 +341,29 @@ void TrackContainerView::computeHyperBarViews()
 		//QString s=Engine::getSong()->songStructure();
 		//QString s="I16A16B8AB";
 		//QVector<QColor>
-		hyperBarViews().append(new HyperBarView(12,Qt::green,"I"));
-		hyperBarViews().append(new HyperBarView(16,Qt::red,"A"));
-		hyperBarViews().append(new HyperBarView(8,Qt::blue,"B"));
-		hyperBarViews().append(new HyperBarView(16,Qt::red,"A"));
-		hyperBarViews().append(new HyperBarView(8,Qt::green,"B"));
+		/*
+		hyperBarViews().append(new HyperBarView( 5,QColor(0,255,0,64),"I"));
+		hyperBarViews().append(new HyperBarView(16,QColor(255,0,0,64),"A"));
+		hyperBarViews().append(new HyperBarView( 7,QColor(0,0,255,64),"B"));
+		hyperBarViews().append(new HyperBarView(16,QColor(255,0,0,64),"A"));
+		hyperBarViews().append(new HyperBarView( 7,QColor(0,0,255,64),"B"));
+		hyperBarViews().append(new HyperBarView( 1,QColor(0,255,0,64),"B"));
+		hyperBarViews().append(new HyperBarView(16,QColor(255,0,0,64),"A"));
+		hyperBarViews().append(new HyperBarView( 7,QColor(0,0,255,64),"B"));
+		hyperBarViews().append(new HyperBarView( 7,QColor(0,0,255,64),"B"));
+		hyperBarViews().append(new HyperBarView( 2,QColor(255,255,0,64),"O"));
+		*/
 		computeBarViews();
 	}
 }
 
 void TrackContainerView::computeBarViews()
 {
+	//qWarning("TrackContainerView::computeBarViews");
 	m_barViews.clear();
 	if(m_tc==Engine::getSong())
 	{
+		bool sign=true;
 		for(int i=0;i<m_hyperBarViews.size();i++)
 		{
 			const QPointer<HyperBarView>& hbv=m_hyperBarViews.at(i);
@@ -363,7 +374,19 @@ void TrackContainerView::computeBarViews()
 						     : (j==hbv->length()-1
 							? BarView::Types::END
 							: BarView::Types::MIDDLE));
-				bool sign=((j/4)%2==0);
+				if(j==0) sign=!sign;
+				else switch(hbv->length())
+				{
+				case  6: if(j==3) sign=!sign; break;
+				case  7: if(j==4) sign=!sign; break;
+				case  9: if((j==3)||(j==7)) sign=!sign; break;
+				case 10: if(j==5) sign=!sign; break;
+				case 14: if((j==4)||(j==8)) sign=!sign; break;
+				case 15: if((j==5)||(j==10)) sign=!sign; break;
+				case 17: if((j==8)||(j==16)) sign=!sign; break;
+				case 18: if((j==6)||(j==12)) sign=!sign; break;
+				default: if(j%4==0) sign=!sign; break;
+				}
 				m_barViews.append(new BarView(hbv,type,sign));
 			}
 		}
