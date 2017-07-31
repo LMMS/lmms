@@ -24,6 +24,8 @@
 
 #include "PluginBrowser.h"
 
+#include <iostream>
+
 #include <QLabel>
 #include <QPainter>
 #include <QMouseEvent>
@@ -125,13 +127,6 @@ PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
 
 
 
-PluginDescWidget::~PluginDescWidget()
-{
-}
-
-
-
-
 void PluginDescWidget::paintEvent( QPaintEvent * e )
 {
 
@@ -182,7 +177,20 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 void PluginDescWidget::enterEvent( QEvent * _e )
 {
 	m_mouseOver = true;
-	m_targetHeight = height() + HEIGHT_INCREMENT;
+
+	QFontMetrics metrics = this->fontMetrics();
+
+	const int s = 16 + ( 32 * ( tLimit( height(), 24, 60 ) - 24 ) ) /
+					   ( 60 - 24 );
+	const QSize logo_size( s, s );
+
+	const QRect bounds = metrics.boundingRect(10 + logo_size.width(), 20, width() - 58 - 5, 999,
+										Qt::TextWordWrap,
+										qApp->translate( "pluginBrowser", m_pluginDescriptor.description ));
+
+	m_targetHeight = bounds.height();
+	m_heightIncrement = qMax(1,static_cast<int>((m_targetHeight - height()) / (ANIMATION_STEPS)));
+
 	updateHeight();
 	QWidget::enterEvent( _e );
 }
@@ -216,13 +224,20 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 
 void PluginDescWidget::updateHeight()
 {
+	if (qAbs(m_targetHeight-height()) <= m_heightIncrement)
+	{
+		setFixedHeight(m_targetHeight);
+		m_updateTimer.stop();
+		return;
+	}
+
 	if( m_targetHeight > height() )
 	{
-		setFixedHeight( height() + HEIGHT_INCREMENT );
+		setFixedHeight( height() + m_heightIncrement );
 	}
 	else if( m_targetHeight < height() )
 	{
-		setFixedHeight( height() - HEIGHT_INCREMENT );
+		setFixedHeight( height() - m_heightIncrement );
 	}
 	else
 	{

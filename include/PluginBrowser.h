@@ -62,14 +62,13 @@ class PluginDescWidget : public QWidget
 	Q_OBJECT
 public:
 	PluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
-	virtual ~PluginDescWidget();
 
 
 protected:
-	virtual void enterEvent( QEvent * _e );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
+	void enterEvent( QEvent * _e ) override;
+	void leaveEvent( QEvent * _e ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
 
 
 private slots:
@@ -78,7 +77,7 @@ private slots:
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
-	constexpr static int HEIGHT_INCREMENT{4};
+	constexpr static int ANIMATION_STEPS{4};
 
 	QTimer m_updateTimer;
 
@@ -87,6 +86,7 @@ private:
 
 	bool m_mouseOver;
 	int m_targetHeight;
+	int m_heightIncrement;
 
 };
 
