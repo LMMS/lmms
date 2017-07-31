@@ -125,8 +125,8 @@ public:
 		return( "trackcontainerview" );
 	}
 
-	inline QVector<QPointer<HyperBarView>>& hyperBarViews() { return m_hyperBarViews; }
-	inline QVector<QPointer<BarView>>& barViews() { return m_barViews; }
+	inline QVector<QPointer<HyperBarView> >& hyperBarViews() { return m_hyperBarViews; }
+	inline QVector<QPointer<BarView> >& barViews() { return m_barViews; }
 
 public slots:
 	void realignTracks();
@@ -195,8 +195,8 @@ private:
 	RubberBand * m_rubberBand;
 	QPoint m_origin;
 
-	QVector<QPointer<HyperBarView>> m_hyperBarViews;
-	QVector<QPointer<BarView>> m_barViews;
+	QVector<QPointer<HyperBarView> > m_hyperBarViews;
+	QVector<QPointer<BarView> > m_barViews;
 
 signals:
 	void positionChanged( const MidiTime & _pos );

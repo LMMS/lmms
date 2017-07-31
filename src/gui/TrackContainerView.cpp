@@ -338,7 +338,7 @@ void TrackContainerView::computeHyperBarViews()
 	m_hyperBarViews.clear();
 	if(m_tc==Engine::getSong())
 	{
-		QMap<QChar,QPair<int,QColor>> map;
+		QMap<QChar,QPair<int,QColor> > map;
 		map.insert('I',QPair<int,QColor>( 4,QColor(  0,255,  0,64)));
 		map.insert('A',QPair<int,QColor>(16,QColor(255,  0,  0,64)));
 		map.insert('B',QPair<int,QColor>( 8,QColor(  0,  0,255,64)));
