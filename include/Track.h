@@ -322,6 +322,45 @@ private:
 
 
 
+class HyperBarView : public QObject
+{
+ public:
+	HyperBarView(int length,const QColor& color,const QString& label);
+	//HyperBarView(HyperBarView& hbv);
+	inline const int      length() const { return m_length; }
+	inline const QColor&  color() const { return m_color; }
+	inline const QString& label() const { return m_label; }
+
+ private:
+	//HyperBarView();
+	const int     m_length;
+	const QColor  m_color;
+	const QString m_label;
+};
+
+class BarView : public QObject
+{
+ public:
+	enum Types {
+		START,
+		MIDDLE,
+		END
+	};
+
+	BarView(const QPointer<HyperBarView>& hbv,Types type,bool sign);
+	//BarView(BarView& bv);
+	//inline HyperBarView hyperbar() { return m_hbv; }
+	inline const Types type() const { return m_type; }
+	inline const bool  sign() const { return m_sign; }
+	inline const QColor color() const { return m_hbv->color(); }
+
+ private:
+	//BarView();
+	const QPointer<HyperBarView> m_hbv;
+	const Types m_type;
+	const bool  m_sign;
+};
+
 class TrackContentWidget : public QWidget, public JournallingObject
 {
 	Q_OBJECT
@@ -377,6 +416,9 @@ protected:
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void resizeEvent( QResizeEvent * re );
+
+	virtual void paintGrid(QPainter& p,int tact,int ppt,QVector<QPointer<BarView>>& barViews);
+	virtual void paintCell(QPainter& p,int xc,int yc,int wc,int hc,const QPointer<BarView>& barView,bool sign);
 
 	virtual QString nodeName() const
 	{

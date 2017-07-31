@@ -958,7 +958,6 @@ int main( int argc, char * * argv )
 		if( autoSaveEnabled )
 		{
 			gui->mainWindow()->autoSaveTimerReset();
-			gui->mainWindow()->autoSave();
 		}
 	}
 

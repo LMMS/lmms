@@ -94,10 +94,6 @@ public:
 	inline QColor const & getBarNumberColor() const { return m_barNumberColor; }
 	inline void setBarNumberColor(QColor const & tactNumberColor) { m_barNumberColor = tactNumberColor; }
 
-	inline int const & getLoopRectangleVerticalPadding() const { return m_loopRectangleVerticalPadding; }
-	inline void setLoopRectangleVerticalPadding(int const & loopRectangleVerticalPadding) { m_loopRectangleVerticalPadding = loopRectangleVerticalPadding; }
-
-
 	inline QColor const & getInactiveLoopColor() const { return m_inactiveLoopColor; }
 	inline void setInactiveLoopColor(QColor const & inactiveLoopColor) { m_inactiveLoopColor = inactiveLoopColor; }
 

@@ -821,7 +821,6 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
-	runAutoSave();
 }
 
 
@@ -840,7 +839,6 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 		Engine::getSong()->createNewProjectFromTemplate(
 			dirBase + _idx->text() + ".mpt" );
 	}
-	runAutoSave();
 }
 
 
@@ -865,7 +863,6 @@ void MainWindow::openProject()
 			setCursor( Qt::ArrowCursor );
 		}
 	}
-	runAutoSave();
 }
 
 
@@ -923,7 +920,6 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		Engine::getSong()->loadProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
-	runAutoSave();
 }
 
 
@@ -1385,7 +1381,7 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
-			_ce->accept();
+			//_ce->accept();
 		}
 	}
 	else
@@ -1561,17 +1557,5 @@ void MainWindow::autoSave()
 		{
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
-	}
-}
-
-
-// For the occasional auto save action that isn't run
-// from the timer where we need to do extra tests.
-void MainWindow::runAutoSave()
-{
-	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
-	{
-		autoSave();
-		autoSaveTimerReset();  // Reset timer
 	}
 }
