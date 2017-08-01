@@ -8,9 +8,11 @@
 
 set -e
 
-LINUXDEPLOYQT="$HOME/bin/linuxdeployqt"
+USERBIN="$HOME/bin"
+LINUXDEPLOYQT="$USERBIN/linuxdeployqt"
+APPIMAGETOOL="$USERBIN/appimagetool"
 VERBOSITY=2 # 3=debug
-LOGFILE="@CMAKE_BINARY_DIR@/linuxdeployqt.log"
+LOGFILE="@CMAKE_BINARY_DIR@/appimage.log"
 APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
 DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 STRIP=""
@@ -58,13 +60,20 @@ DAYSOLD=2
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
 elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
-	url="https://github.com/tresf/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
+	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
 	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
 	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
 	chmod +x "$LINUXDEPLOYQT"
 	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
+	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
+	mv "squashfs-root/usr/bin/appimagetool" "$APPIMAGETOOL"
+	success "Extracted $APPIMAGETOOL"
+	mv "squashfs-root/usr/bin/mksquashfs" "$USERBIN/mksquashfs"
+	success "Extracted $USERBIN/mksquashfs"
+	rm -rf "squashfs-root/"
+
 else
 	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
 fi
@@ -122,40 +131,36 @@ mv "$VSTLIB" "$VSTBIN"
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 
-# Build a list of shared objects in target/lib/lmms
+# Fix linking for soft-linked plugins
 for file in "${APPDIR}usr/lib/lmms/"*.so; do
    thisfile="${APPDIR}usr/lib/lmms/${file##*/}"
-   executables="${executables} -executable=$thisfile"
+   executables="${executables} -executable=\"$thisfile\""
 done
-
-# Fix ladspa linking
-executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/imp_1199.so"
-executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/imbeq_1197.so"
-executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/pitch_scale_1193.so"
-executables="${executables} -executable=${APPDIR}/usr/lib/lmms/ladspa/pitch_scale_1194.so"
+executables="${executables} -executable=\"${ZYNBIN}\""
+executables="${executables} -executable=\"${VSTBIN}\""
+executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/imp_1199.so\""
+executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so\""
+executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so\""
+executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1194.so\""
 
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
-echo -e "#### linuxdeployqt pass 1 ####" > "$LOGFILE"
+echo -e ">>>>> linuxdeployqt" > "$LOGFILE"
 # shellcheck disable=SC2086
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
+"$LINUXDEPLOYQT" "$DESKTOPFILE" $executables -bundle-non-qt-libs -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
 success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
 ln -sr  "$VSTBIN" "$VSTLIB"
 
-# Run a second time to create AppImage
-echo -e "\nFinishing the AppImage..."
-echo -e "\n\n#### linuxdeployqt pass 2 ####" >> "$LOGFILE"
-# shellcheck disable=SC2086
-"$LINUXDEPLOYQT" "$DESKTOPFILE" -executable="$ZYNBIN" -executable="$VSTBIN" $executables -appimage -verbose=$VERBOSITY $STRIP >> "$LOGFILE" 2>&1
-success "Created .AppImage"
+# Remove wine library conflict
+rm -f "${APPDIR}/usr/lib/libwine.so.1"
 
-echo -e "\nMoving to @APPIMAGE_FILE@..."
-# FIXME
-# Per https://github.com/probonopd/linuxdeployqt/issues/146
-mv ./*.AppImage "@APPIMAGE_FILE@"
+# Create AppImage
+echo -e "\nFinishing the AppImage..."
+echo -e "\n\n>>>>> appimagetool" >> "$LOGFILE"
+"$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@" >> "$LOGFILE" 2>&1
 success "Created @APPIMAGE_FILE@"
 
 echo -e "\nFinished"
