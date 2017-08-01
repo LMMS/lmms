@@ -22,6 +22,8 @@
  *
  */
 
+#include <QGridLayout>
+#include <QGroupBox>
 #include <QLayout>
 
 #include "ClickGDXControlDialog.h"
@@ -37,41 +39,66 @@ ClickGDXControlDialog::ClickGDXControlDialog( ClickGDXControls* controls ) :
 	QPalette pal;
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
-	setFixedSize( 110, 170 );
+	setFixedSize( 150, 400 );
 
-	Knob * attTimeKnob = new Knob( knobBright_26, this);
-	attTimeKnob -> move( 16, 10 );
+	QGroupBox * attGB=new QGroupBox(tr ( "Attack" ), this);
+	QGroupBox * desGB=new QGroupBox(tr ( "Descent" ), this);
+	QGroupBox * panGB=new QGroupBox(tr ( "Pan" ), this);
+	attGB->setGeometry(10,10,60,185);
+	desGB->setGeometry(80,10,60,185);
+	panGB->setGeometry(10,205,60,185);
+
+	Knob * attTimeKnob = new Knob( knobBright_26, attGB);
+	attTimeKnob -> move( 17, 35 );
 	attTimeKnob->setModel( &controls->m_attackTimeModel );
-	attTimeKnob->setLabel( tr( "A-Time" ) );
+	attTimeKnob->setLabel( tr( "Time" ) );
 	attTimeKnob->setHintText( tr( "Attack Time:" ) , " beat" );
 
-	Knob * desTimeKnob = new Knob( knobBright_26, this);
-	desTimeKnob -> move( 57, 10 );
+	Knob * desTimeKnob = new Knob( knobBright_26, desGB);
+	desTimeKnob -> move( 17, 35 );
 	desTimeKnob->setModel( &controls->m_descentTimeModel );
-	desTimeKnob->setLabel( tr( "D-Time" ) );
+	desTimeKnob->setLabel( tr( "Time" ) );
 	desTimeKnob->setHintText( tr( "Descent Time:" ) , " beat" );
 
-	Knob * attTypeKnob = new Knob( knobBright_26, this);
-	attTypeKnob -> move( 16, 65 );
+	Knob * attTypeKnob = new Knob( knobBright_26, attGB);
+	attTypeKnob -> move( 17, 85 );
 	attTypeKnob->setModel( &controls->m_attackTypeModel );
-	attTypeKnob->setLabel( tr( "A-Type" ) );
+	attTypeKnob->setLabel( tr( "Type" ) );
 	attTypeKnob->setHintText( tr( "Attack Type:" ) , "" );
 
-	Knob * desTypeKnob = new Knob( knobBright_26, this);
-	desTypeKnob -> move( 57, 65 );
+	Knob * desTypeKnob = new Knob( knobBright_26, desGB);
+	desTypeKnob -> move( 17, 85 );
 	desTypeKnob->setModel( &controls->m_descentTypeModel );
-	desTypeKnob->setLabel( tr( "D-Type" ) );
+	desTypeKnob->setLabel( tr( "Type" ) );
 	desTypeKnob->setHintText( tr( "Descent Type:" ) , "" );
 
-	Knob * attTempoKnob = new Knob( knobBright_26, this);
-	attTempoKnob -> move( 16, 120 );
+	Knob * attTempoKnob = new Knob( knobBright_26, attGB);
+	attTempoKnob -> move( 17, 135 );
 	attTempoKnob->setModel( &controls->m_attackTempoModel );
-	attTempoKnob->setLabel( tr( "A-Tempo" ) );
+	attTempoKnob->setLabel( tr( "Tempo" ) );
 	attTempoKnob->setHintText( tr( "Attack Tempo:" ) , "" );
 
-	Knob * desTempoKnob = new Knob( knobBright_26, this);
-	desTempoKnob -> move( 57, 120 );
+	Knob * desTempoKnob = new Knob( knobBright_26, desGB);
+	desTempoKnob -> move( 17, 135 );
 	desTempoKnob->setModel( &controls->m_descentTempoModel );
-	desTempoKnob->setLabel( tr( "D-Tempo" ) );
+	desTempoKnob->setLabel( tr( "Tempo" ) );
 	desTempoKnob->setHintText( tr( "Descent Tempo:" ) , "" );
+
+	Knob * panTimeKnob = new Knob( knobBright_26, panGB);
+	panTimeKnob -> move( 17, 35 );
+	panTimeKnob->setModel( &controls->m_panTimeModel );
+	panTimeKnob->setLabel( tr( "Time" ) );
+	panTimeKnob->setHintText( tr( "Pan Time:" ) , "" );
+
+	Knob * panTypeKnob = new Knob( knobBright_26, panGB);
+	panTypeKnob -> move( 17, 85 );
+	panTypeKnob->setModel( &controls->m_panTypeModel );
+	panTypeKnob->setLabel( tr( "Type" ) );
+	panTypeKnob->setHintText( tr( "Pan Type:" ) , "" );
+
+	Knob * panTempoKnob = new Knob( knobBright_26, panGB);
+	panTempoKnob -> move( 17, 135 );
+	panTempoKnob->setModel( &controls->m_panTempoModel );
+	panTempoKnob->setLabel( tr( "Tempo" ) );
+	panTempoKnob->setHintText( tr( "Pan Tempo:" ) , "" );
 }

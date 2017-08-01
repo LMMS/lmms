@@ -67,10 +67,15 @@ private:
 	ClickGDXEffect* m_effect;
 	FloatModel m_attackTimeModel;
 	FloatModel m_descentTimeModel;
+	FloatModel m_panTimeModel;
+
 	FloatModel m_attackTypeModel;   // don't use IntModel, Knob will break!
-	FloatModel m_descentTypeModel;  // yes, the design of LMMS is a joke :(
+	FloatModel m_descentTypeModel;
+	FloatModel m_panTypeModel;
+
 	FloatModel m_attackTempoModel;
 	FloatModel m_descentTempoModel;
+	FloatModel m_panTempoModel;
 
 	friend class ClickGDXControlDialog;
 	friend class ClickGDXEffect;
