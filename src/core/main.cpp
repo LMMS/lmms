@@ -166,7 +166,7 @@ void printHelp()
 		"-c, --config <configfile>     Get the configuration from <configfile>\n"
 		"-d, --dump <in>               Dump XML of compressed file <in>\n"
 		"-f, --format <format>         Specify format of render-output where\n"
-		"       Format is either 'wav', 'ogg' or 'mp3'.\n"
+		"       Format is either 'wav', 'flac', 'ogg' or 'mp3'.\n"
 		"    --geometry <geometry>     Specify the size and position of the main window\n"
 		"       geometry is <xsizexysize+xoffset+yoffsety>.\n"
 		"-h, --help                    Show this usage information and exit.\n"
