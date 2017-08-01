@@ -572,7 +572,7 @@ Fader {
 
 TimeLineWidget {
 	/* font-size only supports px and pt. */
-	font-size: 10px; /*7pt;*/
+	font-size: 7pt;
 	/* lengths also support em. This will make sure that the height
 	   will always change in the same proportion as the font size
 	   defined above.
@@ -584,26 +584,21 @@ TimeLineWidget {
 	    - LoopColor: Color of the outermost border
 	    - LoopBrush: Brush to paint the main portion of the rectangle
 	    - LoopInnerColor: Color used to paint the inlayed border */
-	/*
 	qproperty-inactiveLoopColor: #3B424A;
 	qproperty-inactiveLoopBrush: #3B424A;
 	qproperty-inactiveLoopInnerColor: #3B424A;
-       */
 
 	/* Properties for the loop indicator rectangle in active state.
 	   See above for detailed description. */
-	/*
 	qproperty-activeLoopColor: #21A14F;
 	qproperty-activeLoopBrush: #21A14F;
 	qproperty-activeLoopInnerColor: #21A14F;
-       */
+
 	/* Properties for the loop indicator rectangle in selected state.
 	   See above for detailed description. */
-	/*
 	qproperty-selectedLoopColor: #21A14F;
 	qproperty-selectedLoopBrush: #21A14F;
 	qproperty-selectedLoopInnerColor: #21A14F;
-       */
 
 	/* Vertical padding for the loop indicator rectangle.
 	   A value of zero draws the rectangle at the full height of the widget. */
