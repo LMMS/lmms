@@ -134,14 +134,14 @@ sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
 # Fix linking for soft-linked plugins
 for file in "${APPDIR}usr/lib/lmms/"*.so; do
    thisfile="${APPDIR}usr/lib/lmms/${file##*/}"
-   executables="${executables} -executable=\"$thisfile\""
+   executables="${executables} -executable=$thisfile"
 done
-executables="${executables} -executable=\"${ZYNBIN}\""
-executables="${executables} -executable=\"${VSTBIN}\""
-executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/imp_1199.so\""
-executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so\""
-executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so\""
-executables="${executables} -executable=\"${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1194.so\""
+executables="${executables} -executable=${ZYNBIN}"
+executables="${executables} -executable=${VSTBIN}"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imp_1199.so"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so"
+executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1194.so"
 
 # Bundle both qt and non-qt dependencies into appimage format
 echo -e "\nBundling and relinking system dependencies..."
