@@ -176,8 +176,8 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
-    //skip first empty buffer
-    Engine::mixer()->nextBuffer();
+	//skip first empty buffer
+	Engine::mixer()->nextBuffer();
 
 	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
 							Song::Mode_PlaySong );
@@ -201,6 +201,7 @@ void ProjectRenderer::run()
 		}
 	}
 
+	Engine::mixer()->stopProcessing();
 	Engine::getSong()->stopExport();
 
 	// if the user aborted export-process, the file has to be deleted
