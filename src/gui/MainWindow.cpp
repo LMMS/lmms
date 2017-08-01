@@ -911,7 +911,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		QString f = _action->text();
 		// workaround for KDE
 		QFileInfo recentFile(f);
-		if(!recentFile.exists()&&(f.indexOf('&')>0))
+		if(!recentFile.exists()&&(f.indexOf('&')>=0))
 		{
 			f=f.replace("&","");
 		}
@@ -1381,8 +1381,8 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
-			//_ce->accept();
 		}
+		_ce->accept();
 	}
 	else
 	{

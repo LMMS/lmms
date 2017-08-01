@@ -53,6 +53,7 @@ class EXPORT Song : public TrackContainer
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
+	
 public:
 	enum PlayModes
 	{
@@ -266,8 +267,8 @@ public:
 		return m_timeSigModel;
 	}
 
-	inline QString& songStructure() { return m_songStructure; }
-	void setSongStructure(QString& _s);
+	inline QString songStructure() { return m_songStructure; }
+	void setSongStructure(QString s);
 
 public slots:
 	void playSong();

@@ -178,6 +178,13 @@ void Song::setTimeSignature()
 
 
 
+void Song::setSongStructure(QString s)
+{
+	m_songStructure=s;
+}
+
+
+
 void Song::savePos()
 {
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
@@ -1017,6 +1024,9 @@ void Song::loadProject( const QString & fileName )
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
+	if(dataFile.head().hasAttribute("structure"))
+		setSongStructure(dataFile.head().attribute("structure"));
+
 	if( m_playPos[Mode_PlaySong].m_timeLine )
 	{
 		// reset loop-point-state
@@ -1160,6 +1170,8 @@ bool Song::saveProjectFile( const QString & filename )
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
+
+	dataFile.head().setAttribute("structure",songStructure());
 
 	saveState( dataFile, dataFile.content() );
 
