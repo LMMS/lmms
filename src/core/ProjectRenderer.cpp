@@ -43,11 +43,11 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 	{ ProjectRenderer::WaveFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV-File (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
-    { ProjectRenderer::FlacFile,
-        QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC-File (*.flac)"),
-        ".flac",
-        &AudioFileFlac::getInst
-    },
+	{ ProjectRenderer::FlacFile,
+		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC-File (*.flac)"),
+		".flac",
+		&AudioFileFlac::getInst
+	},
 	{ ProjectRenderer::OggFile,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "Compressed OGG-File (*.ogg)" ),
 					".ogg",
@@ -182,8 +182,8 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
-    //skip first empty buffer
-    Engine::mixer()->nextBuffer();
+	//skip first empty buffer
+	Engine::mixer()->nextBuffer();
 
 	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
 							Song::Mode_PlaySong );
