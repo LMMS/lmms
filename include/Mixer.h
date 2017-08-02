@@ -421,6 +421,7 @@ private:
 
 	friend class LmmsCore;
 	friend class MixerWorkerThread;
+	friend class ProjectRenderer;
 
 } ;
 

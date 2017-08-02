@@ -201,6 +201,9 @@ void ProjectRenderer::run()
 		}
 	}
 
+	// notify mixer of the end of processing
+	Engine::mixer()->stopProcessing();
+
 	Engine::getSong()->stopExport();
 
 	// if the user aborted export-process, the file has to be deleted
