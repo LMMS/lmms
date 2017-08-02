@@ -75,7 +75,7 @@ Song::Song() :
 	m_oldTicksPerTact( DefaultTicksPerTact ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
-	m_songStructure(""),
+	m_metaData(),
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
@@ -175,13 +175,6 @@ void Song::setTimeSignature()
 		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator() );
 }
 
-
-
-
-void Song::setSongStructure(QString s)
-{
-	m_songStructure=s;
-}
 
 
 
@@ -1024,8 +1017,7 @@ void Song::loadProject( const QString & fileName )
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
-	if(dataFile.head().hasAttribute("structure"))
-		setSongStructure(dataFile.head().attribute("structure"));
+	m_metaData.load(dataFile,dataFile.head());
 
 	if( m_playPos[Mode_PlaySong].m_timeLine )
 	{
@@ -1171,7 +1163,7 @@ bool Song::saveProjectFile( const QString & filename )
 	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
 
-	dataFile.head().setAttribute("structure",songStructure());
+	m_metaData.save(dataFile,dataFile.head());
 
 	saveState( dataFile, dataFile.content() );
 

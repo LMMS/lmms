@@ -30,6 +30,7 @@
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
+#include "MetaData.h"
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
@@ -53,7 +54,7 @@ class EXPORT Song : public TrackContainer
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
-	
+
 public:
 	enum PlayModes
 	{
@@ -267,8 +268,8 @@ public:
 		return m_timeSigModel;
 	}
 
-	inline QString songStructure() { return m_songStructure; }
-	void setSongStructure(QString s);
+	inline QString songStructure() { return m_metaData.get("Structure"); }
+	inline void setSongStructure(QString s) { m_metaData.put("Structure",s); }
 
 public slots:
 	void playSong();
@@ -327,13 +328,13 @@ private:
 	{
 		return m_playPos[m_playMode].getTicks();
 	}
-	
+
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() +
 			m_playPos[m_playMode].currentFrame();
 	}
-	
+
 	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
@@ -351,7 +352,7 @@ private:
 	IntModel m_masterVolumeModel;
 	IntModel m_masterPitchModel;
 
-	QString m_songStructure;
+	MetaData m_metaData;
 
 	ControllerVector m_controllers;
 
