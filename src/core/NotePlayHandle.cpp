@@ -62,6 +62,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_releaseFramesDone( 0 ),
 	m_subNotes(),
 	m_released( false ),
+	m_releaseStarted( false ),
 	m_hasParent( parent != NULL  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
@@ -248,8 +249,11 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
-	if( m_released )
+	if( m_released && (!instrumentTrack()->isSustainPedalPressed() ||
+		m_releaseStarted) )
 	{
+		m_releaseStarted = true;
+
 		f_cnt_t todo = framesThisPeriod;
 
 		// if this note is base-note for arpeggio, always set
