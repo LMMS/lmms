@@ -62,6 +62,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_releaseFramesDone( 0 ),
 	m_subNotes(),
 	m_released( false ),
+	m_releaseStarted( false ),
 	m_hasParent( parent != NULL  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
@@ -75,8 +76,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_songGlobalParentOffset( 0 ),
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin ),
-	m_frequencyNeedsUpdate( false ),
-	m_releaseStarted( false )
+	m_frequencyNeedsUpdate( false )
 {
 	lock();
 	if( hasParent() == false )
