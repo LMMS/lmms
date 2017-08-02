@@ -444,7 +444,7 @@ int main( int argc, char * * argv )
 				eff = ProjectRenderer::MP3File;
 			}
 #endif
-            else if (ext == "flac")
+			else if (ext == "flac")
 			{
 				eff = ProjectRenderer::FlacFile;
 			}
