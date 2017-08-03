@@ -845,6 +845,7 @@ void Song::clearProject()
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
+	clearSongMetaData();
 
 	Engine::fxMixer()->clear();
 
@@ -1017,7 +1018,8 @@ void Song::loadProject( const QString & fileName )
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
-	m_metaData.load(dataFile,dataFile.head());
+	if(m_metaData.load(dataFile,dataFile.head()))
+		emit metaDataChanged();
 
 	if( m_playPos[Mode_PlaySong].m_timeLine )
 	{
@@ -1547,3 +1549,25 @@ QString Song::errorSummary()
 
 
 
+QString Song::songMetaData(const QString& k)
+{
+	return m_metaData.get(k);
+}
+
+void Song::setSongMetaData(const QString& k,const QString& v)
+{
+	if(m_metaData.set(k,v))
+	{
+		setModified();
+		emit metaDataChanged(k,v);
+	}
+}
+
+void Song::clearSongMetaData()
+{
+	if(m_metaData.clear())
+	{
+		setModified();
+		emit metaDataChanged();
+	}
+}

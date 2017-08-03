@@ -4,8 +4,15 @@
 MetaData::MetaData()
 {
 	//test
-	put("Structure","IABABBO");
-	put("YouTube","http://www.youtube.com/");
+	//set("Structure","IABABBO");
+	//set("YouTube","http://www.youtube.com/");
+}
+
+bool MetaData::clear()
+{
+	bool r=(m_data.size()>0);
+	if(r) m_data.clear();
+	return r;
 }
 
 QString MetaData::get(const QString& k)
@@ -13,14 +20,40 @@ QString MetaData::get(const QString& k)
 	return m_data.value(k,QString(""));
 }
 
-void MetaData::put(const QString& k,const QString& v)
+bool MetaData::set(const QString& k,const QString& v)
 {
-	m_data.insert(k,v);
+	const QString& old=get(k);
+	bool r=(old!=v);
+	if(r)
+	{
+		//qWarning("meta data '%s' has changed: %s",qPrintable(k),qPrintable(v));
+		m_data.insert(k,v);
+	}
+	return r;
 }
 
-void MetaData::load( QDomDocument& doc, QDomElement& head )
+bool MetaData::load( QDomDocument& doc, QDomElement& head )
 {
+	bool r=false;
+	const QDomNodeList& a=head.elementsByTagName("meta");
+	for(int i=0;i<a.length();i++)
+	{
+		const QDomNode& n=a.at(i);
+		if(n.isElement())
+		{
+			const QDomElement& e=n.toElement();
+			if(e.hasAttribute("name")&&
+			   e.hasAttribute("value"))
+			{
+				const QString& k=e.attribute("name");
+				const QString& v=e.attribute("value");
+				if((k!="")&&(v!=""))
+					if(set(k,v)) r=true;
+			}
+		}
 
+	}
+	return r;
 }
 
 void MetaData::save( QDomDocument& doc, QDomElement& head )
@@ -29,9 +62,14 @@ void MetaData::save( QDomDocument& doc, QDomElement& head )
 	while (i.hasNext())
 	{
 		i.next();
-		QDomElement me = doc.createElement("meta");
-		me.setAttribute("value",i.value());
-		me.setAttribute("name",i.key());
-		head.appendChild(me);
+		const QString& v=i.value();
+		if(v!="")
+		{
+			const QString& k=i.key();
+			QDomElement me = doc.createElement("meta");
+			me.setAttribute("value",v);
+			me.setAttribute("name",k);
+			head.appendChild(me);
+		}
 	}
 }

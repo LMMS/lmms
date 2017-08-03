@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SongMetaDataDialog</class>
+ <widget class="QDialog" name="SongMetaDataDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>712</width>
+    <height>526</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_4">
+   <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1">
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab_1">
+        <attribute name="title">
+         <string>Properties</string>
+        </attribute>
+        <widget class="QWidget" name="gridLayoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>9</x>
+           <y>9</y>
+           <width>671</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_Structure">
+            <property name="text">
+             <string>Structure:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="value_Structure"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_Tempo">
+            <property name="text">
+             <string>Tempo:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_TimeSignature">
+            <property name="text">
+             <string>Time Signature:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="value_Tempo">
+            <property name="text">
+             <string notr="true">unknown</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="value_TimeSignature">
+            <property name="text">
+             <string notr="true">N/N</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Tags</string>
+        </attribute>
+        <widget class="QWidget" name="gridLayoutWidget_3">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>671</width>
+           <height>261</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0" columnstretch="0,1">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="value_AlbumTitle"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_SongTitle">
+            <property name="text">
+             <string>Song Title:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_ReleaseDate">
+            <property name="text">
+             <string>Released:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_Artist">
+            <property name="text">
+             <string>Artist:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="value_Artist"/>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDateEdit" name="value_ReleaseDate">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_Style">
+            <property name="text">
+             <string>Style:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="value_Style">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="value_SongTitle"/>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="value_IRCS">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_AlbumTitle">
+            <property name="text">
+             <string>Album Title:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_IRCS">
+            <property name="text">
+             <string notr="true">IRCS:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Links</string>
+        </attribute>
+        <widget class="QWidget" name="gridLayoutWidget_2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>671</width>
+           <height>407</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="horizontalSpacing">
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>2</number>
+          </property>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="value_SoundCloud"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_LMMS">
+            <property name="text">
+             <string notr="true">LMMS.io</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLineEdit" name="value_Orfium"/>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="value_Spotify"/>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_Spotify">
+            <property name="text">
+             <string notr="true">Spotify:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label_YouTube">
+            <property name="text">
+             <string notr="true">YouTube:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="1">
+           <widget class="QLineEdit" name="value_YouTube"/>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_Orfium">
+            <property name="text">
+             <string notr="true">Orfium:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_SoundCloud">
+            <property name="text">
+             <string notr="true">SoundCloud:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="value_iTunes"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="value_Clyp"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_iTunes">
+            <property name="text">
+             <string notr="true">iTunes:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="value_BandCamp"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_Clyp">
+            <property name="text">
+             <string notr="true">Clyp:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="value_Amazon"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_BandCamp">
+            <property name="text">
+             <string notr="true">BandCamp:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_Amazon">
+            <property name="text">
+             <string notr="true">Amazon:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="value_LMMS"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_ArtistWebsite">
+            <property name="text">
+             <string>Artist Website:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="value_ArtistWebsite"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_LabelWebsite">
+            <property name="text">
+             <string>Label Website:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="value_LabelWebsite"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SongMetaDataDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SongMetaDataDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

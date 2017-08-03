@@ -57,6 +57,7 @@
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "SongMetaDataDialog.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -340,6 +341,11 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+
+	edit_menu->addAction( embed::getIconPixmap( "text_block" ),
+					tr( "Song Properties" ),
+					this, SLOT( showSongMetaDataDialog() ) );
+
 	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()) );
 
 	m_viewMenu = new QMenu( this );
@@ -1044,6 +1050,15 @@ void MainWindow::saveProjectAsDefaultTemplate()
 void MainWindow::showSettingsDialog()
 {
 	SetupDialog sd;
+	sd.exec();
+}
+
+
+
+
+void MainWindow::showSongMetaDataDialog()
+{
+	SongMetaDataDialog sd;
 	sd.exec();
 }
 

@@ -28,6 +28,7 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
 	gui/SetupDialog.cpp
+	gui/SongMetaDataDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
@@ -96,6 +97,7 @@ set(LMMS_UIS
 	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui
 	gui/dialogs/export_project.ui
+	gui/dialogs/song_metadata.ui
 
 	gui/Forms/EffectSelectDialog.ui
 

@@ -1,5 +1,5 @@
 /*
- * MetaData.h - generic class to hold meta-data (in particular, of the song)
+ * SongMetaDataDialog.h - dialog for setting song properties/tags/metadata
  *
  * Copyright (c) 2017
  *
@@ -22,25 +22,31 @@
  *
  */
 
-#ifndef METADATA_H
-#define METADATA_H
 
-#include <QMap>
-#include <QString>
-#include <QDomDocument>
+#ifndef SONG_METADATA_DIALOG_H
+#define SONG_METADATA_DIALOG_H
 
-class MetaData
+#include <QDialog>
+#include <vector>
+#include "ui_song_metadata.h"
+
+class SongMetaDataDialog : public QDialog, public Ui::SongMetaDataDialog
 {
- public:
-	MetaData();
-	QString get(const QString& k);
-	bool clear();
-	bool set(const QString& k,const QString& v);
-	bool load( QDomDocument& doc, QDomElement& element );
-	void save( QDomDocument& doc, QDomElement& element );
+	Q_OBJECT
+public:
+	SongMetaDataDialog(QWidget * _parent = NULL);
+	virtual ~SongMetaDataDialog();
 
- protected:
-	QMap<QString,QString> m_data;
-};
+
+protected:
+	virtual void reject( void );
+	virtual void closeEvent( QCloseEvent * _ce );
+
+
+private slots:
+	void accept();
+
+private:
+} ;
 
 #endif

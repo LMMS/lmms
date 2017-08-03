@@ -130,6 +130,7 @@ public:
 
 public slots:
 	void realignTracks();
+	void updateBackgrounds();
 	TrackView * createTrackView( Track * _t );
 	void deleteTrackView( TrackView * _tv );
 
@@ -155,7 +156,6 @@ protected:
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void resizeEvent( QResizeEvent * );
 
-	virtual void updateBackgrounds();
 	virtual void computeHyperBarViews();
 	virtual void computeBarViews();
 

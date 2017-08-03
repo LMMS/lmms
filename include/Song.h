@@ -268,8 +268,11 @@ public:
 		return m_timeSigModel;
 	}
 
-	inline QString songStructure() { return m_metaData.get("Structure"); }
-	inline void setSongStructure(QString s) { m_metaData.put("Structure",s); }
+	QString songMetaData(const QString& k);
+	void setSongMetaData(const QString& k,const QString& v);
+
+	inline QString songStructure() { return songMetaData("Structure"); }
+	inline void setSongStructure(const QString& s) { setSongMetaData("Structure",s); }
 
 public slots:
 	void playSong();
@@ -295,6 +298,8 @@ public slots:
 
 	void addBBTrack();
 
+ protected:
+	void clearSongMetaData();
 
 private slots:
 	void insertBar();
@@ -400,6 +405,7 @@ signals:
 	void lengthChanged( int tacts );
 	void tempoChanged( bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
+	void metaDataChanged( const QString k="*", const QString& v="*" );
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();

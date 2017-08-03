@@ -82,6 +82,8 @@ TrackContainerView::TrackContainerView( TrackContainer * _tc ) :
 
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
 						this, SLOT( realignTracks() ) );
+	connect( Engine::getSong(), SIGNAL( metaDataChanged( const QString&, const QString& ) ),
+						this, SLOT( updateBackgrounds() ) );
 	connect( m_tc, SIGNAL( trackAdded( Track * ) ),
 			this, SLOT( createTrackView( Track * ) ),
 			Qt::QueuedConnection );
@@ -329,6 +331,8 @@ void TrackContainerView::updateBackgrounds()
 	{
 		( *it )->getTrackContentWidget()->updateBackground();
 	}
+
+	update();
 }
 
 
@@ -380,7 +384,8 @@ void TrackContainerView::computeHyperBarViews()
 
 		//QString s=Engine::getSong()->songStructure();
 		//QString s="I16A16B8AB";
-		QString s="IABABCBO";
+		//QString s="IABABCBO";
+		QString s=Engine::getSong()->songMetaData("Structure");
 
 		for(int i=0;i<s.length();i++)
 		{
