@@ -22,6 +22,7 @@
 #cmakedefine LMMS_HAVE_SDL2
 #cmakedefine LMMS_HAVE_STK
 #cmakedefine LMMS_HAVE_VST
+#cmakedefine LMMS_HAVE_SF_COMPLEVEL
 
 #cmakedefine LMMS_DEBUG_FPE
 
