@@ -417,7 +417,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void resizeEvent( QResizeEvent * re );
 
-	virtual void paintGrid(QPainter& p,int tact,int ppt,QVector<QPointer<BarView>>& barViews);
+	virtual void paintGrid(QPainter& p,int tact,int ppt,QVector<QPointer<BarView> >& barViews);
 	virtual void paintCell(QPainter& p,int xc,int yc,int wc,int hc,const QPointer<BarView>& barView,bool sign);
 
 	virtual QString nodeName() const
