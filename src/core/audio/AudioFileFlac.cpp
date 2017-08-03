@@ -63,7 +63,7 @@ bool AudioFileFlac::startEncoding()
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL
 	double compression = getOutputSettings().getCompressionLevel();
-	sf_command(m_sf,SFC_SET_COMPRESSION_LEVEL,&compression,sizeof(double));
+	sf_command(m_sf, SFC_SET_COMPRESSION_LEVEL, &compression, sizeof(double));
 #endif
 
 	m_sf = sf_open(
@@ -76,9 +76,9 @@ bool AudioFileFlac::startEncoding()
 		&m_sfinfo
 	);
 
-	sf_command(m_sf,SFC_SET_CLIPPING,nullptr,SF_TRUE);
+	sf_command(m_sf, SFC_SET_CLIPPING, nullptr, SF_TRUE);
 
-	sf_set_string(m_sf,SF_STR_SOFTWARE,"LMMS");
+	sf_set_string(m_sf, SF_STR_SOFTWARE, "LMMS");
 
 	return true;
 }
@@ -94,7 +94,7 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 		{
 			for(ch_cnt_t channel=0; channel<channels(); ++channel)
 			{
-				buf[frame*channels()+channel] = _ab[frame][channel] * master_gain;
+				buf[frame*channels() + channel] = _ab[frame][channel] * master_gain;
 			}
 		}
 		sf_writef_float(m_sf,static_cast<float*>(buf.get()),frames);
@@ -102,8 +102,8 @@ void AudioFileFlac::writeBuffer(surroundSampleFrame const* _ab, fpp_t const fram
 	else // integer PCM encoding
 	{
 		std::unique_ptr<int_sample_t[]> buf{ new int_sample_t[frames*channels()] };
-		convertToS16(_ab,frames,master_gain,buf.get(),!isLittleEndian());
-		sf_writef_short(m_sf,static_cast<short*>(buf.get()),frames);
+		convertToS16(_ab, frames, master_gain, buf.get(), !isLittleEndian());
+		sf_writef_short(m_sf, static_cast<short*>(buf.get()), frames);
 	}
 
 }

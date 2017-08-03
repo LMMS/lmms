@@ -48,7 +48,13 @@ public:
 			Mixer* mixer,
 			bool& successful)
 	{
-		return new AudioFileFlac(outputSettings,channels,successful,outputFilename,mixer);
+		return new AudioFileFlac(
+			outputSettings,
+			channels,
+			successful,
+			outputFilename,
+			mixer
+		);
 	}
 
 private:
