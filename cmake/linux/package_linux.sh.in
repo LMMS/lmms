@@ -90,6 +90,10 @@ cp -R "@CMAKE_INSTALL_PREFIX@/." "${APPDIR}usr"
 rm -rf "${APPDIR}usr/include"
 success "${APPDIR}"
 
+# Copy rawwaves directory for stk/mallets
+mkdir -p "${APPDIR}usr/share/stk/"
+cp -R /usr/share/stk/rawwaves/ "${APPDIR}usr/share/stk/"
+
 # Create a wrapper script which calls the lmms executable
 mv "${APPDIR}usr/bin/lmms" "${APPDIR}usr/bin/lmms.real"
 # shellcheck disable=SC1083

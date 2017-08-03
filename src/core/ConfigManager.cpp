@@ -503,7 +503,16 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 #elif defined(LMMS_BUILD_APPLE)
 		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		m_stkDir = "/usr/share/stk/rawwaves/";
+		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		{
+			// Assume AppImage bundle
+			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		}
+		else
+		{
+			// Fallback to system provided location
+			m_stkDir = "/usr/share/stk/rawwaves/";
+		}
 #endif
 	}
 #endif
