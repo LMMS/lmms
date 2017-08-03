@@ -613,6 +613,7 @@ MESSAGE(
 "Supported file formats for project export\n"
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
+"* FLAC                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
 "* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
