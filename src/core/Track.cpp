@@ -1592,7 +1592,7 @@ void TrackContentWidget::paintEvent( QPaintEvent * pe )
 
 
 
-void TrackContentWidget::paintGrid(QPainter& p,int tact,int ppt,QVector<QPointer<BarView>>& barViews)
+void TrackContentWidget::paintGrid(QPainter& p,int tact,int ppt,QVector<QPointer<BarView> >& barViews)
 {
 	//int x0=tact*ppt;
 	//int y0=0;

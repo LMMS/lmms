@@ -408,7 +408,7 @@ void TrackContainerView::computeHyperBarViews()
 
 void TrackContainerView::computeBarViews()
 {
-	//qWarning("TrackContainerView::computeBarViews");
+	qWarning("TrackContainerView::computeBarViews");
 	m_barViews.clear();
 	if(m_tc==Engine::getSong())
 	{

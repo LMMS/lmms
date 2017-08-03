@@ -28,7 +28,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab_1">
         <attribute name="title">
@@ -40,18 +40,18 @@
            <x>9</x>
            <y>9</y>
            <width>671</width>
-           <height>91</height>
+           <height>118</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_Structure">
             <property name="text">
              <string>Structure:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="value_Structure"/>
           </item>
           <item row="0" column="0">
@@ -82,6 +82,20 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_Software">
+            <property name="text">
+             <string>Software:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="value_Software">
+            <property name="text">
+             <string notr="true">LMMS</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </widget>
@@ -95,11 +109,24 @@
            <x>10</x>
            <y>10</y>
            <width>671</width>
-           <height>261</height>
+           <height>419</height>
           </rect>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0" columnstretch="0,1">
-          <item row="1" column="1">
+         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0,0,0,0,0" columnstretch="0,0">
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="lineEdit"/>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="lineEdit_2"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_Artist">
+            <property name="text">
+             <string>Artist:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QLineEdit" name="value_AlbumTitle"/>
           </item>
           <item row="0" column="0">
@@ -109,42 +136,15 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_ReleaseDate">
             <property name="text">
              <string>Released:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_Artist">
-            <property name="text">
-             <string>Artist:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="value_Artist"/>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDateEdit" name="value_ReleaseDate">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_Style">
-            <property name="text">
-             <string>Style:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QComboBox" name="value_Style">
+          <item row="8" column="1">
+           <widget class="QComboBox" name="value_Genre">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -159,8 +159,59 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="1">
+           <widget class="QDateEdit" name="value_ReleaseDate">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>130</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_Genre">
+            <property name="text">
+             <string>Genre:</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="value_SongTitle"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_AlbumTitle">
+            <property name="text">
+             <string>Album Title:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_IRCS">
+            <property name="text">
+             <string notr="true">IRCS:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_Subgenre">
+            <property name="text">
+             <string>Subgenre:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_Copyright">
+            <property name="text">
+             <string>Copyright:</string>
+            </property>
+           </widget>
           </item>
           <item row="5" column="1">
            <widget class="QLineEdit" name="value_IRCS">
@@ -178,17 +229,46 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_AlbumTitle">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="value_Artist"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_TrackNumber">
             <property name="text">
-             <string>Album Title:</string>
+             <string>Track Number:</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_IRCS">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="value_TrackNumber">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>130</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_License">
             <property name="text">
-             <string notr="true">IRCS:</string>
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QComboBox" name="value_License">
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
             </property>
            </widget>
           </item>

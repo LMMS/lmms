@@ -26,7 +26,7 @@ bool MetaData::set(const QString& k,const QString& v)
 	bool r=(old!=v);
 	if(r)
 	{
-		//qWarning("meta data '%s' has changed: %s",qPrintable(k),qPrintable(v));
+		qWarning("meta data '%s' has changed: %s",qPrintable(k),qPrintable(v));
 		m_data.insert(k,v);
 	}
 	return r;
