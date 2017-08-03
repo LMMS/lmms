@@ -176,10 +176,14 @@ ELSE()
 ENDIF()
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
-ENDIF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+ENDIF()
+# check if we can use SF_SET_COMPRESSION_LEVEL
+IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
+	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
+ENDIF()
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -625,6 +629,7 @@ MESSAGE(
 "Supported file formats for project export\n"
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
+"* FLAC                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
 "* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
