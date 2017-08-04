@@ -34,7 +34,8 @@
 
 HwScreenWidget::HwScreenWidget(QWidget* parent, int columns, int rows,
 			       const QString & label, const QString & colorSet) :
-	QWidget(parent)
+	QWidget(parent),
+	m_text("")
 {
 	initUi(columns,rows,label,colorSet);
 }
@@ -44,18 +45,19 @@ HwScreenWidget::~HwScreenWidget()
 	delete m_screenPixmap;
 }
 
-void HwScreenWidget::initUi(int columns, int rows, const QString & label, const QString & _colorSet)
+void HwScreenWidget::initUi(int columns, int rows, const QString & label, const QString & colorSet)
 {
 	setEnabled(true);
 	setColumns(columns);
 	setRows(rows);
 	setLabel(label);
-	setColorSet(_colorSet);
+	setColorSet(colorSet);
 
-	connect(this, SIGNAL(columnsChanged(int)), this, SLOT(columnsUpdated()));
-	connect(this, SIGNAL(rowChanged(int)), this, SLOT(columnsUpdated()));
-	connect(this, SIGNAL(labelChanged(QString)), this, SLOT(columnsUpdated()));
-	connect(this, SIGNAL(colorSetChanged(QString)), this, SLOT(columnsUpdated()));
+	connect(this, SIGNAL( columnsChanged(int)      ), this, SLOT( columnsUpdated()  ));
+	connect(this, SIGNAL( rowChanged(int)          ), this, SLOT( rowsUpdated()     ));
+	connect(this, SIGNAL( labelChanged(QString)    ), this, SLOT( labelUpdated()    ));
+	connect(this, SIGNAL( colorSetChanged(QString) ), this, SLOT( colorSetUpdated() ));
+	connect(this, SIGNAL( textChanged(QString)     ), this, SLOT( textUpdated()     ));
 }
 
 void HwScreenWidget::paintEvent(QPaintEvent*)
@@ -195,6 +197,11 @@ void HwScreenWidget::colorSetUpdated()
 }
 
 void HwScreenWidget::labelUpdated()
+{
+	update();
+}
+
+void HwScreenWidget::textUpdated()
 {
 	update();
 }

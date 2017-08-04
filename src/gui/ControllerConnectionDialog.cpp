@@ -31,7 +31,7 @@
 
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
-#include "HwScreenWidget.h"
+//#include "HwScreenWidget.h"
 #include "MidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
