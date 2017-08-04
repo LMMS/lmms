@@ -55,7 +55,7 @@
 
 
 #define QQ_LOCAL_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true /*NOTIFY name##Changed*/)\
 	protected: type m_##name;\
 	void name##Updated();\
 	public:    type getf() { return m_##name; }\
@@ -63,14 +63,14 @@
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)	\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true /*NOTIFY name##Changed*/)	\
 	protected: type m_##name;\
 	public:    type getf() { return m_##name; }\
 	void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_REF_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true /*NOTIFY name##Changed*/)\
 	protected: type * m_##name;\
 	public:    type & getf() { return *m_##name; }\
 	void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
