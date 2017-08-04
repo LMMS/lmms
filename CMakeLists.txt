@@ -181,10 +181,14 @@ ELSE()
 ENDIF()
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
-ENDIF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+ENDIF()
+# check if we can use SF_SET_COMPRESSION_LEVEL
+IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
+	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
+ENDIF()
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -234,26 +238,42 @@ IF(WANT_CARLA)
 ENDIF(WANT_CARLA)
 
 
-# check for SDL
+# check for SDL2
 IF(WANT_SDL)
+	SET(SDL2_BUILDING_LIBRARY TRUE)
+	FIND_PACKAGE(SDL2)
+	IF(SDL2_FOUND)
+		SET(LMMS_HAVE_SDL TRUE)
+		SET(LMMS_HAVE_SDL2 TRUE)
+		SET(STATUS_SDL "OK, using SDL2")
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ELSE()
+		SET(SDL2_INCLUDE_DIR "")
+		SET(SDL2_LIBRARY "")
+	ENDIF()
+ENDIF()
+
+# fallback to SDL1
+IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
+	# Fallback to SDL1.2
 	SET(SDL_BUILDING_LIBRARY TRUE)
 	FIND_PACKAGE(SDL)
 	IF(SDL_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK")
-	ELSE(SDL_FOUND)
-		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similar) "
+		SET(STATUS_SDL "OK, using SDL1.2")
+		# fix mingw since 53abd65
+		IF(NOT SDL_INCLUDE_DIR)
+			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
+		ENDIF()
+		
+	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
-	ENDIF(SDL_FOUND)
-ENDIF(WANT_SDL)
-IF(NOT LMMS_HAVE_SDL)
-	SET(SDL_INCLUDE_DIR "")
-ELSE(NOT LMMS_HAVE_SDL)
-	IF(NOT SDL_INCLUDE_DIR)
-		SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-	ENDIF(NOT SDL_INCLUDE_DIR)
-ENDIF(NOT LMMS_HAVE_SDL)
-
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ENDIF()
+ENDIF()
 
 # check for Stk
 IF(WANT_STK)
@@ -615,6 +635,7 @@ MESSAGE(
 "Supported file formats for project export\n"
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
+"* FLAC                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
 "* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
