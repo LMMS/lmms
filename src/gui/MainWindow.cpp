@@ -465,7 +465,6 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
 	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 8 );
 
-
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
@@ -558,6 +557,13 @@ void MainWindow::finalize()
 								m_toolBar );
 	controllers_window->setShortcut( Qt::Key_F11 );
 
+	ToolButton * reorganize_windows = new ToolButton(
+					embed::getIconPixmap( "apply" ),
+					tr( "Reorganize Windows" ),
+					this, SLOT( reorganizeWindows() ),
+					m_toolBar );
+	reorganize_windows->setShortcut( Qt::Key_F12 );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -565,6 +571,8 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+	m_toolBarLayout->addWidget( reorganize_windows, 1, 8 );
+
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1324,6 +1332,61 @@ void MainWindow::toggleControllerRack()
 	toggleWindow( gui->getControllerRackView() );
 }
 
+
+
+
+void MainWindow::reorganizeWindows()
+{
+	//total space
+	int wt=m_workspace->width();
+	int ht=m_workspace->height();
+	//2nd row
+	int h2=gui->fxMixerView()->height()+52; //tmp 2 titlebars
+	int w2=wt-262; //tmp instr.
+	//1st row
+	int h1=ht-h2+8;
+	int w1=gui->fxMixerView()->width()+6; //tmp
+
+	/*
+	  toggleWindow( gui->getBBEditor(), forceShow );
+	  toggleWindow( gui->songEditor() );
+	  toggleWindow( gui->getProjectNotes() );
+	  toggleWindow( gui->pianoRoll() );
+	  toggleWindow( gui->automationEditor() );
+	  toggleWindow( gui->fxMixerView() );
+	  toggleWindow( gui->getControllerRackView() );
+	*/
+
+	int yt=0;
+	QList<QMdiSubWindow *>	wins=m_workspace->subWindowList();
+	for( QList<QMdiSubWindow *>::iterator it = wins.begin(); it != wins.end(); ++it )
+	{
+		if((*it)->isHidden()) continue;
+
+		if(*it==gui->songEditor()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->getBBEditor()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->getProjectNotes()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->pianoRoll()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->automationEditor()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->fxMixerView()->parentWidget())
+			(*it)->move(0,h2);
+		else
+		if(*it==gui->getControllerRackView()->parentWidget())
+			(*it)->move(w1+2,h2);
+		else
+			{ (*it)->move(w2+2,yt); yt+=24; }
+	}
+}
 
 
 

@@ -55,16 +55,17 @@
 
 
 #define QQ_LOCAL_PROPERTY(type,name,getf,setf)\
-	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
+	Q_PROPERTY(type name READ getf WRITE setf STORED true /*NOTIFY name##Changed*/)	\
 	protected: type m_##name;\
 		   void name##Updated();\
-	public:    type getf() const { return m_##name; }\
+	public:    type getf() { return m_##name; }\
 		   void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY(type,name,getf,setf)\
 	Q_PROPERTY(type name READ getf WRITE setf STORED true /*NOTIFY name##Changed*/)	\
 	protected: type m_##name;\
+		   void name##Updated();\
 	public:    type getf() { return m_##name; }\
 	void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type);\
@@ -72,11 +73,12 @@
 #define QQ_LOCAL_REF_PROPERTY(type,name,getf,setf)\
 	Q_PROPERTY(type name READ getf WRITE setf STORED true /*NOTIFY name##Changed*/)\
 	protected: type * m_##name;\
+		   void name##Updated();\
 	public:    type & getf() { return *m_##name; }\
 	void setf(type & new_val) { if(*m_##name!=new_val) { m_##name=&new_val; Q_EMIT name##Changed(new_val); } }\
 	  Q_SIGNAL void name##Changed(type &);\
 
-
+/*
 #define QQ_LOCAL_PROPERTY_DV(type,name,getf,setf,def_val)\
 	Q_PROPERTY(type name READ getf WRITE setf STORED true NOTIFY name##Changed)\
 	protected: type m_##name = def_val;\
@@ -186,7 +188,7 @@
 	public:   type & getf1() { return delegate->getf2(); }\
 		  void setf1(const type & new_val) { if(delegate->getf2()!=new_val) { delegate->setf2(new_val); Q_EMIT name##Changed(new_val); } }\
 	 Q_SIGNAL void name##Changed(type);\
-
+*/
 
 /***
   Usage:

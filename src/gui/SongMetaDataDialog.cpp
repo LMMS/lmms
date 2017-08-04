@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QDebug>
 
+#include "lmmsversion.h"
 #include "SongMetaDataDialog.h"
 #include "Song.h"
 #include "GuiApplication.h"
@@ -46,6 +47,7 @@ SongMetaDataDialog::SongMetaDataDialog(QWidget * _parent) :
 	value_TimeSignature->setText(QString("%1/%2")
 				     .arg(song->getTimeSigModel().getNumerator())
 				     .arg(song->getTimeSigModel().getDenominator()));
+	value_Software->setText(QString("LMMS %1").arg(LMMS_VERSION));
 	value_Structure->setText(song->songMetaData("Structure"));
 	value_SongTitle->setText(song->songMetaData("SongTitle"));
 	value_AlbumTitle->setText(song->songMetaData("AlbumTitle"));
