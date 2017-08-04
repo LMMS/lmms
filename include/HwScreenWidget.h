@@ -26,6 +26,8 @@
 #ifndef HW_SCREEN_WIDGET_H
 #define HW_SCREEN_WIDGET_H
 
+/*
+
 #include <QPaintEvent>
 #include <QPixmap>
 #include <QWidget>
@@ -43,26 +45,11 @@ class EXPORT HwScreenWidget : public QWidget
 	QQ_LOCAL_PROPERTY(int,rows,rows,setRows)
 	QQ_LOCAL_PROPERTY(QString,label,label,setLabel)
 
-		//Q_PROPERTY( QColor textShadowColor READ textShadowColor WRITE setTextShadowColor )
-
-public:
-	//HwScreenWidget(QWidget* parent = NULL, int columns = 16, int rows = 2,
-	//const QString & label = QString::null, const QString & colorSet = QString::null);
 	HwScreenWidget(QWidget* parent = NULL, int columns = 16, int rows = 2,
-		       const QString & label = QString(""), const QString & colorSet = QString("gob"));
+		       const QString & label = QString(""),
+		       const QString & colorSet = QString("gob"));
 
 	virtual ~HwScreenWidget();
-
-	//void lineText(int line);
-	//void setLineText(int line,QString & text);
-
-	/*
-	void addTextForValue( int value, const QString& text )
-	{
-		m_textForValue[value] = text;
-		update();
-	}
-	*/
 
 public slots:
 	//virtual void setMarginWidth( int width );
@@ -78,25 +65,12 @@ protected:
 
 	virtual void updateSize();
 
-	/*
-	int cellHeight() const
-	{
-		return m_cellHeight;
-	}
-	*/
-
 	void initUi(int columns, int rows, const QString & label, const QString & colorSet);
 
 private:
 
-	//QMap<int, QString> m_textForValue;
+*/
 
-	//QString m_display;
-	//QPixmap* m_colorSetPixmap;
-
-	//int m_cellWidth;
-	//int m_cellHeight;
-	//int m_marginWidth;
 } ;
 
 #endif

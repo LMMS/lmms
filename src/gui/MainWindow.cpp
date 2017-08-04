@@ -558,7 +558,7 @@ void MainWindow::finalize()
 	controllers_window->setShortcut( Qt::Key_F11 );
 
 	ToolButton * reorganize_windows = new ToolButton(
-					embed::getIconPixmap( "apply" ),
+					embed::getIconPixmap( "reorganize_windows" ),
 					tr( "Reorganize Windows" ),
 					this, SLOT( reorganizeWindows() ),
 					m_toolBar );
