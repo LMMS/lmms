@@ -59,7 +59,7 @@
 	protected: type m_##name;\
 		   void name##Updated();\
 	public:    type getf() { return m_##name; }\
-		   void setf(const type new_val) { if(m_##name!=new_val) { m_##name=new_val; emit name##Changed(new_val); } }\
+		   void setf(type new_val) { if(m_##name!=new_val) { m_##name=new_val; emit name##Changed(new_val); } }\
 	signals:   void name##Changed(type);\
 
 #define QQ_LOCAL_PTR_PROPERTY(type,name,getf,setf)\
