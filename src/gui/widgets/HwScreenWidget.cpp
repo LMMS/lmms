@@ -36,7 +36,7 @@ HwScreenWidget::HwScreenWidget(QWidget* parent, int columns, int rows,
 			       const QString & label, const QString & colorSet) :
 	QWidget(parent)
 {
-	initUI(columns,rows,label,colorSet);
+	initUi(columns,rows,label,colorSet);
 }
 
 HwScreenWidget::~HwScreenWidget()
@@ -44,13 +44,18 @@ HwScreenWidget::~HwScreenWidget()
 	delete m_screenPixmap;
 }
 
-void HwScreenWidget::initUI(int columns, int rows, const QString & label, const QString & _colorSet)
+void HwScreenWidget::initUi(int columns, int rows, const QString & label, const QString & _colorSet)
 {
 	setEnabled(true);
 	setColumns(columns);
 	setRows(rows);
 	setLabel(label);
 	setColorSet(_colorSet);
+
+	connect(this, SIGNAL(columnsChanged(int)), this, SLOT(columnsUpdated()));
+	connect(this, SIGNAL(rowChanged(int)), this, SLOT(columnsUpdated()));
+	connect(this, SIGNAL(labelChanged(QString)), this, SLOT(columnsUpdated()));
+	connect(this, SIGNAL(colorSetChanged(QString)), this, SLOT(columnsUpdated()));
 }
 
 void HwScreenWidget::paintEvent(QPaintEvent*)
@@ -165,22 +170,22 @@ void HwScreenWidget::updateSize()
 	setFixedSize(ws,hs);
 }
 
-void HwScreenWidget::columnsChanged(int columns)
+void HwScreenWidget::columnsUpdated()
 {
 	updateSize();
 	update();
 }
 
-void HwScreenWidget::rowsChanged(int rows)
+void HwScreenWidget::rowsUpdated()
 {
 	updateSize();
 	update();
 }
 
-void HwScreenWidget::colorSetChanged(QString colorSet)
+void HwScreenWidget::colorSetUpdated()
 {
 	QString rn="hwscreen_";
-	rn.append(colorSet);
+	rn.append(m_colorSet);
 	m_screenPixmap = new QPixmap( embed::getIconPixmap( rn.toUtf8().constData() ) );
 	m_cellSize=QSize(m_screenPixmap->size().width()  / HwScreenWidget::CHARS_PER_PIXMAP,
 			 m_screenPixmap->size().height() / 2);
@@ -189,7 +194,7 @@ void HwScreenWidget::colorSetChanged(QString colorSet)
 	update();
 }
 
-void HwScreenWidget::labelChanged(QString label)
+void HwScreenWidget::labelUpdated()
 {
 	update();
 }

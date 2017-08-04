@@ -85,7 +85,7 @@ protected:
 	}
 	*/
 
-	void initUI(int columns, int rows, const QString & label, const QString & colorSet);
+	void initUi(int columns, int rows, const QString & label, const QString & colorSet);
 
 private:
 
