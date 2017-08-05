@@ -91,28 +91,6 @@ SET(LMMS_SRCS
 	PARENT_SCOPE
 )
 
-IF(QT5 AND LMMS_BUILD_LINUX)
-    INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include/")
-    add_library(x11embedcontainer STATIC
-        "${CMAKE_SOURCE_DIR}/src/gui/X11EmbedContainer.cpp"
-        "${CMAKE_SOURCE_DIR}/include/X11EmbedContainer.h"
-    )
-    FIND_PACKAGE(Qt5Core COMPONENTS Private)
-    FIND_PACKAGE(Qt5Widgets COMPONENTS Private)
-    FIND_PACKAGE(Qt5X11Extras REQUIRED)
-
-	include_directories(${Qt5Core_PRIVATE_INCLUDE_DIRS})
-	include_directories(${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
-
-	target_link_Libraries(x11embedcontainer
-		 xcb xcb-util X11-xcb Qt5::X11Extras X11
-	)
-
-    SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS} x11embedcontainer PARENT_SCOPE)
-ELSE()
-    add_library(x11embedcontainer STATIC /dev/null)
-ENDIF()
-
 set(LMMS_UIS
 	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui

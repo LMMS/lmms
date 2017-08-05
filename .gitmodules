@@ -1,0 +1,3 @@
+[submodule "src/3rdparty/qt5-x11embed"]
+	path = src/3rdparty/qt5-x11embed
+	url = git@github.com:Lukas-W/qt5-x11embed.git
