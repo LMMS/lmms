@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: lukaswhl/lmms-ci-gcc
+    steps:
+      - checkout
+      - run: mkdir build
+      - run:
+          name: Configuring
+          command: cd build && cmake .. -DWANT_QT5=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - run:
+          name: Building
+          command: cd build && make -j4
+      - run:
+          name: Building tests
+          command: cd build && make tests
+      - run:
+          name: Running tests
+          command: build/tests/tests
