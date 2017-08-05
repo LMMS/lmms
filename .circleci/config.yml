@@ -5,10 +5,14 @@ jobs:
       - image: lukaswhl/lmms-ci-gcc
     steps:
       - checkout
-      - run: mkdir build
+      - restore_cache:
+          keys:
+            - ccache-{{ .Branch }}-{{ .BuildNum }}
+            - ccache-{{ .Branch }}
+            - ccache
       - run:
           name: Configuring
-          command: cd build && cmake .. -DWANT_QT5=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          command: mkdir build && cd build && cmake .. -DWANT_QT5=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_CCACHE=ON
       - run:
           name: Building
           command: cd build && make -j4
@@ -18,3 +22,15 @@ jobs:
       - run:
           name: Running tests
           command: build/tests/tests
+      - save_cache:
+          key: ccache-{{ .Branch }}-{{ .BuildNum }}
+          paths:
+            - ~/.ccache
+      - save_cache:
+          key: ccache-{{ .Branch }}
+          paths:
+            - ~/.ccache
+      - save_cache:
+          key: ccache
+          paths:
+            - ~/.ccache
