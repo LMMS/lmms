@@ -291,6 +291,8 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 						const f_cnt_t _release_begin,
 						const fpp_t _frames )
 {
+	m_paramMutex.lock();
+
 	if( _frame < 0 || _release_begin < 0 )
 	{
 		return;
@@ -328,6 +330,8 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 			env_level * ( 0.5f + *_buf ) :
 			env_level + *_buf;
 	}
+
+	m_paramMutex.unlock();
 }
 
 
@@ -402,6 +406,8 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
+	m_paramMutex.lock();
+
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 				Engine::mixer()->processingSampleRate();
 	// TODO: Remove the expKnobVals, time should be linear
@@ -530,6 +536,8 @@ void EnvelopeAndLfoParameters::updateSampleVars()
 	}
 
 	m_bad_lfoShapeData = true;
+
+	m_paramMutex.unlock();
 
 	emit dataChanged();
 
