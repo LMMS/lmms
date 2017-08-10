@@ -1575,7 +1575,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_arpeggioView->setModel( &m_track->m_arpeggio );
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
-	m_miscView->getPitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
+	m_miscView->PitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
 	updateName();
 }
 
