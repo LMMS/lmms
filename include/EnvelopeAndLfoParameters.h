@@ -121,6 +121,7 @@ private:
 	static LfoInstances * s_lfoInstances;
 	bool m_used;
 
+	QMutex m_paramMutex;
 
 	FloatModel m_predelayModel;
 	FloatModel m_attackModel;
