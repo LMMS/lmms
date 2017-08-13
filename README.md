@@ -37,7 +37,7 @@ Features
 Building
 ---------
 
-See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compiling-lmms) on our
+See [Compiling LMMS](https://github.com/LMMS/lmms/wiki/Compiling) on our
 wiki for information on how to build LMMS.
 
 
