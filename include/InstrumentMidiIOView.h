@@ -72,7 +72,7 @@ public:
 	InstrumentMiscView( InstrumentTrack *it, QWidget* parent );
 	~InstrumentMiscView();
 
-	GroupBox * PitchGroupBox()
+	GroupBox * pitchGroupBox()
 	{
 		return m_pitchGroupBox;
 	}
