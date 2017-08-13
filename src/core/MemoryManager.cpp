@@ -25,197 +25,87 @@
 
 
 #include "MemoryManager.h"
-#include <QReadWriteLock>
+#include <QtDebug>
+
+#include "tlsf.c"
 
 
 MemoryPoolVector MemoryManager::s_memoryPools;
-QReadWriteLock MemoryManager::s_poolMutex;
-PointerInfoMap MemoryManager::s_pointerInfo;
-QMutex MemoryManager::s_pointerMutex;
+QMutex MemoryManager::s_mutex;
+tlsf_t MemoryManager::s_tlsf = NULL;
 
 
 bool MemoryManager::init()
 {
-	s_memoryPools.reserve( 64 );
-	s_pointerInfo.reserve( 4096 );
-	// construct first MemoryPool and allocate memory
-	MemoryPool m ( MM_INITIAL_CHUNKS );
-	m.m_pool = MemoryHelper::alignedMalloc( MM_INITIAL_CHUNKS * MM_CHUNK_SIZE );
-	s_memoryPools.append( m );
+	QMutexLocker lock(&s_mutex);
+	void* mem = MemoryHelper::alignedMalloc(tlsf_size());
+	if (!mem)
+	{
+		return false;
+	}
+	s_tlsf = tlsf_create(mem);
+	if (!s_tlsf)
+	{
+		return false;
+	}
+	s_memoryPools.reserve(64);
+	extend(MM_INITIAL_CHUNKS * MM_CHUNK_SIZE);
 	return true;
 }
 
 
-void * MemoryManager::alloc( size_t size )
+void* MemoryManager::alloc(size_t size)
 {
-	if( !size )
+	QMutexLocker lock(&s_mutex);
+	if (!size)
 	{
 		return NULL;
 	}
-
-	int requiredChunks = size / MM_CHUNK_SIZE + ( size % MM_CHUNK_SIZE > 0 ? 1 : 0 );
-
-	MemoryPool * mp = NULL;
-	void * ptr = NULL;
-
-	MemoryPoolVector::iterator it = s_memoryPools.begin();
-
-	s_poolMutex.lockForRead();
-	while( it != s_memoryPools.end() && !ptr )
+	void* mem = tlsf_malloc(s_tlsf, size + tlsf_alloc_overhead());
+	if (!mem)
 	{
-		ptr = ( *it ).getChunks( requiredChunks );
-		if( ptr )
+		extend(qMax(size, MM_INCREMENT_CHUNKS));
+		mem = tlsf_malloc(s_tlsf, size + tlsf_alloc_overhead());
+		if (!mem)
 		{
-			mp = &( *it );
+			// still no luck? something is horribly wrong
+			qCritical()
+				<< "MemoryManager.cpp: Couldn't allocate memory:"
+				<< size
+				<< "bytes asked";
+			return NULL;
 		}
-		++it;
 	}
-	s_poolMutex.unlock();
-
-	if( ptr )
-	{
-		s_pointerMutex.lock();
-		PtrInfo p;
-			p.chunks = requiredChunks;
-			p.memPool = mp;
-		s_pointerInfo[ptr] = p;
-		s_pointerMutex.unlock();
-		return ptr;
-	}
-
-	// can't find enough chunks in existing pools, so
-	// create a new pool that is guaranteed to have enough chunks
-	int moreChunks = qMax( requiredChunks, MM_INCREMENT_CHUNKS );
-	int i = MemoryManager::extend( moreChunks );
-
-	mp = &s_memoryPools[i];
-	ptr = s_memoryPools[i].getChunks( requiredChunks );
-	if( ptr )
-	{
-		s_pointerMutex.lock();
-		PtrInfo p;
-			p.chunks = requiredChunks;
-			p.memPool = mp;
-		s_pointerInfo[ptr] = p;
-		s_pointerMutex.unlock();
-		return ptr;
-	}
-	// still no luck? something is horribly wrong
-	qFatal( "MemoryManager.cpp: Couldn't allocate memory: %d chunks asked", requiredChunks );
-	return NULL;
+	return mem;
 }
 
 
-void MemoryManager::free( void * ptr )
+void MemoryManager::free(void* ptr)
 {
-	if( !ptr )
-	{
-		return; // Null pointer deallocations are OK but do not need to be handled
-	}
-
-	// fetch info on the ptr and remove
-	s_pointerMutex.lock();
-	if( ! s_pointerInfo.contains( ptr ) ) // if we have no info on ptr, fail loudly
-	{
-		qFatal( "MemoryManager: Couldn't find pointer info for pointer: %p", ptr );
-	}
-	PtrInfo p = s_pointerInfo[ptr];
-	s_pointerInfo.remove( ptr );
-	s_pointerMutex.unlock();
-
-	p.memPool->releaseChunks( ptr, p.chunks );
+	QMutexLocker lock(&s_mutex);
+	tlsf_free(s_tlsf, ptr);
 }
 
 
-int MemoryManager::extend( int chunks )
+void MemoryManager::extend(size_t required)
 {
-	MemoryPool m ( chunks );
-	m.m_pool = MemoryHelper::alignedMalloc( chunks * MM_CHUNK_SIZE );
-
-	s_poolMutex.lockForWrite();
-	s_memoryPools.append( m );
-	int i = s_memoryPools.size() - 1;
-	s_poolMutex.unlock();
-
-	return i;
+	qDebug()
+		<< "MemoryManager::extend() called for"
+		<< required
+		<< "bytes";
+	size_t size = required + tlsf_pool_overhead();
+	pool_t pool = MemoryHelper::alignedMalloc(size);
+	tlsf_add_pool(s_tlsf, pool, size);
 }
 
 
 void MemoryManager::cleanup()
 {
-	for( MemoryPoolVector::iterator it = s_memoryPools.begin(); it != s_memoryPools.end(); ++it )
+	QMutexLocker lock(&s_mutex);
+	for (MemoryPoolVector::iterator it = s_memoryPools.begin(); it != s_memoryPools.end(); ++it)
 	{
-		MemoryHelper::alignedFree( ( *it ).m_pool );
-		MemoryHelper::alignedFree( ( *it ).m_free );
+		MemoryHelper::alignedFree((*it));
 	}
-}
-
-
-void * MemoryPool::getChunks( int chunksNeeded )
-{
-	if( chunksNeeded > m_chunks ) // not enough chunks in this pool?
-	{
-		return NULL;
-	}
-
-	m_mutex.lock();
-
-	// now find out if we have a long enough sequence of chunks in this pool
-	char last = 0;
-	intptr_t n = 0;
-	intptr_t index = -1;
-	bool found = false;
-
-	for( int i = 0; i < m_chunks; ++i )
-	{
-		if( m_free[i] )
-		{
-			if( !last )
-			{
-				index = i;
-			}
-
-			++n;
-			if( n >= chunksNeeded )
-			{
-				found = true;
-				break;
-			}
-		}
-		else
-		{
-			n = 0;
-		}
-
-		last = m_free[i];
-	}
-
-	if( found ) // if enough chunks found, return pointer to chunks
-	{
-		// set chunk flags to false so we know the chunks are in use
-		for( intptr_t i = 0; i < chunksNeeded; ++i )
-		{
-			m_free[ index + i ] = 0;
-		}
-		m_mutex.unlock();
-		return (char*)m_pool + ( index * MM_CHUNK_SIZE );
-	}
-	m_mutex.unlock();
-	return NULL; // out of stock, come again tomorrow!
-}
-
-
-void MemoryPool::releaseChunks( void * ptr, int chunks )
-{
-	m_mutex.lock();
-
-	intptr_t start = ( (intptr_t)ptr - (intptr_t)m_pool ) / MM_CHUNK_SIZE;
-	if( start < 0 )
-	{
-		qFatal( "MemoryManager: error at releaseChunks() - corrupt pointer info?" );
-	}
-
-	memset( &m_free[ start ], 1, chunks );
-
-	m_mutex.unlock();
+	tlsf_destroy(s_tlsf);
+	MemoryHelper::alignedFree(s_tlsf);
 }
