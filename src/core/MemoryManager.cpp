@@ -61,11 +61,11 @@ void* MemoryManager::alloc(size_t size)
 	{
 		return NULL;
 	}
-	void* mem = tlsf_malloc(s_tlsf, size + tlsf_alloc_overhead());
+	void* mem = tlsf_malloc(s_tlsf, size);
 	if (!mem)
 	{
 		extend(qMax(size, MM_INCREMENT_SIZE));
-		mem = tlsf_malloc(s_tlsf, size + tlsf_alloc_overhead());
+		mem = tlsf_malloc(s_tlsf, size);
 		if (!mem)
 		{
 			// still no luck? something is horribly wrong
