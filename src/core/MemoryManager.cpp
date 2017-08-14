@@ -49,7 +49,7 @@ bool MemoryManager::init()
 		return false;
 	}
 	s_memoryPools.reserve(64);
-	extend(MM_INITIAL_CHUNKS * MM_CHUNK_SIZE);
+	extend(MM_INITIAL_SIZE);
 	return true;
 }
 
@@ -64,7 +64,7 @@ void* MemoryManager::alloc(size_t size)
 	void* mem = tlsf_malloc(s_tlsf, size + tlsf_alloc_overhead());
 	if (!mem)
 	{
-		extend(qMax(size, MM_INCREMENT_CHUNKS));
+		extend(qMax(size, MM_INCREMENT_SIZE));
 		mem = tlsf_malloc(s_tlsf, size + tlsf_alloc_overhead());
 		if (!mem)
 		{
@@ -95,6 +95,7 @@ void MemoryManager::extend(size_t required)
 		<< "bytes";
 	size_t size = required + tlsf_pool_overhead();
 	pool_t pool = MemoryHelper::alignedMalloc(size);
+	s_memoryPools.push_back(pool);
 	tlsf_add_pool(s_tlsf, pool, size);
 }
 

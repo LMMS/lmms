@@ -34,28 +34,8 @@
 #include "tlsf.h"
 
 const size_t MM_CHUNK_SIZE = 64; // granularity of managed memory
-const size_t MM_INITIAL_CHUNKS = 1024 * 1024; // how many chunks to allocate at startup - TODO: make configurable
-const size_t MM_INCREMENT_CHUNKS = 16 * 1024; // min. amount of chunks to increment at a time
-const size_t MM_POOL_SIZE = 1024 * 1024;
-
-struct MemoryPool
-{
-	void* m_pool;
-
-	MemoryPool() :
-		m_pool( NULL )
-	{}
-
-	MemoryPool( const MemoryPool & mp ) :
-		m_pool( mp.m_pool )
-	{}
-
-	MemoryPool & operator = ( const MemoryPool & mp )
-	{
-		m_pool = mp.m_pool;
-		return *this;
-	}
-};
+const size_t MM_INITIAL_SIZE = 1024 * 1024 * MM_CHUNK_SIZE; // how many bytes to allocate at startup - TODO: make configurable
+const size_t MM_INCREMENT_SIZE = 16 * 1024 * MM_CHUNK_SIZE; // min. amount of bytes to increment at a time
 
 typedef QVector<pool_t> MemoryPoolVector;
 

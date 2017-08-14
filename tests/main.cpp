@@ -5,9 +5,11 @@
 #include <QDebug>
 
 #include "Engine.h"
+#include "MemoryManager.h"
 
 int main(int argc, char* argv[])
 {
+	MemoryManager::init();
 	new QCoreApplication(argc, argv);
 	Engine::init(true);
 
