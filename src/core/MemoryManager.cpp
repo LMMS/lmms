@@ -31,13 +31,13 @@
 
 
 MemoryPoolVector MemoryManager::s_memoryPools;
-QMutex MemoryManager::s_mutex;
+SpinLock MemoryManager::s_lock;
 tlsf_t MemoryManager::s_tlsf = NULL;
 
 
 bool MemoryManager::init()
 {
-	QMutexLocker lock(&s_mutex);
+	SpinLockGuard lock(&s_lock);
 	void* mem = MemoryHelper::alignedMalloc(tlsf_size());
 	if (!mem)
 	{
@@ -56,7 +56,7 @@ bool MemoryManager::init()
 
 void* MemoryManager::alloc(size_t size)
 {
-	QMutexLocker lock(&s_mutex);
+	SpinLockGuard lock(&s_lock);
 	if (!size)
 	{
 		return NULL;
@@ -82,7 +82,7 @@ void* MemoryManager::alloc(size_t size)
 
 void MemoryManager::free(void* ptr)
 {
-	QMutexLocker lock(&s_mutex);
+	SpinLockGuard lock(&s_lock);
 	tlsf_free(s_tlsf, ptr);
 }
 
@@ -102,7 +102,7 @@ void MemoryManager::extend(size_t required)
 
 void MemoryManager::cleanup()
 {
-	QMutexLocker lock(&s_mutex);
+	SpinLockGuard lock(&s_lock);
 	for (MemoryPoolVector::iterator it = s_memoryPools.begin(); it != s_memoryPools.end(); ++it)
 	{
 		MemoryHelper::alignedFree((*it));

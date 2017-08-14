@@ -27,9 +27,9 @@
 #define MEMORY_MANAGER_H
 
 #include <QtCore/QVector>
-#include <QtCore/QMutex>
 #include <QtCore/QHash>
 #include "MemoryHelper.h"
+#include "SpinLock.h"
 #include "export.h"
 #include "tlsf.h"
 
@@ -50,7 +50,7 @@ public:
 private:
 	static tlsf_t s_tlsf;
 	static MemoryPoolVector s_memoryPools;
-	static QMutex s_mutex;
+	static SpinLock s_lock;
 
 	static void extend( size_t required );
 };
