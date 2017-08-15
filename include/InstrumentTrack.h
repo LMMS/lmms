@@ -27,6 +27,7 @@
 #define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
+#include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "MidiEventProcessor.h"
