@@ -1094,7 +1094,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// inner border
-	if( !beatPattern )
+	if( !( fixedTCOs() && beatPattern ) )
 	{
 		p.setPen( c.lighter( current ? 160 : 130 ) );
 		p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
