@@ -85,7 +85,6 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 
 	int nTracks = 0;
-	//int nTracks_BB = 0;
 	uint8_t buffer[BUFFER_SIZE];
 	uint32_t size;
 
@@ -127,9 +126,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				if (n.nodeName() == "instrumenttrack")
 				{
 					QDomElement it = n.toElement();
-					base_pitch = qRound(it.attribute("pitch", "0").toInt() / 100.0);
 					// transpose +12 semitones, workaround for #1857
-					base_pitch += (69 - it.attribute("basenote", "57").toInt());
+					base_pitch = (69 - it.attribute("basenote", "57").toInt());
 					if (it.attribute("usemasterpitch", "1").toInt())
 					{
 						base_pitch += masterPitch;
@@ -179,7 +177,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
 
-		std::vector<std::vector<std::pair<int,int>>>::iterator itr = plists.begin();
+		auto itr = plists.begin();
 		std::vector<std::pair<int,int>> st;
 
 		if(track->type() != Track::InstrumentTrack) continue;
@@ -199,9 +197,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			if (n.nodeName() == "instrumenttrack")
 			{
 				QDomElement it = n.toElement();
-				base_pitch = qRound(it.attribute("pitch", "0").toInt() / 100.0);
 				// transpose +12 semitones, workaround for #1857
-				base_pitch += (69 - it.attribute("basenote", "57").toInt());
+				base_pitch = (69 - it.attribute("basenote", "57").toInt());
 				if (it.attribute("usemasterpitch", "1").toInt())
 				{
 					base_pitch += masterPitch;
@@ -219,7 +216,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				// workaround for nested BBTCOs
 				int pos = 0;
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
-				for(std::vector<std::pair<int,int>>::iterator it = plist.begin(); it != plist.end(); ++it)
+				for(auto it = plist.begin(); it != plist.end(); ++it)
 				{
 					while(!st.empty() && st.back().second <= it->first)
 					{
@@ -286,7 +283,7 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 
 void MidiExport::writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for(MidiNoteIterator it = nv.begin(); it != nv.end(); ++it)
+	for(auto it = nv.begin(); it != nv.end(); ++it)
 	{
 		mtrack.addNote(it->pitch, it->volume, it->time / 48.0, it->duration / 48.0);
 	}
@@ -301,7 +298,7 @@ void MidiExport::writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for(MidiNoteIterator it = src.begin(); it != src.end(); ++it)
+	for(auto it = src.begin(); it != src.end(); ++it)
 	{
 		for(int time = it->time  + ceil((start - it->time) / len)
 				* len; time < end; time += len)
@@ -322,7 +319,7 @@ void MidiExport::ProcessBBNotes(MidiNoteVector &nv)
 {
 	std::sort(nv.begin(), nv.end());
 	int cur = INT_MAX, next = INT_MAX;
-	for(MidiNoteVector::reverse_iterator it = nv.rbegin(); it != nv.rend(); ++it)
+	for(auto it = nv.rbegin(); it != nv.rend(); ++it)
 	{
 		if (it->time < cur)
 		{
