@@ -27,6 +27,8 @@
 
 #include <QtCore/QTimer>
 #include <QPixmap>
+#include <QtGui/QLabel>
+#include <memory>
 
 #include "SideBarWidget.h"
 #include "Plugin.h"
@@ -37,11 +39,18 @@ class PluginBrowser : public SideBarWidget
 	Q_OBJECT
 public:
 	PluginBrowser( QWidget * _parent );
-	virtual ~PluginBrowser();
+	virtual ~PluginBrowser() = default;
+
+private slots:
+	void highlightPlugin(Plugin::Descriptor const& pd);
+	void highlightNone();
 
 
 private:
 	QWidget * m_view;
+
+	std::unique_ptr<QLabel> m_hint;
+
 };
 
 
@@ -52,6 +61,14 @@ class PluginDescList : public QWidget
 	Q_OBJECT
 public:
 	PluginDescList(QWidget* parent);
+
+signals:
+	void highlight(Plugin::Descriptor const&);
+	void unhighlight();
+
+private slots:
+	void receiveHighlight(Plugin::Descriptor const&);
+	void receiveUnhighlight();
 };
 
 
@@ -70,14 +87,13 @@ protected:
 	void mousePressEvent( QMouseEvent * _me ) override;
 	void paintEvent( QPaintEvent * _pe ) override;
 
-
-private slots:
-	void updateHeight();
+	signals:
+	void highlight(Plugin::Descriptor const& pd);
+	void unhighlight();
 
 
 private:
 	constexpr static int DEFAULT_HEIGHT{24};
-	constexpr static int ANIMATION_STEPS{4};
 
 	QTimer m_updateTimer;
 
@@ -85,9 +101,6 @@ private:
 	QPixmap m_logo;
 
 	bool m_mouseOver;
-	int m_targetHeight;
-	int m_heightIncrement;
-
 };
 
 

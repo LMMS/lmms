@@ -70,6 +70,16 @@ protected:
 		m_layout->addLayout( _l );
 	}
 
+	void changeIcon(QPixmap const& icon)
+	{
+		m_icon=icon;
+	}
+
+	void changeTitle(QString const& title)
+	{
+		m_title=title;
+	}
+
 
 private:
 	QWidget * m_contents;
