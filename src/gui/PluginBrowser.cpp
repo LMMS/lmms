@@ -39,14 +39,6 @@
 #include "PluginFactory.h"
 
 
-static auto pluginBefore = []( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
-{
-	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
-};
-
-
-
-
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument Plugins" ),
 				embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
@@ -125,7 +117,14 @@ PluginDescList::PluginDescList(QWidget *parent) :
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
 	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
-	std::sort(descs.begin(), descs.end(), pluginBefore);
+	std::sort(
+			descs.begin(),
+			descs.end(),
+			[]( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 ) -> bool
+			{
+				return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
+			}
+	);
 	for (const Plugin::Descriptor* desc : descs)
 	{
 		PluginDescWidget* p = new PluginDescWidget( *desc, this );
