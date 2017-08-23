@@ -537,7 +537,7 @@ PluginDescWidget {
 }
 
 PluginDescWidget:hover {
-	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2E343B, stop:1 #1E2326);
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #363F4B, stop:1 #4A545F);
 	color: #d1d8e4;
 }
 
