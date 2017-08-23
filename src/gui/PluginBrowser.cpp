@@ -69,7 +69,10 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 								m_view )
 	);
 	m_hint->setWordWrap( true );
-	m_hint->setFixedHeight(m_hint->sizeHint().height());
+	// TODO fixed height causes some descriptions to be cropped;
+	// variable height causes layout resizing.
+	// Maybe pre-set to a height where resizing is never needed.
+	m_hint->setFixedHeight( m_hint->sizeHint().height() );
 
 	QScrollArea* scrollarea = new QScrollArea( m_view );
 	PluginDescList* descList = new PluginDescList( m_view );
