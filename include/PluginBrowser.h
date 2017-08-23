@@ -27,7 +27,8 @@
 
 #include <QtCore/QTimer>
 #include <QPixmap>
-#include <QtGui/QLabel>
+#include <QLabel>
+
 #include <memory>
 
 #include "SideBarWidget.h"
