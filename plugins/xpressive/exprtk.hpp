@@ -67,6 +67,20 @@ namespace exprtk
    #define exprtk_error_location             \
    "exprtk.hpp:" + details::to_str(__LINE__) \
 
+   #if __GNUC__  >= 7
+
+      #define exprtk_disable_fallthrough_begin                      \
+      _Pragma ("GCC diagnostic push")                               \
+      _Pragma ("GCC diagnostic ignored \"-Wimplicit-fallthrough\"") \
+
+      #define exprtk_disable_fallthrough_end                        \
+      _Pragma ("GCC diagnostic pop")                                \
+
+   #else
+      #define exprtk_disable_fallthrough_begin (void)0;
+      #define exprtk_disable_fallthrough_end   (void)0;
+   #endif
+
    namespace details
    {
       typedef unsigned char uchar_t;
@@ -476,7 +490,7 @@ namespace exprtk
       {
          for (std::size_t i = 0; i < reserved_words_size; ++i)
          {
-            if (imatch(symbol,reserved_words[i]))
+            if (imatch(symbol, reserved_words[i]))
             {
                return true;
             }
@@ -489,7 +503,7 @@ namespace exprtk
       {
          for (std::size_t i = 0; i < reserved_symbols_size; ++i)
          {
-            if (imatch(symbol,reserved_symbols[i]))
+            if (imatch(symbol, reserved_symbols[i]))
             {
                return true;
             }
@@ -502,7 +516,7 @@ namespace exprtk
       {
          for (std::size_t i = 0; i < base_function_list_size; ++i)
          {
-            if (imatch(function_name,base_function_list[i]))
+            if (imatch(function_name, base_function_list[i]))
             {
                return true;
             }
@@ -515,7 +529,7 @@ namespace exprtk
       {
          for (std::size_t i = 0; i < cntrl_struct_list_size; ++i)
          {
-            if (imatch(cntrl_strct,cntrl_struct_list[i]))
+            if (imatch(cntrl_strct, cntrl_struct_list[i]))
             {
                return true;
             }
@@ -528,7 +542,7 @@ namespace exprtk
       {
          for (std::size_t i = 0; i < logic_ops_list_size; ++i)
          {
-            if (imatch(lgc_opr,logic_ops_list[i]))
+            if (imatch(lgc_opr, logic_ops_list[i]))
             {
                return true;
             }
@@ -1666,6 +1680,7 @@ namespace exprtk
 
          if (length <= 4)
          {
+            exprtk_disable_fallthrough_begin
             switch (length)
             {
                #ifdef exprtk_use_lut
@@ -1699,6 +1714,7 @@ namespace exprtk
 
                #undef exprtk_process_digit
             }
+            exprtk_disable_fallthrough_end
          }
          else
             return_result = false;
@@ -2823,7 +2839,7 @@ namespace exprtk
                                  const token& t0 = g.token_list_[i    ];
                                  const token& t1 = g.token_list_[i + 1];
 
-                                 if (!operator()(t0,t1))
+                                 if (!operator()(t0, t1))
                                  {
                                     return i;
                                  }
@@ -2836,7 +2852,7 @@ namespace exprtk
                                  const token& t1 = g.token_list_[i + 1];
                                  const token& t2 = g.token_list_[i + 2];
 
-                                 if (!operator()(t0,t1,t2))
+                                 if (!operator()(t0, t1, t2))
                                  {
                                     return i;
                                  }
@@ -2850,7 +2866,7 @@ namespace exprtk
                                  const token& t2 = g.token_list_[i + 2];
                                  const token& t3 = g.token_list_[i + 3];
 
-                                 if (!operator()(t0,t1,t2,t3))
+                                 if (!operator()(t0, t1, t2, t3))
                                  {
                                     return i;
                                  }
@@ -3375,7 +3391,7 @@ namespace exprtk
                {
                   details::char_t c = t.value[0];
 
-                       if (t.type == lexer::token::e_lbracket)    stack_.push(std::make_pair(')',t.position));
+                       if (t.type == lexer::token::e_lbracket   ) stack_.push(std::make_pair(')',t.position));
                   else if (t.type == lexer::token::e_lcrlbracket) stack_.push(std::make_pair('}',t.position));
                   else if (t.type == lexer::token::e_lsqrbracket) stack_.push(std::make_pair(']',t.position));
                   else if (exprtk::details::is_right_bracket(c))
@@ -3716,7 +3732,7 @@ namespace exprtk
             inline bool register_scanner(lexer::token_scanner* scanner)
             {
                if (token_scanner_list.end() != std::find(token_scanner_list.begin(),
-                                                         token_scanner_list.end(),
+                                                         token_scanner_list.end  (),
                                                          scanner))
                {
                   return false;
@@ -3730,7 +3746,7 @@ namespace exprtk
             inline bool register_modifier(lexer::token_modifier* modifier)
             {
                if (token_modifier_list.end() != std::find(token_modifier_list.begin(),
-                                                          token_modifier_list.end(),
+                                                          token_modifier_list.end  (),
                                                           modifier))
                {
                   return false;
@@ -3744,7 +3760,7 @@ namespace exprtk
             inline bool register_joiner(lexer::token_joiner* joiner)
             {
                if (token_joiner_list.end() != std::find(token_joiner_list.begin(),
-                                                        token_joiner_list.end(),
+                                                        token_joiner_list.end  (),
                                                         joiner))
                {
                   return false;
@@ -3758,7 +3774,7 @@ namespace exprtk
             inline bool register_inserter(lexer::token_inserter* inserter)
             {
                if (token_inserter_list.end() != std::find(token_inserter_list.begin(),
-                                                          token_inserter_list.end(),
+                                                          token_inserter_list.end  (),
                                                           inserter))
                {
                   return false;
@@ -8115,6 +8131,7 @@ namespace exprtk
 
                   int i = 0;
 
+                  exprtk_disable_fallthrough_begin
                   switch (lud.remainder)
                   {
                      #define case_stmt(N)                      \
@@ -8131,6 +8148,7 @@ namespace exprtk
                      case_stmt( 3) case_stmt( 2)
                      case_stmt( 1)
                   }
+                  exprtk_disable_fallthrough_end
 
                   #undef exprtk_loop
                   #undef case_stmt
@@ -8453,8 +8471,8 @@ namespace exprtk
                range_t& range1 = (*str1_range_ptr_);
 
                if (
-                    range0(s0_r0,s0_r1,str0_base_ptr_->size()) &&
-                    range1(s1_r0,s1_r1,str1_base_ptr_->size())
+                    range0(s0_r0, s0_r1, str0_base_ptr_->size()) &&
+                    range1(s1_r0, s1_r1, str1_base_ptr_->size())
                   )
                {
                   std::size_t size = std::min((s0_r1 - s0_r0),(s1_r1 - s1_r0)) + 1;
@@ -9622,6 +9640,7 @@ namespace exprtk
                   vec += lud.batch_size;
                }
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N) \
@@ -9638,6 +9657,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -9770,6 +9790,7 @@ namespace exprtk
                   vec1 += lud.batch_size;
                }
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)        \
@@ -9786,6 +9807,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -10036,6 +10058,7 @@ namespace exprtk
                   vec += lud.batch_size;
                }
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)                  \
@@ -10052,6 +10075,8 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
+
 
                #undef exprtk_loop
                #undef case_stmt
@@ -10183,6 +10208,7 @@ namespace exprtk
 
                int i = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)                                             \
@@ -10199,6 +10225,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -10368,6 +10395,7 @@ namespace exprtk
 
                int i = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)                                             \
@@ -10384,6 +10412,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -10523,6 +10552,7 @@ namespace exprtk
 
                int i = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)                                       \
@@ -10539,6 +10569,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -10676,6 +10707,7 @@ namespace exprtk
 
                int i = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)                                       \
@@ -10692,6 +10724,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -10826,6 +10859,7 @@ namespace exprtk
 
                int i = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (lud.remainder)
                {
                   #define case_stmt(N)                                     \
@@ -10842,6 +10876,7 @@ namespace exprtk
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef exprtk_loop
                #undef case_stmt
@@ -12768,6 +12803,7 @@ namespace exprtk
                T result = T(0);
                int i    = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (vec_size)
                {
                   #define case_stmt(N)         \
@@ -12784,6 +12820,7 @@ namespace exprtk
                   case_stmt( 4) case_stmt( 3)
                   case_stmt( 2) case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef case_stmt
 
@@ -12818,6 +12855,7 @@ namespace exprtk
 
             int i = 0;
 
+            exprtk_disable_fallthrough_begin
             switch (lud.remainder)
             {
                #define case_stmt(N)       \
@@ -12834,6 +12872,7 @@ namespace exprtk
                case_stmt( 3) case_stmt( 2)
                case_stmt( 1)
             }
+            exprtk_disable_fallthrough_end
 
             #undef exprtk_loop
             #undef case_stmt
@@ -12865,6 +12904,7 @@ namespace exprtk
                T result = T(1);
                int i    = 0;
 
+               exprtk_disable_fallthrough_begin
                switch (vec_size)
                {
                   #define case_stmt(N)         \
@@ -12881,6 +12921,7 @@ namespace exprtk
                   case_stmt( 4) case_stmt( 3)
                   case_stmt( 2) case_stmt( 1)
                }
+               exprtk_disable_fallthrough_end
 
                #undef case_stmt
 
@@ -12915,6 +12956,7 @@ namespace exprtk
 
             int i = 0;
 
+            exprtk_disable_fallthrough_begin
             switch (lud.remainder)
             {
                #define case_stmt(N)       \
@@ -12931,6 +12973,7 @@ namespace exprtk
                case_stmt( 3) case_stmt( 2)
                case_stmt( 1)
             }
+            exprtk_disable_fallthrough_end
 
             #undef exprtk_loop
             #undef case_stmt
@@ -17016,6 +17059,8 @@ namespace exprtk
             return false;
          else if (symbol_exists(vector_name))
             return false;
+         else if (0 == v_size)
+            return false;
          else
             return local_data().vector_store.add(vector_name,v,v_size);
       }
@@ -17029,6 +17074,8 @@ namespace exprtk
             return false;
          else if (symbol_exists(vector_name))
             return false;
+         else if (0 == v.size())
+            return false;
          else
             return local_data().vector_store.add(vector_name,v);
       }
@@ -17040,6 +17087,8 @@ namespace exprtk
          else if (!valid_symbol(vector_name))
             return false;
          else if (symbol_exists(vector_name))
+            return false;
+         else if (0 == v.size())
             return false;
          else
             return local_data().vector_store.add(vector_name,v);
@@ -18027,6 +18076,7 @@ namespace exprtk
       typedef details::scor_node<T>                             scor_node_t;
       typedef lexer::token                                          token_t;
       typedef expression_node_t*                        expression_node_ptr;
+      typedef expression<T>                                    expression_t;
       typedef symbol_table<T>                                symbol_table_t;
       typedef typename expression<T>::symtab_list_t     symbol_table_list_t;
       typedef details::vector_holder<T>*                  vector_holder_ptr;
@@ -18336,7 +18386,7 @@ namespace exprtk
                     se.active   &&
                     se.var_node &&
                     details::is_variable_node(se.var_node)
-                 )
+                  )
                {
                   variable_node_ptr vn = reinterpret_cast<variable_node_ptr>(se.var_node);
 
@@ -19862,6 +19912,17 @@ namespace exprtk
 
             return false;
          }
+      }
+
+      inline expression_t compile(const std::string& expression_string, symbol_table_t& symtab)
+      {
+         expression_t expr;
+
+         expr.register_symbol_table(symtab);
+
+         compile(expression_string,expr);
+
+         return expr;
       }
 
       void process_lexer_errors()
@@ -34052,15 +34113,15 @@ namespace exprtk
             return expression_point;
          }
 
-         bool strength_reduction_enabled_;
+         bool                     strength_reduction_enabled_;
          details::node_allocator* node_allocator_;
-         synthesize_map_t synthesize_map_;
-         unary_op_map_t* unary_op_map_;
-         binary_op_map_t* binary_op_map_;
-         inv_binary_op_map_t* inv_binary_op_map_;
-         sf3_map_t* sf3_map_;
-         sf4_map_t* sf4_map_;
-         parser_t* parser_;
+         synthesize_map_t         synthesize_map_;
+         unary_op_map_t*          unary_op_map_;
+         binary_op_map_t*         binary_op_map_;
+         inv_binary_op_map_t*     inv_binary_op_map_;
+         sf3_map_t*               sf3_map_;
+         sf4_map_t*               sf4_map_;
+         parser_t*                parser_;
       };
 
       inline void set_error(const parser_error::type& error_type)
@@ -35454,7 +35515,7 @@ namespace exprtk
          inline T operator()(type v0, type v1)
          {
             scoped_bft<func_2param> sb(*this);
-            base_func::update(v0,v1);
+            base_func::update(v0, v1);
             T result = this->value(base_func::expression);
 
             return result;
@@ -35470,7 +35531,7 @@ namespace exprtk
          inline T operator()(type v0, type v1, type v2)
          {
             scoped_bft<func_3param> sb(*this);
-            base_func::update(v0,v1,v2);
+            base_func::update(v0, v1, v2);
             T result = this->value(base_func::expression);
 
             return result;
@@ -35486,7 +35547,7 @@ namespace exprtk
          inline T operator()(type v0, type v1, type v2, type v3)
          {
             scoped_bft<func_4param> sb(*this);
-            base_func::update(v0,v1,v2,v3);
+            base_func::update(v0, v1, v2, v3);
             T result = this->value(base_func::expression);
 
             return result;
@@ -35502,7 +35563,7 @@ namespace exprtk
          inline T operator()(type v0, type v1, type v2, type v3, type v4)
          {
             scoped_bft<func_5param> sb(*this);
-            base_func::update(v0,v1,v2,v3,v4);
+            base_func::update(v0, v1, v2, v3, v4);
             T result = this->value(base_func::expression);
 
             return result;
@@ -35518,7 +35579,7 @@ namespace exprtk
          inline T operator()(type v0, type v1, type v2, type v3, type v4, type v5)
          {
             scoped_bft<func_6param> sb(*this);
-            base_func::update(v0,v1,v2,v3,v4,v5);
+            base_func::update(v0, v1, v2, v3, v4, v5);
             T result = this->value(base_func::expression);
 
             return result;
