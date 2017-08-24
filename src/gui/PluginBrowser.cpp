@@ -54,58 +54,20 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	view_layout->setSpacing( 5 );
 
 
-	m_hint.reset(new QLabel( tr( "Drag an instrument "
+	auto hint = new QLabel( tr( "Drag an instrument "
 					"into either the Song-Editor, the "
 					"Beat+Bassline Editor or into an "
 					"existing instrument track." ),
-								m_view )
-	);
-	m_hint->setWordWrap( true );
-	// TODO fixed height causes some descriptions to be cropped;
-	// variable height causes layout resizing.
-	// Maybe pre-set to a height where resizing is never needed.
-	m_hint->setFixedHeight( m_hint->sizeHint().height() );
+								m_view );
+	hint->setWordWrap( true );
 
 	QScrollArea* scrollarea = new QScrollArea( m_view );
 	PluginDescList* descList = new PluginDescList( m_view );
-	QObject::connect(
-			descList,SIGNAL(highlight(Plugin::Descriptor const&)),
-			this,SLOT(highlightPlugin(Plugin::Descriptor const&))
-	);
-	QObject::connect(
-			descList,SIGNAL(unhighlight()),
-			this,SLOT(highlightNone())
-	);
-
 	scrollarea->setWidget(descList);
 	scrollarea->setWidgetResizable(true);
 
-	view_layout->addWidget(m_hint.get());
+	view_layout->addWidget(hint);
 	view_layout->addWidget(scrollarea);
-}
-
-
-void PluginBrowser::highlightNone(){
-	m_hint->setText(
-		tr( "Drag an instrument "
-		    "into either the Song-Editor, the "
-			"Beat+Bassline Editor or into an "
-			"existing instrument track."
-		)
-	);
-	changeTitle("Instrument Plugins");
-	changeIcon(embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ));
-	update();
-}
-
-void PluginBrowser::highlightPlugin(Plugin::Descriptor const& pd)
-{
-	m_hint->setText(
-		tr(pd.description)
-	);
-	changeTitle(pd.displayName);
-	changeIcon(pd.logo->pixmap().transformed(QTransform().rotate(90)));
-	update();
 }
 
 
@@ -128,15 +90,6 @@ PluginDescList::PluginDescList(QWidget *parent) :
 	for (const Plugin::Descriptor* desc : descs)
 	{
 		PluginDescWidget* p = new PluginDescWidget( *desc, this );
-		QObject::connect(
-				p,SIGNAL(highlight(Plugin::Descriptor const&)),
-				this,SLOT(receiveHighlight(Plugin::Descriptor const&))
-		);
-
-		QObject::connect(
-				p,SIGNAL(unhighlight()),
-				this,SLOT(receiveUnhighlight())
-		);
 		p->show();
 		layout->addWidget(p);
 	}
@@ -145,22 +98,12 @@ PluginDescList::PluginDescList(QWidget *parent) :
 	layout->addStretch();
 }
 
-void PluginDescList::receiveHighlight(Plugin::Descriptor const& pd){
-	emit highlight(pd);
-}
-
-void PluginDescList::receiveUnhighlight()
-{
-	emit unhighlight();
-}
-
 
 
 
 PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
 	m_logo( _pd.logo->pixmap() ),
 	m_mouseOver( false )
@@ -168,6 +111,7 @@ PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
 	setFixedHeight( DEFAULT_HEIGHT );
 	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
+	setToolTip(_pd.description);
 }
 
 
@@ -209,8 +153,6 @@ void PluginDescWidget::enterEvent( QEvent * _e )
 {
 	m_mouseOver = true;
 
-	emit highlight(m_pluginDescriptor);
-
 	QWidget::enterEvent( _e );
 }
 
@@ -220,8 +162,6 @@ void PluginDescWidget::enterEvent( QEvent * _e )
 void PluginDescWidget::leaveEvent( QEvent * _e )
 {
 	m_mouseOver = false;
-
-	emit unhighlight();
 
 	QWidget::leaveEvent( _e );
 }
