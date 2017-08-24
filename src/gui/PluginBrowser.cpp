@@ -24,8 +24,6 @@
 
 #include "PluginBrowser.h"
 
-#include <iostream>
-
 #include <QLabel>
 #include <QPainter>
 #include <QMouseEvent>
