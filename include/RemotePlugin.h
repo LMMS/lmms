@@ -1072,6 +1072,14 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 							const message & _wm,
 							bool _busy_waiting )
 {
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	if( _busy_waiting )
+	{
+		// No point processing events outside of the main thread
+		_busy_waiting = QThread::currentThread() ==
+					QCoreApplication::instance()->thread();
+	}
+#endif
 	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT
