@@ -88,8 +88,8 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	uint8_t buffer[BUFFER_SIZE];
 	uint32_t size;
 
-	for(const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
-	for(const Track* track : tracks_BB) if (track->type() == Track::InstrumentTrack) nTracks++;
+	for (const Track* track : tracks) if (track->type() == Track::InstrumentTrack) nTracks++;
+	for (const Track* track : tracks_BB) if (track->type() == Track::InstrumentTrack) nTracks++;
 
 	// midi header
 	MidiFile::MIDIHeader header(nTracks);
@@ -99,7 +99,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	std::vector<std::vector<std::pair<int,int>>> plists;
 
 	// midi tracks
-	for( Track* track : tracks )
+	for (Track* track : tracks)
 	{
 		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
@@ -120,7 +120,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 
 			MidiNoteVector pat;
 
-			for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
+			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
 				if (n.nodeName() == "instrumenttrack")
@@ -154,7 +154,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 			element = bbTrack->saveState(dataFile, dataFile.content());
 
 			std::vector<std::pair<int,int>> plist;
-			for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
+			for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 			{
 
 				if (n.nodeName() == "bbtco")
@@ -172,7 +172,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 	} // for each track
 
 	// midi tracks in BB tracks
-	for( Track* track : tracks_BB )
+	for (Track* track : tracks_BB)
 	{
 		DataFile dataFile(DataFile::SongProject);
 		MTrack mtrack;
@@ -180,7 +180,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		auto itr = plists.begin();
 		std::vector<std::pair<int,int>> st;
 
-		if(track->type() != Track::InstrumentTrack) continue;
+		if (track->type() != Track::InstrumentTrack) continue;
 
 		mtrack.addName(track->name().toStdString(), 0);
 		//mtrack.addProgramChange(0, 0);
@@ -192,7 +192,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 		int base_pitch = 0;
 		double base_volume = 1.0;
 
-		for(QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
+		for (QDomNode n = element.firstChild(); !n.isNull(); n = n.nextSibling())
 		{
 			if (n.nodeName() == "instrumenttrack")
 			{
@@ -216,20 +216,20 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				// workaround for nested BBTCOs
 				int pos = 0;
 				int len = n.toElement().attribute("steps", "1").toInt() * 12;
-				for(auto it = plist.begin(); it != plist.end(); ++it)
+				for (auto it = plist.begin(); it != plist.end(); ++it)
 				{
-					while(!st.empty() && st.back().second <= it->first)
+					while (!st.empty() && st.back().second <= it->first)
 					{
 						writeBBPattern(pat, nv, len, st.back().first, pos, st.back().second);
 						pos = st.back().second;
 						st.pop_back();
 					}
 
-					if(!st.empty() && st.back().second <= it->second)
+					if (!st.empty() && st.back().second <= it->second)
 					{
 						writeBBPattern(pat, nv, len, st.back().first, pos, it->first);
 						pos = it->first;
-						while(!st.empty() && st.back().second <= it->second)
+						while (!st.empty() && st.back().second <= it->second)
 						{
 							st.pop_back();
 						}
@@ -239,7 +239,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					pos = it->first;
 				}
 
-				while(!st.empty())
+				while (!st.empty())
 				{
 					writeBBPattern(pat, nv, len, st.back().first, pos, st.back().second);
 					pos = st.back().second;
@@ -265,7 +265,7 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 				int base_pitch, double base_volume, int base_time)
 {
 	// TODO interpret steps="12" muted="0" type="1" name="Piano1"  len="2592"
-	for(QDomNode nn = n.firstChild(); !nn.isNull(); nn = nn.nextSibling())
+	for (QDomNode nn = n.firstChild(); !nn.isNull(); nn = nn.nextSibling())
 	{
 		QDomElement note = nn.toElement();
 		if (note.attribute("len", "0") == "0") continue;
@@ -283,7 +283,7 @@ void MidiExport::writePattern(MidiNoteVector &pat, QDomNode n,
 
 void MidiExport::writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv)
 {
-	for(auto it = nv.begin(); it != nv.end(); ++it)
+	for (auto it = nv.begin(); it != nv.end(); ++it)
 	{
 		mtrack.addNote(it->pitch, it->volume, it->time / 48.0, it->duration / 48.0);
 	}
@@ -298,9 +298,9 @@ void MidiExport::writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
 	start -= base;
 	end -= base;
 	std::sort(src.begin(), src.end());
-	for(auto it = src.begin(); it != src.end(); ++it)
+	for (auto it = src.begin(); it != src.end(); ++it)
 	{
-		for(int time = it->time  + ceil((start - it->time) / len)
+		for (int time = it->time  + ceil((start - it->time) / len)
 				* len; time < end; time += len)
 		{
 			MidiNote note;
@@ -319,14 +319,14 @@ void MidiExport::ProcessBBNotes(MidiNoteVector &nv)
 {
 	std::sort(nv.begin(), nv.end());
 	int cur = INT_MAX, next = INT_MAX;
-	for(auto it = nv.rbegin(); it != nv.rend(); ++it)
+	for (auto it = nv.rbegin(); it != nv.rend(); ++it)
 	{
 		if (it->time < cur)
 		{
 			next = cur;
 			cur = it->time;
 		}
-		if(it->duration < 0)
+		if (it->duration < 0)
 		{
 			it->duration = qMin(-it->duration, next - cur);
 		}
