@@ -102,6 +102,8 @@ public:
 
 
 public slots:
+	void loadSample();
+	void reloadSample();
 	void updateSample();
 
 

@@ -303,6 +303,28 @@ SampleTCOView::~SampleTCOView()
 
 
 
+void SampleTCOView::loadSample()
+{
+	QString af = m_tco->m_sampleBuffer->openAudioFile();
+	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
+	{
+		m_tco->setSampleFile( af );
+		Engine::getSong()->setModified();
+	}
+}
+
+
+
+
+void SampleTCOView::reloadSample()
+{
+	m_tco->setSampleFile( m_tco->m_sampleBuffer->audioFile() );
+	Engine::getSong()->setModified();
+}
+
+
+
+
 void SampleTCOView::updateSample()
 {
 	update();
@@ -324,6 +346,14 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	}
 
 	QMenu contextMenu( this );
+
+	contextMenu.addAction( embed::getIconPixmap( "sample_file" ),
+			       tr( "Load sample" ),
+			       this, SLOT( loadSample() ) );
+	contextMenu.addAction( embed::getIconPixmap( "reload" ),
+			       tr( "Reload" ),
+			       this, SLOT( reloadSample() ) );
+	contextMenu.addSeparator();
 	if( fixedTCOs() == false )
 	{
 		contextMenu.addAction( embed::getIconPixmap( "cancel" ),
@@ -437,12 +467,15 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 
 void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 {
+	loadSample();
+	/*
 	QString af = m_tco->m_sampleBuffer->openAudioFile();
 	if( af != "" && af != m_tco->m_sampleBuffer->audioFile() )
 	{
 		m_tco->setSampleFile( af );
 		Engine::getSong()->setModified();
 	}
+	*/
 }
 
 
