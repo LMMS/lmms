@@ -1066,7 +1066,6 @@ void GigInstrumentView::showFileDialog()
 	types << tr( "GIG Files (*.gig)" );
 	ofd.setNameFilters( types );
 
-	QString dir;
 	if( k->m_filename != "" )
 	{
 		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );

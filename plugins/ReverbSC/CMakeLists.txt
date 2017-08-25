@@ -7,18 +7,18 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 BUILD_PLUGIN(
 	reverbsc
-	ReverbSC.cpp 
-	ReverbSCControls.cpp 
-	ReverbSCControlDialog.cpp 
+	ReverbSC.cpp
+	ReverbSCControls.cpp
+	ReverbSCControlDialog.cpp
 	base.c
 	revsc.c
-	dcblock.c
-	MOCFILES 
-	ReverbSC.h
-	ReverbSCControls.h 
-	ReverbSCControlDialog.h 
 	base.h
 	revsc.h
 	dcblock.h
+	dcblock.c
+	ReverbSC.h
+	MOCFILES
+	ReverbSCControls.h
+	ReverbSCControlDialog.h
 	EMBEDDED_RESOURCES artwork.png logo.png
 )

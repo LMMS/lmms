@@ -42,6 +42,7 @@
 #include "Mixer.h"
 #include "GuiApplication.h"
 #include "PixmapButton.h"
+#include "SampleBuffer.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 #include "ToolTip.h"
@@ -174,17 +175,6 @@ void vestigeInstrument::setParameter( void )
 
 void vestigeInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if( QFileInfo( m_pluginDLL ).isAbsolute() )
-	{
-		QString f = QString( m_pluginDLL ).replace( QDir::separator(), '/' );
-		QString vd = QString( ConfigManager::inst()->vstDir() ).replace( QDir::separator(), '/' );
-        	QString relativePath;
-		if( !( relativePath = f.section( vd, 1, 1 ) ).isEmpty() )
-		{
-			m_pluginDLL = relativePath;
-		}
-	}
-
 	_this.setAttribute( "plugin", m_pluginDLL );
 	m_pluginMutex.lock();
 	if( m_plugin != NULL )
@@ -254,8 +244,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		closePlugin();
 	}
-
-	m_pluginDLL = _file;
+	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
 	TextFloat * tf = TextFloat::displayMessage(
 			tr( "Loading plugin" ),
 			tr( "Please wait while loading VST-plugin..." ),
@@ -269,6 +258,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 		delete tf;
 		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( m_pluginDLL ) );
+		m_pluginDLL = "";
 		return;
 	}
 
@@ -426,9 +416,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
 	m_managePluginButton->move( 216, 101 );
 	m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu_active" ) );
+							"controls_active" ) );
 	m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
-							"track_op_menu" ) );
+							"controls" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
 	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
@@ -441,9 +431,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_openPresetButton->setCheckable( false );
 	m_openPresetButton->setCursor( Qt::PointingHandCursor );
 	m_openPresetButton->move( 200, 224 );
-	m_openPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_openPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"project_open", 20, 20 ) );
-	m_openPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_openPresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_open", 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
@@ -457,9 +447,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolLPresetButton->setCheckable( false );
 	m_rolLPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolLPresetButton->move( 190, 201 );
-	m_rolLPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolLPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"stepper-left-press" ) );
-	m_rolLPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolLPresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"stepper-left" ) );
 	connect( m_rolLPresetButton, SIGNAL( clicked() ), this,
 						SLOT( previousProgram() ) );
@@ -475,9 +465,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_savePresetButton->setCheckable( false );
 	m_savePresetButton->setCursor( Qt::PointingHandCursor );
 	m_savePresetButton->move( 224, 224 );
-	m_savePresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_savePresetButton->setActiveGraphic( embed::getIconPixmap(
 							"project_save", 20, 20  ) );
-	m_savePresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_savePresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"project_save", 20, 20  ) );
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
@@ -491,9 +481,9 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_rolRPresetButton->setCheckable( false );
 	m_rolRPresetButton->setCursor( Qt::PointingHandCursor );
 	m_rolRPresetButton->move( 209, 201 );
-	m_rolRPresetButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolRPresetButton->setActiveGraphic( embed::getIconPixmap(
 							"stepper-right-press" ) );
-	m_rolRPresetButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+	m_rolRPresetButton->setInactiveGraphic( embed::getIconPixmap(
 							"stepper-right" ) );
 	connect( m_rolRPresetButton, SIGNAL( clicked() ), this,
 						SLOT( nextProgram() ) );
@@ -514,7 +504,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( menu, SIGNAL( aboutToShow() ), this, SLOT( updateMenu() ) );
 
 
-	m_selPresetButton->setIcon( PLUGIN_NAME::getIconPixmap( "stepper-down" ) );
+	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 	m_selPresetButton->setWhatsThis(
 		tr( "Click here to select presets that are currently loaded in VST." ) );
 
@@ -534,7 +524,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
 	note_off_all_btn->setGeometry( 20, 160, 200, 24 );
-	note_off_all_btn->setIcon( embed::getIconPixmap( "state_stop" ) );
+	note_off_all_btn->setIcon( embed::getIconPixmap( "stop" ) );
 	note_off_all_btn->setFont( pointSize<8>( note_off_all_btn->font() ) );
 	connect( note_off_all_btn, SIGNAL( clicked() ), this,
 							SLOT( noteOffAll() ) );
@@ -614,29 +604,22 @@ void VestigeInstrumentView::openPlugin()
 {
 	FileDialog ofd( NULL, tr( "Open VST-plugin" ) );
 
-	QString dir;
-	if( m_vi->m_pluginDLL != "" )
-	{
-		dir = QFileInfo( m_vi->m_pluginDLL ).absolutePath();
-	}
-	else
-	{
-		dir = ConfigManager::inst()->vstDir();
-	}
-	// change dir to position of previously opened file
-	ofd.setDirectory( dir );
-	ofd.setFileMode( FileDialog::ExistingFiles );
-
 	// set filters
 	QStringList types;
 	types << tr( "DLL-files (*.dll)" )
 		<< tr( "EXE-files (*.exe)" )
 		;
 	ofd.setNameFilters( types );
+
 	if( m_vi->m_pluginDLL != "" )
 	{
-		// select previously opened file
-		ofd.selectFile( QFileInfo( m_vi->m_pluginDLL ).fileName() );
+		QString f = SampleBuffer::tryToMakeAbsolute( m_vi->m_pluginDLL );
+		ofd.setDirectory( QFileInfo( f ).absolutePath() );
+		ofd.selectFile( QFileInfo( f ).fileName() );
+	}
+	else
+	{
+		ofd.setDirectory( ConfigManager::inst()->vstDir() );
 	}
 
 	if ( ofd.exec () == QDialog::Accepted )

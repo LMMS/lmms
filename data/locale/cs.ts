@@ -47,7 +47,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Contributors ordered by number of commits:</source>
-        <translation>Přispěvovatelé řazeni podle počtu příspěvků</translation>
+        <translation>Přispěvovatelé řazeni podle počtu příspěvků:</translation>
     </message>
     <message>
         <source>Copyright © %1</source>
@@ -55,7 +55,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -151,19 +151,19 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Startpoint:</source>
-        <translation>Počáteční bod:</translation>
+        <translation>Začátek samplu:</translation>
     </message>
     <message>
         <source>Endpoint:</source>
-        <translation>Koncový bod:</translation>
+        <translation>Konec samplu:</translation>
     </message>
     <message>
         <source>Continue sample playback across notes</source>
-        <translation>Přehrávat sampl napříč tóny</translation>
+        <translation>Pokračovat v přehrávání samplu při změně noty</translation>
     </message>
     <message>
         <source>Enabling this option makes the sample continue playing across different notes - if you change pitch, or the note length stops before the end of the sample, then the next note played will continue where it left off. To reset the playback to the start of the sample, insert a note at the bottom of the keyboard (&lt; 20 Hz)</source>
-        <translation>Povolení této možnosti způsobí, že se sampl bude přehrávat přes různé tóny – když změníte výšku tónu nebo když tón skončí před koncem samplu, bude další přehrávaný tón pokračovat tam, kde přestal. Pro obnovení přehrávání od začátku samplu vložte tón do spodní části kláves (&lt; 20 Hz)</translation>
+        <translation>Povolení této možnosti způsobí, že se sampl bude přehrávat přes různé tóny – když změníte výšku tónu nebo když tón skončí před koncem samplu, bude další přehrávaný tón pokračovat tam, kde přestal. Pro obnovení přehrávání od začátku samplu vložte tón do spodní části klávesnice (&lt; 20 Hz)</translation>
     </message>
     <message>
         <source>Disable loop</source>
@@ -217,15 +217,15 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>LMMS was kicked by JACK for some reason. Therefore the JACK backend of LMMS has been restarted. You will have to make manual connections again.</source>
-        <translation type="unfinished"/>
+        <translation>LMMS bylo z nějakého důvodu shozeno JACKem. Proto byl ovladač JACK v LMMS restartován. Musíte znovu provést ruční připojení.</translation>
     </message>
     <message>
         <source>JACK server down</source>
-        <translation type="unfinished"/>
+        <translation>JACK server byl zastaven</translation>
     </message>
     <message>
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
-        <translation type="unfinished"/>
+        <translation>Vypnutí a nové spuštění serveru JACK se nezdařilo. LMMS proto nemůže pokračovat. Uložte svůj projekt a restartujte JACK i LMMS.</translation>
     </message>
     <message>
         <source>CLIENT-NAME</source>
@@ -251,7 +251,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     <name>AudioPortAudio::setupWidget</name>
     <message>
         <source>BACKEND</source>
-        <translation>BACKEND</translation>
+        <translation>OVLADAČ</translation>
     </message>
     <message>
         <source>DEVICE</source>
@@ -291,7 +291,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     <name>AudioSoundIo::setupWidget</name>
     <message>
         <source>BACKEND</source>
-        <translation>BACKEND</translation>
+        <translation>OVLADAČ</translation>
     </message>
     <message>
         <source>DEVICE</source>
@@ -314,7 +314,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Edit song-global automation</source>
-        <translation>Editovat automatizaci pro celou skladbu</translation>
+        <translation>Upravit automatizaci pro celou skladbu</translation>
     </message>
     <message>
         <source>Connected to %1</source>
@@ -326,7 +326,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Edit connection...</source>
-        <translation>Editovat připojení...</translation>
+        <translation>Upravit připojení...</translation>
     </message>
     <message>
         <source>Remove connection</source>
@@ -364,11 +364,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     <name>AutomationEditorWindow</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation>Přehrát nebo pozastavit přehrávání aktuálního patternu (mezerník)</translation>
+        <translation>Přehrát/Pozastavit přehrávání aktuálního patternu (mezerník)</translation>
     </message>
     <message>
         <source>Click here if you want to play the current pattern. This is useful while editing it.  The pattern is automatically looped when the end is reached.</source>
-        <translation>Klikněte zde, pokud chcete přehrát aktuální pattern. To je šikovné při editaci, neboť pattern je automaticky přehráván ve smyčce.</translation>
+        <translation>Klepněte sem, pokud chcete přehrát aktuální pattern. To je šikovné při editaci, neboť pattern je automaticky přehráván ve smyčce.</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
@@ -376,7 +376,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Click here if you want to stop playing of the current pattern.</source>
-        <translation>Klikněte zde, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
+        <translation>Klepněte sem, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
@@ -396,19 +396,19 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Click here and the pattern will be inverted.The points are flipped in the y direction. </source>
-        <translation>Klikněte sem, pokud chcete převrátit pattern. Body budou převráceny v ose y.</translation>
+        <translation>Klepněte sem, pokud chcete převrátit pattern. Body budou převráceny v ose y.</translation>
     </message>
     <message>
         <source>Click here and the pattern will be reversed. The points are flipped in the x direction.</source>
-        <translation>Klikněte sem, pokud chcete převrátit pattern. Body budou převráceny v ose x.</translation>
+        <translation>Klepněte sem, pokud chcete převrátit pattern. Body budou převráceny v ose x.</translation>
     </message>
     <message>
         <source>Click here and draw-mode will be activated. In this mode you can add and move single values.  This is the default mode which is used most of the time.  You can also press &apos;Shift+D&apos; on your keyboard to activate this mode.</source>
-        <translation>Klikněte sem, pokud chcete aktivovat režim kreslení. V tomto výchozím a nejčastěji užívaném režimu lze přidávat a přesunovat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+D.</translation>
+        <translation>Klepněte sem, pokud chcete aktivovat režim kreslení. V tomto výchozím a nejčastěji užívaném režimu lze přidávat a přesunovat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky &quot;Shift+D&quot;.</translation>
     </message>
     <message>
         <source>Click here and erase-mode will be activated. In this mode you can erase single values. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation>Klikněte sem, pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky Shift+E.</translation>
+        <translation>Klepněte sem, pokud chcete aktivovat režim mazání. V tomto režimu lze mazat jednotlivé hodnoty. Pro aktivaci můžete využít též klávesové zkratky &quot;Shift+E&quot;.</translation>
     </message>
     <message>
         <source>Discrete progression</source>
@@ -436,11 +436,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Click here to choose linear progressions for this automation pattern.  The value of the connected object will change at a steady rate over time between control points to reach the correct value at each control point without a sudden change.</source>
-        <translation>Kliknutím sem vyberete lineární vývoj pro tento automatizační pattern.  Hodnota připojeného objektu se změní ve stabilní frekvenci mezi ovládacími body, aby postupně došlo k dosažení dalšího kontrolního bodu.</translation>
+        <translation>Kliknutím sem vyberete lineární vývoj pro tento automatizační pattern.  Hodnota připojeného objektu bude mezi ovládacími body měněna přímočaře, aby postupně došlo k dosažení dalšího kontrolního bodu.</translation>
     </message>
     <message>
         <source>Click here to choose cubic hermite progressions for this automation pattern.  The value of the connected object will change in a smooth curve and ease in to the peaks and valleys.</source>
-        <translation>Kliknutím sem vyberte cubic hermite vývoj pro tento automatizační pattern.  Hodnota připojeného objektu se změní po plynulé křivce a lehce přejde do vrchních a spodních bodů.</translation>
+        <translation>Kliknutím sem vyberte vývoj typu cubic hermite pro tento automatizační pattern.  Hodnota připojeného objektu se změní po plynulé křivce a lehce přejde do vrchních a spodních bodů.</translation>
     </message>
     <message>
         <source>Cut selected values (%1+X)</source>
@@ -456,11 +456,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Click here and selected values will be cut into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klikněte zde, pokud chcete označené hodnoty vyjmout a uložit do schránky. Vložit je pak můžete kdekoliv v libovolném patternu pomocí tlačítka Vložit.</translation>
+        <translation>Klepněte sem, pokud chcete označené hodnoty vyjmout a uložit do schránky. Vložit je pak můžete kdekoliv v libovolném patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
         <source>Click here and selected values will be copied into the clipboard.  You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klikněte zde, pokud chcete označené hodnoty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
+        <translation>Klepněte sem, pokud chcete označené hodnoty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
         <source>Click here and the values from the clipboard will be pasted at the first visible measure.</source>
@@ -472,15 +472,15 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Automation Editor - no pattern</source>
-        <translation>Automatizační editor - žádný pattern</translation>
+        <translation>Editor automatizace – žádný pattern</translation>
     </message>
     <message>
         <source>Automation Editor - %1</source>
-        <translation>Automatizační editor - %1</translation>
+        <translation>Editor automatizace – %1</translation>
     </message>
     <message>
         <source>Edit actions</source>
-        <translation>Upravit akce</translation>
+        <translation>Akce úprav</translation>
     </message>
     <message>
         <source>Interpolation controls</source>
@@ -500,7 +500,15 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation>Model je již k tomuto paternu připojen </translation>
+        <translation>Model je již k tomuto patternu připojen.</translation>
+    </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Kvantizace</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Kvantizace. Nastaví nejmenší velikost kroku pro body automatizace. Ve výchozím stavu také nastaví  délku a vymazává další body v rozsahu. Stisknutím &lt;Ctrl&gt; zrušíte toto chování.</translation>
     </message>
 </context>
 <context>
@@ -514,11 +522,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     <name>AutomationPatternView</name>
     <message>
         <source>double-click to open this pattern in automation editor</source>
-        <translation>dvojklikem otevřít tento pattern v automatizačním editoru</translation>
+        <translation>dvojklikem otevřít tento pattern v Editoru automatizace</translation>
     </message>
     <message>
         <source>Open in Automation editor</source>
-        <translation>Otevřít v automatizačním editoru</translation>
+        <translation>Otevřít v Editoru automatizace</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -526,7 +534,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Reset name</source>
-        <translation>Resetovat jméno</translation>
+        <translation>Obnovit výchozí jméno</translation>
     </message>
     <message>
         <source>Change name</source>
@@ -542,37 +550,37 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Set/clear record</source>
-        <translation>Nastav/vyčisti záznam</translation>
+        <translation>Zapnout/Vypnout záznam</translation>
     </message>
     <message>
         <source>Flip Vertically (Visible)</source>
-        <translation>Převrátit vertikálně (viditelně)</translation>
+        <translation>Převrátit vertikálně (viditelné)</translation>
     </message>
     <message>
         <source>Flip Horizontally (Visible)</source>
-        <translation>Převrátit horizontálně (viditelně)</translation>
+        <translation>Převrátit horizontálně (viditelné)</translation>
     </message>
     <message>
         <source>Model is already connected to this pattern.</source>
-        <translation>Model je již k tomuto paternu připojen.</translation>
+        <translation>Model je již k tomuto patternu připojen.</translation>
     </message>
 </context>
 <context>
     <name>AutomationTrack</name>
     <message>
         <source>Automation track</source>
-        <translation>Automatizační stopa</translation>
+        <translation>Stopa automatizace</translation>
     </message>
 </context>
 <context>
     <name>BBEditor</name>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Editor bicích a basů</translation>
+        <translation>Editor bicích/basů</translation>
     </message>
     <message>
         <source>Play/pause current beat/bassline (Space)</source>
-        <translation>Přehrát/pozastavit přehrávání aktuálního patternu bicích/basů (mezerník)</translation>
+        <translation>Přehrát/Pozastavit přehrávání aktuálního patternu bicích/basů (mezerník)</translation>
     </message>
     <message>
         <source>Stop playback of current beat/bassline (Space)</source>
@@ -580,11 +588,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Click here to play the current beat/bassline.  The beat/bassline is automatically looped when its end is reached.</source>
-        <translation>Klikněte sem, pokud chcete přehrát aktuální pattern bicích/basů. Bicí/basy jsou automaticky přehrávány ve smyčce.</translation>
+        <translation>Klepněte sem, pokud chcete přehrát aktuální pattern bicích/basů. Bicí/basy jsou automaticky přehrávány ve smyčce.</translation>
     </message>
     <message>
         <source>Click here to stop playing of current beat/bassline.</source>
-        <translation>Klikněte sem, pokud chcete zastavit přehrávání aktuálního patternu bicích/basů.</translation>
+        <translation>Klepněte sem, pokud chcete zastavit přehrávání aktuálního patternu bicích/basů.</translation>
     </message>
     <message>
         <source>Add beat/bassline</source>
@@ -592,7 +600,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation>Přidat automatizační stopu</translation>
+        <translation>Přidat stopu automatizace</translation>
     </message>
     <message>
         <source>Remove steps</source>
@@ -608,7 +616,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Track and step actions</source>
-        <translation>Akce stopy a kroku</translation>
+        <translation>Akce stopy a kroků</translation>
     </message>
     <message>
         <source>Clone Steps</source>
@@ -616,14 +624,14 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Add sample-track</source>
-        <translation>Přidat automatizační stopu</translation>
+        <translation>Přidat stopu automatizace</translation>
     </message>
 </context>
 <context>
     <name>BBTCOView</name>
     <message>
         <source>Open in Beat+Bassline-Editor</source>
-        <translation>Otevřít v editoru bicích a basů</translation>
+        <translation>Otevřít v editoru bicích/basů</translation>
     </message>
     <message>
         <source>Reset name</source>
@@ -639,14 +647,14 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Reset color to default</source>
-        <translation>REsetovat barvy do základních</translation>
+        <translation>Obnovit výchozí barvy</translation>
     </message>
 </context>
 <context>
     <name>BBTrack</name>
     <message>
         <source>Beat/Bassline %1</source>
-        <translation>Bicí a basy %1</translation>
+        <translation>Bicí/basy %1</translation>
     </message>
     <message>
         <source>Clone of %1</source>
@@ -665,11 +673,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>GAIN</source>
-        <translation>ZISK</translation>
+        <translation>ZES</translation>
     </message>
     <message>
         <source>Gain:</source>
-        <translation>Zisk:</translation>
+        <translation>Zesílení:</translation>
     </message>
     <message>
         <source>RATIO</source>
@@ -688,7 +696,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Gain</source>
-        <translation>Zisk</translation>
+        <translation>Zesílení</translation>
     </message>
     <message>
         <source>Ratio</source>
@@ -711,7 +719,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Input Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení vstupu:</translation>
     </message>
     <message>
         <source>NOIS</source>
@@ -723,51 +731,51 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Output Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení výstupu:</translation>
     </message>
     <message>
         <source>CLIP</source>
-        <translation type="unfinished"/>
+        <translation>OŘÍZ</translation>
     </message>
     <message>
         <source>Output Clip:</source>
-        <translation type="unfinished"/>
+        <translation>Oříznutí výstupu:</translation>
     </message>
     <message>
         <source>Rate</source>
-        <translation>Rychlost</translation>
+        <translation>Frekv</translation>
     </message>
     <message>
         <source>Rate Enabled</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence zapnuta</translation>
     </message>
     <message>
         <source>Enable samplerate-crushing</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout drtič vzorkovací frekvence</translation>
     </message>
     <message>
         <source>Depth</source>
-        <translation type="unfinished"/>
+        <translation>Hloubka</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
-        <translation type="unfinished"/>
+        <translation>Hloubka zapnuta</translation>
     </message>
     <message>
         <source>Enable bitdepth-crushing</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout drtič bitové hloubky</translation>
     </message>
     <message>
         <source>Sample rate:</source>
-        <translation type="unfinished"/>
+        <translation>Vzorkovací frekvence:</translation>
     </message>
     <message>
         <source>STD</source>
-        <translation type="unfinished"/>
+        <translation>STD</translation>
     </message>
     <message>
         <source>Stereo difference:</source>
-        <translation type="unfinished"/>
+        <translation>Stereo diference:</translation>
     </message>
     <message>
         <source>Levels</source>
@@ -786,7 +794,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Help (not available)</source>
-        <translation>Help (nedostupný)</translation>
+        <translation>Nápověda (nedostupná)</translation>
     </message>
 </context>
 <context>
@@ -797,7 +805,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of Carla.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro zobrazení nebo skrytí grafického uživatelského rozhraní (GUI) Carla.</translation>
     </message>
 </context>
 <context>
@@ -839,7 +847,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>MIDI-devices to receive MIDI-events from</source>
-        <translation>MIDI-zařízení k přijmu MIDI-události</translation>
+        <translation>MIDI zařízení k přijmu MIDI události</translation>
     </message>
     <message>
         <source>USER CONTROLLER</source>
@@ -863,7 +871,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Cycle Detected.</source>
-        <translation>Detekován cyklus.</translation>
+        <translation>Zjištěno zacyklení.</translation>
     </message>
 </context>
 <context>
@@ -882,7 +890,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Confirm delete? There are existing connection(s) associated with this controller. There is no way to undo.</source>
-        <translation type="unfinished"/>
+        <translation>Opravdu smazat? Je (jsou) zde propojení na tento ovladač. Nebude možné vrátit se zpět.</translation>
     </message>
 </context>
 <context>
@@ -905,11 +913,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>&amp;Remove this controller</source>
-        <translation type="unfinished"/>
+        <translation>Odst&amp;ranit tento kontrolér</translation>
     </message>
     <message>
         <source>Re&amp;name this controller</source>
-        <translation type="unfinished"/>
+        <translation>Přejme&amp;novat tento kontrolér</translation>
     </message>
     <message>
         <source>LFO</source>
@@ -920,93 +928,93 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     <name>CrossoverEQControlDialog</name>
     <message>
         <source>Band 1/2 Crossover:</source>
-        <translation type="unfinished"/>
+        <translation>Přechod mezi pásmy 1/2:</translation>
     </message>
     <message>
         <source>Band 2/3 Crossover:</source>
-        <translation type="unfinished"/>
+        <translation>Přechod mezi pásmy 2/3:</translation>
     </message>
     <message>
         <source>Band 3/4 Crossover:</source>
-        <translation type="unfinished"/>
+        <translation>Přechod mezi pásmy 3/4:</translation>
     </message>
     <message>
         <source>Band 1 Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení pásma 1:</translation>
     </message>
     <message>
         <source>Band 2 Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení pásma 2:</translation>
     </message>
     <message>
         <source>Band 3 Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení pásma 3:</translation>
     </message>
     <message>
         <source>Band 4 Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení pásma 4:</translation>
     </message>
     <message>
         <source>Band 1 Mute</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumení pásma 1</translation>
     </message>
     <message>
         <source>Mute Band 1</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumit pásmo 1</translation>
     </message>
     <message>
         <source>Band 2 Mute</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumení pásma 2</translation>
     </message>
     <message>
         <source>Mute Band 2</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumit pásmo 2</translation>
     </message>
     <message>
         <source>Band 3 Mute</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumení pásma 3</translation>
     </message>
     <message>
         <source>Mute Band 3</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumit pásmo 3</translation>
     </message>
     <message>
         <source>Band 4 Mute</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumení pásma 4</translation>
     </message>
     <message>
         <source>Mute Band 4</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumit pásmo 4</translation>
     </message>
 </context>
 <context>
     <name>DelayControls</name>
     <message>
         <source>Delay Samples</source>
-        <translation>Vzorky zpoždění</translation>
+        <translation>Zpoždění vzorků</translation>
     </message>
     <message>
         <source>Feedback</source>
-        <translation type="unfinished"/>
+        <translation>Zpětná vazba</translation>
     </message>
     <message>
         <source>Lfo Frequency</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence LFO</translation>
     </message>
     <message>
         <source>Lfo Amount</source>
-        <translation type="unfinished"/>
+        <translation>Hloubka LFO</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation>Zisk výstupu</translation>
+        <translation>Zesílení výstupu</translation>
     </message>
 </context>
 <context>
     <name>DelayControlsDialog</name>
     <message>
         <source>Lfo Amt</source>
-        <translation type="unfinished"/>
+        <translation>Hloubka LFO</translation>
     </message>
     <message>
         <source>Delay Time</source>
@@ -1014,31 +1022,31 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Feedback Amount</source>
-        <translation type="unfinished"/>
+        <translation>Hloubka zpětné vazby</translation>
     </message>
     <message>
         <source>Lfo</source>
-        <translation type="unfinished"/>
+        <translation>LFO</translation>
     </message>
     <message>
         <source>Out Gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení výstupu</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation>Zisk</translation>
+        <translation>Zesílení</translation>
     </message>
     <message>
         <source>DELAY</source>
-        <translation>DELAY</translation>
+        <translation>ZPOŽ</translation>
     </message>
     <message>
         <source>FDBK</source>
-        <translation>ZP. VAZBA</translation>
+        <translation>ZPVAZ</translation>
     </message>
     <message>
         <source>RATE</source>
-        <translation>POMĚR</translation>
+        <translation>RYCH</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -1053,15 +1061,15 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation type="unfinished"/>
+        <translation>Filtr 2 zapnutý</translation>
     </message>
     <message>
         <source>Click to enable/disable Filter 1</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte pro zapnutí/vypnutí filtru 1</translation>
     </message>
     <message>
         <source>Click to enable/disable Filter 2</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte pro zapnutí/vypnutí filtru 2</translation>
     </message>
     <message>
         <source>FREQ</source>
@@ -1069,11 +1077,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Cutoff frequency</source>
-        <translation>Frekvence seříznutí</translation>
+        <translation>Frekvence oříznutí</translation>
     </message>
     <message>
         <source>RESO</source>
-        <translation>REZON</translation>
+        <translation>REZO</translation>
     </message>
     <message>
         <source>Resonance</source>
@@ -1085,15 +1093,15 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Gain</source>
-        <translation>Zisk</translation>
+        <translation>Zesílení</translation>
     </message>
     <message>
         <source>MIX</source>
-        <translation type="unfinished"/>
+        <translation>POMĚR</translation>
     </message>
     <message>
         <source>Mix</source>
-        <translation type="unfinished"/>
+        <translation>Poměr</translation>
     </message>
 </context>
 <context>
@@ -1104,142 +1112,142 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Filter 1 type</source>
-        <translation>Filtr 1 typ</translation>
+        <translation>Typ filtru 1</translation>
     </message>
     <message>
         <source>Cutoff 1 frequency</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence oříznutí 1</translation>
     </message>
     <message>
         <source>Q/Resonance 1</source>
-        <translation type="unfinished"/>
+        <translation>Q/Rezonance 1</translation>
     </message>
     <message>
         <source>Gain 1</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení 1</translation>
     </message>
     <message>
         <source>Mix</source>
-        <translation type="unfinished"/>
+        <translation>Mix</translation>
     </message>
     <message>
         <source>Filter 2 enabled</source>
-        <translation type="unfinished"/>
+        <translation>Filtr 1 zapnutý</translation>
     </message>
     <message>
         <source>Filter 2 type</source>
-        <translation type="unfinished"/>
+        <translation>Typ filtru 2</translation>
     </message>
     <message>
         <source>Cutoff 2 frequency</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence oříznutí 2</translation>
     </message>
     <message>
         <source>Q/Resonance 2</source>
-        <translation type="unfinished"/>
+        <translation>Q/Rezonance 2</translation>
     </message>
     <message>
         <source>Gain 2</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení 2</translation>
     </message>
     <message>
         <source>LowPass</source>
-        <translation type="unfinished"/>
+        <translation>LowPass</translation>
     </message>
     <message>
         <source>HiPass</source>
-        <translation type="unfinished"/>
+        <translation>HiPass</translation>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation type="unfinished"/>
+        <translation>BandPass csg</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation type="unfinished"/>
+        <translation>BandPass czpg</translation>
     </message>
     <message>
         <source>Notch</source>
-        <translation type="unfinished"/>
+        <translation>Notch</translation>
     </message>
     <message>
         <source>Allpass</source>
-        <translation type="unfinished"/>
+        <translation>Allpass</translation>
     </message>
     <message>
         <source>Moog</source>
-        <translation type="unfinished"/>
+        <translation>Moog</translation>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation type="unfinished"/>
+        <translation>2x LowPass</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation type="unfinished"/>
+        <translation>RC LowPass 12dB</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation type="unfinished"/>
+        <translation>RC BandPass 12dB</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation type="unfinished"/>
+        <translation>RC HighPass 12dB</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation type="unfinished"/>
+        <translation>RC LowPass 24dB</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation type="unfinished"/>
+        <translation>RC BandPass 24dB</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation type="unfinished"/>
+        <translation>RC HighPass 24dB</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation type="unfinished"/>
+        <translation>Vocal Formant Filter</translation>
     </message>
     <message>
         <source>2x Moog</source>
-        <translation type="unfinished"/>
+        <translation>2x Moog</translation>
     </message>
     <message>
         <source>SV LowPass</source>
-        <translation type="unfinished"/>
+        <translation>SV LowPass</translation>
     </message>
     <message>
         <source>SV BandPass</source>
-        <translation type="unfinished"/>
+        <translation>SV BandPass</translation>
     </message>
     <message>
         <source>SV HighPass</source>
-        <translation type="unfinished"/>
+        <translation>SV HighPass</translation>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation type="unfinished"/>
+        <translation>SV Notch</translation>
     </message>
     <message>
         <source>Fast Formant</source>
-        <translation type="unfinished"/>
+        <translation>Fast Formant</translation>
     </message>
     <message>
         <source>Tripole</source>
-        <translation type="unfinished"/>
+        <translation>Tripole</translation>
     </message>
 </context>
 <context>
     <name>Editor</name>
     <message>
         <source>Play (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Přehrát (mezerník)</translation>
     </message>
     <message>
         <source>Stop (Space)</source>
-        <translation type="unfinished"/>
+        <translation>Zastavit (mezerník)</translation>
     </message>
     <message>
         <source>Record</source>
@@ -1262,7 +1270,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Wet/Dry mix</source>
-        <translation>Wet/Dry mix</translation>
+        <translation>Poměr (Wet/Dry)</translation>
     </message>
     <message>
         <source>Gate</source>
@@ -1270,7 +1278,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Decay</source>
-        <translation>Doznívání</translation>
+        <translation>Útlum</translation>
     </message>
 </context>
 <context>
@@ -1326,31 +1334,31 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>W/D</source>
-        <translation>W/D</translation>
+        <translation>POM</translation>
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation>Wet Hodnota:</translation>
+        <translation>Poměr (Wet/Dry):</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation>Wet/Dry otočný ovladač nastavuje poměr mezi vstupním signálem a signálem efektu, který formuje výstup.</translation>
+        <translation>Otočný ovladač Poměr (Wet/Dry) nastavuje poměr mezi vstupním signálem a signálem efektu, který formuje výstup.</translation>
     </message>
     <message>
         <source>DECAY</source>
-        <translation>DOZNÍ</translation>
+        <translation>ÚTLUM</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation>Čas:</translation>
+        <translation>Délka:</translation>
     </message>
     <message>
         <source>The Decay knob controls how many buffers of silence must pass before the plugin stops processing.  Smaller values will reduce the CPU overhead but run the risk of clipping the tail on delay and reverb effects.</source>
-        <translation>Otočný ovladač Doznívání ovládá, kolik bufferů ticha musí projít před tím, než plugin přestane zpracovávat.  Menší hodnoty zredukují využití CPU, ale můžou způsobit uříznutí ozvěn.</translation>
+        <translation>Otočný ovladač Útlum nastavuje, kolik bufferů ticha musí proběhnout před tím, než plugin přestane zpracovávat.  Menší hodnoty zredukují přetížení CPU, ale mohou způsobit oříznutí na konci zpožďovacích a dozvukových efektů.</translation>
     </message>
     <message>
         <source>GATE</source>
-        <translation>BRÁNA</translation>
+        <translation>BRÁ</translation>
     </message>
     <message>
         <source>Gate:</source>
@@ -1358,7 +1366,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>The Gate knob controls the signal level that is considered to be &apos;silence&apos; while deciding when to stop processing signals.</source>
-        <translation>Otočný ovladač Brána určuje sílu signálu, který je považován za &apos;ticho&apos; při rozhodování, kdy skončit se zpracováním signálů.</translation>
+        <translation>Otočný ovladač Brána určuje sílu signálu, který je považován za &quot;ticho&quot; při rozhodování, kdy skončit se zpracováním signálů.</translation>
     </message>
     <message>
         <source>Controls</source>
@@ -1378,7 +1386,20 @@ The Gate knob controls the 'given threshold' for the effect's auto shutdown.  Th
 The Controls button opens a dialog for editing the effect's parameters.
 
 Right clicking will bring up a context menu where you can change the order in which the effects are processed or delete an effect altogether.</source>
-        <translation type="unfinished"/>
+        <translation>Efektové pluginy fungují jako zřetězená série efektů, kde signál bude postupně zpracováván shora dolů.
+
+Přepínač Zapnuto/Vypnuto vám umožní v libovolném časovém okamžiku daný plugin odpojit.
+
+Otočný ovladač Poměr (Wet/Dry) řídí vyvážení vstupního a již zpracovaného signálu do výsledného výstupu efektu. Vstup je v této fázi shodný s výstupem předchozího efektu. Takže když je Poměr nastaven na nízkou hodnotu, obsahuje signál všechny předchozí efekty.
+
+Otočný ovladač Útlum určuje, jak dlouho bude zpracovávání signálu pokračovat po skončení noty. Efekt přestane zpracovávat signál, když hlasitost klesne pod hodnotu daného prahu v daném časovém úseku. Tento ovladač nastavuje právě &quot;daný časový úsek&quot;. Delší časy vyžadují více výkonu procesoru, takže pro většinu efektů by měla být nastavena nízká hodnota. Naopak je potřeba nastavit vyšší hodnotu pro efekty, které vytvářejí delší úseky ticha, jako je např. echo (delay).
+Otočný ovladač Brána určuje &quot;daný práh&quot; pro automatické ukončení efektu.
+
+Počítání délky &quot;daného časového úseku&quot; začíná bezprostředně poté, co úroveň zpracovávaného signálu poklesne pod úroveň určenou tímto ovladačem.
+
+Tlačítko Ovladače otevře dialogové okno pro úpravu parametrů efektu.
+
+Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete měnit pořadí, ve kterém budou efekty zpracovávány, nebo můžete efekt úplně odstranit.</translation>
     </message>
     <message>
         <source>Move &amp;up</source>
@@ -1386,7 +1407,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Move &amp;down</source>
-        <translation>Posunout &amp;dolu</translation>
+        <translation>Posunout &amp;dolů</translation>
     </message>
     <message>
         <source>&amp;Remove this plugin</source>
@@ -1397,23 +1418,23 @@ Right clicking will bring up a context menu where you can change the order in wh
     <name>EnvelopeAndLfoParameters</name>
     <message>
         <source>Predelay</source>
-        <translation type="unfinished"/>
+        <translation>Předzpoždění</translation>
     </message>
     <message>
         <source>Attack</source>
-        <translation>Nástup</translation>
+        <translation>Náběh</translation>
     </message>
     <message>
         <source>Hold</source>
-        <translation type="unfinished"/>
+        <translation>Držení</translation>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Dozněv</translation>
+        <translation>Útlum</translation>
     </message>
     <message>
         <source>Sustain</source>
-        <translation type="unfinished"/>
+        <translation>Vydržení</translation>
     </message>
     <message>
         <source>Release</source>
@@ -1425,23 +1446,23 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>LFO Predelay</source>
-        <translation type="unfinished"/>
+        <translation>Předzpoždění LFO</translation>
     </message>
     <message>
         <source>LFO Attack</source>
-        <translation type="unfinished"/>
+        <translation>Náběh LFO</translation>
     </message>
     <message>
         <source>LFO speed</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost LFO</translation>
     </message>
     <message>
         <source>LFO Modulation</source>
-        <translation type="unfinished"/>
+        <translation>Modulace LFO</translation>
     </message>
     <message>
         <source>LFO Wave Shape</source>
-        <translation type="unfinished"/>
+        <translation>Tvar vlny LFO</translation>
     </message>
     <message>
         <source>Freq x 100</source>
@@ -1449,86 +1470,86 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Modulate Env-Amount</source>
-        <translation>Úroveň modulace</translation>
+        <translation>Hloubka modulace</translation>
     </message>
 </context>
 <context>
     <name>EnvelopeAndLfoView</name>
     <message>
         <source>DEL</source>
-        <translation type="unfinished"/>
+        <translation>PŘED</translation>
     </message>
     <message>
         <source>Predelay:</source>
-        <translation type="unfinished"/>
+        <translation>Předzpoždění:</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro předzpoždění (predelay) stávající obálky. Zvýšení této hodnoty prodlouží čas před začátkem aktuální obálky.</translation>
     </message>
     <message>
         <source>ATT</source>
-        <translation type="unfinished"/>
+        <translation>NÁB</translation>
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished"/>
+        <translation>Náběh:</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení náběhu (attack) u nynější obálky. Zvýšení této hodnoty způsobí prodloužení doby náběhu obálky. Zvolte nižší hodnotu pro nástroje typu piano a vyšší pro smyčce..</translation>
     </message>
     <message>
         <source>HOLD</source>
-        <translation>HOLD</translation>
+        <translation>DRŽ</translation>
     </message>
     <message>
         <source>Hold:</source>
-        <translation>Hold:</translation>
+        <translation>Držení:</translation>
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení délky držení (hold) u nynější obálky. Zvýšení této hodnoty prodlouží část obálky, která zůstává na úrovni náběhu (attack) ještě před začátkem útlumu (decay) na úroveň vydržení (sustain).</translation>
     </message>
     <message>
         <source>DEC</source>
-        <translation>DEC</translation>
+        <translation>ÚTL</translation>
     </message>
     <message>
         <source>Decay:</source>
-        <translation>Doznívání:</translation>
+        <translation>Útlum:</translation>
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení délky útlumu (decay) u nynější obálky. Zvýšení této hodnoty prodlouží část obálky, potřebnou k zeslabení z úrovně náběhu (attack) na úroveň vydržení (sustain). Zvolte nižší hodnotu pro nástroje typu piano. </translation>
     </message>
     <message>
         <source>SUST</source>
-        <translation>SUST</translation>
+        <translation>VYD</translation>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation>Sustain:</translation>
+        <translation>Vydržení:</translation>
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač nastavení vydržení (sustain) u nynější obálky. Zvýšení této hodnoty navýší úroveň, na které obálka zůstává před poklesem na nulu.</translation>
     </message>
     <message>
         <source>REL</source>
-        <translation>REL</translation>
+        <translation>UVOL</translation>
     </message>
     <message>
         <source>Release:</source>
-        <translation>Release:</translation>
+        <translation>Uvolnění:</translation>
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení délky uvolnění (release) u nynější obálky. Zvýšení této hodnoty prodlouží část obálky, potřebnou k zeslabení z úrovně vydržení (sustain) na nulovou úroveň. Zvolte vyšší hodnotu pro nástroje s měkkým zvukem, jako např. smyčce. </translation>
     </message>
     <message>
         <source>AMT</source>
-        <translation type="unfinished"/>
+        <translation>MOD</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -1536,59 +1557,59 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení hloubky modulace u nynější obálky. Zvýšení této hodnoty v závislosti na velikosti (např. hlasitosti nebo frekvence odstřihnutí) způsobí větší ovlivnění touto obálkou.</translation>
     </message>
     <message>
         <source>LFO predelay:</source>
-        <translation type="unfinished"/>
+        <translation>Předzpoždění LFO:</translation>
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení délky předzpoždění (predelay) nynějšího LFO. Zvýšení této hodnoty prodlouží čas před tím, než začne LFO kmitat.</translation>
     </message>
     <message>
         <source>LFO- attack:</source>
-        <translation type="unfinished"/>
+        <translation>Náběh LFO:</translation>
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current LFO. The bigger this value the longer the LFO needs to increase its amplitude to maximum.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení  délky náběhu (attack) u nynějšího LFO. Zvýšení této hodnoty prodlouží čas potřebný pro zvýšení amplitudy LFO na maximum.</translation>
     </message>
     <message>
         <source>SPD</source>
-        <translation type="unfinished"/>
+        <translation>RYCH</translation>
     </message>
     <message>
         <source>LFO speed:</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost LFO:</translation>
     </message>
     <message>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení rychlosti u nynějšího LFO. Zvýšení této hodnoty způsobí rychlejší kmitání LFO a zrychlení vašeho efektu.</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení hloubky modulace u nynějšího LFO. Zvýšení této hodnoty v závislosti na velikosti (např. hlasitosti nebo frekvence odstřihnutí) způsobí větší ovlivnění tímto LFO.</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
-        <translation>Klikněte zde pro sinusovou vlnu.</translation>
+        <translation>Klepněte sem pro sinusovou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klikněte zde pro trojúhelníkovou vlnu.</translation>
+        <translation>Klepněte sem pro trojúhelníkovou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave for current.</source>
-        <translation>Klikněte zde pro pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pilovitou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klikněte zde pro pravoúhlou vlnu.</translation>
+        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a user-defined wave. Afterwards, drag an according sample-file onto the LFO graph.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro vlastní vlnu. Poté přetáhněte zvolený soubor samplu do grafického okna LFO.</translation>
     </message>
     <message>
         <source>FREQ x 100</source>
@@ -1596,27 +1617,27 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Click here if the frequency of this LFO should be multiplied by 100.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem, pokud má být frekvence LFO vynásobena x100.</translation>
     </message>
     <message>
         <source>multiply LFO-frequency by 100</source>
-        <translation type="unfinished"/>
+        <translation>vynásobit frekvenci LFO x100</translation>
     </message>
     <message>
         <source>MODULATE ENV-AMOUNT</source>
-        <translation type="unfinished"/>
+        <translation>MODULOVAT OBÁLKU</translation>
     </message>
     <message>
         <source>Click here to make the envelope-amount controlled by this LFO.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem, pokud má být množství obálky řízeno tímto LFO.</translation>
     </message>
     <message>
         <source>control envelope-amount by this LFO</source>
-        <translation type="unfinished"/>
+        <translation>řízení množství obálky tímto LFO</translation>
     </message>
     <message>
         <source>ms/LFO:</source>
-        <translation type="unfinished"/>
+        <translation>ms/LFO:</translation>
     </message>
     <message>
         <source>Hint</source>
@@ -1628,225 +1649,225 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Click here for random wave.</source>
-        <translation>Klikněte zde pro náhodnou vlnu.</translation>
+        <translation>Klepněte sem pro náhodnou vlnu.</translation>
     </message>
 </context>
 <context>
     <name>EqControls</name>
     <message>
         <source>Input gain</source>
-        <translation>Zisk vstupu</translation>
+        <translation>Zesílení vstupu</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation>Zisk výstupu</translation>
+        <translation>Zesílení výstupu</translation>
     </message>
     <message>
         <source>Low shelf gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení dolního šelfu</translation>
     </message>
     <message>
         <source>Peak 1 gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení špičky 1</translation>
     </message>
     <message>
         <source>Peak 2 gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení špičky 2</translation>
     </message>
     <message>
         <source>Peak 3 gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení špičky 3</translation>
     </message>
     <message>
         <source>Peak 4 gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení špičky 4</translation>
     </message>
     <message>
         <source>High Shelf gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení horního šelfu</translation>
     </message>
     <message>
         <source>HP res</source>
-        <translation type="unfinished"/>
+        <translation>Rezonance horní propusti</translation>
     </message>
     <message>
         <source>Low Shelf res</source>
-        <translation type="unfinished"/>
+        <translation>Rezonance dolního šelfu</translation>
     </message>
     <message>
         <source>Peak 1 BW</source>
-        <translation type="unfinished"/>
+        <translation>Šířka pásma špičky 1</translation>
     </message>
     <message>
         <source>Peak 2 BW</source>
-        <translation type="unfinished"/>
+        <translation>Šířka pásma špičky 2</translation>
     </message>
     <message>
         <source>Peak 3 BW</source>
-        <translation type="unfinished"/>
+        <translation>Šířka pásma špičky 3</translation>
     </message>
     <message>
         <source>Peak 4 BW</source>
-        <translation type="unfinished"/>
+        <translation>Šířka pásma špičky 4</translation>
     </message>
     <message>
         <source>High Shelf res</source>
-        <translation type="unfinished"/>
+        <translation>Rezonance horního šelfu</translation>
     </message>
     <message>
         <source>LP res</source>
-        <translation type="unfinished"/>
+        <translation>Rezonance dolní propusti</translation>
     </message>
     <message>
         <source>HP freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence horní propusti</translation>
     </message>
     <message>
         <source>Low Shelf freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence dolního šelfu</translation>
     </message>
     <message>
         <source>Peak 1 freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence špičky 1</translation>
     </message>
     <message>
         <source>Peak 2 freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence špičky 2</translation>
     </message>
     <message>
         <source>Peak 3 freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence špičky 3</translation>
     </message>
     <message>
         <source>Peak 4 freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence špičky 3</translation>
     </message>
     <message>
         <source>High shelf freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence špičky 4</translation>
     </message>
     <message>
         <source>LP freq</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence dolní propusti</translation>
     </message>
     <message>
         <source>HP active</source>
-        <translation type="unfinished"/>
+        <translation>Horní propust aktivní</translation>
     </message>
     <message>
         <source>Low shelf active</source>
-        <translation type="unfinished"/>
+        <translation>Dolní šelf aktivní</translation>
     </message>
     <message>
         <source>Peak 1 active</source>
-        <translation type="unfinished"/>
+        <translation>Špička 1 aktivní</translation>
     </message>
     <message>
         <source>Peak 2 active</source>
-        <translation type="unfinished"/>
+        <translation>Špička 2 aktivní</translation>
     </message>
     <message>
         <source>Peak 3 active</source>
-        <translation type="unfinished"/>
+        <translation>Špička 3 aktivní</translation>
     </message>
     <message>
         <source>Peak 4 active</source>
-        <translation type="unfinished"/>
+        <translation>Špička 4 aktivní</translation>
     </message>
     <message>
         <source>High shelf active</source>
-        <translation type="unfinished"/>
+        <translation>Horní šelf aktivní</translation>
     </message>
     <message>
         <source>LP active</source>
-        <translation type="unfinished"/>
+        <translation>Dolní propust aktivní</translation>
     </message>
     <message>
         <source>LP 12</source>
-        <translation type="unfinished"/>
+        <translation>DP 12</translation>
     </message>
     <message>
         <source>LP 24</source>
-        <translation type="unfinished"/>
+        <translation>DP 24</translation>
     </message>
     <message>
         <source>LP 48</source>
-        <translation type="unfinished"/>
+        <translation>DP 48</translation>
     </message>
     <message>
         <source>HP 12</source>
-        <translation type="unfinished"/>
+        <translation>HP 12</translation>
     </message>
     <message>
         <source>HP 24</source>
-        <translation type="unfinished"/>
+        <translation>HP 24</translation>
     </message>
     <message>
         <source>HP 48</source>
-        <translation type="unfinished"/>
+        <translation>HP 48</translation>
     </message>
     <message>
         <source>low pass type</source>
-        <translation type="unfinished"/>
+        <translation>typ dolní propusti</translation>
     </message>
     <message>
         <source>high pass type</source>
-        <translation type="unfinished"/>
+        <translation>typ horní propusti</translation>
     </message>
     <message>
         <source>Analyse IN</source>
-        <translation type="unfinished"/>
+        <translation>Analýza VSTUPU</translation>
     </message>
     <message>
         <source>Analyse OUT</source>
-        <translation type="unfinished"/>
+        <translation>Analýza VÝSTUPU</translation>
     </message>
 </context>
 <context>
     <name>EqControlsDialog</name>
     <message>
         <source>HP</source>
-        <translation type="unfinished"/>
+        <translation>HP</translation>
     </message>
     <message>
         <source>Low Shelf</source>
-        <translation type="unfinished"/>
+        <translation>Dolní šelf</translation>
     </message>
     <message>
         <source>Peak 1</source>
-        <translation type="unfinished"/>
+        <translation>Špička 1</translation>
     </message>
     <message>
         <source>Peak 2</source>
-        <translation type="unfinished"/>
+        <translation>Špička 2</translation>
     </message>
     <message>
         <source>Peak 3</source>
-        <translation type="unfinished"/>
+        <translation>Špička 3</translation>
     </message>
     <message>
         <source>Peak 4</source>
-        <translation type="unfinished"/>
+        <translation>Špička 4</translation>
     </message>
     <message>
         <source>High Shelf</source>
-        <translation type="unfinished"/>
+        <translation>Horní šelf</translation>
     </message>
     <message>
         <source>LP</source>
-        <translation type="unfinished"/>
+        <translation>DP</translation>
     </message>
     <message>
         <source>In Gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení vstupu</translation>
     </message>
     <message>
         <source>Gain</source>
-        <translation>Zisk</translation>
+        <translation>Zesílení</translation>
     </message>
     <message>
         <source>Out Gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení výstupu</translation>
     </message>
     <message>
         <source>Bandwidth: </source>
@@ -1862,15 +1883,15 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>lp grp</source>
-        <translation type="unfinished"/>
+        <translation>dp skup</translation>
     </message>
     <message>
         <source>hp grp</source>
-        <translation type="unfinished"/>
+        <translation>hp skup</translation>
     </message>
     <message>
         <source> Octave</source>
-        <translation>Oktáva</translation>
+        <translation>oktávy</translation>
     </message>
 </context>
 <context>
@@ -1881,7 +1902,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>BW: </source>
-        <translation type="unfinished"/>
+        <translation>ŠPás:</translation>
     </message>
     <message>
         <source>Freq: </source>
@@ -1928,31 +1949,31 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Bitrate:</source>
-        <translation>Bitrate:</translation>
+        <translation>Datový tok:</translation>
     </message>
     <message>
         <source>64 KBit/s</source>
-        <translation>64 KBit/s</translation>
+        <translation>64 kbit/s</translation>
     </message>
     <message>
         <source>128 KBit/s</source>
-        <translation>128 KBit/s</translation>
+        <translation>128 kbit/s</translation>
     </message>
     <message>
         <source>160 KBit/s</source>
-        <translation>160 KBit/s</translation>
+        <translation>160 kbit/s</translation>
     </message>
     <message>
         <source>192 KBit/s</source>
-        <translation>192 KBit/s</translation>
+        <translation>192 kbit/s</translation>
     </message>
     <message>
         <source>256 KBit/s</source>
-        <translation>256 KBit/s</translation>
+        <translation>256 kbit/s</translation>
     </message>
     <message>
         <source>320 KBit/s</source>
-        <translation>320 KBit/s</translation>
+        <translation>320 kbit/s</translation>
     </message>
     <message>
         <source>Depth:</source>
@@ -1960,15 +1981,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>16 Bit Integer</source>
-        <translation>16 Bit Integer</translation>
+        <translation>16 bitů celočíselně</translation>
     </message>
     <message>
         <source>32 Bit Float</source>
-        <translation>32 Bit Float</translation>
-    </message>
-    <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation type="unfinished"/>
+        <translation>32 bitů s plovoucí čárkou</translation>
     </message>
     <message>
         <source>Quality settings</source>
@@ -1980,27 +1997,27 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Zero Order Hold</source>
-        <translation type="unfinished"/>
+        <translation>Zero-order hold</translation>
     </message>
     <message>
         <source>Sinc Fastest</source>
-        <translation type="unfinished"/>
+        <translation>Sinc nejrychlejší</translation>
     </message>
     <message>
         <source>Sinc Medium (recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Sinc střední (doporučeno)</translation>
     </message>
     <message>
         <source>Sinc Best (very slow!)</source>
-        <translation type="unfinished"/>
+        <translation>Sinc nejlepší (velmi pomalé!)</translation>
     </message>
     <message>
         <source>Oversampling (use with care!):</source>
-        <translation>Převzorkování (používejte opatrně!)</translation>
+        <translation>Převzorkování (používejte opatrně!):</translation>
     </message>
     <message>
         <source>1x (None)</source>
-        <translation type="unfinished"/>
+        <translation>1x (žádné)</translation>
     </message>
     <message>
         <source>2x</source>
@@ -2016,7 +2033,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"/>
+        <translation>Začít</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2024,11 +2041,11 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Export as loop (remove end silence)</source>
-        <translation>Export do smyčky (odstranění ticha na konci)</translation>
+        <translation>Exportovat jako smyčku (odstranění ticha na konci)</translation>
     </message>
     <message>
         <source>Export between loop markers</source>
-        <translation>Export obsahu smyčky</translation>
+        <translation>Exportovat obsah smyčky</translation>
     </message>
     <message>
         <source>Could not open file</source>
@@ -2044,7 +2061,7 @@ Right clicking will bring up a context menu where you can change the order in wh
     </message>
     <message>
         <source>Error while determining file-encoder device. Please try to choose a different output format.</source>
-        <translation>Chyba při určení souboru zařízení enkodéru. Zkuste prosím vybrat jiný výstupní formát.</translation>
+        <translation>Chyba při zjišťování souboru enkodéru. Zkuste prosím vybrat jiný výstupní formát.</translation>
     </message>
     <message>
         <source>Rendering: %1%</source>
@@ -2053,7 +2070,16 @@ Right clicking will bring up a context menu where you can change the order in wh
     <message>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
-        <translation type="unfinished"/>
+        <translation>Nelze otevřít soubor %1 pro zápis.
+Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které je umístěn, a zkuste znovu!</translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation>24 bitů celočíselně</translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation>Použít proměnlivý datový tok</translation>
     </message>
 </context>
 <context>
@@ -2074,27 +2100,27 @@ Please make sure you have write permission to the file and the directory contain
     <name>FileBrowserTreeWidget</name>
     <message>
         <source>Send to active instrument-track</source>
-        <translation>Poslat do aktivní stopy nástroje</translation>
+        <translation>Odeslat do aktivní stopy nástroje</translation>
     </message>
     <message>
         <source>Open in new instrument-track/B+B Editor</source>
-        <translation type="unfinished"/>
+        <translation>Otevřít v nové nástrojové stopě / editoru bicich/basů</translation>
     </message>
     <message>
         <source>Loading sample</source>
-        <translation>Načítám sampl</translation>
+        <translation>Načítám vzorek</translation>
     </message>
     <message>
         <source>Please wait, loading sample for preview...</source>
-        <translation>Počkejte prosím, načítám sampl pro náhled...</translation>
+        <translation>Počkejte prosím, načítám vzorek pro náhled...</translation>
     </message>
     <message>
         <source>--- Factory files ---</source>
-        <translation type="unfinished"/>
+        <translation>--- Tovární soubory ---</translation>
     </message>
     <message>
         <source>Open in new instrument-track/Song Editor</source>
-        <translation type="unfinished"/>
+        <translation>Otevřít v nové nástrojové stopě / Editoru skladby</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2113,11 +2139,11 @@ Please make sure you have write permission to the file and the directory contain
     <name>FlangerControls</name>
     <message>
         <source>Delay Samples</source>
-        <translation>Vzorky zpoždění</translation>
+        <translation>Zpoždění vzorků</translation>
     </message>
     <message>
         <source>Lfo Frequency</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence LFO</translation>
     </message>
     <message>
         <source>Seconds</source>
@@ -2125,7 +2151,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Regen</source>
-        <translation type="unfinished"/>
+        <translation>Obnov</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -2133,7 +2159,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Invert</source>
-        <translation type="unfinished"/>
+        <translation>Převrátit</translation>
     </message>
 </context>
 <context>
@@ -2180,14 +2206,14 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Invert</source>
-        <translation type="unfinished"/>
+        <translation>Převrátit</translation>
     </message>
 </context>
 <context>
     <name>FxLine</name>
     <message>
         <source>Channel send amount</source>
-        <translation type="unfinished"/>
+        <translation>Množství odeslaného kanálu</translation>
     </message>
     <message>
         <source>The FX channel receives input from one or more instrument tracks.
@@ -2197,11 +2223,17 @@ In order to route the channel to another channel, select the FX channel and clic
 
 You can remove and move FX channels in the context menu, which is accessed by right-clicking the FX channel.
 </source>
-        <translation type="unfinished"/>
+        <translation>Efektový (FX) kanál přijímá vstup z jedné nebo více nástrojových stop.
+Ten může být následně směrován do dalších efektových kanálů. LMMS automaticky zabraňuje vzniku nekonečných smyček a nedovoluje provést propojení, které by ke vzniku smyčky mohlo vést.
+
+Chcete-li směrovat kanál do jiného kanálu, vyberte efektový kanál a klepněte na tlačítko &quot;SEND&quot; v kanálu, který chcete odeslat. Otočný ovladač pod tlačítkem &quot;SEND&quot; určuje množství signálu, které bude do kanálu odesláno.
+
+Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, která je dostupná po klepnutí pravým tlačítkem myši na efektový kanál.
+</translation>
     </message>
     <message>
         <source>Move &amp;left</source>
-        <translation>Přesun do&amp;leva</translation>
+        <translation>Přesunout do&amp;leva</translation>
     </message>
     <message>
         <source>Move &amp;right</source>
@@ -2209,37 +2241,49 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Rename &amp;channel</source>
-        <translation type="unfinished"/>
+        <translation>Přejmenovat &amp;kanál</translation>
     </message>
     <message>
         <source>R&amp;emove channel</source>
-        <translation type="unfinished"/>
+        <translation>Př&amp;esunout kanál</translation>
     </message>
     <message>
         <source>Remove &amp;unused channels</source>
-        <translation type="unfinished"/>
+        <translation>Odstranit nepo&amp;užívané kanály</translation>
     </message>
 </context>
 <context>
     <name>FxMixer</name>
     <message>
         <source>Master</source>
-        <translation type="unfinished"/>
+        <translation>Hlavní</translation>
     </message>
     <message>
         <source>FX %1</source>
-        <translation type="unfinished"/>
+        <translation>Efekt %1</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Hlasitost</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Ztlumit</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Sólo</translation>
     </message>
 </context>
 <context>
     <name>FxMixerView</name>
     <message>
         <source>FX-Mixer</source>
-        <translation>FX mixážní panel</translation>
+        <translation>Efektový mixážní panel</translation>
     </message>
     <message>
         <source>FX Fader %1</source>
-        <translation type="unfinished"/>
+        <translation>Efektový fader %1</translation>
     </message>
     <message>
         <source>Mute</source>
@@ -2247,7 +2291,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Mute this FX channel</source>
-        <translation>Ztlumit tento FX kanál</translation>
+        <translation>Ztlumit tento efektový kanál</translation>
     </message>
     <message>
         <source>Solo</source>
@@ -2255,14 +2299,14 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Solo FX channel</source>
-        <translation>Sólovat FX kanál</translation>
+        <translation>Sólovat efektový kanál</translation>
     </message>
 </context>
 <context>
     <name>FxRoute</name>
     <message>
         <source>Amount to send from channel %1 to channel %2</source>
-        <translation type="unfinished"/>
+        <translation>Množství k odeslání z kanálu %1 do kanálu %2</translation>
     </message>
 </context>
 <context>
@@ -2288,7 +2332,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Click here to open another GIG file</source>
-        <translation>Klikněte sem pro otevření jiného GIG souboru</translation>
+        <translation>Klepněte sem pro otevření jiného GIG souboru</translation>
     </message>
     <message>
         <source>Choose the patch</source>
@@ -2296,7 +2340,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Click here to change which patch of the GIG file to use</source>
-        <translation>Klikněte sem pro změnu patche GIG souboru</translation>
+        <translation>Klepněte sem pro změnu patche GIG souboru</translation>
     </message>
     <message>
         <source>Change which instrument of the GIG file is being played</source>
@@ -2316,7 +2360,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Factor to multiply samples by</source>
-        <translation type="unfinished"/>
+        <translation>Vynásobit vzorky x</translation>
     </message>
     <message>
         <source>Open GIG file</source>
@@ -2339,7 +2383,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Preparing UI</source>
-        <translation>Připravuji AI</translation>
+        <translation>Připravuji UI</translation>
     </message>
     <message>
         <source>Preparing song editor</source>
@@ -2359,7 +2403,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Preparing beat/bassline editor</source>
-        <translation>Připravuji editor bicích a basů</translation>
+        <translation>Připravuji editor bicích/basů</translation>
     </message>
     <message>
         <source>Preparing piano roll</source>
@@ -2367,7 +2411,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Preparing automation editor</source>
-        <translation>Připravuji editor automatizací</translation>
+        <translation>Připravuji Editor automatizace</translation>
     </message>
 </context>
 <context>
@@ -2434,15 +2478,15 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Skip rate</source>
-        <translation type="unfinished"/>
+        <translation>Míra vynechávání</translation>
     </message>
     <message>
         <source>Miss rate</source>
-        <translation type="unfinished"/>
+        <translation>Míra míjení</translation>
     </message>
     <message>
         <source>Cycle steps</source>
-        <translation type="unfinished"/>
+        <translation>Počet kroků v cyklu</translation>
     </message>
 </context>
 <context>
@@ -2453,7 +2497,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>An arpeggio is a method playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords. The only difference is that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads, but there are a lot of other possible chords, you can select.</source>
-        <translation>Arpeggio je způsob hraní (zejména na drnkací nástroje), které činí hudbu mnohem živější. Struny těchto nástrojů (např. harfy) jsou rozechvěny jako v akordech. Jediným rozdílem je, že se tak stane sekvenčně, takže tóny nejsou zahrány ve stejnou dobu. Typickým arpeggiem jsou durové a mollové trojzvuky, ale možných dalších akordů, které si můžete vybrat, je spousta.</translation>
+        <translation>Arpeggio je způsob hry (zejména na drnkací nástroje), který činí hudbu mnohem živější. Struny těchto nástrojů (např. harfy) jsou rozezněny jako v akordech. Jediným rozdílem je, že se tak stane sekvenčně, takže tóny nejsou zahrány ve stejnou dobu. Typickým arpeggiem jsou durové a mollové trojzvuky, ale možných dalších akordů, které si můžete vybrat, je spousta.</translation>
     </message>
     <message>
         <source>RANGE</source>
@@ -2517,35 +2561,35 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>SKIP</source>
-        <translation type="unfinished"/>
+        <translation>VYNECH</translation>
     </message>
     <message>
         <source>Skip rate:</source>
-        <translation type="unfinished"/>
+        <translation>Míra vynechávání:</translation>
     </message>
     <message>
         <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
-        <translation type="unfinished"/>
+        <translation>Funkce vynechávání způsobí, že arpeggiator náhodně pozastaví některý krok. Od počáteční pozice, kde nemá žádný efekt, se po směru hodinových ručiček efekt stupňuje až po maximální nastavení, kdy vynechá vše.</translation>
     </message>
     <message>
         <source>MISS</source>
-        <translation type="unfinished"/>
+        <translation>MÍJ</translation>
     </message>
     <message>
         <source>Miss rate:</source>
-        <translation type="unfinished"/>
+        <translation>Míra míjení:</translation>
     </message>
     <message>
         <source>The miss function will make the arpeggiator miss the intended note.</source>
-        <translation type="unfinished"/>
+        <translation>Funkce míjení způsobí, že arpeggiator netrefí dotyčnou notu.</translation>
     </message>
     <message>
         <source>CYCLE</source>
-        <translation type="unfinished"/>
+        <translation>CYKL</translation>
     </message>
     <message>
         <source>Cycle notes:</source>
-        <translation type="unfinished"/>
+        <translation>Počet not v cyklu:</translation>
     </message>
     <message>
         <source>note(s)</source>
@@ -2553,7 +2597,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Jumps over n steps in the arpeggio and cycles around if we&apos;re over the note range. If the total note range is evenly divisible by the number of steps jumped over you will get stuck in a shorter arpeggio or even on one note.</source>
-        <translation type="unfinished"/>
+        <translation>Skočí přes n kroků v arpeggiu a pokud přesáhne rozsah not, zacyklí se zde. Je-li je celkový rozsah not rovnoměrně dělitelný počtem kroků nad rozdah, uvíznete v kratším arpeggiu nebo dokonce na jedné notě.</translation>
     </message>
 </context>
 <context>
@@ -2564,7 +2608,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Major</source>
-        <translation>dur</translation>
+        <translation>Dur</translation>
     </message>
     <message>
         <source>Majb5</source>
@@ -2828,87 +2872,87 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Harmonic minor</source>
-        <translation>mollová harmonická</translation>
+        <translation>Mollová harmonická</translation>
     </message>
     <message>
         <source>Melodic minor</source>
-        <translation>mollová melodická</translation>
+        <translation>Mollová melodická</translation>
     </message>
     <message>
         <source>Whole tone</source>
-        <translation>celotónová stupnice</translation>
+        <translation>Celotónová</translation>
     </message>
     <message>
         <source>Diminished</source>
-        <translation>zmenšená</translation>
+        <translation>Zmenšená</translation>
     </message>
     <message>
         <source>Major pentatonic</source>
-        <translation>durová pentatonika</translation>
+        <translation>Durová pentatonika</translation>
     </message>
     <message>
         <source>Minor pentatonic</source>
-        <translation>mollová pentatonika</translation>
+        <translation>Mollová pentatonika</translation>
     </message>
     <message>
         <source>Jap in sen</source>
-        <translation>japonská (in sen)</translation>
+        <translation>Japonská (in sen)</translation>
     </message>
     <message>
         <source>Major bebop</source>
-        <translation>durová bebopová</translation>
+        <translation>Durová bebopová</translation>
     </message>
     <message>
         <source>Dominant bebop</source>
-        <translation>dominantní bebopová</translation>
+        <translation>Dominantní bebopová</translation>
     </message>
     <message>
         <source>Blues</source>
-        <translation>bluesová</translation>
+        <translation>Bluesová</translation>
     </message>
     <message>
         <source>Arabic</source>
-        <translation>arabská</translation>
+        <translation>Arabská</translation>
     </message>
     <message>
         <source>Enigmatic</source>
-        <translation>enigmatická</translation>
+        <translation>Enigmatická</translation>
     </message>
     <message>
         <source>Neopolitan</source>
-        <translation>neapolská</translation>
+        <translation>Neapolská</translation>
     </message>
     <message>
         <source>Neopolitan minor</source>
-        <translation>mollová neapolská</translation>
+        <translation>Mollová neapolská</translation>
     </message>
     <message>
         <source>Hungarian minor</source>
-        <translation>mollová maďarská</translation>
+        <translation>Mollová maďarská</translation>
     </message>
     <message>
         <source>Dorian</source>
-        <translation>dórská</translation>
+        <translation>Dórská</translation>
     </message>
     <message>
         <source>Phrygolydian</source>
-        <translation>frygická</translation>
+        <translation>Frygická</translation>
     </message>
     <message>
         <source>Lydian</source>
-        <translation>lydická</translation>
+        <translation>Lydická</translation>
     </message>
     <message>
         <source>Mixolydian</source>
-        <translation>mixolydická</translation>
+        <translation>Mixolydická</translation>
     </message>
     <message>
         <source>Aeolian</source>
-        <translation>aiolská</translation>
+        <translation>Aiolská</translation>
     </message>
     <message>
         <source>Locrian</source>
-        <translation>lokrická</translation>
+        <translation>Lokrická</translation>
     </message>
     <message>
         <source>Chords</source>
@@ -2940,7 +2984,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Phrygian dominant</source>
-        <translation type="unfinished"/>
+        <translation>Frygická dominanta</translation>
     </message>
     <message>
         <source>Persian</source>
@@ -2994,7 +3038,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>PROGRAM</source>
-        <translation type="unfinished"/>
+        <translation>PROGRAM</translation>
     </message>
     <message>
         <source>MIDI devices to receive MIDI events from</source>
@@ -3048,7 +3092,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Cutoff frequency</source>
-        <translation>Frekvence seříznutí</translation>
+        <translation>Frekvence oříznutí</translation>
     </message>
     <message>
         <source>RESO</source>
@@ -3060,7 +3104,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Envelopes/LFOs</source>
-        <translation type="unfinished"/>
+        <translation>Obálky/LFO</translation>
     </message>
     <message>
         <source>Filter type</source>
@@ -3068,95 +3112,95 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Q/Resonance</source>
-        <translation type="unfinished"/>
+        <translation>Q/Rezonance</translation>
     </message>
     <message>
         <source>LowPass</source>
-        <translation type="unfinished"/>
+        <translation>Low-pass</translation>
     </message>
     <message>
         <source>HiPass</source>
-        <translation type="unfinished"/>
+        <translation>HiPass</translation>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation type="unfinished"/>
+        <translation>BandPass csg</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation type="unfinished"/>
+        <translation>BandPass czpg</translation>
     </message>
     <message>
         <source>Notch</source>
-        <translation type="unfinished"/>
+        <translation>Notch</translation>
     </message>
     <message>
         <source>Allpass</source>
-        <translation type="unfinished"/>
+        <translation>Allpass</translation>
     </message>
     <message>
         <source>Moog</source>
-        <translation type="unfinished"/>
+        <translation>Moog</translation>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation type="unfinished"/>
+        <translation>2x LowPass</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation type="unfinished"/>
+        <translation>RC LowPass 12dB</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation type="unfinished"/>
+        <translation>RC BandPass 12dB</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation type="unfinished"/>
+        <translation>RC HighPass 12dB</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation type="unfinished"/>
+        <translation>RC LowPass 24dB</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation type="unfinished"/>
+        <translation>RC BandPass 24dB</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation type="unfinished"/>
+        <translation>RC HighPass 24dB</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation type="unfinished"/>
+        <translation>Vocal Formant Filter</translation>
     </message>
     <message>
         <source>2x Moog</source>
-        <translation type="unfinished"/>
+        <translation>2x Moog</translation>
     </message>
     <message>
         <source>SV LowPass</source>
-        <translation type="unfinished"/>
+        <translation>SV LowPass</translation>
     </message>
     <message>
         <source>SV BandPass</source>
-        <translation type="unfinished"/>
+        <translation>SV BandPass</translation>
     </message>
     <message>
         <source>SV HighPass</source>
-        <translation type="unfinished"/>
+        <translation>SV HighPass</translation>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation type="unfinished"/>
+        <translation>SV Notch</translation>
     </message>
     <message>
         <source>Fast Formant</source>
-        <translation type="unfinished"/>
+        <translation>Fast Formant</translation>
     </message>
     <message>
         <source>Tripole</source>
-        <translation type="unfinished"/>
+        <translation>Tripole</translation>
     </message>
 </context>
 <context>
@@ -3167,7 +3211,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>These tabs contain envelopes. They&apos;re very important for modifying a sound, in that they are almost always necessary for substractive synthesis. For example if you have a volume envelope, you can set when the sound should have a specific volume. If you want to create some soft strings then your sound has to fade in and out very softly. This can be done by setting large attack and release times. It&apos;s the same for other envelope targets like panning, cutoff frequency for the used filter and so on. Just monkey around with it! You can really make cool sounds out of a saw-wave with just some envelopes...!</source>
-        <translation type="unfinished"/>
+        <translation>Tato stránka obsahuje obálky. Ty jsou velmi důležité pro úpravu zvuku a obvykle také i nezbytné pro rozdílovou (subtraktivní) syntézu. Pokud máte například obálku hlasitosti, můžete nastavit, kdy má mít zvuk jakou sílu. Pokud chcete vytvořit něco jako smyčce, váš zvuk by měl mít velmi měkké nasazení i ukončení tónu. Toho dosáhneme nastavením dlouhého času náběhu i uvolnění. Totéž se týká ostatních druhů obálek, jako je obálka panorámatu, frekvence odříznutí pro použití u filtrů apod. Prostě si s tím můžete vyhrát dle libosti! Můžete vytvořit opravdu úžasné zvuky třeba jen z pilovité vlny pomocí vhodných obálek...!</translation>
     </message>
     <message>
         <source>FILTER</source>
@@ -3183,11 +3227,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení frekvence odříznutí pro vybraný filtr. Frekvence odříznutí určuje frekvenci pro odříznutí signálu filtrem. Například filtr typu dolní propust (lowpass) odstřihne všechny frekvence, které jsou vyšší než frekvence odříznutí. Filtr typu horní propust (highpass) odstřihne všechny frekvence, které jsou nižší než frekvence odříznutí atd... </translation>
     </message>
     <message>
         <source>RESO</source>
-        <translation>REZON</translation>
+        <translation>REZO</translation>
     </message>
     <message>
         <source>Resonance:</source>
@@ -3195,7 +3239,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení Q/Rezonance pro vybraný filtr. Q/Rezonance určuje, jak hodně filtr zesílí frekvence poblíž frekvence oříznutí.</translation>
     </message>
     <message>
         <source>FREQ</source>
@@ -3203,11 +3247,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>cutoff frequency:</source>
-        <translation>frekvence seříznutí:</translation>
+        <translation>Frekvence oříznutí:</translation>
     </message>
     <message>
         <source>Envelopes, LFOs and filters are not supported by the current instrument.</source>
-        <translation type="unfinished"/>
+        <translation>Obálky, LFO a filtry nejsou podporovány stávajícím nástrojem.</translation>
     </message>
 </context>
 <context>
@@ -3230,7 +3274,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>FX channel</source>
-        <translation>FX kanál</translation>
+        <translation>Efektový kanál</translation>
     </message>
     <message>
         <source>Default preset</source>
@@ -3246,7 +3290,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Pitch range</source>
-        <translation type="unfinished"/>
+        <translation>Výškový rozsah</translation>
     </message>
     <message>
         <source>Master Pitch</source>
@@ -3293,7 +3337,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>FX %1: %2</source>
-        <translation>FX %1: %2</translation>
+        <translation>Efekt %1: %2</translation>
     </message>
 </context>
 <context>
@@ -3344,11 +3388,11 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>FX channel</source>
-        <translation>FX kanál</translation>
+        <translation>Efektový kanál</translation>
     </message>
     <message>
         <source>ENV/LFO</source>
-        <translation>ENV/LFO</translation>
+        <translation>OBÁ/LFO</translation>
     </message>
     <message>
         <source>FUNC</source>
@@ -3356,7 +3400,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>FX</source>
-        <translation>FX</translation>
+        <translation>EFEKT</translation>
     </message>
     <message>
         <source>MIDI</source>
@@ -3388,15 +3432,15 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
-        <translation>Klikněte sem, chcete-li uložit aktuální nastavení nástrojové stopy do souboru předvoleb. Později můžete nahrát tuto předvolbu dvojitým kliknutím na prohlížeč předvoleb.</translation>
+        <translation>Klepněte sem, chcete-li uložit aktuální nastavení nástrojové stopy do souboru předvoleb. Později můžete nahrát tuto předvolbu dvojitým kliknutím na prohlížeč předvoleb.</translation>
     </message>
     <message>
         <source>MISC</source>
-        <translation>RŮZNÉ</translation>
+        <translation>JINÉ</translation>
     </message>
     <message>
         <source>Use these controls to view and edit the next/previous track in the song editor.</source>
-        <translation>Použije tyto ovládací prvky pro zobrazení a editaci další/předchozí stopy v editoru skladby</translation>
+        <translation>Použije tyto ovládací prvky pro zobrazení a editaci další/předchozí stopy v editoru skladby.</translation>
     </message>
     <message>
         <source>SAVE</source>
@@ -3414,12 +3458,12 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Logaritmické zobrazení</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Zadejte prosím novou hodnotu mezi -96.0 dBFS a 6.0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Vložte prosím novou hodnotu mezi %1 a %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Zadejte prosím novou hodnotu mezi -96.0 dBFS a 6.0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -3459,7 +3503,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <name>LadspaEffect</name>
     <message>
         <source>Unknown LADSPA plugin %1 requested.</source>
-        <translation type="unfinished"/>
+        <translation>Je požadován neznámý LADSPA plugin %1.</translation>
     </message>
 </context>
 <context>
@@ -3531,7 +3575,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>BASE</source>
-        <translation type="unfinished"/>
+        <translation>ZÁKL</translation>
     </message>
     <message>
         <source>Base amount:</source>
@@ -3539,19 +3583,19 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>todo</source>
-        <translation type="unfinished"/>
+        <translation>udělat</translation>
     </message>
     <message>
         <source>SPD</source>
-        <translation type="unfinished"/>
+        <translation>RYCH</translation>
     </message>
     <message>
         <source>LFO-speed:</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost LFO:</translation>
     </message>
     <message>
         <source>Use this knob for setting speed of the LFO. The bigger this value the faster the LFO oscillates and the faster the effect.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení rychlosti LFO. Zvýšení této hodnoty zrychlí kmitání LFO oscilátoru a zrychlí efekt.</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -3559,57 +3603,57 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
-        <translation type="unfinished"/>
+        <translation>Použijte tento otočný ovladač pro nastavení množství modulace způsobené LFO. Čím větší bude tato hodnota, tím více budou propojené paametry (např. hlasitost nebo frekvence odříznutí) ovlivněny tímto LFO.</translation>
     </message>
     <message>
         <source>PHS</source>
-        <translation type="unfinished"/>
+        <translation>FÁZ</translation>
     </message>
     <message>
         <source>Phase offset:</source>
-        <translation type="unfinished"/>
+        <translation>Posun fáze:</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation>stupně</translation>
+        <translation>stupňů</translation>
     </message>
     <message>
         <source>With this knob you can set the phase offset of the LFO. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto otočným ovladačem můžete nastavit fázový posun LFO. To znamená, že můžete posunout bod, ve kterém oscilátor začne kmitat. Například pokud máte sinusovou vlnu s fázovým posunem 180 stupňů, vlna půjde nejdříve dolů. Totéž se stane u vlny pravoúhlé.</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
-        <translation>Klikněte sem pro sinusovou vlnu.</translation>
+        <translation>Klepněte sem pro sinusovou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klikněte sem pro trojúhelníkovou vlnu.</translation>
+        <translation>Klepněte sem pro trojúhelníkovou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation>Klikněte sem pro pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pilovitou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klikněte sem pro pravoúhlou vlnu.</translation>
+        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klikněte sem pro exponenciální vlnu.</translation>
+        <translation>Klepněte sem pro exponenciální vlnu.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
-        <translation>Klikněte sem pro bílý šum.</translation>
+        <translation>Klepněte sem pro bílý šum.</translation>
     </message>
     <message>
         <source>Click here for a user-defined shape.
 Double click to pick a file.</source>
-        <translation>Klikněte sem pro uživatelem definovaný tvar.
-Dvojklik pro výběr souboru.</translation>
+        <translation>Klepněte sem pro uživatelem definovaný tvar.
+Poklepejte pro výběr souboru.</translation>
     </message>
     <message>
         <source>Click here for a moog saw-wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro pilovitou vlnu typu moog.</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -3637,16 +3681,6 @@ Dvojklik pro výběr souboru.</translation>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Could not save config-file</source>
-        <translation>Nemohu uložit konfigurační soubor</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Nemohu uložit konfigurační soubor %1. Pravděpodobně nemáte právo k zápisu do tohoto souboru.
-Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</translation>
-    </message>
     <message>
         <source>&amp;New</source>
         <translation>&amp;Nový</translation>
@@ -3733,39 +3767,39 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Song-Editor. With the help of the Song-Editor you can edit song-playlist and specify when which track should be played. You can also insert and move samples (e.g. rap samples) directly into the playlist.</source>
-        <translation>Zmačknutím tohoto tlačítka zobrazíte nebo schováte Editor skladby. S jeho pomocí můžete editovat playlist skladby a specifikovat, kdy a která stopa má být přehrána. Můžete také vložit a přesunovat samply (např. rapové) přímo do playlistu.</translation>
+        <translation>Stisknutím tohoto tlačítka zobrazíte nebo skryjete Editor skladby. S jeho pomocí můžete upravovat playlist skladby a určit, kdy a která stopa má být přehrána. Můžete také vložit a přesunovat vzorky (např. rapové) přímo do playlistu.</translation>
     </message>
     <message>
         <source>Beat+Bassline Editor</source>
-        <translation>Editor bicích a basů</translation>
+        <translation>Editor bicích/basů</translation>
     </message>
     <message>
         <source>By pressing this button, you can show or hide the Beat+Bassline Editor. The Beat+Bassline Editor is needed for creating beats, and for opening, adding, and removing channels, and for cutting, copying and pasting beat and bassline-patterns, and for other things like that.</source>
-        <translation>Stisknutím tohoto tlačítka zobrazíte nebo skryjete editor bicích a basů. Tento editor je nezbytný pro tvorbu beatů, otevírání, přidávání či odebírání kanálů a dále pro vyjímání, kopírování a vkládání beatů, bicích/basových patternů apod.</translation>
+        <translation>Stisknutím tohoto tlačítka zobrazíte nebo skryjete editor bicích/basů. Tento editor je nezbytný pro tvorbu beatů, otevírání, přidávání či odebírání kanálů a dále pro vyjímání, kopírování a vkládání beatů, bicích/basových patternů apod.</translation>
     </message>
     <message>
         <source>Piano Roll</source>
-        <translation>Piano Roll</translation>
+        <translation>Piano roll</translation>
     </message>
     <message>
         <source>Click here to show or hide the Piano-Roll. With the help of the Piano-Roll you can edit melodies in an easy way.</source>
-        <translation>Klikněte sem, pokud chcete ukázat nebo schovat Piano-Roll. S pomocí Piano Roll můžete jednoduchým způsobem editovat melodie.</translation>
+        <translation>Klepněte sem, pokud chcete ukázat nebo skrýt Piano roll. S pomocí Piano rollu můžete jednoduchým způsobem upravovat melodie.</translation>
     </message>
     <message>
         <source>Automation Editor</source>
-        <translation>Automatizační editor</translation>
+        <translation>Editor automatizace</translation>
     </message>
     <message>
         <source>Click here to show or hide the Automation Editor. With the help of the Automation Editor you can edit dynamic values in an easy way.</source>
-        <translation>Klikněte sem, pokud chcete ukázat nebo schovat Automatizační editor. S pomocí Automatizačního editoru můžete jednoduchým způsobem editovat dynamické hodnoty.</translation>
+        <translation>Klepněte sem, pokud chcete ukázat nebo skrýt Editor automatizace. S pomocí Editoru automatizace můžete jednoduchým způsobem upravovat proměnlivý průběh hodnot.</translation>
     </message>
     <message>
         <source>FX Mixer</source>
-        <translation>FX mixážní panel</translation>
+        <translation>Efektový mixážní panel</translation>
     </message>
     <message>
         <source>Click here to show or hide the FX Mixer. The FX Mixer is a very powerful tool for managing effects for your song. You can insert effects into different effect-channels.</source>
-        <translation>Klikněte sem, pokud chcete ukázat nebo skrýt FX mixážní panel. FX mixážní panel je velmi silný nástroj pro správu efektů ve vaší skladbě. Efekty můžete vkládat do různých efektových kanálů.</translation>
+        <translation>Klepněte sem, pokud chcete ukázat nebo skrýt efektový (FX) mixážní panel. Efektový mixážní panel je velmi výkonný nástroj pro správu efektů ve vaší skladbě. Efekty můžete vkládat do různých efektových kanálů.</translation>
     </message>
     <message>
         <source>Project Notes</source>
@@ -3773,7 +3807,7 @@ Ujistěte se prosím, že máte k souboru právo zápisu a zkuste to znovu.</tra
     </message>
     <message>
         <source>Click here to show or hide the project notes window. In this window you can put down your project notes.</source>
-        <translation>Klikněte sem, pokud chcete ukázat nebo schovat okno pro poznámky. V tomto okně lze vkládat vaše poznámky k projektu.</translation>
+        <translation>Klepněte sem, pokud chcete ukázat nebo schovat okno pro poznámky. V tomto okně lze vkládat vaše poznámky k projektu.</translation>
     </message>
     <message>
         <source>Controller Rack</source>
@@ -3819,11 +3853,11 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Error while parsing configuration file at line %1:%2: %3</source>
-        <translation type="unfinished"/>
+        <translation>Chyba při kontrole konfiguračního souboru na řádku %1:%2: %3</translation>
     </message>
     <message>
         <source>Volumes</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitosti</translation>
     </message>
     <message>
         <source>Undo</source>
@@ -3887,35 +3921,35 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Project recovery</source>
-        <translation type="unfinished"/>
+        <translation>Obnovení projektu</translation>
     </message>
     <message>
         <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
-        <translation type="unfinished"/>
+        <translation>Je k dispozici soubor pro obnovu. Zdá se, že poslední práce nebyla správně ukončena nebo že je již spuštěna jiná instance LMMS. Chcete obnovit tuto verzi projektu?</translation>
     </message>
     <message>
         <source>Recover</source>
-        <translation type="unfinished"/>
+        <translation>Obnovit</translation>
     </message>
     <message>
         <source>Recover the file. Please don&apos;t run multiple instances of LMMS when you do this.</source>
-        <translation type="unfinished"/>
+        <translation>Obnovit soubor. Před dokončením prosím nespouštějte další instance LMMS.</translation>
     </message>
     <message>
         <source>Ignore</source>
-        <translation type="unfinished"/>
+        <translation>Ignorovat</translation>
     </message>
     <message>
         <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
-        <translation type="unfinished"/>
+        <translation>Obvyklým způsobem spustit LMMS, ale vypnout automatické zálohování, aby se zabránilo přepsání souboru pro obnovu.</translation>
     </message>
     <message>
         <source>Discard</source>
-        <translation type="unfinished"/>
+        <translation>Zrušit</translation>
     </message>
     <message>
         <source>Launch a default session and delete the restored files. This is not reversible.</source>
-        <translation type="unfinished"/>
+        <translation>Spustit LMMS do výchozího stavu a smazat obnovené soubory. Tento krok je nevratný.</translation>
     </message>
     <message>
         <source>Preparing plugin browser</source>
@@ -3947,43 +3981,43 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Toggle metronome</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout/Vypnout metronom</translation>
     </message>
     <message>
         <source>Show/hide Song-Editor</source>
-        <translation>Zobrazit/skrýt editor skladby</translation>
+        <translation>Zobrazit/Skrýt editor skladby</translation>
     </message>
     <message>
         <source>Show/hide Beat+Bassline Editor</source>
-        <translation>Zobrazit/skrýt editor bicích a basů</translation>
+        <translation>Zobrazit/Skrýt editor bicích/basů</translation>
     </message>
     <message>
         <source>Show/hide Piano-Roll</source>
-        <translation>Zobrazit/skrýt piano-roll</translation>
+        <translation>Zobrazit/Skrýt Piano roll</translation>
     </message>
     <message>
         <source>Show/hide Automation Editor</source>
-        <translation>Zobrazit/skrýt editor automatizace</translation>
+        <translation>Zobrazit/Skrýt Editor automatizace</translation>
     </message>
     <message>
         <source>Show/hide FX Mixer</source>
-        <translation>Zobrazit/skrýt FX mixážní panel</translation>
+        <translation>Zobrazit/Skrýt efektový mixážní panel</translation>
     </message>
     <message>
         <source>Show/hide project notes</source>
-        <translation>Zobrazit/skrýt poznámky k projektu</translation>
+        <translation>Zobrazit/Skrýt poznámky k projektu</translation>
     </message>
     <message>
         <source>Show/hide controller rack</source>
-        <translation>Zobrazit/skrýt panel ovladačů</translation>
+        <translation>Zobrazit/Skrýt panel ovladačů</translation>
     </message>
     <message>
         <source>Recover session. Please save your work!</source>
-        <translation type="unfinished"/>
+        <translation>Obnovit projekt. Uložte prosím svou práci!</translation>
     </message>
     <message>
         <source>Automatic backup disabled. Remember to save your work!</source>
-        <translation type="unfinished"/>
+        <translation>Automatické zálohování je vypnuto. Nezapomeňte si uložit svou práci!</translation>
     </message>
     <message>
         <source>Recovered project not saved</source>
@@ -3991,27 +4025,23 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>This project was recovered from the previous session. It is currently unsaved and will be lost if you don&apos;t save it. Do you want to save it now?</source>
-        <translation type="unfinished"/>
+        <translation>Tento projekt byl obnoven z minulého spuštění LMMS. Zatím není uložen a pokud tak neučiníte, práce bude ztracena. Chcete jej nyní uložit? </translation>
     </message>
     <message>
         <source>LMMS Project</source>
-        <translation type="unfinished"/>
+        <translation>Projekt LMMS</translation>
     </message>
     <message>
         <source>LMMS Project Template</source>
-        <translation type="unfinished"/>
+        <translation>Šablona projektu LMMS</translation>
     </message>
     <message>
         <source>Overwrite default template?</source>
-        <translation type="unfinished"/>
+        <translation>Přepsat výchozí šablonu?</translation>
     </message>
     <message>
         <source>This will overwrite your current default template.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Volume as dBFS</source>
-        <translation>Hlasitost jako dBFS</translation>
+        <translation>Tímto se přepíše vaše nynější výchozí šablona.</translation>
     </message>
     <message>
         <source>Smooth scroll</source>
@@ -4023,18 +4053,32 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Save project template</source>
-        <translation type="unfinished"/>
+        <translation>Uložit šablonu projektu</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Hlasitost jako dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Nemohu otevřít soubor</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Nelze otevřít soubor %1 pro zápis.
+Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahující soubor a zkuste znovu!</translation>
     </message>
 </context>
 <context>
     <name>MeterDialog</name>
     <message>
         <source>Meter Numerator</source>
-        <translation type="unfinished"/>
+        <translation>Počet dob v taktu</translation>
     </message>
     <message>
         <source>Meter Denominator</source>
-        <translation type="unfinished"/>
+        <translation>Délka doby v taktu</translation>
     </message>
     <message>
         <source>TIME SIG</source>
@@ -4045,11 +4089,11 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     <name>MeterModel</name>
     <message>
         <source>Numerator</source>
-        <translation type="unfinished"/>
+        <translation>Počet dob</translation>
     </message>
     <message>
         <source>Denominator</source>
-        <translation type="unfinished"/>
+        <translation>Délka doby</translation>
     </message>
 </context>
 <context>
@@ -4075,7 +4119,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>You did not compile LMMS with support for SoundFont2 player, which is used to add default sound to imported MIDI files. Therefore no sound will be played back after importing this MIDI file.</source>
-        <translation type="unfinished"/>
+        <translation>Nelze zkompilovat LMMS s podporou přehrávače SoundFont2, který je použitý k přidání výchozího zvuku do importovaných MIDI souborů. Proto nebude po importování tohoto MIDI souboru přehráván žádný zvuk.</translation>
     </message>
     <message>
         <source>Track</source>
@@ -4087,12 +4131,12 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     <message>
         <source>JACK server down</source>
         <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
-        <translation type="unfinished"/>
+        <translation>JACK server zhavaroval</translation>
     </message>
     <message>
         <source>The JACK server seems to be shuted down.</source>
         <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
-        <translation type="unfinished"/>
+        <translation>Zdá se, že JACK server zhavaroval.</translation>
     </message>
 </context>
 <context>
@@ -4157,7 +4201,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 1 Panning</source>
-        <translation>Panoráma Osc 1</translation>
+        <translation>Osc 1 panoráma</translation>
     </message>
     <message>
         <source>Osc 1 Coarse detune</source>
@@ -4181,11 +4225,11 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 1 Sync send on rise</source>
-        <translation type="unfinished"/>
+        <translation>Osc 1 synchronizace při nárůstu</translation>
     </message>
     <message>
         <source>Osc 1 Sync send on fall</source>
-        <translation type="unfinished"/>
+        <translation>Osc 1 synchronizace při poklesu</translation>
     </message>
     <message>
         <source>Osc 2 Volume</source>
@@ -4193,7 +4237,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 2 Panning</source>
-        <translation>Panoráma Osc 2</translation>
+        <translation>Osc 2 panoráma</translation>
     </message>
     <message>
         <source>Osc 2 Coarse detune</source>
@@ -4217,11 +4261,11 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 2 Sync Hard</source>
-        <translation type="unfinished"/>
+        <translation>Osc 2 pevná synchronizace</translation>
     </message>
     <message>
         <source>Osc 2 Sync Reverse</source>
-        <translation type="unfinished"/>
+        <translation>Osc 2 reverzní synchronizace</translation>
     </message>
     <message>
         <source>Osc 3 Volume</source>
@@ -4229,7 +4273,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 3 Panning</source>
-        <translation>Panoráma Osc 3</translation>
+        <translation>Osc 3 panoráma</translation>
     </message>
     <message>
         <source>Osc 3 Coarse detune</source>
@@ -4241,7 +4285,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 3 Sub-oscillator mix</source>
-        <translation type="unfinished"/>
+        <translation>Osc 3 smíchání se sub-oscilátorem</translation>
     </message>
     <message>
         <source>Osc 3 Waveform 1</source>
@@ -4253,99 +4297,99 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Osc 3 Sync Hard</source>
-        <translation type="unfinished"/>
+        <translation>Osc 3 pevná synchronizace</translation>
     </message>
     <message>
         <source>Osc 3 Sync Reverse</source>
-        <translation type="unfinished"/>
+        <translation>Osc 3 reverzní synchronizace</translation>
     </message>
     <message>
         <source>LFO 1 Waveform</source>
-        <translation type="unfinished"/>
+        <translation>LFO 1 vlna</translation>
     </message>
     <message>
         <source>LFO 1 Attack</source>
-        <translation type="unfinished"/>
+        <translation>LFO 1 náběh</translation>
     </message>
     <message>
         <source>LFO 1 Rate</source>
-        <translation type="unfinished"/>
+        <translation>LFO 1  rychlost</translation>
     </message>
     <message>
         <source>LFO 1 Phase</source>
-        <translation type="unfinished"/>
+        <translation>LFO 1 fáze</translation>
     </message>
     <message>
         <source>LFO 2 Waveform</source>
-        <translation type="unfinished"/>
+        <translation>LFO 2 vlna</translation>
     </message>
     <message>
         <source>LFO 2 Attack</source>
-        <translation type="unfinished"/>
+        <translation>LFO 2 náběh</translation>
     </message>
     <message>
         <source>LFO 2 Rate</source>
-        <translation type="unfinished"/>
+        <translation>LFO 2 rychlost</translation>
     </message>
     <message>
         <source>LFO 2 Phase</source>
-        <translation type="unfinished"/>
+        <translation>LFO 2 fáze</translation>
     </message>
     <message>
         <source>Env 1 Pre-delay</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1 předzpoždění </translation>
     </message>
     <message>
         <source>Env 1 Attack</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1 náběh</translation>
     </message>
     <message>
         <source>Env 1 Hold</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1 držení</translation>
     </message>
     <message>
         <source>Env 1 Decay</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1 útlum</translation>
     </message>
     <message>
         <source>Env 1 Sustain</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1 vydržení</translation>
     </message>
     <message>
         <source>Env 1 Release</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1  uvolnění</translation>
     </message>
     <message>
         <source>Env 1 Slope</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 1 sklon</translation>
     </message>
     <message>
         <source>Env 2 Pre-delay</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 předzpoždění</translation>
     </message>
     <message>
         <source>Env 2 Attack</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 náběh</translation>
     </message>
     <message>
         <source>Env 2 Hold</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 držení</translation>
     </message>
     <message>
         <source>Env 2 Decay</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 útlum</translation>
     </message>
     <message>
         <source>Env 2 Sustain</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 vydržení</translation>
     </message>
     <message>
         <source>Env 2 Release</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 uvolnění</translation>
     </message>
     <message>
         <source>Env 2 Slope</source>
-        <translation type="unfinished"/>
+        <translation>Obálka 2 sklon</translation>
     </message>
     <message>
         <source>Osc2-3 modulation</source>
@@ -4353,183 +4397,183 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Selected view</source>
-        <translation type="unfinished"/>
+        <translation>Zvolený pohled</translation>
     </message>
     <message>
         <source>Vol1-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Hla1-Obá1 </translation>
     </message>
     <message>
         <source>Vol1-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Hla1-Obá2</translation>
     </message>
     <message>
         <source>Vol1-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Hla1-LFO1 </translation>
     </message>
     <message>
         <source>Vol1-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Hla1-LFO2</translation>
     </message>
     <message>
         <source>Vol2-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Hla2-Obá1 </translation>
     </message>
     <message>
         <source>Vol2-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Hla2-Obá2 </translation>
     </message>
     <message>
         <source>Vol2-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Hla2-LFO1</translation>
     </message>
     <message>
         <source>Vol2-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Hla2-LFO2</translation>
     </message>
     <message>
         <source>Vol3-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Hla3-Obá1</translation>
     </message>
     <message>
         <source>Vol3-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Hla3-Obá2</translation>
     </message>
     <message>
         <source>Vol3-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Hla3-LFO1</translation>
     </message>
     <message>
         <source>Vol3-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Hla3-LFO2</translation>
     </message>
     <message>
         <source>Phs1-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Fáz1-Obá1</translation>
     </message>
     <message>
         <source>Phs1-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Fáz1-Obá2</translation>
     </message>
     <message>
         <source>Phs1-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Fáz1-LFO1</translation>
     </message>
     <message>
         <source>Phs1-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Fáz1-LFO2</translation>
     </message>
     <message>
         <source>Phs2-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Fáz2-Obá1</translation>
     </message>
     <message>
         <source>Phs2-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Fáz2-Obá2</translation>
     </message>
     <message>
         <source>Phs2-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Fáz2-LFO1</translation>
     </message>
     <message>
         <source>Phs2-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Fáz2-LFO2</translation>
     </message>
     <message>
         <source>Phs3-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Fáz3-Obá1</translation>
     </message>
     <message>
         <source>Phs3-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Fáz3-Obá2</translation>
     </message>
     <message>
         <source>Phs3-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Fáz3-LFO1</translation>
     </message>
     <message>
         <source>Phs3-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Fáz3-LFO2</translation>
     </message>
     <message>
         <source>Pit1-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Výš1-Obá1</translation>
     </message>
     <message>
         <source>Pit1-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Výš1-Obá2</translation>
     </message>
     <message>
         <source>Pit1-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Výš1-LFO1</translation>
     </message>
     <message>
         <source>Pit1-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Výš1-LFO2</translation>
     </message>
     <message>
         <source>Pit2-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Výš2-Obá1</translation>
     </message>
     <message>
         <source>Pit2-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Výš2-Obá2</translation>
     </message>
     <message>
         <source>Pit2-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Výš2-LFO1</translation>
     </message>
     <message>
         <source>Pit2-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Výš2-LFO2</translation>
     </message>
     <message>
         <source>Pit3-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Výš3-Obá1</translation>
     </message>
     <message>
         <source>Pit3-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Výš3-Obá2</translation>
     </message>
     <message>
         <source>Pit3-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Výš3-LFO1</translation>
     </message>
     <message>
         <source>Pit3-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Výš3-LFO2</translation>
     </message>
     <message>
         <source>PW1-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Pul1-Obá1</translation>
     </message>
     <message>
         <source>PW1-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Pul1-Obá2</translation>
     </message>
     <message>
         <source>PW1-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Pul1-LFO1</translation>
     </message>
     <message>
         <source>PW1-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Pul1-LFO2</translation>
     </message>
     <message>
         <source>Sub3-Env1</source>
-        <translation type="unfinished"/>
+        <translation>Sub3-Obá1</translation>
     </message>
     <message>
         <source>Sub3-Env2</source>
-        <translation type="unfinished"/>
+        <translation>Sub3-Obá2</translation>
     </message>
     <message>
         <source>Sub3-LFO1</source>
-        <translation type="unfinished"/>
+        <translation>Sub3-LFO1</translation>
     </message>
     <message>
         <source>Sub3-LFO2</source>
-        <translation type="unfinished"/>
+        <translation>Sub3-LFO2</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -4537,35 +4581,35 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Bandlimited Triangle wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená trojúhelníková vlna</translation>
     </message>
     <message>
         <source>Bandlimited Saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená pilovitá vlna</translation>
     </message>
     <message>
         <source>Bandlimited Ramp wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená šikmá vlna</translation>
     </message>
     <message>
         <source>Bandlimited Square wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená pravoúhlá vlna</translation>
     </message>
     <message>
         <source>Bandlimited Moog saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená pilovitá Moog vlna</translation>
     </message>
     <message>
         <source>Soft square wave</source>
-        <translation type="unfinished"/>
+        <translation>Zaoblená pravoúhlá vlna</translation>
     </message>
     <message>
         <source>Absolute sine wave</source>
-        <translation type="unfinished"/>
+        <translation>Absolutní sinusová vlna</translation>
     </message>
     <message>
         <source>Exponential wave</source>
-        <translation type="unfinished"/>
+        <translation>Exponenciální vlna</translation>
     </message>
     <message>
         <source>White noise</source>
@@ -4581,15 +4625,15 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Digital Ramp wave</source>
-        <translation type="unfinished"/>
+        <translation>Digitální šikmá vlna</translation>
     </message>
     <message>
         <source>Digital Square wave</source>
-        <translation type="unfinished"/>
+        <translation>Digitální pravoúhlá vlna</translation>
     </message>
     <message>
         <source>Digital Moog saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Digitální pilovitá Moog vlna</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -4601,44 +4645,46 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Ramp wave</source>
-        <translation type="unfinished"/>
+        <translation>Šikmá vlna</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Pravoúhlá (square) vlna</translation>
+        <translation>Pravoúhlá vlna</translation>
     </message>
     <message>
         <source>Moog saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Pilovitá Moog vlna</translation>
     </message>
     <message>
         <source>Abs. sine wave</source>
-        <translation type="unfinished"/>
+        <translation>Abs. sinusová vlna</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation>Náhodně</translation>
+        <translation>Náhodná</translation>
     </message>
     <message>
         <source>Random smooth</source>
-        <translation type="unfinished"/>
+        <translation>Vyhlazená náhodná</translation>
     </message>
 </context>
 <context>
     <name>MonstroView</name>
     <message>
         <source>Operators view</source>
-        <translation>Pohled operátora</translation>
+        <translation>Zobrazení operátorů</translation>
     </message>
     <message>
         <source>The Operators view contains all the operators. These include both audible operators (oscillators) and inaudible operators, or modulators: Low-frequency oscillators and Envelopes. 
 
 Knobs and other widgets in the Operators view have their own what&apos;s this -texts, so you can get more specific help for them that way. </source>
-        <translation type="unfinished"/>
+        <translation>Zobrazení operátorů obsahuje všechny operátory. Toto společně zahrnuje jak přímo slyšitelné operátory (oscilátory), tak i neslyšitelné operátory nebo modulátory: generátory nízkých kmitů (LFO) a obálek.
+
+Otočné ovladače a další ovládací prvky v Zobrazení operátorů mají své vlastní textové popisky, takže můžete získat bližší nápovědu, co který konkrétně dělá.</translation>
     </message>
     <message>
         <source>Matrix view</source>
-        <translation>Maticový pohled</translation>
+        <translation>Zobrazení matrice</translation>
     </message>
     <message>
         <source>The Matrix view contains the modulation matrix. Here you can define the modulation relationships between the various operators: Each audible operator (oscillators 1-3) has 3-4 properties that can be modulated by any of the modulators. Using more modulations consumes more CPU power. 
@@ -4646,153 +4692,167 @@ Knobs and other widgets in the Operators view have their own what&apos;s this -t
 The view is divided to modulation targets, grouped by the target oscillator. Available targets are volume, pitch, phase, pulse width and sub-osc ratio. Note: some targets are specific to one oscillator only. 
 
 Each modulation target has 4 knobs, one for each modulator. By default the knobs are at 0, which means no modulation. Turning a knob to 1 causes that modulator to affect the modulation target as much as possible. Turning it to -1 does the same, but the modulation is inversed. </source>
-        <translation type="unfinished"/>
+        <translation>Zobrazení matrice obsahuje modulační matrici. Zde můžete nadefinovat modulační vazby mezi různými operátory: každý slyšitelný operátor (oscilátory 1–3) má 3–4 vlastnosti, které mohou být modulovány dalšími modulátory. Použití více modulací spotřebovává více výkonu procesoru.
+
+Okno je rozděleno na cíle modulace, seskupené podle cílových oscilátorů. Dostupné cíle jsou: hlasitost, výška, fáze, délka pulzu a poměr sub-oscilátoru. Poznámka: některé cíle jsou dostupné pouze pro určitý oscilátor.
+
+Každý cíl modulace má 4 otočné ovladače, jeden pro každý modulátor. Výchozí stav ovladačů je 0, tedy bez modulace. Otočení ovladače na 1  způsobí, že modulátor bude působit na cíl nejvíce, jak je možno. Otočení na -1 způsobí totéž, ale modulace bude inverzně obrácena.</translation>
     </message>
     <message>
         <source>Mix Osc2 with Osc3</source>
-        <translation type="unfinished"/>
+        <translation>Smíchat Osc2 a Osc3</translation>
     </message>
     <message>
         <source>Modulate amplitude of Osc3 with Osc2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat amplitudu Osc3 pomocí Osc2</translation>
     </message>
     <message>
         <source>Modulate frequency of Osc3 with Osc2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat frekvenci Osc3 pomocí Osc2</translation>
     </message>
     <message>
         <source>Modulate phase of Osc3 with Osc2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat fázi Osc3 pomocí Osc2</translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 1 in semitone steps. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač CRS mění ladění oscilátoru 1 v půltónových krocích.</translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 2 in semitone steps. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač CRS mění ladění oscilátoru 2 v půltónových krocích.</translation>
     </message>
     <message>
         <source>The CRS knob changes the tuning of oscillator 3 in semitone steps. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač CRS mění ladění oscilátoru 3 v půltónových krocích.</translation>
     </message>
     <message>
         <source>FTL and FTR change the finetuning of the oscillator for left and right channels respectively. These can add stereo-detuning to the oscillator which widens the stereo image and causes an illusion of space. </source>
-        <translation type="unfinished"/>
+        <translation>FTL a FTR změní jemné ladění oscilátoru pro levý a pravý kanál. To přidává oscilátoru stereo rozladění, které rozšíří stereo obraz a vytvoří dojem prostoru.</translation>
     </message>
     <message>
         <source>The SPO knob modifies the difference in phase between left and right channels. Higher difference creates a wider stereo image. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač SPO upravuje rozdíl ve fázi mezi levým a pravým kanálem. Větší rozdíl vytváří širší stereofonní obraz.</translation>
     </message>
     <message>
         <source>The PW knob controls the pulse width, also known as duty cycle, of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, it doesn&apos;t produce bandlimited output, which means that you can use it as an audible oscillator but it will cause aliasing. You can also use it as an inaudible source of a sync signal, which can be used to synchronize oscillators 2 and 3. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač PW řídí šířku pulzu, jinak též pracovní cyklus, oscilátoru 1. Oscilátor 1 je digitální generátor pulzních vln, který nevytváří pásmově omezený výstup, což znamená, že jej sice můžete použít jako zdroj slyšitelného signálu, ale způsobuje aliasing. Můžete jej ale také využít jako neslyšitelný zdroj synchronizačního signálu, který může sloužit k synchronizaci oscilátorů 2 a 3.</translation>
     </message>
     <message>
         <source>Send Sync on Rise: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from low to high, ie. when the amplitude changes from -1 to 1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation type="unfinished"/>
+        <translation>Zaslání synchronizačního signálu při nárůstu: je-li zapnuto, bude synchronizační signál zasílán pokaždé, když bude stav oscilátoru 1 změněn na vyšší, např. když se amplituda změní z -1 na 1. Výška, fáze a šířka pulzu oscilátoru 1  mohou mít vliv na časování synchronizace, ale jejich množství zde nemá žádný efekt. Synchronizační signály jsou odesílány nezávisle pro levý a pravý kanál.</translation>
     </message>
     <message>
         <source>Send Sync on Fall: When enabled, the Sync signal is sent every time the state of oscillator 1 changes from high to low, ie. when the amplitude changes from 1 to -1. Oscillator 1&apos;s pitch, phase and pulse width may affect the timing of syncs, but its volume has no effect on them. Sync signals are sent independently for both left and right channels. </source>
-        <translation type="unfinished"/>
+        <translation>Zaslání synchronizačního signálu při poklesu: je-li zapnuto, bude synchronizační signál zasílán pokaždé, když bude stav oscilátoru 1 změněn na nižší, např. když se amplituda změní z 1 na -1. Výška, fáze a šířka pulzu oscilátoru 1  mohou mít vliv na časování synchronizace, ale jejich množství zde nemá žádný efekt. Synchronizační signály jsou odesílány nezávisle pro levý a pravý kanál.</translation>
     </message>
     <message>
         <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
-        <translation type="unfinished"/>
+        <translation>Pevná synchronizace: pokaždé, když oscilátor přijme synchronizační signál z oscilátoru 1, jeho fáze bude nastavena na 0, bez ohledu na jeho fázový posun.</translation>
     </message>
     <message>
         <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
-        <translation type="unfinished"/>
+        <translation>Reverzní synchronizace: pokaždé, když oscilátor přijme synchronizační signál z oscilátoru 1, jeho amplituda bude převrácena.</translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 2. </source>
-        <translation type="unfinished"/>
+        <translation>Vyberte vlnu pro oscilátor 2.</translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 3&apos;s first sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
-        <translation type="unfinished"/>
+        <translation>Vyberte vlnu pro první suboscilátor oscilátoru 3. Oscilátor 3 může plynule interpolovat mezi dvěma různými vlnovými průběhy.</translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 3&apos;s second sub-osc. Oscillator 3 can smoothly interpolate between two different waveforms. </source>
-        <translation type="unfinished"/>
+        <translation>Vyberte vlnu pro druhý suboscilátor oscilátoru 3. Oscilátor 3 může plynule interpolovat mezi dvěma různými vlnovými průběhy.</translation>
     </message>
     <message>
         <source>The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. Each sub-osc can be set to produce a different waveform, and oscillator 3 can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied to both sub-oscs/waveforms in the exact same way. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač SUB mění poměr směšování mezi dvěma suboscilátory oscilátoru 3. Každý suboscilátor může být nastaven tak, aby vytvářel jiný vlnový průběh, a oscilátor 3 může plynule interpolovat mezi nimi. Všechny příchozí modulace oscilátoru 3 jsou shodným způsobem aplikovány na oba suboscilátory / vlnové průběhy.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 Mix mode means no modulation: the outputs of the oscillators are simply mixed together. </source>
-        <translation type="unfinished"/>
+        <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
+
+Režim směšování znamená bez modulace: výstupy oscilátorů se jednoduše smíchají.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 AM means amplitude modulation: Oscillator 3&apos;s amplitude (volume) is modulated by oscillator 2. </source>
-        <translation type="unfinished"/>
+        <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
+
+AM znamená amplitudovou modulaci: Amplituda (hlasitost) oscilátoru 3 je modulována oscilátorem 2.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 FM means frequency modulation: Oscillator 3&apos;s frequency (pitch) is modulated by oscillator 2. The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch than &quot;pure&quot; frequency modulation. </source>
-        <translation type="unfinished"/>
+        <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
+
+FM znamená frekvenční modulaci: frekvence (výška) oscilátoru 3 je modulována oscilátorem 2. Frekvenční modulace je implementována jako fázová modulace, která poskytuje stabilnější výslednou výšku než &quot;čistá&quot; frekvenční modulace.</translation>
     </message>
     <message>
         <source>In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by the output of oscillator 2. 
 
 PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 2. It differs from frequency modulation in that the phase changes are not cumulative. </source>
-        <translation type="unfinished"/>
+        <translation>Kromě vyhrazených modulátorů Monstro umožňuje oscilátor 3 modulovat výstupem oscilátoru 2.
+
+PM znamená fázovou modulaci: fáze oscilátoru 3 je modulována oscilátorem 2. To se liší od frekvenční modulace tím, že fázové změny nejsou kumulativní.</translation>
     </message>
     <message>
         <source>Select the waveform for LFO 1. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation type="unfinished"/>
+        <translation>Vyberte tvar vlny pro LFO 1.
+&quot;Náhodná&quot; a &quot;Vyhlazená náhodná&quot; jsou speciální vlny: produkují náhodný výstup, kde rychlost LFO řídí, jak často se mění stav LFO. Vyhlazená verze interpoluje mezi těmito stavy kosinovou interpolací. Tyto náhodné režimy mohou být použity k oživení vašich předvoleb – přidávají něco z analogové nepředvídatelnosti...</translation>
     </message>
     <message>
         <source>Select the waveform for LFO 2. 
 &quot;Random&quot; and &quot;Random smooth&quot; are special waveforms: they produce random output, where the rate of the LFO controls how often the state of the LFO changes. The smooth version interpolates between these states with cosine interpolation. These random modes can be used to give &quot;life&quot; to your presets - add some of that analog unpredictability... </source>
-        <translation type="unfinished"/>
+        <translation>Vyberte tvar vlny pro LFO 2.
+&quot;Náhodná&quot; a &quot;Vyhlazená náhodná&quot; jsou speciální vlny: produkují náhodný výstup, kde rychlost LFO řídí, jak často se mění stav LFO. Vyhlazená verze interpoluje mezi těmito stavy kosinovou interpolací. Tyto náhodné režimy mohou být použity k oživení vašich předvoleb – přidávají něco z analogové nepředvídatelnosti...</translation>
     </message>
     <message>
         <source>Attack causes the LFO to come on gradually from the start of the note. </source>
-        <translation type="unfinished"/>
+        <translation>Náběh způsobí, že LFO najede postupně od začátku noty.</translation>
     </message>
     <message>
         <source>Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. </source>
-        <translation type="unfinished"/>
+        <translation>Rate nastavuje rychlost LFO, měřenou v milisekundách za cyklus. Lze synchronizovat s tempem.</translation>
     </message>
     <message>
         <source>PHS controls the phase offset of the LFO. </source>
-        <translation type="unfinished"/>
+        <translation>PHS řídí fázový posun LFO.</translation>
     </message>
     <message>
         <source>PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. </source>
-        <translation type="unfinished"/>
+        <translation>PRE nebo předzpoždění (PRE, predelay) zpozdí začátek obálky oproti začátku noty. Hodnota 0 znamená bez zpoždění.</translation>
     </message>
     <message>
         <source>ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. A value of 0 means instant. </source>
-        <translation type="unfinished"/>
+        <translation>NÁB nebo náběh určuje, jak rychle vystoupá začátek obálky do špičky, měřeno v milisekundách. Hodnota 0 znamená okamžitý náběh.</translation>
     </message>
     <message>
         <source>HOLD controls how long the envelope stays at peak after the attack phase. </source>
-        <translation type="unfinished"/>
+        <translation>Držení určuje, jak dlouho obálka zůstane na špičce po fázi náběhu.</translation>
     </message>
     <message>
         <source>DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds it would take to go from peak to zero. The actual decay may be shorter if sustain is used. </source>
-        <translation type="unfinished"/>
+        <translation>ÚTL nebo útlum (DEC, decoy) řídí rychlost poklesu obálky ze špičky do nulové úrovně (měřeno v milisekundách). Aktuální útlum může být kratší, pokud je použito podržení (sustain).</translation>
     </message>
     <message>
         <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
-        <translation type="unfinished"/>
+        <translation>POD nebo podržení (SUS, sustain) řídí úroveň podržení v obálce. Fáze útlumu (decoy) nemůže jít pod tuto úroveň, dokud je nota držená.</translation>
     </message>
     <message>
         <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
-        <translation type="unfinished"/>
+        <translation>UVO nebo uvolnění určuje, jak dlouhé bude ukončení noty, tedy jak dlouho bude trvat zeslabení ze špičky na nulu. Skutečná délka uvolnění může být kratší v závislosti na tom, ve které fázi je nota ukončena.</translation>
     </message>
     <message>
         <source>The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. Negative values create curves that start slowly, peak quickly and fall of slowly again. Positive values create curves that start and end quickly, and stay longer near the peaks. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač sklon řídí křivku a tvar obálky. Hodnota 0 vytváří přímý nárůst i pokles. Záporné hodnoty vytvářejí křivku, která začíná pomalu, rychle dosáhne špičky a opět pomalu klesá. Pozitivní hodnoty vytvářejí křivku, která začíná a končí rychle a udržuje se v blízkosti špičky.</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -4828,7 +4888,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source> deg</source>
-        <translation type="unfinished"/>
+        <translation>stupňů</translation>
     </message>
     <message>
         <source>Pulse width</source>
@@ -4836,39 +4896,39 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Send sync on pulse rise</source>
-        <translation type="unfinished"/>
+        <translation>Synchronizace při nárůstu pulzu</translation>
     </message>
     <message>
         <source>Send sync on pulse fall</source>
-        <translation type="unfinished"/>
+        <translation>Synchronizace při poklesu pulzu</translation>
     </message>
     <message>
         <source>Hard sync oscillator 2</source>
-        <translation type="unfinished"/>
+        <translation>Pevně synchronizovat oscilátor 2</translation>
     </message>
     <message>
         <source>Reverse sync oscillator 2</source>
-        <translation type="unfinished"/>
+        <translation>Reverzně synchronizovat oscilátor 2</translation>
     </message>
     <message>
         <source>Sub-osc mix</source>
-        <translation type="unfinished"/>
+        <translation>Míchání sub-osc</translation>
     </message>
     <message>
         <source>Hard sync oscillator 3</source>
-        <translation type="unfinished"/>
+        <translation>Pevně synchronizovat oscilátor 3</translation>
     </message>
     <message>
         <source>Reverse sync oscillator 3</source>
-        <translation type="unfinished"/>
+        <translation>Reverzně synchronizovat oscilátor 3</translation>
     </message>
     <message>
         <source>Attack</source>
-        <translation>Nástup</translation>
+        <translation>Náběh</translation>
     </message>
     <message>
         <source>Rate</source>
-        <translation>Rychlost</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Phase</source>
@@ -4876,19 +4936,19 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Pre-delay</source>
-        <translation type="unfinished"/>
+        <translation>Předzpoždění</translation>
     </message>
     <message>
         <source>Hold</source>
-        <translation type="unfinished"/>
+        <translation>Držení</translation>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Doznívání</translation>
+        <translation>Útlum</translation>
     </message>
     <message>
         <source>Sustain</source>
-        <translation type="unfinished"/>
+        <translation>Vydržení</translation>
     </message>
     <message>
         <source>Release</source>
@@ -4915,19 +4975,19 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Dry</source>
-        <translation type="unfinished"/>
+        <translation>Poměr</translation>
     </message>
     <message>
         <source>Dry Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Poměr zdrojového zvuku:</translation>
     </message>
     <message>
         <source>Stages</source>
-        <translation type="unfinished"/>
+        <translation>Úrovně</translation>
     </message>
     <message>
         <source>Lowpass stages:</source>
-        <translation type="unfinished"/>
+        <translation>Počet úrovní dolní propusti:</translation>
     </message>
     <message>
         <source>Swap inputs</source>
@@ -4946,7 +5006,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Channel 1 Volume</source>
-        <translation>Kanál 1 hlasitost</translation>
+        <translation>Hlasitost kanálu 1</translation>
     </message>
     <message>
         <source>Channel 1 Envelope length</source>
@@ -4958,11 +5018,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Channel 1 Sweep amount</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 1 množství sweepu</translation>
     </message>
     <message>
         <source>Channel 1 Sweep rate</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 1rychlost sweepu</translation>
     </message>
     <message>
         <source>Channel 2 Coarse detune</source>
@@ -4970,7 +5030,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Channel 2 Volume</source>
-        <translation>Kanál 2 hlasitost</translation>
+        <translation>Hlasitost kanálu 2</translation>
     </message>
     <message>
         <source>Channel 2 Envelope length</source>
@@ -4982,11 +5042,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Channel 2 Sweep amount</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 2 množství sweepu</translation>
     </message>
     <message>
         <source>Channel 2 Sweep rate</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 2 rychlost sweepu</translation>
     </message>
     <message>
         <source>Channel 3 Coarse detune</source>
@@ -4994,11 +5054,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Channel 3 Volume</source>
-        <translation>Kanál 3 hlasitost</translation>
+        <translation>Hlasitost kanálu 3</translation>
     </message>
     <message>
         <source>Channel 4 Volume</source>
-        <translation>Kanál 4 hlasitost</translation>
+        <translation>Hlasitost kanálu 4</translation>
     </message>
     <message>
         <source>Channel 4 Envelope length</source>
@@ -5010,7 +5070,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Channel 4 Noise frequency sweep</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 4 sweep frekvence šumu</translation>
     </message>
     <message>
         <source>Master volume</source>
@@ -5045,35 +5105,35 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Enable envelope 1 loop</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout smyčku obálky 1</translation>
     </message>
     <message>
         <source>Enable sweep 1</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout sweep 1</translation>
     </message>
     <message>
         <source>Sweep amount</source>
-        <translation type="unfinished"/>
+        <translation>Množství sweepu</translation>
     </message>
     <message>
         <source>Sweep rate</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost sweepu</translation>
     </message>
     <message>
         <source>12.5% Duty cycle</source>
-        <translation type="unfinished"/>
+        <translation>12.5% pracovního cyklu</translation>
     </message>
     <message>
         <source>25% Duty cycle</source>
-        <translation type="unfinished"/>
+        <translation>25% pracovního cyklu</translation>
     </message>
     <message>
         <source>50% Duty cycle</source>
-        <translation type="unfinished"/>
+        <translation>50% pracovního cyklu</translation>
     </message>
     <message>
         <source>75% Duty cycle</source>
-        <translation type="unfinished"/>
+        <translation>75% pracovního cyklu</translation>
     </message>
     <message>
         <source>Enable channel 2</source>
@@ -5085,11 +5145,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Enable envelope 2 loop</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout smyčku obálky 2</translation>
     </message>
     <message>
         <source>Enable sweep 2</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout sweep 2</translation>
     </message>
     <message>
         <source>Enable channel 3</source>
@@ -5101,7 +5161,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Frequency sweep</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence sweepu</translation>
     </message>
     <message>
         <source>Enable channel 4</source>
@@ -5113,15 +5173,15 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Enable envelope 4 loop</source>
-        <translation type="unfinished"/>
+        <translation>Zapnout smyčku obálky 4</translation>
     </message>
     <message>
         <source>Quantize noise frequency when using note frequency</source>
-        <translation type="unfinished"/>
+        <translation>Kvantizovat frekvenci šumu při použití frekvence noty</translation>
     </message>
     <message>
         <source>Use note frequency for noise</source>
-        <translation type="unfinished"/>
+        <translation>Použít frekvenci pro šum</translation>
     </message>
     <message>
         <source>Noise mode</source>
@@ -5144,7 +5204,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Osc %1 panning</source>
-        <translation>Panoráma Osc %1</translation>
+        <translation>Osc %1 panoráma</translation>
     </message>
     <message>
         <source>Osc %1 coarse detuning</source>
@@ -5172,7 +5232,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Modulation type %1</source>
-        <translation type="unfinished"/>
+        <translation>Typ modulace %1</translation>
     </message>
     <message>
         <source>Osc %1 waveform</source>
@@ -5180,7 +5240,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Osc %1 harmonic</source>
-        <translation type="unfinished"/>
+        <translation>Osc %1 harmonické</translation>
     </message>
 </context>
 <context>
@@ -5226,7 +5286,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Click here to open another patch-file. Loop and Tune settings are not reset.</source>
-        <translation>Klikněte sem, pokud chcete otevřít další patch-soubor. Nastavení smyčky a režimu ladění budou zachována.</translation>
+        <translation>Klepněte sem, pokud chcete otevřít další patch-soubor. Nastavení smyčky a režimu ladění zůstanou zachována.</translation>
     </message>
     <message>
         <source>Loop</source>
@@ -5238,7 +5298,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Here you can toggle the Loop mode. If enabled, PatMan will use the loop information available in the file.</source>
-        <translation type="unfinished"/>
+        <translation>Zde můžete přepínat režim smyčky. Je-li zapnutá, PatMan použije informace o smyčce dostupné v souboru.</translation>
     </message>
     <message>
         <source>Tune</source>
@@ -5250,26 +5310,26 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Here you can toggle the Tune mode. If enabled, PatMan will tune the sample to match the note&apos;s frequency.</source>
-        <translation type="unfinished"/>
+        <translation>Zde můžete přepínat režim ladění. Je-li zapnut, PatMan naladí vzorek tak, aby odpovídal frekvenci noty.</translation>
     </message>
     <message>
         <source>No file selected</source>
-        <translation type="unfinished"/>
+        <translation>Není vybrán žádný soubor</translation>
     </message>
     <message>
         <source>Open patch file</source>
-        <translation type="unfinished"/>
+        <translation>Otevřít soubor patch</translation>
     </message>
     <message>
         <source>Patch-Files (*.pat)</source>
-        <translation type="unfinished"/>
+        <translation>Soubor patch (*.pat)</translation>
     </message>
 </context>
 <context>
     <name>PatternView</name>
     <message>
         <source>Open in piano-roll</source>
-        <translation>Otevřít v piano-roll</translation>
+        <translation>Otevřít v piano rollu</translation>
     </message>
     <message>
         <source>Clear all notes</source>
@@ -5297,7 +5357,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>double-click to open in Piano Roll</source>
-        <translation type="unfinished"/>
+        <translation>poklepáním otevřete v Piano rollu</translation>
     </message>
     <message>
         <source>Clone Steps</source>
@@ -5308,22 +5368,22 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PeakController</name>
     <message>
         <source>Peak Controller</source>
-        <translation type="unfinished"/>
+        <translation>Řízení špičky</translation>
     </message>
     <message>
         <source>Peak Controller Bug</source>
-        <translation type="unfinished"/>
+        <translation>Chyba řízení špičky</translation>
     </message>
     <message>
         <source>Due to a bug in older version of LMMS, the peak controllers may not be connect properly. Please ensure that peak controllers are connected properly and re-save this file. Sorry for any inconvenience caused.</source>
-        <translation type="unfinished"/>
+        <translation>Z důvodu chyby ve starší verzi LMMS nemusí být řízení špičky správně připojeno. Ujistěte se prosím, zda je řízení špičky správně připojeno a znovu uložte tento soubor. Omlouváme se za způsobené nepříjemnosti.</translation>
     </message>
 </context>
 <context>
     <name>PeakControllerDialog</name>
     <message>
         <source>PEAK</source>
-        <translation type="unfinished"/>
+        <translation>ŠPIČ</translation>
     </message>
     <message>
         <source>LFO Controller</source>
@@ -5334,7 +5394,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PeakControllerEffectControlDialog</name>
     <message>
         <source>BASE</source>
-        <translation type="unfinished"/>
+        <translation>ZÁKL</translation>
     </message>
     <message>
         <source>Base amount:</source>
@@ -5346,11 +5406,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished"/>
+        <translation>Náběh:</translation>
     </message>
     <message>
         <source>Release:</source>
-        <translation>Release:</translation>
+        <translation>Uvolnění:</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -5358,27 +5418,27 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>MULT</source>
-        <translation type="unfinished"/>
+        <translation>NÁSB</translation>
     </message>
     <message>
         <source>Amount Multiplicator:</source>
-        <translation type="unfinished"/>
+        <translation>Násobič množství:</translation>
     </message>
     <message>
         <source>ATCK</source>
-        <translation type="unfinished"/>
+        <translation>NÁBH</translation>
     </message>
     <message>
         <source>DCAY</source>
-        <translation type="unfinished"/>
+        <translation>ÚTLM</translation>
     </message>
     <message>
         <source>Treshold:</source>
-        <translation type="unfinished"/>
+        <translation>Práh:</translation>
     </message>
     <message>
         <source>TRSH</source>
-        <translation type="unfinished"/>
+        <translation>PRÁH</translation>
     </message>
 </context>
 <context>
@@ -5393,11 +5453,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Mute output</source>
-        <translation type="unfinished"/>
+        <translation>Ztlumit výstup</translation>
     </message>
     <message>
         <source>Attack</source>
-        <translation>Nástup</translation>
+        <translation>Náběh</translation>
     </message>
     <message>
         <source>Release</source>
@@ -5405,15 +5465,15 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Abs Value</source>
-        <translation type="unfinished"/>
+        <translation>Abs hodnota</translation>
     </message>
     <message>
         <source>Amount Multiplicator</source>
-        <translation type="unfinished"/>
+        <translation>Násobič množství</translation>
     </message>
     <message>
         <source>Treshold</source>
-        <translation type="unfinished"/>
+        <translation>Práh</translation>
     </message>
 </context>
 <context>
@@ -5440,7 +5500,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Mark/unmark current semitone</source>
-        <translation>Zvýraznit/skrýt zvolený tón</translation>
+        <translation>Zvýraznit/Skrýt zvolený tón</translation>
     </message>
     <message>
         <source>Mark current scale</source>
@@ -5476,7 +5536,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Panning: center</source>
-        <translation>Panoráma: %1% střed</translation>
+        <translation>Panoráma: střed</translation>
     </message>
     <message>
         <source>Please enter a new value between %1 and %2:</source>
@@ -5484,7 +5544,7 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Mark/unmark all corresponding octave semitones</source>
-        <translation>Zvýraznit/skrýt zvolený tón ve všech oktávách</translation>
+        <translation>Zvýraznit/Skrýt zvolený tón ve všech oktávách</translation>
     </message>
     <message>
         <source>Select all notes on this key</source>
@@ -5495,15 +5555,15 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     <name>PianoRollWindow</name>
     <message>
         <source>Play/pause current pattern (Space)</source>
-        <translation>Přehrát nebo pozastavit přehrávání aktuálního patternu (mezerník)</translation>
+        <translation>Přehrát/Pozastavit přehrávání aktuálního patternu (mezerník)</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano</source>
-        <translation>Nahrávat z MIDI zařízení nebo z virtuální klávesnice</translation>
+        <translation>Nahrávat z MIDI zařízení / virtuální klávesnice</translation>
     </message>
     <message>
         <source>Record notes from MIDI-device/channel-piano while playing song or BB track</source>
-        <translation>Nahrávat z MIDI zařízení nebo z virtuální klávesnice při přehrávání skladby nebo BB stopy</translation>
+        <translation>Nahrávat z MIDI zařízení / virtuální klávesnice při přehrávání skladby nebo stopy bicích/basů</translation>
     </message>
     <message>
         <source>Stop playing of current pattern (Space)</source>
@@ -5511,19 +5571,19 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Click here to play the current pattern. This is useful while editing it. The pattern is automatically looped when its end is reached.</source>
-        <translation>Klikněte sem, pokud chcete přehrát aktuální pattern. To je užitečné při editaci. Pattern je automaticky přehráván ve smyčce.</translation>
+        <translation>Klepněte sem, pokud chcete přehrát aktuální pattern. To je užitečné při editaci. Pattern je automaticky přehráván ve smyčce.</translation>
     </message>
     <message>
         <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you can play and edit them afterwards.</source>
-        <translation>Klikněte sem, pokud chcete nahrávat z MIDI zařízení nebo z virtuální klávesnice příslušného kanálového okna do aktuálního patternu. Při nahrávání se zaznamenají všechny zahrané noty do tohoto patternu, a následně je můžete přehrát nebo upravit.</translation>
+        <translation>Klepněte sem, pokud chcete nahrávat z MIDI zařízení nebo z virtuální klávesnice příslušného kanálového okna do aktuálního patternu. Při nahrávání se zaznamenají všechny zahrané noty do tohoto patternu, a následně je můžete přehrát nebo upravit.</translation>
     </message>
     <message>
         <source>Click here to record notes from a MIDI-device or the virtual test-piano of the according channel-window to the current pattern. When recording all notes you play will be written to this pattern and you will hear the song or BB track in the background.</source>
-        <translation>Klikněte sem, pokud chcete nahrávat z MIDI zařízení nebo z virtuální klávesnice příslušného kanálového okna do aktuálního patternu. Při nahrávání se zaznamenají všechny zahrané noty do tohoto patternu a na pozadí uslyšíte skladbu nebo BB stopu.</translation>
+        <translation>Klepněte sem, pokud chcete nahrávat z MIDI zařízení nebo z virtuální klávesnice příslušného kanálového okna do aktuálního patternu. Při nahrávání se zaznamenají všechny zahrané noty do tohoto patternu a na pozadí uslyšíte skladbu nebo BB stopu.</translation>
     </message>
     <message>
         <source>Click here to stop playback of current pattern.</source>
-        <translation>Klikněte sem, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
+        <translation>Klepněte sem, pokud chcete zastavit přehrávání aktuálního patternu.</translation>
     </message>
     <message>
         <source>Draw mode (Shift+D)</source>
@@ -5539,23 +5599,23 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Detune mode (Shift+T)</source>
-        <translation>Režim úpravy ladění (Shift+T)</translation>
+        <translation>Režim rozladění (Shift+T)</translation>
     </message>
     <message>
         <source>Click here and draw mode will be activated. In this mode you can add, resize and move notes. This is the default mode which is used most of the time. You can also press &apos;Shift+D&apos; on your keyboard to activate this mode. In this mode, hold %1 to temporarily go into select mode.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro aktivaci režimu kreslení. V tomto režimu můžete přidávat, měnit a přesouvat noty. Toto je výchozí režim, který se používá nejčastěji. Pro aktivaci tohoto režimu můžete také stisknout &quot;Shift+D&quot; na klávesnici. V tomto režimu podržte %1 pro dočasné přepnutí do režimu výběru.</translation>
     </message>
     <message>
         <source>Click here and erase mode will be activated. In this mode you can erase notes. You can also press &apos;Shift+E&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"/>
+        <translation>Klikněte sem pro aktivaci režimu mazání. V tomto režimu můžete vymazávat noty.  Pro aktivaci tohoto režimu můžete také stisknout tlačítko &quot;Shift+E&quot; na klávesnici.</translation>
     </message>
     <message>
         <source>Click here and select mode will be activated. In this mode you can select notes. Alternatively, you can hold %1 in draw mode to temporarily use select mode.</source>
-        <translation type="unfinished"/>
+        <translation>Klikněte sem pro aktivaci režimu výběru. V tomto režimu můžete vybírat noty. Alternativně můžete v režimu kreslení držet %1 pro dočasné přepnutí do režimu výběru.</translation>
     </message>
     <message>
         <source>Click here and detune mode will be activated. In this mode you can click a note to open its automation detuning. You can utilize this to slide notes from one to another. You can also press &apos;Shift+T&apos; on your keyboard to activate this mode.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro aktivaci režimu rozladění. V tomto režimu můžete klepnutím na notu otevřít její automatické rozladění. To můžete využít ke sklouznutí z jedné noty na jinou. Pro aktivaci tohoto režimu můžete také stisknout klávesu &quot;Shift+T&quot; na klávesnici.</translation>
     </message>
     <message>
         <source>Cut selected notes (%1+X)</source>
@@ -5571,11 +5631,11 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Click here and the selected notes will be cut into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klikněte sem, pokud chcete označené noty vyjmout a uložit do schránky. Vložit je pak můžete kdekoliv v libovolném patternu pomocí tlačítka Vložit.</translation>
+        <translation>Klepněte sem, pokud chcete označené noty vyjmout a uložit do schránky. Vložit je pak můžete kdekoliv v libovolném patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
         <source>Click here and the selected notes will be copied into the clipboard. You can paste them anywhere in any pattern by clicking on the paste button.</source>
-        <translation>Klikněte sem, pokud chcete označené noty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
+        <translation>Klepněte sem, pokud chcete označené noty zkopírovat do schránky. Vložit je pak můžete kdekoliv v libovolného patternu pomocí tlačítka Vložit.</translation>
     </message>
     <message>
         <source>Click here and the notes from the clipboard will be pasted at the first visible measure.</source>
@@ -5583,31 +5643,31 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>This controls the magnification of an axis. It can be helpful to choose magnification for a specific task. For ordinary editing, the magnification should be fitted to your smallest notes. </source>
-        <translation type="unfinished"/>
+        <translation>Tímto se ovládá zvětšení osy. To může být užitečné při volbě zvětšení pro konkrétní úkol. Při běžné úpravě by mělo být zvětšení použito na vaše nejmenší noty.</translation>
     </message>
     <message>
         <source>The &apos;Q&apos; stands for quantization, and controls the grid size notes and control points snap to. With smaller quantization values, you can draw shorter notes in Piano Roll, and more exact control points in the Automation Editor.</source>
-        <translation type="unfinished"/>
+        <translation>&quot;Q&quot; znamená kvantizaci, která ovládá mřížku velikosti not a kontrolní body krokování. S menšími hodnotami kvantizace můžete kreslit kratší noty v Piano rollu a přesnější kontrolní body v editoru automatizace.</translation>
     </message>
     <message>
         <source>This lets you select the length of new notes. &apos;Last Note&apos; means that LMMS will use the note length of the note you last edited</source>
-        <translation type="unfinished"/>
+        <translation>Tímto je možno vybrat délku nových not. &quot;Poslední nota&quot; znamená, že LMMS použije délku naposledy upravované noty.</translation>
     </message>
     <message>
         <source>The feature is directly connected to the context-menu on the virtual keyboard, to the left in Piano Roll. After you have chosen the scale you want in this drop-down menu, you can right click on a desired key in the virtual keyboard, and then choose &apos;Mark current Scale&apos;. LMMS will highlight all notes that belongs to the chosen scale, and in the key you have selected!</source>
-        <translation type="unfinished"/>
+        <translation>Funkce je přímo propojena s kontextovou nabídkou na virtuální klávesnici vlevo v Piano rollu. Poté, co jste v rozbalovací nabídce zvolili stupnici, můžete kliknout pravým tlačítkem na požadovanou klávesu na virtuální klávesnici, a pak zvolit &quot;Zvýraznit zvolenou stupnici&quot;. LMMS zvýrazní všechny noty, které patří do zvolené stupnice, a to od klávesy, kterou jste vybrali!</translation>
     </message>
     <message>
         <source>Let you select a chord which LMMS then can draw or highlight.You can find the most common chords in this drop-down menu. After you have selected a chord, click anywhere to place the chord, and right click on the virtual keyboard to open context menu and highlight the chord. To return to single note placement, you need to choose &apos;No chord&apos; in this drop-down menu.</source>
-        <translation type="unfinished"/>
+        <translation>Vyberte si akord, který pak LMMS může nakreslit nebo zvýraznit. V rozbalovací nabídce najdete nejčastěji používané akordy. Po výběru akordu klepněte kamkoliv pro umístění akordu, klepnutím pravým tlačítkem na virtuální klávesnici pak otevřete kontextové menu a zvýrazníte akord. Chcete-li se vrátit k práci s jednotlivými notami, musíte v rozbalovací nabídce zvolit možnost &quot;Žádný akord&quot;.</translation>
     </message>
     <message>
         <source>Edit actions</source>
-        <translation>Upravit akce</translation>
+        <translation>Akce úprav</translation>
     </message>
     <message>
         <source>Copy paste controls</source>
-        <translation type="unfinished"/>
+        <translation>Ovládání kopírování a vkládání</translation>
     </message>
     <message>
         <source>Timeline controls</source>
@@ -5615,19 +5675,19 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
     </message>
     <message>
         <source>Zoom and note controls</source>
-        <translation type="unfinished"/>
+        <translation>Lupa a ovládání not</translation>
     </message>
     <message>
         <source>Piano-Roll - %1</source>
-        <translation type="unfinished"/>
+        <translation>Piano roll - %1</translation>
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
-        <translation type="unfinished"/>
+        <translation>Piano roll - žádný pattern</translation>
     </message>
     <message>
         <source>Quantize</source>
-        <translation type="unfinished"/>
+        <translation>Kvantizace</translation>
     </message>
 </context>
 <context>
@@ -5666,11 +5726,11 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
-        <translation>Nástroj přetáhněte do editoru skladby, editoru bicích a basů nebo do existující nástrojové stopy.</translation>
+        <translation>Nástroj přetáhněte do editoru skladby, editoru bicích/basů nebo do existující nástrojové stopy.</translation>
     </message>
     <message>
         <source>Instrument Plugins</source>
-        <translation type="unfinished"/>
+        <translation>Nástrojové pluginy</translation>
     </message>
 </context>
 <context>
@@ -5681,7 +5741,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>LMMS plugin %1 does not have a plugin descriptor named %2!</source>
-        <translation type="unfinished"/>
+        <translation>U LMMS pluginu %1 chybí popisovač pluginu s názvem %2!</translation>
     </message>
 </context>
 <context>
@@ -5696,7 +5756,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Edit Actions</source>
-        <translation type="unfinished"/>
+        <translation>Provedené úpravy</translation>
     </message>
     <message>
         <source>&amp;Undo</source>
@@ -5811,26 +5871,26 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
-        <translation>Komprimovaný soubor OGG (*.ogg)</translation>
+        <translation>Komprimovaný OGG soubor (*.ogg)</translation>
     </message>
 </context>
 <context>
     <name>QWidget</name>
     <message>
         <source>Name: </source>
-        <translation>Název:</translation>
+        <translation>Název: </translation>
     </message>
     <message>
         <source>Maker: </source>
-        <translation>Tvůrce:</translation>
+        <translation>Tvůrce: </translation>
     </message>
     <message>
         <source>Copyright: </source>
-        <translation>Copyright:</translation>
+        <translation>Autorská práva: </translation>
     </message>
     <message>
         <source>Requires Real Time: </source>
-        <translation>Vyžadován Real Time:</translation>
+        <translation>Vyžaduje běh v reálném čase: </translation>
     </message>
     <message>
         <source>Yes</source>
@@ -5842,27 +5902,27 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Real Time Capable: </source>
-        <translation>Real time schopnost:</translation>
+        <translation>Schopnost běhu v reálném čase: </translation>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation type="unfinished"/>
+        <translation>Zlomené v místě:</translation>
     </message>
     <message>
         <source>Channels In: </source>
-        <translation>Kanály vstup:</translation>
+        <translation>Vstupní kanály: </translation>
     </message>
     <message>
         <source>Channels Out: </source>
-        <translation>Kanály výstup:</translation>
+        <translation>Výstupní kanály: </translation>
     </message>
     <message>
         <source>File: </source>
-        <translation>Soubor:</translation>
+        <translation>Soubor: </translation>
     </message>
     <message>
         <source>File: %1</source>
-        <translation type="unfinished"/>
+        <translation>Soubor: %1</translation>
     </message>
 </context>
 <context>
@@ -5873,6 +5933,60 @@ Důvod: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Vstup</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Zesílení vstupu:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Velikost</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Velikost:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Barva</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Barva:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Výstup</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Zesílení výstupu:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Vstupní úroveň</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Velikost</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Barva</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Zesílení výstupu</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -5880,7 +5994,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Wave-Files (*.wav)</source>
-        <translation>Wav soubory (*.wav)</translation>
+        <translation>WAV soubory (*.wav)</translation>
     </message>
     <message>
         <source>OGG-Files (*.ogg)</source>
@@ -5904,7 +6018,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>AIFF-Files (*.aif *.aiff)</source>
-        <translation type="unfinished"/>
+        <translation>Soubory AIFF (*.aif *.aiff)</translation>
     </message>
     <message>
         <source>AU-Files (*.au)</source>
@@ -5917,6 +6031,14 @@ Důvod: &quot;%2&quot;</translation>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Všechny audio soubory (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation>Chyba otevírání souboru</translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation>Audio soubory jsou omezeny na %1 MB velikosti a %2 minut délky</translation>
     </message>
 </context>
 <context>
@@ -5943,7 +6065,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
-        <translation>Ztlumit/neztlumit (&lt;%1&gt; + prostřední klik)</translation>
+        <translation>Ztlumit/Odtlumit (&lt;%1&gt; + prostřední klik)</translation>
     </message>
 </context>
 <context>
@@ -6008,7 +6130,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>MISC</source>
-        <translation>RŮZNÉ</translation>
+        <translation>JINÉ</translation>
     </message>
     <message>
         <source>Enable tooltips</source>
@@ -6017,10 +6139,6 @@ Důvod: &quot;%2&quot;</translation>
     <message>
         <source>Show restart warning after changing settings</source>
         <translation>Zobrazit výzvu k restartu po změně nastavení</translation>
-    </message>
-    <message>
-        <source>Display volume as dBFS </source>
-        <translation>Zobrazit hlasitost jako dBFS</translation>
     </message>
     <message>
         <source>Compress project files per default</source>
@@ -6225,25 +6343,30 @@ Zpoždění %2 ms</translation>
         <translation>minuta</translation>
     </message>
     <message>
+        <source>Display volume as dBFS </source>
+        <translation>Zobrazit hlasitost jako dBFS</translation>
+    </message>
+    <message>
         <source>Enable auto-save</source>
-        <translation type="unfinished"/>
+        <translation>Povolit automatické ukládání</translation>
     </message>
     <message>
         <source>Allow auto-save while playing</source>
-        <translation type="unfinished"/>
+        <translation>Povolit automatické ukládání během přehrávání</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished"/>
+        <translation>Vypnuto</translation>
     </message>
     <message>
         <source>Auto-save interval: %1</source>
-        <translation type="unfinished"/>
+        <translation>Interval automatického ukládání: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
 Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
-        <translation type="unfinished"/>
+        <translation>Nastavte čas mezi automatickým zálohováním na %1.
+Nezapomeňte také svůj projekt uložit ručně. Můžete si vybrat, zda nechcete během přehrávání zakázat ukládání, což je problematické pro některé starší systémy.</translation>
     </message>
 </context>
 <context>
@@ -6310,7 +6433,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Select file for project-export...</source>
-        <translation type="unfinished"/>
+        <translation>Vyberte soubor pro export projektu...</translation>
     </message>
     <message>
         <source>The following errors occured while loading: </source>
@@ -6322,11 +6445,11 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>LMMS Error report</source>
-        <translation type="unfinished"/>
+        <translation>Chybové hlášení LMMS</translation>
     </message>
     <message>
         <source>Save project</source>
-        <translation type="unfinished"/>
+        <translation>Uložit projekt</translation>
     </message>
 </context>
 <context>
@@ -6411,11 +6534,11 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Version difference</source>
-        <translation type="unfinished"/>
+        <translation>Rozdíl verzí</translation>
     </message>
     <message>
         <source>This %1 was created with LMMS %2.</source>
-        <translation type="unfinished"/>
+        <translation>%1 byl vytvořen v LMMS %2.</translation>
     </message>
 </context>
 <context>
@@ -6434,7 +6557,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Record samples from Audio-device while playing song or BB track</source>
-        <translation>Nahrát samply z audio zařízení při přehrávání skladby nebo BB stopy</translation>
+        <translation>Nahrát samply z audio zařízení při přehrávání skladby stopy bicích/basů</translation>
     </message>
     <message>
         <source>Stop song (Space)</source>
@@ -6450,7 +6573,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Add automation-track</source>
-        <translation>Přidat automatizační stopu</translation>
+        <translation>Přidat stopu automatizace</translation>
     </message>
     <message>
         <source>Draw mode</source>
@@ -6462,19 +6585,19 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Click here, if you want to play your whole song. Playing will be started at the song-position-marker (green). You can also move it while playing.</source>
-        <translation>Klikněte sem, pokud chcete přehrát celou skladbu. Přehrávání začne v místě kde se nalézá zelený označovač pozice, se kterým lze též při přehrávání pohybovat.</translation>
+        <translation>Klepněte sem, pokud chcete přehrát celou skladbu. Přehrávání začne v místě kde se nalézá zelený označovač pozice, se kterým lze též při přehrávání pohybovat.</translation>
     </message>
     <message>
         <source>Click here, if you want to stop playing of your song. The song-position-marker will be set to the start of your song.</source>
-        <translation>Klikněte sem, pokud chcete zastavit přehrávání skladby. Označovač pozice bude nastaven na začátek skladby.</translation>
+        <translation>Klepněte sem, pokud chcete zastavit přehrávání skladby. Označovač pozice bude nastaven na začátek skladby.</translation>
     </message>
     <message>
         <source>Track actions</source>
-        <translation type="unfinished"/>
+        <translation>Akce stopy</translation>
     </message>
     <message>
         <source>Edit actions</source>
-        <translation>Upravit akce</translation>
+        <translation>Akce úprav</translation>
     </message>
     <message>
         <source>Timeline controls</source>
@@ -6530,7 +6653,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     <name>TabWidget</name>
     <message>
         <source>Settings for %1</source>
-        <translation type="unfinished"/>
+        <translation>Nastavení rpo %1</translation>
     </message>
 </context>
 <context>
@@ -6612,23 +6735,23 @@ Remember to also save your project manually. You can choose to disable saving wh
     <name>TimeDisplayWidget</name>
     <message>
         <source>click to change time units</source>
-        <translation>kliknutí změní časové jednotky</translation>
+        <translation>klikněte pro změnu časových jednotek</translation>
     </message>
     <message>
         <source>MIN</source>
-        <translation type="unfinished"/>
+        <translation>MIN</translation>
     </message>
     <message>
         <source>SEC</source>
-        <translation type="unfinished"/>
+        <translation>S</translation>
     </message>
     <message>
         <source>MSEC</source>
-        <translation type="unfinished"/>
+        <translation>MS</translation>
     </message>
     <message>
         <source>BAR</source>
-        <translation type="unfinished"/>
+        <translation>TAKT</translation>
     </message>
     <message>
         <source>BEAT</source>
@@ -6636,18 +6759,18 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>TICK</source>
-        <translation type="unfinished"/>
+        <translation>TIK</translation>
     </message>
 </context>
 <context>
     <name>TimeLineWidget</name>
     <message>
         <source>Enable/disable auto-scrolling</source>
-        <translation>Povolit/zakázat automatický posun</translation>
+        <translation>Povolit/Zakázat automatický posun</translation>
     </message>
     <message>
         <source>Enable/disable loop-points</source>
-        <translation>Povolit/zakázat body přehrávání ve smyčce</translation>
+        <translation>Povolit/Zakázat body přehrávání ve smyčce</translation>
     </message>
     <message>
         <source>After stopping go back to begin</source>
@@ -6667,11 +6790,11 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Press &lt;%1&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"/>
+        <translation>Stiskněte &lt;%1&gt; pro vypnutí magnetických bodů smyčky.</translation>
     </message>
     <message>
         <source>Hold &lt;Shift&gt; to move the begin loop point; Press &lt;%1&gt; to disable magnetic loop points.</source>
-        <translation type="unfinished"/>
+        <translation>Držte &lt;Shift&gt; pro přesouvání počátečního bodu smyčky; stiskněte &lt;%1&gt; pro vypnutí magnetických bodů smyčky.</translation>
     </message>
 </context>
 <context>
@@ -6775,14 +6898,14 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
-        <translation>Ztlumit/odtlumit (&lt;%1&gt; + prostřední tlačítko myši)</translation>
+        <translation>Ztlumit/Odtlumit (&lt;%1&gt; + prostřední tlačítko myši)</translation>
     </message>
 </context>
 <context>
     <name>TrackOperationsWidget</name>
     <message>
         <source>Press &lt;%1&gt; while clicking on move-grip to begin a new drag&apos;n&apos;drop-action.</source>
-        <translation type="unfinished"/>
+        <translation>Při klepnutí na úchop držte &lt;%1&gt; pro zkopírování přetahované stopy.</translation>
     </message>
     <message>
         <source>Actions for this track</source>
@@ -6814,62 +6937,62 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>FX %1: %2</source>
-        <translation>FX %1: %2</translation>
+        <translation>Efekt %1: %2</translation>
     </message>
     <message>
         <source>Turn all recording on</source>
-        <translation type="unfinished"/>
+        <translation>Spustit všechna nahrávání</translation>
     </message>
     <message>
         <source>Turn all recording off</source>
-        <translation>Zastavit veškeré nahrávání</translation>
+        <translation>Zastavit všechna nahrávání</translation>
     </message>
     <message>
         <source>Assign to new FX Channel</source>
-        <translation type="unfinished"/>
+        <translation>Přiřadit k novému efektovému kanálu</translation>
     </message>
 </context>
 <context>
     <name>TripleOscillatorView</name>
     <message>
         <source>Use phase modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation type="unfinished"/>
+        <translation>Použít fázovou modulaci pro modulování oscilátoru 1 oscilátorem 2</translation>
     </message>
     <message>
         <source>Use amplitude modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation type="unfinished"/>
+        <translation>Použít amplitudovou modulaci pro modulování oscilátoru 1 oscilátorem 2</translation>
     </message>
     <message>
         <source>Mix output of oscillator 1 &amp; 2</source>
-        <translation type="unfinished"/>
+        <translation>Smíchat výstupy oscilátorů 1 a 2</translation>
     </message>
     <message>
         <source>Synchronize oscillator 1 with oscillator 2</source>
-        <translation type="unfinished"/>
+        <translation>Synchronizovat oscilátor 1 oscilátorem 2</translation>
     </message>
     <message>
         <source>Use frequency modulation for modulating oscillator 1 with oscillator 2</source>
-        <translation type="unfinished"/>
+        <translation>Použít frekvenční modulaci pro modulování oscilátoru 1 oscilátorem 2</translation>
     </message>
     <message>
         <source>Use phase modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation type="unfinished"/>
+        <translation>Použít fázovou modulaci pro modulování oscilátoru 2 oscilátorem 3</translation>
     </message>
     <message>
         <source>Use amplitude modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation type="unfinished"/>
+        <translation>Použít amplitudovou modulaci pro modulování oscilátoru 2 oscilátorem 3</translation>
     </message>
     <message>
         <source>Mix output of oscillator 2 &amp; 3</source>
-        <translation type="unfinished"/>
+        <translation>Smíchat výstupy oscilátorů 2 a 3</translation>
     </message>
     <message>
         <source>Synchronize oscillator 2 with oscillator 3</source>
-        <translation type="unfinished"/>
+        <translation>Synchronizovat oscilátor 2 oscilátorem 3</translation>
     </message>
     <message>
         <source>Use frequency modulation for modulating oscillator 2 with oscillator 3</source>
-        <translation type="unfinished"/>
+        <translation>Použít frekvenční modulaci pro modulování oscilátoru 2 oscilátorem 3</translation>
     </message>
     <message>
         <source>Osc %1 volume:</source>
@@ -6881,7 +7004,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Osc %1 panning:</source>
-        <translation>Panoráma Osc %1:</translation>
+        <translation>Osc %1 panoráma:</translation>
     </message>
     <message>
         <source>With this knob you can set the panning of the oscillator %1. A value of -100 means 100% left and a value of 100 moves oscillator-output right.</source>
@@ -6889,7 +7012,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Osc %1 coarse detuning:</source>
-        <translation type="unfinished"/>
+        <translation>Osc %1 hrubé rozladění:</translation>
     </message>
     <message>
         <source>semitones</source>
@@ -6897,7 +7020,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>With this knob you can set the coarse detuning of oscillator %1. You can detune the oscillator 24 semitones (2 octaves) up and down. This is useful for creating sounds with a chord.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto otočným ovladačem můžete provést hrubé rozladění oscilátoru %1. Můžete oscilátor rozladit o 24 půltónů (2 oktávy) nahoru nebo dolů. To je dobré pro vytvoření zvuku v akordu.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning left:</source>
@@ -6909,7 +7032,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the left channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto otočným ovladačem můžete provést jemné rozladění oscilátoru %1 v levém kanálu. Rozsah jemného rozladění je mezi -100 a +100 centy. To je dobré pro vytvoření &quot;tlustého&quot; zvuku.</translation>
     </message>
     <message>
         <source>Osc %1 fine detuning right:</source>
@@ -6917,7 +7040,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>With this knob you can set the fine detuning of oscillator %1 for the right channel. The fine-detuning is ranged between -100 cents and +100 cents. This is useful for creating &quot;fat&quot; sounds.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto otočným ovladačem můžete provést jemné rozladění oscilátoru %1 v pravém kanálu. Rozsah jemného rozladění je mezi -100 a +100 centy. To je dobré pro vytvoření &quot;tlustého&quot; zvuku.</translation>
     </message>
     <message>
         <source>Osc %1 phase-offset:</source>
@@ -6925,11 +7048,11 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>degrees</source>
-        <translation>stupně</translation>
+        <translation>stupňů</translation>
     </message>
     <message>
         <source>With this knob you can set the phase-offset of oscillator %1. That means you can move the point within an oscillation where the oscillator begins to oscillate. For example if you have a sine-wave and have a phase-offset of 180 degrees the wave will first go down. It&apos;s the same with a square-wave.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto otočným ovladačem můžete nastavit fázový posun oscilátoru %1. To znamená, že můžete posunout bod, ve kterém oscilátor začne kmitat. Například pokud máte sinusovou vlnu s fázovým posunem 180 stupňů, vlna půjde nejdříve dolů. Totéž se stane u vlny pravoúhlé.</translation>
     </message>
     <message>
         <source>Osc %1 stereo phase-detuning:</source>
@@ -6937,7 +7060,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>With this knob you can set the stereo phase-detuning of oscillator %1. The stereo phase-detuning specifies the size of the difference between the phase-offset of left and right channel. This is very good for creating wide stereo sounds.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto otočným ovladačem můžete nastavit rozladění fáze oscilátoru %1. Rozladění stereo fáze určuje velikost rozdílu mezi fázovým posunem levého a pravého kanálu. To je velmi dobré pro vytvoření širokého stereo zvuku.  </translation>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
@@ -6949,19 +7072,19 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
-        <translation>Klikněte sem pro pilovitou vlnu.</translation>
+        <translation>Použít pilovitou vlnu pro aktuální oscilátor.</translation>
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Klikněte sem pro pilovitou vlnu.</translation>
+        <translation>Použít pravoúhlou vlnu pro aktuální oscilátor.</translation>
     </message>
     <message>
         <source>Use a moog-like saw-wave for current oscillator.</source>
-        <translation type="unfinished"/>
+        <translation>Použít pilovitou vlnu typu moog pro tento oscilátor.</translation>
     </message>
     <message>
         <source>Use an exponential wave for current oscillator.</source>
-        <translation type="unfinished"/>
+        <translation>Použít exponenciální vlnu pro aktuální oscilátor.</translation>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
@@ -6976,15 +7099,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     <name>VersionedSaveDialog</name>
     <message>
         <source>Increment version number</source>
-        <translation type="unfinished"/>
+        <translation>Zvýšit číslo verze</translation>
     </message>
     <message>
         <source>Decrement version number</source>
-        <translation type="unfinished"/>
+        <translation>Snížení čísla verze</translation>
     </message>
     <message>
         <source> already exists. Do you want to replace it?</source>
-        <translation type="unfinished"/>
+        <translation>již existuje. Přejete si jej přepsat?</translation>
     </message>
 </context>
 <context>
@@ -6995,15 +7118,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here, if you want to open another VST-plugin. After clicking on this button, a file-open-dialog appears and you can select your file.</source>
-        <translation>Klikněte sem, pokud chcete otevřít jiný VST plugin. Po kliknutí na toto tlačítko se objeví okno, ve kterém můžete soubor vybrat.</translation>
+        <translation>Klepněte sem, pokud chcete otevřít jiný VST plugin. Po kliknutí na toto tlačítko se objeví okno, ve kterém můžete soubor vybrat.</translation>
     </message>
     <message>
         <source>Show/hide GUI</source>
-        <translation>Zobrazit/skrýt grafické rozhraní</translation>
+        <translation>Zobrazit/Skrýt grafické rozhraní</translation>
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of your VST-plugin.</source>
-        <translation>Klikněte sem pro zobrazení nebo skrytí grafického rozhraní (GUI) pro vaše VST pluginy.</translation>
+        <translation>Klepněte sem pro zobrazení nebo skrytí grafického rozhraní (GUI) pro vaše VST pluginy.</translation>
     </message>
     <message>
         <source>Turn off all notes</source>
@@ -7023,15 +7146,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>No VST-plugin loaded</source>
-        <translation>Není načten VST plugin</translation>
+        <translation>VST plugin není nahrán</translation>
     </message>
     <message>
         <source>Control VST-plugin from LMMS host</source>
-        <translation type="unfinished"/>
+        <translation>Ovládání VST pluginu hostitelským programem LMMS</translation>
     </message>
     <message>
         <source>Click here, if you want to control VST-plugin from host.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem, pokud chcete ovládat VST plugin hostitelským programem.</translation>
     </message>
     <message>
         <source>Open VST-plugin preset</source>
@@ -7039,15 +7162,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
-        <translation>Klikněte sem, chcete-li otevřít jinou *.fxp, *.fxb předvolbu VST pluginu.</translation>
+        <translation>Klepněte sem, chcete-li otevřít jinou *.fxp, *.fxb předvolbu VST pluginu.</translation>
     </message>
     <message>
         <source>Previous (-)</source>
-        <translation type="unfinished"/>
+        <translation>Předchozí (-)</translation>
     </message>
     <message>
         <source>Click here, if you want to switch to another VST-plugin preset program.</source>
-        <translation>Klikněte sem, chcete-li přepnout na jiný přednastavený VST program.</translation>
+        <translation>Klepněte sem, chcete-li přepnout na jiný přednastavený VST program.</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -7055,7 +7178,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
-        <translation>Klikněte sem, chcete-li uložit aktuální předvolbu programu VST pluginu.</translation>
+        <translation>Klepněte sem, chcete-li uložit aktuální předvolbu programu VST pluginu.</translation>
     </message>
     <message>
         <source>Next (+)</source>
@@ -7063,7 +7186,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here to select presets that are currently loaded in VST.</source>
-        <translation>Klikněte sem, chcete-li vybrat předvolby, které jsou aktuálně nahrány ve VST.</translation>
+        <translation>Klepněte sem, chcete-li vybrat předvolby, které jsou aktuálně nahrány ve VST.</translation>
     </message>
     <message>
         <source>Preset</source>
@@ -7071,37 +7194,37 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>by </source>
-        <translation type="unfinished"/>
+        <translation>od</translation>
     </message>
     <message>
         <source> - VST plugin control</source>
-        <translation type="unfinished"/>
+        <translation>- ovládání VST pluginu</translation>
     </message>
 </context>
 <context>
     <name>VisualizationWidget</name>
     <message>
         <source>click to enable/disable visualization of master-output</source>
-        <translation>klikněte pro zapnutí/vypnutí vizualizace hlavního výstupu</translation>
+        <translation>klepněte pro zapnutí/vypnutí vizualizace hlavního výstupu</translation>
     </message>
     <message>
         <source>Click to enable</source>
-        <translation>Klikněte pro zapnutí</translation>
+        <translation>Klepněte pro zapnutí</translation>
     </message>
 </context>
 <context>
     <name>VstEffectControlDialog</name>
     <message>
         <source>Show/hide</source>
-        <translation>Ukázat/skrýt</translation>
+        <translation>Ukázat/Skrýt</translation>
     </message>
     <message>
         <source>Control VST-plugin from LMMS host</source>
-        <translation type="unfinished"/>
+        <translation>Ovládání VST pluginu hostitelským programem LMMS</translation>
     </message>
     <message>
         <source>Click here, if you want to control VST-plugin from host.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem, pokud chcete ovládat VST plugin hostitelským programem.</translation>
     </message>
     <message>
         <source>Open VST-plugin preset</source>
@@ -7109,15 +7232,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here, if you want to open another *.fxp, *.fxb VST-plugin preset.</source>
-        <translation>Klikněte sem, chcete-li otevřít jinou *.fxp, *.fxb předvolbu VST pluginu.</translation>
+        <translation>Klepněte sem, chcete-li otevřít jinou *.fxp, *.fxb předvolbu VST pluginu.</translation>
     </message>
     <message>
         <source>Previous (-)</source>
-        <translation type="unfinished"/>
+        <translation>Předchozí (-)</translation>
     </message>
     <message>
         <source>Click here, if you want to switch to another VST-plugin preset program.</source>
-        <translation>Klikněte sem, chcete-li přepnout na jiný přednastavený VST program.</translation>
+        <translation>Klepněte sem, chcete-li přepnout na jiný přednastavený VST program.</translation>
     </message>
     <message>
         <source>Next (+)</source>
@@ -7125,7 +7248,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here to select presets that are currently loaded in VST.</source>
-        <translation>Klikněte sem, chcete-li vybrat předvolbu, která je aktuálně nahraná ve VST.</translation>
+        <translation>Klepněte sem, chcete-li vybrat předvolbu, která je aktuálně nahraná ve VST.</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -7133,15 +7256,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here, if you want to save current VST-plugin preset program.</source>
-        <translation>Klikněte sem, chcete-li uložit aktuální předvolbu programu VST pluginu.</translation>
+        <translation>Klepněte sem, chcete-li uložit aktuální předvolbu programu VST pluginu.</translation>
     </message>
     <message>
         <source>Effect by: </source>
-        <translation type="unfinished"/>
+        <translation>Efekt od:</translation>
     </message>
     <message>
         <source>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;br /&gt;</translation>
     </message>
 </context>
 <context>
@@ -7160,15 +7283,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>: default</source>
-        <translation type="unfinished"/>
+        <translation>: výchozí</translation>
     </message>
     <message>
         <source>&quot;</source>
-        <translation type="unfinished"/>
+        <translation>&quot;</translation>
     </message>
     <message>
         <source>&apos;</source>
-        <translation type="unfinished"/>
+        <translation>&apos;</translation>
     </message>
     <message>
         <source>Save Preset</source>
@@ -7235,138 +7358,138 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Freq. multiplier A1</source>
-        <translation type="unfinished"/>
+        <translation>Násobič frekv. A1</translation>
     </message>
     <message>
         <source>Freq. multiplier A2</source>
-        <translation type="unfinished"/>
+        <translation>Násobič frekv. A2</translation>
     </message>
     <message>
         <source>Freq. multiplier B1</source>
-        <translation type="unfinished"/>
+        <translation>Násobič frekv. B1</translation>
     </message>
     <message>
         <source>Freq. multiplier B2</source>
-        <translation type="unfinished"/>
+        <translation>Násobič frekv. B2</translation>
     </message>
     <message>
         <source>Left detune A1</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vlevo A1</translation>
     </message>
     <message>
         <source>Left detune A2</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vlevo A2</translation>
     </message>
     <message>
         <source>Left detune B1</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vlevo B1</translation>
     </message>
     <message>
         <source>Left detune B2</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vlevo B2</translation>
     </message>
     <message>
         <source>Right detune A1</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vpravo A1</translation>
     </message>
     <message>
         <source>Right detune A2</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vpravo A2</translation>
     </message>
     <message>
         <source>Right detune B1</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vpravo B1</translation>
     </message>
     <message>
         <source>Right detune B2</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vpravo B2</translation>
     </message>
     <message>
         <source>A-B Mix</source>
-        <translation type="unfinished"/>
+        <translation>Směšovač A-B</translation>
     </message>
     <message>
         <source>A-B Mix envelope amount</source>
-        <translation type="unfinished"/>
+        <translation>Množství obálky směšovače A-B</translation>
     </message>
     <message>
         <source>A-B Mix envelope attack</source>
-        <translation type="unfinished"/>
+        <translation>Náběh obálky směšovače A-B</translation>
     </message>
     <message>
         <source>A-B Mix envelope hold</source>
-        <translation type="unfinished"/>
+        <translation>Množství držení směšovače A-B</translation>
     </message>
     <message>
         <source>A-B Mix envelope decay</source>
-        <translation type="unfinished"/>
+        <translation>Útlum obálky směšovače A-B</translation>
     </message>
     <message>
         <source>A1-B2 Crosstalk</source>
-        <translation type="unfinished"/>
+        <translation>Přeslech A1-B2</translation>
     </message>
     <message>
         <source>A2-A1 modulation</source>
-        <translation type="unfinished"/>
+        <translation>Modulace A1-B2</translation>
     </message>
     <message>
         <source>B2-B1 modulation</source>
-        <translation type="unfinished"/>
+        <translation>Modulace B2-B1</translation>
     </message>
     <message>
         <source>Selected graph</source>
-        <translation type="unfinished"/>
+        <translation>Zvolený graf</translation>
     </message>
 </context>
 <context>
     <name>WatsynView</name>
     <message>
         <source>Select oscillator A1</source>
-        <translation type="unfinished"/>
+        <translation>Vybrat oscilátor A1</translation>
     </message>
     <message>
         <source>Select oscillator A2</source>
-        <translation type="unfinished"/>
+        <translation>Vybrat oscilátor A2</translation>
     </message>
     <message>
         <source>Select oscillator B1</source>
-        <translation type="unfinished"/>
+        <translation>Vybrat oscilátor B1</translation>
     </message>
     <message>
         <source>Select oscillator B2</source>
-        <translation type="unfinished"/>
+        <translation>Vybrat oscilátor B2</translation>
     </message>
     <message>
         <source>Mix output of A2 to A1</source>
-        <translation type="unfinished"/>
+        <translation>Přimíchat výstup A1 do A2</translation>
     </message>
     <message>
         <source>Modulate amplitude of A1 with output of A2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat amplitudu A1 výstupem A2</translation>
     </message>
     <message>
         <source>Ring-modulate A1 and A2</source>
-        <translation type="unfinished"/>
+        <translation>Kruhově modulovat A1 a A2</translation>
     </message>
     <message>
         <source>Modulate phase of A1 with output of A2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat fázi A1 výstupem A2</translation>
     </message>
     <message>
         <source>Mix output of B2 to B1</source>
-        <translation type="unfinished"/>
+        <translation>Přimíchat výstup B1 do B2</translation>
     </message>
     <message>
         <source>Modulate amplitude of B1 with output of B2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat amplitudu B1 výstupem B2</translation>
     </message>
     <message>
         <source>Ring-modulate B1 and B2</source>
-        <translation type="unfinished"/>
+        <translation>Kruhově modulovat B1 a B2</translation>
     </message>
     <message>
         <source>Modulate phase of B1 with output of B2</source>
-        <translation type="unfinished"/>
+        <translation>Modulovat fázi B1 výstupem B2</translation>
     </message>
     <message>
         <source>Draw your own waveform here by dragging your mouse on this graph.</source>
@@ -7378,23 +7501,23 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click to load a waveform from a sample file</source>
-        <translation>Klikněte pro načtení vlny ze souboru samplů.</translation>
+        <translation>Klepněte pro načtení vlny ze souboru samplů</translation>
     </message>
     <message>
         <source>Phase left</source>
-        <translation type="unfinished"/>
+        <translation>Fáze vlevo</translation>
     </message>
     <message>
         <source>Click to shift phase by -15 degrees</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte pro posun fáze o -15 stupňů</translation>
     </message>
     <message>
         <source>Phase right</source>
-        <translation type="unfinished"/>
+        <translation>Fáze vpravo</translation>
     </message>
     <message>
         <source>Click to shift phase by +15 degrees</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte pro posun fáze o +15 stupňů</translation>
     </message>
     <message>
         <source>Normalize</source>
@@ -7402,15 +7525,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click to normalize</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte pro normalizaci</translation>
     </message>
     <message>
         <source>Invert</source>
-        <translation type="unfinished"/>
+        <translation>Převrátit</translation>
     </message>
     <message>
         <source>Click to invert</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte pro převrácení</translation>
     </message>
     <message>
         <source>Smooth</source>
@@ -7418,7 +7541,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click to smooth</source>
-        <translation>Klikněte pro vyhlazení</translation>
+        <translation>Klepněte pro vyhlazení</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -7426,7 +7549,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click for sine wave</source>
-        <translation>Klikněte pro sinusovou vlnu</translation>
+        <translation>Klepněte pro sinusovou vlnu</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -7434,11 +7557,11 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click for triangle wave</source>
-        <translation>Klikněte pro trojúhelníkovou vlnu</translation>
+        <translation>Klepněte pro trojúhelníkovou vlnu</translation>
     </message>
     <message>
         <source>Click for saw wave</source>
-        <translation>Klikněte pro pilovitou vlnu</translation>
+        <translation>Klepněte pro pilovitou vlnu</translation>
     </message>
     <message>
         <source>Square wave</source>
@@ -7446,7 +7569,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click for square wave</source>
-        <translation>Klikněte pro pravoúhlou vlnu</translation>
+        <translation>Klepněte pro pravoúhlou vlnu</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -7458,11 +7581,11 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Freq. multiplier</source>
-        <translation>Frekv. multiplikátor</translation>
+        <translation>Násobič frekv.</translation>
     </message>
     <message>
         <source>Left detune</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vlevo</translation>
     </message>
     <message>
         <source> cents</source>
@@ -7470,46 +7593,46 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Right detune</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění vpravo</translation>
     </message>
     <message>
         <source>A-B Mix</source>
-        <translation type="unfinished"/>
+        <translation>Směšovač A-B</translation>
     </message>
     <message>
         <source>Mix envelope amount</source>
-        <translation type="unfinished"/>
+        <translation>Množství obálky směšovače</translation>
     </message>
     <message>
         <source>Mix envelope attack</source>
-        <translation type="unfinished"/>
+        <translation>Náběh obálky směšovače</translation>
     </message>
     <message>
         <source>Mix envelope hold</source>
-        <translation type="unfinished"/>
+        <translation>Držení obálky směšovače</translation>
     </message>
     <message>
         <source>Mix envelope decay</source>
-        <translation type="unfinished"/>
+        <translation>Útlum obálky směšovače</translation>
     </message>
     <message>
         <source>Crosstalk</source>
-        <translation type="unfinished"/>
+        <translation>Přeslech</translation>
     </message>
 </context>
 <context>
     <name>ZynAddSubFxInstrument</name>
     <message>
         <source>Portamento</source>
-        <translation type="unfinished"/>
+        <translation>Portamento</translation>
     </message>
     <message>
         <source>Filter Frequency</source>
-        <translation type="unfinished"/>
+        <translation>Frekvence filtru</translation>
     </message>
     <message>
         <source>Filter Resonance</source>
-        <translation type="unfinished"/>
+        <translation>Rezonance filtru</translation>
     </message>
     <message>
         <source>Bandwidth</source>
@@ -7517,11 +7640,11 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>FM Gain</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení FM</translation>
     </message>
     <message>
         <source>Resonance Center Frequency</source>
-        <translation type="unfinished"/>
+        <translation>Střední frekvence rezonance</translation>
     </message>
     <message>
         <source>Resonance Bandwidth</source>
@@ -7529,7 +7652,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Forward MIDI Control Change Events</source>
-        <translation type="unfinished"/>
+        <translation>Odesílat události MIDI Control Change</translation>
     </message>
 </context>
 <context>
@@ -7540,15 +7663,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here to show or hide the graphical user interface (GUI) of ZynAddSubFX.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro zobrazení nebo skrytí grafického uživatelského rozhraní (GUI) ZynAddSubFX.</translation>
     </message>
     <message>
         <source>Portamento:</source>
-        <translation type="unfinished"/>
+        <translation>Portamento:</translation>
     </message>
     <message>
         <source>PORT</source>
-        <translation type="unfinished"/>
+        <translation>PORT</translation>
     </message>
     <message>
         <source>Filter Frequency:</source>
@@ -7564,7 +7687,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>RES</source>
-        <translation type="unfinished"/>
+        <translation>REZ</translation>
     </message>
     <message>
         <source>Bandwidth:</source>
@@ -7572,23 +7695,23 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>BW</source>
-        <translation type="unfinished"/>
+        <translation>ŠP</translation>
     </message>
     <message>
         <source>FM Gain:</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení FM:</translation>
     </message>
     <message>
         <source>FM GAIN</source>
-        <translation type="unfinished"/>
+        <translation>ZISK FM</translation>
     </message>
     <message>
         <source>Resonance center frequency:</source>
-        <translation type="unfinished"/>
+        <translation>Střední frekvence rezonance:</translation>
     </message>
     <message>
         <source>RES CF</source>
-        <translation type="unfinished"/>
+        <translation>SF REZ</translation>
     </message>
     <message>
         <source>Resonance bandwidth:</source>
@@ -7596,11 +7719,11 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>RES BW</source>
-        <translation type="unfinished"/>
+        <translation>ŠP REZ</translation>
     </message>
     <message>
         <source>Forward MIDI Control Changes</source>
-        <translation type="unfinished"/>
+        <translation>Odesílat MIDI Control Change</translation>
     </message>
 </context>
 <context>
@@ -7623,11 +7746,11 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Stutter</source>
-        <translation type="unfinished"/>
+        <translation>Pokračování v přehrávání samplu při změně noty</translation>
     </message>
     <message>
         <source>Loopback point</source>
-        <translation type="unfinished"/>
+        <translation>Začátek smyčky</translation>
     </message>
     <message>
         <source>Loop mode</source>
@@ -7651,7 +7774,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Sample not found: %1</source>
-        <translation type="unfinished"/>
+        <translation>Vzorek nenalezen: %1</translation>
     </message>
 </context>
 <context>
@@ -7681,7 +7804,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Pravoúhlá (square) vlna</translation>
+        <translation>Pravoúhlá vlna</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -7697,7 +7820,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation>Pro uhlazení vlny klikněte zde.</translation>
+        <translation>Klepněte sem pro vyhlazení vlny.</translation>
     </message>
     <message>
         <source>Interpolation</source>
@@ -7713,27 +7836,27 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Click for a sine-wave.</source>
-        <translation>Klikněte sem pro sinusovou vlnu.</translation>
+        <translation>Klepněte sem pro sinusovou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klikněte sem pro trojúhelníkovou vlnu.</translation>
+        <translation>Klepněte sem pro trojúhelníkovou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation>Klikněte sem pro pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pilovitou vlnu.</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klikněte sem pro pravoúhlou vlnu.</translation>
+        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
-        <translation>Klikněte sem pro bílý šum.</translation>
+        <translation>Klepněte sem pro bílý šum.</translation>
     </message>
     <message>
         <source>Click here for a user-defined shape.</source>
-        <translation>Klikněte sem pro uživatelem definovaný tvar.</translation>
+        <translation>Klepněte sem pro uživatelem definovaný tvar.</translation>
     </message>
 </context>
 <context>
@@ -7744,7 +7867,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Input gain:</source>
-        <translation>Zisk vstupu:</translation>
+        <translation>Zesílení vstupu:</translation>
     </message>
     <message>
         <source>OUTPUT</source>
@@ -7752,113 +7875,113 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Output gain:</source>
-        <translation>Zisk výstupu:</translation>
+        <translation>Zesílení výstupu:</translation>
     </message>
     <message>
         <source>ATTACK</source>
-        <translation type="unfinished"/>
+        <translation>NÁBĚH</translation>
     </message>
     <message>
         <source>Peak attack time:</source>
-        <translation type="unfinished"/>
+        <translation>Délka náběhu špičky:</translation>
     </message>
     <message>
         <source>RELEASE</source>
-        <translation type="unfinished"/>
+        <translation>UVOLNĚNÍ</translation>
     </message>
     <message>
         <source>Peak release time:</source>
-        <translation type="unfinished"/>
+        <translation>Délka uvolnění špičky:</translation>
     </message>
     <message>
         <source>Reset waveform</source>
-        <translation>Obnovit vlnu</translation>
+        <translation>Obnovení vlny</translation>
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro obnovení křivky zpět do výchozího stavu</translation>
     </message>
     <message>
         <source>Smooth waveform</source>
-        <translation>Vyhlazená vlna</translation>
+        <translation>Vyhlazení vlny</translation>
     </message>
     <message>
         <source>Click here to apply smoothing to wavegraph</source>
-        <translation>Klikněte zde pro použití vyhlazení vlny grafu</translation>
+        <translation>Klepněte sem pro vyhlazení křivky</translation>
     </message>
     <message>
         <source>Increase wavegraph amplitude by 1dB</source>
-        <translation type="unfinished"/>
+        <translation>Zvýšení amplitudy křivky o 1 dB</translation>
     </message>
     <message>
         <source>Click here to increase wavegraph amplitude by 1dB</source>
-        <translation>Zde klikněte pro zvýšení amplitudy vlny o 1dB</translation>
+        <translation>Klepněte sem pro zvýšení amplitudy křivky o 1 dB</translation>
     </message>
     <message>
         <source>Decrease wavegraph amplitude by 1dB</source>
-        <translation type="unfinished"/>
+        <translation>Snížení amplitudy křivky o 1 dB</translation>
     </message>
     <message>
         <source>Click here to decrease wavegraph amplitude by 1dB</source>
-        <translation>Zde klikněte pro snížení amplitudy vlny o 1dB</translation>
+        <translation>Klepněte sem pro snížení amplitudy křivky o 1 dB</translation>
     </message>
     <message>
         <source>Stereomode Maximum</source>
-        <translation type="unfinished"/>
+        <translation>Režim maximálního sterea</translation>
     </message>
     <message>
         <source>Process based on the maximum of both stereo channels</source>
-        <translation type="unfinished"/>
+        <translation>Zpracování vycházející z maxima obou stereo kanálů</translation>
     </message>
     <message>
         <source>Stereomode Average</source>
-        <translation type="unfinished"/>
+        <translation>Režim průměru sterea</translation>
     </message>
     <message>
         <source>Process based on the average of both stereo channels</source>
-        <translation type="unfinished"/>
+        <translation>Zpracování vycházející z průměru obou stereo kanálů</translation>
     </message>
     <message>
         <source>Stereomode Unlinked</source>
-        <translation type="unfinished"/>
+        <translation>Režim nepropojeného sterea</translation>
     </message>
     <message>
         <source>Process each stereo channel independently</source>
-        <translation type="unfinished"/>
+        <translation>Zpracování každého stereo kanálu zvlášť</translation>
     </message>
 </context>
 <context>
     <name>dynProcControls</name>
     <message>
         <source>Input gain</source>
-        <translation>Zisk vstupu</translation>
+        <translation>Zesílení vstupu</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation>Zisk výstupu</translation>
+        <translation>Zesílení výstupu</translation>
     </message>
     <message>
         <source>Attack time</source>
-        <translation type="unfinished"/>
+        <translation>Doba náběhu</translation>
     </message>
     <message>
         <source>Release time</source>
-        <translation type="unfinished"/>
+        <translation>Délka uvolnění</translation>
     </message>
     <message>
         <source>Stereo mode</source>
-        <translation type="unfinished"/>
+        <translation>Režim sterea</translation>
     </message>
 </context>
 <context>
     <name>fxLineLcdSpinBox</name>
     <message>
         <source>Assign to:</source>
-        <translation type="unfinished"/>
+        <translation>Přiřadit k:</translation>
     </message>
     <message>
         <source>New FX Channel</source>
-        <translation>Nový FX kanál</translation>
+        <translation>Nový efektový kanál</translation>
     </message>
 </context>
 <context>
@@ -7896,7 +8019,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Envelope Slope</source>
-        <translation type="unfinished"/>
+        <translation>Sklon frekvence</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -7908,15 +8031,15 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Frequency Slope</source>
-        <translation type="unfinished"/>
+        <translation>Sklon frekvence</translation>
     </message>
     <message>
         <source>Start from note</source>
-        <translation type="unfinished"/>
+        <translation>Začít od noty</translation>
     </message>
     <message>
         <source>End to note</source>
-        <translation type="unfinished"/>
+        <translation>Skončit na notě</translation>
     </message>
 </context>
 <context>
@@ -7935,7 +8058,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Frequency Slope:</source>
-        <translation type="unfinished"/>
+        <translation>Sklon frekvence:</translation>
     </message>
     <message>
         <source>Envelope Length:</source>
@@ -7943,7 +8066,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Envelope Slope:</source>
-        <translation type="unfinished"/>
+        <translation>Sklon obálky:</translation>
     </message>
     <message>
         <source>Click:</source>
@@ -8001,7 +8124,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation>Toto dialogové okno zobrazuje informace o všech LADSPA pluginech, které bylo LMMS schopno nalézt. Zásuvné moduly jsou rozděleny do pěti kategorií podle portů a názvů.
 
 
-K dispozici jsou ty efekty, které mohou být použity v LMMS. Aby v LMMS bylo možné užít efektu, musí se o efekt skutečně jednat, to znamená, že musí mít oba vstupní a výstupní kanály. LMMS identifikuje vstupní kanál jako audio podle &apos;in&apos; v názvu. Výstupní kanály jsou identifikovány pole označení písmeny &apos;out&apos;. Kromě toho efekt musí mít stejný počet vstupů a výstupů a být real time kompatibilní.
+K dispozici jsou ty efekty, které mohou být použity v LMMS. Aby v LMMS bylo možné užít efektu, musí se o efekt skutečně jednat, to znamená, že musí mít oba vstupní a výstupní kanály. LMMS identifikuje vstupní kanál jako audio podle &quot;n&quot; v názvu. Výstupní kanály jsou identifikovány pole označení písmeny &quot;out&quot;. Kromě toho efekt musí mít stejný počet vstupů a výstupů a být real time kompatibilní.
 
 Nedostupné efekty jsou ty, které byly identifikovány jako efekty, ale buď nemají stejný počet vstupních a výstupních kanálů nebo nejsou real time kompatibilní.
 
@@ -8041,7 +8164,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Rate</source>
-        <translation>Rychlost</translation>
+        <translation>Druh</translation>
     </message>
     <message>
         <source>Direction</source>
@@ -8061,11 +8184,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>SR Dependent</source>
-        <translation type="unfinished"/>
+        <translation>SR závislý</translation>
     </message>
     <message>
         <source>Audio</source>
-        <translation>Audio</translation>
+        <translation>Zvuk</translation>
     </message>
     <message>
         <source>Control</source>
@@ -8085,11 +8208,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Integer</source>
-        <translation type="unfinished"/>
+        <translation>Celočíselný</translation>
     </message>
     <message>
         <source>Float</source>
-        <translation type="unfinished"/>
+        <translation>S plovoucí čárkou</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -8108,11 +8231,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>VCF Envelope Mod</source>
-        <translation type="unfinished"/>
+        <translation>VCF modulace obálky</translation>
     </message>
     <message>
         <source>VCF Envelope Decay</source>
-        <translation type="unfinished"/>
+        <translation>VCF útlum obálky</translation>
     </message>
     <message>
         <source>Distortion</source>
@@ -8124,11 +8247,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Slide Decay</source>
-        <translation type="unfinished"/>
+        <translation>Útlum sklouznutí</translation>
     </message>
     <message>
         <source>Slide</source>
-        <translation>Klouzání</translation>
+        <translation>Sklouznutí</translation>
     </message>
     <message>
         <source>Accent</source>
@@ -8136,18 +8259,18 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Dead</source>
-        <translation type="unfinished"/>
+        <translation>Dead</translation>
     </message>
     <message>
         <source>24dB/oct Filter</source>
-        <translation type="unfinished"/>
+        <translation>Filtr 24dB/okt</translation>
     </message>
 </context>
 <context>
     <name>lb302SynthView</name>
     <message>
         <source>Cutoff Freq:</source>
-        <translation>Frek. vypnutí:</translation>
+        <translation>Frekvence odstřihnutí:</translation>
     </message>
     <message>
         <source>Resonance:</source>
@@ -8155,23 +8278,23 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Env Mod:</source>
-        <translation type="unfinished"/>
+        <translation>Modulace obálky:</translation>
     </message>
     <message>
         <source>Decay:</source>
-        <translation>Doznívání:</translation>
+        <translation>Útlum:</translation>
     </message>
     <message>
         <source>303-es-que, 24dB/octave, 3 pole filter</source>
-        <translation type="unfinished"/>
+        <translation>3pólový filtr 303-es-que, 24dB/okt</translation>
     </message>
     <message>
         <source>Slide Decay:</source>
-        <translation type="unfinished"/>
+        <translation>Útlum sklouznutí:</translation>
     </message>
     <message>
         <source>DIST:</source>
-        <translation type="unfinished"/>
+        <translation>Zkreslení:</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -8179,7 +8302,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here for a saw-wave.</source>
-        <translation>Klikněte zde pro pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pilovitou vlnu.</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -8187,15 +8310,15 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here for a triangle-wave.</source>
-        <translation>Klikněte zde pro trojúhelníkovou vlnu.</translation>
+        <translation>Klepněte sem pro trojúhelníkovou vlnu.</translation>
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Pravoúhlá (square) vlna</translation>
+        <translation>Pravoúhlá vlna</translation>
     </message>
     <message>
         <source>Click here for a square-wave.</source>
-        <translation>Klikněte zde pro pravoúhlou vlnu.</translation>
+        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
     </message>
     <message>
         <source>Rounded square wave</source>
@@ -8203,15 +8326,15 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here for a square-wave with a rounded end.</source>
-        <translation>Klikněte sem pro pravoúhlou vlnu s oblým zakončením.</translation>
+        <translation>Klepněte sem pro pravoúhlou vlnu s oblým zakončením.</translation>
     </message>
     <message>
         <source>Moog wave</source>
-        <translation type="unfinished"/>
+        <translation>Moog vlna</translation>
     </message>
     <message>
         <source>Click here for a moog-like wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro vlnu typu moog.</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8219,7 +8342,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click for a sine-wave.</source>
-        <translation>Klikněte sem pro sinusovou vlnu.</translation>
+        <translation>Klepněte sem pro sinusovou vlnu.</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -8227,11 +8350,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here for an exponential wave.</source>
-        <translation>Klikněte zde pro exponenciální vlnu.</translation>
+        <translation>Klepněte sem pro exponenciální vlnu.</translation>
     </message>
     <message>
         <source>Click here for white-noise.</source>
-        <translation>Klikněte sem pro bílý šum.</translation>
+        <translation>Klepněte sem pro bílý šum.</translation>
     </message>
     <message>
         <source>Bandlimited saw wave</source>
@@ -8239,31 +8362,31 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here for bandlimited saw wave.</source>
-        <translation>Klikněte sem pro pásmově omezenou pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pásmově omezenou pilovitou vlnu.</translation>
     </message>
     <message>
         <source>Bandlimited square wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená pravoúhlá vlna</translation>
     </message>
     <message>
         <source>Click here for bandlimited square wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro pásmově zúženou pravoúhlou vlnu.</translation>
     </message>
     <message>
         <source>Bandlimited triangle wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená trojúhelníková vlna</translation>
     </message>
     <message>
         <source>Click here for bandlimited triangle wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro pásmově zúženou trojúhelníkovou vlnu.</translation>
     </message>
     <message>
         <source>Bandlimited moog saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Pásmově zúžená pilovitá moog vlna</translation>
     </message>
     <message>
         <source>Click here for bandlimited moog saw wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro pásmově zúženou pilovitou moog vlnu.</translation>
     </message>
 </context>
 <context>
@@ -8286,7 +8409,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Stick Mix</source>
-        <translation type="unfinished"/>
+        <translation>Mix paliček</translation>
     </message>
     <message>
         <source>Modulator</source>
@@ -8322,11 +8445,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Bowed</source>
-        <translation type="unfinished"/>
+        <translation>Smyčcem</translation>
     </message>
     <message>
         <source>Spread</source>
-        <translation>Rozsah</translation>
+        <translation>Šíře</translation>
     </message>
     <message>
         <source>Marimba</source>
@@ -8342,27 +8465,27 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Wood1</source>
-        <translation type="unfinished"/>
+        <translation>Dřevo1</translation>
     </message>
     <message>
         <source>Reso</source>
-        <translation>Rezon</translation>
+        <translation>Rezo</translation>
     </message>
     <message>
         <source>Wood2</source>
-        <translation type="unfinished"/>
+        <translation>Dřevo2</translation>
     </message>
     <message>
         <source>Beats</source>
-        <translation>Beats</translation>
+        <translation>Údery</translation>
     </message>
     <message>
         <source>Two Fixed</source>
-        <translation type="unfinished"/>
+        <translation>Dvě pevné</translation>
     </message>
     <message>
         <source>Clump</source>
-        <translation type="unfinished"/>
+        <translation>Svazek</translation>
     </message>
     <message>
         <source>Tubular Bells</source>
@@ -8370,19 +8493,19 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Uniform Bar</source>
-        <translation type="unfinished"/>
+        <translation>Obyčejná tyč</translation>
     </message>
     <message>
         <source>Tuned Bar</source>
-        <translation type="unfinished"/>
+        <translation>Laděná tyč</translation>
     </message>
     <message>
         <source>Glass</source>
-        <translation type="unfinished"/>
+        <translation>Sklo</translation>
     </message>
     <message>
         <source>Tibetan Bowl</source>
-        <translation>Tibetská mísa</translation>
+        <translation>Tibetská zpívající mísa</translation>
     </message>
 </context>
 <context>
@@ -8393,11 +8516,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Spread</source>
-        <translation>Rozsah</translation>
+        <translation>Šíře</translation>
     </message>
     <message>
         <source>Spread:</source>
-        <translation>Rozsah:</translation>
+        <translation>Šíře:</translation>
     </message>
     <message>
         <source>Hardness</source>
@@ -8433,11 +8556,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Stick Mix</source>
-        <translation type="unfinished"/>
+        <translation>Mix paliček</translation>
     </message>
     <message>
         <source>Stick Mix:</source>
-        <translation type="unfinished"/>
+        <translation>Mix paliček:</translation>
     </message>
     <message>
         <source>Modulator</source>
@@ -8501,14 +8624,14 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Your Stk-installation seems to be incomplete. Please make sure the full Stk-package is installed!</source>
-        <translation type="unfinished"/>
+        <translation>Zdá se, že instalace Stk není kompletní. Ujistěte se prosím, že je nainstalován celý balík Stk!</translation>
     </message>
 </context>
 <context>
     <name>manageVSTEffectView</name>
     <message>
         <source> - VST parameter control</source>
-        <translation type="unfinished"/>
+        <translation>- řízení parametrů VST</translation>
     </message>
     <message>
         <source>VST Sync</source>
@@ -8516,15 +8639,15 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here if you want to synchronize all parameters with VST plugin.</source>
-        <translation>Klikněte sem, chcete-li synchronizovat všechny parametry s VST pluginem.</translation>
+        <translation>Klepněte sem, chcete-li synchronizovat všechny parametry s VST pluginem.</translation>
     </message>
     <message>
         <source>Automated</source>
-        <translation type="unfinished"/>
+        <translation>Automaticky</translation>
     </message>
     <message>
         <source>Click here if you want to display automated parameters only.</source>
-        <translation>Klikněte sem, pokud chcete pouze zobrazit automatizační parametry.</translation>
+        <translation>Klepněte sem, pokud chcete pouze zobrazit parametry automatizace.</translation>
     </message>
     <message>
         <source>    Close    </source>
@@ -8539,7 +8662,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     <name>manageVestigeInstrumentView</name>
     <message>
         <source> - VST plugin control</source>
-        <translation type="unfinished"/>
+        <translation>- ovládání VST pluginu</translation>
     </message>
     <message>
         <source>VST Sync</source>
@@ -8547,15 +8670,15 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Click here if you want to synchronize all parameters with VST plugin.</source>
-        <translation>Klikněte sem, chcete-li synchronizovat všechny parametry s VST pluginem.</translation>
+        <translation>Klepněte sem, chcete-li synchronizovat všechny parametry s VST pluginem.</translation>
     </message>
     <message>
         <source>Automated</source>
-        <translation type="unfinished"/>
+        <translation>Automaticky</translation>
     </message>
     <message>
         <source>Click here if you want to display automated parameters only.</source>
-        <translation>Klikněte sem, pokud chcete pouze zobrazit automatizační parametry.</translation>
+        <translation>Klepněte sem, pokud chcete pouze zobrazit parametry automatizace.</translation>
     </message>
     <message>
         <source>    Close    </source>
@@ -8574,103 +8697,103 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Op 1 Attack</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 náběh</translation>
     </message>
     <message>
         <source>Op 1 Decay</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 útlum</translation>
     </message>
     <message>
         <source>Op 1 Sustain</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 vydržení</translation>
     </message>
     <message>
         <source>Op 1 Release</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 uvolnění</translation>
     </message>
     <message>
         <source>Op 1 Level</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 úroveň</translation>
     </message>
     <message>
         <source>Op 1 Level Scaling</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 škálování úrovně</translation>
     </message>
     <message>
         <source>Op 1 Frequency Multiple</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 násobení frekvence</translation>
     </message>
     <message>
         <source>Op 1 Feedback</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 zpětná vazba</translation>
     </message>
     <message>
         <source>Op 1 Key Scaling Rate</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 rychlost podle výšky klávesy</translation>
     </message>
     <message>
         <source>Op 1 Percussive Envelope</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 perkusivní obálka</translation>
     </message>
     <message>
         <source>Op 1 Tremolo</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 tremolo</translation>
     </message>
     <message>
         <source>Op 1 Vibrato</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 vibrato</translation>
     </message>
     <message>
         <source>Op 1 Waveform</source>
-        <translation type="unfinished"/>
+        <translation>Op 1 vlna</translation>
     </message>
     <message>
         <source>Op 2 Attack</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 náběh</translation>
     </message>
     <message>
         <source>Op 2 Decay</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 útlum</translation>
     </message>
     <message>
         <source>Op 2 Sustain</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 vydržení</translation>
     </message>
     <message>
         <source>Op 2 Release</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 uvolnění</translation>
     </message>
     <message>
         <source>Op 2 Level</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 úroveň</translation>
     </message>
     <message>
         <source>Op 2 Level Scaling</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 škálování úrovně</translation>
     </message>
     <message>
         <source>Op 2 Frequency Multiple</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 násobení frekvence</translation>
     </message>
     <message>
         <source>Op 2 Key Scaling Rate</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 rychlost podle výšky klávesy</translation>
     </message>
     <message>
         <source>Op 2 Percussive Envelope</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 perkusivní obálka</translation>
     </message>
     <message>
         <source>Op 2 Tremolo</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 tremolo</translation>
     </message>
     <message>
         <source>Op 2 Vibrato</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 vibrato</translation>
     </message>
     <message>
         <source>Op 2 Waveform</source>
-        <translation type="unfinished"/>
+        <translation>Op 2 tvar vlny</translation>
     </message>
     <message>
         <source>FM</source>
@@ -8689,11 +8812,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     <name>opl2instrumentView</name>
     <message>
         <source>Attack</source>
-        <translation>Nástup</translation>
+        <translation>Náběh</translation>
     </message>
     <message>
         <source>Decay</source>
-        <translation>Doznívání</translation>
+        <translation>Útlum</translation>
     </message>
     <message>
         <source>Release</source>
@@ -8701,7 +8824,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Frequency multiplier</source>
-        <translation type="unfinished"/>
+        <translation>Násobič frekvence</translation>
     </message>
 </context>
 <context>
@@ -8739,7 +8862,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Osc %1 panning:</source>
-        <translation>Panoráma Osc %1:</translation>
+        <translation>Osc %1 panoráma:</translation>
     </message>
     <message>
         <source>cents</source>
@@ -8747,106 +8870,106 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>The distortion knob adds distortion to the output of the instrument. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač zkreslení přidá zkreslení k výstupu nástroje.</translation>
     </message>
     <message>
         <source>The volume knob controls the volume of the output of the instrument. It is cumulative with the instrument window&apos;s volume control. </source>
-        <translation type="unfinished"/>
+        <translation>Otočný ovladač hlasitosti ovládá hlasitost výstupu nástroje. Sčítá se s ovládáním hlasitosti okna nástroje.</translation>
     </message>
     <message>
         <source>The randomize button randomizes all knobs except the harmonics,main volume and distortion knobs. </source>
-        <translation type="unfinished"/>
+        <translation>Tlačítko Randomize náhodně nastaví všechny ovladače kromě ovladače harmonických, hlavní hlasitosti a zkreslení.</translation>
     </message>
     <message>
         <source>Osc %1 stereo detuning</source>
-        <translation type="unfinished"/>
+        <translation>Osc %1 rozladění sterea</translation>
     </message>
     <message>
         <source>Osc %1 harmonic:</source>
-        <translation type="unfinished"/>
+        <translation>Osc %1 harmonické:</translation>
     </message>
 </context>
 <context>
     <name>papuInstrument</name>
     <message>
         <source>Sweep time</source>
-        <translation type="unfinished"/>
+        <translation>Trvání sweepu</translation>
     </message>
     <message>
         <source>Sweep direction</source>
-        <translation type="unfinished"/>
+        <translation>Směr sweepu</translation>
     </message>
     <message>
         <source>Sweep RtShift amount</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň pro změnu frekvence sweepu</translation>
     </message>
     <message>
         <source>Wave Pattern Duty</source>
-        <translation type="unfinished"/>
+        <translation>Pracovní cyklus vlnového patternu</translation>
     </message>
     <message>
         <source>Channel 1 volume</source>
-        <translation>Kanál 1 hlasitost</translation>
+        <translation>Hlasitost kanálu 1</translation>
     </message>
     <message>
         <source>Volume sweep direction</source>
-        <translation type="unfinished"/>
+        <translation>Směr hlasitosti sweepu</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"/>
+        <translation>Délka každého kroku ve sweepu</translation>
     </message>
     <message>
         <source>Channel 2 volume</source>
-        <translation>Kanál 2 hlasitost</translation>
+        <translation>Hlasitost kanálu 2</translation>
     </message>
     <message>
         <source>Channel 3 volume</source>
-        <translation>Kanál 3 hlasitost</translation>
+        <translation>Hlasitost kanálu 3</translation>
     </message>
     <message>
         <source>Channel 4 volume</source>
-        <translation>Kanál 4 hlasitost</translation>
+        <translation>Hlasitost kanálu 4</translation>
     </message>
     <message>
         <source>Right Output level</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň pravého výstupu</translation>
     </message>
     <message>
         <source>Left Output level</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň levého výstupu</translation>
     </message>
     <message>
         <source>Channel 1 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 1 do SO2 (pravý)</translation>
     </message>
     <message>
         <source>Channel 2 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 2 do SO2 (pravý)</translation>
     </message>
     <message>
         <source>Channel 3 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 3 do SO2 (pravý)</translation>
     </message>
     <message>
         <source>Channel 4 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 4 do SO2 (pravý)</translation>
     </message>
     <message>
         <source>Channel 1 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 1 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel 2 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 2 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel 3 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 3 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel 4 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 4 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Treble</source>
@@ -8858,90 +8981,90 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Shift Register width</source>
-        <translation type="unfinished"/>
+        <translation>Posun šířky registru</translation>
     </message>
 </context>
 <context>
     <name>papuInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
-        <translation type="unfinished"/>
+        <translation>Trvání sweepu:</translation>
     </message>
     <message>
         <source>Sweep Time</source>
-        <translation type="unfinished"/>
+        <translation>Trvání sweepu</translation>
     </message>
     <message>
         <source>Sweep RtShift amount:</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň pro změnu frekvence sweepu:</translation>
     </message>
     <message>
         <source>Sweep RtShift amount</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň pro změnu frekvence sweepu</translation>
     </message>
     <message>
         <source>Wave pattern duty:</source>
-        <translation type="unfinished"/>
+        <translation>Pracovní cyklus vlnového patternu:</translation>
     </message>
     <message>
         <source>Wave Pattern Duty</source>
-        <translation type="unfinished"/>
+        <translation>Pracovní cyklus vlnového patternu</translation>
     </message>
     <message>
         <source>Square Channel 1 Volume:</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost pulzního kanálu 1:</translation>
     </message>
     <message>
         <source>Length of each step in sweep:</source>
-        <translation type="unfinished"/>
+        <translation>Délka každého kroku ve sweepu:</translation>
     </message>
     <message>
         <source>Length of each step in sweep</source>
-        <translation type="unfinished"/>
+        <translation>Délka každého kroku ve sweepu</translation>
     </message>
     <message>
         <source>Wave pattern duty</source>
-        <translation type="unfinished"/>
+        <translation>Pracovní cyklus vlnového patternu</translation>
     </message>
     <message>
         <source>Square Channel 2 Volume:</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost pulzního kanálu 2:</translation>
     </message>
     <message>
         <source>Square Channel 2 Volume</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost pulzního kanálu 2</translation>
     </message>
     <message>
         <source>Wave Channel Volume:</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost vlnového kanálu:</translation>
     </message>
     <message>
         <source>Wave Channel Volume</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost vlnového kanálu</translation>
     </message>
     <message>
         <source>Noise Channel Volume:</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost šumového kanálu:</translation>
     </message>
     <message>
         <source>Noise Channel Volume</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost šumového kanálu</translation>
     </message>
     <message>
         <source>SO1 Volume (Right):</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost SO1 (pravý):</translation>
     </message>
     <message>
         <source>SO1 Volume (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost SO1 (pravý)</translation>
     </message>
     <message>
         <source>SO2 Volume (Left):</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost SO2 (levý):</translation>
     </message>
     <message>
         <source>SO2 Volume (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost SO2 (levý)</translation>
     </message>
     <message>
         <source>Treble:</source>
@@ -8961,75 +9084,75 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Sweep Direction</source>
-        <translation type="unfinished"/>
+        <translation>Směr sweepu</translation>
     </message>
     <message>
         <source>Volume Sweep Direction</source>
-        <translation type="unfinished"/>
+        <translation>Směr hlasitosti sweepu</translation>
     </message>
     <message>
         <source>Shift Register Width</source>
-        <translation type="unfinished"/>
+        <translation>Posun šířky registru</translation>
     </message>
     <message>
         <source>Channel1 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 1 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel2 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 2 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel3 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 3 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel4 to SO1 (Right)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 4 do SO1 (pravý)</translation>
     </message>
     <message>
         <source>Channel1 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 1 do SO2 (levý)</translation>
     </message>
     <message>
         <source>Channel2 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 2 do SO2 (levý)</translation>
     </message>
     <message>
         <source>Channel3 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 3 do SO2 (levý)</translation>
     </message>
     <message>
         <source>Channel4 to SO2 (Left)</source>
-        <translation type="unfinished"/>
+        <translation>Kanál 4 do SO2 (levý)</translation>
     </message>
     <message>
         <source>Wave Pattern</source>
-        <translation type="unfinished"/>
+        <translation>Vlnový pattern</translation>
     </message>
     <message>
         <source>The amount of increase or decrease in frequency</source>
-        <translation type="unfinished"/>
+        <translation>Množství zvýšení nebo snížení frekvence</translation>
     </message>
     <message>
         <source>The rate at which increase or decrease in frequency occurs</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň, při které dojde ke zvýšení nebo snížení frekvence</translation>
     </message>
     <message>
         <source>The duty cycle is the ratio of the duration (time) that a signal is ON versus the total period of the signal.</source>
-        <translation type="unfinished"/>
+        <translation>Pracovní cyklus je poměr mezi dobou trvání (časem), kdy je signál zapnut, a celkovou délkou signálu.</translation>
     </message>
     <message>
         <source>Square Channel 1 Volume</source>
-        <translation type="unfinished"/>
+        <translation>Hlasitost pulzního kanálu 1</translation>
     </message>
     <message>
         <source>The delay between step change</source>
-        <translation type="unfinished"/>
+        <translation>Zpoždění mezi změnou kroku</translation>
     </message>
     <message>
         <source>Draw the wave here</source>
-        <translation type="unfinished"/>
+        <translation>Nakreslete vlnu zde</translation>
     </message>
 </context>
 <context>
@@ -9079,11 +9202,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Plugin for freely manipulating stereo output</source>
-        <translation type="unfinished"/>
+        <translation>Plugin pro volné úpravy stereo výstupu</translation>
     </message>
     <message>
         <source>Plugin for controlling knobs with sound peaks</source>
-        <translation type="unfinished"/>
+        <translation>Plugin pro řízení otočných ovladačů zvukovými špičkami</translation>
     </message>
     <message>
         <source>Plugin for enhancing stereo separation of a stereo input file</source>
@@ -9103,7 +9226,7 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Tuneful things to bang on</source>
-        <translation>Libozvučná klepátka</translation>
+        <translation>Melodické bicí nástroje</translation>
     </message>
     <message>
         <source>VST-host for using VST(i)-plugins within LMMS</source>
@@ -9124,127 +9247,132 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     <message>
         <source>Emulation of the MOS6581 and MOS8580 SID.
 This chip was used in the Commodore 64 computer.</source>
-        <translation type="unfinished"/>
+        <translation>Emulace MOS6581 a MOS8580 SID.
+Tento čip byl používán v počítačích Commodore 64.</translation>
     </message>
     <message>
         <source>Player for SoundFont files</source>
-        <translation type="unfinished"/>
+        <translation>Přehrávač SoundFont souborů</translation>
     </message>
     <message>
         <source>Emulation of GameBoy (TM) APU</source>
-        <translation type="unfinished"/>
+        <translation>Emulace APU GameBoye (TM)</translation>
     </message>
     <message>
         <source>Customizable wavetable synthesizer</source>
-        <translation type="unfinished"/>
+        <translation>Upravitelný tabulkový syntezátor</translation>
     </message>
     <message>
         <source>Embedded ZynAddSubFX</source>
-        <translation type="unfinished"/>
+        <translation>Vestavěný ZynAddSubFX</translation>
     </message>
     <message>
         <source>2-operator FM Synth</source>
-        <translation type="unfinished"/>
+        <translation>2 operátorová FM syntéza</translation>
     </message>
     <message>
         <source>Filter for importing Hydrogen files into LMMS</source>
-        <translation type="unfinished"/>
+        <translation>Filtr pro import souborů Hydrogen do LMMS</translation>
     </message>
     <message>
         <source>LMMS port of sfxr</source>
-        <translation type="unfinished"/>
+        <translation>LMMS port sfxr</translation>
     </message>
     <message>
         <source>Monstrous 3-oscillator synth with modulation matrix</source>
-        <translation type="unfinished"/>
+        <translation>3oscilátorový syntezátor Monstrous s modulační matricí</translation>
     </message>
     <message>
         <source>Three powerful oscillators you can modulate in several ways</source>
-        <translation type="unfinished"/>
+        <translation>3 silné oscilátory, které můžete různými způsoby modulovat</translation>
     </message>
     <message>
         <source>A native amplifier plugin</source>
-        <translation type="unfinished"/>
+        <translation>Nativní plugin zesilovače</translation>
     </message>
     <message>
         <source>Carla Rack Instrument</source>
-        <translation type="unfinished"/>
+        <translation>Nástroj Carla Rack</translation>
     </message>
     <message>
         <source>4-oscillator modulatable wavetable synth</source>
-        <translation type="unfinished"/>
+        <translation>4oscilátorový modulovatelný tabulkový syntezátor</translation>
     </message>
     <message>
         <source>plugin for waveshaping</source>
-        <translation type="unfinished"/>
+        <translation>plugin pro tvarování vln</translation>
     </message>
     <message>
         <source>Boost your bass the fast and simple way</source>
-        <translation type="unfinished"/>
+        <translation>Zesílení vašeho basu rychlým a snadným způsobem</translation>
     </message>
     <message>
         <source>Versatile drum synthesizer</source>
-        <translation type="unfinished"/>
+        <translation>Univerzální syntezátor bicích nástrojů</translation>
     </message>
     <message>
         <source>Simple sampler with various settings for using samples (e.g. drums) in an instrument-track</source>
-        <translation type="unfinished"/>
+        <translation>Jednoduchý sampler s bohatým nastavením pro používání samplů (např. bicích nástrojů) v nástrojové stopě</translation>
     </message>
     <message>
         <source>plugin for processing dynamics in a flexible way</source>
-        <translation type="unfinished"/>
+        <translation>plugin pro flexibilní práci s dynamikou</translation>
     </message>
     <message>
         <source>Carla Patchbay Instrument</source>
-        <translation type="unfinished"/>
+        <translation>Nástroj Carla Patchbay</translation>
     </message>
     <message>
         <source>plugin for using arbitrary VST effects inside LMMS.</source>
-        <translation type="unfinished"/>
+        <translation>Plugin pro použití libovolného VST efektu v LMMS.</translation>
     </message>
     <message>
         <source>Graphical spectrum analyzer plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin pro grafickou analýzu spektra</translation>
     </message>
     <message>
         <source>A NES-like synthesizer</source>
-        <translation type="unfinished"/>
+        <translation>Syntetizér typu NES</translation>
     </message>
     <message>
         <source>A native delay plugin</source>
-        <translation type="unfinished"/>
+        <translation>Nativní plugin delay</translation>
     </message>
     <message>
         <source>Player for GIG files</source>
-        <translation type="unfinished"/>
+        <translation>Přehrávač GIG souborů</translation>
     </message>
     <message>
         <source>A multitap echo delay plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin multi-tap delay</translation>
     </message>
     <message>
         <source>A native flanger plugin</source>
-        <translation type="unfinished"/>
+        <translation>Nativní plugin flanger</translation>
     </message>
     <message>
         <source>An oversampling bitcrusher</source>
-        <translation type="unfinished"/>
+        <translation>Bitcrusher založený na převzorkování</translation>
     </message>
     <message>
         <source>A native eq plugin</source>
-        <translation type="unfinished"/>
+        <translation>Nativní plugin ekvalizér</translation>
     </message>
     <message>
         <source>A 4-band Crossover Equalizer</source>
-        <translation type="unfinished"/>
+        <translation>4 pásmový crossover ekvalizér</translation>
     </message>
     <message>
         <source>A Dual filter plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin duální filtr</translation>
     </message>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
-        <translation type="unfinished"/>
+        <translation>Filtr pro export souborů MIDI z LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Algoritmus dozvuku od Seana Costello</translation>
     </message>
 </context>
 <context>
@@ -9267,19 +9395,19 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Reverb Roomsize</source>
-        <translation type="unfinished"/>
+        <translation>Velikost dozvukového prostoru</translation>
     </message>
     <message>
         <source>Reverb Damping</source>
-        <translation type="unfinished"/>
+        <translation>Útlum dozvuku</translation>
     </message>
     <message>
         <source>Reverb Width</source>
-        <translation type="unfinished"/>
+        <translation>Délka dozvuku</translation>
     </message>
     <message>
         <source>Reverb Level</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň dozvuku</translation>
     </message>
     <message>
         <source>Chorus</source>
@@ -9287,15 +9415,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Chorus Lines</source>
-        <translation type="unfinished"/>
+        <translation>Počet linií chorusu</translation>
     </message>
     <message>
         <source>Chorus Level</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň chorusu</translation>
     </message>
     <message>
         <source>Chorus Speed</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost chorusu</translation>
     </message>
     <message>
         <source>Chorus Depth</source>
@@ -9314,7 +9442,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Click here to open another SF2 file</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro otevření jiného SF2 souboru</translation>
     </message>
     <message>
         <source>Choose the patch</source>
@@ -9330,47 +9458,47 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>This button enables the reverb effect. This is useful for cool effects, but only works on files that support it.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto tlačítkem zapnete efekt dozvuk (reverb). Ten lze použít pro výborné efekty, ale funguje pouze se soubory, které jej podporují.</translation>
     </message>
     <message>
         <source>Reverb Roomsize:</source>
-        <translation type="unfinished"/>
+        <translation>Velikost dozvukového prostoru:</translation>
     </message>
     <message>
         <source>Reverb Damping:</source>
-        <translation type="unfinished"/>
+        <translation>Útlum dozvuku:</translation>
     </message>
     <message>
         <source>Reverb Width:</source>
-        <translation type="unfinished"/>
+        <translation>Délka dozvuku:</translation>
     </message>
     <message>
         <source>Reverb Level:</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň dozvuku:</translation>
     </message>
     <message>
         <source>Apply chorus (if supported)</source>
-        <translation type="unfinished"/>
+        <translation>Použít chorus (je-li podporován)</translation>
     </message>
     <message>
         <source>This button enables the chorus effect. This is useful for cool echo effects, but only works on files that support it.</source>
-        <translation type="unfinished"/>
+        <translation>Tímto tlačítkem zapnete efekt chorus. Ten lze použít pro výborné echo efekty, ale funguje pouze se soubory, které jej podporují.</translation>
     </message>
     <message>
         <source>Chorus Lines:</source>
-        <translation type="unfinished"/>
+        <translation>Počet linií chorusu:</translation>
     </message>
     <message>
         <source>Chorus Level:</source>
-        <translation type="unfinished"/>
+        <translation>Úroveň chorusu:</translation>
     </message>
     <message>
         <source>Chorus Speed:</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost chorusu:</translation>
     </message>
     <message>
         <source>Chorus Depth:</source>
-        <translation type="unfinished"/>
+        <translation>Hloubka chorusu:</translation>
     </message>
     <message>
         <source>Open SoundFont file</source>
@@ -9378,21 +9506,21 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>SoundFont2 Files (*.sf2)</source>
-        <translation type="unfinished"/>
+        <translation>Soubory SoundFont2 (*.sf2)</translation>
     </message>
 </context>
 <context>
     <name>sfxrInstrument</name>
     <message>
         <source>Wave Form</source>
-        <translation type="unfinished"/>
+        <translation>Vlna</translation>
     </message>
 </context>
 <context>
     <name>sidInstrument</name>
     <message>
         <source>Cutoff</source>
-        <translation type="unfinished"/>
+        <translation>Oříznutí</translation>
     </message>
     <message>
         <source>Resonance</source>
@@ -9404,7 +9532,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Voice 3 off</source>
-        <translation type="unfinished"/>
+        <translation>Vypnout hlas 3</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -9412,7 +9540,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Chip model</source>
-        <translation type="unfinished"/>
+        <translation>Model čipu</translation>
     </message>
 </context>
 <context>
@@ -9427,63 +9555,63 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Cutoff frequency:</source>
-        <translation>Frekvence seříznutí:</translation>
+        <translation>Frekvence oříznutí:</translation>
     </message>
     <message>
         <source>High-Pass filter </source>
-        <translation type="unfinished"/>
+        <translation>Filtr typu horní propust</translation>
     </message>
     <message>
         <source>Band-Pass filter </source>
-        <translation type="unfinished"/>
+        <translation>Filtr typu pásmová propust</translation>
     </message>
     <message>
         <source>Low-Pass filter </source>
-        <translation type="unfinished"/>
+        <translation>Filtr typu dolní propust</translation>
     </message>
     <message>
         <source>Voice3 Off </source>
-        <translation type="unfinished"/>
+        <translation>Vypnout hlas 3</translation>
     </message>
     <message>
         <source>MOS6581 SID </source>
-        <translation type="unfinished"/>
+        <translation>MOS6581 SID</translation>
     </message>
     <message>
         <source>MOS8580 SID </source>
-        <translation type="unfinished"/>
+        <translation>MOS8580 SID</translation>
     </message>
     <message>
         <source>Attack:</source>
-        <translation type="unfinished"/>
+        <translation>Náběh:</translation>
     </message>
     <message>
         <source>Attack rate determines how rapidly the output of Voice %1 rises from zero to peak amplitude.</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost náběhu určuje, jak rychle výstup hlasu %1 stoupne z nuly na špičkovou amplitudu.</translation>
     </message>
     <message>
         <source>Decay:</source>
-        <translation>Doznívání:</translation>
+        <translation>Útlum:</translation>
     </message>
     <message>
         <source>Decay rate determines how rapidly the output falls from the peak amplitude to the selected Sustain level.</source>
-        <translation type="unfinished"/>
+        <translation>Rychlost útlumu (decay) určuje, jak rychle poklesne výstup ze špičky na zvolenou úroveň vydržení (sustain).</translation>
     </message>
     <message>
         <source>Sustain:</source>
-        <translation>Sustain:</translation>
+        <translation>Vydržení:</translation>
     </message>
     <message>
         <source>Output of Voice %1 will remain at the selected Sustain amplitude as long as the note is held.</source>
-        <translation type="unfinished"/>
+        <translation>Výstup hlasu %1 zůstane na zvolené úrovni Vydržení po celou dobu, kdy bude nota držena.</translation>
     </message>
     <message>
         <source>Release:</source>
-        <translation>Release:</translation>
+        <translation>Uvolnění:</translation>
     </message>
     <message>
         <source>The output of of Voice %1 will fall from Sustain amplitude to zero amplitude at the selected Release rate.</source>
-        <translation type="unfinished"/>
+        <translation>Výstup hlasu %1 poklesne z úrovně vydržení (sustain) na nulovou amplitudu zvolenou rychlostí uvolnění (release).</translation>
     </message>
     <message>
         <source>Pulse Width:</source>
@@ -9491,15 +9619,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The Pulse Width resolution allows the width to be smoothly swept with no discernable stepping. The Pulse waveform on Oscillator %1 must be selected to have any audible effect.</source>
-        <translation type="unfinished"/>
+        <translation>Rozlišení šířky pulsu umožňuje plynulé vyhlazení šířky, aby nebylo rozeznatelné krokování. Pulzní vlna na oscilátoru %1 musí být zvolena tak, aby měla nějaký slyšitelný efekt.</translation>
     </message>
     <message>
         <source>Coarse:</source>
-        <translation type="unfinished"/>
+        <translation>Ladění:</translation>
     </message>
     <message>
         <source>The Coarse detuning allows to detune Voice %1 one octave up or down.</source>
-        <translation type="unfinished"/>
+        <translation>Hrubé rozladění umožní rozladit hlas %1 až o jednu oktávu nahoru nebo dolů.</translation>
     </message>
     <message>
         <source>Pulse Wave</source>
@@ -9511,7 +9639,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>SawTooth</source>
-        <translation type="unfinished"/>
+        <translation>Pilovitá vlna</translation>
     </message>
     <message>
         <source>Noise</source>
@@ -9523,38 +9651,38 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Sync synchronizes the fundamental frequency of Oscillator %1 with the fundamental frequency of Oscillator %2 producing &quot;Hard Sync&quot; effects.</source>
-        <translation type="unfinished"/>
+        <translation>Synchronizace synchronizuje základní frekvenci oscilátoru %1 se základní frekvencí oscilátoru %2 pomocí efektu pevné (Hard Sync) synchronizace.</translation>
     </message>
     <message>
         <source>Ring-Mod</source>
-        <translation type="unfinished"/>
+        <translation>Kruhová modulace</translation>
     </message>
     <message>
         <source>Ring-mod replaces the Triangle Waveform output of Oscillator %1 with a &quot;Ring Modulated&quot; combination of Oscillators %1 and %2.</source>
-        <translation type="unfinished"/>
+        <translation>Kruhová modulace nahradí výstup trojúhelníkové vlny na oscilátoru %1 &quot;kruhově modulovanou&quot; kombinací oscilátorů %1 a %2.</translation>
     </message>
     <message>
         <source>Filtered</source>
-        <translation type="unfinished"/>
+        <translation>Filtrování</translation>
     </message>
     <message>
         <source>When Filtered is on, Voice %1 will be processed through the Filter. When Filtered is off, Voice %1 appears directly at the output, and the Filter has no effect on it.</source>
-        <translation type="unfinished"/>
+        <translation>Pokud je zapnuto filtrování, hlas %1 bude zpracován filtrem. Pokud je filtrování vypnuto, hlas %1 se objeví přímo na výstupu a filtr na něj nebude mít žádný efekt.</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"/>
+        <translation>Test</translation>
     </message>
     <message>
         <source>Test, when set, resets and locks Oscillator %1 at zero until Test is turned off.</source>
-        <translation type="unfinished"/>
+        <translation>Test, když je nastaven, resetuje a zablokuje oscilátor %1 na nule, dokud se test nevypne.</translation>
     </message>
 </context>
 <context>
     <name>stereoEnhancerControlDialog</name>
     <message>
         <source>WIDE</source>
-        <translation type="unfinished"/>
+        <translation>ŠÍŘKA</translation>
     </message>
     <message>
         <source>Width:</source>
@@ -9572,38 +9700,38 @@ This chip was used in the Commodore 64 computer.</source>
     <name>stereoMatrixControlDialog</name>
     <message>
         <source>Left to Left Vol:</source>
-        <translation type="unfinished"/>
+        <translation>Levý do levého – hlasitost:</translation>
     </message>
     <message>
         <source>Left to Right Vol:</source>
-        <translation type="unfinished"/>
+        <translation>Levý do pravého – hlasitost:</translation>
     </message>
     <message>
         <source>Right to Left Vol:</source>
-        <translation type="unfinished"/>
+        <translation>Pravý do levého – hlasitost:</translation>
     </message>
     <message>
         <source>Right to Right Vol:</source>
-        <translation type="unfinished"/>
+        <translation>Pravý do pravého – hlasitost:</translation>
     </message>
 </context>
 <context>
     <name>stereoMatrixControls</name>
     <message>
         <source>Left to Left</source>
-        <translation type="unfinished"/>
+        <translation>Levý do levého</translation>
     </message>
     <message>
         <source>Left to Right</source>
-        <translation type="unfinished"/>
+        <translation>Levý do pravého</translation>
     </message>
     <message>
         <source>Right to Left</source>
-        <translation type="unfinished"/>
+        <translation>Pravý do levého</translation>
     </message>
     <message>
         <source>Right to Right</source>
-        <translation type="unfinished"/>
+        <translation>Pravý do pravého</translation>
     </message>
 </context>
 <context>
@@ -9629,11 +9757,11 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Pick %1 position</source>
-        <translation type="unfinished"/>
+        <translation>Místo drnknutí %1</translation>
     </message>
     <message>
         <source>Pickup %1 position</source>
-        <translation type="unfinished"/>
+        <translation>Umístění snímače %1</translation>
     </message>
     <message>
         <source>Pan %1</source>
@@ -9641,7 +9769,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Detune %1</source>
-        <translation type="unfinished"/>
+        <translation>Rozladění %1</translation>
     </message>
     <message>
         <source>Fuzziness %1 </source>
@@ -9649,15 +9777,15 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Length %1</source>
-        <translation type="unfinished"/>
+        <translation>Délka %1</translation>
     </message>
     <message>
         <source>Impulse %1</source>
-        <translation type="unfinished"/>
+        <translation>Impulz %1</translation>
     </message>
     <message>
         <source>Octave %1</source>
-        <translation type="unfinished"/>
+        <translation>Oktáva %1</translation>
     </message>
 </context>
 <context>
@@ -9668,7 +9796,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The &apos;V&apos; knob sets the volume of the selected string.</source>
-        <translation>Otočný ovladač &apos;V&apos; nastavuje hlasitost vybrané struny.</translation>
+        <translation>Otočný ovladač &quot;V&quot; nastavuje hlasitost vybrané struny.</translation>
     </message>
     <message>
         <source>String stiffness:</source>
@@ -9676,31 +9804,31 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The &apos;S&apos; knob sets the stiffness of the selected string.  The stiffness of the string affects how long the string will ring out.  The lower the setting, the longer the string will ring.</source>
-        <translation>Otočný ovladač &apos;S&apos; nastavuje tvrdost vybrané struny. Tvrdost struny ovlivňuje délku doznívání struny. Čím nižší hodnota, tím déle bude struna znít. </translation>
+        <translation>Otočný ovladač &quot;S&quot; nastavuje tvrdost vybrané struny. Tvrdost struny ovlivňuje délku doznívání struny. Čím nižší hodnota, tím déle bude struna znít. </translation>
     </message>
     <message>
         <source>Pick position:</source>
-        <translation>Pozice:</translation>
+        <translation>Místo drnknutí:</translation>
     </message>
     <message>
         <source>The &apos;P&apos; knob sets the position where the selected string will be &apos;picked&apos;.  The lower the setting the closer the pick is to the bridge.</source>
-        <translation>Otočný ovladač &apos;P&apos; nastavuje pozici, ze které bude se na vybrané struně drnkne. Nižší nastavení znamená drnknutí blíže ke kobylce.</translation>
+        <translation>Otočný ovladač &quot;P&quot; nastavuje místo, ve kterém se na vybrané struně drnkne. Nižší nastavení znamená drnknutí blíže ke kobylce.</translation>
     </message>
     <message>
         <source>Pickup position:</source>
-        <translation>Pozice:</translation>
+        <translation>Pozice snímače:</translation>
     </message>
     <message>
         <source>The &apos;PU&apos; knob sets the position where the vibrations will be monitored for the selected string.  The lower the setting, the closer the pickup is to the bridge.</source>
-        <translation>Otočný ovladač &apos;PU&apos; nastavuje pozici snímače pro vybranou strunu. Nižší nastavení znamená snímač blíže u kobylky.</translation>
+        <translation>Otočný ovladač &quot;PU&quot; nastavuje umístění snímače pro vybranou strunu. Nižší nastavení znamená snímač blíže u kobylky.</translation>
     </message>
     <message>
         <source>Pan:</source>
-        <translation>Pan:</translation>
+        <translation>Panoráma:</translation>
     </message>
     <message>
         <source>The Pan knob determines the location of the selected string in the stereo field.</source>
-        <translation>Otočný ovladač &apos;Pan&apos; určuje pozici vybrané struny ve stereo prostoru. </translation>
+        <translation>Otočný ovladač &quot;Pan&quot; určuje pozici vybrané struny ve stereo prostoru. </translation>
     </message>
     <message>
         <source>Detune:</source>
@@ -9708,7 +9836,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The Detune knob modifies the pitch of the selected string.  Settings less than zero will cause the string to sound flat.  Settings greater than zero will cause the string to sound sharp.</source>
-        <translation>Otočný ovladač &apos;Detune&apos; mění ladění vybrané struny. Hodnoty nižší než nula způsobí plochý zvuk, hodnoty vyšší než nula způsobí ostřejší zvuk.</translation>
+        <translation>Otočný ovladač &quot;Detune&quot; mění ladění vybrané struny. Hodnoty nižší než nula způsobí plochý zvuk, hodnoty vyšší než nula způsobí ostřejší zvuk.</translation>
     </message>
     <message>
         <source>Fuzziness:</source>
@@ -9716,7 +9844,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The Slap knob adds a bit of fuzz to the selected string which is most apparent during the attack, though it can also be used to make the string sound more &apos;metallic&apos;.</source>
-        <translation>Otočný ovladač &apos;Slap&apos; přidává ke zvuku vybrané struny jemné roztřepení, které je nejvíce patrné při náběhu tónu, ačkoliv lze také použít pro vytvoření více &apos;kovového&apos; zvuku struny.</translation>
+        <translation>Otočný ovladač &quot;Slap&quot; přidává ke zvuku vybrané struny jemné roztřepení, které je nejvíce patrné při náběhu tónu, ačkoliv lze také použít pro vytvoření více &quot;kovového&quot; zvuku struny.</translation>
     </message>
     <message>
         <source>Length:</source>
@@ -9724,7 +9852,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The Length knob sets the length of the selected string.  Longer strings will both ring longer and sound brighter, however, they will also eat up more CPU cycles.</source>
-        <translation>Otočný ovladač &apos;Lenght&apos; nastavuje délku vybrané struny. Delší struny budou znít déle a jasněji, nicméně však spotřebují více CPU cyklů.</translation>
+        <translation>Otočný ovladač &quot;Lenght&quot; nastavuje délku vybrané struny. Delší struny budou znít déle a jasněji, nicméně však spotřebují více CPU cyklů.</translation>
     </message>
     <message>
         <source>Impulse or initial state</source>
@@ -9732,7 +9860,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The &apos;Imp&apos; selector determines whether the waveform in the graph is to be treated as an impulse imparted to the string by the pick or the initial state of the string.</source>
-        <translation>Přepínač &apos;IMP&apos; určuje, zda vlna v grafu bude považována za impulz přenášený na strunu drnknutím nebo za počáteční stav struny.</translation>
+        <translation>Přepínač &quot;IMP&quot; určuje, zda vlna v grafu bude považována za impulz přenášený na strunu drnknutím nebo za počáteční stav struny.</translation>
     </message>
     <message>
         <source>Octave</source>
@@ -9740,7 +9868,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
-        <translation>Volič &apos;Octave&apos; se používá k výběru harmonického tónu, na kterém bude struna znít. Například &apos;-2&apos; znamená, že struna bude znít dvě oktávy pod základním tónem, &apos;F&apos; znamená, že zní základní tón, a &apos;6&apos; znamená, že struna bude znít šest oktáv nad základním tónem.</translation>
+        <translation>Volič &quot;Octave&quot; se používá k výběru harmonického tónu, na kterém bude struna znít. Například &quot;-2&quot; znamená, že struna bude znít dvě oktávy pod základním tónem, &quot;F&quot; znamená, že zní základní tón a &quot;6&quot; znamená, že struna bude znít šest oktáv nad základním tónem.</translation>
     </message>
     <message>
         <source>Impulse Editor</source>
@@ -9760,7 +9888,7 @@ Vlna může být také nakreslena v grafu.
 
 Tlačítko &quot;S&quot; vyhladí vlnu.
 
-Tlačítko &apos;N&apos; normalizuje vlnu.</translation>
+Tlačítko &quot;N&quot; normalizuje vlnu.</translation>
     </message>
     <message>
         <source>Vibed models up to nine independently vibrating strings.  The 'String' selector allows you to choose which string is being edited.  The 'Imp' selector chooses whether the graph represents an impulse or the initial state of the string.  The 'Octave' selector chooses which harmonic the string should vibrate at.
@@ -9774,15 +9902,15 @@ The 'V' knob controls the volume.  The 'S' knob controls the string's stiffness.
 The 'Length' knob controls the length of the string.
 
 The LED in the lower right corner of the waveform editor determines whether the string is active in the current instrument.</source>
-        <translation>Vibed simuluje až devět nezávisle vibrujících strun. Volič &apos;String&apos; vám umožní vybrat, kterou strunu budete upravovat. Pomocí voliče &apos;Imp&apos; vyberete, jestli graf představuje impulz nebo výchozí stav struny. Voličem &apos;Octave&apos; vyberete, na kterém harmonickém tónu má struna vibrovat.
+        <translation>Vibed simuluje až devět nezávisle vibrujících strun. Volič &quot;String&quot; vám umožní vybrat, kterou strunu budete upravovat. Pomocí voliče &quot;Imp&quot; vyberete, jestli graf představuje impulz nebo výchozí stav struny. Voličem &quot;Octave&quot; vyberete, na kterém harmonickém tónu má struna vibrovat.
 
 Graf vám umožňuje řízení výchozího stavu nebo impulzu použitého pro nastavení pohybu struny.
 
-Otočný ovladač &apos;V&apos; řídí hlasitost. Ovladač &apos;S&apos; nastavuje tvrdost struny. Ovladač &apos;P&apos; určuje pozici drnknutí. Ovladač &apos;PU&apos; nastavuje pozici snímače.
+Otočný ovladač &quot;V&quot; řídí hlasitost. Ovladač &quot;S&quot; nastavuje tvrdost struny. Ovladač &quot;P&quot; určuje pozici drnknutí. Ovladač &quot;PU&quot; nastavuje pozici snímače.
 
-&apos;Pan&apos; a &apos;Detune&apos; snad není třeba vysvětlovat. Ovladač &apos;Slap&apos; přidá ke zvuku struny jemné rozostření.
+&quot;Pan&quot; a &quot;Detune&quot; snad není třeba vysvětlovat. Ovladač &quot;Slap&quot; přidá ke zvuku struny jemné rozostření.
 
-Ovladač &apos;Lenght&apos; určuje délku struny.
+Ovladač &quot;Lenght&quot; určuje délku struny.
 
 LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuálním nástroji aktivní.</translation>
     </message>
@@ -9792,7 +9920,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to enable/disable waveform.</source>
-        <translation>Klikněte sem pro zapnutí/vypnutí vlny.</translation>
+        <translation>Klepněte sem pro zapnutí/vypnutí vlny.</translation>
     </message>
     <message>
         <source>String</source>
@@ -9816,7 +9944,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Square wave</source>
-        <translation>Pravoúhlá (square) vlna</translation>
+        <translation>Pravoúhlá vlna</translation>
     </message>
     <message>
         <source>White noise wave</source>
@@ -9832,7 +9960,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to smooth waveform.</source>
-        <translation>Klikněte sem pro vyhlazení vlny.</translation>
+        <translation>Klepněte sem pro vyhlazení vlny.</translation>
     </message>
     <message>
         <source>Normalize</source>
@@ -9840,7 +9968,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to normalize waveform.</source>
-        <translation>Klikněte sem pro normalizaci vlny.</translation>
+        <translation>Klepněte sem pro normalizaci vlny.</translation>
     </message>
     <message>
         <source>Use a sine-wave for current oscillator.</source>
@@ -9852,11 +9980,11 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Use a saw-wave for current oscillator.</source>
-        <translation>Klikněte sem pro pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pilovitou vlnu.</translation>
     </message>
     <message>
         <source>Use a square-wave for current oscillator.</source>
-        <translation>Klikněte sem pro pilovitou vlnu.</translation>
+        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
     </message>
     <message>
         <source>Use white-noise for current oscillator.</source>
@@ -9871,47 +9999,47 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     <name>voiceObject</name>
     <message>
         <source>Voice %1 pulse width</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 šířka pulzu</translation>
     </message>
     <message>
         <source>Voice %1 attack</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1  náběh</translation>
     </message>
     <message>
         <source>Voice %1 decay</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 útlum</translation>
     </message>
     <message>
         <source>Voice %1 sustain</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 vydržení</translation>
     </message>
     <message>
         <source>Voice %1 release</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 uvolnění</translation>
     </message>
     <message>
         <source>Voice %1 coarse detuning</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 hrubé ladění</translation>
     </message>
     <message>
         <source>Voice %1 wave shape</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 tvar vlny</translation>
     </message>
     <message>
         <source>Voice %1 sync</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 synchronizace</translation>
     </message>
     <message>
         <source>Voice %1 ring modulate</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 kruhová modulace</translation>
     </message>
     <message>
         <source>Voice %1 filtered</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 filtrování</translation>
     </message>
     <message>
         <source>Voice %1 test</source>
-        <translation type="unfinished"/>
+        <translation>Hlas %1 test</translation>
     </message>
 </context>
 <context>
@@ -9922,7 +10050,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Input gain:</source>
-        <translation>Zisk vstupu:</translation>
+        <translation>Zesílení vstupu:</translation>
     </message>
     <message>
         <source>OUTPUT</source>
@@ -9930,7 +10058,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Output gain:</source>
-        <translation>Zisk výstupu:</translation>
+        <translation>Zesílení výstupu:</translation>
     </message>
     <message>
         <source>Reset waveform</source>
@@ -9938,7 +10066,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
-        <translation type="unfinished"/>
+        <translation>Klepněte sem pro obnovení zobrazení křivky zpět do výchozího stavu</translation>
     </message>
     <message>
         <source>Smooth waveform</source>
@@ -9946,7 +10074,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to apply smoothing to wavegraph</source>
-        <translation>Klikněte zde pro použití vyhlazení vlny grafu</translation>
+        <translation>Klepněte sem pro vyhlazení křivky</translation>
     </message>
     <message>
         <source>Increase graph amplitude by 1dB</source>
@@ -9954,7 +10082,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to increase wavegraph amplitude by 1dB</source>
-        <translation>Zde klikněte pro zvýšení amplitudy vlny o 1dB</translation>
+        <translation>Klepněte sem pro zvýšení amplitudy křivky o 1 dB</translation>
     </message>
     <message>
         <source>Decrease graph amplitude by 1dB</source>
@@ -9962,7 +10090,7 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     </message>
     <message>
         <source>Click here to decrease wavegraph amplitude by 1dB</source>
-        <translation>Zde klikněte pro snížení amplitudy vlny o 1dB</translation>
+        <translation>Klepněte sem pro snížení amplitudy křivky o 1 dB</translation>
     </message>
     <message>
         <source>Clip input</source>
@@ -9977,11 +10105,11 @@ LED v pravém dolním rohu editoru vlny určuje, jestli bude struna v aktuální
     <name>waveShaperControls</name>
     <message>
         <source>Input gain</source>
-        <translation>Zisk vstupu</translation>
+        <translation>Zesílení vstupu</translation>
     </message>
     <message>
         <source>Output gain</source>
-        <translation>Zisk výstupu</translation>
+        <translation>Zesílení výstupu</translation>
     </message>
 </context>
 </TS>

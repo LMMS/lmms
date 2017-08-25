@@ -19,6 +19,7 @@ ADD_EXECUTABLE(tests
 	$<TARGET_OBJECTS:lmmsobjs>
 
 	src/core/ProjectVersionTest.cpp
+	src/core/RelativePathsTest.cpp
 
 	src/tracks/AutomationTrackTest.cpp
 )

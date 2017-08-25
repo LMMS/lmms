@@ -27,6 +27,7 @@
 #define INSTRUMENT_TRACK_H
 
 #include "AudioPort.h"
+#include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
 #include "MidiEventProcessor.h"
@@ -166,7 +167,7 @@ public:
 	{
 		return &m_baseNoteModel;
 	}
-	
+
 	int baseNote() const;
 
 	Piano *pianoModel()
@@ -207,6 +208,8 @@ public:
 		return &m_effectChannelModel;
 	}
 
+	void setPreviewMode( const bool );
+
 
 signals:
 	void instrumentChanged();
@@ -242,15 +245,17 @@ private:
 
 	bool m_silentBuffersProcessed;
 
+	bool m_previewMode;
+
 	IntModel m_baseNoteModel;
 
 	NotePlayHandleList m_processHandles;
 
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
-	
+
 	AudioPort m_audioPort;
-	
+
 	FloatModel m_pitchModel;
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;

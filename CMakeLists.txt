@@ -9,6 +9,7 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0003 NEW)
 	IF (CMAKE_MAJOR_VERSION GREATER 2)
 		CMAKE_POLICY(SET CMP0026 OLD)
+		CMAKE_POLICY(SET CMP0050 OLD)
 	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
 
@@ -29,7 +30,7 @@ SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
 SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc2")
+SET(VERSION_STAGE       "rc3")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -50,6 +51,7 @@ OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
+OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
@@ -64,6 +66,7 @@ OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
+OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -173,10 +176,14 @@ ELSE()
 ENDIF()
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
-ENDIF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+ENDIF()
+# check if we can use SF_SET_COMPRESSION_LEVEL
+IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
+	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
+ENDIF()
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -226,26 +233,42 @@ IF(WANT_CARLA)
 ENDIF(WANT_CARLA)
 
 
-# check for SDL
+# check for SDL2
 IF(WANT_SDL)
+	SET(SDL2_BUILDING_LIBRARY TRUE)
+	FIND_PACKAGE(SDL2)
+	IF(SDL2_FOUND)
+		SET(LMMS_HAVE_SDL TRUE)
+		SET(LMMS_HAVE_SDL2 TRUE)
+		SET(STATUS_SDL "OK, using SDL2")
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ELSE()
+		SET(SDL2_INCLUDE_DIR "")
+		SET(SDL2_LIBRARY "")
+	ENDIF()
+ENDIF()
+
+# fallback to SDL1
+IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
+	# Fallback to SDL1.2
 	SET(SDL_BUILDING_LIBRARY TRUE)
 	FIND_PACKAGE(SDL)
 	IF(SDL_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK")
-	ELSE(SDL_FOUND)
-		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similar) "
+		SET(STATUS_SDL "OK, using SDL1.2")
+		# fix mingw since 53abd65
+		IF(NOT SDL_INCLUDE_DIR)
+			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
+		ENDIF()
+		
+	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
-	ENDIF(SDL_FOUND)
-ENDIF(WANT_SDL)
-IF(NOT LMMS_HAVE_SDL)
-	SET(SDL_INCLUDE_DIR "")
-ELSE(NOT LMMS_HAVE_SDL)
-	IF(NOT SDL_INCLUDE_DIR)
-		SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-	ENDIF(NOT SDL_INCLUDE_DIR)
-ENDIF(NOT LMMS_HAVE_SDL)
-
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ENDIF()
+ENDIF()
 
 # check for Stk
 IF(WANT_STK)
@@ -304,6 +327,21 @@ IF(NOT LMMS_HAVE_PULSEAUDIO)
 	SET(PULSEAUDIO_LIBRARIES "")
 ENDIF(NOT LMMS_HAVE_PULSEAUDIO)
 
+
+# check for MP3/Lame-libraries
+IF(WANT_MP3LAME)
+	FIND_PACKAGE(Lame)
+	IF(LAME_FOUND)
+		SET(LMMS_HAVE_MP3LAME TRUE)
+		SET(STATUS_MP3LAME "OK")
+	ELSE(LAME_FOUND)
+		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
+		SET(LAME_LIBRARIES "")
+		SET(LAME_INCLUDE_DIRS "")
+	ENDIF(LAME_FOUND)
+ELSE(WANT_MP3LAME)
+	SET(STATUS_MP3LAME "Disabled for build")
+ENDIF(WANT_MP3LAME)
 
 # check for OGG/Vorbis-libraries
 IF(WANT_OGGVORBIS)
@@ -392,15 +430,15 @@ IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
 ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 
-IF(LMMS_BUILD_OPENBSD)
-	FIND_PACKAGE(Sndio)
-	IF(SNDIO_FOUND)
-		SET(LMMS_HAVE_SNDIO TRUE)
-        	SET(STATUS_SNDIO "OK")
-    	ELSE()
-        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
-	ENDIF(SNDIO_FOUND)
-ENDIF(LMMS_BUILD_OPENBSD)
+# check for sndio (openbsd only, roaraudio won't work yet)
+FIND_PACKAGE(Sndio)
+IF(LMMS_BUILD_OPENBSD AND SNDIO_FOUND)
+	SET(LMMS_HAVE_SNDIO TRUE)
+	SET(STATUS_SNDIO "OK")
+ELSE()
+	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	SET(SNDIO_LIBRARY "")
+ENDIF()
 
 # check for WINE
 IF(WANT_VST)
@@ -419,6 +457,17 @@ IF(LMMS_BUILD_WIN32)
 	SET(LMMS_SUPPORT_VST TRUE)
 	SET(STATUS_VST "OK")
 ENDIF(LMMS_BUILD_WIN32)
+
+IF(WANT_DEBUG_FPE)
+	IF(LMMS_BUILD_LINUX)
+		SET(LMMS_DEBUG_FPE TRUE)
+		SET (STATUS_DEBUG_FPE "Enabled")
+	ELSE()
+		SET (STATUS_DEBUG_FPE "Wanted but disabled due to unsupported platform")
+	ENDIF()
+ELSE()
+	SET (STATUS_DEBUG_FPE "Disabled")
+ENDIF(WANT_DEBUG_FPE)
 
 
 # check for libsamplerate
@@ -580,7 +629,9 @@ MESSAGE(
 "Supported file formats for project export\n"
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
+"* FLAC                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
+"* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
 
 MESSAGE(
@@ -597,6 +648,12 @@ MESSAGE(
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
 "* GIG player                  : ${STATUS_GIG}\n"
+)
+
+MESSAGE(
+"Developer options\n"
+"-----------------------------------------\n"
+"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
 )
 
 MESSAGE(

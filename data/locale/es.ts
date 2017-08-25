@@ -503,6 +503,14 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
         <source>Model is already connected to this pattern.</source>
         <translation>El modelo ya está conectado a este patrón.</translation>
     </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Cuantización</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Cuantización. Define el tamaño mínimo del paso para el Punto de Automatización. Por defecto esto también define la longitud, quitando otros puntos a su alcance. Presiona &lt;Ctrl&gt; para anular este comportamiento.</translation>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -1980,10 +1988,6 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
         <translation>32 Bit Decimal</translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Por favor nota que no todos los parámetros especificados anteriormente se aplican a todos los tipos de archivos.</translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation>Configuración de calidad</translation>
     </message>
@@ -2068,6 +2072,14 @@ Haciendo click derecho accederás a un menú contextual en el que podrás cambia
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>El archivo %1 no puede abrirse para escritura.
 Asegúrate de tener permisos de escritura tanto del archivo como del directorio que lo contiene e inténtalo de nuevo.</translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation>24 Bits Entero</translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation>Usar tasa de bits variable</translation>
     </message>
 </context>
 <context>
@@ -2248,6 +2260,18 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
     <message>
         <source>FX %1</source>
         <translation>FX %1</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Volumen</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Silencio</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Solo</translation>
     </message>
 </context>
 <context>
@@ -3657,16 +3681,6 @@ Haz doble click para seleccionar un archivo.</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Could not save config-file</source>
-        <translation>No se pudo guardar el archivo de configuración</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>No se pudo guardar el archivo de configuración %1. Puede ser que no tengas permisos para escribir este archivo.
-Por favor asegúrate de tener los permisos necesarios e inténtalo de nuevo.</translation>
-    </message>
-    <message>
         <source>&amp;New</source>
         <translation>&amp;Nuevo</translation>
     </message>
@@ -4043,6 +4057,16 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
     <message>
         <source>Volume as dBFS</source>
         <translation>Volumen en dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>No se puede abrir el archivo</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>El archivo %1 no puede abrirse para escritura.
+Asegúrate de tener permisos de escritura tanto del archivo como del directorio que lo contiene e inténtalo de nuevo.</translation>
     </message>
 </context>
 <context>
@@ -6006,6 +6030,14 @@ Razón: &quot;%2&quot;</translation>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Todos los archivos de Audio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation>No se pudo abrir el archivo</translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation>Los archivos de audio tienen un límite de tamaño de %1 MB y %2 minutos de duración</translation>
     </message>
 </context>
 <context>

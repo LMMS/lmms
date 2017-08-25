@@ -227,9 +227,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <source>The JACK server seems to have been shutdown and starting a new instance failed. Therefore LMMS is unable to proceed. You should save your project and restart JACK and LMMS.</source>
         <translation>Il server JACK sembra essere stato spento e non sono partite nuove istanze. Quindi LMMS non è in grado di procedere. Salva il progetto attivo e fai ripartire JACK ed LMMS.</translation>
     </message>
-</context>
-<context>
-    <name>AudioJack::setupWidget</name>
     <message>
         <source>CLIENT-NAME</source>
         <translation>NOME DEL CLIENT</translation>
@@ -504,6 +501,14 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Model is already connected to this pattern.</source>
         <translation>Il controllo è già connesso a questo pattern.</translation>
+    </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Quantizzazione</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Quantizzazione. Imposta la massima precisione dei punti di Automazione. Controlla anche la lunghezza, cancellando quindi i punti che sono entro tale lunghezza. Puoi comunque ignorare questa funzione premendo &lt;Ctrl&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1982,10 +1987,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <translation>Virgola mobile 32 Bit</translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Non tutti i parametri si applicano nella creazione di tutti i formati.</translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation>Impostazioni qualità</translation>
     </message>
@@ -2070,6 +2071,14 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>Impossibile scrivere sul file %1.
 Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation>Interi 24 Bit</translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation>Usa bitrate variabile</translation>
     </message>
 </context>
 <context>
@@ -2251,6 +2260,18 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <source>FX %1</source>
         <translation>FX %1</translation>
     </message>
+    <message>
+        <source>Volume</source>
+        <translation>Volume</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Muto</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Solo</translation>
+    </message>
 </context>
 <context>
     <name>FxMixerView</name>
@@ -2258,9 +2279,6 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <source>FX-Mixer</source>
         <translation>Mixer FX</translation>
     </message>
-</context>
-<context>
-    <name>FxMixerView::FxChannelView</name>
     <message>
         <source>FX Fader %1</source>
         <translation>Volume FX %1</translation>
@@ -3662,16 +3680,6 @@ Fare doppio click per scegliere il file dell&apos;onda.</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Could not save config-file</source>
-        <translation>Non è stato possibile salvare il file di configurazione</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Non è stato possibile salvare il file di configurazione %1. Probabilmente non hai i permessi di scrittura per questo file.
-Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
-    </message>
-    <message>
         <source>&amp;New</source>
         <translation>&amp;Nuovo</translation>
     </message>
@@ -4048,6 +4056,16 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
     <message>
         <source>Volume as dBFS</source>
         <translation>Volume in dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Non è stato possibile aprire il file</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Impossibile scrivere sul file %1.
+Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
     </message>
 </context>
 <context>
@@ -5913,6 +5931,60 @@ Motivo: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Ingresso</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Guadagno in Input:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grandezza</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Grandezza:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Colore</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Colore:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Uscita</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Guadagno in Output:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Guadagno input</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grandezza</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Colore</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Guadagno output</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -5957,6 +6029,14 @@ Motivo: &quot;%2&quot;</translation>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Tutti i file audio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation>Impossibile aprire il file</translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation>I file audio hanno un limite di %1 MB in grandezza e %2 minuti in durata</translation>
     </message>
 </context>
 <context>
@@ -9286,6 +9366,10 @@ Questo chip era utilizzato nel Commode 64.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filtro per esportare file MIDI da LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Algoritmo di Riverbero di Sean Costello</translation>
     </message>
 </context>
 <context>

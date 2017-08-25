@@ -36,7 +36,7 @@ StereoDelay::StereoDelay( int maxTime, int sampleRate )
 	m_maxLength = maxTime * sampleRate;
 	m_length = m_maxLength;
 
-	m_index = 0;
+	m_writeIndex = 0;
 	m_feedback = 0.0f;
 	setSampleRate( sampleRate );
 }
@@ -57,16 +57,18 @@ StereoDelay::~StereoDelay()
 
 void StereoDelay::tick( sampleFrame frame )
 {
-	m_index = ( int )m_length > 0
-			? ( m_index + 1 ) % ( int ) m_length
-			: m_index;
-	float lOut = m_buffer[ m_index ][ 0 ];
-	float rOut = m_buffer[ m_index ] [1 ];
-	m_buffer[ m_index ][ 0 ] = frame[ 0 ] + ( lOut * m_feedback );
-	m_buffer[ m_index ][ 1 ] = frame[ 1 ] + ( rOut * m_feedback );
+	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
+	int readIndex = m_writeIndex - m_length;
+	if (readIndex < 0 ) { readIndex += m_maxLength; }
+	float lOut = m_buffer[ readIndex ][ 0 ];
+	float rOut = m_buffer[ readIndex ] [1 ];
+	m_buffer[ m_writeIndex ][ 0 ] = frame[ 0 ] + ( lOut * m_feedback );
+	m_buffer[ m_writeIndex ][ 1 ] = frame[ 1 ] + ( rOut * m_feedback );
 	frame[ 0 ] = lOut;
 	frame[ 1 ] = rOut;
 }
+
+
 
 
 

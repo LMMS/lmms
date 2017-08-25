@@ -29,6 +29,8 @@
 #include <vector>
 
 #include "ProjectRenderer.h"
+#include "OutputSettings.h"
+
 
 class RenderManager : public QObject
 {
@@ -36,7 +38,7 @@ class RenderManager : public QObject
 public:
 	RenderManager(
 		const Mixer::qualitySettings & qualitySettings,
-		const ProjectRenderer::OutputSettings & outputSettings,
+		const OutputSettings & outputSettings,
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath);
 
@@ -63,7 +65,7 @@ private:
 	void restoreMutedState();
 
 	const Mixer::qualitySettings m_qualitySettings;
-	const ProjectRenderer::OutputSettings m_outputSettings;
+	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormats m_format;
 	QString m_outputPath;
 

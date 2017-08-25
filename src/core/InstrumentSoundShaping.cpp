@@ -137,7 +137,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
 	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
 
-	if( n->isReleased() == false )
+	if( !n->isReleased() || ( n->instrumentTrack()->isSustainPedalPressed() &&
+		!n->isReleaseStarted() ) )
 	{
 		envReleaseBegin += frames;
 	}

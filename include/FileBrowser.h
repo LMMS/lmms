@@ -65,7 +65,7 @@ private:
 
 	void addItems( const QString & path );
 
-	FileBrowserTreeWidget * m_l;
+	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 
 	QLineEdit * m_filterEdit;
 

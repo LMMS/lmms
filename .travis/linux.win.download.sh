@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -e
 
 CACHE_DIR=$TRAVIS_BUILD_DIR/apt_mingw_cache/$1
