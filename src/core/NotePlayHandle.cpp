@@ -252,8 +252,17 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	if( m_released && (!instrumentTrack()->isSustainPedalPressed() ||
 		m_releaseStarted) )
 	{
-		m_releaseStarted = true;
+		if (m_releaseStarted == false)
+		{
 
+			if( m_origin == OriginMidiInput )
+			{
+				setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
+				m_instrumentTrack->midiNoteOff( *this );
+			}
+
+			m_releaseStarted = true;
+		}
 		f_cnt_t todo = framesThisPeriod;
 
 		// if this note is base-note for arpeggio, always set
@@ -379,16 +388,6 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
 				MidiTime::fromFrames( _s, Engine::framesPerTick() ),
 				_s );
-	}
-
-	// inform attached components about MIDI finished (used for recording in Piano Roll)
-	if (!instrumentTrack()->isSustainPedalPressed())
-	{
-		if( m_origin == OriginMidiInput )
-		{
-			setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
-			m_instrumentTrack->midiNoteOff( *this );
-		}
 	}
 }
 
