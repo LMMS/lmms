@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,7 +31,6 @@
 #include <QtCore/QVector>
 
 #include "TrackContainer.h"
-#include "AutomatableModel.h"
 #include "Controller.h"
 #include "MeterModel.h"
 #include "VstSyncController.h"
@@ -68,7 +67,7 @@ public:
 	void clearErrors();
 	void collectError( const QString error );
 	bool hasErrors();
-	QString* errorSummary();
+	QString errorSummary();
 
 	class PlayPos : public MidiTime
 	{
@@ -98,14 +97,26 @@ public:
 
 	void processNextBuffer();
 
+	inline int getLoadingTrackCount() const
+	{
+		return m_nLoadingTrack;
+	}
+
 	inline int getMilliseconds() const
 	{
 		return m_elapsedMilliSeconds;
 	}
-	inline void setMilliSeconds( float ellapsedMilliSeconds )
+
+	inline void setToTime( MidiTime const & midiTime )
 	{
-		m_elapsedMilliSeconds = ellapsedMilliSeconds;
+		m_elapsedMilliSeconds = midiTime.getTimeInMilliseconds(getTempo());
 	}
+
+	inline void setToTimeByTicks(tick_t ticks)
+	{
+		m_elapsedMilliSeconds = MidiTime::ticksToMilliseconds(ticks, getTempo());
+	}
+
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -204,6 +215,9 @@ public:
 	{
 		return m_globalAutomationTrack;
 	}
+
+	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
 
 	// file management
 	void createNewProject();
@@ -325,6 +339,7 @@ private:
 
 	void removeAllControllers();
 
+	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -336,6 +351,7 @@ private:
 
 	ControllerVector m_controllers;
 
+	int m_nLoadingTrack;
 
 	QString m_fileName;
 	QString m_oldFileName;
@@ -351,7 +367,7 @@ private:
 
 	bool m_loadingProject;
 
-	QList<QString> * m_errors;
+	QList<QString> m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2006-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -122,6 +122,7 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 
 #if QT_VERSION >= 0x050000
 #define setResizeMode setSectionResizeMode
+	ui->filterEdit->setClearButtonEnabled( true );
 #endif
 	ui->pluginList->verticalHeader()->setResizeMode(
 						QHeaderView::ResizeToContents );

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2015 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -27,10 +27,9 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
-#include <QtCore/QFileInfo>
 #include <QtCore/QLibrary>
 
-#include "Plugin.h"
+#include "ConfigManager.h"
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
@@ -38,11 +37,16 @@
 	QStringList nameFilters("lib*.so");
 #endif
 
+qint64 qHash(const QFileInfo& fi)
+{
+	return qHash(fi.absoluteFilePath());
+}
+
 PluginFactory* PluginFactory::s_instance = nullptr;
 
 PluginFactory::PluginFactory()
 {
-	// Adds a search path relative to the main executable to if the path exists.
+	// Adds a search path relative to the main executable if the path exists.
 	auto addRelativeIfExists = [this] (const QString& path) {
 		QDir dir(qApp->applicationDirPath());
 		if (!path.isEmpty() && dir.cd(path)) {
@@ -71,12 +75,13 @@ PluginFactory::PluginFactory()
 	if (!(env_path = qgetenv("LMMS_PLUGIN_DIR")).isEmpty())
 		QDir::addSearchPath("plugins", env_path);
 
+	QDir::addSearchPath("plugins", ConfigManager::inst()->workingDir() + "plugins");
+
 	discoverPlugins();
 }
 
 PluginFactory::~PluginFactory()
 {
-
 }
 
 PluginFactory* PluginFactory::instance()
@@ -130,7 +135,11 @@ void PluginFactory::discoverPlugins()
 	PluginInfoList pluginInfos;
 	m_pluginByExt.clear();
 
-	const QFileInfoList& files = QDir("plugins:").entryInfoList(nameFilters);
+	QSet<QFileInfo> files;
+	for (const QString& searchPath : QDir::searchPaths("plugins"))
+	{
+		files.unite(QDir(searchPath).entryInfoList(nameFilters).toSet());
+	}
 
 	// Cheap dependency handling: zynaddsubfx needs ZynAddSubFxCore. By loading
 	// all libraries twice we ensure that libZynAddSubFxCore is found.
@@ -145,6 +154,7 @@ void PluginFactory::discoverPlugins()
 
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
+			qWarning("%s", library->errorString().toLocal8Bit().data());
 			continue;
 		}
 		if (library->resolve("lmms_plugin_main") == nullptr) {

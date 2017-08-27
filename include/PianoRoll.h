@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2008 Andrew Kelley <superjoe30/at/gmail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -54,7 +54,9 @@ class TimeLineWidget;
 class PianoRoll : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QColor gridColor READ gridColor WRITE setGridColor )
+	Q_PROPERTY( QColor barLineColor READ barLineColor WRITE setBarLineColor )
+	Q_PROPERTY( QColor beatLineColor READ beatLineColor WRITE setBeatLineColor )
+	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
@@ -65,6 +67,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
 	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
 	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
+	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
 public:
 	enum EditModes
 	{
@@ -107,10 +110,14 @@ public:
 	Song::PlayModes desiredPlayModeForAccompany() const;
 
 	int quantization() const;
-	
-	// qproperty acces functions
-	QColor gridColor() const;
-	void setGridColor( const QColor & c );
+
+	// qproperty access functions
+	QColor barLineColor() const;
+	void setBarLineColor( const QColor & c );
+	QColor beatLineColor() const;
+	void setBeatLineColor( const QColor & c );
+	QColor lineColor() const;
+	void setLineColor( const QColor & c );
 	QColor noteModeColor() const;
 	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
@@ -131,6 +138,8 @@ public:
 	void setNoteOpacity( const int i );
 	bool noteBorders() const;
 	void setNoteBorders( const bool b );
+	QColor backgroundShade() const;
+	void setBackgroundShade( const QColor & c );
 
 
 protected:
@@ -154,6 +163,7 @@ protected:
 	void selectAll();
 	NoteVector getSelectedNotes();
 	void selectNotesOnKey();
+	int xCoordOfTick( int tick );
 
 	// for entering values with dblclick in the vol/pan bars
 	void enterValue( NoteVector* nv );
@@ -348,7 +358,6 @@ private:
 	EditModes m_editMode;
 	EditModes m_ctrlMode; // mode they were in before they hit ctrl
 
-	bool m_mouseDownLeft; //true if left click is being held down
 	bool m_mouseDownRight; //true if right click is being held down
 
 	TimeLineWidget * m_timeLine;
@@ -370,7 +379,9 @@ private:
 	friend class PianoRollWindow;
 
 	// qproperty fields
-	QColor m_gridColor;
+	QColor m_barLineColor;
+	QColor m_beatLineColor;
+	QColor m_lineColor;
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_barColor;
@@ -381,6 +392,7 @@ private:
 	QColor m_markedSemitoneColor;
 	int m_noteOpacity;
 	bool m_noteBorders;
+	QColor m_backgroundShade;
 
 signals:
 	void positionChanged( const MidiTime & );

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,7 +33,6 @@
 
 #include "InstrumentTrack.h"
 #include "BBTrackContainer.h"
-#include "ValueBuffer.h"
 
 FxRoute::FxRoute( FxChannel * from, FxChannel * to, float amount ) :
 	m_from( from ),
@@ -563,7 +562,7 @@ void FxMixer::mixToChannel( const sampleFrame * _buf, fx_ch_t _ch )
 
 void FxMixer::prepareMasterMix()
 {
-	BufferManager::clear( m_fxChannels[0]->m_buffer, 
+	BufferManager::clear( m_fxChannels[0]->m_buffer,
 					Engine::mixer()->framesPerPeriod() );
 }
 
@@ -636,7 +635,7 @@ void FxMixer::masterMix( sampleFrame * _buf )
 	// reset channel process state
 	for( int i = 0; i < numChannels(); ++i)
 	{
-		BufferManager::clear( m_fxChannels[i]->m_buffer, 
+		BufferManager::clear( m_fxChannels[i]->m_buffer,
 				Engine::mixer()->framesPerPeriod() );
 		m_fxChannels[i]->reset();
 		m_fxChannels[i]->m_queued = false;
@@ -669,7 +668,9 @@ void FxMixer::clearChannel(fx_ch_t index)
 	ch->m_muteModel.setValue( false );
 	ch->m_soloModel.setValue( false );
 	ch->m_name = ( index == 0 ) ? tr( "Master" ) : tr( "FX %1" ).arg( index );
-	ch->m_volumeModel.setDisplayName( ch->m_name );
+	ch->m_volumeModel.setDisplayName( ch->m_name + ">" + tr( "Volume" ) );
+	ch->m_muteModel.setDisplayName( ch->m_name + ">" + tr( "Mute" ) );
+	ch->m_soloModel.setDisplayName( ch->m_name + ">" + tr( "Solo" ) );
 
 	// send only to master
 	if( index > 0)

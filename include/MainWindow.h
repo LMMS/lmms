@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -105,13 +105,10 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	void runAutoSave();
-
 	enum SessionState
 	{
 		Normal,
-		Recover,
-		Limited,
+		Recover
 	};
 
 	void setSession( SessionState session )
@@ -143,7 +140,7 @@ public:
 		return m_keyMods.m_alt;
 	}
 
-	static void saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible = QSize(0, 0) );
+	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 public slots:

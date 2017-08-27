@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -50,40 +50,9 @@ AutomationTrack::~AutomationTrack()
 
 
 
-bool AutomationTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool AutomationTrack::play( const MidiTime & time_start, const fpp_t _frames,
 							const f_cnt_t _frame_base, int _tco_num )
 {
-	if( isMuted() )
-	{
-		return false;
-	}
-
-	tcoVector tcos;
-	if( _tco_num >= 0 )
-	{
-		TrackContentObject * tco = getTCO( _tco_num );
-		tcos.push_back( tco );
-	}
-	else
-	{
-		getTCOsInRange( tcos, _start, _start + static_cast<int>(
-					_frames / Engine::framesPerTick()) );
-	}
-
-	for( tcoVector::iterator it = tcos.begin(); it != tcos.end(); ++it )
-	{
-		AutomationPattern * p = dynamic_cast<AutomationPattern *>( *it );
-		if( p == NULL || ( *it )->isMuted() )
-		{
-			continue;
-		}
-		MidiTime cur_start = _start;
-		if( _tco_num < 0 )
-		{
-			cur_start -= p->startPosition();
-		}
-		p->processMidiTime( cur_start );
-	}
 	return false;
 }
 

@@ -1,8 +1,6 @@
 #include "SendButtonIndicator.h"
 
-#include "Engine.h"
 #include "FxMixer.h"
-#include "Model.h"
 
 QPixmap * SendButtonIndicator::s_qpmOff = NULL;
 QPixmap * SendButtonIndicator::s_qpmOn = NULL;

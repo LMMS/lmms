@@ -14,13 +14,15 @@ QMdiArea {
 AutomationEditor {
 	background-color: rgb(0, 0, 0);
 	color: #e0e0e0;
+	qproperty-backgroundShade: rgba(255, 255, 255, 15);
 	qproperty-vertexColor: #ff77af;
-	qproperty-gridColor: #808080;
 	qproperty-crossColor: rgb( 255, 51, 51 );
+	/* Grid colors */
+	qproperty-lineColor: rgba(128, 128, 128, 80);
+	qproperty-beatLineColor: rgba(128, 128, 128, 160);
+	qproperty-barLineColor: #808080;
 
-	qproperty-graphColor: qlineargradient(spread:reflect,
-                     x1:0, y1:0, x2:0, y2:1,
-                     stop:0 rgba(153, 175, 255, 250),  stop:1 rgba(153, 175, 255, 100));
+	qproperty-graphColor: rgba(153, 175, 255, 200);
 	qproperty-scaleColor: qlineargradient(spread:reflect,
                      x1:0, y1:0.5, x2:1, y2:0.5,
                      stop:0 #333, stop:1 #202020);
@@ -118,7 +120,7 @@ QMenu::indicator:selected {
 
 PianoRoll {
 	background-color: rgb(0, 0, 0);
-	qproperty-gridColor: rgb( 128, 128, 128 );
+	qproperty-backgroundShade: rgba( 255, 255, 255, 10 );
 	qproperty-noteModeColor: rgb( 255, 255, 255 );
 	qproperty-noteColor: rgb( 119, 199, 216 );
 	qproperty-noteOpacity: 128;
@@ -126,10 +128,28 @@ PianoRoll {
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
 	qproperty-barColor: #4afd85;
 	qproperty-markedSemitoneColor: rgba( 40, 40, 40, 200 );
+	/* Grid colors */
+	qproperty-lineColor: rgba( 128, 128, 128, 80 );
+	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );
+	qproperty-barLineColor: rgb( 128, 128, 128 );
+
 	/* Text on the white piano keys */
 	qproperty-textColor: rgb( 0, 0, 0 );
 	qproperty-textColorLight: rgb( 128, 128, 128);
 	qproperty-textShadow: rgb( 240, 240, 240 );
+}
+
+TabWidget {
+	background-color: #5b6571;
+	qproperty-tabText: rgba(255, 255, 255, 180);
+	qproperty-tabTitleText: #fff;
+	qproperty-tabSelected: #61666b;
+	qproperty-tabBackground: #3c434b;
+	qproperty-tabBorder: #3c434b;
+}
+
+GroupBox {
+	background-color: #5b6571;
 }
 
 /* main toolbar oscilloscope - can have transparent bg now */
@@ -272,6 +292,11 @@ QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarr
 
 TrackContainerView QFrame{
 	background-color: #49515b;
+}
+
+/* background for track controls */
+TrackView > QWidget {
+	background-color: #5b6571;
 }
 
 /* autoscroll, loop, stop behaviour toggle buttons */
@@ -516,6 +541,12 @@ PluginDescWidget:hover {
 	background-color: #e0e0e0;
 }
 
+/* piano widget */
+
+PianoView {
+	background-color: #14171a;
+}
+
 /* font sizes for text buttons */
 
 FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
@@ -536,6 +567,7 @@ FxLine {
 /* persistent peak markers for fx peak meters */
 Fader {
 	qproperty-peakGreen: rgb( 74, 253, 133);
+	qproperty-peakYellow: rgb(224, 222, 18);
 	qproperty-peakRed: rgb( 255, 100, 100);
 }
 
@@ -581,14 +613,22 @@ TrackContentObjectView   {
 	qproperty-selectedColor: rgb( 0, 125, 255 );
 	qproperty-BBPatternBackground: rgb( 80, 80, 80 );
 	qproperty-textColor: rgb( 255, 255, 255 );
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
 	qproperty-textShadowColor: rgb( 0, 0, 0 );
 	qproperty-gradient: true; /* boolean property, set true to have a gradient */
+	
+	font-size: 11px;
 }
 
 /* instrument pattern */
 PatternView {
 	background-color: rgb( 119, 199, 216 );
 	color: rgb( 187, 227, 236 );
+
+	qproperty-noteFillColor: rgb( 187, 227, 236 );
+	qproperty-noteBorderColor: rgb( 119, 199, 216 );
+	qproperty-mutedNoteFillColor: rgb( 128, 128, 128 );
+	qproperty-mutedNoteBorderColor: rgb( 80, 80, 80 );
 }
 
 /* sample track pattern */
@@ -855,4 +895,3 @@ LmmsPalette {
 	qproperty-toolTipText: #000;
 	qproperty-toolTipBase: #c9c9c9;
 }
-

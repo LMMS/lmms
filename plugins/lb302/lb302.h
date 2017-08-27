@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2006-2008 Paul Giblock <pgib/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * lb302FilterIIR2 is based on the gsyn filter code by Andy Sloane.
  *

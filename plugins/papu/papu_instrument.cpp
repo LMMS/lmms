@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,6 +23,7 @@
  *
  */
 
+#include <cmath>
 
 #include <QPainter>
 #include <QDomElement>
@@ -39,7 +40,7 @@
 #include "Engine.h"
 #include "Graph.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -69,7 +70,7 @@ papuInstrument::papuInstrument( InstrumentTrack * _instrument_track ) :
 						tr( "Sweep RtShift amount" ) ),
 	m_ch1WavePatternDutyModel( 2.0f, 0.0f, 3.0f, 1.0f, this,
 						tr( "Wave Pattern Duty" ) ),
-	m_ch1VolumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this, 
+	m_ch1VolumeModel( 15.0f, 0.0f, 15.0f, 1.0f, this,
 						tr( "Channel 1 volume" ) ),
 	m_ch1VolSweepDirModel( false, this,
 						tr( "Volume sweep direction" ) ),
@@ -395,7 +396,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		}
 		datalen = framesleft>avail?avail:framesleft;
 		datalen = datalen>buf_size?buf_size:datalen;
-		
+
 		long count = papu->read_samples( buf, datalen*2)/2;
 
 		for( fpp_t frame = 0; frame < count; ++frame )

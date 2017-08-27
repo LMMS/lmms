@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,7 +32,8 @@
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
 #include "Song.h"
-#include "embed.h"
+
+#include <cmath>
 
 int AutomationPattern::s_quantization = 1;
 const float AutomationPattern::DEFAULT_MIN_VALUE = 0;
@@ -109,16 +110,9 @@ AutomationPattern::~AutomationPattern()
 
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
-	if( _search_dup )
+	if( _search_dup && m_objects.contains(_obj) )
 	{
-		for( objectVector::iterator it = m_objects.begin();
-					it != m_objects.end(); ++it )
-		{
-			if( *it == _obj )
-			{				
-				return false;
-			}
-		}
+		return false;
 	}
 
 	// the automation track is unconnected and there is nothing in the track
@@ -183,6 +177,11 @@ const AutomatableModel * AutomationPattern::firstObject() const
 	return &_fm;
 }
 
+const AutomationPattern::objectVector& AutomationPattern::objects() const
+{
+	return m_objects;
+}
+
 
 
 
@@ -204,23 +203,34 @@ void AutomationPattern::updateLength()
 
 
 
-MidiTime AutomationPattern::putValue( const MidiTime & _time,
-							const float _value,
-							const bool _quant_pos )
+MidiTime AutomationPattern::putValue( const MidiTime & time,
+					const float value,
+					const bool quantPos,
+					const bool ignoreSurroundingPoints )
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos ?
-				Note::quantized( _time, quantization() ) :
-				_time;
+	MidiTime newTime = quantPos ?
+				Note::quantized( time, quantization() ) :
+				time;
 
-	m_timeMap[newTime] = _value;
+	m_timeMap[ newTime ] = value;
 	timeMap::const_iterator it = m_timeMap.find( newTime );
+
+	// Remove control points that are covered by the new points
+	// quantization value. Control Key to override
+	if( ! ignoreSurroundingPoints )
+	{
+		for( int i = newTime + 1; i < newTime + quantization(); ++i )
+		{
+			AutomationPattern::removeValue( i );
+		}
+	}
 	if( it != m_timeMap.begin() )
 	{
 		--it;
 	}
-	generateTangents(it, 3);
+	generateTangents( it, 3 );
 
 	// we need to maximize our length in case we're part of a hidden
 	// automation track as the user can't resize this pattern
@@ -237,18 +247,13 @@ MidiTime AutomationPattern::putValue( const MidiTime & _time,
 
 
 
-void AutomationPattern::removeValue( const MidiTime & _time,
-									 const bool _quant_pos )
+void AutomationPattern::removeValue( const MidiTime & time )
 {
 	cleanObjects();
 
-	MidiTime newTime = _quant_pos ?
-				Note::quantized( _time, quantization() ) :
-				_time;
-
-	m_timeMap.remove( newTime );
-	m_tangents.remove( newTime );
-	timeMap::const_iterator it = m_timeMap.lowerBound( newTime );
+	m_timeMap.remove( time );
+	m_tangents.remove( time );
+	timeMap::const_iterator it = m_timeMap.lowerBound( time );
 	if( it != m_timeMap.begin() )
 	{
 		--it;
@@ -265,9 +270,24 @@ void AutomationPattern::removeValue( const MidiTime & _time,
 
 
 
+void AutomationPattern::recordValue(MidiTime time, float value)
+{
+	if( value != m_lastRecordedValue )
+	{
+		putValue( time, value, true );
+		m_lastRecordedValue = value;
+	}
+	else if( valueAt( time ) != value )
+	{
+		removeValue( time );
+	}
+}
+
+
+
 
 /**
- * @brief Set the position of the point that is being draged.
+ * @brief Set the position of the point that is being dragged.
  *        Calling this function will also automatically set m_dragging to true,
  *        which applyDragValue() have to be called to m_dragging.
  * @param the time(x position) of the point being dragged
@@ -275,14 +295,16 @@ void AutomationPattern::removeValue( const MidiTime & _time,
  * @param true to snip x position
  * @return
  */
-MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _value,
-					   const bool _quant_pos )
+MidiTime AutomationPattern::setDragValue( const MidiTime & time,
+						const float value,
+						const bool quantPos,
+						const bool controlKey )
 {
 	if( m_dragging == false )
 	{
-		MidiTime newTime = _quant_pos  ?
-					Note::quantized( _time, quantization() ) :
-					_time;
+		MidiTime newTime = quantPos  ?
+				Note::quantized( time, quantization() ) :
+							time;
 		this->removeValue( newTime );
 		m_oldTimeMap = m_timeMap;
 		m_dragging = true;
@@ -293,10 +315,10 @@ MidiTime AutomationPattern::setDragValue( const MidiTime & _time, const float _v
 
 	for( timeMap::const_iterator it = m_timeMap.begin(); it != m_timeMap.end(); ++it )
 	{
-		generateTangents(it, 3);
+		generateTangents( it, 3 );
 	}
 
-	return this->putValue( _time, _value, _quant_pos );
+	return this->putValue( time, value, quantPos, controlKey );
 
 }
 
@@ -615,44 +637,6 @@ const QString AutomationPattern::name() const
 	#endif
 }
 
-
-
-
-void AutomationPattern::processMidiTime( const MidiTime & time )
-{
-	if( ! isRecording() )
-	{
-		if( time >= 0 && hasAutomation() )
-		{
-			const float val = valueAt( time );
-			for( objectVector::iterator it = m_objects.begin();
-							it != m_objects.end(); ++it )
-			{
-				if( *it )
-				{
-					( *it )->setAutomatedValue( val );
-				}
-
-			}
-		}
-	}
-	else
-	{
-		if( time >= 0 && ! m_objects.isEmpty() )
-		{
-			const float value = static_cast<float>( firstObject()->value<float>() );
-			if( value != m_lastRecordedValue )
-			{
-				putValue( time, value, true );
-				m_lastRecordedValue = value;
-			}
-			else if( valueAt( time ) != value )
-			{
-				removeValue( time, false );
-			}
-		}
-	}
-}
 
 
 

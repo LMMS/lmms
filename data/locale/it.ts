@@ -42,10 +42,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>LMMS</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Involved</source>
         <translation>Coinvolti</translation>
     </message>
@@ -56,6 +52,10 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Copyright © %1</source>
         <translation>Copyright © %1</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -501,6 +501,14 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Model is already connected to this pattern.</source>
         <translation>Il controllo è già connesso a questo pattern.</translation>
+    </message>
+    <message>
+        <source>Quantization</source>
+        <translation>Quantizzazione</translation>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation>Quantizzazione. Imposta la massima precisione dei punti di Automazione. Controlla anche la lunghezza, cancellando quindi i punti che sono entro tale lunghezza. Puoi comunque ignorare questa funzione premendo &lt;Ctrl&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1005,10 +1013,6 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
 <context>
     <name>DelayControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Delay</translation>
-    </message>
-    <message>
         <source>Lfo Amt</source>
         <translation>Quantità Lfo</translation>
     </message>
@@ -1017,16 +1021,8 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
         <translation>Tempo di ritardo</translation>
     </message>
     <message>
-        <source>Regen</source>
-        <translation>Regen</translation>
-    </message>
-    <message>
         <source>Feedback Amount</source>
         <translation>Quantità di Feedback</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation>Frequenza</translation>
     </message>
     <message>
         <source>Lfo</source>
@@ -1039,6 +1035,22 @@ Se sei interessato a tradurre LMMS o vuoi migliorare una traduzione esistente, s
     <message>
         <source>Gain</source>
         <translation>Guadagno</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation>RITARDO</translation>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation>FDBK</translation>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation>FREQUENZA</translation>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>Q.TÀ</translation>
     </message>
 </context>
 <context>
@@ -1880,18 +1892,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <source> Octave</source>
         <translation>Ottave</translation>
     </message>
-    <message>
-        <source>Frequency</source>
-        <translation>Frequenza</translation>
-    </message>
-    <message>
-        <source>Resonance</source>
-        <translation>Risonanza</translation>
-    </message>
-    <message>
-        <source>Bandwidth</source>
-        <translation>Larghezza di Banda</translation>
-    </message>
 </context>
 <context>
     <name>EqHandle</name>
@@ -1987,10 +1987,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <translation>Virgola mobile 32 Bit</translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Non tutti i parametri si applicano nella creazione di tutti i formati.</translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation>Impostazioni qualità</translation>
     </message>
@@ -2055,12 +2051,6 @@ Con il click destro si apre un menu conestuale che permette di cambiare l&apos;o
         <translation>Non è stato possibile aprire il file</translation>
     </message>
     <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>Impossibile aprire in scrittura il file %1.
-Assicurarsi di avere i permessi in scrittura per il file e per la directory contenente il file e riprovare!</translation>
-    </message>
-    <message>
         <source>Export project to %1</source>
         <translation>Esporta il progetto in %1</translation>
     </message>
@@ -2075,6 +2065,20 @@ Assicurarsi di avere i permessi in scrittura per il file e per la directory cont
     <message>
         <source>Rendering: %1%</source>
         <translation>Renderizzazione: %1%</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Impossibile scrivere sul file %1.
+Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation>Interi 24 Bit</translation>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation>Usa bitrate variabile</translation>
     </message>
 </context>
 <context>
@@ -2255,6 +2259,18 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     <message>
         <source>FX %1</source>
         <translation>FX %1</translation>
+    </message>
+    <message>
+        <source>Volume</source>
+        <translation>Volume</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Muto</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Solo</translation>
     </message>
 </context>
 <context>
@@ -2918,7 +2934,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
     </message>
     <message>
         <source>Phrygolydian</source>
-        <translation>Phrygolydian</translation>
+        <translation>Frigia</translation>
     </message>
     <message>
         <source>Lydian</source>
@@ -3440,12 +3456,12 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Modalità logaritmica</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
-        <translation>Inserire un nuovo valore tra -96.0 dBFS e 6.0 dBFS:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Inserire un valore compreso tra %1 e %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Inserire un nuovo valore tra -96.0 dBFS e 6.0 dBFS:</translation>
     </message>
 </context>
 <context>
@@ -3663,16 +3679,6 @@ Fare doppio click per scegliere il file dell&apos;onda.</translation>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Could not save config-file</source>
-        <translation>Non è stato possibile salvare il file di configurazione</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Non è stato possibile salvare il file di configurazione %1. Probabilmente non hai i permessi di scrittura per questo file.
-Assicurati di avere i permessi in scrittura per il file e riprova.</translation>
-    </message>
     <message>
         <source>&amp;New</source>
         <translation>&amp;Nuovo</translation>
@@ -3968,10 +3974,6 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>Salva come progetto default</translation>
     </message>
     <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>Esporta &amp;MIDI...</translation>
-    </message>
-    <message>
         <source>&amp;View</source>
         <translation>&amp;Visualizza</translation>
     </message>
@@ -4040,16 +4042,30 @@ Visitare http://lmms.sf.net/wiki  per la documentazione di LMMS.</translation>
         <translation>In questo modo verrà modificato il tuo progetto di default corrente.</translation>
     </message>
     <message>
-        <source>Volume as dBFS</source>
-        <translation>Volume in dBFS</translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Scorrimento morbido</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
         <translation>Abilita l&apos;etichetta delle note nel piano roll</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation>Salva come modello di progetto</translation>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Volume in dBFS</translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Non è stato possibile aprire il file</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation>Impossibile scrivere sul file %1.
+Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
     </message>
 </context>
 <context>
@@ -5703,16 +5719,16 @@ Motivo: &quot;%2&quot;</translation>
 <context>
     <name>PluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Plugin strumentali</translation>
-    </message>
-    <message>
         <source>Instrument browser</source>
         <translation>Browser strumenti</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
         <translation>È possibile trascinare uno strumento nel Song-Editor, nel Beat+Bassline Editor o direttamente in un canale esistente.</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation>Plugin Strumentali</translation>
     </message>
 </context>
 <context>
@@ -5915,6 +5931,60 @@ Motivo: &quot;%2&quot;</translation>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Ingresso</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Guadagno in Input:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grandezza</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Grandezza:</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Colore</translation>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation>Colore:</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Uscita</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Guadagno in Output:</translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation>Guadagno input</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Grandezza</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Colore</translation>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation>Guadagno output</translation>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -5959,6 +6029,14 @@ Motivo: &quot;%2&quot;</translation>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Tutti i file audio (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation>Impossibile aprire il file</translation>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation>I file audio hanno un limite di %1 MB in grandezza e %2 minuti in durata</translation>
     </message>
 </context>
 <context>
@@ -6061,10 +6139,6 @@ Motivo: &quot;%2&quot;</translation>
         <translation>Dopo aver modificato le impostazioni, mostra un avviso al riavvio</translation>
     </message>
     <message>
-        <source>Display volume as dBFS </source>
-        <translation>Mostra il volume in dBFS</translation>
-    </message>
-    <message>
         <source>Compress project files per default</source>
         <translation>Per impostazione predefinita, comprimi i file di progetto</translation>
     </message>
@@ -6139,10 +6213,6 @@ Motivo: &quot;%2&quot;</translation>
     <message>
         <source>Smooth scroll in Song Editor</source>
         <translation>Scorrimento morbido nel Song-Editor</translation>
-    </message>
-    <message>
-        <source>Enable auto save feature</source>
-        <translation>Abilita la funzione di salvataggio automatico</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
@@ -6271,14 +6341,30 @@ Latenza: %2 ms</translation>
         <translation>minuto</translation>
     </message>
     <message>
-        <source>Auto save interval: %1 %2</source>
-        <translation>Intervallo di auto-salvataggio: %1 %2</translation>
+        <source>Display volume as dBFS </source>
+        <translation>Mostra il volume in dBFS</translation>
+    </message>
+    <message>
+        <source>Enable auto-save</source>
+        <translation>Abiita funzione di salvataggio automatico</translation>
+    </message>
+    <message>
+        <source>Allow auto-save while playing</source>
+        <translation>Consenti il salvataggio automatico durante la riproduzione</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Disabilitato</translation>
+    </message>
+    <message>
+        <source>Auto-save interval: %1</source>
+        <translation>Intervallo di salvataggio automatico: %1</translation>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
-Remember to also save your project manually.</source>
-        <translation>Imposta l&apos;intervallo del backup automatico a %1.
-Ricorda di salvare il tuo progetto anche manualmente.</translation>
+Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
+        <translation>Imposta il tempo tra i salvataggi automatici a %1.
+Ricorda di salvare i progetti manualmente. Puoi disabilitare il salvataggio automatico durante la riproduzione, in quanto potrebbe pesare troppo su un sistema datato.</translation>
     </message>
 </context>
 <context>
@@ -6358,6 +6444,10 @@ Ricorda di salvare il tuo progetto anche manualmente.</translation>
     <message>
         <source>LMMS Error report</source>
         <translation>Informazioni sull&apos;errore di LMMS</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation>Salva progetto</translation>
     </message>
 </context>
 <context>
@@ -7012,6 +7102,10 @@ Assicurarsi di avere i permessi in lettura per il file e per la directory che lo
     <message>
         <source>Decrement version number</source>
         <translation>Riduci numero versione</translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
+        <translation>Esiste già. Vuoi sovrascriverlo?</translation>
     </message>
 </context>
 <context>
@@ -9272,6 +9366,10 @@ Questo chip era utilizzato nel Commode 64.</translation>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Filtro per esportare file MIDI da LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation>Algoritmo di Riverbero di Sean Costello</translation>
     </message>
 </context>
 <context>

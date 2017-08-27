@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,18 +25,15 @@
 
 #include "PeakController.h"
 
-#include <cstdio>
+#include <cmath>
+
 #include <QDomElement>
-#include <QObject>
 #include <QMessageBox>
 
-#include "Engine.h"
 #include "Mixer.h"
 #include "EffectChain.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
 #include "PresetPreviewPlayHandle.h"
-
-class ControllerDialog;
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;

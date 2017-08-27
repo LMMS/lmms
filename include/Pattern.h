@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -165,6 +165,22 @@ public:
 	PatternView( Pattern* pattern, TrackView* parent );
 	virtual ~PatternView();
 
+	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
+	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)
+	Q_PROPERTY(QColor mutedNoteFillColor READ getMutedNoteFillColor WRITE setMutedNoteFillColor)
+	Q_PROPERTY(QColor mutedNoteBorderColor READ getMutedNoteBorderColor WRITE setMutedNoteBorderColor)
+
+	QColor const & getNoteFillColor() const { return m_noteFillColor; }
+	void setNoteFillColor(QColor const & color) { m_noteFillColor = color; }
+
+	QColor const & getNoteBorderColor() const { return m_noteBorderColor; }
+	void setNoteBorderColor(QColor const & color) { m_noteBorderColor = color; }
+
+	QColor const & getMutedNoteFillColor() const { return m_mutedNoteFillColor; }
+	void setMutedNoteFillColor(QColor const & color) { m_mutedNoteFillColor = color; }
+
+	QColor const & getMutedNoteBorderColor() const { return m_mutedNoteBorderColor; }
+	void setMutedNoteBorderColor(QColor const & color) { m_mutedNoteBorderColor = color; }
 
 public slots:
 	virtual void update();
@@ -186,14 +202,19 @@ protected:
 
 
 private:
-	static QPixmap * s_stepBtnOn;
-	static QPixmap * s_stepBtnOverlay;
+	static QPixmap * s_stepBtnOn0;
+	static QPixmap * s_stepBtnOn200;
 	static QPixmap * s_stepBtnOff;
 	static QPixmap * s_stepBtnOffLight;
 
 	Pattern* m_pat;
 	QPixmap m_paintPixmap;
-	
+
+	QColor m_noteFillColor;
+	QColor m_noteBorderColor;
+	QColor m_mutedNoteFillColor;
+	QColor m_mutedNoteBorderColor;
+
 	QStaticText m_staticTextName;
 } ;
 

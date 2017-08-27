@@ -4,7 +4,7 @@
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * Copyright (c) 2010-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -107,9 +107,10 @@ ControllerRackView::~ControllerRackView()
 
 
 
-void ControllerRackView::saveSettings( QDomDocument & _doc,	QDomElement & _this )
+void ControllerRackView::saveSettings( QDomDocument & _doc,
+							QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this, QSize( 400, 300 ) );
+	MainWindow::saveWidgetState( this, _this );
 }
 
 
@@ -229,7 +230,7 @@ void ControllerRackView::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	_ce->ignore();
-}
+ }
 
 
 

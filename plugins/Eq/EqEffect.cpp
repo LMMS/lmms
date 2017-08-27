@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,12 +24,11 @@
 
 #include "EqEffect.h"
 
-#include "embed.cpp"
+#include "embed.h"
 #include "Engine.h"
 #include "EqFader.h"
 #include "interpolation.h"
 #include "lmms_math.h"
-#include "MainWindow.h"
 
 
 extern "C"
@@ -43,7 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT eq_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -71,6 +70,10 @@ EqEffect::~EqEffect()
 
 bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 {
+	//wet/dry controls
+	const float dry = dryLevel();
+	const float wet = wetLevel();
+	sample_t dryS[2];
 	// setup sample exact controls
 	float hpRes = m_eqControls.m_hpResModel.value();
 	float lowShelfRes = m_eqControls.m_lowShelfResModel.value();
@@ -206,6 +209,9 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	for( fpp_t f = 0; f < frames; f++)
 	{
+		//wet dry buffer
+		dryS[0] = buf[f][0];
+		dryS[1] = buf[f][1];
 		if( hpActive )
 		{
 			m_hp12.setParameters( sampleRate, *hpFreqPtr, *hpResPtr, 1 );
@@ -297,6 +303,10 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 			}
 		}
 
+		//apply wet / dry levels
+		buf[f][1] = ( dry * dryS[1] ) + ( wet * buf[f][1] );
+		buf[f][0] = ( dry * dryS[0] ) + ( wet * buf[f][0] );
+
 		//increment pointers if needed
 		hpResPtr += hpResInc;
 		lowShelfResPtr += lowShelfResInc;
@@ -327,7 +337,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );
-		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate * 0.5 ) );
+		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate ) );
 	}
 	else
 	{
@@ -355,49 +365,53 @@ float EqEffect::peakBand( float minF, float maxF, EqAnalyser *fft, int sr )
 		}
 	}
 
-	return ( peak + 100 ) / 100;
+	return ( peak + 60 ) / 100;
 }
 
 
 
 
-void EqEffect::setBandPeaks(EqAnalyser *fft, int samplerate )
+void EqEffect::setBandPeaks( EqAnalyser *fft, int samplerate )
 {
 	m_eqControls.m_lowShelfPeakR = m_eqControls.m_lowShelfPeakL =
-			peakBand( 0,
-					  m_eqControls.m_lowShelfFreqModel.value(), fft , samplerate );
+			peakBand( m_eqControls.m_lowShelfFreqModel.value()
+					  * ( 1 - m_eqControls.m_lowShelfResModel.value() * 0.5 ),
+					  m_eqControls.m_lowShelfFreqModel.value(),
+					  fft , samplerate );
 
 	m_eqControls.m_para1PeakL = m_eqControls.m_para1PeakR =
 			peakBand( m_eqControls.m_para1FreqModel.value()
-					  - ( m_eqControls.m_para1FreqModel.value() * m_eqControls.m_para1BwModel.value() * 0.5 ),
+					  * ( 1 - m_eqControls.m_para1BwModel.value() * 0.5 ),
 					  m_eqControls.m_para1FreqModel.value()
-					  + ( m_eqControls.m_para1FreqModel.value() * m_eqControls.m_para1BwModel.value() * 0.5 ),
+					  * ( 1 + m_eqControls.m_para1BwModel.value() * 0.5 ),
 					  fft , samplerate );
 
 	m_eqControls.m_para2PeakL = m_eqControls.m_para2PeakR =
 			peakBand( m_eqControls.m_para2FreqModel.value()
-					  - ( m_eqControls.m_para2FreqModel.value() * m_eqControls.m_para2BwModel.value() * 0.5 ),
+					  * ( 1 - m_eqControls.m_para2BwModel.value() * 0.5 ),
 					  m_eqControls.m_para2FreqModel.value()
-					  + ( m_eqControls.m_para2FreqModel.value() * m_eqControls.m_para2BwModel.value() * 0.5 ),
+					  * ( 1 + m_eqControls.m_para2BwModel.value() * 0.5 ),
 					  fft , samplerate );
 
 	m_eqControls.m_para3PeakL = m_eqControls.m_para3PeakR =
 			peakBand( m_eqControls.m_para3FreqModel.value()
-					  - ( m_eqControls.m_para3FreqModel.value() * m_eqControls.m_para3BwModel.value() * 0.5 ),
+					  * ( 1 - m_eqControls.m_para3BwModel.value() * 0.5 ),
 					  m_eqControls.m_para3FreqModel.value()
-					  + ( m_eqControls.m_para3FreqModel.value() * m_eqControls.m_para3BwModel.value() * 0.5 ),
+					  * ( 1 + m_eqControls.m_para3BwModel.value() * 0.5 ),
 					  fft , samplerate );
 
 	m_eqControls.m_para4PeakL = m_eqControls.m_para4PeakR =
 			peakBand( m_eqControls.m_para4FreqModel.value()
-					  - ( m_eqControls.m_para4FreqModel.value() * m_eqControls.m_para4BwModel.value() * 0.5 ),
+					  * ( 1 - m_eqControls.m_para4BwModel.value() * 0.5 ),
 					  m_eqControls.m_para4FreqModel.value()
-					  + ( m_eqControls.m_para4FreqModel.value() * m_eqControls.m_para4BwModel.value() * 0.5 ),
+					  * ( 1 + m_eqControls.m_para4BwModel.value() * 0.5 ),
 					  fft , samplerate );
 
 	m_eqControls.m_highShelfPeakL = m_eqControls.m_highShelfPeakR =
 			peakBand( m_eqControls.m_highShelfFreqModel.value(),
-					  samplerate * 0.5 , fft, samplerate );
+					  m_eqControls.m_highShelfFreqModel.value()
+					  * ( 1 + m_eqControls.m_highShelfResModel.value() * 0.5 ),
+					  fft, samplerate );
 }
 
 extern "C"

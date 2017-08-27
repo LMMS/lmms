@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -90,7 +90,7 @@ void BBTrackContainer::updateAfterTrackAdd()
 
 
 
-tact_t BBTrackContainer::lengthOfBB( int _bb )
+tact_t BBTrackContainer::lengthOfBB( int _bb ) const
 {
 	MidiTime max_length = MidiTime::ticksPerTact();
 
@@ -237,6 +237,20 @@ void BBTrackContainer::createTCOsForBB( int _bb )
 	{
 		tl[i]->createTCOsForBB( _bb );
 	}
+}
+
+AutomatedValueMap BBTrackContainer::automatedValuesAt(MidiTime time, int tcoNum) const
+{
+	Q_ASSERT(tcoNum >= 0);
+	Q_ASSERT(time.getTicks() >= 0);
+
+	auto length_tacts = lengthOfBB(tcoNum);
+	auto length_ticks = length_tacts * MidiTime::ticksPerTact();
+	if (time > length_ticks) {
+		time = length_ticks;
+	}
+
+	return TrackContainer::automatedValuesAt(time + (MidiTime::ticksPerTact() * tcoNum), tcoNum);
 }
 
 

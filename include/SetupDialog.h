@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 #include <QDialog>
 #include <QtCore/QMap>
 
+#include "LedCheckbox.h"
 #include "lmmsconfig.h"
 #include "AudioDevice.h"
 #include "MidiClient.h"
@@ -84,7 +85,7 @@ private slots:
 
 	// performance settings widget
 	void setAutoSaveInterval( int time );
-	void resetAutoSaveInterval();
+	void resetAutoSave();
 	void displaySaveIntervalHelp();
 
 	// audio settings widget
@@ -116,6 +117,7 @@ private slots:
 
 	void toggleSmoothScroll( bool _enabled );
 	void toggleAutoSave( bool _enabled );
+	void toggleRunningAutoSave( bool _enabled );
 	void toggleOneInstrumentTrackWindow( bool _enabled );
 	void toggleCompactTrackButtons( bool _enabled );
 	void toggleSyncVSTPlugins( bool _enabled );
@@ -175,9 +177,12 @@ private:
 
 	bool m_smoothScroll;
 	bool m_enableAutoSave;
+	bool m_enableRunningAutoSave;
 	int m_saveInterval;
 	QSlider * m_saveIntervalSlider;
 	QLabel * m_saveIntervalLbl;
+	LedCheckBox * m_autoSave;
+	LedCheckBox * m_runningAutoSave;
 
 	bool m_oneInstrumentTrackWindow;
 	bool m_compactTrackButtons;

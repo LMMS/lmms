@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -23,7 +23,6 @@
  */
 #include "BBTrack.h"
 
-#include <QDomElement>
 #include <QColorDialog>
 #include <QMenu>
 #include <QPainter>
@@ -39,7 +38,7 @@
 #include "RenameDialog.h"
 #include "Song.h"
 #include "SongEditor.h"
-#include "templates.h"
+#include "ToolTip.h"
 #include "TrackLabelButton.h"
 
 
@@ -223,8 +222,10 @@ void BBTCOView::paintEvent( QPaintEvent * )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
-		? QPixmap( size() ) : m_paintPixmap;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	{
+		m_paintPixmap = QPixmap(size());
+	}
 
 	QPainter p( &m_paintPixmap );
 
@@ -267,25 +268,7 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	}
 
 	// pattern name
-	p.setRenderHint( QPainter::TextAntialiasing );
-
-	if(  m_staticTextName.text() != m_bbTCO->name() )
-	{
-		m_staticTextName.setText( m_bbTCO->name() );
-	}
-
-	QFont font;
-	font.setHintingPreference( QFont::PreferFullHinting );
-	font.setPointSize( 8 );
-	p.setFont( font );
-
-	const int textTop = TCO_BORDER_WIDTH + 1;
-	const int textLeft = TCO_BORDER_WIDTH + 1;
-
-	p.setPen( textShadowColor() );
-	p.drawStaticText( textLeft + 1, textTop + 1, m_staticTextName );
-	p.setPen( textColor() );
-	p.drawStaticText( textLeft, textTop, m_staticTextName );
+	paintTextLabel(m_bbTCO->name(), p);
 
 	// inner border
 	p.setPen( c.lighter( 130 ) );
@@ -399,6 +382,12 @@ void BBTCOView::setColor( QColor new_color )
 }
 
 
+void BBTCOView::update()
+{
+	ToolTip::add(this, m_bbTCO->name());
+
+	TrackContentObjectView::update();
+}
 
 
 

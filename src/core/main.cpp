@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -31,7 +31,6 @@
 
 #include <QFileInfo>
 #include <QLocale>
-#include <QDate>
 #include <QTimer>
 #include <QTranslator>
 #include <QApplication>
@@ -44,11 +43,7 @@
 #endif
 
 #ifdef LMMS_HAVE_SCHED_H
-#include <sched.h>
-#endif
-
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
+#include "sched.h"
 #endif
 
 #ifdef LMMS_HAVE_PROCESS_H
@@ -61,6 +56,7 @@
 
 #include <signal.h>
 
+#include "MainApplication.h"
 #include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
@@ -69,11 +65,38 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
+#include "OutputSettings.h"
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
-#include "DataFile.h"
 #include "Song.h"
 #include "SetupDialog.h"
+
+#ifdef LMMS_DEBUG_FPE
+#include <fenv.h> // For feenableexcept
+#include <execinfo.h> // For backtrace and backtrace_symbols_fd
+#include <unistd.h> // For STDERR_FILENO
+#include <csignal> // To register the signal handler
+#endif
+
+
+#ifdef LMMS_DEBUG_FPE
+void signalHandler( int signum ) {
+
+	// Get a back trace
+	void *array[10];
+	size_t size;
+
+	// get void*'s for all entries on the stack
+	size = backtrace(array, 10);
+
+	backtrace_symbols_fd(array, size, STDERR_FILENO);
+
+	// cleanup and close up stuff here
+	// terminate program
+
+	exit(signum);
+}
+#endif
 
 static inline QString baseName( const QString & file )
 {
@@ -128,6 +151,7 @@ void printHelp()
 		"            [ -i <method> ]\n"
 		"            [ --import <in> [-e]]\n"
 		"            [ -l ]\n"
+		"            [ -m <mode>]\n"
 		"            [ -o <path> ]\n"
 		"            [ -p <out> ]\n"
 		"            [ -r <project file> ] [ options ]\n"
@@ -142,7 +166,7 @@ void printHelp()
 		"-c, --config <configfile>     Get the configuration from <configfile>\n"
 		"-d, --dump <in>               Dump XML of compressed file <in>\n"
 		"-f, --format <format>         Specify format of render-output where\n"
-		"       Format is either 'wav' or 'ogg'.\n"
+		"       Format is either 'wav', 'flac', 'ogg' or 'mp3'.\n"
 		"    --geometry <geometry>     Specify the size and position of the main window\n"
 		"       geometry is <xsizexysize+xoffset+yoffsety>.\n"
 		"-h, --help                    Show this usage information and exit.\n"
@@ -155,6 +179,12 @@ void printHelp()
 		"    --import <in> [-e]        Import MIDI file <in>.\n"
 		"       If -e is specified lmms exits after importing the file.\n"
 		"-l, --loop                    Render as a loop\n"
+		"-m, --mode                    Stereo mode used for MP3 export\n"
+		"       Possible values: s, j, m\n"
+		"         s: Stereo\n"
+		"         j: Joint Stereo\n"
+		"         m: Mono\n"
+		"       Default: j\n"
 		"-o, --output <path>           Render into <path>\n"
 		"       For --render, provide a file path\n"
 		"       For --rendertracks, provide a directory path\n"
@@ -199,6 +229,18 @@ void fileCheck( QString &file )
 
 int main( int argc, char * * argv )
 {
+#ifdef LMMS_DEBUG_FPE
+	// Enable exceptions for certain floating point results
+	feenableexcept( FE_INVALID   |
+			FE_DIVBYZERO |
+			FE_OVERFLOW  |
+			FE_UNDERFLOW);
+
+	// Install the trap handler
+	// register signal SIGFPE and signal handler
+	signal(SIGFPE, signalHandler);
+#endif
+
 	// initialize memory managers
 	MemoryManager::init();
 	NotePlayHandleManager::init();
@@ -251,21 +293,20 @@ int main( int argc, char * * argv )
 		}
 	}
 
-#ifndef LMMS_BUILD_WIN32
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_HAIKU)
 	if ( ( getuid() == 0 || geteuid() == 0 ) && !allowRoot )
 	{
 		printf( "LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n" );
 		return EXIT_FAILURE;
-	}	
+	}
 #endif
 
 	QCoreApplication * app = coreOnly ?
 			new QCoreApplication( argc, argv ) :
-					new QApplication( argc, argv ) ;
+					new MainApplication( argc, argv );
 
 	Mixer::qualitySettings qs( Mixer::qualitySettings::Mode_HighQuality );
-	ProjectRenderer::OutputSettings os( 44100, false, 160,
-						ProjectRenderer::Depth_16Bit );
+	OutputSettings os( 44100, OutputSettings::BitRateSettings(160, false), OutputSettings::Depth_16Bit, OutputSettings::StereoMode_JointStereo );
 	ProjectRenderer::ExportFileFormats eff = ProjectRenderer::WaveFile;
 
 	// second of two command-line parsing stages
@@ -319,7 +360,7 @@ int main( int argc, char * * argv )
 				printf( "\nOption \"--allowroot\" will be ignored on this platform.\n\n" );
 			}
 #endif
-			
+
 		}
 		else if( arg == "--dump" || arg == "-d" )
 		{
@@ -397,6 +438,16 @@ int main( int argc, char * * argv )
 				eff = ProjectRenderer::OggFile;
 			}
 #endif
+#ifdef LMMS_HAVE_MP3LAME
+			else if( ext == "mp3" )
+			{
+				eff = ProjectRenderer::MP3File;
+			}
+#endif
+			else if (ext == "flac")
+			{
+				eff = ProjectRenderer::FlacFile;
+			}
 			else
 			{
 				printf( "\nInvalid output format %s.\n\n"
@@ -419,7 +470,7 @@ int main( int argc, char * * argv )
 			sample_rate_t sr = QString( argv[i] ).toUInt();
 			if( sr >= 44100 && sr <= 192000 )
 			{
-				os.samplerate = sr;
+				os.setSampleRate(sr);
 			}
 			else
 			{
@@ -444,7 +495,9 @@ int main( int argc, char * * argv )
 
 			if( br >= 64 && br <= 384 )
 			{
-				os.bitrate = br;
+				OutputSettings::BitRateSettings bitRateSettings = os.getBitRateSettings();
+				bitRateSettings.setBitRate(br);
+				os.setBitRateSettings(bitRateSettings);
 			}
 			else
 			{
@@ -453,9 +506,41 @@ int main( int argc, char * * argv )
 				return EXIT_FAILURE;
 			}
 		}
+		else if( arg == "--mode" || arg == "-m" )
+		{
+			++i;
+
+			if( i == argc )
+			{
+				printf( "\nNo stereo mode specified.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[0] );
+				return EXIT_FAILURE;
+			}
+
+			QString const mode( argv[i] );
+
+			if( mode == "s" )
+			{
+				os.setStereoMode(OutputSettings::StereoMode_Stereo);
+			}
+			else if( mode == "j" )
+			{
+				os.setStereoMode(OutputSettings::StereoMode_JointStereo);
+			}
+			else if( mode == "m" )
+			{
+				os.setStereoMode(OutputSettings::StereoMode_Mono);
+			}
+			else
+			{
+				printf( "\nInvalid stereo mode %s.\n\n"
+	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
+				return EXIT_FAILURE;
+			}
+		}
 		else if( arg =="--float" || arg == "-a" )
 		{
-			os.depth = ProjectRenderer::Depth_32Bit;
+			os.setBitDepth(OutputSettings::Depth_32Bit);
 		}
 		else if( arg == "--interpolation" || arg == "-i" )
 		{
@@ -742,10 +827,6 @@ int main( int argc, char * * argv )
 				"    <td><b>%4</b></td>"
 				"    <td>%5</td>"
 				"  </tr>"
-				"  <tr>"
-				"    <td><b>%6</b></td>"
-				"    <td>%7</td>"
-				"  </tr>"
 				"</table>"
 				"</html>" ).arg(
 				MainWindow::tr( "There is a recovery file present. "
@@ -756,10 +837,6 @@ int main( int argc, char * * argv )
 				MainWindow::tr( "Recover" ),
 				MainWindow::tr( "Recover the file. Please don't run "
 					"multiple instances of LMMS when you do this." ),
-				MainWindow::tr( "Ignore" ),
-				MainWindow::tr( "Launch LMMS as usual but with "
-					"automatic backup disabled to prevent the "
-					"present recover file from being overwritten." ),
 				MainWindow::tr( "Discard" ),
 				MainWindow::tr( "Launch a default session and delete "
 					"the restored files. This is not reversible." )
@@ -771,38 +848,32 @@ int main( int argc, char * * argv )
 
 			QPushButton * recover;
 			QPushButton * discard;
-			QPushButton * ignore;
 			QPushButton * exit;
-			
+
 			#if QT_VERSION >= 0x050000
-				// setting all buttons to the same roles allows us 
+				// setting all buttons to the same roles allows us
 				// to have a custom layout
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
-									QMessageBox::AcceptRole );
-				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 									QMessageBox::AcceptRole );
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
 
-			# else 
+			# else
 				// in qt4 the button order is reversed
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
-				ignore = mb.addButton( MainWindow::tr( "Ignore" ),
 									QMessageBox::AcceptRole );
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
 
 			#endif
-			
+
 			// have a hidden exit button
 			exit = mb.addButton( "", QMessageBox::RejectRole);
 			exit->setVisible(false);
-			
+
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );
-			ignore->setIcon( embed::getIconPixmap( "ignore" ) );
 
 			mb.setDefaultButton( recover );
 			mb.setEscapeButton( exit );
@@ -816,13 +887,6 @@ int main( int argc, char * * argv )
 			{
 				fileToLoad = recoveryFile;
 				gui->mainWindow()->setSession( MainWindow::SessionState::Recover );
-			}
-			else if( mb.clickedButton() == ignore )
-			{
-				if( autoSaveEnabled )
-				{
-					gui->mainWindow()->setSession( MainWindow::SessionState::Limited );
-				}
 			}
 			else // Exit
 			{
@@ -838,6 +902,12 @@ int main( int argc, char * * argv )
 		if( fullscreen )
 		{
 			gui->mainWindow()->showMaximized();
+		}
+
+		// Handle macOS-style FileOpen QEvents
+		QString queuedFile = static_cast<MainApplication *>( app )->queuedFile();
+		if ( !queuedFile.isEmpty() ) {
+			fileToLoad = queuedFile;
 		}
 
 		if( !fileToLoad.isEmpty() )
@@ -860,20 +930,19 @@ int main( int argc, char * * argv )
 			}
 		}
 		// If enabled, open last project if there is one. Else, create
-		// a new one. Also skip recently opened file if limited session to
-		// lower the chance of opening an already opened file.
+		// a new one.
 		else if( ConfigManager::inst()->
 				value( "app", "openlastproject" ).toInt() &&
 			!ConfigManager::inst()->
 				recentlyOpenedProjects().isEmpty() &&
-			gui->mainWindow()->getSession() !=
-				MainWindow::SessionState::Limited )
+				!recoveryFilePresent )
 		{
 			QString f = ConfigManager::inst()->
 					recentlyOpenedProjects().first();
 			QFileInfo recentFile( f );
 
-			if ( recentFile.exists() )
+			if ( recentFile.exists() &&
+				recentFile.suffix().toLower() != "mpt" )
 			{
 				Engine::getSong()->loadProject( f );
 			}
@@ -890,11 +959,9 @@ int main( int argc, char * * argv )
 		// Finally we start the auto save timer and also trigger the
 		// autosave one time as recover.mmp is a signal to possible other
 		// instances of LMMS.
-		if( autoSaveEnabled &&
-			gui->mainWindow()->getSession() != MainWindow::SessionState::Limited )
+		if( autoSaveEnabled )
 		{
 			gui->mainWindow()->autoSaveTimerReset();
-			gui->mainWindow()->autoSave();
 		}
 	}
 

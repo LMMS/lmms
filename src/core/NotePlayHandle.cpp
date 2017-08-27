@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,8 +29,6 @@
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
-#include "MidiEvent.h"
-#include "MidiPort.h"
 #include "Mixer.h"
 #include "Song.h"
 
@@ -64,6 +62,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_releaseFramesDone( 0 ),
 	m_subNotes(),
 	m_released( false ),
+	m_releaseStarted( false ),
 	m_hasParent( parent != NULL  ),
 	m_parent( parent ),
 	m_hadChildren( false ),
@@ -250,8 +249,20 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
 
-	if( m_released )
+	if( m_released && (!instrumentTrack()->isSustainPedalPressed() ||
+		m_releaseStarted) )
 	{
+		if (m_releaseStarted == false)
+		{
+
+			if( m_origin == OriginMidiInput )
+			{
+				setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
+				m_instrumentTrack->midiNoteOff( *this );
+			}
+
+			m_releaseStarted = true;
+		}
 		f_cnt_t todo = framesThisPeriod;
 
 		// if this note is base-note for arpeggio, always set
@@ -377,13 +388,6 @@ void NotePlayHandle::noteOff( const f_cnt_t _s )
 				MidiEvent( MidiNoteOff, midiChannel(), midiKey(), 0 ),
 				MidiTime::fromFrames( _s, Engine::framesPerTick() ),
 				_s );
-	}
-
-	// inform attached components about MIDI finished (used for recording in Piano Roll)
-	if( m_origin == OriginMidiInput )
-	{
-		setLength( MidiTime( static_cast<f_cnt_t>( totalFramesPlayed() / Engine::framesPerTick() ) ) );
-		m_instrumentTrack->midiNoteOff( *this );
 	}
 }
 

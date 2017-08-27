@@ -146,7 +146,7 @@ IF(LMMS_BUILD_LINUX)
 ELSE()
 	SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 ENDIF()
-BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES artwork.png logo.png)
 TARGET_LINK_LIBRARIES(zynaddsubfx -lZynAddSubFxCore)
 ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
 

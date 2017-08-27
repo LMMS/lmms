@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
-#include <QResizeEvent>
 #include <QScrollBar>
 
 #include "embed.h"

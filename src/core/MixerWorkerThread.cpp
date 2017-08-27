@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,12 +24,11 @@
 
 #include "MixerWorkerThread.h"
 
+#include "denormals.h"
 #include <QMutex>
 #include <QWaitCondition>
 #include "ThreadableJob.h"
 #include "Mixer.h"
-
-#include "denormals.h"
 
 MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;

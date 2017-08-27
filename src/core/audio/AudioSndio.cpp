@@ -1,14 +1,35 @@
-#ifndef SINGLE_SOURCE_COMPILE
-
-/* license */
+/*
+ * AudioSndio.cpp - base-class that implements sndio audio support
+ *
+ * Copyright (c) 2010-2016 jackmsr@openbsd.net
+ * Copyright (c) 2016-2017 David Carlier <devnexen@gmail.com>
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
 
 #include "AudioSndio.h"
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QtCore/QFileInfo>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QFileInfo>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
@@ -31,9 +52,10 @@
 AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	AudioDevice( tLimit<ch_cnt_t>(
 	    ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-	    DEFAULT_CHANNELS, SURROUND_CHANNELS ), _mixer )
+	    DEFAULT_CHANNELS, SURROUND_CHANNELS ), _mixer ),
+            m_convertEndian ( false )
 {
-	_success_ful = FALSE;
+	_success_ful = false;
 
 	QString dev = ConfigManager::inst()->value( "audiosndio", "device" );
 
@@ -43,7 +65,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	}
 	else
 	{
-		m_hdl = sio_open( dev.toAscii().data(), SIO_PLAY, 0 );
+		m_hdl = sio_open( dev.toLatin1().constData(), SIO_PLAY, 0 );
 	}
 
 	if( m_hdl == NULL )
@@ -60,6 +82,11 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	m_par.rate = sampleRate();
 	m_par.round = mixer()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
+
+	if ( (isLittleEndian() && (m_par.le == 0)) ||
+	     (!isLittleEndian() && (m_par.le == 1))) {
+		m_convertEndian = true;
+	}
 
 	struct sio_par reqpar = m_par;
 
@@ -89,7 +116,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 		return;
 	}
 
-	_success_ful = TRUE;
+	_success_ful = true;
 }
 
 
@@ -139,7 +166,7 @@ void AudioSndio::run( void )
 	int_sample_t * outbuf =
 	    new int_sample_t[mixer()->framesPerPeriod() * channels()];
 
-	while( TRUE )
+	while( true )
 	{
 		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
@@ -148,7 +175,7 @@ void AudioSndio::run( void )
 		}
 
 		uint bytes = convertToS16( temp, frames,
-		    mixer()->masterGain(), outbuf, FALSE );
+		    mixer()->masterGain(), outbuf, m_convertEndian );
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;
@@ -200,5 +227,3 @@ void AudioSndio::setupWidget::saveSettings( void )
 
 
 #endif	/* LMMS_HAVE_SNDIO */
-
-#endif	/* SINGLE_SOURCE_COMPILE */

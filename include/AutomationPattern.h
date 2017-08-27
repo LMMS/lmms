@@ -5,7 +5,7 @@
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2006-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -59,6 +59,7 @@ public:
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
 	const AutomatableModel * firstObject() const;
+	const objectVector& objects() const;
 
 	// progression-type stuff
 	inline ProgressionTypes progressionType() const
@@ -76,14 +77,19 @@ public:
 	MidiTime timeMapLength() const;
 	void updateLength();
 
-	MidiTime putValue( const MidiTime & _time, const float _value,
-						const bool _quant_pos = true );
+	MidiTime putValue( const MidiTime & time,
+				const float value,
+				const bool quantPos = true,
+				const bool ignoreSurroundingPoints = false );
 
-	void removeValue( const MidiTime & _time,
-					  const bool _quant_pos = true );
+	void removeValue( const MidiTime & time );
 
-	MidiTime setDragValue( const MidiTime & _time, const float _value,
-						   const bool _quant_pos = true );
+	void recordValue(MidiTime time, float value);
+
+	MidiTime setDragValue( const MidiTime & time,
+				const float value,
+				const bool quantPos = true,
+				const bool controlKey = false );
 
 	void applyDragValue();
 
@@ -139,8 +145,6 @@ public:
 
 	static const QString classNodeName() { return "automationpattern"; }
 	QString nodeName() const { return classNodeName(); }
-
-	void processMidiTime( const MidiTime & _time );
 
 	virtual TrackContentObjectView * createView( TrackView * _tv );
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,6 @@
 
 #include "export.h"
 #include "MemoryManager.h"
-#include "lmmsversion.h"
 
 class LmmsCore;
 
@@ -135,10 +134,7 @@ public:
 		return dataDir() + SAMPLES_PATH;
 	}
 
-	QString defaultVersion() const
-	{
-		return LMMS_VERSION;
-	}
+	QString defaultVersion() const;
 
 	QString defaultArtworkDir() const
 	{
@@ -221,6 +217,9 @@ public:
 
 	const QString & value( const QString & cls,
 					const QString & attribute ) const;
+	const QString & value( const QString & cls,
+					const QString & attribute,
+					const QString & defaultVal ) const;
 	void setValue( const QString & cls, const QString & attribute,
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);

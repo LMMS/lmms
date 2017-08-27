@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,13 +32,8 @@
 #include "RemotePlugin.h"
 #include "Mixer.h"
 #include "Engine.h"
-#include "ConfigManager.h"
 
 #include <QDir>
-
-#ifdef LMMS_HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <QtCore/QUuid>
@@ -504,9 +499,3 @@ bool RemotePlugin::processMessage( const message & _m )
 
 	return true;
 }
-
-
-
-
-
-
