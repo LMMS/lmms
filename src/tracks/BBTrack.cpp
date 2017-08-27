@@ -240,7 +240,10 @@ void BBTCOView::paintEvent( QPaintEvent * )
 	
 	lingrad.setColorAt( 0, c.light( 130 ) );
 	lingrad.setColorAt( 1, c.light( 70 ) );
-	
+
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
