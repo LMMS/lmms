@@ -67,7 +67,7 @@ public:
 	void clearErrors();
 	void collectError( const QString error );
 	bool hasErrors();
-	QString* errorSummary();
+	QString errorSummary();
 
 	class PlayPos : public MidiTime
 	{
@@ -359,7 +359,7 @@ private:
 
 	bool m_loadingProject;
 
-	QList<QString> * m_errors;
+	QStringList m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];
