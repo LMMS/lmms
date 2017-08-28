@@ -86,7 +86,6 @@ Song::Song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
-	m_errors( new QList<QString>() ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_patternToPlay( NULL ),
@@ -1138,12 +1137,12 @@ void Song::loadProject( const QString & fileName )
 	{
 		if ( gui )
 		{
-			QMessageBox::warning( NULL, tr("LMMS Error report"), *errorSummary(),
+			QMessageBox::warning( NULL, tr("LMMS Error report"), errorSummary(),
 							QMessageBox::Ok );
 		}
 		else
 		{
-			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
+			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
 		}
 	}
 
@@ -1515,36 +1514,31 @@ void Song::removeController( Controller * controller )
 
 void Song::clearErrors()
 {
-	m_errors->clear();
+	m_errors.clear();
 }
 
 
 
 void Song::collectError( const QString error )
 {
-	m_errors->append( error );
+	m_errors.append( error );
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( m_errors->length() > 0 );
+	return ( m_errors.length() > 0 );
 }
 
 
 
-QString* Song::errorSummary()
+QString Song::errorSummary()
 {
-	QString* errors = new QString();
+	QString errors = m_errors.join("\n") + '\n';
 
-	for ( int i = 0 ; i < m_errors->length() ; i++ )
-	{
-		errors->append( m_errors->value( i ) + "\n" );
-	}
-
-	errors->prepend( "\n\n" );
-	errors->prepend( tr( "The following errors occured while loading: " ) );
+	errors.prepend( "\n\n" );
+	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
 }
