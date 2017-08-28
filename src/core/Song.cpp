@@ -1535,7 +1535,7 @@ bool Song::hasErrors()
 
 QString Song::errorSummary()
 {
-	QString errors = m_errors.join('\n') + '\n';
+	QString errors = m_errors.join("\n") + '\n';
 
 	errors.prepend( "\n\n" );
 	errors.prepend( tr( "The following errors occured while loading: " ) );
