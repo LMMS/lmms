@@ -1,6 +1,7 @@
 /*
  * BufferManager.cpp - A buffer caching/memory management system
  *
+ * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -25,43 +26,59 @@
 
 #include "BufferManager.h"
 
+#include "Engine.h"
+#include "Mixer.h"
 #include "MemoryManager.h"
 
-sampleFrame ** BufferManager::s_available;
-AtomicInt BufferManager::s_availableIndex = 0;
-sampleFrame ** BufferManager::s_released;
-AtomicInt BufferManager::s_releasedIndex = 0;
-//QReadWriteLock BufferManager::s_mutex;
-int BufferManager::s_size;
+#include <boost/lockfree/stack.hpp>
+
+
+namespace {
+using namespace boost::lockfree;
+
+static const int BM_INITIAL_BUFFERS = 1024;
+static const int BM_INCREMENT = 64;
+
+static stack<sampleFrame*
+	,allocator<MmAllocator<void>>
+> s_available;
+
+static fpp_t framesPerPeriod;
+
+void extend( size_t c )
+{
+	s_available.reserve(c);
+
+	size_t cc = c * framesPerPeriod;
+
+	sampleFrame * b = MM_ALLOC( sampleFrame, cc );
+
+	for( size_t i = 0; i < c; ++i )
+	{
+		s_available.push(b);
+		b += framesPerPeriod;
+	}
+}
+
+}
+
 
 
 void BufferManager::init( fpp_t framesPerPeriod )
 {
-	s_available = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
-	s_released = MM_ALLOC( sampleFrame*, BM_INITIAL_BUFFERS );
-
-	int c = framesPerPeriod * BM_INITIAL_BUFFERS;
-	sampleFrame * b = MM_ALLOC( sampleFrame, c );
-
-	for( int i = 0; i < BM_INITIAL_BUFFERS; ++i )
-	{
-		s_available[ i ] = b;
-		b += framesPerPeriod;
-	}
-	s_availableIndex = BM_INITIAL_BUFFERS - 1;
-	s_size = BM_INITIAL_BUFFERS;
+	::framesPerPeriod = framesPerPeriod;
+	extend(BM_INITIAL_BUFFERS);
 }
 
 
 sampleFrame * BufferManager::acquire()
 {
-	if( s_availableIndex < 0 )
+	sampleFrame* b;
+	while (! s_available.pop(b))
 	{
-		qFatal( "BufferManager: out of buffers" );
+		qWarning( "BufferManager: out of buffers" );
+		extend(BM_INCREMENT);
 	}
-
-	int i = s_availableIndex.fetchAndAddOrdered( -1 );
-	sampleFrame * b = s_available[ i ];
 
 	//qDebug( "acquired buffer: %p - index %d", b, i );
 	return b;
@@ -87,42 +104,7 @@ void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 void BufferManager::release( sampleFrame * buf )
 {
 	if (buf == nullptr) return;
-	int i = s_releasedIndex.fetchAndAddOrdered( 1 );
-	s_released[ i ] = buf;
+	s_available.push(buf);
 	//qDebug( "released buffer: %p - index %d", buf, i );
 }
 
-
-void BufferManager::refresh() // non-threadsafe, hence it's called periodically from mixer at a time when no other threads can interfere
-{
-	if( s_releasedIndex == 0 ) return;
-	//qDebug( "refresh: %d buffers", int( s_releasedIndex ) );
-
-	int j = s_availableIndex;
-	for( int i = 0; i < s_releasedIndex; ++i )
-	{
-		++j;
-		s_available[ j ] = s_released[ i ];
-	}
-	s_availableIndex = j;
-	s_releasedIndex = 0;
-}
-
-
-/* // non-extensible for now
-void BufferManager::extend( int c )
-{
-	s_size += c;
-	sampleFrame ** tmp = MM_ALLOC( sampleFrame*, s_size );
-	MM_FREE( s_available );
-	s_available = tmp;
-
-	int cc = c * Engine::mixer()->framesPerPeriod();
-	sampleFrame * b = MM_ALLOC( sampleFrame, cc );
-
-	for( int i = 0; i < c; ++i )
-	{
-		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = b;
-		b += Engine::mixer()->framesPerPeriod();
-	}
-}*/

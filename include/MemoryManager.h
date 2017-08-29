@@ -42,7 +42,7 @@ struct MemoryPool
 {
 	void * m_pool;
 	char * m_free;
-	int m_chunks;
+	size_t m_chunks;
 	QMutex m_mutex;
 
 	MemoryPool() :
@@ -51,10 +51,10 @@ struct MemoryPool
 		m_chunks( 0 )
 	{}
 
-	MemoryPool( int chunks ) :
+	MemoryPool( size_t chunks ) :
 		m_chunks( chunks )
 	{
-		m_free = (char*) MemoryHelper::alignedMalloc( chunks );
+		m_free = reinterpret_cast<char*>(MemoryHelper::alignedMalloc( chunks ));
 		memset( m_free, 1, chunks );
 	}
 
@@ -103,6 +103,23 @@ private:
 	static QMutex s_pointerMutex;
 };
 
+template<typename T>
+struct MmAllocator
+{
+	typedef T value_type;
+	template< class U > struct rebind { typedef MmAllocator<U> other; };
+
+	T* allocate(std::size_t n)
+	{
+		return reinterpret_cast<T*>( MemoryManager::alloc( n ) );
+	}
+
+	void deallocate(T* p, std::size_t)
+	{
+		MemoryManager::free( p );
+	}
+};
+
 
 #define MM_OPERATORS								\
 public: 											\
@@ -124,7 +141,7 @@ static void operator delete[] ( void * ptr )	\
 }
 
 // for use in cases where overriding new/delete isn't a possibility
-#define MM_ALLOC( type, count ) (type*) MemoryManager::alloc( sizeof( type ) * count )
+#define MM_ALLOC( type, count ) reinterpret_cast<type*>(MemoryManager::alloc( sizeof( type ) * count ))
 // and just for symmetry...
 #define MM_FREE( ptr ) MemoryManager::free( ptr )
 
