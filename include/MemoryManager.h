@@ -118,9 +118,10 @@ struct MmAllocator
 	{
 		MemoryManager::free( p );
 	}
+
+	typedef std::vector<T, MmAllocator<T> > vector;
 };
 
-template <typename T> using MmVector = std::vector<T, MmAllocator<T>>;
 
 #define MM_OPERATORS								\
 public: 											\
