@@ -30,67 +30,23 @@
 #include "Mixer.h"
 #include "MemoryManager.h"
 
-#include <boost/lockfree/stack.hpp>
-
-
-namespace {
-using namespace boost::lockfree;
-
-static const int BM_INITIAL_BUFFERS = 1024;
-static const int BM_INCREMENT = 64;
-
-static stack<sampleFrame*
-	,allocator<MmAllocator<void>>
-> s_available;
-
 static fpp_t framesPerPeriod;
-
-void extend( size_t c )
-{
-	s_available.reserve(c);
-
-	size_t cc = c * framesPerPeriod;
-
-	sampleFrame * b = MM_ALLOC( sampleFrame, cc );
-
-	for( size_t i = 0; i < c; ++i )
-	{
-		s_available.push(b);
-		b += framesPerPeriod;
-	}
-}
-
-}
-
-
 
 void BufferManager::init( fpp_t framesPerPeriod )
 {
 	::framesPerPeriod = framesPerPeriod;
-	extend(BM_INITIAL_BUFFERS);
 }
 
 
 sampleFrame * BufferManager::acquire()
 {
-	sampleFrame* b;
-	while (! s_available.pop(b))
-	{
-		qWarning( "BufferManager: out of buffers" );
-		extend(BM_INCREMENT);
-	}
-
-	//qDebug( "acquired buffer: %p - index %d", b, i );
-	return b;
+	return MM_ALLOC(sampleFrame, ::framesPerPeriod);
 }
 
-
-void BufferManager::clear( sampleFrame * ab, const f_cnt_t frames,
-							const f_cnt_t offset )
+void BufferManager::clear(sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset)
 {
 	memset( ab + offset, 0, sizeof( *ab ) * frames );
 }
-
 
 #ifndef LMMS_DISABLE_SURROUND
 void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
@@ -103,8 +59,6 @@ void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 
 void BufferManager::release( sampleFrame * buf )
 {
-	if (buf == nullptr) return;
-	s_available.push(buf);
-	//qDebug( "released buffer: %p - index %d", buf, i );
+	MM_FREE(buf);
 }
 

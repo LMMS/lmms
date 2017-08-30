@@ -111,7 +111,7 @@ struct MmAllocator
 
 	T* allocate(std::size_t n)
 	{
-		return reinterpret_cast<T*>( MemoryManager::alloc( n ) );
+		return reinterpret_cast<T*>( MemoryManager::alloc( sizeof(T) * n ) );
 	}
 
 	void deallocate(T* p, std::size_t)
@@ -120,6 +120,7 @@ struct MmAllocator
 	}
 };
 
+template <typename T> using MmVector = std::vector<T, MmAllocator<T>>;
 
 #define MM_OPERATORS								\
 public: 											\
