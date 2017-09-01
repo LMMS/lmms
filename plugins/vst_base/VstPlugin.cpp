@@ -36,6 +36,7 @@
 #include <QX11EmbedContainer>
 #include <QX11Info>
 #else
+#include "X11EmbedContainer.h"
 #include <QWindow>
 #endif
 #else
@@ -55,8 +56,7 @@
 #include "templates.h"
 #include "FileDialog.h"
 
-
-#if QT_VERSION < 0x050000
+#ifdef LMMS_EMBED_VST
 class vstSubWin : public QMdiSubWindow
 {
 public:
@@ -175,8 +175,6 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 }
 
 
-
-
 #ifdef LMMS_EMBED_VST
 void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 {
@@ -206,49 +204,47 @@ void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
 		return;
 	}
 
-#if QT_VERSION < 0x050000
-	m_pluginWidget = new QWidget( _parent );
-	m_pluginWidget->setFixedSize( m_pluginGeometry );
-	m_pluginWidget->setWindowTitle( name() );
-	if( _parent == NULL )
-	{
-		vstSubWin * sw = new vstSubWin(
-					gui->mainWindow()->workspace() );
-		if( isEffect )
-		{
-			sw->setAttribute( Qt::WA_TranslucentBackground );
-			sw->setWindowFlags( Qt::FramelessWindowHint );
-			sw->setWidget( m_pluginWidget );
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->show();
-		} 
-		else
-		{
-			sw->setWindowFlags( Qt::WindowCloseButtonHint );
-			sw->setWidget( m_pluginWidget );
+	vstSubWin * sw = new vstSubWin( gui->mainWindow()->workspace() );
+	//auto sw = new SubWindow();
 
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->move( 4, 24 );
-			xe->show();
-		}
-	}
+#ifdef LMMS_EMBED_VST_X11
+	QX11EmbedContainer * container = new QX11EmbedContainer( sw );
+	connect(container, SIGNAL(clientIsEmbedded()), this, SLOT(showUI()));
+	container->embedClient( m_pluginWindowID );
 #else
-	QWindow * window = QWindow::fromWinId( m_pluginWindowID );
-	m_pluginWidget = QWidget::createWindowContainer( window, _parent,
-								Qt::Window );
-	m_pluginWidget->setFixedSize( m_pluginGeometry );
-	m_pluginWidget->setWindowTitle( name() );
+	QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
+	QWidget* container = QWidget::createWindowContainer(vw, sw );
 	// TODO: Synchronize show
 	// Tell remote that it is embedded
 	// Wait for remote reply
 #endif
+
+	container->setFixedSize( m_pluginGeometry );
+	container->setWindowTitle( name() );
+
+	if( _parent == NULL )
+	{
+		m_pluginWidget = container;
+
+		sw->setWidget(container);
+
+		if( isEffect )
+		{
+			sw->setAttribute( Qt::WA_TranslucentBackground );
+			sw->setWindowFlags( Qt::FramelessWindowHint );
+		}
+		else
+		{
+			sw->setWindowFlags( Qt::WindowCloseButtonHint );
+		}
+	};
+
+#ifdef LMMS_EMBED_VST_X11
+#endif
+	container->setFixedSize( m_pluginGeometry );
 #endif
 
-	m_pluginWidget->show();
+	//m_pluginWidget->show();
 }
 
 
@@ -268,7 +264,7 @@ void VstPlugin::hideEditor()
 
 void VstPlugin::toggleEditor()
 {
-	QWidget * w = m_pluginWidget;
+	QWidget * w = pluginWidget();
 	if( w )
 	{
 		w->setVisible( !w->isVisible() );

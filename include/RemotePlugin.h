@@ -796,19 +796,6 @@ public:
 		unlock();
 	}
 
-	void showUI()
-	{
-		lock();
-		sendMessage( IdShowUI );
-		unlock();
-	}
-
-	void hideUI()
-	{
-		lock();
-		sendMessage( IdHideUI );
-		unlock();
-	}
 
 	void toggleUI()
 	{
@@ -841,6 +828,9 @@ public:
 		m_commMutex.unlock();
 	}
 
+public slots:
+	void showUI();
+	void hideUI();
 
 protected:
 	inline void setSplittedChannels( bool _on )
