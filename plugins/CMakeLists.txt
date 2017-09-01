@@ -35,6 +35,13 @@ IF(LMMS_MINIMAL)
 	SET(PLUGIN_LIST ${MINIMAL_LIST} ${PLUGIN_LIST})
 ENDIF()
 
+OPTION(LMMS_EMBED_VST "Turn on to embed VSTs as subwindows. Turn off to open VSTs in separate windows." ON)
+OPTION(LMMS_EMBED_VST_X11 "Turn on to embed VSTs using the X11Embed protocol. Turn off to use Qt's own embedding, which may be broken with your Qt version." ON)
+
+IF(NOT LMMS_EMBED_VST OR NOT LMMS_BUILD_LINUX)
+	SET(LMMS_EMBED_VST_X11 OFF)
+ENDIF()
+
 IF("${PLUGIN_LIST}" STREQUAL "")
 	SET(PLUGIN_LIST
 		${MINIMAL_LIST}
