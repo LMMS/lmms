@@ -454,6 +454,15 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
+
+#ifdef LMMS_EMBED_VST_X11
+		case IdShowUI:
+			ShowWindow( m_window, SW_SHOWNORMAL );
+			UpdateWindow( m_window );
+			break;
+#endif
+
+#ifndef LMMS_EMBED_VST
 		case IdShowUI:
 			initEditor();
 			break;
@@ -477,6 +486,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			sendMessage( message( IdIsUIVisible )
 						.addInt( m_window ? 1 : 0 ) );
 			break;
+#endif
 
 		case IdVstLoadPlugin:
 			init( _m.getString() );
@@ -667,7 +677,7 @@ void RemoteVstPlugin::initEditor()
 		wc.hInstance = hInst;
 		wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
 		wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-		wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
+		wc.hbrBackground = NULL;
 		wc.lpszMenuName = NULL;
 		wc.lpszClassName = "LVSL";
 
@@ -705,7 +715,10 @@ void RemoteVstPlugin::initEditor()
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
 
+#ifndef LMMS_EMBED_VST_X11
 	ShowWindow( m_window, SW_SHOWNORMAL );
+#endif
+
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
 #else

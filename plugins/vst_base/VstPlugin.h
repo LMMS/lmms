@@ -96,7 +96,7 @@ public:
 
 	inline QWidget * pluginWidget( bool _top_widget = true )
 	{
-#if QT_VERSION < 0x050000
+#ifdef LMMS_EMBED_VST
 		if( _top_widget && m_pluginWidget )
 		{
 			if( m_pluginWidget->parentWidget() )
