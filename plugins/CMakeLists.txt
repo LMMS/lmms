@@ -36,11 +36,20 @@ IF(LMMS_MINIMAL)
 ENDIF()
 
 OPTION(LMMS_EMBED_VST "Turn on to embed VSTs as subwindows. Turn off to open VSTs in separate windows." ON)
-OPTION(LMMS_EMBED_VST_X11 "Turn on to embed VSTs using the X11Embed protocol. Turn off to use Qt's own embedding, which may be broken with your Qt version." ON)
+
+IF(WANT_QT5)
+	OPTION(LMMS_EMBED_VST_X11 "Turn on to embed VSTs using the X11Embed protocol. Turn off to use Qt's own embedding, which may be broken with your Qt version." ON)
+ENDIF()
 
 IF(NOT LMMS_EMBED_VST OR NOT LMMS_BUILD_LINUX)
 	SET(LMMS_EMBED_VST_X11 OFF)
 ENDIF()
+
+# Qt4 has no QWindow::createWindowContainer, so we always use QX11EmbedContainer
+IF(LMMS_EMBED_VST AND NOT WANT_QT5)
+	SET(LMMS_EMBED_VST_X11 ON)
+ENDIF()
+
 
 IF("${PLUGIN_LIST}" STREQUAL "")
 	SET(PLUGIN_LIST
