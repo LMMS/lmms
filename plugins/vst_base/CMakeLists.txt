@@ -2,6 +2,16 @@ IF(LMMS_SUPPORT_VST)
 
 INCLUDE(BuildPlugin)
 
+IF(LMMS_EMBED_VST)
+    SET(EMBED_FLAGS "-DLMMS_EMBED_VST")
+    IF(LMMS_EMBED_VST_X11)
+        LIST(APPEND EMBED_FLAGS "-DLMMS_EMBED_VST_X11")
+    ENDIF()
+ENDIF()
+
+ADD_DEFINITIONS(${EMBED_FLAGS})
+
+
 IF(LMMS_BUILD_WIN32)
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
 	ADD_EXECUTABLE(RemoteVstPlugin "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp")
@@ -49,6 +59,7 @@ ENDIF(LMMS_HOST_X86_64)
 SET(WINE_CXX_FLAGS "" CACHE STRING "Extra flags passed to wineg++")
 
 STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKER_FLAGS} " " ${WINE_CXX_FLAGS})
+
 ADD_CUSTOM_COMMAND(
 	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
 	COMMAND ${WINE_CXX}
@@ -62,6 +73,7 @@ ADD_CUSTOM_COMMAND(
 		-std=c++0x
 		-mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
 		${WINE_BUILD_FLAGS}
+		${EMBED_FLAGS}
 		-o ../RemoteVstPlugin
 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
