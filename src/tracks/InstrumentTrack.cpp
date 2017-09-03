@@ -273,14 +273,13 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				// be deleted later automatically)
 				Engine::mixer()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
-
-				if (!(isSustainPedalPressed()) ||
-					!(m_notes[event.key()]->origin() ==
-					m_notes[event.key()]->OriginMidiInput))
+				if (isSustainPedalPressed() &&
+					m_notes[event.key()]->origin() ==
+					m_notes[event.key()]->OriginMidiInput)
 				{
-					m_notes[event.key()] = NULL;
+					m_sustainedNotes << m_notes[event.key()];
 				}
-
+				m_notes[event.key()] = NULL;
 				Engine::mixer()->doneChangeInModel();
 			}
 			eventHandled = true;
@@ -311,7 +310,7 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				}
 				else if (isSustainPedalPressed())
 				{
-					for (NotePlayHandle*& nph : m_notes)
+					for (NotePlayHandle* nph : m_sustainedNotes)
 					{
 						if (nph && nph->isReleased())
 						{
@@ -324,9 +323,9 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 									Engine::framesPerTick() ) ) );
 								midiNoteOff( *nph );
 							}
-							nph = NULL;
 						}
 					}
+					m_sustainedNotes.clear();
 					m_sustainPedalPressed = false;
 				}
 			}
