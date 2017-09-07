@@ -12,7 +12,7 @@ PPA_USER=tobydox
 PPA_PROJECT=mingw-x-trusty
 PPA_ROOT=$PPA_HOST/$PPA_USER/$PPA_PROJECT/ubuntu
 
-PPA_URL=$PPA_ROOT/dists/$PPA_DISTRO/main/binary-$PPA_ARCH/Packages
+PPA_URL=$PPA_ROOT/dists/$PPA_DISTRO/main/binary-$PPA_ARCH/Packages.gz
 
 ppa_dir=./ppa/
 
@@ -23,8 +23,11 @@ skip_files="binutils openssl flac libgig libogg libvorbis x-bootstrap zlib"
 skip_files="$skip_files x-runtime gcc qt_4 qt5 x-stk pkgconfig"
 skip_files="$skip_files glib2 libpng"
 
-echo "Connecting to $PPA_HOST to get list of packages..."
-wget -qO- $PPA_URL |grep "Filename:" > $temp_file
+echo "Connecting to $PPA_URL to get list of packages..."
+wget $PPA_URL -qO ${temp_file}.gz
+gzip -d ${temp_file}.gz
+cat $temp_file |grep "Filename:" > ${temp_file}_stripped
+mv ${temp_file}_stripped $temp_file
 
 for j in $skip_files ; do
 	grep -v "$j" $temp_file > $temp_temp_file
@@ -43,7 +46,7 @@ while read -r j
 do
 	echo "Downloading $j..."
 	echo "$PPA_ROOT/$j"
-	wget -O "$ppa_dir$(basename "$j")" "$(echo "$PPA_ROOT/$j" | sed 's/\/Filename: /\//gi')"
+	wget -qO "$ppa_dir$(basename "$j")" "$(echo "$PPA_ROOT/$j" | sed 's/\/Filename: /\//gi')"
 done < $temp_file
 
 
