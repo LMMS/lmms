@@ -211,8 +211,13 @@ IF(LMMS_BUILD_WIN32)
 				DESTINATION .)
 	IF(LMMS_BUILD_MSYS)
 		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libwinpthread-1.dll"
 					"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
 					"${MINGW_PREFIX}/bin/libstdc++-6.dll"
+				DESTINATION .)
+	ELSE()
+		INSTALL(FILES
+					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
 				DESTINATION .)
 	ENDIF()
 	IF(FLTK_FOUND)
