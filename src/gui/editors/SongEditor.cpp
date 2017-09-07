@@ -52,7 +52,6 @@
 #include "PianoRoll.h"
 
 
-
 positionLine::positionLine( QWidget * parent ) :
 	QWidget( parent )
 {
@@ -769,10 +768,14 @@ void SongEditorWindow::record()
 }
 
 
+
+
 void SongEditorWindow::recordAccompany()
 {
 	m_editor->m_song->playAndRecord();
 }
+
+
 
 
 void SongEditorWindow::stop()
@@ -781,6 +784,21 @@ void SongEditorWindow::stop()
 	gui->pianoRoll()->stopRecording();
 }
 
+
+
+
+void SongEditorWindow::lostFocus()
+{
+	if( m_crtlAction )
+	{
+		m_crtlAction->setChecked( true );
+		m_crtlAction->trigger();
+	}
+}
+
+
+
+
 void SongEditorWindow::adjustUiAfterProjectLoad()
 {
 	// make sure to bring us to front as the song editor is the central
@@ -788,6 +806,7 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	// it, it's very annyoing to manually bring up the song editor each time
 	gui->mainWindow()->workspace()->setActiveSubWindow(
 			qobject_cast<QMdiSubWindow *>( parentWidget() ) );
+	connect( qobject_cast<SubWindow *>( parentWidget() ), SIGNAL( focusLost() ), this, SLOT( lostFocus() ) );
 	m_editor->scrolled(0);
 }
 
