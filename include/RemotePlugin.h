@@ -424,6 +424,7 @@ enum RemoteMessageIDs
 	IdChangeSharedMemoryKey,
 	IdChangeInputCount,
 	IdChangeOutputCount,
+	IdChangeInputOutputCount,
 	IdShowUI,
 	IdHideUI,
 	IdSaveSettingsToString,
@@ -917,6 +918,15 @@ public:
 	{
 		m_outputCount = _i;
 		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
+	}
+
+	void setInputOutputCount( int i, int o )
+	{
+		m_inputCount = i;
+		m_outputCount = o;
+		sendMessage( message( IdChangeInputOutputCount )
+				.addInt( i )
+				.addInt( o ) );
 	}
 
 	virtual int inputCount() const
