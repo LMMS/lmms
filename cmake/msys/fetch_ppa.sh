@@ -24,10 +24,7 @@ skip_files="$skip_files x-runtime gcc qt_4 qt5 x-stk pkgconfig"
 skip_files="$skip_files glib2 libpng"
 
 echo "Connecting to $PPA_URL to get list of packages..."
-wget $PPA_URL -qO ${temp_file}.gz
-gzip -d ${temp_file}.gz
-cat $temp_file |grep "Filename:" > ${temp_file}_stripped
-mv ${temp_file}_stripped $temp_file
+wget -qO- $PPA_URL | gzip -d -c | grep "Filename:" > $temp_file
 
 for j in $skip_files ; do
 	grep -v "$j" $temp_file > $temp_temp_file
