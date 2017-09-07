@@ -481,6 +481,12 @@ bool RemotePlugin::processMessage( const message & _m )
 			resizeSharedProcessingMemory();
 			break;
 
+		case IdChangeInputOutputCount:
+			m_inputCount = _m.getInt( 0 );
+			m_outputCount = _m.getInt( 1 );
+			resizeSharedProcessingMemory();
+			break;
+
 		case IdDebugMessage:
 			fprintf( stderr, "RemotePlugin::DebugMessage: %s",
 						_m.getString( 0 ).c_str() );

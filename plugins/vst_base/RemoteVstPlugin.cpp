@@ -249,6 +249,26 @@ public:
 		pthread_mutex_unlock( &m_pluginLock );
 	}
 
+	inline void lockShm()
+	{
+		pthread_mutex_lock( &m_shmLock );
+	}
+
+	inline void unlockShm()
+	{
+		pthread_mutex_unlock( &m_shmLock );
+	}
+
+	inline bool isShmValid()
+	{
+		return m_shmValid;
+	}
+
+	inline void setShmIsValid( bool valid )
+	{
+		m_shmValid = valid;
+	}
+
 	inline bool isProcessing() const
 	{
 		return m_processing;
@@ -347,6 +367,9 @@ private:
 	float * * m_inputs;
 	float * * m_outputs;
 
+	pthread_mutex_t m_shmLock;
+	bool m_shmValid;
+
 	typedef std::vector<VstMidiEvent> VstMidiEventList;
 	VstMidiEventList m_midiEvents;
 
@@ -392,6 +415,8 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_shouldGiveIdle( false ),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
+	m_shmLock(),
+	m_shmValid( false ),
 	m_midiEvents(),
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
@@ -402,6 +427,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
+	pthread_mutex_init( &m_shmLock, NULL );
 
 	__plugin = this;
 
@@ -500,6 +526,7 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	delete[] m_inputs;
 	delete[] m_outputs;
 
+	pthread_mutex_destroy( &m_shmLock );
 	pthread_mutex_destroy( &m_pluginLock );
 }
 
@@ -836,6 +863,16 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 
 	// now we're ready to fetch sound from VST-plugin
 
+	lock();
+	lockShm();
+
+	if( !isShmValid() )
+	{
+		unlockShm();
+		unlock();
+		return;
+	}
+
 	for( int i = 0; i < inputCount(); ++i )
 	{
 		m_inputs[i] = &((float *) _in)[i * bufferSize()];
@@ -846,8 +883,6 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		m_outputs[i] = &((float *) _out)[i * bufferSize()];
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
-
-	lock();
 
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
@@ -864,6 +899,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 	}
 #endif
 
+	unlockShm();
 	unlock();
 
 	m_currentSamplePos += bufferSize();
@@ -1380,14 +1416,19 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 
 void RemoteVstPlugin::updateInOutCount()
 {
+	lockShm();
+
+	setShmIsValid( false );
+
+	unlockShm();
+
 	delete[] m_inputs;
 	delete[] m_outputs;
 
 	m_inputs = NULL;
 	m_outputs = NULL;
 
-	setInputCount( inputCount() );
-	setOutputCount( outputCount() );
+	setInputOutputCount( inputCount(), outputCount() );
 
 	char buf[64];
 	sprintf( buf, "inputs: %d  output: %d\n", inputCount(), outputCount() );
@@ -1841,6 +1882,11 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 		if( m.id == IdStartProcessing || m.id == IdMidiEvent )
 		{
 			_this->processMessage( m );
+		}
+		else if( m.id == IdChangeSharedMemoryKey )
+		{
+			_this->processMessage( m );
+			_this->setShmIsValid( true );
 		}
 		else
 		{
