@@ -170,7 +170,7 @@ void Song::setTimeSignature()
 	emit dataChanged();
 	m_oldTicksPerTact = ticksPerTact();
 
-	m_vstSyncController.setTimeSignature( 
+	m_vstSyncController.setTimeSignature(
 		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator() );
 }
 
@@ -247,7 +247,7 @@ void Song::processNextBuffer()
 
 	// check for looping-mode and act if necessary
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
-	bool checkLoop = 
+	bool checkLoop =
 		tl != NULL && m_exporting == false && tl->loopPointsEnabled();
 
 	if( checkLoop )
@@ -275,7 +275,7 @@ void Song::processNextBuffer()
 		// did we play a tick?
 		if( currentFrame >= framesPerTick )
 		{
-			int ticks = m_playPos[m_playMode].getTicks() + 
+			int ticks = m_playPos[m_playMode].getTicks() +
 				( int )( currentFrame / framesPerTick );
 
 			m_vstSyncController.setAbsolutePosition( ticks );
@@ -323,11 +323,11 @@ void Song::processNextBuffer()
 
 			if( checkLoop )
 			{
-				m_vstSyncController.startCycle( 
+				m_vstSyncController.startCycle(
 					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
 
 				// if looping-mode is enabled and we have got
-				// past the looping range, return to the 
+				// past the looping range, return to the
 				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
@@ -348,10 +348,10 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t framesToPlay = 
+		f_cnt_t framesToPlay =
 			Engine::mixer()->framesPerPeriod() - framesPlayed;
 
-		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick - 
+		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick -
 						( f_cnt_t )currentFrame;
 		// skip last frame fraction
 		if( framesLeft == 0 )
@@ -361,7 +361,7 @@ void Song::processNextBuffer()
 								+ 1.0f );
 			continue;
 		}
-		// do we have samples left in this tick but these are less 
+		// do we have samples left in this tick but these are less
 		// than samples we have to play?
 		if( framesLeft < framesToPlay )
 		{
@@ -602,7 +602,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 
 // send a signal if playposition changes during playback
-	if( isPlaying() ) 
+	if( isPlaying() )
 	{
 		emit playbackPositionChanged();
 		emit updateSampleTracks();
@@ -1108,7 +1108,7 @@ void Song::loadProject( const QString & fileName )
 	// BB-tracks
 	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
-	// Connect controller links to their controllers 
+	// Connect controller links to their controllers
 	// now that everything is loaded
 	ControllerConnection::finalizeConnections();
 
@@ -1363,8 +1363,8 @@ void Song::exportProject( bool multiExport )
 		{
 			int stx = efd.selectedNameFilter().indexOf( "(*." );
 			int etx = efd.selectedNameFilter().indexOf( ")" );
-	
-			if ( stx > 0 && etx > stx ) 
+
+			if ( stx > 0 && etx > stx )
 			{
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
@@ -1400,9 +1400,9 @@ void Song::exportProjectMidi()
 	}
 
 	FileDialog efd( gui->mainWindow() );
-	
+
 	efd.setFileMode( FileDialog::AnyFile );
-	
+
 	QStringList types;
 	types << tr("MIDI File (*.mid)");
 	efd.setNameFilters( types );
@@ -1430,9 +1430,9 @@ void Song::exportProjectMidi()
 
 		QString export_filename = efd.selectedFiles()[0];
 		if (!export_filename.endsWith(suffix)) export_filename += suffix;
-		
+
 		// NOTE start midi export
-		
+
 		// instantiate midi export plugin
 		TrackContainer::TrackList tracks;
 		tracks += Engine::getSong()->tracks();
@@ -1519,26 +1519,17 @@ void Song::collectError( const QString error )
 
 bool Song::hasErrors()
 {
-	return !m_errors.empty();
+	return ( m_errors.length() > 0 );
 }
 
 
 
 QString Song::errorSummary()
 {
-	QString errors;
-
-	for ( int i = 0 ; i < m_errors.length() ; i++ )
-	{
-		errors.append( m_errors.value( i ) + "\n" );
-	}
+	QString errors = m_errors.join("\n") + '\n';
 
 	errors.prepend( "\n\n" );
 	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
 }
-
-
-
-

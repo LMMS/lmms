@@ -25,6 +25,8 @@
 #ifndef PLUGINFACTORY_H
 #define PLUGINFACTORY_H
 
+#include <memory>
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 
@@ -39,14 +41,15 @@ public:
 	struct PluginInfo
 	{
 		PluginInfo() : library(nullptr), descriptor(nullptr) {}
+
 		const QString name() const;
 		QFileInfo file;
-		QLibrary* library;
+		std::shared_ptr<QLibrary> library;
 		Plugin::Descriptor* descriptor;
 
-		bool isNull() const {return library == 0;}
+		bool isNull() const {return ! library;}
 	};
-	typedef QList<PluginInfo*> PluginInfoList;
+	typedef QList<PluginInfo> PluginInfoList;
 	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
 
 	PluginFactory();
@@ -80,11 +83,11 @@ public slots:
 private:
 	DescriptorMap m_descriptors;
 	PluginInfoList m_pluginInfos;
-	QMap<QString, PluginInfo*> m_pluginByExt;
+	QMap<QString, PluginInfo> m_pluginByExt;
 
 	QHash<QString, QString> m_errors;
 
-	static PluginFactory* s_instance;
+	static std::unique_ptr<PluginFactory> s_instance;
 };
 
 #define pluginFactory PluginFactory::instance()
