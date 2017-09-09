@@ -1541,7 +1541,9 @@ void MainWindow::autoSave()
 					"enablerunningautosave" ).toInt() ||
 				! Engine::getSong()->isPlaying() ) )
 	{
-		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		AutoSaveThread * ast = new AutoSaveThread();
+		connect( ast, SIGNAL( finished() ), ast, SLOT( deleteLater() ) );
+		ast->start();
 		autoSaveTimerReset();  // Reset timer
 	}
 	else
@@ -1552,4 +1554,12 @@ void MainWindow::autoSave()
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
 	}
+}
+
+
+
+
+void AutoSaveThread::run()
+{
+	Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 }

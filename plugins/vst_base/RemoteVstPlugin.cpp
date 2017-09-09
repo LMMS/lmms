@@ -44,6 +44,10 @@
 
 #ifdef LMMS_BUILD_LINUX
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -67,6 +71,7 @@
 
 
 #include <vector>
+#include <queue>
 #include <string>
 
 
@@ -113,7 +118,7 @@ class RemoteVstPlugin;
 
 RemoteVstPlugin * __plugin = NULL;
 
-DWORD __GuiThreadID = 0;
+HWND __MessageHwnd = NULL;
 
 
 
@@ -244,8 +249,58 @@ public:
 		pthread_mutex_unlock( &m_pluginLock );
 	}
 
+	inline void lockShm()
+	{
+		pthread_mutex_lock( &m_shmLock );
+	}
+
+	inline void unlockShm()
+	{
+		pthread_mutex_unlock( &m_shmLock );
+	}
+
+	inline bool isShmValid()
+	{
+		return m_shmValid;
+	}
+
+	inline void setShmIsValid( bool valid )
+	{
+		m_shmValid = valid;
+	}
+
+	inline bool isProcessing() const
+	{
+		return m_processing;
+	}
+
+	inline void setProcessing( bool processing )
+	{
+		m_processing = processing;
+	}
+
+	inline void queueMessage( const message & m ) {
+		m_messageList.push( m );
+	}
+
+	inline bool shouldGiveIdle() const
+	{
+		return m_shouldGiveIdle;
+	}
+
+	inline void setShouldGiveIdle( bool shouldGiveIdle )
+	{
+		m_shouldGiveIdle = shouldGiveIdle;
+	}
+
+	void idle();
+	void processUIThreadMessages();
+
 	static DWORD WINAPI processingThread( LPVOID _param );
-	static DWORD WINAPI guiEventLoop( LPVOID _param );
+	static bool setupMessageWindow();
+	static DWORD WINAPI guiEventLoop();
+	static LRESULT CALLBACK messageWndProc( HWND hwnd, UINT uMsg,
+						WPARAM wParam, LPARAM lParam );
 
 
 private:
@@ -303,10 +358,17 @@ private:
 	bool m_initialized;
 
 	pthread_mutex_t m_pluginLock;
+	bool m_processing;
+
+	std::queue<message> m_messageList;
+	bool m_shouldGiveIdle;
 
 
 	float * * m_inputs;
 	float * * m_outputs;
+
+	pthread_mutex_t m_shmLock;
+	bool m_shmValid;
 
 	typedef std::vector<VstMidiEvent> VstMidiEventList;
 	VstMidiEventList m_midiEvents;
@@ -348,8 +410,13 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowHeight( 0 ),
 	m_initialized( false ),
 	m_pluginLock(),
+	m_processing( false ),
+	m_messageList(),
+	m_shouldGiveIdle( false ),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
+	m_shmLock(),
+	m_shmValid( false ),
 	m_midiEvents(),
 	m_bpm( 0 ),
 	m_currentSamplePos( 0 ),
@@ -360,6 +427,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
+	pthread_mutex_init( &m_shmLock, NULL );
 
 	__plugin = this;
 
@@ -458,6 +526,7 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	delete[] m_inputs;
 	delete[] m_outputs;
 
+	pthread_mutex_destroy( &m_shmLock );
 	pthread_mutex_destroy( &m_pluginLock );
 }
 
@@ -794,6 +863,16 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 
 	// now we're ready to fetch sound from VST-plugin
 
+	lock();
+	lockShm();
+
+	if( !isShmValid() )
+	{
+		unlockShm();
+		unlock();
+		return;
+	}
+
 	for( int i = 0; i < inputCount(); ++i )
 	{
 		m_inputs[i] = &((float *) _in)[i * bufferSize()];
@@ -804,8 +883,6 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 		m_outputs[i] = &((float *) _out)[i * bufferSize()];
 		memset( m_outputs[i], 0, bufferSize() * sizeof( float ) );
 	}
-
-	lock();
 
 #ifdef OLD_VST_SDK
 	if( m_plugin->flags & effFlagsCanReplacing )
@@ -822,6 +899,7 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 	}
 #endif
 
+	unlockShm();
 	unlock();
 
 	m_currentSamplePos += bufferSize();
@@ -1338,14 +1416,19 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 
 void RemoteVstPlugin::updateInOutCount()
 {
+	lockShm();
+
+	setShmIsValid( false );
+
+	unlockShm();
+
 	delete[] m_inputs;
 	delete[] m_outputs;
 
 	m_inputs = NULL;
 	m_outputs = NULL;
 
-	setInputCount( inputCount() );
-	setOutputCount( outputCount() );
+	setInputOutputCount( inputCount(), outputCount() );
 
 	char buf[64];
 	sprintf( buf, "inputs: %d  output: %d\n", inputCount(), outputCount() );
@@ -1418,8 +1501,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			SHOW_CALLBACK ("amc: audioMasterIdle\n" );
 			// call application idle routine (this will
 			// call effEditIdle for all open editors too)
-			PostThreadMessage( __GuiThreadID,
-						WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
 			return 0;
 
 		case audioMasterPinConnected:
@@ -1720,8 +1802,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 		case audioMasterUpdateDisplay:
 			SHOW_CALLBACK( "amc: audioMasterUpdateDisplay\n" );
 			// something has changed, update 'multi-fx' display
-			PostThreadMessage( __GuiThreadID,
-						WM_USER, GiveIdle, 0 );
+			PostMessage( __MessageHwnd, WM_USER, GiveIdle, 0 );
 			return 0;
 
 #if kVstVersion > 2
@@ -1754,6 +1835,43 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 
 
+void RemoteVstPlugin::idle()
+{
+	if( isProcessing() )
+	{
+		setShouldGiveIdle( true );
+		return;
+	}
+	setProcessing( true );
+	pluginDispatch( effEditIdle );
+	setShouldGiveIdle( false );
+	setProcessing( false );
+	// We might have received a message whilst idling
+	processUIThreadMessages();
+}
+
+
+
+
+void RemoteVstPlugin::processUIThreadMessages()
+{
+	setProcessing( true );
+	while( m_messageList.size() )
+	{
+		processMessage( m_messageList.front() );
+		m_messageList.pop();
+		if( shouldGiveIdle() )
+		{
+			pluginDispatch( effEditIdle );
+			setShouldGiveIdle( false );
+		}
+	}
+	setProcessing( false );
+}
+
+
+
+
 DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 {
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
@@ -1765,9 +1883,14 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 		{
 			_this->processMessage( m );
 		}
+		else if( m.id == IdChangeSharedMemoryKey )
+		{
+			_this->processMessage( m );
+			_this->setShmIsValid( true );
+		}
 		else
 		{
-			PostThreadMessage( __GuiThreadID,
+			PostMessage( __MessageHwnd,
 					WM_USER,
 					ProcessPluginMessage,
 					(LPARAM) new message( m ) );
@@ -1775,7 +1898,7 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 	}
 
 	// notify GUI thread about shutdown
-	PostThreadMessage( __GuiThreadID, WM_USER, ClosePlugin, 0 );
+	PostMessage( __MessageHwnd, WM_USER, ClosePlugin, 0 );
 
 	return 0;
 }
@@ -1783,64 +1906,83 @@ DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 
 
 
-DWORD WINAPI RemoteVstPlugin::guiEventLoop( LPVOID _param )
+bool RemoteVstPlugin::setupMessageWindow()
 {
-	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
-
 	HMODULE hInst = GetModuleHandle( NULL );
 	if( hInst == NULL )
 	{
-		_this->debugMessage( "guiEventLoop(): can't get "
+		__plugin->debugMessage( "setupMessageWindow(): can't get "
 							"module handle\n" );
-		return -1;
+		return false;
 	}
 
-	HWND timerWindow = CreateWindowEx( 0, "LVSL", "dummy",
+	__MessageHwnd = CreateWindowEx( 0, "LVSL", "dummy",
 						0, 0, 0, 0, 0, NULL, NULL,
 								hInst, NULL );
+	SetWindowLongPtr( __MessageHwnd, GWLP_WNDPROC,
+		reinterpret_cast<LONG_PTR>( RemoteVstPlugin::messageWndProc ) );
 	// install GUI update timer
-	SetTimer( timerWindow, 1000, 50, NULL );
+	SetTimer( __MessageHwnd, 1000, 50, NULL );
 
+	return true;
+}
+
+
+
+
+DWORD WINAPI RemoteVstPlugin::guiEventLoop()
+{
 	MSG msg;
-
-	bool quit = false;
-	while( quit == false && GetMessage( &msg, NULL, 0, 0 ) )
+	while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
 	{
 		TranslateMessage( &msg );
 		DispatchMessage( &msg );
-
-		if( msg.message == WM_TIMER && _this->isInitialized() )
-		{
-			// give plugin some idle-time for GUI-update
-			_this->pluginDispatch( effEditIdle );
-		}
-		else if( msg.message == WM_USER )
-		{
-			switch( msg.wParam )
-			{
-				case ProcessPluginMessage:
-				{
-					message * m = (message *) msg.lParam;
-					_this->processMessage( *m );
-					delete m;
-					break;
-				}
-
-				case GiveIdle:
-					_this->pluginDispatch( effEditIdle );
-					break;
-
-				case ClosePlugin:
-					quit = true;
-					break;
-
-				default:
-					break;
-			}
-		}
 	}
 
 	return 0;
+}
+
+
+
+
+LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
+						WPARAM wParam, LPARAM lParam )
+{
+	if( uMsg == WM_TIMER && __plugin->isInitialized() )
+	{
+		// give plugin some idle-time for GUI-update
+		__plugin->idle();
+		return 0;
+	}
+	else if( uMsg == WM_USER )
+	{
+		switch( wParam )
+		{
+			case ProcessPluginMessage:
+			{
+				message * m = (message *) lParam;
+				__plugin->queueMessage( *m );
+				delete m;
+				if( !__plugin->isProcessing() )
+				{
+					__plugin->processUIThreadMessages();
+				}
+				return 0;
+			}
+
+			case GiveIdle:
+				__plugin->idle();
+				return 0;
+
+			case ClosePlugin:
+				PostQuitMessage(0);
+				return 0;
+
+			default:
+				break;
+		}
+	}
+	return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
 
 
@@ -1893,7 +2035,10 @@ int main( int _argc, char * * _argv )
 
 	if( __plugin->isInitialized() )
 	{
-		__GuiThreadID = GetCurrentThreadId();
+		if( RemoteVstPlugin::setupMessageWindow() == false )
+		{
+			return -1;
+		}
 		if( CreateThread( NULL, 0, RemoteVstPlugin::processingThread,
 						__plugin, 0, NULL ) == NULL )
 		{
@@ -1901,7 +2046,7 @@ int main( int _argc, char * * _argv )
 							"processingThread\n" );
 			return -1;
 		}
-		RemoteVstPlugin::guiEventLoop( __plugin );
+		RemoteVstPlugin::guiEventLoop();
 	}
 
 
