@@ -521,10 +521,6 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>dvojklikem otevřít tento pattern v Editoru automatizace</translation>
-    </message>
-    <message>
         <source>Open in Automation editor</source>
         <translation>Otevřít v Editoru automatizace</translation>
     </message>
@@ -722,10 +718,6 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
         <translation>Zesílení vstupu:</translation>
     </message>
     <message>
-        <source>NOIS</source>
-        <translation>ŠUM</translation>
-    </message>
-    <message>
         <source>Input Noise:</source>
         <translation>Vstup šumu:</translation>
     </message>
@@ -742,20 +734,12 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
         <translation>Oříznutí výstupu:</translation>
     </message>
     <message>
-        <source>Rate</source>
-        <translation>Frekv</translation>
-    </message>
-    <message>
         <source>Rate Enabled</source>
         <translation>Frekvence zapnuta</translation>
     </message>
     <message>
         <source>Enable samplerate-crushing</source>
         <translation>Zapnout drtič vzorkovací frekvence</translation>
-    </message>
-    <message>
-        <source>Depth</source>
-        <translation>Hloubka</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
@@ -770,20 +754,28 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
         <translation>Vzorkovací frekvence:</translation>
     </message>
     <message>
-        <source>STD</source>
-        <translation>STD</translation>
-    </message>
-    <message>
         <source>Stereo difference:</source>
-        <translation>Stereo diference:</translation>
-    </message>
-    <message>
-        <source>Levels</source>
-        <translation>Úrovně</translation>
+        <translation>Stereo rozdíl:</translation>
     </message>
     <message>
         <source>Levels:</source>
         <translation>Úrovně:</translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation>ŠUM</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>FREKV</translation>
+    </message>
+    <message>
+        <source>STEREO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>QUANT</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1081,7 +1073,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>RESO</source>
-        <translation>REZO</translation>
+        <translation>REZON</translation>
     </message>
     <message>
         <source>Resonance</source>
@@ -1089,7 +1081,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>GAIN</source>
-        <translation>ZISK</translation>
+        <translation>ZESIL</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -1120,7 +1112,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Q/Resonance 1</source>
-        <translation>Q/Rezonance 1</translation>
+        <translation>Q/rezonance 1</translation>
     </message>
     <message>
         <source>Gain 1</source>
@@ -1144,7 +1136,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Q/Resonance 2</source>
-        <translation>Q/Rezonance 2</translation>
+        <translation>Q/rezonance 2</translation>
     </message>
     <message>
         <source>Gain 2</source>
@@ -1152,91 +1144,91 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>LowPass</source>
-        <translation>LowPass</translation>
+        <translation>Dolní propust</translation>
     </message>
     <message>
         <source>HiPass</source>
-        <translation>HiPass</translation>
+        <translation>Horní propust</translation>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation>BandPass csg</translation>
+        <translation>Pásmová propust csg</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation>BandPass czpg</translation>
+        <translation>Pásmová propust czpg</translation>
     </message>
     <message>
         <source>Notch</source>
-        <translation>Notch</translation>
+        <translation>Pásmová zádrž</translation>
     </message>
     <message>
         <source>Allpass</source>
-        <translation>Allpass</translation>
+        <translation>Všepásmový filtr</translation>
     </message>
     <message>
         <source>Moog</source>
-        <translation>Moog</translation>
+        <translation>Moogův filtr</translation>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation>2x LowPass</translation>
+        <translation>2x dolní propust</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation>RC LowPass 12dB</translation>
+        <translation>RC dolní propust 12dB</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation>RC BandPass 12dB</translation>
+        <translation>RC pásmová propust 12dB</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation>RC HighPass 12dB</translation>
+        <translation>RC horní propust 12dB</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation>RC LowPass 24dB</translation>
+        <translation>RC dolní propust 24dB</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation>RC BandPass 24dB</translation>
+        <translation>RC pásmová propust 24dB</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation>RC HighPass 24dB</translation>
+        <translation>RC horní propust 24dB</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation>Vocal Formant Filter</translation>
+        <translation>Vokální formantový filtr</translation>
     </message>
     <message>
         <source>2x Moog</source>
-        <translation>2x Moog</translation>
+        <translation>2x Moogův filtr</translation>
     </message>
     <message>
         <source>SV LowPass</source>
-        <translation>SV LowPass</translation>
+        <translation>SV dolní propust</translation>
     </message>
     <message>
         <source>SV BandPass</source>
-        <translation>SV BandPass</translation>
+        <translation>SV pásmová propust</translation>
     </message>
     <message>
         <source>SV HighPass</source>
-        <translation>SV HighPass</translation>
+        <translation>SV horní propust</translation>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation>SV Notch</translation>
+        <translation>SV pásmová zádrž</translation>
     </message>
     <message>
         <source>Fast Formant</source>
-        <translation>Fast Formant</translation>
+        <translation>Rychlý formantový filtr</translation>
     </message>
     <message>
         <source>Tripole</source>
-        <translation>Tripole</translation>
+        <translation>Třípólový filtr</translation>
     </message>
 </context>
 <context>
@@ -1270,7 +1262,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Wet/Dry mix</source>
-        <translation>Poměr (Wet/Dry)</translation>
+        <translation>Poměr zpracovaného/původního signálu</translation>
     </message>
     <message>
         <source>Gate</source>
@@ -1338,11 +1330,11 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>Wet Level:</source>
-        <translation>Poměr (Wet/Dry):</translation>
+        <translation>Úroveň zpracovaného signálu:</translation>
     </message>
     <message>
         <source>The Wet/Dry knob sets the ratio between the input signal and the effect signal that forms the output.</source>
-        <translation>Otočný ovladač Poměr (Wet/Dry) nastavuje poměr mezi vstupním signálem a signálem efektu, který formuje výstup.</translation>
+        <translation>Otočný ovladač Poměr nastavuje poměr mezi vstupním signálem a signálem efektu, který formuje výstup.</translation>
     </message>
     <message>
         <source>DECAY</source>
@@ -1390,7 +1382,7 @@ Right clicking will bring up a context menu where you can change the order in wh
 
 Přepínač Zapnuto/Vypnuto vám umožní v libovolném časovém okamžiku daný plugin odpojit.
 
-Otočný ovladač Poměr (Wet/Dry) řídí vyvážení vstupního a již zpracovaného signálu do výsledného výstupu efektu. Vstup je v této fázi shodný s výstupem předchozího efektu. Takže když je Poměr nastaven na nízkou hodnotu, obsahuje signál všechny předchozí efekty.
+Otočný ovladač Poměr řídí vyvážení mezi vstupním a již zpracovaným signálem ve výsledném výstupu efektu. Vstup je v této fázi shodný s výstupem předchozího efektu. Takže když je Poměr nastaven na nízkou hodnotu, obsahuje signál všechny předchozí efekty.
 
 Otočný ovladač Útlum určuje, jak dlouho bude zpracovávání signálu pokračovat po skončení noty. Efekt přestane zpracovávat signál, když hlasitost klesne pod hodnotu daného prahu v daném časovém úseku. Tento ovladač nastavuje právě &quot;daný časový úsek&quot;. Delší časy vyžadují více výkonu procesoru, takže pro většinu efektů by měla být nastavena nízká hodnota. Naopak je potřeba nastavit vyšší hodnotu pro efekty, které vytvářejí delší úseky ticha, jako je např. echo (delay).
 Otočný ovladač Brána určuje &quot;daný práh&quot; pro automatické ukončení efektu.
@@ -1485,7 +1477,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting predelay of the current envelope. The bigger this value the longer the time before start of actual envelope.</source>
-        <translation>Použijte tento otočný ovladač pro předzpoždění (predelay) stávající obálky. Zvýšení této hodnoty prodlouží čas před začátkem aktuální obálky.</translation>
+        <translation>Tento otočný ovladač nastavuje předzpoždění (predelay) aktuální obálky. Zvýšením hodnoty se  prodlouží čas před začátkem obálky.</translation>
     </message>
     <message>
         <source>ATT</source>
@@ -1497,7 +1489,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current envelope. The bigger this value the longer the envelope needs to increase to attack-level. Choose a small value for instruments like pianos and a big value for strings.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení náběhu (attack) u nynější obálky. Zvýšení této hodnoty způsobí prodloužení doby náběhu obálky. Zvolte nižší hodnotu pro nástroje typu piano a vyšší pro smyčce..</translation>
+        <translation>Tento otočný ovladač nastavuje náběh (attack) u aktuální obálky. Zvýšením hodnoty se prodlouží délka náběhu obálky. Zvolte nižší hodnotu pro nástroje typu piano a vyšší pro smyčce.</translation>
     </message>
     <message>
         <source>HOLD</source>
@@ -1509,7 +1501,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting hold-time of the current envelope. The bigger this value the longer the envelope holds attack-level before it begins to decrease to sustain-level.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení délky držení (hold) u nynější obálky. Zvýšení této hodnoty prodlouží část obálky, která zůstává na úrovni náběhu (attack) ještě před začátkem útlumu (decay) na úroveň vydržení (sustain).</translation>
+        <translation>Tento otočný ovladač nastavuje délku držení (hold) u aktuální obálky. Zvýšením hodnoty se prodlouží část obálky, která zůstává na úrovni náběhu (attack) ještě před začátkem útlumu (decay) na úroveň vydržení (sustain).</translation>
     </message>
     <message>
         <source>DEC</source>
@@ -1521,7 +1513,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting decay-time of the current envelope. The bigger this value the longer the envelope needs to decrease from attack-level to sustain-level. Choose a small value for instruments like pianos.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení délky útlumu (decay) u nynější obálky. Zvýšení této hodnoty prodlouží část obálky, potřebnou k zeslabení z úrovně náběhu (attack) na úroveň vydržení (sustain). Zvolte nižší hodnotu pro nástroje typu piano. </translation>
+        <translation>Tento otočný ovladač nastavuje délku útlumu (decay) u aktuální obálky. Zvýšením hodnoty se prodlouží část obálky, potřebná k zeslabení z úrovně náběhu (attack) na úroveň vydržení (sustain). Zvolte nižší hodnotu pro nástroje typu piano. </translation>
     </message>
     <message>
         <source>SUST</source>
@@ -1533,7 +1525,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting sustain-level of the current envelope. The bigger this value the higher the level on which the envelope stays before going down to zero.</source>
-        <translation>Použijte tento otočný ovladač nastavení vydržení (sustain) u nynější obálky. Zvýšení této hodnoty navýší úroveň, na které obálka zůstává před poklesem na nulu.</translation>
+        <translation>Tento otočný ovladač nastavuje vydržení (sustain) u aktuální obálky. Zvýšením hodnoty se navýší úroveň, na které obálka zůstává před poklesem na nulu.</translation>
     </message>
     <message>
         <source>REL</source>
@@ -1545,7 +1537,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting release-time of the current envelope. The bigger this value the longer the envelope needs to decrease from sustain-level to zero. Choose a big value for soft instruments like strings.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení délky uvolnění (release) u nynější obálky. Zvýšení této hodnoty prodlouží část obálky, potřebnou k zeslabení z úrovně vydržení (sustain) na nulovou úroveň. Zvolte vyšší hodnotu pro nástroje s měkkým zvukem, jako např. smyčce. </translation>
+        <translation>Tento otočný ovladač nastavuje délku uvolnění (release) u aktuální obálky. Zvýšením hodnoty se prodlouží část obálky, potřebná k zeslabení z úrovně vydržení (sustain) na nulovou úroveň. Zvolte vyšší hodnotu pro nástroje s měkkým zvukem, jako např. smyčce. </translation>
     </message>
     <message>
         <source>AMT</source>
@@ -1557,7 +1549,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current envelope. The bigger this value the more the according size (e.g. volume or cutoff-frequency) will be influenced by this envelope.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení hloubky modulace u nynější obálky. Zvýšení této hodnoty v závislosti na velikosti (např. hlasitosti nebo frekvence odstřihnutí) způsobí větší ovlivnění touto obálkou.</translation>
+        <translation>Tento otočný ovladač nastavuje hloubku modulace u aktuální obálky. Zvýšení této hodnoty v závislosti na velikosti (např. hlasitosti nebo frekvence odstřihnutí) způsobí větší ovlivnění touto obálkou.</translation>
     </message>
     <message>
         <source>LFO predelay:</source>
@@ -1565,7 +1557,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting predelay-time of the current LFO. The bigger this value the the time until the LFO starts to oscillate.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení délky předzpoždění (predelay) nynějšího LFO. Zvýšení této hodnoty prodlouží čas před tím, než začne LFO kmitat.</translation>
+        <translation>Tento otočný ovladač nastavuje délku předzpoždění (predelay) aktuálního LFO. Zvýšením hodnoty se prodlouží čas před spuštěním kmitání LFO.</translation>
     </message>
     <message>
         <source>LFO- attack:</source>
@@ -1573,7 +1565,7 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting attack-time of the current LFO. The bigger this value the longer the LFO needs to increase its amplitude to maximum.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení  délky náběhu (attack) u nynějšího LFO. Zvýšení této hodnoty prodlouží čas potřebný pro zvýšení amplitudy LFO na maximum.</translation>
+        <translation>Tento otočný ovladač nastavuje délku náběhu (attack) u aktuálního LFO. Zvýšením hodnoty se prodlouží čas potřebný pro zvýšení amplitudy LFO na maximum.</translation>
     </message>
     <message>
         <source>SPD</source>
@@ -1585,11 +1577,11 @@ Klepnutí pravým tlačítkem myši vyvolá kontextovou nabídku, kde můžete m
     </message>
     <message>
         <source>Use this knob for setting speed of the current LFO. The bigger this value the faster the LFO oscillates and the faster will be your effect.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení rychlosti u nynějšího LFO. Zvýšení této hodnoty způsobí rychlejší kmitání LFO a zrychlení vašeho efektu.</translation>
+        <translation>Tento otočný ovladač nastavuje rychlost u aktuálního LFO. Zvýšením hodnoty se zrychlí kmitání LFO a průběh vašeho efektu.</translation>
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení hloubky modulace u nynějšího LFO. Zvýšení této hodnoty v závislosti na velikosti (např. hlasitosti nebo frekvence odstřihnutí) způsobí větší ovlivnění tímto LFO.</translation>
+        <translation>Tento otočný ovladač nastavuje hloubku modulace u aktuálního LFO. Zvýšení hodnoty v závislosti na velikosti (např. hlasitosti nebo frekvence odstřihnutí) způsobí větší ovlivnění tímto LFO.</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
@@ -2081,6 +2073,81 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
         <source>Use variable bitrate</source>
         <translation>Použít proměnlivý datový tok</translation>
     </message>
+    <message>
+        <source>Stereo mode:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Joint Stereo</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Compression level:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(fastest)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(smallest)</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>Expressive</name>
+    <message>
+        <source>Selected graph</source>
+        <translation>Zvolený graf</translation>
+    </message>
+    <message>
+        <source>A1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>A2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>A3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W1 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W2 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W3 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>PAN1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>PAN2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>REL TRANS</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>Fader</name>
@@ -2094,6 +2161,14 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     <message>
         <source>Browser</source>
         <translation>Prohlížeč</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Refresh list</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2178,15 +2253,11 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <source>DELAY</source>
-        <translation>DELAY</translation>
+        <translation>ZPOŽ</translation>
     </message>
     <message>
         <source>RATE</source>
         <translation>POMĚR</translation>
-    </message>
-    <message>
-        <source>Rate:</source>
-        <translation>Poměr:</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -2198,7 +2269,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <source>FDBK</source>
-        <translation>ZP. VAZBA</translation>
+        <translation>ZP. VAZ</translation>
     </message>
     <message>
         <source>NOISE</source>
@@ -2207,6 +2278,10 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     <message>
         <source>Invert</source>
         <translation>Převrátit</translation>
+    </message>
+    <message>
+        <source>Period:</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2407,7 +2482,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Preparing piano roll</source>
-        <translation>Připravuji piano roll</translation>
+        <translation>Připravuji Piano roll</translation>
     </message>
     <message>
         <source>Preparing automation editor</source>
@@ -2529,7 +2604,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting the arpeggio time in milliseconds. The arpeggio time specifies how long each arpeggio-tone should be played.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení trvání arpeggia v milisekundách. Trvání arpeggia udává, jak dlouho bude každý tón arpeggia přehráván.</translation>
+        <translation>Tento otočný ovladač nastavuje trvání arpeggia v milisekundách. Trvání arpeggia udává, jak dlouho bude každý tón arpeggia přehráván.</translation>
     </message>
     <message>
         <source>GATE</source>
@@ -2545,7 +2620,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting the arpeggio gate. The arpeggio gate specifies the percent of a whole arpeggio-tone that should be played. With this you can make cool staccato arpeggios.</source>
-        <translation>Tento otočný ovladač použijte pro nastavení brány arpeggia. Brána arpeggia určuje procento délky jednotlivých arpeggiových tónů, které budou zahrány. Pomocí brány arpeggia můžete udělat skvělé staccatové arpeggio.</translation>
+        <translation>Tento otočný ovladač nastavuje bránu arpeggia. Brána arpeggia určuje procento délky jednotlivých arpeggiových tónů, které budou zahrány. Pomocí brány arpeggia můžete udělat skvělé staccatové arpeggio.</translation>
     </message>
     <message>
         <source>Chord:</source>
@@ -2604,7 +2679,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     <name>InstrumentFunctionNoteStacking</name>
     <message>
         <source>octave</source>
-        <translation>oktáva</translation>
+        <translation>Oktáva</translation>
     </message>
     <message>
         <source>Major</source>
@@ -2616,7 +2691,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>minor</source>
-        <translation>moll</translation>
+        <translation>Moll</translation>
     </message>
     <message>
         <source>minb5</source>
@@ -2880,7 +2955,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Whole tone</source>
-        <translation>Celotónová</translation>
+        <translation>Celotónová stupnice</translation>
     </message>
     <message>
         <source>Diminished</source>
@@ -2896,7 +2971,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Jap in sen</source>
-        <translation>Japonská (in sen)</translation>
+        <translation>Japonská (in sen) stupnice</translation>
     </message>
     <message>
         <source>Major bebop</source>
@@ -2908,7 +2983,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Blues</source>
-        <translation>Bluesová</translation>
+        <translation>Bluesová stupnice</translation>
     </message>
     <message>
         <source>Arabic</source>
@@ -2968,15 +3043,15 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Minor</source>
-        <translation>moll</translation>
+        <translation>Moll</translation>
     </message>
     <message>
         <source>Chromatic</source>
-        <translation>chromatická</translation>
+        <translation>Chromatická</translation>
     </message>
     <message>
         <source>Half-Whole Diminished</source>
-        <translation>zmenšená (půltón – celý tón)</translation>
+        <translation>Zmenšená (půltón–celý tón)</translation>
     </message>
     <message>
         <source>5</source>
@@ -2988,7 +3063,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Persian</source>
-        <translation>perská</translation>
+        <translation>Perská</translation>
     </message>
 </context>
 <context>
@@ -3007,7 +3082,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
-        <translation>Tento otočný ovladač použijte pro nastavení rozsahu akordů v oktávách. Vybraný akord bude zahrán ve zvoleném počtu oktáv.</translation>
+        <translation>Tento otočný ovladač nastavuje rozsah akordů v oktávách. Vybraný akord bude zahrán ve zvoleném počtu oktáv.</translation>
     </message>
     <message>
         <source>STACKING</source>
@@ -3112,95 +3187,95 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Q/Resonance</source>
-        <translation>Q/Rezonance</translation>
+        <translation>Q/rezonance</translation>
     </message>
     <message>
         <source>LowPass</source>
-        <translation>Low-pass</translation>
+        <translation>Dolní propust</translation>
     </message>
     <message>
         <source>HiPass</source>
-        <translation>HiPass</translation>
+        <translation>Horní propust</translation>
     </message>
     <message>
         <source>BandPass csg</source>
-        <translation>BandPass csg</translation>
+        <translation>Pásmová propust csg</translation>
     </message>
     <message>
         <source>BandPass czpg</source>
-        <translation>BandPass czpg</translation>
+        <translation>Pásmová propust czpg</translation>
     </message>
     <message>
         <source>Notch</source>
-        <translation>Notch</translation>
+        <translation>Pásmová zádrž</translation>
     </message>
     <message>
         <source>Allpass</source>
-        <translation>Allpass</translation>
+        <translation>Všepásmový filtr</translation>
     </message>
     <message>
         <source>Moog</source>
-        <translation>Moog</translation>
+        <translation>Moogův filtr</translation>
     </message>
     <message>
         <source>2x LowPass</source>
-        <translation>2x LowPass</translation>
+        <translation>2x dolní propust</translation>
     </message>
     <message>
         <source>RC LowPass 12dB</source>
-        <translation>RC LowPass 12dB</translation>
+        <translation>RC dolní propust 12dB</translation>
     </message>
     <message>
         <source>RC BandPass 12dB</source>
-        <translation>RC BandPass 12dB</translation>
+        <translation>RC pásmová propust 12dB</translation>
     </message>
     <message>
         <source>RC HighPass 12dB</source>
-        <translation>RC HighPass 12dB</translation>
+        <translation>RC horní propust 12dB</translation>
     </message>
     <message>
         <source>RC LowPass 24dB</source>
-        <translation>RC LowPass 24dB</translation>
+        <translation>RC dolní propust 24dB</translation>
     </message>
     <message>
         <source>RC BandPass 24dB</source>
-        <translation>RC BandPass 24dB</translation>
+        <translation>RC pásmová propust 24dB</translation>
     </message>
     <message>
         <source>RC HighPass 24dB</source>
-        <translation>RC HighPass 24dB</translation>
+        <translation>RC horní propust 24dB</translation>
     </message>
     <message>
         <source>Vocal Formant Filter</source>
-        <translation>Vocal Formant Filter</translation>
+        <translation>Vokální formantový filtr</translation>
     </message>
     <message>
         <source>2x Moog</source>
-        <translation>2x Moog</translation>
+        <translation>2x Moogův filtr</translation>
     </message>
     <message>
         <source>SV LowPass</source>
-        <translation>SV LowPass</translation>
+        <translation>SV dolní propust</translation>
     </message>
     <message>
         <source>SV BandPass</source>
-        <translation>SV BandPass</translation>
+        <translation>SV pásmová propust</translation>
     </message>
     <message>
         <source>SV HighPass</source>
-        <translation>SV HighPass</translation>
+        <translation>SV horní propust</translation>
     </message>
     <message>
         <source>SV Notch</source>
-        <translation>SV Notch</translation>
+        <translation>SV pásmová zádrž</translation>
     </message>
     <message>
         <source>Fast Formant</source>
-        <translation>Fast Formant</translation>
+        <translation>Rychlý formantový filtr</translation>
     </message>
     <message>
         <source>Tripole</source>
-        <translation>Tripole</translation>
+        <translation>Třípólový filtr</translation>
     </message>
 </context>
 <context>
@@ -3227,7 +3302,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting the cutoff frequency for the selected filter. The cutoff frequency specifies the frequency for cutting the signal by a filter. For example a lowpass-filter cuts all frequencies above the cutoff frequency. A highpass-filter cuts all frequencies below cutoff frequency, and so on...</source>
-        <translation>Použijte tento otočný ovladač pro nastavení frekvence odříznutí pro vybraný filtr. Frekvence odříznutí určuje frekvenci pro odříznutí signálu filtrem. Například filtr typu dolní propust (lowpass) odstřihne všechny frekvence, které jsou vyšší než frekvence odříznutí. Filtr typu horní propust (highpass) odstřihne všechny frekvence, které jsou nižší než frekvence odříznutí atd... </translation>
+        <translation>Tento otočný ovladač nastavuje frekvenci odříznutí pro vybraný filtr. Frekvence odříznutí určuje frekvenci pro odříznutí signálu filtrem. Například filtr typu dolní propust (low-pass) odstřihne všechny frekvence, které jsou vyšší než frekvence odříznutí. Filtr typu horní propust (high-pass) odstřihne všechny frekvence, které jsou nižší než frekvence odříznutí atd... </translation>
     </message>
     <message>
         <source>RESO</source>
@@ -3239,7 +3314,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting Q/Resonance for the selected filter. Q/Resonance tells the filter how much it should amplify frequencies near Cutoff-frequency.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení Q/Rezonance pro vybraný filtr. Q/Rezonance určuje, jak hodně filtr zesílí frekvence poblíž frekvence oříznutí.</translation>
+        <translation>Tento otočný ovladač nastavuje Q/rezonanci pro vybraný filtr. Q/rezonance určuje, jak hodně filtr zesílí frekvence poblíž frekvence oříznutí.</translation>
     </message>
     <message>
         <source>FREQ</source>
@@ -3391,20 +3466,8 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
         <translation>Efektový kanál</translation>
     </message>
     <message>
-        <source>ENV/LFO</source>
-        <translation>OBÁ/LFO</translation>
-    </message>
-    <message>
-        <source>FUNC</source>
-        <translation>FUNKCE</translation>
-    </message>
-    <message>
         <source>FX</source>
         <translation>EFEKT</translation>
-    </message>
-    <message>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -3413,10 +3476,6 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     <message>
         <source>XML preset file (*.xpf)</source>
         <translation>XML soubor předvoleb (*.xpf)</translation>
-    </message>
-    <message>
-        <source>PLUGIN</source>
-        <translation>PLUGIN</translation>
     </message>
     <message>
         <source>Pitch range (semitones)</source>
@@ -3435,16 +3494,36 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
         <translation>Klepněte sem, chcete-li uložit aktuální nastavení nástrojové stopy do souboru předvoleb. Později můžete nahrát tuto předvolbu dvojitým kliknutím na prohlížeč předvoleb.</translation>
     </message>
     <message>
-        <source>MISC</source>
-        <translation>JINÉ</translation>
-    </message>
-    <message>
         <source>Use these controls to view and edit the next/previous track in the song editor.</source>
         <translation>Použije tyto ovládací prvky pro zobrazení a editaci další/předchozí stopy v editoru skladby.</translation>
     </message>
     <message>
         <source>SAVE</source>
         <translation>ULOŽIT</translation>
+    </message>
+    <message>
+        <source>Envelope, filter &amp; LFO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Chord stacking &amp; arpeggio</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation>MIDI nastavení</translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Plugin</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3595,7 +3674,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting speed of the LFO. The bigger this value the faster the LFO oscillates and the faster the effect.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení rychlosti LFO. Zvýšení této hodnoty zrychlí kmitání LFO oscilátoru a zrychlí efekt.</translation>
+        <translation>Tento otočný ovladač nastavuje rychlost LFO. Zvýšením hodnoty se zrychlí kmitání LFO a průběh efektu.</translation>
     </message>
     <message>
         <source>Modulation amount:</source>
@@ -3603,7 +3682,7 @@ Efektové kanály můžete odstranit nebo přesunout v kontextové nabídce, kte
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
-        <translation>Použijte tento otočný ovladač pro nastavení množství modulace způsobené LFO. Čím větší bude tato hodnota, tím více budou propojené paametry (např. hlasitost nebo frekvence odříznutí) ovlivněny tímto LFO.</translation>
+        <translation>Tento otočný ovladač nastavuje množství modulace LFO. Čím vyšší bude tato hodnota, tím více budou propojené parametry (např. hlasitost nebo frekvence odříznutí) ovlivněny LFO.</translation>
     </message>
     <message>
         <source>PHS</source>
@@ -3653,7 +3732,7 @@ Poklepejte pro výběr souboru.</translation>
     </message>
     <message>
         <source>Click here for a moog saw-wave.</source>
-        <translation>Klepněte sem pro pilovitou vlnu typu moog.</translation>
+        <translation>Klepněte sem pro pilovitou vlnu typu Moog.</translation>
     </message>
     <message>
         <source>AMNT</source>
@@ -3936,14 +4015,6 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation>Obnovit soubor. Před dokončením prosím nespouštějte další instance LMMS.</translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation>Ignorovat</translation>
-    </message>
-    <message>
-        <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
-        <translation>Obvyklým způsobem spustit LMMS, ale vypnout automatické zálohování, aby se zabránilo přepsání souboru pro obnovu.</translation>
-    </message>
-    <message>
         <source>Discard</source>
         <translation>Zrušit</translation>
     </message>
@@ -4016,10 +4087,6 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
         <translation>Obnovit projekt. Uložte prosím svou práci!</translation>
     </message>
     <message>
-        <source>Automatic backup disabled. Remember to save your work!</source>
-        <translation>Automatické zálohování je vypnuto. Nezapomeňte si uložit svou práci!</translation>
-    </message>
-    <message>
         <source>Recovered project not saved</source>
         <translation>Obnovený projekt není uložen</translation>
     </message>
@@ -4049,7 +4116,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation>Povolit názvy tónů v piano rollu</translation>
+        <translation>Povolit názvy tónů v Piano rollu</translation>
     </message>
     <message>
         <source>Save project template</source>
@@ -4057,7 +4124,7 @@ Navštivte prosím stránku s dokumentací k LMMS na adrese http://lmms.sf.net/w
     </message>
     <message>
         <source>Volume as dBFS</source>
-        <translation>Hlasitost jako dBFS</translation>
+        <translation>Hlasitost v dBFS</translation>
     </message>
     <message>
         <source>Could not open file</source>
@@ -4597,7 +4664,7 @@ Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahují
     </message>
     <message>
         <source>Bandlimited Moog saw wave</source>
-        <translation>Pásmově zúžená pilovitá Moog vlna</translation>
+        <translation>Pásmově zúžená pilovitá vlna typu Moog</translation>
     </message>
     <message>
         <source>Soft square wave</source>
@@ -4633,7 +4700,7 @@ Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahují
     </message>
     <message>
         <source>Digital Moog saw wave</source>
-        <translation>Digitální pilovitá Moog vlna</translation>
+        <translation>Digitální pilovitá vlna typu Moog</translation>
     </message>
     <message>
         <source>Triangle wave</source>
@@ -4653,7 +4720,7 @@ Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahují
     </message>
     <message>
         <source>Moog saw wave</source>
-        <translation>Pilovitá Moog vlna</translation>
+        <translation>Pilovitá vlna typu Moog</translation>
     </message>
     <message>
         <source>Abs. sine wave</source>
@@ -5329,7 +5396,7 @@ PM znamená fázovou modulaci: fáze oscilátoru 3 je modulována oscilátorem 2
     <name>PatternView</name>
     <message>
         <source>Open in piano-roll</source>
-        <translation>Otevřít v piano rollu</translation>
+        <translation>Otevřít v Piano rollu</translation>
     </message>
     <message>
         <source>Clear all notes</source>
@@ -5350,14 +5417,6 @@ PM znamená fázovou modulaci: fáze oscilátoru 3 je modulována oscilátorem 2
     <message>
         <source>Remove steps</source>
         <translation>Odstranit kroky</translation>
-    </message>
-    <message>
-        <source>use mouse wheel to set velocity of a step</source>
-        <translation>použijte kolečko myši pro nastavení dynamiky kroku</translation>
-    </message>
-    <message>
-        <source>double-click to open in Piano Roll</source>
-        <translation>poklepáním otevřete v Piano rollu</translation>
     </message>
     <message>
         <source>Clone Steps</source>
@@ -5679,11 +5738,11 @@ PM znamená fázovou modulaci: fáze oscilátoru 3 je modulována oscilátorem 2
     </message>
     <message>
         <source>Piano-Roll - %1</source>
-        <translation>Piano roll - %1</translation>
+        <translation>Piano roll – %1</translation>
     </message>
     <message>
         <source>Piano-Roll - no pattern</source>
-        <translation>Piano roll - žádný pattern</translation>
+        <translation>Piano roll – žádný pattern</translation>
     </message>
     <message>
         <source>Quantize</source>
@@ -5746,14 +5805,6 @@ Důvod: &quot;%2&quot;</translation>
 </context>
 <context>
     <name>ProjectNotes</name>
-    <message>
-        <source>Project notes</source>
-        <translation>Poznámky k projektu</translation>
-    </message>
-    <message>
-        <source>Put down your project notes here.</source>
-        <translation>Do tohoto okna můžete vkládat Vaše poznámky k projektu.</translation>
-    </message>
     <message>
         <source>Edit Actions</source>
         <translation>Provedené úpravy</translation>
@@ -5862,6 +5913,14 @@ Důvod: &quot;%2&quot;</translation>
         <source>&amp;Color...</source>
         <translation>&amp;Barva...</translation>
     </message>
+    <message>
+        <source>Project Notes</source>
+        <translation>Poznámky k projektu</translation>
+    </message>
+    <message>
+        <source>Enter project notes here</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>ProjectRenderer</name>
@@ -5872,6 +5931,14 @@ Důvod: &quot;%2&quot;</translation>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation>Komprimovaný OGG soubor (*.ogg)</translation>
+    </message>
+    <message>
+        <source>FLAC-File (*.flac)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Compressed MP3-File (*.mp3)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5906,7 +5973,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>In Place Broken: </source>
-        <translation>Zlomené v místě:</translation>
+        <translation>Na místě poškozeného:</translation>
     </message>
     <message>
         <source>Channels In: </source>
@@ -6162,7 +6229,7 @@ Důvod: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
-        <translation>Povolit názvy tónů v piano rollu</translation>
+        <translation>Povolit názvy tónů v Piano rollu</translation>
     </message>
     <message>
         <source>Enable waveform display by default</source>
@@ -6344,7 +6411,7 @@ Zpoždění %2 ms</translation>
     </message>
     <message>
         <source>Display volume as dBFS </source>
-        <translation>Zobrazit hlasitost jako dBFS</translation>
+        <translation>Zobrazit hlasitost v dBFS</translation>
     </message>
     <message>
         <source>Enable auto-save</source>
@@ -6846,6 +6913,10 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
         <source>Importing MIDI-file...</source>
         <translation>Importuji MIDI soubor...</translation>
     </message>
+    <message>
+        <source>Loading Track %1 (%2/Total %3)</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>TrackContentObject</name>
@@ -7080,7 +7151,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Use a moog-like saw-wave for current oscillator.</source>
-        <translation>Použít pilovitou vlnu typu moog pro tento oscilátor.</translation>
+        <translation>Použít pilovitou vlnu typu Moog pro tento oscilátor.</translation>
     </message>
     <message>
         <source>Use an exponential wave for current oscillator.</source>
@@ -7198,7 +7269,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source> - VST plugin control</source>
-        <translation>- ovládání VST pluginu</translation>
+        <translation>– ovládání VST pluginu</translation>
     </message>
 </context>
 <context>
@@ -7648,7 +7719,7 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     </message>
     <message>
         <source>Resonance Bandwidth</source>
-        <translation>Pásmo rezonance</translation>
+        <translation>Šířka pásma rezonance</translation>
     </message>
     <message>
         <source>Forward MIDI Control Change Events</source>
@@ -7971,6 +8042,133 @@ Přesvědčte se prosím, že máte právo ke čtení tohoto souboru a příslu�
     <message>
         <source>Stereo mode</source>
         <translation>Režim sterea</translation>
+    </message>
+</context>
+<context>
+    <name>expressiveView</name>
+    <message>
+        <source>Select oscillator W1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select oscillator W2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select oscillator W3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select OUTPUT 1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select OUTPUT 2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Open help window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinusová vlna</translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
+        <translation>Klepněte sem pro sinusovou vlnu.</translation>
+    </message>
+    <message>
+        <source>Moog-Saw wave</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Click for a Moog-Saw-wave.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>Exponenciální vlna</translation>
+    </message>
+    <message>
+        <source>Click for an exponential wave.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Pilovitá vlna</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation>Klepněte sem pro pilovitou vlnu.</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Vlna definovaná uživatelem</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation>Klepněte sem pro uživatelem definovaný tvar.</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Trojúhelníková vlna</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation>Klepněte sem pro trojúhelníkovou vlnu.</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Pravoúhlá vlna</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation>Klepněte sem pro pravoúhlou vlnu.</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Bílý šum</translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation>Klepněte sem pro bílý šum.</translation>
+    </message>
+    <message>
+        <source>WaveInterpolate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>ExpressionValid</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 1:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 2:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 3:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>O1 panning:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>O2 panning:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Release transition:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Smoothness</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -8330,11 +8528,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Moog wave</source>
-        <translation>Moog vlna</translation>
+        <translation>Vlna typu Moog</translation>
     </message>
     <message>
         <source>Click here for a moog-like wave.</source>
-        <translation>Klepněte sem pro vlnu typu moog.</translation>
+        <translation>Klepněte sem pro vlnu typu Moog.</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8382,11 +8580,11 @@ Dvojitým kliknutím na kterýkoli z modulů se zobrazí informace o portech.</t
     </message>
     <message>
         <source>Bandlimited moog saw wave</source>
-        <translation>Pásmově zúžená pilovitá moog vlna</translation>
+        <translation>Pásmově zúžená pilovitá vlna typu Moog</translation>
     </message>
     <message>
         <source>Click here for bandlimited moog saw wave.</source>
-        <translation>Klepněte sem pro pásmově zúženou pilovitou moog vlnu.</translation>
+        <translation>Klepněte sem pro úzkopásmovou pilovitou vlnu typu Moog.</translation>
     </message>
 </context>
 <context>
@@ -9374,6 +9572,10 @@ Tento čip byl používán v počítačích Commodore 64.</translation>
         <source>Reverb algorithm by Sean Costello</source>
         <translation>Algoritmus dozvuku od Seana Costello</translation>
     </message>
+    <message>
+        <source>Mathematical expression parser</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>sf2Instrument</name>
@@ -9619,7 +9821,7 @@ Tento čip byl používán v počítačích Commodore 64.</translation>
     </message>
     <message>
         <source>The Pulse Width resolution allows the width to be smoothly swept with no discernable stepping. The Pulse waveform on Oscillator %1 must be selected to have any audible effect.</source>
-        <translation>Rozlišení šířky pulsu umožňuje plynulé vyhlazení šířky, aby nebylo rozeznatelné krokování. Pulzní vlna na oscilátoru %1 musí být zvolena tak, aby měla nějaký slyšitelný efekt.</translation>
+        <translation>Rozlišení šířky pulsu umožňuje plynulé vyhlazení šířky, aby nebylo rozeznatelné krokování. Pulzní vlna na oscilátoru %1 musí být zvolena tak, aby měla slyšitelný efekt.</translation>
     </message>
     <message>
         <source>Coarse:</source>
