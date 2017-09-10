@@ -1,0 +1,1015 @@
+/*****************************
+ * modified LMMS style sheet *
+ *****************************/
+
+QLabel {
+	color: #d1d8e4;
+        font-size: 13px;
+}
+
+QGroupBox {
+	color: #d1d8e4;
+        font-size: 13px;
+	font-weight: bold;
+	background-color: rgba(0,0,0,192); /*none; #262b3080;*/
+	/*border-radius: 0px;*/
+	border: 1px solid #d1d8e4;/*rgba(0,0,0,96);#262b30;*/
+	margin:  20px 0px 0px 0px;
+	padding: 10px 10px 10px 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    margin: 0px;
+    padding: 0px 1px;
+    background-color: rgba(0,0,0,192);
+    border-left: 1px solid #d1d8e4;
+    border-right: 1px solid #d1d8e4;
+    border-top: 1px solid #d1d8e4;
+    border-bottom: 1px solid #000000;
+
+}
+
+QTreeWidget, QListWidget {
+	color: #d1d8e4;
+        font-size: 13px;
+}
+
+QMdiArea {
+    background-color: #262b30;/*#111217;*/
+}
+
+AutomationEditor {
+	color: #ffffff;
+	background-color: #141616;
+	qproperty-backgroundShade: rgba(255, 255, 255, 15);
+	qproperty-vertexColor: #6749C2;
+	qproperty-crossColor: rgba(215, 210, 254, 150);
+	/* Grid colors */
+	qproperty-lineColor: #292929;
+	qproperty-beatLineColor: #4a3bba;
+	qproperty-barLineColor: #8173fe;
+
+	qproperty-graphColor: rgba(69,42,153,180);
+	qproperty-scaleColor: #262b30;
+}
+
+/* text box */
+
+QLineEdit {
+	border-radius: 4px;
+	border: 1px;
+	background: #101213;
+	color: #d1d8e4;
+}
+
+QLineEdit:read-only {
+	border-style: none;
+	background: transparent;
+}
+
+/* text box when it wants text */
+
+QLineEdit:focus {
+	border: 1px solid #0bd556;
+}
+
+
+QToolTip {
+	border-radius: 4px;
+	background: #FFFFCF;
+	color: #101213;
+        font-size: 13px;
+}
+
+TextFloat {
+	background: #040506;
+	color: #d1d8e4;
+}
+
+QMenuBar {
+	color: #d1d8e4;
+        font-size: 15px;
+	border: 0px none;
+}
+
+QMenu {
+	border-top: 2px solid #08993E;
+	background-color: #15191c;
+	color: #d1d8e4;
+	font-size: 15px;
+}
+
+QMenu::separator {
+	height: 1.0px;
+	background: #323940;
+	margin-left: 0x;
+	margin-right: 0px;
+}
+
+QMenu::item {
+	color: #d1d8e4;
+	padding: 2px 35px 2px 23px;
+	margin: 3px 0px 3px 0px;
+}
+
+QMenu::item:selected {
+	color: #d1d8e4;
+	font-weight: normal;
+	background-color: #21272b;
+}
+
+QMenu::item:disabled {
+	color: #515459;
+	background-color: #262b30;
+	font-size: 12px;
+	font-weight: normal;
+	padding: 4px 32px 4px 20px;
+}
+
+QMenu::icon {
+	margin: 3px;
+}
+
+QMenu::indicator {
+	width: 16;
+	height: 16;
+	opacity: 0;
+	border: 1px solid #101213;
+	border-radius: 2px;
+	background-color: #101213;
+}
+
+QMenu::indicator:checked {
+	image: url(resources:apply.png);
+}
+
+QMenu::indicator:selected {
+	image: url(resources:apply-selected.png);
+	border: 1px solid #101213;
+	background-color: #101213;
+}
+
+PianoRoll {
+	background-color: #141616;
+	qproperty-backgroundShade: rgba(255, 255, 255, 10);
+	qproperty-noteModeColor: #0bd556;
+	qproperty-noteColor: #0bd556;
+	qproperty-noteOpacity: 165;
+	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
+	qproperty-selectedNoteColor: #006b65;
+	qproperty-barColor: #078f3a;
+	qproperty-markedSemitoneColor: #06170E;
+	/* Grid colors */
+	qproperty-lineColor: #292929;
+	qproperty-beatLineColor: #2d6b45;
+	qproperty-barLineColor: #42a065;
+
+	/* Text on the white piano keys */
+	qproperty-textColor: #000;
+	qproperty-textColorLight: #0bd556;
+	qproperty-textShadow: #fff;
+}
+
+TabWidget {
+	background-color: #3f4750;/*#262b30;*/
+	qproperty-tabText: rgba(255, 255, 255, 180);
+	qproperty-tabTitleText: #fff;
+	qproperty-tabSelected: #323940;
+	qproperty-tabBackground: #181b1f;
+	qproperty-tabBorder: #181b1f;
+}
+
+GroupBox {
+    background-color: #3f4750;/*#262b30;*/
+    /*border: 0px solid #3f4750;*/
+}
+
+/* main toolbar oscilloscope - can have transparent bg now */
+
+VisualizationWidget  {
+	background: none;
+	border: none;
+}
+
+/* main toolbar cpu load widget - this can have transparent bg now */
+
+CPULoadWidget {
+	border: none;
+	background: url(resources:cpuload_bg.png);
+}
+
+/* scrollbar: trough */
+
+/*
+QScrollBar:horizontal {
+	border: 0px solid #262b30;
+	background-color: #3f4750;
+	height: 16px;
+	margin: 0px 16px;
+}
+QScrollBar:vertical {
+	border: 0px solid #262b30;
+	background-color: #3f4750;
+	width: 16px;
+	margin: 16px 0px;
+}
+*/
+
+/* scrollbar: trough clicky things */
+
+/*
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal,
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+	background: none;
+}
+
+QScrollBar::add-page:horizontal:pressed, QScrollBar::sub-page:horizontal:pressed,
+QScrollBar::add-page:vertical:pressed, QScrollBar::sub-page:vertical:pressed {
+	background: rgba(0,0,0,50);
+}
+*/
+
+/* scrollbar: handles (sliders) */
+
+/*
+QScrollBar::handle:horizontal {
+        background-color: #525e69;
+	border: 1px solid #3f4750;
+	border-radius: 1px;
+	min-width: 24px;
+}
+
+QScrollBar::handle:horizontal:hover {
+	background-color: #0072ff;
+}
+
+QScrollBar::handle:horizontal:pressed {
+        background-color: #003980;
+}
+
+QScrollBar::handle:vertical {
+	background-color: #003980;
+	border: 1px solid #3f4750;
+	border-radius: 0px;
+	min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+	background-color: #0072ff;
+}
+
+QScrollBar::handle:vertical:pressed {
+	background-color: #0072ff;
+}
+
+QScrollBar::handle:horizontal:disabled, QScrollBar::handle:vertical:disabled  {
+	background: #262b30;
+	border-radius: 1px;
+	border: none;
+}
+*/
+
+/* arrow buttons */
+
+/*
+QScrollBar::add-line, QScrollBar::sub-line {
+	background: #262b30;
+	border-radius: 0px;
+	border: none;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:horizontal 	{  	subcontrol-position: right; width: 16px;}
+QScrollBar::sub-line:horizontal 	{ 	subcontrol-position: left; width: 16px;}
+QScrollBar::add-line:vertical 		{ 	subcontrol-position: bottom; height: 16px;}
+QScrollBar::sub-line:vertical 		{ 	subcontrol-position: top; height: 16px;}
+
+QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
+	background: #262b30;
+}
+
+QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
+	background: #262b30;
+}
+
+QScrollBar::add-line:disabled, QScrollBar::sub-line:disabled {
+	background: #262b30;
+}
+*/
+
+/* arrow button arrows */
+
+/*
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal,
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+	border: none;
+	background-color: none;
+	width: 5px;
+	height: 5px;
+}
+
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+	margin-top: 3px;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+	margin-left: 3px;
+}
+*/
+
+/*
+QScrollBar::left-arrow:horizontal { background-image: url(resources:sbarrow_left.png);}
+QScrollBar::right-arrow:horizontal { background-image: url(resources:sbarrow_right.png);}
+QScrollBar::up-arrow:vertical { background-image: url(resources:sbarrow_up.png);}
+QScrollBar::down-arrow:vertical { background-image: url(resources:sbarrow_down.png);}
+QScrollBar::left-arrow:horizontal:disabled { background-image: url(resources:sbarrow_left_d.png);}
+QScrollBar::right-arrow:horizontal:disabled { background-image: url(resources:sbarrow_right_d.png);}
+QScrollBar::up-arrow:vertical:disabled { background-image: url(resources:sbarrow_up_d.png);}
+QScrollBar::down-arrow:vertical:disabled { background-image: url(resources:sbarrow_down_d.png);}
+*/
+
+/* background for song editor and bb-editor */
+
+TrackContainerView QFrame {
+	background-color: #3f4750;/*#262b30;*/
+}
+
+/* background for track controls */
+TrackView > QWidget {
+    background-color: #3B424A;
+}
+
+/* autoscroll, loop, stop behaviour toggle buttons */
+
+/* track background colors */
+TrackContentWidget {
+	qproperty-darkerColor: #14171A;
+	qproperty-lighterColor: #2D3238;
+	qproperty-gridColor: #202428;
+	qproperty-embossColor:  #101214;
+}
+
+
+/* gear button in tracks */
+
+TrackOperationsWidget > QPushButton {
+	max-height: 26px;
+	max-width: 26px;
+	min-height: 26px;
+	min-width: 26px;
+	background: none;
+	border: none;
+}
+
+TrackOperationsWidget > QPushButton::menu-indicator {
+	image: url(resources:trackop.png);
+	subcontrol-origin: padding;
+	subcontrol-position: center;
+	position: relative;
+	top: 2px;
+}
+
+TrackOperationsWidget > QPushButton::menu-indicator:hover {
+	image: url(resources:trackop_h.png);
+}
+
+
+TrackOperationsWidget > QPushButton::menu-indicator:pressed,
+TrackOperationsWidget > QPushButton::menu-indicator:checked
+ {
+	image: url(resources:trackop_c.png);
+	position: relative;
+	top: 3px;
+}
+
+/* font sizes */
+
+nameLabel, effectLabel, sf2InstrumentView > QLabel {
+	font-size:15px;
+}
+
+/* main toolbar sliders (master vol, master pitch) */
+
+AutomatableSlider::groove:vertical {
+	background: #040506;
+	border: none;
+	border-radius: 2px;
+	width: 2px;
+	margin: 2px 2px;
+}
+
+AutomatableSlider::handle:vertical {
+	background: none;
+	border-image: url(resources:main_slider.png);
+	width: 26px;
+	height: 10px;
+	border-radius: 2px;
+	margin: -4px -12px -2px;
+}
+
+/* window that shows up when you add effects */
+
+EffectSelectDialog QScrollArea {
+	/*background-color: #3f4750;*/
+}
+
+/* the inner boxes in LADSPA effect windows */
+
+EffectControlDialog QGroupBox {
+	/*background-color: #3f4750;*/
+	/*margin-top: 1ex;*/
+	/*padding: 10px 2px 1px;*/
+	/*border-radius: 0px;*/
+	/*border: none;*/
+}
+
+/* the inner box titles when present (channel 1, channel 2...) */
+
+/*
+EffectControlDialog QGroupBox::title {
+	subcontrol-origin: margin;
+	subcontrol-position: top center;
+	background: #262b30;
+	color: #d1d8e4;
+	border-radius: 0px;
+	border: none;
+	padding: 2px 1px;
+}
+*/
+
+/* main toolbar */
+
+QWidget#mainToolbar {
+        background-color: #3f4750;
+        /*background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #3f4750, stop:1 #373e45);*/
+	border: 0px none;
+	padding: 1px;/*2px*/
+	spacing: 0;
+}
+
+/* smaller toolbars */
+
+QToolBar {
+        background-color: #3f4750;
+        /*background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #3f4750, stop:1 #373e45);*/
+	/*background-color: #434b57;*/
+	border: 0px none;
+	padding: 1px;/*2px*/
+	spacing: 0;
+}
+
+QToolBar::separator {
+	border: 0px none;
+	width: 5px;
+}
+
+/* all tool buttons */
+
+QToolButton {
+	color: #FFFFFF;
+	font-size:16px;
+	font-weight: bold;
+	margin: 0px;
+	padding: 2px 2px 2px 2px;
+	border-top: 1px solid #778394;
+	border-left: 1px solid #778394;
+	border-bottom: 1px solid #1e2226;
+	border-right: 1px solid #1e2226;
+	border-radius: 4px;
+	/*background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0.5, y2:0.5, stop:0 #636c7a, stop:1 #4a515c);*/
+	background-color: #636c7a;
+	/*background-image: url(resources:qtoolbutton_shadow.png);*/
+	min-width: 25px;
+	min-height: 25px;
+}
+
+QToolButton:hover {
+	border-top: 1px solid #909eb3;
+	border-left: 1px solid #909eb3;
+	border-bottom: 1px solid #1e2226;
+	border-right: 1px solid #1e2226;
+	border-radius: 4px;
+        background-color: #8490a3;
+}
+
+QToolButton:pressed {
+	border-top: 1px solid #1b1f22;
+	border-left: 1px solid #1b1f22;
+	border-bottom: 1px solid #4a515e;
+	border-right: 1px solid #4a515e;
+	border-radius: 4px;
+	background-color: #424852;
+}
+
+QToolButton:checked {
+	border-top: 1px solid #1b1f22;
+	border-left: 1px solid #1b1f22;
+	border-bottom: 1px solid #4a515e;
+	border-right: 1px solid #4a515e;
+	border-radius: 4px;
+	background-color: #420000;
+}
+
+QToolButton:checked:hover {
+	border-top: 1px solid #1b1f22;
+	border-left: 1px solid #1b1f22;
+	border-bottom: 1px solid #4a515e;
+	border-right: 1px solid #4a515e;
+	border-radius: 4px;
+	background-color: #5A0000;
+}
+
+QToolButton:checked:pressed {
+	border: 1px solid #000000;
+	border-radius: 4px;
+	background-color: #390000;
+}
+
+TrackLabelButton {
+	background-color: #3B424A;
+	border: 1px solid #3B424A;
+	font-size: 15px;
+	font-weight: normal;
+	padding: 2px 1px;
+}
+/*
+TrackLabelButton:hover {
+	border: 1px solid #820000;
+}
+
+TrackLabelButton:pressed {
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #6060F0, stop:1 #343840);
+}
+
+TrackLabelButton:checked {
+	border: 1px solid #485059;
+	background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #551f22, stop:1 #13161a);
+	background-image: url(resources:../default/track_shadow_p.png);
+}
+
+TrackLabelButton:checked:pressed {
+	border: 1px solid #2f353b;
+	background-color: #0e1012;
+	background-image: url(resources:../default/track_shadow_p.png);
+	font-weight: solid;
+}
+*/
+
+SideBar {
+	subcontrol-position: left;/*center;*/
+	/*background: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:0.5, stop:0 #262b30, stop:1 #373e45);*/
+	background-color: #262b30;
+	min-width: 34px;
+	border: 0px none;
+	padding: 0px;
+	margin: 0px;
+}
+
+SideBar QToolButton {
+	font-size: 12px;
+	margin: 0px;
+	margin-top: -2px;
+	padding: 2px;
+	border: 1px solid #262b30;
+	border-radius: 0px;
+	background-color: #262b30;
+	/*background-color: #636c7a;*/
+	/*background-image: url(resources:qtoolbutton_shadow.png);*/
+}
+
+SideBar QToolButton:hover {
+	font-size: 12px;
+	margin: 0px;
+	margin-top: -2px;
+	padding: 2px;
+	border-top: 1px solid #424852;
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #FF0000;
+	border-right: 1px solid #424852;
+	border-radius: 0px;
+        background-color: #424852;
+	/*background-image: none;*/
+	/*background-image: url(resources:qtoolbutton_shadow.png);*/
+}
+
+SideBar QToolButton:pressed {
+	font-size: 12px;
+	margin: 0px;
+	margin-top: -2px;
+	padding: 2px;
+	border-top: 1px solid #424852; /*left*/
+	border-left: 1px solid #424852; /*bottom*/
+	border-bottom: 1px solid #880000; /*right*/
+	border-right: 1px solid #000000; /*top*/
+	border-radius: 0px;
+	/*background-image: none;*/
+	background-color: #424852;
+}
+
+SideBar QToolButton:checked {
+	font-size: 12px;
+	margin: 0px;
+	margin-top: -2px;
+	padding: 2px;
+	border-top: 1px solid #424852;
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #880000;
+	border-right: 1px solid #424852;
+	border-radius: 0px;
+	background-image: none;
+	background-color: #424852;
+}
+
+SideBar QToolButton:checked:hover {
+	font-size: 12px;
+	margin: 0px;
+	margin-top: -2px;
+	padding: 2px;
+	border-top: 1px solid #424852;
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #FF0000;
+	border-right: 1px solid #424852;
+	border-radius: 0px;
+        background-image: none;
+	/*background-color: #0e1012;*/
+	background-color: #424852;
+}
+
+SideBar QToolButton:checked:pressed {
+	font-size: 12px;
+	margin: 0px;
+	margin-top: -2px;
+	padding: 2px;
+	border-top: 1px solid #424852;
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #FF0000;
+	border-right: 1px solid #424852;
+	border-radius: 0px;
+        background-image: none;
+	/*background-color: #0e1012;*/
+	background-color: #424852;
+}
+
+/* Instrument plugin list */
+
+PluginDescList {
+	background-color: #131517;
+}
+
+PluginDescWidget {
+	border-top: 1px solid #3E474F;
+	border-bottom: 1px solid #101314;
+	border-radius: 2px;
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2E343B, stop:1 #1E2326);
+	color: #d1d8e4;
+	/*font-weight: bold;*/
+	margin: 0px;
+}
+
+PluginDescWidget:hover {
+	background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #2E343B, stop:1 #1E2326);
+	color: #d1d8e4;
+}
+
+/* piano widget */
+
+PianoView {
+	background-color: #14171a;
+}
+
+/* font sizes for text buttons */
+
+FxMixerView QPushButton, EffectRackView QPushButton, ControllerRackView QPushButton {
+	font-size: 13px;
+}
+
+FxLine {
+        background-color: #14161A; /*#3f4750;*/
+	color: #d1d8e4;
+	qproperty-backgroundActive: #420000;
+	qproperty-strokeOuterActive: #000000; /*4a515e;*/
+	qproperty-strokeOuterInactive: #000000; /*4a515e;*/
+	qproperty-strokeInnerActive: #840000;/*262B30; /*#0C0D0F;*/
+	qproperty-strokeInnerInactive: #262B30; /*#0C0D0F;*/
+}
+
+/* persistent peak markers for fx peak meters */
+Fader {
+	qproperty-peakGreen: #0ad45c;
+	qproperty-peakYellow: #d6ec52;
+	qproperty-peakRed: #c12038;
+}
+
+TimeLineWidget {
+        background-color: #3f4750;  /*#101213;*/
+        font-size: 13px;
+	min-height: 21px;
+	max-height: 21px;
+	qproperty-loopRectangleVerticalPadding: 1;
+	qproperty-barLineColor: rgb( 192, 192, 192 );
+	qproperty-barNumberColor: rgb( 192, 192, 192 );
+}
+
+QTreeView {
+	alternate-background-color: #111314;
+}
+
+TrackContainerView QLabel
+{
+	background: none;
+}
+
+/* Patterns */
+
+/* common pattern colors */
+TrackContentObjectView   {
+	qproperty-mutedColor: rgb(255,255,255,100);
+	qproperty-mutedBackgroundColor: #373d48;
+	qproperty-selectedColor: #006B65;
+	qproperty-BBPatternBackground: #373d48;
+	qproperty-textColor: #fff;
+	qproperty-textBackgroundColor: rgba(0, 0, 0, 75);
+	qproperty-textShadowColor: rgb(0,0,0,200);
+	qproperty-gradient: false; /* boolean property, set true to have a gradient */
+
+	font-size: 11px;
+}
+
+/* instrument pattern */
+PatternView {
+	background-color: #21A14F;
+	color: rgba(255,255,255,220);
+}
+
+/* sample track pattern */
+SampleTCOView {
+	background-color: #DE7C05;
+	color: #FFE8CD;
+}
+
+/* automation pattern */
+AutomationPatternView {
+	background-color: #663DE1;
+	color: rgba(255,255,255,90);
+}
+
+/* bb-pattern */
+BBTCOView {
+	background-color: #20BDB2; /* default colour for bb-tracks */
+}
+
+/* Subwindows in MDI-Area */
+
+SubWindow {
+/*
+	color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 #090909, stop:0.05 #3D454F, stop:1 #262B30);
+	qproperty-activeColor: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1 stop:0 #090909, stop:0.05 #636c7a, stop:1 #343840);
+*/
+        color: #003980;
+        qproperty-activeColor: #0072ff;
+	qproperty-textShadowColor: #000000;
+	qproperty-borderColor: #003980;/*#5c6b7a;*/
+	border: 1px none;/*1px solid #003980;*/
+	padding: 3px;
+	background-color: #3f4750;/*#262b30;*/
+	border-radius: 0px;
+}
+
+SubWindow > QLabel {
+	color: #d1d8e4;
+	font-size: 15px;
+	font-style: normal;
+	border-radius: 0px;
+}
+
+SubWindow > QPushButton {
+	background-color: rgba( 255, 255, 255, 0% );
+	border-width: 0px;
+	border-color: none;
+	border-style: none;
+	border-radius: 0px;
+}
+
+SubWindow > QPushButton:hover{
+	background-color: rgba( 255, 255, 255, 15% );
+	border-width: 1px;
+	border-color: rgba( 0, 0, 0, 20% );
+	border-style: solid;
+	border-radius: 0px;
+}
+
+/* Plugins */
+
+TripleOscillatorView Knob {
+	color: rgb(255,255,255);
+	qproperty-outerColor: rgb(255,255,255);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 13.0;
+	qproperty-centerPointY: 14.0;
+	qproperty-lineWidth: 2;
+}
+
+
+kickerInstrumentView Knob#smallKnob {
+	color: #595959;
+	qproperty-outerColor: black;
+	qproperty-innerRadius: 3;
+	qproperty-outerRadius: 11.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+
+kickerInstrumentView Knob#largeKnob {
+	color: #0c3b89;
+	qproperty-outerColor: #519fff;
+	qproperty-innerRadius: 12.0;
+	qproperty-outerRadius: 14.5;
+	qproperty-centerPointX: 17.0;
+	qproperty-centerPointY: 17.0;
+	qproperty-lineWidth: 3;
+}
+
+
+AudioFileProcessorView Knob {
+	color: rgb(240, 147, 14);
+	qproperty-outerColor: rgb(30, 35, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 11.2;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 16.5;
+	qproperty-lineWidth: 3;
+}
+
+organicInstrumentView Knob {
+	color: rgb(124, 207, 98);
+	qproperty-outerColor: rgb(13, 42, 4);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 7.5;
+	qproperty-centerPointX: 10.5;
+	qproperty-centerPointY: 10.5;
+	qproperty-lineWidth: 1.5;
+}
+
+organicInstrumentView Knob#harmKnob {
+	color: rgb(205, 98, 216);
+	qproperty-outerColor: rgb(18, 4, 18);
+}
+
+organicInstrumentView Knob#fx1Knob,
+organicInstrumentView Knob#volKnob {
+	color: rgb(157, 157, 157);
+	qproperty-outerColor: rgb(37, 37, 37);
+	qproperty-innerRadius: 4;
+	qproperty-outerRadius: 10.0;
+	qproperty-centerPointX: 18.5;
+	qproperty-centerPointY: 13.8;
+	qproperty-lineWidth: 2;
+}
+
+sf2InstrumentView Knob {
+	color: #ff00ea;
+	qproperty-outerColor: rgb(20, 5, 18);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 9.2;
+	qproperty-centerPointX: 15.5;
+	qproperty-centerPointY: 15.42;
+	qproperty-lineWidth: 2;
+}
+
+sfxrInstrumentView Knob {
+	color: #000;
+	qproperty-outerColor: rgb(194, 177, 145);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 9;
+	qproperty-lineWidth: 2;
+}
+
+sfxrInstrumentView Knob#envKnob {
+	color:	#263352;
+	qproperty-outerColor: #4b66a4;
+}
+
+sfxrInstrumentView Knob#freqKnob {
+	color:	#1e4a22;
+	qproperty-outerColor: #3c9544;
+}
+
+sfxrInstrumentView Knob#changeKnob {
+	color:	#591c1c;
+	qproperty-outerColor: #b23737;
+}
+
+sfxrInstrumentView Knob#sqrKnob {
+	color:	#3b2714;
+	qproperty-outerColor: #724c27;
+}
+
+sfxrInstrumentView Knob#repeatKnob {
+	color:	#292929;
+	qproperty-outerColor: #515151;
+}
+
+sfxrInstrumentView Knob#phaserKnob {
+	color:	#144c4d;
+	qproperty-outerColor: #299899;
+}
+
+sfxrInstrumentView Knob#filterKnob {
+	color:	#47224c;
+	qproperty-outerColor: #8e4397;
+}
+
+opl2instrumentView Knob {
+	color: rgb(128,128,128);
+	qproperty-outerColor: rgb(255,255,255);
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 9;
+	qproperty-lineWidth: 2;
+}
+
+sidInstrumentView Knob {
+	color: rgb(113,95,80);
+	qproperty-outerColor: rgb( 255,255,255 );
+	qproperty-innerRadius: 2;
+	qproperty-outerRadius: 7;
+	qproperty-lineWidth: 2;
+}
+
+WatsynView Knob {
+	qproperty-innerRadius: 1;
+	qproperty-outerRadius: 7;
+	qproperty-centerPointX: 9.5;
+	qproperty-centerPointY: 9.5;
+	qproperty-lineWidth: 2;
+}
+
+WatsynView Knob#aKnob {
+	color: #43b2ff;
+	qproperty-outerColor: #43b2ff;
+}
+
+WatsynView Knob#bKnob {
+	color: #fc5431;
+	qproperty-outerColor: #fc5431;
+}
+
+WatsynView Knob#mixKnob {
+	color: #43ff82;
+	qproperty-outerColor: #43ff82;
+	qproperty-outerRadius: 13;
+	qproperty-centerPointX: 15.5;
+	qproperty-centerPointY: 15.5;
+}
+
+WatsynView Knob#mixenvKnob {
+	color: #43ff82;
+	qproperty-outerColor: #43ff82;
+}
+
+WatsynView Knob#xtalkKnob {
+	color: #fb50fb;
+	qproperty-outerColor: #fb50fb;
+}
+
+MonstroView Knob {
+	color: #ffffff;
+	qproperty-outerColor: #aaaaaa;
+	qproperty-outerRadius: 9;
+	qproperty-innerRadius: 6;
+	qproperty-centerPointX: 10;
+	qproperty-centerPointY: 10;
+	qproperty-lineWidth: 2.5;
+}
+
+NesInstrumentView Knob {
+	color: #e7231b;
+	qproperty-outerColor: #fff;
+	qproperty-outerRadius: 11.0;
+	qproperty-innerRadius: 8.0;
+	qproperty-centerPointX: 14.5;
+	qproperty-centerPointY: 14.5;
+	qproperty-lineWidth: 2;
+}
+
+/* palette information  */
+
+LmmsPalette {
+        qproperty-background: #3f4750;/*262b30;*/
+	qproperty-windowText: #1de276;
+	qproperty-base: #101213;
+	qproperty-text: #d1d8e4;
+	qproperty-button: #3f4750;
+	qproperty-shadow: rgb(0,0,0);
+	qproperty-buttonText: #d1d8e4;
+	qproperty-brightText: #d1d8e4;
+	qproperty-highlight: #262b30;
+	qproperty-highlightedText: #d1d8e4;
+	/* the next two are used for whatsthis dialogs */
+	qproperty-toolTipText: #d1d8e4;
+	qproperty-toolTipBase: #101213;
+}
