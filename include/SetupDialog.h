@@ -56,7 +56,7 @@ public:
 		AudioSettings,
 		MidiSettings,
 		PathsSettings
-	} ;
+	};
 
 	SetupDialog(ConfigTabs tab_to_open = GeneralSettings);
 	virtual ~SetupDialog();
@@ -193,5 +193,5 @@ private:
 	QLineEdit * m_sf2FileLineEdit;
 #endif
 	QLineEdit * m_backgroundPicFile;
-} ;
+};
 #endif
