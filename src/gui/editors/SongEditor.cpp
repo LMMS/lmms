@@ -651,7 +651,8 @@ ComboBoxModel *SongEditor::zoomingModel() const
 
 SongEditorWindow::SongEditorWindow(Song* song) :
 	Editor(Engine::mixer()->audioDev()->supportsCapture()),
-	m_editor(new SongEditor(song))
+	m_editor(new SongEditor(song)),
+	m_crtlAction( NULL )
 {
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
