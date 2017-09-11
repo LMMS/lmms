@@ -47,7 +47,8 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	"MIDI Export",
 	QT_TRANSLATE_NOOP( "pluginBrowser",
 				"Filter for exporting MIDI-files from LMMS" ),
-	"Mohamed Abdel Maksoud <mohamed at amaksoud.com>",
+	"Mohamed Abdel Maksoud <mohamed at amaksoud.com> and "
+	"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
 	Plugin::ExportFilter,
 	NULL,
@@ -142,7 +143,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 				}
 
 			}
-			ProcessBBNotes(pat);
+			ProcessBBNotes(pat, INT_MAX);
 			writePatternToTrack(mtrack, pat);
 			size = mtrack.writeToBuffer(buffer);
 			midiout.writeRawData((char *)buffer, size);
@@ -246,7 +247,7 @@ bool MidiExport::tryExport(const TrackContainer::TrackList &tracks,
 					st.pop_back();
 				}
 
-				ProcessBBNotes(nv);
+				ProcessBBNotes(nv, pos);
 				writePatternToTrack(mtrack, nv);
 				++itr;
 			}
@@ -315,7 +316,7 @@ void MidiExport::writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
 
 
 
-void MidiExport::ProcessBBNotes(MidiNoteVector &nv)
+void MidiExport::ProcessBBNotes(MidiNoteVector &nv, int cutPos)
 {
 	std::sort(nv.begin(), nv.end());
 	int cur = INT_MAX, next = INT_MAX;
@@ -328,7 +329,7 @@ void MidiExport::ProcessBBNotes(MidiNoteVector &nv)
 		}
 		if (it->duration < 0)
 		{
-			it->duration = qMin(-it->duration, next - cur);
+			it->duration = qMin(qMin(-it->duration, next - cur), cutPos - it->time);
 		}
 	}
 }

@@ -75,7 +75,7 @@ private:
 	void writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv);
 	void writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
 				int len, int base, int start, int end);
-	void ProcessBBNotes(MidiNoteVector &nv);
+	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
 
 	void error();
 
