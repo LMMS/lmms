@@ -771,11 +771,11 @@ Si vous êtes intéressé par la traduction de LMMS dans une nouvelle langue ou 
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>STÉRÉO</translation>
     </message>
     <message>
         <source>QUANT</source>
-        <translation type="unfinished"/>
+        <translation>quant</translation>
     </message>
 </context>
 <context>
@@ -2074,35 +2074,35 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <source>Stereo mode:</source>
-        <translation type="unfinished"/>
+        <translation>Mode stéréo : </translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Stéréo</translation>
     </message>
     <message>
         <source>Joint Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Stéréo conjointe</translation>
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"/>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Compression level:</source>
-        <translation type="unfinished"/>
+        <translation>Niveau de compression : </translation>
     </message>
     <message>
         <source>(fastest)</source>
-        <translation type="unfinished"/>
+        <translation>(le plus rapide)</translation>
     </message>
     <message>
         <source>(default)</source>
-        <translation type="unfinished"/>
+        <translation>(par défaut)</translation>
     </message>
     <message>
         <source>(smallest)</source>
-        <translation type="unfinished"/>
+        <translation>(le plus petit)</translation>
     </message>
 </context>
 <context>
@@ -2113,39 +2113,39 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <source>A1</source>
-        <translation type="unfinished"/>
+        <translation>A1</translation>
     </message>
     <message>
         <source>A2</source>
-        <translation type="unfinished"/>
+        <translation>A2</translation>
     </message>
     <message>
         <source>A3</source>
-        <translation type="unfinished"/>
+        <translation>A3</translation>
     </message>
     <message>
         <source>W1 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>Adoucissement W1</translation>
     </message>
     <message>
         <source>W2 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>Adoucissement W2</translation>
     </message>
     <message>
         <source>W3 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>Adoucissement W3</translation>
     </message>
     <message>
         <source>PAN1</source>
-        <translation type="unfinished"/>
+        <translation>PAN1</translation>
     </message>
     <message>
         <source>PAN2</source>
-        <translation type="unfinished"/>
+        <translation>PAN2</translation>
     </message>
     <message>
         <source>REL TRANS</source>
-        <translation type="unfinished"/>
+        <translation>TRANS REL</translation>
     </message>
 </context>
 <context>
@@ -2163,11 +2163,11 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Chercher</translation>
     </message>
     <message>
         <source>Refresh list</source>
-        <translation type="unfinished"/>
+        <translation>Rafraîchir la liste</translation>
     </message>
 </context>
 <context>
@@ -2280,7 +2280,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
     </message>
     <message>
         <source>Period:</source>
-        <translation type="unfinished"/>
+        <translation>Période : </translation>
     </message>
 </context>
 <context>
@@ -3497,19 +3497,19 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
     </message>
     <message>
         <source>SAVE</source>
-        <translation>SAVE</translation>
+        <translation>SAUV</translation>
     </message>
     <message>
         <source>Envelope, filter &amp; LFO</source>
-        <translation type="unfinished"/>
+        <translation>Enveloppe, filtre, et LFO</translation>
     </message>
     <message>
         <source>Chord stacking &amp; arpeggio</source>
-        <translation type="unfinished"/>
+        <translation>Empilement d&apos;accords et arpège</translation>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Effets</translation>
     </message>
     <message>
         <source>MIDI settings</source>
@@ -3517,11 +3517,11 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"/>
+        <translation>Divers</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"/>
+        <translation>Greffon</translation>
     </message>
 </context>
 <context>
@@ -5917,7 +5917,7 @@ Raison : &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Enter project notes here</source>
-        <translation type="unfinished"/>
+        <translation>Inscrire les notes de projet ici</translation>
     </message>
 </context>
 <context>
@@ -5932,11 +5932,11 @@ Raison : &quot;%2&quot;</translation>
     </message>
     <message>
         <source>FLAC-File (*.flac)</source>
-        <translation type="unfinished"/>
+        <translation>Fichier FLAC (*.flac)</translation>
     </message>
     <message>
         <source>Compressed MP3-File (*.mp3)</source>
-        <translation type="unfinished"/>
+        <translation>Fichier MP3 compressé (*.mp3)</translation>
     </message>
 </context>
 <context>
@@ -6913,7 +6913,7 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Loading Track %1 (%2/Total %3)</source>
-        <translation type="unfinished"/>
+        <translation>Chargement de la piste %1 (%2/Total %3)</translation>
     </message>
 </context>
 <context>
@@ -8046,27 +8046,27 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     <name>expressiveView</name>
     <message>
         <source>Select oscillator W1</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner l&apos;oscillateur W1</translation>
     </message>
     <message>
         <source>Select oscillator W2</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner l&apos;oscillateur W2</translation>
     </message>
     <message>
         <source>Select oscillator W3</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner l&apos;oscillateur W3</translation>
     </message>
     <message>
         <source>Select OUTPUT 1</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner la SORTIE 1</translation>
     </message>
     <message>
         <source>Select OUTPUT 2</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner la SORTIE 2</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir la fenêtre d&apos;aide</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8078,11 +8078,11 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Moog-Saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Onde en dents-de-scie-Moog</translation>
     </message>
     <message>
         <source>Click for a Moog-Saw-wave.</source>
-        <translation type="unfinished"/>
+        <translation>Cliquez pour une onde-en-dents-de-scie-Moog.</translation>
     </message>
     <message>
         <source>Exponential wave</source>
@@ -8090,7 +8090,7 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>Click for an exponential wave.</source>
-        <translation type="unfinished"/>
+        <translation>Cliquez pour une onde exponentielle.</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -8134,39 +8134,39 @@ Veuillez vérifier que vous avez les droits en lecture pour ce fichier et le ré
     </message>
     <message>
         <source>WaveInterpolate</source>
-        <translation type="unfinished"/>
+        <translation>WaveInterpolate</translation>
     </message>
     <message>
         <source>ExpressionValid</source>
-        <translation type="unfinished"/>
+        <translation>ExpressionValid</translation>
     </message>
     <message>
         <source>General purpose 1:</source>
-        <translation type="unfinished"/>
+        <translation>Universel 1 : </translation>
     </message>
     <message>
         <source>General purpose 2:</source>
-        <translation type="unfinished"/>
+        <translation>Universel 2 : </translation>
     </message>
     <message>
         <source>General purpose 3:</source>
-        <translation type="unfinished"/>
+        <translation>Universel 3 : </translation>
     </message>
     <message>
         <source>O1 panning:</source>
-        <translation type="unfinished"/>
+        <translation>Panoramisation 01 : </translation>
     </message>
     <message>
         <source>O2 panning:</source>
-        <translation type="unfinished"/>
+        <translation>Panoramisation 02 : </translation>
     </message>
     <message>
         <source>Release transition:</source>
-        <translation type="unfinished"/>
+        <translation>Transition de relâche : </translation>
     </message>
     <message>
         <source>Smoothness</source>
-        <translation type="unfinished"/>
+        <translation>Adoucissement</translation>
     </message>
 </context>
 <context>
@@ -9571,7 +9571,7 @@ Cette puce était utilisée dans l&apos;ordinateur Commodore 64.</translation>
     </message>
     <message>
         <source>Mathematical expression parser</source>
-        <translation type="unfinished"/>
+        <translation>Analyseur d&apos;expression mathématique</translation>
     </message>
 </context>
 <context>
