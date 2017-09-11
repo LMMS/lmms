@@ -157,7 +157,8 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( n && n->isBbTrackMuted() ) || ! m_instrument )
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayPattern &&
+				n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
