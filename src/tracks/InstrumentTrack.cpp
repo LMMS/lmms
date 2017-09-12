@@ -237,6 +237,11 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
+	if( Engine::getSong()->isExporting() )
+	{
+		return;
+	}
+
 	bool eventHandled = false;
 
 	switch( event.type() )
