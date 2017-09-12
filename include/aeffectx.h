@@ -101,6 +101,7 @@ const int effEditOpen = 14;
 const int effEditClose = 15;
 const int effEditIdle = 19;
 const int effEditTop = 20;
+const int effSetChunk = 24;
 const int effProcessEvents = 25;
 const int effGetEffectName = 45;
 const int effGetVendorString = 47;
