@@ -27,64 +27,17 @@
 #define MEMORY_MANAGER_H
 
 #include <QtCore/QVector>
-#include <QtCore/QMutex>
 #include <QtCore/QHash>
 #include "MemoryHelper.h"
+#include "SpinLock.h"
 #include "export.h"
+#include "tlsf.h"
 
-class QReadWriteLock;
+const size_t MM_CHUNK_SIZE = 64; // granularity of managed memory
+const size_t MM_INITIAL_SIZE = 1024 * 1024 * MM_CHUNK_SIZE; // how many bytes to allocate at startup - TODO: make configurable
+const size_t MM_INCREMENT_SIZE = 16 * 1024 * MM_CHUNK_SIZE; // min. amount of bytes to increment at a time
 
-const int MM_CHUNK_SIZE = 64; // granularity of managed memory
-const int MM_INITIAL_CHUNKS = 1024 * 1024; // how many chunks to allocate at startup - TODO: make configurable
-const int MM_INCREMENT_CHUNKS = 16 * 1024; // min. amount of chunks to increment at a time
-
-struct MemoryPool
-{
-	void * m_pool;
-	char * m_free;
-	int m_chunks;
-	QMutex m_mutex;
-
-	MemoryPool() :
-		m_pool( NULL ),
-		m_free( NULL ),
-		m_chunks( 0 )
-	{}
-
-	MemoryPool( int chunks ) :
-		m_chunks( chunks )
-	{
-		m_free = (char*) MemoryHelper::alignedMalloc( chunks );
-		memset( m_free, 1, chunks );
-	}
-
-	MemoryPool( const MemoryPool & mp ) :
-		m_pool( mp.m_pool ),
-		m_free( mp.m_free ),
-		m_chunks( mp.m_chunks ),
-		m_mutex()
-	{}
-
-	MemoryPool & operator = ( const MemoryPool & mp )
-	{
-		m_pool = mp.m_pool;
-		m_free = mp.m_free;
-		m_chunks = mp.m_chunks;
-		return *this;
-	}
-
-	void * getChunks( int chunksNeeded );
-	void releaseChunks( void * ptr, int chunks );
-};
-
-struct PtrInfo
-{
-	int chunks;
-	MemoryPool * memPool;
-};
-
-typedef QVector<MemoryPool> MemoryPoolVector;
-typedef QHash<void*, PtrInfo> PointerInfoMap;
+typedef QVector<pool_t> MemoryPoolVector;
 
 class EXPORT MemoryManager
 {
@@ -92,15 +45,14 @@ public:
 	static bool init();
 	static void * alloc( size_t size );
 	static void free( void * ptr );
-	static int extend( int chunks ); // returns index of created pool (for use by alloc)
 	static void cleanup();
 
 private:
+	static tlsf_t s_tlsf;
 	static MemoryPoolVector s_memoryPools;
-	static QReadWriteLock s_poolMutex;
+	static SpinLock s_lock;
 
-	static PointerInfoMap s_pointerInfo;
-	static QMutex s_pointerMutex;
+	static void extend( size_t required );
 };
 
 
@@ -136,12 +88,12 @@ static void operator delete[] ( void * ptr )	\
 public: 																\
 static void * operator new ( size_t size )							\
 {																		\
-	qDebug( "MM_OPERATORS_DEBUG: new called for %d bytes", size );		\
+	qDebug( "MM_OPERATORS_DEBUG: new called for %d bytes", ( int )size );		\
 	return MemoryManager::alloc( size );								\
 }																		\
 static void * operator new[] ( size_t size )							\
 {																		\
-	qDebug( "MM_OPERATORS_DEBUG: new[] called for %d bytes", size );	\
+	qDebug( "MM_OPERATORS_DEBUG: new[] called for %d bytes", ( int )size );	\
 	return MemoryManager::alloc( size );								\
 }																		\
 static void operator delete ( void * ptr )							\

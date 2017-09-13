@@ -27,6 +27,8 @@
 
 #include "CarlaNative.h"
 
+#include <QMutex>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 
