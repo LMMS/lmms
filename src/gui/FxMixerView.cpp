@@ -47,6 +47,7 @@
 #include "Mixer.h"
 #include "gui_templates.h"
 #include "InstrumentTrack.h"
+#include "SampleTrack.h"
 #include "Song.h"
 #include "BBTrackContainer.h"
 
@@ -73,7 +74,7 @@ FxMixerView::FxMixerView() :
 
 	// Set margins
 	ml->setContentsMargins( 0, 4, 0, 0 );
-	
+
 	// Channel area
 	m_channelAreaWidget = new QWidget;
 	chLayout = new QHBoxLayout( m_channelAreaWidget );
@@ -138,9 +139,9 @@ FxMixerView::FxMixerView() :
 	ml->addWidget( newChannelBtn, 0, Qt::AlignTop );
 
 
-	// add the stacked layout for the effect racks of fx channels 
+	// add the stacked layout for the effect racks of fx channels
 	ml->addWidget( m_racksWidget, 0, Qt::AlignTop | Qt::AlignRight );
-	
+
 	setCurrentFxLine( m_fxChannelViews[0]->m_fxLine );
 
 	setLayout( ml );
@@ -219,10 +220,10 @@ void FxMixerView::refreshDisplay()
 		chLayout->addWidget(m_fxChannelViews[i]->m_fxLine);
 		m_racksLayout->addWidget( m_fxChannelViews[i]->m_rackView );
 	}
-	
+
 	// set selected fx line to 0
 	setCurrentFxLine( 0 );
-	
+
 	// update all fx lines
 	for( int i = 0; i < m_fxChannelViews.size(); ++i )
 	{
@@ -249,6 +250,12 @@ void FxMixerView::updateMaxChannelSelector()
 			{
 				InstrumentTrack * inst = (InstrumentTrack *) trackList[i];
 				inst->effectChannelModel()->setRange(0,
+					m_fxChannelViews.size()-1,1);
+			}
+			else if( trackList[i]->type() == Track::SampleTrack )
+			{
+				SampleTrack * strk = (SampleTrack *) trackList[i];
+				strk->effectChannelModel()->setRange(0,
 					m_fxChannelViews.size()-1,1);
 			}
 		}
@@ -308,7 +315,7 @@ FxMixerView::FxChannelView::FxChannelView(QWidget * _parent, FxMixerView * _mv,
 	connect(&fxChannel->m_soloModel, SIGNAL( dataChanged() ),
 			_mv, SLOT ( toggledSolo() ) );
 	ToolTip::add( m_soloBtn, tr( "Solo FX channel" ) );
-	
+
 	// Create EffectRack for the channel
 	m_rackView = new EffectRackView( &fxChannel->m_fxChain, _mv->m_racksWidget );
 	m_rackView->setFixedSize( 245, FxLine::FxLineHeight );

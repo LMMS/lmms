@@ -26,13 +26,19 @@
 #define SAMPLE_TRACK_H
 
 #include <QDialog>
+#include <QLayout>
 
 #include "AudioPort.h"
+#include "FxMixer.h"
+#include "FxLineLcdSpinBox.h"
 #include "Track.h"
 
 class EffectRackView;
 class Knob;
 class SampleBuffer;
+class SampleTrackWindow;
+class TrackLabelButton;
+class QLineEdit;
 
 
 class SampleTCO : public TrackContentObject
@@ -141,6 +147,11 @@ public:
 							QDomElement & _parent );
 	virtual void loadTrackSpecificSettings( const QDomElement & _this );
 
+	inline IntModel * effectChannelModel()
+	{
+		return &m_effectChannelModel;
+	}
+
 	inline AudioPort * audioPort()
 	{
 		return &m_audioPort;
@@ -154,15 +165,18 @@ public:
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
+	void updateEffectChannel();
 
 private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
+	IntModel m_effectChannelModel;
 	AudioPort m_audioPort;
 
 
 
 	friend class SampleTrackView;
+	friend class SampleTrackWindow;
 
 } ;
 
@@ -174,6 +188,24 @@ class SampleTrackView : public TrackView
 public:
 	SampleTrackView( SampleTrack* Track, TrackContainerView* tcv );
 	virtual ~SampleTrackView();
+
+	SampleTrackWindow * getSampleTrackWindow()
+	{
+		return m_window;
+	}
+
+	SampleTrack * model()
+	{
+		return castModel<SampleTrack>();
+	}
+
+	const SampleTrack * model() const
+	{
+		return castModel<SampleTrack>();
+	}
+
+
+	virtual QMenu * createFxMenu( QString title, QString newFxLabel );
 
 
 public slots:
@@ -188,11 +220,77 @@ protected:
 	}
 
 
+private slots:
+	void assignFxLine( int channelIndex );
+	void createFxLine();
+
+
 private:
-	EffectRackView * m_effectRack;
-	QWidget * m_effWindow;
+	SampleTrackWindow * m_window;
 	Knob * m_volumeKnob;
 	Knob * m_panningKnob;
+
+	TrackLabelButton * m_tlb;
+
+
+	friend class SampleTrackWindow;
+
+} ;
+
+
+
+class SampleTrackWindow : public QWidget, public ModelView,
+								public SerializingObjectHook
+{
+	Q_OBJECT
+public:
+	SampleTrackWindow(SampleTrackView * tv);
+	virtual ~SampleTrackWindow();
+
+	SampleTrack * model()
+	{
+		return castModel<SampleTrack>();
+	}
+
+	const SampleTrack * model() const
+	{
+		return castModel<SampleTrack>();
+	}
+
+	void setSampleTrackView(SampleTrackView * tv);
+
+	SampleTrackView *sampleTrackView()
+	{
+		return m_stv;
+	}
+
+
+public slots:
+	void textChanged(const QString & new_name);
+	void toggleVisibility(bool on);
+	void updateName();
+
+
+protected:
+	// capture close-events for toggling sample-track-button
+	virtual void closeEvent(QCloseEvent * ce);
+
+	virtual void saveSettings(QDomDocument & doc, QDomElement & element);
+	virtual void loadSettings(const QDomElement & element);
+
+private:
+	virtual void modelChanged();
+
+	SampleTrack * m_track;
+	SampleTrackView * m_stv;
+
+	// widgets on the top of an sample-track-window
+	QLineEdit * m_nameLineEdit;
+	Knob * m_volumeKnob;
+	Knob * m_panningKnob;
+	FxLineLcdSpinBox * m_effectChannelNumber;
+
+	EffectRackView * m_effectRack;
 
 } ;
 
