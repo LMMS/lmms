@@ -777,11 +777,11 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>STEREO</translation>
     </message>
     <message>
         <source>QUANT</source>
-        <translation type="unfinished"/>
+        <translation>QUANT</translation>
     </message>
 </context>
 <context>
@@ -2080,35 +2080,35 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     </message>
     <message>
         <source>Stereo mode:</source>
-        <translation type="unfinished"/>
+        <translation>Stereomodus:</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Stereo</translation>
     </message>
     <message>
         <source>Joint Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Joint stereo</translation>
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"/>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Compression level:</source>
-        <translation type="unfinished"/>
+        <translation>Compressieniveau:</translation>
     </message>
     <message>
         <source>(fastest)</source>
-        <translation type="unfinished"/>
+        <translation>(snelste)</translation>
     </message>
     <message>
         <source>(default)</source>
-        <translation type="unfinished"/>
+        <translation>(standaard)</translation>
     </message>
     <message>
         <source>(smallest)</source>
-        <translation type="unfinished"/>
+        <translation>(kleinste)</translation>
     </message>
 </context>
 <context>
@@ -2119,39 +2119,39 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     </message>
     <message>
         <source>A1</source>
-        <translation type="unfinished"/>
+        <translation>A1</translation>
     </message>
     <message>
         <source>A2</source>
-        <translation type="unfinished"/>
+        <translation>A2</translation>
     </message>
     <message>
         <source>A3</source>
-        <translation type="unfinished"/>
+        <translation>A3</translation>
     </message>
     <message>
         <source>W1 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>W1 afvlakken</translation>
     </message>
     <message>
         <source>W2 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>W2 afvlakken</translation>
     </message>
     <message>
         <source>W3 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>W3 afvlakken</translation>
     </message>
     <message>
         <source>PAN1</source>
-        <translation type="unfinished"/>
+        <translation>PAN1</translation>
     </message>
     <message>
         <source>PAN2</source>
-        <translation type="unfinished"/>
+        <translation>PAN2</translation>
     </message>
     <message>
         <source>REL TRANS</source>
-        <translation type="unfinished"/>
+        <translation>REL TRANS</translation>
     </message>
 </context>
 <context>
@@ -2169,11 +2169,11 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Zoeken</translation>
     </message>
     <message>
         <source>Refresh list</source>
-        <translation type="unfinished"/>
+        <translation>Lijst verversen</translation>
     </message>
 </context>
 <context>
@@ -2286,7 +2286,7 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     </message>
     <message>
         <source>Period:</source>
-        <translation type="unfinished"/>
+        <translation>Periode:</translation>
     </message>
 </context>
 <context>
@@ -3508,15 +3508,15 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
     </message>
     <message>
         <source>Envelope, filter &amp; LFO</source>
-        <translation type="unfinished"/>
+        <translation>Envelope, filter en LFO</translation>
     </message>
     <message>
         <source>Chord stacking &amp; arpeggio</source>
-        <translation type="unfinished"/>
+        <translation>Akkoorden opeenstapelen &amp; arpeggio</translation>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Effecten</translation>
     </message>
     <message>
         <source>MIDI settings</source>
@@ -3524,11 +3524,11 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"/>
+        <translation>Overige</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plug-in</translation>
     </message>
 </context>
 <context>
@@ -5926,7 +5926,7 @@ Reden: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Enter project notes here</source>
-        <translation type="unfinished"/>
+        <translation>Geef hier uw projectnotities in</translation>
     </message>
 </context>
 <context>
@@ -5941,11 +5941,11 @@ Reden: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>FLAC-File (*.flac)</source>
-        <translation type="unfinished"/>
+        <translation>FLAC-bestand (*.flac)</translation>
     </message>
     <message>
         <source>Compressed MP3-File (*.mp3)</source>
-        <translation type="unfinished"/>
+        <translation>Gecomprimeerd MP3-bestand (*.mp3)</translation>
     </message>
 </context>
 <context>
@@ -6922,7 +6922,7 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
     <message>
         <source>Loading Track %1 (%2/Total %3)</source>
-        <translation type="unfinished"/>
+        <translation>Track %1 laden (%2/totaal %3)</translation>
     </message>
 </context>
 <context>
@@ -8055,27 +8055,27 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     <name>expressiveView</name>
     <message>
         <source>Select oscillator W1</source>
-        <translation type="unfinished"/>
+        <translation>Oscillator W1 selecteren</translation>
     </message>
     <message>
         <source>Select oscillator W2</source>
-        <translation type="unfinished"/>
+        <translation>Oscillator W2 selecteren</translation>
     </message>
     <message>
         <source>Select oscillator W3</source>
-        <translation type="unfinished"/>
+        <translation>Oscillator W3 selecteren</translation>
     </message>
     <message>
         <source>Select OUTPUT 1</source>
-        <translation type="unfinished"/>
+        <translation>UITVOER 1 selecteren</translation>
     </message>
     <message>
         <source>Select OUTPUT 2</source>
-        <translation type="unfinished"/>
+        <translation>UITVOER 2 selecteren</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation type="unfinished"/>
+        <translation>Help-venster openen</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8087,11 +8087,11 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
     <message>
         <source>Moog-Saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Moog-zaagtandgolf</translation>
     </message>
     <message>
         <source>Click for a Moog-Saw-wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klikken voor een moog-zaagtandgolf.</translation>
     </message>
     <message>
         <source>Exponential wave</source>
@@ -8099,7 +8099,7 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
     <message>
         <source>Click for an exponential wave.</source>
-        <translation type="unfinished"/>
+        <translation>Klikken voor een exponentiële golf.</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -8143,39 +8143,39 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     </message>
     <message>
         <source>WaveInterpolate</source>
-        <translation type="unfinished"/>
+        <translation>GolfInterpoleren</translation>
     </message>
     <message>
         <source>ExpressionValid</source>
-        <translation type="unfinished"/>
+        <translation>ExpressieGeldig</translation>
     </message>
     <message>
         <source>General purpose 1:</source>
-        <translation type="unfinished"/>
+        <translation>Algemeen doel 1:</translation>
     </message>
     <message>
         <source>General purpose 2:</source>
-        <translation type="unfinished"/>
+        <translation>Algemeen doel 2:</translation>
     </message>
     <message>
         <source>General purpose 3:</source>
-        <translation type="unfinished"/>
+        <translation>Algemeen doel 3:</translation>
     </message>
     <message>
         <source>O1 panning:</source>
-        <translation type="unfinished"/>
+        <translation>O1 panning:</translation>
     </message>
     <message>
         <source>O2 panning:</source>
-        <translation type="unfinished"/>
+        <translation>O2 panning:</translation>
     </message>
     <message>
         <source>Release transition:</source>
-        <translation type="unfinished"/>
+        <translation>Release-overgang:</translation>
     </message>
     <message>
         <source>Smoothness</source>
-        <translation type="unfinished"/>
+        <translation>Gladheid</translation>
     </message>
 </context>
 <context>
@@ -9580,7 +9580,7 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
     </message>
     <message>
         <source>Mathematical expression parser</source>
-        <translation type="unfinished"/>
+        <translation>Wiskundige uitdrukking-verwerker</translation>
     </message>
 </context>
 <context>
