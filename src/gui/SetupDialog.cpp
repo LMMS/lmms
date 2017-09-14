@@ -144,8 +144,8 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 {
 	setWindowIcon(
 			embed::getIconPixmap( "setup_general" ) );
-	setWindowTitle( tr(
-			"Settings" ) );
+	setWindowTitle(
+			tr( "Settings" ) );
 	setModal( true );
 	setFixedSize( 452, 520 );
 
@@ -183,8 +183,8 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	QVBoxLayout * general_layout = new QVBoxLayout( general_w );
 	general_layout->setSpacing( 0 );
 	general_layout->setMargin( 0 );
-	labelWidget( general_w, tr(
-			"General settings" ) );
+	labelWidget( general_w,
+			tr( "General settings" ) );
 
 
 	const int XDelta = 10;
@@ -247,6 +247,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 
 
 	gui_tw->setFixedHeight( YDelta*labelNumber1 + HeaderSize );
+
 
 	int labelNumber2 = 0;
 
@@ -353,9 +354,9 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	m_saveIntervalSlider = new QSlider( Qt::Horizontal, auto_save_tw );
 	m_saveIntervalSlider->setRange( 1, 20 );
 	m_saveIntervalSlider->setTickPosition( QSlider::TicksBelow );
-	m_saveIntervalSlider->setPageStep( 1 );
+	m_saveIntervalSlider->setPageStep( 4 ); // The original fourth value is 1.
 	m_saveIntervalSlider->setTickInterval( 1 );
-	m_saveIntervalSlider->setGeometry( 10, 16, 340, 20 ); // The original fourth value is 18.
+	m_saveIntervalSlider->setGeometry( 10, 16, 340, 18 );
 	m_saveIntervalSlider->setValue( m_saveInterval );
 
 	connect( m_saveIntervalSlider, SIGNAL( valueChanged( int ) ), this,
@@ -575,7 +576,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	m_bufferSizeSlider->setTickPosition( QSlider::TicksBelow );
 	m_bufferSizeSlider->setPageStep( 8 );
 	m_bufferSizeSlider->setTickInterval( 8 );
-	m_bufferSizeSlider->setGeometry( 10, 16, 340, 20 ); // The original fourth value is 18.
+	m_bufferSizeSlider->setGeometry( 10, 16, 340, 18 );
 	m_bufferSizeSlider->setValue( m_bufferSize / 64 );
 
 	connect( m_bufferSizeSlider, SIGNAL( valueChanged( int ) ), this,
@@ -911,7 +912,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	pathSelectorLayout->addWidget( gig_tw );
 	pathSelectorLayout->addSpacing( 20 );
 	pathSelectorLayout->addWidget( theme_tw );
-	pathSelectorLayout->addSpacing( 5 );
+	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( backgroundPicFile_tw );
 	pathSelectorLayout->addStretch();
 
@@ -1440,7 +1441,8 @@ void SetupDialog::setAutoSaveInterval( int value )
 	QString minutes = m_saveInterval > 1 ? tr( "minutes" ) : tr( "minute" );
 	minutes = QString( "%1 %2" ).arg( QString::number( m_saveInterval ), minutes );
 	minutes = m_enableAutoSave ?  minutes : tr( "disabled" );
-	m_saveIntervalLbl->setText( tr( "Autosave interval: %1" ).arg( minutes ) );
+	m_saveIntervalLbl->setText(
+			tr( "Autosave interval: %1" ).arg( minutes ) );
 }
 
 
