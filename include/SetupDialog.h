@@ -163,8 +163,8 @@ private:
 	trMap m_audioIfaceNames;
 	bool m_hqAudioDev;
 	int m_bufferSize;
-	QSlider * m_bufSizeSlider;
-	QLabel * m_bufSizeLbl;
+	QSlider * m_bufferSizeSlider;
+	QLabel * m_bufferSizeLbl;
 
 	// MIDI settings widget.
 	QComboBox * m_midiInterfaces;
