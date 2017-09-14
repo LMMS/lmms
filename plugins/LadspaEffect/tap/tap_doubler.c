@@ -116,6 +116,7 @@ typedef struct {
 	LADSPA_Data run_adding_gain;
 } Doubler;
 
+void cleanup_Doubler(LADSPA_Handle);
 
 /* generate fractal pattern using Midpoint Displacement Method
  * v: buffer of floats to output fractal pattern to
@@ -157,26 +158,34 @@ instantiate_Doubler(const LADSPA_Descriptor * Descriptor,
 		((Doubler *)ptr)->run_adding_gain = 1.0f;
 
 		if ((((Doubler *)ptr)->ring_L = 
-		     calloc(BUFLEN * sample_rate / 192000, sizeof(LADSPA_Data))) == NULL)
+		     calloc(BUFLEN * sample_rate / 192000, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Doubler(ptr);
 			return NULL;
+		}
 		((Doubler *)ptr)->buflen_L = BUFLEN * sample_rate / 192000;
 		((Doubler *)ptr)->pos_L = 0;
 
 		if ((((Doubler *)ptr)->ring_R = 
-		     calloc(BUFLEN * sample_rate / 192000, sizeof(LADSPA_Data))) == NULL)
+		     calloc(BUFLEN * sample_rate / 192000, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Doubler(ptr);
 			return NULL;
+		}
 		((Doubler *)ptr)->buflen_R = BUFLEN * sample_rate / 192000;
 		((Doubler *)ptr)->pos_R = 0;
 
 		if ((((Doubler *)ptr)->ring_pnoise = 
-		     calloc(NOISE_LEN, sizeof(LADSPA_Data))) == NULL)
+		     calloc(NOISE_LEN, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Doubler(ptr);
 			return NULL;
+		}
 		((Doubler *)ptr)->buflen_pnoise = NOISE_LEN;
 		((Doubler *)ptr)->pos_pnoise = 0;
 
 		if ((((Doubler *)ptr)->ring_dnoise = 
-		     calloc(NOISE_LEN, sizeof(LADSPA_Data))) == NULL)
+		     calloc(NOISE_LEN, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Doubler(ptr);
 			return NULL;
+		}
 		((Doubler *)ptr)->buflen_dnoise = NOISE_LEN;
 		((Doubler *)ptr)->pos_dnoise = 0;
 

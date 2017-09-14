@@ -90,6 +90,7 @@ typedef struct {
 	LADSPA_Data run_adding_gain;
 } Reflector;
 
+void cleanup_Reflector(LADSPA_Handle);
 
 
 /* Construct a new plugin instance. */
@@ -104,32 +105,42 @@ instantiate_Reflector(const LADSPA_Descriptor * Descriptor,
 		((Reflector *)ptr)->run_adding_gain = 1.0f;
 
 		if ((((Reflector *)ptr)->ring0 = 
-		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL)
+		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Reflector(ptr);
 			return NULL;
+		}
 		((Reflector *)ptr)->buflen0 = 2 * MAX_FRAGMENT_LEN * sample_rate / 1000;
 		((Reflector *)ptr)->pos0 = 0;
 
 		if ((((Reflector *)ptr)->ring1 = 
-		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL)
+		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Reflector(ptr);
 			return NULL;
+		}
 		((Reflector *)ptr)->buflen1 = 2 * MAX_FRAGMENT_LEN * sample_rate / 1000;
 		((Reflector *)ptr)->pos1 = 0;
 
 		if ((((Reflector *)ptr)->delay1 = 
-		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL)
+		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Reflector(ptr);
 			return NULL;
+		}
 		((Reflector *)ptr)->delay_buflen1 = 2 * MAX_FRAGMENT_LEN * sample_rate / 3000;
 		((Reflector *)ptr)->pos1 = 0;
 
 		if ((((Reflector *)ptr)->ring2 = 
-		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL)
+		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Reflector(ptr);
 			return NULL;
+		}
 		((Reflector *)ptr)->buflen2 = 2 * MAX_FRAGMENT_LEN * sample_rate / 1000;
 		((Reflector *)ptr)->pos2 = 0;
 
 		if ((((Reflector *)ptr)->delay2 = 
-		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL)
+		     calloc(2 * MAX_FRAGMENT_LEN * MAX_SAMPLE_RATE, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Reflector(ptr);
 			return NULL;
+		}
 		((Reflector *)ptr)->delay_buflen2 = 4 * MAX_FRAGMENT_LEN * sample_rate / 3000;
 		((Reflector *)ptr)->pos2 = 0;
 

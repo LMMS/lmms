@@ -71,6 +71,7 @@ typedef struct {
 } Limiter;
 
 
+void cleanup_Limiter(LADSPA_Handle);
 
 
 /* Construct a new plugin instance. */
@@ -85,8 +86,10 @@ instantiate_Limiter(const LADSPA_Descriptor * Descriptor,
 		((Limiter *)ptr)->run_adding_gain = 1.0f;
 
 		if ((((Limiter *)ptr)->ringbuffer = 
-		     calloc(RINGBUF_SIZE, sizeof(LADSPA_Data))) == NULL)
+		     calloc(RINGBUF_SIZE, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Limiter(ptr);
 			return NULL;
+		}
 
 		/* 80 Hz is the lowest frequency with which zero-crosses were
 		 * observed to occur (this corresponds to 40 Hz signal frequency).
