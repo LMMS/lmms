@@ -73,7 +73,10 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 			{
 				// Prevent plugins making the main window transparent
 				STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);
-				style->styleNew &= ~WS_EX_LAYERED;
+				if(!(style->styleOld & WS_EX_LAYERED))
+				{
+					style->styleNew &= ~WS_EX_LAYERED;
+				}
 				*result = 0;
 				return true;
 			}
