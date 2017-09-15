@@ -62,3 +62,24 @@ bool MainApplication::event(QEvent* event)
 			return QApplication::event(event);
 	}
 }
+
+#ifdef LMMS_BUILD_WIN32
+bool MainApplication::winEventFilter(MSG* msg, long* result)
+{
+	switch(msg->message)
+	{
+		case WM_STYLECHANGING:
+			if(msg->wParam == GWL_EXSTYLE)
+			{
+				// Prevent plugins making the main window transparent
+				STYLESTRUCT * style = reinterpret_cast<STYLESTRUCT *>(msg->lParam);
+				style->styleNew &= ~WS_EX_LAYERED;
+				*result = 0;
+				return true;
+			}
+			return false;
+		default:
+			return false;
+	}
+}
+#endif
