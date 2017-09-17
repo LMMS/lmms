@@ -59,6 +59,6 @@ void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 
 void BufferManager::release( sampleFrame * buf )
 {
-	MM_FREE(buf);
+	MM_FREE( buf );
 }
 
