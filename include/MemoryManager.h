@@ -54,7 +54,7 @@ struct MemoryPool
 	MemoryPool( size_t chunks ) :
 		m_chunks( chunks )
 	{
-		m_free = reinterpret_cast<char*>(MemoryHelper::alignedMalloc( chunks ));
+		m_free = reinterpret_cast<char*>( MemoryHelper::alignedMalloc( chunks ) );
 		memset( m_free, 1, chunks );
 	}
 
@@ -109,17 +109,17 @@ struct MmAllocator
 	typedef T value_type;
 	template< class U > struct rebind { typedef MmAllocator<U> other; };
 
-	T* allocate(std::size_t n)
+	T* allocate( std::size_t n )
 	{
 		return reinterpret_cast<T*>( MemoryManager::alloc( sizeof(T) * n ) );
 	}
 
-	void deallocate(T* p, std::size_t)
+	void deallocate( T* p, std::size_t )
 	{
 		MemoryManager::free( p );
 	}
 
-	typedef std::vector<T, MmAllocator<T> > vector;
+	typedef std::vector<T, MmAllocator<T>> vector;
 };
 
 
@@ -143,7 +143,7 @@ static void operator delete[] ( void * ptr )	\
 }
 
 // for use in cases where overriding new/delete isn't a possibility
-#define MM_ALLOC( type, count ) reinterpret_cast<type*>(MemoryManager::alloc( sizeof( type ) * count ))
+#define MM_ALLOC( type, count ) reinterpret_cast<type*>( MemoryManager::alloc( sizeof( type ) * count ) )
 // and just for symmetry...
 #define MM_FREE( ptr ) MemoryManager::free( ptr )
 
