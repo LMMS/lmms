@@ -119,7 +119,7 @@ struct MmAllocator
 		MemoryManager::free( p );
 	}
 
-	typedef std::vector<T, MmAllocator<T>> vector;
+	typedef std::vector< T, MmAllocator<T> > vector;
 };
 
 
