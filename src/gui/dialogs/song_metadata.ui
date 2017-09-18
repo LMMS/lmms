@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>712</width>
+    <width>722</width>
     <height>526</height>
    </rect>
   </property>
@@ -37,10 +37,10 @@
         <widget class="QWidget" name="gridLayoutWidget">
          <property name="geometry">
           <rect>
-           <x>9</x>
-           <y>9</y>
-           <width>671</width>
-           <height>118</height>
+           <x>1</x>
+           <y>0</y>
+           <width>697</width>
+           <height>121</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
@@ -106,10 +106,10 @@
         <widget class="QWidget" name="gridLayoutWidget_3">
          <property name="geometry">
           <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>671</width>
-           <height>419</height>
+           <x>4</x>
+           <y>0</y>
+           <width>685</width>
+           <height>421</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0,0,0,0,0" columnstretch="0,0">
@@ -288,10 +288,10 @@
         <widget class="QWidget" name="gridLayoutWidget_2">
          <property name="geometry">
           <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>671</width>
-           <height>407</height>
+           <x>2</x>
+           <y>2</y>
+           <width>697</width>
+           <height>421</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
