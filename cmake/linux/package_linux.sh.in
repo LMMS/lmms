@@ -106,7 +106,7 @@ if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
    export LIBGL_ALWAYS_SOFTWARE=1;
 fi
-QT_X11_NO_NATIVE_MENUBAR=1 \$DIR/usr/bin/lmms.real "\$@"
+QT_X11_NO_NATIVE_MENUBAR=1 QT_AUTO_SCREEN_SCALE_FACTOR=1 \$DIR/usr/bin/lmms.real "\$@"
 EOL
 
 chmod +x "${APPDIR}usr/bin/lmms"
