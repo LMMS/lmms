@@ -89,7 +89,7 @@ private slots:
 	void toggleSmoothScroll(bool enabled);
 	void toggleAnimateAFP(bool enabled);
 	void toggleSyncVSTPlugins(bool enabled);
-	void toggleDisableAutoquit(bool enabled);
+	void toggleDisableAutoQuit(bool enabled);
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
@@ -174,8 +174,8 @@ private:
 	// Paths settings widget.
 	QString m_workingDir;
 	QString m_vstDir;
-	QString m_artworkDir;
-	QString m_ladDir;
+	QString m_themeDir;
+	QString m_ladspaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -192,6 +192,6 @@ private:
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QLineEdit * m_sf2FileLineEdit;
 #endif
-	QLineEdit * m_backgroundPicFile;
+	QLineEdit * m_backgroundPicFileLineEdit;
 };
 #endif

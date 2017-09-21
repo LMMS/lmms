@@ -71,7 +71,7 @@
 
 inline void labelWidget( QWidget * w, const QString & txt )
 {
-	QLabel * title = new QLabel( w, txt ); // The original subroutine arguments are ( txt, w ).
+	QLabel * title = new QLabel( txt, w );
 	QFont f = title->font();
 	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
@@ -123,7 +123,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 #endif
 	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
 	m_themeDir( QDir::toNativeSeparators( ConfigManager::inst()->themeDir() ) ),
-	m_backgroundPicFile( QDir::toNativeSeparators( ConfigManager::inst()->backgroundPictureFile() ) ),
+	m_backgroundPicFile( QDir::toNativeSeparators( ConfigManager::inst()->backgroundPicFile() ) ),
 	m_enableAutoSave( ConfigManager::inst()->value(
 			"ui", "enableautosave", "1" ).toInt() ),
 	m_enableRunningAutoSave( ConfigManager::inst()->value(
@@ -156,13 +156,13 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	vlayout->setSpacing( 0 );
 	vlayout->setMargin( 0 );
 		
+	// Main widget.
+	QWidget * main_w = new QWidget( this );
+
 	// Horizontal layout.
 	QHBoxLayout * hlayout = new QHBoxLayout( main_w );
 	hlayout->setSpacing( 0 );
 	hlayout->setMargin( 0 );
-
-	// Main widget.
-	QWidget * main_w = new QWidget( this );
 
 	// The tab bar that holds the major tabs.
 	m_tabBar = new TabBar( main_w, QBoxLayout::TopToBottom );
@@ -189,7 +189,6 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 
 	const int XDelta = 10;
 	const int YDelta = 18;
-	const int HeaderSize = 30;
 	
 	int labelNumber1 = 0;
 
@@ -246,7 +245,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 			SLOT( toggleOneInstrumentTrackWindow( bool ) ) );
 
 
-	gui_tw->setFixedHeight( YDelta*labelNumber1 + HeaderSize );
+	gui_tw->setFixedHeight( YDelta*labelNumber1 );
 
 
 	int labelNumber2 = 0;
@@ -281,7 +280,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 			SLOT( toggleOpenLastProject( bool ) ) );
 
 
-	projects_tw->setFixedHeight( YDelta*labelNumber2 + HeaderSize );
+	projects_tw->setFixedHeight( YDelta*labelNumber2 );
 
 	// Language tab.
 	TabWidget * lang_tw = new TabWidget(
@@ -329,9 +328,9 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 
 	// General layout ordering.
 	general_layout->addWidget( gui_tw );
-	general_layout->addSpacing( 20 );
+	general_layout->addSpacing( 10 );
 	general_layout->addWidget( projects_tw );
-	general_layout->addSpacing( 20 );
+	general_layout->addSpacing( 10 );
 	general_layout->addWidget( lang_tw );
 	general_layout->addStretch();
 
@@ -354,7 +353,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	m_saveIntervalSlider = new QSlider( Qt::Horizontal, auto_save_tw );
 	m_saveIntervalSlider->setRange( 1, 20 );
 	m_saveIntervalSlider->setTickPosition( QSlider::TicksBelow );
-	m_saveIntervalSlider->setPageStep( 4 ); // The original fourth value is 1.
+	m_saveIntervalSlider->setPageStep( 1 );
 	m_saveIntervalSlider->setTickInterval( 1 );
 	m_saveIntervalSlider->setGeometry( 10, 16, 340, 18 );
 	m_saveIntervalSlider->setValue( m_saveInterval );
@@ -402,7 +401,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	// UI effect vs. performance tab.
 	TabWidget * ui_fx_tw = new TabWidget(
 			tr( "UI effects vs. performance" ), performance_w );
-	ui_fx_tw->setFixedHeight( 60 ); // The original value is 70.
+	ui_fx_tw->setFixedHeight( 60 );
 
 	LedCheckBox * smoothScroll = new LedCheckBox(
 			tr( "Smooth scroll in song editor" ), ui_fx_tw );
@@ -421,7 +420,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	// Plugins tab.
 	TabWidget * plugins_tw = new TabWidget(
 			tr( "Plugins" ), performance_w );
-	plugins_tw->setFixedHeight( 60 ); // The original value is 70.
+	plugins_tw->setFixedHeight( 60 );
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr( "Sync VST plugins to host playback" ), plugins_tw );
@@ -430,11 +429,11 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	connect( syncVST, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleSyncVSTPlugins( bool ) ) );
 
-	LedCheckBox * disableAutoquit = new LedCheckBox(
+	LedCheckBox * disableAutoQuit = new LedCheckBox(
 			tr( "Keep effects running even without input" ), plugins_tw );
 	disableAutoQuit->move( 10, 40 );
-	disableAutoquit->setChecked( m_disableAutoQuit );
-	connect( disableAutoquit, SIGNAL( toggled( bool ) ), this,
+	disableAutoQuit->setChecked( m_disableAutoQuit );
+	connect( disableAutoQuit, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleDisableAutoquit( bool ) ) );
 
 
@@ -734,25 +733,25 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	labelWidget( paths_w,
 			tr( "Paths settings" ) );
 //	QLabel * title = new QLabel(
-//			tr( "Paths" ), paths_w ); -> Commented for testing.
-//	QFont f = title->font(); -> Commented for testing.
-//	f.setBold( true ); -> Commented for testing.
-//	title->setFont( pointSize<12>( f ) ); -> Commented for testing.
+//			tr( "Paths settings" ), paths_w );
+//	QFont f = title->font();
+//	f.setBold( true );
+//	title->setFont( pointSize<12>( f ) );
 
 
 	QScrollArea * pathsScroll = new QScrollArea( paths_w );
 
 	// Path selectors widget.
 	QWidget * pathSelectors = new QWidget( settings_w );
-	QVBoxLayout * pathSelectorLayout = new QVBoxLayout;
+	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
 	pathsScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	pathsScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	pathsScroll->resize( 362, paths_height - 50  );
+	pathsScroll->resize( 360, paths_height - 50  ); // .362.
 	pathsScroll->move( 0, 30 );
 	pathSelectors->resize( 360, paths_height - 50 );
 
 	const int txtLength = 284;
-	const int btnStart = 300; // The original value is 297.
+	const int btnStart = 300; // .297.
 
 
 	// LMMS working directory tab.
@@ -882,9 +881,9 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 			tr( "Background picture file" ), paths_w );
 	backgroundPicFile_tw->setFixedHeight( 48 );
 
-	m_backgroundPicFileEdit = new QLineEdit( m_backgroundPicFile, backgroundPicFile_tw );
-	m_backgroundPicFileEdit->setGeometry( 10, 20, txtLength, 16 );
-	connect( m_backgroundPicFileEdit, SIGNAL( textChanged( const QString & ) ), this,
+	m_backgroundPicFileLineEdit = new QLineEdit( m_backgroundPicFile, backgroundPicFile_tw );
+	m_backgroundPicFileLineEdit->setGeometry( 10, 20, txtLength, 16 );
+	connect( m_backgroundPicFileLineEdit, SIGNAL( textChanged( const QString & ) ), this,
 			SLOT( setBackgroundPicFile( const QString & ) ) );
 
 	QPushButton * backgroundPicFile_select_btn = new QPushButton(
@@ -894,27 +893,27 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	connect( backgroundPicFile_select_btn, SIGNAL( clicked() ), this,
 			SLOT( openBackgroundPicFile() ) );
 
-	pathSelectors->setLayout( pathSelectorLayout );
+	pathSelectors->setLayout( pathSelectorsLayout );
 
 	// Path selectors layout ordering.
-	pathSelectorLayout->addWidget( workingDir_tw );
-	pathSelectorLayout->addSpacing( 20 );
-	pathSelectorLayout->addWidget( vst_tw );
-	pathSelectorLayout->addSpacing( 10 );
-	pathSelectorLayout->addWidget( ladspa_tw );
-	pathSelectorLayout->addSpacing( 20 );
-	pathSelectorLayout->addWidget( sf2_tw );
-	pathSelectorLayout->addSpacing( 5 );
+	pathSelectorsLayout->addWidget( workingDir_tw );
+	pathSelectorsLayout->addSpacing( 10 );
+	pathSelectorsLayout->addWidget( vstDir_tw );
+	pathSelectorsLayout->addSpacing( 10 );
+	pathSelectorsLayout->addWidget( ladspaDir_tw );
+	pathSelectorsLayout->addSpacing( 10 );
+	pathSelectorsLayout->addWidget( sf2Dir_tw );
+	pathSelectorsLayout->addSpacing( 10 );
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	pathSelectorLayout->addWidget( sf_tw );
-	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorsLayout->addWidget( sf2File_tw );
+	pathSelectorsLayout->addSpacing( 10 );
 #endif
-	pathSelectorLayout->addWidget( gig_tw );
-	pathSelectorLayout->addSpacing( 20 );
-	pathSelectorLayout->addWidget( theme_tw );
-	pathSelectorLayout->addSpacing( 10 );
-	pathSelectorLayout->addWidget( backgroundPicFile_tw );
-	pathSelectorLayout->addStretch();
+	pathSelectorsLayout->addWidget( gigDir_tw );
+	pathSelectorsLayout->addSpacing( 10 );
+	pathSelectorsLayout->addWidget( themeDir_tw );
+	pathSelectorsLayout->addSpacing( 10 );
+	pathSelectorsLayout->addWidget( backgroundPicFile_tw );
+	pathSelectorsLayout->addStretch();
 
 	paths_layout->addWidget( pathSelectors );
 
@@ -988,7 +987,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	extras_layout->addWidget( restartWarning );
 	extras_layout->addSpacing( 10 );
 	extras_layout->addWidget( ok_btn );
-	extras->addSpacing( 10 );
+	extras_layout->addSpacing( 10 );
 	extras_layout->addWidget( cancel_btn );
 	extras_layout->addSpacing( 10 );
 
@@ -1200,7 +1199,7 @@ void SetupDialog::toggleSyncVSTPlugins( bool enabled )
 }
 
 
-void SetupDialog::toggleDisableAutoquit( bool enabled )
+void SetupDialog::toggleDisableAutoQuit( bool enabled )
 {
 	m_disableAutoQuit = enabled;
 }
@@ -1212,6 +1211,72 @@ void SetupDialog::toggleHQAudioDev( bool enabled )
 {
 	m_hqAudioDev = enabled;
 }
+
+
+
+void SetupDialog::setAutoSaveInterval( int value )
+{
+	m_saveInterval = value;
+	m_saveIntervalSlider->setValue( m_saveInterval );
+	QString minutes = m_saveInterval > 1 ? tr( "minutes" ) : tr( "minute" );
+	minutes = QString( "%1 %2" ).arg( QString::number( m_saveInterval ), minutes );
+	minutes = m_enableAutoSave ?  minutes : tr( "disabled" );
+	m_saveIntervalLbl->setText(
+			tr( "Autosave interval: %1" ).arg( minutes ) );
+}
+
+
+
+
+void SetupDialog::resetAutoSave()
+{
+	setAutoSaveInterval( MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES );
+	m_autoSave->setChecked( true );
+	m_runningAutoSave->setChecked( false );
+}
+
+
+
+
+void SetupDialog::displaySaveIntervalHelp()
+{
+	QWhatsThis::showText( QCursor::pos(),
+			tr( "The autosave recovery file is:\n"
+				"%1.\n"
+				"Remember to also save your project manually. "
+				"You can choose to disable saving while playing, "
+				"something some older systems find difficult." ).arg( ConfigManager::inst()->recoveryFile() ) );
+}
+
+
+
+
+void SetupDialog::audioInterfaceChanged( const QString & iface )
+{
+	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
+		it != m_audioIfaceSetupWidgets.end(); ++it )
+	{
+		it.value()->hide();
+	}
+
+	m_audioIfaceSetupWidgets[m_audioIfaceNames[iface]]->show();
+}
+
+
+
+
+void SetupDialog::displayAudioHelp()
+{
+	QWhatsThis::showText( QCursor::pos(),
+			tr( "Here you can select your preferred audio interface. "
+				"The audio interfaces available depend on "
+				"the configuration of your system during compilation time. "
+				"Below is a box which offers controls to "
+				"setup the selected audio interface." ) );
+}
+
+
+
 
 void SetupDialog::setBufferSize( int value )
 {
@@ -1260,6 +1325,33 @@ void SetupDialog::displayBufferSizeHelp()
 				"especially on older computers or "
 				"systems with a non-realtime "
 				"kernel." ) );
+}
+
+
+
+
+void SetupDialog::midiInterfaceChanged( const QString & iface )
+{
+	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
+		it != m_midiIfaceSetupWidgets.end(); ++it )
+	{
+		it.value()->hide();
+	}
+
+	m_midiIfaceSetupWidgets[m_midiIfaceNames[iface]]->show();
+}
+
+
+
+
+void SetupDialog::displayMIDIHelp()
+{
+	QWhatsThis::showText( QCursor::pos(),
+			tr( "Here you can select your preferred MIDI interface. "
+				"The MIDI interfaces available depend on "
+				"the configuration of your system during compilation time. "
+				"Below is a box which offers controls to "
+				"setup the selected MIDI interface." ) );
 }
 
 
@@ -1386,7 +1478,7 @@ void SetupDialog::openThemeDir()
 			tr( "Choose your theme directory" ), m_themeDir );
 	if( new_dir != QString::null )
 	{
-		m_adLineEdit->setText( new_dir );
+		m_themeDirLineEdit->setText( new_dir );
 	}
 }
 
@@ -1416,7 +1508,7 @@ void SetupDialog::openBackgroundPicFile()
 	QString dir = ( m_backgroundPicFile.isEmpty() ) ?
 		m_themeDir :
 		m_backgroundPicFile;
-	QString new_file = FileDialog::getOpenFilename( this,
+	QString new_file = FileDialog::getOpenFileName( this,
 			tr( "Choose your background picture file" ), dir, "Image files (" + fileTypes + ")" );
 	
 	if( new_file != QString::null )
@@ -1431,93 +1523,18 @@ void SetupDialog::setBackgroundPicFile( const QString & backgroundPicFile )
 	m_backgroundPicFile = backgroundPicFile;
 }
 
+/*
+TODO:
+Fix the position of the extras widegt.
+Fix that some odd stuff are required to display the "Paths settings" string.
+Find the height for path selectors layout that fits 5 tabs perfectly.
+*/
 
-
-
-void SetupDialog::setAutoSaveInterval( int value )
-{
-	m_saveInterval = value;
-	m_saveIntervalSlider->setValue( m_saveInterval );
-	QString minutes = m_saveInterval > 1 ? tr( "minutes" ) : tr( "minute" );
-	minutes = QString( "%1 %2" ).arg( QString::number( m_saveInterval ), minutes );
-	minutes = m_enableAutoSave ?  minutes : tr( "disabled" );
-	m_saveIntervalLbl->setText(
-			tr( "Autosave interval: %1" ).arg( minutes ) );
-}
-
-
-
-
-void SetupDialog::resetAutoSave()
-{
-	setAutoSaveInterval( MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES );
-	m_autoSave->setChecked( true );
-	m_runningAutoSave->setChecked( false );
-}
-
-
-
-
-void SetupDialog::displaySaveIntervalHelp()
-{
-	QWhatsThis::showText( QCursor::pos(),
-			tr( "The autosave recovery file is:\n"
-				"%1.\n"
-				"Remember to also save your project manually. "
-				"You can choose to disable saving while playing, "
-				"something some older systems find difficult." ).arg( ConfigManager::inst()->recoveryFile() ) );
-}
-
-
-
-
-void SetupDialog::audioInterfaceChanged( const QString & iface )
-{
-	for( AswMap::iterator it = m_audioIfaceSetupWidgets.begin();
-		it != m_audioIfaceSetupWidgets.end(); ++it )
-	{
-		it.value()->hide();
-	}
-
-	m_audioIfaceSetupWidgets[m_audioIfaceNames[iface]]->show();
-}
-
-
-
-
-void SetupDialog::displayAudioHelp()
-{
-	QWhatsThis::showText( QCursor::pos(),
-			tr( "Here you can select your preferred audio interface. "
-				"The audio interfaces available depend on "
-				"the configuration of your system during compilation time. "
-				"Below is a box which offers controls to "
-				"setup the selected audio interface." ) );
-}
-
-
-
-
-void SetupDialog::midiInterfaceChanged( const QString & iface )
-{
-	for( MswMap::iterator it = m_midiIfaceSetupWidgets.begin();
-		it != m_midiIfaceSetupWidgets.end(); ++it )
-	{
-		it.value()->hide();
-	}
-
-	m_midiIfaceSetupWidgets[m_midiIfaceNames[iface]]->show();
-}
-
-
-
-
-void SetupDialog::displayMIDIHelp()
-{
-	QWhatsThis::showText( QCursor::pos(),
-			tr( "Here you can select your preferred MIDI interface. "
-				"The MIDI interfaces available depend on "
-				"the configuration of your system during compilation time. "
-				"Below is a box which offers controls to "
-				"setup the selected MIDI interface." ) );
-}
+/*
+Chnages:
+• Improved code style.
+• Improved translatable strings.
+• Reordered everything.
+• Divided the MISC tab into 2 tabs: GUI and Projects, and moved some of its items.
+• Moved some items to more appropriate places.
+*/

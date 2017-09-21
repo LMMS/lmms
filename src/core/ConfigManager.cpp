@@ -52,7 +52,7 @@ ConfigManager::ConfigManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() +"/.lmmsrc.xml" ),
 	m_workingDir( QDir::home().absolutePath() + "/lmms/"),
 	m_dataDir( "data:/" ),
-	m_artworkDir( defaultArtworkDir() ),
+	m_themeDir( defaultThemeDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
@@ -174,7 +174,7 @@ void ConfigManager::upgrade()
 	// Don't use old themes as they break the UI (i.e. 0.4 != 1.0, etc)
 	if ( createdWith.setCompareType(ProjectVersion::Minor) != LMMS_VERSION )
 	{
-		m_artworkDir = defaultArtworkDir();
+		m_themeDir = defaultThemeDir();
 	}
 
 	// Bump the version, now that we are upgraded
@@ -192,73 +192,73 @@ bool ConfigManager::hasWorkingDir() const
 }
 
 
-void ConfigManager::setWorkingDir( const QString & _wd )
+void ConfigManager::setWorkingDir( const QString & workingDir )
 {
-	m_workingDir = ensureTrailingSlash( _wd );
+	m_workingDir = ensureTrailingSlash( workingDir );
 }
 
 
 
 
-void ConfigManager::setVSTDir( const QString & _vd )
+void ConfigManager::setVSTDir( const QString & vstDir )
 {
-	m_vstDir = ensureTrailingSlash( _vd );
+	m_vstDir = ensureTrailingSlash( vstDir );
 }
 
 
 
 
-void ConfigManager::setArtworkDir( const QString & _ad )
+void ConfigManager::setThemeDir( const QString & themeDir )
 {
-	m_artworkDir = ensureTrailingSlash( _ad );
+	m_themeDir = ensureTrailingSlash( themeDir );
 }
 
 
 
 
-void ConfigManager::setLADSPADir( const QString & _fd )
+void ConfigManager::setLADSPADir( const QString & ladspaDir )
 {
-	m_ladDir = _fd;
+	m_ladspaDir = ladspaDir;
 }
 
 
 
 
-void ConfigManager::setSTKDir( const QString & _fd )
+void ConfigManager::setSTKDir( const QString & stkDir )
 {
 #ifdef LMMS_HAVE_STK
-	m_stkDir = ensureTrailingSlash( _fd );
+	m_stkDir = ensureTrailingSlash( stkDir );
 #endif
 }
 
 
 
 
-void ConfigManager::setDefaultSoundfont( const QString & _sf )
+void ConfigManager::setSF2File( const QString & sf2File )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_defaultSoundfont = _sf;
+	m_sf2File = sf2File;
 #endif
 }
 
 
 
 
-void ConfigManager::setBackgroundArtwork( const QString & _ba )
+void ConfigManager::setBackgroundPicFile( const QString & backgroundPicFile )
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_backgroundArtwork = _ba;
+	m_backgroundPicFile = backgroundPicFile;
 #endif
 }
 
-void ConfigManager::setGIGDir(const QString &gd)
+void ConfigManager::setGIGDir(const QString & gigDir)
 {
-	m_gigDir = gd;
+	m_gigDir = gigDir;
 }
 
-void ConfigManager::setSF2Dir(const QString &sfd)
+void ConfigManager::setSF2Dir(const QString & sf2Dir)
 {
-	m_sf2Dir = sfd;
+	m_sf2Dir = sf2Dir;
 }
 
 
@@ -434,37 +434,37 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 				node = node.nextSibling();
 			}
 
-			if( value( "paths", "artwork" ) != "" )
+			if( value( "paths", "theme" ) != "" )
 			{
-				m_artworkDir = value( "paths", "artwork" );
+				m_themeDir = value( "paths", "theme" );
 #ifdef LMMS_BUILD_WIN32
 				// Detect a QDir/QFile hang on Windows
 				// see issue #3417 on github
-				bool badPath = ( m_artworkDir == "/" || m_artworkDir == "\\" );
+				bool badPath = ( m_themeDir == "/" || m_themeDir == "\\" );
 #else
 				bool badPath = false;
 #endif
 
-				if( badPath || !QDir( m_artworkDir ).exists() ||
-						!QFile( m_artworkDir + "/style.css" ).exists() )
+				if( badPath || !QDir( m_themeDir ).exists() ||
+						!QFile( m_themeDir + "/style.css" ).exists() )
 				{
-					m_artworkDir = defaultArtworkDir();
+					m_themeDir = defaultThemeDir();
 				}
-				m_artworkDir = ensureTrailingSlash(m_artworkDir);
+				m_themeDir = ensureTrailingSlash(m_themeDir);
 			}
 			setWorkingDir( value( "paths", "workingdir" ) );
 
 			setGIGDir( value( "paths", "gigdir" ) == "" ? gigDir() : value( "paths", "gigdir" ) );
 			setSF2Dir( value( "paths", "sf2dir" ) == "" ? sf2Dir() : value( "paths", "sf2dir" ) );
 			setVSTDir( value( "paths", "vstdir" ) );
-			setLADSPADir( value( "paths", "laddir" ) );
+			setLADSPADir( value( "paths", "ladspadir" ) );
 		#ifdef LMMS_HAVE_STK
 			setSTKDir( value( "paths", "stkdir" ) );
 		#endif
 		#ifdef LMMS_HAVE_FLUIDSYNTH
-			setDefaultSoundfont( value( "paths", "defaultsf2" ) );
+			setSF2File( value( "paths", "defaultsf2" ) );
 		#endif
-			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
+			setBackgroundPicFile( value( "paths", "backgroundtheme" ) );
 		}
 		else if( gui )
 		{
@@ -489,9 +489,9 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 #endif
 	}
 
-	if( m_ladDir.isEmpty()  )
+	if( m_ladspaDir.isEmpty()  )
 	{
-		m_ladDir = userLadspaDir();
+		m_ladspaDir = userLadspaDir();
 	}
 
 #ifdef LMMS_HAVE_STK
@@ -511,7 +511,7 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 	QStringList searchPaths;
 	if(! qgetenv("LMMS_THEME_PATH").isNull())
 		searchPaths << qgetenv("LMMS_THEME_PATH");
-	searchPaths << artworkDir() << defaultArtworkDir();
+	searchPaths << themeDir() << defaultThemeDir();
 	QDir::setSearchPaths( "resources", searchPaths);
 
 	// Create any missing subdirectories in the working dir, but only if the working dir exists
@@ -528,19 +528,19 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 
 void ConfigManager::saveConfigFile()
 {
-	setValue( "paths", "artwork", m_artworkDir );
+	setValue( "paths", "theme", m_themeDir );
 	setValue( "paths", "workingdir", m_workingDir );
 	setValue( "paths", "vstdir", m_vstDir );
 	setValue( "paths", "gigdir", m_gigDir );
 	setValue( "paths", "sf2dir", m_sf2Dir );
-	setValue( "paths", "laddir", m_ladDir );
+	setValue( "paths", "ladspadir", m_ladspaDir );
 #ifdef LMMS_HAVE_STK
 	setValue( "paths", "stkdir", m_stkDir );
 #endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	setValue( "paths", "defaultsf2", m_defaultSoundfont );
+	setValue( "paths", "defaultsf2", m_sf2File );
 #endif
-	setValue( "paths", "backgroundartwork", m_backgroundArtwork );
+	setValue( "paths", "backgroundtheme", m_backgroundPicFile );
 
 	QDomDocument doc( "lmms-config-file" );
 
