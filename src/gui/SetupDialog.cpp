@@ -1522,19 +1522,3 @@ void SetupDialog::setBackgroundPicFile( const QString & backgroundPicFile )
 {
 	m_backgroundPicFile = backgroundPicFile;
 }
-
-/*
-TODO:
-Fix the position of the extras widegt.
-Fix that some odd stuff are required to display the "Paths settings" string.
-Find the height for path selectors layout that fits 5 tabs perfectly.
-*/
-
-/*
-Chnages:
-• Improved code style.
-• Improved translatable strings.
-• Reordered everything.
-• Divided the MISC tab into 2 tabs: GUI and Projects, and moved some of its items.
-• Moved some items to more appropriate places.
-*/
