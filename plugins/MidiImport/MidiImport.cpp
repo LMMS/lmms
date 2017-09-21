@@ -98,7 +98,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	if( gui != NULL &&
-		ConfigManager::inst()->defaultSoundfont().isEmpty() )
+		ConfigManager::inst()->sf2File().isEmpty() )
 	{
 		QMessageBox::information( gui->mainWindow(),
 			tr( "Setup incomplete" ),
@@ -237,7 +237,7 @@ public:
 			if( it_inst )
 			{
 				isSF2 = true;
-				it_inst->loadFile( ConfigManager::inst()->defaultSoundfont() );
+				it_inst->loadFile( ConfigManager::inst()->sf2File() );
 				it_inst->childModel( "bank" )->setValue( 0 );
 				it_inst->childModel( "patch" )->setValue( 0 );
 			}

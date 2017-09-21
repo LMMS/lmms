@@ -150,16 +150,16 @@ MainWindow::MainWindow() :
 	m_workspace = new QMdiArea( splitter );
 
 	// Load background
-	emit initProgress(tr("Loading background artwork"));
-	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
-	QImage bgImage;
-	if( !bgArtwork.isEmpty() )
+	emit initProgress(tr("Loading background theme"));
+	QString backgroundPicFile = ConfigManager::inst()->backgroundPicFile();
+	QImage backgroundPic;
+	if( !backgroundPicFile.isEmpty() )
 	{
-		bgImage = QImage( bgArtwork );
+		backgroundPic = QImage( backgroundPicFile );
 	}
-	if( !bgImage.isNull() )
+	if( !backgroundPicFile.isNull() )
 	{
-		m_workspace->setBackground( bgImage );
+		m_workspace->setBackground( backgroundPic );
 	}
 	else
 	{
