@@ -69,7 +69,7 @@
 typedef AutomationPattern::timeMap timeMap;
 
 
-// some constants...
+// Some constants.
 const int INITIAL_PIANOROLL_WIDTH = 860;
 const int INITIAL_PIANOROLL_HEIGHT = 480;
 
@@ -93,16 +93,16 @@ const int PR_TOP_MARGIN = 16;
 const int PR_RIGHT_MARGIN = SCROLLBAR_SIZE;
 
 
-// width of area used for resizing (the grip at the end of a note)
+// Width of area used for resizing (the grip at the end of a note).
 const int RESIZE_AREA_WIDTH = 9;
 
-// width of line for setting volume/panning of note
+// Width of line for setting volume/panning of note.
 const int NOTE_EDIT_LINE_WIDTH = 3;
 
-// key where to start
+// Key where to start
 const int INITIAL_START_KEY = Key_C + Octave_4 * KeysPerOctave;
 
-// number of each note to provide in quantization and note lengths
+// Number of each note to provide in quantization and note lengths.
 const int NUM_EVEN_LENGTHS = 6;
 const int NUM_TRIPLET_LENGTHS = 5;
 
@@ -131,13 +131,13 @@ static QString getNoteString( int key )
 
 
 
-// used for drawing of piano
+// Used for drawing of piano.
 PianoRoll::PianoRollKeyTypes PianoRoll::prKeyOrder[] =
 {
 	PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY,
 	PR_WHITE_KEY_SMALL, PR_WHITE_KEY_SMALL, PR_BLACK_KEY, PR_WHITE_KEY_BIG,
 	PR_BLACK_KEY, PR_WHITE_KEY_BIG, PR_BLACK_KEY, PR_WHITE_KEY_SMALL
-} ;
+};
 
 
 const int DEFAULT_PR_PPT = KEY_LINE_HEIGHT * DefaultStepsPerTact;
@@ -193,9 +193,11 @@ PianoRoll::PianoRoll() :
 	m_noteBorders( true ),
 	m_backgroundShade( 0, 0, 0 )
 {
-	// gui names of edit modes
-	m_nemStr.push_back( tr( "Note Velocity" ) );
-	m_nemStr.push_back( tr( "Note Panning" ) );
+	// GUI names of edit modes.
+	m_nemStr.push_back(
+			tr( "Note velocity" ) );
+	m_nemStr.push_back(
+			tr( "Note panning" ) );
 
 	QSignalMapper * signalMapper = new QSignalMapper( this );
 	m_noteEditMenu = new QMenu( this );
@@ -203,29 +205,41 @@ PianoRoll::PianoRoll() :
 	for( int i = 0; i < m_nemStr.size(); ++i )
 	{
 		QAction * act = new QAction( m_nemStr.at(i), this );
-		connect( act, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+		connect( act, SIGNAL(triggered()), signalMapper,
+				SLOT(map()) );
 		signalMapper->setMapping( act, i );
 		m_noteEditMenu->addAction( act );
 	}
-	connect( signalMapper, SIGNAL(mapped(int)),
-			this, SLOT(changeNoteEditMode(int)) );
+	connect( signalMapper, SIGNAL(mapped(int)), this,
+			SLOT(changeNoteEditMode(int)) );
 
 	signalMapper = new QSignalMapper( this );
 	m_semiToneMarkerMenu = new QMenu( this );
 
-	QAction* markSemitoneAction = new QAction( tr("Mark/unmark current semitone"), this );
-	QAction* markAllOctaveSemitonesAction = new QAction( tr("Mark/unmark all corresponding octave semitones"), this );
-	QAction* markScaleAction = new QAction( tr("Mark current scale"), this );
-	QAction* markChordAction = new QAction( tr("Mark current chord"), this );
-	QAction* unmarkAllAction = new QAction( tr("Unmark all"), this );
-	QAction* copyAllNotesAction = new QAction( tr("Select all notes on this key"), this);
+	QAction* markSemitoneAction = new QAction(
+			tr("Mark/unmark current semitone"), this );
+	QAction* markAllOctaveSemitonesAction = new QAction(
+			tr("Mark/unmark all corresponding octave semitones"), this );
+	QAction* markScaleAction = new QAction(
+			tr("Mark current scale"), this );
+	QAction* markChordAction = new QAction(
+			tr("Mark current chord"), this );
+	QAction* unmarkAllAction = new QAction(
+			tr("Unmark all"), this );
+	QAction* copyAllNotesAction = new QAction(
+			tr("Select all notes on this key"), this);
 
-	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( markSemitoneAction, SIGNAL(triggered()), signalMapper,
+			SLOT(map()) );
 	connect( markAllOctaveSemitonesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( markScaleAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( markChordAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
-	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+	connect( markScaleAction, SIGNAL(triggered()), signalMapper,
+			SLOT(map()) );
+	connect( markChordAction, SIGNAL(triggered()), signalMapper,
+			SLOT(map()) );
+	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper,
+			SLOT(map()) );
+	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper,
+			SLOT(map()) );
 
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
 	signalMapper->setMapping( markAllOctaveSemitonesAction, static_cast<int>( stmaMarkAllOctaveSemiTones ) );
@@ -237,10 +251,13 @@ PianoRoll::PianoRoll() :
 	markScaleAction->setEnabled( false );
 	markChordAction->setEnabled( false );
 
-	connect( this, SIGNAL(semiToneMarkerMenuScaleSetEnabled(bool)), markScaleAction, SLOT(setEnabled(bool)) );
-	connect( this, SIGNAL(semiToneMarkerMenuChordSetEnabled(bool)), markChordAction, SLOT(setEnabled(bool)) );
+	connect( this, SIGNAL(semiToneMarkerMenuScaleSetEnabled(bool)), markScaleAction,
+			SLOT(setEnabled(bool)) );
+	connect( this, SIGNAL(semiToneMarkerMenuChordSetEnabled(bool)), markChordAction,
+			SLOT(setEnabled(bool)) );
 
-	connect( signalMapper, SIGNAL(mapped(int)), this, SLOT(markSemiTone(int)) );
+	connect( signalMapper, SIGNAL(mapped(int)), this,
+			SLOT(markSemiTone(int)) );
 
 	m_semiToneMarkerMenu->addAction( markSemitoneAction );
 	m_semiToneMarkerMenu->addAction( markAllOctaveSemitonesAction );
@@ -249,7 +266,7 @@ PianoRoll::PianoRoll() :
 	m_semiToneMarkerMenu->addAction( unmarkAllAction );
 	m_semiToneMarkerMenu->addAction( copyAllNotesAction );
 
-	// init pixmaps
+	// Init pixmaps.
 	if( s_whiteKeySmallPm == NULL )
 	{
 		s_whiteKeySmallPm = new QPixmap( embed::getIconPixmap(
@@ -301,7 +318,7 @@ PianoRoll::PianoRoll() :
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
 	}
 
-	// init text-float
+	// Init text-float.
 	if( s_textFloat == NULL )
 	{
 		s_textFloat = new TextFloat;
@@ -309,52 +326,48 @@ PianoRoll::PianoRoll() :
 
 	setAttribute( Qt::WA_OpaquePaintEvent, true );
 
-	// add time-line
+	// Add timeline.
 	m_timeLine = new TimeLineWidget( WHITE_KEY_WIDTH, 0, m_ppt,
 					Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern ),
 						m_currentPosition, this );
-	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
-		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
-	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
-			this, SLOT( updatePosition( const MidiTime & ) ) );
+	connect( this, SIGNAL( positionChanged( const MidiTime & ) ), m_timeLine,
+			SLOT( updatePosition( const MidiTime & ) ) );
+	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ), this,
+			SLOT( updatePosition( const MidiTime & ) ) );
 
-	// update timeline when in record-accompany mode
-	connect( Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine,
-				SIGNAL( positionChanged( const MidiTime & ) ),
-			this,
+	// Update timeline when in record-accompany mode.
+	connect( Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ), this,
 			SLOT( updatePositionAccompany( const MidiTime & ) ) );
-	// TODO
-/*	connect( engine::getSong()->getPlayPos( Song::Mode_PlayBB ).m_timeLine,
-				SIGNAL( positionChanged( const MidiTime & ) ),
-			this,
+	// TODO:
+/*	connect( engine::getSong()->getPlayPos( Song::Mode_PlayBB ).m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ), this,
 			SLOT( updatePositionAccompany( const MidiTime & ) ) );*/
 
 	removeSelection();
 
-	// init scrollbars
+	// Init horizontal scrollbar.
 	m_leftRightScroll = new QScrollBar( Qt::Horizontal, this );
 	m_leftRightScroll->setSingleStep( 1 );
 	connect( m_leftRightScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( horScrolled( int ) ) );
-
+			SLOT( horScrolled( int ) ) );
+	// Init vertical scrollbar.
 	m_topBottomScroll = new QScrollBar( Qt::Vertical, this );
 	m_topBottomScroll->setSingleStep( 1 );
-	m_topBottomScroll->setPageStep( 20 );
 	connect( m_topBottomScroll, SIGNAL( valueChanged( int ) ), this,
-						SLOT( verScrolled( int ) ) );
+			SLOT( verScrolled( int ) ) );
 
-	// setup zooming-stuff
+	// Set up zooming stuff.
 	for( float const & zoomLevel : m_zoomLevels )
 	{
 		m_zoomingModel.addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel.setValue( m_zoomingModel.findText( "100%" ) );
-	connect( &m_zoomingModel, SIGNAL( dataChanged() ),
-					this, SLOT( zoomingChanged() ) );
+	connect( &m_zoomingModel, SIGNAL( dataChanged() ), this,
+			SLOT( zoomingChanged() ) );
 
-	// Set up quantization model
-	m_quantizeModel.addItem( tr( "Note lock" ) );
+	// Set up quantization model.
+	m_quantizeModel.addItem(
+			tr( "Note lock" ) );
 	for( int i = 0; i <= NUM_EVEN_LENGTHS; ++i )
 	{
 		m_quantizeModel.addItem( "1/" + QString::number( 1 << i ) );
@@ -366,16 +379,17 @@ PianoRoll::PianoRoll() :
 	m_quantizeModel.addItem( "1/192" );
 	m_quantizeModel.setValue( m_quantizeModel.findText( "1/16" ) );
 
-	connect( &m_quantizeModel, SIGNAL( dataChanged() ),
-					this, SLOT( quantizeChanged() ) );
+	connect( &m_quantizeModel, SIGNAL( dataChanged() ), this,
+			SLOT( quantizeChanged() ) );
 
-	// Set up note length model
-	m_noteLenModel.addItem( tr( "Last note" ),
+	// Set up note length model.
+	m_noteLenModel.addItem(
+			tr( "Last note" ),
 					new PixmapLoader( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
-						"tripletsixteenth", "tripletthirtysecond" } ;
+						"tripletsixteenth", "tripletthirtysecond" };
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
@@ -389,15 +403,16 @@ PianoRoll::PianoRoll() :
 	}
 	m_noteLenModel.setValue( 0 );
 
-	// Note length change can cause a redraw if Q is set to lock
-	connect( &m_noteLenModel, SIGNAL( dataChanged() ),
-					this, SLOT( quantizeChanged() ) );
+	// Note length change can cause a redraw if Q is set to lock.
+	connect( &m_noteLenModel, SIGNAL( dataChanged() ), this,
+			SLOT( quantizeChanged() ) );
 
-	// Set up scale model
+	// Set up scale model.
 	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
 			InstrumentFunctionNoteStacking::ChordTable::getInstance();
 
-	m_scaleModel.addItem( tr("No scale") );
+	m_scaleModel.addItem(
+			tr("No scale") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
 	{
 		if( chord.isScale() )
@@ -407,12 +422,13 @@ PianoRoll::PianoRoll() :
 	}
 
 	m_scaleModel.setValue( 0 );
-	// change can update m_semiToneMarkerMenu
-	connect( &m_scaleModel, SIGNAL( dataChanged() ),
-						this, SLOT( updateSemiToneMarkerMenu() ) );
+	// Change can update m_semiToneMarkerMenu.
+	connect( &m_scaleModel, SIGNAL( dataChanged() ), this,
+			SLOT( updateSemiToneMarkerMenu() ) );
 
-	// Set up chord model
-	m_chordModel.addItem( tr("No chord") );
+	// Set up chord model.
+	m_chordModel.addItem(
+			tr("No chord") );
 	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
 	{
 		if( ! chord.isScale() )
@@ -423,23 +439,22 @@ PianoRoll::PianoRoll() :
 
 	m_chordModel.setValue( 0 );
 
-	// change can update m_semiToneMarkerMenu
-	connect( &m_chordModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateSemiToneMarkerMenu() ) );
+	// Change can update m_semiToneMarkerMenu.
+	connect( &m_chordModel, SIGNAL( dataChanged() ), this,
+			SLOT( updateSemiToneMarkerMenu() ) );
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setMouseTracking( true );
 
-	connect( &m_scaleModel, SIGNAL( dataChanged() ),
-					this, SLOT( updateSemiToneMarkerMenu() ) );
+	connect( &m_scaleModel, SIGNAL( dataChanged() ), this, SLOT( updateSemiToneMarkerMenu() ) );
 
-	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ),
-						this, SLOT( update() ) );
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int, int ) ), this,
+			SLOT( update() ) );
 
-	//connection for selecion from timeline
-	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
-			this, SLOT( selectRegionFromPixels( int, int ) ) );
+	// Connection for selecion from timeline.
+	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ), this,
+			SLOT( selectRegionFromPixels( int, int ) ) );
 }
 
 
@@ -453,7 +468,7 @@ void PianoRoll::reset()
 void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeout)
 {
 	s_textFloat->setText( text );
-	// show the float, offset slightly so as to not obscure anything
+	// Show the float, offset slightly so as to not obscure anything.
 	s_textFloat->moveGlobal( this, pos + QPoint(4, 16) );
 	if (timeout == -1)
 	{
@@ -469,8 +484,9 @@ void PianoRoll::showTextFloat(const QString &text, const QPoint &pos, int timeou
 void PianoRoll::showVolTextFloat(volume_t vol, const QPoint &pos, int timeout)
 {
 	//! \todo display velocity for MIDI-based instruments
-	// possibly dBFS values too? not sure if it makes sense for note volumes...
-	showTextFloat( tr("Velocity: %1%").arg( vol ), pos, timeout );
+	// Possibly dBFS values too? Not sure if it makes sense for note volumes.
+	showTextFloat(
+			tr("Velocity: %1%").arg( vol ), pos, timeout );
 }
 
 
@@ -479,15 +495,18 @@ void PianoRoll::showPanTextFloat(panning_t pan, const QPoint &pos, int timeout)
 	QString text;
 	if( pan < 0 )
 	{
-		text = tr("Panning: %1% left").arg( qAbs( pan ) );
+		text =
+				tr("Panning: %1% left").arg( qAbs( pan ) );
 	}
 	else if( pan > 0 )
 	{
-		text = tr("Panning: %1% right").arg( qAbs( pan ) );
+		text =
+				tr("Panning: %1% right").arg( qAbs( pan ) );
 	}
 	else
 	{
-		text = tr("Panning: center");
+		text =
+				tr("Panning: center");
 	}
 	showTextFloat( text, pos, timeout );
 }
@@ -530,7 +549,7 @@ void PianoRoll::markSemiTone( int i )
 
 			if ( m_markedSemiTones.contains(key) )
 			{
-				// lets erase all of the ones that match this by octave
+				// Lets erase all of the ones that match this by octave.
 				QList<int>::iterator i;
 				for (int ix = 0; ix < aok.size(); ++ix)
 				{
@@ -540,7 +559,7 @@ void PianoRoll::markSemiTone( int i )
 			}
 			else
 			{
-				// we should add all of the ones that match this by octave
+				// We should add all of the ones that match this by octave.
 				m_markedSemiTones.append(aok);
 			}
 
@@ -606,14 +625,14 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 		m_pattern->instrumentTrack()->disconnect( this );
 	}
 
-	// force the song-editor to stop playing if it played pattern before
+	// Force the song editor to stop playing if it played pattern before.
 	if( Engine::getSong()->isPlaying() &&
 		Engine::getSong()->playMode() == Song::Mode_PlayPattern )
 	{
 		Engine::getSong()->playPattern( NULL );
 	}
 
-	// set new data
+	// Set new data.
 	m_pattern = newPattern;
 	m_currentPosition = 0;
 	m_currentNote = NULL;
@@ -630,7 +649,7 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 
 	m_leftRightScroll->setValue( 0 );
 
-	// determine the central key so that we can scroll to it
+	// Determine the central key so that we can scroll to.
 	int central_key = 0;
 	int total_notes = 0;
 	for( const Note *note : m_pattern->notes() )
@@ -650,15 +669,18 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	}
 
 	// resizeEvent() does the rest for us (scrolling, range-checking
-	// of start-notes and so on...)
+	// of start-notes and so on).
 	resizeEvent( NULL );
 
-	// make sure to always get informed about the pattern being destroyed
-	connect( m_pattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( hidePattern( Pattern* ) ) );
-
-	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
-	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
-	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+	// Make sure to always get informed about the pattern being destroyed.
+	connect( m_pattern, SIGNAL( destroyedPattern( Pattern* ) ), this,
+			SLOT( hidePattern( Pattern* ) ) );
+	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this,
+			SLOT( startRecordNote( const Note& ) ) );
+	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this,
+			SLOT( finishRecordNote( const Note& ) ) );
+	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this,
+			SLOT( update() ) );
 
 	update();
 	emit currentPatternChanged();
@@ -680,7 +702,7 @@ void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 	xStart -= WHITE_KEY_WIDTH;
 	xEnd  -= WHITE_KEY_WIDTH;
 
-	// select an area of notes
+	// Select an area of notes.
 	int pos_ticks = xStart * MidiTime::ticksPerTact() / m_ppt +
 					m_currentPosition;
 	int key_num = 0;
@@ -688,9 +710,9 @@ void PianoRoll::selectRegionFromPixels( int xStart, int xEnd )
 	m_selectedTick = 0;
 	m_selectStartKey = key_num;
 	m_selectedKeys = 1;
-	// change size of selection
+	// Change size of selection.
 
-	// get tick in which the cursor is posated
+	// Get tick in which the cursor is posated.
 	pos_ticks = xEnd  * MidiTime::ticksPerTact() / m_ppt +
 					m_currentPosition;
 	key_num = 120;
@@ -841,8 +863,8 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 	const int noteHeight = KEY_LINE_HEIGHT - 1 - borderWidth;
 	int noteWidth = width + 1 - borderWidth;
 
-	// adjust note to make it a bit faded if it has a lower volume
-	// in stereo using gradients
+	// Adjust note to make it a bit faded if it has a lower volume
+	// in stereo using gradients.
 	QColor lcol = QColor::fromHsv( col.hue(), col.saturation(),
 						volVal * leftPercent, noteOpc );
 	QColor rcol = QColor::fromHsv( col.hue(), col.saturation(),
@@ -864,7 +886,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 	p.drawRect( x, y, noteWidth, noteHeight );
 
-	// draw the note endmark, to hint the user to resize
+	// Draw the note endmark, to hint the user to resize.
 	p.setBrush( col );
 	if( width > 2 )
 	{
@@ -955,15 +977,15 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 	bool useAllNotes = ! isSelection();
 	for( Note *note : m_pattern->notes() )
 	{
-		// if none are selected, move all notes, otherwise
-		// only move selected notes
+		// If none are selected, move all notes, otherwise
+		// only move selected notes.
 		if( useAllNotes || note->selected() )
 		{
 			note->setKey( note->key() + amount );
 		}
 	}
 
-	// we modified the song
+	// We modified the song.
 	update();
 	gui->songEditor()->update();
 }
@@ -978,11 +1000,11 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 	bool first = true;
 	for( Note *note : m_pattern->notes() )
 	{
-		// if none are selected, move all notes, otherwise
-		// only move selected notes
+		// If none are selected, move all notes, otherwise
+		// only move selected notes.
 		if( note->selected() || (useAllNotes && note->length() > 0) )
 		{
-			// don't let notes go to out of bounds
+			// Don't let notes go to out of bounds.
 			if( first )
 			{
 				m_moveBoundaryLeft = note->pos();
@@ -1000,7 +1022,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 	m_pattern->updateLength();
 	m_pattern->dataChanged();
 
-	// we modified the song
+	// We modified the song.
 	update();
 	gui->songEditor()->update();
 }
@@ -1008,7 +1030,7 @@ void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 
 
 
-bool PianoRoll::isSelection() const // are any notes selected?
+bool PianoRoll::isSelection() const // Are any notes selected?
 {
 	for( const Note *note : m_pattern->notes() )
 	{
@@ -1023,7 +1045,7 @@ bool PianoRoll::isSelection() const // are any notes selected?
 
 
 
-int PianoRoll::selectionCount() const // how many notes are selected?
+int PianoRoll::selectionCount() const // How many notes are selected?
 {
 	int sum = 0;
 
@@ -1059,32 +1081,32 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 		case Qt::Key_Down:
 			{
 				int direction = (ke->key() == Qt::Key_Up ? +1 : -1);
-				if( ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone )
+				if( ( ke->modifiers() & Qt::ControlModifier ) && ! ( ke->modifiers() & Qt::ShiftModifier ) && m_action == ActionNone ) // Added !.
 				{
-					// shift selection up an octave
-					// if nothing selected, shift _everything_
+					// Shift selection up an octave,
+					// if nothing is selected, shift everything.
 					shiftSemiTone( 12 * direction );
 				}
-				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
+				else if( ( ke->modifiers() & Qt::ShiftModifier ) && ! ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone ) // Added !.
 				{
-					// Move selected notes up by one semitone
+					// Move selected notes up by one semitone.
 					shiftSemiTone( 1 * direction );
 				}
 				else
 				{
-					// scroll
+					// Scroll.
 					m_topBottomScroll->setValue( m_topBottomScroll->value() -
-						cm_scrollAmtVert * direction );
+							cm_scrollAmtVert * direction );
 
-					// if they are moving notes around or resizing,
-					// recalculate the note/resize position
+					// If they are moving notes around or resizing,
+					// recalculate the note/resize position.
 					if( m_action == ActionMoveNote ||
 							m_action == ActionResizeNote )
 					{
 						dragNotes( m_lastMouseX, m_lastMouseY,
-									ke->modifiers() & Qt::AltModifier,
-									ke->modifiers() & Qt::ShiftModifier,
-									ke->modifiers() & Qt::ControlModifier );
+								ke->modifiers() & Qt::AltModifier,
+								ke->modifiers() & Qt::ShiftModifier,
+								ke->modifiers() & Qt::ControlModifier );
 					}
 				}
 				ke->accept();
@@ -1095,21 +1117,21 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 		case Qt::Key_Left:
 			{
 				int direction = (ke->key() == Qt::Key_Right ? +1 : -1);
-				if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone )
+				if( ( ke->modifiers() & Qt::ControlModifier ) && ! ( ke->modifiers() & Qt::ShiftModifier ) && m_action == ActionNone ) // Added !.
 				{
-					// Move selected notes by one bar to the left
+					// Move selected notes by one bar to the left.
 					shiftPos( direction * MidiTime::ticksPerTact() );
 				}
-				else if( ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
+				else if( ( ke->modifiers() & Qt::ShiftModifier ) && ! ( ke->modifiers() & Qt::ControlModifier ) && m_action == ActionNone) // Added !.
 				{
-					// move notes
+					// Move notes.
 					bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
 					int amt = quantized ? quantization() : 1;
 					shiftPos( direction * amt );
 				}
 				else if( ke->modifiers() & Qt::AltModifier)
 				{
-					// switch to editing a pattern adjacent to this one in the song editor
+					// Switch to editing a pattern adjacent to this one in the song editor.
 					Pattern * p = direction > 0 ? m_pattern->nextPattern() : m_pattern->previousPattern();
 					if(p != NULL)
 					{
@@ -1118,12 +1140,12 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				}
 				else
 				{
-					// scroll
+					// Scroll.
 					m_leftRightScroll->setValue( m_leftRightScroll->value() +
 						direction * cm_scrollAmtHoriz );
 
-					// if they are moving notes around or resizing,
-					// recalculate the note/resize position
+					// If they are moving notes around or resizing,
+					// recalculate the note/resize position.
 					if( m_action == ActionMoveNote ||
 							m_action == ActionResizeNote )
 					{
@@ -1144,20 +1166,27 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				ke->accept();
 				if (ke->modifiers() & Qt::ShiftModifier)
 				{
-					// Ctrl + Shift + A = deselect all notes
+					// Ctrl + Shift + A = deselect all notes.
 					clearSelectedNotes();
 				}
 				else
 				{
-					// Ctrl + A = select all notes
+					// Ctrl + A = select all notes.
 					selectAll();
 				}
 				update();
 			}
 			break;
 
+		/* case Qt::Key_B:
+			if( ke->modifiers() & Qt::ControlModifier )
+			{
+				ke->accept();
+
+			} */
+
 		case Qt::Key_Escape:
-			// Same as Ctrl + Shift + A
+			// Same as Ctrl + Shift + A.
 			clearSelectedNotes();
 			break;
 
@@ -1205,7 +1234,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 			// Enter selection mode if:
 			// -> this window is active
 			// -> shift is not pressed
-			// (<S-C-drag> is shortcut for sticky note resize)
+			// (<S-C-drag> is shortcut for sticky note resize).
 			if ( !( ke->modifiers() & Qt::ShiftModifier ) && isActiveWindow() )
 			{
 				m_ctrlMode = m_editMode;
@@ -1217,7 +1246,6 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 		default:
 			break;
 	}
-
 	update();
 }
 
@@ -1245,7 +1273,7 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			update();
 			break;
 
-		// update after undo/redo
+		// Update after undo/redo.
 		case Qt::Key_Z:
 		case Qt::Key_R:
 			if( hasValidPattern() && ke->modifiers() == Qt::ControlModifier )
@@ -1254,7 +1282,6 @@ void PianoRoll::keyReleaseEvent(QKeyEvent* ke )
 			}
 			break;
 	}
-
 	update();
 }
 
@@ -1346,12 +1373,13 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			n->createDetuning();
 		}
 		detuningPattern = n->detuning()->automationPattern();
-		connect(detuningPattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(detuningPattern, SIGNAL(dataChanged()), this,
+				SLOT(update()));
 		gui->automationEditor()->open(detuningPattern);
 		return;
 	}
 
-	// if holding control, go to selection mode unless shift is also pressed
+	// If holding control, go to selection mode unless shift is also pressed.
 	if( me->modifiers() & Qt::ControlModifier && m_editMode != ModeSelect )
 	{
 		m_ctrlMode = m_editMode;
@@ -1360,7 +1388,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		update();
 	}
 
-	// keep track of the point where the user clicked down
+	// Keep track of the point where the user clicked down.
 	if( me->button() == Qt::LeftButton )
 	{
 		m_moveStartX = me->x();
@@ -1369,7 +1397,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( me->y() > keyAreaBottom() && me->y() < noteEditTop() )
 	{
-		// resizing the note edit area
+		// Resizing the note edit area.
 		m_action = ActionResizeNoteEditArea;
 		m_oldNotesEditHeight = m_notesEditHeight;
 		return;
@@ -1386,22 +1414,22 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 		if( x > WHITE_KEY_WIDTH )
 		{
-			// set, move or resize note
+			// Set, move or resize note.
 
 			x -= WHITE_KEY_WIDTH;
 
-			// get tick in which the user clicked
+			// Get tick in which the user clicked.
 			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
 
-			// get note-vector of current pattern
+			// Get note-vector of current pattern.
 			const NoteVector & notes = m_pattern->notes();
 
-			// will be our iterator in the following loop
+			// Will be our iterator in the following loop.
 			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 
-			// loop through whole note-vector...
+			// Loop through whole note-vector.
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note *note = *it;
@@ -1410,8 +1438,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				{
 					len = 4;
 				}
-				// and check whether the user clicked on an
-				// existing note or an edit-line
+				// And check whether the user clicked on an
+				// existing note or an edit-line.
 				if( pos_ticks >= note->pos() &&
 						len > 0 &&
 					(
@@ -1430,36 +1458,35 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				--it;
 			}
 
-			// first check whether the user clicked in note-edit-
-			// area
+			// First check whether the user clicked in note-edit area.
 			if( edit_note )
 			{
 				m_pattern->addJournalCheckPoint();
-				// scribble note edit changes
+				// Scribble note edit changes.
 				mouseMoveEvent( me );
 				return;
 			}
-			// left button??
+			// Left button?
 			else if( me->button() == Qt::LeftButton &&
 							m_editMode == ModeDraw )
 			{
-				// whether this action creates new note(s) or not
+				// Whether this action creates new note(s) or not.
 				bool is_new_note = false;
 
 				Note * created_new_note = NULL;
-				// did it reach end of vector because
-				// there's no note??
+				// Did it reach end of vector because
+				// there's no note?
 				if( it == notes.begin()-1 )
 				{
 					is_new_note = true;
 					m_pattern->addJournalCheckPoint();
 
-					// then set new note
+					// Then set new note.
 
-					// clear selection and select this new note
+					// Clear selection and select this new note.
 					clearSelectedNotes();
 
-					// +32 to quanitize the note correctly when placing notes with
+					// +32 To quanitize the note correctly when placing notes with
 					// the mouse.  We do this here instead of in note.quantized
 					// because live notes should still be quantized at the half.
 					MidiTime note_pos( pos_ticks - ( quantization() / 2 ) );
@@ -1476,8 +1503,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 					if( ! chord.isEmpty() )
 					{
-						// if a chord is selected, create following notes in chord
-						// or arpeggio mode
+						// If a chord is selected, create following notes in chord
+						// or arpeggio mode.
 						const bool arpeggio = me->modifiers() & Qt::ShiftModifier;
 						for( int i = 1; i < chord.size(); i++ )
 						{
@@ -1493,9 +1520,9 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						}
 					}
 
-					// reset it so that it can be used for
+					// Reset it so that it can be used for
 					// ops (move, resize) after this
-					// code-block
+					// code-block.
 					it = notes.begin();
 					while( it != notes.end() && *it != created_new_note )
 					{
@@ -1509,7 +1536,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				m_lastNoteVolume = current_note->getVolume();
 				m_lenOfNewNotes = current_note->length();
 
-				// remember which key and tick we started with
+				// Remember which key and tick we started with.
 				m_mouseDownKey = m_startKey;
 				m_mouseDownTick = m_currentPosition;
 
@@ -1518,7 +1545,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				{
 					Note *note = *it;
 
-					// remember note starting positions
+					// Remember note starting positions.
 					note->setOldKey( note->key() );
 					note->setOldPos( note->pos() );
 					note->setOldLength( note->length() );
@@ -1526,7 +1553,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					if( note->selected() )
 					{
 
-						// figure out the bounding box of all the selected notes
+						// Figure out the bounding box of all the selected notes.
 						if( first )
 						{
 							m_moveBoundaryLeft = note->pos().getTicks();
@@ -1551,8 +1578,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					}
 				}
 
-				// if clicked on an unselected note, remove selection
-				// and select that new note
+				// If clicked on an unselected note, remove selection
+				// and select that new note.
 				if( ! m_currentNote->selected() )
 				{
 					clearSelectedNotes();
@@ -1564,16 +1591,16 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				}
 
 
-				// clicked at the "tail" of the note?
+				// Clicked at the "tail" of the note?
 				if( pos_ticks * m_ppt / MidiTime::ticksPerTact() >
 						m_currentNote->endPos() * m_ppt / MidiTime::ticksPerTact() - RESIZE_AREA_WIDTH
 					&& m_currentNote->length() > 0 )
 				{
 					m_pattern->addJournalCheckPoint();
-					// then resize the note
+					// Then resize the note.
 					m_action = ActionResizeNote;
 
-					// set resize-cursor
+					// Set resize-cursor.
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
 				}
@@ -1584,23 +1611,23 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 						m_pattern->addJournalCheckPoint();
 					}
 
-					// otherwise move it
+					// Otherwise move it.
 					m_action = ActionMoveNote;
 
-					// set move-cursor
+					// Set move-cursor.
 					QCursor c( Qt::SizeAllCursor );
 					QApplication::setOverrideCursor( c );
 
-					// if they're holding shift, copy all selected notes
+					// If they're holding shift, copy all selected notes.
 					if( ! is_new_note && me->modifiers() & Qt::ShiftModifier )
 					{
-						// vector to hold new notes until we're through the loop
+						// Vector to hold new notes until we're through the loop.
 						QVector<Note> newNotes;
 						for( Note* const& note : notes )
 						{
 							if( note->selected() )
 							{
-								// copy this note
+								// Copy this note.
 								Note noteCopy( *note );
 								newNotes.push_back( noteCopy );
 							}
@@ -1609,21 +1636,21 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 						if( newNotes.size() != 0 )
 						{
-							//put notes from vector into piano roll
+							// Put notes from vector into piano roll.
 							for( int i = 0; i < newNotes.size(); ++i)
 							{
 								Note * newNote = m_pattern->addNote( newNotes[i], false );
 								newNote->setSelected( false );
 							}
 
-							// added new notes, so must update engine, song, etc
+							// Added new notes, so must update engine, song, etc.
 							Engine::getSong()->setModified();
 							update();
 							gui->songEditor()->update();
 						}
 					}
 
-					// play the note
+					// Play the note.
 					testPlayNote( m_currentNote );
 				}
 
@@ -1633,7 +1660,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 							m_editMode == ModeDraw ) ||
 					m_editMode == ModeErase )
 			{
-				// erase single note
+				// Erase single note.
 				m_mouseDownRight = true;
 				if( it != notes.begin()-1 )
 				{
@@ -1645,7 +1672,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			else if( me->button() == Qt::LeftButton &&
 							m_editMode == ModeSelect )
 			{
-				// select an area of notes
+				// Select an area of notes.
 
 				m_selectStartTick = pos_ticks;
 				m_selectedTick = 0;
@@ -1653,29 +1680,28 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 				m_selectedKeys = 1;
 				m_action = ActionSelectNotes;
 
-				// call mousemove to fix glitch where selection
-				// appears in wrong spot on mousedown
+				// Call mousemove to fix glitch where selection
+				// appears in wrong spot on mousedown.
 				mouseMoveEvent( me );
 			}
-
 			update();
 		}
 		else if( me->y() < keyAreaBottom() )
 		{
-			// reference to last key needed for both
+			// Reference to last key needed for both
 			// right click (used for copy all keys on note)
-			// and for playing the key when left-clicked
+			// and for playing the key when left-clicked.
 			m_lastKey = key_num;
 
-			// clicked on keyboard on the left
+			// clicked on keyboard on the left.
 			if( me->buttons() == Qt::RightButton )
 			{
-				// right click - tone marker contextual menu
+				// Right click - tone marker contextual menu.
 				m_semiToneMarkerMenu->popup( mapToGlobal( QPoint( me->x(), me->y() ) ) );
 			}
 			else if( me->buttons() == Qt::LeftButton )
 			{
-				// left click - play the note
+				// Left click - play the note.
 				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity;
 				m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key_num, v );
 			}
@@ -1684,7 +1710,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		{
 			if( me->buttons() == Qt::LeftButton )
 			{
-				// clicked in the box below the keys to the left of note edit area
+				// Clicked in the box below the keys to the left of note edit area.
 				m_noteEditMode = (NoteEditMode)(((int)m_noteEditMode)+1);
 				if( m_noteEditMode == NoteEditCount )
 				{
@@ -1694,7 +1720,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			}
 			else if( me->buttons() == Qt::RightButton )
 			{
-				// pop menu asking which one they want to edit
+				// Pop menu asking which one they want to edit.
 				m_noteEditMenu->popup( mapToGlobal( QPoint( me->x(), me->y() ) ) );
 			}
 		}
@@ -1711,11 +1737,11 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 		return;
 	}
 
-	// if they clicked in the note edit area, enter value for the volume bar
+	// If they clicked in the note edit area, enter value for the volume bar.
 	if( me->x() > noteEditLeft() && me->x() < noteEditRight()
 		&& me->y() > noteEditTop() && me->y() < noteEditBottom() )
 	{
-		// get values for going through notes
+		// Get values for going through notes.
 		int pixel_range = 4;
 		int x = me->x() - WHITE_KEY_WIDTH;
 		const int ticks_start = ( x-pixel_range/2 ) *
@@ -1724,7 +1750,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 		const int ticks_middle = x * MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
-		// go through notes to figure out which one we want to change
+		// Go through notes to figure out which one we want to change.
 		bool altPressed = me->modifiers() & Qt::AltModifier;
 		NoteVector nv;
 		for ( Note * i : m_pattern->notes() )
@@ -1734,12 +1760,12 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 				nv += i;
 			}
 		}
-		// make sure we're on a note
+		// Make sure we're on a note.
 		if( nv.size() > 0 )
 		{
 			const Note * closest = NULL;
 			int closest_dist = 9999999;
-			// if we caught multiple notes, find the closest...
+			// If we caught multiple notes, find the closest
 			if( nv.size() > 1 )
 			{
 				for ( const Note * i : nv )
@@ -1747,7 +1773,7 @@ void PianoRoll::mouseDoubleClickEvent(QMouseEvent * me )
 					const int dist = qAbs( i->pos().getTicks() - ticks_middle );
 					if( dist < closest_dist ) { closest = i; closest_dist = dist; }
 				}
-				// ... then remove all notes from the vector that aren't on the same exact time
+				// then remove all notes from the vector that aren't on the same exact time.
 				NoteVector::Iterator it = nv.begin();
 				while( it != nv.end() )
 				{
@@ -1801,12 +1827,12 @@ void PianoRoll::pauseTestNotes( bool pause )
 		{
 			if( pause )
 			{
-				// stop note
+				// Stop note.
 				m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( note->key() );
 			}
 			else
 			{
-				// start note
+				// Start note.
 				note->setIsPlaying( false );
 				testPlayNote( note );
 			}
@@ -1819,13 +1845,13 @@ void PianoRoll::pauseTestNotes( bool pause )
 
 void PianoRoll::testPlayKey( int key, int velocity, int pan )
 {
-	// turn off old key
+	// Turn off old key.
 	m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( m_lastKey );
 
-	// remember which one we're playing
+	// Remember which one we're playing.
 	m_lastKey = key;
 
-	// play new key
+	// Play new key.
 	m_pattern->instrumentTrack()->pianoModel()->handleKeyPress( key, velocity );
 }
 
@@ -1839,11 +1865,11 @@ void PianoRoll::computeSelectedNotes(bool shift)
 		m_selectStartKey == 0 &&
 		m_selectedKeys == 0 )
 	{
-		// don't bother, there's no selection
+		// Don't bother, there's no selection.
 		return;
 	}
 
-	// setup selection-vars
+	// Set up selection-vars.
 	int sel_pos_start = m_selectStartTick;
 	int sel_pos_end = m_selectStartTick+m_selectedTick;
 	if( sel_pos_start > sel_pos_end )
@@ -1858,12 +1884,12 @@ void PianoRoll::computeSelectedNotes(bool shift)
 		qSwap<int>( sel_key_start, sel_key_end );
 	}
 
-	//int y_base = noteEditTop() - 1;
+	// int y_base = noteEditTop() - 1;
 	if( hasValidPattern() )
 	{
 		for( Note *note : m_pattern->notes() )
 		{
-			// make a new selection unless they're holding shift
+			// Make a new selection unless they're holding shift.
 			if( ! shift )
 			{
 				note->setSelected( false );
@@ -1884,19 +1910,18 @@ void PianoRoll::computeSelectedNotes(bool shift)
 
 			int pos_ticks = note->pos();
 
-			// if the selection even barely overlaps the note
+			// If the selection even barely overlaps the note.
 			if( key > sel_key_start &&
 				key <= sel_key_end &&
 				pos_ticks + len_ticks > sel_pos_start &&
 				pos_ticks < sel_pos_end )
 			{
-				// remove from selection when holding shift
+				// Remove from selection when holding shift.
 				bool selected = shift && note->selected();
 				note->setSelected( ! selected);
 			}
 		}
 	}
-
 	removeSelection();
 	update();
 }
@@ -1916,24 +1941,24 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 		if( m_action == ActionSelectNotes && m_editMode == ModeSelect )
 		{
-			// select the notes within the selection rectangle and
-			// then destroy the selection rectangle
+			// Select the notes within the selection rectangle and
+			// then destroy the selection rectangle.
 			computeSelectedNotes(
 					me->modifiers() & Qt::ShiftModifier );
 		}
 		else if( m_action == ActionMoveNote )
 		{
-			// we moved one or more notes so they have to be
+			// We moved one or more notes so they have to be
 			// moved properly according to new starting-
-			// time in the note-array of pattern
+			// time in the note-array of pattern.
 			m_pattern->rearrangeAllNotes();
 
 		}
 
 		if( m_action == ActionMoveNote || m_action == ActionResizeNote )
 		{
-			// if we only moved one note, deselect it so we can
-			// edit the notes in the note edit area
+			// If we only moved one note, deselect it so we can
+			// edit the notes in the note edit area.
 			if( selectionCount() == 1 )
 			{
 				clearSelectedNotes();
@@ -1949,7 +1974,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 
 	if( hasValidPattern() )
 	{
-		// turn off all notes that are playing
+		// Turn off all notes that are playing.
 		for ( Note *note : m_pattern->notes() )
 		{
 			if( note->isPlaying() )
@@ -1960,7 +1985,7 @@ void PianoRoll::mouseReleaseEvent( QMouseEvent * me )
 			}
 		}
 
-		// stop playing keys that we let go of
+		// Stop playing keys that we let go of.
 		m_pattern->instrumentTrack()->pianoModel()->
 						handleKeyRelease( m_lastKey );
 	}
@@ -2001,7 +2026,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == ActionResizeNoteEditArea )
 	{
-		// change m_notesEditHeight and then repaint
+		// Change m_notesEditHeight and then repaint.
 		m_notesEditHeight = tLimit<int>(
 					m_oldNotesEditHeight - ( me->y() - m_moveStartY ),
 					NOTE_EDIT_MIN_HEIGHT,
@@ -2020,12 +2045,12 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		int key_num = getKey( me->y() );
 		int x = me->x();
 
-		// see if they clicked on the keyboard on the left
+		// See if they clicked on the keyboard on the left.
 		if( x < WHITE_KEY_WIDTH && m_action == ActionNone
 		    && ! edit_note && key_num != m_lastKey
 			&& me->buttons() & Qt::LeftButton )
 		{
-			// clicked on a key, play the note
+			// Clicked on a key, play the note.
 			testPlayKey( key_num, ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity, 0 );
 			update();
 			return;
@@ -2037,7 +2062,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			&& m_editMode == ModeDraw
 			&& (m_action == ActionMoveNote || m_action == ActionResizeNote ) )
 		{
-			// handle moving notes and resizing them
+			// Handle moving notes and resizing them.
 			bool replay_note = key_num != m_lastKey
 							&& m_action == ActionMoveNote;
 
@@ -2060,24 +2085,24 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				( me->buttons() & Qt::LeftButton || me->buttons() & Qt::MiddleButton
 				|| ( me->buttons() & Qt::RightButton && me->modifiers() & Qt::ShiftModifier ) ) )
 		{
-			// editing note properties
+			// Editing note properties.
 
 			// Change notes within a certain pixel range of where
-			// the mouse cursor is
+			// the mouse cursor is.
 			int pixel_range = 14;
 
-			// convert to ticks so that we can check which notes
-			// are in the range
+			// Convert to ticks so that we can check which notes
+			// are in the range.
 			int ticks_start = ( x-pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 			int ticks_end = ( x+pixel_range/2 ) *
 					MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
-			// get note-vector of current pattern
+			// Get note-vector of current pattern.
 			const NoteVector & notes = m_pattern->notes();
 
-			// determine what volume/panning to set note to
-			// if middle-click, set to defaults
+			// Determine what volume/panning to set note to
+			// if middle-click, set to defaults.
 			volume_t vol = DefaultVolume;
 			panning_t pan = DefaultPanning;
 
@@ -2106,20 +2131,20 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				showPanTextFloat( pan, me->pos() );
 			}
 
-			// When alt is pressed we only edit the note under the cursor
+			// When alt is pressed we only edit the note under the cursor.
 			bool altPressed = me->modifiers() & Qt::AltModifier;
 			// We iterate from last note in pattern to the first,
-			// chronologically
+			// chronologically.
 			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note* n = *it;
 
 				bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
-				// Play note under the cursor
+				// Play note under the cursor.
 				if ( isUnderPosition ) { testPlayNote( n ); }
 				// If note is the one under the cursor or is selected when alt is
-				// not pressed
+				// not pressed.
 				if ( ( isUnderPosition && !isSelection() ) || ( n->selected() && !altPressed ) )
 				{
 					if( m_noteEditMode == NoteEditVolume )
@@ -2140,7 +2165,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				}
 				else if( n->isPlaying() )
 				{
-					// mouse not over this note, stop playing it.
+					// Mouse not over this note, stop playing it.
 					m_pattern->instrumentTrack()->pianoModel()->handleKeyRelease( n->key() );
 
 					n->setIsPlaying( false );
@@ -2150,30 +2175,30 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--it;
 			}
 
-			// Emit pattern has changed
+			// Emit pattern has changed.
 			m_pattern->dataChanged();
 		}
 
 		else if( me->buttons() == Qt::NoButton && m_editMode == ModeDraw )
 		{
-			// set move- or resize-cursor
+			// Set move- or resize-cursor.
 
-			// get tick in which the cursor is posated
+			// Get tick in which the cursor is posated.
 			int pos_ticks = ( x * MidiTime::ticksPerTact() ) /
 						m_ppt + m_currentPosition;
 
-			// get note-vector of current pattern
+			// Get note-vector of current pattern.
 			const NoteVector & notes = m_pattern->notes();
 
-			// will be our iterator in the following loop
+			// Will be our iterator in the following loop.
 			NoteVector::ConstIterator it = notes.begin()+notes.size()-1;
 
-			// loop through whole note-vector...
+			// Loop through whole note-vector
 			for( int i = 0; i < notes.size(); ++i )
 			{
 				Note *note = *it;
-				// and check whether the cursor is over an
-				// existing note
+				// and check whether the cursor is over
+				// an existing note.
 				if( pos_ticks >= note->pos() &&
 			    		pos_ticks <= note->pos() +
 							note->length() &&
@@ -2185,15 +2210,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--it;
 			}
 
-			// did it reach end of vector because there's
-			// no note??
+			// Did it reach end of vector because there's
+			// no note?
 			if( it != notes.begin()-1 )
 			{
 				Note *note = *it;
-				// x coordinate of the right edge of the note
+				// x coordinate of the right edge of the note.
 				int noteRightX = ( note->pos() + note->length() -
 					m_currentPosition) * m_ppt/MidiTime::ticksPerTact();
-				// cursor at the "tail" of the note?
+				// Cursor at the "tail" of the note?
 				bool atTail = note->length() > 0 && x > noteRightX -
 							RESIZE_AREA_WIDTH;
 				Qt::CursorShape cursorShape = atTail ? Qt::SizeHorCursor :
@@ -2216,7 +2241,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			}
 			else
 			{
-				// the cursor is over no note, so restore cursor
+				// The cursor is over no note, so restore cursor.
 				while( QApplication::overrideCursor() != NULL )
 				{
 					QApplication::restoreOverrideCursor();
@@ -2228,9 +2253,9 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 						m_action == ActionSelectNotes )
 		{
 
-			// change size of selection
+			// Change size of selection.
 
-			// get tick in which the cursor is posated
+			// Get tick in which the cursor is posated.
 			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
@@ -2248,20 +2273,20 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		}
 		else if( m_editMode == ModeDraw && me->buttons() & Qt::RightButton )
 		{
-			// holding down right-click to delete notes
+			// Holding down right-click to delete notes.
 
-			// get tick in which the user clicked
+			// Get tick in which the user clicked.
 			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
 							m_currentPosition;
 
 
-			// get note-vector of current pattern
+			// Get note-vector of current pattern.
 			const NoteVector & notes = m_pattern->notes();
 
-			// will be our iterator in the following loop
+			// Will be our iterator in the following loop.
 			NoteVector::ConstIterator it = notes.begin();
 
-			// loop through whole note-vector...
+			// Loop through whole note-vector
 			while( it != notes.end() )
 			{
 				Note *note = *it;
@@ -2270,8 +2295,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				{
 					len = 4;
 				}
-				// and check whether the user clicked on an
-				// existing note or an edit-line
+				// and check whether the user clicked on
+				// an existing note or an edit-line.
 				if( pos_ticks >= note->pos() &&
 						len > 0 &&
 					(
@@ -2287,7 +2312,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					)
 					)
 				{
-					// delete this note
+					// Delete this note.
 					m_pattern->removeNote( note );
 					Engine::getSong()->setModified();
 				}
@@ -2331,7 +2356,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 									4 );
 			}
 
-			// get tick in which the cursor is posated
+			// Get tick in which the cursor is posated.
 			int pos_ticks = x * MidiTime::ticksPerTact()/ m_ppt +
 							m_currentPosition;
 
@@ -2377,7 +2402,6 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 		}
 		QApplication::restoreOverrideCursor();
 	}
-
 	m_lastMouseX = me->x();
 	m_lastMouseY = me->y();
 
@@ -2389,26 +2413,26 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 {
-	// dragging one or more notes around
+	// Dragging one or more notes around.
 
-	// convert pixels to ticks and keys
+	// Convert pixels to ticks and keys.
 	int off_x = x - m_moveStartX;
 	int off_ticks = off_x * MidiTime::ticksPerTact() / m_ppt;
 	int off_key = getKey( y ) - getKey( m_moveStartY );
 
-	// handle scroll changes while dragging
+	// Handle scroll changes while dragging.
 	off_ticks -= m_mouseDownTick - m_currentPosition;
 	off_key -= m_mouseDownKey - m_startKey;
 
 
-	// if they're not holding alt, quantize the offset
+	// If they're not holding alt, quantize the offset.
 	if( ! alt )
 	{
 		off_ticks = floor( off_ticks / quantization() )
 						* quantization();
 	}
 
-	// make sure notes won't go outside boundary conditions
+	// Make sure notes won't go outside boundary conditions.
 	if( m_action == ActionMoveNote && ! ( shift && ! m_startedWithShift ) )
 	{
 		if( m_moveBoundaryLeft + off_ticks < 0 )
@@ -2426,7 +2450,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 	}
 
 
-	// get note-vector of current pattern
+	// Get note-vector of current pattern.
 	const NoteVector & notes = m_pattern->notes();
 
 	if (m_action == ActionMoveNote)
@@ -2437,7 +2461,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			{
 				if( shift && ! m_startedWithShift )
 				{
-					// quick resize, toggled by holding shift after starting a note move, but not before
+					// Quick resize, toggled by holding shift after starting a note move, but not before.
 					int ticks_new = note->oldLength().getTicks() + off_ticks;
 					if( ticks_new <= 0 )
 					{
@@ -2448,13 +2472,13 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				}
 				else
 				{
-					// moving note
+					// Moving note.
 					int pos_ticks = note->oldPos().getTicks() + off_ticks;
 					int key_num = note->oldKey() + off_key;
 
-					// ticks can't be negative
+					// Ticks can't be negative.
 					pos_ticks = qMax(0, pos_ticks);
-					// upper/lower bound checks on key_num
+					// Upper/lower bound checks on key_num.
 					key_num = qMax(0, key_num);
 					key_num = qMin(key_num, NumKeys);
 
@@ -2467,18 +2491,18 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 	else if (m_action == ActionResizeNote)
 	{
 		// When resizing notes:
-		// If shift is not pressed, resize the selected notes but do not rearrange them
-		// If shift is pressed we resize and rearrange only the selected notes
-		// If shift + ctrl then we also rearrange all posterior notes (sticky)
-		// If shift is pressed but only one note is selected, apply sticky
+		// If shift is not pressed, resize the selected notes but do not rearrange them.
+		// If shift is pressed we resize and rearrange only the selected notes.
+		// If shift + ctrl then we also rearrange all posterior notes (sticky).
+		// If shift is pressed but only one note is selected, apply sticky.
 
 		if (shift)
 		{
 			// Algorithm:
 			// Relative to the starting point of the left-most selected note,
-			//   all selected note start-points and *endpoints* (not length) should be scaled by a calculated factor.
+			// all selected note start-points and *endpoints* (not length) should be scaled by a calculated factor.
 			// This factor is such that the endpoint of the note whose handle is being dragged should lie under the cursor.
-			// first, determine the start-point of the left-most selected note:
+			// First, determine the start-point of the left-most selected note:
 			int stretchStartTick = -1;
 			for (const Note *note : notes)
 			{
@@ -2487,7 +2511,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 					stretchStartTick = note->oldPos().getTicks();
 				}
 			}
-			// determine the ending tick of the right-most selected note
+			// Determine the ending tick of the right-most selected note.
 			const Note *posteriorNote = nullptr;
 			for (const Note *note : notes)
 			{
@@ -2499,32 +2523,32 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				}
 			}
 			int posteriorEndTick = posteriorNote->pos().getTicks() + posteriorNote->length().getTicks();
-			// end-point of the note whose handle is being dragged:
+			// End-point of the note whose handle is being dragged:
 			int stretchEndTick = m_currentNote->oldPos().getTicks() + m_currentNote->oldLength().getTicks();
-			// Calculate factor by which to scale the start-point and end-point of all selected notes
+			// Calculate factor by which to scale the start-point and end-point of all selected notes.
 			float scaleFactor = (float)(stretchEndTick - stretchStartTick + off_ticks) / qMax(1, stretchEndTick - stretchStartTick);
 			scaleFactor = qMax(0.0f, scaleFactor);
 
-			// process all selected notes & determine how much the endpoint of the right-most note was shifted
+			// Process all selected notes & determine how much the endpoint of the right-most note was shifted.
 			int posteriorDeltaThisFrame = 0;
 			for (Note *note : notes)
 			{
 				if(note->selected())
 				{
-					// scale relative start and end positions by scaleFactor
+					// Scale relative start and end positions by scaleFactor.
 					int newStart = stretchStartTick + scaleFactor *
 						(note->oldPos().getTicks() - stretchStartTick);
 					int newEnd = stretchStartTick + scaleFactor *
 						(note->oldPos().getTicks()+note->oldLength().getTicks() - stretchStartTick);
-					// if  not holding alt, quantize the offsets
+					// If  not holding alt, quantize the offsets.
 					if(!alt)
 					{
-						// quantize start time
+						// Quantize start time.
 						int oldStart = note->oldPos().getTicks();
 						int startDiff = newStart - oldStart;
 						startDiff = floor(startDiff / quantization()) * quantization();
 						newStart = oldStart + startDiff;
-						// quantize end time
+						// Quantize end time.
 						int oldEnd = oldStart + note->oldLength().getTicks();
 						int endDiff = newEnd - oldEnd;
 						endDiff = floor(endDiff / quantization()) * quantization();
@@ -2544,7 +2568,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 			}
 			if (ctrl || selectionCount() == 1)
 			{
-				// if holding ctrl or only one note is selected, reposition posterior notes
+				// If holding ctrl or only one note is selected, reposition posterior notes.
 				for (Note *note : notes)
 				{
 					if (!note->selected() && note->pos().getTicks() >= posteriorEndTick)
@@ -2557,7 +2581,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		}
 		else
 		{
-			// shift is not pressed; stretch length of selected notes but not their position
+			// Shift is not pressed; stretch length of selected notes but not their position.
 			for (Note *note : notes)
 			{
 				if (note->selected())
@@ -2594,16 +2618,16 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	QBrush bgColor = p.background();
 
-	// fill with bg color
+	// Fill with bg color.
 	p.fillRect( 0, 0, width(), height(), bgColor );
 
-	// set font-size to 8
+	// Set font-size to 8.
 	p.setFont( pointSize<8>( p.font() ) );
 
-	// y_offset is used to align the piano-keys on the key-lines
+	// y_offset is used to align the piano-keys on the key-lines.
 	int y_offset = 0;
 
-	// calculate y_offset according to first key
+	// Calculate y_offset according to the first key.
 	switch( prKeyOrder[m_startKey % KeysPerOctave] )
 	{
 		case PR_BLACK_KEY: y_offset = KEY_LINE_HEIGHT / 4; break;
@@ -2616,17 +2640,17 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 			break;
 	}
-	// start drawing at the bottom
+	// Start drawing at the bottom.
 	int key_line_y = keyAreaBottom() - 1;
-	// used for aligning black-keys later
+	// Used for aligning black-keys later.
 	int first_white_key_height = WHITE_KEY_SMALL_HEIGHT;
-	// key-counter - only needed for finding out whether the processed
-	// key is the first one
+	// Key-counter - only needed for finding out whether the processed
+	// key is the first one.
 	int keys_processed = 0;
 
 	int key = m_startKey;
 
-	// display note marks before drawing other lines
+	// Display note marks before drawing other lines.
 	for( int i = 0; i < m_markedSemiTones.size(); i++ )
 	{
 		const int key_num = m_markedSemiTones.at( i );
@@ -2643,7 +2667,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 
 
-	// draw all white keys...
+	// Draw all white keys.
 	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;
 			key_line_y -= KEY_LINE_HEIGHT, ++keys_processed )
 	{
@@ -2653,22 +2677,22 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			prKeyOrder[m_startKey % KeysPerOctave] ==
 								PR_BLACK_KEY )
 		{
-			// draw it!
+			// Draw it!
 			p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT,
 							*s_whiteKeySmallPm );
-			// update y-pos
+			// Update y-pos.
 			y -= WHITE_KEY_SMALL_HEIGHT / 2;
-			// move first black key down (we didn't draw whole
+			// Move first black key down (we didn't draw whole
 			// white key so black key needs to be lifted down)
 			// (default for first_white_key_height =
 			// WHITE_KEY_SMALL_HEIGHT, so WHITE_KEY_SMALL_HEIGHT/2
-			// is smaller)
+			// is smaller).
 			first_white_key_height = WHITE_KEY_SMALL_HEIGHT / 2;
 		}
-		// check whether to draw a big or a small white key
+		// Check whether to draw a big or a small white key.
 		if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_SMALL )
 		{
-			// draw a small one while checking if it is pressed or not
+			// Draw a small one while checking if it is pressed or not.
 			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPressedPm );
@@ -2677,13 +2701,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				p.drawPixmap( PIANO_X, y - WHITE_KEY_SMALL_HEIGHT, *s_whiteKeySmallPm );
 			}
-			// update y-pos
+			// Update y-pos.
 			y -= WHITE_KEY_SMALL_HEIGHT;
 
 		}
 		else if( prKeyOrder[key % KeysPerOctave] == PR_WHITE_KEY_BIG )
 		{
-			// draw a big one while checking if it is pressed or not
+			// Draw a big one while checking if it is pressed or not.
 			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPressedPm );
@@ -2692,17 +2716,17 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			{
 				p.drawPixmap( PIANO_X, y-WHITE_KEY_BIG_HEIGHT, *s_whiteKeyBigPm );
 			}
-			// if a big white key has been the first key,
-			// black keys needs to be lifted up
+			// If a big white key has been the first key,
+			// black keys needs to be lifted up.
 			if( keys_processed == 0 )
 			{
 				first_white_key_height = WHITE_KEY_BIG_HEIGHT;
 			}
-			// update y-pos
+			// Update y-pos.
 			y -= WHITE_KEY_BIG_HEIGHT;
 		}
 
-		// Compute the corrections for the note names
+		// Compute the corrections for the note names.
 		int yCorrectionForNoteLabels = 0;
 
 		int keyCode = key % KeysPerOctave;
@@ -2725,7 +2749,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 		if( Piano::isWhiteKey( key ) )
 		{
-			// Draw note names if activated in the preferences, C notes are always drawn
+			// Draw note names if activated in the preferences, C notes are always drawn.
 			if ( key % 12 == 0 || drawNoteNames )
 			{
 				QString noteString = getNoteString( key );
@@ -2735,7 +2759,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 				p.setPen( textShadow() );
 				p.drawText( textStart + QPoint( 1, 1 ), noteString );
-				// The C key is painted darker than the other ones
+				// The C key is painted darker than the other ones.
 				if ( key % 12 == 0 )
 				{
 					p.setPen( textColor() );
@@ -2750,7 +2774,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		++key;
 	}
 
-	// reset all values, because now we're going to draw all black keys
+	// Reset all values, because now we're going to draw all black keys
 	key = m_startKey;
 	keys_processed = 0;
 	int white_cnt = 0;
@@ -2759,33 +2783,33 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	for( int y = keyAreaBottom() + y_offset;
 					y > PR_TOP_MARGIN; ++keys_processed )
 	{
-		// check for black key that is only half visible on the bottom
-		// of piano-roll
+		// Check for black key that is only half visible on the bottom
+		// of piano-roll.
 		if( keys_processed == 0
-		    // current key may not be a black one
+		    // Current key may not be a black one.
 		    && prKeyOrder[key % KeysPerOctave] != PR_BLACK_KEY
-		    // but the previous one must be black (we must check this
-		    // because there might be two white keys (E-F)
+		    // But the previous one must be black (we must check this
+		    // because there might be two white keys (E-F).
 		    && prKeyOrder[( key - 1 ) % KeysPerOctave] ==
 								PR_BLACK_KEY )
 		{
-			// draw the black key!
+			// Draw the black key!
 			p.drawPixmap( PIANO_X, y - BLACK_KEY_HEIGHT / 2,
 								*s_blackKeyPm );
-			// is the one after the start-note a black key??
+			// Is the one after the start-note a black key?
 			if( prKeyOrder[( key + 1 ) % KeysPerOctave] !=
 								PR_BLACK_KEY )
 			{
-				// no, then move it up!
+				// No, then move it up!
 				y -= KEY_LINE_HEIGHT / 2;
 			}
 		}
-		// current key black?
+		// Current key is black?
 		if( prKeyOrder[key % KeysPerOctave] == PR_BLACK_KEY)
 		{
-			// then draw it (calculation of y very complicated,
-			// but that's the only working solution, sorry...)
-			// check if the key is pressed or not
+			// Then draw it (calculation of y is very complicated,
+			// but that's the only working solution, sorry).
+			// Check if the key is pressed or not.
 			if( hasValidPattern() && m_pattern->instrumentTrack()->pianoModel()->isKeyPressed( key ) )
 			{
 				p.drawPixmap( PIANO_X, y - ( first_white_key_height -
@@ -2800,15 +2824,15 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 						WHITE_KEY_SMALL_HEIGHT/2 - 1 -
 						BLACK_KEY_HEIGHT, *s_blackKeyPm );
 			}
-			// update y-pos
+			// Update y-pos.
 			y -= WHITE_KEY_BIG_HEIGHT;
-			// reset white-counter
+			// Reset white-counter.
 			white_cnt = 0;
 		}
 		else
 		{
-			// simple workaround for increasing x if there were
-			// two white keys (e.g. between E and F)
+			// Simple workaround for increasing x if there were
+			// two white keys (e.g. between E and F).
 			++white_cnt;
 			if( white_cnt > 1 )
 			{
@@ -2820,12 +2844,12 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 
 
-	// erase the area below the piano, because there might be keys that
-	// should be only half-visible
+	// Erase the area below the piano, because there might be keys that
+	// should be only half-visible.
 	p.fillRect( QRect( 0, keyAreaBottom(),
 			WHITE_KEY_WIDTH, noteEditBottom() - keyAreaBottom() ), bgColor );
 
-	// display note editing info
+	// Display note editing info.
 	QFont f = p.font();
 	f.setBold( false );
 	p.setFont( pointSize<10>( f ) );
@@ -2835,34 +2859,34 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			   Qt::AlignCenter | Qt::TextWordWrap,
 			   m_nemStr.at( m_noteEditMode ) + ":" );
 
-	// set clipping area, because we are not allowed to paint over
-	// keyboard...
+	// Set clipping area, because we are not allowed to paint over
+	// keyboard.
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN,
 				width() - WHITE_KEY_WIDTH,
 				height() - PR_TOP_MARGIN - PR_BOTTOM_MARGIN );
 
-	// draw the grid
+	// Draw the grid.
 	if( hasValidPattern() )
 	{
 		int q, x, tick;
 
 		if( m_zoomingModel.value() > 3 )
 		{
-			// If we're over 100% zoom, we allow all quantization level grids
+			// If we're over 100% zoom, we allow all quantization level grids.
 			q = quantization();
 		}
 		else if( quantization() % 3 != 0 )
 		{
 			// If we're under 100% zoom, we allow quantization grid up to 1/24 for triplets
-			// to ensure a dense doesn't fill out the background
+			// to ensure a dense doesn't fill out the background.
 			q = quantization() < 8 ? 8 : quantization();
 		}
 		else {
-			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes
+			// If we're under 100% zoom, we allow quantization grid up to 1/32 for normal notes.
 			q = quantization() < 6 ? 6 : quantization();
 		}
 
-		// First we draw the vertical quantization lines
+		// First we draw the vertical quantization lines.
 		for( tick = m_currentPosition - m_currentPosition % q, x = xCoordOfTick( tick );
 			x <= width(); tick += q, x = xCoordOfTick( tick ) )
 		{
@@ -2870,14 +2894,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
 
-		// Draw horizontal lines
+		// Draw horizontal lines.
 		key = m_startKey;
 		for( int y = keyAreaBottom() - 1; y > PR_TOP_MARGIN;
 				y -= KEY_LINE_HEIGHT )
 		{
 			if( static_cast<Keys>( key % KeysPerOctave ) == Key_C )
 			{
-				// C note gets accented
+				// C note gets accented.
 				p.setPen( beatLineColor() );
 			}
 			else
@@ -2889,14 +2913,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 
-		// Draw alternating shades on bars
+		// Draw alternating shades on bars.
 		float timeSignature = static_cast<float>( Engine::getSong()->getTimeSigModel().getNumerator() )
 				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomLevels[m_zoomingModel.value()];
-		//the bars which disappears at the left side by scrolling
+		// The bars which disappears at the left side by scrolling.
 		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerTact();
 
-		//iterates the visible bars and draw the shading on uneven bars
+		// Iterates the visible bars and draw the shading on uneven bars.
 		for( int x = WHITE_KEY_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppt, ++barCount )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
@@ -2907,7 +2931,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 
 
-		// Draw the vertical beat lines
+		// Draw the vertical beat lines.
 		int ticksPerBeat = DefaultTicksPerTact /
 			Engine::getSong()->getTimeSigModel().getDenominator();
 
@@ -2919,7 +2943,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
 
-		// Draw the vertical bar lines
+		// Draw the vertical bar lines.
 		for( tick = m_currentPosition - m_currentPosition % MidiTime::ticksPerTact(),
 			x = xCoordOfTick( tick ); x <= width();
 			tick += MidiTime::ticksPerTact(), x = xCoordOfTick( tick ) )
@@ -2930,10 +2954,10 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	}
 
 
-	// following code draws all notes in visible area
-	// and the note editing stuff (volume, panning, etc)
+	// Following code draws all notes in visible area
+	// and the note editing stuff (volume, panning, etc).
 
-	// setup selection-vars
+	// Set up selection-vars.
 	int sel_pos_start = m_selectStartTick;
 	int sel_pos_end = m_selectStartTick+m_selectedTick;
 	if( sel_pos_start > sel_pos_end )
@@ -2980,25 +3004,24 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			int note_width = len_ticks * m_ppt / MidiTime::ticksPerTact();
 			const int x = ( pos_ticks - m_currentPosition ) *
 					m_ppt / MidiTime::ticksPerTact();
-			// skip this note if not in visible area at all
+			// Skip this note if not in visible area at all.
 			if( !( x + note_width >= 0 && x <= width() - WHITE_KEY_WIDTH ) )
 			{
 				continue;
 			}
 
-			// is the note in visible area?
+			// Is the note in visible area?
 			if( key > 0 && key <= visible_keys )
 			{
 
-				// we've done and checked all, let's draw the
-				// note
+				// We've done and checked all, let's draw the note/
 				drawNoteRect( p, x + WHITE_KEY_WIDTH,
 						y_base - key * KEY_LINE_HEIGHT,
 								note_width, note, noteColor(), selectedNoteColor(),
 							 	noteOpacity(), noteBorders() );
 			}
 
-			// draw note editing stuff
+			// Draw note editing stuff.
 			int editHandleTop = 0;
 			if( m_noteEditMode == NoteEditVolume )
 			{
@@ -3060,15 +3083,14 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		p.setPen( QApplication::palette().color( QPalette::Active,
 							QPalette::BrightText ) );
 		p.drawText( WHITE_KEY_WIDTH + 20, PR_TOP_MARGIN + 40,
-				tr( "Please open a pattern by double-clicking "
-								"on it!" ) );
+				tr( "Please open a pattern by double-clicking on it." ) );
 	}
 
 	p.setClipRect( WHITE_KEY_WIDTH, PR_TOP_MARGIN, width() -
 				WHITE_KEY_WIDTH, height() - PR_TOP_MARGIN -
 					m_notesEditHeight - PR_BOTTOM_MARGIN );
 
-	// now draw selection-frame
+	// Now draw selection-frame.
 	int x = ( ( sel_pos_start - m_currentPosition ) * m_ppt ) /
 						MidiTime::ticksPerTact();
 	int w = ( ( ( sel_pos_end - m_currentPosition ) * m_ppt ) /
@@ -3079,24 +3101,23 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 	p.setBrush( Qt::NoBrush );
 	p.drawRect( x + WHITE_KEY_WIDTH, y, w, h );
 
-	// TODO: Get this out of paint event
+	// TODO: Get this out of paint event.
 	int l = ( hasValidPattern() )? (int) m_pattern->length() : 0;
 
-	// reset scroll-range
+	// Reset scroll-range.
 	if( m_leftRightScroll->maximum() != l )
 	{
 		m_leftRightScroll->setRange( 0, l );
-		m_leftRightScroll->setPageStep( l );
 	}
 
-	// set line colors
+	// Set line colors.
 	QColor editAreaCol = QColor( lineColor() );
 	QColor currentKeyCol = QColor( beatLineColor() );
 
 	editAreaCol.setAlpha( 64 );
 	currentKeyCol.setAlpha( 64 );
 
-	// horizontal line for the key under the cursor
+	// Horizontal line for the key under the cursor.
 	if( hasValidPattern() )
 	{
 		int key_num = getKey( mapFromGlobal( QCursor::pos() ).y() );
@@ -3104,13 +3125,13 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 					( key_num - m_startKey + 1 ), width() - 10, KEY_LINE_HEIGHT - 7, currentKeyCol );
 	}
 
-	// bar to resize note edit area
+	// Bar to resize note edit area.
 	p.setClipRect( 0, 0, width(), height() );
 	p.fillRect( QRect( 0, keyAreaBottom(),
 					width()-PR_RIGHT_MARGIN, NOTE_EDIT_RESIZE_BAR ), editAreaCol );
 
 	const QPixmap * cursor = NULL;
-	// draw current edit-mode-icon below the cursor
+	// Draw current edit-mode-icon below the cursor.
 	switch( m_editMode )
 	{
 		case ModeDraw:
@@ -3141,7 +3162,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 
 
-// responsible for moving/resizing scrollbars after window-resizing
+// Responsible for moving/resizing scrollbars after window-resizing.
 void PianoRoll::resizeEvent(QResizeEvent * re)
 {
 	m_leftRightScroll->setGeometry( WHITE_KEY_WIDTH,
@@ -3179,11 +3200,11 @@ void PianoRoll::resizeEvent(QResizeEvent * re)
 void PianoRoll::wheelEvent(QWheelEvent * we )
 {
 	we->accept();
-	// handle wheel events for note edit area - for editing note vol/pan with mousewheel
+	// Handle wheel events for note edit area - for editing note vol/pan with scroll wheel.
 	if( we->x() > noteEditLeft() && we->x() < noteEditRight()
 	&& we->y() > noteEditTop() && we->y() < noteEditBottom() )
 	{
-		// get values for going through notes
+		// Get values for going through notes.
 		int pixel_range = 8;
 		int x = we->x() - WHITE_KEY_WIDTH;
 		int ticks_start = ( x - pixel_range / 2 ) *
@@ -3193,7 +3214,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 
 		// When alt is pressed we only edit the note under the cursor
 		bool altPressed = we->modifiers() & Qt::AltModifier;
-		// go through notes to figure out which one we want to change
+		// go through notes to figure out which one we want to change.
 		NoteVector nv;
 		for ( Note * i : m_pattern->notes() )
 		{
@@ -3219,8 +3240,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					});
 				if ( allVolumesEqual )
 				{
-					// show the volume hover-text only if all notes have the
-					// same volume
+					// Show the volume hover-text only if all notes have the
+					// same volume.
 					showVolTextFloat( nv[0]->getVolume(), we->pos(), 1000 );
 				}
 			}
@@ -3238,8 +3259,8 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 					});
 				if ( allPansEqual )
 				{
-					// show the pan hover-text only if all notes have the same
-					// panning
+					// Show the pan hover-text only if all notes have the
+					// same panning.
 					showPanTextFloat( nv[0]->getPanning(), we->pos(), 1000 );
 				}
 			}
@@ -3247,61 +3268,62 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 		}
 	}
 
-	// not in note edit area, so handle scrolling/zooming and quantization change
-	else
-	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
-	{
-		int q = m_quantizeModel.value();
-		if( we->delta() > 0 )
-		{
-			q--;
-		}
-		else if( we->delta() < 0 )
-		{
-			q++;
-		}
-		q = qBound( 0, q, m_quantizeModel.size() - 1 );
-		m_quantizeModel.setValue( q );
-	}
-	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
-	{
-		int l = m_noteLenModel.value();
-		if( we->delta() > 0 )
-		{
-			l--;
-		}
-		else if( we->delta() < 0 )
-		{
-			l++;
-		}
-		l = qBound( 0, l, m_noteLenModel.size() - 1 );
-		m_noteLenModel.setValue( l );
-	}
-	else if( we->modifiers() & Qt::ControlModifier )
-	{
-		int z = m_zoomingModel.value();
-		if( we->delta() > 0 )
-		{
-			z++;
-		}
-		else if( we->delta() < 0 )
-		{
-			z--;
-		}
-		z = qBound( 0, z, m_zoomingModel.size() - 1 );
-		// update combobox with zooming-factor
-		m_zoomingModel.setValue( z );
-	}
-	else if( we->modifiers() & Qt::ShiftModifier
-			 || we->orientation() == Qt::Horizontal )
-	{
-		m_leftRightScroll->setValue( m_leftRightScroll->value() -
-							we->delta() * 2 / 15 );
-	}
+	// Not in note edit area, so handle quantization, note length, zooming and scrollong.
 	else
 	{
-		m_topBottomScroll->setValue( m_topBottomScroll->value() -
-							we->delta() / 30 );
+		if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
+		{
+			int q = m_quantizeModel.value();
+			if( we->delta() > 0 )
+			{
+				q--;
+			}
+			else if( we->delta() < 0 )
+			{
+				q++;
+			}
+			q = qBound( 0, q, m_quantizeModel.size() - 1 );
+			m_quantizeModel.setValue( q );
+		}
+		else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
+		{
+			int l = m_noteLenModel.value();
+			if( we->delta() > 0 )
+			{
+				l--;
+			}
+			else if( we->delta() < 0 )
+			{
+				l++;
+			}
+			l = qBound( 0, l, m_noteLenModel.size() - 1 );
+			m_noteLenModel.setValue( l );
+		}
+		else if( we->modifiers() & Qt::ControlModifier )
+		{
+			int z = m_zoomingModel.value();
+			if( we->delta() > 0 )
+			{
+				z++;
+			}
+			else if( we->delta() < 0 )
+			{
+				z--;
+			}
+			z = qBound( 0, z, m_zoomingModel.size() - 1 );
+			// Update combobox with zooming-factor.
+			m_zoomingModel.setValue( z );
+		}
+		else if( we->modifiers() & Qt::ShiftModifier || we->orientation() == Qt::Horizontal )
+		{
+			m_leftRightScroll->setValue( m_leftRightScroll->value() -
+								we->delta() * 2 / 15 );
+		}
+		else
+		{
+			m_topBottomScroll->setValue( m_topBottomScroll->value() -
+								we->delta() / 30 );
+		}
 	}
 }
 
@@ -3327,11 +3349,11 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 int PianoRoll::getKey(int y ) const
 {
 	int key_line_y = keyAreaBottom() - 1;
-	// pressed key on piano
+	// Pressed key on piano.
 	int key_num = ( key_line_y - y ) / KEY_LINE_HEIGHT;
 	key_num += m_startKey;
 
-	// some range-checking-stuff
+	// Some range-checking stuff.
 	if( key_num < 0 )
 	{
 		key_num = 0;
@@ -3513,7 +3535,7 @@ void PianoRoll::horScrolled(int new_pos )
 
 void PianoRoll::verScrolled( int new_pos )
 {
-	// revert value
+	// Revert value.
 	m_startKey = m_totalKeysToScroll - new_pos;
 
 	update();
@@ -3537,7 +3559,7 @@ void PianoRoll::selectAll()
 		return;
 	}
 
-	// if first_time = true, we HAVE to set the vars for select
+	// If first_time = true, we HAVE to set the vars for select.
 	bool first_time = true;
 
 	for( const Note *note : m_pattern->notes() )
@@ -3550,10 +3572,10 @@ void PianoRoll::selectAll()
 		int pos_ticks = note->pos();
 		if( key <= m_selectStartKey || first_time )
 		{
-			// if we move start-key down, we have to add
+			// If we move start-key down, we have to add
 			// the difference between old and new start-key
 			// to m_selectedKeys, otherwise the selection
-			// is just moved down...
+			// is just moved down.
 			m_selectedKeys += m_selectStartKey
 							- ( key - 1 );
 			m_selectStartKey = key - 1;
@@ -3583,7 +3605,7 @@ void PianoRoll::selectAll()
 
 
 
-// returns vector with pointers to all selected notes
+// Returns vector with pointers to all selected notes.
 NoteVector PianoRoll::getSelectedNotes()
 {
 	NoteVector selectedNotes;
@@ -3601,7 +3623,7 @@ NoteVector PianoRoll::getSelectedNotes()
 	return selectedNotes;
 }
 
-// selects all notess associated with m_lastKey
+// Selects all notess associated with m_lastKey.
 void PianoRoll::selectNotesOnKey()
 {
 	if (hasValidPattern()) {
@@ -3622,7 +3644,7 @@ void PianoRoll::enterValue( NoteVector* nv )
 		int new_val;
 		new_val = QInputDialog::getInt(	this, "Piano roll: note velocity",
 					tr( "Please enter a new value between %1 and %2:" ).
-						arg( MinVolume ).arg( MaxVolume ),
+					arg( MinVolume ).arg( MaxVolume ),
 					(*nv)[0]->getVolume(),
 					MinVolume, MaxVolume, 1, &ok );
 
@@ -3640,8 +3662,8 @@ void PianoRoll::enterValue( NoteVector* nv )
 		bool ok;
 		int new_val;
 		new_val = QInputDialog::getInt(	this, "Piano roll: note panning",
-					tr( "Please enter a new value between %1 and %2:" ).
-							arg( PanningLeft ).arg( PanningRight ),
+						tr( "Please enter a new value between %1 and %2:" ).
+						arg( PanningLeft ).arg( PanningRight ),
 						(*nv)[0]->getPanning(),
 						PanningLeft, PanningRight, 1, &ok );
 
@@ -3711,12 +3733,11 @@ void PianoRoll::cutSelectedNotes()
 
 		for( Note *note : selected_notes )
 		{
-			// note (the memory of it) is also deleted by
-			// pattern::removeNote(...) so we don't have to do that
+			// Note (the memory of it) is also deleted by
+			// pattern::removeNote(...) so we don't have to do that.
 			m_pattern->removeNote( note );
 		}
 	}
-
 	update();
 	gui->songEditor()->update();
 }
@@ -3741,7 +3762,7 @@ void PianoRoll::pasteNotes()
 
 		QDomNodeList list = dataFile.elementsByTagName( Note::classNodeName() );
 
-		// remove selection and select the newly pasted notes
+		// Remove selection and select the newly pasted notes.
 		clearSelectedNotes();
 
 		if( ! list.isEmpty() )
@@ -3751,20 +3772,20 @@ void PianoRoll::pasteNotes()
 
 		for( int i = 0; ! list.item( i ).isNull(); ++i )
 		{
-			// create the note
+			// Create the note.
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
 			cur_note.setPos( cur_note.pos() + m_timeLine->pos() );
 
-			// select it
+			// Select it.
 			cur_note.setSelected( true );
 
-			// add to pattern
+			// Add to pattern.
 			m_pattern->addNote( cur_note );
 		}
 
-		// we only have to do the following lines if we pasted at
-		// least one note...
+		// We only have to do the following lines if we pasted at.
+		// least one note.
 		Engine::getSong()->setModified();
 		update();
 		gui->songEditor()->update();
@@ -3785,21 +3806,21 @@ void PianoRoll::deleteSelectedNotes()
 
 	m_pattern->addJournalCheckPoint();
 
-	// get note-vector of current pattern
+	// Get note-vector of current pattern.
 	const NoteVector & notes = m_pattern->notes();
 
-	// will be our iterator in the following loop
+	// Will be our iterator in the following loop.
 	NoteVector::ConstIterator it = notes.begin();
 	while( it != notes.end() )
 	{
 		Note *note = *it;
 		if( note->selected() )
 		{
-			// delete this note
+			// Delete this note.
 			m_pattern->removeNote( note );
 			update_after_delete = true;
 
-			// start over, make sure we get all the notes
+			// Start over, make sure we get all the notes.
 			it = notes.begin();
 		}
 		else
@@ -3945,7 +3966,6 @@ void PianoRoll::quantizeNotes()
 		copy.quantizePos( quantization() );
 		m_pattern->addNote( copy );
 	}
-
 	update();
 	gui->songEditor()->update();
 }
@@ -4007,11 +4027,11 @@ Note * PianoRoll::noteUnderMouse()
 	int pos_ticks = ( pos.x() - WHITE_KEY_WIDTH ) *
 			MidiTime::ticksPerTact() / m_ppt + m_currentPosition;
 
-	// loop through whole note-vector...
+	// Loop through whole note-vector
 	for( Note* const& note : m_pattern->notes() )
 	{
 		// and check whether the cursor is over an
-		// existing note
+		// existing note.
 		if( pos_ticks >= note->pos()
 				&& pos_ticks <= note->endPos()
 				&& note->key() == key_num
@@ -4033,38 +4053,47 @@ PianoRollWindow::PianoRollWindow() :
 {
 	setCentralWidget( m_editor );
 
-	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ) );
-	m_recordAction->setToolTip(tr( "Record notes from MIDI-device/channel-piano" ) );
-	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ) );
-	m_stopAction->setToolTip( tr( "Stop playing of current pattern (Space)" ) );
+	m_playAction->setToolTip(
+			tr( "Play/pause current pattern (Space)" ) );
+	m_recordAction->setToolTip(
+			tr( "Record notes from MIDI-device/channel-piano" ) );
+	m_recordAccompanyAction->setToolTip(
+			tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ) );
+	m_stopAction->setToolTip(
+			tr( "Stop playing of current pattern (Space)" ) );
 
 	m_playAction->setWhatsThis(
-		tr( "Click here to play the current pattern. "
-			"This is useful while editing it. The pattern is "
-			"automatically looped when its end is reached." ) );
+			tr( "Click here to play the current pattern "
+				"This is useful while editing it. The pattern is "
+				"automatically looped when its end is reached." ) );
 	m_recordAction->setWhatsThis(
-		tr( "Click here to record notes from a MIDI-"
-			"device or the virtual test-piano of the according "
-			"channel-window to the current pattern. When recording "
-			"all notes you play will be written to this pattern "
-			"and you can play and edit them afterwards." ) );
+			tr( "Click here to record notes from a MIDI-"
+				"device or the virtual test-piano of the according "
+				"channel-window to the current pattern. When recording "
+				"all notes you play will be written to this pattern "
+				"and you can play and edit them afterwards." ) );
 	m_recordAccompanyAction->setWhatsThis(
-		tr( "Click here to record notes from a MIDI-"
-			"device or the virtual test-piano of the according "
-			"channel-window to the current pattern. When recording "
-			"all notes you play will be written to this pattern "
-			"and you will hear the song or BB track in the background." ) );
+			tr( "Click here to record notes from a MIDI-"
+				"device or the virtual test-piano of the according "
+				"channel-window to the current pattern. When recording "
+				"all notes you play will be written to this pattern "
+				"and you will hear the song or BB track in the background." ) );
 	m_stopAction->setWhatsThis(
-		tr( "Click here to stop playback of current pattern." ) );
+			tr( "Click here to stop playback of current pattern." ) );
 
-	DropToolBar *notesActionsToolBar = addDropToolBarToTop( tr( "Edit actions" ) );
+	DropToolBar *notesActionsToolBar = addDropToolBarToTop(
+			tr( "Edit actions" ) );
 
-	// init edit-buttons at the top
+	// Init edit-buttons at the top.
 	ActionGroup* editModeGroup = new ActionGroup( this );
-	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
-	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
-	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
-	QAction* detuneAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Detune mode (Shift+T)" ) );
+	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ),
+			tr( "Draw mode (Shift+D)" ) );
+	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ),
+			tr("Erase mode (Shift+E)" ) );
+	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ),
+			tr( "Select mode (Shift+S)" ) );
+	QAction* detuneAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ),
+			tr("Detune mode (Shift+T)" ) );
 
 	drawAction->setChecked( true );
 
@@ -4074,42 +4103,45 @@ PianoRollWindow::PianoRollWindow() :
 	detuneAction->setShortcut( Qt::SHIFT | Qt::Key_T );
 
 	drawAction->setWhatsThis(
-		tr( "Click here and draw mode will be activated. In this "
-			"mode you can add, resize and move notes. This "
-			"is the default mode which is used most of the time. "
-			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode. In this mode, hold %1 to "
-			"temporarily go into select mode." ).arg(
+			tr( "Click here and draw mode will be activated. In this "
+				"mode you can add, resize and move notes. This "
+				"is the default mode which is used most of the time. "
+				"You can also press 'Shift+D' on your keyboard to "
+				"activate this mode. In this mode, hold %1 to "
+				"temporarily go into select mode." ).arg(
 				#ifdef LMMS_BUILD_APPLE
 				"⌘" ) );
 				#else
 				"Ctrl" ) );
 				#endif
 	eraseAction->setWhatsThis(
-		tr( "Click here and erase mode will be activated. In this "
-			"mode you can erase notes. You can also press "
-			"'Shift+E' on your keyboard to activate this mode." ) );
+			tr( "Click here and erase mode will be activated. In this "
+				"mode you can erase notes. You can also press "
+				"'Shift+E' on your keyboard to activate this mode." ) );
 	selectAction->setWhatsThis(
-		tr( "Click here and select mode will be activated. "
-			"In this mode you can select notes. Alternatively, "
-			"you can hold %1 in draw mode to temporarily use "
-			"select mode." ).arg(
+			tr( "Click here and select mode will be activated. "
+				"In this mode you can select notes. Alternatively, "
+				"you can hold %1 in draw mode to temporarily use "
+				"select mode." ).arg(
 				#ifdef LMMS_BUILD_APPLE
 				"⌘" ) );
 				#else
 				"Ctrl" ) );
 				#endif
 	detuneAction->setWhatsThis(
-		tr( "Click here and detune mode will be activated. "
-			"In this mode you can click a note to open its "
-			"automation detuning. You can utilize this to slide "
-			"notes from one to another. You can also press "
-			"'Shift+T' on your keyboard to activate this mode." ) );
+			tr( "Click here and detune mode will be activated. "
+				"In this mode you can click a note to open its "
+				"automation detuning. You can utilize this to slide "
+				"notes from one to another. You can also press "
+				"'Shift+T' on your keyboard to activate this mode." ) );
 
-	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
+	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor,
+			SLOT( setEditMode( int ) ) );
 
-	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ), tr( "Quantize" ), this );
-	connect( quantizeAction, SIGNAL( triggered() ), m_editor, SLOT( quantizeNotes() ) );
+	QAction* quantizeAction = new QAction(embed::getIconPixmap( "quantize" ),
+			tr( "Quantize" ), this );
+	connect( quantizeAction, SIGNAL( triggered() ), m_editor,
+			SLOT( quantizeNotes() ) );
 
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
@@ -4118,8 +4150,9 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
 
-	// Copy + paste actions
-	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
+	// Copy and paste actions.
+	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop(
+			tr( "Copy and paste controls" ) );
 
 	QAction* cutAction = new QAction(embed::getIconPixmap( "edit_cut" ),
 							  tr( "Cut selected notes (%1+X)" ).arg(
@@ -4161,23 +4194,28 @@ PianoRollWindow::PianoRollWindow() :
 	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
 	pasteAction->setShortcut( Qt::CTRL | Qt::Key_V );
 
-	connect( cutAction, SIGNAL( triggered() ), m_editor, SLOT( cutSelectedNotes() ) );
-	connect( copyAction, SIGNAL( triggered() ), m_editor, SLOT( copySelectedNotes() ) );
-	connect( pasteAction, SIGNAL( triggered() ), m_editor, SLOT( pasteNotes() ) );
+	connect( cutAction, SIGNAL( triggered() ), m_editor,
+			SLOT( cutSelectedNotes() ) );
+	connect( copyAction, SIGNAL( triggered() ), m_editor,
+			SLOT( copySelectedNotes() ) );
+	connect( pasteAction, SIGNAL( triggered() ), m_editor,
+			SLOT( pasteNotes() ) );
 
 	copyPasteActionsToolBar->addAction( cutAction );
 	copyPasteActionsToolBar->addAction( copyAction );
 	copyPasteActionsToolBar->addAction( pasteAction );
 
 
-	DropToolBar *timeLineToolBar = addDropToolBarToTop( tr( "Timeline controls" ) );
+	DropToolBar *timeLineToolBar = addDropToolBarToTop(
+			tr( "Timeline controls" ) );
 	m_editor->m_timeLine->addToolButtons( timeLineToolBar );
 
 
 	addToolBarBreak();
 
 
-	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop( tr( "Zoom and note controls" ) );
+	DropToolBar *zoomAndNotesToolBar = addDropToolBarToTop(
+			tr( "Zoom and note controls" ) );
 
 	QLabel * zoom_lbl = new QLabel( m_toolBar );
 	zoom_lbl->setPixmap( embed::getIconPixmap( "zoom" ) );
@@ -4186,7 +4224,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
 	m_zoomingComboBox->setFixedSize( 64, 22 );
 
-	// setup quantize-stuff
+	// Set up quantize-stuff.
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
 	quantize_lbl->setPixmap( embed::getIconPixmap( "quantize" ) );
 
@@ -4194,7 +4232,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 64, 22 );
 
-	// setup note-len-stuff
+	// Set up note-len stuff.
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
 	note_len_lbl->setPixmap( embed::getIconPixmap( "note" ) );
 
@@ -4202,7 +4240,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_noteLenComboBox->setModel( &m_editor->m_noteLenModel );
 	m_noteLenComboBox->setFixedSize( 105, 22 );
 
-	// setup scale-stuff
+	// Set up scale-stuff.
 	QLabel * scale_lbl = new QLabel( m_toolBar );
 	scale_lbl->setPixmap( embed::getIconPixmap( "scale" ) );
 
@@ -4210,7 +4248,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
 	m_scaleComboBox->setFixedSize( 105, 22 );
 
-	// setup chord-stuff
+	// Set up chord-stuff.
 	QLabel * chord_lbl = new QLabel( m_toolBar );
 	chord_lbl->setPixmap( embed::getIconPixmap( "chord" ) );
 
@@ -4239,41 +4277,32 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addWidget( m_chordComboBox );
 
 	m_zoomingComboBox->setWhatsThis(
-				tr(
-					"This controls the magnification of an axis. "
+				tr( "This controls the magnification of an axis. "
 					"It can be helpful to choose magnification for a specific "
 					"task. For ordinary editing, the magnification should be "
-					"fitted to your smallest notes. "
-					) );
+					"fitted to your smallest notes.") );
 
 	m_quantizeComboBox->setWhatsThis(
-				tr(
-					"The 'Q' stands for quantization, and controls the grid size "
+				tr( "The 'Q' stands for quantization, and controls the grid size "
 					"notes and control points snap to. "
 					"With smaller quantization values, you can draw shorter notes "
 					"in Piano Roll, and more exact control points in the "
-					"Automation Editor."
-
-					) );
+					"Automation editor.") );
 
 	m_noteLenComboBox->setWhatsThis(
-				tr(
-					"This lets you select the length of new notes. "
-					"'Last Note' means that LMMS will use the note length of "
-					"the note you last edited"
-					) );
+				tr( "This lets you select the length of new notes. "
+					"\"Last Note\" means that LMMS will use the note length of "
+					"the note you last edited." ) );
 
 	m_scaleComboBox->setWhatsThis(
-				tr(
-					"The feature is directly connected to the context-menu "
+				tr( "The feature is directly connected to the context-menu "
 					"on the virtual keyboard, to the left in Piano Roll. "
 					"After you have chosen the scale you want "
 					"in this drop-down menu, "
 					"you can right click on a desired key in the virtual keyboard, "
 					"and then choose 'Mark current Scale'. "
 					"LMMS will highlight all notes that belongs to the chosen scale, "
-					"and in the key you have selected!"
-					) );
+					"and in the key you have selected!" ) );
 
 	m_chordComboBox->setWhatsThis(
 				tr(
@@ -4282,18 +4311,18 @@ PianoRollWindow::PianoRollWindow() :
 					"After you have selected a chord, click anywhere to place the chord, and right "
 					"click on the virtual keyboard to open context menu and highlight the chord. "
 					"To return to single note placement, you need to choose 'No chord' "
-					"in this drop-down menu."
-					) );
+					"in this drop-down menu." ) );
 
-	// setup our actual window
+	// Set up our actual window.
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
 	setWindowIcon( embed::getIconPixmap( "piano" ) );
 	setCurrentPattern( NULL );
 
-	// Connections
+	// Connections.
 	connect( m_editor, SIGNAL( currentPatternChanged() ), this, SIGNAL( currentPatternChanged() ) );
-	connect( m_editor, SIGNAL( currentPatternChanged() ), this, SLOT( patternRenamed() ) );
+	connect( m_editor, SIGNAL( currentPatternChanged() ), this,
+			SLOT( patternRenamed() ) );
 }
 
 
@@ -4313,13 +4342,17 @@ void PianoRollWindow::setCurrentPattern( Pattern* pattern )
 
 	if ( pattern )
 	{
-		setWindowTitle( tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
-		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this, SLOT( patternRenamed()) );
-		connect( pattern, SIGNAL( dataChanged() ), this, SLOT( patternRenamed() ) );
+		setWindowTitle(
+				tr( "Piano-Roll - %1" ).arg( pattern->name() ) );
+		connect( pattern->instrumentTrack(), SIGNAL( nameChanged() ), this,
+				SLOT( patternRenamed()) );
+		connect( pattern, SIGNAL( dataChanged() ), this,
+				SLOT( patternRenamed() ) );
 	}
 	else
 	{
-		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+		setWindowTitle(
+				tr( "Piano-Roll - no pattern" ) );
 	}
 }
 
@@ -4418,11 +4451,13 @@ void PianoRollWindow::patternRenamed()
 {
 	if ( currentPattern() )
 	{
-		setWindowTitle( tr( "Piano-Roll - %1" ).arg( currentPattern()->name() ) );
+		setWindowTitle(
+				tr( "Piano-Roll - %1" ).arg( currentPattern()->name() ) );
 	}
 	else
 	{
-		setWindowTitle( tr( "Piano-Roll - no pattern" ) );
+		setWindowTitle(
+				tr( "Piano-Roll - no pattern" ) );
 	}
 }
 
@@ -4431,6 +4466,6 @@ void PianoRollWindow::patternRenamed()
 
 void PianoRollWindow::focusInEvent( QFocusEvent * event )
 {
-	// when the window is given focus, also give focus to the actual piano roll
+	// When the window is given focus, also give focus to the actual piano roll.
 	m_editor->setFocus( event->reason() );
 }

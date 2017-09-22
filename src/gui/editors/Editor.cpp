@@ -38,9 +38,11 @@ void Editor::setPauseIcon(bool displayPauseIcon)
 {
 	// If we're playing, show a pause icon
 	if (displayPauseIcon)
-		m_playAction->setIcon(embed::getIconPixmap("pause"));
+		m_playAction->setIcon(
+				embed::getIconPixmap("pause"));
 	else
-		m_playAction->setIcon(embed::getIconPixmap("play"));
+		m_playAction->setIcon(
+				embed::getIconPixmap("play"));
 }
 
 DropToolBar * Editor::addDropToolBarToTop(QString const & windowTitle)
@@ -80,7 +82,8 @@ Editor::Editor(bool record) :
 	m_recordAccompanyAction(nullptr),
 	m_stopAction(nullptr)
 {
-	m_toolBar = addDropToolBarToTop(tr("Transport controls"));
+	m_toolBar = addDropToolBarToTop(
+			tr("Transport controls"));
 
 	auto addButton = [this](QAction* action, QString objectName) {
 		m_toolBar->addAction(action);
@@ -88,18 +91,31 @@ Editor::Editor(bool record) :
 	};
 
 	// Set up play and record actions
-	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
-	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
+	m_playAction = new QAction(
+			embed::getIconPixmap("play"),
+			tr("Play (Space)"), this);
+	m_stopAction = new QAction(
+			embed::getIconPixmap("stop"),
+			tr("Stop (Space)"), this);
 
-	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
-	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
+	m_recordAction = new QAction(
+			embed::getIconPixmap("record"),
+			tr("Record"), this);
+	m_recordAccompanyAction = new QAction(
+			embed::getIconPixmap("record_accompany"),
+			tr("Record while playing"), this);
 
 	// Set up connections
-	connect(m_playAction, SIGNAL(triggered()), this, SLOT(play()));
-	connect(m_recordAction, SIGNAL(triggered()), this, SLOT(record()));
-	connect(m_recordAccompanyAction, SIGNAL(triggered()), this, SLOT(recordAccompany()));
-	connect(m_stopAction, SIGNAL(triggered()), this, SLOT(stop()));
-	new QShortcut(Qt::Key_Space, this, SLOT(togglePlayStop()));
+	connect(m_playAction, SIGNAL(triggered()), this,
+			SLOT(play()));
+	connect(m_recordAction, SIGNAL(triggered()), this,
+			SLOT(record()));
+	connect(m_recordAccompanyAction, SIGNAL(triggered()), this,
+			SLOT(recordAccompany()));
+	connect(m_stopAction, SIGNAL(triggered()), this,
+			SLOT(stop()));
+	new QShortcut(Qt::Key_Space, this,
+			SLOT(togglePlayStop()));
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
