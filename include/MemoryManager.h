@@ -107,7 +107,7 @@ template<typename T>
 struct MmAllocator
 {
 	typedef T value_type;
-	template< class U > struct rebind { typedef MmAllocator<U> other; };
+	template<class U>  struct rebind { typedef MmAllocator<U> other; };
 
 	T* allocate( std::size_t n )
 	{
@@ -119,7 +119,7 @@ struct MmAllocator
 		MemoryManager::free( p );
 	}
 
-	typedef std::vector< T, MmAllocator<T> > vector;
+	typedef std::vector<T, MmAllocator<T> > vector;
 };
 
 
