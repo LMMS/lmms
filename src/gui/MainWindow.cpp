@@ -300,12 +300,11 @@ void MainWindow::finalize()
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
-	// temporarily disabled broken MIDI export				
-	/*project_menu->addAction( embed::getIconPixmap( "midi_file" ),
+	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					Engine::getSong(),
 					SLOT( exportProjectMidi() ),
-					Qt::CTRL + Qt::Key_M );*/
+					Qt::CTRL + Qt::Key_M );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
 #if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
@@ -1541,7 +1540,9 @@ void MainWindow::autoSave()
 					"enablerunningautosave" ).toInt() ||
 				! Engine::getSong()->isPlaying() ) )
 	{
-		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
+		AutoSaveThread * ast = new AutoSaveThread();
+		connect( ast, SIGNAL( finished() ), ast, SLOT( deleteLater() ) );
+		ast->start();
 		autoSaveTimerReset();  // Reset timer
 	}
 	else
@@ -1552,4 +1553,12 @@ void MainWindow::autoSave()
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
 	}
+}
+
+
+
+
+void AutoSaveThread::run()
+{
+	Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 }

@@ -394,7 +394,7 @@ int VstPlugin::currentProgram()
 {
 	lock();
 	sendMessage( message( IdVstCurrentProgram ) );
-	waitForMessage( IdVstCurrentProgram );
+	waitForMessage( IdVstCurrentProgram, true );
 	unlock();
 
 	return m_currentProgram;
@@ -406,7 +406,7 @@ const QMap<QString, QString> & VstPlugin::parameterDump()
 {
 	lock();
 	sendMessage( IdVstGetParameterDump );
-	waitForMessage( IdVstParameterDump );
+	waitForMessage( IdVstParameterDump, true );
 	unlock();
 
 	return m_parameterDump;
@@ -533,7 +533,7 @@ void VstPlugin::openPreset( )
 				QSTR_TO_STDSTR(
 					QDir::toNativeSeparators( ofd.selectedFiles()[0] ) ) )
 			);
-		waitForMessage( IdLoadPresetFile );
+		waitForMessage( IdLoadPresetFile, true );
 		unlock();
 	}
 }
@@ -545,7 +545,7 @@ void VstPlugin::setProgram( int index )
 {
 	lock();
 	sendMessage( message( IdVstSetProgram ).addInt( index ) );
-	waitForMessage( IdVstSetProgram );
+	waitForMessage( IdVstSetProgram, true );
 	unlock();
 }
 
@@ -556,7 +556,7 @@ void VstPlugin::rotateProgram( int offset )
 {
 	lock();
 	sendMessage( message( IdVstRotateProgram ).addInt( offset ) );
-	waitForMessage( IdVstRotateProgram );
+	waitForMessage( IdVstRotateProgram, true );
 	unlock();
 }
 
@@ -567,7 +567,7 @@ void VstPlugin::loadProgramNames()
 {
 	lock();
 	sendMessage( message( IdVstProgramNames ) );
-	waitForMessage( IdVstProgramNames );
+	waitForMessage( IdVstProgramNames, true );
 	unlock();
 }
 
@@ -604,7 +604,7 @@ void VstPlugin::savePreset( )
 				QSTR_TO_STDSTR(
 					QDir::toNativeSeparators( fns ) ) )
 			);
-		waitForMessage( IdSavePresetFile );
+		waitForMessage( IdSavePresetFile, true );
 		unlock();
 	}
 }
@@ -616,7 +616,7 @@ void VstPlugin::setParam( int i, float f )
 {
 	lock();
 	sendMessage( message( IdVstSetParameter ).addInt( i ).addFloat( f ) );
-	//waitForMessage( IdVstSetParameter );
+	//waitForMessage( IdVstSetParameter, true );
 	unlock();
 }
 
@@ -645,7 +645,7 @@ void VstPlugin::loadChunk( const QByteArray & _chunk )
 					QSTR_TO_STDSTR(
 						QDir::toNativeSeparators( tf.fileName() ) ) ).
 				addInt( _chunk.size() ) );
-		waitForMessage( IdLoadSettingsFromFile );
+		waitForMessage( IdLoadSettingsFromFile, true );
 		unlock();
 	}
 }
@@ -664,7 +664,7 @@ QByteArray VstPlugin::saveChunk()
 				addString(
 					QSTR_TO_STDSTR(
 						QDir::toNativeSeparators( tf.fileName() ) ) ) );
-		waitForMessage( IdSaveSettingsToFile );
+		waitForMessage( IdSaveSettingsToFile, true );
 		unlock();
 		a = tf.readAll();
 	}
