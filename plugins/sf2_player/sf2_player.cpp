@@ -122,7 +122,7 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	// everytime we load a new soundfont.
 	m_synth = new_fluid_synth( m_settings );
 
-	loadFile( ConfigManager::inst()->defaultSoundfont() );
+	loadFile( ConfigManager::inst()->sf2File() );
 
 	updateSampleRate();
 	updateReverbOn();

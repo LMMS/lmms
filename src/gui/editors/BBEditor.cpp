@@ -43,18 +43,22 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	Editor(false),
 	m_trackContainerView( new BBTrackContainerView(tc) )
 {
-	setWindowIcon( embed::getIconPixmap( "bb_track_btn" ) );
-	setWindowTitle( tr( "Beat+Bassline Editor" ) );
+	setWindowIcon(
+			embed::getIconPixmap( "bb_track_btn" ) );
+	setWindowTitle(
+			tr( "Beat+Bassline editor" ) );
 	setCentralWidget(m_trackContainerView);
 
 	setAcceptDrops(true);
 	m_toolBar->setAcceptDrops(true);
-	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_trackContainerView, SLOT(dragEnterEvent(QDragEnterEvent*)));
-	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_trackContainerView, SLOT(dropEvent(QDropEvent*)));
+	connect(m_toolBar, SIGNAL(dragEntered(QDragEnterEvent*)), m_trackContainerView,
+			SLOT(dragEnterEvent(QDragEnterEvent*)));
+	connect(m_toolBar, SIGNAL(dropped(QDropEvent*)), m_trackContainerView,
+			SLOT(dropEvent(QDropEvent*)));
 
-	// TODO: Use style sheet
+	// TODO: Use style sheet.
 	if( ConfigManager::inst()->value( "ui",
-					  "compacttrackbuttons" ).toInt() )
+				"compacttrackbuttons" ).toInt() )
 	{
 		setMinimumWidth( TRACK_OP_WIDTH_COMPACT + DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT
 			     + 2 * TCO_BORDER_WIDTH + 384 );
@@ -66,20 +70,22 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	}
 
 
-	m_playAction->setToolTip(tr( "Play/pause current beat/bassline (Space)" ));
-	m_stopAction->setToolTip(tr( "Stop playback of current beat/bassline (Space)" ));
+	m_playAction->setToolTip(
+			tr( "Play/pause current beat/bassline (Space)" ));
+	m_stopAction->setToolTip(
+			tr( "Stop playback of current beat/bassline (Space)" ));
 
 	m_playAction->setWhatsThis(
-		tr( "Click here to play the current "
-			"beat/bassline.  The beat/bassline is automatically "
-			"looped when its end is reached." ) );
+			tr( "Click here to play the current "
+				"beat/bassline.  The beat/bassline is automatically "
+				"looped when its end is reached." ) );
 	m_stopAction->setWhatsThis(
-		tr( "Click here to stop playing of current "
-							"beat/bassline." ) );
+			tr( "Click here to stop playing of current beat/bassline." ) );
 
 
-	// Beat selector
-	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(tr("Beat selector"));
+	// Beat selector.
+	DropToolBar *beatSelectionToolBar = addDropToolBarToTop(
+			tr("Beat selector"));
 
 	m_bbComboBox = new ComboBox( m_toolBar );
 	m_bbComboBox->setFixedSize( 200, 22 );
@@ -88,43 +94,56 @@ BBEditor::BBEditor( BBTrackContainer* tc ) :
 	beatSelectionToolBar->addWidget( m_bbComboBox );
 
 
-	// Track actions
-	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(tr("Track and step actions"));
+	// Track actions.
+	DropToolBar *trackAndStepActionsToolBar = addDropToolBarToTop(
+			tr("Track and step actions"));
 
 
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_bb_track"), tr("Add beat/bassline"),
-						 Engine::getSong(), SLOT(addBBTrack()));
 	trackAndStepActionsToolBar->addAction(
-				embed::getIconPixmap("add_sample_track"),
-				tr("Add sample-track"), m_trackContainerView,
-				SLOT(addSampleTrack()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("add_automation"), tr("Add automation-track"),
-						 m_trackContainerView, SLOT(addAutomationTrack()));
+			embed::getIconPixmap("add_bb_track"),
+			tr("Add beat/bassline"), Engine::getSong(),
+			SLOT(addBBTrack()));
+	trackAndStepActionsToolBar->addAction(
+			embed::getIconPixmap("add_sample_track"),
+			tr("Add sample-track"), m_trackContainerView,
+			SLOT(addSampleTrack()));
+	trackAndStepActionsToolBar->addAction(
+			embed::getIconPixmap("add_automation"),
+			tr("Add automation-track"), m_trackContainerView,
+			SLOT(addAutomationTrack()));
 
 	QWidget* stretch = new QWidget(m_toolBar);
 	stretch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	trackAndStepActionsToolBar->addWidget(stretch);
 
 
-	// Step actions
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_remove"), tr("Remove steps"),
-						 m_trackContainerView, SLOT(removeSteps()));
-	trackAndStepActionsToolBar->addAction(embed::getIconPixmap("step_btn_add"), tr("Add steps"),
-						 m_trackContainerView, SLOT( addSteps()));
-	trackAndStepActionsToolBar->addAction( embed::getIconPixmap( "step_btn_duplicate" ), tr( "Clone Steps" ),
-						  m_trackContainerView, SLOT( cloneSteps() ) );
+	// Step actions.
+	trackAndStepActionsToolBar->addAction(
+			embed::getIconPixmap("step_btn_remove"),
+			tr("Remove steps"), m_trackContainerView,
+			SLOT(removeSteps()));
+	trackAndStepActionsToolBar->addAction(
+			embed::getIconPixmap("step_btn_add"),
+			tr("Add steps"), m_trackContainerView,
+			SLOT( addSteps()));
+	trackAndStepActionsToolBar->addAction(
+			embed::getIconPixmap( "step_btn_duplicate" ),
+			tr( "Clone Steps" ), m_trackContainerView,
+			SLOT( cloneSteps() ) );
 
-	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ),
-			m_trackContainerView, SLOT( updatePosition() ) );
+	connect( &tc->m_bbComboBoxModel, SIGNAL( dataChanged() ), m_trackContainerView,
+			SLOT( updatePosition() ) );
 
 
 	QAction* viewNext = new QAction(this);
-	connect(viewNext, SIGNAL(triggered()), m_bbComboBox, SLOT(selectNext()));
+	connect(viewNext, SIGNAL(triggered()), m_bbComboBox,
+			SLOT(selectNext()));
 	viewNext->setShortcut(Qt::Key_Plus);
 	addAction(viewNext);
 
 	QAction* viewPrevious = new QAction(this);
-	connect(viewPrevious, SIGNAL(triggered()), m_bbComboBox, SLOT(selectPrevious()));
+	connect(viewPrevious, SIGNAL(triggered()), m_bbComboBox,
+			SLOT(selectPrevious()));
 	viewPrevious->setShortcut(Qt::Key_Minus);
 	addAction(viewPrevious);
 }
@@ -274,7 +293,7 @@ void BBTrackContainerView::dropEvent(QDropEvent* de)
 
 void BBTrackContainerView::updatePosition()
 {
-	//realignTracks();
+	// realignTracks();
 	emit positionChanged( m_currentPosition );
 }
 

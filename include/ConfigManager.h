@@ -136,14 +136,14 @@ public:
 
 	QString defaultVersion() const;
 
-	QString defaultArtworkDir() const
+	QString defaultThemeDir() const
 	{
 		return m_dataDir + DEFAULT_THEME_PATH;
 	}
 
-	QString artworkDir() const
+	QString themeDir() const
 	{
-		return m_artworkDir;
+		return m_themeDir;
 	}
 
 	QString trackIconsDir() const
@@ -173,7 +173,7 @@ public:
 
 	const QString & ladspaDir() const
 	{
-		return m_ladDir;
+		return m_ladspaDir;
 	}
 
 	const QString recoveryFile() const
@@ -194,15 +194,15 @@ public:
 #endif
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	const QString & defaultSoundfont() const
+	const QString & sf2File() const
 	{
-		return m_defaultSoundfont;
+		return m_sf2File;
 	}
 #endif
 
-	const QString & backgroundArtwork() const
+	const QString & backgroundPicFile() const
 	{
-		return m_backgroundArtwork;
+		return m_backgroundPicFile;
 	}
 
 	inline const QStringList & recentlyOpenedProjects() const
@@ -230,12 +230,12 @@ public:
 
 	void setWorkingDir( const QString & _wd );
 	void setVSTDir( const QString & _vd );
-	void setArtworkDir( const QString & _ad );
+	void setThemeDir( const QString & _ad );
 	void setLADSPADir( const QString & _fd );
 	void setVersion( const QString & _cv );
 	void setSTKDir( const QString & _fd );
-	void setDefaultSoundfont( const QString & _sf );
-	void setBackgroundArtwork( const QString & _ba );
+	void setSF2File( const QString & _sf );
+	void setBackgroundPicFile( const QString & _ba );
 	void setGIGDir( const QString & gd );
 	void setSF2Dir( const QString & sfd );
 
@@ -257,9 +257,9 @@ private:
 	QString m_lmmsRcFile;
 	QString m_workingDir;
 	QString m_dataDir;
-	QString m_artworkDir;
+	QString m_themeDir;
 	QString m_vstDir;
-	QString m_ladDir;
+	QString m_ladspaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 	QString m_version;
@@ -267,9 +267,9 @@ private:
 	QString m_stkDir;
 #endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QString m_defaultSoundfont;
+	QString m_sf2File;
 #endif
-	QString m_backgroundArtwork;
+	QString m_backgroundPicFile;
 	QStringList m_recentlyOpenedProjects;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
