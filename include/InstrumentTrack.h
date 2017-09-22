@@ -237,6 +237,7 @@ private:
 	MidiPort m_midiPort;
 
 	NotePlayHandle* m_notes[NumKeys];
+	NotePlayHandleList m_sustainedNotes;
 
 	int m_runningMidiNotes[NumKeys];
 	QMutex m_midiNotesMutex;

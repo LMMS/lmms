@@ -1,7 +1,8 @@
 /*
  * MidiExport.h - support for Exporting MIDI-files
  *
- * Author: Mohamed Abdel Maksoud <mohamed at amaksoud.com>
+ * Copyright (c) 2015 Mohamed Abdel Maksoud <mohamed at amaksoud.com>
+ * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -31,25 +32,52 @@
 #include "MidiFile.hpp"
 
 
+const int BUFFER_SIZE = 50*1024;
+typedef MidiFile::MIDITrack<BUFFER_SIZE> MTrack;
+
+struct MidiNote
+{
+	int time;
+	uint8_t pitch;
+	int duration;
+	uint8_t volume;
+
+	inline bool operator<(const MidiNote &b) const
+	{
+		return this->time < b.time;
+	}
+} ;
+
+typedef std::vector<MidiNote> MidiNoteVector;
+typedef std::vector<MidiNote>::iterator MidiNoteIterator;
+
+
 
 class MidiExport: public ExportFilter
 {
 // 	Q_OBJECT
 public:
-	MidiExport( );
+	MidiExport();
 	~MidiExport();
 
-	virtual PluginView * instantiateView( QWidget * )
+	virtual PluginView *instantiateView(QWidget *)
 	{
-		return( NULL );
+		return nullptr;
 	}
 
-	virtual bool tryExport( const TrackContainer::TrackList &tracks, int tempo, const QString &filename );
+	virtual bool tryExport(const TrackContainer::TrackList &tracks,
+				const TrackContainer::TrackList &tracks_BB,
+				int tempo, int masterPitch, const QString &filename);
 	
 private:
-	
+	void writePattern(MidiNoteVector &pat, QDomNode n,
+				int base_pitch, double base_volume, int base_time);
+	void writePatternToTrack(MTrack &mtrack, MidiNoteVector &nv);
+	void writeBBPattern(MidiNoteVector &src, MidiNoteVector &dst,
+				int len, int base, int start, int end);
+	void ProcessBBNotes(MidiNoteVector &nv, int cutPos);
 
-	void error( void );
+	void error();
 
 
 } ;
