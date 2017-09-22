@@ -40,7 +40,7 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

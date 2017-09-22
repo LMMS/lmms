@@ -45,7 +45,7 @@
 #include "ToolTip.h"
 #include "BandLimitedWave.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 // Envelope Recalculation period

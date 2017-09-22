@@ -41,7 +41,7 @@
 #include "PixmapButton.h"
 #include "ToolTip.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 #define C64_PAL_CYCLES_PER_SEC  985248
 

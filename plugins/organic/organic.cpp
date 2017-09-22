@@ -40,7 +40,7 @@
 #include "templates.h"
 #include "ToolTip.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 

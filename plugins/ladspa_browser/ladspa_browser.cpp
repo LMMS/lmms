@@ -38,7 +38,7 @@
 #include "TabBar.h"
 #include "TabButton.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -54,7 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspabrowser_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Tool,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;

@@ -71,6 +71,33 @@
 #include "Song.h"
 #include "SetupDialog.h"
 
+#ifdef LMMS_DEBUG_FPE
+#include <fenv.h> // For feenableexcept
+#include <execinfo.h> // For backtrace and backtrace_symbols_fd
+#include <unistd.h> // For STDERR_FILENO
+#include <csignal> // To register the signal handler
+#endif
+
+
+#ifdef LMMS_DEBUG_FPE
+void signalHandler( int signum ) {
+
+	// Get a back trace
+	void *array[10];
+	size_t size;
+
+	// get void*'s for all entries on the stack
+	size = backtrace(array, 10);
+
+	backtrace_symbols_fd(array, size, STDERR_FILENO);
+
+	// cleanup and close up stuff here
+	// terminate program
+
+	exit(signum);
+}
+#endif
+
 static inline QString baseName( const QString & file )
 {
 	return QFileInfo( file ).absolutePath() + "/" +
@@ -139,7 +166,7 @@ void printHelp()
 		"-c, --config <configfile>     Get the configuration from <configfile>\n"
 		"-d, --dump <in>               Dump XML of compressed file <in>\n"
 		"-f, --format <format>         Specify format of render-output where\n"
-		"       Format is either 'wav', 'ogg' or 'mp3'.\n"
+		"       Format is either 'wav', 'flac', 'ogg' or 'mp3'.\n"
 		"    --geometry <geometry>     Specify the size and position of the main window\n"
 		"       geometry is <xsizexysize+xoffset+yoffsety>.\n"
 		"-h, --help                    Show this usage information and exit.\n"
@@ -202,6 +229,18 @@ void fileCheck( QString &file )
 
 int main( int argc, char * * argv )
 {
+#ifdef LMMS_DEBUG_FPE
+	// Enable exceptions for certain floating point results
+	feenableexcept( FE_INVALID   |
+			FE_DIVBYZERO |
+			FE_OVERFLOW  |
+			FE_UNDERFLOW);
+
+	// Install the trap handler
+	// register signal SIGFPE and signal handler
+	signal(SIGFPE, signalHandler);
+#endif
+
 	// initialize memory managers
 	MemoryManager::init();
 	NotePlayHandleManager::init();
@@ -259,7 +298,7 @@ int main( int argc, char * * argv )
 	{
 		printf( "LMMS cannot be run as root.\nUse \"--allowroot\" to override.\n\n" );
 		return EXIT_FAILURE;
-	}	
+	}
 #endif
 
 	QCoreApplication * app = coreOnly ?
@@ -321,7 +360,7 @@ int main( int argc, char * * argv )
 				printf( "\nOption \"--allowroot\" will be ignored on this platform.\n\n" );
 			}
 #endif
-			
+
 		}
 		else if( arg == "--dump" || arg == "-d" )
 		{
@@ -405,6 +444,10 @@ int main( int argc, char * * argv )
 				eff = ProjectRenderer::MP3File;
 			}
 #endif
+			else if (ext == "flac")
+			{
+				eff = ProjectRenderer::FlacFile;
+			}
 			else
 			{
 				printf( "\nInvalid output format %s.\n\n"
@@ -806,16 +849,16 @@ int main( int argc, char * * argv )
 			QPushButton * recover;
 			QPushButton * discard;
 			QPushButton * exit;
-			
+
 			#if QT_VERSION >= 0x050000
-				// setting all buttons to the same roles allows us 
+				// setting all buttons to the same roles allows us
 				// to have a custom layout
 				discard = mb.addButton( MainWindow::tr( "Discard" ),
 									QMessageBox::AcceptRole );
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
 
-			# else 
+			# else
 				// in qt4 the button order is reversed
 				recover = mb.addButton( MainWindow::tr( "Recover" ),
 									QMessageBox::AcceptRole );
@@ -823,11 +866,11 @@ int main( int argc, char * * argv )
 									QMessageBox::AcceptRole );
 
 			#endif
-			
+
 			// have a hidden exit button
 			exit = mb.addButton( "", QMessageBox::RejectRole);
 			exit->setVisible(false);
-			
+
 			// set icons
 			recover->setIcon( embed::getIconPixmap( "recover" ) );
 			discard->setIcon( embed::getIconPixmap( "discard" ) );

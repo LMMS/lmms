@@ -29,6 +29,7 @@
 #include <QPainter>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "endian_handling.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -41,7 +42,7 @@
 #include "FileDialog.h"
 #include "ConfigManager.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 

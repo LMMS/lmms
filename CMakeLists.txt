@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
 
 PROJECT(lmms)
 
@@ -66,6 +66,7 @@ OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
+OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -175,10 +176,14 @@ ELSE()
 ENDIF()
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.11)
+PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
 IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.11 - please install, remove CMakeCache.txt and try again!")
-ENDIF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+ENDIF()
+# check if we can use SF_SET_COMPRESSION_LEVEL
+IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
+	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
+ENDIF()
 
 IF(WANT_CALF)
 	SET(LMMS_HAVE_CALF TRUE)
@@ -228,26 +233,42 @@ IF(WANT_CARLA)
 ENDIF(WANT_CARLA)
 
 
-# check for SDL
+# check for SDL2
 IF(WANT_SDL)
+	SET(SDL2_BUILDING_LIBRARY TRUE)
+	FIND_PACKAGE(SDL2)
+	IF(SDL2_FOUND)
+		SET(LMMS_HAVE_SDL TRUE)
+		SET(LMMS_HAVE_SDL2 TRUE)
+		SET(STATUS_SDL "OK, using SDL2")
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ELSE()
+		SET(SDL2_INCLUDE_DIR "")
+		SET(SDL2_LIBRARY "")
+	ENDIF()
+ENDIF()
+
+# fallback to SDL1
+IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
+	# Fallback to SDL1.2
 	SET(SDL_BUILDING_LIBRARY TRUE)
 	FIND_PACKAGE(SDL)
 	IF(SDL_FOUND)
 		SET(LMMS_HAVE_SDL TRUE)
-		SET(STATUS_SDL "OK")
-	ELSE(SDL_FOUND)
-		SET(STATUS_SDL "not found, please install libsdl1.2-dev (or similar) "
+		SET(STATUS_SDL "OK, using SDL1.2")
+		# fix mingw since 53abd65
+		IF(NOT SDL_INCLUDE_DIR)
+			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
+		ENDIF()
+		
+	ELSE()
+		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
-	ENDIF(SDL_FOUND)
-ENDIF(WANT_SDL)
-IF(NOT LMMS_HAVE_SDL)
-	SET(SDL_INCLUDE_DIR "")
-ELSE(NOT LMMS_HAVE_SDL)
-	IF(NOT SDL_INCLUDE_DIR)
-		SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
-	ENDIF(NOT SDL_INCLUDE_DIR)
-ENDIF(NOT LMMS_HAVE_SDL)
-
+		SET(SDL_INCLUDE_DIR "")
+		SET(SDL_LIBRARY "")
+	ENDIF()
+ENDIF()
 
 # check for Stk
 IF(WANT_STK)
@@ -409,15 +430,15 @@ IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 	FIND_PACKAGE(Threads)
 ENDIF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE OR LMMS_BUILD_OPENBSD)
 
-IF(LMMS_BUILD_OPENBSD)
-	FIND_PACKAGE(Sndio)
-	IF(SNDIO_FOUND)
-		SET(LMMS_HAVE_SNDIO TRUE)
-        	SET(STATUS_SNDIO "OK")
-    	ELSE()
-        	SET(STATUS_SNDIO "<not found or not supported on this platform>")
-	ENDIF(SNDIO_FOUND)
-ENDIF(LMMS_BUILD_OPENBSD)
+# check for sndio (openbsd only, roaraudio won't work yet)
+FIND_PACKAGE(Sndio)
+IF(LMMS_BUILD_OPENBSD AND SNDIO_FOUND)
+	SET(LMMS_HAVE_SNDIO TRUE)
+	SET(STATUS_SNDIO "OK")
+ELSE()
+	SET(STATUS_SNDIO "<not found or not supported on this platform>")
+	SET(SNDIO_LIBRARY "")
+ENDIF()
 
 # check for WINE
 IF(WANT_VST)
@@ -436,6 +457,17 @@ IF(LMMS_BUILD_WIN32)
 	SET(LMMS_SUPPORT_VST TRUE)
 	SET(STATUS_VST "OK")
 ENDIF(LMMS_BUILD_WIN32)
+
+IF(WANT_DEBUG_FPE)
+	IF(LMMS_BUILD_LINUX)
+		SET(LMMS_DEBUG_FPE TRUE)
+		SET (STATUS_DEBUG_FPE "Enabled")
+	ELSE()
+		SET (STATUS_DEBUG_FPE "Wanted but disabled due to unsupported platform")
+	ENDIF()
+ELSE()
+	SET (STATUS_DEBUG_FPE "Disabled")
+ENDIF(WANT_DEBUG_FPE)
 
 
 # check for libsamplerate
@@ -472,17 +504,6 @@ FILE(REMOVE include/lmmsconfig.h)
 
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
-
-# embedded resources stuff
-IF(WIN32 OR WIN64)
-	# compile buildtools native
-	SET(BIN2RES_CPP "${CMAKE_SOURCE_DIR}/buildtools/bin2res.cpp")
-	SET(BIN2RES "${CMAKE_BINARY_DIR}/bin2res")
-	ADD_CUSTOM_TARGET(bin2res COMMAND g++ "\"${BIN2RES_CPP}\"" -o "\"${BIN2RES}\"" DEPENDS "${BIN2RES_CPP}")
-ELSE(WIN32 OR WIN64)
-	ADD_EXECUTABLE(bin2res buildtools/bin2res.cpp)
-	GET_TARGET_PROPERTY(BIN2RES bin2res LOCATION)
-ENDIF(WIN32 OR WIN64)
 
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
@@ -608,6 +629,7 @@ MESSAGE(
 "Supported file formats for project export\n"
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
+"* FLAC                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
 "* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
@@ -626,6 +648,12 @@ MESSAGE(
 "* TAP LADSPA plugins          : ${STATUS_TAP}\n"
 "* SWH LADSPA plugins          : ${STATUS_SWH}\n"
 "* GIG player                  : ${STATUS_GIG}\n"
+)
+
+MESSAGE(
+"Developer options\n"
+"-----------------------------------------\n"
+"* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
 )
 
 MESSAGE(

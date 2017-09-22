@@ -35,7 +35,7 @@
 #include "Mixer.h"
 #include "Oscillator.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {

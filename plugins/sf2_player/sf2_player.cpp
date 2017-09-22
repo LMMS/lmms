@@ -31,6 +31,7 @@
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "sf2_player.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
 #include "InstrumentPlayHandle.h"
@@ -44,7 +45,7 @@
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

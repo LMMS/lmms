@@ -521,10 +521,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open in Automation editor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2063,6 +2059,81 @@ Please make sure you have write permission to the file and the directory contain
         <source>Use variable bitrate</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Stereo mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Joint Stereo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compression level:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(fastest)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(smallest)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Expressive</name>
+    <message>
+        <source>Selected graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W1 smoothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W2 smoothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W3 smoothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAN1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PAN2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>REL TRANS</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Fader</name>
@@ -2075,6 +2146,14 @@ Please make sure you have write permission to the file and the directory contain
     <name>FileBrowser</name>
     <message>
         <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh list</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5301,14 +5380,6 @@ PM means phase modulation: Oscillator 3&apos;s phase is modulated by oscillator 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>use mouse wheel to set velocity of a step</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>double-click to open in Piano Roll</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Clone Steps</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5819,6 +5890,14 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FLAC-File (*.flac)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compressed MP3-File (*.mp3)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6787,6 +6866,10 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Importing MIDI-file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading Track %1 (%2/Total %3)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7913,6 +7996,133 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Stereo mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>expressiveView</name>
+    <message>
+        <source>Select oscillator W1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator W2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select oscillator W3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select OUTPUT 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select OUTPUT 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open help window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moog-Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for a Moog-Saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click for an exponential wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WaveInterpolate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ExpressionValid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General purpose 1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General purpose 2:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General purpose 3:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O1 panning:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O2 panning:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Release transition:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smoothness</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9301,6 +9511,10 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Reverb algorithm by Sean Costello</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mathematical expression parser</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

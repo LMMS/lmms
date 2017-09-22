@@ -52,7 +52,7 @@ float frnd(float range)
 #include "MidiTime.h"
 #include "Mixer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {

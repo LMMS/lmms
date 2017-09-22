@@ -38,6 +38,7 @@ public:
 	enum ExportFileFormats: int
 	{
 		WaveFile,
+		FlacFile,
 		OggFile,
 		MP3File,
 		NumFileFormats

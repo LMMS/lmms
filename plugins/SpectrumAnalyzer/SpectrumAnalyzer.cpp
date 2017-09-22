@@ -24,7 +24,7 @@
 
 #include "SpectrumAnalyzer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -38,7 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader(),
 	NULL,
 	NULL
 } ;

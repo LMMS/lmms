@@ -35,7 +35,7 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -1433,14 +1433,14 @@ void MonstroInstrument::updateSamplerate()
 void MonstroInstrument::updateSlope1()
 {
 	const float slope = m_env1Slope.value();
-	m_slope[0] = exp10f( slope * -1.0f );
+	m_slope[0] = exp10( slope * -1.0f );
 }
 
 
 void MonstroInstrument::updateSlope2()
 {
 	const float slope = m_env2Slope.value();
-	m_slope[1] = exp10f( slope * -1.0f );
+	m_slope[1] = exp10( slope * -1.0f );
 }
 
 
