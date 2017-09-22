@@ -240,9 +240,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
 #ifdef LMMS_EMBED_VST
-#if QT_VERSION < 0x050000
 		l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
-#endif
 #endif
 		l->setRowStretch( 5, 1 );
 		l->setColumnStretch( 1, 1 );
