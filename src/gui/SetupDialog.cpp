@@ -732,11 +732,11 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	paths_layout->setMargin( 0 );
 	labelWidget( paths_w,
 			tr( "Paths settings" ) );
-//	QLabel * title = new QLabel(
-//			tr( "Paths settings" ), paths_w );
-//	QFont f = title->font();
-//	f.setBold( true );
-//	title->setFont( pointSize<12>( f ) );
+	QLabel * title = new QLabel(
+			tr( "Paths settings" ), paths_w );
+	QFont f = title->font();
+	f.setBold( true );
+	title->setFont( pointSize<12>( f ) );
 
 
 	QScrollArea * pathsScroll = new QScrollArea( paths_w );
