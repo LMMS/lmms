@@ -174,13 +174,13 @@ private:
 	// Paths settings widget.
 	QString m_workingDir;
 	QString m_vstDir;
-	QString m_themeDir;
 	QString m_ladspaDir;
 	QString m_gigDir;
 	QString m_sf2Dir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_sf2File;
 #endif
+	QString m_themeDir;
 	QString m_backgroundPicFile;
 
 	QLineEdit * m_workingDirLineEdit;

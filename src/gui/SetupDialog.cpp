@@ -110,29 +110,15 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 			"app", "openlastproject" ).toInt() ),
 	m_lang( ConfigManager::inst()->value(
 			"app", "language" ) ),
-	m_hqAudioDev( ConfigManager::inst()->value(
-			"mixer", "hqaudio" ).toInt() ),
-	m_bufferSize( ConfigManager::inst()->value(
-			"mixer", "framesperaudiobuffer" ).toInt() ),
-	m_workingDir( QDir::toNativeSeparators( ConfigManager::inst()->workingDir() ) ),
-	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
-	m_ladspaDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
-	m_sf2Dir( QDir::toNativeSeparators( ConfigManager::inst()->sf2Dir() ) ),
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	m_sf2File( QDir::toNativeSeparators( ConfigManager::inst()->sf2File() ) ),
-#endif
-	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
-	m_themeDir( QDir::toNativeSeparators( ConfigManager::inst()->themeDir() ) ),
-	m_backgroundPicFile( QDir::toNativeSeparators( ConfigManager::inst()->backgroundPicFile() ) ),
-	m_enableAutoSave( ConfigManager::inst()->value(
-			"ui", "enableautosave", "1" ).toInt() ),
-	m_enableRunningAutoSave( ConfigManager::inst()->value(
-			"ui", "enablerunningautosave", "0" ).toInt() ),
 	m_saveInterval(	ConfigManager::inst()->value(
 			"ui", "saveinterval" ).toInt() < 1 ?
 			MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
 			ConfigManager::inst()->value(
 			"ui", "saveinterval" ).toInt() ),
+	m_enableAutoSave( ConfigManager::inst()->value(
+			"ui", "enableautosave", "1" ).toInt() ),
+	m_enableRunningAutoSave( ConfigManager::inst()->value(
+			"ui", "enablerunningautosave", "0" ).toInt() ),
 	m_smoothScroll( ConfigManager::inst()->value(
 			"ui", "smoothscroll" ).toInt() ),
 	m_animateAFP(ConfigManager::inst()->value(
@@ -140,7 +126,21 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	m_syncVSTPlugins( ConfigManager::inst()->value(
 			"ui", "syncvstplugins" ).toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value(
-			"ui", "disableautoquit").toInt() )
+			"ui", "disableautoquit").toInt() ),
+	m_hqAudioDev( ConfigManager::inst()->value(
+			"mixer", "hqaudio" ).toInt() ),
+	m_bufferSize( ConfigManager::inst()->value(
+			"mixer", "framesperaudiobuffer" ).toInt() ),
+	m_workingDir( QDir::toNativeSeparators( ConfigManager::inst()->workingDir() ) ),
+	m_vstDir( QDir::toNativeSeparators( ConfigManager::inst()->vstDir() ) ),
+	m_ladspaDir( QDir::toNativeSeparators( ConfigManager::inst()->ladspaDir() ) ),
+	m_gigDir( QDir::toNativeSeparators( ConfigManager::inst()->gigDir() ) ),
+	m_sf2Dir( QDir::toNativeSeparators( ConfigManager::inst()->sf2Dir() ) ),
+#ifdef LMMS_HAVE_FLUIDSYNTH
+	m_sf2File( QDir::toNativeSeparators( ConfigManager::inst()->sf2File() ) ),
+#endif
+	m_themeDir( QDir::toNativeSeparators( ConfigManager::inst()->themeDir() ) ),
+	m_backgroundPicFile( QDir::toNativeSeparators( ConfigManager::inst()->backgroundPicFile() ) )
 {
 	setWindowIcon(
 			embed::getIconPixmap( "setup_general" ) );
