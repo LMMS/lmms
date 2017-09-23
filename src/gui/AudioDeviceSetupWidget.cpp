@@ -22,7 +22,9 @@
  *
  */
 
+
 #include "AudioDeviceSetupWidget.h"
+
 
 AudioDeviceSetupWidget::AudioDeviceSetupWidget(const QString & caption, QWidget * parent) :
 	TabWidget(TabWidget::

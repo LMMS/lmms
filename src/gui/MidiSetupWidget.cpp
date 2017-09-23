@@ -22,12 +22,14 @@
  *
  */
 
+
 #include "MidiSetupWidget.h"
 
 #include <QLineEdit>
 
 #include "ConfigManager.h"
 #include "gui_templates.h"
+
 
 MidiSetupWidget::MidiSetupWidget(const QString & caption, const QString & configSection,
 	const QString & devName, QWidget * parent) :

@@ -22,6 +22,7 @@
  *
  */
 
+
 #ifndef SETUP_DIALOG_H
 #define SETUP_DIALOG_H
 
@@ -125,7 +126,7 @@ private slots:
 private:
 	TabBar * m_tabBar;
 
-	// General settings widget.
+	// General settings stuff.
 	bool m_warnAfterSetup;
 	bool m_tooltips;
 	bool m_displaydBFS;
@@ -139,7 +140,7 @@ private:
 	QString m_lang;
 	QStringList m_languages;
 
-	// Performance settings widget.
+	// Performance settings stuff.
 	int m_saveInterval;
 	bool m_enableAutoSave;
 	bool m_enableRunningAutoSave;
@@ -157,7 +158,7 @@ private:
 	typedef QMap<QString, MidiSetupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 
-	// Audio settings widget.
+	// Audio settings stuff.
 	QComboBox * m_audioInterfaces;
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
@@ -166,12 +167,12 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 
-	// MIDI settings widget.
+	// MIDI settings stuff.
 	QComboBox * m_midiInterfaces;
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 
-	// Paths settings widget.
+	// Paths settings stuff.
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_ladspaDir;
