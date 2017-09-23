@@ -147,9 +147,15 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	setWindowTitle(
 			tr( "Settings" ) );
 	setModal( true );
-	setFixedSize( 452, 520 );
+	setFixedSize( 452, 412 );
 
 	Engine::projectJournal()->setJournalling( false );
+
+
+	// Constants for positioning LED check boxes.
+	const int XDelta = 10;
+	const int YDelta = 18;
+
 
 	// Vertical layout.
 	QVBoxLayout * vlayout = new QVBoxLayout( this );
@@ -187,9 +193,6 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 			tr( "General settings" ) );
 
 
-	const int XDelta = 10;
-	const int YDelta = 18;
-	
 	int labelNumber1 = 0;
 
 	// GUI tab.
@@ -199,7 +202,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * enableTooltips = new LedCheckBox(
 			tr( "Enable tooltips" ), gui_tw );
 	labelNumber1++;
-	enableTooltips->move( XDelta, YDelta*labelNumber1 );
+	enableTooltips->move( XDelta, YDelta * labelNumber1 );
 	enableTooltips->setChecked( m_tooltips );
 	connect( enableTooltips, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleTooltips( bool ) ) );
@@ -207,7 +210,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * dbfs = new LedCheckBox(
 			tr( "Display volume as dBFS " ), gui_tw );
 	labelNumber1++;
-	dbfs->move( XDelta, YDelta*labelNumber1 );
+	dbfs->move( XDelta, YDelta * labelNumber1 );
 	dbfs->setChecked( m_displaydBFS );
 	connect( dbfs, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleDisplaydBFS( bool ) ) );
@@ -215,7 +218,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * displayWaveform = new LedCheckBox(
 			tr( "Enable master oscilloscope by default" ), gui_tw );
 	labelNumber1++;
-	displayWaveform->move( XDelta, YDelta*labelNumber1 );
+	displayWaveform->move( XDelta, YDelta * labelNumber1 );
 	displayWaveform->setChecked( m_displayWaveform );
 	connect( displayWaveform, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleDisplayWaveform( bool ) ) );
@@ -223,7 +226,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * noteLabels = new LedCheckBox(
 			tr( "Enable all note labels in piano roll" ), gui_tw );
 	labelNumber1++;
-	noteLabels->move( XDelta, YDelta*labelNumber1 );
+	noteLabels->move( XDelta, YDelta * labelNumber1 );
 	noteLabels->setChecked( m_printNoteLabels );
 	connect( noteLabels, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleNoteLabels( bool ) ) );
@@ -231,7 +234,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * compacttracks = new LedCheckBox(
 			tr( "Compact track buttons" ), gui_tw );
 	labelNumber1++;
-	compacttracks->move( XDelta, YDelta*labelNumber1 );
+	compacttracks->move( XDelta, YDelta * labelNumber1 );
 	compacttracks->setChecked( m_compactTrackButtons );
 	connect( compacttracks, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleCompactTrackButtons( bool ) ) );
@@ -239,13 +242,13 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * oneitw = new LedCheckBox(
 			tr( "One instrument-track-window mode" ), gui_tw );
 	labelNumber1++;
-	oneitw->move( XDelta, YDelta*labelNumber1 );
+	oneitw->move( XDelta, YDelta * labelNumber1 );
 	oneitw->setChecked( m_oneInstrumentTrackWindow );
 	connect( oneitw, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleOneInstrumentTrackWindow( bool ) ) );
 
 
-	gui_tw->setFixedHeight( YDelta*labelNumber1 );
+	gui_tw->setFixedHeight( YDelta + YDelta * labelNumber1 );
 
 
 	int labelNumber2 = 0;
@@ -258,7 +261,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * mmpz = new LedCheckBox(
 			tr( "Compress project files by default" ), projects_tw );
 	labelNumber2++;
-	mmpz->move( XDelta, YDelta*labelNumber2 );
+	mmpz->move( XDelta, YDelta * labelNumber2 );
 	mmpz->setChecked( m_MMPZ );
 	connect( mmpz, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleMMPZ( bool ) ) );
@@ -266,7 +269,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * disableBackup = new LedCheckBox(
 			tr( "Create a backup file when saving a project" ), projects_tw );
 	labelNumber2++;
-	disableBackup->move( XDelta, YDelta*labelNumber2 );
+	disableBackup->move( XDelta, YDelta * labelNumber2 );
 	disableBackup->setChecked( m_disableBackup );
 	connect( disableBackup, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleDisableBackup( bool ) ) );
@@ -274,13 +277,13 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	LedCheckBox * openLastProject = new LedCheckBox(
 			tr( "Reopen last project on startup" ), projects_tw );
 	labelNumber2++;
-	openLastProject->move( XDelta, YDelta*labelNumber2 );
+	openLastProject->move( XDelta, YDelta * labelNumber2 );
 	openLastProject->setChecked( m_openLastProject );
 	connect( openLastProject, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleOpenLastProject( bool ) ) );
 
 
-	projects_tw->setFixedHeight( YDelta*labelNumber2 );
+	projects_tw->setFixedHeight( YDelta + YDelta * labelNumber2 );
 
 	// Language tab.
 	TabWidget * lang_tw = new TabWidget(
@@ -345,6 +348,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	labelWidget( performance_w,
 			tr( "Performance settings" ) );
 
+
 	// Autosave tab.
 	TabWidget * auto_save_tw = new TabWidget(
 			tr( "Autosave" ), performance_w );
@@ -398,43 +402,55 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	m_saveIntervalSlider->setEnabled( m_enableAutoSave );
 	m_runningAutoSave->setVisible( m_enableAutoSave );
 
+
+	int labelNumber3 = 0;
+
 	// UI effect vs. performance tab.
 	TabWidget * ui_fx_tw = new TabWidget(
-			tr( "UI effects vs. performance" ), performance_w );
-	ui_fx_tw->setFixedHeight( 60 );
+			tr( "User interface (UI) effects vs. performance" ), performance_w );
 
 	LedCheckBox * smoothScroll = new LedCheckBox(
 			tr( "Smooth scroll in song editor" ), ui_fx_tw );
-	smoothScroll->move( 10, 20 );
+	labelNumber3++;
+	smoothScroll->move( XDelta, YDelta * labelNumber3 );
 	smoothScroll->setChecked( m_smoothScroll );
 	connect( smoothScroll, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleSmoothScroll( bool ) ) );
 
 	LedCheckBox * animAFP = new LedCheckBox(
 			tr( "Display playback cursor in AudioFileProcessor" ), ui_fx_tw );
-	animAFP->move( 10, 40 );
+	labelNumber3++;
+	animAFP->move( XDelta, YDelta * labelNumber3 );
 	animAFP->setChecked( m_animateAFP );
 	connect( animAFP, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleAnimateAFP( bool ) ) );
 
+	ui_fx_tw->setFixedHeight( YDelta + YDelta * labelNumber3 );
+
+
+	int labelNumber4 = 0;
+
 	// Plugins tab.
 	TabWidget * plugins_tw = new TabWidget(
 			tr( "Plugins" ), performance_w );
-	plugins_tw->setFixedHeight( 60 );
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr( "Sync VST plugins to host playback" ), plugins_tw );
-	syncVST->move( 10, 20 );
+	labelNumber4++;
+	syncVST->move( XDelta, YDelta * labelNumber4 );
 	syncVST->setChecked( m_syncVSTPlugins );
 	connect( syncVST, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleSyncVSTPlugins( bool ) ) );
 
 	LedCheckBox * disableAutoQuit = new LedCheckBox(
 			tr( "Keep effects running even without input" ), plugins_tw );
-	disableAutoQuit->move( 10, 40 );
+	labelNumber4++;
+	disableAutoQuit->move( XDelta, YDelta * labelNumber4 );
 	disableAutoQuit->setChecked( m_disableAutoQuit );
 	connect( disableAutoQuit, SIGNAL( toggled( bool ) ), this,
 			SLOT( toggleDisableAutoquit( bool ) ) );
+
+	plugins_tw->setFixedHeight( YDelta + YDelta * labelNumber4 );
 
 
 	// Performance layout ordering.
@@ -722,7 +738,7 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 
 	// Paths widget.
 	QWidget * paths_w = new QWidget( settings_w );
-	int paths_height = 370;
+	int paths_height = 320;
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	paths_height += 55;
 #endif
@@ -746,12 +762,12 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
 	pathsScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	pathsScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	pathsScroll->resize( 360, paths_height - 50  ); // .362.
+	pathsScroll->resize( 360, paths_height - 50  );
 	pathsScroll->move( 0, 30 );
 	pathSelectors->resize( 360, paths_height - 50 );
 
 	const int txtLength = 284;
-	const int btnStart = 300; // .297.
+	const int btnStart = 300;
 
 
 	// LMMS working directory tab.
@@ -982,7 +998,6 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 			SLOT( reject() ) );
 
 	// Extras layout ordering.
-	extras_layout->addStretch();
 	extras_layout->addSpacing( 10 );
 	extras_layout->addWidget( restartWarning );
 	extras_layout->addSpacing( 10 );
@@ -996,7 +1011,6 @@ SetupDialog::SetupDialog( ConfigTabs tab_to_open ) :
 	vlayout->addSpacing( 10 );
 	vlayout->addWidget( extras_w );
 	vlayout->addSpacing( 10 );
-	vlayout->addStretch();
 
 	show();
 }
