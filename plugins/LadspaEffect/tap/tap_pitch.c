@@ -89,6 +89,7 @@ typedef struct {
 } Pitch;
 
 
+void cleanup_Pitch(LADSPA_Handle);
 
 /* Construct a new plugin instance. */
 LADSPA_Handle 
@@ -102,8 +103,10 @@ instantiate_Pitch(const LADSPA_Descriptor * Descriptor,
 		((Pitch *)ptr)->run_adding_gain = 1.0f;
 
 		if ((((Pitch *)ptr)->ringbuffer = 
-		     calloc(2 * PM_BUFLEN, sizeof(LADSPA_Data))) == NULL)
+		     calloc(2 * PM_BUFLEN, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Pitch(ptr);
 			return NULL;
+		}
 		((Pitch *)ptr)->buflen = 2 * PM_BUFLEN * sample_rate / 192000;
 		((Pitch *)ptr)->pos = 0;
 

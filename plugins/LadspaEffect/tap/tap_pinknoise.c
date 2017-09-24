@@ -63,6 +63,7 @@ typedef struct {
 	LADSPA_Data run_adding_gain;
 } Pinknoise;
 
+void cleanup_Pinknoise(LADSPA_Handle);
 
 
 /* generate fractal pattern using Midpoint Displacement Method
@@ -105,8 +106,10 @@ instantiate_Pinknoise(const LADSPA_Descriptor * Descriptor,
 	        ((Pinknoise *)ptr)->run_adding_gain = 1.0;
 
                 if ((((Pinknoise *)ptr)->ring =
-                     calloc(NOISE_LEN, sizeof(LADSPA_Data))) == NULL)
+                     calloc(NOISE_LEN, sizeof(LADSPA_Data))) == NULL) {
+			cleanup_Pinknoise(ptr);
                         return NULL;
+		}
                 ((Pinknoise *)ptr)->buflen = NOISE_LEN;
                 ((Pinknoise *)ptr)->pos = 0;
 
