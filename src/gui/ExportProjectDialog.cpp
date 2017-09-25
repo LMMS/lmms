@@ -197,7 +197,7 @@ void ExportProjectDialog::startExport()
 	connect(m_renderManager.get(), SIGNAL(progressChanged(int)),
 			progressBar, SLOT(setValue(int)));
 	connect(m_renderManager.get(), SIGNAL(progressChanged(int)),
-			this, SLOT(updateTitleBar(int))) ;
+			this, SLOT(updateTitleBar(int)));
 	connect(m_renderManager.get(), SIGNAL(finished()),
 			this, SLOT(accept()));
 	connect(m_renderManager.get(), SIGNAL(finished()),
