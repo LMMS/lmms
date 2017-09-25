@@ -25,13 +25,22 @@
 #ifndef MAINAPPLICATION_H
 #define MAINAPPLICATION_H
 
+#include "lmmsconfig.h"
+
 #include <QApplication>
+
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#endif
 
 class MainApplication : public QApplication
 {
 public:
 	MainApplication(int& argc, char** argv);
 	bool event(QEvent* event);
+#ifdef LMMS_BUILD_WIN32
+	bool winEventFilter(MSG* msg, long* result);
+#endif
 	inline QString& queuedFile()
 	{
 	    return m_queuedFile;
