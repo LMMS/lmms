@@ -42,12 +42,14 @@
         <string>File format settings</string>
        </property>
        <layout class="QVBoxLayout">
+<!--
         <property name="spacing">
          <number>6</number>
         </property>
         <property name="leftMargin">
          <number>9</number>
         </property>
+-->
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
@@ -114,12 +116,14 @@
         </item>
         <item>
          <widget class="QWidget" name="depthWidget" native="true">
+<!--
           <property name="minimumSize">
            <size>
             <width>0</width>
             <height>20</height>
            </size>
           </property>
+-->
           <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
@@ -239,9 +243,11 @@
              <property name="currentIndex">
               <number>-1</number>
              </property>
+<!--
              <property name="maxVisibleItems">
               <number>9</number>
              </property>
+-->
             </widget>
            </item>
           </layout>
@@ -250,9 +256,11 @@
         <item>
          <widget class="QWidget" name="bitrateWidget" native="true">
           <layout class="QVBoxLayout">
+<!--
            <property name="spacing">
             <number>6</number>
            </property>
+-->
            <property name="leftMargin">
             <number>0</number>
            </property>

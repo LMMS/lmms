@@ -6,20 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>270</height>
+    <width>504</width>
+    <height>286</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>500</width>
-    <height>270</height>
+    <width>504</width>
+    <height>286</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>About LMMS</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+<!--
    <property name="spacing">
     <number>8</number>
    </property>
@@ -35,6 +36,7 @@
    <property name="bottomMargin">
     <number>8</number>
    </property>
+-->
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -278,6 +280,7 @@ If you're interested in translating LMMS in another language or want to improve 
    <signal>accepted()</signal>
    <receiver>AboutDialog</receiver>
    <slot>accept()</slot>
+<!--
    <hints>
     <hint type="sourcelabel">
      <x>248</x>
@@ -288,12 +291,14 @@ If you're interested in translating LMMS in another language or want to improve 
      <y>274</y>
     </hint>
    </hints>
+-->
   </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>AboutDialog</receiver>
    <slot>reject()</slot>
+<!--
    <hints>
     <hint type="sourcelabel">
      <x>316</x>
@@ -304,6 +309,7 @@ If you're interested in translating LMMS in another language or want to improve 
      <y>274</y>
     </hint>
    </hints>
+-->
   </connection>
  </connections>
 </ui>
