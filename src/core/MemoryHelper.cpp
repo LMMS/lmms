@@ -30,7 +30,7 @@
  * Allocate a number of bytes and return them.
  * @param byteNum is the number of bytes
  */
-void* MemoryHelper::alignedMalloc( int byteNum )
+void* MemoryHelper::alignedMalloc( size_t byteNum )
 {
 	char *ptr, *ptr2, *aligned_ptr;
 	int align_mask = ALIGN_SIZE - 1;
