@@ -482,9 +482,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
 
-	// refresh buffer pool
-	BufferManager::refresh();
-
 	s_renderingThread = false;
 
 	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );

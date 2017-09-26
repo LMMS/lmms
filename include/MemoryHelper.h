@@ -31,7 +31,7 @@
 class MemoryHelper {
 public:
 
-	static void* alignedMalloc( int );
+	static void* alignedMalloc( size_t );
 
 	static void alignedFree( void* );
 
