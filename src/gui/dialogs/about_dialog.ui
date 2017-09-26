@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>358</height>
+    <width>500</width>
+    <height>270</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>558</width>
-    <height>358</height>
+    <width>500</width>
+    <height>270</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -202,6 +202,7 @@
        </item>
       </layout>
      </widget>
+<!--
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
        <string>Involved</string>
@@ -223,6 +224,7 @@
        </item>
       </layout>
      </widget>
+-->
      <widget class="QWidget" name="Seite">
       <attribute name="title">
        <string>Translation</string>
