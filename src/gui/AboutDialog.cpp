@@ -29,34 +29,35 @@
 #include "versioninfo.h"
 
 
+
 AboutDialog::AboutDialog(QWidget* parent) :
 	QDialog(parent),
 	Ui::AboutDialog()
 {
-	setupUi(this);
+	setupUi( this );
 
 
-	iconLabel->setPixmap(embed::getIconPixmap("icon", 64, 64));
+	iconLabel->setPixmap( embed::getIconPixmap( "icon", 64, 64 ) );
 
-	versionLabel->setText(versionLabel->text().
-			arg(LMMS_VERSION).
-			arg(PLATFORM).
-			arg(MACHINE).
-			arg(QT_VERSION_STR).
-			arg(GCC_VERSION));
+	versionLabel->setText( versionLabel->text().
+					arg( LMMS_VERSION ).
+					arg( PLATFORM ).
+					arg( MACHINE ).
+					arg( QT_VERSION_STR ).
+					arg( GCC_VERSION ) );
 	versionLabel->setTextInteractionFlags(
-			versionLabel->textInteractionFlags() |
-			Qt::TextSelectableByMouse);
+					versionLabel->textInteractionFlags() |
+					Qt::TextSelectableByMouse );
 
-	copyrightLabel->setText(copyrightLabel->text().
-			arg(LMMS_PROJECT_COPYRIGHT));
+	copyrightLabel->setText( copyrightLabel->text().
+					arg( LMMS_PROJECT_COPYRIGHT ) );
 
 	authorLabel->setPlainText(
-			embed::getText("AUTHORS"));
+					embed::getText( "AUTHORS" ) );
 
 	/*involvedLabel->setPlainText(
-			embed::getText("CONTRIBUTORS"));*/
+					embed::getText( "CONTRIBUTORS" ) );*/
 
 	licenseLabel->setPlainText(
-			embed::getText("LICENSE.txt"));
+					embed::getText( "LICENSE.txt" ) );
 }
