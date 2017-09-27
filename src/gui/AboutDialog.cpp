@@ -54,7 +54,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
 
 	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
 
-	/*involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );*/
-
 	licenseLabel->setPlainText( embed::getText( "LICENSE.txt" ) );
+
+	involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );
 }

@@ -204,7 +204,6 @@
        </item>
       </layout>
      </widget>
-<!--
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
        <string>Involved</string>
@@ -226,7 +225,6 @@
        </item>
       </layout>
      </widget>
--->
      <widget class="QWidget" name="Seite">
       <attribute name="title">
        <string>Translation</string>
