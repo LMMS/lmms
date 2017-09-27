@@ -44,7 +44,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
 	{ ProjectRenderer::FlacFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "FLAC (*.flac)" ),
+		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlac::getInst
 	},
@@ -230,7 +230,6 @@ void ProjectRenderer::abortProcessing()
 
 
 
-
 void ProjectRenderer::updateConsoleProgress()
 {
 	const int cols = 50;
@@ -244,7 +243,7 @@ void ProjectRenderer::updateConsoleProgress()
 	}
 	prog[cols] = 0;
 
-	const char * activity = ( const char * ) "|/-\\";
+	const char * activity = (const char *) "|/-\\";
 	memset( buf, 0, sizeof( buf ) );
 	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
 							activity[rot] );

@@ -88,7 +88,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 		else if ( i==MAX_LEVEL ){ info = tr( "( Slowest - smallest )" ); }
 		
 		compLevelCB->addItem(
-			QString::number( i )+" "+info,
+			QString::number(i)+" "+info,
 			QVariant(i/static_cast<double>(MAX_LEVEL))
 		);
 	}
@@ -108,7 +108,7 @@ void ExportProjectDialog::reject()
 	if( m_renderManager ) {
 		m_renderManager->abortProcessing();
 	}
-	m_renderManager.reset( nullptr );
+	m_renderManager.reset(nullptr);
 
 	QDialog::reject();
 }
@@ -177,7 +177,7 @@ void ExportProjectDialog::startExport()
 	// Make sure we have the the correct file extension
 	// so there's no confusion about the codec in use.
 	auto output_name = m_fileName;
-	if (!(m_multiExport || output_name.endsWith( m_fileExtension,Qt::CaseInsensitive)))
+	if (!(m_multiExport || output_name.endsWith(m_fileExtension,Qt::CaseInsensitive)))
 	{
 		output_name+=m_fileExtension;
 	}
@@ -191,7 +191,7 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
 			this, SLOT( updateTitleBar( int ) ));
 	connect( m_renderManager.get(), SIGNAL( finished() ),
-			this, SLOT( accept() ) );
+			this, SLOT( accept() ) ) ;
 	connect( m_renderManager.get(), SIGNAL( finished() ),
 			gui->mainWindow(), SLOT( resetWindowTitle() ) );
 
@@ -229,7 +229,7 @@ void ExportProjectDialog::onFileFormatChanged(int index)
 			(exportFormat == ProjectRenderer::WaveFile ||
 			 exportFormat == ProjectRenderer::FlacFile);
 
-	bool variableBitrateVisible = !( exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile );
+	bool variableBitrateVisible = !(exportFormat == ProjectRenderer::MP3File || exportFormat == ProjectRenderer::FlacFile);
 
 #ifdef LMMS_HAVE_SF_COMPLEVEL
 	bool compressionLevelVisible = (exportFormat == ProjectRenderer::FlacFile);
@@ -253,7 +253,7 @@ void ExportProjectDialog::startBtnClicked()
 	bool successful_conversion = false;
 	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
 	m_ft = static_cast<ProjectRenderer::ExportFileFormats>(
-			tag.toInt( &successful_conversion )
+			tag.toInt(&successful_conversion)
 	);
 
 	if( !successful_conversion )
@@ -275,6 +275,7 @@ void ExportProjectDialog::startBtnClicked()
 			break;
 		}
 	}
+
 	startButton->setEnabled( false );
 	progressBar->setEnabled( true );
 
