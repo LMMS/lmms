@@ -56,7 +56,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 #else
 					NULL
 #endif
-	},
+									},
 	{ ProjectRenderer::MP3File,
 		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
 					".mp3",
@@ -65,7 +65,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 #else
 					NULL
 #endif
-	},
+									},
 	// Insert your own file-encoder infos here.
 	// Maybe one day the user can add own encoders inside the program.
 
@@ -89,7 +89,7 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 {
 	AudioFileDeviceInstantiaton audioEncoderFactory = fileEncodeDevices[exportFileFormat].m_getDevInst;
 
-	if ( audioEncoderFactory )
+	if (audioEncoderFactory)
 	{
 		bool successful = false;
 
@@ -154,7 +154,7 @@ void ProjectRenderer::startProcessing()
 		// Have to do mixer stuff with GUI-thread affinity in order to
 		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::mixer()->setAudioDevice( m_fileDev,
-						m_qualitySettings, false);
+						m_qualitySettings, false );
 
 		start(
 #ifndef LMMS_BUILD_WIN32
@@ -198,7 +198,7 @@ void ProjectRenderer::run()
 							&& !m_abort )
 	{
 		m_fileDev->processNextBuffer();
-		const int nprog = lengthTicks == 0 ? 100 : ( exportPos.getTicks()-startTick) * 100 / lengthTicks;
+		const int nprog = lengthTicks == 0 ? 100 : (exportPos.getTicks()-startTick) * 100 / lengthTicks;
 		if( m_progress != nprog )
 		{
 			m_progress = nprog;
@@ -247,7 +247,7 @@ void ProjectRenderer::updateConsoleProgress()
 	const char * activity = ( const char * ) "|/-\\";
 	memset( buf, 0, sizeof( buf ) );
 	sprintf( buf, "\r|%s|    %3d%%   %c  ", prog, m_progress,
-			activity[rot] );
+							activity[rot] );
 	rot = ( rot+1 ) % 4;
 
 	fprintf( stderr, "%s", buf );

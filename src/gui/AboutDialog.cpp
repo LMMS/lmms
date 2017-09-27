@@ -52,12 +52,9 @@ AboutDialog::AboutDialog(QWidget* parent) :
 	copyrightLabel->setText( copyrightLabel->text().
 					arg( LMMS_PROJECT_COPYRIGHT ) );
 
-	authorLabel->setPlainText(
-					embed::getText( "AUTHORS" ) );
+	authorLabel->setPlainText( embed::getText( "AUTHORS" ) );
 
-	/*involvedLabel->setPlainText(
-					embed::getText( "CONTRIBUTORS" ) );*/
+	/*involvedLabel->setPlainText( embed::getText( "CONTRIBUTORS" ) );*/
 
-	licenseLabel->setPlainText(
-					embed::getText( "LICENSE.txt" ) );
+	licenseLabel->setPlainText( embed::getText( "LICENSE.txt" ) );
 }
