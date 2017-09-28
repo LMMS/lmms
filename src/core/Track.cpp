@@ -2086,7 +2086,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "solo", isSolo() );
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
-		element.setAttribute( "height", m_height );
+		element.setAttribute( "trackheight", m_height );
 	}
 
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -2182,7 +2182,7 @@ void Track::loadSettings( const QDomElement & element )
 		node = node.nextSibling();
 	}
 
-	int storedHeight = element.attribute( "height" ).toInt();
+	int storedHeight = element.attribute( "trackheight" ).toInt();
 	if( storedHeight >= MINIMAL_TRACK_HEIGHT )
 	{
 		m_height = storedHeight;
