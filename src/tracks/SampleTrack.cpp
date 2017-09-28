@@ -587,7 +587,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			return false;
 		}
 		tcos.push_back( getTCO( _tco_num ) );
-		bb_track = BBTrack::findBBTrack( _tco_num );
+		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		{
+			bb_track = BBTrack::findBBTrack( _tco_num );
+		}
 	}
 	else
 	{
