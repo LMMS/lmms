@@ -157,7 +157,8 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( n && n->isBbTrackMuted() ) || ! m_instrument )
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayPattern &&
+				n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
@@ -278,6 +279,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				// be deleted later automatically)
 				Engine::mixer()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
+				if (isSustainPedalPressed() &&
+					m_notes[event.key()]->origin() ==
+					m_notes[event.key()]->OriginMidiInput)
+				{
+					m_sustainedNotes << m_notes[event.key()];
+				}
 				m_notes[event.key()] = NULL;
 				Engine::mixer()->doneChangeInModel();
 			}
@@ -307,8 +314,24 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				{
 					m_sustainPedalPressed = true;
 				}
-				else
+				else if (isSustainPedalPressed())
 				{
+					for (NotePlayHandle* nph : m_sustainedNotes)
+					{
+						if (nph && nph->isReleased())
+						{
+							if( nph->origin() ==
+								nph->OriginMidiInput)
+							{
+								nph->setLength(
+									MidiTime( static_cast<f_cnt_t>(
+									nph->totalFramesPlayed() /
+									Engine::framesPerTick() ) ) );
+								midiNoteOff( *nph );
+							}
+						}
+					}
+					m_sustainedNotes.clear();
 					m_sustainPedalPressed = false;
 				}
 			}
@@ -591,7 +614,10 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		TrackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = BBTrack::findBBTrack( _tco_num );
+		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		{
+			bb_track = BBTrack::findBBTrack( _tco_num );
+		}
 	}
 	else
 	{

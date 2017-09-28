@@ -8,7 +8,7 @@ Comment=easy music production for everyone!
 Comment[ca]=Producció fàcil de música per a tothom!
 Comment[fr]=Production facile de musique pour tout le monde !
 Icon=lmms
-Exec=env QT_X11_NO_NATIVE_MENUBAR=1 lmms %f
+Exec=env QT_X11_NO_NATIVE_MENUBAR=1 QT_AUTO_SCREEN_SCALE_FACTOR=1 lmms %f
 Terminal=false
 Type=Application
 Categories=Qt;AudioVideo;Audio;Midi;
