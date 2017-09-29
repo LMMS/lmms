@@ -240,6 +240,16 @@ void TimeLineWidget::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "lp0pos", (int) loopBegin() );
 	_this.setAttribute( "lp1pos", (int) loopEnd() );
 	_this.setAttribute( "lpstate", m_loopPoints );
+
+	QDomElement loops = _doc.createElement( "loops" );
+	_this.appendChild( loops );
+	for(int n=0;n<NB_LOOPS;n++)
+	{
+		QDomElement loop = _doc.createElement( "loop" );
+		loop.setAttribute("start",m_loopPos[2*n]);
+		loop.setAttribute("end",m_loopPos[2*n+1]);
+		loops.appendChild( loop );
+	}
 }
 
 
@@ -251,6 +261,25 @@ void TimeLineWidget::loadSettings( const QDomElement & _this )
 	m_loopPos[1] = _this.attribute( "lp1pos" ).toInt();
 	m_loopPoints = static_cast<LoopPointStates>(
 					_this.attribute( "lpstate" ).toInt() );
+
+
+	QDomNode loops = _this.firstChildElement("loops");
+	if( !loops.isNull() && loops.isElement() )
+	{
+		int n=0;
+		QDomElement loop=loops.firstChildElement("loop");
+		while( !loop.isNull() && (n<NB_LOOPS))
+		{
+			if( loop.isElement() )
+			{
+				m_loopPos[2*n  ]=loop.attribute("start").toInt();
+				m_loopPos[2*n+1]=loop.attribute("end").toInt();
+				n++;
+			}
+			loop = loop.nextSibling().toElement();
+		}
+	}
+
 	update();
 	emit loopPointStateLoaded( m_loopPoints );
 }
