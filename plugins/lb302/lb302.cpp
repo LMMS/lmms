@@ -339,7 +339,6 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	// Experimenting with a0 between original (0.5) and 1.0
 	vca_a0 = 0.5;
-	vca_a = 9;
 	vca_mode = 3;
 
 	vcfs[0] = new lb302FilterIIR2(&fs);
