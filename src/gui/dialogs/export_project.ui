@@ -20,7 +20,6 @@
    <string>Export project</string>
   </property>
   <layout class="QVBoxLayout">
-<!--
    <item>
     <widget class="QCheckBox" name="exportLoopCB">
      <property name="text">
@@ -28,7 +27,6 @@
      </property>
     </widget>
    </item>
--->
    <item>
     <widget class="QCheckBox" name="renderMarkersCB">
      <property name="text">
