@@ -284,8 +284,12 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 	slideToggle( false, this, tr( "Slide" ) ),
 	accentToggle( false, this, tr( "Accent" ) ),
 	deadToggle( false, this, tr( "Dead" ) ),
-	db24Toggle( false, this, tr( "24dB/oct Filter" ) )
-
+	db24Toggle( false, this, tr( "24dB/oct Filter" ) ),
+	vca_attack(1.0 - 0.96406088),
+	vca_decay(0.99897516),
+	vca_a0(0.5),
+	vca_a(0.),
+	vca_mode(3)
 {
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged( ) ),
@@ -327,19 +331,7 @@ lb302Synth::lb302Synth( InstrumentTrack * _instrumentTrack ) :
 
 	vcf_envpos = ENVINC;
 
-	// Start VCA on an attack.
-	vca_mode = 3;
-	vca_a = 0;
-
-	//vca_attack = 1.0 - 0.94406088;
-	vca_attack = 1.0 - 0.96406088;
-	vca_decay = 0.99897516;
-
 	vco_shape = BL_SAWTOOTH;
-
-	// Experimenting with a0 between original (0.5) and 1.0
-	vca_a0 = 0.5;
-	vca_mode = 3;
 
 	vcfs[0] = new lb302FilterIIR2(&fs);
 	vcfs[1] = new lb302Filter3Pole(&fs);
