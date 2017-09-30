@@ -688,9 +688,7 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialMousePos( me->pos() );
-
-	BBTrackContainer * isbbEditor = dynamic_cast<BBTrackContainer*>( getTrackContentObject()->getTrack()->trackContainer() );
-	if( !isbbEditor && me->button() == Qt::LeftButton )
+	if( me->button() == Qt::LeftButton && fixedTCOs() == false )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
