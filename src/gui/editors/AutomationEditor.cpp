@@ -1634,6 +1634,17 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
+
+		int mouseX = (we->x() - VALUES_WIDTH)* MidiTime::ticksPerTact();
+		// ticks based on the mouse x-position where the scroll wheel was used
+		int ticks = mouseX / m_ppt;
+		// what would be the ticks in the new zoom level on the very same mouse x
+		int newTicks = mouseX / (DEFAULT_PPT * m_zoomXLevels[x]);
+
+		// scroll so the tick "selected" by the mouse x doesn't move on the screen
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
+
+
 		m_zoomingXModel.setValue( x );
 	}
 	else if( we->modifiers() & Qt::ShiftModifier
