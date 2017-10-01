@@ -130,14 +130,8 @@ void Graph::mouseMoveEvent ( QMouseEvent * _me )
 	x = qMax( 2, qMin( x, width()-3 ) );
 	y = qMax( 2, qMin( y, height()-3 ) );
 
-	if( qAbs( diff ) > 1 )
-	{
-		drawLineAt( x, y, m_lastCursorX );
-	}
-	else
-	{
-		changeSampleAt( x, y );
-	}
+
+	drawLineAt( x, y, m_lastCursorX );
 
 	// update mouse
 	if( diff != 0 )
@@ -209,25 +203,47 @@ void Graph::drawLineAt( int _x, int _y, int _lastx )
 
 	float range = minVal - maxVal;
 	float val = ( _y*range/( height()-5 ) ) + maxVal;
-	float lastval = model() -> m_samples[ (int)( _lastx * xscale ) ];
-
-	// calculate line drawing variables
-	int linelen = qAbs( _x - _lastx ) + 1;
-	int xstep = _x > _lastx ? -1 : 1;
-	float ystep = ( lastval - val ) / linelen;
-
-	int start = INT_MAX;
-	int end = 0;
-	// draw a line
-	for ( int i = 0; i < linelen; i++ )
+	
+	int sample_begin, sample_end;
+	float lastval;
+	float val_begin, val_end;
+	
+	if (_lastx > _x)
 	{
-		int x = (_x + (i * xstep)) * xscale;		// get x value
-		model()->drawSampleAt( x, val + (i * ystep));
-		start = qMin( start, x );
-		end = qMax( end, x );
+		sample_begin = (int)((_x) * xscale);
+		sample_end = (int)ceil((_lastx+1) * xscale);
+		lastval = model() -> m_samples[ (int)( sample_end - 1 ) ];
+		val_begin = val;
+		val_end = lastval;
+
+	}
+	else
+	{
+		sample_begin = (int)(_lastx * xscale);
+		sample_end =  (int)ceil((_x+1) * xscale);
+		lastval = model() -> m_samples[ (int)( sample_begin ) ];
+		val_begin = lastval;
+		val_end = val;
+		
 	}
 	
-	model()->samplesChanged( start, end );
+	// calculate line drawing variables
+	int linelen = sample_end - sample_begin;
+	if (linelen == 1)
+	{
+		val_begin = val;
+	}
+	//int xstep = _x > _lastx ? -1 : 1;
+	float ystep = ( val_end - val_begin ) / linelen;
+
+	// draw a line
+	for ( int i = 0 ; i < linelen; i++ )
+	{
+		model()->drawSampleAt( sample_begin + i , val_begin + ((i ) * ystep));
+	}
+
+	
+	model()->samplesChanged( sample_begin, sample_end );
 }
 
 void Graph::changeSampleAt( int _x, int _y )
@@ -265,6 +281,7 @@ void Graph::mouseReleaseEvent( QMouseEvent * _me )
 		m_mouseDown = false;
 		setCursor( Qt::CrossCursor );
 		update();
+		emit drawn();
 	}
 }
 
@@ -633,7 +650,24 @@ void graphModel::smoothNonCyclic()
 	emit samplesChanged(0, length()-1);
 }
 
-
+//makes a cyclic convolution.
+void graphModel::convolve(const float *convolution, const int convolutionLength, const int centerOffset)
+{
+	// store values in temporary array
+	QVector<float> temp = m_samples;
+	const int graphLength = length();
+	float sum;
+	for ( int i = 0; i <  graphLength; i++ )
+	{
+		sum = 0;
+		for ( int j = 0; j < convolutionLength; j++ )
+		{
+			sum += convolution[j] * temp[( i + j ) % graphLength];
+		}
+		m_samples[( i + centerOffset ) % graphLength] = sum;
+	}
+	emit samplesChanged(0, graphLength - 1);
+}
 
 void graphModel::normalize()
 {
@@ -676,7 +710,7 @@ void graphModel::invert()
 void graphModel::shiftPhase( int _deg )
 {
 	// calculate offset in samples
-	int offset = ( _deg * length() ) / 360; //multiply first because integers 
+	const int offset = ( _deg * length() ) / 360; //multiply first because integers
 	
 	// store values in temporary array
 	QVector<float> temp = m_samples;
@@ -690,6 +724,14 @@ void graphModel::shiftPhase( int _deg )
 	}
 	
 	emit samplesChanged( 0, length()-1 );
+}
+
+void graphModel::clear()
+{
+	const int graph_length = length();
+	for( int i = 0; i < graph_length; i++ )
+		m_samples[i] = 0;
+	emit samplesChanged( 0, graph_length - 1 );
 }
 
 
