@@ -44,7 +44,7 @@
 #include "base64.h"
 #include "lmms_constants.h"
 
-#include "embed.h"
+#include "embed.cpp"
 
 #include "exprsynth.h"
 
