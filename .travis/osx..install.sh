@@ -2,7 +2,7 @@
 
 set -e
 
-PACKAGES="cmake pkg-config fftw libogg libvorbis libsndfile libsamplerate jack sdl stk portaudio node fltk"
+PACKAGES="cmake pkg-config fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio node fltk"
 
 if [ "$QT5" ]; then
 	PACKAGES="$PACKAGES qt@5.5"

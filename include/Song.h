@@ -2,7 +2,7 @@
  * Song.h - class song - the root of the model-tree
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -67,7 +67,7 @@ public:
 	void clearErrors();
 	void collectError( const QString error );
 	bool hasErrors();
-	QString* errorSummary();
+	QString errorSummary();
 
 	class PlayPos : public MidiTime
 	{
@@ -97,14 +97,26 @@ public:
 
 	void processNextBuffer();
 
+	inline int getLoadingTrackCount() const
+	{
+		return m_nLoadingTrack;
+	}
+
 	inline int getMilliseconds() const
 	{
 		return m_elapsedMilliSeconds;
 	}
-	inline void setMilliSeconds( float ellapsedMilliSeconds )
+
+	inline void setToTime( MidiTime const & midiTime )
 	{
-		m_elapsedMilliSeconds = ellapsedMilliSeconds;
+		m_elapsedMilliSeconds = midiTime.getTimeInMilliseconds(getTempo());
 	}
+
+	inline void setToTimeByTicks(tick_t ticks)
+	{
+		m_elapsedMilliSeconds = MidiTime::ticksToMilliseconds(ticks, getTempo());
+	}
+
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -242,7 +254,7 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
-	
+
 
 	const ControllerVector & controllers() const
 	{
@@ -313,13 +325,13 @@ private:
 	{
 		return m_playPos[m_playMode].getTicks();
 	}
-	
+
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() +
 			m_playPos[m_playMode].currentFrame();
 	}
-	
+
 	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
@@ -339,6 +351,7 @@ private:
 
 	ControllerVector m_controllers;
 
+	int m_nLoadingTrack;
 
 	QString m_fileName;
 	QString m_oldFileName;
@@ -354,7 +367,7 @@ private:
 
 	bool m_loadingProject;
 
-	QList<QString> * m_errors;
+	QStringList m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];

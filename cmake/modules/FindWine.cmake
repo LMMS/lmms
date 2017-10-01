@@ -7,7 +7,7 @@
 #  WINE_DEFINITIONS - Compiler switches required for using wine
 #
 
-LIST(APPEND CMAKE_PREFIX_PATH /opt/wine-devel /opt/wine-staging)
+LIST(APPEND CMAKE_PREFIX_PATH /opt/wine-stable /opt/wine-devel /opt/wine-staging)
 
 FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATH_SUFFIXES wine)
 FIND_LIBRARY(WINE_LIBRARY NAMES wine PATH_SUFFIXES wine i386-linux-gnu/wine)

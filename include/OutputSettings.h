@@ -38,6 +38,13 @@ public:
 		NumDepths
 	};
 
+	enum StereoMode
+	{
+		StereoMode_Stereo,
+		StereoMode_JointStereo,
+		StereoMode_Mono
+	};
+
 	class BitRateSettings
 	{
 	public:
@@ -60,10 +67,20 @@ public:
 public:
 	OutputSettings( sample_rate_t sampleRate,
 			BitRateSettings const & bitRateSettings,
-			BitDepth bitDepth ) :
+			BitDepth bitDepth,
+			StereoMode stereoMode ) :
 		m_sampleRate(sampleRate),
 		m_bitRateSettings(bitRateSettings),
-		m_bitDepth(bitDepth)
+		m_bitDepth(bitDepth),
+		m_stereoMode(stereoMode),
+		m_compressionLevel(0.5)
+	{
+	}
+
+	OutputSettings( sample_rate_t sampleRate,
+			BitRateSettings const & bitRateSettings,
+			BitDepth bitDepth ) :
+		OutputSettings(sampleRate, bitRateSettings, bitDepth, StereoMode_Stereo )
 	{
 	}
 
@@ -76,10 +93,22 @@ public:
 	BitDepth getBitDepth() const { return m_bitDepth; }
 	void setBitDepth(BitDepth bitDepth) { m_bitDepth = bitDepth; }
 
+	StereoMode getStereoMode() const { return m_stereoMode; }
+	void setStereoMode(StereoMode stereoMode) { m_stereoMode = stereoMode; }
+
+
+	double getCompressionLevel() const{ return m_compressionLevel; }
+	void setCompressionLevel(double level){
+		// legal range is 0.0 to 1.0.
+		m_compressionLevel = level;
+	}
+
 private:
 	sample_rate_t m_sampleRate;
 	BitRateSettings m_bitRateSettings;
 	BitDepth m_bitDepth;
+	StereoMode m_stereoMode;
+	double m_compressionLevel;
 };
 
 #endif

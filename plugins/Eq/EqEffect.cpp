@@ -70,6 +70,10 @@ EqEffect::~EqEffect()
 
 bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 {
+	//wet/dry controls
+	const float dry = dryLevel();
+	const float wet = wetLevel();
+	sample_t dryS[2];
 	// setup sample exact controls
 	float hpRes = m_eqControls.m_hpResModel.value();
 	float lowShelfRes = m_eqControls.m_lowShelfResModel.value();
@@ -205,6 +209,9 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	for( fpp_t f = 0; f < frames; f++)
 	{
+		//wet dry buffer
+		dryS[0] = buf[f][0];
+		dryS[1] = buf[f][1];
 		if( hpActive )
 		{
 			m_hp12.setParameters( sampleRate, *hpFreqPtr, *hpResPtr, 1 );
@@ -295,6 +302,10 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 				buf[f][1] = m_lp481.update( buf[f][1], 1 );
 			}
 		}
+
+		//apply wet / dry levels
+		buf[f][1] = ( dry * dryS[1] ) + ( wet * buf[f][1] );
+		buf[f][0] = ( dry * dryS[0] ) + ( wet * buf[f][0] );
 
 		//increment pointers if needed
 		hpResPtr += hpResInc;

@@ -29,6 +29,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QMainWindow>
+#include <QThread>
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
@@ -105,13 +106,10 @@ public:
 		return m_autoSaveTimer.interval();
 	}
 
-	void runAutoSave();
-
 	enum SessionState
 	{
 		Normal,
-		Recover,
-		Limited,
+		Recover
 	};
 
 	void setSession( SessionState session )
@@ -143,7 +141,7 @@ public:
 		return m_keyMods.m_alt;
 	}
 
-	static void saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible = QSize(0, 0) );
+	static void saveWidgetState( QWidget * _w, QDomElement & _de );
 	static void restoreWidgetState( QWidget * _w, const QDomElement & _de );
 
 public slots:
@@ -249,6 +247,13 @@ signals:
 	void periodicUpdate();
 	void initProgress(const QString &msg);
 
+} ;
+
+class AutoSaveThread : public QThread
+{
+	Q_OBJECT
+public:
+	void run();
 } ;
 
 #endif

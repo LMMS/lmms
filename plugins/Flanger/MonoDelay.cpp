@@ -34,7 +34,7 @@ MonoDelay::MonoDelay( int maxTime , int sampleRate )
 	m_maxLength = maxTime * sampleRate;
 	m_length = m_maxLength;
 
-	m_index = 0;
+	m_writeIndex = 0;
 	m_feedback = 0.0f;
 	setSampleRate( sampleRate );
 }
@@ -54,11 +54,11 @@ MonoDelay::~MonoDelay()
 
 void MonoDelay::tick( sample_t* sample )
 {
-	m_index = ( int )m_length > 0
-			? ( m_index + 1 ) % ( int )m_length
-			: m_index;
-	float out = m_buffer[ m_index ];
-	m_buffer[ m_index ] = *sample + ( out * m_feedback );
+	m_writeIndex = ( m_writeIndex + 1 ) % ( int )m_maxLength;
+	int readIndex = m_writeIndex - m_length;
+	if (readIndex < 0 ) { readIndex += m_maxLength; }
+	float out = m_buffer[ readIndex ];
+	m_buffer[ m_writeIndex ] = *sample + ( out * m_feedback );
 	*sample = out;
 }
 

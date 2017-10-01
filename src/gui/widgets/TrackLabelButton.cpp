@@ -36,6 +36,7 @@
 #include "InstrumentTrack.h"
 #include "RenameDialog.h"
 #include "Song.h"
+#include "TrackRenameLineEdit.h"
 
 
 
@@ -48,7 +49,7 @@ TrackLabelButton::TrackLabelButton( TrackView * _tv, QWidget * _parent ) :
 	setAcceptDrops( true );
 	setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 	setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
-	m_renameLineEdit = new QLineEdit( this );
+	m_renameLineEdit = new TrackRenameLineEdit( this );
 	m_renameLineEdit->hide();
 	
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
@@ -83,8 +84,8 @@ void TrackLabelButton::rename()
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{
 		QString txt = m_trackView->getTrack()->name();
-		RenameDialog rename_dlg( txt );
-		rename_dlg.exec();
+		RenameDialog renameDlg( txt );
+		renameDlg.exec();
 		if( txt != text() )
 		{
 			m_trackView->getTrack()->setName( txt );

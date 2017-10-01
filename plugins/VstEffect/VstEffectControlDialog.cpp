@@ -87,10 +87,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_managePluginButton = new PixmapButton( this, "" );
 		m_managePluginButton->setCheckable( false );
 		m_managePluginButton->setCursor( Qt::PointingHandCursor );
-		m_managePluginButton->setActiveGraphic( embed::getIconPixmap(
-							"track_op_menu_active" ) );
-		m_managePluginButton->setInactiveGraphic( embed::getIconPixmap(
-							"track_op_menu" ) );
+		m_managePluginButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"controls_active" ) );
+		m_managePluginButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
+							"controls" ) );
 		connect( m_managePluginButton, SIGNAL( clicked() ),  _ctl,
 						SLOT( managePlugin() ) );
 		ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
@@ -98,8 +98,8 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_managePluginButton->setWhatsThis(
 			tr( "Click here, if you want to control VST-plugin from host." ) );
 
-		m_managePluginButton->setMinimumWidth( 21 );
-		m_managePluginButton->setMaximumWidth( 21 );
+		m_managePluginButton->setMinimumWidth( 26 );
+		m_managePluginButton->setMaximumWidth( 26 );
 		m_managePluginButton->setMinimumHeight( 21 );
 		m_managePluginButton->setMaximumHeight( 21 );
 

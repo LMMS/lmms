@@ -35,15 +35,19 @@ class ProjectRenderer : public QThread
 {
 	Q_OBJECT
 public:
-	enum ExportFileFormats
+	enum ExportFileFormats: int
 	{
 		WaveFile,
+		FlacFile,
 		OggFile,
+		MP3File,
 		NumFileFormats
 	} ;
 
 	struct FileEncodeDevice
 	{
+		bool isAvailable() const { return m_getDevInst != nullptr; }
+
 		ExportFileFormats m_fileFormat;
 		const char * m_description;
 		const char * m_extension;

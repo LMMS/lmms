@@ -6,9 +6,8 @@
   Author: Nasca Octavian Paul
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+  it under the terms of version 2 of the GNU General Public License
+  as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +30,7 @@ class EQ:public Effect
 {
     public:
         EQ(bool insertion_, float *efxoutl_, float *efxoutr_, unsigned int srate, int bufsize);
-        ~EQ() {}
+        ~EQ();
         void out(const Stereo<float *> &smp);
         void setpreset(unsigned char npreset);
         void changepar(int npar, unsigned char value);

@@ -527,10 +527,6 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
 <context>
     <name>AutomationPatternView</name>
     <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>dubbelklikken om dit patroon te openen in automatisering-editor</translation>
-    </message>
-    <message>
         <source>Open in Automation editor</source>
         <translation>Openen in automatisering-editor</translation>
     </message>
@@ -728,10 +724,6 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
         <translation>Invoer-gain:</translation>
     </message>
     <message>
-        <source>NOIS</source>
-        <translation>NOIS</translation>
-    </message>
-    <message>
         <source>Input Noise:</source>
         <translation>Invoer-ruis:</translation>
     </message>
@@ -748,20 +740,12 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
         <translation>Uitvoer-clip:</translation>
     </message>
     <message>
-        <source>Rate</source>
-        <translation>Ratio</translation>
-    </message>
-    <message>
         <source>Rate Enabled</source>
         <translation>Ratio ingeschakeld</translation>
     </message>
     <message>
         <source>Enable samplerate-crushing</source>
         <translation>Samplerate-crushing inschakelen</translation>
-    </message>
-    <message>
-        <source>Depth</source>
-        <translation>Diepte</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
@@ -776,20 +760,28 @@ https://www.transifex.com/lmms/teams/61632/nl/</translation>
         <translation>Samplerate:</translation>
     </message>
     <message>
-        <source>STD</source>
-        <translation>STD</translation>
-    </message>
-    <message>
         <source>Stereo difference:</source>
         <translation>Stereo-verschil:</translation>
     </message>
     <message>
-        <source>Levels</source>
-        <translation>Niveaus</translation>
-    </message>
-    <message>
         <source>Levels:</source>
         <translation>Niveaus </translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation>NOISE</translation>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>FREQ</translation>
+    </message>
+    <message>
+        <source>STEREO</source>
+        <translation>STEREO</translation>
+    </message>
+    <message>
+        <source>QUANT</source>
+        <translation>QUANT</translation>
     </message>
 </context>
 <context>
@@ -2086,6 +2078,81 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
         <source>Use variable bitrate</source>
         <translation>Variabele bitrate gebruiken</translation>
     </message>
+    <message>
+        <source>Stereo mode:</source>
+        <translation>Stereomodus:</translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation>Stereo</translation>
+    </message>
+    <message>
+        <source>Joint Stereo</source>
+        <translation>Joint stereo</translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation>Mono</translation>
+    </message>
+    <message>
+        <source>Compression level:</source>
+        <translation>Compressieniveau:</translation>
+    </message>
+    <message>
+        <source>(fastest)</source>
+        <translation>(snelste)</translation>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation>(standaard)</translation>
+    </message>
+    <message>
+        <source>(smallest)</source>
+        <translation>(kleinste)</translation>
+    </message>
+</context>
+<context>
+    <name>Expressive</name>
+    <message>
+        <source>Selected graph</source>
+        <translation>Geselecteerde grafiek</translation>
+    </message>
+    <message>
+        <source>A1</source>
+        <translation>A1</translation>
+    </message>
+    <message>
+        <source>A2</source>
+        <translation>A2</translation>
+    </message>
+    <message>
+        <source>A3</source>
+        <translation>A3</translation>
+    </message>
+    <message>
+        <source>W1 smoothing</source>
+        <translation>W1 afvlakken</translation>
+    </message>
+    <message>
+        <source>W2 smoothing</source>
+        <translation>W2 afvlakken</translation>
+    </message>
+    <message>
+        <source>W3 smoothing</source>
+        <translation>W3 afvlakken</translation>
+    </message>
+    <message>
+        <source>PAN1</source>
+        <translation>PAN1</translation>
+    </message>
+    <message>
+        <source>PAN2</source>
+        <translation>PAN2</translation>
+    </message>
+    <message>
+        <source>REL TRANS</source>
+        <translation>REL TRANS</translation>
+    </message>
 </context>
 <context>
     <name>Fader</name>
@@ -2099,6 +2166,14 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     <message>
         <source>Browser</source>
         <translation>Verkenner</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Zoeken</translation>
+    </message>
+    <message>
+        <source>Refresh list</source>
+        <translation>Lijst verversen</translation>
     </message>
 </context>
 <context>
@@ -2190,10 +2265,6 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
         <translation>RATIO</translation>
     </message>
     <message>
-        <source>Rate:</source>
-        <translation>Ratio:</translation>
-    </message>
-    <message>
         <source>AMNT</source>
         <translation>HVHD</translation>
     </message>
@@ -2212,6 +2283,10 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
     <message>
         <source>Invert</source>
         <translation>Inverteren</translation>
+    </message>
+    <message>
+        <source>Period:</source>
+        <translation>Periode:</translation>
     </message>
 </context>
 <context>
@@ -3396,20 +3471,8 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
         <translation>FX-kanaal</translation>
     </message>
     <message>
-        <source>ENV/LFO</source>
-        <translation>ENV/LFO</translation>
-    </message>
-    <message>
-        <source>FUNC</source>
-        <translation>FUNC</translation>
-    </message>
-    <message>
         <source>FX</source>
         <translation>FX</translation>
-    </message>
-    <message>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -3418,10 +3481,6 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
     <message>
         <source>XML preset file (*.xpf)</source>
         <translation>XML-presetbestand (*.xpf)</translation>
-    </message>
-    <message>
-        <source>PLUGIN</source>
-        <translation>PLUGIN</translation>
     </message>
     <message>
         <source>Pitch range (semitones)</source>
@@ -3440,16 +3499,36 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
         <translation>Klik hier als u de huidige instrument-track-instellingen wilt opslaan in een presetbestand. Later kunt u deze preset laden door erop te dubbelklikken in de preset-browser.</translation>
     </message>
     <message>
-        <source>MISC</source>
-        <translation>VARIA</translation>
-    </message>
-    <message>
         <source>Use these controls to view and edit the next/previous track in the song editor.</source>
         <translation>Gebruik deze bedieningen om de volgende/vorige track in de song-editor weer te geven en te bewerken.</translation>
     </message>
     <message>
         <source>SAVE</source>
         <translation>OPSLAAN</translation>
+    </message>
+    <message>
+        <source>Envelope, filter &amp; LFO</source>
+        <translation>Envelope, filter en LFO</translation>
+    </message>
+    <message>
+        <source>Chord stacking &amp; arpeggio</source>
+        <translation>Akkoorden opeenstapelen &amp; arpeggio</translation>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation>Effecten</translation>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation>MIDI-instellingen</translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation>Overige</translation>
+    </message>
+    <message>
+        <source>Plugin</source>
+        <translation>Plug-in</translation>
     </message>
 </context>
 <context>
@@ -3941,14 +4020,6 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
         <translation>Bestand herstellen. Gelieve niet meerdere instanties van LMMS uit te voeren wanneer u dit doet.</translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation>Negeren</translation>
-    </message>
-    <message>
-        <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
-        <translation>Start LMMS zoals gebruikelijk, maar met automatische back-up uitgeschakeld om te voorkomen dat het huidige herstelbestand overschreven wordt.</translation>
-    </message>
-    <message>
         <source>Discard</source>
         <translation>Verwerpen</translation>
     </message>
@@ -4019,10 +4090,6 @@ Bezoek http://lmms.sf.net/wiki voor documentatie over LMMS.</translation>
     <message>
         <source>Recover session. Please save your work!</source>
         <translation>Sessie herstellen. Sla uw werk op!</translation>
-    </message>
-    <message>
-        <source>Automatic backup disabled. Remember to save your work!</source>
-        <translation>Automatische backup uitgeschakeld. Denk eraan om uw werk op te slaan!</translation>
     </message>
     <message>
         <source>Recovered project not saved</source>
@@ -5359,14 +5426,6 @@ PM betekent fasemodulatie: de fase van oscillator 3 wordt gemoduleerd door oscil
         <translation>Stappen verwijderen</translation>
     </message>
     <message>
-        <source>use mouse wheel to set velocity of a step</source>
-        <translation>gebruik muiswiel om de snelheid van een stap in te stellen</translation>
-    </message>
-    <message>
-        <source>double-click to open in Piano Roll</source>
-        <translation>dubbelklikken om in piano-roll te openen</translation>
-    </message>
-    <message>
         <source>Clone Steps</source>
         <translation>Stappen klonen</translation>
     </message>
@@ -5754,14 +5813,6 @@ Reden: &quot;%2&quot;</translation>
 <context>
     <name>ProjectNotes</name>
     <message>
-        <source>Project notes</source>
-        <translation>Projectnotities</translation>
-    </message>
-    <message>
-        <source>Put down your project notes here.</source>
-        <translation>Zet hier uw projectnotities neer.</translation>
-    </message>
-    <message>
         <source>Edit Actions</source>
         <translation>Bewerking-acties</translation>
     </message>
@@ -5869,6 +5920,14 @@ Reden: &quot;%2&quot;</translation>
         <source>&amp;Color...</source>
         <translation>&amp;Kleur...</translation>
     </message>
+    <message>
+        <source>Project Notes</source>
+        <translation>Projectnotities</translation>
+    </message>
+    <message>
+        <source>Enter project notes here</source>
+        <translation>Geef hier uw projectnotities in</translation>
+    </message>
 </context>
 <context>
     <name>ProjectRenderer</name>
@@ -5879,6 +5938,14 @@ Reden: &quot;%2&quot;</translation>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation>Gecomprimeerd OGG-bestand (¨*.ogg)</translation>
+    </message>
+    <message>
+        <source>FLAC-File (*.flac)</source>
+        <translation>FLAC-bestand (*.flac)</translation>
+    </message>
+    <message>
+        <source>Compressed MP3-File (*.mp3)</source>
+        <translation>Gecomprimeerd MP3-bestand (*.mp3)</translation>
     </message>
 </context>
 <context>
@@ -6852,6 +6919,10 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     <message>
         <source>Importing MIDI-file...</source>
         <translation>MIDI-bestand importeren...</translation>
+    </message>
+    <message>
+        <source>Loading Track %1 (%2/Total %3)</source>
+        <translation>Track %1 laden (%2/totaal %3)</translation>
     </message>
 </context>
 <context>
@@ -7978,6 +8049,133 @@ Verzeker u ervan dat u leesrechten heeft voor het bestand en zijn bevattende map
     <message>
         <source>Stereo mode</source>
         <translation>Stereomodus</translation>
+    </message>
+</context>
+<context>
+    <name>expressiveView</name>
+    <message>
+        <source>Select oscillator W1</source>
+        <translation>Oscillator W1 selecteren</translation>
+    </message>
+    <message>
+        <source>Select oscillator W2</source>
+        <translation>Oscillator W2 selecteren</translation>
+    </message>
+    <message>
+        <source>Select oscillator W3</source>
+        <translation>Oscillator W3 selecteren</translation>
+    </message>
+    <message>
+        <source>Select OUTPUT 1</source>
+        <translation>UITVOER 1 selecteren</translation>
+    </message>
+    <message>
+        <source>Select OUTPUT 2</source>
+        <translation>UITVOER 2 selecteren</translation>
+    </message>
+    <message>
+        <source>Open help window</source>
+        <translation>Help-venster openen</translation>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Sinusgolf</translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
+        <translation>Klikken voor sinusgolf.</translation>
+    </message>
+    <message>
+        <source>Moog-Saw wave</source>
+        <translation>Moog-zaagtandgolf</translation>
+    </message>
+    <message>
+        <source>Click for a Moog-Saw-wave.</source>
+        <translation>Klikken voor een moog-zaagtandgolf.</translation>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>Exponentiële golf</translation>
+    </message>
+    <message>
+        <source>Click for an exponential wave.</source>
+        <translation>Klikken voor een exponentiële golf.</translation>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Zaagtandgolf</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation>Klik hier voor een zaagtandgolf.</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Aangepaste golf</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation>Klik hier voor een aangepaste vorm.</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Driehoeksgolf</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation>Klik hier voor een driehoeksgolf.</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Blokgolf</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation>Klik hier voor een blokgolf.</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Witte-ruisgolf</translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation>Klik hier voor witte ruis.</translation>
+    </message>
+    <message>
+        <source>WaveInterpolate</source>
+        <translation>GolfInterpoleren</translation>
+    </message>
+    <message>
+        <source>ExpressionValid</source>
+        <translation>ExpressieGeldig</translation>
+    </message>
+    <message>
+        <source>General purpose 1:</source>
+        <translation>Algemeen doel 1:</translation>
+    </message>
+    <message>
+        <source>General purpose 2:</source>
+        <translation>Algemeen doel 2:</translation>
+    </message>
+    <message>
+        <source>General purpose 3:</source>
+        <translation>Algemeen doel 3:</translation>
+    </message>
+    <message>
+        <source>O1 panning:</source>
+        <translation>O1 panning:</translation>
+    </message>
+    <message>
+        <source>O2 panning:</source>
+        <translation>O2 panning:</translation>
+    </message>
+    <message>
+        <source>Release transition:</source>
+        <translation>Release-overgang:</translation>
+    </message>
+    <message>
+        <source>Smoothness</source>
+        <translation>Gladheid</translation>
     </message>
 </context>
 <context>
@@ -9379,6 +9577,10 @@ Deze chip werd gebruikt in de Commodore 64 computer.</translation>
     <message>
         <source>Reverb algorithm by Sean Costello</source>
         <translation>Reverb-algoritme door Sean Costello</translation>
+    </message>
+    <message>
+        <source>Mathematical expression parser</source>
+        <translation>Wiskundige uitdrukking-verwerker</translation>
     </message>
 </context>
 <context>

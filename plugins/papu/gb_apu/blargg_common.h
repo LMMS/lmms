@@ -1,178 +1,196 @@
-
 // Sets up common environment for Shay Green's libraries.
-//
-// Don't modify this file directly; #define HAVE_CONFIG_H and put your
-// configuration into "config.h".
-
-// Copyright (C) 2004-2005 Shay Green.
+// To change configuration options, modify blargg_config.h, not this file.
 
 #ifndef BLARGG_COMMON_H
 #define BLARGG_COMMON_H
 
-// Allow prefix configuration file *which can re-include blargg_common.h*
-// (probably indirectly).
-#ifdef HAVE_CONFIG_H
-	#undef BLARGG_COMMON_H
-	#include "config.h"
-	#define BLARGG_COMMON_H
+#include <stddef.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <limits.h>
+
+#undef BLARGG_COMMON_H
+// allow blargg_config.h to #include blargg_common.h
+#include "blargg_config.h"
+#ifndef BLARGG_COMMON_H
+#define BLARGG_COMMON_H
+
+// BLARGG_RESTRICT: equivalent to restrict, where supported
+#if __GNUC__ >= 3 || _MSC_VER >= 1100
+	#define BLARGG_RESTRICT __restrict
+#else
+	#define BLARGG_RESTRICT
 #endif
 
-// Source files use #include BLARGG_ENABLE_OPTIMIZER before performance-critical code
-#ifndef BLARGG_ENABLE_OPTIMIZER
-	#define BLARGG_ENABLE_OPTIMIZER "blargg_common.h"
-#endif
-
-// Source files have #include BLARGG_SOURCE_BEGIN at the beginning
-#ifndef BLARGG_SOURCE_BEGIN
-	#define BLARGG_SOURCE_BEGIN "blargg_source.h"
-#endif
-
-// Determine compiler's language support
-
-#if defined (__MWERKS__)
-	// Metrowerks CodeWarrior
-	#define BLARGG_COMPILER_HAS_NAMESPACE 1
-	#if !__option(bool)
-		#define BLARGG_COMPILER_HAS_BOOL 0
-	#endif
-
-#elif defined (_MSC_VER)
-	// Microsoft Visual C++
-	#if _MSC_VER < 1100
-		#define BLARGG_COMPILER_HAS_BOOL 0
-	#endif
-
-#elif defined (__GNUC__)
-	// GNU C++
-	#define BLARGG_COMPILER_HAS_NAMESPACE 1
-	#define BLARGG_COMPILER_HAS_BOOL 1
-
-#elif defined (__MINGW32__)
-	// Mingw?
-	#define BLARGG_COMPILER_HAS_BOOL 1
-
-#elif __cplusplus < 199711
-	// Pre-ISO C++ compiler
-	#define BLARGG_COMPILER_HAS_BOOL 0
-	#define STATIC_CAST( type ) (type)
-
-#endif
-
-// STATIC_CAST(T) (expr) -> static_cast< T > (expr)
+// STATIC_CAST(T,expr): Used in place of static_cast<T> (expr)
 #ifndef STATIC_CAST
-	#define STATIC_CAST( type ) static_cast< type >
+	#define STATIC_CAST(T,expr) ((T) (expr))
 #endif
 
-// Set up boost
-#include "boost/config.hpp"
-#ifndef BOOST_MINIMAL
-	#define BOOST boost
-	#ifndef BLARGG_COMPILER_HAS_NAMESPACE
-		#define BLARGG_COMPILER_HAS_NAMESPACE 1
+// blargg_err_t (0 on success, otherwise error string)
+#ifndef blargg_err_t
+	typedef const char* blargg_err_t;
+#endif
+
+// blargg_vector - very lightweight vector of POD types (no constructor/destructor)
+template<class T>
+class blargg_vector {
+	T* begin_;
+	size_t size_;
+public:
+	blargg_vector() : begin_( 0 ), size_( 0 ) { }
+	~blargg_vector() { free( begin_ ); }
+	size_t size() const { return size_; }
+	T* begin() const { return begin_; }
+	T* end() const { return begin_ + size_; }
+	blargg_err_t resize( size_t n )
+	{
+		void* p = realloc( begin_, n * sizeof (T) );
+		if ( !p && n )
+			return "Out of memory";
+		begin_ = (T*) p;
+		size_ = n;
+		return 0;
+	}
+	void clear() { void* p = begin_; begin_ = 0; size_ = 0; free( p ); }
+	T& operator [] ( size_t n ) const
+	{
+		assert( n <= size_ ); // <= to allow past-the-end value
+		return begin_ [n];
+	}
+};
+
+#ifndef BLARGG_DISABLE_NOTHROW
+	// throw spec mandatory in ISO C++ if operator new can return NULL
+	#if __cplusplus >= 199711 || __GNUC__ >= 3
+		#define BLARGG_THROWS( spec ) throw spec
+	#else
+		#define BLARGG_THROWS( spec )
 	#endif
-	#ifndef BLARGG_COMPILER_HAS_BOOL
-		#define BLARGG_COMPILER_HAS_BOOL 1
+	#define BLARGG_DISABLE_NOTHROW \
+		void* operator new ( size_t s ) BLARGG_THROWS(()) { return malloc( s ); }\
+		void operator delete ( void* p ) { free( p ); }
+	#define BLARGG_NEW new
+#else
+	#include <new>
+	#define BLARGG_NEW new (std::nothrow)
+#endif
+
+// BLARGG_4CHAR('a','b','c','d') = 'abcd' (four character integer constant)
+#define BLARGG_4CHAR( a, b, c, d ) \
+	((a&0xFF)*0x1000000L + (b&0xFF)*0x10000L + (c&0xFF)*0x100L + (d&0xFF))
+
+// BOOST_STATIC_ASSERT( expr ): Generates compile error if expr is 0.
+#ifndef BOOST_STATIC_ASSERT
+	#ifdef _MSC_VER
+		// MSVC6 (_MSC_VER < 1300) fails for use of __LINE__ when /Zl is specified
+		#define BOOST_STATIC_ASSERT( expr ) \
+			void blargg_failed_( int (*arg) [2 / (int) !!(expr) - 1] )
+	#else
+		// Some other compilers fail when declaring same function multiple times in class,
+		// so differentiate them by line
+		#define BOOST_STATIC_ASSERT( expr ) \
+			void blargg_failed_( int (*arg) [2 / !!(expr) - 1] [__LINE__] )
 	#endif
 #endif
 
-// Bool support
+// BLARGG_COMPILER_HAS_BOOL: If 0, provides bool support for old compiler. If 1,
+// compiler is assumed to support bool. If undefined, availability is determined.
 #ifndef BLARGG_COMPILER_HAS_BOOL
-	#define BLARGG_COMPILER_HAS_BOOL 1
-#elif !BLARGG_COMPILER_HAS_BOOL
+	#if defined (__MWERKS__)
+		#if !__option(bool)
+			#define BLARGG_COMPILER_HAS_BOOL 0
+		#endif
+	#elif defined (_MSC_VER)
+		#if _MSC_VER < 1100
+			#define BLARGG_COMPILER_HAS_BOOL 0
+		#endif
+	#elif defined (__GNUC__)
+		// supports bool
+	#elif __cplusplus < 199711
+		#define BLARGG_COMPILER_HAS_BOOL 0
+	#endif
+#endif
+#if defined (BLARGG_COMPILER_HAS_BOOL) && !BLARGG_COMPILER_HAS_BOOL
+	// If you get errors here, modify your blargg_config.h file
 	typedef int bool;
 	const bool true  = 1;
 	const bool false = 0;
 #endif
 
-// Set up namespace support
+// blargg_long/blargg_ulong = at least 32 bits, int if it's big enough
 
-#ifndef BLARGG_COMPILER_HAS_NAMESPACE
-	#define BLARGG_COMPILER_HAS_NAMESPACE 0
-#endif
-
-#ifndef BLARGG_USE_NAMESPACE
-	#define BLARGG_USE_NAMESPACE BLARGG_COMPILER_HAS_NAMESPACE
-#endif
-
-#ifndef BOOST
-	#if BLARGG_USE_NAMESPACE
-		#define BOOST boost
-	#else
-		#define BOOST
-	#endif
-#endif
-
-#undef BLARGG_BEGIN_NAMESPACE
-#undef BLARGG_END_NAMESPACE
-#if BLARGG_USE_NAMESPACE
-	#define BLARGG_BEGIN_NAMESPACE( name ) namespace name {
-	#define BLARGG_END_NAMESPACE }
+#if INT_MAX < 0x7FFFFFFF || LONG_MAX == 0x7FFFFFFF
+	typedef long blargg_long;
 #else
-	#define BLARGG_BEGIN_NAMESPACE( name )
-	#define BLARGG_END_NAMESPACE
+	typedef int blargg_long;
 #endif
 
-#if BLARGG_USE_NAMESPACE
-	#define STD std
+#if UINT_MAX < 0xFFFFFFFF || ULONG_MAX == 0xFFFFFFFF
+	typedef unsigned long blargg_ulong;
 #else
-	#define STD
+	typedef unsigned blargg_ulong;
 #endif
 
-// BOOST::uint8_t, BOOST::int16_t, etc.
-#include "boost/cstdint.hpp"
+// BOOST::int8_t etc.
 
-// BOOST_STATIC_ASSERT( expr )
-#include "boost/static_assert.hpp"
+// HAVE_STDINT_H: If defined, use <stdint.h> for int8_t etc.
+#if defined (HAVE_STDINT_H)
+	#include <stdint.h>
+	#define BOOST
 
-// Common standard headers
-#if BLARGG_COMPILER_HAS_NAMESPACE
-	#include <cstddef>
-	#include <cassert>
+// HAVE_INTTYPES_H: If defined, use <stdint.h> for int8_t etc.
+#elif defined (HAVE_INTTYPES_H)
+	#include <inttypes.h>
+	#define BOOST
+
 #else
-	#include <stddef.h>
-	#include <assert.h>
+	struct BOOST
+	{
+		#if UCHAR_MAX == 0xFF && SCHAR_MAX == 0x7F
+			typedef signed char     int8_t;
+			typedef unsigned char   uint8_t;
+		#else
+			// No suitable 8-bit type available
+			typedef struct see_blargg_common_h int8_t;
+			typedef struct see_blargg_common_h uint8_t;
+		#endif
+		
+		#if USHRT_MAX == 0xFFFF
+			typedef short           int16_t;
+			typedef unsigned short  uint16_t;
+		#else
+			// No suitable 16-bit type available
+			typedef struct see_blargg_common_h int16_t;
+			typedef struct see_blargg_common_h uint16_t;
+		#endif
+		
+		#if ULONG_MAX == 0xFFFFFFFF
+			typedef long            int32_t;
+			typedef unsigned long   uint32_t;
+		#elif UINT_MAX == 0xFFFFFFFF
+			typedef int             int32_t;
+			typedef unsigned int    uint32_t;
+		#else
+			// No suitable 32-bit type available
+			typedef struct see_blargg_common_h int32_t;
+			typedef struct see_blargg_common_h uint32_t;
+		#endif
+	};
 #endif
 
-// blargg_err_t (NULL on success, otherwise error string)
-typedef const char* blargg_err_t;
-const blargg_err_t blargg_success = 0;
-
-// BLARGG_NEW is used in place of 'new' to create objects. By default,
-// plain new is used.
-#ifndef BLARGG_NEW
-	#define BLARGG_NEW new
+#if __GNUC__ >= 3
+	#define BLARGG_DEPRECATED __attribute__ ((deprecated))
+#else
+	#define BLARGG_DEPRECATED
 #endif
 
-// BLARGG_BIG_ENDIAN and BLARGG_LITTLE_ENDIAN
-// Only needed if modules are used which must know byte order.
-#if !defined (BLARGG_BIG_ENDIAN) && !defined (BLARGG_LITTLE_ENDIAN)
-	#if defined (__powerc) || defined (macintosh)
-		#define BLARGG_BIG_ENDIAN 1
-	
-	#elif defined (_MSC_VER) && defined (_M_IX86)
-		#define BLARGG_LITTLE_ENDIAN 1
-	
-	#endif
-#endif
-
-// BLARGG_NONPORTABLE (allow use of nonportable optimizations/features)
-#ifndef BLARGG_NONPORTABLE
-	#define BLARGG_NONPORTABLE 0
-#endif
-#ifdef BLARGG_MOST_PORTABLE
-	#error "BLARGG_MOST_PORTABLE has been removed; use BLARGG_NONPORTABLE."
-#endif
-
-// BLARGG_CPU_*
-#if !defined (BLARGG_CPU_POWERPC) && !defined (BLARGG_CPU_X86)
-	#if defined (__powerc)
-		#define BLARGG_CPU_POWERPC 1
-	
-	#elif defined (_MSC_VER) && defined (_M_IX86)
-		#define BLARGG_CPU_X86 1
-	
-	#endif
+// Use in place of "= 0;" for a pure virtual, since these cause calls to std C++ lib.
+// During development, BLARGG_PURE( x ) expands to = 0;
+// virtual int func() BLARGG_PURE( { return 0; } )
+#ifndef BLARGG_PURE
+	#define BLARGG_PURE( def ) def
 #endif
 
 #endif
-
+#endif

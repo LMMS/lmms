@@ -237,7 +237,7 @@ void BBTrackContainerView::removeBBView(int bb)
 
 void BBTrackContainerView::saveSettings(QDomDocument& doc, QDomElement& element)
 {
-	MainWindow::saveWidgetState(parentWidget(), element, QSize( 640, 400 ) );
+	MainWindow::saveWidgetState( parentWidget(), element );
 }
 
 void BBTrackContainerView::loadSettings(const QDomElement& element)
