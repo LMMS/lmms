@@ -196,6 +196,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 		qWarning( "Remote plugin '%s' not found.",
 						exec.toUtf8().constData() );
 		m_failed = true;
+		invalidate();
 		unlock();
 		return failed();
 	}
