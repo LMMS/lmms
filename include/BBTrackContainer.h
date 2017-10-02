@@ -45,7 +45,7 @@ public:
 
 	inline virtual QString nodeName() const override
 	{
-	    return "bbtrackcontainer";
+		return "bbtrackcontainer";
 	}
 
 	tact_t lengthOfBB( int _bb ) const;
