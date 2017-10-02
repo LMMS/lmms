@@ -2133,6 +2133,8 @@ void AutomationEditor::setQuantization()
 	}
 	quantization = DefaultTicksPerTact / quantization;
 	AutomationPattern::setQuantization( quantization );
+
+	update();
 }
 
 
