@@ -1116,7 +1116,9 @@ TrackContentWidget::~TrackContentWidget()
 
 void TrackContentWidget::updateBackground()
 {
-	const int tactsPerBar = 4;
+	/*
+	//const int tactsPerBar = 4;
+	const int tactsPerBar=Engine::getSong()->getTimeSigModel().getNumerator();
 	const TrackContainerView * tcv = m_trackView->trackContainerView();
 
 	// Assume even-pixels-per-tact. Makes sense, should be like this anyways
@@ -1132,7 +1134,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1143,12 +1145,13 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	
+
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
+	*/
 
 	// Force redraw
 	update();
@@ -1561,14 +1564,90 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 void TrackContentWidget::paintEvent( QPaintEvent * pe )
 {
 	// Assume even-pixels-per-tact. Makes sense, should be like this anyways
-	const TrackContainerView * tcv = m_trackView->trackContainerView();
+	/*const*/ TrackContainerView * tcv = m_trackView->trackContainerView();
 	int ppt = static_cast<int>( tcv->pixelsPerTact() );
 	QPainter p( this );
 	// Don't draw background on BB-Editor
 	if( m_trackView->trackContainerView() != gui->getBBEditor()->trackContainerView() )
 	{
+		/*
 		p.drawTiledPixmap( rect(), m_background, QPoint(
 				tcv->currentPosition().getTact() * ppt, 0 ) );
+		*/
+		paintGrid(p,tcv->currentPosition().getTact(),ppt,tcv->barViews());
+	}
+}
+
+
+
+
+void TrackContentWidget::paintGrid(QPainter& p,int tact,int ppt,QVector<QPointer<BarView> >& barViews)
+{
+	//int x0=tact*ppt;
+	//int y0=0;
+
+	QRect r=rect();
+	//qWarning("r=(%d,%d,%d,%d)",r.x(),r.y(),r.width(),r.height());
+	//qWarning("x0=%d y0=%d",x0,y0);
+
+	const int wc  =ppt;
+	const int hc  =height();
+	const int y   =r.y();
+	const int xmin=r.x();
+	const int xmax=r.x()+r.width();
+
+	for(int x=xmin;x<xmax;x+=wc,tact++)
+	{
+		bool sign=((tact/4)%2==0);
+		const QPointer<BarView> bv=((tact>=0)&&(tact<barViews.size()))
+			? barViews.at(tact)
+			: NULL;
+		//if((tact==5)||(tact==10)) bv=BarView(QColor(255,0,0,64),Qt::Dense4Pattern);
+		paintCell(p,x,y,wc,hc,bv,sign);
+	}
+}
+
+void TrackContentWidget::paintCell(QPainter& p,int xc,int yc,int wc,int hc,const QPointer<BarView>& barView,bool defaultSign)
+{
+	bool sign=defaultSign;
+	if(barView!=NULL) sign=barView->sign();
+	QBrush bg=(sign ? darkerColor() : lighterColor());
+	p.fillRect(xc,yc,wc,hc,bg);
+
+	// vertical line
+	p.setPen( QPen( embossColor(), 1 ) );
+	p.drawLine( QLineF( xc+1, yc, xc+1, yc+hc-1 ) );
+
+	p.setPen( QPen( gridColor(), 1 ) );
+	p.drawLine( QLineF( xc, yc, xc, yc+hc-1 ) );
+
+	// horizontal line
+	p.setPen( QPen( gridColor(), 1 ) );
+	p.drawLine( xc, yc+hc-1, xc+wc-1, yc+hc-1 );
+
+	if(barView!=NULL)
+	{
+		const QColor& fg=barView->color();
+		if(fg!=Qt::transparent)
+		{
+			p.fillRect(xc+1,yc,wc-1,hc,QBrush(fg,Qt::Dense6Pattern));
+
+			switch(barView->type())
+		        {
+			case BarView::START:
+				p.setPen( QPen( fg, 1 ) );
+				p.drawLine( QLineF( xc,   yc, xc,   yc+hc-1 ) );
+				p.drawLine( QLineF( xc+1, yc, xc+1, yc+hc-1 ) );
+				break;
+			case BarView::END:
+				p.setPen( QPen( fg, 1 ) );
+				p.drawLine( QLineF( xc+wc-1, yc, xc+wc-1, yc+hc-1 ) );
+				p.drawLine( QLineF( xc+wc-2, yc, xc+wc-2, yc+hc-1 ) );
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }
 
@@ -1791,19 +1870,35 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 {
 	QPainter p( this );
-	p.fillRect( rect(), palette().brush(QPalette::Background) );
+	QRect r=rect();
+	p.fillRect(r, palette().brush(QPalette::Background) );
 
-	if( m_trackView->isMovingTrack() == false )
+	if( m_trackView->isMovingTrack() )
 	{
-		p.drawPixmap( 2, 2, *s_grip );
-		m_trackOps->show();
-		m_muteBtn->show();
+		p.setPen(Qt::red);
+		p.drawLine(r.x(),r.y(),r.x(),r.y()+r.height()-1);
+	}
+
+	/*
+	  if( m_trackView->isMovingTrack() == false )
+	{
+	*/
+		int y=2;
+		while(y<height())
+		{
+			p.drawPixmap( 2, y, *s_grip );
+			y+=s_grip->height();
+		}
+	/*
+	  m_trackOps->show();
+	  //m_muteBtn->show();
 	}
 	else
 	{
 		m_trackOps->hide();
 		m_muteBtn->hide();
 	}
+	*/
 }
 
 
@@ -2713,6 +2808,12 @@ void TrackView::dropEvent( QDropEvent * de )
  */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
+	if(me->x()>10) //TODO: should be the width of the handle
+	{
+		QWidget::mousePressEvent( me );
+		return;
+	}
+	
 	// If previously dragged too small, restore on shift-leftclick
 	if( height() < DEFAULT_TRACK_HEIGHT &&
 		me->modifiers() & Qt::ShiftModifier &&
@@ -2876,3 +2977,58 @@ void TrackView::createTCOView( TrackContentObject * tco )
 	}
 	tco->selectViewOnCreate( false );
 }
+
+
+
+HyperBarView::HyperBarView(int length,const QColor& color,const QString& label) :
+	m_length(length),
+	m_color(color),
+	m_label(label)
+
+{
+}
+
+/*
+HyperBarView::HyperBarView() :
+	m_length(0),
+	m_color(Qt::transparent),
+	m_label("")
+
+{
+}
+*/
+
+/*
+HyperBarView::HyperBarView(HyperBarView& hbv) :
+	m_length(hbv.m_length),
+	m_color(hbv.m_color),
+	m_label(hbv.m_label)
+
+{
+}
+*/
+
+BarView::BarView(const QPointer<HyperBarView>& hbv,Types type,bool sign) :
+	m_hbv(hbv),
+	m_type(type),
+	m_sign(sign)
+{
+}
+
+/*
+BarView::BarView(BarView& bv) :
+	m_hbv(bv.m_hbv),
+	m_type(bv.m_type),
+	m_sign(bv.m_sign)
+{
+}
+*/
+
+/*
+BarView::BarView() :
+	m_hbv(HyperBarView::NULL),
+	m_type(Types::MIDDLE),
+	m_sign(false)
+{
+}
+*/

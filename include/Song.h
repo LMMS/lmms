@@ -30,6 +30,7 @@
 #include <QtCore/QSharedMemory>
 #include <QtCore/QVector>
 
+#include "MetaData.h"
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
@@ -53,6 +54,7 @@ class EXPORT Song : public TrackContainer
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
+
 public:
 	enum PlayModes
 	{
@@ -255,7 +257,6 @@ public:
 	void addController( Controller * c );
 	void removeController( Controller * c );
 
-
 	const ControllerVector & controllers() const
 	{
 		return m_controllers;
@@ -267,6 +268,11 @@ public:
 		return m_timeSigModel;
 	}
 
+	QString songMetaData(const QString& k);
+	void setSongMetaData(const QString& k,const QString& v);
+
+	inline QString songStructure() { return songMetaData("Structure"); }
+	inline void setSongStructure(const QString& s) { setSongMetaData("Structure",s); }
 
 public slots:
 	void playSong();
@@ -292,6 +298,8 @@ public slots:
 
 	void addBBTrack();
 
+ protected:
+	void clearSongMetaData();
 
 private slots:
 	void insertBar();
@@ -349,6 +357,8 @@ private:
 	IntModel m_masterVolumeModel;
 	IntModel m_masterPitchModel;
 
+	MetaData m_metaData;
+
 	ControllerVector m_controllers;
 
 	int m_nLoadingTrack;
@@ -395,6 +405,7 @@ signals:
 	void lengthChanged( int tacts );
 	void tempoChanged( bpm_t newBPM );
 	void timeSignatureChanged( int oldTicksPerTact, int ticksPerTact );
+	void metaDataChanged( const QString k="*", const QString& v="*" );
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();

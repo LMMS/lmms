@@ -28,6 +28,7 @@
 #include <QWidget>
 
 #include "AutomatableModel.h"
+#include "ComboBoxModel.h"
 #include "Controller.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
@@ -75,6 +76,7 @@ protected:
 
 	float m_lastValue;
 	float m_previousValue;
+	bool  m_switch;
 
 	friend class ControllerConnectionDialog;
 	friend class AutoDetectMidiController;

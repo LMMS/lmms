@@ -96,13 +96,12 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	if( effect()->controls()->controlCount() > 0 )
 	{
-		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-									this );
+		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),this );
 		QFont f = ctls_btn->font();
 		ctls_btn->setFont( pointSize<8>( f ) );
-		ctls_btn->setGeometry( 140, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ),
-					this, SLOT( editControls() ) );
+		//ctls_btn->setGeometry( 140, 14, 50, 20 );
+		ctls_btn->setGeometry( 136, 8, 66, 41 );
+		connect( ctls_btn, SIGNAL( clicked() ), this, SLOT( editControls() ) );
 
 		m_controlView = effect()->controls()->createView();
 		if( m_controlView )

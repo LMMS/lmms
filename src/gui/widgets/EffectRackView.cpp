@@ -39,14 +39,15 @@ EffectRackView::EffectRackView( EffectChain* model, QWidget* parent ) :
 	ModelView( NULL, this )
 {
 	QVBoxLayout* mainLayout = new QVBoxLayout( this );
-	mainLayout->setMargin( 5 );
+	mainLayout->setMargin( 0 );//5
 
 	m_effectsGroupBox = new GroupBox( tr( "EFFECTS CHAIN" ) );
 	mainLayout->addWidget( m_effectsGroupBox );
 
 	QVBoxLayout* effectsLayout = new QVBoxLayout( m_effectsGroupBox );
 	effectsLayout->setSpacing( 0 );
-	effectsLayout->setContentsMargins( 2, m_effectsGroupBox->titleBarHeight() + 2, 2, 2 );
+	//effectsLayout->setContentsMargins( 2, m_effectsGroupBox->titleBarHeight() + 4, 2, 2 );
+	effectsLayout->setContentsMargins( 1, m_effectsGroupBox->titleBarHeight() + 4, 1, 1 );
 
 	m_scrollArea = new QScrollArea;
 	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );

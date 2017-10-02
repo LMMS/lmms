@@ -75,6 +75,7 @@ Song::Song() :
 	m_oldTicksPerTact( DefaultTicksPerTact ),
 	m_masterVolumeModel( 100, 0, 200, this, tr( "Master volume" ) ),
 	m_masterPitchModel( 0, -12, 12, this, tr( "Master pitch" ) ),
+	m_metaData(),
 	m_fileName(),
 	m_oldFileName(),
 	m_modified( false ),
@@ -844,6 +845,7 @@ void Song::clearProject()
 	QCoreApplication::sendPostedEvents();
 	Engine::getBBTrackContainer()->clearAllTracks();
 	clearAllTracks();
+	clearSongMetaData();
 
 	Engine::fxMixer()->clear();
 
@@ -1016,6 +1018,9 @@ void Song::loadProject( const QString & fileName )
 	m_masterVolumeModel.loadSettings( dataFile.head(), "mastervol" );
 	m_masterPitchModel.loadSettings( dataFile.head(), "masterpitch" );
 
+	if(m_metaData.load(dataFile,dataFile.head()))
+		emit metaDataChanged();
+
 	if( m_playPos[Mode_PlaySong].m_timeLine )
 	{
 		// reset loop-point-state
@@ -1159,6 +1164,8 @@ bool Song::saveProjectFile( const QString & filename )
 	m_timeSigModel.saveSettings( dataFile, dataFile.head(), "timesig" );
 	m_masterVolumeModel.saveSettings( dataFile, dataFile.head(), "mastervol" );
 	m_masterPitchModel.saveSettings( dataFile, dataFile.head(), "masterpitch" );
+
+	m_metaData.save(dataFile,dataFile.head());
 
 	saveState( dataFile, dataFile.content() );
 
@@ -1532,4 +1539,27 @@ QString Song::errorSummary()
 	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
+}
+
+QString Song::songMetaData(const QString& k)
+{
+	return m_metaData.get(k);
+}
+
+void Song::setSongMetaData(const QString& k,const QString& v)
+{
+	if(m_metaData.set(k,v))
+	{
+		setModified();
+		emit metaDataChanged(k,v);
+	}
+}
+
+void Song::clearSongMetaData()
+{
+	if(m_metaData.clear())
+	{
+		setModified();
+		emit metaDataChanged();
+	}
 }

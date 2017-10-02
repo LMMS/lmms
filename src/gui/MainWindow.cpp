@@ -57,6 +57,7 @@
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "SongMetaDataDialog.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -87,10 +88,13 @@ MainWindow::MainWindow() :
 	hbox->setSpacing( 0 );
 	hbox->setMargin( 0 );
 
-	SideBar * sideBar = new SideBar( Qt::Vertical, w );
+	//SideBar * sideBar = new SideBar( Qt::Vertical, w );
+	SideBar * sideBar = new SideBar( Qt::Vertical, main_widget);
 
 	QSplitter * splitter = new QSplitter( Qt::Horizontal, w );
 	splitter->setChildrenCollapsible( false );
+
+	m_workspace = new QMdiArea( splitter );
 
 	ConfigManager* confMgr = ConfigManager::inst();
 
@@ -147,8 +151,6 @@ MainWindow::MainWindow() :
 					embed::getIconPixmap( "computer" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, dirs_as_items) );
 
-	m_workspace = new QMdiArea( splitter );
-
 	// Load background
 	emit initProgress(tr("Loading background artwork"));
 	QString bgArtwork = ConfigManager::inst()->backgroundArtwork();
@@ -170,9 +172,8 @@ MainWindow::MainWindow() :
 	m_workspace->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 	m_workspace->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
 
-	hbox->addWidget( sideBar );
 	hbox->addWidget( splitter );
-
+	hbox->addWidget( sideBar );
 
 	// create global-toolbar at the top of our window
 	m_toolBar = new QWidget( main_widget );
@@ -340,6 +341,11 @@ void MainWindow::finalize()
 	edit_menu->addAction( embed::getIconPixmap( "setup_general" ),
 					tr( "Settings" ),
 					this, SLOT( showSettingsDialog() ) );
+
+	edit_menu->addAction( embed::getIconPixmap( "text_block" ),
+					tr( "Song Properties" ),
+					this, SLOT( showSongMetaDataDialog() ) );
+
 	connect( edit_menu, SIGNAL(aboutToShow()), this, SLOT(updateUndoRedoButtons()) );
 
 	m_viewMenu = new QMenu( this );
@@ -459,7 +465,6 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
 	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 8 );
 
-
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
@@ -552,6 +557,13 @@ void MainWindow::finalize()
 								m_toolBar );
 	controllers_window->setShortcut( Qt::Key_F11 );
 
+	ToolButton * reorganize_windows = new ToolButton(
+					embed::getIconPixmap( "reorganize_windows" ),
+					tr( "Reorganize Windows" ),
+					this, SLOT( reorganizeWindows() ),
+					m_toolBar );
+	reorganize_windows->setShortcut( Qt::Key_F12 );
+
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -559,6 +571,8 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+	m_toolBarLayout->addWidget( reorganize_windows, 1, 8 );
+
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -887,8 +901,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 				continue;
 			}
 
-			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), *it );
+			m_recentlyOpenedProjectsMenu->addAction( embed::getIconPixmap( "project_file" ), *it );
 #ifdef LMMS_BUILD_APPLE
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
@@ -909,7 +922,14 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	if ( mayChangeProject(true) )
 	{
-		const QString & f = _action->text();
+		QString f = _action->text();
+		// workaround for KDE
+		QFileInfo recentFile(f);
+		if(!recentFile.exists()&&(f.indexOf('&')>=0))
+		{
+			f=f.replace("&","");
+		}
+		//end
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
 		setCursor( Qt::ArrowCursor );
@@ -1038,6 +1058,15 @@ void MainWindow::saveProjectAsDefaultTemplate()
 void MainWindow::showSettingsDialog()
 {
 	SetupDialog sd;
+	sd.exec();
+}
+
+
+
+
+void MainWindow::showSongMetaDataDialog()
+{
+	SongMetaDataDialog sd;
 	sd.exec();
 }
 
@@ -1306,6 +1335,61 @@ void MainWindow::toggleControllerRack()
 
 
 
+void MainWindow::reorganizeWindows()
+{
+	//total space
+	int wt=m_workspace->width();
+	int ht=m_workspace->height();
+	//2nd row
+	int h2=gui->fxMixerView()->height()+52; //tmp 2 titlebars
+	int w2=wt-262; //tmp instr.
+	//1st row
+	int h1=ht-h2+8;
+	int w1=gui->fxMixerView()->width()+6; //tmp
+
+	/*
+	  toggleWindow( gui->getBBEditor(), forceShow );
+	  toggleWindow( gui->songEditor() );
+	  toggleWindow( gui->getProjectNotes() );
+	  toggleWindow( gui->pianoRoll() );
+	  toggleWindow( gui->automationEditor() );
+	  toggleWindow( gui->fxMixerView() );
+	  toggleWindow( gui->getControllerRackView() );
+	*/
+
+	int yt=0;
+	QList<QMdiSubWindow *>	wins=m_workspace->subWindowList();
+	for( QList<QMdiSubWindow *>::iterator it = wins.begin(); it != wins.end(); ++it )
+	{
+		if((*it)->isHidden()) continue;
+
+		if(*it==gui->songEditor()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->getBBEditor()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->getProjectNotes()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->pianoRoll()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->automationEditor()->parentWidget())
+			(*it)->setGeometry(0,0,w2,h1);
+		else
+		if(*it==gui->fxMixerView()->parentWidget())
+			(*it)->move(0,h2);
+		else
+		if(*it==gui->getControllerRackView()->parentWidget())
+			(*it)->move(w1+2,h2);
+		else
+			{ (*it)->move(w2+2,yt); yt+=24; }
+	}
+}
+
+
+
 void MainWindow::updatePlayPauseIcons()
 {
 	gui->songEditor()->setPauseIcon( false );
@@ -1375,8 +1459,8 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
-			_ce->accept();
 		}
+		_ce->accept();
 	}
 	else
 	{

@@ -211,6 +211,8 @@ public:
 		return m_data;
 	}
 
+	f_cnt_t findClosestZero(f_cnt_t _index);
+
 	QString openAudioFile() const;
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
@@ -304,7 +306,6 @@ private:
 						f_cnt_t _end ) const;
 	f_cnt_t getLoopedIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
-
 
 signals:
 	void sampleUpdated();

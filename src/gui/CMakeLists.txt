@@ -28,6 +28,7 @@ SET(LMMS_SRCS
 	gui/PluginBrowser.cpp
 	gui/RowTableView.cpp
 	gui/SetupDialog.cpp
+	gui/SongMetaDataDialog.cpp
 	gui/StringPairDrag.cpp
 	gui/SubWindow.cpp
 	gui/TimeLineWidget.cpp
@@ -58,6 +59,7 @@ SET(LMMS_SRCS
 	gui/widgets/FxLine.cpp
 	gui/widgets/Graph.cpp
 	gui/widgets/GroupBox.cpp
+	#gui/widgets/HwScreenWidget.cpp
 	gui/widgets/InstrumentFunctionViews.cpp
 	gui/widgets/InstrumentMidiIOView.cpp
 	gui/widgets/InstrumentSoundShapingView.cpp
@@ -95,6 +97,7 @@ set(LMMS_UIS
 	${LMMS_UIS}
 	gui/dialogs/about_dialog.ui
 	gui/dialogs/export_project.ui
+	gui/dialogs/song_metadata.ui
 
 	gui/Forms/EffectSelectDialog.ui
 

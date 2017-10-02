@@ -922,6 +922,35 @@ void AudioFileProcessorWaveView::mouseMoveEvent( QMouseEvent * _me )
 }
 
 
+void AudioFileProcessorWaveView::mouseDoubleClickEvent ( QMouseEvent * _me )
+{
+	f_cnt_t step0,step1;
+	switch( m_draggingType )
+	{
+		case sample_start:
+			step0=m_sampleBuffer.startFrame();
+			step1=m_sampleBuffer.findClosestZero(step0);
+			qWarning("mouseDoubleClickEvent: start=%d, step=%d",step0,step1);
+			slideSamplePointByFrames(start,step1-step0);
+			break;
+		case sample_end:
+			step0=m_sampleBuffer.endFrame();
+			step1=m_sampleBuffer.findClosestZero(step0);
+			qWarning("mouseDoubleClickEvent: end=%d, step=%d",step0,step1);
+			slideSamplePointByFrames(end,step1-step0);
+			break;
+		case sample_loop:
+			step0=m_sampleBuffer.loopStartFrame();
+			step1=m_sampleBuffer.findClosestZero(step0);
+			qWarning("mouseDoubleClickEvent: loop=%d, step=%d",step0,step1);
+			slideSamplePointByFrames(loop,step1-step0);
+			break;
+		default:
+			break;
+	};
+};
+
+
 
 
 void AudioFileProcessorWaveView::wheelEvent( QWheelEvent * _we )

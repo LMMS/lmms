@@ -1,0 +1,6 @@
+<RCC>
+	<qresource prefix="artwork/clickgdx">
+		<file alias="artwork.png">/home/desnoix/Devel/LMMS/lmms/plugins/ClickGDX/artwork.png</file>
+		<file alias="logo.png">/home/desnoix/Devel/LMMS/lmms/plugins/ClickGDX/logo.png</file>
+	</qresource>
+</RCC>

@@ -55,7 +55,7 @@
 		public slots:											\
 			void setfunc( const type val )						\
 			{													\
-				modelname.setValue( (float) val );				\
+				modelname.setValue( val );				\
 			}
 
 

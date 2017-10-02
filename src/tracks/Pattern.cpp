@@ -1075,7 +1075,7 @@ void PatternView::paintEvent( QPaintEvent * )
 						Qt::IgnoreAspectRatio,
 						Qt::SmoothTransformation );
 
-		for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
+	for( int it = 0; it < steps; it++ )	// go through all the steps in the beat pattern
 		{
 			Note * n = m_pat->noteAtStep( it );
 

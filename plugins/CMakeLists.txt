@@ -45,7 +45,9 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		carlabase
 		carlapatchbay
 		carlarack
+		ClickGDX
 		CrossoverEQ
+		# csound_instr - not ready
 		Delay
 		DualFilter
 		dynamics_processor

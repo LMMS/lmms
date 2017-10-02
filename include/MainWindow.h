@@ -157,6 +157,7 @@ public slots:
 	bool saveProjectAsNewVersion();
 	void saveProjectAsDefaultTemplate();
 	void showSettingsDialog();
+	void showSongMetaDataDialog();
 	void aboutLMMS();
 	void help();
 	void toggleAutomationEditorWin();
@@ -166,6 +167,7 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void reorganizeWindows();
 
 	void updatePlayPauseIcons();
 

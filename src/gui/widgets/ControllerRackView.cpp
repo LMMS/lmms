@@ -49,11 +49,16 @@ ControllerRackView::ControllerRackView( ) :
 	setWindowTitle( tr( "Controller Rack" ) );
 
 	m_scrollArea = new QScrollArea( this );
-	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
+	m_scrollArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	m_scrollArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+	m_scrollArea->setPalette( QApplication::palette( m_scrollArea ) );
+	// tmp vvv
+	m_scrollArea->setFrameStyle( QFrame::NoFrame );
+	m_scrollArea->setWidget( new QWidget );
 
 	QWidget * scrollAreaWidget = new QWidget( m_scrollArea );
 	m_scrollAreaLayout = new QVBoxLayout( scrollAreaWidget );
+	m_scrollAreaLayout->setSpacing(0);//2
 	m_scrollAreaLayout->addStretch();
 	scrollAreaWidget->setLayout( m_scrollAreaLayout );
 
@@ -61,7 +66,7 @@ ControllerRackView::ControllerRackView( ) :
 	m_scrollArea->setWidgetResizable( true );
 
 	m_addButton = new QPushButton( this );
-	m_addButton->setText( tr( "Add" ) );
+	m_addButton->setText( tr( "Add controller" ) );
 
 	connect( m_addButton, SIGNAL( clicked() ),
 			this, SLOT( addController() ) );
@@ -71,6 +76,8 @@ ControllerRackView::ControllerRackView( ) :
 	connect( song, SIGNAL( controllerRemoved( Controller* ) ), SLOT( onControllerRemoved( Controller* ) ) );
 
 	QVBoxLayout * layout = new QVBoxLayout();
+	layout->setMargin( 0 );//2
+	layout->setSpacing( 0 );//2
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
 	this->setLayout( layout );
@@ -84,8 +91,8 @@ ControllerRackView::ControllerRackView( ) :
 	
 	subWin->setAttribute( Qt::WA_DeleteOnClose, false );
 	subWin->move( 680, 310 );
-	subWin->resize( 350, 200 );
-	subWin->setFixedWidth( 350 );
+	subWin->resize( 250, 200 );
+	subWin->setFixedWidth( 250 );
 	subWin->setMinimumHeight( 200 );
 }
 
@@ -118,7 +125,7 @@ void ControllerRackView::loadSettings( const QDomElement & _this )
 
 void ControllerRackView::deleteController( ControllerView * _view )
 {
-	Controller * c = _view->getController();
+	Controller * c = _view->controller();
 
 	if( c->connectionCount() > 0 )
 	{
@@ -167,7 +174,7 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 	for ( QVector<ControllerView *>::const_iterator it = m_controllerViews.begin(); it != end; ++it)
 	{
 		ControllerView *currentControllerView = *it;
-		if ( currentControllerView->getController() == removedController )
+		if ( currentControllerView->controller() == removedController )
 		{
 			viewOfRemovedController = currentControllerView;
 			break;

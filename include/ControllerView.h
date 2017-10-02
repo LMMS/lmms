@@ -25,7 +25,8 @@
 #ifndef CONTROLLER_VIEW_H
 #define CONTROLLER_VIEW_H
 
-#include <QFrame>
+//#include <QFrame>
+#include <QWidget>
 
 #include "AutomatableModel.h"
 #include "Controller.h"
@@ -39,21 +40,21 @@ class QMdiSubWindow;
 class LedCheckBox;
 
 
-class ControllerView : public QFrame, public ModelView
+class ControllerView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
 	ControllerView( Controller * _controller, QWidget * _parent );
 	virtual ~ControllerView();
 
-	inline Controller * getController()
+	inline Controller * controller()
 	{
-		return( castModel<Controller>() );
+		return castModel<Controller>();
 	}
 
-	inline const Controller * getController() const
+	inline const Controller * controller() const
 	{
-		return( castModel<Controller>() );
+		return castModel<Controller>();
 	}
 
 
@@ -70,15 +71,16 @@ signals:
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * _me );
+	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void modelChanged();
 	virtual void mouseDoubleClickEvent( QMouseEvent * event );
 
 
 private:
+	QPixmap m_bg;
+	LedCheckBox * m_bypass;
 	QMdiSubWindow * m_subWindow;
 	ControllerDialog * m_controllerDlg;
-	QLabel * m_nameLabel;
-	bool m_show;
 
 } ;
 

@@ -159,6 +159,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
+	//ws->setAutoFillBackground(true);
+
 	int wsHeight = 370;
 #ifdef LMMS_HAVE_STK
 	wsHeight += 50;
@@ -386,6 +388,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 
 	QWidget * paths = new QWidget( ws );
+	//paths->setAutoFillBackground(true);
+
 	int pathsHeight = 370;
 #ifdef LMMS_HAVE_STK
 	pathsHeight += 55;
@@ -397,12 +401,14 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	QVBoxLayout * dir_layout = new QVBoxLayout( paths );
 	dir_layout->setSpacing( 0 );
 	dir_layout->setMargin( 0 );
-	labelWidget( paths, tr( "Paths" ) );
+	//labelWidget( paths, tr( "Paths" ) );
+	labelWidget( paths, tr( "Directories" ) );
+	/*
 	QLabel * title = new QLabel( tr( "Directories" ), paths );
 	QFont f = title->font();
 	f.setBold( true );
 	title->setFont( pointSize<12>( f ) );
-
+	*/
 
 	QScrollArea *pathScroll = new QScrollArea( paths );
 
@@ -410,11 +416,11 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	QVBoxLayout *pathSelectorLayout = new QVBoxLayout;
 	pathScroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
 	pathScroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-	pathScroll->resize( 362, pathsHeight - 50  );
+	pathScroll->resize( 360, pathsHeight - 50  );//362
 	pathScroll->move( 0, 30 );
-	pathSelectors->resize( 360, pathsHeight - 50 );
+	//pathSelectors->resize( 360, pathsHeight - 50 );
 
-	const int txtLength = 284;
+	const int txtLength = 285;//284;
 	const int btnStart = 297;
 
 
@@ -461,7 +467,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	// background artwork file
 	TabWidget * backgroundArtwork_tw = new TabWidget( tr(
-			"Background artwork" ).toUpper(), paths );
+							     "Background artwork" ).toUpper(), pathSelectors );//paths
 	backgroundArtwork_tw->setFixedHeight( 48 );
 
 	m_baLineEdit = new QLineEdit( m_backgroundArtwork, 
@@ -540,7 +546,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	// LADSPA-dir
 	TabWidget * lad_tw = new TabWidget( tr(
 			"LADSPA plugin directories" ).toUpper(),
-							paths );
+							pathSelectors );
 	lad_tw->setFixedHeight( 48 );
 
 	m_ladLineEdit = new QLineEdit( m_ladDir, lad_tw );
@@ -561,7 +567,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	// STK-dir
 	TabWidget * stk_tw = new TabWidget( tr(
 			"STK rawwave directory" ).toUpper(),
-							paths );
+							pathSelectors );
 	stk_tw->setFixedHeight( 48 );
 
 	m_stkLineEdit = new QLineEdit( m_stkDir, stk_tw );
@@ -581,7 +587,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	// Soundfont
 	TabWidget * sf_tw = new TabWidget( tr(
-			"Default Soundfont File" ).toUpper(), paths );
+			"Default Soundfont File" ).toUpper(), pathSelectors );
 	sf_tw->setFixedHeight( 48 );
 
 	m_sfLineEdit = new QLineEdit( m_defaultSoundfont, sf_tw );
@@ -596,7 +602,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	sf_select_btn->move( btnStart, 16 );
 	connect( sf_select_btn, SIGNAL( clicked() ), this,
 				 		SLOT( openDefaultSoundfont() ) );
-#endif	
+#endif
 
 	pathSelectors->setLayout( pathSelectorLayout );
 
@@ -612,19 +618,19 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #ifdef LMMS_HAVE_STK
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( stk_tw );
-#endif	
+#endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( sf_tw );
-#endif	
+#endif
 	pathSelectorLayout->addSpacing( 10 );
 	pathSelectorLayout->addWidget( artwork_tw );
 	pathSelectorLayout->addSpacing( 10 );
-	pathSelectorLayout->addStretch();
 	pathSelectorLayout->addWidget( backgroundArtwork_tw );
 	pathSelectorLayout->addSpacing( 10 );
+	pathSelectorLayout->addStretch();
 
-	dir_layout->addWidget( pathSelectors );
+	dir_layout->addWidget( pathScroll );
 
 	pathScroll->setWidget( pathSelectors );
 	pathScroll->setWidgetResizable( true );

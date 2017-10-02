@@ -594,6 +594,12 @@ TimeLineWidget {
 	qproperty-activeLoopBrush: #21A14F;
 	qproperty-activeLoopInnerColor: #21A14F;
 
+	/* Properties for the loop indicator rectangle in selected state.
+	   See above for detailed description. */
+	qproperty-selectedLoopColor: #21A14F;
+	qproperty-selectedLoopBrush: #21A14F;
+	qproperty-selectedLoopInnerColor: #21A14F;
+
 	/* Vertical padding for the loop indicator rectangle.
 	   A value of zero draws the rectangle at the full height of the widget. */
 	qproperty-loopRectangleVerticalPadding: 1;
