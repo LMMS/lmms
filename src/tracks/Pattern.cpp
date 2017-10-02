@@ -891,6 +891,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
 	lingrad.setColorAt( beatPattern ? 1 : 0, c );
 
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -1129,7 +1132,7 @@ void PatternView::paintEvent( QPaintEvent * )
 		paintTextLabel(m_pat->name(), p);
 	}
 
-	if( !beatPattern )
+	if( !( fixedTCOs() && beatPattern ) )
 	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );

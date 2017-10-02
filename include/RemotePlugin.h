@@ -424,6 +424,7 @@ enum RemoteMessageIDs
 	IdChangeSharedMemoryKey,
 	IdChangeInputCount,
 	IdChangeOutputCount,
+	IdChangeInputOutputCount,
 	IdShowUI,
 	IdHideUI,
 	IdSaveSettingsToString,
@@ -919,6 +920,15 @@ public:
 		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
 	}
 
+	void setInputOutputCount( int i, int o )
+	{
+		m_inputCount = i;
+		m_outputCount = o;
+		sendMessage( message( IdChangeInputOutputCount )
+				.addInt( i )
+				.addInt( o ) );
+	}
+
 	virtual int inputCount() const
 	{
 		return m_inputCount;
@@ -1072,6 +1082,14 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 							const message & _wm,
 							bool _busy_waiting )
 {
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	if( _busy_waiting )
+	{
+		// No point processing events outside of the main thread
+		_busy_waiting = QThread::currentThread() ==
+					QCoreApplication::instance()->thread();
+	}
+#endif
 	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT

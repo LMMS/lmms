@@ -206,6 +206,7 @@ void ExportProjectDialog::startExport()
 	}
 }
 
+
 void ExportProjectDialog::onFileFormatChanged(int index)
 {
 	// Extract the format tag from the currently selected item,

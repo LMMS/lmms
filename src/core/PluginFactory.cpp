@@ -42,7 +42,7 @@ qint64 qHash(const QFileInfo& fi)
 	return qHash(fi.absoluteFilePath());
 }
 
-PluginFactory* PluginFactory::s_instance = nullptr;
+std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 
 PluginFactory::PluginFactory()
 {
@@ -87,9 +87,9 @@ PluginFactory::~PluginFactory()
 PluginFactory* PluginFactory::instance()
 {
 	if (s_instance == nullptr)
-		s_instance = new PluginFactory();
+		s_instance.reset(new PluginFactory());
 
-	return s_instance;
+	return s_instance.get();
 }
 
 const Plugin::DescriptorList PluginFactory::descriptors() const
@@ -109,16 +109,15 @@ const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
 
 const PluginFactory::PluginInfo PluginFactory::pluginSupportingExtension(const QString& ext)
 {
-	PluginInfo* info = m_pluginByExt.value(ext, nullptr);
-	return info == nullptr ? PluginInfo() : *info;
+	return m_pluginByExt.value(ext, PluginInfo());
 }
 
 const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
 {
-	for (const PluginInfo* info : m_pluginInfos)
+	for (const PluginInfo& info : m_pluginInfos)
 	{
-		if (qstrcmp(info->descriptor->name, name) == 0)
-			return *info;
+		if (qstrcmp(info.descriptor->name, name) == 0)
+			return info;
 	}
 	return PluginInfo();
 }
@@ -150,7 +149,7 @@ void PluginFactory::discoverPlugins()
 
 	for (const QFileInfo& file : files)
 	{
-		QLibrary* library = new QLibrary(file.absoluteFilePath());
+		auto library = std::make_shared<QLibrary>(file.absoluteFilePath());
 
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
@@ -167,7 +166,7 @@ void PluginFactory::discoverPlugins()
 			descriptorName = descriptorName.mid(3);
 		}
 
-		Plugin::Descriptor* pluginDescriptor = (Plugin::Descriptor*) library->resolve(descriptorName.toUtf8().constData());
+		Plugin::Descriptor* pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
 		if(pluginDescriptor == nullptr)
 		{
 			qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
@@ -175,26 +174,20 @@ void PluginFactory::discoverPlugins()
 			continue;
 		}
 
-		PluginInfo* info = new PluginInfo;
-		info->file = file;
-		info->library = library;
-		info->descriptor = pluginDescriptor;
+		PluginInfo info;
+		info.file = file;
+		info.library = library;
+		info.descriptor = pluginDescriptor;
 		pluginInfos << info;
 
-		for (const QString& ext : QString(info->descriptor->supportedFileTypes).split(','))
+		for (const QString& ext : QString(info.descriptor->supportedFileTypes).split(','))
 		{
 			m_pluginByExt.insert(ext, info);
 		}
 
-		descriptors.insert(info->descriptor->type, info->descriptor);
+		descriptors.insert(info.descriptor->type, info.descriptor);
 	}
 
-
-	for (PluginInfo* info : m_pluginInfos)
-	{
-		delete info->library;
-		delete info;
-	}
 	m_pluginInfos = pluginInfos;
 	m_descriptors = descriptors;
 }

@@ -22,7 +22,8 @@ if ! env | grep MINGW; then
 fi
 
 info "Preparing the git directory..."
-mkdir "$HOME/.git"; touch "$HOME/.git/config" > /dev/null &2>1
+mkdir "$HOME/.git" || true
+touch "$HOME/.git/config" > /dev/null 2>&1
 git config --global http.sslverify false
 
 info "Cloning the repository..."

@@ -2,7 +2,7 @@
  * Song.h - class song - the root of the model-tree
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -254,7 +254,7 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
-	
+
 
 	const ControllerVector & controllers() const
 	{
@@ -325,13 +325,13 @@ private:
 	{
 		return m_playPos[m_playMode].getTicks();
 	}
-	
+
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() +
 			m_playPos[m_playMode].currentFrame();
 	}
-	
+
 	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
@@ -367,7 +367,7 @@ private:
 
 	bool m_loadingProject;
 
-	QList<QString> m_errors;
+	QStringList m_errors;
 
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];

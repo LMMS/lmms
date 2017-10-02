@@ -211,8 +211,13 @@ IF(LMMS_BUILD_WIN32)
 				DESTINATION .)
 	IF(LMMS_BUILD_MSYS)
 		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/libwinpthread-1.dll"
 					"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
 					"${MINGW_PREFIX}/bin/libstdc++-6.dll"
+				DESTINATION .)
+	ELSE()
+		INSTALL(FILES
+					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
 				DESTINATION .)
 	ENDIF()
 	IF(FLTK_FOUND)
@@ -226,9 +231,11 @@ IF(LMMS_BUILD_WIN32)
 				DESTINATION .)
 	ENDIF()
 	IF(GIG_FOUND)
-		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/libgig-6.dll"
-				DESTINATION .)
+		# Handle libgig-*.dll
+		INSTALL(
+			CODE "FILE(GLOB GIG_LIBRARY \"${MINGW_PREFIX}/bin/libgig-*.dll\")"
+			CODE "FILE(INSTALL \${GIG_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX})"
+		)
 	ENDIF()
 	IF(PORTAUDIO_FOUND)
 		INSTALL(FILES
