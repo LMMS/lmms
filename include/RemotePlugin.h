@@ -621,6 +621,11 @@ public:
 			fetchAndProcessNextMessage();
 		}
 	}
+
+	static bool isMainThreadWaiting()
+	{
+		return waitDepthCounter() > 0;
+	}
 #endif
 
 	virtual bool processMessage( const message & _m ) = 0;
@@ -657,6 +662,14 @@ protected:
 
 
 private:
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	static int & waitDepthCounter()
+	{
+		static int waitDepth = 0;
+		return waitDepth;
+	}
+#endif
+
 #ifdef SYNC_WITH_SHM_FIFO
 	shmFifo * m_in;
 	shmFifo * m_out;
@@ -1089,6 +1102,26 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 		_busy_waiting = QThread::currentThread() ==
 					QCoreApplication::instance()->thread();
 	}
+
+	struct WaitDepthCounter
+	{
+		WaitDepthCounter( int & depth, bool busy ) :
+			m_depth( depth ),
+			m_busy( busy )
+		{
+			if( m_busy ) { ++m_depth; }
+		}
+
+		~WaitDepthCounter()
+		{
+			if( m_busy ) { --m_depth; }
+		}
+
+		int & m_depth;
+		bool m_busy;
+	};
+
+	WaitDepthCounter wdc( waitDepthCounter(), _busy_waiting );
 #endif
 	while( !isInvalid() )
 	{
