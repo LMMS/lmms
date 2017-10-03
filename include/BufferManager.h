@@ -30,9 +30,6 @@
 #include "export.h"
 #include "lmms_basics.h"
 
-const int BM_INITIAL_BUFFERS = 512;
-//const int BM_INCREMENT = 64;
-
 class EXPORT BufferManager
 {
 public:
@@ -46,17 +43,6 @@ public:
 						const f_cnt_t offset = 0 );
 #endif
 	static void release( sampleFrame * buf );
-	static void refresh();
-//	static void extend( int c );
-
-private:
-	static sampleFrame ** s_available;
-	static AtomicInt s_availableIndex;
-
-	static sampleFrame ** s_released;
-	static AtomicInt s_releasedIndex;
-//	static QReadWriteLock s_mutex;
-	static int s_size;
 };
 
 #endif

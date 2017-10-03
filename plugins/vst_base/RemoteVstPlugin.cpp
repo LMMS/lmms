@@ -1385,20 +1385,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 
 void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
-	char * buf = NULL;
-
-	void * chunk = NULL;
-	// various plugins need this in order to not crash when setting
-	// chunk (also we let the plugin allocate "safe" memory this way)
-	const int actualLen = pluginDispatch( 23, 0, 0, &chunk );
-
-	// allocated buffer big enough?
-	if( _len > actualLen )
-	{
-		// no, then manually allocate a buffer
-		buf = new char[_len];
-		chunk = buf;
-	}
+	char * chunk = new char[_len];
 
 	const int fd = open( _file.c_str(), O_RDONLY | O_BINARY );
 	if ( ::read( fd, chunk, _len ) != _len )
@@ -1406,9 +1393,10 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
 	close( fd );
-	pluginDispatch( 24, 0, _len, chunk );
 
-	delete[] buf;
+	pluginDispatch( effSetChunk, 0, _len, chunk );
+
+	delete[] chunk;
 }
 
 

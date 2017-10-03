@@ -688,7 +688,7 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialMousePos( me->pos() );
-	if( me->button() == Qt::LeftButton )
+	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
 		if( me->modifiers() & Qt::ControlModifier )
 		{
@@ -776,7 +776,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			m_tco->toggleMute();
 		}
-		else if( me->modifiers() & Qt::ShiftModifier && fixedTCOs() == false )
+		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
 			remove();
 		}
@@ -787,7 +787,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			m_tco->toggleMute();
 		}
-		else if( fixedTCOs() == false )
+		else if( !fixedTCOs() )
 		{
 			remove();
 		}

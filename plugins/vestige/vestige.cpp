@@ -32,6 +32,7 @@
 #include <QMenu>
 #include <QDomElement>
 
+#include "BufferManager.h"
 #include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -282,15 +283,18 @@ void vestigeInstrument::loadFile( const QString & _file )
 void vestigeInstrument::play( sampleFrame * _buf )
 {
 	m_pluginMutex.lock();
+
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+
 	if( m_plugin == NULL )
 	{
+		BufferManager::clear( _buf, frames );
+
 		m_pluginMutex.unlock();
 		return;
 	}
 
 	m_plugin->process( NULL, _buf );
-
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
