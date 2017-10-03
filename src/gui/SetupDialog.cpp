@@ -157,13 +157,14 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	const int YDelta = 18;
 
 
+	// Main widget.
+	QWidget * main_w = new QWidget(this);
+
+
 	// Vertical layout.
 	QVBoxLayout * vlayout = new QVBoxLayout(this);
 	vlayout->setSpacing(0);
 	vlayout->setMargin(0);
-		
-	// Main widget.
-	QWidget * main_w = new QWidget(this);
 
 	// Horizontal layout.
 	QHBoxLayout * hlayout = new QHBoxLayout(main_w);
@@ -232,7 +233,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			SLOT(toggleNoteLabels(bool)));
 
 	LedCheckBox * compacttracks = new LedCheckBox(
-			tr("Compact track buttons"), gui_tw);
+			tr("Enable compact track buttons"), gui_tw);
 	labelNumber1++;
 	compacttracks->move(XDelta, YDelta * labelNumber1);
 	compacttracks->setChecked(m_compactTrackButtons);
@@ -240,7 +241,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			SLOT(toggleCompactTrackButtons(bool)));
 
 	LedCheckBox * oneitw = new LedCheckBox(
-			tr("One instrument-track-window mode"), gui_tw);
+			tr("Enable one instrument-track-window mode"), gui_tw);
 	labelNumber1++;
 	oneitw->move(XDelta, YDelta * labelNumber1);
 	oneitw->setChecked(m_oneInstrumentTrackWindow);
@@ -448,7 +449,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	disableAutoQuit->move(XDelta, YDelta * labelNumber4);
 	disableAutoQuit->setChecked(m_disableAutoQuit);
 	connect(disableAutoQuit, SIGNAL(toggled(bool)), this,
-			SLOT(toggleDisableAutoquit(bool)));
+			SLOT(toggleDisableAutoQuit(bool)));
 
 	plugins_tw->setFixedHeight(YDelta + YDelta * labelNumber4);
 
