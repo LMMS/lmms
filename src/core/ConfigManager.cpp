@@ -51,13 +51,13 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 
 ConfigManager::ConfigManager() :
-	m_lmmsRcFile(QDir::home().absolutePath() +"/.lmmsrc.xml"),
 	m_workingDir(QDir::home().absolutePath() + "/lmms/"),
 	m_dataDir("data:/"),
-	m_themeDir(defaultThemeDir()),
 	m_vstDir(m_workingDir + "vst/"),
-	m_gigDir(m_workingDir + GIG_PATH),
 	m_sf2Dir(m_workingDir + SF2_PATH),
+	m_gigDir(m_workingDir + GIG_PATH),
+	m_themeDir(defaultThemeDir()),
+	m_lmmsRcFile(QDir::home().absolutePath() +"/.lmmsrc.xml"),
 	m_version(defaultVersion())
 {
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())

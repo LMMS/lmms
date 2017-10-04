@@ -271,8 +271,8 @@ private:
 	QString m_themeDir;
 	QString m_backgroundPicFile;
 	QString m_lmmsRcFile;
-	QStringList m_recentlyOpenedProjects;
 	QString m_version;
+	QStringList m_recentlyOpenedProjects;
 
 	typedef QVector<QPair<QString, QString> > stringPairVector;
 	typedef QMap<QString, stringPairVector> settingsMap;
