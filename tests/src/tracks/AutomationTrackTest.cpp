@@ -110,11 +110,10 @@ private slots:
 		auto song = Engine::getSong();
 		auto bbContainer = Engine::getBBTrackContainer();
 		BBTrack bbTrack(song);
-		AutomationTrack automationTrack(bbContainer);
-		bbTrack.createTCOsForBB(bbTrack.index());
+		Track* automationTrack = Track::create(Track::AutomationTrack, bbContainer);
 
-		QVERIFY(automationTrack.numOfTCOs());
-		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack.getTCO(0));
+		QVERIFY(automationTrack->numOfTCOs());
+		AutomationPattern* p1 = dynamic_cast<AutomationPattern*>(automationTrack->getTCO(0));
 		QVERIFY(p1);
 
 		FloatModel model;
@@ -130,7 +129,6 @@ private slots:
 		QCOMPARE(bbContainer->automatedValuesAt(50, bbTrack.index())[&model], 1.0f);
 
 		BBTrack bbTrack2(song);
-		bbTrack.createTCOsForBB(bbTrack2.index());
 
 		QCOMPARE(bbContainer->automatedValuesAt(5, bbTrack.index())[&model], 0.5f);
 		QVERIFY(! bbContainer->automatedValuesAt(5, bbTrack2.index()).size());
