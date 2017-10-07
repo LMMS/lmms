@@ -39,6 +39,7 @@ class QLineEdit;
 class QListView;
 class QScrollArea;
 class AutoDetectMidiController;
+class AutoDetectRMidiController;
 class ComboBox;
 class GroupBox;
 class TabWidget;
@@ -65,13 +66,17 @@ public slots:
 //	void setSelection( const effectKey & _selection );
 	void selectController();
 	void midiToggled();
+	void rMidiToggled();
 	void userToggled();
 	void autoDetectToggled();
+	void autoRDetectToggled();
 	void enableAutoDetect( QAction * _a );
+	void enableRAutoDetect( QAction * _a );
 
 
 protected slots:
 	void midiValueChanged();
+	void rMidiValueChanged();
 
 
 private:
@@ -82,6 +87,14 @@ private:
 	LedCheckBox * m_midiAutoDetectCheckBox;
 	MidiPortMenu * m_readablePorts;
 	BoolModel m_midiAutoDetect;
+
+	// RMidi
+	GroupBox * m_rMidiGroupBox;
+	LcdSpinBox * m_rMidiChannelSpinBox;
+	LcdSpinBox * m_rMidiControllerSpinBox;
+	LedCheckBox * m_rMidiAutoDetectCheckBox;
+	MidiPortMenu * m_rReadablePorts;
+	BoolModel m_rMidiAutoDetect;
 
 	// User
 	GroupBox * m_userGroupBox;
@@ -96,6 +109,8 @@ private:
 
 	// Temporary midiController
 	AutoDetectMidiController * m_midiController;
+	// Temporary rMidiController
+	AutoDetectRMidiController * m_rMidiController;
 } ;
 
 #endif

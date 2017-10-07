@@ -104,6 +104,13 @@ public slots:
 		emit emitClonePosition( m_position );
 	}
 
+
+	//gets the value from a midi signal
+	void getMidiValue()
+	{
+
+	}
+
 private:
 
 	//the position of the semitone in the vector

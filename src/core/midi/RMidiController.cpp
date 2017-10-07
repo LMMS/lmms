@@ -1,5 +1,5 @@
 /*
- * MidiController.cpp - implementation of class midi-controller which handles
+ * RMidiController.cpp - implementation of class midi-controller which handles
  *                      MIDI control change messages
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
@@ -29,11 +29,11 @@
 #include "Song.h"
 #include "Mixer.h"
 #include "MidiClient.h"
-#include "MidiController.h"
+#include "RMidiController.h"
 
 
-MidiController::MidiController( Model * _parent ) :
-	Controller( Controller::MidiController, _parent, tr( "MIDI Controller" ) ),
+RMidiController::RMidiController( Model * _parent ) :
+	Controller( Controller::RMidiController, _parent, tr( "MIDI Controller" ) ),
 	MidiEventProcessor(),
 	m_midiPort( tr( "unnamed_midi_controller" ),
 			Engine::mixer()->midiClient(), this, this, MidiPort::Input ),
@@ -48,14 +48,14 @@ MidiController::MidiController( Model * _parent ) :
 
 
 
-MidiController::~MidiController()
+RMidiController::~RMidiController()
 {
 }
 
 
 
 
-void MidiController::updateValueBuffer()
+void RMidiController::updateValueBuffer()
 {
 	if( m_previousValue != m_lastValue )
 	{
@@ -70,9 +70,9 @@ void MidiController::updateValueBuffer()
 }
 
 
-void MidiController::updateName()
+void RMidiController::updateName()
 {
-	setName( QString("MIDI ch%1 ctrl%2").
+	setName( QString("RMIDI ch%1 ctrl%2").
 			arg( m_midiPort.inputChannel() ).
 			arg( m_midiPort.inputController() ) );
 }
@@ -80,13 +80,12 @@ void MidiController::updateName()
 
 
 
-void MidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+void RMidiController::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	unsigned char controllerNum;
 
 	switch( event.type() )
 	{
-		
 		case MidiControlChange:
 			controllerNum = event.controllerNumber();
 			if( m_midiPort.inputController() == controllerNum + 1 &&
@@ -99,6 +98,50 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 				emit valueChanged();
 			}
 			break;
+			//RIKIS SAMSONITE
+			//RIKIS SAMSONITE
+		case MidiPitchBend:
+			controllerNum = event.controllerNumber();
+
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+				{
+					unsigned int val = event.param(0);
+					m_previousValue = m_lastValue;
+					m_lastValue = (float)( val ) / 16128.0f;
+					emit valueChanged();
+				}
+			break;
+		case MidiNoteOn:
+			controllerNum = event.controllerNumber();
+
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+				{
+					unsigned int val = event.param(0);
+					m_previousValue = m_lastValue;
+					m_lastValue = (float)( val ) / 16128.0f;
+					emit valueChanged();
+				}
+			break;
+		case MidiNoteOff:
+			controllerNum = event.controllerNumber();
+
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+				{
+					unsigned int val = event.param(0);
+					m_previousValue = m_lastValue;
+					m_lastValue = (float)( val ) / 16128.0f;
+				emit valueChanged();
+				}
+			break;
+			//RIKIS SAMSONITE
+			//RIKIS SAMSONITE
+
 		default:
 			// Don't care - maybe add special cases for pitch and mod later
 			break;
@@ -108,7 +151,7 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 
 
 
-void MidiController::subscribeReadablePorts( const MidiPort::Map & _map )
+void RMidiController::subscribeReadablePorts( const MidiPort::Map & _map )
 {
 	for( MidiPort::Map::ConstIterator it = _map.constBegin();
 						it != _map.constEnd(); ++it )
@@ -120,7 +163,7 @@ void MidiController::subscribeReadablePorts( const MidiPort::Map & _map )
 
 
 
-void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void RMidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	Controller::saveSettings( _doc, _this );
 	m_midiPort.saveSettings( _doc, _this );
@@ -130,7 +173,7 @@ void MidiController::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 
 
-void MidiController::loadSettings( const QDomElement & _this )
+void RMidiController::loadSettings( const QDomElement & _this )
 {
 	Controller::loadSettings( _this );
 
@@ -142,15 +185,15 @@ void MidiController::loadSettings( const QDomElement & _this )
 
 
 
-QString MidiController::nodeName() const
+QString RMidiController::nodeName() const
 {
-	return( "Midicontroller" );
+	return( "RMidiController" );
 }
 
 
 
 
-ControllerDialog * MidiController::createDialog( QWidget * _parent )
+ControllerDialog * RMidiController::createDialog( QWidget * _parent )
 {
 	return NULL;
 }

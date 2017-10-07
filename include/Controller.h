@@ -49,6 +49,7 @@ public:
 		DummyController,
 		LfoController,
 		MidiController,
+		RMidiController,
 		PeakController,
 		/*
 		XYController,
