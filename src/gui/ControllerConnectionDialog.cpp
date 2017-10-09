@@ -28,11 +28,11 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QMessageBox>
+#include <QLabel>
 
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "MidiController.h"
-#include "RMidiController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
 #include "Mixer.h"
@@ -45,83 +45,6 @@
 
 #include "gui_templates.h"
 #include "embed.h"
-
-class AutoDetectRMidiController : public RMidiController
-{
-public:
-	AutoDetectRMidiController( Model* parent ) :
-		RMidiController( parent ),
-		m_detectedMidiChannel( 0 ),
-		m_detectedMidiController( 0 )
-	{
-		updateName();
-	}
-
-
-	virtual ~AutoDetectRMidiController()
-	{
-	}
-
-
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 )
-	{
-		//RIKIS
-		if( (event.type() == MidiControlChange || event.type() == MidiPitchBend) &&
-			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
-		{
-			m_detectedMidiChannel = event.channel() + 1;
-			m_detectedMidiController = event.controllerNumber() + 1;
-			m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
-
-			emit valueChanged();
-		}
-	}
-
-
-	// Would be a nice copy ctor, but too hard to add copy ctor because
-	// model has none.
-	RMidiController* copyToRMidiController( Model* parent )
-	{
-		RMidiController* c = new RMidiController( parent );
-		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
-		c->m_midiPort.setInputController( m_midiPort.inputController() );
-		c->subscribeReadablePorts( m_midiPort.readablePorts() );
-		c->updateName();
-
-		return c;
-	}
-
-
-	void useDetected()
-	{
-		m_midiPort.setInputChannel( m_detectedMidiChannel );
-		m_midiPort.setInputController( m_detectedMidiController );
-
-		const MidiPort::Map& map = m_midiPort.readablePorts();
-		for( MidiPort::Map::ConstIterator it = map.begin(); it != map.end(); ++it )
-		{
-			m_midiPort.subscribeReadablePort( it.key(),
-									m_detectedMidiPort.isEmpty() || ( it.key() == m_detectedMidiPort ) );
-		}
-	}
-
-
-public slots:
-	void reset()
-	{
-		m_midiPort.setInputChannel( 0 );
-		m_midiPort.setInputController( 0 );
-		m_detectedMidiChannel=0;
-		m_detectedMidiController=0;
-	}
-
-
-private:
-	int m_detectedMidiChannel;
-	int m_detectedMidiController;
-	QString m_detectedMidiPort;
-
-} ;
 
 
 
@@ -144,15 +67,22 @@ public:
 
 	virtual void processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 )
 	{
-		if( event.type() == MidiControlChange &&
-			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
-		{
-			m_detectedMidiChannel = event.channel() + 1;
-			m_detectedMidiController = event.controllerNumber() + 1;
-			m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
+	//ORIG
+//		if( event.type() == MidiControlChange &&
+//			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
+ //ORIG
 
-			emit valueChanged();
-		}
+		//RIKIS	- detecting all midi inputs
+		if(	( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
+			{
+				m_detectedMidiChannel = event.channel() + 1;
+				m_detectedMidiController = event.controllerNumber() + 1;
+				m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
+
+				useDetected(); //setta il controller
+				MidiController::processInEvent(event,time,offset); //Colling base class event to trigger actions and signal
+//				emit valueChanged(); //Not necessary anymore
+			}
 	}
 
 
@@ -207,66 +137,23 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 	QDialog( _parent ),
 	m_readablePorts( NULL ),
 	m_midiAutoDetect( false ),
-	m_rReadablePorts( NULL ),
-	m_rMidiAutoDetect( false ),
 	m_controller( NULL ),
 	m_targetModel( _target_model ),
-	m_midiController( NULL ),
-m_rMidiController( NULL )
+	m_midiController( NULL )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_audio" ) );
 	setWindowTitle( tr( "Connection Settings" ) );
 	setModal( true );
 
-	// rMidi stuff
-	m_rMidiGroupBox = new GroupBox( tr( "RMIDI CONTROLLER" ), this );
-	m_rMidiGroupBox->setGeometry( 8, 10, 240, 80 );
-	connect( m_rMidiGroupBox->model(), SIGNAL( dataChanged() ),
-			this, SLOT( rMidiToggled() ) );
-	
-	m_rMidiChannelSpinBox = new LcdSpinBox( 2, m_rMidiGroupBox,
-			tr( "Input channel" ) );
-	m_rMidiChannelSpinBox->addTextForValue( 0, "--" );
-	m_rMidiChannelSpinBox->setLabel( tr( "CHANNEL" ) );
-	m_rMidiChannelSpinBox->move( 8, 24 );
-
-	m_rMidiControllerSpinBox = new LcdSpinBox( 3, m_rMidiGroupBox,
-			tr( "Input controller" ) );
-	m_rMidiControllerSpinBox->addTextForValue( 0, "---" );
-	m_rMidiControllerSpinBox->setLabel( tr( "CONTROLLER" ) );
-	m_rMidiControllerSpinBox->move( 68, 24 );
-	
-
-	m_rMidiAutoDetectCheckBox =
-			new LedCheckBox( tr("Auto Detect"),
-				m_rMidiGroupBox, tr("Auto Detect") );
-	m_rMidiAutoDetectCheckBox->setModel( &m_rMidiAutoDetect );
-	m_rMidiAutoDetectCheckBox->move( 8, 60 );
-	connect( &m_rMidiAutoDetect, SIGNAL( dataChanged() ),
-			this, SLOT( autoRDetectToggled() ) );
-
-	// when using with non-raw-clients we can provide buttons showing
-	// our port-menus when being clicked
-
-	if( !Engine::mixer()->midiClient()->isRaw() )
-	{
-		m_rReadablePorts = new MidiPortMenu( MidiPort::Input );
-		connect( m_rReadablePorts, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( enableRAutoDetect( QAction * ) ) );
-		ToolButton * rp_rbtn = new ToolButton( m_rMidiGroupBox );
-		rp_rbtn->setText( tr( "MIDI-devices to receive "
-						"MIDI-events from" ) );
-		rp_rbtn->setIcon( embed::getIconPixmap( "piano" ) );
-		rp_rbtn->setGeometry( 160, 24, 32, 32 );
-		rp_rbtn->setMenu( m_rReadablePorts );
-		rp_rbtn->setPopupMode( QToolButton::InstantPopup );
-	}
-
 
 	// Midi stuff
 	m_midiGroupBox = new GroupBox( tr( "MIDI CONTROLLER" ), this );
-	m_midiGroupBox->setGeometry( 8, 100, 240, 80 );
-	connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
+	//ORIGINAL
+//m_midiGroupBox->setGeometry( 8, 10, 240, 80 );
+	//RIKIS
+	m_midiGroupBox->setGeometry( 8, 10, 330, 80 );
+	//RIKIS
+connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( midiToggled() ) );
 
 	m_midiChannelSpinBox = new LcdSpinBox( 2, m_midiGroupBox,
@@ -301,20 +188,64 @@ m_rMidiController( NULL )
 		rp_btn->setText( tr( "MIDI-devices to receive "
 						"MIDI-events from" ) );
 		rp_btn->setIcon( embed::getIconPixmap( "piano" ) );
-		rp_btn->setGeometry( 160, 24, 32, 32 );
+		rp_btn->setGeometry( 290, 24, 32, 32 );
 		rp_btn->setMenu( m_readablePorts );
 		rp_btn->setPopupMode( QToolButton::InstantPopup );
+
+		//RIKIS
+		QFont font;
+		font.setPointSize(8);
+		font.setBold(true);
+		m_VelocityLabel = new QLabel( m_midiGroupBox );
+		m_VelocityLabel->setStyleSheet("border: 1px solid grey ;color: red");
+		m_VelocityLabel->setFont(font);
+		m_VelocityLabel->setGeometry(150,24,40,15);
+		m_VelocityLabel->setMargin(1);
+		m_VelocityLabel->setText(tr("Velocity"));
+
+
+		QLabel * m_ControllerLabel = new QLabel( m_midiGroupBox );
+		m_ControllerLabel->setGeometry(195,24,40,15);
+		m_ControllerLabel->setStyleSheet("border: 1px solid grey; color: red");
+		m_ControllerLabel->setFont(font);
+		m_ControllerLabel->setMargin(1);
+		m_ControllerLabel->setText(tr("Controller"));
+
+		QLabel * m_KeyLabel = new QLabel( m_midiGroupBox );
+		m_KeyLabel->setGeometry(150,40,40,15);
+		m_KeyLabel->setStyleSheet("border: 1px solid grey; color: red");
+		m_KeyLabel->setFont(font);
+		m_KeyLabel->setMargin(1);
+		m_KeyLabel->setText(tr("Key"));
+		QLabel * m_PanningLabel = new QLabel( m_midiGroupBox );
+		m_PanningLabel->setGeometry(195,40,40,15);
+		m_PanningLabel->setStyleSheet("border: 1px solid grey; color: red");
+		m_PanningLabel->setFont(font);
+		m_PanningLabel->setMargin(1);
+		m_PanningLabel->setText(tr("Panning"));
+
+		QLabel * m_PitchLabel = new QLabel( m_midiGroupBox );
+		m_PitchLabel->setGeometry(150,56,40,15);
+		m_PitchLabel->setStyleSheet("border: 1px solid grey; color: red");
+		m_PitchLabel->setFont(font);
+		m_PitchLabel->setMargin(1);
+		m_PitchLabel->setText(tr("Pitch"));
+		//RIKIS
 	}
 
 
 	// User stuff
 	m_userGroupBox = new GroupBox( tr( "USER CONTROLLER" ), this );
-	m_userGroupBox->setGeometry( 8, 190, 240, 60 );
+	//ORIGINAL
+	//m_userGroupBox->setGeometry( 8, 100, 240, 60 );
+	//RIKIS
+	m_userGroupBox->setGeometry( 8, 100, 320, 60 );
+	//RIKIS
 	connect( m_userGroupBox->model(), SIGNAL( dataChanged() ),
 			this, SLOT( userToggled() ) );
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
-	m_userController->setGeometry( 10, 24, 200, 22 );
+	m_userController->setGeometry( 10, 24, 310, 22 );
 
 	for( int i = 0; i < Engine::getSong()->controllers().size(); ++i )
 	{
@@ -325,7 +256,12 @@ m_rMidiController( NULL )
 
 	// Mapping functions
 	m_mappingBox = new TabWidget( tr( "MAPPING FUNCTION" ), this );
-	m_mappingBox->setGeometry( 8, 260, 240, 64 );
+	//ORIGINAL
+	//m_mappingBox->setGeometry( 8, 170, 240, 64 );
+	//RIKIS
+	m_mappingBox->setGeometry( 8, 170, 330, 64 );
+	//RIKIS
+
 	m_mappingFunction = new QLineEdit( m_mappingBox );
 	m_mappingFunction->setGeometry( 10, 20, 170, 16 );
 	m_mappingFunction->setText( "input" );
@@ -334,7 +270,7 @@ m_rMidiController( NULL )
 
 	// Buttons
 	QWidget * buttons = new QWidget( this );
-	buttons->setGeometry( 8, 320, 240, 32 );
+	buttons->setGeometry( 8, 240, 240, 32 );
 
 	QHBoxLayout * btn_layout = new QHBoxLayout( buttons );
 	btn_layout->setSpacing( 0 );
@@ -359,7 +295,10 @@ m_rMidiController( NULL )
 	btn_layout->addWidget( cancel_btn );
 	btn_layout->addSpacing( 10 );
 
-	setFixedSize( 256, 360 );
+//ORIGINAL
+//	setFixedSize( 256, 280 );
+//RIKIS
+	setFixedSize( 350, 280 );
 
 	// Crazy MIDI View stuff
 	
@@ -383,18 +322,6 @@ m_rMidiController( NULL )
 
 							m_midiController->subscribeReadablePorts( static_cast<MidiController*>( cc->getController() )->m_midiPort.readablePorts() );
 						}
-					else if ( cc->getController()->type() == Controller::RMidiController )
-						{
-							m_rMidiGroupBox->model()->setValue( true );
-							// ensure controller is created
-							rMidiToggled();
-
-							RMidiController * cont = (RMidiController*)( cc->getController() );
-							m_rMidiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
-							m_rMidiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
-
-							m_rMidiController->subscribeReadablePorts( static_cast<RMidiController*>( cc->getController() )->m_midiPort.readablePorts() );
-						}
 					else
 						{
 							int idx = Engine::getSong()->controllers().indexOf( cc->getController() );
@@ -409,9 +336,9 @@ m_rMidiController( NULL )
 		}
 
 	if( !cc )
-	{
-		m_rMidiGroupBox->model()->setValue( true );
-	}
+		{
+			m_midiGroupBox->model()->setValue( true );
+		}
 
 	show();
 }
@@ -422,10 +349,9 @@ m_rMidiController( NULL )
 ControllerConnectionDialog::~ControllerConnectionDialog()
 {
 	delete m_readablePorts;
-	delete m_rReadablePorts;
+//	delete m_rReadablePorts;
 
 	delete m_midiController;
-	delete m_rMidiController;
 }
 
 
@@ -433,18 +359,6 @@ ControllerConnectionDialog::~ControllerConnectionDialog()
 
 void ControllerConnectionDialog::selectController()
 {
-	// rMidi
-	if( m_rMidiGroupBox->model()->value() > 0 )
-		{
-			if( m_rMidiControllerSpinBox->model()->value() > 0 )
-				{
-					RMidiController * mc;
-					mc = m_rMidiController->copyToRMidiController( Engine::getSong() );
-					mc->m_midiPort.setName( m_targetModel->fullDisplayName() );
-					m_controller = mc;
-				}
-		}
-
 	// Midi
 	if( m_midiGroupBox->model()->value() > 0 )
 		{
@@ -488,16 +402,6 @@ void ControllerConnectionDialog::midiToggled()
 			m_userGroupBox->model()->setValue( 0 );
 		}
 
-		if( m_rMidiGroupBox->model()->value() != 0 )
-		{
-			m_rMidiGroupBox->model()->setValue( 0 );
-			m_rMidiChannelSpinBox->model()->setValue(0);
-			m_rMidiControllerSpinBox->model()->setValue(0);
-//			m_rReadablePorts->setEnabled(false);
-		}
-
-
-//		m_readablePorts->setEnabled(true);
 		if( !m_midiController )
 		{
 			m_midiController = new AutoDetectMidiController( Engine::getSong() );
@@ -527,56 +431,6 @@ void ControllerConnectionDialog::midiToggled()
 	m_midiAutoDetectCheckBox->setEnabled( enabled );
 }
 
-void ControllerConnectionDialog::rMidiToggled()
-{
-	int enabled = m_rMidiGroupBox->model()->value();
-	if( enabled != 0 )
-	{
-		if( m_userGroupBox->model()->value() != 0 )
-		{
-			m_userGroupBox->model()->setValue( 0 );
-		}
-
-		if( m_midiGroupBox->model()->value() != 0 )
-		{
-				m_midiGroupBox->model()->setValue( 0 );
-				m_midiChannelSpinBox->model()->setValue(0);
-				m_midiControllerSpinBox->model()->setValue(0);
-//				m_readablePorts->setEnabled(false);
-		}
-
-//		m_rReadablePorts->setEnabled(true);
-		if( !m_rMidiController )
-		{
-			m_rMidiController = new AutoDetectRMidiController( Engine::getSong() );
-
-			MidiPort::Map map = m_rMidiController->m_midiPort.readablePorts();
-			for( MidiPort::Map::Iterator it = map.begin(); it != map.end(); ++it )
-			{
-				it.value() = true;
-			}
-			m_rMidiController->subscribeReadablePorts( map );
-
-			m_rMidiChannelSpinBox->setModel( &m_rMidiController->m_midiPort.m_inputChannelModel );
-			m_rMidiControllerSpinBox->setModel( &m_rMidiController->m_midiPort.m_inputControllerModel );
-
-			if( m_rReadablePorts )
-			{
-				m_rReadablePorts->setModel( &m_rMidiController->m_midiPort );
-			}
-
-			connect( m_rMidiController, SIGNAL( valueChanged() ), this, SLOT( rMidiValueChanged() ) );
-		}
-	}
-	m_rMidiAutoDetect.setValue( enabled );
-
-	m_rMidiChannelSpinBox->setEnabled( enabled );
-	m_rMidiControllerSpinBox->setEnabled( enabled );
-	m_rMidiAutoDetectCheckBox->setEnabled( enabled );
-}
-
-
-
 
 void ControllerConnectionDialog::userToggled()
 {
@@ -585,11 +439,6 @@ void ControllerConnectionDialog::userToggled()
 	if( enabled != 0 && m_midiGroupBox->model()->value() != 0 )
 	{
 		m_midiGroupBox->model()->setValue( 0 );
-	}
-//	m_rReadablePorts->setEnabled(false);
-	if( enabled != 0 && m_rMidiGroupBox->model()->value() != 0 )
-	{
-		m_rMidiGroupBox->model()->setValue( 0 );
 	}
 
 	m_userController->setEnabled( enabled );
@@ -602,15 +451,8 @@ void ControllerConnectionDialog::autoDetectToggled()
 {
 	if( m_midiAutoDetect.value() )
 		{
-			m_midiController->reset();
-		}
-}
 
-void ControllerConnectionDialog::autoRDetectToggled()
-{
-	if( m_rMidiAutoDetect.value() )
-		{
-			m_rMidiController->reset();
+			m_midiController->reset();
 		}
 }
 
@@ -627,20 +469,10 @@ void ControllerConnectionDialog::midiValueChanged()
 			m_readablePorts->updateMenu();
 		}
 	}
+	//RIKIS
+	setLabelText();
+	//RIKIS
 }
-
-void ControllerConnectionDialog::rMidiValueChanged()
-{
-	if( m_rMidiAutoDetect.value() )
-	{
-		m_rMidiController->useDetected();
-		if( m_rReadablePorts )
-		{
-			m_rReadablePorts->updateMenu();
-		}
-	}
-}
-
 
 
 void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
@@ -648,15 +480,12 @@ void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 	if( _a->isChecked() )
 	{
 		m_midiAutoDetectCheckBox->model()->setValue( true );
-	}
+		}
 }
 
-void ControllerConnectionDialog::enableRAutoDetect( QAction * _a )
+void ControllerConnectionDialog::setLabelText()
 {
-	if( _a->isChecked() )
-	{
-		m_rMidiAutoDetectCheckBox->model()->setValue( true );
-	}
+		m_VelocityLabel->setText(QString::number(m_midiController->getLastValue()));
 }
 
 

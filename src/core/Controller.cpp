@@ -35,7 +35,6 @@
 #include "ControllerDialog.h"
 #include "LfoController.h"
 #include "MidiController.h"
-#include "RMidiController.h"
 #include "PeakController.h"
 
 
@@ -213,10 +212,6 @@ Controller * Controller::create( ControllerTypes _ct, Model * _parent )
 
 		case Controller::MidiController:
 			c = new ::MidiController( _parent );
-			break;
-
-		case Controller::RMidiController:
-			c = new ::RMidiController( _parent );
 			break;
 
 		default: 

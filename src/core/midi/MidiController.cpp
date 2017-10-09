@@ -43,6 +43,12 @@ MidiController::MidiController( Model * _parent ) :
 	setSampleExact( true );
 	connect( &m_midiPort, SIGNAL( modeChanged() ),
 			this, SLOT( updateName() ) );
+
+	//RIKIS
+//	m_MinVal = -std::numeric_limits<float>::infinity();
+//	m_MaxVal =  std::numeric_limits<float>::infinity();
+//	m_ControllerType = original;
+	//RIKIS
 }
 
 
@@ -99,6 +105,82 @@ void MidiController::processInEvent( const MidiEvent& event, const MidiTime& tim
 				emit valueChanged();
 			}
 			break;
+
+			//RIKIS
+		case MidiNoteOff:
+//			controllerNum = event.controllerNumber();
+//			if( m_midiPort.inputController() == controllerNum + 1 &&
+//					( m_midiPort.inputChannel() == event.channel() + 1 ||
+//						m_midiPort.inputChannel() == 0 ) )
+//			{
+//				unsigned char val = event.controllerValue();
+//				m_previousValue = m_lastValue;
+//				m_lastValue = (float)( val ) / 127.0f;
+//				emit valueChanged();
+//			}
+//			break;
+		case MidiNoteOn: //gets back the note velocity
+			controllerNum = event.controllerNumber();
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+			{
+				unsigned char val = event.velocity();
+				m_previousValue = m_lastValue;
+				m_lastValue = (float)( val ) / 127.0f;
+				emit valueChanged();
+			}
+			break;
+		case MidiKeyPressure: //gets back event velocity
+			controllerNum = event.controllerNumber();
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+			{
+				unsigned char val = event.velocity();
+				m_previousValue = m_lastValue;
+				m_lastValue = (float)( val ) / 127.0f;
+				emit valueChanged();
+			}
+			break;
+		case MidiProgramChange:
+			controllerNum = event.controllerNumber();
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+			{
+				unsigned char val = event.program();
+				m_previousValue = m_lastValue;
+				m_lastValue = (float)( val ) / 128.0f;
+				emit valueChanged();
+			}
+			break;
+		case MidiChannelPressure:
+			controllerNum = event.controllerNumber();
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+			{
+				unsigned char val = event.channelPressure();
+				m_previousValue = m_lastValue;
+				m_lastValue = (float)( val ) / 127.0f;
+				emit valueChanged();
+			}
+			break;
+		case MidiPitchBend:
+			controllerNum = event.controllerNumber();
+			if( m_midiPort.inputController() == controllerNum + 1 &&
+					( m_midiPort.inputChannel() == event.channel() + 1 ||
+						m_midiPort.inputChannel() == 0 ) )
+			{
+				unsigned int val = event.pitchBend();
+				m_previousValue = m_lastValue;
+				m_lastValue = (float)( val ) / 16383.0f;
+				emit valueChanged();
+			}
+			break;
+		//RIKIS
+
 		default:
 			// Don't care - maybe add special cases for pitch and mod later
 			break;

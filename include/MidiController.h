@@ -40,6 +40,15 @@ class MidiController : public Controller, public MidiEventProcessor
 {
 	Q_OBJECT
 public:
+
+	//RIKIS
+	//each element will display its own behaviour end be receptive to certain events
+//	enum ControllerElements {
+//		knob,slider,button,wheel,original //the original enum makes the controller behave without the enhancement (compatibility issues)
+//	};
+	//RIKIS
+
+
 	MidiController( Model * _parent );
 	virtual ~MidiController();
 
@@ -64,6 +73,13 @@ public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
 	void updateName();
 
+	//RIKIS
+	//Convenience class for displaying values
+	float getLastValue()
+	{
+		return m_lastValue;
+	}
+	//RIKIS
 
 protected:
 	// The internal per-controller get-value function
@@ -75,6 +91,12 @@ protected:
 
 	float m_lastValue;
 	float m_previousValue;
+
+	//RIKIS
+//	ControllerElements m_ControllerType; //Manually set behaviour: Controller acting as Knob, Slider, Button, Note...
+//	float m_MinVal;	//Minum value reached by controller: manually set
+//	float m_MaxVal; //Max value manually set
+	//RIKIS
 
 	friend class ControllerConnectionDialog;
 	friend class AutoDetectMidiController;
