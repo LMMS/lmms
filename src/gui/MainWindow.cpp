@@ -838,7 +838,7 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 
 		QString templateFile = dirBase + _idx->text() + ".mpt";
 		//KDE adds accelerators to everythng in the menu.
-		if( !QFileInfo::exists(templateFile) ) {
+		if( !QFileInfo(templateFile).exists() ) {
 			templateFile = templateFile.replace('&', "" );
 		}
 
@@ -918,7 +918,7 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		QString f = _action->text();
 		setCursor( Qt::WaitCursor );
 		//KDE adds accelerators to everythng in the menu.
-		if( !QFileInfo::exists(f) ) {
+		if( !QFileInfo(f).exists() ) {
 			f = f.replace('&', "" );
 		}
 		Engine::getSong()->loadProject( f );
