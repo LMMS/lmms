@@ -524,6 +524,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		frames_processed += arp_frames;
 		cur_frame += arp_frames;
 	}
+
+	// make sure note is handled as arp-base-note, even
+	// if we didn't add a sub-note so far
+	if( m_arpModeModel.value() != FreeMode )
+	{
+		_n->setMasterNote();
+	}
 }
 
 
