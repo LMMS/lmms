@@ -328,21 +328,21 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			else
 			{
 				new (&oscs_l[i]) Oscillator(
-							&m_osc[i]->m_waveShapeModel,
-							&m_osc[i]->m_modulationAlgoModel,
-							_n->frequency(),
-							m_osc[i]->m_detuningLeft,
-							m_osc[i]->m_phaseOffsetLeft,
-							m_osc[i]->m_volumeLeft,
-							&oscs_l[i + 1] );
+						&m_osc[i]->m_waveShapeModel,
+						&m_osc[i]->m_modulationAlgoModel,
+						_n->frequency(),
+						m_osc[i]->m_detuningLeft,
+						m_osc[i]->m_phaseOffsetLeft,
+						m_osc[i]->m_volumeLeft,
+						&oscs_l[i + 1] );
 				new (&oscs_r[i]) Oscillator(
-							&m_osc[i]->m_waveShapeModel,
-							&m_osc[i]->m_modulationAlgoModel,
-							_n->frequency(),
-							m_osc[i]->m_detuningRight,
-							m_osc[i]->m_phaseOffsetRight,
-							m_osc[i]->m_volumeRight,
-							&oscs_r[i + 1] );
+						&m_osc[i]->m_waveShapeModel,
+						&m_osc[i]->m_modulationAlgoModel,
+						_n->frequency(),
+						m_osc[i]->m_detuningRight,
+						m_osc[i]->m_phaseOffsetRight,
+						m_osc[i]->m_volumeRight,
+						&oscs_r[i + 1] );
 			}
 
 			oscs_l[i].setUserWave( m_osc[i]->m_sampleBuffer );
