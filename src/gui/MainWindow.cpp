@@ -64,22 +64,24 @@
 
 #include "lmmsversion.h"
 
-#ifdef LMMS_BUILD_LINUX
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BULID_APPLE) && !defined(LMMS_BUILD_HAIKU)
 #include <dlfcn.h>
-//This function is slightly modified from a solution to a KDE bug
-//Found at https://bugs.kde.org/show_bug.cgi?id=337491#c21
-void DisableSystemAccel(QWidget *what)
+//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
+void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
-	void *d = dlopen("libKF5WidgetsAddons.so", RTLD_LAZY);
-	if (!d)
+	void *libraryHandle = dlopen("libKF5WidgetsAddons.so", RTLD_LAZY);
+	if (!libraryHandle) {
+		//KDE not installed, nothing to do.
 		return;
-	using DisablerFunc = void(*)(QWidget*);
-	DisablerFunc setNoAccel;
-	setNoAccel = reinterpret_cast<DisablerFunc>(dlsym(d, "_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
-	if (setNoAccel) {
-		setNoAccel(what);
 	}
-	dlclose(d);
+	using DisablerFunc = void(*)(QWidget*);
+	DisablerFunc setNoAccelerators =
+			reinterpret_cast<DisablerFunc>(dlsym(libraryHandle,
+					"_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+	if (setNoAccelerators) {
+		setNoAccelerators(mainWindow);
+	}
+	dlclose(libraryHandle);
 }
 #endif
 
@@ -94,8 +96,8 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
-#ifdef LMMS_BUILD_LINUX
-	DisableSystemAccel(this);
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BULID_APPLE) && !defined(LMMS_BUILD_HAIKU)
+	disableAutoKeyAccelerators(this);
 #endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
