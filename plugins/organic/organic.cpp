@@ -233,8 +233,9 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		Oscillator * oscs_l[m_numOscillators];
-		Oscillator * oscs_r[m_numOscillators];
+		Oscillator * oscs_all = MM_ALLOC( Oscillator, m_numOscillators*2 );
+		Oscillator * oscs_l = oscs_all;
+		Oscillator * oscs_r = oscs_all + m_numOscillators;
 
 		_n->m_pluginData = new oscPtr;
 
@@ -250,7 +251,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 			if( i == m_numOscillators - 1 )
 			{
 				// create left oscillator
-				oscs_l[i] = new Oscillator(
+				new (&oscs_l[i]) Oscillator(
 						&m_osc[i]->m_waveShape,
 						&m_modulationAlgo,
 						_n->frequency(),
@@ -258,7 +259,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i],
 						m_osc[i]->m_volumeLeft );
 				// create right oscillator
-				oscs_r[i] = new Oscillator(
+				new (&oscs_r[i]) Oscillator(
 						&m_osc[i]->m_waveShape,
 						&m_modulationAlgo,
 						_n->frequency(),
@@ -269,30 +270,30 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 			else
 			{
 				// create left oscillator
-				oscs_l[i] = new Oscillator(
+				 new (&oscs_l[i]) Oscillator(
 						&m_osc[i]->m_waveShape,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetLeft[i],
 						m_osc[i]->m_volumeLeft,
-						oscs_l[i + 1] );
+						&oscs_l[i + 1] );
 				// create right oscillator
-				oscs_r[i] = new Oscillator(
+				 new (&oscs_r[i]) Oscillator(
 						&m_osc[i]->m_waveShape,
 						&m_modulationAlgo,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						static_cast<oscPtr *>( _n->m_pluginData )->phaseOffsetRight[i],
 						m_osc[i]->m_volumeRight,
-						oscs_r[i + 1] );
+						&oscs_r[i + 1] );
 			}
 			
 				
 		}
 
-		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = oscs_l[0];
-		static_cast<oscPtr *>( _n->m_pluginData )->oscRight = oscs_r[0];
+		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = &oscs_l[0];
+		static_cast<oscPtr *>( _n->m_pluginData )->oscRight = &oscs_r[0];
 	}
 
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
@@ -325,11 +326,7 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 
 void organicInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
-						_n->m_pluginData )->oscLeft );
-	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
-						_n->m_pluginData )->oscRight );
-	
+	MM_FREE( static_cast<oscPtr *>(_n->m_pluginData )->oscLeft);
 	delete static_cast<oscPtr *>( _n->m_pluginData );
 }
 
