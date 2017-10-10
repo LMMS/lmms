@@ -836,8 +836,14 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
+		QString templateFile = dirBase + _idx->text() + ".mpt";
+		//KDE adds accelerators to everythng in the menu.
+		if( !QFileInfo::exists(templateFile) ) {
+			templateFile = templateFile.replace('&', "" );
+		}
+
 		Engine::getSong()->createNewProjectFromTemplate(
-			dirBase + _idx->text() + ".mpt" );
+			templateFile );
 	}
 }
 
@@ -909,8 +915,12 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	if ( mayChangeProject(true) )
 	{
-		const QString & f = _action->text();
+		QString f = _action->text();
 		setCursor( Qt::WaitCursor );
+		//KDE adds accelerators to everythng in the menu.
+		if( !QFileInfo::exists(f) ) {
+			f = f.replace('&', "" );
+		}
 		Engine::getSong()->loadProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
