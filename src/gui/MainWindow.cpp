@@ -64,6 +64,24 @@
 
 #include "lmmsversion.h"
 
+#ifdef LMMS_BUILD_LINUX
+#include <dlfcn.h>
+//This function is slightly modified from a solution to a KDE bug
+//Found at https://bugs.kde.org/show_bug.cgi?id=337491#c21
+void DisableSystemAccel(QWidget *what)
+{
+	void *d = dlopen("libKF5WidgetsAddons.so", RTLD_LAZY);
+	if (!d)
+		return;
+	using DisablerFunc = void(*)(QWidget*);
+	DisablerFunc setNoAccel;
+	setNoAccel = reinterpret_cast<DisablerFunc>(dlsym(d, "_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+	if (setNoAccel) {
+		setNoAccel(what);
+	}
+	dlclose(d);
+}
+#endif
 
 
 MainWindow::MainWindow() :
@@ -76,6 +94,9 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
+#ifdef LMMS_BUILD_LINUX
+	DisableSystemAccel(this);
+#endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
 	QWidget * main_widget = new QWidget( this );
@@ -836,14 +857,8 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
-		QString templateFile = dirBase + _idx->text() + ".mpt";
-		//KDE adds accelerators to everythng in the menu.
-		if( !QFileInfo(templateFile).exists() ) {
-			templateFile = templateFile.replace('&', "" );
-		}
-
-		Engine::getSong()->createNewProjectFromTemplate(
-			templateFile );
+		const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
+		Engine::getSong()->createNewProjectFromTemplate(f);
 	}
 }
 
@@ -894,7 +909,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 			}
 
 			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), *it );
+					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
@@ -910,17 +925,12 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 
 
-
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	if ( mayChangeProject(true) )
 	{
-		QString f = _action->text();
+		const QString f = _action->text().replace("&&", "&");
 		setCursor( Qt::WaitCursor );
-		//KDE adds accelerators to everythng in the menu.
-		if( !QFileInfo(f).exists() ) {
-			f = f.replace('&', "" );
-		}
 		Engine::getSong()->loadProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
@@ -1510,7 +1520,7 @@ void MainWindow::fillTemplatesMenu()
 	{
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
+					( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
 		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
 		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);

@@ -130,6 +130,11 @@ if(LMMS_HAVE_OSS AND LMMS_BUILD_OPENBSD)
     SET(EXTRA_LIBRARIES "-lossaudio")
 endif()
 
+if(LMMS_BUILD_LINUX)
+  #libdl is needed for a KDE bug workaround.
+  SET(EXTRA_LIBRARIES "-ldl")
+endif()
+
 IF(LMMS_BUILD_HAIKU)
 	SET(EXTRA_LIBRARIES "-lnetwork")
 ENDIF()
