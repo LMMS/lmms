@@ -42,6 +42,10 @@ class IntModel;
 class EXPORT Oscillator
 {
 	MM_OPERATORS
+	void* operator new( std::size_t, void* p )
+	{
+		return p;
+	}
 public:
 	enum WaveShapes
 	{
