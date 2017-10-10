@@ -1,3 +1,5 @@
+set(CMAKE_C_FLAGS "-std=c11")
+
 add_library(rpmalloc STATIC
 	rpmalloc/rpmalloc/rpmalloc.c
 	rpmalloc/rpmalloc/rpmalloc.h
