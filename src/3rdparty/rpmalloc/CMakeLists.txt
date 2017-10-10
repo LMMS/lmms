@@ -17,7 +17,7 @@ endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(rpmalloc
-		PRIVATE -DENABLE_ASSERTS -DENABLE_VALIDATE_ARGS
+		PRIVATE -DENABLE_ASSERTS=1 -DENABLE_VALIDATE_ARGS=1
 	)
 endif()
 
@@ -25,6 +25,6 @@ option(LMMS_ENABLE_MALLOC_STATS "Enables statistics for rpmalloc" OFF)
 
 if (LMMS_ENABLE_MALLOC_STATS)
 	target_compile_definitions(rpmalloc
-		PRIVATE -DENABLE_STATISTICS
+		PRIVATE -DENABLE_STATISTICS=1
 	)
 endif()
