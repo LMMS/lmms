@@ -47,7 +47,7 @@ std::unique_ptr<PluginFactory> PluginFactory::s_instance;
 PluginFactory::PluginFactory()
 {
 	// Adds a search path relative to the main executable if the path exists.
-	auto addRelativeIfExists = [this] (const QString& path) {
+	auto addRelativeIfExists = [](const QString & path) {
 		QDir dir(qApp->applicationDirPath());
 		if (!path.isEmpty() && dir.cd(path)) {
 			QDir::addSearchPath("plugins", dir.absolutePath());
