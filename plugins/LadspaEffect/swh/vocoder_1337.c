@@ -47,7 +47,7 @@ struct bandpasses
   LADSPA_Data y[MAX_BANDS];
 };
 
-void inline doBandpasses(struct bandpasses *bands, LADSPA_Data sample, int num_bands);
+void doBandpasses(struct bandpasses *bands, LADSPA_Data sample, int num_bands);
 
 struct bands_out{
   LADSPA_Data decay[MAX_BANDS];
@@ -65,7 +65,7 @@ const LADSPA_Data decay_table[] =
   1/250.0, 1/250.0, 1/250.0
 };
 
-void inline doBandpasses(struct bandpasses *bands, LADSPA_Data sample, int num_bands)
+void doBandpasses(struct bandpasses *bands, LADSPA_Data sample, int num_bands)
 {
   int i;
   for (i=0; i < num_bands; i++)
