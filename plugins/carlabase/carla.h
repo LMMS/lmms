@@ -25,6 +25,8 @@
 #ifndef CARLA_H
 #define CARLA_H
 
+#include <QtCore/QMutex>
+
 #include "CarlaNative.h"
 
 #include "Instrument.h"
