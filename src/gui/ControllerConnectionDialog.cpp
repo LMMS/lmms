@@ -32,7 +32,7 @@
 
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
-#include "MidiController.h"
+#include "MidiCustomController.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
 #include "Mixer.h"
@@ -47,12 +47,43 @@
 #include "embed.h"
 
 
+QString enumToString(MidiEventTypes midi)
+{
+	switch (midi){
+		case 	MidiNoteOff:
+			return QString("MidiNoteOff");
+			break;
+		case MidiNoteOn:
+			return QString("MidiNoteOn");
+			break;
+		case MidiKeyPressure:
+			return QString("MidiKeyPressure");
+			break;
+		case MidiControlChange:
+			return QString("MidiControlChange");
+			break;
+		case MidiProgramChange:
+			return QString("MidiProgramChange");
+			break;
+		case MidiChannelPressure:
+			return QString("MidiChannelPressure");
+			break;
+		case MidiPitchBend:
+			return QString("MidiPitchBend");
+			break;
+		default:
+			return QString("Unheld message");
+			break;
+		}
+}
 
-class AutoDetectMidiController : public MidiController
+
+
+class AutoDetectMidiController : public MidiCustomController
 {
 public:
 	AutoDetectMidiController( Model* parent ) :
-		MidiController( parent ),
+		MidiCustomController( parent ),
 		m_detectedMidiChannel( 0 ),
 		m_detectedMidiController( 0 )
 	{
@@ -80,7 +111,7 @@ public:
 				m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
 
 				useDetected(); //setta il controller
-				MidiController::processInEvent(event,time,offset); //Colling base class event to trigger actions and signal
+				MidiCustomController::processInEvent(event,time,offset); //Colling base class event to trigger actions and signal
 //				emit valueChanged(); //Not necessary anymore
 			}
 	}
@@ -88,9 +119,9 @@ public:
 
 	// Would be a nice copy ctor, but too hard to add copy ctor because
 	// model has none.
-	MidiController* copyToMidiController( Model* parent )
+	MidiCustomController* copyToMidiController( Model* parent )
 	{
-		MidiController* c = new MidiController( parent );
+		MidiCustomController* c = new MidiCustomController( parent );
 		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
 		c->m_midiPort.setInputController( m_midiPort.inputController() );
 		c->subscribeReadablePorts( m_midiPort.readablePorts() );
@@ -196,40 +227,41 @@ connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 		QFont font;
 		font.setPointSize(8);
 		font.setBold(true);
-		m_VelocityLabel = new QLabel( m_midiGroupBox );
-		m_VelocityLabel->setStyleSheet("border: 1px solid grey ;color: red");
-		m_VelocityLabel->setFont(font);
-		m_VelocityLabel->setGeometry(150,24,40,15);
-		m_VelocityLabel->setMargin(1);
-		m_VelocityLabel->setText(tr("Velocity"));
+		m_ControllerTypeLabel = new QLabel( m_midiGroupBox );
+		m_ControllerTypeLabel->setStyleSheet("border: 1px solid grey ;color: red");
+		m_ControllerTypeLabel->setFont(font);
+		m_ControllerTypeLabel->setGeometry(150,24,105,15);
+		m_ControllerTypeLabel->setMargin(1);
+		m_ControllerTypeLabel->setText(tr("Controller message"));
 
-
-		QLabel * m_ControllerLabel = new QLabel( m_midiGroupBox );
-		m_ControllerLabel->setGeometry(195,24,40,15);
-		m_ControllerLabel->setStyleSheet("border: 1px solid grey; color: red");
-		m_ControllerLabel->setFont(font);
-		m_ControllerLabel->setMargin(1);
-		m_ControllerLabel->setText(tr("Controller"));
-
-		QLabel * m_KeyLabel = new QLabel( m_midiGroupBox );
+		m_KeyLabel = new QLabel( m_midiGroupBox );
 		m_KeyLabel->setGeometry(150,40,40,15);
-		m_KeyLabel->setStyleSheet("border: 1px solid grey; color: red");
+		m_KeyLabel->setStyleSheet("border: 1px solid grey; color: orange");
 		m_KeyLabel->setFont(font);
 		m_KeyLabel->setMargin(1);
 		m_KeyLabel->setText(tr("Key"));
-		QLabel * m_PanningLabel = new QLabel( m_midiGroupBox );
-		m_PanningLabel->setGeometry(195,40,40,15);
-		m_PanningLabel->setStyleSheet("border: 1px solid grey; color: red");
-		m_PanningLabel->setFont(font);
-		m_PanningLabel->setMargin(1);
-		m_PanningLabel->setText(tr("Panning"));
 
-		QLabel * m_PitchLabel = new QLabel( m_midiGroupBox );
-		m_PitchLabel->setGeometry(150,56,40,15);
-		m_PitchLabel->setStyleSheet("border: 1px solid grey; color: red");
+		m_VelocityLabel = new QLabel( m_midiGroupBox );
+		m_VelocityLabel->setGeometry(150,56,40,15);
+		m_VelocityLabel->setStyleSheet("border: 1px solid grey; color: orange");
+		m_VelocityLabel->setFont(font);
+		m_VelocityLabel->setMargin(1);
+		m_VelocityLabel->setText(tr("Velocity"));
+
+		m_PitchLabel = new QLabel( m_midiGroupBox );
+		m_PitchLabel->setGeometry(195,40,60,15);
+		m_PitchLabel->setStyleSheet("border: 1px solid grey; color: orange");
 		m_PitchLabel->setFont(font);
 		m_PitchLabel->setMargin(1);
 		m_PitchLabel->setText(tr("Pitch"));
+
+		m_ValueLabel = new QLabel( m_midiGroupBox );
+		m_ValueLabel->setGeometry(195,56,60,15);
+		m_ValueLabel->setStyleSheet("border: 2px solid grey; color: green");
+		m_ValueLabel->setFont(font);
+		m_ValueLabel->setMargin(1);
+		m_ValueLabel->setText(tr("Value"));
+
 		//RIKIS
 	}
 
@@ -316,7 +348,7 @@ connect( m_midiGroupBox->model(), SIGNAL( dataChanged() ),
 							// ensure controller is created
 							midiToggled();
 
-							MidiController * cont = (MidiController*)( cc->getController() );
+							MidiCustomController * cont = (MidiCustomController*)( cc->getController() );
 							m_midiChannelSpinBox->model()->setValue( cont->m_midiPort.inputChannel() );
 							m_midiControllerSpinBox->model()->setValue( cont->m_midiPort.inputController() );
 
@@ -364,7 +396,7 @@ void ControllerConnectionDialog::selectController()
 		{
 			if( m_midiControllerSpinBox->model()->value() > 0 )
 				{
-					MidiController * mc;
+					MidiCustomController * mc;
 					mc = m_midiController->copyToMidiController( Engine::getSong() );
 					mc->m_midiPort.setName( m_targetModel->fullDisplayName() );
 					m_controller = mc;
@@ -485,10 +517,9 @@ void ControllerConnectionDialog::enableAutoDetect( QAction * _a )
 
 void ControllerConnectionDialog::setLabelText()
 {
-		m_VelocityLabel->setText(QString::number(m_midiController->getLastValue()));
+	m_ControllerTypeLabel->setText(enumToString(m_midiController->getMidiType()));
+	m_KeyLabel->setText(QString::number(m_midiController->getMidiKey()));
+	m_VelocityLabel->setText(QString::number(m_midiController->getMidiVelocity()));
+	m_PitchLabel->setText(QString::number(m_midiController->getMidiPitchbend()));
+	m_ValueLabel->setText(QString::number(m_midiController->getLastValue()));
 }
-
-
-
-
-

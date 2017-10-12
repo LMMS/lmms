@@ -2,7 +2,7 @@
  * MidiController.h - A controller to receive MIDI control-changes
  *
  * Copyright (c) 2008 Paul Giblock <drfaygo/at/gmail.com>
- *
+ * 
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -22,13 +22,13 @@
  *
  */
 
-#ifndef MIDI_CONTROLLER_H
-#define MIDI_CONTROLLER_H
+#ifndef MIDI_CUSTOMCONTROLLER_H
+#define MIDI_CUSTOMCONTROLLER_H
 
 #include <QWidget>
 
 #include "AutomatableModel.h"
-#include "Controller.h"
+#include "MidiController.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 
@@ -36,12 +36,21 @@
 class MidiPort;
 
 
-class MidiController : public Controller, public MidiEventProcessor
+class MidiCustomController : public MidiController
 {
 	Q_OBJECT
 public:
-	MidiController( Model * _parent );
-	virtual ~MidiController();
+
+	//RIKIS
+	//each element will display its own behaviour end be receptive to certain events
+//	enum ControllerElements {
+//		knob,slider,button,wheel,original //the original enum makes the controller behave without the enhancement (compatibility issues)
+//	};
+	//RIKIS
+
+
+	MidiCustomController( Model * _parent );
+	virtual ~MidiCustomController();
 
 	virtual void processInEvent( const MidiEvent & _me,
 					const MidiTime & _time, f_cnt_t offset = 0 );
@@ -64,6 +73,14 @@ public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
 	void updateName();
 
+	//Convenience classes for displaying values
+	float getLastValue(){return m_lastValue;}
+	int getMidiControllerValue(){return m_MidiControllerValue ;}
+	int getMidiVelocity(){return m_MidiVelocity ;}
+	int getMidiKey(){return m_MidiKey ;}
+	int getMidiPanning(){return m_MidiPanning ;}
+	int getMidiPitchbend(){return m_MidiPitchbend ;}
+	MidiEventTypes getMidiType(){return m_MidiType;}
 
 protected:
 	// The internal per-controller get-value function
@@ -72,6 +89,12 @@ protected:
 
 	MidiPort m_midiPort;
 
+	int m_MidiControllerValue;
+	int m_MidiVelocity;
+	int m_MidiKey;
+	int m_MidiPanning;
+	int m_MidiPitchbend;
+	MidiEventTypes m_MidiType;
 
 	float m_lastValue;
 	float m_previousValue;

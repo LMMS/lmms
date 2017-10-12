@@ -90,7 +90,11 @@ private:
 	BoolModel m_midiAutoDetect;
 
 	//RIKIS
+	QLabel * m_ValueLabel;
+	QLabel * m_ControllerTypeLabel;
+	QLabel * m_KeyLabel;
 	QLabel * m_VelocityLabel;
+	QLabel * m_PitchLabel;
 	//RIKIS
 
 
