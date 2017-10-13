@@ -2710,7 +2710,7 @@ void TrackView::dropEvent( QDropEvent * de )
  */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
-	if(me->x()>10) // 10 = The width of the grip + 2 pixels to the left and right.
+	if( me->x()>10 ) // 10 = The width of the grip + 2 pixels to the left and right.
 	{
 		QWidget::mousePressEvent( me );
 		return;
