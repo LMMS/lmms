@@ -325,7 +325,7 @@ TrackOperationsWidget > QPushButton::menu-indicator {
 
 TrackOperationsWidget > QPushButton::menu-indicator:pressed,
 TrackOperationsWidget > QPushButton::menu-indicator:checked {
-	image: url(resources:trackop_c.png);
+	image: url(resources:trackop.png);
 	position: relative;
 	top: 2px;
 }
