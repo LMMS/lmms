@@ -67,6 +67,7 @@ OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
+OPTION(WANT_DEBUG_RTIME "Debug render times" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -469,6 +470,17 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
+IF(WANT_DEBUG_RTIME)
+	IF(LMMS_BUILD_LINUX)
+		SET(LMMS_DEBUG_RENDERTIME TRUE)
+		SET (STATUS_DEBUG_RTIME "Enabled")
+	ELSE()
+		SET (STATUS_DEBUG_RTIME "Wanted but disabled due to unsupported platform")
+	ENDIF()
+ELSE()
+	SET (STATUS_DEBUG_RTIME "Disabled")
+ENDIF(WANT_DEBUG_RTIME)
+
 
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
@@ -654,6 +666,7 @@ MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
 "* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Debug render times          : ${STATUS_DEBUG_RTIME}\n"
 )
 
 MESSAGE(
