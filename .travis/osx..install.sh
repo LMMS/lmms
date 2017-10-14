@@ -23,18 +23,8 @@ done;
 brew install $PACKAGES
 
 # Recompile fluid-synth without CoreAudio per issues #649
-# Changes to fluid-synth.rb must be pushed to URL prior to use
-if [ "$TRAVIS_EVENT_TYPE" == "pull_request" ]; then
-	slug=$TRAVIS_PULL_REQUEST_SLUG
-	branch=$TRAVIS_PULL_REQUEST_BRANCH
-elif "${TRAVIS}"; then
-	slug=$TRAVIS_REPO_SLUG
-	branch=$TRAVIS_BRANCH
-else
-	slug="LMMS/lmms"
-	branch=$(git symbolic-ref --short HEAD)
-fi
+# Ruby formula must be a URL
 
-brew install --build-from-source "https://raw.githubusercontent.com/${slug}/${branch}/cmake/apple/fluid-synth.rb"
+brew install --build-from-source "https://gist.githubusercontent.com/tresf/c9260c43270abd4ce66ff40359588435/raw/fluid-synth.rb"
 
 sudo npm install -g appdmg
