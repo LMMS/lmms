@@ -128,7 +128,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 }
 
 
-void NotePlayHandle::done()
+NotePlayHandle::~NotePlayHandle()
 {
 	lock();
 	noteOff( 0 );
@@ -599,7 +599,7 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 
 void NotePlayHandleManager::release( NotePlayHandle * nph )
 {
-	nph->done();
+	nph->NotePlayHandle::~NotePlayHandle();
 	s_mutex.lockForRead();
 	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
 	s_mutex.unlock();
