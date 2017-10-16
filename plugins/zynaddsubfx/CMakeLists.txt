@@ -24,9 +24,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-d
 IF(LMMS_BUILD_WIN32)
 	# link system-libraries
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
-	# fix X11 headers errors caused by bug with mingw + c++11
-	REMOVE_DEFINITIONS(-std=c++0x)
-	ADD_DEFINITIONS(-std=gnu++0x) 
+	# fix X11 headers errors caused by bug with mingw + c++11 (enable -std=gnu++0x)
+	SET(CMAKE_CXX_EXTENSIONS ON)
 ENDIF(LMMS_BUILD_WIN32)
 
 SET(FLTK_SKIP_OPENGL TRUE)
