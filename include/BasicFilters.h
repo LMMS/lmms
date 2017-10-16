@@ -218,7 +218,7 @@ private:
 };
 typedef OnePole<2> StereoOnePole;
 
-template<ch_cnt_t CHANNELS>
+template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS>
 class BasicFilters
 {
 	MM_OPERATORS

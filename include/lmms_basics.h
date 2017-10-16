@@ -31,7 +31,7 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_STDINT_H
-#include <stdint.h>
+#include <cstdint>
 #endif
 
 
@@ -59,6 +59,9 @@ typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 #define likely(x)	Q_LIKELY(x)
 #define unlikely(x)	Q_UNLIKELY(x)
 
+// windows headers define "min" and "max" macros, breaking the methods bwloe
+#undef min
+#undef max
 
 template<typename T>
 struct typeInfo
