@@ -66,8 +66,7 @@ public:
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle() {}
-	void done();
+	virtual ~NotePlayHandle();
 
 	void * operator new ( size_t size, void * p )
 	{
