@@ -1,7 +1,3 @@
-IF(LMMS_HAVE_WEAKJACK)
-	set(WEAKJACK core/audio/AudioWeakJack.c)
-ENDIF()
-	
 set(LMMS_SRCS
 	${LMMS_SRCS}
 	core/AutomatableModel.cpp
@@ -76,7 +72,6 @@ set(LMMS_SRCS
 	core/audio/AudioFileMP3.cpp
 	core/audio/AudioFileOgg.cpp
 	core/audio/AudioFileWave.cpp
-	${WEAKJACK}
 	core/audio/AudioJack.cpp
 	core/audio/AudioOss.cpp
 	core/audio/AudioSndio.cpp
@@ -98,6 +93,10 @@ set(LMMS_SRCS
 	core/midi/MidiPort.cpp
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
-
-	PARENT_SCOPE
 )
+
+IF(LMMS_HAVE_WEAKJACK)
+	set(LMMS_SRCS ${LMMS_SRCS} core/audio/WeakJack.c)
+ENDIF()
+
+set(LMMS_SRC ${LMMS_SRC} PARENT_SCOPE)
