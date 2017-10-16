@@ -56,8 +56,8 @@ typedef uint16_t fx_ch_t;			// FX-channel (0 to MAX_EFFECT_CHANNEL)
 typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 
 // use for improved branch prediction
-#define likely(x)	__builtin_expect((x),1)
-#define unlikely(x)	__builtin_expect((x),0)
+#define likely(x)	Q_LIKELY(x)
+#define unlikely(x)	Q_UNLIKELY(x)
 
 
 template<typename T>
