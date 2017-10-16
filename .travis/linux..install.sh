@@ -9,7 +9,7 @@ PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libmp3lame-dev
 PACKAGES="$PACKAGES libjack0"
 
 if [ $QT5 ]; then
-	PACKAGES="$PACKAGES qtbase5-dev qttools5-dev-tools qttools5-dev"
+	PACKAGES="$PACKAGES qt58base qt58translations qt58tools"
 else
 	PACKAGES="$PACKAGES libqt4-dev"
 fi
