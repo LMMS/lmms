@@ -28,12 +28,8 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
-#ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #include <jack/midiport.h>
-#else
-#include "AudioWeakJack.h"
-#endif
 
 #include <QtCore/QThread>
 #include <QMutex>
