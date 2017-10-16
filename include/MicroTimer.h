@@ -27,16 +27,19 @@
 
 #include "lmmsconfig.h"
 
-#ifdef LMMS_HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
+#include <chrono>
 #include <cstdlib>
 #include "lmms_basics.h"
 
 
 class MicroTimer
 {
+	using clock = std::chrono::steady_clock;
+	using time_point = std::chrono::steady_clock::time_point;
+
+	static_assert (std::ratio_less_equal<clock::duration::period,
+		std::micro>::value, "MicroTimer: steady_clock doesn't support microsecond resolution");
+
 public:
 	inline MicroTimer()
 	{
@@ -49,21 +52,18 @@ public:
 
 	inline void reset()
 	{
-		gettimeofday( &begin, NULL );
+		begin = clock::now();
 	}
 
 	inline int elapsed() const
 	{
-		struct timeval now;
-		gettimeofday( &now, NULL );
-		return ( now.tv_sec - begin.tv_sec ) * 1000 * 1000 +
-					( now.tv_usec - begin.tv_usec );
+		auto now = clock::now();
+		return std::chrono::duration_cast<std::chrono::duration<int, std::micro>>(now - begin).count();
 	}
 
 
 private:
-	struct timeval begin;
-
+	time_point begin;
 } ;
 
 
