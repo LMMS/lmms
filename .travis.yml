@@ -6,7 +6,6 @@ dist: trusty
 sudo: required
 cache:
     directories:
-        - apt_mingw_cache
         - $HOME/.ccache
 matrix:
     include:
