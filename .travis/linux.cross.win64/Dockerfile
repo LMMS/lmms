@@ -9,7 +9,7 @@ RUN \
     apt-get install --no-install-recommends -y --force-yes \
         git \
         cmake \
-		pkgconfig \
+		pkg-config \
         make \
         nsis \
         tofrodos \
