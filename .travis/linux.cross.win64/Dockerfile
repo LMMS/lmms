@@ -16,7 +16,7 @@ RUN \
 		qt4-linguist-tools \
 		g++-mingw-w64 \
 		qt5base-mingw-w64 \
-		sdl-mingw-w64
+		sdl-mingw-w64 \
 		libvorbis-mingw-w64 \
 		fluidsynth-mingw-w64 \
 		stk-mingw-w64 \
