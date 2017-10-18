@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
+set -e
 
-CPUS=$(cat /proc/cpuinfo | grep bogo | wc -l)
+CPUS=$(grep -c bogo /proc/cpuinfo)
 
 cd /lmms
 
 mkdir build
 cd build
 
-../cmake/build_mingw$1.sh
+../cmake/build_mingw"$1".sh
 
-echo Building on $CPUS CPUs
+echo Building on "$CPUS" CPUs
 make -j$((CPUS+1))
 
 make package
