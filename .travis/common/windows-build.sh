@@ -14,4 +14,4 @@ make -j$((CPUS+1))
 
 make package
 
-mv -v *setup.exe /lmms
+mv -v lmms-*.exe /lmms
