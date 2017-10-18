@@ -14,6 +14,7 @@ RUN \
         nsis \
         tofrodos \
 		g++-mingw-w64 \
+		libz-mingw-w64-dev \
 		qt5base-mingw-w64 \
 		qt5tools-mingw-w64 \
 		qt5translations-mingw-w64 \
