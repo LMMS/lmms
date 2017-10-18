@@ -1,5 +1,7 @@
 language: cpp
 compiler: gcc
+services:
+    - docker
 dist: trusty
 sudo: required
 cache:
@@ -14,14 +16,11 @@ matrix:
         - os: osx
           osx_image: xcode8.2
         - env: QT5=True
-        - env: QT5=True TARGET_OS=win32
-        - env: QT5=True TARGET_OS=win64
         - os: osx
           env: QT5=True
 install: ${TRAVIS_BUILD_DIR}/.travis/install.sh
 script: ${TRAVIS_BUILD_DIR}/.travis/script.sh
 after_script: ${TRAVIS_BUILD_DIR}/.travis/after_script.sh
-before_deploy: make package
 deploy:
     provider: releases
     api_key:
@@ -31,5 +30,5 @@ deploy:
     on:
         tags: true
         all_branches: true
-        condition: '("$TARGET_OS" = win??) && "$QT5"'
+        condition: '("$TARGET_OS" = win??)'
     repo: LMMS/lmms
