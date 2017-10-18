@@ -3,7 +3,7 @@ MAINTAINER Tobias Junghans <tobydox@users.sf.net>
 
 RUN \
     apt-get update && \
-    apt-get install -y software-properties-common && \
+    apt-get install --no-install-recommends -y software-properties-common && \
     add-apt-repository -y "ppa:tobydox/mingw-w64" && \
     apt-get update && \
     apt-get install --no-install-recommends -y --force-yes \
