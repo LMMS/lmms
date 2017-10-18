@@ -13,9 +13,10 @@ RUN \
         make \
         nsis \
         tofrodos \
-		qt4-linguist-tools \
 		g++-mingw-w64 \
 		qt5base-mingw-w64 \
+		qt5tools-mingw-w64 \
+		qt5translations-mingw-w64 \
 		sdl-mingw-w64 \
 		libvorbis-mingw-w64 \
 		fluidsynth-mingw-w64 \
