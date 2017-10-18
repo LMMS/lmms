@@ -33,15 +33,11 @@
 #define _USE_GNU 1
 
 /* unlocking some standard math calls. */
-#define __USE_ISOC99 1
-#define __USE_ISOC9X 1
-#define _ISOC99_SOURCE 1
-#define _ISOC9X_SOURCE 1
 
 #include <stdlib.h>
 #include <string.h>
 
-#include <math.h>
+#include <cmath>
 
 #include <assert.h>
 #include <stdio.h>
@@ -184,7 +180,7 @@ class Plugin {
 		inline sample_t getport_unclamped (int i)
 			{
 				sample_t v = *ports[i];
-				return (isinf (v) || isnan(v)) ? 0 : v;
+				return (std::isinf (v) || std::isnan(v)) ? 0 : v;
 			}
 
 		/* get port value and clamp to port range */

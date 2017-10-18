@@ -28,6 +28,8 @@
 #ifndef _DSP_WINDOWS_H_ 
 #define _DSP_WINDOWS_H_
 
+#include <cmath>
+
 namespace DSP {
 	
 /* prototypes for window value application ... */
@@ -147,7 +149,7 @@ kaiser (sample_t * s, int n, double beta)
 		double k = besseli ((beta * sqrt (1 - pow ((2 * i / (n - 1)), 2)))) / bb;
 
 		/* can you spell hack */
-		if (!isfinite (k) || isnan(k))
+		if (std::isinf(k) || std::isnan(k))
 			k = 0;
 
 		F (s[si], k);
