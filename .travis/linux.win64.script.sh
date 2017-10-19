@@ -3,4 +3,5 @@
 set -e
 
 export CMAKE_OPTS="$CMAKE_FLAGS -DUSE_WERROR=ON"
-../cmake/build_mingw64.sh
+docker run -v "${TRAVIS_BUILD_DIR}":/lmms:rw lmms-build /bin/sh /lmms/.travis/linux.cross.win64/script.sh
+

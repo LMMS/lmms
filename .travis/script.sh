@@ -10,6 +10,10 @@ if [ "$TYPE" = 'style' ]; then
 	# shellcheck disable=SC2046
 	shellcheck $(find -O3 "$TRAVIS_BUILD_DIR/.travis/" "$TRAVIS_BUILD_DIR/cmake/" -type f -name '*.sh' -o -name "*.sh.in")
 
+elif [[ $TARGET_OS == "win32" || $TARGET_OS == "win64" ]] ; then
+
+	"$TRAVIS_BUILD_DIR/.travis/$TRAVIS_OS_NAME.$TARGET_OS.script.sh"
+
 else
 
 	mkdir build

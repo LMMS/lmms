@@ -218,7 +218,7 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 	m_arpCycleModel( 0.0f, 0.0f, 6.0f, 1.0f, this, tr( "Cycle steps" ) ),
 	m_arpSkipModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Skip rate" ) ),
 	m_arpMissModel( 0.0f, 0.0f, 100.0f, 1.0f, this, tr( "Miss rate" ) ),
-	m_arpTimeModel( 100.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
+	m_arpTimeModel( 200.0f, 25.0f, 2000.0f, 1.0f, 2000, this, tr( "Arpeggio time" ) ),
 	m_arpGateModel( 100.0f, 1.0f, 200.0f, 1.0f, this, tr( "Arpeggio gate" ) ),
 	m_arpDirectionModel( this, tr( "Arpeggio direction" ) ),
 	m_arpModeModel( this, tr( "Arpeggio mode" ) )
@@ -332,14 +332,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 		frames_processed += remaining_frames_for_cur_arp;
 
-		// init with zero
-		int cur_arp_idx = 0;
-
 		// in sorted mode: is it our turn or do we have to be quiet for
 		// now?
 		if( m_arpModeModel.value() == SortMode &&
 				( ( cur_frame / arp_frames ) % total_range ) / range != (f_cnt_t) _n->index() )
 		{
+			// Set master note if not playing arp note or it will play as an ordinary note
+			_n->setMasterNote();
 			// update counters
 			frames_processed += arp_frames;
 			cur_frame += arp_frames;
@@ -352,10 +351,9 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 
 			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
 			{
-				if( cur_arp_idx == 0 )
-				{
-					_n->setMasterNote();
-				}
+				// Set master note to prevent the note to extend over skipped notes
+				// This may only be needed for lb302
+				_n->setMasterNote();
 				// update counters
 				frames_processed += arp_frames;
 				cur_frame += arp_frames;
@@ -376,6 +374,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			}
 		}
 
+		int cur_arp_idx = 0;
 		// process according to arpeggio-direction...
 		if( dir == ArpDirUp )
 		{
@@ -526,6 +525,13 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			cur_frame += arp_frames;
 
 		} // end cst.active block
+	}
+
+	// make sure note is handled as arp-base-note, even
+	// if we didn't add a sub-note so far
+	if( m_arpModeModel.value() != FreeMode )
+	{
+		_n->setMasterNote();
 	}
 }
 

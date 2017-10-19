@@ -8,7 +8,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Enable C++11
-ADD_DEFINITIONS(-std=c++0x)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 IF(LMMS_BUILD_APPLE)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -172,24 +172,15 @@ IF(LMMS_BUILD_WIN32)
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
 
-	IF(QT5)
-		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/Qt5Core.dll"
-					"${MINGW_PREFIX}/bin/Qt5Gui.dll"
-					"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
-					"${MINGW_PREFIX}/bin/Qt5Xml.dll"
-				DESTINATION .)
-		INSTALL(FILES
-					"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
-				DESTINATION ./platforms)
-	ELSE()
-		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/QtCore4.dll"
-					"${MINGW_PREFIX}/bin/QtGui4.dll"
-					"${MINGW_PREFIX}/bin/QtSvg4.dll"
-					"${MINGW_PREFIX}/bin/QtXml4.dll"
-				DESTINATION .)
-	ENDIF()
+	INSTALL(FILES
+				"${MINGW_PREFIX}/bin/Qt5Core.dll"
+				"${MINGW_PREFIX}/bin/Qt5Gui.dll"
+				"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
+				"${MINGW_PREFIX}/bin/Qt5Xml.dll"
+			DESTINATION .)
+	INSTALL(FILES
+				"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
+			DESTINATION ./platforms)
 
 	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
@@ -197,7 +188,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libvorbis-0.dll"
 					"${MINGW_PREFIX}/bin/libvorbisenc-2.dll"
 					"${MINGW_PREFIX}/bin/libvorbisfile-3.dll"
-					"${MINGW_PREFIX}/bin/libjpeg-9.dll"
+					"${MINGW_PREFIX}/bin/libjpeg-62.dll"
 					"${MINGW_PREFIX}/bin/libogg-0.dll"
 					"${MINGW_PREFIX}/bin/libmp3lame-0.dll"
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
@@ -206,23 +197,31 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/SDL.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
-					"${MINGW_PREFIX}/bin/zlib1.dll"
-					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
 				DESTINATION .)
 	IF(LMMS_BUILD_MSYS)
 		INSTALL(FILES
+					"${MINGW_PREFIX}/bin/zlib1.dll"
 					"${MINGW_PREFIX}/bin/libwinpthread-1.dll"
 					"${MINGW_PREFIX}/bin/libgcc_s_seh-1.dll"
 					"${MINGW_PREFIX}/bin/libstdc++-6.dll"
 				DESTINATION .)
 	ELSE()
+		SET(DLLDIR_GCC "/usr/lib/gcc/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/6.3-win32")
+		IF(WIN64)
+			SET(DLL_GCC "libgcc_s_seh-1.dll")
+		ELSE()
+			SET(DLL_GCC "libgcc_s_sjlj-1.dll")
+		ENDIF()
 		INSTALL(FILES
-					"${MINGW_PREFIX}/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32/bin/libwinpthread-1.dll"
+					"${MINGW_PREFIX}/lib/zlib1.dll"
+					"${MINGW_PREFIX}/lib/libwinpthread-1.dll"
+					"${DLLDIR_GCC}/libstdc++-6.dll"
+					"${DLLDIR_GCC}/${DLL_GCC}"
 				DESTINATION .)
 	ENDIF()
 	IF(FLTK_FOUND)
 		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/libfltk.dll"
+					"${MINGW_PREFIX}/bin/libfltk_SHARED.dll"
 				DESTINATION .)
 	ENDIF()
 	IF(FLUIDSYNTH_FOUND)
@@ -239,12 +238,12 @@ IF(LMMS_BUILD_WIN32)
 	ENDIF()
 	IF(PORTAUDIO_FOUND)
 		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/libportaudio-2.dll"
+					"${MINGW_PREFIX}/bin/libportaudio.dll"
 				DESTINATION .)
 	ENDIF()
 	IF(SOUNDIO_FOUND)
 		INSTALL(FILES
-					"${MINGW_PREFIX}/lib/libsoundio.dll"
+					"${MINGW_PREFIX}/bin/libsoundio.dll"
 				DESTINATION .)
 	ENDIF()
 
