@@ -1,18 +1,77 @@
 version: 2
+
+shared:
+  restore_cache: &restore_cache
+    restore_cache:
+      keys:
+        - ccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}
+        - ccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
+        - ccache-{{ arch }}
+  save_cache: &save_cache
+    save_cache:
+      key: ccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .BuildNum }}
+      paths:
+        - ~/.ccache
+
+  ccache_stats: &ccache_stats
+    run:
+      name: Print ccache statistics
+      command: |
+        echo "[ccache config]"
+        ccache -p
+        echo "[ccache stats]"
+        ccache -s
+
+  common_environment: &common_environment
+    QT5: True
+    CMAKE_OPTS: -DWANT_QT5=ON -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_CCACHE=ON
+    CCACHE_MAXSIZE: 500M
+    CCACHE_LOGFILE: /tmp/ccache.log
+
 jobs:
-  build:
+  mingw32:
+    environment:
+      <<: *common_environment
     docker:
-      - image: lukaswhl/lmms-ci-gcc
+      - image: lukaswhl/lmms-ci-linux.mingw32:14.04
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - ccache-{{ .Branch }}-{{ .BuildNum }}
-            - ccache-{{ .Branch }}
-            - ccache
+      - *restore_cache
+      - run:
+          name: Building
+          command: |
+            mkdir build && cd build
+            ../cmake/build_mingw32.sh
+            make -j2
+      - *ccache_stats
+      - *save_cache
+  mingw64:
+    environment:
+      <<: *common_environment
+    docker:
+      - image: lukaswhl/lmms-ci-linux.mingw64:14.04
+    steps:
+      - checkout
+      - *restore_cache
+      - run:
+          name: Building
+          command: |
+            mkdir build && cd build
+            ../cmake/build_mingw64.sh
+            make -j2
+      - *ccache_stats
+      - *save_cache
+  linux.gcc:
+    docker:
+      - image: lukaswhl/lmms-ci-linux.gcc:14.04
+    environment:
+      <<: *common_environment
+    steps:
+      - checkout
+      - *restore_cache
       - run:
           name: Configuring
-          command: mkdir build && cd build && cmake .. -DWANT_QT5=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_CCACHE=ON
+          command: mkdir build && cd build && cmake .. $CMAKE_OPTS
       - run:
           name: Building
           command: cd build && make -j4
@@ -22,15 +81,15 @@ jobs:
       - run:
           name: Running tests
           command: build/tests/tests
-      - save_cache:
-          key: ccache-{{ .Branch }}-{{ .BuildNum }}
-          paths:
-            - ~/.ccache
-      - save_cache:
-          key: ccache-{{ .Branch }}
-          paths:
-            - ~/.ccache
-      - save_cache:
-          key: ccache
-          paths:
-            - ~/.ccache
+      - *ccache_stats
+      - *save_cache
+      - store_artifacts:
+          path: /tmp/ccache.log
+          destination: ccache.log
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - mingw32
+      - mingw64
+      - linux.gcc
