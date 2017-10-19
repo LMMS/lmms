@@ -1078,7 +1078,7 @@ void sf2InstrumentView::showFileDialog()
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
-	types << tr( "SoundFont2 Files (*.sf2)" );
+	types << tr( "SoundFont Files (*.sf2 *.sf3)" );
 	ofd.setNameFilters( types );
 
 	if( k->m_filename != "" )
