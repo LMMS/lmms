@@ -18,6 +18,7 @@ DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 STRIP=""
 
 # Don't strip for Debug|RelWithDebInfo builds
+# shellcheck disable=SC2193
 if [[ "@CMAKE_BUILD_TYPE@" == *"Deb"* ]]; then
 	STRIP="-no-strip"
 fi
@@ -51,7 +52,8 @@ fi
 echo -e "\nWriting verbose output to \"${LOGFILE}\""
 
 # Ensure linuxdeployqt uses the same qmake version as cmake
-export PATH="$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+export PATH
+PATH="$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
 
 # Fetch portable linuxdeployqt if cache is older than $DAYSOLD
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
