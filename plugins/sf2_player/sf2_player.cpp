@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"sf2",
+	"sf2,sf3",
 	NULL
 } ;
 
