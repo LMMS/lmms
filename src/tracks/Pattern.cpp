@@ -271,7 +271,7 @@ Note * Pattern::noteAtStep( int _step )
 void Pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
-	qSort(m_notes.begin(), m_notes.end(), Note::lessThan );
+	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
 }
 
 
