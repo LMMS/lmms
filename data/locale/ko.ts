@@ -29,7 +29,7 @@
         <source>Current language not translated (or native English).
 
 If you&apos;re interested in translating LMMS in another language or want to improve existing translations, you&apos;re welcome to help us! Simply contact the maintainer!</source>
-        <translation>송현진 (Hyunjin Song) &lt;PhysSong@users.noreply.github.com&gt;
+        <translation>송현진 (Hyunjin Song) &lt;tteu.ingog@gmail.com&gt;
 방성범 (Bang Seongbeom) &lt;bangseongbeom@gmail.com&gt;
 
 LMMS를 다른 언어로 번역하고 싶다거나 기존 번역을 개선하고 싶다면 저희를 도와주세요! LMMS 관리자와의 연락을 통해 참여하실 수 있습니다.</translation>
@@ -772,7 +772,7 @@ LMMS를 다른 언어로 번역하고 싶다거나 기존 번역을 개선하고
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>스테레오</translation>
     </message>
     <message>
         <source>QUANT</source>
@@ -2067,7 +2067,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"/>
+        <translation>스테레오</translation>
     </message>
     <message>
         <source>Joint Stereo</source>
@@ -2075,7 +2075,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"/>
+        <translation>모노</translation>
     </message>
     <message>
         <source>Compression level:</source>
@@ -3742,7 +3742,7 @@ Double click to pick a file.</source>
     </message>
     <message>
         <source>Launching mixer threads</source>
-        <translation type="unfinished"/>
+        <translation>믹서 스레드를 시작하는 중</translation>
     </message>
 </context>
 <context>
@@ -4018,7 +4018,7 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     </message>
     <message>
         <source>Root directory</source>
-        <translation type="unfinished"/>
+        <translation>최상위 디렉토리</translation>
     </message>
     <message>
         <source>Loading background artwork</source>
@@ -4122,6 +4122,10 @@ Please make sure you have write permission to the file and the directory contain
         <translation>파일 %1을(를) 쓰기 위하여 열 수 없습니다.
 경로에 파일이 존재하고 파일에 쓸 수 있는 권한이 있는지 확인 후 다시 시도하시기 바랍니다!</translation>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -4189,7 +4193,7 @@ Please make sure you have write permission to the file and the directory contain
     <message>
         <source>The JACK server seems to be shuted down.</source>
         <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
-        <translation type="unfinished"/>
+        <translation>JACK 서버가 종료된 것 같습니다.</translation>
     </message>
 </context>
 <context>
@@ -5825,7 +5829,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Bold</source>
-        <translation type="unfinished"/>
+        <translation>굵게(&amp;B)</translation>
     </message>
     <message>
         <source>%1+B</source>
@@ -5841,7 +5845,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Underline</source>
-        <translation type="unfinished"/>
+        <translation>밑줄(&amp;U)</translation>
     </message>
     <message>
         <source>%1+U</source>
@@ -5849,7 +5853,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Left</source>
-        <translation type="unfinished"/>
+        <translation>왼쪽 정렬(&amp;L)</translation>
     </message>
     <message>
         <source>%1+L</source>
@@ -5857,7 +5861,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>C&amp;enter</source>
-        <translation type="unfinished"/>
+        <translation>가운데 정렬(&amp;E)</translation>
     </message>
     <message>
         <source>%1+E</source>
@@ -5865,7 +5869,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Right</source>
-        <translation type="unfinished"/>
+        <translation>오른쪽 정렬(&amp;R)</translation>
     </message>
     <message>
         <source>%1+R</source>
@@ -5873,7 +5877,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Justify</source>
-        <translation type="unfinished"/>
+        <translation>양쪽 정렬(&amp;J)</translation>
     </message>
     <message>
         <source>%1+J</source>
@@ -5881,7 +5885,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>&amp;Color...</source>
-        <translation type="unfinished"/>
+        <translation>색(&amp;C)...</translation>
     </message>
     <message>
         <source>Project Notes</source>
@@ -5889,7 +5893,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Enter project notes here</source>
-        <translation type="unfinished"/>
+        <translation>여기에 프로젝트 노트를 입력하세요</translation>
     </message>
 </context>
 <context>
@@ -5904,11 +5908,11 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>FLAC-File (*.flac)</source>
-        <translation type="unfinished"/>
+        <translation>FLAC 파일(*.flac)</translation>
     </message>
     <message>
         <source>Compressed MP3-File (*.mp3)</source>
-        <translation type="unfinished"/>
+        <translation>압축 MP3 파일(*.mp3)</translation>
     </message>
 </context>
 <context>
@@ -5951,7 +5955,7 @@ Reason: &quot;%2&quot;</source>
     </message>
     <message>
         <source>Channels Out: </source>
-        <translation>출력 채널</translation>
+        <translation>출력 채널:</translation>
     </message>
     <message>
         <source>File: </source>
@@ -6446,7 +6450,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Hydrogen projects</source>
-        <translation type="unfinished"/>
+        <translation>Hydrogen 프로젝트</translation>
     </message>
     <message>
         <source>All file types</source>
@@ -6458,7 +6462,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>This project is empty so exporting makes no sense. Please put some items into Song Editor first!</source>
-        <translation type="unfinished"/>
+        <translation>빈 프로젝트를 내보내는 것은 무의미합니다. 먼저 노래 편집기에 항목을 추가하시기 바랍니다!</translation>
     </message>
     <message>
         <source>Select directory for writing exported tracks...</source>
@@ -6470,7 +6474,7 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>Select file for project-export...</source>
-        <translation type="unfinished"/>
+        <translation>프로젝트를 내보낼 파일 선택...</translation>
     </message>
     <message>
         <source>The following errors occured while loading: </source>
@@ -6810,15 +6814,15 @@ Remember to also save your project manually. You can choose to disable saving wh
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="unfinished"/>
+        <translation>정지한 뒤 시작점으로 이동</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="unfinished"/>
+        <translation>정지한 뒤 재생을 시작한 점으로 이동</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
-        <translation type="unfinished"/>
+        <translation>정지한 후 위치 유지</translation>
     </message>
     <message>
         <source>Hint</source>
@@ -6878,11 +6882,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Importing MIDI-file...</source>
-        <translation type="unfinished"/>
+        <translation>MIDI 파일을 가져오는중...</translation>
     </message>
     <message>
         <source>Loading Track %1 (%2/Total %3)</source>
-        <translation type="unfinished"/>
+        <translation>트랙 %1 로딩 중 (%2/총 %3)</translation>
     </message>
 </context>
 <context>
@@ -7662,15 +7666,15 @@ Please make sure you have read-permission to the file and the directory containi
     <name>ZynAddSubFxInstrument</name>
     <message>
         <source>Portamento</source>
-        <translation type="unfinished"/>
+        <translation>포르타멘토</translation>
     </message>
     <message>
         <source>Filter Frequency</source>
-        <translation type="unfinished"/>
+        <translation>필터 주파수</translation>
     </message>
     <message>
         <source>Filter Resonance</source>
-        <translation type="unfinished"/>
+        <translation>필터 공명</translation>
     </message>
     <message>
         <source>Bandwidth</source>
@@ -7705,15 +7709,15 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Portamento:</source>
-        <translation type="unfinished"/>
+        <translation>포르타멘토:</translation>
     </message>
     <message>
         <source>PORT</source>
-        <translation type="unfinished"/>
+        <translation>포르타멘토</translation>
     </message>
     <message>
         <source>Filter Frequency:</source>
-        <translation type="unfinished"/>
+        <translation>필터 주파수:</translation>
     </message>
     <message>
         <source>FREQ</source>
@@ -7761,7 +7765,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Forward MIDI Control Changes</source>
-        <translation type="unfinished"/>
+        <translation>MIDI 컨트롤 변화(CC) 전달</translation>
     </message>
 </context>
 <context>
@@ -7937,7 +7941,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
-        <translation type="unfinished"/>
+        <translation>클릭하여 기본 그래프로 초기화</translation>
     </message>
     <message>
         <source>Smooth waveform</source>
@@ -9940,7 +9944,7 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
     <message>
         <source>Octave %1</source>
-        <translation type="unfinished"/>
+        <translation>옥타브 %1</translation>
     </message>
 </context>
 <context>
@@ -10205,7 +10209,7 @@ The LED in the lower right corner of the waveform editor determines whether the 
     </message>
     <message>
         <source>Click here to reset the wavegraph back to default</source>
-        <translation type="unfinished"/>
+        <translation>클릭하여 기본 그래프로 초기화</translation>
     </message>
     <message>
         <source>Smooth waveform</source>

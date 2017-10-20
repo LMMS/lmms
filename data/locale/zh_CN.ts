@@ -4130,6 +4130,10 @@ Please make sure you have write permission to the file and the directory contain
         <translation>无法写入文件 %1
 请确保您有对该文件以及包含该文件目录的写入权限！</translation>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>导出 MIDI (&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>

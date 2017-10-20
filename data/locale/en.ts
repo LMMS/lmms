@@ -4113,6 +4113,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>

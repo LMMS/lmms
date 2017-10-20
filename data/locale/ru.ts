@@ -775,7 +775,7 @@ Oe Ai &lt;oeai/at/symbiants/dot/com&gt;</translation>
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>СТЕРЕО</translation>
     </message>
     <message>
         <source>QUANT</source>
@@ -4140,6 +4140,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>Невозможно открыть файл %1 для записи. Пожалуйста, убедитесь, что у вас есть разрешение на запись в файл и содержащую его директорию, и попробуйте снова.</translation>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Экспорт &amp;MIDI...</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -7359,7 +7363,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Vst Plugin Preset (*.fxp *.fxb)</source>
-        <translation>Предустановка VST плагина (*.fxp, *.fxb)</translation>
+        <translation>Предустановка VST плагина (*.fxp *.fxb)</translation>
     </message>
     <message>
         <source>: default</source>
