@@ -3,15 +3,20 @@
 # Accomodate both linux windows mingw locations
 MINGW=/mingw64
 if [ -z "$MSYSCON" ]; then
-	MINGW=/usr/x86_64-w64-mingw32
+	MINGW=/opt$MINGW
 else
 	CMAKE_OPTS="$CMAKE_OPTS -DLMMS_BUILD_MSYS=1"
-	export PATH=$MINGW/bin:$PATH
 fi
 
-export PKG_CONFIG_PATH=$MINGW/lib/pkgconfig/
+export PATH=$MINGW/bin:$PATH
 
-CMAKE_OPTS="-DWANT_QT5=True -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
+if [ "$1" = "-qt5" ]; then
+        QT5=True
+fi
+
+if [ $QT5 ]; then
+        CMAKE_OPTS="-DWANT_QT5=$QT5 -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
+fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 

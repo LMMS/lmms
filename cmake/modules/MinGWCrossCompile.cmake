@@ -40,8 +40,7 @@ IF(LMMS_BUILD_MSYS)
 	ENDIF()
 # Linux mingw requires explicitly defined tools to prevent clash with native system tools
 ELSE()
-	SET(MINGW_PREFIX /usr/${MINGW_TARGET}/)
-	SET(MINGW_TOOL_PREFIX       /usr/bin/${MINGW_TARGET}-)
+	SET(MINGW_TOOL_PREFIX           ${MINGW_PREFIX}/bin/${CMAKE_SYSTEM_PROCESSOR}-w64-mingw32-)
 
 	# Specify the cross compiler
 	SET(CMAKE_C_COMPILER            ${MINGW_TOOL_PREFIX}gcc)
@@ -51,6 +50,7 @@ ELSE()
 	# Mingw tools
 	SET(STRIP                       ${MINGW_TOOL_PREFIX}strip)
 	SET(WINDRES                     ${MINGW_TOOL_PREFIX}windres)
+	SET(ENV{PKG_CONFIG}             ${MINGW_TOOL_PREFIX}pkg-config)
 	
 	# Search for programs in the build host directories
 	SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -61,14 +61,15 @@ ELSE()
 	# For 32-bit vst support	
 	IF(WIN64)
 		# Specify the 32-bit cross compiler
-		SET(MINGW_PREFIX32     /usr/${MINGW_TARGET32}/)
-		SET(MINGW_TOOL_PREFIX32     /usr/bin/${MINGW_TARGET32}-)
+		SET(MINGW_TOOL_PREFIX32     ${MINGW_PREFIX32}/bin/${CMAKE_SYSTEM_PROCESSOR32}-w64-mingw32-)
 		SET(CMAKE_C_COMPILER32      ${MINGW_TOOL_PREFIX32}gcc)
 		SET(CMAKE_CXX_COMPILER32    ${MINGW_TOOL_PREFIX32}g++)
 	ENDIF()
+	
+	INCLUDE_DIRECTORIES(${MINGW_PREFIX}/include)
 ENDIF()
 
-LINK_DIRECTORIES(${MINGW_PREFIX}/lib)
+LINK_DIRECTORIES(${MINGW_PREFIX}/lib ${MINGW_PREFIX}/bin)
 
 # Qt tools
 SET(QT_BINARY_DIR				    ${MINGW_PREFIX}/bin)
@@ -83,6 +84,7 @@ IF(NOT DEFINED ENV{MINGW_DEBUG_INFO})
 	MESSAGE("* CMAKE_CXX_COMPILER                   : ${CMAKE_CXX_COMPILER}")
 	MESSAGE("* CMAKE_RC_COMPILER                    : ${CMAKE_RC_COMPILER}")
 	MESSAGE("* WINDRES                              : ${WINDRES}")
+	MESSAGE("* ENV{PKG_CONFIG}                      : $ENV{PKG_CONFIG}")
 	MESSAGE("* MINGW_TOOL_PREFIX32                  : ${MINGW_TOOL_PREFIX32}")
 	MESSAGE("* CMAKE_C_COMPILER32                   : ${CMAKE_C_COMPILER32}")
 	MESSAGE("* CMAKE_CXX_COMPILER32                 : ${CMAKE_CXX_COMPILER32}")
