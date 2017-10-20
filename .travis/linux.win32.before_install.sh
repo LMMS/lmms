@@ -2,5 +2,5 @@
 
 set -e
 
-docker build -t lmms-build "${TRAVIS_BUILD_DIR}/.travis/linux.cross.win32/"
-
+sudo add-apt-repository ppa:tobydox/mingw-x-trusty -y
+sudo apt-get update -qq

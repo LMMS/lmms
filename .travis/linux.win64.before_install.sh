@@ -2,5 +2,4 @@
 
 set -e
 
-docker build -t lmms-build "${TRAVIS_BUILD_DIR}/.travis/linux.cross.win64/"
-
+"$TRAVIS_BUILD_DIR/.travis/linux.win32.before_install.sh"
