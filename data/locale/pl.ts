@@ -775,7 +775,7 @@ Zauważone błędy i propozycje zmian tłumaczenia proszę zgłaszać na e-mail:
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>STEREO</translation>
     </message>
     <message>
         <source>QUANT</source>
@@ -2078,11 +2078,11 @@ Upewnij się, że masz uprawnienia do zapisu do pliku i katalogu zawierającego 
     </message>
     <message>
         <source>Stereo mode:</source>
-        <translation type="unfinished"/>
+        <translation>Tryb stereo:</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Stereo</translation>
     </message>
     <message>
         <source>Joint Stereo</source>
@@ -2090,23 +2090,23 @@ Upewnij się, że masz uprawnienia do zapisu do pliku i katalogu zawierającego 
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"/>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Compression level:</source>
-        <translation type="unfinished"/>
+        <translation>Poziom kompresji:</translation>
     </message>
     <message>
         <source>(fastest)</source>
-        <translation type="unfinished"/>
+        <translation>(najszybszy)</translation>
     </message>
     <message>
         <source>(default)</source>
-        <translation type="unfinished"/>
+        <translation>(domyślny)</translation>
     </message>
     <message>
         <source>(smallest)</source>
-        <translation type="unfinished"/>
+        <translation>(najdokładniejszy)</translation>
     </message>
 </context>
 <context>
@@ -2167,11 +2167,11 @@ Upewnij się, że masz uprawnienia do zapisu do pliku i katalogu zawierającego 
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Szukaj</translation>
     </message>
     <message>
         <source>Refresh list</source>
-        <translation type="unfinished"/>
+        <translation>Odśwież listę</translation>
     </message>
 </context>
 <context>
@@ -2284,7 +2284,7 @@ Upewnij się, że masz uprawnienia do zapisu do pliku i katalogu zawierającego 
     </message>
     <message>
         <source>Period:</source>
-        <translation type="unfinished"/>
+        <translation>Odstętp:</translation>
     </message>
 </context>
 <context>
@@ -3514,7 +3514,7 @@ Możesz usunąć i przenieść kanały FX w menu kontekstowym, które jest dost�
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Efekty</translation>
     </message>
     <message>
         <source>MIDI settings</source>
@@ -3522,11 +3522,11 @@ Możesz usunąć i przenieść kanały FX w menu kontekstowym, które jest dost�
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"/>
+        <translation>Różne</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"/>
+        <translation>Wtyczka</translation>
     </message>
 </context>
 <context>
@@ -4138,6 +4138,10 @@ Odwiedź witrynę http://lmms.sf.net/wiki for documentation on LMMS.</translatio
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>Nie udało się otworzyć pliku %1 do zapisu.
 Upewnij się, że masz uprawnienia do zapisu do pliku i katalogu zawierającego plik i spróbuj ponownie!</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5922,7 +5926,7 @@ Powód: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Enter project notes here</source>
-        <translation type="unfinished"/>
+        <translation>Wprowadź notatki dotyczące projektu</translation>
     </message>
 </context>
 <context>
@@ -5937,11 +5941,11 @@ Powód: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>FLAC-File (*.flac)</source>
-        <translation type="unfinished"/>
+        <translation>Plik FLAC (*.flac)</translation>
     </message>
     <message>
         <source>Compressed MP3-File (*.mp3)</source>
-        <translation type="unfinished"/>
+        <translation>Skompresowany plik MP3 (*.mp3)</translation>
     </message>
 </context>
 <context>
@@ -6919,7 +6923,7 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
     </message>
     <message>
         <source>Loading Track %1 (%2/Total %3)</source>
-        <translation type="unfinished"/>
+        <translation>Ładowanie utworu %1 (%2/Łącznie %3)</translation>
     </message>
 </context>
 <context>
@@ -8072,7 +8076,7 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
     </message>
     <message>
         <source>Open help window</source>
-        <translation type="unfinished"/>
+        <translation>Otwórz okno pomocy</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8160,11 +8164,11 @@ Upewnij się, że masz uprawnienia do odczytu tego pliku i katalogu zawierające
     </message>
     <message>
         <source>O1 panning:</source>
-        <translation type="unfinished"/>
+        <translation>Panoramowanie O1:</translation>
     </message>
     <message>
         <source>O2 panning:</source>
-        <translation type="unfinished"/>
+        <translation>Panoramowanie O2:</translation>
     </message>
     <message>
         <source>Release transition:</source>
@@ -9237,19 +9241,19 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
     <message>
         <source>Wave Channel Volume:</source>
-        <translation type="unfinished"/>
+        <translation>Głośność kanału fali:</translation>
     </message>
     <message>
         <source>Wave Channel Volume</source>
-        <translation type="unfinished"/>
+        <translation>Głośność kanału fali</translation>
     </message>
     <message>
         <source>Noise Channel Volume:</source>
-        <translation type="unfinished"/>
+        <translation>Głośność kanału szumu:</translation>
     </message>
     <message>
         <source>Noise Channel Volume</source>
-        <translation type="unfinished"/>
+        <translation>Głośność kanału szumu</translation>
     </message>
     <message>
         <source>SO1 Volume (Right):</source>
@@ -9569,7 +9573,7 @@ Te układy scalone były stosowane w komputerach Commodore 64.</translation>
     </message>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
-        <translation type="unfinished"/>
+        <translation>Filtr służący do eksportowania plików MIDI z LMMS</translation>
     </message>
     <message>
         <source>Reverb algorithm by Sean Costello</source>
