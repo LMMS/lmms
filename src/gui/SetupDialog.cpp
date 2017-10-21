@@ -823,7 +823,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(ladspaDir_select_btn, SIGNAL(clicked()), this,
 			SLOT(openLADSPADir()));
 
-	// SF2 files direcroty tab.
+	// SF2 files directory tab.
 	TabWidget * sf2Dir_tw = new TabWidget(
 			tr("SF2 files directory"), pathSelectors);
 	sf2Dir_tw->setFixedHeight(48);
@@ -878,7 +878,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Theme directory tab.
 	TabWidget * themeDir_tw = new TabWidget(
-			tr("Theme direcroty"), pathSelectors);
+			tr("Theme directory"), pathSelectors);
 	themeDir_tw->setFixedHeight(48);
 
 	m_themeDirLineEdit = new QLineEdit(m_themeDir, themeDir_tw);
