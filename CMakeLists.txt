@@ -68,6 +68,7 @@ OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
+OPTION(WANT_DEBUG_PERFLOG "Log task performance" ON)
 
 
 IF(LMMS_BUILD_APPLE)
@@ -267,7 +268,6 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		IF(NOT SDL_INCLUDE_DIR)
 			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
 		ENDIF()
-		
 	ELSE()
 		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
@@ -487,6 +487,16 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
+IF(WANT_DEBUG_PERFLOG)
+	IF(LMMS_BUILD_LINUX)
+		SET(LMMS_DEBUG_PERFLOG TRUE)
+		SET (STATUS_DEBUG_PERFLOG "Enabled")
+	ELSE()
+		SET (STATUS_DEBUG_PERFLOG "Wanted but disabled due to unsupported platform")
+	ENDIF()
+ELSE()
+	SET (STATUS_DEBUG_RTIME "Disabled")
+ENDIF(WANT_DEBUG_PERFLOG)
 
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
@@ -672,6 +682,7 @@ MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
 "* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
+"* Performance log             : ${STATUS_DEBUG_PERFLOG}\n"
 )
 
 MESSAGE(
