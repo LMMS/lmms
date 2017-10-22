@@ -4128,6 +4128,10 @@ Por favor visite http://lmms.sf.net/wiki para ter acesso a mais infromações so
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Exportar &amp;MIDI...</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>

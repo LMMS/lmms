@@ -772,11 +772,11 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>ESTÉREO</translation>
     </message>
     <message>
         <source>QUANT</source>
-        <translation type="unfinished"/>
+        <translation>SECUENCIADOR</translation>
     </message>
 </context>
 <context>
@@ -2075,35 +2075,35 @@ Asegúrate de tener permisos de escritura tanto del archivo como del directorio 
     </message>
     <message>
         <source>Stereo mode:</source>
-        <translation type="unfinished"/>
+        <translation>MODO ESTÉREO:</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Estéreo</translation>
     </message>
     <message>
         <source>Joint Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Conjunto De Estéreo:</translation>
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"/>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Compression level:</source>
-        <translation type="unfinished"/>
+        <translation>Compresor De Niveles:</translation>
     </message>
     <message>
         <source>(fastest)</source>
-        <translation type="unfinished"/>
+        <translation>(Rápido)</translation>
     </message>
     <message>
         <source>(default)</source>
-        <translation type="unfinished"/>
+        <translation>(Por Defecto)</translation>
     </message>
     <message>
         <source>(smallest)</source>
-        <translation type="unfinished"/>
+        <translation>(Reducir)</translation>
     </message>
 </context>
 <context>
@@ -2114,39 +2114,39 @@ Asegúrate de tener permisos de escritura tanto del archivo como del directorio 
     </message>
     <message>
         <source>A1</source>
-        <translation type="unfinished"/>
+        <translation>A1</translation>
     </message>
     <message>
         <source>A2</source>
-        <translation type="unfinished"/>
+        <translation>A2</translation>
     </message>
     <message>
         <source>A3</source>
-        <translation type="unfinished"/>
+        <translation>A3</translation>
     </message>
     <message>
         <source>W1 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>W1 Suavizadora</translation>
     </message>
     <message>
         <source>W2 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>W2 Suavizadora</translation>
     </message>
     <message>
         <source>W3 smoothing</source>
-        <translation type="unfinished"/>
+        <translation>W3 Suavizadora</translation>
     </message>
     <message>
         <source>PAN1</source>
-        <translation type="unfinished"/>
+        <translation>PAN1</translation>
     </message>
     <message>
         <source>PAN2</source>
-        <translation type="unfinished"/>
+        <translation>PAN2</translation>
     </message>
     <message>
         <source>REL TRANS</source>
-        <translation type="unfinished"/>
+        <translation>REL TRANS</translation>
     </message>
 </context>
 <context>
@@ -2164,11 +2164,11 @@ Asegúrate de tener permisos de escritura tanto del archivo como del directorio 
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Buscar</translation>
     </message>
     <message>
         <source>Refresh list</source>
-        <translation type="unfinished"/>
+        <translation>Actualizar Lista</translation>
     </message>
 </context>
 <context>
@@ -2281,7 +2281,7 @@ Asegúrate de tener permisos de escritura tanto del archivo como del directorio 
     </message>
     <message>
         <source>Period:</source>
-        <translation type="unfinished"/>
+        <translation>Period:</translation>
     </message>
 </context>
 <context>
@@ -3502,15 +3502,15 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
     </message>
     <message>
         <source>Envelope, filter &amp; LFO</source>
-        <translation type="unfinished"/>
+        <translation>Sobre, Filtro y LFO</translation>
     </message>
     <message>
         <source>Chord stacking &amp; arpeggio</source>
-        <translation type="unfinished"/>
+        <translation>Acorde de Apilamiento y Arpegio</translation>
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Efectos</translation>
     </message>
     <message>
         <source>MIDI settings</source>
@@ -3518,11 +3518,11 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"/>
+        <translation>Diversos</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin</translation>
     </message>
 </context>
 <context>
@@ -4134,6 +4134,10 @@ Por favor visita http://lmms.sf.net/wiki para obtener documentación acerca de L
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>El archivo %1 no puede abrirse para escritura.
 Asegúrate de tener permisos de escritura tanto del archivo como del directorio que lo contiene e inténtalo de nuevo.</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Exportar &amp;MIDI...</translation>
     </message>
 </context>
 <context>
@@ -5918,7 +5922,7 @@ Razón: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>Enter project notes here</source>
-        <translation type="unfinished"/>
+        <translation>Ingrese las Notas del Proyecto Aquí</translation>
     </message>
 </context>
 <context>
@@ -5933,11 +5937,11 @@ Razón: &quot;%2&quot;</translation>
     </message>
     <message>
         <source>FLAC-File (*.flac)</source>
-        <translation type="unfinished"/>
+        <translation>Archivo FLAC (*.flac)</translation>
     </message>
     <message>
         <source>Compressed MP3-File (*.mp3)</source>
-        <translation type="unfinished"/>
+        <translation>Compresor De Archivos MP3 (*.mp3)</translation>
     </message>
 </context>
 <context>
@@ -6914,7 +6918,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Loading Track %1 (%2/Total %3)</source>
-        <translation type="unfinished"/>
+        <translation>Cargando Pista %1 (%2/Total %3)</translation>
     </message>
 </context>
 <context>
@@ -8047,27 +8051,27 @@ Please make sure you have read-permission to the file and the directory containi
     <name>expressiveView</name>
     <message>
         <source>Select oscillator W1</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar Oscilador W1</translation>
     </message>
     <message>
         <source>Select oscillator W2</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar Oscilador W2</translation>
     </message>
     <message>
         <source>Select oscillator W3</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar Oscilador W3</translation>
     </message>
     <message>
         <source>Select OUTPUT 1</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar SALIDA 1</translation>
     </message>
     <message>
         <source>Select OUTPUT 2</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar SALIDA 2</translation>
     </message>
     <message>
         <source>Open help window</source>
-        <translation type="unfinished"/>
+        <translation>Abrir Ventana De Ayuda</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8079,11 +8083,11 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Moog-Saw wave</source>
-        <translation type="unfinished"/>
+        <translation>Moog-Saw wave</translation>
     </message>
     <message>
         <source>Click for a Moog-Saw-wave.</source>
-        <translation type="unfinished"/>
+        <translation>Clic Aquí Para La Moog-Saw-wave.</translation>
     </message>
     <message>
         <source>Exponential wave</source>
@@ -8091,7 +8095,7 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>Click for an exponential wave.</source>
-        <translation type="unfinished"/>
+        <translation>Clic Aquí para Obtener una Onda Exponencial.</translation>
     </message>
     <message>
         <source>Saw wave</source>
@@ -8135,39 +8139,39 @@ Please make sure you have read-permission to the file and the directory containi
     </message>
     <message>
         <source>WaveInterpolate</source>
-        <translation type="unfinished"/>
+        <translation>Oleada Interpolar</translation>
     </message>
     <message>
         <source>ExpressionValid</source>
-        <translation type="unfinished"/>
+        <translation>Expresión Validada</translation>
     </message>
     <message>
         <source>General purpose 1:</source>
-        <translation type="unfinished"/>
+        <translation>Propósito General 1:</translation>
     </message>
     <message>
         <source>General purpose 2:</source>
-        <translation type="unfinished"/>
+        <translation>Propósito General 2:</translation>
     </message>
     <message>
         <source>General purpose 3:</source>
-        <translation type="unfinished"/>
+        <translation>Propósito General 3:</translation>
     </message>
     <message>
         <source>O1 panning:</source>
-        <translation type="unfinished"/>
+        <translation>Panorámica O1:</translation>
     </message>
     <message>
         <source>O2 panning:</source>
-        <translation type="unfinished"/>
+        <translation>Panorámica O2:</translation>
     </message>
     <message>
         <source>Release transition:</source>
-        <translation type="unfinished"/>
+        <translation>Liberar La Transición:</translation>
     </message>
     <message>
         <source>Smoothness</source>
-        <translation type="unfinished"/>
+        <translation>Suavizar</translation>
     </message>
 </context>
 <context>
@@ -9572,7 +9576,7 @@ Este chip fue usado en las computadoras Commodore 64.</translation>
     </message>
     <message>
         <source>Mathematical expression parser</source>
-        <translation type="unfinished"/>
+        <translation>Analizador de Expresión Matemática</translation>
     </message>
 </context>
 <context>

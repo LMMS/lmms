@@ -771,7 +771,7 @@ Jika Anda tertarik untuk menerjemahkan LMMS dalam bahasa lain atau ingin meningk
     </message>
     <message>
         <source>STEREO</source>
-        <translation type="unfinished"/>
+        <translation>STEREO</translation>
     </message>
     <message>
         <source>QUANT</source>
@@ -2066,7 +2066,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"/>
+        <translation>Stereo</translation>
     </message>
     <message>
         <source>Joint Stereo</source>
@@ -2074,23 +2074,23 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <source>Mono</source>
-        <translation type="unfinished"/>
+        <translation>Mono</translation>
     </message>
     <message>
         <source>Compression level:</source>
-        <translation type="unfinished"/>
+        <translation>Level kompresi:</translation>
     </message>
     <message>
         <source>(fastest)</source>
-        <translation type="unfinished"/>
+        <translation>(tercepat)</translation>
     </message>
     <message>
         <source>(default)</source>
-        <translation type="unfinished"/>
+        <translation>(bawaan)</translation>
     </message>
     <message>
         <source>(smallest)</source>
-        <translation type="unfinished"/>
+        <translation>(terkecil)</translation>
     </message>
 </context>
 <context>
@@ -2101,15 +2101,15 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <source>A1</source>
-        <translation type="unfinished"/>
+        <translation>A1</translation>
     </message>
     <message>
         <source>A2</source>
-        <translation type="unfinished"/>
+        <translation>A2</translation>
     </message>
     <message>
         <source>A3</source>
-        <translation type="unfinished"/>
+        <translation>A3</translation>
     </message>
     <message>
         <source>W1 smoothing</source>
@@ -2151,11 +2151,11 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Cari</translation>
     </message>
     <message>
         <source>Refresh list</source>
-        <translation type="unfinished"/>
+        <translation>Segarkan daftar</translation>
     </message>
 </context>
 <context>
@@ -2268,7 +2268,7 @@ Pastikan Anda memiliki izin menulis ke file dan direktori yang berisi berkas ter
     </message>
     <message>
         <source>Period:</source>
-        <translation type="unfinished"/>
+        <translation>Periode:</translation>
     </message>
 </context>
 <context>
@@ -2646,11 +2646,11 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
     </message>
     <message>
         <source>CYCLE</source>
-        <translation type="unfinished"/>
+        <translation>SIKLUS</translation>
     </message>
     <message>
         <source>Cycle notes:</source>
-        <translation type="unfinished"/>
+        <translation>Siklus nada:</translation>
     </message>
     <message>
         <source>note(s)</source>
@@ -3500,7 +3500,7 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
     </message>
     <message>
         <source>Effects</source>
-        <translation type="unfinished"/>
+        <translation>Efek</translation>
     </message>
     <message>
         <source>MIDI settings</source>
@@ -3508,11 +3508,11 @@ Anda dapat menghapus dan memindahkan saluran FX dalam menu konteks, yang diakses
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"/>
+        <translation>Serba aneka</translation>
     </message>
     <message>
         <source>Plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin</translation>
     </message>
 </context>
 <context>
@@ -4122,6 +4122,10 @@ Silakan kunjungi http://lmms.sf.net/wiki untuk dokumentasi LMMS.</translation>
         <source>Could not open file %1 for writing.
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation>Tidak bisa membuka berkas %1</translation>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6815,11 +6819,11 @@ Setidaknya pastikan Anda memiliki izini baca kepada berkas tersebut lalu coba la
     </message>
     <message>
         <source>After stopping go back to begin</source>
-        <translation type="unfinished"/>
+        <translation>Setelah berhenti kembali ke awal</translation>
     </message>
     <message>
         <source>After stopping go back to position at which playing was started</source>
-        <translation type="unfinished"/>
+        <translation>Setelah berhenti kembali ke posisi dimana pemutaran dimulai</translation>
     </message>
     <message>
         <source>After stopping keep position</source>
@@ -6889,7 +6893,7 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     </message>
     <message>
         <source>Loading Track %1 (%2/Total %3)</source>
-        <translation type="unfinished"/>
+        <translation>Memuat Trek %1 (%2/Total %3)</translation>
     </message>
 </context>
 <context>
@@ -7780,11 +7784,11 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     </message>
     <message>
         <source>Start of sample</source>
-        <translation type="unfinished"/>
+        <translation>Awal dari sampel</translation>
     </message>
     <message>
         <source>End of sample</source>
-        <translation type="unfinished"/>
+        <translation>Akhir dar sampel</translation>
     </message>
     <message>
         <source>Reverse sample</source>
@@ -7827,14 +7831,14 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     <name>bitInvader</name>
     <message>
         <source>Samplelength</source>
-        <translation type="unfinished"/>
+        <translation>Panjangsampel</translation>
     </message>
 </context>
 <context>
     <name>bitInvaderView</name>
     <message>
         <source>Sample Length</source>
-        <translation type="unfinished"/>
+        <translation>Panjang Sampel</translation>
     </message>
     <message>
         <source>Sine wave</source>
@@ -8016,7 +8020,7 @@ Pastikan anda memiliki izin baca untuk berkas ini dan direktori yang mengandung 
     </message>
     <message>
         <source>Stereo mode</source>
-        <translation type="unfinished"/>
+        <translation>Mode stereo</translation>
     </message>
 </context>
 <context>
@@ -9517,7 +9521,7 @@ Chip yang digunakan pada komputer Commodore 64.</translation>
     </message>
     <message>
         <source>A native eq plugin</source>
-        <translation type="unfinished"/>
+        <translation>Plugin eq bawaan</translation>
     </message>
     <message>
         <source>A 4-band Crossover Equalizer</source>
@@ -9529,7 +9533,7 @@ Chip yang digunakan pada komputer Commodore 64.</translation>
     </message>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
-        <translation type="unfinished"/>
+        <translation>Filter untuk mengekspor berkas MIDI dari LMMS</translation>
     </message>
     <message>
         <source>Reverb algorithm by Sean Costello</source>
@@ -9667,7 +9671,7 @@ Chip yang digunakan pada komputer Commodore 64.</translation>
     </message>
     <message>
         <source>Open SoundFont file</source>
-        <translation type="unfinished"/>
+        <translation>Buka berkas SoundFont</translation>
     </message>
     <message>
         <source>SoundFont2 Files (*.sf2)</source>
