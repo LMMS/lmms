@@ -303,9 +303,9 @@ f_cnt_t InstrumentSoundShaping::releaseFrames() const
 	{
 		return 0;
 	}
-	
+
 	f_cnt_t ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
-	
+
 	if( !m_instrumentTrack->instrument()->flags().testFlag( Instrument::IsSingleStreamed ) )
 	{
 		return ret_val;
