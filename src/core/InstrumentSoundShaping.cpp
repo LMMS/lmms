@@ -299,9 +299,13 @@ f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 
 f_cnt_t InstrumentSoundShaping::releaseFrames() const
 {
-	f_cnt_t ret_val = m_instrumentTrack->instrument()
-		? m_instrumentTrack->instrument()->desiredReleaseFrames()
-		: 0;
+	if( !m_instrumentTrack->instrument() )
+	{
+		return 0;
+	}
+	
+	f_cnt_t ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
+	
 	if( !m_instrumentTrack->instrument()->flags().testFlag( Instrument::IsSingleStreamed ) )
 	{
 		return ret_val;
