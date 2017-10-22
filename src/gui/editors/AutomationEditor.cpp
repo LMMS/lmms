@@ -1100,7 +1100,7 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 {
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
-	const int outerRadius = qBound( 2, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
+	const int outerRadius = qBound( 3, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
 	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
 	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
