@@ -244,17 +244,7 @@ void TrackContainerView::realignTracks()
 
 void TrackContainerView::yugeTracks()
 {
-	QWidget * content = m_scrollArea->widget();
-	content->setFixedWidth( width()
-				- m_scrollArea->verticalScrollBar()->width() );
-	content->setFixedHeight( content->minimumSizeHint().height() );
-
-	for( trackViewList::iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
-	{
-		( *it )->show();
-		( *it )->update();
-	}
+	//TODO I GUESS
 }
 
 
@@ -262,17 +252,7 @@ void TrackContainerView::yugeTracks()
 
 void TrackContainerView::smolTracks()
 {
-	QWidget * content = m_scrollArea->widget();
-	//content->setFixedWidth( width()
-	//			- m_scrollArea->verticalScrollBar()->width() );
-	content->setFixedHeight( content->minimumSizeHint().height() );
-
-	for( trackViewList::iterator it = m_trackViews.begin();
-						it != m_trackViews.end(); ++it )
-	{
-		( *it )->show();
-		( *it )->update();
-	}
+	//TEMP CRAP
 }
 
 
