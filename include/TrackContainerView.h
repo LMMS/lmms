@@ -126,6 +126,8 @@ public:
 
 public slots:
 	void realignTracks();
+	void yugeTracks();
+	void smolTracks();
 	TrackView * createTrackView( Track * _t );
 	void deleteTrackView( TrackView * _tv );
 

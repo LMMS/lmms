@@ -73,6 +73,7 @@ public:
 	void loadSettings( const QDomElement& element );
 
 	ComboBoxModel *zoomingModel() const;
+	ComboBoxModel *verticalZoomingModel() const;
 
 public slots:
 	void scrolled( int new_pos );
@@ -104,6 +105,7 @@ private slots:
 	void updateScrollBar(int len);
 
 	void zoomingChanged();
+	void verticalZoomingChanged();
 
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );
@@ -130,6 +132,7 @@ private:
 	positionLine * m_positionLine;
 
 	ComboBoxModel* m_zoomingModel;
+	ComboBoxModel* m_verticalZoomingModel;
 
 	static const QVector<double> m_zoomLevels;
 
@@ -186,6 +189,7 @@ private:
 	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
+	ComboBox * m_verticalZoomingComboBox;
 };
 
 #endif

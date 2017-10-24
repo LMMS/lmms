@@ -242,6 +242,42 @@ void TrackContainerView::realignTracks()
 
 
 
+void TrackContainerView::yugeTracks()
+{
+	QWidget * content = m_scrollArea->widget();
+	content->setFixedWidth( width()
+				- m_scrollArea->verticalScrollBar()->width() );
+	content->setFixedHeight( content->minimumSizeHint().height() );
+
+	for( trackViewList::iterator it = m_trackViews.begin();
+						it != m_trackViews.end(); ++it )
+	{
+		( *it )->show();
+		( *it )->update();
+	}
+}
+
+
+
+
+void TrackContainerView::smolTracks()
+{
+	QWidget * content = m_scrollArea->widget();
+	//content->setFixedWidth( width()
+	//			- m_scrollArea->verticalScrollBar()->width() );
+	content->setFixedHeight( content->minimumSizeHint().height() );
+
+	for( trackViewList::iterator it = m_trackViews.begin();
+						it != m_trackViews.end(); ++it )
+	{
+		( *it )->show();
+		( *it )->update();
+	}
+}
+
+
+
+
 TrackView * TrackContainerView::createTrackView( Track * _t )
 {
 	//m_tc->addJournalCheckPoint();

@@ -76,11 +76,13 @@ SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
+	m_verticalZoomingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
 {
 	m_zoomingModel->setParent(this);
+	m_verticalZoomingModel->setParent(this);
 	// create time-line
 	int widgetTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
@@ -241,11 +243,16 @@ SongEditor::SongEditor( Song * song ) :
 	for( float const & zoomLevel : m_zoomLevels )
 	{
 		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		m_verticalZoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel->setInitValue(
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+	m_verticalZoomingModel->setInitValue(
+			m_verticalZoomingModel->findText( "100%" ) );
+	connect( m_verticalZoomingModel, SIGNAL( dataChanged() ),
+					this, SLOT( verticalZoomingChanged() ) );
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -371,7 +378,29 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 
 void SongEditor::wheelEvent( QWheelEvent * we )
 {
-	if( we->modifiers() & Qt::ControlModifier )
+	if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::ShiftModifier )
+	{
+		int z = m_verticalZoomingModel->value();
+
+		if( we->delta() > 0 )
+		{
+			z++;
+		}
+		else if( we->delta() < 0 )
+		{
+			z--;
+		}
+		z = qBound( 0, z, m_verticalZoomingModel->size() - 1 );
+		// update combobox with zooming-factor
+		m_verticalZoomingModel->setValue( z );
+
+		// update timeline
+		m_song->m_playPos[Song::Mode_PlaySong].m_timeLine->
+					setPixelsPerTact( pixelsPerTact() );
+		// and make sure, all TCO's are resized and relocated
+		realignTracks();
+	}
+	else if( we->modifiers() & Qt::ControlModifier )
 	{
 		int z = m_zoomingModel->value();
 
@@ -393,6 +422,7 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 		// and make sure, all TCO's are resized and relocated
 		realignTracks();
 	}
+
 	else if( we->modifiers() & Qt::ShiftModifier || we->orientation() == Qt::Horizontal )
 	{
 		m_leftRightScroll->setValue( m_leftRightScroll->value() -
@@ -622,6 +652,15 @@ void SongEditor::zoomingChanged()
 
 
 
+void SongEditor::verticalZoomingChanged()
+{
+	//TODO I GUESS
+	yugeTracks();
+}
+
+
+
+
 void SongEditor::selectAllTcos( bool select )
 {
 	QVector<selectableObject *> so = select ? rubberBand()->selectableObjects() : rubberBand()->selectedObjects();
@@ -645,6 +684,14 @@ bool SongEditor::allowRubberband() const
 ComboBoxModel *SongEditor::zoomingModel() const
 {
 	return m_zoomingModel;
+}
+
+
+
+
+ComboBoxModel *SongEditor::verticalZoomingModel() const
+{
+	return m_verticalZoomingModel;
 }
 
 
@@ -731,6 +778,15 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	zoomToolBar->addWidget( zoom_lbl );
 	zoomToolBar->addWidget( m_zoomingComboBox );
+
+	// setup vertical zooming-stuff?
+	m_verticalZoomingComboBox = new ComboBox( m_toolBar );
+	m_verticalZoomingComboBox->setFixedSize( 80, 22 );
+	m_verticalZoomingComboBox->move( 580, 4 );
+	m_verticalZoomingComboBox->setModel(m_editor->m_verticalZoomingModel);
+
+	zoomToolBar->addWidget( zoom_lbl );
+	zoomToolBar->addWidget( m_verticalZoomingComboBox );
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
