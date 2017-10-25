@@ -84,6 +84,16 @@ public:
 		m_dataMutex.unlock();
 	}
 
+	void lockNote()
+	{
+		m_noteMutex.lock();
+	}
+
+	void unlockNote()
+	{
+		m_noteMutex.unlock();
+	}
+
 	bool isPreviewing()
 	{
 		bool ret = !m_dataMutex.tryLock();
@@ -99,6 +109,7 @@ private:
 	InstrumentTrack* m_previewInstrumentTrack;
 	NotePlayHandle* m_previewNote;
 	QMutex m_dataMutex;
+	QMutex m_noteMutex;
 
 	friend class PresetPreviewPlayHandle;
 
@@ -113,15 +124,17 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	PlayHandle( TypePresetPreviewHandle ),
 	m_previewNote( NULL )
 {
-	s_previewTC->lockData();
-
 	setUsesBuffer( false );
 
+	s_previewTC->lockData();
+	Engine::mixer()->requestChangeInModel();
+	s_previewTC->lockNote();
 	if( s_previewTC->previewNote() != NULL )
 	{
 		s_previewTC->previewNote()->mute();
 	}
-
+	s_previewTC->unlockNote();
+	Engine::mixer()->doneChangeInModel();
 
 	const bool j = Engine::projectJournal()->isJournalling();
 	Engine::projectJournal()->setJournalling( false );
@@ -174,6 +187,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 	s_previewTC->previewInstrumentTrack()->
 				midiPort()->setMode( MidiPort::Disabled );
 
+	Engine::mixer()->requestChangeInModel();
+	s_previewTC->lockNote();
 	// create note-play-handle for it
 	m_previewNote = NotePlayHandleManager::acquire(
 			s_previewTC->previewInstrumentTrack(), 0,
@@ -186,6 +201,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	Engine::mixer()->addPlayHandle( m_previewNote );
 
+	s_previewTC->unlockNote();
+	Engine::mixer()->doneChangeInModel();
 	s_previewTC->unlockData();
 	Engine::projectJournal()->setJournalling( j );
 }
@@ -195,7 +212,8 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 {
-	s_previewTC->lockData();
+	Engine::mixer()->requestChangeInModel();
+	s_previewTC->lockNote();
 	// not muted by other preset-preview-handle?
 	if( !m_previewNote->isMuted() )
 	{
@@ -203,7 +221,8 @@ PresetPreviewPlayHandle::~PresetPreviewPlayHandle()
 		s_previewTC->setPreviewNote( NULL );
 	}
 	m_previewNote->noteOff();
-	s_previewTC->unlockData();
+	s_previewTC->unlockNote();
+	Engine::mixer()->doneChangeInModel();
 }
 
 
@@ -258,13 +277,13 @@ ConstNotePlayHandleList PresetPreviewPlayHandle::nphsOfInstrumentTrack(
 						const InstrumentTrack * _it )
 {
 	ConstNotePlayHandleList cnphv;
-	s_previewTC->lockData();
+	s_previewTC->lockNote();
 	if( s_previewTC->previewNote() != NULL &&
 		s_previewTC->previewNote()->instrumentTrack() == _it )
 	{
 		cnphv.push_back( s_previewTC->previewNote() );
 	}
-	s_previewTC->unlockData();
+	s_previewTC->unlockNote();
 	return cnphv;
 }
 
