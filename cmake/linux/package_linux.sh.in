@@ -9,8 +9,10 @@
 set -e
 
 USERBIN="$HOME/bin"
-LINUXDEPLOYQT="$USERBIN/linuxdeployqt"
-APPIMAGETOOL="$USERBIN/appimagetool"
+LINUXDEPLOYQTDIR="$HOME/bin/linuxdeployqt"
+LINUXDEPLOYQTBIN="$LINUXDEPLOYQTDIR/usr/bin"
+LINUXDEPLOYQT="$LINUXDEPLOYQTBIN/linuxdeployqt"
+APPIMAGETOOL="$LINUXDEPLOYQTBIN/appimagetool"
 VERBOSITY=2 # 3=debug
 LOGFILE="@CMAKE_BINARY_DIR@/appimage.log"
 APPDIR="@CMAKE_BINARY_DIR@/@PROJECT_NAME_UCASE@.AppDir/"
@@ -56,28 +58,27 @@ export PATH
 PATH="$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
 
 # Fetch portable linuxdeployqt if cache is older than $DAYSOLD
+APPIMAGE=$USERBIN/linuxdeployqt.AppImage
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
-mkdir -p "$HOME/bin"
+mkdir -p "$USERBIN"
 DAYSOLD=2
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
-elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
+elif ! find "$APPIMAGE" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
 	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
 	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
-	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
-	chmod +x "$LINUXDEPLOYQT"
-	touch "$LINUXDEPLOYQT"
-	success "Downloaded $LINUXDEPLOYQT"
-	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
-	mv "squashfs-root/usr/bin/appimagetool" "$APPIMAGETOOL"
-	success "Extracted $APPIMAGETOOL"
-	mv "squashfs-root/usr/bin/mksquashfs" "$USERBIN/mksquashfs"
-	success "Extracted $USERBIN/mksquashfs"
+	wget "$url" -O "$APPIMAGE" -q || (rm "$APPIMAGE" && false)
+	chmod +x "$APPIMAGE"
+	touch "$APPIMAGE"
+	success "Downloaded $APPIMAGE"
+	"$APPIMAGE" --appimage-extract > /dev/null 2>&1
+	mv "squashfs-root" "$LINUXDEPLOYQTDIR"
+	success "Extracted $APPIMAGE contents"
 	rm -rf "squashfs-root/"
 
 else
-	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
+	skipped "$APPIMAGE is less than $DAYSOLD days old"
 fi
 
 # Make skeleton AppDir
@@ -166,7 +167,7 @@ rm -f "${APPDIR}/usr/lib/libwine.so.1"
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n>>>>> appimagetool" >> "$LOGFILE"
-"$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@" >> "$LOGFILE" 2>&1
+PATH=$LINUXDEPLOYQTBIN:$PATH "$APPIMAGETOOL" "${APPDIR}" "@APPIMAGE_FILE@" >> "$LOGFILE" 2>&1
 success "Created @APPIMAGE_FILE@"
 
 echo -e "\nFinished"

@@ -22,11 +22,19 @@ shared:
         echo "[ccache stats]"
         ccache -s
 
+  # Commmon initializing commands
+  init: &init
+    run:
+      name: Initialize
+      command: |
+        mkdir -p /tmp/artifacts
+
+  # Commmon environment variables
   common_environment: &common_environment
     QT5: True
     CMAKE_OPTS: -DWANT_QT5=ON -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_CCACHE=ON
     CCACHE_MAXSIZE: 500M
-    CCACHE_LOGFILE: /tmp/ccache.log
+    CCACHE_LOGFILE: /tmp/artifacts/ccache.log
 
 jobs:
   mingw32:
@@ -36,13 +44,14 @@ jobs:
       - image: lukaswhl/lmms-ci-linux.mingw32:14.04
     steps:
       - checkout
+      - *init
       - *restore_cache
       - run:
           name: Building
           command: |
             mkdir build && cd build
             ../cmake/build_mingw32.sh
-            make -j2
+            make -j6
       - *ccache_stats
       - *save_cache
   mingw64:
@@ -52,13 +61,14 @@ jobs:
       - image: lukaswhl/lmms-ci-linux.mingw64:14.04
     steps:
       - checkout
+      - *init
       - *restore_cache
       - run:
           name: Building
           command: |
             mkdir build && cd build
             ../cmake/build_mingw64.sh
-            make -j2
+            make -j6
       - *ccache_stats
       - *save_cache
   linux.gcc:
@@ -68,24 +78,32 @@ jobs:
       <<: *common_environment
     steps:
       - checkout
+      - *init
       - *restore_cache
       - run:
-          name: Configuring
-          command: mkdir build && cd build && cmake .. $CMAKE_OPTS
+          name: Configure
+          command: mkdir build && cd build && cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
       - run:
-          name: Building
-          command: cd build && make -j4
+          name: Build
+          command: cd build && make -j6
       - run:
-          name: Building tests
+          name: Build tests
           command: cd build && make tests
       - run:
-          name: Running tests
+          name: Run tests
           command: build/tests/tests
       - *ccache_stats
-      - *save_cache
+      - run:
+          name: Build AppImage
+          command: |
+            cd build
+            make install
+            make appimage
+            cp ./lmms-*.AppImage /tmp/artifacts/
       - store_artifacts:
-          path: /tmp/ccache.log
-          destination: ccache.log
+          path: /tmp/artifacts/
+          destination: /
+      - *save_cache
 workflows:
   version: 2
   build-and-test:
