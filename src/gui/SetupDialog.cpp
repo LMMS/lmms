@@ -147,7 +147,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	setWindowTitle(
 			tr("Settings"));
 	setModal(true);
-	setFixedSize(452, 412);
+	setFixedSize(452, 426);
 
 	Engine::projectJournal()->setJournalling(false);
 
@@ -291,7 +291,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Language"), general_w);
 	lang_tw->setFixedHeight(48);
 	QComboBox * changeLang = new QComboBox(lang_tw);
-	changeLang->move(XDelta, YDelta);
+	changeLang->move(XDelta, 20);
 
 	QDir dir(ConfigManager::inst()->localeDir());
 	QStringList fileNames = dir.entryList(QStringList("*.qm"));
@@ -353,15 +353,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Autosave tab.
 	TabWidget * auto_save_tw = new TabWidget(
 			tr("Autosave"), performance_w);
-	auto_save_tw->setFixedHeight(110);
+	auto_save_tw->setFixedHeight(106);
 
 	m_saveIntervalSlider = new QSlider(Qt::Horizontal, auto_save_tw);
-	m_saveIntervalSlider->setRange(1, 20);
-	m_saveIntervalSlider->setTickPosition(QSlider::TicksBelow);
-	m_saveIntervalSlider->setPageStep(1);
-	m_saveIntervalSlider->setTickInterval(1);
-	m_saveIntervalSlider->setGeometry(10, 16, 340, 18);
 	m_saveIntervalSlider->setValue(m_saveInterval);
+	m_saveIntervalSlider->setRange(1, 20);
+	m_saveIntervalSlider->setTickInterval(1);
+	m_saveIntervalSlider->setPageStep(1);
+	m_saveIntervalSlider->setGeometry(10, 18, 340, 18);
+	m_saveIntervalSlider->setTickPosition(QSlider::TicksBelow);
 
 	connect(m_saveIntervalSlider, SIGNAL(valueChanged(int)), this,
 			SLOT(setAutoSaveInterval(int)));
@@ -379,7 +379,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_runningAutoSave = new LedCheckBox(
 			tr("Allow autosave while playing"), auto_save_tw);
-	m_runningAutoSave->move(20, 90);
+	m_runningAutoSave->move(20, 88);
 	m_runningAutoSave->setChecked(m_enableRunningAutoSave);
 	connect(m_runningAutoSave, SIGNAL(toggled(bool)), this,
 			SLOT(toggleRunningAutoSave(bool)));
@@ -476,10 +476,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Audio interface tab.
 	TabWidget * audioiface_tw = new TabWidget(
 			tr("Audio interface"), audio_w);
-	audioiface_tw->setFixedHeight(60);
+	audioiface_tw->setFixedHeight(56);
 
 	m_audioInterfaces = new QComboBox(audioiface_tw);
-	m_audioInterfaces->setGeometry(10, 20, 240, 22);
+	m_audioInterfaces->setGeometry(10, 20, 240, 28);
 
 
 	QPushButton * audio_help_btn = new QPushButton(
@@ -585,15 +585,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Buffer size tab.
 	TabWidget * bufferSize_tw = new TabWidget(
 			tr("Buffer size"), audio_w);
-	bufferSize_tw->setFixedHeight(80);
+	bufferSize_tw->setFixedHeight(76);
 
 	m_bufferSizeSlider = new QSlider(Qt::Horizontal, bufferSize_tw);
 	m_bufferSizeSlider->setRange(1, 256);
-	m_bufferSizeSlider->setTickPosition(QSlider::TicksBelow);
-	m_bufferSizeSlider->setPageStep(8);
 	m_bufferSizeSlider->setTickInterval(8);
-	m_bufferSizeSlider->setGeometry(10, 16, 340, 18);
+	m_bufferSizeSlider->setPageStep(8);
 	m_bufferSizeSlider->setValue(m_bufferSize / 64);
+	m_bufferSizeSlider->setGeometry(10, 18, 340, 18);
+	m_bufferSizeSlider->setTickPosition(QSlider::TicksBelow);
 
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)), this,
 			SLOT(setBufferSize(int)));
@@ -642,10 +642,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// MIDI interface tab.
 	TabWidget * midiiface_tw = new TabWidget(
 			tr("MIDI interface"), midi_w);
-	midiiface_tw->setFixedHeight(60);
+	midiiface_tw->setFixedHeight(56);
 
 	m_midiInterfaces = new QComboBox(midiiface_tw);
-	m_midiInterfaces->setGeometry(10, 20, 240, 22);
+	m_midiInterfaces->setGeometry(10, 20, 240, 28);
 
 
 	QPushButton * midi_help_btn = new QPushButton(
