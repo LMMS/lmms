@@ -688,7 +688,7 @@ void AutomationEditor::removePoints( int x0, int x1 )
 	int x = x0;
 	int xstep;
 
-	if( deltax < AutomationPattern::quantization() )
+	if( deltax < 1 )
 	{
 		return;
 	}
