@@ -23,7 +23,7 @@
    <item>
     <widget class="QCheckBox" name="exportLoopCB">
      <property name="text">
-      <string>Export as loop (remove end silence)</string>
+      <string>Export as loop (remove extra bar)</string>
      </property>
     </widget>
    </item>
