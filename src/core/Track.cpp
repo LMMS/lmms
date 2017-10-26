@@ -2528,9 +2528,11 @@ void Track::iWasToldToVerticallyZoom()
 	//	selectableObject::update();
 	//}
 	//doesn't help emit dataChanged();
-	setFixedHeight( 300 );
+	//thought this might fix bbs: setFixedHeight( 300 );
 		//m_trackContainerView->realignTracks();
 		//m_track->setHeight( height() );
+
+	//I feel like I need to get into TrackView somehow.
 }
 
 

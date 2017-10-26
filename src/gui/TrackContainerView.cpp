@@ -242,22 +242,6 @@ void TrackContainerView::realignTracks()
 
 
 
-void TrackContainerView::yugeTracks()
-{
-	//Spekular was here
-}
-
-
-
-
-void TrackContainerView::smolTracks()
-{
-	//Spekular was here
-}
-
-
-
-
 TrackView * TrackContainerView::createTrackView( Track * _t )
 {
 	//m_tc->addJournalCheckPoint();

@@ -662,7 +662,6 @@ void SongEditor::zoomingChanged()
 void SongEditor::verticalZoomingChanged()
 {
 	//Spekular was here
-	//yugeTracks();
 	//m_track->setHeight(300);
 	//setHeight(300);
 	emit pleaseVerticallyZoom();
