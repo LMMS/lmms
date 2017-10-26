@@ -144,6 +144,10 @@ private:
 
 	friend class SongEditorWindow;
 
+signals:
+
+	void pleaseVerticallyZoom();
+
 } ;
 
 

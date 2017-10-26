@@ -50,6 +50,8 @@
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
+//Spekular was here
+#include "Track.h"
 
 
 positionLine::positionLine( QWidget * parent ) :
@@ -76,12 +78,14 @@ SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
+	//Spekular was here
 	m_verticalZoomingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
 {
 	m_zoomingModel->setParent(this);
+	//Spekular was here
 	m_verticalZoomingModel->setParent(this);
 	// create time-line
 	int widgetTotal = ConfigManager::inst()->value( "ui",
@@ -243,16 +247,19 @@ SongEditor::SongEditor( Song * song ) :
 	for( float const & zoomLevel : m_zoomLevels )
 	{
 		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
+		//Spekular was here
 		m_verticalZoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel->setInitValue(
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
+	//Spekular was here
 	m_verticalZoomingModel->setInitValue(
 			m_verticalZoomingModel->findText( "100%" ) );
 	connect( m_verticalZoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( verticalZoomingChanged() ) );
+	connect(this, SIGNAL(pleaseVerticallyZoom()), m_song, SLOT(howHardCanItBeToVZoom()));
 
 	setFocusPolicy( Qt::StrongFocus );
 	setFocus();
@@ -654,8 +661,17 @@ void SongEditor::zoomingChanged()
 
 void SongEditor::verticalZoomingChanged()
 {
-	//TODO I GUESS
-	yugeTracks();
+	//Spekular was here
+	//yugeTracks();
+	//m_track->setHeight(300);
+	//setHeight(300);
+	emit pleaseVerticallyZoom();
+	//TextFloat::displayMessage("verticalZoomingChanged() called, hopefully emitted pleaseVerticallyZoom()");
+	//verticalZoom();
+	//setPixelsPerTact( m_zoomLevels[m_zoomingModel->value()] * DEFAULT_PIXELS_PER_TACT );
+	//connect(m_addBBTrackAction, SIGNAL(triggered()), m_editor->m_song, SLOT(addBBTrack()));
+
+	//realignTracks();
 }
 
 
@@ -790,6 +806,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
+	//Spekular was here
+	//connect(this, SIGNAL(pleaseVerticallyZoom()), m_editor->m_song, SLOT(howHardCanItBeToVZoom()));
 }
 
 QSize SongEditorWindow::sizeHint() const

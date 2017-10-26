@@ -244,7 +244,7 @@ void TrackContainerView::realignTracks()
 
 void TrackContainerView::yugeTracks()
 {
-	//TODO I GUESS
+	//Spekular was here
 }
 
 
@@ -252,7 +252,7 @@ void TrackContainerView::yugeTracks()
 
 void TrackContainerView::smolTracks()
 {
-	//TEMP CRAP
+	//Spekular was here
 }
 
 

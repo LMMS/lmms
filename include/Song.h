@@ -292,6 +292,9 @@ public slots:
 
 	void addBBTrack();
 
+	//spekular was here
+	void howHardCanItBeToVZoom();
+
 
 private slots:
 	void insertBar();

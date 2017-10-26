@@ -586,6 +586,7 @@ public:
 
 	BoolModel* getMutedModel();
 
+
 public slots:
 	virtual void setName( const QString & newName )
 	{
@@ -594,6 +595,9 @@ public slots:
 	}
 
 	void toggleSolo();
+
+	//Spekular was here
+	void iWasToldToVerticallyZoom();
 
 
 private:
@@ -674,6 +678,8 @@ public:
 
 public slots:
 	virtual bool close();
+	//Spekular was here
+	//void soCloseYetSoFar();
 
 
 protected:
