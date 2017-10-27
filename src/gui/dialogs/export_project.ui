@@ -16,6 +16,12 @@
     <height>374</height>
    </size>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>379</width>
+    <height>374</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Export project</string>
   </property>
