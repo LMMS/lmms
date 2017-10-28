@@ -67,12 +67,20 @@ public:
 
 	NotePlayHandle* previewNote()
 	{
+	#if QT_VERSION >= 0x050000
 		return m_previewNote.loadAcquire();
+	#else
+		return m_previewNote;
+	#endif
 	}
 
 	void setPreviewNote( NotePlayHandle * _note )
 	{
+	#if QT_VERSION >= 0x050000
 		m_previewNote.storeRelease( _note );
+	#else
+		m_previewNote = _note;
+	#endif
 	}
 
 	bool testAndSetPreviewNote( NotePlayHandle * expectedVal, NotePlayHandle * newVal )
