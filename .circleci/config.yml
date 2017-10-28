@@ -41,7 +41,7 @@ jobs:
     environment:
       <<: *common_environment
     docker:
-      - image: lukaswhl/lmms-ci-linux.mingw32:14.04
+      - image: lmmsci/linux.mingw32:14.04
     steps:
       - checkout
       - *init
@@ -58,7 +58,7 @@ jobs:
     environment:
       <<: *common_environment
     docker:
-      - image: lukaswhl/lmms-ci-linux.mingw64:14.04
+      - image: lmmsci/linux.mingw64:14.04
     steps:
       - checkout
       - *init
@@ -73,7 +73,7 @@ jobs:
       - *save_cache
   linux.gcc:
     docker:
-      - image: lukaswhl/lmms-ci-linux.gcc:14.04
+      - image: lmmsci/linux.gcc:14.04
     environment:
       <<: *common_environment
     steps:
