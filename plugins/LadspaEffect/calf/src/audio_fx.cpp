@@ -731,6 +731,7 @@ void lookahead_limiter::process(float &left, float &right, float * multi_buffer)
                 _peak = fabs(buffer[nextpos[j]]) > fabs(buffer[nextpos[j] + 1]) ? fabs(buffer[nextpos[j]]) : fabs(buffer[nextpos[j] + 1]);
                 // calc a delta to use to reach our incoming peak from the
                 // stored position
+                _peak = std::max( _peak, 0.000001f );
                 _delta = (_limit / peak - (limit * _multi_coeff * weight) / _peak) / (((buffer_size - nextpos[j] + pos) % buffer_size) / channels);
                 if(_delta < nextdelta[j]) {
                     // if the buffered delta is more important than the delta
