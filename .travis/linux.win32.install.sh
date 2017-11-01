@@ -14,11 +14,14 @@ MINGW_PACKAGES="mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x
 	mingw32-x-pkgconfig mingw32-x-binutils mingw32-x-gcc mingw32-x-runtime
 	mingw32-x-libgig mingw32-x-libsoundio mingw32-x-lame $MINGW_PACKAGES"
 
+# swh build dependencies
+SWH_PACKAGES="perl libxml2-utils libxml-perl liblist-moreutils-perl"
+
 export MINGW_PACKAGES
 
 "$TRAVIS_BUILD_DIR/.travis/linux.win.download.sh" win32
 
-PACKAGES="nsis cloog-isl libmpc3 qt4-linguist-tools mingw32 $MINGW_PACKAGES"
+PACKAGES="nsis cloog-isl libmpc3 qt4-linguist-tools mingw32 $MINGW_PACKAGES $SWH_PACKAGES"
 
 # shellcheck disable=SC2086
 sudo apt-get install -y $PACKAGES
