@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="valveRect" id="1405" class="DistortionPlugin,SimulatorPlugin">
+    <name>Valve rectifier</name>
+
+    <callback event="instantiate"><![CDATA[
+      // Number of samples in averaging buffer
+      avg_size = s_rate / 9;
+      // Reciprocal of obove
+      avg_sizer = 9.0f / (float)s_rate;
+      // Averaging buffer
+      avg = calloc(avg_size, sizeof(float));
+      // Sum of samples in averaging buffer
+      avgs = 0.0f;
+      // Position in averaging buffer
+      apos = 0;
+      // Last value in lowpass 1
+      lp1tm1 = 0.0f;
+      // Last value in lowpass 2
+      lp2tm1 = 0.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      memset(avg, 0, avg_size * sizeof(float));
+      avgs = 0.0f;
+      apos = 0;
+      lp1tm1 = 0.0f;
+      lp2tm1 = 0.0f;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->avg);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float q, x, fx;
+      const float dist = dist_p * 40.0f + 0.1f;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        x = fabs(input[pos]);
+        if (x > lp1tm1) {
+          lp1tm1 = x;
+        } else {
+          lp1tm1 = 0.9999f * lp1tm1 + 0.0001f * x;
+        }
+
+        avgs -= avg[apos];
+        avgs += lp1tm1;
+        avg[apos++] = lp1tm1;
+        apos %= avg_size;
+
+        lp2tm1 = 0.999f * lp2tm1 + avgs*avg_sizer * 0.001f;
+	q = lp1tm1 * sag - lp2tm1 * 1.02f - 1.0f;
+	if (q > -0.01f) {
+          q = -0.01f;
+        } else if (q < -1.0f) {
+          q = -1.0f;
+        }
+
+        if (input[pos] == q) {
+          fx = 1.0f / dist + q / (1.0f - f_exp(dist * q));
+        } else {
+          fx = (input[pos] - q) /
+           (1.0f - f_exp(-dist * (input[pos] - q))) +
+           q / (1.0f - f_exp(dist * q));
+        }
+
+        buffer_write(output[pos], fx);
+      }
+
+      plugin_data->lp1tm1 = lp1tm1;
+      plugin_data->lp2tm1 = lp2tm1;
+      plugin_data->avgs = avgs;
+      plugin_data->apos = apos;
+    ]]></callback>
+
+    <port label="sag" dir="input" type="control" hint="default_0">
+      <name>Sag level</name>
+      <p>The level of power supply sag that will be caused by attacks.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="dist_p" dir="input" type="control" hint="default_0">
+      <name>Distortion</name>
+      <p>How harsh the distortion caused by the sag will be.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="lp1tm1" type="float" />
+    <instance-data label="lp2tm1" type="float" />
+    <instance-data label="avg" type="float *" />
+    <instance-data label="avg_size" type="int" />
+    <instance-data label="avg_sizer" type="float" />
+    <instance-data label="avgs" type="float" />
+    <instance-data label="apos" type="unsigned int" />
+  </plugin>
+</ladspa>

@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="valve" id="1209" class="DistortionPlugin,SimulatorPlugin">
+    <name>Valve saturation</name>
+    <p>A model of valve (tube) distortion, lacking some of the harmonics you would get in a real tube amp, but sounds good nonetheless.</p>
+    <p>Taken from Ragnar Bendiksen's thesis: \url{https://web.archive.org/web/20050212034404/http://www.notam02.no/~rbendiks/Diplom/Innhold.html}.</p>
+
+    <callback event="activate"><![CDATA[
+      itm1 = 0.0f;
+      otm1 = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos;
+LADSPA_Data fx;
+
+const float q = q_p - 0.999f;
+const float dist = dist_p * 40.0f + 0.1f;
+
+if (q == 0.0f) {
+	for (pos = 0; pos < sample_count; pos++) {
+		if (input[pos] == q) {
+			fx = 1.0f / dist;
+		} else {
+			fx = input[pos] / (1.0f - f_exp(-dist * input[pos]));
+		}
+		otm1 = 0.999f * otm1 + fx - itm1;
+		round_to_zero(&otm1);
+		itm1 = fx;
+		buffer_write(output[pos], otm1);
+	}
+} else {
+	for (pos = 0; pos < sample_count; pos++) {
+		if (input[pos] == q) {
+			fx = 1.0f / dist + q / (1.0f - f_exp(dist * q));
+		} else {
+			fx = (input[pos] - q) /
+			 (1.0f - f_exp(-dist * (input[pos] - q))) +
+			 q / (1.0f - f_exp(dist * q));
+		}
+		otm1 = 0.999f * otm1 + fx - itm1;
+		round_to_zero(&otm1);
+		itm1 = fx;
+		buffer_write(output[pos], otm1);
+	}
+}
+
+plugin_data->itm1 = itm1;
+plugin_data->otm1 = otm1;
+    ]]></callback>
+
+    <port label="q_p" dir="input" type="control" hint="default_0">
+      <name>Distortion level</name>
+      <p>How hard the signal is driven against the limit of the amplifier.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="dist_p" dir="input" type="control" hint="default_0">
+      <name>Distortion character</name>
+      <p>The hardness of the sound, low for soft, high for hard.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="itm1" type="LADSPA_Data"/>
+    <instance-data label="otm1" type="LADSPA_Data"/>
+
+  </plugin>
+</ladspa>

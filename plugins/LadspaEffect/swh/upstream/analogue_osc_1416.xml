@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include <math.h>
+
+      #include "ladspa-util.h"
+      #include "util/blo.h"
+    ]]></code>
+  </global>
+
+  <plugin label="analogueOsc" id="1416" class="OscillatorPlugin">
+    <name>Analogue Oscillator</name>
+    <p>This plugin simulates the output you get from an analogue synth's oscillators.</p>
+    <p>You can get a reasonable emulation of a 303's square (for example) if you set the warmth to about 0.4 and the instability to about 0.05.</p>
+    <p>The frequency is currently a control input, and there is no interpolation, so if your host is using large block size it will sound steppy.</p>
+    <p>I'm unsure whether to convert this to an audio input or interpolate the control in.</p>
+
+    <callback event="instantiate"><![CDATA[
+      tables = blo_h_tables_new(512);
+      osc = blo_h_new(tables, BLO_SINE, (float)s_rate);
+      fs = (float)s_rate;
+      itm1 = 0.0f;
+      otm1 = 0.0f;
+      otm2 = 0.0f;
+      rnda = 43437;
+      rndb = 111145;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      blo_h_tables_free(plugin_data->tables);
+      blo_h_free(plugin_data->osc);
+    ]]></callback>
+
+    <callback event="run" unused-vars="tables"><![CDATA[
+      unsigned long pos;
+      LADSPA_Data x, y;
+      const float q = warm - 0.999f;
+      const float leak = 1.0f - warm * 0.02f;
+      const unsigned int max_jump = (unsigned int)f_round(instab * 30000.0f) + 1;
+
+      osc->wave = LIMIT(f_round(wave) - 1, 0, BLO_N_WAVES-1);
+      osc->nyquist = fs * (0.47f - f_clamp(warm, 0.0f, 1.0f) * 0.41f);
+      blo_hd_set_freq(osc, freq);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	x = blo_hd_run_cub(osc);
+        rnda += 432577;
+        rnda *= 47;
+	rndb += 7643113;
+        rnda *= 59;
+        osc->ph.all += (((rnda + rndb)/2) % max_jump) - max_jump/2;
+        osc->ph.all &= osc->ph_mask;
+	y = (x - q) / (1.0f - f_exp(-1.2f * (x - q))) +
+              q / (1.0f - f_exp(1.2f * q));
+	/* Catch the case where x ~= q */
+	if (isnan(y) || fabs(y) > 1.0f) {
+		y = 0.83333f + q / (1.0f - f_exp(1.2f * q));
+	}
+	otm2 = otm1;
+        otm1 = leak * otm1 + y - itm1;
+        itm1 = y;
+
+        buffer_write(output[pos], (otm1 + otm2) * 0.5f);
+      }
+
+      plugin_data->itm1 = itm1;
+      plugin_data->otm1 = otm1;
+      plugin_data->otm2 = otm2;
+      plugin_data->rnda = rnda;
+      plugin_data->rndb = rndb;
+    ]]></callback>
+
+    <port label="wave" dir="input" type="control" hint="integer,default_1">
+      <name>Waveform (1=sin, 2=tri, 3=squ, 4=saw)</name>
+      <p><![CDATA[
+	The basic shape of the waveform is selected using this control:
+
+	\begin{tabular}{|r|l|}
+	\hline
+	Value & Waveform \\
+	\hline \hline
+	1 & Sine \\
+	2 & Triangle \\
+	3 & Square \\
+	4 & Saw \\
+        \hline
+	\end{tabular}
+      ]]></p>
+      <range min="1" max="BLO_N_WAVES"/>
+    </port>
+
+    <port label="freq" dir="input" type="control" hint="sample_rate,default_440,logarithmic">
+      <name>Frequency (Hz)</name>
+      <p>The frequency of the output (Hz).</p>
+      <range min="0.000001" max="0.499"/>
+    </port>
+
+    <port label="warm" dir="input" type="control" hint="default_0">
+      <name>Warmth</name>
+      <p>The degree of softening that is applied to the generated waveform, reduces the number of harmonics in the output.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="instab" dir="input" type="control" hint="default_0">
+      <name>Instability</name>
+      <p>The degree of pitch instability of the output. Turning this too high with square and saw waves will produce an annoying jittery sound, I want to fix this but it is tricky.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="tables" type="blo_h_tables *" />
+    <instance-data label="osc" type="blo_h_osc *" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="itm1" type="float" />
+    <instance-data label="otm1" type="float" />
+    <instance-data label="otm2" type="float" />
+    <instance-data label="rnda" type="unsigned int" />
+    <instance-data label="rndb" type="unsigned int" />
+  </plugin>
+</ladspa>

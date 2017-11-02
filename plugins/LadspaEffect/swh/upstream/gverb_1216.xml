@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Juhana Sadeharju &lt;kouhia at nic.funet.fi&gt;, LADSPAification by Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+/*
+
+GVerb algorithm designed and implemented by Juhana Sadeharju.
+LADSPA implementation and GVerb speeds ups by Steve Harris.
+
+Comments and suggestions should be mailed to Juhana Sadeharju
+(kouhia at nic funet fi).
+
+*/
+
+#include "ladspa-util.h"
+#include "gverb/gverbdsp.h"
+#include "gverb/gverb.h"
+    </code>
+  </global>
+
+  <plugin label="gverb" id="1216" class="ReverbPlugin">
+    <name>GVerb</name>
+    <p>A mono in, stereo out reverb implementation by Juhana Sadeharju (kouhia at nic.funet.fi). I ported it to LADSPA and did some testing.</p>
+    <p>Please contact Juhana directly regarding any bugs you find.</p>
+    <p><![CDATA[
+      Paul Winkler recommends a good starting point for a "large hall" as follows:
+
+	\begin{tabular}{|l|r|}
+	\hline
+	Parameter & Value \\
+	\hline
+	Roomsize & 200 \\
+	Reverb time & 1.3 \\
+	Damping & 0.4 \\
+	Input bandwidth & 0.5 \\
+	Dry signal level & 0 \\
+	Early reflection level & -12 \\
+	Tail level & 0 \\
+	\hline
+	\end{tabular}
+    ]]></p>
+
+    <callback event="instantiate"><![CDATA[
+      verb = gverb_new(s_rate, 300.0f, 50.0f, 7.0f, 0.5f, 15.0f, 0.5f, 0.5f, 0.5f);
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      gverb_flush(plugin_data->verb);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      gverb_free(plugin_data->verb);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float l, r;
+      float dryc = DB_CO(drylevel);
+
+      gverb_set_roomsize(verb, roomsize);
+      gverb_set_revtime(verb, revtime);
+      gverb_set_damping(verb, damping);
+      gverb_set_inputbandwidth(verb, inputbandwidth);
+      gverb_set_earlylevel(verb, DB_CO(earlylevel));
+      gverb_set_taillevel(verb, DB_CO(taillevel));
+
+      for (pos = 0; pos < sample_count; pos++) {
+        gverb_do(verb, input[pos], &l, &r);
+        buffer_write(outl[pos], l + input[pos] * dryc);
+        buffer_write(outr[pos], r + input[pos] * dryc);
+      }
+    ]]></callback>
+
+    <port label="roomsize" dir="input" type="control" hint="default_low">
+      <name>Roomsize (m)</name>
+      <p>The size of the room, in meters. Excessivly large, and excessivly small values will make it sound a bit unrealistic.</p>
+      <p>Values of around 30 sound good.</p>
+      <range min="1" max="300"/>
+    </port>
+
+    <port label="revtime" dir="input" type="control" hint="default_low">
+      <name>Reverb time (s)</name>
+      <p>Reverb decay time, in seconds. 7 is a good place to start.</p>
+      <range min="0.1" max="30"/>
+    </port>
+
+    <port label="damping" dir="input" type="control" hint="default_middle">
+      <name>Damping</name>
+      <p>This controls the high frequency damping (a lowpass filter), values near 1 will make it sound very bright, values near 0 will make it sound very dark.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="inputbandwidth" dir="input" type="control" hint="default_high">
+      <name>Input bandwidth</name>
+      <p>This is like a damping control for the input, it has a similar effect to the damping control, but is subtly different.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="drylevel" dir="input" type="control" hint="default_minimum">
+      <name>Dry signal level (dB)</name>
+      <p>The amount of dry signal to be mixed with the reverberated signal.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="earlylevel" dir="input" type="control" hint="default_0">
+      <name>Early reflection level (dB)</name>
+      <p>The quantity of early reflections (scatter reflections directly from the source). Think of Lexicons ambiance patches.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="taillevel" dir="input" type="control" hint="default_high">
+      <name>Tail level (dB)</name>
+      <p>The level of the classic reverb tail reflections.</p>
+      <range min="-70" max="0"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="outl" dir="output" type="audio">
+      <name>Left output</name>
+    </port>
+
+    <port label="outr" dir="output" type="audio">
+      <name>Right output</name>
+    </port>
+
+    <instance-data label="verb" type="ty_gverb *" />
+  </plugin>
+</ladspa>

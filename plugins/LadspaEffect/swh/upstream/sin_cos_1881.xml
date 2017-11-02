@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="sinCos" id="1881" class="OscillatorPlugin">
+    <name>Sine + cosine oscillator</name>
+    <p>This is a simple oscillator that outputs sinewaves with a 90 degree phase shift between them.</p>
+    <p>The current implementation is very inefficient, but I will improve it later.</p>
+
+    <callback event="instantiate"><![CDATA[
+      fs = (float)s_rate;
+      phi = 0.0;
+      last_om = 0.0;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const double target_om = 2.0 * M_PI * f_clamp(freq, 0.0f, 0.5f) * pow(2.0, f_clamp(pitch, 0.0f, 16.0f)) / fs;
+      const double om_d = (target_om - last_om) / (double)sample_count;
+      double om = last_om;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer_write(sine[pos], sin(phi));
+        buffer_write(cosine[pos], cos(phi));
+	om += om_d;
+	phi += om;
+      }
+      while (phi > 2.0 * M_PI) {
+	phi -= 2.0 * M_PI;
+      }
+
+      plugin_data->phi = phi;
+      plugin_data->last_om = target_om;
+    ]]></callback>
+
+    <port label="freq" dir="input" type="control" hint="default_440,sample_rate,logarithmic">
+      <name>Base frequency (Hz)</name>
+      <p>The base frequency of the output waves.</p>
+     <range min="0.000001" max="0.5"/>
+    </port>
+
+    <port label="pitch" dir="input" type="control" hint="default_0">
+      <name>Pitch offset</name>
+      <p>The pitch offset of the output waves. Final oscillator frequency is $base + 2\^pitch$.</p>
+     <range min="0" max="8"/>
+    </port>
+
+    <port label="sine" dir="output" type="audio">
+      <name>Sine output</name>
+    </port>
+
+    <port label="cosine" dir="output" type="audio">
+      <name>Cosine output</name>
+    </port>
+
+    <instance-data label="phi" type="double" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="last_om" type="double" />
+  </plugin>
+</ladspa>

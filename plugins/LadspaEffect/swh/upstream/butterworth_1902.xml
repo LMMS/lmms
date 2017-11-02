@@ -1,0 +1,180 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Alexander Ehlert &lt;mag@glame.de&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#include "config.h"
+			#include "util/iir.h"
+                        #include "util/buffer.h"
+		</code>
+	</global>
+
+	<plugin label="bwxover_iir" id="1902" class="BandpassPlugin">
+		<name>Glame Butterworth X-over Filter</name>
+                <p> Butterworth X-over filter
+                </p>
+
+                <callback event="instantiate">
+                  sample_rate = s_rate;
+                </callback>
+		<callback event="run">
+                  butterworth_stage(gt, 0, cutoff, resonance, sample_rate);
+                  iir_process_buffer_1s_5(iirf, gt, input, lpoutput, sample_count,0);
+		  buffer_sub(input, lpoutput, hpoutput, sample_count);
+
+                  // Unused variable
+                  (void)(run_adding_gain);
+                </callback>
+
+                <callback event="activate">                  
+                  gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
+                  iirf = init_iirf_t(gt);
+                  butterworth_stage(gt, 0, *(plugin_data->cutoff), 
+		  			   *(plugin_data->resonance), 
+					   sample_rate);
+                </callback>
+
+                <callback event="cleanup">
+                  free_iirf_t(plugin_data->iirf, plugin_data->gt);
+                  free_iir_stage(plugin_data->gt);
+                </callback>
+
+                <port label="cutoff" dir="input" type="control" hint="default_low, sample_rate, logarithmic">
+			<name>Cutoff Frequency (Hz)</name>
+ 			<range min="0.0001" max="0.45"/>
+		</port>
+
+                <port label="resonance" dir="input" type="control" hint="default_middle">
+			<name>Resonance</name>
+ 			<range min="0.1" max="1.41"/>
+		</port>
+                
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="lpoutput" dir="output" type="audio">
+			<name>LP-Output</name>
+		</port>
+		
+		<port label="hpoutput" dir="output" type="audio">
+			<name>HP-Output</name>
+		</port>
+            
+                <instance-data label="iirf" type="iirf_t*"/>
+                <instance-data label="gt" type="iir_stage_t*"/>  
+                <instance-data label="sample_rate" type="long"/>           
+
+	</plugin>
+
+        <plugin label="buttlow_iir" id="1903" class="LowpassPlugin">
+		<name>GLAME Butterworth Lowpass</name>
+                <p> Butterworth lowpass filter
+                </p>
+
+                <callback event="instantiate">
+                  sample_rate = s_rate;
+                </callback>
+		<callback event="run">
+                  butterworth_stage(gt, 0, cutoff, resonance, sample_rate);
+                  iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
+
+                  // Unused variable
+                  (void)(run_adding_gain);
+                </callback>
+
+                <callback event="activate">                  
+                  gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
+                  iirf = init_iirf_t(gt);
+                  butterworth_stage(gt, 0, *(plugin_data->cutoff), 
+		  			   *(plugin_data->resonance), 
+					   sample_rate);
+                </callback>
+
+                <callback event="cleanup">
+                  free_iirf_t(plugin_data->iirf, plugin_data->gt);
+                  free_iir_stage(plugin_data->gt);
+                </callback>
+
+                <port label="cutoff" dir="input" type="control" hint="default_low, sample_rate, logarithmic">
+			<name>Cutoff Frequency (Hz)</name>
+ 			<range min="0.0001" max="0.45"/>
+		</port>
+
+                <port label="resonance" dir="input" type="control" hint="default_middle">
+			<name>Resonance</name>
+ 			<range min="0.1" max="1.41"/>
+		</port>
+                
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+		
+                <instance-data label="iirf" type="iirf_t*"/>
+                <instance-data label="gt" type="iir_stage_t*"/>  
+                <instance-data label="sample_rate" type="long"/>           
+
+	</plugin>
+
+        <plugin label="butthigh_iir" id="1904" class="HighpassPlugin">
+		<name>GLAME Butterworth Highpass</name>
+                <p> Butterworth highpass filter
+                </p>
+
+                <callback event="instantiate">
+                  sample_rate = s_rate;
+                </callback>
+		<callback event="run">
+                  butterworth_stage(gt, 1, cutoff, resonance, sample_rate);
+                  iir_process_buffer_1s_5(iirf, gt, input, output, sample_count,0);
+
+                  // Unused variable
+                  (void)(run_adding_gain);
+                </callback>
+
+                <callback event="activate">                  
+                  gt = init_iir_stage(IIR_STAGE_LOWPASS,1,3,2);
+                  iirf = init_iirf_t(gt);
+                  butterworth_stage(gt, 1, *(plugin_data->cutoff), 
+		  			   *(plugin_data->resonance), 
+					   sample_rate);
+                </callback>
+
+                <callback event="cleanup">
+                  free_iirf_t(plugin_data->iirf, plugin_data->gt);
+                  free_iir_stage(plugin_data->gt);
+                </callback>
+
+                <port label="cutoff" dir="input" type="control" hint="default_low, sample_rate, logarithmic">
+			<name>Cutoff Frequency (Hz)</name>
+ 			<range min="0.0001" max="0.45"/>
+		</port>
+
+                <port label="resonance" dir="input" type="control" hint="default_middle">
+			<name>Resonance</name>
+ 			<range min="0.1" max="1.41"/>
+		</port>
+                
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+		
+                <instance-data label="iirf" type="iirf_t*"/>
+                <instance-data label="gt" type="iir_stage_t*"/>  
+                <instance-data label="sample_rate" type="long"/>           
+
+	</plugin>
+  
+</ladspa>

@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include <stdlib.h>
+      #include <math.h>
+
+      #include "ladspa-util.h"
+
+      /* Beware of dependcies if you change this */
+      #define DELAY_SIZE 8192
+    ]]></code>
+  </global>
+
+  <plugin label="amPitchshift" id="1433" class="PitchPlugin">
+    <name>AM pitchshifter</name>
+    <p>This plugin works by running a single write pointer (monotonic) and two read pointers (pitchscaled) over a ringbuffer.</p>
+    <p>The output is faded between the two readpointers according to the sine of the distance from the write pointer. The design is based on the mechanism of a mechanical pitchshifter I saw in the Gemeentemuseum in Den Haag, though I'm sure it is a common enough algorithm.</p>
+
+    <callback event="instantiate"><![CDATA[
+      delay = calloc(DELAY_SIZE, sizeof(LADSPA_Data));
+      rptr.all = 0;
+      wptr = 0;
+      last_size = -1;
+      delay_mask = 0xFF;
+      delay_ofs = 0x80;
+      last_gain = 0.5f;
+      count = 0;
+      last_inc = 0.0f;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->delay);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      fixp16 om;
+      float gain = last_gain, gain_inc = last_inc;
+      unsigned int i;
+
+      om.all = f_round(pitch * 65536.0f);
+
+      if (size != last_size) {
+	int size_tmp = f_round(size);
+
+	if (size_tmp > 7) {
+	  size_tmp = 5;
+	} else if (size_tmp < 1) {
+	  size_tmp = 1;
+	}
+	plugin_data->last_size = size;
+
+	/* Calculate the ringbuf parameters, the magick constants will need
+	 * to be changed if you change DELAY_SIZE */
+	delay_mask = (1 << (size_tmp + 6)) - 1;
+	delay_ofs = 1 << (size_tmp + 5);
+      }
+
+      for (pos = 0; pos < sample_count; pos++) {
+	float out = 0.0f;
+
+	if (count++ > 14) {
+	  float tmp;
+	  count = 0;
+	  tmp = 0.5f * (float)((rptr.part.in - wptr + delay_ofs/2) &
+                delay_mask) / (float)delay_ofs;
+	  tmp = sinf(M_PI * 2.0f * tmp) * 0.5f + 0.5f;
+	  gain_inc = (tmp - gain) / 15.0f;
+	}
+	gain += gain_inc;
+
+	delay[wptr] = input[pos];
+
+	/* Add contributions from the two readpointers, scaled by thier
+         * distance from the write pointer */
+	i = rptr.part.in;
+	out += cube_interp((float)rptr.part.fr * 0.0000152587f,
+                           delay[(i - 1) & delay_mask], delay[i],
+                           delay[(i + 1) & delay_mask],
+                           delay[(i + 2) & delay_mask]) * (1.0f - gain);
+	i += delay_ofs;
+	out += cube_interp((float)rptr.part.fr * 0.0000152587f,
+                           delay[(i - 1) & delay_mask], delay[i & delay_mask],
+                           delay[(i + 1) & delay_mask],
+                           delay[(i + 2) & delay_mask]) * gain;
+	
+	buffer_write(output[pos], out);
+
+	/* Increment ringbuffer pointers */
+	wptr = (wptr + 1) & delay_mask;
+	rptr.all += om.all;
+	rptr.part.in &= delay_mask;
+      }
+
+    plugin_data->rptr.all = rptr.all;
+    plugin_data->wptr = wptr;
+    plugin_data->delay_mask = delay_mask;
+    plugin_data->delay_ofs = delay_ofs;
+    plugin_data->last_gain = gain;
+    plugin_data->count = count;
+    plugin_data->last_inc = gain_inc;
+
+    *(plugin_data->latency) = delay_ofs/2;
+    ]]></callback>
+
+    <port label="pitch" dir="input" type="control" hint="logarithmic,default_1">
+      <name>Pitch shift</name>
+      <p>The multiple of the output pitch, eg. 2.0 will increase the pitch by one octave.</p>
+      <range min="0.25" max="4.0"/>
+    </port>
+
+    <port label="size" dir="input" type="control" hint="integer,default_middle">
+      <name>Buffer size</name>
+      <p>The order of magnitude of the buffer size. Small buffers will sound fluttery, large buffers will have flangy sounding echos.</p>
+      <p>I recommend a buffer size of 3 for a reasonable compromise, with wideband material at around 48KHz. For drums you might have to lower it, and for voiced background noises it can go higher.</p>
+      <range min="1" max="7"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="latency" dir="output" type="control">
+      <name>latency</name>
+    </port>
+
+    <instance-data label="delay" type="LADSPA_Data *" />
+    <instance-data label="rptr" type="fixp16" />
+    <instance-data label="wptr" type="unsigned int" />
+    <instance-data label="last_size" type="int" />
+    <instance-data label="delay_mask" type="unsigned int" />
+    <instance-data label="delay_ofs" type="unsigned int" />
+    <instance-data label="last_gain" type="float" />
+    <instance-data label="last_inc" type="float" />
+    <instance-data label="count" type="unsigned int" />
+  </plugin>
+</ladspa>

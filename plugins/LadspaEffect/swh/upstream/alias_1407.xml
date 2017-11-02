@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="alias" id="1407" class="DistortionPlugin">
+    <name>Aliasing</name>
+    <p>Simulates aliasing using nyquist frequency modulation. Produces wacky results if the blocks aren't even numbers of samples long.</p>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float coef = 1.0f - 2.0f * level;
+
+      if (output != input) {
+        for (pos = 0; pos < sample_count; pos+=2) {
+          buffer_write(output[pos], input[pos]);
+        }
+      }
+      for (pos = 1; pos < sample_count; pos+=2) {
+        buffer_write(output[pos], input[pos] * coef);
+      }
+    ]]></callback>
+
+    <port label="level" dir="input" type="control" hint="default_0">
+      <name>Aliasing level</name>
+      <p>Controls the amount of simulated aliasing in the output.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+  </plugin>
+</ladspa>

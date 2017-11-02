@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Andy Wingo &lt;wingo at pobox dot com&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+
+      #define LOG001 -6.9077552789f
+    ]]></code>
+  </global>
+
+  <!-- ******   DECAY   ****** -->
+
+  <plugin label="decay" id="1886" class="UtilityPlugin">
+    <name>Exponential signal decay</name>
+    <p>Based on work by James McCartney in SuperCollider.</p>
+    
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+
+      // Uninitialized variables
+      b = 0;
+      first_time = 0;
+      last_decay_time = 0;
+      y = 0;
+    ]]></callback>
+    
+    <callback event="activate"><![CDATA[
+      b = 0.f;
+      y = 0.f;
+      last_decay_time = 0.f;
+      first_time = 0;
+    ]]></callback>
+    
+    <callback event="run"><![CDATA[
+      int i;
+
+      if (first_time) {
+        plugin_data->last_decay_time = decay_time;
+        plugin_data->b = decay_time == 0.f ? 0.f : exp (LOG001 / (decay_time * sample_rate));
+        plugin_data->first_time = 0;
+      }
+
+      if (decay_time == last_decay_time) {
+        if (b == 0.f)
+          for (i=0; i<sample_count; i++)
+            out[i] = y = in[i];
+        else
+          for (i=0; i<sample_count; i++)
+            out[i] = y = in[i] + b * y;
+      } else {
+        LADSPA_Data b_slope;
+
+        plugin_data->b = decay_time == 0.f ? 0.f : exp (LOG001 / (decay_time * sample_rate));
+        b_slope = (plugin_data->b - b) / sample_count;
+
+        for (i=0; i<sample_count; i++) {
+          buffer_write(out[i], y = in[i] + b * y);
+          b += b_slope;
+        }
+
+        plugin_data->last_decay_time = decay_time;
+      }
+      
+      plugin_data->y = y;
+    ]]></callback>
+
+    <port label="in" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="out" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <port label="decay_time" dir="input" type="control" hint="default_1">
+      <name>Decay Time (s)</name>
+      <range min="0"/>
+      <p>
+       Time for the echoes to decay by 60 decibels.
+      </p>
+    </port>
+
+    <instance-data label="y" type="LADSPA_Data" />
+    <instance-data label="b" type="LADSPA_Data" />
+    <instance-data label="last_decay_time" type="LADSPA_Data" />
+    <instance-data label="sample_rate" type="LADSPA_Data" />
+    <instance-data label="first_time" type="char" />
+  </plugin>
+</ladspa>

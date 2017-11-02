@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="dcRemove" id="1207" class="HighpassPlugin,UtilityPlugin">
+    <name>DC Offset Remover</name>
+    <p>Simply removes the DC (0 Hz) component from an audio signal, uses a high pass filter, so has some side effects, but they should be minimal.</p>
+
+    <callback event="activate"><![CDATA[
+      itm1 = 0.0f;
+      otm1 = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        otm1 = 0.999f * otm1 + input[pos] - itm1;
+	itm1 = input[pos];
+        buffer_write(output[pos], otm1);
+      }
+
+      plugin_data->itm1 = itm1;
+      plugin_data->otm1 = otm1;
+    ]]></callback>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="itm1" type="LADSPA_Data"/>
+    <instance-data label="otm1" type="LADSPA_Data"/>
+  </plugin>
+</ladspa>

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="foldover" id="1213" class="DistortionPlugin">
+    <name>Foldover distortion</name>
+    <p>Uses a sinwave approximation to simulate valve style foldover distortion.</p>
+    <p>Probably should have a DC offset remover on the output, but it's not always necessary.</p>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float x;
+      const float drive = drive_p + 1.0f;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	x = input[pos] * drive + push;
+        buffer_write(output[pos], 1.5f * x - 0.5f * x * x * x);
+      }
+    ]]></callback>
+
+    <port label="drive_p" dir="input" type="control" hint="default_0">
+      <name>Drive</name>
+      <range min="0" max="1"/>
+      <p>Controls the degree of distortion.</p>
+    </port>
+
+    <port label="push" dir="input" type="control" hint="default_0">
+      <name>Skew</name>
+      <range min="0" max="1"/>
+      <p>Controls the asymmetry of the waveform.</p>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+  </plugin>
+</ladspa>

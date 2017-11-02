@@ -1,0 +1,171 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#include "ladspa-util.h"
+
+			int refcount;
+			LADSPA_Data *sin_tbl, *tri_tbl, *saw_tbl, *squ_tbl;
+			long sample_rate;
+		</code>
+	</global>
+
+	<plugin label="ringmod_2i1o" id="1188" class="ModulatorPlugin">
+		<name>Ringmod with two inputs</name>
+		<p>This is a simple 2 input ring modulator.</p>
+		<p>It is important that the modulator input is bounded to (-1, +1), otherwise you will get rubbish on the output.</p>
+
+		<callback event="run">
+			unsigned long pos;
+			float tmpa = depth * 0.5f;
+			float tmpb = 2.0f - depth;
+
+			for (pos = 0; pos &lt; sample_count; pos++) {
+				buffer_write(output[pos], input[pos] * (tmpa * modulator[pos] + tmpb));
+			}
+		</callback>
+
+		<port label="depth" dir="input" type="control" hint="default_0">
+			<name>Modulation depth (0=none, 1=AM, 2=RM)</name>
+			<range min="0" max="2"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+			<p>This is the audio input.</p>
+		</port>
+
+		<port label="modulator" dir="input" type="audio" hint="default_0">
+			<name>Modulator</name>
+			<range min="-1" max="+1"/>
+			<p>This is the modulator input.</p>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+	</plugin>
+
+	<plugin label="ringmod_1i1o1l" id="1189" class="ModulatorPlugin">
+		<name>Ringmod with LFO</name>
+		<p>This is a simple ring modulator and LFO.</p>
+
+		<callback event="instantiate">
+			long i;
+
+			sample_rate = s_rate;
+
+			if (refcount++ == 0) {
+				sin_tbl = malloc(sizeof(LADSPA_Data) * sample_rate);
+				for (i = 0; i &lt; sample_rate; i++) {
+					sin_tbl[i] = sin(i * 2 * M_PI / sample_rate);
+				}
+				
+				tri_tbl = malloc(sizeof(LADSPA_Data) * sample_rate);
+				for (i = 0; i &lt; sample_rate; i++) {
+					tri_tbl[i] = acos(cos(i * 2 * M_PI / sample_rate)) / M_PI * 2 - 1;
+				}
+
+				squ_tbl = malloc(sizeof(LADSPA_Data) * sample_rate);
+				for (i = 0; i &lt; sample_rate; i++) {
+					squ_tbl[i] = (i &lt; sample_rate/2) ? 1 : -1;
+				}
+
+				saw_tbl = malloc(sizeof(LADSPA_Data) * sample_rate);
+				for (i = 0; i &lt; sample_rate; i++) {
+					saw_tbl[i] = ((2.0 * i) - (float)sample_rate) / (float)sample_rate;
+				}
+			}
+
+			offset = 0;
+		</callback>
+
+		<callback event="activate">
+			offset = 0;
+		</callback>
+
+		<callback event="cleanup" unused-vars="plugin_data">
+			if (--refcount == 0) {
+				free(sin_tbl);
+				free(tri_tbl);
+				free(squ_tbl);
+				free(saw_tbl);
+			}
+		</callback>
+
+		<callback event="run">
+			LADSPA_Data scale = fabs(sin) + fabs(tri) +
+			 fabs(saw) + fabs(squ);
+			int o;
+			unsigned long pos;
+
+			// Rescale to more useful value
+			const float depth = depthp * 0.5f;
+
+			if (scale == 0.0) {
+				scale = 1.0;
+			}
+
+			for (pos = 0; pos &lt; sample_count; pos++) {
+				o = f_round(offset);
+				buffer_write(output[pos], input[pos] *
+				 (depth * (((sin / scale) * sin_tbl[o]) +
+				   ((tri / scale) * tri_tbl[o]) +
+				   ((saw / scale) * saw_tbl[o]) +
+				   ((squ / scale) * squ_tbl[o])) +
+				   (1.0f - depth)));
+				offset += freq;
+				if (offset > sample_rate) {
+					offset -= sample_rate;
+				}
+			}
+
+			plugin_data->offset = offset;
+		</callback>
+
+		<port label="depthp" dir="input" type="control" hint="default_0">
+			<name>Modulation depth (0=none, 1=AM, 2=RM)</name>
+			<range min="0" max="2"/>
+		</port>
+
+		<port label="freq" dir="input" type="control" hint="default_440">
+			<name>Frequency (Hz)</name>
+			<range min="1" max="1000"/>
+		</port>
+
+		<port label="sin" dir="input" type="control" hint="default_1">
+			<name>Sine level</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="tri" dir="input" type="control" hint="default_0">
+			<name>Triangle level</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="saw" dir="input" type="control" hint="default_0">
+			<name>Sawtooth level</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="squ" dir="input" type="control" hint="default_0">
+			<name>Square level</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+
+		<instance-data label="offset" type="LADSPA_Data"/>
+	</plugin>
+</ladspa>

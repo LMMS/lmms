@@ -1,0 +1,312 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code><![CDATA[
+#include "config.h"
+
+#ifdef FFTW3
+
+#include <fftw3.h>
+
+typedef fftwf_plan fft_plan;
+typedef float fftw_real;
+
+#else
+
+#ifdef EXPLICIT_S
+#include <srfftw.h>
+#else
+#include <rfftw.h>
+#endif //EXPLICIT_S
+
+typedef rfftw_plan fft_plan;
+
+#endif //FFTW3
+
+#include "ladspa-util.h"
+
+#define FFT_LENGTH 1024
+#define OVER_SAMP  4
+#define BANDS      15
+
+
+float bands[BANDS] =
+  { 50.00f, 100.00f, 155.56f, 220.00f, 311.13f,
+    440.00f, 622.25f, 880.00f, 1244.51f, 1760.00f, 2489.02f,
+    3519.95, 4978.04f, 9956.08f, 19912.16f };
+		]]></code>
+	</global>
+
+	<plugin label="mbeq" id="1197" class="MultiEQPlugin">
+		<name>Multiband EQ</name>
+		<p>This is a fairly typical multiband graphical equalizer. It's implemented using a FFT, so it takes quite a lot of CPU power, but should have less phase effects than an equivalent filter implementation.</p>
+		<p>If the input signal is at too low a sample rate then the top bands will be ignored, the highest useful band will always be a high shelf.</p>
+
+		<callback event="instantiate"><![CDATA[
+int i, bin;
+float last_bin, next_bin;
+float db;
+float hz_per_bin = (float)s_rate / (float)FFT_LENGTH;
+
+in_fifo = calloc(FFT_LENGTH, sizeof(LADSPA_Data));
+out_fifo = calloc(FFT_LENGTH, sizeof(LADSPA_Data));
+out_accum = calloc(FFT_LENGTH * 2, sizeof(LADSPA_Data));
+real = calloc(FFT_LENGTH, sizeof(fftw_real));
+comp = calloc(FFT_LENGTH, sizeof(fftw_real));
+window = calloc(FFT_LENGTH, sizeof(float));
+bin_base = calloc(FFT_LENGTH/2, sizeof(int));
+bin_delta = calloc(FFT_LENGTH/2, sizeof(float));
+fifo_pos = 0;
+
+#ifdef FFTW3
+plan_rc = fftwf_plan_r2r_1d(FFT_LENGTH, real, comp, FFTW_R2HC, FFTW_MEASURE);
+plan_cr = fftwf_plan_r2r_1d(FFT_LENGTH, comp, real, FFTW_HC2R, FFTW_MEASURE);
+#else
+plan_rc = rfftw_create_plan(FFT_LENGTH, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
+plan_cr = rfftw_create_plan(FFT_LENGTH, FFTW_COMPLEX_TO_REAL, FFTW_ESTIMATE);
+#endif
+
+// Create raised cosine window table
+for (i=0; i < FFT_LENGTH; i++) {
+	window[i] = -0.5f*cos(2.0f*M_PI*(double)i/(double)FFT_LENGTH)+0.5f;
+	window[i] *= 2.0f;
+}
+
+// Create db->coeffiecnt lookup table
+db_table = malloc(1000 * sizeof(float));
+for (i=0; i < 1000; i++) {
+	db = ((float)i/10) - 70;
+	db_table[i] = pow(10.0f, db/20.0f);
+}
+
+// Create FFT bin -> band + delta tables
+bin = 0;
+while (bin <= bands[0]/hz_per_bin) {
+	bin_base[bin] = 0;
+	bin_delta[bin++] = 0.0f;
+}
+for (i = 1; i < BANDS-1 && bin < (FFT_LENGTH/2)-1 && bands[i+1] < s_rate/2; i++) {
+	last_bin = bin;
+	next_bin = (bands[i+1])/hz_per_bin;
+	while (bin <= next_bin) {
+		bin_base[bin] = i;
+		bin_delta[bin] = (float)(bin - last_bin) / (float)(next_bin - last_bin);
+		bin++;
+	}
+}
+for (; bin < (FFT_LENGTH/2); bin++) {
+	bin_base[bin] = BANDS-1;
+	bin_delta[bin] = 0.0f;
+}
+		]]></callback>
+
+		<callback event="activate"><![CDATA[
+fifo_pos = 0;
+		]]></callback>
+
+		<callback event="cleanup"><![CDATA[
+			free(plugin_data->in_fifo);
+			free(plugin_data->out_fifo);
+			free(plugin_data->out_accum);
+			free(plugin_data->real);
+			free(plugin_data->comp);
+			free(plugin_data->window);
+			free(plugin_data->bin_base);
+			free(plugin_data->bin_delta);
+			free(plugin_data->db_table);
+		]]></callback>
+
+		<callback event="run"><![CDATA[
+int i, bin, gain_idx;
+float gains[BANDS + 1] =
+  { band_1, band_2, band_3, band_4, band_5, band_6, band_7, band_8, band_9,
+    band_10, band_11, band_12, band_13, band_14, band_15, 0.0f };
+float coefs[FFT_LENGTH / 2];
+unsigned long pos;
+
+int step_size = FFT_LENGTH / OVER_SAMP;
+int fft_latency = FFT_LENGTH - step_size;
+
+// Convert gains from dB to co-efficents
+for (i = 0; i < BANDS; i++) {
+	gain_idx = (int)((gains[i] * 10) + 700);
+	gains[i] = db_table[LIMIT(gain_idx, 0, 999)];
+}
+
+// Calculate coefficients for each bin of FFT
+coefs[0] = 0.0f;
+for (bin=1; bin < (FFT_LENGTH/2-1); bin++) {
+	coefs[bin] = ((1.0f-bin_delta[bin]) * gains[bin_base[bin]])
+		      + (bin_delta[bin] * gains[bin_base[bin]+1]);
+}
+
+if (fifo_pos == 0) {
+	fifo_pos = fft_latency;
+}
+
+for (pos = 0; pos < sample_count; pos++) {
+	in_fifo[fifo_pos] = input[pos];
+	buffer_write(output[pos], out_fifo[fifo_pos-fft_latency]);
+	fifo_pos++;
+
+	// If the FIFO is full
+	if (fifo_pos >= FFT_LENGTH) {
+		fifo_pos = fft_latency;
+
+		// Window input FIFO
+		for (i=0; i < FFT_LENGTH; i++) {
+			real[i] = in_fifo[i] * window[i];
+		}
+
+		// Run the real->complex transform
+#ifdef FFTW3
+		fftwf_execute(plan_rc);
+#else
+		rfftw_one(plan_rc, real, comp);
+#endif
+
+		// Multiply the bins magnitudes by the coeficients
+		comp[0] *= coefs[0];
+		for (i = 1; i < FFT_LENGTH/2; i++) {
+			comp[i] *= coefs[i];
+			comp[FFT_LENGTH-i] *= coefs[i];
+		}
+
+		// Run the complex->real transform
+#ifdef FFTW3
+                fftwf_execute(plan_cr);
+#else
+		rfftw_one(plan_cr, comp, real);
+#endif
+
+		// Window into the output accumulator
+		for (i = 0; i < FFT_LENGTH; i++) {
+			out_accum[i] += 0.9186162f * window[i] * real[i]/(FFT_LENGTH * OVER_SAMP);
+		}
+		for (i = 0; i < step_size; i++) {
+			out_fifo[i] = out_accum[i];
+		}
+
+		// Shift output accumulator
+		memmove(out_accum, out_accum + step_size, FFT_LENGTH*sizeof(LADSPA_Data));
+
+		// Shift input fifo
+		for (i = 0; i < fft_latency; i++) {
+			in_fifo[i] = in_fifo[i+step_size];
+		}
+	}
+}
+
+// Store the fifo_position
+plugin_data->fifo_pos = fifo_pos;
+
+*(plugin_data->latency) = fft_latency;
+		]]></callback>
+
+		<port label="band_1" dir="input" type="control" hint="default_0">
+			<name>50Hz gain (low shelving)</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_2" dir="input" type="control" hint="default_0">
+			<name>100Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_3" dir="input" type="control" hint="default_0">
+			<name>156Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_4" dir="input" type="control" hint="default_0">
+			<name>220Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_5" dir="input" type="control" hint="default_0">
+			<name>311Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_6" dir="input" type="control" hint="default_0">
+			<name>440Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_7" dir="input" type="control" hint="default_0">
+			<name>622Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_8" dir="input" type="control" hint="default_0">
+			<name>880Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_9" dir="input" type="control" hint="default_0">
+			<name>1250Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_10" dir="input" type="control" hint="default_0">
+			<name>1750Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_11" dir="input" type="control" hint="default_0">
+			<name>2500Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+		<port label="band_12" dir="input" type="control" hint="default_0">
+			<name>3500Hz gain</name>
+			<range min="-70" max="+30"/>
+		</port>
+
+                <port label="band_13" dir="input" type="control" hint="default_0">
+                        <name>5000Hz gain</name>
+                        <range min="-70" max="+30"/>
+                </port>
+
+                <port label="band_14" dir="input" type="control" hint="default_0">
+                        <name>10000Hz gain</name>
+                        <range min="-70" max="+30"/>
+                </port>
+
+                <port label="band_15" dir="input" type="control" hint="default_0">
+                        <name>20000Hz gain</name>
+                        <range min="-70" max="+30"/>
+                </port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+
+		<port label="latency" dir="output" type="control">
+			<name>latency</name>
+		</port>
+
+		<instance-data label="in_fifo" type="LADSPA_Data *"/>
+		<instance-data label="out_fifo" type="LADSPA_Data *"/>
+		<instance-data label="out_accum" type="LADSPA_Data *"/>
+		<instance-data label="real" type="fftw_real *"/>
+		<instance-data label="comp" type="fftw_real *"/>
+		<instance-data label="window" type="float *"/>
+		<instance-data label="fifo_pos" type="long"/>
+		<instance-data label="db_table" type="float *"/>
+		<instance-data label="bin_base" type="int *"/>
+		<instance-data label="bin_delta" type="float *"/>
+		<instance-data label="plan_rc" type="fft_plan"/>
+		<instance-data label="plan_cr" type="fft_plan"/>
+<!-- static fft_plan plan_rc = NULL, plan_cr = NULL; -->
+	</plugin>
+</ladspa>

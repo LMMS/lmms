@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #define HARMONICS 11
+
+      /* Calculate Chebychev coefficents from partial magnitudes, adapted from
+       * example in Num. Rec. */
+      void chebpc(float c[], float d[])
+      {
+          int k, j;
+          float sv, dd[HARMONICS];
+      
+          for (j = 0; j < HARMONICS; j++) {
+              d[j] = dd[j] = 0.0;
+          }
+      
+          d[0] = c[HARMONICS - 1];
+      
+          for (j = HARMONICS - 2; j >= 1; j--) {
+              for (k = HARMONICS - j; k >= 1; k--) {
+                  sv = d[k];
+                  d[k] = 2.0 * d[k - 1] - dd[k];
+                  dd[k] = sv;
+              }
+              sv = d[0];
+              d[0] = -dd[0] + c[j];
+              dd[0] = sv;
+          }
+      
+          for (j = HARMONICS - 1; j >= 1; j--) {
+              d[j] = d[j - 1] - dd[j];
+          }
+          d[0] = -dd[0] + 0.5 * c[0];
+      }
+    ]]></code>
+  </global>
+
+  <plugin label="harmonicGen" id="1220" class="GeneratorPlugin">
+    <name>Harmonic generator</name>
+    <p>\subsubsection{What does it do?}</p>
+    <p>Allows you to add harmonics and remove the fundamental from any audio signal.</p>
+    <p>\subsubsection{Known bugs}</p>
+    <p>There is no bandwith limiting filter on the output, so it is easy to create excessively high frequency harmonics that could cause aliasing problems. In practice this doesn't seem to be a serious problem however.</p>
+    <p>\subsubsection{Examples}</p>
+    <p>There are many interesting effects you can achieve with sinewaves, one example is producing bandlimited squarewaves from sinewaves. To do this set the parameters to 1, 0, -0.3333, 0, 0.2, 0, -0.14285, 0, 0.11111.</p>
+    <p>To get a triangle like signal use 1, 0, -0.3333, 0, -0.2, 0, -0.14285, 0, -0.11111.</p>
+
+    <callback event="activate"><![CDATA[
+      itm1 = 0.0f;
+      otm1 = 0.0f;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos, i;
+      float mag_fix;
+      float mag[HARMONICS] = {0.0f, mag_1, mag_2, mag_3, mag_4, mag_5, mag_6,
+                              mag_7, mag_8, mag_9, mag_10};
+      float p[HARMONICS];
+
+      // Normalise magnitudes
+      mag_fix = (fabs(mag_1) + fabs(mag_2) + fabs(mag_3) + fabs(mag_4) +
+                 fabs(mag_5) + fabs(mag_6) + fabs(mag_7) + fabs(mag_8) +
+                 fabs(mag_9) + fabs(mag_10));
+      if (mag_fix < 1.0f) {
+        mag_fix = 1.0f;
+      } else {
+        mag_fix = 1.0f / mag_fix;
+      }
+      for (i=0; i<HARMONICS; i++) {
+        mag[i] *= mag_fix;
+      }
+
+      // Calculate polynomial coefficients, using Chebychev aproximation
+      chebpc(mag, p);
+
+      for (pos = 0; pos < sample_count; pos++) {
+        float x = input[pos], y;
+
+        // Calculate the polynomial using Horner's Rule
+	y = p[0] + (p[1] + (p[2] + (p[3] + (p[4] + (p[5] + (p[6] + (p[7] +
+            (p[8] + (p[9] + p[10] * x) * x) * x) * x) * x) * x) * x) * x) *
+            x) * x;
+
+	// DC offset remove (odd harmonics cause DC offset)
+        otm1 = 0.999f * otm1 + y - itm1;
+        itm1 = y;
+
+        buffer_write(output[pos], otm1);
+      }
+
+      plugin_data->itm1 = itm1;
+      plugin_data->otm1 = otm1;
+    ]]></callback>
+
+    <port label="mag_1" dir="input" type="control" hint="default_1">
+      <name>Fundamental magnitude</name>
+      <p>The amplitude of the fundamental of the signal, reduce it to 0 to remove the base signal altogether, or -1 to phase invert it.</p>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_2" dir="input" type="control" hint="default_0">
+      <name>2nd harmonic magnitude</name>
+      <p>The 2nd harmonic, its frequency is twice the frequency of the fundamental.</p>
+      <p>Even harmonics add a distorted feel to the sound, valve (tube) amplifiers introduce distortions at all the harmonics.</p>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_3" dir="input" type="control" hint="default_0">
+      <name>3rd harmonic magnitude</name>
+      <p>The 3rd harmonic, its frequency is three times the frequency of the fundamental.</p>
+      <p>Transistor amplifiers only introduce distortion into the odd harmonics.</p>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_4" dir="input" type="control" hint="default_0">
+      <name>4th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_5" dir="input" type="control" hint="default_0">
+      <name>5th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_6" dir="input" type="control" hint="default_0">
+      <name>6th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_7" dir="input" type="control" hint="default_0">
+      <name>7th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_8" dir="input" type="control" hint="default_0">
+      <name>8th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_9" dir="input" type="control" hint="default_0">
+      <name>9th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="mag_10" dir="input" type="control" hint="default_0">
+      <name>10th harmonic magnitude</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+      <range min="-1" max="+1"/>
+    </port>
+
+    <instance-data label="itm1" type="float" />
+    <instance-data label="otm1" type="float" />
+  </plugin>
+</ladspa>

@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <code><![CDATA[
+      #include <ladspa-util.h>
+
+      #define MIN(a,b) ((a) < (b) ? (a) : (b))
+      #define N_TAPS 128
+
+      typedef struct {
+        unsigned int delay;
+        float gain;
+      } tap;
+    ]]></code>
+  </global>
+
+  <plugin label="delayorama" id="1402" class="DelayPlugin">
+    <name>Delayorama</name>
+
+    <callback event="instantiate"><![CDATA[
+      sample_rate = s_rate;
+
+      buffer_pos = 0;
+
+      buffer_size = 6.0f * sample_rate;
+
+      taps = malloc(2 * sizeof(tap *));
+      taps[0] = calloc(N_TAPS, sizeof(tap));
+      taps[1] = calloc(N_TAPS, sizeof(tap));
+      active_set = 0;
+      next_set = 1;
+
+      buffer = calloc(buffer_size, sizeof(LADSPA_Data));
+
+      last_out = 0.0f;
+
+      last_ampsc = 0.0f;
+      last_delaysc = 0.0f;
+      last_start = 0;
+      last_range = 0;
+      last_ntaps = 0;
+      last_seed = 0;
+      last_a_rand = 0;
+      last_d_rand = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, buffer_size * sizeof(LADSPA_Data));
+
+      last_out = 0.0f;
+      last_ampsc = 0.0f;
+      last_delaysc = 0.0f;
+      last_start = 0;
+      last_range = 0;
+      last_ntaps = 0;
+      last_seed = 0;
+      last_a_rand = 0;
+      last_d_rand = 0;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->taps[0]);
+      free(plugin_data->taps[1]);
+      free(plugin_data->taps);
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float coef = DB_CO(gain);
+      unsigned int i;
+      unsigned int recalc = 0;
+      unsigned int ntaps = LIMIT(f_round(tap_count), 2, N_TAPS);
+      float range = f_clamp(delay_range * sample_rate, 0.0f,
+				(float)(buffer_size-1));
+      LADSPA_Data out;
+      float xfade = 0.0f;
+
+      const float feedback = feedback_pc * 0.01f;
+      const float gain_rand = gain_rand_pc * 0.01f;
+      const float delay_rand = delay_rand_pc * 0.01f;
+
+
+      if (ntaps != last_ntaps) {
+        recalc = 1;
+        plugin_data->last_ntaps = ntaps;
+      }
+      if (first_delay != last_start) {
+        recalc = 1;
+        plugin_data->last_start = first_delay;
+      }
+      if (range != last_range) {
+        recalc = 1;
+        plugin_data->last_range = range;
+      }
+      if (delay_scale != last_delaysc) {
+        recalc = 1;
+        plugin_data->last_delaysc = delay_scale;
+      }
+      if (gain_scale != last_ampsc) {
+        recalc = 1;
+        plugin_data->last_ampsc = gain_scale;
+      }
+      if (seed != last_seed) {
+        recalc = 1;
+        plugin_data->last_seed = seed;
+      }
+      if (gain_rand != last_a_rand) {
+        recalc = 1;
+        plugin_data->last_a_rand = gain_rand;
+      }
+      if (delay_rand != last_d_rand) {
+        recalc = 1;
+        plugin_data->last_d_rand = delay_rand;
+      }
+
+      if (recalc) {
+        float delay_base = first_delay * sample_rate;
+        float delay_fix;
+        float gain, delay, delay_sum;
+	float d_rand, g_rand;
+
+	srand(f_round(seed));
+        if (delay_base + range > buffer_size-1) {
+          delay_base = buffer_size - 1 - range;
+        }
+
+	if (gain_scale <= 1.0f) {
+          gain = 1.0f;
+	} else {
+          gain = 1.0f / pow(gain_scale, ntaps-1);
+        }
+
+	if (delay_scale == 1.0f) {
+		delay_fix = range / (ntaps - 1);
+	} else {
+		delay_fix = range * (delay_scale - 1.0f) / (pow(delay_scale, ntaps - 1) - 1.0f);
+	}
+        delay = 1.0f;
+	delay_sum = 0.0f;
+
+        for (i=0; i<ntaps; i++) {
+	  g_rand = (1.0f-gain_rand) + (float)rand() / (float)RAND_MAX * 2.0f * gain_rand;
+	  d_rand = (1.0f-delay_rand) + (float)rand() / (float)RAND_MAX * 2.0f * delay_rand;
+          taps[next_set][i].delay = MIN((unsigned int)(delay_base + delay_sum * delay_fix * d_rand), buffer_size-1);
+          taps[next_set][i].gain = gain * g_rand;
+
+          delay_sum += delay;
+          delay *= delay_scale;
+	  gain *= gain_scale;
+        }
+        for (; i<N_TAPS; i++) {
+	  taps[next_set][i].delay = 0.0f;
+	  taps[next_set][i].gain = 0.0f;
+        }
+      }
+
+      out = last_out;
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer[buffer_pos] = input[pos] * coef + (out * feedback);
+
+        out = 0.0f;
+        for (i=0; i<ntaps; i++) {
+          int p = buffer_pos - taps[active_set][i].delay;
+          if (p<0) p += buffer_size;
+          out += buffer[p] * taps[active_set][i].gain;
+        }
+
+        if (recalc) {
+	  xfade += 1.0f / (float)sample_count;
+          out *= (1-xfade);
+          for (i=0; i<ntaps; i++) {
+            int p = buffer_pos - taps[next_set][i].delay;
+            if (p<0) p += buffer_size;
+            out += buffer[p] * taps[next_set][i].gain * xfade;
+          }
+        }
+
+        buffer_write(output[pos], LIN_INTERP(wet, input[pos], out));
+
+	if (++buffer_pos >= buffer_size) {
+          buffer_pos = 0;
+        }
+      }
+
+      if (recalc) {
+	plugin_data->active_set = next_set;
+	plugin_data->next_set = active_set;
+      }
+
+      plugin_data->buffer_pos = buffer_pos;
+      plugin_data->last_out = out;
+    ]]></callback>
+
+    <port label="seed" dir="input" type="control" hint="integer,default_0">
+      <name>Random seed</name>
+      <p>Controls the random numbers that will be used to stagger the delays and amplitudes if random is turned up on them. Changing this forces the random values to be recalulated.</p>
+      <range min="0" max="1000"/>
+    </port>
+
+    <port label="gain" dir="input" type="control" hint="default_0">
+      <name>Input gain (dB)</name>
+      <p>Controls the gain of the input signal in dB's.</p>
+      <range min="-96" max="+24"/>
+    </port>
+
+    <port label="feedback_pc" dir="input" type="control" hint="default_0">
+      <name>Feedback (%)</name>
+      <p>Controls the amount of output signal fed back into the input.</p>
+      <range min="0" max="100"/>
+    </port>
+
+    <port label="tap_count" dir="input" type="control" hint="integer,default_minimum">
+      <name>Number of taps</name>
+      <p>Controls the number of taps in the delay.</p>
+      <range min="2" max="N_TAPS"/>
+    </port>
+
+    <port label="first_delay" dir="input" type="control" hint="default_0">
+      <name>First delay (s)</name>
+      <p>The time of the first delay.</p>
+      <range min="0" max="5"/>
+    </port>
+
+    <port label="delay_range" dir="input" type="control" hint="default_maximum">
+      <name>Delay range (s)</name>
+      <p>The time difference between the first and last delay.</p>
+      <range min="0.0001" max="6"/>
+    </port>
+
+    <port label="delay_scale" dir="input" type="control" hint="default_1">
+      <name>Delay change</name>
+      <p>The scaling factor between one delay and the next.</p>
+      <range min="0.2" max="5"/>
+    </port>
+
+    <port label="delay_rand_pc" dir="input" type="control" hint="default_0">
+      <name>Delay random (%)</name>
+      <p>The random factor applied to the delay.</p>
+      <range min="0" max="100"/>
+    </port>
+
+    <port label="gain_scale" dir="input" type="control" hint="default_1">
+      <name>Amplitude change</name>
+      <p>The scaling factor between one amplitude and the next.</p>
+      <range min="0.2" max="5"/>
+    </port>
+
+    <port label="gain_rand_pc" dir="input" type="control" hint="default_0">
+      <name>Amplitude random (%)</name>
+      <p>The random factor applied to the amplitude.</p>
+      <range min="0" max="100"/>
+    </port>
+
+    <port label="wet" dir="input" type="control" hint="default_1">
+      <name>Dry/wet mix</name>
+      <p>The level of delayed sound mixed into the output.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="buffer_pos" type="unsigned long"/>
+    <instance-data label="buffer_size" type="unsigned int"/>
+    <instance-data label="sample_rate" type="unsigned int"/>
+    <instance-data label="last_start" type="float"/>
+    <instance-data label="last_range" type="float"/>
+    <instance-data label="last_delaysc" type="float"/>
+    <instance-data label="last_ampsc" type="float"/>
+    <instance-data label="last_ntaps" type="unsigned int"/>
+    <instance-data label="last_seed" type="float"/>
+    <instance-data label="last_a_rand" type="float"/>
+    <instance-data label="last_d_rand" type="float"/>
+    <instance-data label="last_out" type="LADSPA_Data"/>
+    <instance-data label="active_set" type="unsigned int"/>
+    <instance-data label="next_set" type="unsigned int"/>
+    <instance-data label="taps" type="tap **"/>
+    <instance-data label="buffer" type="LADSPA_Data *"/>
+  </plugin>
+</ladspa>

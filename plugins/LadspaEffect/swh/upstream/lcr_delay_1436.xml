@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+      #include "util/biquad.h"
+    </code>
+  </global>
+
+  <plugin label="lcrDelay" id="1436" class="DelayPlugin">
+    <name>L/C/R Delay</name>
+    <p>This is a left/centre/right delay with feedback, based on the one in the Korg Trinity. Requested by Marek Peteraj.</p>
+
+    <callback event="instantiate"><![CDATA[
+      int buffer_size = 32768;
+
+      fs = s_rate;
+      while (buffer_size < fs * 2.7f) {
+	buffer_size *= 2;
+      }
+      buffer = calloc(buffer_size, sizeof(LADSPA_Data));
+      buffer_mask = buffer_size - 1;
+      buffer_pos = 0;
+      last_ll = 0.0f;
+      last_cl = 0.0f;
+      last_rl = 0.0f;
+      last_ld = 0.0f;
+      last_cd = 0.0f;
+      last_rd = 0.0f;
+
+      filters = malloc(2 * sizeof(biquad));
+    ]]></callback>
+      
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, (buffer_mask + 1) * sizeof(LADSPA_Data));
+      last_ll = 0.0f;
+      last_cl = 0.0f;
+      last_rl = 0.0f;
+      last_ld = 0.0f;
+      last_cd = 0.0f;
+      last_rd = 0.0f;
+      biquad_init(filters);
+      biquad_init(filters + 1);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->filters);
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float sc_r = 1.0f / (float)sample_count;
+      const float spr_t = 0.5f + spread * 0.01f;
+      const float spr_o = 0.5f - spread * 0.01f;
+      float fb = feedback * 0.01f;
+      float ll, cl, rl, ld, cd, rd;
+      float ll_d, cl_d, rl_d, ld_d, cd_d, rd_d;
+      float left, right;
+      float fbs; /* Feedback signal */
+
+      if (fb < -0.99f) {
+	fb = -0.99f;
+      } else if (fb > 0.99f) {
+	fb = 0.99f;
+      }
+
+      ls_set_params(filters, fs * 0.0001f * powf(2.0f, low_d * 0.12f),
+		    -0.5f * low_d, 0.5f, fs);
+      hs_set_params(filters + 1, fs * (0.41f - 0.0001f *
+		    powf(2.0f, high_d * 0.12f)), -70.0f, 0.9f, fs);
+
+      ll = last_ll;				/* Start value of Left Level */
+      ll_d = (llev * 0.01f - last_ll) * sc_r; 	/* Delta for Left Level */
+      cl = last_cl;
+      cl_d = (clev * 0.01f - last_cl) * sc_r;
+      rl = last_rl;
+      rl_d = (rlev * 0.01f - last_rl) * sc_r;
+
+      ld = last_ld;
+      ld_d = (ldel * fs * 0.001f - last_ld) * sc_r;
+      cd = last_cd;
+      cd_d = (cdel * fs * 0.001f - last_cd) * sc_r;
+      rd = last_rd;
+      rd_d = (rdel * fs * 0.001f - last_rd) * sc_r;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        /* Increment linear interpolators */
+	ll += ll_d;
+	rl += rl_d;
+	cl += cl_d;
+	ld += ld_d;
+	rd += rd_d;
+	cd += cd_d;
+
+	/* Write input into delay line */
+	buffer[buffer_pos] = in_l[pos] + in_r[pos];
+	/* Add feedback, must be done afterwards for case where C delay = 0 */
+	fbs = buffer[(buffer_pos - f_round(cd)) & buffer_mask] * fb;
+	fbs = flush_to_zero(fbs);
+	fbs = biquad_run(filters, fbs);
+	fbs = biquad_run(filters + 1, fbs);
+	buffer[buffer_pos] += fbs;
+
+	/* Outputs from left and right delay beffers + centre mix */
+        left  = buffer[(buffer_pos - f_round(ld)) & buffer_mask] * ll +
+                buffer[(buffer_pos - f_round(cd)) & buffer_mask] * cl;
+        right = buffer[(buffer_pos - f_round(rd)) & buffer_mask] * rl +
+                buffer[(buffer_pos - f_round(cd)) & buffer_mask] * cl;
+
+	/* Left and right channel outs */
+	buffer_write(out_l[pos], in_l[pos] * (1.0f - wet) +
+			(left * spr_t + right * spr_o) * wet);
+        buffer_write(out_r[pos], in_r[pos] * (1.0f - wet) +
+			(left * spr_o + right * spr_t) * wet);
+
+	buffer_pos = (buffer_pos + 1) & buffer_mask;
+      }
+
+      plugin_data->last_ll = ll;
+      plugin_data->last_cl = cl;
+      plugin_data->last_rl = rl;
+      plugin_data->last_ld = ld;
+      plugin_data->last_cd = cd;
+      plugin_data->last_rd = rd;
+      plugin_data->buffer_pos = buffer_pos;
+    ]]></callback>
+
+    <port label="ldel" dir="input" type="control" hint="default_low">
+      <name>L delay (ms)</name>
+      <p>The delay of the left output in milliseconds.</p>
+      <range min="0" max="2700"/>
+    </port>
+
+    <port label="llev" dir="input" type="control" hint="default_middle">
+      <name>L level</name>
+      <p>The level of the left output.</p>
+      <range min="0" max="50"/>
+    </port>
+
+    <port label="cdel" dir="input" type="control" hint="default_low">
+      <name>C delay (ms)</name>
+      <p>The delay of the centre output in milliseconds.</p>
+      <range min="0" max="2700"/>
+    </port>
+
+    <port label="clev" dir="input" type="control" hint="default_middle">
+      <name>C level</name>
+      <p>The level of the centre output.</p>
+      <range min="0" max="50"/>
+    </port>
+
+    <port label="rdel" dir="input" type="control" hint="default_low">
+      <name>R delay (ms)</name>
+      <p>The delay of the right output in milliseconds.</p>
+      <range min="0" max="2700"/>
+    </port>
+
+    <port label="rlev" dir="input" type="control" hint="default_middle">
+      <name>R level</name>
+      <p>The level of the right output.</p>
+      <range min="0" max="50"/>
+    </port>
+
+    <port label="feedback" dir="input" type="control" hint="default_0">
+      <name>Feedback</name>
+      <p>The amount of the C delay output that is mixed back into the delay.</p>
+      <range min="-100" max="100"/>
+    </port>
+
+    <port label="high_d" dir="input" type="control" hint="default_middle">
+      <name>High damp (%)</name>
+      <p>The damping of the high frequencies in the feedback path.</p>
+      <range min="0" max="100"/>
+    </port>
+
+    <port label="low_d" dir="input" type="control" hint="default_middle">
+      <name>Low damp (%)</name>
+      <p>The damping of the low frequencies in the feedback path.</p>
+      <range min="0" max="100"/>
+    </port>
+
+    <port label="spread" dir="input" type="control" hint="default_middle">
+      <name>Spread</name>
+      <p>The width of the stereo image.</p>
+      <range min="0" max="50"/>
+    </port>
+
+    <port label="wet" dir="input" type="control" hint="default_0">
+      <name>Dry/Wet level</name>
+      <p>The amounts of the input and effect mixed to produce the output.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="in_l" dir="input" type="audio">
+      <name>L input</name>
+    </port>
+
+    <port label="in_r" dir="input" type="audio">
+      <name>R input</name>
+    </port>
+
+    <port label="out_l" dir="output" type="audio">
+      <name>L output</name>
+    </port>
+
+    <port label="out_r" dir="output" type="audio">
+      <name>R output</name>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_pos" type="unsigned int" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="last_ll" type="float" />
+    <instance-data label="last_cl" type="float" />
+    <instance-data label="last_rl" type="float" />
+    <instance-data label="last_ld" type="float" />
+    <instance-data label="last_cd" type="float" />
+    <instance-data label="last_rd" type="float" />
+    <instance-data label="filters" type="biquad *" />
+  </plugin>
+</ladspa>

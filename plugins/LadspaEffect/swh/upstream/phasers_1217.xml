@@ -1,0 +1,450 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+
+      #define LFO_SIZE 4096
+
+      typedef struct {
+        float a1;
+	float zm1;
+      } allpass;
+
+      inline static float ap_run(allpass *a, float x)
+      {
+	float y = x * -(a->a1) + a->zm1;
+        a->zm1 = y * a->a1 + x;
+
+        return y;
+      }
+
+      inline static void ap_set_delay(allpass *a, float d)
+      {
+        a->a1 = (1.0f - d) / (1.0f + d);
+      }
+
+      inline static void ap_clear(allpass *a)
+      {
+        a->a1  = 0.0f;
+        a->zm1 = 0.0f;
+      }
+
+      typedef struct {
+        float ga;
+        float gr;
+        float env;
+      } envelope;
+
+      inline static float env_run(envelope *e, float in)
+      {
+        float env_lvl = e->env;
+
+        in = fabs(in);
+
+        if (env_lvl < in) {
+          env_lvl = e->ga * (env_lvl - in) + in;
+        } else {
+          env_lvl = e->gr * (env_lvl - in) + in;
+        }
+
+	e->env = env_lvl;
+	return env_lvl;
+      }
+
+      // Set attack time in samples
+      inline static void env_set_attack(envelope *e, float a)
+      {
+        e->ga = f_exp(-1.0f/a);
+      }
+
+      // Set release time in samples
+      inline static void env_set_release(envelope *e, float r)
+      {
+        e->gr = f_exp(-1.0f/r);
+      }
+
+    ]]></code>
+  </global>
+
+  <plugin label="lfoPhaser" id="1217" class="PhaserPlugin">
+    <name>LFO Phaser</name>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int i;
+      float p;
+
+      ap = calloc(6, sizeof(allpass));
+      ym1 = 0.0f;
+      lfo_tbl = malloc(sizeof(float) * LFO_SIZE);
+      p = 0.0f;
+      for (i=0; i<LFO_SIZE; i++) {
+        p += M_PI * 0.0004882812f;
+        lfo_tbl[i] = (sin(p) + 1.1f) * 0.25f;
+      }
+      lfo_pos = 0;
+
+      // Frames per lfo value
+      f_per_lv = (float)s_rate * 0.0002441406f;
+
+      count = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      ap_clear(ap);
+      ap_clear(ap+1);
+      ap_clear(ap+2);
+      ap_clear(ap+3);
+      ap_clear(ap+4);
+      ap_clear(ap+5);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->ap);
+      free(plugin_data->lfo_tbl);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      unsigned int mod;
+      float y, d, ofs;
+
+      mod = f_round(f_per_lv / lfo_rate);
+      if (mod < 1) {
+        mod=1;
+      }
+
+      d = lfo_tbl[lfo_pos];
+
+      for (pos = 0; pos < sample_count; pos++) {
+        // Get new value for LFO if needed
+	if (++count % mod == 0) {
+	  lfo_pos++;
+	  lfo_pos &= 0x7FF;
+	  count = 0;
+          d = lfo_tbl[lfo_pos] * lfo_depth;
+
+          ap_set_delay(ap, d);
+	  ofs = spread * 0.01562f;
+          ap_set_delay(ap+1, d+ofs);
+	  ofs *= 2.0f;
+          ap_set_delay(ap+2, d+ofs);
+	  ofs *= 2.0f;
+          ap_set_delay(ap+3, d+ofs);
+	  ofs *= 2.0f;
+          ap_set_delay(ap+4, d+ofs);
+	  ofs *= 2.0f;
+          ap_set_delay(ap+5, d+ofs);
+
+        }
+	//Run in series, doesn't quite sound as nice
+	y = ap_run(ap, input[pos] + ym1 * fb);
+	y = ap_run(ap+1, y);
+	y = ap_run(ap+2, y);
+	y = ap_run(ap+3, y);
+	y = ap_run(ap+4, y);
+	y = ap_run(ap+5, y);
+
+        buffer_write(output[pos], y);
+	ym1 = y;
+      }
+
+      plugin_data->ym1 = ym1;
+      plugin_data->count = count;
+      plugin_data->lfo_pos = lfo_pos;
+    ]]></callback>
+
+    <port label="lfo_rate" dir="input" type="control" hint="default_low">
+      <name>LFO rate (Hz)</name>
+      <range min="0" max="100" />
+    </port>
+
+    <port label="lfo_depth" dir="input" type="control" hint="default_low">
+      <name>LFO depth</name>
+      <range min="0" max="1" />
+    </port>
+
+    <port label="fb" dir="input" type="control" hint="default_0">
+      <name>Feedback</name>
+      <range min="-1" max="1" />
+    </port>
+
+    <port label="spread" dir="input" type="control" hint="default_middle">
+      <name>Spread (octaves)</name>
+      <range min="0" max="2" />
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="ap" type="allpass *" />
+    <instance-data label="count" type="int" />
+    <instance-data label="lfo_tbl" type="float *" />
+    <instance-data label="lfo_pos" type="int" />
+    <instance-data label="f_per_lv" type="float" />
+    <instance-data label="ym1" type="float" />
+  </plugin>
+
+  <plugin label="fourByFourPole" id="1218" class="AllpassPlugin">
+    <name>4 x 4 pole allpass</name>
+
+    <callback event="instantiate"><![CDATA[
+      ap = calloc(16, sizeof(allpass));
+      y0 = 0.0f;
+      y1 = 0.0f;
+      y2 = 0.0f;
+      y3 = 0.0f;
+      sr_r_2 = 1.0f / s_rate;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      ap_clear(ap);
+      ap_clear(ap+1);
+      ap_clear(ap+2);
+      ap_clear(ap+3);
+      ap_clear(ap+4);
+      ap_clear(ap+5);
+      ap_clear(ap+6);
+      ap_clear(ap+7);
+      ap_clear(ap+8);
+      ap_clear(ap+9);
+      ap_clear(ap+10);
+      ap_clear(ap+11);
+      ap_clear(ap+12);
+      ap_clear(ap+13);
+      ap_clear(ap+14);
+      ap_clear(ap+15);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->ap);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      ap_set_delay(ap,   f0 * sr_r_2);
+      ap_set_delay(ap+1, f0 * sr_r_2);
+      ap_set_delay(ap+2, f0 * sr_r_2);
+      ap_set_delay(ap+3, f0 * sr_r_2);
+      ap_set_delay(ap+4, f1 * sr_r_2);
+      ap_set_delay(ap+5, f1 * sr_r_2);
+      ap_set_delay(ap+6, f1 * sr_r_2);
+      ap_set_delay(ap+7, f1 * sr_r_2);
+      ap_set_delay(ap+8, f2 * sr_r_2);
+      ap_set_delay(ap+9, f2 * sr_r_2);
+      ap_set_delay(ap+10, f2 * sr_r_2);
+      ap_set_delay(ap+11, f2 * sr_r_2);
+      ap_set_delay(ap+12, f3 * sr_r_2);
+      ap_set_delay(ap+13, f3 * sr_r_2);
+      ap_set_delay(ap+14, f3 * sr_r_2);
+      ap_set_delay(ap+15, f3 * sr_r_2);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	y0 = ap_run(ap,   input[pos] + y0 * fb0);
+	y0 = ap_run(ap+1,   y0);
+	y0 = ap_run(ap+2,   y0);
+	y0 = ap_run(ap+3,   y0);
+
+	y1 = ap_run(ap+4,   y0 + y1 * fb1);
+	y1 = ap_run(ap+5,   y1);
+	y1 = ap_run(ap+6,   y1);
+	y1 = ap_run(ap+7,   y1);
+
+	y2 = ap_run(ap+8,  y1 + y2 * fb2);
+	y2 = ap_run(ap+9,  y2);
+	y2 = ap_run(ap+10, y2);
+	y2 = ap_run(ap+11, y2);
+
+	y3 = ap_run(ap+12, y2 + y3 * fb3);
+	y3 = ap_run(ap+13, y3);
+	y3 = ap_run(ap+14, y3);
+	y3 = ap_run(ap+15, y3);
+
+        buffer_write(output[pos], y3);
+      }
+
+      plugin_data->y0 = y0;
+      plugin_data->y1 = y1;
+      plugin_data->y2 = y2;
+      plugin_data->y3 = y3;
+    ]]></callback>
+
+    <port label="f0" dir="input" type="control" hint="default_low">
+      <name>Frequency 1</name>
+      <range min="1" max="20000" />
+    </port>
+
+    <port label="fb0" dir="input" type="control" hint="default_0">
+      <name>Feedback 1</name>
+      <range min="-1" max="1" />
+    </port>
+
+    <port label="f1" dir="input" type="control" hint="default_middle">
+      <name>Frequency 2</name>
+      <range min="1" max="20000" />
+    </port>
+
+    <port label="fb1" dir="input" type="control" hint="default_0">
+      <name>Feedback 2</name>
+      <range min="-1" max="1" />
+    </port>
+
+    <port label="f2" dir="input" type="control" hint="default_high">
+      <name>Frequency 3</name>
+      <range min="1" max="20000" />
+    </port>
+
+    <port label="fb2" dir="input" type="control" hint="default_0">
+      <name>Feedback 3</name>
+      <range min="-1" max="1" />
+    </port>
+
+    <port label="f3" dir="input" type="control" hint="default_maximum">
+      <name>Frequency 4</name>
+      <range min="1" max="20000" />
+    </port>
+
+    <port label="fb3" dir="input" type="control" hint="default_0">
+      <name>Feedback 4</name>
+      <range min="-1" max="1" />
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="ap" type="allpass *" />
+    <instance-data label="y0" type="float" />
+    <instance-data label="y1" type="float" />
+    <instance-data label="y2" type="float" />
+    <instance-data label="y3" type="float" />
+    <instance-data label="sr_r_2" type="float" />
+  </plugin>
+
+  <plugin label="autoPhaser" id="1219" class="PhaserPlugin">
+    <name>Auto phaser</name>
+
+    <callback event="instantiate"><![CDATA[
+      ap = calloc(6, sizeof(allpass));
+      env = calloc(1, sizeof(envelope));
+      ym1 = 0.0f;
+      sample_rate = (float)s_rate;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      ap_clear(ap);
+      ap_clear(ap+1);
+      ap_clear(ap+2);
+      ap_clear(ap+3);
+      ap_clear(ap+4);
+      ap_clear(ap+5);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->ap);
+      free(plugin_data->env);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float y, d, ofs;
+      float attack = attack_p;
+      float decay = decay_p;
+      const float depth = depth_p * 0.5f;
+
+      if (attack < 0.01f) {
+        attack = 0.01f;
+      }
+      if (decay < 0.01f) {
+        decay = 0.01f;
+      }
+      env_set_attack(env, attack * sample_rate * 0.25f);
+      env_set_release(env, decay * sample_rate * 0.25f);
+
+
+      for (pos = 0; pos < sample_count; pos++) {
+        if (pos % 4 == 0) {
+          d = env_run(env, input[pos]) * depth;
+          ap_set_delay(ap, d);
+          ofs = spread * 0.01562f;
+          ap_set_delay(ap+1, d+ofs);
+          ofs *= 2.0f;
+          ap_set_delay(ap+2, d+ofs);
+          ofs *= 2.0f;
+          ap_set_delay(ap+3, d+ofs);
+          ofs *= 2.0f;
+          ap_set_delay(ap+4, d+ofs);
+          ofs *= 2.0f;
+          ap_set_delay(ap+5, d+ofs);
+        }
+
+	//Run allpass filters in series
+	y = ap_run(ap, input[pos] + ym1 * fb);
+	y = ap_run(ap+1, y);
+	y = ap_run(ap+2, y);
+	y = ap_run(ap+3, y);
+	y = ap_run(ap+4, y);
+	y = ap_run(ap+5, y);
+
+        buffer_write(output[pos], y);
+	ym1 = y;
+      }
+
+      plugin_data->ym1 = ym1;
+    ]]></callback>
+
+    <port label="attack_p" dir="input" type="control" hint="default_low">
+      <name>Attack time (s)</name>
+      <range min="0" max="1" />
+    </port>
+
+    <port label="decay_p" dir="input" type="control" hint="default_low">
+      <name>Decay time (s)</name>
+      <range min="0" max="1" />
+    </port>
+
+    <port label="depth_p" dir="input" type="control" hint="default_low">
+      <name>Modulation depth</name>
+      <range min="0" max="1" />
+    </port>
+
+    <port label="fb" dir="input" type="control" hint="default_0">
+      <name>Feedback</name>
+      <range min="-1" max="1" />
+    </port>
+
+    <port label="spread" dir="input" type="control" hint="default_1">
+      <name>Spread (octaves)</name>
+      <range min="0" max="2" />
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="ap" type="allpass *" />
+    <instance-data label="ym1" type="float" />
+    <instance-data label="env" type="envelope *" />
+    <instance-data label="sample_rate" type="float" />
+  </plugin>
+</ladspa>

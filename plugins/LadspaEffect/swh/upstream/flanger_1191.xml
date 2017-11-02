@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+#include "ladspa-util.h"
+    ]]></code>
+  </global>
+
+  <plugin label="flanger" id="1191" class="FlangerPlugin">
+    <name>Flanger</name>
+    <p>A digital flanger implementation. Uses a novel zero excursion, controlled bandwidth modulation function, which should make the modulation less repetitive and noticeable.</p>
+    <p>This effect is similar in character to a phaser (see section \ref{lfoPhaser}). The main difference is that a phaser sounds more regular and stable.</p>
+
+    <callback event="instantiate"><![CDATA[
+int min_size;
+
+sample_rate = s_rate;
+
+prev_law_peak = 0.0f;
+next_law_peak = 1.0f;
+prev_law_pos = 0;
+next_law_pos = 10;
+
+min_size = sample_rate * 0.04f;
+for (delay_size = 1024; delay_size < min_size; delay_size *= 2);
+delay_tbl = malloc(sizeof(LADSPA_Data) * delay_size);
+delay_pos = 0;
+count = 0;
+old_d_base = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+memset(delay_tbl, 0, sizeof(LADSPA_Data) * delay_size);
+delay_pos = 0;
+count = 0;
+old_d_base = 0;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+free(plugin_data->delay_tbl);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos;
+long d_base, new_d_base;
+LADSPA_Data out;
+float delay_depth;
+float dp; // float delay position
+float dp_frac; // fractional part
+long dp_idx; // integer delay index
+long law_p; // period of law
+float frac = 0.0f, step; // Portion the way through the block
+float law; /* law amplitude */
+float n_ph, p_ph;
+const float fb = f_clamp(feedback, -0.999f, 0.999f);
+
+// Set law params
+law_p = (float)sample_rate / law_freq;
+if (law_p < 1) {
+	law_p = 1;
+}
+
+// Calculate base delay size in samples
+new_d_base = (LIMIT(f_round(delay_base), 0, 25) * sample_rate) / 1000;
+
+// Calculate delay depth in samples
+delay_depth = f_clamp(detune * (float)sample_rate * 0.001f, 0.0f, delay_size - new_d_base - 1.0f);
+
+step = 1.0f/sample_count;
+for (pos = 0; pos < sample_count; pos++) {
+	if (count % law_p == 0) {
+		// Value for amplitude of law peak
+		next_law_peak = (float)rand() / (float)RAND_MAX;
+		next_law_pos = count + law_p;
+	} else if (count % law_p == law_p / 2) {
+		// Value for amplitude of law peak
+		prev_law_peak = (float)rand() / (float)RAND_MAX;
+		prev_law_pos = count + law_p;
+	}
+
+	// Calculate position in delay table
+	d_base = LIN_INTERP(frac, old_d_base, new_d_base);
+	n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
+	p_ph = n_ph + 0.5f;
+	while (p_ph > 1.0f) {
+		p_ph -= 1.0f;
+	}
+	law = f_sin_sq(3.1415926f*p_ph)*prev_law_peak +
+		f_sin_sq(3.1415926f*n_ph)*next_law_peak;
+
+	dp = (float)(delay_pos - d_base) - (delay_depth * law);
+	// Get the integer part
+	dp_idx = f_round(dp - 0.5f);
+	// Get the fractional part
+	dp_frac = dp - dp_idx;
+
+	// Accumulate into output buffer
+	out = cube_interp(dp_frac, delay_tbl[(dp_idx-1) & (delay_size-1)], delay_tbl[dp_idx & (delay_size-1)], delay_tbl[(dp_idx+1) & (delay_size-1)], delay_tbl[(dp_idx+2) & (delay_size-1)]);
+
+	// Store new delayed value
+	delay_tbl[delay_pos] = flush_to_zero(input[pos] + (fb * out));
+	// Sometimes the delay can pick up NaN values, I'm not sure why
+	// and this is easier than fixing it
+	if (isnan(delay_tbl[delay_pos])) {
+		delay_tbl[delay_pos] = 0.0f;
+	}
+
+	out = f_clamp(delay_tbl[delay_pos] * 0.707f, -1.0, 1.0);
+	buffer_write(output[pos], out);
+
+	frac += step;
+	delay_pos = (delay_pos + 1) & (delay_size-1);
+
+	count++;
+}
+
+plugin_data->count = count;
+plugin_data->prev_law_peak = prev_law_peak;
+plugin_data->next_law_peak = next_law_peak;
+plugin_data->prev_law_pos = prev_law_pos;
+plugin_data->next_law_pos = next_law_pos;
+plugin_data->delay_pos = delay_pos;
+plugin_data->old_d_base = new_d_base;
+    ]]></callback>
+
+    <port label="delay_base" dir="input" type="control" hint="default_low">
+      <name>Delay base (ms)</name>
+      <range min="0.1" max="25"/>
+      <p>This is the offset from the input time that the detune delay moves around.</p>
+      <p>10 is probably a good starting value.</p>
+    </port>
+
+    <port label="detune" dir="input" type="control" hint="default_low">
+      <name>Max slowdown (ms)</name>
+      <range min="0" max="10"/>
+      <p>This is the maximum delay that will be applied to the delayed signal, relative to the dry signal.</p>
+    </port>
+
+    <port label="law_freq" dir="input" type="control" hint="default_low,logarithmic">
+      <name>LFO frequency (Hz)</name>
+      <range min="0.05" max="100"/>
+      <p>This is the core frequency that the 'LFO' will move at. The LFO isn't actually an oscillator, but it does vary periodically.</p>
+    </port>
+
+    <port label="feedback" dir="input" type="control" hint="default_0">
+      <name>Feedback</name>
+      <range min="-1" max="1"/>
+      <p>Feedback applied from the output to the input, increases the depth of the effect, but makes it sound less like a real flanger.</p>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="sample_rate" type="long"/>
+    <instance-data label="count" type="long"/>
+    <instance-data label="prev_law_peak" type="float"/>
+    <instance-data label="next_law_peak" type="float"/>
+    <instance-data label="prev_law_pos" type="int"/>
+    <instance-data label="next_law_pos" type="int"/>
+    <instance-data label="delay_tbl" type="LADSPA_Data *"/>
+    <instance-data label="delay_pos" type="long"/>
+    <instance-data label="delay_size" type="long"/>
+    <instance-data label="old_d_base" type="long"/>
+  </plugin>
+</ladspa>

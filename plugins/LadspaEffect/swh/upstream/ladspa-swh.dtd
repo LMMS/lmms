@@ -1,0 +1,34 @@
+<!ELEMENT ladspa (global+,plugin+)>
+<!ATTLIST ladspa version CDATA "1.0">
+
+<!ELEMENT global (meta+,code?,p*)>
+
+<!ELEMENT meta EMPTY>
+<!ATTLIST meta name  (maker|copyright|properties) #REQUIRED
+               value CDATA                        #REQUIRED>
+
+<!ELEMENT code (#PCDATA)>
+
+<!ELEMENT p (#PCDATA)>
+
+<!ELEMENT plugin (name,p*,callback+,port+,instance-data*)>
+<!ATTLIST plugin label CDATA #REQUIRED
+                 id    CDATA #REQUIRED>
+
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT callback (#PCDATA)>
+<!ATTLIST callback event (run|instatiate|activate|cleanup) #REQUIRED>
+
+<!ELEMENT port (name, range*, p*)>
+<!ATTLIST port label CDATA           #REQUIRED
+               dir   (input|output)  #REQUIRED
+               type  (audio|control) #REQUIRED>
+
+<!ELEMENT range EMPTY>
+<!ATTLIST range min CDATA #REQUIRED
+                max CDATA #REQUIRED>
+
+<!ELEMENT instance-data EMPTY>
+<!ATTLIST instance-data label CDATA #REQUIRED
+                        type  CDATA #REQUIRED>

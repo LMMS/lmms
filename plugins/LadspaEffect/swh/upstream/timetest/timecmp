@@ -1,0 +1,61 @@
+#!/usr/bin/perl -w
+
+my $pattern = shift @ARGV;
+
+my $reps = 4;
+
+open(RC, "timetest.rc");
+while(<RC>) {
+	next if /^\s*#/;
+	next if /^\s*$/;
+	next if ($pattern && !/$pattern/);
+	@stuff = split("\t");
+	$name = $stuff[0];
+	$line = $stuff[1];
+	chomp $line;
+	$line =~ /(\S+\.so)/;
+	$command = $line." 2>&1";
+	$cycles = 10000000000;
+	$pers = 100000;
+	my $count;
+	for $count (1..$reps+1) {
+		$out = `$command`;
+		chomp $out;
+		$out =~ /Plugin cycles: (\d+) \((\d+)\//;
+		if ($1 < $cycles) {
+			$cycles = $1;
+		}
+		if ($2 < $pers) {
+			$pers = $2;
+		}
+	}
+	$out =~ /UID: (\d+)/;
+	$UID = $1;
+	$acycles = $cycles;
+	
+	$line =~ s/(.*\.\.)/$1\/icc-so/;
+#print $line."\n";
+	$command = $line." 2>&1";
+	$cycles = 10000000000;
+	$pers = 100000;
+	$ok = 1;
+	for $count (1..$reps+1) {
+		$out = `$command`;
+		chomp $out;
+		unless ($out =~ /Plugin cycles: (\d+) \((\d+)\//) {
+			print("ERROR\t$name\n");
+			$ok = 0;
+			last;
+		}
+		if ($1 < $cycles) {
+			$cycles = $1;
+		}
+		if ($2 < $pers) {
+			$pers = $2;
+		}
+	}
+	next if !$ok;
+	$out =~ /UID: (\d+)/;
+	$UID = $1;
+	print sprintf("%.3f", ($cycles/$acycles))."\t$name\n";
+}

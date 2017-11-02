@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="rateShifter" id="1417" class="PitchPlugin">
+    <name>Rate shifter</name>
+    <p>Stretches or compresses the input with a ringbuffer.</p>
+    <p>Because of the ringbuffer you will get stretches of silence or clicks when the read pointer passes the write pointer.</p>
+    <p>The ringbuffer is about 2.7-3.0s long, depending on the sample rate.</p>
+    <p>Versions with variable buffer sizes or declicking code would be easy (but a bit less efficient); shout if you would find them useful.</p>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int size = 32768;
+      const float fs = s_rate;
+
+      while (size < 2.7f * fs) {
+	size *= 2;
+      }
+      buffer = calloc(size, sizeof(LADSPA_Data));
+      buffer_mask = size - 1;
+      read_ptr.all = 0;
+      write_ptr = size / 2;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, buffer_mask + 1);
+      read_ptr.all = 0;
+      write_ptr = (buffer_mask + 1) / 2;
+      write_ptr = 0;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      fixp32 read_inc;
+
+      read_inc.all = (long long)(rate * 4294967296.0f);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	const unsigned int rp = read_ptr.part.in;
+
+	/* Do write pointer stuff */
+        buffer[write_ptr] = input[pos];
+	write_ptr = (write_ptr + 1) & buffer_mask;
+
+	/* And now read pointer */
+        buffer_write(output[pos], cube_interp((float)read_ptr.part.fr / 4294967296.0f, buffer[(rp - 1) & buffer_mask], buffer[rp],  buffer[(rp + 1) & buffer_mask], buffer[(rp + 2) & buffer_mask]));
+	read_ptr.all += read_inc.all;
+	read_ptr.part.in &= buffer_mask;
+      }
+
+      plugin_data->read_ptr.all = read_ptr.all;
+      plugin_data->write_ptr = write_ptr;
+    ]]></callback>
+
+    <port label="rate" dir="input" type="control" hint="default_1">
+      <name>Rate</name>
+      <p>The rate of the output signal; eg. 2.0 will double the speed. Negative numbers will play backwards.</p>
+      <p>Pretty much any value will work, but the ranges give what most people are going to want to use. You can get some interesting sounds with very high numbers (e.g. 2000).</p>
+      <range min="-4" max="4"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="read_ptr" type="fixp32" />
+    <instance-data label="write_ptr" type="unsigned int" />
+  </plugin>
+</ladspa>

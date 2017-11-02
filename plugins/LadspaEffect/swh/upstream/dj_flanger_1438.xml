@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include <sys/types.h>
+      #include "ladspa-util.h"
+
+      #define DELAY_TIME 0.005f
+    ]]></code>
+  </global>
+
+  <plugin label="djFlanger" id="1438" class="FlangerPlugin">
+    <name>DJ flanger</name>
+    <p>This is a flanger which is more or less typical of DJ mixing desks. Requested by Patrick Shirkey.</p>
+
+    <callback event="instantiate"><![CDATA[
+      int buffer_size = 2048;
+
+      fs = s_rate;
+      while (buffer_size < fs * DELAY_TIME + 3.0f) {
+	buffer_size *= 2;
+      }
+      buffer = calloc(buffer_size, sizeof(LADSPA_Data));
+      buffer_mask = buffer_size - 1;
+      buffer_pos = 0;
+      x = 0.5f;
+      y = 0.0f;
+      last_sync = 0;
+    ]]></callback>
+      
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, (buffer_mask + 1) * sizeof(LADSPA_Data));
+      last_sync = 0;
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const float omega = 6.2831852f / (period * fs);
+      const float dr = 0.001f * fs * depth;
+      float fb;
+      float d;
+      float dout, out;
+      unsigned int dof;
+
+      if (feedback > 99.0f) {
+	fb = 0.99f;
+      } else if (feedback < -99.0f) {
+	fb = -0.99f;
+      } else {
+	fb = feedback * 0.01f;
+      }
+
+      if (sync > 0) {
+	if (!last_sync) {
+          x = 0.5f;
+          y = 0.0f;
+        }
+	plugin_data->last_sync = 1;
+      } else {
+	plugin_data->last_sync = 0;
+      }
+
+      for (pos = 0; pos < sample_count; pos++) {
+	/* Write input into delay line */
+	buffer[buffer_pos] = input[pos];
+
+	/* Calcuate delay */
+	d = (x + 0.5f) * dr;
+
+	dof = f_round(d);
+	//dout = buffer[(buffer_pos - f_round(d)) & buffer_mask];
+	dout = cube_interp(d - floor(d),
+			   buffer[(buffer_pos - dof - 3) & buffer_mask],
+                           buffer[(buffer_pos - dof - 2) & buffer_mask],
+                           buffer[(buffer_pos - dof - 1) & buffer_mask],
+                           buffer[(buffer_pos - dof) & buffer_mask]);
+
+	/* Write output */
+	out = (buffer[buffer_pos] + dout) * 0.5f;
+	buffer[buffer_pos] = input[pos] + out * fb;
+	buffer_write(output[pos], out);
+
+	/* Roll ringbuffer */
+	buffer_pos = (buffer_pos + 1) & buffer_mask;
+
+	/* Run LFO */
+	x -= omega * y;
+	y += omega * x;
+      }
+
+      plugin_data->x = x;
+      plugin_data->y = y;
+      plugin_data->buffer_pos = buffer_pos;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <port label="sync" dir="input" type="control" hint="default_0,toggled">
+      <name>LFO sync</name>
+      <p>When turned from off to on it resets the phase of the LFO back to the start of the cycle. Used to sync the LFO to the track.</p>
+    </port>
+
+    <port label="period" dir="input" type="control" hint="default_1">
+      <name>LFO period (s)</name>
+      <p>The cycle period of the LFO in seconds.</p>
+      <range min="0.1" max="32.0"/>
+    </port>
+
+    <port label="depth" dir="input" type="control" hint="default_high">
+      <name>LFO depth (ms)</name>
+      <p>The maximum delay the LFO will use to flange, in milliseconds.</p>
+      <range min="1" max="5"/>
+    </port>
+
+    <port label="feedback" dir="input" type="control" hint="default_0">
+      <name>Feedback (%)</name>
+      <p>The amount of the delays output that is mixed back into the delay.</p>
+      <range min="-100" max="100"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_pos" type="unsigned int" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="fs" type="float" />
+    <instance-data label="x" type="float" />
+    <instance-data label="y" type="float" />
+    <instance-data label="last_sync" type="unsigned int" />
+  </plugin>
+</ladspa>

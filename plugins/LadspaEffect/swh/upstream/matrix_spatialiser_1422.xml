@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Joern Nettingsmeier &lt;nettings@folkwang-hochschule.de&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+	/*
+	   thanks to Steve Harris for walking me through my first plugin !
+	*/
+
+	#include "ladspa-util.h"
+
+        /* we use sin/cos panning and start at pi/4. this is the correction factor
+	   to bring the signal back to unity gain in neutral position.
+	   it should be 1/x : sin(x) = cos(x) (~1.41421...). but since we are using an
+	   approximation of sin/cos, we take its equal gain point, which leads to 1.3333...
+	*/
+	#define EQUALGAINPOINT_OFFSET 128.0f
+	#define EQUALGAINPOINT_TO_UNITY 4.0f / 3.0f
+
+	#define BITSPERCYCLE 10                 /* resolution of the width parameter for */
+	#define BITSPERQUARTER (BITSPERCYCLE-2) /* one cycle (0-2pi) */
+
+	/* borrowed code: http://www.dspguru.com/comp.dsp/tricks/alg/sincos.htm
+	   i'm using a constant of 0.75, which makes the calculations simpler and does
+	   not yield discontinuities.
+	   author: Olli Niemitalo (oniemita@mail.student.oulu.fi)
+	*/
+	static inline void sin_cos_approx(int phasein, float *vsin, float *vcos) {
+		// Modulo phase into quarter, convert to float 0..1
+		float modphase = (phasein & ((1<<BITSPERQUARTER) - 1))
+		* 1.0f / (1<<BITSPERQUARTER);
+		// Extract quarter bits
+		int quarter = phasein & (3<<BITSPERQUARTER);
+		// Recognize quarter
+		if (!quarter) {
+			// First quarter, angle = 0 .. pi/2
+			float x = modphase - 0.5f;
+			float temp = 0.75f - x * x;
+			*vsin = temp + x;
+			*vcos = temp - x;
+		} else if (quarter == 1<<BITSPERQUARTER) {
+			// Second quarter, angle = pi/2 .. pi
+			float x = 0.5f - modphase;
+			float temp = 0.75f - x*x;
+			*vsin = x + temp;
+			*vcos = x - temp;
+		} else if (quarter == 2<<BITSPERQUARTER) {
+			// Third quarter, angle = pi .. 1.5pi
+			float x = modphase - 0.5f;
+			float temp = x*x - 0.75f;
+			*vsin = temp - x;
+			*vcos = temp + x;
+		} else {
+			// Fourth quarter, angle = 1.5pi..2pi
+			float x = modphase - 0.5f;
+			float temp = 0.75f - x*x;
+			*vsin = x - temp;
+			*vcos = x + temp;
+		}
+	}
+    ]]></code>
+  </global>
+
+  <plugin label="matrixSpatialiser" id="1422" class="UtilityPlugin">
+    <name>Matrix Spatialiser</name>
+    <p><![CDATA[
+      A simple spatializer that lets you control the width of a stereo signal.
+
+      We convert it into a MS (mid/side) signal, manipulate the gain coefficients
+      with a constant-power panning function, and reconvert to left/right stereo.
+
+      $mid = (i_left + i_right) / 2$
+
+      $side = (i_left - i_right) / 2$
+
+      $width = (-pi/4)..0..(pi/4)$
+
+      $o_left = mid * cos(width + pi/4)$
+      $o_right = side * sin(width + pi/4)$
+
+      {\small shifted by pi/4, so that 0 is neutral.}
+    ]]></p>
+    <callback event="instantiate"><![CDATA[
+	current_m_gain = 0.0f;
+	current_s_gain = 0.0f;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+	sin_cos_approx(EQUALGAINPOINT_OFFSET, &current_s_gain, &current_m_gain);
+	current_m_gain *= EQUALGAINPOINT_TO_UNITY; /* normalize the neutral  */
+	current_s_gain *= EQUALGAINPOINT_TO_UNITY; /* setting to unity gain. */
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+	unsigned long pos;
+	LADSPA_Data mid, side;
+	LADSPA_Data m_gain, s_gain;
+	int width_ = f_round(width + EQUALGAINPOINT_OFFSET);
+
+	/* smoothen the gain changes. to spread the curve over the entire
+	   buffer length (i.e.#sample_count samples), make lp dependent on
+	   sample_count.
+	*/
+	const float lp = 7.0f / (float) sample_count; /* value found by experiment */
+	const float lp_i = 1.0f - lp;
+
+	/* do approximately the same as
+	   s_gain = sin(width); m_gain = cos(width);
+	   but a lot faster:
+	*/
+	sin_cos_approx(width_, &s_gain, &m_gain);
+
+	m_gain *= EQUALGAINPOINT_TO_UNITY; /* normalize the neutral  */
+	s_gain *= EQUALGAINPOINT_TO_UNITY; /* setting to unity gain. */
+
+	#ifdef DEBUG
+	/* do a "hardware bypass" if width == 0 */
+	/* no smoothing here                    */
+	if (width_ == 128) {
+		for (pos = 0; pos < sample_count; pos++) {
+		buffer_write(o_left[pos], i_left[pos]);
+		buffer_write(o_right[pos], i_right[pos]);
+		}
+	} else
+	#endif
+
+	for (pos = 0; pos < sample_count; pos++) {
+		current_m_gain = current_m_gain * lp_i + m_gain * lp;
+		current_s_gain = current_s_gain * lp_i + s_gain * lp;
+		mid = (i_left[pos] + i_right[pos]) * 0.5f * current_m_gain;
+		side = (i_left[pos] - i_right[pos]) * 0.5f * current_s_gain;
+		buffer_write(o_left[pos], mid + side);
+		buffer_write(o_right[pos], mid - side);
+	}
+
+	plugin_data->current_m_gain = current_m_gain;
+	plugin_data->current_s_gain = current_s_gain;
+    ]]></callback>
+
+    <port label="i_left" dir="input" type="audio">
+      <name>Input L</name>
+    </port>
+    <port label="i_right" dir="input" type="audio">
+      <name>Input R</name>
+    </port>
+    <port label="width" dir="input" type="control" hint="integer,default_0">
+      <name>Width</name>
+      <range min="-512" max="512"/>
+      <p><![CDATA[
+         0 is neutral (unmodified signal)
+	 + 128 is side only (=very wide)
+	 - 128 is mid only (=mono)
+       ]]></p>
+     </port>
+
+    <port label="o_left" dir="output" type="audio">
+      <name>Output L</name>
+    </port>
+    <port label="o_right" dir="output" type="audio">
+      <name>Output R</name>
+    </port>
+
+    <instance-data label="current_m_gain" type="LADSPA_Data" />
+    <instance-data label="current_s_gain" type="LADSPA_Data" />
+  </plugin>
+</ladspa>
+

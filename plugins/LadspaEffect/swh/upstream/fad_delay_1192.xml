@@ -1,0 +1,114 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<code>
+#include "ladspa-util.h"
+
+#define BASE_BUFFER 8 // Base buffer length (s)
+		</code>
+	</global>
+
+	<plugin label="fadDelay" id="1192" class="DelayPlugin">
+		<name>Fractionally Addressed Delay Line</name>
+		<p>A fixed ring buffer delay implementation. Has different dynamics to a normal delay, more suitable for certain things.</p>
+		<p>Changes in delay length are generally more pleasing, but delays >2s long have reduced sound quality.</p>
+
+		<callback event="instantiate"><![CDATA[
+			unsigned int min_bs;
+
+			sample_rate = s_rate;
+			min_bs = BASE_BUFFER * s_rate;
+			for (buffer_size = 4096; buffer_size < min_bs;
+			     buffer_size *= 2);
+			buffer = calloc(buffer_size, sizeof(LADSPA_Data));
+			buffer_mask = buffer_size - 1;
+			phase = 0;
+			last_phase = 0;
+			last_in = 0.0f;
+		]]></callback>
+
+		<callback event="activate">
+			int i;
+
+			for (i = 0; i &lt; buffer_size; i++) {
+				buffer[i] = 0;
+			}
+			phase = 0;
+			last_phase = 0;
+			last_in = 0.0f;
+		</callback>
+
+		<callback event="cleanup">
+			free(plugin_data->buffer);
+		</callback>
+
+		<callback event="run"><![CDATA[
+long int pos;
+float increment = (float)buffer_size / ((float)sample_rate *
+					f_max(fabs(delay), 0.01));
+float lin_int, lin_inc;
+int track;
+int fph;
+LADSPA_Data out;
+const float fb = DB_CO(fb_db);
+
+for (pos = 0; pos < sample_count; pos++) {
+	fph = f_round(floor(phase));
+	last_phase = fph;
+	lin_int = phase - (float)fph;
+	out = LIN_INTERP(lin_int, buffer[(fph+1) & buffer_mask],
+	 buffer[(fph+2) & buffer_mask]);
+	phase += increment;
+	lin_inc = 1.0f / (floor(phase) - last_phase + 1);
+	lin_inc = lin_inc > 1.0f ? 1.0f : lin_inc;
+	lin_int = 0.0f;
+	for (track = last_phase; track < phase; track++) {
+		lin_int += lin_inc;
+		buffer[track % buffer_size] = out * fb +
+		 LIN_INTERP(lin_int, last_in, input[pos]);
+	}
+	last_in = input[pos];
+	buffer_write(output[pos], out);
+	if (phase >= buffer_size) {
+		phase -= buffer_size;
+	}
+}
+
+// Store current phase in instance
+plugin_data->phase = phase;
+plugin_data->last_phase = last_phase;
+plugin_data->last_in = last_in;
+		]]></callback>
+
+		<port label="delay" dir="input" type="control" hint="default_1">
+			<name>Delay (seconds)</name>
+			<p>The neutral delay time is 2 seconds. Times above 2 seconds will have reduced quality and times below will have increased CPU usage.</p>
+			<range min="0.1" max="10"/>
+		</port>
+
+		<port label="fb_db" dir="input" type="control" hint="default_0">
+			<name>Feedback (dB)</name>
+			<range min="-70" max="0"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+
+		<instance-data label="buffer" type="LADSPA_Data *"/>
+		<instance-data label="phase" type="float"/>
+		<instance-data label="last_phase" type="int"/>
+		<instance-data label="last_in" type="LADSPA_Data"/>
+		<instance-data label="buffer_size" type="unsigned long"/>
+		<instance-data label="buffer_mask" type="unsigned long"/>
+		<instance-data label="sample_rate" type="long"/>
+	</plugin>
+</ladspa>

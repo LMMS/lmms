@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "ladspa-util.h"
+      #include "util/biquad.h"
+
+      #define ENV_TR 0.0001f
+
+      #define CLOSED  1
+      #define OPENING 2
+      #define OPEN    3
+      #define CLOSING 4
+    ]]></code>
+  </global>
+
+  <plugin label="gate" id="1410" class="GatePlugin">
+    <name>Gate</name>
+    <p>The parameters are copied from the Drawmer DS-201, but I've never used one, so if someone out there has one, please tell me if it behaves differently.</p>
+
+    <callback event="instantiate"><![CDATA[
+      fs = s_rate;
+      env = 0.0f;
+      gate = 0.0f;
+      state = CLOSED;
+      hold_count = 0;
+
+      lf = malloc(sizeof(biquad));
+      hf = malloc(sizeof(biquad));
+      biquad_init(lf);
+      biquad_init(hf);
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      env = 0.0f;
+      gate = 0.0f;
+      state = CLOSED;
+      biquad_init(lf);
+      biquad_init(hf);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->lf);
+      free(plugin_data->hf);
+    ]]></callback>
+
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float cut = DB_CO(range);
+      float t_level = DB_CO(threshold);
+      float a_rate = 1000.0f / (attack * fs);
+      float d_rate = 1000.0f / (decay * fs);
+      float post_filter, apost_filter;
+      int op = f_round(select);
+
+      ls_set_params(lf, lf_fc, -40.0f, 0.6f, fs);
+      hs_set_params(hf, hf_fc, -50.0f, 0.6f, fs);
+
+      for (pos = 0; pos < sample_count; pos++) {
+	post_filter = biquad_run(lf, input[pos]);
+	post_filter = biquad_run(hf, post_filter);
+	apost_filter = fabs(post_filter);
+
+        if (apost_filter > env) {
+          env = apost_filter;
+        } else {
+          env = apost_filter * ENV_TR + env * (1.0f - ENV_TR);
+        }
+
+	if (state == CLOSED) {
+	  if (env >= t_level) {
+	    state = OPENING;
+	  }
+        } else if (state == OPENING) {
+	  gate += a_rate;
+	  if (gate >= 1.0f) {
+	    gate = 1.0f;
+	    state = OPEN;
+	    hold_count = f_round(hold * fs * 0.001f);
+	    plugin_data->hold_count = hold_count;
+	  }
+        } else if (state == OPEN) {
+	  if (hold_count <= 0) {
+	    if (env < t_level) {
+	      state = CLOSING;
+            }
+	  } else {
+	    hold_count--;
+	  }
+	} else if (state == CLOSING) {
+	  gate -= d_rate;
+	  if (env >= t_level) {
+	    state = OPENING;
+	  } else if (gate <= 0.0f) {
+	    gate = 0.0f;
+	    state = CLOSED;
+	  }
+	}
+
+	if (op == 0) {
+          buffer_write(output[pos], input[pos] * (cut * (1.0f - gate) + gate));
+	} else if (op == -1) {
+          buffer_write(output[pos], post_filter);
+	} else {
+	  buffer_write(output[pos], input[pos]);
+	}
+      }
+
+      plugin_data->env = env;
+      plugin_data->gate = gate;
+      plugin_data->state = state;
+      plugin_data->hold_count = hold_count;
+    ]]></callback>
+
+    <port label="lf_fc" dir="input" type="control" hint="sample_rate,default_minimum">
+      <name>LF key filter (Hz)</name>
+      <p>Controls the cutoff of the low frequency filter (highpass).</p>
+      <range min="0.0007f" max="0.1"/>
+    </port>
+
+    <port label="hf_fc" dir="input" type="control" hint="sample_rate,default_maximum">
+      <name>HF key filter (Hz)</name>
+      <p>Controls the cutoff of the high frequency filter (lowpass).</p>
+      <range min="0.005f" max="0.49"/>
+    </port>
+
+    <port label="threshold" dir="input" type="control" hint="default_minimum">
+      <name>Threshold (dB)</name>
+      <p>Controls the level at which the gate will open.</p>
+      <range min="-70" max="+20"/>
+    </port>
+
+    <port label="attack" dir="input" type="control" hint="default_low">
+      <name>Attack (ms)</name>
+      <p>Controls the time the gate will take to open fully.</p>
+      <range min="0.01" max="1000"/>
+    </port>
+
+    <port label="hold" dir="input" type="control" hint="default_high">
+      <name>Hold (ms)</name>
+      <p>Controls the minimum time the gate will stay open for.</p>
+      <range min="2" max="2000"/>
+    </port>
+
+    <port label="decay" dir="input" type="control" hint="default_middle">
+      <name>Decay (ms)</name>
+      <p>Controls the time the gate will take to close fully.</p>
+      <range min="2" max="4000"/>
+    </port>
+
+    <port label="range" dir="input" type="control" hint="default_minimum">
+      <name>Range (dB)</name>
+      <p>Controls the difference between the gate's open and closed state.</p>
+      <range min="-90" max="0"/>
+    </port>
+
+    <port label="select" dir="input" type="control" hint="integer,default_0">
+      <name>Output select (-1 = key listen, 0 = gate, 1 = bypass)</name>
+      <p>Controls output monitor. -1 is the output of the key filters (so you can check what is being gated on). 0 is the normal, gated output. 1 is bypass mode.</p>
+      <range min="-1" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+    <instance-data label="env" type="float" />
+    <instance-data label="gate" type="float" />
+    <instance-data label="state" type="int" />
+    <instance-data label="hold_count" type="int" />
+    <instance-data label="lf" type="biquad *" />
+    <instance-data label="hf" type="biquad *" />
+  </plugin>
+</ladspa>

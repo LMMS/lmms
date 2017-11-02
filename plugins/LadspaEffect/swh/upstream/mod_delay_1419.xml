@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+    </code>
+  </global>
+
+  <plugin label="modDelay" id="1419" class="DelayPlugin">
+    <name>Modulatable delay</name>
+    <p>A delay whose tap can be modulated at audio rate.</p>
+    <p>Requested by Matthias Nagorni at LinuxTag 2002, in order to make a Leslie simulator.</p>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int size = 32768;
+
+      fs = s_rate;
+      while (size < 2.7f * fs) {
+	size *= 2;
+      }
+      buffer = calloc(size, sizeof(LADSPA_Data));
+      buffer_mask = size - 1;
+      write_ptr = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      memset(buffer, 0, buffer_mask + 1);
+      write_ptr = 0;
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->buffer);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	float tmp;
+	const float rpf = modff((base + delay[pos]) * fs, &tmp);
+	const int rp = write_ptr - 4 - f_round(tmp);
+
+        buffer[write_ptr++] = input[pos];
+	write_ptr &= buffer_mask;
+
+        buffer_write(output[pos], cube_interp(rpf, buffer[(rp - 1) & buffer_mask], buffer[rp & buffer_mask],  buffer[(rp + 1) & buffer_mask], buffer[(rp + 2) & buffer_mask]));
+      }
+      plugin_data->write_ptr = write_ptr;
+    ]]></callback>
+
+    <port label="base" dir="input" type="control" hint="default_maximum">
+      <name>Base delay (s)</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="delay" dir="input" type="audio" hint="default_0">
+      <name>Delay (s)</name>
+      <range min="0" max="1.7"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+    <instance-data label="buffer" type="LADSPA_Data *" />
+    <instance-data label="buffer_mask" type="unsigned int" />
+    <instance-data label="write_ptr" type="unsigned int" />
+  </plugin>
+</ladspa>

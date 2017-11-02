@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="waveTerrain" id="1412" class="OscillatorPlugin">
+    <name>Wave Terrain Oscillator</name>
+    <p>A Wave Terrain oscillator, taken from Curtis Roads' example in {\em The Computer Music Tutorial}.</p>
+    <p>Inputs x and y move the cursor around on a 2D landscape "wavetable" that is used to generate the output. The function used is  z = (x - y) * (x - 1) * (x + 1) * (y - 1) * (y + 1).</p>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      float x, y;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	x = xb[pos];
+	y = yb[pos];
+        buffer_write(zb[pos], (x - y) * (x - 1.0f) * (x + 1.0f) * (y - 1.0f) * (y + 1.0f) );
+      }
+    ]]></callback>
+
+    <port label="xb" dir="input" type="audio" hint="default_0">
+      <name>x</name>
+    </port>
+
+    <port label="yb" dir="input" type="audio" hint="default_0">
+      <name>y</name>
+    </port>
+
+    <port label="zb" dir="output" type="audio">
+      <name>z</name>
+    </port>
+  </plugin>
+</ladspa>

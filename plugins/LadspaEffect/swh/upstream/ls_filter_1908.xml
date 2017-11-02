@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "ladspa-util.h"
+      #include "util/ls_filter.h"
+    </code>
+  </global>
+
+  <plugin label="lsFilter" id="1908" class="FilterPlugin">
+    <name>LS Filter</name>
+    <p>This is a filter created for the LinkSampler project - its designed to closely follow the filter used in giga sampler.</p>
+
+    <callback event="instantiate"><![CDATA[
+      filt = malloc(sizeof(ls_filt));
+      fs = s_rate;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+      ls_filt_init(filt);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+      const ls_filt_type t = (ls_filt_type)f_round(type);
+
+      ls_filt_setup(filt, t, cutoff, resonance, fs);
+
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer_write(output[pos], ls_filt_run(filt, input[pos]));
+      }
+	
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      free(plugin_data->filt);
+    ]]></callback>
+
+    <port label="type" dir="input" type="control" hint="default_0, integer">
+      <name>Filter type (0=LP, 1=BP, 2=HP)</name>
+      <p>The type of the filter, 0 for low pass, 1 for band pass, 2 for high pass.</p>
+      <range min="0" max="2"/>
+    </port>
+
+    <port label="cutoff" dir="input" type="control" hint="default_middle, logarithmic, sample_rate">
+      <name>Cutoff frequency (Hz)</name>
+      <p>Controls the frequency at which the filter starts to effect the audio signal.</p>
+      <p>eg. a lowpass filter with a cutoff frequency of 1000 Hz will only let frequencies below 1000 Hz through.</p>
+      <range min="0.002" max="0.5"/>
+    </port>
+
+    <port label="resonance" dir="input" type="control" hint="default_0">
+      <name>Resonance</name>
+      <p>Creates a peak at the cutoff frequency, for the classic overdriven filter sound. At high values the peak at the cutoff will overwhelm the filtered signal.</p>
+      <range min="0.0" max="1.0"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="fs" type="float" />
+    <instance-data label="filt" type="ls_filt *" />
+  </plugin>
+</ladspa>

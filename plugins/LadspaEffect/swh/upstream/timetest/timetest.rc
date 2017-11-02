@@ -1,0 +1,33 @@
+Amp	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../amp_1181.so amp 0
+Fast overdrive	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../foverdrive_1196.so foverdrive 1
+#Overdrive (with colouration)	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../overdrive_1182.so overdrive 0 0.5 0.5 0.5
+Comb filter	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../comb_1190.so comb 500 50 150
+Waveshaper	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../shaper_1187.so shaper 5
+Ringmod w/ LFO	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../ringmod_1188.so ringmod_1i1o1l 2 50 0.3 0.4 0.5 0.6
+Audio divider	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../divider_1186.so divider 8
+Diode processor	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../diode_1185.so diode 1.5
+Decliper	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../declip_1195.so declip
+Pitch scaler	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../pitch_scale_1193.so pitchScale 0.7
+Pitch scaler (high quality)	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../pitch_scale_1194.so pitchScaleHQ 0.7
+16 band EQ	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../mbeq_1197.so mbeq -70 -60 -50 -40 -30 -20 -10 -5 +5 +10 +5 0 0 0 0 0
+Sinus wavewrapper	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../sinus_wavewrapper_1198.so sinusWavewrapper 0.2
+Hermes filter	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../hermes_filter_1200.so hermesFilter 3 0 0.27 1 100 1 40 1 1.5 1 2 -4 -4 -50 -70 -70 -70 200 1000 3 1 3 5 1500 0.65 0 130 0 5 400 0.8 0 0 -177 1 150 0.9 0.97 30 30 0.025 0.9 0.5 0.05 0.7 0.5 0.1 0.5 0.5 0 -20 -20
+Chorus (3 voice)	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../multivoice_chorus_1201.so multivoiceChorus 3 20 3 1 10 0
+Flanger	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../flanger_1191.so flanger 1 0.3 0.5 0.7
+Decimator	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../decimator_1202.so decimator 4 1000
+Analogue style oscilator	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../analogue_osc_1205.so analogueOsc 50 0
+Transient processor	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../transient_1206.so transient 0.7 -0.7
+Fractional Delay	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../fad_delay_1192.so fadDelay 3 -10
+DC offset remover	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../dc_remove_1207.so dcRemove
+Retro flanger	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../retro_flange_1208.so retroFlange 5 4
+Valve saturation	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../valve_1209.so valve 0.5 0.5
+Sifter	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../sifter_1210.so sifter 32
+Tape style delay (4 taps)	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../tape_delay_1211.so tapeDelay 1 -10 0.1 -10 0.2 -10 0.3 -10 0.4 -10
+Foldover distorter	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../foldover_1213.so foldover 0.5 0.5
+State variable filter	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../amp_1181.so amp -89 ../svf_1214.so svf 2 3000 0.5 0.5
+GSM phone effect	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../gsm_1215.so gsm 0.5 1 0
+GVerb (reverb)	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../gverb_1216.so gverb 150 5 0.5 0.25 0 0 0
+LFO Phaser	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../phasers_1217.so lfoPhaser 10 0.5 0.6 1
+4x4 pole allpass	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../phasers_1217.so fourByFourPole 1000 0.7 2000 -0.7 3000 0.8 4000 -0.8
+Auto phaser	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../phasers_1217.so autoPhaser 1 0.1 0.0001 0.6 0.01
+Harmonic generator	applyplugin ../testdata/happyness-ext-m.wav /dev/null ../harmonic_gen_1220.so harmonicGen 1 0 0 0 0 0 0 0 0 0

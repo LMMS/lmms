@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code>
+			#include "ladspa-util.h"
+			#define COMB_SIZE 0x4000
+			#define COMB_MASK 0x3FFF
+		</code>
+	</global>
+
+	<plugin label="combSplitter" id="1411" class="CombPlugin">
+		<name>Comb Splitter</name>
+		<p>Divides the input up into two parts with frequency peaks at f Hz intervals, skewed by f/2 Hz between the two outputs. Mixing the two outputs will get you exactly the input signal.</p>
+		<p>I generally use this trick to divide up an input signal, process the two halves differently, then mix them again. It sounds pretty funky.</p>
+
+		<callback event="instantiate">
+			sample_rate = s_rate;
+			comb_tbl = malloc(sizeof(LADSPA_Data) * COMB_SIZE);
+			comb_pos = 0;
+			last_offset = 1000;
+		</callback>
+
+		<callback event="activate">
+			int i;
+
+			for (i = 0; i &lt; COMB_SIZE; i++) {
+				comb_tbl[i] = 0;
+			}
+			comb_pos = 0;
+			last_offset = 1000;
+		</callback>
+
+                <callback event="cleanup">
+                        free(plugin_data->comb_tbl);
+                </callback>
+
+		<callback event="run"><![CDATA[
+			float offset;
+			int data_pos;
+			unsigned long pos;
+			float xf, xf_step, d_pos, fr, interp, in;
+
+			offset = sample_rate / freq;
+			offset = f_clamp(offset, 0, COMB_SIZE - 1);
+			xf_step = 1.0f / (float)sample_count;
+			xf = 0.0f;
+
+			for (pos = 0; pos < sample_count; pos++) {
+				xf += xf_step;
+				d_pos = comb_pos - LIN_INTERP(xf, last_offset, offset);
+				data_pos = f_trunc(d_pos);
+				fr = d_pos - data_pos;
+				interp =  cube_interp(fr, comb_tbl[(data_pos - 1) & COMB_MASK], comb_tbl[data_pos & COMB_MASK], comb_tbl[(data_pos + 1) & COMB_MASK], comb_tbl[(data_pos + 2) & COMB_MASK]);
+				in = input[pos];
+				comb_tbl[comb_pos] = in;
+				buffer_write(out1[pos], (in + interp) * 0.5f);
+				buffer_write(out2[pos], (in - interp) * 0.5f);
+				comb_pos = (comb_pos + 1) & COMB_MASK;
+			}
+
+			plugin_data->comb_pos = comb_pos;
+			plugin_data->last_offset = offset;
+		]]></callback>
+
+		<port label="freq" dir="input" type="control" hint="default_low">
+			<name>Band separation (Hz)</name>
+			<range min="16" max="640"/>
+			<p>The distance between the frequency peaks.</p>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="out1" dir="output" type="audio">
+			<name>Output 1</name>
+			<p>The sum output.</p>
+		</port>
+
+		<port label="out2" dir="output" type="audio">
+			<name>Output 2</name>
+			<p>The difference output.</p>
+		</port>
+
+		<instance-data label="comb_tbl" type="LADSPA_Data *"/>
+		<instance-data label="comb_pos" type="long"/>
+		<instance-data label="sample_rate" type="long"/>
+		<instance-data label="last_offset" type="float"/>
+	</plugin>
+</ladspa>

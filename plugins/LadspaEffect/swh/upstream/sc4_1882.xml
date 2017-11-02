@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "util/db.h"
+      #include "util/rms.h"
+
+      #define A_TBL 256
+    ]]></code>
+  </global>
+
+  <plugin label="sc4" id="1882" class="CompressorPlugin">
+    <name>SC4</name>
+    <p>A stereo compressor with variable envelope follower for RMS / peak behaviour. Based on the code for SC1.</p>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int i;
+      float sample_rate = (float)s_rate;
+
+      rms = rms_env_new();
+      sum = 0.0f;
+      amp = 0.0f;
+      gain = 0.0f;
+      gain_t = 0.0f;
+      env = 0.0f;
+      env_rms = 0.0f;
+      env_peak = 0.0f;
+      count = 0;
+
+      as = malloc(A_TBL * sizeof(float));
+      as[0] = 1.0f;
+      for (i=1; i<A_TBL; i++) {
+	as[i] = expf(-1.0f / (sample_rate * (float)i / (float)A_TBL));
+      }
+
+      db_init();
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      rms_env_free(plugin_data->rms);
+      free(plugin_data->as);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      const float ga = attack < 2.0f ? 0.0f : as[f_round(attack * 0.001f * (float)(A_TBL-1))];
+      const float gr = as[f_round(release * 0.001f * (float)(A_TBL-1))];
+      const float rs = (ratio - 1.0f) / ratio;
+      const float mug = db2lin(makeup_gain);
+      const float knee_min = db2lin(threshold - knee);
+      const float knee_max = db2lin(threshold + knee);
+      const float ef_a = ga * 0.25f;
+      const float ef_ai = 1.0f - ef_a;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	const float la = fabs(left_in[pos]);
+	const float ra = fabs(right_in[pos]);
+	const float lev_in = f_max(la, ra);
+        sum += lev_in * lev_in;
+
+        if (amp > env_rms) {
+          env_rms = env_rms * ga + amp * (1.0f - ga);
+        } else {
+          env_rms = env_rms * gr + amp * (1.0f - gr);
+        }
+	round_to_zero(&env_rms);
+        if (lev_in > env_peak) {
+          env_peak = env_peak * ga + lev_in * (1.0f - ga);
+        } else {
+          env_peak = env_peak * gr + lev_in * (1.0f - gr);
+        }
+	round_to_zero(&env_peak);
+        if ((count++ & 3) == 3) {
+          amp = rms_env_process(rms, sum * 0.25f);
+          sum = 0.0f;
+	  if (isnan(env_rms)) {
+	    // This can happen sometimes, but I don't know why
+	    env_rms = 0.0f;
+	  }
+
+          env = LIN_INTERP(rms_peak, env_rms, env_peak);
+
+	  if (env <= knee_min) {
+            gain_t = 1.0f;
+	  } else if (env < knee_max) {
+	    const float x = -(threshold - knee - lin2db(env)) / knee;
+	    gain_t = db2lin(-knee * rs * x * x * 0.25f);
+          } else {
+            gain_t = db2lin((threshold - lin2db(env)) * rs);
+          }
+        }
+        gain = gain * ef_a + gain_t * ef_ai;
+        buffer_write(left_out[pos], left_in[pos] * gain * mug);
+        buffer_write(right_out[pos], right_in[pos] * gain * mug);
+      }
+      plugin_data->sum = sum;
+      plugin_data->amp = amp;
+      plugin_data->gain = gain;
+      plugin_data->gain_t = gain_t;
+      plugin_data->env = env;
+      plugin_data->env_rms = env_rms;
+      plugin_data->env_peak = env_peak;
+      plugin_data->count = count;
+
+      *(plugin_data->amplitude) = lin2db(env);
+      *(plugin_data->gain_red) = lin2db(gain);
+    ]]></callback>
+
+    <port label="rms_peak" dir="input" type="control" hint="default_minimum">
+      <name>RMS/peak</name>
+      <p>The balance between the RMS and peak envelope followers.</p>
+      <p>RMS is generally better for subtle, musical compression and peak is better for heavier, fast compression and percussion.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="attack" dir="input" type="control" hint="default_low">
+      <name>Attack time (ms)</name>
+      <p>The attack time in milliseconds.</p>
+      <range min="1.5" max="400"/>
+    </port>
+
+    <port label="release" dir="input" type="control" hint="default_middle">
+      <name>Release time (ms)</name>
+      <p>The release time in milliseconds.</p>
+      <range min="2" max="800"/>
+    </port>
+
+    <port label="threshold" dir="input" type="control" hint="default_maximum">
+      <name>Threshold level (dB)</name>
+      <p>The point at which the compressor will start to kick in.</p>
+      <range min="-30" max="0"/>
+    </port>
+
+    <port label="ratio" dir="input" type="control" hint="default_1">
+      <name>Ratio (1:n)</name>
+      <p>The gain reduction ratio used when the signal level exceeds the threshold.</p>
+      <range min="1" max="20"/>
+    </port>
+
+    <port label="knee" dir="input" type="control" hint="default_low">
+      <name>Knee radius (dB)</name>
+      <p>The distance from the threshold where the knee curve starts.</p>
+      <range min="1" max="10"/>
+    </port>
+
+    <port label="makeup_gain" dir="input" type="control" hint="default_0">
+      <name>Makeup gain (dB)</name>
+      <p>Controls the gain of the makeup input signal in dB's.</p>
+      <range min="0" max="+24"/>
+    </port>
+
+    <port label="amplitude" dir="output" type="control">
+      <name>Amplitude (dB)</name>
+      <p>The level of the input signal, in decibels.</p>
+      <range min="-40" max="+12"/>
+    </port>
+
+    <port label="gain_red" dir="output" type="control">
+      <name>Gain reduction (dB)</name>
+      <p>The degree of gain reduction applied to the input signal, in decibels.</p>
+      <range min="-24" max="0"/>
+    </port>
+
+    <port label="left_in" dir="input" type="audio">
+      <name>Left input</name>
+    </port>
+
+    <port label="right_in" dir="input" type="audio">
+      <name>Right input</name>
+    </port>
+
+    <port label="left_out" dir="output" type="audio">
+      <name>Left output</name>
+    </port>
+
+    <port label="right_out" dir="output" type="audio">
+      <name>Right output</name>
+    </port>
+
+    <instance-data label="rms" type="rms_env *" />
+    <instance-data label="as" type="float *" />
+
+    <instance-data label="sum" type="float" />
+    <instance-data label="amp" type="float" />
+    <instance-data label="gain" type="float" />
+    <instance-data label="gain_t" type="float" />
+    <instance-data label="env" type="float" />
+    <instance-data label="env_rms" type="float" />
+    <instance-data label="env_peak" type="float" />
+    <instance-data label="count" type="unsigned int" />
+  </plugin>
+</ladspa>

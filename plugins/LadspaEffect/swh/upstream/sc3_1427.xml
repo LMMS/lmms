@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code><![CDATA[
+      #include "util/db.h"
+      #include "util/rms.h"
+
+      #define A_TBL 256
+    ]]></code>
+  </global>
+
+  <plugin label="sc3" id="1427" class="CompressorPlugin">
+    <name>SC3</name>
+    <p>A stereo compressor with sidechain input. Based on the code for SC1.</p>
+
+    <callback event="instantiate"><![CDATA[
+      unsigned int i;
+      float sample_rate = (float)s_rate;
+
+      rms = rms_env_new();
+      sum = 0.0f;
+      amp = 0.0f;
+      gain = 0.0f;
+      gain_t = 0.0f;
+      env = 0.0f;
+      count = 0;
+
+      as = malloc(A_TBL * sizeof(float));
+      as[0] = 1.0f;
+      for (i=1; i<A_TBL; i++) {
+	as[i] = expf(-1.0f / (sample_rate * (float)i / (float)A_TBL));
+      }
+
+      db_init();
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+      rms_env_free(plugin_data->rms);
+      free(plugin_data->as);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      const float ga = as[f_round(attack * 0.001f * (float)(A_TBL-1))];
+      const float gr = as[f_round(release * 0.001f * (float)(A_TBL-1))];
+      const float rs = (ratio - 1.0f) / ratio;
+      const float mug = db2lin(makeup_gain);
+      const float knee_min = db2lin(threshold - knee);
+      const float knee_max = db2lin(threshold + knee);
+      const float chain_bali = 1.0f - chain_bal;
+      const float ef_a = ga * 0.25f;
+      const float ef_ai = 1.0f - ef_a;
+
+      for (pos = 0; pos < sample_count; pos++) {
+	const float lev_in = chain_bali * (left_in[pos] + right_in[pos]) * 0.5f
+			     + chain_bal * sidechain[pos];
+        sum += lev_in * lev_in;
+
+        if (amp > env) {
+          env = env * ga + amp * (1.0f - ga);
+        } else {
+          env = env * gr + amp * (1.0f - gr);
+        }
+        if (count++ % 4 == 3) {
+          amp = rms_env_process(rms, sum * 0.25f);
+          sum = 0.0f;
+	  if (isnan(env)) {
+	    // This can happen sometimes, but I dont know why
+	    env = 0.0f;
+	  } else if (env <= knee_min) {
+            gain_t = 1.0f;
+	  } else if (env < knee_max) {
+	    const float x = -(threshold - knee - lin2db(env)) / knee;
+	    gain_t = db2lin(-knee * rs * x * x * 0.25f);
+          } else {
+            gain_t = db2lin((threshold - lin2db(env)) * rs);
+          }
+        }
+        gain = gain * ef_a + gain_t * ef_ai;
+        buffer_write(left_out[pos], left_in[pos] * gain * mug);
+        buffer_write(right_out[pos], right_in[pos] * gain * mug);
+      }
+      plugin_data->sum = sum;
+      plugin_data->amp = amp;
+      plugin_data->gain = gain;
+      plugin_data->gain_t = gain_t;
+      plugin_data->env = env;
+      plugin_data->count = count;
+    ]]></callback>
+
+    <port label="attack" dir="input" type="control" hint="default_low">
+      <name>Attack time (ms)</name>
+      <p>The attack time in milliseconds.</p>
+      <range min="2" max="400"/>
+    </port>
+
+    <port label="release" dir="input" type="control" hint="default_middle">
+      <name>Release time (ms)</name>
+      <p>The release time in milliseconds.</p>
+      <range min="2" max="800"/>
+    </port>
+
+    <port label="threshold" dir="input" type="control" hint="default_maximum">
+      <name>Threshold level (dB)</name>
+      <p>The point at which the compressor will start to kick in.</p>
+      <range min="-30" max="0"/>
+    </port>
+
+    <port label="ratio" dir="input" type="control" hint="default_1">
+      <name>Ratio (1:n)</name>
+      <p>The gain reduction ratio used when the signal level exceeds the threshold.</p>
+      <range min="1" max="10"/>
+    </port>
+
+    <port label="knee" dir="input" type="control" hint="default_low">
+      <name>Knee radius (dB)</name>
+      <p>The distance from the threshold where the knee curve starts.</p>
+      <range min="1" max="10"/>
+    </port>
+
+    <port label="makeup_gain" dir="input" type="control" hint="default_0">
+      <name>Makeup gain (dB)</name>
+      <p>Controls the gain of the makeup input signal in dB's.</p>
+      <range min="0" max="+24"/>
+    </port>
+
+    <port label="chain_bal" dir="input" type="control" hint="default_0">
+      <name>Chain balance</name>
+      <p>Controls the chain signal used, 0 = Left+right in, 1 = Sidechain.</p>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="sidechain" dir="input" type="audio">
+      <name>Sidechain</name>
+    </port>
+
+    <port label="left_in" dir="input" type="audio">
+      <name>Left input</name>
+    </port>
+
+    <port label="right_in" dir="input" type="audio">
+      <name>Right input</name>
+    </port>
+
+    <port label="left_out" dir="output" type="audio">
+      <name>Left output</name>
+    </port>
+
+    <port label="right_out" dir="output" type="audio">
+      <name>Right output</name>
+    </port>
+
+    <instance-data label="rms" type="rms_env *" />
+    <instance-data label="as" type="float *" />
+
+    <instance-data label="sum" type="float" />
+    <instance-data label="amp" type="float" />
+    <instance-data label="gain" type="float" />
+    <instance-data label="gain_t" type="float" />
+    <instance-data label="env" type="float" />
+    <instance-data label="count" type="unsigned int" />
+  </plugin>
+</ladspa>

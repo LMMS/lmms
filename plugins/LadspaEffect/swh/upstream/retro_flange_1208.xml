@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+
+		<code><![CDATA[
+#include "ladspa-util.h"
+
+#define BASE_BUFFER 0.001 // Base buffer length (s)
+
+static inline LADSPA_Data sat(LADSPA_Data x, float q,  float dist) {
+	if (x == q) {
+		return 1.0f / dist + q / (1.0f - f_exp(dist * q));
+	}
+	return ((x - q) / (1.0f - f_exp(-dist * (x - q))) + q /
+	 (1.0f - f_exp(dist * q)));
+}
+
+		]]></code>
+	</global>
+
+	<plugin label="retroFlange" id="1208" class="FlangerPlugin">
+		<name>Retro Flanger</name>
+		<p>A model of someone flanging the input.</p>
+		<p>Models the tape saturation effects, and frequency smear of a manual flanger. The results are a slightly distorted, but more subtle flanger sound that you get from a normal digital flanger.</p>
+
+		<callback event="instantiate"><![CDATA[
+sample_rate = s_rate;
+buffer_size = BASE_BUFFER * s_rate;
+buffer = calloc(buffer_size, sizeof(LADSPA_Data));
+phase = 0;
+last_phase = 0;
+last_in = 0.0f;
+max_law_p = s_rate*2;
+last_law_p = -1;
+delay_line_length = sample_rate * 0.01f;
+delay_line = calloc(sizeof(float), delay_line_length);
+
+delay_pos = 0;
+count = 0;
+
+prev_law_peak = 0.0f;
+next_law_peak = 1.0f;
+prev_law_pos = 0;
+next_law_pos = 10;
+
+z0 = 0.0f;
+z1 = 0.0f;
+z2 = 0.0f;
+		]]></callback>
+
+		<callback event="activate"><![CDATA[
+memset(delay_line, 0, sizeof(float) * delay_line_length);
+memset(buffer, 0, sizeof(LADSPA_Data) * buffer_size);
+z0 = 0.0f;
+z1 = 0.0f;
+z2 = 0.0f;
+
+prev_law_peak = 0.0f;
+next_law_peak = 1.0f;
+prev_law_pos = 0;
+next_law_pos = 10;
+		]]></callback>
+
+		<callback event="cleanup"><![CDATA[
+free(plugin_data->delay_line);
+free(plugin_data->buffer);
+		]]></callback>
+
+		<callback event="run"><![CDATA[
+long int pos;
+int law_p = f_trunc(LIMIT(sample_rate / f_clamp(law_freq, 0.0001f, 100.0f), 1, max_law_p));
+float increment;
+float lin_int, lin_inc;
+int track;
+int fph;
+LADSPA_Data out = 0.0f;
+const float dda_c = f_clamp(delay_depth_avg, 0.0f, 10.0f);
+int dl_used = (dda_c * sample_rate) / 1000;
+float inc_base = 1000.0f * (float)BASE_BUFFER;
+const float delay_depth = 2.0f * dda_c;
+float n_ph, p_ph, law;
+
+for (pos = 0; pos < sample_count; pos++) {
+	// Write into the delay line
+	delay_line[delay_pos] = input[pos];
+	z0 = delay_line[MOD(delay_pos - dl_used, delay_line_length)] + 0.12919609397f*z1 - 0.31050847f*z2;
+	out = sat(z0*0.20466966f + z1*0.40933933f + z2*0.40933933f,
+	                -0.23f, 3.3f);
+	z2 = z1; z1 = z0;
+	delay_pos = (delay_pos + 1) % delay_line_length;
+
+        if ((count++ % law_p) == 0) {
+		// Value for amplitude of law peak
+		next_law_peak = (float)rand() / (float)RAND_MAX;
+		next_law_pos = count + law_p;
+	} else if (count % law_p == law_p / 2) {
+		// Value for amplitude of law peak
+		prev_law_peak = (float)rand() / (float)RAND_MAX;
+		prev_law_pos = count + law_p;
+        }
+
+        n_ph = (float)(law_p - labs(next_law_pos - count))/(float)law_p;
+        p_ph = n_ph + 0.5f;
+        if (p_ph > 1.0f) {
+                p_ph -= 1.0f;
+        }
+        law = f_sin_sq(3.1415926f*p_ph)*prev_law_peak +
+                f_sin_sq(3.1415926f*n_ph)*next_law_peak;
+
+	increment = inc_base / (delay_depth * law + 0.2);
+	fph = f_trunc(phase);
+	last_phase = fph;
+	lin_int = phase - (float)fph;
+	out += LIN_INTERP(lin_int, buffer[(fph+1) % buffer_size],
+	 buffer[(fph+2) % buffer_size]);
+	phase += increment;
+	lin_inc = 1.0f / (floor(phase) - last_phase + 1);
+	lin_inc = lin_inc > 1.0f ? 1.0f : lin_inc;
+	lin_int = 0.0f;
+	for (track = last_phase; track < phase; track++) {
+		lin_int += lin_inc;
+		buffer[track % buffer_size] =
+		 LIN_INTERP(lin_int, last_in, input[pos]);
+	}
+	last_in = input[pos];
+	buffer_write(output[pos], out * 0.707f);
+	if (phase >= buffer_size) {
+		phase -= buffer_size;
+	}
+}
+
+// Store current phase in instance
+plugin_data->phase = phase;
+plugin_data->prev_law_peak = prev_law_peak;
+plugin_data->next_law_peak = next_law_peak;
+plugin_data->prev_law_pos = prev_law_pos;
+plugin_data->next_law_pos = next_law_pos;
+plugin_data->last_phase = last_phase;
+plugin_data->last_in = last_in;
+plugin_data->count = count;
+plugin_data->last_law_p = last_law_p;
+plugin_data->delay_pos = delay_pos;
+plugin_data->z0 = z0;
+plugin_data->z1 = z1;
+plugin_data->z2 = z2;
+		]]></callback>
+
+		<port label="delay_depth_avg" dir="input" type="control" hint="default_low">
+			<name>Average stall (ms)</name>
+			<range min="0" max="10"/>
+			<p>The average time difference between the two tapes, per stall</p>
+		</port>
+
+		<port label="law_freq" dir="input" type="control" hint="default_1">
+			<name>Flange frequency (Hz)</name>
+			<range min="0.5" max="8"/>
+			<p>The rate the tape is stalled at.</p>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+		</port>
+
+		<instance-data label="buffer" type="LADSPA_Data *"/>
+		<instance-data label="phase" type="float"/>
+		<instance-data label="last_phase" type="int"/>
+		<instance-data label="last_in" type="LADSPA_Data"/>
+		<instance-data label="buffer_size" type="long"/>
+		<instance-data label="sample_rate" type="long"/>
+		<instance-data label="count" type="long"/>
+		<instance-data label="max_law_p" type="int"/>
+		<instance-data label="last_law_p" type="int"/>
+		<instance-data label="delay_pos" type="int"/>
+		<instance-data label="delay_line_length" type="int"/>
+		<instance-data label="delay_line" type="LADSPA_Data *"/>
+		<instance-data label="z0" type="LADSPA_Data"/>
+		<instance-data label="z1" type="LADSPA_Data"/>
+		<instance-data label="z2" type="LADSPA_Data"/>
+		<instance-data label="prev_law_peak" type="float"/>
+		<instance-data label="next_law_peak" type="float"/>
+		<instance-data label="prev_law_pos" type="int"/>
+		<instance-data label="next_law_pos" type="int"/>
+
+	</plugin>
+</ladspa>

@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+		<code><![CDATA[
+#include "ladspa-util.h"
+
+// Constants to match filter types
+#define F_LP 1
+#define F_HP 2
+#define F_BP 3
+#define F_BR 4
+#define F_AP 5
+
+// Number of filter oversamples
+#define F_R 3
+
+/* Structure to hold parameters for SV filter */
+
+typedef struct {
+	float f;     // 2.0*sin(PI*fs/(fc*r));
+	float q;     // 2.0*cos(pow(q, 0.1)*PI*0.5);
+	float qnrm;  // sqrt(m/2.0f+0.01f);
+	float h;     // high pass output
+	float b;     // band pass output
+	float l;     // low pass output
+	float p;     // peaking output (allpass with resonance)
+	float n;     // notch output
+	float *op;   // pointer to output value
+} sv_filter;
+
+/* Store data in SVF struct, takes the sampling frequency, cutoff frequency
+   and Q, and fills in the structure passed */
+
+static inline void setup_svf(sv_filter *sv, float fs, float fc, float q, int t) {
+	sv->f = 2.0f * sin(M_PI * fc / (float)(fs * F_R));
+	sv->q = 2.0f * cos(pow(q, 0.1f) * M_PI * 0.5f);
+	sv->qnrm = sqrt(sv->q/2.0+0.01);
+	switch(t) {
+	case F_LP:
+		sv->op = &(sv->l);
+		break;
+	case F_HP:
+		sv->op = &(sv->h);
+		break;
+	case F_BP:
+		sv->op = &(sv->b);
+		break;
+	case F_BR:
+		sv->op = &(sv->n);
+		break;
+	default:
+		sv->op = &(sv->p);
+	}
+}
+
+/* Run one sample through the SV filter. Filter is by andy@vellocet */
+
+static inline float run_svf(sv_filter *sv, float in) {
+	float out;
+	int i;
+
+	in = sv->qnrm * in ;
+	for (i=0; i < F_R; i++) {
+		// very slight waveshape for extra stability
+		sv->b = flush_to_zero(sv->b - sv->b * sv->b * sv->b * 0.001f);
+
+		// regular state variable code here
+		// the notch and peaking outputs are optional
+		sv->h = flush_to_zero(in - sv->l - sv->q * sv->b);
+		sv->b = sv->b + sv->f * sv->h;
+		sv->l = flush_to_zero(sv->l + sv->f * sv->b);
+		sv->n = sv->l + sv->h;
+		sv->p = sv->l - sv->h;
+
+		out = *(sv->op);
+		in = out;
+	}
+
+	return out;
+}
+		]]></code>
+	</global>
+
+	<plugin label="svf" id="1214" class="FilterPlugin">
+		<name>State Variable Filter</name>
+		<p>An oversampled state variable filter with a few tweaks.</p>
+		<p>Quite a nice State Variable Filter, tends to be unstable with high resonance and Q values, but good when kept under control.</p>
+		<callback event="instantiate">
+sample_rate = s_rate;
+
+svf = calloc(1, sizeof(sv_filter));
+		</callback>
+
+		<callback event="activate">
+setup_svf(svf, 0, 0, 0, 0);
+		</callback>
+
+		<callback event="cleanup">
+free(plugin_data->svf);
+		</callback>
+
+		<callback event="run"><![CDATA[
+long int pos;
+
+setup_svf(svf, sample_rate, filt_freq, filt_q, f_round(filt_type));
+
+for (pos = 0; pos < sample_count; pos++) {
+	buffer_write(output[pos], run_svf(svf, input[pos] + (svf->b * filt_res)));
+}
+		]]></callback>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+			<range min="-1" max="1"/>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+			<range min="-1" max="1"/>
+		</port>
+
+		<port label="filt_type" dir="input" type="control" hint="integer,default_0">
+			<name>Filter type (0=none, 1=LP, 2=HP, 3=BP, 4=BR, 5=AP)</name>
+			<range min="0" max="5"/>
+			<p>Select between no filtering, low-pass, high-pass, band-pass, band-reject and all-pass.</p>
+		</port>
+
+		<port label="filt_freq" dir="input" type="control" hint="default_440">
+			<name>Filter freq</name>
+			<range min="0" max="6000"/>
+			<p>Cutoff frequency, beware of high values with low sample rates.</p>
+		</port>
+
+		<port label="filt_q" dir="input" type="control" hint="default_low">
+			<name>Filter Q</name>
+			<range min="0" max="1"/>
+			<p>The filters Q, or cutoff slope.</p>
+		</port>
+
+		<port label="filt_res" dir="input" type="control" hint="default_0">
+			<name>Filter resonance</name>
+			<range min="0" max="1"/>
+			<p>The filter's resonance, sort of separate from Q but very related (implemented with feedback).</p>
+			<p>Do not use with the bandpass mode.</p>
+		</port>
+
+		<instance-data label="sample_rate" type="int"/>
+		<instance-data label="svf" type="sv_filter *"/>
+	</plugin>
+</ladspa>

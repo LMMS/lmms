@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Frank Neumann &lt;franky@users.sourceforge.net&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+	</global>
+
+	<plugin label="split" id="1406" class="UtilityPlugin">
+		<name>Mono to Stereo splitter</name>
+		<p>Takes a mono input signal, and outputs it to both left and right channel, thus \"stereophizing" it.</p>
+
+		<callback event="run">
+			unsigned long pos;
+
+			for (pos = 0; pos &lt; sample_count; pos++) {
+				const LADSPA_Data in = input[pos];
+
+				buffer_write(out1[pos], in);
+				buffer_write(out2[pos], in);
+			}
+		</callback>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="out2" dir="output" type="audio">
+			<name>Output 1</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="out1" dir="output" type="audio">
+			<name>Output 2</name>
+			<range min="-1" max="+1"/>
+		</port>
+	</plugin>
+</ladspa>

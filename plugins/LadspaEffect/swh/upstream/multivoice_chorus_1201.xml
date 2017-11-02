@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <code><![CDATA[
+#include "ladspa-util.h"
+#define MAX_LAWS 7
+    ]]></code>
+  </global>
+
+  <plugin label="multivoiceChorus" id="1201" class="ChorusPlugin">
+    <name>Multivoice Chorus</name>
+    <p>This is an implementation of a Multivoice (as opposed to Multiscale) chorus algorithm. Its uses a novel, sinc based noise interpolation method to produce a subtle modulation law which makes it possible to get away with larger numbers of voices without the metallic, artificial sound common in chorus effects.</p>
+
+    <callback event="instantiate"><![CDATA[
+int min_size;
+
+sample_rate = s_rate;
+
+max_law_p = s_rate/2;
+last_law_p = -1;
+law_pos = 0;
+law_roll = 0;
+
+min_size = sample_rate / 10;
+for (delay_size = 1024; delay_size < min_size; delay_size *= 2);
+delay_mask = delay_size - 1;
+delay_tbl = calloc(sizeof(float), delay_size);
+delay_pos = 0;
+
+prev_peak_pos = malloc(sizeof(unsigned int) * MAX_LAWS);
+next_peak_pos = malloc(sizeof(unsigned int) * MAX_LAWS);
+prev_peak_amp = malloc(sizeof(float) * MAX_LAWS);
+next_peak_amp = malloc(sizeof(float) * MAX_LAWS);
+dp_targ = malloc(sizeof(float) * MAX_LAWS);
+dp_curr = malloc(sizeof(float) * MAX_LAWS);
+
+count = 0;
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+memset(delay_tbl, 0, sizeof(float) * delay_size);
+memset(prev_peak_pos, 0, sizeof(unsigned int) * MAX_LAWS);
+memset(next_peak_pos, 0, sizeof(unsigned int) * MAX_LAWS);
+memset(prev_peak_amp, 0, sizeof(float) * MAX_LAWS);
+memset(next_peak_amp, 0, sizeof(float) * MAX_LAWS);
+memset(dp_targ, 0, sizeof(float) * MAX_LAWS);
+memset(dp_curr, 0, sizeof(float) * MAX_LAWS);
+    ]]></callback>
+
+    <callback event="cleanup"><![CDATA[
+free(plugin_data->delay_tbl);
+free(plugin_data->prev_peak_pos);
+free(plugin_data->next_peak_pos);
+free(plugin_data->prev_peak_amp);
+free(plugin_data->next_peak_amp);
+free(plugin_data->dp_targ);
+free(plugin_data->dp_curr);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos;
+int d_base, t;
+LADSPA_Data out;
+float delay_depth;
+float dp; // float delay position
+float dp_frac; // fractional part
+int dp_idx; // Integer delay index
+int laws, law_separation, base_offset;
+int law_p; // Period of law
+float atten; // Attenuation
+
+// Set law params
+laws = LIMIT(f_round(voices) - 1, 0, 7);
+law_p = LIMIT(f_round(sample_rate/f_clamp(law_freq, 0.0001f, 1000.0f)), 1, max_law_p);
+if (laws > 0) {
+	law_separation = law_p / laws;
+} else {
+	law_separation = 0;
+}
+
+// Calculate voice spread in samples
+base_offset = (f_clamp(voice_spread, 0.0f, 2.0f) * sample_rate) / 1000;
+// Calculate base delay size in samples
+d_base = (f_clamp(delay_base, 5.0f, 40.0f) * sample_rate) / 1000;
+// Calculate delay depth in samples
+delay_depth = f_clamp((law_p * f_clamp(detune, 0.0f, 10.0f)) / (100.0f * M_PI), 0.0f, delay_size - d_base - 1 - (base_offset * laws));
+
+// Calculate output attenuation
+atten = DB_CO(f_clamp(attendb, -100.0, 24.0));
+
+for (pos = 0; pos < sample_count; pos++) {
+	// N times per law 'frequency' splurge a new set of windowed data
+	// into one of the N law buffers. Keeps the laws out of phase.
+	if (laws > 0 && (count % law_separation) == 0) {
+		next_peak_amp[law_roll] = (float)rand() / (float)RAND_MAX;
+		next_peak_pos[law_roll] = count + law_p;
+	}
+	if (laws > 0 && (count % law_separation) == law_separation/2) {
+		prev_peak_amp[law_roll] = (float)rand() / (float)RAND_MAX;
+		prev_peak_pos[law_roll] = count + law_p;
+		// Pick the next law to be changed
+		law_roll = (law_roll + 1) % laws;
+	}
+
+	out = input[pos];
+	if (count % 16 < laws) {
+		unsigned int t = count % 16;
+		// Calculate sinus phases
+		float n_ph = (float)(law_p - labs(next_peak_pos[t] - count))/law_p;
+		float p_ph = n_ph + 0.5f;
+		if (p_ph > 1.0f) {
+			p_ph -= 1.0f;
+		}
+
+		dp_targ[t] = f_sin_sq(3.1415926f*p_ph)*prev_peak_amp[t] + f_sin_sq(3.1415926f*n_ph)*next_peak_amp[t];
+	}
+	for (t=0; t<laws; t++) {
+		dp_curr[t] = 0.9f*dp_curr[t] + 0.1f*dp_targ[t];
+		//dp_curr[t] = dp_targ[t];
+		dp = (float)(delay_pos + d_base - (t*base_offset)) - delay_depth * dp_curr[t];
+		// Get the integer part
+		dp_idx = f_round(dp-0.5f);
+		// Get the fractional part
+		dp_frac = dp - dp_idx;
+		// Calculate the modulo'd table index
+		dp_idx = dp_idx & delay_mask;
+
+		// Accumulate into output buffer
+		out += cube_interp(dp_frac, delay_tbl[(dp_idx-1) & delay_mask], delay_tbl[dp_idx], delay_tbl[(dp_idx+1) & delay_mask], delay_tbl[(dp_idx+2) & delay_mask]);
+	}
+	law_pos = (law_pos + 1) % (max_law_p * 2);
+
+	// Store new delay value
+	delay_tbl[delay_pos] = input[pos];
+	delay_pos = (delay_pos + 1) & delay_mask;
+
+	buffer_write(output[pos], out * atten);
+	count++;
+}
+
+plugin_data->count = count;
+plugin_data->law_pos = law_pos;
+plugin_data->last_law_p = last_law_p;
+plugin_data->law_roll = law_roll;
+plugin_data->delay_pos = delay_pos;
+    ]]></callback>
+
+    <port label="voices" dir="input" type="control" hint="integer,default_1">
+      <name>Number of voices</name>
+      <range min="1" max="8"/>
+    </port>
+
+    <port label="delay_base" dir="input" type="control" hint="default_minimum">
+      <name>Delay base (ms)</name>
+      <range min="10" max="40"/>
+    </port>
+
+    <port label="voice_spread" dir="input" type="control" hint="default_low">
+      <name>Voice separation (ms)</name>
+      <range min="0" max="2"/>
+      <p>The individual voices can either be running at the same base delay (set this to zero) or staggered.</p>
+      <p>Setting this to non-zero values can make the output sound richer, but will make it sound grainy with some type of signal.</p>
+    </port>
+
+    <port label="detune" dir="input" type="control" hint="default_1">
+      <name>Detune (%)</name>
+      <range min="0" max="5"/>
+      <p>The maximum amount that a voice will be detuned by. I recommend a value of 1, but you may be able to get away with higher values if the signal is less harmonic.</p>
+    </port>
+
+    <port label="law_freq" dir="input" type="control" hint="default_low">
+      <name>LFO frequency (Hz)</name>
+      <range min="2" max="30"/>
+      <p>The frequency that the detune effect will be modulated at. A matter of taste, for most types of input lower will be more subtle.</p>
+    </port>
+
+    <port label="attendb" dir="input" type="control" hint="default_0">
+      <name>Output attenuation (dB)</name>
+      <range min="-20" max="0"/>
+      <p>With large numbers of voices the output can become too high, so use this to trim the amplitude to a more helpful level.</p>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+    </port>
+
+    <instance-data label="sample_rate" type="long"/>
+    <instance-data label="count" type="long"/>
+    <instance-data label="law_pos" type="int"/>
+    <instance-data label="law_roll" type="int"/>
+    <instance-data label="max_law_p" type="int"/>
+    <instance-data label="last_law_p" type="int"/>
+    <instance-data label="delay_tbl" type="float *"/>
+    <instance-data label="delay_pos" type="unsigned int"/>
+    <instance-data label="delay_size" type="unsigned int"/>
+    <instance-data label="delay_mask" type="unsigned int"/>
+    <instance-data label="prev_peak_pos" type="unsigned int *"/>
+    <instance-data label="next_peak_pos" type="unsigned int *"/>
+    <instance-data label="prev_peak_amp" type="float *"/>
+    <instance-data label="next_peak_amp" type="float *"/>
+    <instance-data label="dp_targ" type="float *"/>
+    <instance-data label="dp_curr" type="float *"/>
+  </plugin>
+</ladspa>

@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+    <code>
+      #include "util/biquad.h"
+    </code>
+  </global>
+
+  <plugin label="triplePara" id="1204" class="ParaEQPlugin">
+    <name>Triple band parametric with shelves</name>
+    <p>Actually five bands of eq, but the first and last are locked to shelving filters.</p>
+    <p>For details see the single band parametric (section \ref{singlePara}).</p>
+
+    <callback event="instantiate"><![CDATA[
+fs = s_rate;
+
+filters = calloc(5, sizeof(biquad));
+biquad_init(&filters[0]);
+biquad_init(&filters[1]);
+biquad_init(&filters[2]);
+biquad_init(&filters[3]);
+biquad_init(&filters[4]);
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+biquad_init(&filters[0]);
+biquad_init(&filters[1]);
+biquad_init(&filters[2]);
+biquad_init(&filters[3]);
+biquad_init(&filters[4]);
+    ]]></callback>
+
+    <callback event="run"><![CDATA[
+unsigned long pos;
+float in;
+
+ls_set_params(&filters[0], fc_L, gain_L, bw_L, fs);
+eq_set_params(&filters[1], fc_1, gain_1, bw_1, fs);
+eq_set_params(&filters[2], fc_2, gain_2, bw_2, fs);
+eq_set_params(&filters[3], fc_3, gain_3, bw_3, fs);
+hs_set_params(&filters[4], fc_H, gain_H, bw_H, fs);
+
+for (pos = 0; pos < sample_count; pos++) {
+	in = biquad_run(&filters[0], input[pos]);
+	in = biquad_run(&filters[1], in);
+	in = biquad_run(&filters[2], in);
+	in = biquad_run(&filters[3], in);
+	in = biquad_run(&filters[4], in);
+	buffer_write(output[pos], in);
+}
+    ]]></callback>
+
+    <callback event="activate"><![CDATA[
+biquad_init(&filters[0]);
+biquad_init(&filters[1]);
+biquad_init(&filters[2]);
+biquad_init(&filters[3]);
+biquad_init(&filters[4]);
+    ]]></callback>
+
+    <callback event="cleanup">
+free(plugin_data->filters);
+    </callback>
+
+    <port label="gain_L" dir="input" type="control" hint="default_0">
+      <name>Low-shelving gain (dB)</name>
+      <range min="-70" max="+30"/>
+    </port>
+
+    <port label="fc_L" dir="input" type="control" hint="logarithmic,sample_rate,default_minimum">
+      <name>Low-shelving frequency (Hz)</name>
+      <range min="0.0001" max="0.49"/>
+    </port>
+
+    <port label="bw_L" dir="input" type="control" hint="default_middle">
+      <name>Low-shelving slope</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="gain_1" dir="input" type="control" hint="default_0">
+      <name>Band 1 gain (dB)</name>
+      <range min="-70" max="+30"/>
+    </port>
+
+    <port label="fc_1" dir="input" type="control" hint="logarithmic,sample_rate,default_low">
+      <name>Band 1 frequency (Hz)</name>
+      <range min="0.0001" max="0.49"/>
+    </port>
+
+    <port label="bw_1" dir="input" type="control" hint="default_1">
+      <name>Band 1 bandwidth (octaves)</name>
+      <range min="0" max="4"/>
+    </port>
+
+    <port label="gain_2" dir="input" type="control" hint="default_0">
+      <name>Band 2 gain (dB)</name>
+      <range min="-70" max="+30"/>
+    </port>
+
+    <port label="fc_2" dir="input" type="control" hint="logarithmic,sample_rate,default_middle">
+      <name>Band 2 frequency (Hz)</name>
+      <range min="0.0001" max="0.49"/>
+    </port>
+
+    <port label="bw_2" dir="input" type="control" hint="default_1">
+      <name>Band 2 bandwidth (octaves)</name>
+      <range min="0" max="4"/>
+    </port>
+
+    <port label="gain_3" dir="input" type="control" hint="default_0">
+      <name>Band 3 gain (dB)</name>
+      <range min="-70" max="+30"/>
+    </port>
+
+    <port label="fc_3" dir="input" type="control" hint="logarithmic,sample_rate,default_high">
+      <name>Band 3 frequency (Hz)</name>
+      <range min="0.0001" max="0.49"/>
+    </port>
+
+    <port label="bw_3" dir="input" type="control" hint="default_1">
+      <name>Band 3 bandwidth (octaves)</name>
+      <range min="0" max="4"/>
+    </port>
+
+    <port label="gain_H" dir="input" type="control" hint="default_0">
+      <name>High-shelving gain (dB)</name>
+      <range min="-70" max="+30"/>
+    </port>
+
+    <port label="fc_H" dir="input" type="control" hint="logarithmic,sample_rate,default_maximum">
+      <name>High-shelving frequency (Hz)</name>
+      <range min="0.0001" max="0.49"/>
+    </port>
+
+    <port label="bw_H" dir="input" type="control" hint="default_middle">
+      <name>High-shelving slope</name>
+      <range min="0" max="1"/>
+    </port>
+
+    <port label="input" dir="input" type="audio">
+      <name>Input</name>
+      <range min="-1.0" max="+1.0"/>
+    </port>
+
+    <port label="output" dir="output" type="audio">
+      <name>Output</name>
+      <range min="-1.0" max="+1.0"/>
+    </port>
+
+    <instance-data label="fs" type="float"/>
+    <instance-data label="filters" type="biquad *"/>
+  </plugin>
+</ladspa>

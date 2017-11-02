@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css"?>
+
+<ladspa>
+  <global>
+    <meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+    <meta name="copyright" value="GPL"/>
+    <meta name="properties" value="HARD_RT_CAPABLE"/>
+  </global>
+
+  <plugin label="matrixStMS" id="1420" class="UtilityPlugin">
+    <name>Matrix: Stereo to MS</name>
+
+    <callback event="run"><![CDATA[
+      unsigned long pos;
+
+      for (pos = 0; pos < sample_count; pos++) {
+        buffer_write(mid[pos], (left[pos] + right[pos]) * 0.5);
+        buffer_write(side[pos], (left[pos] - right[pos]) * 0.5);
+      }
+    ]]></callback>
+
+    <port label="left" dir="input" type="audio">
+      <name>Left</name>
+    </port>
+    <port label="right" dir="input" type="audio">
+      <name>Right</name>
+    </port>
+
+    <port label="mid" dir="output" type="audio">
+      <name>Mid</name>
+    </port>
+    <port label="side" dir="output" type="audio">
+      <name>Side</name>
+    </port>
+  </plugin>
+</ladspa>

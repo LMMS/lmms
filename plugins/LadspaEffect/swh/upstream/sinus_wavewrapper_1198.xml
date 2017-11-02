@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<!DOCTYPE ladspa SYSTEM "ladspa-swh.dtd">
+<?xml-stylesheet href="ladspa.css" type="text/css" ?>
+<ladspa>
+	<global>
+		<meta name="maker" value="Steve Harris &lt;steve@plugin.org.uk&gt;"/>
+		<meta name="copyright" value="GPL"/>
+		<meta name="properties" value="HARD_RT_CAPABLE"/>
+	</global>
+
+	<plugin label="sinusWavewrapper" id="1198" class="WaveshaperPlugin">
+		<name>Sinus wavewrapper</name>
+                <p>Produces an unusual distortion effect, for a more amp like tone, see the valve saturation plugin (section \ref{valve}).</p>
+
+		<callback event="run"><![CDATA[
+			float coef = wrap * M_PI;
+			unsigned long pos;
+
+			if (coef < 0.05f) {
+				coef = 0.05f;
+			}
+
+			for (pos = 0; pos < sample_count; pos++) {
+				buffer_write(output[pos], sin(input[pos] * coef));
+			}
+		]]></callback>
+
+		<port label="wrap" dir="input" type="control" hint="default_0">
+			<name>Wrap degree</name>
+			<range min="0" max="10"/>
+		</port>
+
+		<port label="input" dir="input" type="audio">
+			<name>Input</name>
+			<range min="-1" max="+1"/>
+		</port>
+
+		<port label="output" dir="output" type="audio">
+			<name>Output</name>
+			<range min="-1" max="+1"/>
+		</port>
+	</plugin>
+</ladspa>
