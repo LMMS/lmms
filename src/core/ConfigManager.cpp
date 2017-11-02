@@ -54,7 +54,7 @@ ConfigManager::ConfigManager() :
 	m_workingDir(QDir::home().absolutePath() + "/lmms/"),
 	m_dataDir("data:/"),
 	m_vstDir(m_workingDir + "vst/"),
-	m_sfDir(m_workingDir + SF_PATH),
+	m_sf2Dir(m_workingDir + SF2_PATH),
 	m_gigDir(m_workingDir + GIG_PATH),
 	m_themeDir(defaultThemeDir()),
 	m_lmmsRcFile(QDir::home().absolutePath() +"/.lmmsrc.xml"),
@@ -236,10 +236,10 @@ void ConfigManager::setSTKDir(const QString & stkDir)
 
 
 
-void ConfigManager::setSFFile(const QString & sfFile)
+void ConfigManager::setSF2File(const QString & sf2File)
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_sfFile = sfFile;
+	m_sf2File = sf2File;
 #endif
 }
 
@@ -258,9 +258,9 @@ void ConfigManager::setGIGDir(const QString & gigDir)
 	m_gigDir = gigDir;
 }
 
-void ConfigManager::setSFDir(const QString & sfDir)
+void ConfigManager::setSF2Dir(const QString & sf2Dir)
 {
-	m_sfDir = sfDir;
+	m_sf2Dir = sf2Dir;
 }
 
 
@@ -273,7 +273,7 @@ void ConfigManager::createWorkingDir()
 	QDir().mkpath(userSamplesDir());
 	QDir().mkpath(userPresetsDir());
 	QDir().mkpath(userGigDir());
-	QDir().mkpath(userSfDir());
+	QDir().mkpath(userSf2Dir());
 	QDir().mkpath(userVstDir());
 	QDir().mkpath(userLadspaDir());
 }
@@ -457,14 +457,14 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			setWorkingDir(value("paths", "workingdir"));
 
 			setGIGDir(value("paths", "gigdir") == "" ? gigDir() : value("paths", "gigdir"));
-			setSFDir(value("paths", "sfdir") == "" ? sfDir() : value("paths", "sfdir"));
+			setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
 			setVSTDir(value("paths", "vstdir"));
 			setLADSPADir(value("paths", "ladspadir"));
 		#ifdef LMMS_HAVE_STK
 			setSTKDir(value("paths", "stkdir"));
 		#endif
 		#ifdef LMMS_HAVE_FLUIDSYNTH
-			setSFFile(value("paths", "defaultsf"));
+			setSF2File(value("paths", "defaultsf2"));
 		#endif
 			setBackgroundPicFile(value("paths", "backgroundtheme"));
 		}
@@ -534,13 +534,13 @@ void ConfigManager::saveConfigFile()
 	setValue("paths", "workingdir", m_workingDir);
 	setValue("paths", "vstdir", m_vstDir);
 	setValue("paths", "gigdir", m_gigDir);
-	setValue("paths", "sfdir", m_sfDir);
+	setValue("paths", "sf2dir", m_sf2Dir);
 	setValue("paths", "ladspadir", m_ladspaDir);
 #ifdef LMMS_HAVE_STK
 	setValue("paths", "stkdir", m_stkDir);
 #endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	setValue("paths", "defaultsf", m_sfFile);
+	setValue("paths", "defaultsf2", m_sf2File);
 #endif
 	setValue("paths", "backgroundtheme", m_backgroundPicFile);
 
