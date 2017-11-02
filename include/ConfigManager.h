@@ -45,7 +45,7 @@ const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString GIG_PATH = "samples/gig/";
-const QString SF2_PATH = "samples/sf2/";
+const QString SF_PATH = "samples/soundfont/";
 const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
@@ -125,15 +125,15 @@ public:
 		return m_ladspaDir;
 	}
 
-	const QString & sf2Dir() const
+	const QString & sfDir() const
 	{
-		return m_sf2Dir;
+		return m_sfDir;
 	}
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	const QString & sf2File() const
+	const QString & sfFile() const
 	{
-		return m_sf2File;
+		return m_sfFile;
 	}
 #endif
 
@@ -159,9 +159,9 @@ public:
 		return workingDir() + LADSPA_PATH;
 	}
 
-	QString userSf2Dir() const
+	QString userSfDir() const
 	{
-		return workingDir() + SF2_PATH;
+		return workingDir() + SF_PATH;
 	}
 
 	QString userGigDir() const
@@ -233,8 +233,8 @@ public:
 	void setWorkingDir(const QString & workingDir);
 	void setVSTDir(const QString & vstDir);
 	void setLADSPADir(const QString & ladspaDir);
-	void setSF2Dir(const QString & sf2Dir);
-	void setSF2File(const QString & sf2File);
+	void setSFDir(const QString & sfDir);
+	void setSFFile(const QString & sfFile);
 	void setSTKDir(const QString & stkDir);
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
@@ -260,9 +260,9 @@ private:
 	QString m_dataDir;
 	QString m_vstDir;
 	QString m_ladspaDir;
-	QString m_sf2Dir;
+	QString m_sfDir;
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	QString m_sf2File;
+	QString m_sfFile;
 #endif
 #ifdef LMMS_HAVE_STK
 	QString m_stkDir;

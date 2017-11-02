@@ -135,9 +135,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_vstDir(QDir::toNativeSeparators(ConfigManager::inst()->vstDir())),
 	m_ladspaDir(QDir::toNativeSeparators(ConfigManager::inst()->ladspaDir())),
 	m_gigDir(QDir::toNativeSeparators(ConfigManager::inst()->gigDir())),
-	m_sf2Dir(QDir::toNativeSeparators(ConfigManager::inst()->sf2Dir())),
+	m_sfDir(QDir::toNativeSeparators(ConfigManager::inst()->sfDir())),
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_sf2File(QDir::toNativeSeparators(ConfigManager::inst()->sf2File())),
+	m_sfFile(QDir::toNativeSeparators(ConfigManager::inst()->sfFile())),
 #endif
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
 	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
@@ -823,40 +823,40 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(ladspaDir_select_btn, SIGNAL(clicked()), this,
 			SLOT(openLADSPADir()));
 
-	// SF2 files directory tab.
-	TabWidget * sf2Dir_tw = new TabWidget(
-			tr("SF2 files directory"), pathSelectors);
-	sf2Dir_tw->setFixedHeight(48);
+	// SF files directory tab.
+	TabWidget * sfDir_tw = new TabWidget(
+			tr("SoundFont files directory"), pathSelectors);
+	sfDir_tw->setFixedHeight(48);
 
-	m_sf2DirLineEdit = new QLineEdit(m_sf2Dir, sf2Dir_tw);
-	m_sf2DirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_sf2DirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setSF2Dir(const QString &)));
+	m_sfDirLineEdit = new QLineEdit(m_sfDir, sfDir_tw);
+	m_sfDirLineEdit->setGeometry(10, 20, txtLength, 16);
+	connect(m_sfDirLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(setSFDir(const QString &)));
 
-	QPushButton * sf2Dir_select_btn = new QPushButton(
-			embed::getIconPixmap("project_open", 16, 16), "", sf2Dir_tw);
-	sf2Dir_select_btn->setFixedSize(24, 24);
-	sf2Dir_select_btn->move(btnStart, 16);
-	connect(sf2Dir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openSF2Dir()));
+	QPushButton * sfDir_select_btn = new QPushButton(
+			embed::getIconPixmap("project_open", 16, 16), "", sfDir_tw);
+	sfDir_select_btn->setFixedSize(24, 24);
+	sfDir_select_btn->move(btnStart, 16);
+	connect(sfDir_select_btn, SIGNAL(clicked()), this,
+			SLOT(openSFDir()));
 	
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	// Default SF2 file tab.
-	TabWidget * sf2File_tw = new TabWidget(
-			tr("Default SF2 file"), paths_w);
-	sf2File_tw->setFixedHeight(48);
+	// Default SF file tab.
+	TabWidget * sfFile_tw = new TabWidget(
+			tr("Default SoundFont file"), paths_w);
+	sfFile_tw->setFixedHeight(48);
 
-	m_sf2FileLineEdit = new QLineEdit(m_sf2File, sf2File_tw);
-	m_sf2FileLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_sf2FileLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setSF2File(const QString &)));
+	m_sfFileLineEdit = new QLineEdit(m_sfFile, sfFile_tw);
+	m_sfFileLineEdit->setGeometry(10, 20, txtLength, 16);
+	connect(m_sfFileLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(setSFFile(const QString &)));
 
-	QPushButton * sf2File_select_btn = new QPushButton(
-			embed::getIconPixmap("project_open", 16, 16), "", sf2File_tw);
-	sf2File_select_btn->setFixedSize(24, 24);
-	sf2File_select_btn->move(btnStart, 16);
-	connect(sf2File_select_btn, SIGNAL(clicked()), this,
-			SLOT(openSF2File()));
+	QPushButton * sfFile_select_btn = new QPushButton(
+			embed::getIconPixmap("project_open", 16, 16), "", sfFile_tw);
+	sfFile_select_btn->setFixedSize(24, 24);
+	sfFile_select_btn->move(btnStart, 16);
+	connect(sfFile_select_btn, SIGNAL(clicked()), this,
+			SLOT(openSFFile()));
 #endif
 		
 	// GIG files directory tab.
@@ -919,10 +919,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	pathSelectorsLayout->addSpacing(10);
 	pathSelectorsLayout->addWidget(ladspaDir_tw);
 	pathSelectorsLayout->addSpacing(10);
-	pathSelectorsLayout->addWidget(sf2Dir_tw);
+	pathSelectorsLayout->addWidget(sfDir_tw);
 	pathSelectorsLayout->addSpacing(10);
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	pathSelectorsLayout->addWidget(sf2File_tw);
+	pathSelectorsLayout->addWidget(sfFile_tw);
 	pathSelectorsLayout->addSpacing(10);
 #endif
 	pathSelectorsLayout->addWidget(gigDir_tw);
@@ -1074,9 +1074,9 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
 	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
 	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladspaDir));
-	ConfigManager::inst()->setSF2Dir(QDir::fromNativeSeparators(m_sf2Dir));
+	ConfigManager::inst()->setSFDir(QDir::fromNativeSeparators(m_sfDir));
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	ConfigManager::inst()->setSF2File(m_sf2File);
+	ConfigManager::inst()->setSFFile(m_sfFile);
 #endif
 	ConfigManager::inst()->setGIGDir(QDir::fromNativeSeparators(m_gigDir));
 	ConfigManager::inst()->setThemeDir(QDir::fromNativeSeparators(m_themeDir));
@@ -1423,41 +1423,41 @@ void SetupDialog::setLADSPADir(const QString & ladspaDir)
 }
 
 
-void SetupDialog::openSF2Dir()
+void SetupDialog::openSFDir()
 {
 	QString new_dir = FileDialog::getExistingDirectory(this,
-			tr("Choose your SF2 files directory"), m_sf2Dir);
+			tr("Choose your SoundFont files directory"), m_sfDir);
 	if(new_dir != QString::null)
 	{
-		m_sf2DirLineEdit->setText(new_dir);
+		m_sfDirLineEdit->setText(new_dir);
 	}
 }
 
 
-void SetupDialog::setSF2Dir(const QString & sf2Dir)
+void SetupDialog::setSFDir(const QString & sfDir)
 {
-	m_sf2Dir = sf2Dir;
+	m_sfDir = sfDir;
 }
 
 
-void SetupDialog::openSF2File()
+void SetupDialog::openSFFile()
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString new_file = FileDialog::getOpenFileName(this,
-			tr("Choose your default SF2 file"), m_sf2File, "SoundFont 2 files (*.sf2)");
+			tr("Choose your default SoundFont file"), m_sfFile, "SoundFont files (*.sf2 *.sf3)");
 	
 	if(new_file != QString::null)
 	{
-		m_sf2FileLineEdit->setText(new_file);
+		m_sfFileLineEdit->setText(new_file);
 	}
 #endif
 }
 
 
-void SetupDialog::setSF2File(const QString & sf2File)
+void SetupDialog::setSFFile(const QString & sfFile)
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
-	m_sf2File = sf2File;
+	m_sfFile = sfFile;
 #endif
 }
 
