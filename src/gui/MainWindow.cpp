@@ -33,6 +33,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QLibrary>
 #include <QSplitter>
 #include <QUrl>
 #include <QWhatsThis>
@@ -65,23 +66,18 @@
 #include "lmmsversion.h"
 
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BULID_APPLE) && !defined(LMMS_BUILD_HAIKU)
-#include <dlfcn.h>
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
-	void *libraryHandle = dlopen("libKF5WidgetsAddons.so", RTLD_LAZY);
-	if (!libraryHandle) {
-		//KDE not installed, nothing to do.
-		return;
-	}
 	using DisablerFunc = void(*)(QWidget*);
-	DisablerFunc setNoAccelerators =
-			reinterpret_cast<DisablerFunc>(dlsym(libraryHandle,
-					"_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
-	if (setNoAccelerators) {
+	QLibrary kf5WidgetsAddon("libKF5WidgetsAddons.so");
+	DisablerFunc setNoAccelerators = 
+			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+	if(setNoAccelerators)
+	{
 		setNoAccelerators(mainWindow);
 	}
-	dlclose(libraryHandle);
+	kf5WidgetsAddon.unload();
 }
 #endif
 
