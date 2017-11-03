@@ -70,7 +70,7 @@
 void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
 	using DisablerFunc = void(*)(QWidget*);
-	QLibrary kf5WidgetsAddon("KF5WidgetsAddons");
+	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
 	DisablerFunc setNoAccelerators = 
 			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
 	if(setNoAccelerators)
