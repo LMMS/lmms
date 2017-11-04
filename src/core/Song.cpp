@@ -266,13 +266,22 @@ void Song::processNextBuffer()
 	}
 
 	f_cnt_t framesPlayed = 0;
+	f_cnt_t framesToPlay = Engine::mixer()->framesPerPeriod() - framesPlayed;
+
+	float currentFrame = m_playPos[m_playMode].currentFrame();
+	if( ( f_cnt_t ) currentFrame == 0 )
+	{
+		processAutomations(trackList, m_playPos[m_playMode], framesToPlay);
+	}
+
 	const float framesPerTick = Engine::framesPerTick();
 
 	while( framesPlayed < Engine::mixer()->framesPerPeriod() )
 	{
 		m_vstSyncController.update();
 
-		float currentFrame = m_playPos[m_playMode].currentFrame();
+		currentFrame = m_playPos[m_playMode].currentFrame();
+
 		// did we play a tick?
 		if( currentFrame >= framesPerTick )
 		{
@@ -353,8 +362,7 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t framesToPlay = 
-			Engine::mixer()->framesPerPeriod() - framesPlayed;
+		framesToPlay = Engine::mixer()->framesPerPeriod() - framesPlayed;
 
 		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick - 
 						( f_cnt_t )currentFrame;
