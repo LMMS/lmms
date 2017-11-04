@@ -33,6 +33,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QLibrary>
 #include <QSplitter>
 #include <QUrl>
 #include <QWhatsThis>
@@ -64,6 +65,21 @@
 
 #include "lmmsversion.h"
 
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BULID_APPLE) && !defined(LMMS_BUILD_HAIKU)
+//Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
+void disableAutoKeyAccelerators(QWidget* mainWindow)
+{
+	using DisablerFunc = void(*)(QWidget*);
+	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
+	DisablerFunc setNoAccelerators = 
+			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
+	if(setNoAccelerators)
+	{
+		setNoAccelerators(mainWindow);
+	}
+	kf5WidgetsAddon.unload();
+}
+#endif
 
 
 MainWindow::MainWindow() :
@@ -76,6 +92,9 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BULID_APPLE) && !defined(LMMS_BUILD_HAIKU)
+	disableAutoKeyAccelerators(this);
+#endif
 	setAttribute( Qt::WA_DeleteOnClose );
 
 	QWidget * main_widget = new QWidget( this );
@@ -836,8 +855,8 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 				ConfigManager::inst()->factoryTemplatesDir() :
 				ConfigManager::inst()->userTemplateDir();
 
-		Engine::getSong()->createNewProjectFromTemplate(
-			dirBase + _idx->text() + ".mpt" );
+		const QString f = dirBase + _idx->text().replace("&&", "&") + ".mpt";
+		Engine::getSong()->createNewProjectFromTemplate(f);
 	}
 }
 
@@ -888,7 +907,7 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 			}
 
 			m_recentlyOpenedProjectsMenu->addAction(
-					embed::getIconPixmap( "project_file" ), *it );
+					embed::getIconPixmap( "project_file" ), it->replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
 			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
@@ -904,12 +923,11 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 
 
 
-
 void MainWindow::openRecentlyOpenedProject( QAction * _action )
 {
 	if ( mayChangeProject(true) )
 	{
-		const QString & f = _action->text();
+		const QString f = _action->text().replace("&&", "&");
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
 		setCursor( Qt::ArrowCursor );
@@ -1500,7 +1518,7 @@ void MainWindow::fillTemplatesMenu()
 	{
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
+					( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
 		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
 		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
