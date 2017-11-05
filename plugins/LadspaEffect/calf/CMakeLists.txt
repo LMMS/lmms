@@ -1,7 +1,8 @@
 # INCLUDE(CheckSubmodule)
 # CHECK_SUBMODULE(swh/configure.ac)
 
-# Note: The last version of Calf that was LADSPA-capable is version 0.0.18.2
+# Note:
+# 	The last version of Calf that was LADSPA-capable is version 0.0.18.2
 
 # Parse version info from autoconf
 FILE(READ calf/configure.ac VERSION_FILE)
@@ -9,6 +10,14 @@ STRING(REPLACE "[" ";" VERSION_FILE ${VERSION_FILE} )
 STRING(REPLACE "]" ";" VERSION_FILE ${VERSION_FILE} )
 LIST(GET VERSION_FILE 2 VERSION)
 CONFIGURE_FILE(config.h.in config.h)
+
+# Revert LADSPA removal patch
+EXECUTE_PROCESS(
+	COMMAND patch calf/src/calf/ladspa_wrap.h ladspa_wrap.h.diff
+	COMMAND patch calf/src/plugin.cpp plugin.cpp.diff
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	OUTPUT_QUIET
+)
 
 FILE(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/calf/src/*.cpp")
 LIST(SORT SOURCES)
