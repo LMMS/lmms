@@ -10,6 +10,6 @@
 [submodule "plugins/OpulenZ/adplug"]
 	path = plugins/OpulenZ/adplug
 	url = https://github.com/adplug/adplug.git
-[submodule "plugins/LadspaEffect/calf/calf"]
-	path = plugins/LadspaEffect/calf/calf
-	url = https://github.com/calf-studio-gear/calf
+[submodule "plugins/LadspaEffect/calf/veal"]
+	path = plugins/LadspaEffect/calf/veal
+	url = https://github.com/lmms/veal
