@@ -995,6 +995,31 @@ void DataFile::upgrade_1_3_0()
 			}
 		}
 	}
+
+	list = elementsByTagName( "effect" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement effect = list.item( i ).toElement();
+		if( effect.attribute( "name" ) == "ladspaeffect" )
+		{
+			QDomNodeList keys = effect.elementsByTagName( "key" );
+			for( int j = 0; !keys.item( j ).isNull(); ++j )
+			{
+				QDomElement key = keys.item( j ).toElement();
+				QDomNodeList attributes = key.elementsByTagName( "attribute" );
+				for( int k = 0; !attributes.item( k ).isNull(); ++k )
+				{
+					QDomElement attribute = attributes.item( k ).toElement();
+					if( attribute.attribute( "name" ) == "file" &&
+							( attribute.attribute( "value" ) == "calf" || 
+							attribute.attribute( "value" ) == "calf.so" ) )
+					{
+						attribute.setAttribute( "value", "veal" );
+					}
+				}
+			}
+		}
+	}
 }
 
 
