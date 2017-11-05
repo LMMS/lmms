@@ -11,14 +11,6 @@ STRING(REPLACE "]" ";" VERSION_FILE ${VERSION_FILE} )
 LIST(GET VERSION_FILE 2 VERSION)
 CONFIGURE_FILE(config.h.in config.h)
 
-# Revert LADSPA removal patch
-EXECUTE_PROCESS(
-	COMMAND patch calf/src/calf/ladspa_wrap.h ladspa_wrap.h.diff
-	COMMAND patch calf/src/plugin.cpp plugin.cpp.diff
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	OUTPUT_QUIET
-)
-
 FILE(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/calf/src/*.cpp")
 LIST(SORT SOURCES)
 
@@ -37,6 +29,7 @@ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include"
                     "${CMAKE_BINARY_DIR}"
                     "${CMAKE_CURRENT_BINARY_DIR}"
                     "${CMAKE_CURRENT_SOURCE_DIR}/calf/src")
+		
 INSTALL(TARGETS calf LIBRARY DESTINATION "${PLUGIN_DIR}/ladspa")
 SET_TARGET_PROPERTIES(calf PROPERTIES PREFIX "")
 SET(INLINE_FLAGS "")
