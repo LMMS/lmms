@@ -2,8 +2,6 @@ IF(LMMS_SUPPORT_VST)
 
 INCLUDE(BuildPlugin)
 
-ADD_DEFINITIONS(${EMBED_FLAGS})
-
 IF(LMMS_BUILD_WIN32)
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
 	ADD_EXECUTABLE(RemoteVstPlugin "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp")
@@ -65,7 +63,6 @@ ADD_CUSTOM_COMMAND(
 		-std=c++0x
 		-mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
 		${WINE_BUILD_FLAGS}
-		${EMBED_FLAGS}
 		-o ../RemoteVstPlugin
 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
