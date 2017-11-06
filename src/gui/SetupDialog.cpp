@@ -1077,7 +1077,11 @@ void SetupDialog::accept()
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
+#if QT_VERSION >= 0x050000
 					m_vstEmbedComboBox->currentData().toString() );
+#else
+					m_vstEmbedComboBox->itemData(m_vstEmbedComboBox->currentIndex()).toString() );
+#endif
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
