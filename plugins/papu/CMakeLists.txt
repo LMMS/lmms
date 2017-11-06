@@ -1,3 +1,25 @@
+# INCLUDE(CheckSubmodule)
+# CHECK_SUBMODULE(game-music-emu/CMakeLists.txt)
 INCLUDE(BuildPlugin)
+INCLUDE_DIRECTORIES(game-music-emu/gme)
 
-BUILD_PLUGIN(papu papu_instrument.cpp papu_instrument.h Basic_Gb_Apu.cpp Basic_Gb_Apu.h gb_apu/Gb_Oscs.cpp gb_apu/Gb_Apu.h gb_apu/Blip_Buffer.cpp gb_apu/Gb_Apu.cpp gb_apu/Gb_Oscs.h gb_apu/blargg_common.h gb_apu/Blip_Buffer.h gb_apu/Multi_Buffer.cpp gb_apu/blargg_source.h gb_apu/Multi_Buffer.h MOCFILES papu_instrument.h EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png")
+BUILD_PLUGIN(papu
+	papu_instrument.cpp
+	papu_instrument.h
+	Basic_Gb_Apu.cpp # TODO: Replace with subclass
+	Basic_Gb_Apu.h   # TODO: Replace with subclass
+	# Gb_Apu_Buffer.cpp
+	# Gb_Apu_Buffer.h
+	game-music-emu/gme/Gb_Apu.cpp
+	game-music-emu/gme/Gb_Apu.h
+	game-music-emu/gme/Gb_Oscs.cpp
+	game-music-emu/gme/Blip_Buffer.cpp
+	game-music-emu/gme/Gb_Oscs.h
+	game-music-emu/gme/blargg_common.h
+	game-music-emu/gme/Blip_Buffer.h
+	game-music-emu/gme/Multi_Buffer.cpp
+	game-music-emu/gme/blargg_source.h
+	game-music-emu/gme/Multi_Buffer.h
+	MOCFILES papu_instrument.h
+	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
+)
