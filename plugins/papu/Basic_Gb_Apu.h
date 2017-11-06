@@ -6,8 +6,8 @@
 #ifndef BASIC_GB_APU_H
 #define BASIC_GB_APU_H
 
-#include "gb_apu/Gb_Apu.h"
-#include "gb_apu/Multi_Buffer.h"
+#include "Gb_Apu.h"
+#include "Multi_Buffer.h"
 #include "MemoryManager.h"
 
 class Basic_Gb_Apu {
