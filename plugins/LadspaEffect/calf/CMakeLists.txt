@@ -15,7 +15,7 @@ FILE(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/veal/src/*.cpp")
 LIST(SORT SOURCES)
 
 # Skip files matching pattern
-SET(FILE_PATTERNS "ctl;gui;gtk;session;connector;jack;rdf;draw;fluid;preset;lv2;benchmark;win")
+SET(FILE_PATTERNS "ctl;gui;gtk;session;connector;jack;rdf;draw;fluid;preset;lv2;benchmark;win;plugin.cpp")
 FOREACH(_item ${SOURCES})
 	FOREACH(_pattern ${FILE_PATTERNS})
 		IF(${_item} MATCHES ${_pattern})

@@ -1,3 +1,4 @@
 #define VERSION "${VERSION}"
 #define PACKAGE_NAME "veal"
 #define USE_LADSPA 1
+#define PKGLIBDIR ""
