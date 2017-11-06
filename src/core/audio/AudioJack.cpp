@@ -47,8 +47,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-                    _mixer,
-                    true /* supportsCapture */),
+					_mixer),
 	m_client( NULL ),
 	m_active( false ),
 	m_midiClient( NULL ),
@@ -57,6 +56,8 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
+	m_supportsCapture = true;
+
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
@@ -436,7 +437,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 		for( jack_nframes_t frame = 0; frame < _nframes; ++frame )
 		{
-			m_inBuffer[frame][c] = channel_buffer[frame] /*/ gain*/;
+			m_inBuffer[frame][c] = channel_buffer[frame] / gain;
 		}
 	}
 
