@@ -343,9 +343,9 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
 				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
-	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
+	contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
-						m_tco, SLOT( toggleRecord() ) );*/
+						m_tco, SLOT( toggleRecord() ) );
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -533,7 +533,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// recording sample tracks is not possible at the moment 
 
-	/* if( m_tco->isRecord() )
+	if( m_tco->isRecord() )
 	{
 		p.setFont( pointSize<7>( p.font() ) );
 
@@ -544,7 +544,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 		p.setBrush( QBrush( textColor() ) );
 		p.drawEllipse( 4, 5, 4, 4 );
-	}*/
+	}
 
 	p.end();
 
