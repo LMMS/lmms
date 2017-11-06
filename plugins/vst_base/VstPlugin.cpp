@@ -659,6 +659,7 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 	m_pluginSubWindow = new vstSubWin( gui->mainWindow()->workspace() );
 	auto sw = m_pluginSubWindow.data();
 
+#if QT_VERSION >= 0x050100
 	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
@@ -668,6 +669,8 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 		// Tell remote that it is embedded
 		// Wait for remote reply
 	}
+#endif
+
 #ifdef LMMS_BUILD_LINUX
 	else if (m_embedMethod == "xembed" )
 	{
