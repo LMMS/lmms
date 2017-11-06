@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SampleTrack.cpp - implementation of class SampleTrack, a track which
  *                   provides arrangement of samples
  *
@@ -22,7 +22,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "SampleTrack.h"
 
 #include <QDomElement>
