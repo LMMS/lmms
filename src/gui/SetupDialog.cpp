@@ -67,7 +67,9 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-
+#ifdef LMMS_BUILD_LINUX
+#include <QtX11Extras/QX11Info>
+#endif
 
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
@@ -137,12 +139,14 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
-						   "disableautoquit").toInt() )
+						   "disableautoquit").toInt() ),
+	m_vstEmbedMethod(ConfigManager::inst()->value( "ui",
+						   "vstembedmethod", "xembed"))
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
-	setFixedSize( 452, 520 );
+	setFixedSize( 452, 570 );
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -159,7 +163,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-	int wsHeight = 370;
+	int wsHeight = 420;
 #ifdef LMMS_HAVE_STK
 	wsHeight += 50;
 #endif
@@ -168,7 +172,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	ws->setFixedSize( 360, wsHeight );
 	QWidget * general = new QWidget( ws );
-	general->setFixedSize( 360, 240 );
+	general->setFixedSize( 360, 290 );
 	QVBoxLayout * gen_layout = new QVBoxLayout( general );
 	gen_layout->setSpacing( 0 );
 	gen_layout->setMargin( 0 );
@@ -335,6 +339,19 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
+	TabWidget* embed_tw = new TabWidget( tr( "PLUGIN EMBEDDING" ), general);
+	embed_tw->setFixedHeight( 48 );
+	m_vstEmbedComboBox = new QComboBox( embed_tw );
+	m_vstEmbedComboBox->move( XDelta, YDelta );
+	m_vstEmbedComboBox->addItem( tr( "No embedding" ), "none" );
+	m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
+#ifdef LMMS_BUILD_LINUX
+	if ( QX11Info::isPlatformX11() ) {
+		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
+	}
+#endif
+	m_vstEmbedComboBox->setCurrentIndex( m_vstEmbedComboBox->findData( m_vstEmbedMethod ) );
+
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
 	lang_tw->setFixedHeight( 48 );
 	QComboBox * changeLang = new QComboBox( lang_tw );
@@ -380,13 +397,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( misc_tw );
 	gen_layout->addSpacing( 10 );
+	gen_layout->addWidget( embed_tw );
+	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( lang_tw );
 	gen_layout->addStretch();
 
 
 
 	QWidget * paths = new QWidget( ws );
-	int pathsHeight = 370;
+	int pathsHeight = 420;
 #ifdef LMMS_HAVE_STK
 	pathsHeight += 55;
 #endif
@@ -1044,6 +1063,8 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
+	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
+					m_vstEmbedComboBox->currentData().toString() );
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));

@@ -66,7 +66,7 @@
 #include <vector>
 #include <queue>
 #include <string>
-
+#include <iostream>
 
 #include <aeffectx.h>
 
@@ -103,8 +103,12 @@ struct ERect
 #include <sys/shm.h>
 #endif
 
+using namespace std;
+
 static VstHostLanguages hlang = LanguageEnglish;
 
+static bool EMBED = false;
+static bool EMBED_X11 = false;
 
 class RemoteVstPlugin;
 
@@ -521,24 +525,17 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 bool RemoteVstPlugin::processMessage( const message & _m )
 {
-	switch( _m.id )
+	if (! EMBED)
 	{
-
-#ifdef LMMS_EMBED_VST_X11
-		case IdShowUI:
-			ShowWindow( m_window, SW_SHOWNORMAL );
-			UpdateWindow( m_window );
-			break;
-#endif
-
-#ifndef LMMS_EMBED_VST
+		switch( _m.id )
+		{
 		case IdShowUI:
 			initEditor();
-			break;
+			return true;
 
 		case IdHideUI:
 			destroyEditor();
-			break;
+			return true;
 
 		case IdToggleUI:
 			if( m_window )
@@ -549,14 +546,23 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			{
 				initEditor();
 			}
-			break;
+			return true;
 
 		case IdIsUIVisible:
 			sendMessage( message( IdIsUIVisible )
-						.addInt( m_window ? 1 : 0 ) );
-			break;
-#endif
+						 .addInt( m_window ? 1 : 0 ) );
+			return true;
+		}
+	}
+	else if (EMBED && _m.id == IdShowUI)
+	{
+		ShowWindow( m_window, SW_SHOWNORMAL );
+		UpdateWindow( m_window );
+		return true;
+	}
 
+	switch( _m.id )
+	{
 		case IdVstLoadPlugin:
 			init( _m.getString() );
 			break;
@@ -757,12 +763,15 @@ void RemoteVstPlugin::initEditor()
 		m_registeredWindowClass = true;
 	}
 
+	DWORD dwStyle;
+	if (EMBED) {
+		dwStyle = WS_POPUP | WS_SYSMENU | WS_BORDER;
+	} else {
+		dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
+	}
+
 	m_window = CreateWindowEx( 0, "LVSL", pluginName(),
-#ifdef LMMS_EMBED_VST
-		WS_POPUP | WS_SYSMENU | WS_BORDER,
-#else
-		WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX,
-#endif
+		dwStyle,
 		0, 0, 10, 10, NULL, NULL, hInst, NULL );
 	if( m_window == NULL )
 	{
@@ -784,9 +793,9 @@ void RemoteVstPlugin::initEditor()
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
 
-#ifndef LMMS_EMBED_VST_X11
-	ShowWindow( m_window, SW_SHOWNORMAL );
-#endif
+	if (! EMBED) {
+		ShowWindow( m_window, SW_SHOWNORMAL );
+	}
 
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
@@ -2030,9 +2039,9 @@ LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
 int main( int _argc, char * * _argv )
 {
 #ifdef SYNC_WITH_SHM_FIFO
-	if( _argc < 3 )
+	if( _argc < 4 )
 #else
-	if( _argc < 2 )
+	if( _argc < 3 )
 #endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
@@ -2063,6 +2072,35 @@ int main( int _argc, char * * _argv )
 		printf( "Notice: could not set high priority.\n" );
 	}
 #endif
+
+	{
+	#ifdef SYNC_WITH_SHM_FIFO
+		int embedMethodIndex = 3;
+	#else
+		int embedMethodIndex = 2;
+	#endif
+		std::string embedMethod = _argv[embedMethodIndex];
+
+		if ( embedMethod == "none" )
+		{
+			cerr << "Starting detached." << endl;
+			EMBED = EMBED_X11 = false;
+		}
+		else if ( embedMethod == "qt" )
+		{
+			cerr << "Starting using Qt-native embedding." << endl;
+			EMBED = true; EMBED_X11 = false;
+		}
+		else if ( embedMethod == "xembed" )
+		{
+			cerr << "Starting using X11Embed protocol." << endl;
+			EMBED = true; EMBED_X11 = true;
+		}
+		else
+		{
+			cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << endl;
+		}
+	}
 
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it

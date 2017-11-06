@@ -35,6 +35,10 @@
 
 #include "lmmsversion.h"
 
+#ifdef LMMS_BUILD_LINUX
+#include <QtX11Extras/QX11Info>
+#endif
+
 static inline QString ensureTrailingSlash( const QString & s )
 {
 	if( ! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\') )
@@ -184,6 +188,18 @@ void ConfigManager::upgrade()
 QString ConfigManager::defaultVersion() const
 {
 	return LMMS_VERSION;
+}
+
+QString ConfigManager::vstEmbedMethod() const
+{
+	QString defaultMethod = "qt";
+#ifdef LMMS_BUILD_LINUX
+	if (QX11Info::isPlatformX11()) {
+		defaultMethod = "xembed";
+	}
+#endif
+
+	return value( "ui", "vstembedmethod", defaultMethod );
 }
 
 bool ConfigManager::hasWorkingDir() const

@@ -30,8 +30,6 @@
 #include "RemotePlugin.h"
 
 
-//#define LMMS_EMBED_VST
-
 
 struct VstParameterDumpItem
 {

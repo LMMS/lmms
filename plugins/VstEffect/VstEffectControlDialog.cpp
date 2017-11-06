@@ -30,6 +30,7 @@
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 
+#include "ConfigManager.h"
 #include "PixmapButton.h"
 #include "embed.h"
 #include "ToolTip.h"
@@ -43,9 +44,7 @@
 
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
-#ifdef LMMS_EMBED_VST
 	m_pluginWidget( NULL ),
-#endif
 	m_plugin( NULL ),
 	tbLabel( NULL )
 {
@@ -54,46 +53,43 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	l->setVerticalSpacing( 2 );
 	l->setHorizontalSpacing( 2 );
 
+	bool embed_vst = ConfigManager::inst()->vstEmbedMethod() != "none";
+
 	if( _ctl != NULL && _ctl->m_effect != NULL &&
 					_ctl->m_effect->m_plugin != NULL )
 	{
 		m_plugin = _ctl->m_effect->m_plugin;
-#ifdef LMMS_EMBED_VST
-		m_plugin->showEditor( NULL, true );
-		m_pluginWidget = m_plugin->pluginWidget();
+
+		if (embed_vst) {
+			m_plugin->createUI( nullptr, true );
+			m_pluginWidget = m_plugin->pluginWidget( false );
 
 #ifdef LMMS_BUILD_WIN32
+			if( !m_pluginWidget )
+			{
+				m_pluginWidget = m_plugin->pluginWidget( false );
+			}
+#endif
 
-		if( !m_pluginWidget )
-		{
-			m_pluginWidget = m_plugin->pluginWidget( false );
 		}
-#endif
-
-#else // LMMS_EMBED_VST
-		m_plugin->showUI();
-#endif
 	}
 
-#ifdef LMMS_EMBED_VST
-	if( m_pluginWidget )
-#else
-	if( m_plugin )
-#endif
+	if ( m_plugin && (!embed_vst || m_pluginWidget) )
 	{
 		setWindowTitle( m_plugin->name() );
 		setMinimumWidth( 250 );
 
 		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
-#ifdef LMMS_EMBED_VST
-		btn->setCheckable( true );
-		connect( btn, SIGNAL( toggled( bool ) ),
-					SLOT( togglePluginUI( bool ) ) );
-		emit btn->click();
-#else
-		connect( btn, SIGNAL( clicked( bool ) ),
-					SLOT( togglePluginUI( bool ) ) );
-#endif
+
+		if (embed_vst) {
+			btn->setCheckable( true );
+			btn->setChecked( true );
+			connect( btn, SIGNAL( toggled( bool ) ),
+						SLOT( togglePluginUI( bool ) ) );
+		} else {
+			connect( btn, SIGNAL( clicked( bool ) ),
+						SLOT( togglePluginUI( bool ) ) );
+		}
 
 		btn->setMinimumWidth( 78 );
 		btn->setMaximumWidth( 78 );
@@ -222,12 +218,15 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_savePresetButton->setMinimumHeight( 21 );
 		m_savePresetButton->setMaximumHeight( 21 );
 
-#ifdef LMMS_EMBED_VST
-		int newSize = m_pluginWidget->width() + 20;
-		newSize = (newSize < 250) ? 250 : newSize;
-#else
-		int newSize = 250;
-#endif
+		int newSize;
+
+		if (embed_vst) {
+			newSize = m_pluginWidget->width() + 20;
+			newSize = (newSize < 250) ? 250 : newSize;
+		} else {
+			newSize = 250;
+		}
+
 		QWidget* resize = new QWidget(this);
 		resize->resize( newSize, 10 );
 		QWidget* space0 = new QWidget(this);
@@ -239,9 +238,9 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed,
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
-#ifdef LMMS_EMBED_VST
-		l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
-#endif
+		if (embed_vst) {
+			l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
+		}
 		l->setRowStretch( 5, 1 );
 		l->setColumnStretch( 1, 1 );
 
@@ -291,20 +290,17 @@ VstEffectControlDialog::~VstEffectControlDialog()
 
 void VstEffectControlDialog::togglePluginUI( bool checked )
 {
-	if( m_plugin )
+	if( !m_plugin ) {
+		return;
+	}
+
+	if( ConfigManager::inst()->vstEmbedMethod() != "none" )
 	{
-#ifdef LMMS_EMBED_VST
-		if( checked )
-		{
-			m_plugin->showEditor( NULL, true );
-		}
-		else
-		{
-			m_plugin->hideEditor();
-		}
-#else
+		m_pluginWidget->setVisible( checked );
+	}
+	else
+	{
 		m_plugin->toggleUI();
-#endif
 	}
 }
 
