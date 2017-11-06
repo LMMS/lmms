@@ -189,27 +189,27 @@ bool AudioJack::initJackClient()
 						JackPortIsOutput, 0 ) );
 		if( m_outputPorts.back() == NULL )
 		{
-            printf( "no more out JACK-ports available!\n" );
+			printf( "no more out JACK-ports available!\n" );
 			return false;
 		}
 	}
 
-    // Register In ports
-    for( ch_cnt_t ch = 0; ch < channels(); ++ch )
-    {
-        QString name = QString( "master in " ) +
-                ( ( ch % 2 ) ? "R" : "L" ) +
-                QString::number( ch / 2 + 1 );
-        m_inputPorts.push_back( jack_port_register( m_client,
-                        name.toLatin1().constData(),
-                        JACK_DEFAULT_AUDIO_TYPE,
-                        JackPortIsInput, 0 ) );
-        if( m_inputPorts.back() == NULL )
-        {
-            printf( "no more in JACK-ports available!\n" );
-            return false;
-        }
-    }
+	// Register In ports
+	for( ch_cnt_t ch = 0; ch < channels(); ++ch )
+	{
+		QString name = QString( "master in " ) +
+				( ( ch % 2 ) ? "R" : "L" ) +
+				QString::number( ch / 2 + 1 );
+		m_inputPorts.push_back( jack_port_register( m_client,
+													name.toLatin1().constData(),
+													JACK_DEFAULT_AUDIO_TYPE,
+													JackPortIsInput, 0 ) );
+		if( m_inputPorts.back() == NULL )
+		{
+			printf( "no more in JACK-ports available!\n" );
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -370,9 +370,9 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		m_tempOutBufs[c] =
 			(jack_default_audio_sample_t *) jack_port_get_buffer(
 												m_outputPorts[c], _nframes );
-        m_tempInBufs[c] =
-                (jack_default_audio_sample_t *) jack_port_get_buffer(
-                                                    m_inputPorts[c], _nframes );
+		m_tempInBufs[c] =
+				(jack_default_audio_sample_t *) jack_port_get_buffer(
+					m_inputPorts[c], _nframes );
 
 	}
 
