@@ -27,9 +27,9 @@
 
 #include <QPainter>
 #include <QDomElement>
-#include "Basic_Gb_Apu.h"
-
 #include "papu_instrument.h"
+#include "Gb_Apu_Buffer.h"
+#include "Multi_Buffer.h"
 #include "base64.h"
 #include "InstrumentTrack.h"
 #include "Knob.h"
@@ -248,25 +248,25 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 
 	if ( tfp == 0 )
 	{
-		Basic_Gb_Apu *papu = new Basic_Gb_Apu();
+		Gb_Apu_Buffer *papu = new Gb_Apu_Buffer();
 		papu->set_sample_rate( samplerate );
 
 		// Master sound circuitry power control
-		papu->write_register( 0xff26, 0x80 );
+		papu->write_register( 0,  0xff26, 0x80 );
 
 		data = m_ch1VolumeModel.value();
 		data = data<<1;
 		data += m_ch1VolSweepDirModel.value();
 		data = data<<3;
 		data += m_ch1SweepStepLengthModel.value();
-		papu->write_register( 0xff12, data );
+		papu->write_register( 0,  0xff12, data );
 
 		data = m_ch2VolumeModel.value();
 		data = data<<1;
 		data += m_ch2VolSweepDirModel.value();
 		data = data<<3;
 		data += m_ch2SweepStepLengthModel.value();
-		papu->write_register( 0xff17, data );
+		papu->write_register( 0,  0xff17, data );
 
 		//channel 4 - noise
 		data = m_ch4VolumeModel.value();
@@ -274,15 +274,15 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data += m_ch4VolSweepDirModel.value();
 		data = data<<3;
 		data += m_ch4SweepStepLengthModel.value();
-		papu->write_register( 0xff21, data );
+		papu->write_register( 0,  0xff21, data );
 
 		//channel 4 init
-		papu->write_register( 0xff23, 128 );
+		papu->write_register( 0,  0xff23, 128 );
 
 		_n->m_pluginData = papu;
 	}
 
-	Basic_Gb_Apu *papu = static_cast<Basic_Gb_Apu *>( _n->m_pluginData );
+	Gb_Apu_Buffer *papu = static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
 
 	papu->treble_eq( m_trebleModel.value() );
 	papu->bass_freq( m_bassModel.value() );
@@ -293,35 +293,35 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	data += m_ch1SweepDirModel.value();
 	data = data << 3;
 	data += m_ch1SweepRtShiftModel.value();
-	papu->write_register( 0xff10, data );
+	papu->write_register( 0,  0xff10, data );
 
 	data = m_ch1WavePatternDutyModel.value();
 	data = data<<6;
-	papu->write_register( 0xff11, data );
+	papu->write_register( 0,  0xff11, data );
 
 
 	//channel 2 - square
 	data = m_ch2WavePatternDutyModel.value();
 	data = data<<6;
-	papu->write_register( 0xff16, data );
+	papu->write_register( 0,  0xff16, data );
 
 
 	//channel 3 - wave
 	//data = m_ch3OnModel.value()?128:0;
 	data = 128;
-	papu->write_register( 0xff1a, data );
+	papu->write_register( 0,  0xff1a, data );
 
 	int ch3voldata[4] = { 0, 3, 2, 1 };
 	data = ch3voldata[(int)m_ch3VolumeModel.value()];
 	data = data<<5;
-	papu->write_register( 0xff1c, data );
+	papu->write_register( 0,  0xff1c, data );
 
 
 	//controls
 	data = m_so1VolumeModel.value();
 	data = data<<4;
 	data += m_so2VolumeModel.value();
-	papu->write_register( 0xff24, data );
+	papu->write_register( 0,  0xff24, data );
 
 	data = m_ch4So2Model.value()?128:0;
 	data += m_ch3So2Model.value()?64:0;
@@ -331,7 +331,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	data += m_ch3So1Model.value()?4:0;
 	data += m_ch2So1Model.value()?2:0;
 	data += m_ch1So1Model.value()?1:0;
-	papu->write_register( 0xff25, data );
+	papu->write_register( 0,  0xff25, data );
 
 	const float * wpm = m_graphModel.samples();
 
@@ -339,7 +339,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	{
 		data = (int)floor(wpm[i*2]) << 4;
 		data += (int)floor(wpm[i*2+1]);
-		papu->write_register( 0xff30 + i, data );
+		papu->write_register( 0,  0xff30 + i, data );
 	}
 
 	if( ( freq >= 65 ) && ( freq <=4000 ) )
@@ -349,13 +349,13 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data = 2048 - ( ( 4194304 / freq )>>5 );
 		if( tfp==0 )
 		{
-			papu->write_register( 0xff13, data & 0xff );
-			papu->write_register( 0xff14, (data>>8) | initflag );
+			papu->write_register( 0,  0xff13, data & 0xff );
+			papu->write_register( 0,  0xff14, (data>>8) | initflag );
 		}
-		papu->write_register( 0xff18, data & 0xff );
-		papu->write_register( 0xff19, (data>>8) | initflag );
-		papu->write_register( 0xff1d, data & 0xff );
-		papu->write_register( 0xff1e, (data>>8) | initflag );
+		papu->write_register( 0,  0xff18, data & 0xff );
+		papu->write_register( 0,  0xff19, (data>>8) | initflag );
+		papu->write_register( 0,  0xff1d, data & 0xff );
+		papu->write_register( 0,  0xff1e, (data>>8) | initflag );
 	}
 
 	if( tfp == 0 )
@@ -379,7 +379,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
 		data += ropt;
-		papu->write_register( 0xff22, data );
+		papu->write_register( 0,  0xff22, data );
 	}
 
 	int const buf_size = 2048;
@@ -391,7 +391,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		int avail = papu->samples_avail();
 		if( avail <= 0 )
 		{
-			papu->end_frame();
+			papu->end_frame(0);
 			avail = papu->samples_avail();
 		}
 		datalen = framesleft>avail?avail:framesleft;
@@ -416,7 +416,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 
 void papuInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<Basic_Gb_Apu *>( _n->m_pluginData );
+	delete static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
 }
 
 
