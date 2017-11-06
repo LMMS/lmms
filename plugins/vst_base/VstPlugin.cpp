@@ -584,19 +584,6 @@ void VstPlugin::showUI()
 		QWidget * w = pluginWidget();
 		if( w )
 		{
-#		ifdef LMMS_BUILD_WIN32
-			// hide sw, plugin window wrapper on win32
-			// this is obtained from pluginWidget()
-			if( isEffect )
-			{
-				w->setWindowFlags( Qt::FramelessWindowHint );
-				w->setAttribute( Qt::WA_TranslucentBackground );
-			}
-			else
-			{
-				w->setWindowFlags( Qt::WindowCloseButtonHint );
-			}
-#		endif
 			w->show();
 		}
 	}

@@ -140,8 +140,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
 						   "disableautoquit").toInt() ),
-	m_vstEmbedMethod(ConfigManager::inst()->value( "ui",
-						   "vstembedmethod", "xembed"))
+	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
