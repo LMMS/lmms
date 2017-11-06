@@ -771,7 +771,7 @@ public:
 #endif
 	}
 
-	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg );
+	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
 
 	inline void waitForHostInfoGotten()
 	{
@@ -798,7 +798,7 @@ public:
 	}
 
 
-	void toggleUI()
+	virtual void toggleUI()
 	{
 		lock();
 		sendMessage( IdToggleUI );
@@ -830,8 +830,8 @@ public:
 	}
 
 public slots:
-	void showUI();
-	void hideUI();
+	virtual void showUI();
+	virtual void hideUI();
 
 protected:
 	inline void setSplittedChannels( bool _on )

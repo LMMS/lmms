@@ -51,9 +51,7 @@ protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 
 private:
-#ifdef LMMS_EMBED_VST
 	QWidget * m_pluginWidget;
-#endif
 
 	PixmapButton * m_openPresetButton;
 	PixmapButton * m_rolLPresetButton;
