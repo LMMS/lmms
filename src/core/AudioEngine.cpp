@@ -354,7 +354,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 
 		if( it != m_playHandles.end() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+		    if((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -402,7 +402,7 @@ const surroundSampleFrame * AudioEngine::renderNextBuffer()
 		}
 		if( ( *it )->isFinished() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+		    if((*it)->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -675,7 +675,7 @@ bool AudioEngine::addPlayHandle( PlayHandle* handle )
 	if( criticalXRuns() == false )
 	{
 		m_newPlayHandles.push( handle );
-		handle->audioPort()->addPlayHandle( handle );
+		if (handle->audioPort()) { handle->audioPort()->addPlayHandle(handle); }
 		return true;
 	}
 
@@ -696,7 +696,7 @@ void AudioEngine::removePlayHandle(PlayHandle * ph)
 	// which were created in a thread different than the audio engine thread
 	if (ph->affinityMatters() && ph->affinity() == QThread::currentThread())
 	{
-		ph->audioPort()->removePlayHandle(ph);
+		if (ph->audioPort()) { ph->audioPort()->removePlayHandle(ph); }
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
@@ -755,7 +755,7 @@ void AudioEngine::removePlayHandlesOfTypes(Track * track, const quint8 types)
 	{
 		if ((*it)->isFromTrack(track) && ((*it)->type() & types))
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if (( *it )->audioPort()) { (*it)->audioPort()->removePlayHandle(*it); }
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );

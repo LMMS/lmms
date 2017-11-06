@@ -38,7 +38,8 @@ PlayHandle::PlayHandle(const Type type, f_cnt_t offset) :
 		m_affinity(QThread::currentThread()),
 		m_playHandleBuffer(BufferManager::acquire()),
 		m_bufferReleased(true),
-		m_usesBuffer(true)
+		m_usesBuffer(true),
+		m_audioPort{nullptr}
 {
 }
 
