@@ -32,21 +32,25 @@
 #include <QCloseEvent>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+
 #ifdef LMMS_BUILD_LINUX
-#if QT_VERSION < 0x050000
-#include <QX11EmbedContainer>
-#include <QX11Info>
-#else
-#include "X11EmbedContainer.h"
-#include <QWindow>
+#	if QT_VERSION < 0x050000
+#		include <QX11EmbedContainer>
+#		include <QX11Info>
+#	else
+#		include "X11EmbedContainer.h"
+#		include <QWindow>
+#	endif
 #endif
-#else
-#include <QLayout>
+
+#if QT_VERSION >= 0x050000
+#	include <QWindow>
 #endif
+
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
-#include <windows.h>
+#	include <windows.h>
 #endif
 
 #include "ConfigManager.h"
