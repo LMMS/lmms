@@ -6,10 +6,8 @@ INCLUDE_DIRECTORIES(game-music-emu/gme)
 BUILD_PLUGIN(papu
 	papu_instrument.cpp
 	papu_instrument.h
-	Basic_Gb_Apu.cpp # TODO: Replace with subclass
-	Basic_Gb_Apu.h   # TODO: Replace with subclass
-	# Gb_Apu_Buffer.cpp
-	# Gb_Apu_Buffer.h
+	Gb_Apu_Buffer.cpp
+	Gb_Apu_Buffer.h
 	game-music-emu/gme/Gb_Apu.cpp
 	game-music-emu/gme/Gb_Apu.h
 	game-music-emu/gme/Gb_Oscs.cpp
