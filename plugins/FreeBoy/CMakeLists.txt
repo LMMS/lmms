@@ -1,11 +1,9 @@
-# INCLUDE(CheckSubmodule)
-# CHECK_SUBMODULE(game-music-emu/CMakeLists.txt)
 INCLUDE(BuildPlugin)
 INCLUDE_DIRECTORIES(game-music-emu/gme)
 
-BUILD_PLUGIN(papu
-	papu_instrument.cpp
-	papu_instrument.h
+BUILD_PLUGIN(freeboy
+	FreeBoy.cpp
+	FreeBoy.h
 	Gb_Apu_Buffer.cpp
 	Gb_Apu_Buffer.h
 	game-music-emu/gme/Gb_Apu.cpp
@@ -18,6 +16,6 @@ BUILD_PLUGIN(papu
 	game-music-emu/gme/Multi_Buffer.cpp
 	game-music-emu/gme/blargg_source.h
 	game-music-emu/gme/Multi_Buffer.h
-	MOCFILES papu_instrument.h
+	MOCFILES FreeBoy.h
 	EMBEDDED_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.png"
 )

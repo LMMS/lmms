@@ -1,5 +1,5 @@
 /*
- * papu_Instrument.h - GameBoy papu based instrument
+ * FreeBoyInstrument.h - GameBoy papu based instrument
  *
  * Copyright (c) 2008 <Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
@@ -23,26 +23,27 @@
  *
  */
 
-#ifndef _PAPU_H
-#define _PAPU_H
+#ifndef FREEBOY_H
+#define FREEBOY_H
 
 #include <QObject>
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Knob.h"
 #include "Graph.h"
+#include "Gb_Apu.h"
 
-class papuInstrumentView;
+class FreeBoyInstrumentView;
 class NotePlayHandle;
 class PixmapButton;
 
-class papuInstrument : public Instrument
+class FreeBoyInstrument : public Instrument
 {
 	Q_OBJECT
 public:
 
-	papuInstrument( InstrumentTrack * _instrument_track );
-	virtual ~papuInstrument();
+	FreeBoyInstrument( InstrumentTrack * _instrument_track );
+	virtual ~FreeBoyInstrument();
 
 	virtual void playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer );
@@ -102,16 +103,20 @@ private:
 
 	graphModel  m_graphModel;
 
-	friend class papuInstrumentView;
+	// Fake CPU timing
+	blip_time_t m_time;
+	blip_time_t fakeClock() { return m_time += 4; }
+
+	friend class FreeBoyInstrumentView;
 } ;
 
 
-class papuInstrumentView : public InstrumentView
+class FreeBoyInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	papuInstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~papuInstrumentView();
+	FreeBoyInstrumentView( Instrument * _instrument, QWidget * _parent );
+	virtual ~FreeBoyInstrumentView();
 
 private:
 	virtual void modelChanged();
