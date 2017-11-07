@@ -109,6 +109,12 @@ if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
    export LIBGL_ALWAYS_SOFTWARE=1;
 fi
+if ldconfig -p | grep libjack.so.0 > /dev/null 2>&1; then
+   echo "Jack appears to be installed on this system, so we'll use it."
+else
+   echo "Jack does not appear to be installed.  That's OK, we'll use a dummy version instead."
+   export LD_LIBRARY_PATH=\$DIR/usr/lib/lmms/optional:\$LD_LIBRARY_PATH
+fi
 QT_X11_NO_NATIVE_MENUBAR=1 QT_AUTO_SCREEN_SCALE_FACTOR=1 \$DIR/usr/bin/lmms.real "\$@"
 EOL
 
@@ -163,6 +169,12 @@ ln -sr  "$VSTBIN" "$VSTLIB"
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
+
+# Remove bundled jack library
+rm -f "${APPDIR}/usr/lib/libjack.so.0"
+
+# Make a symlink to a dummy libjack.so.0
+ln -sr "${APPDIR}usr/lib/lmms/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/libjack.so.0"
 
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
