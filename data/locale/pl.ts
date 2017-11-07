@@ -9095,7 +9095,7 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Okres wobulacji</translation>
@@ -9190,7 +9190,7 @@ Podwójne kliknięcie na którejkolwiek wtyczce otworzy okienko z informacjami o
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Okres wobulacji:</translation>

@@ -9090,7 +9090,7 @@ Haciendo doble click en cualquier complemento se mostrará la información de su
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Duración del barrido</translation>
@@ -9185,7 +9185,7 @@ Haciendo doble click en cualquier complemento se mostrará la información de su
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Duración del barrido:</translation>
