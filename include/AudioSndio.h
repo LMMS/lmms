@@ -72,6 +72,8 @@ private:
 
 	struct sio_hdl *m_hdl;
 	struct sio_par m_par;
+
+	bool m_convertEndian;
 } ;
 
 

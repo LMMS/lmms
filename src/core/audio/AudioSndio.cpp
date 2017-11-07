@@ -27,9 +27,9 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QtCore/QFileInfo>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QFileInfo>
+#include <QLabel>
+#include <QLineEdit>
 
 #include "endian_handling.h"
 #include "LcdSpinBox.h"
@@ -52,9 +52,10 @@
 AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	AudioDevice( tLimit<ch_cnt_t>(
 	    ConfigManager::inst()->value( "audiosndio", "channels" ).toInt(),
-	    DEFAULT_CHANNELS, SURROUND_CHANNELS ), _mixer )
+	    DEFAULT_CHANNELS, SURROUND_CHANNELS ), _mixer ),
+            m_convertEndian ( false )
 {
-	_success_ful = FALSE;
+	_success_ful = false;
 
 	QString dev = ConfigManager::inst()->value( "audiosndio", "device" );
 
@@ -64,7 +65,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	}
 	else
 	{
-		m_hdl = sio_open( dev.toAscii().data(), SIO_PLAY, 0 );
+		m_hdl = sio_open( dev.toLatin1().constData(), SIO_PLAY, 0 );
 	}
 
 	if( m_hdl == NULL )
@@ -82,6 +83,11 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	m_par.round = mixer()->framesPerPeriod();
 	m_par.appbufsz = m_par.round * 2;
 
+	if ( (isLittleEndian() && (m_par.le == 0)) ||
+	     (!isLittleEndian() && (m_par.le == 1))) {
+		m_convertEndian = true;
+	}
+
 	struct sio_par reqpar = m_par;
 
 	if (!sio_setpar(m_hdl, &m_par))
@@ -98,7 +104,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	if (reqpar.pchan != m_par.pchan ||
 		reqpar.bits != m_par.bits ||
 		reqpar.le != m_par.le ||
-		(abs(reqpar.rate - m_par.rate) * 100)/reqpar.rate > 2)
+		(::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100)/reqpar.rate > 2)
 	{
 		printf( "sndio: returned params not as requested\n" );
 		return;
@@ -110,7 +116,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 		return;
 	}
 
-	_success_ful = TRUE;
+	_success_ful = true;
 }
 
 
@@ -160,7 +166,7 @@ void AudioSndio::run( void )
 	int_sample_t * outbuf =
 	    new int_sample_t[mixer()->framesPerPeriod() * channels()];
 
-	while( TRUE )
+	while( true )
 	{
 		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
@@ -169,7 +175,7 @@ void AudioSndio::run( void )
 		}
 
 		uint bytes = convertToS16( temp, frames,
-		    mixer()->masterGain(), outbuf, FALSE );
+		    mixer()->masterGain(), outbuf, m_convertEndian );
 		if( sio_write( m_hdl, outbuf, bytes ) != bytes )
 		{
 			break;

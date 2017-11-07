@@ -73,7 +73,7 @@ typedef struct {
         float *op;   // pointer to output value
 } sv_filter;
 
-inline float soft_clip(float sc_in) {
+float soft_clip(float sc_in) {
         if ((sc_in < CLIP) && (sc_in > -CLIP)) {
                 return sc_in;
         } else if (sc_in > 0.0f) {
@@ -86,7 +86,7 @@ inline float soft_clip(float sc_in) {
 /* Store data in SVF struct, takes the sampling frequency, cutoff frequency
    and Q, and fills in the structure passed */
 
-inline void setup_svf(sv_filter *sv, float fs, float fc, float q, int t) {
+void setup_svf(sv_filter *sv, float fs, float fc, float q, int t) {
         sv->f = 2.0f * sinf(M_PI * fc / (float)(fs * F_R));
         sv->q = 2.0f * cosf(powf(q, 0.1f) * M_PI * 0.5f);
         sv->qnrm = sqrtf(sv->q*0.5f + 0.01f);
@@ -111,7 +111,7 @@ inline void setup_svf(sv_filter *sv, float fs, float fc, float q, int t) {
 
 /* Change the frequency of a running SVF */
 
-inline void setup_f_svf(sv_filter *sv, const float fs, const float fc) {
+void setup_f_svf(sv_filter *sv, const float fs, const float fc) {
         sv->f = 2.0f * sin(M_PI * fc / ((float)(fs * F_R)));
 }
 

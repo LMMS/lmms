@@ -132,6 +132,7 @@ protected:
 	void getSelectedValues(timeMap & selected_values );
 
 	void drawLine( int x0, float y0, int x1, float y1 );
+	void removePoints( int x0, int x1 );
 
 protected slots:
 	void play();

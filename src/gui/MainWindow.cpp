@@ -54,6 +54,7 @@
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
@@ -1535,14 +1536,14 @@ void MainWindow::browseHelp()
 void MainWindow::autoSave()
 {
 	if( !Engine::getSong()->isExporting() &&
+		!Engine::getSong()->isLoadingProject() &&
+		!RemotePluginBase::isMainThreadWaiting() &&
 		!QApplication::mouseButtons() &&
-			( ConfigManager::inst()->value( "ui",
-					"enablerunningautosave" ).toInt() ||
-				! Engine::getSong()->isPlaying() ) )
+		( ConfigManager::inst()->value( "ui",
+				"enablerunningautosave" ).toInt() ||
+			! Engine::getSong()->isPlaying() ) )
 	{
-		AutoSaveThread * ast = new AutoSaveThread();
-		connect( ast, SIGNAL( finished() ), ast, SLOT( deleteLater() ) );
-		ast->start();
+		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer
 	}
 	else
@@ -1553,12 +1554,4 @@ void MainWindow::autoSave()
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
 	}
-}
-
-
-
-
-void AutoSaveThread::run()
-{
-	Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 }

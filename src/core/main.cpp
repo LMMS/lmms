@@ -57,7 +57,6 @@
 #include <signal.h>
 
 #include "MainApplication.h"
-#include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
@@ -203,7 +202,6 @@ void fileCheck( QString &file )
 int main( int argc, char * * argv )
 {
 	// initialize memory managers
-	MemoryManager::init();
 	NotePlayHandleManager::init();
 
 	// intialize RNG
@@ -929,9 +927,6 @@ int main( int argc, char * * argv )
 	{
 		Engine::destroy();
 	}
-
-	// cleanup memory managers
-	MemoryManager::cleanup();
 
 	// ProjectRenderer::updateConsoleProgress() doesn't return line after render
 	if( coreOnly )

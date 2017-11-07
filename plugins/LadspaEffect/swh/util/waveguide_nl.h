@@ -35,7 +35,7 @@ waveguide_nl *waveguide_nl_new(int size, float fc, float da, float db)
 	return wg;
 }
 
-inline void waveguide_nl_reset(waveguide_nl *wg)
+void waveguide_nl_reset(waveguide_nl *wg)
 {
 	memset(wg->buffer[0], 0, wg->size * sizeof(float));
 	memset(wg->buffer[1], 0, wg->size * sizeof(float));
@@ -45,7 +45,7 @@ inline void waveguide_nl_reset(waveguide_nl *wg)
 	wg->zm1[1] = 0.0f;
 }
 
-inline void waveguide_nl_free(waveguide_nl *wg)
+void waveguide_nl_free(waveguide_nl *wg)
 {
 	if (!wg) {
 		return;
@@ -55,7 +55,7 @@ inline void waveguide_nl_free(waveguide_nl *wg)
 	free(wg);
 }
 
-inline void waveguide_nl_set_delay(waveguide_nl *wg, int delay)
+void waveguide_nl_set_delay(waveguide_nl *wg, int delay)
 {
 	if (delay > wg->size) {
 		wg->delay = wg->size;
@@ -66,18 +66,18 @@ inline void waveguide_nl_set_delay(waveguide_nl *wg, int delay)
 	}
 }
 
-inline void waveguide_nl_set_fc(waveguide_nl *wg, float fc)
+void waveguide_nl_set_fc(waveguide_nl *wg, float fc)
 {
 	wg->fc = fc;
 }
 
-inline void waveguide_nl_set_ap(waveguide_nl *wg, float da, float db)
+void waveguide_nl_set_ap(waveguide_nl *wg, float da, float db)
 {
 	wg->a1a = (1.0f - da) / (1.0f + da);
 	wg->a1b = (1.0f - db) / (1.0f + db);
 }
 
-inline void waveguide_nl_process_lin(waveguide_nl *wg, float in0, float in1, float *out0, float *out1)
+void waveguide_nl_process_lin(waveguide_nl *wg, float in0, float in1, float *out0, float *out1)
 {
 	float tmp;
 
@@ -103,7 +103,7 @@ inline void waveguide_nl_process_lin(waveguide_nl *wg, float in0, float in1, flo
 	}
 }
 
-inline void waveguide_nl_process(waveguide_nl *wg, float in0, float in1, float *out0, float *out1)
+void waveguide_nl_process(waveguide_nl *wg, float in0, float in1, float *out0, float *out1)
 {
 	float tmp;
 	float a1;
