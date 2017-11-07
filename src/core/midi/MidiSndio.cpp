@@ -27,8 +27,8 @@
 
 #ifdef LMMS_HAVE_SNDIO
 
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
+#include <QLabel>
+#include <QLineEdit>
 
 #ifdef LMMS_HAVE_STDLIB_H
 #include <stdlib.h>
@@ -42,7 +42,7 @@
 
 MidiSndio::MidiSndio( void ) :
 	MidiClientRaw(),
-	m_quit( FALSE )
+	m_quit( false )
 {
 	QString dev = probeDevice();
 
@@ -52,7 +52,7 @@ MidiSndio::MidiSndio( void ) :
 	}
 	else
 	{
-		m_hdl = mio_open( dev.toAscii().data(), MIO_IN | MIO_OUT, 0 );
+		m_hdl = mio_open( dev.toLatin1().constData(), MIO_IN | MIO_OUT, 0 );
 	}
 
 	if( m_hdl == NULL )
@@ -69,7 +69,7 @@ MidiSndio::~MidiSndio()
 {
 	if( isRunning() )
 	{
-		m_quit = TRUE;
+		m_quit = true;
 		wait( 1000 );
 		terminate();
 	}
@@ -97,7 +97,7 @@ void MidiSndio::run( void )
 	char buf[0x100], *p;
 	size_t n;
 	int ret;
-	while( m_quit == FALSE && m_hdl )
+	while( m_quit == false && m_hdl )
 	{
 		nfds = mio_pollfd( m_hdl, &pfd, POLLIN );
 		ret = poll( &pfd, nfds, 100 );

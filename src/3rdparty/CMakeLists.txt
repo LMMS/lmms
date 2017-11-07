@@ -1,4 +1,5 @@
-include(ExternalProject)
+set(CMAKE_C_FLAGS "")
+set(CMAKE_CXX_FLAGS "")
 
 IF(QT5 AND LMMS_BUILD_LINUX)
 	set(BUILD_SHARED_LIBS OFF)
@@ -6,3 +7,5 @@ IF(QT5 AND LMMS_BUILD_LINUX)
 ELSE()
 	add_library(qx11embedcontainer STATIC /dev/null)
 ENDIF()
+
+ADD_SUBDIRECTORY(rpmalloc)
