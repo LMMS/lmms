@@ -109,6 +109,7 @@ static VstHostLanguages hlang = LanguageEnglish;
 
 static bool EMBED = false;
 static bool EMBED_X11 = false;
+static bool EMBED_WIN32 = false;
 
 class RemoteVstPlugin;
 
@@ -566,17 +567,6 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 		case IdVstLoadPlugin:
 			init( _m.getString() );
 			break;
-
-// TODO: Drop Windows hack for Qt 4
-#ifdef LMMS_BUILD_WIN32
-		case IdVstPluginWindowInformation:
-		{
-			HWND top = FindWindowEx( NULL, NULL, NULL,
-						_m.getString().c_str() );
-			m_window = FindWindowEx( top, NULL, NULL, NULL );
-			break;
-		}
-#endif
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -2084,21 +2074,27 @@ int main( int _argc, char * * _argv )
 		if ( embedMethod == "none" )
 		{
 			cerr << "Starting detached." << endl;
-			EMBED = EMBED_X11 = false;
+			EMBED = EMBED_X11 = EMBED_WIN32 = false;
+		}
+		else if ( embedMethod == "win32" )
+		{
+			cerr << "Starting using Win32-native embedding." << endl;
+			EMBED = EMBED_WIN32 = true; EMBED_X11= false;
 		}
 		else if ( embedMethod == "qt" )
 		{
 			cerr << "Starting using Qt-native embedding." << endl;
-			EMBED = true; EMBED_X11 = false;
+			EMBED = true; EMBED_X11 = EMBED_WIN32 = false;
 		}
 		else if ( embedMethod == "xembed" )
 		{
 			cerr << "Starting using X11Embed protocol." << endl;
-			EMBED = true; EMBED_X11 = true;
+			EMBED = EMBED_X11 = true; EMBED_WIN32 = false;
 		}
 		else
 		{
 			cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << endl;
+			EMBED = EMBED_X11 = EMBED_WIN32 = false;
 		}
 	}
 

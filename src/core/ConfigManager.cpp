@@ -199,6 +199,10 @@ QString ConfigManager::vstEmbedMethod() const
 	}
 #endif
 
+#ifdef LMMS_BUILD_WIN32
+	defaultMethod = "win32";
+#endif
+
 	return value( "ui", "vstembedmethod", defaultMethod );
 }
 

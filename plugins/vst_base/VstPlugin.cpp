@@ -51,6 +51,7 @@
 
 #ifdef LMMS_BUILD_WIN32
 #	include <windows.h>
+#	include <QLayout>
 #endif
 
 #include "ConfigManager.h"
@@ -668,19 +669,49 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 		// TODO: Synchronize show
 		// Tell remote that it is embedded
 		// Wait for remote reply
-	}
+	} else
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if (m_embedMethod == "win32" )
+	{
+		QWidget * helper = new QWidget;
+		QHBoxLayout * l = new QHBoxLayout( helper );
+		QWidget * target = new QWidget( helper );
+		l->setSpacing( 0 );
+		l->setMargin( 0 );
+		l->addWidget( target );
+
+		// we've to call that for making sure, Qt created the windows
+		helper->winId();
+		HWND targetHandle = (HWND)target->winId();
+		HWND pluginHandle = (HWND)(intptr_t)m_pluginWindowID;
+
+		DWORD style = GetWindowLong(pluginHandle, GWL_STYLE);
+		style = style & ~(WS_POPUP);
+		style = style | WS_CHILD;
+		SetWindowLong(pluginHandle, GWL_STYLE, style);
+		SetParent(pluginHandle, targetHandle);
+
+		DWORD threadId = GetWindowThreadProcessId(pluginHandle, NULL);
+		DWORD currentThreadId = GetCurrentThreadId();
+		AttachThreadInput(currentThreadId, threadId, true);
+
+		container = helper;
+		RemotePlugin::showUI();
+
+	} else
 #endif
 
 #ifdef LMMS_BUILD_LINUX
-	else if (m_embedMethod == "xembed" )
+	if (m_embedMethod == "xembed" )
 	{
 		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( sw );
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
 		container = embedContainer;
-	}
+	} else
 #endif
-	else
 	{
 		qCritical() << "Unknown embed method" << m_embedMethod;
 		delete m_pluginSubWindow;

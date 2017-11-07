@@ -347,6 +347,10 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
 #endif
 
+#ifdef LMMS_BUILD_WIN32
+	m_vstEmbedComboBox->addItem( tr( "Embed using native Win32 API" ), "win32" );
+#endif
+
 #ifdef LMMS_BUILD_LINUX
 	if ( QX11Info::isPlatformX11() ) {
 		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
