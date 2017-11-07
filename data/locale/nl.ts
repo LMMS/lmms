@@ -9094,7 +9094,7 @@ Dubbelklikken op om het even welke plugins zal informatie geven over de poorten.
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Sweep-tijd</translation>
@@ -9189,7 +9189,7 @@ Dubbelklikken op om het even welke plugins zal informatie geven over de poorten.
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Sweep-tijd:</translation>
