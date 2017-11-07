@@ -20,35 +20,34 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef GB_APU_BUFFER_H
-#define GB_APU_BUFFER_H
+#include "Gb_Apu_Buffer.h"
 
-#include "Gb_Apu.h"
-#include "Multi_Buffer.h"
-#include "MemoryManager.h"
+Gb_Apu_Buffer::Gb_Apu_Buffer() {}
+Gb_Apu_Buffer::~Gb_Apu_Buffer() {}
 
-class Gb_Apu_Buffer : public Gb_Apu {
-	MM_OPERATORS
-public:
-	Gb_Apu_Buffer();
-	~Gb_Apu_Buffer();
+void Gb_Apu_Buffer::end_frame(blip_time_t end_time) {
+	Gb_Apu::end_frame(end_time);
+	m_buf.end_frame(end_time);
+}
 
-	void write_register(blip_time_t, unsigned addr, int data);
-	int read_register(blip_time_t, unsigned addr);
-	void end_frame(blip_time_t);
-	blargg_err_t set_sample_rate(long rate);
-	long samples_avail() const;
-	typedef blip_sample_t sample_t;
-	long read_samples(sample_t* out, long count);
+// Sets specified sample rate and clock rate in Multi_Buffer
+blargg_err_t Gb_Apu_Buffer::set_sample_rate(long sample_rate, long clock_rate) {
+	Gb_Apu_Buffer::output(m_buf.center(), m_buf.left(), m_buf.right());
+	m_buf.clock_rate(clock_rate);
+	return m_buf.set_sample_rate(sample_rate);
+}
 
-	void bass_freq(int freq);
-private:
-	Stereo_Buffer m_buf;
-	blip_time_t m_time;
+// Wrap Multi_Buffer::samples_avail()
+long Gb_Apu_Buffer::samples_avail() const {
+	return m_buf.samples_avail();
+}
 
-	// faked CPU timing
-	blip_time_t clock() { return m_time += 4; }
-};
+// Wrap Multi_Buffer::read_samples(...)
+long Gb_Apu_Buffer::read_samples(sample_t* out, long count) {
+	return m_buf.read_samples(out, count);
+}
 
-#endif
+void Gb_Apu_Buffer::bass_freq(int freq) {
+	m_buf.bass_freq(freq);
+}
 
