@@ -968,6 +968,26 @@ void DataFile::upgrade_1_2_0_rc2_42()
 }
 
 
+void DataFile::upgrade_1_3_0()
+{
+	QDomNodeList list = elementsByTagName( "instrument" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if( el.attribute( "name" ) == "papu" )
+		{
+			el.setAttribute( "name", "freeboy" );
+			QDomNodeList children = el.elementsByTagName( "papu" );
+			for( int j = 0; !children.item( j ).isNull(); ++j )
+			{
+				QDomElement child = children.item( j ).toElement();
+				child.setTagName( "freeboy" );
+			}
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -1048,6 +1068,10 @@ void DataFile::upgrade()
 	{
 		upgrade_1_2_0_rc3();
 		upgrade_1_2_0_rc2_42();
+	}
+	if( version < "1.3.0" )
+	{
+		upgrade_1_3_0();
 	}
 
 	// update document meta data

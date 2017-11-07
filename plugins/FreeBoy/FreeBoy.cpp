@@ -1,5 +1,5 @@
 /*
- * papu_instrument.cpp - GameBoy papu based instrument
+ * FreeBoy.cpp - GameBoy papu based instrument
  *
  * Copyright (c) 2008 Attila Herman <attila589/at/gmail.com>
  *				Csaba Hruska <csaba.hruska/at/gmail.com>
@@ -27,7 +27,7 @@
 
 #include <QPainter>
 #include <QDomElement>
-#include "papu_instrument.h"
+#include "FreeBoy.h"
 #include "Gb_Apu_Buffer.h"
 #include "Multi_Buffer.h"
 #include "base64.h"
@@ -42,9 +42,12 @@
 
 #include "embed.h"
 
+const blip_time_t FRAME_LENGTH = 70224;
+const long CLOCK_RATE = 4194304;
+
 extern "C"
 {
-Plugin::Descriptor PLUGIN_EXPORT papu_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT freeboy_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"FreeBoy",
@@ -61,8 +64,8 @@ Plugin::Descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 }
 
 
-papuInstrument::papuInstrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &papu_plugin_descriptor ),
+FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &freeboy_plugin_descriptor ),
 
 	m_ch1SweepTimeModel( 4.0f, 0.0f, 7.0f, 1.0f, this, tr( "Sweep time" ) ),
 	m_ch1SweepDirModel( false, this, tr( "Sweep direction" ) ),
@@ -112,17 +115,19 @@ papuInstrument::papuInstrument( InstrumentTrack * _instrument_track ) :
 	m_trebleModel( -20.0f, -100.0f, 200.0f, 1.0f, this, tr( "Treble" ) ),
 	m_bassModel( 461.0f, -1.0f, 600.0f, 1.0f, this, tr( "Bass" ) ),
 
-	m_graphModel( 0, 15, 32, this, false, 1 )
+	m_graphModel( 0, 15, 32, this, false, 1 ),
+
+	m_time(0)
 {
 }
 
 
-papuInstrument::~papuInstrument()
+FreeBoyInstrument::~FreeBoyInstrument()
 {
 }
 
 
-void papuInstrument::saveSettings( QDomDocument & _doc,
+void FreeBoyInstrument::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
 	m_ch1SweepTimeModel.saveSettings( _doc, _this, "st" );
@@ -165,7 +170,7 @@ void papuInstrument::saveSettings( QDomDocument & _doc,
 	_this.setAttribute( "sampleShape", sampleString );
 }
 
-void papuInstrument::loadSettings( const QDomElement & _this )
+void FreeBoyInstrument::loadSettings( const QDomElement & _this )
 {
 	m_ch1SweepTimeModel.loadSettings( _this, "st" );
 	m_ch1SweepDirModel.loadSettings( _this, "sd" );
@@ -207,15 +212,15 @@ void papuInstrument::loadSettings( const QDomElement & _this )
 	m_graphModel.setSamples( (float*) dst );
 }
 
-QString papuInstrument::nodeName() const
+QString FreeBoyInstrument::nodeName() const
 {
-	return( papu_plugin_descriptor.name );
+	return( freeboy_plugin_descriptor.name );
 }
 
 
 
 
-/*f_cnt_t papuInstrument::desiredReleaseFrames() const
+/*f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 {
 	const float samplerate = Engine::mixer()->processingSampleRate();
 	int maxrel = 0;
@@ -228,14 +233,14 @@ QString papuInstrument::nodeName() const
 	return f_cnt_t( float(relTime[maxrel])*samplerate/1000.0 );
 }*/
 
-f_cnt_t papuInstrument::desiredReleaseFrames() const
+f_cnt_t FreeBoyInstrument::desiredReleaseFrames() const
 {
 	return f_cnt_t( 1000 );
 }
 
 
 
-void papuInstrument::playNote( NotePlayHandle * _n,
+void FreeBoyInstrument::playNote( NotePlayHandle * _n,
 						sampleFrame * _working_buffer )
 {
 	const f_cnt_t tfp = _n->totalFramesPlayed();
@@ -249,24 +254,24 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	if ( tfp == 0 )
 	{
 		Gb_Apu_Buffer *papu = new Gb_Apu_Buffer();
-		papu->set_sample_rate( samplerate );
+		papu->set_sample_rate( samplerate, CLOCK_RATE );
 
 		// Master sound circuitry power control
-		papu->write_register( 0,  0xff26, 0x80 );
+		papu->write_register( fakeClock(),  0xff26, 0x80 );
 
 		data = m_ch1VolumeModel.value();
 		data = data<<1;
 		data += m_ch1VolSweepDirModel.value();
 		data = data<<3;
 		data += m_ch1SweepStepLengthModel.value();
-		papu->write_register( 0,  0xff12, data );
+		papu->write_register( fakeClock(),  0xff12, data );
 
 		data = m_ch2VolumeModel.value();
 		data = data<<1;
 		data += m_ch2VolSweepDirModel.value();
 		data = data<<3;
 		data += m_ch2SweepStepLengthModel.value();
-		papu->write_register( 0,  0xff17, data );
+		papu->write_register( fakeClock(),  0xff17, data );
 
 		//channel 4 - noise
 		data = m_ch4VolumeModel.value();
@@ -274,10 +279,10 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data += m_ch4VolSweepDirModel.value();
 		data = data<<3;
 		data += m_ch4SweepStepLengthModel.value();
-		papu->write_register( 0,  0xff21, data );
+		papu->write_register( fakeClock(),  0xff21, data );
 
 		//channel 4 init
-		papu->write_register( 0,  0xff23, 128 );
+		papu->write_register( fakeClock(),  0xff23, 128 );
 
 		_n->m_pluginData = papu;
 	}
@@ -293,35 +298,35 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	data += m_ch1SweepDirModel.value();
 	data = data << 3;
 	data += m_ch1SweepRtShiftModel.value();
-	papu->write_register( 0,  0xff10, data );
+	papu->write_register( fakeClock(),  0xff10, data );
 
 	data = m_ch1WavePatternDutyModel.value();
 	data = data<<6;
-	papu->write_register( 0,  0xff11, data );
+	papu->write_register( fakeClock(),  0xff11, data );
 
 
 	//channel 2 - square
 	data = m_ch2WavePatternDutyModel.value();
 	data = data<<6;
-	papu->write_register( 0,  0xff16, data );
+	papu->write_register( fakeClock(),  0xff16, data );
 
 
 	//channel 3 - wave
 	//data = m_ch3OnModel.value()?128:0;
 	data = 128;
-	papu->write_register( 0,  0xff1a, data );
+	papu->write_register( fakeClock(),  0xff1a, data );
 
 	int ch3voldata[4] = { 0, 3, 2, 1 };
 	data = ch3voldata[(int)m_ch3VolumeModel.value()];
 	data = data<<5;
-	papu->write_register( 0,  0xff1c, data );
+	papu->write_register( fakeClock(),  0xff1c, data );
 
 
 	//controls
 	data = m_so1VolumeModel.value();
 	data = data<<4;
 	data += m_so2VolumeModel.value();
-	papu->write_register( 0,  0xff24, data );
+	papu->write_register( fakeClock(),  0xff24, data );
 
 	data = m_ch4So2Model.value()?128:0;
 	data += m_ch3So2Model.value()?64:0;
@@ -331,7 +336,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	data += m_ch3So1Model.value()?4:0;
 	data += m_ch2So1Model.value()?2:0;
 	data += m_ch1So1Model.value()?1:0;
-	papu->write_register( 0,  0xff25, data );
+	papu->write_register( fakeClock(),  0xff25, data );
 
 	const float * wpm = m_graphModel.samples();
 
@@ -339,7 +344,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 	{
 		data = (int)floor(wpm[i*2]) << 4;
 		data += (int)floor(wpm[i*2+1]);
-		papu->write_register( 0,  0xff30 + i, data );
+		papu->write_register( fakeClock(),  0xff30 + i, data );
 	}
 
 	if( ( freq >= 65 ) && ( freq <=4000 ) )
@@ -349,13 +354,13 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data = 2048 - ( ( 4194304 / freq )>>5 );
 		if( tfp==0 )
 		{
-			papu->write_register( 0,  0xff13, data & 0xff );
-			papu->write_register( 0,  0xff14, (data>>8) | initflag );
+			papu->write_register( fakeClock(),  0xff13, data & 0xff );
+			papu->write_register( fakeClock(),  0xff14, (data>>8) | initflag );
 		}
-		papu->write_register( 0,  0xff18, data & 0xff );
-		papu->write_register( 0,  0xff19, (data>>8) | initflag );
-		papu->write_register( 0,  0xff1d, data & 0xff );
-		papu->write_register( 0,  0xff1e, (data>>8) | initflag );
+		papu->write_register( fakeClock(),  0xff18, data & 0xff );
+		papu->write_register( fakeClock(),  0xff19, (data>>8) | initflag );
+		papu->write_register( fakeClock(),  0xff1d, data & 0xff );
+		papu->write_register( fakeClock(),  0xff1e, (data>>8) | initflag );
 	}
 
 	if( tfp == 0 )
@@ -379,7 +384,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data += m_ch4ShiftRegWidthModel.value();
 		data = data << 3;
 		data += ropt;
-		papu->write_register( 0,  0xff22, data );
+		papu->write_register( fakeClock(),  0xff22, data );
 	}
 
 	int const buf_size = 2048;
@@ -391,7 +396,8 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		int avail = papu->samples_avail();
 		if( avail <= 0 )
 		{
-			papu->end_frame(0);
+			m_time = 0;
+			papu->end_frame(FRAME_LENGTH);
 			avail = papu->samples_avail();
 		}
 		datalen = framesleft>avail?avail:framesleft;
@@ -414,7 +420,7 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 
 
 
-void papuInstrument::deleteNotePluginData( NotePlayHandle * _n )
+void FreeBoyInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	delete static_cast<Gb_Apu_Buffer *>( _n->m_pluginData );
 }
@@ -422,16 +428,16 @@ void papuInstrument::deleteNotePluginData( NotePlayHandle * _n )
 
 
 
-PluginView * papuInstrument::instantiateView( QWidget * _parent )
+PluginView * FreeBoyInstrument::instantiateView( QWidget * _parent )
 {
-	return( new papuInstrumentView( this, _parent ) );
+	return( new FreeBoyInstrumentView( this, _parent ) );
 }
 
 
-class papuKnob : public Knob
+class FreeBoyKnob : public Knob
 {
 public:
-	papuKnob( QWidget * _parent ) :
+	FreeBoyKnob( QWidget * _parent ) :
 			Knob( knobStyled, _parent )
 	{
 		setFixedSize( 30, 30 );
@@ -447,7 +453,7 @@ public:
 
 
 
-papuInstrumentView::papuInstrumentView( Instrument * _instrument,
+FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 							QWidget * _parent ) :
 	InstrumentView( _instrument, _parent )
 {
@@ -457,14 +463,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap( "artwork" ) );
 	setPalette( pal );
 
-	m_ch1SweepTimeKnob = new papuKnob( this );
+	m_ch1SweepTimeKnob = new FreeBoyKnob( this );
 	m_ch1SweepTimeKnob->setHintText( tr( "Sweep Time:" ), "" );
 	m_ch1SweepTimeKnob->move( 5 + 4*32, 106 );
 	ToolTip::add( m_ch1SweepTimeKnob, tr( "Sweep Time" ) );
 	m_ch1SweepTimeKnob->setWhatsThis( tr( "The amount of increase or"
 									" decrease in frequency" ) );
 
-	m_ch1SweepRtShiftKnob = new papuKnob( this );
+	m_ch1SweepRtShiftKnob = new FreeBoyKnob( this );
 	m_ch1SweepRtShiftKnob->setHintText( tr( "Sweep RtShift amount:" )
 										, "" );
 	m_ch1SweepRtShiftKnob->move( 5 + 3*32, 106 );
@@ -472,7 +478,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 	m_ch1SweepRtShiftKnob->setWhatsThis( tr( "The rate at which increase or"
 									" decrease in frequency occurs" ) );
 
-	m_ch1WavePatternDutyKnob = new papuKnob( this );
+	m_ch1WavePatternDutyKnob = new FreeBoyKnob( this );
 	m_ch1WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
 									, "" );
 	m_ch1WavePatternDutyKnob->move( 5 + 2*32, 106 );
@@ -481,14 +487,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 									" the duration (time) that a signal is ON"
 									" versus the total period of the signal." ) );
 
-	m_ch1VolumeKnob = new papuKnob( this );
+	m_ch1VolumeKnob = new FreeBoyKnob( this );
 	m_ch1VolumeKnob->setHintText( tr( "Square Channel 1 Volume:" )
 								, "" );
 	m_ch1VolumeKnob->move( 5, 106 );
 	ToolTip::add( m_ch1VolumeKnob, tr( "Square Channel 1 Volume:" ) );
 	m_ch1VolumeKnob->setWhatsThis( tr( "Square Channel 1 Volume" ) );
 
-	m_ch1SweepStepLengthKnob = new papuKnob( this );
+	m_ch1SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch1SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch1SweepStepLengthKnob->move( 5 + 32, 106 );
@@ -497,7 +503,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 
-	m_ch2WavePatternDutyKnob = new papuKnob( this );
+	m_ch2WavePatternDutyKnob = new FreeBoyKnob( this );
 	m_ch2WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
 									, "" );
 	m_ch2WavePatternDutyKnob->move( 5 + 2*32, 155 );
@@ -506,14 +512,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 									" the duration (time) that a signal is ON"
 									" versus the total period of the signal." ) );
 
-	m_ch2VolumeKnob = new papuKnob( this );
+	m_ch2VolumeKnob = new FreeBoyKnob( this );
 	m_ch2VolumeKnob->setHintText( tr( "Square Channel 2 Volume:" )
 							, "" );
 	m_ch2VolumeKnob->move( 5, 155 );
 	ToolTip::add( m_ch2VolumeKnob, tr( "Square Channel 2 Volume" ) );
 	m_ch2VolumeKnob->setWhatsThis( tr( "Square Channel 2 Volume" ) );
 
-	m_ch2SweepStepLengthKnob = new papuKnob( this );
+	m_ch2SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch2SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch2SweepStepLengthKnob->move( 5 + 32, 155 );
@@ -522,7 +528,7 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 
-	m_ch3VolumeKnob = new papuKnob( this );
+	m_ch3VolumeKnob = new FreeBoyKnob( this );
 	m_ch3VolumeKnob->setHintText( tr( "Wave Channel Volume:" ), "" );
 	m_ch3VolumeKnob->move( 5, 204 );
 	ToolTip::add( m_ch3VolumeKnob, tr( "Wave Channel Volume" ) );
@@ -530,13 +536,13 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 
-	m_ch4VolumeKnob = new papuKnob( this );
+	m_ch4VolumeKnob = new FreeBoyKnob( this );
 	m_ch4VolumeKnob->setHintText( tr( "Noise Channel Volume:" ), "" );
 	m_ch4VolumeKnob->move( 144, 155 );
 	ToolTip::add( m_ch4VolumeKnob, tr( "Noise Channel Volume" ) );
 	m_ch4VolumeKnob->setWhatsThis( tr( "Noise Channel Volume" ) );
 
-	m_ch4SweepStepLengthKnob = new papuKnob( this );
+	m_ch4SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch4SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch4SweepStepLengthKnob->move( 144 + 32, 155 );
@@ -545,22 +551,22 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 
 
 
-	m_so1VolumeKnob = new papuKnob( this );
+	m_so1VolumeKnob = new FreeBoyKnob( this );
 	m_so1VolumeKnob->setHintText( tr( "SO1 Volume (Right):" ), "" );
 	m_so1VolumeKnob->move( 5, 58 );
 	ToolTip::add( m_so1VolumeKnob, tr( "SO1 Volume (Right)" ) );
 
-	m_so2VolumeKnob = new papuKnob( this );
+	m_so2VolumeKnob = new FreeBoyKnob( this );
 	m_so2VolumeKnob->setHintText( tr( "SO2 Volume (Left):" ), "" );
 	m_so2VolumeKnob->move( 5 + 32, 58 );
 	ToolTip::add( m_so2VolumeKnob, tr( "SO2 Volume (Left)" ) );
 
-	m_trebleKnob = new papuKnob( this );
+	m_trebleKnob = new FreeBoyKnob( this );
 	m_trebleKnob->setHintText( tr( "Treble:" ), "" );
 	m_trebleKnob->move( 5 + 2*32, 58 );
 	ToolTip::add( m_trebleKnob, tr( "Treble" ) );
 
-	m_bassKnob = new papuKnob( this );
+	m_bassKnob = new FreeBoyKnob( this );
 	m_bassKnob->setHintText( tr( "Bass:" ), "" );
 	m_bassKnob->move( 5 + 3*32, 58 );
 	ToolTip::add( m_bassKnob, tr( "Bass" ) );
@@ -689,14 +695,14 @@ papuInstrumentView::papuInstrumentView( Instrument * _instrument,
 }
 
 
-papuInstrumentView::~papuInstrumentView()
+FreeBoyInstrumentView::~FreeBoyInstrumentView()
 {
 }
 
 
-void papuInstrumentView::modelChanged()
+void FreeBoyInstrumentView::modelChanged()
 {
-	papuInstrument * p = castModel<papuInstrument>();
+	FreeBoyInstrument * p = castModel<FreeBoyInstrument>();
 
 	m_ch1SweepTimeKnob->setModel( &p->m_ch1SweepTimeModel );
 	m_ch1SweepDirButton->setModel( &p->m_ch1SweepDirModel );
@@ -740,7 +746,7 @@ extern "C"
 // necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-	return( new papuInstrument(
+	return( new FreeBoyInstrument(
 				static_cast<InstrumentTrack *>( _data ) ) );
 }
 

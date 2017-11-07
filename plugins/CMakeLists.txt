@@ -62,7 +62,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		nes
 		opl2
 		organic
-		papu
+		FreeBoy
 		patman
 		peak_controller_effect
 		GigPlayer
