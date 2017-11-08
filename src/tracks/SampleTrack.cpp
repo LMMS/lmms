@@ -138,6 +138,7 @@ const QString & SampleTCO::sampleFile() const
 void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 {
 	sharedObject::unref( m_sampleBuffer );
+	setStartTimeOffset( 0 );
 	m_sampleBuffer = sb;
 	updateLength();
 
