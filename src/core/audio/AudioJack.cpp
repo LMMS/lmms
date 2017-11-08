@@ -52,6 +52,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	m_active( false ),
 	m_midiClient( NULL ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
+	m_tempInBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
@@ -90,6 +91,7 @@ AudioJack::~AudioJack()
 		jack_client_close( m_client );
 	}
 
+	delete[] m_tempInBufs;
 	delete[] m_tempOutBufs;
 
 	delete[] m_outBuf;
