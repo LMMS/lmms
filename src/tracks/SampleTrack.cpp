@@ -104,8 +104,15 @@ bool SampleTrack::play( const TimePos & _start, const fpp_t _frames,
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
 					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
-					//we only play within the sampleBuffer limits
-					if( sampleStart < sampleBufferLength )
+
+					// In case we are recoding, "play" the whole TCO.
+					if(sTco->isRecord()) {
+                        samplePlayLength = tcoFrameLength;
+                    }
+
+                    //we only play within the sampleBuffer limits
+                    //Ignore that in case of recoding.
+					if( sampleStart < sampleBufferLength || sTco->isRecord ())
 					{
 						sTco->setSampleStartFrame( sampleStart );
 						sTco->setSamplePlayLength( samplePlayLength );
