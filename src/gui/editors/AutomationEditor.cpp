@@ -1378,13 +1378,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float *values = m_pattern->valuesAfter( it.key() );
 
 				float nextValue;
-				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
+				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
+					nextValue = it.value();
 				}
 				else
 				{
-					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
+					nextValue = ( it + 1 ).value();
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
