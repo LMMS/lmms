@@ -42,7 +42,10 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 }
 
 
-
+static void stream_read_callback(pa_stream *s, size_t length, void *userdata)
+{
+	static_cast<AudioPulseAudio *>( userdata )->streamReadCallback( s, length );
+}
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<ch_cnt_t>(
@@ -50,14 +53,18 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
 								_mixer ),
 	m_s( NULL ),
-	m_quit( false ),
-	m_convertEndian( false )
+	m_recordStream{nullptr},
+	m_quit( false )
 {
 	_success_ful = false;
 
-	m_sampleSpec.format = PA_SAMPLE_S16LE;
+	m_sampleSpec.format = PA_SAMPLE_FLOAT32;
 	m_sampleSpec.rate = sampleRate();
 	m_sampleSpec.channels = channels();
+
+	m_recordSampleSpec = m_sampleSpec;
+
+	m_supportsCapture = true;
 
 	_success_ful = true;
 }
@@ -145,6 +152,27 @@ static void stream_state_callback( pa_stream *s, void * userdata )
 	}
 }
 
+/* This routine is called whenever the stream state changes */
+static void record_stream_state_callback( pa_stream *s, void * userdata )
+{
+	switch( pa_stream_get_state( s ) )
+	{
+		case PA_STREAM_CREATING:
+		case PA_STREAM_TERMINATED:
+			break;
+
+		case PA_STREAM_READY:
+			qDebug( "Record stream successfully created\n" );
+			break;
+
+		case PA_STREAM_FAILED:
+		default:
+			qCritical( "record stream errror: %s\n",
+					pa_strerror(pa_context_errno(
+						pa_stream_get_context( s ) ) ) );
+	}
+}
+
 
 
 /* This is called whenever the context status changes */
@@ -165,6 +193,10 @@ static void context_state_callback(pa_context *c, void *userdata)
 			pa_stream_set_state_callback( _this->m_s, stream_state_callback, _this );
 			pa_stream_set_write_callback( _this->m_s, stream_write_callback, _this );
 
+			_this->m_recordStream = pa_stream_new( c, "lmms sample track record", &_this->m_sampleSpec,  NULL);
+			pa_stream_set_state_callback( _this->m_recordStream, record_stream_state_callback, _this );
+			pa_stream_set_read_callback ( _this->m_recordStream, stream_read_callback , _this );
+
 			pa_buffer_attr buffer_attr;
 
 			buffer_attr.maxlength = (uint32_t)(-1);
@@ -182,10 +214,17 @@ static void context_state_callback(pa_context *c, void *userdata)
 			buffer_attr.tlength = pa_usec_to_bytes( latency * PA_USEC_PER_MSEC,
 														&_this->m_sampleSpec );
 
-			pa_stream_connect_playback( _this->m_s, NULL, &buffer_attr,
+			pa_stream_connect_playback( _this->m_s,
+										NULL,
+										&buffer_attr,
 										PA_STREAM_ADJUST_LATENCY,
 										NULL,	// volume
 										NULL );
+
+			pa_stream_connect_record (_this->m_recordStream,
+									  NULL,
+									  &buffer_attr,
+									  PA_STREAM_ADJUST_LATENCY);
 			_this->signalConnected( true );
 			break;
 		}
@@ -242,6 +281,8 @@ void AudioPulseAudio::run()
 
 		pa_stream_disconnect( m_s );
 		pa_stream_unref( m_s );
+		pa_stream_disconnect( m_recordStream );
+		pa_stream_unref( m_recordStream );
 	}
 	else
 	{
@@ -266,10 +307,9 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 {
 	const fpp_t fpp = mixer()->framesPerPeriod();
 	surroundSampleFrame * temp = new surroundSampleFrame[fpp];
-	int_sample_t* pcmbuf = (int_sample_t *)pa_xmalloc( fpp * channels() * sizeof(int_sample_t) );
 
 	size_t fd = 0;
-	while( fd < length/4 && m_quit == false )
+	while( fd < length && m_quit == false )
 	{
 		const fpp_t frames = getNextBuffer( temp );
 		if( !frames )
@@ -277,24 +317,49 @@ void AudioPulseAudio::streamWriteCallback( pa_stream *s, size_t length )
 			m_quit = true;
 			break;
 		}
-		int bytes = convertToS16( temp, frames,
-						mixer()->masterGain(),
-						pcmbuf,
-						m_convertEndian );
-		if( bytes > 0 )
-		{
-			pa_stream_write( m_s, pcmbuf, bytes, NULL, 0,
-							PA_SEEK_RELATIVE );
+
+		auto gain = mixer()->masterGain();
+		for (fpp_t f = 0; f < frames; ++f) {
+			temp[f][0] *= gain;
+			temp[f][1] *= gain;
 		}
-		fd += frames;
+
+
+
+		pa_stream_write( m_s, static_cast<const void*>(temp),
+						 frames * sizeof(surroundSampleFrame), NULL, 0,
+						 PA_SEEK_RELATIVE );
+
+		fd += (frames * sizeof(surroundSampleFrame));
 	}
 
-	pa_xfree( pcmbuf );
 	delete[] temp;
 }
 
 
+void AudioPulseAudio::streamReadCallback(pa_stream *s, size_t length) {
+	const sampleFrame *buffer = nullptr;
+	size_t buffer_size = 0;
 
+	while (length > 0) {
+
+		pa_stream_peek (m_recordStream,
+						reinterpret_cast<const void**> (const_cast<const sampleFrame**>(&buffer)),
+						&buffer_size);
+
+		fpp_t frames = buffer_size / sizeof (sampleFrame);
+
+		pa_stream_drop (m_recordStream);
+
+		if (buffer_size && buffer) {
+			mixer()->pushInputFrames (buffer,
+									  frames,
+									  true);
+		}
+
+		length -= buffer_size;
+	}
+}
 
 void AudioPulseAudio::signalConnected( bool connected )
 {
