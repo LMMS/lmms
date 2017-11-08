@@ -1967,13 +1967,6 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop()
 	while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
 	{
 		TranslateMessage( &msg );
-
-		if( msg.message == WM_SYSCOMMAND && msg.wParam == SC_CLOSE )
-		{
-			__plugin->destroyEditor();
-			continue;
-		}
-
 		DispatchMessage( &msg );
 	}
 
@@ -2020,6 +2013,12 @@ LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
 				break;
 		}
 	}
+	else if( uMsg == WM_SYSCOMMAND && wParam == SC_CLOSE )
+	{
+		__plugin->destroyEditor();
+		return 0;
+	}
+
 	return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
 
