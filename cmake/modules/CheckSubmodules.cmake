@@ -18,13 +18,13 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 # Files which confirm a successful clone
-SET(VALID_CRUMBS "CMakeLists.txt;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh")
+SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh")
 
 MESSAGE("\nValidating submodules...")
 FILE(READ "${CMAKE_SOURCE_DIR}/.gitmodules" SUBMODULE_DATA)
 
 # Assume alpha-numeric paths
-STRING(REGEX MATCHALL "path = [0-9A-Za-z/]+" SUBMODULE_LIST ${SUBMODULE_DATA})
+STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST ${SUBMODULE_DATA})
 FOREACH(_part ${SUBMODULE_LIST})
 	STRING(REPLACE "path = " "" SUBMODULE_PATH ${_part})
 
@@ -46,6 +46,36 @@ ENDFOREACH()
 
 LIST(SORT SUBMODULE_LIST)
 
+# Once called, status is stored in GIT_RESULT respectively.
+# Note: Git likes to write to stderr.  Don't assume stderr is error; Check GIT_RESULT instead.
+MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT)
+	FIND_PACKAGE(Git REQUIRED)
+	IF(${FORCE_DEINIT})
+		MESSAGE("--   Resetting ${SUBMODULE_PATH}")
+		EXECUTE_PROCESS(
+			COMMAND ${GIT_EXECUTABLE} submodule deinit -f ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			OUTPUT_QUIET
+		)
+		# Recurse
+		GIT_SUBMODULE(${SUBMODULE_PATH} false)
+	ELSE()
+		MESSAGE("--   Fetching ${SUBMODULE_PATH}")
+		EXECUTE_PROCESS(
+			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			RESULT_VARIABLE GIT_RESULT
+			OUTPUT_VARIABLE GIT_STDOUT
+			ERROR_VARIABLE GIT_STDERR
+		)
+
+		SET(GIT_MESSAGE "${GIT_STDOUT}${GIT_STDERR}")
+		MESSAGE(${GIT_MESSAGE})
+	ENDIF()
+ENDMACRO()
+
+SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory")
+
 # Attempt to do lazy clone
 FOREACH(_submodule ${SUBMODULE_LIST})
 	STRING(REPLACE "/" ";" PATH_PARTS ${_submodule})
@@ -61,15 +91,26 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		ENDIF()
 	ENDFOREACH()
 	IF(NOT CRUMB_FOUND)
-		FIND_PACKAGE(Git REQUIRED)
-		MESSAGE("--   Missing ${_submodule}")
-		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${CMAKE_SOURCE_DIR}/${_submodule}
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-			ERROR_VARIABLE GIT_STDERR
-		)
-		IF(GIT_STDERR)
-			MESSAGE(FATAL_ERROR ${GIT_STDERR})
+		GIT_SUBMODULE(${_submodule} false)
+
+		SET(MAX_ATTEMPTS 2)
+		SET(COUNTED 0)
+		SET(COUNTING "")
+		# Handle edge-cases where submodule didn't clone properly or re-uses a non-empty directory
+		WHILE(NOT GIT_RESULT EQUAL 0 AND COUNTED LESS MAX_ATTEMPTS)
+			LIST(APPEND COUNTING "x")
+			LIST(LENGTH COUNTING COUNTED)
+
+			FOREACH(_phrase ${RETRY_PHRASES})
+				IF("${GIT_MESSAGE}" MATCHES "${_phrase}")
+					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
+					GIT_SUBMODULE(${_submodule} true)
+				ENDIF()
+			ENDFOREACH()
+		ENDWHILE()
+
+		IF(NOT GIT_RESULT EQUAL 0)
+			MESSAGE(FATAL_ERROR "${GIT_EXECUTABLE} exited with status of ${GIT_RESULT}")
 		ENDIF()
 	ENDIF()
 ENDFOREACH()
