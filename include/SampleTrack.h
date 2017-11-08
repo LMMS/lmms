@@ -73,6 +73,11 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
+	/**
+	 * @brief isEmpty  Check if this TCO has not content.
+	 */
+	bool isEmpty() const;
+
 public slots:
 	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
