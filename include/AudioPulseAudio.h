@@ -72,11 +72,15 @@ public:
 
 
 	void streamWriteCallback( pa_stream * s, size_t length );
+	void streamReadCallback(pa_stream *s, size_t length);
 
 	void signalConnected( bool connected );
 
 	pa_stream * m_s;
 	pa_sample_spec m_sampleSpec;
+
+	pa_stream * m_recordStream;
+	pa_sample_spec m_recordSampleSpec;
 
 
 private:
@@ -86,8 +90,6 @@ private:
 	virtual void run();
 
 	volatile bool m_quit;
-
-	bool m_convertEndian;
 
 	bool m_connected;
 	QSemaphore m_connectedSemaphore;
