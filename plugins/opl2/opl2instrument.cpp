@@ -50,6 +50,7 @@
 #include "opl.h"
 #include "temuopl.h"
 
+#include <assert.h>
 #include "embed.h"
 #include "math.h"
 #include "debug.h"
