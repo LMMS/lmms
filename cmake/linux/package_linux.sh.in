@@ -170,11 +170,13 @@ ln -sr  "$VSTBIN" "$VSTLIB"
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
 
-# Remove bundled jack library
-rm -f "${APPDIR}/usr/lib/libjack.so.0"
-
-# Make a symlink to a dummy libjack.so.0
-ln -sr "${APPDIR}usr/lib/lmms/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/libjack.so.0"
+# Remove problematic jack library, replace with weakjack
+if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
+   rm -f "${APPDIR}/usr/lib/libjack.so.0"
+   mkdir -p "${APPDIR}usr/lib/lmms/optional/"
+   cp "@CMAKE_BINARY_DIR@/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/weakjack.so"
+   ln -sr "${APPDIR}usr/lib/lmms/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/libjack.so.0"
+fi
 
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
