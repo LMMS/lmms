@@ -50,9 +50,15 @@ SampleRecordHandle::~SampleRecordHandle()
 {
 	if( !m_buffers.empty() )
 	{
+		auto sampleStart = m_tco->sampleBuffer ()->startFrame ();
+
 		SampleBuffer* sb;
 		createSampleBuffer( &sb );
 		m_tco->setSampleBuffer( sb );
+
+		// Apply the sample buffer offset from the start of the TCO.
+		MidiTime startTimeOffset = (tick_t)( sampleStart / Engine::framesPerTick());
+		m_tco->setStartTimeOffset (startTimeOffset);
 	}
 	
 	while( !m_buffers.empty() )
