@@ -984,6 +984,16 @@ void DataFile::upgrade_1_3_0()
 				child.setTagName( "freeboy" );
 			}
 		}
+		else if( el.attribute( "name" ) == "OPL2" )
+		{
+			el.setAttribute( "name", "opulenz" );
+			QDomNodeList children = el.elementsByTagName( "OPL2" );
+			for( int j = 0; !children.item( j ).isNull(); ++j )
+			{
+				QDomElement child = children.item( j ).toElement();
+				child.setTagName( "opulenz" );
+			}
+		}
 	}
 }
 

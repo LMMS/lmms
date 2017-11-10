@@ -1,5 +1,5 @@
 /*
- * OPL2 FM synth
+ * OpulenZ.h - AdLib OPL2 FM synth based instrument
  *
  * Copyright (c) 2013 Raine M. Ekman <raine/at/iki/fi>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef _OPL2_H
-#define _OPL2_H
+#ifndef OPULENZ_H
+#define OPULENZ_H
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -41,12 +41,12 @@
 // The "normal" range for LMMS pitchbends
 #define DEFAULT_BEND_CENTS 100
 
-class opl2instrument : public Instrument
+class OpulenzInstrument : public Instrument
 {
 	Q_OBJECT
 public:
-	opl2instrument( InstrumentTrack * _instrument_track );
-	virtual ~opl2instrument();
+	OpulenzInstrument( InstrumentTrack * _instrument_track );
+	virtual ~OpulenzInstrument();
 
 	virtual QString nodeName() const;
 	virtual PluginView * instantiateView( QWidget * _parent );
@@ -142,12 +142,12 @@ private:
 
 
 
-class opl2instrumentView : public InstrumentView
+class OpulenzInstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	opl2instrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~opl2instrumentView();
+	OpulenzInstrumentView( Instrument * _instrument, QWidget * _parent );
+	virtual ~OpulenzInstrumentView();
 	LcdSpinBox *m_patch;
 	void modelChanged();
 
