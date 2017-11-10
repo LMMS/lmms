@@ -13,3 +13,6 @@
 [submodule "plugins/LadspaEffect/calf/veal"]
 	path = plugins/LadspaEffect/calf/veal
 	url = https://github.com/lmms/veal
+[submodule "plugins/xpressive/exprtk"]
+	path = plugins/xpressive/exprtk
+	url = https://github.com/ArashPartow/exprtk
