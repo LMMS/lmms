@@ -85,21 +85,12 @@ public:
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	RemotePlugin(),
-	JournallingObject(),
 	m_plugin( _plugin ),
-	m_pluginWidget( NULL ),
 	m_pluginWindowID( 0 ),
+	m_embedMethod( ConfigManager::inst()->vstEmbedMethod() ),
 	m_badDllFormat( false ),
-	m_name(),
 	m_version( 0 ),
-	m_vendorString(),
-	m_productString(),
-	m_currentProgramName(),
-	m_allProgramNames(),
-	p_name(),
-	m_currentProgram(),
-	m_idleTimer()
+	m_currentProgram()
 {
 	setSplittedChannels( true );
 
@@ -139,7 +130,7 @@ VstPlugin::~VstPlugin()
 
 void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 {
-	init( remoteVstPluginExecutable, false, {ConfigManager::inst()->vstEmbedMethod()} );
+	init( remoteVstPluginExecutable, false, {m_embedMethod} );
 
 	waitForHostInfoGotten();
 	if( failed() )
@@ -246,7 +237,7 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if ( ConfigManager::inst()->vstEmbedMethod() != "none" )
+	if ( m_embedMethod != "none" )
 	{
 		if( pluginWidget() != NULL )
 		{
@@ -286,7 +277,7 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 void VstPlugin::toggleUI()
 {
-	if ( ConfigManager::inst()->vstEmbedMethod() == "none" )
+	if ( m_embedMethod == "none" )
 	{
 		RemotePlugin::toggleUI();
 	}
@@ -369,7 +360,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 
 QWidget *VstPlugin::pluginWidget(bool _top_widget)
 {
-	if ( ConfigManager::inst()->vstEmbedMethod() != "none" )
+	if ( m_embedMethod != "none" )
 	{
 		if( _top_widget && m_pluginWidget )
 		{
@@ -576,8 +567,7 @@ void VstPlugin::idleUpdate()
 
 void VstPlugin::showUI()
 {
-	QString embedMethod = ConfigManager::inst()->vstEmbedMethod();
-	if ( embedMethod == "none" )
+	if ( m_embedMethod == "none" )
 	{
 		RemotePlugin::showUI();
 	}
@@ -598,7 +588,7 @@ void VstPlugin::showUI()
 void VstPlugin::hideUI()
 {
 	RemotePlugin::hideUI();
-	if ( ConfigManager::inst()->vstEmbedMethod() == "none" )
+	if ( m_embedMethod == "none" )
 	{
 	}
 	else if ( pluginWidget() != nullptr )
@@ -669,8 +659,7 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 	m_pluginSubWindow = new vstSubWin( gui->mainWindow()->workspace() );
 	auto sw = m_pluginSubWindow.data();
 
-	QString embedMethod = ConfigManager::inst()->vstEmbedMethod();
-	if (embedMethod == "qt" )
+	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
 		container = QWidget::createWindowContainer(vw, sw );
@@ -680,7 +669,7 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 		// Wait for remote reply
 	}
 #ifdef LMMS_BUILD_LINUX
-	else if (embedMethod == "xembed" )
+	else if (m_embedMethod == "xembed" )
 	{
 		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( sw );
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
@@ -690,7 +679,7 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 #endif
 	else
 	{
-		qCritical() << "Unknown embed method" << embedMethod;
+		qCritical() << "Unknown embed method" << m_embedMethod;
 		delete m_pluginSubWindow;
 		return;
 	}
@@ -716,6 +705,11 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 	};
 
 	container->setFixedSize( m_pluginGeometry );
+}
+
+QString VstPlugin::embedMethod() const
+{
+	return m_embedMethod;
 }
 
 
