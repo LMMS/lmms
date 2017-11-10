@@ -1,5 +1,5 @@
 /*
- * OPL2 FM synth
+ * OpulenZ.cpp - AdLib OPL2 FM synth based instrument
  *
  * Copyright (c) 2014 Raine M. Ekman <raine/at/iki/fi>
  *
@@ -33,9 +33,7 @@
 //   - Portamento (needs mono mode?)
 //     - Pre-bend/post-bend in poly mode could use portamento speed?
 
-#include "opl2instrument.h"
-#include "mididata.h"
-#include "debug.h"
+#include "OpulenZ.h"
 #include "Instrument.h"
 #include "Engine.h"
 #include "InstrumentPlayHandle.h"
@@ -46,13 +44,14 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QByteArray>
+#include <assert.h>
+#include <math.h>
 
 #include "opl.h"
 #include "temuopl.h"
+#include "mididata.h"
 
-#include <assert.h>
 #include "embed.h"
-#include "math.h"
 #include "debug.h"
 
 #include "Knob.h"
@@ -63,7 +62,7 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT OPL2_plugin_descriptor =
+Plugin::Descriptor PLUGIN_EXPORT opulenz_plugin_descriptor =
 {
         STRINGIFY( PLUGIN_NAME ),
         "OpulenZ",
@@ -80,20 +79,20 @@ Plugin::Descriptor PLUGIN_EXPORT OPL2_plugin_descriptor =
 // necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 {
-        return( new opl2instrument( static_cast<InstrumentTrack *>( _data ) ) );
+        return( new OpulenzInstrument( static_cast<InstrumentTrack *>( _data ) ) );
 }
 
 }
 
 // I'd much rather do without a mutex, but it looks like
 // the emulator code isn't really ready for threads
-QMutex opl2instrument::emulatorMutex;
+QMutex OpulenzInstrument::emulatorMutex;
 
 // Weird ordering of voice parameters
 const unsigned int adlib_opadd[OPL2_VOICES] = {0x00, 0x01, 0x02, 0x08, 0x09, 0x0A, 0x10, 0x11, 0x12};
 
-opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
-	Instrument( _instrument_track, &OPL2_plugin_descriptor ),
+OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
+	Instrument( _instrument_track, &opulenz_plugin_descriptor ),
 	m_patchModel( 0, 0, 127, this, tr( "Patch" ) ),
 	op1_a_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Attack" )  ),
 	op1_d_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 1 Decay" )   ),
@@ -217,7 +216,7 @@ opl2instrument::opl2instrument( InstrumentTrack * _instrument_track ) :
 	Engine::mixer()->addPlayHandle( iph );
 }
 
-opl2instrument::~opl2instrument() {
+OpulenzInstrument::~OpulenzInstrument() {
 	delete theEmulator;
 	Engine::mixer()->removePlayHandlesOfTypes( instrumentTrack(),
 				PlayHandle::TypeNotePlayHandle
@@ -226,7 +225,7 @@ opl2instrument::~opl2instrument() {
 }
 
 // Samplerate changes when choosing oversampling, so this is more or less mandatory
-void opl2instrument::reloadEmulator() {
+void OpulenzInstrument::reloadEmulator() {
 	delete theEmulator;
 	emulatorMutex.lock();
 	theEmulator = new CTemuopl(Engine::mixer()->processingSampleRate(), true, false);
@@ -241,7 +240,7 @@ void opl2instrument::reloadEmulator() {
 }
 
 // This shall only be called from code protected by the holy Mutex!
-void opl2instrument::setVoiceVelocity(int voice, int vel) {
+void OpulenzInstrument::setVoiceVelocity(int voice, int vel) {
 	int vel_adjusted;
 	// Velocity calculation, some kind of approximation
 	// Only calculate for operator 1 if in adding mode, don't want to change timbre
@@ -263,7 +262,7 @@ void opl2instrument::setVoiceVelocity(int voice, int vel) {
 }
 
 // Pop least recently used voice
-int opl2instrument::popVoice() {
+int OpulenzInstrument::popVoice() {
 	int tmp = voiceLRU[0];
 	for( int i=0; i<OPL2_VOICES-1; ++i) {
 		voiceLRU[i] = voiceLRU[i+1];
@@ -276,7 +275,7 @@ int opl2instrument::popVoice() {
 	return tmp;
 }
 // Push voice into first free slot
-int opl2instrument::pushVoice(int v) {
+int OpulenzInstrument::pushVoice(int v) {
 	int i;
 	assert(voiceLRU[OPL2_VOICES-1]==OPL2_NO_VOICE);
 	for(i=OPL2_VOICES-1; i>0; --i) {
@@ -292,7 +291,7 @@ int opl2instrument::pushVoice(int v) {
 	return i;
 }
 
-bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
+bool OpulenzInstrument::handleMidiEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
 	emulatorMutex.lock();
 	int key, vel, voice, tmp_pb;
@@ -386,18 +385,18 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 	return true;
 }
 
-QString opl2instrument::nodeName() const
+QString OpulenzInstrument::nodeName() const
 {
-        return( OPL2_plugin_descriptor.name );
+        return( opulenz_plugin_descriptor.name );
 }
 
-PluginView * opl2instrument::instantiateView( QWidget * _parent )
+PluginView * OpulenzInstrument::instantiateView( QWidget * _parent )
 {
-        return( new opl2instrumentView( this, _parent ) );
+        return( new OpulenzInstrumentView( this, _parent ) );
 }
 
 
-void opl2instrument::play( sampleFrame * _working_buffer )
+void OpulenzInstrument::play( sampleFrame * _working_buffer )
 {
 	emulatorMutex.lock();
 	theEmulator->update(renderbuffer, frameCount);
@@ -418,7 +417,7 @@ void opl2instrument::play( sampleFrame * _working_buffer )
 }
 
 
-void opl2instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
+void OpulenzInstrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	op1_a_mdl.saveSettings( _doc, _this, "op1_a" );
 	op1_d_mdl.saveSettings( _doc, _this, "op1_d" );
@@ -452,7 +451,7 @@ void opl2instrument::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	trem_depth_mdl.saveSettings( _doc, _this, "trem_depth" );
 }
 
-void opl2instrument::loadSettings( const QDomElement & _this )
+void OpulenzInstrument::loadSettings( const QDomElement & _this )
 {
 	op1_a_mdl.loadSettings( _this, "op1_a" );
 	op1_d_mdl.loadSettings( _this, "op1_d" );
@@ -488,7 +487,7 @@ void opl2instrument::loadSettings( const QDomElement & _this )
 }
 
 // Load a patch into the emulator
-void opl2instrument::loadPatch(const unsigned char inst[14]) {
+void OpulenzInstrument::loadPatch(const unsigned char inst[14]) {
 	emulatorMutex.lock();
 	for(int v=0; v<OPL2_VOICES; ++v) {
 		theEmulator->write(0x20+adlib_opadd[v],inst[0]); // op1 AM/VIB/EG/KSR/Multiplier
@@ -506,7 +505,7 @@ void opl2instrument::loadPatch(const unsigned char inst[14]) {
 	emulatorMutex.unlock();
 }
 
-void opl2instrument::tuneEqual(int center, float Hz) {
+void OpulenzInstrument::tuneEqual(int center, float Hz) {
 	float tmp;
 	for(int n=0; n<128; ++n) {
 		tmp = Hz*pow( 2.0, ( n - center ) * ( 1.0 / 12.0 ) + pitchbend * ( 1.0 / 1200.0 ) );
@@ -515,7 +514,7 @@ void opl2instrument::tuneEqual(int center, float Hz) {
 }
 
 // Find suitable F number in lowest possible block
-int opl2instrument::Hz2fnum(float Hz) {
+int OpulenzInstrument::Hz2fnum(float Hz) {
 	for(int block=0; block<8; ++block) {
 		unsigned int fnum = Hz * pow( 2.0, 20.0 - (double)block ) * ( 1.0 / 49716.0 );
 		if(fnum<1023) {
@@ -526,13 +525,13 @@ int opl2instrument::Hz2fnum(float Hz) {
 }
 
 // Load one of the default patches
-void opl2instrument::loadGMPatch() {
+void OpulenzInstrument::loadGMPatch() {
 	unsigned char *inst = midi_fm_instruments[m_patchModel.value()];
 	loadPatch(inst);
 }
 
 // Update patch from the models to the chip emulation
-void opl2instrument::updatePatch() {
+void OpulenzInstrument::updatePatch() {
 	unsigned char inst[14] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	inst[0] = ( op1_trem_mdl.value() ?  128 : 0  ) +
 		( op1_vib_mdl.value() ?  64 : 0 ) +
@@ -586,7 +585,7 @@ void opl2instrument::updatePatch() {
 }
 
 // Load an SBI file into the knob models
-void opl2instrument::loadFile( const QString& file ) {
+void OpulenzInstrument::loadFile( const QString& file ) {
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBINS/
 	// http://cd.textfiles.com/soundsensations/SYNTH/SBI1198/1198SBI.ZIP
 	if( !file.isEmpty() && QFileInfo( file ).exists() )
@@ -678,7 +677,7 @@ void opl2instrument::loadFile( const QString& file ) {
 
 
 
-opl2instrumentView::opl2instrumentView( Instrument * _instrument,
+OpulenzInstrumentView::OpulenzInstrumentView( Instrument * _instrument,
                                                         QWidget * _parent ) :
         InstrumentView( _instrument, _parent )
 {
@@ -694,8 +693,8 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
 
 #define BUTTON_GEN(buttname, tooltip, xpos, ypos) \
 	buttname = new PixmapButton( this, NULL );\
-        buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_on" ) );\
-        buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opl2_led_off" ) );\
+        buttname->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "led_on" ) );\
+        buttname->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "led_off" ) );\
 	buttname->setCheckable( true );\
         ToolTip::add( buttname, tr( tooltip ) );\
         buttname->move( xpos, ypos );
@@ -760,13 +759,13 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
                                                                 "artwork" ) );
         setPalette( pal );
 }
-opl2instrumentView::~opl2instrumentView() {
+OpulenzInstrumentView::~OpulenzInstrumentView() {
 	// Knobs are QWidgets and our children, so they're 
 	// destroyed automagically
 }
 
 // Returns text for time knob formatted nicely
-inline QString opl2instrumentView::knobHintHelper(float n) {
+inline QString OpulenzInstrumentView::knobHintHelper(float n) {
 	if(n>1000) {
 		return QString::number(n/1000, 'f', 0)+ " s";
 	} else if(n>10) {
@@ -776,7 +775,7 @@ inline QString opl2instrumentView::knobHintHelper(float n) {
 	}
 }
 
-void opl2instrumentView::updateKnobHints()
+void OpulenzInstrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
@@ -796,7 +795,7 @@ void opl2instrumentView::updateKnobHints()
 		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
 	};
 
-	opl2instrument * m = castModel<opl2instrument>();
+	OpulenzInstrument * m = castModel<OpulenzInstrument>();
 	
 
 	op1_a_kn->setHintText( tr( "Attack" ),
@@ -817,9 +816,9 @@ void opl2instrumentView::updateKnobHints()
 			       " (" + QString::number(fmultipliers[(int)m->op2_mul_mdl.value()]) + " semitones)");
 }
 
-void opl2instrumentView::modelChanged()
+void OpulenzInstrumentView::modelChanged()
 {
-	opl2instrument * m = castModel<opl2instrument>();
+	OpulenzInstrument * m = castModel<OpulenzInstrument>();
 	// m_patch->setModel( &m->m_patchModel );
 
 	op1_a_kn->setModel( &m->op1_a_mdl );

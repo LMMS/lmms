@@ -60,7 +60,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		MultitapEcho
 		monstro
 		nes
-		opl2
+		OpulenZ
 		organic
 		FreeBoy
 		patman
