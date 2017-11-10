@@ -1,5 +1,5 @@
 /*
- * exprfront.cpp - implementation of a Frontend to ExprTk
+ * ExprSynth.cpp - Implementation of a Frontend to ExprTk
  *
  * Copyright (c) 2016-2017 Orr Dvori
  *
@@ -23,7 +23,7 @@
  */
 
 
-#include "exprsynth.h"
+#include "ExprSynth.h"
 
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@
 #include <cstdlib>
 #include <random>
 
-#include "expressive_plugin.h"
+#include "Xpressive.h"
 
 #include "interpolation.h"
 #include "lmms_math.h"

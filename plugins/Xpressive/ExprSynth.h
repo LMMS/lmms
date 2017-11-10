@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef EXPRFRONT_H_
-#define EXPRFRONT_H_
+#ifndef EXPRSYNTH_H
+#define EXPRSYNTH_H
 
 #include <cmath>
 #include <cstddef>
@@ -138,4 +138,4 @@ inline void clearArray(T* arr,unsigned int size)
 
 
 
-#endif /* EXPRFRONT_H_ */
+#endif
