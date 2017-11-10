@@ -53,12 +53,13 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	l->setVerticalSpacing( 2 );
 	l->setHorizontalSpacing( 2 );
 
-	bool embed_vst = ConfigManager::inst()->vstEmbedMethod() != "none";
+	bool embed_vst = false;
 
 	if( _ctl != NULL && _ctl->m_effect != NULL &&
 					_ctl->m_effect->m_plugin != NULL )
 	{
 		m_plugin = _ctl->m_effect->m_plugin;
+		embed_vst = m_plugin->embedMethod() != "none";
 
 		if (embed_vst) {
 			m_plugin->createUI( nullptr, true );

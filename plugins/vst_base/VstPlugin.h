@@ -107,6 +107,8 @@ public:
 
 	void createUI( QWidget *parent, bool isEffect );
 
+	QString embedMethod() const;
+
 public slots:
 	void setTempo( bpm_t _bpm );
 	void updateSampleRate();
@@ -132,6 +134,7 @@ private:
 	QPointer<vstSubWin> m_pluginSubWindow;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;
+	const QString m_embedMethod;
 
 	bool m_badDllFormat;
 
