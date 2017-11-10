@@ -32,6 +32,7 @@
 #include <QMenu>
 #include <QDomElement>
 
+#include "ConfigManager.h"
 #include "BufferManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
@@ -89,6 +90,10 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	Engine::mixer()->addPlayHandle( iph );
+
+	connect( ConfigManager::inst(), SIGNAL( valueChanged(QString,QString,QString) ),
+			 this, SLOT( handleConfigChange(QString, QString, QString) ),
+			 Qt::QueuedConnection );
 }
 
 
@@ -168,6 +173,20 @@ void vestigeInstrument::setParameter( void )
 	if ( m_plugin != NULL ) {
 		m_plugin->setParam( knobUNID, knobFModel[knobUNID]->value() );
 	}
+}
+
+void vestigeInstrument::handleConfigChange(QString cls, QString attr, QString value)
+{
+	if ( cls == "ui" && attr == "vstembedmethod" )
+	{
+		reloadPlugin();
+	}
+}
+
+void vestigeInstrument::reloadPlugin()
+{
+	closePlugin();
+	loadFile( m_pluginDLL );
 }
 
 
@@ -366,10 +385,6 @@ void vestigeInstrument::closePlugin( void )
 	}
 
 	m_pluginMutex.lock();
-	if( m_plugin )
-	{
-		delete m_plugin->pluginWidget();
-	}
 	delete m_plugin;
 	m_plugin = NULL;
 	m_pluginMutex.unlock();

@@ -352,12 +352,15 @@ void ConfigManager::setValue( const QString & cls,
 {
 	if( m_settings.contains( cls ) )
 	{
-		for( stringPairVector::iterator it = m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it )
+		for( QPair<QString, QString>& pair : m_settings[cls])
 		{
-			if( ( *it ).first == attribute )
+			if( pair.first == attribute )
 			{
-				( *it ).second = value;
+				if ( pair.second != value )
+				{
+					pair.second = value;
+					emit valueChanged( cls, attribute, value );
+				}
 				return;
 			}
 		}

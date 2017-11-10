@@ -587,9 +587,9 @@ void VstPlugin::showUI()
 
 void VstPlugin::hideUI()
 {
-	RemotePlugin::hideUI();
 	if ( m_embedMethod == "none" )
 	{
+		RemotePlugin::hideUI();
 	}
 	else if ( pluginWidget() != nullptr )
 	{

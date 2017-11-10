@@ -1019,6 +1019,20 @@ SetupDialog::~SetupDialog()
 
 void SetupDialog::accept()
 {
+	if( m_warnAfterSetup )
+	{
+		QMessageBox::information( NULL, tr( "Restart LMMS" ),
+					tr( "Please note that most changes "
+						"won't take effect until "
+						"you restart LMMS!" ),
+					QMessageBox::Ok );
+	}
+
+	// Hide dialog before setting values. This prevents an obscure bug
+	// where non-embedded VST windows would steal focus and prevent LMMS
+	// from taking mouse input, rendering the application unusable.
+	QDialog::accept();
+
 	ConfigManager::inst()->setValue( "mixer", "framesperaudiobuffer",
 					QString::number( m_bufferSize ) );
 	ConfigManager::inst()->setValue( "mixer", "audiodev",
@@ -1094,16 +1108,6 @@ void SetupDialog::accept()
 	}
 
 	ConfigManager::inst()->saveConfigFile();
-
-	QDialog::accept();
-	if( m_warnAfterSetup )
-	{
-		QMessageBox::information( NULL, tr( "Restart LMMS" ),
-					tr( "Please note that most changes "
-						"won't take effect until "
-						"you restart LMMS!" ),
-					QMessageBox::Ok );
-	}
 }
 
 
