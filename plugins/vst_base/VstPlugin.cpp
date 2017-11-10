@@ -130,6 +130,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
+	delete m_pluginSubWindow;
+	delete m_pluginWidget;
 }
 
 
