@@ -1,5 +1,5 @@
 /*
- * expressive_plugin.h - instrument which uses a mathematical formula
+ * Xpressive.h - Instrument which uses a mathematical formula parser
  *
  * Copyright (c) 2016-2017 Orr Dvori
  * 
@@ -23,8 +23,8 @@
  */
 
 
-#ifndef EXPRESSIVE_PLUGIN_H
-#define EXPRESSIVE_PLUGIN_H
+#ifndef XPRESSIVE_H
+#define XPRESSIVE_H
 
 #include <QPlainTextEdit>
 
@@ -35,10 +35,10 @@
 #include "LedCheckbox.h"
 #include "PixmapButton.h"
 
-#include "exprsynth.h"
+#include "ExprSynth.h"
 
 class oscillator;
-class expressiveView;
+class XpressiveView;
 
 const int	W1_EXPR = 0;
 const int	W2_EXPR = 1;
@@ -53,12 +53,12 @@ class SubWindow;
 
 
 
-class Expressive : public Instrument
+class Xpressive : public Instrument
 {
 	Q_OBJECT
 public:
-	Expressive(InstrumentTrack* instrument_track );
-	virtual ~Expressive();
+	Xpressive(InstrumentTrack* instrument_track );
+	virtual ~Xpressive();
 
 	virtual void playNote(NotePlayHandle* nph,
 						sampleFrame* working_buffer );
@@ -139,14 +139,14 @@ private:
 } ;
 
 
-class expressiveView : public InstrumentView
+class XpressiveView : public InstrumentView
 {
 	Q_OBJECT
 public:
-	expressiveView( Instrument* _instrument,
+	XpressiveView( Instrument* _instrument,
 					QWidget* _parent );
 
-	virtual ~expressiveView();
+	virtual ~XpressiveView();
 protected:
 
 
@@ -200,15 +200,15 @@ private:
 	bool m_wave_expr;
 } ;
 
-class expressiveHelpView: public QTextEdit
+class XpressiveHelpView: public QTextEdit
 {
 	Q_OBJECT
 public:
-	static expressiveHelpView* getInstance()
+	static XpressiveHelpView* getInstance()
 	{
 		if (!s_instance)
 		{
-			s_instance = new expressiveHelpView();
+			s_instance = new XpressiveHelpView();
 		}
 		return s_instance;
 	}
@@ -218,8 +218,8 @@ public:
 	}
 
 private:
-	expressiveHelpView();
-	static expressiveHelpView *s_instance;
+	XpressiveHelpView();
+	static XpressiveHelpView *s_instance;
 	static QString s_helpText;
 
 };

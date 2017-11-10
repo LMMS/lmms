@@ -1,5 +1,5 @@
 /*
- * expressive_plugin.cpp - instrument which uses a mathematical formula parser
+ * Xpressive.cpp - Instrument which uses a mathematical formula parser
  *
  * Copyright (c) 2016-2017 Orr Dvori
  * 
@@ -22,7 +22,7 @@
  *
  */
 
-#include "expressive_plugin.h"
+#include "Xpressive.h"
 
 #include <QDomElement>
 
@@ -46,7 +46,7 @@
 
 #include "embed.h"
 
-#include "exprsynth.h"
+#include "ExprSynth.h"
 
 extern "C" {
 
@@ -68,14 +68,14 @@ O2 -> trianglew(2t*f)*(0.5+0.5sinew(12*A1*t))+sinew(t*f)*(0.5+0.5sinew(12*A1*t+0
 
 /***********************************************************************
  *
- *	class Expressive
+ *	class Xpressive
  *
  *	lmms - plugin
  *
  ***********************************************************************/
 #define GRAPH_LENGTH 4096
 
-Expressive::Expressive(InstrumentTrack* instrument_track) :
+Xpressive::Xpressive(InstrumentTrack* instrument_track) :
 	Instrument(instrument_track, &xpressive_plugin_descriptor),
 	m_graphO1(-1.0f, 1.0f, 360, this),
 	m_graphO2(-1.0f, 1.0f, 360, this),
@@ -107,10 +107,10 @@ Expressive::Expressive(InstrumentTrack* instrument_track) :
 	m_outputExpression[1]="expw(integrate(f*atan(500t)*2/pi))*0.5+0.12";
 }
 
-Expressive::~Expressive() {
+Xpressive::~Xpressive() {
 }
 
-void Expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
+void Xpressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 	// Save plugin version
 	_this.setAttribute("version", "0.1");
@@ -146,7 +146,7 @@ void Expressive::saveSettings(QDomDocument & _doc, QDomElement & _this) {
 
 }
 
-void Expressive::loadSettings(const QDomElement & _this) {
+void Xpressive::loadSettings(const QDomElement & _this) {
 
 	m_outputExpression[0]=_this.attribute( "O1").toLatin1();
 	m_outputExpression[1]=_this.attribute( "O2").toLatin1();
@@ -191,11 +191,11 @@ void Expressive::loadSettings(const QDomElement & _this) {
 }
 
 
-QString Expressive::nodeName() const {
+QString Xpressive::nodeName() const {
 	return (xpressive_plugin_descriptor.name);
 }
 
-void Expressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
+void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	m_A1=m_parameterA1.value();
 	m_A2=m_parameterA2.value();
 	m_A3=m_parameterA3.value();
@@ -237,15 +237,15 @@ void Expressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 	instrumentTrack()->processAudioBuffer(working_buffer, frames + offset, nph);
 }
 
-void Expressive::deleteNotePluginData(NotePlayHandle* nph) {
+void Xpressive::deleteNotePluginData(NotePlayHandle* nph) {
 	delete static_cast<ExprSynth *>(nph->m_pluginData);
 }
 
-PluginView * Expressive::instantiateView(QWidget* parent) {
-	return (new expressiveView(this, parent));
+PluginView * Xpressive::instantiateView(QWidget* parent) {
+	return (new XpressiveView(this, parent));
 }
 
-class expressiveKnob: public Knob {
+class XpressiveKnob: public Knob {
 public:
 	void setStyle()
 	{
@@ -258,11 +258,11 @@ public:
 		setTotalAngle(300.0);
 		setLineWidth(3);
 	}
-	expressiveKnob(QWidget * _parent, const QString & _name) :
+	XpressiveKnob(QWidget * _parent, const QString & _name) :
 			Knob(knobStyled, _parent,_name) {
 		setStyle();
 	}
-	expressiveKnob(QWidget * _parent) :
+	XpressiveKnob(QWidget * _parent) :
 			Knob(knobStyled, _parent) {
 		setStyle();
 	}
@@ -270,7 +270,7 @@ public:
 };
 
 
-expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
+XpressiveView::XpressiveView(Instrument * _instrument, QWidget * _parent) :
 	InstrumentView(_instrument, _parent)
 
 {
@@ -352,7 +352,7 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_selectedGraphGroup->addButton(m_o1Btn);
 	m_selectedGraphGroup->addButton(m_o2Btn);
 
-	Expressive *e = castModel<Expressive>();
+	Xpressive *e = castModel<Xpressive>();
 	m_selectedGraphGroup->setModel(&e->selectedGraph());
 
 	m_sinWaveBtn = new PixmapButton(this, tr("Sine wave"));
@@ -423,27 +423,27 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	m_expressionEditor->move(9, 128);
 	m_expressionEditor->resize(180, 90);
 
-	m_generalPurposeKnob[0] = new expressiveKnob(this,"A1");
+	m_generalPurposeKnob[0] = new XpressiveKnob(this,"A1");
 	m_generalPurposeKnob[0]->setHintText(tr("General purpose 1:"), "");
 	m_generalPurposeKnob[0]->move(COL_KNOBS, ROW_KNOBSA1);
 
-	m_generalPurposeKnob[1] = new expressiveKnob(this,"A2");
+	m_generalPurposeKnob[1] = new XpressiveKnob(this,"A2");
 	m_generalPurposeKnob[1]->setHintText(tr("General purpose 2:"), "");
 	m_generalPurposeKnob[1]->move(COL_KNOBS, ROW_KNOBSA2);
 
-	m_generalPurposeKnob[2] = new expressiveKnob(this,"A3");
+	m_generalPurposeKnob[2] = new XpressiveKnob(this,"A3");
 	m_generalPurposeKnob[2]->setHintText(tr("General purpose 3:"), "");
 	m_generalPurposeKnob[2]->move(COL_KNOBS, ROW_KNOBSA3);
 
-	m_panningKnob[0] = new expressiveKnob(this,"O1 panning");
+	m_panningKnob[0] = new XpressiveKnob(this,"O1 panning");
 	m_panningKnob[0]->setHintText(tr("O1 panning:"), "");
 	m_panningKnob[0]->move(COL_KNOBS, ROW_KNOBSP1);
 
-	m_panningKnob[1] = new expressiveKnob(this,"O2 panning");
+	m_panningKnob[1] = new XpressiveKnob(this,"O2 panning");
 	m_panningKnob[1]->setHintText(tr("O2 panning:"), "");
 	m_panningKnob[1]->move(COL_KNOBS, ROW_KNOBSP2);
 
-	m_relKnob = new expressiveKnob(this,"Release transition");
+	m_relKnob = new XpressiveKnob(this,"Release transition");
 	m_relKnob->setHintText(tr("Release transition:"), "ms");
 	m_relKnob->move(COL_KNOBS, ROW_KNOBREL);
 
@@ -489,13 +489,13 @@ expressiveView::expressiveView(Instrument * _instrument, QWidget * _parent) :
 	updateLayout();
 }
 
-expressiveView::~expressiveView()
+XpressiveView::~XpressiveView()
 {
 }
 
 
-void expressiveView::expressionChanged() {
-	Expressive * e = castModel<Expressive>();
+void XpressiveView::expressionChanged() {
+	Xpressive * e = castModel<Xpressive>();
 	QByteArray text = m_expressionEditor->toPlainText().toLatin1();
 
 	switch (m_selectedGraphGroup->model()->value()) {
@@ -584,7 +584,7 @@ void expressiveView::expressionChanged() {
 	}
 }
 
-void Expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
+void Xpressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 {
 	out->setSamples(in->samples());
 	if (smoothness>0)
@@ -613,10 +613,10 @@ void Expressive::smooth(float smoothness,const graphModel * in,graphModel * out)
 
 
 
-void expressiveView::smoothChanged()
+void XpressiveView::smoothChanged()
 {
 	
-	Expressive * e = castModel<Expressive>();
+	Xpressive * e = castModel<Xpressive>();
 	float smoothness=0;
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
@@ -629,7 +629,7 @@ void expressiveView::smoothChanged()
 		smoothness=e->smoothW3().value();
 		break;
 	}
-	Expressive::smooth(smoothness,m_raw_graph,m_graph->model());
+	Xpressive::smooth(smoothness,m_raw_graph,m_graph->model());
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->W1().copyFrom(m_graph->model());
@@ -645,10 +645,10 @@ void expressiveView::smoothChanged()
 	m_graph->setEnabled(m_smoothKnob->model()->value() == 0 && m_expressionEditor->toPlainText().size() == 0);
 }
 
-void expressiveView::graphDrawn()
+void XpressiveView::graphDrawn()
 {
 	m_raw_graph->setSamples(m_graph->model()->samples());
-	Expressive * e = castModel<Expressive>();
+	Xpressive * e = castModel<Xpressive>();
 	switch (m_selectedGraphGroup->model()->value()) {
 	case W1_EXPR:
 		e->W1().copyFrom(m_graph->model());
@@ -663,8 +663,8 @@ void expressiveView::graphDrawn()
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::modelChanged() {
-	Expressive * b = castModel<Expressive>();
+void XpressiveView::modelChanged() {
+	Xpressive * b = castModel<Xpressive>();
 
 	m_expressionValidToggle->setModel( &b->exprValid() );
 	m_generalPurposeKnob[0]->setModel( &b->parameterA1() );
@@ -679,8 +679,8 @@ void expressiveView::modelChanged() {
 	updateLayout();
 }
 
-void expressiveView::updateLayout() {
-	Expressive * e = castModel<Expressive>();
+void XpressiveView::updateLayout() {
+	Xpressive * e = castModel<Xpressive>();
 	m_output_expr=false;
 	m_wave_expr=false;
 	switch (m_selectedGraphGroup->model()->value()) {
@@ -743,7 +743,7 @@ void expressiveView::updateLayout() {
 	}
 }
 
-void expressiveView::sinWaveClicked() {
+void XpressiveView::sinWaveClicked() {
 	if (m_output_expr)
 		m_expressionEditor->appendPlainText("sinew(t*f)");
 	else
@@ -751,7 +751,7 @@ void expressiveView::sinWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::triangleWaveClicked() {
+void XpressiveView::triangleWaveClicked() {
 	if (m_output_expr)
 		m_expressionEditor->appendPlainText("trianglew(t*f)");
 	else
@@ -759,7 +759,7 @@ void expressiveView::triangleWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::sawWaveClicked() {
+void XpressiveView::sawWaveClicked() {
 	if (m_output_expr)
 		m_expressionEditor->appendPlainText("saww(t*f)");
 	else
@@ -767,7 +767,7 @@ void expressiveView::sawWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::sqrWaveClicked() {
+void XpressiveView::sqrWaveClicked() {
 	if (m_output_expr)
 		m_expressionEditor->appendPlainText("squarew(t*f)");
 	else
@@ -775,12 +775,12 @@ void expressiveView::sqrWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::noiseWaveClicked() {
+void XpressiveView::noiseWaveClicked() {
 	m_expressionEditor->appendPlainText("rand");
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::moogSawWaveClicked()
+void XpressiveView::moogSawWaveClicked()
 {
 	if (m_output_expr)
 		m_expressionEditor->appendPlainText("moogsaww(t*f)");
@@ -788,7 +788,7 @@ void expressiveView::moogSawWaveClicked()
 		m_expressionEditor->appendPlainText("moogsaww(t)");
 	Engine::getSong()->setModified();
 }
-void expressiveView::expWaveClicked()
+void XpressiveView::expWaveClicked()
 {
 	if (m_output_expr)
 		m_expressionEditor->appendPlainText("expw(t*f)");
@@ -797,16 +797,16 @@ void expressiveView::expWaveClicked()
 	Engine::getSong()->setModified();
 }
 
-void expressiveView::usrWaveClicked() {
+void XpressiveView::usrWaveClicked() {
 	m_expressionEditor->setPlainText("");
 	QString fileName = m_raw_graph->setWaveToUser();
 	smoothChanged();
 	Engine::getSong()->setModified();
 }
 
-expressiveHelpView* expressiveHelpView::s_instance=0;
+XpressiveHelpView* XpressiveHelpView::s_instance=0;
 
-QString expressiveHelpView::s_helpText=
+QString XpressiveHelpView::s_helpText=
 "<b>O1, O2</b> - Two output waves. Panning is controled by PN1 and PN2.<br>"
 "<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
 "These waves can be used as functions inside the output waves (O1, O2). The wave period is 1.<br>"
@@ -854,7 +854,7 @@ QString expressiveHelpView::s_helpText=
 "<b>Phase Modulation</b> - [vol1]*W1( integrate(f) + [vol2]*W2( integrate(f) ) )<br>"
 		;
 
-expressiveHelpView::expressiveHelpView():QTextEdit(s_helpText)
+XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 {
 	setWindowTitle ( "X-Pressive Help" );
 	setTextInteractionFlags ( Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse );
@@ -864,21 +864,21 @@ expressiveHelpView::expressiveHelpView():QTextEdit(s_helpText)
 	parentWidget()->setFixedSize( 300, 500);
 }
 
-void expressiveView::helpClicked() {
-	expressiveHelpView::getInstance()->show();
+void XpressiveView::helpClicked() {
+	XpressiveHelpView::getInstance()->show();
 
 }
 
 __attribute__((destructor)) static void module_destroy()
 {
-	expressiveHelpView::finalize();
+	XpressiveHelpView::finalize();
 }
 
 extern "C" {
 
 // necessary for getting instance out of shared lib
 Plugin * PLUGIN_EXPORT lmms_plugin_main(Model *, void * _data) {
-	return (new Expressive(static_cast<InstrumentTrack *>(_data)));
+	return (new Xpressive(static_cast<InstrumentTrack *>(_data)));
 }
 
 }
