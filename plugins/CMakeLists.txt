@@ -80,7 +80,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		watsyn
 		waveshaper
 		vibed
-		xpressive
+		Xpressive
 		zynaddsubfx
 	)
 
