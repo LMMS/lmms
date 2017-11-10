@@ -7,6 +7,6 @@
 [submodule "plugins/FreeBoy/game-music-emu"]
 	path = plugins/FreeBoy/game-music-emu
 	url = https://bitbucket.org/mpyne/game-music-emu.git
-[submodule "plugins/opl2/adplug"]
-	path = plugins/opl2/adplug
+[submodule "plugins/OpulenZ/adplug"]
+	path = plugins/OpulenZ/adplug
 	url = https://github.com/adplug/adplug.git
