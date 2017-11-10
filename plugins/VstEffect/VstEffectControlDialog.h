@@ -31,6 +31,7 @@
 #include <QObject>
 #include <QPainter>
 #include <QLabel>
+#include <QSharedPointer>
 
 
 class VstEffectControls;
@@ -59,7 +60,7 @@ private:
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
 
-	VstPlugin * m_plugin;
+	QSharedPointer<VstPlugin> m_plugin;
 
 	QLabel * tbLabel;
 
