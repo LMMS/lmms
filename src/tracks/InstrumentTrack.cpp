@@ -1260,6 +1260,18 @@ QMenu * InstrumentTrackView::createFxMenu(QString title, QString newFxLabel)
 	return fxMenu;
 }
 
+void InstrumentTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *trackOperations)
+{
+	TrackView::updateTrackOperationsWidgetMenu (trackOperations);
+
+	auto toMenu = trackOperations->trackOps ()->menu ();
+	QMenu *fxMenu = createFxMenu( tr( "FX %1: %2" ), tr( "Assign to new FX Channel" ));
+	toMenu->addMenu(fxMenu);
+
+	toMenu->addSeparator();
+	toMenu->addMenu( midiMenu() );
+}
+
 
 
 

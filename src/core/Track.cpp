@@ -1886,6 +1886,11 @@ void TrackOperationsWidget::clearTrack()
 	t->unlock();
 }
 
+QPushButton *TrackOperationsWidget::trackOps() const
+{
+	return m_trackOps;
+}
+
 
 
 /*! \brief Remove this track from the track list
@@ -1909,64 +1914,8 @@ void TrackOperationsWidget::removeTrack()
  */
 void TrackOperationsWidget::updateMenu()
 {
-	QMenu * toMenu = m_trackOps->menu();
-	toMenu->clear();
-	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
-						tr( "Clone this track" ),
-						this, SLOT( cloneTrack() ) );
-	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
-						tr( "Remove this track" ),
-						this, SLOT( removeTrack() ) );
-
-	if( ! m_trackView->trackContainerView()->fixedTCOs() )
-	{
-		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
-	}
-	if (QMenu *fxMenu = m_trackView->createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
-	{
-		toMenu->addMenu(fxMenu);
-	}
-
-	if (InstrumentTrackView * trackView = dynamic_cast<InstrumentTrackView *>(m_trackView))
-	{
-		toMenu->addSeparator();
-		toMenu->addMenu(trackView->midiMenu());
-	}
-	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
-	{
-		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
-		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
-	}
+	return m_trackView->updateTrackOperationsWidgetMenu (this);
 }
-
-
-void TrackOperationsWidget::toggleRecording( bool on )
-{
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
-	if( atv )
-	{
-		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
-		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
-			if( ap ) { ap->setRecording( on ); }
-		}
-		atv->update();
-	}
-}
-
-
-
-void TrackOperationsWidget::recordingOn()
-{
-	toggleRecording( true );
-}
-
-
-void TrackOperationsWidget::recordingOff()
-{
-	toggleRecording( false );
-}
-
 
 // ===========================================================================
 // track
@@ -2672,6 +2621,29 @@ void TrackView::update()
 		m_trackContentWidget.changePosition();
 	}
 	QWidget::update();
+}
+
+void TrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *trackOperations)
+{
+	QMenu * toMenu = trackOperations->m_trackOps->menu();
+
+	toMenu->clear();
+	toMenu->addAction( embed::getIconPixmap( "edit_copy", 16, 16 ),
+						tr( "Clone this track" ),
+						trackOperations, SLOT( cloneTrack() ) );
+	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
+						tr( "Remove this track" ),
+						trackOperations, SLOT( removeTrack() ) );
+
+	if( ! trackContainerView()->fixedTCOs() )
+	{
+		toMenu->addAction( tr( "Clear this track" ), trackOperations, SLOT( clearTrack() ) );
+	}
+
+	if (QMenu *fxMenu = createFxMenu(tr("FX %1: %2"), tr("Assign to new FX Channel")))
+	{
+		toMenu->addMenu(fxMenu);
+	}
 }
 
 

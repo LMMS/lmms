@@ -319,6 +319,8 @@ public:
 	QMenu * createFxMenu( QString title, QString newFxLabel );
 
 
+	virtual void updateTrackOperationsWidgetMenu (TrackOperationsWidget *trackOperations) override;
+
 protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
