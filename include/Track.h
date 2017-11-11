@@ -429,6 +429,8 @@ public:
 	~TrackOperationsWidget();
 
 
+	QPushButton *trackOps() const;
+
 protected:
 	virtual void mousePressEvent( QMouseEvent * me );
 	virtual void paintEvent( QPaintEvent * pe );
@@ -438,8 +440,6 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-	void recordingOn();
-	void recordingOff();
 	void clearTrack();
 
 private:
@@ -675,6 +675,8 @@ public:
 	}
 
 	virtual void update();
+
+	virtual void updateTrackOperationsWidgetMenu (TrackOperationsWidget *trackOperations);
 
 
 public slots:
