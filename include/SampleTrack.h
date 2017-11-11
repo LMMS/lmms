@@ -133,6 +133,13 @@ class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
+	enum RecordingChannel : int {
+		None,
+		MonoRight,
+		MonoLeft,
+		Stereo,
+	};
+
 	SampleTrack( TrackContainer* tc );
 	virtual ~SampleTrack();
 
@@ -156,11 +163,16 @@ public:
 		return "sampletrack";
 	}
 
+	RecordingChannel recordingChannel() const;
+	void setRecordingChannel(const RecordingChannel &recordingChannel);
+
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
 
 private:
+	RecordingChannel m_recordingChannel = RecordingChannel::None;
+
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	AudioPort m_audioPort;
@@ -181,6 +193,8 @@ public:
 	virtual ~SampleTrackView();
 
 
+	virtual void updateTrackOperationsWidgetMenu (TrackOperationsWidget *trackOperations) override;
+
 public slots:
 	void showEffects();
 
@@ -192,6 +206,9 @@ protected:
 		return "SampleTrackView";
 	}
 
+
+private slots:
+	void onRecordActionSelected (QAction *action);
 
 private:
 	EffectRackView * m_effectRack;
