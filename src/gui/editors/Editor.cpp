@@ -25,6 +25,8 @@
 #include "Editor.h"
 
 #include "Song.h"
+#include "ComboBox.h"
+#include "ToolButton.h"
 
 #include "MainWindow.h"
 #include "embed.h"
@@ -107,10 +109,15 @@ Editor::Editor(bool record, bool stepRecord) :
 
 	// Add actions to toolbar
 	addButton(m_playAction, "playButton");
+	addButton(m_stopAction, "stopButton");
+
+	// Seperate playback buttons and recording buttons.
+	m_toolBar->addSeparator ();
+
 	if (record)
 	{
-		addButton(m_recordAction, "recordButton");
 		addButton(m_recordAccompanyAction, "recordAccompanyButton");
+		addButton(m_recordAction, "m_recordAction");
 	}
 	if(stepRecord)
 	{
