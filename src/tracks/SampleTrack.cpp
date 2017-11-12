@@ -840,7 +840,7 @@ void SampleTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *tra
 	SampleTrack * st = castModel<SampleTrack>();
 	auto toMenu = trackOperations->trackOps ()->menu ();
 
-	QMenu *recordMenu = toMenu->addMenu (tr ("Set record type"));
+	QMenu *recordMenu = toMenu->addMenu (tr ("Set record channnel"));
 	auto *recordChannels = new QActionGroup(recordMenu);
 
 	recordChannels->setExclusive (true);
