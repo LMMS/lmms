@@ -826,7 +826,6 @@ void SampleTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *tra
 
 	recordChannels->setExclusive (true);
 
-	recordChannels->addAction(tr( "default" ))->setData (SampleTrack::RecordingChannel::None);
 	recordChannels->addAction(tr( "Stereo" ))->setData (SampleTrack::RecordingChannel::Stereo);
 	recordChannels->addAction(tr( "Mono left" ))->setData (SampleTrack::RecordingChannel::MonoLeft);
 	recordChannels->addAction(tr( "Mono right" ))->setData (SampleTrack::RecordingChannel::MonoRight);
@@ -876,7 +875,15 @@ void SampleTrackView::modelChanged()
 
 void SampleTrackView::onRecordActionSelected(QAction *action) {
 	SampleTrack * st = castModel<SampleTrack>();
-	st->setRecordingChannel (static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>()));
+	auto selectedRecordingChannel = static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>());
 
-	action->setChecked (true);
+	// If we've selected the current recording channel again, we should undo it.
+	if (selectedRecordingChannel == st->m_recordingChannel) {
+		st->setRecordingChannel (SampleTrack::RecordingChannel::None);
+		action->setChecked (false);
+	} else {
+		st->setRecordingChannel (selectedRecordingChannel);
+		action->setChecked (true);
+	}
+
 }
