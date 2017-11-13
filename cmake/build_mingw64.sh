@@ -8,7 +8,7 @@ else
 	CMAKE_OPTS="$CMAKE_OPTS -DLMMS_BUILD_MSYS=1"
 fi
 
-export PATH=$PATH:$MINGW/bin
+export PATH=$MINGW/bin:$PATH
 
 if [ "$1" = "-qt5" ]; then
         QT5=True
@@ -19,4 +19,6 @@ if [ $QT5 ]; then
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cmake $DIR/.. -DCMAKE_TOOLCHAIN_FILE=$DIR/../cmake/modules/Win64Toolchain.cmake -DCMAKE_MODULE_PATH=$DIR/../cmake/modules/ $CMAKE_OPTS
+
+# shellcheck disable=SC2086
+cmake "$DIR/.." -DCMAKE_TOOLCHAIN_FILE="$DIR/../cmake/modules/Win64Toolchain.cmake" -DCMAKE_MODULE_PATH="$DIR/../cmake/modules/" $CMAKE_OPTS

@@ -4,7 +4,7 @@
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2012-2013 Paul Giblock    <p/at/pgiblock.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,19 +32,18 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QTextStream>
 
 #include "base64.h"
 #include "ConfigManager.h"
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "lmms_basics.h"
-#include "lmmsversion.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+
+#include "lmmsversion.h"
 
 static void findIds(const QDomElement& elem, QList<jo_id_t>& idList);
 
@@ -901,6 +900,129 @@ void DataFile::upgrade_1_1_91()
 }
 
 
+void DataFile::upgrade_1_2_0_rc3()
+{
+	// Upgrade from earlier bbtrack beat note behaviour of adding
+	// steps if a note is placed after the last step.
+	QDomNodeList bbtracks = elementsByTagName( "bbtrack" );
+	for( int i = 0; !bbtracks.item( i ).isNull(); ++i )
+	{
+		QDomNodeList patterns = bbtracks.item( i
+				).toElement().elementsByTagName(
+								"pattern" );
+		for( int j = 0; !patterns.item( j ).isNull(); ++j )
+		{
+			int patternLength, steps;
+			QDomElement el = patterns.item( j ).toElement();
+			if( el.attribute( "len" ) != "" )
+			{
+				patternLength = el.attribute( "len" ).toInt();
+				steps = patternLength / 12;
+				el.setAttribute( "steps", steps );
+			}
+		}
+	}
+}
+
+
+static void upgradeElement_1_2_0_rc2_42( QDomElement & el )
+{
+	if( el.hasAttribute( "syncmode" ) )
+	{
+		int syncmode = el.attribute( "syncmode" ).toInt();
+		QStringList names;
+		QDomNamedNodeMap atts = el.attributes();
+		for( uint i = 0; i < atts.length(); i++ )
+		{
+			QString name = atts.item( i ).nodeName();
+			if( name.endsWith( "_numerator" ) )
+			{
+				names << name.remove( "_numerator" )
+								+ "_syncmode";
+			}
+		}
+		for( QStringList::iterator it = names.begin(); it < names.end();
+									++it )
+		{
+			el.setAttribute( *it, syncmode );
+		}
+	}
+
+	QDomElement child = el.firstChildElement();
+	while ( !child.isNull() )
+	{
+		upgradeElement_1_2_0_rc2_42( child );
+		child = child.nextSiblingElement();
+	}
+}
+
+
+void DataFile::upgrade_1_2_0_rc2_42()
+{
+	QDomElement el = firstChildElement();
+	while ( !el.isNull() )
+	{
+		upgradeElement_1_2_0_rc2_42( el );
+		el = el.nextSiblingElement();
+	}
+}
+
+
+void DataFile::upgrade_1_3_0()
+{
+	QDomNodeList list = elementsByTagName( "instrument" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if( el.attribute( "name" ) == "papu" )
+		{
+			el.setAttribute( "name", "freeboy" );
+			QDomNodeList children = el.elementsByTagName( "papu" );
+			for( int j = 0; !children.item( j ).isNull(); ++j )
+			{
+				QDomElement child = children.item( j ).toElement();
+				child.setTagName( "freeboy" );
+			}
+		}
+		else if( el.attribute( "name" ) == "OPL2" )
+		{
+			el.setAttribute( "name", "opulenz" );
+			QDomNodeList children = el.elementsByTagName( "OPL2" );
+			for( int j = 0; !children.item( j ).isNull(); ++j )
+			{
+				QDomElement child = children.item( j ).toElement();
+				child.setTagName( "opulenz" );
+			}
+		}
+	}
+
+	list = elementsByTagName( "effect" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement effect = list.item( i ).toElement();
+		if( effect.attribute( "name" ) == "ladspaeffect" )
+		{
+			QDomNodeList keys = effect.elementsByTagName( "key" );
+			for( int j = 0; !keys.item( j ).isNull(); ++j )
+			{
+				QDomElement key = keys.item( j ).toElement();
+				QDomNodeList attributes = key.elementsByTagName( "attribute" );
+				for( int k = 0; !attributes.item( k ).isNull(); ++k )
+				{
+					QDomElement attribute = attributes.item( k ).toElement();
+					if( attribute.attribute( "name" ) == "file" &&
+							( attribute.attribute( "value" ) == "calf" || 
+							attribute.attribute( "value" ) == "calf.so" ) )
+					{
+						attribute.setAttribute( "value", "veal" );
+					}
+				}
+			}
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -976,6 +1098,15 @@ void DataFile::upgrade()
 	if( version < "1.1.91-0" )
 	{
 		upgrade_1_1_91();
+	}
+	if( version < "1.2.0-rc3" )
+	{
+		upgrade_1_2_0_rc3();
+		upgrade_1_2_0_rc2_42();
+	}
+	if( version < "1.3.0" )
+	{
+		upgrade_1_3_0();
 	}
 
 	// update document meta data

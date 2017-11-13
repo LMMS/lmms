@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -29,6 +29,7 @@
 
 #include <QVector>
 
+#include "ActionGroup.h"
 #include "Editor.h"
 #include "TrackContainerView.h"
 
@@ -81,6 +82,8 @@ public slots:
 	void setEditModeSelect();
 
 	void updatePosition( const MidiTime & t );
+	void updatePositionLine();
+	void selectAllTcos( bool select );
 
 protected:
 	virtual void closeEvent( QCloseEvent * ce );
@@ -134,6 +137,7 @@ private:
 	bool m_smoothScroll;
 
 	EditMode m_mode;
+	EditMode m_ctrlMode; // mode they were in before they hit ctrl
 
 	friend class SongEditorWindow;
 
@@ -152,6 +156,9 @@ public:
 
 	SongEditor* m_editor;
 
+protected:
+	virtual void resizeEvent( QResizeEvent * event );
+
 public slots:
 	void play();
 	void record();
@@ -165,18 +172,25 @@ public slots:
 protected slots:
 	void recordAccompany();
 
+	void lostFocus();
 	void adjustUiAfterProjectLoad();
 
 signals:
 	void playTriggered();
+	void resized();
 
 private:
+	virtual void keyPressEvent( QKeyEvent * ke );
+	virtual void keyReleaseEvent( QKeyEvent * ke );
+
 	QAction* m_addBBTrackAction;
 	QAction* m_addSampleTrackAction;
 	QAction* m_addAutomationTrackAction;
 
+	ActionGroup * m_editModeGroup;
 	QAction* m_drawModeAction;
 	QAction* m_selectModeAction;
+	QAction* m_crtlAction;
 
 	ComboBox * m_zoomingComboBox;
 };

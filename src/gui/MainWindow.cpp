@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,7 +30,6 @@
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMdiArea>
-#include <QMdiSubWindow>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
@@ -42,7 +41,6 @@
 #include "AudioDummy.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
-#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
@@ -52,26 +50,21 @@
 #include "GrooveView.h"
 #include "StudioControllerView.h"
 #include "GuiApplication.h"
-#include "InstrumentTrack.h"
-#include "lmmsversion.h"
-#include "Mixer.h"
 #include "PianoRoll.h"
-#include "PianoView.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
-#include "Song.h"
 #include "SongEditor.h"
-#include "SubWindow.h"
-#include "templates.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
 
+#include "lmmsversion.h"
 
 
 
@@ -201,7 +194,7 @@ MainWindow::MainWindow() :
 
 	m_updateTimer.start( 1000 / 20, this );  // 20 fps
 
-	if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() )
+	if( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() )
 	{
 		// connect auto save
 		connect(&m_autoSaveTimer, SIGNAL(timeout()), this, SLOT(autoSave()));
@@ -310,14 +303,16 @@ void MainWindow::finalize()
 					SLOT( exportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
-	// temporarily disabled broken MIDI export				
-	/*project_menu->addAction( embed::getIconPixmap( "midi_file" ),
+	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
 					Engine::getSong(),
 					SLOT( exportProjectMidi() ),
-					Qt::CTRL + Qt::Key_M );*/
+					Qt::CTRL + Qt::Key_M );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
+#endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
 					qApp, SLOT( closeAllWindows() ),
 					Qt::CTRL + Qt::Key_Q );
@@ -392,7 +387,10 @@ void MainWindow::finalize()
 					tr( "What's This?" ),
 					this, SLOT( enterWhatsThisMode() ) );
 
+// Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
+#endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
@@ -688,10 +686,6 @@ void MainWindow::resetWindowTitle()
 	{
 		title += " - " + tr( "Recover session. Please save your work!" );
 	}
-	if( getSession() == Limited )
-	{
-		title += " - " + tr( "Automatic backup disabled. Remember to save your work!" );
-	}
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
@@ -762,7 +756,7 @@ void MainWindow::clearKeyModifiers()
 
 
 
-void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const & sizeIfInvisible )
+void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de )
 {
 	// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
 	// we really care about the position of the *window* - not the position of the widget within its window
@@ -785,7 +779,7 @@ void MainWindow::saveWidgetState( QWidget * _w, QDomElement & _de, QSize const &
 	_de.setAttribute( "x", normalGeom.x() );
 	_de.setAttribute( "y", normalGeom.y() );
 
-	QSize sizeToStore = visible ? normalGeom.size() : sizeIfInvisible;
+	QSize sizeToStore = normalGeom.size();
 	_de.setAttribute( "width", sizeToStore.width() );
 	_de.setAttribute( "height", sizeToStore.height() );
 }
@@ -797,8 +791,8 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 {
 	QRect r( qMax( 1, _de.attribute( "x" ).toInt() ),
 			qMax( 1, _de.attribute( "y" ).toInt() ),
-			qMax( 100, _de.attribute( "width" ).toInt() ),
-			qMax( 100, _de.attribute( "height" ).toInt() ) );
+			qMax( _w->sizeHint().width(), _de.attribute( "width" ).toInt() ),
+			qMax( _w->minimumHeight(), _de.attribute( "height" ).toInt() ) );
 	if( _de.hasAttribute( "visible" ) && !r.isNull() )
 	{
 		// If our widget is the main content of a window (e.g. piano roll, FxMixer, etc), 
@@ -849,7 +843,6 @@ void MainWindow::createNewProject()
 	{
 		Engine::getSong()->createNewProject();
 	}
-	runAutoSave();
 }
 
 
@@ -868,7 +861,6 @@ void MainWindow::createNewProjectFromTemplate( QAction * _idx )
 		Engine::getSong()->createNewProjectFromTemplate(
 			dirBase + _idx->text() + ".mpt" );
 	}
-	runAutoSave();
 }
 
 
@@ -893,7 +885,6 @@ void MainWindow::openProject()
 			setCursor( Qt::ArrowCursor );
 		}
 	}
-	runAutoSave();
 }
 
 
@@ -904,8 +895,8 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 	m_recentlyOpenedProjectsMenu->clear();
 	QStringList rup = ConfigManager::inst()->recentlyOpenedProjects();
 
-//	The file history goes 30 deep but we only show the 15
-//	most recent ones that we can open.
+//	The file history goes 50 deep but we only show the 15
+//	most recent ones that we can open and omit .mpt files.
 	int shownInMenu = 0;
 	for( QStringList::iterator it = rup.begin(); it != rup.end(); ++it )
 	{
@@ -913,8 +904,17 @@ void MainWindow::updateRecentlyOpenedProjectsMenu()
 		if ( recentFile.exists() && 
 				*it != ConfigManager::inst()->recoveryFile() )
 		{
+			if( recentFile.suffix().toLower() == "mpt" )
+			{
+				continue;
+			}
+
 			m_recentlyOpenedProjectsMenu->addAction(
 					embed::getIconPixmap( "project_file" ), *it );
+#ifdef LMMS_BUILD_APPLE
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_recentlyOpenedProjectsMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 			shownInMenu++;
 			if( shownInMenu >= 15 )
 			{
@@ -934,10 +934,8 @@ void MainWindow::openRecentlyOpenedProject( QAction * _action )
 		const QString & f = _action->text();
 		setCursor( Qt::WaitCursor );
 		Engine::getSong()->loadProject( f );
-		ConfigManager::inst()->addRecentlyOpenedProject( f );
 		setCursor( Qt::ArrowCursor );
 	}
-	runAutoSave();
 }
 
 
@@ -1407,8 +1405,8 @@ void MainWindow::closeEvent( QCloseEvent * _ce )
 	if( mayChangeProject(true) )
 	{
 		// delete recovery file
-		if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt()
-			&& getSession() != Limited )
+		if( ConfigManager::inst()->
+				value( "ui", "enableautosave" ).toInt() )
 		{
 			sessionCleanup();
 			_ce->accept();
@@ -1516,6 +1514,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 
 	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
@@ -1533,6 +1535,10 @@ void MainWindow::fillTemplatesMenu()
 		m_templatesMenu->addAction(
 					embed::getIconPixmap( "project_file" ),
 					( *it ).left( ( *it ).length() - 4 ) );
+#ifdef LMMS_BUILD_APPLE
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+#endif
 	}
 }
 
@@ -1563,10 +1569,13 @@ void MainWindow::browseHelp()
 
 void MainWindow::autoSave()
 {
-	if( ( !ConfigManager::inst()->value( "ui", "disablerunningautosave" ).toInt() ||
-		! Engine::getSong()->isPlaying() ) &&
-		!( Engine::getSong()->isExporting() ||
-		QApplication::mouseButtons() ) )
+	if( !Engine::getSong()->isExporting() &&
+		!Engine::getSong()->isLoadingProject() &&
+		!RemotePluginBase::isMainThreadWaiting() &&
+		!QApplication::mouseButtons() &&
+		( ConfigManager::inst()->value( "ui",
+				"enablerunningautosave" ).toInt() ||
+			! Engine::getSong()->isPlaying() ) )
 	{
 		Engine::getSong()->saveProjectFile(ConfigManager::inst()->recoveryFile());
 		autoSaveTimerReset();  // Reset timer
@@ -1578,18 +1587,5 @@ void MainWindow::autoSave()
 		{
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
-	}
-}
-
-
-// For the occasional auto save action that isn't run
-// from the timer where we need to do extra tests.
-void MainWindow::runAutoSave()
-{
-	if( !ConfigManager::inst()->value( "ui", "disableautosave" ).toInt() &&
-		getSession() != Limited )
-	{
-		autoSave();
-		autoSaveTimerReset();  // Reset timer
 	}
 }

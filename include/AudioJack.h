@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,11 @@
 #include "lmmsconfig.h"
 
 #ifdef LMMS_HAVE_JACK
+#ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
+#else
+#include "AudioWeakJack.h"
+#endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>

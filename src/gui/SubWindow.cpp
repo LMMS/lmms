@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 
 #include <QMdiArea>
 #include <QMoveEvent>
-#include <QResizeEvent>
 #include <QScrollBar>
 
 #include "embed.h"
@@ -38,7 +37,8 @@
 SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	QMdiSubWindow( parent, windowFlags ),
 	m_buttonSize( 17, 17 ),
-	m_titleBarHeight( 24 )
+	m_titleBarHeight( 24 ),
+	m_hasFocus( false )
 {
 	// initialize the tracked geometry to whatever Qt thinks the normal geometry currently is.
 	// this should always work, since QMdiSubWindows will not start as maximized
@@ -89,6 +89,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	setWindowFlags( Qt::SubWindow | Qt::WindowMaximizeButtonHint |
 		Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint |
 		Qt::CustomizeWindowHint );
+	connect( mdiArea(), SIGNAL( subWindowActivated( QMdiSubWindow* ) ), this, SLOT( focusChanged( QMdiSubWindow* ) ) );
 }
 
 
@@ -284,6 +285,22 @@ void SubWindow::adjustTitleBar()
 	elideText( m_windowTitle, widget()->windowTitle() );
 	m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
 	m_windowTitle->adjustSize();
+}
+
+
+
+
+void SubWindow::focusChanged( QMdiSubWindow *subWindow )
+{
+	if( m_hasFocus && subWindow != this )
+	{
+		m_hasFocus = false;
+		emit focusLost();
+	}
+	else if( subWindow == this )
+	{
+		m_hasFocus = true;
+	}
 }
 
 

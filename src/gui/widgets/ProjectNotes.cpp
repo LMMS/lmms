@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,7 +32,6 @@
 #include <QFontDatabase>
 #include <QLineEdit>
 #include <QMdiArea>
-#include <QTextCursor>
 #include <QTextEdit>
 #include <QToolBar>
 #include <QDomCDATASection>
@@ -68,7 +67,7 @@ ProjectNotes::ProjectNotes() :
 	setupActions();
 
 	setCentralWidget( m_edit );
-	setWindowTitle( tr( "Project notes" ) );
+	setWindowTitle( tr( "Project Notes" ) );
 	setWindowIcon( embed::getIconPixmap( "project_notes" ) );
 
 	gui->mainWindow()->addWindowedWidget( this );
@@ -90,7 +89,7 @@ ProjectNotes::~ProjectNotes()
 
 void ProjectNotes::clear()
 {
-	m_edit->setHtml( tr( "Put down your project notes here." ) );
+	m_edit->setHtml( tr( "Enter project notes here" ) );
 	m_edit->selectAll();
 	m_edit->setTextColor( QColor( 224, 224, 224 ) );
 	QTextCursor cursor = m_edit->textCursor();
@@ -439,7 +438,7 @@ void ProjectNotes::alignmentChanged( int _a )
 
 void ProjectNotes::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	MainWindow::saveWidgetState( this, _this, QSize( 640, 400 ) );
+	MainWindow::saveWidgetState( this, _this );
 
 	QDomCDATASection ds = _doc.createCDATASection( m_edit->toHtml() );
 	_this.appendChild( ds );

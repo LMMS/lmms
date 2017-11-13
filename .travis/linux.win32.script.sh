@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
-export CMAKE_OPTS="-DUSE_WERROR=ON"
+set -e
+
+export CMAKE_OPTS="$CMAKE_FLAGS -DUSE_WERROR=ON"
 ../cmake/build_mingw32.sh

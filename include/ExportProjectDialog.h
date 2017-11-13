@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2012 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,7 @@
 #define EXPORT_PROJECT_DIALOG_H
 
 #include <QDialog>
-#include <vector>
+#include <memory>
 #include "ui_export_project.h"
 
 #include "ProjectRenderer.h"
@@ -39,8 +39,6 @@ class ExportProjectDialog : public QDialog, public Ui::ExportProjectDialog
 	Q_OBJECT
 public:
 	ExportProjectDialog( const QString & _file_name, QWidget * _parent, bool multi_export );
-	virtual ~ExportProjectDialog();
-
 
 protected:
 	virtual void reject( void );
@@ -53,6 +51,8 @@ private slots:
 	void accept();
 	void startExport();
 
+	void onFileFormatChanged(int);
+
 private:
 	QString m_fileName;
 	QString m_dirName;
@@ -60,7 +60,7 @@ private:
 	bool m_multiExport;
 
 	ProjectRenderer::ExportFileFormats m_ft;
-	RenderManager* m_renderManager;
+	std::unique_ptr<RenderManager> m_renderManager;
 } ;
 
 #endif

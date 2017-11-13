@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2009 Paul Giblock <drfaygo/at/gmail.com>
  * 
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,15 +25,12 @@
 #ifndef PEAK_CONTROLLER_H
 #define PEAK_CONTROLLER_H
 
-#include <QWidget>
-
 #include "Model.h"
-#include "AutomatableModel.h"
 #include "Controller.h"
 #include "ControllerDialog.h"
 
-class automatableButtonGroup;
-class Knob;
+class QWidget;
+
 class PeakControllerEffect;
 
 typedef QVector<PeakControllerEffect *> PeakControllerEffectVector;

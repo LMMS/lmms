@@ -11,6 +11,8 @@
 #cmakedefine LMMS_HAVE_ALSA
 #cmakedefine LMMS_HAVE_FLUIDSYNTH
 #cmakedefine LMMS_HAVE_JACK
+#cmakedefine LMMS_HAVE_WEAKJACK
+#cmakedefine LMMS_HAVE_MP3LAME
 #cmakedefine LMMS_HAVE_OGGVORBIS
 #cmakedefine LMMS_HAVE_OSS
 #cmakedefine LMMS_HAVE_SNDIO
@@ -18,8 +20,12 @@
 #cmakedefine LMMS_HAVE_SOUNDIO
 #cmakedefine LMMS_HAVE_PULSEAUDIO
 #cmakedefine LMMS_HAVE_SDL
+#cmakedefine LMMS_HAVE_SDL2
 #cmakedefine LMMS_HAVE_STK
 #cmakedefine LMMS_HAVE_VST
+#cmakedefine LMMS_HAVE_SF_COMPLEVEL
+
+#cmakedefine LMMS_DEBUG_FPE
 
 #cmakedefine LMMS_HAVE_STDINT_H
 #cmakedefine LMMS_HAVE_STDLIB_H

@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -62,12 +62,10 @@ class EXPORT MidiTime
 public:
 	MidiTime( const tact_t tact, const tick_t ticks );
 	MidiTime( const tick_t ticks = 0 );
-	MidiTime( const MidiTime& time );
 
 	MidiTime toNearestTact() const;
 	MidiTime toAbsoluteTact() const;
 
-	MidiTime& operator=( const MidiTime& time );
 	MidiTime& operator+=( const MidiTime& time );
 	MidiTime& operator-=( const MidiTime& time );
 
@@ -92,12 +90,16 @@ public:
 	// calculate number of frame that are needed this time
 	f_cnt_t frames( const float framesPerTick ) const;
 
+	double getTimeInMilliseconds(bpm_t beatsPerMinute) const;
+
 	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
 	static tick_t ticksPerTact();
 	static tick_t ticksPerTact( const TimeSig &sig );
 	static int stepsPerTact();
 	static void setTicksPerTact( tick_t tpt );
 	static MidiTime stepPosition( int step );
+	static double ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute);
+	static double ticksToMilliseconds(double ticks, bpm_t beatsPerMinute);
 
 private:
 	tick_t m_ticks;

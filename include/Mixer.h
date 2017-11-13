@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,10 +24,6 @@
 
 #ifndef MIXER_H
 #define MIXER_H
-
-#include "denormals.h"
-
-#include "lmmsconfig.h"
 
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
@@ -162,6 +158,9 @@ public:
 
 
 	// audio-device-stuff
+
+	// Returns the current audio device's name. This is not necessarily
+	// the user's preferred audio device, in case you were thinking that.
 	inline const QString & audioDevName() const
 	{
 		return m_audioDevName;
@@ -354,7 +353,7 @@ private:
 
 	void runChangesInModel();
 
-
+	bool m_renderOnly;
 
 	QVector<AudioPort *> m_audioPorts;
 
@@ -422,6 +421,7 @@ private:
 
 	friend class LmmsCore;
 	friend class MixerWorkerThread;
+	friend class ProjectRenderer;
 
 } ;
 

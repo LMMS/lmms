@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -113,11 +113,19 @@ public:
 	void quantizeLength( const int qGrid );
 	void quantizePos( const int qGrid );
 
-	static inline bool lessThan( Note * &lhs, Note * &rhs )
+	static inline bool lessThan( const Note * lhs, const Note * rhs )
 	{
 		// function to compare two notes - must be called explictly when
 		// using qSort
-		return (bool) ((int) ( *lhs ).pos() < (int) ( *rhs ).pos());
+		if( (int)( *lhs ).pos() < (int)( *rhs ).pos() )
+		{
+			return true;
+		}
+		else if( (int)( *lhs ).pos() > (int)( *rhs ).pos() )
+		{
+			return false;
+		}
+		return ( (int)( *lhs ).key() > (int)( *rhs ).key() );
 	}
 
 	inline bool selected() const

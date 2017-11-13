@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -32,8 +32,6 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
-#include "NotePlayHandle.h"
-
 
 
 const float CUT_FREQ_MULTIPLIER = 6000.0f;
@@ -139,7 +137,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 	const f_cnt_t envTotalFrames = n->totalFramesPlayed();
 	f_cnt_t envReleaseBegin = envTotalFrames - n->releaseFramesDone() + n->framesBeforeRelease();
 
-	if( n->isReleased() == false )
+	if( !n->isReleased() || ( n->instrumentTrack()->isSustainPedalPressed() &&
+		!n->isReleaseStarted() ) )
 	{
 		envReleaseBegin += frames;
 	}
@@ -300,13 +299,22 @@ f_cnt_t InstrumentSoundShaping::envFrames( const bool _only_vol ) const
 
 f_cnt_t InstrumentSoundShaping::releaseFrames() const
 {
+	if( !m_instrumentTrack->instrument() )
+	{
+		return 0;
+	}
+
+	f_cnt_t ret_val = m_instrumentTrack->instrument()->desiredReleaseFrames();
+
+	if( m_instrumentTrack->instrument()->flags().testFlag( Instrument::IsSingleStreamed ) )
+	{
+		return ret_val;
+	}
+
 	if( m_envLfoParameters[Volume]->isUsed() )
 	{
 		return m_envLfoParameters[Volume]->releaseFrames();
 	}
-	f_cnt_t ret_val = m_instrumentTrack->instrument() 
-		? m_instrumentTrack->instrument()->desiredReleaseFrames()
-		: 0;
 
 	for( int i = Volume+1; i < NumTargets; ++i )
 	{

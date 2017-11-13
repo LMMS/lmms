@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -38,7 +38,6 @@
 #include "Track.h"
 
 #include <assert.h>
-#include <cstdio>
 
 #include <QLayout>
 #include <QMenu>
@@ -60,20 +59,14 @@
 #include "GuiApplication.h"
 #include "FxMixerView.h"
 #include "gui_templates.h"
-#include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "DataFile.h"
-#include "PixmapButton.h"
 #include "ProjectJournal.h"
 #include "SampleTrack.h"
 #include "Song.h"
 #include "SongEditor.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
-#include "ToolTip.h"
-#include "TrackContainer.h"
 
 
 /*! The width of the resize grip in pixels
@@ -176,6 +169,14 @@ void TrackContentObject::changeLength( const MidiTime & length )
 
 
 
+bool TrackContentObject::comparePosition(const TrackContentObject *a, const TrackContentObject *b)
+{
+	return a->startPosition() < b->startPosition();
+}
+
+
+
+
 /*! \brief Copy this TrackContentObject to the clipboard.
  *
  *  Copies this track content object to the clipboard.
@@ -221,6 +222,22 @@ void TrackContentObject::toggleMute()
 {
 	m_mutedModel.setValue( !m_mutedModel.value() );
 	emit dataChanged();
+}
+
+
+
+
+MidiTime TrackContentObject::startTimeOffset() const
+{
+	return m_startTimeOffset;
+}
+
+
+
+
+void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
+{
+	m_startTimeOffset = startTimeOffset;
 }
 
 
@@ -356,6 +373,11 @@ QColor TrackContentObjectView::selectedColor() const
 QColor TrackContentObjectView::textColor() const
 { return m_textColor; }
 
+QColor TrackContentObjectView::textBackgroundColor() const
+{
+	return m_textBackgroundColor;
+}
+
 QColor TrackContentObjectView::textShadowColor() const
 { return m_textShadowColor; }
 
@@ -377,6 +399,11 @@ void TrackContentObjectView::setSelectedColor( const QColor & c )
 
 void TrackContentObjectView::setTextColor( const QColor & c )
 { m_textColor = QColor( c ); }
+
+void TrackContentObjectView::setTextBackgroundColor( const QColor & c )
+{
+	m_textBackgroundColor = c;
+}
 
 void TrackContentObjectView::setTextShadowColor( const QColor & c )
 { m_textShadowColor = QColor( c ); }
@@ -629,6 +656,39 @@ DataFile TrackContentObjectView::createTCODataFiles(
 	return dataFile;
 }
 
+void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & painter)
+{
+	if (text.trimmed() == "")
+	{
+		return;
+	}
+
+	painter.setRenderHint( QPainter::TextAntialiasing );
+
+	QFont labelFont = this->font();
+	labelFont.setHintingPreference( QFont::PreferFullHinting );
+	painter.setFont( labelFont );
+
+	const int textTop = TCO_BORDER_WIDTH + 1;
+	const int textLeft = TCO_BORDER_WIDTH + 3;
+
+	QFontMetrics fontMetrics(labelFont);
+	QString elidedPatternName = fontMetrics.elidedText(text, Qt::ElideMiddle, width() - 2 * textLeft);
+
+	if (elidedPatternName.length() < 2)
+	{
+		elidedPatternName = text.trimmed();
+	}
+
+	painter.fillRect(QRect(0, 0, width(), fontMetrics.height() + 2 * textTop), textBackgroundColor());
+
+	int const finalTextTop = textTop + fontMetrics.ascent();
+	painter.setPen(textShadowColor());
+	painter.drawText( textLeft + 1, finalTextTop + 1, elidedPatternName );
+	painter.setPen( textColor() );
+	painter.drawText( textLeft, finalTextTop, elidedPatternName );
+}
+
 /*! \brief Handle a mouse press on this trackContentObjectView.
  *
  *  Handles the various ways in which a trackContentObjectView can be
@@ -647,17 +707,11 @@ DataFile TrackContentObjectView::createTCODataFiles(
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
 	setInitialMousePos( me->pos() );
-	if( m_trackView->trackContainerView()->allowRubberband() == true &&
-	    me->button() == Qt::LeftButton )
+	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
-		if( m_trackView->trackContainerView()->rubberBandActive() == true )
+		if( me->modifiers() & Qt::ControlModifier )
 		{
-			// Propagate to trackView for rubberbanding
-			selectableObject::mousePressEvent( me );
-		}
-		else if ( me->modifiers() & Qt::ControlModifier )
-		{
-			if( isSelected() == true )
+			if( isSelected() )
 			{
 				m_action = CopySelection;
 			}
@@ -668,74 +722,52 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		}
 		else if( !me->modifiers() )
 		{
-			if( isSelected() == true )
+			if( isSelected() )
 			{
 				m_action = MoveSelection;
 			}
+			else
+			{
+				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+				if( me->x() < RESIZE_GRIP_WIDTH && sTco )
+				{
+					m_action = ResizeLeft;
+					m_oldTime = m_tco->startPosition();
+					QCursor c( Qt::SizeHorCursor );
+					QApplication::setOverrideCursor( c );
+					s_textFloat->setTitle( tr( "Current length" ) );
+				}
+				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
+				{
+					m_action = Move;
+					m_oldTime = m_tco->startPosition();
+					QCursor c( Qt::SizeAllCursor );
+					QApplication::setOverrideCursor( c );
+					s_textFloat->setTitle( tr( "Current position" ) );
+				}
+				else if( !m_tco->getAutoResize() )
+				{
+					m_action = Resize;
+					m_oldTime = m_tco->length();
+					QCursor c( Qt::SizeHorCursor );
+					QApplication::setOverrideCursor( c );
+					s_textFloat->setTitle( tr( "Current length" ) );
+				}
+			}
 		}
-	}
-	else if( me->button() == Qt::LeftButton && 
-			 me->modifiers() & Qt::ControlModifier )
-	{
-		// start drag-action
-		QVector<TrackContentObjectView *> tcoViews;
-		tcoViews.push_back( this );
-		DataFile dataFile = createTCODataFiles( tcoViews );
-		QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
-						128, 128,
-						Qt::KeepAspectRatio,
-						Qt::SmoothTransformation );
-		new StringPairDrag( QString( "tco_%1" ).arg(
-						m_tco->getTrack()->type() ),
-					dataFile.toString(), thumbnail, this );
-	}
-	else if( me->button() == Qt::LeftButton &&
-		/*	engine::mainWindow()->isShiftPressed() == false &&*/
-							fixedTCOs() == false )
-	{
-		m_tco->addJournalCheckPoint();
-
-		// move or resize
-		m_tco->setJournalling( false );
-
-		setInitialMousePos( me->pos() );
-
-		if( me->x() < width() - RESIZE_GRIP_WIDTH )
-		{
-			m_action = Move;
-			m_oldTime = m_tco->startPosition();
-			QCursor c( Qt::SizeAllCursor );
-			QApplication::setOverrideCursor( c );
-			s_textFloat->setTitle( tr( "Current position" ) );
-			delete m_hint;
-			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> and drag to make "
-							"a copy." ).arg(
-								#ifdef LMMS_BUILD_APPLE
-								"⌘"),
-								#else
-								"Ctrl"),
-								#endif
-					embed::getIconPixmap( "hint" ), 0 );
-		}
-		else if( !m_tco->getAutoResize() )
-		{
-			m_action = Resize;
-			m_oldTime = m_tco->length();
-			QCursor c( Qt::SizeHorCursor );
-			QApplication::setOverrideCursor( c );
-			s_textFloat->setTitle( tr( "Current length" ) );
-			delete m_hint;
-			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> for free "
-							"resizing." ).arg(
-								#ifdef LMMS_BUILD_APPLE
-								"⌘"),
-								#else
-								"Ctrl"),
-								#endif
-					embed::getIconPixmap( "hint" ), 0 );
-		}
+		delete m_hint;
+		QString hint = m_action == Move ? tr( "Press <%1> and drag to make "
+										  "a copy." )
+										: tr( "Press <%1> for free "
+										  "resizing." );
+		m_hint = TextFloat::displayMessage( tr( "Hint" ),
+				hint.arg(
+							#ifdef LMMS_BUILD_APPLE
+							"⌘"),
+							#else
+							"Ctrl"),
+							#endif
+				embed::getIconPixmap( "hint" ), 0 );
 //		s_textFloat->reparent( this );
 		// setup text-float as if TCO was already moved/resized
 		mouseMoveEvent( me );
@@ -747,7 +779,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			m_tco->toggleMute();
 		}
-		else if( me->modifiers() & Qt::ShiftModifier && fixedTCOs() == false )
+		else if( me->modifiers() & Qt::ShiftModifier && !fixedTCOs() )
 		{
 			remove();
 		}
@@ -758,7 +790,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		{
 			m_tco->toggleMute();
 		}
-		else if( fixedTCOs() == false )
+		else if( !fixedTCOs() )
 		{
 			remove();
 		}
@@ -785,10 +817,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 {
 	if( m_action == CopySelection )
 	{
-		if( mouseMovedDistance( me, 2 ) == true &&
-		    m_trackView->trackContainerView()->allowRubberband() == true &&
-		    m_trackView->trackContainerView()->rubberBandActive() == false &&
-		    ( me->modifiers() & Qt::ControlModifier ) )
+		if( mouseMovedDistance( me, 2 ) == true )
 		{
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
@@ -882,7 +911,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			t = ( *it )->startPosition() +
 				static_cast<int>( dx *MidiTime::ticksPerTact() /
 					 ppt )-smallest_pos;
-			if( ! ( me->modifiers() & Qt::AltModifier )
+			if( ! ( me->modifiers() & Qt::ControlModifier )
 					   && me->button() == Qt::NoButton )
 			{
 				t = t.toNearestTact();
@@ -890,14 +919,43 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			( *it )->movePosition( t );
 		}
 	}
-	else if( m_action == Resize )
+	else if( m_action == Resize || m_action == ResizeLeft )
 	{
-		MidiTime t = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
-		if( ! ( me->modifiers() & Qt::ControlModifier ) && me->button() == Qt::NoButton )
+		if( m_action == Resize )
 		{
-			t = qMax<int>( MidiTime::ticksPerTact(), t.toNearestTact() );
+			MidiTime t = qMax( MidiTime::ticksPerTact() / 16, static_cast<int>( me->x() * MidiTime::ticksPerTact() / ppt ) );
+			if( ! ( me->modifiers() & Qt::ControlModifier ) && me->button() == Qt::NoButton )
+			{
+				t = qMax<int>( MidiTime::ticksPerTact(), t.toNearestTact() );
+			}
+			m_tco->changeLength( t );
 		}
-		m_tco->changeLength( t );
+		else
+		{
+			SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+			if( sTco )
+			{
+				const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
+
+				MidiTime t = qMax( 0, (int)
+								   m_trackView->trackContainerView()->currentPosition()+
+								   static_cast<int>( x * MidiTime::ticksPerTact() /
+													 ppt ) );
+				if( ! ( me->modifiers() & Qt::ControlModifier )
+						&& me->button() == Qt::NoButton )
+				{
+					t = t.toNearestTact();
+				}
+				MidiTime oldPos = m_tco->startPosition();
+				if( m_tco->length() + ( oldPos - t ) >= MidiTime::ticksPerTact() )
+				{
+					m_tco->movePosition( t );
+					m_trackView->getTrackContentWidget()->changePosition();
+					m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
+					sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+				}
+			}
+		}
 		s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
 				arg( m_tco->length().getTact() ).
 				arg( m_tco->length().getTicks() %
@@ -913,7 +971,9 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else
 	{
-		if( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
+		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
+		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco ) )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -956,8 +1016,9 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 		setSelected( !isSelected() );
 	}
 
-	if( m_action == Move || m_action == Resize )
+	if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
+		// TODO: Fix m_tco->setJournalling() consistency
 		m_tco->setJournalling( true );
 	}
 	m_action = NoAction;
@@ -1423,11 +1484,9 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 	const TrackContainer::TrackList tracks = getTrack()->trackContainer()->tracks();
 	const int currentTrackIndex = tracks.indexOf( getTrack() );
 
-	bool allowRubberband = m_trackView->trackContainerView()->allowRubberband();
+	bool wasSelection = m_trackView->trackContainerView()->rubberBand()->selectedObjects().count();
 
 	// Unselect the old group
-	if( allowRubberband == true )
-	{
 		const QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
 		for( QVector<selectableObject *>::const_iterator it = so.begin();
@@ -1435,7 +1494,7 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		{
 			( *it )->setSelected( false );
 		}
-	}
+
 
 	// TODO -- Need to draw the hovericon either way, or ghost the TCOs
 	// onto their final position.
@@ -1460,10 +1519,11 @@ bool TrackContentWidget::pasteSelection( MidiTime tcoPos, QDropEvent * de )
 		TrackContentObject * tco = t->createTCO( pos );
 		tco->restoreState( tcoElement );
 		tco->movePosition( pos );
-		if( allowRubberband == true )
+		if( wasSelection )
 		{
 			tco->selectViewOnCreate( true );
 		}
+
 		//check tco name, if the same as source track name dont copy
 		if( tco->name() == tracks[trackIndex]->name() )
 		{
@@ -1510,6 +1570,11 @@ void TrackContentWidget::mousePressEvent( QMouseEvent * me )
 	else if( me->button() == Qt::LeftButton &&
 			!m_trackView->trackContainerView()->fixedTCOs() )
 	{
+		QVector<selectableObject*> so =  m_trackView->trackContainerView()->rubberBand()->selectedObjects();
+		for( int i = 0; i < so.count(); ++i )
+		{
+			so.at( i )->setSelected( false);
+		}
 		getTrack()->addJournalCheckPoint();
 		const MidiTime pos = getPosition( me->x() ).getTact() *
 						MidiTime::ticksPerTact();
@@ -2115,7 +2180,7 @@ void Track::saveSettings( QDomDocument & doc, QDomElement & element )
 	element.setAttribute( "solo", isSolo() );
 	if( m_height >= MINIMAL_TRACK_HEIGHT )
 	{
-		element.setAttribute( "height", m_height );
+		element.setAttribute( "trackheight", m_height );
 	}
 
 	QDomElement tsDe = doc.createElement( nodeName() );
@@ -2211,10 +2276,10 @@ void Track::loadSettings( const QDomElement & element )
 		node = node.nextSibling();
 	}
 
-	if( element.attribute( "height" ).toInt() >= MINIMAL_TRACK_HEIGHT &&
-		element.attribute( "height" ).toInt() <= DEFAULT_TRACK_HEIGHT )	// workaround for #3585927, tobydox/2012-11-11
+	int storedHeight = element.attribute( "trackheight" ).toInt();
+	if( storedHeight >= MINIMAL_TRACK_HEIGHT )
 	{
-		m_height = element.attribute( "height" ).toInt();
+		m_height = storedHeight;
 	}
 }
 
@@ -2335,10 +2400,8 @@ int Track::getTCONum( const TrackContentObject * tco )
 
 /*! \brief Retrieve a list of trackContentObjects that fall within a period.
  *
- *  Here we're interested in a range of trackContentObjects that fall
- *  completely within a given time period - their start must be no earlier
- *  than the given start time and their end must be no later than the given
- *  end time.
+ *  Here we're interested in a range of trackContentObjects that intersect
+ *  the given time period.
  *
  *  We return the TCOs we find in order by time, earliest TCOs first.
  *
@@ -2349,33 +2412,16 @@ int Track::getTCONum( const TrackContentObject * tco )
 void Track::getTCOsInRange( tcoVector & tcoV, const MidiTime & start,
 							const MidiTime & end )
 {
-	for( tcoVector::iterator itO = m_trackContentObjects.begin();
-				itO != m_trackContentObjects.end(); ++itO )
+	for( TrackContentObject* tco : m_trackContentObjects )
 	{
-		TrackContentObject * tco = ( *itO );
 		int s = tco->startPosition();
 		int e = tco->endPosition();
 		if( ( s <= end ) && ( e >= start ) )
 		{
-			// ok, TCO is posated within given range
-			// now let's search according position for TCO in list
-			// 	-> list is ordered by TCO's position afterwards
-			bool inserted = false;
-			for( tcoVector::iterator it = tcoV.begin();
-						it != tcoV.end(); ++it )
-			{
-				if( ( *it )->startPosition() >= s )
-				{
-					tcoV.insert( it, tco );
-					inserted = true;
-					break;
-				}
-			}
-			if( inserted == false )
-			{
-				// no TCOs found posated behind current TCO...
-				tcoV.push_back( tco );
-			}
+			// TCO is within given range
+			// Insert sorted by TCO's position
+			tcoV.insert(std::upper_bound(tcoV.begin(), tcoV.end(), tco, TrackContentObject::comparePosition),
+						tco);
 		}
 	}
 }
@@ -2480,6 +2526,12 @@ tact_t Track::length() const
 	for( tcoVector::const_iterator it = m_trackContentObjects.begin();
 				it != m_trackContentObjects.end(); ++it )
 	{
+		if( Engine::getSong()->isExporting() &&
+				( *it )->isMuted() )
+		{
+			continue;
+		}
+
 		const tick_t cur = ( *it )->endPosition();
 		if( cur > last )
 		{

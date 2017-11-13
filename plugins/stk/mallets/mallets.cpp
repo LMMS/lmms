@@ -5,7 +5,7 @@
  * Copyright (c) 2009-2015 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2016 Oskar Wallgren <oskarwallgren13/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -33,13 +33,14 @@
 #include "ModalBar.h"
 #include "TubeBell.h"
 
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

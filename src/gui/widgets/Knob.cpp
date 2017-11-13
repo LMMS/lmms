@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -28,7 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QPalette>
 #include <QWhatsThis>
 
 #ifndef __USE_XOPEN
@@ -41,14 +40,12 @@
 #include "ConfigManager.h"
 #include "ControllerConnection.h"
 #include "embed.h"
-#include "Engine.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "StringPairDrag.h"
-#include "templates.h"
 #include "TextFloat.h"
 
 TextFloat * Knob::s_textFloat = NULL;
@@ -634,7 +631,6 @@ void Knob::mouseMoveEvent( QMouseEvent * _me )
 		emit sliderMoved( model()->value() );
 		QCursor::setPos( mapToGlobal( m_origMousePos ) );
 	}
-
 	s_textFloat->setText( displayValue() );
 }
 
@@ -738,7 +734,7 @@ void Knob::setPosition( const QPoint & _p )
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
-			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - newValue ) / step + 0.5 ) ) * step;
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
 			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
@@ -752,7 +748,7 @@ void Knob::setPosition( const QPoint & _p )
 	{
 		if( qAbs( value ) >= step )
 		{
-			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - value ) / step + 0.5 ) ) * step;
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
 			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}

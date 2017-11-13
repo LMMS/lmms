@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Andrew Kelley <superjoe30/at/gmail/dot/com>
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -26,19 +26,12 @@
 #include "FxLine.h"
 
 #include <QGraphicsProxyWidget>
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QLineEdit>
 #include <QWhatsThis>
 
 #include "CaptionMenu.h"
-#include "embed.h"
-#include "Engine.h"
 #include "FxMixer.h"
-#include "FxMixerView.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
-#include "SendButtonIndicator.h"
 #include "Song.h"
 
 

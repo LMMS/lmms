@@ -43,10 +43,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>LMMS</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <source>Involved</source>
         <translation>Учасники</translation>
     </message>
@@ -57,6 +53,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Copyright © %1</source>
         <translation>Авторське право © %1</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -505,6 +505,14 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Model is already connected to this pattern.</source>
         <translation>Модель вже підключена до цього шаблону.</translation>
     </message>
+    <message>
+        <source>Quantization</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Quantization. Sets the smallest step size for the Automation Point. By default this also sets the length, clearing out other points in the range. Press &lt;Ctrl&gt; to override this behaviour.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>AutomationPattern</name>
@@ -515,10 +523,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 </context>
 <context>
     <name>AutomationPatternView</name>
-    <message>
-        <source>double-click to open this pattern in automation editor</source>
-        <translation>Двічі клацніть мишею щоб налаштувати автоматизацію для цього шаблону</translation>
-    </message>
     <message>
         <source>Open in Automation editor</source>
         <translation>Відкрити в редакторі автоматизації</translation>
@@ -617,6 +621,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <source>Clone Steps</source>
         <translation>Клонувати такти</translation>
     </message>
+    <message>
+        <source>Add sample-track</source>
+        <translation>Додати доріжку запису</translation>
+    </message>
 </context>
 <context>
     <name>BBTCOView</name>
@@ -713,10 +721,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Вхідне підсилення: </translation>
     </message>
     <message>
-        <source>NOIS</source>
-        <translation>ШУМ</translation>
-    </message>
-    <message>
         <source>Input Noise:</source>
         <translation>Вхідний шум: </translation>
     </message>
@@ -733,20 +737,12 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Вихідне відсічення: </translation>
     </message>
     <message>
-        <source>Rate</source>
-        <translation>Частота вибірки</translation>
-    </message>
-    <message>
         <source>Rate Enabled</source>
         <translation>Частоту вибірки увімкнено</translation>
     </message>
     <message>
         <source>Enable samplerate-crushing</source>
         <translation>Включити дроблення частоти дискретизації</translation>
-    </message>
-    <message>
-        <source>Depth</source>
-        <translation>Глибина</translation>
     </message>
     <message>
         <source>Depth Enabled</source>
@@ -761,20 +757,28 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Частота дискретизації: </translation>
     </message>
     <message>
-        <source>STD</source>
-        <translation>STD</translation>
-    </message>
-    <message>
         <source>Stereo difference:</source>
         <translation>Стерео різниця: </translation>
     </message>
     <message>
-        <source>Levels</source>
-        <translation>Рівні</translation>
-    </message>
-    <message>
         <source>Levels:</source>
         <translation>Рівні: </translation>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>FREQ</source>
+        <translation>ЧАСТ</translation>
+    </message>
+    <message>
+        <source>STEREO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>QUANT</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -903,8 +907,16 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Введіть нову назву контролера</translation>
     </message>
     <message>
-        <source>&amp;Remove this plugin</source>
-        <translation>&amp;R Убрати цей плагін</translation>
+        <source>&amp;Remove this controller</source>
+        <translation>&amp;R Видалити цей контролер</translation>
+    </message>
+    <message>
+        <source>Re&amp;name this controller</source>
+        <translation>&amp;N Перейменувати цей контролер</translation>
+    </message>
+    <message>
+        <source>LFO</source>
+        <translation>LFO</translation>
     </message>
 </context>
 <context>
@@ -996,10 +1008,6 @@ If you&apos;re interested in translating LMMS in another language or want to imp
 <context>
     <name>DelayControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Затримка</translation>
-    </message>
-    <message>
         <source>Lfo Amt</source>
         <translation>Вел LFO</translation>
     </message>
@@ -1008,16 +1016,8 @@ If you&apos;re interested in translating LMMS in another language or want to imp
         <translation>Час затримки</translation>
     </message>
     <message>
-        <source>Regen</source>
-        <translation>Перегенерувати</translation>
-    </message>
-    <message>
         <source>Feedback Amount</source>
         <translation>Величина повернення</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation>Частота вибірки</translation>
     </message>
     <message>
         <source>Lfo</source>
@@ -1030,6 +1030,22 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Gain</source>
         <translation>Підсилення</translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>ГЛИБ</translation>
     </message>
 </context>
 <context>
@@ -1287,6 +1303,10 @@ If you&apos;re interested in translating LMMS in another language or want to imp
     <message>
         <source>Name</source>
         <translation>І&apos;мя</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Тип</translation>
     </message>
     <message>
         <source>Description</source>
@@ -1868,18 +1888,6 @@ Right clicking will bring up a context menu where you can change the order in wh
         <source> Octave</source>
         <translation> Октава</translation>
     </message>
-    <message>
-        <source>Frequency</source>
-        <translation>Частота</translation>
-    </message>
-    <message>
-        <source>Resonance</source>
-        <translation>Резонанс</translation>
-    </message>
-    <message>
-        <source>Bandwidth</source>
-        <translation>Ширина смуги</translation>
-    </message>
 </context>
 <context>
     <name>EqHandle</name>
@@ -1975,10 +1983,6 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation>32 Біт плаваюча </translation>
     </message>
     <message>
-        <source>Please note that not all of the parameters above apply for all file formats.</source>
-        <translation>Зауважте, що не всі параметри нижче будуть застосовані для всіх форматів файлів.</translation>
-    </message>
-    <message>
         <source>Quality settings</source>
         <translation>Налаштування якості</translation>
     </message>
@@ -2043,12 +2047,6 @@ Right clicking will bring up a context menu where you can change the order in wh
         <translation>Не можу відкрити файл</translation>
     </message>
     <message>
-        <source>Could not open file %1 for writing.
-Please make sure you have write-permission to the file and the directory containing the file and try again!</source>
-        <translation>Не можу відкрити файл %1 для запису.
-Перевірте, чи володієте ви правами на запис в обраний файл і каталог що його містить і спробуйте знову!</translation>
-    </message>
-    <message>
         <source>Export project to %1</source>
         <translation>Експорт проекту в %1</translation>
     </message>
@@ -2064,6 +2062,94 @@ Please make sure you have write-permission to the file and the directory contain
         <source>Rendering: %1%</source>
         <translation>Обробка: %1%</translation>
     </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>24 Bit Integer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Use variable bitrate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Stereo mode:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Joint Stereo</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Compression level:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(fastest)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(default)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>(smallest)</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>Expressive</name>
+    <message>
+        <source>Selected graph</source>
+        <translation>Обраний графік</translation>
+    </message>
+    <message>
+        <source>A1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>A2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>A3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W1 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W2 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>W3 smoothing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>PAN1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>PAN2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>REL TRANS</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>Fader</name>
@@ -2077,6 +2163,14 @@ Please make sure you have write-permission to the file and the directory contain
     <message>
         <source>Browser</source>
         <translation>Оглядач файлів</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Refresh list</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2148,44 +2242,48 @@ Please make sure you have write-permission to the file and the directory contain
 <context>
     <name>FlangerControlsDialog</name>
     <message>
-        <source>Delay</source>
-        <translation>Затримка</translation>
-    </message>
-    <message>
         <source>Delay Time:</source>
         <translation>Час затримки: </translation>
-    </message>
-    <message>
-        <source>Lfo Hz</source>
-        <translation>Lfo Гц</translation>
-    </message>
-    <message>
-        <source>Lfo:</source>
-        <translation>Lfo:</translation>
-    </message>
-    <message>
-        <source>Amt</source>
-        <translation>Кіл</translation>
-    </message>
-    <message>
-        <source>Amt:</source>
-        <translation>Кіл:</translation>
-    </message>
-    <message>
-        <source>Regen</source>
-        <translation>Перегенерувати</translation>
     </message>
     <message>
         <source>Feedback Amount:</source>
         <translation>Величина повернення: </translation>
     </message>
     <message>
-        <source>Noise</source>
-        <translation>Шум</translation>
-    </message>
-    <message>
         <source>White Noise Amount:</source>
         <translation>Об&apos;єм білого шуму: </translation>
+    </message>
+    <message>
+        <source>DELAY</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>RATE</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>AMNT</source>
+        <translation>ГЛИБ</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>FDBK</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>NOISE</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Invert</source>
+        <translation>Інвертувати</translation>
+    </message>
+    <message>
+        <source>Period:</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2238,17 +2336,21 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>FX %1</source>
         <translation>Ефект %1</translation>
     </message>
+    <message>
+        <source>Volume</source>
+        <translation>Гучність</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Тиша</translation>
+    </message>
+    <message>
+        <source>Solo</source>
+        <translation>Соло</translation>
+    </message>
 </context>
 <context>
     <name>FxMixerView</name>
-    <message>
-        <source>Rename FX channel</source>
-        <translation>Перейменувати канал Ефекту</translation>
-    </message>
-    <message>
-        <source>Enter the new name for this FX channel</source>
-        <translation>Введіть нову назву для цього каналу Ефекту</translation>
-    </message>
     <message>
         <source>FX-Mixer</source>
         <translation>Мікшер Ефектів</translation>
@@ -2448,6 +2550,18 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <source>Down and up</source>
         <translation>Вниз та вгору</translation>
     </message>
+    <message>
+        <source>Skip rate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Miss rate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Cycle steps</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>InstrumentFunctionArpeggioView</name>
@@ -2518,6 +2632,46 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>Mode:</source>
         <translation>Режим:</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Skip rate:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The skip function will make the arpeggiator pause one step randomly. From its start in full counter clockwise position and no effect it will gradually progress to full amnesia at maximum setting.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>MISS</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Miss rate:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>The miss function will make the arpeggiator miss the intended note.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>CYCLE</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Cycle notes:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>note(s)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Jumps over n steps in the arpeggio and cycles around if we&apos;re over the note range. If the total note range is evenly divisible by the number of steps jumped over you will get stuck in a shorter arpeggio or even on one note.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2901,6 +3055,14 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>5</source>
         <translation>5</translation>
+    </message>
+    <message>
+        <source>Phrygian dominant</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Persian</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3304,20 +3466,8 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Канал ЕФ</translation>
     </message>
     <message>
-        <source>ENV/LFO</source>
-        <translation>ОБВ/LFO</translation>
-    </message>
-    <message>
-        <source>FUNC</source>
-        <translation>ФУНКЦ</translation>
-    </message>
-    <message>
         <source>FX</source>
         <translation>ЕФ</translation>
-    </message>
-    <message>
-        <source>MIDI</source>
-        <translation>MIDI</translation>
     </message>
     <message>
         <source>Save preset</source>
@@ -3326,10 +3476,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     <message>
         <source>XML preset file (*.xpf)</source>
         <translation>XML файл налаштувань (*.xpf)</translation>
-    </message>
-    <message>
-        <source>PLUGIN</source>
-        <translation>ПЛАГІН</translation>
     </message>
     <message>
         <source>Pitch range (semitones)</source>
@@ -3348,16 +3494,36 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Нитисніть тут, щоб зберегти налаштування поточної інстр. доріжки в файл предустановок. Пізніше можна завантажити цю передустановку подвійним кліком в браузері предустановок.</translation>
     </message>
     <message>
-        <source>MISC</source>
-        <translation>РІЗНЕ</translation>
-    </message>
-    <message>
         <source>Use these controls to view and edit the next/previous track in the song editor.</source>
         <translation>Використовуйте ці елементи керування для перегляду і редагування наступного/попереднього треку в музичному редакторі.</translation>
     </message>
     <message>
         <source>SAVE</source>
         <translation>ЗБЕРЕГТИ</translation>
+    </message>
+    <message>
+        <source>Envelope, filter &amp; LFO</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Chord stacking &amp; arpeggio</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Effects</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>MIDI settings</source>
+        <translation>Параметри MIDI</translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Plugin</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -3371,12 +3537,12 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Встановити логарифмічний</translation>
     </message>
     <message>
-        <source>Please enter a new value between -96.0 dBV and 6.0 dBV:</source>
-        <translation>Введіть нове значення від -96,0 дБВ до 6,0 дБВ:</translation>
-    </message>
-    <message>
         <source>Please enter a new value between %1 and %2:</source>
         <translation>Введіть нове значення від %1 до %2:</translation>
+    </message>
+    <message>
+        <source>Please enter a new value between -96.0 dBFS and 6.0 dBFS:</source>
+        <translation>Введіть нове значення від -96,0 дБFS до 6,0 дБFS:</translation>
     </message>
 </context>
 <context>
@@ -3511,10 +3677,6 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Ця ручка встановлює швидкість LFO. Чим більше значення, тим більша частота осциллятора.</translation>
     </message>
     <message>
-        <source>AMT</source>
-        <translation>КІЛ</translation>
-    </message>
-    <message>
         <source>Modulation amount:</source>
         <translation>Кількість модуляції:</translation>
     </message>
@@ -3572,6 +3734,10 @@ Double click to pick a file.</source>
         <source>Click here for a moog saw-wave.</source>
         <translation>Натисніть для зигзагоподібної муг-хвилі.</translation>
     </message>
+    <message>
+        <source>AMNT</source>
+        <translation>ГЛИБ</translation>
+    </message>
 </context>
 <context>
     <name>LmmsCore</name>
@@ -3594,16 +3760,6 @@ Double click to pick a file.</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Could not save config-file</source>
-        <translation>Не можу зберегти налаштування</translation>
-    </message>
-    <message>
-        <source>Could not save configuration file %1. You're probably not permitted to write to this file.
-Please make sure you have write-access to the file and try again.</source>
-        <translation>Не можу записати налаштування в файл %1. Можливо, ви не володієте правами на запис в нього.
-Будь ласка, перевірте свої права і спробуйте знову.</translation>
-    </message>
     <message>
         <source>&amp;New</source>
         <translation>&amp;N Новий</translation>
@@ -3860,32 +4016,12 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Відновлення файлу. Будь ласка, не запускайте кілька копій LMMS під час цієї операції.</translation>
     </message>
     <message>
-        <source>Ignore</source>
-        <translation>Ігнорувати</translation>
-    </message>
-    <message>
-        <source>Launch LMMS as usual but with automatic backup disabled to prevent the present recover file from being overwritten.</source>
-        <translation>Запуск LMMS як зазвичай, але з відключеним автоматичним резервуванням, щоб запобігти перезапису файлу відновлення.</translation>
-    </message>
-    <message>
         <source>Discard</source>
         <translation>Відкинути</translation>
     </message>
     <message>
         <source>Launch a default session and delete the restored files. This is not reversible.</source>
         <translation>Запуск за замовчуванням з видаленням файла відновлення. Ця дія не відворотня.</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Вихід</translation>
-    </message>
-    <message>
-        <source>Shut down LMMS with no further action.</source>
-        <translation>Вимкнути LMMS без будь-яких подальших дій.</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Вийти</translation>
     </message>
     <message>
         <source>Preparing plugin browser</source>
@@ -3910,10 +4046,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>Save as default template</source>
         <translation>Зберегти як шаблон за замовчуванням</translation>
-    </message>
-    <message>
-        <source>Export &amp;MIDI...</source>
-        <translation>Експорт в &amp;MIDI ...</translation>
     </message>
     <message>
         <source>&amp;View</source>
@@ -3956,10 +4088,6 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Відновлення сесії. Будь ласка, збережіть свою роботу!</translation>
     </message>
     <message>
-        <source>Automatic backup disabled. Remember to save your work!</source>
-        <translation>Автоматичне резервне копіювання відключено. Не забудьте зберегти вашу роботу!</translation>
-    </message>
-    <message>
         <source>Recovered project not saved</source>
         <translation>Відновлений проект не збережено</translation>
     </message>
@@ -3984,16 +4112,33 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
         <translation>Це перезапише поточний шаблон за замовчуванням.</translation>
     </message>
     <message>
-        <source>Volume as dBV</source>
-        <translation>Відображати гучність в децибелах </translation>
-    </message>
-    <message>
         <source>Smooth scroll</source>
         <translation>Плавне прокручування</translation>
     </message>
     <message>
         <source>Enable note labels in piano roll</source>
         <translation>Включити позначення нот у музичному редакторі</translation>
+    </message>
+    <message>
+        <source>Save project template</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Volume as dBFS</source>
+        <translation>Відображати гучність в децибелах </translation>
+    </message>
+    <message>
+        <source>Could not open file</source>
+        <translation>Не можу відкрити файл</translation>
+    </message>
+    <message>
+        <source>Could not open file %1 for writing.
+Please make sure you have write permission to the file and the directory containing the file and try again!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Експорт в &amp;MIDI ...</translation>
     </message>
 </context>
 <context>
@@ -4051,6 +4196,19 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
     <message>
         <source>Track</source>
         <translation>Трек</translation>
+    </message>
+</context>
+<context>
+    <name>MidiJack</name>
+    <message>
+        <source>JACK server down</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (title)</extracomment>
+        <translation>JACK-сервер не доступний</translation>
+    </message>
+    <message>
+        <source>The JACK server seems to be shuted down.</source>
+        <extracomment>When JACK(JACK Audio Connection Kit) disconnects, it will show the following message (dialog message)</extracomment>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5270,14 +5428,6 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>Видалити такти</translation>
     </message>
     <message>
-        <source>use mouse wheel to set velocity of a step</source>
-        <translation>використовуйте колесо миші для встановлення кроку гучності</translation>
-    </message>
-    <message>
-        <source>double-click to open in Piano Roll</source>
-        <translation>Відкрити в редакторі нот подвійним клацанням миші</translation>
-    </message>
-    <message>
         <source>Clone Steps</source>
         <translation>Клонувати такти</translation>
     </message>
@@ -5351,12 +5501,12 @@ PM (ФМ) режим означає Фазова Модуляція: Осцил�
         <translation>ЗГАС</translation>
     </message>
     <message>
-        <source>TRES</source>
-        <translation>ПОР</translation>
-    </message>
-    <message>
         <source>Treshold:</source>
         <translation>Поріг: </translation>
+    </message>
+    <message>
+        <source>TRSH</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5640,16 +5790,16 @@ Reason: &quot;%2&quot;</source>
 <context>
     <name>PluginBrowser</name>
     <message>
-        <source>Instrument plugins</source>
-        <translation>Інструменти</translation>
-    </message>
-    <message>
         <source>Instrument browser</source>
         <translation>Огляд інструментів</translation>
     </message>
     <message>
         <source>Drag an instrument into either the Song-Editor, the Beat+Bassline Editor or into an existing instrument track.</source>
         <translation>Ви можете переносити потрібні вам інструменти з цієї панелі в музичний, ритм-бас редактор або в існуючу доріжку інструменту.</translation>
+    </message>
+    <message>
+        <source>Instrument Plugins</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5665,14 +5815,6 @@ Reason: &quot;%2&quot;</source>
 </context>
 <context>
     <name>ProjectNotes</name>
-    <message>
-        <source>Project notes</source>
-        <translation>Нотатки до проекту</translation>
-    </message>
-    <message>
-        <source>Put down your project notes here.</source>
-        <translation>Тут ви можете тримати замітки до свого проекту.</translation>
-    </message>
     <message>
         <source>Edit Actions</source>
         <translation>Зміна</translation>
@@ -5781,6 +5923,14 @@ Reason: &quot;%2&quot;</source>
         <source>&amp;Color...</source>
         <translation>&amp;C Колір...</translation>
     </message>
+    <message>
+        <source>Project Notes</source>
+        <translation>Примітки проекту</translation>
+    </message>
+    <message>
+        <source>Enter project notes here</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>ProjectRenderer</name>
@@ -5791,6 +5941,14 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Compressed OGG-File (*.ogg)</source>
         <translation>Стиснутий файл OGG (*.ogg)</translation>
+    </message>
+    <message>
+        <source>FLAC-File (*.flac)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Compressed MP3-File (*.mp3)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5852,6 +6010,60 @@ Reason: &quot;%2&quot;</source>
     </message>
 </context>
 <context>
+    <name>ReverbSCControlDialog</name>
+    <message>
+        <source>Input</source>
+        <translation>Ввід</translation>
+    </message>
+    <message>
+        <source>Input Gain:</source>
+        <translation>Вхідне підсилення: </translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Color:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Вивід</translation>
+    </message>
+    <message>
+        <source>Output Gain:</source>
+        <translation>Вихідне підсилення: </translation>
+    </message>
+</context>
+<context>
+    <name>ReverbSCControls</name>
+    <message>
+        <source>Input Gain</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Output Gain</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>SampleBuffer</name>
     <message>
         <source>Open audio file</source>
@@ -5896,6 +6108,14 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>All Audio-Files (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</source>
         <translation>Всі Аудіо-файли (*.wav *.ogg *.ds *.flac *.spx *.voc *.aif *.aiff *.au *.raw)</translation>
+    </message>
+    <message>
+        <source>Fail to open file</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Audio files are limited to %1 MB in size and %2 minutes of playing time</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -5998,10 +6218,6 @@ Reason: &quot;%2&quot;</source>
         <translation>Показувати попередження про перезапуск при зміні налаштувань</translation>
     </message>
     <message>
-        <source>Display volume as dBV </source>
-        <translation>Відображати гучність в децибелах  </translation>
-    </message>
-    <message>
         <source>Compress project files per default</source>
         <translation>За замовчуванням стискати файли проектів</translation>
     </message>
@@ -6058,10 +6274,6 @@ Reason: &quot;%2&quot;</source>
         <translation>Фонове зображення</translation>
     </message>
     <message>
-        <source>FL Studio installation directory</source>
-        <translation>Каталог установки FL Studio</translation>
-    </message>
-    <message>
         <source>STK rawwave directory</source>
         <translation>Каталог STK rawwave</translation>
     </message>
@@ -6080,10 +6292,6 @@ Reason: &quot;%2&quot;</source>
     <message>
         <source>Smooth scroll in Song Editor</source>
         <translation>Плавне прокручування в музичному редакторі</translation>
-    </message>
-    <message>
-        <source>Enable auto save feature</source>
-        <translation>Включити функцію авто-збереження</translation>
     </message>
     <message>
         <source>Show playback cursor in AudioFileProcessor</source>
@@ -6142,10 +6350,6 @@ Latency: %2 ms</source>
     <message>
         <source>Choose artwork-theme directory</source>
         <translation>Вибір каталогу з темою оформлення для LMMS</translation>
-    </message>
-    <message>
-        <source>Choose FL Studio installation directory</source>
-        <translation>Вибір каталогу встановленої FL Studio</translation>
     </message>
     <message>
         <source>Choose LADSPA plugin directory</source>
@@ -6216,14 +6420,29 @@ Latency: %2 ms</source>
         <translation>хвилина</translation>
     </message>
     <message>
-        <source>Auto save interval: %1 %2</source>
-        <translation>Інтервал автоматичного збереження: %1 %2</translation>
+        <source>Display volume as dBFS </source>
+        <translation>Відображати гучність в децибелах  </translation>
+    </message>
+    <message>
+        <source>Enable auto-save</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Allow auto-save while playing</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Auto-save interval: %1</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Set the time between automatic backup to %1.
-Remember to also save your project manually.</source>
-        <translation>Встановіть проміжок часу автоматичного резервного копіювання в %1.
-Не забудьте також зберегти проект вручну.</translation>
+Remember to also save your project manually. You can choose to disable saving while playing, something some older systems find difficult.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6265,10 +6484,6 @@ Remember to also save your project manually.</source>
         <translation>MiDi послідовність</translation>
     </message>
     <message>
-        <source>FL Studio projects</source>
-        <translation>FL Studio проекти</translation>
-    </message>
-    <message>
         <source>Hydrogen projects</source>
         <translation>Hydrogen проекти</translation>
     </message>
@@ -6307,6 +6522,10 @@ Remember to also save your project manually.</source>
     <message>
         <source>LMMS Error report</source>
         <translation>Повідомлення про помилку в LMMS</translation>
+    </message>
+    <message>
+        <source>Save project</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6382,20 +6601,20 @@ Remember to also save your project manually.</source>
         <translation>Неможливо відкрити %1 для запису, можливо, немає дозволу на запис в цей файл, будь-ласка упевніться, що є доступ до цього файлу і спробуйте знову.</translation>
     </message>
     <message>
-        <source>Project Version Mismatch</source>
-        <translation>Невідповідність версій проекту</translation>
-    </message>
-    <message>
-        <source>This %1 was created with LMMS version %2, but version %3 is installed</source>
-        <translation>Цей %1 було створено в LMMS версії %2, але встановлена ​​версія %3</translation>
-    </message>
-    <message>
         <source>template</source>
         <translation>шаблон</translation>
     </message>
     <message>
         <source>project</source>
         <translation>проект</translation>
+    </message>
+    <message>
+        <source>Version difference</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>This %1 was created with LMMS %2.</source>
+        <translation>Цей %1 було створено в LMMS версії %2</translation>
     </message>
 </context>
 <context>
@@ -6500,10 +6719,6 @@ Remember to also save your project manually.</source>
     <message>
         <source>Maximize</source>
         <translation>Розгорнути</translation>
-    </message>
-    <message>
-        <source>Minimize</source>
-        <translation>Згорнути</translation>
     </message>
     <message>
         <source>Restore</source>
@@ -6708,8 +6923,8 @@ Please make sure you have read-permission to the file and the directory containi
         <translation>Імпортую файл MIDI...</translation>
     </message>
     <message>
-        <source>Importing FLP-file...</source>
-        <translation>Імпортую файл FLP...</translation>
+        <source>Loading Track %1 (%2/Total %3)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -6969,6 +7184,10 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Decrement version number</source>
         <translation>Зменшуючийся номер версії</translation>
+    </message>
+    <message>
+        <source> already exists. Do you want to replace it?</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -7832,6 +8051,133 @@ Please make sure you have read-permission to the file and the directory containi
     <message>
         <source>Stereo mode</source>
         <translation>Стерео режим</translation>
+    </message>
+</context>
+<context>
+    <name>expressiveView</name>
+    <message>
+        <source>Select oscillator W1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select oscillator W2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select oscillator W3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select OUTPUT 1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select OUTPUT 2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Open help window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Sine wave</source>
+        <translation>Синусоїда</translation>
+    </message>
+    <message>
+        <source>Click for a sine-wave.</source>
+        <translation>Генерувати гармонійний (синусоїдальний) сигнал.</translation>
+    </message>
+    <message>
+        <source>Moog-Saw wave</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Click for a Moog-Saw-wave.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Exponential wave</source>
+        <translation>Експоненціальна хвиля</translation>
+    </message>
+    <message>
+        <source>Click for an exponential wave.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Saw wave</source>
+        <translation>Зигзаг</translation>
+    </message>
+    <message>
+        <source>Click here for a saw-wave.</source>
+        <translation>Згенерувати зигзаг.</translation>
+    </message>
+    <message>
+        <source>User defined wave</source>
+        <translation>Користувацька</translation>
+    </message>
+    <message>
+        <source>Click here for a user-defined shape.</source>
+        <translation>Задати форму сигналу вручну.</translation>
+    </message>
+    <message>
+        <source>Triangle wave</source>
+        <translation>Трикутник</translation>
+    </message>
+    <message>
+        <source>Click here for a triangle-wave.</source>
+        <translation>Згенерувати трикутний сигнал.</translation>
+    </message>
+    <message>
+        <source>Square wave</source>
+        <translation>Квадратна хвиля</translation>
+    </message>
+    <message>
+        <source>Click here for a square-wave.</source>
+        <translation>Згенерувати квадратний сигнал.</translation>
+    </message>
+    <message>
+        <source>White noise wave</source>
+        <translation>Білий шум</translation>
+    </message>
+    <message>
+        <source>Click here for white-noise.</source>
+        <translation>Згенерувати білий шум.</translation>
+    </message>
+    <message>
+        <source>WaveInterpolate</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>ExpressionValid</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 1:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 2:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>General purpose 3:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>O1 panning:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>O2 panning:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Release transition:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Smoothness</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -8750,7 +9096,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Час поширення</translation>
@@ -8845,7 +9191,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Час розгортки:</translation>
@@ -9077,10 +9423,6 @@ Double clicking any of the plugins will bring up information on the ports.</sour
         <translation>Показати встановлені модулі LADSPA</translation>
     </message>
     <message>
-        <source>Filter for importing FL Studio projects into LMMS</source>
-        <translation>Фільтр для імпортування файлів FL Stuio</translation>
-    </message>
-    <message>
         <source>GUS-compatible patch instrument</source>
         <translation>Патч-інструмент, сумісний з GUS</translation>
     </message>
@@ -9233,6 +9575,14 @@ This chip was used in the Commodore 64 computer.</source>
     <message>
         <source>Filter for exporting MIDI-files from LMMS</source>
         <translation>Фільтри для експорту MIDI-файлів з LMMS</translation>
+    </message>
+    <message>
+        <source>Reverb algorithm by Sean Costello</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Mathematical expression parser</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

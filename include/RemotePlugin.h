@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -94,6 +94,7 @@ typedef int32_t key_t;
 
 #ifndef SYNC_WITH_SHM_FIFO
 #include <poll.h>
+#include <unistd.h>
 #endif
 
 #endif
@@ -423,6 +424,7 @@ enum RemoteMessageIDs
 	IdChangeSharedMemoryKey,
 	IdChangeInputCount,
 	IdChangeOutputCount,
+	IdChangeInputOutputCount,
 	IdShowUI,
 	IdHideUI,
 	IdSaveSettingsToString,
@@ -619,6 +621,11 @@ public:
 			fetchAndProcessNextMessage();
 		}
 	}
+
+	static bool isMainThreadWaiting()
+	{
+		return waitDepthCounter() > 0;
+	}
 #endif
 
 	virtual bool processMessage( const message & _m ) = 0;
@@ -655,6 +662,14 @@ protected:
 
 
 private:
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	static int & waitDepthCounter()
+	{
+		static int waitDepth = 0;
+		return waitDepth;
+	}
+#endif
+
 #ifdef SYNC_WITH_SHM_FIFO
 	shmFifo * m_in;
 	shmFifo * m_out;
@@ -918,6 +933,15 @@ public:
 		sendMessage( message( IdChangeOutputCount ).addInt( _i ) );
 	}
 
+	void setInputOutputCount( int i, int o )
+	{
+		m_inputCount = i;
+		m_outputCount = o;
+		sendMessage( message( IdChangeInputOutputCount )
+				.addInt( i )
+				.addInt( o ) );
+	}
+
 	virtual int inputCount() const
 	{
 		return m_inputCount;
@@ -1071,6 +1095,34 @@ RemotePluginBase::message RemotePluginBase::waitForMessage(
 							const message & _wm,
 							bool _busy_waiting )
 {
+#ifndef BUILD_REMOTE_PLUGIN_CLIENT
+	if( _busy_waiting )
+	{
+		// No point processing events outside of the main thread
+		_busy_waiting = QThread::currentThread() ==
+					QCoreApplication::instance()->thread();
+	}
+
+	struct WaitDepthCounter
+	{
+		WaitDepthCounter( int & depth, bool busy ) :
+			m_depth( depth ),
+			m_busy( busy )
+		{
+			if( m_busy ) { ++m_depth; }
+		}
+
+		~WaitDepthCounter()
+		{
+			if( m_busy ) { --m_depth; }
+		}
+
+		int & m_depth;
+		bool m_busy;
+	};
+
+	WaitDepthCounter wdc( waitDepthCounter(), _busy_waiting );
+#endif
 	while( !isInvalid() )
 	{
 #ifndef BUILD_REMOTE_PLUGIN_CLIENT

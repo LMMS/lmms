@@ -9,7 +9,7 @@
  * Copyright (C) 2005-2008 Christian Schoenebeck
  * Copyright (C) 2009-2010 Christian Schoenebeck and Grigor Iliev
  *
- * This file is part of Linux MultiMedia Studio - http://lmms.sourceforge.net
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -52,7 +52,7 @@
 #include "ToolTip.h"
 #include "LcdSpinBox.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -1066,7 +1066,6 @@ void GigInstrumentView::showFileDialog()
 	types << tr( "GIG Files (*.gig)" );
 	ofd.setNameFilters( types );
 
-	QString dir;
 	if( k->m_filename != "" )
 	{
 		QString f = SampleBuffer::tryToMakeAbsolute( k->m_filename );

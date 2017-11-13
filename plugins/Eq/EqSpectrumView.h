@@ -2,7 +2,7 @@
 *
 * Copyright (c) 2014 David French <dave/dot/french3/at/googlemail/dot/com>
 *
-* This file is part of LMMS - http://lmms.io
+* This file is part of LMMS - https://lmms.io
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -32,7 +32,6 @@
 
 
 const int MAX_BANDS = 2048;
-
 class EqAnalyser
 {
 public:
@@ -61,6 +60,7 @@ private:
 	int m_sampleRate;
 	bool m_active;
 	bool m_inProgress;
+	float m_fftWindow[FFT_BUFFER_SIZE];
 };
 
 

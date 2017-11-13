@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -25,6 +25,7 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
 
 #include "JournallingObject.h"
@@ -407,7 +408,7 @@ public:
 	{
 	}
 	float getRoundedValue() const;
-	float getDigitCount();
+	int getDigitCount() const;
 	defaultTypedMethods(float);
 
 } ;
@@ -444,6 +445,7 @@ public:
 
 } ;
 
+typedef QMap<AutomatableModel*, float> AutomatedValueMap;
 
 #endif
 

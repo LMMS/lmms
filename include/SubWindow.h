@@ -5,7 +5,7 @@
  *
  * Copyright (c) 2015 Colin Wallace <wallace.colin.a@gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -65,7 +65,10 @@ protected:
 	virtual void resizeEvent( QResizeEvent * event );
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void changeEvent( QEvent * event );
-	
+
+signals:
+	void focusLost();
+
 private:
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
@@ -79,10 +82,14 @@ private:
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
+	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
 	bool isMaximized();
 	void adjustTitleBar();
+
+private slots:
+	void focusChanged( QMdiSubWindow * subWindow );
 };
 
 #endif

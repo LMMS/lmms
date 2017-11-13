@@ -56,16 +56,18 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		LadspaEffect
 		lb302
 		MidiImport
-		# MidiExport - temporarily disabled, MIDI export is broken
+		MidiExport
 		MultitapEcho
 		monstro
 		nes
-		opl2
+		OpulenZ
 		organic
-		papu
+		FreeBoy
 		patman
 		peak_controller_effect
 		GigPlayer
+		ReverbSC
+		sf2_player
 		sfxr
 		sid
 		SpectrumAnalyzer
@@ -78,15 +80,10 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		watsyn
 		waveshaper
 		vibed
+		Xpressive
 		zynaddsubfx
 	)
 
-	IF(NOT LMMS_BUILD_APPLE)
-		SET(PLUGIN_LIST
-			${PLUGIN_LIST}
-			sf2_player
-		)
-	ENDIF()
 ENDIF("${PLUGIN_LIST}" STREQUAL "")
 
 FOREACH(PLUGIN ${PLUGIN_LIST})

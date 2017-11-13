@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -24,8 +24,6 @@
 
 #include <QDomElement>
 #include <QDir>
-#include <QFile>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
 #include <QtCore/QTextStream>
@@ -35,6 +33,7 @@
 #include "ProjectVersion.h"
 #include "GuiApplication.h"
 
+#include "lmmsversion.h"
 
 static inline QString ensureTrailingSlash( const QString & s )
 {
@@ -64,7 +63,12 @@ ConfigManager::ConfigManager() :
 
 	// If we're in development (lmms is not installed) let's get the source and
 	// binary directories by reading the CMake Cache
-	QFile cmakeCache(qApp->applicationDirPath() + "/CMakeCache.txt");
+	QDir appPath = qApp->applicationDirPath();
+	// If in tests, get parent directory
+	if (appPath.dirName() == "tests") {
+		appPath.cdUp();
+	}
+	QFile cmakeCache(appPath.absoluteFilePath("CMakeCache.txt"));
 	if (cmakeCache.exists()) {
 		cmakeCache.open(QFile::ReadOnly);
 		QTextStream stream(&cmakeCache);
@@ -177,6 +181,11 @@ void ConfigManager::upgrade()
 	m_version = LMMS_VERSION;
 }
 
+QString ConfigManager::defaultVersion() const
+{
+	return LMMS_VERSION;
+}
+
 bool ConfigManager::hasWorkingDir() const
 {
 	return QDir( m_workingDir ).exists();
@@ -273,7 +282,8 @@ void ConfigManager::addRecentlyOpenedProject( const QString & file )
 {
 	QFileInfo recentFile( file );
 	if( recentFile.suffix().toLower() == "mmp" ||
-			recentFile.suffix().toLower() == "mmpz" )
+		recentFile.suffix().toLower() == "mmpz" ||
+		recentFile.suffix().toLower() == "mpt" )
 	{
 		m_recentlyOpenedProjects.removeAll( file );
 		if( m_recentlyOpenedProjects.size() > 50 )
@@ -305,6 +315,16 @@ const QString & ConfigManager::value( const QString & cls,
 	}
 	static QString empty;
 	return empty;
+}
+
+
+
+const QString & ConfigManager::value( const QString & cls,
+				      const QString & attribute,
+				      const QString & defaultVal ) const
+{
+	const QString & val = value( cls, attribute );
+	return val.isEmpty() ? defaultVal : val;
 }
 
 
@@ -417,7 +437,16 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 			if( value( "paths", "artwork" ) != "" )
 			{
 				m_artworkDir = value( "paths", "artwork" );
-				if( !QDir( m_artworkDir ).exists() )
+#ifdef LMMS_BUILD_WIN32
+				// Detect a QDir/QFile hang on Windows
+				// see issue #3417 on github
+				bool badPath = ( m_artworkDir == "/" || m_artworkDir == "\\" );
+#else
+				bool badPath = false;
+#endif
+
+				if( badPath || !QDir( m_artworkDir ).exists() ||
+						!QFile( m_artworkDir + "/style.css" ).exists() )
 				{
 					m_artworkDir = defaultArtworkDir();
 				}
@@ -474,7 +503,16 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 #elif defined(LMMS_BUILD_APPLE)
 		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		m_stkDir = "/usr/share/stk/rawwaves/";
+		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		{
+			// Assume AppImage bundle
+			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		}
+		else
+		{
+			// Fallback to system provided location
+			m_stkDir = "/usr/share/stk/rawwaves/";
+		}
 #endif
 	}
 #endif
@@ -547,14 +585,21 @@ void ConfigManager::saveConfigFile()
 	QFile outfile( m_lmmsRcFile );
 	if( !outfile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		QMessageBox::critical( NULL,
-			MainWindow::tr( "Could not save config-file" ),
-			MainWindow::tr( "Could not save configuration file %1. "
-					"You're probably not permitted to "
-					"write to this file.\n"
-					"Please make sure you have write-"
-					"access to the file and try again." ).
-							arg( m_lmmsRcFile  ) );
+		QString title, message;
+		title = MainWindow::tr( "Could not open file" );
+		message = MainWindow::tr( "Could not open file %1 "
+					"for writing.\nPlease make "
+					"sure you have write "
+					"permission to the file and "
+					"the directory containing the "
+					"file and try again!"
+						).arg( m_lmmsRcFile );
+		if( gui )
+		{
+			QMessageBox::critical( NULL, title, message,
+						QMessageBox::Ok,
+						QMessageBox::NoButton );
+		}
 		return;
 	}
 

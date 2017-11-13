@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -30,15 +30,13 @@
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "BufferManager.h"
-#include "ValueBuffer.h"
-#include "panning.h"
 
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
 		BoolModel * mutedModel ) :
 	m_bufferUsage( false ),
-	m_portBuffer( NULL ),
+	m_portBuffer( BufferManager::acquire() ),
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
@@ -59,6 +57,7 @@ AudioPort::~AudioPort()
 	setExtOutputEnabled( false );
 	Engine::mixer()->removeAudioPort( this );
 	delete m_effects;
+	BufferManager::release( m_portBuffer );
 }
 
 
@@ -112,8 +111,7 @@ void AudioPort::doProcessing()
 
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
-	// get a buffer for processing and clear it
-	m_portBuffer = BufferManager::acquire();
+	// clear the buffer
 	BufferManager::clear( m_portBuffer, fpp );
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
@@ -227,8 +225,6 @@ void AudioPort::doProcessing()
 																			// TODO: improve the flow here - convert to pull model
 		m_bufferUsage = false;
 	}
-
-	BufferManager::release( m_portBuffer ); // release buffer, we don't need it anymore
 }
 
 

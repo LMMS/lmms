@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -35,7 +35,6 @@
 #include "Mixer.h"
 #include "Engine.h"
 #include "gui_templates.h"
-#include "templates.h"
 
 #ifdef LMMS_HAVE_UNISTD_H
 #include <unistd.h>
@@ -45,9 +44,6 @@
 #endif
 #ifdef LMMS_HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef LMMS_HAVE_STDLIB_H
-#include <stdlib.h>
 #endif
 
 #ifdef LMMS_HAVE_SYS_SOUNDCARD_H

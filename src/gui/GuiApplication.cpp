@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Lukas W <lukaswhl/at/gmail.com>
  *
- * This file is part of LMMS - http://lmms.io
+ * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -43,6 +43,8 @@
 #include "SongEditor.h"
 
 #include <QApplication>
+#include <QDir>
+#include <QtGlobal>
 #include <QMessageBox>
 #include <QSplashScreen>
 
@@ -56,6 +58,11 @@ GuiApplication* GuiApplication::instance()
 
 GuiApplication::GuiApplication()
 {
+	// enable HiDPI scaling before showing anything (Qt 5.6+ only)
+	#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+		QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+	#endif
+	
 	// prompt the user to create the LMMS working directory (e.g. ~/lmms) if it doesn't exist
 	if ( !ConfigManager::inst()->hasWorkingDir() &&
 		QMessageBox::question( NULL,
@@ -68,6 +75,10 @@ GuiApplication::GuiApplication()
 		ConfigManager::inst()->createWorkingDir();
 	}
 	// Init style and palette
+	QDir::addSearchPath("artwork", ConfigManager::inst()->artworkDir());
+	QDir::addSearchPath("artwork", ConfigManager::inst()->defaultArtworkDir());
+	QDir::addSearchPath("artwork", ":/artwork");
+
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);
 
@@ -76,6 +87,10 @@ GuiApplication::GuiApplication()
 
 	QApplication::setPalette( *lpal );
 	LmmsStyle::s_palette = lpal;
+
+#ifdef LMMS_BUILD_APPLE
+	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, true);
+#endif
 
 	// Show splash screen
 	QSplashScreen splashScreen( embed::getIconPixmap( "splash" ) );
@@ -191,13 +206,10 @@ void GuiApplication::childDestroyed(QObject *obj)
 	{
 		m_grooveView = nullptr;
 	}
-<<<<<<< HEAD
 	else if (obj == m_studioControllerView)
 	{
 		m_studioControllerView = nullptr;
 	}
-=======
->>>>>>> 8e2f06baabdf024f3acfcd69ff11a4e72552ca9c
 	else if (obj == m_songEditor)
 	{
 		m_songEditor = nullptr;
