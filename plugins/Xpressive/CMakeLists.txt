@@ -10,6 +10,12 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dexprtk_disable_rtl_io_file")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dexprtk_disable_rtl_vecops")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WERROR_FLAGS} -fexceptions")
 
+# See https://github.com/ArashPartow/exprtk/pull/9
+IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	EXECUTE_PROCESS(COMMAND patch exprtk/exprtk.hpp exprtk.hpp.patch
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET)
+ENDIF()
+
 IF(LMMS_BUILD_WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -Dexprtk_disable_enhanced_features")
 ENDIF()
