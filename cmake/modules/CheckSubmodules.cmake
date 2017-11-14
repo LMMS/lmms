@@ -20,6 +20,12 @@
 # Files which confirm a successful clone
 SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh")
 
+# Try and use the specified shallow clone on submodules, if supported
+SET(DEPTH_VALUE 100)
+
+# Number of times git commands will retry before failing
+SET(MAX_ATTEMPTS 2)
+
 MESSAGE("\nValidating submodules...")
 FILE(READ "${CMAKE_SOURCE_DIR}/.gitmodules" SUBMODULE_DATA)
 
@@ -60,9 +66,16 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT)
 		# Recurse
 		GIT_SUBMODULE(${SUBMODULE_PATH} false)
 	ELSE()
-		MESSAGE("--   Fetching ${SUBMODULE_PATH}")
+		# Try to use the depth switch
+		SET(DEPTH_CMD "")
+			MESSAGE("--   Fetching ${SUBMODULE_PATH}")
+		IF(DEPTH_VALUE)
+			SET(DEPTH_CMD "--depth" )
+			MESSAGE("--   Fetching ${SUBMODULE_PATH} @ --depth ${DEPTH_VALUE}")
+		ENDIF()
+		
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive ${DEPTH_CMD} ${DEPTH_VALUE} ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 			RESULT_VARIABLE GIT_RESULT
 			OUTPUT_VARIABLE GIT_STDOUT
@@ -93,7 +106,6 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 	IF(NOT CRUMB_FOUND)
 		GIT_SUBMODULE(${_submodule} false)
 
-		SET(MAX_ATTEMPTS 2)
 		SET(COUNTED 0)
 		SET(COUNTING "")
 		# Handle edge-cases where submodule didn't clone properly or re-uses a non-empty directory
@@ -104,6 +116,15 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 			FOREACH(_phrase ${RETRY_PHRASES})
 				IF("${GIT_MESSAGE}" MATCHES "${_phrase}")
 					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
+					
+					# Shallow submodules were introduced in 1.8.4
+					# Shallow commits can fail to clone from non-default branches, only try once
+					IF(GIT_VERSION_STRING VERSION_GREATER "1.8.3" AND COUNTED LESS 2)
+						# Try a shallow submodule clone
+					ELSE()
+						UNSET(DEPTH_VALUE)
+					ENDIF()
+					
 					GIT_SUBMODULE(${_submodule} true)
 				ENDIF()
 			ENDFOREACH()
