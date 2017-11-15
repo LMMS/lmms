@@ -13,6 +13,7 @@ IF(COMMAND CMAKE_POLICY)
 	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
 
+INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
