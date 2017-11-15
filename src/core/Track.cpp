@@ -2500,7 +2500,6 @@ void Track::toggleSolo()
 
 
 
-//Spekular was here
 void Track::iWasToldToVerticallyZoom()
 {
 	//setHeight( 200 );
