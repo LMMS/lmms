@@ -678,8 +678,6 @@ public:
 
 public slots:
 	virtual bool close();
-	//Spekular was here
-	//void soCloseYetSoFar();
 
 
 protected:
