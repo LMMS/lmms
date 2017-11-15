@@ -595,7 +595,6 @@ public slots:
 
 	void toggleSolo();
 
-	//Spekular was here
 	void iWasToldToVerticallyZoom();
 
 
