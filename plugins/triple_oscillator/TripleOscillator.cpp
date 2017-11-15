@@ -39,7 +39,7 @@
 #include "SampleBuffer.h"
 #include "ToolTip.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"

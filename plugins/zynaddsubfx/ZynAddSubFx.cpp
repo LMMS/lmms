@@ -46,7 +46,7 @@
 #include "Mixer.h"
 #include "ControllerConnection.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 
@@ -445,8 +445,8 @@ void ZynAddSubFxInstrument::initPlugin()
 			RemotePlugin::message( IdZasfPresetDirectory ).
 				addString(
 					QSTR_TO_STDSTR(
-						QString( ConfigManager::inst()->factoryPresetsDir() +
-								QDir::separator() + "ZynAddSubFX" ) ) ) );
+						QDir( ConfigManager::inst()->factoryPresetsDir() +
+								"/ZynAddSubFX" ).absolutePath() ) ) );
 
 		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
 

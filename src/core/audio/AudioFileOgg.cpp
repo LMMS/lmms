@@ -36,21 +36,14 @@
 #include "Mixer.h"
 
 
-AudioFileOgg::AudioFileOgg( const sample_rate_t _sample_rate,
-				const ch_cnt_t _channels,
-				bool & _success_ful,
-				const QString & _file,
-				const bool _use_vbr,
-				const bitrate_t _nom_bitrate,
-				const bitrate_t _min_bitrate,
-				const bitrate_t _max_bitrate,
-				const int _depth,
-				Mixer*  _mixer ) :
-	AudioFileDevice( _sample_rate, _channels, _file, _use_vbr,
-				_nom_bitrate, _min_bitrate, _max_bitrate,
-								_depth, _mixer )
+AudioFileOgg::AudioFileOgg(	OutputSettings const & outputSettings,
+				const ch_cnt_t channels,
+				bool & successful,
+				const QString & file,
+				Mixer* mixer ) :
+	AudioFileDevice( outputSettings, channels, file, mixer )
 {
-	m_ok = _success_ful = outputFileOpened() && startEncoding();
+	m_ok = successful = outputFileOpened() && startEncoding();
 }
 
 
@@ -77,8 +70,7 @@ inline int AudioFileOgg::writePage()
 bool AudioFileOgg::startEncoding()
 {
 	vorbis_comment vc;
-	const char * comments = "Cool=This song has been made using Linux "
-							"MultiMedia Studio";
+	const char * comments = "Cool=This song has been made using LMMS";
 	int comment_length = strlen( comments );
 	char * user_comments = new char[comment_length + 1];
 	strcpy( user_comments, comments );
@@ -89,17 +81,17 @@ bool AudioFileOgg::startEncoding()
 	vc.vendor = NULL;
 
 	m_channels = channels();
-	// vbr enabled?
-	if( useVBR() == 0 )
+
+	bool useVariableBitRate = getOutputSettings().getBitRateSettings().isVariableBitRate();
+	bitrate_t minimalBitrate = nominalBitrate();
+	bitrate_t maximumBitrate = nominalBitrate();
+
+	if( useVariableBitRate )
 	{
-		m_minBitrate = nominalBitrate();	// min for vbr
-		m_maxBitrate = nominalBitrate();	// max for vbr
+		minimalBitrate = minBitrate();		// min for vbr
+		maximumBitrate = maxBitrate();		// max for vbr
 	}
-	else
-	{
-		m_minBitrate = minBitrate();		// min for vbr
-		m_maxBitrate = maxBitrate();		// max for vbr
-	}
+
 
 	m_rate 		= sampleRate();		// default-samplerate
 	if( m_rate > 48000 )
@@ -107,16 +99,16 @@ bool AudioFileOgg::startEncoding()
 		m_rate = 48000;
 		setSampleRate( 48000 );
 	}
-	m_serialNo 	= 0;			// track-num?
+
 	m_comments 	= &vc;			// comments for ogg-file
 
 	// Have vorbisenc choose a mode for us
 	vorbis_info_init( &m_vi );
 
 	if( vorbis_encode_setup_managed( &m_vi, m_channels, m_rate,
-			( m_maxBitrate > 0 )? m_maxBitrate * 1000 : -1,
+			( maximumBitrate > 0 )? maximumBitrate * 1000 : -1,
 						nominalBitrate() * 1000, 
-			( m_minBitrate > 0 )? m_minBitrate * 1000 : -1 ) )
+			( minimalBitrate > 0 )? minimalBitrate * 1000 : -1 ) )
 	{
 		printf( "Mode initialization failed: invalid parameters for "
 								"bitrate\n" );
@@ -125,14 +117,14 @@ bool AudioFileOgg::startEncoding()
 		return false;
 	}
 
-	if( useVBR() == false )
-	{
-		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
-	}
-	else if( useVBR() == true )
+	if( useVariableBitRate )
 	{
 		// Turn off management entirely (if it was turned on).
 		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_SET, NULL );
+	}
+	else
+	{
+		vorbis_encode_ctl( &m_vi, OV_ECTL_RATEMANAGE_AVG, NULL );
 	}
 
 	vorbis_encode_setup_init( &m_vi );
@@ -142,6 +134,10 @@ bool AudioFileOgg::startEncoding()
 	vorbis_analysis_init( &m_vd, &m_vi );
 	vorbis_block_init( &m_vd, &m_vb );
 
+	// We give our ogg file a random serial number and avoid
+	// 0 and UINT32_MAX which can get you into trouble.
+	qsrand( time( 0 ) );
+	m_serialNo = 0xD0000000 + qrand() % 0x0FFFFFFF;
 	ogg_stream_init( &m_os, m_serialNo );
 
 	// Now, build the three header packets and send through to the stream

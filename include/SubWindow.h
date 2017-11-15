@@ -72,7 +72,10 @@ protected:
 	virtual void resizeEvent( QResizeEvent * event );
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void changeEvent( QEvent * event );
-	
+
+signals:
+	void focusLost();
+
 private:
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
@@ -86,10 +89,14 @@ private:
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
+	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
 	bool isMaximized();
 	void adjustTitleBar();
+
+private slots:
+	void focusChanged( QMdiSubWindow * subWindow );
 };
 
 #endif

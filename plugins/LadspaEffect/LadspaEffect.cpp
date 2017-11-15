@@ -41,7 +41,7 @@
 #include "ValueBuffer.h"
 #include "Song.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -57,7 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT ladspaeffect_plugin_descriptor =
 	"Danny McRae <khjklujn/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	new LadspaSubPluginFeatures( Plugin::Effect )
 } ;

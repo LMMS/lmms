@@ -41,14 +41,14 @@ public:
 	virtual bool play( MidiTime _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
 
-	virtual void updateAfterTrackAdd();
+	virtual void updateAfterTrackAdd() override;
 
-	inline virtual QString nodeName() const
+	inline virtual QString nodeName() const override
 	{
 		return "bbtrackcontainer";
 	}
 
-	tact_t lengthOfBB( int _bb );
+	tact_t lengthOfBB( int _bb ) const;
 	inline tact_t lengthOfCurrentBB()
 	{
 		return lengthOfBB( currentBB() );
@@ -62,6 +62,7 @@ public:
 	void fixIncorrectPositions();
 	void createTCOsForBB( int _bb );
 
+	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum) const override;
 
 public slots:
 	void play();

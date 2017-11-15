@@ -631,7 +631,6 @@ void Knob::mouseMoveEvent( QMouseEvent * _me )
 		emit sliderMoved( model()->value() );
 		QCursor::setPos( mapToGlobal( m_origMousePos ) );
 	}
-
 	s_textFloat->setText( displayValue() );
 }
 
@@ -735,7 +734,7 @@ void Knob::setPosition( const QPoint & _p )
 		float newValue = value * ratio;
 		if( qAbs( newValue ) >= step )
 		{
-			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - newValue ) / step + 0.5 ) ) * step;
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
 			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}
@@ -749,7 +748,7 @@ void Knob::setPosition( const QPoint & _p )
 	{
 		if( qAbs( value ) >= step )
 		{
-			float roundedValue = static_cast<float>( static_cast<int>( ( oldValue - value ) / step + 0.5 ) ) * step;
+			float roundedValue = qRound( ( oldValue - value ) / step ) * step;
 			model()->setValue( roundedValue );
 			m_leftOver = 0.0f;
 		}

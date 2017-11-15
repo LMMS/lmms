@@ -26,7 +26,7 @@
 #define EQCONTROLS_H
 
 #include "EffectControls.h"
-#include "EqControlsDialog.h"
+#include "EqSpectrumView.h"
 
 
 class EqEffect;
@@ -54,10 +54,7 @@ public:
 		return 42;
 	}
 
-	virtual EffectControlDialog* createView()
-	{
-		return new EqControlsDialog( this );
-	}
+	virtual EffectControlDialog* createView();
 
 	float m_inPeakL;
 	float m_inPeakR;

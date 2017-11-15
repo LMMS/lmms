@@ -44,7 +44,7 @@ const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString GIG_PATH = "samples/gig/";
-const QString SF2_PATH = "samples/sf2/";
+const QString SF2_PATH = "samples/soundfonts/";
 const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
@@ -217,6 +217,9 @@ public:
 
 	const QString & value( const QString & cls,
 					const QString & attribute ) const;
+	const QString & value( const QString & cls,
+					const QString & attribute,
+					const QString & defaultVal ) const;
 	void setValue( const QString & cls, const QString & attribute,
 						const QString & value );
 	void deleteValue( const QString & cls, const QString & attribute);

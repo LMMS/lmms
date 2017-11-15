@@ -69,7 +69,7 @@ QPixmap * AutomationEditor::s_toolYFlip = NULL;
 QPixmap * AutomationEditor::s_toolXFlip = NULL;
 
 const QVector<double> AutomationEditor::m_zoomXLevels =
-		{ 8.0f, 4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f };
+		{ 0.125f, 0.25f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f };
 
 
 
@@ -152,7 +152,8 @@ AutomationEditor::AutomationEditor() :
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
 				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
-						m_currentPosition, this );
+					m_currentPosition,
+					Song::Mode_PlayAutomationPattern, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -239,7 +240,7 @@ void AutomationEditor::setCurrentPattern(AutomationPattern * new_pattern )
 
 void AutomationEditor::saveSettings(QDomDocument & doc, QDomElement & dom_parent)
 {
-	MainWindow::saveWidgetState(parentWidget(), dom_parent, QSize( 640, 400 ));
+	MainWindow::saveWidgetState( parentWidget(), dom_parent );
 }
 
 
@@ -589,6 +590,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_editMode == DRAW ) ||
 					m_editMode == ERASE )
 			{
+				m_drawLastTick = pos_ticks;
 				m_pattern->addJournalCheckPoint();
 				// erase single value
 				if( it != time_map.end() )
@@ -680,6 +682,39 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
+
+void AutomationEditor::removePoints( int x0, int x1 )
+{
+	int deltax = qAbs( x1 - x0 );
+	int x = x0;
+	int xstep;
+
+	if( deltax < 1 )
+	{
+		return;
+	}
+
+	if( x0 < x1 )
+	{
+		xstep = 1;
+	}
+	else
+	{
+		xstep = -1;
+	}
+
+	int i = 0;
+	while( i <= deltax )
+	{
+		m_pattern->removeValue( MidiTime( x ) );
+		x += xstep;
+		i += 1;
+	}
+}
+
+
+
+
 void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
 	QMutexLocker m( &m_patternMutex );
@@ -735,14 +770,13 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == ERASE ) )
 		{
-			// int resolution needed to improve the sensitivity of
-			// the erase manoeuvre with zoom levels < 100%
-			int zoom = m_zoomingXModel.value();
-			int resolution = 1 + zoom * zoom;
-			for( int i = -resolution; i < resolution; ++i )
+			// removing automation point
+			if( pos_ticks < 0 )
 			{
-				m_pattern->removeValue( MidiTime( pos_ticks + i ) );
+				pos_ticks = 0;
 			}
+			removePoints( m_drawLastTick, pos_ticks );
+			Engine::getSong()->setModified();
 		}
 		else if( mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
@@ -1067,7 +1101,7 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 {
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
-	const int outerRadius = qBound( 2, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
+	const int outerRadius = qBound( 3, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
 	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
 	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
@@ -1233,18 +1267,20 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 			}
 		}
 
+
 		// alternating shades for better contrast
-		// count the bars which disappear on left by scrolling
-
+		float timeSignature = static_cast<float>( Engine::getSong()->getTimeSigModel().getNumerator() )
+				/ static_cast<float>( Engine::getSong()->getTimeSigModel().getDenominator() );
 		float zoomFactor = m_zoomXLevels[m_zoomingXModel.value()];
-		int barCount = m_currentPosition / MidiTime::ticksPerTact();
-		int leftBars = m_currentPosition * zoomFactor / m_ppt;
+		//the bars which disappears at the left side by scrolling
+		int leftBars = m_currentPosition * zoomFactor / MidiTime::ticksPerTact();
 
-		for( int x = VALUES_WIDTH; x < width() + m_currentPosition * zoomFactor; x += m_ppt, ++barCount )
+		//iterates the visible bars and draw the shading on uneven bars
+		for( int x = VALUES_WIDTH, barCount = leftBars; x < width() + m_currentPosition * zoomFactor / timeSignature; x += m_ppt, ++barCount )
 		{
 			if( ( barCount + leftBars )  % 2 != 0 )
 			{
-				p.fillRect( x - m_currentPosition * zoomFactor, TOP_MARGIN, m_ppt,
+				p.fillRect( x - m_currentPosition * zoomFactor / timeSignature, TOP_MARGIN, m_ppt,
 					height() - ( SCROLLBAR_SIZE + TOP_MARGIN ), backgroundShade() );
 			}
 		}
@@ -1252,13 +1288,6 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		// Draw the beat grid
 		int ticksPerBeat = DefaultTicksPerTact /
 			Engine::getSong()->getTimeSigModel().getDenominator();
-
-		// triplet mode occurs if the note quantization isn't a multiple of 3
-		// note that the automation editor does not support triplets yet
-		if( AutomationPattern::quantization() % 3 != 0 )
-		{
-			ticksPerBeat = static_cast<int>( ticksPerBeat * 2.0/3.0 );
-		}
 
 		for( tick = m_currentPosition - m_currentPosition % ticksPerBeat,
 				 x = xCoordOfTick( tick );
@@ -1308,7 +1337,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 		//Don't bother doing/rendering anything if there is no automation points
 		if( time_map.size() > 0 )
 		{
-			timeMap::iterator it = time_map.begin(); 
+			timeMap::iterator it = time_map.begin();
 			while( it+1 != time_map.end() )
 			{
 				// skip this section if it occurs completely before the
@@ -1325,7 +1354,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				{
 					break;
 				}
-				
+
 				//NEEDS Change in CSS
 				/*bool is_selected = false;
 				// if we're in move-mode, we may only draw
@@ -1365,8 +1394,8 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				for( int i = 0; i < ( it + 1 ).key() - it.key(); i++ )
 				{	path.lineTo( QPointF( xCoordOfTick( it.key() + i ), yCoordOfLevel( values[i] ) ) );
 					//NEEDS Change in CSS
-					//drawLevelTick( p, it.key() + i, values[i], is_selected ); 
-					
+					//drawLevelTick( p, it.key() + i, values[i], is_selected );
+
 				}
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( nextValue ) ) );
 				path.lineTo( QPointF( xCoordOfTick( ( it + 1 ).key() ), yCoordOfLevel( 0 ) ) );
@@ -1542,12 +1571,12 @@ void AutomationEditor::drawLevelTick(QPainter & p, int tick, float value)
 
 		p.fillRect( x, y_start, rect_width, rect_height, currentColor );
 	}
-	
+
 	else
 	{
 		printf("not in range\n");
 	}
-	
+
 }
 
 
@@ -1605,12 +1634,12 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		{
 			y++;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			y--;
 		}
 		y = qBound( 0, y, m_zoomingYModel.size() - 1 );
-		m_zoomingYModel.setValue( y ); 
+		m_zoomingYModel.setValue( y );
 	}
 	else if( we->modifiers() & Qt::ControlModifier && we->modifiers() & Qt::AltModifier )
 	{
@@ -1619,7 +1648,7 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		{
 			q--;
 		}
-		if( we->delta() < 0 )
+		else if( we->delta() < 0 )
 		{
 			q++;
 		}
@@ -1632,11 +1661,11 @@ void AutomationEditor::wheelEvent(QWheelEvent * we )
 		int x = m_zoomingXModel.value();
 		if( we->delta() > 0 )
 		{
-			x--;
-		}
-		if( we->delta() < 0 )
-		{
 			x++;
+		}
+		else if( we->delta() < 0 )
+		{
+			x--;
 		}
 		x = qBound( 0, x, m_zoomingXModel.size() - 1 );
 		m_zoomingXModel.setValue( x );
@@ -2105,6 +2134,8 @@ void AutomationEditor::setQuantization()
 	}
 	quantization = DefaultTicksPerTact / quantization;
 	AutomationPattern::setQuantization( quantization );
+
+	update();
 }
 
 

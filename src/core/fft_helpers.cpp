@@ -160,7 +160,7 @@ int calc13octaveband31(float *absspec_buffer, float *subbands, int num_spec, flo
 {
 static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000};
 	int i, j;
-	float f_min, f_max, frequency, bandwith;
+	float f_min, f_max, frequency, bandwidth;
 	int j_min, j_max=0;
 	float fpower;
 
@@ -189,13 +189,13 @@ static const int onethirdoctavecenterfr[] = {20, 25, 31, 40, 50, 63, 80, 100, 12
 	{
 		subbands[i]=0;
 
-		// calculate bandwith for subband
+		// calculate bandwidth for subband
 		frequency=onethirdoctavecenterfr[i];
 
-		bandwith=(pow(2, 1.0/3.0)-1)*frequency;
+		bandwidth=(pow(2, 1.0/3.0)-1)*frequency;
 
-		f_min=frequency-bandwith/2.0;
-		f_max=frequency+bandwith/2.0;
+		f_min=frequency-bandwidth/2.0;
+		f_max=frequency+bandwidth/2.0;
 
 		j_min=(int)(f_min/max_frequency*(float)num_spec);
 

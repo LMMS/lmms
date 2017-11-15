@@ -48,7 +48,7 @@
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
-			Song::PlayPos & pos, const MidiTime & begin,
+			Song::PlayPos & pos, const MidiTime & begin, Song::PlayModes mode,
 							QWidget * parent ) :
 	QWidget( parent ),
 	m_inactiveLoopColor( 52, 63, 53, 64 ),
@@ -69,6 +69,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_ppt( ppt ),
 	m_pos( pos ),
 	m_begin( begin ),
+	m_mode( mode ),
 	m_savedPos( -1 ),
 	m_hint( NULL ),
 	m_action( NoAction ),
@@ -94,6 +95,8 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	connect( updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updatePosition() ) );
 	updateTimer->start( 50 );
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
+					this, SLOT( update() ) );
 }
 
 
@@ -368,10 +371,13 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	switch( m_action )
 	{
 		case MovePositionMarker:
-			m_pos.setTicks( t.getTicks() );
-			Engine::getSong()->setMilliSeconds( ( t.getTicks() *
-					( 60 * 1000 / 48 ) ) /
-						Engine::getSong()->getTempo() );
+			m_pos.setTicks(t.getTicks());
+			Engine::getSong()->setToTime(t, m_mode);
+			if (!( Engine::getSong()->isPlaying()))
+			{
+				//Song::Mode_None is used when nothing is being played.
+				Engine::getSong()->setToTime(t, Song::Mode_None);
+			}
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			positionMarkerMoved();

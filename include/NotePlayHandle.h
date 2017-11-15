@@ -66,8 +66,7 @@ public:
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle() {}
-	void done();
+	virtual ~NotePlayHandle();
 
 	void * operator new ( size_t size, void * p )
 	{
@@ -154,6 +153,11 @@ public:
 	bool isReleased() const
 	{
 		return m_released;
+	}
+
+	bool isReleaseStarted() const
+	{
+		return m_releaseStarted;
 	}
 
 	/*! Returns total numbers of frames played so far */
@@ -297,6 +301,7 @@ private:
 											// release of note
 	NotePlayHandleList m_subNotes;			// used for chords and arpeggios
 	volatile bool m_released;				// indicates whether note is released
+	bool m_releaseStarted;
 	bool m_hasParent;						// indicates whether note has parent
 	NotePlayHandle * m_parent;			// parent note
 	bool m_hadChildren;

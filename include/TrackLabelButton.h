@@ -29,8 +29,9 @@
 #include <QToolButton>
 #include <QLineEdit>
 
-
 class TrackView;
+
+class TrackRenameLineEdit;
 
 
 class TrackLabelButton : public QToolButton
@@ -60,7 +61,7 @@ protected:
 private:
 	TrackView * m_trackView;
 	QString m_iconName;
-	QLineEdit * m_renameLineEdit;
+	TrackRenameLineEdit * m_renameLineEdit;
 	QRect m_buttonRect;
 	QString elideName( const QString &name );
 

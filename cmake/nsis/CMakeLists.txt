@@ -7,11 +7,17 @@ SET(CPACK_NSIS_URL_INFO_ABOUT           "${PROJECT_URL}" PARENT_SCOPE)
 SET(CPACK_NSIS_CONTACT                  "${PROJECT_EMAIL}" PARENT_SCOPE)
 SET(CPACK_PACKAGE_EXECUTABLES           "${CMAKE_PROJECT_NAME}.exe;${PROJECT_NAME_UCASE}" PARENT_SCOPE)
 SET(CPACK_NSIS_MENU_LINKS               "${CMAKE_PROJECT_NAME}.exe;${PROJECT_NAME_UCASE}" PARENT_SCOPE)
-SET(CPACK_NSIS_DEFINES                  "!include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh")
+SET(CPACK_NSIS_DEFINES                  "
+  !include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh
+  !include LogicLib.nsh
+  !include WinVer.nsh")
 SET(CPACK_PACKAGE_FILE_NAME             "${CMAKE_PROJECT_NAME}-${VERSION}-win32")
-SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS   "
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmpz\\\" \\\"${PROJECT_NAME_UCASE} Project (compressed)\\\"
+  \\\${IfNot} \\\${AtMostWin7}
+    WriteRegDWORD HKLM \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\SideBySide\\\" \\\"PreferExternalManifest\\\" \\\"1\\\"
+  \\\${EndIf}
   " PARENT_SCOPE)
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
@@ -64,3 +70,4 @@ IF(LMMS_HAVE_STK)
 	INSTALL(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
 ENDIF()
 
+INSTALL(FILES "lmms.exe.manifest" DESTINATION .)

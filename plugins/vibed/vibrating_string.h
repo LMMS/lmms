@@ -130,7 +130,7 @@ private:
 				offset =  ( m_randomize / 2.0f -
 						m_randomize ) * r;
 				_dl->data[i] = _scale *
-						_values[_dl->length - i] +
+						_values[_dl->length - i - 1] +
 						offset;
 			}
 			for( int i = _pick; i < _dl->length; i++ )
@@ -183,7 +183,7 @@ private:
 	* iteration. */
 	inline void toBridgeUpdate( delayLine * _dl, sample_t _insamp )
 	{
-		register sample_t * ptr = _dl->pointer;
+		sample_t * ptr = _dl->pointer;
 		*ptr = _insamp * m_stringLoss;
 		++ptr;
 		if( ptr > _dl->end )
@@ -202,7 +202,7 @@ private:
 	inline void fromBridgeUpdate( delayLine * _dl, 
 							sample_t _insamp )
 	{
-		register sample_t * ptr = _dl->pointer;
+		sample_t * ptr = _dl->pointer;
 		--ptr;
 		if( ptr < _dl->data )
 		{

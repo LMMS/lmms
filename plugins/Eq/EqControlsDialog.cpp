@@ -32,10 +32,15 @@
 #include "AutomatableButton.h"
 #include "embed.h"
 #include "Engine.h"
-#include "EqControls.h"
-#include "EqFader.h"
+#include "Knob.h"
 #include "Fader.h"
 #include "LedCheckbox.h"
+#include "PixmapButton.h"
+
+#include "EqControls.h"
+#include "EqFader.h"
+#include "EqParameterWidget.h"
+#include "EqSpectrumView.h"
 
 
 EqControlsDialog::EqControlsDialog( EqControls *controls ) :
@@ -213,4 +218,23 @@ void EqControlsDialog::mouseDoubleClickEvent(QMouseEvent *event)
 	m_originalHeight = parentWidget()->height() == 283 ? m_originalHeight : parentWidget()->height() ;
 	parentWidget()->setFixedHeight( parentWidget()->height() == m_originalHeight ? 283 : m_originalHeight  );
 	update();
+}
+
+EqBand* EqControlsDialog::setBand(int index, BoolModel* active, FloatModel* freq, FloatModel* res, FloatModel* gain, QColor color, QString name, float* peakL, float* peakR, BoolModel* hp12, BoolModel* hp24, BoolModel* hp48, BoolModel* lp12, BoolModel* lp24, BoolModel* lp48)
+{
+	EqBand *filterModels = m_parameterWidget->getBandModels( index );
+	filterModels->active = active;
+	filterModels->freq = freq;
+	filterModels->res = res;
+	filterModels->color = color;
+	filterModels->gain = gain;
+	filterModels->peakL = peakL;
+	filterModels->peakR = peakR;
+	filterModels->hp12 = hp12;
+	filterModels->hp24 = hp24;
+	filterModels->hp48 = hp48;
+	filterModels->lp12 = lp12;
+	filterModels->lp24 = lp24;
+	filterModels->lp48 = lp48;
+	return filterModels;
 }

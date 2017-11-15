@@ -30,24 +30,15 @@
 #include "GuiApplication.h"
 
 
-AudioFileDevice::AudioFileDevice( const sample_rate_t _sample_rate,
+AudioFileDevice::AudioFileDevice( OutputSettings const & outputSettings,
 					const ch_cnt_t _channels,
 					const QString & _file,
-					const bool _use_vbr,
-					const bitrate_t _nom_bitrate,
-					const bitrate_t _min_bitrate,
-					const bitrate_t _max_bitrate,
-					const int _depth,
 					Mixer*  _mixer ) :
 	AudioDevice( _channels, _mixer ),
 	m_outputFile( _file ),
-	m_useVbr( _use_vbr ),
-	m_nomBitrate( _nom_bitrate ),
-	m_minBitrate( _min_bitrate ),
-	m_maxBitrate( _max_bitrate ),
-	m_depth( _depth )
+	m_outputSettings(outputSettings)
 {
-	setSampleRate( _sample_rate );
+	setSampleRate( outputSettings.getSampleRate() );
 
 	if( m_outputFile.open( QFile::WriteOnly | QFile::Truncate ) == false )
 	{
