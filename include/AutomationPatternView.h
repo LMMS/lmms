@@ -46,13 +46,10 @@ public slots:
 	void openInAutomationEditor();
 	virtual void update();
 
+	// Open automation editor to a specific bar from the song editor
 	void openToBar();
-
-	// Scroll to arbitrary point from song editor, except on first open
-
-
+	// Check for correct playmode to allow openToBar (it requires PlaySong)
 	void allowOpenToBar();
-	// Check for correct playmode
 
 protected slots:
 	void resetName();
