@@ -37,6 +37,11 @@
 #include "sched.h"
 #endif
 
+#ifdef LMMS_DEBUG_RENDERTIME
+#include <sys/times.h>
+#include <unistd.h>
+#endif
+
 const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
@@ -180,6 +185,13 @@ void ProjectRenderer::run()
 #endif
 #endif
 #endif
+#ifdef LMMS_DEBUG_RENDERTIME
+	static clock_t t1;
+	static clock_t t2;
+	static struct tms t1_cpu;
+	static struct tms t2_cpu;
+	t1=times(&t1_cpu);
+#endif
 
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
@@ -212,7 +224,16 @@ void ProjectRenderer::run()
 	Engine::mixer()->stopProcessing();
 
 	Engine::getSong()->stopExport();
-
+	
+#ifdef LMMS_DEBUG_RENDERTIME
+	long cputicks = sysconf(_SC_CLK_TCK);
+	t2 = times(&t2_cpu);
+	
+	fprintf(stderr,"Real Time: %.2f, User Time %.2f, System Time %.2f\n",
+	       (float)(t2 - t1)/cputicks,
+	       (float)(t2_cpu.tms_utime - t1_cpu.tms_utime)/cputicks,
+	       (float)(t2_cpu.tms_stime - t1_cpu.tms_stime)/cputicks);
+#endif
 	// if the user aborted export-process, the file has to be deleted
 	const QString f = m_fileDev->outputFile();
 	if( m_abort )

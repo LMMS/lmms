@@ -26,6 +26,7 @@
 #cmakedefine LMMS_HAVE_SF_COMPLEVEL
 
 #cmakedefine LMMS_DEBUG_FPE
+#cmakedefine LMMS_DEBUG_RENDERTIME
 
 #cmakedefine LMMS_HAVE_STDINT_H
 #cmakedefine LMMS_HAVE_STDLIB_H
