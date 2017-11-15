@@ -26,20 +26,22 @@
 
 #ifdef LMMS_DEBUG_PERFLOG
 
-QHash< QString,PerfLog::Entry> PerfLog::s_running;
+QHash <QString,PerfLog::Entry> PerfLog::s_running;
 
 PerfLog::Entry::Entry()
 {
-	c=times(&t);
-	if(c==-1) qFatal("PerfLogEntry: init failed");
+	c = times(&t);
+	if (c == -1) { qFatal("PerfLogEntry: init failed"); }
 }
 
 void PerfLog::begin(const QString& what)
 {
-	if(s_running.contains(what))
-		qWarning("PerfLog::begin already %s",qPrintable(what));
+	if (s_running.contains(what))
+	{
+		qWarning("PerfLog::begin already %s", qPrintable(what));
+	}
 
-	s_running.insert(what,Entry());
+	s_running.insert(what, Entry());
 }
 
 void PerfLog::end(const QString& what)
@@ -50,13 +52,13 @@ void PerfLog::end(const QString& what)
 			qFatal("PerfLog::end sysconf()");
 
 	PerfLog::Entry e;
-	PerfLog::Entry b=s_running.take(what);
+	PerfLog::Entry b = s_running.take(what);
 	//                | task | real  | user  | syst 
 	qWarning("PERFLOG | %20s | %7.2f | %7.2f | %7.2f",
 		 qPrintable(what),
-		 (e.c-b.c)/(double)clktck,
-		 (e.t.tms_utime - b.t.tms_utime)/(double)clktck,
-		 (e.t.tms_stime - b.t.tms_stime)/(double)clktck);
+		 (e.c - b.c) / (double)clktck,
+		 (e.t.tms_utime - b.t.tms_utime) / (double)clktck,
+		 (e.t.tms_stime - b.t.tms_stime) / (double)clktck);
 }
 
 #endif

@@ -51,11 +51,11 @@ class PerfLog
 	{
 	public:
 		clock_t c;
-		tms     t;
+		tms t;
 		Entry();
 	};
 
-	static QHash< QString,PerfLog::Entry> s_running;
+	static QHash<QString, PerfLog::Entry> s_running;
 };
 
 
