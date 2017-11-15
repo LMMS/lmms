@@ -152,7 +152,8 @@ AutomationEditor::AutomationEditor() :
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
 				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
-						m_currentPosition, this );
+					m_currentPosition,
+					Song::Mode_PlayAutomationPattern, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
