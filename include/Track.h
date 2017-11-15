@@ -600,6 +600,8 @@ public slots:
 
 	void toggleSolo();
 
+	void iWasToldToVerticallyZoom();
+
 
 private:
 	TrackContainer* m_trackContainer;

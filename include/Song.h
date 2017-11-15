@@ -311,6 +311,8 @@ public slots:
 
 	void addBBTrack();
 
+	void howHardCanItBeToVZoom();
+
 
 private slots:
 	void insertBar();

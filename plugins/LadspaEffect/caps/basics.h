@@ -184,7 +184,7 @@ class Plugin {
 		inline sample_t getport_unclamped (int i)
 			{
 				sample_t v = *ports[i];
-				return (isinf (v) || isnan(v)) ? 0 : v;
+				return (__builtin_isinf_sign(v) || __builtin_isnan(v)) ? 0 : v;
 			}
 
 		/* get port value and clamp to port range */

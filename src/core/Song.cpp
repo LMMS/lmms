@@ -777,6 +777,21 @@ void Song::addBBTrack()
 
 
 
+void Song::howHardCanItBeToVZoom()
+{
+	//TextFloat::displayMessage("we're in 'howHardCanItBeToVZoom' in song.cpp");
+	m_tracksMutex.lockForRead();
+	for( TrackList::const_iterator it = tracks().begin();
+					it != tracks().end(); ++it )
+	{
+		( *it )->iWasToldToVerticallyZoom();//soCloseYetSoFar();//
+	}
+	m_tracksMutex.unlock();
+}
+
+
+
+
 void Song::addSampleTrack()
 {
 	( void )Track::create( Track::SampleTrack, this );

@@ -2532,6 +2532,42 @@ void Track::toggleSolo()
 
 
 
+void Track::iWasToldToVerticallyZoom()
+{
+	//setHeight( 200 );
+		//m_trackContentObjects.first()->setHeight(200);
+		this->setHeight( 200 );
+
+	//m_track->setHeight( DEFAULT_TRACK_HEIGHT );
+	setHeight( 300 );
+	QString msg = "Tracks should be this tall:" + QString::number(getHeight());
+	TextFloat::displayMessage(msg);
+	m_height = getHeight();
+	//int n = numOfTCOs();
+	//for (int i = 0; i < n; i++){
+	//	getTCO(i).update();
+	//}
+	//TrackView::update();
+	//TrackContentObjectView::update()
+	//void TrackContentObjectView::update()
+	//{
+	//	if( fixedTCOs() )
+	//	{
+	//		updateLength();
+	//	}
+	//	m_needsUpdate = true;
+	//	selectableObject::update();
+	//}
+	//doesn't help emit dataChanged();
+	//thought this might fix bbs: setFixedHeight( 300 );
+		//m_trackContainerView->realignTracks();
+		//m_track->setHeight( height() );
+
+	//I feel like I need to get into TrackView somehow.
+}
+
+
+
 
 BoolModel *Track::getMutedModel()
 {
@@ -2863,6 +2899,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 		ToolTip::add( this, m_track->m_name );
 	}
 }
+
 
 
 
