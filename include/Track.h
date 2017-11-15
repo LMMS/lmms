@@ -586,7 +586,6 @@ public:
 
 	BoolModel* getMutedModel();
 
-
 public slots:
 	virtual void setName( const QString & newName )
 	{
