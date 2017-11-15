@@ -2563,6 +2563,37 @@ void AutomationEditorWindow::open(AutomationPattern* pattern)
 	setFocus();
 }
 
+void AutomationEditorWindow::openBar(AutomationPattern* pattern, MidiTime position)
+{
+	//How many bars we need to scroll. Playhead position - pattern start position
+	int offset = 0;
+	if (position.getTact() < Engine::getSong()->getTacts()) { offset = Engine::getSong()->getTacts() - position.getTact(); }
+
+	//Open the pattern
+	open(pattern);
+
+	//This scrolls to the right part
+	//12 scroll values per 16th note
+	m_editor->m_leftRightScroll->setValue( offset * 12 * 16 );
+
+	//Various attempts at scrolling the viewport without user input
+	//m_editor->updateAfterPatternChange();
+	//resizeEvent( NULL );
+	//update();
+	//m_editor->update();
+	//m_editor->updatePosition(MidiTime( scrollTo ));
+	//m_editor->m_timeLine->updatePosition(MidiTime( scrollTo ));
+	//emit currentPatternChanged();
+	//m_editor->m_leftRightScroll->triggerAction(QAbstractSlider::SliderSingleStepSub);
+	TextFloat::displayMessage("Shift + scroll up then down");
+
+	//Issues:
+	//"Open to bar" doesn't work on first press. Changing playmodes might be bad, in which case it's back to square one.
+	//View doesn't scroll on its own
+	//Opens to playhead instead of mouse position. This is fine, imo
+	
+}
+
 QSize AutomationEditorWindow::sizeHint() const
 {
 	return {INITIAL_WIDTH, INITIAL_HEIGHT};

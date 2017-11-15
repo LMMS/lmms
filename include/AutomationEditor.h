@@ -286,6 +286,7 @@ public:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 
 	void open(AutomationPattern* pattern);
+	void openBar(AutomationPattern* pattern, MidiTime position);
 
 	AutomationEditor* m_editor;
 

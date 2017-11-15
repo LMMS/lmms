@@ -80,12 +80,35 @@ void AutomationPatternView::openInAutomationEditor()
 }
 
 
+
+
+void AutomationPatternView::openToBar()
+{
+	if(gui) gui->automationEditor()->openBar(m_pat, m_pat->startPosition());
+}
+
 void AutomationPatternView::update()
 {
 	ToolTip::add(this, m_pat->name());
 
 	TrackContentObjectView::update();
 }
+
+
+
+
+void AutomationPatternView::allowOpenToBar()
+{
+	if(Engine::getSong()->playMode() == 1)
+	{ 
+		TextFloat::displayMessage("Right Playmode, allow");
+	}//_cm.a.setEnabled(true); }
+	else
+	{
+		TextFloat::displayMessage("Disallow/Gray Out");
+	}//_cm.a.setEnabled(false); } 
+}
+
 
 
 
@@ -168,10 +191,23 @@ void AutomationPatternView::flipX()
 
 void AutomationPatternView::constructContextMenu( QMenu * _cm )
 {
+	//Open to specific bar
+	QAction * b = new QAction( embed::getIconPixmap( "automation" ), 
+				tr( "Open to Playhead" ), _cm );
+	_cm->insertAction( _cm->actions()[0], b );
+
+	//Call a function when playbackState changes
+	connect(Engine::getSong(), SIGNAL(playbackStateChanged()), this, SLOT( allowOpenToBar() ));
+
+	connect(b, SIGNAL(triggered()), this, SLOT(openToBar()));
+
+	//Open in Automation editor
 	QAction * a = new QAction( embed::getIconPixmap( "automation" ),
 				tr( "Open in Automation editor" ), _cm );
 	_cm->insertAction( _cm->actions()[0], a );
 	connect(a, SIGNAL(triggered()), this, SLOT(openInAutomationEditor()));
+
+	//Delete/Cut/Copy/Paste/Mute
 	_cm->insertSeparator( _cm->actions()[1] );
 
 	_cm->addSeparator();
