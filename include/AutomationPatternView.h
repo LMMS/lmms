@@ -42,18 +42,17 @@ public:
 	virtual ~AutomationPatternView();
 
 public slots:
-	/// Opens this view's pattern in the global automation editor
+	// Opens this view's pattern in the global automation editor
 	void openInAutomationEditor();
-<<<<<<< 0f7d19268118f583b26e755918aed652a11065d6
 	virtual void update();
-=======
-	void openToBar();
-<<<<<<< 0afdaae455b5083e4dc91619bc89ced14d59bae7
->>>>>>> Scroll to arbitrary point from song editor, except on first open
 
-=======
+	void openToBar();
+
+	// Scroll to arbitrary point from song editor, except on first open
+
+
 	void allowOpenToBar();
->>>>>>> Check for correct playmode
+	// Check for correct playmode
 
 protected slots:
 	void resetName();
