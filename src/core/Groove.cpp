@@ -1,6 +1,6 @@
 
-#include <QtCore/QObject> // needed for midi_tim.h to compile?!?!
-#include <QtGui/QLabel>
+#include <QObject>
+#include <QLabel>
 
 #include "Groove.h"
 #include "lmms_basics.h"

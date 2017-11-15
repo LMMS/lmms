@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QMdiArea>
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "embed.h"
 #include "Engine.h"

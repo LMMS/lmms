@@ -1,7 +1,7 @@
 #ifndef HALFSWING_H
 #define HALFSWING_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "Groove.h"
 #include "Knob.h"

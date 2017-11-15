@@ -24,8 +24,6 @@
 
 #include "SongEditor.h"
 
-#include <QDebug>
-
 #include <QTimeLine>
 #include <QAction>
 #include <QKeyEvent>
@@ -338,8 +336,6 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 			m_song->setPlayPos( t, Song::Mode_PlaySong );
 		}
 	}
-	
-	// above don't work on my machine below does
 	else if( ke->key() == Qt::Key_Home )
 	{
 		gui->songEditor()->home();

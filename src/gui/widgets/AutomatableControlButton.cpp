@@ -1,8 +1,8 @@
 /*
- * AutomatableButton.cpp - implementation of class automatableButton and
- *                          automatableButtonGroup
+ * AutomatableControlButton.cpp - A button with a model that accepts     
+ * 	values from 0 - 127 for MIDI
  *
- * Copyright (c) 2006-2011 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 teknopaul <teknopaul/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

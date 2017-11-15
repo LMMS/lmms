@@ -6,12 +6,11 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QMdiArea>
-#include <QDebug>
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
 
-#include <QtXml/QDomElement>
+#include <QDomElement>
 
 #include "embed.h"
 #include "Engine.h"
@@ -114,101 +113,56 @@ StudioControllerView::~StudioControllerView()
 
 void StudioControllerView::doHome()
 {
-
-	// Korg
-	//Note ON we get  0.496094
-	//Note OFF we get 126.503906
-	// TODO presumably other controllers don't do control change like this?
+	// Korg:  NOTE ON=0.496094, OFF=126.503906 
+	// TODO: Confirm for other controllers
 	bool click = m_homeButton->model()->value() < 1.0f;
-	
 	if (click) gui->songEditor()->home();
-
 }
 
 
 void StudioControllerView::doStop()
 {
-
-	// Korg
-	//Note ON we get  0.496094
-	//Note OFF we get 126.503906
-	// TODO presumably other controllers don't do control change like this?
-	bool click = m_stopButton->model()->value() < 1.0f;
-	
 	// receive 127 for note on (pressed) and 0 for released
+	bool click = m_stopButton->model()->value() < 1.0f;
 	if (click) gui->songEditor()->stop();
 }
 
 
 void StudioControllerView::doPlay()
 {
-
-	// Korg
-	//Note ON we get  0.496094
-	//Note OFF we get 126.503906
-	// TODO presumably other controllers don't do control change like this?
 	bool click = m_playButton->model()->value() < 1.0f;
-	
 	if (click) gui->songEditor()->play();
-
 }
 
 
 void StudioControllerView::doNext()
 {
-
-	// Korg
-	//Note ON we get  0.496094
-	//Note OFF we get 126.503906
-	// TODO presumably other controllers don't do control change like this?
 	bool click = m_playButton->model()->value() < 1.0f;
-	
 	if (click) gui->songEditor()->next();
-
 }
 
 
 void StudioControllerView::doPrev()
 {
-
-	// Korg
-	//Note ON we get  0.496094
-	//Note OFF we get 126.503906
-	// TODO presumably other controllers don't do control change like this?
 	bool click = m_playButton->model()->value() < 1.0f;
-	
 	if (click) gui->songEditor()->prev();
-
 }
 
 
 void StudioControllerView::doRecord()
 {
-
-	// Korg
-	//Note ON we get  0.496094
-	//Note OFF we get 126.503906
-	// TODO presumably other controllers don't do control change like this?
 	bool click = m_recordButton->model()->value() < 1.0f;
-	
 	if (click) gui->songEditor()->record();
-
 }
 
 
 void StudioControllerView::doScroll()
 {
-
-	// Korg
-	// get a value from 1-127 tha LMMS retgurns as 0-126.0
-
+	// Korg: Value range 1-127, LMMS: 0.0-126.0 
 	float pos = m_scrollButton->model()->value();
-	
 	if (pos > m_scrollLast ) gui->songEditor()->next();
 	if (pos < m_scrollLast ) gui->songEditor()->prev();
-	
 	m_scrollLast = pos;
-	
 }
 
 
@@ -216,7 +170,7 @@ void StudioControllerView::doScroll()
 
 void StudioControllerView::controllerChanged(int index)
 {
-	// TODO load a file of mappings
+	// TODO: load a file of mappings
 }
 
 QDomElement saveSettings(QDomDocument & doc, AutomatableControlButton* button)
@@ -229,7 +183,6 @@ QDomElement saveSettings(QDomDocument & doc, AutomatableControlButton* button)
 
 void StudioControllerView::saveControllers()
 {
-	qWarning("saving...");
 	QDomDocument doc = QDomDocument( "lmms-studio-controller" );
 	QDomElement root = doc.createElement( "lmms-studio-controller" );
 	root.setAttribute( "creator", "LMMS" );
@@ -244,6 +197,7 @@ void StudioControllerView::saveControllers()
 	root.appendChild(saveSettings(doc, m_scrollButton));
 	root.appendChild(saveSettings(doc, m_stopButton));
 	
+	// FIXME: Make this platform independent
 	QFile outfile( "/var/tmp/lmms-studio-controller.xml" );
 	if (! outfile.open(QIODevice::WriteOnly | QIODevice::Text) ) {
 		QMessageBox::critical( NULL, "Could not open file", "Could not open file /var/tmp/lmms-studio-controller.xml" );
@@ -253,7 +207,6 @@ void StudioControllerView::saveControllers()
 		ts << doc.toString();
 		outfile.close();
 	}
-	qWarning("saved");
 }
 
 

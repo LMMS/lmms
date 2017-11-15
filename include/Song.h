@@ -324,6 +324,7 @@ private:
 	Song( const Song & );
 	virtual ~Song();
 
+
 	inline tact_t currentTact() const
 	{
 		return m_playPos[m_playMode].getTact();

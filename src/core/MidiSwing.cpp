@@ -23,7 +23,7 @@
  *
  */
 
-#include <QtGui/QLabel>
+#include <QLabel>
 
 #include "MidiSwing.h"
 

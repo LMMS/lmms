@@ -1,8 +1,8 @@
 /*
- * AutomatableButton.h - class automatableControlButton,
- *  A button with a model that accepts values from 0 - 127 for midi
+ * AutomatableControlButton.h - A button with a model that accepts
+ *     values from 0 - 127 for MIDI 
  *
- * Copyright (c) 2006-2008 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 teknopaul <teknopaul/at/users.sourceforge.net>
  *
  * This file is part of LMMS - http://lmms.io
  *

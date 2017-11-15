@@ -1,7 +1,7 @@
 #ifndef GROOVEEXPERIMENTS_H
 #define GROOVEEXPERIMENTS_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "Groove.h"
 #include "Knob.h"

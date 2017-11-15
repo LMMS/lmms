@@ -1,7 +1,7 @@
 #ifndef HYDROGENSWING_H
 #define HYDROGENSWING_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "Groove.h"
 #include "Knob.h"

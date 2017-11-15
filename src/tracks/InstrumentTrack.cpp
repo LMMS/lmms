@@ -680,8 +680,11 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 		// very effective algorithm for playing notes that are
 		// posated within the current sample-frame
+
+
 		
-		// TODO add this back if groove is straight, perhap have groove supply max shift so we can skip some notes if not all
+		// FIXME: Uncomment once groove is straight.
+		// Perhaps have groove supply max shift so we can skip some notes if not all
 /*
 		if( cur_start > 0 )
 		{
@@ -722,19 +725,22 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	return played_a_note;
 }
 
-// return NULL for use global groove or m_noGroove to disable the global groove
-// TODO track specific grooves (might sound a bit wierd)
 Groove * InstrumentTrack::groove()
 {
+
+	// TODO: Track-specific groove (may sound weird)
 	if (m_grooveOn)
 	{
+		// NULL: Use global groove
 		return m_groove;
 	}
 	else
 	{
+		// Disable global groove
 		return m_noGroove;
 	}
 }
+
 
 void InstrumentTrack::disableGroove()
 {
@@ -744,10 +750,13 @@ void InstrumentTrack::disableGroove()
 	}
 	m_grooveOn = false;
 }
+
+
 void InstrumentTrack::enableGroove()
 {
 	m_grooveOn = true;
 }
+
 
 TrackContentObject * InstrumentTrack::createTCO( const MidiTime & )
 {

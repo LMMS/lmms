@@ -1197,14 +1197,11 @@ void MainWindow::toggleGrooveView( void )
 {
 	toggleWindow( gui->grooveView() );
 }
-<<<<<<< HEAD
 
 void MainWindow::toggleStudioControllerView( void )
 {
 	toggleWindow( gui->studioControllerView() );
 }
-=======
->>>>>>> 8e2f06baabdf024f3acfcd69ff11a4e72552ca9c
 
 void MainWindow::updateViewMenu()
 {

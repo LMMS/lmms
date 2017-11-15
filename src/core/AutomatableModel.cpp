@@ -22,8 +22,6 @@
  *
  */
 
-#include <QDebug>
-
 #include "AutomatableModel.h"
 
 #include "lmms_math.h"
@@ -112,9 +110,9 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		// non automation, linear scale (default), can be saved as attribute
 		element.setAttribute( name, m_value );
 	}
+
 	if( m_controllerConnection )
 	{
-		qWarning("m_controllerConnection");
 		QDomElement controllerElement;
 
 		// get "connection" element (and create it if needed)

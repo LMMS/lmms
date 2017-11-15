@@ -21,9 +21,9 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#include <QtCore/QObject>
-#include <QtXml/QDomElement>
-#include <QtGui/QLabel>
+#include <QObject>
+#include <QDomElement>
+#include <QLabel>
 
 #include "Engine.h"
 #include "Groove.h"

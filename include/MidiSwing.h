@@ -1,7 +1,7 @@
 #ifndef MIDISWING_H
 #define MIDISWING_H
 
-#include <QtCore/QObject>
+#include <QObject>
 
 #include "Groove.h"
 #include "lmms_basics.h"
