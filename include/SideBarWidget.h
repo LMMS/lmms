@@ -70,7 +70,6 @@ protected:
 		m_layout->addLayout( _l );
 	}
 
-
 private:
 	QWidget * m_contents;
 	QVBoxLayout * m_layout;

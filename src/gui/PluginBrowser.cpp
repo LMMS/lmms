@@ -37,14 +37,6 @@
 #include "PluginFactory.h"
 
 
-static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
-{
-	return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
-}
-
-
-
-
 PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	SideBarWidget( tr( "Instrument Plugins" ),
 				embed::getIconPixmap( "plugins" ).transformed( QTransform().rotate( 90 ) ), _parent )
@@ -60,7 +52,7 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 	view_layout->setSpacing( 5 );
 
 
-	QLabel * hint = new QLabel( tr( "Drag an instrument "
+	auto hint = new QLabel( tr( "Drag an instrument "
 					"into either the Song-Editor, the "
 					"Beat+Bassline Editor or into an "
 					"existing instrument track." ),
@@ -79,20 +71,20 @@ PluginBrowser::PluginBrowser( QWidget * _parent ) :
 
 
 
-PluginBrowser::~PluginBrowser()
-{
-}
-
-
-
-
 PluginDescList::PluginDescList(QWidget *parent) :
 	QWidget(parent)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
 	QList<Plugin::Descriptor*> descs = pluginFactory->descriptors(Plugin::Instrument);
-	std::sort(descs.begin(), descs.end(), pluginBefore);
+	std::sort(
+			descs.begin(),
+			descs.end(),
+			[]( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 ) -> bool
+			{
+				return qstricmp( d1->displayName, d2->displayName ) < 0 ? true : false;
+			}
+	);
 	for (const Plugin::Descriptor* desc : descs)
 	{
 		PluginDescWidget* p = new PluginDescWidget( *desc, this );
@@ -110,23 +102,14 @@ PluginDescList::PluginDescList(QWidget *parent) :
 PluginDescWidget::PluginDescWidget( const Plugin::Descriptor & _pd,
 							QWidget * _parent ) :
 	QWidget( _parent ),
-	m_updateTimer( this ),
 	m_pluginDescriptor( _pd ),
 	m_logo( _pd.logo->pixmap() ),
-	m_mouseOver( false ),
-	m_targetHeight( 24 )
+	m_mouseOver( false )
 {
-	connect( &m_updateTimer, SIGNAL( timeout() ), SLOT( updateHeight() ) );
-	setFixedHeight( m_targetHeight );
+	setFixedHeight( DEFAULT_HEIGHT );
 	setMouseTracking( true );
 	setCursor( Qt::PointingHandCursor );
-}
-
-
-
-
-PluginDescWidget::~PluginDescWidget()
-{
+	setToolTip(_pd.description);
 }
 
 
@@ -159,21 +142,6 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 	p.setFont( f );
 	p.drawText( 10 + logo_size.width(), 15,
 					m_pluginDescriptor.displayName );
-
-	if( height() > 24 || m_mouseOver )
-	{
-		f.setBold( false );
-		p.setFont( f );
-		QRect br;
-		p.drawText( 10 + logo_size.width(), 20, width() - 58 - 5, 999,
-								Qt::TextWordWrap,
-								qApp->translate( "pluginBrowser", m_pluginDescriptor.description ),
-								&br );
-		if( m_mouseOver )
-		{
-			m_targetHeight = qMax( 60, 25 + br.height() );
-		}
-	}
 }
 
 
@@ -182,8 +150,7 @@ void PluginDescWidget::paintEvent( QPaintEvent * e )
 void PluginDescWidget::enterEvent( QEvent * _e )
 {
 	m_mouseOver = true;
-	m_targetHeight = height() + 1;
-	updateHeight();
+
 	QWidget::enterEvent( _e );
 }
 
@@ -193,8 +160,7 @@ void PluginDescWidget::enterEvent( QEvent * _e )
 void PluginDescWidget::leaveEvent( QEvent * _e )
 {
 	m_mouseOver = false;
-	m_targetHeight = 24;
-	updateHeight();
+
 	QWidget::leaveEvent( _e );
 }
 
@@ -211,30 +177,6 @@ void PluginDescWidget::mousePressEvent( QMouseEvent * _me )
 	}
 }
 
-
-
-
-void PluginDescWidget::updateHeight()
-{
-	if( m_targetHeight > height() )
-	{
-		setFixedHeight( height() + 1 );
-	}
-	else if( m_targetHeight < height() )
-	{
-		setFixedHeight( height() - 1 );
-	}
-	else
-	{
-		m_updateTimer.stop();
-		return;
-	}
-
-	if( !m_updateTimer.isActive() )
-	{
-		m_updateTimer.start( 10 );
-	}
-}
 
 
 
