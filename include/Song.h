@@ -292,7 +292,6 @@ public slots:
 
 	void addBBTrack();
 
-	//spekular was here
 	void howHardCanItBeToVZoom();
 
 
