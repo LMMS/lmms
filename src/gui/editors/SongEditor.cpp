@@ -50,7 +50,6 @@
 #include "TimeDisplayWidget.h"
 #include "AudioDevice.h"
 #include "PianoRoll.h"
-//Spekular was here
 #include "Track.h"
 
 
@@ -78,14 +77,12 @@ SongEditor::SongEditor( Song * song ) :
 	TrackContainerView( song ),
 	m_song( song ),
 	m_zoomingModel(new ComboBoxModel()),
-	//Spekular was here
 	m_verticalZoomingModel(new ComboBoxModel()),
 	m_scrollBack( false ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
 	m_mode(DrawMode)
 {
 	m_zoomingModel->setParent(this);
-	//Spekular was here
 	m_verticalZoomingModel->setParent(this);
 	// create time-line
 	int widgetTotal = ConfigManager::inst()->value( "ui",
@@ -247,14 +244,12 @@ SongEditor::SongEditor( Song * song ) :
 	for( float const & zoomLevel : m_zoomLevels )
 	{
 		m_zoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
-		//Spekular was here
 		m_verticalZoomingModel->addItem( QString( "%1\%" ).arg( zoomLevel * 100 ) );
 	}
 	m_zoomingModel->setInitValue(
 			m_zoomingModel->findText( "100%" ) );
 	connect( m_zoomingModel, SIGNAL( dataChanged() ),
 					this, SLOT( zoomingChanged() ) );
-	//Spekular was here
 	m_verticalZoomingModel->setInitValue(
 			m_verticalZoomingModel->findText( "100%" ) );
 	connect( m_verticalZoomingModel, SIGNAL( dataChanged() ),
@@ -661,7 +656,6 @@ void SongEditor::zoomingChanged()
 
 void SongEditor::verticalZoomingChanged()
 {
-	//Spekular was here
 	//m_track->setHeight(300);
 	//setHeight(300);
 	emit pleaseVerticallyZoom();
@@ -805,8 +799,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 
 	connect(song, SIGNAL(projectLoaded()), this, SLOT(adjustUiAfterProjectLoad()));
 	connect(this, SIGNAL(resized()), m_editor, SLOT(updatePositionLine()));
-	//Spekular was here
-	//connect(this, SIGNAL(pleaseVerticallyZoom()), m_editor->m_song, SLOT(howHardCanItBeToVZoom()));
 }
 
 QSize SongEditorWindow::sizeHint() const
