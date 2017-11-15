@@ -2864,40 +2864,6 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 
 
 
-//Spekular was here
-//void soCloseYetSoFar()
-//{
-	//	setFixedHeight( qMax<int>( me->y(), MINIMAL_TRACK_HEIGHT ) );
-	//	m_trackContainerView->realignTracks();
-	//	m_track->setHeight( height() );
-	//setHeight( 200 );
-		//m_trackContentObjects.first()->setHeight(200);
-	//	m_track->setHeight( 200 );
-
-	//m_track->setHeight( DEFAULT_TRACK_HEIGHT );
-	//m_track->setHeight( 300 );
-	//QString msg = "Tracks should be this tall:" + QString::number(m_track->getHeight());
-	//TextFloat::displayMessage(msg);
-	//m_height = getHeight();
-	//int n = numOfTCOs();
-	//for (int i = 0; i < n; i++){
-	//	getTCO(i).update();
-	//}
-	//TrackView::update();
-	//TrackContentObjectView::update()
-	//void TrackContentObjectView::update()
-	//{
-	//	if( fixedTCOs() )
-	//	{
-	//		updateLength();
-	//	}
-	//	m_needsUpdate = true;
-	//	selectableObject::update();
-	//}
-//}
-
-
-
 
 /*! \brief Handle a mouse release event on this track View.
  *
