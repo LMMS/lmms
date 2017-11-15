@@ -427,7 +427,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "gig" ) &&
+		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" ) &&
 			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
@@ -983,7 +983,7 @@ void FileItem::determineFileType( void )
 		m_type = PresetFile;
 		m_handling = LoadByPlugin;
 	}
-	else if( ext == "sf2" )
+	else if( ext == "sf2" || ext == "sf3" )
 	{
 		m_type = SoundFontFile;
 	}
