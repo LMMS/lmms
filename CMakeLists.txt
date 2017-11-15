@@ -68,7 +68,7 @@ OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
 OPTION(WANT_QT5		"Build with Qt5" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
-OPTION(WANT_DEBUG_PERFLOG "Log task performance" ON)
+OPTION(WANT_DEBUG_PERFLOG "Log task performance" OFF)
 
 
 IF(LMMS_BUILD_APPLE)

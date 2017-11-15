@@ -25,6 +25,15 @@
 #ifndef PERFLOG_H
 #define PERFLOG_H
 
+#include "lmmsconfig.h"
+
+#ifndef LMMS_DEBUG_PERFLOG
+
+#define PL_BEGIN(w)
+#define PL_END(w)
+
+#else
+
 #include <unistd.h>
 #include <sys/times.h>
 
@@ -49,12 +58,6 @@ class PerfLog
 	static QHash< QString,PerfLog::Entry> s_running;
 };
 
-#ifndef LMMS_DEBUG_PERFLOG
-
-#define PL_BEGIN(w)
-#define PL_END(w)
-
-#else
 
 #define PL_BEGIN(w) PerfLog::begin(w);
 #define PL_END(w) PerfLog::end(w);

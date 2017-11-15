@@ -22,9 +22,9 @@
  *
  */
 
-//#ifdef LMMS_DEBUG_PERFLOG
-
 #include "PerfLog.h"
+
+#ifdef LMMS_DEBUG_PERFLOG
 
 QHash< QString,PerfLog::Entry> PerfLog::s_running;
 
@@ -59,4 +59,4 @@ void PerfLog::end(const QString& what)
 		 (e.t.tms_stime - b.t.tms_stime)/(double)clktck);
 }
 
-//#endif
+#endif
