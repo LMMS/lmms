@@ -20,23 +20,6 @@
    <string>About LMMS</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-<!--
-   <property name="spacing">
-    <number>8</number>
-   </property>
-   <property name="leftMargin">
-    <number>8</number>
-   </property>
-   <property name="topMargin">
-    <number>8</number>
-   </property>
-   <property name="rightMargin">
-    <number>8</number>
-   </property>
-   <property name="bottomMargin">
-    <number>8</number>
-   </property>
--->
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -46,8 +29,6 @@
          <width>64</width>
          <height>64</height>
         </size>
-       </property>
-       <property name="text">
        </property>
       </widget>
      </item>
@@ -278,36 +259,12 @@ If you're interested in translating LMMS in another language or want to improve 
    <signal>accepted()</signal>
    <receiver>AboutDialog</receiver>
    <slot>accept()</slot>
-<!--
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
--->
   </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>AboutDialog</receiver>
    <slot>reject()</slot>
-<!--
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
--->
   </connection>
  </connections>
 </ui>
