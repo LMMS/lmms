@@ -33,6 +33,7 @@
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
+#include "Mixer.h"
 #include "VstSyncController.h"
 
 
@@ -232,6 +233,7 @@ public:
 	void loadingCancelled()
 	{
 		m_isCancelled = true;
+		Engine::mixer()->clearNewPlayHandles();
 	}
 
 	bool isCancelled()
