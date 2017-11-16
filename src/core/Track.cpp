@@ -717,10 +717,20 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
-				m_action = ToggleSelected;
+				gui->songEditor()->m_editor->selectAllTcos( false );
+				QVector<TrackContentObjectView *> tcoViews;
+				tcoViews.push_back( this );
+				DataFile dataFile = createTCODataFiles( tcoViews );
+				QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
+							128, 128,
+							Qt::KeepAspectRatio,
+							Qt::SmoothTransformation );
+				new StringPairDrag( QString( "tco_%1" ).arg(
+										m_tco->getTrack()->type() ),
+									dataFile.toString(), thumbnail, this );
 			}
 		}
-		else if( !me->modifiers() )
+		else
 		{
 			if( isSelected() )
 			{
@@ -728,8 +738,17 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
+				gui->songEditor()->m_editor->selectAllTcos( false );
+				m_tco->addJournalCheckPoint();
+
+				// move or resize
+				m_tco->setJournalling( false );
+
+				setInitialMousePos( me->pos() );
+
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-				if( me->x() < RESIZE_GRIP_WIDTH && sTco )
+				if( me->x() < RESIZE_GRIP_WIDTH && sTco
+						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
 					m_oldTime = m_tco->startPosition();
@@ -753,25 +772,24 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					QApplication::setOverrideCursor( c );
 					s_textFloat->setTitle( tr( "Current length" ) );
 				}
+				// s_textFloat->reparent( this );
+				// setup text-float as if TCO was already moved/resized
+				mouseMoveEvent( me );
+				s_textFloat->show();
 			}
+
+			delete m_hint;
+			QString hint = m_action == Move || m_action == MoveSelection
+						? tr( "Press <%1> and drag to make a copy." )
+						: tr( "Press <%1> for free resizing." );
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
+					embed::getIconPixmap( "hint" ), 0 );
 		}
-		delete m_hint;
-		QString hint = m_action == Move ? tr( "Press <%1> and drag to make "
-										  "a copy." )
-										: tr( "Press <%1> for free "
-										  "resizing." );
-		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-				hint.arg(
-							#ifdef LMMS_BUILD_APPLE
-							"⌘"),
-							#else
-							"Ctrl"),
-							#endif
-				embed::getIconPixmap( "hint" ), 0 );
-//		s_textFloat->reparent( this );
-		// setup text-float as if TCO was already moved/resized
-		mouseMoveEvent( me );
-		s_textFloat->show();
 	}
 	else if( me->button() == Qt::RightButton )
 	{
