@@ -32,14 +32,15 @@
 #include "debug.h"
 
 
-SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
+SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTimeOffset) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
 	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
 	m_bbTrack( NULL ),
 	m_tco( tco ),
-	m_recordingChannel{dynamic_cast<SampleTrack*>(m_track)->recordingChannel ()}
+	m_recordingChannel{dynamic_cast<SampleTrack*>(m_track)->recordingChannel ()},
+	m_startRecordTimeOffset{startRecordTimeOffset}
 {
 }
 
@@ -50,15 +51,11 @@ SampleRecordHandle::~SampleRecordHandle()
 {
 	if( !m_buffers.empty() )
 	{
-		auto sampleStart = m_tco->sampleBuffer ()->startFrame ();
-
 		SampleBuffer* sb;
 		createSampleBuffer( &sb );
 		m_tco->setSampleBuffer( sb );
 
-		// Apply the sample buffer offset from the start of the TCO.
-		MidiTime startTimeOffset = (tick_t)( sampleStart / Engine::framesPerTick());
-		m_tco->setStartTimeOffset (startTimeOffset);
+		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
 	}
 	
 	while( !m_buffers.empty() )
