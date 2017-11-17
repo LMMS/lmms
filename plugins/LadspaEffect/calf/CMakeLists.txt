@@ -1,6 +1,3 @@
-# INCLUDE(CheckSubmodule)
-# CHECK_SUBMODULE(swh/configure.ac)
-
 # Note:
 # 	The last version of Calf that was LADSPA-capable is version 0.0.18.2
 
