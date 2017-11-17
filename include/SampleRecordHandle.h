@@ -43,7 +43,7 @@ class Track;
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
+	SampleRecordHandle( SampleTCO* tco , MidiTime startRecordTimeOffset);
 	virtual ~SampleRecordHandle();
 
 	virtual void play( sampleFrame * _working_buffer );
@@ -82,6 +82,10 @@ private:
 	// The recording type as it was when we started
 	// recording.
 	SampleTrack::RecordingChannel m_recordingChannel;
+
+	// The offset from the start of m_track that the record has
+	// started from.
+	MidiTime m_startRecordTimeOffset;
 } ;
 
 
