@@ -33,12 +33,14 @@
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
+#include "embed.h"
 #include "TrackContainer.h"
 #include "InstrumentTrack.h"
 #include "Song.h"
 
 #include "GuiApplication.h"
 #include "MainWindow.h"
+#include "TextFloat.h"
 
 TrackContainer::TrackContainer() :
 	Model( NULL ),
@@ -110,6 +112,14 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 						QEventLoop::AllEvents, 100 );
 			if( pd->wasCanceled() )
 			{
+				if ( gui )
+				{
+					TextFloat::displayMessage( tr( "Loading cancelled" ),
+					tr( "Project loading was cancelled." ),
+					embed::getIconPixmap( "project_file", 24, 24 ),
+					2000 );
+				}
+				Engine::getSong()->loadingCancelled();
 				break;
 			}
 		}
