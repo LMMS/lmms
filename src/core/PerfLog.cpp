@@ -1,5 +1,5 @@
 /*
- * PerfLog.h - Small performance logger
+ * PerfLog.cpp - Small performance logger
  *
  * Copyright (c) 2017 gi0e5b06
  *
