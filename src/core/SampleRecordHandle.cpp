@@ -33,13 +33,14 @@
 #include "debug.h"
 
 
-SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
+SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , TimePos startRecordTimeOffset) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
 	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
 	m_bbTrack( nullptr ),
-	m_tco( tco )
+	m_tco(tco),
+	m_startRecordTimeOffset{startRecordTimeOffset}
 {
 }
 
@@ -53,6 +54,8 @@ SampleRecordHandle::~SampleRecordHandle()
 		SampleBuffer* sb;
 		createSampleBuffer( &sb );
 		m_tco->setSampleBuffer( sb );
+
+		m_tco->setStartTimeOffset(m_startRecordTimeOffset);
 	}
 	
 	while( !m_buffers.empty() )

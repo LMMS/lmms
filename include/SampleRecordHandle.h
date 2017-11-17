@@ -41,7 +41,7 @@ class Track;
 class SampleRecordHandle : public PlayHandle
 {
 public:
-	SampleRecordHandle( SampleTCO* tco );
+	explicit SampleRecordHandle(SampleTCO* tco, TimePos startRecordTimeOffset);
 	virtual ~SampleRecordHandle();
 
 	void play( sampleFrame * _working_buffer ) override;
@@ -65,7 +65,10 @@ private:
 	Track * m_track;
 	BBTrack * m_bbTrack;
 	SampleTCO * m_tco;
-
+	
+	// The offset from the start of m_track that the record has
+	// started from.
+	TimePos m_startRecordTimeOffset;
 } ;
 
 
