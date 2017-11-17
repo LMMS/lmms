@@ -666,7 +666,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 				{
 					return played_a_note;
 				}
-				SampleRecordHandle* smpHandle = new SampleRecordHandle( st );
+				SampleRecordHandle* smpHandle = new SampleRecordHandle( st , _start - st->startPosition ());
 				handle = smpHandle;
 			}
 			else
