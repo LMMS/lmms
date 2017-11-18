@@ -210,6 +210,7 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	static QStringList availabeVstEmbedMethods();
 	QString vstEmbedMethod() const;
 
 	// returns true if the working dir (e.g. ~/lmms) exists on disk

@@ -190,19 +190,34 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
-QString ConfigManager::vstEmbedMethod() const
+QStringList ConfigManager::availabeVstEmbedMethods()
 {
-	QString defaultMethod = "qt";
+	QStringList methods;
+	methods.append("none");
+#if QT_VERSION >= 0x050100
+	methods.append("qt");
+#endif
+#ifdef LMMS_BUILD_WIN32
+	methods.append("win32");
+#endif
 #ifdef LMMS_BUILD_LINUX
-	if (QX11Info::isPlatformX11()) {
-		defaultMethod = "xembed";
+#if QT_VERSION >= 0x050000
+	if (static_cast<QGuiApplication*>(QApplication::instance())->
+		platformName() == "xcb")
+#else
+	if (qgetenv("QT_QPA_PLATFORM").isNull()
+		|| qgetenv("QT_QPA_PLATFORM") == "xcb")
+#endif
+	{
+		methods.append("xembed");
 	}
 #endif
+	return methods;
+}
 
-#ifdef LMMS_BUILD_WIN32
-	defaultMethod = "win32";
-#endif
-
+QString ConfigManager::vstEmbedMethod() const
+{
+	QString defaultMethod = *(availabeVstEmbedMethods().end() - 1);
 	return value( "ui", "vstembedmethod", defaultMethod );
 }
 
