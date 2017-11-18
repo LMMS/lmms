@@ -24,6 +24,7 @@
 
 
 #include "Engine.h"
+#include "ChordTable.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "FxMixer.h"
@@ -43,6 +44,7 @@ ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
+ChordTable * LmmsCore::s_chordTable = NULL;
 
 
 
@@ -62,6 +64,8 @@ void LmmsCore::init( bool renderOnly )
 	s_bbTrackContainer = new BBTrackContainer;
 
 	s_ladspaManager = new Ladspa2LMMS;
+
+	s_chordTable = new ChordTable( NULL );
 
 	s_projectJournal->setJournalling( true );
 
@@ -99,6 +103,8 @@ void LmmsCore::destroy()
 	deleteHelper( &s_projectJournal );
 
 	deleteHelper( &s_song );
+
+	deleteHelper ( &s_chordTable );
 
 	delete ConfigManager::inst();
 }

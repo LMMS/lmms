@@ -32,7 +32,7 @@
 
 
 
-class AutomatableSlider : public QSlider, public IntModelView
+class EXPORT AutomatableSlider : public QSlider, public IntModelView
 {
 	Q_OBJECT
 public:

@@ -50,6 +50,7 @@ class ComboBox;
 class NotePlayHandle;
 class Pattern;
 class TimeLineWidget;
+class ChordTable;
 
 class PianoRoll : public QWidget
 {
@@ -203,6 +204,9 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
+	//Updates the models related to ChordTable when it changes
+	void updateChordTable();
+
 
 signals:
 	void currentPatternChanged();
@@ -296,6 +300,9 @@ private:
 	static PianoRollKeyTypes prKeyOrder[];
 
 	static TextFloat * s_textFloat;
+
+	//The chordtable for scales and chords models
+	ChordTable * m_chordTable;
 
 	ComboBoxModel m_zoomingModel;
 	ComboBoxModel m_quantizeModel;

@@ -37,6 +37,7 @@
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
+#include "ChordTable.h"
 #include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
@@ -1046,6 +1047,14 @@ void Song::loadProject( const QString & fileName )
 		}
 	}
 
+	// Load Chordtable
+	node = dataFile.content().firstChildElement( Engine::chordTable()->nodeName() );
+	if( !node.isNull() )
+	{
+		Engine::chordTable()->restoreState( node.toElement() );
+	}
+
+
 	node = dataFile.content().firstChild();
 
 	QDomNodeList tclist=dataFile.content().elementsByTagName("trackcontainer");
@@ -1167,6 +1176,10 @@ bool Song::saveProjectFile( const QString & filename )
 
 	m_globalAutomationTrack->saveState( dataFile, dataFile.content() );
 	Engine::fxMixer()->saveState( dataFile, dataFile.content() );
+
+	//Saving chordTable data
+	Engine::chordTable()->saveState( dataFile, dataFile.content() );
+
 	if( gui )
 	{
 		gui->getControllerRackView()->saveState( dataFile, dataFile.content() );

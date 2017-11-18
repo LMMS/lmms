@@ -60,6 +60,7 @@
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 
+#include "ChordTable.h"
 
 #if QT_VERSION < 0x040800
 #define MiddleButton MidButton
@@ -224,6 +225,10 @@ PianoRoll::PianoRoll() :
 	connect( markChordAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( unmarkAllAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
 	connect( copyAllNotesAction, SIGNAL(triggered()), signalMapper, SLOT(map()) );
+
+	//on chord Table change we reload the chord and scale combo boxes models
+	connect( Engine::chordTable(), SIGNAL(chordNameChanged()), this, SLOT (updateChordTable()));
+
 
 	signalMapper->setMapping( markSemitoneAction, static_cast<int>( stmaMarkCurrentSemiTone ) );
 	signalMapper->setMapping( markAllOctaveSemitonesAction, static_cast<int>( stmaMarkAllOctaveSemiTones ) );
@@ -393,15 +398,14 @@ PianoRoll::PianoRoll() :
 					this, SLOT( quantizeChanged() ) );
 
 	// Set up scale model
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
+	m_chordTable = Engine::chordTable();
 
 	m_scaleModel.addItem( tr("No scale") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for( const Chord * chord : * m_chordTable )
 	{
-		if( chord.isScale() )
+		if( chord->isScale() )
 		{
-			m_scaleModel.addItem( chord.getName() );
+			m_scaleModel.addItem( chord->getName() );
 		}
 	}
 
@@ -412,11 +416,11 @@ PianoRoll::PianoRoll() :
 
 	// Set up chord model
 	m_chordModel.addItem( tr("No chord") );
-	for( const InstrumentFunctionNoteStacking::Chord& chord : chord_table )
+	for( const Chord * chord : * m_chordTable )
 	{
-		if( ! chord.isScale() )
+		if( ! chord->isScale() )
 		{
-			m_chordModel.addItem( chord.getName() );
+			m_chordModel.addItem( chord->getName() );
 		}
 	}
 
@@ -441,7 +445,45 @@ PianoRoll::PianoRoll() :
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
 }
 
+//Updates the chordtable models when it changes
+void PianoRoll::updateChordTable()
+{
+	//getting the selected value
+	int v = m_scaleModel.value();
+	//clearing the list
+	m_scaleModel.clear();
 
+	m_scaleModel.addItem( tr("No scale") );
+	Chord *chord;
+	for(int i=0;i<m_chordTable->size();i++ )
+	{
+		chord=m_chordTable->at(i);
+		if( chord->isScale() )
+		{
+			m_scaleModel.addItem( chord->getName() );
+		}
+	}
+	//getting back the previously selected value
+	m_scaleModel.setValue( v );
+
+	// Reloading changed chord model
+
+	//getting the selected value
+	v= m_chordModel.value();
+	//clearing the model
+	m_chordModel.clear();
+
+	m_chordModel.addItem( tr("No chord") );
+	for(int i=0;i<m_chordTable->size();i++ )
+	{
+		chord=m_chordTable->at(i);
+		if( !chord->isScale() )
+		{
+			m_chordModel.addItem( chord->getName() );
+		}
+	}
+	m_chordModel.setValue( v );
+}
 
 void PianoRoll::reset()
 {
@@ -503,7 +545,7 @@ void PianoRoll::changeNoteEditMode( int i )
 void PianoRoll::markSemiTone( int i )
 {
 	const int key = getKey( mapFromGlobal( m_semiToneMarkerMenu->pos() ).y() );
-	const InstrumentFunctionNoteStacking::Chord * chord = nullptr;
+	const Chord * chord = nullptr;
 
 	switch( static_cast<SemiToneMarkerAction>( i ) )
 	{
@@ -546,14 +588,12 @@ void PianoRoll::markSemiTone( int i )
 			break;
 		}
 		case stmaMarkCurrentScale:
-			chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-					.getScaleByName( m_scaleModel.currentText() );
+		chord = & m_chordTable->getScaleByName( m_scaleModel.currentText() );
 		case stmaMarkCurrentChord:
 		{
 			if( ! chord )
 			{
-				chord = & InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+				chord =  & m_chordTable->getChordByName( m_chordModel.currentText() );
 			}
 
 			if( chord->isEmpty() )
@@ -1473,8 +1513,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 					new_note.setVolume( m_lastNoteVolume );
 					created_new_note = m_pattern->addNote( new_note );
 
-					const InstrumentFunctionNoteStacking::Chord & chord = InstrumentFunctionNoteStacking::ChordTable::getInstance()
-						.getChordByName( m_chordModel.currentText() );
+					const Chord & chord = m_chordTable->getChordByName( m_chordModel.currentText() );
 
 					if( ! chord.isEmpty() )
 					{
@@ -3957,12 +3996,8 @@ void PianoRoll::quantizeNotes()
 
 void PianoRoll::updateSemiToneMarkerMenu()
 {
-	const InstrumentFunctionNoteStacking::ChordTable& chord_table =
-			InstrumentFunctionNoteStacking::ChordTable::getInstance();
-	const InstrumentFunctionNoteStacking::Chord& scale =
-			chord_table.getScaleByName( m_scaleModel.currentText() );
-	const InstrumentFunctionNoteStacking::Chord& chord =
-			chord_table.getChordByName( m_chordModel.currentText() );
+	const Chord & scale = m_chordTable->getScaleByName( m_scaleModel.currentText() );
+	const Chord & chord = m_chordTable->getChordByName( m_chordModel.currentText() );
 
 	emit semiToneMarkerMenuScaleSetEnabled( ! scale.isEmpty() );
 	emit semiToneMarkerMenuChordSetEnabled( ! chord.isEmpty() );

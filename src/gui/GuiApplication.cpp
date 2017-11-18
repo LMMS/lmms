@@ -38,6 +38,7 @@
 #include "PianoRoll.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
+#include "PluginView.h"
 
 #include <QApplication>
 #include <QDir>
@@ -52,8 +53,14 @@ GuiApplication* GuiApplication::instance()
 	return s_instance;
 }
 
+void GuiApplication::setChordTableEditorView(PluginView *_view)
+{
+	m_chordTableEditorView =  _view;
+}
 
-GuiApplication::GuiApplication()
+
+GuiApplication::GuiApplication() :
+	m_chordTableEditorView( NULL ) //awaiting initialization
 {
 	// enable HiDPI scaling before showing anything (Qt 5.6+ only)
 	#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))

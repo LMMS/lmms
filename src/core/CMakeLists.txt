@@ -7,6 +7,7 @@ set(LMMS_SRCS
 	core/BBTrackContainer.cpp
 	core/BufferManager.cpp
 	core/Clipboard.cpp
+	core/ChordTable.cpp
 	core/ComboBoxModel.cpp
 	core/ConfigManager.cpp
 	core/Controller.cpp

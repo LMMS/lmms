@@ -39,6 +39,7 @@ class ProjectJournal;
 class Mixer;
 class Song;
 class Ladspa2LMMS;
+class ChordTable;
 
 
 // Note: This class is called 'LmmsCore' instead of 'Engine' because of naming
@@ -111,6 +112,12 @@ public:
 		return s_instanceOfMe;
 	}
 
+	static ChordTable * chordTable()
+	{
+		return s_chordTable;
+	}
+
+
 signals:
 	void initProgress(const QString &msg);
 
@@ -137,6 +144,8 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
+
+	static ChordTable * s_chordTable;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

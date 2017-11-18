@@ -28,6 +28,7 @@
 #include <QtCore/QObject>
 
 #include "export.h"
+#include "PluginView.h"
 
 class QLabel;
 
@@ -58,6 +59,23 @@ public:
 	AutomationEditorWindow* automationEditor() { return m_automationEditor; }
 	ControllerRackView* getControllerRackView() { return m_controllerRackView; }
 
+	//As at present the editor is a toolPlugin we initiate it 
+	//while loading in gui/MainWindow.cpp:368
+	void setChordTableEditorView( PluginView * _view );
+
+	PluginView* getChordTableEditorView() { return m_chordTableEditorView; }
+
+	//the convenience method which emits the signal below
+	void emitGenericSignal_1(int i)
+	{
+		emit genericSignal_1( i );
+	}
+
+signals:
+	//lazy workaround for easy communication
+	void genericSignal_1( int i );
+
+
 public slots:
 	void displayInitProgress(const QString &msg);
 
@@ -66,6 +84,9 @@ private slots:
 
 private:
 	static GuiApplication* s_instance;
+
+	//will be initialized by MainWindow.finalize - tools menu section
+	PluginView* m_chordTableEditorView;
 
 	MainWindow* m_mainWindow;
 	FxMixerView* m_fxMixerView;
