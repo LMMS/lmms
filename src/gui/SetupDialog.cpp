@@ -342,20 +342,21 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	embed_tw->setFixedHeight( 48 );
 	m_vstEmbedComboBox = new QComboBox( embed_tw );
 	m_vstEmbedComboBox->move( XDelta, YDelta );
+
+	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
 	m_vstEmbedComboBox->addItem( tr( "No embedding" ), "none" );
-#if QT_VERSION >= 0x050100
-	m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
-#endif
-
-#ifdef LMMS_BUILD_WIN32
-	m_vstEmbedComboBox->addItem( tr( "Embed using native Win32 API" ), "win32" );
-#endif
-
-#ifdef LMMS_BUILD_LINUX
-	if ( QX11Info::isPlatformX11() ) {
+	if( embedMethods.contains("qt") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
+	}
+	if( embedMethods.contains("win32") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using native Win32 API" ), "win32" );
+	}
+	if( embedMethods.contains("xembed") )
+	{
 		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
 	}
-#endif
 	m_vstEmbedComboBox->setCurrentIndex( m_vstEmbedComboBox->findData( m_vstEmbedMethod ) );
 
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
