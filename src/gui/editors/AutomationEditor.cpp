@@ -517,16 +517,13 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			// loop through whole time-map...
 			while( it != time_map.end() )
 			{
-				MidiTime len = 4;
-
 				// and check whether the user clicked on an
 				// existing value
 				if( pos_ticks >= it.key() &&
-					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
-					level <= it.value() )
+					level == it.value() )
 				{
 					break;
 				}
