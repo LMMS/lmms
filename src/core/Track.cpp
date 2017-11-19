@@ -815,6 +815,24 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 {
+	// copy a non selected TCO by Ctrl + dragging
+	if( mouseMovedDistance( me, 2) == true && m_action == ToggleSelected  )
+	{
+		gui->songEditor()->m_editor->selectAllTcos( false );
+		QVector<TrackContentObjectView *> tcoViews;
+		tcoViews.push_back( this );
+		DataFile dataFile = createTCODataFiles( tcoViews );
+		QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
+									128, 128,
+									Qt::KeepAspectRatio,
+									Qt::SmoothTransformation );
+		new StringPairDrag( QString( "tco_%1" ).arg(
+									m_tco->getTrack()->type() ),
+									dataFile.toString(), thumbnail, this );
+		m_action=NoAction;
+	}
+
+
 	if( m_action == CopySelection )
 	{
 		if( mouseMovedDistance( me, 2 ) == true )
@@ -1015,6 +1033,8 @@ void TrackContentObjectView::mouseReleaseEvent( QMouseEvent * me )
 	{
 		setSelected( !isSelected() );
 	}
+
+
 
 	if( m_action == Move || m_action == Resize || m_action == ResizeLeft )
 	{
