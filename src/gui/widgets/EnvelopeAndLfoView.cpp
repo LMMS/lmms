@@ -394,13 +394,17 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 					StringPairDrag::decodeValue( _de ) );
 		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
+		update();
 	}
 	else if( type == QString( "tco_%1" ).arg( Track::SampleTrack ) )
 	{
 		DataFile dataFile( value.toUtf8() );
-		m_params->m_userWave.setAudioFile( dataFile.content().firstChild().toElement().  attribute( "src" ) );
+		m_params->m_userWave.setAudioFile( dataFile.content().
+					firstChildElement().firstChildElement().
+					firstChildElement().attribute( "src" ) );
 		m_userLfoBtn->model()->setValue( true );
 		_de->accept();
+		update();
 	}
 }
 
