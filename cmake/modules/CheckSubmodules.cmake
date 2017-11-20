@@ -70,11 +70,12 @@ ENDFOREACH()
 MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 	FIND_PACKAGE(Git REQUIRED)
 	# Handle missing commits
-	IF(${FORCE_REMOTE})
-		SET(SUBMODULE_URL ${FORCE_REMOTE})
-		MESSAGE("--   Adding remote submodulefix to ${SUBMODULE_PATH")
+	SET(FORCE_REMOTE_FLAG "${FORCE_REMOTE}")
+	IF(FORCE_REMOTE_FLAG)
+		MESSAGE("--   Adding remote submodulefix to ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
-			COMMAND ${GIT_EXECUTABLE} remote add submodulefix ${SUBMODULE_URL}
+			COMMAND ${GIT_EXECUTABLE} remote rm submodulefix
+			COMMAND ${GIT_EXECUTABLE} remote add submodulefix ${FORCE_REMOTE}
 			COMMAND ${GIT_EXECUTABLE} fetch submodulefix
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
 			OUTPUT_QUIET
@@ -112,8 +113,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 	ENDIF()
 ENDMACRO()
 
-SET(REF_MISSING "no such remote ref")
-SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory;${REF_MISSING}")
+SET(MISSING_COMMIT_PHRASES "no such remote ref;reference is not a tree")
+SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory;already exists;${MISSING_COMMIT_PHRASES}")
 
 # Attempt to do lazy clone
 FOREACH(_submodule ${SUBMODULE_LIST})
@@ -127,6 +128,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		IF(EXISTS "${CMAKE_SOURCE_DIR}/${_submodule}/${_crumb}")
 			SET(CRUMB_FOUND true)
 			MESSAGE("--   Found ${_submodule}/${_crumb}")
+			BREAK()
 		ENDIF()
 	ENDFOREACH()
 	IF(NOT CRUMB_FOUND)
@@ -138,9 +140,15 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		WHILE(NOT GIT_RESULT EQUAL 0 AND COUNTED LESS MAX_ATTEMPTS)
 			LIST(APPEND COUNTING "x")
 			LIST(LENGTH COUNTING COUNTED)
-
+			SET(MISSING_COMMIT false)
+			FOREACH(_phrase ${MISSING_COMMIT_PHRASES})
+				IF("${GIT_MESSAGE}" MATCHES "${_phrase}")
+					SET(MISSING_COMMIT true)
+					BREAK()
+				ENDIF()
+			ENDFOREACH()
 			FOREACH(_phrase ${RETRY_PHRASES})
-				IF("${GIT_MESSAGE}" MATCHES "${REF_MISSING}")
+				IF(${MISSING_COMMIT})
 					LIST(FIND SUBMODULE_LIST ${_submodule} SUBMODULE_INDEX)
 					LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} SUBMODULE_URL)
 					MESSAGE("--   Retrying ${_submodule} using 'remote add submodulefix' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
