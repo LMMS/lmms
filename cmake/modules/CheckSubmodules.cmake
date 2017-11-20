@@ -18,7 +18,7 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 # Files which confirm a successful clone
-SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh")
+SET(VALID_CRUMBS "CMakeLists.txt;Makefile;Makefile.in;Makefile.am;configure.ac;configure.py;autogen.sh;.gitignore")
 
 # Try and use the specified shallow clone on submodules, if supported
 SET(DEPTH_VALUE 100)
@@ -29,10 +29,22 @@ SET(MAX_ATTEMPTS 2)
 MESSAGE("\nValidating submodules...")
 FILE(READ "${CMAKE_SOURCE_DIR}/.gitmodules" SUBMODULE_DATA)
 
+# Force English locale
+SET(LC_ALL_BACKUP "$ENV{LC_ALL}")
+SET(LANG_BACKUP "$ENV{LANG}")
+SET(ENV{LC_ALL} "C")
+SET(ENV{LANG} "en_US")
+
 # Assume alpha-numeric paths
 STRING(REGEX MATCHALL "path = [-0-9A-Za-z/]+" SUBMODULE_LIST ${SUBMODULE_DATA})
+STRING(REGEX MATCHALL "url = [.:%-0-9A-Za-z/]+" SUBMODULE_URL_LIST ${SUBMODULE_DATA})
+
 FOREACH(_part ${SUBMODULE_LIST})
 	STRING(REPLACE "path = " "" SUBMODULE_PATH ${_part})
+
+	LIST(FIND SUBMODULE_LIST ${_part} SUBMODULE_INDEX)
+	LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} _url)
+	STRING(REPLACE "url = " "" SUBMODULE_URL ${_url})
 
 	# Remove submodules from validation as specified in -DSKIP_SUBMODULES=foo;bar
 	SET(SKIP false)
@@ -44,19 +56,32 @@ FOREACH(_part ${SUBMODULE_LIST})
 			ENDIF()
 		ENDFOREACH()
 	ENDIF()
-	LIST(REMOVE_ITEM SUBMODULE_LIST ${_part})
 	IF(NOT SKIP)
-		LIST(APPEND SUBMODULE_LIST ${SUBMODULE_PATH})
+		LIST(INSERT SUBMODULE_LIST ${SUBMODULE_INDEX} ${SUBMODULE_PATH})
+		LIST(INSERT SUBMODULE_URL_LIST ${SUBMODULE_INDEX} ${SUBMODULE_URL})
 	ENDIF()
+	LIST(REMOVE_ITEM SUBMODULE_LIST ${_part})
+	LIST(REMOVE_ITEM SUBMODULE_URL_LIST ${_url})
 ENDFOREACH()
 
-LIST(SORT SUBMODULE_LIST)
 
 # Once called, status is stored in GIT_RESULT respectively.
 # Note: Git likes to write to stderr.  Don't assume stderr is error; Check GIT_RESULT instead.
-MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT)
+MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 	FIND_PACKAGE(Git REQUIRED)
-	IF(${FORCE_DEINIT})
+	# Handle missing commits
+	IF(${FORCE_REMOTE})
+		SET(SUBMODULE_URL ${FORCE_REMOTE})
+		MESSAGE("--   Adding remote submodulefix to ${SUBMODULE_PATH")
+		EXECUTE_PROCESS(
+			COMMAND ${GIT_EXECUTABLE} remote add submodulefix ${SUBMODULE_URL}
+			COMMAND ${GIT_EXECUTABLE} fetch submodulefix
+			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
+			OUTPUT_QUIET
+		)
+		# Recurse
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false)
+	ELSEIF(${FORCE_DEINIT})
 		MESSAGE("--   Resetting ${SUBMODULE_PATH}")
 		EXECUTE_PROCESS(
 			COMMAND ${GIT_EXECUTABLE} submodule deinit -f ${CMAKE_SOURCE_DIR}/${SUBMODULE_PATH}
@@ -64,7 +89,7 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT)
 			OUTPUT_QUIET
 		)
 		# Recurse
-		GIT_SUBMODULE(${SUBMODULE_PATH} false)
+		GIT_SUBMODULE(${SUBMODULE_PATH} false false)
 	ELSE()
 		# Try to use the depth switch
 		SET(DEPTH_CMD "")
@@ -87,7 +112,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT)
 	ENDIF()
 ENDMACRO()
 
-SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory")
+SET(REF_MISSING "no such remote ref")
+SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory;${REF_MISSING}")
 
 # Attempt to do lazy clone
 FOREACH(_submodule ${SUBMODULE_LIST})
@@ -104,7 +130,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 		ENDIF()
 	ENDFOREACH()
 	IF(NOT CRUMB_FOUND)
-		GIT_SUBMODULE(${_submodule} false)
+		GIT_SUBMODULE(${_submodule} false false)
 
 		SET(COUNTED 0)
 		SET(COUNTING "")
@@ -114,9 +140,16 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 			LIST(LENGTH COUNTING COUNTED)
 
 			FOREACH(_phrase ${RETRY_PHRASES})
-				IF("${GIT_MESSAGE}" MATCHES "${_phrase}")
-					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
+				IF("${GIT_MESSAGE}" MATCHES "${REF_MISSING}")
+					LIST(FIND SUBMODULE_LIST ${_submodule} SUBMODULE_INDEX)
+					LIST(GET SUBMODULE_URL_LIST ${SUBMODULE_INDEX} SUBMODULE_URL)
+					MESSAGE("--   Retrying ${_submodule} using 'remote add submodulefix' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
 					
+					GIT_SUBMODULE(${_submodule} false "${SUBMODULE_URL}")
+					BREAK()
+				ELSEIF("${GIT_MESSAGE}" MATCHES "${_phrase}")
+					MESSAGE("--   Retrying ${_submodule} using 'deinit' (attempt ${COUNTED} of ${MAX_ATTEMPTS})...")
+
 					# Shallow submodules were introduced in 1.8.4
 					# Shallow commits can fail to clone from non-default branches, only try once
 					IF(GIT_VERSION_STRING VERSION_GREATER "1.8.3" AND COUNTED LESS 2)
@@ -125,7 +158,8 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 						UNSET(DEPTH_VALUE)
 					ENDIF()
 					
-					GIT_SUBMODULE(${_submodule} true)
+					GIT_SUBMODULE(${_submodule} true false)
+					BREAK()
 				ENDIF()
 			ENDFOREACH()
 		ENDWHILE()
@@ -136,3 +170,7 @@ FOREACH(_submodule ${SUBMODULE_LIST})
 	ENDIF()
 ENDFOREACH()
 MESSAGE("-- Done validating submodules.\n")
+
+# Reset locale
+SET(ENV{LC_ALL} "${LC_ALL_BACKUP}")
+SET(ENV{LANG} "${LANG_BACKUP}")
