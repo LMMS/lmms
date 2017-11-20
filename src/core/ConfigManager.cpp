@@ -217,8 +217,10 @@ QStringList ConfigManager::availabeVstEmbedMethods()
 
 QString ConfigManager::vstEmbedMethod() const
 {
-	QString defaultMethod = *(availabeVstEmbedMethods().end() - 1);
-	return value( "ui", "vstembedmethod", defaultMethod );
+	QStringList methods = availabeVstEmbedMethods();
+	QString defaultMethod = *(methods.end() - 1);
+	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
+	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
 }
 
 bool ConfigManager::hasWorkingDir() const
