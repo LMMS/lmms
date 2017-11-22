@@ -86,6 +86,24 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 
 ENDIF("${PLUGIN_LIST}" STREQUAL "")
 
+IF(MSVC)
+	SET(MSVC_INCOMPATIBLE_PLUGINS
+		LadspaEffect
+		monstro
+		organic
+		ReverbSC
+		sid
+		vestige
+		vibed
+		vst_base
+		VstEffect
+		xpressive
+		zynaddsubfx
+	)
+	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")
+	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})
+ENDIF()
+
 FOREACH(PLUGIN ${PLUGIN_LIST})
 	ADD_SUBDIRECTORY(${PLUGIN})
 ENDFOREACH()
