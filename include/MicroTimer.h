@@ -25,42 +25,18 @@
 #ifndef MICRO_TIMER
 #define MICRO_TIMER
 
-#include "lmmsconfig.h"
-
 #include <chrono>
-#include <cstdlib>
-#include "lmms_basics.h"
-
 
 class MicroTimer
 {
-	using clock = std::chrono::steady_clock;
 	using time_point = std::chrono::steady_clock::time_point;
 
-	static_assert (std::ratio_less_equal<clock::duration::period,
-		std::micro>::value, "MicroTimer: steady_clock doesn't support microsecond resolution");
-
 public:
-	inline MicroTimer()
-	{
-		reset();
-	}
+	MicroTimer();
+	~MicroTimer();
 
-	inline ~MicroTimer()
-	{
-	}
-
-	inline void reset()
-	{
-		begin = clock::now();
-	}
-
-	inline int elapsed() const
-	{
-		auto now = clock::now();
-		return std::chrono::duration_cast<std::chrono::duration<int, std::micro>>(now - begin).count();
-	}
-
+	void reset();
+	int elapsed() const;
 
 private:
 	time_point begin;
