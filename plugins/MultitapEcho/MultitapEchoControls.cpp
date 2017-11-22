@@ -102,7 +102,7 @@ void MultitapEchoControls::setDefaultAmpShape()
 {
 	const int length = m_steps.value();
 	
-	float samples [length];
+	QVarLengthArray<float> samples(length);
 	for( int i = 0; i < length; ++i )
 	{
 		samples[i] = 0.0f;
@@ -116,7 +116,7 @@ void MultitapEchoControls::setDefaultLpShape()
 {
 	const int length = m_steps.value();
 	
-	float samples [length];
+	QVarLengthArray<float> samples(length);
 	for( int i = 0; i < length; ++i )
 	{
 		samples[i] = 3.0f;
