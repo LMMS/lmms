@@ -22,8 +22,6 @@
  *
  */
 
-#include <QtCore/QtGlobal>
-
 #ifndef EXPORT_H
 #define EXPORT_H
 
@@ -32,10 +30,10 @@
 #ifdef LMMS_BUILD_WIN32
 
 #ifdef PLUGIN_NAME
-#define EXPORT Q_DECL_IMPORT
-#define PLUGIN_EXPORT Q_DECL_EXPORT
+#define EXPORT __declspec(dllimport)
+#define PLUGIN_EXPORT __declspec(dllexport)
 #else
-#define EXPORT Q_DECL_EXPORT
+#define EXPORT __declspec(dllexport)
 #endif
 
 #else

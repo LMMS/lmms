@@ -471,14 +471,11 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
-
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
 
-
-message("Compiler: ${CMAKE_CXX_COMPILER_ID} Is MSVC: ${MSVC} Version: ${MSVC}")
 # set compiler flags
-IF(CMAKE_CXX_COMPILER_ID MATCHES (GNU|AppleClang))
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
 	SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 	OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)
 	IF(${USE_WERROR})
@@ -522,8 +519,7 @@ LIST(SORT LMMS_INCLUDES)
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-#SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-IF(CMAKE_CXX_COMPILER_ID MATCHES (GNU|AppleClang))
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
 	IF(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 	ELSE(WIN32)

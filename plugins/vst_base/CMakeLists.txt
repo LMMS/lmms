@@ -71,6 +71,7 @@ ADD_CUSTOM_COMMAND(
 		-L${WINE_LIBRARY_DIR}
 		${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
 		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
+		-std=c++0x
 		${WINE_BUILD_FLAGS}
 		-o ../RemoteVstPlugin
 	# Ensure correct file extension

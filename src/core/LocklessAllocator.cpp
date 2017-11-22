@@ -26,6 +26,10 @@
 
 #include <stdio.h>
 
+#ifndef LMMS_BUILD_WIN32
+#include <strings.h>
+#endif
+
 #include "lmmsconfig.h"
 
 

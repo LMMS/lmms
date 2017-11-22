@@ -44,7 +44,7 @@
 #include "interpolation.h"
 #include "MemoryManager.h"
 
-template<ch_cnt_t CHANNELS> class BasicFilters;
+template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS> class BasicFilters;
 
 template<ch_cnt_t CHANNELS>
 class LinkwitzRiley
@@ -218,7 +218,7 @@ private:
 };
 typedef OnePole<2> StereoOnePole;
 
-template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS>
+template<ch_cnt_t CHANNELS>
 class BasicFilters
 {
 	MM_OPERATORS
