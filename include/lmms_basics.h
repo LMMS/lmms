@@ -96,7 +96,7 @@ struct typeInfo
 template<>
 inline float typeInfo<float>::minEps()
 {
-	return 1.0e-10;
+	return 1.0e-10f;
 }
 
 template<>
