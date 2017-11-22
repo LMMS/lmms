@@ -1,7 +1,9 @@
 INCLUDE(BuildPlugin)
 
 # Avoid unused warnings for mididata.h
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
+ENDIF()
 
 INCLUDE_DIRECTORIES(adplug/src)
 
