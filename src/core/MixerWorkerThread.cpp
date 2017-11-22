@@ -34,13 +34,6 @@ MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;
 QList<MixerWorkerThread *> MixerWorkerThread::workerThreads;
 
-#ifdef _MSC_VER
-	#define ASM(x) __asm { x };
-#else
-	#define ASM(x) asm ( "x" );
-#endif
-
-
 // implementation of internal JobQueue
 void MixerWorkerThread::JobQueue::reset( OperationMode _opMode )
 {
@@ -93,8 +86,8 @@ void MixerWorkerThread::JobQueue::wait()
 {
 	while( (int) m_itemsDone < (int) m_queueSize )
 	{
-#if defined(LMMS_HOST_X86) || (defined(LMMS_HOST_X86_64) && ! defined(_MSC_VER) )
-		ASM( "pause" );
+#if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
+		_mm_pause();
 #endif
 	}
 }
