@@ -41,15 +41,15 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 {
 
 	{ ProjectRenderer::WaveFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV-File (*.wav)" ),
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "WAV (*.wav)" ),
 					".wav", &AudioFileWave::getInst },
 	{ ProjectRenderer::FlacFile,
-		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC-File (*.flac)"),
+		QT_TRANSLATE_NOOP("ProjectRenderer", "FLAC (*.flac)"),
 		".flac",
 		&AudioFileFlac::getInst
 	},
 	{ ProjectRenderer::OggFile,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "Compressed OGG-File (*.ogg)" ),
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "OGG (*.ogg)" ),
 					".ogg",
 #ifdef LMMS_HAVE_OGGVORBIS
 					&AudioFileOgg::getInst
@@ -58,7 +58,7 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 #endif
 									},
 	{ ProjectRenderer::MP3File,
-		QT_TRANSLATE_NOOP( "ProjectRenderer", "Compressed MP3-File (*.mp3)" ),
+		QT_TRANSLATE_NOOP( "ProjectRenderer", "MP3 (*.mp3)" ),
 					".mp3",
 #ifdef LMMS_HAVE_MP3LAME
 					&AudioFileMP3::getInst
@@ -66,8 +66,8 @@ const ProjectRenderer::FileEncodeDevice ProjectRenderer::fileEncodeDevices[] =
 					NULL
 #endif
 									},
-	// ... insert your own file-encoder-infos here... may be one day the
-	// user can add own encoders inside the program...
+	// Insert your own file-encoder infos here.
+	// Maybe one day the user can add own encoders inside the program.
 
 	{ ProjectRenderer::NumFileFormats, NULL, NULL, NULL }
 
@@ -109,15 +109,15 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 ProjectRenderer::~ProjectRenderer()
 {
-	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
+	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
 	Engine::mixer()->changeQuality( m_oldQualitySettings );
 }
 
 
 
 
-// little help-function for getting file-format from a file-extension (only for
-// registered file-encoders)
+// Little help function for getting file format from a file extension
+// (only for registered file-encoders).
 ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 							const QString & _ext )
 {
@@ -131,7 +131,7 @@ ProjectRenderer::ExportFileFormats ProjectRenderer::getFileFormatFromExtension(
 		++idx;
 	}
 
-	return( WaveFile );	// default
+	return( WaveFile ); // Default.
 }
 
 
@@ -151,9 +151,8 @@ void ProjectRenderer::startProcessing()
 
 	if( isReady() )
 	{
-		// have to do mixer stuff with GUI-thread-affinity in order to
-		// make slots connected to sampleRateChanged()-signals being
-		// called immediately
+		// Have to do mixer stuff with GUI-thread affinity in order to
+		// make slots connected to sampleRateChanged()-signals being called immediately.
 		Engine::mixer()->setAudioDevice( m_fileDev,
 						m_qualitySettings, false );
 
@@ -169,6 +168,7 @@ void ProjectRenderer::startProcessing()
 
 void ProjectRenderer::run()
 {
+	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 #if 0
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
@@ -182,7 +182,7 @@ void ProjectRenderer::run()
 
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
-	//skip first empty buffer
+	// Skip first empty buffer.
 	Engine::mixer()->nextBuffer();
 
 	const Song::PlayPos & exportPos = Engine::getSong()->getPlayPos(
@@ -193,7 +193,7 @@ void ProjectRenderer::run()
 	tick_t endTick = exportEndpoints.second.getTicks();
 	tick_t lengthTicks = endTick - startTick;
 
-	// Continually track and emit progress percentage to listeners
+	// Continually track and emit progress percentage to listeners.
 	while( exportPos.getTicks() < endTick &&
 				Engine::getSong()->isExporting() == true
 							&& !m_abort )
@@ -207,12 +207,12 @@ void ProjectRenderer::run()
 		}
 	}
 
-	// notify mixer of the end of processing
+	// Notify mixer of the end of processing.
 	Engine::mixer()->stopProcessing();
 
 	Engine::getSong()->stopExport();
 
-	// if the user aborted export-process, the file has to be deleted
+	// If the user aborted export-process, the file has to be deleted.
 	const QString f = m_fileDev->outputFile();
 	if( m_abort )
 	{
@@ -253,6 +253,5 @@ void ProjectRenderer::updateConsoleProgress()
 	fprintf( stderr, "%s", buf );
 	fflush( stderr );
 }
-
 
 

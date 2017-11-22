@@ -33,27 +33,8 @@ IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 
 IF(LMMS_HOST_X86_64)
 	SET(EXTRA_FLAGS -m32)
-
-	EXEC_PROGRAM( ${WINE_CXX} ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
-	# workaround for broken wineg++ in WINE 1.4 (shipped e.g. with Ubuntu Precise)
-	IF("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386-linux-gnu/wine/libwinecrt0.a -L/usr/lib/i386-linux-gnu/wine/ -luser32 -lkernel32 -lgdi32)
-	ENDIF()
-	# The following check works on Fedora systems
-	IF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /usr/lib/i386/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
-	ENDIF()
-	# Wine stable
-	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-stable/lib64/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-stable/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
-	ENDIF()
-	# Wine development
-	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-devel/lib64/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-devel/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
-	ENDIF()
-	# Wine staging
-	IF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-staging/lib64/wine/libwinecrt0.a.*")
-		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs /opt/wine-staging/lib/wine/libwinecrt0.a -luser32 -lkernel32 -lgdi32)
+	IF(WINE_LIBRARY_FIX)
+		SET(EXTRA_FLAGS ${EXTRA_FLAGS} -nodefaultlibs ${WINE_LIBRARY_FIX}wine/libwinecrt0.a -L${WINE_LIBRARY_FIX}wine/ -luser32 -lkernel32 -lgdi32)
 	ENDIF()
 ENDIF(LMMS_HOST_X86_64)
 

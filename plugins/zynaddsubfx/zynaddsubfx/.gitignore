@@ -1,8 +1,0 @@
-*.o
-*~
-src/zynaddsubfx
-src/Tests/runner
-src/Tests/runner.cpp
-CMakeCache.txt
-CMakeFiles
-build

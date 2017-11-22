@@ -442,12 +442,15 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	m_midiNotesMutex.unlock();
 
 	lock();
-	// invalidate all NotePlayHandles linked to this track
+	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
-	Engine::mixer()->removePlayHandlesOfTypes( this, removeIPH
-				? PlayHandle::TypeNotePlayHandle
-					| PlayHandle::TypeInstrumentPlayHandle
-				: PlayHandle::TypeNotePlayHandle );
+
+	quint8 flags = PlayHandle::TypeNotePlayHandle | PlayHandle::TypePresetPreviewHandle;
+	if( removeIPH )
+	{
+		flags |= PlayHandle::TypeInstrumentPlayHandle;
+	}
+	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
 	unlock();
 }
 
