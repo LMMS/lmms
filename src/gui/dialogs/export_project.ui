@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>715</width>
-    <height>491</height>
+    <width>379</width>
+    <height>374</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>519</width>
-    <height>412</height>
+    <width>379</width>
+    <height>374</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>379</width>
+    <height>374</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -21,19 +27,27 @@
   </property>
   <layout class="QVBoxLayout">
    <item>
+    <widget class="QCheckBox" name="exportLoopCB">
+     <property name="text">
+      <string>Export as loop (remove extra bar)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="renderMarkersCB">
+     <property name="text">
+      <string>Export between loop markers</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout">
      <item>
       <widget class="QGroupBox" name="outputGroupBox">
        <property name="title">
-        <string>Output</string>
+        <string>File format settings</string>
        </property>
        <layout class="QVBoxLayout">
-        <property name="spacing">
-         <number>6</number>
-        </property>
-        <property name="leftMargin">
-         <number>9</number>
-        </property>
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
@@ -62,7 +76,7 @@
            <item>
             <widget class="QLabel" name="labelSampleRate">
              <property name="text">
-              <string>Samplerate:</string>
+              <string>Sampling rate:</string>
              </property>
             </widget>
            </item>
@@ -100,12 +114,6 @@
         </item>
         <item>
          <widget class="QWidget" name="depthWidget" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
           <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
@@ -122,7 +130,7 @@
            <item>
             <widget class="QLabel" name="labelBitDepth">
              <property name="text">
-              <string>Depth:</string>
+              <string>Bit depth:</string>
              </property>
             </widget>
            </item>
@@ -133,17 +141,17 @@
              </property>
              <item>
               <property name="text">
-               <string>16 Bit Integer</string>
+               <string>16 Bit integer</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>24 Bit Integer</string>
+               <string>24 Bit integer</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>32 Bit Float</string>
+               <string>32 Bit float</string>
               </property>
              </item>
             </widget>
@@ -180,17 +188,17 @@
              </property>
              <item>
               <property name="text">
+               <string>Mono</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
                <string>Stereo</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Joint Stereo</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Mono</string>
+               <string>Joint stereo</string>
               </property>
              </item>
             </widget>
@@ -225,9 +233,6 @@
              <property name="currentIndex">
               <number>-1</number>
              </property>
-             <property name="maxVisibleItems">
-              <number>9</number>
-             </property>
             </widget>
            </item>
           </layout>
@@ -236,9 +241,6 @@
         <item>
          <widget class="QWidget" name="bitrateWidget" native="true">
           <layout class="QVBoxLayout">
-           <property name="spacing">
-            <number>6</number>
-           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -312,8 +314,8 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>163</width>
-            <height>20</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
          </spacer>
@@ -341,22 +343,22 @@
           </property>
           <item>
            <property name="text">
-            <string>Zero Order Hold</string>
+            <string>Zero order hold</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Sinc Fastest</string>
+            <string>Sinc worst (fastest)</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Sinc Medium (recommended)</string>
+            <string>Sinc medium (recommended)</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Sinc Best (very slow!)</string>
+            <string>Sinc best (slowest)</string>
            </property>
           </item>
          </widget>
@@ -364,7 +366,7 @@
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Oversampling (use with care!):</string>
+           <string>Oversampling:</string>
           </property>
          </widget>
         </item>
@@ -393,28 +395,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="exportLoopCB">
-          <property name="text">
-           <string>Export as loop (remove end silence)</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="renderMarkersCB">
-          <property name="text">
-           <string>Export between loop markers</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
-            <height>40</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
          </spacer>
@@ -433,8 +421,8 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
       </spacer>

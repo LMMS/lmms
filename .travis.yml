@@ -17,6 +17,7 @@ matrix:
         - env: QT5=True TARGET_OS=win32
         - env: QT5=True TARGET_OS=win64
         - os: osx
+          osx_image: xcode8.2
           env: QT5=True
 install: ${TRAVIS_BUILD_DIR}/.travis/install.sh
 script: ${TRAVIS_BUILD_DIR}/.travis/script.sh

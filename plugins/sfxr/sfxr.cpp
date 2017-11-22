@@ -464,6 +464,7 @@ void sfxrInstrument::playNote( NotePlayHandle * _n, sampleFrame * _working_buffe
 	}
 	else if( static_cast<SfxrSynth*>(_n->m_pluginData)->isPlaying() == false )
 	{
+		memset(_working_buffer + offset, 0, sizeof(sampleFrame) * frameNum);
 		_n->noteOff();
 		return;
 	}

@@ -61,9 +61,9 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		MultitapEcho
 		monstro
 		nes
-		opl2
+		OpulenZ
 		organic
-		papu
+		FreeBoy
 		patman
 		peak_controller_effect
 		GigPlayer
@@ -81,7 +81,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		watsyn
 		waveshaper
 		vibed
-		xpressive
+		Xpressive
 		zynaddsubfx
 	)
 
@@ -98,7 +98,7 @@ IF(MSVC)
 		vibed
 		vst_base
 		VstEffect
-		xpressive
+		Xpressive
 		zynaddsubfx
 	)
 	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")

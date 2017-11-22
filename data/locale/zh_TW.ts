@@ -4122,6 +4122,10 @@ Please visit http://lmms.sf.net/wiki for documentation on LMMS.</source>
 Please make sure you have write permission to the file and the directory containing the file and try again!</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>導出 MIDI (&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -9056,7 +9060,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation type="unfinished"/>
@@ -9151,7 +9155,7 @@ Double clicking any of the plugins will bring up information on the ports.</sour
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation type="unfinished"/>
