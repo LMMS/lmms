@@ -71,6 +71,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 
 AudioJack::~AudioJack()
 {
+	stopProcessing();
 #ifdef AUDIO_PORT_SUPPORT
 	while( m_portMap.size() )
 	{
@@ -252,6 +253,7 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
+	m_stopped = true;
 }
 
 
@@ -397,10 +399,6 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		if( m_framesDoneInCurBuf == m_framesToDoInCurBuf )
 		{
 			m_framesToDoInCurBuf = getNextBuffer( m_outBuf );
-			if( !m_framesToDoInCurBuf )
-			{
-				m_stopped = true;
-			}
 			m_framesDoneInCurBuf = 0;
 		}
 	}
