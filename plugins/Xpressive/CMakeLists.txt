@@ -11,7 +11,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dexprtk_disable_rtl_vecops")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WERROR_FLAGS} -fexceptions")
 
 # See https://github.com/ArashPartow/exprtk/pull/9
-IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+IF("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	EXECUTE_PROCESS(COMMAND patch exprtk/exprtk.hpp exprtk.hpp.patch
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET)
 ENDIF()
