@@ -66,7 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new patmanInstrument( static_cast<InstrumentTrack *>( _data ) );
 }

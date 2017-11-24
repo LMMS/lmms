@@ -29,6 +29,7 @@
 #include "MidiEvent.h"
 #include "VstSyncData.h"
 
+#include <atomic>
 #include <vector>
 #include <cstdio>
 #include <cstdlib>
@@ -234,7 +235,7 @@ public:
 	// recursive lock
 	inline void lock()
 	{
-		if( !isInvalid() && __sync_add_and_fetch( &m_lockDepth, 1 ) == 1 )
+		if( !isInvalid() && m_lockDepth.fetch_add( 1 ) == 0 )
 		{
 			m_dataSem.acquire();
 		}
@@ -243,7 +244,7 @@ public:
 	// recursive unlock
 	inline void unlock()
 	{
-		if( __sync_sub_and_fetch( &m_lockDepth, 1) <= 0 )
+		if( m_lockDepth.fetch_sub( 1 ) <= 1 )
 		{
 			m_dataSem.release();
 		}
@@ -404,7 +405,7 @@ private:
 	shmData * m_data;
 	QSystemSemaphore m_dataSem;
 	QSystemSemaphore m_messageSem;
-	volatile int m_lockDepth;
+	std::atomic_int m_lockDepth;
 
 } ;
 #endif
