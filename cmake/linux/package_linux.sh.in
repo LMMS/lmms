@@ -42,6 +42,9 @@ function skipped {
 	echo -e "   ${PLAIN}[${YELLOW}skipped${PLAIN}] ${1}"
 }
 
+# Blindly assume system arch is appimage arch
+ARCH=$(arch)
+export ARCH
 
 # Check for problematic install locations
 INSTALL=$(echo "@CMAKE_INSTALL_PREFIX@" | sed 's/\/*$//g')
