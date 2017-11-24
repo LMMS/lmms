@@ -41,8 +41,10 @@
 #include "MainWindow.h"
 #include "MidiTime.h"
 #include "debug.h"
-#include "embed.h"
 #include "Song.h"
+
+#include "embed.h"
+#include "plugin_export.h"
 
 #include "portsmf/allegro.h"
 

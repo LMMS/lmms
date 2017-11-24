@@ -37,6 +37,7 @@
 #include "BBTrack.h"
 #include "InstrumentTrack.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {

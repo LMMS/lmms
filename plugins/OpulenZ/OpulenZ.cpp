@@ -59,6 +59,8 @@
 #include "PixmapButton.h"
 #include "ToolTip.h"
 
+#include "plugin_export.h"
+
 extern "C"
 {
 

@@ -42,6 +42,8 @@
 
 #include "embed.h"
 
+#include "plugin_export.h"
+
 const blip_time_t FRAME_LENGTH = 70224;
 const long CLOCK_RATE = 4194304;
 

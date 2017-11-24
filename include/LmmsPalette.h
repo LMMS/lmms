@@ -24,13 +24,13 @@
  */
 
 #include <QWidget>
-#include "export.h"
+#include "lmms_export.h"
 
 #ifndef LMMSPALETTE_H
 #define LMMSPALETTE_H
 
 
-class EXPORT LmmsPalette : public QWidget
+class LMMS_EXPORT LmmsPalette : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY( QColor background READ background WRITE setBackground )

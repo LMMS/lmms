@@ -125,7 +125,7 @@ private:
 
 
 
-class EXPORT BBTrack : public Track
+class LMMS_EXPORT BBTrack : public Track
 {
 	Q_OBJECT
 public:

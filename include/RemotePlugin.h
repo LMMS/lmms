@@ -25,7 +25,7 @@
 #ifndef REMOTE_PLUGIN_H
 #define REMOTE_PLUGIN_H
 
-#include "export.h"
+#include "lmms_export.h"
 #include "MidiEvent.h"
 #include "VstSyncData.h"
 
@@ -79,8 +79,8 @@ typedef int32_t key_t;
 
 
 #ifdef BUILD_REMOTE_PLUGIN_CLIENT
-#undef EXPORT
-#define EXPORT
+#undef LMMS_EXPORT
+#define LMMS_EXPORT
 #define COMPILE_REMOTE_PLUGIN_BASE
 
 #ifndef SYNC_WITH_SHM_FIFO
@@ -444,7 +444,7 @@ enum RemoteMessageIDs
 
 
 
-class EXPORT RemotePluginBase
+class LMMS_EXPORT RemotePluginBase
 {
 public:
 	struct message
@@ -768,7 +768,7 @@ private:
 } ;
 
 
-class EXPORT RemotePlugin : public QObject, public RemotePluginBase
+class LMMS_EXPORT RemotePlugin : public QObject, public RemotePluginBase
 {
 	Q_OBJECT
 public:

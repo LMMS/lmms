@@ -34,7 +34,7 @@
 class TrackContainer;
 
 
-class EXPORT ImportFilter : public Plugin
+class LMMS_EXPORT ImportFilter : public Plugin
 {
 public:
 	ImportFilter( const QString & _file_name,

@@ -28,15 +28,15 @@
 #include <QPixmap>
 #include <QtCore/QString>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 
 
 namespace embed
 {
 
-QPixmap EXPORT getIconPixmap( const QString&  _name, int _w = -1, int _h = -1 );
-QString EXPORT getText( const char * _name );
+QPixmap LMMS_EXPORT getIconPixmap( const QString&  _name, int _w = -1, int _h = -1 );
+QString LMMS_EXPORT getText( const char * _name );
 
 }
 

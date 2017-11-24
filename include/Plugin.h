@@ -41,7 +41,7 @@ class PluginView;
 class AutomatableModel;
 
 
-class EXPORT Plugin : public Model, public JournallingObject
+class LMMS_EXPORT Plugin : public Model, public JournallingObject
 {
 	MM_OPERATORS
 	Q_OBJECT
@@ -78,7 +78,7 @@ public:
 			return QString( supportedFileTypes ).split( QChar( ',' ) ).contains( extension );
 		}
 
-		class EXPORT SubPluginFeatures
+		class LMMS_EXPORT SubPluginFeatures
 		{
 		public:
 			struct Key

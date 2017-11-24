@@ -27,7 +27,7 @@
 #define INSTRUMENT_H
 
 #include <QString>
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 #include "MemoryManager.h"
 #include "MidiTime.h"
@@ -41,7 +41,7 @@ class NotePlayHandle;
 class Track;
 
 
-class EXPORT Instrument : public Plugin
+class LMMS_EXPORT Instrument : public Plugin
 {
 	MM_OPERATORS
 public:

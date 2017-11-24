@@ -463,7 +463,7 @@ signals:
 
 
 // base-class for all tracks
-class EXPORT Track : public Model, public JournallingObject
+class LMMS_EXPORT Track : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS

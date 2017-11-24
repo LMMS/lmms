@@ -30,7 +30,7 @@
 #include "AutomatableModelView.h"
 
 
-class EXPORT LcdSpinBox : public LcdWidget, public IntModelView
+class LMMS_EXPORT LcdSpinBox : public LcdWidget, public IntModelView
 {
 	Q_OBJECT
 public:

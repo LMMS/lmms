@@ -19,6 +19,7 @@ INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
 INCLUDE(FindPkgConfig)
+INCLUDE(GenerateExportHeader)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 

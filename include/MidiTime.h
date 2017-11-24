@@ -29,7 +29,7 @@
 
 #include <QtGlobal>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 
 // note: 1 "Tact" = 1 Measure
@@ -40,7 +40,7 @@ const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
 
 class MeterModel;
 
-class EXPORT TimeSig
+class LMMS_EXPORT TimeSig
 {
 public:
 	// in a time signature,
@@ -57,7 +57,7 @@ private:
 };
 
 
-class EXPORT MidiTime
+class LMMS_EXPORT MidiTime
 {
 public:
 	MidiTime( const tact_t tact, const tick_t ticks );
