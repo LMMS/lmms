@@ -33,6 +33,7 @@
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
+#include "Mixer.h"
 #include "VstSyncController.h"
 
 
@@ -256,6 +257,17 @@ public:
 		return m_loadingProject;
 	}
 
+	void loadingCancelled()
+	{
+		m_isCancelled = true;
+		Engine::mixer()->clearNewPlayHandles();
+	}
+
+	bool isCancelled()
+	{
+		return m_isCancelled;
+	}
+
 	bool isModified() const
 	{
 		return m_modified;
@@ -385,6 +397,7 @@ private:
 	volatile bool m_paused;
 
 	bool m_loadingProject;
+	bool m_isCancelled;
 
 	QStringList m_errors;
 

@@ -501,6 +501,20 @@ void Mixer::clear()
 
 
 
+void Mixer::clearNewPlayHandles()
+{
+	requestChangeInModel();
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	{
+		LocklessListElement * next = e->next;
+		m_newPlayHandles.free( e );
+		e = next;
+	}
+	doneChangeInModel();
+}
+
+
+
 // removes all play-handles. this is necessary, when the song is stopped ->
 // all remaining notes etc. would be played until their end
 void Mixer::clearInternal()
