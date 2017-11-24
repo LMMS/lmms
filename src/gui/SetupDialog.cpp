@@ -67,10 +67,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#ifdef LMMS_BUILD_LINUX
-#include <QtX11Extras/QX11Info>
-#endif
-
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );

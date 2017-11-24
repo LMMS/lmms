@@ -35,10 +35,6 @@
 
 #include "lmmsversion.h"
 
-#ifdef LMMS_BUILD_LINUX
-#include <QtX11Extras/QX11Info>
-#endif
-
 static inline QString ensureTrailingSlash( const QString & s )
 {
 	if( ! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\') )
