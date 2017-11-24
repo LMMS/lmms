@@ -67,10 +67,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#ifdef LMMS_BUILD_LINUX
-#include <QtX11Extras/QX11Info>
-#endif
-
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );
@@ -342,13 +338,21 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	embed_tw->setFixedHeight( 48 );
 	m_vstEmbedComboBox = new QComboBox( embed_tw );
 	m_vstEmbedComboBox->move( XDelta, YDelta );
+
+	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
 	m_vstEmbedComboBox->addItem( tr( "No embedding" ), "none" );
-	m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
-#ifdef LMMS_BUILD_LINUX
-	if ( QX11Info::isPlatformX11() ) {
+	if( embedMethods.contains("qt") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
+	}
+	if( embedMethods.contains("win32") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using native Win32 API" ), "win32" );
+	}
+	if( embedMethods.contains("xembed") )
+	{
 		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
 	}
-#endif
 	m_vstEmbedComboBox->setCurrentIndex( m_vstEmbedComboBox->findData( m_vstEmbedMethod ) );
 
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
@@ -1077,7 +1081,11 @@ void SetupDialog::accept()
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
 	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
+#if QT_VERSION >= 0x050000
 					m_vstEmbedComboBox->currentData().toString() );
+#else
+					m_vstEmbedComboBox->itemData(m_vstEmbedComboBox->currentIndex()).toString() );
+#endif
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
