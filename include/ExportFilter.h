@@ -32,7 +32,7 @@
 #include "Plugin.h"
 
 
-class EXPORT ExportFilter : public Plugin
+class LMMS_EXPORT ExportFilter : public Plugin
 {
 public:
 	ExportFilter( const Descriptor * _descriptor ) : Plugin( _descriptor, NULL ) {}

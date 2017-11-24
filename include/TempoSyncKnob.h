@@ -34,7 +34,7 @@
 
 class MeterDialog;
 
-class EXPORT TempoSyncKnob : public Knob
+class LMMS_EXPORT TempoSyncKnob : public Knob
 {
 	Q_OBJECT
 public:

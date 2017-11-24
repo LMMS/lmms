@@ -30,7 +30,7 @@
 #include <QtCore/QObject>
 
 
-#include "export.h"
+#include "lmms_export.h"
 
 class BBTrackContainer;
 class DummyTrackContainer;
@@ -53,7 +53,7 @@ class Ladspa2LMMS;
 class LmmsCore;
 typedef LmmsCore Engine;
 
-class EXPORT LmmsCore : public QObject
+class LMMS_EXPORT LmmsCore : public QObject
 {
 	Q_OBJECT
 public:

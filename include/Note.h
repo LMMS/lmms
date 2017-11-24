@@ -78,7 +78,7 @@ const float MaxDetuning = 4 * 12.0f;
 
 
 
-class EXPORT Note : public SerializingObject
+class LMMS_EXPORT Note : public SerializingObject
 {
 public:
 	Note( const MidiTime & length = MidiTime( 0 ),

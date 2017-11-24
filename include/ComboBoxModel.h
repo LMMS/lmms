@@ -33,7 +33,7 @@
 #include "embed.h"
 
 
-class EXPORT ComboBoxModel : public IntModel
+class LMMS_EXPORT ComboBoxModel : public IntModel
 {
 	Q_OBJECT
 public:

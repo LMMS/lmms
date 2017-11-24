@@ -29,10 +29,10 @@
 #include <QWidget>
 #include <QPixmap>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
-class EXPORT TextFloat : public QWidget
+class LMMS_EXPORT TextFloat : public QWidget
 {
 	Q_OBJECT
 public:
