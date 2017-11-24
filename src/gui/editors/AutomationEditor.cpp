@@ -523,7 +523,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
-					level == it.value() )
+		( level == it.value() || mouseEvent->button() == Qt::RightButton ) )
 				{
 					break;
 				}
