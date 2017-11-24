@@ -400,10 +400,14 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		{
 			m_framesToDoInCurBuf = getNextBuffer( m_outBuf );
 			m_framesDoneInCurBuf = 0;
+			if( !m_framesToDoInCurBuf )
+			{
+				break;
+			}
 		}
 	}
 
-	if( m_stopped == true )
+	if( _nframes != done )
 	{
 		for( int c = 0; c < channels(); ++c )
 		{
