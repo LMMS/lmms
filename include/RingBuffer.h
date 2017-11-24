@@ -32,7 +32,7 @@
 #include "lmms_math.h"
 #include "MemoryManager.h"
 
-class EXPORT RingBuffer : public QObject
+class LMMS_EXPORT RingBuffer : public QObject
 {
 	Q_OBJECT
 	MM_OPERATORS

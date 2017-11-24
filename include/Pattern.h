@@ -46,7 +46,7 @@ class SampleBuffer;
 
 
 
-class EXPORT Pattern : public TrackContentObject
+class LMMS_EXPORT Pattern : public TrackContentObject
 {
 	Q_OBJECT
 public:

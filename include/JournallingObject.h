@@ -31,7 +31,7 @@
 #include "SerializingObject.h"
 
 
-class EXPORT JournallingObject : public SerializingObject
+class LMMS_EXPORT JournallingObject : public SerializingObject
 {
 public:
 	JournallingObject();

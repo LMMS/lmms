@@ -31,12 +31,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "Plugin.h"
 
 class QLibrary;
 
-class EXPORT PluginFactory
+class LMMS_EXPORT PluginFactory
 {
 public:
 	struct PluginInfo

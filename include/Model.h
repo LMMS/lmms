@@ -28,10 +28,10 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
 
 
-class EXPORT Model : public QObject
+class LMMS_EXPORT Model : public QObject
 {
 	Q_OBJECT
 public:

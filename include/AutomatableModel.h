@@ -63,7 +63,7 @@
 
 class ControllerConnection;
 
-class EXPORT AutomatableModel : public Model, public JournallingObject
+class LMMS_EXPORT AutomatableModel : public Model, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -349,7 +349,7 @@ signals:
 
 
 
-template <typename T> class EXPORT TypedAutomatableModel : public AutomatableModel
+template <typename T> class LMMS_EXPORT TypedAutomatableModel : public AutomatableModel
 {
 public:
 	using AutomatableModel::AutomatableModel;
@@ -377,7 +377,7 @@ public:
 
 // some typed AutomatableModel-definitions
 
-class EXPORT FloatModel : public TypedAutomatableModel<float>
+class LMMS_EXPORT FloatModel : public TypedAutomatableModel<float>
 {
 	Q_OBJECT
 public:
@@ -394,7 +394,7 @@ public:
 } ;
 
 
-class EXPORT IntModel : public TypedAutomatableModel<int>
+class LMMS_EXPORT IntModel : public TypedAutomatableModel<int>
 {
 	Q_OBJECT
 public:
@@ -409,7 +409,7 @@ public:
 } ;
 
 
-class EXPORT BoolModel : public TypedAutomatableModel<bool>
+class LMMS_EXPORT BoolModel : public TypedAutomatableModel<bool>
 {
 	Q_OBJECT
 public:

@@ -101,10 +101,22 @@ ADD_LIBRARY(lmmsobjs OBJECT
 	${LMMS_UI_OUT}
 	${LMMS_RCC_OUT}
 )
+
+GENERATE_EXPORT_HEADER(lmmsobjs
+	BASE_NAME lmms
+)
+# GENERATE_EXPORT_HEADER doesn't seem to do this automatically
+TARGET_COMPILE_DEFINITIONS(lmmsobjs
+	PRIVATE -Dlmmsobjs_EXPORTS
+)
+
 ADD_EXECUTABLE(lmms
 	core/main.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
 	"${WINRC}"
+)
+TARGET_INCLUDE_DIRECTORIES(lmms
+	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Set Visual Studio startup project to lmms
