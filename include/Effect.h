@@ -37,7 +37,7 @@ class EffectChain;
 class EffectControls;
 
 
-class EXPORT Effect : public Plugin
+class LMMS_EXPORT Effect : public Plugin
 {
 	MM_OPERATORS
 	Q_OBJECT

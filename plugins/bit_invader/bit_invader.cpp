@@ -43,6 +43,8 @@
 
 #include "embed.h"
 
+#include "plugin_export.h"
+
 extern "C"
 {
 

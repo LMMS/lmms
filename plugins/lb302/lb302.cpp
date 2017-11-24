@@ -46,7 +46,7 @@
 #include "BandLimitedWave.h"
 
 #include "embed.h"
-
+#include "plugin_export.h"
 
 // Envelope Recalculation period
 #define ENVINC 64

@@ -33,7 +33,7 @@
 class Effect;
 
 
-class EXPORT EffectChain : public Model, public SerializingObject
+class LMMS_EXPORT EffectChain : public Model, public SerializingObject
 {
 	Q_OBJECT
 public:

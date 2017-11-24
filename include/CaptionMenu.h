@@ -28,12 +28,12 @@
 
 #include <QMenu>
 
-#include "export.h"
+#include "lmms_export.h"
 
 ///
 /// \brief A context menu with a caption
 ///
-class EXPORT CaptionMenu : public QMenu
+class LMMS_EXPORT CaptionMenu : public QMenu
 {
 	Q_OBJECT
 public:

@@ -43,7 +43,7 @@ enum knobTypes
 
 
 
-class EXPORT Knob : public QWidget, public FloatModelView
+class LMMS_EXPORT Knob : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 	Q_ENUMS( knobTypes )
