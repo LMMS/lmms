@@ -64,7 +64,7 @@
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
 
-static __thread bool s_renderingThread;
+static thread_local bool s_renderingThread;
 
 
 

@@ -98,7 +98,7 @@ bool VersionedSaveDialog::changeFileNameVersion(QString &fileName, bool incremen
 		Q_ASSERT( ok );
 
 		// Can't decrement 0
-		if ( !increment and version == 0 )
+		if ( !increment && version == 0 )
 			return false;
 		// Replace version number
 		version = increment ? version + 1 : version - 1;
