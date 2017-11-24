@@ -35,10 +35,6 @@
 
 #include "lmmsversion.h"
 
-#ifdef LMMS_BUILD_LINUX
-#include <QtX11Extras/QX11Info>
-#endif
-
 static inline QString ensureTrailingSlash( const QString & s )
 {
 	if( ! s.isEmpty() && !s.endsWith('/') && !s.endsWith('\\') )
@@ -190,16 +186,37 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
-QString ConfigManager::vstEmbedMethod() const
+QStringList ConfigManager::availabeVstEmbedMethods()
 {
-	QString defaultMethod = "qt";
+	QStringList methods;
+	methods.append("none");
+#if QT_VERSION >= 0x050100
+	methods.append("qt");
+#endif
+#ifdef LMMS_BUILD_WIN32
+	methods.append("win32");
+#endif
 #ifdef LMMS_BUILD_LINUX
-	if (QX11Info::isPlatformX11()) {
-		defaultMethod = "xembed";
+#if QT_VERSION >= 0x050000
+	if (static_cast<QGuiApplication*>(QApplication::instance())->
+		platformName() == "xcb")
+#else
+	if (qgetenv("QT_QPA_PLATFORM").isNull()
+		|| qgetenv("QT_QPA_PLATFORM") == "xcb")
+#endif
+	{
+		methods.append("xembed");
 	}
 #endif
+	return methods;
+}
 
-	return value( "ui", "vstembedmethod", defaultMethod );
+QString ConfigManager::vstEmbedMethod() const
+{
+	QStringList methods = availabeVstEmbedMethods();
+	QString defaultMethod = *(methods.end() - 1);
+	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
+	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
 }
 
 bool ConfigManager::hasWorkingDir() const
