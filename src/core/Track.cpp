@@ -717,17 +717,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
-				gui->songEditor()->m_editor->selectAllTcos( false );
-				QVector<TrackContentObjectView *> tcoViews;
-				tcoViews.push_back( this );
-				DataFile dataFile = createTCODataFiles( tcoViews );
-				QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
-							128, 128,
-							Qt::KeepAspectRatio,
-							Qt::SmoothTransformation );
-				new StringPairDrag( QString( "tco_%1" ).arg(
-										m_tco->getTrack()->type() ),
-									dataFile.toString(), thumbnail, this );
+				m_action = ToggleSelected;
 			}
 		}
 		else
@@ -833,28 +823,34 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_action == CopySelection )
+	if( m_action == CopySelection || m_action == ToggleSelected )
 	{
 		if( mouseMovedDistance( me, 2 ) == true )
 		{
+			QVector<TrackContentObjectView *> tcoViews;
+			if( m_action == CopySelection )
+			{
+				// Collect all selected TCOs
+				QVector<selectableObject *> so =
+					m_trackView->trackContainerView()->selectedObjects();
+				for( auto it = so.begin(); it != so.end(); ++it )
+				{
+					TrackContentObjectView * tcov =
+						dynamic_cast<TrackContentObjectView *>( *it );
+					if( tcov != NULL )
+					{
+						tcoViews.push_back( tcov );
+					}
+				}
+			}
+			else
+			{
+				gui->songEditor()->m_editor->selectAllTcos( false );
+				tcoViews.push_back( this );
+			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
 			m_action = NoAction;
-
-			// Collect all selected TCOs
-			QVector<TrackContentObjectView *> tcoViews;
-			QVector<selectableObject *> so =
-				m_trackView->trackContainerView()->selectedObjects();
-			for( QVector<selectableObject *>::iterator it = so.begin();
-					it != so.end(); ++it )
-			{
-				TrackContentObjectView * tcov =
-					dynamic_cast<TrackContentObjectView *>( *it );
-				if( tcov != NULL )
-				{
-					tcoViews.push_back( tcov );
-				}
-			}
 
 			// Write the TCOs to the DataFile for copying
 			DataFile dataFile = createTCODataFiles( tcoViews );
