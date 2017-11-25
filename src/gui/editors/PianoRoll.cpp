@@ -963,6 +963,9 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 		}
 	}
 
+	m_pattern->rearrangeAllNotes();
+	m_pattern->dataChanged();
+
 	// we modified the song
 	update();
 	gui->songEditor()->update();
