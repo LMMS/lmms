@@ -48,22 +48,43 @@ STRING(REPLACE "include/wine" "include" WINE_INCLUDE_BASE_DIR ${WINE_INCLUDE_DIR
 STRING(REPLACE "lib/libwine.so" "lib" WINE_LIBRARY_DIR ${WINE_LIBRARY})
 STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKER_FLAGS} " " ${WINE_CXX_FLAGS})
 
+SET(WINE_CXX_ARGS
+	-I${CMAKE_BINARY_DIR}
+	-I${CMAKE_SOURCE_DIR}/include
+	-I${WINE_INCLUDE_BASE_DIR}
+	-L${WINE_LIBRARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
+	-std=c++0x
+	-mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
+	${WINE_BUILD_FLAGS}
+	-o ../RemoteVstPlugin
+)
+
+# winegcc fails if winebuild is not in path
+GET_FILENAME_COMPONENT(WINE_BINDIR ${WINE_CXX} PATH)
+FIND_PROGRAM(WINEBUILD winebuild NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+IF(NOT WINEBUILD)
+	IF(CMAKE_VERSION VERSION_LESS 3.1)
+		MESSAGE(WARNING "winebuild is not in PATH. Building RemoteVstPlugin may fail.")
+	ELSE()
+		SET(WINE_CXX_ARGS -E env PATH=$ENV{PATH}:${WINE_BINDIR} ${WINE_CXX} ${WINE_CXX_ARGS})
+		SET(WINE_CXX "${CMAKE_COMMAND}")
+	ENDIF()
+ENDIF()
+
+set(ENV{PATH} "$ENV{PATH}:${WINE_BINDIR}")
+
 ADD_CUSTOM_COMMAND(
 	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
+	COMMAND export
+		ARGS "PATH=$PATH:${WINE_BINDIR}"
 	COMMAND ${WINE_CXX}
-	ARGS -I${CMAKE_BINARY_DIR}
-		-I${CMAKE_SOURCE_DIR}/include
-		-I${WINE_INCLUDE_BASE_DIR}
-		-L${WINE_LIBRARY_DIR}
-		${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
-		-std=c++0x
-		-mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
-		${WINE_BUILD_FLAGS}
-		-o ../RemoteVstPlugin
+	ARGS ${WINE_CXX_ARGS}
 	# Ensure correct file extension
 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
 	OUTPUTS ../RemoteVstPlugin
+	VERBATIM
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ../RemoteVstPlugin.exe.so)
