@@ -128,21 +128,10 @@ void VstEffect::openPlugin( const QString & _plugin )
 			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
-#if QT_VERSION > 0x050000
-	m_plugin.reset(new VstPlugin( _plugin ));
-#else
-	{
-		QSharedPointer<VstPlugin> newPlugin(new VstPlugin( _plugin ));
-		std::swap(m_plugin, newPlugin);
-	}
-#endif
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin( _plugin ));
 	if( m_plugin->failed() )
 	{
-#if QT_VERSION > 0x050000
-		m_plugin.reset(nullptr);
-#else
 		m_plugin.clear();
-#endif
 		delete tf;
 		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
 		return;
