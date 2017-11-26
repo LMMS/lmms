@@ -33,12 +33,14 @@
 #include <QWidget>
 
 #include "JournallingObject.h"
-#include "communication.h"
+#include "RemotePlugin.h"
+
+#include "vstbase_export.h"
 
 class vstSubWin;
 
 
-class PLUGIN_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
+class VSTBASE_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
 	Q_OBJECT
 public:

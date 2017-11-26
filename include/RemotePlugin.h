@@ -25,7 +25,6 @@
 #ifndef REMOTE_PLUGIN_H
 #define REMOTE_PLUGIN_H
 
-#include "lmms_export.h"
 #include "MidiEvent.h"
 #include "VstSyncData.h"
 
@@ -89,6 +88,7 @@ typedef int32_t key_t;
 #endif
 
 #else
+#include "lmms_export.h"
 #include <QtCore/QMutex>
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
@@ -886,6 +886,7 @@ private:
 
 private slots:
 	void processFinished( int exitCode, QProcess::ExitStatus exitStatus );
+	void processErrored(QProcess::ProcessError err );
 } ;
 
 #endif
