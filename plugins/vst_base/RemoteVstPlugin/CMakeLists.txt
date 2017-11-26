@@ -1,17 +1,24 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(RemoteVstPlugin 
 	LANGUAGES CXX)
-
 set(CMAKE_CXX_STANDARD 11)
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+include(CheckCXXPreprocessor)
+
+CHECK_CXX_DEFINE(IS_WIN "__WIN32__")
+CHECK_CXX_DEFINE(IS_WIN64 "__WIN64__")
+
+if(NOT IS_WIN)
+	message(FATAL_ERROR "Toolchain used does not target windows.")
+ENDIF()
+
+if(IS_WIN64 OR CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BITNESS 64)
 else()
 	set(BITNESS 32)
 endif()
 
 set(EXE_NAME RemoteVstPlugin${BITNESS})
-
 add_executable(${EXE_NAME}
 	../RemoteVstPlugin.cpp
 )
@@ -24,7 +31,7 @@ target_include_directories(${EXE_NAME}
 )
 
 if(WIN32)
-	find_package(Qt5 REQUIRED COMPONENTS Core)
+	find_package(Qt5Core REQUIRED)
 	target_link_libraries(${EXE_NAME} Qt5::Core)
 endif()
 
