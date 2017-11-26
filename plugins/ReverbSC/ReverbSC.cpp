@@ -24,6 +24,7 @@
 #include "ReverbSC.h"
 
 #include "embed.h"
+#include "plugin_export.h"
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 
