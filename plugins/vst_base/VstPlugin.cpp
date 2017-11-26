@@ -24,6 +24,8 @@
 
 #include "VstPlugin.h"
 
+#include "communication.h"
+
 #include <QtCore/QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -79,12 +81,14 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 {
 	setSplittedChannels( true );
 
-	tryLoad( REMOTE_VST_PLUGIN_FILEPATH );
 #ifdef LMMS_BUILD_WIN64
+	tryLoad( "RemoteVstPlugin64" );
 	if( m_badDllFormat )
 	{
 		m_badDllFormat = false;
-		tryLoad( "32/RemoteVstPlugin32" );
+#endif
+		tryLoad( "RemoteVstPlugin32" );
+#ifdef LMMS_BUILD_WIN64
 	}
 #endif
 
