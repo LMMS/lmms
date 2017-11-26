@@ -296,6 +296,9 @@ AutomatedValueMap TrackContainer::automatedValuesFromTracks(const TrackList &tra
 				continue;
 			}
 			MidiTime relTime = time - p->startPosition();
+			if (! p->getAutoResize()) {
+				relTime = qMin(relTime, p->length());
+			}
 			float value = p->valueAt(relTime);
 
 			for (AutomatableModel* model : p->objects())
