@@ -1,0 +1,49 @@
+#!/bin/sh
+# Wrapper script for winegcc to remove .exe file ending automatically
+# appended by winebuild.
+# Usage: winegcc <args ...>
+
+set -e
+
+args="$@"
+
+# Find output name
+POSITIONAL=()
+while [ $# -gt 0 ]; do
+	key="$1"
+
+	case $key in
+		-o)
+			output=$2
+			shift
+			;;
+		-c)
+			no_link=true
+			;;
+		*)
+
+			;;
+	esac
+
+	shift
+done
+
+if [ -z "$output" ]; then
+	if [ "$no_link" != true ]; then
+		output="a.out"
+		no_move=true
+	fi
+#	echo "Fatal error in winegcc wrapper: Can't find output file name in args."
+#	exit 1
+fi
+
+wineg++ $args
+
+if [ -z "$no_link" ] && [ "$no_move" != true ]; then
+	if [ ! -e "$output.exe" ]; then
+		echo "Fatal error in winegcc wrapper: No output file \"$output.exe\" found."
+		exit 1
+	fi
+
+	mv $output.exe $output
+fi
