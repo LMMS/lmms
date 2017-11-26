@@ -34,10 +34,6 @@
 
 #include "RemotePlugin.h"
 
-#ifdef LMMS_HAVE_PTHREAD_H
-#include <pthread.h>
-#endif
-
 #ifdef LMMS_HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -63,6 +59,7 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
+#include <mutex>
 #include <vector>
 #include <queue>
 #include <string>
@@ -243,17 +240,17 @@ public:
 
 	inline void lockShm()
 	{
-		pthread_mutex_lock( &m_shmLock );
+		m_shmLock.lock();
 	}
 
 	inline bool tryLockShm()
 	{
-		return pthread_mutex_trylock( &m_shmLock ) == 0;
+		return m_shmLock.try_lock();
 	}
 
 	inline void unlockShm()
 	{
-		pthread_mutex_unlock( &m_shmLock );
+		m_shmLock.unlock();
 	}
 
 	inline bool isShmValid()
@@ -349,7 +346,7 @@ private:
 	float * * m_inputs;
 	float * * m_outputs;
 
-	pthread_mutex_t m_shmLock;
+	std::mutex m_shmLock;
 	bool m_shmValid;
 
 	typedef std::vector<VstMidiEvent> VstMidiEventList;
@@ -395,7 +392,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_shouldGiveIdle( false ),
 	m_inputs( NULL ),
 	m_outputs( NULL ),
-	m_shmLock(),
 	m_shmValid( false ),
 	m_midiEvents(),
 	m_bpm( 0 ),
@@ -405,8 +401,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_shmID( -1 ),
 	m_vstSyncData( NULL )
 {
-	pthread_mutex_init( &m_shmLock, NULL );
-
 	__plugin = this;
 
 #ifndef USE_QT_SHMEM
@@ -496,8 +490,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 	delete[] m_inputs;
 	delete[] m_outputs;
-
-	pthread_mutex_destroy( &m_shmLock );
 }
 
 
@@ -683,7 +675,7 @@ static void close_check( FILE* fp )
 {
 	if( fclose( fp ) )
 	{
-		perror( "close" );
+		perror( "fclose" );
 	}
 }
 
@@ -1567,11 +1559,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 			_timeInfo.flags |= kVstBarsValid;
 
-#ifdef LMMS_BUILD_WIN64
-			return (long long) &_timeInfo;
-#else
-			return (long) &_timeInfo;
-#endif
+			return (intptr_t) &_timeInfo;
 
 		case audioMasterProcessEvents:
 			SHOW_CALLBACK( "amc: audioMasterProcessEvents\n" );
@@ -1995,14 +1983,6 @@ int main( int _argc, char * * _argv )
 		return -1;
 	}
 
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-	// (non-portable) initialization of statically linked pthread library
-	pthread_win32_process_attach_np();
-	pthread_win32_thread_attach_np();
-#endif
-#endif
-
 #ifdef LMMS_BUILD_LINUX
 #ifdef LMMS_HAVE_SCHED_H
 	// try to set realtime-priority
@@ -2109,14 +2089,6 @@ int main( int _argc, char * * _argv )
 
 
 	delete __plugin;
-
-
-#ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
-	pthread_win32_thread_detach_np();
-	pthread_win32_process_detach_np();
-#endif
-#endif
 
 	return 0;
 
