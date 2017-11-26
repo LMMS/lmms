@@ -12,8 +12,7 @@ ENDIF()
 
 BUILD_PLUGIN(vsteffect VstEffect.cpp VstEffectControls.cpp VstEffectControlDialog.cpp VstSubPluginFeatures.cpp VstEffect.h VstEffectControls.h VstEffectControlDialog.h VstSubPluginFeatures.h MOCFILES VstEffectControlDialog.h VstEffectControls.h EMBEDDED_RESOURCES *.png)
 SET_TARGET_PROPERTIES(vsteffect PROPERTIES COMPILE_FLAGS "-Wno-attributes")
-TARGET_LINK_LIBRARIES(vsteffect -lvstbase)
-ADD_DEPENDENCIES(vsteffect vstbase)
+TARGET_LINK_LIBRARIES(vsteffect vstbase)
 
 ENDIF(LMMS_SUPPORT_VST)
 
