@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 include(CheckCXXPreprocessor)
 
-CHECK_CXX_DEFINE(IS_WIN "__WIN32__")
-CHECK_CXX_DEFINE(IS_WIN64 "__WIN64__")
+CHECK_CXX_DEFINE(IS_WIN "_WIN32")
+CHECK_CXX_DEFINE(IS_WIN64 "_WIN64")
 
 if(NOT IS_WIN)
 	message(FATAL_ERROR "Toolchain used does not target windows.")
