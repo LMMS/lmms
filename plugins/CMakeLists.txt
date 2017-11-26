@@ -94,9 +94,7 @@ IF(MSVC)
 		organic
 		ReverbSC
 		sid
-		vestige
 		vibed
-		vst_base
 		VstEffect
 		Xpressive
 		zynaddsubfx

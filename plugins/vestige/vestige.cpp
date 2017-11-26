@@ -22,6 +22,10 @@
  *
  */
 
+#include <QtCore/QtGlobal>
+
+#include "VstPlugin.h"
+
 #include "vestige.h"
 
 #include <memory>
@@ -41,7 +45,7 @@
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
 #include "InstrumentTrack.h"
-#include "VstPlugin.h"
+
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "GuiApplication.h"
@@ -52,6 +56,7 @@
 #include "ToolTip.h"
 #include "FileDialog.h"
 
+
 #include "embed.h"
 
 
@@ -59,7 +64,7 @@
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
+Plugin::Descriptor Q_DECL_EXPORT  vestige_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VeSTige",
@@ -612,7 +617,7 @@ void VestigeInstrumentView::updateMenu( void )
      		QMenu * to_menu = m_selPresetButton->menu();
     		to_menu->clear();
 
-    		QAction *presetActions[list1.size()];
+			QVector<QAction*> presetActions(list1.size());
 
      		for (int i = 0; i < list1.size(); i++) {
 			presetActions[i] = new QAction(this);
@@ -1163,7 +1168,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
+Q_DECL_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
 }
