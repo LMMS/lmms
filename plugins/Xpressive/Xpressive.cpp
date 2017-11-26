@@ -48,6 +48,8 @@
 
 #include "ExprSynth.h"
 
+#include "plugin_export.h"
+
 extern "C" {
 
 Plugin::Descriptor PLUGIN_EXPORT xpressive_plugin_descriptor = { STRINGIFY(

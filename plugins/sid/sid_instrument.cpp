@@ -42,6 +42,7 @@
 #include "ToolTip.h"
 
 #include "embed.h"
+#include "plugin_export.h"
 
 #define C64_PAL_CYCLES_PER_SEC  985248
 
