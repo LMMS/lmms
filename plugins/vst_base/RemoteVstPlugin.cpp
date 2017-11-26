@@ -788,7 +788,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		return false;
 	}
 
-	typedef AEffect * ( __stdcall * mainEntryPointer )
+	typedef AEffect * ( __cdecl * mainEntryPointer )
 						( audioMasterCallback );
 	mainEntryPointer mainEntry = (mainEntryPointer)
 				GetProcAddress( m_libInst, "VSTPluginMain" );
