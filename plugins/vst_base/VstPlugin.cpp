@@ -99,14 +99,14 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 {
 	setSplittedChannels( true );
 
-#ifdef LMMS_HOST_X86_64
+#ifdef LMMS_BUILD_WIN64
 	tryLoad( "RemoteVstPlugin64" );
 	if( m_badDllFormat )
 	{
 		m_badDllFormat = false;
 #endif
 		tryLoad( "RemoteVstPlugin32" );
-#ifdef LMMS_HOST_X86_64
+#ifdef LMMS_BUILD_WIN64
 	}
 #endif
 

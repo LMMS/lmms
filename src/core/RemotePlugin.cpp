@@ -123,7 +123,7 @@ RemotePlugin::RemotePlugin() :
 
 	connect( &m_process, SIGNAL( finished( int, QProcess::ExitStatus ) ),
 		this, SLOT( processFinished( int, QProcess::ExitStatus ) ) );
-	connect( &m_process, SIGNAL( errorOccured( QProcess::ProcessError ) ),
+	connect( &m_process, SIGNAL( errorOccurred( QProcess::ProcessError ) ),
 			 this, SLOT( processErrored( QProcess::ProcessError ) ) );
 }
 
