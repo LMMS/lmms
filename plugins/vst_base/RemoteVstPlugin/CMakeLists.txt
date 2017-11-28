@@ -50,12 +50,12 @@ if(IS_MINGW)
 
 	if(NOT HAS_STD_MUTEX)
 		target_include_directories(${EXE_NAME} PRIVATE
-			"${CMAKE_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
+			"${LMMS_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
 		target_compile_definitions(${EXE_NAME} PRIVATE
 			-DUSE_MINGW_THREADS_REPLACEMENT)
 	endif()
 endif()
 
 IF(STRIP)
-	ADD_CUSTOM_COMMAND(TARGET RemoteVstPlugin32 POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:RemoteVstPlugin32>")
+	ADD_CUSTOM_COMMAND(TARGET ${EXE_NAME} POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:${EXE_NAME}>")
 ENDIF()
