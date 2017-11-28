@@ -720,7 +720,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				m_action = ToggleSelected;
 			}
 		}
-		else
+		else if( !me->modifiers() )
 		{
 			if( isSelected() )
 			{
