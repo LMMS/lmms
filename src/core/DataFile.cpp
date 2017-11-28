@@ -194,7 +194,7 @@ bool DataFile::validate( QString extension )
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
-				extension == "sf2" || extension == "pat" || extension == "mid" ||
+				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
 				) )
 		{

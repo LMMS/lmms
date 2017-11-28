@@ -1702,12 +1702,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent )          /*!< The parent track view */
 {
-	if( s_grip == NULL )
-	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip" ) );
-	}
-
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop-action." ).arg(
 					#ifdef LMMS_BUILD_APPLE
@@ -1830,14 +1824,17 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 	if( m_trackView->isMovingTrack() == false )
 	{
+		s_grip = new QPixmap( embed::getIconPixmap(
+							"track_op_grip" ) );
+
 		p.drawPixmap( 2, 2, *s_grip );
-		m_trackOps->show();
-		m_muteBtn->show();
 	}
 	else
 	{
-		m_trackOps->hide();
-		m_muteBtn->hide();
+		s_grip = new QPixmap( embed::getIconPixmap(
+							"track_op_grip_c" ) );
+
+		p.drawPixmap( 2, 2, *s_grip );
 	}
 }
 
@@ -2807,6 +2804,7 @@ void TrackView::dropEvent( QDropEvent * de )
  */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
+
 	// If previously dragged too small, restore on shift-leftclick
 	if( height() < DEFAULT_TRACK_HEIGHT &&
 		me->modifiers() & Qt::ShiftModifier &&
@@ -2837,9 +2835,15 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 		}
 		else
 		{
+			if( me->x()>10 ) // 10 = The width of the grip + 2 pixels to the left and right.
+			{
+				QWidget::mousePressEvent( me );
+				return;
+			}
+
 			m_action = MoveTrack;
 
-			QCursor c( Qt::SizeAllCursor );
+			QCursor c( Qt::SizeVerCursor );
 			QApplication::setOverrideCursor( c );
 			// update because in move-mode, all elements in
 			// track-op-widgets are hidden as a visual feedback

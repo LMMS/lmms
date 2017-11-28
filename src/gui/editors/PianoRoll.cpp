@@ -311,7 +311,8 @@ PianoRoll::PianoRoll() :
 	m_timeLine = new TimeLineWidget( WHITE_KEY_WIDTH, 0, m_ppt,
 					Engine::getSong()->getPlayPos(
 						Song::Mode_PlayPattern ),
-						m_currentPosition, this );
+						m_currentPosition,
+						Song::Mode_PlayPattern, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -1671,10 +1672,10 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			// clicked on keyboard on the left
 			if( me->buttons() == Qt::RightButton )
 			{
-				// right click, tone marker contextual menu
+				// right click - tone marker contextual menu
 				m_semiToneMarkerMenu->popup( mapToGlobal( QPoint( me->x(), me->y() ) ) );
 			}
-			else
+			else if( me->buttons() == Qt::LeftButton )
 			{
 				// left click - play the note
 				int v = ( (float) x ) / ( (float) WHITE_KEY_WIDTH ) * MidiDefaultVelocity;
