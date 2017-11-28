@@ -105,10 +105,6 @@ ADD_LIBRARY(lmmsobjs OBJECT
 GENERATE_EXPORT_HEADER(lmmsobjs
 	BASE_NAME lmms
 )
-# GENERATE_EXPORT_HEADER doesn't seem to do this automatically
-TARGET_COMPILE_DEFINITIONS(lmmsobjs
-	PRIVATE -Dlmmsobjs_EXPORTS
-)
 
 ADD_EXECUTABLE(lmms
 	core/main.cpp
@@ -117,6 +113,14 @@ ADD_EXECUTABLE(lmms
 )
 TARGET_INCLUDE_DIRECTORIES(lmms
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+# GENERATE_EXPORT_HEADER doesn't do this automatically for OBJECT libraries
+TARGET_COMPILE_DEFINITIONS(lmmsobjs
+	PRIVATE -Dlmmsobjs_EXPORTS
+)
+TARGET_COMPILE_DEFINITIONS(lmms
+	PRIVATE -Dlmmsobjs_EXPORTS
 )
 
 # Set Visual Studio startup project to lmms
