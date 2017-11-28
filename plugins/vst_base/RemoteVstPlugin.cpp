@@ -59,7 +59,12 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
-#include <mutex>
+#ifdef USE_MINGW_THREADS_REPLACEMENT
+#	include <mingw.mutex.h>
+#else
+#	include <mutex>
+#endif
+
 #include <vector>
 #include <queue>
 #include <string>
