@@ -987,7 +987,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
-		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco ) )
+		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize() ) )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
