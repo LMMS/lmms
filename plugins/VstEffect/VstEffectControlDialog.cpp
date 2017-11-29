@@ -218,14 +218,12 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		m_savePresetButton->setMinimumHeight( 21 );
 		m_savePresetButton->setMaximumHeight( 21 );
 
-		int newSize;
+		int newSize = 0;
 
 		if (embed_vst) {
 			newSize = m_pluginWidget->width() + 20;
-			newSize = (newSize < 250) ? 250 : newSize;
-		} else {
-			newSize = 250;
 		}
+		newSize = std::max(newSize, 250);
 
 		QWidget* resize = new QWidget(this);
 		resize->resize( newSize, 10 );
@@ -294,13 +292,6 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 		return;
 	}
 
-	if( ConfigManager::inst()->vstEmbedMethod() != "none" )
-	{
-		m_pluginWidget->setVisible( checked );
-	}
-	else
-	{
-		m_plugin->toggleUI();
-	}
+	m_plugin->toggleUI();
 }
 
