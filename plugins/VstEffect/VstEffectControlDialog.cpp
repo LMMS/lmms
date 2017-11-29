@@ -78,7 +78,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	if ( m_plugin && (!embed_vst || m_pluginWidget) )
 	{
 		setWindowTitle( m_plugin->name() );
-		setMinimumWidth( 250 );
 
 		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
 
