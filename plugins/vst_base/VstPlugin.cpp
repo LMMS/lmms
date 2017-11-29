@@ -361,17 +361,19 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 
 QWidget *VstPlugin::pluginWidget(bool _top_widget)
 {
-	if ( m_embedMethod != "none" )
+	if ( m_embedMethod == "none" || !m_pluginWidget )
 	{
-		if( _top_widget && m_pluginWidget )
-		{
-			if( m_pluginWidget->parentWidget() )
-			{
-				return m_pluginWidget->parentWidget();
-			}
-		}
+		return nullptr;
 	}
-	return m_pluginWidget;
+
+	if ( _top_widget && m_pluginWidget->parentWidget() == m_pluginSubWindow )
+	{
+		return m_pluginSubWindow;
+	}
+	else
+	{
+		return m_pluginWidget;
+	}
 }
 
 
