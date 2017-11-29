@@ -665,10 +665,7 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
 		container = QWidget::createWindowContainer(vw, sw );
-		RemotePlugin::showUI();
-		// TODO: Synchronize show
-		// Tell remote that it is embedded
-		// Wait for remote reply
+		container->installEventFilter(this);
 	} else
 #endif
 
@@ -739,6 +736,20 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 	};
 
 	container->setFixedSize( m_pluginGeometry );
+}
+
+bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
+{
+#if QT_VERSION >= 0x050100
+	if (embedMethod() == "qt" && obj == m_pluginWidget)
+	{
+		if (event->type() == QEvent::Show) {
+			RemotePlugin::showUI();
+		}
+		qDebug() << obj << event;
+	}
+#endif
+	return false;
 }
 
 QString VstPlugin::embedMethod() const

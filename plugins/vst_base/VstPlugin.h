@@ -106,6 +106,7 @@ public:
 	void toggleUI() override;
 
 	void createUI( QWidget *parent, bool isEffect );
+	bool eventFilter(QObject *obj, QEvent *event);
 
 	QString embedMethod() const;
 
