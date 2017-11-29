@@ -64,7 +64,7 @@
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
 
-static __thread bool s_renderingThread;
+static thread_local bool s_renderingThread;
 
 
 
@@ -498,6 +498,20 @@ void Mixer::clear()
 	m_clearSignal = true;
 }
 
+
+
+
+void Mixer::clearNewPlayHandles()
+{
+	requestChangeInModel();
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	{
+		LocklessListElement * next = e->next;
+		m_newPlayHandles.free( e );
+		e = next;
+	}
+	doneChangeInModel();
+}
 
 
 

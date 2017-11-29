@@ -174,6 +174,7 @@ private:
 		TrackContainerView* m_trackContainerView;
 
 	} ;
+	friend class TrackContainerView::scrollArea;
 
 	TrackContainer* m_tc;
 	typedef QList<TrackView *> trackViewList;

@@ -327,6 +327,16 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 		float *values = m_pat->valuesAfter( it.key() );
 
+		float nextValue;
+		if( m_pat->progressionType() == AutomationPattern::DiscreteProgression )
+		{
+			nextValue = it.value();
+		}
+		else
+		{
+			nextValue = ( it + 1 ).value();
+		}
+
 		QPainterPath path;
 		QPointF origin = QPointF( x_base + it.key() * ppTick, 0.0f );
 		path.moveTo( origin );
@@ -340,7 +350,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			path.lineTo( QPointF( x, value ) );
 
 		}
-		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, values[ ( it + 1 ).key() - 1 - it.key() ] );
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, nextValue );
 		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, 0.0f );
 		path.lineTo( origin );
 

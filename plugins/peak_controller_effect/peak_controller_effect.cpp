@@ -148,7 +148,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new PeakControllerEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( _data ) );

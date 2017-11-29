@@ -615,7 +615,7 @@ char * MidiApple::getFullName(MIDIEndpointRef &endpoint_ref)
 	char * deviceName = getName(device);
 	char * endPointName = getName(endpoint_ref);
 	qDebug("device name='%s' endpoint name='%s'",deviceName,endPointName);
-	char * fullName = (char *)malloc(strlen(deviceName) + strlen(endPointName)+1);
+	char * fullName = (char *)malloc(strlen(deviceName) + strlen(":") + strlen(endPointName)+1);
 	sprintf(fullName, "%s:%s", deviceName,endPointName);
 	return fullName;
 }
