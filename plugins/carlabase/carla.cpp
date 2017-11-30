@@ -154,7 +154,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     QString dllName(carla_get_library_filename());
 
 #if defined(CARLA_OS_LINUX)
-    fHost.resourceDir = strdup(QString(dllName.split("/lib/carla")[0] + "/share/carla/resources/").toUtf8().constData());
+    fHost.resourceDir = strdup(QString(dllName.split("/lib")[0] + "/share/carla/resources/").toUtf8().constData());
 #else
     fHost.resourceDir = NULL;
 #endif

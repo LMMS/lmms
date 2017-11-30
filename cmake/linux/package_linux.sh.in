@@ -178,6 +178,16 @@ if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
    ln -sr "${APPDIR}usr/lib/lmms/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/libjack.so.0"
 fi
 
+# Use system-provided Carla files
+CARLABIN="/usr/share/carla/resources"
+if [ -d "${CARLABIN}" ]; then
+   rm -f "${APPDIR}/usr/lib/libcarla*.so"
+   mkdir -p "${APPDIR}${CARLABIN}"
+   ln -sf "${CARLABIN}/carla-plugin" "${APPDIR}${CARLABIN}/carla-plugin"
+   ln -sf "${CARLABIN}/carla-plugin-patchbay" "${APPDIR}${CARLABIN}/carla-plugin-patchbay"
+fi
+
+
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n>>>>> appimagetool" >> "$LOGFILE"
