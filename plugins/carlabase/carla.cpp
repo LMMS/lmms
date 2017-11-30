@@ -36,6 +36,7 @@
 
 #include <QApplication>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QPushButton>
 #include <QTimerEvent>
 #include <QVBoxLayout>
@@ -150,15 +151,22 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     fHost.uiName      = NULL;
     fHost.uiParentId  = 0;
 
-    // figure out prefix from dll filename
+    // carla/resources contains PyQt scripts required for launch
     QString dllName(carla_get_library_filename());
-
+    QString resourcesPath = QString();
 #if defined(CARLA_OS_LINUX)
-    fHost.resourceDir = strdup(QString(dllName.split("/lib")[0] + "/share/carla/resources/").toUtf8().constData());
-#else
-    fHost.resourceDir = NULL;
+    // parse prefix from dll filename
+    QDir path = QFileInfo(dllName).dir();
+    path.cdUp();
+    path.cdUp();
+    resourcesPath = path.absolutePath() + "/share/carla/resources";
+#elif defined(CARLA_OS_MAC)
+    // assume standard install location
+    resourcesPath = "/Applications/Carla.app/Contents/MacOS/resources";
+#elif defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
+    // not yet supported
 #endif
-
+    fHost.resourceDir            = strdup(resourcesPath.toUtf8().constData());
     fHost.get_buffer_size        = host_get_buffer_size;
     fHost.get_sample_rate        = host_get_sample_rate;
     fHost.is_offline             = host_is_offline;

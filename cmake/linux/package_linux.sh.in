@@ -103,7 +103,7 @@ mv "${APPDIR}usr/bin/lmms" "${APPDIR}usr/bin/lmms.real"
 cat >"${APPDIR}usr/bin/lmms" <<EOL
 #!/usr/bin/env bash
 DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-export LD_LIBRARY_PATH=\$DIR/usr/lib/:\$DIR/usr/lib/lmms:\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=\$DIR/usr/lib/:\$DIR/usr/lib/lmms:/usr/lib/carla/:/usr/lib64/carla/:\$LD_LIBRARY_PATH
 # Prevent segfault on VirualBox
 if lsmod |grep vboxguest > /dev/null 2>&1; then
    echo "VirtualBox detected.  Forcing libgl software rendering."
@@ -170,6 +170,9 @@ ln -sr  "$VSTBIN" "$VSTLIB"
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"
 
+# Use system-provided carla
+rm -f "${APPDIR}usr/lib/"libcarla*.so
+
 # Remove problematic jack library, replace with weakjack
 if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
    rm -f "${APPDIR}/usr/lib/libjack.so.0"
@@ -177,16 +180,6 @@ if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
    cp "@CMAKE_BINARY_DIR@/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/weakjack.so"
    ln -sr "${APPDIR}usr/lib/lmms/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/libjack.so.0"
 fi
-
-# Use system-provided Carla files
-CARLABIN="/usr/share/carla/resources"
-if [ -d "${CARLABIN}" ]; then
-   rm -f "${APPDIR}/usr/lib/libcarla*.so"
-   mkdir -p "${APPDIR}${CARLABIN}"
-   ln -sf "${CARLABIN}/carla-plugin" "${APPDIR}${CARLABIN}/carla-plugin"
-   ln -sf "${CARLABIN}/carla-plugin-patchbay" "${APPDIR}${CARLABIN}/carla-plugin-patchbay"
-fi
-
 
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
