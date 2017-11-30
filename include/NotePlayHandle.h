@@ -33,7 +33,7 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 class QReadWriteLock;
 class InstrumentTrack;

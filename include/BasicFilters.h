@@ -42,7 +42,7 @@
 #include "templates.h"
 #include "lmms_constants.h"
 #include "interpolation.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 template<ch_cnt_t CHANNELS=DEFAULT_CHANNELS> class BasicFilters;
 

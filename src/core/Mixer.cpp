@@ -36,7 +36,7 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
