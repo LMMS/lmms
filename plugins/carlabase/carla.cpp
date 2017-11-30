@@ -260,21 +260,14 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
 
     switch (opcode)
     {
-    case NATIVE_HOST_OPCODE_NULL:
-        break;
-    case NATIVE_HOST_OPCODE_UPDATE_PARAMETER:
-    case NATIVE_HOST_OPCODE_UPDATE_MIDI_PROGRAM:
-    case NATIVE_HOST_OPCODE_RELOAD_PARAMETERS:
-    case NATIVE_HOST_OPCODE_RELOAD_MIDI_PROGRAMS:
-    case NATIVE_HOST_OPCODE_RELOAD_ALL:
-        // nothing
-        break;
     case NATIVE_HOST_OPCODE_UI_UNAVAILABLE:
         handleUiClosed();
         break;
     case NATIVE_HOST_OPCODE_HOST_IDLE:
         qApp->processEvents();
         break;
+    default:
+	break;
     }
 
     return ret;
