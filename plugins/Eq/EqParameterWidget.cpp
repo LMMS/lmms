@@ -104,7 +104,7 @@ void EqParameterWidget::updateHandle()
 	m_eqcurve->setModelChanged( true );
 	for( int i = 0 ; i < bandCount(); i++ )
 	{
-		if ( m_handleList->at( i )->getHandleMoved() == false ) //prevents a short circuit between handle and data model
+		if ( !m_handleList->at( i )->mousePressed() ) //prevents a short circuit between handle and data model
 		{
 			//sets the band on active if a fader or a knob is moved
 			bool hover = false; // prevents an action if handle is moved
@@ -126,7 +126,6 @@ void EqParameterWidget::updateHandle()
 		else
 		{
 			m_handleList->at( i )->setHandleActive( m_bands[i].active->value() );
-			m_handleList->at( i )->setHandleMoved( false );
 		}
 	}
 	if ( m_bands[0].hp12->value() ) m_handleList->at( 0 )->sethp12();
