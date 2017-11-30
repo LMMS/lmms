@@ -35,7 +35,7 @@
 #include "NotePlayHandle.h"
 #include "PixmapButton.h"
 #include <samplerate.h>
-#include "MemoryManager.h"
+#include "Memory.h"
 
 
 #define makeknob( name, x, y, hint, unit, oname ) 		\

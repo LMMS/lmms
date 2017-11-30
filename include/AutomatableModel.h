@@ -32,7 +32,7 @@
 #include "Model.h"
 #include "MidiTime.h"
 #include "ValueBuffer.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 #include "ModelVisitor.h"
 
 // simple way to map a property of a view to a model

@@ -28,7 +28,7 @@
 
 #include <vector>
 
-#include "MemoryManager.h"
+#include "Memory.h"
 #include "lmms_export.h"
 
 class LMMS_EXPORT ValueBuffer : public std::vector<float>

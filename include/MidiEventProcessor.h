@@ -27,7 +27,7 @@
 
 #include "MidiEvent.h"
 #include "MidiTime.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 // all classes being able to process MIDI-events should inherit from this
 class MidiEventProcessor

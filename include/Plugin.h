@@ -31,7 +31,7 @@
 
 #include "JournallingObject.h"
 #include "Model.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 
 class QWidget;

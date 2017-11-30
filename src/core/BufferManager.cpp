@@ -28,7 +28,7 @@
 
 #include "Engine.h"
 #include "Mixer.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 static fpp_t framesPerPeriod;
 

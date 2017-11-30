@@ -25,7 +25,7 @@
  */
 
 
-#include "MemoryManager.h"
+#include "Memory.h"
 
 #include <QtCore/QtGlobal>
 #include "rpmalloc.h"
@@ -104,3 +104,4 @@ void _AlignedAllocator_Base::dealloc_impl(void* p)
 	p = static_cast<char*>( p ) - *ptr2;
 	free( p );
 }
+
