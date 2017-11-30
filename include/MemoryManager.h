@@ -2,8 +2,9 @@
  * MemoryManager.h
  *
  * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
  * Copyright (c) 2014 Vesa Kivimäki
- * Copyright (c) 2007-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -62,8 +63,41 @@ struct MmAllocator
 	}
 
 	typedef std::vector<T, MmAllocator<T> > vector;
+
+private:
+	MemoryManager::ThreadGuard m_threadGuard;
 };
 
+class _AlignedAllocator_Base
+{
+protected:
+	void* alloc_impl( size_t n, size_t alignment );
+	void dealloc_impl( void* p );
+};
+
+template<typename T>
+class AlignedAllocator : _AlignedAllocator_Base
+{
+public:
+	typedef T value_type;
+	template<class U>  struct rebind { typedef MmAllocator<U> other; };
+
+	AlignedAllocator( size_t alignment = 16 )
+		: alignment(alignment) {}
+
+	T* allocate( std::size_t n )
+	{
+		return reinterpret_cast<T*>( alloc_impl( sizeof(T) * n, alignment ) );
+	}
+
+	void deallocate( T* p, std::size_t )
+	{
+		dealloc_impl( p );
+	}
+
+private:
+	std::size_t alignment;
+};
 
 #define MM_OPERATORS								\
 public: 											\
