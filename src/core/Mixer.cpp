@@ -36,7 +36,7 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "MemoryHelper.h"
+#include "MemoryManager.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -136,11 +136,10 @@ Mixer::Mixer( bool renderOnly ) :
 	// now that framesPerPeriod is fixed initialize global BufferManager
 	BufferManager::init( m_framesPerPeriod );
 
+	AlignedAllocator<surroundSampleFrame> alloc;
 	for( int i = 0; i < 3; i++ )
 	{
-		m_readBuf = (surroundSampleFrame*)
-			MemoryHelper::alignedMalloc( m_framesPerPeriod *
-						sizeof( surroundSampleFrame ) );
+		m_readBuf = alloc.allocate( m_framesPerPeriod );
 
 		BufferManager::clear( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
@@ -189,9 +188,10 @@ Mixer::~Mixer()
 	delete m_audioDev;
 	delete m_midiClient;
 
+	AlignedAllocator<surroundSampleFrame> alloc;
 	for( int i = 0; i < 3; i++ )
 	{
-		MemoryHelper::alignedFree( m_bufferPool[i] );
+		alloc.deallocate( m_bufferPool[i], m_framesPerPeriod );
 	}
 
 	for( int i = 0; i < 2; ++i )

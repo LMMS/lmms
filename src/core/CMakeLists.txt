@@ -31,7 +31,6 @@ set(LMMS_SRCS
 	core/LadspaManager.cpp
 	core/LfoController.cpp
 	core/LocklessAllocator.cpp
-	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp

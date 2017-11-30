@@ -2,6 +2,8 @@
  * MemoryManager.cpp
  *
  * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
+ * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -74,4 +76,31 @@ void MemoryManager::free(void * ptr)
 	Q_UNUSED(&local_mm_thread_guard);
 	Q_ASSERT_X(rpmalloc_is_thread_initialized(), "MemoryManager::free", "Thread not initialized");
 	return rpfree(ptr);
+}
+
+void* _AlignedAllocator_Base::alloc_impl( size_t n , size_t alignment)
+{
+	char *ptr, *ptr2, *aligned_ptr;
+	int align_mask = alignment - 1;
+
+	ptr = static_cast<char*>( malloc( n + alignment + sizeof( int ) ) );
+
+	if( ptr == NULL ) std::bad_alloc;
+
+	ptr2 = ptr + sizeof( int );
+	aligned_ptr = ptr2 + ( alignment - ( ( size_t ) ptr2 & align_mask ) );
+
+	ptr2 = aligned_ptr - sizeof( int );
+	*( ( int* ) ptr2 ) = ( int )( aligned_ptr - ptr );
+
+	return aligned_ptr;
+}
+
+void _AlignedAllocator_Base::dealloc_impl(void* p)
+{
+	if ( !p ) return;
+
+	int *ptr2 = static_cast<int*>( p ) - 1;
+	p = static_cast<char*>( p ) - *ptr2;
+	free( p );
 }
