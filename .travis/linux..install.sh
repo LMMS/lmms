@@ -16,8 +16,7 @@ fi
 
 sudo apt-get install -y $PACKAGES
 
-# Carla depends on kxstudio which creates some package conflicts (wine, etc) if
-# run too early in the dependency process.
+# kxstudio repo offers Carla; avoid package conflicts (wine, etc) by running last
 sudo add-apt-repository -y ppa:kxstudio-debian/libs
 sudo add-apt-repository -y ppa:kxstudio-debian/apps
 sudo apt-get update

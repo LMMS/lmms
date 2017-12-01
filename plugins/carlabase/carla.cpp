@@ -153,7 +153,7 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
 
     // carla/resources contains PyQt scripts required for launch
     QString dllName(carla_get_library_filename());
-    QString resourcesPath = QString();
+    QString resourcesPath;
 #if defined(CARLA_OS_LINUX)
     // parse prefix from dll filename
     QDir path = QFileInfo(dllName).dir();
