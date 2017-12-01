@@ -201,6 +201,7 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
+	QMutexLocker m( &m_processingMutex );
 	m_stopped = false;
 
 	if( m_active || m_client == NULL )
@@ -253,6 +254,7 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
+	QMutexLocker m( &m_processingMutex );
 	m_stopped = true;
 }
 
@@ -340,6 +342,8 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
+	QMutexLocker m( &m_processingMutex );
+
 	// do midi processing first so that midi input can
 	// add to the following sound processing
 	if( m_midiClient && _nframes > 0 )
