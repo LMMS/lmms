@@ -151,10 +151,10 @@ private slots:
 		pattern->putValue(MidiTime(0, 0), 0.0);
 		pattern->putValue(MidiTime(4, 0), 1.0);
 
-		QCOMPARE(pattern->valueAt(MidiTime(0, 0)), 0.0);
-		QCOMPARE(pattern->valueAt(MidiTime(1, 0)), 0.25);
-		QCOMPARE(pattern->valueAt(MidiTime(2, 0)), 0.5);
-		QCOMPARE(pattern->valueAt(MidiTime(4, 0)), 1.0);
+		QCOMPARE(pattern->valueAt(MidiTime(0, 0)), 0.0f);
+		QCOMPARE(pattern->valueAt(MidiTime(1, 0)), 0.25f);
+		QCOMPARE(pattern->valueAt(MidiTime(2, 0)), 0.5f);
+		QCOMPARE(pattern->valueAt(MidiTime(4, 0)), 1.0f);
 	}
 
 	void testBBTrack()
