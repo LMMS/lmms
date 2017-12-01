@@ -71,7 +71,10 @@ JPFUN(1, const char *,   port_type, (const jack_port_t *p), (p), 0)
 JPFUN(1, const char **,  port_get_connections, (const jack_port_t *p), (p), 0)
 JPFUN(1, const char **,  port_get_all_connections, (const jack_client_t *c, const jack_port_t *p), (c,p), 0)
 JPFUN(1, int,            port_set_name, (jack_port_t *p, const char *n), (p,n), -1)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 JXFUN(0, int,            port_rename, (jack_client_t *c, jack_port_t *p, const char *n), (c,p,n), return jack_port_set_name (p,n);)
+#pragma GCC diagnostic pop
 JPFUN(1, int,            port_get_aliases, (const jack_port_t *port, char* const aliases[2]), (port,aliases), 0)
 JPFUN(1, int,            port_disconnect, (jack_client_t *c, jack_port_t *p), (c,p), 0)
 JPFUN(1, int,            connect, (jack_client_t *c, const char *s, const char *d), (c,s,d), -1)

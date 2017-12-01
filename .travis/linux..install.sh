@@ -15,3 +15,9 @@ else
 fi
 
 sudo apt-get install -y $PACKAGES
+
+# kxstudio repo offers Carla; avoid package conflicts (wine, etc) by running last
+sudo add-apt-repository -y ppa:kxstudio-debian/libs
+sudo add-apt-repository -y ppa:kxstudio-debian/apps
+sudo apt-get update
+sudo apt-get install -y carla-git
