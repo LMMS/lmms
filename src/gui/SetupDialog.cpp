@@ -971,18 +971,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	hlayout->addSpacing(10);
 	hlayout->addStretch();
 
-	// Extras widget.
+	// Extras widget and layout.
 	QWidget * extras_w = new QWidget(this);
 	QHBoxLayout * extras_layout = new QHBoxLayout(extras_w);
 	extras_layout->setSpacing(0);
 	extras_layout->setMargin(0);
 
-	// Restart warning LED.
-	LedCheckBox * restartWarning = new LedCheckBox(
-			tr("Display restart warning after changing settings"), extras_w);
-	restartWarning->setChecked(m_warnAfterSetup);
-	connect(restartWarning, SIGNAL(toggled(bool)), this,
-			SLOT(toggleWarnAfterSetup(bool)));
+	// Restart warning label.
+	QLabel * restartWarning = new QLabel(
+			tr("<strong>Warning:</strong> Some changes require restarting LMMS."), extras_w);
 
 	// OK button.
 	QPushButton * ok_btn = new QPushButton(
@@ -1001,7 +998,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Extras layout ordering.
 	extras_layout->addSpacing(10);
 	extras_layout->addWidget(restartWarning);
-	extras_layout->addSpacing(10);
+	extras_layout->addStretch();
 	extras_layout->addWidget(ok_btn);
 	extras_layout->addSpacing(10);
 	extras_layout->addWidget(cancel_btn);
@@ -1098,26 +1095,18 @@ void SetupDialog::accept()
 	ConfigManager::inst()->saveConfigFile();
 
 	QDialog::accept();
-	if(m_warnAfterSetup)
-	{
-		QMessageBox::information(NULL,
-				tr("Warning"),
-				tr("Please note that most changes "
-					"won't take effect until "
-					"you restart LMMS."), QMessageBox::Ok);
-	}
 }
 
 
 
 
 // General settings subroutines.
-
+/*
 void SetupDialog::toggleWarnAfterSetup(bool enabled)
 {
 	m_warnAfterSetup = enabled;
 }
-
+*/
 
 void SetupDialog::toggleTooltips(bool enabled)
 {

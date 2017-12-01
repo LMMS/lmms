@@ -69,7 +69,7 @@ protected slots:
 
 private slots:
 	// General settings widget.
-	void toggleWarnAfterSetup(bool enabled);
+//	void toggleWarnAfterSetup(bool enabled);
 	void toggleTooltips(bool enabled);
 	void toggleDisplaydBFS(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
