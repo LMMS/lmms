@@ -69,7 +69,6 @@ protected slots:
 
 private slots:
 	// General settings widget.
-//	void toggleWarnAfterSetup(bool enabled);
 	void toggleTooltips(bool enabled);
 	void toggleDisplaydBFS(bool enabled);
 	void toggleDisplayWaveform(bool enabled);
@@ -122,12 +121,13 @@ private slots:
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
 
+	void toggleRestartWarning();
+
 
 private:
 	TabBar * m_tabBar;
 
 	// General settings stuff.
-	bool m_warnAfterSetup;
 	bool m_tooltips;
 	bool m_displaydBFS;
 	bool m_displayWaveform;
@@ -194,5 +194,7 @@ private:
 	QLineEdit * m_sf2FileLineEdit;
 #endif
 	QLineEdit * m_backgroundPicFileLineEdit;
+
+	QLabel * restartWarning;
 };
 #endif

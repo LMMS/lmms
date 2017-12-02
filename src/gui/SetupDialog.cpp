@@ -88,8 +88,6 @@ inline void labelWidget(QWidget * w, const QString & txt )
 
 
 SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
-	m_warnAfterSetup(!ConfigManager::inst()->value(
-			"app", "nomsgaftersetup").toInt()),
 	m_tooltips(!ConfigManager::inst()->value(
 			"tooltips", "disabled").toInt()),
 	m_displaydBFS(ConfigManager::inst()->value(
@@ -207,6 +205,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	enableTooltips->setChecked(m_tooltips);
 	connect(enableTooltips, SIGNAL(toggled(bool)), this,
 			SLOT(toggleTooltips(bool)));
+	connect(enableTooltips, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 	LedCheckBox * dbfs = new LedCheckBox(
 			tr("Display volume as dBFS "), gui_tw);
@@ -215,6 +215,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	dbfs->setChecked(m_displaydBFS);
 	connect(dbfs, SIGNAL(toggled(bool)), this,
 			SLOT(toggleDisplaydBFS(bool)));
+	connect(dbfs, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 	LedCheckBox * displayWaveform = new LedCheckBox(
 			tr("Enable master oscilloscope by default"), gui_tw);
@@ -223,6 +225,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	displayWaveform->setChecked(m_displayWaveform);
 	connect(displayWaveform, SIGNAL(toggled(bool)), this,
 			SLOT(toggleDisplayWaveform(bool)));
+	connect(displayWaveform, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 	LedCheckBox * noteLabels = new LedCheckBox(
 			tr("Enable all note labels in piano roll"), gui_tw);
@@ -232,13 +236,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(noteLabels, SIGNAL(toggled(bool)), this,
 			SLOT(toggleNoteLabels(bool)));
 
-	LedCheckBox * compacttracks = new LedCheckBox(
+	LedCheckBox * compactTracks = new LedCheckBox(
 			tr("Enable compact track buttons"), gui_tw);
 	labelNumber1++;
-	compacttracks->move(XDelta, YDelta * labelNumber1);
-	compacttracks->setChecked(m_compactTrackButtons);
-	connect(compacttracks, SIGNAL(toggled(bool)), this,
+	compactTracks->move(XDelta, YDelta * labelNumber1);
+	compactTracks->setChecked(m_compactTrackButtons);
+	connect(compactTracks, SIGNAL(toggled(bool)), this,
 			SLOT(toggleCompactTrackButtons(bool)));
+	connect(compactTracks, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 	LedCheckBox * oneitw = new LedCheckBox(
 			tr("Enable one instrument-track-window mode"), gui_tw);
@@ -247,6 +253,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	oneitw->setChecked(m_oneInstrumentTrackWindow);
 	connect(oneitw, SIGNAL(toggled(bool)), this,
 			SLOT(toggleOneInstrumentTrackWindow(bool)));
+	connect(oneitw, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 
 	gui_tw->setFixedHeight(YDelta + YDelta * labelNumber1);
@@ -266,6 +274,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	mmpz->setChecked(m_MMPZ);
 	connect(mmpz, SIGNAL(toggled(bool)), this,
 			SLOT(toggleMMPZ(bool)));
+	connect(mmpz, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 	LedCheckBox * disableBackup = new LedCheckBox(
 			tr("Create a backup file when saving a project"), projects_tw);
@@ -305,6 +315,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	}
 	connect(changeLang, SIGNAL(currentIndexChanged(int)), this,
 			SLOT(setLanguage(int)));
+	connect(changeLang, SIGNAL(toggled(bool)), this,
+			SLOT(toggleRestartWarning()));
 
 	// If language unset, fallback to system language when available.
 	if(m_lang == "")
@@ -885,6 +897,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_themeDirLineEdit->setGeometry(10, 20, txtLength, 16);
 	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)), this,
 			SLOT(setThemeDir(const QString &)));
+	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(toggleRestartWarning()));
 
 	QPushButton * themeDir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", themeDir_tw);
@@ -902,6 +916,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_backgroundPicFileLineEdit->setGeometry(10, 20, txtLength, 16);
 	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)), this,
 			SLOT(setBackgroundPicFile(const QString &)));
+	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)), this,
+			SLOT(toggleRestartWarning()));
 
 	QPushButton * backgroundPicFile_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", backgroundPicFile_tw);
@@ -978,8 +994,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	extras_layout->setMargin(0);
 
 	// Restart warning label.
-	QLabel * restartWarning = new QLabel(
+	restartWarning = new QLabel(
 			tr("<strong>Warning:</strong> Some changes require restarting LMMS."), extras_w);
+	restartWarning->hide();
 
 	// OK button.
 	QPushButton * ok_btn = new QPushButton(
@@ -1025,9 +1042,7 @@ SetupDialog::~SetupDialog()
 
 
 void SetupDialog::accept()
-{	ConfigManager::inst()->setValue("app", "nomsgaftersetup",
-					QString::number(!m_warnAfterSetup));
-	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
+{	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
@@ -1101,12 +1116,6 @@ void SetupDialog::accept()
 
 
 // General settings subroutines.
-/*
-void SetupDialog::toggleWarnAfterSetup(bool enabled)
-{
-	m_warnAfterSetup = enabled;
-}
-*/
 
 void SetupDialog::toggleTooltips(bool enabled)
 {
@@ -1517,4 +1526,12 @@ void SetupDialog::openBackgroundPicFile()
 void SetupDialog::setBackgroundPicFile(const QString & backgroundPicFile)
 {
 	m_backgroundPicFile = backgroundPicFile;
+}
+
+
+
+
+void SetupDialog::toggleRestartWarning()
+{
+	if (restartWarning->isHidden()) {restartWarning->show();}
 }
