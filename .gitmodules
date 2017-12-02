@@ -49,3 +49,7 @@
 [submodule "src/3rdparty/hiir/hiir"]
 	path = src/3rdparty/hiir/hiir
 	url = https://github.com/LostRobotMusic/hiir
+[submodule "plugins/LadspaEffect/caps/caps-lv2"]
+	path = plugins/LadspaEffect/caps/caps-lv2
+	url = https://github.com/JohannesLorenz/caps-lv2.git
+	branch = stdint-fix
