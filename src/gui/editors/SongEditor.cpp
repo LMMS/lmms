@@ -656,6 +656,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL )
 {
+    bool isRecordSupported = Engine::mixer()->audioDev()->supportsCapture();
+
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
@@ -704,7 +706,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	recordTool->setPopupMode( QToolButton::InstantPopup );
 	recordTool->setFixedWidth (17);
 
-	m_toolBar->addWidget (recordTool);
+    if (isRecordSupported)
+        m_toolBar->addWidget (recordTool);
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
