@@ -659,6 +659,8 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL )
 {
+	bool isRecordSupported = Engine::mixer()->audioDev()->supportsCapture();
+
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
 
@@ -674,32 +676,34 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
-	auto *recordMenu = new QMenu(this);
-	auto *recordGroup = new QActionGroup(this);
-	recordGroup->addAction (new QAction(tr("Stereo"), recordGroup))->setData (SampleTrack::RecordingChannel::Stereo);
-	recordGroup->addAction (new QAction(tr("Mono left"), recordGroup))->setData (SampleTrack::RecordingChannel::MonoLeft);
-	recordGroup->addAction (new QAction(tr("Mono right"), recordGroup))->setData (SampleTrack::RecordingChannel::MonoRight);
+	if (isRecordSupported) {
+		auto *recordMenu = new QMenu(this);
+		auto *recordGroup = new QActionGroup(this);
+		recordGroup->addAction (new QAction(tr("Stereo"), recordGroup))->setData (SampleTrack::RecordingChannel::Stereo);
+		recordGroup->addAction (new QAction(tr("Mono left"), recordGroup))->setData (SampleTrack::RecordingChannel::MonoLeft);
+		recordGroup->addAction (new QAction(tr("Mono right"), recordGroup))->setData (SampleTrack::RecordingChannel::MonoRight);
 
-	recordGroup->setExclusive (true);
+		recordGroup->setExclusive (true);
 
-	for (auto *action : recordGroup->actions ()) {
-		action->setCheckable (true);
+		for (auto *action : recordGroup->actions ()) {
+			action->setCheckable (true);
+		}
+
+		// Check stereo by default.
+		recordGroup->actions ().first ()->setChecked (true);
+
+		connect (recordGroup, SIGNAL(triggered(QAction*)), SLOT(onRecordChannelSelected(QAction*)));
+
+		recordMenu->addActions (recordGroup->actions ());
+
+		QToolButton * recordTool = new QToolButton(this);
+		recordTool->setMenu(recordMenu);
+		recordTool->setToolTip (tr ("Select default channels to record."));
+		recordTool->setPopupMode( QToolButton::InstantPopup );
+		recordTool->setFixedWidth (17);
+
+		m_toolBar->addWidget (recordTool);
 	}
-
-	// Check stereo by default.
-	recordGroup->actions ().first ()->setChecked (true);
-
-	connect (recordGroup, SIGNAL(triggered(QAction*)), SLOT(onRecordChannelSelected(QAction*)));
-
-	recordMenu->addActions (recordGroup->actions ());
-
-	QToolButton * recordTool = new QToolButton(this);
-	recordTool->setMenu(recordMenu);
-	recordTool->setToolTip (tr ("Select default channels to record."));
-	recordTool->setPopupMode( QToolButton::InstantPopup );
-	recordTool->setFixedWidth (17);
-
-	m_toolBar->addWidget (recordTool);
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
