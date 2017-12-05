@@ -31,7 +31,7 @@ static void __attribute__((constructor)) swh_init(); // forward declaration
 
 #define MAX_BSIZE 1000
 
-inline int partition(LADSPA_Data array[], int left, int right);
+int partition(LADSPA_Data array[], int left, int right);
 
 void q_sort(LADSPA_Data array[], int left, int right) {
         float pivot = partition(array, left, right);
@@ -44,7 +44,7 @@ void q_sort(LADSPA_Data array[], int left, int right) {
         }
 }
 
-inline int partition(LADSPA_Data array[], int left, int right) {
+int partition(LADSPA_Data array[], int left, int right) {
         float pivot = array[left];
 
         while (left < right) {

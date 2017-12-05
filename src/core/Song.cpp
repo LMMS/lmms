@@ -86,6 +86,7 @@ Song::Song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
+	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_patternToPlay( NULL ),
@@ -1074,7 +1075,7 @@ void Song::loadProject( const QString & fileName )
 		}
 	}
 
-	while( !node.isNull() )
+	while( !node.isNull() && !isCancelled() )
 	{
 		if( node.isElement() )
 		{
@@ -1132,6 +1133,13 @@ void Song::loadProject( const QString & fileName )
 	Engine::projectJournal()->setJournalling( true );
 
 	emit projectLoaded();
+
+	if( isCancelled() )
+	{
+		m_isCancelled = false;
+		createNewProject();
+		return;
+	}
 
 	if ( hasErrors())
 	{
@@ -1278,7 +1286,7 @@ void Song::saveControllerStates( QDomDocument & doc, QDomElement & element )
 void Song::restoreControllerStates( const QDomElement & element )
 {
 	QDomNode node = element.firstChild();
-	while( !node.isNull() )
+	while( !node.isNull() && !isCancelled() )
 	{
 		Controller * c = Controller::create( node.toElement(), this );
 		Q_ASSERT( c != NULL );

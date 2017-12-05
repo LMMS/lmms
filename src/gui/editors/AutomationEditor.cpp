@@ -517,16 +517,13 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			// loop through whole time-map...
 			while( it != time_map.end() )
 			{
-				MidiTime len = 4;
-
 				// and check whether the user clicked on an
 				// existing value
 				if( pos_ticks >= it.key() &&
-					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
-					level <= it.value() )
+		( level == it.value() || mouseEvent->button() == Qt::RightButton ) )
 				{
 					break;
 				}
@@ -589,6 +586,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 							m_editMode == DRAW ) ||
 					m_editMode == ERASE )
 			{
+				m_drawLastTick = pos_ticks;
 				m_pattern->addJournalCheckPoint();
 				// erase single value
 				if( it != time_map.end() )
@@ -680,6 +678,39 @@ void AutomationEditor::mouseReleaseEvent(QMouseEvent * mouseEvent )
 
 
 
+
+void AutomationEditor::removePoints( int x0, int x1 )
+{
+	int deltax = qAbs( x1 - x0 );
+	int x = x0;
+	int xstep;
+
+	if( deltax < 1 )
+	{
+		return;
+	}
+
+	if( x0 < x1 )
+	{
+		xstep = 1;
+	}
+	else
+	{
+		xstep = -1;
+	}
+
+	int i = 0;
+	while( i <= deltax )
+	{
+		m_pattern->removeValue( MidiTime( x ) );
+		x += xstep;
+		i += 1;
+	}
+}
+
+
+
+
 void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 {
 	QMutexLocker m( &m_patternMutex );
@@ -735,14 +766,13 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 				( mouseEvent->buttons() & Qt::LeftButton &&
 						m_editMode == ERASE ) )
 		{
-			// int resolution needed to improve the sensitivity of
-			// the erase manoeuvre with zoom levels < 100%
-			int zoom = m_zoomingXModel.value();
-			int resolution = 1 + zoom * zoom;
-			for( int i = -resolution; i < resolution; ++i )
+			// removing automation point
+			if( pos_ticks < 0 )
 			{
-				m_pattern->removeValue( MidiTime( pos_ticks + i ) );
+				pos_ticks = 0;
 			}
+			removePoints( m_drawLastTick, pos_ticks );
+			Engine::getSong()->setModified();
 		}
 		else if( mouseEvent->buttons() & Qt::NoButton && m_editMode == DRAW )
 		{
@@ -1067,7 +1097,7 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 {
 	int x = xCoordOfTick( it.key() );
 	int y = yCoordOfLevel( it.value() );
-	const int outerRadius = qBound( 2, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
+	const int outerRadius = qBound( 3, ( m_ppt * AutomationPattern::quantization() ) / 576, 5 ); // man, getting this calculation right took forever
 	p.setPen( QPen( vertexColor().lighter( 200 ) ) );
 	p.setBrush( QBrush( vertexColor() ) );
 	p.drawEllipse( x - outerRadius, y - outerRadius, outerRadius * 2, outerRadius * 2 );
@@ -1345,13 +1375,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float *values = m_pattern->valuesAfter( it.key() );
 
 				float nextValue;
-				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
+				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
+					nextValue = it.value();
 				}
 				else
 				{
-					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
+					nextValue = ( it + 1 ).value();
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
@@ -2100,6 +2130,8 @@ void AutomationEditor::setQuantization()
 	}
 	quantization = DefaultTicksPerTact / quantization;
 	AutomationPattern::setQuantization( quantization );
+
+	update();
 }
 
 

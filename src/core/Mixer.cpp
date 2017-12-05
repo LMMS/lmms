@@ -36,6 +36,7 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
+#include "MemoryHelper.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -497,6 +498,20 @@ void Mixer::clear()
 	m_clearSignal = true;
 }
 
+
+
+
+void Mixer::clearNewPlayHandles()
+{
+	requestChangeInModel();
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	{
+		LocklessListElement * next = e->next;
+		m_newPlayHandles.free( e );
+		e = next;
+	}
+	doneChangeInModel();
+}
 
 
 

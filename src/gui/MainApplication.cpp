@@ -33,7 +33,12 @@
 
 MainApplication::MainApplication(int& argc, char** argv) :
 	QApplication(argc, argv),
-	m_queuedFile() {}
+	m_queuedFile()
+{
+#if defined(LMMS_BUILD_WIN32) && QT_VERSION >= 0x050000
+	installNativeEventFilter(this);
+#endif
+}
 
 bool MainApplication::event(QEvent* event)
 {
@@ -64,6 +69,7 @@ bool MainApplication::event(QEvent* event)
 }
 
 #ifdef LMMS_BUILD_WIN32
+// This can be moved into nativeEventFilter once Qt4 support has been dropped
 bool MainApplication::winEventFilter(MSG* msg, long* result)
 {
 	switch(msg->message)
@@ -85,4 +91,16 @@ bool MainApplication::winEventFilter(MSG* msg, long* result)
 			return false;
 	}
 }
+
+#if QT_VERSION >= 0x050000
+bool MainApplication::nativeEventFilter(const QByteArray& eventType,
+					void* message, long* result)
+{
+	if(eventType == "windows_generic_MSG")
+	{
+		return winEventFilter(static_cast<MSG *>(message), result);
+	}
+	return false;
+}
+#endif
 #endif
