@@ -297,6 +297,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		return;
 	}
+
 	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
 	{
 		m_action = MovePositionMarker;
@@ -316,40 +317,31 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	}
 	else if( event->button() == Qt::RightButton || event->button() == Qt::MiddleButton )
 	{
-        	m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const MidiTime t = m_begin + static_cast<int>( event->x() * MidiTime::ticksPerTact() / m_ppt );
+		m_moveXOff = s_posMarkerPixmap->width() / 2;
+		const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
+
+		if( t < ( ( m_loopPos[0] + m_loopPos[1] ) / 2 ) )
+		{
+			m_action = MoveLoopBegin;
+		}
+		else if( t > ( ( m_loopPos[0] + m_loopPos[1] ) / 2 ) )
+		{
+			m_action = MoveLoopEnd;
+		}
+
 		if( m_loopPos[0] > m_loopPos[1]  )
 		{
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
-		if( ( event->modifiers() & Qt::ShiftModifier ) || event->button() == Qt::MiddleButton )
-		{
-			m_action = MoveLoopBegin;
-		}
-		else
-		{
-			m_action = MoveLoopEnd;
-		}
+
 		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
 	}
 
-	if( m_action == MoveLoopBegin )
+	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <%1> to disable magnetic loop points." ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘"),
-						#else
-						"Ctrl"),
-						#endif
-					embed::getIconPixmap( "hint" ), 0 );
-	}
-	else if( m_action == MoveLoopEnd )
-	{
-		delete m_hint;
-		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(
 						#ifdef LMMS_BUILD_APPLE
 						"⌘"),
 						#else
