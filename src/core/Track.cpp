@@ -835,10 +835,16 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			m_trackView->trackContainerView()->currentPosition()+
 				static_cast<int>( x * MidiTime::ticksPerTact() /
 									ppt ) );
+		MidiTime offset = m_tco->startPosition() -
+					m_tco->startPosition().toNearestTact();
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
 		{
-			t = t.toNearestTact();
+			t = t.toNearestTact() + offset;
+			while( t < 0 )
+			{
+				t += MidiTime::ticksPerTact();
+			}
 		}
 		m_tco->movePosition( t );
 		m_trackView->getTrackContentWidget()->changePosition();
@@ -855,7 +861,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<TrackContentObject *> tcos;
-		MidiTime smallest_pos, t;
+		MidiTime smallest_pos, t, offset;
 		// find out smallest position of all selected objects for not
 		// moving an object before zero
 		for( QVector<selectableObject *>::iterator it = so.begin();
@@ -877,13 +883,19 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
+			offset = ( *it )->startPosition() -
+					( *it )->startPosition().toNearestTact();
 			t = ( *it )->startPosition() +
 				static_cast<int>( dx *MidiTime::ticksPerTact() /
 					 ppt )-smallest_pos;
 			if( ! ( me->modifiers() & Qt::AltModifier )
 					   && me->button() == Qt::NoButton )
 			{
-				t = t.toNearestTact();
+				t = t.toNearestTact() + offset;
+				while( t < 0 )
+				{
+					t += MidiTime::ticksPerTact();
+				}
 			}
 			( *it )->movePosition( t );
 		}
