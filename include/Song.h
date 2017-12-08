@@ -310,8 +310,6 @@ public slots:
 	void stop();
 
 	void importProject();
-	void exportProject( bool multiExport = false );
-	void exportProjectTracks();
 
 	void startExport();
 	void stopExport();
