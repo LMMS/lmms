@@ -248,6 +248,7 @@ private slots:
 	void onToggleMetronome();
 	void onExportProject();
 	void onExportProjectTracks();
+	void onImportProject();
 
 
 signals:

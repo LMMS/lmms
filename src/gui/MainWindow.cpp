@@ -50,6 +50,7 @@
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
+#include "ImportFilter.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -309,8 +310,8 @@ void MainWindow::finalize()
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
-					Engine::getSong(),
-					SLOT( importProject() ) );
+					this,
+					SLOT( onImportProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
 					this,
@@ -1702,4 +1703,29 @@ void MainWindow::onExportProject()
 void MainWindow::onExportProjectTracks()
 {
 	this->exportProject(true);
+}
+
+void MainWindow::onImportProject()
+{
+	Song * song = Engine::getSong();
+
+	if (song)
+	{
+		FileDialog ofd( nullptr, tr( "Import file" ),
+				ConfigManager::inst()->userProjectsDir(),
+				tr("MIDI sequences") +
+				" (*.mid *.midi *.rmi);;" +
+				tr("Hydrogen projects") +
+				" (*.h2song);;" +
+				tr("All file types") +
+				" (*.*)");
+
+		ofd.setFileMode( FileDialog::ExistingFiles );
+		if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
+		{
+			ImportFilter::import( ofd.selectedFiles()[0], song );
+		}
+
+		song->setLoadOnLauch(false);
+	}
 }
