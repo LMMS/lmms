@@ -300,6 +300,8 @@ public:
 
 	void exportProjectMidi(QString const & exportFileName) const;
 
+	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
+
 public slots:
 	void playSong();
 	void record();
@@ -308,8 +310,6 @@ public slots:
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
-
-	void importProject();
 
 	void startExport();
 	void stopExport();
