@@ -196,6 +196,8 @@ private:
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
 
+	void exportProject(bool multiExport = false);
+
 	QMdiArea * m_workspace;
 
 	QWidget * m_toolBar;
@@ -244,6 +246,8 @@ private slots:
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
+	void onExportProject();
+	void onExportProjectTracks();
 
 
 signals:

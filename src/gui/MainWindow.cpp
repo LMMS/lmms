@@ -45,6 +45,7 @@
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
+#include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "FxMixerView.h"
@@ -55,6 +56,7 @@
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "ProjectRenderer.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
@@ -311,13 +313,13 @@ void MainWindow::finalize()
 					SLOT( importProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					Engine::getSong(),
-					SLOT( exportProject() ),
+					this,
+					SLOT( onExportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
-					Engine::getSong(),
-					SLOT( exportProjectTracks() ),
+					this,
+					SLOT( onExportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
@@ -450,8 +452,8 @@ void MainWindow::finalize()
 	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					Engine::getSong(),
-							SLOT( exportProject() ),
+					this,
+							SLOT( onExportProject() ),
 								m_toolBar );
 
 	ToolButton * whatsthis = new ToolButton(
@@ -1611,4 +1613,93 @@ void MainWindow::onExportProjectMidi()
 
 		Engine::getSong()->exportProjectMidi(export_filename);
 	}
+}
+
+void MainWindow::exportProject(bool multiExport)
+{
+	QString const & projectFileName = Engine::getSong()->projectFileName();
+
+	FileDialog efd( gui->mainWindow() );
+
+	if ( multiExport )
+	{
+		efd.setFileMode( FileDialog::Directory);
+		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
+		if( !projectFileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+		}
+	}
+	else
+	{
+		efd.setFileMode( FileDialog::AnyFile );
+		int idx = 0;
+		QStringList types;
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats)
+		{
+			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
+				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
+			}
+			++idx;
+		}
+		efd.setNameFilters( types );
+		QString baseFilename;
+		if( !projectFileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+			baseFilename = QFileInfo( projectFileName ).completeBaseName();
+		}
+		else
+		{
+			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+			baseFilename = tr( "untitled" );
+		}
+		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
+		efd.setWindowTitle( tr( "Select file for project-export..." ) );
+	}
+
+	QString suffix = "wav";
+	efd.setDefaultSuffix( suffix );
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
+					 !efd.selectedFiles()[0].isEmpty() )
+	{
+
+		QString exportFileName = efd.selectedFiles()[0];
+		if ( !multiExport )
+		{
+			int stx = efd.selectedNameFilter().indexOf( "(*." );
+			int etx = efd.selectedNameFilter().indexOf( ")" );
+
+			if ( stx > 0 && etx > stx )
+			{
+				// Get first extension from selected dropdown.
+				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
+				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
+				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+				if ( efd.selectedFiles()[0].endsWith( suffix ) )
+				{
+					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+							tr( "Save project" ) ) )
+					{
+						exportFileName += suffix;
+					}
+				}
+			}
+		}
+
+		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
+		epd.exec();
+	}
+}
+
+void MainWindow::onExportProject()
+{
+	this->exportProject();
+}
+
+void MainWindow::onExportProjectTracks()
+{
+	this->exportProject(true);
 }
