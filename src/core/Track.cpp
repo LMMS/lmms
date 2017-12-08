@@ -840,7 +840,14 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
 		{
-			t = t.toNearestTact() + offset;
+			if( me->modifiers() & Qt::ShiftModifier )
+			{
+				t = t.toNearestTact();
+			}
+			else
+			{
+				t = t.toNearestTact() + offset;
+			}
 			while( t < 0 )
 			{
 				t += MidiTime::ticksPerTact();
