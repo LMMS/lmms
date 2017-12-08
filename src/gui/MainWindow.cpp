@@ -322,8 +322,8 @@ void MainWindow::finalize()
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
-					Engine::getSong(),
-					SLOT( exportProjectMidi() ),
+					this,
+					SLOT( onExportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
@@ -1571,5 +1571,44 @@ void MainWindow::autoSave()
 		{
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
+	}
+}
+
+void MainWindow::onExportProjectMidi()
+{
+	FileDialog efd( this );
+
+	efd.setFileMode( FileDialog::AnyFile );
+
+	QStringList types;
+	types << tr("MIDI File (*.mid)");
+	efd.setNameFilters( types );
+	QString base_filename;
+	QString const & projectFileName = Engine::getSong()->projectFileName();
+	if( !projectFileName.isEmpty() )
+	{
+		efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+		base_filename = QFileInfo( projectFileName ).completeBaseName();
+	}
+	else
+	{
+		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+		base_filename = tr( "untitled" );
+	}
+	efd.selectFile( base_filename + ".mid" );
+	efd.setDefaultSuffix( "mid");
+	efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	{
+		const QString suffix = ".mid";
+
+		QString export_filename = efd.selectedFiles()[0];
+		if (!export_filename.endsWith(suffix)) export_filename += suffix;
+
+		Engine::getSong()->exportProjectMidi(export_filename);
 	}
 }

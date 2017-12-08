@@ -175,6 +175,9 @@ public slots:
 
 	void autoSave();
 
+private slots:
+	void onExportProjectMidi();
+
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void focusOutEvent( QFocusEvent * _fe );

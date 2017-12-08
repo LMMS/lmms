@@ -1388,54 +1388,22 @@ void Song::exportProject( bool multiExport )
 }
 
 
-void Song::exportProjectMidi()
+void Song::exportProjectMidi(QString const & exportFileName) const
 {
-	FileDialog efd( gui->mainWindow() );
+	// instantiate midi export plugin
+	TrackContainer::TrackList const & tracks = this->tracks();
+	TrackContainer::TrackList const & tracks_BB = Engine::getBBTrackContainer()->tracks();
 
-	efd.setFileMode( FileDialog::AnyFile );
-
-	QStringList types;
-	types << tr("MIDI File (*.mid)");
-	efd.setNameFilters( types );
-	QString base_filename;
-	if( !m_fileName.isEmpty() )
+	ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", nullptr, nullptr));
+	if (exf)
 	{
-		efd.setDirectory( QFileInfo( m_fileName ).absolutePath() );
-		base_filename = QFileInfo( m_fileName ).completeBaseName();
+		exf->tryExport(tracks, tracks_BB, getTempo(), m_masterPitchModel.value(), exportFileName);
 	}
 	else
 	{
-		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
-		base_filename = tr( "untitled" );
+		qDebug() << "failed to load midi export filter!";
 	}
-	efd.selectFile( base_filename + ".mid" );
-	efd.setDefaultSuffix( "mid");
-	efd.setWindowTitle( tr( "Select file for project-export..." ) );
 
-	efd.setAcceptMode( FileDialog::AcceptSave );
-
-
-	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
-	{
-		const QString suffix = ".mid";
-
-		QString export_filename = efd.selectedFiles()[0];
-		if (!export_filename.endsWith(suffix)) export_filename += suffix;
-
-		// NOTE start midi export
-
-		// instantiate midi export plugin
-		TrackContainer::TrackList tracks;
-		TrackContainer::TrackList tracks_BB;
-		tracks = Engine::getSong()->tracks();
-		tracks_BB = Engine::getBBTrackContainer()->tracks();
-		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
-		if (exf==NULL) {
-			qDebug() << "failed to load midi export filter!";
-			return;
-		}
-		exf->tryExport(tracks, tracks_BB, getTempo(), m_masterPitchModel.value(), export_filename);
-	}
 }
 
 
