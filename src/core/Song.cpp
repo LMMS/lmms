@@ -37,7 +37,6 @@
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
-#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -45,10 +44,8 @@
 #include "FxMixer.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "ImportFilter.h"
 #include "ExportFilter.h"
 #include "MainWindow.h"
-#include "FileDialog.h"
 #include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
@@ -1234,28 +1231,6 @@ bool Song::guiSaveProjectAs( const QString & _file_name )
 	}
 	m_oldFileName = m_fileName;
 	return true;
-}
-
-
-
-
-void Song::importProject()
-{
-	FileDialog ofd( NULL, tr( "Import file" ),
-			ConfigManager::inst()->userProjectsDir(),
-			tr("MIDI sequences") +
-			" (*.mid *.midi *.rmi);;" +
-			tr("Hydrogen projects") +
-			" (*.h2song);;" +
-			tr("All file types") +
-			" (*.*)");
-
-	ofd.setFileMode( FileDialog::ExistingFiles );
-	if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
-	{
-		ImportFilter::import( ofd.selectedFiles()[0], this );
-	}
-	m_loadOnLaunch = false;
 }
 
 
