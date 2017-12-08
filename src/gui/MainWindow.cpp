@@ -69,13 +69,8 @@
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
+	using DisablerFunc = void(*)(QWidget*);
 	QLibrary kf5WidgetsAddon("KF5WidgetsAddons", 5);
-    if (!kf5WidgetsAddon.isLoaded())
-    {
-        return;
-    }
-
-    using DisablerFunc = void(*)(QWidget*);
 	DisablerFunc setNoAccelerators = 
 			reinterpret_cast<DisablerFunc>(kf5WidgetsAddon.resolve("_ZN19KAcceleratorManager10setNoAccelEP7QWidget"));
 	if(setNoAccelerators)
