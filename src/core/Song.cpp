@@ -51,7 +51,6 @@
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
 #include "SongEditor.h"
-#include "TextFloat.h"
 #include "TimeLineWidget.h"
 #include "PeakController.h"
 
@@ -1186,50 +1185,43 @@ bool Song::saveProjectFile( const QString & filename )
 
 
 
-// save current song and update the gui
+// Save the current song
 bool Song::guiSaveProject()
 {
 	DataFile dataFile( DataFile::SongProject );
 	m_fileName = dataFile.nameWithExtension( m_fileName );
-	if( saveProjectFile( m_fileName ) && gui != nullptr )
+
+	bool const saveResult = saveProjectFile( m_fileName );
+
+	if( saveResult )
 	{
-		TextFloat::displayMessage( tr( "Project saved" ),
-					tr( "The project %1 is now saved."
-							).arg( m_fileName ),
-				embed::getIconPixmap( "project_save", 24, 24 ),
-									2000 );
-		ConfigManager::inst()->addRecentlyOpenedProject( m_fileName );
 		m_modified = false;
-		gui->mainWindow()->resetWindowTitle();
-	}
-	else if( gui != nullptr )
-	{
-		TextFloat::displayMessage( tr( "Project NOT saved." ),
-				tr( "The project %1 was not saved!" ).arg(
-							m_fileName ),
-				embed::getIconPixmap( "error" ), 4000 );
-		return false;
 	}
 
-	return true;
+	return saveResult;
 }
 
 
 
 
-// save current song in given filename
+// Save the current song with the given filename
 bool Song::guiSaveProjectAs( const QString & _file_name )
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
 	m_fileName = _file_name;
-	if( guiSaveProject() == false )
+
+	if(!guiSaveProject())
 	{
+		// Saving failed. Restore old filenames.
 		m_fileName = m_oldFileName;
 		m_oldFileName = o;
+
 		return false;
 	}
+
 	m_oldFileName = m_fileName;
+
 	return true;
 }
 

@@ -62,6 +62,7 @@
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "TextFloat.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -948,7 +949,7 @@ bool MainWindow::saveProject()
 	}
 	else
 	{
-		Engine::getSong()->guiSaveProject();
+		this->guiSaveProject();
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
@@ -1000,7 +1001,7 @@ bool MainWindow::saveProjectAs()
 				}
 			}
 		}
-		Engine::getSong()->guiSaveProjectAs( fname );
+		this->guiSaveProjectAs( fname );
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
@@ -1025,7 +1026,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
+		this->guiSaveProjectAs( fileName );
 		return true;
 	}
 }
@@ -1693,6 +1694,40 @@ void MainWindow::exportProject(bool multiExport)
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
 		epd.exec();
 	}
+}
+
+void MainWindow::handleSaveResult(QString const & filename, bool songSavedSuccessfully)
+{
+	if (songSavedSuccessfully)
+	{
+		TextFloat::displayMessage( tr( "Project saved" ), tr( "The project %1 is now saved.").arg( filename ),
+				embed::getIconPixmap( "project_save", 24, 24 ), 2000 );
+		ConfigManager::inst()->addRecentlyOpenedProject(filename);
+		resetWindowTitle();
+	}
+	else
+	{
+		TextFloat::displayMessage( tr( "Project NOT saved." ), tr( "The project %1 was not saved!" ).arg(filename),
+				embed::getIconPixmap( "error" ), 4000 );
+	}
+}
+
+bool MainWindow::guiSaveProject()
+{
+	Song * song = Engine::getSong();
+	bool const songSaveResult = song->guiSaveProject();
+	handleSaveResult(song->projectFileName(), songSaveResult);
+
+	return songSaveResult;
+}
+
+bool MainWindow::guiSaveProjectAs( const QString & filename )
+{
+	Song * song = Engine::getSong();
+	bool const songSaveResult = song->guiSaveProjectAs(filename);
+	handleSaveResult(filename, songSaveResult);
+
+	return songSaveResult;
 }
 
 void MainWindow::onExportProject()
