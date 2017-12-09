@@ -428,7 +428,7 @@ signals:
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();
-
+	void stopped();
 } ;
 
 
