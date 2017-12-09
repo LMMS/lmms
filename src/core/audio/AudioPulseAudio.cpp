@@ -44,7 +44,7 @@ static void stream_write_callback(pa_stream *s, size_t length, void *userdata)
 
 static void stream_read_callback(pa_stream *s, size_t length, void *userdata)
 {
-    static_cast<AudioPulseAudio *>( userdata )->streamReadCallback( s, length );
+	static_cast<AudioPulseAudio *>( userdata )->streamReadCallback( s, length );
 }
 
 AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :

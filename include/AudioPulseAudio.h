@@ -71,7 +71,7 @@ public:
 
 
 	void streamWriteCallback( pa_stream * s, size_t length );
-    void streamReadCallback(pa_stream *s, size_t length);
+	void streamReadCallback(pa_stream *s, size_t length);
 
 	void signalConnected( bool connected );
 

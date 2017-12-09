@@ -656,7 +656,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_editor(new SongEditor(song)),
 	m_crtlAction( NULL )
 {
-    bool isRecordSupported = Engine::mixer()->audioDev()->supportsCapture();
+	bool isRecordSupported = Engine::mixer()->audioDev()->supportsCapture();
 
 	setWindowTitle( tr( "Song-Editor" ) );
 	setWindowIcon( embed::getIconPixmap( "songeditor" ) );
@@ -880,5 +880,5 @@ void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
 
 SampleTrack::RecordingChannel SongEditorWindow::globalRecordChannel() const
 {
-    return m_globalRecordChannel;
+	return m_globalRecordChannel;
 }
