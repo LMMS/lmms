@@ -197,6 +197,9 @@ private:
 	void refocus();
 
 	void exportProject(bool multiExport = false);
+	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
+	bool guiSaveProject();
+	bool guiSaveProjectAs( const QString & filename );
 
 	QMdiArea * m_workspace;
 
