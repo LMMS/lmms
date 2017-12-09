@@ -309,9 +309,7 @@ bool Mixer::criticalXRuns() const
 
 
 
-void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames,
-							 bool shouldApplyMasterGain)
-{	
+void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames, bool shouldApplyMasterGain) {
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
