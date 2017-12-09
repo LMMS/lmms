@@ -252,7 +252,7 @@ private slots:
 	void onExportProject();
 	void onExportProjectTracks();
 	void onImportProject();
-
+	void onSongStopped();
 
 signals:
 	void periodicUpdate();
