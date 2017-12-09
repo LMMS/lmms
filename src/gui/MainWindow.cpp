@@ -63,6 +63,7 @@
 #include "SideBar.h"
 #include "SongEditor.h"
 #include "TextFloat.h"
+#include "TimeLineWidget.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -233,6 +234,8 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
+
+	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
 }
 
 
@@ -1762,5 +1765,41 @@ void MainWindow::onImportProject()
 		}
 
 		song->setLoadOnLauch(false);
+	}
+}
+
+void MainWindow::onSongStopped()
+{
+	Song * song = Engine::getSong();
+	Song::PlayPos const & playPos = song->getPlayPos();
+
+	TimeLineWidget * tl = playPos.m_timeLine;
+
+	if( tl )
+	{
+		SongEditorWindow* songEditor = gui->songEditor();
+		switch( tl->behaviourAtStop() )
+		{
+			case TimeLineWidget::BackToZero:
+				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+				{
+					songEditor->m_editor->updatePosition(0);
+				}
+				break;
+
+			case TimeLineWidget::BackToStart:
+				if( tl->savedPos() >= 0 )
+				{
+					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+					{
+						songEditor->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+					}
+					tl->savePos( -1 );
+				}
+				break;
+
+			case TimeLineWidget::KeepStopPosition:
+				break;
+		}
 	}
 }

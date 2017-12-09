@@ -640,19 +640,13 @@ void Song::stop()
 	m_paused = false;
 	m_recording = true;
 
-	if( tl != NULL )
+	if( tl )
 	{
-
 		switch( tl->behaviourAtStop() )
 		{
 			case TimeLineWidget::BackToZero:
 				m_playPos[m_playMode].setTicks(0);
 				m_elapsedMilliSeconds[m_playMode] = 0;
-				if( gui && gui->songEditor() &&
-						( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
-				{
-					gui->songEditor()->m_editor->updatePosition(0);
-				}
 				break;
 
 			case TimeLineWidget::BackToStart:
@@ -661,17 +655,11 @@ void Song::stop()
 					m_playPos[m_playMode].setTicks(tl->savedPos().getTicks());
 					setToTime(tl->savedPos());
 
-					if( gui && gui->songEditor() &&
-							( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
-					{
-						gui->songEditor()->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
-					}
 					tl->savePos( -1 );
 				}
 				break;
 
 			case TimeLineWidget::KeepStopPosition:
-			default:
 				break;
 		}
 	}
@@ -695,6 +683,7 @@ void Song::stop()
 
 	m_playMode = Mode_None;
 
+	emit stopped();
 	emit playbackStateChanged();
 }
 
