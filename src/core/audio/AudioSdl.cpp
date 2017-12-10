@@ -75,7 +75,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
   	SDL_AudioSpec actual; 
 
 #ifdef LMMS_HAVE_SDL2
-    m_outputDevice = SDL_OpenAudioDevice (SDL_GetAudioDeviceName(0, 0),
+	m_outputDevice = SDL_OpenAudioDevice (NULL,
 										  0,
 										  &m_audioHandle,
 										  &actual,
@@ -102,7 +102,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
-	m_inputDevice = SDL_OpenAudioDevice (SDL_GetAudioDeviceName(0, 1),
+	m_inputDevice = SDL_OpenAudioDevice (NULL,
 										 1,
 										 &m_inputAudioHandle,
 										 &actual,
