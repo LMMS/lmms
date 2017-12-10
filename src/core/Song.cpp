@@ -451,6 +451,18 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 	}
 }
 
+void Song::setModified(bool value)
+{
+	if( !m_loadingProject )
+	{
+		if (m_modified != value)
+		{
+			m_modified = value;
+			emit modified();
+		}
+	}
+}
+
 std::pair<MidiTime, MidiTime> Song::getExportEndpoints() const
 {
 	if ( m_renderBetweenMarkers )
@@ -933,13 +945,8 @@ void Song::createNewProject()
 
 	QCoreApplication::sendPostedEvents();
 
-	m_modified = false;
+	setModified(false);
 	m_loadOnLaunch = false;
-
-	if( gui->mainWindow() )
-	{
-		gui->mainWindow()->resetWindowTitle();
-	}
 }
 
 
@@ -1132,13 +1139,8 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	m_loadingProject = false;
-	m_modified = false;
+	setModified(false);
 	m_loadOnLaunch = false;
-
-	if( gui && gui->mainWindow() )
-	{
-		gui->mainWindow()->resetWindowTitle();
-	}
 }
 
 
@@ -1184,7 +1186,7 @@ bool Song::guiSaveProject()
 
 	if( saveResult )
 	{
-		m_modified = false;
+		setModified(false);
 	}
 
 	return saveResult;
@@ -1289,15 +1291,7 @@ void Song::updateFramesPerTick()
 
 void Song::setModified()
 {
-	if( !m_loadingProject )
-	{
-		m_modified = true;
-		if( gui != nullptr && gui->mainWindow() &&
-			QThread::currentThread() == gui->mainWindow()->thread() )
-		{
-			gui->mainWindow()->resetWindowTitle();
-		}
-	}
+	setModified(true);
 }
 
 
