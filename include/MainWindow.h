@@ -254,6 +254,7 @@ private slots:
 	void onImportProject();
 	void onSongStopped();
 	void onSongModified();
+	void onProjectFileNameChanged();
 
 signals:
 	void periodicUpdate();

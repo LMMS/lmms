@@ -37,6 +37,7 @@
 #include "BBEditor.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
+#include "ConfigManager.h"
 #include "ControllerRackView.h"
 #include "ControllerConnection.h"
 #include "embed.h"
@@ -45,7 +46,6 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ExportFilter.h"
-#include "MainWindow.h"
 #include "Pattern.h"
 #include "PianoRoll.h"
 #include "ProjectJournal.h"
@@ -916,7 +916,8 @@ void Song::createNewProject()
 
 	Engine::projectJournal()->setJournalling( false );
 
-	m_fileName = m_oldFileName = "";
+	m_oldFileName = "";
+	setProjectFileName("");
 
 	Track * t;
 	t = Track::create( Track::InstrumentTrack, this );
@@ -957,13 +958,10 @@ void Song::createNewProjectFromTemplate( const QString & templ )
 	loadProject( templ );
 	// clear file-name so that user doesn't overwrite template when
 	// saving...
-	m_fileName = m_oldFileName = "";
+	m_oldFileName = "";
+	setProjectFileName("");
 	// update window title
 	m_loadOnLaunch = false;
-	if( gui->mainWindow() )
-	{
-		gui->mainWindow()->resetWindowTitle();
-	}
 }
 
 
@@ -979,7 +977,7 @@ void Song::loadProject( const QString & fileName )
 	Engine::projectJournal()->setJournalling( false );
 
 	m_oldFileName = m_fileName;
-	m_fileName = fileName;
+	setProjectFileName(fileName);
 
 	DataFile dataFile( m_fileName );
 	// if file could not be opened, head-node is null and we create
@@ -990,7 +988,7 @@ void Song::loadProject( const QString & fileName )
 		{
 			createNewProject();
 		}
-		m_fileName = m_oldFileName;
+		setProjectFileName(m_oldFileName);
 		return;
 	}
 
@@ -1180,7 +1178,8 @@ bool Song::saveProjectFile( const QString & filename )
 bool Song::guiSaveProject()
 {
 	DataFile dataFile( DataFile::SongProject );
-	m_fileName = dataFile.nameWithExtension( m_fileName );
+	QString fileNameWithExtension = dataFile.nameWithExtension( m_fileName );
+	setProjectFileName(fileNameWithExtension);
 
 	bool const saveResult = saveProjectFile( m_fileName );
 
@@ -1200,12 +1199,12 @@ bool Song::guiSaveProjectAs( const QString & _file_name )
 {
 	QString o = m_oldFileName;
 	m_oldFileName = m_fileName;
-	m_fileName = _file_name;
+	setProjectFileName(_file_name);
 
 	if(!guiSaveProject())
 	{
 		// Saving failed. Restore old filenames.
-		m_fileName = m_oldFileName;
+		setProjectFileName(m_oldFileName);
 		m_oldFileName = o;
 
 		return false;
@@ -1292,6 +1291,15 @@ void Song::updateFramesPerTick()
 void Song::setModified()
 {
 	setModified(true);
+}
+
+void Song::setProjectFileName(QString const & projectFileName)
+{
+	if (m_fileName != projectFileName)
+	{
+		m_fileName = projectFileName;
+		emit projectFileNameChanged();
+	}
 }
 
 
