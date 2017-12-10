@@ -370,6 +370,8 @@ private:
 
 	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
+	void setModified(bool value);
+
 	AutomationTrack * m_globalAutomationTrack;
 
 	IntModel m_tempoModel;
@@ -429,6 +431,7 @@ signals:
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();
 	void stopped();
+	void modified();
 } ;
 
 

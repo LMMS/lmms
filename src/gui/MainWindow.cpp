@@ -236,6 +236,8 @@ MainWindow::MainWindow() :
 				this, SLOT( updatePlayPauseIcons() ) );
 
 	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
+
+	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
 }
 
 
@@ -672,24 +674,24 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 
 void MainWindow::resetWindowTitle()
 {
-	QString title = "";
+	QString title(tr( "Untitled" ));
+
 	if( Engine::getSong()->projectFileName() != "" )
 	{
 		title = QFileInfo( Engine::getSong()->projectFileName()
 							).completeBaseName();
 	}
-	if( title == "" )
-	{
-		title = tr( "Untitled" );
-	}
+
 	if( Engine::getSong()->isModified() )
 	{
 		title += '*';
 	}
+
 	if( getSession() == Recover )
 	{
 		title += " - " + tr( "Recover session. Please save your work!" );
 	}
+
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
@@ -1801,5 +1803,17 @@ void MainWindow::onSongStopped()
 			case TimeLineWidget::KeepStopPosition:
 				break;
 		}
+	}
+}
+
+void MainWindow::onSongModified()
+{
+	// Only update the window title if the code is executed from the GUI main thread.
+	// The assumption seems to be that the Song can also be set as modified from other
+	// threads. This is not a good design! Copied from the original implementation of
+	// Song::setModified.
+	if(QThread::currentThread() == this->thread())
+	{
+		this->resetWindowTitle();
 	}
 }
