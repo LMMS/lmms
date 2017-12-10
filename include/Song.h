@@ -372,6 +372,8 @@ private:
 
 	void setModified(bool value);
 
+	void setProjectFileName(QString const & projectFileName);
+
 	AutomationTrack * m_globalAutomationTrack;
 
 	IntModel m_tempoModel;
@@ -432,6 +434,7 @@ signals:
 	void updateSampleTracks();
 	void stopped();
 	void modified();
+	void projectFileNameChanged();
 } ;
 
 

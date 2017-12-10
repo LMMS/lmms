@@ -238,6 +238,7 @@ MainWindow::MainWindow() :
 	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
 
 	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
+	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 }
 
 
@@ -1816,4 +1817,9 @@ void MainWindow::onSongModified()
 	{
 		this->resetWindowTitle();
 	}
+}
+
+void MainWindow::onProjectFileNameChanged()
+{
+	this->resetWindowTitle();
 }
