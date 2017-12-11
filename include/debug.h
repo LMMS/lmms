@@ -34,9 +34,9 @@
 #ifdef LMMS_DEBUG
 	#include <assert.h>
 #else
-    #ifndef assert
-	#define assert(x) ((void)(x))
-    #endif
+	#ifndef assert
+		#define assert(x) ((void)(x))
+	#endif
 #endif
 #include <cstdio>
 
