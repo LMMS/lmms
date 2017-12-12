@@ -2378,8 +2378,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	//	copyPasteActionsToolBar->addAction( pasteAction );
 
 
-	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
-	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
+	// Not implemented.
+	//DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	//m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
 
 	addToolBarBreak();
