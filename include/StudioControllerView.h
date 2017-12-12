@@ -24,29 +24,30 @@ signals:
 public slots:
 	void controllerChanged(int index);
 	void doHome();
-	void doStop();
 	void doPlay();
+	void doStop();
+	void doRecord();
 	void doNext();
 	void doPrev();
-	void doRecord();
 	void doScroll();
 	void saveControllers();
 	void loadControllers();
 
 private:
 	float m_scrollLast;
-	
-	QComboBox * m_dropDown;
-	QVBoxLayout * m_layout;
-	AutomatableControlButton  * m_homeButton;
-	AutomatableControlButton  * m_stopButton;
-	AutomatableControlButton  * m_playButton;
-	AutomatableControlButton  * m_recordButton;
-	AutomatableControlButton  * m_scrollButton;
-	AutomatableControlButton  * m_nextButton;
-	AutomatableControlButton  * m_prevButton;
-	AutomatableControlButton  * m_saveButton;
 
+	QVBoxLayout * m_layout;
+	QComboBox * m_dropDown;
+	QLabel * m_controllerLabel;
+	QLabel * m_actionsLabel;
+	AutomatableControlButton * m_homeButton;
+	AutomatableControlButton * m_playButton;
+	AutomatableControlButton * m_stopButton;
+	AutomatableControlButton * m_recordButton;
+	AutomatableControlButton * m_nextButton;
+	AutomatableControlButton * m_prevButton;
+	AutomatableControlButton * m_scrollButton;
+	AutomatableControlButton * m_saveButton;
 };
 
 #endif // STUDIOCONTROLLERVIEW_H

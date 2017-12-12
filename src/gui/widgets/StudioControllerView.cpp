@@ -22,84 +22,84 @@
 #include "ControllerConnection.h"
 #include "MidiController.h"
 
-
-
 StudioControllerView::StudioControllerView( ) :
 	QWidget()
 {
-	setMinimumWidth( 250 );
-	setMinimumHeight( 210 );
-	setMaximumWidth( 250 );
-	resize( 250, 220 );
-
 	setWindowIcon( embed::getIconPixmap( "note_double_whole" ) );
 	setWindowTitle( tr( "Studio Controller" ) );
 
+	m_layout = new QVBoxLayout();
+	this->setLayout( m_layout );
+
+	m_controllerLabel = new QLabel( tr( "Controller:" ), this );
+	m_actionsLabel = new QLabel( tr( "Actions:" ), this );
+
 	m_dropDown = new QComboBox(this);
 	m_dropDown->setInsertPolicy(QComboBox::InsertAtTop);
-	// insert reverse order
-	m_dropDown->insertItem(0, "No Controller" , QVariant::fromValue(0) );
-	
-	m_dropDown->insertItem(0, "nanoKontrol" , QVariant::fromValue(1) );
+	// Insert reverse order.
+	m_dropDown->insertItem(0, "nanoKontrol" , QVariant::fromValue(1));
+	m_dropDown->insertItem(0, tr("No controller") , QVariant::fromValue(0));
 	
 	m_dropDown->setCurrentIndex(0);
 
-	m_layout = new QVBoxLayout();
+	m_layout->addWidget( m_controllerLabel );
 	m_layout->addWidget( m_dropDown );
-	this->setLayout( m_layout );
+	m_layout->addWidget( m_actionsLabel );
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 
-	// No maximize button
+	// No maximize button.
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
 
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->move( 90, 90 );
+	subWin->setFixedSize( 170, 340 );
 
-	// LMMS midi configurable actions
+	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
+	parentWidget()->move( 1080, 90 );
+
+	// LMMS MIDI configurable actions.
 	m_homeButton = new AutomatableControlButton(this, "home");
-	m_homeButton->setText("home");
+	m_homeButton->setText(tr("Home"));
 	m_layout->addWidget( m_homeButton );
 	connect( m_homeButton->model(), SIGNAL( dataChanged() ), this, SLOT( doHome() ) );
-	
-	m_stopButton = new AutomatableControlButton(this, "stop");
-	m_stopButton->setText("stop");
-	m_layout->addWidget( m_stopButton );
-	connect( m_stopButton->model(), SIGNAL( dataChanged() ), this, SLOT( doStop() ) );
-	
+
 	m_playButton = new AutomatableControlButton(this, "play");
-	m_playButton->setText("play");
+	m_playButton->setText(tr("Play"));
 	m_layout->addWidget( m_playButton );
 	connect( m_playButton->model(), SIGNAL( dataChanged() ), this, SLOT( doPlay() ) );
-	
+
+	m_stopButton = new AutomatableControlButton(this, "stop");
+	m_stopButton->setText(tr("Stop"));
+	m_layout->addWidget( m_stopButton );
+	connect( m_stopButton->model(), SIGNAL( dataChanged() ), this, SLOT( doStop() ) );
+
 	m_recordButton = new AutomatableControlButton(this, "record");
-	m_recordButton->setText("record");
+	m_recordButton->setText(tr("Record"));
 	m_layout->addWidget( m_recordButton );
 	connect( m_recordButton->model(), SIGNAL( dataChanged() ), this, SLOT( doRecord() ) );
-	
-	m_scrollLast = 0.0f;
-	m_scrollButton = new AutomatableControlButton(this, "scroll");
-	m_scrollButton->setText("scroll");
-	m_layout->addWidget( m_scrollButton );
-	connect( m_scrollButton->model(), SIGNAL( dataChanged() ), this, SLOT( doScroll() ) );
 
 	m_nextButton = new AutomatableControlButton(this, "next");
-	m_nextButton->setText("next");
+	m_nextButton->setText(tr("Next"));
 	m_layout->addWidget( m_nextButton );
 	connect( m_nextButton->model(), SIGNAL( dataChanged() ), this, SLOT( doNext() ) );
 
 	m_prevButton = new AutomatableControlButton(this, "prev");
-	m_prevButton->setText("prev");
+	m_prevButton->setText(tr("Previous"));
 	m_layout->addWidget( m_prevButton );
 	connect( m_prevButton->model(), SIGNAL( dataChanged() ), this, SLOT( doPrev() ) );
-	
-	QPushButton* m_saveButton = new QPushButton("save", this);
+
+	m_scrollLast = 0.0f;
+	m_scrollButton = new AutomatableControlButton(this, "scroll");
+	m_scrollButton->setText(tr("Scroll"));
+	m_layout->addWidget( m_scrollButton );
+	connect( m_scrollButton->model(), SIGNAL( dataChanged() ), this, SLOT( doScroll() ) );
+
+	QPushButton* m_saveButton = new QPushButton(tr("Save"), this);
 	m_layout->addWidget( m_saveButton );
 	connect( m_saveButton, SIGNAL( clicked() ), this, SLOT( saveControllers() ) );
 	
-	// controller actions
+	// Controller actions.
 	connect( m_dropDown, SIGNAL( activated(int) ), this, SLOT( controllerChanged(int) ) );
 
 	update();
@@ -120,18 +120,25 @@ void StudioControllerView::doHome()
 }
 
 
+void StudioControllerView::doPlay()
+{
+	bool click = m_playButton->model()->value() < 1.0f;
+	if (click) gui->songEditor()->play();
+}
+
+
 void StudioControllerView::doStop()
 {
-	// receive 127 for note on (pressed) and 0 for released
+	// Receive 127 for note on (pressed) and 0 for released
 	bool click = m_stopButton->model()->value() < 1.0f;
 	if (click) gui->songEditor()->stop();
 }
 
 
-void StudioControllerView::doPlay()
+void StudioControllerView::doRecord()
 {
-	bool click = m_playButton->model()->value() < 1.0f;
-	if (click) gui->songEditor()->play();
+	bool click = m_recordButton->model()->value() < 1.0f;
+	if (click) gui->songEditor()->record();
 }
 
 
@@ -149,16 +156,9 @@ void StudioControllerView::doPrev()
 }
 
 
-void StudioControllerView::doRecord()
-{
-	bool click = m_recordButton->model()->value() < 1.0f;
-	if (click) gui->songEditor()->record();
-}
-
-
 void StudioControllerView::doScroll()
 {
-	// Korg: Value range 1-127, LMMS: 0.0-126.0 
+	// Korg: Value range 1-127, LMMS: 0.0-126.0.
 	float pos = m_scrollButton->model()->value();
 	if (pos > m_scrollLast ) gui->songEditor()->next();
 	if (pos < m_scrollLast ) gui->songEditor()->prev();
@@ -170,7 +170,7 @@ void StudioControllerView::doScroll()
 
 void StudioControllerView::controllerChanged(int index)
 {
-	// TODO: load a file of mappings
+	// TODO: load a file of mappings.
 }
 
 QDomElement saveSettings(QDomDocument & doc, AutomatableControlButton* button)
@@ -189,15 +189,15 @@ void StudioControllerView::saveControllers()
 	doc.appendChild(root);
 
 	root.appendChild(saveSettings(doc, m_homeButton));
-	root.appendChild(saveSettings(doc, m_nextButton));
 	root.appendChild(saveSettings(doc, m_playButton));
-	root.appendChild(saveSettings(doc, m_prevButton));
-	root.appendChild(saveSettings(doc, m_recordButton));
-	root.appendChild(saveSettings(doc, m_saveButton));
-	root.appendChild(saveSettings(doc, m_scrollButton));
 	root.appendChild(saveSettings(doc, m_stopButton));
+	root.appendChild(saveSettings(doc, m_recordButton));
+	root.appendChild(saveSettings(doc, m_nextButton));
+	root.appendChild(saveSettings(doc, m_prevButton));
+	root.appendChild(saveSettings(doc, m_scrollButton));
+	root.appendChild(saveSettings(doc, m_saveButton));
 	
-	// FIXME: Make this platform independent
+	// FIXME: Make this platform independent.
 	QFile outfile( "/var/tmp/lmms-studio-controller.xml" );
 	if (! outfile.open(QIODevice::WriteOnly | QIODevice::Text) ) {
 		QMessageBox::critical( NULL, "Could not open file", "Could not open file /var/tmp/lmms-studio-controller.xml" );
@@ -208,7 +208,6 @@ void StudioControllerView::saveControllers()
 		outfile.close();
 	}
 }
-
 
 
 void StudioControllerView::loadControllers()
