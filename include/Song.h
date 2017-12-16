@@ -321,6 +321,8 @@ public slots:
 
 	void addBBTrack();
 
+signals:
+	void beforeRecord ();
 
 private slots:
 	void insertBar();

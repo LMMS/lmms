@@ -49,6 +49,10 @@ SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTime
 
 SampleRecordHandle::~SampleRecordHandle()
 {
+	// If this is an automatically created tco,
+	// enable resizing.
+	m_tco->setAutoResize (false);
+
 	if( !m_buffers.empty() )
 	{
 		SampleBuffer* sb;
