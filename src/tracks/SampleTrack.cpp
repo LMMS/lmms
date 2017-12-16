@@ -626,13 +626,16 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			TrackContentObject * tco = getTCO( i );
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-			float framesPerTick = Engine::framesPerTick();
+
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
 				if( sTco->isPlaying() == false )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
+					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
+					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() );
+
+					f_cnt_t tcoFrameLength = bufferFramesPerTick * ( sTco->endPosition() - sTco->startPosition() );
+
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
