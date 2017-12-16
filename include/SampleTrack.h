@@ -131,6 +131,7 @@ private:
 class SampleTrack : public Track
 {
 	Q_OBJECT
+	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
 	enum RecordingChannel : int {
 		None,
@@ -168,10 +169,13 @@ public:
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
+	void beforeRecord ();
+	void toggleRecord();
 
 private:
 	RecordingChannel m_recordingChannel = RecordingChannel::None;
 
+	BoolModel m_recordModel;
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	AudioPort m_audioPort;
@@ -210,6 +214,7 @@ private slots:
 	void onRecordActionSelected (QAction *action);
 
 private:
+	QAction *m_toggleRecordAction;
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
 	Knob * m_volumeKnob;
