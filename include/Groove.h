@@ -22,7 +22,8 @@
  * License along with this program (see COPYING); if not, write to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301 USA.
- **/
+ *
+ */
 #ifndef GROOVE_H
 #define GROOVE_H
 
@@ -40,7 +41,7 @@ class Groove : public SerializingObject
 public:
 	Groove();
 
-	/**
+	/*
 	 * Groove should return true if the note should be played in the curr_time tick,
 	 * at the start of the tick or any time before the next tick.
 	 *
@@ -53,8 +54,8 @@ public:
 	 * returns 0 to play now on the tick, -1 to not play at all and the new offset
 	 *         that the note should be shifted if it is to be played later in this tick.
 	 */
-	virtual int isInTick(MidiTime * _cur_start, fpp_t _frames, f_cnt_t _offset,
-						 Note * _n, Pattern * _p ) ;
+	virtual int isInTick( MidiTime * _cur_start, fpp_t _frames, f_cnt_t _offset,
+						Note * _n, Pattern * _p );
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _element );
 	virtual void loadSettings( const QDomElement & _this );
@@ -65,7 +66,6 @@ public:
 	{
 		return "none";
 	}
-
 };
 
 #endif // GROOVE_H

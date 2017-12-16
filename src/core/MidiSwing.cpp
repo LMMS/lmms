@@ -85,7 +85,7 @@ void MidiSwing::loadSettings( const QDomElement & _this )
 
 QWidget * MidiSwing::instantiateView( QWidget * _parent )
 {
-	return new QLabel("Midi Swing");
+	return new QLabel("");
 }
 
 static int applyMidiSwing(int _pos_in_eigth)
@@ -99,6 +99,4 @@ static int applyMidiSwing(int _pos_in_eigth)
 	if (_pos_in_eigth == 4) return 5;
 	if (_pos_in_eigth == 5) return 5;
 	return 0;
-
 }
-

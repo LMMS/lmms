@@ -26,37 +26,35 @@
 GrooveView::GrooveView( ) :
 	QWidget()
 {
-	setMinimumWidth( 250 );
-	setMinimumHeight( 210 );
-	setMaximumWidth( 250 );
-	resize( 250, 220 );
-
 	setWindowIcon( embed::getIconPixmap( "note_double_whole" ) );
 	setWindowTitle( tr( "Groove" ) );
 
+	m_layout = new QVBoxLayout();
+	this->setLayout( m_layout );
+
 	m_dropDown = new QComboBox(this);
-	// insert reverse order
-	m_dropDown->insertItem(0, "Half Swing" , QVariant::fromValue(5) );
-	m_dropDown->insertItem(0, "Experiment" , QVariant::fromValue(4) );
-	m_dropDown->insertItem(0, "Midi Swing" , QVariant::fromValue(3) );
-	m_dropDown->insertItem(0, "Hydrogen Swing" , QVariant::fromValue(2) );
-	m_dropDown->insertItem(0, "Straight" , QVariant::fromValue(1) );
+	// Insert reverse order.
+	m_dropDown->insertItem(0, tr("Experiment swing") , QVariant::fromValue(5) );
+	m_dropDown->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(4) );
+	m_dropDown->insertItem(0, tr("Half swing") , QVariant::fromValue(3) );
+	m_dropDown->insertItem(0, tr("MIDI swing") , QVariant::fromValue(2) );
+	m_dropDown->insertItem(0, tr("No swing") , QVariant::fromValue(1) );
 	m_dropDown->setCurrentIndex(0);
 
-	m_layout = new QVBoxLayout();
 	m_layout->addWidget( m_dropDown );
-	m_layout->addWidget( new QLabel("Select groove") );
-	this->setLayout( m_layout );
+	m_layout->addWidget( new QLabel("") );
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
 
-	// No maximize button
+	// No maximize button.
 	Qt::WindowFlags flags = subWin->windowFlags();
 	flags &= ~Qt::WindowMaximizeButtonHint;
 	subWin->setWindowFlags( flags );
 
+	subWin->setFixedSize( 170, 121 );
+
 	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->move( 880, 490 );
+	parentWidget()->move( 1080, 450 );
 
 	connect( m_dropDown, SIGNAL( activated(int) ),
 			this, SLOT( grooveChanged(int) ) );
@@ -82,35 +80,33 @@ void GrooveView::update()
 	{
 		m_dropDown->setCurrentIndex(0);
 	}
-	if (groove->nodeName() == "hydrogen")
+	if (groove->nodeName() == "midi")
 	{
 		m_dropDown->setCurrentIndex(1);
 	}
-	if (groove->nodeName() == "midi")
+	if (groove->nodeName() == "half")
 	{
 		m_dropDown->setCurrentIndex(2);
 	}
-	if (groove->nodeName() == "experiment")
+	if (groove->nodeName() == "hydrogen")
 	{
 		m_dropDown->setCurrentIndex(3);
 	}
-	if (groove->nodeName() == "half")
+	if (groove->nodeName() == "experiment")
 	{
-		m_dropDown->setCurrentIndex(3);
+		m_dropDown->setCurrentIndex(4);
 	}
 	setView(groove);
 }
 
 void GrooveView::clear()
 {
-	
 	QLayoutItem * li = m_layout->takeAt(1);
 	delete li->widget();
 	delete li;
 	
 	m_dropDown->setCurrentIndex(0);
-	m_layout->addWidget( new QLabel("Select groove") );
-	
+	m_layout->addWidget(new QLabel(""));
 }
 
 void GrooveView::grooveChanged(int index)
@@ -126,40 +122,36 @@ void GrooveView::grooveChanged(int index)
 		}
 		case 1 :
 		{
-			groove = new HydrogenSwing();
+			groove = new MidiSwing();
 			break;
 		}
 		case 2 :
 		{
-			groove = new MidiSwing();
+			groove = new HalfSwing();
 			break;
 		}
 		case 3 :
 		{
-			groove = new GrooveExperiments();
+			groove = new HydrogenSwing();
 			break;
 		}
 		case 4 :
 		{
-			groove = new HalfSwing();
+			groove = new GrooveExperiments();
 			break;
 		}
 	}
-	
 	Song * song = Engine::getSong();
-	song->setGlobalGroove(groove); // TODO this can fail
+	song->setGlobalGroove(groove); // TODO: This can fail.
 	setView(groove);
-	
 }
 
 void GrooveView::setView(Groove * groove)
 {
-	
 	QWidget * view = groove->instantiateView(this);
 	QLayoutItem * li = m_layout->takeAt(1);
 	delete li->widget();
 	delete li;
-	
-	m_layout->addWidget( view );
-}
 
+	m_layout->addWidget(view);
+}

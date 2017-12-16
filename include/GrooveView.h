@@ -32,7 +32,6 @@ private:
 
 	QComboBox * m_dropDown;
 	QVBoxLayout * m_layout;
-    
 };
 
 #endif // GROOVEVIEW_H

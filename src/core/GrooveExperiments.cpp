@@ -187,8 +187,8 @@ GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments * _ge, QWidget * 
 {
 	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
 	m_nob = new Knob(knobBright_26, this, "Shift");
-	m_nob->setModel( m_nobModel );
-	m_nob->setLabel( tr( "Shiftyness" ) );
+	m_nob->setModel(m_nobModel);
+	m_nob->setLabel(tr("Shiftiness"));
 	m_nob->setEnabled(true);
 	m_nobModel->setValue(_ge->amount());
 
