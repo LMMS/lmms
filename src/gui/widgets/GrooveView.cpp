@@ -26,7 +26,7 @@
 GrooveView::GrooveView( ) :
 	QWidget()
 {
-	setWindowIcon( embed::getIconPixmap( "note_double_whole" ) );
+	setWindowIcon( embed::getIconPixmap( "groove" ) );
 	setWindowTitle( tr( "Groove" ) );
 
 	m_layout = new QVBoxLayout();
