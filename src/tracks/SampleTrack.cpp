@@ -263,6 +263,8 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		QString s;
 		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
 	}
+
+	_this.setAttribute ("sample_rate", m_sampleBuffer->sampleRate ());
 	// TODO: start- and end-frame
 }
 
@@ -283,6 +285,10 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
+
+	if (_this.hasAttribute ("sample_rate")) {
+		m_sampleBuffer->setSampleRate (_this.attribute ("sample_rate").toInt ());
+	}
 }
 
 
