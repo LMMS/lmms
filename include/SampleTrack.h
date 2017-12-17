@@ -173,7 +173,7 @@ public slots:
 	void toggleRecord();
 
 private:
-	RecordingChannel m_recordingChannel = RecordingChannel::None;
+	IntModel m_recordingChannelModel;
 
 	BoolModel m_recordModel;
 	FloatModel m_volumeModel;
