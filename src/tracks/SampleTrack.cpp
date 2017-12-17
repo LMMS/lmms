@@ -594,7 +594,12 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
+	m_recordingChannelModel(RecordingChannel::None,
+							RecordingChannel::None,
+							RecordingChannel::Stereo,
+							this,
+							tr ("Record channel"))
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
@@ -741,6 +746,8 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
 	m_effectChannelModel.saveSettings( _doc, _this, "fxch" );
+	m_recordModel.saveSettings(_doc, _this, "record");
+	m_recordingChannelModel.saveSettings (_doc, _this, "record_channel");
 }
 
 
@@ -761,10 +768,13 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
+
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
 	m_effectChannelModel.setRange( 0, Engine::fxMixer()->numChannels() - 1 );
 	m_effectChannelModel.loadSettings( _this, "fxch" );
+	m_recordModel.loadSettings (_this, "record");
+	m_recordingChannelModel.loadSettings (_this, "record_channel");
 }
 
 
@@ -822,8 +832,8 @@ void SampleTrack::toggleRecord() {
 SampleTrack::RecordingChannel SampleTrack::recordingChannel() const{
 	// If we had defined a recording channel for this track, use
 	// it. Otherwise, use the global setting.
-	if (m_recordingChannel != RecordingChannel::None) {
-		return m_recordingChannel;
+	if (m_recordingChannelModel.value () != static_cast<int>(RecordingChannel::None)) {
+		return static_cast<RecordingChannel>(m_recordingChannelModel.value ());
 	} else {
 		return gui->songEditor ()->globalRecordChannel ();
 	}
@@ -831,7 +841,7 @@ SampleTrack::RecordingChannel SampleTrack::recordingChannel() const{
 
 void SampleTrack::setRecordingChannel(const RecordingChannel &recordingChannel)
 {
-	m_recordingChannel = recordingChannel;
+	m_recordingChannelModel.setValue (recordingChannel);
 }
 
 void SampleTrack::updateEffectChannel()
@@ -954,12 +964,10 @@ void SampleTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *tra
 	for (auto *action : recordChannels->actions ()) {
 		action->setCheckable (true);
 
-		if (static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>())
-				== st->m_recordingChannel)
+		if (action->data ().value<int>() == st->m_recordingChannelModel.value ())
 		{
 			action->setChecked (true);
 		}
-
 	}
 
 	recordMenu->addActions (recordChannels->actions ());
@@ -1248,12 +1256,13 @@ void SampleTrackView::onRecordActionSelected(QAction *action) {
 	auto selectedRecordingChannel = static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>());
 
 	// If we've selected the current recording channel again, we should undo it.
-	if (selectedRecordingChannel == st->m_recordingChannel) {
+	if (selectedRecordingChannel == static_cast<SampleTrack::RecordingChannel>(st->m_recordingChannelModel.value ())) {
 		st->setRecordingChannel (SampleTrack::RecordingChannel::None);
 		action->setChecked (false);
 	} else {
 		st->setRecordingChannel (selectedRecordingChannel);
 		action->setChecked (true);
 	}
+
 
 }
