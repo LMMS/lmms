@@ -589,17 +589,18 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 SampleTrack::SampleTrack( TrackContainer* tc ) :
 	Track( Track::SampleTrack, tc ),
+	m_recordingChannelModel(RecordingChannel::None,
+							RecordingChannel::None,
+							RecordingChannel::Stereo,
+							this,
+							tr ("Record channel")),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
 							tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel ),
-	m_recordingChannelModel(RecordingChannel::None,
-							RecordingChannel::None,
-							RecordingChannel::Stereo,
-							this,
-							tr ("Record channel"))
+	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
