@@ -3763,7 +3763,7 @@ void PianoRoll::pasteNotes()
 			cur_note.setSelected( true );
 
 			// add to pattern
-			m_pattern->addNote( cur_note );
+			m_pattern->addNote( cur_note, false );
 		}
 
 		// we only have to do the following lines if we pasted at
@@ -3926,6 +3926,8 @@ void PianoRoll::quantizeNotes()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
+
 	NoteVector notes = getSelectedNotes();
 
 	if( notes.empty() )
@@ -3951,6 +3953,7 @@ void PianoRoll::quantizeNotes()
 
 	update();
 	gui->songEditor()->update();
+	Engine::getSong()->setModified();
 }
 
 
