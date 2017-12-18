@@ -453,13 +453,10 @@ void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fp
 
 void Song::setModified(bool value)
 {
-	if( !m_loadingProject )
+	if( !m_loadingProject && m_modified != value)
 	{
-		if (m_modified != value)
-		{
-			m_modified = value;
-			emit modified();
-		}
+		m_modified = value;
+		emit modified();
 	}
 }
 
