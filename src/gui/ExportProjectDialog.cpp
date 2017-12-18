@@ -47,7 +47,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	setWindowTitle( tr( "Export project to %1" ).arg(
 					QFileInfo( _file_name ).fileName() ) );
 
-	// get the extension of the chosen file
+	// Get the extension of the chosen file.
 	QStringList parts = _file_name.split( '.' );
 	QString fileExt;
 	if( parts.size() > 0 )
@@ -60,16 +60,16 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	{
 		if( ProjectRenderer::fileEncodeDevices[i].isAvailable() )
 		{
-			// get the extension of this format
+			// Get the extension of this format.
 			QString renderExt = ProjectRenderer::fileEncodeDevices[i].m_extension;
 
-			// add to combo box
+			// Add to combo box.
 			fileFormatCB->addItem( ProjectRenderer::tr(
 				ProjectRenderer::fileEncodeDevices[i].m_description ),
-				QVariant(ProjectRenderer::fileEncodeDevices[i].m_fileFormat) // format tag; later used for identification
+				QVariant( ProjectRenderer::fileEncodeDevices[i].m_fileFormat ) // Format tag; later used for identification.
 			);
 
-			// if this is our extension, select it
+			// If this is our extension, select it.
 			if( QString::compare( renderExt, fileExt,
 									Qt::CaseInsensitive ) == 0 )
 			{
@@ -84,9 +84,8 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	for(int i=0; i<=MAX_LEVEL; ++i)
 	{
 		QString info="";
-		if (i==0){ info = tr("(fastest)"); }
-		else if (i==4){ info = tr("(default)"); }
-		else if (i==MAX_LEVEL){ info = tr("(smallest)"); }
+		if ( i==0 ){ info = tr( "( Fastest - biggest )" ); }
+		else if ( i==MAX_LEVEL ){ info = tr( "( Slowest - smallest )" ); }
 		
 		compLevelCB->addItem(
 			QString::number(i)+" "+info,
@@ -95,7 +94,7 @@ ExportProjectDialog::ExportProjectDialog( const QString & _file_name,
 	}
 	compLevelCB->setCurrentIndex(MAX_LEVEL/2);
 #ifndef LMMS_HAVE_SF_COMPLEVEL
-	//Disable this widget; the setting would be ignored by the renderer.
+	// Disable this widget; the setting would be ignored by the renderer.
 	compressionWidget->setVisible(false);
 #endif
 
@@ -175,8 +174,8 @@ void ExportProjectDialog::startExport()
 		os.setCompressionLevel(level);
 	}
 
-	//Make sure we have the the correct file extension
-	//so there's no confusion about the codec in use.
+	// Make sure we have the the correct file extension
+	// so there's no confusion about the codec in use.
 	auto output_name = m_fileName;
 	if (!(m_multiExport || output_name.endsWith(m_fileExtension,Qt::CaseInsensitive)))
 	{
@@ -190,9 +189,9 @@ void ExportProjectDialog::startExport()
 	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
 			progressBar, SLOT( setValue( int ) ) );
 	connect( m_renderManager.get(), SIGNAL( progressChanged( int ) ),
-			this, SLOT( updateTitleBar( int ) )) ;
+			this, SLOT( updateTitleBar( int ) ));
 	connect( m_renderManager.get(), SIGNAL( finished() ),
-			this, SLOT( accept() ) );
+			this, SLOT( accept() ) ) ;
 	connect( m_renderManager.get(), SIGNAL( finished() ),
 			gui->mainWindow(), SLOT( resetWindowTitle() ) );
 
@@ -250,7 +249,7 @@ void ExportProjectDialog::startBtnClicked()
 {
 	m_ft = ProjectRenderer::NumFileFormats;
 
-	//Get file format from current menu selection.
+	// Get file format from current menu selection.
 	bool successful_conversion = false;
 	QVariant tag = fileFormatCB->itemData(fileFormatCB->currentIndex());
 	m_ft = static_cast<ProjectRenderer::ExportFileFormats>(

@@ -9089,7 +9089,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Tempo di sweep</translation>
@@ -9184,7 +9184,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Tempo di sweep:</translation>

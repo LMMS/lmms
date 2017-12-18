@@ -728,8 +728,17 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 			else
 			{
+				gui->songEditor()->m_editor->selectAllTcos( false );
+				m_tco->addJournalCheckPoint();
+
+				// move or resize
+				m_tco->setJournalling( false );
+
+				setInitialMousePos( me->pos() );
+
 				SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
-				if( me->x() < RESIZE_GRIP_WIDTH && sTco )
+				if( me->x() < RESIZE_GRIP_WIDTH && sTco
+						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
 					m_oldTime = m_tco->startPosition();
@@ -753,25 +762,24 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 					QApplication::setOverrideCursor( c );
 					s_textFloat->setTitle( tr( "Current length" ) );
 				}
+				// s_textFloat->reparent( this );
+				// setup text-float as if TCO was already moved/resized
+				mouseMoveEvent( me );
+				s_textFloat->show();
 			}
+
+			delete m_hint;
+			QString hint = m_action == Move || m_action == MoveSelection
+						? tr( "Press <%1> and drag to make a copy." )
+						: tr( "Press <%1> for free resizing." );
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(
+								#ifdef LMMS_BUILD_APPLE
+								"⌘"),
+								#else
+								"Ctrl"),
+								#endif
+					embed::getIconPixmap( "hint" ), 0 );
 		}
-		delete m_hint;
-		QString hint = m_action == Move ? tr( "Press <%1> and drag to make "
-										  "a copy." )
-										: tr( "Press <%1> for free "
-										  "resizing." );
-		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-				hint.arg(
-							#ifdef LMMS_BUILD_APPLE
-							"⌘"),
-							#else
-							"Ctrl"),
-							#endif
-				embed::getIconPixmap( "hint" ), 0 );
-//		s_textFloat->reparent( this );
-		// setup text-float as if TCO was already moved/resized
-		mouseMoveEvent( me );
-		s_textFloat->show();
 	}
 	else if( me->button() == Qt::RightButton )
 	{
@@ -815,28 +823,34 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
  */
 void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 {
-	if( m_action == CopySelection )
+	if( m_action == CopySelection || m_action == ToggleSelected )
 	{
 		if( mouseMovedDistance( me, 2 ) == true )
 		{
+			QVector<TrackContentObjectView *> tcoViews;
+			if( m_action == CopySelection )
+			{
+				// Collect all selected TCOs
+				QVector<selectableObject *> so =
+					m_trackView->trackContainerView()->selectedObjects();
+				for( auto it = so.begin(); it != so.end(); ++it )
+				{
+					TrackContentObjectView * tcov =
+						dynamic_cast<TrackContentObjectView *>( *it );
+					if( tcov != NULL )
+					{
+						tcoViews.push_back( tcov );
+					}
+				}
+			}
+			else
+			{
+				gui->songEditor()->m_editor->selectAllTcos( false );
+				tcoViews.push_back( this );
+			}
 			// Clear the action here because mouseReleaseEvent will not get
 			// triggered once we go into drag.
 			m_action = NoAction;
-
-			// Collect all selected TCOs
-			QVector<TrackContentObjectView *> tcoViews;
-			QVector<selectableObject *> so =
-				m_trackView->trackContainerView()->selectedObjects();
-			for( QVector<selectableObject *>::iterator it = so.begin();
-					it != so.end(); ++it )
-			{
-				TrackContentObjectView * tcov =
-					dynamic_cast<TrackContentObjectView *>( *it );
-				if( tcov != NULL )
-				{
-					tcoViews.push_back( tcov );
-				}
-			}
 
 			// Write the TCOs to the DataFile for copying
 			DataFile dataFile = createTCODataFiles( tcoViews );
@@ -975,7 +989,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	{
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( m_tco );
 		if( ( me->x() > width() - RESIZE_GRIP_WIDTH && !me->buttons() && !m_tco->getAutoResize() )
-		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco ) )
+		||  ( me->x() < RESIZE_GRIP_WIDTH && !me->buttons() && sTco && !m_tco->getAutoResize() ) )
 		{
 			if( QApplication::overrideCursor() != NULL &&
 				QApplication::overrideCursor()->shape() !=
@@ -1704,12 +1718,6 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	QWidget( parent ),             /*!< The parent widget */
 	m_trackView( parent )          /*!< The parent track view */
 {
-	if( s_grip == NULL )
-	{
-		s_grip = new QPixmap( embed::getIconPixmap(
-							"track_op_grip" ) );
-	}
-
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
 				"to begin a new drag'n'drop-action." ).arg(
 					#ifdef LMMS_BUILD_APPLE
@@ -1832,14 +1840,17 @@ void TrackOperationsWidget::paintEvent( QPaintEvent * pe )
 
 	if( m_trackView->isMovingTrack() == false )
 	{
+		s_grip = new QPixmap( embed::getIconPixmap(
+							"track_op_grip" ) );
+
 		p.drawPixmap( 2, 2, *s_grip );
-		m_trackOps->show();
-		m_muteBtn->show();
 	}
 	else
 	{
-		m_trackOps->hide();
-		m_muteBtn->hide();
+		s_grip = new QPixmap( embed::getIconPixmap(
+							"track_op_grip_c" ) );
+
+		p.drawPixmap( 2, 2, *s_grip );
 	}
 }
 
@@ -2715,6 +2726,7 @@ void TrackView::dropEvent( QDropEvent * de )
  */
 void TrackView::mousePressEvent( QMouseEvent * me )
 {
+
 	// If previously dragged too small, restore on shift-leftclick
 	if( height() < DEFAULT_TRACK_HEIGHT &&
 		me->modifiers() & Qt::ShiftModifier &&
@@ -2745,9 +2757,15 @@ void TrackView::mousePressEvent( QMouseEvent * me )
 		}
 		else
 		{
+			if( me->x()>10 ) // 10 = The width of the grip + 2 pixels to the left and right.
+			{
+				QWidget::mousePressEvent( me );
+				return;
+			}
+
 			m_action = MoveTrack;
 
-			QCursor c( Qt::SizeAllCursor );
+			QCursor c( Qt::SizeVerCursor );
 			QApplication::setOverrideCursor( c );
 			// update because in move-mode, all elements in
 			// track-op-widgets are hidden as a visual feedback

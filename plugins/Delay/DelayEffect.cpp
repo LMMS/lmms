@@ -157,7 +157,7 @@ extern "C"
 {
 
 //needed for getting plugin out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new DelayEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

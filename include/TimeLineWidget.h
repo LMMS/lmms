@@ -72,8 +72,8 @@ public:
 	} ;
 
 
-	TimeLineWidget( int xoff, int yoff, float ppt, Song::PlayPos & pos,
-				const MidiTime & begin, QWidget * parent );
+	TimeLineWidget(int xoff, int yoff, float ppt, Song::PlayPos & pos,
+				const MidiTime & begin, Song::PlayModes mode, QWidget * parent);
 	virtual ~TimeLineWidget();
 
 	inline QColor const & getBarLineColor() const { return m_barLineColor; }
@@ -217,6 +217,7 @@ private:
 	float m_ppt;
 	Song::PlayPos & m_pos;
 	const MidiTime & m_begin;
+	const Song::PlayModes m_mode;
 	MidiTime m_loopPos[2];
 
 	MidiTime m_savedPos;

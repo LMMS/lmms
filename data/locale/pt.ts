@@ -9065,7 +9065,7 @@ Clicando duas vezes com o mouse em qualquer plugin, voc6e terá informações so
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Varredura temporal</translation>
@@ -9160,7 +9160,7 @@ Clicando duas vezes com o mouse em qualquer plugin, voc6e terá informações so
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Varredura temporal:</translation>

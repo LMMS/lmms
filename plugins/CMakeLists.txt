@@ -1,8 +1,9 @@
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+SET(CMAKE_DEBUG_POSTFIX "")
 
 # Enable C++11
-ADD_DEFINITIONS(-std=c++0x)
+SET(CMAKE_CXX_STANDARD 11)
 
 IF(LMMS_BUILD_APPLE)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -60,9 +61,9 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		MultitapEcho
 		monstro
 		nes
-		opl2
+		OpulenZ
 		organic
-		papu
+		FreeBoy
 		patman
 		peak_controller_effect
 		GigPlayer
@@ -80,11 +81,29 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		watsyn
 		waveshaper
 		vibed
-		xpressive
+		Xpressive
 		zynaddsubfx
 	)
 
 ENDIF("${PLUGIN_LIST}" STREQUAL "")
+
+IF(MSVC)
+	SET(MSVC_INCOMPATIBLE_PLUGINS
+		LadspaEffect
+		monstro
+		organic
+		ReverbSC
+		sid
+		vestige
+		vibed
+		vst_base
+		VstEffect
+		Xpressive
+		zynaddsubfx
+	)
+	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")
+	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})
+ENDIF()
 
 FOREACH(PLUGIN ${PLUGIN_LIST})
 	ADD_SUBDIRECTORY(${PLUGIN})

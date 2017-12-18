@@ -152,7 +152,8 @@ AutomationEditor::AutomationEditor() :
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
 				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
-						m_currentPosition, this );
+					m_currentPosition,
+					Song::Mode_PlayAutomationPattern, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -517,16 +518,13 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			// loop through whole time-map...
 			while( it != time_map.end() )
 			{
-				MidiTime len = 4;
-
 				// and check whether the user clicked on an
 				// existing value
 				if( pos_ticks >= it.key() &&
-					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
-					level <= it.value() )
+					level == it.value() )
 				{
 					break;
 				}
@@ -1378,13 +1376,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float *values = m_pattern->valuesAfter( it.key() );
 
 				float nextValue;
-				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
+				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
+					nextValue = it.value();
 				}
 				else
 				{
-					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
+					nextValue = ( it + 1 ).value();
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );

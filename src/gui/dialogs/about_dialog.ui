@@ -6,35 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>357</height>
+    <width>504</width>
+    <height>286</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>558</width>
-    <height>357</height>
+    <width>504</width>
+    <height>286</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>About LMMS</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="spacing">
-    <number>8</number>
-   </property>
-   <property name="leftMargin">
-    <number>8</number>
-   </property>
-   <property name="topMargin">
-    <number>8</number>
-   </property>
-   <property name="rightMargin">
-    <number>8</number>
-   </property>
-   <property name="bottomMargin">
-    <number>8</number>
-   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -44,9 +29,6 @@
          <width>64</width>
          <height>64</height>
         </size>
-       </property>
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>
@@ -65,7 +47,7 @@
        <item>
         <widget class="QLabel" name="versionLabel">
          <property name="text">
-          <string>Version %1 (%2/%3, Qt %4, %5)</string>
+          <string>Version %1 (%2/%3, Qt %4, %5).</string>
          </property>
         </widget>
        </item>
@@ -78,8 +60,8 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
       </spacer>
@@ -106,8 +88,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>10</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -115,7 +97,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>LMMS - easy music production for everyone</string>
+          <string>LMMS - easy music production for everyone.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -132,8 +114,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>10</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -141,7 +123,7 @@
        <item>
         <widget class="QLabel" name="copyrightLabel">
          <property name="text">
-          <string>Copyright © %1</string>
+          <string>Copyright © %1.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -158,8 +140,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>10</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -167,7 +149,7 @@
        <item>
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://lmms.io&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#33cc33;&quot;&gt;https://lmms.io&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -181,8 +163,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>40</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -236,7 +218,6 @@
          </property>
          <property name="plainText">
           <string>Current language not translated (or native English).
-
 If you're interested in translating LMMS in another language or want to improve existing translations, you're welcome to help us! Simply contact the maintainer!</string>
          </property>
         </widget>
@@ -278,32 +259,12 @@ If you're interested in translating LMMS in another language or want to improve 
    <signal>accepted()</signal>
    <receiver>AboutDialog</receiver>
    <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
   </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>AboutDialog</receiver>
    <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
   </connection>
  </connections>
 </ui>
