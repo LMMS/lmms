@@ -30,6 +30,7 @@
 #include "RemotePlugin.h"
 
 
+
 struct VstParameterDumpItem
 {
 	int32_t index;
@@ -56,7 +57,6 @@ enum VstRemoteMessageIDs
 {
 	// vstPlugin -> remoteVstPlugin
 	IdVstLoadPlugin = IdUserBase,
-	IdVstPluginWindowInformation,
 	IdVstClosePlugin,
 	IdVstSetTempo,
 	IdVstSetLanguage,
