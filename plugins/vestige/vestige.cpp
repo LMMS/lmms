@@ -177,10 +177,12 @@ void vestigeInstrument::setParameter( void )
 
 void vestigeInstrument::handleConfigChange(QString cls, QString attr, QString value)
 {
-	if ( cls == "ui" && attr == "vstembedmethod" )
-	{
-		reloadPlugin();
-	}
+    Q_UNUSED(cls); Q_UNUSED(attr); Q_UNUSED(value);
+    // Disabled for consistency with VST effects that don't implement this. (#3786)
+    // if ( cls == "ui" && attr == "vstembedmethod" )
+    // {
+    // 	reloadPlugin();
+    // }
 }
 
 void vestigeInstrument::reloadPlugin()
