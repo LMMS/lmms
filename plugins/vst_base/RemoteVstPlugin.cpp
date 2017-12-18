@@ -63,17 +63,10 @@
 #define USE_WS_PREFIX
 #include <windows.h>
 
-#if defined(LMMS_BUILD_WIN32) || defined(LMMS_BUILD_WIN64)
-#include "basename.c"
-#else
-#include <libgen.h>
-#endif
-
-
 #include <vector>
 #include <queue>
 #include <string>
-
+#include <iostream>
 
 #include <aeffectx.h>
 
@@ -105,14 +98,18 @@ struct ERect
 #ifndef USE_QT_SHMEM
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #endif
 
+using namespace std;
+
 static VstHostLanguages hlang = LanguageEnglish;
 
+static bool EMBED = false;
+static bool EMBED_X11 = false;
+static bool EMBED_WIN32 = false;
 
 class RemoteVstPlugin;
 
@@ -136,6 +133,7 @@ public:
 
 	void init( const std::string & _plugin_file );
 	void initEditor();
+	void destroyEditor();
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
 
@@ -356,6 +354,7 @@ private:
 	int m_windowHeight;
 
 	bool m_initialized;
+	bool m_registeredWindowClass;
 
 	pthread_mutex_t m_pluginLock;
 	bool m_processing;
@@ -401,7 +400,6 @@ RemoteVstPlugin::RemoteVstPlugin( key_t _shm_in, key_t _shm_out ) :
 RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	RemotePluginClient( socketPath ),
 #endif
-	m_shortName( "" ),
 	m_libInst( NULL ),
 	m_plugin( NULL ),
 	m_window( NULL ),
@@ -409,6 +407,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
+	m_registeredWindowClass( false ),
 	m_pluginLock(),
 	m_processing( false ),
 	m_messageList(),
@@ -424,7 +423,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_in( NULL ),
 	m_shmID( -1 ),
 	m_vstSyncData( NULL )
-
 {
 	pthread_mutex_init( &m_pluginLock, NULL );
 	pthread_mutex_init( &m_shmLock, NULL );
@@ -491,14 +489,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 
 RemoteVstPlugin::~RemoteVstPlugin()
 {
-	if( m_window != NULL )
-	{
-		pluginDispatch( effEditClose );
-#ifdef LMMS_BUILD_LINUX
-		CloseWindow( m_window );
-#endif
-		m_window = NULL;
-	}
+	destroyEditor();
 	pluginDispatch( effMainsChanged, 0, 0 );
 	pluginDispatch( effClose );
 #ifndef USE_QT_SHMEM
@@ -535,21 +526,47 @@ RemoteVstPlugin::~RemoteVstPlugin()
 
 bool RemoteVstPlugin::processMessage( const message & _m )
 {
+	if (! EMBED)
+	{
+		switch( _m.id )
+		{
+		case IdShowUI:
+			initEditor();
+			return true;
+
+		case IdHideUI:
+			destroyEditor();
+			return true;
+
+		case IdToggleUI:
+			if( m_window )
+			{
+				destroyEditor();
+			}
+			else
+			{
+				initEditor();
+			}
+			return true;
+
+		case IdIsUIVisible:
+			sendMessage( message( IdIsUIVisible )
+						 .addInt( m_window ? 1 : 0 ) );
+			return true;
+		}
+	}
+	else if (EMBED && _m.id == IdShowUI)
+	{
+		ShowWindow( m_window, SW_SHOWNORMAL );
+		UpdateWindow( m_window );
+		return true;
+	}
+
 	switch( _m.id )
 	{
 		case IdVstLoadPlugin:
 			init( _m.getString() );
 			break;
-
-#ifdef LMMS_BUILD_WIN32
-		case IdVstPluginWindowInformation:
-		{
-			HWND top = FindWindowEx( NULL, NULL, NULL,
-						_m.getString().c_str() );
-			m_window = FindWindowEx( top, NULL, NULL, NULL );
-			break;
-		}
-#endif
 
 		case IdVstSetTempo:
 			setBPM( _m.getInt() );
@@ -688,9 +705,20 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
+static void close_check( int fd )
+{
+	if( close( fd ) )
+	{
+		perror( "close" );
+	}
+}
+
+
+
+
 void RemoteVstPlugin::initEditor()
 {
-	if( !( m_plugin->flags & effFlagsHasEditor ) )
+	if( m_window || !( m_plugin->flags & effFlagsHasEditor ) )
 	{
 		return;
 	}
@@ -704,38 +732,37 @@ void RemoteVstPlugin::initEditor()
 	}
 
 
-	WNDCLASS wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = DefWindowProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInst;
-	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wc.hbrBackground = (HBRUSH) GetStockObject( BLACK_BRUSH );
-	wc.lpszMenuName = NULL;
-	wc.lpszClassName = "LVSL";
-
-	if( !RegisterClass( &wc ) )
+	if( !m_registeredWindowClass )
 	{
-		return;
+		WNDCLASS wc;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = DefWindowProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInst;
+		wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+		wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+		wc.hbrBackground = NULL;
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = "LVSL";
+
+		if( !RegisterClass( &wc ) )
+		{
+			return;
+		}
+		m_registeredWindowClass = true;
 	}
 
-#ifdef LMMS_BUILD_LINUX
-	//m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-	//		       ( WS_OVERLAPPEDWINDOW | WS_THICKFRAME ) & ~WS_MAXIMIZEBOX,
-	//		       0, 0, 10, 10, NULL, NULL, hInst, NULL );
+	DWORD dwStyle;
+	if (EMBED) {
+		dwStyle = WS_POPUP | WS_SYSMENU | WS_BORDER;
+	} else {
+		dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
+	}
 
-	m_window = CreateWindowEx( 0 , "LVSL", m_shortName.c_str(),
-	   WS_POPUP | WS_SYSMENU | WS_BORDER , 0, 0, 10, 10, NULL, NULL, hInst, NULL);
-#else
-	m_windowID = 1;	// arbitrary value on win32 to signal
-			// vstPlugin-class that we have an editor
-
-	m_window = CreateWindowEx( 0, "LVSL", m_shortName.c_str(),
-					WS_CHILD, 0, 0, 10, 10,
-					m_window, NULL, hInst, NULL );
-#endif
+	m_window = CreateWindowEx( 0, "LVSL", pluginName(),
+		dwStyle,
+		0, 0, 10, 10, NULL, NULL, hInst, NULL );
 	if( m_window == NULL )
 	{
 		debugMessage( "initEditor(): cannot create editor window\n" );
@@ -756,12 +783,32 @@ void RemoteVstPlugin::initEditor()
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
 
-	ShowWindow( m_window, SW_SHOWNORMAL );
-	UpdateWindow( m_window );
+	if (! EMBED) {
+		ShowWindow( m_window, SW_SHOWNORMAL );
+	}
 
 #ifdef LMMS_BUILD_LINUX
 	m_windowID = (intptr_t) GetProp( m_window, "__wine_x11_whole_window" );
+#else
+	// 64-bit versions of Windows use 32-bit handles for interoperability
+	m_windowID = (intptr_t) m_window;
 #endif
+}
+
+
+
+
+void RemoteVstPlugin::destroyEditor()
+{
+	if( m_window == NULL )
+	{
+		return;
+	}
+
+	pluginDispatch( effEditClose );
+	// Destroying the window takes some time in Wine 1.8.5
+	DestroyWindow( m_window );
+	m_window = NULL;
 }
 
 
@@ -778,10 +825,6 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 		}
 		return false;
 	}
-
-	char * tmp = strdup( _plugin_file.c_str() );
-	m_shortName = basename( tmp );
-	free( tmp );
 
 	typedef AEffect * ( __stdcall * mainEntryPointer )
 						( audioMasterCallback );
@@ -1067,7 +1110,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
 			}
-			close( fd );
+			close_check( fd );
 		}
 	}
 }
@@ -1392,7 +1435,7 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
-	close( fd );
+	close_check( fd );
 
 	pluginDispatch( effSetChunk, 0, _len, chunk );
 
@@ -1970,6 +2013,12 @@ LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
 				break;
 		}
 	}
+	else if( uMsg == WM_SYSCOMMAND && wParam == SC_CLOSE )
+	{
+		__plugin->destroyEditor();
+		return 0;
+	}
+
 	return DefWindowProc( hwnd, uMsg, wParam, lParam );
 }
 
@@ -1979,9 +2028,9 @@ LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
 int main( int _argc, char * * _argv )
 {
 #ifdef SYNC_WITH_SHM_FIFO
-	if( _argc < 3 )
+	if( _argc < 4 )
 #else
-	if( _argc < 2 )
+	if( _argc < 3 )
 #endif
 	{
 		fprintf( stderr, "not enough arguments\n" );
@@ -2012,6 +2061,41 @@ int main( int _argc, char * * _argv )
 		printf( "Notice: could not set high priority.\n" );
 	}
 #endif
+
+	{
+	#ifdef SYNC_WITH_SHM_FIFO
+		int embedMethodIndex = 3;
+	#else
+		int embedMethodIndex = 2;
+	#endif
+		std::string embedMethod = _argv[embedMethodIndex];
+
+		if ( embedMethod == "none" )
+		{
+			cerr << "Starting detached." << endl;
+			EMBED = EMBED_X11 = EMBED_WIN32 = false;
+		}
+		else if ( embedMethod == "win32" )
+		{
+			cerr << "Starting using Win32-native embedding." << endl;
+			EMBED = EMBED_WIN32 = true; EMBED_X11= false;
+		}
+		else if ( embedMethod == "qt" )
+		{
+			cerr << "Starting using Qt-native embedding." << endl;
+			EMBED = true; EMBED_X11 = EMBED_WIN32 = false;
+		}
+		else if ( embedMethod == "xembed" )
+		{
+			cerr << "Starting using X11Embed protocol." << endl;
+			EMBED = EMBED_X11 = true; EMBED_WIN32 = false;
+		}
+		else
+		{
+			cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << endl;
+			EMBED = EMBED_X11 = EMBED_WIN32 = false;
+		}
+	}
 
 	// constructor automatically will process messages until it receives
 	// a IdVstLoadPlugin message and processes it

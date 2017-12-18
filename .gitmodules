@@ -1,3 +1,6 @@
+[submodule "src/3rdparty/qt5-x11embed"]
+	path = src/3rdparty/qt5-x11embed
+	url = https://github.com/Lukas-W/qt5-x11embed.git
 [submodule "src/3rdparty/rpmalloc/rpmalloc"]
 	path = src/3rdparty/rpmalloc/rpmalloc
 	url = https://github.com/rampantpixels/rpmalloc.git
