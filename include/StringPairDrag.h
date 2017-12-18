@@ -55,6 +55,11 @@ public:
 		return( "application/x-lmms-stringpair" );
 	}
 
+	static const char * mimeTypeOsc()
+	{
+		return( "application/x-osc-stringpair" );
+	}
+
 } ;
 
 

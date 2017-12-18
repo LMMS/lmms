@@ -70,20 +70,40 @@ StringPairDrag::~StringPairDrag()
 }
 
 
-
+// TODO: clean up debug output
 
 bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 						const QString & _allowed_keys )
 {
-	if( !_dee->mimeData()->hasFormat( mimeType() ) )
+	printf("StringPairDrag: %d %d\n",
+	       _dee->pos().x(), _dee->pos().y());
+	if( !_dee->mimeData()->hasFormat( mimeType() ) &&
+		!_dee->mimeData()->hasFormat( mimeTypeOsc() ) )
 	{
+		printf("will reject: bad mimetype: %s\n",
+			_dee->mimeData()->formats().empty()
+				? "none"
+				: _dee->mimeData()->formats().front().
+					toUtf8().data());
 		return( false );
 	}
 	QString txt = _dee->mimeData()->data( mimeType() );
 	if( _allowed_keys.split( ',' ).contains( txt.section( ':', 0, 0 ) ) )
 	{
 		_dee->acceptProposedAction();
+		puts("will accept DnD");
 		return( true );
+	}
+	else {
+		QString txtOsc = _dee->mimeData()->data( mimeTypeOsc() );
+		if( _allowed_keys.split( ',' ).contains( txtOsc.section( ':', 0, 0 ) ) )
+		{
+			_dee->acceptProposedAction();
+			puts("will accept OSC DnD");
+			return( true );
+		}
+		else
+			printf("will reject: cannot drop \"%s\" or \"%s\" here\n", txt.toUtf8().data(), txtOsc.toUtf8().data());
 	}
 	_dee->ignore();
 	return( false );
@@ -94,7 +114,9 @@ bool StringPairDrag::processDragEnterEvent( QDragEnterEvent * _dee,
 
 QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 {
-	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 0, 0 ) );
+	bool hasMt = (mimeData->hasFormat(mimeType()));
+	return( QString::fromUtf8( mimeData->data(
+		hasMt ? mimeType() : mimeTypeOsc() ) ).section( ':', 0, 0 ) );
 }
 
 
@@ -102,7 +124,11 @@ QString StringPairDrag::decodeMimeKey( const QMimeData * mimeData )
 
 QString StringPairDrag::decodeMimeValue( const QMimeData * mimeData )
 {
-	return( QString::fromUtf8( mimeData->data( mimeType() ) ).section( ':', 1, -1 ) );
+	const char* myMimeType = (mimeData->hasFormat(mimeType()))
+			? mimeType()
+			: mimeTypeOsc();
+	return( QString::fromUtf8( mimeData->data( myMimeType ) ).
+		section( ':', 1, -1 ) );
 }
 
 

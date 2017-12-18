@@ -1,3 +1,5 @@
+add_subdirectory(spa)
+
 set(LMMS_SRCS
 	${LMMS_SRCS}
 	core/AutomatableModel.cpp
@@ -61,6 +63,7 @@ set(LMMS_SRCS
 	core/SampleRecordHandle.cpp
 	core/SerializingObject.cpp
 	core/Song.cpp
+	core/SpaOscModel.cpp
 	core/TempoSyncKnobModel.cpp
 	core/ToolPlugin.cpp
 	core/Track.cpp
@@ -97,5 +100,8 @@ set(LMMS_SRCS
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
+	${SPA_SRCS}
+
 	PARENT_SCOPE
 )
+

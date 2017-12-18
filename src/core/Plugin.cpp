@@ -26,6 +26,9 @@
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
 #include <QMessageBox>
+#include <spa/spa.h>
+
+#include "../core/spa/SpaInstrument.h"
 
 #include "Plugin.h"
 #include "embed.h"
@@ -107,8 +110,27 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 		return new DummyPlugin();
 	}
 
-	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
-	if( instantiationHook == NULL )
+	Plugin* inst;
+	spa::descriptor_loader_t spa_loader;
+	InstantiationHook instantiationHook;
+	if( (instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" )) )
+	{
+		inst = instantiationHook( parent, data );
+	}
+	else if( (spa_loader = (spa::descriptor_loader_t) pi.library->resolve( spa::descriptor_name )) )
+	{
+		// instantiate a SPA Instrument
+		// it will load and contain the SPA plugin
+		// and transfer LMMS events to SPA function calls
+		SpaInstrument* spa_inst = new SpaInstrument(
+			static_cast<InstrumentTrack *>( data ),
+			pi.file.absoluteFilePath().toUtf8().data(),
+			pi.descriptor);
+		unsigned port = spa_inst->plugin->net_port();
+		Engine::getSpaInstruments().insert(port, spa_inst);
+		inst = spa_inst;
+	}
+	else
 	{
 		if( gui )
 		{
@@ -120,7 +142,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 		return new DummyPlugin();
 	}
 
-	Plugin * inst = instantiationHook( parent, data );
+
 	return inst;
 }
 

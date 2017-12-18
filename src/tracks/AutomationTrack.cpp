@@ -24,6 +24,8 @@
  *
  */
 
+#include <QDebug>
+#include <QMap>
 #include "AutomationTrack.h"
 #include "AutomationPattern.h"
 #include "Engine.h"
@@ -32,7 +34,8 @@
 #include "StringPairDrag.h"
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
-
+#include "../core/spa/SpaInstrument.h"
+#include "SpaOscModel.h"
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
@@ -89,7 +92,7 @@ void AutomationTrack::loadTrackSpecificSettings( const QDomElement & _this )
 AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerView* tcv ) :
 	TrackView( _at, tcv )
 {
-        setFixedHeight( 32 );
+	setFixedHeight( 32 );
 	TrackLabelButton * tlb = new TrackLabelButton( this,
 						getTrackSettingsWidget() );
 	tlb->setIcon( embed::getIconPixmap( "automation_track" ) );
@@ -100,6 +103,7 @@ AutomationTrackView::AutomationTrackView( AutomationTrack * _at, TrackContainerV
 
 void AutomationTrackView::dragEnterEvent( QDragEnterEvent * _dee )
 {
+	puts("ATW:dragEnter");
 	StringPairDrag::processDragEnterEvent( _dee, "automatable_model" );
 }
 
@@ -110,12 +114,55 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 {
 	QString type = StringPairDrag::decodeKey( _de );
 	QString val = StringPairDrag::decodeValue( _de );
+	// qDebug() << "DROP: type/val:" << type << ", " << val;
+
 	if( type == "automatable_model" )
 	{
-		AutomatableModel * mod = dynamic_cast<AutomatableModel *>(
+
+		AutomatableModel * mod = nullptr;
+
+		if(_de->mimeData()->hasFormat( "application/x-osc-stringpair"))
+		{
+			QUrl url(val);
+			if(!url.isValid())
+			{
+				printf("Could not find a port in %s => "
+				       "can not make connection\n", val.toUtf8().data());
+			}
+			else
+			{
+				// qDebug() << val;
+				const QMap<int, class SpaInstrument*>& insmap = Engine::getSpaInstruments();
+				auto itr = insmap.find(url.port());
+				if(itr == insmap.end())
+				{
+					puts("DnD from an instrument which is not in LMMS... ignoring");
+					// TODO: MessageBox?
+				}
+				else
+				{
+					/* TODO: name */
+					AutomatableModel* spamod = SpaOscModelFactory(itr.value(), url.path()).res;
+					//SpaOscModel* spamod = new SpaOscModel(itr.value(), url.path().toUtf8().data());
+					if(spamod)
+					{
+						itr.value()->connectedModels.insert(url.path(), spamod);
+						mod = spamod;
+					}
+					else {
+						qDebug() << "LMMS: Could not create model from OSC port (received \"" << val << "\")";
+					}
+				}
+			}
+		}
+		else
+		{
+			mod = dynamic_cast<AutomatableModel *>(
 				Engine::projectJournal()->
-					journallingObject( val.toInt() ) );
-		if( mod != NULL )
+				journallingObject( val.toInt() ) );
+		}
+
+		if( mod )
 		{
 			MidiTime pos = MidiTime( trackContainerView()->
 							currentPosition() +
@@ -135,6 +182,9 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 			pat->addObject( mod );
 			pat->movePosition( pos );
 		}
+
+		// tell the source app that the drop did succeed
+		_de->acceptProposedAction();
 	}
 
 	update();

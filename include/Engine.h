@@ -91,6 +91,11 @@ public:
 		return s_ladspaManager;
 	}
 
+	static class QMap<int, class SpaInstrument*>& getSpaInstruments()
+	{
+		return s_spaInstruments;
+	}
+
 	static DummyTrackContainer * dummyTrackContainer()
 	{
 		return s_dummyTC;
@@ -137,6 +142,7 @@ private:
 	static DummyTrackContainer * s_dummyTC;
 
 	static Ladspa2LMMS * s_ladspaManager;
+	static QMap<int, class SpaInstrument*> s_spaInstruments;
 
 	// even though most methods are static, an instance is needed for Qt slots/signals
 	static LmmsCore * s_instanceOfMe;

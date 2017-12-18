@@ -41,6 +41,7 @@ BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
+QMap<int, class SpaInstrument*> LmmsCore::s_spaInstruments;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
 
 

@@ -26,10 +26,13 @@
 #define PLUGINFACTORY_H
 
 #include <memory>
+#include <string>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QHash>
 #include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QVector>
 
 #include "lmms_export.h"
 #include "Plugin.h"
@@ -85,6 +88,7 @@ private:
 	DescriptorMap m_descriptors;
 	PluginInfoList m_pluginInfos;
 	QMap<QString, PluginInfo> m_pluginByExt;
+	QVector<std::string> m_garbage; //!< cleaned up at destruction
 
 	QHash<QString, QString> m_errors;
 

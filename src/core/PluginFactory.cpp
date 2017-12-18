@@ -28,8 +28,11 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
+#include <spa/spa.h>
 
 #include "ConfigManager.h"
+#include "Plugin.h"
+#include "embed.h"
 
 #ifdef LMMS_BUILD_WIN32
 	QStringList nameFilters("*.dll");
@@ -150,42 +153,79 @@ void PluginFactory::discoverPlugins()
 	for (const QFileInfo& file : files)
 	{
 		auto library = std::make_shared<QLibrary>(file.absoluteFilePath());
+		spa::descriptor_loader_t spaDescriptorLoader;
 
 		if (! library->load()) {
 			m_errors[file.baseName()] = library->errorString();
 			qWarning("%s", library->errorString().toLocal8Bit().data());
 			continue;
 		}
-		if (library->resolve("lmms_plugin_main") == nullptr) {
-			continue;
-		}
 
-		QString descriptorName = file.baseName() + "_plugin_descriptor";
-		if( descriptorName.left(3) == "lib" )
+		Plugin::Descriptor* pluginDescriptor = nullptr;
+		if (library->resolve("lmms_plugin_main"))
 		{
-			descriptorName = descriptorName.mid(3);
+			// LMMS plugin
+
+			QString descriptorName = file.baseName() + "_plugin_descriptor";
+			if( descriptorName.left(3) == "lib" )
+			{
+				descriptorName = descriptorName.mid(3);
+			}
+
+			pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
+			if(pluginDescriptor == nullptr)
+			{
+				qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
+							  arg(file.absoluteFilePath()).arg(descriptorName);
+				continue;
+			}
+		}
+		else if ((spaDescriptorLoader = (spa::descriptor_loader_t) library->resolve(spa::descriptor_name))) {
+			spa::descriptor* descriptor = (*spaDescriptorLoader)(0 /* = plugin number, TODO */);
+			if(descriptor)
+			{
+				std::string unique_name =
+					spa::unique_name(*descriptor);
+				m_garbage.push_back(unique_name);
+
+				const char** xpm = descriptor->xpm_load();
+				assert(xpm);
+				QString xpmKey= "spa-plugin:" +
+					QString::fromStdString(unique_name);
+
+				// spa (simple plugin API) plugin
+				pluginDescriptor = new Plugin::Descriptor {
+					m_garbage.back().c_str(),
+					descriptor->name(),
+					descriptor->description_line(),
+					descriptor->authors(),
+					(int)descriptor->version_major() << 24 |
+						(descriptor->version_minor() & 0xff) << 16 |
+						(descriptor->version_patch() & 0xffff),
+					Plugin::Instrument, // TODO... could also be an effect
+					new PixmapLoader(QString("xpm:"
+						+ xpmKey), xpm),
+					descriptor->save_formats()
+				};
+			}
 		}
 
-		Plugin::Descriptor* pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
-		if(pluginDescriptor == nullptr)
+		if(pluginDescriptor)
 		{
-			qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
-						  arg(file.absoluteFilePath()).arg(descriptorName);
-			continue;
+			PluginInfo info;
+			info.file = file;
+			info.library = library;
+			info.descriptor = pluginDescriptor;
+			pluginInfos << info;
+
+			if(info.descriptor->supportedFileTypes)
+			for (const QString& ext : QString(info.descriptor->supportedFileTypes).split(','))
+			{
+				m_pluginByExt.insert(ext, info);
+			}
+
+			descriptors.insert(info.descriptor->type, info.descriptor);
 		}
-
-		PluginInfo info;
-		info.file = file;
-		info.library = library;
-		info.descriptor = pluginDescriptor;
-		pluginInfos << info;
-
-		for (const QString& ext : QString(info.descriptor->supportedFileTypes).split(','))
-		{
-			m_pluginByExt.insert(ext, info);
-		}
-
-		descriptors.insert(info.descriptor->type, info.descriptor);
 	}
 
 	m_pluginInfos = pluginInfos;
