@@ -315,7 +315,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		m_action = SelectSongTCO;
 		m_initalXSelect = event->x();
 	}
-	else if( event->button() == Qt::RightButton || event->button() == Qt::MiddleButton )
+	else if( event->button() == Qt::RightButton )
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
 		const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
