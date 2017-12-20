@@ -198,7 +198,7 @@ HydrogenSwingView::HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * _paren
 	QWidget( _parent )
 {
 	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
-	m_nob = new Knob(knobBright_26, this, "swingFactor");
+	m_nob = new Knob(knobBright_26, this);
 	m_nob->setModel( m_nobModel );
 	m_nob->setLabel( tr( "Swinginess" ) );
 	m_nob->setEnabled(true);
