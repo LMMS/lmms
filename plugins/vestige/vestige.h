@@ -74,6 +74,8 @@ public:
 
 protected slots:
 	void setParameter( void );
+	void handleConfigChange( QString cls, QString attr, QString value );
+	void reloadPlugin();
 
 private:
 	void closePlugin( void );

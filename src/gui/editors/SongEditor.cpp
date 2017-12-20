@@ -90,7 +90,8 @@ SongEditor::SongEditor( Song * song ) :
 	m_timeLine = new TimeLineWidget( widgetTotal, 32,
 					pixelsPerTact(),
 					m_song->m_playPos[Song::Mode_PlaySong],
-					m_currentPosition, this );
+					m_currentPosition,
+					Song::Mode_PlaySong, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 				m_song->m_playPos[Song::Mode_PlaySong].m_timeLine,
 			SLOT( updatePosition( const MidiTime & ) ) );

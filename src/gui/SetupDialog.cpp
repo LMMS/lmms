@@ -67,8 +67,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-
-
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );
@@ -137,12 +135,13 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
 						   "displaywaveform").toInt() ),
 	m_disableAutoQuit(ConfigManager::inst()->value( "ui",
-						   "disableautoquit").toInt() )
+						   "disableautoquit").toInt() ),
+	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() )
 {
 	setWindowIcon( embed::getIconPixmap( "setup_general" ) );
 	setWindowTitle( tr( "Setup LMMS" ) );
 	setModal( true );
-	setFixedSize( 452, 520 );
+	setFixedSize( 452, 570 );
 
 	Engine::projectJournal()->setJournalling( false );
 
@@ -159,7 +158,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_tabBar->setFixedWidth( 72 );
 
 	QWidget * ws = new QWidget( settings );
-	int wsHeight = 370;
+	int wsHeight = 420;
 #ifdef LMMS_HAVE_STK
 	wsHeight += 50;
 #endif
@@ -168,7 +167,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	ws->setFixedSize( 360, wsHeight );
 	QWidget * general = new QWidget( ws );
-	general->setFixedSize( 360, 240 );
+	general->setFixedSize( 360, 290 );
 	QVBoxLayout * gen_layout = new QVBoxLayout( general );
 	gen_layout->setSpacing( 0 );
 	gen_layout->setMargin( 0 );
@@ -335,6 +334,27 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	misc_tw->setFixedHeight( YDelta*labelNumber + HeaderSize );
 
+	TabWidget* embed_tw = new TabWidget( tr( "PLUGIN EMBEDDING" ), general);
+	embed_tw->setFixedHeight( 48 );
+	m_vstEmbedComboBox = new QComboBox( embed_tw );
+	m_vstEmbedComboBox->move( XDelta, YDelta );
+
+	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	m_vstEmbedComboBox->addItem( tr( "No embedding" ), "none" );
+	if( embedMethods.contains("qt") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using Qt API" ), "qt" );
+	}
+	if( embedMethods.contains("win32") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using native Win32 API" ), "win32" );
+	}
+	if( embedMethods.contains("xembed") )
+	{
+		m_vstEmbedComboBox->addItem( tr( "Embed using XEmbed protocol" ), "xembed" );
+	}
+	m_vstEmbedComboBox->setCurrentIndex( m_vstEmbedComboBox->findData( m_vstEmbedMethod ) );
+
 	TabWidget * lang_tw = new TabWidget( tr( "LANGUAGE" ), general );
 	lang_tw->setFixedHeight( 48 );
 	QComboBox * changeLang = new QComboBox( lang_tw );
@@ -380,13 +400,15 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( misc_tw );
 	gen_layout->addSpacing( 10 );
+	gen_layout->addWidget( embed_tw );
+	gen_layout->addSpacing( 10 );
 	gen_layout->addWidget( lang_tw );
 	gen_layout->addStretch();
 
 
 
 	QWidget * paths = new QWidget( ws );
-	int pathsHeight = 370;
+	int pathsHeight = 420;
 #ifdef LMMS_HAVE_STK
 	pathsHeight += 55;
 #endif
@@ -1001,6 +1023,20 @@ SetupDialog::~SetupDialog()
 
 void SetupDialog::accept()
 {
+	if( m_warnAfterSetup )
+	{
+		QMessageBox::information( NULL, tr( "Restart LMMS" ),
+					tr( "Please note that most changes "
+						"won't take effect until "
+						"you restart LMMS!" ),
+					QMessageBox::Ok );
+	}
+
+	// Hide dialog before setting values. This prevents an obscure bug
+	// where non-embedded VST windows would steal focus and prevent LMMS
+	// from taking mouse input, rendering the application unusable.
+	QDialog::accept();
+
 	ConfigManager::inst()->setValue( "mixer", "framesperaudiobuffer",
 					QString::number( m_bufferSize ) );
 	ConfigManager::inst()->setValue( "mixer", "audiodev",
@@ -1044,6 +1080,12 @@ void SetupDialog::accept()
 	ConfigManager::inst()->setValue( "ui", "disableautoquit",
 					QString::number( m_disableAutoQuit ) );
 	ConfigManager::inst()->setValue( "app", "language", m_lang );
+	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
+#if QT_VERSION >= 0x050000
+					m_vstEmbedComboBox->currentData().toString() );
+#else
+					m_vstEmbedComboBox->itemData(m_vstEmbedComboBox->currentIndex()).toString() );
+#endif
 
 
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
@@ -1074,16 +1116,6 @@ void SetupDialog::accept()
 	}
 
 	ConfigManager::inst()->saveConfigFile();
-
-	QDialog::accept();
-	if( m_warnAfterSetup )
-	{
-		QMessageBox::information( NULL, tr( "Restart LMMS" ),
-					tr( "Please note that most changes "
-						"won't take effect until "
-						"you restart LMMS!" ),
-					QMessageBox::Ok );
-	}
 }
 
 

@@ -2,7 +2,7 @@
 if [ "$QT5" ]; then
 	unset QTDIR QT_PLUGIN_PATH LD_LIBRARY_PATH
 	# shellcheck disable=SC1091
-	source /opt/qt58/bin/qt58-env.sh
+	source /opt/qt59/bin/qt59-env.sh
 fi
 
 set -e

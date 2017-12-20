@@ -164,8 +164,8 @@ RemotePlugin::~RemotePlugin()
 
 
 
-bool RemotePlugin::init( const QString &pluginExecutable,
-							bool waitForInitDoneMsg )
+bool RemotePlugin::init(const QString &pluginExecutable,
+							bool waitForInitDoneMsg , QStringList extraArgs)
 {
 	lock();
 	if( m_failed )
@@ -209,6 +209,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 #else
 	args << m_socketFile;
 #endif
+	args << extraArgs;
 #ifndef DEBUG_REMOTE_PLUGIN
 	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
 	m_process.setWorkingDirectory( QCoreApplication::applicationDirPath() );
@@ -390,6 +391,20 @@ void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 	m.addInt( _offset );
 	lock();
 	sendMessage( m );
+	unlock();
+}
+
+void RemotePlugin::showUI()
+{
+	lock();
+	sendMessage( IdShowUI );
+	unlock();
+}
+
+void RemotePlugin::hideUI()
+{
+	lock();
+	sendMessage( IdHideUI );
 	unlock();
 }
 

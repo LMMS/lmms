@@ -31,12 +31,13 @@
 #ifndef LMMS_HAVE_WEAKJACK
 #include <jack/jack.h>
 #else
-#include "AudioWeakJack.h"
+#include "weak_libjack.h"
 #endif
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QMutexLocker>
 
 #include <memory>
 
@@ -109,6 +110,7 @@ private:
 
 	bool m_active;
 	bool m_stopped;
+	QMutex m_processingMutex;
 
 	MidiJack *m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;

@@ -74,6 +74,7 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 
 AudioJack::~AudioJack()
 {
+	stopProcessing();
 #ifdef AUDIO_PORT_SUPPORT
 	while( m_portMap.size() )
 	{
@@ -221,6 +222,7 @@ bool AudioJack::initJackClient()
 
 void AudioJack::startProcessing()
 {
+	QMutexLocker m( &m_processingMutex );
 	m_stopped = false;
 
 	if( m_active || m_client == NULL )
@@ -273,6 +275,8 @@ void AudioJack::startProcessing()
 
 void AudioJack::stopProcessing()
 {
+	QMutexLocker m( &m_processingMutex );
+	m_stopped = true;
 }
 
 
@@ -359,6 +363,8 @@ void AudioJack::renamePort( AudioPort * _port )
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
+	QMutexLocker m( &m_processingMutex );
+
 	// do midi processing first so that midi input can
 	// add to the following sound processing
 	if( m_midiClient && _nframes > 0 )
@@ -422,11 +428,11 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		if( m_framesDoneInCurBuf == m_framesToDoInCurBuf )
 		{
 			m_framesToDoInCurBuf = getNextBuffer( m_outBuf );
+			m_framesDoneInCurBuf = 0;
 			if( !m_framesToDoInCurBuf )
 			{
-				m_stopped = true;
+				break;
 			}
-			m_framesDoneInCurBuf = 0;
 		}
 	}
 
@@ -445,8 +451,8 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 		mixer()->pushInputFrames (m_inBuffer.get (), _nframes);
 	}
-
-	if( m_stopped == true )
+  
+	if( _nframes != done )
 	{
 		for( int c = 0; c < channels(); ++c )
 		{

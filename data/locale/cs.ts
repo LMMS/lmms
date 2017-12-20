@@ -9093,7 +9093,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Trvání sweepu</translation>
@@ -9188,7 +9188,7 @@ Poklepáním na kterýkoliv modul se zobrazí informace o portech.</translation>
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Trvání sweepu:</translation>
