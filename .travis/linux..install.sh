@@ -10,6 +10,7 @@ PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libmp3lame-dev
 # swh build dependencies
 SWH_PACKAGES="perl libxml2-utils libxml-perl liblist-moreutils-perl"
 
+# VST dependencies
 VST_PACKAGES="wine-dev libqt5x11extras5-dev qtbase5-private-dev libxcb-util0-dev libxcb-keysyms1-dev"
 
 # Help with unmet dependencies
