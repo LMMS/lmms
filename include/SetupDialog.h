@@ -127,7 +127,7 @@ private slots:
 private:
 	TabBar * m_tabBar;
 
-	// General settings stuff.
+	// General settings widgets.
 	bool m_tooltips;
 	bool m_displaydBFS;
 	bool m_displayWaveform;
@@ -140,7 +140,7 @@ private:
 	QString m_lang;
 	QStringList m_languages;
 
-	// Performance settings stuff.
+	// Performance settings widgets.
 	int m_saveInterval;
 	bool m_enableAutoSave;
 	bool m_enableRunningAutoSave;
@@ -150,6 +150,7 @@ private:
 	LedCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
+	QLabel * m_vstEmbedLbl;
 	QComboBox* m_vstEmbedComboBox;
 	QString m_vstEmbedMethod;
 	bool m_syncVSTPlugins;
@@ -160,7 +161,7 @@ private:
 	typedef QMap<QString, MidiSetupWidget *> MswMap;
 	typedef QMap<QString, QString> trMap;
 
-	// Audio settings stuff.
+	// Audio settings widgets.
 	QComboBox * m_audioInterfaces;
 	AswMap m_audioIfaceSetupWidgets;
 	trMap m_audioIfaceNames;
@@ -169,12 +170,12 @@ private:
 	QSlider * m_bufferSizeSlider;
 	QLabel * m_bufferSizeLbl;
 
-	// MIDI settings stuff.
+	// MIDI settings widgets.
 	QComboBox * m_midiInterfaces;
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 
-	// Paths settings stuff.
+	// Paths settings widgets.
 	QString m_workingDir;
 	QString m_vstDir;
 	QString m_ladspaDir;

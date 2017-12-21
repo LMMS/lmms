@@ -443,11 +443,16 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	ui_fx_tw->setFixedHeight(YDelta + YDelta * labelNumber3);
 
 
-	int labelNumber4 = 0;
+	float labelNumber4 = 0;
 
 	// Plugins tab.
 	TabWidget * plugins_tw = new TabWidget(
 			tr("Plugins"), performance_w);
+
+	m_vstEmbedLbl = new QLabel(plugins_tw);
+	labelNumber4++;
+	m_vstEmbedLbl->move(XDelta, YDelta * labelNumber4);
+	m_vstEmbedLbl->setText(tr("VST plugins embedding:"));
 
 	m_vstEmbedComboBox = new QComboBox(plugins_tw);
 	labelNumber4++;
@@ -471,7 +476,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr("Sync VST plugins to host playback"), plugins_tw);
-	labelNumber4++;
+	labelNumber4 = labelNumber4 + 1.6;
 	syncVST->move(XDelta, YDelta * labelNumber4);
 	syncVST->setChecked(m_syncVSTPlugins);
 	connect(syncVST, SIGNAL(toggled(bool)), this,
@@ -1070,36 +1075,35 @@ void SetupDialog::accept()
 	// from taking mouse input, rendering the application unusable.
 	QDialog::accept();
 
-	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
-					QString::number(m_bufferSize));
-	ConfigManager::inst()->setValue("mixer", "audiodev",
-					m_audioIfaceNames[m_audioInterfaces->currentText()]);
-	ConfigManager::inst()->setValue("mixer", "mididev",
-					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setValue("tooltips", "disabled",
 					QString::number(!m_tooltips));
 	ConfigManager::inst()->setValue("app", "displaydbfs",
 					QString::number(m_displaydBFS));
+	ConfigManager::inst()->setValue("ui", "displaywaveform",
+					QString::number(m_displayWaveform));
+	ConfigManager::inst()->setValue("ui", "printnotelabels",
+					QString::number(m_printNoteLabels));
+	ConfigManager::inst()->setValue("ui", "compacttrackbuttons",
+					QString::number(m_compactTrackButtons));
+	ConfigManager::inst()->setValue("ui", "oneinstrumenttrackwindow",
+					QString::number(m_oneInstrumentTrackWindow));
 	ConfigManager::inst()->setValue("app", "nommpz",
 					QString::number(!m_MMPZ));
 	ConfigManager::inst()->setValue("app", "disablebackup",
 					QString::number(!m_disableBackup));
 	ConfigManager::inst()->setValue("app", "openlastproject",
 					QString::number(m_openLastProject));
-	ConfigManager::inst()->setValue("mixer", "hqaudio",
-					QString::number(m_hqAudioDev));
-	ConfigManager::inst()->setValue("ui", "smoothscroll",
-					QString::number(m_smoothScroll));
-	ConfigManager::inst()->setValue("ui", "enableautosave",
-					QString::number(m_enableAutoSave));
+	ConfigManager::inst()->setValue("app", "language", m_lang);
 	ConfigManager::inst()->setValue("ui", "saveinterval",
 					QString::number(m_saveInterval));
+	ConfigManager::inst()->setValue("ui", "enableautosave",
+					QString::number(m_enableAutoSave));
 	ConfigManager::inst()->setValue("ui", "enablerunningautosave",
 					QString::number(m_enableRunningAutoSave));
-	ConfigManager::inst()->setValue("ui", "oneinstrumenttrackwindow",
-					QString::number(m_oneInstrumentTrackWindow));
-	ConfigManager::inst()->setValue("ui", "compacttrackbuttons",
-					QString::number(m_compactTrackButtons));
+	ConfigManager::inst()->setValue("ui", "smoothscroll",
+					QString::number(m_smoothScroll));
+	ConfigManager::inst()->setValue("ui", "animateafp",
+					QString::number(m_animateAFP));
 	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
 #if QT_VERSION >= 0x050000
 					m_vstEmbedComboBox->currentData().toString() );
@@ -1108,15 +1112,16 @@ void SetupDialog::accept()
 #endif
 	ConfigManager::inst()->setValue("ui", "syncvstplugins",
 					QString::number(m_syncVSTPlugins));
-	ConfigManager::inst()->setValue("ui", "animateafp",
-					QString::number(m_animateAFP));
-	ConfigManager::inst()->setValue("ui", "printnotelabels",
-					QString::number(m_printNoteLabels));
-	ConfigManager::inst()->setValue("ui", "displaywaveform",
-					QString::number(m_displayWaveform));
 	ConfigManager::inst()->setValue("ui", "disableautoquit",
 					QString::number(m_disableAutoQuit));
-	ConfigManager::inst()->setValue("app", "language", m_lang);
+	ConfigManager::inst()->setValue("mixer", "audiodev",
+					m_audioIfaceNames[m_audioInterfaces->currentText()]);
+	ConfigManager::inst()->setValue("mixer", "hqaudio",
+					QString::number(m_hqAudioDev));
+	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
+					QString::number(m_bufferSize));
+	ConfigManager::inst()->setValue("mixer", "mididev",
+					m_midiIfaceNames[m_midiInterfaces->currentText()]);
 	ConfigManager::inst()->setWorkingDir(QDir::fromNativeSeparators(m_workingDir));
 	ConfigManager::inst()->setVSTDir(QDir::fromNativeSeparators(m_vstDir));
 	ConfigManager::inst()->setLADSPADir(QDir::fromNativeSeparators(m_ladspaDir));
