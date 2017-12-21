@@ -159,7 +159,11 @@ void AudioSdl::startProcessing()
 
 void AudioSdl::stopProcessing()
 {
+#ifdef LMMS_HAVE_SDL2
+	if( SDL_GetAudioDeviceStatus(m_outputDevice) == SDL_AUDIO_PLAYING )
+#else
 	if( SDL_GetAudioStatus() == SDL_AUDIO_PLAYING )
+#endif
 	{
 #ifdef LMMS_HAVE_SDL2
 		SDL_LockAudioDevice (m_inputDevice);
