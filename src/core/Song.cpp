@@ -86,14 +86,15 @@ Song::Song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
+	m_isCancelled( false ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
-	m_elapsedMilliSeconds( 0 ),
 	m_elapsedTicks( 0 ),
 	m_elapsedTacts( 0 )
 {
+	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
 						this, SLOT( setTempo() ) );
 	connect( &m_tempoModel, SIGNAL( dataUnchanged() ),
@@ -387,7 +388,7 @@ void Song::processNextBuffer()
 		framesPlayed += framesToPlay;
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
-		m_elapsedMilliSeconds += MidiTime::ticksToMilliseconds( framesToPlay / framesPerTick, getTempo());
+		m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds(framesToPlay / framesPerTick, getTempo());
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
 	}
@@ -597,7 +598,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 {
 	tick_t ticksFromPlayMode = m_playPos[playMode].getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
+	m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 
@@ -651,8 +652,8 @@ void Song::stop()
 		switch( tl->behaviourAtStop() )
 		{
 			case TimeLineWidget::BackToZero:
-				m_playPos[m_playMode].setTicks( 0 );
-				m_elapsedMilliSeconds = 0;
+				m_playPos[m_playMode].setTicks(0);
+				m_elapsedMilliSeconds[m_playMode] = 0;
 				if( gui && gui->songEditor() &&
 						( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
 				{
@@ -663,7 +664,7 @@ void Song::stop()
 			case TimeLineWidget::BackToStart:
 				if( tl->savedPos() >= 0 )
 				{
-					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
+					m_playPos[m_playMode].setTicks(tl->savedPos().getTicks());
 					setToTime(tl->savedPos());
 
 					if( gui && gui->songEditor() &&
@@ -683,9 +684,12 @@ void Song::stop()
 	else
 	{
 		m_playPos[m_playMode].setTicks( 0 );
-		m_elapsedMilliSeconds = 0;
+		m_elapsedMilliSeconds[m_playMode] = 0;
 	}
 	m_playing = false;
+
+	m_elapsedMilliSeconds[Mode_None] = m_elapsedMilliSeconds[m_playMode];
+	m_playPos[Mode_None].setTicks(m_playPos[m_playMode].getTicks());
 
 	m_playPos[m_playMode].setCurrentFrame( 0 );
 
@@ -1065,7 +1069,7 @@ void Song::loadProject( const QString & fileName )
 		}
 	}
 
-	while( !node.isNull() )
+	while( !node.isNull() && !isCancelled() )
 	{
 		if( node.isElement() )
 		{
@@ -1123,6 +1127,13 @@ void Song::loadProject( const QString & fileName )
 	Engine::projectJournal()->setJournalling( true );
 
 	emit projectLoaded();
+
+	if( isCancelled() )
+	{
+		m_isCancelled = false;
+		createNewProject();
+		return;
+	}
 
 	if ( hasErrors())
 	{
@@ -1269,7 +1280,7 @@ void Song::saveControllerStates( QDomDocument & doc, QDomElement & element )
 void Song::restoreControllerStates( const QDomElement & element )
 {
 	QDomNode node = element.firstChild();
-	while( !node.isNull() )
+	while( !node.isNull() && !isCancelled() )
 	{
 		Controller * c = Controller::create( node.toElement(), this );
 		Q_ASSERT( c != NULL );
@@ -1301,16 +1312,6 @@ void Song::exportProjectTracks()
 
 void Song::exportProject( bool multiExport )
 {
-	if( isEmpty() )
-	{
-		QMessageBox::information( gui->mainWindow(),
-				tr( "Empty project" ),
-				tr( "This project is empty so exporting makes "
-					"no sense. Please put some items into "
-					"Song Editor first!" ) );
-		return;
-	}
-
 	FileDialog efd( gui->mainWindow() );
 
 	if ( multiExport )
@@ -1389,16 +1390,6 @@ void Song::exportProject( bool multiExport )
 
 void Song::exportProjectMidi()
 {
-	if( isEmpty() )
-	{
-		QMessageBox::information( gui->mainWindow(),
-				tr( "Empty project" ),
-				tr( "This project is empty so exporting makes "
-					"no sense. Please put some items into "
-					"Song Editor first!" ) );
-		return;
-	}
-
 	FileDialog efd( gui->mainWindow() );
 
 	efd.setFileMode( FileDialog::AnyFile );
@@ -1435,14 +1426,15 @@ void Song::exportProjectMidi()
 
 		// instantiate midi export plugin
 		TrackContainer::TrackList tracks;
-		tracks += Engine::getSong()->tracks();
-		tracks += Engine::getBBTrackContainer()->tracks();
+		TrackContainer::TrackList tracks_BB;
+		tracks = Engine::getSong()->tracks();
+		tracks_BB = Engine::getBBTrackContainer()->tracks();
 		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
 		if (exf==NULL) {
 			qDebug() << "failed to load midi export filter!";
 			return;
 		}
-		exf->tryExport(tracks, Engine::getSong()->getTempo(), export_filename);
+		exf->tryExport(tracks, tracks_BB, getTempo(), m_masterPitchModel.value(), export_filename);
 	}
 }
 

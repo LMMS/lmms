@@ -34,8 +34,6 @@ MixerWorkerThread::JobQueue MixerWorkerThread::globalJobQueue;
 QWaitCondition * MixerWorkerThread::queueReadyWaitCond = NULL;
 QList<MixerWorkerThread *> MixerWorkerThread::workerThreads;
 
-
-
 // implementation of internal JobQueue
 void MixerWorkerThread::JobQueue::reset( OperationMode _opMode )
 {
@@ -89,7 +87,7 @@ void MixerWorkerThread::JobQueue::wait()
 	while( (int) m_itemsDone < (int) m_queueSize )
 	{
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
-		asm( "pause" );
+		_mm_pause();
 #endif
 	}
 }
@@ -153,6 +151,7 @@ void MixerWorkerThread::startAndWaitForJobs()
 
 void MixerWorkerThread::run()
 {
+	MemoryManager::ThreadGuard mmThreadGuard; Q_UNUSED(mmThreadGuard);
 	disable_denormals();
 
 	QMutex m;

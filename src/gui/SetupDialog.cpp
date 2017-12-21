@@ -121,6 +121,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "smoothscroll").toInt()),
 	m_animateAFP(ConfigManager::inst()->value(
 			"ui", "animateafp", "1").toInt()),
+	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() ),
 	m_syncVSTPlugins(ConfigManager::inst()->value(
 			"ui", "syncvstplugins").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
@@ -352,6 +353,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 
 
+
 	// Performance widget.
 	QWidget * performance_w = new QWidget(settings_w);
 	performance_w->setFixedSize(360, 200);
@@ -446,6 +448,26 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// Plugins tab.
 	TabWidget * plugins_tw = new TabWidget(
 			tr("Plugins"), performance_w);
+
+	m_vstEmbedComboBox = new QComboBox(plugins_tw);
+	labelNumber4++;
+	m_vstEmbedComboBox->move(XDelta, YDelta * labelNumber4);
+
+	QStringList embedMethods = ConfigManager::availabeVstEmbedMethods();
+	m_vstEmbedComboBox->addItem(tr("No embedding"), "none");
+	if(embedMethods.contains("qt"))
+	{
+		m_vstEmbedComboBox->addItem(tr("Embed using Qt API"), "qt");
+	}
+	if( embedMethods.contains("win32"))
+	{
+		m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"), "win32");
+	}
+	if( embedMethods.contains("xembed"))
+	{
+		m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed");
+	}
+	m_vstEmbedComboBox->setCurrentIndex(m_vstEmbedComboBox->findData(m_vstEmbedMethod));
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr("Sync VST plugins to host playback"), plugins_tw);
@@ -1042,7 +1064,13 @@ SetupDialog::~SetupDialog()
 
 
 void SetupDialog::accept()
-{	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
+{
+	// Hide dialog before setting values. This prevents an obscure bug
+	// where non-embedded VST windows would steal focus and prevent LMMS
+	// from taking mouse input, rendering the application unusable.
+	QDialog::accept();
+
+	ConfigManager::inst()->setValue("mixer", "framesperaudiobuffer",
 					QString::number(m_bufferSize));
 	ConfigManager::inst()->setValue("mixer", "audiodev",
 					m_audioIfaceNames[m_audioInterfaces->currentText()]);
@@ -1072,6 +1100,12 @@ void SetupDialog::accept()
 					QString::number(m_oneInstrumentTrackWindow));
 	ConfigManager::inst()->setValue("ui", "compacttrackbuttons",
 					QString::number(m_compactTrackButtons));
+	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
+#if QT_VERSION >= 0x050000
+					m_vstEmbedComboBox->currentData().toString() );
+#else
+					m_vstEmbedComboBox->itemData(m_vstEmbedComboBox->currentIndex()).toString() );
+#endif
 	ConfigManager::inst()->setValue("ui", "syncvstplugins",
 					QString::number(m_syncVSTPlugins));
 	ConfigManager::inst()->setValue("ui", "animateafp",
@@ -1106,10 +1140,7 @@ void SetupDialog::accept()
 	{
 		it.value()->saveSettings();
 	}
-
 	ConfigManager::inst()->saveConfigFile();
-
-	QDialog::accept();
 }
 
 

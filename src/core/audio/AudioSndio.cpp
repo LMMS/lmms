@@ -104,7 +104,7 @@ AudioSndio::AudioSndio(bool & _success_ful, Mixer * _mixer) :
 	if (reqpar.pchan != m_par.pchan ||
 		reqpar.bits != m_par.bits ||
 		reqpar.le != m_par.le ||
-		(abs(reqpar.rate - m_par.rate) * 100)/reqpar.rate > 2)
+		(::abs(static_cast<int>(reqpar.rate) - static_cast<int>(m_par.rate)) * 100)/reqpar.rate > 2)
 	{
 		printf( "sndio: returned params not as requested\n" );
 		return;

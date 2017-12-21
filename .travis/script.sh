@@ -12,7 +12,7 @@ if [ "$TYPE" = 'style' ]; then
 
 else
 
-	mkdir build
+	mkdir -p build
 	cd build
 
 	export CMAKE_FLAGS="-DWANT_QT5=$QT5 -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo"

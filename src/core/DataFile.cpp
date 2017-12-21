@@ -194,7 +194,7 @@ bool DataFile::validate( QString extension )
 		if (! ( extension == "mmp" || extension == "mpt" || extension == "mmpz" ||
 				extension == "xpf" || extension == "xml" ||
 				( extension == "xiz" && ! pluginFactory->pluginSupportingExtension(extension).isNull()) ||
-				extension == "sf2" || extension == "pat" || extension == "mid" ||
+				extension == "sf2" || extension == "sf3" || extension == "pat" || extension == "mid" ||
 				extension == "dll"
 				) )
 		{
@@ -968,6 +968,61 @@ void DataFile::upgrade_1_2_0_rc2_42()
 }
 
 
+void DataFile::upgrade_1_3_0()
+{
+	QDomNodeList list = elementsByTagName( "instrument" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement el = list.item( i ).toElement();
+		if( el.attribute( "name" ) == "papu" )
+		{
+			el.setAttribute( "name", "freeboy" );
+			QDomNodeList children = el.elementsByTagName( "papu" );
+			for( int j = 0; !children.item( j ).isNull(); ++j )
+			{
+				QDomElement child = children.item( j ).toElement();
+				child.setTagName( "freeboy" );
+			}
+		}
+		else if( el.attribute( "name" ) == "OPL2" )
+		{
+			el.setAttribute( "name", "opulenz" );
+			QDomNodeList children = el.elementsByTagName( "OPL2" );
+			for( int j = 0; !children.item( j ).isNull(); ++j )
+			{
+				QDomElement child = children.item( j ).toElement();
+				child.setTagName( "opulenz" );
+			}
+		}
+	}
+
+	list = elementsByTagName( "effect" );
+	for( int i = 0; !list.item( i ).isNull(); ++i )
+	{
+		QDomElement effect = list.item( i ).toElement();
+		if( effect.attribute( "name" ) == "ladspaeffect" )
+		{
+			QDomNodeList keys = effect.elementsByTagName( "key" );
+			for( int j = 0; !keys.item( j ).isNull(); ++j )
+			{
+				QDomElement key = keys.item( j ).toElement();
+				QDomNodeList attributes = key.elementsByTagName( "attribute" );
+				for( int k = 0; !attributes.item( k ).isNull(); ++k )
+				{
+					QDomElement attribute = attributes.item( k ).toElement();
+					if( attribute.attribute( "name" ) == "file" &&
+							( attribute.attribute( "value" ) == "calf" || 
+							attribute.attribute( "value" ) == "calf.so" ) )
+					{
+						attribute.setAttribute( "value", "veal" );
+					}
+				}
+			}
+		}
+	}
+}
+
+
 void DataFile::upgrade()
 {
 	ProjectVersion version =
@@ -1048,6 +1103,10 @@ void DataFile::upgrade()
 	{
 		upgrade_1_2_0_rc3();
 		upgrade_1_2_0_rc2_42();
+	}
+	if( version < "1.3.0" )
+	{
+		upgrade_1_3_0();
 	}
 
 	// update document meta data

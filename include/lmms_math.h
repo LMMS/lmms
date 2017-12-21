@@ -212,11 +212,12 @@ static inline float logToLinearScale( float min, float max, float value )
 static inline float linearToLogScale( float min, float max, float value )
 {
 	static const float EXP = 1.0f / F_E;
-	const float val = ( value - min ) / ( max - min );
+	const float valueLimited = qBound( min, value, max);
+	const float val = ( valueLimited - min ) / ( max - min );
 	if( min < 0 )
 	{
 		const float mmax = qMax( qAbs( min ), qAbs( max ) );
-		float result = signedPowf( value / mmax, EXP ) * mmax;
+		float result = signedPowf( valueLimited / mmax, EXP ) * mmax;
 		return isnan( result ) ? 0 : result;
 	}
 	float result = powf( val, EXP ) * ( max - min ) + min;

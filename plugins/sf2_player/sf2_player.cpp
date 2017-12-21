@@ -60,7 +60,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	0x0100,
 	Plugin::Instrument,
 	new PluginPixmapLoader( "logo" ),
-	"sf2",
+	"sf2,sf3",
 	NULL
 } ;
 
@@ -1078,7 +1078,7 @@ void sf2InstrumentView::showFileDialog()
 	ofd.setFileMode( FileDialog::ExistingFiles );
 
 	QStringList types;
-	types << tr( "SoundFont2 Files (*.sf2)" );
+	types << tr( "SoundFont Files (*.sf2 *.sf3)" );
 	ofd.setNameFilters( types );
 
 	if( k->m_filename != "" )

@@ -32,9 +32,9 @@
 #include <QtCore/QPair>
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
+#include <QtCore/QObject>
 
 #include "export.h"
-#include "MemoryManager.h"
 
 
 class LmmsCore;
@@ -45,16 +45,16 @@ const QString TEMPLATE_PATH = "templates/";
 const QString PRESETS_PATH = "presets/";
 const QString SAMPLES_PATH = "samples/";
 const QString GIG_PATH = "samples/gig/";
-const QString SF2_PATH = "samples/sf2/";
+const QString SF2_PATH = "samples/soundfonts/";
 const QString LADSPA_PATH ="plugins/ladspa/";
 const QString DEFAULT_THEME_PATH = "themes/default/";
 const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
-class EXPORT ConfigManager
+class EXPORT ConfigManager : public QObject
 {
-	MM_OPERATORS
+	Q_OBJECT
 public:
 	static inline ConfigManager * inst()
 	{
@@ -212,6 +212,9 @@ public:
 	}
 //--------------------------------------------------
 
+	static QStringList availabeVstEmbedMethods();
+	QString vstEmbedMethod() const;
+
 	// Returns true if the working dir (e.g. ~/lmms) exists on disk.
 	bool hasWorkingDir() const;
 
@@ -244,6 +247,8 @@ public:
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();
 
+signals:
+	void valueChanged( QString cls, QString attribute, QString value );
 
 private:
 	static ConfigManager * s_instanceOfMe;

@@ -33,6 +33,8 @@
 #include <QDomElement>
 
 #include "ConfigManager.h"
+#include "BufferManager.h"
+#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"
@@ -89,6 +91,10 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	// now we need a play-handle which cares for calling play()
 	InstrumentPlayHandle * iph = new InstrumentPlayHandle( this, _instrument_track );
 	Engine::mixer()->addPlayHandle( iph );
+
+	connect( ConfigManager::inst(), SIGNAL( valueChanged(QString,QString,QString) ),
+			 this, SLOT( handleConfigChange(QString, QString, QString) ),
+			 Qt::QueuedConnection );
 }
 
 
@@ -168,6 +174,22 @@ void vestigeInstrument::setParameter( void )
 	if ( m_plugin != NULL ) {
 		m_plugin->setParam( knobUNID, knobFModel[knobUNID]->value() );
 	}
+}
+
+void vestigeInstrument::handleConfigChange(QString cls, QString attr, QString value)
+{
+    Q_UNUSED(cls); Q_UNUSED(attr); Q_UNUSED(value);
+    // Disabled for consistency with VST effects that don't implement this. (#3786)
+    // if ( cls == "ui" && attr == "vstembedmethod" )
+    // {
+    // 	reloadPlugin();
+    // }
+}
+
+void vestigeInstrument::reloadPlugin()
+{
+	closePlugin();
+	loadFile( m_pluginDLL );
 }
 
 
@@ -262,7 +284,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
-	m_plugin->showEditor( NULL, false );
+	m_plugin->showUI();
 
 	if( set_ch_name )
 	{
@@ -282,15 +304,18 @@ void vestigeInstrument::loadFile( const QString & _file )
 void vestigeInstrument::play( sampleFrame * _buf )
 {
 	m_pluginMutex.lock();
+
+	const fpp_t frames = Engine::mixer()->framesPerPeriod();
+
 	if( m_plugin == NULL )
 	{
+		BufferManager::clear( _buf, frames );
+
 		m_pluginMutex.unlock();
 		return;
 	}
 
 	m_plugin->process( NULL, _buf );
-
-	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	instrumentTrack()->processAudioBuffer( _buf, frames, NULL );
 
@@ -363,10 +388,6 @@ void vestigeInstrument::closePlugin( void )
 	}
 
 	m_pluginMutex.lock();
-	if( m_plugin )
-	{
-		delete m_plugin->pluginWidget();
-	}
 	delete m_plugin;
 	m_plugin = NULL;
 	m_pluginMutex.unlock();
@@ -736,19 +757,7 @@ void VestigeInstrumentView::toggleGUI( void )
 	{
 		return;
 	}
-	QWidget * w = m_vi->m_plugin->pluginWidget();
-	if( w == NULL )
-	{
-		return;
-	}
-	if( w->isHidden() )
-	{
-		w->show();
-	}
-	else
-	{
-		w->hide();
-	}
+	m_vi->m_plugin->toggleUI();
 }
 
 
@@ -1137,7 +1146,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new vestigeInstrument( static_cast<InstrumentTrack *>( _data ) );
 }

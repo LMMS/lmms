@@ -150,6 +150,8 @@ private:
 	LedCheckBox * m_runningAutoSave;
 	bool m_smoothScroll;
 	bool m_animateAFP;
+	QComboBox* m_vstEmbedComboBox;
+	QString m_vstEmbedMethod;
 	bool m_syncVSTPlugins;
 	bool m_disableAutoQuit;
 

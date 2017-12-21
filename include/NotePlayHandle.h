@@ -27,6 +27,7 @@
 #define NOTE_PLAY_HANDLE_H
 
 #include "AtomicInt.h"
+#include "BasicFilters.h"
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
@@ -36,7 +37,6 @@ class QReadWriteLock;
 class InstrumentTrack;
 class NotePlayHandle;
 
-template<ch_cnt_t=DEFAULT_CHANNELS> class BasicFilters;
 typedef QList<NotePlayHandle *> NotePlayHandleList;
 typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
@@ -66,8 +66,7 @@ public:
 					NotePlayHandle* parent = NULL,
 					int midiEventChannel = -1,
 					Origin origin = OriginPattern );
-	virtual ~NotePlayHandle() {}
-	void done();
+	virtual ~NotePlayHandle();
 
 	void * operator new ( size_t size, void * p )
 	{

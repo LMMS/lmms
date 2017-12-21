@@ -28,6 +28,7 @@
 #include <memory>
 
 #include <QtCore/QFileInfo>
+#include <QtCore/QHash>
 #include <QtCore/QList>
 
 #include "export.h"

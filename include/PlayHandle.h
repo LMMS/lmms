@@ -28,6 +28,10 @@
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 
+#include "export.h"
+
+#include "MemoryManager.h"
+
 #include "ThreadableJob.h"
 #include "lmms_basics.h"
 
@@ -36,7 +40,7 @@ class QThread;
 class Track;
 class AudioPort;
 
-class PlayHandle : public ThreadableJob
+class EXPORT PlayHandle : public ThreadableJob
 {
 public:
 	enum Types
@@ -142,20 +146,17 @@ public:
 	
 	void releaseBuffer();
 	
-	sampleFrame * buffer()
-	{
-		return m_playHandleBuffer;
-	}
+	sampleFrame * buffer();
 
 private:
 	Type m_type;
 	f_cnt_t m_offset;
 	QThread* m_affinity;
 	QMutex m_processingLock;
-	sampleFrame * m_playHandleBuffer;
+	sampleFrame* m_playHandleBuffer;
+	bool m_bufferReleased;
 	bool m_usesBuffer;
 	AudioPort * m_audioPort;
-
 } ;
 
 

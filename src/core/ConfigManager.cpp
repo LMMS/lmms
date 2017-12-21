@@ -188,6 +188,39 @@ QString ConfigManager::defaultVersion() const
 	return LMMS_VERSION;
 }
 
+QStringList ConfigManager::availabeVstEmbedMethods()
+{
+	QStringList methods;
+	methods.append("none");
+#if QT_VERSION >= 0x050100
+	methods.append("qt");
+#endif
+#ifdef LMMS_BUILD_WIN32
+	methods.append("win32");
+#endif
+#ifdef LMMS_BUILD_LINUX
+#if QT_VERSION >= 0x050000
+	if (static_cast<QGuiApplication*>(QApplication::instance())->
+		platformName() == "xcb")
+#else
+	if (qgetenv("QT_QPA_PLATFORM").isNull()
+		|| qgetenv("QT_QPA_PLATFORM") == "xcb")
+#endif
+	{
+		methods.append("xembed");
+	}
+#endif
+	return methods;
+}
+
+QString ConfigManager::vstEmbedMethod() const
+{
+	QStringList methods = availabeVstEmbedMethods();
+	QString defaultMethod = *(methods.end() - 1);
+	QString currentMethod = value( "ui", "vstembedmethod", defaultMethod );
+	return methods.contains(currentMethod) ? currentMethod : defaultMethod;
+}
+
 bool ConfigManager::hasWorkingDir() const
 {
 	return QDir(m_workingDir).exists();
@@ -338,12 +371,15 @@ void ConfigManager::setValue(const QString & cls,
 {
 	if(m_settings.contains(cls))
 	{
-		for(stringPairVector::iterator it = m_settings[cls].begin();
-					it != m_settings[cls].end(); ++it)
+		for(QPair<QString, QString>& pair : m_settings[cls])
 		{
-			if((*it).first == attribute)
+			if(pair.first == attribute)
 			{
-				(*it).second = value;
+				if (pair.second != value)
+				{
+					pair.second = value;
+					emit valueChanged(cls, attribute, value);
+				}
 				return;
 			}
 		}
@@ -505,7 +541,16 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 #elif defined(LMMS_BUILD_APPLE)
 		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
 #else
-		m_stkDir = "/usr/share/stk/rawwaves/";
+		if ( qApp->applicationDirPath().startsWith("/tmp/") )
+		{
+			// Assume AppImage bundle
+			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
+		}
+		else
+		{
+			// Fallback to system provided location
+			m_stkDir = "/usr/share/stk/rawwaves/";
+		}
 #endif
 	}
 #endif

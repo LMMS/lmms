@@ -32,7 +32,7 @@ Features
 * Many powerful instrument and effect-plugins out of the box
 * Full user-defined track-based automation and computer-controlled automation sources
 * Compatible with many standards such as SoundFont2, VST(i), LADSPA, GUS Patches, and full MIDI support
-* MIDI file importing
+* MIDI file importing and exporting
 
 Building
 ---------
