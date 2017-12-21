@@ -13,6 +13,7 @@ matrix:
         - env: TARGET_OS=win64
         - os: osx
           osx_image: xcode8.2
+        - env: QT5=
         - env: QT5=True
         - env: QT5=True TARGET_OS=win32
         - env: QT5=True TARGET_OS=win64

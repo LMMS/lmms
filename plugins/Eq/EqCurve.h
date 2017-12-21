@@ -71,8 +71,7 @@ public:
 	void setMouseHover( bool d );
 	bool isActiveHandle();
 	void setHandleActive( bool a );
-	void setHandleMoved(bool a);
-	bool getHandleMoved();
+	bool mousePressed() const;
 	void sethp12();
 	void sethp24();
 	void sethp48();
@@ -95,7 +94,6 @@ protected:
 private:
 	double calculateGain( const double freq, const double a1, const double a2, const double b0, const double b1, const double b2 );
 	void loadPixmap();
-
 	float m_pixelsPerUnitWidth;
 	float m_pixelsPerUnitHeight;
 	float m_scale;
@@ -111,11 +109,7 @@ private:
 	float m_resonance;
 	bool m_mousePressed;
 	bool m_active;
-	bool m_handleMoved;
 	QPixmap m_circlePixmap;
-private slots:
-	void handleMoved();
-
 };
 
 
