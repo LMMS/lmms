@@ -218,7 +218,7 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	// TODO: dbV handling
 	if( m_displayConversion )
 	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
+		newValue = QInputDialog::getDouble( this, tr( "Set value" ),
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() * 100 ).
 							arg( model()->maxValue() * 100 ),
@@ -228,7 +228,7 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	}
 	else
 	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
+		newValue = QInputDialog::getDouble( this, tr( "Set value" ),
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() ).
 							arg( model()->maxValue() ),
