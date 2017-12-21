@@ -451,7 +451,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 		mixer()->pushInputFrames (m_inBuffer.get (), _nframes);
 	}
-  
+
 	if( _nframes != done )
 	{
 		for( int c = 0; c < channels(); ++c )
