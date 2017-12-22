@@ -476,7 +476,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	LedCheckBox * syncVST = new LedCheckBox(
 			tr("Sync VST plugins to host playback"), plugins_tw);
-	labelNumber4 = labelNumber4 + 1.6;
+	labelNumber4 += 1.6;
 	syncVST->move(XDelta, YDelta * labelNumber4);
 	syncVST->setChecked(m_syncVSTPlugins);
 	connect(syncVST, SIGNAL(toggled(bool)), this,
@@ -788,22 +788,17 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	paths_layout->setMargin(0);
 	labelWidget(paths_w,
 			tr("Paths settings"));
-	QLabel * title = new QLabel(
-			tr("Paths settings"), paths_w);
-	QFont f = title->font();
-	f.setBold(true);
-	title->setFont(pointSize<12>(f));
 
 
+	// Paths scroll area.
 	QScrollArea * pathsScroll = new QScrollArea(paths_w);
-
-	// Path selectors widget.
-	QWidget * pathSelectors = new QWidget(settings_w);
-	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
 	pathsScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pathsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pathsScroll->resize(360, paths_height - 50 );
+	pathsScroll->resize(360, paths_height - 50);
 	pathsScroll->move(0, 30);
+
+	// Path selectors widget.
+	QWidget * pathSelectors = new QWidget(paths_w);
 	pathSelectors->resize(360, paths_height - 50);
 
 	const int txtLength = 284;
@@ -847,7 +842,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// LADSPA plugins directory tab.
 	TabWidget * ladspaDir_tw = new TabWidget(
-			tr("LADSPA plugins directories"), paths_w);
+			tr("LADSPA plugins directories"), pathSelectors);
 	ladspaDir_tw->setFixedHeight(48);
 
 	m_ladspaDirLineEdit = new QLineEdit(m_ladspaDir, ladspaDir_tw);
@@ -882,7 +877,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	// Default SF2 file tab.
 	TabWidget * sf2File_tw = new TabWidget(
-			tr("Default SF2 file"), paths_w);
+			tr("Default SF2 file"), pathSelectors);
 	sf2File_tw->setFixedHeight(48);
 
 	m_sf2FileLineEdit = new QLineEdit(m_sf2File, sf2File_tw);
@@ -936,7 +931,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Background picture file tab.
 	TabWidget * backgroundPicFile_tw = new TabWidget(
-			tr("Background picture file"), paths_w);
+			tr("Background picture file"), pathSelectors);
 	backgroundPicFile_tw->setFixedHeight(48);
 
 	m_backgroundPicFileLineEdit = new QLineEdit(m_backgroundPicFile, backgroundPicFile_tw);
@@ -953,32 +948,33 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(backgroundPicFile_select_btn, SIGNAL(clicked()), this,
 			SLOT(openBackgroundPicFile()));
 
+	// Path selectors layout.
+	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
 	pathSelectors->setLayout(pathSelectorsLayout);
 
-	// Path selectors layout ordering.
 	pathSelectorsLayout->addWidget(workingDir_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(vstDir_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(ladspaDir_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(sf2Dir_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	pathSelectorsLayout->addWidget(sf2File_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 #endif
 	pathSelectorsLayout->addWidget(gigDir_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(themeDir_tw);
-	pathSelectorsLayout->addSpacing(10);
+	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(backgroundPicFile_tw);
 	pathSelectorsLayout->addStretch();
 
-	paths_layout->addWidget(pathSelectors);
-
 	pathsScroll->setWidget(pathSelectors);
 	pathsScroll->setWidgetResizable(true);
+
+	paths_layout->addWidget(pathsScroll);
 
 
 
