@@ -635,6 +635,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	}
 
 	updateInOutCount();
+	updateBufferSize();
 
 	// some plugins have to set samplerate during init
 	if( m_vstSyncData->hasSHM )
