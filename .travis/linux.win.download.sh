@@ -2,7 +2,7 @@
 
 set -e
 
-export MANUAL_PACKAGES_URLS="https://www.libsdl.org/release/SDL2-devel-2.0.7-mingw.tar.gz,cross"
+export MANUAL_PACKAGES_URLS="https://www.libsdl.org/release/SDL2-devel-2.0.7-mingw.tar.gz,native"
 
 CACHE_DIR=$TRAVIS_BUILD_DIR/apt_mingw_cache/$1
 mkdir -p "$CACHE_DIR"
@@ -16,7 +16,7 @@ for PACKAGE_URL_AND_OPTS in $MANUAL_PACKAGES_URLS; do
     PACKAGE_URL="${PACKAGE_URL_AND_OPTS[0]}"
     OPTS="${PACKAGE_URL_AND_OPTS[1]}"
 
-    echo "Downloading $OPTS..."
+    echo "Downloading $PACKAGE_URL ..."
 
     mkdir PACKAGE_URL_TEMP
     cd PACKAGE_URL_TEMP
