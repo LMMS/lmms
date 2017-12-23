@@ -2,26 +2,34 @@
 
 set -e
 
+export MANUAL_PACKAGES_URLS="https://www.libsdl.org/release/SDL2-devel-2.0.7-mingw.tar.gz,cross"
+
 CACHE_DIR=$TRAVIS_BUILD_DIR/apt_mingw_cache/$1
 mkdir -p "$CACHE_DIR"
 
 pushd "$CACHE_DIR"
 
 for PACKAGE_URL_AND_OPTS in $MANUAL_PACKAGES_URLS; do
+    pushd "$PWD"
     PACKAGE_URL_AND_OPTS=(${PACKAGE_URL_AND_OPTS//,/ })
 
     PACKAGE_URL="${PACKAGE_URL_AND_OPTS[0]}"
     OPTS="${PACKAGE_URL_AND_OPTS[1]}"
 
+    echo "Downloading $OPTS..."
+
     mkdir PACKAGE_URL_TEMP
     cd PACKAGE_URL_TEMP
     
-    curl "$PACKAGE_URL" | tar xfz - 
-    cd *
+    curl "$PACKAGE_URL" | tar xfz -
+    dir_name=$(ls)
+    cd "$dir_name"
 
-    make install $OPTS
+    echo "Installing package $dir_name ..."
+    make install "$OPTS"
 
     rm -r PACKAGE_URL_TEMP
+    popd
 done
 
 # shellcheck disable=SC2086
