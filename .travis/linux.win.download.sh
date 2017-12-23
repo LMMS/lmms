@@ -28,8 +28,8 @@ for PACKAGE_URL_AND_OPTS in $MANUAL_PACKAGES_URLS; do
     echo "Installing package $dir_name ..."
     sudo make install "$OPTS"
 
-    rm -r PACKAGE_URL_TEMP
     popd
+    rm -r PACKAGE_URL_TEMP
 done
 
 # shellcheck disable=SC2086
