@@ -4,8 +4,13 @@ BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialo
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ladspa")
 
-# Disable C++11
-SET(CMAKE_CXX_STANDARD 98)
+# Enable C++11 for all except mingw builds
+# TODO: Validate against modern mingw compiler
+IF(NOT MINGW_PREFIX)
+	SET(CMAKE_CXX_STANDARD 11)
+ELSE()
+	SET(CMAKE_CXX_STANDARD 98)
+ENDIF()
 
 IF(WANT_CAPS)
 ADD_SUBDIRECTORY(caps)
