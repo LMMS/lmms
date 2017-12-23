@@ -9,14 +9,7 @@ else
 fi
 
 export PATH=$MINGW/bin:$PATH
-
-if [ "$1" = "-qt5" ]; then
-        QT5=True
-fi
-
-if [ $QT5 ]; then
-        CMAKE_OPTS="-DWANT_QT5=$QT5 -DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
-fi
+CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
