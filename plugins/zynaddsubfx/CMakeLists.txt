@@ -127,9 +127,7 @@ IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore QtCore4 QtGui4 QtXml4)
 ENDIF()
 
-IF(QT5)
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
-ENDIF()
 
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lws2_32)
@@ -179,9 +177,7 @@ TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui -lZynAddSubFxCore ${FLTK
 ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
 # Support qt_version_tag in Qt 5.6
-IF(QT5)
-	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
-ENDIF(QT5)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)
