@@ -26,7 +26,7 @@ for PACKAGE_URL_AND_OPTS in $MANUAL_PACKAGES_URLS; do
     cd "$dir_name"
 
     echo "Installing package $dir_name ..."
-    make install "$OPTS"
+    sudo make install "$OPTS"
 
     rm -r PACKAGE_URL_TEMP
     popd
