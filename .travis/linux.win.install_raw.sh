@@ -17,7 +17,7 @@ while read -r PACKAGE_URL_AND_OPTS; do
     cd "$dir_name"
 
     echo "Installing package $dir_name ..."
-    sudo make install "$OPTS"
+    sudo make "$OPTS"
 
     popd
     rm -rf PACKAGE_URL_TEMP
