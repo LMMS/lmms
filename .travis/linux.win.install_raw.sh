@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# Split PACKAGE_URL_AND_OPTS by lines
 while read -r PACKAGE_URL_AND_OPTS; do
     pushd "$PWD"
-    # Split PACKAGE_URL_AND_OPTS by ,
     IFS=',' read -ra PACKAGE_URL_AND_OPTS <<< "$PACKAGE_URL_AND_OPTS"
 
     PACKAGE_URL="${PACKAGE_URL_AND_OPTS[0]}"
@@ -18,8 +16,9 @@ while read -r PACKAGE_URL_AND_OPTS; do
     dir_name=$(ls)
     cd "$dir_name"
 
+    ls *
     echo "Installing package $dir_name (make ${OPTS}) ..."
-    sudo make "$OPTS"
+    sudo make $OPTS
 
     popd
     rm -rf PACKAGE_URL_TEMP
