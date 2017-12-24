@@ -1,4 +1,6 @@
-for PACKAGE_URL_AND_OPTS in $MANUAL_PACKAGES_URLS; do
+#!/usr/bin/env bash
+
+while read -r PACKAGE_URL_AND_OPTS; do
     pushd "$PWD"
     PACKAGE_URL_AND_OPTS=(${PACKAGE_URL_AND_OPTS//,/ })
 
@@ -19,4 +21,5 @@ for PACKAGE_URL_AND_OPTS in $MANUAL_PACKAGES_URLS; do
 
     popd
     rm -rf PACKAGE_URL_TEMP
-done
+done <<< "$MANUAL_PACKAGES_URLS"
+

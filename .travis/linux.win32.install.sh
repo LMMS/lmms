@@ -11,7 +11,7 @@ MINGW_PACKAGES="mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x
 # swh build dependencies
 SWH_PACKAGES="perl libxml2-utils libxml-perl liblist-moreutils-perl"
 
-export MANUAL_PACKAGES_URLS="https://www.libsdl.org/release/SDL2-devel-2.0.7-mingw.tar.gz,install-package arch=x86_64-w64-mingw32 prefix=/usr/local/cross-tools/x86_64-w64-mingw32"
+export MANUAL_PACKAGES_URLS="https://www.libsdl.org/release/SDL2-devel-2.0.7-mingw.tar.gz,install-package arch=x86_64-w64-mingw32 prefix=/opt/mingw32"
 
 export MINGW_PACKAGES
 
