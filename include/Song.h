@@ -298,6 +298,10 @@ public:
 		return m_timeSigModel;
 	}
 
+	void setRecordDelay( int time );
+	int getRecordDelay();
+	void startRecordCountDown();
+
 
 public slots:
 	void playSong();
@@ -404,6 +408,7 @@ private:
 	PlayModes m_playMode;
 	PlayPos m_playPos[Mode_Count];
 	tact_t m_length;
+	int m_recordDelay;
 
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
@@ -430,6 +435,7 @@ signals:
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();
+	void recordCoundDown();
 
 } ;
 

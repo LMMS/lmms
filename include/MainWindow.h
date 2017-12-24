@@ -33,6 +33,7 @@
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
+#include "LcdSpinBox.h"
 
 class QAction;
 class QDomElement;
@@ -166,6 +167,7 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void updateCountDownDuration();
 
 	void updatePlayPauseIcons();
 
@@ -222,6 +224,7 @@ private:
 
 	QBasicTimer m_updateTimer;
 	QTimer m_autoSaveTimer;
+	QTimer m_recordCountDownTimer;
 	int m_autoSaveInterval;
 
 	friend class GuiApplication;
@@ -229,6 +232,10 @@ private:
 	QMenu * m_viewMenu;
 
 	ToolButton * m_metronomeToggle;
+
+	LcdSpinBox * m_countDownClock;
+
+	LcdSpinBoxModel * m_countDownValue;
 
 	SessionState m_session;
 
@@ -241,6 +248,8 @@ private slots:
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
+	void startRecordCountDown();
+	void decrementRecordCountDown();
 
 
 signals:

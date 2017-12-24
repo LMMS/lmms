@@ -4365,7 +4365,8 @@ void PianoRollWindow::stop()
 
 void PianoRollWindow::record()
 {
-	m_editor->record();
+	Engine::getSong()->startRecordCountDown();
+	QTimer::singleShot( Engine::getSong()->getRecordDelay() * 1000 , m_editor, SLOT( record() ) );
 }
 
 
@@ -4373,7 +4374,8 @@ void PianoRollWindow::record()
 
 void PianoRollWindow::recordAccompany()
 {
-	m_editor->recordAccompany();
+	Engine::getSong()->startRecordCountDown();
+	QTimer::singleShot( Engine::getSong()->getRecordDelay() * 1000 , m_editor, SLOT( recordAccompany() ) );
 }
 
 
