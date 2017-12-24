@@ -2,8 +2,6 @@
 
 while read -r PACKAGE_URL_AND_OPTS; do
     pushd "$PWD"
-    PACKAGE_URL_AND_OPTS= (${PACKAGE_URL_AND_OPTS//,/ })
-    
     IFS=',' read -ra PACKAGE_URL_AND_OPTS <<< "$PACKAGE_URL_AND_OPTS"
 
     PACKAGE_URL="${PACKAGE_URL_AND_OPTS[0]}"
