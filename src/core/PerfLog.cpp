@@ -24,41 +24,106 @@
 
 #include "PerfLog.h"
 
-#ifdef LMMS_DEBUG_PERFLOG
+#include "lmmsconfig.h"
 
-QHash <QString,PerfLog::Entry> PerfLog::s_running;
+#if defined(LMMS_HAVE_SYS_TIME_H) && defined(LMMS_HAVE_UNISTD_H)
+#	define USE_POSIX_TIME
+#endif
 
-PerfLog::Entry::Entry()
+#ifdef USE_POSIX_TIME
+#	include <unistd.h>
+#	include <sys/times.h>
+#endif
+
+PerfTime::PerfTime()
+	: m_real(-1)
 {
-	c = times(&t);
-	if (c == -1) { qFatal("PerfLogEntry: init failed"); }
 }
 
-void PerfLog::begin(const QString& what)
+clock_t PerfTime::real() const
 {
-	if (s_running.contains(what))
-	{
-		qWarning("PerfLog::begin already %s", qPrintable(what));
-	}
-
-	s_running.insert(what, Entry());
+	return m_real;
 }
 
-void PerfLog::end(const QString& what)
+clock_t PerfTime::user() const
+{
+	return m_user;
+}
+
+clock_t PerfTime::system() const
+{
+	return m_system;
+}
+
+bool PerfTime::valid() const
+{
+	return m_real != -1;
+}
+
+PerfTime PerfTime::now()
+{
+	PerfTime time;
+#ifdef USE_POSIX_TIME
+	tms t;
+	time.m_real = times(&t);
+	time.m_user = t.tms_utime;
+	time.m_system = t.tms_stime;
+	if (time.m_real == -1) { qWarning("PerfTime: now failed"); }
+#endif
+	return time;
+}
+
+clock_t PerfTime::ticksPerSecond()
 {
 	static long clktck = 0;
-	if (!clktck)
-		if ((clktck = sysconf(_SC_CLK_TCK)) < 0)
-			qFatal("PerfLog::end sysconf()");
-
-	PerfLog::Entry e;
-	PerfLog::Entry b = s_running.take(what);
-	//                | task | real  | user  | syst 
-	qWarning("PERFLOG | %20s | %7.2f | %7.2f | %7.2f",
-		 qPrintable(what),
-		 (e.c - b.c) / (double)clktck,
-		 (e.t.tms_utime - b.t.tms_utime) / (double)clktck,
-		 (e.t.tms_stime - b.t.tms_stime) / (double)clktck);
+#ifdef USE_POSIX_TIME
+	if (!clktck) {
+		if ((clktck = sysconf(_SC_CLK_TCK)) < 0) {
+			qWarning("PerfLog::end sysconf()");
+		}
+	}
+#endif
+	return clktck;
 }
 
-#endif
+PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
+{
+	PerfTime diff;
+	diff.m_real = lhs.m_real - rhs.m_real;
+	diff.m_user = lhs.m_user - rhs.m_user;
+	diff.m_system = lhs.m_system - rhs.m_system;
+	return diff;
+}
+
+PerfLog::PerfLog(const QString& what)
+	: what(what)
+{
+	begin();
+}
+
+PerfLog::~PerfLog()
+{
+	end();
+}
+
+void PerfLog::begin()
+{
+	begin_time = PerfTime::now();
+}
+
+void PerfLog::end()
+{
+	if (! begin_time.valid()) {
+		return;
+	}
+
+	long clktck = PerfTime::ticksPerSecond();
+
+	PerfTime d = PerfTime::now() - begin_time;
+	//                | task | real  | user  | syst
+	qWarning("PERFLOG | %20s | %7.2f | %7.2f | %7.2f",
+			 qPrintable(what),
+			 d.real() / (double)clktck,
+			 d.user() / (double)clktck,
+			 d.system() / (double)clktck);
+}

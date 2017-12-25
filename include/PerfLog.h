@@ -25,43 +25,41 @@
 #ifndef PERFLOG_H
 #define PERFLOG_H
 
-#include "lmmsconfig.h"
+#include <ctime>
+#include <QtCore/QString>
 
-#ifndef LMMS_DEBUG_PERFLOG
+class PerfTime
+{
+public:
+	PerfTime();
+	bool valid() const;
 
-#define PL_BEGIN(w)
-#define PL_END(w)
+	clock_t real() const;
+	clock_t user() const;
+	clock_t system() const;
 
-#else
+	static PerfTime now();
+	static clock_t ticksPerSecond();
 
-#include <unistd.h>
-#include <sys/times.h>
-
-#include <QHash>
-#include <QString>
+	friend PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs);
+private:
+	clock_t m_real;
+	clock_t m_user;
+	clock_t m_system;
+};
 
 class PerfLog
 {
  public:
-	static void begin(const QString& what);
-	static void end(const QString& what);
+	PerfLog(const QString& what);
+	~PerfLog();
+
+	void begin();
+	void end();
 
  private:
-	class Entry
-	{
-	public:
-		clock_t c;
-		tms t;
-		Entry();
-	};
-
-	static QHash<QString, PerfLog::Entry> s_running;
+	QString what;
+	PerfTime begin_time;
 };
-
-
-#define PL_BEGIN(w) PerfLog::begin(w);
-#define PL_END(w) PerfLog::end(w);
-
-#endif
 
 #endif
