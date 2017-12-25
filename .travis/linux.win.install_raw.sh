@@ -10,14 +10,15 @@ while read -r PACKAGE_URL_AND_OPTS; do
     echo "Downloading $PACKAGE_URL ..."
 
     mkdir PACKAGE_URL_TEMP
-    cd PACKAGE_URL_TEMP
+    cd PACKAGE_URL_TEMP || exit 1
     
     curl "$PACKAGE_URL" | tar xfz -
     dir_name=$(ls)
-    cd "$dir_name"
+    cd "$dir_name" || exit 1
 
-    ls *
     echo "Installing package $dir_name (make ${OPTS}) ..."
+    
+    # shellcheck disable=SC2086
     sudo make $OPTS
 
     popd
