@@ -96,7 +96,7 @@ PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
 }
 
 PerfLog::PerfLog(const QString& what)
-	: what(what)
+	: name(what)
 {
 	begin();
 }
@@ -120,10 +120,12 @@ void PerfLog::end()
 	long clktck = PerfTime::ticksPerSecond();
 
 	PerfTime d = PerfTime::now() - begin_time;
-	//                | task | real  | user  | syst
-	qWarning("PERFLOG | %20s | %7.2f | %7.2f | %7.2f",
-			 qPrintable(what),
-			 d.real() / (double)clktck,
+	qWarning("PERFLOG | %20s | %.2fuser, %.2fsystem %.2felapsed",
+			 qPrintable(name),
 			 d.user() / (double)clktck,
-			 d.system() / (double)clktck);
+			 d.system() / (double)clktck,
+			 d.real() / (double)clktck);
+
+	// Invalidate so destructor won't call print another log entry
+	begin_time = PerfTime();
 }

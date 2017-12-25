@@ -28,6 +28,10 @@
 #include <ctime>
 #include <QtCore/QString>
 
+/// \brief CPU time point
+///
+/// Represents a point in CPU time (not wall-clock time) intended for measuring
+/// performance.
 class PerfTime
 {
 public:
@@ -48,17 +52,21 @@ private:
 	clock_t m_system;
 };
 
+/// \brief The PerfLog class
+///
+/// Measures time between construction and destruction and prints the result to
+/// stderr, along with \p name. Alternatively, call begin() and end() explicitly.
 class PerfLog
 {
  public:
-	PerfLog(const QString& what);
+	PerfLog(const QString& name);
 	~PerfLog();
 
 	void begin();
 	void end();
 
  private:
-	QString what;
+	QString name;
 	PerfTime begin_time;
 };
 
