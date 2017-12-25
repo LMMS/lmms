@@ -199,7 +199,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
-					"${MINGW_PREFIX}/bin/SDL.dll"
+					"${MINGW_PREFIX}/bin/SDL2.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/zlib1.dll"
