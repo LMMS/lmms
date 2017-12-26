@@ -70,7 +70,13 @@
 
 #include "lmmsversion.h"
 
+<<<<<<< HEAD
+#include "plugins/chordtable_editor/chordtable_editor.h"
+
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BULID_APPLE) && !defined(LMMS_BUILD_HAIKU)
+=======
 #if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+>>>>>>> upstream/master
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
@@ -380,9 +386,19 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
+	PluginView *tp;
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
+		tp = ToolPlugin::instantiate( desc->name, /*this*/NULL )->createView(this);
+		if ( !strcmp(desc->name, "chordtableeditor") )
+		{
+			//setting up the gui reference to the ChordTable editor plugin
+			gui->setChordTableEditorView( tp );
+		}
+		m_tools.push_back( tp );
+
+
 		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
 						   ->createView(this) );
 	}

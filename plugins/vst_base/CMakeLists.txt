@@ -6,11 +6,7 @@ IF(LMMS_BUILD_WIN32)
 	ADD_DEFINITIONS(-DPTW32_STATIC_LIB)
 	ADD_EXECUTABLE(RemoteVstPlugin "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp")
 
-	IF(QT5)
-		TARGET_LINK_LIBRARIES(RemoteVstPlugin Qt5::Core)
-	ELSE()
-		TARGET_LINK_LIBRARIES(RemoteVstPlugin -lQtCore4)
-	ENDIF()
+	TARGET_LINK_LIBRARIES(RemoteVstPlugin Qt5::Core)
 	TARGET_LINK_LIBRARIES(RemoteVstPlugin -lpthread -lgdi32 -lws2_32)
 	SET_TARGET_PROPERTIES(RemoteVstPlugin PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -O0")
 	ADD_CUSTOM_COMMAND(TARGET RemoteVstPlugin POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:RemoteVstPlugin>")
@@ -26,8 +22,13 @@ ENDIF(LMMS_BUILD_WIN32)
 
 SET(REMOTE_VST_PLUGIN_FILEPATH "RemoteVstPlugin" CACHE STRING "Relative file path to RemoteVstPlugin")
 
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/3rdparty/qt5-x11embed/src/")
 ADD_DEFINITIONS(-DREMOTE_VST_PLUGIN_FILEPATH="${REMOTE_VST_PLUGIN_FILEPATH}")
 BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
+
+IF(LMMS_BUILD_LINUX AND WANT_QT5)
+	TARGET_LINK_LIBRARIES(vstbase qx11embedcontainer)
+ENDIF()
 
 IF(LMMS_BUILD_LINUX AND NOT WANT_VST_NOWINE)
 
@@ -43,22 +44,44 @@ SET(WINE_CXX_FLAGS "" CACHE STRING "Extra flags passed to wineg++")
 STRING(REPLACE "include/wine" "include" WINE_INCLUDE_BASE_DIR ${WINE_INCLUDE_DIR})
 STRING(REPLACE "lib/libwine.so" "lib" WINE_LIBRARY_DIR ${WINE_LIBRARY})
 STRING(REPLACE " " ";" WINE_BUILD_FLAGS ${CMAKE_CXX_FLAGS} " " ${CMAKE_EXE_LINKER_FLAGS} " " ${WINE_CXX_FLAGS})
+
+SET(WINE_CXX_ARGS
+	-I${CMAKE_BINARY_DIR}
+	-I${CMAKE_SOURCE_DIR}/include
+	-I${WINE_INCLUDE_BASE_DIR}
+	-L${WINE_LIBRARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
+	-std=c++0x
+	-mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
+	${WINE_BUILD_FLAGS}
+	-o ../RemoteVstPlugin
+)
+
+# winegcc fails if winebuild is not in path
+GET_FILENAME_COMPONENT(WINE_BINDIR ${WINE_CXX} PATH)
+FIND_PROGRAM(WINEBUILD winebuild NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+IF(NOT WINEBUILD)
+	IF(CMAKE_VERSION VERSION_LESS 3.1)
+		MESSAGE(WARNING "winebuild is not in PATH. Building RemoteVstPlugin may fail.")
+	ELSE()
+		SET(WINE_CXX_ARGS -E env PATH=$ENV{PATH}:${WINE_BINDIR} ${WINE_CXX} ${WINE_CXX_ARGS})
+		SET(WINE_CXX "${CMAKE_COMMAND}")
+	ENDIF()
+ENDIF()
+
+set(ENV{PATH} "$ENV{PATH}:${WINE_BINDIR}")
+
 ADD_CUSTOM_COMMAND(
 	SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp"
+	COMMAND export
+		ARGS "PATH=$PATH:${WINE_BINDIR}"
 	COMMAND ${WINE_CXX}
-	ARGS -I${CMAKE_BINARY_DIR}
-		-I${CMAKE_SOURCE_DIR}/include
-		-I${WINE_INCLUDE_BASE_DIR}
-		-L${WINE_LIBRARY_DIR}
-		${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
-		-ansi -mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
-		-std=c++0x
-		${WINE_BUILD_FLAGS}
-		-o ../RemoteVstPlugin
+	ARGS ${WINE_CXX_ARGS}
 	# Ensure correct file extension
 	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
 	OUTPUTS ../RemoteVstPlugin
+	VERBATIM
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ../RemoteVstPlugin.exe.so)
