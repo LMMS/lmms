@@ -119,8 +119,7 @@ void PadsGDX::playNote(NotePlayHandle* _n, sampleFrame* _buffer )
         //qInfo("PadsGDX::playNote origin=%d",_n->origin());
         //key+=69-base;
 
-        if((_n->origin()==NotePlayHandle::OriginMidiInput)&&
-           (_n->generation()==0))
+        if((_n->origin()==NotePlayHandle::OriginMidiInput))
                 setCurrentKey(key);
 
         SampleBuffer* sample=m_sampleBuffer[key];

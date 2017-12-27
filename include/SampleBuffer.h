@@ -251,6 +251,7 @@ public:
 		m_varLock.unlock();
 	}
 
+	static QString selectAudioFile(const QString & _file = QString::null);
 	static QString tryToMakeRelative( const QString & _file );
 	static QString tryToMakeAbsolute(const QString & file);
 

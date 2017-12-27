@@ -208,30 +208,29 @@ void PadsGDXView::doConnections()
         PadsGDX* a=castModel<PadsGDX>();
         //qInfo("PadsGDXView::PadsGDXView connect from %p to %p",a,this);
 
-	DEBUG_CONNECT( a, SIGNAL(isPlaying(f_cnt_t)),
+	connect( a, SIGNAL(isPlaying(f_cnt_t)),
                        m_waveView, SLOT(onPlaying(f_cnt_t)) );
 
-	DEBUG_CONNECT( a, SIGNAL( keyUpdated(int)),
+	connect( a, SIGNAL( keyUpdated(int)),
                        this, SLOT( onKeyUpdated(int)) );
-        //DEBUG_CONNECT( a, &PadsGDX::keyUpdated,
+        //connect( a, &PadsGDX::keyUpdated,
         //             this, &PadsGDXView::onKeyUpdated );
 
-	DEBUG_DISCONNECT( a, SIGNAL( dataChanged() ),
+	disconnect( a, SIGNAL( dataChanged() ),
                           this, SLOT( update() ) );
-	DEBUG_CONNECT( a, SIGNAL( dataChanged() ),
+	connect( a, SIGNAL( dataChanged() ),
                        this, SLOT( onModelChanged() ) );
 
-	DEBUG_CONNECT( a, SIGNAL(sampleUpdated( )),
+	connect( a, SIGNAL(sampleUpdated( )),
                        this, SLOT(onSampleUpdated()) );
 
-	//DEBUG_CONNECT( a, SIGNAL(keyUpdated(int)),
+	//connect( a, SIGNAL(keyUpdated(int)),
         //                 qApp, SLOT(aboutQt()) );
 }
 
 
 void PadsGDXView::onKeyUpdated(int _key)
 {
-        qInfo("PadsGDXView::onKeyUpdated");
         onModelChanged();
         onSampleUpdated();
 }
