@@ -78,7 +78,7 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${WINE_CXX}
 	ARGS ${WINE_CXX_ARGS}
 	# Ensure correct file extension
-	COMMAND sh -c "mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
+	COMMAND /bin/sh -c "/bin/mv ../RemoteVstPlugin.exe ../RemoteVstPlugin || true"
 	TARGET vstbase
 	OUTPUTS ../RemoteVstPlugin
 	VERBATIM
