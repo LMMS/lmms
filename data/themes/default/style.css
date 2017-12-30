@@ -7,6 +7,44 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 	color: #d1d8e4;
 }
 
+QTreeWidget::item  {
+	padding: 0px;
+}
+
+QTreeView  {
+	animated: true;
+	outline: none;
+	font-size:14px;
+	indentation: 10;
+	selection-background-color: #3C444E;
+}
+
+QTreeWidget::item:hover  {
+	background-color: #3C444E;
+	padding-left: 0px;
+}
+
+QTreeWidget::item:selected  {
+	background-color: #17793b;
+	border: none;
+}
+
+QTreeView::item:has-children:open{
+	background-color: #17793b;
+}
+
+QTreeView::branch:has-children:open{
+	selection-background-color: #17793b;
+}
+
+QTreeView::item:has-children:closed:!hover {
+	background-color: #101213;
+}
+
+QTreeView::item:!has-children:open:!hover {
+	background-color: #101213;
+}
+
 QMdiArea {
 	background-color: #111314;
 }
