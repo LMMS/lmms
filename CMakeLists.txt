@@ -381,7 +381,7 @@ IF(WANT_JACK)
 			SET(STATUS_JACK "OK (weak linking enabled)")
 			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
-			SET(JACK_LIBRARIES "dl")
+			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		ELSE()
 			SET(STATUS_JACK "OK")
 		ENDIF()
