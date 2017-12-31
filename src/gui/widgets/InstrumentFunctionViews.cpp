@@ -88,10 +88,13 @@ InstrumentFunctionNoteStackingView::~InstrumentFunctionNoteStackingView()
 
 void InstrumentFunctionNoteStackingView::showChordTableEditor()
 {
-	gui->getChordTableEditorView()->show();
-	gui->getChordTableEditorView()->parentWidget()->show();
-	gui->getChordTableEditorView()->setFocus();
-	gui->emitGenericSignal_1(m_cc->m_chordsModel.value());
+	if (gui && gui->getChordTableEditorView())
+		{
+			gui->getChordTableEditorView()->show();
+			gui->getChordTableEditorView()->parentWidget()->show();
+			gui->getChordTableEditorView()->setFocus();
+			gui->emitGenericSignal_1(m_cc->m_chordsModel.value());
+		}
 }
 
 
@@ -260,8 +263,11 @@ void InstrumentFunctionArpeggioView::modelChanged()
 
 void InstrumentFunctionArpeggioView::showChordTableEditor()
 {
-	gui->getChordTableEditorView()->show();
-	gui->getChordTableEditorView()->parentWidget()->show();
-	gui->getChordTableEditorView()->setFocus();
-	gui->emitGenericSignal_1(m_a->m_arpModel.value());
+	if (gui && gui->getChordTableEditorView())
+		{
+			gui->getChordTableEditorView()->show();
+			gui->getChordTableEditorView()->parentWidget()->show();
+			gui->getChordTableEditorView()->setFocus();
+			gui->emitGenericSignal_1(m_a->m_arpModel.value());
+		}
 }

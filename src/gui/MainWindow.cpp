@@ -380,12 +380,18 @@ void MainWindow::finalize()
 
 
 	m_toolsMenu = new QMenu( this );
+	PluginView *tp;
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
-		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
-						   ->createView(this) );
-	}
+			m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
+			tp = ToolPlugin::instantiate( desc->name, /*this*/NULL )->createView(this);
+			if ( !strcmp(desc->name, "chordtableeditor") )
+				{
+					//setting up the gui reference to the ChordTable editor plugin into gui
+					gui->setChordTableEditorView( tp );
+				}
+			m_tools.push_back( tp );
+		}
 	if( !m_toolsMenu->isEmpty() )
 	{
 		menuBar()->addMenu( m_toolsMenu )->setText( tr( "&Tools" ) );
