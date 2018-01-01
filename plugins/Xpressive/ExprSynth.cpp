@@ -296,6 +296,44 @@ inline unsigned int rotateLeft(unsigned int x, const int b)
 	return x;
 }
 
+struct RandomVectorSeedFunction : public exprtk::ifunction<float>
+{
+	using exprtk::ifunction<float>::operator();
+
+	RandomVectorSeedFunction() :
+	exprtk::ifunction<float>(2)
+	{ exprtk::disable_has_side_effects(*this); }
+
+	static inline float randv(const float& index,int irseed)
+	{
+		if (index < 0 || std::isnan(index) || std::isinf(index))
+		{
+			return 0;
+		}
+		const unsigned int xi = (unsigned int)index;
+		const unsigned int si = irseed % data_size;
+		const unsigned int sa = irseed / data_size;
+		unsigned int res=rotateLeft(random_data[(xi + 23 * si + 1) % data_size] ^ random_data[(xi / data_size + sa) % data_size],sa % 31 + 1);
+		res ^= rotateLeft(random_data[(3 * xi + si + 13) % data_size],(xi+2*si) % 32) ^rotateLeft( random_data[(xi / data_size + 2 * sa) % data_size],xi % 31 + 1);
+		return static_cast<int>(res) / (float)(1 << 31);
+	}
+
+	inline float operator()(const float& index,const float& seed)
+	{
+		int irseed;
+		if (seed < 0 || std::isnan(seed) || std::isinf(seed))
+		{
+			irseed=0;
+		}
+		else
+			irseed=(int)seed;
+		return randv(index,irseed);
+	}
+
+	static const int data_size=sizeof(random_data)/sizeof(int);
+};
+static RandomVectorSeedFunction randsv_func;
+
 struct RandomVectorFunction : public exprtk::ifunction<float>
 {
 	using exprtk::ifunction<float>::operator();
@@ -307,19 +345,9 @@ struct RandomVectorFunction : public exprtk::ifunction<float>
 
 	inline float operator()(const float& index)
 	{
-		if (index < 0 || std::isnan(index) || std::isinf(index))
-		{
-			return 0;
-		}
-		const unsigned int xi = (unsigned int)index;
-		const unsigned int si = m_rseed % data_size;
-		const unsigned int sa = m_rseed / data_size;
-		unsigned int res=rotateLeft(random_data[(xi + si) % data_size] ^ random_data[(xi / data_size + sa) % data_size],sa % 31 + 1);
-		res ^= rotateLeft(random_data[(3 * xi + si) % data_size] ^ random_data[(xi / data_size + 2 * sa) % data_size],xi % 31 + 1);
-		return static_cast<int>(res) / (float)(1 << 31);
+		return RandomVectorSeedFunction::randv(index,m_rseed);
 	}
 
-	const int data_size=sizeof(random_data)/sizeof(int);
 	const unsigned int m_rseed;
 };
 
@@ -369,6 +397,7 @@ public:
 	RandomVectorFunction m_rand_vec;
 	IntegrateFunction<float> *m_integ_func;
 	LastSampleFunction<float> m_last_func;
+
 };
 
 
@@ -500,6 +529,7 @@ ExprFront::ExprFront(const char * expr)
 		m_data->m_symbol_table.add_pi();
 	
 		m_data->m_symbol_table.add_constant("e", F_E);
+		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() % max_float_integer_mod);
 	
 		m_data->m_symbol_table.add_function("sinew", sin_wave_func);
 		m_data->m_symbol_table.add_function("squarew", square_wave_func);
@@ -513,6 +543,7 @@ ExprFront::ExprFront(const char * expr)
 		m_data->m_symbol_table.add_function("semitone", harmonic_semitone_func);
 		m_data->m_symbol_table.add_function("rand", simple_rand);
 		m_data->m_symbol_table.add_function("randv", m_data->m_rand_vec);
+		m_data->m_symbol_table.add_function("randsv", randsv_func);
 		m_data->m_symbol_table.add_function("last", m_data->m_last_func);
 	}
 	catch(...)

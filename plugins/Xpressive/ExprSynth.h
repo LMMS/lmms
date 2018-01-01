@@ -52,6 +52,8 @@ public:
 private:
 	ExprFrontData *m_data;
 	bool m_valid;
+	
+	static const int max_float_integer_mod=(1<<numeric_limits<float>::digits);
 };
 
 class WaveSample
