@@ -14,7 +14,6 @@ QTreeWidget::item  {
 QTreeView  {
 	outline: none;
 	font-size: 14px;
-	indentation: 10;
 	selection-background-color: transparent;
 }
 
@@ -22,7 +21,7 @@ QTreeWidget::item:hover  {
 	background-color: #3C444E;
 }
 
-QTreeWidget::item:selected  {
+QTreeWidget::item:!has-children:selected  {
 	background-color: #17793b;
 }
 
