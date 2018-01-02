@@ -749,6 +749,31 @@ bool LadspaManager::isInteger( const ladspa_key_t & _plugin,
 
 
 
+bool LadspaManager::isEnum( const ladspa_key_t & _plugin, uint32_t _port )
+{
+	if( m_ladspaManagerMap.contains( _plugin )
+		   && _port < getPortCount( _plugin ) )
+	{
+		LADSPA_Descriptor_Function descriptorFunction =
+			m_ladspaManagerMap[_plugin]->descriptorFunction;
+		const LADSPA_Descriptor * descriptor =
+				descriptorFunction(
+					m_ladspaManagerMap[_plugin]->index );
+		LADSPA_PortRangeHintDescriptor hintDescriptor =
+			descriptor->PortRangeHints[_port].HintDescriptor;
+		// This is an LMMS extension to ladspa
+		return( LADSPA_IS_HINT_INTEGER( hintDescriptor ) &&
+			LADSPA_IS_HINT_TOGGLED( hintDescriptor ) );
+	}
+	else
+	{
+		return( false );
+	}
+}
+
+
+
+
 QString LadspaManager::getPortName( const ladspa_key_t & _plugin,
 								uint32_t _port )
 {

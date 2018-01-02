@@ -179,6 +179,12 @@ public:
 	be described as [-0.1, 3.1]. */
 	bool  isInteger( const ladspa_key_t & _plugin, uint32_t _port );
 
+	/* Indicates that a user interface would probably wish to provide a
+	stepped control taking only integer values. This is equal to isInteger,
+	but the number of values is usually small and may be better depicted
+	with a combo box. */
+	bool  isEnum( const ladspa_key_t & _plugin, uint32_t _port );
+
 	/* Returns the name of the port. */
 	QString  getPortName( const ladspa_key_t & _plugin, uint32_t _port );
 

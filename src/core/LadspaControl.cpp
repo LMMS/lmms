@@ -59,6 +59,7 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 			break;
 
 		case INTEGER:
+		case ENUM:
 			m_knobModel.setRange( static_cast<int>( m_port->max ),
 					  static_cast<int>( m_port->min ),
 					  1 + static_cast<int>( m_port->max -
@@ -117,6 +118,7 @@ LADSPA_Data LadspaControl::value()
 		case TOGGLED:
 			return static_cast<LADSPA_Data>( m_toggledModel.value() );
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			return static_cast<LADSPA_Data>( m_knobModel.value() );
 		case TIME:
@@ -136,6 +138,7 @@ ValueBuffer * LadspaControl::valueBuffer()
 	{
 		case TOGGLED:
 		case INTEGER:
+		case ENUM:
 			return NULL;
 		case FLOATING:
 			return m_knobModel.valueBuffer();
@@ -159,6 +162,7 @@ void LadspaControl::setValue( LADSPA_Data _value )
 			m_toggledModel.setValue( static_cast<bool>( _value ) );
 			break;
 		case INTEGER:
+		case ENUM:
 			m_knobModel.setValue( static_cast<int>( _value ) );
 			break;
 		case FLOATING:
@@ -193,6 +197,7 @@ void LadspaControl::saveSettings( QDomDocument& doc,
 			m_toggledModel.saveSettings( doc, e, "data" );
 			break;
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			m_knobModel.saveSettings( doc, e, "data" );
 			break;
@@ -236,6 +241,7 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 			m_toggledModel.loadSettings( e, dataModelName );
 			break;
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			m_knobModel.loadSettings( e, dataModelName );
 			break;
@@ -259,6 +265,7 @@ void LadspaControl::linkControls( LadspaControl * _control )
 			BoolModel::linkModels( &m_toggledModel, _control->toggledModel() );
 			break;
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			FloatModel::linkModels( &m_knobModel, _control->knobModel() );
 			break;
@@ -309,6 +316,7 @@ void LadspaControl::unlinkControls( LadspaControl * _control )
 			BoolModel::unlinkModels( &m_toggledModel, _control->toggledModel() );
 			break;
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			FloatModel::unlinkModels( &m_knobModel, _control->knobModel() );
 			break;
