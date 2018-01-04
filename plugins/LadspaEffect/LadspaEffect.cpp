@@ -375,7 +375,7 @@ void LadspaEffect::pluginInstantiation()
 			{
 				p->data_type = ENUM;
 			}
-			if( manager->isPortToggled( m_key, port ) )
+			else if( manager->isPortToggled( m_key, port ) )
 			{
 				p->data_type = TOGGLED;
 			}

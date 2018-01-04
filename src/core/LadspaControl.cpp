@@ -48,6 +48,8 @@ LadspaControl::LadspaControl( Model * _parent, port_desc_t * _port,
 	switch( m_port->data_type )
 	{
 		case TOGGLED:
+			m_toggledModel.setInitValue(
+				static_cast<bool>( m_port->def ) );
 			connect( &m_toggledModel, SIGNAL( dataChanged() ),
 					 this, SLOT( ledChanged() ) );
 			if( m_port->def == 1.0f )
@@ -221,36 +223,64 @@ void LadspaControl::loadSettings( const QDomElement& parent, const QString& name
 	QString linkModelName = "link";
 	QDomElement e = parent.namedItem( name ).toElement();
 
-	// COMPAT < 1.0.0: detect old data format where there's either no dedicated sub
-	// element or there's a direct sub element with automation link information
-	if( e.isNull() || e.hasAttribute( "id" ) )
+	if(e.isNull())
 	{
-		dataModelName = name;
-		linkModelName = name + "link";
-		e = parent;
+		// the port exists in the current effect, but not in the
+		// savefile => it's a new port, so load the default value
+		if( m_link )
+			m_linkEnabledModel.setValue(m_linkEnabledModel.initValue());
+		switch( m_port->data_type )
+		{
+			case TOGGLED:
+				m_toggledModel.setValue(m_toggledModel.initValue());
+				break;
+			case INTEGER:
+			case ENUM:
+			case FLOATING:
+				m_knobModel.setValue(m_knobModel.initValue());
+				break;
+			case TIME:
+				m_tempoSyncKnobModel.setValue(m_tempoSyncKnobModel.initValue());
+				break;
+			default:
+				printf("LadspaControl::loadSettings BAD BAD BAD\n");
+				break;
+		}
 	}
-
-	if( m_link )
+	else
 	{
-		m_linkEnabledModel.loadSettings( e, linkModelName );
-	}
 
-	switch( m_port->data_type )
-	{
-		case TOGGLED:
-			m_toggledModel.loadSettings( e, dataModelName );
-			break;
-		case INTEGER:
-		case ENUM:
-		case FLOATING:
-			m_knobModel.loadSettings( e, dataModelName );
-			break;
-		case TIME:
-			m_tempoSyncKnobModel.loadSettings( e, dataModelName );
-			break;
-		default:
-			printf("LadspaControl::loadSettings BAD BAD BAD\n");
-			break;
+		// COMPAT < 1.0.0: detect old data format where there's either no dedicated sub
+		// element or there's a direct sub element with automation link information
+		if( e.isNull() || e.hasAttribute( "id" ) )
+		{
+			dataModelName = name;
+			linkModelName = name + "link";
+			e = parent;
+		}
+
+		if( m_link )
+		{
+			m_linkEnabledModel.loadSettings( e, linkModelName );
+		}
+
+		switch( m_port->data_type )
+		{
+			case TOGGLED:
+				m_toggledModel.loadSettings( e, dataModelName );
+				break;
+			case INTEGER:
+			case ENUM:
+			case FLOATING:
+				m_knobModel.loadSettings( e, dataModelName );
+				break;
+			case TIME:
+				m_tempoSyncKnobModel.loadSettings( e, dataModelName );
+				break;
+			default:
+				printf("LadspaControl::loadSettings BAD BAD BAD\n");
+				break;
+		}
 	}
 }
 
