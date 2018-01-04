@@ -9,7 +9,6 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView  {
 	outline: none;
-	font-size: 14px;
 	selection-background-color: transparent;
 	selection-color: #d1d8e4;
 }
