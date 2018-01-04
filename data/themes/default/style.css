@@ -11,6 +11,7 @@ QTreeView  {
 	outline: none;
 	font-size: 14px;
 	selection-background-color: transparent;
+	selection-color: #d1d8e4;
 }
 
 QTreeWidget::item:hover  {
@@ -19,6 +20,14 @@ QTreeWidget::item:hover  {
 
 QTreeWidget::item:selected  {
 	background-color: #17793b;
+}
+
+QTreeView::branch:has-children:open {
+	border-image: url("resources:open_branch.png") 0;
+}
+
+QTreeView::branch:has-children:closed {
+	border-image: url("resources:closed_branch.png") 0;
 }
 
 QMdiArea {
