@@ -7,6 +7,10 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 	color: #d1d8e4;
 }
 
+QTreeView {
+	outline: none;
+}
+
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
 	background-color: #3C444E;
