@@ -110,6 +110,7 @@ static VstHostLanguages hlang = LanguageEnglish;
 static bool EMBED = false;
 static bool EMBED_X11 = false;
 static bool EMBED_WIN32 = false;
+static bool HEADLESS = false;
 
 class RemoteVstPlugin;
 
@@ -354,7 +355,6 @@ private:
 	int m_windowHeight;
 
 	bool m_initialized;
-	bool m_registeredWindowClass;
 
 	pthread_mutex_t m_pluginLock;
 	bool m_processing;
@@ -407,7 +407,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
-	m_registeredWindowClass( false ),
 	m_pluginLock(),
 	m_processing( false ),
 	m_messageList(),
@@ -718,7 +717,7 @@ static void close_check( int fd )
 
 void RemoteVstPlugin::initEditor()
 {
-	if( m_window || !( m_plugin->flags & effFlagsHasEditor ) )
+	if( HEADLESS || m_window || !( m_plugin->flags & effFlagsHasEditor ) )
 	{
 		return;
 	}
@@ -731,27 +730,6 @@ void RemoteVstPlugin::initEditor()
 		return;
 	}
 
-
-	if( !m_registeredWindowClass )
-	{
-		WNDCLASS wc;
-		wc.style = CS_HREDRAW | CS_VREDRAW;
-		wc.lpfnWndProc = DefWindowProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInst;
-		wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
-		wc.hCursor = LoadCursor( NULL, IDC_ARROW );
-		wc.hbrBackground = NULL;
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = "LVSL";
-
-		if( !RegisterClass( &wc ) )
-		{
-			return;
-		}
-		m_registeredWindowClass = true;
-	}
 
 	DWORD dwStyle;
 	if (EMBED) {
@@ -2062,6 +2040,29 @@ int main( int _argc, char * * _argv )
 	}
 #endif
 
+	HMODULE hInst = GetModuleHandle( NULL );
+	if( hInst == NULL )
+	{
+		return -1;
+	}
+
+	WNDCLASS wc;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = DefWindowProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInst;
+	wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+	wc.hbrBackground = NULL;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = "LVSL";
+
+	if( !RegisterClass( &wc ) )
+	{
+		return -1;
+	}
+
 	{
 	#ifdef SYNC_WITH_SHM_FIFO
 		int embedMethodIndex = 3;
@@ -2073,27 +2074,32 @@ int main( int _argc, char * * _argv )
 		if ( embedMethod == "none" )
 		{
 			cerr << "Starting detached." << endl;
-			EMBED = EMBED_X11 = EMBED_WIN32 = false;
+			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 		else if ( embedMethod == "win32" )
 		{
 			cerr << "Starting using Win32-native embedding." << endl;
-			EMBED = EMBED_WIN32 = true; EMBED_X11= false;
+			EMBED = EMBED_WIN32 = true; EMBED_X11 = HEADLESS = false;
 		}
 		else if ( embedMethod == "qt" )
 		{
 			cerr << "Starting using Qt-native embedding." << endl;
-			EMBED = true; EMBED_X11 = EMBED_WIN32 = false;
+			EMBED = true; EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 		else if ( embedMethod == "xembed" )
 		{
 			cerr << "Starting using X11Embed protocol." << endl;
-			EMBED = EMBED_X11 = true; EMBED_WIN32 = false;
+			EMBED = EMBED_X11 = true; EMBED_WIN32 = HEADLESS = false;
+		}
+		else if ( embedMethod == "headless" )
+		{
+			cerr << "Starting without UI." << endl;
+			HEADLESS = true; EMBED = EMBED_X11 = EMBED_WIN32 = false;
 		}
 		else
 		{
 			cerr << "Unknown embed method " << embedMethod << ". Starting detached instead." << endl;
-			EMBED = EMBED_X11 = EMBED_WIN32 = false;
+			EMBED = EMBED_X11 = EMBED_WIN32 = HEADLESS = false;
 		}
 	}
 
