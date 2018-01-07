@@ -1499,7 +1499,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// value is 0 for input and != 0 otherwise. note: the
 			// return value is 0 for <true> such that older versions
 			// will always return true.
-			return 1;
+			return 0;
 
 		case audioMasterGetTime:
 			SHOW_CALLBACK( "amc: audioMasterGetTime\n" );
