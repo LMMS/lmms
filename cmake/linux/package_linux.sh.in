@@ -55,8 +55,8 @@ fi
 echo -e "\nWriting verbose output to \"${LOGFILE}\""
 
 # Ensure linuxdeployqt uses the same qmake version as cmake
-export PATH
 PATH="$HOME/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+export PATH
 
 # Fetch portable linuxdeployqt if cache is older than $DAYSOLD
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
