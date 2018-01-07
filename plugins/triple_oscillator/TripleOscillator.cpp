@@ -300,8 +300,9 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 {
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		Oscillator * oscs_l[NUM_OF_OSCILLATORS];
-		Oscillator * oscs_r[NUM_OF_OSCILLATORS];
+		auto allOscs = MM_ALLOC( Oscillator, NUM_OF_OSCILLATORS*2 );
+		Oscillator * oscs_l = allOscs;
+		Oscillator * oscs_r = allOscs + NUM_OF_OSCILLATORS;
 
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
@@ -309,14 +310,14 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
 			{
-				oscs_l[i] = new Oscillator(
+				new (&oscs_l[i]) Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft );
-				oscs_r[i] = new Oscillator(
+				new (&oscs_r[i])Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
@@ -326,33 +327,32 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			}
 			else
 			{
-				oscs_l[i] = new Oscillator(
+				new (&oscs_l[i]) Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
 						m_osc[i]->m_volumeLeft,
-						oscs_l[i + 1] );
-				oscs_r[i] = new Oscillator(
+						&oscs_l[i + 1] );
+				new (&oscs_r[i]) Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,
 						m_osc[i]->m_volumeRight,
-						oscs_r[i + 1] );
+						&oscs_r[i + 1] );
 			}
 
-			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
-			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
+			oscs_l[i].setUserWave( m_osc[i]->m_sampleBuffer );
+			oscs_r[i].setUserWave( m_osc[i]->m_sampleBuffer );
 
 		}
 
 		_n->m_pluginData = new oscPtr;
-		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = oscs_l[0];
-		static_cast< oscPtr *>( _n->m_pluginData )->oscRight =
-								oscs_r[0];
+		static_cast<oscPtr *>( _n->m_pluginData )->oscLeft = &oscs_l[0];
+		static_cast<oscPtr *>( _n->m_pluginData )->oscRight = &oscs_r[0];
 	}
 
 	Oscillator * osc_l = static_cast<oscPtr *>( _n->m_pluginData )->oscLeft;
@@ -374,10 +374,9 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 void TripleOscillator::deleteNotePluginData( NotePlayHandle * _n )
 {
-	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
-						_n->m_pluginData )->oscLeft );
-	delete static_cast<Oscillator *>( static_cast<oscPtr *>(
-						_n->m_pluginData )->oscRight );
+	auto ptr = static_cast<oscPtr*>(_n->m_pluginData)->oscLeft;
+	//It is safe to simply free the oscillators because they don't own anything.
+	MM_FREE( ptr );
 	delete static_cast<oscPtr *>( _n->m_pluginData );
 }
 
