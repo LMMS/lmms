@@ -470,13 +470,6 @@ ELSE()
 	SET (STATUS_DEBUG_FPE "Disabled")
 ENDIF(WANT_DEBUG_FPE)
 
-IF(LMMS_BUILD_LINUX)
-	SET(LMMS_DEBUG_PERFLOG TRUE)
-	SET(STATUS_DEBUG_PERFLOG "Enabled")
-ELSE()
-	SET(STATUS_DEBUG_PERFLOG "Wanted but disabled due to unsupported platform")
-ENDIF()
-
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
 
@@ -673,7 +666,6 @@ MESSAGE(
 "Developer options\n"
 "-----------------------------------------\n"
 "* Debug FP exceptions         : ${STATUS_DEBUG_FPE}\n"
-"* Performance log             : ${STATUS_DEBUG_PERFLOG}\n"
 )
 
 MESSAGE(
