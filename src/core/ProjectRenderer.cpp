@@ -27,6 +27,7 @@
 
 #include "ProjectRenderer.h"
 #include "Song.h"
+#include "PerfLog.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -180,6 +181,8 @@ void ProjectRenderer::run()
 #endif
 #endif
 
+	PerfLog perfLog("Project Render");
+
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
@@ -211,6 +214,8 @@ void ProjectRenderer::run()
 	Engine::mixer()->stopProcessing();
 
 	Engine::getSong()->stopExport();
+
+	perfLog.end();
 
 	// If the user aborted export-process, the file has to be deleted.
 	const QString f = m_fileDev->outputFile();
