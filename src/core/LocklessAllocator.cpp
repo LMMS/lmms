@@ -25,10 +25,12 @@
 #include "LocklessAllocator.h"
 
 #include <stdio.h>
-#include <strings.h>
 
 #include "lmmsconfig.h"
 
+#ifndef LMMS_BUILD_WIN32
+#include <strings.h>
+#endif
 
 static const size_t SIZEOF_SET = sizeof( int ) * 8;
 

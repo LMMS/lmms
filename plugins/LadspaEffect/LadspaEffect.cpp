@@ -24,6 +24,7 @@
  */
 
 
+#include <QtCore/QVarLengthArray>
 #include <QMessageBox>
 
 #include "LadspaEffect.h"
@@ -141,12 +142,12 @@ bool LadspaEffect::processAudioBuffer( sampleFrame * _buf,
 
 	int frames = _frames;
 	sampleFrame * o_buf = NULL;
-	sampleFrame sBuf [_frames];
+	QVarLengthArray<sample_t> sBuf(_frames * DEFAULT_CHANNELS);
 
 	if( m_maxSampleRate < Engine::mixer()->processingSampleRate() )
 	{
 		o_buf = _buf;
-		_buf = &sBuf[0];
+		_buf = reinterpret_cast<sampleFrame*>(sBuf.data());
 		sampleDown( o_buf, _buf, m_maxSampleRate );
 		frames = _frames * m_maxSampleRate /
 				Engine::mixer()->processingSampleRate();
@@ -593,7 +594,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new LadspaEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

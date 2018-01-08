@@ -40,7 +40,14 @@ class QMoveEvent;
 class QResizeEvent;
 class QWidget;
 
-
+/**
+ * @brief The SubWindow class
+ * 
+ *  Because of a bug in the QMdiSubWindow class to save the right position and size
+ *  of a subwindow in a project and because of the inability
+ *  for cusomizing the title bar appearance, lmms implements its own subwindow
+ *  class.
+ */
 class EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT

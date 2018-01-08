@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QVarLengthArray>
 #include <QDomElement>
 
 #include "InstrumentSoundShaping.h"
@@ -153,8 +154,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	if( m_filterEnabledModel.value() )
 	{
-		float cutBuffer [frames];
-		float resBuffer [frames];
+		QVarLengthArray<float> cutBuffer(frames);
+		QVarLengthArray<float> resBuffer(frames);
 
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
@@ -167,11 +168,11 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 		if( m_envLfoParameters[Cut]->isUsed() )
 		{
-			m_envLfoParameters[Cut]->fillLevel( cutBuffer, envTotalFrames, envReleaseBegin, frames );
+			m_envLfoParameters[Cut]->fillLevel( cutBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 		}
 		if( m_envLfoParameters[Resonance]->isUsed() )
 		{
-			m_envLfoParameters[Resonance]->fillLevel( resBuffer, envTotalFrames, envReleaseBegin, frames );
+			m_envLfoParameters[Resonance]->fillLevel( resBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 		}
 
 		const float fcv = m_filterCutModel.value();
@@ -246,8 +247,8 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 
 	if( m_envLfoParameters[Volume]->isUsed() )
 	{
-		float volBuffer [frames];
-		m_envLfoParameters[Volume]->fillLevel( volBuffer, envTotalFrames, envReleaseBegin, frames );
+		QVarLengthArray<float> volBuffer(frames);
+		m_envLfoParameters[Volume]->fillLevel( volBuffer.data(), envTotalFrames, envReleaseBegin, frames );
 
 		for( fpp_t frame = 0; frame < frames; ++frame )
 		{

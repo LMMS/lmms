@@ -33,6 +33,7 @@
 #include "TrackContainer.h"
 #include "Controller.h"
 #include "MeterModel.h"
+#include "Mixer.h"
 #include "VstSyncController.h"
 
 
@@ -104,17 +105,36 @@ public:
 
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds;
+		return m_elapsedMilliSeconds[m_playMode];
 	}
 
-	inline void setToTime( MidiTime const & midiTime )
+	inline int getMilliseconds(PlayModes playMode) const
 	{
-		m_elapsedMilliSeconds = midiTime.getTimeInMilliseconds(getTempo());
+		return m_elapsedMilliSeconds[playMode];
+	}
+
+	inline void setToTime(MidiTime const & midiTime)
+	{
+		m_elapsedMilliSeconds[m_playMode] = midiTime.getTimeInMilliseconds(getTempo());
+		m_playPos[m_playMode].setTicks(midiTime.getTicks());
+	}
+
+	inline void setToTime(MidiTime const & midiTime, PlayModes playMode)
+	{
+		m_elapsedMilliSeconds[playMode] = midiTime.getTimeInMilliseconds(getTempo());
+		m_playPos[playMode].setTicks(midiTime.getTicks());
 	}
 
 	inline void setToTimeByTicks(tick_t ticks)
 	{
-		m_elapsedMilliSeconds = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_elapsedMilliSeconds[m_playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_playPos[m_playMode].setTicks(ticks);
+	}
+
+	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
+	{
+		m_elapsedMilliSeconds[playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_playPos[playMode].setTicks(ticks);
 	}
 
 	inline int getTacts() const
@@ -237,6 +257,17 @@ public:
 		return m_loadingProject;
 	}
 
+	void loadingCancelled()
+	{
+		m_isCancelled = true;
+		Engine::mixer()->clearNewPlayHandles();
+	}
+
+	bool isCancelled()
+	{
+		return m_isCancelled;
+	}
+
 	bool isModified() const
 	{
 		return m_modified;
@@ -267,6 +298,9 @@ public:
 		return m_timeSigModel;
 	}
 
+	void exportProjectMidi(QString const & exportFileName) const;
+
+	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
 
 public slots:
 	void playSong();
@@ -276,11 +310,6 @@ public slots:
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
-
-	void importProject();
-	void exportProject( bool multiExport = false );
-	void exportProjectTracks();
-	void exportProjectMidi();
 
 	void startExport();
 	void stopExport();
@@ -341,6 +370,10 @@ private:
 
 	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
+	void setModified(bool value);
+
+	void setProjectFileName(QString const & projectFileName);
+
 	AutomationTrack * m_globalAutomationTrack;
 
 	IntModel m_tempoModel;
@@ -366,6 +399,7 @@ private:
 	volatile bool m_paused;
 
 	bool m_loadingProject;
+	bool m_isCancelled;
 
 	QStringList m_errors;
 
@@ -376,7 +410,7 @@ private:
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
-	double m_elapsedMilliSeconds;
+	double m_elapsedMilliSeconds[Mode_Count];
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
@@ -398,7 +432,9 @@ signals:
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();
-
+	void stopped();
+	void modified();
+	void projectFileNameChanged();
 } ;
 
 

@@ -397,8 +397,9 @@ signals:
 
 // some typed AutomatableModel-definitions
 
-class FloatModel : public AutomatableModel
+class EXPORT FloatModel : public AutomatableModel
 {
+	Q_OBJECT
 public:
 	FloatModel( float val = 0, float min = 0, float max = 0, float step = 0,
 				Model * parent = NULL,
@@ -414,8 +415,9 @@ public:
 } ;
 
 
-class IntModel : public AutomatableModel
+class EXPORT IntModel : public AutomatableModel
 {
+	Q_OBJECT
 public:
 	IntModel( int val = 0, int min = 0, int max = 0,
 				Model* parent = NULL,
@@ -430,8 +432,9 @@ public:
 } ;
 
 
-class BoolModel : public AutomatableModel
+class EXPORT BoolModel : public AutomatableModel
 {
+	Q_OBJECT
 public:
 	BoolModel( const bool val = false,
 				Model* parent = NULL,

@@ -152,7 +152,8 @@ AutomationEditor::AutomationEditor() :
 	m_timeLine = new TimeLineWidget( VALUES_WIDTH, 0, m_ppt,
 				Engine::getSong()->getPlayPos(
 					Song::Mode_PlayAutomationPattern ),
-						m_currentPosition, this );
+					m_currentPosition,
+					Song::Mode_PlayAutomationPattern, this );
 	connect( this, SIGNAL( positionChanged( const MidiTime & ) ),
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
@@ -434,9 +435,11 @@ void AutomationEditor::leaveEvent(QEvent * e )
 }
 
 
-void AutomationEditor::drawLine( int x0, float y0, int x1, float y1 )
+void AutomationEditor::drawLine( int x0In, float y0, int x1In, float y1 )
 {
-	int deltax = qRound( qAbs<float>( x1 - x0 ) );
+	int x0 = Note::quantized( x0In, AutomationPattern::quantization() );
+	int x1 = Note::quantized( x1In, AutomationPattern::quantization() );
+	int deltax = qAbs( x1 - x0 );
 	float deltay = qAbs<float>( y1 - y0 );
 	int x = x0;
 	float y = y0;
@@ -452,7 +455,7 @@ void AutomationEditor::drawLine( int x0, float y0, int x1, float y1 )
 
 	float yscale = deltay / ( deltax );
 
-	if( x0 < x1)
+	if( x0 < x1 )
 	{
 		xstep = AutomationPattern::quantization();
 	}
@@ -461,19 +464,22 @@ void AutomationEditor::drawLine( int x0, float y0, int x1, float y1 )
 		xstep = -( AutomationPattern::quantization() );
 	}
 
+	float lineAdjust;
 	if( y0 < y1 )
 	{
 		ystep = 1;
+		lineAdjust = yscale;
 	}
 	else
 	{
 		ystep = -1;
+		lineAdjust = -( yscale );
 	}
 
 	int i = 0;
 	while( i < deltax )
 	{
-		y = y0 + ( ystep * yscale * i );
+		y = y0 + ( ystep * yscale * i ) + lineAdjust;
 
 		x += xstep;
 		i += 1;
@@ -517,16 +523,13 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 			// loop through whole time-map...
 			while( it != time_map.end() )
 			{
-				MidiTime len = 4;
-
 				// and check whether the user clicked on an
 				// existing value
 				if( pos_ticks >= it.key() &&
-					len > 0 &&
 					( it+1==time_map.end() ||
 						pos_ticks <= (it+1).key() ) &&
 		( pos_ticks<= it.key() + MidiTime::ticksPerTact() *4 / m_ppt ) &&
-					level <= it.value() )
+		( level == it.value() || mouseEvent->button() == Qt::RightButton ) )
 				{
 					break;
 				}
@@ -1378,13 +1381,13 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 				float *values = m_pattern->valuesAfter( it.key() );
 
 				float nextValue;
-				if ( m_pattern->valuesAfter( ( it + 1 ).key() ) != NULL )
+				if( m_pattern->progressionType() == AutomationPattern::DiscreteProgression )
 				{
-					nextValue = *( m_pattern->valuesAfter( ( it + 1 ).key() ) );
+					nextValue = it.value();
 				}
 				else
 				{
-					nextValue = values[ ( it + 1 ).key() - it.key() -1 ];
+					nextValue = ( it + 1 ).value();
 				}
 
 				p.setRenderHints( QPainter::Antialiasing, true );
@@ -2376,8 +2379,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	//	copyPasteActionsToolBar->addAction( pasteAction );
 
 
-	DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
-	m_editor->m_timeLine->addToolButtons(timeLineToolBar);
+	// Not implemented.
+	//DropToolBar *timeLineToolBar = addDropToolBarToTop(tr("Timeline controls"));
+	//m_editor->m_timeLine->addToolButtons(timeLineToolBar);
 
 
 	addToolBarBreak();
