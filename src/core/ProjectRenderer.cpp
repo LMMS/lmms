@@ -181,7 +181,7 @@ void ProjectRenderer::run()
 #endif
 #endif
 
-	PerfLog perfLog("Project Render");
+	PerfLogTimer perfLog("Project Render");
 
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();

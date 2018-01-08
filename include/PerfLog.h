@@ -56,11 +56,11 @@ private:
 ///
 /// Measures time between construction and destruction and prints the result to
 /// stderr, along with \p name. Alternatively, call begin() and end() explicitly.
-class PerfLog
+class PerfLogTimer
 {
  public:
-	PerfLog(const QString& name);
-	~PerfLog();
+	PerfLogTimer(const QString& name);
+	~PerfLogTimer();
 
 	void begin();
 	void end();

@@ -95,23 +95,23 @@ PerfTime operator-(const PerfTime& lhs, const PerfTime& rhs)
 	return diff;
 }
 
-PerfLog::PerfLog(const QString& what)
+PerfLogTimer::PerfLogTimer(const QString& what)
 	: name(what)
 {
 	begin();
 }
 
-PerfLog::~PerfLog()
+PerfLogTimer::~PerfLogTimer()
 {
 	end();
 }
 
-void PerfLog::begin()
+void PerfLogTimer::begin()
 {
 	begin_time = PerfTime::now();
 }
 
-void PerfLog::end()
+void PerfLogTimer::end()
 {
 	if (! begin_time.valid()) {
 		return;
