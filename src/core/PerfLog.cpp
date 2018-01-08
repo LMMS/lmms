@@ -26,7 +26,7 @@
 
 #include "lmmsconfig.h"
 
-#if defined(LMMS_HAVE_SYS_TIME_H) && defined(LMMS_HAVE_UNISTD_H)
+#if defined(LMMS_HAVE_SYS_TIMES_H) && defined(LMMS_HAVE_UNISTD_H)
 #	define USE_POSIX_TIME
 #endif
 
