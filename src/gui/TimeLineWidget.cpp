@@ -349,7 +349,6 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 						#endif
 					embed::getIconPixmap( "hint" ), 0 );
 	}
-
 	mouseMoveEvent( event );
 }
 
