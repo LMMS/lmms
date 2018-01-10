@@ -25,6 +25,8 @@
 #include <QMessageBox>
 
 #include "VstEffect.h"
+
+#include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
@@ -123,7 +125,7 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 void VstEffect::openPlugin( const QString & _plugin )
 {
 	TextFloat * tf = NULL;
-	if( !Engine::mixer()->isRenderOnly() )
+	if( gui )
 	{
 		tf = TextFloat::displayMessage(
 			VstPlugin::tr( "Loading plugin" ),

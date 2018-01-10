@@ -88,9 +88,9 @@ public:
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( _plugin ),
 	m_pluginWindowID( 0 ),
-	m_embedMethod( Engine::mixer()->isRenderOnly()
-			? "headless"
-			: ConfigManager::inst()->vstEmbedMethod() ),
+	m_embedMethod( gui
+			? ConfigManager::inst()->vstEmbedMethod()
+			: "headless" ),
 	m_badDllFormat( false ),
 	m_version( 0 ),
 	m_currentProgram()

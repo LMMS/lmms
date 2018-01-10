@@ -258,7 +258,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
 	TextFloat * tf = NULL;
-	if( !Engine::mixer()->isRenderOnly() )
+	if( gui )
 	{
 		tf = TextFloat::displayMessage(
 				tr( "Loading plugin" ),

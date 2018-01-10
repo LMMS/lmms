@@ -240,11 +240,6 @@ public:
 		return m_qualitySettings;
 	}
 
-	bool isRenderOnly() const
-	{
-		return m_renderOnly;
-	}
-
 
 	sample_rate_t baseSampleRate() const;
 	sample_rate_t outputSampleRate() const;
