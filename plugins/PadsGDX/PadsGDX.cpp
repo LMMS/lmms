@@ -418,7 +418,7 @@ bool PadsGDX::checkPointBounds(int key) {
 		return false;
 	}
 
-	SampleBuffer* sample = m_sampleBuffer[key];
+	SampleBuffer* sample = m_sampleBuffer[key]; Q_UNUSED(sample);
 
 	m_checking = true;
 	setJournalling(false);
@@ -656,7 +656,7 @@ void PadsGDX::loadSettings(const QDomElement & element) {
 
 extern "C" {
 // necessary for getting instance out of shared lib
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model *, void* dat) {
+Plugin* PLUGIN_EXPORT lmms_plugin_main(Model *, void* data) {
 	return new PadsGDX(static_cast<InstrumentTrack*>(data));
 }
 }
