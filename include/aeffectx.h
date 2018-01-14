@@ -28,6 +28,9 @@
 
 #include <stdint.h>
 
+// Calling convention
+#define VST_CALL_CONV __cdecl
+
 #define CCONST(a, b, c, d)( ( ( (int32_t) a ) << 24 ) |		\
 				( ( (int32_t) b ) << 16 ) |		\
 				( ( (int32_t) c ) << 8 ) |		\
@@ -205,13 +208,13 @@ public:
 	// 00-03
 	int32_t magic;
 	// dispatcher 04-07
-	intptr_t (* dispatcher)( AEffect * , int32_t , int32_t , intptr_t, void * , float );
+	intptr_t (VST_CALL_CONV * dispatcher)( AEffect * , int32_t , int32_t , intptr_t, void * , float );
 	// process, quite sure 08-0b
-	void (* process)( AEffect * , float * * , float * * , int32_t );
+	void (VST_CALL_CONV * process)( AEffect * , float * * , float * * , int32_t );
 	// setParameter 0c-0f
-	void (* setParameter)( AEffect * , int32_t , float );
+	void (VST_CALL_CONV * setParameter)( AEffect * , int32_t , float );
 	// getParameter 10-13
-	float (* getParameter)( AEffect * , int32_t );
+	float (VST_CALL_CONV * getParameter)( AEffect * , int32_t );
 	// programs 14-17
 	int32_t numPrograms;
 	// Params 18-1b
@@ -238,7 +241,7 @@ public:
 	// Don't know 4c-4f
 	char unknown1[4];
 	// processReplacing 50-53
-	void (* processReplacing)( AEffect * , float * * , float * * , int );
+	void (VST_CALL_CONV * processReplacing)( AEffect * , float * * , float * * , int );
 
 } ;
 
@@ -281,7 +284,7 @@ public:
 
 
 
-typedef intptr_t (* audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
+typedef intptr_t (VST_CALL_CONV * audioMasterCallback)( AEffect * , int32_t, int32_t, intptr_t, void * , float );
 
 
 #endif
