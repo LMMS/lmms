@@ -419,6 +419,7 @@ enum RemoteMessageIDs
 	IdQuit,
 	IdSampleRateInformation,
 	IdBufferSizeInformation,
+	IdInformationUpdated,
 	IdMidiEvent,
 	IdStartProcessing,
 	IdProcessingDone,
@@ -807,6 +808,7 @@ public:
 	{
 		lock();
 		sendMessage( message( IdSampleRateInformation ).addInt( _sr ) );
+		waitForMessage( IdInformationUpdated, true );
 		unlock();
 	}
 
@@ -1318,9 +1320,14 @@ bool RemotePluginClient::processMessage( const message & _m )
 		case IdSampleRateInformation:
 			m_sampleRate = _m.getInt();
 			updateSampleRate();
+			reply_message.id = IdInformationUpdated;
+			reply = true;
 			break;
 
 		case IdBufferSizeInformation:
+			// Should LMMS gain the ability to change buffer size
+			// without a restart, it must wait for this message to
+			// complete processing or else risk VST crashes
 			m_bufferSize = _m.getInt();
 			updateBufferSize();
 			break;

@@ -308,6 +308,7 @@ void VstPlugin::updateSampleRate()
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
 			addInt( Engine::mixer()->processingSampleRate() ) );
+	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }
 

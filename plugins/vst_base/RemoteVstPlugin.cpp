@@ -238,19 +238,14 @@ public:
 	// has to be called as soon as input- or output-count changes
 	void updateInOutCount();
 
-	inline void lock()
-	{
-		pthread_mutex_lock( &m_pluginLock );
-	}
-
-	inline void unlock()
-	{
-		pthread_mutex_unlock( &m_pluginLock );
-	}
-
 	inline void lockShm()
 	{
 		pthread_mutex_lock( &m_shmLock );
+	}
+
+	inline bool tryLockShm()
+	{
+		return pthread_mutex_trylock( &m_shmLock ) == 0;
 	}
 
 	inline void unlockShm()
@@ -319,22 +314,8 @@ private:
 
 	bool load( const std::string & _plugin_file );
 
-	// thread-safe dispatching of plugin
 	int pluginDispatch( int cmd, int param1 = 0, int param2 = 0,
 					void * p = NULL, float f = 0 )
-	{
-		int ret = 0;
-		lock();
-		if( m_plugin )
-		{
-			ret = m_plugin->dispatcher( m_plugin, cmd, param1, param2, p, f );
-		}
-		unlock();
-		return ret;
-	}
-
-	// thread-safe dispatching of plugin
-	int pluginDispatchNoLocking( int cmd, int param1 = 0, int param2 = 0, void * p = NULL, float f = 0 )
 	{
 		if( m_plugin )
 		{
@@ -356,7 +337,6 @@ private:
 
 	bool m_initialized;
 
-	pthread_mutex_t m_pluginLock;
 	bool m_processing;
 
 	std::queue<message> m_messageList;
@@ -407,7 +387,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
-	m_pluginLock(),
 	m_processing( false ),
 	m_messageList(),
 	m_shouldGiveIdle( false ),
@@ -423,7 +402,6 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_shmID( -1 ),
 	m_vstSyncData( NULL )
 {
-	pthread_mutex_init( &m_pluginLock, NULL );
 	pthread_mutex_init( &m_shmLock, NULL );
 
 	__plugin = this;
@@ -517,7 +495,6 @@ RemoteVstPlugin::~RemoteVstPlugin()
 	delete[] m_outputs;
 
 	pthread_mutex_destroy( &m_shmLock );
-	pthread_mutex_destroy( &m_pluginLock );
 }
 
 
@@ -622,9 +599,7 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 			break;
 
 		case IdVstSetParameter:
-			lock();
 			m_plugin->setParameter( m_plugin, _m.getInt( 0 ), _m.getFloat( 1 ) );
-			unlock();
 			//sendMessage( IdVstSetParameter );
 			break;
 
@@ -659,12 +634,8 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	}
 
 	updateInOutCount();
-
-	// some plugins have to set samplerate during init
-	if( m_vstSyncData->hasSHM )
-	{
-		updateSampleRate();
-	}
+	updateBufferSize();
+	updateSampleRate();
 
 	/* set program to zero */
 	/* i comment this out because it breaks dfx Geometer
@@ -884,13 +855,14 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 
 	// now we're ready to fetch sound from VST-plugin
 
-	lock();
-	lockShm();
+	if( !tryLockShm() )
+	{
+		return;
+	}
 
 	if( !isShmValid() )
 	{
 		unlockShm();
-		unlock();
 		return;
 	}
 
@@ -921,7 +893,6 @@ void RemoteVstPlugin::process( const sampleFrame * _in, sampleFrame * _out )
 #endif
 
 	unlockShm();
-	unlock();
 
 	m_currentSamplePos += bufferSize();
 }
@@ -1028,8 +999,6 @@ void RemoteVstPlugin::sendCurrentProgramName()
 
 void RemoteVstPlugin::getParameterDump()
 {
-	lock();
-
 	message m( IdVstParameterDump );
 	m.addInt( m_plugin->numParams );
 
@@ -1037,15 +1006,13 @@ void RemoteVstPlugin::getParameterDump()
 	{
 		char paramName[32];
 		memset( paramName, 0, sizeof( paramName ) );
-		pluginDispatchNoLocking( effGetParamName, i, 0, paramName );
+		pluginDispatch( effGetParamName, i, 0, paramName );
 		paramName[sizeof(paramName)-1] = 0;
 
 		m.addInt( i );
 		m.addString( paramName );
 		m.addFloat( m_plugin->getParameter( m_plugin, i ) );
 	}
-
-	unlock();
 
 	sendMessage( m );
 }
@@ -1055,7 +1022,6 @@ void RemoteVstPlugin::getParameterDump()
 
 void RemoteVstPlugin::setParameterDump( const message & _m )
 {
-	lock();
 	const int n = _m.getInt( 0 );
 	const int params = ( n > m_plugin->numParams ) ?
 					m_plugin->numParams : n;
@@ -1068,7 +1034,6 @@ void RemoteVstPlugin::setParameterDump( const message & _m )
 		item.value = _m.getFloat( ++p );
 		m_plugin->setParameter( m_plugin, item.index, item.value );
 	}
-	unlock();
 }
 
 
@@ -1221,14 +1186,12 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 			chunk_size = m_plugin->numParams * sizeof( float );
 			data = new char[ chunk_size ];
 			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( data );
-			lock();
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				float value = m_plugin->getParameter( m_plugin, i );
 				unsigned int * pValue = ( unsigned int * ) &value;
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
-			unlock();
 		} else chunk_size = (((m_plugin->numParams * sizeof( float )) + 56)*m_plugin->numPrograms);
 	}
 
@@ -1274,14 +1237,12 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 			pluginDispatch( effSetProgram, 0, j );
 			pluginDispatch( effGetProgramName, 0, 0, pBank->prgName );
 			fwrite ( pBank, 1, 56, stream );
-			lock();
 			for ( int i = 0; i < m_plugin->numParams; i++ )
 			{
 				value = m_plugin->getParameter( m_plugin, i );
 				pValue = ( unsigned int * ) &value;
 				toUIntArray[ i ] = endian_swap( *pValue );
 			}
-			unlock();
 			fwrite ( data, 1, chunk_size, stream );
 		}
 		pluginDispatch( effSetProgram, 0, currProgram );
@@ -1348,7 +1309,6 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			pluginDispatch( 24, 1, len, chunk );
 		else
 		{
-			lock();
 			unsigned int* toUIntArray = reinterpret_cast<unsigned int*>( chunk );
 			for (int i = 0; i < pBank->numPrograms; i++ )
 			{
@@ -1356,7 +1316,6 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 				pFloat = ( float* ) &toUInt;
 				m_plugin->setParameter( m_plugin, i, *pFloat );
 			}
-			unlock();
 		}
 	} else {
 		if(pBank->fxMagic != 0x6B427846) {
@@ -1367,7 +1326,6 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 			int currProgram = pluginDispatch( effGetProgram );
 			chunk = new char[ len = sizeof(float)*m_plugin->numParams ];
 			toUIntArray = reinterpret_cast<unsigned int *>( chunk );
-			lock();
 			for (int i =0; i < numPrograms; i++) {
 				if ( fread (pBank, 1, 56, stream) != 56 )
 				{
@@ -1388,7 +1346,6 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 					m_plugin->setParameter( m_plugin, j, *pFloat );
 				}
 			}
-			unlock();
 			pluginDispatch( effSetProgram, 0, currProgram );
 			fclose( stream );
 		}
@@ -1520,7 +1477,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			// value is 0 for input and != 0 otherwise. note: the
 			// return value is 0 for <true> such that older versions
 			// will always return true.
-			return 1;
+			return 0;
 
 		case audioMasterGetTime:
 			SHOW_CALLBACK( "amc: audioMasterGetTime\n" );
