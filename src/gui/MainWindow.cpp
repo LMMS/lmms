@@ -36,7 +36,6 @@
 #include <QLibrary>
 #include <QSplitter>
 #include <QUrl>
-#include <QWhatsThis>
 
 #include "AboutDialog.h"
 #include "AudioDummy.h"
@@ -410,9 +409,6 @@ void MainWindow::finalize()
 							tr( "Help" ),
 							this, SLOT( help() ) );
 	}
-	help_menu->addAction( embed::getIconPixmap( "whatsthis" ),
-					tr( "What's This?" ),
-					this, SLOT( enterWhatsThisMode() ) );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
 #if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
@@ -464,12 +460,6 @@ void MainWindow::finalize()
 							SLOT( onExportProject() ),
 								m_toolBar );
 
-	ToolButton * whatsthis = new ToolButton(
-				embed::getIconPixmap( "whatsthis" ),
-					tr( "What's this?" ),
-					this, SLOT( enterWhatsThisMode() ),
-								m_toolBar );
-
 	m_metronomeToggle = new ToolButton(
 				embed::getIconPixmap( "metronome" ),
 				tr( "Toggle metronome" ),
@@ -485,8 +475,7 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( project_open_recent, 0, 4 );
 	m_toolBarLayout->addWidget( project_save, 0, 5 );
 	m_toolBarLayout->addWidget( project_export, 0, 6 );
-	m_toolBarLayout->addWidget( whatsthis, 0, 7 );
-	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 8 );
+	m_toolBarLayout->addWidget( m_metronomeToggle, 0, 7 );
 
 
 	// window-toolbar
@@ -496,13 +485,6 @@ void MainWindow::finalize()
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
 	song_editor_window->setShortcut( Qt::Key_F5 );
-	song_editor_window->setWhatsThis(
-		tr( "By pressing this button, you can show or hide the "
-			"Song-Editor. With the help of the Song-Editor you can "
-			"edit song-playlist and specify when which track "
-			"should be played. "
-			"You can also insert and move samples (e.g. "
-			"rap samples) directly into the playlist." ) );
 
 
 	ToolButton * bb_editor_window = new ToolButton(
@@ -512,13 +494,6 @@ void MainWindow::finalize()
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
 	bb_editor_window->setShortcut( Qt::Key_F6 );
-	bb_editor_window->setWhatsThis(
-		tr( "By pressing this button, you can show or hide the "
-			"Beat+Bassline Editor. The Beat+Bassline Editor is "
-			"needed for creating beats, and for opening, adding, and "
-			"removing channels, and for cutting, copying and pasting "
-			"beat and bassline-patterns, and for other things like "
-			"that." ) );
 
 
 	ToolButton * piano_roll_window = new ToolButton(
@@ -528,11 +503,6 @@ void MainWindow::finalize()
 					this, SLOT( togglePianoRollWin() ),
 								m_toolBar );
 	piano_roll_window->setShortcut( Qt::Key_F7 );
-	piano_roll_window->setWhatsThis(
-			tr( "Click here to show or hide the "
-				"Piano-Roll. With the help of the Piano-Roll "
-				"you can edit melodies in an easy way."
-				) );
 
 	ToolButton * automation_editor_window = new ToolButton(
 					embed::getIconPixmap( "automation" ),
@@ -542,12 +512,6 @@ void MainWindow::finalize()
 					SLOT( toggleAutomationEditorWin() ),
 					m_toolBar );
 	automation_editor_window->setShortcut( Qt::Key_F8 );
-	automation_editor_window->setWhatsThis(
-			tr( "Click here to show or hide the "
-				"Automation Editor. With the help of the "
-				"Automation Editor you can edit dynamic values "
-				"in an easy way."
-				) );
 
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
@@ -555,11 +519,6 @@ void MainWindow::finalize()
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
-	fx_mixer_window->setWhatsThis(
-		tr( "Click here to show or hide the "
-			"FX Mixer. The FX Mixer is a very powerful tool "
-			"for managing effects for your song. You can insert "
-			"effects into different effect-channels." ) );
 
 	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
@@ -568,10 +527,6 @@ void MainWindow::finalize()
 					this, SLOT( toggleProjectNotesWin() ),
 								m_toolBar );
 	project_notes_window->setShortcut( Qt::Key_F10 );
-	project_notes_window->setWhatsThis(
-		tr( "Click here to show or hide the "
-			"project notes window. In this window you can put "
-			"down your project notes.") );
 
 	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
@@ -833,13 +788,6 @@ void MainWindow::restoreWidgetState( QWidget * _w, const QDomElement & _de )
 
 void MainWindow::emptySlot()
 {
-}
-
-
-
-void MainWindow::enterWhatsThisMode()
-{
-	QWhatsThis::enterWhatsThisMode();
 }
 
 

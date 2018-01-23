@@ -1465,29 +1465,12 @@ MonstroView::MonstroView( Instrument * _instrument,
 	m_opViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_active" ) );
 	m_opViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "opview_inactive" ) );
 	ToolTip::add( m_opViewButton, tr( "Operators view" ) );
-	m_opViewButton -> setWhatsThis( tr( "The Operators view contains all the operators. These include both audible "
-										"operators (oscillators) and inaudible operators, or modulators: "
-										"Low-frequency oscillators and Envelopes. \n\n"
-										"Knobs and other widgets in the Operators view have their own what's this -texts, "
-										"so you can get more specific help for them that way. " ) );
 
 	PixmapButton * m_matViewButton = new PixmapButton( this, NULL );
 	m_matViewButton -> move( 125,0 );
 	m_matViewButton -> setActiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_active" ) );
 	m_matViewButton -> setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "matview_inactive" ) );
 	ToolTip::add( m_matViewButton, tr( "Matrix view" ) );
-	m_matViewButton -> setWhatsThis( tr( "The Matrix view contains the modulation matrix. Here you can define "
-										"the modulation relationships between the various operators: Each "
-										"audible operator (oscillators 1-3) has 3-4 properties that can be "
-										"modulated by any of the modulators. Using more modulations consumes "
-										"more CPU power. \n\n"
-										"The view is divided to modulation targets, grouped by the target oscillator. "
-										"Available targets are volume, pitch, phase, pulse width and sub-osc ratio. "
-										"Note: some targets are specific to one oscillator only. \n\n"
-										"Each modulation target has 4 knobs, one for each modulator. By default "
-										"the knobs are at 0, which means no modulation. Turning a knob to 1 causes "
-										"that modulator to affect the modulation target as much as possible. Turning "
-										"it to -1 does the same, but the modulation is inversed. " ) );
 
 	m_selectedViewGroup = new automatableButtonGroup( this );
 	m_selectedViewGroup -> addButton( m_opViewButton );
@@ -1770,128 +1753,6 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 
 
 
-////////////////////////////////////
-//                                //
-// whatsthis-information strings  //
-//                                //
-////////////////////////////////////
-
-	m_osc1CrsKnob -> setWhatsThis( tr( "The CRS knob changes the tuning of oscillator 1 in semitone steps. " ) );
-	m_osc2CrsKnob -> setWhatsThis( tr( "The CRS knob changes the tuning of oscillator 2 in semitone steps. " ) );
-	m_osc3CrsKnob -> setWhatsThis( tr( "The CRS knob changes the tuning of oscillator 3 in semitone steps. " ) );
-	m_osc1FtlKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc1FtrKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc2FtlKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc2FtrKnob -> setWhatsThis( tr( "FTL and FTR change the finetuning of the oscillator for left and right "
-										"channels respectively. These can add stereo-detuning to the oscillator "
-										"which widens the stereo image and causes an illusion of space. " ) );
-	m_osc1SpoKnob -> setWhatsThis( tr( "The SPO knob modifies the difference in phase between left and right "
-										"channels. Higher difference creates a wider stereo image. " ) );
-	m_osc2SpoKnob -> setWhatsThis( tr( "The SPO knob modifies the difference in phase between left and right "
-										"channels. Higher difference creates a wider stereo image. " ) );
-	m_osc3SpoKnob -> setWhatsThis( tr( "The SPO knob modifies the difference in phase between left and right "
-										"channels. Higher difference creates a wider stereo image. " ) );
-	m_osc1PwKnob -> setWhatsThis( tr( "The PW knob controls the pulse width, also known as duty cycle, "
-										"of oscillator 1. Oscillator 1 is a digital pulse wave oscillator, "
-										"it doesn't produce bandlimited output, which means that you can "
-										"use it as an audible oscillator but it will cause aliasing. You can "
-										"also use it as an inaudible source of a sync signal, which can be "
-										"used to synchronize oscillators 2 and 3. " ) );
-	m_osc1SSRButton -> setWhatsThis( tr( "Send Sync on Rise: When enabled, the Sync signal is sent every time "
-										"the state of oscillator 1 changes from low to high, ie. when the amplitude "
-										"changes from -1 to 1. "
-										"Oscillator 1's pitch, phase and pulse width may affect the timing of syncs, "
-										"but its volume has no effect on them. Sync signals are sent independently "
-										"for both left and right channels. " ) );
-	m_osc1SSFButton -> setWhatsThis( tr( "Send Sync on Fall: When enabled, the Sync signal is sent every time "
-										"the state of oscillator 1 changes from high to low, ie. when the amplitude "
-										"changes from 1 to -1. "
-										"Oscillator 1's pitch, phase and pulse width may affect the timing of syncs, "
-										"but its volume has no effect on them. Sync signals are sent independently "
-										"for both left and right channels. " ) );
-	m_osc2SyncHButton -> setWhatsThis( tr( "Hard sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"its phase is reset to 0 + whatever its phase offset is. " ) );
-	m_osc3SyncHButton -> setWhatsThis( tr( "Hard sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"its phase is reset to 0 + whatever its phase offset is. " ) );
-	m_osc2SyncRButton -> setWhatsThis( tr( "Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"the amplitude of the oscillator gets inverted. " ) );
-	m_osc3SyncRButton -> setWhatsThis( tr( "Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, "
-											"the amplitude of the oscillator gets inverted. " ) );
-	m_osc2WaveBox -> setWhatsThis( tr( "Choose waveform for oscillator 2. " ) );
-	m_osc3Wave1Box -> setWhatsThis( tr( "Choose waveform for oscillator 3's first sub-osc. "
-										"Oscillator 3 can smoothly interpolate between two different waveforms. " ) );
-	m_osc3Wave2Box -> setWhatsThis( tr( "Choose waveform for oscillator 3's second sub-osc. "
-										"Oscillator 3 can smoothly interpolate between two different waveforms. " ) );
-	m_osc3SubKnob -> setWhatsThis( tr( "The SUB knob changes the mixing ratio of the two sub-oscs of oscillator 3. "
-										"Each sub-osc can be set to produce a different waveform, and oscillator 3 "
-										"can smoothly interpolate between them. All incoming modulations to oscillator 3 are applied "
-										"to both sub-oscs/waveforms in the exact same way. " ) );
-	m_mixButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"Mix mode means no modulation: the outputs of the oscillators are simply mixed together. " ) );
-	m_amButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"AM means amplitude modulation: Oscillator 3's amplitude (volume) is modulated by oscillator 2. " ) );
-	m_fmButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"FM means frequency modulation: Oscillator 3's frequency (pitch) is modulated by oscillator 2. "
-									"The frequency modulation is implemented as phase modulation, which gives a more stable overall pitch "
-									"than \"pure\" frequency modulation. " ) );
-	m_pmButton -> setWhatsThis( tr( "In addition to dedicated modulators, Monstro allows oscillator 3 to be modulated by "
-									"the output of oscillator 2. \n\n"
-									"PM means phase modulation: Oscillator 3's phase is modulated by oscillator 2. "
-									"It differs from frequency modulation in that the phase changes are not cumulative. " ) );
-	m_lfo1WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 1. \n"
-										"\"Random\" and \"Random smooth\" are special waveforms: "
-										"they produce random output, where the rate of the LFO controls how often "
-										"the state of the LFO changes. The smooth version interpolates between these "
-										"states with cosine interpolation. These random modes can be used to give "
-										"\"life\" to your presets - add some of that analog unpredictability... " ) );
-	m_lfo2WaveBox -> setWhatsThis( tr( "Select the waveform for LFO 2. \n"
-										"\"Random\" and \"Random smooth\" are special waveforms: "
-										"they produce random output, where the rate of the LFO controls how often "
-										"the state of the LFO changes. The smooth version interpolates between these "
-										"states with cosine interpolation. These random modes can be used to give "
-										"\"life\" to your presets - add some of that analog unpredictability... " ) );
-	m_lfo1AttKnob -> setWhatsThis( tr( "Attack causes the LFO to come on gradually from the start of the note. " ) );
-	m_lfo2AttKnob -> setWhatsThis( tr( "Attack causes the LFO to come on gradually from the start of the note. " ) );
-	m_lfo1RateKnob -> setWhatsThis( tr( "Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. " ) );
-	m_lfo2RateKnob -> setWhatsThis( tr( "Rate sets the speed of the LFO, measured in milliseconds per cycle. Can be synced to tempo. " ) );
-	m_lfo1PhsKnob -> setWhatsThis( tr( "PHS controls the phase offset of the LFO. " ) );
-	m_lfo2PhsKnob -> setWhatsThis( tr( "PHS controls the phase offset of the LFO. " ) );
-
-	m_env1PreKnob -> setWhatsThis( tr( "PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. " ) );
-	m_env2PreKnob -> setWhatsThis( tr( "PRE, or pre-delay, delays the start of the envelope from the start of the note. 0 means no delay. " ) );
-	m_env1AttKnob -> setWhatsThis( tr( "ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. "
-										"A value of 0 means instant. " ) );
-	m_env2AttKnob -> setWhatsThis( tr( "ATT, or attack, controls how fast the envelope ramps up at start, measured in milliseconds. "
-										"A value of 0 means instant. " ) );
-	m_env1HoldKnob -> setWhatsThis( tr( "HOLD controls how long the envelope stays at peak after the attack phase. " ) );
-	m_env2HoldKnob -> setWhatsThis( tr( "HOLD controls how long the envelope stays at peak after the attack phase. " ) );
-	m_env1DecKnob -> setWhatsThis( tr( "DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds "
-										"it would take to go from peak to zero. The actual decay may be shorter if sustain is used. ") );
-	m_env2DecKnob -> setWhatsThis( tr( "DEC, or decay, controls how fast the envelope falls off from its peak, measured in milliseconds "
-										"it would take to go from peak to zero. The actual decay may be shorter if sustain is used. ") );
-	m_env1SusKnob -> setWhatsThis( tr( "SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level "
-										"as long as the note is held. " ) );
-	m_env2SusKnob -> setWhatsThis( tr( "SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level "
-										"as long as the note is held. " ) );
-	m_env1RelKnob -> setWhatsThis( tr( "REL, or release, controls how long the release is for the note, measured in how long it would take to "
-										"fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. ") );
-	m_env2RelKnob -> setWhatsThis( tr( "REL, or release, controls how long the release is for the note, measured in how long it would take to "
-										"fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. ") );
-	m_env1SlopeKnob -> setWhatsThis( tr( "The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. "
-											"Negative values create curves that start slowly, peak quickly and fall of slowly again. "
-											"Positive values create curves that start and end quickly, and stay longer near the peaks. " ) );
-	m_env2SlopeKnob -> setWhatsThis( tr( "The slope knob controls the curve or shape of the envelope. A value of 0 creates straight rises and falls. "
-											"Negative values create curves that start slowly, peak quickly and fall of slowly again. "
-											"Positive values create curves that start and end quickly, and stay longer near the peaks. " ) );
 	return( view );
 }
 

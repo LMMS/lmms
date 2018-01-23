@@ -467,39 +467,30 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_ch1SweepTimeKnob->setHintText( tr( "Sweep Time:" ), "" );
 	m_ch1SweepTimeKnob->move( 5 + 4*32, 106 );
 	ToolTip::add( m_ch1SweepTimeKnob, tr( "Sweep Time" ) );
-	m_ch1SweepTimeKnob->setWhatsThis( tr( "The amount of increase or"
-									" decrease in frequency" ) );
 
 	m_ch1SweepRtShiftKnob = new FreeBoyKnob( this );
 	m_ch1SweepRtShiftKnob->setHintText( tr( "Sweep RtShift amount:" )
 										, "" );
 	m_ch1SweepRtShiftKnob->move( 5 + 3*32, 106 );
 	ToolTip::add( m_ch1SweepRtShiftKnob, tr( "Sweep RtShift amount" ) );
-	m_ch1SweepRtShiftKnob->setWhatsThis( tr( "The rate at which increase or"
-									" decrease in frequency occurs" ) );
 
 	m_ch1WavePatternDutyKnob = new FreeBoyKnob( this );
 	m_ch1WavePatternDutyKnob->setHintText( tr( "Wave pattern duty:" )
 									, "" );
 	m_ch1WavePatternDutyKnob->move( 5 + 2*32, 106 );
 	ToolTip::add( m_ch1WavePatternDutyKnob, tr( "Wave Pattern Duty" ) );
-	m_ch1WavePatternDutyKnob->setWhatsThis( tr( "The duty cycle is the ratio of"
-									" the duration (time) that a signal is ON"
-									" versus the total period of the signal." ) );
 
 	m_ch1VolumeKnob = new FreeBoyKnob( this );
 	m_ch1VolumeKnob->setHintText( tr( "Square Channel 1 Volume:" )
 								, "" );
 	m_ch1VolumeKnob->move( 5, 106 );
 	ToolTip::add( m_ch1VolumeKnob, tr( "Square Channel 1 Volume:" ) );
-	m_ch1VolumeKnob->setWhatsThis( tr( "Square Channel 1 Volume" ) );
 
 	m_ch1SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch1SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch1SweepStepLengthKnob->move( 5 + 32, 106 );
 	ToolTip::add( m_ch1SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
-	m_ch1SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
 
 
 
@@ -508,23 +499,18 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 									, "" );
 	m_ch2WavePatternDutyKnob->move( 5 + 2*32, 155 );
 	ToolTip::add( m_ch2WavePatternDutyKnob, tr( "Wave pattern duty" ) );
-	m_ch2WavePatternDutyKnob->setWhatsThis( tr( "The duty cycle is the ratio of"
-									" the duration (time) that a signal is ON"
-									" versus the total period of the signal." ) );
 
 	m_ch2VolumeKnob = new FreeBoyKnob( this );
 	m_ch2VolumeKnob->setHintText( tr( "Square Channel 2 Volume:" )
 							, "" );
 	m_ch2VolumeKnob->move( 5, 155 );
 	ToolTip::add( m_ch2VolumeKnob, tr( "Square Channel 2 Volume" ) );
-	m_ch2VolumeKnob->setWhatsThis( tr( "Square Channel 2 Volume" ) );
 
 	m_ch2SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch2SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch2SweepStepLengthKnob->move( 5 + 32, 155 );
 	ToolTip::add( m_ch2SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
-	m_ch2SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
 
 
 
@@ -532,7 +518,6 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_ch3VolumeKnob->setHintText( tr( "Wave Channel Volume:" ), "" );
 	m_ch3VolumeKnob->move( 5, 204 );
 	ToolTip::add( m_ch3VolumeKnob, tr( "Wave Channel Volume" ) );
-	m_ch3VolumeKnob->setWhatsThis( tr( "Wave Channel Volume" ) );
 
 
 
@@ -540,14 +525,12 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_ch4VolumeKnob->setHintText( tr( "Noise Channel Volume:" ), "" );
 	m_ch4VolumeKnob->move( 144, 155 );
 	ToolTip::add( m_ch4VolumeKnob, tr( "Noise Channel Volume" ) );
-	m_ch4VolumeKnob->setWhatsThis( tr( "Noise Channel Volume" ) );
 
 	m_ch4SweepStepLengthKnob = new FreeBoyKnob( this );
 	m_ch4SweepStepLengthKnob->setHintText( tr( "Length of each step in sweep:" )
 									, "" );
 	m_ch4SweepStepLengthKnob->move( 144 + 32, 155 );
 	ToolTip::add( m_ch4SweepStepLengthKnob, tr( "Length of each step in sweep" ) );
-	m_ch4SweepStepLengthKnob->setWhatsThis( tr( "The delay between step change" ) );
 
 
 
@@ -691,7 +674,6 @@ FreeBoyInstrumentView::FreeBoyInstrumentView( Instrument * _instrument,
 	m_graph->move( 37, 199 );
 	m_graph->resize(208, 47);
 	ToolTip::add( m_graph, tr( "Wave Pattern" ) );
-	m_graph->setWhatsThis( tr( "Draw the wave here" ) );
 }
 
 

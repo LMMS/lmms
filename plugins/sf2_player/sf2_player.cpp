@@ -847,8 +847,6 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	ToolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
 
-	m_fileDialogButton->setWhatsThis( tr( "Click here to open another SF2 file" ) );
-
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
 	m_patchDialogButton->setCursor( QCursor( Qt::PointingHandCursor ) );
@@ -908,10 +906,6 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_reverbButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_on" ) );
 	m_reverbButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "reverb_off" ) );
 	ToolTip::add( m_reverbButton, tr( "Apply reverb (if supported)" ) );
-	m_reverbButton->setWhatsThis(
-		tr( "This button enables the reverb effect. "
-			"This is useful for cool effects, but only works on "
-			"files that support it." ) );
 
 
 	m_reverbRoomSizeKnob = new sf2Knob( this );
@@ -948,10 +942,6 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	m_chorusButton->setActiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_on" ) );
 	m_chorusButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap( "chorus_off" ) );
 	ToolTip::add( m_chorusButton, tr( "Apply chorus (if supported)" ) );
-	m_chorusButton->setWhatsThis(
-		tr( "This button enables the chorus effect. "
-			"This is useful for cool echo effects, but only works on "
-			"files that support it." ) );
 
 	m_chorusNumKnob = new sf2Knob( this );
 	m_chorusNumKnob->setHintText( tr("Chorus Lines:"), "" );

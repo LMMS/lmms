@@ -427,11 +427,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 						SLOT( openPlugin() ) );
 	ToolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
 
-	m_openPluginButton->setWhatsThis(
-		tr( "Click here, if you want to open another VST-plugin. After "
-			"clicking on this button, a file-open-dialog appears "
-			"and you can select your file." ) );
-
 	m_managePluginButton = new PixmapButton( this, "" );
 	m_managePluginButton->setCheckable( false );
 	m_managePluginButton->setCursor( Qt::PointingHandCursor );
@@ -443,9 +438,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
 	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
-
-	m_managePluginButton->setWhatsThis(
-		tr( "Click here, if you want to control VST-plugin from host." ) );
 
 
 	m_openPresetButton = new PixmapButton( this, "" );
@@ -459,9 +451,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
 	ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
-
-	m_openPresetButton->setWhatsThis(
-		tr( "Click here, if you want to open another *.fxp, *.fxb VST-plugin preset." ) );
 
 
 	m_rolLPresetButton = new PixmapButton( this, "" );
@@ -478,9 +467,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
-	m_rolLPresetButton->setWhatsThis(
-		tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
-
 
 	m_savePresetButton = new PixmapButton( this, "" );
 	m_savePresetButton->setCheckable( false );
@@ -493,9 +479,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	connect( m_savePresetButton, SIGNAL( clicked() ), this,
 						SLOT( savePreset() ) );
 	ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
-
-	m_savePresetButton->setWhatsThis(
-		tr( "Click here, if you want to save current VST-plugin preset program." ) );
 
 
 	m_rolRPresetButton = new PixmapButton( this, "" );
@@ -512,10 +495,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 	m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
-	m_rolRPresetButton->setWhatsThis(
-		tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
-
-
 
 	m_selPresetButton = new QPushButton( tr( "" ), this );
 	m_selPresetButton->setGeometry( 228, 201, 16, 16 );
@@ -526,8 +505,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 
 
 	m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
-	m_selPresetButton->setWhatsThis(
-		tr( "Click here to select presets that are currently loaded in VST." ) );
 
 	m_selPresetButton->setMenu(menu);
 
@@ -538,9 +515,6 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 	m_toggleGUIButton->setFont( pointSize<8>( m_toggleGUIButton->font() ) );
 	connect( m_toggleGUIButton, SIGNAL( clicked() ), this,
 							SLOT( toggleGUI() ) );
-	m_toggleGUIButton->setWhatsThis(
-		tr( "Click here to show or hide the graphical user interface "
-			"(GUI) of your VST-plugin." ) );
 
 	QPushButton * note_off_all_btn = new QPushButton( tr( "Turn off all "
 							"notes" ), this );
@@ -890,16 +864,12 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_syncButton = new QPushButton( tr( "VST Sync" ), this );
 	connect( m_syncButton, SIGNAL( clicked() ), this,
 							SLOT( syncPlugin() ) );
-	m_syncButton->setWhatsThis(
-		tr( "Click here if you want to synchronize all parameters with VST plugin." ) );
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
 	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), this );
 	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
 							SLOT( displayAutomatedOnly() ) );
-	m_displayAutomatedOnly->setWhatsThis(
-		tr( "Click here if you want to display automated parameters only." ) );
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
@@ -907,8 +877,6 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
 	connect( m_closeButton, SIGNAL( clicked() ), this,
 							SLOT( closeWindow() ) );
-	m_closeButton->setWhatsThis(
-		tr( "Close VST plugin knob-controller window." ) );
 
 	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 

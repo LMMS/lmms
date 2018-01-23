@@ -2205,15 +2205,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	// Play/stop buttons
 	m_playAction->setToolTip(tr( "Play/pause current pattern (Space)" ));
-	m_playAction->setWhatsThis(
-		tr( "Click here if you want to play the current pattern. "
-			"This is useful while editing it.  The pattern is "
-			"automatically looped when the end is reached." ) );
 
 	m_stopAction->setToolTip(tr("Stop playing of current pattern (Space)"));
-	m_stopAction->setWhatsThis(
-		tr( "Click here if you want to stop playing of the "
-			"current pattern." ) );
 
 	// Edit mode buttons
 	DropToolBar *editActionsToolBar = addDropToolBarToTop(tr("Edit actions"));
@@ -2229,38 +2222,9 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_flipYAction = new QAction(embed::getIconPixmap("flip_y"), tr("Flip vertically"), this);
 	m_flipXAction = new QAction(embed::getIconPixmap("flip_x"), tr("Flip horizontally"), this);
 
-	m_flipYAction->setWhatsThis(
-				tr( "Click here and the pattern will be inverted."
-					"The points are flipped in the y direction. " ) );
-	m_flipXAction->setWhatsThis(
-				tr( "Click here and the pattern will be reversed. "
-					"The points are flipped in the x direction." ) );
-
 //	TODO: m_selectButton and m_moveButton are broken.
 //	m_selectButton = new QAction(embed::getIconPixmap("edit_select"), tr("Select mode (Shift+S)"), editModeGroup);
 //	m_moveButton = new QAction(embed::getIconPixmap("edit_move"), tr("Move selection mode (Shift+M)"), editModeGroup);
-
-	drawAction->setWhatsThis(
-		tr( "Click here and draw-mode will be activated. In this "
-			"mode you can add and move single values.  This "
-			"is the default mode which is used most of the time.  "
-			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode." ) );
-	eraseAction->setWhatsThis(
-		tr( "Click here and erase-mode will be activated. In this "
-			"mode you can erase single values. You can also press "
-			"'Shift+E' on your keyboard to activate this mode." ) );
-	/*m_selectButton->setWhatsThis(
-		tr( "Click here and select-mode will be activated. In this "
-			"mode you can select values. This is necessary "
-			"if you want to cut, copy, paste, delete, or move "
-			"values. You can also press 'Shift+S' on your keyboard "
-			"to activate this mode." ) );
-	m_moveButton->setWhatsThis(
-		tr( "If you click here, move-mode will be activated. In this "
-			"mode you can move the values you selected in select-"
-			"mode. You can also press 'Shift+M' on your keyboard "
-			"to activate this mode." ) );*/
 
 	connect(editModeGroup, SIGNAL(triggered(int)), m_editor, SLOT(setEditMode(int)));
 
@@ -2292,31 +2256,8 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	m_tensionKnob = new Knob( knobSmall_17, this, "Tension" );
 	m_tensionKnob->setModel(m_editor->m_tensionModel);
 	ToolTip::add(m_tensionKnob, tr("Tension value for spline"));
-	m_tensionKnob->setWhatsThis(
-				tr("A higher tension value may make a smoother curve "
-				   "but overshoot some values. A low tension "
-				   "value will cause the slope of the curve to "
-				   "level off at each control point."));
 
 	connect(m_cubicHermiteAction, SIGNAL(toggled(bool)), m_tensionKnob, SLOT(setEnabled(bool)));
-
-	m_discreteAction->setWhatsThis(
-		tr( "Click here to choose discrete progressions for this "
-			"automation pattern.  The value of the connected "
-			"object will remain constant between control points "
-			"and be set immediately to the new value when each "
-			"control point is reached." ) );
-	m_linearAction->setWhatsThis(
-		tr( "Click here to choose linear progressions for this "
-			"automation pattern.  The value of the connected "
-			"object will change at a steady rate over time "
-			"between control points to reach the correct value at "
-			"each control point without a sudden change." ) );
-	m_cubicHermiteAction->setWhatsThis(
-		tr( "Click here to choose cubic hermite progressions for this "
-			"automation pattern.  The value of the connected "
-			"object will change in a smooth curve and ease in to "
-			"the peaks and valleys." ) );
 
 	interpolationActionsToolBar->addSeparator();
 	interpolationActionsToolBar->addAction(m_discreteAction);
@@ -2352,18 +2293,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 						#else
 						"Ctrl"), this);
 						#endif
-
-	cutAction->setWhatsThis(
-		tr( "Click here and selected values will be cut into the "
-			"clipboard.  You can paste them anywhere in any pattern "
-			"by clicking on the paste button." ) );
-	copyAction->setWhatsThis(
-		tr( "Click here and selected values will be copied into "
-			"the clipboard.  You can paste them anywhere in any "
-			"pattern by clicking on the paste button." ) );
-	pasteAction->setWhatsThis(
-		tr( "Click here and the values from the clipboard will be "
-			"pasted at the first visible measure." ) );
 
 	cutAction->setShortcut(Qt::CTRL | Qt::Key_X);
 	copyAction->setShortcut(Qt::CTRL | Qt::Key_C);
@@ -2448,11 +2377,6 @@ AutomationEditorWindow::AutomationEditorWindow() :
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
 	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
-	m_quantizeComboBox->setWhatsThis( tr( "Quantization. Sets the smallest "
-				"step size for the Automation Point. By default "
-				"this also sets the length, clearing out other "
-				"points in the range. Press <Ctrl> to override "
-				"this behaviour." ) );
 
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );

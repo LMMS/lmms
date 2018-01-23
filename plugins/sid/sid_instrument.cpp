@@ -551,41 +551,26 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		Knob *ak = new sidKnob( this );
 		ak->setHintText( tr("Attack:"), "" );
 		ak->move( 7, 114 + i*50 );
-		ak->setWhatsThis( tr ( "Attack rate determines how rapidly the output "
-				"of Voice %1 rises from zero to peak amplitude." ).arg( i+1 ) );
 
 		Knob *dk = new sidKnob( this );
 		dk->setHintText( tr("Decay:") , "" );
 		dk->move( 7 + 28, 114 + i*50 );
-		dk->setWhatsThis( tr ( "Decay rate determines how rapidly the output "
-				"falls from the peak amplitude to the selected Sustain level." ) );
 
 		Knob *sk = new sidKnob( this );
 		sk->setHintText( tr("Sustain:"), "" );
 		sk->move( 7 + 2*28, 114 + i*50 );
-		sk->setWhatsThis( tr ( "Output of Voice %1 will remain at the selected "
-				"Sustain amplitude as long as the note is held." ).arg( i+1 ) );
 
 		Knob *rk = new sidKnob( this );
 		rk->setHintText( tr("Release:"), "" );
 		rk->move( 7 + 3*28, 114 + i*50 );
-		rk->setWhatsThis( tr ( "The output of of Voice %1 will fall from "
-				"Sustain amplitude to zero amplitude at the selected Release "
-				"rate." ).arg( i+1 ) );
 
 		Knob *pwk = new sidKnob( this );
 		pwk->setHintText( tr("Pulse Width:"), "" );
 		pwk->move( 7 + 4*28, 114 + i*50 );
-		pwk->setWhatsThis( tr ( "The Pulse Width resolution allows the width "
-				"to be smoothly swept with no discernable stepping. The Pulse "
-				"waveform on Oscillator %1 must be selected to have any audible"
-				" effect." ).arg( i+1 ) );
 
 		Knob *crsk = new sidKnob( this );
 		crsk->setHintText( tr("Coarse:"), " semitones" );
 		crsk->move( 147, 114 + i*50 );
-		crsk->setWhatsThis( tr ( "The Coarse detuning allows to detune Voice "
-				"%1 one octave up or down." ).arg( i+1 ) );
 
 		PixmapButton * pulse_btn = new PixmapButton( this, NULL );
 		pulse_btn->move( 187, 101 + i*50 );
@@ -637,10 +622,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		sync_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "sync" ) );
 		ToolTip::add( sync_btn, tr( "Sync" ) );
-		sync_btn->setWhatsThis( tr ( "Sync synchronizes the fundamental "
-			"frequency of Oscillator %1 with the fundamental frequency of "
-			"Oscillator %2 producing \"Hard Sync\" effects." ).arg( i+1 )
-			.arg( syncRingWidth[i] ) );
 
 		PixmapButton * ringMod_btn = new PixmapButton( this, NULL );
 		ringMod_btn->setCheckable( true );
@@ -650,10 +631,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		ringMod_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "ring" ) );
 		ToolTip::add( ringMod_btn, tr( "Ring-Mod" ) );
-		ringMod_btn->setWhatsThis( tr ( "Ring-mod replaces the Triangle "
-			"Waveform output of Oscillator %1 with a \"Ring Modulated\" "
-			"combination of Oscillators %1 and %2." ).arg( i+1 )
-			.arg( syncRingWidth[i] ) );
 
 		PixmapButton * filter_btn = new PixmapButton( this, NULL );
 		filter_btn->setCheckable( true );
@@ -663,10 +640,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		filter_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "filter" ) );
 		ToolTip::add( filter_btn, tr( "Filtered" ) );
-		filter_btn->setWhatsThis( tr ( "When Filtered is on, Voice %1 will be "
-			"processed through the Filter. When Filtered is off, Voice %1 "
-			"appears directly at the output, and the Filter has no effect on "
-			"it." ).arg( i+1 ) );
 
 		PixmapButton * test_btn = new PixmapButton( this, NULL );
 		test_btn->setCheckable( true );
@@ -676,8 +649,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		test_btn->setInactiveGraphic(
 			PLUGIN_NAME::getIconPixmap( "test" ) );
 		ToolTip::add( test_btn, tr( "Test" ) );
-		test_btn->setWhatsThis( tr ( "Test, when set, resets and locks "
-			"Oscillator %1 at zero until Test is turned off." ).arg( i+1 ) );
 
 		m_voiceKnobs[i] = voiceKnobs( ak, dk, sk, rk, pwk, crsk, wfbg,
 								sync_btn, ringMod_btn, filter_btn, test_btn );

@@ -107,9 +107,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 						SLOT( managePlugin() ) );
 		ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
 
-		m_managePluginButton->setWhatsThis(
-			tr( "Click here, if you want to control VST-plugin from host." ) );
-
 		m_managePluginButton->setMinimumWidth( 26 );
 		m_managePluginButton->setMaximumWidth( 26 );
 		m_managePluginButton->setMinimumHeight( 21 );
@@ -125,9 +122,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( m_openPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( openPreset() ) );
 		ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
-
-		m_openPresetButton->setWhatsThis(
-			tr( "Click here, if you want to open another *.fxp, *.fxb VST-plugin preset." ) );
 
 		m_openPresetButton->setMinimumWidth( 16 );
 		m_openPresetButton->setMaximumWidth( 16 );
@@ -151,9 +145,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
-		m_rolLPresetButton->setWhatsThis(
-			tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
-
 		m_rolLPresetButton->setMinimumWidth( 16 );
 		m_rolLPresetButton->setMaximumWidth( 16 );
 		m_rolLPresetButton->setMinimumHeight( 16 );
@@ -176,9 +167,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
-		m_rolRPresetButton->setWhatsThis(
-			tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
-
 		m_rolRPresetButton->setMinimumWidth( 16 );
 		m_rolRPresetButton->setMaximumWidth( 16 );
 		m_rolRPresetButton->setMinimumHeight( 16 );
@@ -189,8 +177,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		_ctl->m_selPresetButton->setCheckable( false );
 		_ctl->m_selPresetButton->setCursor( Qt::PointingHandCursor );
 		_ctl->m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
-		_ctl->m_selPresetButton->setWhatsThis(
-			tr( "Click here to select presets that are currently loaded in VST." ) );
 
  		_ctl->m_selPresetButton->setMenu(_ctl->menu);
 
@@ -209,9 +195,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		connect( m_savePresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( savePreset() ) );
 		ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
-
-		m_savePresetButton->setWhatsThis(
-			tr( "Click here, if you want to save current VST-plugin preset program." ) );
 
 		m_savePresetButton->setMinimumWidth( 21 );
 		m_savePresetButton->setMaximumWidth( 21 );

@@ -903,7 +903,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->move( widgetWidth-2*24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
-	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
@@ -1336,8 +1335,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 						SLOT( viewPrevInstrument() ) );
 	connect( m_leftRightNav, SIGNAL( onNavRight() ), this,
 						SLOT( viewNextInstrument() ) );
-	m_leftRightNav->setWhatsThis(
-		tr( "Use these controls to view and edit the next/previous track in the song editor." ) );
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
@@ -1359,7 +1356,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
@@ -1431,9 +1427,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
 	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
-	saveSettingsBtn->setWhatsThis(
-		tr( "Click here, if you want to save current instrument track settings in a preset file. "
-			"Later you can load this preset by double-clicking it in the preset-browser." ) );
 
 	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
 

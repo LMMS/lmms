@@ -72,42 +72,21 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_baseKnob->setLabel( tr( "BASE" ) );
 	m_baseKnob->move( CD_LFO_BASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_baseKnob->setHintText( tr( "Base amount:" ), "" );
-	m_baseKnob->setWhatsThis( tr("todo") );
-
 
 	m_speedKnob = new TempoSyncKnob( knobBright_26, this );
 	m_speedKnob->setLabel( tr( "SPD" ) );
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_speedKnob->setHintText( tr( "LFO-speed:" ), "" );
-	m_speedKnob->setWhatsThis(
-		tr( "Use this knob for setting speed of the LFO. The "
-			"bigger this value the faster the LFO oscillates and "
-			"the faster the effect." ) );
-
 
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
 	m_amountKnob->move( CD_LFO_AMOUNT_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_amountKnob->setHintText( tr( "Modulation amount:" ), "" );
-	m_amountKnob->setWhatsThis(
-		tr( "Use this knob for setting modulation amount of the "
-			"LFO. The bigger this value, the more the connected "
-			"control (e.g. volume or cutoff-frequency) will "
-			"be influenced by the LFO." ) );
 
 	m_phaseKnob = new Knob( knobBright_26, this );
 	m_phaseKnob->setLabel( tr( "PHS" ) );
 	m_phaseKnob->move( CD_LFO_PHASE_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
 	m_phaseKnob->setHintText( tr( "Phase offset:" ) , "" + tr( "degrees" ) );
-	m_phaseKnob->setWhatsThis(
-			tr( "With this knob you can set the phase offset of "
-				"the LFO. That means you can move the "
-				"point within an oscillation where the "
-				"oscillator begins to oscillate. For example "
-				"if you have a sine-wave and have a phase-"
-				"offset of 180 degrees the wave will first go "
-				"down. It's the same with a square-wave."
-				) );
 
 	PixmapButton * sin_wave_btn = new PixmapButton( this, NULL );
 	sin_wave_btn->move( CD_LFO_SHAPES_X, CD_LFO_SHAPES_Y );
@@ -271,10 +250,6 @@ void LfoControllerDialog::contextMenuEvent( QContextMenuEvent * )
 	contextMenu->addAction( embed::getIconPixmap( "cancel" ),
 						tr( "&Remove this plugin" ),
 						this, SLOT( deletePlugin() ) );
-	contextMenu->addSeparator();
-	contextMenu->addAction( embed::getIconPixmap( "help" ),
-						tr( "&Help" ),
-						this, SLOT( displayHelp() ) );
 	contextMenu->exec( QCursor::pos() );
 	delete contextMenu;
 	*/

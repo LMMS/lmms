@@ -539,9 +539,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
-	m_toggleUIButton->setWhatsThis(
-		tr( "Click here to show or hide the graphical user interface "
-			"(GUI) of ZynAddSubFX." ) );
 
 	l->addWidget( m_toggleUIButton, 0, 0, 1, 4 );
 	l->setRowStretch( 1, 5 );

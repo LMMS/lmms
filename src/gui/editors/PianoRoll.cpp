@@ -4043,25 +4043,6 @@ PianoRollWindow::PianoRollWindow() :
 	m_recordAccompanyAction->setToolTip( tr( "Record notes from MIDI-device/channel-piano while playing song or BB track" ) );
 	m_stopAction->setToolTip( tr( "Stop playing of current pattern (Space)" ) );
 
-	m_playAction->setWhatsThis(
-		tr( "Click here to play the current pattern. "
-			"This is useful while editing it. The pattern is "
-			"automatically looped when its end is reached." ) );
-	m_recordAction->setWhatsThis(
-		tr( "Click here to record notes from a MIDI-"
-			"device or the virtual test-piano of the according "
-			"channel-window to the current pattern. When recording "
-			"all notes you play will be written to this pattern "
-			"and you can play and edit them afterwards." ) );
-	m_recordAccompanyAction->setWhatsThis(
-		tr( "Click here to record notes from a MIDI-"
-			"device or the virtual test-piano of the according "
-			"channel-window to the current pattern. When recording "
-			"all notes you play will be written to this pattern "
-			"and you will hear the song or BB track in the background." ) );
-	m_stopAction->setWhatsThis(
-		tr( "Click here to stop playback of current pattern." ) );
-
 	DropToolBar *notesActionsToolBar = addDropToolBarToTop( tr( "Edit actions" ) );
 
 	// init edit-buttons at the top
@@ -4077,39 +4058,6 @@ PianoRollWindow::PianoRollWindow() :
 	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
 	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
 	detuneAction->setShortcut( Qt::SHIFT | Qt::Key_T );
-
-	drawAction->setWhatsThis(
-		tr( "Click here and draw mode will be activated. In this "
-			"mode you can add, resize and move notes. This "
-			"is the default mode which is used most of the time. "
-			"You can also press 'Shift+D' on your keyboard to "
-			"activate this mode. In this mode, hold %1 to "
-			"temporarily go into select mode." ).arg(
-				#ifdef LMMS_BUILD_APPLE
-				"⌘" ) );
-				#else
-				"Ctrl" ) );
-				#endif
-	eraseAction->setWhatsThis(
-		tr( "Click here and erase mode will be activated. In this "
-			"mode you can erase notes. You can also press "
-			"'Shift+E' on your keyboard to activate this mode." ) );
-	selectAction->setWhatsThis(
-		tr( "Click here and select mode will be activated. "
-			"In this mode you can select notes. Alternatively, "
-			"you can hold %1 in draw mode to temporarily use "
-			"select mode." ).arg(
-				#ifdef LMMS_BUILD_APPLE
-				"⌘" ) );
-				#else
-				"Ctrl" ) );
-				#endif
-	detuneAction->setWhatsThis(
-		tr( "Click here and detune mode will be activated. "
-			"In this mode you can click a note to open its "
-			"automation detuning. You can utilize this to slide "
-			"notes from one to another. You can also press "
-			"'Shift+T' on your keyboard to activate this mode." ) );
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
@@ -4149,18 +4097,6 @@ PianoRollWindow::PianoRollWindow() :
 						#else
 						"Ctrl" ), this );
 						#endif
-
-	cutAction->setWhatsThis(
-		tr( "Click here and the selected notes will be cut into the "
-			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste button." ) );
-	copyAction->setWhatsThis(
-		tr( "Click here and the selected notes will be copied into the "
-			"clipboard. You can paste them anywhere in any pattern "
-			"by clicking on the paste button." ) );
-	pasteAction->setWhatsThis(
-		tr( "Click here and the notes from the clipboard will be "
-			"pasted at the first visible measure." ) );
 
 	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
 	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
@@ -4242,53 +4178,6 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( chord_lbl );
 	zoomAndNotesToolBar->addWidget( m_chordComboBox );
-
-	m_zoomingComboBox->setWhatsThis(
-				tr(
-					"This controls the magnification of an axis. "
-					"It can be helpful to choose magnification for a specific "
-					"task. For ordinary editing, the magnification should be "
-					"fitted to your smallest notes. "
-					) );
-
-	m_quantizeComboBox->setWhatsThis(
-				tr(
-					"The 'Q' stands for quantization, and controls the grid size "
-					"notes and control points snap to. "
-					"With smaller quantization values, you can draw shorter notes "
-					"in Piano Roll, and more exact control points in the "
-					"Automation Editor."
-
-					) );
-
-	m_noteLenComboBox->setWhatsThis(
-				tr(
-					"This lets you select the length of new notes. "
-					"'Last Note' means that LMMS will use the note length of "
-					"the note you last edited"
-					) );
-
-	m_scaleComboBox->setWhatsThis(
-				tr(
-					"The feature is directly connected to the context-menu "
-					"on the virtual keyboard, to the left in Piano Roll. "
-					"After you have chosen the scale you want "
-					"in this drop-down menu, "
-					"you can right click on a desired key in the virtual keyboard, "
-					"and then choose 'Mark current Scale'. "
-					"LMMS will highlight all notes that belongs to the chosen scale, "
-					"and in the key you have selected!"
-					) );
-
-	m_chordComboBox->setWhatsThis(
-				tr(
-					"Let you select a chord which LMMS then can draw or highlight."
-					"You can find the most common chords in this drop-down menu. "
-					"After you have selected a chord, click anywhere to place the chord, and right "
-					"click on the virtual keyboard to open context menu and highlight the chord. "
-					"To return to single note placement, you need to choose 'No chord' "
-					"in this drop-down menu."
-					) );
 
 	// setup our actual window
 	setFocusPolicy( Qt::StrongFocus );

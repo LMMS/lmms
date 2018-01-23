@@ -104,7 +104,6 @@ private slots:
 	void removeUnusedChannels();
 	void moveChannelLeft();
 	void moveChannelRight();
-	void displayHelp();
 };
 
 

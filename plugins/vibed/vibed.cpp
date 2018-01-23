@@ -24,7 +24,6 @@
 
 #include <QDomDocument>
 #include <QMap>
-#include <QWhatsThis>
 
 #include "vibed.h"
 #include "Engine.h"
@@ -363,76 +362,44 @@ vibedView::vibedView( Instrument * _instrument,
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->move( 103, 142 );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "" );
-	m_volumeKnob->setWhatsThis( tr( "The 'V' knob sets the volume "
-					"of the selected string." ) );
 
 	m_stiffnessKnob = new Knob( knobBright_26, this );
 	m_stiffnessKnob->move( 129, 142 );
 	m_stiffnessKnob->setHintText( tr( "String stiffness:" )
 							, "" );
-	m_stiffnessKnob->setWhatsThis( tr(
-"The 'S' knob sets the stiffness of the selected string.  The stiffness "
-"of the string affects how long the string will ring out.  The lower "
-"the setting, the longer the string will ring." ) );
 	
 	
 	m_pickKnob = new Knob( knobBright_26, this );
 	m_pickKnob->move( 153, 142 );
 	m_pickKnob->setHintText( tr( "Pick position:" ), "" );
-	m_pickKnob->setWhatsThis( tr(
-"The 'P' knob sets the position where the selected string will be 'picked'.  "
-"The lower the setting the closer the pick is to the bridge." ) );
 
 	m_pickupKnob = new Knob( knobBright_26, this );
 	m_pickupKnob->move( 177, 142 );
 	m_pickupKnob->setHintText( tr( "Pickup position:" )
 						, "" );
-	m_pickupKnob->setWhatsThis( tr(
-"The 'PU' knob sets the position where the vibrations will be monitored "
-"for the selected string.  The lower the setting, the closer the "
-"pickup is to the bridge." ) );
 
 	m_panKnob = new Knob( knobBright_26, this );
 	m_panKnob->move( 105, 187 );
     m_panKnob->setHintText( tr( "Pan:" ), "" );
-	m_panKnob->setWhatsThis( tr(
-"The Pan knob determines the location of the selected string in the stereo "
-"field." ) );
 	
 	m_detuneKnob = new Knob( knobBright_26, this );
 	m_detuneKnob->move( 150, 187 );
 	m_detuneKnob->setHintText( tr( "Detune:" ), "" );
-	m_detuneKnob->setWhatsThis( tr(
-"The Detune knob modifies the pitch of the selected string.  Settings less "
-"than zero will cause the string to sound flat.  Settings greater than zero "
-"will cause the string to sound sharp." ) );
 
 	m_randomKnob = new Knob( knobBright_26, this );
 	m_randomKnob->move( 194, 187 );
 	m_randomKnob->setHintText( tr( "Fuzziness:" )
 						, "" );
-	m_randomKnob->setWhatsThis( tr(
-"The Slap knob adds a bit of fuzz to the selected string which is most "
-"apparent during the attack, though it can also be used to make the string "
-"sound more 'metallic'.") );
 
 	m_lengthKnob = new Knob( knobBright_26, this );
 	m_lengthKnob->move( 23, 193 );
 	m_lengthKnob->setHintText( tr( "Length:" )
 						, "" );
-	m_lengthKnob->setWhatsThis( tr(
-"The Length knob sets the length of the selected string.  Longer strings "
-"will both ring longer and sound brighter, however, they will also eat up "
-"more CPU cycles." ) );
 
 	m_impulse = new LedCheckBox( "", this );
 	m_impulse->move( 23, 94 );
 	ToolTip::add( m_impulse,
 			tr( "Impulse or initial state" ) );
-	m_impulse->setWhatsThis( tr(
-"The 'Imp' selector determines whether the waveform in the graph is to be "
-"treated as an impulse imparted to the string by the pick or the initial "
-"state of the string." ) );
 
 	m_harmonic = new nineButtonSelector(
 		PLUGIN_NAME::getIconPixmap( "button_-2_on" ),
@@ -458,12 +425,6 @@ vibedView::vibedView( Instrument * _instrument,
 		this );
 
 	m_harmonic->setWindowTitle( tr( "Octave" ) );
-	m_harmonic->setWhatsThis( tr(
-"The Octave selector is used to choose which harmonic of the note the "
-"string will ring at.  For example, '-2' means the string will ring two "
-"octaves below the fundamental, 'F' means the string will ring at the "
-"fundamental, and '6' means the string will ring six octaves above the "
-"fundamental." ) );
 	
 
 	m_stringSelector = new nineButtonSelector(
@@ -495,41 +456,6 @@ vibedView::vibedView( Instrument * _instrument,
 	m_graph->move( 76, 21 );
 	m_graph->resize(132, 104);
 
-	m_graph->setWhatsThis( tr(
-"The waveform editor provides control over the initial state or impulse "
-"that is used to start the string vibrating.  The buttons to the right of "
-"the graph will initialize the waveform to the selected type.  The '?' "
-"button will load a waveform from a file--only the first 128 samples "
-"will be loaded.\n\n"
-
-"The waveform can also be drawn in the graph.\n\n"
-
-"The 'S' button will smooth the waveform.\n\n"
-
-"The 'N' button will normalize the waveform.") );
-	
-
-	setWhatsThis( tr(
-"Vibed models up to nine independently vibrating strings.  The 'String' "
-"selector allows you to choose which string is being edited.  The 'Imp' " "selector chooses whether the graph represents an impulse or the initial "
-"state of the string.  The 'Octave' selector chooses which harmonic the "
-"string should vibrate at.\n\n"
-
-"The graph allows you to control the initial state or impulse used to set the "
-"string in motion.\n\n"
-
-"The 'V' knob controls the volume.  The 'S' knob controls the string's "
-"stiffness.  The 'P' knob controls the pick position.  The 'PU' knob "
-"controls the pickup position.\n\n"
-
-"'Pan' and 'Detune' hopefully don't need explanation.  The 'Slap' knob "
-"adds a bit of fuzz to the sound of the string.\n\n"
-
-"The 'Length' knob controls the length of the string.\n\n"
-
-"The LED in the lower right corner of the waveform editor determines "
-"whether the string is active in the current instrument." ) );
-
 
 	m_power = new LedCheckBox( "", this, tr( "Enable waveform" ) );
 	m_power->move( 212, 130 );
@@ -539,11 +465,6 @@ vibedView::vibedView( Instrument * _instrument,
 	
 	// String selector is not a part of the model
 	m_stringSelector->setWindowTitle( tr( "String" ) );
-	m_stringSelector->setWhatsThis( tr(
-"The String selector is used to choose which string the controls are "
-"editing.  A Vibed instrument can contain up to nine independently "
-"vibrating strings.  The LED in the lower right corner of the "
-"waveform editor indicates whether the selected string is active." ) );
 
 	connect( m_stringSelector, SIGNAL( nineButtonSelection( int ) ),
 			this, SLOT( showString( int ) ) );
@@ -758,18 +679,8 @@ void vibedView::contextMenuEvent( QContextMenuEvent * )
 {
 
 	CaptionMenu contextMenu( model()->displayName(), this );
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 
-}
-
-
-
-
-void vibedView::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-					whatsThis() );
 }
 
 
