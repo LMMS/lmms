@@ -25,6 +25,8 @@
 #include <QMessageBox>
 
 #include "VstEffect.h"
+
+#include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
@@ -122,10 +124,14 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = TextFloat::displayMessage(
-		VstPlugin::tr( "Loading plugin" ),
-		VstPlugin::tr( "Please wait while loading VST plugin..." ),
-			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	TextFloat * tf = NULL;
+	if( gui )
+	{
+		tf = TextFloat::displayMessage(
+			VstPlugin::tr( "Loading plugin" ),
+			VstPlugin::tr( "Please wait while loading VST plugin..." ),
+				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	}
 
 	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
 	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin( _plugin ));
