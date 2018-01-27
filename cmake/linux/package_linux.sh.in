@@ -75,8 +75,11 @@ elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/nul
 	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
 	mv "squashfs-root/usr/bin/appimagetool" "$APPIMAGETOOL"
 	success "Extracted $APPIMAGETOOL"
-	mv "squashfs-root/usr/bin/mksquashfs" "$USERBIN/mksquashfs"
-	success "Extracted $USERBIN/mksquashfs"
+	mkdir -p "$USERBIN/../lib"
+	mv "squashfs-root/usr/lib/appimagekit/" "$USERBIN/../lib/"
+	success "Extracted $USERBIN/../lib/mksquashfs"
+        mv "squashfs-root/usr/bin/desktop-file-validate" "$USERBIN/desktop-file-validate"
+        success "Extracted $USERBIN/desktop-file-validate"
 	rm -rf "squashfs-root/"
 
 else
@@ -130,7 +133,7 @@ EOL
 
 chmod +x "${APPDIR}usr/bin/lmms"
 
-# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
