@@ -612,8 +612,6 @@ sidInstrumentView::sidInstrumentView( Instrument * _instrument,
 		wfbg->addButton( saw_btn );
 		wfbg->addButton( noise_btn );
 
-		int syncRingWidth[] = { 3, 1, 2 };
-
 		PixmapButton * sync_btn = new PixmapButton( this, NULL );
 		sync_btn->setCheckable( true );
 		sync_btn->move( 207, 134 + i*50 );
