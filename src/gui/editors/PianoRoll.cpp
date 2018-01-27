@@ -2120,9 +2120,14 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
 				// Play note under the cursor
 				if ( isUnderPosition ) { testPlayNote( n ); }
-				// If note is the one under the cursor or is selected when alt is
-				// not pressed
-				if ( ( isUnderPosition && !isSelection() ) || ( n->selected() && !altPressed ) )
+				// If note is:
+				// Under the cursor, when there is no selection
+				// Selected, and alt is not pressed
+				// Under the cursor, selected, and alt is pressed
+				if ( ( isUnderPosition && !isSelection() ) ||
+					  ( n->selected() && !altPressed ) ||
+					  ( isUnderPosition && n->selected() && altPressed )
+					)
 				{
 					if( m_noteEditMode == NoteEditVolume )
 					{
@@ -3756,7 +3761,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + m_timeLine->pos() );
+			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
 
 			// select it
 			cur_note.setSelected( true );

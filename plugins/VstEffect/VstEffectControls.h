@@ -82,12 +82,10 @@ private:
 	VstEffect * m_effect;
 
 	QPushButton * m_selPresetButton;
-	QMenu *menu;
 
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
-	Knob ** vstKnobs;
 	int paramCount;
 
 	QObject * ctrHandle;
@@ -133,6 +131,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
+	Knob ** vstKnobs;
 
 } ;
 
