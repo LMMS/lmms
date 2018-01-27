@@ -12503,23 +12503,6 @@ This chip was used in the Commodore 64 computer.</source>
     </message>
 </context>
 <context>
-    <name>testcontext</name>
-    <message>
-        <location filename="../../src/3rdparty/qt5-x11embed/3rdparty/ECM/tests/ECMPoQmToolsTest/tr_test.cpp" line="39"/>
-        <location filename="../../src/3rdparty/qt5-x11embed/3rdparty/ECM/tests/ECMPoQmToolsTest/tr_thread_test_module.cpp" line="37"/>
-        <source>test string</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../../src/3rdparty/qt5-x11embed/3rdparty/ECM/tests/ECMPoQmToolsTest/tr_test.cpp" line="40"/>
-        <location filename="../../src/3rdparty/qt5-x11embed/3rdparty/ECM/tests/ECMPoQmToolsTest/tr_thread_test_module.cpp" line="38"/>
-        <source>test plural %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>vestigeInstrument</name>
     <message>
         <location filename="../../plugins/vestige/vestige.cpp" line="265"/>
