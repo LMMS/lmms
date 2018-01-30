@@ -78,8 +78,8 @@ elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/nul
 	mkdir -p "$USERBIN/../lib"
 	mv "squashfs-root/usr/lib/appimagekit/" "$USERBIN/../lib/"
 	success "Extracted $USERBIN/../lib/mksquashfs"
-        mv "squashfs-root/usr/bin/desktop-file-validate" "$USERBIN/desktop-file-validate"
-        success "Extracted $USERBIN/desktop-file-validate"
+	mv "squashfs-root/usr/bin/desktop-file-validate" "$USERBIN/desktop-file-validate"
+	success "Extracted $USERBIN/desktop-file-validate"
 	rm -rf "squashfs-root/"
 
 else
