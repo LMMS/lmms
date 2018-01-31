@@ -41,7 +41,8 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 	m_cc( cc ),
 	m_chordsGroupBox( new GroupBox( tr( "STACKING" ) ) ),
 	m_chordsComboBox( new ComboBox() ),
-	m_chordRangeKnob( new Knob( knobBright_26 ) )
+	m_chordRangeKnob( new Knob( knobBright_26 ) ),
+	m_chordTimeKnob( new TempoSyncKnob( knobBright_26 ) )
 {
 	QHBoxLayout* topLayout = new QHBoxLayout( this );
 	topLayout->setMargin( 0 );
@@ -63,9 +64,13 @@ InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( Instrume
 			"The selected chord will be played within specified "
 			"number of octaves." ) );
 
+	m_chordTimeKnob->setLabel( tr( "SPREAD" ) );
+	m_chordTimeKnob->setHintText( tr( "Note spread time:" ), " " + tr( "ms" ) );
+
 	mainLayout->addWidget( chordLabel, 0, 0 );
 	mainLayout->addWidget( m_chordsComboBox, 1, 0 );
 	mainLayout->addWidget( m_chordRangeKnob, 0, 1, 2, 1, Qt::AlignHCenter );
+	mainLayout->addWidget( m_chordTimeKnob, 0, 2, 2, 1, Qt::AlignHCenter );
 }
 
 
@@ -85,6 +90,7 @@ void InstrumentFunctionNoteStackingView::modelChanged()
 	m_chordsGroupBox->setModel( &m_cc->m_chordsEnabledModel );
 	m_chordsComboBox->setModel( &m_cc->m_chordsModel );
 	m_chordRangeKnob->setModel( &m_cc->m_chordRangeModel );
+	m_chordTimeKnob->setModel( &m_cc->m_chordTimeModel );
 }
 
 

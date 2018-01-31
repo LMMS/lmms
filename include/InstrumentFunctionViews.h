@@ -56,6 +56,7 @@ private:
 	GroupBox * m_chordsGroupBox;
 	ComboBox * m_chordsComboBox;
 	Knob * m_chordRangeKnob;
+	TempoSyncKnob * m_chordTimeKnob;
 
 } ;
 

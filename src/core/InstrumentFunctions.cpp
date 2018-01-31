@@ -207,7 +207,8 @@ InstrumentFunctionNoteStacking::InstrumentFunctionNoteStacking( Model * _parent 
 	Model( _parent, tr( "Chords" ) ),
 	m_chordsEnabledModel( false, this ),
 	m_chordsModel( this, tr( "Chord type" ) ),
-	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) )
+	m_chordRangeModel( 1.0f, 1.0f, 9.0f, 1.0f, this, tr( "Chord range" ) ),
+	m_chordTimeModel( 0.0f, 0.0f, 2000.0f, 1.0f, 2000, this, tr( "Chord spread" ) )
 {
 	const ChordTable & chord_table = ChordTable::getInstance();
 	for( int i = 0; i < chord_table.size(); ++i )
@@ -241,31 +242,36 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 	{
 		// then insert sub-notes for chord
 		const int selected_chord = m_chordsModel.value();
+		const f_cnt_t noteSpread = m_chordTimeModel.value() / 1000.0f * Engine::mixer()->processingSampleRate();
 
 		for( int octave_cnt = 0; octave_cnt < m_chordRangeModel.value(); ++octave_cnt )
 		{
 			const int sub_note_key_base = base_note_key + octave_cnt * KeysPerOctave;
+			const int chordSize = chord_table[selected_chord].size();
 
 			// process all notes in the chord
-			for( int i = 0; i < chord_table[selected_chord].size(); ++i )
+			for( int i = 0; i < chordSize; ++i )
 			{
 				// add interval to sub-note-key
 				const int sub_note_key = sub_note_key_base + (int) chord_table[selected_chord][i];
+				const int note = octave_cnt * chordSize + i;
 				// maybe we're out of range -> let's get outta
 				// here!
 				if( sub_note_key > NumKeys )
 				{
 					break;
 				}
+				const f_cnt_t noteDelay = (f_cnt_t)( noteSpread * note );
 				// create copy of base-note
 				Note note_copy( _n->length(), 0, sub_note_key, _n->getVolume(), _n->getPanning(), _n->detuning() );
 
 				// create sub-note-play-handle, only note is
 				// different
 				Engine::mixer()->addPlayHandle( 
-						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
-									_n, -1, NotePlayHandle::OriginNoteStacking )
-						);
+						NotePlayHandleManager::acquire( _n->instrumentTrack(),
+						( _n->offset() + noteDelay ),
+						_n->frames(), note_copy, _n, -1,
+						NotePlayHandle::OriginNoteStacking ) );
 			}
 		}
 	}
@@ -279,6 +285,7 @@ void InstrumentFunctionNoteStacking::saveSettings( QDomDocument & _doc, QDomElem
 	m_chordsEnabledModel.saveSettings( _doc, _this, "chord-enabled" );
 	m_chordsModel.saveSettings( _doc, _this, "chord" );
 	m_chordRangeModel.saveSettings( _doc, _this, "chordrange" );
+	m_chordTimeModel.saveSettings( _doc, _this, "note-spread" );
 }
 
 
@@ -289,6 +296,7 @@ void InstrumentFunctionNoteStacking::loadSettings( const QDomElement & _this )
 	m_chordsEnabledModel.loadSettings( _this, "chord-enabled" );
 	m_chordsModel.loadSettings( _this, "chord" );
 	m_chordRangeModel.loadSettings( _this, "chordrange" );
+	m_chordTimeModel.loadSettings( _this, "note-spread" );
 }
 
 
@@ -340,7 +348,6 @@ InstrumentFunctionArpeggio::~InstrumentFunctionArpeggio()
 
 void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 {
-	const int base_note_key = _n->key();
 	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
 		_n->origin() == NotePlayHandle::OriginNoteStacking ||
 		!m_arpEnabledModel.value() ||
@@ -349,7 +356,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		return;
 	}
 
-
+	const int base_note_key = _n->key();
 	const int selected_arp = m_arpModel.value();
 
 	ConstNotePlayHandleList cnphv = NotePlayHandle::nphsOfInstrumentTrack( _n->instrumentTrack() );

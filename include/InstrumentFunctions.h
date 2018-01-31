@@ -147,7 +147,7 @@ private:
 	BoolModel m_chordsEnabledModel;
 	ComboBoxModel m_chordsModel;
 	FloatModel m_chordRangeModel;
-
+	TempoSyncKnobModel m_chordTimeModel;
 
 	friend class InstrumentFunctionNoteStackingView;
 
