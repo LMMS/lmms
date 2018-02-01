@@ -3409,6 +3409,7 @@ void PianoRoll::record()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	m_recording = true;
 
 	Engine::getSong()->playPattern( m_pattern, false );
@@ -3428,6 +3429,7 @@ void PianoRoll::recordAccompany()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	m_recording = true;
 
 	if( m_pattern->getTrack()->trackContainer() == Engine::getSong() )
