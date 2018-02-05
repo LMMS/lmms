@@ -1016,6 +1016,31 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute( "value", "veal" );
 					}
+					else if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "Sidechaincompressor" )
+					{
+						attribute.setAttribute( "value", "SidechainCompressor" );
+					}
+					else if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "Sidechaingate" )
+					{
+						attribute.setAttribute( "value", "SidechainGate" );
+					}
+					else if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "Multibandcompressor" )
+					{
+						attribute.setAttribute( "value", "MultibandCompressor" );
+					}
+					else if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "Multibandgate" )
+					{
+						attribute.setAttribute( "value", "MultibandGate" );
+					}
+					else if( attribute.attribute( "name" ) == "plugin" &&
+							attribute.attribute( "value" ) == "Multibandlimiter" )
+					{
+						attribute.setAttribute( "value", "MultibandLimiter" );
+					}
 				}
 			}
 		}
