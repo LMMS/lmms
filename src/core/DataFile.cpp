@@ -1041,6 +1041,47 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute( "value", "MultibandLimiter" );
 					}
+					// Handle port changes
+					if( attribute.attribute( "name" ) == "plugin" &&
+							( attribute.attribute( "value" ) == "MultibandLimiter" ||
+							attribute.attribute( "value" ) == "MultibandCompressor" ||
+							attribute.attribute( "value" ) == "MultibandGate" ) )
+					{
+
+						// Head back up the DOM to upgrade ports
+						QDomNodeList ladspacontrols = effect.elementsByTagName( "ladspacontrols" );
+						for( int m = 0; !ladspacontrols.item( m ).isNull(); ++m )
+						{
+							QDomElement ladspacontrol = ladspacontrols.item( m ).toElement();
+							for( QDomElement port = ladspacontrol.firstChild().toElement();
+								!port.isNull(); port = port.nextSibling().toElement() )
+							{
+								QStringList parts = port.tagName().split("port");
+								// Not a "port"
+								if ( parts.size() < 2 )
+								{
+									continue;
+								}
+								int num = parts[1].toInt();
+								// Leave as-is
+								if ( num <= 17 )
+								{
+									continue;
+								}
+								// Remove unused ports
+								if ( num >= 18 && num <= 23 )
+								{
+									ladspacontrol.removeChild(port);
+								}
+								// Bump higher ports up 6 positions
+								else if ( num >= 24 )
+								{
+									// port01...port010, etc
+									port.setTagName( "0" + ( num - 6 ) );
+								}
+							}
+						}
+					}
 				}
 			}
 		}
