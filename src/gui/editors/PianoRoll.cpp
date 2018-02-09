@@ -4075,7 +4075,7 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
 	QAction* cutAction = new QAction(embed::getIconPixmap( "edit_cut" ),
-							  tr( "Cut selected notes (%1+X)" ).arg(
+							  tr( "Cut (%1+X)" ).arg(
 									#ifdef LMMS_BUILD_APPLE
 									"⌘" ), this );
 									#else
@@ -4083,7 +4083,7 @@ PianoRollWindow::PianoRollWindow() :
 									#endif
 
 	QAction* copyAction = new QAction(embed::getIconPixmap( "edit_copy" ),
-							   tr( "Copy selected notes (%1+C)" ).arg(
+							   tr( "Copy (%1+C)" ).arg(
 	 								#ifdef LMMS_BUILD_APPLE
 	 								"⌘"), this);
 	 								#else
@@ -4091,7 +4091,7 @@ PianoRollWindow::PianoRollWindow() :
 	 								#endif
 
 	QAction* pasteAction = new QAction(embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste notes from clipboard (%1+V)" ).arg(
+					tr( "Paste (%1+V)" ).arg(
 						#ifdef LMMS_BUILD_APPLE
 						"⌘" ), this );
 						#else
@@ -4126,6 +4126,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_zoomingComboBox = new ComboBox( m_toolBar );
 	m_zoomingComboBox->setModel( &m_editor->m_zoomingModel );
 	m_zoomingComboBox->setFixedSize( 64, 22 );
+	m_zoomingComboBox->setToolTip( tr( "Horizontal zooming") );
 
 	// setup quantize-stuff
 	QLabel * quantize_lbl = new QLabel( m_toolBar );
@@ -4134,6 +4135,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 	m_quantizeComboBox->setFixedSize( 64, 22 );
+	m_quantizeComboBox->setToolTip( tr( "Quantization") );
 
 	// setup note-len-stuff
 	QLabel * note_len_lbl = new QLabel( m_toolBar );
@@ -4142,6 +4144,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_noteLenComboBox = new ComboBox( m_toolBar );
 	m_noteLenComboBox->setModel( &m_editor->m_noteLenModel );
 	m_noteLenComboBox->setFixedSize( 105, 22 );
+	m_noteLenComboBox->setToolTip( tr( "Note length") );
 
 	// setup scale-stuff
 	QLabel * scale_lbl = new QLabel( m_toolBar );
@@ -4150,6 +4153,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_scaleComboBox = new ComboBox( m_toolBar );
 	m_scaleComboBox->setModel( &m_editor->m_scaleModel );
 	m_scaleComboBox->setFixedSize( 105, 22 );
+	m_scaleComboBox->setToolTip( tr( "Scale") );
 
 	// setup chord-stuff
 	QLabel * chord_lbl = new QLabel( m_toolBar );
@@ -4158,6 +4162,7 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox = new ComboBox( m_toolBar );
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
 	m_chordComboBox->setFixedSize( 105, 22 );
+	m_chordComboBox->setToolTip( tr( "Chord") );
 
 
 	zoomAndNotesToolBar->addWidget( zoom_lbl );
