@@ -2324,6 +2324,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingXComboBox = new ComboBox( zoomToolBar );
 	m_zoomingXComboBox->setFixedSize( 80, 22 );
+	m_zoomingXComboBox->setToolTip( tr( "Horizontal zooming" ) );
 
 	for( float const & zoomLevel : m_editor->m_zoomXLevels )
 	{
@@ -2342,6 +2343,7 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_zoomingYComboBox = new ComboBox( zoomToolBar );
 	m_zoomingYComboBox->setFixedSize( 80, 22 );
+	m_zoomingYComboBox->setToolTip( tr( "Vertical zooming" ) );
 
 	m_editor->m_zoomingYModel.addItem( "Auto" );
 	for( int i = 0; i < 7; ++i )
@@ -2371,12 +2373,12 @@ AutomationEditorWindow::AutomationEditorWindow() :
 
 	m_quantizeComboBox = new ComboBox( m_toolBar );
 	m_quantizeComboBox->setFixedSize( 60, 22 );
+	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
 
 	m_quantizeComboBox->setModel( &m_editor->m_quantizeModel );
 
 	quantizationActionsToolBar->addWidget( quantize_lbl );
 	quantizationActionsToolBar->addWidget( m_quantizeComboBox );
-	m_quantizeComboBox->setToolTip( tr( "Quantization" ) );
 
 	// Setup our actual window
 	setFocusPolicy( Qt::StrongFocus );
