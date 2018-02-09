@@ -462,7 +462,7 @@ void MainWindow::finalize()
 
 	m_metronomeToggle = new ToolButton(
 				embed::getIconPixmap( "metronome" ),
-				tr( "Toggle metronome" ),
+				tr( "Metronome" ),
 				this, SLOT( onToggleMetronome() ),
 							m_toolBar );
 	m_metronomeToggle->setCheckable(true);
@@ -481,7 +481,7 @@ void MainWindow::finalize()
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
-					tr( "Show/hide Song-Editor" ) + " (F5)",
+					tr( "Song-Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
 	song_editor_window->setShortcut( Qt::Key_F5 );
@@ -489,7 +489,7 @@ void MainWindow::finalize()
 
 	ToolButton * bb_editor_window = new ToolButton(
 					embed::getIconPixmap( "bb_track_btn" ),
-					tr( "Show/hide Beat+Bassline Editor" ) +
+					tr( "Beat+Bassline Editor" ) +
 									" (F6)",
 					this, SLOT( toggleBBEditorWin() ),
 								m_toolBar );
@@ -498,7 +498,7 @@ void MainWindow::finalize()
 
 	ToolButton * piano_roll_window = new ToolButton(
 						embed::getIconPixmap( "piano" ),
-						tr( "Show/hide Piano-Roll" ) +
+						tr( "Piano-Roll" ) +
 									" (F7)",
 					this, SLOT( togglePianoRollWin() ),
 								m_toolBar );
@@ -506,7 +506,7 @@ void MainWindow::finalize()
 
 	ToolButton * automation_editor_window = new ToolButton(
 					embed::getIconPixmap( "automation" ),
-					tr( "Show/hide Automation Editor" ) +
+					tr( "Automation Editor" ) +
 									" (F8)",
 					this,
 					SLOT( toggleAutomationEditorWin() ),
@@ -515,14 +515,14 @@ void MainWindow::finalize()
 
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "Show/hide FX Mixer" ) + " (F9)",
+					tr( "FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
 	fx_mixer_window->setShortcut( Qt::Key_F9 );
 
 	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
-					tr( "Show/hide project notes" ) +
+					tr( "Project Notes" ) +
 								" (F10)",
 					this, SLOT( toggleProjectNotesWin() ),
 								m_toolBar );
@@ -530,7 +530,7 @@ void MainWindow::finalize()
 
 	ToolButton * controllers_window = new ToolButton(
 					embed::getIconPixmap( "controller" ),
-					tr( "Show/hide controller rack" ) +
+					tr( "Controller Rack" ) +
 								" (F11)",
 					this, SLOT( toggleControllerRack() ),
 								m_toolBar );
