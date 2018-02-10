@@ -58,8 +58,6 @@ public:
 	/// behavior the UI. This is used in VstInstrumentPlugin to wrap the VST UI
 	/// in a QMdiSubWindow
 	virtual QWidget* editor();
-	void hideEditor();
-	void toggleEditor();
 
 	inline const QString & name() const
 	{
@@ -107,7 +105,6 @@ public:
 		return "vstplugin";
 	}
 
-	void toggleUI() override;
 
 	virtual void createUI(QWidget *parent);
 	bool eventFilter(QObject *obj, QEvent *event);
@@ -127,12 +124,15 @@ public slots:
 
 	void showUI() override;
 	void hideUI() override;
+	void toggleUI() override;
 
 	void handleClientEmbed();
 
 private:
 	void loadChunk( const QByteArray & _chunk );
 	QByteArray saveChunk();
+
+	void toggleEditorVisibility(int visible = -1);
 
 	QString m_plugin;
 	QPointer<QWidget> m_pluginWidget;
