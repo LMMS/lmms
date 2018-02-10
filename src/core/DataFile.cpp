@@ -1052,6 +1052,7 @@ void DataFile::upgrade_1_3_0()
 						QDomNodeList ladspacontrols = effect.elementsByTagName( "ladspacontrols" );
 						for( int m = 0; !ladspacontrols.item( m ).isNull(); ++m )
 						{
+							QList<QDomElement> removeList;
 							QDomElement ladspacontrol = ladspacontrols.item( m ).toElement();
 							for( QDomElement port = ladspacontrol.firstChild().toElement();
 								!port.isNull(); port = port.nextSibling().toElement() )
@@ -1068,17 +1069,24 @@ void DataFile::upgrade_1_3_0()
 								{
 									continue;
 								}
-								// Remove unused ports
+								// Mark ports for removal
 								if ( num >= 18 && num <= 23 )
 								{
-									ladspacontrol.removeChild(port);
+									removeList << port;
 								}
 								// Bump higher ports up 6 positions
 								else if ( num >= 24 )
 								{
 									// port01...port010, etc
-									port.setTagName( "0" + ( num - 6 ) );
+									QString name( "port0" );
+									name.append( QString::number( num -6 ) );
+									port.setTagName( name );
 								}
+							}
+							// Remove ports marked for removal
+							for ( QDomElement e : removeList )
+							{
+								ladspacontrol.removeChild( e );
 							}
 						}
 					}
