@@ -24,6 +24,8 @@
 
 #include "vestige.h"
 
+#include <memory>
+
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QPainter>
