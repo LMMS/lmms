@@ -56,7 +56,7 @@ void Controller::defaults()
     portamento.propRate     = 80;
     portamento.propDepth    = 90;
     portamento.receive      = 1;
-    portamento.time = 64;
+    portamento.time = 0;
     portamento.updowntimestretch = 64;
     portamento.pitchthresh     = 3;
     portamento.pitchthreshtype = 1;
@@ -197,8 +197,9 @@ void Controller::setsustain(int value)
 void Controller::setportamento(int value)
 {
     portamento.data = value;
+    portamento.time = value;
     if(portamento.receive != 0)
-        portamento.portamento = ((value < 64) ? 0 : 1);
+        portamento.portamento = ((value <= 0) ? 0 : 1);
 }
 
 int Controller::initportamento(float oldfreq,
