@@ -59,10 +59,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView()
-	{
-		return new VstEffectControlDialog( this );
-	}
+	virtual EffectControlDialog * createView();
 
 
 protected slots:
@@ -98,6 +95,7 @@ private:
 	friend class VstEffectControlDialog;
 	friend class manageVSTEffectView;
 
+	bool m_vstGuiVisible;
 } ;
 
 
