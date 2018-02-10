@@ -113,7 +113,8 @@ public:
 	}
 
 	/// Overwrite editor() to return the sub window instead of the embed widget
-	/// itself. This makes hideEditor() and toggleEditor() hide the sub window.
+	/// itself. This makes toggleUI() and related functions toggle the
+	/// sub window's visibility.
 	QWidget* editor() override
 	{
 		return m_pluginSubWindow.get();
