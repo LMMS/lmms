@@ -3,7 +3,7 @@
 PACKAGES="cmake pkgconfig fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio node fltk"
 
 if [ $QT5 ]; then
-	PACKAGES="$PACKAGES homebrew/versions/qt55"
+	PACKAGES="$PACKAGES qt5"
 else
 	PACKAGES="$PACKAGES cartr/qt4/qt"
 fi
