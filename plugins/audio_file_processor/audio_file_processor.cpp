@@ -466,7 +466,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openAudioFileButton, SIGNAL( clicked() ),
 					this, SLOT( openAudioFile() ) );
-	ToolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
+	ToolTip::add( m_openAudioFileButton, tr( "Open sample" ) );
 
 	m_reverseButton = new PixmapButton( this );
 	m_reverseButton->setCheckable( true );
@@ -529,11 +529,11 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 
 	m_startKnob = new AudioFileProcessorWaveView::knob( this );
 	m_startKnob->move( 45, 108 );
-	m_startKnob->setHintText( tr( "Startpoint:" ), "" );
+	m_startKnob->setHintText( tr( "Start point:" ), "" );
 
 	m_endKnob = new AudioFileProcessorWaveView::knob( this );
 	m_endKnob->move( 125, 108 );
-	m_endKnob->setHintText( tr( "Endpoint:" ), "" );
+	m_endKnob->setHintText( tr( "End point:" ), "" );
 
 	m_loopKnob = new AudioFileProcessorWaveView::knob( this );
 	m_loopKnob->move( 85, 108 );

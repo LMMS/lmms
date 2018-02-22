@@ -425,7 +425,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openPluginButton, SIGNAL( clicked() ), this,
 						SLOT( openPlugin() ) );
-	ToolTip::add( m_openPluginButton, tr( "Open other VST-plugin" ) );
+	ToolTip::add( m_openPluginButton, tr( "Open VST plugin" ) );
 
 	m_managePluginButton = new PixmapButton( this, "" );
 	m_managePluginButton->setCheckable( false );

@@ -353,7 +353,7 @@ sfxrInstrument::sfxrInstrument( InstrumentTrack * _instrument_track ) :
 	m_lpFilResoModel(0.0f, this, "LP Filter Resonance"),
 	m_hpFilCutModel(0.0f, this, "HP Filter Cutoff"),
 	m_hpFilCutSweepModel(0.0f, this, "HP Filter Cutoff Sweep"),
-	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave Form" ) )
+	m_waveFormModel( SQR_WAVE, 0, WAVES_NUM-1, this, tr( "Wave" ) )
 {
 }
 

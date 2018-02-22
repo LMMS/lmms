@@ -105,7 +105,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"controls" ) );
 		connect( m_managePluginButton, SIGNAL( clicked() ),  _ctl,
 						SLOT( managePlugin() ) );
-		ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
+		ToolTip::add( m_managePluginButton, tr( "Control VST plugin from LMMS host" ) );
 
 		m_managePluginButton->setMinimumWidth( 26 );
 		m_managePluginButton->setMaximumWidth( 26 );
@@ -121,7 +121,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"project_open" ) );
 		connect( m_openPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( openPreset() ) );
-		ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
+		ToolTip::add( m_openPresetButton, tr( "Open VST plugin preset" ) );
 
 		m_openPresetButton->setMinimumWidth( 16 );
 		m_openPresetButton->setMaximumWidth( 16 );

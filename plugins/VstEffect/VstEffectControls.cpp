@@ -324,7 +324,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	l->setVerticalSpacing( 10 );
 	l->setHorizontalSpacing( 23 );
 
-	m_syncButton = new QPushButton( tr( "VST Sync" ), widget );
+	m_syncButton = new QPushButton( tr( "VST sync" ), widget );
 	connect( m_syncButton, SIGNAL( clicked() ), this,
 							SLOT( syncPlugin() ) );
 

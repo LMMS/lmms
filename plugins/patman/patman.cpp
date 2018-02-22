@@ -464,7 +464,7 @@ PatmanView::PatmanView( Instrument * _instrument, QWidget * _parent ) :
 							"select_file" ) );
 	connect( m_openFileButton, SIGNAL( clicked() ),
 				this, SLOT( openFile() ) );
-	ToolTip::add( m_openFileButton, tr( "Open other patch" ) );
+	ToolTip::add( m_openFileButton, tr( "Open patch" ) );
 
 	m_loopButton = new PixmapButton( this, tr( "Loop" ) );
 	m_loopButton->setObjectName("loopButton");

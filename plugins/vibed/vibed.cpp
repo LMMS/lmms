@@ -90,19 +90,19 @@ vibed::vibed( InstrumentTrack * _instrumentTrack ) :
 		m_pickupKnobs.append( knob );
 
 		knob = new FloatModel( 0.0f, -1.0f, 1.0f, 0.01f, this,
-				tr( "Pan %1" ).arg( harm+1 )  );
+				tr( "String %1 panning" ).arg( harm+1 )  );
 		m_panKnobs.append( knob );
 
 		knob = new FloatModel( 0.0f, -0.1f, 0.1f, 0.001f, this,
-				tr( "Detune %1" ).arg( harm+1 ) );
+				tr( "String %1 detune" ).arg( harm+1 ) );
 		m_detuneKnobs.append( knob );
 
 		knob = new FloatModel( 0.0f, 0.0f, 0.75f, 0.01f, this,
-				tr( "Fuzziness %1 " ).arg( harm+1 ) );
+				tr( "String %1 fuzziness" ).arg( harm+1 ) );
 		m_randomKnobs.append( knob );
 
 		knob = new FloatModel( 1, 1, 16, 1, this,
-				tr( "Length %1" ).arg( harm+1 ) );
+				tr( "String %1 length" ).arg( harm+1 ) );
 		m_lengthKnobs.append( knob );
 
 		led = new BoolModel( false, this,
@@ -110,7 +110,7 @@ vibed::vibed( InstrumentTrack * _instrumentTrack ) :
 		m_impulses.append( led );
 
 		led = new BoolModel( harm==0, this,
-				tr( "Octave %1" ).arg( harm+1 )  );
+				tr( "String %1" ).arg( harm+1 )  );
 		m_powerButtons.append( led );
 
 		harmonic = new nineButtonSelectorModel( 2, 0, 8, this );
@@ -361,7 +361,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_volumeKnob = new Knob( knobBright_26, this );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->move( 103, 142 );
-	m_volumeKnob->setHintText( tr( "Volume:" ), "" );
+	m_volumeKnob->setHintText( tr( "String volume:" ), "" );
 
 	m_stiffnessKnob = new Knob( knobBright_26, this );
 	m_stiffnessKnob->move( 129, 142 );
@@ -380,26 +380,26 @@ vibedView::vibedView( Instrument * _instrument,
 
 	m_panKnob = new Knob( knobBright_26, this );
 	m_panKnob->move( 105, 187 );
-    m_panKnob->setHintText( tr( "Pan:" ), "" );
+    m_panKnob->setHintText( tr( "String panning:" ), "" );
 	
 	m_detuneKnob = new Knob( knobBright_26, this );
 	m_detuneKnob->move( 150, 187 );
-	m_detuneKnob->setHintText( tr( "Detune:" ), "" );
+	m_detuneKnob->setHintText( tr( "String detune:" ), "" );
 
 	m_randomKnob = new Knob( knobBright_26, this );
 	m_randomKnob->move( 194, 187 );
-	m_randomKnob->setHintText( tr( "Fuzziness:" )
+	m_randomKnob->setHintText( tr( "String fuzziness:" )
 						, "" );
 
 	m_lengthKnob = new Knob( knobBright_26, this );
 	m_lengthKnob->move( 23, 193 );
-	m_lengthKnob->setHintText( tr( "Length:" )
+	m_lengthKnob->setHintText( tr( "String length:" )
 						, "" );
 
 	m_impulse = new LedCheckBox( "", this );
 	m_impulse->move( 23, 94 );
 	ToolTip::add( m_impulse,
-			tr( "Impulse or initial state" ) );
+			tr( "Impulse" ) );
 
 	m_harmonic = new nineButtonSelector(
 		PLUGIN_NAME::getIconPixmap( "button_-2_on" ),
@@ -460,7 +460,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_power = new LedCheckBox( "", this, tr( "Enable waveform" ) );
 	m_power->move( 212, 130 );
 	ToolTip::add( m_power,
-			tr( "Click here to enable/disable waveform." ) );
+			tr( "Enable/disable string" ) );
 
 	
 	// String selector is not a part of the model
@@ -478,8 +478,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"sin_wave_inactive" ) );
 	ToolTip::add( m_sinWaveBtn,
-				tr( "Use a sine-wave for "
-				    "current oscillator." ) );
+				tr( "Sine wave" ) );
 	connect( m_sinWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sinWaveClicked() ) );
 
@@ -491,8 +490,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_triangleWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "triangle_wave_inactive" ) );
 	ToolTip::add( m_triangleWaveBtn,
-			tr( "Use a triangle-wave "
-			    "for current oscillator." ) );
+			tr( "Triangle wave" ) );
 	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( triangleWaveClicked( ) ) );
 
@@ -504,8 +502,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"saw_wave_inactive" ) );
 	ToolTip::add( m_sawWaveBtn,
-				tr( "Use a saw-wave for "
-				    "current oscillator." ) );
+				tr( "Saw wave" ) );
 	connect( m_sawWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sawWaveClicked() ) );
 
@@ -517,39 +514,36 @@ vibedView::vibedView( Instrument * _instrument,
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"square_wave_inactive" ) );
 	ToolTip::add( m_sqrWaveBtn,
-			tr( "Use a square-wave for "
-			    "current oscillator." ) );
+			tr( "Square wave" ) );
 	connect( m_sqrWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( sqrWaveClicked() ) );
 
 	
-	m_whiteNoiseWaveBtn = new PixmapButton( this, tr( "White noise wave" ) );
+	m_whiteNoiseWaveBtn = new PixmapButton( this, tr( "White noise" ) );
 	m_whiteNoiseWaveBtn->move( 212, 92 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 			embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	ToolTip::add( m_whiteNoiseWaveBtn,
-			tr( "Use white-noise for "
-			    "current oscillator." ) );
+			tr( "White noise" ) );
 	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( noiseWaveClicked() ) );
 
 	
-	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
+	m_usrWaveBtn = new PixmapButton( this, tr( "User-defined wave" ) );
 	m_usrWaveBtn->move( 212, 109 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 				"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 				"usr_wave_inactive" ) );
 	ToolTip::add( m_usrWaveBtn,
-			tr( "Use a user-defined "
-			    "waveform for current oscillator." ) );
+			tr( "User-defined wave" ) );
 	connect( m_usrWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( usrWaveClicked() ) );
 
 
-	m_smoothBtn = new PixmapButton( this, tr( "Smooth" ) );
+	m_smoothBtn = new PixmapButton( this, tr( "Smooth waveform" ) );
 	m_smoothBtn->move( 79, 129 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"smooth_active" ) );
@@ -557,11 +551,11 @@ vibedView::vibedView( Instrument * _instrument,
 			"smooth_inactive" ) );
 	m_smoothBtn->setChecked( false );
 	ToolTip::add( m_smoothBtn,
-			tr( "Click here to smooth waveform." ) );
+			tr( "Smooth waveform" ) );
 	connect( m_smoothBtn, SIGNAL ( clicked () ),
 			this, SLOT ( smoothClicked() ) );
 	
-	m_normalizeBtn = new PixmapButton( this, tr( "Normalize" ) );
+	m_normalizeBtn = new PixmapButton( this, tr( "Normalize waveform" ) );
 	m_normalizeBtn->move( 96, 129 );
 	m_normalizeBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 			"normalize_active" ) );
@@ -569,7 +563,7 @@ vibedView::vibedView( Instrument * _instrument,
 			"normalize_inactive" ) );
 	m_normalizeBtn->setChecked( false );
 	ToolTip::add( m_normalizeBtn,
-			tr( "Click here to normalize waveform." ) );
+			tr( "Normalize waveform" ) );
 
 	connect( m_normalizeBtn, SIGNAL ( clicked () ),
 			this, SLOT ( normalizeClicked() ) );

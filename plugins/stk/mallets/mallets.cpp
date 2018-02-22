@@ -67,13 +67,13 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	Instrument( _instrument_track, &malletsstk_plugin_descriptor ),
 	m_hardnessModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Hardness" )),
 	m_positionModel(64.0f, 0.0f, 64.0f, 0.1f, this, tr( "Position" )),
-	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Gain" )),
-	m_vibratoFreqModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato Freq" )),
-	m_stickModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick Mix" )),
+	m_vibratoGainModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato gain" )),
+	m_vibratoFreqModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Vibrato frequency" )),
+	m_stickModel(0.0f, 0.0f, 128.0f, 0.1f, this, tr( "Stick mix" )),
 	m_modulatorModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Modulator" )),
 	m_crossfadeModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Crossfade" )),
-	m_lfoSpeedModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Speed" )),
-	m_lfoDepthModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO Depth" )),
+	m_lfoSpeedModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO speed" )),
+	m_lfoDepthModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "LFO depth" )),
 	m_adsrModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "ADSR" )),
 	m_pressureModel(64.0f, 0.1f, 128.0f, 0.1f, this, tr( "Pressure" )),
 	m_motionModel(64.0f, 0.0f, 128.0f, 0.1f, this, tr( "Motion" )),
@@ -94,31 +94,31 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Agogo" ) );
 	m_scalers.append( 5.0 );
-	m_presetsModel.addItem( tr( "Wood1" ) );
+	m_presetsModel.addItem( tr( "Wood 1" ) );
 	m_scalers.append( 4.0 );
 	m_presetsModel.addItem( tr( "Reso" ) );
 	m_scalers.append( 2.5 );
-	m_presetsModel.addItem( tr( "Wood2" ) );
+	m_presetsModel.addItem( tr( "Wood 2" ) );
 	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Beats" ) );
 	m_scalers.append( 20.0 );
-	m_presetsModel.addItem( tr( "Two Fixed" ) );
+	m_presetsModel.addItem( tr( "Two fixed" ) );
 	m_scalers.append( 5.0 );
 	m_presetsModel.addItem( tr( "Clump" ) );
 	m_scalers.append( 4.0 );
 	
 	// TubeBell
-	m_presetsModel.addItem( tr( "Tubular Bells" ) );
+	m_presetsModel.addItem( tr( "Tubular bells" ) );
 	m_scalers.append( 1.8 );
 	
 	// BandedWG
-	m_presetsModel.addItem( tr( "Uniform Bar" ) );
+	m_presetsModel.addItem( tr( "Uniform bar" ) );
 	m_scalers.append( 25.0 );
-	m_presetsModel.addItem( tr( "Tuned Bar" ) );
+	m_presetsModel.addItem( tr( "Tuned bar" ) );
 	m_scalers.append( 10.0 );
 	m_presetsModel.addItem( tr( "Glass" ) );
 	m_scalers.append( 16.0 );
-	m_presetsModel.addItem( tr( "Tibetan Bowl" ) );
+	m_presetsModel.addItem( tr( "Tibetan bowl" ) );
 	m_scalers.append( 7.0 );
 }
 
@@ -460,19 +460,19 @@ QWidget * malletsInstrumentView::setupModalBarControls( QWidget * _parent )
 	m_positionKnob->setHintText( tr( "Position:" ), "" );
 
 	m_vibratoGainKnob = new Knob( knobVintage_32, widget );
-	m_vibratoGainKnob->setLabel( tr( "Vib Gain" ) );
+	m_vibratoGainKnob->setLabel( tr( "Vibrato gain" ) );
 	m_vibratoGainKnob->move( 30, 140 );
-	m_vibratoGainKnob->setHintText( tr( "Vib Gain:" ), "" );
+	m_vibratoGainKnob->setHintText( tr( "Vibrato gain:" ), "" );
 
 	m_vibratoFreqKnob = new Knob( knobVintage_32, widget );
-	m_vibratoFreqKnob->setLabel( tr( "Vib Freq" ) );
+	m_vibratoFreqKnob->setLabel( tr( "Vibrato frequency" ) );
 	m_vibratoFreqKnob->move( 110, 140 );
-	m_vibratoFreqKnob->setHintText( tr( "Vib Freq:" ), "" );
+	m_vibratoFreqKnob->setHintText( tr( "Vibrato frequency:" ), "" );
 
 	m_stickKnob = new Knob( knobVintage_32, widget );
-	m_stickKnob->setLabel( tr( "Stick Mix" ) );
+	m_stickKnob->setLabel( tr( "Stick mix" ) );
 	m_stickKnob->move( 190, 90 );
-	m_stickKnob->setHintText( tr( "Stick Mix:" ), "" );
+	m_stickKnob->setHintText( tr( "Stick mix:" ), "" );
 	
 	return( widget );
 }
@@ -496,14 +496,14 @@ QWidget * malletsInstrumentView::setupTubeBellControls( QWidget * _parent )
 	m_crossfadeKnob->setHintText( tr( "Crossfade:" ), "" );
 	
 	m_lfoSpeedKnob = new Knob( knobVintage_32, widget );
-	m_lfoSpeedKnob->setLabel( tr( "LFO Speed" ) );
+	m_lfoSpeedKnob->setLabel( tr( "LFO speed" ) );
 	m_lfoSpeedKnob->move( 30, 140 );
-	m_lfoSpeedKnob->setHintText( tr( "LFO Speed:" ), "" );
+	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
 	
 	m_lfoDepthKnob = new Knob( knobVintage_32, widget );
-	m_lfoDepthKnob->setLabel( tr( "LFO Depth" ) );
+	m_lfoDepthKnob->setLabel( tr( "LFO depth" ) );
 	m_lfoDepthKnob->move( 110, 140 );
-	m_lfoDepthKnob->setHintText( tr( "LFO Depth:" ), "" );
+	m_lfoDepthKnob->setHintText( tr( "LFO depth:" ), "" );
 	
 	m_adsrKnob = new Knob( knobVintage_32, widget );
 	m_adsrKnob->setLabel( tr( "ADSR" ) );

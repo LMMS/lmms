@@ -99,15 +99,15 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 	m_patchNum( 0, 0, 127, this, tr("Patch") ),
 	m_gain( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Gain" ) ),
 	m_reverbOn( false, this, tr( "Reverb" ) ),
-	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this, tr( "Reverb Roomsize" ) ),
-	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this, tr( "Reverb Damping" ) ),
-	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this, tr( "Reverb Width" ) ),
-	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this, tr( "Reverb Level" ) ),
+	m_reverbRoomSize( FLUID_REVERB_DEFAULT_ROOMSIZE, 0, 1.0, 0.01f, this, tr( "Room size" ) ),
+	m_reverbDamping( FLUID_REVERB_DEFAULT_DAMP, 0, 1.0, 0.01, this, tr( "Damping" ) ),
+	m_reverbWidth( FLUID_REVERB_DEFAULT_WIDTH, 0, 1.0, 0.01f, this, tr( "Width" ) ),
+	m_reverbLevel( FLUID_REVERB_DEFAULT_LEVEL, 0, 1.0, 0.01f, this, tr( "Level" ) ),
 	m_chorusOn( false, this, tr( "Chorus" ) ),
-	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr( "Chorus Lines" ) ),
-	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr( "Chorus Level" ) ),
-	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Chorus Speed" ) ),
-	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Chorus Depth" ) )
+	m_chorusNum( FLUID_CHORUS_DEFAULT_N, 0, 10.0, 1.0, this, tr( "Lines" ) ),
+	m_chorusLevel( FLUID_CHORUS_DEFAULT_LEVEL, 0, 10.0, 0.01, this, tr( "Level" ) ),
+	m_chorusSpeed( FLUID_CHORUS_DEFAULT_SPEED, 0.29, 5.0, 0.01, this, tr( "Speed" ) ),
+	m_chorusDepth( FLUID_CHORUS_DEFAULT_DEPTH, 0, 46.0, 0.05, this, tr( "Depth" ) )
 {
 	for( int i = 0; i < 128; ++i )
 	{
@@ -845,7 +845,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open other SoundFont file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open SoundFont file" ) );
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -857,7 +857,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
 
 
 	// LCDs
@@ -892,7 +892,7 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// Gain
 	m_gainKnob = new sf2Knob( this );
-	m_gainKnob->setHintText( tr("Gain"), "" );
+	m_gainKnob->setHintText( tr("Gain:"), "" );
 	m_gainKnob->move( 86, 55 );
 //	vl->addWidget( m_gainKnob );
 
@@ -909,19 +909,19 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 
 
 	m_reverbRoomSizeKnob = new sf2Knob( this );
-	m_reverbRoomSizeKnob->setHintText( tr("Reverb Roomsize:"), "" );
+	m_reverbRoomSizeKnob->setHintText( tr("Room size:"), "" );
 	m_reverbRoomSizeKnob->move( 93, 160 );
 
 	m_reverbDampingKnob = new sf2Knob( this );
-	m_reverbDampingKnob->setHintText( tr("Reverb Damping:"), "" );
+	m_reverbDampingKnob->setHintText( tr("Damping:"), "" );
 	m_reverbDampingKnob->move( 130, 160 );
 
 	m_reverbWidthKnob = new sf2Knob( this );
-	m_reverbWidthKnob->setHintText( tr("Reverb Width:"), "" );
+	m_reverbWidthKnob->setHintText( tr("Width:"), "" );
 	m_reverbWidthKnob->move( 167, 160 );
 
 	m_reverbLevelKnob = new sf2Knob( this );
-	m_reverbLevelKnob->setHintText( tr("Reverb Level:"), "" );
+	m_reverbLevelKnob->setHintText( tr("Level:"), "" );
 	m_reverbLevelKnob->move( 204, 160 );
 
 /*	hl->addWidget( m_reverbOnLed );
@@ -944,19 +944,19 @@ sf2InstrumentView::sf2InstrumentView( Instrument * _instrument, QWidget * _paren
 	ToolTip::add( m_chorusButton, tr( "Apply chorus (if supported)" ) );
 
 	m_chorusNumKnob = new sf2Knob( this );
-	m_chorusNumKnob->setHintText( tr("Chorus Lines:"), "" );
+	m_chorusNumKnob->setHintText( tr("Lines:"), "" );
 	m_chorusNumKnob->move( 93, 206 );
 
 	m_chorusLevelKnob = new sf2Knob( this );
-	m_chorusLevelKnob->setHintText( tr("Chorus Level:"), "" );
+	m_chorusLevelKnob->setHintText( tr("Level:"), "" );
 	m_chorusLevelKnob->move( 130 , 206 );
 
 	m_chorusSpeedKnob = new sf2Knob( this );
-	m_chorusSpeedKnob->setHintText( tr("Chorus Speed:"), "" );
+	m_chorusSpeedKnob->setHintText( tr("Speed:"), "" );
 	m_chorusSpeedKnob->move( 167 , 206 );
 
 	m_chorusDepthKnob = new sf2Knob( this );
-	m_chorusDepthKnob->setHintText( tr("Chorus Depth:"), "" );
+	m_chorusDepthKnob->setHintText( tr("Depth:"), "" );
 	m_chorusDepthKnob->move( 204 , 206 );
 /*
 	hl->addWidget( m_chorusOnLed );

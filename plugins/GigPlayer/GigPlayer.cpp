@@ -938,7 +938,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_fileDialogButton, SIGNAL( clicked() ), this, SLOT( showFileDialog() ) );
 
-	ToolTip::add( m_fileDialogButton, tr( "Open other GIG file" ) );
+	ToolTip::add( m_fileDialogButton, tr( "Open GIG file" ) );
 
 	// Patch Button
 	m_patchDialogButton = new PixmapButton( this );
@@ -950,7 +950,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	connect( m_patchDialogButton, SIGNAL( clicked() ), this, SLOT( showPatchDialog() ) );
 
-	ToolTip::add( m_patchDialogButton, tr( "Choose the patch" ) );
+	ToolTip::add( m_patchDialogButton, tr( "Choose patch" ) );
 
 	// LCDs
 	m_bankNumLcd = new LcdSpinBox( 3, "21pink", this );
@@ -967,7 +967,7 @@ GigInstrumentView::GigInstrumentView( Instrument * _instrument, QWidget * _paren
 
 	// Gain
 	m_gainKnob = new gigKnob( this );
-	m_gainKnob->setHintText( tr( "Gain" ) + " ", "" );
+	m_gainKnob->setHintText( tr( "Gain:" ) + " ", "" );
 	m_gainKnob->move( 32, 140 );
 
 	setAutoFillBackground( true );
