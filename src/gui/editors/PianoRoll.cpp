@@ -4069,14 +4069,14 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
-	QAction* detuneAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Detune mode (Shift+T)" ) );
+	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch-Bend Mode (Shift+T)" ) );
 
 	drawAction->setChecked( true );
 
 	drawAction->setShortcut( Qt::SHIFT | Qt::Key_D );
 	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
 	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
-	detuneAction->setShortcut( Qt::SHIFT | Qt::Key_T );
+	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
 
 	drawAction->setWhatsThis(
 		tr( "Click here and draw mode will be activated. In this "
@@ -4104,8 +4104,8 @@ PianoRollWindow::PianoRollWindow() :
 				#else
 				"Ctrl" ) );
 				#endif
-	detuneAction->setWhatsThis(
-		tr( "Click here and detune mode will be activated. "
+	pitchBendAction->setWhatsThis(
+		tr( "Click here and Pitch-Bend Mode will be activated. "
 			"In this mode you can click a note to open its "
 			"automation detuning. You can utilize this to slide "
 			"notes from one to another. You can also press "
@@ -4119,7 +4119,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
-	notesActionsToolBar->addAction( detuneAction );
+	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
 
