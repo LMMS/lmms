@@ -45,20 +45,25 @@
 #include "ControllerRackView.h"
 #include "embed.h"
 #include "Engine.h"
+#include "ExportProjectDialog.h"
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
+#include "ImportFilter.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"
+#include "ProjectRenderer.h"
 #include "RemotePlugin.h"
 #include "SetupDialog.h"
 #include "SideBar.h"
 #include "SongEditor.h"
+#include "TextFloat.h"
+#include "TimeLineWidget.h"
 #include "ToolButton.h"
 #include "ToolPlugin.h"
 #include "VersionedSaveDialog.h"
@@ -229,6 +234,11 @@ MainWindow::MainWindow() :
 
 	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ),
 				this, SLOT( updatePlayPauseIcons() ) );
+
+	connect(Engine::getSong(), SIGNAL(stopped()), SLOT(onSongStopped()));
+
+	connect(Engine::getSong(), SIGNAL(modified()), SLOT(onSongModified()));
+	connect(Engine::getSong(), SIGNAL(projectFileNameChanged()), SLOT(onProjectFileNameChanged()));
 }
 
 
@@ -307,23 +317,23 @@ void MainWindow::finalize()
 	project_menu->addSeparator();
 	project_menu->addAction( embed::getIconPixmap( "project_import" ),
 					tr( "Import..." ),
-					Engine::getSong(),
-					SLOT( importProject() ) );
+					this,
+					SLOT( onImportProject() ) );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport..." ),
-					Engine::getSong(),
-					SLOT( exportProject() ),
+					this,
+					SLOT( onExportProject() ),
 					Qt::CTRL + Qt::Key_E );
 	project_menu->addAction( embed::getIconPixmap( "project_export" ),
 					tr( "E&xport Tracks..." ),
-					Engine::getSong(),
-					SLOT( exportProjectTracks() ),
+					this,
+					SLOT( onExportProjectTracks() ),
 					Qt::CTRL + Qt::SHIFT + Qt::Key_E );
 
 	project_menu->addAction( embed::getIconPixmap( "midi_file" ),
 					tr( "Export &MIDI..." ),
-					Engine::getSong(),
-					SLOT( exportProjectMidi() ),
+					this,
+					SLOT( onExportProjectMidi() ),
 					Qt::CTRL + Qt::Key_M );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
@@ -450,8 +460,8 @@ void MainWindow::finalize()
 	ToolButton * project_export = new ToolButton(
 				embed::getIconPixmap( "project_export" ),
 					tr( "Export current project" ),
-					Engine::getSong(),
-							SLOT( exportProject() ),
+					this,
+							SLOT( onExportProject() ),
 								m_toolBar );
 
 	ToolButton * whatsthis = new ToolButton(
@@ -665,24 +675,24 @@ SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags
 
 void MainWindow::resetWindowTitle()
 {
-	QString title = "";
+	QString title(tr( "Untitled" ));
+
 	if( Engine::getSong()->projectFileName() != "" )
 	{
 		title = QFileInfo( Engine::getSong()->projectFileName()
 							).completeBaseName();
 	}
-	if( title == "" )
-	{
-		title = tr( "Untitled" );
-	}
+
 	if( Engine::getSong()->isModified() )
 	{
 		title += '*';
 	}
+
 	if( getSession() == Recover )
 	{
 		title += " - " + tr( "Recover session. Please save your work!" );
 	}
+
 	setWindowTitle( title + " - " + tr( "LMMS %1" ).arg( LMMS_VERSION ) );
 }
 
@@ -945,7 +955,7 @@ bool MainWindow::saveProject()
 	}
 	else
 	{
-		Engine::getSong()->guiSaveProject();
+		this->guiSaveProject();
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
@@ -997,7 +1007,7 @@ bool MainWindow::saveProjectAs()
 				}
 			}
 		}
-		Engine::getSong()->guiSaveProjectAs( fname );
+		this->guiSaveProjectAs( fname );
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
@@ -1022,7 +1032,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
+		this->guiSaveProjectAs( fileName );
 		return true;
 	}
 }
@@ -1572,4 +1582,244 @@ void MainWindow::autoSave()
 			autoSaveTimerReset( m_autoSaveShortTime );
 		}
 	}
+}
+
+void MainWindow::onExportProjectMidi()
+{
+	FileDialog efd( this );
+
+	efd.setFileMode( FileDialog::AnyFile );
+
+	QStringList types;
+	types << tr("MIDI File (*.mid)");
+	efd.setNameFilters( types );
+	QString base_filename;
+	QString const & projectFileName = Engine::getSong()->projectFileName();
+	if( !projectFileName.isEmpty() )
+	{
+		efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+		base_filename = QFileInfo( projectFileName ).completeBaseName();
+	}
+	else
+	{
+		efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+		base_filename = tr( "untitled" );
+	}
+	efd.selectFile( base_filename + ".mid" );
+	efd.setDefaultSuffix( "mid");
+	efd.setWindowTitle( tr( "Select file for project-export..." ) );
+
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() && !efd.selectedFiles()[0].isEmpty() )
+	{
+		const QString suffix = ".mid";
+
+		QString export_filename = efd.selectedFiles()[0];
+		if (!export_filename.endsWith(suffix)) export_filename += suffix;
+
+		Engine::getSong()->exportProjectMidi(export_filename);
+	}
+}
+
+void MainWindow::exportProject(bool multiExport)
+{
+	QString const & projectFileName = Engine::getSong()->projectFileName();
+
+	FileDialog efd( gui->mainWindow() );
+
+	if ( multiExport )
+	{
+		efd.setFileMode( FileDialog::Directory);
+		efd.setWindowTitle( tr( "Select directory for writing exported tracks..." ) );
+		if( !projectFileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+		}
+	}
+	else
+	{
+		efd.setFileMode( FileDialog::AnyFile );
+		int idx = 0;
+		QStringList types;
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats)
+		{
+			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
+				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
+			}
+			++idx;
+		}
+		efd.setNameFilters( types );
+		QString baseFilename;
+		if( !projectFileName.isEmpty() )
+		{
+			efd.setDirectory( QFileInfo( projectFileName ).absolutePath() );
+			baseFilename = QFileInfo( projectFileName ).completeBaseName();
+		}
+		else
+		{
+			efd.setDirectory( ConfigManager::inst()->userProjectsDir() );
+			baseFilename = tr( "untitled" );
+		}
+		efd.selectFile( baseFilename + ProjectRenderer::fileEncodeDevices[0].m_extension );
+		efd.setWindowTitle( tr( "Select file for project-export..." ) );
+	}
+
+	QString suffix = "wav";
+	efd.setDefaultSuffix( suffix );
+	efd.setAcceptMode( FileDialog::AcceptSave );
+
+	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
+					 !efd.selectedFiles()[0].isEmpty() )
+	{
+
+		QString exportFileName = efd.selectedFiles()[0];
+		if ( !multiExport )
+		{
+			int stx = efd.selectedNameFilter().indexOf( "(*." );
+			int etx = efd.selectedNameFilter().indexOf( ")" );
+
+			if ( stx > 0 && etx > stx )
+			{
+				// Get first extension from selected dropdown.
+				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
+				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
+				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
+				if ( efd.selectedFiles()[0].endsWith( suffix ) )
+				{
+					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+							tr( "Save project" ) ) )
+					{
+						exportFileName += suffix;
+					}
+				}
+			}
+		}
+
+		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
+		epd.exec();
+	}
+}
+
+void MainWindow::handleSaveResult(QString const & filename, bool songSavedSuccessfully)
+{
+	if (songSavedSuccessfully)
+	{
+		TextFloat::displayMessage( tr( "Project saved" ), tr( "The project %1 is now saved.").arg( filename ),
+				embed::getIconPixmap( "project_save", 24, 24 ), 2000 );
+		ConfigManager::inst()->addRecentlyOpenedProject(filename);
+		resetWindowTitle();
+	}
+	else
+	{
+		TextFloat::displayMessage( tr( "Project NOT saved." ), tr( "The project %1 was not saved!" ).arg(filename),
+				embed::getIconPixmap( "error" ), 4000 );
+	}
+}
+
+bool MainWindow::guiSaveProject()
+{
+	Song * song = Engine::getSong();
+	bool const songSaveResult = song->guiSaveProject();
+	handleSaveResult(song->projectFileName(), songSaveResult);
+
+	return songSaveResult;
+}
+
+bool MainWindow::guiSaveProjectAs( const QString & filename )
+{
+	Song * song = Engine::getSong();
+	bool const songSaveResult = song->guiSaveProjectAs(filename);
+	handleSaveResult(filename, songSaveResult);
+
+	return songSaveResult;
+}
+
+void MainWindow::onExportProject()
+{
+	this->exportProject();
+}
+
+void MainWindow::onExportProjectTracks()
+{
+	this->exportProject(true);
+}
+
+void MainWindow::onImportProject()
+{
+	Song * song = Engine::getSong();
+
+	if (song)
+	{
+		FileDialog ofd( nullptr, tr( "Import file" ),
+				ConfigManager::inst()->userProjectsDir(),
+				tr("MIDI sequences") +
+				" (*.mid *.midi *.rmi);;" +
+				tr("Hydrogen projects") +
+				" (*.h2song);;" +
+				tr("All file types") +
+				" (*.*)");
+
+		ofd.setFileMode( FileDialog::ExistingFiles );
+		if( ofd.exec () == QDialog::Accepted && !ofd.selectedFiles().isEmpty() )
+		{
+			ImportFilter::import( ofd.selectedFiles()[0], song );
+		}
+
+		song->setLoadOnLauch(false);
+	}
+}
+
+void MainWindow::onSongStopped()
+{
+	Song * song = Engine::getSong();
+	Song::PlayPos const & playPos = song->getPlayPos();
+
+	TimeLineWidget * tl = playPos.m_timeLine;
+
+	if( tl )
+	{
+		SongEditorWindow* songEditor = gui->songEditor();
+		switch( tl->behaviourAtStop() )
+		{
+			case TimeLineWidget::BackToZero:
+				if( songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+				{
+					songEditor->m_editor->updatePosition(0);
+				}
+				break;
+
+			case TimeLineWidget::BackToStart:
+				if( tl->savedPos() >= 0 )
+				{
+					if(songEditor && ( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
+					{
+						songEditor->m_editor->updatePosition( MidiTime(tl->savedPos().getTicks() ) );
+					}
+					tl->savePos( -1 );
+				}
+				break;
+
+			case TimeLineWidget::KeepStopPosition:
+				break;
+		}
+	}
+}
+
+void MainWindow::onSongModified()
+{
+	// Only update the window title if the code is executed from the GUI main thread.
+	// The assumption seems to be that the Song can also be set as modified from other
+	// threads. This is not a good design! Copied from the original implementation of
+	// Song::setModified.
+	if(QThread::currentThread() == this->thread())
+	{
+		this->resetWindowTitle();
+	}
+}
+
+void MainWindow::onProjectFileNameChanged()
+{
+	this->resetWindowTitle();
 }

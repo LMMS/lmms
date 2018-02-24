@@ -298,6 +298,9 @@ public:
 		return m_timeSigModel;
 	}
 
+	void exportProjectMidi(QString const & exportFileName) const;
+
+	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
 
 public slots:
 	void playSong();
@@ -307,11 +310,6 @@ public slots:
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
-
-	void importProject();
-	void exportProject( bool multiExport = false );
-	void exportProjectTracks();
-	void exportProjectMidi();
 
 	void startExport();
 	void stopExport();
@@ -374,6 +372,10 @@ private:
 
 	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
 
+	void setModified(bool value);
+
+	void setProjectFileName(QString const & projectFileName);
+
 	AutomationTrack * m_globalAutomationTrack;
 
 	IntModel m_tempoModel;
@@ -432,7 +434,9 @@ signals:
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();
-
+	void stopped();
+	void modified();
+	void projectFileNameChanged();
 } ;
 
 
