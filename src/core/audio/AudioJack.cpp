@@ -486,7 +486,7 @@ void AudioJack::shutdownCallback( void * _udata )
 void AudioJack::connectJackPort(const char *outputPort,
 										  const char *inputPort,
 										  const char *portName) {
-	if(outputPort == NULL | inputPort == NULL)
+	if(outputPort == NULL || inputPort == NULL)
 	{
 		printf( "no physical %s port. you'll have to do "
 			"connections at your own!\n", portName);
