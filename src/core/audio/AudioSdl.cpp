@@ -100,6 +100,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 
 #ifdef LMMS_HAVE_SDL2
 	m_inputAudioHandle = m_audioHandle;
+	m_inputAudioHandle.freq = mixer ()->inputSampleRate ();
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
 
 	m_inputDevice = SDL_OpenAudioDevice (NULL,
@@ -107,7 +108,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 										 &m_inputAudioHandle,
 										 &actual,
 										 0);
-	if (m_inputDevice != 0) {
+	if (m_inputDevice != 0 && actual.freq == mixer ()->inputSampleRate ()) {
 		m_supportsCapture = true;
 	} else {
 		m_supportsCapture = false;
