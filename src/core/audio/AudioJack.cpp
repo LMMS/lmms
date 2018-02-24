@@ -244,30 +244,30 @@ void AudioJack::startProcessing()
 
 
 
-	const char * * ports = jack_get_ports( m_client, NULL, NULL,
+	const char * * inputPorts = jack_get_ports( m_client, NULL, NULL,
 						JackPortIsPhysical |
 						JackPortIsInput );
-	if( ports == NULL )
-	{
-		printf( "no physical playback ports. you'll have to do "
-			"connections at your own!\n" );
-	}
-	else
-	{
-		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
-		{
-			if( jack_connect( m_client, jack_port_name(
-							m_outputPorts[ch] ),
-								ports[ch] ) )
-			{
-				printf( "cannot connect output ports. you'll "
-					"have to do connections at your own!\n"
-									);
-			}
+	// Connect lmms to the default playback device.
+	if (inputPorts) {
+		for (uint i = 0; i < channels (); ++i) {
+			connectJackPort (jack_port_name (m_outputPorts[i]), inputPorts[i], "playback");
 		}
+
+		free( inputPorts );
 	}
 
-	free( ports );
+	const char * * outputPorts = jack_get_ports( m_client, NULL, NULL,
+						JackPortIsPhysical |
+						JackPortIsOutput );
+	// Connect lmms to the default capture device.
+	if (outputPorts) {
+		for (uint i = 0; i < channels (); ++i) {
+			connectJackPort (outputPorts[i], jack_port_name (m_inputPorts[i]), "capture");
+		}
+
+		free( outputPorts );
+	}
+
 }
 
 
@@ -481,6 +481,27 @@ void AudioJack::shutdownCallback( void * _udata )
 	AudioJack * _this = static_cast<AudioJack *>( _udata );
 	_this->m_client = NULL;
 	_this->zombified();
+}
+
+void AudioJack::connectJackPort(const char *outputPort,
+										  const char *inputPort,
+										  const char *portName) {
+	if(outputPort == NULL | inputPort == NULL)
+	{
+		printf( "no physical %s port. you'll have to do "
+			"connections at your own!\n", portName);
+	}
+	else
+	{
+		if( jack_connect( m_client, outputPort,
+						  inputPort) )
+		{
+			printf( "cannot connect %s port. you'll "
+					"have to do connections at your own!\n",
+					portName);
+		}
+	}
+
 }
 
 
