@@ -181,12 +181,10 @@ rm -f "${APPDIR}/usr/lib/libwine.so.1"
 # Use system-provided carla
 rm -f "${APPDIR}usr/lib/"libcarla*.so
 
-# Remove problematic jack library, replace with weakjack
+# Move jack out of LD_LIBRARY_PATH
 if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
-   rm -f "${APPDIR}/usr/lib/libjack.so.0"
    mkdir -p "${APPDIR}usr/lib/lmms/optional/"
-   cp "@CMAKE_BINARY_DIR@/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/weakjack.so"
-   ln -sr "${APPDIR}usr/lib/lmms/optional/weakjack.so" "${APPDIR}usr/lib/lmms/optional/libjack.so.0"
+   mv "${APPDIR}/usr/lib/libjack.so.0" "${APPDIR}usr/lib/lmms/optional/"
 fi
 
 # Create AppImage

@@ -1,14 +1,5 @@
 IF(LMMS_HAVE_WEAKJACK)
 	set(WEAKJACK core/audio/AudioWeakJack.c)
-
-	# Build libjack.so.0 stub as weakjack.so for AppImages
-	IF(LMMS_BUILD_LINUX)
-		ADD_LIBRARY(weakjack MODULE ../../src/core/audio/AudioWeakJack.c)
-		INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
-		# We can't predict an AppImage build, so stash the build artifact for later
-		INSTALL(TARGETS weakjack LIBRARY DESTINATION "${CMAKE_BINARY_DIR}/optional")
-		SET_TARGET_PROPERTIES(weakjack PROPERTIES PREFIX "" SUFFIX ".so")
-	ENDIF()
 ENDIF()
 	
 set(LMMS_SRCS
