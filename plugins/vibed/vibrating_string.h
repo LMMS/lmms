@@ -130,7 +130,7 @@ private:
 				offset =  ( m_randomize / 2.0f -
 						m_randomize ) * r;
 				_dl->data[i] = _scale *
-						_values[_dl->length - i] +
+						_values[_dl->length - i - 1] +
 						offset;
 			}
 			for( int i = _pick; i < _dl->length; i++ )

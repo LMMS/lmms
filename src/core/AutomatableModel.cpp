@@ -42,8 +42,6 @@ AutomatableModel::AutomatableModel( DataType type,
 	Model( parent, displayName, defaultConstructed ),
 	m_dataType( type ),
 	m_scaleType( Linear ),
-	m_value( val ),
-	m_initValue( val ),
 	m_minValue( min ),
 	m_maxValue( max ),
 	m_step( step ),
@@ -59,6 +57,7 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_hasSampleExactData( false )
 
 {
+	m_value = fittedValue( val );
 	setInitValue( val );
 }
 
@@ -523,14 +522,8 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 
 ValueBuffer * AutomatableModel::valueBuffer()
 {
-	// if we've already calculated the valuebuffer this period, return the cached buffer
-	if( m_lastUpdatedPeriod == s_periodCounter )
-	{
-		return m_hasSampleExactData
-			? &m_valueBuffer
-			: NULL;
-	}
 	QMutexLocker m( &m_valueBufferMutex );
+	// if we've already calculated the valuebuffer this period, return the cached buffer
 	if( m_lastUpdatedPeriod == s_periodCounter )
 	{
 		return m_hasSampleExactData
@@ -626,6 +619,7 @@ void AutomatableModel::setInitValue( const float value )
 	m_initValue = fittedValue( value );
 	bool journalling = testAndSetJournalling( false );
 	setValue( value );
+	m_oldValue = m_value;
 	setJournalling( journalling );
 	emit initValueChanged( value );
 }
@@ -716,19 +710,19 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 
 float FloatModel::getRoundedValue() const
 {
-	return static_cast<float>( static_cast<int>( value() / step<float>() + 0.5 ) ) * step<float>();
+	return qRound( value() / step<float>() ) * step<float>();
 }
 
 
 
 
-float FloatModel::getDigitCount()
+int FloatModel::getDigitCount() const
 {
 	float steptemp = step<float>();
 	int digits = 0;
 	while ( steptemp < 1 )
 	{
-		steptemp = steptemp / 0.1f;
+		steptemp = steptemp * 10.0f;
 		digits++;
 	}
 	return digits;

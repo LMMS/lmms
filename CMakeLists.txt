@@ -9,6 +9,7 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0003 NEW)
 	IF (CMAKE_MAJOR_VERSION GREATER 2)
 		CMAKE_POLICY(SET CMP0026 OLD)
+		CMAKE_POLICY(SET CMP0050 OLD)
 	ENDIF()
 ENDIF(COMMAND CMAKE_POLICY)
 
@@ -19,7 +20,7 @@ INCLUDE(FindPkgConfig)
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
 # Updated by maintenance tasks
-SET(PROJECT_YEAR 2015)
+SET(PROJECT_YEAR 2017)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -29,7 +30,7 @@ SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
 SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc2")
+SET(VERSION_STAGE       "rc4")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -50,6 +51,8 @@ OPTION(WANT_CAPS	"Include C* Audio Plugin Suite (LADSPA plugins)" ON)
 OPTION(WANT_CARLA	"Include Carla plugin" ON)
 OPTION(WANT_CMT		"Include Computer Music Toolkit LADSPA plugins" ON)
 OPTION(WANT_JACK	"Include JACK (Jack Audio Connection Kit) support" ON)
+OPTION(WANT_WEAKJACK	"Loosely link JACK libraries" ON)
+OPTION(WANT_MP3LAME	"Include MP3/Lame support" ON)
 OPTION(WANT_OGGVORBIS	"Include OGG/Vorbis support" ON)
 OPTION(WANT_PULSEAUDIO	"Include PulseAudio support" ON)
 OPTION(WANT_PORTAUDIO	"Include PortAudio support" ON)
@@ -67,7 +70,6 @@ OPTION(WANT_QT5		"Build with Qt5" OFF)
 
 
 IF(LMMS_BUILD_APPLE)
-	SET(WANT_SF2 OFF)
 	SET(WANT_ALSA OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_VST OFF)
@@ -83,12 +85,14 @@ IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
 	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
+	SET(WANT_PORTAUDIO OFF)
 	SET(WANT_SOUNDIO OFF)
 	SET(WANT_WINMM ON)
 	SET(LMMS_HAVE_WINMM TRUE)
 	SET(STATUS_ALSA "<not supported on this platform>")
 	SET(STATUS_JACK "<not supported on this platform>")
 	SET(STATUS_PULSEAUDIO "<not supported on this platform>")
+	SET(STATUS_PORTAUDIO "<disabled on this platform>")
 	SET(STATUS_SOUNDIO "<disabled in this release>")
 	SET(STATUS_WINMM "OK")
 	SET(STATUS_APPLEMIDI "<not supported on this platform>")
@@ -150,6 +154,9 @@ IF(WANT_QT5)
 		Qt5::Widgets
 		Qt5::Xml
 	)
+
+	# Resolve Qt5::qmake to full path for use in packaging scripts
+	GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
 
 	FIND_PACKAGE(Qt5Test)
 	SET(QT_QTTEST_LIBRARY Qt5::Test)
@@ -306,6 +313,21 @@ IF(NOT LMMS_HAVE_PULSEAUDIO)
 ENDIF(NOT LMMS_HAVE_PULSEAUDIO)
 
 
+# check for MP3/Lame-libraries
+IF(WANT_MP3LAME)
+	FIND_PACKAGE(Lame)
+	IF(LAME_FOUND)
+		SET(LMMS_HAVE_MP3LAME TRUE)
+		SET(STATUS_MP3LAME "OK")
+	ELSE(LAME_FOUND)
+		SET(STATUS_MP3LAME "not found, please install libmp3lame-dev (or similar)")
+		SET(LAME_LIBRARIES "")
+		SET(LAME_INCLUDE_DIRS "")
+	ENDIF(LAME_FOUND)
+ELSE(WANT_MP3LAME)
+	SET(STATUS_MP3LAME "Disabled for build")
+ENDIF(WANT_MP3LAME)
+
 # check for OGG/Vorbis-libraries
 IF(WANT_OGGVORBIS)
 	FIND_PACKAGE(OggVorbis)
@@ -348,8 +370,16 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 IF(WANT_JACK)
 	PKG_CHECK_MODULES(JACK jack>=0.77)
 	IF(JACK_FOUND)
+		IF(WANT_WEAKJACK)
+			SET(LMMS_HAVE_WEAKJACK TRUE)
+			SET(STATUS_JACK "OK (weak linking enabled)")
+			SET(JACK_INCLUDE_DIRS "")
+			# use dlsym instead
+			SET(JACK_LIBRARIES "dl")
+		ELSE()
+			SET(STATUS_JACK "OK")
+		ENDIF()
 		SET(LMMS_HAVE_JACK TRUE)
-		SET(STATUS_JACK "OK")
 	ELSE(JACK_FOUND)
 		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 			"if you require JACK support")
@@ -408,7 +438,11 @@ IF(WANT_VST)
 	FIND_PACKAGE(Wine)
 	IF(WINE_FOUND)
 		SET(LMMS_SUPPORT_VST TRUE)
-		SET(STATUS_VST "OK")
+		IF(WINE_LIBRARY_FIX)
+			SET(STATUS_VST "OK, with workaround linking ${WINE_LIBRARY_FIX}")
+		ELSE()
+			SET(STATUS_VST "OK")
+		ENDIF()
 	ELSEIF(WANT_VST_NOWINE)
 		SET(LMMS_SUPPORT_VST TRUE)
 		SET(STATUS_VST "OK")
@@ -476,6 +510,19 @@ IF(WIN32)
 ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DPIC")
 ENDIF(WIN32)
+
+# use ccache
+OPTION(USE_CCACHE "Use ccache for compilation" OFF)
+IF(USE_CCACHE)
+    FIND_PROGRAM(CCACHE ccache)
+    IF (CCACHE)
+        MESSAGE(STATUS "Using ccache found in PATH")
+        SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE})
+        SET_PROPERTY(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE})
+    ELSE()
+        MESSAGE(WARNING "USE_CCACHE enabled, but no ccache found")
+    ENDIF()
+ENDIF()
 
 # make sub-directories
 ADD_SUBDIRECTORY(cmake)
@@ -580,6 +627,7 @@ MESSAGE(
 "-----------------------------------------\n"
 "* WAVE                        : OK\n"
 "* OGG/VORBIS                  : ${STATUS_OGGVORBIS}\n"
+"* MP3/Lame                    : ${STATUS_MP3LAME}\n"
 )
 
 MESSAGE(

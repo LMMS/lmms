@@ -129,11 +129,11 @@ void MidiPort::processInEvent( const MidiEvent& event, const MidiTime& time )
 			{
 				return;
 			}
-		}
 
-		if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
-		{
-			inEvent.setVelocity( fixedInputVelocity() );
+			if( fixedInputVelocity() >= 0 && inEvent.velocity() > 0 )
+			{
+				inEvent.setVelocity( fixedInputVelocity() );
+			}
 		}
 
 		m_midiEventProcessor->processInEvent( inEvent, time );

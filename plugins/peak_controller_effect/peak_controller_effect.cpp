@@ -67,7 +67,10 @@ PeakControllerEffect::PeakControllerEffect(
 	m_autoController( NULL )
 {
 	m_autoController = new PeakController( Engine::getSong(), this );
-	Engine::getSong()->addController( m_autoController );
+	if( !Engine::getSong()->isLoadingProject() )
+	{
+		Engine::getSong()->addController( m_autoController );
+	}
 	PeakController::s_effects.append( this );
 }
 

@@ -35,34 +35,21 @@
 class AudioFileWave : public AudioFileDevice
 {
 public:
-	AudioFileWave( const sample_rate_t _sample_rate,
-			const ch_cnt_t _channels,
-			bool & _success_ful,
-			const QString & _file,
-			const bool _use_vbr,
-			const bitrate_t _nom_bitrate,
-			const bitrate_t _min_bitrate,
-			const bitrate_t _max_bitrate,
-			const int _depth,
+	AudioFileWave( OutputSettings const & outputSettings,
+			const ch_cnt_t channels,
+			bool & successful,
+			const QString & file,
 			Mixer* mixer );
 	virtual ~AudioFileWave();
 
-	static AudioFileDevice * getInst( const sample_rate_t _sample_rate,
-						const ch_cnt_t _channels,
-						bool & _success_ful,
-						const QString & _file,
-						const bool _use_vbr,
-						const bitrate_t _nom_bitrate,
-						const bitrate_t _min_bitrate,
-						const bitrate_t _max_bitrate,
-						const int _depth,
-						Mixer* mixer )
+	static AudioFileDevice * getInst( const QString & outputFilename,
+					  OutputSettings const & outputSettings,
+					  const ch_cnt_t channels,
+					  Mixer* mixer,
+					  bool & successful )
 	{
-		return new AudioFileWave( _sample_rate, _channels,
-						_success_ful, _file, _use_vbr,
-						_nom_bitrate, _min_bitrate,
-							_max_bitrate, _depth,
-							mixer );
+		return new AudioFileWave( outputSettings, channels, successful,
+					  outputFilename, mixer );
 	}
 
 
@@ -74,11 +61,9 @@ private:
 	bool startEncoding();
 	void finishEncoding();
 
-
+private:
 	SF_INFO m_si;
 	SNDFILE * m_sf;
-
 } ;
-
 
 #endif

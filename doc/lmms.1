@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH LMMS 1 "February 17, 2016"
+.TH LMMS 1 "June 15, 2017"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -52,6 +52,9 @@ lmms \- software for easy music production
 .RB "[ \--\fBloop\fP ]"
 .br
 .B lmms
+.RB "[ \--\fBmode\fP \fIstereomode\fP ]"
+.br
+.B lmms
 .RB "[ \--\fBoutput\fP \fIpath\fP ]"
 .br
 .B lmms
@@ -94,7 +97,7 @@ Get the configuration from \fIconfigfile\fP instead of ~/.lmmsrc.xml (default)
 .IP "\fB\-d, --dump\fP \fIin\fP
 Dump XML of compressed file \fIin\fP (i.e. MMPZ-file)
 .IP "\fB\-f, --format\fP \fIformat\fP
-Specify format of render-output where \fIformat\fP is either 'wav' or 'ogg'
+Specify format of render-output where \fIformat\fP is either 'wav', 'ogg' or 'mp3'.
 .IP "\fB\    --geometry\fP \fIgeometry\fP
 Specify the prefered size and position of the main window
 .br
@@ -111,6 +114,8 @@ Import MIDI file \fIin\fP
 If -e is specified lmms exits after importing the file.
 .IP "\fB\-l, --loop
 Render the given file as a loop, i.e. stop rendering at exactly the end of the song. Additional silence or reverb tails at the end of the song are not rendered.
+.IP "\fB\-m, --mode\fP \fIstereomode\fP
+Set the stereo mode used for the MP3 export. \fIstereomode\fP can be either 's' (stereo mode), 'j' (joint stereo) or 'm' (mono). If no mode is given 'j' is used as the default.
 .IP "\fB\-o, --output\fP \fIpath\fP
 Render into \fIpath\fP
 .br

@@ -119,8 +119,8 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 #endif
 	m_backgroundArtwork( QDir::toNativeSeparators( ConfigManager::inst()->backgroundArtwork() ) ),
 	m_smoothScroll( ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt() ),
-	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave" ).toInt() ),
-	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave" ).toInt() ),
+	m_enableAutoSave( ConfigManager::inst()->value( "ui", "enableautosave", "1" ).toInt() ),
+	m_enableRunningAutoSave( ConfigManager::inst()->value( "ui", "enablerunningautosave", "0" ).toInt() ),
 	m_saveInterval(	ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() < 1 ?
 					MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES :
 			ConfigManager::inst()->value( "ui", "saveinterval" ).toInt() ),
@@ -131,7 +131,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_syncVSTPlugins( ConfigManager::inst()->value( "ui",
 							"syncvstplugins" ).toInt() ),
 	m_animateAFP(ConfigManager::inst()->value( "ui",
-						   "animateafp").toInt() ),
+						   "animateafp", "1" ).toInt() ),
 	m_printNoteLabels(ConfigManager::inst()->value( "ui",
 						   "printnotelabels").toInt() ),
 	m_displayWaveform(ConfigManager::inst()->value( "ui",
@@ -808,6 +808,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		m_audioInterfaces->addItem( it.key() );
 	}
 
+	// If no preferred audio device is saved, save the current one
 	QString audioDevName = 
 		ConfigManager::inst()->value( "mixer", "audiodev" );
 	if( audioDevName.length() == 0 )
@@ -1517,7 +1518,7 @@ void SetupDialog::resetAutoSave()
 {
 	setAutoSaveInterval( MainWindow::DEFAULT_SAVE_INTERVAL_MINUTES );
 	m_autoSave->setChecked( true );
-	m_runningAutoSave->setChecked( true );
+	m_runningAutoSave->setChecked( false );
 }
 
 

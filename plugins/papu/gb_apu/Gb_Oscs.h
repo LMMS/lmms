@@ -1,100 +1,83 @@
-
 // Private oscillators used by Gb_Apu
 
-// Gb_Snd_Emu 0.1.4. Copyright (C) 2003-2005 Shay Green. GNU LGPL license.
-
+// Gb_Snd_Emu 0.1.5
 #ifndef GB_OSCS_H
 #define GB_OSCS_H
 
+#include "blargg_common.h"
 #include "Blip_Buffer.h"
 
-enum { gb_apu_max_vol = 7 };
-
-struct Gb_Osc {
+struct Gb_Osc
+{
+	enum { trigger = 0x80 };
+	enum { len_enabled_mask = 0x40 };
+	
 	Blip_Buffer* outputs [4]; // NULL, right, left, center
 	Blip_Buffer* output;
 	int output_select;
+	BOOST::uint8_t* regs; // osc's 5 registers
 	
 	int delay;
 	int last_amp;
-	int period;
 	int volume;
-	int global_volume;
-	int frequency;
 	int length;
-	int new_length;
-	bool enabled;
-	bool length_enabled;
+	int enabled;
 	
-	Gb_Osc();
-	
-	void clock_length();
 	void reset();
-	virtual void run( gb_time_t begin, gb_time_t end ) = 0;
-	virtual void write_register( int reg, int value );
+	void clock_length();
+	int frequency() const { return (regs [4] & 7) * 0x100 + regs [3]; }
 };
 
-struct Gb_Env : Gb_Osc {
-	int env_period;
-	int env_dir;
+struct Gb_Env : Gb_Osc
+{
 	int env_delay;
-	int new_volume;
 	
-	Gb_Env();
 	void reset();
 	void clock_envelope();
-	void write_register( int, int );
+	bool write_register( int, int );
 };
 
-struct Gb_Square : Gb_Env {
-	int phase;
-	int duty;
+struct Gb_Square : Gb_Env
+{
+	enum { period_mask = 0x70 };
+	enum { shift_mask  = 0x07 };
 	
-	int sweep_period;
+	typedef Blip_Synth<blip_good_quality,1> Synth;
+	Synth const* synth;
 	int sweep_delay;
-	int sweep_shift;
-	int sweep_dir;
 	int sweep_freq;
-	bool has_sweep;
+	int phase;
 	
-	typedef Blip_Synth<blip_good_quality,15 * gb_apu_max_vol * 2> Synth;
-	const Synth* synth;
-	
-	Gb_Square();
 	void reset();
-	void run( gb_time_t, gb_time_t );
-	void write_register( int, int );
 	void clock_sweep();
+	void run( blip_time_t, blip_time_t, int playing );
 };
 
-struct Gb_Wave : Gb_Osc {
-	int volume_shift;
-	unsigned wave_pos;
+struct Gb_Noise : Gb_Env
+{
+	typedef Blip_Synth<blip_med_quality,1> Synth;
+	Synth const* synth;
+	unsigned bits;
+	
+	void run( blip_time_t, blip_time_t, int playing );
+};
+
+struct Gb_Wave : Gb_Osc
+{
+	typedef Blip_Synth<blip_med_quality,1> Synth;
+	Synth const* synth;
+	int wave_pos;
 	enum { wave_size = 32 };
-	bool new_enabled;
 	BOOST::uint8_t wave [wave_size];
 	
-	typedef Blip_Synth<blip_med_quality,15 * gb_apu_max_vol * 2> Synth;
-	const Synth* synth;
-	
-	Gb_Wave();
-	void reset();
-	void run( gb_time_t, gb_time_t );
 	void write_register( int, int );
+	void run( blip_time_t, blip_time_t, int playing );
 };
 
-struct Gb_Noise : Gb_Env {
-	unsigned bits;
-	int tap;
-	
-	typedef Blip_Synth<blip_med_quality,15 * gb_apu_max_vol * 2> Synth;
-	const Synth* synth;
-	
-	Gb_Noise();
-	void reset();
-	void run( gb_time_t, gb_time_t );
-	void write_register( int, int );
-};
+inline void Gb_Env::reset()
+{
+	env_delay = 0;
+	Gb_Osc::reset();
+}
 
 #endif
-

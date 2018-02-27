@@ -1,0 +1,4 @@
+set(CMAKE_C_FLAGS "")
+set(CMAKE_CXX_FLAGS "")
+
+ADD_SUBDIRECTORY(rpmalloc)

@@ -36,6 +36,7 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
+#include "MemoryHelper.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -69,6 +70,7 @@ static __thread bool s_renderingThread;
 
 
 Mixer::Mixer( bool renderOnly ) :
+	m_renderOnly( renderOnly ),
 	m_framesPerPeriod( DEFAULT_BUFFER_SIZE ),
 	m_inputBufferRead( 0 ),
 	m_inputBufferWrite( 1 ),
@@ -203,8 +205,16 @@ Mixer::~Mixer()
 
 void Mixer::initDevices()
 {
-	m_audioDev = tryAudioDevices();
-	m_midiClient = tryMidiClients();
+	bool success_ful = false;
+	if( m_renderOnly ) {
+		m_audioDev = new AudioDummy( success_ful, this );
+		m_audioDevName = AudioDummy::name();
+		m_midiClient = new MidiDummy;
+		m_midiClientName = MidiDummy::name();
+	} else {
+		m_audioDev = tryAudioDevices();
+		m_midiClient = tryMidiClients();
+	}
 }
 
 
@@ -472,9 +482,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	EnvelopeAndLfoParameters::instances()->trigger();
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
-
-	// refresh buffer pool
-	BufferManager::refresh();
 
 	s_renderingThread = false;
 

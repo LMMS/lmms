@@ -94,6 +94,8 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	connect( updateTimer, SIGNAL( timeout() ),
 					this, SLOT( updatePosition() ) );
 	updateTimer->start( 50 );
+	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
+					this, SLOT( update() ) );
 }
 
 

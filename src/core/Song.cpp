@@ -30,6 +30,8 @@
 #include <QFileInfo>
 #include <QMessageBox>
 
+#include <functional>
+
 #include "AutomationTrack.h"
 #include "AutomationEditor.h"
 #include "BBEditor.h"
@@ -84,7 +86,6 @@ Song::Song() :
 	m_playing( false ),
 	m_paused( false ),
 	m_loadingProject( false ),
-	m_errors( new QList<QString>() ),
 	m_playMode( Mode_None ),
 	m_length( 0 ),
 	m_patternToPlay( NULL ),
@@ -376,13 +377,7 @@ void Song::processNextBuffer()
 
 		if( ( f_cnt_t ) currentFrame == 0 )
 		{
-			if( m_playMode == Mode_PlaySong )
-			{
-				m_globalAutomationTrack->play(
-						m_playPos[m_playMode],
-						framesToPlay,
-						framesPlayed, tcoNum );
-			}
+			processAutomations(trackList, m_playPos[m_playMode], framesToPlay);
 
 			// loop through all tracks and play them
 			for( int i = 0; i < trackList.size(); ++i )
@@ -405,26 +400,66 @@ void Song::processNextBuffer()
 	}
 }
 
-bool Song::isExportDone() const
+
+void Song::processAutomations(const TrackList &tracklist, MidiTime timeStart, fpp_t)
 {
-	if ( m_renderBetweenMarkers )
+	AutomatedValueMap values;
+
+	QSet<const AutomatableModel*> recordedModels;
+
+	TrackContainer* container = this;
+	int tcoNum = -1;
+
+	switch (m_playMode)
 	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				m_playPos[Mode_PlaySong].m_timeLine->loopEnd().getTicks();
+	case Mode_PlaySong:
+		break;
+	case Mode_PlayBB:
+	{
+		Q_ASSERT(tracklist.size() == 1);
+		Q_ASSERT(tracklist.at(0)->type() == Track::BBTrack);
+		auto bbTrack = dynamic_cast<BBTrack*>(tracklist.at(0));
+		auto bbContainer = Engine::getBBTrackContainer();
+		container = bbContainer;
+		tcoNum = bbTrack->index();
+	}
+		break;
+	default:
+		return;
 	}
 
-	if( m_exportLoop )
+	values = container->automatedValuesAt(timeStart, tcoNum);
+	TrackList tracks = container->tracks();
+
+	Track::tcoVector tcos;
+	for (Track* track : tracks)
 	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				length() * ticksPerTact();
+		if (track->type() == Track::AutomationTrack) {
+			track->getTCOsInRange(tcos, 0, timeStart);
+		}
 	}
-	else
+
+	// Process recording
+	for (TrackContentObject* tco : tcos)
 	{
-		return m_exporting == true &&
-			m_playPos[Mode_PlaySong].getTicks() >= 
-				( length() + 1 ) * ticksPerTact();
+		auto p = dynamic_cast<AutomationPattern *>(tco);
+		MidiTime relTime = timeStart - p->startPosition();
+		if (p->isRecording() && relTime >= 0 && relTime < p->length())
+		{
+			const AutomatableModel* recordedModel = p->firstObject();
+			p->recordValue(relTime, recordedModel->value<float>());
+
+			recordedModels << recordedModel;
+		}
+	}
+
+	// Apply values
+	for (auto it = values.begin(); it != values.end(); it++)
+	{
+		if (! recordedModels.contains(it.key()))
+		{
+			it.key()->setAutomatedValue(it.value());
+		}
 	}
 }
 
@@ -778,6 +813,12 @@ AutomationPattern * Song::tempoAutomationPattern()
 }
 
 
+AutomatedValueMap Song::automatedValuesAt(MidiTime time, int tcoNum) const
+{
+	return TrackContainer::automatedValuesFromTracks(TrackList(tracks()) << m_globalAutomationTrack, time, tcoNum);
+}
+
+
 
 
 void Song::clearProject()
@@ -1012,6 +1053,27 @@ void Song::loadProject( const QString & fileName )
 	}
 
 	node = dataFile.content().firstChild();
+
+	QDomNodeList tclist=dataFile.content().elementsByTagName("trackcontainer");
+	m_nLoadingTrack=0;
+	for( int i=0,n=tclist.count(); i<n; ++i )
+	{
+		QDomNode nd=tclist.at(i).firstChild();
+		while(!nd.isNull())
+		{
+			if( nd.isElement() && nd.nodeName() == "track" )
+			{
+				++m_nLoadingTrack;
+				if( nd.toElement().attribute("type").toInt() == Track::BBTrack )
+				{
+					n += nd.toElement().elementsByTagName("bbtrack").at(0)
+						.toElement().firstChildElement().childNodes().count();
+				}
+				nd=nd.nextSibling();
+			}
+		}
+	}
+
 	while( !node.isNull() )
 	{
 		if( node.isElement() )
@@ -1075,12 +1137,12 @@ void Song::loadProject( const QString & fileName )
 	{
 		if ( gui )
 		{
-			QMessageBox::warning( NULL, tr("LMMS Error report"), *errorSummary(),
+			QMessageBox::warning( NULL, tr("LMMS Error report"), errorSummary(),
 							QMessageBox::Ok );
 		}
 		else
 		{
-			QTextStream(stderr) << *Engine::getSong()->errorSummary() << endl;
+			QTextStream(stderr) << Engine::getSong()->errorSummary() << endl;
 		}
 	}
 
@@ -1274,9 +1336,11 @@ void Song::exportProject( bool multiExport )
 		efd.setFileMode( FileDialog::AnyFile );
 		int idx = 0;
 		QStringList types;
-		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats )
+		while( ProjectRenderer::fileEncodeDevices[idx].m_fileFormat != ProjectRenderer::NumFileFormats)
 		{
-			types << tr( ProjectRenderer::fileEncodeDevices[idx].m_description );
+			if(ProjectRenderer::fileEncodeDevices[idx].isAvailable()) {
+				types << tr(ProjectRenderer::fileEncodeDevices[idx].m_description);
+			}
 			++idx;
 		}
 		efd.setNameFilters( types );
@@ -1295,13 +1359,14 @@ void Song::exportProject( bool multiExport )
 		efd.setWindowTitle( tr( "Select file for project-export..." ) );
 	}
 
+	QString suffix = "wav";
+	efd.setDefaultSuffix( suffix );
 	efd.setAcceptMode( FileDialog::AcceptSave );
-
 
 	if( efd.exec() == QDialog::Accepted && !efd.selectedFiles().isEmpty() &&
 					 !efd.selectedFiles()[0].isEmpty() )
 	{
-		QString suffix = "";
+
 		QString exportFileName = efd.selectedFiles()[0];
 		if ( !multiExport )
 		{
@@ -1313,17 +1378,16 @@ void Song::exportProject( bool multiExport )
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
 				suffix = efd.selectedNameFilter().mid( stx + 2, etx - stx - 2 ).split( " " )[0].trimmed();
+				exportFileName.remove( "." + suffix, Qt::CaseInsensitive );
 				if ( efd.selectedFiles()[0].endsWith( suffix ) )
 				{
-					suffix = "";
+					if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
+							tr( "Save project" ) ) )
+					{
+						exportFileName += suffix;
+					}
 				}
 			}
-		}
-
-		if( VersionedSaveDialog::fileExistsQuery( exportFileName + suffix,
-				tr( "Save project" ) ) )
-		{
-			exportFileName += suffix;
 		}
 
 		ExportProjectDialog epd( exportFileName, gui->mainWindow(), multiExport );
@@ -1380,14 +1444,15 @@ void Song::exportProjectMidi()
 		
 		// instantiate midi export plugin
 		TrackContainer::TrackList tracks;
-		tracks += Engine::getSong()->tracks();
-		tracks += Engine::getBBTrackContainer()->tracks();
+		TrackContainer::TrackList tracks_BB;
+		tracks = Engine::getSong()->tracks();
+		tracks_BB = Engine::getBBTrackContainer()->tracks();
 		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
 		if (exf==NULL) {
 			qDebug() << "failed to load midi export filter!";
 			return;
 		}
-		exf->tryExport(tracks, Engine::getSong()->getTempo(), export_filename);
+		exf->tryExport(tracks, tracks_BB, getTempo(), m_masterPitchModel.value(), export_filename);
 	}
 }
 
@@ -1450,36 +1515,31 @@ void Song::removeController( Controller * controller )
 
 void Song::clearErrors()
 {
-	m_errors->clear();
+	m_errors.clear();
 }
 
 
 
 void Song::collectError( const QString error )
 {
-	m_errors->append( error );
+	m_errors.append( error );
 }
 
 
 
 bool Song::hasErrors()
 {
-	return ( m_errors->length() > 0 );
+	return ( m_errors.length() > 0 );
 }
 
 
 
-QString* Song::errorSummary()
+QString Song::errorSummary()
 {
-	QString* errors = new QString();
+	QString errors = m_errors.join("\n") + '\n';
 
-	for ( int i = 0 ; i < m_errors->length() ; i++ )
-	{
-		errors->append( m_errors->value( i ) + "\n" );
-	}
-
-	errors->prepend( "\n\n" );
-	errors->prepend( tr( "The following errors occured while loading: " ) );
+	errors.prepend( "\n\n" );
+	errors.prepend( tr( "The following errors occured while loading: " ) );
 
 	return errors;
 }

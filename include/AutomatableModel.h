@@ -25,6 +25,7 @@
 #ifndef AUTOMATABLE_MODEL_H
 #define AUTOMATABLE_MODEL_H
 
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
 
 #include "JournallingObject.h"
@@ -407,7 +408,7 @@ public:
 	{
 	}
 	float getRoundedValue() const;
-	float getDigitCount();
+	int getDigitCount() const;
 	defaultTypedMethods(float);
 
 } ;
@@ -444,6 +445,7 @@ public:
 
 } ;
 
+typedef QMap<AutomatableModel*, float> AutomatedValueMap;
 
 #endif
 

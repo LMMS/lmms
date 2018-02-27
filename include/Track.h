@@ -146,6 +146,8 @@ public:
 		return m_selectViewOnCreate;
 	}
 
+	/// Returns true if and only if a->startPosition() < b->startPosition()
+	static bool comparePosition(const TrackContentObject* a, const TrackContentObject* b);
 
 public slots:
 	void copy();
