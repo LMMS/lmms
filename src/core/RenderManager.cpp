@@ -52,6 +52,8 @@ RenderManager::~RenderManager()
 void RenderManager::abortProcessing()
 {
 	if ( m_activeRenderer ) {
+		disconnect( m_activeRenderer, SIGNAL( finished() ),
+				this, SLOT( renderNextTrack() ) );
 		m_activeRenderer->abortProcessing();
 	}
 	restoreMutedState();
