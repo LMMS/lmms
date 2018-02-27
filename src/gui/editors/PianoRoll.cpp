@@ -2059,7 +2059,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				pauseTestNotes( false );
 			}
 		}
-		else if( ( edit_note || m_action == ActionChangeNoteProperty ) &&
+		else if( m_editMode != ModeErase &&
+			( edit_note || m_action == ActionChangeNoteProperty ) &&
 				( me->buttons() & Qt::LeftButton || me->buttons() & Qt::MiddleButton
 				|| ( me->buttons() & Qt::RightButton && me->modifiers() & Qt::ShiftModifier ) ) )
 		{
@@ -2254,9 +2255,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--m_selectedKeys;
 			}
 		}
-		else if( m_editMode == ModeDraw && me->buttons() & Qt::RightButton )
+		else if( ( m_editMode == ModeDraw && me->buttons() & Qt::RightButton )
+				|| ( m_editMode == ModeErase && me->buttons() ) )
 		{
-			// holding down right-click to delete notes
+			// holding down right-click to delete notes or holding down
+			// any key if in erase mode
 
 			// get tick in which the user clicked
 			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
