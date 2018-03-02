@@ -49,6 +49,7 @@ RenderManager::RenderManager(
 RenderManager::~RenderManager()
 {
 	delete m_activeRenderer;
+	m_activeRenderer = NULL;
 
 	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
 	Engine::mixer()->changeQuality( m_oldQualitySettings );
