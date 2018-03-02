@@ -237,7 +237,7 @@
         <fxchain numofeffects="0" enabled="0"/>
         <connection>
           <muted>
-            <Midicontroller type="2" inputchannel="1" fixedinputvelocity="-1" outputcontroller="0" inports="" name="MIDI ch1 ctrl37" outputchannel="1" fixedoutputvelocity="-1" readable="1" fixedoutputnote="-1" outputprogram="1" writable="0" basevelocity="127" inputcontroller="37"/>
+            <Midicontroller type="2" inputchannel="1" fixedinputvelocity="-1" outputcontroller="0" inports="" name="MIDI ch1 ctrl37" outputchannel="1" fixedoutputvelocity="-1" readable="0" fixedoutputnote="-1" outputprogram="1" writable="0" basevelocity="127" inputcontroller="37"/>
           </muted>
         </connection>
       </fxchannel>
