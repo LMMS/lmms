@@ -26,7 +26,7 @@ INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/3rdparty/qt5-x11embed/src/")
 ADD_DEFINITIONS(-DREMOTE_VST_PLUGIN_FILEPATH="${REMOTE_VST_PLUGIN_FILEPATH}")
 BUILD_PLUGIN(vstbase vst_base.cpp VstPlugin.cpp VstPlugin.h communication.h MOCFILES VstPlugin.h)
 
-IF(LMMS_BUILD_LINUX AND WANT_QT5)
+IF(LMMS_BUILD_LINUX)
 	TARGET_LINK_LIBRARIES(vstbase qx11embedcontainer)
 ENDIF()
 

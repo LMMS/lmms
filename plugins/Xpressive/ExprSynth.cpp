@@ -529,7 +529,8 @@ ExprFront::ExprFront(const char * expr)
 		m_data->m_symbol_table.add_pi();
 	
 		m_data->m_symbol_table.add_constant("e", F_E);
-		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() % max_float_integer_mod);
+
+		m_data->m_symbol_table.add_constant("seed", SimpleRandom::generator() & max_float_integer_mask);
 	
 		m_data->m_symbol_table.add_function("sinew", sin_wave_func);
 		m_data->m_symbol_table.add_function("squarew", square_wave_func);
