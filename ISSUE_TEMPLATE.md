@@ -1,36 +1,28 @@
 Issues are used for 3 purposes, feature requests, bug documentation, and even development related conversations.
 
-For **bugs**, you need these pieces of information:
-1. Expected behavior
-2. Steps to reproduce. A screenshot of the error. And a screen recording.
-3. What OS were you using?
-4. Debug log attached(if possible)
+Bug Template:
 
-For **feature requests**, add as much of these details as possible:
-Why? and summary of What?
-Why should we add this feature?
-What benefits will it add?
+Expected behavior:
 
-Detailed What?
-Description: What does your new feature do?
-Schematics: Can you diagram anything?
-Concept art: If your feature 
+Steps to reproduce:
+A screenshot of the error and a screen recording if possible.
 
-How?
-What steps can be taken to implement this code?
-Are you coding this code?
-Are you creating this code?
+OS Version:
 
-For **conversations**, it's really simple:
-Just write your topic down, subject in the title ect. The only conversations that
-should be done via the Issues if it deals with development.
+LMMS Version:
 
-Example appropriate topics:
-* Documentation
-* Programming Practice
-* Framework
-* Paradigm
-* ect.
+Feature Request Template:
+
+Note: Ask discord in #support
+
+Feature Description:
+
+Schematics:
+(if your feature involves a new GUI or GUI change)
+
+Implementation Plan:
+(If possible), ways to implement code-wise.
+
 
 In general, most conversations should take place in the IRC Channel except in rare cases.
 IRC:
