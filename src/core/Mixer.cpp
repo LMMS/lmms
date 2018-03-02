@@ -579,8 +579,6 @@ void Mixer::setAudioDevice( AudioDevice * _dev )
 {
 	stopProcessing();
 
-	m_oldAudioDev = m_audioDev;
-
 	if( _dev == NULL )
 	{
 		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
@@ -608,7 +606,6 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 	stopProcessing();
 
 	m_qualitySettings = _qs;
-	m_oldAudioDev = m_audioDev;
 
 	if( _dev == NULL )
 	{
@@ -625,6 +622,17 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 	emit sampleRateChanged();
 
 	startProcessing( _needs_fifo );
+}
+
+
+
+
+void Mixer::storeAudioDevice()
+{
+	if( !m_oldAudioDev )
+	{
+		m_oldAudioDev = m_audioDev;
+	}
 }
 
 
