@@ -776,7 +776,7 @@ void XpressiveView::sqrWaveClicked() {
 }
 
 void XpressiveView::noiseWaveClicked() {
-	m_expressionEditor->appendPlainText("rand");
+	m_expressionEditor->appendPlainText("randsv(t*srate,0)");
 	Engine::getSong()->setModified();
 }
 
