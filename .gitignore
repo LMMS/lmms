@@ -8,3 +8,9 @@
 /plugins/zynaddsubfx/zynaddsubfx/doc/Makefile
 /plugins/zynaddsubfx/zynaddsubfx/doc/gen/Makefile
 /data/locale/*.qm
+
+# IDE files
+.vimrc
+tags
+cscope.out
+/cscope

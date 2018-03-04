@@ -168,6 +168,10 @@ FOREACH(LIB ${LMMS_REQUIRED_LIBS})
     ENDIF()
 ENDFOREACH()
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LILV lilv-0 REQUIRED)
+include_directories(${LILV_INCLUDE_DIRS})
+target_link_libraries(lmms ${LILV_LIBRARIES})
 
 # Required libs for debug msys builds
 IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")

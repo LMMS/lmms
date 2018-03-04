@@ -176,6 +176,11 @@ public:
 		return m_ladDir;
 	}
 
+  const QString & lv2Dir() const
+  {
+    return m_lv2Dir;
+  }
+
 	const QString recoveryFile() const
 	{
 		return m_workingDir + "recover.mmp";
@@ -241,6 +246,7 @@ public:
 	void setBackgroundArtwork( const QString & _ba );
 	void setGIGDir( const QString & gd );
 	void setSF2Dir( const QString & sfd );
+  void setLV2Dir( const QString & lv2d );
 
 	// creates the working directory & subdirectories on disk.
 	void createWorkingDir();
@@ -274,6 +280,7 @@ private:
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	QString m_defaultSoundfont;
 #endif
+  QString m_lv2Dir;
 	QString m_backgroundArtwork;
 	QStringList m_recentlyOpenedProjects;
 
