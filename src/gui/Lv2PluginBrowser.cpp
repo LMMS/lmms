@@ -32,6 +32,7 @@
 #include <QMdiSubWindow>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QDebug>
 
 #include "Lv2PluginBrowser.h"
 #include "BBTrackContainer.h"
@@ -68,8 +69,8 @@ Lv2PluginBrowser::Lv2PluginBrowser(
 	SideBarWidget( title, pm, parent )
 {
 	setWindowTitle( tr( "Lv2 Plugin Browser" ) );
-	m_l = new Lv2PluginBrowserTreeWidget( contentParent() );
-	addContentWidget( m_l );
+	m_treeWidget = new Lv2PluginBrowserTreeWidget( contentParent() );
+	addContentWidget( m_treeWidget );
 
 	QWidget * ops = new QWidget( contentParent() );
 	ops->setFixedHeight( 24 );
@@ -119,10 +120,10 @@ bool Lv2PluginBrowser::filterItems( const QString & filter, QTreeWidgetItem * it
 	// call with item=NULL to filter the entire tree
 	bool anyMatched = false;
 
-	int numChildren = item ? item->childCount() : m_l->topLevelItemCount();
+	int numChildren = item ? item->childCount() : m_treeWidget->topLevelItemCount();
 	for( int i = 0; i < numChildren; ++i )
 	{
-		QTreeWidgetItem * it = item ? item->child( i ) : m_l->topLevelItem(i);
+		QTreeWidgetItem * it = item ? item->child( i ) : m_treeWidget->topLevelItem(i);
 
 		// is directory?
 		if( it->childCount() )
@@ -167,17 +168,11 @@ bool Lv2PluginBrowser::filterItems( const QString & filter, QTreeWidgetItem * it
 
 void Lv2PluginBrowser::reloadTree( void )
 {
-	//const QString text = m_filterEdit->text();
-	//m_filterEdit->clear();
-	//m_l->clear();
-	//QStringList paths = m_directories.split( '*' );
-	//for( QStringList::iterator it = paths.begin(); it != paths.end(); ++it )
-	//{
-		//addItems( *it );
-	//}
-	//expandItems();
-	//m_filterEdit->setText( text );
-	//filterItems( text );
+	const QString text = m_filterEdit->text();
+	m_filterEdit->clear();
+	m_treeWidget->clear();
+  addItems();
+	filterItems( text );
 }
 
 
@@ -194,8 +189,26 @@ void Lv2PluginBrowser::giveFocusToFilter()
 
 
 
-void Lv2PluginBrowser::addItems(const QString & path )
+void Lv2PluginBrowser::addItems()
 {
+  Lilv::World world;
+  world.load_all();
+  Lilv::Plugins plugins = world.get_all_plugins();
+  LilvIter * iter =  plugins.begin();
+  do {
+    Lilv::Plugin plugin = plugins.get(iter);
+    Lilv::Node name = plugin.get_name();
+    Lilv::PluginClass plugin_class = plugin.get_class();
+    qDebug(plugin_class.get_label().as_string());
+    if (QString::compare(plugin_class.get_label().as_string(), "Instrument") == 0)
+    {
+      m_treeWidget->addTopLevelItem(new QTreeWidgetItem(
+        * new QStringList( { *(new QString(name.as_string())) } ),
+          0));
+    }
+  } while ((iter = plugins.next(iter)) != nullptr);
+
+
 }
 
 

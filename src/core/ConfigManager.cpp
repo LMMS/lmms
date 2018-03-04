@@ -56,7 +56,7 @@ ConfigManager::ConfigManager() :
 	m_vstDir( m_workingDir + "vst/" ),
 	m_gigDir( m_workingDir + GIG_PATH ),
 	m_sf2Dir( m_workingDir + SF2_PATH ),
-	m_version( defaultVersion() ),
+	m_version( defaultVersion() )
 {
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));

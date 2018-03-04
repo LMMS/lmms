@@ -59,13 +59,12 @@ private slots:
 private:
 	virtual void keyPressEvent( QKeyEvent * ke );
 
-	void addItems( const QString & path );
+	void addItems();
 
-	Lv2PluginBrowserTreeWidget * m_l;
+	Lv2PluginBrowserTreeWidget * m_treeWidget;
 
 	QLineEdit * m_filterEdit;
 
-	QString m_directories;
 	QString m_filter;
 
 } ;
@@ -108,5 +107,11 @@ private slots:
 	void updateDirectory( QTreeWidgetItem * item );
 
 } ;
+
+// TODO
+//class Lv2Plugin : public QTreeWidgetItem
+//{
+  //public:
+//}
 
 #endif
