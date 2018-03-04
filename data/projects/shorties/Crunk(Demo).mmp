@@ -190,11 +190,6 @@
     <fxmixer maximized="0" height="332" visible="1" minimized="0" x="1" y="463" width="530">
       <fxchannel muted="0" num="0" name="Master" volume="1" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
-        <connection>
-          <muted>
-            <Midicontroller outputchannel="1" outputcontroller="0" basevelocity="127" name="MIDI ch1 ctrl37" outputprogram="1" fixedinputvelocity="-1" fixedoutputvelocity="-1" fixedoutputnote="-1" inputchannel="1" inputcontroller="37" inports="" readable="0" type="2" writable="0"/>
-          </muted>
-        </connection>
       </fxchannel>
       <fxchannel muted="0" num="1" name="Drum" volume="1" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>

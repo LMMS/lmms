@@ -676,11 +676,6 @@
     <fxmixer maximized="0" height="332" visible="1" minimized="0" x="9" y="530" width="530">
       <fxchannel muted="0" num="0" name="Master" volume="0.31" soloed="0">
         <fxchain enabled="0" numofeffects="0"/>
-        <connection>
-          <muted>
-            <Midicontroller outputchannel="1" outputcontroller="0" basevelocity="127" name="MIDI ch1 ctrl37" outputprogram="1" fixedinputvelocity="-1" fixedoutputvelocity="-1" fixedoutputnote="-1" inputchannel="1" inputcontroller="37" inports="" readable="0" type="2" writable="0"/>
-          </muted>
-        </connection>
       </fxchannel>
     </fxmixer>
     <ControllerRackView maximized="0" height="300" visible="0" minimized="0" x="955" y="413" width="400"/>
