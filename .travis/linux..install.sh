@@ -3,7 +3,7 @@
 PACKAGES="cmake libsndfile-dev fftw3-dev libvorbis-dev libogg-dev libmp3lame-dev
 	libasound2-dev libjack-jackd2-dev libsdl-dev libsamplerate0-dev libstk0-dev stk
 	libfluidsynth-dev portaudio19-dev g++-multilib libfltk1.3-dev
-	libgig-dev libsoundio-dev"
+	libgig-dev libsoundio-dev liblilv-dev"
 
 VST_PACKAGES="wine-dev libqt5x11extras5-dev qtbase5-private-dev libxcb-util0-dev libxcb-keysyms1-dev"
 

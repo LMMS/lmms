@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-PACKAGES="cmake pkgconfig fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio node fltk"
+PACKAGES="cmake pkgconfig fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio
+node fltk lilv"
 
 if [ $QT5 ]; then
 	PACKAGES="$PACKAGES qt5"
