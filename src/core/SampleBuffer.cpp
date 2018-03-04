@@ -1415,7 +1415,8 @@ QString SampleBuffer::tryToMakeRelative( const QString & file )
 {
 	if( QFileInfo( file ).isRelative() == false )
 	{
-		QString f = QString( file ).replace( QDir::separator(), '/' );
+		// Normalize the path
+		QString f = QFileInfo( file ).canonicalFilePath().replace( QDir::separator(), '/' );
 
 		// First, look in factory samples
 		// Isolate "samples/" from "data:/samples/"
