@@ -2910,7 +2910,7 @@ Puedes quitar y mover los canales FX a través del menú contextual. Accede a es
         <translation>modo Dórico</translation>
     </message>
     <message>
-        <source>Phrygolydian</source>
+        <source>Phygrian</source>
         <translation>modo Frigio</translation>
     </message>
     <message>

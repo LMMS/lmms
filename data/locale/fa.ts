@@ -2660,8 +2660,8 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished">Dorian</translation>
     </message>
     <message>
-        <source>Phrygolydian</source>
-        <translation type="unfinished">Phrygolydian</translation>
+        <source>Phygrian</source>
+        <translation type="unfinished">Phygrian</translation>
     </message>
     <message>
         <source>Lydian</source>
