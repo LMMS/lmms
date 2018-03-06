@@ -81,6 +81,10 @@ IF(NOT ("${LAME_INCLUDE_DIRS}" STREQUAL ""))
 	INCLUDE_DIRECTORIES("${LAME_INCLUDE_DIRS}")
 ENDIF()
 
+IF(NOT ("${LILV_INCLUDE_DIRS}" STREQUAL ""))
+	INCLUDE_DIRECTORIES(${LILV_INCLUDE_DIRS})
+ENDIF()
+
 # Use libraries in non-standard directories (e.g., another version of Qt)
 IF(LMMS_BUILD_LINUX)
 	LINK_LIBRARIES(-Wl,--enable-new-dtags)
@@ -146,6 +150,7 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${JACK_LIBRARIES}
 	${OGGVORBIS_LIBRARIES}
 	${LAME_LIBRARIES}
+	${LILV_LIBRARIES}
 	${SAMPLERATE_LIBRARIES}
 	${SNDFILE_LIBRARIES}
 	${EXTRA_LIBRARIES}
@@ -167,11 +172,6 @@ FOREACH(LIB ${LMMS_REQUIRED_LIBS})
 	    ENDIF()
     ENDIF()
 ENDFOREACH()
-
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LILV lilv-0 REQUIRED)
-include_directories(${LILV_INCLUDE_DIRS})
-target_link_libraries(lmms ${LILV_LIBRARIES})
 
 # Required libs for debug msys builds
 IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")

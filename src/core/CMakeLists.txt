@@ -1,7 +1,7 @@
 IF(LMMS_HAVE_WEAKJACK)
 	set(WEAKJACK core/audio/AudioWeakJack.c)
 ENDIF()
-	
+
 set(LMMS_SRCS
 	${LMMS_SRCS}
 	core/AutomatableModel.cpp
@@ -35,6 +35,9 @@ set(LMMS_SRCS
 	core/LadspaManager.cpp
 	core/LfoController.cpp
 	core/LocklessAllocator.cpp
+	core/Lv2Manager.cpp
+	core/Lv2Plugin.cpp
+	#core/Lv2Instrument.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp

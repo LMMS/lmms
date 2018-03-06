@@ -1,0 +1,81 @@
+/*
+ * Lv2Plugin.h - declaration of Lv2Plugin class
+ *
+ * Copyright (c) 2018 Alexandros Theodotou @faiyadesu
+ *
+ * This file is part of LMMS - https://lmms.io
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program (see COPYING); if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA 02110-1301 USA.
+ *
+ */
+
+#ifndef LV2_PLUGIN_H
+#define LV2_PLUGIN_H
+
+#include <lilv/lilvmm.hpp>
+#include <QString>
+
+
+// This class is a simple wrapper of Lilv Plugin
+class Lv2Plugin
+{
+public:
+	Lv2Plugin(Lilv::Plugin * plugin );
+	Lv2Plugin(QString uri);
+	virtual ~Lv2Plugin();
+
+	inline QString getUri()
+	{
+		return uri;
+	}
+	inline QString getName()
+	{
+		return name;
+	}
+	inline QString getParentClass()
+	{
+		return parentClass;
+	}
+	inline long getNumPorts()
+	{
+		return numPorts;
+	}
+	inline QString getAuthorName()
+	{
+		return authorName;
+	}
+	inline QString getAuthorEmail()
+	{
+		return authorEmail;
+	}
+	inline QString getAuthorHomePage()
+	{
+		return authorHomePage;
+	}
+
+private:
+	QString uri;
+	QString name;
+	QString parentClass;
+	QString childClass;
+	unsigned int numPorts;
+	QString authorName;
+	QString authorEmail;
+	QString authorHomePage;
+};
+
+
+#endif

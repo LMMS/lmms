@@ -465,6 +465,9 @@ ENDIF(LMMS_BUILD_WIN32)
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
 
+# check for lilv
+PKG_CHECK_MODULES(LILV lilv-0 REQUIRED)
+
 # set compiler flags
 SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")
 OPTION(USE_WERROR "Add -werror to the build flags. Stops the build on warnings" OFF)

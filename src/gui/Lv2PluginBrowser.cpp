@@ -45,6 +45,7 @@
 #include "ImportFilter.h"
 #include "Instrument.h"
 #include "InstrumentTrack.h"
+#include "Lv2Manager.h"
 #include "Lv2PluginBrowser.h"
 #include "MainWindow.h"
 #include "Mixer.h"
@@ -54,14 +55,6 @@
 #include "Song.h"
 #include "StringPairDrag.h"
 #include "TextFloat.h"
-
-enum TreeWidgetItemTypes
-{
-	TypeFileItem = QTreeWidgetItem::UserType,
-	TypeDirectoryItem
-} ;
-
-
 
 Lv2PluginBrowser::Lv2PluginBrowser(
 			const QString & title, const QPixmap & pm,
@@ -191,28 +184,19 @@ void Lv2PluginBrowser::giveFocusToFilter()
 
 void Lv2PluginBrowser::addItems()
 {
-  Lilv::World world;
-  world.load_all();
-  Lilv::Plugins plugins = world.get_all_plugins();
-  LilvIter * iter =  plugins.begin();
-  do {
-    Lilv::Plugin plugin = plugins.get(iter);
-    Lilv::Node name = plugin.get_name();
-    Lilv::PluginClass plugin_class = plugin.get_class();
-    qDebug(plugin_class.get_label().as_string());
-    if (QString::compare(plugin_class.get_label().as_string(), "Instrument") == 0)
-    {
-      m_treeWidget->addTopLevelItem(new QTreeWidgetItem(
-        * new QStringList( { *(new QString(name.as_string())) } ),
-          0));
-    }
-  } while ((iter = plugins.next(iter)) != nullptr);
-
-
+	Lv2Manager & manager =  Lv2Manager::getInstance();
+	QVector<Lv2Plugin*> plugins = manager.getPlugins();
+	for ( int i = 0; i < plugins.size(); i++ )
+	{
+		Lv2Plugin * plugin = plugins.at(i);
+		qDebug() << plugin->getParentClass();
+		if ( QString::compare( plugin->getParentClass(),
+			"GeneratorPlugin") == 0)
+		{
+			m_treeWidget->addTopLevelItem( new Lv2PluginItem( plugin ) );
+		}
+	}
 }
-
-
-
 
 void Lv2PluginBrowser::keyPressEvent(QKeyEvent * ke )
 {
@@ -225,13 +209,6 @@ void Lv2PluginBrowser::keyPressEvent(QKeyEvent * ke )
 		ke->ignore();
 	}
 }
-
-
-
-
-
-
-
 
 Lv2PluginBrowserTreeWidget::Lv2PluginBrowserTreeWidget(QWidget * parent ) :
 	QTreeWidget( parent ),
@@ -246,15 +223,7 @@ Lv2PluginBrowserTreeWidget::Lv2PluginBrowserTreeWidget(QWidget * parent ) :
 
 	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
-	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem * ) ),
-				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
-	connect( this, SIGNAL( itemExpanded( QTreeWidgetItem * ) ),
-				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
-
 }
-
-
-
 
 Lv2PluginBrowserTreeWidget::~Lv2PluginBrowserTreeWidget()
 {
@@ -265,9 +234,8 @@ Lv2PluginBrowserTreeWidget::~Lv2PluginBrowserTreeWidget()
 
 void Lv2PluginBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	FileItem * f = dynamic_cast<FileItem *>( itemAt( e->pos() ) );
-	if( f != NULL && ( f->handling() == FileItem::LoadAsPreset ||
-				 f->handling() == FileItem::LoadByPlugin ) )
+	Lv2PluginItem * f = dynamic_cast<Lv2PluginItem *>( itemAt( e->pos() ) );
+	if( f != NULL )
 	{
 		m_contextMenuItem = f;
 		QMenu contextMenu( this );
@@ -313,15 +281,13 @@ void Lv2PluginBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 //		}
 	}
 
-	FileItem * f = dynamic_cast<FileItem *>( i );
+	Lv2PluginItem * f = dynamic_cast<Lv2PluginItem *>( i );
 	if( f != NULL )
 	{
 		m_pphMutex.lock();
 		m_pphMutex.unlock();
 	}
 }
-
-
 
 
 void Lv2PluginBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
@@ -333,52 +299,15 @@ void Lv2PluginBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		// make sure any playback is stopped
 		mouseReleaseEvent( NULL );
 
-		FileItem * f = dynamic_cast<FileItem *>( itemAt( m_pressPos ) );
-		if( f != NULL )
+		Lv2PluginItem * item = dynamic_cast<Lv2PluginItem *>( itemAt( m_pressPos ) );
+		if( item != NULL )
 		{
-			switch( f->type() )
-			{
-				case FileItem::PresetFile:
-					new StringPairDrag( f->handling() == FileItem::LoadAsPreset ?
-							"presetfile" : "pluginpresetfile",
-							f->fullName(),
-							embed::getIconPixmap( "preset_file" ), this );
-					break;
-
-				case FileItem::SampleFile:
-					new StringPairDrag( "samplefile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::SoundFontFile:
-					new StringPairDrag( "soundfontfile", f->fullName(),
-							embed::getIconPixmap( "soundfont_file" ), this );
-					break;
-				case FileItem::PatchFile:
-					new StringPairDrag( "patchfile", f->fullName(),
-							embed::getIconPixmap( "sample_file" ), this );
-					break;
-				case FileItem::VstPluginFile:
-					new StringPairDrag( "vstpluginfile", f->fullName(),
-							embed::getIconPixmap( "vst_plugin_file" ), this );
-					break;
-				case FileItem::MidiFile:
-					new StringPairDrag( "importedproject", f->fullName(),
-							embed::getIconPixmap( "midi_file" ), this );
-					break;
-				case FileItem::ProjectFile:
-					new StringPairDrag( "projectfile", f->fullName(),
-							embed::getIconPixmap( "project_file" ), this );
-					break;
-
-				default:
-					break;
-			}
+			new StringPairDrag( "lv2pluginfile",
+			item->getPlugin()->getName(),
+			embed::getIconPixmap( "vst_plugin_file" ), this );
 		}
 	}
 }
-
-
-
 
 void Lv2PluginBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
@@ -388,123 +317,54 @@ void Lv2PluginBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	m_pphMutex.unlock();
 }
 
-
-
-
-
-void Lv2PluginBrowserTreeWidget::handleFile(FileItem * f, InstrumentTrack * it )
+void Lv2PluginBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, InstrumentTrack * it )
 {
 	Engine::mixer()->requestChangeInModel();
-	switch( f->handling() )
-	{
-		case FileItem::LoadAsProject:
-			if( gui->mainWindow()->mayChangeProject(true) )
-			{
-				Engine::getSong()->loadProject( f->fullName() );
-			}
-			break;
 
-		case FileItem::LoadByPlugin:
-		{
-			const QString e = f->extension();
-			Instrument * i = it->instrument();
-			if( i == NULL ||
-				!i->descriptor()->supportsFileType( e ) )
-			{
-				i = it->loadInstrument(
-					pluginFactory->pluginSupportingExtension(e).name() );
-			}
-			i->loadFile( f->fullName() );
-			break;
-		}
+  //const QString e = f->extension();
+  //Instrument * i = it->instrument();
+  //if( i == NULL ||
+    //!i->descriptor()->supportsFileType( e ) )
+  //{
+    //i = it->loadInstrument(
+      //pluginFactory->pluginSupportingExtension(e).name() );
+  //}
+  //i->loadFile( f->fullName() );
 
-		case FileItem::LoadAsPreset:
-		{
-			DataFile dataFile( f->fullName() );
-			InstrumentTrack::removeMidiPortNode( dataFile );
-			it->setSimpleSerializing();
-			it->loadSettings( dataFile.content().toElement() );
-			break;
-		}
-
-		case FileItem::ImportAsProject:
-			ImportFilter::import( f->fullName(),
-							Engine::getSong() );
-			break;
-
-		case FileItem::NotSupported:
-		default:
-			break;
-
-	}
-	Engine::mixer()->doneChangeInModel();
+  Engine::mixer()->doneChangeInModel();
 }
-
-
-
 
 void Lv2PluginBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
-	FileItem * f = dynamic_cast<FileItem *>( item );
-	if( f == NULL )
+	Lv2PluginItem * lv2pi = dynamic_cast<Lv2PluginItem *>( item );
+	if( lv2pi == NULL )
 	{
 		return;
 	}
 
-enum TreeWidgetItemTypes
-{
-	TypeFileItem = QTreeWidgetItem::UserType,
-	TypeDirectoryItem
-} ;
-
-
-	if( f->handling() == FileItem::LoadAsProject ||
-		f->handling() == FileItem::ImportAsProject )
-	{
-		handleFile( f, NULL );
-	}
-	else if( f->handling() != FileItem::NotSupported )
-	{
-		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack,
-					Engine::getBBTrackContainer() ) );
-		handleFile( f, it );
-	}
+  InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
+      Track::create( Track::InstrumentTrack,
+        Engine::getBBTrackContainer() ) );
+  handlePlugin( lv2pi, it );
 }
-
-
-
 
 void Lv2PluginBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 {
-	if( m_contextMenuItem->handling() == FileItem::LoadAsPreset ||
-		m_contextMenuItem->handling() == FileItem::LoadByPlugin )
-	{
-		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-				Track::create( Track::InstrumentTrack, tc ) );
-		handleFile( m_contextMenuItem, it );
-	}
+  InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
+    Track::create( Track::InstrumentTrack, tc ) );
+  handlePlugin( m_contextMenuItem, it );
 }
-
-
-
 
 void Lv2PluginBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 {
 	openInNewInstrumentTrack( Engine::getBBTrackContainer() );
 }
 
-
-
-
 void Lv2PluginBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 {
 	openInNewInstrumentTrack( Engine::getSong() );
 }
-
-
-
 
 void Lv2PluginBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
@@ -523,22 +383,24 @@ void Lv2PluginBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 						w.previous()->widget() );
 		if( itw != NULL && itw->isHidden() == false )
 		{
-			handleFile( m_contextMenuItem, itw->model() );
+			handlePlugin( m_contextMenuItem, itw->model() );
 			break;
 		}
 	}
 }
 
-
-
-
-void Lv2PluginBrowserTreeWidget::updateDirectory(QTreeWidgetItem * item )
+Lv2PluginItem::Lv2PluginItem( Lv2Plugin * plugin) :
+    QTreeWidgetItem( QStringList( plugin->getName()), 0 )
 {
-	Directory * dir = dynamic_cast<Directory *>( item );
-	if( dir != NULL )
-	{
-		dir->update();
-	}
+  initPixmaps();
+  //lilv_plugin =
 }
 
+QPixmap * Lv2PluginItem::s_Lv2PluginPixmap = NULL;
+
+void Lv2PluginItem::initPixmaps( void )
+{
+	Lv2PluginItem::s_Lv2PluginPixmap = new QPixmap( embed::getIconPixmap(
+						"vst_plugin_file", 16, 16 ) );
+}
 
