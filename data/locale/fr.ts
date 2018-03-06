@@ -2917,7 +2917,7 @@ Vous pouvez supprimer et déplacer les canaux d&apos;effets dans le menu context
         <translation>Dorienne</translation>
     </message>
     <message>
-        <source>Phrygian</source>
+        <source>Phrygolydian</source>
         <translation>Phrygo-lydienne</translation>
     </message>
     <message>

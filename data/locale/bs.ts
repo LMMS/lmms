@@ -3524,7 +3524,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
     </message>
     <message>
         <location filename="src/core/InstrumentFunctions.cpp" line="128"/>
-        <source>Phrygian</source>
+        <source>Phrygolydian</source>
         <translation type="unfinished"/>
     </message>
     <message>

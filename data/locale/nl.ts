@@ -2924,7 +2924,7 @@ U kunt FX-kanalen verwijderen en verplaatsen in het contextmenu, dat toegankelij
         <translation>Dorisch</translation>
     </message>
     <message>
-        <source>Phrygian</source>
+        <source>Phrygolydian</source>
         <translation>Frygolydisch</translation>
     </message>
     <message>

@@ -2907,7 +2907,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Phrygian</source>
+        <source>Phrygolydian</source>
         <translation type="unfinished"/>
     </message>
     <message>

@@ -125,7 +125,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan minor" ), { 0, 1, 3, 5, 7, 8, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Hungarian minor" ), { 0, 2, 3, 6, 7, 8, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
