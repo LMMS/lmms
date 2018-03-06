@@ -178,7 +178,8 @@ void LcdSpinBox::enterValue()
 			arg( model()->maxValue() ),
 			model()->value(),
 			model()->minValue(),
-			model()->maxValue(), 4, &ok );
+			model()->maxValue(),
+			model()->step<int>(), &ok );
 
 	if( ok )
 	{
