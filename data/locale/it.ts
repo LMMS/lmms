@@ -2915,7 +2915,7 @@ Puoi rimuovere e muovere i canali con il menù contestuale, cliccando con il tas
         <translation>Dorica</translation>
     </message>
     <message>
-        <source>Phrygolydian</source>
+        <source>Phrygian</source>
         <translation>Frigia</translation>
     </message>
     <message>
