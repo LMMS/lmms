@@ -2910,7 +2910,7 @@ You can remove and move FX channels in the context menu, which is accessed by ri
         <translation>Дорійська</translation>
     </message>
     <message>
-        <source>Phygrian</source>
+        <source>Phrygolydian</source>
         <translation>Фруголідійська</translation>
     </message>
     <message>

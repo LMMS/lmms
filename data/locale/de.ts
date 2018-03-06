@@ -2909,7 +2909,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
         <translation>Dorisch</translation>
     </message>
     <message>
-        <source>Phygrian</source>
+        <source>Phrygolydian</source>
         <translation>Phrygisch</translation>
     </message>
     <message>
