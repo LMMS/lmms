@@ -368,10 +368,10 @@ static freefunc0<float,SimpleRandom::float_random_with_engine,false> simple_rand
 class ExprFrontData
 {
 public:
-	ExprFrontData():
+	ExprFrontData(int last_func_samples):
 	m_rand_vec(SimpleRandom::generator()),
 	m_integ_func(NULL),
-	m_last_func(500)
+	m_last_func(last_func_samples)
 	{}
 	~ExprFrontData()
 	{
@@ -518,12 +518,12 @@ struct harmonic_semitone
 static freefunc1<float,harmonic_semitone,true> harmonic_semitone_func;
 
 
-ExprFront::ExprFront(const char * expr)
+ExprFront::ExprFront(const char * expr, int last_func_samples)
 {
 	m_valid = false;
 	try
 	{
-		m_data = new ExprFrontData();
+		m_data = new ExprFrontData(last_func_samples);
 	
 		m_data->m_expression_string = expr;
 		m_data->m_symbol_table.add_pi();
@@ -774,7 +774,7 @@ void ExprSynth::renderOutput(fpp_t frames, sampleFrame *buf)
 				}
 				o1 = o1_rawExpr->value();
 				o2 = o2_rawExpr->value();
-				last_func1->setLastSample(o1);
+				last_func1->setLastSample(o1);//put result in the circular buffer for the "last" function.
 				last_func2->setLastSample(o2);
 				buf[frame][0] = (-pn1 + 0.5) * o1 + (-pn2 + 0.5) * o2;
 				buf[frame][1] = ( pn1 + 0.5) * o1 + ( pn2 + 0.5) * o2;

@@ -40,7 +40,7 @@ class ExprFront
 {
 public:
 	typedef float (*ff1data_functor)(void*, float);
-	ExprFront(const char* expr);
+	ExprFront(const char* expr, int last_func_samples);
 	~ExprFront();
 	bool compile();
 	inline bool isValid() { return m_valid; }

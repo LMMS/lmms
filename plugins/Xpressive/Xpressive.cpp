@@ -202,23 +202,24 @@ void Xpressive::playNote(NotePlayHandle* nph, sampleFrame* working_buffer) {
 
 	if (nph->totalFramesPlayed() == 0 || nph->m_pluginData == NULL) {
 
-		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData());
-		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData());
+		ExprFront *exprO1 = new ExprFront(m_outputExpression[0].constData(),Engine::mixer()->processingSampleRate());//give the "last" function a whole second
+		ExprFront *exprO2 = new ExprFront(m_outputExpression[1].constData(),Engine::mixer()->processingSampleRate());
 
-		auto init_expression_step1 = [this, nph](ExprFront* e) {
-			e->add_constant("key", nph->key());
-			e->add_constant("bnote", nph->instrumentTrack()->baseNote());
-			e->add_constant("srate", Engine::mixer()->processingSampleRate());
-			e->add_constant("v", nph->getVolume() / 255.0);
-			e->add_constant("tempo", Engine::getSong()->getTempo());
-			e->add_variable("A1", m_A1);
+		auto init_expression_step1 = [this, nph](ExprFront* e) { //lambda function to init exprO1 and exprO2
+			//add the constants and the variables to the expression.
+			e->add_constant("key", nph->key());//the key that was pressed.
+			e->add_constant("bnote", nph->instrumentTrack()->baseNote()); // the base note
+			e->add_constant("srate", Engine::mixer()->processingSampleRate());// sample rate of the mixer
+			e->add_constant("v", nph->getVolume() / 255.0); //volume of the note.
+			e->add_constant("tempo", Engine::getSong()->getTempo());//tempo of the song.
+			e->add_variable("A1", m_A1);//A1,A2,A3: general purpose input controls.
 			e->add_variable("A2", m_A2);
 			e->add_variable("A3", m_A3);
 		};
 		init_expression_step1(exprO1);
 		init_expression_step1(exprO2);
 
-		m_W1.setInterpolate(m_interpolateW1.value());
+		m_W1.setInterpolate(m_interpolateW1.value());//set interpolation according to the user selection.
 		m_W2.setInterpolate(m_interpolateW2.value());
 		m_W3.setInterpolate(m_interpolateW3.value());
 		nph->m_pluginData = new ExprSynth(&m_W1, &m_W2, &m_W3, exprO1, exprO2, nph,
@@ -520,11 +521,11 @@ void XpressiveView::expressionChanged() {
 
 	if (text.size()>0)
 	{
-		ExprFront expr(text.constData());
+		const unsigned int sample_rate=m_raw_graph->length();
+		ExprFront expr(text.constData(),sample_rate);
 		float t=0;
 		const float f=10,key=5,v=0.5;
 		unsigned int i;
-		const unsigned int sample_rate=m_raw_graph->length();
 		expr.add_variable("t", t);
 
 		if (m_output_expr)
@@ -828,7 +829,7 @@ QString XpressiveHelpView::s_helpText=
 "<b>cent(x)</b> - Gives pow(2,x/1200), so you can multiply it with the f variable to pitch the frequency.<br>"
 "100 cents equals one semitone<br>"
 "<b>semitone(x)</b> - Gives pow(2,x/12), so you can multiply it with the f variable to pitch the frequency.<br>"
-"<b>last(n)</b> - Gives you the last n'th evaluated sample. The argument n must be in the range [1,500], or else, it will return 0.<br>"
+"<b>last(n)</b> - Gives you the last n'th evaluated sample. In O1 and O2 it keeps a whole second. Thus the argument n must be in the range [1,srate], or else, it will return 0.<br>"
 "<b>integrate(x)</b> - Integrates x by delta t (It sums values and divides them by sample rate).<br>"
 "If you use notes with automated frequency, you should use:<br>"
 "sinew(integrate(f)) instead of sinew(t*f)<br>"
