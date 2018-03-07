@@ -239,13 +239,13 @@ public:
 		m_bbTrack = t;
 	}
 
-	/*! Process note detuning automation */
+	/*! Process note pitch bend automation */
 	void processMidiTime( const MidiTime& time );
 
 	/*! Updates total length (m_frames) depending on a new tempo */
 	void resize( const bpm_t newTempo );
 
-	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note detuning */
+	/*! Set song-global offset (relative to containing pattern) in order to properly perform the note pitch bend */
 	void setSongGlobalParentOffset( const MidiTime& offset )
 	{
 		m_songGlobalParentOffset = offset;
@@ -263,11 +263,11 @@ public:
 	}
 
 private:
-	class BaseDetuning
+	class BasePitchBend
 	{
 		MM_OPERATORS
 	public:
-		BaseDetuning( DetuningHelper* detuning );
+		BasePitchBend( PitchBendHelper* pitchBend );
 
 		void setValue( float val )
 		{
@@ -317,7 +317,7 @@ private:
 	float m_frequency;
 	float m_unpitchedFrequency;
 
-	BaseDetuning* m_baseDetuning;
+	BasePitchBend* m_basePitchBend;
 	MidiTime m_songGlobalParentOffset;
 
 	int m_midiChannel;

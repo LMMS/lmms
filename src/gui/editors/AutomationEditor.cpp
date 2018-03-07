@@ -341,7 +341,7 @@ void AutomationEditor::update()
 	QWidget::update();
 
 	QMutexLocker m( &m_patternMutex );
-	// Note detuning?
+	// Note pitch bend?
 	if( m_pattern && !m_pattern->getTrack() )
 	{
 		gui->pianoRoll()->update();

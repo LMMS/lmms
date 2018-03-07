@@ -2,7 +2,7 @@
  * Note.cpp - implementation of class note
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -28,12 +28,12 @@
 #include <math.h>
 
 #include "Note.h"
-#include "DetuningHelper.h"
+#include "PitchBendHelper.h"
 
 
 Note::Note( const MidiTime & length, const MidiTime & pos,
 		int key, volume_t volume, panning_t panning,
-						DetuningHelper * detuning ) :
+						PitchBendHelper * pitchBend ) :
 	m_selected( false ),
 	m_oldKey( qBound( 0, key, NumKeys ) ),
 	m_oldPos( pos ),
@@ -44,15 +44,15 @@ Note::Note( const MidiTime & length, const MidiTime & pos,
 	m_panning( qBound( PanningLeft, panning, PanningRight ) ),
 	m_length( length ),
 	m_pos( pos ),
-	m_detuning( NULL )
+	m_pitchBend( NULL )
 {
-	if( detuning )
+	if( pitchBend )
 	{
-		m_detuning = sharedObject::ref( detuning );
+		m_pitchBend = sharedObject::ref( pitchBend );
 	}
 	else
 	{
-		createDetuning();
+		createPitchBend();
 	}
 }
 
@@ -71,11 +71,11 @@ Note::Note( const Note & note ) :
 	m_panning( note.m_panning ),
 	m_length( note.m_length ),
 	m_pos( note.m_pos ),
-	m_detuning( NULL )
+	m_pitchBend( NULL )
 {
-	if( note.m_detuning )
+	if( note.m_pitchBend )
 	{
-		m_detuning = sharedObject::ref( note.m_detuning );
+		m_pitchBend = sharedObject::ref( note.m_pitchBend );
 	}
 }
 
@@ -84,9 +84,9 @@ Note::Note( const Note & note ) :
 
 Note::~Note()
 {
-	if( m_detuning )
+	if( m_pitchBend )
 	{
-		sharedObject::unref( m_detuning );
+		sharedObject::unref( m_pitchBend );
 	}
 }
 
@@ -177,9 +177,9 @@ void Note::saveSettings( QDomDocument & doc, QDomElement & parent )
 	parent.setAttribute( "len", m_length );
 	parent.setAttribute( "pos", m_pos );
 
-	if( m_detuning && m_length )
+	if( m_pitchBend && m_length )
 	{
-		m_detuning->saveSettings( doc, parent );
+		m_pitchBend->saveSettings( doc, parent );
 	}
 }
 
@@ -197,8 +197,8 @@ void Note::loadSettings( const QDomElement & _this )
 
 	if( _this.hasChildNodes() )
 	{
-		createDetuning();
-		m_detuning->loadSettings( _this );
+		createPitchBend();
+		m_pitchBend->loadSettings( _this );
 	}
 }
 
@@ -206,23 +206,23 @@ void Note::loadSettings( const QDomElement & _this )
 
 
 
-void Note::createDetuning()
+void Note::createPitchBend()
 {
-	if( m_detuning == NULL )
+	if( m_pitchBend == NULL )
 	{
-		m_detuning = new DetuningHelper;
-		(void) m_detuning->automationPattern();
-		m_detuning->setRange( -MaxDetuning, MaxDetuning, 0.5f );
-		m_detuning->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
+		m_pitchBend = new PitchBendHelper;
+		(void) m_pitchBend->automationPattern();
+		m_pitchBend->setRange( -MaxPitchBend, MaxPitchBend, 0.5f );
+		m_pitchBend->automationPattern()->setProgressionType( AutomationPattern::LinearProgression );
 	}
 }
 
 
 
 
-bool Note::hasDetuningInfo() const
+bool Note::hasPitchBendInfo() const
 {
-	return m_detuning && m_detuning->hasAutomation();
+	return m_pitchBend && m_pitchBend->hasAutomation();
 }
 
 
