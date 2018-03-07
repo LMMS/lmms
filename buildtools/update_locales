@@ -1,0 +1,71 @@
+#!/bin/bash
+aberr(){ printf "[\e[31mERROR\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
+abinfo(){ printf "[\e[96mINFO\e[0m]: \e[1m%s\e[0m\n" "$*" >&2; }
+
+function upload_to_tx() {
+  if ! which tx > /dev/null; then
+    aberr "You don't have Transifex client installed. \n Run \`pip install transifex-client\` to install it."
+    exit 1
+  fi
+  abinfo "Uploading to transifex..."
+  if ! tx push -s; then
+    aberr "Problems occurred when uploading strings to Transifex."
+    printf "\t Either there are syntax errors in source file or you don't have permission to update the source file."
+    exit 1
+  fi
+  exit 0
+}
+
+function validate() {
+  ERR_LANG=""
+  ERR_BUF=""
+  for i in data/locale/*.ts; do
+    if ! ERR_BUF=$(lconvert-qt5 -i "${i}" -o "/tmp/test.qm" -of qm 2>&1); then
+      ERR_LANG+="\e[96m$(basename "${i}")\e[0m: \e[93m${ERR_BUF}\e[0m "
+      printf "\e[31mx\e[0m"
+      continue
+    fi
+    printf "\e[32m.\e[0m"
+  done
+  echo ""
+  if [[ "x${ERR_LANG}" != "x" ]]; then
+    aberr "The following files failed the validation: "
+    echo -e "${ERR_LANG}"
+  fi
+}
+
+abinfo "Checking for your environment..."
+if ! which lupdate-qt5 > /dev/null; then
+  aberr "You don't seem to have Qt i18n tools installed."
+  printf "\tUsually this comes with your Qt installation, or you need to\n"
+  printf "\tinstall extra packages like \`qt5-tools\` or similar.\n"
+  exit 1;
+fi
+
+abinfo "Scanning directories..."
+
+if test -d src/3rdparty/qt5-x11embed/3rdparty/ECM/; then
+  # prevent from collecting strings in ECM
+  rm -rf src/3rdparty/qt5-x11embed/3rdparty/ECM/
+fi
+
+if ! lupdate-qt5 -I include/ src/ plugins/ -ts data/locale/en.ts; then
+  aberr "There are some problems when collecting the strings."
+  exit 1
+fi
+
+abinfo "Validating translations..."
+validate
+
+abinfo "Translations successfully updated."
+printf "Do you want to upload translations to Transifex? [y/N]: "
+read -n 1 -r TX
+echo ""
+
+if [[ "$TX" == "y" || "$TX" == "Y" ]]; then
+  upload_to_tx
+fi
+
+abinfo "No upload as required."
+
+exit 0
