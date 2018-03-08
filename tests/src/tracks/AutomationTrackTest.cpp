@@ -30,7 +30,7 @@
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
-#include "DetuningHelper.h"
+#include "PitchBendHelper.h"
 #include "InstrumentTrack.h"
 #include "Pattern.h"
 #include "TrackContainer.h"
