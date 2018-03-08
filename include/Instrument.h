@@ -29,6 +29,7 @@
 #include <QString>
 #include "export.h"
 #include "lmms_basics.h"
+#include "Lv2PluginInfo.h"
 #include "MemoryManager.h"
 #include "MidiTime.h"
 #include "Plugin.h"
@@ -117,6 +118,10 @@ public:
 	// on failure
 	static Instrument * instantiate( const QString & _plugin_name,
 									InstrumentTrack * _instrument_track );
+
+	// instantiate lv2 plugin or return NULL
+	static Instrument * instantiate(const Lv2PluginInfo& _plugin_info,
+			InstrumentTrack * _instrument_track);
 
 	virtual bool isFromTrack( const Track * _track ) const;
 

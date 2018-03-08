@@ -49,7 +49,7 @@
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "Lv2PluginBrowser.h"
+#include "Lv2InstrumentBrowser.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -125,7 +125,7 @@ MainWindow::MainWindow() :
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
-  sideBar->appendTab( new Lv2PluginBrowser(
+  sideBar->appendTab( new Lv2InstrumentBrowser(
         tr( "LV2 Plugins" ), embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ), splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +

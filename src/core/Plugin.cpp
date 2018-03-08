@@ -125,6 +125,13 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 }
 
 
+Plugin * Plugin::instantiate( const Lv2PluginInfo& _pi, Model * parent,
+								void * data )
+{
+	// TODO instantiate lv2 plugin as Plugin class and return it
+	return new DummyPlugin();
+}
+
 
 
 void Plugin::collectErrorForUI( QString errMsg )
@@ -159,7 +166,7 @@ Plugin::Descriptor::SubPluginFeatures::Key::Key( const QDomElement & key ) :
 		QDomElement e = l.item( i ).toElement();
 		attributes[e.attribute( "name" )] = e.attribute( "value" );
 	}
-		
+
 }
 
 
@@ -169,7 +176,7 @@ QDomElement Plugin::Descriptor::SubPluginFeatures::Key::saveXML(
 						QDomDocument & doc ) const
 {
 	QDomElement e = doc.createElement( "key" );
-	for( AttributeMap::ConstIterator it = attributes.begin(); 
+	for( AttributeMap::ConstIterator it = attributes.begin();
 		it != attributes.end(); ++it )
 	{
 		QDomElement a = doc.createElement( "attribute" );

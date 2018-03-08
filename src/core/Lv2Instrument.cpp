@@ -1,5 +1,5 @@
 /*
- * Lv2Plugin.h - definition of Lv2Plugin class
+ * Lv2Instrument.cpp - implementation of Lv2Instrument class
  *
  * Copyright (c) 2018 Alexandros Theodotou @faiyadesu
  *
@@ -22,28 +22,44 @@
  *
  */
 
-#include <QRegExp>
-#include <QStringList>
+#include "Lv2Instrument.h"
 
-#include "Lv2Plugin.h"
-
-Lv2Plugin::Lv2Plugin(Lilv::Plugin * plugin ) :
-	name( plugin->get_name().as_string() ),
-	uri( plugin->get_uri().as_string() ),
-	childClass( plugin->get_class().get_label().as_string() ),
-	numPorts( plugin->get_num_ports() ),
-	authorName( plugin->get_author_name().as_string() ),
-	authorEmail( plugin->get_author_email().as_string() ),
-	authorHomePage( plugin->get_author_homepage().as_string() )
-{
-	QRegExp rx(".+#([a-zA-Z]+)");
-	int pos = rx.indexIn(plugin->get_class().get_parent_uri().as_string());
-	QStringList list = rx.capturedTexts();
-	parentClass = list.at(1);
-}
-
-Lv2Plugin::~Lv2Plugin()
+extern "C"
 {
 
+Plugin::Descriptor PLUGIN_EXPORT lv2_plugin_descriptor =
+{
+	STRINGIFY( PLUGIN_NAME ),
+	"Organic",
+	QT_TRANSLATE_NOOP( "pluginBrowser",
+				"Additive Synthesizer for organ-like sounds" ),
+	"Andreas Brandmaier <andreas/at/brandmaier.de>",
+	0x0100,
+	Plugin::Instrument,
+	NULL,
+	NULL,
+	NULL
+} ;
 }
 
+Lv2Instrument::Lv2Instrument(InstrumentTrack * _instrument_track) :
+	Instrument( _instrument_track, &lv2_plugin_descriptor )
+{
+
+}
+
+Lv2Instrument::~Lv2Instrument()
+{
+
+}
+
+Lv2InstrumentView::Lv2InstrumentView(Instrument * _instrument,
+		QWidget * _parent) :
+	InstrumentView( _instrument, _parent )
+{
+}
+
+Lv2InstrumentView::~Lv2InstrumentView()
+{
+
+}

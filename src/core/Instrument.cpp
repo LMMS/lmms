@@ -84,6 +84,22 @@ Instrument * Instrument::instantiate( const QString & _plugin_name,
 }
 
 
+Instrument * Instrument::instantiate( const Lv2PluginInfo & _plugin_info,
+					InstrumentTrack * _instrument_track )
+{
+	Plugin * p = Plugin::instantiate( _plugin_info, _instrument_track,
+							_instrument_track );
+	// check whether instantiated plugin is an instrument
+	if( dynamic_cast<Instrument *>( p ) != NULL )
+	{
+		// everything ok, so return pointer
+		return dynamic_cast<Instrument *>( p );
+	}
+
+	// not quite... so delete plugin and return dummy instrument
+	delete p;
+	return( new DummyInstrument( _instrument_track ) );
+}
 
 
 bool Instrument::isFromTrack( const Track * _track ) const

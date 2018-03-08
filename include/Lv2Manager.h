@@ -31,7 +31,7 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
-#include "Lv2Plugin.h"
+#include "Lv2PluginInfo.h"
 
 // A singleton class to manage Lv2 plugins
 class Lv2Manager
@@ -43,13 +43,13 @@ public:
 		return instance;
 	}
 
-	QVector<Lv2Plugin*> getPlugins();
+	QVector<Lv2PluginInfo*> getPlugins();
 
 private:
 	Lv2Manager();
 	Lv2Manager( Lv2Manager const& );
 	void operator=( Lv2Manager const& );
-	QVector<Lv2Plugin*> collection;
+	QVector<Lv2PluginInfo*> collection;
 
 	void scanPlugins();
 };

@@ -22,56 +22,50 @@
  *
  */
 
-#ifndef _LV2_INSTRUMENT_H
-#define _LV2_INSTRUMENT_H
+#ifndef LV2_INSTRUMENT_H
+#define LV2_INSTRUMENT_H
 
 #include <QtCore/QMutex>
 #include <QtCore/QSharedPointer>
 
+#include "Instrument.h"
+#include "InstrumentTrack.h"
+#include "InstrumentView.h"
 #include "JournallingObject.h"
-#include "Lv2Plugin.h"
+#include "Lv2PluginInfo.h"
 #include "RemotePlugin.h"
 
 
-//class Lv2Instrument : public RemotePlugin, public JournallingObject,
-  //public Lv2Plugin
-//{
-  //Q_OBJECT
-//public:
-	//Lv2Instrument( Model * _parent,
-			//const Descriptor::SubPluginFeatures::Key * _key );
-	//virtual ~Lv2Instrument();
+class Lv2Instrument : public Instrument
+{
+	Q_OBJECT
+public:
+	explicit Lv2Instrument( InstrumentTrack * _instrument_track );
+	virtual ~Lv2Instrument();
 
 	//virtual bool processAudioBuffer( sampleFrame * _buf,
 							//const fpp_t _frames );
 
-	//virtual EffectControls * controls()
-	//{
-		//return &m_vstControls;
-	//}
-
-	//virtual inline QString publicName() const
-	//{
-		//return m_plugin->name();
-	//}
-
-
-//private:
+private:
 	//void openPlugin( const QString & _plugin );
 	//void closePlugin();
 
-	//QSharedPointer<VstPlugin> m_plugin;
-	//QMutex m_pluginMutex;
-	//EffectKey m_key;
+	QMutex m_pluginMutex;
+} ;
 
-	//VstEffectControls m_vstControls;
+class Lv2InstrumentView : public InstrumentView
+{
+	Q_OBJECT
+public:
+	Lv2InstrumentView( Instrument * _instrument, QWidget * _parent );
+	virtual ~Lv2InstrumentView();
 
+private:
+	//virtual void modelChanged();
 
-	//friend class VstEffectControls;
-	//friend class VstEffectControlDialog;
-	//friend class manageVSTEffectView;
-
-//} ;
+protected slots:
+	//void updateKnobHint();
+};
 
 
 

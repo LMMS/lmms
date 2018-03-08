@@ -30,6 +30,7 @@
 #include <QtXml/QDomDocument>
 
 #include "JournallingObject.h"
+#include "Lv2PluginInfo.h"
 #include "Model.h"
 #include "MemoryManager.h"
 
@@ -176,12 +177,16 @@ public:
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
 	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
 
-	// create a view for the model 
+	// returns an instance of a lv2 plugin
+	// if specified plugin couldn't be loaded, it creates a dummy-plugin
+	static Plugin * instantiate( const Lv2PluginInfo& _pi, Model * parent, void * data );
+
+	// create a view for the model
 	PluginView * createView( QWidget * parent );
 
 
 protected:
-	// create a view for the model 
+	// create a view for the model
 	virtual PluginView* instantiateView( QWidget * ) = 0;
 	void collectErrorForUI( QString errMsg );
 

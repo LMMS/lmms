@@ -24,6 +24,7 @@
  *
  */
 
+#include <lilv/lilvmm.hpp>
 #include <QtCore>
 
 #include "Lv2Manager.h"
@@ -42,15 +43,13 @@ void Lv2Manager::scanPlugins()
 	LilvIter * iter =  plugins.begin();
 	do {
 		Lilv::Plugin raw_plugin = plugins.get(iter);
-		qDebug( raw_plugin.get_class().get_parent_uri().as_string() );
-		//if (raw_plugin.verify()) { // only add verified plugins
-			Lv2Plugin * plugin = new Lv2Plugin( &raw_plugin );
-			collection.append( plugin );
-		//}
+		//qDebug( raw_plugin.get_class().get_parent_uri().as_string() );
+		Lv2PluginInfo * plugin = new Lv2PluginInfo( &raw_plugin );
+		collection.append( plugin );
 	} while ((iter = plugins.next(iter)) != nullptr);
 }
 
-QVector<Lv2Plugin*> Lv2Manager::getPlugins()
+QVector<Lv2PluginInfo*> Lv2Manager::getPlugins()
 {
 	if (collection.size() == 0)
 	{
@@ -63,7 +62,7 @@ QVector<Lv2Plugin*> Lv2Manager::getPlugins()
 	//Lilv::PluginClass plugin_class = plugin.get_class();
 	//if (QString::compare(plugin_class.get_label().as_string(), "Instrument") == 0)
 	//{
-		//m_treeWidget->addTopLevelItem( new Lv2PluginItem(
+		//m_treeWidget->addTopLevelItem( new Lv2PluginInfoItem(
 		//QString(name.as_string()), QString( plugin.get_uri().as_string()) ) );
 	//}
 

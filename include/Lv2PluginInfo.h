@@ -1,5 +1,5 @@
 /*
- * Lv2Plugin.h - declaration of Lv2Plugin class
+ * Lv2PluginInfo.h - Lv2 plugin metadata
  *
  * Copyright (c) 2018 Alexandros Theodotou @faiyadesu
  *
@@ -25,17 +25,19 @@
 #ifndef LV2_PLUGIN_H
 #define LV2_PLUGIN_H
 
-#include <lilv/lilvmm.hpp>
 #include <QString>
 
+namespace Lilv {
+	struct Plugin;
+}
 
 // This class is a simple wrapper of Lilv Plugin
-class Lv2Plugin
+class Lv2PluginInfo
 {
 public:
-	Lv2Plugin(Lilv::Plugin * plugin );
-	Lv2Plugin(QString uri);
-	virtual ~Lv2Plugin();
+	Lv2PluginInfo(Lilv::Plugin * plugin );
+	Lv2PluginInfo(QString uri);
+	virtual ~Lv2PluginInfo();
 
 	inline QString getUri()
 	{
@@ -65,6 +67,7 @@ public:
 	{
 		return authorHomePage;
 	}
+	void debugPrint();
 
 private:
 	QString uri;

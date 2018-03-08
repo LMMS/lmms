@@ -30,6 +30,7 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
+#include "Lv2PluginInfo.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -147,6 +148,9 @@ public:
 
 	// load instrument whose name matches given one
 	Instrument * loadInstrument( const QString & _instrument_name );
+
+	// load lv2 Instrument
+	Instrument  * loadLv2Instrument(const Lv2PluginInfo& _plugin_info);
 
 	AudioPort * audioPort()
 	{

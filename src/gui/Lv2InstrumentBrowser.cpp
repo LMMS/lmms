@@ -1,5 +1,5 @@
 /*
- * Lv2PluginBrowser.cpp - implementation of the Lv2 plugin browser
+ * Lv2InstrumentBrowser.cpp - implementation of the Lv2 plugin browser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -34,7 +34,6 @@
 #include <QShortcut>
 #include <QDebug>
 
-#include "Lv2PluginBrowser.h"
 #include "BBTrackContainer.h"
 #include "ConfigManager.h"
 #include "embed.h"
@@ -46,7 +45,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Lv2Manager.h"
-#include "Lv2PluginBrowser.h"
+#include "Lv2InstrumentBrowser.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "PluginFactory.h"
@@ -56,13 +55,13 @@
 #include "StringPairDrag.h"
 #include "TextFloat.h"
 
-Lv2PluginBrowser::Lv2PluginBrowser(
+Lv2InstrumentBrowser::Lv2InstrumentBrowser(
 			const QString & title, const QPixmap & pm,
 			QWidget * parent) :
 	SideBarWidget( title, pm, parent )
 {
 	setWindowTitle( tr( "Lv2 Plugin Browser" ) );
-	m_treeWidget = new Lv2PluginBrowserTreeWidget( contentParent() );
+	m_treeWidget = new Lv2InstrumentBrowserTreeWidget( contentParent() );
 	addContentWidget( m_treeWidget );
 
 	QWidget * ops = new QWidget( contentParent() );
@@ -101,14 +100,14 @@ Lv2PluginBrowser::Lv2PluginBrowser(
 
 
 
-Lv2PluginBrowser::~Lv2PluginBrowser()
+Lv2InstrumentBrowser::~Lv2InstrumentBrowser()
 {
 }
 
 
 
 
-bool Lv2PluginBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
+bool Lv2InstrumentBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 {
 	// call with item=NULL to filter the entire tree
 	bool anyMatched = false;
@@ -159,18 +158,21 @@ bool Lv2PluginBrowser::filterItems( const QString & filter, QTreeWidgetItem * it
 
 
 
-void Lv2PluginBrowser::reloadTree( void )
+void Lv2InstrumentBrowser::reloadTree( void )
 {
 	const QString text = m_filterEdit->text();
+
+
+
 	m_filterEdit->clear();
 	m_treeWidget->clear();
-  addItems();
+	addItems();
 	filterItems( text );
 }
 
 
 
-void Lv2PluginBrowser::giveFocusToFilter()
+void Lv2InstrumentBrowser::giveFocusToFilter()
 {
 	if (!m_filterEdit->hasFocus())
 	{
@@ -182,23 +184,23 @@ void Lv2PluginBrowser::giveFocusToFilter()
 
 
 
-void Lv2PluginBrowser::addItems()
+void Lv2InstrumentBrowser::addItems()
 {
 	Lv2Manager & manager =  Lv2Manager::getInstance();
-	QVector<Lv2Plugin*> plugins = manager.getPlugins();
+	QVector<Lv2PluginInfo*> plugins = manager.getPlugins();
 	for ( int i = 0; i < plugins.size(); i++ )
 	{
-		Lv2Plugin * plugin = plugins.at(i);
-		qDebug() << plugin->getParentClass();
+		Lv2PluginInfo* plugin = plugins.at(i);
 		if ( QString::compare( plugin->getParentClass(),
 			"GeneratorPlugin") == 0)
 		{
+			plugin->debugPrint();
 			m_treeWidget->addTopLevelItem( new Lv2PluginItem( plugin ) );
 		}
 	}
 }
 
-void Lv2PluginBrowser::keyPressEvent(QKeyEvent * ke )
+void Lv2InstrumentBrowser::keyPressEvent(QKeyEvent * ke )
 {
 	if( ke->key() == Qt::Key_F5 )
 	{
@@ -210,7 +212,7 @@ void Lv2PluginBrowser::keyPressEvent(QKeyEvent * ke )
 	}
 }
 
-Lv2PluginBrowserTreeWidget::Lv2PluginBrowserTreeWidget(QWidget * parent ) :
+Lv2InstrumentBrowserTreeWidget::Lv2InstrumentBrowserTreeWidget(QWidget * parent ) :
 	QTreeWidget( parent ),
 	m_mousePressed( false ),
 	m_pressPos(),
@@ -225,14 +227,14 @@ Lv2PluginBrowserTreeWidget::Lv2PluginBrowserTreeWidget(QWidget * parent ) :
 			SLOT( activateListItem( QTreeWidgetItem *, int ) ) );
 }
 
-Lv2PluginBrowserTreeWidget::~Lv2PluginBrowserTreeWidget()
+Lv2InstrumentBrowserTreeWidget::~Lv2InstrumentBrowserTreeWidget()
 {
 }
 
 
 
 
-void Lv2PluginBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
+void Lv2InstrumentBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
 	Lv2PluginItem * f = dynamic_cast<Lv2PluginItem *>( itemAt( e->pos() ) );
 	if( f != NULL )
@@ -258,7 +260,7 @@ void Lv2PluginBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 
 
 
-void Lv2PluginBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
+void Lv2InstrumentBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
 	QTreeWidget::mousePressEvent( me );
 	if( me->button() != Qt::LeftButton )
@@ -290,7 +292,7 @@ void Lv2PluginBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 }
 
 
-void Lv2PluginBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
+void Lv2InstrumentBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 {
 	if( m_mousePressed == true &&
 		( m_pressPos - me->pos() ).manhattanLength() >
@@ -300,16 +302,17 @@ void Lv2PluginBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		mouseReleaseEvent( NULL );
 
 		Lv2PluginItem * item = dynamic_cast<Lv2PluginItem *>( itemAt( m_pressPos ) );
+		item->getPlugin()->debugPrint();
 		if( item != NULL )
 		{
 			new StringPairDrag( "lv2pluginfile",
-			item->getPlugin()->getName(),
+			item->getPlugin()->getUri(),
 			embed::getIconPixmap( "vst_plugin_file" ), this );
 		}
 	}
 }
 
-void Lv2PluginBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
+void Lv2InstrumentBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 {
 	m_mousePressed = false;
 
@@ -317,24 +320,21 @@ void Lv2PluginBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	m_pphMutex.unlock();
 }
 
-void Lv2PluginBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, InstrumentTrack * it )
+void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, InstrumentTrack * it )
 {
 	Engine::mixer()->requestChangeInModel();
 
-  //const QString e = f->extension();
-  //Instrument * i = it->instrument();
-  //if( i == NULL ||
-    //!i->descriptor()->supportsFileType( e ) )
-  //{
-    //i = it->loadInstrument(
-      //pluginFactory->pluginSupportingExtension(e).name() );
-  //}
-  //i->loadFile( f->fullName() );
+	//const QString e = f->extension();
+	Instrument * i = it->instrument();
+	if( i == NULL )
+	{
+		i = it->loadLv2Instrument(*(f->getPlugin()));
+	}
 
-  Engine::mixer()->doneChangeInModel();
+	Engine::mixer()->doneChangeInModel();
 }
 
-void Lv2PluginBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
+void Lv2InstrumentBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
 	Lv2PluginItem * lv2pi = dynamic_cast<Lv2PluginItem *>( item );
@@ -343,30 +343,30 @@ void Lv2PluginBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 		return;
 	}
 
-  InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
-      Track::create( Track::InstrumentTrack,
-        Engine::getBBTrackContainer() ) );
-  handlePlugin( lv2pi, it );
+	InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
+	Track::create( Track::InstrumentTrack,
+		Engine::getBBTrackContainer() ) );
+	handlePlugin( lv2pi, it );
 }
 
-void Lv2PluginBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
+void Lv2InstrumentBrowserTreeWidget::openInNewInstrumentTrack( TrackContainer* tc )
 {
   InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
     Track::create( Track::InstrumentTrack, tc ) );
   handlePlugin( m_contextMenuItem, it );
 }
 
-void Lv2PluginBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
+void Lv2InstrumentBrowserTreeWidget::openInNewInstrumentTrackBBE( void )
 {
 	openInNewInstrumentTrack( Engine::getBBTrackContainer() );
 }
 
-void Lv2PluginBrowserTreeWidget::openInNewInstrumentTrackSE( void )
+void Lv2InstrumentBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 {
 	openInNewInstrumentTrack( Engine::getSong() );
 }
 
-void Lv2PluginBrowserTreeWidget::sendToActiveInstrumentTrack( void )
+void Lv2InstrumentBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
@@ -389,11 +389,11 @@ void Lv2PluginBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 	}
 }
 
-Lv2PluginItem::Lv2PluginItem( Lv2Plugin * plugin) :
-    QTreeWidgetItem( QStringList( plugin->getName()), 0 )
+Lv2PluginItem::Lv2PluginItem( Lv2PluginInfo * plugin) :
+    QTreeWidgetItem( QStringList( plugin->getName()), 0 ),
+	m_plugin( plugin )
 {
-  initPixmaps();
-  //lilv_plugin =
+	initPixmaps();
 }
 
 QPixmap * Lv2PluginItem::s_Lv2PluginPixmap = NULL;
