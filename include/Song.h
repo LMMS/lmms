@@ -35,11 +35,13 @@
 #include "MeterModel.h"
 #include "Mixer.h"
 #include "VstSyncController.h"
+#include "Groove.h"
 
 
 class AutomationTrack;
 class Pattern;
 class TimeLineWidget;
+class Groove;
 
 
 const bpm_t MinTempo = 10;
@@ -236,6 +238,11 @@ public:
 		return m_globalAutomationTrack;
 	}
 
+	Groove * globalGroove()
+	{
+		return m_globalGroove;
+	}
+
 	//TODO: Add Q_DECL_OVERRIDE when Qt4 is dropped
 	AutomatedValueMap automatedValuesAt(MidiTime time, int tcoNum = -1) const;
 
@@ -246,6 +253,7 @@ public:
 	bool guiSaveProject();
 	bool guiSaveProjectAs( const QString & filename );
 	bool saveProjectFile( const QString & filename );
+	void setGlobalGroove(Groove * groove);
 
 	const QString & projectFileName() const
 	{
@@ -310,6 +318,7 @@ public slots:
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
+	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void startExport();
 	void stopExport();
@@ -361,8 +370,6 @@ private:
 			m_playPos[m_playMode].currentFrame();
 	}
 
-	void setPlayPos( tick_t ticks, PlayModes playMode );
-
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
 	void restoreControllerStates( const QDomElement & element );
 
@@ -375,6 +382,7 @@ private:
 	void setProjectFileName(QString const & projectFileName);
 
 	AutomationTrack * m_globalAutomationTrack;
+	Groove * m_globalGroove;
 
 	IntModel m_tempoModel;
 	MeterModel m_timeSigModel;

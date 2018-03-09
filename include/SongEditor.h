@@ -110,7 +110,7 @@ private:
 	virtual void wheelEvent( QWheelEvent * we );
 
 	virtual bool allowRubberband() const;
-
+	void scrollToPos( const MidiTime & t );
 
 	Song * m_song;
 
@@ -159,11 +159,18 @@ public:
 protected:
 	virtual void resizeEvent( QResizeEvent * event );
 
-protected slots:
+public slots:
 	void play();
 	void record();
-	void recordAccompany();
 	void stop();
+	void home();
+	void next();
+	void prev();
+	void end();
+	
+	
+protected slots:
+	void recordAccompany();
 
 	void lostFocus();
 	void adjustUiAfterProjectLoad();

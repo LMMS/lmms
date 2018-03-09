@@ -166,6 +166,8 @@ public slots:
 	void toggleFxMixerWin();
 	void togglePianoRollWin();
 	void toggleControllerRack();
+	void toggleStudioControllerView();
+	void toggleGrooveView();
 
 	void updatePlayPauseIcons();
 
