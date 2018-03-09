@@ -62,18 +62,11 @@ public:
 		waitForMessage( IdInitDone );
 
 		pthread_mutex_init( &m_guiMutex, NULL );
-		pthread_create( &m_guiThreadHandle, NULL, guiThread, this );
+		pthread_create( &m_messageThreadHandle, NULL, messageLoop, this );
 	}
 
 	virtual ~RemoteZynAddSubFx()
 	{
-		m_guiExit = true;
-#ifdef LMMS_BUILD_WIN32
-		Sleep( m_guiSleepTime * 2 );
-#else
-		usleep( m_guiSleepTime * 2 * 1000 );
-#endif
-
 		Nio::stop();
 	}
 
@@ -87,7 +80,7 @@ public:
 		LocalZynAddSubFx::setBufferSize( bufferSize() );
 	}
 
-	void run()
+	void messageLoop()
 	{
 		message m;
 		while( ( m = receiveMessage() ).id != IdQuit )
@@ -96,6 +89,7 @@ public:
 			processMessage( m );
 			pthread_mutex_unlock( &m_master->mutex );
 		}
+		m_guiExit = true;
 	}
 
 	virtual bool processMessage( const message & _m )
@@ -151,23 +145,22 @@ public:
 		LocalZynAddSubFx::processAudio( _out );
 	}
 
-	static void * guiThread( void * _arg )
+	static void * messageLoop( void * _arg )
 	{
 		RemoteZynAddSubFx * _this =
 					static_cast<RemoteZynAddSubFx *>( _arg );
 
-		_this->guiThread();
+		_this->messageLoop();
 
 		return NULL;
 	}
 
+	void guiLoop();
 
 private:
-	void guiThread();
-
 	const int m_guiSleepTime;
 
-	pthread_t m_guiThreadHandle;
+	pthread_t m_messageThreadHandle;
 	pthread_mutex_t m_guiMutex;
 	std::queue<RemotePluginClient::message> m_guiMessages;
 	bool m_guiExit;
@@ -177,7 +170,7 @@ private:
 
 
 
-void RemoteZynAddSubFx::guiThread()
+void RemoteZynAddSubFx::guiLoop()
 {
 	int exitProgram = 0;
 	MasterUI * ui = NULL;
@@ -292,7 +285,7 @@ int main( int _argc, char * * _argv )
 	RemoteZynAddSubFx * remoteZASF = new RemoteZynAddSubFx( _argv[1] );
 #endif
 
-	remoteZASF->run();
+	remoteZASF->guiLoop();
 
 	delete remoteZASF;
 

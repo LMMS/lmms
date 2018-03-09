@@ -18,23 +18,23 @@ SET(WINE_LIBRARIES ${WINE_LIBRARY} )
 
 # Handle wine linking problems
 EXEC_PROGRAM(${WINE_CXX} ARGS "-v -m32 /dev/zero" OUTPUT_VARIABLE WINEBUILD_OUTPUT)
+STRING(REPLACE " " ";" WINEBUILD_FLAGS "${WINEBUILD_OUTPUT}")
 
-# Debian systems 
-IF("${WINEBUILD_OUTPUT}" MATCHES ".*x86_64-linux-gnu/wine/libwinecrt0.a.*")
-	SET(WINE_LIBRARY_FIX "/usr/lib/i386-linux-gnu/" )
-# Fedora systems 
-ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/usr/lib/lib64/wine/libwinecrt0.a.*")
-	SET(WINE_LIBRARY_FIX "/usr/lib/i386/")
-# Wine stable
-ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-stable/lib64/wine/libwinecrt0.a.*")
-	SET(WINE_LIBRARY_FIX "/opt/wine-stable/lib/")
-# Wine development
-ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-devel/lib64/wine/libwinecrt0.a.*")
-	SET(WINE_LIBRARY_FIX "/opt/wine-devel/lib/")
-# Wine staging
-ELSEIF("${WINEBUILD_OUTPUT}" MATCHES "/opt/wine-staging/lib64/wine/libwinecrt0.a.*")
-	SET(WINE_LIBRARY_FIX "/opt/wine-staging/lib/")
-ENDIF()
+FOREACH(FLAG ${WINEBUILD_FLAGS})
+	IF("${FLAG}" MATCHES "libwinecrt0.a.*")
+		# Debian systems
+		STRING(REPLACE "/lib/x86_64-" "/lib/i386-" FLAG "${FLAG}")
+		# Fedora systems
+		STRING(REPLACE "/lib/lib64" "/lib/i386" FLAG "${FLAG}")
+		# Gentoo systems
+		STRING(REPLACE "/lib/wine-" "/lib32/wine-" FLAG "${FLAG}")
+		# WineHQ (/opt/wine-stable, /opt/wine-devel, /opt/wine-staging)
+		STRING(REPLACE "/lib64/wine/" "/lib/wine/" FLAG "${FLAG}")
+
+		STRING(REGEX REPLACE "/wine/libwinecrt0.a.*" "" WINE_LIBRARY_FIX "${FLAG}")
+		SET(WINE_LIBRARY_FIX "${WINE_LIBRARY_FIX}/")
+	ENDIF()
+ENDFOREACH()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Wine DEFAULT_MSG WINE_LIBRARIES WINE_INCLUDE_DIRS)

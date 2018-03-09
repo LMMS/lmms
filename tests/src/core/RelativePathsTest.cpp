@@ -40,8 +40,11 @@ private slots:
 
 		QString absPath = fi.absoluteFilePath();
 		QString relPath = "drums/kick01.ogg";
+		QString fuzPath = absPath;
+		fuzPath.replace(relPath, "drums/.///kick01.ogg");
 		QCOMPARE(SampleBuffer::tryToMakeRelative(absPath), relPath);
 		QCOMPARE(SampleBuffer::tryToMakeAbsolute(relPath), absPath);
+		QCOMPARE(SampleBuffer::tryToMakeRelative(fuzPath), relPath);
 	}
 } RelativePathTests;
 
