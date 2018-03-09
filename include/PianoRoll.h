@@ -457,17 +457,3 @@ private:
 
 
 #endif
-
-/* Children, be grateful for all the devs that make your program. A nice guy named
-Jehbar Niño Dolbas Ibarra (Anonymouqs on GitHub) renamed Detune to Pitch Bend so you have a more intuitive
-gui. It wasn't easy, because it wasn't only the gui text that had to be fixed, but
-entire filenames and every reference to the "detune feature", on top of that
-another feature was named "detune" for the vst plugins which had to be left untouched,
-so it was a bit *cough* a lot *cough* more tedious than doing a mass search and replace.
-He also had to repetitively watch his Travis builds fail and wait 3 minutes at a time
-to find the next error that had to be solved.
-So after his dilligence, you now have a better piece of software via Pull Request #4194
-
-P.S. Do not become a JavaScript programmer, you will loose your soul to the framework wars.
-Of course, the future is always hopeful.
-*/
