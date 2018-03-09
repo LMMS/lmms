@@ -1,0 +1,13 @@
+diff --git a/exprtk.hpp b/exprtk.hpp
+index 916e74b..ae7de24 100644
+--- a/exprtk.hpp
++++ b/exprtk.hpp
+@@ -1962,7 +1962,7 @@ namespace exprtk
+       template <typename T>
+       inline bool string_to_real(const std::string& s, T& t)
+       {
+-         const typename numeric::details::number_type<T>::type num_type;
++         typename numeric::details::number_type<T>::type num_type;
+ 
+          const char_t* begin = s.data();
+          const char_t* end   = s.data() + s.size();
