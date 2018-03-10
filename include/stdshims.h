@@ -6,6 +6,10 @@
 #include <memory>
 #include <utility>
 
+#if (__cplusplus >= 201402L)
+#warning "This file should now be removed! The functions it provides are part of the C++14 standard."
+#endif
+
 /// Shim for http://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args)
