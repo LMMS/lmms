@@ -35,6 +35,9 @@
 #include "Lv2PluginInfo.h"
 #include "RemotePlugin.h"
 
+namespace Lilv {
+	struct Instance;
+}
 
 class Lv2Instrument : public Instrument
 {
@@ -56,32 +59,6 @@ public:
 
 	QString nodeName() const override;
 
-	//f_cnt_t beatLen( NotePlayHandle * _n ) const;
-
-
-	//inline f_cnt_t desiredReleaseFrames() const
-	//{
-		//return 0;
-	//}
-
-	//inline Flags flags() const
-	//{
-		//return NoFlags;
-	//}
-
-	//inline bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
-	//{
-		//return true;
-	//}
-
-	//QString fullDisplayName() const;
-
-	//bool isFromTrack( const Track * _track ) const;
-
-	//void loadFile( const QString & file );
-
-	//AutomatableModel* childModel( const QString & modelName );
-
 
 private:
 	//void openPlugin( const QString & _plugin );
@@ -89,6 +66,7 @@ private:
 
 	const Lv2PluginInfo* m_pluginInfo;
 	QMutex m_pluginMutex;
+	Lilv::Instance * m_instance;
 
 	PluginView* instantiateView( QWidget * _parent ) override;
 };

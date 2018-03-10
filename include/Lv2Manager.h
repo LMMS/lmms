@@ -36,6 +36,7 @@
 namespace Lilv {
 	struct World;
 }
+typedef struct _LV2_Feature LV2_Feature;
 
 // A singleton class to manage Lv2 plugins
 class Lv2Manager
@@ -51,12 +52,22 @@ public:
 
 	//Lilv::Plugin* getPlugin();
 
+	inline Lilv::World* getWorld() const
+	{
+		return m_world;
+	}
+
+	Lilv::Plugin* getPlugin(QString& uri);
+
+	LV2_Feature* const* getHostFeatures();
+
 private:
 	Lv2Manager();
 	Lv2Manager( Lv2Manager const& );
 	void operator=( Lv2Manager const& );
 	QVector<Lv2PluginInfo*> collection;
 	Lilv::World* m_world;
+	LV2_Feature** m_host_features;
 
 	void scanPlugins();
 };

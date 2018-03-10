@@ -31,6 +31,13 @@
 
 Lv2Manager::Lv2Manager()
 {
+	// TODO add host lv2 features
+	m_host_features = new LV2_Feature*[3];
+	m_host_features[0] = new LV2_Feature {
+		"http://lv2plug.in/ns/ext/urid#unmap", nullptr };
+	m_host_features[1] = new LV2_Feature {
+		"http://lv2plug.in/ns/ext/worker#schedule", nullptr };
+	m_host_features[2] = NULL;
 	scanPlugins();
 }
 
@@ -47,9 +54,8 @@ void Lv2Manager::scanPlugins()
 	Lilv::Plugins plugins = m_world->get_all_plugins();
 	LilvIter * iter =  plugins.begin();
 	do {
-		Lilv::Plugin raw_plugin = plugins.get(iter);
-		//qDebug( raw_plugin.get_class().get_parent_uri().as_string() );
-		Lv2PluginInfo * plugin = new Lv2PluginInfo( &raw_plugin );
+		Lilv::Plugin* raw_plugin = new Lilv::Plugin(plugins.get(iter));
+		Lv2PluginInfo * plugin = new Lv2PluginInfo( raw_plugin );
 		collection.append( plugin );
 	} while ((iter = plugins.next(iter)) != nullptr);
 }
@@ -63,6 +69,11 @@ QVector<Lv2PluginInfo*> Lv2Manager::getPlugins()
 	return collection;
 }
 
+//Lilv::Plugin Lv2Manager::getPlugin()
+//{
+
+//}
+
 	//Lilv::Node name = plugin.get_name();
 	//Lilv::PluginClass plugin_class = plugin.get_class();
 	//if (QString::compare(plugin_class.get_label().as_string(), "Instrument") == 0)
@@ -70,4 +81,9 @@ QVector<Lv2PluginInfo*> Lv2Manager::getPlugins()
 		//m_treeWidget->addTopLevelItem( new Lv2PluginInfoItem(
 		//QString(name.as_string()), QString( plugin.get_uri().as_string()) ) );
 	//}
+
+LV2_Feature* const* Lv2Manager::getHostFeatures()
+{
+	return const_cast<LV2_Feature* const*>(m_host_features);
+}
 

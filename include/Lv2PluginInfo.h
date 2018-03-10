@@ -67,6 +67,12 @@ public:
 	{
 		return authorHomePage;
 	}
+
+	Lilv::Plugin* getRawPlugin() const
+	{
+		return m_raw_plugin;
+	}
+
 	void debugPrint() const;
 
 private:

@@ -109,7 +109,7 @@ Lv2InstrumentBrowser::~Lv2InstrumentBrowser()
 
 bool Lv2InstrumentBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 {
-	qDebug("filtering items");
+	//qDebug("filtering items");
 	// call with item=NULL to filter the entire tree
 	bool anyMatched = false;
 
@@ -263,7 +263,7 @@ void Lv2InstrumentBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 
 void Lv2InstrumentBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 {
-	qDebug("mouse press event");
+	//qDebug("mouse press event");
 	QTreeWidget::mousePressEvent( me );
 	if( me->button() != Qt::LeftButton )
 	{
@@ -324,7 +324,7 @@ void Lv2InstrumentBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, InstrumentTrack * it )
 {
-	qDebug("handling plugin");
+	//qDebug("handling plugin");
 	Engine::mixer()->requestChangeInModel();
 
 	//const QString e = f->extension();
@@ -340,7 +340,7 @@ void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, Instrument
 void Lv2InstrumentBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
-	qDebug("activating list item");
+	//qDebug("activating list item");
 	Lv2PluginItem * lv2pi = dynamic_cast<Lv2PluginItem *>( item );
 	if( lv2pi == NULL )
 	{
@@ -372,7 +372,7 @@ void Lv2InstrumentBrowserTreeWidget::openInNewInstrumentTrackSE( void )
 
 void Lv2InstrumentBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 {
-	qDebug("sending to active inst track");
+	//qDebug("sending to active inst track");
 	// get all windows opened in the workspace
 	QList<QMdiSubWindow*> pl =
 			gui->mainWindow()->workspace()->

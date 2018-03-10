@@ -29,9 +29,9 @@
 
 #include "Lv2PluginInfo.h"
 
-Lv2PluginInfo::Lv2PluginInfo(Lilv::Plugin * plugin ) :
-	name( plugin->get_name().as_string() ),
+Lv2PluginInfo::Lv2PluginInfo(Lilv::Plugin *plugin ) :
 	uri(  plugin->get_uri().as_string() ),
+	name( plugin->get_name().as_string() ),
 	childClass(  plugin->get_class().get_label().as_string() ),
 	numPorts( plugin->get_num_ports() ),
 	authorName( plugin->get_author_name().as_string() ),
@@ -43,7 +43,6 @@ Lv2PluginInfo::Lv2PluginInfo(Lilv::Plugin * plugin ) :
 	rx.indexIn(plugin->get_class().get_parent_uri().as_string());
 	QStringList list = rx.capturedTexts();
 	parentClass = list.at(1);
-
 }
 
 Lv2PluginInfo::~Lv2PluginInfo()
