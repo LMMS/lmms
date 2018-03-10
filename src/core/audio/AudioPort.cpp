@@ -56,7 +56,6 @@ AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
 	Engine::mixer()->removeAudioPort( this );
-	delete m_effects;
 	BufferManager::release( m_portBuffer );
 }
 
