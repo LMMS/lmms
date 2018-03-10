@@ -37,9 +37,10 @@
 
 class QWidget;
 
+class AutomatableModel;
+class InstrumentTrack;
 class PixmapLoader;
 class PluginView;
-class AutomatableModel;
 
 
 class EXPORT Plugin : public Model, public JournallingObject
@@ -179,7 +180,7 @@ public:
 
 	// returns an instance of a lv2 plugin
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const Lv2PluginInfo& _pi, Model * parent, void * data );
+	static Plugin * instantiate( const Lv2PluginInfo& _pi, InstrumentTrack * _it);
 
 	// create a view for the model
 	PluginView * createView( QWidget * parent );

@@ -40,25 +40,65 @@ class Lv2Instrument : public Instrument
 {
 	Q_OBJECT
 public:
-	explicit Lv2Instrument( InstrumentTrack * _instrument_track );
-	virtual ~Lv2Instrument();
+	explicit Lv2Instrument(const Lv2PluginInfo& _pi,
+			InstrumentTrack * _it);
+	~Lv2Instrument() override;
 
-	//virtual bool processAudioBuffer( sampleFrame * _buf,
-							//const fpp_t _frames );
+	void playNote( NotePlayHandle* _note_to_play,
+					sampleFrame* _working_buf) override;
+
+	void deleteNotePluginData( NotePlayHandle * _note_to_play ) override;
+
+	void saveSettings(QDomDocument& _doc,
+			QDomElement& _parent) override;
+
+	void loadSettings(const QDomElement& _this) override;
+
+	QString nodeName() const override;
+
+	//f_cnt_t beatLen( NotePlayHandle * _n ) const;
+
+
+	//inline f_cnt_t desiredReleaseFrames() const
+	//{
+		//return 0;
+	//}
+
+	//inline Flags flags() const
+	//{
+		//return NoFlags;
+	//}
+
+	//inline bool handleMidiEvent( const MidiEvent&, const MidiTime& = MidiTime(), f_cnt_t offset = 0 )
+	//{
+		//return true;
+	//}
+
+	//QString fullDisplayName() const;
+
+	//bool isFromTrack( const Track * _track ) const;
+
+	//void loadFile( const QString & file );
+
+	//AutomatableModel* childModel( const QString & modelName );
+
 
 private:
 	//void openPlugin( const QString & _plugin );
 	//void closePlugin();
 
+	const Lv2PluginInfo* m_pluginInfo;
 	QMutex m_pluginMutex;
-} ;
+
+	PluginView* instantiateView( QWidget * _parent ) override;
+};
 
 class Lv2InstrumentView : public InstrumentView
 {
 	Q_OBJECT
 public:
 	Lv2InstrumentView( Instrument * _instrument, QWidget * _parent );
-	virtual ~Lv2InstrumentView();
+	~Lv2InstrumentView();
 
 private:
 	//virtual void modelChanged();

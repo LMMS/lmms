@@ -34,12 +34,17 @@ Lv2Manager::Lv2Manager()
 	scanPlugins();
 }
 
+//Lilv::Plugin getPlugin(const Lv2PluginInfo& _pi)
+//{
+	//m_worl
+//}
+
 void Lv2Manager::scanPlugins()
 {
 	collection.clear();
-	Lilv::World world;
-	world.load_all();
-	Lilv::Plugins plugins = world.get_all_plugins();
+	m_world = new Lilv::World();
+	m_world->load_all();
+	Lilv::Plugins plugins = m_world->get_all_plugins();
 	LilvIter * iter =  plugins.begin();
 	do {
 		Lilv::Plugin raw_plugin = plugins.get(iter);

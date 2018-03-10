@@ -39,35 +39,35 @@ public:
 	Lv2PluginInfo(QString uri);
 	virtual ~Lv2PluginInfo();
 
-	inline QString getUri()
+	inline QString getUri() const
 	{
 		return uri;
 	}
-	inline QString getName()
+	inline QString getName() const
 	{
 		return name;
 	}
-	inline QString getParentClass()
+	inline QString getParentClass() const
 	{
 		return parentClass;
 	}
-	inline long getNumPorts()
+	inline long getNumPorts() const
 	{
 		return numPorts;
 	}
-	inline QString getAuthorName()
+	inline QString getAuthorName() const
 	{
 		return authorName;
 	}
-	inline QString getAuthorEmail()
+	inline QString getAuthorEmail() const
 	{
 		return authorEmail;
 	}
-	inline QString getAuthorHomePage()
+	inline QString getAuthorHomePage() const
 	{
 		return authorHomePage;
 	}
-	void debugPrint();
+	void debugPrint() const;
 
 private:
 	QString uri;
@@ -78,6 +78,7 @@ private:
 	QString authorName;
 	QString authorEmail;
 	QString authorHomePage;
+	Lilv::Plugin * m_raw_plugin;
 };
 
 

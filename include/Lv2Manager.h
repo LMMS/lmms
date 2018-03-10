@@ -33,6 +33,10 @@
 
 #include "Lv2PluginInfo.h"
 
+namespace Lilv {
+	struct World;
+}
+
 // A singleton class to manage Lv2 plugins
 class Lv2Manager
 {
@@ -45,11 +49,14 @@ public:
 
 	QVector<Lv2PluginInfo*> getPlugins();
 
+	//Lilv::Plugin* getPlugin();
+
 private:
 	Lv2Manager();
 	Lv2Manager( Lv2Manager const& );
 	void operator=( Lv2Manager const& );
 	QVector<Lv2PluginInfo*> collection;
+	Lilv::World* m_world;
 
 	void scanPlugins();
 };

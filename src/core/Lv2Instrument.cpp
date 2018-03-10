@@ -22,30 +22,39 @@
  *
  */
 
+#include "Engine.h"
 #include "Lv2Instrument.h"
+#include "Mixer.h"
+
+#include "embed.h"
+
+static PixmapLoader dummyLoader;
 
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT lv2_plugin_descriptor =
+Plugin::Descriptor lv2_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
-	"Organic",
-	QT_TRANSLATE_NOOP( "pluginBrowser",
-				"Additive Synthesizer for organ-like sounds" ),
-	"Andreas Brandmaier <andreas/at/brandmaier.de>",
+	"Lv2 Ins",
+	QT_TRANSLATE_NOOP( "Lv2 Instrument",
+				"An lv2 instrument plugin" ),
+	"Alexandros Theodotou @faiyadesu",
 	0x0100,
 	Plugin::Instrument,
-	NULL,
-	NULL,
+	&dummyLoader, // logo
 	NULL
 } ;
 }
 
-Lv2Instrument::Lv2Instrument(InstrumentTrack * _instrument_track) :
-	Instrument( _instrument_track, &lv2_plugin_descriptor )
+Lv2Instrument::Lv2Instrument(const Lv2PluginInfo& _pi,
+		InstrumentTrack * _it) :
+	Instrument( _it, &lv2_plugin_descriptor ),
+	m_pluginInfo(&_pi)
 {
-
+	lv2_plugin_descriptor.name = _pi.getName().toUtf8();
+	lv2_plugin_descriptor.displayName = _pi.getName().toUtf8();
+	//Lv2Manager::getInstance().getPlugin();
 }
 
 Lv2Instrument::~Lv2Instrument()
@@ -53,10 +62,45 @@ Lv2Instrument::~Lv2Instrument()
 
 }
 
+void Lv2Instrument::playNote( NotePlayHandle * _note_to_play/* _note_to_play */,
+				sampleFrame * _working_buf/* _working_buf */ )
+{
+	// TODO
+		memset( _working_buf, 0, sizeof( sampleFrame ) *
+			Engine::mixer()->framesPerPeriod() );
+}
+
+void Lv2Instrument::deleteNotePluginData( NotePlayHandle * _note_to_play )
+{
+	// TODO
+}
+
+
+void Lv2Instrument::loadSettings(const QDomElement& _this)
+{
+
+}
+
+QString Lv2Instrument::nodeName() const
+{
+	return m_pluginInfo->getName();
+}
+
+void Lv2Instrument::saveSettings(QDomDocument& _doc, QDomElement& _parent)
+{
+
+}
+
+PluginView* Lv2Instrument::instantiateView( QWidget * _parent)
+{
+	return new Lv2InstrumentView(this, _parent);
+}
+
 Lv2InstrumentView::Lv2InstrumentView(Instrument * _instrument,
 		QWidget * _parent) :
 	InstrumentView( _instrument, _parent )
 {
+	//TODO draw UI
 }
 
 Lv2InstrumentView::~Lv2InstrumentView()

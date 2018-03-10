@@ -22,17 +22,18 @@
  *
  */
 
+#include <QMessageBox>
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QLibrary>
-#include <QMessageBox>
 
+#include "AutomatableModel.h"
 #include "Plugin.h"
 #include "embed.h"
 #include "Engine.h"
 #include "GuiApplication.h"
 #include "DummyPlugin.h"
-#include "AutomatableModel.h"
+#include "Lv2Instrument.h"
 #include "Song.h"
 
 
@@ -125,11 +126,10 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 }
 
 
-Plugin * Plugin::instantiate( const Lv2PluginInfo& _pi, Model * parent,
-								void * data )
+Plugin * Plugin::instantiate( const Lv2PluginInfo& _pi,
+		InstrumentTrack * _it)
 {
-	// TODO instantiate lv2 plugin as Plugin class and return it
-	return new DummyPlugin();
+	return new Lv2Instrument(_pi, _it);
 }
 
 

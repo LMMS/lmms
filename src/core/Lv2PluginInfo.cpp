@@ -36,7 +36,8 @@ Lv2PluginInfo::Lv2PluginInfo(Lilv::Plugin * plugin ) :
 	numPorts( plugin->get_num_ports() ),
 	authorName( plugin->get_author_name().as_string() ),
 	authorEmail( plugin->get_author_email().as_string() ),
-	authorHomePage( plugin->get_author_homepage().as_string() )
+	authorHomePage( plugin->get_author_homepage().as_string() ),
+	m_raw_plugin( plugin)
 {
 	QRegExp rx(".+#([a-zA-Z]+)");
 	rx.indexIn(plugin->get_class().get_parent_uri().as_string());
@@ -50,7 +51,7 @@ Lv2PluginInfo::~Lv2PluginInfo()
 
 }
 
-void Lv2PluginInfo::debugPrint()
+void Lv2PluginInfo::debugPrint() const
 {
 	qDebug() << uri << name << parentClass << childClass << numPorts << authorName << authorEmail << authorHomePage;
 }
