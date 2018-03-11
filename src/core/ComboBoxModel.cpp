@@ -25,7 +25,8 @@
 #include "ComboBoxModel.h"
 #include "embed.h"
 
-using namespace std;
+using std::unique_ptr;
+using std::move;
 
 void ComboBoxModel::addItem( QString item, unique_ptr<PixmapLoader> loader )
 {

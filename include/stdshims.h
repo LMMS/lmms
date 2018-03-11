@@ -9,7 +9,7 @@
 
 #if (__cplusplus >= 201402L)
 #warning "This file should now be removed! The functions it provides are part of the C++14 standard."
-using std::unique_ptr;
+using std::make_unique;
 
 #else
 
