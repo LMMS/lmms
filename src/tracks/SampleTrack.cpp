@@ -146,6 +146,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
+	setStartTimeOffset( 0 );
 	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
 
 	emit sampleChanged();
@@ -183,10 +184,16 @@ void SampleTCO::updateTrackTcos()
 	}
 }
 
+
+
+
 bool SampleTCO::isPlaying() const
 {
 	return m_isPlaying;
 }
+
+
+
 
 void SampleTCO::setIsPlaying(bool isPlaying)
 {
@@ -241,6 +248,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
+	_this.setAttribute( "off", startTimeOffset() );
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -265,6 +273,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
+	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 }
 
 
@@ -365,6 +374,8 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
+
+
 
 
 
@@ -478,6 +489,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
 
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -498,8 +512,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
-
-	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
+	
+	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
 
@@ -591,7 +606,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			return false;
 		}
 		tcos.push_back( getTCO( _tco_num ) );
-		bb_track = BBTrack::findBBTrack( _tco_num );
+		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		{
+			bb_track = BBTrack::findBBTrack( _tco_num );
+		}
 	}
 	else
 	{
@@ -602,10 +620,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			float framesPerTick = Engine::framesPerTick();
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false )
+				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
+					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
+					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more

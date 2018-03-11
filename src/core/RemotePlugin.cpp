@@ -164,8 +164,8 @@ RemotePlugin::~RemotePlugin()
 
 
 
-bool RemotePlugin::init( const QString &pluginExecutable,
-							bool waitForInitDoneMsg )
+bool RemotePlugin::init(const QString &pluginExecutable,
+							bool waitForInitDoneMsg , QStringList extraArgs)
 {
 	lock();
 	if( m_failed )
@@ -196,6 +196,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 		qWarning( "Remote plugin '%s' not found.",
 						exec.toUtf8().constData() );
 		m_failed = true;
+		invalidate();
 		unlock();
 		return failed();
 	}
@@ -208,6 +209,7 @@ bool RemotePlugin::init( const QString &pluginExecutable,
 #else
 	args << m_socketFile;
 #endif
+	args << extraArgs;
 #ifndef DEBUG_REMOTE_PLUGIN
 	m_process.setProcessChannelMode( QProcess::ForwardedChannels );
 	m_process.setWorkingDirectory( QCoreApplication::applicationDirPath() );
@@ -392,6 +394,20 @@ void RemotePlugin::processMidiEvent( const MidiEvent & _e,
 	unlock();
 }
 
+void RemotePlugin::showUI()
+{
+	lock();
+	sendMessage( IdShowUI );
+	unlock();
+}
+
+void RemotePlugin::hideUI()
+{
+	lock();
+	sendMessage( IdHideUI );
+	unlock();
+}
+
 
 
 
@@ -478,6 +494,12 @@ bool RemotePlugin::processMessage( const message & _m )
 
 		case IdChangeOutputCount:
 			m_outputCount = _m.getInt( 0 );
+			resizeSharedProcessingMemory();
+			break;
+
+		case IdChangeInputOutputCount:
+			m_inputCount = _m.getInt( 0 );
+			m_outputCount = _m.getInt( 1 );
 			resizeSharedProcessingMemory();
 			break;
 

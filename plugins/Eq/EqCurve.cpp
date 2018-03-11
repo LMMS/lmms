@@ -32,8 +32,7 @@ EqHandle::EqHandle( int num, int x, int y ):
 	m_width( x ),
 	m_heigth( y ),
 	m_mousePressed( false ),
-	m_active( false ),
-	m_handleMoved( false )
+	m_active( false )
 {
 	setFlag( ItemIsMovable );
 	setFlag( ItemSendsGeometryChanges );
@@ -41,7 +40,6 @@ EqHandle::EqHandle( int num, int x, int y ):
 	float totalHeight = 36;
 	m_pixelsPerUnitHeight = ( m_heigth ) / ( totalHeight );
 	setMouseHover( false );
-	connect( this, SIGNAL( positionChanged() ), this, SLOT( handleMoved() ) );
 }
 
 
@@ -88,14 +86,6 @@ float EqHandle::gainToYPixel(float gain , int h, float pixelPerUnitHeight )
 float EqHandle::yPixelToGain(float y , int h, float pixelPerUnitHeight )
 {
 	return ( ( h * 0.5 ) - y ) / pixelPerUnitHeight;
-}
-
-
-
-
-void EqHandle::handleMoved()
-{
-	m_handleMoved = true;
 }
 
 
@@ -187,6 +177,11 @@ void EqHandle::loadPixmap()
 	QString fileName = "handle" + QString::number(m_numb+1);
 	if ( !isActiveHandle() ) { fileName = fileName + "inactive"; }
 	m_circlePixmap = PLUGIN_NAME::getIconPixmap( fileName.toLatin1() );
+}
+
+bool EqHandle::mousePressed() const
+{
+	return m_mousePressed;
 }
 
 
@@ -458,22 +453,6 @@ bool EqHandle::isActiveHandle()
 void EqHandle::setHandleActive( bool a )
 {
 	EqHandle::m_active = a;
-}
-
-
-
-
-void EqHandle::setHandleMoved( bool a )
-{
-	m_handleMoved = a;
-}
-
-
-
-
-bool EqHandle::getHandleMoved()
-{
-	return m_handleMoved;
 }
 
 

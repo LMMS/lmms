@@ -155,6 +155,7 @@ public:
 
 	void initDevices();
 	void clear();
+	void clearNewPlayHandles();
 
 
 	// audio-device-stuff
@@ -174,6 +175,7 @@ public:
 	void setAudioDevice( AudioDevice * _dev,
 				const struct qualitySettings & _qs,
 							bool _needs_fifo );
+	void storeAudioDevice();
 	void restoreAudioDevice();
 	inline AudioDevice * audioDev()
 	{

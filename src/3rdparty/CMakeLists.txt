@@ -1,0 +1,10 @@
+set(CMAKE_C_FLAGS "")
+set(CMAKE_CXX_FLAGS "")
+
+IF(LMMS_BUILD_LINUX)
+	set(BUILD_SHARED_LIBS OFF)
+	add_subdirectory(qt5-x11embed)
+ENDIF()
+
+ADD_SUBDIRECTORY(rpmalloc)
+ADD_SUBDIRECTORY(weakjack)

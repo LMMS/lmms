@@ -36,6 +36,7 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
+#include "MemoryHelper.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -63,7 +64,7 @@
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
 
-static __thread bool s_renderingThread;
+static thread_local bool s_renderingThread;
 
 
 
@@ -482,9 +483,6 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	Controller::triggerFrameCounter();
 	AutomatableModel::incrementPeriodCounter();
 
-	// refresh buffer pool
-	BufferManager::refresh();
-
 	s_renderingThread = false;
 
 	m_profiler.finishPeriod( processingSampleRate(), m_framesPerPeriod );
@@ -500,6 +498,20 @@ void Mixer::clear()
 	m_clearSignal = true;
 }
 
+
+
+
+void Mixer::clearNewPlayHandles()
+{
+	requestChangeInModel();
+	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	{
+		LocklessListElement * next = e->next;
+		m_newPlayHandles.free( e );
+		e = next;
+	}
+	doneChangeInModel();
+}
 
 
 
@@ -567,8 +579,6 @@ void Mixer::setAudioDevice( AudioDevice * _dev )
 {
 	stopProcessing();
 
-	m_oldAudioDev = m_audioDev;
-
 	if( _dev == NULL )
 	{
 		printf( "param _dev == NULL in Mixer::setAudioDevice(...). "
@@ -596,7 +606,6 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 	stopProcessing();
 
 	m_qualitySettings = _qs;
-	m_oldAudioDev = m_audioDev;
 
 	if( _dev == NULL )
 	{
@@ -613,6 +622,17 @@ void Mixer::setAudioDevice( AudioDevice * _dev,
 	emit sampleRateChanged();
 
 	startProcessing( _needs_fifo );
+}
+
+
+
+
+void Mixer::storeAudioDevice()
+{
+	if( !m_oldAudioDev )
+	{
+		m_oldAudioDev = m_audioDev;
+	}
 }
 
 

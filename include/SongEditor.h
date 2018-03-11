@@ -165,6 +165,7 @@ protected slots:
 	void recordAccompany();
 	void stop();
 
+	void lostFocus();
 	void adjustUiAfterProjectLoad();
 
 signals:

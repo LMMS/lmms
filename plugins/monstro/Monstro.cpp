@@ -1692,6 +1692,8 @@ QWidget * MonstroView::setupOperatorsView( QWidget * _parent )
 	makeknob( m_osc3SpoKnob, KNOBCOL4, O3ROW, tr( "Stereo phase offset" ), tr( " deg" ), "osc3Knob" )
 	makeknob( m_osc3SubKnob, KNOBCOL5, O3ROW, tr( "Sub-osc mix" ), "", "osc3Knob" )
 
+	m_osc3VolKnob -> setVolumeKnob( true );
+
 	m_osc3Wave1Box = new ComboBox( view );
 	m_osc3Wave1Box -> setGeometry( 160, O3ROW + 7, 42, 22 );
 	m_osc3Wave1Box->setFont( pointSize<8>( m_osc3Wave1Box->font() ) );
@@ -1963,7 +1965,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new MonstroInstrument( static_cast<InstrumentTrack *>( _data ) );
 }

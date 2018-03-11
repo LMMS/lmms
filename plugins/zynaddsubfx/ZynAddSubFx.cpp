@@ -445,8 +445,8 @@ void ZynAddSubFxInstrument::initPlugin()
 			RemotePlugin::message( IdZasfPresetDirectory ).
 				addString(
 					QSTR_TO_STDSTR(
-						QString( ConfigManager::inst()->factoryPresetsDir() +
-								QDir::separator() + "ZynAddSubFX" ) ) ) );
+						QDir( ConfigManager::inst()->factoryPresetsDir() +
+								"/ZynAddSubFX" ).absolutePath() ) ) );
 
 		m_remotePlugin->updateSampleRate( Engine::mixer()->processingSampleRate() );
 
@@ -658,7 +658,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 
 	return new ZynAddSubFxInstrument( static_cast<InstrumentTrack *>( _data ) );

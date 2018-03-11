@@ -35,6 +35,8 @@
 #include "JournallingObject.h"
 #include "communication.h"
 
+class vstSubWin;
+
 
 class PLUGIN_EXPORT VstPlugin : public RemotePlugin, public JournallingObject
 {
@@ -52,8 +54,8 @@ public:
 		return m_pluginWindowID != 0;
 	}
 
-	void showEditor( QWidget * _parent = NULL, bool isEffect = false );
 	void hideEditor();
+	void toggleEditor();
 
 	inline const QString & name() const
 	{
@@ -91,17 +93,7 @@ public:
 	void setParameterDump( const QMap<QString, QString> & _pdump );
 
 
-	inline QWidget * pluginWidget( bool _top_widget = true )
-	{
-		if( _top_widget && m_pluginWidget )
-		{
-			if( m_pluginWidget->parentWidget() )
-			{
-				return m_pluginWidget->parentWidget();
-			}
-		}
-		return m_pluginWidget;
-	}
+	QWidget * pluginWidget( bool _top_widget = true );
 
 	virtual void loadSettings( const QDomElement & _this );
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _this );
@@ -111,6 +103,12 @@ public:
 		return "vstplugin";
 	}
 
+	void toggleUI() override;
+
+	void createUI( QWidget *parent, bool isEffect );
+	bool eventFilter(QObject *obj, QEvent *event);
+
+	QString embedMethod() const;
 
 public slots:
 	void setTempo( bpm_t _bpm );
@@ -123,6 +121,10 @@ public slots:
 	void setParam( int i, float f );
 	void idleUpdate();
 
+	void showUI() override;
+	void hideUI() override;
+
+	void handleClientEmbed();
 
 private:
 	void loadChunk( const QByteArray & _chunk );
@@ -130,8 +132,10 @@ private:
 
 	QString m_plugin;
 	QPointer<QWidget> m_pluginWidget;
+	QPointer<vstSubWin> m_pluginSubWindow;
 	int m_pluginWindowID;
 	QSize m_pluginGeometry;
+	const QString m_embedMethod;
 
 	bool m_badDllFormat;
 

@@ -293,6 +293,8 @@ void EnvelopeAndLfoParameters::fillLevel( float * _buf, f_cnt_t _frame,
 						const f_cnt_t _release_begin,
 						const fpp_t _frames )
 {
+	QMutexLocker m(&m_paramMutex);
+
 	if( _frame < 0 || _release_begin < 0 )
 	{
 		return;
@@ -404,6 +406,8 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 
 void EnvelopeAndLfoParameters::updateSampleVars()
 {
+	QMutexLocker m(&m_paramMutex);
+
 	const float frames_per_env_seg = SECS_PER_ENV_SEGMENT *
 				Engine::mixer()->processingSampleRate();
 

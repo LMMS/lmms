@@ -74,6 +74,8 @@ public:
 
 protected slots:
 	void setParameter( void );
+	void handleConfigChange( QString cls, QString attr, QString value );
+	void reloadPlugin();
 
 private:
 	void closePlugin( void );
@@ -85,7 +87,6 @@ private:
 	QString m_pluginDLL;
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
-	Knob ** vstKnobs;
 	FloatModel ** knobFModel;
 	QObject * p_subWindow;
 	int paramCount;
@@ -128,6 +129,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
+	Knob ** vstKnobs;
 
 } ;
 

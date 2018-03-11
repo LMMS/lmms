@@ -265,7 +265,10 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
-	
+
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -324,6 +327,16 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 
 		float *values = m_pat->valuesAfter( it.key() );
 
+		float nextValue;
+		if( m_pat->progressionType() == AutomationPattern::DiscreteProgression )
+		{
+			nextValue = it.value();
+		}
+		else
+		{
+			nextValue = ( it + 1 ).value();
+		}
+
 		QPainterPath path;
 		QPointF origin = QPointF( x_base + it.key() * ppTick, 0.0f );
 		path.moveTo( origin );
@@ -337,7 +350,7 @@ void AutomationPatternView::paintEvent( QPaintEvent * )
 			path.lineTo( QPointF( x, value ) );
 
 		}
-		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, values[ ( it + 1 ).key() - 1 - it.key() ] );
+		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, nextValue );
 		path.lineTo( x_base + ( ( it + 1 ).key() ) * ppTick, 0.0f );
 		path.lineTo( origin );
 
@@ -482,8 +495,3 @@ void AutomationPatternView::scaleTimemapToFit( float oldMin, float oldMax )
 
 	m_pat->generateTangents();
 }
-
-
-
-
-

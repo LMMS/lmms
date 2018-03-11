@@ -215,28 +215,7 @@ Note * Pattern::addNote( const Note & _new_note, const bool _quant_pos )
 	}
 
 	instrumentTrack()->lock();
-	if( m_notes.size() == 0 || m_notes.back()->pos() <= new_note->pos() )
-	{
-		m_notes.push_back( new_note );
-	}
-	else
-	{
-		// simple algorithm for inserting the note between two
-		// notes with smaller and greater position
-		// maybe it could be optimized by starting in the middle and
-		// going forward or backward but note-inserting isn't that
-		// time-critical since it is usually not done while playing...
-		long new_note_abs_time = new_note->pos();
-		NoteVector::Iterator it = m_notes.begin();
-
-		while( it != m_notes.end() &&
-					( *it )->pos() < new_note_abs_time )
-		{
-			++it;
-		}
-
-		m_notes.insert( it, new_note );
-	}
+	m_notes.insert(std::upper_bound(m_notes.begin(), m_notes.end(), new_note, Note::lessThan), new_note);
 	instrumentTrack()->unlock();
 
 	checkType();
@@ -294,7 +273,7 @@ Note * Pattern::noteAtStep( int _step )
 void Pattern::rearrangeAllNotes()
 {
 	// sort notes by start time
-	qSort(m_notes.begin(), m_notes.end(), Note::lessThan );
+	std::sort(m_notes.begin(), m_notes.end(), Note::lessThan);
 }
 
 
@@ -891,6 +870,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	lingrad.setColorAt( beatPattern ? 0 : 1, c.darker( 300 ) );
 	lingrad.setColorAt( beatPattern ? 1 : 0, c );
 
+	// paint a black rectangle under the pattern to prevent glitches with transparent backgrounds
+	p.fillRect( rect(), QColor( 0, 0, 0 ) );
+
 	if( gradient() )
 	{
 		p.fillRect( rect(), lingrad );
@@ -1129,7 +1111,7 @@ void PatternView::paintEvent( QPaintEvent * )
 		paintTextLabel(m_pat->name(), p);
 	}
 
-	if( !beatPattern )
+	if( !( fixedTCOs() && beatPattern ) )
 	{
 		// inner border
 		p.setPen( c.lighter( current ? 160 : 130 ) );

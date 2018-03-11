@@ -25,13 +25,14 @@
 #ifndef _VST_EFFECT_H
 #define _VST_EFFECT_H
 
-#include <QMutex>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
 
 #include "Effect.h"
-#include "VstPlugin.h"
 #include "VstEffectControlDialog.h"
 #include "VstEffectControls.h"
 
+class VstPlugin;
 
 class VstEffect : public Effect
 {
@@ -58,7 +59,7 @@ private:
 	void openPlugin( const QString & _plugin );
 	void closePlugin();
 
-	VstPlugin * m_plugin;
+	QSharedPointer<VstPlugin> m_plugin;
 	QMutex m_pluginMutex;
 	EffectKey m_key;
 

@@ -65,6 +65,7 @@ private:
 	void restoreMutedState();
 
 	const Mixer::qualitySettings m_qualitySettings;
+	const Mixer::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;
 	ProjectRenderer::ExportFileFormats m_format;
 	QString m_outputPath;

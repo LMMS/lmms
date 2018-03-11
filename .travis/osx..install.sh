@@ -2,13 +2,7 @@
 
 set -e
 
-PACKAGES="cmake pkg-config fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio node fltk"
-
-if [ "$QT5" ]; then
-	PACKAGES="$PACKAGES qt@5.5"
-else
-	PACKAGES="$PACKAGES cartr/qt4/qt@4"
-fi
+PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libsoundio stk portaudio node fltk qt5"
 
 if "${TRAVIS}"; then
    PACKAGES="$PACKAGES ccache"
@@ -22,19 +16,15 @@ done;
 # shellcheck disable=SC2086
 brew install $PACKAGES
 
-# Recompile fluid-synth without CoreAudio per issues #649
-# Changes to fluid-synth.rb must be pushed to URL prior to use
-if [ "$TRAVIS_EVENT_TYPE" == "pull_request" ]; then
-	slug=$TRAVIS_PULL_REQUEST_SLUG
-	branch=$TRAVIS_PULL_REQUEST_BRANCH
-elif "${TRAVIS}"; then
-	slug=$TRAVIS_REPO_SLUG
-	branch=$TRAVIS_BRANCH
-else
-	slug="LMMS/lmms"
-	branch=$(git symbolic-ref --short HEAD)
-fi
+# fftw tries to install gcc which conflicts with travis
+brew install fftw --ignore-dependencies
 
-brew install --build-from-source "https://raw.githubusercontent.com/${slug}/${branch}/cmake/apple/fluid-synth.rb"
+# Recompile fluid-synth without CoreAudio per issues #649
+# Ruby formula must be a URL
+
+brew install --build-from-source "https://gist.githubusercontent.com/tresf/c9260c43270abd4ce66ff40359588435/raw/fluid-synth.rb"
+
+# Build libgig 4.1.0 from source to avoid 3.3.0 "ISO C++11 does not allow access declarations"
+brew install --build-from-source "https://raw.githubusercontent.com/tresf/homebrew-core/gig/Formula/libgig.rb"
 
 sudo npm install -g appdmg

@@ -25,13 +25,33 @@
 #ifndef MAINAPPLICATION_H
 #define MAINAPPLICATION_H
 
+#include "lmmsconfig.h"
+
 #include <QApplication>
 
+#ifdef LMMS_BUILD_WIN32
+#include <windows.h>
+#if QT_VERSION >= 0x050000
+#include <QAbstractNativeEventFilter>
+#endif
+#endif
+
+#if defined(LMMS_BUILD_WIN32) && QT_VERSION >= 0x050000
+class MainApplication : public QApplication, public QAbstractNativeEventFilter
+#else
 class MainApplication : public QApplication
+#endif
 {
 public:
 	MainApplication(int& argc, char** argv);
 	bool event(QEvent* event);
+#ifdef LMMS_BUILD_WIN32
+	bool winEventFilter(MSG* msg, long* result);
+#if QT_VERSION >= 0x050000
+	bool nativeEventFilter(const QByteArray& eventType, void* message,
+				long* result);
+#endif
+#endif
 	inline QString& queuedFile()
 	{
 	    return m_queuedFile;

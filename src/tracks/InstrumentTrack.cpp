@@ -157,7 +157,8 @@ InstrumentTrack::~InstrumentTrack()
 void InstrumentTrack::processAudioBuffer( sampleFrame* buf, const fpp_t frames, NotePlayHandle* n )
 {
 	// we must not play the sound if this InstrumentTrack is muted...
-	if( isMuted() || ( n && n->isBbTrackMuted() ) || ! m_instrument )
+	if( isMuted() || ( Engine::getSong()->playMode() != Song::Mode_PlayPattern &&
+				n && n->isBbTrackMuted() ) || ! m_instrument )
 	{
 		return;
 	}
@@ -237,6 +238,11 @@ MidiEvent InstrumentTrack::applyMasterKey( const MidiEvent& event )
 
 void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset )
 {
+	if( Engine::getSong()->isExporting() )
+	{
+		return;
+	}
+
 	bool eventHandled = false;
 
 	switch( event.type() )
@@ -273,6 +279,12 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				// be deleted later automatically)
 				Engine::mixer()->requestChangeInModel();
 				m_notes[event.key()]->noteOff( offset );
+				if (isSustainPedalPressed() &&
+					m_notes[event.key()]->origin() ==
+					m_notes[event.key()]->OriginMidiInput)
+				{
+					m_sustainedNotes << m_notes[event.key()];
+				}
 				m_notes[event.key()] = NULL;
 				Engine::mixer()->doneChangeInModel();
 			}
@@ -302,8 +314,24 @@ void InstrumentTrack::processInEvent( const MidiEvent& event, const MidiTime& ti
 				{
 					m_sustainPedalPressed = true;
 				}
-				else
+				else if (isSustainPedalPressed())
 				{
+					for (NotePlayHandle* nph : m_sustainedNotes)
+					{
+						if (nph && nph->isReleased())
+						{
+							if( nph->origin() ==
+								nph->OriginMidiInput)
+							{
+								nph->setLength(
+									MidiTime( static_cast<f_cnt_t>(
+									nph->totalFramesPlayed() /
+									Engine::framesPerTick() ) ) );
+								midiNoteOff( *nph );
+							}
+						}
+					}
+					m_sustainedNotes.clear();
 					m_sustainPedalPressed = false;
 				}
 			}
@@ -414,12 +442,15 @@ void InstrumentTrack::silenceAllNotes( bool removeIPH )
 	m_midiNotesMutex.unlock();
 
 	lock();
-	// invalidate all NotePlayHandles linked to this track
+	// invalidate all NotePlayHandles and PresetPreviewHandles linked to this track
 	m_processHandles.clear();
-	Engine::mixer()->removePlayHandlesOfTypes( this, removeIPH
-				? PlayHandle::TypeNotePlayHandle
-					| PlayHandle::TypeInstrumentPlayHandle
-				: PlayHandle::TypeNotePlayHandle );
+
+	quint8 flags = PlayHandle::TypeNotePlayHandle | PlayHandle::TypePresetPreviewHandle;
+	if( removeIPH )
+	{
+		flags |= PlayHandle::TypeInstrumentPlayHandle;
+	}
+	Engine::mixer()->removePlayHandlesOfTypes( this, flags );
 	unlock();
 }
 
@@ -586,7 +617,10 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 	{
 		TrackContentObject * tco = getTCO( _tco_num );
 		tcos.push_back( tco );
-		bb_track = BBTrack::findBBTrack( _tco_num );
+		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		{
+			bb_track = BBTrack::findBBTrack( _tco_num );
+		}
 	}
 	else
 	{
