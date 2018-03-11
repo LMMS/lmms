@@ -27,9 +27,9 @@
 
 
 
-void ComboBoxModel::addItem( const QString& item, std::unique_ptr<PixmapLoader> loader )
+void ComboBoxModel::addItem( QString item, std::unique_ptr<PixmapLoader> loader )
 {
-	m_items.push_back( std::make_pair( item, std::move(loader) ) );
+	m_items.emplace_back( std::move(item), std::move(loader) );
 	setRange( 0, m_items.size() - 1 );
 }
 
