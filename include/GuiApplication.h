@@ -36,7 +36,6 @@ class BBEditor;
 class ControllerRackView;
 class FxMixerView;
 class GrooveView;
-class StudioControllerView;
 class MainWindow;
 class PianoRollWindow;
 class ProjectNotes;
@@ -54,7 +53,6 @@ public:
 	MainWindow* mainWindow() { return m_mainWindow; }
 	FxMixerView* fxMixerView() { return m_fxMixerView; }
 	GrooveView* grooveView() { return m_grooveView; }
-	StudioControllerView* studioControllerView() { return m_studioControllerView; }
 	SongEditorWindow* songEditor() { return m_songEditor; }
 	BBEditor* getBBEditor() { return m_bbEditor; }
 	PianoRollWindow* pianoRoll() { return m_pianoRoll; }
@@ -74,7 +72,6 @@ private:
 	MainWindow* m_mainWindow;
 	FxMixerView* m_fxMixerView;
 	GrooveView* m_grooveView;
-	StudioControllerView* m_studioControllerView;
 	SongEditorWindow* m_songEditor;
 	AutomationEditorWindow* m_automationEditor;
 	BBEditor* m_bbEditor;

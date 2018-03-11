@@ -339,19 +339,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 	}
 	else if( ke->key() == Qt::Key_Home )
 	{
-		gui->songEditor()->home();
-	}
-	else if( ke->key() == Qt::Key_PageUp || ke->key() == Qt::Key_MediaPrevious  )
-	{
-		gui->songEditor()->prev();
-	}
-	else if( ke->key() == Qt::Key_PageDown || ke->key() == Qt::Key_MediaNext )
-	{
-		gui->songEditor()->next();
-	}
-	else if( ke->key() == Qt::Key_End )
-	{
-		gui->songEditor()->end();
+		m_song->setPlayPos( 0, Song::Mode_PlaySong );
 	}
 	else if( ke->key() == Qt::Key_Delete )
 	{
@@ -653,36 +641,6 @@ bool SongEditor::allowRubberband() const
 }
 
 
-void SongEditor::scrollToPos( const MidiTime & t )
-{
-	int widgetWidth, trackOpWidth;
-	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT;
-		trackOpWidth = TRACK_OP_WIDTH_COMPACT;
-	}
-	else
-	{
-		widgetWidth = DEFAULT_SETTINGS_WIDGET_WIDTH;
-		trackOpWidth = TRACK_OP_WIDTH;
-	}
-
-	m_smoothScroll = ConfigManager::inst()->value( "ui", "smoothscroll" ).toInt();
-	const int w = width() - widgetWidth
-						- trackOpWidth
-						- contentWidget()->verticalScrollBar()->width(); // width of right scrollbar
-	if( t > m_currentPosition + w * MidiTime::ticksPerTact() /
-						pixelsPerTact() )
-	{
-		animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
-	}
-	else if( t < m_currentPosition )
-	{
-		animateScroll( m_leftRightScroll, t.getTact(), m_smoothScroll );
-	}
-	m_scrollBack = false;
-}
-
 
 
 ComboBoxModel *SongEditor::zoomingModel() const
@@ -809,7 +767,7 @@ void SongEditorWindow::play()
 
 void SongEditorWindow::record()
 {
-	Engine::getSong()->record();
+	m_editor->m_song->record();
 }
 
 
@@ -817,7 +775,7 @@ void SongEditorWindow::record()
 
 void SongEditorWindow::recordAccompany()
 {
-	Engine::getSong()->playAndRecord();
+	m_editor->m_song->playAndRecord();
 }
 
 
@@ -825,46 +783,11 @@ void SongEditorWindow::recordAccompany()
 
 void SongEditorWindow::stop()
 {
-	Engine::getSong()->stop();
+	m_editor->m_song->stop();
 	gui->pianoRoll()->stopRecording();
 }
 
 
-void SongEditorWindow::home()
-{
-	MidiTime mTime = MidiTime(0, 0);
-	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-	m_editor->m_timeLine->updatePosition( mTime );
-	m_editor->scrollToPos( mTime );	
-}
-
-
-void SongEditorWindow::next()
-{
-	MidiTime mTime = MidiTime(Engine::getSong()->getPlayPos(Song::Mode_PlaySong).getTact() + 1, 0);
-	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-	m_editor->m_timeLine->updatePosition( mTime );
-	m_editor->scrollToPos( mTime );
-}
-
-
-void SongEditorWindow::prev()
-{
-	int tact = Engine::getSong()->getPlayPos(Song::Mode_PlaySong).getTact() - 1;
-	MidiTime mTime = MidiTime(tact > 0 ? tact : 0, 0);
-	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-	m_editor->m_timeLine->updatePosition( mTime );
-	m_editor->scrollToPos( mTime );
-}
-
-
-void SongEditorWindow::end()
-{
-	MidiTime mTime = MidiTime(Engine::getSong()->length(), 0);
-	Engine::getSong()->setPlayPos(mTime.getTicks(), Song::Mode_PlaySong );
-	m_editor->m_timeLine->updatePosition( mTime );
-	m_editor->scrollToPos( mTime );
-}
 
 
 void SongEditorWindow::lostFocus()

@@ -35,7 +35,6 @@
 #include "ControllerRackView.h"
 #include "FxMixerView.h"
 #include "GrooveView.h"
-#include "StudioControllerView.h"
 #include "InstrumentTrack.h"
 #include "MainWindow.h"
 #include "PianoRoll.h"
@@ -143,10 +142,6 @@ GuiApplication::GuiApplication()
 	m_grooveView = new GrooveView;
 	connect(m_grooveView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
 
-	displayInitProgress(tr("Preparing studio controller"));
-	m_studioControllerView = new StudioControllerView;
-	connect(m_studioControllerView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
-
 	displayInitProgress(tr("Preparing controller rack"));
 	m_controllerRackView = new ControllerRackView;
 	connect(m_controllerRackView, SIGNAL(destroyed(QObject*)), this, SLOT(childDestroyed(QObject*)));
@@ -205,10 +200,6 @@ void GuiApplication::childDestroyed(QObject *obj)
 	else if (obj == m_grooveView)
 	{
 		m_grooveView = nullptr;
-	}
-	else if (obj == m_studioControllerView)
-	{
-		m_studioControllerView = nullptr;
 	}
 	else if (obj == m_songEditor)
 	{
