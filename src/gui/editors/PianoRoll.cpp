@@ -67,7 +67,7 @@
 #define MiddleButton MidButton
 #endif
 
-using namespace std;
+using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
 
