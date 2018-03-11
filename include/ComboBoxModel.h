@@ -49,7 +49,7 @@ public:
 		clear();
 	}
 
-	void addItem( const QString& item, std::unique_ptr<PixmapLoader> loader = nullptr );
+	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
 
 	void clear();
 
