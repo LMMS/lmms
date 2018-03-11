@@ -96,21 +96,22 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	setModel( _model );
 
-	if( effect()->controls()->controlCount() > 0 )
-	{
-		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-									this );
-		QFont f = ctls_btn->font();
-		ctls_btn->setFont( pointSize<8>( f ) );
-		ctls_btn->setGeometry( 140, 14, 50, 20 );
-		connect( ctls_btn, SIGNAL( clicked() ),
-					this, SLOT( editControls() ) );
 
-		m_controlView = effect()->controls()->createView();
+    if( effect()->controls()->controlCount() > 0 )
+	{
+        m_controlView = effect()->controls()->createView();
+
 		if( m_controlView )
 		{
 			if( dynamic_cast<PeakControllerEffectControlDialog*>( m_controlView ) == NULL )
 			{
+                QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
+                                            this );
+                QFont f = ctls_btn->font();
+                ctls_btn->setFont( pointSize<8>( f ) );
+                ctls_btn->setGeometry( 140, 14, 50, 20 );
+                connect( ctls_btn, SIGNAL( clicked() ),
+                            this, SLOT( editControls() ) );
 				m_subWindow = gui->mainWindow()->addWindowedWidget(	m_controlView,
 							Qt::SubWindow | Qt::CustomizeWindowHint  |
 							Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
