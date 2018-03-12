@@ -16,6 +16,7 @@ SET(LMMS_SRCS
 	gui/FxMixerView.cpp
 	gui/GuiApplication.cpp
 	gui/InstrumentView.cpp
+    gui/JalvQt.cpp
 	gui/LfoControllerDialog.cpp
 	gui/LmmsPalette.cpp
 	gui/LmmsStyle.cpp

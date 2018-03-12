@@ -31,12 +31,15 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
-#include "Lv2PluginInfo.h"
-
-namespace Lilv {
-	struct World;
+extern "C" {
+#include "jalv_internal.h"
 }
-typedef struct _LV2_Feature LV2_Feature;
+
+class Lv2PluginInfo;
+
+//namespace Lilv {
+	//struct World;
+//}
 
 // A singleton class to manage Lv2 plugins
 class Lv2Manager
@@ -48,28 +51,29 @@ public:
 		return instance;
 	}
 
+	Jalv jalv;
+
 	QVector<Lv2PluginInfo*> getPlugins();
 
 	//Lilv::Plugin* getPlugin();
 
-	inline Lilv::World* getWorld() const
-	{
-		return m_world;
-	}
+	//inline Lilv::World* getWorld() const
+	//{
+		//return m_world;
+	//}
 
-	Lilv::Plugin* getPlugin(QString& uri);
+	//Lilv::Plugin* getPlugin(QString& uri);
 
-	LV2_Feature* const* getHostFeatures();
+	//LV2_Feature* const* getHostFeatures();
 
 private:
 	Lv2Manager();
 	Lv2Manager( Lv2Manager const& );
 	void operator=( Lv2Manager const& );
-	QVector<Lv2PluginInfo*> collection;
-	Lilv::World* m_world;
-	LV2_Feature** m_host_features;
+	//QVector<Lv2PluginInfo*> collection;
+	//Lilv::World* m_world;
 
-	void scanPlugins();
+	//void scanPlugins();
 };
 
 #endif

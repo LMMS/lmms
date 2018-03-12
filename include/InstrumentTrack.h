@@ -30,7 +30,6 @@
 #include "GroupBox.h"
 #include "InstrumentFunctions.h"
 #include "InstrumentSoundShaping.h"
-#include "Lv2PluginInfo.h"
 #include "MidiEventProcessor.h"
 #include "MidiPort.h"
 #include "NotePlayHandle.h"
@@ -62,6 +61,8 @@ class TabWidget;
 class TrackLabelButton;
 class LedCheckBox;
 class QLabel;
+
+typedef struct LilvPluginImpl LilvPlugin;
 
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
@@ -150,7 +151,7 @@ public:
 	Instrument * loadInstrument( const QString & _instrument_name );
 
 	// load lv2 Instrument
-	Instrument  * loadLv2Instrument(const Lv2PluginInfo& _plugin_info);
+	Instrument  * loadLv2Instrument(const LilvPlugin* _plugin);
 
 	AudioPort * audioPort()
 	{

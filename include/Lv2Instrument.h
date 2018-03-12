@@ -32,7 +32,6 @@
 #include "InstrumentTrack.h"
 #include "InstrumentView.h"
 #include "JournallingObject.h"
-#include "Lv2PluginInfo.h"
 #include "RemotePlugin.h"
 
 namespace Lilv {
@@ -43,7 +42,7 @@ class Lv2Instrument : public Instrument
 {
 	Q_OBJECT
 public:
-	explicit Lv2Instrument(const Lv2PluginInfo& _pi,
+	explicit Lv2Instrument(const LilvPlugin* _pi,
 			InstrumentTrack * _it);
 	~Lv2Instrument() override;
 
@@ -64,7 +63,7 @@ private:
 	//void openPlugin( const QString & _plugin );
 	//void closePlugin();
 
-	const Lv2PluginInfo* m_pluginInfo;
+	const LilvPlugin* m_plugin;
 	QMutex m_pluginMutex;
 	Lilv::Instance * m_instance;
 

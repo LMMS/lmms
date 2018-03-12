@@ -126,7 +126,7 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 }
 
 
-Plugin * Plugin::instantiate( const Lv2PluginInfo& _pi,
+Plugin * Plugin::instantiate( const LilvPlugin* _pi,
 		InstrumentTrack * _it)
 {
 	return new Lv2Instrument(_pi, _it);

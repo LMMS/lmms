@@ -854,13 +854,13 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 
 
 
-Instrument * InstrumentTrack::loadLv2Instrument( const Lv2PluginInfo& _plugin_info)
+Instrument * InstrumentTrack::loadLv2Instrument( const LilvPlugin* _plugin)
 {
 	silenceAllNotes( true );
 
 	lock();
 	delete m_instrument;
-	m_instrument = Instrument::instantiate( _plugin_info, this );
+	m_instrument = Instrument::instantiate( _plugin, this );
 	unlock();
 	setName( m_instrument->displayName() );
 

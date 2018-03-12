@@ -465,8 +465,12 @@ ENDIF(LMMS_BUILD_WIN32)
 # check for libsamplerate
 PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
 
-# check for lilv
-PKG_CHECK_MODULES(LILV lilv-0 REQUIRED)
+# check for lv2 related libraries
+#PKG_CHECK_MODULES(LILV lilv-0 REQUIRED)
+PKG_CHECK_MODULES(LV2 lv2 REQUIRED)
+PKG_CHECK_MODULES(SORD sord-0 REQUIRED)
+PKG_CHECK_MODULES(GTK2 gtk+-2.0 REQUIRED)
+PKG_CHECK_MODULES(GTKMM gtkmm-2.4 REQUIRED)
 
 # set compiler flags
 SET(WERROR_FLAGS "-Wall -Werror=unused-function -Wno-sign-compare -Wno-strict-overflow")

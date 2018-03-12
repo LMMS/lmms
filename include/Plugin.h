@@ -30,7 +30,6 @@
 #include <QtXml/QDomDocument>
 
 #include "JournallingObject.h"
-#include "Lv2PluginInfo.h"
 #include "Model.h"
 #include "MemoryManager.h"
 
@@ -42,6 +41,7 @@ class InstrumentTrack;
 class PixmapLoader;
 class PluginView;
 
+typedef struct LilvPluginImpl LilvPlugin;
 
 class EXPORT Plugin : public Model, public JournallingObject
 {
@@ -180,7 +180,7 @@ public:
 
 	// returns an instance of a lv2 plugin
 	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const Lv2PluginInfo& _pi, InstrumentTrack * _it);
+	static Plugin * instantiate( const LilvPlugin* _pi, InstrumentTrack * _it);
 
 	// create a view for the model
 	PluginView * createView( QWidget * parent );

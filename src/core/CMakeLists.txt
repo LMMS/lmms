@@ -36,7 +36,6 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LocklessAllocator.cpp
 	core/Lv2Manager.cpp
-	core/Lv2PluginInfo.cpp
 	core/Lv2Instrument.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp

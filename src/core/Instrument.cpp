@@ -26,7 +26,6 @@
 #include "InstrumentTrack.h"
 #include "DummyInstrument.h"
 
-
 Instrument::Instrument( InstrumentTrack * _instrument_track,
 					const Descriptor * _descriptor ) :
 	Plugin( _descriptor, NULL/* _instrument_track*/ ),
@@ -84,10 +83,10 @@ Instrument * Instrument::instantiate( const QString & _plugin_name,
 }
 
 
-Instrument * Instrument::instantiate( const Lv2PluginInfo & _plugin_info,
+Instrument * Instrument::instantiate(const LilvPlugin* _plugin,
 					InstrumentTrack * _instrument_track )
 {
-	Plugin * p = Plugin::instantiate( _plugin_info, _instrument_track);
+	Plugin * p = Plugin::instantiate( _plugin, _instrument_track);
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<Instrument *>( p ) != NULL )
 	{

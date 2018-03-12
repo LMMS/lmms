@@ -22,7 +22,6 @@
  *
  */
 
-#include <lilv/lilvmm.hpp>
 #include "Engine.h"
 #include "Lv2Instrument.h"
 #include "Lv2Manager.h"
@@ -49,33 +48,33 @@ Plugin::Descriptor lv2_plugin_descriptor =
 } ;
 }
 
-Lv2Instrument::Lv2Instrument(const Lv2PluginInfo& _pi,
+Lv2Instrument::Lv2Instrument(const LilvPlugin* _pi,
 		InstrumentTrack * _it) :
 	Instrument( _it, &lv2_plugin_descriptor ),
-	m_pluginInfo(&_pi)
+	m_plugin(_pi)
 {
 	//Lv2Manager::getInstance().getWorld()->get_all_plugins()
 		//.get_by_uri()
-	lv2_plugin_descriptor.name =
-		m_pluginInfo->getName().toUtf8();
-	lv2_plugin_descriptor.displayName =
-		m_pluginInfo->getName().toUtf8();
+	//lv2_plugin_descriptor.name =
+		//m_pluginInfo->getName().toUtf8();
+	//lv2_plugin_descriptor.displayName =
+		//m_pluginInfo->getName().toUtf8();
 		//_pi.getRawPlugin()->get_name().as_string();
 	//lv2_plugin_descriptor.description = _pi.getRawPlugin();
 	//Lv2Manager::getInstance().getPlugin();
-	m_instance = Lilv::Instance::create(
-			*(_pi.getRawPlugin()),
-			Engine::mixer()->baseSampleRate(),
-			Lv2Manager::getInstance().getHostFeatures());
-			//_pi.getRawPlugin()->get_required_features());
-	Lilv::Nodes rf = _pi.getRawPlugin()
-		->get_required_features();
-	LilvIter* iter = rf.begin();
-	do
-	{
-		Lilv::Node f = rf.get(iter);
-		qDebug("Plugin required feature: %s", f.as_string());
-	} while ((iter = rf.next(iter)) != nullptr);
+	//m_instance = Lilv::Instance::create(
+			//*(_pi.getRawPlugin()),
+			//Engine::mixer()->baseSampleRate(),
+			//Lv2Manager::getInstance().getHostFeatures());
+			////_pi.getRawPlugin()->get_required_features());
+	//Lilv::Nodes rf = _pi.getRawPlugin()
+		//->get_required_features();
+	//LilvIter* iter = rf.begin();
+	//do
+	//{
+		//Lilv::Node f = rf.get(iter);
+		//qDebug("Plugin required feature: %s", f.as_string());
+	//} while ((iter = rf.next(iter)) != nullptr);
 	//instance->get_descriptor();
 	//instance->activate();
 	// TODO save/pass descriptor and handle somewhere
@@ -107,7 +106,7 @@ void Lv2Instrument::loadSettings(const QDomElement& _this)
 
 QString Lv2Instrument::nodeName() const
 {
-	return m_pluginInfo->getName();
+	return lilv_node_as_string(lilv_plugin_get_name(m_plugin));
 }
 
 void Lv2Instrument::saveSettings(QDomDocument& _doc, QDomElement& _parent)

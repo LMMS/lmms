@@ -22,7 +22,7 @@
  *
  */
 
-#include <lilv/lilvmm.hpp>
+//#include <lilv/lilvmm.hpp>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -188,17 +188,27 @@ void Lv2InstrumentBrowser::giveFocusToFilter()
 void Lv2InstrumentBrowser::addItems()
 {
 	Lv2Manager & manager =  Lv2Manager::getInstance();
-	QVector<Lv2PluginInfo*> plugins = manager.getPlugins();
-	for ( int i = 0; i < plugins.size(); i++ )
+	const LilvPlugins* plugins = lilv_world_get_all_plugins(
+			manager.jalv.world);
+	QRegExp rx(tr(".+#([a-zA-Z]+)"));
+	for (LilvIter* it = lilv_plugins_begin(plugins);
+      !lilv_plugins_is_end(plugins, it);
+      it = lilv_plugins_next(plugins, it))
 	{
-		Lv2PluginInfo* plugin = plugins.at(i);
-		if ( QString::compare( plugin->getParentClass(),
-			"GeneratorPlugin") == 0)
+		const LilvPlugin * plugin = lilv_plugins_get(plugins, it);
+		const LilvPluginClass* plug_class =
+			lilv_plugin_get_class(plugin);
+		const LilvNode* parent_uri =
+			lilv_plugin_class_get_parent_uri(plug_class);
+		rx.indexIn(lilv_node_as_string(parent_uri));
+		QStringList list = rx.capturedTexts();
+		QString parentClass = list.at(1);
+		if (QString::compare(parentClass, tr("GeneratorPlugin")) == 0)
 		{
-			plugin->debugPrint();
-			m_treeWidget->addTopLevelItem( new Lv2PluginItem( plugin ) );
+			m_treeWidget->addTopLevelItem(new Lv2InstrumentItem(plugin));
 		}
 	}
+	qDebug("finished");
 }
 
 void Lv2InstrumentBrowser::keyPressEvent(QKeyEvent * ke )
@@ -237,7 +247,7 @@ Lv2InstrumentBrowserTreeWidget::~Lv2InstrumentBrowserTreeWidget()
 
 void Lv2InstrumentBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {
-	Lv2PluginItem * f = dynamic_cast<Lv2PluginItem *>( itemAt( e->pos() ) );
+	Lv2InstrumentItem * f = dynamic_cast<Lv2InstrumentItem *>( itemAt( e->pos() ) );
 	if( f != NULL )
 	{
 		m_contextMenuItem = f;
@@ -285,7 +295,7 @@ void Lv2InstrumentBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 //		}
 	}
 
-	Lv2PluginItem * f = dynamic_cast<Lv2PluginItem *>( i );
+	Lv2InstrumentItem * f = dynamic_cast<Lv2InstrumentItem *>( i );
 	if( f != NULL )
 	{
 		m_pphMutex.lock();
@@ -303,12 +313,11 @@ void Lv2InstrumentBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		// make sure any playback is stopped
 		mouseReleaseEvent( NULL );
 
-		Lv2PluginItem * item = dynamic_cast<Lv2PluginItem *>( itemAt( m_pressPos ) );
-		item->getPlugin()->debugPrint();
+		Lv2InstrumentItem * item = dynamic_cast<Lv2InstrumentItem *>( itemAt( m_pressPos ) );
 		if( item != NULL )
 		{
 			new StringPairDrag( "lv2pluginfile",
-			item->getPlugin()->getUri(),
+			lilv_node_as_string(lilv_plugin_get_uri(item->getPlugin())),
 			embed::getIconPixmap( "vst_plugin_file" ), this );
 		}
 	}
@@ -322,7 +331,7 @@ void Lv2InstrumentBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 	m_pphMutex.unlock();
 }
 
-void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, InstrumentTrack * it )
+void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2InstrumentItem * f, InstrumentTrack * it )
 {
 	//qDebug("handling plugin");
 	Engine::mixer()->requestChangeInModel();
@@ -331,7 +340,7 @@ void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2PluginItem * f, Instrument
 	Instrument * i = it->instrument();
 	if( i == NULL )
 	{
-		i = it->loadLv2Instrument(*(f->getPlugin()));
+		i = it->loadLv2Instrument(f->getPlugin());
 	}
 
 	Engine::mixer()->doneChangeInModel();
@@ -341,7 +350,7 @@ void Lv2InstrumentBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
 	//qDebug("activating list item");
-	Lv2PluginItem * lv2pi = dynamic_cast<Lv2PluginItem *>( item );
+	Lv2InstrumentItem * lv2pi = dynamic_cast<Lv2InstrumentItem *>( item );
 	if( lv2pi == NULL )
 	{
 		return;
@@ -394,18 +403,19 @@ void Lv2InstrumentBrowserTreeWidget::sendToActiveInstrumentTrack( void )
 	}
 }
 
-Lv2PluginItem::Lv2PluginItem( Lv2PluginInfo * plugin) :
-    QTreeWidgetItem( QStringList( plugin->getName()), 0 ),
-	m_plugin( plugin )
+Lv2InstrumentItem::Lv2InstrumentItem(const LilvPlugin* plugin) :
+    QTreeWidgetItem(QStringList(lilv_node_as_string(
+					lilv_plugin_get_name(plugin)))),
+	m_plugin(plugin)
 {
 	initPixmaps();
 }
 
-QPixmap * Lv2PluginItem::s_Lv2PluginPixmap = NULL;
+QPixmap * Lv2InstrumentItem::s_Lv2PluginPixmap = NULL;
 
-void Lv2PluginItem::initPixmaps( void )
+void Lv2InstrumentItem::initPixmaps( void )
 {
-	Lv2PluginItem::s_Lv2PluginPixmap = new QPixmap( embed::getIconPixmap(
+	Lv2InstrumentItem::s_Lv2PluginPixmap = new QPixmap( embed::getIconPixmap(
 						"vst_plugin_file", 16, 16 ) );
 }
 

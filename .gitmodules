@@ -4,3 +4,18 @@
 [submodule "src/3rdparty/rpmalloc/rpmalloc"]
 	path = src/3rdparty/rpmalloc/rpmalloc
 	url = https://github.com/rampantpixels/rpmalloc.git
+[submodule "src/3rdparty/suil"]
+	path = src/3rdparty/suil
+	url = https://github.com/drobilla/suil
+[submodule "src/3rdparty/sratom"]
+	path = src/3rdparty/sratom
+	url = https://github.com/drobilla/sratom
+[submodule "src/3rdparty/serd"]
+	path = src/3rdparty/serd
+	url = https://github.com/drobilla/serd
+[submodule "src/3rdparty/jalv"]
+	path = src/3rdparty/jalv
+	url = https://github.com/drobilla/jalv
+[submodule "src/3rdparty/lilv"]
+	path = src/3rdparty/lilv
+	url = https://github.com/drobilla/lilv

@@ -26,23 +26,21 @@
 #ifndef LV2_PLUGIN_BROWSER_H
 #define LV2_PLUGIN_BROWSER_H
 
-#include <lilv/lilvmm.hpp>
-
 #include <QtCore/QDir>
 #include <QtCore/QMutex>
 #include <QTreeWidget>
 
-#include "Lv2PluginInfo.h"
 #include "SideBarWidget.h"
-
 
 class QLineEdit;
 
-class Lv2PluginItem;
+class Lv2InstrumentItem;
 class InstrumentTrack;
 class Lv2InstrumentBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
+
+typedef struct LilvPluginImpl LilvPlugin;
 
 class Lv2InstrumentBrowser : public SideBarWidget
 {
@@ -89,7 +87,7 @@ protected:
 
 
 private:
-	void handlePlugin( Lv2PluginItem * fi, InstrumentTrack * it );
+	void handlePlugin(Lv2InstrumentItem* fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc );
 
 
@@ -98,7 +96,7 @@ private:
 
 	QMutex m_pphMutex;
 
-	Lv2PluginItem * m_contextMenuItem;
+	Lv2InstrumentItem * m_contextMenuItem;
 
 
 private slots:
@@ -109,21 +107,21 @@ private slots:
 
 } ;
 
-class Lv2PluginItem : public QTreeWidgetItem
+class Lv2InstrumentItem : public QTreeWidgetItem
 {
 public:
-	Lv2PluginItem( Lv2PluginInfo * plugin );
+	Lv2InstrumentItem (const LilvPlugin * plugin);
 
-  inline Lv2PluginInfo * getPlugin()
-  {
-    return m_plugin;
-  }
+	inline const LilvPlugin* getPlugin()
+	{
+		return m_plugin;
+	}
 
 private:
 	void initPixmaps( void );
 
 	static QPixmap * s_Lv2PluginPixmap;
-	Lv2PluginInfo * m_plugin;
+	const LilvPlugin * m_plugin;
 } ;
 
 
