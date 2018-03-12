@@ -2896,7 +2896,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
-
 		// Draw the vertical beat lines
 		int ticksPerBeat = DefaultTicksPerTact /
 			Engine::getSong()->getTimeSigModel().getDenominator();
@@ -2917,22 +2916,22 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			p.setPen( barLineColor() );
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
-	}
 
-	// draw marked semitones after the grid
-	for( int i = 0; i < m_markedSemiTones.size(); i++ )
-	{
-		const int key_num = m_markedSemiTones.at( i );
-		const int y = keyAreaBottom() + 5
-			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
-
-		if( y > keyAreaBottom() )
+		// draw marked semitones after the grid
+		for( int i = 0; i < m_markedSemiTones.size(); i++ )
 		{
-			break;
-		}
+			const int key_num = m_markedSemiTones.at( i );
+			const int y = keyAreaBottom() + 5
+				- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
 
-		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT + 1,
-			    markedSemitoneColor() );
+			if( y > keyAreaBottom() )
+			{
+				break;
+			}
+
+			p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT + 1,
+				    markedSemitoneColor() );
+		}
 	}
 
 	// following code draws all notes in visible area
