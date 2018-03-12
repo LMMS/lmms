@@ -40,7 +40,8 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	m_subWindow( NULL ),
 	knobFModel( NULL ),
 	ctrHandle( NULL ),
-	lastPosInMenu (0)
+	lastPosInMenu (0),
+	m_vstGuiVisible ( true )
 //	m_presetLabel ( NULL )
 {
 }
@@ -64,6 +65,8 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 	m_effect->m_pluginMutex.lock();
 	if( m_effect->m_plugin != NULL )
 	{
+		m_vstGuiVisible = _this.attribute( "guivisible" ).toInt();
+
 		m_effect->m_plugin->loadSettings( _this );
 
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
@@ -140,6 +143,15 @@ int VstEffectControls::controlCount()
 {
 	return m_effect->m_plugin != NULL &&
 		m_effect->m_plugin->hasEditor() ?  1 : 0;
+}
+
+
+
+EffectControlDialog *VstEffectControls::createView()
+{
+	auto dialog = new VstEffectControlDialog( this );
+	dialog->togglePluginUI( m_vstGuiVisible );
+	return dialog;
 }
 
 

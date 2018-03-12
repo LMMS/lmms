@@ -45,6 +45,7 @@
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( NULL ),
+
 	m_plugin( NULL ),
 	tbLabel( NULL )
 {
@@ -62,16 +63,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		embed_vst = m_plugin->embedMethod() != "none";
 
 		if (embed_vst) {
-			m_plugin->createUI( nullptr, true );
-			m_pluginWidget = m_plugin->pluginWidget( false );
-
-#ifdef LMMS_BUILD_WIN32
-			if( !m_pluginWidget )
-			{
-				m_pluginWidget = m_plugin->pluginWidget( false );
+			if (! m_plugin->pluginWidget()) {
+				m_plugin->createUI(nullptr);
 			}
-#endif
-
+			m_pluginWidget = m_plugin->pluginWidget();
 		}
 	}
 
@@ -79,22 +74,20 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	{
 		setWindowTitle( m_plugin->name() );
 
-		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
+		QPushButton * btn = new QPushButton( tr( "Show/hide" ));
 
 		if (embed_vst) {
 			btn->setCheckable( true );
 			btn->setChecked( true );
-			connect( btn, SIGNAL( toggled( bool ) ),
-						SLOT( togglePluginUI( bool ) ) );
-		} else {
-			connect( btn, SIGNAL( clicked( bool ) ),
-						SLOT( togglePluginUI( bool ) ) );
 		}
+		connect( btn, SIGNAL( toggled( bool ) ),
+					SLOT( togglePluginUI( bool ) ) );
 
 		btn->setMinimumWidth( 78 );
 		btn->setMaximumWidth( 78 );
 		btn->setMinimumHeight( 24 );
 		btn->setMaximumHeight( 24 );
+		m_togglePluginButton = btn;
 
 		m_managePluginButton = new PixmapButton( this, "" );
 		m_managePluginButton->setCheckable( false );
@@ -295,6 +288,14 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 		return;
 	}
 
-	m_plugin->toggleUI();
+	if ( m_togglePluginButton->isChecked() != checked ) {
+		m_togglePluginButton->setChecked( checked );
+	}
+
+	if ( checked ) {
+		m_plugin->showUI();
+	} else {
+		m_plugin->hideUI();
+	}
 }
 

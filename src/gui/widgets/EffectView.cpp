@@ -29,6 +29,7 @@
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QWhatsThis>
+#include <QLayout>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -109,7 +110,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		{
 			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
 			m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-			m_subWindow->setFixedSize( m_subWindow->size() );
+			if (m_subWindow->layout()) {
+				m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+			}
 
 			Qt::WindowFlags flags = m_subWindow->windowFlags();
 			flags &= ~Qt::WindowMaximizeButtonHint;
