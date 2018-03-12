@@ -393,6 +393,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 		m_params->m_userWave.setAudioFile(
 					StringPairDrag::decodeValue( _de ) );
 		m_userLfoBtn->model()->setValue( true );
+		m_params->m_lfoWaveModel.setValue(EnvelopeAndLfoParameters::UserDefinedWave);
 		_de->accept();
 		update();
 	}
@@ -403,6 +404,7 @@ void EnvelopeAndLfoView::dropEvent( QDropEvent * _de )
 					firstChildElement().firstChildElement().
 					firstChildElement().attribute( "src" ) );
 		m_userLfoBtn->model()->setValue( true );
+		m_params->m_lfoWaveModel.setValue(EnvelopeAndLfoParameters::UserDefinedWave);
 		_de->accept();
 		update();
 	}
