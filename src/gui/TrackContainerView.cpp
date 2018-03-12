@@ -377,7 +377,18 @@ void TrackContainerView::dropEvent( QDropEvent * _de )
 		//it->toggledInstrumentTrackButton( true );
 		_de->accept();
 	}
-	else if( type == "samplefile" || type == "pluginpresetfile" 
+	//else if (type == "lv2instrument")
+	//{
+		//InstrumentTrack * it = dynamic_cast<InstrumentTrack *>(
+				//Track::create( Track::InstrumentTrack,
+								//m_tc ) );
+		//InstrumentLoaderThread *ilt = new InstrumentLoaderThread(
+					//this, it, value );
+		//ilt->start();
+		////it->toggledInstrumentTrackButton( true );
+		//_de->accept();
+	//}
+	else if( type == "samplefile" || type == "pluginpresetfile"
 		|| type == "soundfontfile" || type == "vstpluginfile"
 		|| type == "patchfile" )
 	{

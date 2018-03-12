@@ -200,6 +200,7 @@ void Lv2InstrumentBrowser::addItems()
 			lilv_plugin_get_class(plugin);
 		const LilvNode* parent_uri =
 			lilv_plugin_class_get_parent_uri(plug_class);
+		manager.find_by_uri(lilv_node_as_string(parent_uri));
 		rx.indexIn(lilv_node_as_string(parent_uri));
 		QStringList list = rx.capturedTexts();
 		QString parentClass = list.at(1);
@@ -208,7 +209,6 @@ void Lv2InstrumentBrowser::addItems()
 			m_treeWidget->addTopLevelItem(new Lv2InstrumentItem(plugin));
 		}
 	}
-	qDebug("finished");
 }
 
 void Lv2InstrumentBrowser::keyPressEvent(QKeyEvent * ke )
@@ -316,7 +316,7 @@ void Lv2InstrumentBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 		Lv2InstrumentItem * item = dynamic_cast<Lv2InstrumentItem *>( itemAt( m_pressPos ) );
 		if( item != NULL )
 		{
-			new StringPairDrag( "lv2pluginfile",
+			new StringPairDrag( "instrument",
 			lilv_node_as_string(lilv_plugin_get_uri(item->getPlugin())),
 			embed::getIconPixmap( "vst_plugin_file" ), this );
 		}
@@ -333,14 +333,13 @@ void Lv2InstrumentBrowserTreeWidget::mouseReleaseEvent(QMouseEvent * me )
 
 void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2InstrumentItem * f, InstrumentTrack * it )
 {
-	//qDebug("handling plugin");
 	Engine::mixer()->requestChangeInModel();
 
-	//const QString e = f->extension();
 	Instrument * i = it->instrument();
 	if( i == NULL )
 	{
-		i = it->loadLv2Instrument(f->getPlugin());
+		i = it->loadInstrument(lilv_node_as_string(
+					lilv_plugin_get_uri(f->getPlugin())));
 	}
 
 	Engine::mixer()->doneChangeInModel();

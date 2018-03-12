@@ -782,6 +782,14 @@ signal_handler(int ignored)
 	zix_sem_post(&exit_sem);
 }
 
+const LilvPlugin* Lv2Manager::find_by_uri(const char* uri)
+{
+	const LilvNode* node = lilv_new_uri(
+			jalv.world, uri);
+	const LilvPlugins* plugins = lilv_world_get_all_plugins(jalv.world);
+	return lilv_plugins_get_by_uri(plugins, node);
+}
+
 Lv2Manager::Lv2Manager()
 {
 	memset(&jalv, '\0', sizeof(Jalv));

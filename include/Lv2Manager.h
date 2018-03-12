@@ -62,7 +62,7 @@ public:
 		//return m_world;
 	//}
 
-	//Lilv::Plugin* getPlugin(QString& uri);
+	const LilvPlugin* find_by_uri(const char* uri);
 
 	//LV2_Feature* const* getHostFeatures();
 

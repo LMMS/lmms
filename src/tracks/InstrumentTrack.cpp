@@ -23,6 +23,7 @@
  *
  */
 
+#include <lilv/lilv.h>
 #include <QDir>
 #include <QQueue>
 #include <QApplication>
@@ -60,6 +61,7 @@
 #include "LcdSpinBox.h"
 #include "LedCheckbox.h"
 #include "LeftRightNav.h"
+#include "Lv2Manager.h"
 #include "MainWindow.h"
 #include "MidiClient.h"
 #include "MidiPortMenu.h"
@@ -854,21 +856,21 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 
 
 
-Instrument * InstrumentTrack::loadLv2Instrument( const LilvPlugin* _plugin)
-{
-	silenceAllNotes( true );
+//Instrument * InstrumentTrack::loadLv2Instrument( const LilvPlugin* _plugin)
+//{
+	//silenceAllNotes( true );
 
-	lock();
-	delete m_instrument;
-	m_instrument = Instrument::instantiate( _plugin, this );
-	unlock();
-	setName( m_instrument->displayName() );
+	//lock();
+	//delete m_instrument;
+	//m_instrument = Instrument::instantiate( _plugin, this );
+	//unlock();
+	//setName( m_instrument->displayName() );
 
-	emit instrumentChanged();
+	//emit instrumentChanged();
 
-	return m_instrument;
+	//return m_instrument;
 
-}
+//}
 
 
 // #### ITV:
@@ -1736,7 +1738,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	StringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
+	StringPairDrag::processDragEnterEvent( event, "lv2instrument,instrument,presetfile,pluginpresetfile" );
 }
 
 
@@ -1755,6 +1757,16 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	QString type = StringPairDrag::decodeKey( event );
 	QString value = StringPairDrag::decodeValue( event );
 
+	//if (type == "lv2instrument")
+	//{
+		//m_track->loadLv2Instrument(Lv2Manager::getInstance()
+				//.find_by_uri(value.toUtf8().constData()));
+
+		//Engine::getSong()->setModified();
+
+		//event->accept();
+		//setFocus();
+	//}
 	if( type == "instrument" )
 	{
 		m_track->loadInstrument( value );

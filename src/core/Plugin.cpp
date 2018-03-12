@@ -34,6 +34,7 @@
 #include "GuiApplication.h"
 #include "DummyPlugin.h"
 #include "Lv2Instrument.h"
+#include "Lv2Manager.h"
 #include "Song.h"
 
 
@@ -95,8 +96,11 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 								void * data )
 {
 	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
+	const LilvPlugin* lv2p = Lv2Manager::getInstance()
+		.find_by_uri(pluginName.toUtf8().constData());
 	if( pi.isNull() )
 	{
+		return new Lv2Instrument(lv2p, static_cast<InstrumentTrack*>(data));
 		if( gui )
 		{
 			QMessageBox::information( NULL,
@@ -125,12 +129,12 @@ Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
 	return inst;
 }
 
-
-Plugin * Plugin::instantiate( const LilvPlugin* _pi,
-		InstrumentTrack * _it)
-{
-	return new Lv2Instrument(_pi, _it);
-}
+// for LV2 plugins
+//Plugin * Plugin::instantiate( const LilvPlugin* _pi,
+		//InstrumentTrack * _it)
+//{
+	//return new Lv2Instrument(_pi, _it);
+//}
 
 
 
