@@ -889,10 +889,6 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
 		int pos_ticks = it.key();
-		if( pos_ticks > _n->length() )
-		{
-			break;
-		}
 		int pos_x = _x + pos_ticks * m_ppt / MidiTime::ticksPerTact();
 
 		const float level = it.value();
