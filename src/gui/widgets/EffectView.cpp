@@ -30,6 +30,7 @@
 #include <QPainter>
 #include <QWhatsThis>
 
+#include "ControllerRackView.h"
 #include "EffectView.h"
 #include "DummyEffect.h"
 #include "CaptionMenu.h"
@@ -96,36 +97,38 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 	setModel( _model );
 
-
-    if( effect()->controls()->controlCount() > 0 )
+	if( effect()->controls()->controlCount() > 0 )
 	{
-        m_controlView = effect()->controls()->createView();
+		m_controlView = effect()->controls()->createView();
+
+		QPushButton * ctls_btn = new QPushButton( tr( "Controls" ), this );
+		QFont f = ctls_btn->font();
+		ctls_btn->setFont( pointSize<8>( f ) );
+		ctls_btn->setGeometry( 140, 14, 50, 20 );
+		connect(ctls_btn, SIGNAL(clicked()), this, SLOT(editControls()));
 
 		if( m_controlView )
 		{
 			if( dynamic_cast<PeakControllerEffectControlDialog*>( m_controlView ) == NULL )
 			{
-                QPushButton * ctls_btn = new QPushButton( tr( "Controls" ),
-                                            this );
-                QFont f = ctls_btn->font();
-                ctls_btn->setFont( pointSize<8>( f ) );
-                ctls_btn->setGeometry( 140, 14, 50, 20 );
-                connect( ctls_btn, SIGNAL( clicked() ),
-                            this, SLOT( editControls() ) );
 				m_subWindow = gui->mainWindow()->addWindowedWidget(	m_controlView,
-							Qt::SubWindow | Qt::CustomizeWindowHint  |
-							Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
+											Qt::SubWindow | Qt::CustomizeWindowHint  |
+											Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
 				m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 				m_subWindow->setFixedSize( m_subWindow->size() );
 
-			Qt::WindowFlags flags = m_subWindow->windowFlags();
-			flags &= ~Qt::WindowMaximizeButtonHint;
-			m_subWindow->setWindowFlags( flags );
+				Qt::WindowFlags flags = m_subWindow->windowFlags();
+				flags &= ~Qt::WindowMaximizeButtonHint;
+				m_subWindow->setWindowFlags( flags );
 
-			connect( m_controlView, SIGNAL( closed() ),
-					this, SLOT( closeEffects() ) );
+				connect( m_controlView, SIGNAL( closed() ),
+						 this, SLOT( closeEffects() ) );
 
 				m_subWindow->hide();
+			}
+			else
+			{
+				gui->getControllerRackView()->subWin()->hide();
 			}
 		}
 	}
@@ -188,17 +191,26 @@ EffectView::~EffectView()
 
 void EffectView::editControls()
 {
-	if( m_subWindow )
+	QMdiSubWindow * controls;
+	if( dynamic_cast<PeakControllerEffectControlDialog*>( m_controlView ) == NULL )
 	{
-		if( !m_subWindow->isVisible() )
+		controls = m_subWindow;
+	}
+	else
+	{
+		controls = gui->getControllerRackView()->subWin();
+	}
+	if( controls )
+	{
+		if( !controls->isVisible() )
 		{
-			m_subWindow->show();
-			m_subWindow->raise();
+			controls->show();
+			controls->raise();
 			effect()->controls()->setViewVisible( true );
 		}
 		else
 		{
-			m_subWindow->hide();
+			controls->hide();
 			effect()->controls()->setViewVisible( false );
 		}
 	}

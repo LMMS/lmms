@@ -56,6 +56,8 @@ public:
 		return "ControllerRackView";
 	}
 
+	QMdiSubWindow *subWin() const;
+
 public slots:
 	void deleteController( ControllerView * _view );
 	void onControllerAdded( Controller * );

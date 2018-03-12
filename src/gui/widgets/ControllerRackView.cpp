@@ -216,11 +216,16 @@ void ControllerRackView::addController()
 	setFocus();
 }
 
+QMdiSubWindow *ControllerRackView::subWin() const
+{
+	return m_subWin;
+}
+
 
 
 
 void ControllerRackView::closeEvent( QCloseEvent * _ce )
- {
+{
 	if( parentWidget() )
 	{
 		parentWidget()->hide();
@@ -230,7 +235,7 @@ void ControllerRackView::closeEvent( QCloseEvent * _ce )
 		hide();
 	}
 	_ce->ignore();
- }
+}
 
 
 
