@@ -58,11 +58,18 @@ public:
 
 	QMdiSubWindow *subWin() const;
 
+	bool allExpanded() const;
+	bool allCollapsed() const;
+
 public slots:
 	void deleteController( ControllerView * _view );
+	void collapsingAll();
+	void expandAll();
 	void onControllerAdded( Controller * );
 	void onControllerRemoved( Controller * );
 	void onControllerCollapsed();
+	void setAllExpanded(bool allExpanded);
+	void setAllCollapsed(bool allCollapsed);
 
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
@@ -80,6 +87,8 @@ private:
 	QPushButton * m_addButton;
 	QMdiSubWindow * m_subWin;
 
+	bool m_allExpanded;
+	bool m_allCollapsed;
 	// Stores the index of where to insert the next ControllerView.
 	// Needed so that the StretchItem always stays at the last position.
 	int m_nextIndex;

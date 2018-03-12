@@ -36,6 +36,7 @@
 #include <QWhatsThis>
 
 
+#include "ControllerRackView.h"
 #include "CaptionMenu.h"
 #include "ControllerConnection.h"
 #include "ControllerDialog.h"
@@ -93,7 +94,7 @@ ControllerView::ControllerView( Controller * _model, QWidget * _parent ) :
 	m_collapse->setAttribute( Qt::WA_NoMousePropagation );
 	m_collapse->setToolTip( tr( "collapse" ) );
 	m_collapse->move( width() - buttonsize.width() - 3, 3 );
-	connect( m_collapse, SIGNAL( clicked() ), this, SLOT( collapseController() ) );
+	connect( m_collapse, SIGNAL( clicked() ), this, SLOT( toggleCollapseController() ) );
 	setAcceptDrops( true );
 	setModel( _model );
 }
@@ -108,6 +109,33 @@ ControllerView::~ControllerView()
 
 
 
+void ControllerView::collapseController()
+{
+	m_collapse->setIcon( embed::getIconPixmap( "stepper-left" ) );
+	m_controllerDlg->hide();
+	setFixedHeight( m_titleBarHeight );
+	emit controllerCollapsed();
+	gui->getControllerRackView()->setAllCollapsed(false);
+	gui->getControllerRackView()->setAllExpanded(false);
+
+}
+
+
+
+
+void ControllerView::expandController()
+{
+	m_controllerDlg->show();
+	setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
+	m_collapse->setIcon( embed::getIconPixmap( "stepper-down" ) );
+	gui->getControllerRackView()->setAllCollapsed(false);
+	gui->getControllerRackView()->setAllExpanded(false);
+
+}
+
+
+
+
 void ControllerView::deleteController()
 {
 	emit( deleteController( this ) );
@@ -116,20 +144,15 @@ void ControllerView::deleteController()
 
 
 
-void ControllerView::collapseController()
+void ControllerView::toggleCollapseController()
 {
 	if( m_controllerDlg->isHidden() )
 	{
-		m_controllerDlg->show();
-		setFixedHeight( m_controllerDlg->height() + m_titleBarHeight + 1 );
-		m_collapse->setIcon( embed::getIconPixmap( "stepper-down" ) );
+		expandController();
 	}
 	else
 	{
-		m_collapse->setIcon( embed::getIconPixmap( "stepper-left" ) );
-		m_controllerDlg->hide();
-		setFixedHeight( m_titleBarHeight );
-		emit controllerCollapsed();
+		collapseController();
 	}
 }
 
@@ -227,7 +250,11 @@ void ControllerView::paintEvent(QPaintEvent* event)
 void ControllerView::contextMenuEvent( QContextMenuEvent * )
 {
 	QPointer<CaptionMenu> contextMenu = new CaptionMenu( model()->displayName(), this );
-	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Remove this plugin" ), this, SLOT( deleteController() ) );
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Remove this controller" ), this, SLOT( deleteController() ) );
+	QAction * collapse = contextMenu->addAction( embed::getIconPixmap( "stepper-left" ), tr( "&Collaps all controllers" ), this,SIGNAL( collapseAll() ) );
+	collapse->setDisabled(gui->getControllerRackView()->allCollapsed());
+	QAction * expand = contextMenu->addAction( embed::getIconPixmap( "stepper-down" ), tr( "&Expand all controllers" ), this,SIGNAL( expandAll() ) );
+	expand->setDisabled(gui->getControllerRackView()->allExpanded());
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );

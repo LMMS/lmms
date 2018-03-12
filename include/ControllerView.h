@@ -60,9 +60,11 @@ public:
 
 public slots:
 
+	void collapseController();
+	void expandController();
 	void deleteController();
 	void displayHelp();
-	void collapseController();
+	void toggleCollapseController();
 	void renameFinished();
 	void rename();
 
@@ -70,6 +72,8 @@ public slots:
 signals:
 	void deleteController( ControllerView * _view );
 	void controllerCollapsed();
+	void collapseAll();
+	void expandAll();
 
 
 protected:

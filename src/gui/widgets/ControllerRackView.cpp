@@ -46,6 +46,8 @@
 
 ControllerRackView::ControllerRackView( ) :
 	QWidget(),
+	m_allExpanded(false),
+	m_allCollapsed(false),
 	m_nextIndex(0)
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
@@ -149,6 +151,36 @@ void ControllerRackView::deleteController( ControllerView * _view )
 
 
 
+void ControllerRackView::collapsingAll()
+{
+	QVector<ControllerView *>::const_iterator end = m_controllerViews.end();
+	for( QVector<ControllerView *>::const_iterator it = m_controllerViews.begin(); it != end; ++it)
+	{
+		ControllerView *currentControllerView = *it;
+		currentControllerView->collapseController();
+	}
+	m_allCollapsed = true;
+	m_allExpanded = false;
+}
+
+
+
+
+void ControllerRackView::expandAll()
+{
+	QVector<ControllerView *>::const_iterator end = m_controllerViews.end();
+	for( QVector<ControllerView *>::const_iterator it = m_controllerViews.begin(); it != end; ++it)
+	{
+		ControllerView *currentControllerView = *it;
+		currentControllerView->expandController();
+	}
+	m_allCollapsed = false;
+	m_allExpanded = true;
+}
+
+
+
+
 void ControllerRackView::onControllerAdded( Controller * controller )
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
@@ -156,6 +188,8 @@ void ControllerRackView::onControllerAdded( Controller * controller )
 	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
 	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ), this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
 	connect( controllerView, SIGNAL( controllerCollapsed() ), this, SLOT( onControllerCollapsed() ) );
+	connect(controllerView, SIGNAL( collapseAll() ), this, SLOT(collapsingAll()));
+	connect(controllerView, SIGNAL( expandAll() ), this, SLOT(expandAll()));
 	m_controllerViews.append( controllerView );
 	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
 
@@ -214,6 +248,26 @@ void ControllerRackView::addController()
 	// fix bug which always made ControllerRackView loose focus when adding
 	// new controller
 	setFocus();
+}
+
+void ControllerRackView::setAllCollapsed(bool allCollapsed)
+{
+	m_allCollapsed = allCollapsed;
+}
+
+void ControllerRackView::setAllExpanded(bool allExpanded)
+{
+	m_allExpanded = allExpanded;
+}
+
+bool ControllerRackView::allCollapsed() const
+{
+	return m_allCollapsed;
+}
+
+bool ControllerRackView::allExpanded() const
+{
+	return m_allExpanded;
 }
 
 QMdiSubWindow *ControllerRackView::subWin() const
