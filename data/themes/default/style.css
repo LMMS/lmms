@@ -33,6 +33,26 @@ QMdiArea {
 	background-color: #111314;
 }
 
+QPushButton, QComboBox {
+	background: #3f4750;
+}
+
+QSlider::handle:horizontal {
+	background-color: #5a6572;
+	border: 1px solid #212020;
+	border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+  background-color: #5a626b;
+	border: 1px solid #212020;
+}
+
+QSlider::sub-page:horizontal {
+  background-color: #3a3f45;
+	border: 1px solid #212020;
+}
+
 AutomationEditor {
 	color: #ffffff;
 	background-color: #141616;
@@ -904,7 +924,7 @@ LmmsPalette {
 	qproperty-windowText: #1de276;
 	qproperty-base: #101213;
 	qproperty-text: #d1d8e4;
-	qproperty-button: #3f4750;
+	qproperty-button: #dfe4ec;
 	qproperty-shadow: rgb(0,0,0);
 	qproperty-buttonText: #d1d8e4;
 	qproperty-brightText: #d1d8e4;
