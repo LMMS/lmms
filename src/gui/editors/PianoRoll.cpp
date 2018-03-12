@@ -2633,23 +2633,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	int key = m_startKey;
 
-	// display note marks before drawing other lines
-	for( int i = 0; i < m_markedSemiTones.size(); i++ )
-	{
-		const int key_num = m_markedSemiTones.at( i );
-		const int y = keyAreaBottom() + 5
-			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
-
-		if( y > keyAreaBottom() )
-		{
-			break;
-		}
-
-		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT,
-			    markedSemitoneColor() );
-	}
-
-
 	// draw all white keys...
 	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;
 			key_line_y -= KEY_LINE_HEIGHT, ++keys_processed )
@@ -2936,6 +2919,21 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 		}
 	}
 
+	// draw marked semitones after the grid
+	for( int i = 0; i < m_markedSemiTones.size(); i++ )
+	{
+		const int key_num = m_markedSemiTones.at( i );
+		const int y = keyAreaBottom() + 5
+			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
+
+		if( y > keyAreaBottom() )
+		{
+			break;
+		}
+
+		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT + 1,
+			    markedSemitoneColor() );
+	}
 
 	// following code draws all notes in visible area
 	// and the note editing stuff (volume, panning, etc)
