@@ -184,6 +184,19 @@ void ControllerView::rename()
 
 
 
+void ControllerView::moveUp()
+{
+	emit controllerMoveUp(this);
+}
+
+void ControllerView::moveDown()
+{
+	emit controllerMoveDown(this);
+}
+
+
+
+
 void ControllerView::mouseDoubleClickEvent( QMouseEvent * event )
 {
 	rename();
@@ -255,6 +268,8 @@ void ControllerView::contextMenuEvent( QContextMenuEvent * )
 	collapse->setDisabled(gui->getControllerRackView()->allCollapsed());
 	QAction * expand = contextMenu->addAction( embed::getIconPixmap( "stepper-down" ), tr( "&Expand all controllers" ), this,SIGNAL( expandAll() ) );
 	expand->setDisabled(gui->getControllerRackView()->allExpanded());
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Move up" ), this, SLOT( moveUp() ) );
+	contextMenu->addAction( embed::getIconPixmap( "cancel" ), tr( "&Move down" ), this, SLOT( moveDown() ) );
 	contextMenu->addSeparator();
 	contextMenu->addHelpAction();
 	contextMenu->exec( QCursor::pos() );

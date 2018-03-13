@@ -67,6 +67,8 @@ public slots:
 	void toggleCollapseController();
 	void renameFinished();
 	void rename();
+	void moveUp();
+	void moveDown();
 
 
 signals:
@@ -74,6 +76,8 @@ signals:
 	void controllerCollapsed();
 	void collapseAll();
 	void expandAll();
+	void controllerMoveUp(ControllerView * view);
+	void controllerMoveDown(ControllerView * view);
 
 
 protected:

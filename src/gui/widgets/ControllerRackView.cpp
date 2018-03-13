@@ -47,8 +47,7 @@
 ControllerRackView::ControllerRackView( ) :
 	QWidget(),
 	m_allExpanded(false),
-	m_allCollapsed(false),
-	m_nextIndex(0)
+	m_allCollapsed(false)
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
 	setWindowTitle( tr( "Controller Rack" ) );
@@ -181,19 +180,21 @@ void ControllerRackView::expandAll()
 
 
 
-void ControllerRackView::onControllerAdded( Controller * controller )
+void ControllerRackView::onControllerAdded(Controller * controller)
 {
 	QWidget * scrollAreaWidget = m_scrollArea->widget();
 
-	ControllerView * controllerView = new ControllerView( controller, scrollAreaWidget );
-	connect( controllerView, SIGNAL( deleteController( ControllerView * ) ), this, SLOT( deleteController( ControllerView * ) ), Qt::QueuedConnection );
-	connect( controllerView, SIGNAL( controllerCollapsed() ), this, SLOT( onControllerCollapsed() ) );
-	connect(controllerView, SIGNAL( collapseAll() ), this, SLOT(collapsingAll()));
-	connect(controllerView, SIGNAL( expandAll() ), this, SLOT(expandAll()));
-	m_controllerViews.append( controllerView );
-	m_scrollAreaLayout->insertWidget( m_nextIndex, controllerView );
+	ControllerView * controllerView = new ControllerView(controller, scrollAreaWidget);
+	connect(controllerView, SIGNAL(deleteController(ControllerView*)), this, SLOT(deleteController(ControllerView*)), Qt::QueuedConnection);
+	connect(controllerView, SIGNAL(controllerCollapsed()), this, SLOT(onControllerCollapsed()));
+	connect(controllerView, SIGNAL(collapseAll()), this, SLOT(collapsingAll()));
+	connect(controllerView, SIGNAL(expandAll()), this, SLOT(expandAll()));
+	connect(controllerView, SIGNAL(controllerMoveUp(ControllerView*)), this, SLOT(moveControllerUp(ControllerView*)));
+	connect(controllerView, SIGNAL(controllerMoveDown(ControllerView*)), this, SLOT(moveControllerDown(ControllerView*)));
+	m_controllerViews.append(controllerView);
+	int n = m_scrollAreaLayout->count()-1; //-1 because the stretch?
+	m_scrollAreaLayout->insertWidget(n, controllerView);
 
-	++m_nextIndex;
 	update();
 }
 
@@ -221,7 +222,6 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 					m_controllerViews.end(), viewOfRemovedController ) );
 
 		delete viewOfRemovedController;
-		--m_nextIndex;
 		m_scrollArea->verticalScrollBar()->hide();
 		update();
 	}
@@ -248,6 +248,26 @@ void ControllerRackView::addController()
 	// fix bug which always made ControllerRackView loose focus when adding
 	// new controller
 	setFocus();
+}
+
+void ControllerRackView::moveControllerUp(ControllerView *cv)
+{
+	if(cv != m_controllerViews.first())
+	{
+		int index = m_controllerViews.indexOf(cv);
+		m_scrollAreaLayout->removeWidget(cv);
+		m_scrollAreaLayout->insertWidget(index-1, cv);
+		ControllerView * temp = m_controllerViews[index-1];
+		m_controllerViews[index-1] = cv;
+		m_controllerViews[index] = temp;
+	}
+}
+
+void ControllerRackView::moveControllerDown(ControllerView *cv)
+{
+	//move up the controller among is the same
+	int index = m_controllerViews.indexOf(cv) + 1;
+	moveControllerUp( m_controllerViews.at(index) );
 }
 
 void ControllerRackView::setAllCollapsed(bool allCollapsed)

@@ -78,6 +78,8 @@ protected:
 
 private slots:
 	void addController();
+	void moveControllerUp(ControllerView * cv);
+	void moveControllerDown(ControllerView * cv);
 
 private:
 	QVector<ControllerView *> m_controllerViews;
@@ -89,9 +91,6 @@ private:
 
 	bool m_allExpanded;
 	bool m_allCollapsed;
-	// Stores the index of where to insert the next ControllerView.
-	// Needed so that the StretchItem always stays at the last position.
-	int m_nextIndex;
 } ;
 
 #endif
