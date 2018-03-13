@@ -856,6 +856,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<TrackContentObject *> tcos;
 		MidiTime smallest_pos, t;
+		TrackContentObject * mostLeftTCO = dynamic_cast<TrackContentObjectView *>(so.first())->getTrackContentObject();
 		// find out smallest position of all selected objects for not
 		// moving an object before zero
 		for( QVector<selectableObject *>::iterator it = so.begin();
@@ -867,15 +868,22 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			{
 				continue;
 			}
+
 			TrackContentObject * tco = tcov->m_tco;
 			tcos.push_back( tco );
+
+			if(tco->startPosition() < mostLeftTCO->startPosition() )
+			{
+				mostLeftTCO = tco;
+			}
+
 			smallest_pos = qMin<int>( smallest_pos,
 					(int)tco->startPosition() +
 				static_cast<int>( dx *
 					MidiTime::ticksPerTact() / ppt ) );
 		}
-		MidiTime oldPos = tcos.first()->startPosition();
-		t = tcos.first()->startPosition() +
+		MidiTime oldPos = mostLeftTCO->startPosition();
+		t = mostLeftTCO->startPosition() +
 				static_cast<int>( dx *MidiTime::ticksPerTact() /
 								  ppt )-smallest_pos;
 
@@ -884,12 +892,15 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		{
 			t = t.toNearestTact();
 		}
-		tcos.first()->movePosition( t );
-		MidiTime offs = oldPos - tcos.first()->startPosition();
-		for( QVector<TrackContentObject *>::iterator it = tcos.begin()+1;
+		mostLeftTCO->movePosition( t );
+		MidiTime offs = oldPos - mostLeftTCO->startPosition();
+		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
-			( *it )->movePosition( (*it)->startPosition() - offs);
+			if( (*it) != mostLeftTCO )
+			{
+				( *it )->movePosition( (*it)->startPosition() - offs);
+			}
 		}
 	}
 	else if( m_action == Resize )
