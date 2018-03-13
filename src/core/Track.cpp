@@ -874,18 +874,22 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				static_cast<int>( dx *
 					MidiTime::ticksPerTact() / ppt ) );
 		}
-		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
+		MidiTime oldPos = tcos.first()->startPosition();
+		t = tcos.first()->startPosition() +
+				static_cast<int>( dx *MidiTime::ticksPerTact() /
+								  ppt )-smallest_pos;
+
+		if( !( me->modifiers() & Qt::ControlModifier )
+				&& me->button() == Qt::NoButton)
+		{
+			t = t.toNearestTact();
+		}
+		tcos.first()->movePosition( t );
+		MidiTime offs = oldPos - tcos.first()->startPosition();
+		for( QVector<TrackContentObject *>::iterator it = tcos.begin()+1;
 							it != tcos.end(); ++it )
 		{
-			t = ( *it )->startPosition() +
-				static_cast<int>( dx *MidiTime::ticksPerTact() /
-					 ppt )-smallest_pos;
-			if( ! ( me->modifiers() & Qt::AltModifier )
-					   && me->button() == Qt::NoButton )
-			{
-				t = t.toNearestTact();
-			}
-			( *it )->movePosition( t );
+			( *it )->movePosition( (*it)->startPosition() - offs);
 		}
 	}
 	else if( m_action == Resize )
