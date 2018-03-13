@@ -26,7 +26,7 @@
 #ifndef RENDER_MANAGER_H
 #define RENDER_MANAGER_H
 
-#include <vector>
+#include <memory>
 
 #include "ProjectRenderer.h"
 #include "OutputSettings.h"
@@ -70,7 +70,7 @@ private:
 	ProjectRenderer::ExportFileFormats m_format;
 	QString m_outputPath;
 
-	ProjectRenderer* m_activeRenderer;
+	std::unique_ptr<ProjectRenderer> m_activeRenderer;
 
 	QVector<Track*> m_tracksToRender;
 	QVector<Track*> m_unmuted;
