@@ -40,6 +40,7 @@
 #endif
 
 #include <math.h>
+#include <utility>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
@@ -57,6 +58,7 @@
 #include "MainWindow.h"
 #include "Pattern.h"
 #include "SongEditor.h"
+#include "stdshims.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 
@@ -65,6 +67,7 @@
 #define MiddleButton MidButton
 #endif
 
+using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
 
@@ -370,7 +373,7 @@ PianoRoll::PianoRoll() :
 
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
-					new PixmapLoader( "edit_draw" ) );
+					make_unique<PixmapLoader>( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
@@ -378,13 +381,13 @@ PianoRoll::PianoRoll() :
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
-		PixmapLoader *loader = new PixmapLoader( "note_" + pixmaps[i] );
-		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), loader );
+		auto loader = make_unique<PixmapLoader>( "note_" + pixmaps[i] );
+		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), ::move(loader) );
 	}
 	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
 	{
-		PixmapLoader *loader = new PixmapLoader( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
-		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), loader );
+		auto loader = make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
+		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), ::move(loader) );
 	}
 	m_noteLenModel.setValue( 0 );
 
