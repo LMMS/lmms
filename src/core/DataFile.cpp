@@ -38,7 +38,7 @@
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
 #include "TextFloat.h"

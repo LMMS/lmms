@@ -30,7 +30,7 @@
 #include "Instrument.h"
 #include "InstrumentTrack.h"
 #include "Mixer.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
 

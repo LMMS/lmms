@@ -36,7 +36,7 @@
 #include "Mixer.h"
 
 
-LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginTypes _type ) :
+LadspaSubPluginFeatures::LadspaSubPluginFeatures( Plugin::PluginType _type ) :
 	SubPluginFeatures( _type )
 {
 }

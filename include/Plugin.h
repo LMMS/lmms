@@ -48,7 +48,7 @@ class EXPORT Plugin : public Model, public JournallingObject
 	MM_OPERATORS
 	Q_OBJECT
 public:
-	enum PluginTypes
+	enum PluginType
 	{
 		Instrument,	// instrument being used in channel-track
 		Effect,		// effect-plugin for effect-board
@@ -61,6 +61,13 @@ public:
 		Undefined = 255
 	} ;
 
+	enum PluginProtocol
+	{
+		Embedded,
+		LADSPA,
+		Lv2
+	};
+
 	// descriptor holds information about a plugin - every external plugin
 	// has to instantiate such a descriptor in an extern "C"-section so that
 	// the plugin-loader is able to access information about the plugin
@@ -71,7 +78,7 @@ public:
 		const char * description;
 		const char * author;
 		int version;
-		PluginTypes type;
+		PluginType type;
 		const PixmapLoader * logo;
 		const char * supportedFileTypes;
 
@@ -114,7 +121,7 @@ public:
 			typedef QList<Key> KeyList;
 
 
-			SubPluginFeatures( Plugin::PluginTypes type ) :
+			SubPluginFeatures( Plugin::PluginType type ) :
 				m_type( type )
 			{
 			}
@@ -133,7 +140,7 @@ public:
 
 
 		protected:
-			const Plugin::PluginTypes m_type;
+			const Plugin::PluginType m_type;
 		} ;
 
 		SubPluginFeatures * subPluginFeatures;
@@ -155,7 +162,7 @@ public:
 	}
 
 	// return plugin-type
-	inline PluginTypes type( void ) const
+	inline PluginType type( void ) const
 	{
 		return m_descriptor->type;
 	}
@@ -174,13 +181,13 @@ public:
 	// reference the class header.  Should return null if not key not found.
 	virtual AutomatableModel* childModel( const QString & modelName );
 
-	// returns an instance of a plugin whose name matches to given one
-	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const QString& pluginName, Model * parent, void * data );
+	// if  plugin couldn't be loaded, it creates a dummy-plugin
+	static Plugin* instantiate(const QString& plugin_id,
+			Model * parent, void * data);
 
-	// returns an instance of a lv2 plugin
-	// if specified plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin * instantiate( const LilvPlugin* _pi, InstrumentTrack * _it);
+	// detects the plugin protocol based on the given plugin id
+	// if plugin is a uri, returns LV2, otherwise Embedded
+	static PluginProtocol detectProtocol(const QString& plugin_id);
 
 	// create a view for the model
 	PluginView * createView( QWidget * parent );

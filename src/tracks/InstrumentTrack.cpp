@@ -23,7 +23,6 @@
  *
  */
 
-#include <lilv/lilv.h>
 #include <QDir>
 #include <QQueue>
 #include <QApplication>
@@ -68,7 +67,7 @@
 #include "Mixer.h"
 #include "MixHelpers.h"
 #include "Pattern.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 #include "PluginView.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
@@ -839,13 +838,13 @@ void InstrumentTrack::setPreviewMode( const bool value )
 
 
 
-Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
+Instrument * InstrumentTrack::loadInstrument( const QString & _instrument_id )
 {
 	silenceAllNotes( true );
 
 	lock();
 	delete m_instrument;
-	m_instrument = Instrument::instantiate( _plugin_name, this );
+	m_instrument = Instrument::instantiate( _instrument_id, this );
 	unlock();
 	setName( m_instrument->displayName() );
 
@@ -853,24 +852,6 @@ Instrument * InstrumentTrack::loadInstrument( const QString & _plugin_name )
 
 	return m_instrument;
 }
-
-
-
-//Instrument * InstrumentTrack::loadLv2Instrument( const LilvPlugin* _plugin)
-//{
-	//silenceAllNotes( true );
-
-	//lock();
-	//delete m_instrument;
-	//m_instrument = Instrument::instantiate( _plugin, this );
-	//unlock();
-	//setName( m_instrument->displayName() );
-
-	//emit instrumentChanged();
-
-	//return m_instrument;
-
-//}
 
 
 // #### ITV:
@@ -1738,7 +1719,7 @@ void InstrumentTrackWindow::focusInEvent( QFocusEvent* )
 
 void InstrumentTrackWindow::dragEnterEventGeneric( QDragEnterEvent* event )
 {
-	StringPairDrag::processDragEnterEvent( event, "lv2instrument,instrument,presetfile,pluginpresetfile" );
+	StringPairDrag::processDragEnterEvent( event, "instrument,presetfile,pluginpresetfile" );
 }
 
 
@@ -1757,16 +1738,6 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 	QString type = StringPairDrag::decodeKey( event );
 	QString value = StringPairDrag::decodeValue( event );
 
-	//if (type == "lv2instrument")
-	//{
-		//m_track->loadLv2Instrument(Lv2Manager::getInstance()
-				//.find_by_uri(value.toUtf8().constData()));
-
-		//Engine::getSong()->setModified();
-
-		//event->accept();
-		//setFocus();
-	//}
 	if( type == "instrument" )
 	{
 		m_track->loadInstrument( value );

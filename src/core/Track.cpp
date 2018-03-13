@@ -308,8 +308,8 @@ TrackContentObjectView::~TrackContentObjectView()
 
 /*! \brief Update a TrackContentObjectView
  *
- *  TCO's get drawn only when needed, 
- *  and when a TCO is updated, 
+ *  TCO's get drawn only when needed,
+ *  and when a TCO is updated,
  *  it needs to be redrawn.
  *
  */
@@ -672,7 +672,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			}
 		}
 	}
-	else if( me->button() == Qt::LeftButton && 
+	else if( me->button() == Qt::LeftButton &&
 			 me->modifiers() & Qt::ControlModifier )
 	{
 		// start drag-action
@@ -1104,7 +1104,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1115,9 +1115,9 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-	
+
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );	
+	pmp.setPen( QPen( gridColor(), 1 ) );
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
@@ -1837,7 +1837,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-	
+
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -1904,7 +1904,7 @@ void TrackOperationsWidget::recordingOff()
  *
  * \todo check the definitions of all the properties - are they OK?
  */
-Track::Track( TrackTypes type, TrackContainer * tc ) :
+Track::Track( TrackType type, TrackContainer * tc ) :
 	Model( tc ),                   /*!< The track Model */
 	m_trackContainer( tc ),        /*!< The track container object */
 	m_type( type ),                /*!< The track type */
@@ -1955,7 +1955,7 @@ Track::~Track()
  *  \param tt The type of track to create
  *  \param tc The track container to attach to
  */
-Track * Track::create( TrackTypes tt, TrackContainer * tc )
+Track * Track::create( TrackType tt, TrackContainer * tc )
 {
 	Engine::mixer()->requestChangeInModel();
 
@@ -2000,7 +2000,7 @@ Track * Track::create( const QDomElement & element, TrackContainer * tc )
 	Engine::mixer()->requestChangeInModel();
 
 	Track * t = create(
-		static_cast<TrackTypes>( element.attribute( "type" ).toInt() ),
+		static_cast<TrackType>( element.attribute( "type" ).toInt() ),
 									tc );
 	if( t != NULL )
 	{
@@ -2760,7 +2760,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos = 
+		const int yPos =
 			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 

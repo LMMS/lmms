@@ -1,5 +1,5 @@
 /*
- * PluginFactory.cpp
+ * EmbeddedPluginFactory.cpp
  *
  * Copyright (c) 2015 Lukas W <lukaswhl/at/gmail.com>
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
@@ -42,9 +42,9 @@ qint64 qHash(const QFileInfo& fi)
 	return qHash(fi.absoluteFilePath());
 }
 
-std::unique_ptr<PluginFactory> PluginFactory::s_instance;
+std::unique_ptr<EmbeddedPluginFactory> EmbeddedPluginFactory::s_instance;
 
-PluginFactory::PluginFactory()
+EmbeddedPluginFactory::EmbeddedPluginFactory()
 {
 	// Adds a search path relative to the main executable if the path exists.
 	auto addRelativeIfExists = [this] (const QString& path) {
@@ -80,39 +80,39 @@ PluginFactory::PluginFactory()
 	discoverPlugins();
 }
 
-PluginFactory::~PluginFactory()
+EmbeddedPluginFactory::~EmbeddedPluginFactory()
 {
 }
 
-PluginFactory* PluginFactory::instance()
+EmbeddedPluginFactory* EmbeddedPluginFactory::instance()
 {
 	if (s_instance == nullptr)
-		s_instance.reset(new PluginFactory());
+		s_instance.reset(new EmbeddedPluginFactory());
 
 	return s_instance.get();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors() const
+const Plugin::DescriptorList EmbeddedPluginFactory::descriptors() const
 {
 	return m_descriptors.values();
 }
 
-const Plugin::DescriptorList PluginFactory::descriptors(Plugin::PluginTypes type) const
+const Plugin::DescriptorList EmbeddedPluginFactory::descriptors(Plugin::PluginType type) const
 {
 	return m_descriptors.values(type);
 }
 
-const PluginFactory::PluginInfoList& PluginFactory::pluginInfos() const
+const EmbeddedPluginFactory::PluginInfoList& EmbeddedPluginFactory::pluginInfos() const
 {
 	return m_pluginInfos;
 }
 
-const PluginFactory::PluginInfo PluginFactory::pluginSupportingExtension(const QString& ext)
+const EmbeddedPluginFactory::PluginInfo EmbeddedPluginFactory::pluginSupportingExtension(const QString& ext)
 {
 	return m_pluginByExt.value(ext, PluginInfo());
 }
 
-const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) const
+const EmbeddedPluginFactory::PluginInfo EmbeddedPluginFactory::pluginInfo(const char* name) const
 {
 	for (const PluginInfo& info : m_pluginInfos)
 	{
@@ -122,13 +122,13 @@ const PluginFactory::PluginInfo PluginFactory::pluginInfo(const char* name) cons
 	return PluginInfo();
 }
 
-QString PluginFactory::errorString(QString pluginName) const
+QString EmbeddedPluginFactory::errorString(QString pluginName) const
 {
-	static QString notfound = qApp->translate("PluginFactory", "Plugin not found.");
+	static QString notfound = qApp->translate("EmbeddedPluginFactory", "Plugin not found.");
 	return m_errors.value(pluginName, notfound);
 }
 
-void PluginFactory::discoverPlugins()
+void EmbeddedPluginFactory::discoverPlugins()
 {
 	DescriptorMap descriptors;
 	PluginInfoList pluginInfos;
@@ -169,7 +169,7 @@ void PluginFactory::discoverPlugins()
 		Plugin::Descriptor* pluginDescriptor = reinterpret_cast<Plugin::Descriptor*>(library->resolve(descriptorName.toUtf8().constData()));
 		if(pluginDescriptor == nullptr)
 		{
-			qWarning() << qApp->translate("PluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
+			qWarning() << qApp->translate("EmbeddedPluginFactory", "LMMS plugin %1 does not have a plugin descriptor named %2!").
 						  arg(file.absoluteFilePath()).arg(descriptorName);
 			continue;
 		}
@@ -194,7 +194,7 @@ void PluginFactory::discoverPlugins()
 
 
 
-const QString PluginFactory::PluginInfo::name() const
+const QString EmbeddedPluginFactory::PluginInfo::name() const
 {
 	return descriptor ? descriptor->name : QString();
 }

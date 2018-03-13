@@ -32,7 +32,7 @@
 
 
 
-VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginTypes _type ) :
+VstSubPluginFeatures::VstSubPluginFeatures( Plugin::PluginType _type ) :
 	SubPluginFeatures( _type )
 {
 }

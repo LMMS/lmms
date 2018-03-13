@@ -61,7 +61,7 @@ public:
 		return NULL;
 	}
 
-	int countTracks( Track::TrackTypes _tt = Track::NumTrackTypes ) const;
+	int countTracks( Track::TrackType _tt = Track::NumTrackTypes ) const;
 
 
 	void addTrack( Track * _track );

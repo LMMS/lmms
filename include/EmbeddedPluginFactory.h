@@ -1,5 +1,5 @@
 /*
- * PluginFactory.h
+ * EmbeddedPluginFactory.h
  *
  * Copyright (c) 2015 Lukas W <lukaswhl/at/gmail.com>
  *
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef PLUGINFACTORY_H
-#define PLUGINFACTORY_H
+#ifndef EMBEDDED_PLUGINFACTORY_H
+#define EMBEDDED_PLUGINFACTORY_H
 
 #include <memory>
 
@@ -36,7 +36,7 @@
 
 class QLibrary;
 
-class EXPORT PluginFactory
+class EXPORT EmbeddedPluginFactory
 {
 public:
 	struct PluginInfo
@@ -51,20 +51,20 @@ public:
 		bool isNull() const {return ! library;}
 	};
 	typedef QList<PluginInfo> PluginInfoList;
-	typedef QMultiMap<Plugin::PluginTypes, Plugin::Descriptor*> DescriptorMap;
+	typedef QMultiMap<Plugin::PluginType, Plugin::Descriptor*> DescriptorMap;
 
-	PluginFactory();
-	~PluginFactory();
+	EmbeddedPluginFactory();
+	~EmbeddedPluginFactory();
 
-	/// Returns the singleton instance of PluginFactory. You won't need to call
+	/// Returns the singleton instance of EmbeddedPluginFactory. You won't need to call
 	/// this directly, use pluginFactory instead.
-	static PluginFactory* instance();
+	static EmbeddedPluginFactory* instance();
 
 	/// Returns a list of all found plugins' descriptors.
 	const Plugin::DescriptorList descriptors() const;
-	const Plugin::DescriptorList descriptors(Plugin::PluginTypes type) const;
+	const Plugin::DescriptorList descriptors(Plugin::PluginType type) const;
 
-	/// Returns a list of all found plugins' PluginFactory::PluginInfo objects.
+	/// Returns a list of all found plugins' EmbeddedPluginFactory::PluginInfo objects.
 	const PluginInfoList& pluginInfos() const;
 	/// Returns a plugin that support the given file extension
 	const PluginInfo pluginSupportingExtension(const QString& ext);
@@ -88,9 +88,9 @@ private:
 
 	QHash<QString, QString> m_errors;
 
-	static std::unique_ptr<PluginFactory> s_instance;
+	static std::unique_ptr<EmbeddedPluginFactory> s_instance;
 };
 
-#define pluginFactory PluginFactory::instance()
+#define pluginFactory EmbeddedPluginFactory::instance()
 
-#endif // PLUGINFACTORY_H
+#endif // EMBEDDED_PLUGINFACTORY_H

@@ -48,7 +48,7 @@
 #include "Lv2InstrumentBrowser.h"
 #include "MainWindow.h"
 #include "Mixer.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 #include "PresetPreviewPlayHandle.h"
 #include "SamplePlayHandle.h"
 #include "Song.h"
@@ -348,7 +348,6 @@ void Lv2InstrumentBrowserTreeWidget::handlePlugin( Lv2InstrumentItem * f, Instru
 void Lv2InstrumentBrowserTreeWidget::activateListItem(QTreeWidgetItem * item,
 								int column )
 {
-	//qDebug("activating list item");
 	Lv2InstrumentItem * lv2pi = dynamic_cast<Lv2InstrumentItem *>( item );
 	if( lv2pi == NULL )
 	{

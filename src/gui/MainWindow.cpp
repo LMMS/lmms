@@ -52,7 +52,7 @@
 #include "Lv2InstrumentBrowser.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 #include "PluginView.h"
 #include "ProjectJournal.h"
 #include "ProjectNotes.h"

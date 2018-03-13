@@ -65,10 +65,10 @@ f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
 
 
 
-Instrument * Instrument::instantiate( const QString & _plugin_name,
+Instrument * Instrument::instantiate( const QString & _plugin_id,
 					InstrumentTrack * _instrument_track )
 {
-	Plugin * p = Plugin::instantiate( _plugin_name, _instrument_track,
+	Plugin * p = Plugin::instantiate( _plugin_id, _instrument_track,
 							_instrument_track );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<Instrument *>( p ) != NULL )
@@ -82,29 +82,10 @@ Instrument * Instrument::instantiate( const QString & _plugin_name,
 	return( new DummyInstrument( _instrument_track ) );
 }
 
-//Instrument * Instrument::instantiate(const LilvPlugin* _plugin,
-					//InstrumentTrack * _instrument_track )
-//{
-	//Plugin * p = Plugin::instantiate( _plugin, _instrument_track);
-	//// check whether instantiated plugin is an instrument
-	//if( dynamic_cast<Instrument *>( p ) != NULL )
-	//{
-		//// everything ok, so return pointer
-		//return dynamic_cast<Instrument *>( p );
-	//}
-
-	//// not quite... so delete plugin and return dummy instrument
-	//delete p;
-	//return( new DummyInstrument( _instrument_track ) );
-//}
-
 bool Instrument::isFromTrack( const Track * _track ) const
 {
 	return( m_instrumentTrack == _track );
 }
-
-
-
 
 void Instrument::applyRelease( sampleFrame * buf, const NotePlayHandle * _n )
 {

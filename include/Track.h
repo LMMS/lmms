@@ -229,7 +229,7 @@ public:
 	// access needsUpdate member variable
 	bool needsUpdate();
 	void setNeedsUpdate( bool b );
-	
+
 public slots:
 	virtual bool close();
 	void cut();
@@ -463,7 +463,7 @@ class EXPORT Track : public Model, public JournallingObject
 public:
 	typedef QVector<TrackContentObject *> tcoVector;
 
-	enum TrackTypes
+	enum TrackType
 	{
 		InstrumentTrack,
 		BBTrack,
@@ -475,17 +475,17 @@ public:
 		NumTrackTypes
 	} ;
 
-	Track( TrackTypes type, TrackContainer * tc );
+	Track( TrackType type, TrackContainer * tc );
 	virtual ~Track();
 
-	static Track * create( TrackTypes tt, TrackContainer * tc );
+	static Track * create( TrackType tt, TrackContainer * tc );
 	static Track * create( const QDomElement & element,
 							TrackContainer * tc );
 	Track * clone();
 
 
 	// pure virtual functions
-	TrackTypes type() const
+	TrackType type() const
 	{
 		return m_type;
 	}
@@ -555,13 +555,13 @@ public:
 
 	using Model::dataChanged;
 
-	inline int getHeight() 
+	inline int getHeight()
 	{
 		return m_height >= MINIMAL_TRACK_HEIGHT
-			? m_height 
+			? m_height
 			: DEFAULT_TRACK_HEIGHT;
 	}
-	inline void setHeight( int height ) 
+	inline void setHeight( int height )
 	{
 		m_height = height;
 	}
@@ -593,7 +593,7 @@ public slots:
 
 private:
 	TrackContainer* m_trackContainer;
-	TrackTypes m_type;
+	TrackType m_type;
 	QString m_name;
 	int m_height;
 

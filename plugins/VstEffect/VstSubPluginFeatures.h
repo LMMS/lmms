@@ -33,7 +33,7 @@
 class VstSubPluginFeatures : public Plugin::Descriptor::SubPluginFeatures
 {
 public:
-	VstSubPluginFeatures( Plugin::PluginTypes _type );
+	VstSubPluginFeatures( Plugin::PluginType _type );
 
 	virtual void fillDescriptionWidget( QWidget * _parent,
 											const Key * _key ) const;

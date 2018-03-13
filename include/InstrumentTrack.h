@@ -62,8 +62,6 @@ class TrackLabelButton;
 class LedCheckBox;
 class QLabel;
 
-typedef struct LilvPluginImpl LilvPlugin;
-
 
 class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
@@ -148,10 +146,7 @@ public:
 
 
 	// load instrument whose name matches given one
-	Instrument * loadInstrument( const QString & _instrument_name );
-
-	// load lv2 Instrument
-	Instrument  * loadLv2Instrument(const LilvPlugin* _plugin);
+	Instrument * loadInstrument( const QString & _instrument_id );
 
 	AudioPort * audioPort()
 	{

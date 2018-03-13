@@ -153,7 +153,7 @@ void TrackContainer::loadSettings( const QDomElement & _this )
 
 
 
-int TrackContainer::countTracks( Track::TrackTypes _tt ) const
+int TrackContainer::countTracks( Track::TrackType _tt ) const
 {
 	int cnt = 0;
 	m_tracksMutex.lockForRead();

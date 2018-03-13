@@ -28,7 +28,7 @@
 
 #include "gui_templates.h"
 #include "embed.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 
 #include <QLabel>
 

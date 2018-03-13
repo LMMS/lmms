@@ -89,53 +89,77 @@ AutomatableModel * Plugin::childModel( const QString & )
 	return &fm;
 }
 
-
-
-#include "PluginFactory.h"
-Plugin * Plugin::instantiate( const QString& pluginName, Model * parent,
-								void * data )
+// FIXME use regex
+Plugin::PluginProtocol Plugin::detectProtocol(const QString& _plugin_id)
 {
-	const PluginFactory::PluginInfo& pi = pluginFactory->pluginInfo(pluginName.toUtf8());
 	const LilvPlugin* lv2p = Lv2Manager::getInstance()
-		.find_by_uri(pluginName.toUtf8().constData());
-	if( pi.isNull() )
+		.find_by_uri(_plugin_id.toUtf8().constData());
+	if (lv2p == nullptr)
 	{
-		return new Lv2Instrument(lv2p, static_cast<InstrumentTrack*>(data));
-		if( gui )
-		{
-			QMessageBox::information( NULL,
-				tr( "Plugin not found" ),
-				tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
-						arg( pluginName ).arg( pluginFactory->errorString(pluginName) ),
-				QMessageBox::Ok | QMessageBox::Default );
-		}
-		return new DummyPlugin();
+		return Embedded;
 	}
-
-	InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
-	if( instantiationHook == NULL )
+	else
 	{
-		if( gui )
-		{
-			QMessageBox::information( NULL,
-				tr( "Error while loading plugin" ),
-				tr( "Failed to load plugin \"%1\"!").arg( pluginName ),
-				QMessageBox::Ok | QMessageBox::Default );
-		}
-		return new DummyPlugin();
+		return Lv2;
 	}
-
-	Plugin * inst = instantiationHook( parent, data );
-	return inst;
 }
 
-// for LV2 plugins
-//Plugin * Plugin::instantiate( const LilvPlugin* _pi,
-		//InstrumentTrack * _it)
-//{
-	//return new Lv2Instrument(_pi, _it);
-//}
 
+#include "EmbeddedPluginFactory.h"
+Plugin* Plugin::instantiate(const QString& _plugin_id,
+		Model * parent, void * data )
+{
+	switch (detectProtocol(_plugin_id))
+	{
+		case Embedded:
+			{
+				const EmbeddedPluginFactory::PluginInfo& pi =
+					pluginFactory->pluginInfo(_plugin_id.toUtf8());
+				if( pi.isNull() )
+				{
+					if( gui )
+					{
+						QMessageBox::information( NULL,
+							tr( "Plugin not found" ),
+							tr( "The plugin \"%1\" wasn't found or could not be loaded!\nReason: \"%2\"" ).
+									arg(_plugin_id).arg( pluginFactory->errorString(_plugin_id)),
+							QMessageBox::Ok | QMessageBox::Default );
+					}
+					return new DummyPlugin();
+				}
+
+				InstantiationHook instantiationHook = ( InstantiationHook ) pi.library->resolve( "lmms_plugin_main" );
+				if( instantiationHook == NULL )
+				{
+					if( gui )
+					{
+						QMessageBox::information( NULL,
+							tr( "Error while loading plugin" ),
+							tr( "Failed to load plugin \"%1\"!").arg(_plugin_id),
+							QMessageBox::Ok | QMessageBox::Default );
+					}
+					return new DummyPlugin();
+				}
+
+				Plugin * inst = instantiationHook( parent, data );
+				return inst;
+
+				break;
+			}
+		case Lv2:
+			{
+				const LilvPlugin* lv2p = Lv2Manager::getInstance()
+					.find_by_uri(_plugin_id.toUtf8().constData());
+				// FIXME only handles instruments
+				return new Lv2Instrument(lv2p, static_cast<InstrumentTrack*>(data));
+				break;
+			}
+		case LADSPA:
+			//
+			break;
+	}
+	return nullptr;
+}
 
 
 void Plugin::collectErrorForUI( QString errMsg )

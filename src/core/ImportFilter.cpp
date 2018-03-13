@@ -28,7 +28,7 @@
 #include "ImportFilter.h"
 #include "Engine.h"
 #include "TrackContainer.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 #include "ProjectJournal.h"
 
 

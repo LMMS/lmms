@@ -34,7 +34,7 @@
 #include "templates.h"
 #include "gui_templates.h"
 #include "StringPairDrag.h"
-#include "PluginFactory.h"
+#include "EmbeddedPluginFactory.h"
 
 
 static bool pluginBefore( const Plugin::Descriptor* d1, const Plugin::Descriptor* d2 )
