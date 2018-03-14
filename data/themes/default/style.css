@@ -9,6 +9,7 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView {
 	outline: none;
+	font-size: 14px;
 }
 
 QTreeWidget::item:hover,
