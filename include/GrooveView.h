@@ -16,7 +16,7 @@ class GrooveView : public QWidget
 {
 	Q_OBJECT
 public:
-	GrooveView();
+	GrooveView(QWidget * parent);
 	virtual ~GrooveView();
 	
 	void clear();
@@ -30,7 +30,7 @@ public slots:
 private:
 	void setView(Groove * groove);
 
-	QComboBox * m_dropDown;
+	QComboBox * m_comboBox;
 	QVBoxLayout * m_layout;
 };
 

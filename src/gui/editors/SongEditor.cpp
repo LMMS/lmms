@@ -38,6 +38,7 @@
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
 #include "embed.h"
+#include "GrooveView.h"
 #include "GuiApplication.h"
 #include "LcdSpinBox.h"
 #include "MainWindow.h"
@@ -143,6 +144,11 @@ SongEditor::SongEditor( Song * song ) :
 	m_timeSigDisplay = new MeterDialog( this, true );
 	m_timeSigDisplay->setModel( &m_song->m_timeSigModel );
 	gui->mainWindow()->addWidgetToToolBar( m_timeSigDisplay );
+
+	gui->mainWindow()->addSpacingToToolBar( 10 );
+
+
+	gui->mainWindow()->addWidgetToToolBar( new GrooveView( tb ) );
 
 	gui->mainWindow()->addSpacingToToolBar( 10 );
 

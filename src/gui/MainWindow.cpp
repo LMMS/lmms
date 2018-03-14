@@ -49,7 +49,6 @@
 #include "FileBrowser.h"
 #include "FileDialog.h"
 #include "FxMixerView.h"
-#include "GrooveView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "PianoRoll.h"
@@ -582,14 +581,6 @@ void MainWindow::finalize()
 								m_toolBar );
 	controllers_window->setShortcut( Qt::Key_F11 );
 
-	ToolButton * groove_view = new ToolButton(
-					embed::getIconPixmap( "groove" ),
-					tr ( "Show/hide Groove" ) +
-								" (Calc)",
-					this, SLOT( toggleGrooveView() ),
-							m_toolBar);
-	groove_view->setShortcut( Qt::Key_Calculator );
-	
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
@@ -597,7 +588,6 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
 	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
-	m_toolBarLayout->addWidget( groove_view, 1, 8 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -651,7 +641,7 @@ void MainWindow::finalize()
 
 int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 {
-	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 7 : _col;
+	int col = ( _col == -1 ) ? m_toolBarLayout->columnCount() + 6 : _col;
 	if( _w->height() > 32 || _row == -1 )
 	{
 		m_toolBarLayout->addWidget( _w, 0, col, 2, 1 );
@@ -669,7 +659,7 @@ int MainWindow::addWidgetToToolBar( QWidget * _w, int _row, int _col )
 void MainWindow::addSpacingToToolBar( int _size )
 {
 	m_toolBarLayout->setColumnMinimumWidth( m_toolBarLayout->columnCount() +
-								7, _size );
+								6, _size );
 }
 
 SubWindow* MainWindow::addWindowedWidget(QWidget *w, Qt::WindowFlags windowFlags)
@@ -1207,11 +1197,6 @@ void MainWindow::toggleAutomationEditorWin()
 void MainWindow::toggleFxMixerWin()
 {
 	toggleWindow( gui->fxMixerView() );
-}
-
-void MainWindow::toggleGrooveView( void )
-{
-	toggleWindow( gui->grooveView() );
 }
 
 void MainWindow::updateViewMenu()

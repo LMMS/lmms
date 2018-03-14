@@ -21,42 +21,25 @@
 #include "GrooveExperiments.h"
 #include "MidiSwing.h"
 
-//GrooveView::GrooveView(QWidget *parent) :
-//	QWidget(parent)
-GrooveView::GrooveView( ) :
-	QWidget()
+GrooveView::GrooveView(QWidget * parent) :
+	QWidget(parent)
 {
-	setWindowIcon( embed::getIconPixmap( "groove" ) );
-	setWindowTitle( tr( "Groove" ) );
-
 	m_layout = new QVBoxLayout();
 	this->setLayout( m_layout );
 
-	m_dropDown = new QComboBox(this);
+	m_comboBox = new QComboBox(this);
 	// Insert reverse order.
-	m_dropDown->insertItem(0, tr("Experiment swing") , QVariant::fromValue(5) );
-	m_dropDown->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(4) );
-	m_dropDown->insertItem(0, tr("Half swing") , QVariant::fromValue(3) );
-	m_dropDown->insertItem(0, tr("MIDI swing") , QVariant::fromValue(2) );
-	m_dropDown->insertItem(0, tr("No swing") , QVariant::fromValue(1) );
-	m_dropDown->setCurrentIndex(0);
+	m_comboBox->insertItem(0, tr("Experiment swing") , QVariant::fromValue(5) );
+	m_comboBox->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(4) );
+	m_comboBox->insertItem(0, tr("Half swing") , QVariant::fromValue(3) );
+	m_comboBox->insertItem(0, tr("MIDI swing") , QVariant::fromValue(2) );
+	m_comboBox->insertItem(0, tr("No swing") , QVariant::fromValue(1) );
+	m_comboBox->setCurrentIndex(0);
 
-	m_layout->addWidget( m_dropDown );
+	m_layout->addWidget( m_comboBox );
 	m_layout->addWidget( new QLabel("") );
 
-	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
-
-	// No maximize button.
-	Qt::WindowFlags flags = subWin->windowFlags();
-	flags &= ~Qt::WindowMaximizeButtonHint;
-	subWin->setWindowFlags( flags );
-
-	subWin->setFixedSize( 170, 121 );
-
-	parentWidget()->setAttribute( Qt::WA_DeleteOnClose, false );
-	parentWidget()->move( 1080, 450 );
-
-	connect( m_dropDown, SIGNAL( activated(int) ),
+	connect( m_comboBox, SIGNAL( activated(int) ),
 			this, SLOT( grooveChanged(int) ) );
 
 	connect( Engine::getSong(), SIGNAL( dataChanged() ),
@@ -70,7 +53,7 @@ GrooveView::GrooveView( ) :
 
 GrooveView::~GrooveView()
 {
-	delete m_dropDown;
+	delete m_comboBox;
 }
 
 void GrooveView::update()
@@ -78,23 +61,23 @@ void GrooveView::update()
 	Groove * groove = Engine::getSong()->globalGroove();
 	if (groove->nodeName() == "none")
 	{
-		m_dropDown->setCurrentIndex(0);
+		m_comboBox->setCurrentIndex(0);
 	}
 	if (groove->nodeName() == "midi")
 	{
-		m_dropDown->setCurrentIndex(1);
+		m_comboBox->setCurrentIndex(1);
 	}
 	if (groove->nodeName() == "half")
 	{
-		m_dropDown->setCurrentIndex(2);
+		m_comboBox->setCurrentIndex(2);
 	}
 	if (groove->nodeName() == "hydrogen")
 	{
-		m_dropDown->setCurrentIndex(3);
+		m_comboBox->setCurrentIndex(3);
 	}
 	if (groove->nodeName() == "experiment")
 	{
-		m_dropDown->setCurrentIndex(4);
+		m_comboBox->setCurrentIndex(4);
 	}
 	setView(groove);
 }
@@ -105,7 +88,7 @@ void GrooveView::clear()
 	delete li->widget();
 	delete li;
 	
-	m_dropDown->setCurrentIndex(0);
+	m_comboBox->setCurrentIndex(0);
 	m_layout->addWidget(new QLabel(""));
 }
 
@@ -113,7 +96,7 @@ void GrooveView::grooveChanged(int index)
 {
 	Groove * groove = NULL;
 
-	int selectedIdx = m_dropDown->currentIndex();
+	int selectedIdx = m_comboBox->currentIndex();
 	switch (selectedIdx) {
 		case 0 : 
 		{

@@ -1046,10 +1046,7 @@ void Song::loadProject( const QString & fileName )
 	{
 		m_globalGroove = GrooveFactory::create("none");
 	}
-	if ( gui ) {
-		gui->grooveView()->update();
-	}
-		
+
 	node = dataFile.content().firstChild();
 
 	QDomNodeList tclist=dataFile.content().elementsByTagName("trackcontainer");
