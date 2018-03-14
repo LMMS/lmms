@@ -771,7 +771,7 @@ void Knob::enterValue()
 		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
-			this, windowTitle(),
+			this, tr( "Set value" ),
 			tr( "Please enter a new value between "
 					"-96.0 dBFS and 6.0 dBFS:" ),
 				20.0 * log10( model()->getRoundedValue() / 100.0 ),
@@ -788,7 +788,7 @@ void Knob::enterValue()
 	else
 	{
 		new_val = QInputDialog::getDouble(
-				this, windowTitle(),
+				this, tr( "Set value" ),
 				tr( "Please enter a new value between "
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
