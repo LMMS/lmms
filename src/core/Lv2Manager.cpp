@@ -1,6 +1,5 @@
 /*
- * Lv2Manager.cpp - definition of class Lv2Manager
- *						a class to manage loading and instantiation
+ * Lv2Manager.cpp - a class to manage loading and instantiation
  *						of LV2 plugins
  *
  * Copyright (c) Alexandros Theodotou @faiyadesu
@@ -53,24 +52,7 @@ extern "C" {
 #    include <unistd.h>
 #endif
 
-#include "jalv_internal.h"
 
-#include "lv2/lv2plug.in/ns/ext/atom/atom.h"
-#include "lv2/lv2plug.in/ns/ext/buf-size/buf-size.h"
-#include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
-#include "lv2/lv2plug.in/ns/ext/event/event.h"
-#include "lv2/lv2plug.in/ns/ext/options/options.h"
-#include "lv2/lv2plug.in/ns/ext/parameters/parameters.h"
-#include "lv2/lv2plug.in/ns/ext/patch/patch.h"
-#include "lv2/lv2plug.in/ns/ext/port-groups/port-groups.h"
-#include "lv2/lv2plug.in/ns/ext/port-props/port-props.h"
-#include "lv2/lv2plug.in/ns/ext/presets/presets.h"
-#include "lv2/lv2plug.in/ns/ext/state/state.h"
-#include "lv2/lv2plug.in/ns/ext/time/time.h"
-#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
-#include "lv2/lv2plug.in/ns/ext/urid/urid.h"
-#include "lv2/lv2plug.in/ns/ext/worker/worker.h"
-#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
 
 #include "lilv/lilv.h"
 
@@ -80,23 +62,13 @@ extern "C" {
 #include "worker.h"
 }
 
+#include "Engine.h"
+#include "ConfigManager.h"
+#include "Song.h"
+
 #define NS_RDF "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 #define NS_XSD "http://www.w3.org/2001/XMLSchema#"
 
-#ifndef MIN
-#    define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#endif
-
-#ifndef MAX
-#    define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#endif
-
-/* Size factor for UI ring buffers.  The ring size is a few times the size of
-   an event output to give the UI a chance to keep up.  Experiments with Ingen,
-   which can highly saturate its event output, led me to this value.  It
-   really ought to be enough for anybody(TM).
-*/
-#define N_BUFFER_CYCLES 16
 
 ZixSem exit_sem;  /**< Exit semaphore */
 
@@ -110,6 +82,7 @@ map_uri(LV2_URID_Map_Handle handle,
 	zix_sem_post(&jalv->symap_lock);
 	return id;
 }
+
 
 static const char*
 unmap_uri(LV2_URID_Unmap_Handle handle,
@@ -137,22 +110,10 @@ uri_to_id(LV2_URI_Map_Callback_Data callback_data,
 	return id;
 }
 
-#define NS_EXT "http://lv2plug.in/ns/ext/"
-
 static LV2_URI_Map_Feature uri_map = { NULL, &uri_to_id };
 
-static LV2_Extension_Data_Feature ext_data = { NULL };
+LV2_Extension_Data_Feature Lv2Manager::ext_data = { NULL };
 
-LV2_Feature uri_map_feature      = { NS_EXT "uri-map", NULL };
-LV2_Feature map_feature          = { LV2_URID__map, NULL };
-LV2_Feature unmap_feature        = { LV2_URID__unmap, NULL };
-LV2_Feature make_path_feature    = { LV2_STATE__makePath, NULL };
-LV2_Feature sched_feature        = { LV2_WORKER__schedule, NULL };
-LV2_Feature state_sched_feature  = { LV2_WORKER__schedule, NULL };
-LV2_Feature safe_restore_feature = { LV2_STATE__threadSafeRestore, NULL };
-LV2_Feature log_feature          = { LV2_LOG__log, NULL };
-LV2_Feature options_feature      = { LV2_OPTIONS__options, NULL };
-LV2_Feature def_state_feature    = { LV2_STATE__loadDefaultState, NULL };
 
 /** These features have no data */
 static LV2_Feature buf_size_features[3] = {
@@ -160,8 +121,22 @@ static LV2_Feature buf_size_features[3] = {
 	{ LV2_BUF_SIZE__fixedBlockLength, NULL },
 	{ LV2_BUF_SIZE__boundedBlockLength, NULL } };
 
-const LV2_Feature* features[12] = {
-	&uri_map_feature, &map_feature, &unmap_feature,
+
+extern LV2_Feature uri_map_feature;
+extern LV2_Feature map_feature;
+extern LV2_Feature unmap_feature;
+extern LV2_Feature make_path_feature;
+extern LV2_Feature sched_feature;
+extern LV2_Feature state_sched_feature;
+extern LV2_Feature safe_restore_feature;
+extern LV2_Feature log_feature;
+extern LV2_Feature options_feature;
+extern LV2_Feature def_state_feature;
+
+const LV2_Feature* Lv2Manager::features[12] = {
+	&uri_map_feature,
+	&map_feature,
+	&unmap_feature,
 	&sched_feature,
 	&log_feature,
 	&options_feature,
@@ -174,19 +149,19 @@ const LV2_Feature* features[12] = {
 };
 
 /** Return true iff Jalv supports the given feature. */
-//static bool
-//feature_is_supported(const char* uri)
-//{
-	//if (!strcmp(uri, "http://lv2plug.in/ns/lv2core#isLive")) {
-		//return true;
-	//}
-	//for (const LV2_Feature*const* f = features; *f; ++f) {
-		//if (!strcmp(uri, (*f)->URI)) {
-			//return true;
-		//}
-	//}
-	//return false;
-//}
+bool
+Lv2Manager::feature_is_supported(const char* uri)
+{
+	if (!strcmp(uri, "http://lv2plug.in/ns/lv2core#isLive")) {
+		return true;
+	}
+	for (const LV2_Feature*const* f = features; *f; ++f) {
+		if (!strcmp(uri, (*f)->URI)) {
+			return true;
+		}
+	}
+	return false;
+}
 
 /** Abort and exit on error */
 static void
@@ -362,8 +337,8 @@ jalv_control_by_symbol(Jalv* jalv, const char* sym)
 	return NULL;
 }
 
-static void
-print_control_value(Jalv* jalv, const struct Port* port, float value)
+void
+Lv2Manager::print_control_value(Jalv* jalv, const struct Port* port, float value)
 {
 	const LilvNode* sym = lilv_port_get_symbol(jalv->plugin, port->lilv_port);
 	printf("%-*s = %f\n", jalv->longest_sym, lilv_node_as_string(sym), value);
@@ -470,7 +445,7 @@ jalv_ui_instantiate(Jalv* jalv, const char* native_ui_type, void* parent)
 		NS_EXT "instance-access", lilv_instance_get_handle(jalv->instance)
 	};
 	const LV2_Feature data_feature = {
-		LV2_DATA_ACCESS_URI, &ext_data
+		LV2_DATA_ACCESS_URI, &Lv2Manager::ext_data
 	};
 	const LV2_Feature idle_feature = {
 		LV2_UI__idleInterface, NULL
@@ -746,7 +721,7 @@ jalv_update(Jalv* jalv)
 		}
 
 		if (ev.protocol == 0 && jalv->opts.print_controls) {
-			print_control_value(jalv, &jalv->ports[ev.index], *(float*)buf);
+			Lv2Manager::print_control_value(jalv, &jalv->ports[ev.index], *(float*)buf);
 		}
 	}
 
@@ -794,10 +769,11 @@ Lv2Manager::Lv2Manager()
 {
 	memset(&jalv, '\0', sizeof(Jalv));
 	jalv.prog_name     = "lmms";
-	jalv.block_length  = 4096;  /* Should be set by backend */
+	jalv.block_length  = ConfigManager::inst()
+		->value("mixer", "framesperaudiobuffer").toInt();
 	jalv.midi_buf_size = 1024;  /* Should be set by backend */
 	jalv.play_state    = JALV_PAUSED;
-	jalv.bpm           = 120.0f;
+	jalv.bpm           = Engine::getSong()->getTempo();
 	jalv.control_in    = (uint32_t)-1;
 
 	suil_init(0, NULL, SUIL_ARG_NONE);

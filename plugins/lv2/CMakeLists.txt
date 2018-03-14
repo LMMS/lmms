@@ -1,4 +1,4 @@
-FILE(GLOB LV2_INTERNALS_SOURCES ./*h ./*c ./*.cpp **/*.h **/*.c **/*.cpp)
+FILE(GLOB LV2_INTERNALS_SOURCES ./*.h ./*.c ./*.cpp **/*.h **/*.c **/*.cpp)
 add_library(lv2internals STATIC
     ${LV2_INTERNALS_SOURCES}
 )

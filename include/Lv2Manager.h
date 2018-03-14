@@ -35,7 +35,40 @@ extern "C" {
 #include "jalv_internal.h"
 }
 
-class Lv2PluginInfo;
+#include "lv2/lv2plug.in/ns/ext/atom/atom.h"
+#include "lv2/lv2plug.in/ns/ext/buf-size/buf-size.h"
+#include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
+#include "lv2/lv2plug.in/ns/ext/event/event.h"
+#include "lv2/lv2plug.in/ns/ext/options/options.h"
+#include "lv2/lv2plug.in/ns/ext/parameters/parameters.h"
+#include "lv2/lv2plug.in/ns/ext/patch/patch.h"
+#include "lv2/lv2plug.in/ns/ext/port-groups/port-groups.h"
+#include "lv2/lv2plug.in/ns/ext/port-props/port-props.h"
+#include "lv2/lv2plug.in/ns/ext/presets/presets.h"
+#include "lv2/lv2plug.in/ns/ext/state/state.h"
+#include "lv2/lv2plug.in/ns/ext/time/time.h"
+#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
+#include "lv2/lv2plug.in/ns/ext/urid/urid.h"
+#include "lv2/lv2plug.in/ns/ext/worker/worker.h"
+#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
+
+/* Size factor for UI ring buffers.  The ring size is a few times the size of
+   an event output to give the UI a chance to keep up.  Experiments with Ingen,
+   which can highly saturate its event output, led me to this value.  It
+   really ought to be enough for anybody(TM).
+*/
+#define N_BUFFER_CYCLES 16
+
+#ifndef MIN
+#    define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#    define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
+#define NS_EXT "http://lv2plug.in/ns/ext/"
+
 
 //namespace Lilv {
 	//struct World;
@@ -53,7 +86,7 @@ public:
 
 	Jalv jalv;
 
-	QVector<Lv2PluginInfo*> getPlugins();
+	//QVector<Lv2PluginInfo*> getPlugins();
 
 	//Lilv::Plugin* getPlugin();
 
@@ -65,6 +98,13 @@ public:
 	const LilvPlugin* find_by_uri(const char* uri);
 
 	//LV2_Feature* const* getHostFeatures();
+	bool feature_is_supported(const char* uri);
+
+	static LV2_Extension_Data_Feature ext_data;
+
+	static const LV2_Feature* features[12];
+
+	static void print_control_value(Jalv* jalv, const struct Port* port, float value);
 
 private:
 	Lv2Manager();

@@ -216,7 +216,7 @@ int
 jalv_init(int* argc, char*** argv, JalvOptions* opts)
 {
 	app = new QApplication(*argc, *argv, true);
-	app->setStyleSheet("QGroupBox::title { subcontrol-position: top center }");
+	//app->setStyleSheet("QGroupBox::title { subcontrol-position: top center }");
 
 	return 0;
 }
@@ -596,31 +596,31 @@ jalv_open_ui(Jalv* jalv)
 	lilv_node_free(name);
 
 	win->setCentralWidget(widget);
-	app->connect(app, SIGNAL(lastWindowClosed()), app, SLOT(quit()));
+	//app->connect(app, SIGNAL(lastWindowClosed()), app, SLOT(quit()));
 
 	win->show();
-	if (jalv->ui_instance && !jalv_ui_is_resizable(jalv)) {
-		widget->setMinimumSize(widget->width(), widget->height());
-		widget->setMaximumSize(widget->width(), widget->height());
-		win->adjustSize();
-		win->setFixedSize(win->width(), win->height());
-	} else {
+	//if (jalv->ui_instance && !jalv_ui_is_resizable(jalv)) {
+		//widget->setMinimumSize(widget->width(), widget->height());
+		//widget->setMaximumSize(widget->width(), widget->height());
+		//win->adjustSize();
+		//win->setFixedSize(win->width(), win->height());
+	//} else {
 		win->resize(widget->width(),
 		            widget->height() + win->menuBar()->height());
-	}
+	//}
 
 	Timer* timer = new Timer(jalv);
 	timer->start(1000 / jalv->ui_update_hz);
 
-	int ret = app->exec();
-	zix_sem_post(jalv->done);
-	return ret;
+	//int ret = app->exec();
+	//zix_sem_post(jalv->done);
+	return 0;
 }
 
 int
 jalv_close_ui(Jalv* jalv)
 {
-	app->quit();
+	//app->quit();
 	return 0;
 }
 
