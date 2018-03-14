@@ -343,6 +343,7 @@ TrackOperationsWidget > QPushButton::menu-indicator {
 	subcontrol-position: center;
 	position: relative;
 	top: 2px;
+	left: 2px;
 }
 
 TrackOperationsWidget > QPushButton::menu-indicator:hover {
