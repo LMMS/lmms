@@ -9,17 +9,23 @@ QLabel, QTreeWidget, QListWidget, QGroupBox, QMenuBar {
 
 QTreeView {
 	outline: none;
-	font-size: 14px;
+	font-size: 12px;
+}
+
+QTreeWidget::item {
+	padding: 1px;
 }
 
 QTreeWidget::item:hover,
 QTreeWidget::branch:hover {
 	background-color: #3C444E;
+	padding-left: 0px;
 }
 
 QTreeWidget::item:selected,
 QTreeWidget::branch:selected {
 	background-color: #17793b;
+	padding-left: 0px;
 }
 
 QTreeView::branch:has-children:open {
