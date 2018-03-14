@@ -372,32 +372,35 @@ signals:
 
 
 
+template <typename T> class EXPORT TypedAutomatableModel : public AutomatableModel
+{
+public:
+	using AutomatableModel::AutomatableModel;
+	T value( int frameOffset = 0 ) const
+	{
+		return AutomatableModel::value<T>( frameOffset );
+	}
 
-#define defaultTypedMethods(type)								\
-	type value( int frameOffset = 0 ) const						\
-	{															\
-		return AutomatableModel::value<type>( frameOffset );	\
-	}															\
-																\
-	type initValue() const										\
-	{															\
-		return AutomatableModel::initValue<type>();				\
-	}															\
-																\
-	type minValue() const										\
-	{															\
-		return AutomatableModel::minValue<type>();				\
-	}															\
-																\
-	type maxValue() const										\
-	{															\
-		return AutomatableModel::maxValue<type>();				\
-	}															\
+	T initValue() const
+	{
+		return AutomatableModel::initValue<T>();
+	}
+
+	T minValue() const
+	{
+		return AutomatableModel::minValue<T>();
+	}
+
+	T maxValue() const
+	{
+		return AutomatableModel::maxValue<T>();
+	}
+};
 
 
 // some typed AutomatableModel-definitions
 
-class EXPORT FloatModel : public AutomatableModel
+class EXPORT FloatModel : public TypedAutomatableModel<float>
 {
 	Q_OBJECT
 public:
@@ -405,17 +408,15 @@ public:
 				Model * parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
 	float getRoundedValue() const;
 	int getDigitCount() const;
-	defaultTypedMethods(float);
-
 } ;
 
 
-class EXPORT IntModel : public AutomatableModel
+class EXPORT IntModel : public TypedAutomatableModel<int>
 {
 	Q_OBJECT
 public:
@@ -423,16 +424,13 @@ public:
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
 	{
 	}
-
-	defaultTypedMethods(int);
-
 } ;
 
 
-class EXPORT BoolModel : public AutomatableModel
+class EXPORT BoolModel : public TypedAutomatableModel<bool>
 {
 	Q_OBJECT
 public:
@@ -440,12 +438,9 @@ public:
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
 	{
 	}
-
-	defaultTypedMethods(bool);
-
 } ;
 
 typedef QMap<AutomatableModel*, float> AutomatedValueMap;
