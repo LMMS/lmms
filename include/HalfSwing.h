@@ -3,8 +3,8 @@
 
 #include <QObject>
 
+#include "AutomatableSlider.h"
 #include "Groove.h"
-#include "Knob.h"
 #include "lmms_basics.h"
 #include "MidiTime.h"
 #include "Note.h"
@@ -47,7 +47,7 @@ public slots:
 private:
 	int m_frames_per_tick;
 	int m_swingAmount;
-	float m_swingFactor;// =  (m_swingAmount / 127.0)
+	float m_swingFactor;// =  (m_swingAmount / 127)
 
 } ;
 
@@ -60,12 +60,12 @@ public:
 
 public slots:
 	void modelChanged();
-	void valueChanged(float);
+	void valueChanged(int);
 
 private:
 	HalfSwing * m_half_swing;
-	FloatModel * m_nobModel;
-	Knob * m_nob;
+	IntModel * m_sliderModel;
+	AutomatableSlider * m_slider;
 
 } ;
 

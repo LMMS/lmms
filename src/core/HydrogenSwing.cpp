@@ -26,10 +26,10 @@
 #include <QDomElement>
 #include <QLabel>
 
+//#include "AutomatableSlider.h"
 #include "Engine.h"
 #include "Groove.h"
 #include "HydrogenSwing.h"
-#include "Knob.h"
 #include "lmms_basics.h"
 #include "MidiTime.h"
 #include "Note.h"
@@ -44,7 +44,7 @@ HydrogenSwing::HydrogenSwing(QObject * _parent) :
 	Groove()
 {
 	m_swingAmount = 0;
-	m_swingFactor = 0;
+	m_swingFactor = 0.0;
 	init();
 	update();
 }
@@ -81,7 +81,7 @@ void HydrogenSwing::setAmount(int _amount)
 	if (_amount > 0 && _amount <= 127)
 	{
 		m_swingAmount = _amount;
-		m_swingFactor =  (((float)m_swingAmount) / 127.0);
+		m_swingFactor =  (((int)m_swingAmount) / 127);
 		emit swingAmountChanged(m_swingAmount);
 	}
 	else if (_amount  == 0)
@@ -195,33 +195,34 @@ QWidget * HydrogenSwing::instantiateView( QWidget * _parent )
 // VIEW //
 
 HydrogenSwingView::HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * _parent) :
-	QWidget( _parent )
+	QWidget(_parent)
 {
-	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
-	m_nob = new Knob(knobBright_26, this);
-	m_nob->setModel( m_nobModel );
-	m_nob->setLabel( tr( "Swinginess" ) );
-	m_nob->setEnabled(true);
-	m_nobModel->setValue(_hy_swing->amount());
+	m_sliderModel = new IntModel(0, 0, 127); // Unused
+	m_slider = new AutomatableSlider(this, tr("Swinginess"));
+	m_slider->setOrientation(Qt::Horizontal);
+	m_slider->setFixedSize( 90, 26 );
+	m_slider->setPageStep(1);
+	m_slider->setModel(m_sliderModel);
+	m_sliderModel->setValue(_hy_swing->amount());
 
 	m_hy_swing = _hy_swing;
 
-	connect(m_nob, SIGNAL(sliderMoved(float)), this, SLOT(valueChanged(float)));
-	connect(m_nobModel, SIGNAL( dataChanged() ), this, SLOT(modelChanged()) );
+	connect(m_slider, SIGNAL(sliderMoved(int)), this, SLOT(valueChanged(int)));
+	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
 }
 
 HydrogenSwingView::~HydrogenSwingView()
 {
-	delete m_nob;
-	delete m_nobModel;
+	delete m_slider;
+	delete m_sliderModel;
 }
 
 void HydrogenSwingView::modelChanged()
 {
-	m_hy_swing->setAmount((int)m_nobModel->value());
+	m_hy_swing->setAmount((int)m_sliderModel->value());
 }
 
-void HydrogenSwingView::valueChanged(float _f) // this value passed is gibberish
+void HydrogenSwingView::valueChanged(int _i) // this value passed is gibberish
 {
-	m_hy_swing->setAmount((int)m_nobModel->value());
+	m_hy_swing->setAmount((int)m_sliderModel->value());
 }

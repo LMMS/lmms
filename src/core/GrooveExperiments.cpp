@@ -25,10 +25,10 @@
 #include <QDomElement>
 #include <QLabel>
 
+//#include "AutomatableSlider.h"
 #include "Engine.h"
 #include "Groove.h"
 #include "GrooveExperiments.h"
-#include "Knob.h"
 #include "lmms_basics.h"
 #include "MidiTime.h"
 #include "Note.h"
@@ -42,7 +42,7 @@ GrooveExperiments::GrooveExperiments(QObject * _parent) :
 	Groove()
 {
 	m_shiftAmount = 0;
-	m_shiftFactor = 0;
+	m_shiftFactor = 0.0;
 	init();
 	update();
 }
@@ -79,7 +79,7 @@ void GrooveExperiments::setAmount(int _amount)
 	if (_amount > 0 && _amount <= 127)
 	{
 		m_shiftAmount = _amount;
-		m_shiftFactor =  (((float)m_shiftAmount) / 127.0);
+		m_shiftFactor =  (((int)m_shiftAmount) / 127);
 		emit shiftAmountChanged(m_shiftAmount);
 	}
 	else if (_amount  == 0)
@@ -153,12 +153,12 @@ int GrooveExperiments::isInTick(MidiTime * _cur_start, const fpp_t _frames, cons
 	// else no groove adjustments
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
 }
-
+// FIXME: Broken.
 void GrooveExperiments::saveSettings( QDomDocument & _doc, QDomElement & _element )
 {
 	_element.setAttribute("shiftAmount", m_shiftAmount);
 }
-
+// FIXME: Broken.
 void GrooveExperiments::loadSettings( const QDomElement & _this )
 {
 	bool ok;
@@ -183,34 +183,34 @@ QWidget * GrooveExperiments::instantiateView( QWidget * _parent )
 // VIEW //
 
 GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments * _ge, QWidget * _parent) :
-	QWidget( _parent )
+	QWidget(_parent)
 {
-	m_nobModel = new FloatModel(0.0, 0.0, 127.0, 1.0); // Unused
-	m_nob = new Knob(knobBright_26, this);
-	m_nob->setModel(m_nobModel);
-	m_nob->setLabel(tr("Shiftiness"));
-	m_nob->setEnabled(true);
-	m_nobModel->setValue(_ge->amount());
+	m_sliderModel = new IntModel(0, 0, 127); // Unused
+	m_slider = new AutomatableSlider(this, tr("Swinginess"));
+	m_slider->setOrientation(Qt::Horizontal);
+	m_slider->setFixedSize( 90, 26 );
+	m_slider->setPageStep(1);
+	m_slider->setModel(m_sliderModel);
+	m_sliderModel->setValue(_ge->amount());
 
 	m_ge = _ge;
 
-	connect(m_nob, SIGNAL(sliderMoved(float)), this, SLOT(valueChanged(float)));
-	connect(m_nobModel, SIGNAL( dataChanged() ), this, SLOT(modelChanged()) );
-
+	connect(m_slider, SIGNAL(sliderMoved(int)), this, SLOT(valueChanged(int)));
+	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
 }
 
 GrooveExperimentsView::~GrooveExperimentsView()
 {
-	delete m_nob;
-	delete m_nobModel;
+	delete m_slider;
+	delete m_sliderModel;
 }
 
 void GrooveExperimentsView::modelChanged()
 {
-	m_ge->setAmount((int)m_nobModel->value());
+	m_ge->setAmount((int)m_sliderModel->value());
 }
 
-void GrooveExperimentsView::valueChanged(float _f) // this value passed is gibberish
+void GrooveExperimentsView::valueChanged(int _i) // this value passed is gibberish
 {
-	m_ge->setAmount((int)m_nobModel->value());
+	m_ge->setAmount((int)m_sliderModel->value());
 }
