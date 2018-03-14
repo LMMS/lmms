@@ -3,7 +3,9 @@
 #include "GrooveFactory.h"
 
 #include "Groove.h"
+#include "GrooveExperiments.h"
 #include "MidiSwing.h"
+#include "HalfSwing.h"
 #include "HydrogenSwing.h"
 
 GrooveFactory::GrooveFactory()
@@ -25,6 +27,12 @@ Groove * GrooveFactory::create(QString _grooveType) {
 	}
 	if (_grooveType == "midi") {
 		return new MidiSwing();
+	}
+	if (_grooveType == "half") {
+		return new HalfSwing();
+	}
+	if (_grooveType == "experiment") {
+		return new GrooveExperiments();
 	}
 	return new Groove();
 }

@@ -37,12 +37,11 @@
 
 #include "stdio.h"
 
-GrooveExperiments::GrooveExperiments(QObject * _parent) :
-	QObject( _parent ),
-	Groove()
+GrooveExperiments::GrooveExperiments(QObject * parent) :
+	Groove(parent)
 {
-	m_shiftAmount = 0;
-	m_shiftFactor = 0.0;
+	m_amount = 0;
+	m_swingFactor = 0.0;
 	init();
 	update();
 }
@@ -63,40 +62,10 @@ void GrooveExperiments::init()
 
 }
 
-int GrooveExperiments::amount()
-{
-	return m_shiftAmount;
-}
-
 void GrooveExperiments::update()
 {
 	m_frames_per_tick =  Engine::framesPerTick();
 }
-
-void GrooveExperiments::setAmount(int _amount)
-{
-
-	if (_amount > 0 && _amount <= 127)
-	{
-		m_shiftAmount = _amount;
-		m_shiftFactor =  (((int)m_shiftAmount) / 127);
-		emit shiftAmountChanged(m_shiftAmount);
-	}
-	else if (_amount  == 0)
-	{
-		m_shiftAmount = 0;
-		m_shiftFactor =  0.0;
-		emit shiftAmountChanged(m_shiftAmount);
-	}
-	else
-	{
-		m_shiftAmount = 127;
-		m_shiftFactor =  1.0;
-		emit shiftAmountChanged(m_shiftAmount);
-	}
-
-}
-
 
 int GrooveExperiments::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset, Note * _n, Pattern * _p )
 {
@@ -129,7 +98,7 @@ int GrooveExperiments::isInTick(MidiTime * _cur_start, const fpp_t _frames, cons
 	if ( pos_in_eigth >= 0 ) 
 	{
 
-		float ticks_to_shift = ((pos_in_eigth - 12) * -m_shiftFactor);
+		float ticks_to_shift = ((pos_in_eigth - 12) * -m_swingFactor);
 		
 		f_cnt_t frames_to_shift = (int)(ticks_to_shift * m_frames_per_tick);
 		
@@ -152,25 +121,6 @@ int GrooveExperiments::isInTick(MidiTime * _cur_start, const fpp_t _frames, cons
 
 	// else no groove adjustments
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
-}
-// FIXME: Broken.
-void GrooveExperiments::saveSettings( QDomDocument & _doc, QDomElement & _element )
-{
-	_element.setAttribute("shiftAmount", m_shiftAmount);
-}
-// FIXME: Broken.
-void GrooveExperiments::loadSettings( const QDomElement & _this )
-{
-	bool ok;
-	int amount =  _this.attribute("shiftAmount").toInt(&ok);
-	if (ok)
-	{
-		setAmount(amount);
-	}
-	else
-	{
-		setAmount(0);
-	}
 }
 
 QWidget * GrooveExperiments::instantiateView( QWidget * _parent )

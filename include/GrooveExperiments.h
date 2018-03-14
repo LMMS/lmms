@@ -13,7 +13,7 @@
 /**
  * A groove thats new
  */
-class GrooveExperiments : public QObject, public Groove
+class GrooveExperiments : public Groove
 {
 	Q_OBJECT
 public:
@@ -22,12 +22,9 @@ public:
 	virtual ~GrooveExperiments();
 
 	void init();
-	int amount();
 
 	int isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset, Note * _n, Pattern * _p );
 
-	void loadSettings( const QDomElement & _this );
-	void saveSettings( QDomDocument & _doc, QDomElement & _element );
 	inline virtual QString nodeName() const
 	{
 		return "experiment";
@@ -37,20 +34,12 @@ public:
 
 	QWidget * instantiateView( QWidget * _parent );
 
-signals:
-	void shiftAmountChanged(int _newAmount);
-
-
 public slots:
 	// valid values are from 0 - 127
-	void setAmount(int _amount);
 	void update();
 
 private:
 	int m_frames_per_tick;
-	int m_shiftAmount;
-	float m_shiftFactor;// =  (m_shiftAmount / 127)
-
 } ;
 
 class GrooveExperimentsView : public QWidget

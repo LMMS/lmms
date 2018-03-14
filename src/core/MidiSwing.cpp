@@ -28,8 +28,7 @@
 #include "MidiSwing.h"
 
 MidiSwing::MidiSwing(QObject * _parent) :
-	QObject( _parent ),
-	Groove()
+	Groove(_parent)
 {
 }
 
@@ -70,16 +69,6 @@ int MidiSwing::isInTick(MidiTime * _cur_start, Note * _n, Pattern * _p )
 	int swingTicks = applyMidiSwing(pos_in_eigth);
 
 	return _cur_start->getTicks() == swingTicks + _n->pos().getTicks() ? 0 : -1;
-
-}
-
-void MidiSwing::saveSettings( QDomDocument & _doc, QDomElement & _element )
-{
-
-}
-
-void MidiSwing::loadSettings( const QDomElement & _this )
-{
 
 }
 

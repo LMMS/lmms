@@ -9,7 +9,8 @@
 #include "Pattern.h"
 #include "Song.h"
 
-Groove::Groove()
+Groove::Groove(QObject *parent) :
+	QObject(parent)
 {
 }
 
@@ -23,15 +24,40 @@ int Groove::isInTick(MidiTime * _cur_start, fpp_t _frames, f_cnt_t _offset,
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
 }
 
-
-void Groove::saveSettings( QDomDocument & _doc, QDomElement & _element )
+void Groove::setAmount(int amount)
 {
+
+	if (amount < 0) {
+		amount = 0;
+	}
+	if (amount > 127) {
+		amount = 127;
+	}
+
+	m_amount = amount;
+	m_swingFactor = ((float)m_amount) / 127.0f;
+	emit amountChanged(m_amount);
 
 }
 
-void Groove::loadSettings( const QDomElement & _this )
+void Groove::saveSettings(QDomDocument & doc, QDomElement & element )
 {
+	Q_UNUSED(doc);
+	element.setAttribute("amount", m_amount);
+}
 
+void Groove::loadSettings( const QDomElement & element )
+{
+	bool ok;
+	int amount = element.attribute("amount").toInt(&ok);
+	if (ok)
+	{
+		setAmount(amount);
+	}
+	else
+	{
+		setAmount(0);
+	}
 }
 
 QWidget * Groove::instantiateView( QWidget * _parent )

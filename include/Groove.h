@@ -35,11 +35,12 @@
 #include "Pattern.h"
 #include "SerializingObject.h"
 
-class Groove : public SerializingObject
+class Groove : public QObject, public SerializingObject
 {
+	Q_OBJECT
 
 public:
-	Groove();
+	Groove(QObject* parent = nullptr);
 
 	/*
 	 * Groove should return true if the note should be played in the curr_time tick,
@@ -56,9 +57,10 @@ public:
 	 */
 	virtual int isInTick( MidiTime * _cur_start, fpp_t _frames, f_cnt_t _offset,
 						Note * _n, Pattern * _p );
+	int amount() const {return m_amount;}
 
-	virtual void saveSettings( QDomDocument & _doc, QDomElement & _element );
-	virtual void loadSettings( const QDomElement & _this );
+	virtual void saveSettings( QDomDocument & doc, QDomElement & element );
+	virtual void loadSettings(const QDomElement & element );
 
 	virtual QWidget * instantiateView( QWidget * _parent );
 
@@ -66,6 +68,16 @@ public:
 	{
 		return "none";
 	}
+
+signals:
+	void amountChanged(int newAmount);
+
+public slots:
+	void setAmount(int amount);
+
+protected:
+	int m_amount;
+	float m_swingFactor; // = (m_amount / 127)
 };
 
 #endif // GROOVE_H

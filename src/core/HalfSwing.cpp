@@ -40,10 +40,9 @@
 
 
 HalfSwing::HalfSwing(QObject * _parent) :
-	QObject( _parent ),
-	Groove()
+	Groove(_parent)
 {
-	m_swingAmount = 0;
+	m_amount = 0;
 	m_swingFactor = 0.0;
 	init();
 	update();
@@ -65,38 +64,10 @@ void HalfSwing::init()
 
 }
 
-int HalfSwing::amount()
-{
-	return m_swingAmount;
-}
 
 void HalfSwing::update()
 {
 	m_frames_per_tick =  Engine::framesPerTick();
-}
-
-void HalfSwing::setAmount(int _amount)
-{
-
-	if (_amount > 0 && _amount <= 127)
-	{
-		m_swingAmount = _amount;
-		m_swingFactor =  (((int)m_swingAmount) / 127);
-		emit swingAmountChanged(m_swingAmount);
-	}
-	else if (_amount  == 0)
-	{
-		m_swingAmount = 0;
-		m_swingFactor =  0.0;
-		emit swingAmountChanged(m_swingAmount);
-	}
-	else
-	{
-		m_swingAmount = 127;
-		m_swingFactor =  1.0;
-		emit swingAmountChanged(m_swingAmount);
-	}
-
 }
 
 
@@ -158,25 +129,6 @@ int HalfSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_
 
 	// else no groove adjustments
 	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
-}
-// FIXME: Broken.
-void HalfSwing::saveSettings( QDomDocument & _doc, QDomElement & _element )
-{
-	_element.setAttribute("swingAmount", m_swingAmount);
-}
-// FIXME: Broken.
-void HalfSwing::loadSettings( const QDomElement & _this )
-{
-	bool ok;
-	int amount =  _this.attribute("swingAmount").toInt(&ok);
-	if (ok)
-	{
-		setAmount(amount);
-	}
-	else
-	{
-		setAmount(0);
-	}
 }
 
 QWidget * HalfSwing::instantiateView( QWidget * _parent )
