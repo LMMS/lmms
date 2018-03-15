@@ -32,7 +32,6 @@
 #include "gui_templates.h"
 #include "Knob.h"
 #include "TempoSyncKnob.h"
-#include "ToolTip.h"
 
 
 InstrumentFunctionNoteStackingView::InstrumentFunctionNoteStackingView( InstrumentFunctionNoteStacking* cc, QWidget* parent ) :

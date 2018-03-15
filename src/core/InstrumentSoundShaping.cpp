@@ -50,8 +50,8 @@ const QString InstrumentSoundShaping::targetNames[InstrumentSoundShaping::NumTar
 	InstrumentSoundShaping::tr( "Pitch" ),*/
 	{ InstrumentSoundShaping::tr( "CUTOFF" ), "cut",
 			InstrumentSoundShaping::tr( "Cutoff frequency" ) },
-	{ InstrumentSoundShaping::tr( "RESO" ), "res",
-			InstrumentSoundShaping::tr( "Resonance" ) }
+	{ InstrumentSoundShaping::tr( "Q/RESO" ), "res",
+			InstrumentSoundShaping::tr( "Q/Resonance" ) }
 } ;
  
 
@@ -79,25 +79,25 @@ InstrumentSoundShaping::InstrumentSoundShaping(
 			tr( targetNames[i][2].toUtf8().constData() ) );
 	}
 
-	m_filterModel.addItem( tr( "LowPass" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "HiPass" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "BandPass csg" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "BandPass czpg" ), new PixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Low-pass" ), new PixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "Hi-pass" ), new PixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Band-pass csg" ), new PixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "Band-pass czpg" ), new PixmapLoader( "filter_bp" ) );
 	m_filterModel.addItem( tr( "Notch" ), new PixmapLoader( "filter_notch" ) );
-	m_filterModel.addItem( tr( "Allpass" ), new PixmapLoader( "filter_ap" ) );
+	m_filterModel.addItem( tr( "All-pass" ), new PixmapLoader( "filter_ap" ) );
 	m_filterModel.addItem( tr( "Moog" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "2x LowPass" ), new PixmapLoader( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "RC LowPass 12dB" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC BandPass 12dB" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC HighPass 12dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "RC LowPass 24dB" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "RC BandPass 24dB" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "RC HighPass 24dB" ), new PixmapLoader( "filter_hp" ) );
-	m_filterModel.addItem( tr( "Vocal Formant Filter" ), new PixmapLoader( "filter_hp" ) );	
+	m_filterModel.addItem( tr( "2x Low-pass" ), new PixmapLoader( "filter_2lp" ) );
+	m_filterModel.addItem( tr( "RC Low-pass 12 dB/oct" ), new PixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC Band-pass 12 dB/oct" ), new PixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC High-pass 12 dB/oct" ), new PixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "RC Low-pass 24 dB/oct" ), new PixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "RC Band-pass 24 dB/oct" ), new PixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "RC High-pass 24 dB/oct" ), new PixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "Vocal Formant" ), new PixmapLoader( "filter_hp" ) );
 	m_filterModel.addItem( tr( "2x Moog" ), new PixmapLoader( "filter_2lp" ) );
-	m_filterModel.addItem( tr( "SV LowPass" ), new PixmapLoader( "filter_lp" ) );
-	m_filterModel.addItem( tr( "SV BandPass" ), new PixmapLoader( "filter_bp" ) );
-	m_filterModel.addItem( tr( "SV HighPass" ), new PixmapLoader( "filter_hp" ) );
+	m_filterModel.addItem( tr( "SV Low-pass" ), new PixmapLoader( "filter_lp" ) );
+	m_filterModel.addItem( tr( "SV Band-pass" ), new PixmapLoader( "filter_bp" ) );
+	m_filterModel.addItem( tr( "SV High-pass" ), new PixmapLoader( "filter_hp" ) );
 	m_filterModel.addItem( tr( "SV Notch" ), new PixmapLoader( "filter_notch" ) );
 	m_filterModel.addItem( tr( "Fast Formant" ), new PixmapLoader( "filter_hp" ) );
 	m_filterModel.addItem( tr( "Tripole" ), new PixmapLoader( "filter_lp" ) );

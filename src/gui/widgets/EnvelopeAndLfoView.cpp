@@ -97,7 +97,7 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_predelayKnob = new Knob( knobBright_26, this );
 	m_predelayKnob->setLabel( tr( "DEL" ) );
 	m_predelayKnob->move( PREDELAY_KNOB_X, ENV_KNOBS_Y );
-	m_predelayKnob->setHintText( tr( "Predelay:" ), "" );
+	m_predelayKnob->setHintText( tr( "Pre-delay:" ), "" );
 
 
 	m_attackKnob = new Knob( knobBright_26, this );
@@ -141,19 +141,19 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_lfoPredelayKnob = new Knob( knobBright_26, this );
 	m_lfoPredelayKnob->setLabel( tr( "DEL" ) );
 	m_lfoPredelayKnob->move( LFO_PREDELAY_KNOB_X, LFO_KNOB_Y );
-	m_lfoPredelayKnob->setHintText( tr( "LFO predelay:" ), "" );
+	m_lfoPredelayKnob->setHintText( tr( "Pre-delay:" ), "" );
 
 
 	m_lfoAttackKnob = new Knob( knobBright_26, this );
 	m_lfoAttackKnob->setLabel( tr( "ATT" ) );
 	m_lfoAttackKnob->move( LFO_ATTACK_KNOB_X, LFO_KNOB_Y );
-	m_lfoAttackKnob->setHintText( tr( "LFO- attack:" ), "" );
+	m_lfoAttackKnob->setHintText( tr( "Attack:" ), "" );
 
 
 	m_lfoSpeedKnob = new TempoSyncKnob( knobBright_26, this );
 	m_lfoSpeedKnob->setLabel( tr( "SPD" ) );
 	m_lfoSpeedKnob->move( LFO_SPEED_KNOB_X, LFO_KNOB_Y );
-	m_lfoSpeedKnob->setHintText( tr( "LFO speed:" ), "" );
+	m_lfoSpeedKnob->setHintText( tr( "Frequency:" ), "" );
 
 
 	m_lfoAmountKnob = new Knob( knobBright_26, this );
@@ -218,15 +218,15 @@ EnvelopeAndLfoView::EnvelopeAndLfoView( QWidget * _parent ) :
 	m_x100Cb = new LedCheckBox( tr( "FREQ x 100" ), this );
 	m_x100Cb->setFont( pointSizeF( m_x100Cb->font(), 6.5 ) );
 	m_x100Cb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 36 );
-	ToolTip::add( m_x100Cb, tr( "multiply LFO-frequency by 100" ) );
+	ToolTip::add( m_x100Cb, tr( "Multiply LFO frequency by 100" ) );
 
 
-	m_controlEnvAmountCb = new LedCheckBox( tr( "MODULATE ENV-AMOUNT" ),
+	m_controlEnvAmountCb = new LedCheckBox( tr( "MODULATE ENV AMOUNT" ),
 			this );
 	m_controlEnvAmountCb->move( LFO_PREDELAY_KNOB_X, LFO_GRAPH_Y + 54 );
 	m_controlEnvAmountCb->setFont( pointSizeF( m_controlEnvAmountCb->font(), 6.5 ) );
 	ToolTip::add( m_controlEnvAmountCb,
-				tr( "control envelope-amount by this LFO" ) );
+				tr( "Control envelope amount by this LFO" ) );
 
 
 	setAcceptDrops( true );
@@ -512,8 +512,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 		if( m_params->m_userWave.frames() <= 1 )
 		{
 			TextFloat::displayMessage( tr( "Hint" ),
-				tr( "Drag a sample from somewhere and drop "
-					"it in this window." ),
+				tr( "Drag and drop a sample in this window." ),
 					embed::getIconPixmap( "hint" ), 3000 );
 		}
 	}
