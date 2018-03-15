@@ -52,11 +52,11 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 	setFixedSize( 373, 109 );
 
 	makeknob( cut1Knob, 24, 26, m_cut1Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res1Knob, 74, 26, m_res1Model, tr( "RESO" ), tr( "Resonance" ), "" )
+	makeknob( res1Knob, 74, 26, m_res1Model, tr( "Q/RESO" ), tr( "Q/Resonance" ), "" )
 	makeknob( gain1Knob, 124, 26, m_gain1Model, tr( "GAIN" ), tr( "Gain" ), "%" )
 	makeknob( mixKnob, 173, 37, m_mixModel, tr( "MIX" ), tr( "Mix" ), "" )
 	makeknob( cut2Knob, 222, 26, m_cut2Model, tr( "FREQ" ), tr( "Cutoff frequency" ), "Hz" )
-	makeknob( res2Knob, 272, 26, m_res2Model, tr( "RESO" ), tr( "Resonance" ), "" )
+	makeknob( res2Knob, 272, 26, m_res2Model, tr( "Q/RESO" ), tr( "Q/Resonance" ), "" )
 	makeknob( gain2Knob, 322, 26, m_gain2Model, tr( "GAIN" ), tr( "Gain" ), "%" )
 
 	gain1Knob-> setVolumeKnob( true );
@@ -69,10 +69,10 @@ DualFilterControlDialog::DualFilterControlDialog( DualFilterControls* controls )
 
 	enabled1Toggle -> move( 12, 11 );
 	enabled1Toggle -> setModel( &controls -> m_enabled1Model );
-	ToolTip::add( enabled1Toggle, tr( "Enable/disable Filter 1" ) );
+	ToolTip::add( enabled1Toggle, tr( "Enable/disable filter 1" ) );
 	enabled2Toggle -> move( 210, 11 );
 	enabled2Toggle -> setModel( &controls -> m_enabled2Model );
-	ToolTip::add( enabled2Toggle, tr( "Enable/disable Filter 2" ) );
+	ToolTip::add( enabled2Toggle, tr( "Enable/disable filter 2" ) );
 
 	ComboBox * m_filter1ComboBox = new ComboBox( this );
 	m_filter1ComboBox->setGeometry( 19, 70, 137, 22 );
