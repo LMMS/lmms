@@ -96,7 +96,7 @@ DualFilterControls::DualFilterControls( DualFilterEffect* effect ) :
 	m_filter2Model.addItem( tr( "SV High-pass" ), make_unique<PixmapLoader>( "filter_hp" ) );
 	m_filter2Model.addItem( tr( "SV Notch" ), make_unique<PixmapLoader>( "filter_notch" ) );
 	m_filter2Model.addItem( tr( "Fast Formant" ), make_unique<PixmapLoader>( "filter_hp" ) );
-	m_filter2Model.addItem( tr( "Tripole" ), make_unique<PixmapLoader>( "filter_lp" ) )
+	m_filter2Model.addItem( tr( "Tripole" ), make_unique<PixmapLoader>( "filter_lp" ) );
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( updateFilters() ) );
 }
