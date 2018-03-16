@@ -968,6 +968,47 @@ void DataFile::upgrade_1_2_0_rc2_42()
 }
 
 
+/**
+ *  Helper function to call a functor for all effect ports' DomElements,
+ *  providing the functor with lists to add and remove DomElements. Helpful for
+ *  patching port values from savefiles.
+ */
+template<class Ftor>
+void iterate_ladspa_ports(QDomElement& effect, Ftor& ftor)
+{
+	// Head back up the DOM to upgrade ports
+	QDomNodeList ladspacontrols = effect.elementsByTagName( "ladspacontrols" );
+	for( int m = 0; !ladspacontrols.item( m ).isNull(); ++m )
+	{
+		QList<QDomElement> addList, removeList;
+		QDomElement ladspacontrol = ladspacontrols.item( m ).toElement();
+		for( QDomElement port = ladspacontrol.firstChild().toElement();
+			!port.isNull(); port = port.nextSibling().toElement() )
+		{
+			QStringList parts = port.tagName().split("port");
+			// Not a "port"
+			if ( parts.size() < 2 )
+			{
+				continue;
+			}
+			int num = parts[1].toInt();
+
+			ftor(port, num, addList, removeList);
+		}
+		// Add ports marked for adding
+		for ( QDomElement e : addList )
+		{
+			puts("ADD");
+			ladspacontrol.appendChild( e );
+		}
+		// Remove ports marked for removal
+		for ( QDomElement e : removeList )
+		{
+			ladspacontrol.removeChild( e );
+		}
+	}
+}
+
 void DataFile::upgrade_1_3_0()
 {
 	QDomNodeList list = elementsByTagName( "instrument" );
@@ -1009,6 +1050,7 @@ void DataFile::upgrade_1_3_0()
 				QDomNodeList attributes = key.elementsByTagName( "attribute" );
 				for( int k = 0; !attributes.item( k ).isNull(); ++k )
 				{
+					// Effect name changes
 					QDomElement attribute = attributes.item( k ).toElement();
 					if( attribute.attribute( "name" ) == "file" &&
 							( attribute.attribute( "value" ) == "calf" || 
@@ -1041,55 +1083,77 @@ void DataFile::upgrade_1_3_0()
 					{
 						attribute.setAttribute( "value", "MultibandLimiter" );
 					}
+
+
 					// Handle port changes
 					if( attribute.attribute( "name" ) == "plugin" &&
 							( attribute.attribute( "value" ) == "MultibandLimiter" ||
 							attribute.attribute( "value" ) == "MultibandCompressor" ||
 							attribute.attribute( "value" ) == "MultibandGate" ) )
 					{
-
-						// Head back up the DOM to upgrade ports
-						QDomNodeList ladspacontrols = effect.elementsByTagName( "ladspacontrols" );
-						for( int m = 0; !ladspacontrols.item( m ).isNull(); ++m )
+						auto fn = [&](QDomElement& port, int num, QList<QDomElement>&, QList<QDomElement>& removeList)
 						{
-							QList<QDomElement> removeList;
-							QDomElement ladspacontrol = ladspacontrols.item( m ).toElement();
-							for( QDomElement port = ladspacontrol.firstChild().toElement();
-								!port.isNull(); port = port.nextSibling().toElement() )
+							// Mark ports for removal
+							if ( num >= 18 && num <= 23 )
 							{
-								QStringList parts = port.tagName().split("port");
-								// Not a "port"
-								if ( parts.size() < 2 )
-								{
-									continue;
-								}
-								int num = parts[1].toInt();
-								// Leave as-is
-								if ( num <= 17 )
-								{
-									continue;
-								}
-								// Mark ports for removal
-								if ( num >= 18 && num <= 23 )
-								{
-									removeList << port;
-								}
-								// Bump higher ports up 6 positions
-								else if ( num >= 24 )
-								{
-									// port01...port010, etc
-									QString name( "port0" );
-									name.append( QString::number( num -6 ) );
-									port.setTagName( name );
-								}
+								removeList << port;
 							}
-							// Remove ports marked for removal
-							for ( QDomElement e : removeList )
+							// Bump higher ports up 6 positions
+							else if ( num >= 24 )
 							{
-								ladspacontrol.removeChild( e );
+								// port01...port010, etc
+								QString name( "port0" );
+								name.append( QString::number( num -6 ) );
+								port.setTagName( name );
 							}
-						}
+						};
+						iterate_ladspa_ports(effect, fn);
 					}
+
+					if( attribute.attribute( "name" ) == "plugin" &&
+							( attribute.attribute( "value" ) == "Pulsator" ) )
+					{
+						auto fn = [&](QDomElement& port, int num, QList<QDomElement>& addList, QList<QDomElement>& removeList)
+						{
+							switch(num)
+							{
+								case 16:
+								{
+									// old freq is now at port 25
+									QDomElement portCopy = createElement("port25");
+									portCopy.setAttribute("data", port.attribute("data"));
+									addList << portCopy;
+									// remove old freq port
+									removeList << port;
+									// set the "timing" port to choose port23+2=port25 (timing in Hz)
+									QDomElement timing = createElement("port22");
+									timing.setAttribute("data", 2);
+									addList << timing;
+									break;
+								}
+								// port 18 (modulation) => 17
+								case 17:
+									port.setTagName("port16");
+									break;
+								case 18:
+								{
+									// leave port 18 (offsetr), but add port 17 (offsetl)
+									QDomElement offsetl = createElement("port17");
+									offsetl.setAttribute("data", .0f);
+									addList << offsetl;
+									// additional: bash port 21 to 1
+									QDomElement pulsewidth = createElement("port21");
+									pulsewidth.setAttribute("data", 1.f);
+									addList << pulsewidth;
+									break;
+								}
+							}
+
+
+						};
+						iterate_ladspa_ports(effect, fn);
+					}
+
 				}
 			}
 		}
