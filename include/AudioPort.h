@@ -36,6 +36,9 @@ class EffectChain;
 class FloatModel;
 class BoolModel;
 
+// The AudioPort mixes the audio from the PlayHandle buffers,
+// then passes this buffer through the effect chain,
+// then the Volume and gain controls are applied.
 class AudioPort : public ThreadableJob
 {
 	MM_OPERATORS

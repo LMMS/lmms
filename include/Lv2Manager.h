@@ -84,36 +84,24 @@ public:
 		return instance;
 	}
 
-	Jalv jalv;
-
-	//QVector<Lv2PluginInfo*> getPlugins();
-
-	//Lilv::Plugin* getPlugin();
-
-	//inline Lilv::World* getWorld() const
-	//{
-		//return m_world;
-	//}
-
+	LilvWorld* world;
 	const LilvPlugin* find_by_uri(const char* uri);
 
 	//LV2_Feature* const* getHostFeatures();
 	bool feature_is_supported(const char* uri);
 
+	static const bool generic_ui = false;
+
 	static LV2_Extension_Data_Feature ext_data;
 
 	static const LV2_Feature* features[12];
 
-	static void print_control_value(Jalv* jalv, const struct Port* port, float value);
+	static void print_control_value(JalvPlugin* jalv, const struct Port* port, float value);
 
 private:
 	Lv2Manager();
 	Lv2Manager( Lv2Manager const& );
 	void operator=( Lv2Manager const& );
-	//QVector<Lv2PluginInfo*> collection;
-	//Lilv::World* m_world;
-
-	//void scanPlugins();
 };
 
 #endif

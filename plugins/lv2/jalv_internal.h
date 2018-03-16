@@ -58,7 +58,7 @@ extern "C" {
 
 typedef struct JalvBackend JalvBackend;
 
-typedef struct Jalv Jalv;
+typedef struct JalvPlugin JalvPlugin;
 
 enum PortFlow {
 	FLOW_UNKNOWN,
@@ -105,7 +105,7 @@ int scale_point_cmp(const ScalePoint* a, const ScalePoint* b);
 
 /** Plugin control. */
 typedef struct {
-	Jalv*       jalv;
+	JalvPlugin*       jalv;
 	ControlType type;
 	LilvNode*   node;
 	LilvNode*   symbol;          ///< Symbol
@@ -130,10 +130,10 @@ typedef struct {
 } ControlID;
 
 ControlID*
-new_port_control(Jalv* jalv, uint32_t index);
+new_port_control(JalvPlugin* jalv, uint32_t index);
 
 ControlID*
-new_property_control(Jalv* jalv, const LilvNode* property);
+new_property_control(JalvPlugin* jalv, const LilvNode* property);
 
 typedef struct {
 	size_t      n_controls;
@@ -157,9 +157,6 @@ typedef struct {
 } ControlChange;
 
 typedef struct {
-	char*    name;              ///< Client name
-	int      name_exact;        ///< Exit if name is taken
-	char*    uuid;              ///< Session UUID
 	char*    load;              ///< Path for state to load
 	char*    preset;            ///< URI of preset to load
 	char**   controls;          ///< Control values
@@ -172,7 +169,6 @@ typedef struct {
 	int      no_menu;           ///< Hide menu iff true
 	int      show_ui;           ///< Show non-embedded UI
 	int      print_controls;    ///< Print control changes to stdout
-	int      non_interactive;   ///< Do not listen for commands on stdin
 } JalvOptions;
 
 typedef struct {
@@ -254,7 +250,7 @@ typedef enum {
 } JalvPlayState;
 
 typedef struct {
-	Jalv*                       jalv;       ///< Pointer back to Jalv
+	JalvPlugin*                       jalv;       ///< Pointer back to Jalv
 	ZixRing*                    requests;   ///< Requests to the worker
 	ZixRing*                    responses;  ///< Responses from the worker
 	void*                       response;   ///< Worker response buffer
@@ -264,13 +260,12 @@ typedef struct {
 	bool                        threaded;   ///< Run work in another thread
 } JalvWorker;
 
-struct Jalv {
-	JalvOptions        opts;           ///< Command-line options
+struct JalvPlugin {
+	JalvOptions opts;
 	JalvURIDs          urids;          ///< URIDs
 	JalvNodes          nodes;          ///< Nodes
+	LilvWorld* world; // for convenience, points to Lv2Manager's world
 	LV2_Atom_Forge     forge;          ///< Atom forge
-	const char*        prog_name;      ///< Program name (argv[0])
-	LilvWorld*         world;          ///< Lilv World
 	LV2_URID_Map       map;            ///< URI => Int map
 	LV2_URID_Unmap     unmap;          ///< Int => URI map
 	SerdEnv*           env;            ///< Environment for RDF printing
@@ -278,7 +273,6 @@ struct Jalv {
 	Sratom*            ui_sratom;      ///< Atom serialiser for UI thread
 	Symap*             symap;          ///< URI map
 	ZixSem             symap_lock;     ///< Lock for URI map
-	JalvBackend*       backend;        ///< Audio system backend
 	ZixRing*           ui_events;      ///< Port events from UI
 	ZixRing*           plugin_events;  ///< Port events from plugin
 	void*              ui_event_buf;   ///< Buffer for reading UI port events
@@ -287,6 +281,7 @@ struct Jalv {
 	ZixSem             work_lock;      ///< Lock for plugin work() method
 	ZixSem*            done;           ///< Exit semaphore
 	ZixSem             paused;         ///< Paused signal from process thread
+	ZixSem exit_sem;  /**< Exit semaphore */
 	JalvPlayState      play_state;     ///< Current play state
 	char*              temp_dir;       ///< Temporary plugin state directory
 	char*              save_dir;       ///< Plugin save directory
@@ -315,45 +310,29 @@ struct Jalv {
 	float              bpm;            ///< Transport tempo in beats per minute
 	bool               rolling;        ///< Transport speed (0=stop, 1=play)
 	bool               buf_size_set;   ///< True iff buffer size callback fired
-	bool               exit;           ///< True iff execution is finished
 	bool               has_ui;         ///< True iff a control UI is present
 	bool               request_update; ///< True iff a plugin update is needed
 	bool               safe_restore;   ///< Plugin restore() is thread-safe
 };
 
-int
-jalv_init(int* argc, char*** argv, JalvOptions* opts);
-
-JalvBackend*
-jalv_backend_init(Jalv* jalv);
-
-void
-jalv_backend_activate(Jalv* jalv);
-
-void
-jalv_backend_deactivate(Jalv* jalv);
-
-void
-jalv_backend_close(Jalv* jalv);
-
 /** Expose a port to the system (if applicable) and connect it to its buffer. */
 void
-jalv_backend_activate_port(Jalv* jalv, uint32_t port_index);
+jalv_backend_activate_port(JalvPlugin* jalv, uint32_t port_index);
 
 void
-jalv_create_ports(Jalv* jalv);
+jalv_create_ports(JalvPlugin* jalv);
 
 void
-jalv_allocate_port_buffers(Jalv* jalv);
+jalv_allocate_port_buffers(JalvPlugin* jalv);
 
 struct Port*
-jalv_port_by_symbol(Jalv* jalv, const char* sym);
+jalv_port_by_symbol(JalvPlugin* jalv, const char* sym);
 
 void
-jalv_create_controls(Jalv* jalv, bool writable);
+jalv_create_controls(JalvPlugin* jalv, bool writable);
 
 ControlID*
-jalv_control_by_symbol(Jalv* jalv, const char* sym);
+jalv_control_by_symbol(JalvPlugin* jalv, const char* sym);
 
 void
 jalv_set_control(const ControlID* control,
@@ -362,27 +341,27 @@ jalv_set_control(const ControlID* control,
                  const void*      body);
 
 const char*
-jalv_native_ui_type(Jalv* jalv);
+jalv_native_ui_type(JalvPlugin* jalv);
 
 bool
-jalv_discover_ui(Jalv* jalv);
+jalv_discover_ui(JalvPlugin* jalv);
 
 int
-jalv_open_ui(Jalv* jalv);
+jalv_open_ui(JalvPlugin* jalv);
 
 void
-jalv_init_ui(Jalv* jalv);
+jalv_init_ui(JalvPlugin* jalv);
 
 int
-jalv_close_ui(Jalv* jalv);
+jalv_close_ui(JalvPlugin* jalv);
 
 void
-jalv_ui_instantiate(Jalv*       jalv,
+jalv_ui_instantiate(JalvPlugin*       jalv,
                     const char* native_ui_type,
                     void*       parent);
 
 bool
-jalv_ui_is_resizable(Jalv* jalv);
+jalv_ui_is_resizable(JalvPlugin* jalv);
 
 void
 jalv_ui_write(SuilController controller,
@@ -392,62 +371,62 @@ jalv_ui_write(SuilController controller,
               const void*    buffer);
 
 void
-jalv_apply_ui_events(Jalv* jalv, uint32_t nframes);
+jalv_apply_ui_events(JalvPlugin* jalv, uint32_t nframes);
 
 uint32_t
 jalv_ui_port_index(SuilController controller, const char* symbol);
 
 void
-jalv_ui_port_event(Jalv*       jalv,
+jalv_ui_port_event(JalvPlugin*       jalv,
                    uint32_t    port_index,
                    uint32_t    buffer_size,
                    uint32_t    protocol,
                    const void* buffer);
 
 bool
-jalv_send_to_ui(Jalv*       jalv,
+jalv_send_to_ui(JalvPlugin*       jalv,
                 uint32_t    port_index,
                 uint32_t    type,
                 uint32_t    size,
                 const void* body);
 bool
-jalv_run(Jalv* jalv, uint32_t nframes);
+jalv_run(JalvPlugin* jalv, uint32_t nframes);
 
 bool
-jalv_update(Jalv* jalv);
+jalv_update(JalvPlugin* jalv);
 
 int
-jalv_ui_resize(Jalv* jalv, int width, int height);
+jalv_ui_resize(JalvPlugin* jalv, int width, int height);
 
-typedef int (*PresetSink)(Jalv*           jalv,
+typedef int (*PresetSink)(JalvPlugin*           jalv,
                           const LilvNode* node,
                           const LilvNode* title,
                           void*           data);
 
 int
-jalv_load_presets(Jalv* jalv, PresetSink sink, void* data);
+jalv_load_presets(JalvPlugin* jalv, PresetSink sink, void* data);
 
 int
-jalv_unload_presets(Jalv* jalv);
+jalv_unload_presets(JalvPlugin* jalv);
 
 int
-jalv_apply_preset(Jalv* jalv, const LilvNode* preset);
+jalv_apply_preset(JalvPlugin* jalv, const LilvNode* preset);
 
 int
-jalv_delete_current_preset(Jalv* jalv);
+jalv_delete_current_preset(JalvPlugin* jalv);
 
 int
-jalv_save_preset(Jalv*       jalv,
+jalv_save_preset(JalvPlugin*       jalv,
                  const char* dir,
                  const char* uri,
                  const char* label,
                  const char* filename);
 
 void
-jalv_save(Jalv* jalv, const char* dir);
+jalv_save(JalvPlugin* jalv, const char* dir);
 
 void
-jalv_save_port_values(Jalv*           jalv,
+jalv_save_port_values(JalvPlugin*           jalv,
                       SerdWriter*     writer,
                       const SerdNode* subject);
 char*
@@ -455,7 +434,7 @@ jalv_make_path(LV2_State_Make_Path_Handle handle,
                const char*                path);
 
 void
-jalv_apply_state(Jalv* jalv, LilvState* state);
+jalv_apply_state(JalvPlugin* jalv, LilvState* state);
 
 char*
 atom_to_turtle(LV2_URID_Unmap* unmap,

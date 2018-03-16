@@ -28,7 +28,7 @@ scale_point_cmp(const ScalePoint* a, const ScalePoint* b)
 }
 
 ControlID*
-new_port_control(Jalv* jalv, uint32_t index)
+new_port_control(JalvPlugin* jalv, uint32_t index)
 {
 	struct Port*      port  = &jalv->ports[index];
 	const LilvPort*   lport = port->lilv_port;
@@ -56,16 +56,17 @@ new_port_control(Jalv* jalv, uint32_t index)
 
 	lilv_port_get_range(plug, lport, &id->def, &id->min, &id->max);
 	if (lilv_port_has_property(plug, lport, jalv->nodes.lv2_sampleRate)) {
+		LilvWorld* world = jalv->world;
 		/* Adjust range for lv2:sampleRate controls */
 		if (lilv_node_is_float(id->min) || lilv_node_is_int(id->min)) {
 			const float min = lilv_node_as_float(id->min) * jalv->sample_rate;
 			lilv_node_free(id->min);
-			id->min = lilv_new_float(jalv->world, min);
+			id->min = lilv_new_float(world, min);
 		}
 		if (lilv_node_is_float(id->max) || lilv_node_is_int(id->max)) {
 			const float max = lilv_node_as_float(id->max) * jalv->sample_rate;
 			lilv_node_free(id->max);
-			id->max = lilv_new_float(jalv->world, max);
+			id->max = lilv_new_float(world, max);
 		}
 	}
 
@@ -99,7 +100,7 @@ new_port_control(Jalv* jalv, uint32_t index)
 }
 
 static bool
-has_range(Jalv* jalv, const LilvNode* subject, const char* range_uri)
+has_range(JalvPlugin* jalv, const LilvNode* subject, const char* range_uri)
 {
 	LilvNode*  range  = lilv_new_uri(jalv->world, range_uri);
 	const bool result = lilv_world_ask(
@@ -109,7 +110,7 @@ has_range(Jalv* jalv, const LilvNode* subject, const char* range_uri)
 }
 
 ControlID*
-new_property_control(Jalv* jalv, const LilvNode* property)
+new_property_control(JalvPlugin* jalv, const LilvNode* property)
 {
 	ControlID* id = (ControlID*)calloc(1, sizeof(ControlID));
 	id->jalv     = jalv;

@@ -35,9 +35,9 @@ jalv_vprintf(LV2_Log_Handle handle,
              va_list        ap)
 {
 	// TODO: Lock
-	Jalv* jalv  = (Jalv*)handle;
+	JalvPlugin* jalv  = (JalvPlugin*)handle;
 	bool  fancy = true;
-	if (type == jalv->urids.log_Trace && jalv->opts.trace) {
+	if (type == jalv->urids.log_Trace) {
 		jalv_ansi_start(stderr, 32);
 		fprintf(stderr, "trace: ");
 	} else if (type == jalv->urids.log_Error) {

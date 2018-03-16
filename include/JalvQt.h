@@ -68,18 +68,18 @@ class PresetAction : public QAction
 	Q_OBJECT
 
 public:
-	PresetAction(QObject* parent, Jalv* jalv, LilvNode* preset);
+	PresetAction(QObject* parent, JalvPlugin* jalv, LilvNode* preset);
 
 public slots:
 	void presetChosen();
 
 private:
-	Jalv*     _jalv;
+	JalvPlugin*     _jalv;
 	LilvNode* _preset;
 };
 
 typedef struct {
-	Jalv*        jalv;
+	JalvPlugin*        jalv;
 	struct Port* port;
 } PortContainer;
 

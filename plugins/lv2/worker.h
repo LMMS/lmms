@@ -19,7 +19,7 @@
 #include "jalv_internal.h"
 
 void
-jalv_worker_init(Jalv*                       jalv,
+jalv_worker_init(JalvPlugin*                       jalv,
                  JalvWorker*                 worker,
                  const LV2_Worker_Interface* iface,
                  bool                        threaded);

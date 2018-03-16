@@ -34,9 +34,16 @@
 #include "JournallingObject.h"
 #include "RemotePlugin.h"
 
+extern "C" {
+#include "jalv_internal.h"
+#include "zix/sem.h"
+}
+
 namespace Lilv {
 	struct Instance;
 }
+
+typedef struct JalvPlugin JalvPlugin;
 
 class Lv2Instrument : public Instrument
 {
@@ -64,6 +71,7 @@ private:
 	//void closePlugin();
 
 	const LilvPlugin* m_plugin;
+	JalvPlugin jalvPlugin;
 	QMutex m_pluginMutex;
 	Lilv::Instance * m_instance;
 

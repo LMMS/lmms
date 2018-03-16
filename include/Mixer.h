@@ -65,7 +65,8 @@ const Octaves BaseOctave = DefaultOctave;
 
 class MixerWorkerThread;
 
-
+// The Mixer removes PlayHandles when notes have stopped,
+// and adds new PlayHandles where required, i.e Note On
 class EXPORT Mixer : public QObject
 {
 	Q_OBJECT

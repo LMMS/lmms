@@ -31,13 +31,10 @@ static void*
 worker_func(void* data)
 {
 	JalvWorker* worker = (JalvWorker*)data;
-	Jalv*       jalv   = worker->jalv;
+	JalvPlugin*       jalv   = worker->jalv;
 	void*       buf    = NULL;
 	while (true) {
 		zix_sem_wait(&worker->sem);
-		if (jalv->exit) {
-			break;
-		}
 
 		uint32_t size = 0;
 		zix_ring_read(worker->requests, (char*)&size, sizeof(size));
@@ -61,7 +58,7 @@ worker_func(void* data)
 }
 
 void
-jalv_worker_init(Jalv*                       jalv,
+jalv_worker_init(JalvPlugin*                       jalv,
                  JalvWorker*                 worker,
                  const LV2_Worker_Interface* iface,
                  bool                        threaded)
@@ -98,7 +95,7 @@ jalv_worker_schedule(LV2_Worker_Schedule_Handle handle,
                      const void*                data)
 {
 	JalvWorker* worker = (JalvWorker*)handle;
-	Jalv*       jalv   = worker->jalv;
+	JalvPlugin*       jalv   = worker->jalv;
 	if (worker->threaded) {
 		// Schedule a request to be executed by the worker thread
 		zix_ring_write(worker->requests, (const char*)&size, sizeof(size));

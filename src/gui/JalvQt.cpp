@@ -14,6 +14,7 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 #include "JalvQt.h"
+#include "Lv2Manager.h"
 
 #define CONTROL_WIDTH 150
 #define DIAL_STEPS    10000
@@ -191,7 +192,7 @@ FlowLayout::smartSpacing(QStyle::PixelMetric pm) const
 	}
 }
 
-PresetAction::PresetAction(QObject* parent, Jalv* jalv, LilvNode* preset)
+PresetAction::PresetAction(QObject* parent, JalvPlugin* jalv, LilvNode* preset)
 		: QAction(parent)
 		, _jalv(jalv)
 		, _preset(preset)
@@ -212,17 +213,9 @@ void PresetAction::presetChosen() {
 
 extern "C" {
 
-int
-jalv_init(int* argc, char*** argv, JalvOptions* opts)
-{
-	app = new QApplication(*argc, *argv, true);
-	//app->setStyleSheet("QGroupBox::title { subcontrol-position: top center }");
-
-	return 0;
-}
 
 const char*
-jalv_native_ui_type(Jalv* jalv)
+jalv_native_ui_type(JalvPlugin* jalv)
 {
 #if QT_VERSION >= 0x050000
 	return "http://lv2plug.in/ns/extensions/ui#Qt5UI";
@@ -232,7 +225,7 @@ jalv_native_ui_type(Jalv* jalv)
 }
 
 int
-jalv_ui_resize(Jalv* jalv, int width, int height)
+jalv_ui_resize(JalvPlugin* jalv, int width, int height)
 {
 	if (jalv->ui_instance && width > 0 && height > 0) {
 		QWidget* widget = (QWidget*)suil_instance_get_widget(jalv->ui_instance);
@@ -244,7 +237,7 @@ jalv_ui_resize(Jalv* jalv, int width, int height)
 }
 
 void
-jalv_ui_port_event(Jalv*       jalv,
+jalv_ui_port_event(JalvPlugin*       jalv,
                    uint32_t    port_index,
                    uint32_t    buffer_size,
                    uint32_t    protocol,
@@ -264,18 +257,18 @@ jalv_ui_port_event(Jalv*       jalv,
 class Timer : public QTimer
 {
 public:
-	explicit Timer(Jalv* jalv) : _jalv(jalv) {}
+	explicit Timer(JalvPlugin* jalv) : _jalv(jalv) {}
 
 	void timerEvent(QTimerEvent* e) {
 		jalv_update(_jalv);
 	}
 
 private:
-	Jalv* _jalv;
+	JalvPlugin* _jalv;
 };
 
 static int
-add_preset_to_menu(Jalv*           jalv,
+add_preset_to_menu(JalvPlugin*           jalv,
                    const LilvNode* node,
                    const LilvNode* title,
                    void*           data)
@@ -470,7 +463,7 @@ Control::dialChanged(int dialValue)
 static bool
 portGroupLessThan(const PortContainer &p1, const PortContainer &p2)
 {
-	Jalv*           jalv  = p1.jalv;
+	JalvPlugin*           jalv  = p1.jalv;
 	const LilvPort* port1 = p1.port->lilv_port;
 	const LilvPort* port2 = p2.port->lilv_port;
 
@@ -490,15 +483,14 @@ portGroupLessThan(const PortContainer &p1, const PortContainer &p2)
 }
 
 static QWidget*
-build_control_widget(Jalv* jalv)
+build_control_widget(JalvPlugin* jalv)
 {
 	const LilvPlugin* plugin = jalv->plugin;
-	LilvWorld*        world  = jalv->world;
+	LilvWorld*        world  = Lv2Manager::getInstance().world;
 
 	QList<PortContainer> portContainers;
 	for (unsigned i = 0; i < jalv->num_ports; ++i) {
-		if (!jalv->opts.show_hidden &&
-		    lilv_port_has_property(plugin, jalv->ports[i].lilv_port,
+		if (lilv_port_has_property(plugin, jalv->ports[i].lilv_port,
 		                           jalv->nodes.pprops_notOnGUI)) {
 			continue;
 		}
@@ -554,13 +546,13 @@ build_control_widget(Jalv* jalv)
 }
 
 bool
-jalv_discover_ui(Jalv* jalv)
+jalv_discover_ui(JalvPlugin* jalv)
 {
 	return true;
 }
 
 int
-jalv_open_ui(Jalv* jalv)
+jalv_open_ui(JalvPlugin* jalv)
 {
 	QMainWindow* win          = new QMainWindow();
 	QMenu*       file_menu    = win->menuBar()->addMenu("&File");
@@ -574,7 +566,7 @@ jalv_open_ui(Jalv* jalv)
 
 	jalv_load_presets(jalv, add_preset_to_menu, presets_menu);
 
-	if (jalv->ui && !jalv->opts.generic_ui) {
+	if (jalv->ui && !Lv2Manager::generic_ui) {
 		jalv_ui_instantiate(jalv, jalv_native_ui_type(jalv), win);
 	}
 
@@ -618,7 +610,7 @@ jalv_open_ui(Jalv* jalv)
 }
 
 int
-jalv_close_ui(Jalv* jalv)
+jalv_close_ui(JalvPlugin* jalv)
 {
 	//app->quit();
 	return 0;

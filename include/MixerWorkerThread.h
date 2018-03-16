@@ -33,6 +33,9 @@ class QWaitCondition;
 class Mixer;
 class ThreadableJob;
 
+//  responsible for running the PlayHandles,
+//  these are all started, then we simply wait for all
+//  play handles to finish
 class MixerWorkerThread : public QThread
 {
 public:

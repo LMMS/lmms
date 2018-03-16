@@ -61,7 +61,7 @@ char*
 jalv_make_path(LV2_State_Make_Path_Handle handle,
                const char*                path)
 {
-	Jalv* jalv = (Jalv*)handle;
+	JalvPlugin* jalv = (JalvPlugin*)handle;
 
 	// Create in save directory if saving, otherwise use temp directory
 	return jalv_strjoin(jalv->save_dir ? jalv->save_dir : jalv->temp_dir, path);
@@ -73,7 +73,7 @@ get_port_value(const char* port_symbol,
                uint32_t*   size,
                uint32_t*   type)
 {
-	Jalv*        jalv = (Jalv*)user_data;
+	JalvPlugin*        jalv = (JalvPlugin*)user_data;
 	struct Port* port = jalv_port_by_symbol(jalv, port_symbol);
 	if (port && port->flow == FLOW_INPUT && port->type == TYPE_CONTROL) {
 		*size = sizeof(float);
@@ -85,7 +85,7 @@ get_port_value(const char* port_symbol,
 }
 
 void
-jalv_save(Jalv* jalv, const char* dir)
+jalv_save(JalvPlugin* jalv, const char* dir)
 {
 	jalv->save_dir = jalv_strjoin(dir, "/");
 
@@ -105,7 +105,7 @@ jalv_save(Jalv* jalv, const char* dir)
 }
 
 int
-jalv_load_presets(Jalv* jalv, PresetSink sink, void* data)
+jalv_load_presets(JalvPlugin* jalv, PresetSink sink, void* data)
 {
 	LilvNodes* presets = lilv_plugin_get_related(jalv->plugin,
 	                                             jalv->nodes.pset_Preset);
@@ -133,7 +133,7 @@ jalv_load_presets(Jalv* jalv, PresetSink sink, void* data)
 }
 
 int
-jalv_unload_presets(Jalv* jalv)
+jalv_unload_presets(JalvPlugin* jalv)
 {
 	LilvNodes* presets = lilv_plugin_get_related(jalv->plugin,
 	                                             jalv->nodes.pset_Preset);
@@ -153,7 +153,7 @@ set_port_value(const char* port_symbol,
                uint32_t    size,
                uint32_t    type)
 {
-	Jalv*        jalv = (Jalv*)user_data;
+	JalvPlugin*        jalv = (JalvPlugin*)user_data;
 	struct Port* port = jalv_port_by_symbol(jalv, port_symbol);
 	if (!port) {
 		fprintf(stderr, "error: Preset port `%s' is missing\n", port_symbol);
@@ -196,7 +196,7 @@ set_port_value(const char* port_symbol,
 }
 
 void
-jalv_apply_state(Jalv* jalv, LilvState* state)
+jalv_apply_state(JalvPlugin* jalv, LilvState* state)
 {
 	bool must_pause = !jalv->safe_restore && jalv->play_state == JALV_RUNNING;
 	if (state) {
@@ -216,7 +216,7 @@ jalv_apply_state(Jalv* jalv, LilvState* state)
 }
 
 int
-jalv_apply_preset(Jalv* jalv, const LilvNode* preset)
+jalv_apply_preset(JalvPlugin* jalv, const LilvNode* preset)
 {
 	lilv_state_free(jalv->preset);
 	jalv->preset = lilv_state_new_from_world(jalv->world, &jalv->map, preset);
@@ -225,7 +225,7 @@ jalv_apply_preset(Jalv* jalv, const LilvNode* preset)
 }
 
 int
-jalv_save_preset(Jalv*       jalv,
+jalv_save_preset(JalvPlugin*       jalv,
                  const char* dir,
                  const char* uri,
                  const char* label,
@@ -251,7 +251,7 @@ jalv_save_preset(Jalv*       jalv,
 }
 
 int
-jalv_delete_current_preset(Jalv* jalv)
+jalv_delete_current_preset(JalvPlugin* jalv)
 {
 	if (!jalv->preset) {
 		return 1;

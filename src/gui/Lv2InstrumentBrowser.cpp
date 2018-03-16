@@ -189,7 +189,7 @@ void Lv2InstrumentBrowser::addItems()
 {
 	Lv2Manager & manager =  Lv2Manager::getInstance();
 	const LilvPlugins* plugins = lilv_world_get_all_plugins(
-			manager.jalv.world);
+			manager.world);
 	QRegExp rx(tr(".+#([a-zA-Z]+)"));
 	for (LilvIter* it = lilv_plugins_begin(plugins);
       !lilv_plugins_is_end(plugins, it);
