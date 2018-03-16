@@ -26,6 +26,8 @@
 #ifndef NOTE_PLAY_HANDLE_H
 #define NOTE_PLAY_HANDLE_H
 
+#include <memory>
+
 #include "AtomicInt.h"
 #include "BasicFilters.h"
 #include "Note.h"
@@ -46,7 +48,7 @@ class EXPORT NotePlayHandle : public PlayHandle, public Note
 	MM_OPERATORS
 public:
 	void * m_pluginData;
-	BasicFilters<> * m_filter;
+	std::unique_ptr<BasicFilters<>> m_filter;
 
 	// specifies origin of NotePlayHandle
 	enum Origins

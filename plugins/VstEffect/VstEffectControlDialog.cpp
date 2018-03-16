@@ -178,7 +178,10 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		_ctl->m_selPresetButton->setCursor( Qt::PointingHandCursor );
 		_ctl->m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
 
- 		_ctl->m_selPresetButton->setMenu(_ctl->menu);
+		QMenu * menu = new QMenu;
+		connect( menu, SIGNAL( aboutToShow() ), _ctl, SLOT( updateMenu() ) );
+
+ 		_ctl->m_selPresetButton->setMenu(menu);
 
 		_ctl->m_selPresetButton->setMinimumWidth( 16 );
 		_ctl->m_selPresetButton->setMaximumWidth( 16 );

@@ -189,7 +189,7 @@ MidiTime AutomationPattern::timeMapLength() const
 {
 	if( m_timeMap.isEmpty() ) return 0;
 	timeMap::const_iterator it = m_timeMap.end();
-	return MidiTime( qMax( MidiTime( (it-1).key() ).getTact() + 1, 1 ), 0 );
+	return MidiTime( MidiTime( (it-1).key() ).nextFullTact(), 0 );
 }
 
 

@@ -225,9 +225,9 @@ bool ConfigManager::hasWorkingDir() const
 }
 
 
-void ConfigManager::setWorkingDir( const QString & _wd )
+void ConfigManager::setWorkingDir( const QString & wd )
 {
-	m_workingDir = ensureTrailingSlash( _wd );
+	m_workingDir = ensureTrailingSlash( QFileInfo( wd ).canonicalFilePath() );
 }
 
 
@@ -553,6 +553,8 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 	}
 #endif
 
+	upgrade();
+
 	QStringList searchPaths;
 	if(! qgetenv("LMMS_THEME_PATH").isNull())
 		searchPaths << qgetenv("LMMS_THEME_PATH");
@@ -564,8 +566,6 @@ void ConfigManager::loadConfigFile( const QString & configFile )
 	{
 		createWorkingDir();
 	}
-
-	upgrade();
 }
 
 
