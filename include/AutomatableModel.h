@@ -96,11 +96,6 @@ public:
 	virtual ~AutomatableModel();
 
 
-	static float copiedValue()
-	{
-		return s_copiedValue;
-	}
-
 	bool isAutomated() const;
 	bool isAutomatedOrControlled() const
 	{
@@ -288,8 +283,6 @@ public:
 
 public slots:
 	virtual void reset();
-	virtual void copyValue();
-	virtual void pasteValue();
 	void unlinkControllerConnection();
 
 
@@ -351,8 +344,6 @@ private:
 	//! NULL if not appended to controller, otherwise connection info
 	ControllerConnection* m_controllerConnection;
 
-
-	static float s_copiedValue;
 
 	ValueBuffer m_valueBuffer;
 	long m_lastUpdatedPeriod;
