@@ -1,5 +1,4 @@
 /*
-/*
  * LfoControllerDialog.cpp - per-controller-specific view for changing a
  *                           controller's settings
  *
