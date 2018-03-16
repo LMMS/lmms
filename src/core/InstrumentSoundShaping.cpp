@@ -161,9 +161,9 @@ void InstrumentSoundShaping::processAudioBuffer( sampleFrame* buffer,
 		int old_filter_cut = 0;
 		int old_filter_res = 0;
 
-		if( n->m_filter == NULL )
+		if( n->m_filter == nullptr )
 		{
-			n->m_filter = new BasicFilters<>( Engine::mixer()->processingSampleRate() );
+			n->m_filter = make_unique<BasicFilters<>>( Engine::mixer()->processingSampleRate() );
 		}
 		n->m_filter->setFilterType( m_filterModel.value() );
 

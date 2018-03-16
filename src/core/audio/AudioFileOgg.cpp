@@ -31,6 +31,7 @@
 #ifdef LMMS_HAVE_OGGVORBIS
 
 
+#include <string>
 #include <vorbis/vorbisenc.h>
 
 #include "Mixer.h"
@@ -71,9 +72,9 @@ bool AudioFileOgg::startEncoding()
 {
 	vorbis_comment vc;
 	const char * comments = "Cool=This song has been made using LMMS";
-	int comment_length = strlen( comments );
-	char * user_comments = new char[comment_length + 1];
-	strcpy( user_comments, comments );
+	std::string user_comments_str(comments);
+	int comment_length = user_comments_str.size();
+	char * user_comments = &user_comments_str[0];
 
 	vc.user_comments = &user_comments;
 	vc.comment_lengths = &comment_length;
@@ -113,7 +114,6 @@ bool AudioFileOgg::startEncoding()
 		printf( "Mode initialization failed: invalid parameters for "
 								"bitrate\n" );
 		vorbis_info_clear( &m_vi );
-		delete[] user_comments;
 		return false;
 	}
 
@@ -169,12 +169,10 @@ bool AudioFileOgg::startEncoding()
 		{
 			// clean up
 			finishEncoding();
-			delete[] user_comments;
 			return false;
 		}
 	}
 
-	delete[] user_comments;
 	return true;
 }
 
