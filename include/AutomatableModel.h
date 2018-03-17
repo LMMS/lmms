@@ -252,11 +252,6 @@ public:
 
 	float globalAutomationValueAt( const MidiTime& time );
 
-	bool hasStrictStepSize() const
-	{
-		return m_hasStrictStepSize;
-	}
-
 	void setStrictStepSize( const bool b )
 	{
 		m_hasStrictStepSize = b;
