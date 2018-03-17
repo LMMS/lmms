@@ -77,21 +77,7 @@ public:
 		Decibel
 	};
 
-	enum DataType
-	{
-		Float,
-		Integer,
-		Bool
-	} ;
-
-	AutomatableModel( DataType type,
-						const float val = 0,
-						const float min = 0,
-						const float max = 0,
-						const float step = 0,
-						Model* parent = NULL,
-						const QString& displayName = QString(),
-						bool defaultConstructed = false );
+public:
 
 	virtual ~AutomatableModel();
 
@@ -244,7 +230,7 @@ public:
 		return "automatablemodel";
 	}
 
-	QString displayValue( const float val ) const;
+	virtual QString displayValue( const float val ) const = 0;
 
 	bool hasLinkedModels() const
 	{
@@ -294,6 +280,15 @@ public slots:
 
 
 protected:
+	// Not meant to be directly instantiated
+	AutomatableModel(
+						const float val = 0,
+						const float min = 0,
+						const float max = 0,
+						const float step = 0,
+						Model* parent = NULL,
+						const QString& displayName = QString(),
+						bool defaultConstructed = false );
 	//! returns a value which is in range between min() and
 	//! max() and aligned according to the step size (step size 0.05 -> value
 	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
@@ -324,7 +319,6 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	DataType m_dataType;
 	ScaleType m_scaleType; //! scale type, linear by default
 	float m_value;
 	float m_initValue;
@@ -405,11 +399,12 @@ public:
 				Model * parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
+		AutomatableModel( val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
 	float getRoundedValue() const;
 	int getDigitCount() const;
+	QString displayValue( const float val ) const override;
 	defaultTypedMethods(float);
 
 } ;
@@ -423,9 +418,10 @@ public:
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
+		AutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
 	{
 	}
+	QString displayValue( const float val ) const override;
 
 	defaultTypedMethods(int);
 
@@ -440,9 +436,10 @@ public:
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		AutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
+		AutomatableModel( val, false, true, 1, parent, displayName, defaultConstructed )
 	{
 	}
+	QString displayValue( const float val ) const override;
 
 	defaultTypedMethods(bool);
 

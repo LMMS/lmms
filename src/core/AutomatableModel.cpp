@@ -36,11 +36,10 @@ long AutomatableModel::s_periodCounter = 0;
 
 
 
-AutomatableModel::AutomatableModel( DataType type,
+AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
-	m_dataType( type ),
 	m_scaleType( Linear ),
 	m_minValue( min ),
 	m_maxValue( max ),
@@ -269,19 +268,6 @@ float AutomatableModel::inverseScaledValue( float value ) const
 	return m_scaleType == Linear
 		? value
 		: ::linearToLogScale( minValue<float>(), maxValue<float>(), value );
-}
-
-
-
-QString AutomatableModel::displayValue( const float val ) const
-{
-	switch( m_dataType )
-	{
-		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
-		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
-		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
-	}
-	return "0";
 }
 
 
@@ -728,3 +714,19 @@ int FloatModel::getDigitCount() const
 	return digits;
 }
 
+
+
+QString FloatModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<float>( scaledValue( val ) ) );
+}
+
+QString IntModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<int>( scaledValue( val ) ) );
+}
+
+QString BoolModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<bool>( scaledValue( val ) ) );
+}
