@@ -118,7 +118,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( m_hasLinkedModels || m_controllerConnection != NULL ) )
+		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -234,7 +234,7 @@ public:
 
 	bool hasLinkedModels() const
 	{
-		return m_hasLinkedModels;
+		return !m_linkedModels.empty();
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -334,7 +334,6 @@ private:
 	bool m_hasStrictStepSize;
 
 	AutoModelVector m_linkedModels;
-	bool m_hasLinkedModels;
 
 
 	//! NULL if not appended to controller, otherwise connection info

@@ -49,7 +49,6 @@ AutomatableModel::AutomatableModel(
 	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
-	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
@@ -397,7 +396,6 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 	if( !m_linkedModels.contains( model ) && model != this )
 	{
 		m_linkedModels.push_back( model );
-		m_hasLinkedModels = true;
 
 		if( !model->hasLinkedModels() )
 		{
@@ -416,7 +414,6 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 	{
 		m_linkedModels.erase( it );
 	}
-	m_hasLinkedModels = !m_linkedModels.isEmpty();
 }
 
 
@@ -448,8 +445,6 @@ void AutomatableModel::unlinkAllModels()
 	{
 		unlinkModels( this, model );
 	}
-
-	m_hasLinkedModels = false;
 }
 
 
@@ -552,7 +547,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		}
 	}
 	AutomatableModel* lm = NULL;
-	if( m_hasLinkedModels )
+	if( hasLinkedModels() )
 	{
 		lm = m_linkedModels.first();
 	}
