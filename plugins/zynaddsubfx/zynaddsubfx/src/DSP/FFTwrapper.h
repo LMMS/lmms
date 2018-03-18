@@ -49,5 +49,24 @@ class FFTwrapper
         fftwf_plan     planfftw, planfftw_inv;
 };
 
+/*
+ * The "std::polar" template has no clear definition for the range of
+ * the input parameters, and some C++ standard library implementations
+ * don't accept negative amplitude among others. Define our own
+ * FFTpolar template, which works like we expect it to.
+ */
+template<class _Tp>
+std::complex<_Tp>
+FFTpolar(const _Tp& __rho, const _Tp& __theta = _Tp(0))
+{
+        _Tp __x = __rho * cos(__theta);
+        if (std::isnan(__x))
+                __x = 0;
+        _Tp __y = __rho * sin(__theta);
+        if (std::isnan(__y))
+                __y = 0;
+        return std::complex<_Tp>(__x, __y);
+}
+
 void FFT_cleanup();
 #endif
