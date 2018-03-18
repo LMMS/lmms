@@ -24,6 +24,7 @@
 #ifndef FFT_WRAPPER_H
 #define FFT_WRAPPER_H
 #include <fftw3.h>
+#include <cmath>
 #include <complex>
 typedef float	fftw_real;
 typedef std::complex<fftw_real> fft_t;
