@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PITCHBEND_HELPER_H
-#define PITCHBEND_HELPER_H
+#ifndef DETUNING_HELPER_H
+#define DETUNING_HELPER_H
 
 #include "InlineAutomation.h"
 #include "MemoryManager.h"
