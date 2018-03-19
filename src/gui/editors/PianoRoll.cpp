@@ -49,7 +49,7 @@
 #include "Clipboard.h"
 #include "ComboBox.h"
 #include "debug.h"
-#include "PitchBendHelper.h"
+#include "DetuningHelper.h"
 #include "embed.h"
 #include "GuiApplication.h"
 #include "gui_templates.h"
@@ -876,7 +876,7 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 
 
-void PianoRoll::drawPitchBendInfo( QPainter & _p, const Note * _n, int _x,
+void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 								int _y ) const
 {
 	int middle_y = _y + KEY_LINE_HEIGHT / 2;
@@ -885,7 +885,7 @@ void PianoRoll::drawPitchBendInfo( QPainter & _p, const Note * _n, int _x,
 	int old_x = 0;
 	int old_y = 0;
 
-	timeMap & map = _n->pitchBend()->automationPattern()->getTimeMap();
+	timeMap & map = _n->detuning()->automationPattern()->getTimeMap();
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
 		int pos_ticks = it.key();
@@ -901,7 +901,7 @@ void PianoRoll::drawPitchBendInfo( QPainter & _p, const Note * _n, int _x,
 
 		if( old_x != 0 && old_y != 0 )
 		{
-			switch( _n->pitchBend()->automationPattern()->progressionType() )
+			switch( _n->detuning()->automationPattern()->progressionType() )
 			{
 			case AutomationPattern::DiscreteProgression:
 				_p.drawLine( old_x, old_y, pos_x, old_y );
@@ -1336,21 +1336,21 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 		return;
 	}
 
-	if( m_editMode == ModeEditPitchBend && noteUnderMouse() )
+	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
-		static AutomationPattern* pitchBendPattern = nullptr;
-		if (pitchBendPattern != nullptr)
+		static AutomationPattern* detuningPattern = nullptr;
+		if (detuningPattern != nullptr)
 		{
-			pitchBendPattern->disconnect(this);
+			detuningPattern->disconnect(this);
 		}
 		Note* n = noteUnderMouse();
-		if (n->pitchBend() == nullptr)
+		if (n->detuning() == nullptr)
 		{
-			n->createPitchBend();
+			n->createDetuning();
 		}
-		pitchBendPattern = n->pitchBend()->automationPattern();
-		connect(pitchBendPattern, SIGNAL(dataChanged()), this, SLOT(update()));
-		gui->automationEditor()->open(pitchBendPattern);
+		detuningPattern = n->detuning()->automationPattern();
+		connect(detuningPattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		gui->automationEditor()->open(detuningPattern);
 		return;
 	}
 
@@ -3048,9 +3048,9 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			editHandles << QPoint ( x + noteEditLeft(),
 						editHandleTop );
 
-			if( note->hasPitchBendInfo() )
+			if( note->hasDetuningInfo() )
 			{
-				drawPitchBendInfo( p, note,
+				drawDetuningInfo( p, note,
 					x + WHITE_KEY_WIDTH,
 					y_base - key * KEY_LINE_HEIGHT );
 			}
@@ -3137,7 +3137,7 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			break;
 		case ModeErase: cursor = s_toolErase; break;
 		case ModeSelect: cursor = s_toolSelect; break;
-		case ModeEditPitchBend: cursor = s_toolOpen; break;
+		case ModeEditDetuning: cursor = s_toolOpen; break;
 	}
 	if( cursor != NULL )
 	{
@@ -4115,7 +4115,7 @@ PianoRollWindow::PianoRollWindow() :
 	pitchBendAction->setWhatsThis(
 		tr( "Click here and Pitch Bend Mode will be activated. "
 			"In this mode you can click a note to open its "
-			"automation pitch bend. You can utilize this to slide "
+			"automation detuning. You can utilize this to slide "
 			"notes from one to another. You can also press "
 			"'Shift+T' on your keyboard to activate this mode." ) );
 

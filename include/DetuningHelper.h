@@ -1,5 +1,5 @@
 /*
- * PitchBendHelper.h - pitch bend automation helper
+ * DetuningHelper.h - detuning automation helper
  *
  * Copyright (c) 2007 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2008-2010 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -29,17 +29,17 @@
 #include "InlineAutomation.h"
 #include "MemoryManager.h"
 
-class PitchBendHelper : public InlineAutomation
+class DetuningHelper : public InlineAutomation
 {
 	Q_OBJECT
 	MM_OPERATORS
 public:
-	PitchBendHelper() :
+	DetuningHelper() :
 		InlineAutomation()
 	{
 	}
 
-	virtual ~PitchBendHelper()
+	virtual ~DetuningHelper()
 	{
 	}
 
@@ -50,12 +50,12 @@ public:
 
 	virtual QString displayName() const
 	{
-		return tr( "Note pitch bend" );
+		return tr( "Note detuning" );
 	}
 
 	inline virtual QString nodeName() const
 	{
-		return "pitch bend";
+		return "detuning";
 	}
 
 } ;
