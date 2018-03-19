@@ -74,7 +74,7 @@ public:
 		ModeDraw,
 		ModeErase,
 		ModeSelect,
-		ModeEditPitchBend,
+		ModeEditDetuning,
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
