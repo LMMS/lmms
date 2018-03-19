@@ -25,7 +25,7 @@
 
 #include "NotePlayHandle.h"
 #include "BasicFilters.h"
-#include "PitchBendHelper.h"
+#include "DetuningHelper.h"
 #include "InstrumentSoundShaping.h"
 #include "InstrumentTrack.h"
 #include "Instrument.h"
@@ -33,8 +33,8 @@
 #include "Song.h"
 
 
-NotePlayHandle::BasePitchBend::BasePitchBend( PitchBendHelper *pitchBend ) :
-	m_value( pitchBend ? pitchBend->automationPattern()->valueAt( 0 ) : 0 )
+NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
+	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {
 }
 
@@ -51,7 +51,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 								int midiEventChannel,
 								Origin origin ) :
 	PlayHandle( TypeNotePlayHandle, _offset ),
-	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.pitchBend() ),
+	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
 	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
@@ -72,7 +72,7 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	m_origBaseNote( instrumentTrack->baseNote() ),
 	m_frequency( 0 ),
 	m_unpitchedFrequency( 0 ),
-	m_basePitchBend( NULL ),
+	m_baseDetuning( NULL ),
 	m_songGlobalParentOffset( 0 ),
 	m_midiChannel( midiEventChannel >= 0 ? midiEventChannel : instrumentTrack->midiPort()->realOutputChannel() ),
 	m_origin( origin ),
@@ -81,12 +81,12 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	lock();
 	if( hasParent() == false )
 	{
-		m_basePitchBend = new BasePitchBend( pitchBend() );
+		m_baseDetuning = new BaseDetuning( detuning() );
 		m_instrumentTrack->m_processHandles.push_back( this );
 	}
 	else
 	{
-		m_basePitchBend = parent->m_basePitchBend;
+		m_baseDetuning = parent->m_baseDetuning;
 
 		parent->m_subNotes.push_back( this );
 		parent->m_hadChildren = true;
@@ -135,7 +135,7 @@ NotePlayHandle::~NotePlayHandle()
 
 	if( hasParent() == false )
 	{
-		delete m_basePitchBend;
+		delete m_baseDetuning;
 		m_instrumentTrack->m_processHandles.removeAll( this );
 	}
 	else
@@ -508,7 +508,7 @@ void NotePlayHandle::updateFrequency()
 		( key() -
 				m_instrumentTrack->baseNoteModel()->value() +
 				mp +
-				m_basePitchBend->value() )
+				m_baseDetuning->value() )
 												 / 12.0f;
 	m_frequency = BaseFreq * powf( 2.0f, pitch + m_instrumentTrack->pitchModel()->value() / ( 100 * 12.0f ) );
 	m_unpitchedFrequency = BaseFreq * powf( 2.0f, pitch );
@@ -524,12 +524,12 @@ void NotePlayHandle::updateFrequency()
 
 void NotePlayHandle::processMidiTime( const MidiTime& time )
 {
-	if( pitchBend() && time >= songGlobalParentOffset()+pos() )
+	if( detuning() && time >= songGlobalParentOffset()+pos() )
 	{
-		const float v = pitchBend()->automationPattern()->valueAt( time - songGlobalParentOffset() - pos() );
-		if( !typeInfo<float>::isEqual( v, m_basePitchBend->value() ) )
+		const float v = detuning()->automationPattern()->valueAt( time - songGlobalParentOffset() - pos() );
+		if( !typeInfo<float>::isEqual( v, m_baseDetuning->value() ) )
 		{
-			m_basePitchBend->setValue( v );
+			m_baseDetuning->setValue( v );
 			updateFrequency();
 		}
 	}

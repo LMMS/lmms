@@ -33,7 +33,7 @@
 #include "MidiTime.h"
 #include "SerializingObject.h"
 
-class PitchBendHelper;
+class DetuningHelper;
 
 
 enum Keys
@@ -74,7 +74,7 @@ const int KeysPerOctave = WhiteKeysPerOctave + BlackKeysPerOctave;
 const int NumKeys = NumOctaves * KeysPerOctave;
 const int DefaultKey = DefaultOctave*KeysPerOctave + Key_A;
 
-const float MaxPitchBend = 4 * 12.0f;
+const float MaxDetuning = 4 * 12.0f;
 
 
 
@@ -86,7 +86,7 @@ public:
 		int key = DefaultKey,
 		volume_t volume = DefaultVolume,
 		panning_t panning = DefaultPanning,
-		PitchBendHelper * pitchBend = NULL );
+		DetuningHelper * detuning = NULL );
 	Note( const Note & note );
 	virtual ~Note();
 
@@ -207,14 +207,14 @@ public:
 
 	static MidiTime quantized( const MidiTime & m, const int qGrid );
 
-	PitchBendHelper * pitchBend() const
+	DetuningHelper * detuning() const
 	{
-		return m_pitchBend;
+		return m_detuning;
 	}
-	bool hasPitchBendInfo() const;
+	bool hasDetuningInfo() const;
 	bool withinRange(int tickStart, int tickEnd) const;
 
-	void createPitchBend();
+	void createDetuning();
 
 
 protected:
@@ -235,7 +235,7 @@ private:
 	panning_t m_panning;
 	MidiTime m_length;
 	MidiTime m_pos;
-	PitchBendHelper * m_pitchBend;
+	DetuningHelper * m_detuning;
 };
 
 

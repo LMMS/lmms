@@ -628,7 +628,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 					_frames / frames_per_tick ) );
 	}
 
-	// Handle automation: pitch bend
+	// Handle automation: detuning
 	for( NotePlayHandleList::Iterator it = m_processHandles.begin();
 					it != m_processHandles.end(); ++it )
 	{
@@ -688,7 +688,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 			if( _tco_num < 0 )
 			{
 				// then set song-global offset of pattern in order to
-				// properly perform the note pitch bend
+				// properly perform the note detuning
 				notePlayHandle->setSongGlobalParentOffset( p->startPosition() );
 			}
 
