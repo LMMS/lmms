@@ -143,9 +143,10 @@ private slots:
 		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
 		notePattern->changeLength(MidiTime(4, 0));
 		Note* note = notePattern->addNote(Note(MidiTime(4, 0)), false);
-		note->createPitchBend();
+		note->createDetuning();
+		
+ 		DetuningHelper* dh = note->detuning();
 
-		DetuningHelper* dh = note->pitchBend();
 		auto pattern = dh->automationPattern();
 		pattern->setProgressionType( AutomationPattern::LinearProgression );
 		pattern->putValue(MidiTime(0, 0), 0.0);
