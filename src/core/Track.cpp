@@ -857,9 +857,8 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<TrackContentObject *> tcos;
-		MidiTime dtick;
-		int smallestPos;
-		dtick = MidiTime( static_cast<int>( dx *
+		int smallestPos = 0;
+		MidiTime dtick = MidiTime( static_cast<int>( dx *
 					MidiTime::ticksPerTact() / ppt ) );
 		if( snap )
 		{
