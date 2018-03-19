@@ -144,7 +144,6 @@ private slots:
 		notePattern->changeLength(MidiTime(4, 0));
 		Note* note = notePattern->addNote(Note(MidiTime(4, 0)), false);
 		note->createDetuning();
-		
  		DetuningHelper* dh = note->detuning();
 		auto pattern = dh->automationPattern();
 		pattern->setProgressionType( AutomationPattern::LinearProgression );
