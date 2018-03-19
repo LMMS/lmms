@@ -145,7 +145,7 @@ private slots:
 		Note* note = notePattern->addNote(Note(MidiTime(4, 0)), false);
 		note->createPitchBend();
 
-		DetuningHelper* dh = note->pitchBend();
+		PitchBendHelper* dh = note->pitchBend();
 		auto pattern = dh->automationPattern();
 		pattern->setProgressionType( AutomationPattern::LinearProgression );
 		pattern->putValue(MidiTime(0, 0), 0.0);
