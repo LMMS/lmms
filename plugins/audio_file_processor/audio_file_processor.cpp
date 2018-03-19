@@ -97,13 +97,13 @@ audioFileProcessor::audioFileProcessor( InstrumentTrack * _instrument_track ) :
 				this, SLOT( loopPointChanged() ) );
 	connect( &m_stutterModel, SIGNAL( dataChanged() ),
 	    		this, SLOT( stutterModelChanged() ) );
-
+	    		
 //interpolation modes
 	m_interpolationModel.addItem( tr( "None" ) );
 	m_interpolationModel.addItem( tr( "Linear" ) );
 	m_interpolationModel.addItem( tr( "Sinc" ) );
 	m_interpolationModel.setValue( 1 );
-
+	
 	pointChanged();
 }
 
@@ -156,7 +156,7 @@ void audioFileProcessor::playNote( NotePlayHandle * _n,
 				srcmode = SRC_SINC_MEDIUM_QUALITY;
 				break;
 		}
-		_n->m_pluginData = new handleState( _n->hasPitchBendInfo(), srcmode );
+		_n->m_pluginData = new handleState( _n->hasDetuningInfo(), srcmode );
 		((handleState *)_n->m_pluginData)->setFrameIndex( m_nextPlayStartPoint );
 		((handleState *)_n->m_pluginData)->setBackwards( m_nextPlayBackwards );
 
@@ -364,7 +364,7 @@ void audioFileProcessor::stutterModelChanged()
 }
 
 
-void audioFileProcessor::startPointChanged( void )
+void audioFileProcessor::startPointChanged( void ) 
 {
 	// check if start is over end and swap values if so
 	if( m_startPointModel.value() > m_endPointModel.value() )
@@ -391,7 +391,7 @@ void audioFileProcessor::startPointChanged( void )
 	{
 		m_endPointModel.setValue( qMin( m_endPointModel.value() + 0.001f, 1.0f ) );
 	}
-
+	
 	pointChanged();
 
 }
@@ -1327,3 +1327,7 @@ Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
 
 
 }
+
+
+
+
