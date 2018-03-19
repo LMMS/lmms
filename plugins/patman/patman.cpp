@@ -420,7 +420,7 @@ void patmanInstrument::selectSample( NotePlayHandle * _n )
 	{
 		hdata->sample = new SampleBuffer( NULL, 0 );
 	}
-	hdata->state = new SampleBuffer::handleState( _n->hasPitchBendInfo() );
+	hdata->state = new SampleBuffer::handleState( _n->hasDetuningInfo() );
 
 	_n->m_pluginData = hdata;
 }
