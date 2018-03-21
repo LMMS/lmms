@@ -835,10 +835,23 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			m_trackView->trackContainerView()->currentPosition()+
 				static_cast<int>( x * MidiTime::ticksPerTact() /
 									ppt ) );
+		MidiTime offset = m_tco->startPosition() -
+					m_tco->startPosition().toNearestTact();
 		if( ! ( me->modifiers() & Qt::ControlModifier )
 		   && me->button() == Qt::NoButton )
 		{
-			t = t.toNearestTact();
+			if( me->modifiers() & Qt::ShiftModifier )
+			{
+				t = t.toNearestTact();
+			}
+			else
+			{
+				t = t.toNearestTact() + offset;
+			}
+			while( t < 0 )
+			{
+				t += MidiTime::ticksPerTact();
+			}
 		}
 		m_tco->movePosition( t );
 		m_trackView->getTrackContentWidget()->changePosition();
@@ -851,11 +864,26 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 	}
 	else if( m_action == MoveSelection )
 	{
+		// find out if we have moved by testing the grabbed tco with the
+		// same algorithm as 'm_action == Move' from above
+		const int x = mapToParent( me->pos() ).x() - m_initialMousePos.x();
+		MidiTime oldTime = m_tco->startPosition();
+		MidiTime newTime = qMax( 0, (int)
+			m_trackView->trackContainerView()->currentPosition()+
+				static_cast<int>( x * MidiTime::ticksPerTact() /
+									ppt ) );
+		if( oldTime.toNearestTact() == newTime.toNearestTact() )
+		{
+			// the grabbed tco didn't move so neither do the rest
+			return;
+		}
+
+		// calculate move
 		const int dx = me->x() - m_initialMousePos.x();
 		QVector<selectableObject *> so =
 			m_trackView->trackContainerView()->selectedObjects();
 		QVector<TrackContentObject *> tcos;
-		MidiTime smallest_pos, t;
+		MidiTime smallest_pos, t, offset;
 		// find out smallest position of all selected objects for not
 		// moving an object before zero
 		for( QVector<selectableObject *>::iterator it = so.begin();
@@ -874,16 +902,25 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				static_cast<int>( dx *
 					MidiTime::ticksPerTact() / ppt ) );
 		}
+
+		// don't move any part ahead of song start
+		if( smallest_pos < 0 )
+		{
+			return;
+		}
+
 		for( QVector<TrackContentObject *>::iterator it = tcos.begin();
 							it != tcos.end(); ++it )
 		{
-			t = ( *it )->startPosition() +
-				static_cast<int>( dx *MidiTime::ticksPerTact() /
-					 ppt )-smallest_pos;
+			MidiTime start = ( *it )->startPosition();
+			offset = start - start.toNearestTact();
+			t = start - smallest_pos;
+			// find directon with dx and add/subtract ticksPerTact()
+			t += dx > 0 ? MidiTime::ticksPerTact() : -MidiTime::ticksPerTact();
 			if( ! ( me->modifiers() & Qt::AltModifier )
 					   && me->button() == Qt::NoButton )
 			{
-				t = t.toNearestTact();
+				t = t.toNearestTact() + offset;
 			}
 			( *it )->movePosition( t );
 		}
