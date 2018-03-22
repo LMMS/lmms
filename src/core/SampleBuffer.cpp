@@ -1416,7 +1416,6 @@ QString SampleBuffer::tryToMakeRelative( const QString & file )
 	if( QFileInfo( file ).isRelative() == false )
 	{
 		// Normalize the path
-		QFileInfo fileInfo( file );
 		QString f( QDir::cleanPath( file ) + QDir::separator() + QFileInfo( file ).fileName() );
 		f.replace( QDir::separator(), '/' );
 
