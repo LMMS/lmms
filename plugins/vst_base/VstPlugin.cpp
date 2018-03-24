@@ -656,6 +656,10 @@ void VstPlugin::createUI( QWidget * parent )
 #ifdef LMMS_BUILD_LINUX
 	if (m_embedMethod == "xembed" )
 	{
+		if (parent)
+		{
+			parent->setAttribute(Qt::WA_NativeWindow);
+		}
 		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( parent );
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
@@ -671,8 +675,6 @@ void VstPlugin::createUI( QWidget * parent )
 	container->setWindowTitle( name() );
 
 	m_pluginWidget = container;
-
-	container->setFixedSize( m_pluginGeometry );
 }
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
