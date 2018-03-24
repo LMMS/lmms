@@ -64,7 +64,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		if (embed_vst) {
 			if (! m_plugin->pluginWidget()) {
-				m_plugin->createUI(nullptr);
+				m_plugin->createUI(this);
 			}
 			m_pluginWidget = m_plugin->pluginWidget();
 		}
