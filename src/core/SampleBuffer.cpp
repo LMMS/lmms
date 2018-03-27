@@ -1425,7 +1425,7 @@ QString SampleBuffer::tryToMakeRelative( const QString & file )
 		// Iterate over all valid "data:/" searchPaths
 		for ( const QString & path : QDir::searchPaths( "data" ) )
 		{
-			QString samplesPath = QString( path + samplesSuffix ).replace( QDir::separator(), '/' );
+			QString samplesPath = QDir::cleanPath( path + samplesSuffix ) + "/";
 			if ( f.startsWith( samplesPath ) )
 			{
 				return QString( f ).mid( samplesPath.length() );
