@@ -18,20 +18,20 @@ GrooveFactory::GrooveFactory()
  *
  * TODO this is a bit Java-like how does C++ do this kind of thing normally
  */
-Groove * GrooveFactory::create(QString _grooveType) {
-	if (_grooveType == NULL || _grooveType == "none") {
+Groove * GrooveFactory::create(QString grooveType) {
+	if (grooveType == NULL || grooveType == "none") {
 		return new Groove();
 	}
-	if (_grooveType == "hydrogen") {
+	if (grooveType == "hydrogen") {
 		return new HydrogenSwing();
 	}
-	if (_grooveType == "midi") {
+	if (grooveType == "midi") {
 		return new MidiSwing();
 	}
-	if (_grooveType == "half") {
+	if (grooveType == "half") {
 		return new HalfSwing();
 	}
-	if (_grooveType == "experiment") {
+	if (grooveType == "experiment") {
 		return new GrooveExperiments();
 	}
 	return new Groove();

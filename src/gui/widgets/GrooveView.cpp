@@ -25,28 +25,28 @@ GrooveView::GrooveView(QWidget * parent) :
 	QWidget(parent)
 {
 	m_layout = new QVBoxLayout();
-	this->setLayout( m_layout );
+	this->setLayout(m_layout);
 
 	m_comboBox = new QComboBox(this);
 	// Insert reverse order.
-	m_comboBox->insertItem(0, tr("Experiment swing") , QVariant::fromValue(5) );
-	m_comboBox->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(4) );
-	m_comboBox->insertItem(0, tr("Half swing") , QVariant::fromValue(3) );
-	m_comboBox->insertItem(0, tr("MIDI swing") , QVariant::fromValue(2) );
-	m_comboBox->insertItem(0, tr("No swing") , QVariant::fromValue(1) );
+	m_comboBox->insertItem(0, tr("Experiment swing") , QVariant::fromValue(5));
+	m_comboBox->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(4));
+	m_comboBox->insertItem(0, tr("Half swing") , QVariant::fromValue(3));
+	m_comboBox->insertItem(0, tr("MIDI swing") , QVariant::fromValue(2));
+	m_comboBox->insertItem(0, tr("No swing") , QVariant::fromValue(1));
 	m_comboBox->setCurrentIndex(0);
 
-	m_layout->addWidget( m_comboBox );
-	m_layout->addWidget( new QLabel("") );
+	m_layout->addWidget(m_comboBox);
+	m_layout->addWidget(new QLabel(""));
 
-	connect( m_comboBox, SIGNAL( activated(int) ),
-			this, SLOT( grooveChanged(int) ) );
+	connect(m_comboBox, SIGNAL(activated(int)),
+			this, SLOT(grooveChanged(int)));
 
-	connect( Engine::getSong(), SIGNAL( dataChanged() ),
-			this, SLOT( update() ) );
+	connect(Engine::getSong(), SIGNAL(dataChanged()),
+			this, SLOT(update()));
 
-	connect( Engine::getSong(), SIGNAL( projectLoaded() ),
-			this, SLOT( update() ) );
+	connect(Engine::getSong(), SIGNAL(projectLoaded()),
+			this, SLOT(update()));
 
 	update();
 }

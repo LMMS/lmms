@@ -18,10 +18,10 @@ Groove::Groove(QObject *parent) :
  * Default groove is no groove. Not even a wiggle.
  * @return 0 or -1
  */
-int Groove::isInTick(MidiTime * _cur_start, fpp_t _frames, f_cnt_t _offset,
-						 Note * _n, Pattern * _p ) {
+int Groove::isInTick(MidiTime * curStart, fpp_t frames, f_cnt_t offset,
+						Note * n, Pattern * p) {
 
-	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
+	return n->pos().getTicks() == curStart->getTicks() ? 0 : -1;
 }
 
 void Groove::setAmount(int amount)
@@ -40,13 +40,13 @@ void Groove::setAmount(int amount)
 
 }
 
-void Groove::saveSettings(QDomDocument & doc, QDomElement & element )
+void Groove::saveSettings(QDomDocument & doc, QDomElement & element)
 {
 	Q_UNUSED(doc);
 	element.setAttribute("amount", m_amount);
 }
 
-void Groove::loadSettings( const QDomElement & element )
+void Groove::loadSettings(const QDomElement & element)
 {
 	bool ok;
 	int amount = element.attribute("amount").toInt(&ok);
@@ -60,7 +60,7 @@ void Groove::loadSettings( const QDomElement & element )
 	}
 }
 
-QWidget * Groove::instantiateView( QWidget * _parent )
+QWidget * Groove::instantiateView(QWidget * parent)
 {
 	return new QLabel("");
 }

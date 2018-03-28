@@ -17,34 +17,34 @@ class HalfSwing : public Groove
 {
 	Q_OBJECT
 public:
-	HalfSwing(QObject *parent=0 );
+	HalfSwing(QObject *parent = NULL);
 
 	virtual ~HalfSwing();
 
 	void init();
 
-	int isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset, Note * _n, Pattern * _p );
+	int isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p);
 
 	inline virtual QString nodeName() const
 	{
 		return "half";
 	}
 
-	QWidget * instantiateView( QWidget * _parent );
+	QWidget * instantiateView(QWidget * parent);
 
 public slots:
 	// valid values are from 0 - 127
 	void update();
 
 private:
-	int m_frames_per_tick;
+	int m_framesPerTick;
 } ;
 
 class HalfSwingView : public QWidget
 {
 	Q_OBJECT
 public:
-	HalfSwingView(HalfSwing * _half_swing, QWidget * parent=0 );
+	HalfSwingView(HalfSwing * halfSwing, QWidget * parent = NULL);
 	~HalfSwingView();
 
 public slots:
@@ -52,7 +52,7 @@ public slots:
 	void valueChanged(int);
 
 private:
-	HalfSwing * m_half_swing;
+	HalfSwing * m_swing;
 	IntModel * m_sliderModel;
 	AutomatableSlider * m_slider;
 

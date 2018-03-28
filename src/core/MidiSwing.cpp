@@ -27,8 +27,8 @@
 
 #include "MidiSwing.h"
 
-MidiSwing::MidiSwing(QObject * _parent) :
-	Groove(_parent)
+MidiSwing::MidiSwing(QObject * parent) :
+	Groove(parent)
 {
 }
 
@@ -36,56 +36,56 @@ MidiSwing::~MidiSwing()
 {
 }
 
-static int applyMidiSwing(int pos_in_eight);
+static int applyMidiSwing(int posInEight);
 
-int MidiSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset,
-					 Note * _n, Pattern * _p )
+int MidiSwing::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset,
+					Note * n, Pattern * p)
 {
-	return isInTick(_cur_start, _n, _p );
+	return isInTick(curStart, n, p);
 }
 
-int MidiSwing::isInTick(MidiTime * _cur_start, Note * _n, Pattern * _p )
+int MidiSwing::isInTick(MidiTime * curStart, Note * n, Pattern * p)
 {
 
 	// Where are we in the beat
-	int pos_in_beat =  _n->pos().getTicks() % 48; // assumes 48 ticks per beat, todo verify this
+	int posInBeat =  n->pos().getTicks() % 48; // assumes 48 ticks per beat, todo verify this
 
 
-	// the Midi Swing algorthym.
+	// the Midi Swing algorithm.
 
-	int pos_in_eigth = -1;
-	if ( pos_in_beat >= 12 && pos_in_beat < 18 ) 
+	int posInEigth = -1;
+	if (posInBeat >= 12 && posInBeat < 18)
 	{  
 		// 1st half of second quarter
 		//add a 0 - 24 tick shift
-		pos_in_eigth = pos_in_beat - 12;  // 0-5
+		posInEigth = posInBeat - 12;  // 0-5
 	}
-	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 )
+	else  if (posInBeat >= 36 && posInBeat < 42)
 	{ 
 		// 1st half of third quarter
-		pos_in_eigth = pos_in_beat - 36;  // 0-5
+		posInEigth = posInBeat - 36;  // 0-5
 	}
 
-	int swingTicks = applyMidiSwing(pos_in_eigth);
+	int swingTicks = applyMidiSwing(posInEigth);
 
-	return _cur_start->getTicks() == swingTicks + _n->pos().getTicks() ? 0 : -1;
+	return curStart->getTicks() == swingTicks + n->pos().getTicks() ? 0 : -1;
 
 }
 
-QWidget * MidiSwing::instantiateView( QWidget * _parent )
+QWidget * MidiSwing::instantiateView(QWidget * parent)
 {
 	return new QLabel("");
 }
 
-static int applyMidiSwing(int _pos_in_eigth)
+static int applyMidiSwing(int posInEight)
 {
 	// TODO case
-	if (_pos_in_eigth < 0) return 0;
-	if (_pos_in_eigth == 0) return 3;
-	if (_pos_in_eigth == 1) return 3;
-	if (_pos_in_eigth == 2) return 4;
-	if (_pos_in_eigth == 3) return 4;
-	if (_pos_in_eigth == 4) return 5;
-	if (_pos_in_eigth == 5) return 5;
+	if (posInEight < 0) return 0;
+	if (posInEight == 0) return 3;
+	if (posInEight == 1) return 3;
+	if (posInEight == 2) return 4;
+	if (posInEight == 3) return 4;
+	if (posInEight == 4) return 5;
+	if (posInEight == 5) return 5;
 	return 0;
 }

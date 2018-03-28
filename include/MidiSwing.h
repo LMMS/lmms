@@ -17,20 +17,20 @@ class MidiSwing : public Groove
 {
 	Q_OBJECT
 public:
-	MidiSwing(QObject * _parent=0 );
+	MidiSwing(QObject * parent = NULL);
 
 	~MidiSwing();
 
 	// TODO why declaring this should it not come from super class?
-	int isInTick(MidiTime * cur_start, const fpp_t _frames, const f_cnt_t _offset, Note * n, Pattern * p );
-	int isInTick(MidiTime * _cur_start, Note * _n, Pattern * _p );
+	int isInTick(MidiTime * cur_start, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p);
+	int isInTick(MidiTime * curStart, Note * n, Pattern * p);
 
 	inline virtual QString nodeName() const
 	{
 		return "midi";
 	}
 
-	QWidget * instantiateView( QWidget * _parent );
+	QWidget * instantiateView(QWidget * parent);
 
 signals:
 

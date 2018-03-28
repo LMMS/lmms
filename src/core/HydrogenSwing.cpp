@@ -57,29 +57,29 @@ void HydrogenSwing::init()
 {
 
 	Song * s = Engine::getSong();
-	connect( s, SIGNAL(projectLoaded()),        this, SLOT(update()) );
-	connect( s, SIGNAL(lengthChanged(int)),        this, SLOT(update()) );
-	connect( s, SIGNAL(tempoChanged(bpm_t)),         this, SLOT(update()) );
-	connect( s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()) );
+	connect(s, SIGNAL(projectLoaded()),        this, SLOT(update()));
+	connect(s, SIGNAL(lengthChanged(int)),        this, SLOT(update()));
+	connect(s, SIGNAL(tempoChanged(bpm_t)),         this, SLOT(update()));
+	connect(s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 
 }
 
 void HydrogenSwing::update()
 {
-	m_frames_per_tick =  Engine::framesPerTick();
+	m_framesPerTick =  Engine::framesPerTick();
 }
 
-int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset,
-					 Note * _n, Pattern * _p )
+int HydrogenSwing::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset,
+					Note * n, Pattern * p)
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
-	if ( m_frames_per_tick == 0 )
+	if (m_framesPerTick == 0)
 	{
-		m_frames_per_tick =  Engine::framesPerTick(); // e.g. 500 at 120BPM 4/4
+		m_framesPerTick =  Engine::framesPerTick(); // e.g. 500 at 120BPM 4/4
 	}
 
 	// only ever delay notes by 7 ticks, so if the tick is earlier don't play
-	if ( _n->pos().getTicks() + 7 < _cur_start->getTicks())
+	if (n->pos().getTicks() + 7 < curStart->getTicks())
 	{
 		return -1;
 	}
@@ -88,41 +88,41 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 
 	// Where are we in the beat
 	// 48 ticks to the beat, 192 ticks to the bar
-	int pos_in_beat =  _n->pos().getTicks() % 48;
+	int posInBeat =  n->pos().getTicks() % 48;
 
 
-	// The Hydrogen Swing algorthym.
+	// The Hydrogen Swing algorithm.
 	// Guessed by turning the knob and watching the possitions change in Audacity.
 	// Basically we delay (shift) notes on the the 2nd and 4th quarter of the beat.
 
-	int pos_in_eigth = -1;
-	if ( pos_in_beat >= 12 && pos_in_beat < 18 )
+	int posInEigth = -1;
+	if (posInBeat >= 12 && posInBeat < 18)
 	{
 		// 1st half of second quarter
-		pos_in_eigth = pos_in_beat - 12;  // 0-5
+		posInEigth = posInBeat - 12;  // 0-5
 	}
-	else  if ( pos_in_beat >= 36 && pos_in_beat < 42 )
+	else  if (posInBeat >= 36 && posInBeat < 42)
 	{
 		// 1st half of third quarter
-		pos_in_eigth = pos_in_beat - 36;  // 0-5
+		posInEigth = posInBeat - 36;  // 0-5
 	}
 
-	if ( pos_in_eigth >= 0 ) 
+	if (posInEigth >= 0)
 	{
 
-		float ticks_to_shift = ((pos_in_eigth - 6) * -m_swingFactor);
+		float ticksToShift = ((posInEigth - 6) * -m_swingFactor);
 		
-		f_cnt_t frames_to_shift = (int)(ticks_to_shift * m_frames_per_tick);
+		f_cnt_t framesToShift = (int)(ticksToShift * m_framesPerTick);
 		
-		int tick_offset = (int)(frames_to_shift / m_frames_per_tick); // round down
+		int tickOffset = (int)(framesToShift / m_framesPerTick); // round down
 
-		if ( _cur_start->getTicks() == (_n->pos().getTicks() + tick_offset) ) 
+		if (curStart->getTicks() == (n->pos().getTicks() + tickOffset))
 		{
 			// play in this tick
 
-			f_cnt_t new_offset = (frames_to_shift % m_frames_per_tick) + _offset;
+			f_cnt_t newOffset = (framesToShift % m_framesPerTick) + offset;
 
-			return new_offset;
+			return newOffset;
 		}
 		else
 		{ 
@@ -132,28 +132,28 @@ int HydrogenSwing::isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_
 	}
 
 	// else no groove adjustments
-	return _n->pos().getTicks() == _cur_start->getTicks() ? 0 : -1;
+	return n->pos().getTicks() == curStart->getTicks() ? 0 : -1;
 }
 
-QWidget * HydrogenSwing::instantiateView( QWidget * _parent )
+QWidget * HydrogenSwing::instantiateView(QWidget * parent)
 {
-	return new HydrogenSwingView(this, _parent);
+	return new HydrogenSwingView(this, parent);
 }
 
 // VIEW //
 
-HydrogenSwingView::HydrogenSwingView(HydrogenSwing * _hy_swing, QWidget * _parent) :
-	QWidget(_parent)
+HydrogenSwingView::HydrogenSwingView(HydrogenSwing * swing, QWidget * parent) :
+	QWidget(parent)
 {
 	m_sliderModel = new IntModel(0, 0, 127); // Unused
 	m_slider = new AutomatableSlider(this, tr("Swinginess"));
 	m_slider->setOrientation(Qt::Horizontal);
-	m_slider->setFixedSize( 90, 26 );
+	m_slider->setFixedSize(90, 26);
 	m_slider->setPageStep(1);
 	m_slider->setModel(m_sliderModel);
-	m_sliderModel->setValue(_hy_swing->amount());
+	m_sliderModel->setValue(swing->amount());
 
-	m_hy_swing = _hy_swing;
+	m_swing = swing;
 
 	connect(m_slider, SIGNAL(sliderMoved(int)), this, SLOT(valueChanged(int)));
 	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
@@ -167,10 +167,10 @@ HydrogenSwingView::~HydrogenSwingView()
 
 void HydrogenSwingView::modelChanged()
 {
-	m_hy_swing->setAmount((int)m_sliderModel->value());
+	m_swing->setAmount((int)m_sliderModel->value());
 }
 
-void HydrogenSwingView::valueChanged(int _i) // this value passed is gibberish
+void HydrogenSwingView::valueChanged(int value) // this value passed is gibberish
 {
-	m_hy_swing->setAmount((int)m_sliderModel->value());
+	m_swing->setAmount((int)m_sliderModel->value());
 }

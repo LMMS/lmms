@@ -17,13 +17,13 @@ class GrooveExperiments : public Groove
 {
 	Q_OBJECT
 public:
-	GrooveExperiments(QObject *parent=0 );
+	GrooveExperiments(QObject *parent = NULL);
 
 	virtual ~GrooveExperiments();
 
 	void init();
 
-	int isInTick(MidiTime * _cur_start, const fpp_t _frames, const f_cnt_t _offset, Note * _n, Pattern * _p );
+	int isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p);
 
 	inline virtual QString nodeName() const
 	{
@@ -32,21 +32,21 @@ public:
 
 
 
-	QWidget * instantiateView( QWidget * _parent );
+	QWidget * instantiateView(QWidget * parent);
 
 public slots:
 	// valid values are from 0 - 127
 	void update();
 
 private:
-	int m_frames_per_tick;
+	int m_framesPerTick;
 } ;
 
 class GrooveExperimentsView : public QWidget
 {
 	Q_OBJECT
 public:
-	GrooveExperimentsView(GrooveExperiments * _m_ge, QWidget * parent=0 );
+	GrooveExperimentsView(GrooveExperiments * groove, QWidget * parent = NULL);
 	~GrooveExperimentsView();
 
 public slots:
@@ -54,7 +54,7 @@ public slots:
 	void valueChanged(int);
 
 private:
-	GrooveExperiments * m_ge;
+	GrooveExperiments * m_groove;
 	IntModel * m_sliderModel;
 	AutomatableSlider * m_slider;
 

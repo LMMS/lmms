@@ -55,14 +55,14 @@ public:
 	 * returns 0 to play now on the tick, -1 to not play at all and the new offset
 	 *         that the note should be shifted if it is to be played later in this tick.
 	 */
-	virtual int isInTick( MidiTime * _cur_start, fpp_t _frames, f_cnt_t _offset,
-						Note * _n, Pattern * _p );
+	virtual int isInTick(MidiTime * curStart, fpp_t frames, f_cnt_t offset,
+						Note * n, Pattern * p);
 	int amount() const {return m_amount;}
 
-	virtual void saveSettings( QDomDocument & doc, QDomElement & element );
-	virtual void loadSettings(const QDomElement & element );
+	virtual void saveSettings(QDomDocument & doc, QDomElement & element);
+	virtual void loadSettings(const QDomElement & element);
 
-	virtual QWidget * instantiateView( QWidget * _parent );
+	virtual QWidget * instantiateView(QWidget * parent);
 
 	virtual QString nodeName() const
 	{

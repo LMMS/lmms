@@ -32,7 +32,7 @@ class GrooveFactory
 {
 
 public:
-	static Groove * create(QString type);
+	static Groove * create(QString grooveType);
 
 private:
 	GrooveFactory();
