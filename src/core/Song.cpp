@@ -1040,9 +1040,8 @@ void Song::loadProject( const QString & fileName )
 		QDomElement ge = dataFile.content().firstChildElement( "groove" );
 		m_globalGroove = GrooveFactory::create(ge.attribute("type"));
 		m_globalGroove->restoreState( ge.firstChildElement(ge.attribute("type")) );
-		
 	}
-	else 
+	else
 	{
 		m_globalGroove = GrooveFactory::create("none");
 	}

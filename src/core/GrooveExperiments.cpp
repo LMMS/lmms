@@ -55,10 +55,10 @@ void GrooveExperiments::init()
 {
 
 	Song * s = Engine::getSong();
-	connect( s, SIGNAL(projectLoaded()),        this, SLOT(update()) );
-	connect( s, SIGNAL(lengthChanged(int)),        this, SLOT(update()) );
-	connect( s, SIGNAL(tempoChanged(bpm_t)),         this, SLOT(update()) );
-	connect( s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()) );
+	connect(s, SIGNAL(projectLoaded()),        this, SLOT(update()));
+	connect(s, SIGNAL(lengthChanged(int)),        this, SLOT(update()));
+	connect(s, SIGNAL(tempoChanged(bpm_t)),         this, SLOT(update()));
+	connect(s, SIGNAL(timeSignatureChanged(int, int)), this, SLOT(update()));
 
 }
 
@@ -67,16 +67,16 @@ void GrooveExperiments::update()
 	m_framesPerTick =  Engine::framesPerTick();
 }
 
-int GrooveExperiments::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p )
+int GrooveExperiments::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t offset, Note * n, Pattern * p)
 {
 	// TODO why is this wrong on boot how do we set it once not every loop
-	if ( m_framesPerTick == 0 )
+	if (m_framesPerTick == 0)
 	{
 		m_framesPerTick =  Engine::framesPerTick(); // e.g. 500 at 120BPM 4/4
 	}
 
 	// only ever delay notes by 12 ticks, so if the tick is earlier don't play
-	if ( n->pos().getTicks() + 12 < curStart->getTicks())
+	if (n->pos().getTicks() + 12 < curStart->getTicks())
 	{
 		return -1;
 	}
@@ -85,26 +85,26 @@ int GrooveExperiments::isInTick(MidiTime * curStart, const fpp_t frames, const f
 
 	// Where are we in the beat
 	// 48 ticks to the beat, 192 ticks to the bar
-	int pos_in_beat =  n->pos().getTicks() % 48;
+	int posInBeat =  n->pos().getTicks() % 48;
 
 
 	int posInEigth = -1;
-	if ( pos_in_beat >= 36 && pos_in_beat < 48 )
+	if (posInBeat >= 36 && posInBeat < 48)
 	{
 		// third quarter
-		posInEigth = pos_in_beat - 36;  // 0-11
+		posInEigth = posInBeat - 36;  // 0-11
 	}
 
-	if ( posInEigth >= 0 ) 
+	if (posInEigth >= 0)
 	{
 
 		float ticksToShift = ((posInEigth - 12) * -m_swingFactor);
-		
+
 		f_cnt_t framesToShift = (int)(ticksToShift * m_framesPerTick);
-		
+
 		int tickOffset = (int)(framesToShift / m_framesPerTick); // round down
 
-		if ( curStart->getTicks() == (n->pos().getTicks() + tickOffset) )
+		if (curStart->getTicks() == (n->pos().getTicks() + tickOffset))
 		{
 			// play in this tick
 
@@ -113,7 +113,7 @@ int GrooveExperiments::isInTick(MidiTime * curStart, const fpp_t frames, const f
 			return newOffset;
 		}
 		else
-		{ 
+		{
 			// this note does not play in this tick
 			return -1;
 		}
@@ -138,7 +138,7 @@ GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments * groove, QWidget
 	m_sliderModel = new IntModel(0, 0, 127); // Unused
 	m_slider = new AutomatableSlider(this, tr("Swinginess"));
 	m_slider->setOrientation(Qt::Horizontal);
-	m_slider->setFixedSize( 90, 26 );
+	m_slider->setFixedSize(90, 26);
 	m_slider->setPageStep(1);
 	m_slider->setModel(m_sliderModel);
 	m_sliderModel->setValue(groove->amount());

@@ -261,7 +261,7 @@ private:
 	FloatModel m_panningModel;
 
 	AudioPort m_audioPort;
-	
+
 	// Track specific groove or NULL
 	Groove * m_groove;
 	Groove * m_noGroove;

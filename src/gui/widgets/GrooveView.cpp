@@ -87,7 +87,7 @@ void GrooveView::clear()
 	QLayoutItem * li = m_layout->takeAt(1);
 	delete li->widget();
 	delete li;
-	
+
 	m_comboBox->setCurrentIndex(0);
 	m_layout->addWidget(new QLabel(""));
 }
@@ -98,7 +98,7 @@ void GrooveView::grooveChanged(int index)
 
 	int selectedIdx = m_comboBox->currentIndex();
 	switch (selectedIdx) {
-		case 0 : 
+		case 0 :
 		{
 			groove = new Groove();
 			break;

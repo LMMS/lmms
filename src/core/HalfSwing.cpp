@@ -107,9 +107,9 @@ int HalfSwing::isInTick(MidiTime * curStart, const fpp_t frames, const f_cnt_t o
 	{
 
 		float ticksToShift = ((posInEigth - 6) * -m_swingFactor);
-		
+
 		f_cnt_t framesToShift = (int)(ticksToShift * m_framesPerTick);
-		
+
 		int tickOffset = (int)(framesToShift / m_framesPerTick); // round down
 
 		if (curStart->getTicks() == (n->pos().getTicks() + tickOffset))

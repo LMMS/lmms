@@ -1992,19 +1992,19 @@ QMenu * TrackOperationsWidget::grooveMenu()
 
 		// turn groove off.
 		QAction * muteAct = new QAction(embed::getIconPixmap( "led_red", 16, 16 ),
-										"Off",	this);
+										"Off", this);
 		muteAct->setData(t->id());
-		grooveMenu->addAction( muteAct );
-		QObject::connect(muteAct, SIGNAL( triggered( ) ),
-			 this, SLOT( disableGroove( ) ));
+		grooveMenu->addAction(muteAct);
+		QObject::connect(muteAct, SIGNAL(triggered()),
+			 this, SLOT(disableGroove()));
 
 		// turn groove on.
 		QAction * unmuteAct = new QAction(embed::getIconPixmap( "led_green", 16, 16 ),
-										"On",	this);
+										"On", this);
 		unmuteAct->setData(t->id());
-		grooveMenu->addAction( unmuteAct );
-		QObject::connect(unmuteAct, SIGNAL( triggered( ) ),
-			 this, SLOT( enableGroove( ) ));
+		grooveMenu->addAction(unmuteAct);
+		QObject::connect(unmuteAct, SIGNAL(triggered()),
+			 this, SLOT(enableGroove()));
 
 	}
 

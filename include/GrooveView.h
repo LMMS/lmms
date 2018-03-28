@@ -18,7 +18,7 @@ class GrooveView : public QWidget
 public:
 	GrooveView(QWidget * parent);
 	virtual ~GrooveView();
-	
+
 	void clear();
 
 signals:

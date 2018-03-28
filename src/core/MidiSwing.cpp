@@ -57,7 +57,7 @@ int MidiSwing::isInTick(MidiTime * curStart, Note * n, Pattern * p)
 	if (posInBeat >= 12 && posInBeat < 18)
 	{  
 		// 1st half of second quarter
-		//add a 0 - 24 tick shift
+		// add a 0 - 24 tick shift
 		posInEigth = posInBeat - 12;  // 0-5
 	}
 	else  if (posInBeat >= 36 && posInBeat < 42)

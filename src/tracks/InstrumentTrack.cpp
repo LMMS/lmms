@@ -682,7 +682,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 		// posated within the current sample-frame
 
 
-		
+
 		// FIXME: Uncomment once groove is straight.
 		// Perhaps have groove supply max shift so we can skip some notes if not all
 /*
@@ -718,7 +718,7 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 				Engine::mixer()->addPlayHandle( notePlayHandle );
 				played_a_note = true;
 			}
- 			++nit;
+			++nit;
 		}
 	}
 	unlock();
