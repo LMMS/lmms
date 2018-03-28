@@ -77,7 +77,6 @@ public:
 		Decibel
 	};
 
-public:
 
 	virtual ~AutomatableModel();
 
@@ -268,7 +267,6 @@ public slots:
 
 
 protected:
-	// Not meant to be directly instantiated
 	AutomatableModel(
 						const float val = 0,
 						const float min = 0,
