@@ -24,14 +24,13 @@
 GrooveView::GrooveView(QWidget * parent) :
 	QWidget(parent)
 {
-	m_layout = new QVBoxLayout();
-	this->setLayout(m_layout);
+	m_layout = new QVBoxLayout(this);
 
 	m_comboBox = new QComboBox(this);
 	// Insert reverse order.
 	m_comboBox->insertItem(0, tr("Experiment swing") , QVariant::fromValue(5));
-	m_comboBox->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(4));
-	m_comboBox->insertItem(0, tr("Half swing") , QVariant::fromValue(3));
+	m_comboBox->insertItem(0, tr("Half swing") , QVariant::fromValue(4));
+	m_comboBox->insertItem(0, tr("Hydrogen swing") , QVariant::fromValue(3));
 	m_comboBox->insertItem(0, tr("MIDI swing") , QVariant::fromValue(2));
 	m_comboBox->insertItem(0, tr("No swing") , QVariant::fromValue(1));
 	m_comboBox->setCurrentIndex(0);
@@ -53,7 +52,6 @@ GrooveView::GrooveView(QWidget * parent) :
 
 GrooveView::~GrooveView()
 {
-	delete m_comboBox;
 }
 
 void GrooveView::update()
@@ -67,11 +65,11 @@ void GrooveView::update()
 	{
 		m_comboBox->setCurrentIndex(1);
 	}
-	if (groove->nodeName() == "half")
+	if (groove->nodeName() == "hydrogen")
 	{
 		m_comboBox->setCurrentIndex(2);
 	}
-	if (groove->nodeName() == "hydrogen")
+	if (groove->nodeName() == "half")
 	{
 		m_comboBox->setCurrentIndex(3);
 	}
@@ -110,12 +108,12 @@ void GrooveView::grooveChanged(int index)
 		}
 		case 2 :
 		{
-			groove = new HalfSwing();
+			groove = new HydrogenSwing();
 			break;
 		}
 		case 3 :
 		{
-			groove = new HydrogenSwing();
+			groove = new HalfSwing();
 			break;
 		}
 		case 4 :
