@@ -77,21 +77,6 @@ public:
 		Decibel
 	};
 
-	enum DataType
-	{
-		Float,
-		Integer,
-		Bool
-	} ;
-
-	AutomatableModel( DataType type,
-						const float val = 0,
-						const float min = 0,
-						const float max = 0,
-						const float step = 0,
-						Model* parent = NULL,
-						const QString& displayName = QString(),
-						bool defaultConstructed = false );
 
 	virtual ~AutomatableModel();
 
@@ -127,7 +112,7 @@ public:
 	template<class T>
 	inline T value( int frameOffset = 0 ) const
 	{
-		if( unlikely( m_hasLinkedModels || m_controllerConnection != NULL ) )
+		if( unlikely( hasLinkedModels() || m_controllerConnection != NULL ) )
 		{
 			return castValue<T>( controllerValue( frameOffset ) );
 		}
@@ -239,11 +224,11 @@ public:
 		return "automatablemodel";
 	}
 
-	QString displayValue( const float val ) const;
+	virtual QString displayValue( const float val ) const = 0;
 
 	bool hasLinkedModels() const
 	{
-		return m_hasLinkedModels;
+		return !m_linkedModels.empty();
 	}
 
 	// a way to track changed values in the model and avoid using signals/slots - useful for speed-critical code.
@@ -260,11 +245,6 @@ public:
 	}
 
 	float globalAutomationValueAt( const MidiTime& time );
-
-	bool hasStrictStepSize() const
-	{
-		return m_hasStrictStepSize;
-	}
 
 	void setStrictStepSize( const bool b )
 	{
@@ -287,6 +267,14 @@ public slots:
 
 
 protected:
+	AutomatableModel(
+						const float val = 0,
+						const float min = 0,
+						const float max = 0,
+						const float step = 0,
+						Model* parent = NULL,
+						const QString& displayName = QString(),
+						bool defaultConstructed = false );
 	//! returns a value which is in range between min() and
 	//! max() and aligned according to the step size (step size 0.05 -> value
 	//! 0.12345 becomes 0.10 etc.). You should always call it at the end after
@@ -317,7 +305,6 @@ private:
 	template<class T> void roundAt( T &value, const T &where ) const;
 
 
-	DataType m_dataType;
 	ScaleType m_scaleType; //! scale type, linear by default
 	float m_value;
 	float m_initValue;
@@ -338,7 +325,6 @@ private:
 	bool m_hasStrictStepSize;
 
 	AutoModelVector m_linkedModels;
-	bool m_hasLinkedModels;
 
 
 	//! NULL if not appended to controller, otherwise connection info
@@ -399,11 +385,12 @@ public:
 				Model * parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		TypedAutomatableModel( Float, val, min, max, step, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, min, max, step, parent, displayName, defaultConstructed )
 	{
 	}
 	float getRoundedValue() const;
 	int getDigitCount() const;
+	QString displayValue( const float val ) const override;
 } ;
 
 
@@ -415,9 +402,10 @@ public:
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		TypedAutomatableModel( Integer, val, min, max, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, min, max, 1, parent, displayName, defaultConstructed )
 	{
 	}
+	QString displayValue( const float val ) const override;
 } ;
 
 
@@ -429,9 +417,10 @@ public:
 				Model* parent = NULL,
 				const QString& displayName = QString(),
 				bool defaultConstructed = false ) :
-		TypedAutomatableModel( Bool, val, false, true, 1, parent, displayName, defaultConstructed )
+		TypedAutomatableModel( val, false, true, 1, parent, displayName, defaultConstructed )
 	{
 	}
+	QString displayValue( const float val ) const override;
 } ;
 
 typedef QMap<AutomatableModel*, float> AutomatedValueMap;
