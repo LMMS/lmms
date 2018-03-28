@@ -35,11 +35,10 @@ long AutomatableModel::s_periodCounter = 0;
 
 
 
-AutomatableModel::AutomatableModel( DataType type,
+AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
-	m_dataType( type ),
 	m_scaleType( Linear ),
 	m_minValue( min ),
 	m_maxValue( max ),
@@ -49,7 +48,6 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
-	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
@@ -272,19 +270,6 @@ float AutomatableModel::inverseScaledValue( float value ) const
 
 
 
-QString AutomatableModel::displayValue( const float val ) const
-{
-	switch( m_dataType )
-	{
-		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
-		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
-		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
-	}
-	return "0";
-}
-
-
-
 //! @todo: this should be moved into a maths header
 template<class T>
 void roundAt( T& value, const T& where, const T& step_size )
@@ -410,7 +395,6 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 	if( !m_linkedModels.contains( model ) && model != this )
 	{
 		m_linkedModels.push_back( model );
-		m_hasLinkedModels = true;
 
 		if( !model->hasLinkedModels() )
 		{
@@ -429,7 +413,6 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 	{
 		m_linkedModels.erase( it );
 	}
-	m_hasLinkedModels = !m_linkedModels.isEmpty();
 }
 
 
@@ -461,8 +444,6 @@ void AutomatableModel::unlinkAllModels()
 	{
 		unlinkModels( this, model );
 	}
-
-	m_hasLinkedModels = false;
 }
 
 
@@ -565,7 +546,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		}
 	}
 	AutomatableModel* lm = NULL;
-	if( m_hasLinkedModels )
+	if( hasLinkedModels() )
 	{
 		lm = m_linkedModels.first();
 	}
@@ -712,3 +693,19 @@ int FloatModel::getDigitCount() const
 	return digits;
 }
 
+
+
+QString FloatModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<float>( scaledValue( val ) ) );
+}
+
+QString IntModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<int>( scaledValue( val ) ) );
+}
+
+QString BoolModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<bool>( scaledValue( val ) ) );
+}
