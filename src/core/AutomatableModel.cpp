@@ -31,7 +31,6 @@
 #include "Mixer.h"
 #include "ProjectJournal.h"
 
-float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;
 
 
@@ -613,21 +612,6 @@ void AutomatableModel::reset()
 	setValue( initValue<float>() );
 }
 
-
-
-
-void AutomatableModel::copyValue()
-{
-	s_copiedValue = value<float>();
-}
-
-
-
-
-void AutomatableModel::pasteValue()
-{
-	setValue( copiedValue() );
-}
 
 
 

@@ -398,7 +398,11 @@ PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
-
+IF(FLTK_FOUND)
+	SET(STATUS_ZYN "OK")
+ELSE()
+	SET(STATUS_ZYN "not found, please install fltk")
+ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
@@ -650,6 +654,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"
