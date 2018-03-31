@@ -4,10 +4,8 @@
 #define GROOVEVIEW_H
 
 #include <QWidget>
-#include <QCloseEvent>
-
-#include <QComboBox>
 #include <QVBoxLayout>
+#include <QComboBox>
 
 #include "Groove.h"
 #include "SerializingObject.h"
@@ -25,13 +23,13 @@ signals:
 
 public slots:
 	void update();
-	void grooveChanged(int index);
+	void grooveChanged();
 
 private:
 	void setView(Groove * groove);
 
-	QComboBox * m_comboBox;
 	QVBoxLayout * m_layout;
+	QComboBox * m_comboBox;
 };
 
 #endif // GROOVEVIEW_H

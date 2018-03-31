@@ -48,8 +48,8 @@ public:
 	~HalfSwingView();
 
 public slots:
+	void valueChanged();
 	void modelChanged();
-	void valueChanged(int);
 
 private:
 	HalfSwing * m_swing;

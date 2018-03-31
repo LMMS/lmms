@@ -32,10 +32,6 @@ public:
 
 	QWidget * instantiateView(QWidget * parent);
 
-signals:
-
-public slots:
-
 };
 
 #endif // MIDISWING_H

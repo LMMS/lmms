@@ -50,8 +50,8 @@ public:
 	~HydrogenSwingView();
 
 public slots:
+	void valueChanged();
 	void modelChanged();
-	void valueChanged(int value);
 
 private:
 	HydrogenSwing * m_swing;

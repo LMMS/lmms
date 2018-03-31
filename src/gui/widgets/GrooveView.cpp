@@ -1,13 +1,4 @@
 
-#include <QApplication>
-#include <QLayout>
-#include <QPushButton>
-#include <QScrollArea>
-#include <QVBoxLayout>
-#include <QMdiArea>
-
-#include <QDomElement>
-
 #include "embed.h"
 #include "Engine.h"
 #include "MainWindow.h"
@@ -38,8 +29,8 @@ GrooveView::GrooveView(QWidget * parent) :
 	m_layout->addWidget(m_comboBox);
 	m_layout->addWidget(new QLabel(""));
 
-	connect(m_comboBox, SIGNAL(activated(int)),
-			this, SLOT(grooveChanged(int)));
+	connect(m_comboBox, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(grooveChanged()));
 
 	connect(Engine::getSong(), SIGNAL(dataChanged()),
 			this, SLOT(update()));
@@ -90,12 +81,12 @@ void GrooveView::clear()
 	m_layout->addWidget(new QLabel(""));
 }
 
-void GrooveView::grooveChanged(int index)
+void GrooveView::grooveChanged()
 {
 	Groove * groove = NULL;
 
-	int selectedIdx = m_comboBox->currentIndex();
-	switch (selectedIdx) {
+	int currentIndex = m_comboBox->currentIndex();
+	switch (currentIndex) {
 		case 0 :
 		{
 			groove = new Groove();

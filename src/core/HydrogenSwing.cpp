@@ -23,10 +23,8 @@
  *
  */
 #include <QObject>
-#include <QDomElement>
 #include <QLabel>
 
-//#include "AutomatableSlider.h"
 #include "Engine.h"
 #include "Groove.h"
 #include "HydrogenSwing.h"
@@ -146,16 +144,16 @@ HydrogenSwingView::HydrogenSwingView(HydrogenSwing * swing, QWidget * parent) :
 	QWidget(parent)
 {
 	m_sliderModel = new IntModel(0, 0, 127); // Unused
+	m_sliderModel->setValue(swing->amount());
 	m_slider = new AutomatableSlider(this, tr("Swinginess"));
 	m_slider->setOrientation(Qt::Horizontal);
 	m_slider->setFixedSize(90, 26);
 	m_slider->setPageStep(1);
 	m_slider->setModel(m_sliderModel);
-	m_sliderModel->setValue(swing->amount());
 
 	m_swing = swing;
 
-	connect(m_slider, SIGNAL(sliderMoved(int)), this, SLOT(valueChanged(int)));
+	connect(m_slider, SIGNAL(sliderMoved()), this, SLOT(valueChanged()));
 	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
 }
 
@@ -165,12 +163,12 @@ HydrogenSwingView::~HydrogenSwingView()
 	delete m_sliderModel;
 }
 
-void HydrogenSwingView::modelChanged()
+void HydrogenSwingView::valueChanged()
 {
-	m_swing->setAmount((int)m_sliderModel->value());
+	m_swing->setAmount(m_sliderModel->value());
 }
 
-void HydrogenSwingView::valueChanged(int value) // this value passed is gibberish
+void HydrogenSwingView::modelChanged()
 {
-	m_swing->setAmount((int)m_sliderModel->value());
+	m_swing->setAmount(m_sliderModel->value());
 }

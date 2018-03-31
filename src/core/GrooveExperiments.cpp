@@ -22,10 +22,8 @@
  *
  */
 #include <QObject>
-#include <QDomElement>
 #include <QLabel>
 
-//#include "AutomatableSlider.h"
 #include "Engine.h"
 #include "Groove.h"
 #include "GrooveExperiments.h"
@@ -136,16 +134,16 @@ GrooveExperimentsView::GrooveExperimentsView(GrooveExperiments * groove, QWidget
 	QWidget(parent)
 {
 	m_sliderModel = new IntModel(0, 0, 127); // Unused
+	m_sliderModel->setValue(groove->amount());
 	m_slider = new AutomatableSlider(this, tr("Swinginess"));
 	m_slider->setOrientation(Qt::Horizontal);
 	m_slider->setFixedSize(90, 26);
 	m_slider->setPageStep(1);
 	m_slider->setModel(m_sliderModel);
-	m_sliderModel->setValue(groove->amount());
 
 	m_groove = groove;
 
-	connect(m_slider, SIGNAL(sliderMoved(int)), this, SLOT(valueChanged(int)));
+	connect(m_slider, SIGNAL(sliderMoved()), this, SLOT(valueChanged()));
 	connect(m_sliderModel, SIGNAL(dataChanged()), this, SLOT(modelChanged()));
 }
 
@@ -155,12 +153,12 @@ GrooveExperimentsView::~GrooveExperimentsView()
 	delete m_sliderModel;
 }
 
-void GrooveExperimentsView::modelChanged()
+void GrooveExperimentsView::valueChanged()
 {
-	m_groove->setAmount((int)m_sliderModel->value());
+	m_groove->setAmount(m_sliderModel->value());
 }
 
-void GrooveExperimentsView::valueChanged(int _i) // this value passed is gibberish
+void GrooveExperimentsView::modelChanged()
 {
-	m_groove->setAmount((int)m_sliderModel->value());
+	m_groove->setAmount(m_sliderModel->value());
 }

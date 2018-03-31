@@ -50,8 +50,8 @@ public:
 	~GrooveExperimentsView();
 
 public slots:
+	void valueChanged();
 	void modelChanged();
-	void valueChanged(int);
 
 private:
 	GrooveExperiments * m_groove;
