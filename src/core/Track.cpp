@@ -368,6 +368,9 @@ QColor TrackContentObjectView::mutedColor() const
 QColor TrackContentObjectView::mutedBackgroundColor() const
 { return m_mutedBackgroundColor; }
 
+QColor TrackContentObjectView::recordingBackgroundColor() const
+{ return m_recordingBackgroundColor; }
+
 QColor TrackContentObjectView::selectedColor() const
 { return m_selectedColor; }
 
@@ -411,6 +414,9 @@ void TrackContentObjectView::setTextShadowColor( const QColor & c )
 
 void TrackContentObjectView::setBBPatternBackground( const QColor & c )
 { m_BBPatternBackground = QColor( c ); }
+
+void TrackContentObjectView::setRecordingBackgroundColor (const QColor & c )
+{ m_recordingBackgroundColor = QColor( c ); }
 
 void TrackContentObjectView::setGradient( const bool & b )
 { m_gradient = b; }
