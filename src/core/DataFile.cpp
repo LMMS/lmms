@@ -1160,11 +1160,11 @@ void DataFile::upgrade_1_3_0()
 								{
 									// leave port 18 (offsetr), but add port 17 (offsetl)
 									QDomElement offsetl = createElement("port017");
-									offsetl.setAttribute("data", .0f);
+									offsetl.setAttribute("data", 0.0f);
 									addList << offsetl;
 									// additional: bash port 21 to 1
 									QDomElement pulsewidth = createElement("port021");
-									pulsewidth.setAttribute("data", 1.f);
+									pulsewidth.setAttribute("data", 1.0f);
 									addList << pulsewidth;
 									break;
 								}
@@ -1194,10 +1194,10 @@ void DataFile::upgrade_1_3_0()
 
 									// port 5 and 6 (in, out gain) need to be bashed to 1:
 									QDomElement input = createElement("port05");
-									input.setAttribute("data", 1.f);
+									input.setAttribute("data", 1.0f);
 									addList << input;
 									QDomElement output = createElement("port06");
-									output.setAttribute("data", 1.f);
+									output.setAttribute("data", 1.0f);
 									addList << output;
 
 									break;
