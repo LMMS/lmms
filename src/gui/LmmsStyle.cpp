@@ -176,7 +176,8 @@ void LmmsStyle::drawComplexControl( ComplexControl control,
 							painter, widget );
 			return;
 		}
-	} else if (control == CC_MdiControls)
+	}
+	else if (control == CC_MdiControls)
 	{
 		QStyleOptionComplex so(*option);
 		so.palette.setColor(QPalette::Button, QColor(223, 228, 236));
