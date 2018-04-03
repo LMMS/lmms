@@ -1,7 +1,7 @@
 /*
  * PerfLog.cpp - Small performance logger
  *
- * Copyright (c) 2017 gi0e5b06
+ * Copyright (c) 2017-2018 LMMS Developers
  *
  * This file is part of LMMS - https://lmms.io
  *
