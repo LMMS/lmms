@@ -251,6 +251,7 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		IF(NOT SDL_INCLUDE_DIR)
 			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
 		ENDIF()
+
 	ELSE()
 		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
