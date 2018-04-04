@@ -29,7 +29,6 @@
 #include "PeakController.h"
 #include "peak_controller_effect_controls.h"
 #include "peak_controller_effect.h"
-#include "PresetPreviewPlayHandle.h"
 #include "Song.h"
 
 
@@ -79,12 +78,6 @@ void PeakControllerEffectControls::loadSettings( const QDomElement & _this )
 	else
 	{
 		m_effect->m_effectId = rand();
-	}
-
-	if( m_effect->m_autoController && PresetPreviewPlayHandle::isPreviewing() == true )
-	{
-		delete m_effect->m_autoController;
-		m_effect->m_autoController = 0;
 	}
 }
 
