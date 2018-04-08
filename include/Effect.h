@@ -104,7 +104,8 @@ public:
 	inline f_cnt_t timeout() const
 	{
 		const float samples = Engine::mixer()->processingSampleRate() * m_autoQuitModel.value() / 1000.0f;
-		return 1 + ( static_cast<int>( samples ) / Engine::mixer()->framesPerPeriod() );
+		int frames = Engine::mixer()->framesPerPeriod();
+		return frames + static_cast<int>( samples ) / frames;
 	}
 
 	inline float wetLevel() const
