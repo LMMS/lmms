@@ -58,18 +58,10 @@ GuiApplication::GuiApplication()
 	#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
 		QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
 	#endif
-	
-	// prompt the user to create the LMMS working directory (e.g. ~/lmms) if it doesn't exist
-	if ( !ConfigManager::inst()->hasWorkingDir() &&
-		QMessageBox::question( NULL,
-				tr( "Working directory" ),
-				tr( "The LMMS working directory %1 does not "
-				"exist. Create it now? You can change the directory "
-				"later via Edit -> Settings." ).arg( ConfigManager::inst()->workingDir() ),
-					QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes)
-	{
-		ConfigManager::inst()->createWorkingDir();
-	}
+
+	// Create the LMMS working directory and subdirectories (e.g. ~/Documents/lmms)
+	ConfigManager::inst()->createWorkingDir();
+
 	// Init style and palette
 	LmmsStyle* lmmsstyle = new LmmsStyle();
 	QApplication::setStyle(lmmsstyle);

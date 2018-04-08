@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QApplication>
+#include <QStandardPaths>
 #include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
@@ -50,7 +51,11 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 ConfigManager::ConfigManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() +"/.lmmsrc.xml" ),
-	m_workingDir( QDir::home().absolutePath() + "/lmms/"),
+	#if QT_VERSION >= 0x050100
+	m_workingDir( QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/lmms/"),
+	#else
+	m_workingDir( QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ) + "/lmms/"),
+	#endif
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
