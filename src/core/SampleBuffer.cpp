@@ -62,10 +62,6 @@
 
 SampleBuffer::SampleBuffer() :
 	m_audioFile( "" ),
-	m_origData( NULL ),
-	m_origFrames( 0 ),
-	m_data( NULL ),
-	m_frames( 0 ),
 	m_startFrame( 0 ),
 	m_endFrame( 0 ),
 	m_loopStartFrame( 0 ),
@@ -105,25 +101,38 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames )
 {
 	if( _frames > 0 )
 	{
-		m_origData = MM_ALLOC( sampleFrame, _frames );
-		memcpy( m_origData, _data, _frames * BYTES_PER_FRAME );
-		m_origFrames = _frames;
-		update();
+		m_origData.assign (_data, _data + _frames);
 	}
 }
 
 
+SampleBuffer::SampleBuffer( SampleBuffer::DataVector &&movedData ) :
+	m_audioFile( "" ),
+	m_startFrame( 0 ),
+	m_endFrame( 0 ),
+	m_loopStartFrame( 0 ),
+	m_loopEndFrame( 0 ),
+	m_amplification( 1.0f ),
+	m_reversed( false ),
+	m_frequency( BaseFreq ),
+	m_sampleRate( Engine::mixer()->baseSampleRate() )
+{
+	m_origData = std::move(movedData);
+	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
+	update();
+}
+
 
 
 SampleBuffer::SampleBuffer( const f_cnt_t _frames )
-	: SampleBuffer()
+	: SampleBuffer(
+			DataVector(static_cast<typename DataVector::size_type>(_frames),
+			sampleFrame{0,0})
+		  )
 {
 	if( _frames > 0 )
 	{
-		m_origData = MM_ALLOC( sampleFrame, _frames );
-		memset( m_origData, 0, _frames * BYTES_PER_FRAME );
-		m_origFrames = _frames;
-		update();
+		m_data.resize (_frames, {0,0});
 	}
 }
 
@@ -132,8 +141,6 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames )
 
 SampleBuffer::~SampleBuffer()
 {
-	MM_FREE( m_origData );
-	MM_FREE( m_data );
 }
 
 
@@ -144,14 +151,13 @@ void SampleBuffer::sampleRateChanged()
 }
 
 
-void SampleBuffer::update( bool _keep_settings )
+void SampleBuffer::update(bool _keep_settings)
 {
-	const bool lock = ( m_data != NULL );
+	const bool lock = ( m_data.size () != 0);
 	if( lock )
 	{
 		Engine::mixer()->requestChangeInModel();
 		m_varLock.lockForWrite();
-		MM_FREE( m_data );
 	}
 
 	// File size and sample length limits
@@ -159,17 +165,18 @@ void SampleBuffer::update( bool _keep_settings )
 	const int sampleLengthMax = 90; // Minutes
 
 	bool fileLoadError = false;
-	if( m_audioFile.isEmpty() && m_origData != NULL && m_origFrames > 0 )
+	if( m_audioFile.isEmpty() && m_origData.size () > 0 )
 	{
 		// TODO: reverse- and amplification-property is not covered
 		// by following code...
-		m_data = MM_ALLOC( sampleFrame, m_origFrames );
-		memcpy( m_data, m_origData, m_origFrames * BYTES_PER_FRAME );
+		auto previousFrames = frames ();
+		m_data = std::move(m_origData);
 		if( _keep_settings == false )
 		{
-			m_frames = m_origFrames;
 			m_loopStartFrame = m_startFrame = 0;
-			m_loopEndFrame = m_endFrame = m_frames;
+			m_loopEndFrame = m_endFrame = frames ();
+		} else {
+			m_data.resize (previousFrames);
 		}
 	}
 	else if( !m_audioFile.isEmpty() )
@@ -179,7 +186,7 @@ void SampleBuffer::update( bool _keep_settings )
 		sample_t * fbuf = NULL;
 		ch_cnt_t channels = DEFAULT_CHANNELS;
 		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
-		m_frames = 0;
+		f_cnt_t dataFrames = 0;
 
 		const QFileInfo fileInfo( file );
 		if( fileInfo.size() > fileSizeMax * 1024 * 1024 )
@@ -213,42 +220,41 @@ void SampleBuffer::update( bool _keep_settings )
 			// workaround for a bug in libsndfile or our libsndfile decoder
 			// causing some OGG files to be distorted -> try with OGG Vorbis
 			// decoder first if filename extension matches "ogg"
-			if( m_frames == 0 && fileInfo.suffix() == "ogg" )
+			if( dataFrames == 0 && fileInfo.suffix() == "ogg" )
 			{
-				m_frames = decodeSampleOGGVorbis( file, buf, channels, samplerate );
+				dataFrames = decodeSampleOGGVorbis( file, buf, channels, samplerate );
 			}
 #endif
-			if( m_frames == 0 )
+			if( dataFrames == 0 )
 			{
-				m_frames = decodeSampleSF( file, fbuf, channels,
+				dataFrames = decodeSampleSF( file, fbuf, channels,
 									samplerate );
 			}
 #ifdef LMMS_HAVE_OGGVORBIS
-			if( m_frames == 0 )
+			if( dataFrames == 0 )
 			{
-				m_frames = decodeSampleOGGVorbis( file, buf, channels,
+				dataFrames = decodeSampleOGGVorbis( file, buf, channels,
 									samplerate );
 			}
 #endif
-			if( m_frames == 0 )
+			if( dataFrames == 0 )
 			{
-				m_frames = decodeSampleDS( file, buf, channels,
+				dataFrames = decodeSampleDS( file, buf, channels,
 									samplerate );
 			}
 		}
 
-		if ( m_frames == 0 || fileLoadError )  // if still no frames, bail
+		if ( dataFrames == 0 || fileLoadError )  // if still no frames, bail
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
-			m_data = MM_ALLOC( sampleFrame, 1 );
-			memset( m_data, 0, sizeof( *m_data ) );
-			m_frames = 1;
+			m_data.resize (1, {0,0});
 			m_loopStartFrame = m_startFrame = 0;
 			m_loopEndFrame = m_endFrame = 1;
 		}
 		else // otherwise normalize sample rate
 		{
+			m_data.resize (dataFrames);
 			normalizeSampleRate( samplerate, _keep_settings );
 		}
 	}
@@ -256,9 +262,7 @@ void SampleBuffer::update( bool _keep_settings )
 	{
 		// neither an audio-file nor a buffer to copy from, so create
 		// buffer containing one sample-frame
-		m_data = MM_ALLOC( sampleFrame, 1 );
-		memset( m_data, 0, sizeof( *m_data ) );
-		m_frames = 1;
+		m_data.resize (1, {0,0});
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = 1;
 	}
@@ -295,7 +299,7 @@ void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, 
 	// following code transforms int-samples into
 	// float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-	m_data = MM_ALLOC( sampleFrame, _frames );
+	m_data.resize (_frames);
 	const int ch = ( _channels > 1 ) ? 1 : 0;
 
 	// if reversing is on, we also reverse when
@@ -330,7 +334,7 @@ void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _
 
 {
 
-	m_data = MM_ALLOC( sampleFrame, _frames );
+	m_data.resize (_frames);
 	const int ch = ( _channels > 1 ) ? 1 : 0;
 
 	// if reversing is on, we also reverse when
@@ -370,11 +374,7 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	{
 		SampleBuffer * resampled = resample( _src_sr,
 					Engine::mixer()->baseSampleRate() );
-		MM_FREE( m_data );
-		m_frames = resampled->frames();
-		m_data = MM_ALLOC( sampleFrame, m_frames );
-		memcpy( m_data, resampled->data(), m_frames *
-							sizeof( sampleFrame ) );
+		m_data = std::move(resampled->m_data);
 		delete resampled;
 	}
 
@@ -382,7 +382,7 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	{
 		// update frame-variables
 		m_loopStartFrame = m_startFrame = 0;
-		m_loopEndFrame = m_endFrame = m_frames;
+		m_loopEndFrame = m_endFrame = frames ();
 	}
 }
 
@@ -782,7 +782,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 
 
 
-
+const
 sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 		f_cnt_t _frames, LoopMode _loopmode, sampleFrame * * _tmp, bool * _backwards,
 		f_cnt_t _loopstart, f_cnt_t _loopend, f_cnt_t _end ) const
@@ -791,21 +791,21 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 	{
 		if( _index + _frames <= _end )
 		{
-			return m_data + _index;
+			return data () + _index;
 		}
 	}
 	else if( _loopmode == LoopOn )
 	{
 		if( _index + _frames <= _loopend )
 		{
-			return m_data + _index;
+			return data () + _index;
 		}
 	}
 	else
 	{
 		if( ! *_backwards && _index + _frames < _loopend )
 		{
-			return m_data + _index;
+			return data () + _index;
 		}
 	}
 
@@ -814,19 +814,19 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 	if( _loopmode == LoopOff )
 	{
 		f_cnt_t available = _end - _index;
-		memcpy( *_tmp, m_data + _index, available * BYTES_PER_FRAME );
+		memcpy( *_tmp, data () + _index, available * BYTES_PER_FRAME );
 		memset( *_tmp + available, 0, ( _frames - available ) *
 							BYTES_PER_FRAME );
 	}
 	else if( _loopmode == LoopOn )
 	{
 		f_cnt_t copied = qMin( _frames, _loopend - _index );
-		memcpy( *_tmp, m_data + _index, copied * BYTES_PER_FRAME );
+		memcpy( *_tmp, data () + _index, copied * BYTES_PER_FRAME );
 		f_cnt_t loop_frames = _loopend - _loopstart;
 		while( copied < _frames )
 		{
 			f_cnt_t todo = qMin( _frames - copied, loop_frames );
-			memcpy( *_tmp + copied, m_data + _loopstart, todo * BYTES_PER_FRAME );
+			memcpy( *_tmp + copied, data () + _loopstart, todo * BYTES_PER_FRAME );
 			copied += todo;
 		}
 	}
@@ -853,7 +853,7 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 		else
 		{
 			copied = qMin( _frames, _loopend - pos );
-			memcpy( *_tmp, m_data + pos, copied * BYTES_PER_FRAME );
+			memcpy( *_tmp, data () + pos, copied * BYTES_PER_FRAME );
 			pos += copied;
 			if( pos == _loopend ) backwards = true;
 		}
@@ -875,7 +875,7 @@ sampleFrame * SampleBuffer::getSampleFragment( f_cnt_t _index,
 			else
 			{
 				f_cnt_t todo = qMin( _frames - copied, _loopend - pos );
-				memcpy( *_tmp + copied, m_data + pos, todo * BYTES_PER_FRAME );
+				memcpy( *_tmp + copied, data () + pos, todo * BYTES_PER_FRAME );
 				pos += todo;
 				copied += todo;
 				if( pos >= _loopend ) backwards = true;
@@ -919,9 +919,9 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
 {
-	if( m_frames == 0 ) return;
+	if( frames () == 0 ) return;
 
-	const bool focus_on_range = _to_frame <= m_frames
+	const bool focus_on_range = _to_frame <= frames ()
 					&& 0 <= _from_frame && _from_frame < _to_frame;
 	//_p.setClipRect( _clip );
 	const int w = _dr.width();
@@ -929,7 +929,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 
 	const int yb = h / 2 + _dr.y();
 	const float y_space = h*0.5f;
-	const int nb_frames = focus_on_range ? _to_frame - _from_frame : m_frames;
+	const int nb_frames = focus_on_range ? _to_frame - _from_frame : frames ();
 
 	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
 	QPointF * l = new QPointF[nb_frames / fpp + 1];
@@ -937,7 +937,7 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 	int n = 0;
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
-	const int last = focus_on_range ? _to_frame : m_frames;
+	const int last = focus_on_range ? _to_frame : frames ();
 	for( int frame = first; frame < last; frame += fpp )
 	{
 		l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
@@ -1150,8 +1150,8 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 
 #else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
-	base64::encode( (const char *) m_data,
-					m_frames * sizeof( sampleFrame ), _dst );
+	base64::encode( (const char *) data (),
+					frames () * sizeof( sampleFrame ), _dst );
 
 #endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
@@ -1164,12 +1164,9 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr )
 {
-	sampleFrame * data = m_data;
-	const f_cnt_t frames = m_frames;
-	const f_cnt_t dst_frames = static_cast<f_cnt_t>( frames /
+	const f_cnt_t dst_frames = static_cast<f_cnt_t>( frames ()/
 					(float) _src_sr * (float) _dst_sr );
 	SampleBuffer * dst_sb = new SampleBuffer( dst_frames );
-	sampleFrame * dst_buf = dst_sb->m_origData;
 
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
 	int error;
@@ -1351,11 +1348,10 @@ void SampleBuffer::loadFromBase64( const QString & _data )
 
 #else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
 
-	m_origFrames = dsize / sizeof( sampleFrame );
-	MM_FREE( m_origData );
-	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
-	memcpy( m_origData, dst, dsize );
-
+	m_origData.resize (dsize / sizeof( sampleFrame ));
+	memcpy (m_origData.data (),
+			dst,
+			m_origData.size ());
 #endif
 
 	delete[] dst;
@@ -1456,12 +1452,20 @@ QString SampleBuffer::tryToMakeAbsolute(const QString& file)
 	return file;
 }
 
+void SampleBuffer::addData(const DataVector::iterator begin, const DataVector::iterator end) {
+	// First of all, don't let anyone read.
+	m_varLock.lockForWrite ();
+	{
+		// Insert to the end of the vector.
+		m_data.insert (m_data.end (), begin, end);
 
+		m_data.swap (m_origData);
+		m_data.clear ();
+	}
+	m_varLock.unlock ();
 
-
-
-
-
+	update ();
+}
 
 SampleBuffer::handleState::handleState( bool _varying_pitch, int interpolation_mode ) :
 	m_frameIndex( 0 ),
