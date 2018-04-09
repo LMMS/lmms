@@ -81,6 +81,9 @@ public slots:
 	void updateTrackTcos();
 
 
+private slots:
+	void onSampleBufferChanged ();
+
 private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
