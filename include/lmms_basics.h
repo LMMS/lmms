@@ -32,8 +32,8 @@
 
 #ifdef LMMS_HAVE_STDINT_H
 #include <cstdint>
+#include <array>
 #endif
-
 
 typedef int32_t bar_t;
 typedef int32_t tick_t;
@@ -127,12 +127,10 @@ const ch_cnt_t SURROUND_CHANNELS =
 
 
 
-typedef sample_t sampleFrame[DEFAULT_CHANNELS];
-typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
+typedef std::array<sample_t, DEFAULT_CHANNELS> sampleFrame;
+
+typedef std::array<sample_t, SURROUND_CHANNELS> surroundSampleFrame;
 #define ALIGN_SIZE 16
-#if __GNUC__
-typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
-#endif
 
 
 #define STRINGIFY(s) STR(s)
