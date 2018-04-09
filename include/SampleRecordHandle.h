@@ -28,14 +28,15 @@
 
 #include <QtCore/QList>
 #include <QtCore/QPair>
+#include <vector>
 
 #include "MidiTime.h"
 #include "PlayHandle.h"
 #include "SampleTrack.h"
+#include "SampleBuffer.h"
 
 
 class BBTrack;
-class SampleBuffer;
 class SampleTCO;
 class Track;
 
@@ -52,7 +53,6 @@ public:
 	virtual bool isFromTrack( const Track * _track ) const;
 
 	f_cnt_t framesRecorded() const;
-	void createSampleBuffer( SampleBuffer * * _sample_buf );
 
 
 private:
@@ -70,10 +70,10 @@ private:
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
 
-	typedef QList<QPair<sampleFrame *, f_cnt_t> > bufferList;
-	bufferList m_buffers;
 	f_cnt_t m_framesRecorded;
 	MidiTime m_minLength;
+
+	SampleBuffer::DataVector m_currentBuffer;
 
 	Track * m_track;
 	BBTrack * m_bbTrack;

@@ -89,6 +89,8 @@ SampleTCO::SampleTCO( Track * _track ) :
 	//care about TCO position
 	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
 
+	connect (m_sampleBuffer, SIGNAL(sampleUpdated()), this, SLOT(onSampleBufferChanged()));
+
 	switch( getTrack()->trackContainer()->type() )
 	{
 		case TrackContainer::BBContainer:
@@ -140,6 +142,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 	sharedObject::unref( m_sampleBuffer );
 	setStartTimeOffset( 0 );
 	m_sampleBuffer = sb;
+	connect (m_sampleBuffer, SIGNAL(sampleUpdated()), this, SLOT(onSampleBufferChanged()));
 	updateLength();
 
 	emit sampleChanged();
@@ -198,6 +201,11 @@ void SampleTCO::updateTrackTcos()
 	{
 		sampletrack->updateTcos();
 	}
+}
+
+void SampleTCO::onSampleBufferChanged()
+{
+	emit sampleChanged ();
 }
 
 
@@ -540,7 +548,16 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
 	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
-	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+
+	// Make sure our SampleBuffer is not locked, if it is,
+	// skip this frame and flag it for
+	if (m_tco->sampleBuffer ()->tryDataReadLock ()) {
+		m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+		m_tco->m_sampleBuffer->dataUnlock ();
+	} else {
+		// We have not really did much.
+		setNeedsUpdate (true);
+	}
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
 	QString filename = fileInfo.fileName();
