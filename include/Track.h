@@ -290,8 +290,6 @@ private:
 
 	TextFloat * m_hint;
 
-	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
-
 // qproperty fields
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
