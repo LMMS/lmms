@@ -69,25 +69,6 @@ private slots:
 
 
 private:
-	struct VstSyncData
-	{
-		bool isPlaying;
-		float ppqPos;
-		int timeSigNumer;
-		int timeSigDenom;
-		bool isCycle;
-		bool hasSHM;
-		float cycleStart;
-		float cycleEnd;
-		int m_bufferSize;
-		int m_sampleRate;
-		int m_bpm;
-
-#ifdef VST_SNC_LATENCY
-		float m_latency;
-#endif
-	} ;
-
 	VstSyncData* m_syncData;
 
 	int m_shmID;

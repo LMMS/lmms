@@ -328,6 +328,11 @@ private:
 	uint16_t  getPluginInputs( const LADSPA_Descriptor * _descriptor );
 	uint16_t  getPluginOutputs( const LADSPA_Descriptor * _descriptor );
 
+	const LADSPA_PortDescriptor* getPortDescriptor( const ladspa_key_t& _plugin,
+													uint32_t _port );
+	const LADSPA_PortRangeHint* getPortRangeHint( const ladspa_key_t& _plugin,
+													uint32_t _port );
+
 	typedef QMap<ladspa_key_t, ladspaManagerDescription *>
 						ladspaManagerMapType;
 	ladspaManagerMapType m_ladspaManagerMap;

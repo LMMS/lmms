@@ -1936,35 +1936,31 @@ void TrackOperationsWidget::updateMenu()
 }
 
 
-void TrackOperationsWidget::recordingOn()
+void TrackOperationsWidget::toggleRecording( bool on )
 {
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
 		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( true ); }
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
+			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();
 	}
 }
 
 
+
+void TrackOperationsWidget::recordingOn()
+{
+	toggleRecording( true );
+}
+
+
 void TrackOperationsWidget::recordingOff()
 {
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
-	if( atv )
-	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
-		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( false ); }
-		}
-		atv->update();
-	}
+	toggleRecording( false );
 }
 
 
