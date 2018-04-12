@@ -27,6 +27,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <limits>
 #include "AutomatableModel.h"
 #include "Graph.h"
 #include "Instrument.h"
@@ -39,7 +40,7 @@ class ExprFront
 {
 public:
 	typedef float (*ff1data_functor)(void*, float);
-	ExprFront(const char* expr);
+	ExprFront(const char* expr, int last_func_samples);
 	~ExprFront();
 	bool compile();
 	inline bool isValid() { return m_valid; }
@@ -52,6 +53,9 @@ public:
 private:
 	ExprFrontData *m_data;
 	bool m_valid;
+	
+	static const int max_float_integer_mask=(1<<(std::numeric_limits<float>::digits))-1;
+
 };
 
 class WaveSample
