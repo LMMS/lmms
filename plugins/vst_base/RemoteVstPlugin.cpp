@@ -293,8 +293,8 @@ public:
 	static DWORD WINAPI processingThread( LPVOID _param );
 	static bool setupMessageWindow();
 	static DWORD WINAPI guiEventLoop();
-	static LRESULT CALLBACK messageWndProc( HWND hwnd, UINT uMsg,
-						WPARAM wParam, LPARAM lParam );
+	static LRESULT CALLBACK wndProc( HWND hwnd, UINT uMsg,
+					WPARAM wParam, LPARAM lParam );
 
 
 private:
@@ -1884,8 +1884,6 @@ bool RemoteVstPlugin::setupMessageWindow()
 	__MessageHwnd = CreateWindowEx( 0, "LVSL", "dummy",
 						0, 0, 0, 0, 0, NULL, NULL,
 								hInst, NULL );
-	SetWindowLongPtr( __MessageHwnd, GWLP_WNDPROC,
-		reinterpret_cast<LONG_PTR>( RemoteVstPlugin::messageWndProc ) );
 	// install GUI update timer
 	SetTimer( __MessageHwnd, 1000, 50, NULL );
 
@@ -1910,7 +1908,7 @@ DWORD WINAPI RemoteVstPlugin::guiEventLoop()
 
 
 
-LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
+LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 						WPARAM wParam, LPARAM lParam )
 {
 	if( uMsg == WM_TIMER && __plugin->isInitialized() )
@@ -2004,7 +2002,7 @@ int main( int _argc, char * * _argv )
 
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = DefWindowProc;
+	wc.lpfnWndProc = RemoteVstPlugin::wndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInst;
