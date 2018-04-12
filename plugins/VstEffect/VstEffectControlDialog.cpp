@@ -82,8 +82,8 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 			connect( btn, SIGNAL( toggled( bool ) ),
 						SLOT( togglePluginUI( bool ) ) );
 		} else {
-			connect( btn, SIGNAL( clicked( bool ) ),
-						SLOT( togglePluginUI( bool ) ) );
+			connect( btn, SIGNAL( clicked() ),
+						m_plugin.data(), SLOT( toggleUI() ) );
 		}
 
 		btn->setMinimumWidth( 78 );
