@@ -10,3 +10,5 @@ ENDIF()
 
 ADD_SUBDIRECTORY(rpmalloc)
 ADD_SUBDIRECTORY(weakjack)
+
+ADD_SUBDIRECTORY(libcds)

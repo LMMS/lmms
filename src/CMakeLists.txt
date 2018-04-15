@@ -168,6 +168,7 @@ SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${SNDFILE_LIBRARIES}
 	${EXTRA_LIBRARIES}
 	rpmalloc
+	cds-s
 )
 
 # Expose required libs for tests binary

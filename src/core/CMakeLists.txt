@@ -30,8 +30,8 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
-	core/LocklessAllocator.cpp
 	core/Memory.cpp
+	core/MemoryPool.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
 	core/Mixer.cpp
@@ -98,6 +98,8 @@ set(LMMS_SRCS
 	core/midi/MidiPort.cpp
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
+
+	core/libcds.cpp
 
 	PARENT_SCOPE
 )

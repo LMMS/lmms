@@ -25,7 +25,7 @@
 #ifndef LOCKLESS_LIST_H
 #define LOCKLESS_LIST_H
 
-#include "LocklessAllocator.h"
+#include "MemoryPool.h"
 
 #include <atomic>
 
@@ -41,7 +41,7 @@ public:
 
 	LocklessList( size_t size ) :
 		m_first(nullptr),
-		m_allocator(new LocklessAllocatorT<Element>(size))
+		m_allocator(new MemoryPool<Element>(size))
 	{
 	}
 
@@ -52,7 +52,7 @@ public:
 
 	void push( T value )
 	{
-		Element * e = m_allocator->alloc();
+		Element * e = m_allocator->allocate();
 		e->value = value;
 		e->next = m_first.load(std::memory_order_relaxed);
 
@@ -81,14 +81,13 @@ public:
 
 	void free( Element * e )
 	{
-		m_allocator->free( e );
+		m_allocator->destroy( e );
 	}
 
 
 private:
 	std::atomic<Element*> m_first;
-	LocklessAllocatorT<Element> * m_allocator;
-
+	MemoryPool<Element> * m_allocator;
 } ;
 
 
