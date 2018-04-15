@@ -37,6 +37,8 @@
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "Memory.h"
+#include "BufferManager.h"
+#include "LocklessList.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -59,10 +61,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#include "BufferManager.h"
-
-typedef LocklessList<PlayHandle *>::Element LocklessListElement;
-
 
 static thread_local bool s_renderingThread;
 
@@ -78,7 +76,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_writeBuf( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_newPlayHandles( PlayHandle::MaxNumber ),
+	m_newPlayHandles( new LocklessStack<PlayHandle*>(PlayHandle::MaxNumber) ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
@@ -427,12 +425,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	song->processNextBuffer();
 
 	// add all play-handles that have to be added
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	PlayHandle* ph;
+	while ( m_newPlayHandles->pop(ph) )
 	{
-		m_playHandles += e->value;
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
-		e = next;
+		m_playHandles += ph;
 	}
 
 	// STAGE 1: run and render all play handles
@@ -504,12 +500,8 @@ void Mixer::clear()
 void Mixer::clearNewPlayHandles()
 {
 	requestChangeInModel();
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
-	{
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
-		e = next;
-	}
+	PlayHandle* ph;
+	while ( m_newPlayHandles->pop(ph) ) {}
 	doneChangeInModel();
 }
 
@@ -674,7 +666,7 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 {
 	if( criticalXRuns() == false )
 	{
-		m_newPlayHandles.push( handle );
+		m_newPlayHandles->push( handle );
 		handle->audioPort()->addPlayHandle( handle );
 		return true;
 	}
@@ -701,24 +693,14 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		for( LocklessListElement * e = m_newPlayHandles.first(),
-				* ePrev = NULL; e; ePrev = e, e = e->next )
-		{
-			if( e->value == _ph )
-			{
-				if( ePrev )
-				{
-					ePrev->next = e->next;
+		m_newPlayHandles->apply([_ph](decltype(m_newPlayHandles)::element_type::Container container) {
+			for (auto it=container.begin(); it != container.end(); it++) {
+				if (*it == _ph) {
+					container.erase(it);
+					break;
 				}
-				else
-				{
-					m_newPlayHandles.setFirst( e->next );
-				}
-				m_newPlayHandles.free( e );
-				removedFromList = true;
-				break;
 			}
-		}
+		});
 		// Now check m_playHandles
 		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
 					m_playHandles.end(), _ph );

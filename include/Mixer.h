@@ -25,24 +25,25 @@
 #ifndef MIXER_H
 #define MIXER_H
 
+#include <memory>
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
 #include <QtCore/QVector>
 #include <QtCore/QWaitCondition>
 #include <samplerate.h>
 
-
 #include "lmms_basics.h"
-#include "LocklessList.h"
 #include "Note.h"
 #include "fifo_buffer.h"
 #include "MixerProfiler.h"
-
+#include "PlayHandle.h"
+#include "LocklessList_fwd.h"
 
 class AudioDevice;
 class MidiClient;
 class AudioPort;
 
+class MixerWorkerThread;
 
 const fpp_t MINIMUM_BUFFER_SIZE = 32;
 const fpp_t DEFAULT_BUFFER_SIZE = 256;
@@ -54,16 +55,10 @@ const int BYTES_PER_SURROUND_FRAME = sizeof( surroundSampleFrame );
 
 const float OUTPUT_SAMPLE_MULTIPLIER = 32767.0f;
 
-
 const float BaseFreq = 440.0f;
 const Keys BaseKey = Key_A;
 const Octaves BaseOctave = DefaultOctave;
 
-
-#include "PlayHandle.h"
-
-
-class MixerWorkerThread;
 
 
 class EXPORT Mixer : public QObject
@@ -382,7 +377,7 @@ private:
 	// playhandle stuff
 	PlayHandleList m_playHandles;
 	// place where new playhandles are added temporarily
-	LocklessList<PlayHandle *> m_newPlayHandles;
+	std::unique_ptr<LocklessStack<PlayHandle *>> m_newPlayHandles;
 	ConstPlayHandleList m_playHandlesToRemove;
 
 

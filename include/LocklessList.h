@@ -1,7 +1,7 @@
 /*
- * LocklessList.h - list with lockless push and pop
+ * LocklessList.h
  *
- * Copyright (c) 2016 Javier Serrano Polo <javier@jasp.net>
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -25,80 +25,71 @@
 #ifndef LOCKLESS_LIST_H
 #define LOCKLESS_LIST_H
 
-#include <QAtomicPointer>
+#include <boost/double_ended/devector.hpp>
+#include <cds/container/fcdeque.h>
+#include "libcds.h"
 
-#include "LocklessAllocator.h"
+#include "Memory.h"
 
-template<typename T>
-class LocklessList
+#include "LocklessList_fwd.h"
+
+template<typename T, unsigned N, typename A>
+using _devector = boost::double_ended::devector<T,
+	boost::double_ended::small_buffer_size<N>,
+	boost::double_ended::devector_growth_policy,
+	A
+>;
+
+// Use erenon's devector as a good tradeoff between std::vector and std::deque.
+// It offers reserve() functionality like std::vector, while still supporting
+// push_back() and push_front() in amortized O(1).
+template<typename T, unsigned N>
+using _LoocklessDeque_Base = cds::container::FCDeque<T, _devector<T, N, MmAllocator<T>>>;
+
+template<typename T, unsigned N>
+class LocklessList : private _LoocklessDeque_Base<T, N>
 {
+	using Base = _LoocklessDeque_Base<T, N>;
 public:
-	struct Element
-	{
-		T value;
-		Element * next;
-	} ;
+	using Container = typename Base::deque_type;
+	using value_type = T;
 
-	LocklessList( size_t size )
+	LocklessList(size_t size = 0) : Base()
 	{
-		m_allocator = new LocklessAllocatorT<Element>( size );
+		reserve_back(size);
 	}
 
-	~LocklessList()
+	void reserve_back(size_t size)
 	{
-		delete m_allocator;
+		Base::apply([size](Container& st) {
+			st.reserve_back(size);
+		});
+	}
+	void reserve_front(size_t size)
+	{
+		Base::apply([size](Container& st) {
+			st.reserve_front(size);
+		});
 	}
 
-	void push( T value )
-	{
-		Element * e = m_allocator->alloc();
-		e->value = value;
+	using Base::push_front;
+	using Base::pop_front;
+	using Base::push_back;
+	using Base::pop_back;
+	using Base::apply;
+};
 
-		do
-		{
-#if QT_VERSION >= 0x050000
-			e->next = m_first.loadAcquire();
-#else
-			e->next = m_first;
-#endif
-		}
-		while( !m_first.testAndSetOrdered( e->next, e ) );
-	}
-
-	Element * popList()
-	{
-		return m_first.fetchAndStoreOrdered( NULL );
-	}
-
-	Element * first()
-	{
-#if QT_VERSION >= 0x050000
-		return m_first.loadAcquire();
-#else
-		return m_first;
-#endif
-	}
-
-	void setFirst( Element * e )
-	{
-#if QT_VERSION >= 0x050000
-		m_first.storeRelease( e );
-#else
-		m_first = e;
-#endif
-	}
-
-	void free( Element * e )
-	{
-		m_allocator->free( e );
-	}
-
-
-private:
-	QAtomicPointer<Element> m_first;
-	LocklessAllocatorT<Element> * m_allocator;
-
-} ;
-
+/// Convenience subclass providing push and pop operations (equivalent to
+/// push_back and pop_back)
+template<typename T, unsigned N>
+class LocklessStack : public LocklessList<T, N>
+{
+	using Base = LocklessList<T, N>;
+public:
+	using LocklessList<T>::LocklessList;
+	void push(const T& value) { Base::push_back(value); }
+	void push(T&& value) { Base::push_back(value); }
+	bool pop(T& value) { return Base::pop_back(value); }
+};
 
 #endif

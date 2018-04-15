@@ -8,3 +8,13 @@ ENDIF()
 
 ADD_SUBDIRECTORY(rpmalloc)
 ADD_SUBDIRECTORY(weakjack)
+
+ADD_SUBDIRECTORY(libcds)
+TARGET_LINK_LIBRARIES(cds-s INTERFACE
+	Boost::system Boost::thread
+)
+
+ADD_LIBRARY(double_ended INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(double_ended INTERFACE
+	"${CMAKE_CURRENT_SOURCE_DIR}/double_ended/include"
+)
