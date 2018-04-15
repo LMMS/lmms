@@ -82,6 +82,10 @@ bool sanitize( sampleFrame * src, int frames )
 				src[f][c] = 0.0f;
 				found = true;
 			}
+			else
+			{
+				src[f][c] = qBound( -4.0f, src[f][c], 4.0f );
+			}
 		}
 	}
 	return found;
