@@ -1,5 +1,5 @@
 /*
- * MemoryManager.h
+ * Memory.h
  *
  * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
  * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
@@ -32,25 +32,35 @@
 #include <vector>
 
 #include "export.h"
+#include "NiftyCounter.h"
 
 class EXPORT MemoryManager
 {
 public:
-	struct ThreadGuard
-	{
-		ThreadGuard();
-		~ThreadGuard();
-	};
-
 	static void * alloc( size_t size );
 	static void free( void * ptr );
+
+private:
+	static void initialize();
+	static void deinitialize();
+	static void thread_initialize();
+	static void thread_deinitialize();
+public:
+	typedef NiftyCounter<MemoryManager::initialize, MemoryManager::deinitialize> MmCounter;
+	typedef NiftyCounterTL<MemoryManager::thread_initialize, MemoryManager::thread_deinitialize> ThreadGuard;
 };
 
+static MemoryManager::MmCounter _mm_counter;
+
 template<typename T>
-struct MmAllocator
+class MmAllocator
 {
+public:
+	MmAllocator() = default;
+	template< class U > MmAllocator( const MmAllocator<U>& other ) {}
 	typedef T value_type;
-	template<class U>  struct rebind { typedef MmAllocator<U> other; };
+	template<class U> struct rebind { typedef MmAllocator<U> other; };
+
 
 	T* allocate( std::size_t n )
 	{
