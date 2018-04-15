@@ -33,7 +33,6 @@
 #include "Mixer.h"
 #include "EffectChain.h"
 #include "plugins/peak_controller_effect/peak_controller_effect.h"
-#include "PresetPreviewPlayHandle.h"
 
 PeakControllerEffectVector PeakController::s_effects;
 int PeakController::m_getCount;
@@ -64,11 +63,7 @@ PeakController::PeakController( Model * _parent,
 
 PeakController::~PeakController()
 {
-	//EffectChain::loadSettings() appends effect to EffectChain::m_effects
-	//When it's previewing, EffectChain::loadSettings(<Controller Fx XML>) is not called
-	//Therefore, we shouldn't call removeEffect() as it is not even appended.
-	//NB: Most XML setting are loaded on preview, except controller fx.
-	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL && PresetPreviewPlayHandle::isPreviewing() == false )
+	if( m_peakEffect != NULL && m_peakEffect->effectChain() != NULL )
 	{
 		m_peakEffect->effectChain()->removeEffect( m_peakEffect );
 	}
