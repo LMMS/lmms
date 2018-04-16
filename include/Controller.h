@@ -130,6 +130,7 @@ public:
 	void removeConnection( ControllerConnection * );
 	int connectionCount() const;
 
+	bool hasModel( const Model * m ) const;
 
 public slots:
 	virtual ControllerDialog * createDialog( QWidget * _parent );
@@ -138,8 +139,6 @@ public slots:
 	{
 		m_name = _new_name;
 	}
-
-	bool hasModel( const Model * m );
 
 
 protected:
