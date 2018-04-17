@@ -33,7 +33,7 @@
 #include "Note.h"
 #include "PlayHandle.h"
 #include "Track.h"
-#include "Memory.h"
+#include "MemoryPool.h"
 
 class QReadWriteLock;
 class InstrumentTrack;
@@ -45,7 +45,6 @@ typedef QList<const NotePlayHandle *> ConstNotePlayHandleList;
 
 class EXPORT NotePlayHandle : public PlayHandle, public Note
 {
-	MM_OPERATORS
 public:
 	void * m_pluginData;
 	std::unique_ptr<BasicFilters<>> m_filter;
@@ -328,31 +327,6 @@ private:
 	bool m_frequencyNeedsUpdate;				// used to update pitch
 } ;
 
-
-const int INITIAL_NPH_CACHE = 256;
-const int NPH_CACHE_INCREMENT = 16;
-
-class NotePlayHandleManager
-{
-	MM_OPERATORS
-public:
-	static void init();
-	static NotePlayHandle * acquire( InstrumentTrack* instrumentTrack,
-					const f_cnt_t offset,
-					const f_cnt_t frames,
-					const Note& noteToPlay,
-					NotePlayHandle* parent = NULL,
-					int midiEventChannel = -1,
-					NotePlayHandle::Origin origin = NotePlayHandle::OriginPattern );
-	static void release( NotePlayHandle * nph );
-	static void extend( int i );
-
-private:
-	static NotePlayHandle ** s_available;
-	static QReadWriteLock s_mutex;
-	static AtomicInt s_availableIndex;
-	static int s_size;
-};
-
+extern MemoryPool<NotePlayHandle> NotePlayHandlePool;
 
 #endif
