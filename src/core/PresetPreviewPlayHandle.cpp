@@ -182,7 +182,7 @@ PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, 
 
 	Engine::mixer()->requestChangeInModel();
 	// create note-play-handle for it
-	m_previewNote = NotePlayHandleManager::acquire(
+	m_previewNote = NotePlayHandlePool.construct(
 			s_previewTC->previewInstrumentTrack(), 0,
 			typeInfo<f_cnt_t>::max() / 2,
 				Note( 0, 0, DefaultKey, 100 ) );

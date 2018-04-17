@@ -32,7 +32,6 @@
 #include "PresetPreviewPlayHandle.h"
 #include "stdshims.h"
 
-
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
 {
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "octave" ), { 0, -1 } },
@@ -263,7 +262,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 				// create sub-note-play-handle, only note is
 				// different
 				Engine::mixer()->addPlayHandle(
-						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
+						NotePlayHandlePool.construct( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking )
 						);
 			}
@@ -502,7 +501,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// create sub-note-play-handle, only ptr to note is different
 		// and is_arp_note=true
 		Engine::mixer()->addPlayHandle(
-				NotePlayHandleManager::acquire( _n->instrumentTrack(),
+				NotePlayHandlePool.construct( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
 							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, _n->getVolume(),
