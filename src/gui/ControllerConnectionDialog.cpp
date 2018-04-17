@@ -188,9 +188,8 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
 	m_userController->setGeometry( 10, 24, 200, 22 );
-	for( int i = 0; i < Engine::getSong()->controllers().size(); ++i )
+	for (Controller * c : Engine::getSong()->controllers())
 	{
-		Controller * c = Engine::getSong()->controllers().at( i );
 		m_userController->model()->addItem( c->name() );
 	}
 	connect( m_userController->model(), SIGNAL( dataUnchanged() ),
