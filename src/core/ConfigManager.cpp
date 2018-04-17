@@ -227,7 +227,7 @@ bool ConfigManager::hasWorkingDir() const
 
 void ConfigManager::setWorkingDir( const QString & wd )
 {
-	m_workingDir = ensureTrailingSlash( QFileInfo( wd ).canonicalFilePath() );
+	m_workingDir = ensureTrailingSlash( QDir::cleanPath( wd ) );
 }
 
 
