@@ -1,7 +1,7 @@
 /*
- * BufferManager.cpp - A buffer caching/memory management system
+ * BufferPool.cpp
  *
- * Copyright (c) 2017 Lukas W <lukaswhl/at/gmail.com>
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -24,32 +24,31 @@
  *
  */
 
-#include "BufferManager.h"
+#include "BufferPool.h"
 
-#include "Engine.h"
-#include "Mixer.h"
-#include "Memory.h"
+#include <cstring>
+#include "MemoryPool.h"
 
-static fpp_t framesPerPeriod;
+static std::unique_ptr<_MemoryPool_Base> pool;
+const int BM_INITIAL_BUFFERS = 256;
 
-void BufferManager::init( fpp_t framesPerPeriod )
+void BufferPool::init( fpp_t framesPerPeriod )
 {
-	::framesPerPeriod = framesPerPeriod;
+	pool.reset(new _MemoryPool_Base(framesPerPeriod * sizeof(sampleFrame), BM_INITIAL_BUFFERS));
 }
 
-
-sampleFrame * BufferManager::acquire()
+sampleFrame * BufferPool::acquire()
 {
-	return MM_ALLOC( sampleFrame, ::framesPerPeriod );
+	return reinterpret_cast<sampleFrame*>(pool->allocate());
 }
 
-void BufferManager::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
+void BufferPool::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
 {
 	memset( ab + offset, 0, sizeof( *ab ) * frames );
 }
 
 #ifndef LMMS_DISABLE_SURROUND
-void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
+void BufferPool::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 							const f_cnt_t offset )
 {
 	memset( ab + offset, 0, sizeof( *ab ) * frames );
@@ -57,8 +56,7 @@ void BufferManager::clear( surroundSampleFrame * ab, const f_cnt_t frames,
 #endif
 
 
-void BufferManager::release( sampleFrame * buf )
+void BufferPool::release( sampleFrame * buf )
 {
-	MM_FREE( buf );
+	pool->deallocate(buf);
 }
-
