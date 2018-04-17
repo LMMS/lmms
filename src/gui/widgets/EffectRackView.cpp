@@ -138,10 +138,6 @@ void EffectRackView::deletePlugin( EffectView* view )
 	Effect * e = view->effect();
 	m_effectViews.erase( qFind( m_effectViews.begin(), m_effectViews.end(), view ) );
 	delete view;
-	if( m_effectViews.size() == 0 )
-	{
-		fxChain()->m_enabledModel.setValue( false );
-	}
 	fxChain()->removeEffect( e );
 	e->deleteLater();
 	update();
@@ -235,7 +231,6 @@ void EffectRackView::addEffect()
 
 	Effect * fx = esd.instantiateSelectedPlugin( fxChain() );
 
-	fxChain()->m_enabledModel.setValue( true );
 	fxChain()->appendEffect( fx );
 	update();
 
