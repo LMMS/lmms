@@ -327,8 +327,8 @@ TrackContentObjectView::~TrackContentObjectView()
 
 /*! \brief Update a TrackContentObjectView
  *
- *  TCO's get drawn only when needed,
- *  and when a TCO is updated,
+ *  TCO's get drawn only when needed, 
+ *  and when a TCO is updated, 
  *  it needs to be redrawn.
  *
  */
@@ -741,61 +741,50 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
-					m_oldTime = m_tco->startPosition();
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
-					s_textFloat->setTitle( tr( "Current length" ) );
 				}
 				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
-					m_oldTime = m_tco->startPosition();
 					QCursor c( Qt::SizeAllCursor );
 					QApplication::setOverrideCursor( c );
-					s_textFloat->setTitle( tr( "Current position" ) );
 				}
 				else if( !m_tco->getAutoResize() )
 				{
 					m_action = Resize;
-					m_oldTime = m_tco->length();
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
+				}
+
+				if( m_action == Move )
+				{
+					s_textFloat->setTitle( tr( "Current position" ) );
+					s_textFloat->setText( QString( "%1:%2" ).
+						arg( m_tco->startPosition().getTact() + 1 ).
+						arg( m_tco->startPosition().getTicks() %
+								MidiTime::ticksPerTact() ) );
+				}
+				else if( m_action == Resize || m_action == ResizeLeft )
+				{
 					s_textFloat->setTitle( tr( "Current length" ) );
+					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
+							arg( m_tco->length().getTact() ).
+							arg( m_tco->length().getTicks() %
+									MidiTime::ticksPerTact() ).
+							arg( m_tco->startPosition().getTact() + 1 ).
+							arg( m_tco->startPosition().getTicks() %
+									MidiTime::ticksPerTact() ).
+							arg( m_tco->endPosition().getTact() + 1 ).
+							arg( m_tco->endPosition().getTicks() %
+									MidiTime::ticksPerTact() ) );
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if TCO was already moved/resized
-				mouseMoveEvent( me );
+				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 				s_textFloat->show();
 			}
-		}
 
-		if( me->x() < width() - RESIZE_GRIP_WIDTH )
-		{
-			m_action = Move;
-			QCursor c( Qt::SizeAllCursor );
-			QApplication::setOverrideCursor( c );
-			delete m_hint;
-			m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> and drag to make "
-							"a copy." ).arg(
-								#ifdef LMMS_BUILD_APPLE
-								"⌘"),
-								#else
-								"Ctrl"),
-								#endif
-					embed::getIconPixmap( "hint" ), 0 );
-			s_textFloat->setTitle( tr( "Current position" ) );
-			s_textFloat->setText( QString( "%1:%2" ).
-					arg( m_tco->startPosition().getTact() + 1 ).
-					arg( m_tco->startPosition().getTicks() %
-							MidiTime::ticksPerTact() ) );
-			s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
-		}
-		else if( !m_tco->getAutoResize() )
-		{
-			m_action = Resize;
-			QCursor c( Qt::SizeHorCursor );
-			QApplication::setOverrideCursor( c );
 			delete m_hint;
 			QString hint = m_action == Move || m_action == MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
@@ -807,21 +796,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 								"Ctrl"),
 								#endif
 					embed::getIconPixmap( "hint" ), 0 );
-			s_textFloat->setTitle( tr( "Current length" ) );
-			s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
-					arg( m_tco->length().getTact() ).
-					arg( m_tco->length().getTicks() %
-							MidiTime::ticksPerTact() ).
-					arg( m_tco->startPosition().getTact() + 1 ).
-					arg( m_tco->startPosition().getTicks() %
-							MidiTime::ticksPerTact() ).
-					arg( m_tco->endPosition().getTact() + 1 ).
-					arg( m_tco->endPosition().getTicks() %
-							MidiTime::ticksPerTact() ) );
-			s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 		}
-//		s_textFloat->reparent( this );
-		s_textFloat->show();
 	}
 	else if( me->button() == Qt::RightButton )
 	{
@@ -1221,7 +1196,7 @@ void TrackContentWidget::updateBackground()
 
 	// draw lines
 	// vertical lines
-	pmp.setPen( QPen( gridColor(), 1 ) );
+	pmp.setPen( QPen( gridColor(), 1 ) );	
 	for( float x = 0; x < w * 2; x += ppt )
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
@@ -1232,9 +1207,9 @@ void TrackContentWidget::updateBackground()
 	{
 		pmp.drawLine( QLineF( x, 0.0, x, h ) );
 	}
-
+	
 	// horizontal line
-	pmp.setPen( QPen( gridColor(), 1 ) );
+	pmp.setPen( QPen( gridColor(), 1 ) );	
 	pmp.drawLine( 0, h-1, w*2, h-1 );
 
 	pmp.end();
@@ -1955,7 +1930,7 @@ void TrackOperationsWidget::updateMenu()
 	toMenu->addAction( embed::getIconPixmap( "cancel", 16, 16 ),
 						tr( "Remove this track" ),
 						this, SLOT( removeTrack() ) );
-
+	
 	if( ! m_trackView->trackContainerView()->fixedTCOs() )
 	{
 		toMenu->addAction( tr( "Clear this track" ), this, SLOT( clearTrack() ) );
@@ -2885,7 +2860,7 @@ void TrackView::mouseMoveEvent( QMouseEvent * me )
 	else if( m_action == MoveTrack )
 	{
 		// look which track-widget the mouse-cursor is over
-		const int yPos =
+		const int yPos = 
 			m_trackContainerView->contentWidget()->mapFromGlobal( me->globalPos() ).y();
 		const TrackView * trackAtY = m_trackContainerView->trackViewAt( yPos );
 
