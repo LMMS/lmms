@@ -37,6 +37,7 @@
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
 #include "Memory.h"
+#include "BufferPool.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -58,8 +59,6 @@
 #include "MidiWinMM.h"
 #include "MidiApple.h"
 #include "MidiDummy.h"
-
-#include "BufferManager.h"
 
 typedef LocklessList<PlayHandle *>::Element LocklessListElement;
 
@@ -98,7 +97,7 @@ Mixer::Mixer( bool renderOnly ) :
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		BufferManager::clear( m_inputBuffer[i], m_inputBufferSize[i] );
+		BufferPool::clear( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
 	// determine FIFO size and number of frames per period
@@ -133,15 +132,15 @@ Mixer::Mixer( bool renderOnly ) :
 	// allocte the FIFO from the determined size
 	m_fifo = new fifo( fifoSize );
 
-	// now that framesPerPeriod is fixed initialize global BufferManager
-	BufferManager::init( m_framesPerPeriod );
+	// now that framesPerPeriod is fixed initialize global BufferPool
+	BufferPool::init( m_framesPerPeriod );
 
 	AlignedAllocator<surroundSampleFrame> alloc;
 	for( int i = 0; i < 3; i++ )
 	{
 		m_readBuf = alloc.allocate( m_framesPerPeriod );
 
-		BufferManager::clear( m_readBuf, m_framesPerPeriod );
+		BufferPool::clear( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
 
@@ -417,7 +416,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_readBuf = m_bufferPool[m_readBuffer];
 
 	// clear last audio-buffer
-	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
+	BufferPool::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
 	FxMixer * fxMixer = Engine::fxMixer();

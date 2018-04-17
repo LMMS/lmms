@@ -39,8 +39,6 @@
 #include <QDomElement>
 
 #include "ConfigManager.h"
-#include "BufferManager.h"
-#include "ConfigManager.h"
 #include "Engine.h"
 #include "gui_templates.h"
 #include "InstrumentPlayHandle.h"

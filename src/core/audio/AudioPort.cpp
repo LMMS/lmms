@@ -29,14 +29,14 @@
 #include "Engine.h"
 #include "Mixer.h"
 #include "MixHelpers.h"
-#include "BufferManager.h"
+#include "BufferPool.h"
 
 
 AudioPort::AudioPort( const QString & _name, bool _has_effect_chain,
 		FloatModel * volumeModel, FloatModel * panningModel,
 		BoolModel * mutedModel ) :
 	m_bufferUsage( false ),
-	m_portBuffer( BufferManager::acquire() ),
+	m_portBuffer( BufferPool::acquire() ),
 	m_extOutputEnabled( false ),
 	m_nextFxChannel( 0 ),
 	m_name( "unnamed port" ),
@@ -56,7 +56,7 @@ AudioPort::~AudioPort()
 {
 	setExtOutputEnabled( false );
 	Engine::mixer()->removeAudioPort( this );
-	BufferManager::release( m_portBuffer );
+	BufferPool::release( m_portBuffer );
 }
 
 
@@ -111,7 +111,7 @@ void AudioPort::doProcessing()
 	const fpp_t fpp = Engine::mixer()->framesPerPeriod();
 
 	// clear the buffer
-	BufferManager::clear( m_portBuffer, fpp );
+	BufferPool::clear( m_portBuffer, fpp );
 
 	//qDebug( "Playhandles: %d", m_playHandles.size() );
 	for( PlayHandle * ph : m_playHandles ) // now we mix all playhandle buffers into the audioport buffer
