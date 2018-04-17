@@ -30,8 +30,8 @@ set(LMMS_SRCS
 	core/LadspaControl.cpp
 	core/LadspaManager.cpp
 	core/LfoController.cpp
-	core/LocklessAllocator.cpp
 	core/Memory.cpp
+	core/MemoryPool.cpp
 	core/MeterModel.cpp
 	core/MicroTimer.cpp
 	core/Mixer.cpp

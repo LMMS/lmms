@@ -15,6 +15,7 @@ ADD_EXECUTABLE(tests
 
 	src/core/ProjectVersionTest.cpp
 	src/core/RelativePathsTest.cpp
+	src/core/MemoryPoolTest.cpp
 
 	src/tracks/AutomationTrackTest.cpp
 )
