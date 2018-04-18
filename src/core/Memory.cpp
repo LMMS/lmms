@@ -69,30 +69,12 @@ void MemoryManager::thread_deinitialize()
 	rpmalloc_thread_finalize();
 }
 
-void* _AlignedAllocator_Base::alloc_impl( size_t n , size_t alignment)
+void* _AlignedAllocator_Base::alloc_impl(size_t alignment, size_t size )
 {
-	char *ptr, *ptr2, *aligned_ptr;
-	int align_mask = alignment - 1;
-
-	ptr = static_cast<char*>( malloc( n + alignment + sizeof( int ) ) );
-
-	if( ptr == NULL ) throw std::bad_alloc{};
-
-	ptr2 = ptr + sizeof( int );
-	aligned_ptr = ptr2 + ( alignment - ( ( size_t ) ptr2 & align_mask ) );
-
-	ptr2 = aligned_ptr - sizeof( int );
-	*( ( int* ) ptr2 ) = ( int )( aligned_ptr - ptr );
-
-	return aligned_ptr;
+	return rpaligned_alloc(alignment, size);
 }
 
 void _AlignedAllocator_Base::dealloc_impl(void* p)
 {
-	if ( !p ) return;
-
-	int *ptr2 = static_cast<int*>( p ) - 1;
-	p = static_cast<char*>( p ) - *ptr2;
-	free( p );
+	rpfree(p);
 }
-

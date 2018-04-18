@@ -81,7 +81,7 @@ private:
 class _AlignedAllocator_Base
 {
 protected:
-	void* alloc_impl( size_t n, size_t alignment );
+	void* alloc_impl( size_t alignment, size_t size );
 	void dealloc_impl( void* p );
 };
 
@@ -97,7 +97,7 @@ public:
 
 	T* allocate( std::size_t n )
 	{
-		return reinterpret_cast<T*>( alloc_impl( sizeof(T) * n, alignment ) );
+		return reinterpret_cast<T*>( alloc_impl( alignment, sizeof(T) * n ) );
 	}
 
 	void deallocate( T* p, std::size_t )
