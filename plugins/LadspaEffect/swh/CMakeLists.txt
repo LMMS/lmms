@@ -17,7 +17,7 @@ ENDIF()
 
 # Additional compile flags
 SET(COMPILE_FLAGS "${COMPILE_FLAGS} -O3 -Wall")
-SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -fstrength-reduce -funroll-loops -ffast-math -c -fno-strict-aliasing")
+SET(COMPILE_FLAGS "${COMPILE_FLAGS} -fomit-frame-pointer -funroll-loops -ffast-math -c -fno-strict-aliasing")
 SET(COMPILE_FLAGS "${COMPILE_FLAGS} ${PIC_FLAGS}")
 
 # Loop over every XML file
