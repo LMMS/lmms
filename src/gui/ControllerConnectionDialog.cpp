@@ -385,15 +385,6 @@ void ControllerConnectionDialog::midiToggled()
 
 
 
-void ControllerConnectionDialog::userSelected()
-{
-	m_userGroupBox->model()->setValue( 1 );
-	userToggled();
-}
-
-
-
-
 void ControllerConnectionDialog::userToggled()
 {
 	int enabled = m_userGroupBox->model()->value();
@@ -401,6 +392,15 @@ void ControllerConnectionDialog::userToggled()
 	{
 		m_midiGroupBox->model()->setValue( 0 );
 	}
+}
+
+
+
+
+void ControllerConnectionDialog::userSelected()
+{
+	m_userGroupBox->model()->setValue( 1 );
+	userToggled();
 }
 
 
