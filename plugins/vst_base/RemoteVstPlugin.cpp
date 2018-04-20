@@ -730,8 +730,10 @@ void RemoteVstPlugin::initEditor()
 	m_windowWidth = er->right - er->left;
 	m_windowHeight = er->bottom - er->top;
 
-	SetWindowPos( m_window, 0, 0, 0, m_windowWidth + 8,
-			m_windowHeight + 26, SWP_NOACTIVATE |
+	RECT windowSize = { 0, 0, m_windowWidth, m_windowHeight };
+	AdjustWindowRect( &windowSize, dwStyle, false );
+	SetWindowPos( m_window, 0, 0, 0, windowSize.right - windowSize.left,
+			windowSize.bottom - windowSize.top, SWP_NOACTIVATE |
 						SWP_NOMOVE | SWP_NOZORDER );
 	pluginDispatch( effEditTop );
 
@@ -1968,7 +1970,7 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 				break;
 		}
 	}
-	else if( uMsg == WM_SYSCOMMAND && wParam == SC_CLOSE )
+	else if( uMsg == WM_SYSCOMMAND && (wParam & 0xfff0) == SC_CLOSE )
 	{
 		__plugin->hideEditor();
 		return 0;
