@@ -134,6 +134,8 @@ public:
 
 	void init( const std::string & _plugin_file );
 	void initEditor();
+	void showEditor();
+	void hideEditor();
 	void destroyEditor();
 
 	virtual void process( const sampleFrame * _in, sampleFrame * _out );
@@ -507,27 +509,28 @@ bool RemoteVstPlugin::processMessage( const message & _m )
 		switch( _m.id )
 		{
 		case IdShowUI:
-			initEditor();
+			showEditor();
 			return true;
 
 		case IdHideUI:
-			destroyEditor();
+			hideEditor();
 			return true;
 
 		case IdToggleUI:
-			if( m_window )
+			if( m_window && IsWindowVisible( m_window ) )
 			{
-				destroyEditor();
+				hideEditor();
 			}
 			else
 			{
-				initEditor();
+				showEditor();
 			}
 			return true;
 
 		case IdIsUIVisible:
+			bool visible = m_window && IsWindowVisible( m_window );
 			sendMessage( message( IdIsUIVisible )
-						 .addInt( m_window ? 1 : 0 ) );
+						 .addInt( visible ? 1 : 0 ) );
 			return true;
 		}
 	}
@@ -709,7 +712,7 @@ void RemoteVstPlugin::initEditor()
 		dwStyle = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX;
 	}
 
-	m_window = CreateWindowEx( 0, "LVSL", pluginName(),
+	m_window = CreateWindowEx( WS_EX_APPWINDOW, "LVSL", pluginName(),
 		dwStyle,
 		0, 0, 10, 10, NULL, NULL, hInst, NULL );
 	if( m_window == NULL )
@@ -733,7 +736,7 @@ void RemoteVstPlugin::initEditor()
 	pluginDispatch( effEditTop );
 
 	if (! EMBED) {
-		ShowWindow( m_window, SW_SHOWNORMAL );
+		showEditor();
 	}
 
 #ifdef LMMS_BUILD_LINUX
@@ -742,6 +745,26 @@ void RemoteVstPlugin::initEditor()
 	// 64-bit versions of Windows use 32-bit handles for interoperability
 	m_windowID = (intptr_t) m_window;
 #endif
+}
+
+
+
+
+void RemoteVstPlugin::showEditor() {
+	if( !EMBED && !HEADLESS && m_window )
+	{
+		ShowWindow( m_window, SW_SHOWNORMAL );
+	}
+}
+
+
+
+
+void RemoteVstPlugin::hideEditor() {
+	if( !EMBED && !HEADLESS && m_window )
+	{
+		ShowWindow( m_window, SW_HIDE );
+	}
 }
 
 
@@ -1947,7 +1970,7 @@ LRESULT CALLBACK RemoteVstPlugin::wndProc( HWND hwnd, UINT uMsg,
 	}
 	else if( uMsg == WM_SYSCOMMAND && wParam == SC_CLOSE )
 	{
-		__plugin->destroyEditor();
+		__plugin->hideEditor();
 		return 0;
 	}
 
