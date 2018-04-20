@@ -113,6 +113,12 @@ sf2Instrument::sf2Instrument( InstrumentTrack * _instrument_track ) :
 		m_notesRunning[i] = 0;
 	}
 
+
+#if FLUIDSYNTH_VERSION_MAJOR >= 1 && FLUIDSYNTH_VERSION_MINOR >= 1 && FLUIDSYNTH_VERSION_MICRO >= 9
+	// Deactivate all audio drivers in fluidsynth
+	const char *none[] = { NULL };
+	fluid_audio_driver_register( none );
+#endif
 	m_settings = new_fluid_settings();
 
 	//fluid_settings_setint( m_settings, (char *) "audio.period-size", engine::mixer()->framesPerPeriod() );
