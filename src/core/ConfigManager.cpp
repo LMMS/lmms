@@ -26,6 +26,11 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QApplication>
+#if QT_VERSION >= 0x050000
+#include <QStandardPaths>
+#else
+#include <QDesktopServices>
+#endif
 #include <QtCore/QTextStream>
 
 #include "ConfigManager.h"
@@ -50,7 +55,11 @@ ConfigManager * ConfigManager::s_instanceOfMe = NULL;
 
 ConfigManager::ConfigManager() :
 	m_lmmsRcFile( QDir::home().absolutePath() +"/.lmmsrc.xml" ),
-	m_workingDir( QDir::home().absolutePath() + "/lmms/"),
+	#if QT_VERSION >= 0x050000
+	m_workingDir( QStandardPaths::writableLocation( QStandardPaths::DocumentsLocation ) + "/lmms/"),
+	#else
+	m_workingDir( QDesktopServices::storageLocation( QDesktopServices::DocumentsLocation ) + "/lmms/"),
+	#endif
 	m_dataDir( "data:/" ),
 	m_artworkDir( defaultArtworkDir() ),
 	m_vstDir( m_workingDir + "vst/" ),
@@ -58,6 +67,10 @@ ConfigManager::ConfigManager() :
 	m_sf2Dir( m_workingDir + SF2_PATH ),
 	m_version( defaultVersion() )
 {
+	// Detect < 1.2.0 working directory as a courtesy
+	if ( QFileInfo( QDir::home().absolutePath() + "/lmms/projects/" ).exists() )
+                m_workingDir = QDir::home().absolutePath() + "/lmms/";
+
 	if (! qgetenv("LMMS_DATA_DIR").isEmpty())
 		QDir::addSearchPath("data", QString::fromLocal8Bit(qgetenv("LMMS_DATA_DIR")));
 
