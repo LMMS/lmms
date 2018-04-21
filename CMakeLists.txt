@@ -20,8 +20,7 @@ INCLUDE(FindPkgConfig)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-# Updated by maintenance tasks
-SET(PROJECT_YEAR 2017)
+SET(PROJECT_YEAR 2018)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
