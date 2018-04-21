@@ -89,7 +89,6 @@ private:
 
 	AudioFileDevice * m_fileDev;
 	Mixer::qualitySettings m_qualitySettings;
-	Mixer::qualitySettings m_oldQualitySettings;
 
 	volatile int m_progress;
 	volatile bool m_abort;

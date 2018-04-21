@@ -4134,6 +4134,10 @@ Please make sure you have write permission to the file and the directory contain
         <translation>Impossibile scrivere sul file %1.
 Si prega di controllare i permessi di scrittura sul file e la cartella che lo contiene, e poi riprovare!</translation>
     </message>
+    <message>
+        <source>Export &amp;MIDI...</source>
+        <translation>Esporta &amp;MIDI...</translation>
+    </message>
 </context>
 <context>
     <name>MeterDialog</name>
@@ -9085,7 +9089,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
 </context>
 <context>
-    <name>papuInstrument</name>
+    <name>FreeBoyInstrument</name>
     <message>
         <source>Sweep time</source>
         <translation>Tempo di sweep</translation>
@@ -9180,7 +9184,7 @@ Facendo doppio click sui plugin verranno fornite informazioni sulle relative por
     </message>
 </context>
 <context>
-    <name>papuInstrumentView</name>
+    <name>FreeBoyInstrumentView</name>
     <message>
         <source>Sweep Time:</source>
         <translation>Tempo di sweep:</translation>

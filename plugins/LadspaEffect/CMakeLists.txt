@@ -1,15 +1,16 @@
 INCLUDE(BuildPlugin)
 
-# Disable C++11
-REMOVE_DEFINITIONS(-std=c++0x)
-# Enable C++11 for CXXFLAGS only and not for Windows
-IF(NOT LMMS_BUILD_WIN32)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-ENDIF()
-
 BUILD_PLUGIN(ladspaeffect LadspaEffect.cpp LadspaControls.cpp LadspaControlDialog.cpp LadspaSubPluginFeatures.cpp LadspaEffect.h LadspaControls.h LadspaControlDialog.h LadspaSubPluginFeatures.h MOCFILES LadspaEffect.h LadspaControls.h LadspaControlDialog.h EMBEDDED_RESOURCES logo.png)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ladspa")
+
+# Enable C++11 for all except mingw builds
+# TODO: Validate against modern mingw compiler
+IF(NOT MINGW_PREFIX)
+	SET(CMAKE_CXX_STANDARD 11)
+ELSE()
+	SET(CMAKE_CXX_STANDARD 98)
+ENDIF()
 
 IF(WANT_CAPS)
 ADD_SUBDIRECTORY(caps)

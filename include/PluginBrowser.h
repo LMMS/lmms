@@ -37,8 +37,7 @@ class PluginBrowser : public SideBarWidget
 	Q_OBJECT
 public:
 	PluginBrowser( QWidget * _parent );
-	virtual ~PluginBrowser();
-
+	virtual ~PluginBrowser() = default;
 
 private:
 	QWidget * m_view;
@@ -62,29 +61,21 @@ class PluginDescWidget : public QWidget
 	Q_OBJECT
 public:
 	PluginDescWidget( const Plugin::Descriptor & _pd, QWidget * _parent );
-	virtual ~PluginDescWidget();
 
 
 protected:
-	virtual void enterEvent( QEvent * _e );
-	virtual void leaveEvent( QEvent * _e );
-	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void paintEvent( QPaintEvent * _pe );
-
-
-private slots:
-	void updateHeight();
-
+	void enterEvent( QEvent * _e ) override;
+	void leaveEvent( QEvent * _e ) override;
+	void mousePressEvent( QMouseEvent * _me ) override;
+	void paintEvent( QPaintEvent * _pe ) override;
 
 private:
-	QTimer m_updateTimer;
+	constexpr static int DEFAULT_HEIGHT{24};
 
 	const Plugin::Descriptor & m_pluginDescriptor;
 	QPixmap m_logo;
 
 	bool m_mouseOver;
-	int m_targetHeight;
-
 };
 
 

@@ -25,6 +25,8 @@
 #include <QMessageBox>
 
 #include "VstEffect.h"
+
+#include "GuiApplication.h"
 #include "Song.h"
 #include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
@@ -55,7 +57,6 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 VstEffect::VstEffect( Model * _parent,
 			const Descriptor::SubPluginFeatures::Key * _key ) :
 	Effect( &vsteffect_plugin_descriptor, _parent, _key ),
-	m_plugin( NULL ),
 	m_pluginMutex(),
 	m_key( *_key ),
 	m_vstControls( this )
@@ -73,7 +74,6 @@ VstEffect::VstEffect( Model * _parent,
 
 VstEffect::~VstEffect()
 {
-	closePlugin();
 }
 
 
@@ -124,25 +124,27 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 
 void VstEffect::openPlugin( const QString & _plugin )
 {
-	TextFloat * tf = TextFloat::displayMessage(
-		VstPlugin::tr( "Loading plugin" ),
-		VstPlugin::tr( "Please wait while loading VST plugin..." ),
-			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
-	m_pluginMutex.lock();
-	m_plugin = new VstPlugin( _plugin );
+	TextFloat * tf = NULL;
+	if( gui )
+	{
+		tf = TextFloat::displayMessage(
+			VstPlugin::tr( "Loading plugin" ),
+			VstPlugin::tr( "Please wait while loading VST plugin..." ),
+				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	}
+
+	QMutexLocker ml( &m_pluginMutex ); Q_UNUSED( ml );
+	m_plugin = QSharedPointer<VstPlugin>(new VstPlugin( _plugin ));
 	if( m_plugin->failed() )
 	{
-		m_pluginMutex.unlock();
-		closePlugin();
+		m_plugin.clear();
 		delete tf;
 		collectErrorForUI( VstPlugin::tr( "The VST plugin %1 could not be loaded." ).arg( _plugin ) );
 		return;
 	}
 
-	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin, SLOT( setTempo( bpm_t ) ) );
+	VstPlugin::connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ), m_plugin.data(), SLOT( setTempo( bpm_t ) ) );
 	m_plugin->setTempo( Engine::getSong()->getTempo() );
-
-	m_pluginMutex.unlock();
 
 	delete tf;
 
@@ -151,27 +153,12 @@ void VstEffect::openPlugin( const QString & _plugin )
 
 
 
-void VstEffect::closePlugin()
-{
-	m_pluginMutex.lock();
-	if( m_plugin && m_plugin->pluginWidget() != NULL )
-	{
-		delete m_plugin->pluginWidget();
-	}
-	delete m_plugin;
-	m_plugin = NULL;
-	m_pluginMutex.unlock();
-}
-
-
-
-
 
 extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new VstEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

@@ -2,13 +2,7 @@
 
 set -e
 
-PACKAGES="cmake pkg-config fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio node fltk"
-
-if [ "$QT5" ]; then
-	PACKAGES="$PACKAGES qt@5.5"
-else
-	PACKAGES="$PACKAGES cartr/qt4/qt@4"
-fi
+PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk portaudio node fltk qt5"
 
 if "${TRAVIS}"; then
    PACKAGES="$PACKAGES ccache"
@@ -21,6 +15,9 @@ done;
 
 # shellcheck disable=SC2086
 brew install $PACKAGES
+
+# fftw tries to install gcc which conflicts with travis
+brew install fftw --ignore-dependencies
 
 # Recompile fluid-synth without CoreAudio per issues #649
 # Ruby formula must be a URL

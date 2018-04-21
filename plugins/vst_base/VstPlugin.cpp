@@ -2,7 +2,7 @@
  * VstPlugin.cpp - implementation of VstPlugin class
  *
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -24,6 +24,7 @@
 
 #include "VstPlugin.h"
 
+#include <QtCore/QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QLocale>
@@ -31,18 +32,26 @@
 #include <QCloseEvent>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+
 #ifdef LMMS_BUILD_LINUX
-#if QT_VERSION < 0x050000
-#include <QX11EmbedContainer>
-#include <QX11Info>
+#	if QT_VERSION < 0x050000
+#		include <QX11EmbedContainer>
+#		include <QX11Info>
+#	else
+#		include "X11EmbedContainer.h"
+#		include <QWindow>
+#	endif
 #endif
-#else
-#include <QLayout>
+
+#if QT_VERSION >= 0x050000
+#	include <QWindow>
 #endif
+
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
-#include <windows.h>
+#	include <windows.h>
+#	include <QLayout>
 #endif
 
 #include "ConfigManager.h"
@@ -52,8 +61,6 @@
 #include "Song.h"
 #include "templates.h"
 #include "FileDialog.h"
-#include <QLayout>
-
 
 class vstSubWin : public QMdiSubWindow
 {
@@ -78,24 +85,15 @@ public:
 } ;
 
 
-
-
 VstPlugin::VstPlugin( const QString & _plugin ) :
-	RemotePlugin(),
-	JournallingObject(),
 	m_plugin( _plugin ),
-	m_pluginWidget( NULL ),
 	m_pluginWindowID( 0 ),
+	m_embedMethod( gui
+			? ConfigManager::inst()->vstEmbedMethod()
+			: "headless" ),
 	m_badDllFormat( false ),
-	m_name(),
 	m_version( 0 ),
-	m_vendorString(),
-	m_productString(),
-	m_currentProgramName(),
-	m_allProgramNames(),
-	p_name(),
-	m_currentProgram(),
-	m_idleTimer()
+	m_currentProgram()
 {
 	setSplittedChannels( true );
 
@@ -126,6 +124,8 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
+	delete m_pluginSubWindow;
+	delete m_pluginWidget;
 }
 
 
@@ -133,29 +133,15 @@ VstPlugin::~VstPlugin()
 
 void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 {
-	init( remoteVstPluginExecutable, false );
+	init( remoteVstPluginExecutable, false, {m_embedMethod} );
+
+	waitForHostInfoGotten();
+	if( failed() )
+	{
+		return;
+	}
 
 	lock();
-#ifdef LMMS_BUILD_WIN32
-	QWidget * helper = new QWidget;
-	QHBoxLayout * l = new QHBoxLayout( helper );
-	QWidget * target = new QWidget( helper );
-	l->setSpacing( 0 );
-	l->setMargin( 0 );
-	l->addWidget( target );
-
-	static int k = 0;
-	const QString t = QString( "vst%1%2" ).arg( GetCurrentProcessId()<<10 ).
-								arg( ++k );
-	helper->setWindowTitle( t );
-
-	// we've to call that for making sure, Qt created the windows
-	(void) helper->winId();
-	(void) target->winId();
-
-	sendMessage( message( IdVstPluginWindowInformation ).
-					addString( QSTR_TO_STDSTR( t ) ) );
-#endif
 
 	VstHostLanguages hlang = LanguageEnglish;
 	switch( QLocale::system().language() )
@@ -183,95 +169,6 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 	waitForInitDone();
 
 	unlock();
-
-#ifdef LMMS_BUILD_WIN32
-	if( !failed() && m_pluginWindowID )
-	{
-		target->setFixedSize( m_pluginGeometry );
-		vstSubWin * sw = new vstSubWin(
-					gui->mainWindow()->workspace() );
-		sw->setWidget( helper );
-		helper->setWindowTitle( name() );
-		m_pluginWidget = helper;
-	}
-	else
-	{
-		delete helper;
-	}
-#endif
-}
-
-
-
-
-void VstPlugin::showEditor( QWidget * _parent, bool isEffect )
-{
-	QWidget * w = pluginWidget();
-	if( w )
-	{
-#ifdef LMMS_BUILD_WIN32
-		// hide sw, plugin window wrapper on win32
-		// this is obtained from pluginWidget()
-		if( isEffect )
-		{
-			w->setWindowFlags( Qt::FramelessWindowHint );
-			w->setAttribute( Qt::WA_TranslucentBackground );
-		}
-		else
-		{
-			w->setWindowFlags( Qt::WindowCloseButtonHint );
-		}
-#endif
-		w->show();
-		return;
-	}
-
-#ifdef LMMS_BUILD_LINUX
-	if( m_pluginWindowID == 0 )
-	{
-		return;
-	}
-
-	m_pluginWidget = new QWidget( _parent );
-	m_pluginWidget->setFixedSize( m_pluginGeometry );
-	m_pluginWidget->setWindowTitle( name() );
-	if( _parent == NULL )
-	{
-		vstSubWin * sw = new vstSubWin(
-					gui->mainWindow()->workspace() );
-		if( isEffect )
-		{
-			sw->setAttribute( Qt::WA_TranslucentBackground );
-			sw->setWindowFlags( Qt::FramelessWindowHint );
-			sw->setWidget( m_pluginWidget );
-#if QT_VERSION < 0x050000
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->show();
-#endif
-		} 
-		else
-		{
-			sw->setWindowFlags( Qt::WindowCloseButtonHint );
-			sw->setWidget( m_pluginWidget );
-
-#if QT_VERSION < 0x050000
-			QX11EmbedContainer * xe = new QX11EmbedContainer( sw );
-			xe->embedClient( m_pluginWindowID );
-			xe->setFixedSize( m_pluginGeometry );
-			xe->move( 4, 24 );
-			xe->show();
-#endif
-		}
-	}
-
-#endif
-
-	if( m_pluginWidget )
-	{
-		m_pluginWidget->show();
-	}
 }
 
 
@@ -289,18 +186,27 @@ void VstPlugin::hideEditor()
 
 
 
+void VstPlugin::toggleEditor()
+{
+	QWidget * w = pluginWidget();
+	if( w )
+	{
+		w->setVisible( !w->isVisible() );
+	}
+}
+
+
+
+
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
-	if( pluginWidget() != NULL )
+	if( _this.attribute( "guivisible" ).toInt() )
 	{
-		if( _this.attribute( "guivisible" ).toInt() )
-		{
-			showEditor( NULL, false );
-		}
-		else
-		{
-			hideEditor();
-		}
+		showUI();
+	}
+	else
+	{
+		hideUI();
 	}
 
 	const int num_params = _this.attribute( "numparams" ).toInt();
@@ -334,9 +240,20 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 
 void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
-	if( pluginWidget() != NULL )
+	if ( m_embedMethod != "none" )
 	{
-		_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
+		if( pluginWidget() != NULL )
+		{
+			_this.setAttribute( "guivisible", pluginWidget()->isVisible() );
+		}
+	}
+	else
+	{
+		int visible = isUIVisible();
+		if ( visible != -1 )
+		{
+			_this.setAttribute( "guivisible", visible );
+		}
 	}
 
 	// try to save all settings in a chunk
@@ -361,6 +278,18 @@ void VstPlugin::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "program", currentProgram() );
 }
 
+void VstPlugin::toggleUI()
+{
+	if ( m_embedMethod == "none" )
+	{
+		RemotePlugin::toggleUI();
+	}
+	else if (pluginWidget())
+	{
+		toggleEditor();
+	}
+}
+
 
 
 
@@ -379,6 +308,7 @@ void VstPlugin::updateSampleRate()
 	lock();
 	sendMessage( message( IdSampleRateInformation ).
 			addInt( Engine::mixer()->processingSampleRate() ) );
+	waitForMessage( IdInformationUpdated, true );
 	unlock();
 }
 
@@ -432,6 +362,23 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 	unlock();
 }
 
+QWidget *VstPlugin::pluginWidget(bool _top_widget)
+{
+	if ( m_embedMethod == "none" || !m_pluginWidget )
+	{
+		return nullptr;
+	}
+
+	if ( _top_widget && m_pluginWidget->parentWidget() == m_pluginSubWindow )
+	{
+		return m_pluginSubWindow;
+	}
+	else
+	{
+		return m_pluginWidget;
+	}
+}
+
 
 
 
@@ -439,17 +386,17 @@ bool VstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
-		case IdVstBadDllFormat:
-			m_badDllFormat = true;
-			break;
+	case IdVstBadDllFormat:
+		m_badDllFormat = true;
+		break;
 
-		case IdVstPluginWindowID:
-			m_pluginWindowID = _m.getInt();
-			break;
+	case IdVstPluginWindowID:
+		m_pluginWindowID = _m.getInt();
+		break;
 
-		case IdVstPluginEditorGeometry:
-			m_pluginGeometry = QSize( _m.getInt( 0 ),
-							_m.getInt( 1 ) );
+	case IdVstPluginEditorGeometry:
+		m_pluginGeometry = QSize( _m.getInt( 0 ),
+								  _m.getInt( 1 ) );
 			break;
 
 		case IdVstPluginName:
@@ -624,6 +571,46 @@ void VstPlugin::idleUpdate()
 	unlock();
 }
 
+void VstPlugin::showUI()
+{
+	if ( m_embedMethod == "none" )
+	{
+		RemotePlugin::showUI();
+	}
+	else if ( m_embedMethod != "headless" )
+	{
+		if (! pluginWidget()) {
+			createUI( NULL, false );
+		}
+
+		QWidget * w = pluginWidget();
+		if( w )
+		{
+			w->show();
+		}
+	}
+}
+
+void VstPlugin::hideUI()
+{
+	if ( m_embedMethod == "none" )
+	{
+		RemotePlugin::hideUI();
+	}
+	else if ( pluginWidget() != nullptr )
+	{
+		hideEditor();
+	}
+}
+
+// X11Embed only
+void VstPlugin::handleClientEmbed()
+{
+	lock();
+	sendMessage( IdShowUI );
+	unlock();
+}
+
 
 
 void VstPlugin::loadChunk( const QByteArray & _chunk )
@@ -665,6 +652,114 @@ QByteArray VstPlugin::saveChunk()
 	}
 
 	return a;
+}
+
+void VstPlugin::createUI( QWidget * parent, bool isEffect )
+{
+	if( m_pluginWindowID == 0 )
+	{
+		return;
+	}
+
+	QWidget* container = nullptr;
+	m_pluginSubWindow = new vstSubWin( gui->mainWindow()->workspace() );
+	auto sw = m_pluginSubWindow.data();
+
+#if QT_VERSION >= 0x050100
+	if (m_embedMethod == "qt" )
+	{
+		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
+		container = QWidget::createWindowContainer(vw, sw );
+		container->installEventFilter(this);
+	} else
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if (m_embedMethod == "win32" )
+	{
+		QWidget * helper = new QWidget;
+		QHBoxLayout * l = new QHBoxLayout( helper );
+		QWidget * target = new QWidget( helper );
+		l->setSpacing( 0 );
+		l->setMargin( 0 );
+		l->addWidget( target );
+
+		// we've to call that for making sure, Qt created the windows
+		helper->winId();
+		HWND targetHandle = (HWND)target->winId();
+		HWND pluginHandle = (HWND)(intptr_t)m_pluginWindowID;
+
+		DWORD style = GetWindowLong(pluginHandle, GWL_STYLE);
+		style = style & ~(WS_POPUP);
+		style = style | WS_CHILD;
+		SetWindowLong(pluginHandle, GWL_STYLE, style);
+		SetParent(pluginHandle, targetHandle);
+
+		DWORD threadId = GetWindowThreadProcessId(pluginHandle, NULL);
+		DWORD currentThreadId = GetCurrentThreadId();
+		AttachThreadInput(currentThreadId, threadId, true);
+
+		container = helper;
+		RemotePlugin::showUI();
+
+	} else
+#endif
+
+#ifdef LMMS_BUILD_LINUX
+	if (m_embedMethod == "xembed" )
+	{
+		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( sw );
+		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
+		embedContainer->embedClient( m_pluginWindowID );
+		container = embedContainer;
+	} else
+#endif
+	{
+		qCritical() << "Unknown embed method" << m_embedMethod;
+		delete m_pluginSubWindow;
+		return;
+	}
+
+	container->setFixedSize( m_pluginGeometry );
+	container->setWindowTitle( name() );
+
+	if( parent == NULL )
+	{
+		m_pluginWidget = container;
+
+		sw->setWidget(container);
+
+		if( isEffect )
+		{
+			sw->setAttribute( Qt::WA_TranslucentBackground );
+			sw->setWindowFlags( Qt::FramelessWindowHint );
+		}
+		else
+		{
+			sw->setWindowFlags( Qt::WindowCloseButtonHint );
+		}
+	};
+
+	container->setFixedSize( m_pluginGeometry );
+}
+
+bool VstPlugin::eventFilter(QObject *obj, QEvent *event)
+{
+#if QT_VERSION >= 0x050100
+	if (embedMethod() == "qt" && obj == m_pluginWidget)
+	{
+		if (event->type() == QEvent::Show) {
+			RemotePlugin::showUI();
+		}
+		qDebug() << obj << event;
+	}
+#endif
+	return false;
+}
+
+QString VstPlugin::embedMethod() const
+{
+	return m_embedMethod;
 }
 
 

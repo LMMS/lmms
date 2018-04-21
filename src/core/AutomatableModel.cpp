@@ -31,19 +31,15 @@
 #include "Mixer.h"
 #include "ProjectJournal.h"
 
-float AutomatableModel::s_copiedValue = 0;
 long AutomatableModel::s_periodCounter = 0;
 
 
 
-AutomatableModel::AutomatableModel( DataType type,
+AutomatableModel::AutomatableModel(
 						const float val, const float min, const float max, const float step,
 						Model* parent, const QString & displayName, bool defaultConstructed ) :
 	Model( parent, displayName, defaultConstructed ),
-	m_dataType( type ),
 	m_scaleType( Linear ),
-	m_value( val ),
-	m_initValue( val ),
 	m_minValue( min ),
 	m_maxValue( max ),
 	m_step( step ),
@@ -52,13 +48,13 @@ AutomatableModel::AutomatableModel( DataType type,
 	m_valueChanged( false ),
 	m_setValueDepth( 0 ),
 	m_hasStrictStepSize( false ),
-	m_hasLinkedModels( false ),
 	m_controllerConnection( NULL ),
 	m_valueBuffer( static_cast<int>( Engine::mixer()->framesPerPeriod() ) ),
 	m_lastUpdatedPeriod( -1 ),
 	m_hasSampleExactData( false )
 
 {
+	m_value = fittedValue( val );
 	setInitValue( val );
 }
 
@@ -274,19 +270,6 @@ float AutomatableModel::inverseScaledValue( float value ) const
 
 
 
-QString AutomatableModel::displayValue( const float val ) const
-{
-	switch( m_dataType )
-	{
-		case Float: return QString::number( castValue<float>( scaledValue( val ) ) );
-		case Integer: return QString::number( castValue<int>( scaledValue( val ) ) );
-		case Bool: return QString::number( castValue<bool>( scaledValue( val ) ) );
-	}
-	return "0";
-}
-
-
-
 //! @todo: this should be moved into a maths header
 template<class T>
 void roundAt( T& value, const T& where, const T& step_size )
@@ -412,7 +395,6 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 	if( !m_linkedModels.contains( model ) && model != this )
 	{
 		m_linkedModels.push_back( model );
-		m_hasLinkedModels = true;
 
 		if( !model->hasLinkedModels() )
 		{
@@ -431,7 +413,6 @@ void AutomatableModel::unlinkModel( AutomatableModel* model )
 	{
 		m_linkedModels.erase( it );
 	}
-	m_hasLinkedModels = !m_linkedModels.isEmpty();
 }
 
 
@@ -463,8 +444,6 @@ void AutomatableModel::unlinkAllModels()
 	{
 		unlinkModels( this, model );
 	}
-
-	m_hasLinkedModels = false;
 }
 
 
@@ -523,14 +502,8 @@ float AutomatableModel::controllerValue( int frameOffset ) const
 
 ValueBuffer * AutomatableModel::valueBuffer()
 {
-	// if we've already calculated the valuebuffer this period, return the cached buffer
-	if( m_lastUpdatedPeriod == s_periodCounter )
-	{
-		return m_hasSampleExactData
-			? &m_valueBuffer
-			: NULL;
-	}
 	QMutexLocker m( &m_valueBufferMutex );
+	// if we've already calculated the valuebuffer this period, return the cached buffer
 	if( m_lastUpdatedPeriod == s_periodCounter )
 	{
 		return m_hasSampleExactData
@@ -573,7 +546,7 @@ ValueBuffer * AutomatableModel::valueBuffer()
 		}
 	}
 	AutomatableModel* lm = NULL;
-	if( m_hasLinkedModels )
+	if( hasLinkedModels() )
 	{
 		lm = m_linkedModels.first();
 	}
@@ -626,6 +599,7 @@ void AutomatableModel::setInitValue( const float value )
 	m_initValue = fittedValue( value );
 	bool journalling = testAndSetJournalling( false );
 	setValue( value );
+	m_oldValue = m_value;
 	setJournalling( journalling );
 	emit initValueChanged( value );
 }
@@ -638,21 +612,6 @@ void AutomatableModel::reset()
 	setValue( initValue<float>() );
 }
 
-
-
-
-void AutomatableModel::copyValue()
-{
-	s_copiedValue = value<float>();
-}
-
-
-
-
-void AutomatableModel::pasteValue()
-{
-	setValue( copiedValue() );
-}
 
 
 
@@ -734,3 +693,19 @@ int FloatModel::getDigitCount() const
 	return digits;
 }
 
+
+
+QString FloatModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<float>( scaledValue( val ) ) );
+}
+
+QString IntModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<int>( scaledValue( val ) ) );
+}
+
+QString BoolModel::displayValue( const float val ) const
+{
+	return QString::number( castValue<bool>( scaledValue( val ) ) );
+}

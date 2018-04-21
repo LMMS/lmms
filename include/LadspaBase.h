@@ -45,6 +45,7 @@ typedef enum BufferRates
 typedef enum BufferData
 {
 	TOGGLED,
+	ENUM,
 	INTEGER,
 	FLOATING,
 	TIME,

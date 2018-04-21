@@ -204,7 +204,8 @@ private:
 	MswMap m_midiIfaceSetupWidgets;
 	trMap m_midiIfaceNames;
 
-
+	QComboBox* m_vstEmbedComboBox;
+	QString m_vstEmbedMethod;
 } ;
 
 

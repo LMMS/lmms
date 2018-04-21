@@ -29,6 +29,7 @@
 #include "Song.h"
 #include "BBTrackContainer.h"
 #include "BBTrack.h"
+#include "stdshims.h"
 
 
 RenderManager::RenderManager(
@@ -37,21 +38,25 @@ RenderManager::RenderManager(
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
+	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
 	m_outputSettings(outputSettings),
 	m_format(fmt),
-	m_outputPath(outputPath),
-	m_activeRenderer(NULL)
+	m_outputPath(outputPath)
 {
+	Engine::mixer()->storeAudioDevice();
 }
 
 RenderManager::~RenderManager()
 {
-	delete m_activeRenderer;
+	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
+	Engine::mixer()->changeQuality( m_oldQualitySettings );
 }
 
 void RenderManager::abortProcessing()
 {
 	if ( m_activeRenderer ) {
+		disconnect( m_activeRenderer.get(), SIGNAL( finished() ),
+				this, SLOT( renderNextTrack() ) );
 		m_activeRenderer->abortProcessing();
 	}
 	restoreMutedState();
@@ -60,8 +65,7 @@ void RenderManager::abortProcessing()
 // Called to render each new track when rendering tracks individually.
 void RenderManager::renderNextTrack()
 {
-	delete m_activeRenderer;
-	m_activeRenderer = NULL;
+	m_activeRenderer.reset();
 
 	if( m_tracksToRender.isEmpty() )
 	{
@@ -85,7 +89,7 @@ void RenderManager::renderNextTrack()
 		int trackNum = m_tracksToRender.size() + 1;
 
 		// create a renderer for this track
-		m_activeRenderer = new ProjectRenderer(
+		m_activeRenderer = make_unique<ProjectRenderer>(
 				m_qualitySettings,
 				m_outputSettings,
 				m_format,
@@ -94,11 +98,11 @@ void RenderManager::renderNextTrack()
 		if ( m_activeRenderer->isReady() )
 		{
 			// pass progress signals through
-			connect( m_activeRenderer, SIGNAL( progressChanged( int ) ),
+			connect( m_activeRenderer.get(), SIGNAL( progressChanged( int ) ),
 					this, SIGNAL( progressChanged( int ) ) );
 
 			// when it is finished, render the next track
-			connect( m_activeRenderer, SIGNAL( finished() ),
+			connect( m_activeRenderer.get(), SIGNAL( finished() ),
 					this, SLOT( renderNextTrack() ) );
 
 			m_activeRenderer->startProcessing();
@@ -150,7 +154,7 @@ void RenderManager::renderTracks()
 // Render the song into a single track
 void RenderManager::renderProject()
 {
-	m_activeRenderer = new ProjectRenderer(
+	m_activeRenderer = make_unique<ProjectRenderer>(
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,
@@ -159,11 +163,11 @@ void RenderManager::renderProject()
 	if( m_activeRenderer->isReady() )
 	{
 		// pass progress signals through
-		connect( m_activeRenderer, SIGNAL( progressChanged( int ) ),
+		connect( m_activeRenderer.get(), SIGNAL( progressChanged( int ) ),
 				this, SIGNAL( progressChanged( int ) ) );
 
 		// as we have not queued any tracks, renderNextTrack will just clean up
-		connect( m_activeRenderer, SIGNAL( finished() ),
+		connect( m_activeRenderer.get(), SIGNAL( finished() ),
 				this, SLOT( renderNextTrack() ) );
 
 		m_activeRenderer->startProcessing();

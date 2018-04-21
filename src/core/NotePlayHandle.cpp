@@ -53,7 +53,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	PlayHandle( TypeNotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
-	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
 	m_totalFramesPlayed( 0 ),
@@ -154,8 +153,6 @@ NotePlayHandle::~NotePlayHandle()
 	}
 
 	m_subNotes.clear();
-
-	delete m_filter;
 
 	if( buffer() ) releaseBuffer();
 

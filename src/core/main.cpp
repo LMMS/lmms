@@ -57,7 +57,6 @@
 #include <signal.h>
 
 #include "MainApplication.h"
-#include "MemoryManager.h"
 #include "ConfigManager.h"
 #include "NotePlayHandle.h"
 #include "embed.h"
@@ -130,7 +129,7 @@ void printVersion( char *executableName )
 		"License as published by the Free Software Foundation; either\n"
 		"version 2 of the License, or (at your option) any later version.\n\n"
 		"Try \"%s --help\" for more information.\n\n", LMMS_VERSION,
-		PLATFORM, MACHINE, QT_VERSION_STR, GCC_VERSION,
+		PLATFORM, MACHINE, QT_VERSION_STR, COMPILER_VERSION,
 		LMMS_PROJECT_COPYRIGHT, executableName );
 }
 
@@ -242,7 +241,6 @@ int main( int argc, char * * argv )
 #endif
 
 	// initialize memory managers
-	MemoryManager::init();
 	NotePlayHandleManager::init();
 
 	// intialize RNG
@@ -972,9 +970,6 @@ int main( int argc, char * * argv )
 	{
 		Engine::destroy();
 	}
-
-	// cleanup memory managers
-	MemoryManager::cleanup();
 
 	// ProjectRenderer::updateConsoleProgress() doesn't return line after render
 	if( coreOnly )

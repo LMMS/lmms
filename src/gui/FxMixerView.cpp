@@ -382,6 +382,10 @@ void FxMixerView::deleteChannel(int index)
 	// remember selected line
 	int selLine = m_currentFxLine->channelIndex();
 
+	// in case the deleted channel is soloed or the remaining
+	// channels will be left in a muted state
+	Engine::fxMixer()->clearChannel(index);
+
 	// delete the real channel
 	Engine::fxMixer()->deleteChannel(index);
 
