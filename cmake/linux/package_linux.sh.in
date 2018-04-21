@@ -71,6 +71,7 @@ elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/nul
 	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
 	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
+	LINUXDEPLOYQT="squashfs-root/AppRun"
 	APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
 	success "Extracted $APPIMAGETOOL"
 else

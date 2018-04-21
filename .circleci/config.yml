@@ -103,6 +103,9 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts/
           destination: /
+      - store_artifacts:
+          path: build/appimage.log
+          destination: /
       - *save_cache
   shellcheck:
     docker:
