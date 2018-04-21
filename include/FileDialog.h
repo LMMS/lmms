@@ -38,6 +38,16 @@ public:
 						const QString &directory = QString(),
 						const QString &filter = QString() );
 
+	static QString getExistingDirectory(QWidget *parent,
+										const QString &caption,
+										const QString &directory,
+										QFileDialog::Options options = QFileDialog::ShowDirsOnly);
+    static QString getOpenFileName(QWidget *parent = 0,
+									const QString &caption = QString(),
+									const QString &directory = QString(),
+									const QString &filter = QString(),
+									QString *selectedFilter = 0,
+									QFileDialog::Options options = 0);
 	void clearSelection();
 };
 
