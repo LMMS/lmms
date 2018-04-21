@@ -1076,23 +1076,36 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 inline void AutomationEditor::drawCross( QPainter & p )
 {
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
-	float level = getLevel( mouse_pos.y() );
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
+	float level = getLevel( mouse_pos.y() );
 	float cross_y = m_y_auto ?
 		grid_bottom - ( ( grid_bottom - TOP_MARGIN )
 				* ( level - m_minLevel )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
+	int right_margin = width() - SCROLLBAR_SIZE;
+	int bottom_margin = height() - SCROLLBAR_SIZE;
+
 	p.setPen( crossColor() );
 	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
-	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(),
-						height() - SCROLLBAR_SIZE );
+	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(), bottom_margin );
+
+
 	QPoint tt_pos =  QCursor::pos();
-	tt_pos.ry() -= 64;
-	tt_pos.rx() += 32;
+	tt_pos.ry() -= 51;
+	tt_pos.rx() += 26;
+
 	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
-	QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
+
+	// Limit the scaled-level tooltip to the grid
+	if(	mouse_pos.x() > LEFT_MARGIN &&
+		mouse_pos.x() < right_margin &&
+		mouse_pos.y() > TOP_MARGIN &&
+		mouse_pos.y() < bottom_margin )
+	{
+		QToolTip::showText( tt_pos, QString::number( scaledLevel ), this );
+	}
 }
 
 
