@@ -7,17 +7,9 @@ SET(CMAKE_CXX_STANDARD 11)
 
 SET(CMAKE_AUTOMOC ON)
 
-ADD_EXECUTABLE(tests
+ADD_EXECUTABLE(benchmarks
 	EXCLUDE_FROM_ALL
-	main.cpp
-	QTestSuite
+	benchmark.cpp
 	$<TARGET_OBJECTS:lmmsobjs>
-
-	src/core/ProjectVersionTest.cpp
-	src/core/RelativePathsTest.cpp
-	src/core/MemoryPoolTest.cpp
-
-	src/tracks/AutomationTrackTest.cpp
 )
-TARGET_LINK_LIBRARIES(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
-TARGET_LINK_LIBRARIES(tests ${LMMS_REQUIRED_LIBS})
+TARGET_LINK_LIBRARIES(benchmarks ${QT_LIBRARIES} ${LMMS_REQUIRED_LIBS})

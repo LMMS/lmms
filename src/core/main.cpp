@@ -239,10 +239,6 @@ int main( int argc, char * * argv )
 	// register signal SIGFPE and signal handler
 	signal(SIGFPE, signalHandler);
 #endif
-
-	// initialize memory managers
-	NotePlayHandleManager::init();
-
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
 

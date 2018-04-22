@@ -30,7 +30,7 @@
 #include <QObject>
 #include "lmms_basics.h"
 #include "lmms_math.h"
-#include "MemoryManager.h"
+#include "Memory.h"
 
 class EXPORT RingBuffer : public QObject
 {

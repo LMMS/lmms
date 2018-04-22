@@ -32,7 +32,6 @@
 #include "Mixer.h"
 #include "Song.h"
 
-
 NotePlayHandle::BaseDetuning::BaseDetuning( DetuningHelper *detuning ) :
 	m_value( detuning ? detuning->automationPattern()->valueAt( 0 ) : 0 )
 {
@@ -548,73 +547,5 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 	}
 }
 
-
-NotePlayHandle ** NotePlayHandleManager::s_available;
-QReadWriteLock NotePlayHandleManager::s_mutex;
-AtomicInt NotePlayHandleManager::s_availableIndex;
-int NotePlayHandleManager::s_size;
-
-
-void NotePlayHandleManager::init()
-{
-	s_available = MM_ALLOC( NotePlayHandle*, INITIAL_NPH_CACHE );
-
-	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, INITIAL_NPH_CACHE );
-
-	for( int i=0; i < INITIAL_NPH_CACHE; ++i )
-	{
-		s_available[ i ] = n;
-		++n;
-	}
-	s_availableIndex = INITIAL_NPH_CACHE - 1;
-	s_size = INITIAL_NPH_CACHE;
-}
-
-
-NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrack,
-				const f_cnt_t offset,
-				const f_cnt_t frames,
-				const Note& noteToPlay,
-				NotePlayHandle* parent,
-				int midiEventChannel,
-				NotePlayHandle::Origin origin )
-{
-	if( s_availableIndex < 0 )
-	{
-		s_mutex.lockForWrite();
-		if( s_availableIndex < 0 ) extend( NPH_CACHE_INCREMENT );
-		s_mutex.unlock();
-	}
-	s_mutex.lockForRead();
-	NotePlayHandle * nph = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
-	s_mutex.unlock();
-
-	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
-	return nph;
-}
-
-
-void NotePlayHandleManager::release( NotePlayHandle * nph )
-{
-	nph->NotePlayHandle::~NotePlayHandle();
-	s_mutex.lockForRead();
-	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
-	s_mutex.unlock();
-}
-
-
-void NotePlayHandleManager::extend( int c )
-{
-	s_size += c;
-	NotePlayHandle ** tmp = MM_ALLOC( NotePlayHandle*, s_size );
-	MM_FREE( s_available );
-	s_available = tmp;
-
-	NotePlayHandle * n = MM_ALLOC( NotePlayHandle, c );
-
-	for( int i=0; i < c; ++i )
-	{
-		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = n;
-		++n;
-	}
-}
+const int INITIAL_NPH_CACHE = 256;
+MemoryPool<NotePlayHandle> NotePlayHandlePool{INITIAL_NPH_CACHE};

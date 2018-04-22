@@ -36,7 +36,9 @@
 #include "NotePlayHandle.h"
 #include "ConfigManager.h"
 #include "SamplePlayHandle.h"
-#include "MemoryHelper.h"
+#include "Memory.h"
+#include "BufferPool.h"
+#include "LocklessList.h"
 
 // platform-specific audio-interface-classes
 #include "AudioAlsa.h"
@@ -59,10 +61,6 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
-#include "BufferManager.h"
-
-typedef LocklessList<PlayHandle *>::Element LocklessListElement;
-
 
 static thread_local bool s_renderingThread;
 
@@ -78,7 +76,7 @@ Mixer::Mixer( bool renderOnly ) :
 	m_writeBuf( NULL ),
 	m_workers(),
 	m_numWorkers( QThread::idealThreadCount()-1 ),
-	m_newPlayHandles( PlayHandle::MaxNumber ),
+	m_newPlayHandles( new LocklessStack<PlayHandle*>(PlayHandle::MaxNumber) ),
 	m_qualitySettings( qualitySettings::Mode_Draft ),
 	m_masterGain( 1.0f ),
 	m_isProcessing( false ),
@@ -98,7 +96,7 @@ Mixer::Mixer( bool renderOnly ) :
 		m_inputBufferFrames[i] = 0;
 		m_inputBufferSize[i] = DEFAULT_BUFFER_SIZE * 100;
 		m_inputBuffer[i] = new sampleFrame[ DEFAULT_BUFFER_SIZE * 100 ];
-		BufferManager::clear( m_inputBuffer[i], m_inputBufferSize[i] );
+		BufferPool::clear( m_inputBuffer[i], m_inputBufferSize[i] );
 	}
 
 	// determine FIFO size and number of frames per period
@@ -133,16 +131,15 @@ Mixer::Mixer( bool renderOnly ) :
 	// allocte the FIFO from the determined size
 	m_fifo = new fifo( fifoSize );
 
-	// now that framesPerPeriod is fixed initialize global BufferManager
-	BufferManager::init( m_framesPerPeriod );
+	// now that framesPerPeriod is fixed initialize global BufferPool
+	BufferPool::init( m_framesPerPeriod );
 
+	AlignedAllocator<surroundSampleFrame> alloc;
 	for( int i = 0; i < 3; i++ )
 	{
-		m_readBuf = (surroundSampleFrame*)
-			MemoryHelper::alignedMalloc( m_framesPerPeriod *
-						sizeof( surroundSampleFrame ) );
+		m_readBuf = alloc.allocate( m_framesPerPeriod );
 
-		BufferManager::clear( m_readBuf, m_framesPerPeriod );
+		BufferPool::clear( m_readBuf, m_framesPerPeriod );
 		m_bufferPool.push_back( m_readBuf );
 	}
 
@@ -189,9 +186,10 @@ Mixer::~Mixer()
 	delete m_audioDev;
 	delete m_midiClient;
 
+	AlignedAllocator<surroundSampleFrame> alloc;
 	for( int i = 0; i < 3; i++ )
 	{
-		MemoryHelper::alignedFree( m_bufferPool[i] );
+		alloc.deallocate( m_bufferPool[i], m_framesPerPeriod );
 	}
 
 	for( int i = 0; i < 2; ++i )
@@ -400,7 +398,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandlePool.destroy( (NotePlayHandle*) *it );
 			}
 			else delete *it;
 			m_playHandles.erase( it );
@@ -417,7 +415,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	m_readBuf = m_bufferPool[m_readBuffer];
 
 	// clear last audio-buffer
-	BufferManager::clear( m_writeBuf, m_framesPerPeriod );
+	BufferPool::clear( m_writeBuf, m_framesPerPeriod );
 
 	// prepare master mix (clear internal buffers etc.)
 	FxMixer * fxMixer = Engine::fxMixer();
@@ -427,12 +425,10 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	song->processNextBuffer();
 
 	// add all play-handles that have to be added
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
+	PlayHandle* ph;
+	while ( m_newPlayHandles->pop(ph) )
 	{
-		m_playHandles += e->value;
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
-		e = next;
+		m_playHandles += ph;
 	}
 
 	// STAGE 1: run and render all play handles
@@ -454,7 +450,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandlePool.destroy( (NotePlayHandle*) *it );
 			}
 			else delete *it;
 			it = m_playHandles.erase( it );
@@ -504,12 +500,8 @@ void Mixer::clear()
 void Mixer::clearNewPlayHandles()
 {
 	requestChangeInModel();
-	for( LocklessListElement * e = m_newPlayHandles.popList(); e; )
-	{
-		LocklessListElement * next = e->next;
-		m_newPlayHandles.free( e );
-		e = next;
-	}
+	PlayHandle* ph;
+	while ( m_newPlayHandles->pop(ph) ) {}
 	doneChangeInModel();
 }
 
@@ -674,14 +666,14 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 {
 	if( criticalXRuns() == false )
 	{
-		m_newPlayHandles.push( handle );
+		m_newPlayHandles->push( handle );
 		handle->audioPort()->addPlayHandle( handle );
 		return true;
 	}
 
 	if( handle->type() == PlayHandle::TypeNotePlayHandle )
 	{
-		NotePlayHandleManager::release( (NotePlayHandle*)handle );
+		NotePlayHandlePool.destroy( (NotePlayHandle*)handle );
 	}
 	else delete handle;
 
@@ -701,24 +693,14 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
-		for( LocklessListElement * e = m_newPlayHandles.first(),
-				* ePrev = NULL; e; ePrev = e, e = e->next )
-		{
-			if( e->value == _ph )
-			{
-				if( ePrev )
-				{
-					ePrev->next = e->next;
+		m_newPlayHandles->apply([_ph](decltype(m_newPlayHandles)::element_type::Container container) {
+			for (auto it=container.begin(); it != container.end(); it++) {
+				if (*it == _ph) {
+					container.erase(it);
+					break;
 				}
-				else
-				{
-					m_newPlayHandles.setFirst( e->next );
-				}
-				m_newPlayHandles.free( e );
-				removedFromList = true;
-				break;
 			}
-		}
+		});
 		// Now check m_playHandles
 		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
@@ -734,7 +716,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 		{
 			if( _ph->type() == PlayHandle::TypeNotePlayHandle )
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) _ph );
+				NotePlayHandlePool.destroy( (NotePlayHandle*) _ph );
 			}
 			else delete _ph;
 		}
@@ -760,7 +742,7 @@ void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 			( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
-				NotePlayHandleManager::release( (NotePlayHandle*) *it );
+				NotePlayHandlePool.destroy( (NotePlayHandle*) *it );
 			}
 			else delete *it;
 			it = m_playHandles.erase( it );

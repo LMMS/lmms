@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2014 Simon Symeonidis <lethaljellybean/at/gmail/com>
- * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ * MemoryPoolTest.cpp
+ *
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -21,22 +22,37 @@
  *
  */
 
+#include "QTestSuite.h"
 
-#ifndef MEMORY_HELPER_H
-#define MEMORY_HELPER_H
+#include "MemoryPool.h"
 
-/**
- * Helper class to alocate aligned memory and free it.
- */
-class MemoryHelper {
-public:
+#include <array>
+#include <stack>
 
-	static void* alignedMalloc( size_t );
+class MemoryPoolTest : QTestSuite
+{
+	Q_OBJECT
+private slots:
+	void MemoryPoolTests()
+	{
+		using T = std::array<char, 16>;
+		MemoryPool<T> pool(256);
 
-	static void alignedFree( void* );
+		std::stack<T*> ptrs;
 
-private:
-};
+		for (int i=0; i < 256; i++) {
+			ptrs.push(pool.allocate_bounded());
+			QVERIFY(ptrs.top());
+		}
+		QCOMPARE(pool.allocate_bounded(), nullptr);
+		ptrs.push(pool.allocate());
+		QVERIFY(ptrs.top());
 
-#endif
+		while (!ptrs.empty()) {
+			pool.deallocate(ptrs.top());
+			ptrs.pop();
+		}
+	}
+} MemoryPoolTests;
 
+#include "MemoryPoolTest.moc"

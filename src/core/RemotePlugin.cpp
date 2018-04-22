@@ -28,7 +28,7 @@
 #include <QDebug>
 #endif
 
-#include "BufferManager.h"
+#include "BufferPool.h"
 #include "RemotePlugin.h"
 #include "Mixer.h"
 #include "Engine.h"
@@ -269,7 +269,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 	{
 		if( _out_buf != NULL )
 		{
-			BufferManager::clear( _out_buf, frames );
+			BufferPool::clear( _out_buf, frames );
 		}
 		return false;
 	}
@@ -288,7 +288,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		}
 		if( _out_buf != NULL )
 		{
-			BufferManager::clear( _out_buf, frames );
+			BufferPool::clear( _out_buf, frames );
 		}
 		return false;
 	}
@@ -362,7 +362,7 @@ bool RemotePlugin::process( const sampleFrame * _in_buf,
 		sampleFrame * o = (sampleFrame *) ( m_shm +
 							m_inputCount*frames );
 		// clear buffer, if plugin didn't fill up both channels
-		BufferManager::clear( _out_buf, frames );
+		BufferPool::clear( _out_buf, frames );
 
 		for( ch_cnt_t ch = 0; ch <
 				qMin<int>( DEFAULT_CHANNELS, outputs ); ++ch )

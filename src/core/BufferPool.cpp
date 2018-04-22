@@ -1,6 +1,7 @@
 /*
- * BufferManager.h - A buffer caching/memory management system
+ * BufferPool.cpp
  *
+ * Copyright (c) 2018 Lukas W <lukaswhl/at/gmail.com>
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
  * Copyright (c) 2006-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -23,26 +24,39 @@
  *
  */
 
-#ifndef BUFFER_MANAGER_H
-#define BUFFER_MANAGER_H
+#include "BufferPool.h"
 
-#include "AtomicInt.h"
-#include "export.h"
-#include "lmms_basics.h"
+#include <cstring>
+#include "MemoryPool.h"
 
-class EXPORT BufferManager
+static std::unique_ptr<_MemoryPool_Base> pool;
+const int BM_INITIAL_BUFFERS = 256;
+
+void BufferPool::init( fpp_t framesPerPeriod )
 {
-public:
-	static void init( fpp_t framesPerPeriod );
-	static sampleFrame * acquire();
-	// audio-buffer-mgm
-	static void clear( sampleFrame * ab, const f_cnt_t frames,
-						const f_cnt_t offset = 0 );
-#ifndef LMMS_DISABLE_SURROUND
-	static void clear( surroundSampleFrame * ab, const f_cnt_t frames,
-						const f_cnt_t offset = 0 );
-#endif
-	static void release( sampleFrame * buf );
-};
+	pool.reset(new _MemoryPool_Base(framesPerPeriod * sizeof(sampleFrame), BM_INITIAL_BUFFERS));
+}
 
+sampleFrame * BufferPool::acquire()
+{
+	return reinterpret_cast<sampleFrame*>(pool->allocate());
+}
+
+void BufferPool::clear( sampleFrame *ab, const f_cnt_t frames, const f_cnt_t offset )
+{
+	memset( ab + offset, 0, sizeof( *ab ) * frames );
+}
+
+#ifndef LMMS_DISABLE_SURROUND
+void BufferPool::clear( surroundSampleFrame * ab, const f_cnt_t frames,
+							const f_cnt_t offset )
+{
+	memset( ab + offset, 0, sizeof( *ab ) * frames );
+}
 #endif
+
+
+void BufferPool::release( sampleFrame * buf )
+{
+	pool->deallocate(buf);
+}
