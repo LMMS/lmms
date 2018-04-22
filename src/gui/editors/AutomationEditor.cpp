@@ -1099,7 +1099,7 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
 
 	// Limit the scaled-level tooltip to the grid
-	if(	mouse_pos.x() > LEFT_MARGIN &&
+	if( mouse_pos.x() > LEFT_MARGIN &&
 		mouse_pos.x() < right_margin &&
 		mouse_pos.y() > TOP_MARGIN &&
 		mouse_pos.y() < bottom_margin )
