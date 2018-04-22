@@ -436,7 +436,6 @@ float LadspaManager::getDefaultSetting( const ladspa_key_t & _plugin,
 							uint32_t _port )
 {
 	const auto* portRangeHint = getPortRangeHint( _plugin, _port );
-	const LADSPA_Descriptor * descriptor = getDescriptor( _plugin );
 	if( portRangeHint )
 	{
 		LADSPA_PortRangeHintDescriptor hintDescriptor = portRangeHint->HintDescriptor;
