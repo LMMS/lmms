@@ -1084,7 +1084,6 @@ inline void AutomationEditor::drawCross( QPainter & p )
 				/ (float)( m_maxLevel - m_minLevel ) ) :
 		grid_bottom - ( level - m_bottomLevel ) * m_y_delta;
 
-	int right_margin = width() - SCROLLBAR_SIZE;
 	int bottom_margin = height() - SCROLLBAR_SIZE;
 
 	p.setPen( crossColor() );
@@ -1099,8 +1098,8 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
 
 	// Limit the scaled-level tooltip to the grid
-	if( mouse_pos.x() > LEFT_MARGIN &&
-		mouse_pos.x() < right_margin &&
+	if( mouse_pos.x() > VALUES_WIDTH - 1 && // left_margin
+		mouse_pos.x() < width() - SCROLLBAR_SIZE && // right_margin
 		mouse_pos.y() > TOP_MARGIN &&
 		mouse_pos.y() < bottom_margin )
 	{
