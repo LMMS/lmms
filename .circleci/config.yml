@@ -107,6 +107,14 @@ jobs:
           path: build/appimage.log
           destination: /
       - *save_cache
+  shellcheck:
+    docker:
+      - image: koalaman/shellcheck-alpine:v0.4.6
+    steps:
+      - checkout
+      - run:
+          name: Shellcheck
+          command: shellcheck $(find "./cmake/" -type f -name '*.sh' -o -name "*.sh.in")
 workflows:
   version: 2
   build-and-test:
@@ -114,3 +122,4 @@ workflows:
       - mingw32
       - mingw64
       - linux.gcc
+      - shellcheck
