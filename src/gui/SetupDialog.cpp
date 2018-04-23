@@ -776,11 +776,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Paths widget.
 	QWidget * paths_w = new QWidget(settings_w);
-	int paths_height = 320;
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	paths_height += 55;
-#endif
-	paths_w->setFixedSize(360, paths_height);
 
 	QVBoxLayout * paths_layout = new QVBoxLayout(paths_w);
 	paths_layout->setSpacing(0);
@@ -793,12 +788,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QScrollArea * pathsScroll = new QScrollArea(paths_w);
 	pathsScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pathsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pathsScroll->resize(360, paths_height - 50);
 	pathsScroll->move(0, 30);
 
 	// Path selectors widget.
 	QWidget * pathSelectors = new QWidget(paths_w);
-	pathSelectors->resize(360, paths_height - 50);
 
 	const int txtLength = 284;
 	const int btnStart = 300;
@@ -972,6 +965,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	pathsScroll->setWidgetResizable(true);
 
 	paths_layout->addWidget(pathsScroll);
+	paths_layout->addStretch();
 
 
 
