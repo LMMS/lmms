@@ -143,8 +143,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 {
 	setWindowIcon(
 			embed::getIconPixmap("setup_general"));
-	setWindowTitle(
-			tr("Settings"));
+	setWindowTitle(tr("Settings"));
 	setModal(true);
 	setFixedSize(452, 426);
 
@@ -189,8 +188,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QVBoxLayout * general_layout = new QVBoxLayout(general_w);
 	general_layout->setSpacing(0);
 	general_layout->setMargin(0);
-	labelWidget(general_w,
-			tr("General settings"));
+	labelWidget(general_w, tr("General settings"));
 
 
 	int labelNumber1 = 0;
@@ -204,58 +202,58 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	labelNumber1++;
 	enableTooltips->move(XDelta, YDelta * labelNumber1);
 	enableTooltips->setChecked(m_tooltips);
-	connect(enableTooltips, SIGNAL(toggled(bool)), this,
-			SLOT(toggleTooltips(bool)));
-	connect(enableTooltips, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(enableTooltips, SIGNAL(toggled(bool)),
+			this, SLOT(toggleTooltips(bool)));
+	connect(enableTooltips, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 	LedCheckBox * dbfs = new LedCheckBox(
 			tr("Display volume as dBFS "), gui_tw);
 	labelNumber1++;
 	dbfs->move(XDelta, YDelta * labelNumber1);
 	dbfs->setChecked(m_displaydBFS);
-	connect(dbfs, SIGNAL(toggled(bool)), this,
-			SLOT(toggleDisplaydBFS(bool)));
-	connect(dbfs, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(dbfs, SIGNAL(toggled(bool)),
+			this, SLOT(toggleDisplaydBFS(bool)));
+	connect(dbfs, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 	LedCheckBox * displayWaveform = new LedCheckBox(
 			tr("Enable master oscilloscope by default"), gui_tw);
 	labelNumber1++;
 	displayWaveform->move(XDelta, YDelta * labelNumber1);
 	displayWaveform->setChecked(m_displayWaveform);
-	connect(displayWaveform, SIGNAL(toggled(bool)), this,
-			SLOT(toggleDisplayWaveform(bool)));
-	connect(displayWaveform, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(displayWaveform, SIGNAL(toggled(bool)),
+			this, SLOT(toggleDisplayWaveform(bool)));
+	connect(displayWaveform, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 	LedCheckBox * noteLabels = new LedCheckBox(
 			tr("Enable all note labels in piano roll"), gui_tw);
 	labelNumber1++;
 	noteLabels->move(XDelta, YDelta * labelNumber1);
 	noteLabels->setChecked(m_printNoteLabels);
-	connect(noteLabels, SIGNAL(toggled(bool)), this,
-			SLOT(toggleNoteLabels(bool)));
+	connect(noteLabels, SIGNAL(toggled(bool)),
+			this, SLOT(toggleNoteLabels(bool)));
 
 	LedCheckBox * compactTracks = new LedCheckBox(
 			tr("Enable compact track buttons"), gui_tw);
 	labelNumber1++;
 	compactTracks->move(XDelta, YDelta * labelNumber1);
 	compactTracks->setChecked(m_compactTrackButtons);
-	connect(compactTracks, SIGNAL(toggled(bool)), this,
-			SLOT(toggleCompactTrackButtons(bool)));
-	connect(compactTracks, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(compactTracks, SIGNAL(toggled(bool)),
+			this, SLOT(toggleCompactTrackButtons(bool)));
+	connect(compactTracks, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 	LedCheckBox * oneitw = new LedCheckBox(
 			tr("Enable one instrument-track-window mode"), gui_tw);
 	labelNumber1++;
 	oneitw->move(XDelta, YDelta * labelNumber1);
 	oneitw->setChecked(m_oneInstrumentTrackWindow);
-	connect(oneitw, SIGNAL(toggled(bool)), this,
-			SLOT(toggleOneInstrumentTrackWindow(bool)));
-	connect(oneitw, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(oneitw, SIGNAL(toggled(bool)),
+			this, SLOT(toggleOneInstrumentTrackWindow(bool)));
+	connect(oneitw, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 
 	gui_tw->setFixedHeight(YDelta + YDelta * labelNumber1);
@@ -273,26 +271,26 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	labelNumber2++;
 	mmpz->move(XDelta, YDelta * labelNumber2);
 	mmpz->setChecked(m_MMPZ);
-	connect(mmpz, SIGNAL(toggled(bool)), this,
-			SLOT(toggleMMPZ(bool)));
-	connect(mmpz, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(mmpz, SIGNAL(toggled(bool)),
+			this, SLOT(toggleMMPZ(bool)));
+	connect(mmpz, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 	LedCheckBox * disableBackup = new LedCheckBox(
 			tr("Create a backup file when saving a project"), projects_tw);
 	labelNumber2++;
 	disableBackup->move(XDelta, YDelta * labelNumber2);
 	disableBackup->setChecked(m_disableBackup);
-	connect(disableBackup, SIGNAL(toggled(bool)), this,
-			SLOT(toggleDisableBackup(bool)));
+	connect(disableBackup, SIGNAL(toggled(bool)),
+			this, SLOT(toggleDisableBackup(bool)));
 
 	LedCheckBox * openLastProject = new LedCheckBox(
 			tr("Reopen last project on startup"), projects_tw);
 	labelNumber2++;
 	openLastProject->move(XDelta, YDelta * labelNumber2);
 	openLastProject->setChecked(m_openLastProject);
-	connect(openLastProject, SIGNAL(toggled(bool)), this,
-			SLOT(toggleOpenLastProject(bool)));
+	connect(openLastProject, SIGNAL(toggled(bool)),
+			this, SLOT(toggleOpenLastProject(bool)));
 
 
 	projects_tw->setFixedHeight(YDelta + YDelta * labelNumber2);
@@ -314,10 +312,10 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		QString lang = QLocale(m_languages.last()).nativeLanguageName();
 		changeLang->addItem(lang);
 	}
-	connect(changeLang, SIGNAL(currentIndexChanged(int)), this,
-			SLOT(setLanguage(int)));
-	connect(changeLang, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRestartWarning()));
+	connect(changeLang, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(setLanguage(int)));
+	connect(changeLang, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRestartWarning()));
 
 	// If language unset, fallback to system language when available.
 	if(m_lang == "")
@@ -377,8 +375,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_saveIntervalSlider->setGeometry(10, 18, 340, 18);
 	m_saveIntervalSlider->setTickPosition(QSlider::TicksBelow);
 
-	connect(m_saveIntervalSlider, SIGNAL(valueChanged(int)), this,
-			SLOT(setAutoSaveInterval(int)));
+	connect(m_saveIntervalSlider, SIGNAL(valueChanged(int)),
+			this, SLOT(setAutoSaveInterval(int)));
 
 	m_saveIntervalLbl = new QLabel(auto_save_tw);
 	m_saveIntervalLbl->setGeometry(10, 40, 200, 24);
@@ -388,29 +386,29 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("Enable autosave"), auto_save_tw);
 	m_autoSave->move(10, 70);
 	m_autoSave->setChecked(m_enableAutoSave);
-	connect(m_autoSave, SIGNAL(toggled(bool)), this,
-			SLOT(toggleAutoSave(bool)));
+	connect(m_autoSave, SIGNAL(toggled(bool)),
+			this, SLOT(toggleAutoSave(bool)));
 
 	m_runningAutoSave = new LedCheckBox(
 			tr("Allow autosave while playing"), auto_save_tw);
 	m_runningAutoSave->move(20, 88);
 	m_runningAutoSave->setChecked(m_enableRunningAutoSave);
-	connect(m_runningAutoSave, SIGNAL(toggled(bool)), this,
-			SLOT(toggleRunningAutoSave(bool)));
+	connect(m_runningAutoSave, SIGNAL(toggled(bool)),
+			this, SLOT(toggleRunningAutoSave(bool)));
 
 	QPushButton * autoSaveResetBtn = new QPushButton(
 			embed::getIconPixmap("reload"), "", auto_save_tw);
 	autoSaveResetBtn->setGeometry(290, 70, 28, 28);
-	connect(autoSaveResetBtn, SIGNAL(clicked()), this,
-			SLOT(resetAutoSave()));
+	connect(autoSaveResetBtn, SIGNAL(clicked()),
+			this, SLOT(resetAutoSave()));
 	ToolTip::add(autoSaveResetBtn,
 			tr("Reset to default value"));
 
 	QPushButton * saveIntervalBtn = new QPushButton(
 			embed::getIconPixmap("help"), "", auto_save_tw);
 	saveIntervalBtn->setGeometry(320, 70, 28, 28);
-	connect(saveIntervalBtn, SIGNAL(clicked()), this,
-			SLOT(displaySaveIntervalHelp()));
+	connect(saveIntervalBtn, SIGNAL(clicked()),
+			this, SLOT(displaySaveIntervalHelp()));
 	ToolTip::add(saveIntervalBtn,
 			tr("Help"));
 
@@ -429,16 +427,16 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	labelNumber3++;
 	smoothScroll->move(XDelta, YDelta * labelNumber3);
 	smoothScroll->setChecked(m_smoothScroll);
-	connect(smoothScroll, SIGNAL(toggled(bool)), this,
-			SLOT(toggleSmoothScroll(bool)));
+	connect(smoothScroll, SIGNAL(toggled(bool)),
+			this, SLOT(toggleSmoothScroll(bool)));
 
 	LedCheckBox * animAFP = new LedCheckBox(
 			tr("Display playback cursor in AudioFileProcessor"), ui_fx_tw);
 	labelNumber3++;
 	animAFP->move(XDelta, YDelta * labelNumber3);
 	animAFP->setChecked(m_animateAFP);
-	connect(animAFP, SIGNAL(toggled(bool)), this,
-			SLOT(toggleAnimateAFP(bool)));
+	connect(animAFP, SIGNAL(toggled(bool)),
+			this, SLOT(toggleAnimateAFP(bool)));
 
 	ui_fx_tw->setFixedHeight(YDelta + YDelta * labelNumber3);
 
@@ -479,16 +477,16 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	labelNumber4 += 1.6;
 	syncVST->move(XDelta, YDelta * labelNumber4);
 	syncVST->setChecked(m_syncVSTPlugins);
-	connect(syncVST, SIGNAL(toggled(bool)), this,
-			SLOT(toggleSyncVSTPlugins(bool)));
+	connect(syncVST, SIGNAL(toggled(bool)),
+			this, SLOT(toggleSyncVSTPlugins(bool)));
 
 	LedCheckBox * disableAutoQuit = new LedCheckBox(
 			tr("Keep effects running even without input"), plugins_tw);
 	labelNumber4++;
 	disableAutoQuit->move(XDelta, YDelta * labelNumber4);
 	disableAutoQuit->setChecked(m_disableAutoQuit);
-	connect(disableAutoQuit, SIGNAL(toggled(bool)), this,
-			SLOT(toggleDisableAutoQuit(bool)));
+	connect(disableAutoQuit, SIGNAL(toggled(bool)),
+			this, SLOT(toggleDisableAutoQuit(bool)));
 
 	plugins_tw->setFixedHeight(YDelta + YDelta * labelNumber4);
 
@@ -524,8 +522,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QPushButton * audio_help_btn = new QPushButton(
 			embed::getIconPixmap("help"), "", audioiface_tw);
 	audio_help_btn->setGeometry(320, 20, 28, 28);
-	connect(audio_help_btn, SIGNAL(clicked()), this,
-			SLOT(displayAudioHelp()));
+	connect(audio_help_btn, SIGNAL(clicked()),
+			this, SLOT(displayAudioHelp()));
 	ToolTip::add(audio_help_btn,
 			tr("Help"));
 
@@ -608,8 +606,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
-	connect(m_audioInterfaces, SIGNAL(activated(const QString &)), this,
-			SLOT(audioInterfaceChanged(const QString &)));
+	connect(m_audioInterfaces, SIGNAL(activated(const QString &)),
+			this, SLOT(audioInterfaceChanged(const QString &)));
 
 
 	// HQ mode LED.
@@ -617,8 +615,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			tr("HQ mode for output audio device"), audio_w);
 	hqaudio->move(10, 0);
 	hqaudio->setChecked(m_hqAudioDev);
-	connect(hqaudio, SIGNAL(toggled(bool)), this,
-			SLOT(toggleHQAudioDev(bool)));
+	connect(hqaudio, SIGNAL(toggled(bool)),
+			this, SLOT(toggleHQAudioDev(bool)));
 
 
 	// Buffer size tab.
@@ -634,8 +632,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_bufferSizeSlider->setGeometry(10, 18, 340, 18);
 	m_bufferSizeSlider->setTickPosition(QSlider::TicksBelow);
 
-	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)), this,
-			SLOT(setBufferSize(int)));
+	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
+			this, SLOT(setBufferSize(int)));
 
 	m_bufferSizeLbl = new QLabel(bufferSize_tw);
 	m_bufferSizeLbl->setGeometry(10, 40, 200, 24);
@@ -644,16 +642,16 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QPushButton * bufferSize_reset_btn = new QPushButton(
 			embed::getIconPixmap("reload"), "", bufferSize_tw);
 	bufferSize_reset_btn->setGeometry(290, 40, 28, 28);
-	connect(bufferSize_reset_btn, SIGNAL(clicked()), this,
-			SLOT(resetBufferSize()));
+	connect(bufferSize_reset_btn, SIGNAL(clicked()),
+			this, SLOT(resetBufferSize()));
 	ToolTip::add(bufferSize_reset_btn,
 			tr("Reset to default value"));
 
 	QPushButton * bufferSize_help_btn = new QPushButton(
 			embed::getIconPixmap("help"), "", bufferSize_tw);
 	bufferSize_help_btn->setGeometry(320, 40, 28, 28);
-	connect(bufferSize_help_btn, SIGNAL(clicked()), this,
-			SLOT(displayBufferSizeHelp()));
+	connect(bufferSize_help_btn, SIGNAL(clicked()),
+			this, SLOT(displayBufferSizeHelp()));
 	ToolTip::add(bufferSize_help_btn,
 			tr("Help"));
 
@@ -690,8 +688,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QPushButton * midi_help_btn = new QPushButton(
 			embed::getIconPixmap("help"), "", midiiface_tw);
 	midi_help_btn->setGeometry(320, 20, 28, 28);
-	connect(midi_help_btn, SIGNAL(clicked()), this,
-			SLOT(displayMIDIHelp()));
+	connect(midi_help_btn, SIGNAL(clicked()),
+			this, SLOT(displayMIDIHelp()));
 	ToolTip::add(midi_help_btn,
 			tr("Help"));
 
@@ -764,8 +762,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
-	connect(m_midiInterfaces, SIGNAL(activated(const QString &)), this,
-			SLOT(midiInterfaceChanged(const QString &)));
+	connect(m_midiInterfaces, SIGNAL(activated(const QString &)),
+			this, SLOT(midiInterfaceChanged(const QString &)));
 
 
 	// MIDI layout ordering.
@@ -783,11 +781,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	paths_height += 55;
 #endif
 	paths_w->setFixedSize(360, paths_height);
+
 	QVBoxLayout * paths_layout = new QVBoxLayout(paths_w);
 	paths_layout->setSpacing(0);
 	paths_layout->setMargin(0);
-	labelWidget(paths_w,
-			tr("Paths settings"));
+
+	labelWidget(paths_w, tr("Paths settings"));
 
 
 	// Paths scroll area.
@@ -804,7 +803,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	const int txtLength = 284;
 	const int btnStart = 300;
 
-
 	// LMMS working directory tab.
 	TabWidget * workingDir_tw = new TabWidget(
 			tr("LMMS working directory"), pathSelectors);
@@ -812,33 +810,32 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_workingDirLineEdit = new QLineEdit(m_workingDir, workingDir_tw);
 	m_workingDirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_workingDirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setWorkingDir(const QString &)));
+	connect(m_workingDirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setWorkingDir(const QString &)));
 
 	QPushButton * workingDir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", workingDir_tw);
 	workingDir_select_btn->setFixedSize(24, 24);
 	workingDir_select_btn->move(btnStart, 16);
-	connect(workingDir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openWorkingDir()));
+	connect(workingDir_select_btn, SIGNAL(clicked()),
+			this, SLOT(openWorkingDir()));
 
 	// VST plugins directory tab.
 	TabWidget * vstDir_tw = new TabWidget(
-			tr("VST plugins directory"),
-								pathSelectors);
+			tr("VST plugins directory"), pathSelectors);
 	vstDir_tw->setFixedHeight(48);
 
 	m_vstDirLineEdit = new QLineEdit(m_vstDir, vstDir_tw);
 	m_vstDirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_vstDirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setVSTDir(const QString &)));
+	connect(m_vstDirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setVSTDir(const QString &)));
 
 	QPushButton * vstDir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", vstDir_tw);
 	vstDir_select_btn->setFixedSize(24, 24);
 	vstDir_select_btn->move(btnStart, 16);
-	connect(vstDir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openVSTDir()));
+	connect(vstDir_select_btn, SIGNAL(clicked()),
+			this, SLOT(openVSTDir()));
 
 	// LADSPA plugins directory tab.
 	TabWidget * ladspaDir_tw = new TabWidget(
@@ -847,15 +844,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_ladspaDirLineEdit = new QLineEdit(m_ladspaDir, ladspaDir_tw);
 	m_ladspaDirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_ladspaDirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setLADSPADir(const QString &)));
+	connect(m_ladspaDirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setLADSPADir(const QString &)));
 
 	QPushButton * ladspaDir_select_btn = new QPushButton(
 			embed::getIconPixmap("add_folder", 16, 16), "", ladspaDir_tw);
 	ladspaDir_select_btn->setFixedSize(24, 24);
 	ladspaDir_select_btn->move(btnStart, 16);
-	connect(ladspaDir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openLADSPADir()));
+	connect(ladspaDir_select_btn, SIGNAL(clicked()),
+			this, SLOT(openLADSPADir()));
 
 	// SF2 files directory tab.
 	TabWidget * sf2Dir_tw = new TabWidget(
@@ -864,15 +861,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_sf2DirLineEdit = new QLineEdit(m_sf2Dir, sf2Dir_tw);
 	m_sf2DirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_sf2DirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setSF2Dir(const QString &)));
+	connect(m_sf2DirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setSF2Dir(const QString &)));
 
 	QPushButton * sf2Dir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", sf2Dir_tw);
 	sf2Dir_select_btn->setFixedSize(24, 24);
 	sf2Dir_select_btn->move(btnStart, 16);
-	connect(sf2Dir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openSF2Dir()));
+	connect(sf2Dir_select_btn, SIGNAL(clicked()),
+			this, SLOT(openSF2Dir()));
 	
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	// Default SF2 file tab.
@@ -882,15 +879,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_sf2FileLineEdit = new QLineEdit(m_sf2File, sf2File_tw);
 	m_sf2FileLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_sf2FileLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setSF2File(const QString &)));
+	connect(m_sf2FileLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setSF2File(const QString &)));
 
 	QPushButton * sf2File_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", sf2File_tw);
 	sf2File_select_btn->setFixedSize(24, 24);
 	sf2File_select_btn->move(btnStart, 16);
-	connect(sf2File_select_btn, SIGNAL(clicked()), this,
-			SLOT(openSF2File()));
+	connect(sf2File_select_btn, SIGNAL(clicked()),
+			this, SLOT(openSF2File()));
 #endif
 		
 	// GIG files directory tab.
@@ -900,15 +897,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_gigDirLineEdit = new QLineEdit(m_gigDir, gigDir_tw);
 	m_gigDirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_gigDirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setGIGDir(const QString &)));
+	connect(m_gigDirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setGIGDir(const QString &)));
 
 	QPushButton * gigDir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", gigDir_tw);
 	gigDir_select_btn->setFixedSize(24, 24);
 	gigDir_select_btn->move(btnStart, 16);
-	connect(gigDir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openGIGDir()));
+	connect(gigDir_select_btn, SIGNAL(clicked()),
+			this, SLOT(openGIGDir()));
 
 	// Theme directory tab.
 	TabWidget * themeDir_tw = new TabWidget(
@@ -917,17 +914,17 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_themeDirLineEdit = new QLineEdit(m_themeDir, themeDir_tw);
 	m_themeDirLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setThemeDir(const QString &)));
-	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(toggleRestartWarning()));
+	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setThemeDir(const QString &)));
+	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(toggleRestartWarning()));
 
 	QPushButton * themeDir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", themeDir_tw);
 	themeDir_select_btn->setFixedSize(24, 24);
 	themeDir_select_btn->move(btnStart, 16);
-	connect(themeDir_select_btn, SIGNAL(clicked()), this,
-			SLOT(openThemeDir()));
+	connect(themeDir_select_btn, SIGNAL(clicked()),
+			this, SLOT(openThemeDir()));
 
 	// Background picture file tab.
 	TabWidget * backgroundPicFile_tw = new TabWidget(
@@ -936,17 +933,17 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_backgroundPicFileLineEdit = new QLineEdit(m_backgroundPicFile, backgroundPicFile_tw);
 	m_backgroundPicFileLineEdit->setGeometry(10, 20, txtLength, 16);
-	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(setBackgroundPicFile(const QString &)));
-	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)), this,
-			SLOT(toggleRestartWarning()));
+	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(setBackgroundPicFile(const QString &)));
+	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)),
+			this, SLOT(toggleRestartWarning()));
 
 	QPushButton * backgroundPicFile_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", backgroundPicFile_tw);
 	backgroundPicFile_select_btn->setFixedSize(24, 24);
 	backgroundPicFile_select_btn->move(btnStart, 16);
-	connect(backgroundPicFile_select_btn, SIGNAL(clicked()), this,
-			SLOT(openBackgroundPicFile()));
+	connect(backgroundPicFile_select_btn, SIGNAL(clicked()),
+			this, SLOT(openBackgroundPicFile()));
 
 	// Path selectors layout.
 	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
@@ -980,26 +977,20 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Major tabs ordering.
 	m_tabBar->addTab(general_w,
-			tr("General settings"), 0, false,
-					true)->setIcon(
-							embed::getIconPixmap("setup_general"));
+			tr("General settings"), 0, false, true)->setIcon(
+					embed::getIconPixmap("setup_general"));
 	m_tabBar->addTab(performance_w,
-			tr("Performance settings"), 1, false,
-					true)->setIcon(
-							embed::getIconPixmap("setup_performance"));
+			tr("Performance settings"), 1, false, true)->setIcon(
+					embed::getIconPixmap("setup_performance"));
 	m_tabBar->addTab(audio_w,
-			tr("Audio settings"), 2, false,
-					true)->setIcon(
-							embed::getIconPixmap("setup_audio"));
+			tr("Audio settings"), 2, false, true)->setIcon(
+					embed::getIconPixmap("setup_audio"));
 	m_tabBar->addTab(midi_w,
-			tr("MIDI settings"), 3, false,
-					true)->setIcon(
-							embed::getIconPixmap("setup_midi"));
+			tr("MIDI settings"), 3, false, true)->setIcon(
+					embed::getIconPixmap("setup_midi"));
 	m_tabBar->addTab(paths_w,
-			tr("Paths settings"), 4, true,
-					true)->setIcon(
-							embed::getIconPixmap("setup_directories"));
-
+			tr("Paths settings"), 4, true, true)->setIcon(
+					embed::getIconPixmap("setup_directories"));
 
 	m_tabBar->setActiveTab(tab_to_open);
 
@@ -1025,15 +1016,15 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QPushButton * ok_btn = new QPushButton(
 			embed::getIconPixmap("apply"),
 			tr("OK"), extras_w);
-	connect(ok_btn, SIGNAL(clicked()), this,
-			SLOT(accept()));
+	connect(ok_btn, SIGNAL(clicked()),
+			this, SLOT(accept()));
 
 	// Cancel button.
 	QPushButton * cancel_btn = new QPushButton(
 			embed::getIconPixmap("cancel"),
 			tr("Cancel"), extras_w);
-	connect(cancel_btn, SIGNAL(clicked()), this,
-			SLOT(reject()));
+	connect(cancel_btn, SIGNAL(clicked()),
+			this, SLOT(reject()));
 
 	// Extras layout ordering.
 	extras_layout->addSpacing(10);
@@ -1147,7 +1138,7 @@ void SetupDialog::accept()
 
 
 
-// General settings subroutines.
+// General settings slots.
 
 void SetupDialog::toggleTooltips(bool enabled)
 {
@@ -1211,7 +1202,7 @@ void SetupDialog::setLanguage(int lang)
 
 
 
-// Performance settings subroutines.
+// Performance settings slots.
 
 void SetupDialog::setAutoSaveInterval(int value)
 {
@@ -1285,7 +1276,7 @@ void SetupDialog::toggleDisableAutoQuit(bool enabled)
 
 
 
-// Audio settings subroutines.
+// Audio settings slots.
 
 void SetupDialog::toggleHQAudioDev(bool enabled)
 {
@@ -1366,7 +1357,7 @@ void SetupDialog::displayBufferSizeHelp()
 }
 
 
-// MIDI settings subroutines.
+// MIDI settings slots.
 
 void SetupDialog::midiInterfaceChanged(const QString & iface)
 {
@@ -1392,7 +1383,7 @@ void SetupDialog::displayMIDIHelp()
 
 
 
-// Paths settings subroutines.
+// Paths settings slots.
 
 void SetupDialog::openWorkingDir()
 {

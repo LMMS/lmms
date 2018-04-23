@@ -64,17 +64,18 @@ public:
 		}
 		return s_instanceOfMe;
 	}
-//-----------------------------------------------------------
-	const QString & dataDir() const
-	{
-		return m_dataDir;
-	}
+
 
 	const QString & workingDir() const
 	{
 		return m_workingDir;
 	}
-//-----------------------------------------------------------
+
+	const QString & dataDir() const
+	{
+		return m_dataDir;
+	}
+
 	QString factoryProjectsDir() const
 	{
 		return dataDir() + PROJECTS_PATH;
@@ -94,7 +95,8 @@ public:
 	{
 		return dataDir() + SAMPLES_PATH;
 	}
-//-----------------------------------------------------------
+
+
 	QString userProjectsDir() const
 	{
 		return workingDir() + PROJECTS_PATH;
@@ -114,7 +116,8 @@ public:
 	{
 		return workingDir() + SAMPLES_PATH;
 	}
-//-----------------------------------------------------------
+
+
 	const QString & vstDir() const
 	{
 		return m_vstDir;
@@ -148,7 +151,8 @@ public:
 	{
 		return m_gigDir;
 	}
-//-----------------------------------------------------------
+
+
 	QString userVstDir() const
 	{
 		return m_vstDir;
@@ -168,7 +172,7 @@ public:
 	{
 		return workingDir() + GIG_PATH;
 	}
-//-----------------------------------------------------------
+
 	QString defaultThemeDir() const
 	{
 		return m_dataDir + DEFAULT_THEME_PATH;
@@ -179,16 +183,16 @@ public:
 		return m_themeDir;
 	}
 
+	const QString & backgroundPicFile() const
+	{
+		return m_backgroundPicFile;
+	}
+
 	QString trackIconsDir() const
 	{
 		return m_dataDir + TRACK_ICON_PATH;
 	}
 
-	const QString & backgroundPicFile() const
-	{
-		return m_backgroundPicFile;
-	}
-//-----------------------------------------------------------
 	const QString recoveryFile() const
 	{
 		return m_workingDir + "recover.mmp";
@@ -198,19 +202,19 @@ public:
 	{
 		return m_recentlyOpenedProjects;
 	}
-//-----------------------------------------------------------
+
+	QString localeDir() const
+	{
+		return m_dataDir + LOCALE_PATH;
+	}
+
 	const QString & version() const
 	{
 		return m_version;
 	}
 
 	QString defaultVersion() const;
-//-----------------------------------------------------------
-	QString localeDir() const
-	{
-		return m_dataDir + LOCALE_PATH;
-	}
-//--------------------------------------------------
+
 
 	static QStringList availabeVstEmbedMethods();
 	QString vstEmbedMethod() const;
@@ -285,7 +289,5 @@ private:
 
 
 	friend class LmmsCore;
-
-} ;
-
+};
 #endif
