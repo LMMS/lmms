@@ -314,7 +314,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	}
 	connect(changeLang, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(setLanguage(int)));
-	connect(changeLang, SIGNAL(toggled(bool)),
+	connect(changeLang, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(toggleRestartWarning()));
 
 	// If language unset, fallback to system language when available.
