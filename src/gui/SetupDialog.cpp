@@ -634,6 +634,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(setBufferSize(int)));
+	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
+			this, SLOT(toggleRestartWarning()));
 
 	m_bufferSizeLbl = new QLabel(bufferSize_tw);
 	m_bufferSizeLbl->setGeometry(10, 40, 200, 24);
