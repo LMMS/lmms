@@ -188,11 +188,14 @@ ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent,
 
 	m_userController = new ComboBox( m_userGroupBox, "Controller" );
 	m_userController->setGeometry( 10, 24, 200, 22 );
-
 	for (Controller * c : Engine::getSong()->controllers())
 	{
 		m_userController->model()->addItem( c->name() );
 	}
+	connect( m_userController->model(), SIGNAL( dataUnchanged() ),
+			this, SLOT( userSelected() ) );
+	connect( m_userController->model(), SIGNAL( dataChanged() ),
+			this, SLOT( userSelected() ) );
 
 
 	// Mapping functions
@@ -389,8 +392,15 @@ void ControllerConnectionDialog::userToggled()
 	{
 		m_midiGroupBox->model()->setValue( 0 );
 	}
+}
 
-	m_userController->setEnabled( enabled );
+
+
+
+void ControllerConnectionDialog::userSelected()
+{
+	m_userGroupBox->model()->setValue( 1 );
+	userToggled();
 }
 
 

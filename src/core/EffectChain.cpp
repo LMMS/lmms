@@ -125,6 +125,8 @@ void EffectChain::appendEffect( Effect * _effect )
 	m_effects.append( _effect );
 	Engine::mixer()->doneChangeInModel();
 
+	m_enabledModel.setValue( true );
+
 	emit dataChanged();
 }
 
@@ -144,6 +146,12 @@ void EffectChain::removeEffect( Effect * _effect )
 	m_effects.erase( found );
 
 	Engine::mixer()->doneChangeInModel();
+
+	if( m_effects.isEmpty() )
+	{
+		m_enabledModel.setValue( false );
+	}
+
 	emit dataChanged();
 }
 
@@ -250,7 +258,6 @@ void EffectChain::clear()
 
 	Engine::mixer()->requestChangeInModel();
 
-	m_enabledModel.setValue( false );
 	while( m_effects.count() )
 	{
 		Effect * e = m_effects[m_effects.count() - 1];
@@ -259,4 +266,6 @@ void EffectChain::clear()
 	}
 
 	Engine::mixer()->doneChangeInModel();
+
+	m_enabledModel.setValue( false );
 }
