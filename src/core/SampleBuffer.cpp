@@ -129,6 +129,7 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames )
 
 
 
+
 SampleBuffer::~SampleBuffer()
 {
 	MM_FREE( m_origData );
@@ -141,7 +142,6 @@ void SampleBuffer::sampleRateChanged()
 {
 	update( true );
 }
-
 
 
 void SampleBuffer::update( bool _keep_settings )

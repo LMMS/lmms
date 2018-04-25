@@ -158,7 +158,7 @@ void RenderManager::render(QString outputPath)
 	else
 	{
 		qDebug( "Renderer failed to acquire a file device!" );
-		emit finished();
+		renderNextTrack();
 	}
 }
 
