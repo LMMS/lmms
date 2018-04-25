@@ -594,14 +594,14 @@ void FxMixer::masterMix( sampleFrame * _buf )
 			MixerWorkerThread::addJob( ch );
 		}
 	}
-	while( m_fxChannels[0]->state() != ThreadableJob::Done )
+	while (m_fxChannels[0]->state() != ThreadableJob::ProcessingState::Done)
 	{
 		bool found = false;
 		for( FxChannel * ch : m_fxChannels )
 		{
-			int s = ch->state();
-			if( s == ThreadableJob::Queued
-				|| s == ThreadableJob::InProgress )
+			const auto s = ch->state();
+			if (s == ThreadableJob::ProcessingState::Queued
+				|| s == ThreadableJob::ProcessingState::InProgress)
 			{
 				found = true;
 				break;
