@@ -64,6 +64,8 @@ private:
 	QString pathForTrack( const Track *track, int num );
 	void restoreMutedState();
 
+	void render( QString outputPath );
+
 	const Mixer::qualitySettings m_qualitySettings;
 	const Mixer::qualitySettings m_oldQualitySettings;
 	const OutputSettings m_outputSettings;

@@ -88,30 +88,7 @@ void RenderManager::renderNextTrack()
 		// for multi-render, prefix each output file with a different number
 		int trackNum = m_tracksToRender.size() + 1;
 
-		// create a renderer for this track
-		m_activeRenderer = make_unique<ProjectRenderer>(
-				m_qualitySettings,
-				m_outputSettings,
-				m_format,
-				pathForTrack(renderTrack, trackNum));
-
-		if ( m_activeRenderer->isReady() )
-		{
-			// pass progress signals through
-			connect( m_activeRenderer.get(), SIGNAL( progressChanged( int ) ),
-					this, SIGNAL( progressChanged( int ) ) );
-
-			// when it is finished, render the next track
-			connect( m_activeRenderer.get(), SIGNAL( finished() ),
-					this, SLOT( renderNextTrack() ) );
-
-			m_activeRenderer->startProcessing();
-		}
-		else
-		{
-			qDebug( "Renderer failed to acquire a file device!" );
-			renderNextTrack();
-		}
+		render( pathForTrack(renderTrack, trackNum) );
 	}
 }
 
@@ -154,11 +131,16 @@ void RenderManager::renderTracks()
 // Render the song into a single track
 void RenderManager::renderProject()
 {
+	render( m_outputPath );
+}
+
+void RenderManager::render(QString outputPath)
+{
 	m_activeRenderer = make_unique<ProjectRenderer>(
 			m_qualitySettings,
 			m_outputSettings,
 			m_format,
-			m_outputPath);
+			outputPath);
 
 	if( m_activeRenderer->isReady() )
 	{
@@ -166,7 +148,8 @@ void RenderManager::renderProject()
 		connect( m_activeRenderer.get(), SIGNAL( progressChanged( int ) ),
 				this, SIGNAL( progressChanged( int ) ) );
 
-		// as we have not queued any tracks, renderNextTrack will just clean up
+		// when it is finished, render the next track.
+		// if we have not queued any tracks, renderNextTrack will just clean up
 		connect( m_activeRenderer.get(), SIGNAL( finished() ),
 				this, SLOT( renderNextTrack() ) );
 
@@ -175,7 +158,7 @@ void RenderManager::renderProject()
 	else
 	{
 		qDebug( "Renderer failed to acquire a file device!" );
-		emit finished();
+		renderNextTrack();
 	}
 }
 
