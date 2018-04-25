@@ -409,7 +409,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No output file specified" );
+				return usageError( "No output file specified" );
 			}
 
 
@@ -421,7 +421,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No output format specified" );
+				return usageError( "No output format specified" );
 			}
 
 
@@ -449,7 +449,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-                return usageError( QString( "Invalid output format %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid output format %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--samplerate" || arg == "-s" )
@@ -458,7 +458,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No samplerate specified" );
+				return usageError( "No samplerate specified" );
 			}
 
 
@@ -469,7 +469,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-                return usageError( QString( "Invalid samplerate %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid samplerate %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--bitrate" || arg == "-b" )
@@ -478,7 +478,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No bitrate specified" );
+				return usageError( "No bitrate specified" );
 			}
 
 
@@ -492,7 +492,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-                return usageError( QString( "Invalid bitrate %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid bitrate %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--mode" || arg == "-m" )
@@ -501,7 +501,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No stereo mode specified" );
+				return usageError( "No stereo mode specified" );
 			}
 
 			QString const mode( argv[i] );
@@ -520,7 +520,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-                return usageError( QString( "Invalid stereo mode %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid stereo mode %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg =="--float" || arg == "-a" )
@@ -533,7 +533,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No interpolation method specified" );
+				return usageError( "No interpolation method specified" );
 			}
 
 
@@ -557,7 +557,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-                return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--oversampling" || arg == "-x" )
@@ -566,7 +566,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No oversampling specified" );
+				return usageError( "No oversampling specified" );
 			}
 
 
@@ -587,7 +587,7 @@ int main( int argc, char * * argv )
 		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
 		break;
 				default:
-                return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--import" )
@@ -596,7 +596,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No file specified for importing" );
+				return usageError( "No file specified for importing" );
 			}
 
 			fileToImport = QString::fromLocal8Bit( argv[i] );
@@ -614,7 +614,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No profile specified" );
+				return usageError( "No profile specified" );
 			}
 
 
@@ -626,7 +626,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-                return usageError( "No configuration file specified" );
+				return usageError( "No configuration file specified" );
 			}
 
 			configFile = QString::fromLocal8Bit( argv[i] );
@@ -635,7 +635,7 @@ int main( int argc, char * * argv )
 		{
 			if( argv[i][0] == '-' )
 			{
-                return usageError( QString( "Invalid option %1" ).arg( argv[i] ) );
+				return usageError( QString( "Invalid option %1" ).arg( argv[i] ) );
 			}
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
 		}
