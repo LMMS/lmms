@@ -25,9 +25,8 @@
 #ifndef LOCKLESS_ALLOCATOR_H
 #define LOCKLESS_ALLOCATOR_H
 
+#include <atomic>
 #include <stddef.h>
-
-#include "AtomicInt.h"
 
 class LocklessAllocator
 {
@@ -43,11 +42,11 @@ private:
 	size_t m_capacity;
 	size_t m_elementSize;
 
-	AtomicInt * m_freeState;
+	std::atomic_int * m_freeState;
 	size_t m_freeStateSets;
 
-	AtomicInt m_available;
-	AtomicInt m_startIndex;
+	std::atomic_int m_available;
+	std::atomic_int m_startIndex;
 
 } ;
 
