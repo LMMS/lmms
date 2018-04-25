@@ -71,7 +71,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet( 0 )
+	m_dependenciesMet(0)
 {
 	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
 }
@@ -98,7 +98,7 @@ inline void FxChannel::processed()
 
 void FxChannel::incrementDeps()
 {
-	int i = m_dependenciesMet.fetchAndAddOrdered( 1 ) + 1;
+	int i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
