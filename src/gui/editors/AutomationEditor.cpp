@@ -1076,7 +1076,6 @@ void AutomationEditor::mouseMoveEvent(QMouseEvent * mouseEvent )
 inline void AutomationEditor::drawCross( QPainter & p )
 {
 	QPoint mouse_pos = mapFromGlobal( QCursor::pos() );
-
 	int grid_bottom = height() - SCROLLBAR_SIZE - 1;
 	float level = getLevel( mouse_pos.y() );
 	float cross_y = m_y_auto ?
@@ -1088,16 +1087,8 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	int bottom_margin = height() - SCROLLBAR_SIZE;
 
 	p.setPen( crossColor() );
-
-	// Limit the cross to the grid
-	if( mouse_pos.x() > VALUES_WIDTH - 1 &&
-		mouse_pos.x() < width() - SCROLLBAR_SIZE - 1 &&
-		mouse_pos.y() > TOP_MARGIN + 1 &&
-		mouse_pos.y() < grid_bottom )
-	{
-		p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(), bottom_margin );
-		p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
-	}
+	p.drawLine( VALUES_WIDTH, (int) cross_y, width(), (int) cross_y );
+	p.drawLine( mouse_pos.x(), TOP_MARGIN, mouse_pos.x(), bottom_margin );
 
 
 	QPoint tt_pos =  QCursor::pos();
@@ -1107,8 +1098,8 @@ inline void AutomationEditor::drawCross( QPainter & p )
 	float scaledLevel = m_pattern->firstObject()->scaledValue( level );
 
 	// Limit the scaled-level tooltip to the grid
-	if( mouse_pos.x() > VALUES_WIDTH - 1 &&
-		mouse_pos.x() < width() - SCROLLBAR_SIZE &&
+	if( mouse_pos.x() > VALUES_WIDTH - 1 && // left_margin
+		mouse_pos.x() < width() - SCROLLBAR_SIZE && // right_margin
 		mouse_pos.y() > TOP_MARGIN &&
 		mouse_pos.y() < bottom_margin )
 	{
@@ -1493,6 +1484,7 @@ void AutomationEditor::paintEvent(QPaintEvent * pe )
 
 	if( validPattern() && GuiApplication::instance()->automationEditor()->hasFocus() )
 	{
+
 		drawCross( p );
 	}
 
