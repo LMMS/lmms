@@ -1894,34 +1894,6 @@ void TrackOperationsWidget::removeTrack()
 	emit trackRemovalScheduled( m_trackView );
 }
 
-/*! \brief Turns off the groove
- *
- */
-void TrackOperationsWidget::disableGroove()
-{
-	//engine::getMixer()->lock();
-	Track * t = m_trackView->getTrack();
-	if (t->type() == Track::InstrumentTrack) {
-		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>( t );
-		it->disableGroove();
-	}
-	//engine::getMixer()->unlock();
-}
-
-/*! \brief Turns on the groove
- *
- */
-void TrackOperationsWidget::enableGroove()
-{
-	//engine::getMixer()->lock();
-	Track * t = m_trackView->getTrack();
-	if (t->type() == Track::InstrumentTrack) {
-		InstrumentTrack * it = dynamic_cast<InstrumentTrack *>( t );
-		it->enableGroove();
-	}
-	//engine::getMixer()->unlock();
-}
-
 /*! \brief Update the trackOperationsWidget context menu
  *
  *  For all track types, we have the Clone and Remove options.
@@ -1949,10 +1921,8 @@ void TrackOperationsWidget::updateMenu()
 	{
 		QMenu *fxMenu = trackView->createFxMenu( tr( "FX %1: %2" ), tr( "Assign to new FX Channel" ));
 		toMenu->addMenu(fxMenu);
-
 		toMenu->addSeparator();
 		toMenu->addMenu( trackView->midiMenu() );
-		toMenu->addMenu( grooveMenu() );
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
@@ -1975,40 +1945,6 @@ void TrackOperationsWidget::recordingOn()
 		}
 		atv->update();
 	}
-}
-
-// Groove operations
-QMenu * TrackOperationsWidget::grooveMenu()
-{
-
-	// TODO, this is a memory leak presumably
-	QMenu * grooveMenu = new QMenu();
-	grooveMenu->setIcon( embed::getIconPixmap( "note_double_whole", 16, 16 ) );
-	grooveMenu->setTitle("Groove");
-
-	Track * t = this->m_trackView->getTrack();
-
-	if(t->type() == Track::InstrumentTrack) {
-
-		// turn groove off.
-		QAction * muteAct = new QAction(embed::getIconPixmap( "led_red", 16, 16 ),
-										"Off", this);
-		muteAct->setData(t->id());
-		grooveMenu->addAction(muteAct);
-		QObject::connect(muteAct, SIGNAL(triggered()),
-			 this, SLOT(disableGroove()));
-
-		// turn groove on.
-		QAction * unmuteAct = new QAction(embed::getIconPixmap( "led_green", 16, 16 ),
-										"On", this);
-		unmuteAct->setData(t->id());
-		grooveMenu->addAction(unmuteAct);
-		QObject::connect(unmuteAct, SIGNAL(triggered()),
-			 this, SLOT(enableGroove()));
-
-	}
-
-	return grooveMenu;
 }
 
 void TrackOperationsWidget::recordingOff()

@@ -207,19 +207,28 @@ void InstrumentMidiIOView::modelChanged()
 InstrumentMiscView::InstrumentMiscView(InstrumentTrack *it, QWidget *parent) :
 	QWidget( parent )
 {
-	QVBoxLayout* layout = new QVBoxLayout( this );
-	layout->setMargin( 5 );
 	m_pitchGroupBox = new GroupBox( tr ( "MASTER PITCH" ) );
-	layout->addWidget( m_pitchGroupBox );
-	QHBoxLayout* masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
-	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
-	QLabel *tlabel = new QLabel(tr( "Enables the use of Master Pitch" ) );
 	m_pitchGroupBox->setModel( &it->m_useMasterPitchModel );
-	masterPitchLayout->addWidget( tlabel );
+	QLabel *label1 = new QLabel( tr( "Enables the use of Master Pitch" ) );
+	QHBoxLayout *masterPitchLayout = new QHBoxLayout( m_pitchGroupBox );
+	masterPitchLayout->setContentsMargins( 8, 18, 8, 8 );
+	masterPitchLayout->addWidget( label1 );
+
+	m_grooveGroupBox = new GroupBox( tr ( "GROOVE" ) );
+	m_grooveGroupBox->setModel( &it->m_useGrooveModel );
+	QLabel *label2 = new QLabel( tr( "Enables the use of Groove" ) );
+	QHBoxLayout *grooveLayout = new QHBoxLayout( m_grooveGroupBox );
+	grooveLayout->setContentsMargins( 8, 18, 8, 8 );
+	grooveLayout->addWidget( label2 );
+
+
+	QVBoxLayout *layout = new QVBoxLayout( this );
+	layout->setMargin( 5 );
+	layout->addWidget( m_pitchGroupBox );
+	layout->addWidget( m_grooveGroupBox );
 	layout->addStretch();
 }
 
 InstrumentMiscView::~InstrumentMiscView()
 {
-
 }

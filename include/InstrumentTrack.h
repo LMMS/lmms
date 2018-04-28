@@ -271,6 +271,7 @@ private:
 	IntModel m_pitchRangeModel;
 	IntModel m_effectChannelModel;
 	BoolModel m_useMasterPitchModel;
+	BoolModel m_useGrooveModel;
 
 
 	Instrument * m_instrument;
@@ -287,7 +288,9 @@ private:
 	friend class NotePlayHandle;
 	friend class InstrumentMiscView;
 
-} ;
+private slots:
+void updateGroove();
+};
 
 
 

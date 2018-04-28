@@ -106,7 +106,8 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	m_pitchModel( 0, MinPitchDefault, MaxPitchDefault, 1, this, tr( "Pitch" ) ),
 	m_pitchRangeModel( 1, 1, 60, this, tr( "Pitch range" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
-	m_useMasterPitchModel( true, this, tr( "Master Pitch") ),
+	m_useMasterPitchModel( true, this, tr( "Master Pitch" ) ),
+	m_useGrooveModel( true, this, tr( "Groove" ) ),
 	m_instrument( NULL ),
 	m_soundShaping( this ),
 	m_arpeggio( this ),
@@ -132,6 +133,7 @@ InstrumentTrack::InstrumentTrack( TrackContainer* tc ) :
 	connect( &m_pitchModel, SIGNAL( dataChanged() ), this, SLOT( updatePitch() ) );
 	connect( &m_pitchRangeModel, SIGNAL( dataChanged() ), this, SLOT( updatePitchRange() ) );
 	connect( &m_effectChannelModel, SIGNAL( dataChanged() ), this, SLOT( updateEffectChannel() ) );
+	connect( &m_useGrooveModel, SIGNAL( dataChanged() ), this, SLOT( updateGroove() ) );
 }
 
 
@@ -727,8 +729,6 @@ bool InstrumentTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 Groove * InstrumentTrack::groove()
 {
-
-	// TODO: Track-specific groove (may sound weird)
 	if (m_grooveOn)
 	{
 		// NULL: Use global groove
@@ -742,19 +742,20 @@ Groove * InstrumentTrack::groove()
 }
 
 
-void InstrumentTrack::disableGroove()
+void InstrumentTrack::updateGroove()
 {
-	if (m_noGroove == NULL)
+	if (m_useGrooveModel.value())
 	{
-		m_noGroove = new Groove();
+		m_grooveOn = true;
 	}
-	m_grooveOn = false;
-}
-
-
-void InstrumentTrack::enableGroove()
-{
-	m_grooveOn = true;
+	else
+	{
+		if (m_noGroove == NULL)
+		{
+			m_noGroove = new Groove();
+		}
+		m_grooveOn = false;
+	}
 }
 
 
@@ -784,6 +785,7 @@ void InstrumentTrack::saveTrackSpecificSettings( QDomDocument& doc, QDomElement 
 	m_effectChannelModel.saveSettings( doc, thisElement, "fxch" );
 	m_baseNoteModel.saveSettings( doc, thisElement, "basenote" );
 	m_useMasterPitchModel.saveSettings( doc, thisElement, "usemasterpitch");
+	m_useGrooveModel.saveSettings( doc, thisElement, "usegroove");
 
 	if( m_instrument != NULL )
 	{
@@ -819,6 +821,7 @@ void InstrumentTrack::loadTrackSpecificSettings( const QDomElement & thisElement
 	}
 	m_baseNoteModel.loadSettings( thisElement, "basenote" );
 	m_useMasterPitchModel.loadSettings( thisElement, "usemasterpitch");
+	m_useGrooveModel.loadSettings( thisElement, "usegroove");
 
 	// clear effect-chain just in case we load an old preset without FX-data
 	m_audioPort.effects()->clear();
@@ -1641,6 +1644,7 @@ void InstrumentTrackWindow::modelChanged()
 	m_midiView->setModel( &m_track->m_midiPort );
 	m_effectView->setModel( m_track->m_audioPort.effects() );
 	m_miscView->pitchGroupBox()->setModel(&m_track->m_useMasterPitchModel);
+	m_miscView->grooveGroupBox()->setModel(&m_track->m_useGrooveModel);
 	updateName();
 }
 

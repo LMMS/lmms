@@ -62,8 +62,7 @@ private:
 	QToolButton * m_wpBtn;
 
 	LcdSpinBox* m_baseVelocitySpinBox;
-
-} ;
+};
 
 class InstrumentMiscView : public QWidget
 {
@@ -76,11 +75,14 @@ public:
 	{
 		return m_pitchGroupBox;
 	}
+	GroupBox * grooveGroupBox()
+	{
+		return m_grooveGroupBox;
+	}
 
 private:
-
 	GroupBox * m_pitchGroupBox;
-
+	GroupBox * m_grooveGroupBox;
 };
 
 #endif
