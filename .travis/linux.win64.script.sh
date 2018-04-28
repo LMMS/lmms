@@ -3,4 +3,4 @@
 set -e
 
 export CMAKE_OPTS="$CMAKE_FLAGS -DUSE_WERROR=ON"
-../cmake/build_mingw64.sh
+../cmake/build_win64.sh
