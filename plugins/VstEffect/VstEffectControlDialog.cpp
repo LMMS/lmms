@@ -272,7 +272,7 @@ void VstEffectControlDialog::showEvent(QShowEvent *_se)
 
 VstEffectControlDialog::~VstEffectControlDialog()
 {
-#if !(QT_VERSION < 0x050000 && defined(LMMS_BUILD_LINUX))
+#ifndef LMMS_BUILD_LINUX
 	if (m_pluginWidget && layout()) {
 		layout()->removeWidget(m_pluginWidget);
 		m_pluginWidget->setParent(nullptr);

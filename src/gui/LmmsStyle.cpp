@@ -132,11 +132,7 @@ LmmsStyle::LmmsStyle() :
 
 	if( s_palette != NULL ) { qApp->setPalette( *s_palette ); }
 
-#if QT_VERSION >= 0x050000
 	setBaseStyle( QStyleFactory::create( "Fusion" ) );
-#else
-	setBaseStyle( QStyleFactory::create( "Plastique" ) );
-#endif
 }
 
 
