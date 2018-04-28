@@ -34,7 +34,7 @@ IF(WIN32 AND MSVC)
 ELSEIF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
+				COMMAND "${CMAKE_RC_COMPILER}"
 					"-I\"${CMAKE_SOURCE_DIR}\""
 					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
 					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""

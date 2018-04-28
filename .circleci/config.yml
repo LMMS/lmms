@@ -32,16 +32,17 @@ shared:
   # Commmon environment variables
   common_environment: &common_environment
     QT5: True
-    CMAKE_OPTS: -DWANT_QT5=ON -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_CCACHE=ON
+    CMAKE_OPTS: -DUSE_WERROR=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_CCACHE=ON
     CCACHE_MAXSIZE: 500M
     CCACHE_LOGFILE: /tmp/artifacts/ccache.log
+    MAKEFLAGS: -j6
 
 jobs:
   mingw32:
     environment:
       <<: *common_environment
     docker:
-      - image: lmmsci/linux.mingw32:14.04
+      - image: lmmsci/linux.mingw32:18.04
     steps:
       - checkout
       - *init
@@ -50,15 +51,16 @@ jobs:
           name: Building
           command: |
             mkdir build && cd build
-            ../cmake/build_mingw32.sh
-            make -j6
+            ../cmake/build_win32.sh
+            make lmms
+            make
       - *ccache_stats
       - *save_cache
   mingw64:
     environment:
       <<: *common_environment
     docker:
-      - image: lmmsci/linux.mingw64:14.04
+      - image: lmmsci/linux.mingw64:18.04
     steps:
       - checkout
       - *init
@@ -67,13 +69,13 @@ jobs:
           name: Building
           command: |
             mkdir build && cd build
-            ../cmake/build_mingw64.sh
-            make -j6
+            ../cmake/build_win64.sh
+            make
       - *ccache_stats
       - *save_cache
   linux.gcc:
     docker:
-      - image: lmmsci/linux.gcc:14.04
+      - image: lmmsci/linux.gcc:18.04
     environment:
       <<: *common_environment
     steps:
@@ -85,7 +87,7 @@ jobs:
           command: mkdir build && cd build && cmake .. $CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=./install
       - run:
           name: Build
-          command: cd build && make -j6
+          command: cd build && make
       - run:
           name: Build tests
           command: cd build && make tests
