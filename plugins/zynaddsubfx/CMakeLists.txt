@@ -20,7 +20,7 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 # build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-misleading-indentation -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
 
 IF(LMMS_BUILD_WIN32)
 	# link system-libraries
@@ -151,7 +151,7 @@ ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
+				COMMAND "${CMAKE_RC_COMPILER}"
 					"-I\"${CMAKE_CURRENT_SOURCE_DIR}\""
 					"-o\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj\""
 					"-i\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc\""
