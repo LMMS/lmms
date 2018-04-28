@@ -24,9 +24,11 @@
 
 #include "MixerWorkerThread.h"
 
-#include "denormals.h"
+#include <xmmintrin.h>
 #include <QMutex>
 #include <QWaitCondition>
+
+#include "denormals.h"
 #include "ThreadableJob.h"
 #include "Mixer.h"
 

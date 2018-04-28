@@ -1,0 +1,6 @@
+INCLUDE(MSYS-32)
+INCLUDE(Win64)
+SET(LMMS_BUILD_MSYS 1)
+
+SET(MINGW_PREFIX                /mingw64)
+SET(MINGW_PREFIX32              /mingw32)
