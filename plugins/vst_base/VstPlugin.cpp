@@ -35,17 +35,10 @@
 
 #ifdef LMMS_BUILD_LINUX
 #	include <QX11Info>
-#	if QT_VERSION < 0x050000
-#		include <QX11EmbedContainer>
-#	else
-#		include "X11EmbedContainer.h"
-#		include <QWindow>
-#	endif
+#	include "X11EmbedContainer.h"
 #endif
 
-#if QT_VERSION >= 0x050000
-#	include <QWindow>
-#endif
+#include <QWindow>
 
 #include <QDomDocument>
 

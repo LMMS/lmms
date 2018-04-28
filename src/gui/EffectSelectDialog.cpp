@@ -120,21 +120,15 @@ EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
 	connect( ui->buttonBox, SIGNAL( accepted() ),
 				this, SLOT( acceptSelection() ) );
 
-#if QT_VERSION >= 0x050000
-#define setResizeMode setSectionResizeMode
 	ui->filterEdit->setClearButtonEnabled( true );
-#endif
-	ui->pluginList->verticalHeader()->setResizeMode(
+	ui->pluginList->verticalHeader()->setSectionResizeMode(
 						QHeaderView::ResizeToContents );
 	ui->pluginList->verticalHeader()->hide();
-	ui->pluginList->horizontalHeader()->setResizeMode( 0,
+	ui->pluginList->horizontalHeader()->setSectionResizeMode( 0,
 							QHeaderView::Stretch );
-	ui->pluginList->horizontalHeader()->setResizeMode( 1,
+	ui->pluginList->horizontalHeader()->setSectionResizeMode( 1,
 						QHeaderView::ResizeToContents );
 	ui->pluginList->sortByColumn( 0, Qt::AscendingOrder );
-#if QT_VERSION >= 0x050000
-#undef setResizeMode
-#endif
 
 	updateSelection();
 	show();
