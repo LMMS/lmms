@@ -59,7 +59,8 @@ public:
 			for( const NotePlayHandle * constNotePlayHandle : nphv )
 			{
 				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
-				if( notePlayHandle->state() != ThreadableJob::Done && ! notePlayHandle->isFinished() )
+				if( notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
+					!notePlayHandle->isFinished())
 				{
 					nphsLeft = true;
 					notePlayHandle->process();
