@@ -41,7 +41,6 @@
 #include <QToolBar>
 #include <QLabel>
 
-
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( NULL ),
@@ -271,6 +270,17 @@ void VstEffectControlDialog::paintEvent( QPaintEvent * )
 		tbLabel->setText( tr( "Effect by: " ) + m_plugin->vendorString() +
 			tr( "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />" ) +
 			m_plugin->currentProgramName() );
+	}
+}
+
+void VstEffectControlDialog::showEvent(QShowEvent *_se)
+{
+	EffectControlDialog::showEvent( _se );
+	// Workaround for a (unexplained) bug where on project-load the effect
+	// control window has size 0 and would only restore to the proper size upon
+	// moving the window or interacting with it.
+	if (parentWidget()) {
+		parentWidget()->adjustSize();
 	}
 }
 
