@@ -1,0 +1,11 @@
+# Dummy CircleCI Config File
+version: 2
+jobs:
+  build:
+    machine: true
+    branches:
+      ignore: stable-1.2
+    steps:
+      - run:
+          name: Dummy
+          command: echo "Dummy command to prevent error"
