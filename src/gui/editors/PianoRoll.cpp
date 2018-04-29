@@ -40,6 +40,7 @@
 #endif
 
 #include <math.h>
+#include <utility>
 
 #include "AutomationEditor.h"
 #include "ActionGroup.h"
@@ -57,6 +58,7 @@
 #include "MainWindow.h"
 #include "Pattern.h"
 #include "SongEditor.h"
+#include "stdshims.h"
 #include "TextFloat.h"
 #include "TimeLineWidget.h"
 
@@ -65,6 +67,7 @@
 #define MiddleButton MidButton
 #endif
 
+using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
 
@@ -370,7 +373,7 @@ PianoRoll::PianoRoll() :
 
 	// Set up note length model
 	m_noteLenModel.addItem( tr( "Last note" ),
-					new PixmapLoader( "edit_draw" ) );
+					make_unique<PixmapLoader>( "edit_draw" ) );
 	const QString pixmaps[] = { "whole", "half", "quarter", "eighth",
 						"sixteenth", "thirtysecond", "triplethalf",
 						"tripletquarter", "tripleteighth",
@@ -378,13 +381,13 @@ PianoRoll::PianoRoll() :
 
 	for( int i = 0; i < NUM_EVEN_LENGTHS; ++i )
 	{
-		PixmapLoader *loader = new PixmapLoader( "note_" + pixmaps[i] );
-		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), loader );
+		auto loader = make_unique<PixmapLoader>( "note_" + pixmaps[i] );
+		m_noteLenModel.addItem( "1/" + QString::number( 1 << i ), ::move(loader) );
 	}
 	for( int i = 0; i < NUM_TRIPLET_LENGTHS; ++i )
 	{
-		PixmapLoader *loader = new PixmapLoader( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
-		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), loader );
+		auto loader = make_unique<PixmapLoader>( "note_" + pixmaps[i+NUM_EVEN_LENGTHS] );
+		m_noteLenModel.addItem( "1/" + QString::number( (1 << i) * 3 ), ::move(loader) );
 	}
 	m_noteLenModel.setValue( 0 );
 
@@ -2058,7 +2061,8 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				pauseTestNotes( false );
 			}
 		}
-		else if( ( edit_note || m_action == ActionChangeNoteProperty ) &&
+		else if( m_editMode != ModeErase &&
+			( edit_note || m_action == ActionChangeNoteProperty ) &&
 				( me->buttons() & Qt::LeftButton || me->buttons() & Qt::MiddleButton
 				|| ( me->buttons() & Qt::RightButton && me->modifiers() & Qt::ShiftModifier ) ) )
 		{
@@ -2120,9 +2124,14 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				bool isUnderPosition = n->withinRange( ticks_start, ticks_end );
 				// Play note under the cursor
 				if ( isUnderPosition ) { testPlayNote( n ); }
-				// If note is the one under the cursor or is selected when alt is
-				// not pressed
-				if ( ( isUnderPosition && !isSelection() ) || ( n->selected() && !altPressed ) )
+				// If note is:
+				// Under the cursor, when there is no selection
+				// Selected, and alt is not pressed
+				// Under the cursor, selected, and alt is pressed
+				if ( ( isUnderPosition && !isSelection() ) ||
+					  ( n->selected() && !altPressed ) ||
+					  ( isUnderPosition && n->selected() && altPressed )
+					)
 				{
 					if( m_noteEditMode == NoteEditVolume )
 					{
@@ -2248,9 +2257,11 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 				--m_selectedKeys;
 			}
 		}
-		else if( m_editMode == ModeDraw && me->buttons() & Qt::RightButton )
+		else if( ( m_editMode == ModeDraw && me->buttons() & Qt::RightButton )
+				|| ( m_editMode == ModeErase && me->buttons() ) )
 		{
-			// holding down right-click to delete notes
+			// holding down right-click to delete notes or holding down
+			// any key if in erase mode
 
 			// get tick in which the user clicked
 			int pos_ticks = x * MidiTime::ticksPerTact() / m_ppt +
@@ -3403,6 +3414,7 @@ void PianoRoll::record()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	m_recording = true;
 
 	Engine::getSong()->playPattern( m_pattern, false );
@@ -3422,6 +3434,7 @@ void PianoRoll::recordAccompany()
 		return;
 	}
 
+	m_pattern->addJournalCheckPoint();
 	m_recording = true;
 
 	if( m_pattern->getTrack()->trackContainer() == Engine::getSong() )
@@ -3756,7 +3769,7 @@ void PianoRoll::pasteNotes()
 			// create the note
 			Note cur_note;
 			cur_note.restoreState( list.item( i ).toElement() );
-			cur_note.setPos( cur_note.pos() + m_timeLine->pos() );
+			cur_note.setPos( cur_note.pos() + Note::quantized( m_timeLine->pos(), quantization() ) );
 
 			// select it
 			cur_note.setSelected( true );

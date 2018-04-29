@@ -427,7 +427,7 @@ void FileBrowserTreeWidget::mousePressEvent(QMouseEvent * me )
 			m_previewPlayHandle = s;
 			delete tf;
 		}
-		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" ) &&
+		else if( ( f->extension ()== "xiz" || f->extension() == "sf2" || f->extension() == "sf3" || f->extension() == "gig" || f->extension() == "pat" ) &&
 			! pluginFactory->pluginSupportingExtension(f->extension()).isNull() )
 		{
 			m_previewPlayHandle = new PresetPreviewPlayHandle( f->fullName(), f->handling() == FileItem::LoadByPlugin );
@@ -491,6 +491,10 @@ void FileBrowserTreeWidget::mouseMoveEvent( QMouseEvent * me )
 				case FileItem::SoundFontFile:
 					new StringPairDrag( "soundfontfile", f->fullName(),
 							embed::getIconPixmap( "soundfont_file" ), this );
+					break;
+				case FileItem::PatchFile:
+					new StringPairDrag( "patchfile", f->fullName(),
+							embed::getIconPixmap( "sample_file" ), this );
 					break;
 				case FileItem::VstPluginFile:
 					new StringPairDrag( "vstpluginfile", f->fullName(),

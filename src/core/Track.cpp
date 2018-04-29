@@ -972,9 +972,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 					m_tco->movePosition( t );
 					m_trackView->getTrackContentWidget()->changePosition();
 					m_tco->changeLength( m_tco->length() + ( oldPos - t ) );
-
-					if (! sTco->isEmpty ())
-						sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
+					sTco->setStartTimeOffset( sTco->startTimeOffset() + ( oldPos - t ) );
 				}
 			}
 		}
@@ -1922,6 +1920,39 @@ void TrackOperationsWidget::updateMenu()
 {
 	return m_trackView->updateTrackOperationsWidgetMenu (this);
 }
+
+
+void TrackOperationsWidget::recordingOn()
+{
+	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	if( atv )
+	{
+		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+		{
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+			if( ap ) { ap->setRecording( true ); }
+		}
+		atv->update();
+	}
+}
+
+
+void TrackOperationsWidget::recordingOff()
+{
+	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
+	if( atv )
+	{
+		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
+		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+		{
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+			if( ap ) { ap->setRecording( false ); }
+		}
+		atv->update();
+	}
+}
+
 
 // ===========================================================================
 // track

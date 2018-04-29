@@ -32,23 +32,6 @@
 
 
 
-SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( new SampleBuffer( sampleFile ) ),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( true ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( NULL ),
-	m_bbTrack( NULL )
-{
-	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
-}
-
-
-
-
 SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
@@ -66,17 +49,20 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	PlayHandle( TypeSamplePlayHandle ),
-	m_sampleBuffer( sharedObject::ref( tco->sampleBuffer() ) ),
-	m_doneMayReturnTrue( true ),
-	m_frame( 0 ),
-	m_ownAudioPort( false ),
-	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
-	m_volumeModel( &m_defaultVolumeModel ),
-	m_track( tco->getTrack() ),
-	m_bbTrack( NULL )
+SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
+	SamplePlayHandle( new SampleBuffer( sampleFile ) )
 {
+	sharedObject::unref( m_sampleBuffer );
+	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+}
+
+
+
+
+SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
+	SamplePlayHandle( tco->sampleBuffer() )
+{
+	m_track = tco->getTrack();
 	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
 }
 

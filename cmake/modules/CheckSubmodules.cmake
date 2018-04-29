@@ -113,8 +113,8 @@ MACRO(GIT_SUBMODULE SUBMODULE_PATH FORCE_DEINIT FORCE_REMOTE)
 	ENDIF()
 ENDMACRO()
 
-SET(MISSING_COMMIT_PHRASES "no such remote ref;reference is not a tree")
-SET(RETRY_PHRASES "Failed to recurse;unadvertised object;cannot create directory;already exists;${MISSING_COMMIT_PHRASES}")
+SET(MISSING_COMMIT_PHRASES "no such remote ref;reference is not a tree;unadvertised object")
+SET(RETRY_PHRASES "Failed to recurse;cannot create directory;already exists;${MISSING_COMMIT_PHRASES}")
 
 # Attempt to do lazy clone
 FOREACH(_submodule ${SUBMODULE_LIST})

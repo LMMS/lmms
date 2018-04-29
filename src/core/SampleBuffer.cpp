@@ -59,30 +59,8 @@
 #include "FileDialog.h"
 
 
-SampleBuffer::SampleBuffer( const QString & _audio_file,
-							bool _is_base64_data ) :
-	m_audioFile( ( _is_base64_data == true ) ? "" : _audio_file ),
-	m_startFrame( 0 ),
-	m_endFrame( 0 ),
-	m_loopStartFrame( 0 ),
-	m_loopEndFrame( 0 ),
-	m_amplification( 1.0f ),
-	m_reversed( false ),
-	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
-{
-	if( _is_base64_data == true )
-	{
-		loadFromBase64( _audio_file );
-	}
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
-	update();
-}
 
-
-
-
-SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
+SampleBuffer::SampleBuffer() :
 	m_audioFile( "" ),
 	m_startFrame( 0 ),
 	m_endFrame( 0 ),
@@ -93,25 +71,39 @@ SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames ) :
 	m_frequency( BaseFreq ),
 	m_sampleRate( Engine::mixer()->baseSampleRate() )
 {
-	if( _frames > 0 )
-	{
-		m_origData.assign (_data, _data + _frames);
-	}
+
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	update();
+}
+
+
+
+SampleBuffer::SampleBuffer( const QString & _audio_file,
+							bool _is_base64_data )
+	: SampleBuffer()
+{
+	if( _is_base64_data )
+	{
+		loadFromBase64( _audio_file );
+	}
+	else
+	{
+		m_audioFile = _audio_file;
+		update();
+	}
+}
+
+
+
+
+SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames )
+	: SampleBuffer(DataVector{_data, _data + _frames})
+{
 }
 
 
 SampleBuffer::SampleBuffer( SampleBuffer::DataVector &&movedData ) :
-	m_audioFile( "" ),
-	m_startFrame( 0 ),
-	m_endFrame( 0 ),
-	m_loopStartFrame( 0 ),
-	m_loopEndFrame( 0 ),
-	m_amplification( 1.0f ),
-	m_reversed( false ),
-	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+	SampleBuffer()
 {
 	m_origData = std::move(movedData);
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
@@ -119,24 +111,9 @@ SampleBuffer::SampleBuffer( SampleBuffer::DataVector &&movedData ) :
 }
 
 
-
-SampleBuffer::SampleBuffer( const f_cnt_t _frames ) :
-	m_audioFile( "" ),
-	m_startFrame( 0 ),
-	m_endFrame( 0 ),
-	m_loopStartFrame( 0 ),
-	m_loopEndFrame( 0 ),
-	m_amplification( 1.0f ),
-	m_reversed( false ),
-	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+SampleBuffer::SampleBuffer( const f_cnt_t _frames )
+	: SampleBuffer(DataVector{_frames, 0})
 {
-	if( _frames > 0 )
-	{
-		m_data.resize (_frames, {0,0});
-	}
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
-	update();
 }
 
 
@@ -154,7 +131,7 @@ void SampleBuffer::sampleRateChanged()
 }
 
 
-void SampleBuffer::update(bool _keep_settings)
+void SampleBuffer::update( bool _keep_settings )
 {
 	const bool lock = ( m_data.size () != 0);
 	if( lock )
@@ -1402,7 +1379,8 @@ QString SampleBuffer::tryToMakeRelative( const QString & file )
 {
 	if( QFileInfo( file ).isRelative() == false )
 	{
-		QString f = QString( file ).replace( QDir::separator(), '/' );
+		// Normalize the path
+		QString f = QFileInfo( file ).canonicalFilePath().replace( QDir::separator(), '/' );
 
 		// First, look in factory samples
 		// Isolate "samples/" from "data:/samples/"

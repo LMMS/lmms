@@ -107,13 +107,12 @@ public:
 	} ;
 
 
+	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file = QString(),
-						bool _is_base64_data = false );
+	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	SampleBuffer( const f_cnt_t _frames );
-	SampleBuffer(SampleBuffer::DataVector &&movedData);
+	explicit SampleBuffer( const f_cnt_t _frames );
 
 	virtual ~SampleBuffer();
 
@@ -213,7 +212,7 @@ public:
 
 	inline const sampleFrame * data() const
 	{
-		return m_data.data ();
+		return m_data;
 	}
 
 	QString openAudioFile() const;
@@ -310,6 +309,7 @@ private:
 	DataVector m_origData;
 	DataVector m_data;
 	QReadWriteLock m_varLock;
+	f_cnt_t m_frames;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;
 	f_cnt_t m_loopStartFrame;
