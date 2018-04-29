@@ -472,7 +472,7 @@ ELSE()
 ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
+PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.9)
 
 # set compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
