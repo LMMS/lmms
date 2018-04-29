@@ -675,8 +675,8 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		SRC_DATA src_data;
 		// Generate output
 		src_data.data_in =
-			getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
-			loopStartFrame, loopEndFrame, endFrame )->data ();
+			libSampleRateSrc(getSampleFragment( play_frame, fragment_size, _loopmode, &tmp, &is_backwards,
+			loopStartFrame, loopEndFrame, endFrame ))->data ();
 		src_data.data_out = _ab->data ();
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
@@ -1176,7 +1176,7 @@ SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 	{
 		SRC_DATA src_data;
 		src_data.end_of_input = 1;
-		src_data.data_in = data ()->data ();
+		src_data.data_in = libSampleRateSrc(data ())->data ();
 		src_data.data_out = dst_sb->m_origData.data ()->data ();
 		src_data.input_frames = frames ();
 		src_data.output_frames = dst_frames;
