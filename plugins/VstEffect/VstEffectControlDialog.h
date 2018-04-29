@@ -50,6 +50,7 @@ public:
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void showEvent( QShowEvent* _se ) override;
 
 private:
 	QWidget * m_pluginWidget;
