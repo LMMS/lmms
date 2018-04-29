@@ -1921,39 +1921,6 @@ void TrackOperationsWidget::updateMenu()
 	return m_trackView->updateTrackOperationsWidgetMenu (this);
 }
 
-
-void TrackOperationsWidget::recordingOn()
-{
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
-	if( atv )
-	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
-		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( true ); }
-		}
-		atv->update();
-	}
-}
-
-
-void TrackOperationsWidget::recordingOff()
-{
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
-	if( atv )
-	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
-		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( false ); }
-		}
-		atv->update();
-	}
-}
-
-
 // ===========================================================================
 // track
 // ===========================================================================

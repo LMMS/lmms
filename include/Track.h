@@ -445,9 +445,6 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
-	void toggleRecording(bool on);
-	void recordingOn();
-	void recordingOff();
 	void clearTrack();
 
 private:
