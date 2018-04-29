@@ -25,6 +25,7 @@
 #include "MixerWorkerThread.h"
 
 #include "denormals.h"
+#include <QDebug>
 #include <QMutex>
 #include <QWaitCondition>
 #include "ThreadableJob.h"
@@ -54,7 +55,13 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 		// update job state
 		_job->queue();
 		// actually queue the job via atomic operations
-		m_items[m_queueSize.fetchAndAddOrdered(1)] = _job;
+		auto index = m_queueSize.fetchAndAddOrdered(1);
+		if (index < JOB_QUEUE_SIZE) {
+			m_items[index] = _job;
+		} else {
+			qWarning() << "Job queue is full!";
+			m_itemsDone.fetchAndAddOrdered(1);
+		}
 	}
 }
 
@@ -66,7 +73,7 @@ void MixerWorkerThread::JobQueue::run()
 	while( processedJob && (int) m_itemsDone < (int) m_queueSize )
 	{
 		processedJob = false;
-		for( int i = 0; i < m_queueSize; ++i )
+		for( int i = 0; i < m_queueSize && i < JOB_QUEUE_SIZE; ++i )
 		{
 			ThreadableJob * job = m_items[i].fetchAndStoreOrdered( NULL );
 			if( job )

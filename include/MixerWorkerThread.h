@@ -62,7 +62,7 @@ public:
 		void wait();
 
 	private:
-#define JOB_QUEUE_SIZE 1024
+#define JOB_QUEUE_SIZE 8192
 		QAtomicPointer<ThreadableJob> m_items[JOB_QUEUE_SIZE];
 		AtomicInt m_queueSize;
 		AtomicInt m_itemsDone;
