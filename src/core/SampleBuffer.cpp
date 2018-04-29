@@ -112,7 +112,8 @@ SampleBuffer::SampleBuffer( SampleBuffer::DataVector &&movedData ) :
 
 
 SampleBuffer::SampleBuffer( const f_cnt_t _frames )
-	: SampleBuffer(DataVector{_frames, 0})
+	: SampleBuffer(DataVector{static_cast<typename DataVector::size_type> (_frames),
+				   sampleFrame{0,0}})
 {
 }
 

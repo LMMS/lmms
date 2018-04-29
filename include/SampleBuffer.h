@@ -114,6 +114,8 @@ public:
 	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
 	explicit SampleBuffer( const f_cnt_t _frames );
 
+	SampleBuffer(SampleBuffer::DataVector &&movedData);
+
 	virtual ~SampleBuffer();
 
 	bool play( sampleFrame * _ab, handleState * _state,
@@ -212,7 +214,7 @@ public:
 
 	inline const sampleFrame * data() const
 	{
-		return m_data;
+		return m_data.data ();
 	}
 
 	QString openAudioFile() const;
