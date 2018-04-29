@@ -151,6 +151,8 @@ INCLUDE_DIRECTORIES(
 	${Qt5Xml_INCLUDE_DIRS}
 )
 
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src/3rdparty/mingw-std-threads")
+
 SET(QT_LIBRARIES
 	Qt5::Core
 	Qt5::Gui

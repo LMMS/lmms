@@ -14,8 +14,8 @@
 
 #include <QtCore/QDebug>
 
-#include <cds/container/vyukov_mpmc_cycle_queue.h>
 #include "libcds.h"
+#include <cds/container/vyukov_mpmc_cycle_queue.h>
 
 #include "Memory.h"
 
@@ -24,9 +24,9 @@ class _MemoryPool_Private : MmAllocator<char>
 	using Alloc = MmAllocator<char>;
 public:
 	_MemoryPool_Private(size_t size, size_t nmemb)
-		: m_freelist(nmemb)
-		, m_elementSize(size)
+		: m_elementSize(size)
 		, m_numElms(nmemb)
+		, m_freelist(nmemb)
 	{
 		m_buffer = new char[m_elementSize * m_numElms];
 		for (size_t i = 0; i < m_numElms; i++) {
@@ -67,7 +67,7 @@ public:
 	{
 		if (is_from_pool(ptr)) {
 			bool pushed = m_freelist.push(reinterpret_cast<char*>(ptr));
-			assert(pushed);
+			assert(pushed); Q_UNUSED(pushed);
 		} else {
 			do_deallocate(ptr);
 		}
