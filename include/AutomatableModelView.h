@@ -1,5 +1,6 @@
 /*
- * AutomatableModelView.h - class AutomatableModelView
+ * AutomatableModelView.h - provides AutomatableModelView base class and
+ * provides BoolModelView, FloatModelView, IntModelView subclasses.
  *
  * Copyright (c) 2008-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -74,7 +75,6 @@ protected:
 
 	QString m_description;
 	QString m_unit;
-
 } ;
 
 
@@ -93,6 +93,11 @@ public slots:
 	void unlinkAllModels();
 	void removeSongGlobalAutomation();
 
+private slots:
+	/// Copy the model's value to the clipboard.
+	void copyToClipboard();
+	/// Paste the model's value from the clipboard.
+	void pasteFromClipboard();
 
 protected:
 	AutomatableModelView* m_amv;
@@ -101,31 +106,26 @@ protected:
 
 
 
+template <typename ModelType> class EXPORT TypedModelView : public AutomatableModelView
+{
+public:
+	TypedModelView( Model* model, QWidget* _this) :
+		AutomatableModelView( model, _this )
+	{}
 
-#define generateTypedModelView(type)							\
-class EXPORT type##ModelView : public AutomatableModelView		\
-{																\
-public:															\
-	type##ModelView( Model* model, QWidget* _this ) :			\
-		AutomatableModelView( model, _this )					\
-	{															\
-	}															\
-																\
-	type##Model* model()										\
-	{															\
-		return castModel<type##Model>();						\
-	}															\
-																\
-	const type##Model* model() const							\
-	{															\
-		return castModel<type##Model>();						\
-	}															\
-}
+	ModelType* model()
+	{
+		return castModel<ModelType>();
+	}
+	const ModelType* model() const
+	{
+		return castModel<ModelType>();
+	}
+};
 
-
-generateTypedModelView(Float);
-generateTypedModelView(Int);
-generateTypedModelView(Bool);
+using FloatModelView = TypedModelView<FloatModel>;
+using IntModelView = TypedModelView<IntModel>;
+using BoolModelView = TypedModelView<BoolModel>;
 
 
 #endif

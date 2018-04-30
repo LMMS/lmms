@@ -1497,43 +1497,32 @@ void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
-	QDir user_d( ConfigManager::inst()->userTemplateDir() );
-	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
-						QDir::Files | QDir::Readable );
+	auto addTemplatesFromDir = [this]( QDir dir ) {
+		QStringList templates = dir.entryList( QStringList( "*.mpt" ),
+							QDir::Files | QDir::Readable );
 
-	m_custom_templates_count = templates.count();
-	for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-	{
-		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
+		if ( templates.size() && ! m_templatesMenu->actions().isEmpty() )
+		{
+			m_templatesMenu->addSeparator();
+		}
+
+		for( QStringList::iterator it = templates.begin();
+							it != templates.end(); ++it )
+		{
+			m_templatesMenu->addAction(
+						embed::getIconPixmap( "project_file" ),
+						( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+			m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
 #endif
-	}
+		}
 
-	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
-	templates = d.entryList( QStringList( "*.mpt" ),
-						QDir::Files | QDir::Readable );
+		return templates.size();
+	};
 
-
-	if( m_custom_templates_count > 0 && !templates.isEmpty() )
-	{
-		m_templatesMenu->addSeparator();
-	}
-	for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-	{
-		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-	}
+	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
+	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 }
 
 

@@ -124,6 +124,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -250,7 +251,7 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		IF(NOT SDL_INCLUDE_DIR)
 			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
 		ENDIF()
-		
+
 	ELSE()
 		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
@@ -380,7 +381,7 @@ IF(WANT_JACK)
 			SET(STATUS_JACK "OK (weak linking enabled)")
 			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
-			SET(JACK_LIBRARIES "dl")
+			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		ELSE()
 			SET(STATUS_JACK "OK")
 		ENDIF()
@@ -398,7 +399,11 @@ PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
-
+IF(FLTK_FOUND)
+	SET(STATUS_ZYN "OK")
+ELSE()
+	SET(STATUS_ZYN "not found, please install fltk")
+ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
@@ -461,7 +466,7 @@ IF(LMMS_BUILD_WIN32)
 ENDIF(LMMS_BUILD_WIN32)
 
 IF(WANT_DEBUG_FPE)
-	IF(LMMS_BUILD_LINUX)
+	IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
 		SET(LMMS_DEBUG_FPE TRUE)
 		SET (STATUS_DEBUG_FPE "Enabled")
 	ELSE()
@@ -650,6 +655,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"

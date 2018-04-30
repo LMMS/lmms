@@ -27,6 +27,7 @@
 
 #include "ProjectRenderer.h"
 #include "Song.h"
+#include "PerfLog.h"
 
 #include "AudioFileWave.h"
 #include "AudioFileOgg.h"
@@ -83,7 +84,6 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 	QThread( Engine::mixer() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( qualitySettings ),
-	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
@@ -109,8 +109,6 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 ProjectRenderer::~ProjectRenderer()
 {
-	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
 }
 
 
@@ -180,6 +178,8 @@ void ProjectRenderer::run()
 #endif
 #endif
 
+	PerfLogTimer perfLog("Project Render");
+
 	Engine::getSong()->startExport();
 	Engine::getSong()->updateLength();
 	// Skip first empty buffer.
@@ -211,6 +211,8 @@ void ProjectRenderer::run()
 	Engine::mixer()->stopProcessing();
 
 	Engine::getSong()->stopExport();
+
+	perfLog.end();
 
 	// If the user aborted export-process, the file has to be deleted.
 	const QString f = m_fileDev->outputFile();

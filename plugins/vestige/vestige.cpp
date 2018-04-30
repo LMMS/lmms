@@ -84,7 +84,6 @@ vestigeInstrument::vestigeInstrument( InstrumentTrack * _instrument_track ) :
 	m_pluginMutex(),
 	m_subWindow( NULL ),
 	m_scrollArea( NULL ),
-	vstKnobs( NULL ),
 	knobFModel( NULL ),
 	p_subWindow( NULL )
 {
@@ -132,18 +131,12 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
 		char paramStr[35];
-		vstKnobs = new Knob *[ paramCount ];
 		knobFModel = new FloatModel *[ paramCount ];
 		QStringList s_dumpValues;
-		QWidget * widget = new QWidget();
 		for( int i = 0; i < paramCount; i++ )
 		{
 			sprintf( paramStr, "param%d", i );
 			s_dumpValues = dump[ paramStr ].split( ":" );
-
-			vstKnobs[i] = new Knob( knobBright_26, widget, s_dumpValues.at( 1 ) );
-			vstKnobs[i]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
-			vstKnobs[i]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
 
 			knobFModel[i] = new FloatModel( 0.0f, 0.0f, 1.0f, 0.01f, this, QString::number(i) );
 			knobFModel[i]->loadSettings( _this, paramStr );
@@ -155,8 +148,6 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 			}
 
 			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
-
-			vstKnobs[i]->setModel( knobFModel[i] );
 		}
 	}
 	m_pluginMutex.unlock();
@@ -267,10 +258,14 @@ void vestigeInstrument::loadFile( const QString & _file )
 		closePlugin();
 	}
 	m_pluginDLL = SampleBuffer::tryToMakeRelative( _file );
-	TextFloat * tf = TextFloat::displayMessage(
-			tr( "Loading plugin" ),
-			tr( "Please wait while loading VST-plugin..." ),
-			PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	TextFloat * tf = NULL;
+	if( gui )
+	{
+		tf = TextFloat::displayMessage(
+				tr( "Loading plugin" ),
+				tr( "Please wait while loading VST-plugin..." ),
+				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
+	}
 
 	m_pluginMutex.lock();
 	m_plugin = new VstPlugin( m_pluginDLL );
@@ -348,14 +343,7 @@ void vestigeInstrument::closePlugin( void )
 		for( int i = 0; i < paramCount; i++ )
 		{
 			delete knobFModel[ i ];
-			delete vstKnobs[ i ];
 		}
-	}
-
-	if( vstKnobs != NULL )
-	{
-		delete [] vstKnobs;
-		vstKnobs = NULL;
 	}
 
 	if( knobFModel != NULL )
@@ -921,35 +909,34 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 	const QMap<QString, QString> & dump = m_vi->m_plugin->parameterDump();
 	m_vi->paramCount = dump.size();
 
-	bool isVstKnobs = true;
+	vstKnobs = new Knob *[ m_vi->paramCount ];
 
-	if (m_vi->vstKnobs == NULL) {
-		m_vi->vstKnobs = new Knob *[ m_vi->paramCount ];
-		isVstKnobs = false;
-	}
+	bool hasKnobModel = true;
 	if (m_vi->knobFModel == NULL) {
 		m_vi->knobFModel = new FloatModel *[ m_vi->paramCount ];
+		hasKnobModel = false;
 	}
 
 	char paramStr[35];
 	QStringList s_dumpValues;
 
-	if (isVstKnobs == false) {
-		for( int i = 0; i < m_vi->paramCount; i++ )
+	for( int i = 0; i < m_vi->paramCount; i++ )
+	{
+		sprintf( paramStr, "param%d", i);
+		s_dumpValues = dump[ paramStr ].split( ":" );
+
+		vstKnobs[ i ] = new Knob( knobBright_26, this, s_dumpValues.at( 1 ) );
+		vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
+		vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
+
+		if( !hasKnobModel )
 		{
-			sprintf( paramStr, "param%d", i);
-    			s_dumpValues = dump[ paramStr ].split( ":" );
-
-			m_vi->vstKnobs[ i ] = new Knob( knobBright_26, this, s_dumpValues.at( 1 ) );
-			m_vi->vstKnobs[ i ]->setHintText( s_dumpValues.at( 1 ) + ":", "" );
-			m_vi->vstKnobs[ i ]->setLabel( s_dumpValues.at( 1 ).left( 15 ) );
-
 			sprintf( paramStr, "%d", i);
 			m_vi->knobFModel[ i ] = new FloatModel( (s_dumpValues.at( 2 )).toFloat(),
 				0.0f, 1.0f, 0.01f, castModel<vestigeInstrument>(), tr( paramStr ) );
-			connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
-			m_vi->vstKnobs[i] ->setModel( m_vi->knobFModel[i] );
 		}
+		connect( m_vi->knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
+		vstKnobs[i] ->setModel( m_vi->knobFModel[i] );
 	}
 
 	int i = 0;
@@ -959,7 +946,7 @@ manageVestigeInstrumentView::manageVestigeInstrumentView( Instrument * _instrume
 		{
 			if( i < m_vi->paramCount )
 			{
-				l->addWidget( m_vi->vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
+				l->addWidget( vstKnobs[i], lrow, lcolumn, Qt::AlignCenter );
 			}
 			i++;
 		}
@@ -1025,12 +1012,12 @@ void manageVestigeInstrumentView::displayAutomatedOnly( void )
 
 		if( !( m_vi->knobFModel[ i ]->isAutomated() || m_vi->knobFModel[ i ]->controllerConnection() ) )
 		{
-			if( m_vi->vstKnobs[ i ]->isVisible() == true  && isAuto )
+			if( vstKnobs[ i ]->isVisible() == true  && isAuto )
 			{
-				m_vi->vstKnobs[ i ]->hide();
+				vstKnobs[ i ]->hide();
 				m_displayAutomatedOnly->setText( "All" );
 			} else {
-				m_vi->vstKnobs[ i ]->show();
+				vstKnobs[ i ]->show();
 				m_displayAutomatedOnly->setText( "Automated" );
 			}
 		}
@@ -1045,13 +1032,13 @@ manageVestigeInstrumentView::~manageVestigeInstrumentView()
 		for( int i = 0; i < m_vi->paramCount; i++ )
 		{
 			delete m_vi->knobFModel[ i ];
-			delete m_vi->vstKnobs[ i ];
+			delete vstKnobs[ i ];
 		}
 	}
 
-	if (m_vi->vstKnobs != NULL) {
-		delete []m_vi->vstKnobs;
-		m_vi->vstKnobs = NULL;
+	if (vstKnobs != NULL) {
+		delete []vstKnobs;
+		vstKnobs = NULL;
 	}
 
 	if( m_vi->knobFModel != NULL )

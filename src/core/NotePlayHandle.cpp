@@ -53,7 +53,6 @@ NotePlayHandle::NotePlayHandle( InstrumentTrack* instrumentTrack,
 	PlayHandle( TypeNotePlayHandle, _offset ),
 	Note( n.length(), n.pos(), n.key(), n.getVolume(), n.getPanning(), n.detuning() ),
 	m_pluginData( NULL ),
-	m_filter( NULL ),
 	m_instrumentTrack( instrumentTrack ),
 	m_frames( 0 ),
 	m_totalFramesPlayed( 0 ),
@@ -154,8 +153,6 @@ NotePlayHandle::~NotePlayHandle()
 	}
 
 	m_subNotes.clear();
-
-	delete m_filter;
 
 	if( buffer() ) releaseBuffer();
 
@@ -554,7 +551,7 @@ void NotePlayHandle::resize( const bpm_t _new_tempo )
 
 NotePlayHandle ** NotePlayHandleManager::s_available;
 QReadWriteLock NotePlayHandleManager::s_mutex;
-AtomicInt NotePlayHandleManager::s_availableIndex;
+std::atomic_int NotePlayHandleManager::s_availableIndex;
 int NotePlayHandleManager::s_size;
 
 
@@ -589,7 +586,7 @@ NotePlayHandle * NotePlayHandleManager::acquire( InstrumentTrack* instrumentTrac
 		s_mutex.unlock();
 	}
 	s_mutex.lockForRead();
-	NotePlayHandle * nph = s_available[ s_availableIndex.fetchAndAddOrdered( -1 ) ];
+	NotePlayHandle * nph = s_available[s_availableIndex--];
 	s_mutex.unlock();
 
 	new( (void*)nph ) NotePlayHandle( instrumentTrack, offset, frames, noteToPlay, parent, midiEventChannel, origin );
@@ -601,7 +598,7 @@ void NotePlayHandleManager::release( NotePlayHandle * nph )
 {
 	nph->NotePlayHandle::~NotePlayHandle();
 	s_mutex.lockForRead();
-	s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = nph;
+	s_available[++s_availableIndex] = nph;
 	s_mutex.unlock();
 }
 
@@ -617,7 +614,7 @@ void NotePlayHandleManager::extend( int c )
 
 	for( int i=0; i < c; ++i )
 	{
-		s_available[ s_availableIndex.fetchAndAddOrdered( 1 ) + 1 ] = n;
+		s_available[++s_availableIndex] = n;
 		++n;
 	}
 }

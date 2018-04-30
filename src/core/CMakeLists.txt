@@ -44,6 +44,7 @@ set(LMMS_SRCS
 	core/NotePlayHandle.cpp
 	core/Oscillator.cpp
 	core/PeakController.cpp
+	core/PerfLog.cpp
 	core/Piano.cpp
 	core/PlayHandle.cpp
 	core/Plugin.cpp

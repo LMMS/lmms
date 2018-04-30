@@ -119,6 +119,8 @@ void ExportProjectDialog::accept()
 {
 	m_renderManager.reset(nullptr);
 	QDialog::accept();
+
+	gui->mainWindow()->resetWindowTitle();
 }
 
 
