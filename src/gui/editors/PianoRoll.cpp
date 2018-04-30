@@ -31,6 +31,7 @@
 #include <QLayout>
 #include <QMdiArea>
 #include <QPainter>
+#include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QSignalMapper>
@@ -1334,8 +1335,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
-		static AutomationPattern* detuningPattern = nullptr;
-		if (detuningPattern != nullptr)
+		static QPointer<AutomationPattern> detuningPattern = nullptr;
+		if (detuningPattern.data() != nullptr)
 		{
 			detuningPattern->disconnect(this);
 		}
@@ -1345,7 +1346,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			n->createDetuning();
 		}
 		detuningPattern = n->detuning()->automationPattern();
-		connect(detuningPattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
 		gui->automationEditor()->open(detuningPattern);
 		return;
 	}
