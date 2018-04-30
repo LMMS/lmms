@@ -58,8 +58,6 @@
 
 #include "FileDialog.h"
 
-
-
 SampleBuffer::SampleBuffer() :
 	m_audioFile( "" ),
 	m_startFrame( 0 ),
