@@ -284,6 +284,16 @@ public slots:
 	void sampleRateChanged();
 
 private:
+	// HACK: libsamplerate < 0.1.8 doesn't get read-only variables
+	//	     as const. It has been fixed in 0.1.9 but has not been
+	//		 shipped for some destributions.
+	//		 This function just returns a variable that should have
+	//		 been `const` as non-const to bypass using 0.1.9.
+	inline static sampleFrame * libSampleRateSrc (const sampleFrame *ptr)
+	{
+		return const_cast<sampleFrame*>(ptr);
+	}
+
 	void update( bool _keep_settings = false );
 
 	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
