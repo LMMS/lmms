@@ -22,6 +22,8 @@
  *
  */
 
+#include <QApplication>
+#include <QClipboard>
 #include <QMenu>
 #include <QMouseEvent>
 
@@ -37,6 +39,7 @@
 #include "AutomationEditor.h"
 
 
+static float floatFromClipboard(bool* ok=nullptr);
 
 AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	ModelView( model, _this ),
@@ -74,13 +77,18 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 						AutomatableModel::tr( "&Copy value (%1%2)" ).
 							arg( model->displayValue( model->value<float>() ) ).
 							arg( m_unit ),
-						model, SLOT( copyValue() ) );
+						amvSlots, SLOT( copyToClipboard() ) );
 
-	menu->addAction( embed::getIconPixmap( "edit_paste" ),
-						AutomatableModel::tr( "&Paste value (%1%2)").
-							arg( model->displayValue( AutomatableModel::copiedValue() ) ).
-							arg( m_unit ),
-						model, SLOT( pasteValue() ) );
+	bool canPaste = true;
+	const float valueToPaste = floatFromClipboard(&canPaste);
+	const QString pasteDesc = canPaste ?
+					AutomatableModel::tr( "&Paste value (%1%2)").
+						arg( model->displayValue( valueToPaste ) ).
+						arg( m_unit )
+					: AutomatableModel::tr( "&Paste value");
+	QAction* pasteAction = menu->addAction( embed::getIconPixmap( "edit_paste" ),
+						pasteDesc, amvSlots, SLOT( pasteFromClipboard() ) );
+	pasteAction->setEnabled(canPaste);
 
 	menu->addSeparator();
 
@@ -157,7 +165,6 @@ void AutomatableModelView::mousePressEvent( QMouseEvent* event )
 		modelUntyped()->reset();
 	}
 }
-
 
 
 
@@ -245,5 +252,26 @@ void AutomatableModelViewSlots::unlinkAllModels()
 	m_amv->modelUntyped()->unlinkAllModels();
 }
 
+void AutomatableModelViewSlots::copyToClipboard()
+{
+	QClipboard* clipboard = QApplication::clipboard();
+	clipboard->setText(QString::number(m_amv->value<float>()));
+}
 
+void AutomatableModelViewSlots::pasteFromClipboard()
+{
+	bool isNumber = false;
+	const float number = floatFromClipboard(&isNumber);
+	if (isNumber) {
+		m_amv->modelUntyped()->setValue(number);
+	}
+}
+
+
+/// Attempt to parse a float from the clipboard
+static float floatFromClipboard(bool* ok)
+{
+	const QClipboard* clipboard = QApplication::clipboard();
+	return clipboard->text().toFloat(ok);
+}
 

@@ -36,6 +36,7 @@
 #cmakedefine LMMS_HAVE_SEMAPHORE_H
 #cmakedefine LMMS_HAVE_SYS_SHM_H
 #cmakedefine LMMS_HAVE_SYS_TIME_H
+#cmakedefine LMMS_HAVE_SYS_TIMES_H
 #cmakedefine LMMS_HAVE_SCHED_H
 #cmakedefine LMMS_HAVE_SYS_SOUNDCARD_H
 #cmakedefine LMMS_HAVE_SOUNDCARD_H

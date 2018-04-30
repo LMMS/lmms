@@ -71,7 +71,7 @@ FxChannel::FxChannel( int idx, Model * _parent ) :
 	m_lock(),
 	m_channelIndex( idx ),
 	m_queued( false ),
-	m_dependenciesMet( 0 )
+	m_dependenciesMet(0)
 {
 	BufferManager::clear( m_buffer, Engine::mixer()->framesPerPeriod() );
 }
@@ -98,7 +98,7 @@ inline void FxChannel::processed()
 
 void FxChannel::incrementDeps()
 {
-	int i = m_dependenciesMet.fetchAndAddOrdered( 1 ) + 1;
+	int i = m_dependenciesMet++ + 1;
 	if( i >= m_receives.size() && ! m_queued )
 	{
 		m_queued = true;
@@ -594,14 +594,14 @@ void FxMixer::masterMix( sampleFrame * _buf )
 			MixerWorkerThread::addJob( ch );
 		}
 	}
-	while( m_fxChannels[0]->state() != ThreadableJob::Done )
+	while (m_fxChannels[0]->state() != ThreadableJob::ProcessingState::Done)
 	{
 		bool found = false;
 		for( FxChannel * ch : m_fxChannels )
 		{
-			int s = ch->state();
-			if( s == ThreadableJob::Queued
-				|| s == ThreadableJob::InProgress )
+			const auto s = ch->state();
+			if (s == ThreadableJob::ProcessingState::Queued
+				|| s == ThreadableJob::ProcessingState::InProgress)
 			{
 				found = true;
 				break;

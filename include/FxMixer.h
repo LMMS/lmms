@@ -30,6 +30,7 @@
 #include "JournallingObject.h"
 #include "ThreadableJob.h"
 
+#include <atomic>
 
 class FxRoute;
 typedef QVector<FxRoute *> FxRouteVector;
@@ -70,7 +71,7 @@ class FxChannel : public ThreadableJob
 		void unmuteForSolo();
 
 	
-		QAtomicInt m_dependenciesMet;
+		std::atomic_int m_dependenciesMet;
 		void incrementDeps();
 		void processed();
 		

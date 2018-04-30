@@ -25,12 +25,12 @@
 #ifndef COMBOBOX_MODEL_H
 #define COMBOBOX_MODEL_H
 
-#include <QtCore/QVector>
-#include <QtCore/QPair>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "AutomatableModel.h"
-
-class PixmapLoader;
+#include "embed.h"
 
 
 class EXPORT ComboBoxModel : public IntModel
@@ -49,7 +49,7 @@ public:
 		clear();
 	}
 
-	void addItem( const QString& item, PixmapLoader* loader = NULL );
+	void addItem( QString item, std::unique_ptr<PixmapLoader> loader = nullptr );
 
 	void clear();
 
@@ -62,7 +62,7 @@ public:
 
 	const PixmapLoader* currentData() const
 	{
-		return m_items[value()].second;
+		return m_items[value()].second.get();
 	}
 
 	const QString & itemText( int i ) const
@@ -72,7 +72,7 @@ public:
 
 	const PixmapLoader* itemPixmap( int i ) const
 	{
-		return m_items[qBound<int>( minValue(), i, maxValue() )].second;
+		return m_items[qBound<int>( minValue(), i, maxValue() )].second.get();
 	}
 
 	int size() const
@@ -82,9 +82,9 @@ public:
 
 
 private:
-	typedef QPair<QString, PixmapLoader *> Item;
+	typedef std::pair<QString, std::unique_ptr<PixmapLoader> > Item;
 
-	QVector<Item> m_items;
+	std::vector<Item> m_items;
 
 } ;
 
