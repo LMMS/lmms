@@ -900,8 +900,9 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// Compute pixels per tact
-	const int baseWidth = fixedTCOs() ? parentWidget()->width() : width();
-	const float pixelsPerTact = ( baseWidth - 2 * TCO_BORDER_WIDTH ) / (float) m_pat->length().getTact();
+	const int baseWidth = fixedTCOs() ? parentWidget()->width() - 2 * TCO_BORDER_WIDTH
+						: width() - TCO_BORDER_WIDTH;
+	const float pixelsPerTact = baseWidth / (float) m_pat->length().getTact();
 
 	// Length of one tact/beat in the [0,1] x [0,1] coordinate system
 	const float tactLength = 1. / m_pat->length().getTact();
