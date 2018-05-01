@@ -372,11 +372,11 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	{
 		case MovePositionMarker:
 			m_pos.setTicks(t.getTicks());
-			Engine::getSong()->setToTime(t, m_mode);
+			Engine::getSong()->setToTime(t);
 			if (!( Engine::getSong()->isPlaying()))
 			{
 				//Song::Mode_None is used when nothing is being played.
-				Engine::getSong()->setToTime(t, Song::Mode_None);
+				Engine::getSong()->setToTime(t);
 			}
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
