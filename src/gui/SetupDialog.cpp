@@ -312,10 +312,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 		QString lang = QLocale(m_languages.last()).nativeLanguageName();
 		changeLang->addItem(lang);
 	}
-	connect(changeLang, SIGNAL(currentIndexChanged(int)),
-			this, SLOT(setLanguage(int)));
-	connect(changeLang, SIGNAL(currentIndexChanged(int)),
-			this, SLOT(toggleRestartWarning()));
 
 	// If language unset, fallback to system language when available.
 	if(m_lang == "")
@@ -339,6 +335,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			break;
 		}
 	}
+
+	connect(changeLang, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(setLanguage(int)));
+	connect(changeLang, SIGNAL(currentIndexChanged(int)),
+			this, SLOT(toggleRestartWarning()));
 
 
 	// General layout ordering.
