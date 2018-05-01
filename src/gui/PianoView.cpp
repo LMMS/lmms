@@ -327,13 +327,22 @@ void PianoView::modelChanged()
  */
 int PianoView::getKeyFromMouse( const QPoint & _p ) const
 {
-	int key_num = (int)( (float) _p.x() / (float) PW_WHITE_KEY_WIDTH );
+	int offset = _p.x() % PW_WHITE_KEY_WIDTH;
+	if( offset < 0 ) offset += PW_WHITE_KEY_WIDTH;
+	int key_num = ( _p.x() - offset) / PW_WHITE_KEY_WIDTH;
 
 	for( int i = 0; i <= key_num; ++i )
 	{
 		if ( Piano::isBlackKey( m_startKey+i ) )
 		{
 			++key_num;
+		}
+	}
+	for( int i = 0; i >= key_num; --i )
+	{
+		if ( Piano::isBlackKey( m_startKey+i ) )
+		{
+			--key_num;
 		}
 	}
 
@@ -345,16 +354,14 @@ int PianoView::getKeyFromMouse( const QPoint & _p ) const
 		// then do extra checking whether the mouse-cursor is over
 		// a black key
 		if( key_num > 0 && Piano::isBlackKey( key_num-1 ) &&
-			_p.x() % PW_WHITE_KEY_WIDTH <=
-					( PW_WHITE_KEY_WIDTH / 2 ) -
-						( PW_BLACK_KEY_WIDTH / 2 ) )
+			offset <= ( PW_WHITE_KEY_WIDTH / 2 ) -
+					( PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			--key_num;
 		}
 		if( key_num < NumKeys - 1 && Piano::isBlackKey( key_num+1 ) &&
-			_p.x() % PW_WHITE_KEY_WIDTH >=
-				( PW_WHITE_KEY_WIDTH -
-				  		PW_BLACK_KEY_WIDTH / 2 ) )
+			offset >= ( PW_WHITE_KEY_WIDTH -
+					PW_BLACK_KEY_WIDTH / 2 ) )
 		{
 			++key_num;
 		}
