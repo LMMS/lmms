@@ -504,7 +504,7 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 
 		int x = mouseEvent->x();
 
-		if( x > VALUES_WIDTH )
+		if( x >= VALUES_WIDTH )
 		{
 			// set or move value
 
