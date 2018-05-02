@@ -48,7 +48,7 @@ public:
 
 		JobQueue() :
 			m_items(),
-			m_queueSize( 0 ),
+			m_writeIndex( 0 ),
 			m_itemsDone( 0 ),
 			m_opMode( Static )
 		{
@@ -64,7 +64,7 @@ public:
 	private:
 #define JOB_QUEUE_SIZE 8192
 		QAtomicPointer<ThreadableJob> m_items[JOB_QUEUE_SIZE];
-		AtomicInt m_queueSize;
+		AtomicInt m_writeIndex;
 		AtomicInt m_itemsDone;
 		OperationMode m_opMode;
 
