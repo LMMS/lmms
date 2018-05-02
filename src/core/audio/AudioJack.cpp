@@ -26,11 +26,13 @@
 
 #ifdef LMMS_HAVE_JACK
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
 #include <QMessageBox>
 
 #include "Engine.h"
+#include "Song.h"
 #include "GuiApplication.h"
 #include "templates.h"
 #include "gui_templates.h"
@@ -71,7 +73,6 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 
 AudioJack::~AudioJack()
 {
-	stopProcessing();
 #ifdef AUDIO_PORT_SUPPORT
 	while( m_portMap.size() )
 	{
@@ -83,6 +84,7 @@ AudioJack::~AudioJack()
 	{
 		if( m_active )
 		{
+			stopProcessing();
 			jack_deactivate( m_client );
 		}
 		jack_client_close( m_client );
@@ -136,7 +138,7 @@ AudioJack* AudioJack::addMidiClient(MidiJack *midiClient)
 bool AudioJack::initJackClient()
 {
 	QString clientName = ConfigManager::inst()->value( "audiojack",
-								"clientname" );
+							   "clientname" );
 	if( clientName.isEmpty() )
 	{
 		clientName = "lmms";
@@ -145,8 +147,8 @@ bool AudioJack::initJackClient()
 	const char * serverName = NULL;
 	jack_status_t status;
 	m_client = jack_client_open( clientName.toLatin1().constData(),
-						JackNullOption, &status,
-								serverName );
+				     JackNullOption, &status,
+				     serverName );
 	if( m_client == NULL )
 	{
 		printf( "jack_client_open() failed, status 0x%2.0x\n", status );
@@ -159,18 +161,16 @@ bool AudioJack::initJackClient()
 	if( status & JackNameNotUnique )
 	{
 		printf( "there's already a client with name '%s', so unique "
-			"name '%s' was assigned\n", clientName.
-							toLatin1().constData(),
-					jack_get_client_name( m_client ) );
+			"name '%s' was assigned\n",
+			clientName.toLatin1().constData(),
+			jack_get_client_name( m_client ) );
 	}
 
 	// set process-callback
 	jack_set_process_callback( m_client, staticProcessCallback, this );
 
 	// set shutdown-callback
-	jack_on_shutdown( m_client, shutdownCallback, this );
-
-
+	jack_on_shutdown( m_client, staticShutdownCallback, this );
 
 	if( jack_get_sample_rate( m_client ) != sampleRate() )
 	{
@@ -193,6 +193,10 @@ bool AudioJack::initJackClient()
 		}
 	}
 
+	QString mode=transportMode();
+	if((mode=="client")||(mode=="master"))
+		Engine::s_transport=this;
+
 	return true;
 }
 
@@ -211,7 +215,7 @@ void AudioJack::startProcessing()
 
 	if( jack_activate( m_client ) )
 	{
-		printf( "cannot activate client\n" );
+		qCritical( "Jack: cannot activate client" );
 		return;
 	}
 
@@ -247,6 +251,8 @@ void AudioJack::startProcessing()
 	}
 
 	free( ports );
+
+	transportQuery();
 }
 
 
@@ -337,11 +343,73 @@ void AudioJack::renamePort( AudioPort * _port )
 #endif
 }
 
+const QString AudioJack::transportMode()
+{
+	QString r=ConfigManager::inst()->value( "audiojack","transport" );
+	if(r.isEmpty()||
+	   ((r!="independent")&&(r!="slave")&&(r!="client")&&(r!="master")))
+	{
+		r="independent";
+		ConfigManager::inst()->setValue( "audiojack", "transport", r);
+	}
+	return r;
+}
+
+f_cnt_t AudioJack::transportPosition()
+{
+	jack_position_t pos;
+	/*jack_transport_state_t ts=*/jack_transport_query(m_client, &pos);
+	return pos.frame;
+}
+
+void AudioJack::transportStart()
+{
+	jack_transport_start(m_client);
+}
+
+void AudioJack::transportStop()
+{
+	jack_transport_stop(m_client);
+}
+
+void AudioJack::transportLocate(f_cnt_t _frame)
+{
+	qWarning("AudioJack::transportLocate %d",_frame);
+	jack_transport_locate(m_client, _frame);
+}
+
+void AudioJack::transportQuery()
+{
+	const QString& mode=transportMode();
+	ITransport* song=Engine::getSong();
+
+	if((mode=="client")||(mode=="master"))
+		Engine::s_transport=this;
+	else
+		Engine::s_transport=song;
+
+	if(mode=="independent") return;
+
+	jack_position_t pos;
+	jack_transport_state_t ts=jack_transport_query(m_client, &pos);
+
+	if(ts==JackTransportRolling) song->transportStart();
+	if(ts==JackTransportStopped) song->transportStop();
+
+	if(song->transportPosition()!=pos.frame)
+	{
+		qWarning("AudioJack: lmms=%d jack=%d",song->transportPosition(),pos.frame);
+		song->transportLocate(pos.frame);
+	}
+}
+
 
 
 
 int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 {
+	if( !m_active ) return 0;
+
 	QMutexLocker m( &m_processingMutex );
 
 	// do midi processing first so that midi input can
@@ -355,8 +423,8 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	for( int c = 0; c < channels(); ++c )
 	{
 		m_tempOutBufs[c] =
-			(jack_default_audio_sample_t *) jack_port_get_buffer(
-												m_outputPorts[c], _nframes );
+			(jack_default_audio_sample_t *) jack_port_get_buffer
+			( m_outputPorts[c], _nframes );
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
@@ -403,15 +471,15 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		if( m_framesDoneInCurBuf == m_framesToDoInCurBuf )
 		{
 			m_framesToDoInCurBuf = getNextBuffer( m_outBuf );
-			m_framesDoneInCurBuf = 0;
 			if( !m_framesToDoInCurBuf )
 			{
-				break;
+				m_stopped = true;
 			}
+			m_framesDoneInCurBuf = 0;
 		}
 	}
 
-	if( _nframes != done )
+	if( m_stopped == true )
 	{
 		for( int c = 0; c < channels(); ++c )
 		{
@@ -419,6 +487,8 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 			memset( b, 0, sizeof( *b ) * ( _nframes - done ) );
 		}
 	}
+
+	transportQuery();
 
 	return 0;
 }
@@ -428,18 +498,18 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 
 int AudioJack::staticProcessCallback( jack_nframes_t _nframes, void * _udata )
 {
-	return static_cast<AudioJack *>( _udata )->
-					processCallback( _nframes, _udata );
+	AudioJack* aj = static_cast<AudioJack *>( _udata );
+	return aj->processCallback( _nframes, _udata );
 }
 
 
 
 
-void AudioJack::shutdownCallback( void * _udata )
+void AudioJack::staticShutdownCallback( void * _udata )
 {
-	AudioJack * _this = static_cast<AudioJack *>( _udata );
-	_this->m_client = NULL;
-	_this->zombified();
+	AudioJack* aj = static_cast<AudioJack *>( _udata );
+	aj->m_client = NULL;
+	aj->zombified();
 }
 
 
@@ -449,6 +519,11 @@ void AudioJack::shutdownCallback( void * _udata )
 AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	AudioDeviceSetupWidget( AudioJack::name(), _parent )
 {
+
+	QLabel * cn_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
+	//cn_lbl->setFont( pointSize<6>( cn_lbl->font() ) );
+	cn_lbl->setGeometry( 10, 40, 160, 10 );
+
 	QString cn = ConfigManager::inst()->value( "audiojack", "clientname" );
 	if( cn.isEmpty() )
 	{
@@ -456,10 +531,6 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	}
 	m_clientName = new QLineEdit( cn, this );
 	m_clientName->setGeometry( 10, 20, 160, 20 );
-
-	QLabel * cn_lbl = new QLabel( tr( "CLIENT-NAME" ), this );
-	cn_lbl->setFont( pointSize<7>( cn_lbl->font() ) );
-	cn_lbl->setGeometry( 10, 40, 160, 10 );
 
 	LcdSpinBoxModel * m = new LcdSpinBoxModel( /* this */ );
 	m->setRange( DEFAULT_CHANNELS, SURROUND_CHANNELS );
@@ -472,6 +543,20 @@ AudioJack::setupWidget::setupWidget( QWidget * _parent ) :
 	m_channels->setLabel( tr( "CHANNELS" ) );
 	m_channels->move( 180, 20 );
 
+	QLabel * mode_lbl = new QLabel( tr( "TRANSPORT" ), this );
+	//mode_lbl->setFont( pointSize<6>( mode_lbl->font() ) );
+	mode_lbl->setGeometry( 240, 40, 100, 10 );
+
+	QString mode = ConfigManager::inst()->value( "audiojack", "transport" );
+	if( mode.isEmpty() ) mode="none";
+	QStringList modes;
+	modes << "none" << "slave" << "client" << "master";
+	m_transports=new QComboBox( this );
+	m_transports->addItems(modes);
+	int i=m_transports->findText(mode);
+	if(i<0) i=0;
+	m_transports->setCurrentIndex(i);
+	m_transports->setGeometry( 240, 20, 100, 20 );
 }
 
 
@@ -488,9 +573,11 @@ AudioJack::setupWidget::~setupWidget()
 void AudioJack::setupWidget::saveSettings()
 {
 	ConfigManager::inst()->setValue( "audiojack", "clientname",
-							m_clientName->text() );
+					 m_clientName->text() );
 	ConfigManager::inst()->setValue( "audiojack", "channels",
-				QString::number( m_channels->value<int>() ) );
+					 QString::number( m_channels->value<int>() ) );
+	ConfigManager::inst()->setValue( "audiojack", "transport",
+					 m_transports->currentText() );
 }
 
 

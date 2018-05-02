@@ -37,8 +37,9 @@
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
 FxMixer * LmmsCore::s_fxMixer = NULL;
-BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 Song * LmmsCore::s_song = NULL;
+ITransport * LmmsCore::s_transport = NULL;
+BBTrackContainer * LmmsCore::s_bbTrackContainer = NULL;
 ProjectJournal * LmmsCore::s_projectJournal = NULL;
 Ladspa2LMMS * LmmsCore::s_ladspaManager = NULL;
 DummyTrackContainer * LmmsCore::s_dummyTC = NULL;
@@ -81,6 +82,7 @@ void LmmsCore::init( bool renderOnly )
 void LmmsCore::destroy()
 {
 	s_projectJournal->stopAllJournalling();
+	transport()->transportStop();
 	s_mixer->stopProcessing();
 
 	PresetPreviewPlayHandle::cleanup();

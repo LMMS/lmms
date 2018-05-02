@@ -139,6 +139,7 @@ public:
 	{
 		m_savedPos = _pos;
 	}
+
 	inline const MidiTime & savedPos() const
 	{
 		return m_savedPos;

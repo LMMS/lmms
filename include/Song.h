@@ -36,6 +36,7 @@
 #include "Mixer.h"
 #include "VstSyncController.h"
 
+#include "ITransport.h"
 
 class AutomationTrack;
 class Pattern;
@@ -48,12 +49,13 @@ const bpm_t MaxTempo = 999;
 const tick_t MaxSongLength = 9999 * DefaultTicksPerTact;
 
 
-class EXPORT Song : public TrackContainer
+class EXPORT Song : public TrackContainer, public virtual ITransport
 {
 	Q_OBJECT
 	mapPropertyFromModel( int,getTempo,setTempo,m_tempoModel );
 	mapPropertyFromModel( int,masterPitch,setMasterPitch,m_masterPitchModel );
 	mapPropertyFromModel( int,masterVolume,setMasterVolume, m_masterVolumeModel );
+
 public:
 	enum PlayModes
 	{
@@ -87,7 +89,13 @@ public:
 		{
 			return m_currentFrame;
 		}
-		TimeLineWidget * m_timeLine;
+
+                inline float absoluteFrame() const
+                {
+                        return getTicks()*Engine::framesPerTick()+m_currentFrame;
+                }
+
+                TimeLineWidget * m_timeLine;
 
 	private:
 		float m_currentFrame;
@@ -105,36 +113,22 @@ public:
 
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds[m_playMode];
+		return m_elapsedMilliSeconds;
 	}
 
-	inline int getMilliseconds(PlayModes playMode) const
+	inline void setToTime( int millis )
 	{
-		return m_elapsedMilliSeconds[playMode];
+		m_elapsedMilliSeconds = millis;
 	}
 
-	inline void setToTime(MidiTime const & midiTime)
+	inline void setToTime( MidiTime const & midiTime )
 	{
-		m_elapsedMilliSeconds[m_playMode] = midiTime.getTimeInMilliseconds(getTempo());
-		m_playPos[m_playMode].setTicks(midiTime.getTicks());
-	}
-
-	inline void setToTime(MidiTime const & midiTime, PlayModes playMode)
-	{
-		m_elapsedMilliSeconds[playMode] = midiTime.getTimeInMilliseconds(getTempo());
-		m_playPos[playMode].setTicks(midiTime.getTicks());
+		m_elapsedMilliSeconds = midiTime.getTimeInMilliseconds(getTempo());
 	}
 
 	inline void setToTimeByTicks(tick_t ticks)
 	{
-		m_elapsedMilliSeconds[m_playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
-		m_playPos[m_playMode].setTicks(ticks);
-	}
-
-	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
-	{
-		m_elapsedMilliSeconds[playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
-		m_playPos[playMode].setTicks(ticks);
+		m_elapsedMilliSeconds = MidiTime::ticksToMilliseconds(ticks, getTempo());
 	}
 
 	inline int getTacts() const
@@ -302,6 +296,11 @@ public:
 
 	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
 
+	virtual f_cnt_t transportPosition();
+	virtual void transportStart();
+	virtual void transportStop();
+	virtual void transportLocate(f_cnt_t _frame);
+
 public slots:
 	void playSong();
 	void record();
@@ -410,7 +409,7 @@ private:
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
-	double m_elapsedMilliSeconds[Mode_Count];
+	double m_elapsedMilliSeconds;
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
