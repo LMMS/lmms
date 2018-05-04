@@ -28,7 +28,6 @@
 
 #include <memory>
 
-#include "AtomicInt.h"
 #include "BasicFilters.h"
 #include "Note.h"
 #include "PlayHandle.h"
@@ -350,7 +349,7 @@ public:
 private:
 	static NotePlayHandle ** s_available;
 	static QReadWriteLock s_mutex;
-	static AtomicInt s_availableIndex;
+	static std::atomic_int s_availableIndex;
 	static int s_size;
 };
 

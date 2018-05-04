@@ -31,6 +31,7 @@
 #include <QLayout>
 #include <QMdiArea>
 #include <QPainter>
+#include <QPointer>
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QSignalMapper>
@@ -891,10 +892,6 @@ void PianoRoll::drawDetuningInfo( QPainter & _p, const Note * _n, int _x,
 	for( timeMap::ConstIterator it = map.begin(); it != map.end(); ++it )
 	{
 		int pos_ticks = it.key();
-		if( pos_ticks > _n->length() )
-		{
-			break;
-		}
 		int pos_x = _x + pos_ticks * m_ppt / MidiTime::ticksPerTact();
 
 		const float level = it.value();
@@ -1340,8 +1337,8 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 
 	if( m_editMode == ModeEditDetuning && noteUnderMouse() )
 	{
-		static AutomationPattern* detuningPattern = nullptr;
-		if (detuningPattern != nullptr)
+		static QPointer<AutomationPattern> detuningPattern = nullptr;
+		if (detuningPattern.data() != nullptr)
 		{
 			detuningPattern->disconnect(this);
 		}
@@ -1351,7 +1348,7 @@ void PianoRoll::mousePressEvent(QMouseEvent * me )
 			n->createDetuning();
 		}
 		detuningPattern = n->detuning()->automationPattern();
-		connect(detuningPattern, SIGNAL(dataChanged()), this, SLOT(update()));
+		connect(detuningPattern.data(), SIGNAL(dataChanged()), this, SLOT(update()));
 		gui->automationEditor()->open(detuningPattern);
 		return;
 	}
@@ -2639,23 +2636,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 
 	int key = m_startKey;
 
-	// display note marks before drawing other lines
-	for( int i = 0; i < m_markedSemiTones.size(); i++ )
-	{
-		const int key_num = m_markedSemiTones.at( i );
-		const int y = keyAreaBottom() + 5
-			- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
-
-		if( y > keyAreaBottom() )
-		{
-			break;
-		}
-
-		p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT,
-			    markedSemitoneColor() );
-	}
-
-
 	// draw all white keys...
 	for( int y = key_line_y + 1 + y_offset; y > PR_TOP_MARGIN;
 			key_line_y -= KEY_LINE_HEIGHT, ++keys_processed )
@@ -2919,7 +2899,6 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
-
 		// Draw the vertical beat lines
 		int ticksPerBeat = DefaultTicksPerTact /
 			Engine::getSong()->getTimeSigModel().getDenominator();
@@ -2940,8 +2919,23 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			p.setPen( barLineColor() );
 			p.drawLine( x, PR_TOP_MARGIN, x, height() - PR_BOTTOM_MARGIN );
 		}
-	}
 
+		// draw marked semitones after the grid
+		for( int i = 0; i < m_markedSemiTones.size(); i++ )
+		{
+			const int key_num = m_markedSemiTones.at( i );
+			const int y = keyAreaBottom() + 5
+				- KEY_LINE_HEIGHT * ( key_num - m_startKey + 1 );
+
+			if( y > keyAreaBottom() )
+			{
+				break;
+			}
+
+			p.fillRect( WHITE_KEY_WIDTH + 1, y - KEY_LINE_HEIGHT / 2, width() - 10, KEY_LINE_HEIGHT + 1,
+				    markedSemitoneColor() );
+		}
+	}
 
 	// following code draws all notes in visible area
 	// and the note editing stuff (volume, panning, etc)
@@ -4063,14 +4057,14 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* drawAction = editModeGroup->addAction( embed::getIconPixmap( "edit_draw" ), tr( "Draw mode (Shift+D)" ) );
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
-	QAction* detuneAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Detune mode (Shift+T)" ) );
+	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
 
 	drawAction->setChecked( true );
 
 	drawAction->setShortcut( Qt::SHIFT | Qt::Key_D );
 	eraseAction->setShortcut( Qt::SHIFT | Qt::Key_E );
 	selectAction->setShortcut( Qt::SHIFT | Qt::Key_S );
-	detuneAction->setShortcut( Qt::SHIFT | Qt::Key_T );
+	pitchBendAction->setShortcut( Qt::SHIFT | Qt::Key_T );
 
 	connect( editModeGroup, SIGNAL( triggered( int ) ), m_editor, SLOT( setEditMode( int ) ) );
 
@@ -4080,7 +4074,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
-	notesActionsToolBar->addAction( detuneAction );
+	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
 

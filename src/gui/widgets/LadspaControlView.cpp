@@ -77,6 +77,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		}
 
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			knb = new Knob( knobBright_26, this, m_ctl->port()->name );
 			break;

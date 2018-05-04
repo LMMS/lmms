@@ -56,25 +56,27 @@ echo -e "\nWriting verbose output to \"${LOGFILE}\""
 PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
 export PATH
 
-# Fetch portable linuxdeployqt if cache is older than $DAYSOLD
+# Fetch portable linuxdeployqt if not in PATH
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
-mkdir -p "$HOME/bin"
-DAYSOLD=2
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
-elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
-	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
-	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
+else
+	filename="linuxdeployqt-continuous-$(uname -p).AppImage"
+	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/$filename"
+	down_file="$(pwd)/$filename"
+	if [ ! -f "$LINUXDEPLOYQT" ]; then
+		ln -s "$down_file" "$LINUXDEPLOYQT"
+	fi
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
-	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
+	wget -N -q "$url" || (rm "$filename" && false)
 	chmod +x "$LINUXDEPLOYQT"
-	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
+	# Extract AppImage and replace LINUXDEPLOYQT variable with extracted binary
+	# to support systems without fuse
 	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
+	LINUXDEPLOYQT="squashfs-root/AppRun"
 	APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
 	success "Extracted $APPIMAGETOOL"
-else
-	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
 fi
 
 # Make skeleton AppDir

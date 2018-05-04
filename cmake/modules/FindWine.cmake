@@ -7,11 +7,13 @@
 #  WINE_DEFINITIONS - Compiler switches required for using wine
 #
 
-LIST(APPEND CMAKE_PREFIX_PATH /opt/wine-stable /opt/wine-devel /opt/wine-staging)
+LIST(APPEND CMAKE_PREFIX_PATH /opt/wine-stable /opt/wine-devel /opt/wine-staging /usr/lib/wine/)
 
-FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATH_SUFFIXES wine)
+FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATH_SUFFIXES wine wine/wine)
 FIND_LIBRARY(WINE_LIBRARY NAMES wine PATH_SUFFIXES wine i386-linux-gnu/wine)
-FIND_PROGRAM(WINE_CXX NAMES wineg++ winegcc winegcc64 winegcc32)
+FIND_PROGRAM(WINE_CXX
+	NAMES wineg++ winegcc winegcc64 winegcc32 winegcc-stable
+	PATHS /usr/lib/wine)
 
 SET(WINE_INCLUDE_DIRS ${WINE_INCLUDE_DIR} )
 SET(WINE_LIBRARIES ${WINE_LIBRARY} )
@@ -37,6 +39,6 @@ FOREACH(FLAG ${WINEBUILD_FLAGS})
 ENDFOREACH()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Wine DEFAULT_MSG WINE_LIBRARIES WINE_INCLUDE_DIRS)
+find_package_handle_standard_args(Wine DEFAULT_MSG WINE_CXX WINE_LIBRARIES WINE_INCLUDE_DIRS)
 
 mark_as_advanced(WINE_INCLUDE_DIR WINE_LIBRARY)

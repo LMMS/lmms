@@ -772,7 +772,7 @@ void Knob::enterValue()
 			this, tr( "Set value" ),
 			tr( "Please enter a new value between "
 					"-96.0 dBFS and 6.0 dBFS:" ),
-				20.0 * log10( model()->getRoundedValue() / 100.0 ),
+				ampToDbfs( model()->getRoundedValue() / 100.0 ),
 							-96.0, 6.0, model()->getDigitCount(), &ok );
 		if( new_val <= -96.0 )
 		{
@@ -824,7 +824,7 @@ QString Knob::displayValue() const
 		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		return m_description.trimmed() + QString( " %1 dBFS" ).
-				arg( 20.0 * log10( model()->getRoundedValue() / volumeRatio() ),
+				arg( ampToDbfs( model()->getRoundedValue() / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).

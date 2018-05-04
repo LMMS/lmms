@@ -300,8 +300,6 @@ private:
 
 	TextFloat * m_hint;
 
-	MidiTime m_oldTime;// used for undo/redo while mouse-button is pressed
-
 // qproperty fields
 	QColor m_mutedColor;
 	QColor m_mutedBackgroundColor;
@@ -438,6 +436,7 @@ private slots:
 	void cloneTrack();
 	void removeTrack();
 	void updateMenu();
+	void toggleRecording(bool on);
 	void recordingOn();
 	void recordingOff();
 	void clearTrack();

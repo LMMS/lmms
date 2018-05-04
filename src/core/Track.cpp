@@ -741,30 +741,47 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
-					m_oldTime = m_tco->startPosition();
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
-					s_textFloat->setTitle( tr( "Current length" ) );
 				}
 				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
-					m_oldTime = m_tco->startPosition();
 					QCursor c( Qt::SizeAllCursor );
 					QApplication::setOverrideCursor( c );
-					s_textFloat->setTitle( tr( "Current position" ) );
 				}
 				else if( !m_tco->getAutoResize() )
 				{
 					m_action = Resize;
-					m_oldTime = m_tco->length();
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
+				}
+
+				if( m_action == Move )
+				{
+					s_textFloat->setTitle( tr( "Current position" ) );
+					s_textFloat->setText( QString( "%1:%2" ).
+						arg( m_tco->startPosition().getTact() + 1 ).
+						arg( m_tco->startPosition().getTicks() %
+								MidiTime::ticksPerTact() ) );
+				}
+				else if( m_action == Resize || m_action == ResizeLeft )
+				{
 					s_textFloat->setTitle( tr( "Current length" ) );
+					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
+							arg( m_tco->length().getTact() ).
+							arg( m_tco->length().getTicks() %
+									MidiTime::ticksPerTact() ).
+							arg( m_tco->startPosition().getTact() + 1 ).
+							arg( m_tco->startPosition().getTicks() %
+									MidiTime::ticksPerTact() ).
+							arg( m_tco->endPosition().getTact() + 1 ).
+							arg( m_tco->endPosition().getTicks() %
+									MidiTime::ticksPerTact() ) );
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if TCO was already moved/resized
-				mouseMoveEvent( me );
+				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 				s_textFloat->show();
 			}
 
@@ -891,8 +908,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
 						MidiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-		                                        height() + 2 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -980,8 +996,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_tco->endPosition().getTact() + 1 ).
 				arg( m_tco->endPosition().getTicks() %
 						MidiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-					height() + 2) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
 	else
 	{
@@ -1936,35 +1951,31 @@ void TrackOperationsWidget::updateMenu()
 }
 
 
-void TrackOperationsWidget::recordingOn()
+void TrackOperationsWidget::toggleRecording( bool on )
 {
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
 		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( true ); }
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
+			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();
 	}
 }
 
 
+
+void TrackOperationsWidget::recordingOn()
+{
+	toggleRecording( true );
+}
+
+
 void TrackOperationsWidget::recordingOff()
 {
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
-	if( atv )
-	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
-		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( false ); }
-		}
-		atv->update();
-	}
+	toggleRecording( false );
 }
 
 
