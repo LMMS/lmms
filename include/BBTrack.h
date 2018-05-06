@@ -41,7 +41,7 @@ class BBTCO : public TrackContentObject
 {
 public:
 	BBTCO( Track * _track );
-	virtual ~BBTCO();
+	virtual ~BBTCO() = default;
 
 	virtual void saveSettings( QDomDocument & _doc, QDomElement & _parent );
 	virtual void loadSettings( const QDomElement & _this );
@@ -90,7 +90,7 @@ class BBTCOView : public TrackContentObjectView
 	Q_OBJECT
 public:
 	BBTCOView( TrackContentObject * _tco, TrackView * _tv );
-	virtual ~BBTCOView();
+	virtual ~BBTCOView() = default;
 
 	QColor color() const
 	{

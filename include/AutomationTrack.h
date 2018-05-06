@@ -35,7 +35,7 @@ class AutomationTrack : public Track
 	Q_OBJECT
 public:
 	AutomationTrack( TrackContainer* tc, bool _hidden = false );
-	virtual ~AutomationTrack();
+	virtual ~AutomationTrack() = default;
 
 	virtual bool play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _frame_base, int _tco_num = -1 );
@@ -63,7 +63,7 @@ class AutomationTrackView : public TrackView
 {
 public:
 	AutomationTrackView( AutomationTrack* at, TrackContainerView* tcv );
-	virtual ~AutomationTrackView();
+	virtual ~AutomationTrackView() = default;
 
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );

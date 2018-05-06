@@ -54,7 +54,7 @@ public:
 
 	AutomationPattern( AutomationTrack * _auto_track );
 	AutomationPattern( const AutomationPattern & _pat_to_copy );
-	virtual ~AutomationPattern();
+	virtual ~AutomationPattern() = default;
 
 	bool addObject( AutomatableModel * _obj, bool _search_dup = true );
 
