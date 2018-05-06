@@ -140,9 +140,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_themeDir(QDir::toNativeSeparators(ConfigManager::inst()->themeDir())),
 	m_backgroundPicFile(QDir::toNativeSeparators(ConfigManager::inst()->backgroundPicFile()))
 {
-	setWindowIcon(
-			embed::getIconPixmap("setup_general"));
+	setWindowIcon(embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
+	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	setModal(true);
 	setFixedSize(454, 400);
 
