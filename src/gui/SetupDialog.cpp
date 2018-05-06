@@ -523,7 +523,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QHBoxLayout * as_w_layout = new QHBoxLayout(as_w);
 	as_w_layout->setSpacing(0);
 	as_w_layout->setMargin(0);
-	//as_w_layout->setAutoAdd(true);
 
 #ifdef LMMS_HAVE_JACK
 	m_audioIfaceSetupWidgets[AudioJack::name()] = 
@@ -681,14 +680,13 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	ToolTip::add(midi_help_btn,
 			tr("Help"));
 
-	//Ifaces-settings-widget.
+	// Ifaces-settings-widget.
 	QWidget * ms_w = new QWidget(midi_w);
 	ms_w->setFixedHeight(60);
 
 	QHBoxLayout * ms_w_layout = new QHBoxLayout(ms_w);
 	ms_w_layout->setSpacing(0);
 	ms_w_layout->setMargin(0);
-	//ms_w_layout->setAutoAdd(true);
 
 #ifdef LMMS_HAVE_ALSA
 	m_midiIfaceSetupWidgets[MidiAlsaSeq::name()] =
@@ -1032,9 +1030,9 @@ SetupDialog::~SetupDialog()
 
 void SetupDialog::accept()
 {
-	// Hide dialog before setting values. This prevents an obscure bug
-	// where non-embedded VST windows would steal focus and prevent LMMS
-	// from taking mouse input, rendering the application unusable.
+	/* Hide dialog before setting values. This prevents an obscure bug
+	where non-embedded VST windows would steal focus and prevent LMMS
+	from taking mouse input, rendering the application unusable. */
 	QDialog::accept();
 
 	ConfigManager::inst()->setValue("tooltips", "disabled",
