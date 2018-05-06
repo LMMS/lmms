@@ -52,7 +52,6 @@ protected:
 	virtual void dragEnterEvent( QDragEnterEvent * _dee );
 	virtual void dropEvent( QDropEvent * _de );
 	virtual void mousePressEvent( QMouseEvent * _me );
-	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void mouseReleaseEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void resizeEvent( QResizeEvent * _re );
