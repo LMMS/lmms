@@ -81,7 +81,6 @@ inline void labelWidget(QWidget * w, const QString & txt )
 
 	dynamic_cast<QBoxLayout *>(w->layout())->addSpacing(5);
 	dynamic_cast<QBoxLayout *>(w->layout())->addWidget(title);
-	dynamic_cast<QBoxLayout *>(w->layout())->addSpacing(10);
 }
 
 
@@ -145,7 +144,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			embed::getIconPixmap("setup_general"));
 	setWindowTitle(tr("Settings"));
 	setModal(true);
-	setFixedSize(452, 426);
+	setFixedSize(454, 400);
 
 	Engine::projectJournal()->setJournalling(false);
 
@@ -176,17 +175,12 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Settings widget.
 	QWidget * settings_w = new QWidget(main_w);
-	int settings_w_height = 370;
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	settings_w_height += 50;
-#endif
-	settings_w->setFixedSize(360, settings_w_height);
+	settings_w->setFixedSize(360, 360);
 
 	// General widget.
 	QWidget * general_w = new QWidget(settings_w);
-	general_w->setFixedSize(360, 240);
 	QVBoxLayout * general_layout = new QVBoxLayout(general_w);
-	general_layout->setSpacing(0);
+	general_layout->setSpacing(10);
 	general_layout->setMargin(0);
 	labelWidget(general_w, tr("General settings"));
 
@@ -344,9 +338,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// General layout ordering.
 	general_layout->addWidget(gui_tw);
-	general_layout->addSpacing(10);
 	general_layout->addWidget(projects_tw);
-	general_layout->addSpacing(10);
 	general_layout->addWidget(lang_tw);
 	general_layout->addStretch();
 
@@ -355,9 +347,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Performance widget.
 	QWidget * performance_w = new QWidget(settings_w);
-	performance_w->setFixedSize(360, 200);
 	QVBoxLayout * performance_layout = new QVBoxLayout(performance_w);
-	performance_layout->setSpacing(0);
+	performance_layout->setSpacing(10);
 	performance_layout->setMargin(0);
 	labelWidget(performance_w,
 			tr("Performance settings"));
@@ -494,9 +485,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Performance layout ordering.
 	performance_layout->addWidget(auto_save_tw);
-	performance_layout->addSpacing(10);
 	performance_layout->addWidget(ui_fx_tw);
-	performance_layout->addSpacing(10);
 	performance_layout->addWidget(plugins_tw);
 	performance_layout->addStretch();
 
@@ -504,9 +493,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Audio widget.
 	QWidget * audio_w = new QWidget(settings_w);
-	audio_w->setFixedSize(360, 200);
 	QVBoxLayout * audio_layout = new QVBoxLayout(audio_w);
-	audio_layout->setSpacing(0);
+	audio_layout->setSpacing(10);
 	audio_layout->setMargin(0);
 	labelWidget(audio_w,
 			tr("Audio settings"));
@@ -661,11 +649,8 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Audio layout ordering.
 	audio_layout->addWidget(audioiface_tw);
-	audio_layout->addSpacing(10);
 	audio_layout->addWidget(as_w);
-	audio_layout->addSpacing(10);
 	audio_layout->addWidget(hqaudio);
-	audio_layout->addSpacing(10);
 	audio_layout->addWidget(bufferSize_tw);
 	audio_layout->addStretch();
 
@@ -674,7 +659,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	// MIDI widget.
 	QWidget * midi_w = new QWidget(settings_w);
 	QVBoxLayout * midi_layout = new QVBoxLayout(midi_w);
-	midi_layout->setSpacing(0);
+	midi_layout->setSpacing(10);
 	midi_layout->setMargin(0);
 	labelWidget(midi_w,
 			tr("MIDI settings"));
@@ -771,7 +756,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// MIDI layout ordering.
 	midi_layout->addWidget(midiiface_tw);
-	midi_layout->addSpacing(10);
 	midi_layout->addWidget(ms_w);
 	midi_layout->addStretch();
 
@@ -781,7 +765,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QWidget * paths_w = new QWidget(settings_w);
 
 	QVBoxLayout * paths_layout = new QVBoxLayout(paths_w);
-	paths_layout->setSpacing(0);
+	paths_layout->setSpacing(10);
 	paths_layout->setMargin(0);
 
 	labelWidget(paths_w, tr("Paths settings"));
@@ -791,7 +775,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	QScrollArea * pathsScroll = new QScrollArea(paths_w);
 	pathsScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	pathsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pathsScroll->move(0, 30);
 
 	// Path selectors widget.
 	QWidget * pathSelectors = new QWidget(paths_w);
@@ -885,7 +868,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(sf2File_select_btn, SIGNAL(clicked()),
 			this, SLOT(openSF2File()));
 #endif
-		
+
 	// GIG files directory tab.
 	TabWidget * gigDir_tw = new TabWidget(
 			tr("GIG files directory"), pathSelectors);
@@ -943,26 +926,21 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Path selectors layout.
 	QVBoxLayout * pathSelectorsLayout = new QVBoxLayout;
-	pathSelectors->setLayout(pathSelectorsLayout);
+	pathSelectorsLayout->setSpacing(10);
 
 	pathSelectorsLayout->addWidget(workingDir_tw);
-	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(vstDir_tw);
-	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(ladspaDir_tw);
-	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(sf2Dir_tw);
-	pathSelectorsLayout->addSpacing(5);
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	pathSelectorsLayout->addWidget(sf2File_tw);
-	pathSelectorsLayout->addSpacing(5);
 #endif
 	pathSelectorsLayout->addWidget(gigDir_tw);
-	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(themeDir_tw);
-	pathSelectorsLayout->addSpacing(5);
 	pathSelectorsLayout->addWidget(backgroundPicFile_tw);
 	pathSelectorsLayout->addStretch();
+
+	pathSelectors->setLayout(pathSelectorsLayout);
 
 	pathsScroll->setWidget(pathSelectors);
 	pathsScroll->setWidgetResizable(true);
@@ -992,11 +970,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_tabBar->setActiveTab(tab_to_open);
 
 	// Horizontal layout ordering.
+	hlayout->addSpacing(2);
 	hlayout->addWidget(m_tabBar);
 	hlayout->addSpacing(10);
 	hlayout->addWidget(settings_w);
 	hlayout->addSpacing(10);
-	hlayout->addStretch();
 
 	// Extras widget and layout.
 	QWidget * extras_w = new QWidget(this);
