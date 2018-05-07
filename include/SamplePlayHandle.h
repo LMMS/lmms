@@ -38,7 +38,7 @@ class AudioPort;
 class SamplePlayHandle : public PlayHandle
 {
 public:
-	SamplePlayHandle( SampleBuffer* sampleBuffer );
+	SamplePlayHandle(SampleBuffer* sampleBuffer , bool shouldCreateAudioPort=true);
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleTCO* tco );
 	virtual ~SamplePlayHandle();

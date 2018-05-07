@@ -32,25 +32,26 @@
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer ) :
+SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool shouldCreateAudioPort) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_ownAudioPort( true ),
+	m_ownAudioPort( shouldCreateAudioPort ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
-	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+	if (shouldCreateAudioPort)
+		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
 }
 
 
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle( new SampleBuffer( sampleFile ) )
+	SamplePlayHandle( new SampleBuffer( sampleFile ) , false)
 {
 	sharedObject::unref( m_sampleBuffer );
 	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
@@ -60,7 +61,7 @@ SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
 
 
 SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
-	SamplePlayHandle( tco->sampleBuffer() )
+	SamplePlayHandle( tco->sampleBuffer() , false)
 {
 	m_track = tco->getTrack();
 	setAudioPort( ( (SampleTrack *)tco->getTrack() )->audioPort() );
@@ -72,7 +73,7 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 SamplePlayHandle::~SamplePlayHandle()
 {
 	sharedObject::unref( m_sampleBuffer );
-	if( m_ownAudioPort )
+	if( m_ownAudioPort && audioPort ())
 	{
 		delete audioPort();
 	}
