@@ -54,10 +54,6 @@ jobs:
             ../cmake/build_win32.sh
             make lmms
             make
-            cp ./lmms-*win*.exe /tmp/artifacts/
-      - store_artifacts:
-          path: /tmp/artifacts/
-          destination: /
       - *ccache_stats
       - *save_cache
   mingw64:
@@ -75,11 +71,6 @@ jobs:
             mkdir build && cd build
             ../cmake/build_win64.sh
             make
-            make package
-            cp ./lmms-*win*.exe /tmp/artifacts/
-      - store_artifacts:
-          path: /tmp/artifacts/
-          destination: /
       - *ccache_stats
       - *save_cache
   linux.gcc:
