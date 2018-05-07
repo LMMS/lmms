@@ -73,7 +73,6 @@ public:
 	bool isEmpty() const;
 
 public slots:
-	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength();
 	void toggleRecord();
