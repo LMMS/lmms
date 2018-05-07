@@ -65,6 +65,18 @@ struct MmAllocator
 };
 
 
+template< class T1, class T2 >
+constexpr bool operator==( const MmAllocator<T1>&, const MmAllocator<T2>&)
+{
+	return true;
+}
+
+template< class T1, class T2 >
+constexpr bool operator!=( const MmAllocator<T1>&, const MmAllocator<T2>&)
+{
+	return false;
+}
+
 #define MM_OPERATORS								\
 public: 											\
 static void * operator new ( size_t size )		\
