@@ -49,6 +49,8 @@ SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTime
 
 SampleRecordHandle::~SampleRecordHandle()
 {
+	m_tco->updateLength ();
+
 	// If this is an automatically created tco,
 	// enable resizing.
 	m_tco->setAutoResize (false);
@@ -67,12 +69,15 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 	// It is the first buffer.
 	if (m_framesRecorded == 0) {
+		// Make sure we don't have the previous data.
+		m_tco->sampleBuffer ()->resetData(std::move (m_currentBuffer));
 		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
-		m_tco->setSampleBuffer (new SampleBuffer(std::move (m_currentBuffer)));
+
 		m_tco->sampleBuffer ()->setSampleRate( Engine::mixer()->inputSampleRate() );
 	} else {
-		if (! m_currentBuffer.empty ())
+		if (! m_currentBuffer.empty ()) {
 			m_tco->sampleBuffer ()->addData (m_currentBuffer.begin (), m_currentBuffer.end ());
+		}
 	}
 
 	m_framesRecorded += frames;
@@ -80,7 +85,6 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
 	if( len > m_minLength )
 	{
-//		m_tco->changeLength( len );
 		m_minLength = len;
 	}
 }
