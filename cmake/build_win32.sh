@@ -12,8 +12,6 @@ else
         MINGW=/usr/x86_64-w64-mingw32
 fi
 if [ -z "$MSYSCON" ]; then
-	MINGW=/opt$MINGW
-
 	DISTRO=$(lsb_release -si)
 	DISTRO_VERSION=$(lsb_release -sr)
 
