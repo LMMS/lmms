@@ -9,8 +9,11 @@ fi
 if [ "$ARCH" == "32" ]; then
         MINGW=/usr/i686-w64-mingw32
 else
-        MINGW=/usr/x86_64-w64-mingw32
+        MINGW=/usr/i686-w64-mingw32
 fi
+
+MINGW=/usr/i686-w64-mingw32
+
 if [ -z "$MSYSCON" ]; then
 	MINGW=/opt$MINGW
 
