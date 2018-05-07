@@ -273,7 +273,9 @@ public:
 	 * @warning That locks m_varLock for write.
 	 */
 	void addData(const DataVector::iterator begin, const DataVector::iterator end);
-	
+
+	void resetData(DataVector &&newData);
+
 public slots:
 	void setAudioFile( const QString & _audio_file );
 	void loadFromBase64( const QString & _data );
