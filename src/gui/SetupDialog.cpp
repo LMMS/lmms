@@ -67,6 +67,8 @@
 #include "MidiApple.h"
 #include "MidiDummy.h"
 
+constexpr int BUFFERSIZE_RESOLUTION = 32;
+
 inline void labelWidget( QWidget * _w, const QString & _txt )
 {
 	QLabel * title = new QLabel( _txt, _w );
@@ -182,7 +184,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	m_bufSizeSlider->setPageStep( 8 );
 	m_bufSizeSlider->setTickInterval( 8 );
 	m_bufSizeSlider->setGeometry( 10, 16, 340, 18 );
-	m_bufSizeSlider->setValue( m_bufferSize / 32 );
+	m_bufSizeSlider->setValue( m_bufferSize / BUFFERSIZE_RESOLUTION );
 
 	connect( m_bufSizeSlider, SIGNAL( valueChanged( int ) ), this,
 						SLOT( setBufferSize( int ) ) );
@@ -1123,7 +1125,7 @@ void SetupDialog::accept()
 
 void SetupDialog::setBufferSize( int _value )
 {
-	const int step = DEFAULT_BUFFER_SIZE / 32;
+	const int step = DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION;
 	if( _value > step && _value % step )
 	{
 		int mod_value = _value % step;
@@ -1143,7 +1145,7 @@ void SetupDialog::setBufferSize( int _value )
 		m_bufSizeSlider->setValue( _value );
 	}
 
-	m_bufferSize = _value * 32;
+	m_bufferSize = _value * BUFFERSIZE_RESOLUTION;
 	m_bufSizeLbl->setText( tr( "Frames: %1\nLatency: %2 ms" ).arg(
 					m_bufferSize ).arg(
 						1000.0f * m_bufferSize /
@@ -1156,7 +1158,7 @@ void SetupDialog::setBufferSize( int _value )
 
 void SetupDialog::resetBufSize()
 {
-	setBufferSize( DEFAULT_BUFFER_SIZE / 32 );
+	setBufferSize( DEFAULT_BUFFER_SIZE / BUFFERSIZE_RESOLUTION );
 }
 
 
