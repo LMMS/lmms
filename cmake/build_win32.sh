@@ -37,7 +37,7 @@ if [ "$ARCH" == "32" ]; then
 	export CFLAGS="-march=pentium3 -mtune=generic -mpreferred-stack-boundary=5 -mfpmath=sse"
 fi
 
-CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$MINGW $CMAKE_OPTS"
+CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$MINGW -DMINGW_PREFIX=$MINGW $CMAKE_OPTS"
 
 # shellcheck disable=SC2086
 cmake "$DIR/.." -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN" -DCMAKE_MODULE_PATH="$DIR/../cmake/modules/" $CMAKE_OPTS
