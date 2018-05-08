@@ -313,8 +313,7 @@ void AudioSdl::sdlInputAudioCallback(Uint8 *_buf, int _len) {
 	sampleFrame *samples_buffer = (sampleFrame *) _buf;
 	fpp_t frames = _len / sizeof ( sampleFrame );
 
-	mixer()->pushInputFrames (samples_buffer, frames,
-							  true /* applyGain */);
+	mixer()->pushInputFrames (samples_buffer, frames);
 }
 
 #endif
