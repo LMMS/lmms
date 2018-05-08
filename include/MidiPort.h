@@ -124,6 +124,8 @@ public:
 		return m_writablePorts;
 	}
 
+	void invalidateCilent();
+
 	MidiPortMenu* m_readablePortsMenu;
 	MidiPortMenu* m_writablePortsMenu;
 
