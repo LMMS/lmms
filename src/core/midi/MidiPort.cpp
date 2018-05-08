@@ -27,8 +27,11 @@
 
 #include "MidiPort.h"
 #include "MidiClient.h"
+#include "MidiDummy.h"
 #include "Note.h"
 #include "Song.h"
+
+static MidiDummy s_dummyClient;
 
 
 
@@ -410,4 +413,7 @@ void MidiPort::updateOutputProgram()
 
 
 
-
+void MidiPort::invalidateCilent()
+{
+	m_midiClient = &s_dummyClient;
+}
