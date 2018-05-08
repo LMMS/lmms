@@ -437,13 +437,12 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	if (! m_stopped) {
 		m_inBuffer.reset (new sampleFrame[_nframes]);
 
-		const float gain = mixer()->masterGain();
 		for( int c = 0; c < channels(); ++c ) {
 			jack_default_audio_sample_t *channel_buffer = m_tempInBufs[c];
 
 			for( jack_nframes_t frame = 0; frame < _nframes; ++frame )
 			{
-				m_inBuffer[frame][c] = channel_buffer[frame] / gain;
+				m_inBuffer[frame][c] = channel_buffer[frame];
 			}
 		}
 

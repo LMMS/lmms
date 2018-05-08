@@ -353,8 +353,7 @@ void AudioPulseAudio::streamReadCallback(pa_stream *s, size_t length) {
 
 		if (buffer_size && buffer) {
 			mixer()->pushInputFrames (buffer,
-									  frames,
-									  true);
+									  frames);
 		}
 
 		length -= buffer_size;
