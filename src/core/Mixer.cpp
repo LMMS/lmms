@@ -309,7 +309,7 @@ bool Mixer::criticalXRuns() const
 
 
 
-void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames, bool shouldApplyMasterGain) {
+void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames) {
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
@@ -330,11 +330,6 @@ void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames, bool
 	}
 
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
-
-	if (!shouldApplyMasterGain) {
-		applyMasterGainToInputBuffer (&buf[ frames ], _frames, DEFAULT_CHANNELS,
-									  masterGain ());
-	}
 
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 
@@ -579,17 +574,6 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 	startProcessing();
 }
-
-void Mixer::applyMasterGainToInputBuffer(sampleFrame *frames_data, const size_t frames_count, uint channels_count,
-									float gain) {
-	for (fpp_t f = 0; f < frames_count; ++f) {
-		for (uint channel = 0; channel < channels_count; ++channel) {
-			frames_data[f][channel] /= gain;
-		}
-
-	}
-}
-
 
 
 
