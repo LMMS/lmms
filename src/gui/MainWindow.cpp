@@ -520,25 +520,25 @@ void MainWindow::finalize()
 				"in an easy way."
 				) );
 
-	ToolButton * controllers_window = new ToolButton(
-					embed::getIconPixmap( "controller" ),
-					tr( "Show/hide controller rack" ) +
-								" (F9)",
-					this, SLOT( toggleControllerRack() ),
-								m_toolBar );
-	controllers_window->setShortcut( Qt::Key_F9 );
-
 	ToolButton * fx_mixer_window = new ToolButton(
 					embed::getIconPixmap( "fx_mixer" ),
-					tr( "Show/hide FX Mixer" ) + " (F10)",
+					tr( "Show/hide FX Mixer" ) + " (F9)",
 					this, SLOT( toggleFxMixerWin() ),
 					m_toolBar );
-	fx_mixer_window->setShortcut( Qt::Key_F10 );
+	fx_mixer_window->setShortcut( Qt::Key_F9 );
 	fx_mixer_window->setWhatsThis(
 		tr( "Click here to show or hide the "
 			"FX Mixer. The FX Mixer is a very powerful tool "
 			"for managing effects for your song. You can insert "
 			"effects into different effect-channels." ) );
+
+	ToolButton * controllers_window = new ToolButton(
+					embed::getIconPixmap( "controller" ),
+					tr( "Show/hide controller rack" ) +
+								" (F10)",
+					this, SLOT( toggleControllerRack() ),
+								m_toolBar );
+	controllers_window->setShortcut( Qt::Key_F10 );
 
 	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
@@ -556,8 +556,8 @@ void MainWindow::finalize()
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 5 );
-	m_toolBarLayout->addWidget( fx_mixer_window, 1, 6 );
+	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
+	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
 	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
@@ -1195,13 +1195,13 @@ void MainWindow::updateViewMenu()
 			      this,
 			      SLOT( toggleAutomationEditorWin())
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
-			      tr( "Controller Rack" ) + " (F9)",
-			      this, SLOT( toggleControllerRack() )
-		);
 	m_viewMenu->addAction(embed::getIconPixmap( "fx_mixer" ),
-			      tr( "FX Mixer" ) + " (F10)",
+			      tr( "FX Mixer" ) + " (F9)",
 			      this, SLOT( toggleFxMixerWin() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
+			      tr( "Controller Rack" ) + " (F10)",
+			      this, SLOT( toggleControllerRack() )
 		);
 	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
 			      tr( "Project Notes" ) + " (F11)",
