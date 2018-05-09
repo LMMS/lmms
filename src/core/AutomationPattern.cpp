@@ -98,16 +98,6 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	}
 }
 
-
-
-
-AutomationPattern::~AutomationPattern()
-{
-}
-
-
-
-
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	if( _search_dup && m_objects.contains(_obj) )

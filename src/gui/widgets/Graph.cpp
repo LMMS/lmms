@@ -56,13 +56,6 @@ Graph::Graph( QWidget * _parent, graphStyle _style, int _width,
 			this, SLOT( updateGraph( ) ) );
 }
 
-
-Graph::~Graph()
-{
-}
-
-
-
 void Graph::setForeground( const QPixmap &_pixmap )
 {
 	m_foreground = _pixmap;
@@ -469,14 +462,6 @@ graphModel::graphModel( float _min, float _max, int _length,
 	m_step( _step )
 {
 }
-
-
-
-graphModel::~graphModel()
-{
-}
-
-
 
 void graphModel::setRange( float _min, float _max )
 {
