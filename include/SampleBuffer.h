@@ -115,8 +115,6 @@ public:
 	explicit SampleBuffer( const f_cnt_t _frames );
 	SampleBuffer(SampleBuffer::DataVector &&movedData);
 
-	virtual ~SampleBuffer();
-
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
 				const float _freq,
@@ -225,7 +223,7 @@ public:
 
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock()
-	SampleBuffer * resample( const sample_rate_t _src_sr,
+	SampleBuffer resample( const sample_rate_t _src_sr,
 						const sample_rate_t _dst_sr );
 
 	void normalizeSampleRate( const sample_rate_t _src_sr,
