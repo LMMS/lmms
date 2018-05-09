@@ -133,12 +133,6 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	init(model, name);
 }
 
-
-Fader::~Fader()
-{
-}
-
-
 void Fader::init(FloatModel * model, QString const & name)
 {
 	setWindowTitle( name );

@@ -112,16 +112,6 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 	show();
 }
 
-
-
-
-FileBrowser::~FileBrowser()
-{
-}
-
-
-
-
 bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 {
 	// call with item=NULL to filter the entire tree
@@ -337,16 +327,6 @@ FileBrowserTreeWidget::FileBrowserTreeWidget(QWidget * parent ) :
 				SLOT( updateDirectory( QTreeWidgetItem * ) ) );
 
 }
-
-
-
-
-FileBrowserTreeWidget::~FileBrowserTreeWidget()
-{
-}
-
-
-
 
 void FileBrowserTreeWidget::contextMenuEvent(QContextMenuEvent * e )
 {

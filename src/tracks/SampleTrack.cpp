@@ -302,16 +302,6 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 }
 
-
-
-
-SampleTCOView::~SampleTCOView()
-{
-}
-
-
-
-
 void SampleTCOView::updateSample()
 {
 	update();
