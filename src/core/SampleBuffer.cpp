@@ -139,9 +139,6 @@ SampleBuffer::SampleBuffer( const f_cnt_t _frames )
 
 
 
-SampleBuffer::~SampleBuffer()
-{
-}
 
 
 
@@ -248,7 +245,7 @@ void SampleBuffer::update(bool _keep_settings)
 		{
 			// sample couldn't be decoded, create buffer containing
 			// one sample-frame
-			m_data.resize (1, {0,0});
+			m_data.clear ();
 			m_loopStartFrame = m_startFrame = 0;
 			m_loopEndFrame = m_endFrame = 1;
 		}
@@ -260,9 +257,7 @@ void SampleBuffer::update(bool _keep_settings)
 	}
 	else
 	{
-		// neither an audio-file nor a buffer to copy from, so create
-		// buffer containing one sample-frame
-		m_data.resize (1, {0,0});
+		m_data.clear ();
 		m_loopStartFrame = m_startFrame = 0;
 		m_loopEndFrame = m_endFrame = 1;
 	}
@@ -373,10 +368,9 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != Engine::mixer()->baseSampleRate() )
 	{
-		SampleBuffer * resampled = resample( _src_sr,
+		SampleBuffer resampled = resample( _src_sr,
 					Engine::mixer()->baseSampleRate() );
-		m_data = std::move(resampled->m_data);
-		delete resampled;
+		m_data = std::move(resampled.m_data);
 	}
 
 	if( _keep_settings == false )
@@ -1162,12 +1156,12 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 
 
 
-SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr )
+std::unique_ptr<SampleBuffer> SampleBuffer::resample(const sample_rate_t _src_sr,
+													const sample_rate_t _dst_sr )
 {
 	const f_cnt_t dst_frames = static_cast<f_cnt_t>( frames ()/
 					(float) _src_sr * (float) _dst_sr );
-	SampleBuffer * dst_sb = new SampleBuffer( dst_frames );
+	DataVector outputData(dst_frames);
 
 	// yeah, libsamplerate, let's rock with sinc-interpolation!
 	int error;
@@ -1178,7 +1172,7 @@ SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 		SRC_DATA src_data;
 		src_data.end_of_input = 1;
 		src_data.data_in = libSampleRateSrc(data ())->data ();
-		src_data.data_out = dst_sb->m_origData.data ()->data ();
+		src_data.data_out = outputData.data ()->data();
 		src_data.input_frames = frames ();
 		src_data.output_frames = dst_frames;
 		src_data.src_ratio = (double) _dst_sr / _src_sr;
@@ -1193,8 +1187,8 @@ SampleBuffer * SampleBuffer::resample( const sample_rate_t _src_sr,
 	{
 		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
 	}
-	dst_sb->update();
-	return dst_sb;
+
+	return std::unique_ptr<SampleBuffer>(new SampleBuffer(std::move(outputData)));
 }
 
 
