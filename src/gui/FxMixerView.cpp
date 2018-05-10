@@ -534,9 +534,10 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			}
 			break;
 		case Qt::Key_F2:
-			renameChannel( m_currentFxLine->channelIndex() );
 		case Qt::Key_Enter:
+		case Qt::Key_Return:
 			renameChannel( m_currentFxLine->channelIndex() );
+			break;
 	}
 }
 
