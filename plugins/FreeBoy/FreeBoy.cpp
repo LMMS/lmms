@@ -104,14 +104,14 @@ FreeBoyInstrument::FreeBoyInstrument( InstrumentTrack * _instrument_track ) :
 
 	m_so1VolumeModel( 7.0f, 0.0f, 7.0f, 1.0f, this, tr( "Right Output level") ),
 	m_so2VolumeModel( 7.0f, 0.0f, 7.0f, 1.0f, this, tr( "Left Output level" ) ),
-	m_ch1So1Model( true, this, tr( "Channel 1 to SO2 (Left)" ) ),
+	m_ch1So1Model( false, this, tr( "Channel 1 to SO2 (Left)" ) ),
 	m_ch2So1Model( true, this, tr( "Channel 2 to SO2 (Left)" ) ),
 	m_ch3So1Model( true, this, tr( "Channel 3 to SO2 (Left)" ) ),
-	m_ch4So1Model( true, this, tr( "Channel 4 to SO2 (Left)" ) ),
-	m_ch1So2Model( true, this, tr( "Channel 1 to SO1 (Right)" ) ),
+	m_ch4So1Model( false, this, tr( "Channel 4 to SO2 (Left)" ) ),
+	m_ch1So2Model( false, this, tr( "Channel 1 to SO1 (Right)" ) ),
 	m_ch2So2Model( true, this, tr( "Channel 2 to SO1 (Right)" ) ),
 	m_ch3So2Model( true, this, tr( "Channel 3 to SO1 (Right)" ) ),
-	m_ch4So2Model( true, this, tr( "Channel 4 to SO1 (Right)" ) ),
+	m_ch4So2Model( false, this, tr( "Channel 4 to SO1 (Right)" ) ),
 	m_trebleModel( -20.0f, -100.0f, 200.0f, 1.0f, this, tr( "Treble" ) ),
 	m_bassModel( 461.0f, -1.0f, 600.0f, 1.0f, this, tr( "Bass" ) ),
 
