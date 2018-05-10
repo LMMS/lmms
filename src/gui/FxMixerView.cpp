@@ -491,6 +491,12 @@ void FxMixerView::moveChannelRight(int index)
 }
 
 
+void FxMixerView::renameChannel(int index)
+{
+	m_fxChannelViews[index]->m_fxLine->renameChannel();
+}
+
+
 
 void FxMixerView::keyPressEvent(QKeyEvent * e)
 {
@@ -527,6 +533,10 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 				addNewChannel();
 			}
 			break;
+		case Qt::Key_F2:
+			renameChannel( m_currentFxLine->channelIndex() );
+		case Qt::Key_Enter:
+			renameChannel( m_currentFxLine->channelIndex() );
 	}
 }
 
