@@ -535,11 +535,6 @@ void FxMixerView::keyPressEvent(QKeyEvent * e)
 			break;
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
-		{
-			/*bool accepted = e->isAccepted();
-			if ( e->isAccepted() )
-				break;*/
-		}
 		case Qt::Key_F2:
 			renameChannel( m_currentFxLine->channelIndex() );
 			break;
