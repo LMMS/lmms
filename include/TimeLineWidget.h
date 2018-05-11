@@ -160,9 +160,9 @@ public:
 		return "timeline";
 	}
 
-	inline int markerX( const MidiTime & _t ) const
+	inline int markerX( const MidiTime & _tick ) const
 	{
-		return m_xOffset + static_cast<int>( ( _t - m_begin ) *
+		return m_xOffset + static_cast<int>( ( _tick - m_begin ) *
 					m_ppt / MidiTime::ticksPerTact() );
 	}
 
@@ -240,7 +240,7 @@ private:
 
 
 signals:
-	void positionChanged( const MidiTime & _t );
+	void positionChanged( const MidiTime & _tick );
 	void loopPointStateLoaded( int _n );
 	void positionMarkerMoved();
 

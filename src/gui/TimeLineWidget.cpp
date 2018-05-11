@@ -298,7 +298,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 		return;
 	}
 
-	if( event->button() == Qt::LeftButton  && !(event->modifiers() & Qt::ShiftModifier) )
+	if( event->button() == Qt::LeftButton && !(event->modifiers() & Qt::ShiftModifier) )
 	{
 		m_action = MovePositionMarker;
 		if( event->x() - m_xOffset < s_posMarkerPixmap->width() )
@@ -318,13 +318,14 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	else if( event->button() == Qt::RightButton )
 	{
 		m_moveXOff = s_posMarkerPixmap->width() / 2;
-		const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
+		const MidiTime tick = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
+		const MidiTime loopMid = ( m_loopPos[0] + m_loopPos[1] ) / 2;
 
-		if( t < ( ( m_loopPos[0] + m_loopPos[1] ) / 2 ) )
+		if( tick < loopMid )
 		{
 			m_action = MoveLoopBegin;
 		}
-		else if( t > ( ( m_loopPos[0] + m_loopPos[1] ) / 2 ) )
+		else if( tick > loopMid )
 		{
 			m_action = MoveLoopEnd;
 		}
@@ -334,7 +335,7 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 			qSwap( m_loopPos[0], m_loopPos[1] );
 		}
 
-		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = t;
+		m_loopPos[( m_action == MoveLoopBegin ) ? 0 : 1] = tick;
 	}
 
 	if( m_action == MoveLoopBegin || m_action == MoveLoopEnd )
@@ -357,17 +358,17 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 
 void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 {
-	const MidiTime t = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
+	const MidiTime tick = m_begin + static_cast<int>( qMax( event->x() - m_xOffset - m_moveXOff, 0 ) * MidiTime::ticksPerTact() / m_ppt );
 
 	switch( m_action )
 	{
 		case MovePositionMarker:
-			m_pos.setTicks(t.getTicks());
-			Engine::getSong()->setToTime(t, m_mode);
+			m_pos.setTicks(tick.getTicks());
+			Engine::getSong()->setToTime(tick, m_mode);
 			if (!( Engine::getSong()->isPlaying()))
 			{
 				//Song::Mode_None is used when nothing is being played.
-				Engine::getSong()->setToTime(t, Song::Mode_None);
+				Engine::getSong()->setToTime(tick, Song::Mode_None);
 			}
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
@@ -377,17 +378,17 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 		case MoveLoopBegin:
 		case MoveLoopEnd:
 		{
-			const int i = m_action - MoveLoopBegin;
+			const int i = m_action - MoveLoopBegin; // i == 0 || i == 1
 			if( event->modifiers() & Qt::ControlModifier )
 			{
 				// no ctrl-press-hint when having ctrl pressed
 				delete m_hint;
 				m_hint = NULL;
-				m_loopPos[i] = t;
+				m_loopPos[i] = tick;
 			}
 			else
 			{
-				m_loopPos[i] = t.toNearestTact();
+				m_loopPos[i] = tick.toNearestTact();
 			}
 			// Catch begin == end
 			if( m_loopPos[0] == m_loopPos[1] )
