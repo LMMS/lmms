@@ -81,6 +81,8 @@ public:
 
 	void renameChannel();
 
+	bool eventFilter (QObject *dist, QEvent *event);
+
 private:
 	void drawFxLine( QPainter* p, const FxLine *fxLine, bool isActive, bool sendToThis, bool receiveFromThis );
 	QString elideName( const QString & name );

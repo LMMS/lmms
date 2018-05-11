@@ -100,7 +100,6 @@ public:
 	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
 
-	// rename the channel
 	void renameChannel(int index);
 
 	// make sure the display syncs up with the fx mixer.

@@ -34,6 +34,24 @@
 #include "GuiApplication.h"
 #include "Song.h"
 
+bool FxLine::eventFilter( QObject *dist, QEvent *event )
+{
+	// If we are in a rename, capture the enter/return events and handle them
+	if ( event->type() == QEvent::KeyPress )
+	{
+		QKeyEvent * keyEvent = static_cast<QKeyEvent*>(event);
+		if( keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return )
+		{
+			if( m_inRename )
+			{
+				renameFinished();
+				event->accept(); // Stop the event from propagating
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 const int FxLine::FxLineHeight = 287;
 QPixmap * FxLine::s_sendBgArrow = NULL;
@@ -100,6 +118,7 @@ FxLine::FxLine( QWidget * _parent, FxMixerView * _mv, int _channelIndex ) :
 	m_renameLineEdit->setFixedWidth( 65 );
 	m_renameLineEdit->setFont( pointSizeF( font(), 7.5f ) );
 	m_renameLineEdit->setReadOnly( true );
+	m_renameLineEdit->installEventFilter( this );
 
 	QGraphicsScene * scene = new QGraphicsScene();
 	scene->setSceneRect( 0, 0, 33, FxLineHeight );
