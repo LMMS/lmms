@@ -142,7 +142,7 @@ ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
 VSTLIB="${APPDIR}usr/lib/lmms/RemoteVstPlugin.exe.so"
 
 ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
-VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin.exe.so"
+VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
 mv "$VSTLIB" "$VSTBIN"
