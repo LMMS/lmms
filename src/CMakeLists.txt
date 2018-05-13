@@ -271,8 +271,113 @@ IF(NOT MSVC)
 
 	ENDIF(LMMS_BUILD_WIN32)
 ELSE(NOT MSVC)
-		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
 		SET_TARGET_PROPERTIES(lmms PROPERTIES
 			ENABLE_EXPORTS ON
 		)
+		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+		
+				SET_TARGET_PROPERTIES(lmms PROPERTIES
+			LINK_FLAGS "${LINK_FLAGS} -mwindows"
+			ENABLE_EXPORTS ON
+		)
+
+		#CMAKE_FIND_ROOT_PATH
+		SET(VCPKG_ROOT ${CMAKE_FIND_ROOT_PATH})
+		
+		INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
+		
+		INSTALL(FILES
+					"${VCPKG_ROOT}/bin/Qt5Core.dll"
+					"${VCPKG_ROOT}/bin/Qt5Gui.dll"
+					"${VCPKG_ROOT}/bin/Qt5Widgets.dll"
+					"${VCPKG_ROOT}/bin/Qt5Xml.dll"
+
+					"${VCPKG_ROOT}/bin/zlib1.dll"
+					"${VCPKG_ROOT}/bin/jpeg62.dll"
+					"${VCPKG_ROOT}/bin/libpng16.dll"
+					"${VCPKG_ROOT}/bin/gthread-2.dll"
+					"${VCPKG_ROOT}/bin/glib-2.dll"
+					"${VCPKG_ROOT}/bin/harfbuzz.dll"
+					"${VCPKG_ROOT}/bin/pcre2-16.dll"
+					"${VCPKG_ROOT}/bin/double-conversion.dll"
+					"${VCPKG_ROOT}/bin/freetype.dll"
+					"${VCPKG_ROOT}/bin/libbz2.dll"
+					"${VCPKG_ROOT}/bin/pcre.dll"
+					"${VCPKG_ROOT}/bin/libiconv.dll"
+					"${VCPKG_ROOT}/bin/libcharset.dll"
+					"${VCPKG_ROOT}/bin/libintl.dll"
+				DESTINATION .)
+		
+		INSTALL(FILES
+					"${VCPKG_ROOT}/plugins/platforms/qwindows.dll"
+				DESTINATION ./platforms)
+		
+		INSTALL(FILES
+					"${VCPKG_ROOT}/bin/libsndfile-1.dll"
+						"${VCPKG_ROOT}/bin/ogg.dll"
+						"${VCPKG_ROOT}/bin/vorbis.dll"
+						"${VCPKG_ROOT}/bin/vorbisenc.dll"
+						"${VCPKG_ROOT}/bin/FLAC.dll"
+						"${VCPKG_ROOT}/bin/vorbisfile.dll"
+
+					"${VCPKG_ROOT}/bin/libsamplerate-0.dll"
+					"${VCPKG_ROOT}/bin/SDL2.dll"
+					"${VCPKG_ROOT}/bin/fftw3f.dll"
+				DESTINATION .)
+		
+		#not yet in vcpkg
+		#IF(LAME_FOUND)
+		#	INSTALL(FILES
+		#				"${VCPKG_ROOT}/bin/libmp3lame-0.dll"
+		#			DESTINATION .)
+		#ENDIF(LAME_FOUND)
+		IF(FLTK_FOUND)
+			INSTALL(FILES
+					"${VCPKG_ROOT}/bin/libfltk_SHARED.dll"
+						
+					"${VCPKG_ROOT}/bin/zlib1.dll"
+					"${VCPKG_ROOT}/bin/jpeg62.dll"
+				DESTINATION .)
+		ENDIF()
+		
+		IF(FLUIDSYNTH_FOUND)
+			INSTALL(FILES
+					"${VCPKG_ROOT}/bin/libfluidsynth-1.dll"
+					"${VCPKG_ROOT}/bin/glib-2.dll"
+					"${VCPKG_ROOT}/bin/pcre.dll"
+					"${VCPKG_ROOT}/bin/libiconv.dll"
+					"${VCPKG_ROOT}/bin/libcharset.dll"
+					"${VCPKG_ROOT}/bin/libintl.dll"
+				DESTINATION .)
+		ENDIF()
+
+		#not yet included in vcpkg
+		#IF(GIG_FOUND)
+		#	# Handle libgig-*.dll
+		#	FILE(GLOB GIG_LIBRARY "${VCPKG_ROOT}/bin/libgig-*.dll")
+		#	INSTALL(FILES
+		#				${GIG_LIBRARY}
+		#			DESTINATION .)
+		#ENDIF()
+		
+		
+		#TODO fix for 32bit
+		IF(PORTAUDIO_FOUND)
+			IF(LMMS_BUILD_WIN64)
+				INSTALL(FILES
+						"${VCPKG_ROOT}/bin/portaudio-x64.dll"
+					DESTINATION .)
+			ELSE(LMMS_BUILD_WIN64)
+				INSTALL(FILES
+						"${VCPKG_ROOT}/bin/portaudio-x86.dll"
+					DESTINATION .)
+			ENDIF(LMMS_BUILD_WIN64)
+		ENDIF()
+		
+		#not yet in vcpkg
+		#IF(SOUNDIO_FOUND)
+		#	INSTALL(FILES
+		#				"${VCPKG_ROOT}/bin/libsoundio.dll"
+		#			DESTINATION .)
+		#ENDIF()
 ENDIF(NOT MSVC)
