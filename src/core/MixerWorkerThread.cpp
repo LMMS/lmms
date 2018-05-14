@@ -104,6 +104,7 @@ MixerWorkerThread::MixerWorkerThread( Mixer* mixer ) :
 	QThread( mixer ),
 	m_quit( false )
 {
+	setObjectName("MixerWorkerThread");
 	// initialize global static data
 	if( queueReadyWaitCond == NULL )
 	{

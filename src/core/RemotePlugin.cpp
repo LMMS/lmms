@@ -49,6 +49,7 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 	m_plugin( _p ),
 	m_quit( false )
 {
+	setObjectName("ProcessWatcher");
 }
 
 
