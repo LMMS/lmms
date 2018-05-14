@@ -2441,6 +2441,7 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 
 	if (m_action == ActionMoveNote)
 	{
+        bool firstIteration = true;
 		for (Note *note : notes)
 		{
 			if( note->selected() )
@@ -2459,6 +2460,18 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 				else
 				{
 					// moving note
+                    if (firstIteration)
+                        {
+                            firstIteration = false;
+                            Note copy (*note);
+                            // quantize first note
+                            int pos_ticks = copy.oldPos().getTicks() + off_ticks;
+                            pos_ticks = qMax(0, pos_ticks);
+                            copy.setPos (MidiTime(pos_ticks));
+                            copy.quantizePos(quantization());
+                            // new off_ticks based on quantized (copy) note  and not-quantized note
+                            off_ticks += copy.pos().getTicks() - (note->oldPos().getTicks() + off_ticks);
+                        }
 					int pos_ticks = note->oldPos().getTicks() + off_ticks;
 					int key_num = note->oldKey() + off_key;
 
@@ -2568,10 +2581,19 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
 		else
 		{
 			// shift is not pressed; stretch length of selected notes but not their position
+            bool firstIteration = true;
 			for (Note *note : notes)
 			{
 				if (note->selected())
 				{
+                    if (firstIteration)
+                    {
+                        firstIteration = false;
+                        Note copy (*note);
+                        int oldEndPoint = copy.oldPos()+copy.oldLength();
+                        int quantizedEndPoint = Note::quantized( copy.oldLength()+copy.oldPos(), quantization() );
+                        off_ticks += quantizedEndPoint - oldEndPoint;
+                    }
 					int newLength = note->oldLength() + off_ticks;
 					newLength = qMax(1, newLength);
 					note->setLength( MidiTime(newLength) );
