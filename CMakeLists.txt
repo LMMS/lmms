@@ -719,4 +719,5 @@ MESSAGE(
 "-----------------------------------------------------------------\n"
 "\n\n")
 
+SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_DIR}")
 INCLUDE(InstallRequiredSystemLibraries)

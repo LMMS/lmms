@@ -331,6 +331,7 @@ ELSE(NOT MSVC)
 		#				"${VCPKG_ROOT}/bin/libmp3lame-0.dll"
 		#			DESTINATION .)
 		#ENDIF(LAME_FOUND)
+		
 		IF(FLTK_FOUND)
 			INSTALL(FILES
 					"${VCPKG_ROOT}/bin/libfltk_SHARED.dll"
@@ -359,9 +360,7 @@ ELSE(NOT MSVC)
 		#				${GIG_LIBRARY}
 		#			DESTINATION .)
 		#ENDIF()
-		
-		
-		#TODO fix for 32bit
+
 		IF(PORTAUDIO_FOUND)
 			IF(LMMS_BUILD_WIN64)
 				INSTALL(FILES
