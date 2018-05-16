@@ -246,7 +246,6 @@ public:
 	void setGIGDir(const QString & gigDir);
 	void setThemeDir(const QString & themeDir);
 	void setBackgroundPicFile(const QString & backgroundPicFile);
-	//void setVersion(const QString & _cv); <- This doesn't seem to be used anywhere.
 
 	// Creates the working directory & subdirectories on disk.
 	void createWorkingDir();

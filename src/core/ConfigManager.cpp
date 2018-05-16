@@ -243,14 +243,6 @@ void ConfigManager::setVSTDir(const QString & vstDir)
 
 
 
-void ConfigManager::setThemeDir(const QString & themeDir)
-{
-	m_themeDir = ensureTrailingSlash(themeDir);
-}
-
-
-
-
 void ConfigManager::setLADSPADir(const QString & ladspaDir)
 {
 	m_ladspaDir = ladspaDir;
@@ -269,6 +261,14 @@ void ConfigManager::setSTKDir(const QString & stkDir)
 
 
 
+void ConfigManager::setSF2Dir(const QString & sf2Dir)
+{
+	m_sf2Dir = sf2Dir;
+}
+
+
+
+
 void ConfigManager::setSF2File(const QString & sf2File)
 {
 #ifdef LMMS_HAVE_FLUIDSYNTH
@@ -279,22 +279,28 @@ void ConfigManager::setSF2File(const QString & sf2File)
 
 
 
-void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
-{
-#ifdef LMMS_HAVE_FLUIDSYNTH
-	m_backgroundPicFile = backgroundPicFile;
-#endif
-}
-
 void ConfigManager::setGIGDir(const QString & gigDir)
 {
 	m_gigDir = gigDir;
 }
 
-void ConfigManager::setSF2Dir(const QString & sf2Dir)
+
+
+
+void ConfigManager::setThemeDir(const QString & themeDir)
 {
-	m_sf2Dir = sf2Dir;
+	m_themeDir = ensureTrailingSlash(themeDir);
 }
+
+
+
+
+void ConfigManager::setBackgroundPicFile(const QString & backgroundPicFile)
+{
+	m_backgroundPicFile = backgroundPicFile;
+}
+
+
 
 
 void ConfigManager::createWorkingDir()

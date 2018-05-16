@@ -69,7 +69,7 @@
 #include "MidiDummy.h"
 
 
-inline void labelWidget(QWidget * w, const QString & txt )
+inline void labelWidget(QWidget * w, const QString & txt)
 {
 	QLabel * title = new QLabel(txt, w);
 	QFont f = title->font();
@@ -120,7 +120,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 			"ui", "smoothscroll").toInt()),
 	m_animateAFP(ConfigManager::inst()->value(
 			"ui", "animateafp", "1").toInt()),
-	m_vstEmbedMethod( ConfigManager::inst()->vstEmbedMethod() ),
+	m_vstEmbedMethod(ConfigManager::inst()->vstEmbedMethod()),
 	m_syncVSTPlugins(ConfigManager::inst()->value(
 			"ui", "syncvstplugins").toInt()),
 	m_disableAutoQuit(ConfigManager::inst()->value(
@@ -168,7 +168,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	hlayout->setSpacing(0);
 	hlayout->setMargin(0);
 
-	// The tab bar that holds the major tabs.
+	// Tab bar for the main tabs.
 	m_tabBar = new TabBar(main_w, QBoxLayout::TopToBottom);
 	m_tabBar->setExclusive(true);
 	m_tabBar->setFixedWidth(72);
@@ -199,7 +199,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(enableTooltips, SIGNAL(toggled(bool)),
 			this, SLOT(toggleTooltips(bool)));
 	connect(enableTooltips, SIGNAL(toggled(bool)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	LedCheckBox * dbfs = new LedCheckBox(
 			tr("Display volume as dBFS "), gui_tw);
@@ -209,7 +209,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(dbfs, SIGNAL(toggled(bool)),
 			this, SLOT(toggleDisplaydBFS(bool)));
 	connect(dbfs, SIGNAL(toggled(bool)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	LedCheckBox * displayWaveform = new LedCheckBox(
 			tr("Enable master oscilloscope by default"), gui_tw);
@@ -219,7 +219,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(displayWaveform, SIGNAL(toggled(bool)),
 			this, SLOT(toggleDisplayWaveform(bool)));
 	connect(displayWaveform, SIGNAL(toggled(bool)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	LedCheckBox * noteLabels = new LedCheckBox(
 			tr("Enable all note labels in piano roll"), gui_tw);
@@ -237,7 +237,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(compactTracks, SIGNAL(toggled(bool)),
 			this, SLOT(toggleCompactTrackButtons(bool)));
 	connect(compactTracks, SIGNAL(toggled(bool)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	LedCheckBox * oneitw = new LedCheckBox(
 			tr("Enable one instrument-track-window mode"), gui_tw);
@@ -247,7 +247,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(oneitw, SIGNAL(toggled(bool)),
 			this, SLOT(toggleOneInstrumentTrackWindow(bool)));
 	connect(oneitw, SIGNAL(toggled(bool)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 
 	gui_tw->setFixedHeight(YDelta + YDelta * labelNumber1);
@@ -268,7 +268,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(mmpz, SIGNAL(toggled(bool)),
 			this, SLOT(toggleMMPZ(bool)));
 	connect(mmpz, SIGNAL(toggled(bool)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	LedCheckBox * disableBackup = new LedCheckBox(
 			tr("Create a backup file when saving a project"), projects_tw);
@@ -333,7 +333,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(changeLang, SIGNAL(currentIndexChanged(int)),
 			this, SLOT(setLanguage(int)));
 	connect(changeLang, SIGNAL(currentIndexChanged(int)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 
 	// General layout ordering.
@@ -454,11 +454,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	{
 		m_vstEmbedComboBox->addItem(tr("Embed using Qt API"), "qt");
 	}
-	if( embedMethods.contains("win32"))
+	if(embedMethods.contains("win32"))
 	{
 		m_vstEmbedComboBox->addItem(tr("Embed using native Win32 API"), "win32");
 	}
-	if( embedMethods.contains("xembed"))
+	if(embedMethods.contains("xembed"))
 	{
 		m_vstEmbedComboBox->addItem(tr("Embed using XEmbed protocol"), "xembed");
 	}
@@ -623,7 +623,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
 			this, SLOT(setBufferSize(int)));
 	connect(m_bufferSizeSlider, SIGNAL(valueChanged(int)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	m_bufferSizeLbl = new QLabel(bufferSize_tw);
 	m_bufferSizeLbl->setGeometry(10, 40, 200, 24);
@@ -894,7 +894,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)),
 			this, SLOT(setThemeDir(const QString &)));
 	connect(m_themeDirLineEdit, SIGNAL(textChanged(const QString &)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	QPushButton * themeDir_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", themeDir_tw);
@@ -913,7 +913,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)),
 			this, SLOT(setBackgroundPicFile(const QString &)));
 	connect(m_backgroundPicFileLineEdit, SIGNAL(textChanged(const QString &)),
-			this, SLOT(toggleRestartWarning()));
+			this, SLOT(showRestartWarning()));
 
 	QPushButton * backgroundPicFile_select_btn = new QPushButton(
 			embed::getIconPixmap("project_open", 16, 16), "", backgroundPicFile_tw);
@@ -981,9 +981,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	extras_layout->setMargin(0);
 
 	// Restart warning label.
-	restartWarning = new QLabel(
+	restartWarningLbl = new QLabel(
 			tr("<strong>Warning:</strong> Some changes require restarting LMMS."), extras_w);
-	restartWarning->hide();
+	restartWarningLbl->hide();
 
 	// OK button.
 	QPushButton * ok_btn = new QPushButton(
@@ -1001,7 +1001,7 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	// Extras layout ordering.
 	extras_layout->addSpacing(10);
-	extras_layout->addWidget(restartWarning);
+	extras_layout->addWidget(restartWarningLbl);
 	extras_layout->addStretch();
 	extras_layout->addWidget(ok_btn);
 	extras_layout->addSpacing(10);
@@ -1064,11 +1064,11 @@ void SetupDialog::accept()
 					QString::number(m_smoothScroll));
 	ConfigManager::inst()->setValue("ui", "animateafp",
 					QString::number(m_animateAFP));
-	ConfigManager::inst()->setValue( "ui", "vstembedmethod",
+	ConfigManager::inst()->setValue("ui", "vstembedmethod",
 #if QT_VERSION >= 0x050000
-					m_vstEmbedComboBox->currentData().toString() );
+					m_vstEmbedComboBox->currentData().toString());
 #else
-					m_vstEmbedComboBox->itemData(m_vstEmbedComboBox->currentIndex()).toString() );
+					m_vstEmbedComboBox->itemData(m_vstEmbedComboBox->currentIndex()).toString());
 #endif
 	ConfigManager::inst()->setValue("ui", "syncvstplugins",
 					QString::number(m_syncVSTPlugins));
@@ -1511,7 +1511,7 @@ void SetupDialog::openBackgroundPicFile()
 		m_backgroundPicFile;
 	QString new_file = FileDialog::getOpenFileName(this,
 			tr("Choose your background picture file"), dir, "Image files (" + fileTypes + ")");
-	
+
 	if(new_file != QString::null)
 	{
 		m_backgroundPicFileLineEdit->setText(new_file);
@@ -1527,7 +1527,7 @@ void SetupDialog::setBackgroundPicFile(const QString & backgroundPicFile)
 
 
 
-void SetupDialog::toggleRestartWarning()
+void SetupDialog::showRestartWarning()
 {
-	if (restartWarning->isHidden()) {restartWarning->show();}
+	restartWarningLbl->show();
 }

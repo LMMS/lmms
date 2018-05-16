@@ -121,7 +121,7 @@ private slots:
 	void openBackgroundPicFile();
 	void setBackgroundPicFile(const QString & backgroundPicFile);
 
-	void toggleRestartWarning();
+	void showRestartWarning();
 
 
 private:
@@ -198,6 +198,6 @@ private:
 #endif
 	QLineEdit * m_backgroundPicFileLineEdit;
 
-	QLabel * restartWarning;
+	QLabel * restartWarningLbl;
 };
 #endif
