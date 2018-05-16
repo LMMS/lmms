@@ -54,7 +54,7 @@ public:
 
 	inline void restart()
 	{
-		m_phase = 0; // Change to allow a phase offset?
+		m_phase = 0;
 	}
 
 
