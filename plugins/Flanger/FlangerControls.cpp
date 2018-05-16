@@ -43,6 +43,7 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
 
 {
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( changedPlaybackState() ) );
 }
 
 
@@ -78,6 +79,13 @@ void FlangerControls::saveSettings( QDomDocument &doc, QDomElement &parent )
 void FlangerControls::changedSampleRate()
 {
 	m_effect->changeSampleRate();
+}
+
+
+
+void FlangerControls::changedPlaybackState()
+{
+	m_effect->restartLFO();
 }
 
 
