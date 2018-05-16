@@ -26,6 +26,7 @@
 #include <QDomDocument>
 #include <QBitmap>
 #include <QPainter>
+#include <QRandomGenerator>
 
 #include "TripleOscillator.h"
 #include "AutomatableButton.h"
@@ -315,6 +316,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
+						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeLeft );
 				oscs_r[i] = new Oscillator(
 						&m_osc[i]->m_waveShapeModel,
@@ -322,6 +324,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,
+						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeRight );
 			}
 			else
@@ -332,6 +335,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
 						m_osc[i]->m_phaseOffsetLeft,
+						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
 				oscs_r[i] = new Oscillator(
@@ -340,6 +344,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
 						m_osc[i]->m_phaseOffsetRight,
+						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
 			}

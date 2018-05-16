@@ -130,6 +130,8 @@ private:
 	} ;
 
 
+
+
 	friend class TripleOscillatorView;
 
 } ;
