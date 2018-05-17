@@ -251,16 +251,6 @@ void ConfigManager::setLADSPADir(const QString & ladspaDir)
 
 
 
-void ConfigManager::setSTKDir(const QString & stkDir)
-{
-#ifdef LMMS_HAVE_STK
-	m_stkDir = ensureTrailingSlash(stkDir);
-#endif
-}
-
-
-
-
 void ConfigManager::setSF2Dir(const QString & sf2Dir)
 {
 	m_sf2Dir = sf2Dir;
@@ -502,9 +492,6 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 			setSF2Dir(value("paths", "sf2dir") == "" ? sf2Dir() : value("paths", "sf2dir"));
 			setVSTDir(value("paths", "vstdir"));
 			setLADSPADir(value("paths", "ladspadir"));
-		#ifdef LMMS_HAVE_STK
-			setSTKDir(value("paths", "stkdir"));
-		#endif
 		#ifdef LMMS_HAVE_FLUIDSYNTH
 			setSF2File(value("paths", "defaultsf2"));
 		#endif
@@ -538,29 +525,6 @@ void ConfigManager::loadConfigFile(const QString & configFile)
 		m_ladspaDir = userLadspaDir();
 	}
 
-#ifdef LMMS_HAVE_STK
-	if(m_stkDir.isEmpty() || m_stkDir == QDir::separator() || m_stkDir == "/" ||
-			!QDir(m_stkDir).exists())
-	{
-#if defined(LMMS_BUILD_WIN32)
-		m_stkDir = m_dataDir + "stk/rawwaves/";
-#elif defined(LMMS_BUILD_APPLE)
-		m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
-#else
-		if ( qApp->applicationDirPath().startsWith("/tmp/") )
-		{
-			// Assume AppImage bundle
-			m_stkDir = qApp->applicationDirPath() + "/../share/stk/rawwaves/";
-		}
-		else
-		{
-			// Fallback to system provided location
-			m_stkDir = "/usr/share/stk/rawwaves/";
-		}
-#endif
-	}
-#endif
-
 	upgrade();
 
 	QStringList searchPaths;
@@ -587,9 +551,6 @@ void ConfigManager::saveConfigFile()
 	setValue("paths", "gigdir", m_gigDir);
 	setValue("paths", "sf2dir", m_sf2Dir);
 	setValue("paths", "ladspadir", m_ladspaDir);
-#ifdef LMMS_HAVE_STK
-	setValue("paths", "stkdir", m_stkDir);
-#endif
 #ifdef LMMS_HAVE_FLUIDSYNTH
 	setValue("paths", "defaultsf2", m_sf2File);
 #endif

@@ -84,8 +84,7 @@ malletsInstrument::malletsInstrument( InstrumentTrack * _instrument_track ):
 	m_spreadModel(0, 0, 255, 1, this, tr( "Spread" )),
 	m_versionModel( MALLETS_PRESET_VERSION, 0, MALLETS_PRESET_VERSION, this, "" ),
 	m_isOldVersionModel( false, this, "" ),
-	m_filesMissing( !QDir( ConfigManager::inst()->stkDir() ).exists() ||
-		!QFileInfo( ConfigManager::inst()->stkDir() + "/sinewave.raw" ).exists() )
+	m_filesMissing( !QDir( s_stkDir ).exists() || !QFileInfo( s_stkDir + "/sinewave.raw" ).exists() )
 {
 	// ModalBar
 	m_presetsModel.addItem( tr( "Marimba" ) );
@@ -619,8 +618,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLatin1().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -669,8 +667,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLatin1().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -717,8 +714,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	try
 	{
 		Stk::setSampleRate( _sample_rate );
-		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+		Stk::setRawwavePath( QDir( s_stkDir ).absolutePath().toLatin1().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif

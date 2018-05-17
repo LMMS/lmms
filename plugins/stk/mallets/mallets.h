@@ -43,6 +43,7 @@ namespace stk { } ;
 using namespace stk;
 
 static const int MALLETS_PRESET_VERSION = 1;
+static const QString s_stkDir = "data:stk/";
 
 class malletsSynth
 {
