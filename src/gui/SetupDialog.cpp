@@ -1525,9 +1525,7 @@ void SetupDialog::setDefaultSoundfont( const QString & _sf )
 
 void SetupDialog::setBackgroundArtwork( const QString & _ba )
 {
-#ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
-#endif
 }
 
 
