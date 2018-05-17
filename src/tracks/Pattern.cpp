@@ -37,7 +37,6 @@
 #include "PianoRoll.h"
 #include "RenameDialog.h"
 #include "SampleBuffer.h"
-#include "AudioSampleRecorder.h"
 #include "BBTrackContainer.h"
 #include "StringPairDrag.h"
 #include "MainWindow.h"
