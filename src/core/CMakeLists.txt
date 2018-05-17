@@ -83,7 +83,6 @@ set(LMMS_SRCS
 	core/audio/AudioPortAudio.cpp
 	core/audio/AudioSoundIo.cpp
 	core/audio/AudioPulseAudio.cpp
-	core/audio/AudioSampleRecorder.cpp
 	core/audio/AudioSdl.cpp
 
 	core/midi/MidiAlsaRaw.cpp
