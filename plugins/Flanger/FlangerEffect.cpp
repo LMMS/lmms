@@ -112,7 +112,7 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 		if(invertFeedback)
 		{
 			m_lDelay->tick( &buf[f][1] );
-			m_rDelay->tick(&buf[f][0] );
+			m_rDelay->tick( &buf[f][0] );
 		} else
 		{
 			m_lDelay->tick( &buf[f][0] );
@@ -135,6 +135,13 @@ void FlangerEffect::changeSampleRate()
 	m_lfo->setSampleRate( Engine::mixer()->processingSampleRate() );
 	m_lDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
 	m_rDelay->setSampleRate( Engine::mixer()->processingSampleRate() );
+}
+
+
+
+void FlangerEffect::restartLFO()
+{
+	m_lfo->restart();
 }
 
 
