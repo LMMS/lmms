@@ -51,10 +51,9 @@ SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool shouldCrea
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle( new SampleBuffer( sampleFile ) , false)
+	SamplePlayHandle( new SampleBuffer( sampleFile ) , true)
 {
 	sharedObject::unref( m_sampleBuffer );
-	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
 }
 
 
