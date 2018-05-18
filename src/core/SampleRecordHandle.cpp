@@ -70,13 +70,15 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	// It is the first buffer.
 	if (m_framesRecorded == 0) {
 		// Make sure we don't have the previous data.
-		m_tco->sampleBuffer ()->resetData(std::move (m_currentBuffer));
+		m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
+										   Engine::mixer ()->inputSampleRate (),
+										   false);
 		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
-
-		m_tco->sampleBuffer ()->setSampleRate( Engine::mixer()->inputSampleRate() );
 	} else {
 		if (! m_currentBuffer.empty ()) {
-			m_tco->sampleBuffer ()->addData (m_currentBuffer.begin (), m_currentBuffer.end ());
+			m_tco->sampleBuffer ()->addData (m_currentBuffer,
+											 Engine::mixer ()->inputSampleRate (),
+											 false);
 		}
 	}
 

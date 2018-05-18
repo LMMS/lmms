@@ -39,15 +39,6 @@
 #include <vorbis/vorbisfile.h>
 #endif
 
-#ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
-#include <FLAC/stream_encoder.h>
-#endif
-
-#ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
-#include <FLAC/stream_decoder.h>
-#endif
-
-
 #include "base64.h"
 #include "ConfigManager.h"
 #include "DrumSynth.h"
@@ -67,13 +58,15 @@ SampleBuffer::SampleBuffer() :
 	m_loopStartFrame( 0 ),
 	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
-	m_reversed( false ),
 	m_frequency( BaseFreq ),
 	m_sampleRate( Engine::mixer()->baseSampleRate() )
 {
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
-	update();
+	beginBufferChange (false);
+	doneBufferChange (false, /* shouldLock */
+					  false, /* shouldKeepSettings */
+					  m_sampleRate);
 }
 
 
@@ -84,202 +77,136 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 {
 	if( _is_base64_data )
 	{
-		loadFromBase64( _audio_file );
+		loadFromBase64( _audio_file, false );
 	}
 	else
 	{
-		m_audioFile = _audio_file;
-		update();
+		changeAudioFile (_audio_file, false, false);
 	}
 }
 
 
-
-
-SampleBuffer::SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames )
-	: SampleBuffer()
+SampleBuffer::SampleBuffer(SampleBuffer::DataVector &&movedData , sample_rate_t sampleRate) :
+	SampleBuffer()
 {
-	if( _frames > 0 )
-	{
-		m_origData.assign (_data, _data + _frames);
-	}
-}
-
-
-SampleBuffer::SampleBuffer( SampleBuffer::DataVector &&movedData ) :
-	m_audioFile( "" ),
-	m_startFrame( 0 ),
-	m_endFrame( 0 ),
-	m_loopStartFrame( 0 ),
-	m_loopEndFrame( 0 ),
-	m_amplification( 1.0f ),
-	m_reversed( false ),
-	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
-{
-	m_origData = std::move(movedData);
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
-	update();
+	beginBufferChange (false);
+	setSampleRate (sampleRate);
+	m_data = std::move (movedData);
+	doneBufferChange (
+	/* shouldLock */				false,
+	/* shouldKeepSettings */		false,
+									sampleRate
+	);
 }
 
 
 
-SampleBuffer::SampleBuffer( const f_cnt_t _frames )
-	: SampleBuffer(
-			DataVector(static_cast<typename DataVector::size_type>(_frames),
-			sampleFrame{0,0})
-		  )
-{
-	if( _frames > 0 )
-	{
-		m_data.resize (_frames, {0,0});
-	}
+void SampleBuffer::sampleRateChanged() {
+	auto previousSampleRate = sampleRate ();
+	if (Engine::mixer ()->baseSampleRate () == sampleRate ())
+		return;
+
+	beginBufferChange (true);
+	setSampleRate (Engine::mixer ()->baseSampleRate ());
+
+	// Resample the buffer.
+	doneBufferChange (
+	/* shouldLock */				true,
+	/* shouldKeepSettings */		true,
+									previousSampleRate
+	);
 }
 
-
-
-
-
-
-
-void SampleBuffer::sampleRateChanged()
+void SampleBuffer::changeAudioFile(QString audioFile, bool shouldLock,
+								   bool shouldKeepSettings)
 {
-	update( true );
-}
-
-
-void SampleBuffer::update(bool _keep_settings)
-{
-	const bool lock = ( m_data.size () != 0);
-	if( lock )
-	{
-		Engine::mixer()->requestChangeInModel();
-		m_varLock.lockForWrite();
-	}
+	if (audioFile == "")
+		return;
 
 	// File size and sample length limits
 	const int fileSizeMax = 300; // MB
 	const int sampleLengthMax = 90; // Minutes
 
 	bool fileLoadError = false;
-	if( m_audioFile.isEmpty() && m_origData.size () > 0 )
+	QString file = tryToMakeAbsolute( audioFile );
+
+	ch_cnt_t channels = DEFAULT_CHANNELS;
+	sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
+	DataVector fileData;
+
+	const QFileInfo fileInfo( file );
+	if( fileInfo.size() > fileSizeMax * 1024 * 1024 )
 	{
-		// TODO: reverse- and amplification-property is not covered
-		// by following code...
-		auto previousFrames = frames ();
-		m_data = std::move(m_origData);
-		if( _keep_settings == false )
-		{
-			m_loopStartFrame = m_startFrame = 0;
-			m_loopEndFrame = m_endFrame = frames ();
-		} else {
-			m_data.resize (previousFrames);
-		}
+		fileLoadError = true;
 	}
-	else if( !m_audioFile.isEmpty() )
-	{
-		QString file = tryToMakeAbsolute( m_audioFile );
-		int_sample_t * buf = NULL;
-		sample_t * fbuf = NULL;
-		ch_cnt_t channels = DEFAULT_CHANNELS;
-		sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
-		f_cnt_t dataFrames = 0;
 
-		const QFileInfo fileInfo( file );
-		if( fileInfo.size() > fileSizeMax * 1024 * 1024 )
+	if (!fileLoadError) {
+		// Use QFile to handle unicode file names on Windows
+		QFile f(file);
+		f.open(QIODevice::ReadOnly);
+		SNDFILE * snd_file;
+		SF_INFO sf_info;
+		sf_info.format = 0;
+		if( ( snd_file = sf_open_fd( f.handle(), SFM_READ, &sf_info, false ) ) != NULL )
 		{
-			fileLoadError = true;
-		}
-		else
-		{
-			// Use QFile to handle unicode file names on Windows
-			QFile f(file);
-			f.open(QIODevice::ReadOnly);
-			SNDFILE * snd_file;
-			SF_INFO sf_info;
-			sf_info.format = 0;
-			if( ( snd_file = sf_open_fd( f.handle(), SFM_READ, &sf_info, false ) ) != NULL )
+			f_cnt_t frames = sf_info.frames;
+			int rate = sf_info.samplerate;
+			if( frames / rate > sampleLengthMax * 60 )
 			{
-				f_cnt_t frames = sf_info.frames;
-				int rate = sf_info.samplerate;
-				if( frames / rate > sampleLengthMax * 60 )
-				{
-					fileLoadError = true;
-				}
-				sf_close( snd_file );
+				fileLoadError = true;
 			}
-			f.close();
+			sf_close( snd_file );
 		}
+		f.close();
+	}
 
-		if( !fileLoadError )
-		{
+	if( !fileLoadError ) {
+
 #ifdef LMMS_HAVE_OGGVORBIS
-			// workaround for a bug in libsndfile or our libsndfile decoder
-			// causing some OGG files to be distorted -> try with OGG Vorbis
-			// decoder first if filename extension matches "ogg"
-			if( dataFrames == 0 && fileInfo.suffix() == "ogg" )
-			{
-				dataFrames = decodeSampleOGGVorbis( file, buf, channels, samplerate );
-			}
+		// workaround for a bug in libsndfile or our libsndfile decoder
+		// causing some OGG files to be distorted -> try with OGG Vorbis
+		// decoder first if filename extension matches "ogg"
+		if( fileInfo.suffix() == "ogg" )
+		{
+			fileData = decodeSampleOGGVorbis( file, channels, samplerate );
+		}
 #endif
-			if( dataFrames == 0 )
-			{
-				dataFrames = decodeSampleSF( file, fbuf, channels,
-									samplerate );
-			}
+		if(fileData.empty ())
+		{
+			fileData = decodeSampleSF( file, channels, samplerate );
+		}
 #ifdef LMMS_HAVE_OGGVORBIS
-			if( dataFrames == 0 )
-			{
-				dataFrames = decodeSampleOGGVorbis( file, buf, channels,
-									samplerate );
-			}
+		if( fileData.empty () )
+		{
+			fileData = decodeSampleOGGVorbis( file, channels, samplerate );
+		}
 #endif
-			if( dataFrames == 0 )
-			{
-				dataFrames = decodeSampleDS( file, buf, channels,
-									samplerate );
-			}
-		}
-
-		if ( dataFrames == 0 || fileLoadError )  // if still no frames, bail
+		if( fileData.empty () )
 		{
-			// sample couldn't be decoded, create buffer containing
-			// one sample-frame
-			m_data.clear ();
-			m_loopStartFrame = m_startFrame = 0;
-			m_loopEndFrame = m_endFrame = 1;
-		}
-		else // otherwise normalize sample rate
-		{
-			m_data.resize (dataFrames);
-			normalizeSampleRate( samplerate, _keep_settings );
+			fileData = decodeSampleDS( file, channels, samplerate );
 		}
 	}
-	else
-	{
-		m_data.clear ();
-		m_loopStartFrame = m_startFrame = 0;
-		m_loopEndFrame = m_endFrame = 1;
+
+	if (fileData.empty ()) {
+		fileLoadError = true;
 	}
 
-	if( lock )
-	{
-		m_varLock.unlock();
-		Engine::mixer()->doneChangeInModel();
-	}
-
-	emit sampleUpdated();
-
-	if( fileLoadError )
-	{
+	if (! fileLoadError) {
+		// Ok, we have no errors; let's update the actual data.
+		beginBufferChange (shouldLock);
+		m_data = std::move(fileData);
+		doneBufferChange (shouldLock,
+						  shouldKeepSettings,
+						  samplerate);
+	} else {
 		QString title = tr( "Fail to open file" );
 		QString message = tr( "Audio files are limited to %1 MB "
-				"in size and %2 minutes of playing time"
-				).arg( fileSizeMax ).arg( sampleLengthMax );
+							  "in size and %2 minutes of playing time"
+							  ).arg( fileSizeMax ).arg( sampleLengthMax );
 		if( gui )
 		{
 			QMessageBox::information( NULL,
-				title, message,	QMessageBox::Ok );
+									  title, message,	QMessageBox::Ok );
 		}
 		else
 		{
@@ -289,76 +216,26 @@ void SampleBuffer::update(bool _keep_settings)
 	}
 }
 
-
-void SampleBuffer::convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
+SampleBuffer::DataVector SampleBuffer::convertIntToFloat (int_sample_t * & _ibuf, f_cnt_t _frames, int _channels)
 {
 	// following code transforms int-samples into
 	// float-samples and does amplifying & reversing
 	const float fac = 1 / OUTPUT_SAMPLE_MULTIPLIER;
-	m_data.resize (_frames);
+	DataVector vector(_frames);
 	const int ch = ( _channels > 1 ) ? 1 : 0;
 
-	// if reversing is on, we also reverse when
-	// scaling
-	if( m_reversed )
+	int idx = 0;
+	for( f_cnt_t frame = 0; frame < _frames;
+					++frame )
 	{
-		int idx = ( _frames - 1 ) * _channels;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _ibuf[idx+0] * fac;
-			m_data[frame][1] = _ibuf[idx+ch] * fac;
-			idx -= _channels;
-		}
-	}
-	else
-	{
-		int idx = 0;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _ibuf[idx+0] * fac;
-			m_data[frame][1] = _ibuf[idx+ch] * fac;
-			idx += _channels;
-		}
+		vector[frame][0] = _ibuf[idx+0] * fac;
+		vector[frame][1] = _ibuf[idx+ch] * fac;
+		idx += _channels;
 	}
 
 	delete[] _ibuf;
-}
 
-void SampleBuffer::directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels)
-
-{
-
-	m_data.resize (_frames);
-	const int ch = ( _channels > 1 ) ? 1 : 0;
-
-	// if reversing is on, we also reverse when
-	// scaling
-	if( m_reversed )
-	{
-		int idx = ( _frames - 1 ) * _channels;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _fbuf[idx+0];
-			m_data[frame][1] = _fbuf[idx+ch];
-			idx -= _channels;
-		}
-	}
-	else
-	{
-		int idx = 0;
-		for( f_cnt_t frame = 0; frame < _frames;
-						++frame )
-		{
-			m_data[frame][0] = _fbuf[idx+0];
-			m_data[frame][1] = _fbuf[idx+ch];
-			idx += _channels;
-		}
-	}
-
-	delete[] _fbuf;
+	return vector;
 }
 
 
@@ -366,11 +243,9 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 							bool _keep_settings )
 {
 	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != Engine::mixer()->baseSampleRate() )
+	if( _src_sr != sampleRate ())
 	{
-		SampleBuffer resampled = resample( _src_sr,
-					Engine::mixer()->baseSampleRate() );
-		m_data = std::move(resampled.m_data);
+		m_data = resampleData (m_data, _src_sr, sampleRate ());
 	}
 
 	if( _keep_settings == false )
@@ -382,17 +257,52 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 }
 
 
+SampleBuffer::DataVector
+SampleBuffer::resampleData (const DataVector &inputData, sample_rate_t inputSampleRate,
+							sample_rate_t requiredSampleRate)
+{
+	const f_cnt_t dst_frames = static_cast<f_cnt_t>( inputData.size ()/
+					(float) inputSampleRate * (float) requiredSampleRate );
+	DataVector outputData(dst_frames);
+
+	// yeah, libsamplerate, let's rock with sinc-interpolation!
+	int error;
+	SRC_STATE * state;
+	if( ( state = src_new( SRC_SINC_MEDIUM_QUALITY,
+					DEFAULT_CHANNELS, &error ) ) != NULL )
+	{
+		SRC_DATA src_data;
+		src_data.end_of_input = 1;
+		src_data.data_in = libSampleRateSrc(inputData.data ())->data ();
+		src_data.data_out = outputData.data ()->data();
+		src_data.input_frames = inputData.size ();
+		src_data.output_frames = dst_frames;
+		src_data.src_ratio = (double) inputSampleRate / requiredSampleRate;
+		if( ( error = src_process( state, &src_data ) ) )
+		{
+			printf( "SampleBuffer: error while resampling: %s\n",
+							src_strerror( error ) );
+		}
+		src_delete( state );
+	}
+	else
+	{
+		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
+	}
+
+	return outputData;
+}
 
 
-f_cnt_t SampleBuffer::decodeSampleSF(QString _f,
-					sample_t * & _buf,
+SampleBuffer::DataVector SampleBuffer::decodeSampleSF( QString _f,
 					ch_cnt_t & _channels,
-					sample_rate_t & _samplerate )
+					sample_rate_t &_samplerate)
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
 	sf_info.format = 0;
 	f_cnt_t frames = 0;
+	DataVector vector;
 	bool sf_rr = false;
 
 
@@ -402,9 +312,20 @@ f_cnt_t SampleBuffer::decodeSampleSF(QString _f,
 	if( ( snd_file = sf_open_fd( f.handle(), SFM_READ, &sf_info, false ) ) != NULL )
 	{
 		frames = sf_info.frames;
+		vector.resize (frames);
+		sf_rr = sf_read_float( snd_file, vector.data ()->data (), DEFAULT_CHANNELS * frames );
 
-		_buf = new sample_t[sf_info.channels * frames];
-		sf_rr = sf_read_float( snd_file, _buf, sf_info.channels * frames );
+		if (sf_info.channels != DEFAULT_CHANNELS) {
+#ifdef DEBUG_LMMS
+			qDebug( "SampleBuffer::decodeSampleSF(): Not a stereo file: %s: %s", _f, sf_strerror( NULL ) );
+#endif
+
+			_channels = sf_info.channels;
+			_samplerate = sf_info.samplerate;
+
+			sf_close( snd_file );
+			return vector;
+		}
 
 		if( sf_rr < sf_info.channels * frames )
 		{
@@ -427,14 +348,7 @@ f_cnt_t SampleBuffer::decodeSampleSF(QString _f,
 	}
 	f.close();
 
-	//write down either directly or convert i->f depending on file type
-
-	if ( frames > 0 && _buf != NULL )
-	{
-		directFloatWrite ( _buf, frames, _channels);
-	}
-
-	return frames;
+	return vector;
 }
 
 
@@ -492,10 +406,9 @@ long qfileTellCallback( void * _udata )
 
 
 
-f_cnt_t SampleBuffer::decodeSampleOGGVorbis( QString _f,
-						int_sample_t * & _buf,
+SampleBuffer::DataVector SampleBuffer::decodeSampleOGGVorbis(QString _f,
 						ch_cnt_t & _channels,
-						sample_rate_t & _samplerate )
+						sample_rate_t & _samplerate)
 {
 	static ov_callbacks callbacks =
 	{
@@ -513,7 +426,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis( QString _f,
 	if( f->open( QFile::ReadOnly ) == false )
 	{
 		delete f;
-		return 0;
+		return {};
 	}
 
 	int err = ov_open_callbacks( f, &vf, NULL, 0, callbacks );
@@ -544,7 +457,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis( QString _f,
 				break;
 		}
 		delete f;
-		return 0;
+		return {};
 	}
 
 	ov_pcm_seek( &vf, 0 );
@@ -554,7 +467,7 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis( QString _f,
 
 	ogg_int64_t total = ov_pcm_total( &vf, -1 );
 
-	_buf = new int_sample_t[total * _channels];
+	auto _buf = new int_sample_t[total * _channels];
 	int bitstream = 0;
 	long bytes_read = 0;
 
@@ -578,30 +491,29 @@ f_cnt_t SampleBuffer::decodeSampleOGGVorbis( QString _f,
 
 	if ( frames > 0 && _buf != NULL )
 	{
-		convertIntToFloat ( _buf, frames, _channels);
+		return convertIntToFloat ( _buf, frames, _channels);
 	}
 
-	return frames;
+	return {};
 }
 #endif
 
 
 
 
-f_cnt_t SampleBuffer::decodeSampleDS( QString _f,
-						int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _samplerate )
+SampleBuffer::DataVector SampleBuffer::decodeSampleDS(QString _f, ch_cnt_t & _channels,
+						sample_rate_t & _samplerate)
 {
 	DrumSynth ds;
+	int_sample_t *_buf = NULL;
 	f_cnt_t frames = ds.GetDSFileSamples( _f, _buf, _channels, _samplerate );
 
 	if ( frames > 0 && _buf != NULL )
 	{
-		convertIntToFloat ( _buf, frames, _channels);
+		return convertIntToFloat ( _buf, frames, _channels);
 	}
 
-	return frames;
+	return {};
 
 }
 
@@ -941,9 +853,10 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 			( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
 		++n;
 	}
+
 	_p.setRenderHint( QPainter::Antialiasing );
-	_p.drawPolyline( l, nb_frames / fpp );
-	_p.drawPolyline( r, nb_frames / fpp );
+	_p.drawPolyline( l, (n-first-1) );
+	_p.drawPolyline( r, (n-first-1) );
 	delete[] l;
 	delete[] r;
 }
@@ -1053,306 +966,41 @@ QString SampleBuffer::openAndSetWaveformFile()
 
 
 
-#undef LMMS_HAVE_FLAC_STREAM_ENCODER_H	/* not yet... */
-#undef LMMS_HAVE_FLAC_STREAM_DECODER_H
-
-#ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
-FLAC__StreamEncoderWriteStatus flacStreamEncoderWriteCallback(
-					const FLAC__StreamEncoder *
-								/*_encoder*/,
-					const FLAC__byte _buffer[],
-					unsigned int/* _samples*/,
-					unsigned int _bytes,
-					unsigned int/* _current_frame*/,
-					void * _client_data )
-{
-/*	if( _bytes == 0 )
-	{
-		return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
-	}*/
-	return ( static_cast<QBuffer *>( _client_data )->write(
-				(const char *) _buffer, _bytes ) ==
-								(int) _bytes ) ?
-				FLAC__STREAM_ENCODER_WRITE_STATUS_OK :
-				FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
-}
-
-
-void flacStreamEncoderMetadataCallback( const FLAC__StreamEncoder *,
-					const FLAC__StreamMetadata * _metadata,
-					void * _client_data )
-{
-	QBuffer * b = static_cast<QBuffer *>( _client_data );
-	b->seek( 0 );
-	b->write( (const char *) _metadata, sizeof( *_metadata ) );
-}
-
-#endif
-
-
-
 QString & SampleBuffer::toBase64( QString & _dst ) const
 {
-#ifdef LMMS_HAVE_FLAC_STREAM_ENCODER_H
-	const f_cnt_t FRAMES_PER_BUF = 1152;
-
-	FLAC__StreamEncoder * flac_enc = FLAC__stream_encoder_new();
-	FLAC__stream_encoder_set_channels( flac_enc, DEFAULT_CHANNELS );
-	FLAC__stream_encoder_set_blocksize( flac_enc, FRAMES_PER_BUF );
-/*	FLAC__stream_encoder_set_do_exhaustive_model_search( flac_enc, true );
-	FLAC__stream_encoder_set_do_mid_side_stereo( flac_enc, true );*/
-	FLAC__stream_encoder_set_sample_rate( flac_enc,
-					Engine::mixer()->sampleRate() );
-	QBuffer ba_writer;
-	ba_writer.open( QBuffer::WriteOnly );
-
-	FLAC__stream_encoder_set_write_callback( flac_enc,
-					flacStreamEncoderWriteCallback );
-	FLAC__stream_encoder_set_metadata_callback( flac_enc,
-					flacStreamEncoderMetadataCallback );
-	FLAC__stream_encoder_set_client_data( flac_enc, &ba_writer );
-	if( FLAC__stream_encoder_init( flac_enc ) != FLAC__STREAM_ENCODER_OK )
-	{
-		printf( "error within FLAC__stream_encoder_init()!\n" );
-	}
-	f_cnt_t frame_cnt = 0;
-	while( frame_cnt < m_frames )
-	{
-		f_cnt_t remaining = qMin<f_cnt_t>( FRAMES_PER_BUF,
-							m_frames - frame_cnt );
-		FLAC__int32 buf[FRAMES_PER_BUF * DEFAULT_CHANNELS];
-		for( f_cnt_t f = 0; f < remaining; ++f )
-		{
-			for( ch_cnt_t ch = 0; ch < DEFAULT_CHANNELS; ++ch )
-			{
-				buf[f*DEFAULT_CHANNELS+ch] = (FLAC__int32)(
-					Mixer::clip( m_data[f+frame_cnt][ch] ) *
-						OUTPUT_SAMPLE_MULTIPLIER );
-			}
-		}
-		FLAC__stream_encoder_process_interleaved( flac_enc, buf,
-								remaining );
-		frame_cnt += remaining;
-	}
-	FLAC__stream_encoder_finish( flac_enc );
-	FLAC__stream_encoder_delete( flac_enc );
-	printf("%d %d\n", frame_cnt, (int)ba_writer.size() );
-	ba_writer.close();
-
-	base64::encode( ba_writer.buffer().data(), ba_writer.buffer().size(),
-									_dst );
-
-
-#else	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
-
 	base64::encode( (const char *) data (),
 					frames () * sizeof( sampleFrame ), _dst );
-
-#endif	/* LMMS_HAVE_FLAC_STREAM_ENCODER_H */
 
 	return _dst;
 }
 
 
-
-
-std::unique_ptr<SampleBuffer> SampleBuffer::resample(const sample_rate_t _src_sr,
-													const sample_rate_t _dst_sr )
-{
-	const f_cnt_t dst_frames = static_cast<f_cnt_t>( frames ()/
-					(float) _src_sr * (float) _dst_sr );
-	DataVector outputData(dst_frames);
-
-	// yeah, libsamplerate, let's rock with sinc-interpolation!
-	int error;
-	SRC_STATE * state;
-	if( ( state = src_new( SRC_SINC_MEDIUM_QUALITY,
-					DEFAULT_CHANNELS, &error ) ) != NULL )
-	{
-		SRC_DATA src_data;
-		src_data.end_of_input = 1;
-		src_data.data_in = libSampleRateSrc(data ())->data ();
-		src_data.data_out = outputData.data ()->data();
-		src_data.input_frames = frames ();
-		src_data.output_frames = dst_frames;
-		src_data.src_ratio = (double) _dst_sr / _src_sr;
-		if( ( error = src_process( state, &src_data ) ) )
-		{
-			printf( "SampleBuffer: error while resampling: %s\n",
-							src_strerror( error ) );
-		}
-		src_delete( state );
-	}
-	else
-	{
-		printf( "Error: src_new() failed in sample_buffer.cpp!\n" );
-	}
-
-	return std::unique_ptr<SampleBuffer>(new SampleBuffer(std::move(outputData)));
-}
-
-
-
-
 void SampleBuffer::setAudioFile( const QString & _audio_file )
 {
-	m_audioFile = tryToMakeRelative( _audio_file );
-	update();
+	changeAudioFile (_audio_file, true, false);
 }
 
 
 
-#ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
-
-struct flacStreamDecoderClientData
-{
-	QBuffer * read_buffer;
-	QBuffer * write_buffer;
-} ;
-
-
-
-FLAC__StreamDecoderReadStatus flacStreamDecoderReadCallback(
-					const FLAC__StreamDecoder *
-								/*_decoder*/,
-					FLAC__byte * _buffer,
-					unsigned int * _bytes,
-					void * _client_data )
-{
-	int res = static_cast<flacStreamDecoderClientData *>(
-					_client_data )->read_buffer->read(
-						(char *) _buffer, *_bytes );
-
-	if( res > 0 )
-	{
-		*_bytes = res;
-		return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
-
-	}
-	*_bytes = 0;
-	return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
-}
-
-
-
-
-FLAC__StreamDecoderWriteStatus flacStreamDecoderWriteCallback(
-					const FLAC__StreamDecoder *
-								/*_decoder*/,
-					const FLAC__Frame * _frame,
-					const FLAC__int32 * const _buffer[],
-					void * _client_data )
-{
-	if( _frame->header.channels != 2 )
-	{
-		printf( "channels != 2 in "
-					"flacStreamDecoderWriteCallback()\n" );
-		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
-	}
-
-	if( _frame->header.bits_per_sample != 16 )
-	{
-		printf( "bits_per_sample != 16 in "
-					"flacStreamDecoderWriteCallback()\n" );
-		return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
-	}
-
-	const f_cnt_t frames = _frame->header.blocksize;
-	for( f_cnt_t frame = 0; frame < frames; ++frame )
-	{
-		sampleFrame sframe = { _buffer[0][frame] /
-						OUTPUT_SAMPLE_MULTIPLIER,
-					_buffer[1][frame] /
-						OUTPUT_SAMPLE_MULTIPLIER
-					} ;
-		static_cast<flacStreamDecoderClientData *>(
-					_client_data )->write_buffer->write(
-				(const char *) sframe, sizeof( sframe ) );
-	}
-	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
-}
-
-
-void flacStreamDecoderMetadataCallback( const FLAC__StreamDecoder *,
-					const FLAC__StreamMetadata *,
-					void * /*_client_data*/ )
-{
-	printf("stream decoder metadata callback\n");
-/*	QBuffer * b = static_cast<QBuffer *>( _client_data );
-	b->seek( 0 );
-	b->write( (const char *) _metadata, sizeof( *_metadata ) );*/
-}
-
-
-void flacStreamDecoderErrorCallback( const FLAC__StreamDecoder *,
-					FLAC__StreamDecoderErrorStatus _status,
-					void * /*_client_data*/ )
-{
-	printf("error callback! %d\n", _status);
-	// what to do now??
-}
-
-#endif
-
-
-void SampleBuffer::loadFromBase64( const QString & _data )
+void SampleBuffer::loadFromBase64( const QString & _data ,  bool shouldLock)
 {
 	char * dst = NULL;
 	int dsize = 0;
 	base64::decode( _data, &dst, &dsize );
 
-#ifdef LMMS_HAVE_FLAC_STREAM_DECODER_H
-
-	QByteArray orig_data = QByteArray::fromRawData( dst, dsize );
-	QBuffer ba_reader( &orig_data );
-	ba_reader.open( QBuffer::ReadOnly );
-
-	QBuffer ba_writer;
-	ba_writer.open( QBuffer::WriteOnly );
-
-	flacStreamDecoderClientData cdata = { &ba_reader, &ba_writer } ;
-
-	FLAC__StreamDecoder * flac_dec = FLAC__stream_decoder_new();
-
-	FLAC__stream_decoder_set_read_callback( flac_dec,
-					flacStreamDecoderReadCallback );
-	FLAC__stream_decoder_set_write_callback( flac_dec,
-					flacStreamDecoderWriteCallback );
-	FLAC__stream_decoder_set_error_callback( flac_dec,
-					flacStreamDecoderErrorCallback );
-	FLAC__stream_decoder_set_metadata_callback( flac_dec,
-					flacStreamDecoderMetadataCallback );
-	FLAC__stream_decoder_set_client_data( flac_dec, &cdata );
-
-	FLAC__stream_decoder_init( flac_dec );
-
-	FLAC__stream_decoder_process_until_end_of_stream( flac_dec );
-
-	FLAC__stream_decoder_finish( flac_dec );
-	FLAC__stream_decoder_delete( flac_dec );
-
-	ba_reader.close();
-
-	orig_data = ba_writer.buffer();
-	printf("%d\n", (int) orig_data.size() );
-
-	m_origFrames = orig_data.size() / sizeof( sampleFrame );
-	MM_FREE( m_origData );
-	m_origData = MM_ALLOC( sampleFrame, m_origFrames );
-	memcpy( m_origData, orig_data.data(), orig_data.size() );
-
-#else /* LMMS_HAVE_FLAC_STREAM_DECODER_H */
-
-	m_origData.resize (dsize / sizeof( sampleFrame ));
-	memcpy (m_origData.data (),
+	DataVector input(dsize / sizeof(sampleFrame));
+	memcpy (input.data (),
 			dst,
-			m_origData.size ());
-#endif
+			input.size () * sizeof (sampleFrame));
 
 	delete[] dst;
 
+	beginBufferChange (shouldLock);
+	m_data = std::move(input);
 	m_audioFile = QString();
-	update();
+	doneBufferChange (shouldLock,
+					  true,
+					  sampleRate ());
 }
 
 
@@ -1377,20 +1025,9 @@ void SampleBuffer::setEndFrame( const f_cnt_t _e )
 void SampleBuffer::setAmplification( float _a )
 {
 	m_amplification = _a;
+
 	emit sampleUpdated();
 }
-
-
-
-
-void SampleBuffer::setReversed( bool _on )
-{
-	m_reversed = _on;
-	update( true );
-}
-
-
-
 
 QString SampleBuffer::tryToMakeRelative( const QString & file )
 {
@@ -1447,32 +1084,6 @@ QString SampleBuffer::tryToMakeAbsolute(const QString& file)
 	return file;
 }
 
-void SampleBuffer::addData(const DataVector::iterator begin, const DataVector::iterator end) {
-	// First of all, don't let anyone read.
-	m_varLock.lockForWrite ();
-	{
-		// Insert to the end of the vector.
-		m_data.insert (m_data.end (), begin, end);
-
-		m_data.swap (m_origData);
-		m_data.clear ();
-	}
-	m_varLock.unlock ();
-
-	update ();
-}
-
-void SampleBuffer::resetData(DataVector &&newData) {
-	m_varLock.lockForWrite ();
-	{
-		m_data.clear ();
-		m_origData = std::move (newData);
-	}
-	m_varLock.unlock ();
-
-	update ();
-}
-
 SampleBuffer::handleState::handleState( bool _varying_pitch, int interpolation_mode ) :
 	m_frameIndex( 0 ),
 	m_varyingPitch( _varying_pitch ),
@@ -1493,4 +1104,94 @@ SampleBuffer::handleState::handleState( bool _varying_pitch, int interpolation_m
 SampleBuffer::handleState::~handleState()
 {
 	src_delete( m_resamplingData );
+}
+
+void SampleBuffer::beginBufferChange(bool shouldLock, bool shouldLockMixer)
+{
+	if (shouldLockMixer) {
+		Engine::mixer ()->requestChangeInModel ();
+	}
+
+	if (shouldLock) {
+		m_varLock.lockForWrite ();
+	}
+}
+
+void SampleBuffer::doneBufferChange(bool shouldUnlock,
+									bool shouldKeepSettings,
+									sample_rate_t bufferSampleRate,
+									bool shouldUnlockMixer) {
+
+	normalizeSampleRate (bufferSampleRate, shouldKeepSettings);
+
+	// TODO: reverse- and amplification-property is not covered
+	// by following code...
+	auto previousFrames = frames ();
+	if( shouldKeepSettings == false ) {
+		m_loopStartFrame = m_startFrame = 0;
+		m_loopEndFrame = m_endFrame = frames ();
+	} else {
+		m_data.resize (previousFrames);
+	}
+
+	if (shouldUnlock) {
+		m_varLock.unlock ();
+	}
+
+	if (shouldUnlockMixer) {
+		Engine::mixer ()->doneChangeInModel ();
+	}
+
+	emit sampleUpdated();
+}
+
+void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer) {
+	DataVector newVector;
+
+	if (sampleRate != m_sampleRate) {
+		// We should resample this data;
+
+		newVector = resampleData (vector, sampleRate, m_sampleRate);
+	}
+
+	// First of all, don't let anyone read.
+	beginBufferChange (true, shouldLockMixer);
+	{
+		if (! newVector.empty()) {
+			// Insert to the end of the resampled vector.
+			m_data.reserve (m_data.size () + newVector.size ());
+			m_data.insert (m_data.end (), newVector.cbegin (), newVector.cend ());
+		} else {
+			// Insert to the end of the vector.
+			m_data.reserve (m_data.size () + (vector.size ()));
+			m_data.insert (m_data.end (), vector.cbegin (), vector.cend ());
+		}
+	}
+	doneBufferChange (true, /* lock */
+					  true, /* save settings */
+					  this->sampleRate(),
+					  shouldLockMixer);
+}
+
+void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer) {
+	beginBufferChange (true, shouldLockMixer);
+	{
+		m_audioFile = QString();
+		m_data = std::move (newData);
+	}
+	doneBufferChange (true, /* lock */
+					  false, /* save settings */
+					  dataSampleRate,
+					  shouldLockMixer);
+}
+
+void SampleBuffer::reverse(bool shouldLockMixer) {
+	beginBufferChange (true, shouldLockMixer);
+	{
+		std::reverse(m_data.begin (), m_data.end ());
+	}
+	doneBufferChange (true, /* should(Un)Lock? yes! */
+					  true, /* should we restore settings? */
+					  sampleRate (), /* we have not made any change in the sample rate. */
+					  shouldLockMixer);
 }
