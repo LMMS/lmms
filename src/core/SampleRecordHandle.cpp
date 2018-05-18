@@ -35,7 +35,6 @@
 SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTimeOffset) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
-	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
 	m_bbTrack( NULL ),
 	m_tco( tco ),
@@ -83,12 +82,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	}
 
 	m_framesRecorded += frames;
-
-	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
-	if( len > m_minLength )
-	{
-		m_minLength = len;
-	}
+	m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
 }
 
 
@@ -96,7 +90,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 bool SampleRecordHandle::isFinished() const
 {
-	return false;
+	return !m_tco->getAutoResize () && (m_startRecordTimeOffset + m_timeRecorded) >= m_tco->length ();
 }
 
 
