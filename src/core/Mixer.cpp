@@ -397,7 +397,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 		if( it != m_playHandles.end() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if ((*it )->audioPort())
+				( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
