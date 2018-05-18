@@ -346,7 +346,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 			}
 		}
 
-		sampleFrame * data = new sampleFrame[frames];
+		SampleBuffer::DataVector data(frames);
 
 		for( f_cnt_t frame = 0; frame < frames; ++frame )
 		{
@@ -357,9 +357,8 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 			}
 		}
 
-		SampleBuffer* psample = new SampleBuffer( data, frames );
+		SampleBuffer* psample = new SampleBuffer( std::move(data), sample_rate );
 		psample->setFrequency( root_freq / 1000.0f );
-		psample->setSampleRate( sample_rate );
 
 		if( modes & MODES_LOOPING )
 		{
@@ -370,7 +369,6 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 		m_patchSamples.push_back( psample );
 
 		delete[] wave_samples;
-		delete[] data;
 	}
 	fclose( fd );
 	return( LoadOK );

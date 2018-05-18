@@ -247,7 +247,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
+		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) , true);
 	}
 
 	m_loopModel.loadSettings( _this, "looped" );
@@ -267,6 +267,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 
 	m_reverseModel.loadSettings( _this, "reversed" );
+	// The current state of m_sampleBuffer.
+	m_isCurrentlyReversed = m_reverseModel.value ();
 
 	m_stutterModel.loadSettings( _this, "stutter" );
 	if( _this.hasAttribute( "interp" ) )
@@ -343,7 +345,12 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 
 void audioFileProcessor::reverseModelChanged( void )
 {
-	m_sampleBuffer.setReversed( m_reverseModel.value() );
+	if (m_reverseModel.value () != m_isCurrentlyReversed) {
+		m_isCurrentlyReversed = m_reverseModel.value ();
+
+		m_sampleBuffer.reverse (true);
+	}
+
 	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
 	m_nextPlayBackwards = false;
 }
@@ -784,7 +791,6 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_endKnob( 0 ),
 	m_loopKnob( 0 ),
 	m_isDragging( false ),
-	m_reversed( false ),
 	m_framesPlayed( 0 ),
 	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
 {
@@ -1063,11 +1069,7 @@ void AudioFileProcessorWaveView::updateGraph()
 		m_to = m_sampleBuffer.endFrame();
 	}
 
-	if( m_sampleBuffer.reversed() != m_reversed )
-	{
-		reverse();
-	}
-	else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
+	if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
 	{
 		return;
 	}
@@ -1239,24 +1241,6 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 	if( m_loopKnob ) {
 		m_loopKnob->slideBy( v, false );
 	}
-}
-
-
-
-
-void AudioFileProcessorWaveView::reverse()
-{
-	slideSampleByFrames(
-		m_sampleBuffer.frames()
-			- m_sampleBuffer.endFrame()
-			- m_sampleBuffer.startFrame()
-	);
-
-	const f_cnt_t from = m_from;
-	m_from = m_sampleBuffer.frames() - m_to;
-	m_to = m_sampleBuffer.frames() - from;
-
-	m_reversed = ! m_reversed;
 }
 
 

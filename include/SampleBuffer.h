@@ -111,9 +111,7 @@ public:
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
 	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
-	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	explicit SampleBuffer( const f_cnt_t _frames );
-	SampleBuffer(SampleBuffer::DataVector &&movedData);
+	SampleBuffer(DataVector &&movedData, sample_rate_t sampleRate);
 
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
@@ -179,11 +177,6 @@ public:
 		return m_amplification;
 	}
 
-	inline bool reversed() const
-	{
-		return m_reversed;
-	}
-
 	inline float frequency() const
 	{
 		return m_frequency;
@@ -219,12 +212,6 @@ public:
 	QString openAndSetWaveformFile();
 
 	QString & toBase64( QString & _dst ) const;
-
-
-	// protect calls from the GUI to this function with dataReadLock() and
-	// dataUnlock()
-	SampleBuffer resample( const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr );
 
 	void normalizeSampleRate( const sample_rate_t _src_sr,
 						bool _keep_settings = false );
@@ -265,28 +252,42 @@ public:
 
 	/**
 	 * @brief Add data to the buffer,
-	 * @param begin	Begining of an InputIterator.
+	 * @param begin	Beginning of an InputIterator.
 	 * @param end	End of an InputIterator.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
 	 *
 	 * @warning That locks m_varLock for write.
 	 */
-	void addData(const DataVector::iterator begin, const DataVector::iterator end);
+	void addData(const DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer=true);
 
-	void resetData(DataVector &&newData);
+	/**
+	 * @brief Reset the class and initialize it with @a newData.
+	 * @param newData	mm, that's the new data.
+	 * @param dataSampleRate	Sample rate for @a newData.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 */
+	void resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer=true);
+
+	/**
+	 * @brief Just reverse the current buffer.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 *
+	 * This function simply calls `std::reverse` on m_data.
+	 */
+	void reverse(bool shouldLockMixer=true);
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
-	void loadFromBase64( const QString & _data );
+	void loadFromBase64(const QString & _data , bool shouldLock);
 	void setStartFrame( const f_cnt_t _s );
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
-	void setReversed( bool _on );
 	void sampleRateChanged();
 
-private:
+protected:
 	// HACK: libsamplerate < 0.1.8 doesn't get read-only variables
 	//	     as const. It has been fixed in 0.1.9 but has not been
-	//		 shipped for some destributions.
+	//		 shipped for some distributions.
 	//		 This function just returns a variable that should have
 	//		 been `const` as non-const to bypass using 0.1.9.
 	inline static sampleFrame * libSampleRateSrc (const sampleFrame *ptr)
@@ -294,22 +295,17 @@ private:
 		return const_cast<sampleFrame*>(ptr);
 	}
 
-	void update( bool _keep_settings = false );
+	void changeAudioFile (QString audioFile, bool shouldLock, bool shouldKeepSettings);
 
-	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	static DataVector convertIntToFloat(int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 
-	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	static DataVector decodeSampleSF( const char * _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis( const char * _f, int_sample_t * & _buf,
+	static DataVector decodeSampleOGGVorbis( const char * _f,
 						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+						sample_rate_t & _sample_rate);
 #endif
-	f_cnt_t decodeSampleDS( const char * _f, int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	static DataVector decodeSampleDS( const char * _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
 
 	inline sampleFrame * data()
 	{
@@ -317,7 +313,6 @@ private:
 	}
 
 	QString m_audioFile;
-	DataVector m_origData;
 	DataVector m_data;
 	QReadWriteLock m_varLock;
 	f_cnt_t m_startFrame;
@@ -325,7 +320,6 @@ private:
 	f_cnt_t m_loopStartFrame;
 	f_cnt_t m_loopEndFrame;
 	float m_amplification;
-	bool m_reversed;
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
@@ -339,6 +333,25 @@ private:
 	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 
 
+	static DataVector resampleData(const DataVector &inputData, sample_rate_t inputSampleRate, sample_rate_t requiredSampleRate);
+
+	/**
+	 * @brief Do the actions necessary before changing m_data.
+	 * @param shouldLock	Is anyone else might be using m_data?
+	 */
+	void beginBufferChange (bool shouldLock, bool shouldLockMixer=true);
+
+	/**
+	 * @brief Do some actions necessary after changing m_data.
+	 * @param shoguldLock	The same value you've used on @a beginBufferChange.
+	 * @param shouldKeepSettings	Should we keep playback settings?
+	 * @param bufferSampleRate		The new m_data's sample rate.
+	 * @param shouldNotNotify		Should we not notify anyone about this change?
+	 */
+	void doneBufferChange (bool shouldLock,
+						   bool shouldKeepSettings,
+						   sample_rate_t bufferSampleRate,
+						   bool shouldLockMixer=true);
 signals:
 	void sampleUpdated();
 

@@ -102,6 +102,15 @@ private:
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
 
+	/**
+	 * @brief Is currently m_sampleBuffer reversed?
+	 *
+	 * Since m_sampleBuffer has no longer the `reversed`
+	 * attribute, we track it here; m_reverseModel is
+	 * only what the user want it to be.
+	 */
+	bool m_isCurrentlyReversed = false;
+
 	friend class AudioFileProcessorView;
 
 } ;
