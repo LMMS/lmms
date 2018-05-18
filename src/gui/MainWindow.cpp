@@ -561,33 +561,33 @@ void MainWindow::finalize()
 			"for managing effects for your song. You can insert "
 			"effects into different effect-channels." ) );
 
+	ToolButton * controllers_window = new ToolButton(
+					embed::getIconPixmap( "controller" ),
+					tr( "Show/hide controller rack" ) +
+								" (F10)",
+					this, SLOT( toggleControllerRack() ),
+								m_toolBar );
+	controllers_window->setShortcut( Qt::Key_F10 );
+
 	ToolButton * project_notes_window = new ToolButton(
 					embed::getIconPixmap( "project_notes" ),
 					tr( "Show/hide project notes" ) +
-								" (F10)",
+								" (F11)",
 					this, SLOT( toggleProjectNotesWin() ),
 								m_toolBar );
-	project_notes_window->setShortcut( Qt::Key_F10 );
+	project_notes_window->setShortcut( Qt::Key_F11 );
 	project_notes_window->setWhatsThis(
 		tr( "Click here to show or hide the "
 			"project notes window. In this window you can put "
 			"down your project notes.") );
-
-	ToolButton * controllers_window = new ToolButton(
-					embed::getIconPixmap( "controller" ),
-					tr( "Show/hide controller rack" ) +
-								" (F11)",
-					this, SLOT( toggleControllerRack() ),
-								m_toolBar );
-	controllers_window->setShortcut( Qt::Key_F11 );
 
 	m_toolBarLayout->addWidget( song_editor_window, 1, 1 );
 	m_toolBarLayout->addWidget( bb_editor_window, 1, 2 );
 	m_toolBarLayout->addWidget( piano_roll_window, 1, 3 );
 	m_toolBarLayout->addWidget( automation_editor_window, 1, 4 );
 	m_toolBarLayout->addWidget( fx_mixer_window, 1, 5 );
-	m_toolBarLayout->addWidget( project_notes_window, 1, 6 );
-	m_toolBarLayout->addWidget( controllers_window, 1, 7 );
+	m_toolBarLayout->addWidget( controllers_window, 1, 6 );
+	m_toolBarLayout->addWidget( project_notes_window, 1, 7 );
 	m_toolBarLayout->setColumnStretch( 100, 1 );
 
 	// setup-dialog opened before?
@@ -1227,14 +1227,13 @@ void MainWindow::updateViewMenu()
 			      tr( "FX Mixer" ) + " (F9)",
 			      this, SLOT( toggleFxMixerWin() )
 		);
-	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
-			      tr( "Project Notes" ) +	" (F10)",
-			      this, SLOT( toggleProjectNotesWin() )
-		);
 	m_viewMenu->addAction(embed::getIconPixmap( "controller" ),
-			      tr( "Controller Rack" ) +
-			      " (F11)",
+			      tr( "Controller Rack" ) + " (F10)",
 			      this, SLOT( toggleControllerRack() )
+		);
+	m_viewMenu->addAction(embed::getIconPixmap( "project_notes" ),
+			      tr( "Project Notes" ) + " (F11)",
+			      this, SLOT( toggleProjectNotesWin() )
 		);
 
 	m_viewMenu->addSeparator();
@@ -1497,43 +1496,32 @@ void MainWindow::fillTemplatesMenu()
 {
 	m_templatesMenu->clear();
 
-	QDir user_d( ConfigManager::inst()->userTemplateDir() );
-	QStringList templates = user_d.entryList( QStringList( "*.mpt" ),
-						QDir::Files | QDir::Readable );
+	auto addTemplatesFromDir = [this]( QDir dir ) {
+		QStringList templates = dir.entryList( QStringList( "*.mpt" ),
+							QDir::Files | QDir::Readable );
 
-	m_custom_templates_count = templates.count();
-	for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-	{
-		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ) );
+		if ( templates.size() && ! m_templatesMenu->actions().isEmpty() )
+		{
+			m_templatesMenu->addSeparator();
+		}
+
+		for( QStringList::iterator it = templates.begin();
+							it != templates.end(); ++it )
+		{
+			m_templatesMenu->addAction(
+						embed::getIconPixmap( "project_file" ),
+						( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
 #ifdef LMMS_BUILD_APPLE
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
+			m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
+			m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
 #endif
-	}
+		}
 
-	QDir d( ConfigManager::inst()->factoryProjectsDir() + "templates" );
-	templates = d.entryList( QStringList( "*.mpt" ),
-						QDir::Files | QDir::Readable );
+		return templates.size();
+	};
 
-
-	if( m_custom_templates_count > 0 && !templates.isEmpty() )
-	{
-		m_templatesMenu->addSeparator();
-	}
-	for( QStringList::iterator it = templates.begin();
-						it != templates.end(); ++it )
-	{
-		m_templatesMenu->addAction(
-					embed::getIconPixmap( "project_file" ),
-					( *it ).left( ( *it ).length() - 4 ).replace("&", "&&") );
-#ifdef LMMS_BUILD_APPLE
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(false); // QTBUG-44565 workaround
-		m_templatesMenu->actions().last()->setIconVisibleInMenu(true);
-#endif
-	}
+	m_custom_templates_count = addTemplatesFromDir( ConfigManager::inst()->userTemplateDir() );
+	addTemplatesFromDir( ConfigManager::inst()->factoryProjectsDir() + "templates" );
 }
 
 

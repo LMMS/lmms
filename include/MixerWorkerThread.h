@@ -25,9 +25,9 @@
 #ifndef MIXER_WORKER_THREAD_H
 #define MIXER_WORKER_THREAD_H
 
-#include <AtomicInt.h>
-#include <QtCore/QAtomicPointer>
 #include <QtCore/QThread>
+
+#include <atomic>
 
 class QWaitCondition;
 class Mixer;
@@ -46,12 +46,14 @@ public:
 			Dynamic	// jobs can be added while processing queue
 		} ;
 
+#define JOB_QUEUE_SIZE 1024
 		JobQueue() :
 			m_items(),
 			m_queueSize( 0 ),
 			m_itemsDone( 0 ),
 			m_opMode( Static )
 		{
+			std::fill(m_items, m_items + JOB_QUEUE_SIZE, nullptr);
 		}
 
 		void reset( OperationMode _opMode );
@@ -62,10 +64,9 @@ public:
 		void wait();
 
 	private:
-#define JOB_QUEUE_SIZE 1024
-		QAtomicPointer<ThreadableJob> m_items[JOB_QUEUE_SIZE];
-		AtomicInt m_queueSize;
-		AtomicInt m_itemsDone;
+		std::atomic<ThreadableJob*> m_items[JOB_QUEUE_SIZE];
+		std::atomic_int m_queueSize;
+		std::atomic_int m_itemsDone;
 		OperationMode m_opMode;
 
 	} ;

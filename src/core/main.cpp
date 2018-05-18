@@ -29,6 +29,7 @@
 
 #include "denormals.h"
 
+#include <QDebug>
 #include <QFileInfo>
 #include <QLocale>
 #include <QTimer>
@@ -223,7 +224,17 @@ void fileCheck( QString &file )
 	}
 }
 
+int usageError(const QString& message)
+{
+	qCritical().noquote() << QString("\n%1.\n\nTry \"%2 --help\" for more information.\n\n")
+				   .arg( message ).arg( qApp->arguments()[0] );
+	return EXIT_FAILURE;
+}
 
+int noInputFileError()
+{
+	return usageError( "No input file specified" );
+}
 
 
 int main( int argc, char * * argv )
@@ -328,9 +339,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo input file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return noInputFileError();
 			}
 
 
@@ -366,9 +375,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo input file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return noInputFileError();
 			}
 
 
@@ -385,9 +392,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo input file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return noInputFileError();
 			}
 
 
@@ -404,9 +409,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo output file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No output file specified" );
 			}
 
 
@@ -418,9 +421,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo output format specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No output format specified" );
 			}
 
 
@@ -448,9 +449,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid output format %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid output format %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--samplerate" || arg == "-s" )
@@ -459,9 +458,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo samplerate specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No samplerate specified" );
 			}
 
 
@@ -472,9 +469,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid samplerate %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid samplerate %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--bitrate" || arg == "-b" )
@@ -483,9 +478,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo bitrate specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No bitrate specified" );
 			}
 
 
@@ -499,9 +492,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid bitrate %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid bitrate %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--mode" || arg == "-m" )
@@ -510,9 +501,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo stereo mode specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No stereo mode specified" );
 			}
 
 			QString const mode( argv[i] );
@@ -531,9 +520,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid stereo mode %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid stereo mode %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg =="--float" || arg == "-a" )
@@ -546,9 +533,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo interpolation method specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No interpolation method specified" );
 			}
 
 
@@ -572,9 +557,7 @@ int main( int argc, char * * argv )
 			}
 			else
 			{
-				printf( "\nInvalid interpolation method %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid interpolation method %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--oversampling" || arg == "-x" )
@@ -583,9 +566,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo oversampling specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No oversampling specified" );
 			}
 
 
@@ -606,9 +587,7 @@ int main( int argc, char * * argv )
 		qs.oversampling = Mixer::qualitySettings::Oversampling_8x;
 		break;
 				default:
-				printf( "\nInvalid oversampling %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid oversampling %1" ).arg( argv[i] ) );
 			}
 		}
 		else if( arg == "--import" )
@@ -617,11 +596,8 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo file specified for importing.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No file specified for importing" );
 			}
-
 
 			fileToImport = QString::fromLocal8Bit( argv[i] );
 
@@ -638,9 +614,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo profile specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No profile specified" );
 			}
 
 
@@ -652,9 +626,7 @@ int main( int argc, char * * argv )
 
 			if( i == argc )
 			{
-				printf( "\nNo configuration file specified.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[0] );
-				return EXIT_FAILURE;
+				return usageError( "No configuration file specified" );
 			}
 
 			configFile = QString::fromLocal8Bit( argv[i] );
@@ -663,9 +635,7 @@ int main( int argc, char * * argv )
 		{
 			if( argv[i][0] == '-' )
 			{
-				printf( "\nInvalid option %s.\n\n"
-	"Try \"%s --help\" for more information.\n\n", argv[i], argv[0] );
-				return EXIT_FAILURE;
+				return usageError( QString( "Invalid option %1" ).arg( argv[i] ) );
 			}
 			fileToLoad = QString::fromLocal8Bit( argv[i] );
 		}

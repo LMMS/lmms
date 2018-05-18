@@ -61,12 +61,6 @@ TabWidget::TabWidget( const QString & caption, QWidget * parent, bool usePixmap 
 
 }
 
-
-TabWidget::~TabWidget()
-{
-}
-
-
 void TabWidget::addTab( QWidget * w, const QString & name, const char *pixmap, int idx )
 {
 	setFont( pointSize<8>( font() ) );

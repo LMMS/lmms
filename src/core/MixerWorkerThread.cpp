@@ -24,9 +24,11 @@
 
 #include "MixerWorkerThread.h"
 
-#include "denormals.h"
+#include <xmmintrin.h>
 #include <QMutex>
 #include <QWaitCondition>
+
+#include "denormals.h"
 #include "ThreadableJob.h"
 #include "Mixer.h"
 
@@ -52,7 +54,7 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 		// update job state
 		_job->queue();
 		// actually queue the job via atomic operations
-		m_items[m_queueSize.fetchAndAddOrdered(1)] = _job;
+		m_items[m_queueSize++] = _job;
 	}
 }
 
@@ -61,17 +63,17 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 void MixerWorkerThread::JobQueue::run()
 {
 	bool processedJob = true;
-	while( processedJob && (int) m_itemsDone < (int) m_queueSize )
+	while (processedJob && m_itemsDone < m_queueSize)
 	{
 		processedJob = false;
 		for( int i = 0; i < m_queueSize; ++i )
 		{
-			ThreadableJob * job = m_items[i].fetchAndStoreOrdered( NULL );
+			ThreadableJob * job = m_items[i].exchange(nullptr);
 			if( job )
 			{
 				job->process();
 				processedJob = true;
-				m_itemsDone.fetchAndAddOrdered( 1 );
+				++m_itemsDone;
 			}
 		}
 		// always exit loop if we're not in dynamic mode
@@ -84,7 +86,7 @@ void MixerWorkerThread::JobQueue::run()
 
 void MixerWorkerThread::JobQueue::wait()
 {
-	while( (int) m_itemsDone < (int) m_queueSize )
+	while (m_itemsDone < m_queueSize)
 	{
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 		_mm_pause();

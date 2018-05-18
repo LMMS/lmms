@@ -41,9 +41,8 @@ public:
 		m_orientation( _orientation )
 	{
 	}
-	virtual ~SideBarButton()
-	{
-	}
+
+	virtual ~SideBarButton() = default;
 
 	Qt::Orientation orientation() const
 	{
