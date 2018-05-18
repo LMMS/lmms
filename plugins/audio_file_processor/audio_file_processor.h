@@ -66,6 +66,10 @@ public:
 
 	virtual PluginView * instantiateView( QWidget * _parent );
 
+	bool isReversed () const
+	{
+		return m_isCurrentlyReversed;
+	}
 
 public slots:
 	void setAudioFile( const QString & _audio_file, bool _rename = true );
@@ -101,6 +105,15 @@ private:
 
 	f_cnt_t m_nextPlayStartPoint;
 	bool m_nextPlayBackwards;
+
+	/**
+	 * @brief Is currently m_sampleBuffer reversed?
+	 *
+	 * Since m_sampleBuffer has no longer the `reversed`
+	 * attribute, we track it here; m_reverseModel is
+	 * only what the user want it to be.
+	 */
+	bool m_isCurrentlyReversed = false;
 
 	friend class AudioFileProcessorView;
 
@@ -235,6 +248,7 @@ private:
 		sample_loop
 	} ;
 
+	audioFileProcessor *m_audioFileProcessor;
 	SampleBuffer& m_sampleBuffer;
 	QPixmap m_graph;
 	f_cnt_t m_from;
@@ -256,7 +270,7 @@ private:
 	bool m_animation;
 
 public:
-	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf );
+	AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf, audioFileProcessor *fileProcessor);
 	void setKnobs(knob *_start, knob *_end, knob *_loop );
 
 

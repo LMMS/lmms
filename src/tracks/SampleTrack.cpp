@@ -288,7 +288,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	setSampleFile( _this.attribute( "src" ) );
 	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
 	{
-		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
+		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ), true);
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
@@ -402,7 +402,7 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
 	{
 		m_tco->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) );
+					StringPairDrag::decodeValue( _de ) , true);
 		m_tco->updateLength();
 		update();
 		_de->accept();

@@ -247,7 +247,7 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
+		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) , true);
 	}
 
 	m_loopModel.loadSettings( _this, "looped" );
@@ -267,6 +267,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 
 	m_reverseModel.loadSettings( _this, "reversed" );
+	// The current state of m_sampleBuffer.
+	m_isCurrentlyReversed = m_reverseModel.value ();
 
 	m_stutterModel.loadSettings( _this, "stutter" );
 	if( _this.hasAttribute( "interp" ) )
@@ -343,7 +345,12 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 
 void audioFileProcessor::reverseModelChanged( void )
 {
-	m_sampleBuffer.setReversed( m_reverseModel.value() );
+	if (m_reverseModel.value () != m_isCurrentlyReversed) {
+		m_isCurrentlyReversed = m_reverseModel.value ();
+
+		m_sampleBuffer.reverse (true);
+	}
+
 	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
 	m_nextPlayBackwards = false;
 }
@@ -602,7 +609,7 @@ void AudioFileProcessorView::newWaveView()
 		delete m_waveView;
 		m_waveView = 0;
 	}
-	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
+	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer, castModel<audioFileProcessor>());
 	m_waveView->move( 2, 172 );
 	m_waveView->setKnobs(
 		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
@@ -729,8 +736,10 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	}
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf ) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, SampleBuffer& buf ,
+													   audioFileProcessor *fileProcessor) :
 	QWidget( _parent ),
+	m_audioFileProcessor{fileProcessor},
 	m_sampleBuffer( buf ),
 	m_graph( QPixmap( _w - 2 * s_padding, _h - 2 * s_padding ) ),
 	m_from( 0 ),
@@ -1004,8 +1013,7 @@ void AudioFileProcessorWaveView::updateGraph()
 		m_to = m_sampleBuffer.endFrame();
 	}
 
-	if( m_sampleBuffer.reversed() != m_reversed )
-	{
+	if(m_audioFileProcessor->isReversed () != m_reversed) {
 		reverse();
 	}
 	else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
