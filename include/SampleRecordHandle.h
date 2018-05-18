@@ -71,7 +71,11 @@ private:
 						const f_cnt_t _frames );
 
 	f_cnt_t m_framesRecorded;
-	MidiTime m_minLength;
+
+	/**
+	 * @brief Total of ticks we've recorded.
+	 */
+	MidiTime m_timeRecorded;
 
 	SampleBuffer::DataVector m_currentBuffer;
 
