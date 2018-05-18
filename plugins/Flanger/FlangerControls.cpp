@@ -43,6 +43,7 @@ FlangerControls::FlangerControls( FlangerEffect *effect ) :
 
 {
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( changedSampleRate() ) );
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( changedPlaybackState() ) );
 }
 
 
@@ -81,3 +82,9 @@ void FlangerControls::changedSampleRate()
 }
 
 
+
+
+void FlangerControls::changedPlaybackState()
+{
+	m_effect->restartLFO();
+}

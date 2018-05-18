@@ -44,6 +44,7 @@ public:
 		return &m_flangerControls;
 	}
 	void changeSampleRate();
+	void restartLFO();
 
 private:
 	FlangerControls m_flangerControls;
