@@ -56,7 +56,7 @@ SET(WINE_CXX_ARGS
 	-L${WINE_LIBRARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/RemoteVstPlugin.cpp
 	-std=c++0x
-	-mwindows -lpthread ${EXTRA_FLAGS} -fno-omit-frame-pointer
+	-mwindows -lpthread -lole32 ${EXTRA_FLAGS} -fno-omit-frame-pointer
 	${WINE_BUILD_FLAGS}
 	-o ../RemoteVstPlugin
 )
