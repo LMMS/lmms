@@ -380,21 +380,11 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 /*	 ### TODO:
 	Old reversed sustain kept for backward compatibility
 	with 4.15 file format*/
-
 	if( _this.hasAttribute( "sus" ) )
 	{
 		m_sustainModel.loadSettings( _this, "sus" );
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
-
-	// ### TODO:
-/*	// Keep compatibility with version 2.1 file format
-	if( _this.hasAttribute( "lfosyncmode" ) )
-	{
-		m_lfoSpeedKnob->setSyncMode(
-		( TempoSyncKnob::TtempoSyncMode ) _this.attribute(
-						"lfosyncmode" ).toInt() );
-	}*/
 
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 

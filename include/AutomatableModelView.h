@@ -36,7 +36,7 @@ class EXPORT AutomatableModelView : public ModelView
 {
 public:
 	AutomatableModelView( Model* model, QWidget* _this );
-	virtual ~AutomatableModelView();
+	virtual ~AutomatableModelView() = default;
 
 	// some basic functions for convenience
 	AutomatableModel* modelUntyped()

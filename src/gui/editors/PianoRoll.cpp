@@ -3296,6 +3296,14 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel.size() - 1 );
+
+		int x = (we->x() - WHITE_KEY_WIDTH)* MidiTime::ticksPerTact();
+		// ticks based on the mouse x-position where the scroll wheel was used
+		int ticks = x / m_ppt;
+		// what would be the ticks in the new zoom level on the very same mouse x
+		int newTicks = x / (DEFAULT_PR_PPT * m_zoomLevels[z]);
+		// scroll so the tick "selected" by the mouse x doesn't move on the screen
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + ticks - newTicks);
 		// update combobox with zooming-factor
 		m_zoomingModel.setValue( z );
 	}
