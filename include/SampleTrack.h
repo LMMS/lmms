@@ -82,8 +82,6 @@ public slots:
 	void setSampleFile( const QString & _sf );
 	void updateLength();
 	void toggleRecord();
-	void playbackPositionChanged();
-	void updateTrackTcos();
 
 
 private slots:
@@ -93,7 +91,6 @@ private:
 	SampleBuffer* m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
-
 
 	friend class SampleTCOView;
 
@@ -185,6 +182,7 @@ public slots:
 	void updateEffectChannel();
 	void beforeRecord ();
 	void toggleRecord();
+	void playbackPositionChanged();
 
 private:
 	IntModel m_recordingChannelModel;
