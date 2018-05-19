@@ -52,8 +52,10 @@ SampleRecordHandle::~SampleRecordHandle()
 
 	// If this is an automatically created tco,
 	// enable resizing.
-	m_tco->setAutoResize (false);
-	m_tco->setRecord( false );
+	if (m_framesRecorded != 0) {
+		m_tco->setAutoResize (false);
+		m_tco->setRecord( false );
+	}
 }
 
 
