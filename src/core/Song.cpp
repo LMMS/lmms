@@ -256,6 +256,9 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
 			emit updateSampleTracks();
+
+			if (isRecording ())
+				emit beforeRecord ();
 		}
 	}
 
@@ -328,6 +331,9 @@ void Song::processNextBuffer()
 				{
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
 					setToTime(tl->loopBegin());
+
+					if (isRecording ())
+						emit beforeRecord ();
 				}
 				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
 				{
