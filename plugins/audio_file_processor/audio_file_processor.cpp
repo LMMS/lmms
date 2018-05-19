@@ -651,7 +651,7 @@ void AudioFileProcessorView::newWaveView()
 		delete m_waveView;
 		m_waveView = 0;
 	}
-	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
+	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer, castModel<audioFileProcessor>());
 	m_waveView->move( 2, 172 );
 	m_waveView->setKnobs(
 		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
@@ -778,8 +778,10 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	}
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf ) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, SampleBuffer& buf ,
+													   audioFileProcessor *fileProcessor) :
 	QWidget( _parent ),
+	m_audioFileProcessor{fileProcessor},
 	m_sampleBuffer( buf ),
 	m_graph( QPixmap( _w - 2 * s_padding, _h - 2 * s_padding ) ),
 	m_from( 0 ),
@@ -1069,7 +1071,9 @@ void AudioFileProcessorWaveView::updateGraph()
 		m_to = m_sampleBuffer.endFrame();
 	}
 
-	if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
+	if(m_audioFileProcessor->isReversed () != m_reversed) {
+		reverse();
+	} else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
 	{
 		return;
 	}
@@ -1086,11 +1090,23 @@ void AudioFileProcessorWaveView::updateGraph()
 		p,
 		QRect( 0, 0, m_graph.width(), m_graph.height() ),
 		m_from, m_to
-	);
+				);
 }
 
+void AudioFileProcessorWaveView::reverse()
+{
+	slideSampleByFrames(
+		m_sampleBuffer.frames()
+			- m_sampleBuffer.endFrame()
+			- m_sampleBuffer.startFrame()
+	);
 
+	const f_cnt_t from = m_from;
+	m_from = m_sampleBuffer.frames() - m_to;
+	m_to = m_sampleBuffer.frames() - from;
 
+	m_reversed = ! m_reversed;
+}
 
 void AudioFileProcessorWaveView::zoom( const bool _out )
 {
