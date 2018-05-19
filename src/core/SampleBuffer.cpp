@@ -246,7 +246,7 @@ void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
 	// do samplerate-conversion to our default-samplerate
 	if( _src_sr != sampleRate ())
 	{
-		m_data = resampleData (m_data, sampleRate (), sampleRate ());
+		m_data = resampleData (m_data, _src_sr, sampleRate ());
 	}
 
 	if( _keep_settings == false )
@@ -1118,10 +1118,10 @@ void SampleBuffer::beginBufferChange(bool shouldLock, bool shouldLockMixer)
 	}
 }
 
-void SampleBuffer::doneBufferChange(bool shouldLock,
+void SampleBuffer::doneBufferChange(bool shouldUnlock,
 									bool shouldKeepSettings,
 									sample_rate_t bufferSampleRate,
-									bool shouldLockMixer) {
+									bool shouldUnlockMixer) {
 
 	normalizeSampleRate (bufferSampleRate, shouldKeepSettings);
 
@@ -1135,11 +1135,11 @@ void SampleBuffer::doneBufferChange(bool shouldLock,
 		m_data.resize (previousFrames);
 	}
 
-	if (shouldLock) {
+	if (shouldUnlock) {
 		m_varLock.unlock ();
 	}
 
-	if (shouldLockMixer) {
+	if (shouldUnlockMixer) {
 		Engine::mixer ()->doneChangeInModel ();
 	}
 
@@ -1164,8 +1164,8 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 			m_data.insert (m_data.end (), newVector.cbegin (), newVector.cend ());
 		} else {
 			// Insert to the end of the vector.
-			m_data.reserve (m_data.size () + (newVector.size ()));
-			m_data.insert (m_data.end (), vector.begin (), vector.end ());
+			m_data.reserve (m_data.size () + (vector.size ()));
+			m_data.insert (m_data.end (), vector.cbegin (), vector.cend ());
 		}
 	}
 	doneBufferChange (true, /* lock */

@@ -343,15 +343,14 @@ protected:
 
 	/**
 	 * @brief Do some actions necessary after changing m_data.
-	 * @param shoguldLock	The same value you've used on @a beginBufferChange.
+	 * @param shouldUnlock	The same value you've used on @a beginBufferChange.
 	 * @param shouldKeepSettings	Should we keep playback settings?
 	 * @param bufferSampleRate		The new m_data's sample rate.
-	 * @param shouldNotNotify		Should we not notify anyone about this change?
 	 */
-	void doneBufferChange (bool shouldLock,
+	void doneBufferChange (bool shouldUnlock,
 						   bool shouldKeepSettings,
 						   sample_rate_t bufferSampleRate,
-						   bool shouldLockMixer=true);
+						   bool shouldUnlockMixer=true);
 signals:
 	void sampleUpdated();
 
