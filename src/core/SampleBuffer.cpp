@@ -79,7 +79,7 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 	}
 	else
 	{
-		changeAudioFile (m_audioFile, false, false);
+		changeAudioFile (_audio_file, false, false);
 	}
 }
 
