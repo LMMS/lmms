@@ -1183,7 +1183,7 @@ void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate,
 	doneBufferChange (true, /* lock */
 					  false, /* save settings */
 					  dataSampleRate,
-					  true);
+					  shouldLockMixer);
 }
 
 void SampleBuffer::reverse(bool shouldLockMixer) {
