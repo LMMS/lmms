@@ -839,8 +839,18 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		ConfigManager::inst()->setValue(
 					"mixer", "audiodev", audioDevName );
 	}
-	m_audioInterfaces->
-		setCurrentIndex( m_audioInterfaces->findText( audioDevName ) );
+
+	int index = m_audioInterfaces->findText(audioDevName);
+	//check index, during debugging (dis/en)abling audio devices this can cause a crash (index -1)
+	//TODO: output error msg? 
+	if (index < 0)
+	{
+		audioDevName = Engine::mixer()->audioDevName();
+		ConfigManager::inst()->setValue(
+			"mixer", "audiodev", audioDevName);
+	}
+
+	m_audioInterfaces->setCurrentIndex(m_audioInterfaces->findText(audioDevName));
 	m_audioIfaceSetupWidgets[audioDevName]->show();
 
 	connect( m_audioInterfaces, SIGNAL( activated( const QString & ) ),
@@ -942,8 +952,18 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 		ConfigManager::inst()->setValue(
 					"mixer", "mididev", midiDevName );
 	}
-	m_midiInterfaces->setCurrentIndex( 
-		m_midiInterfaces->findText( midiDevName ) );
+
+	index = m_midiInterfaces->findText(midiDevName);
+	//not found? init to default
+	//TODO: output error msg?
+	if (index < 0)
+	{
+		midiDevName = Engine::mixer()->midiClientName();
+		ConfigManager::inst()->setValue(
+			"mixer", "mididev", midiDevName);
+	}
+
+	m_midiInterfaces->setCurrentIndex(m_midiInterfaces->findText(midiDevName));
 	m_midiIfaceSetupWidgets[midiDevName]->show();
 
 	connect( m_midiInterfaces, SIGNAL( activated( const QString & ) ),
