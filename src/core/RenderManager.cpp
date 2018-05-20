@@ -37,21 +37,29 @@ RenderManager::RenderManager(
 		ProjectRenderer::ExportFileFormats fmt,
 		QString outputPath) :
 	m_qualitySettings(qualitySettings),
+	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
 	m_outputSettings(outputSettings),
 	m_format(fmt),
 	m_outputPath(outputPath),
 	m_activeRenderer(NULL)
 {
+	Engine::mixer()->storeAudioDevice();
 }
 
 RenderManager::~RenderManager()
 {
 	delete m_activeRenderer;
+	m_activeRenderer = NULL;
+
+	Engine::mixer()->restoreAudioDevice();  // Also deletes audio dev.
+	Engine::mixer()->changeQuality( m_oldQualitySettings );
 }
 
 void RenderManager::abortProcessing()
 {
 	if ( m_activeRenderer ) {
+		disconnect( m_activeRenderer, SIGNAL( finished() ),
+				this, SLOT( renderNextTrack() ) );
 		m_activeRenderer->abortProcessing();
 	}
 	restoreMutedState();

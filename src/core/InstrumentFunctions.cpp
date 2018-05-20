@@ -45,7 +45,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "aug" ), { 0, 4, 8, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "augsus4" ), { 0, 5, 8, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "tri" ), { 0, 3, 6, 9, -1 } },
-	
+
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6" ), { 0, 4, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6sus4" ), { 0, 5, 7, 9, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "6add9" ), { 0, 4, 7, 9, 14, -1 } },
@@ -125,7 +125,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Neopolitan minor" ), { 0, 1, 3, 5, 7, 8, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Hungarian minor" ), { 0, 2, 3, 6, 7, 8, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Dorian" ), { 0, 2, 3, 5, 7, 9, 10, -1 } },
-	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygolydian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
+	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian" ), { 0, 1, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Lydian" ), { 0, 2, 4, 6, 7, 9, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Mixolydian" ), { 0, 2, 4, 5, 7, 9, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Aeolian" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
@@ -133,7 +133,7 @@ InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking:
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Minor" ), { 0, 2, 3, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Chromatic" ), { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Half-Whole Diminished" ), { 0, 1, 3, 4, 6, 7, 9, 10, -1 } },
-	
+
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "5" ), { 0, 7, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Phrygian dominant" ), { 0, 1, 4, 5, 7, 8, 10, -1 } },
 	{ QT_TRANSLATE_NOOP( "InstrumentFunctionNoteStacking", "Persian" ), { 0, 1, 4, 5, 6, 8, 11, -1 } }
@@ -262,7 +262,7 @@ void InstrumentFunctionNoteStacking::processNote( NotePlayHandle * _n )
 
 				// create sub-note-play-handle, only note is
 				// different
-				Engine::mixer()->addPlayHandle( 
+				Engine::mixer()->addPlayHandle(
 						NotePlayHandleManager::acquire( _n->instrumentTrack(), _n->offset(), _n->frames(), note_copy,
 									_n, -1, NotePlayHandle::OriginNoteStacking )
 						);
@@ -344,7 +344,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 	if( _n->origin() == NotePlayHandle::OriginArpeggio ||
 		_n->origin() == NotePlayHandle::OriginNoteStacking ||
 		!m_arpEnabledModel.value() ||
-		( _n->isReleased() && _n->releaseFramesDone() >= _n->actualReleaseFramesToDo() ) )
+		_n->isReleased() )
 	{
 		return;
 	}
@@ -412,7 +412,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		// Skip notes randomly
 		if( m_arpSkipModel.value() )
 		{
-
 			if( 100 * ( (float) rand() / (float)( RAND_MAX + 1.0f ) ) < m_arpSkipModel.value() )
 			{
 				// Set master note to prevent the note to extend over skipped notes
@@ -501,12 +500,6 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 			continue;
 		}
 
-		float vol_level = 1.0f;
-		if( _n->isReleased() )
-		{
-			vol_level = _n->volumeLevel( cur_frame + gated_frames );
-		}
-
 		// create new arp-note
 
 		// create sub-note-play-handle, only ptr to note is different
@@ -515,7 +508,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 				NotePlayHandleManager::acquire( _n->instrumentTrack(),
 							frames_processed,
 							gated_frames,
-							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, (volume_t) qRound( _n->getVolume() * vol_level ),
+							Note( MidiTime( 0 ), MidiTime( 0 ), sub_note_key, _n->getVolume(),
 									_n->getPanning(), _n->detuning() ),
 							_n, -1, NotePlayHandle::OriginArpeggio )
 				);
@@ -569,13 +562,10 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	// Keep compatibility with version 0.2.1 file format
 	if( _this.hasAttribute( "arpsyncmode" ) )
 	{
-	 	m_arpTimeKnob->setSyncMode( 
+	 	m_arpTimeKnob->setSyncMode(
  		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
  						 "arpsyncmode" ).toInt() );
 	}*/
 
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }
-
-
-

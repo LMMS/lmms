@@ -143,7 +143,9 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 {
 	if( m_startPosition != pos )
 	{
+		Engine::mixer()->requestChangeInModel();
 		m_startPosition = pos;
+		Engine::mixer()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}
@@ -701,10 +703,8 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 		if( me->x() < width() - RESIZE_GRIP_WIDTH )
 		{
 			m_action = Move;
-			m_oldTime = m_tco->startPosition();
 			QCursor c( Qt::SizeAllCursor );
 			QApplication::setOverrideCursor( c );
-			s_textFloat->setTitle( tr( "Current position" ) );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <%1> and drag to make "
@@ -715,14 +715,18 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 								"Ctrl"),
 								#endif
 					embed::getIconPixmap( "hint" ), 0 );
+			s_textFloat->setTitle( tr( "Current position" ) );
+			s_textFloat->setText( QString( "%1:%2" ).
+					arg( m_tco->startPosition().getTact() + 1 ).
+					arg( m_tco->startPosition().getTicks() %
+							MidiTime::ticksPerTact() ) );
+			s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 		}
 		else if( !m_tco->getAutoResize() )
 		{
 			m_action = Resize;
-			m_oldTime = m_tco->length();
 			QCursor c( Qt::SizeHorCursor );
 			QApplication::setOverrideCursor( c );
-			s_textFloat->setTitle( tr( "Current length" ) );
 			delete m_hint;
 			m_hint = TextFloat::displayMessage( tr( "Hint" ),
 					tr( "Press <%1> for free "
@@ -733,10 +737,20 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 								"Ctrl"),
 								#endif
 					embed::getIconPixmap( "hint" ), 0 );
+			s_textFloat->setTitle( tr( "Current length" ) );
+			s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
+					arg( m_tco->length().getTact() ).
+					arg( m_tco->length().getTicks() %
+							MidiTime::ticksPerTact() ).
+					arg( m_tco->startPosition().getTact() + 1 ).
+					arg( m_tco->startPosition().getTicks() %
+							MidiTime::ticksPerTact() ).
+					arg( m_tco->endPosition().getTact() + 1 ).
+					arg( m_tco->endPosition().getTicks() %
+							MidiTime::ticksPerTact() ) );
+			s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 		}
 //		s_textFloat->reparent( this );
-		// setup text-float as if TCO was already moved/resized
-		mouseMoveEvent( me );
 		s_textFloat->show();
 	}
 	else if( me->button() == Qt::RightButton )
@@ -846,8 +860,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
 						MidiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-		                                        height() + 2 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -906,8 +919,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_tco->endPosition().getTact() + 1 ).
 				arg( m_tco->endPosition().getTicks() %
 						MidiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-					height() + 2) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
 	else
 	{

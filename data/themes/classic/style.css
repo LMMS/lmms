@@ -127,7 +127,7 @@ PianoRoll {
 	qproperty-noteBorders: true; /* boolean property, set false to have borderless notes */
 	qproperty-selectedNoteColor: rgb( 0, 125, 255 );
 	qproperty-barColor: #4afd85;
-	qproperty-markedSemitoneColor: rgba( 40, 40, 40, 200 );
+	qproperty-markedSemitoneColor: rgba( 0, 255, 200, 60 );
 	/* Grid colors */
 	qproperty-lineColor: rgba( 128, 128, 128, 80 );
 	qproperty-beatLineColor: rgba( 128, 128, 128, 160 );

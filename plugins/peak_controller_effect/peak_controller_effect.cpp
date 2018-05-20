@@ -26,6 +26,7 @@
 
 #include "Controller.h"
 #include "Song.h"
+#include "PresetPreviewPlayHandle.h"
 #include "PeakController.h"
 #include "peak_controller_effect.h"
 #include "lmms_math.h"
@@ -67,7 +68,7 @@ PeakControllerEffect::PeakControllerEffect(
 	m_autoController( NULL )
 {
 	m_autoController = new PeakController( Engine::getSong(), this );
-	if( !Engine::getSong()->isLoadingProject() )
+	if( !Engine::getSong()->isLoadingProject() && !PresetPreviewPlayHandle::isPreviewing() )
 	{
 		Engine::getSong()->addController( m_autoController );
 	}

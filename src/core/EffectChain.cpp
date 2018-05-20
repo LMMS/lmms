@@ -202,11 +202,8 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 	{
 		return false;
 	}
-	const bool exporting = Engine::getSong()->isExporting();
-	if( exporting ) // strip infs/nans if exporting
-	{
-		MixHelpers::sanitize( _buf, _frames );
-	}
+
+	MixHelpers::sanitize( _buf, _frames );
 
 	bool moreEffects = false;
 	for( EffectList::Iterator it = m_effects.begin(); it != m_effects.end(); ++it )
@@ -214,10 +211,7 @@ bool EffectChain::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames, b
 		if( hasInputNoise || ( *it )->isRunning() )
 		{
 			moreEffects |= ( *it )->processAudioBuffer( _buf, _frames );
-			if( exporting ) // strip infs/nans if exporting
-			{
-				MixHelpers::sanitize( _buf, _frames );
-			}
+			MixHelpers::sanitize( _buf, _frames );
 		}
 	}
 

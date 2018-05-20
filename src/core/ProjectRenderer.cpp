@@ -77,7 +77,6 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 	QThread( Engine::mixer() ),
 	m_fileDev( NULL ),
 	m_qualitySettings( qualitySettings ),
-	m_oldQualitySettings( Engine::mixer()->currentQualitySettings() ),
 	m_progress( 0 ),
 	m_abort( false )
 {
@@ -103,8 +102,6 @@ ProjectRenderer::ProjectRenderer( const Mixer::qualitySettings & qualitySettings
 
 ProjectRenderer::~ProjectRenderer()
 {
-	Engine::mixer()->restoreAudioDevice();  // also deletes audio-dev
-	Engine::mixer()->changeQuality( m_oldQualitySettings );
 }
 
 
