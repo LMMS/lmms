@@ -141,8 +141,7 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 int VstEffectControls::controlCount()
 {
-	return m_effect->m_plugin != NULL &&
-		m_effect->m_plugin->hasEditor() ?  1 : 0;
+	return m_effect->m_plugin != NULL ? 1 : 0;
 }
 
 

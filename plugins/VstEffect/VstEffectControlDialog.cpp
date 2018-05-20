@@ -62,14 +62,14 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		embed_vst = m_plugin->embedMethod() != "none";
 
 		if (embed_vst) {
-			if (! m_plugin->pluginWidget()) {
+			if (m_plugin->hasEditor() && ! m_plugin->pluginWidget()) {
 				m_plugin->createUI(this);
 			}
 			m_pluginWidget = m_plugin->pluginWidget();
 		}
 	}
 
-	if ( m_plugin && (!embed_vst || m_pluginWidget) )
+	if (m_plugin)
 	{
 		setWindowTitle( m_plugin->name() );
 
@@ -218,7 +218,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		int newSize = 0;
 
-		if (embed_vst) {
+		if (m_pluginWidget) {
 			newSize = m_pluginWidget->width() + 20;
 		}
 		newSize = std::max(newSize, 250);
@@ -234,7 +234,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed,
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
-		if (embed_vst) {
+		if (m_pluginWidget) {
 			l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
 		}
 		l->setRowStretch( 5, 1 );
