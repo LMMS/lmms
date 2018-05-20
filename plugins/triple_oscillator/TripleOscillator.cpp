@@ -334,15 +334,16 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
+						//m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
+						.3,
 						m_osc[i]->m_volumeLeft );
 				oscs_r[i] = new Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight + phaseRandR,
-						//QRandomGenerator::global()->generateDouble(),
+						//m_osc[i]->m_phaseOffsetRight + phaseRandR,
+						.3,
 						m_osc[i]->m_volumeRight );
 			}
 			else
@@ -352,8 +353,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
-						//QRandomGenerator::global()->generateDouble(),
+						//m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
+						0,
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
 				oscs_r[i] = new Oscillator(
@@ -361,8 +362,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight + phaseRandR,
-						//QRandomGenerator::global()->generateDouble(),
+						//m_osc[i]->m_phaseOffsetRight + phaseRandR,
+						0,
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
 			}
@@ -370,6 +371,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
 			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
 
+			oscs_l[i]->recalcPhase();
+			oscs_r[i]->recalcPhase();
 
 		}
 

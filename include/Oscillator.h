@@ -158,6 +158,8 @@ public:
 		return m_subOsc;
 	}
 
+	void recalcPhase();
+
 
 private:
 	const IntModel * m_waveShapeModel;
@@ -210,8 +212,6 @@ private:
 
 	template<WaveShapes W>
 	inline sample_t getSample( const float _sample );
-
-	inline void recalcPhase();
 
 } ;
 
