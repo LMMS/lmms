@@ -153,6 +153,11 @@ public:
 		return m_userWave->userWaveSample( _sample );
 	}
 
+	inline Oscillator * getSubOsc()
+	{
+		return m_subOsc;
+	}
+
 
 private:
 	const IntModel * m_waveShapeModel;

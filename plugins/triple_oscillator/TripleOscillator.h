@@ -26,6 +26,8 @@
 #ifndef _TRIPLE_OSCILLATOR_H
 #define _TRIPLE_OSCILLATOR_H
 
+#include <QMap>
+
 #include "Instrument.h"
 #include "InstrumentView.h"
 #include "Oscillator.h"
@@ -128,6 +130,8 @@ private:
 		Oscillator * oscLeft;
 		Oscillator * oscRight;
 	} ;
+
+	QMap<Oscillator *, float> m_randomPhases;
 
 
 

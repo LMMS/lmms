@@ -23,6 +23,8 @@
  */
  
 
+#include <iostream>
+
 #include <QDomDocument>
 #include <QBitmap>
 #include <QPainter>
@@ -307,23 +309,39 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
 
+			float phaseRandL;
+			float phaseRandR;
+
+			if ( !m_randomPhases.contains( oscs_l[i] ) && !m_randomPhases.contains( oscs_r[i]) )
+			{
+				phaseRandL = QRandomGenerator::global()->generateDouble();
+				m_randomPhases[oscs_l[i]] = phaseRandL;
+				phaseRandR = QRandomGenerator::global()->generateDouble();
+				m_randomPhases[oscs_r[i]] = phaseRandR;
+			}
+			else
+			{
+				phaseRandL = m_randomPhases[oscs_l[i]];
+				phaseRandR = m_randomPhases[oscs_r[i]];
+			}
+
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
 			{
+				std::cout << m_osc[i]->m_phaseOffsetLeft << std::endl;
 				oscs_l[i] = new Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
-						//QRandomGenerator::global()->generateDouble(),
+						m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
 						m_osc[i]->m_volumeLeft );
 				oscs_r[i] = new Oscillator(
 						&m_osc[i]->m_waveShapeModel,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						m_osc[i]->m_phaseOffsetRight + phaseRandR,
 						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeRight );
 			}
@@ -334,7 +352,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningLeft,
-						m_osc[i]->m_phaseOffsetLeft,
+						m_osc[i]->m_phaseOffsetLeft	+ phaseRandL,
 						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeLeft,
 						oscs_l[i + 1] );
@@ -343,7 +361,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 						&m_osc[i]->m_modulationAlgoModel,
 						_n->frequency(),
 						m_osc[i]->m_detuningRight,
-						m_osc[i]->m_phaseOffsetRight,
+						m_osc[i]->m_phaseOffsetRight + phaseRandR,
 						//QRandomGenerator::global()->generateDouble(),
 						m_osc[i]->m_volumeRight,
 						oscs_r[i + 1] );
@@ -351,6 +369,7 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
 			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
+
 
 		}
 
@@ -372,6 +391,24 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	applyRelease( _working_buffer, _n );
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
+
+	// If this is the last playNote for the note, stop tracking
+	// the note for phase randomization
+	if( _n->framesLeft() <= desiredReleaseFrames() )
+	{
+		auto currentOscL = osc_l;
+		auto currentOscR = osc_r;
+		for( int i = 0; i < NUM_OF_OSCILLATORS; i++ )
+		{
+			if( i != 0 )
+			{
+				currentOscL = currentOscL->getSubOsc();
+				currentOscR = currentOscR->getSubOsc();
+			}
+			m_randomPhases.remove(currentOscL);
+			m_randomPhases.remove(currentOscR);
+		}
+	}
 }
 
 
