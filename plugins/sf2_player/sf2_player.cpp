@@ -27,7 +27,7 @@
 #include <QLayout>
 #include <QLabel>
 #include <QDomDocument>
-
+#include <vector>
 #include "ConfigManager.h"
 #include "FileDialog.h"
 #include "sf2_player.h"
@@ -603,10 +603,12 @@ void sf2Instrument::noteOn( SF2PluginData * n )
 
 	// get list of current voice IDs so we can easily spot the new
 	// voice after the fluid_synth_noteon() call
-	const int poly = fluid_synth_get_polyphony( m_synth );
-	fluid_voice_t * voices[poly];
-	unsigned int id[poly];
-	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+
+	size_t poly = fluid_synth_get_polyphony( m_synth );
+	std::vector<fluid_voice_t *>voices(poly);
+	std::vector<unsigned int>id(poly);
+
+	fluid_synth_get_voicelist( m_synth, voices.data(), poly, -1 );
 	for( int i = 0; i < poly; ++i )
 	{
 		id[i] = 0;
@@ -619,7 +621,7 @@ void sf2Instrument::noteOn( SF2PluginData * n )
 	fluid_synth_noteon( m_synth, m_channel, n->midiNote, n->lastVelocity );
 
 	// get new voice and save it
-	fluid_synth_get_voicelist( m_synth, voices, poly, -1 );
+	fluid_synth_get_voicelist( m_synth, voices.data(), poly, -1 );
 	for( int i = 0; i < poly && voices[i]; ++i )
 	{
 		const unsigned int newID = fluid_voice_get_id( voices[i] );
