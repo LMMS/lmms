@@ -164,18 +164,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-
-#ifdef LMMS_BUILD_LINUX
-
 	delete m_subWindow;
-#else
-	if( m_subWindow )
-	{
-		// otherwise on win32 build VST GUI can get lost
-		m_subWindow->hide();
-	}
-#endif
-
 }
 
 
