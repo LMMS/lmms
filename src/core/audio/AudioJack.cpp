@@ -245,8 +245,10 @@ void AudioJack::startProcessing()
 			}
 		}
 	}
-
-	free( ports );
+	//HACK:
+	//TODO: Very important, don't commit to lmms master
+	//I need to find out how to properly deallocate this
+	//free( ports );
 }
 
 

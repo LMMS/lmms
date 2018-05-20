@@ -89,7 +89,6 @@ ENDIF(LMMS_BUILD_APPLE)
 
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
-	SET(WANT_JACK OFF)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_PORTAUDIO OFF)
 	SET(WANT_SOUNDIO OFF)
@@ -381,23 +380,34 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 
 # check for JACK
 IF(WANT_JACK)
-	PKG_CHECK_MODULES(JACK jack>=0.77)
-	IF(JACK_FOUND)
-		IF(WANT_WEAKJACK)
-			SET(LMMS_HAVE_WEAKJACK TRUE)
-			SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-			SET(STATUS_JACK "OK (weak linking enabled)")
-			SET(JACK_INCLUDE_DIRS "")
-			# use dlsym instead
-			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
-		ELSE()
-			SET(STATUS_JACK "OK")
-		ENDIF()
+	#TODO: quick hack to enable jack for windows. remove and implement it better.
+	#Do not use jack2 from vcpkg, uninstall if you have it (header file defines uint8_t etc...)
+	IF(MSVC)
+		#this is the jack common dir if you got it from git
+		SET(JACK_INCLUDE_DIRS "" CACHE PATH "Jack2 path")
+		#This is in the jack build dir common/jack.lib again if from git
+		SET(JACK_LIBRARIES "" CACHE FILEPATH "jack2 library path")
+		SET(JACK_FOUND TRUE)
 		SET(LMMS_HAVE_JACK TRUE)
-	ELSE(JACK_FOUND)
-		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
-			"if you require JACK support")
-	ENDIF(JACK_FOUND)
+	ELSE(MSVC)
+		PKG_CHECK_MODULES(JACK jack>=0.77)
+		IF(JACK_FOUND)
+			IF(WANT_WEAKJACK)
+				SET(LMMS_HAVE_WEAKJACK TRUE)
+				SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
+				SET(STATUS_JACK "OK (weak linking enabled)")
+				SET(JACK_INCLUDE_DIRS "")
+				# use dlsym instead
+				SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+			ELSE()
+				SET(STATUS_JACK "OK")
+			ENDIF()
+			SET(LMMS_HAVE_JACK TRUE)
+		ELSE(JACK_FOUND)
+			SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
+				"if you require JACK support")
+		ENDIF(JACK_FOUND)
+	ENDIF(MSVC)
 ENDIF(WANT_JACK)
 
 
