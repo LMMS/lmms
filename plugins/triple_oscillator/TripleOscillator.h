@@ -27,6 +27,7 @@
 #define _TRIPLE_OSCILLATOR_H
 
 #include <QMap>
+#include <QPair>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -135,7 +136,7 @@ private:
 		Oscillator * oscRight;
 	} ;
 
-	QMap<Oscillator *, float> m_randomPhases;
+	QMap<QPair<NotePlayHandle *, int>, float> m_randomPhases;
 
 
 	friend class TripleOscillatorView;

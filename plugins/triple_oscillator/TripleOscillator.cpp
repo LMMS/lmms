@@ -327,17 +327,17 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			float phaseRandL;
 			float phaseRandR;
 
-			if ( !m_randomPhases.contains( oscs_l[i] ) && !m_randomPhases.contains( oscs_r[i]) )
+			if ( !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i ) ) && !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ) ) )
 			{
 				phaseRandL = fastRandf( 1 );
-				m_randomPhases[oscs_l[i]] = phaseRandL * m_osc[i]->m_phaseRand;
+				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )] = phaseRandL * m_osc[i]->m_phaseRand;
 				phaseRandR = fastRandf( 1 );
-				m_randomPhases[oscs_r[i]] = phaseRandR * m_osc[i]->m_phaseRand;
+				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )] = phaseRandR * m_osc[i]->m_phaseRand;
 			}
 			else
 			{
-				phaseRandL = m_randomPhases[oscs_l[i]];
-				phaseRandR = m_randomPhases[oscs_r[i]];
+				phaseRandL = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )];
+				phaseRandR = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )];
 			}
 
 			// the last oscs needs no sub-oscs...
@@ -405,17 +405,10 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	// the note for phase randomization
 	if( _n->framesLeft() <= desiredReleaseFrames() )
 	{
-		auto currentOscL = osc_l;
-		auto currentOscR = osc_r;
 		for( int i = 0; i < NUM_OF_OSCILLATORS; i++ )
 		{
-			if( i != 0 )
-			{
-				currentOscL = currentOscL->getSubOsc();
-				currentOscR = currentOscR->getSubOsc();
-			}
-			m_randomPhases.remove(currentOscL);
-			m_randomPhases.remove(currentOscR);
+			m_randomPhases.remove(QPair<NotePlayHandle *, int>( _n, i ));
+			m_randomPhases.remove(QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ));
 		}
 	}
 }
