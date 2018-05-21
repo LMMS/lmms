@@ -138,8 +138,6 @@ private:
 	QMap<Oscillator *, float> m_randomPhases;
 
 
-
-
 	friend class TripleOscillatorView;
 
 } ;

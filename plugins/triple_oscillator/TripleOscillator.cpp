@@ -26,7 +26,6 @@
 #include <QDomDocument>
 #include <QBitmap>
 #include <QPainter>
-#include <QRandomGenerator>
 
 #include "TripleOscillator.h"
 #include "AutomatableButton.h"
@@ -39,6 +38,7 @@
 #include "PixmapButton.h"
 #include "SampleBuffer.h"
 #include "ToolTip.h"
+#include "lmms_math.h"
 
 #include "embed.h"
 
@@ -329,9 +329,9 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 			if ( !m_randomPhases.contains( oscs_l[i] ) && !m_randomPhases.contains( oscs_r[i]) )
 			{
-				phaseRandL = QRandomGenerator::global()->generateDouble();
+				phaseRandL = fastRandf( 1 );
 				m_randomPhases[oscs_l[i]] = phaseRandL * m_osc[i]->m_phaseRand;
-				phaseRandR = QRandomGenerator::global()->generateDouble();
+				phaseRandR = fastRandf( 1 );
 				m_randomPhases[oscs_r[i]] = phaseRandR * m_osc[i]->m_phaseRand;
 			}
 			else
