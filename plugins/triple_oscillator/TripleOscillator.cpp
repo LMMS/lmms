@@ -380,10 +380,6 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 			oscs_l[i]->setUserWave( m_osc[i]->m_sampleBuffer );
 			oscs_r[i]->setUserWave( m_osc[i]->m_sampleBuffer );
-
-			oscs_l[i]->recalcPhase();
-			oscs_r[i]->recalcPhase();
-
 		}
 
 		_n->m_pluginData = new oscPtr;

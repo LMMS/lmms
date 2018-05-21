@@ -158,8 +158,6 @@ public:
 		return m_subOsc;
 	}
 
-	void recalcPhase();
-
 
 private:
 	const IntModel * m_waveShapeModel;
@@ -190,6 +188,8 @@ private:
 	float syncInit( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
+
+	inline void recalcPhase();
 
 	template<WaveShapes W>
 	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
