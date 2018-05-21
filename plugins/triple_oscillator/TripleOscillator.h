@@ -60,6 +60,7 @@ private:
 	FloatModel m_fineRightModel;
 	FloatModel m_phaseOffsetModel;
 	FloatModel m_stereoPhaseDetuningModel;
+	FloatModel m_phaseRandModel;
 	IntModel m_waveShapeModel;
 	IntModel m_modulationAlgoModel;
 	SampleBuffer* m_sampleBuffer;
@@ -74,6 +75,8 @@ private:
 	float m_phaseOffsetLeft;
 	float m_phaseOffsetRight;
 
+	float m_phaseRand;
+
 	friend class TripleOscillator;
 	friend class TripleOscillatorView;
 
@@ -86,6 +89,7 @@ private slots:
 	void updateDetuningRight();
 	void updatePhaseOffsetLeft();
 	void updatePhaseOffsetRight();
+	void updatePhaseRand();
 
 } ;
 
@@ -166,6 +170,7 @@ private:
 					Knob * fr,
 					Knob * po,
 					Knob * spd,
+					Knob * rnd,
 					PixmapButton * uwb,
 					automatableButtonGroup * wsbg ) :
 			m_volKnob( v ),
@@ -175,6 +180,7 @@ private:
 			m_fineRightKnob( fr ),
 			m_phaseOffsetKnob( po ),
 			m_stereoPhaseDetuningKnob( spd ),
+			m_phaseRandKnob( rnd ),
 			m_userWaveButton( uwb ),
 			m_waveShapeBtnGrp( wsbg )
 		{
@@ -189,6 +195,7 @@ private:
 		Knob * m_fineRightKnob;
 		Knob * m_phaseOffsetKnob;
 		Knob * m_stereoPhaseDetuningKnob;
+		Knob * m_phaseRandKnob;
 		PixmapButton * m_userWaveButton;
 		automatableButtonGroup * m_waveShapeBtnGrp;
 
