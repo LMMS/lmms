@@ -104,12 +104,11 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	if( m_badDllFormat )
 	{
 		m_badDllFormat = false;
+		tryLoad( "32/RemoteVstPlugin32" );
+	} 
+#else
+	tryLoad("RemoteVstPlugin32");
 #endif
-		tryLoad( "RemoteVstPlugin32" );
-#ifdef LMMS_BUILD_WIN64
-	}
-#endif
-
 	setTempo( Engine::getSong()->getTempo() );
 
 	connect( Engine::getSong(), SIGNAL( tempoChanged( bpm_t ) ),

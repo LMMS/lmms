@@ -368,11 +368,11 @@ ELSE(NOT MSVC)
 		IF(PORTAUDIO_FOUND)
 			IF(LMMS_BUILD_WIN64)
 				INSTALL(FILES
-						"${VCPKG_ROOT}/bin/portaudio-x64.dll"
+						"${VCPKG_ROOT}/bin/portaudio_x64.dll"
 					DESTINATION .)
 			ELSE(LMMS_BUILD_WIN64)
 				INSTALL(FILES
-						"${VCPKG_ROOT}/bin/portaudio-x86.dll"
+						"${VCPKG_ROOT}/bin/portaudio_x86.dll"
 					DESTINATION .)
 			ENDIF(LMMS_BUILD_WIN64)
 		ENDIF()

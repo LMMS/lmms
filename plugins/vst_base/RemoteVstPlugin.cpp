@@ -1473,7 +1473,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 
 		case audioMasterVersion:
 			SHOW_CALLBACK( "amc: audioMasterVersion\n" );
-			return 2300;
+			return 2400;
 
 		case audioMasterCurrentId:
 			SHOW_CALLBACK( "amc: audioMasterCurrentId\n" );
