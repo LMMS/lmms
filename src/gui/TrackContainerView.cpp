@@ -521,7 +521,6 @@ InstrumentLoaderThread::InstrumentLoaderThread( QObject *parent, InstrumentTrack
 	m_it( it ),
 	m_name( name )
 {
-	setObjectName("InstrumentLoaderThread");
 	m_containerThread = thread();
 }
 
