@@ -28,6 +28,7 @@
 
 #include <QMap>
 #include <QPair>
+#include <QMutex>
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -137,7 +138,7 @@ private:
 	} ;
 
 	QMap<QPair<NotePlayHandle *, int>, float> m_randomPhases;
-
+	QMutex m_randomPhases_mutex;
 
 	friend class TripleOscillatorView;
 

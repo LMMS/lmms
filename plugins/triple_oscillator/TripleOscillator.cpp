@@ -327,6 +327,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			float phaseRandL;
 			float phaseRandR;
 
+			m_randomPhases_mutex.lock();
+
 			if ( !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i ) ) && !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ) ) )
 			{
 				phaseRandL = fastRandf( 1 );
@@ -339,6 +341,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 				phaseRandL = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )];
 				phaseRandR = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )];
 			}
+
+			m_randomPhases_mutex.unlock();
 
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
@@ -405,11 +409,13 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	// the note for phase randomization
 	if( _n->framesLeft() <= desiredReleaseFrames() )
 	{
+		m_randomPhases_mutex.lock();
 		for( int i = 0; i < NUM_OF_OSCILLATORS; i++ )
 		{
 			m_randomPhases.remove(QPair<NotePlayHandle *, int>( _n, i ));
 			m_randomPhases.remove(QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ));
 		}
+		m_randomPhases_mutex.unlock();
 	}
 }
 
