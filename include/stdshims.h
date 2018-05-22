@@ -7,8 +7,10 @@
 #include <memory>
 #include <utility>
 
-#if (__cplusplus >= 201402L)
+#if (__cplusplus >= 201402L || _MSC_VER)
+#ifndef _MSC_VER
 #warning "This file should now be removed! The functions it provides are part of the C++14 standard."
+#endif
 using std::make_unique;
 
 #else

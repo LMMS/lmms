@@ -47,6 +47,9 @@ ENDIF()
 INCLUDE(VersionInfo)
 INCLUDE(DetectMachine)
 
+IF(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake$")
+	SET(USING_VCPKG TRUE)
+ENDIF()
 
 OPTION(WANT_ALSA	"Include ALSA (Advanced Linux Sound Architecture) support" ON)
 OPTION(WANT_CALF	"Include CALF LADSPA plugins" ON)
@@ -166,10 +169,15 @@ FIND_PACKAGE(Qt5Test)
 SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
-PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
-IF(NOT SNDFILE_FOUND)
-	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
-ENDIF()
+IF(USING_VCPKG)
+	FIND_PACKAGE(LibSndFile 1.0.18 REQUIRED)
+	SET(SNDFILE_LIBRARIES sndfile-shared)
+ELSE(USING_VCPKG)
+	PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
+	IF(NOT SNDFILE_FOUND)
+		MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
+	ENDIF()
+ENDIF(USING_VCPKG)
 # check if we can use SF_SET_COMPRESSION_LEVEL
 IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
 	SET(LMMS_HAVE_SF_COMPLEVEL TRUE)
@@ -394,8 +402,13 @@ ENDIF(WANT_JACK)
 
 
 # check for FFTW3F-library
-PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
-
+IF(USING_VCPKG)
+	#currently find_package for fftw is broken in vcpkg. Replace this when fixed
+	FIND_PATH(FFTW3F_INCLUDE_DIRS fftw3.h)
+	FIND_LIBRARY(FFTW3F_LIBRARIES fftw3f)
+ELSE(USING_VCPKG)
+	PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
+ENDIF(USING_VCPKG)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
@@ -477,7 +490,13 @@ ELSE()
 ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
+IF(USING_VCPKG)
+	#TODO no cmake config support. Can we check the version some other way?
+	FIND_FILE(SAMPLERATE_INCLUDE_DIRS samplerate.h)
+	FIND_LIBRARY(SAMPLERATE_LIBRARIES libsamplerate-0)
+ELSE(USING_VCPKG)
+	PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
+ENDIF(USING_VCPKG)
 
 # set compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -700,4 +719,5 @@ MESSAGE(
 "-----------------------------------------------------------------\n"
 "\n\n")
 
+SET(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${BIN_DIR}")
 INCLUDE(InstallRequiredSystemLibraries)

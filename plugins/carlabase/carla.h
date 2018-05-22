@@ -26,9 +26,9 @@
 #define CARLA_H
 
 #include <QtCore/QMutex>
+#include "plugin_export.h"
 
 #include "CarlaNative.h"
-
 #include "Instrument.h"
 #include "InstrumentView.h"
 

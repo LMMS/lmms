@@ -328,7 +328,7 @@ private:
 	} ;
 
 	// callback used by plugin for being able to communicate with it's host
-	static VST_CALL_CONV intptr_t hostCallback( AEffect * _effect, int32_t _opcode,
+	static intptr_t VST_CALL_CONV hostCallback( AEffect * _effect, int32_t _opcode,
 					int32_t _index, intptr_t _value,
 					void * _ptr, float _opt );
 
