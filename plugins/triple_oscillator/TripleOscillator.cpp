@@ -82,7 +82,7 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 			tr( "Osc %1 phase-offset" ).arg( _idx + 1 ) ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
 			tr( "Osc %1 stereo phase-detuning" ).arg( _idx + 1 ) ),
-	m_phaseRandModel( 1.0f, 0.0f, 1.0f, 0.01f, this,
+	m_phaseRandModel( 0.0f, 0.0f, 100.0f, 1.0f, this,
 			tr( "Osc %1 phase randomization" ).arg( _idx + 1 ) ),
 	m_waveShapeModel( Oscillator::SineWave, 0, 
 			Oscillator::NumWaveShapes-1, this,
@@ -217,7 +217,7 @@ void OscillatorObject::updatePhaseOffsetRight()
 
 void OscillatorObject::updatePhaseRand()
 {
-	m_phaseRand = m_phaseRandModel.value();
+	m_phaseRand = m_phaseRandModel.value() / 100;
 }
 
 
@@ -641,7 +641,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		phrk->move( 165, knob_y );
 		phrk->setHintText( tr( "Osc %1 phase rand:" ).
 						  arg( i + 1 ),
-							" " + tr( "degrees" ) );
+							" " + tr( "%" ) );
 
 		// setup phase-offset-knob
 		Knob * pok = new TripleOscKnob( this );
