@@ -331,15 +331,15 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 
 			if ( !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i ) ) && !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ) ) )
 			{
-				phaseRandL = fastRandf( 1 );
-				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )] = phaseRandL * m_osc[i]->m_phaseRand;
-				phaseRandR = fastRandf( 1 );
-				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )] = phaseRandR * m_osc[i]->m_phaseRand;
+				phaseRandL = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+				phaseRandR = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )] = phaseRandL;
+				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )] = phaseRandR;
 			}
 			else
 			{
-				phaseRandL = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )];
-				phaseRandR = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )];
+				phaseRandL = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )] * m_osc[i]->m_phaseRand;
+				phaseRandR = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )] * m_osc[i]->m_phaseRand;
 			}
 
 			m_randomPhases_mutex.unlock();
