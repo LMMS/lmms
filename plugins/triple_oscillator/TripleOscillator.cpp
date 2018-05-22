@@ -327,22 +327,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 			float phaseRandL;
 			float phaseRandR;
 
-			m_randomPhases_mutex.lock();
-
-			if ( !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i ) ) && !m_randomPhases.contains( QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ) ) )
-			{
-				phaseRandL = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
-				phaseRandR = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
-				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )] = phaseRandL;
-				m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )] = phaseRandR;
-			}
-			else
-			{
-				phaseRandL = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i )] * m_osc[i]->m_phaseRand;
-				phaseRandR = m_randomPhases[QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS )] * m_osc[i]->m_phaseRand;
-			}
-
-			m_randomPhases_mutex.unlock();
+			phaseRandL = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+			phaseRandR = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
 
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
@@ -404,19 +390,6 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 	applyRelease( _working_buffer, _n );
 
 	instrumentTrack()->processAudioBuffer( _working_buffer, frames + offset, _n );
-
-	// If this is the last playNote for the note, stop tracking
-	// the note for phase randomization
-	if( _n->framesLeft() <= desiredReleaseFrames() )
-	{
-		m_randomPhases_mutex.lock();
-		for( int i = 0; i < NUM_OF_OSCILLATORS; i++ )
-		{
-			m_randomPhases.remove(QPair<NotePlayHandle *, int>( _n, i ));
-			m_randomPhases.remove(QPair<NotePlayHandle *, int>( _n, i + NUM_OF_OSCILLATORS ));
-		}
-		m_randomPhases_mutex.unlock();
-	}
 }
 
 
