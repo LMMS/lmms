@@ -285,6 +285,8 @@ public slots:
 	void sampleRateChanged();
 
 protected:
+	static sample_rate_t mixerSampleRate();
+
 	// HACK: libsamplerate < 0.1.8 doesn't get read-only variables
 	//	     as const. It has been fixed in 0.1.9 but has not been
 	//		 shipped for some distributions.
