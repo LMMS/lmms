@@ -57,7 +57,7 @@ SampleBuffer::SampleBuffer() :
 	m_loopEndFrame( 0 ),
 	m_amplification( 1.0f ),
 	m_frequency( BaseFreq ),
-	m_sampleRate( Engine::mixer()->baseSampleRate() )
+	m_sampleRate( mixerSampleRate () )
 {
 
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
@@ -101,18 +101,23 @@ SampleBuffer::SampleBuffer(SampleBuffer::DataVector &&movedData , sample_rate_t 
 
 void SampleBuffer::sampleRateChanged() {
 	auto previousSampleRate = sampleRate ();
-	if (Engine::mixer ()->baseSampleRate () == sampleRate ())
+	if (mixerSampleRate () == sampleRate ())
 		return;
 
 	beginBufferChange (true);
-	setSampleRate (Engine::mixer ()->baseSampleRate ());
+	setSampleRate (mixerSampleRate ());
 
 	// Resample the buffer.
 	doneBufferChange (
 	/* shouldLock */				true,
 	/* shouldKeepSettings */		true,
 									previousSampleRate
-	);
+				);
+}
+
+sample_rate_t SampleBuffer::mixerSampleRate()
+{
+	return Engine::mixer ()->processingSampleRate ();
 }
 
 void SampleBuffer::changeAudioFile(QString audioFile, bool shouldLock,
@@ -134,7 +139,7 @@ void SampleBuffer::changeAudioFile(QString audioFile, bool shouldLock,
 	#endif
 
 	ch_cnt_t channels = DEFAULT_CHANNELS;
-	sample_rate_t samplerate = Engine::mixer()->baseSampleRate();
+	sample_rate_t samplerate = mixerSampleRate ();
 	DataVector fileData;
 
 	const QFileInfo fileInfo( file );
@@ -278,7 +283,7 @@ SampleBuffer::resampleData (const DataVector &inputData, sample_rate_t inputSamp
 		src_data.data_out = outputData.data ()->data();
 		src_data.input_frames = inputData.size ();
 		src_data.output_frames = dst_frames;
-		src_data.src_ratio = (double) inputSampleRate / requiredSampleRate;
+		src_data.src_ratio = (double) requiredSampleRate / inputSampleRate;
 		if( ( error = src_process( state, &src_data ) ) )
 		{
 			printf( "SampleBuffer: error while resampling: %s\n",
@@ -1160,11 +1165,9 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 	{
 		if (! newVector.empty()) {
 			// Insert to the end of the resampled vector.
-			m_data.reserve (m_data.size () + newVector.size ());
 			m_data.insert (m_data.end (), newVector.cbegin (), newVector.cend ());
 		} else {
 			// Insert to the end of the vector.
-			m_data.reserve (m_data.size () + (vector.size ()));
 			m_data.insert (m_data.end (), vector.cbegin (), vector.cend ());
 		}
 	}
