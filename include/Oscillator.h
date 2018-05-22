@@ -153,11 +153,6 @@ public:
 		return m_userWave->userWaveSample( _sample );
 	}
 
-	inline Oscillator * getSubOsc()
-	{
-		return m_subOsc;
-	}
-
 
 private:
 	const IntModel * m_waveShapeModel;
@@ -165,8 +160,8 @@ private:
 	const float & m_freq;
 	const float & m_detuning;
 	const float & m_volume;
-	Oscillator * m_subOsc;
 	float m_ext_phaseOffset;
+	Oscillator * m_subOsc;
 	float m_phaseOffset;
 	float m_phase;
 	const SampleBuffer * m_userWave;
@@ -189,8 +184,6 @@ private:
 							const ch_cnt_t _chnl );
 	inline bool syncOk( float _osc_coeff );
 
-	inline void recalcPhase();
-
 	template<WaveShapes W>
 	void updateNoSub( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
@@ -212,6 +205,8 @@ private:
 
 	template<WaveShapes W>
 	inline sample_t getSample( const float _sample );
+
+	inline void recalcPhase();
 
 } ;
 
