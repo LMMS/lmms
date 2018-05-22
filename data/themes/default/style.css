@@ -144,9 +144,9 @@ PianoRoll {
 	qproperty-noteColor: #0bd556;
 	qproperty-noteOpacity: 165;
 	qproperty-noteBorders: false; /* boolean property, set false to have borderless notes */
-	qproperty-selectedNoteColor: #006b65;
+	qproperty-selectedNoteColor: #064d79;
 	qproperty-barColor: #078f3a;
-	qproperty-markedSemitoneColor: #06170E;
+	qproperty-markedSemitoneColor: rgba(255, 255, 255, 30);
 	/* Grid colors */
 	qproperty-lineColor: #292929;
 	qproperty-beatLineColor: #2d6b45;

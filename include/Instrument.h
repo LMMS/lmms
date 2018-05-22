@@ -57,7 +57,7 @@ public:
 
 	Instrument( InstrumentTrack * _instrument_track,
 					const Descriptor * _descriptor );
-	virtual ~Instrument();
+	virtual ~Instrument() = default;
 
 	// --------------------------------------------------------------------
 	// functions that can/should be re-implemented:

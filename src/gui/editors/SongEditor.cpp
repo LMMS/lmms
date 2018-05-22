@@ -83,11 +83,11 @@ SongEditor::SongEditor( Song * song ) :
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
-	int widgetTotal = ConfigManager::inst()->value( "ui",
+	m_widgetWidthTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	m_timeLine = new TimeLineWidget( widgetTotal, 32,
+	m_timeLine = new TimeLineWidget( m_widgetWidthTotal, 32,
 					pixelsPerTact(),
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
@@ -391,6 +391,16 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
+
+
+		int x = (we->x() - m_widgetWidthTotal);
+		// tact based on the mouse x-position where the scroll wheel was used
+		int tact= x  / pixelsPerTact();
+		// what would be the tact in the new zoom level on the very same mouse x
+		int newTact = x / DEFAULT_PIXELS_PER_TACT / m_zoomLevels[z];
+		// scroll so the tact "selected" by the mouse x doesn't move on the screen
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + tact - newTact);
+
 		// update combobox with zooming-factor
 		m_zoomingModel->setValue( z );
 

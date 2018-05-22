@@ -50,16 +50,6 @@ AutomatableModelView::AutomatableModelView( ::Model* model, QWidget* _this ) :
 	widget()->setCursor( QCursor( embed::getIconPixmap( "hand" ), 3, 3 ) );
 }
 
-
-
-
-AutomatableModelView::~AutomatableModelView()
-{
-}
-
-
-
-
 void AutomatableModelView::addDefaultActions( QMenu* menu )
 {
 	AutomatableModel* model = modelUntyped();

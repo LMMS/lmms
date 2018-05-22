@@ -31,7 +31,7 @@
 class InstrumentTrack;
 class MidiEventProcessor;
 
-class Piano : public Model
+class Piano final : public Model
 {
 public:
 	enum KeyTypes
@@ -41,7 +41,6 @@ public:
 	} ;
 
 	Piano( InstrumentTrack* track );
-	virtual ~Piano();
 
 	void setKeyState( int key, bool state );
 

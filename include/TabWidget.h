@@ -37,7 +37,7 @@ class TabWidget : public QWidget
 	Q_OBJECT
 public:
 	TabWidget( const QString & _caption, QWidget * _parent, bool usePixmap = false );
-	virtual ~TabWidget();
+	virtual ~TabWidget() = default;
 
 	void addTab( QWidget * w, const QString & name, const char *pixmap = NULL, int idx = -1 );
 

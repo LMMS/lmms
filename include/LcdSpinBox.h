@@ -38,7 +38,7 @@ public:
 
 	LcdSpinBox( int numDigits, const QString& style, QWidget* parent, const QString& name = QString::null );
 
-	virtual ~LcdSpinBox();
+	virtual ~LcdSpinBox() = default;
 
 	virtual void modelChanged()
 	{

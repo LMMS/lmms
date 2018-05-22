@@ -9,7 +9,7 @@
 
 LIST(APPEND CMAKE_PREFIX_PATH /opt/wine-stable /opt/wine-devel /opt/wine-staging /usr/lib/wine/)
 
-FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATH_SUFFIXES wine)
+FIND_PATH(WINE_INCLUDE_DIR windows/windows.h PATH_SUFFIXES wine wine/wine)
 FIND_LIBRARY(WINE_LIBRARY NAMES wine PATH_SUFFIXES wine i386-linux-gnu/wine)
 FIND_PROGRAM(WINE_CXX
 	NAMES wineg++ winegcc winegcc64 winegcc32 winegcc-stable
