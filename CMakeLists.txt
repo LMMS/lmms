@@ -386,6 +386,9 @@ IF(WANT_JACK)
 		SET(JACK_INCLUDE_DIRS "" CACHE PATH "Jack2 path")
 		#This is in the jack build dir common/jack.lib again if from git
 		SET(JACK_LIBRARIES "" CACHE FILEPATH "jack2 library path")
+		#again, quick hack. Get the jack dll for installing its in build/common/libjack-0.dll
+		SET(JACK_LIBRARY_DLL "" CACHE FILEPATH "jack2 library dll")
+		
 		SET(JACK_FOUND TRUE)
 		SET(LMMS_HAVE_JACK TRUE)
 	ELSE(MSVC)

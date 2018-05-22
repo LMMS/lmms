@@ -377,6 +377,11 @@ ELSE(NOT MSVC)
 			ENDIF(LMMS_BUILD_WIN64)
 		ENDIF()
 		
+		#TODO: quick hack to make an installer
+		IF(JACK_FOUND)
+			INSTALL(FILES ${JACK_LIBRARY_DLL} DESTINATION .)
+		ENDIF(JACK_FOUND)
+
 		#not yet in vcpkg
 		#IF(SOUNDIO_FOUND)
 		#	INSTALL(FILES
