@@ -1961,10 +1961,6 @@ LRESULT CALLBACK RemoteVstPlugin::messageWndProc( HWND hwnd, UINT uMsg,
 
 int main( int _argc, char * * _argv )
 {
-#ifdef LMMS_BUILD_WIN32
-	CoInitialize(nullptr);
-#endif
-
 #ifdef SYNC_WITH_SHM_FIFO
 	if( _argc < 4 )
 #else
@@ -1974,6 +1970,8 @@ int main( int _argc, char * * _argv )
 		fprintf( stderr, "not enough arguments\n" );
 		return -1;
 	}
+
+        CoInitialize(nullptr);
 
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
@@ -2090,9 +2088,7 @@ int main( int _argc, char * * _argv )
 
 	delete __plugin;
 
-#ifdef LMMS_BUILD_WIN32
 	CoUninitialize();
-#endif
 
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
