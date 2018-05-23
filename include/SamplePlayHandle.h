@@ -30,6 +30,8 @@
 #include "AutomatableModel.h"
 #include "PlayHandle.h"
 
+#include <memory>
+
 class BBTrack;
 class SampleTCO;
 class Track;
@@ -40,6 +42,7 @@ class SamplePlayHandle : public PlayHandle
 {
 public:
 	SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort = true );
+	SamplePlayHandle( const std::shared_ptr<SampleBuffer> &sampleBuffer, bool ownAudioPort = true );
 	SamplePlayHandle( const QString& sampleFile );
 	SamplePlayHandle( SampleTCO* tco );
 	virtual ~SamplePlayHandle();
@@ -77,7 +80,7 @@ public:
 
 
 private:
-	SampleBuffer * m_sampleBuffer;
+	std::shared_ptr<SampleBuffer> m_sampleBuffer;
 	bool m_doneMayReturnTrue;
 
 	f_cnt_t m_frame;

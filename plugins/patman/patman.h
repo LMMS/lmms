@@ -31,6 +31,7 @@
 #include "SampleBuffer.h"
 #include "AutomatableModel.h"
 #include "MemoryManager.h"
+#include <memory>
 
 class PixmapButton;
 
@@ -82,11 +83,11 @@ private:
 		MM_OPERATORS
 		SampleBuffer::handleState* state;
 		bool tuned;
-		SampleBuffer* sample;
+		std::shared_ptr<SampleBuffer> sample;
 	} handle_data;
 
 	QString m_patchFile;
-	QVector<SampleBuffer *> m_patchSamples;
+	QVector<std::shared_ptr<SampleBuffer>> m_patchSamples;
 	BoolModel m_loopedModel;
 	BoolModel m_tunedModel;
 

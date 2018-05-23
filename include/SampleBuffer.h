@@ -50,7 +50,7 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class LMMS_EXPORT SampleBuffer : public QObject, public sharedObject
+class LMMS_EXPORT SampleBuffer : public QObject
 {
 	Q_OBJECT
 	MM_OPERATORS
