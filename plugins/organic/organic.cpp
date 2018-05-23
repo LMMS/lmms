@@ -21,14 +21,12 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-
-
 #include "organic.h"
-
 
 #include <QDomElement>
 #include <QPainter>
 
+#include <vector>
 
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -233,8 +231,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		Oscillator * oscs_l[m_numOscillators];
-		Oscillator * oscs_r[m_numOscillators];
+		std::vector<Oscillator*> oscs_l(m_numOscillators);
+		std::vector<Oscillator*> oscs_r(m_numOscillators);
 
 		_n->m_pluginData = new oscPtr;
 
