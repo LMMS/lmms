@@ -169,7 +169,7 @@ void patmanInstrument::playNote( NotePlayHandle * _n,
 void patmanInstrument::deleteNotePluginData( NotePlayHandle * _n )
 {
 	handle_data * hdata = (handle_data *)_n->m_pluginData;
-	sharedObject::unref( hdata->sample );
+
 	delete hdata->state;
 	delete hdata;
 }
@@ -356,7 +356,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 			}
 		}
 
-		SampleBuffer* psample = new SampleBuffer( std::move(data), sample_rate );
+		auto psample = std::make_shared<SampleBuffer>( std::move(data), sample_rate );
 		psample->setFrequency( root_freq / 1000.0f );
 
 		if( modes & MODES_LOOPING )
@@ -365,7 +365,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 			psample->setLoopEndFrame( loop_end );
 		}
 
-		m_patchSamples.push_back( psample );
+		m_patchSamples.push_back( std::move(psample) );
 
 		delete[] wave_samples;
 	}
@@ -378,11 +378,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 
 void patmanInstrument::unloadCurrentPatch( void )
 {
-	while( !m_patchSamples.empty() )
-	{
-		sharedObject::unref( m_patchSamples.back() );
-		m_patchSamples.pop_back();
-	}
+	m_patchFile.clear ();
 }
 
 
@@ -393,18 +389,18 @@ void patmanInstrument::selectSample( NotePlayHandle * _n )
 	const float freq = _n->frequency();
 
 	float min_dist = HUGE_VALF;
-	SampleBuffer* sample = NULL;
+	std::shared_ptr<SampleBuffer> sample;
 
-	for( QVector<SampleBuffer *>::iterator it = m_patchSamples.begin(); it != m_patchSamples.end(); ++it )
+	for( auto &element : m_patchSamples )
 	{
-		float patch_freq = ( *it )->frequency();
+		float patch_freq = element->frequency();
 		float dist = freq >= patch_freq ? freq / patch_freq :
 							patch_freq / freq;
 
 		if( dist < min_dist )
 		{
 			min_dist = dist;
-			sample = *it;
+			sample = element;
 		}
 	}
 
@@ -412,11 +408,11 @@ void patmanInstrument::selectSample( NotePlayHandle * _n )
 	hdata->tuned = m_tunedModel.value();
 	if( sample )
 	{
-		hdata->sample = sharedObject::ref( sample );
+		hdata->sample = sample;
 	}
 	else
 	{
-		hdata->sample = new SampleBuffer( NULL, 0 );
+		hdata->sample = std::make_shared<SampleBuffer>();
 	}
 	hdata->state = new SampleBuffer::handleState( _n->hasDetuningInfo() );
 
