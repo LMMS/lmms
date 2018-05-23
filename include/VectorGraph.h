@@ -27,10 +27,16 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <QVector>
+#include <QPair>
 
 #include "ModelView.h"
 
-class EXPORT VectorGraph : public QWidget//, public ModelView
+class vectorGraphModel;
+
+
+
+class EXPORT VectorGraph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -43,5 +49,19 @@ protected:
 private:
 	QPainter m_canvas;
 };
+
+
+
+class EXPORT vectorGraphModel : public Model
+{
+	Q_OBJECT
+public:
+	vectorGraphModel();
+	virtual ~vectorGraphModel() = default;
+
+private:
+	QVector<QPair<float, float>> m_points;
+	QVector<float> m_tensions;
+}
 
 #endif
