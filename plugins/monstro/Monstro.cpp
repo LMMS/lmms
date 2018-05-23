@@ -24,7 +24,7 @@
 
 
 #include <QDomElement>
-
+#include <vector>
 #include "Monstro.h"
 #include "Engine.h"
 #include "InstrumentTrack.h"
@@ -341,9 +341,9 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	float sub;
 
 	// modulators
-	float lfo[2][ m_parent->m_fpp ];
-	float env[2][ m_parent->m_fpp ];
-	
+	std::vector<float> lfo[2] = { std::vector<float>(m_parent->m_fpp), std::vector<float>(m_parent->m_fpp) };
+	std::vector<float> env[2] = { std::vector<float>(m_parent->m_fpp), std::vector<float>(m_parent->m_fpp) };
+
 	// render modulators: envelopes, lfos
 	updateModulators( &env[0][0], &env[1][0], &lfo[0][0], &lfo[1][0], _frames );
 
