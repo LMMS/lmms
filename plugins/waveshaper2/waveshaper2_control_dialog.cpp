@@ -29,7 +29,8 @@
 #include "waveshaper2_control_dialog.h"
 #include "waveshaper2_controls.h"
 #include "embed.h"
-#include "Graph.h"
+//#include "Graph.h"
+#include "VectorGraph.h"
 #include "PixmapButton.h"
 #include "ToolTip.h"
 #include "LedCheckbox.h"
@@ -46,6 +47,7 @@ waveShaper2ControlDialog::waveShaper2ControlDialog(
 	setPalette( pal );
 	setFixedSize( 224, 274 );
 
+	/*
 	Graph * waveGraph = new Graph( this, Graph::LinearNonCyclicStyle, 204, 205 );
 	waveGraph -> move( 10, 6 );
 	waveGraph -> setModel( &_controls -> m_wavegraphModel );
@@ -55,7 +57,13 @@ waveShaper2ControlDialog::waveShaper2ControlDialog(
 			PLUGIN_NAME::getIconPixmap("wavegraph") );
 	waveGraph->setPalette( pal );
 	waveGraph->setGraphColor( QColor( 85, 204, 145 ) );
-	waveGraph -> setMaximumSize( 204, 205 );
+	waveGraph -> setMaximumSize( 204, 205 );*/
+
+	VectorGraph * graph = new VectorGraph( this, 204, 205 );
+	graph->move( 10, 6 );
+	graph->setMaximumSize( 204, 205 );
+
+
 
 	Knob * inputKnob = new Knob( knobBright_26, this);
 	inputKnob -> setVolumeKnob( true );
