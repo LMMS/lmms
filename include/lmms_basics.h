@@ -174,6 +174,8 @@ struct alignas (alignof(T)) ElementAlignedArray
 typedef ElementAlignedArray<sample_t, DEFAULT_CHANNELS> sampleFrame;
 typedef ElementAlignedArray<sample_t, SURROUND_CHANNELS> surroundSampleFrame;
 
+#define ALIGN_SIZE (16)
+
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN
 

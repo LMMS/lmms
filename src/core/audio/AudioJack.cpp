@@ -437,7 +437,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 	}
 
 	if (! m_stopped) {
-		m_inBuffer.reset (new sampleFrame[_nframes]);
+		m_inBuffer.resize (_nframes);
 
 		for( int c = 0; c < channels(); ++c ) {
 			jack_default_audio_sample_t *channel_buffer = m_tempInBufs[c];
@@ -448,7 +448,7 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 			}
 		}
 
-		mixer()->pushInputFrames (m_inBuffer.get (), _nframes);
+		mixer()->pushInputFrames (m_inBuffer.data (), _nframes);
 	}
 
 	if( _nframes != done )
