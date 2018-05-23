@@ -324,11 +324,8 @@ void TripleOscillator::playNote( NotePlayHandle * _n,
 		for( int i = NUM_OF_OSCILLATORS - 1; i >= 0; --i )
 		{
 
-			float phaseRandL;
-			float phaseRandR;
-
-			phaseRandL = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
-			phaseRandR = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+			float phaseRandL = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
+			float phaseRandR = fastRandf( 1 ) * m_osc[i]->m_phaseRand;
 
 			// the last oscs needs no sub-oscs...
 			if( i == NUM_OF_OSCILLATORS - 1 )
@@ -639,7 +636,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		// setup phase randomization knob
 		Knob * phrk = new TripleOscKnob( this );
 		phrk->move( 165, knob_y );
-		phrk->setHintText( tr( "Osc %1 phase rand:" ).
+		phrk->setHintText( tr( "Osc %1 phase randomization:" ).
 						  arg( i + 1 ),
 							" " + tr( "%" ) );
 
