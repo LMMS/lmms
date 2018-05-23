@@ -213,9 +213,6 @@ public:
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
-	void normalizeSampleRate( const sample_rate_t _src_sr,
-						bool _keep_settings = false );
-
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock(), out of loops for efficiency
 	inline sample_t userWaveSample( const float _sample ) const
