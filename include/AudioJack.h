@@ -118,7 +118,7 @@ private:
 	QVector<jack_port_t *> m_inputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
 	jack_default_audio_sample_t * * m_tempInBufs;
-	std::unique_ptr<sampleFrame[]> m_inBuffer;
+	std::vector<sampleFrame> m_inBuffer;
 	surroundSampleFrame * m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;
