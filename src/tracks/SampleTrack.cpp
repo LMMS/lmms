@@ -66,7 +66,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( updateLength() ) );
 
-	connect (m_sampleBuffer, SIGNAL(sampleUpdated()), this, SLOT(onSampleBufferChanged()));
+	connect (m_sampleBuffer.get (), SIGNAL(sampleUpdated()), this, SLOT(onSampleBufferChanged()));
 
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -95,7 +95,6 @@ SampleTCO::~SampleTCO()
 	{
 		sampletrack->updateTcos();
 	}
-	sharedObject::unref( m_sampleBuffer );
 }
 
 
@@ -212,15 +211,10 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
-	if( sampleFile() == "" )
-	{
-		QString s;
-		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
-	}
 
-	_this.setAttribute ("sample_rate", m_sampleBuffer->sampleRate ());
+	m_sampleBuffer->saveState (_doc, _this);
+
 	_this.setAttribute ("is_record", isRecord ());
 	// TODO: start- and end-frame
 }
@@ -234,18 +228,32 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	setSampleFile( _this.attribute( "src" ) );
-	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
-	{
-		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ), true);
+
+	// Should not be happening after 1.3.
+	if (_this.hasAttribute ("src")) {
+		auto audioFile = _this.attribute ("src");
+
+		if (! audioFile.isEmpty ()) {
+			setSampleFile( _this.attribute( "src" ) );
+		}
 	}
+
+	if (sampleFile () == QString()) {
+		// Data without any other info.
+		// Should not be happening after 1.3.
+		if (_this.hasAttribute ("data") && _this.attribute ("data") != QString()) {
+			qWarning("Using default sampleRate. That could lead to invalid values1");
+			m_sampleBuffer->loadFromBase64 (_this.attribute ("data"),
+											Engine::mixer ()->baseSampleRate (),
+											true);
+		} else {
+			m_sampleBuffer->restoreState (_this.firstChildElement (m_sampleBuffer->nodeName ()));
+		}
+	}
+
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
-
-	if (_this.hasAttribute ("sample_rate")) {
-		m_sampleBuffer->setSampleRate (_this.attribute ("sample_rate").toInt ());
-	}
 
 	if (_this.hasAttribute ("is_record")) {
 		setRecord (_this.attribute ("is_record").toInt ());
@@ -363,15 +371,6 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 	{
 		m_tco->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
-	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
-	{
-		m_tco->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) , true);
-		m_tco->updateLength();
-		update();
-		_de->accept();
-		Engine::getSong()->setModified();
 	}
 	else
 	{
