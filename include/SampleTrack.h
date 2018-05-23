@@ -53,7 +53,7 @@ public:
 		return "sampletco";
 	}
 
-	SampleBuffer* sampleBuffer()
+	const std::shared_ptr<SampleBuffer> sampleBuffer()
 	{
 		return m_sampleBuffer;
 	}
@@ -82,7 +82,7 @@ private slots:
 	void onSampleBufferChanged ();
 
 private:
-	SampleBuffer* m_sampleBuffer;
+	std::shared_ptr<SampleBuffer> m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
 
