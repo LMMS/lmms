@@ -793,6 +793,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * _parent, int _w
 	m_endKnob( 0 ),
 	m_loopKnob( 0 ),
 	m_isDragging( false ),
+	m_reversed(false),
 	m_framesPlayed( 0 ),
 	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
 {
