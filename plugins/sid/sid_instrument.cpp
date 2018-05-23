@@ -29,6 +29,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <vector>
 
 #include "sid.h"
 
@@ -324,7 +325,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 	cSID *sid = static_cast<cSID *>( _n->m_pluginData );
 	int delta_t = clockrate * frames / samplerate + 4;
-	short buf[frames];
+	std::vector<short> buf(frames);
 	unsigned char sidreg[NUMSIDREGS];
 
 	for (int c = 0; c < NUMSIDREGS; c++)
@@ -425,7 +426,7 @@ void sidInstrument::playNote( NotePlayHandle * _n,
 
 	sidreg[24] = data8&0x00FF;
 		
-	int num = sid_fillbuffer(sidreg, sid,delta_t,buf, frames);
+	int num = sid_fillbuffer(sidreg, sid,delta_t,buf.data(), frames);
 	if(num!=frames)
 		printf("!!!Not enough samples\n");
 
