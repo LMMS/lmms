@@ -89,7 +89,6 @@ SampleBuffer::SampleBuffer(SampleBuffer::DataVector &&movedData , sample_rate_t 
 	SampleBuffer()
 {
 	beginBufferChange (false);
-	setSampleRate (sampleRate);
 	m_data = std::move (movedData);
 	doneBufferChange (
 	/* shouldLock */				false,
@@ -131,18 +130,27 @@ void SampleBuffer::loadSettings(const QDomElement &_this) {
 
 void SampleBuffer::sampleRateChanged() {
 	auto previousSampleRate = sampleRate ();
-	if (mixerSampleRate () == sampleRate ())
+	auto requiredSampleRate = mixerSampleRate ();
+
+	if (requiredSampleRate == sampleRate ())
 		return;
 
-	beginBufferChange (true);
-	setSampleRate (mixerSampleRate ());
+	// Only resample the buffer if the processing
+	// sample rate is higher than the SampleBuffer's
+	// sample rate.
+	if (requiredSampleRate > sampleRate ()) {
+		beginBufferChange (true);
 
-	// Resample the buffer.
-	doneBufferChange (
-	/* shouldLock */				true,
-	/* shouldKeepSettings */		true,
-									previousSampleRate
-				);
+		m_data = resampleData (m_data, previousSampleRate, requiredSampleRate);
+
+		doneBufferChange (
+		/* shouldLock */				true,
+		/* shouldKeepSettings */		true,
+										requiredSampleRate
+		);
+	}
+
+
 }
 
 sample_rate_t SampleBuffer::mixerSampleRate()
@@ -272,24 +280,6 @@ SampleBuffer::DataVector SampleBuffer::convertIntToFloat (int_sample_t * & _ibuf
 	delete[] _ibuf;
 
 	return vector;
-}
-
-
-void SampleBuffer::normalizeSampleRate( const sample_rate_t _src_sr,
-							bool _keep_settings )
-{
-	// do samplerate-conversion to our default-samplerate
-	if( _src_sr != sampleRate ())
-	{
-		m_data = resampleData (m_data, _src_sr, sampleRate ());
-	}
-
-	if( _keep_settings == false )
-	{
-		// update frame-variables
-		m_loopStartFrame = m_startFrame = 0;
-		m_loopEndFrame = m_endFrame = frames ();
-	}
 }
 
 
@@ -1154,7 +1144,7 @@ void SampleBuffer::doneBufferChange(bool shouldUnlock,
 									sample_rate_t bufferSampleRate,
 									bool shouldUnlockMixer) {
 
-	normalizeSampleRate (bufferSampleRate, shouldKeepSettings);
+	setSampleRate (bufferSampleRate);
 
 	// TODO: reverse- and amplification-property is not covered
 	// by following code...
