@@ -49,6 +49,9 @@
 #include "ExprSynth.h"
 
 #include "plugin_export.h"
+#ifdef LMMS_BUILD_WIN32
+#include <Windows.h>
+#endif
 
 extern "C" {
 
@@ -876,11 +879,25 @@ void XpressiveView::helpClicked() {
 
 }
 
+#ifdef LMMS_BUILD_WIN32
+//TODO: s_instance already gets deleted when the parent is deleted
+//I'm leaving this code here in case I'm mistaken because the same should go
+//for the linux implementation, but can't test it.
+
+//BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+//{
+//	if (fdwReason == DLL_PROCESS_DETACH)
+//	{
+//		XpressiveHelpView::finalize();
+//	}
+//	return TRUE;
+//}
+#else
 __attribute__((destructor)) static void module_destroy()
 {
 	XpressiveHelpView::finalize();
 }
-
+#endif
 extern "C" {
 
 // necessary for getting instance out of shared lib
