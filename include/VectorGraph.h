@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QVector>
+#include <QtMath>
 
 #include "ModelView.h"
 
@@ -95,8 +96,16 @@ public:
 
 	VectorGraphPoint * getPoint(int index);
 
+	float calculateSample(float input);
+	float calculateSectionSample(float input, int sectionStartIndex);
+	int getSectionStartIndex(float input);
+
 private:
 	QVector<VectorGraphPoint> m_points;
+	static inline bool floatEqual(float a, float b, float epsilon)
+	{
+		return qFabs(a - b) < epsilon;
+	}
 };
 
 
@@ -104,7 +113,12 @@ private:
 class VectorGraphPoint
 {
 public:
-	VectorGraphPoint(float x, float y);
+	enum TensionType
+	{
+		SingleCurve
+	};
+
+	VectorGraphPoint(float x, float y, float tension, TensionType type);
 	VectorGraphPoint();
 	inline float x()
 	{
@@ -114,9 +128,35 @@ public:
 	{
 		return m_y;
 	}
+	inline float tension()
+	{
+		return m_tension;
+	}
+	inline TensionType tensionType()
+	{
+		return m_tensionType;
+	}
+	inline float tensionPower()
+	{
+		return m_tensionPower;
+	}
+	inline float dryAmt()
+	{
+		return m_dryAmt;
+	}
+	inline void setTension(float tension)
+	{
+		m_tension = tension;
+		m_tensionPower = qPow(10, tension);
+		m_dryAmt = 0.2 * qPow(1 - qAbs(tension), 5);
+	}
 private:
 	float m_x;
 	float m_y;
+	float m_tension;
+	float m_tensionPower;
+	float m_dryAmt;
+	TensionType m_tensionType;
 };
 
 #endif

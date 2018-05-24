@@ -23,6 +23,7 @@
  */
 
 #include "VectorGraph.h"
+#include "lmms_math.h"
 
 VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	QWidget( _parent ),
@@ -33,13 +34,15 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	m_width = _width;
 	m_height = _height;
 
+	m_resolution = m_width * 2; // Maybe find a more efficient way to make the ends appear where they should
+
 	QVector<VectorGraphPoint> points = QVector<VectorGraphPoint>();
 
-	points.append(VectorGraphPoint(0, 0));
-	points.append(VectorGraphPoint(0.2, 0.5));
-	points.append(VectorGraphPoint(0.7, 0.3));
-	points.append(VectorGraphPoint(0.8, 0.9));
-	points.append(VectorGraphPoint(1, 1));
+	points.append(VectorGraphPoint(0, 0, 0, VectorGraphPoint::TensionType::SingleCurve));
+	points.append(VectorGraphPoint(0.2, 0.5, -0.5, VectorGraphPoint::TensionType::SingleCurve));
+	points.append(VectorGraphPoint(0.7, 0.3, 0, VectorGraphPoint::TensionType::SingleCurve));
+	points.append(VectorGraphPoint(0.8, 0.9, 0, VectorGraphPoint::TensionType::SingleCurve));
+	points.append(VectorGraphPoint(1, 1, 0, VectorGraphPoint::TensionType::SingleCurve));
 
 	model()->setPoints(points);
 }
@@ -52,6 +55,18 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	pen.setWidth(1.5);
 	pen.setColor(Qt::white);
 	m_canvas.setPen(pen);
+
+	QPainterPath path;
+	path.moveTo(0, m_resolution);
+
+	for (int i = 0; i < m_resolution; i++)
+	{
+		auto h = (model()->calculateSample((float) i / m_resolution));
+		path.lineTo(((float) i / m_resolution) * m_width,
+					(1 - h) * m_height);
+	}
+
+	m_canvas.drawPath(path);
 
 	for (int i = 0; i < model()->getPointCount(); i++)
 	{
@@ -74,17 +89,74 @@ VectorGraphPoint * VectorGraphModel::getPoint(int index)
 	return & m_points[index];
 }
 
+int VectorGraphModel::getSectionStartIndex(float input)
+{
+	if (m_points.size() == 0)
+	{
+		return -1;
+	}
+	else if (m_points.size() == 1)
+	{
+		return 0;
+	}
+
+	for (int i = 1; i < m_points.size(); i++)
+	{
+		if (m_points[i].x() > input || floatEqual(m_points[i].x(), input, 0.000001)) // unsure if this is a good epsilon
+		{
+			return i - 1;
+		}
+	}
+
+	return -1;
+}
+
+float VectorGraphModel::calculateSectionSample(float input, int sectionStartIndex)
+{
+	if (m_points.size() == 1 && sectionStartIndex == 0)
+	{
+		return m_points[0].y();
+	}
+
+	VectorGraphPoint * point = getPoint(sectionStartIndex + 1);
+
+	if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
+	{
+		return input;
+	}
+
+	//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
+	return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(input, point->tensionPower());
+}
+
+float VectorGraphModel::calculateSample(float input)
+{
+	int startIndex = getSectionStartIndex(input);
+	int endIndex = startIndex + 1;
+
+	VectorGraphPoint * startPoint = getPoint(startIndex);
+	VectorGraphPoint * endPoint = getPoint(endIndex);
+
+	float sectionNormalizedInput = (input - startPoint->x()) * (1 / (endPoint->x() - startPoint->x()));
+	float sectionNormalizedOutput = calculateSectionSample(sectionNormalizedInput, startIndex);
+	float output = sectionNormalizedOutput * (endPoint->y() - startPoint->y()) + startPoint->y();
+	return output;
+}
 
 
 
-VectorGraphPoint::VectorGraphPoint(float x, float y)
+VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, TensionType type)
 {
 	m_x = x;
 	m_y = y;
+	setTension(tension);
+	m_tensionType = type;
 }
 
 VectorGraphPoint::VectorGraphPoint()
 {
 	m_x = 0;
 	m_y = 0;
+	setTension(0);
+	m_tensionType = TensionType::SingleCurve;
 }
