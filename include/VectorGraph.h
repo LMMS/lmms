@@ -28,11 +28,12 @@
 #include <QWidget>
 #include <QPainter>
 #include <QVector>
-#include <QPair>
 
 #include "ModelView.h"
 
-class vectorGraphModel;
+class VectorGraphModel;
+class VectorGraphPoint;
+
 
 
 
@@ -43,25 +44,79 @@ public:
 	VectorGraph( QWidget * _parent, int _width, int _height );
 	virtual ~VectorGraph() = default;
 
+	inline void setResolution(int resolution)
+	{
+		m_resolution = resolution;
+	}
+
+	inline VectorGraphModel * model()
+	{
+		return castModel<VectorGraphModel>();
+	}
+
+	inline int getWidth()
+	{
+		return m_width;
+	}
+
+	inline int getHeight()
+	{
+		return m_height;
+	}
+
 protected:
 	void paintEvent( QPaintEvent * event ) override;
 
 private:
 	QPainter m_canvas;
+	int m_resolution;
+	int m_width;
+	int m_height;
 };
 
 
 
-class EXPORT vectorGraphModel : public Model
+class EXPORT VectorGraphModel : public Model
 {
 	Q_OBJECT
 public:
-	vectorGraphModel();
-	virtual ~vectorGraphModel() = default;
+	VectorGraphModel(Model *_parent, bool _default_constructed);
+	virtual ~VectorGraphModel() = default;
+
+	inline void setPoints(QVector<VectorGraphPoint> points)
+	{
+		m_points = points;
+	}
+
+	inline int getPointCount()
+	{
+		return m_points.size();
+	}
+
+	VectorGraphPoint * getPoint(int index);
 
 private:
-	QVector<QPair<float, float>> m_points;
-	QVector<float> m_tensions;
-}
+	QVector<VectorGraphPoint> m_points;
+};
+
+
+
+class VectorGraphPoint
+{
+public:
+	VectorGraphPoint(float x, float y);
+	VectorGraphPoint();
+	inline float x()
+	{
+		return m_x;
+	}
+	inline float y()
+	{
+		return m_y;
+	}
+private:
+	float m_x;
+	float m_y;
+};
 
 #endif
