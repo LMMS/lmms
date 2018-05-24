@@ -65,8 +65,11 @@ public:
 		return m_height;
 	}
 
+signals:
+	void drawn();
 protected:
 	void paintEvent( QPaintEvent * event ) override;
+	void mousePressEvent( QMouseEvent * _me );
 
 private:
 	QPainter m_canvas;
@@ -99,6 +102,7 @@ public:
 	float calculateSample(float input);
 	float calculateSectionSample(float input, int sectionStartIndex);
 	int getSectionStartIndex(float input);
+	void insertPointAfter(int index, VectorGraphPoint point);
 
 private:
 	QVector<VectorGraphPoint> m_points;
@@ -148,7 +152,7 @@ public:
 	{
 		m_tension = tension;
 		m_tensionPower = qPow(10, tension);
-		m_dryAmt = 0.2 * qPow(1 - qAbs(tension), 5);
+		m_dryAmt = 0.2 * qPow(1 - qAbs(tension), 3);
 	}
 private:
 	float m_x;

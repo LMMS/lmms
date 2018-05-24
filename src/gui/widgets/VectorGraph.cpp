@@ -22,6 +22,8 @@
  *
  */
 
+#include <QMouseEvent>
+
 #include "VectorGraph.h"
 #include "lmms_math.h"
 
@@ -72,6 +74,23 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	{
 		auto point = model()->getPoint(i);
 		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), 5, 5);
+	}
+}
+
+void VectorGraph::mousePressEvent(QMouseEvent *event)
+{
+	if (event->button() == Qt::MouseButton::RightButton)
+	{
+		int leftBoundIndex = model()->getSectionStartIndex((float) event->x() / m_width);
+		model()->insertPointAfter(leftBoundIndex,
+			VectorGraphPoint(
+				(float) event->x() / m_width,
+				1 - (float) event->y() / m_height,
+				0,
+				VectorGraphPoint::SingleCurve
+			)
+		);
+		update();
 	}
 }
 
@@ -141,6 +160,11 @@ float VectorGraphModel::calculateSample(float input)
 	float sectionNormalizedOutput = calculateSectionSample(sectionNormalizedInput, startIndex);
 	float output = sectionNormalizedOutput * (endPoint->y() - startPoint->y()) + startPoint->y();
 	return output;
+}
+
+void VectorGraphModel::insertPointAfter(int index, VectorGraphPoint point)
+{
+	m_points.insert(index + 1, point);
 }
 
 
