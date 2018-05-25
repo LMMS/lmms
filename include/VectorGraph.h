@@ -125,11 +125,11 @@ public:
 
 	const inline int getPointSize()
 	{
-		return 5;
+		return 6;
 	}
 	const inline int getTensionHandleSize()
 	{
-		return 3;
+		return 4;
 	}
 
 private:

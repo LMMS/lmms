@@ -75,6 +75,14 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 		auto point = model()->getPoint(i);
 		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), model()->getPointSize(), model()->getPointSize());
 	}
+
+	for (int i = 1; i < model()->getPointCount(); i++)
+	{
+		auto point = model()->getPoint(i);
+		auto previousPoint = model()->getPoint(i - 1);
+		float xValueToDrawAt = ((point->x() + previousPoint->x()) / 2) * m_width;
+		m_canvas.drawEllipse(QPoint(xValueToDrawAt, (1 - model()->calculateSample(xValueToDrawAt / m_width)) * m_height), model()->getTensionHandleSize(), model()->getTensionHandleSize());
+	}
 }
 
 void VectorGraph::mousePressEvent(QMouseEvent *event)
