@@ -27,6 +27,8 @@
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 namespace lmms::gui
 {
@@ -46,7 +48,20 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 
 void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 {
-	_ce->ignore();
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		_ce->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
+	{
+		parentWidget()->hide();
+		_ce->ignore();
+	}
+	else
+	{
+		hide();
+		_ce->ignore();
+	}
 	emit closed();
 }
 

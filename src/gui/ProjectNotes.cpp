@@ -392,15 +392,20 @@ void ProjectNotes::loadSettings( const QDomElement & _this )
 
 void ProjectNotes::closeEvent( QCloseEvent * _ce )
 {
-	if( parentWidget() )
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		_ce->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		_ce->ignore();
 	}
 	else
 	{
 		hide();
+		_ce->ignore();
 	}
-	_ce->ignore();
  }
 
 } // namespace lmms::gui

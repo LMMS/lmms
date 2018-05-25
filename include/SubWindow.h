@@ -82,6 +82,7 @@ protected:
 	void paintEvent( QPaintEvent * pe ) override;
 	void changeEvent( QEvent * event ) override;
 	void showEvent( QShowEvent* event ) override;
+	bool eventFilter( QObject * obj, QEvent * event ) override;
 
 	bool isDetached() const;
 

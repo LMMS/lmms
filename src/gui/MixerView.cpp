@@ -523,18 +523,23 @@ void MixerView::keyPressEvent(QKeyEvent * e)
 
 
 
-void MixerView::closeEvent(QCloseEvent * ce)
- {
-	if (parentWidget())
+void MixerView::closeEvent( QCloseEvent * _ce )
+{
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		_ce->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		_ce->ignore();
 	}
 	else
 	{
 		hide();
+		_ce->ignore();
 	}
-	ce->ignore();
- }
+}
 
 
 
