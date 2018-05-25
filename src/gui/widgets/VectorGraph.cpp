@@ -40,11 +40,13 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 
 	QVector<VectorGraphPoint> points = QVector<VectorGraphPoint>();
 
-	points.append(VectorGraphPoint(0, 0, 0, VectorGraphPoint::TensionType::SingleCurve));
-	points.append(VectorGraphPoint(0.2, 0.5, -0.5, VectorGraphPoint::TensionType::SingleCurve));
-	points.append(VectorGraphPoint(0.7, 0.3, 0, VectorGraphPoint::TensionType::SingleCurve));
-	points.append(VectorGraphPoint(0.8, 0.9, 0, VectorGraphPoint::TensionType::SingleCurve));
-	points.append(VectorGraphPoint(1, 1, 0, VectorGraphPoint::TensionType::SingleCurve));
+	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraphPoint::TensionType::SingleCurve);
+	firstPoint.permaLockX();
+	firstPoint.permaLockY();
+	points.append(firstPoint);
+	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraphPoint::TensionType::SingleCurve);
+	finalPoint.permaLockX();
+	points.append(finalPoint);
 
 	model()->setPoints(points);
 }
@@ -202,50 +204,50 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 {
 	VectorGraphPoint * currentPoint = getPoint(index);
 
-	if (index == 0)
+	if (!currentPoint->isXLocked())
 	{
-		currentPoint->setY(y);
-		return;
+		bool checkRight = true;
+
+		if (index + 1 == m_points.size())
+		{
+			checkRight = false;
+		}
+
+		VectorGraphPoint * leftPoint = getPoint(index - 1);
+		VectorGraphPoint * rightPoint;
+		if (checkRight)
+		{
+			rightPoint = getPoint(index + 1);
+		}
+
+		if (x < leftPoint->x())
+		{
+			currentPoint->setX(leftPoint->x());
+		}
+		else if (checkRight && x > rightPoint->x())
+		{
+			currentPoint->setX(rightPoint->x());
+		}
+		else
+		{
+			currentPoint->setX(x);
+		}
 	}
 
-	bool checkRight = true;
-
-	if (index + 1 == m_points.size())
+	if (!currentPoint->isYLocked())
 	{
-		checkRight = false;
-	}
-
-	VectorGraphPoint * leftPoint = getPoint(index - 1);
-	VectorGraphPoint * rightPoint;
-	if (checkRight)
-	{
-		rightPoint = getPoint(index + 1);
-	}
-
-	if (x < leftPoint->x())
-	{
-		currentPoint->setX(leftPoint->x());
-	}
-	else if (checkRight && x > rightPoint->x())
-	{
-		currentPoint->setX(rightPoint->x());
-	}
-	else
-	{
-		currentPoint->setX(x);
-	}
-
-	if (y > 1)
-	{
-		currentPoint->setY(1);
-	}
-	else if (y < 0)
-	{
-		currentPoint->setY(0);
-	}
-	else
-	{
-		currentPoint->setY(y);
+		if (y > 1)
+		{
+			currentPoint->setY(1);
+		}
+		else if (y < 0)
+		{
+			currentPoint->setY(0);
+		}
+		else
+		{
+			currentPoint->setY(y);
+		}
 	}
 }
 
@@ -272,6 +274,10 @@ VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, TensionType 
 	m_y = y;
 	setTension(tension);
 	m_tensionType = type;
+	m_isXLocked = false;
+	m_isYLocked = false;
+	m_isXPermaLocked = false;
+	m_isYPermaLocked = false;
 }
 
 VectorGraphPoint::VectorGraphPoint()
@@ -280,4 +286,8 @@ VectorGraphPoint::VectorGraphPoint()
 	m_y = 0;
 	setTension(0);
 	m_tensionType = TensionType::SingleCurve;
+	m_isXLocked = false;
+	m_isYLocked = false;
+	m_isXPermaLocked = false;
+	m_isYPermaLocked = false;
 }

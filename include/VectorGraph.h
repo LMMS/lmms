@@ -125,11 +125,11 @@ public:
 
 	const inline int getPointSize()
 	{
-		return 6;
+		return 5;
 	}
 	const inline int getTensionHandleSize()
 	{
-		return 4;
+		return 3;
 	}
 
 private:
@@ -197,6 +197,46 @@ public:
 		m_tensionPower = qPow(10, tension);
 		m_dryAmt = 0.2 * qPow(1 - qAbs(tension), 3);
 	}
+	inline void lockX()
+	{
+		m_isXLocked = true;
+	}
+	inline void lockY()
+	{
+		m_isYLocked = true;
+	}
+	inline void permaLockX()
+	{
+		m_isXPermaLocked = true;
+	}
+	inline void permaLockY()
+	{
+		m_isYPermaLocked = true;
+	}
+	inline void unlockX()
+	{
+		m_isXLocked = false;
+	}
+	inline void unlockY()
+	{
+		m_isYLocked = false;
+	}
+	inline void permaUnlockX()
+	{
+		m_isXPermaLocked = false;
+	}
+	inline void permaUnlockY()
+	{
+		m_isYPermaLocked = false;
+	}
+	inline bool isXLocked()
+	{
+		return m_isXLocked || m_isXPermaLocked;
+	}
+	inline bool isYLocked()
+	{
+		return m_isYLocked || m_isYPermaLocked;
+	}
 private:
 	float m_x;
 	float m_y;
@@ -204,6 +244,10 @@ private:
 	float m_tensionPower;
 	float m_dryAmt;
 	TensionType m_tensionType;
+	bool m_isXLocked;
+	bool m_isYLocked;
+	bool m_isXPermaLocked;
+	bool m_isYPermaLocked;
 };
 
 #endif
