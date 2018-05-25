@@ -29,7 +29,6 @@
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QMainWindow>
-#include <QThread>
 
 #include "ConfigManager.h"
 #include "SubWindow.h"

@@ -40,8 +40,9 @@ class LcdSpinBox;
 class QLineEdit;
 
 
-class AudioSndio : public AudioDevice, public QThread
+class AudioSndio : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioSndio( bool & _success_ful, Mixer * _mixer );
 	virtual ~AudioSndio();
