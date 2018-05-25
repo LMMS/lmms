@@ -69,7 +69,9 @@ signals:
 	void drawn();
 protected:
 	void paintEvent( QPaintEvent * event ) override;
-	void mousePressEvent( QMouseEvent * _me );
+	void mousePressEvent( QMouseEvent * event );
+	void mouseMoveEvent( QMouseEvent * event );
+	void mouseReleaseEvent( QMouseEvent * event );
 
 private:
 	QPainter m_canvas;
@@ -97,15 +99,32 @@ public:
 		return m_points.size();
 	}
 
-	VectorGraphPoint * getPoint(int index);
+	inline void setCurrentDraggedPoint(int index)
+	{
+		m_currentDraggedPoint = index;
+	}
 
+	inline void resetCurrentDraggedPoint()
+	{
+		m_currentDraggedPoint = -1;
+	}
+
+	inline int getCurrentDraggedPoint()
+	{
+		return m_currentDraggedPoint;
+	}
+
+	VectorGraphPoint * getPoint(int index);
 	float calculateSample(float input);
 	float calculateSectionSample(float input, int sectionStartIndex);
 	int getSectionStartIndex(float input);
 	void insertPointAfter(int index, VectorGraphPoint point);
+	void tryMove(int index, float x, float y);
 
 private:
 	QVector<VectorGraphPoint> m_points;
+	int m_currentDraggedPoint;
+
 	static inline bool floatEqual(float a, float b, float epsilon)
 	{
 		return qFabs(a - b) < epsilon;
@@ -131,6 +150,14 @@ public:
 	inline float y()
 	{
 		return m_y;
+	}
+	inline void setX(float x)
+	{
+		m_x = x;
+	}
+	inline void setY(float y)
+	{
+		m_y = y;
 	}
 	inline float tension()
 	{

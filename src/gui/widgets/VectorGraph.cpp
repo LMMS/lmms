@@ -90,8 +90,23 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 				VectorGraphPoint::SingleCurve
 			)
 		);
+		model()->setCurrentDraggedPoint(leftBoundIndex + 1);
 		update();
 	}
+}
+
+void VectorGraph::mouseMoveEvent(QMouseEvent *event)
+{
+	if (model()->getCurrentDraggedPoint() != -1)
+	{
+		model()->tryMove(model()->getCurrentDraggedPoint(), (float) event->x() / m_width, 1 - (float) event->y() / m_height);
+		update();
+	}
+}
+
+void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
+{
+	model()->resetCurrentDraggedPoint();
 }
 
 
@@ -166,6 +181,48 @@ void VectorGraphModel::insertPointAfter(int index, VectorGraphPoint point)
 {
 	m_points.insert(index + 1, point);
 }
+
+void VectorGraphModel::tryMove(int index, float x, float y)
+{
+	VectorGraphPoint * currentPoint = getPoint(index);
+
+	if (index == 0)
+	{
+		currentPoint->setY(y);
+		return;
+	}
+
+	bool checkRight = true;
+
+	if (index + 1 == m_points.size())
+	{
+		checkRight = false;
+	}
+
+	VectorGraphPoint * leftPoint = getPoint(index - 1);
+	VectorGraphPoint * rightPoint;
+	if (checkRight)
+	{
+		rightPoint = getPoint(index + 1);
+	}
+
+	if (x < leftPoint->x())
+	{
+		currentPoint->setX(leftPoint->x());
+	}
+	else if (checkRight && x > rightPoint->x())
+	{
+		currentPoint->setX(rightPoint->x());
+	}
+	else
+	{
+		currentPoint->setX(x);
+	}
+
+	currentPoint->setY(y);
+}
+
+
 
 
 
