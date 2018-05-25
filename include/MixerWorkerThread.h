@@ -35,6 +35,7 @@ class ThreadableJob;
 
 class MixerWorkerThread : public QThread
 {
+	Q_OBJECT
 public:
 	// internal representation of the job queue - all functions are thread-safe
 	class JobQueue

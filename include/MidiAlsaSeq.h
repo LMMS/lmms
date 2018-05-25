@@ -39,7 +39,6 @@
 
 
 struct pollfd;
-class QLineEdit;
 
 
 class MidiAlsaSeq : public QThread, public MidiClient
