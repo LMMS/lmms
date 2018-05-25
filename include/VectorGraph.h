@@ -120,6 +120,17 @@ public:
 	int getSectionStartIndex(float input);
 	void insertPointAfter(int index, VectorGraphPoint point);
 	void tryMove(int index, float x, float y);
+	int getPointIndexFromCoords(int x, int y, int canvasWidth, int canvasHeight);
+
+
+	const inline int getPointSize()
+	{
+		return 5;
+	}
+	const inline int getTensionHandleSize()
+	{
+		return 3;
+	}
 
 private:
 	QVector<VectorGraphPoint> m_points;
@@ -128,6 +139,11 @@ private:
 	static inline bool floatEqual(float a, float b, float epsilon)
 	{
 		return qFabs(a - b) < epsilon;
+	}
+
+	static inline bool arePointsWithinDistance(float x1, float x2, float y1, float y2, float distance)
+	{
+		return qPow(x2 - x1, 2) + qPow(y2 - y1, 2) < qPow(distance, 2);
 	}
 };
 

@@ -73,7 +73,7 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	for (int i = 0; i < model()->getPointCount(); i++)
 	{
 		auto point = model()->getPoint(i);
-		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), 5, 5);
+		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), model()->getPointSize(), model()->getPointSize());
 	}
 }
 
@@ -92,6 +92,14 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 		);
 		model()->setCurrentDraggedPoint(leftBoundIndex + 1);
 		update();
+	}
+	else if (event->button() == Qt::MouseButton::LeftButton)
+	{
+		int index = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
+		if (index > -1)
+		{
+			model()->setCurrentDraggedPoint(index);
+		}
 	}
 }
 
@@ -231,6 +239,19 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 	{
 		currentPoint->setY(y);
 	}
+}
+
+int VectorGraphModel::getPointIndexFromCoords(int x, int y, int canvasWidth, int canvasHeight)
+{
+	for (int i = 0; i < m_points.size(); i++)
+	{
+		VectorGraphPoint * point = getPoint(i);
+		if (arePointsWithinDistance(x, point->x() * canvasWidth, y, point->y() * canvasHeight, getPointSize()))
+		{
+			return i;
+		}
+	}
+	return -1;
 }
 
 
