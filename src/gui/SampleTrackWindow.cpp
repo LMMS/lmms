@@ -230,15 +230,19 @@ void SampleTrackWindow::toggleVisibility(bool on)
 
 void SampleTrackWindow::closeEvent(QCloseEvent* ce)
 {
-	ce->ignore();
-
-	if(getGUI()->mainWindow()->workspace())
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		ce->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
 	{
 		parentWidget()->hide();
+		ce->ignore();
 	}
 	else
 	{
 		hide();
+		ce->ignore();
 	}
 
 	m_stv->m_tlb->setFocus();

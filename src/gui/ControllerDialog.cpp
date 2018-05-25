@@ -27,6 +27,8 @@
 
 #include "ControllerDialog.h"
 #include "Controller.h"
+#include "GuiApplication.h"
+#include "MainWindow.h"
 
 
 ControllerDialog::ControllerDialog( Controller * _controller,
@@ -46,7 +48,20 @@ ControllerDialog::~ControllerDialog()
 
 void ControllerDialog::closeEvent( QCloseEvent * _ce )
 {
-	_ce->ignore();
+	if (windowFlags().testFlag(Qt::Window))
+	{
+		_ce->accept();
+	}
+	else if (getGUI()->mainWindow()->workspace())
+	{
+		parentWidget()->hide();
+		_ce->ignore();
+	}
+	else
+	{
+		hide();
+		_ce->ignore();
+	}
 	emit closed();
 }
 
