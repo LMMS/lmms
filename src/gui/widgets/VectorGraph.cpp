@@ -219,7 +219,18 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 		currentPoint->setX(x);
 	}
 
-	currentPoint->setY(y);
+	if (y > 1)
+	{
+		currentPoint->setY(1);
+	}
+	else if (y < 0)
+	{
+		currentPoint->setY(0);
+	}
+	else
+	{
+		currentPoint->setY(y);
+	}
 }
 
 
