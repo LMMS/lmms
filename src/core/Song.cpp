@@ -108,6 +108,7 @@ Song::Song() :
 			this, SLOT( masterPitchChanged() ) );*/
 
 	qRegisterMetaType<Note>( "Note" );
+	qRegisterMetaType<MidiTime>("MidiTime");
 	setType( SongContainer );
 }
 
@@ -263,9 +264,6 @@ void Song::processNextBuffer()
 			m_vstSyncController.setPlaybackJumped( true );
 
 			emit updateSampleTracks();
-
-			if (isRecording ())
-				emit beforeRecord ();
 		}
 	}
 
@@ -273,6 +271,11 @@ void Song::processNextBuffer()
 	{
 		m_vstSyncController.setPlaybackJumped( true );
 		m_playPos[m_playMode].setJumped( false );
+	}
+	
+	if (isRecording())
+	{
+		emit beforeRecordOn(getPlayPos());
 	}
 
 	f_cnt_t framesPlayed = 0;
@@ -350,7 +353,7 @@ void Song::processNextBuffer()
 
 					if (isRecording())
 					{
-						emit beforeRecord ();
+						emit beforeRecordOn(getPlayPos());
 					}
 					emit updateSampleTracks();
 				}
@@ -560,8 +563,6 @@ void Song::record()
 
 void Song::playAndRecord()
 {
-	emit beforeRecord ();
-
 	playSong();
 	m_recording = true;
 }
