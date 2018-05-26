@@ -34,8 +34,7 @@
 #include <cstdint>
 #endif
 
-// for std::size_t.
-#include <cstddef>
+#include <array>
 
 typedef int32_t tact_t;
 typedef int32_t tick_t;
@@ -133,48 +132,19 @@ const ch_cnt_t LEFT_CHANNEL_INDEX  = 0;
 #define LADSPA_PATH_SEPERATOR ':'
 #endif
 
-/**
- *	@brief Non implementation dependent std::array.
- *
- *  std::array does not guaranty that its alignment
- *	would be that same as its elements. In other words,
- *  the compiler is allowed to add padding to the end
- *  of the class. That would be a problem if we want to
- *  use std::vector<sampleFrame>::data()->data()[X>CHANNEL].
- */
-template<class T, size_t Size>
-struct alignas (alignof(T)) ElementAlignedArray
-{
-	// implicit constructor and
-	// operator =.
+typedef std::array<sample_t, DEFAULT_CHANNELS> sampleFrame;
 
-	T *data()
-	{
-		return m_data;
-	}
+typedef std::array<sample_t, SURROUND_CHANNELS> surroundSampleFrame;
+#define ALIGN_SIZE 16
+#if __GNUC__
+typedef std::array<sample_t, DEFAULT_CHANNELS> sampleFrameA __attribute__((__aligned__(ALIGN_SIZE)));
+#endif
 
-	const T *data() const
-	{
-		return m_data;
-	}
 
-	T &operator[] (size_t index)
-	{
-		return m_data[index];
-	}
-
-	const T &operator[] (size_t index) const
-	{
-		return m_data[index];
-	}
-
-	T m_data[Size];
-};
-
-typedef ElementAlignedArray<sample_t, DEFAULT_CHANNELS> sampleFrame;
-typedef ElementAlignedArray<sample_t, SURROUND_CHANNELS> surroundSampleFrame;
-
-#define ALIGN_SIZE (16)
+static_assert (sizeof(sampleFrame) == sizeof(sample_t) * DEFAULT_CHANNELS,
+			   "sampleFrame's size is not equal to the sum of its parts");
+static_assert (sizeof(surroundSampleFrame) == sizeof(sample_t) * SURROUND_CHANNELS,
+			   "surroundSampleFrame's size is not equal to the sum of its parts");
 
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN
