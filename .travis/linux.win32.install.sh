@@ -9,7 +9,7 @@ MINGW_PACKAGES="mingw32-x-sdl mingw32-x-libvorbis mingw32-x-fluidsynth mingw32-x
 	mingw32-x-libgig mingw32-x-libsoundio mingw32-x-lame mingw32-x-qt5base"
 
 # swh build dependencies
-SWH_PACKAGES="perl libxml2-utils libxml-perl liblist-moreutils-perl"
+SWH_PACKAGES="perl libxml2-utils libxml-perl liblist-moreutils-perl libjack-dev"
 
 export MANUAL_PACKAGES_URLS="https://www.libsdl.org/release/SDL2-devel-2.0.7-mingw.tar.gz,install-package arch=i686-w64-mingw32 prefix=/opt/mingw32"
 
