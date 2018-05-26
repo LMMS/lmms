@@ -105,10 +105,18 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 	}
 	else if (event->button() == Qt::MouseButton::LeftButton)
 	{
-		int index = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
-		if (index > -1)
+		int pointIndex = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
+		if (pointIndex > -1)
 		{
-			model()->setCurrentDraggedPoint(index);
+			model()->setCurrentDraggedPoint(pointIndex);
+		}
+
+		int tensionHandleIndex = model()->getPointIndexFromTensionHandleCoords(event->x(), m_height - event->y(), m_width, m_height);
+		if (tensionHandleIndex > -1)
+		{
+			setCursor(Qt::BlankCursor);
+			model()->setStoredCursorPos(cursor().pos());
+			model()->setCurrentDraggedTensionHandle(tensionHandleIndex);
 		}
 	}
 }
@@ -120,11 +128,39 @@ void VectorGraph::mouseMoveEvent(QMouseEvent *event)
 		model()->tryMove(model()->getCurrentDraggedPoint(), (float) event->x() / m_width, 1 - (float) event->y() / m_height);
 		update();
 	}
+
+	if (model()->getCurrentDraggedTensionHandle() != -1)
+	{
+		QCursor c = cursor();
+		float delta = c.pos().y() - model()->getStoredCursorPos().y();
+		c.pos() = model()->getStoredCursorPos();
+		setCursor(c);
+
+		VectorGraphPoint * pointToEdit = model()->getPoint(model()->getCurrentDraggedTensionHandle());
+		float newTension = pointToEdit->tension() + delta / 1000; // Make the 100 adjustable from somewhere else - it's an important tweak
+		if (newTension > 1)
+			newTension = 1;
+		else if (newTension < -1)
+			newTension = -1;
+		pointToEdit->setTension(newTension);
+		update();
+	}
 }
 
 void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 {
-	model()->resetCurrentDraggedPoint();
+	if (model()->getCurrentDraggedPoint() != -1)
+		model()->resetCurrentDraggedPoint();
+
+	if (model()->getCurrentDraggedTensionHandle() > -1)
+	{
+		QCursor c = cursor();
+		//c.setPos(mapToGlobal(QPoint(15, 15)));
+		c.setPos(model()->getStoredCursorPos());
+		c.setShape(Qt::ArrowCursor);
+		setCursor(c);
+		model()->resetCurrentDraggedTensionHandle();
+	}
 }
 
 
@@ -134,6 +170,8 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 	Model(_parent, tr("VectorGraph"), _default_constructed)
 {
 	m_points = QVector<VectorGraphPoint>();
+	m_currentDraggedPoint = -1;
+	m_currentDraggedTensionHandle = -1;
 }
 
 VectorGraphPoint * VectorGraphModel::getPoint(int index)
@@ -257,6 +295,22 @@ int VectorGraphModel::getPointIndexFromCoords(int x, int y, int canvasWidth, int
 	{
 		VectorGraphPoint * point = getPoint(i);
 		if (arePointsWithinDistance(x, point->x() * canvasWidth, y, point->y() * canvasHeight, getPointSize()))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int canvasWidth, int canvasHeight)
+{
+	for (int i = 1; i < m_points.size(); i++)
+	{
+		VectorGraphPoint * startPoint = getPoint(i - 1);
+		VectorGraphPoint * endPoint = getPoint(i);
+		float tensionHandleCenterX = ((startPoint->x() + endPoint->x()) / 2) * canvasWidth;
+		float tensionHandleCenterY = calculateSample(tensionHandleCenterX / canvasWidth) * canvasHeight;
+		if (arePointsWithinDistance(x, tensionHandleCenterX, y, tensionHandleCenterY, getTensionHandleSize()))
 		{
 			return i;
 		}

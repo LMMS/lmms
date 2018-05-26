@@ -114,6 +114,31 @@ public:
 		return m_currentDraggedPoint;
 	}
 
+	inline void setCurrentDraggedTensionHandle(int index)
+	{
+		m_currentDraggedTensionHandle = index;
+	}
+
+	inline void resetCurrentDraggedTensionHandle()
+	{
+		m_currentDraggedTensionHandle = -1;
+	}
+
+	inline int getCurrentDraggedTensionHandle()
+	{
+		return m_currentDraggedTensionHandle;
+	}
+
+	inline QPoint getStoredCursorPos()
+	{
+		return m_storedCursorPos;
+	}
+
+	inline void setStoredCursorPos(QPoint point)
+	{
+		m_storedCursorPos = point;
+	}
+
 	VectorGraphPoint * getPoint(int index);
 	float calculateSample(float input);
 	float calculateSectionSample(float input, int sectionStartIndex);
@@ -121,6 +146,7 @@ public:
 	void insertPointAfter(int index, VectorGraphPoint point);
 	void tryMove(int index, float x, float y);
 	int getPointIndexFromCoords(int x, int y, int canvasWidth, int canvasHeight);
+	int getPointIndexFromTensionHandleCoords(int x, int y, int canvasWidth, int canvasHeight);
 
 
 	const inline int getPointSize()
@@ -135,7 +161,8 @@ public:
 private:
 	QVector<VectorGraphPoint> m_points;
 	int m_currentDraggedPoint;
-
+	int m_currentDraggedTensionHandle;
+	QPoint m_storedCursorPos;
 	static inline bool floatEqual(float a, float b, float epsilon)
 	{
 		return qFabs(a - b) < epsilon;
@@ -143,7 +170,12 @@ private:
 
 	static inline bool arePointsWithinDistance(float x1, float x2, float y1, float y2, float distance)
 	{
-		return qPow(x2 - x1, 2) + qPow(y2 - y1, 2) < qPow(distance, 2);
+		//return qPow(x2 - x1, 2) + qPow(y2 - y1, 2) <= qPow(distance, 2);
+		qreal aSquared = qPow(x2 - x1, 2);
+		qreal bSquared = qPow(y2 - y1, 2);
+		qreal cSquared = qPow(distance, 2);
+		bool result = aSquared + bSquared <= cSquared;
+		return result;
 	}
 };
 
