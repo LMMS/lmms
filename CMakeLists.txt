@@ -372,23 +372,23 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 
 # check for JACK
 IF(WANT_JACK)
-	PKG_CHECK_MODULES(JACK jack>=0.77)
-	IF(JACK_FOUND)
-		IF(WANT_WEAKJACK)
-			SET(LMMS_HAVE_WEAKJACK TRUE)
-			SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-			SET(STATUS_JACK "OK (weak linking enabled)")
-			# use dlsym instead
-			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
-		ELSE()
+	IF(WANT_WEAKJACK)
+		SET(LMMS_HAVE_WEAKJACK TRUE)
+		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
+		SET(STATUS_JACK "OK (weak linking enabled)")
+		# use dlsym instead
+		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+	ELSE()
+		PKG_CHECK_MODULES(JACK jack>=0.77)
+		IF(JACK_FOUND)
 			SET(STATUS_JACK "OK")
-		ENDIF()
-		SET(LMMS_HAVE_JACK TRUE)
-	ELSE(JACK_FOUND)
-		SET(JACK_INCLUDE_DIRS "")
-		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
-			"if you require JACK support")
-	ENDIF(JACK_FOUND)
+			SET(LMMS_HAVE_JACK TRUE)
+		ELSE(JACK_FOUND)
+			SET(JACK_INCLUDE_DIRS "")
+			SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
+				"if you require JACK support or enable weak jack")
+		ENDIF(JACK_FOUND)
+	ENDIF()
 ENDIF(WANT_JACK)
 
 # check for FFTW3F-library
