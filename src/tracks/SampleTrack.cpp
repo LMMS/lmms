@@ -559,7 +559,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
-	connect (Engine::getSong (), SIGNAL(beforeRecord()), this, SLOT(beforeRecord()));
+	connect (Engine::getSong (), SIGNAL(beforeRecordOn(MidiTime)), this, SLOT(beforeRecordOn(MidiTime)));
 
 
 	//care about positionmarker
@@ -766,7 +766,8 @@ void SampleTrack::setPlayingTcos( bool isPlaying )
 	}
 }
 
-void SampleTrack::beforeRecord() {
+void SampleTrack::beforeRecordOn(MidiTime time)
+{
 	if (isRecord ()) {
 		bool isRecordTCOExist = false;
 
@@ -781,7 +782,7 @@ void SampleTrack::beforeRecord() {
 			auto fallbackRecordTCO = static_cast<SampleTCO*>(createTCO (0));
 
 			fallbackRecordTCO->setRecord (true);
-			fallbackRecordTCO->movePosition (Engine::getSong ()->getPlayPos (Song::Mode_PlaySong));
+			fallbackRecordTCO->movePosition (time);
 //			fallbackRecordTCO->setSamplePlayLength (Engine::framesPerTick());
 			fallbackRecordTCO->changeLength (1);
 			fallbackRecordTCO->setSampleStartFrame (0);
