@@ -86,7 +86,7 @@ ENDIF(LMMS_BUILD_APPLE)
 
 IF(LMMS_BUILD_WIN32)
 	SET(WANT_ALSA OFF)
-		SET(WANT_JACK ON)
+	SET(WANT_JACK ON)
 	SET(WANT_PULSEAUDIO OFF)
 	SET(WANT_PORTAUDIO OFF)
 	SET(WANT_SOUNDIO OFF)
@@ -373,23 +373,25 @@ ENDIF(NOT LMMS_HAVE_ALSA)
 
 # check for JACK
 IF(WANT_JACK)
-	PKG_CHECK_MODULES(JACK jack>=0.77)
-	IF(JACK_FOUND)
-		IF(WANT_WEAKJACK)
-			SET(LMMS_HAVE_WEAKJACK TRUE)
-			SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-			SET(STATUS_JACK "OK (weak linking enabled)")
-			SET(JACK_INCLUDE_DIRS "")
-			# use dlsym instead
-			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
-		ELSE()
-			SET(STATUS_JACK "OK")
-		ENDIF()
+	IF(WANT_WEAKJACK)
+		SET(LMMS_HAVE_WEAKJACK TRUE)
+		SET(WEAKJACK_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack")
+		INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/include")
+		SET(STATUS_JACK "OK (weak linking enabled)")
+		# use dlsym instead
+		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		SET(LMMS_HAVE_JACK TRUE)
-	ELSE(JACK_FOUND)
-		SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
-			"if you require JACK support")
-	ENDIF(JACK_FOUND)
+	ELSE()
+		PKG_CHECK_MODULES(JACK jack>=0.77)
+
+		IF(JACK_FOUND)
+			SET(STATUS_JACK "OK")
+			SET(LMMS_HAVE_JACK TRUE)
+		ELSE(JACK_FOUND)
+			SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
+				"if you require JACK support or enable weak jack")
+		ENDIF(JACK_FOUND)
+	ENDIF()
 ENDIF(WANT_JACK)
 
 
