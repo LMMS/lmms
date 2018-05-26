@@ -180,7 +180,7 @@ public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
 	void updateEffectChannel();
-	void beforeRecord ();
+	void beforeRecordOn (MidiTime time);
 	void toggleRecord();
 	void playbackPositionChanged();
 
