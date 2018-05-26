@@ -740,8 +740,6 @@ void Knob::tabletPressEvent( QTabletEvent * _te )
 			thisModel->saveJournallingState( false );
 		}
 
-		const QPoint & p = _te->pos();
-		m_origMousePos = p;
 		m_prevTabletPos = _te->posF();
 		m_mouseOffset = QPoint(0, 0);
 		m_leftOver = 0.0f;
@@ -754,7 +752,9 @@ void Knob::tabletPressEvent( QTabletEvent * _te )
 				QPoint( width() + 2, 0 ) );
 		s_textFloat->show();
 		m_tabletPressed = true;
-	} else {
+	}
+	else
+	{
 		_te->ignore();
 	}
 
@@ -806,7 +806,6 @@ void Knob::tabletReleaseEvent( QTabletEvent * event )
 	}
 
 	m_tabletPressed = false;
-	QCursor::setPos( mapToGlobal( m_origMousePos ) );
 
 	emit sliderReleased();
 
