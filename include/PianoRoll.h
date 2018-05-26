@@ -75,6 +75,7 @@ public:
 		ModeErase,
 		ModeSelect,
 		ModeEditDetuning,
+		ModeNudge
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -276,7 +277,8 @@ private:
 	int noteEditRight() const;
 	int noteEditLeft() const;
 
-	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl );
+    void dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note * foo);
+    Note * draggedNote;
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -292,6 +294,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
+	static QPixmap * s_toolNudge;
 
 	static PianoRollKeyTypes prKeyOrder[];
 

@@ -24,6 +24,7 @@
  *
  */
 
+#include <iostream>
 #include <QApplication>
 #include <QClipboard>
 #include <QKeyEvent>
@@ -121,6 +122,7 @@ QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
+QPixmap * PianoRoll::s_toolNudge = NULL;
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
@@ -301,6 +303,10 @@ PianoRoll::PianoRoll() :
 	if( s_toolOpen == NULL )
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
+	}
+	if ( s_toolNudge == NULL)
+	{
+		s_toolNudge = new QPixmap( embed::getIconPixmap("edit_move"));
 	}
 
 	// init text-float
@@ -1086,7 +1092,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 						dragNotes( m_lastMouseX, m_lastMouseY,
 									ke->modifiers() & Qt::AltModifier,
 									ke->modifiers() & Qt::ShiftModifier,
-									ke->modifiers() & Qt::ControlModifier );
+                                    ke->modifiers() & Qt::ControlModifier,
+                                   nullptr);
 					}
 				}
 				ke->accept();
@@ -1132,7 +1139,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 						dragNotes( m_lastMouseX, m_lastMouseY,
 									ke->modifiers() & Qt::AltModifier,
 									ke->modifiers() & Qt::ShiftModifier,
-									ke->modifiers() & Qt::ControlModifier );
+                                    ke->modifiers() & Qt::ControlModifier, nullptr );
 					}
 
 				}
@@ -2051,7 +2058,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 			dragNotes( me->x(), me->y(),
 				me->modifiers() & Qt::AltModifier,
 				me->modifiers() & Qt::ShiftModifier,
-				me->modifiers() & Qt::ControlModifier );
+                me->modifiers() & Qt::ControlModifier, noteUnderMouse() );
 
 			if( replay_note && m_action == ActionMoveNote && ! ( ( me->modifiers() & Qt::ShiftModifier ) && ! m_startedWithShift ) )
 			{
@@ -2397,9 +2404,17 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 
 
-void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
+void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* foo )
 {
 	// dragging one or more notes around
+
+    // get note that's dragged
+    if (foo != NULL)
+    {
+        draggedNote = foo;
+    std::cout << foo->key() << std::endl;
+    std::cout << foo->oldPos();
+    }
 
 	// convert pixels to ticks and keys
 	int off_x = x - m_moveStartX;
@@ -2463,14 +2478,14 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl )
                     if (firstIteration)
                         {
                             firstIteration = false;
-                            Note copy (*note);
+                            Note* copy (draggedNote);
                             // quantize first note
-                            int pos_ticks = copy.oldPos().getTicks() + off_ticks;
+                            int pos_ticks = copy->oldPos().getTicks() + off_ticks;
                             pos_ticks = qMax(0, pos_ticks);
-                            copy.setPos (MidiTime(pos_ticks));
-                            copy.quantizePos(quantization());
+                            copy->setPos (MidiTime(pos_ticks));
+                            copy->quantizePos(quantization());
                             // new off_ticks based on quantized (copy) note  and not-quantized note
-                            off_ticks += copy.pos().getTicks() - (note->oldPos().getTicks() + off_ticks);
+                            off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks);
                         }
 					int pos_ticks = note->oldPos().getTicks() + off_ticks;
 					int key_num = note->oldKey() + off_key;
@@ -4107,6 +4122,7 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
 	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
+	QAction* nudgeAction = editModeGroup->addAction(embed::getIconPixmap("nudge"), tr("Nudge mode"));
 
 	drawAction->setChecked( true );
 
@@ -4156,6 +4172,7 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
+	notesActionsToolBar->addAction( nudgeAction );
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
