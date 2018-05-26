@@ -168,7 +168,7 @@ public:
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
-	void beforeRecord ();
+	void beforeRecordOn (MidiTime time);
 	void toggleRecord();
 	void playbackPositionChanged();
 

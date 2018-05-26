@@ -106,6 +106,7 @@ Song::Song() :
 			this, SLOT( masterPitchChanged() ) );*/
 
 	qRegisterMetaType<Note>( "Note" );
+	qRegisterMetaType<MidiTime>("MidiTime");
 	setType( SongContainer );
 }
 
@@ -252,15 +253,16 @@ void Song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			setToTime(tl->loopBegin());
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
-			emit updateSampleTracks();
+			setToTime(tl->loopBegin());
 
-			if (isRecording ())
-				emit beforeRecord ();
+			emit updateSampleTracks();
 		}
 	}
+
+	if (isRecording ())
+		emit beforeRecordOn (getPlayPos ());
 
 	f_cnt_t framesPlayed = 0;
 	const float framesPerTick = Engine::framesPerTick();
@@ -333,7 +335,7 @@ void Song::processNextBuffer()
 					setToTime(tl->loopBegin());
 
 					if (isRecording ())
-						emit beforeRecord ();
+						emit beforeRecordOn (getPlayPos ());
 				}
 				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
 				{
@@ -523,8 +525,6 @@ void Song::record()
 
 void Song::playAndRecord()
 {
-	emit beforeRecord ();
-
 	playSong();
 	m_recording = true;
 }
