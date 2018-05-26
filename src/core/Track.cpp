@@ -143,7 +143,9 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 {
 	if( m_startPosition != pos )
 	{
+		Engine::mixer()->requestChangeInModel();
 		m_startPosition = pos;
+		Engine::mixer()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}

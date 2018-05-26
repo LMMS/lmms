@@ -25,6 +25,7 @@
 #include "MixerWorkerThread.h"
 
 #include <xmmintrin.h>
+#include <QDebug>
 #include <QMutex>
 #include <QWaitCondition>
 
@@ -39,7 +40,7 @@ QList<MixerWorkerThread *> MixerWorkerThread::workerThreads;
 // implementation of internal JobQueue
 void MixerWorkerThread::JobQueue::reset( OperationMode _opMode )
 {
-	m_queueSize = 0;
+	m_writeIndex = 0;
 	m_itemsDone = 0;
 	m_opMode = _opMode;
 }
@@ -54,7 +55,13 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 		// update job state
 		_job->queue();
 		// actually queue the job via atomic operations
-		m_items[m_queueSize++] = _job;
+		auto index = m_writeIndex++;
+		if (index < JOB_QUEUE_SIZE) {
+			m_items[index] = _job;
+		} else {
+			qWarning() << "Job queue is full!";
+			++m_itemsDone;
+		}
 	}
 }
 
@@ -63,10 +70,10 @@ void MixerWorkerThread::JobQueue::addJob( ThreadableJob * _job )
 void MixerWorkerThread::JobQueue::run()
 {
 	bool processedJob = true;
-	while (processedJob && m_itemsDone < m_queueSize)
+	while (processedJob && m_itemsDone < m_writeIndex)
 	{
 		processedJob = false;
-		for( int i = 0; i < m_queueSize; ++i )
+		for( int i = 0; i < m_writeIndex && i < JOB_QUEUE_SIZE; ++i )
 		{
 			ThreadableJob * job = m_items[i].exchange(nullptr);
 			if( job )
@@ -86,7 +93,7 @@ void MixerWorkerThread::JobQueue::run()
 
 void MixerWorkerThread::JobQueue::wait()
 {
-	while (m_itemsDone < m_queueSize)
+	while (m_itemsDone < m_writeIndex)
 	{
 #if defined(LMMS_HOST_X86) || defined(LMMS_HOST_X86_64)
 		_mm_pause();
