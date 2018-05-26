@@ -383,7 +383,6 @@ IF(WANT_JACK)
 	ELSE()
 		PKG_CHECK_MODULES(JACK jack>=0.77)
 
-
 		IF(JACK_FOUND)
 			SET(STATUS_JACK "OK")
 			SET(LMMS_HAVE_JACK TRUE)
@@ -391,7 +390,7 @@ IF(WANT_JACK)
 			SET(STATUS_JACK "not found, please install libjack0.100.0-dev (or similar) "
 				"if you require JACK support or enable weak jack")
 		ENDIF(JACK_FOUND)
-ENDIF()
+	ENDIF()
 ENDIF(WANT_JACK)
 
 
