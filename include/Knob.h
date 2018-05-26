@@ -28,6 +28,7 @@
 
 #include <QWidget>
 #include <QtCore/QPoint>
+#include <QTabletEvent>
 
 #include "AutomatableModelView.h"
 #include "templates.h"
@@ -134,6 +135,10 @@ protected:
 	virtual void mouseDoubleClickEvent( QMouseEvent * _me );
 	virtual void paintEvent( QPaintEvent * _me );
 	virtual void wheelEvent( QWheelEvent * _me );
+	virtual void tabletEvent( QTabletEvent * _te );
+	virtual void tabletPressEvent( QTabletEvent * _te );
+	virtual void tabletReleaseEvent( QTabletEvent * event );
+	virtual void tabletMoveEvent( QTabletEvent * _te );
 
 	virtual float getValue( const QPoint & _p );
 
@@ -178,6 +183,9 @@ private:
 	QPoint m_origMousePos;
 	float m_leftOver;
 	bool m_buttonPressed;
+
+	QPointF m_prevTabletPos;
+	bool m_tabletPressed;
 
 	float m_totalAngle;
 	int m_angle;

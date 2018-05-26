@@ -525,6 +525,7 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 	// and it isn't shown again until user does something which causes
 	// an QApplication::restoreOverrideCursor()-call...
 	mouseReleaseEvent( NULL );
+	tabletReleaseEvent( NULL );
 
 	CaptionMenu contextMenu( model()->displayName(), this );
 	addDefaultActions( &contextMenu );
@@ -664,6 +665,7 @@ void Knob::focusOutEvent( QFocusEvent * _fe )
 {
 	// make sure we don't loose mouse release event
 	mouseReleaseEvent( NULL );
+	tabletReleaseEvent( NULL );
 	QWidget::focusOutEvent( _fe );
 }
 
@@ -695,6 +697,122 @@ void Knob::paintEvent( QPaintEvent * _me )
 				p.fontMetrics().width( m_label ) / 2,
 				height() - 2, m_label );
 	}
+}
+
+
+
+
+
+void Knob::tabletEvent( QTabletEvent * _te )
+{
+	switch( _te->type() )
+	{
+		case QEvent::TabletPress:
+			tabletPressEvent( _te );
+			break;
+		case QEvent::TabletRelease:
+			tabletReleaseEvent( _te );
+			break;
+		case QEvent::TabletMove:
+			tabletMoveEvent( _te );
+			break;
+		default:
+			_te->ignore();
+			break;
+	}
+}
+
+
+
+
+void Knob::tabletPressEvent( QTabletEvent * _te )
+{
+	if( _te->button() == Qt::LeftButton &&
+			! ( _te->modifiers() & Qt::ControlModifier ) &&
+			! ( _te->modifiers() & Qt::ShiftModifier ) )
+	{
+		_te->accept();
+
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
+
+		const QPoint & p = _te->pos();
+		m_origMousePos = p;
+		m_prevTabletPos = _te->posF();
+		m_mouseOffset = QPoint(0, 0);
+		m_leftOver = 0.0f;
+
+		emit sliderPressed();
+
+		QApplication::setOverrideCursor( Qt::BlankCursor );
+		s_textFloat->setText( displayValue() );
+		s_textFloat->moveGlobal( this,
+				QPoint( width() + 2, 0 ) );
+		s_textFloat->show();
+		m_tabletPressed = true;
+	} else {
+		_te->ignore();
+	}
+
+}
+
+
+
+
+void Knob::tabletMoveEvent( QTabletEvent * _te )
+{
+	if( m_tabletPressed )
+	{
+		if ( _te->posF() != m_prevTabletPos )
+		{
+			_te->accept();
+			m_mouseOffset = _te->pos() - m_prevTabletPos.toPoint();
+
+			setPosition( m_mouseOffset );
+			emit sliderMoved( model()->value() );
+
+			m_prevTabletPos = _te->posF();
+		}
+	}
+	else
+	{
+		_te->ignore();
+	}
+
+	s_textFloat->setText( displayValue() );
+}
+
+
+
+
+void Knob::tabletReleaseEvent( QTabletEvent * event )
+{
+	if( event && event->button() == Qt::LeftButton )
+	{
+		event->accept();
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->restoreJournallingState();
+		}
+	}
+	else if ( event )
+	{
+		event->ignore();
+	}
+
+	m_tabletPressed = false;
+	QCursor::setPos( mapToGlobal( m_origMousePos ) );
+
+	emit sliderReleased();
+
+	QApplication::restoreOverrideCursor();
+
+	s_textFloat->hide();
 }
 
 
