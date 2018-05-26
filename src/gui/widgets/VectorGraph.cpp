@@ -133,11 +133,11 @@ void VectorGraph::mouseMoveEvent(QMouseEvent *event)
 	{
 		QCursor c = cursor();
 		float delta = c.pos().y() - model()->getStoredCursorPos().y();
-		c.pos() = model()->getStoredCursorPos();
+		c.setPos(model()->getStoredCursorPos());
 		setCursor(c);
 
 		VectorGraphPoint * pointToEdit = model()->getPoint(model()->getCurrentDraggedTensionHandle());
-		float newTension = pointToEdit->tension() + delta / 1000; // Make the 100 adjustable from somewhere else - it's an important tweak
+		float newTension = pointToEdit->tension() + delta / 250; // Make adjustable from somewhere else - this is an important tweak
 		if (newTension > 1)
 			newTension = 1;
 		else if (newTension < -1)
