@@ -61,6 +61,7 @@ TextFloat * Knob::s_textFloat = NULL;
 	m_volumeKnob( false ), \
 	m_volumeRatio( 100.0, 0.0, 1000000.0 ), \
 	m_buttonPressed( false ), \
+	m_tabletPressed( false ), \
 	m_angle( -10 ), \
 	m_lineWidth( 0 ), \
 	m_textColor( 255, 255, 255 )
@@ -805,13 +806,15 @@ void Knob::tabletReleaseEvent( QTabletEvent * event )
 		event->ignore();
 	}
 
-	m_tabletPressed = false;
+	if (m_tabletPressed) {
+		m_tabletPressed = false;
 
-	emit sliderReleased();
+		emit sliderReleased();
 
-	QApplication::restoreOverrideCursor();
+		QApplication::restoreOverrideCursor();
 
-	s_textFloat->hide();
+		s_textFloat->hide();
+	}
 }
 
 
