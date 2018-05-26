@@ -31,6 +31,7 @@
 #include "PluginFactory.h"
 
 #include <QLabel>
+#include <QHeaderView>
 
 
 EffectSelectDialog::EffectSelectDialog( QWidget * _parent ) :
