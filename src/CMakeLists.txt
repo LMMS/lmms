@@ -244,6 +244,17 @@ IF(LMMS_BUILD_WIN32)
 				DESTINATION .)
 	ENDIF()
 
+
+	seT(JACK_INSTALLER_VERSION, "1.9.11")
+	# Bundle jack
+	IF (WANT_JACK)
+		add_custom_target(jack_binary_installer ALL
+			COMMAND "curl" -OL "https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_VERSION}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe"
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		message ("Test")
+		INSTALL(FILES "${CMAKE_BINARY_DIR}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe" DESTINATION .)
+		INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_BINARY_DIR}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe)")
+	ENDIF()
 ELSE(LMMS_BUILD_WIN32)
 	IF(NOT LMMS_BUILD_APPLE)
 		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
