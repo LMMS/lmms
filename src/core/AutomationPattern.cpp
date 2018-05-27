@@ -563,8 +563,7 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		if( *it )
 		{
 			QDomElement element = _doc.createElement( "object" );
-			element.setAttribute( "id",
-				ProjectJournal::idToSave( ( *it )->id() ) );
+			element.setAttribute( "id", ( *it )->id() );
 			_this.appendChild( element );
 		}
 	}

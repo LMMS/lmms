@@ -76,7 +76,7 @@ public:
 		reallocID( _id, NULL );
 	}
 
-	static jo_id_t idToSave( jo_id_t id );
+	void changeID(const jo_id_t oldID, const jo_id_t newID);
 
 	void clearJournal();
 	void stopAllJournalling();
