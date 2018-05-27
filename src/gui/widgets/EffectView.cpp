@@ -74,7 +74,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_autoQuit = new TempoSyncKnob( knobBright_26, this );
 	m_autoQuit->setLabel( tr( "DECAY" ) );
 	m_autoQuit->move( 60, 5 );
-	m_autoQuit->setEnabled( isEnabled );
+	m_autoQuit->setEnabled( isEnabled && !effect()->m_autoQuitDisabled );
 	m_autoQuit->setHintText( tr( "Time:" ), "ms" );
 	m_autoQuit->setWhatsThis( tr(
 "The Decay knob controls how many buffers of silence must pass before the "
