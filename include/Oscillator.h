@@ -56,7 +56,6 @@ public:
 		NumWaveShapes
 	} ;
 
-
 	enum ModulationAlgos
 	{
 		PhaseModulation,
@@ -88,7 +87,7 @@ public:
 
 	void update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
-
+// now follow the wave-shape-routines...
 
 	static inline sample_t sinSample( const float _sample )
 	{
@@ -120,8 +119,6 @@ public:
 	{
 		return ( fraction( _sample ) > 0.5f ) ? -1.0f : 1.0f;
 	}
-
-
 
 	static inline sample_t moogSawSample( const float _sample )
 	{
