@@ -56,6 +56,7 @@ public:
 		NumWaveShapes
 	} ;
 
+
 	enum ModulationAlgos
 	{
 		PhaseModulation,
@@ -88,7 +89,6 @@ public:
 	void update( sampleFrame * _ab, const fpp_t _frames,
 							const ch_cnt_t _chnl );
 
-	// now follow the wave-shape-routines...
 
 	static inline sample_t sinSample( const float _sample )
 	{
@@ -109,39 +109,11 @@ public:
 		return ph * 4.0f - 4.0f;
 	}
 
-	inline sample_t WtTriangleSample( const float _sample)
-	{
-//		printf("WTTriSample\n");
-		const float frame = _sample * TABLE_LEN;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % TABLE_LEN;
-		if( f1 < 0 )
-		{
-			f1 += TABLE_LEN;
-		}
-		f_cnt_t f2 = f1 < TABLE_LEN - 1 ?
-					f1 + 1 :
-					0;
-		return linearInterpolate( triTables[bandFromFreq(m_freq)][f1], triTables[bandFromFreq(m_freq)][f2], fraction( frame ) );
-	}
+
 
 	static inline sample_t sawSample( const float _sample )
 	{
 		return -1.0f + fraction( _sample ) * 2.0f;
-	}
-
-	inline sample_t WtSawSample( const float _sample)
-	{
-//		printf("WTSawSample\n");
-		const float frame = _sample * TABLE_LEN;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % TABLE_LEN;
-		if( f1 < 0 )
-		{
-			f1 += TABLE_LEN;
-		}
-		f_cnt_t f2 = f1 < TABLE_LEN - 1 ?
-					f1 + 1 :
-					0;
-		return linearInterpolate( sawTables[bandFromFreq(m_freq)][f1], sawTables[bandFromFreq(m_freq)][f2], fraction( frame ) );
 	}
 
 	static inline sample_t squareSample( const float _sample )
@@ -149,20 +121,7 @@ public:
 		return ( fraction( _sample ) > 0.5f ) ? -1.0f : 1.0f;
 	}
 
-	inline sample_t WtSquareSample( const float _sample)
-	{
-//		printf("WTSquareSample\n");
-		const float frame = _sample * TABLE_LEN;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % TABLE_LEN;
-		if( f1 < 0 )
-		{
-			f1 += TABLE_LEN;
-		}
-		f_cnt_t f2 = f1 < TABLE_LEN - 1 ?
-					f1 + 1 :
-					0;
-		return linearInterpolate( squareTables[bandFromFreq(m_freq)][f1], squareTables[bandFromFreq(m_freq)][f2], fraction( frame ) );
-	}
+
 
 	static inline sample_t moogSawSample( const float _sample )
 	{
@@ -198,6 +157,22 @@ public:
 		return m_userWave->userWaveSample( _sample );
 	}
 
+	inline sample_t wtSample(const WaveShapes shape, const float _sample)
+	{
+//		printf("WTSample shape: %d \n",shape);
+		const float frame = _sample * WAVETABLE_LENGTH;
+		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % WAVETABLE_LENGTH;
+		if (f1 < 0)
+		{
+			f1 += WAVETABLE_LENGTH;
+		}
+		f_cnt_t f2 = f1 < WAVETABLE_LENGTH - 1 ?
+					f1 + 1 :
+					0;
+		return linearInterpolate(s_waveTables[shape][waveTableBandFromFreq(m_freq)][f1],
+				s_waveTables[shape][waveTableBandFromFreq(m_freq)][f2], fraction(frame));
+	}
+
 
 private:
 	const IntModel * m_waveShapeModel;
@@ -212,60 +187,37 @@ private:
 	const SampleBuffer * m_userWave;
 
 	/* Multiband WaveTable */
-	static const int TABLE_LEN = 1024;
-	static const int MAX_FREQ = 20000; //limit to the audio spectr
+	static const int WAVETABLE_LENGTH = 1024;
+	static const int MAX_FREQ = 20000; //limit to the audio spectrum
 
 
 	///
 	/// \brief SineTable
 	/// the calculated Sine Wave Table
-	sample_t *sineTable;
-	///
-	/// \brief SquareTable
-	///the calculated Square Wave Table
-	sample_t *squareTable;
-	///
-	/// \brief TriTable
-	/// the calculated Triangle Wave Table
-	sample_t *triTable;
-	///
-	/// \brief SawTable
-	/// the calculated Saw tooth Wave Table
-	sample_t *sawTable;
+	sample_t *m_generatedWaveTable;
 
 	///
 	/// \brief m_bandFreq
 	///array containing base frequency for each band
-	static float *m_bandFreq;
+
+	static float *s_waveTableBandFreqs;
 	///
 	/// \brief m_tableCount
 	///The number of tables the audio spectrum is split into.
-	int m_tableCount;
+	static int s_waveTablesPerWaveformCount;
 
-	/// \brief sinTables
-	/// array of SineWaveTables
-	static sample_t **sineTables;
 	///
-	/// \brief squareTables
-	///arry of Square wave tables
-	static sample_t **squareTables;
-	///
-	/// \brief triTables
-	///array of triangle wave tables
-	static sample_t **triTables;
-	///
-	/// \brief sawTables
-	///array of sawWaveTables
-	static sample_t **sawTables;
+	/// \brief s_waveTables
+	///3d array [waveform][band][frame]
+	static sample_t ***s_waveTables;
 
-	void generateSineTable( int bands );
-	void generateSine2Table( int bands );
-	void generateSawTable( int bands );
-	void generateTriTable( int bands );
-	void generateSquareTable( int bands );
-	int bandFromFreq( float freq );
+	void generateSineWaveTable(int bands);
+	void generateSawWaveTable(int bands);
+	void generateTriangleWaveTable(int bands);
+	void generateSquareWaveTable(int bands);
+	int  waveTableBandFromFreq(float freq);
 	void generateWaveTables();
-	void allocTables();
+	void allocWaveTables();
 
 	/* End Multiband wavetable */
 

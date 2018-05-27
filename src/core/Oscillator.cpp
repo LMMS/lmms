@@ -33,21 +33,21 @@
 
 void Oscillator::waveTableInit()
 {
-	if(!m_bandFreq)
+	if(!s_waveTableBandFreqs)
 	{
-		m_bandFreq = new float[127];
-		m_tableCount = 0;
+		s_waveTableBandFreqs = new float[127];
+		s_waveTablesPerWaveformCount = 0;
 		for (int i = 1; i < 127; i+=4 )
 		{
-			m_bandFreq[m_tableCount] = 440.0 * powf(2.0, (i - 69.0)/12.0);
-			m_tableCount++;
+			s_waveTableBandFreqs[s_waveTablesPerWaveformCount] = 440.0 * powf(2.0, (i - 69.0)/12.0);
+			s_waveTablesPerWaveformCount++;
 		}
 	}
 
 //	printf("table %d\n",m_tableCount);
-	if( !squareTables )
+	if( !s_waveTables )
 	{
-		allocTables();
+		allocWaveTables();
 		qDebug("generate tables start \n");
 		generateWaveTables();
 		qDebug("generate Tables end \n" );
@@ -71,10 +71,7 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 	m_phaseOffset( _phase_offset ),
 	m_phase( _phase_offset ),
 	m_userWave( NULL ),
-	sineTable( 0 ),
-	squareTable( 0 ),
-	triTable( 0 ),
-	sawTable( 0 )
+	m_generatedWaveTable( 0 )
 {
 	waveTableInit();
 }
@@ -116,166 +113,136 @@ void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 	}
 }
 
-void Oscillator::generateSineTable( int bands )
+void Oscillator::generateSineWaveTable(int bands)
 {
 	bands = bands;
-	sineTable = new sample_t[ TABLE_LEN ];
-	for(int i = 0; i < TABLE_LEN; i++)
+	m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
+	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
-		sineTable[i] = sinf( ((float)i/(float)TABLE_LEN) * F_2PI );
+		m_generatedWaveTable[i] = sinf(((float)i / (float)WAVETABLE_LENGTH) * F_2PI);
 	}
 }
 
-void Oscillator::generateSine2Table(int bands)
-{
-	bands = bands;
-	float max = 0;
-	sawTable = new sample_t[ TABLE_LEN ];
-	for(int i = 0 ; i < TABLE_LEN; i++)
-	{
-		sawTable[i] = 0.0;
-		for(int g = 1; g <= 2; g++)
-		{
-			sawTable[i] += sinf( ((float)i/(float)TABLE_LEN) * F_2PI * g);
-		}
-		max = fmax( max, sawTable[i] );
-	}
-
-	for( int i = 0; i < TABLE_LEN; i++ )
-	{
-		sawTable[i] /= max;
-	}
-}
-
-void Oscillator::generateSawTable(int bands)
+void Oscillator::generateSawWaveTable(int bands)
 {
 	float max = 0;
-	sawTable = new sample_t[ TABLE_LEN ];
-	for(int i = 0 ; i < TABLE_LEN; i++)
+	m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
+	for (int i = 0 ; i < WAVETABLE_LENGTH; i++)
 	{
-		sawTable[i] = 0.0;
-		for(int g = 1; g <= bands; g++)
+		m_generatedWaveTable[i] = 0.0;
+		for (int g = 1; g <= bands; g++)
 		{
 			double n = double(g);
-			sawTable[i] +=powf((float)-1.0, (float) ( g + 1 ) ) *
-					(1.0 /n ) * sinf( F_2PI * i * n / (float)TABLE_LEN );
+			m_generatedWaveTable[i] +=powf((float)-1.0, (float) (g + 1 )) *
+					(1.0 / n) * sinf( F_2PI * i * n / (float)WAVETABLE_LENGTH);
 		}
-		max = fmax( max, sawTable[i] );
+		max = fmax(max, m_generatedWaveTable[i]);
 	}
 
-	for( int i = 0; i < TABLE_LEN; i++ )
+	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
-		sawTable[i] /= max;
+		m_generatedWaveTable[i] /= max;
 	}
 }
 
-void Oscillator::generateTriTable(int bands)
+void Oscillator::generateTriangleWaveTable(int bands)
 {
 	float max = 0;
-	triTable = new sample_t[ TABLE_LEN ];
-	for(int i = 0 ; i < TABLE_LEN; i++)
+	m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
+	for (int i = 0 ; i < WAVETABLE_LENGTH; i++)
 	{
-		triTable[i] = 0.0;
-		for(int g = 0; g <= bands * 0.5; g ++)
+		m_generatedWaveTable[i] = 0.0;
+		for (int g = 0; g <= bands * 0.5; g ++)
 		{
 			double n = double(g);
-			triTable[i] += powf((float)-1.0, (float) n ) *
-					(1.0/ powf(( float )( 2 * n +1 ),
-							   ( float )2.0 )) *
-					sinf(F_2PI * ( 2.0 * n + 1) * i/(float)TABLE_LEN);
+			m_generatedWaveTable[i] += powf((float)-1.0, (float)n) *
+					(1.0/ powf((float)(2 * n + 1),
+							   (float)2.0)) *
+					sinf(F_2PI * (2.0 * n + 1) * i/(float)WAVETABLE_LENGTH);
 		}
-		max = fmax( max, triTable[i] );
+		max = fmax(max, m_generatedWaveTable[i]);
 	}
 
-	for( int i = 0; i < TABLE_LEN; i++ )
+	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
-		triTable[i] /= max;
+		m_generatedWaveTable[i] /= max;
 	}
 }
 
-void Oscillator::generateSquareTable(int bands)
+void Oscillator::generateSquareWaveTable(int bands)
 {
 	float max = 0;
-	squareTable = new sample_t[ TABLE_LEN ];
-	for(int i = 0 ; i < TABLE_LEN; i++)
+	m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
+	for (int i = 0 ; i < WAVETABLE_LENGTH; i++)
 	{
-		squareTable[i] = 0.0;
+		m_generatedWaveTable[i] = 0.0;
 		for(int g = 1; g <= bands; g += 2)
 		{
 			double n = double(g);
-			squareTable[i] += (1.0/n) * sinf(F_2PI * i * n / TABLE_LEN );
+			m_generatedWaveTable[i] += (1.0/n) * sinf(F_2PI * i * n / WAVETABLE_LENGTH);
 		}
-		max = fmax( max, squareTable[i] );
+		max = fmax( max, m_generatedWaveTable[i] );
 	}
 
-	for( int i = 0; i < TABLE_LEN; i++ )
+	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
-		squareTable[i] /= max;
+		m_generatedWaveTable[i] /= max;
 	}
 }
 
-int Oscillator::bandFromFreq(float freq)
+int Oscillator::waveTableBandFromFreq(float freq)
 {
 	int i;
-	for( i = 0; i < m_tableCount; ++i )
+	for (i = 0; i < s_waveTablesPerWaveformCount; ++i)
 	{
-		if (m_bandFreq[i] > freq) return i;
+		if (s_waveTableBandFreqs[i] > freq) return i;
 	}
 	return i;
 }
 
-sample_t **Oscillator::squareTables = 0;
-sample_t **Oscillator::sineTables = 0;
-sample_t **Oscillator::sawTables = 0;
-sample_t **Oscillator::triTables = 0;
-float* Oscillator::m_bandFreq = 0;
+sample_t ***Oscillator::s_waveTables = 0;
+float* Oscillator::s_waveTableBandFreqs = 0;
+int Oscillator::s_waveTablesPerWaveformCount = 0;
 
 
 
-void Oscillator::allocTables()
+void Oscillator::allocWaveTables()
 {
-
-	squareTables = new sample_t*[ m_tableCount +1];
-	sineTables = new sample_t*[ m_tableCount +1 ];
-	sawTables = new sample_t*[ m_tableCount +1 ];
-	triTables = new sample_t*[ m_tableCount +1 ];
-	memset( squareTables, 0, sizeof( sample_t ) * m_tableCount );
-	memset( sineTables, 0, sizeof( sample_t ) * m_tableCount );
-	memset( sawTables, 0, sizeof( sample_t ) * m_tableCount );
-	memset( triTables, 0, sizeof( sample_t ) * m_tableCount );
+	s_waveTables = new sample_t**[WaveShapes::NumWaveShapes];
+	memset(s_waveTables, 0, sizeof(sample_t) * WaveShapes::NumWaveShapes);
+	for (int i = 0; i < WaveShapes::NumWaveShapes; ++i)
+	{
+		s_waveTables[i] = new sample_t*[s_waveTablesPerWaveformCount +1];
+		memset(s_waveTables[i], 0, sizeof(sample_t) * s_waveTablesPerWaveformCount);
+	}
 }
 
 void Oscillator::generateWaveTables()
 {
-
-	for(int i = 0 ; i < m_tableCount; ++i)
+	//generate sine tables
+	for (int i = 0 ; i < s_waveTablesPerWaveformCount; ++i)
 	{
-		generateSineTable( MAX_FREQ / m_bandFreq[i] );
-		sineTables[i] = sineTable;
+		generateSineWaveTable( MAX_FREQ / s_waveTableBandFreqs[i]);
+		s_waveTables[WaveShapes::SineWave][i] = m_generatedWaveTable;
 	}
-
-	for(int i = 0 ; i < m_tableCount; ++i)
+	//generate saw tables
+	for (int i = 0 ; i < s_waveTablesPerWaveformCount; ++i)
 	{
-		generateSawTable( MAX_FREQ / m_bandFreq[i] );
-		sawTables[i] = sawTable;
+		generateSawWaveTable(MAX_FREQ / s_waveTableBandFreqs[i]);
+		s_waveTables[WaveShapes::SawWave][i] = m_generatedWaveTable;
 	}
-	for( int i = 0; i < m_tableCount; ++i)
+	//generate square tables
+	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
 	{
-		generateSquareTable( MAX_FREQ / m_bandFreq[i]  );
-		squareTables[i] = squareTable;
+		generateSquareWaveTable( MAX_FREQ / s_waveTableBandFreqs[i]);
+		s_waveTables[WaveShapes::SquareWave][i] = m_generatedWaveTable;
 	}
-
-	for( int i = 0; i < m_tableCount; ++i )
+	//generate triangle tables
+	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
 	{
-		generateTriTable( MAX_FREQ / m_bandFreq[i]  );
-		triTables[i] = triTable;
+		generateTriangleWaveTable(MAX_FREQ / s_waveTableBandFreqs[i]);
+		s_waveTables[WaveShapes::TriangleWave][i] = m_generatedWaveTable;
 	}
-
-	for( int i = 0; i < m_tableCount; ++i )
-	{
-		generateSine2Table( MAX_FREQ / m_bandFreq[i] );
-	}
-	//	return 1;
 }
 
 
@@ -665,6 +632,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SineWave>(
 							const float _sample )
 {
+	return wtSample(WaveShapes::SineWave,_sample);
 	return( sinSample( _sample ) );
 }
 
@@ -675,7 +643,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::TriangleWave>(
 		const float _sample )
 {
-	return( WtTriangleSample( _sample ) );
+	return wtSample(WaveShapes::TriangleWave,_sample));
 	return( triangleSample( _sample ) );
 }
 
@@ -686,7 +654,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SawWave>(
 		const float _sample )
 {
-	return( WtSawSample( _sample ) );
+	return wtSample(WaveShapes::SawWave, _sample);
 	return( sawSample( _sample ) );
 }
 
@@ -697,7 +665,7 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SquareWave>(
 		const float _sample )
 {
-	return( WtSquareSample( _sample ) );
+	return wtSample(WaveShapes::SquareWave, _sample);
 	return( squareSample( _sample ) );
 }
 
