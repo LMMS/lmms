@@ -134,10 +134,7 @@ void ProjectJournal::addJournalCheckPoint( JournallingObject *jo )
 jo_id_t ProjectJournal::allocID( JournallingObject * _obj )
 {
 	jo_id_t id;
-	for( jo_id_t tid = rand(); m_joIDs.contains( id = tid % EO_ID_MSB
-							| EO_ID_MSB ); tid++ )
-	{
-	}
+	for(jo_id_t tid = rand(); m_joIDs.contains(id = tid & (EO_ID_MSB - 1)); ++tid);
 
 	m_joIDs[id] = _obj;
 	//printf("new id: %d\n", id );
@@ -156,16 +153,15 @@ void ProjectJournal::reallocID( const jo_id_t _id, JournallingObject * _obj )
 	}
 }
 
-
-
-
-jo_id_t ProjectJournal::idToSave( jo_id_t id )
+void ProjectJournal::changeID(const jo_id_t oldID, const jo_id_t newID)
 {
-	return id & ~EO_ID_MSB;
+	auto changeFunc = [oldID, newID](CheckPoint& c)
+	{
+		if (c.joID == oldID) {c.joID = newID;}
+	};
+	std::for_each(m_undoCheckPoints.begin(), m_undoCheckPoints.end(), changeFunc);
+	std::for_each(m_redoCheckPoints.begin(), m_redoCheckPoints.end(), changeFunc);
 }
-
-
-
 
 void ProjectJournal::clearJournal()
 {

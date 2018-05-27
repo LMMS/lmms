@@ -118,23 +118,15 @@ void JournallingObject::changeID( jo_id_t _id )
 	{
 		JournallingObject * jo = Engine::projectJournal()->
 											journallingObject( _id );
+		// Fix ID collision
 		if( jo != NULL )
 		{
-			QString used_by = jo->nodeName();
-			if( used_by == "automatablemodel" &&
-				dynamic_cast<AutomatableModel *>( jo ) )
-			{
-				used_by += ":" +
-					dynamic_cast<AutomatableModel *>( jo )->
-								displayName();
-			}
-			fprintf( stderr, "JO-ID %d already in use by %s!\n",
-				(int) _id, used_by.toUtf8().constData() );
-			return;
+			jo->changeID( Engine::projectJournal()->allocID( NULL ) );
 		}
 
 		Engine::projectJournal()->freeID( m_id );
 		Engine::projectJournal()->reallocID( _id, this );
+		Engine::projectJournal()->changeID( m_id, _id );
 		m_id = _id;
 	}
 }
