@@ -24,7 +24,6 @@
  *
  */
 
-#include <iostream>
 #include <QApplication>
 #include <QClipboard>
 #include <QKeyEvent>
@@ -122,7 +121,7 @@ QPixmap * PianoRoll::s_toolErase = NULL;
 QPixmap * PianoRoll::s_toolSelect = NULL;
 QPixmap * PianoRoll::s_toolMove = NULL;
 QPixmap * PianoRoll::s_toolOpen = NULL;
-QPixmap * PianoRoll::s_toolNudge = NULL;
+
 
 TextFloat * PianoRoll::s_textFloat = NULL;
 
@@ -304,10 +303,6 @@ PianoRoll::PianoRoll() :
 	{
 		s_toolOpen = new QPixmap( embed::getIconPixmap( "automation" ) );
 	}
-	if ( s_toolNudge == NULL)
-	{
-		s_toolNudge = new QPixmap( embed::getIconPixmap("edit_move"));
-	}
 
 	// init text-float
 	if( s_textFloat == NULL )
@@ -449,6 +444,15 @@ PianoRoll::PianoRoll() :
 	//connection for selecion from timeline
 	connect( m_timeLine, SIGNAL( regionSelectedFromPixels( int, int ) ),
 			this, SLOT( selectRegionFromPixels( int, int ) ) );
+
+
+	// Set up snap model
+	m_snapModel.addItem( tr("nudge") );
+	m_snapModel.addItem( tr("snap") );
+	m_snapModel.setValue( 0 );
+	connect( &m_snapModel, SIGNAL( dataChanged() ),
+					this, SLOT( changeSnapMode() ) );
+
 }
 
 
@@ -1092,8 +1096,8 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 						dragNotes( m_lastMouseX, m_lastMouseY,
 									ke->modifiers() & Qt::AltModifier,
 									ke->modifiers() & Qt::ShiftModifier,
-                                    ke->modifiers() & Qt::ControlModifier,
-                                   nullptr);
+									ke->modifiers() & Qt::ControlModifier,
+									nullptr);
 					}
 				}
 				ke->accept();
@@ -2404,17 +2408,15 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 
 
 
-void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* foo )
+void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* noteDragged )
 {
 	// dragging one or more notes around
 
     // get note that's dragged
-    if (foo != NULL)
-    {
-        draggedNote = foo;
-    std::cout << foo->key() << std::endl;
-    std::cout << foo->oldPos();
-    }
+	if (noteDragged != NULL)
+	{
+		draggedNote = noteDragged;
+	}
 
 	// convert pixels to ticks and keys
 	int off_x = x - m_moveStartX;
@@ -2475,18 +2477,18 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 				else
 				{
 					// moving note
-                    if (firstIteration)
-                        {
-                            firstIteration = false;
-                            Note* copy (draggedNote);
-                            // quantize first note
-                            int pos_ticks = copy->oldPos().getTicks() + off_ticks;
-                            pos_ticks = qMax(0, pos_ticks);
-                            copy->setPos (MidiTime(pos_ticks));
-                            copy->quantizePos(quantization());
-                            // new off_ticks based on quantized (copy) note  and not-quantized note
-                            off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks);
-                        }
+					if (m_gridMode == gridSnap && firstIteration)
+					{
+							firstIteration = false;
+							Note* copy (draggedNote);
+							// quantize first note
+							int pos_ticks = copy->oldPos().getTicks() + off_ticks;
+							pos_ticks = qMax(0, pos_ticks);
+							copy->setPos (MidiTime(pos_ticks));
+							copy->quantizePos(quantization());
+							// new off_ticks based on quantized (copy) note  and not-quantized note
+							off_ticks += copy->pos().getTicks() - (draggedNote->oldPos().getTicks() + off_ticks);
+					}
 					int pos_ticks = note->oldPos().getTicks() + off_ticks;
 					int key_num = note->oldKey() + off_key;
 
@@ -2601,14 +2603,14 @@ void PianoRoll::dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note* 
 			{
 				if (note->selected())
 				{
-                    if (firstIteration)
-                    {
-                        firstIteration = false;
-                        Note copy (*note);
-                        int oldEndPoint = copy.oldPos()+copy.oldLength();
-                        int quantizedEndPoint = Note::quantized( copy.oldLength()+copy.oldPos(), quantization() );
-                        off_ticks += quantizedEndPoint - oldEndPoint;
-                    }
+						if (m_gridMode == gridSnap && firstIteration)
+								{
+								firstIteration = false;
+								Note copy (*note);
+								int oldEndPoint = copy.oldPos()+copy.oldLength();
+								int quantizedEndPoint = Note::quantized( copy.oldLength()+copy.oldPos(), quantization() );
+								off_ticks += quantizedEndPoint - oldEndPoint;
+								}
 					int newLength = note->oldLength() + off_ticks;
 					newLength = qMax(1, newLength);
 					note->setLength( MidiTime(newLength) );
@@ -4081,6 +4083,22 @@ Note * PianoRoll::noteUnderMouse()
 	return NULL;
 }
 
+void PianoRoll::changeSnapMode()
+{
+	//	gridNudge,
+	//	gridSnap,
+	//	gridFree - to be implemented
+
+	QString qs_snapMode = m_snapModel.currentText();
+	if ( qs_snapMode == "nudge" )
+	{
+		m_gridMode = gridNudge;
+	}
+	if ( qs_snapMode == "snap" )
+	{
+		m_gridMode = gridSnap;
+	}
+}
 
 
 
@@ -4122,8 +4140,6 @@ PianoRollWindow::PianoRollWindow() :
 	QAction* eraseAction = editModeGroup->addAction( embed::getIconPixmap( "edit_erase" ), tr("Erase mode (Shift+E)" ) );
 	QAction* selectAction = editModeGroup->addAction( embed::getIconPixmap( "edit_select" ), tr( "Select mode (Shift+S)" ) );
 	QAction* pitchBendAction = editModeGroup->addAction( embed::getIconPixmap( "automation" ), tr("Pitch Bend mode (Shift+T)" ) );
-	QAction* nudgeAction = editModeGroup->addAction(embed::getIconPixmap("nudge"), tr("Nudge mode"));
-
 	drawAction->setChecked( true );
 
 	drawAction->setShortcut( Qt::SHIFT | Qt::Key_D );
@@ -4172,7 +4188,6 @@ PianoRollWindow::PianoRollWindow() :
 	notesActionsToolBar->addAction( drawAction );
 	notesActionsToolBar->addAction( eraseAction );
 	notesActionsToolBar->addAction( selectAction );
-	notesActionsToolBar->addAction( nudgeAction );
 	notesActionsToolBar->addAction( pitchBendAction );
 	notesActionsToolBar->addSeparator();
 	notesActionsToolBar->addAction( quantizeAction );
@@ -4277,6 +4292,13 @@ PianoRollWindow::PianoRollWindow() :
 	m_chordComboBox->setModel( &m_editor->m_chordModel );
 	m_chordComboBox->setFixedSize( 105, 22 );
 
+    // setup snap-stuff
+    QLabel * snap_lbl = new QLabel( m_toolBar );
+	snap_lbl->setPixmap( embed::getIconPixmap( "gridmode"));
+
+    m_snapComboBox = new ComboBox ( m_toolBar );
+    m_snapComboBox->setModel (&m_editor->m_snapModel );
+    m_snapComboBox->setFixedSize( 105, 22 );
 
 	zoomAndNotesToolBar->addWidget( zoom_lbl );
 	zoomAndNotesToolBar->addWidget( m_zoomingComboBox );
@@ -4296,6 +4318,12 @@ PianoRollWindow::PianoRollWindow() :
 	zoomAndNotesToolBar->addSeparator();
 	zoomAndNotesToolBar->addWidget( chord_lbl );
 	zoomAndNotesToolBar->addWidget( m_chordComboBox );
+
+    zoomAndNotesToolBar->addSeparator();
+    zoomAndNotesToolBar->addWidget( snap_lbl );
+    zoomAndNotesToolBar->addWidget( m_snapComboBox );
+
+
 
 	m_zoomingComboBox->setWhatsThis(
 				tr(
@@ -4342,6 +4370,13 @@ PianoRollWindow::PianoRollWindow() :
 					"click on the virtual keyboard to open context menu and highlight the chord. "
 					"To return to single note placement, you need to choose 'No chord' "
 					"in this drop-down menu."
+					) );
+
+	m_snapComboBox->setWhatsThis(
+				tr(
+					"Let you select how a note is moved when dragging."
+					"Nudge, the default behaviour, notes are moved in steps selected in the quantize menu/"
+					"Snap, notes are snapped to the nearest grid line as set by the quantize menu."
 					) );
 
 	// setup our actual window

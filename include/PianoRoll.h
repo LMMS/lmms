@@ -74,8 +74,7 @@ public:
 		ModeDraw,
 		ModeErase,
 		ModeSelect,
-		ModeEditDetuning,
-		ModeNudge
+        ModeEditDetuning
 	};
 
 	/*! \brief Resets settings to default when e.g. creating a new project */
@@ -204,6 +203,8 @@ protected slots:
 
 	void selectRegionFromPixels( int xStart, int xEnd );
 
+	void changeSnapMode();
+
 
 signals:
 	void currentPatternChanged();
@@ -246,6 +247,13 @@ private:
 		PR_BLACK_KEY
 	};
 
+	enum GridMode
+	{
+		gridNudge,
+		gridSnap,
+		gridFree
+	};
+
 	QVector<QString> m_nemStr; // gui names of each edit mode
 	QMenu * m_noteEditMenu; // when you right click below the key area
 
@@ -277,8 +285,8 @@ private:
 	int noteEditRight() const;
 	int noteEditLeft() const;
 
-    void dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note * foo);
-    Note * draggedNote;
+	void dragNotes( int x, int y, bool alt, bool shift, bool ctrl, Note * foo);
+	Note * draggedNote;
 
 	static const int cm_scrollAmtHoriz = 10;
 	static const int cm_scrollAmtVert = 1;
@@ -294,7 +302,7 @@ private:
 	static QPixmap * s_toolSelect;
 	static QPixmap * s_toolMove;
 	static QPixmap * s_toolOpen;
-	static QPixmap * s_toolNudge;
+
 
 	static PianoRollKeyTypes prKeyOrder[];
 
@@ -305,6 +313,7 @@ private:
 	ComboBoxModel m_noteLenModel;
 	ComboBoxModel m_scaleModel;
 	ComboBoxModel m_chordModel;
+	ComboBoxModel m_snapModel;
 
 	static const QVector<double> m_zoomLevels;
 
@@ -319,6 +328,7 @@ private:
 	Note * m_currentNote;
 	Actions m_action;
 	NoteEditMode m_noteEditMode;
+	GridMode m_gridMode;
 
 	int m_selectStartTick;
 	int m_selectedTick;
@@ -455,6 +465,7 @@ private:
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	ComboBox * m_snapComboBox;
 
 };
 
