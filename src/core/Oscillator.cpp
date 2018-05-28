@@ -69,7 +69,9 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 	m_phaseOffset( _phase_offset ),
 	m_phase( _phase_offset ),
 	m_userWave( NULL ),
+	m_useWaveTable( false ),
 	m_generatedWaveTable( 0 )
+
 {
 	waveTableInit();
 }
@@ -128,10 +130,9 @@ void Oscillator::generateSawWaveTable(int bands)
 	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
 		m_generatedWaveTable[i] = 0.0;
-		for (int g = 1; g <= bands; g++)
+		for (float n = 1; n <= bands; n++)
 		{
-			double n = double(g);
-			m_generatedWaveTable[i] +=powf((float)-1.0, (float)(g + 1)) *
+			m_generatedWaveTable[i] +=powf((float)-1.0, (float)(n + 1)) *
 					(1.0 / n) * sinf(F_2PI * i * n / (float)WAVETABLE_LENGTH);
 		}
 		max = fmax(max, m_generatedWaveTable[i]);
@@ -150,9 +151,8 @@ void Oscillator::generateTriangleWaveTable(int bands)
 	for (int i = 0 ; i < WAVETABLE_LENGTH; i++)
 	{
 		m_generatedWaveTable[i] = 0.0;
-		for (int g = 0; g <= bands * 0.5; g++)
+		for (float n = 0; n <= bands * 0.5; n++)
 		{
-			double n = double(g);
 			m_generatedWaveTable[i] += powf((float)-1.0, (float)n) *
 					(1.0 / powf((float)(2 * n + 1),
 							   (float)2.0)) *
@@ -174,9 +174,8 @@ void Oscillator::generateSquareWaveTable(int bands)
 	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
 		m_generatedWaveTable[i] = 0.0;
-		for (int g = 1; g <= bands; g += 2)
+		for (float n = 1; n <= bands; n += 2)
 		{
-			double n = double(g);
 			m_generatedWaveTable[i] += (1.0 / n) * sinf(F_2PI * i * n / WAVETABLE_LENGTH);
 		}
 		max = fmax(max, m_generatedWaveTable[i]);
@@ -629,8 +628,10 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SineWave>(
 							const float _sample )
 {
-	return wtSample(WaveShapes::SineWave,_sample);
-	return( sinSample( _sample ) );
+	if (m_useWaveTable)
+		{return wtSample(WaveShapes::SineWave,_sample);}
+	else
+		{return sinSample(_sample);}
 }
 
 
@@ -640,8 +641,10 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::TriangleWave>(
 		const float _sample )
 {
-	return wtSample(WaveShapes::TriangleWave,_sample);
-	return( triangleSample( _sample ) );
+	if (m_useWaveTable)
+		{return wtSample(WaveShapes::TriangleWave,_sample);}
+	else
+		{return triangleSample(_sample);}
 }
 
 
@@ -651,8 +654,10 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SawWave>(
 		const float _sample )
 {
-	return wtSample(WaveShapes::SawWave, _sample);
-	return( sawSample( _sample ) );
+	if (m_useWaveTable)
+		{return wtSample(WaveShapes::SawWave, _sample);}
+	else
+		{return( sawSample( _sample ) );}
 }
 
 
@@ -662,8 +667,10 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::SquareWave>(
 		const float _sample )
 {
-	return wtSample(WaveShapes::SquareWave, _sample);
-	return( squareSample( _sample ) );
+	if (m_useWaveTable)
+		{return wtSample(WaveShapes::SquareWave, _sample);}
+	else
+		{return( squareSample( _sample ) );}
 }
 
 

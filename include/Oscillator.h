@@ -80,6 +80,11 @@ public:
 	}
 
 
+	inline void setUseWaveTable(bool n)
+	{
+		m_useWaveTable = n;
+	}
+
 	inline void setUserWave( const SampleBuffer * _wave )
 	{
 		m_userWave = _wave;
@@ -182,11 +187,11 @@ private:
 	float m_phaseOffset;
 	float m_phase;
 	const SampleBuffer * m_userWave;
+	bool m_useWaveTable;
 
 	/* Multiband WaveTable */
 	static const int WAVETABLE_LENGTH = 1024;
 	static const int MAX_FREQ = 20000; //limit to the audio spectrum
-
 
 	///
 	/// \brief SineTable
