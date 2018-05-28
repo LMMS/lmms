@@ -85,7 +85,7 @@ bool waveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 	const float w = wetLevel();
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
-	const float * samples = m_wsControls.m_wavegraphModel.samples();
+	//const float * samples = m_wsControls.m_wavegraphModel.samples();
 	const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
@@ -106,34 +106,27 @@ bool waveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 		s[1] *= *inputPtr;
 
 // clip if clip enabled
-		if( clip )
-		{
+		//if( clip )
+		//{
 			s[0] = qBound( -1.0f, s[0], 1.0f );
 			s[1] = qBound( -1.0f, s[1], 1.0f );
-		}
+		//}
 
 // start effect
 
 		for( i=0; i <= 1; ++i )
 		{
-			const int lookup = static_cast<int>( qAbs( s[i] ) * 200.0f );
-			const float frac = fraction( qAbs( s[i] ) * 200.0f ); 
-			const float posneg = s[i] < 0 ? -1.0f : 1.0f;
+			bool invert = false;
+			if (s[i] < 0)
+				invert = true;
 
-			if( lookup < 1 )
-			{
-				s[i] = frac * samples[0] * posneg;
-			}
-			else if( lookup < 200 )
-			{	
-				s[i] = linearInterpolate( samples[ lookup - 1 ], 
-						samples[ lookup ], frac )
-						* posneg;
-			}
-			else
-			{
-				s[i] *= samples[199];
-			}
+			if (invert)
+				s[i] *= -1;
+
+			s[i] = m_wsControls.m_vectorGraphModel.calculateSample(s[i]);
+
+			if (invert)
+				s[i] *= -1;
 		}
 
 // apply output gain

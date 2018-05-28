@@ -36,19 +36,9 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	m_width = _width;
 	m_height = _height;
 
-	m_resolution = m_width * 2; // Maybe find a more efficient way to make the ends appear where they should
+	VectorGraphModel * vgModel = castModel<VectorGraphModel>();
 
-	QVector<VectorGraphPoint> points = QVector<VectorGraphPoint>();
-
-	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraphPoint::TensionType::SingleCurve);
-	firstPoint.permaLockX();
-	firstPoint.permaLockY();
-	points.append(firstPoint);
-	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraphPoint::TensionType::SingleCurve);
-	finalPoint.permaLockX();
-	points.append(finalPoint);
-
-	model()->setPoints(points);
+	m_resolution = m_width; // Maybe find a more efficient way to make the ends appear where they should
 }
 
 void VectorGraph::paintEvent( QPaintEvent * event )
@@ -163,6 +153,11 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 	}
 }
 
+float VectorGraph::calculateSample(float input)
+{
+	return model()->calculateSample(input);
+}
+
 
 
 
@@ -170,6 +165,15 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 	Model(_parent, tr("VectorGraph"), _default_constructed)
 {
 	m_points = QVector<VectorGraphPoint>();
+
+	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraphPoint::TensionType::SingleCurve);
+	firstPoint.permaLockX();
+	firstPoint.permaLockY();
+	m_points.append(firstPoint);
+	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraphPoint::TensionType::SingleCurve);
+	finalPoint.permaLockX();
+	m_points.append(finalPoint);
+
 	m_currentDraggedPoint = -1;
 	m_currentDraggedTensionHandle = -1;
 }

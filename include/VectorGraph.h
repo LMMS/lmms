@@ -65,6 +65,8 @@ public:
 		return m_height;
 	}
 
+	float calculateSample(float input);
+
 signals:
 	void drawn();
 protected:

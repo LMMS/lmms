@@ -62,6 +62,7 @@ waveShaper2ControlDialog::waveShaper2ControlDialog(
 	VectorGraph * graph = new VectorGraph( this, 204, 205 );
 	graph->move( 10, 6 );
 	graph->setMaximumSize( 204, 205 );
+	graph -> setModel( &_controls -> m_vectorGraphModel );
 
 
 

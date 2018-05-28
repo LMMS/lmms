@@ -42,7 +42,8 @@ waveShaper2Controls::waveShaper2Controls( waveShaper2Effect * _eff ) :
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
 	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
-	m_clipModel( false, this )
+	m_clipModel( false, this ),
+	m_vectorGraphModel( this, true )
 {
 	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
 			this, SLOT( samplesChanged( int, int ) ) );
