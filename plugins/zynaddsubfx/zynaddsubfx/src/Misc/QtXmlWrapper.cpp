@@ -55,9 +55,12 @@
 #include <sstream>
 #include <cstdarg>
 #include <zlib.h>
-#include "lmmsconfig.h"
 #include "../globals.h"
 #include "Util.h"
+
+// Include LMMS headers
+#include "lmmsconfig.h"
+#include "IoHelper.h"
 
 
 struct XmlData
@@ -193,11 +196,12 @@ int QtXmlWrapper::dosavefile(const char *filename,
                            int compression,
                            const char *xmldata) const
 {
+    FILE *file = F_OPEN_UTF8(std::string(filename), "w");
+    if(file == NULL) {
+        return -1;
+    }
+
     if(compression == 0) {
-        FILE *file;
-        file = fopen(filename, "w");
-        if(file == NULL)
-            return -1;
         fputs(xmldata, file);
         fclose(file);
     }
@@ -210,7 +214,7 @@ int QtXmlWrapper::dosavefile(const char *filename,
         snprintf(options, 10, "wb%d", compression);
 
         gzFile gzfile;
-        gzfile = gzopen(filename, options);
+        gzfile = gzdopen(fileToDescriptor(file), options);
         if(gzfile == NULL)
             return -1;
         gzputs(gzfile, xmldata);
@@ -313,7 +317,8 @@ int QtXmlWrapper::loadXMLfile(const std::string &filename)
 char *QtXmlWrapper::doloadfile(const std::string &filename) const
 {
     char  *xmldata = NULL;
-    gzFile gzfile  = gzopen(filename.c_str(), "rb");
+
+    gzFile gzfile  = gzdopen(fileToDescriptor(F_OPEN_UTF8(filename, "rb")), "rb");
 
     if(gzfile != NULL) { //The possibly compressed file opened
         std::stringstream strBuf;             //reading stream
