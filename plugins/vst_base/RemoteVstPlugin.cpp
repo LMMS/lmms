@@ -88,6 +88,7 @@ struct ERect
 #include "lmms_basics.h"
 #include "Midi.h"
 #include "communication.h"
+#include "IoHelper.h"
 
 #include "VstSyncData.h"
 
@@ -678,9 +679,9 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
-static void close_check( int fd )
+static void close_check( FILE* fp )
 {
-	if( close( fd ) )
+	if( fclose( fp ) )
 	{
 		perror( "close" );
 	}
@@ -790,7 +791,7 @@ void RemoteVstPlugin::destroyEditor()
 
 bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
-	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) == NULL )
+	if( ( m_libInst = LoadLibraryW( toWString(_plugin_file).c_str() ) ) == NULL )
 	{
 		// give VstPlugin class a chance to start 32 bit version of RemoteVstPlugin
 		if( GetLastError() == ERROR_BAD_EXE_FORMAT )
@@ -1072,13 +1073,13 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		const int len = pluginDispatch( 23, 0, 0, &chunk );
 		if( len > 0 )
 		{
-			int fd = open( _file.c_str(), O_WRONLY | O_BINARY );
-			if ( ::write( fd, chunk, len ) != len )
+			FILE* fp = F_OPEN_UTF8( _file, "wb" );
+			if ( fwrite( chunk, len, 1, fp ) != len )
 			{
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
 			}
-			close_check( fd );
+			close_check( fp );
 		}
 	}
 }
@@ -1237,7 +1238,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	if (!isPreset &&!chunky) uIntToFile = (unsigned int) m_plugin->numPrograms;
 	pBank->numPrograms = endian_swap( uIntToFile );
 
-	FILE * stream = fopen( _file.c_str(), "w" );
+	FILE * stream = F_OPEN_UTF8( _file, "w" );
 	fwrite ( pBank, 1, 28, stream );
 	fwrite ( progName, 1, isPreset ? 28 : 128, stream );
 	if ( chunky ) {
@@ -1289,7 +1290,7 @@ void RemoteVstPlugin::loadPresetFile( const std::string & _file )
 	unsigned int * pLen = new unsigned int[ 1 ];
 	unsigned int len = 0;
 	sBank * pBank = (sBank*) new char[ sizeof( sBank ) ];
-	FILE * stream = fopen( _file.c_str(), "r" );
+	FILE * stream = F_OPEN_UTF8( _file, "r" );
 	if ( fread ( pBank, 1, 56, stream ) != 56 )
 	{
 		fprintf( stderr, "Error loading preset file.\n" );
@@ -1390,12 +1391,12 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
 	char * chunk = new char[_len];
 
-	const int fd = open( _file.c_str(), O_RDONLY | O_BINARY );
-	if ( ::read( fd, chunk, _len ) != _len )
+	FILE* fp = F_OPEN_UTF8( _file, "rb" );
+	if ( fread( chunk, 1, _len, fp ) != _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
-	close_check( fd );
+	close_check( fp );
 
 	pluginDispatch( effSetChunk, 0, _len, chunk );
 
