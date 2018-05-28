@@ -19,8 +19,15 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 	ADD_DEFINITIONS(-DASM_F2I_YES)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
+#TODO: check if this is also necessary for linux
+IF(MSVC)
+    FIND_LIBRARY(ZLIB_LIBRARIES zlib)
+ENDIF(MSVC)
+
 # build ZynAddSubFX with full optimizations
+IF(NOT MSVC)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-misleading-indentation -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
+ENDIF()
 
 IF(LMMS_BUILD_WIN32)
 	# link system-libraries
@@ -118,10 +125,14 @@ SET(zynaddsubfx_core_SRCS
 IF(LMMS_BUILD_LINUX)
 	ADD_LIBRARY(ZynAddSubFxCore MODULE LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
 ELSE()
-	ADD_LIBRARY(ZynAddSubFxCore SHARED LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
+	ADD_LIBRARY(ZynAddSubFxCore STATIC LocalZynAddSubFx.cpp ${zynaddsubfx_core_SRCS})
 ENDIF()
-TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
 
+IF(MSVC)
+    TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} ${ZLIB_LIBRARIES})
+ELSE(MSVC)
+    TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
+ENDIF(MSVC)
 # required libs for debug msys builds
 IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore QtCore4 QtGui4 QtXml4)
@@ -131,7 +142,7 @@ TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
 
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lws2_32)
-	INSTALL(TARGETS ZynAddSubFxCore RUNTIME DESTINATION "${PLUGIN_DIR}")
+	#INSTALL(TARGETS ZynAddSubFxCore RUNTIME DESTINATION "${PLUGIN_DIR}")
 ELSE(LMMS_BUILD_WIN32)
 	INSTALL(TARGETS ZynAddSubFxCore LIBRARY DESTINATION "${PLUGIN_DIR}")
 ENDIF(LMMS_BUILD_WIN32)
@@ -145,10 +156,10 @@ ELSE()
 	SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${PLUGIN_DIR}")
 ENDIF()
 BUILD_PLUGIN(zynaddsubfx ZynAddSubFx.cpp ZynAddSubFx.h MOCFILES ZynAddSubFx.h EMBEDDED_RESOURCES artwork.png logo.png)
-TARGET_LINK_LIBRARIES(zynaddsubfx -lZynAddSubFxCore)
+TARGET_LINK_LIBRARIES(zynaddsubfx ZynAddSubFxCore)
 ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
 
-IF(WIN32)
+IF(WIN32 AND NOT MSVC)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
 				COMMAND "${CMAKE_RC_COMPILER}"
@@ -156,7 +167,7 @@ IF(WIN32)
 					"-o\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj\""
 					"-i\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc\""
 				DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc")
-ENDIF(WIN32)
+ENDIF()
 
 # Use libraries in non-standard directories (e.g., another version of Qt)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -173,7 +184,7 @@ IF(FLTK_CONFIG AND NOT (LMMS_BUILD_APPLE OR LMMS_BUILD_WIN32))
 	STRING(REPLACE " " ";" FLTK_FILTERED_LDFLAGS ${FLTK_FILTERED_LDFLAGS})
 	LIST(REMOVE_ITEM FLTK_FILTERED_LDFLAGS -lX11)
 ENDIF()
-TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui -lZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS} -lpthread )
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui ZynAddSubFxCore ${FLTK_FILTERED_LDFLAGS} -lpthread )
 ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
 # Support qt_version_tag in Qt 5.6

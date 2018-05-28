@@ -23,9 +23,8 @@
  */
 
 #include <lmmsconfig.h>
-
+#include <vector>
 #include "zynaddsubfx/src/Misc/Util.h"
-#include <unistd.h>
 #include <ctime>
 
 #include "LocalZynAddSubFx.h"
@@ -53,7 +52,7 @@ LocalZynAddSubFx::LocalZynAddSubFx() :
 	if( s_instanceCount == 0 )
 	{
 #ifdef LMMS_BUILD_WIN32
-#ifndef __WINPTHREADS_VERSION
+#if !defined(__WINPTHREADS_VERSION) && !defined(_MSC_VER)
 		// (non-portable) initialization of statically linked pthread library
 		pthread_win32_process_attach_np();
 		pthread_win32_thread_attach_np();
@@ -142,10 +141,10 @@ void LocalZynAddSubFx::loadXML( const std::string & _filename )
 {
 	char * f = strdup( _filename.c_str() );
 
-	pthread_mutex_lock( &m_master->mutex );
+	m_master->mutex.lock();
 	m_master->defaults();
 	m_master->loadXML( f );
-	pthread_mutex_unlock( &m_master->mutex );
+	m_master->mutex.unlock();
 
 	m_master->applyparameters();
 
@@ -160,18 +159,15 @@ void LocalZynAddSubFx::loadPreset( const std::string & _filename, int _part )
 {
 	char * f = strdup( _filename.c_str() );
 
-	pthread_mutex_lock( &m_master->mutex );
+	m_master->mutex.lock();
 	m_master->part[_part]->defaultsinstrument();
 	m_master->part[_part]->loadXMLinstrument( f );
-	pthread_mutex_unlock( &m_master->mutex );
+	m_master->mutex.unlock();
 
 	m_master->applyparameters();
 
 	free( f );
 }
-
-
-
 
 void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 {
@@ -190,9 +186,6 @@ void LocalZynAddSubFx::setPresetDir( const std::string & _dir )
 	}
 }
 
-
-
-
 void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 {
 	if( config.workingDir != NULL )
@@ -204,8 +197,6 @@ void LocalZynAddSubFx::setLmmsWorkingDir( const std::string & _dir )
 	initConfig();
 }
 
-
-
 void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 {
 	for( int i = 0; i < NUM_MIDI_PARTS; ++i )
@@ -213,8 +204,6 @@ void LocalZynAddSubFx::setPitchWheelBendRange( int semitones )
 		m_master->part[i]->ctl.setpitchwheelbendrange( semitones * 100 );
 	}
 }
-
-
 
 void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 {
@@ -256,15 +245,12 @@ void LocalZynAddSubFx::processMidiEvent( const MidiEvent& event )
 	}
 }
 
-
-
-
 void LocalZynAddSubFx::processAudio( sampleFrame * _out )
 {
-	float outputl[synth->buffersize];
-	float outputr[synth->buffersize];
+	std::vector<float> outputl(synth->buffersize);
+	std::vector<float> outputr(synth->buffersize);
 
-	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl, outputr );
+	m_master->GetAudioOutSamples( synth->buffersize, synth->samplerate, outputl.data(), outputr.data() );
 
 	// TODO: move to MixHelpers
 	for( int f = 0; f < synth->buffersize; ++f )

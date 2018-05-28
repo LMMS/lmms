@@ -28,6 +28,8 @@
 #endif
 
 #include <queue>
+#include <thread>
+#include <mutex>
 
 #define BUILD_REMOTE_PLUGIN_CLIENT
 #include "Note.h"
@@ -61,8 +63,7 @@ public:
 		sendMessage( IdInitDone );
 		waitForMessage( IdInitDone );
 
-		pthread_mutex_init( &m_guiMutex, NULL );
-		pthread_create( &m_messageThreadHandle, NULL, messageLoop, this );
+        m_messageThread = std::thread(&RemoteZynAddSubFx::messageLoop, this);
 	}
 
 	virtual ~RemoteZynAddSubFx()
@@ -85,9 +86,9 @@ public:
 		message m;
 		while( ( m = receiveMessage() ).id != IdQuit )
 		{
-			pthread_mutex_lock( &m_master->mutex );
+			m_master->mutex.lock();
 			processMessage( m );
-			pthread_mutex_unlock( &m_master->mutex );
+			m_master->mutex.unlock();
 		}
 		m_guiExit = true;
 	}
@@ -103,9 +104,9 @@ public:
 			case IdHideUI:
 			case IdLoadSettingsFromFile:
 			case IdLoadPresetFile:
-				pthread_mutex_lock( &m_guiMutex );
+				m_guiMutex.lock();
 				m_guiMessages.push( _m );
-				pthread_mutex_unlock( &m_guiMutex );
+				m_guiMutex.unlock();
 				break;
 
 			case IdSaveSettingsToFile:
@@ -145,23 +146,13 @@ public:
 		LocalZynAddSubFx::processAudio( _out );
 	}
 
-	static void * messageLoop( void * _arg )
-	{
-		RemoteZynAddSubFx * _this =
-					static_cast<RemoteZynAddSubFx *>( _arg );
-
-		_this->messageLoop();
-
-		return NULL;
-	}
-
 	void guiLoop();
 
 private:
 	const int m_guiSleepTime;
 
-	pthread_t m_messageThreadHandle;
-	pthread_mutex_t m_guiMutex;
+	std::thread m_messageThread;
+	std::mutex m_guiMutex;
 	std::queue<RemotePluginClient::message> m_guiMessages;
 	bool m_guiExit;
 
@@ -191,12 +182,12 @@ void RemoteZynAddSubFx::guiLoop()
 		}
 		if( exitProgram == 1 )
 		{
-			pthread_mutex_lock( &m_master->mutex );
+			m_master->mutex.lock();
 			sendMessage( IdHideUI );
 			exitProgram = 0;
-			pthread_mutex_unlock( &m_master->mutex );
+			m_master->mutex.unlock();
 		}
-		pthread_mutex_lock( &m_guiMutex );
+		m_guiMutex.lock();
 		while( m_guiMessages.size() )
 		{
 			RemotePluginClient::message m = m_guiMessages.front();
@@ -221,9 +212,9 @@ void RemoteZynAddSubFx::guiLoop()
 					{
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &m_master->mutex );
+					m_master->mutex.lock();
 					sendMessage( IdLoadSettingsFromFile );
-					pthread_mutex_unlock( &m_master->mutex );
+					m_master->mutex.unlock();
 					break;
 				}
 
@@ -237,9 +228,9 @@ void RemoteZynAddSubFx::guiLoop()
 						ui->updatepanel();
 						ui->refresh_master_ui();
 					}
-					pthread_mutex_lock( &m_master->mutex );
+					m_master->mutex.lock();
 					sendMessage( IdLoadPresetFile );
-					pthread_mutex_unlock( &m_master->mutex );
+					m_master->mutex.unlock();
 					break;
 				}
 
@@ -247,7 +238,7 @@ void RemoteZynAddSubFx::guiLoop()
 					break;
 			}
 		}
-		pthread_mutex_unlock( &m_guiMutex );
+		m_guiMutex.unlock();
 	}
 	Fl::flush();
 
@@ -269,7 +260,7 @@ int main( int _argc, char * * _argv )
 		return -1;
 	}
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32) && !defined(_MSC_VER)
 #ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
 	pthread_win32_process_attach_np();
@@ -290,7 +281,7 @@ int main( int _argc, char * * _argv )
 	delete remoteZASF;
 
 
-#ifdef LMMS_BUILD_WIN32
+#if defined(LMMS_BUILD_WIN32) && !defined(_MSC_VER)
 #ifndef __WINPTHREADS_VERSION
 	pthread_win32_thread_detach_np();
 	pthread_win32_process_detach_np();

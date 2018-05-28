@@ -6,7 +6,8 @@
 	url = https://github.com/rampantpixels/rpmalloc.git
 [submodule "plugins/zynaddsubfx/zynaddsubfx"]
 	path = plugins/zynaddsubfx/zynaddsubfx
-	url = https://github.com/lmms/zynaddsubfx.git
+	url = https://github.com/justnope/zynaddsubfx.git
+	branch = msvc/ng
 [submodule "plugins/FreeBoy/game-music-emu"]
 	path = plugins/FreeBoy/game-music-emu
 	url = https://bitbucket.org/mpyne/game-music-emu.git

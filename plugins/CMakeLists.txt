@@ -91,7 +91,6 @@ ENDIF("${PLUGIN_LIST}" STREQUAL "")
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
 		LadspaEffect
-		zynaddsubfx
 	)
 	message(WARNING "Compiling with MSVC. The following plugins are not available: ${MSVC_INCOMPATIBLE_PLUGINS}")
 	LIST(REMOVE_ITEM PLUGIN_LIST ${MSVC_INCOMPATIBLE_PLUGINS})
