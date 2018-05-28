@@ -292,9 +292,7 @@ void ConfigManager::setDefaultSoundfont( const QString & _sf )
 
 void ConfigManager::setBackgroundArtwork( const QString & _ba )
 {
-#ifdef LMMS_HAVE_FLUIDSYNTH
 	m_backgroundArtwork = _ba;
-#endif
 }
 
 void ConfigManager::setGIGDir(const QString &gd)

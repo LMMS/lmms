@@ -38,9 +38,9 @@
 #include "AudioDevice.h"
 
 
-class AudioAlsa : public AudioDevice, public QThread
+class AudioAlsa : public QThread, public AudioDevice
 {
-	// Public classes and enums
+	Q_OBJECT
 public:
 	/**
 	 * @brief Contains the relevant information about available ALSA devices
