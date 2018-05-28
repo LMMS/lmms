@@ -25,7 +25,7 @@ if [ -z "$MSYSCON" ]; then
 		TOOLCHAIN="$DIR/toolchains/Ubuntu-MinGW-W64-$ARCH.cmake"
 	fi
 else
-	CMAKE_OPTS="$CMAKE_OPTS -DLMMS_BUILD_MSYS=1"
+	TOOLCHAIN="$DIR/toolchains/MSYS-$ARCH.cmake"
 fi
 
 export PATH=$MINGW/bin:$PATH

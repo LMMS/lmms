@@ -749,6 +749,7 @@ class RemotePlugin;
 
 class ProcessWatcher : public QThread
 {
+	Q_OBJECT
 public:
 	ProcessWatcher( RemotePlugin * );
 	virtual ~ProcessWatcher()

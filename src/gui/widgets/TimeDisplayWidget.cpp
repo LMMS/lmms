@@ -58,17 +58,6 @@ TimeDisplayWidget::TimeDisplayWidget() :
 					this, SLOT( updateTime() ) );
 }
 
-
-
-
-TimeDisplayWidget::~TimeDisplayWidget()
-{
-}
-
-
-
-
-
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 {
 	m_displayMode = displayMode;

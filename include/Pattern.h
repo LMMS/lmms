@@ -29,7 +29,6 @@
 #include <QtCore/QVector>
 #include <QWidget>
 #include <QDialog>
-#include <QtCore/QThread>
 #include <QPixmap>
 #include <QStaticText>
 
@@ -163,7 +162,7 @@ class PatternView : public TrackContentObjectView
 
 public:
 	PatternView( Pattern* pattern, TrackView* parent );
-	virtual ~PatternView();
+	virtual ~PatternView() = default;
 
 	Q_PROPERTY(QColor noteFillColor READ getNoteFillColor WRITE setNoteFillColor)
 	Q_PROPERTY(QColor noteBorderColor READ getNoteBorderColor WRITE setNoteBorderColor)

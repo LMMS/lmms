@@ -68,7 +68,7 @@ public:
 
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent );
 	Fader( FloatModel * _model, const QString & _name, QWidget * _parent, QPixmap * back, QPixmap * leds, QPixmap * knob );
-	virtual ~Fader();
+	virtual ~Fader() = default;
 
 	void init(FloatModel * model, QString const & name);
 

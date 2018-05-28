@@ -609,7 +609,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 {
 	tick_t ticksFromPlayMode = m_playPos[playMode].getTicks();
 	m_elapsedTicks += ticksFromPlayMode - ticks;
-	m_elapsedMilliSeconds[m_playMode] += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
+	m_elapsedMilliSeconds[playMode] += MidiTime::ticksToMilliseconds( ticks - ticksFromPlayMode, getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 

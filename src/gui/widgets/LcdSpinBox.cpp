@@ -58,14 +58,6 @@ LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, co
 {
 }
 
-
-
-LcdSpinBox::~LcdSpinBox()
-{
-}
-
-
-
 void LcdSpinBox::update()
 {
 	setValue( model()->value() + m_displayOffset );

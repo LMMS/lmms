@@ -57,6 +57,7 @@ public:
 
 private slots:
 	void changedSampleRate();
+	void changedPlaybackState();
 
 private:
 	FlangerEffect* m_effect;
