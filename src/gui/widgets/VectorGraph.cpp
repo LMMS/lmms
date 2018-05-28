@@ -51,7 +51,8 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	m_canvas.setPen(pen);
 
 	QPainterPath path;
-	path.moveTo(0, m_resolution);
+	VectorGraphPoint * firstPoint = model()->getPoint(0);
+	path.moveTo(firstPoint->x() * m_width, (1 - firstPoint->y()) * m_height);
 
 	for (int i = 0; i < m_resolution; i++)
 	{
@@ -126,8 +127,15 @@ void VectorGraph::mouseMoveEvent(QMouseEvent *event)
 		c.setPos(model()->getStoredCursorPos());
 		setCursor(c);
 
-		VectorGraphPoint * pointToEdit = model()->getPoint(model()->getCurrentDraggedTensionHandle());
-		float newTension = pointToEdit->tension() + delta / 250; // Make adjustable from somewhere else - this is an important tweak
+		int index = model()->getCurrentDraggedTensionHandle();
+		VectorGraphPoint * previousPoint = model()->getPoint(index - 1);
+		VectorGraphPoint * pointToEdit = model()->getPoint(index);
+
+		if (previousPoint->y() > pointToEdit->y())
+			delta *= -1;
+
+		// Subtracting, moving down vertically makes the y value go up
+		float newTension = pointToEdit->tension() - delta / 250; // Make adjustable from somewhere else - this is an important tweak
 		if (newTension > 1)
 			newTension = 1;
 		else if (newTension < -1)
@@ -214,13 +222,19 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 
 	VectorGraphPoint * point = getPoint(sectionStartIndex + 1);
 
+	// I'm not convinced that the code below provides any sort of speedup.
+	// Might be useful for preventing edge cases though.
+	// It would if the power function is much less efficient, which I think it might be.
 	if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
 	{
 		return input;
 	}
 
 	//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
-	return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(input, point->tensionPower());
+	if (point->tension() < 0)
+		return qPow(input, point->tensionPower());
+	else
+		return 1 - qPow(1 - input, point->absTensionPower());
 }
 
 float VectorGraphModel::calculateSample(float input)

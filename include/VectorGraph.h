@@ -221,6 +221,10 @@ public:
 	{
 		return m_tensionPower;
 	}
+	inline float absTensionPower()
+	{
+		return m_absTensionPower;
+	}
 	inline float dryAmt()
 	{
 		return m_dryAmt;
@@ -228,7 +232,11 @@ public:
 	inline void setTension(float tension)
 	{
 		m_tension = tension;
-		m_tensionPower = qPow(10, tension);
+
+		// Variables for single curve
+		m_tensionPower = qPow(10, -1 * tension);
+		m_absTensionPower = qPow(10, qAbs(tension));
+
 		m_dryAmt = 0.2 * qPow(1 - qAbs(tension), 3);
 	}
 	inline void lockX()
@@ -276,6 +284,7 @@ private:
 	float m_y;
 	float m_tension;
 	float m_tensionPower;
+	float m_absTensionPower;
 	float m_dryAmt;
 	TensionType m_tensionType;
 	bool m_isXLocked;
