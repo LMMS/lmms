@@ -66,6 +66,7 @@ public:
 	}
 
 	float calculateSample(float input);
+	bool eventFilter(QObject *watched, QEvent *event);
 
 signals:
 	void drawn();
@@ -75,11 +76,15 @@ protected:
 	void mouseMoveEvent( QMouseEvent * event );
 	void mouseReleaseEvent( QMouseEvent * event );
 
+private slots:
+	void deletePoint();
+
 private:
 	QPainter m_canvas;
 	int m_resolution;
 	int m_width;
 	int m_height;
+	int m_currentPoint;
 };
 
 
@@ -149,6 +154,7 @@ public:
 	void tryMove(int index, float x, float y);
 	int getPointIndexFromCoords(int x, int y, int canvasWidth, int canvasHeight);
 	int getPointIndexFromTensionHandleCoords(int x, int y, int canvasWidth, int canvasHeight);
+	void deletePoint(int index);
 
 
 	const inline int getPointSize()

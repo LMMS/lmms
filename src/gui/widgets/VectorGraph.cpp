@@ -26,6 +26,7 @@
 
 #include "VectorGraph.h"
 #include "lmms_math.h"
+#include "CaptionMenu.h"
 
 VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	QWidget( _parent ),
@@ -39,6 +40,8 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	VectorGraphModel * vgModel = castModel<VectorGraphModel>();
 
 	m_resolution = m_width; // Maybe find a more efficient way to make the ends appear where they should
+	m_currentPoint = -1;
+	installEventFilter(this);
 }
 
 void VectorGraph::paintEvent( QPaintEvent * event )
@@ -82,6 +85,13 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::MouseButton::RightButton)
 	{
+		int pointIndex = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
+		if (pointIndex >= 0)
+		{
+			event->ignore();
+			return;
+		}
+
 		int leftBoundIndex = model()->getSectionStartIndex((float) event->x() / m_width);
 		model()->insertPointAfter(leftBoundIndex,
 			VectorGraphPoint(
@@ -92,6 +102,7 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 			)
 		);
 		model()->setCurrentDraggedPoint(leftBoundIndex + 1);
+		event->accept();
 		update();
 	}
 	else if (event->button() == Qt::MouseButton::LeftButton)
@@ -161,9 +172,40 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 	}
 }
 
+bool VectorGraph::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::ContextMenu)
+	{
+		if (model()->getCurrentDraggedPoint() >= 0)
+			return false;
+
+		QContextMenuEvent * menuEvent = static_cast<QContextMenuEvent*>(event);
+
+		m_currentPoint = model()->getPointIndexFromCoords(menuEvent->x(), m_height - menuEvent->y(), m_width, m_height);
+
+		if (m_currentPoint < 0)
+			return false;
+
+		CaptionMenu contextMenu(model()->displayName(), this);
+		contextMenu.addAction(QPixmap(), tr("&Delete"), this, SLOT(deletePoint()));
+		contextMenu.exec(QCursor::pos());
+		return true;
+	}
+}
+
 float VectorGraph::calculateSample(float input)
 {
 	return model()->calculateSample(input);
+}
+
+void VectorGraph::deletePoint()
+{
+	if (m_currentPoint < 0)
+		return;
+
+	model()->deletePoint(m_currentPoint);
+	m_currentPoint = -1;
+	update();
 }
 
 
@@ -334,6 +376,11 @@ int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int can
 		}
 	}
 	return -1;
+}
+
+void VectorGraphModel::deletePoint(int index)
+{
+	m_points.removeAt(index);
 }
 
 
