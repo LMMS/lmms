@@ -37,8 +37,6 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	m_width = _width;
 	m_height = _height;
 
-	VectorGraphModel * vgModel = castModel<VectorGraphModel>();
-
 	m_resolution = m_width; // Maybe find a more efficient way to make the ends appear where they should
 	m_currentPoint = -1;
 	installEventFilter(this);
@@ -191,6 +189,7 @@ bool VectorGraph::eventFilter(QObject *watched, QEvent *event)
 		contextMenu.exec(QCursor::pos());
 		return true;
 	}
+	return false;
 }
 
 float VectorGraph::calculateSample(float input)
