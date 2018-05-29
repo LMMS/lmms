@@ -26,10 +26,12 @@
 
 #include "DrumSynth.h"
 
-#include <fstream>
+#include <sstream>
 #include <cstring>
 
 #include <math.h>     //sin(), exp(), etc.
+
+#include <QFile>
 
 #ifdef LMMS_BUILD_WIN32
 #define powf pow
@@ -112,7 +114,7 @@ void DrumSynth::UpdateEnv(int e, long t)
 }
 
 
-void DrumSynth::GetEnv(int env, const char *sec, const char *key, const char *ini)
+void DrumSynth::GetEnv(int env, const char *sec, const char *key, QString ini)
 {
   char en[256], s[8];
   int i=0, o=0, ep=0;
@@ -162,9 +164,9 @@ float DrumSynth::waveform(float ph, int form)
 }
 
 
-int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, const char *file)
+int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const char *def, char *buffer, int size, QString file)
 {
-    ifstream is;
+    stringstream is;
     bool inSection = false;
     char *line;
     char *k, *b;
@@ -172,7 +174,12 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
 
     line = (char*)malloc(200);
 
-    is.open (file, ifstream::in);
+    // Use QFile to handle unicode file name on Windows
+    // Previously we used ifstream directly
+    QFile f(file);
+    f.open(QIODevice::ReadOnly);
+    QByteArray dat = f.readAll().constData();
+    is.str(string(dat.constData(), dat.size()));
 
     while (is.good()) {
         if (!inSection) {
@@ -218,13 +225,12 @@ int DrumSynth::GetPrivateProfileString(const char *sec, const char *key, const c
         strncpy(buffer, def, size);
     }
 
-    is.close();
     free(line);
 
     return len;
 }
 
-int DrumSynth::GetPrivateProfileInt(const char *sec, const char *key, int def, const char *file)
+int DrumSynth::GetPrivateProfileInt(const char *sec, const char *key, int def, QString file)
 {
   char tmp[16];
   int i=0;
@@ -235,7 +241,7 @@ int DrumSynth::GetPrivateProfileInt(const char *sec, const char *key, int def, c
   return i;
 }
 
-float DrumSynth::GetPrivateProfileFloat(const char *sec, const char *key, float def, const char *file)
+float DrumSynth::GetPrivateProfileFloat(const char *sec, const char *key, float def, QString file)
 {
     char tmp[16];
     float f=0.f;
@@ -252,7 +258,7 @@ float DrumSynth::GetPrivateProfileFloat(const char *sec, const char *key, float 
 //  an associative array or something once we have a datastructure to load in to.
 //  llama
 
-int DrumSynth::GetDSFileSamples(const char *dsfile, int16_t *&wave, int channels, sample_rate_t Fs)
+int DrumSynth::GetDSFileSamples(QString dsfile, int16_t *&wave, int channels, sample_rate_t Fs)
 {
   //input file
   char sec[32];
