@@ -108,13 +108,13 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 	else if (event->button() == Qt::MouseButton::LeftButton)
 	{
 		int pointIndex = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
+		int tensionHandleIndex = model()->getPointIndexFromTensionHandleCoords(event->x(), m_height - event->y(), m_width, m_height);
+
 		if (pointIndex > -1)
 		{
 			model()->setCurrentDraggedPoint(pointIndex);
 		}
-
-		int tensionHandleIndex = model()->getPointIndexFromTensionHandleCoords(event->x(), m_height - event->y(), m_width, m_height);
-		if (tensionHandleIndex > -1)
+		else if (tensionHandleIndex > -1)
 		{
 			setCursor(Qt::BlankCursor);
 			model()->setStoredCursorPos(cursor().pos());
