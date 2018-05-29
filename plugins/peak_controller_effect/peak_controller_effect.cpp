@@ -26,11 +26,12 @@
 
 #include "Controller.h"
 #include "Song.h"
+#include "PresetPreviewPlayHandle.h"
 #include "PeakController.h"
 #include "peak_controller_effect.h"
 #include "lmms_math.h"
 
-#include "embed.h"
+#include "embed.cpp"
 
 extern "C"
 {
@@ -44,7 +45,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader("logo"),
+	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
 } ;
@@ -67,7 +68,7 @@ PeakControllerEffect::PeakControllerEffect(
 	m_autoController( NULL )
 {
 	m_autoController = new PeakController( Engine::getSong(), this );
-	if( !Engine::getSong()->isLoadingProject() )
+	if( !Engine::getSong()->isLoadingProject() && !PresetPreviewPlayHandle::isPreviewing() )
 	{
 		Engine::getSong()->addController( m_autoController );
 	}
@@ -148,7 +149,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
+Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new PeakControllerEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( _data ) );
