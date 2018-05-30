@@ -67,15 +67,15 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	for (int i = 0; i < model()->getPointCount(); i++)
 	{
 		auto point = model()->getPoint(i);
-		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), model()->getPointSize(), model()->getPointSize());
+		int ps = model()->getPointSize();
+		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), ps, ps);
 	}
 
 	for (int i = 1; i < model()->getPointCount(); i++)
 	{
-		auto point = model()->getPoint(i);
-		auto previousPoint = model()->getPoint(i - 1);
-		float xValueToDrawAt = ((point->x() + previousPoint->x()) / 2) * m_width;
-		m_canvas.drawEllipse(QPoint(xValueToDrawAt, (1 - model()->calculateSample(xValueToDrawAt / m_width)) * m_height), model()->getTensionHandleSize(), model()->getTensionHandleSize());
+		float xValueToDrawAt = getTensionHandleXVal(i) * m_width;
+		int ths = model()->getTensionHandleSize();
+		m_canvas.drawEllipse(QPoint(xValueToDrawAt, (1 - getTensionHandleYVal(i)) * m_height), ths, ths);
 	}
 }
 
@@ -171,7 +171,11 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 	{
 		QCursor c = cursor();
 		//c.setPos(mapToGlobal(QPoint(15, 15)));
-		c.setPos(model()->getStoredCursorPos());
+		//QPoint newCursorPoint = model()->getStoredCursorPos();
+		QPoint newCursorPoint(
+					getTensionHandleXVal(model()->getCurrentDraggedTensionHandle()) * m_width,
+					(1 - getTensionHandleYVal(model()->getCurrentDraggedTensionHandle())) * m_height);
+		c.setPos(mapToGlobal(newCursorPoint));
 		c.setShape(Qt::ArrowCursor);
 		setCursor(c);
 		model()->resetCurrentDraggedTensionHandle();
@@ -213,6 +217,18 @@ void VectorGraph::deletePoint()
 	model()->deletePoint(m_currentPoint);
 	m_currentPoint = -1;
 	update();
+}
+
+float VectorGraph::getTensionHandleYVal(int index)
+{
+	return model()->calculateSample(getTensionHandleXVal(index));
+}
+
+float VectorGraph::getTensionHandleXVal(int index)
+{
+	auto point = model()->getPoint(index);
+	auto previousPoint = model()->getPoint(index - 1);
+	return (point->x() + previousPoint->x()) / 2;
 }
 
 

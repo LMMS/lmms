@@ -85,6 +85,8 @@ private:
 	int m_width;
 	int m_height;
 	int m_currentPoint;
+	float getTensionHandleYVal(int index);
+	float getTensionHandleXVal(int index);
 };
 
 
