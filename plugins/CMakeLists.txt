@@ -79,7 +79,7 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		vst_base
 		VstEffect
 		watsyn
-		waveshaper
+        waveshaper
         waveshaper2
 		vibed
 		Xpressive
