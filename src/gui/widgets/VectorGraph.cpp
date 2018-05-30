@@ -55,11 +55,20 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	VectorGraphPoint * firstPoint = model()->getPoint(0);
 	path.moveTo(qRound(firstPoint->x() * m_width), qRound((1 - firstPoint->y()) * m_height));
 
+	int currentSection = -1;
+
 	for (int i = 0; i < m_resolution; i++)
 	{
-		auto h = (model()->calculateSample((float) i / m_resolution));
-		path.lineTo(((float) i / m_resolution) * m_width,
-					(1 - h) * m_height);
+		float x = (float) i / m_resolution;
+		int potentialNewSection = model()->getSectionStartIndex(x);
+		while (potentialNewSection != currentSection)
+		{
+			currentSection++;
+			path.lineTo(x * m_width, (1 - model()->getPoint(currentSection)->y()) * m_height);
+		}
+		auto y = model()->calculateSample(x);
+		path.lineTo(x * m_width,
+					(1 - y) * m_height);
 	}
 
 	m_canvas.drawPath(path);
