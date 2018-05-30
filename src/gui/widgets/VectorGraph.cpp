@@ -369,7 +369,7 @@ int VectorGraphModel::getPointIndexFromCoords(int x, int y, int canvasWidth, int
 		{
 			continue;
 		}
-		if (arePointsWithinDistance(x, point->x() * canvasWidth, y, point->y() * canvasHeight, getPointSize()))
+		if (arePointsWithinDistance(x, point->x() * canvasWidth, y, point->y() * canvasHeight, getPointSize() + 2))
 		{
 			return i;
 		}
@@ -385,7 +385,7 @@ int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int can
 		VectorGraphPoint * endPoint = getPoint(i);
 		float tensionHandleCenterX = ((startPoint->x() + endPoint->x()) / 2) * canvasWidth;
 		float tensionHandleCenterY = calculateSample(tensionHandleCenterX / canvasWidth) * canvasHeight;
-		if (arePointsWithinDistance(x, tensionHandleCenterX, y, tensionHandleCenterY, getTensionHandleSize()))
+		if (arePointsWithinDistance(x, tensionHandleCenterX, y, tensionHandleCenterY, getTensionHandleSize() + 2))
 		{
 			return i;
 		}
