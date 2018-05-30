@@ -148,6 +148,11 @@ public:
 		m_storedCursorPos = point;
 	}
 
+	static inline bool floatEqual(float a, float b, float epsilon)
+	{
+		return qFabs(a - b) < epsilon;
+	}
+
 	VectorGraphPoint * getPoint(int index);
 	float calculateSample(float input);
 	float calculateSectionSample(float input, int sectionStartIndex);
@@ -173,10 +178,6 @@ private:
 	int m_currentDraggedPoint;
 	int m_currentDraggedTensionHandle;
 	QPoint m_storedCursorPos;
-	static inline bool floatEqual(float a, float b, float epsilon)
-	{
-		return qFabs(a - b) < epsilon;
-	}
 
 	static inline bool arePointsWithinDistance(float x1, float x2, float y1, float y2, float distance)
 	{
