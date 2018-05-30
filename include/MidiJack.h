@@ -38,9 +38,11 @@
 #include <QtCore/QThread>
 #include <QMutex>
 #include <QtCore/QFile>
-
+#include <mutex>
+#include <vector>
 #include "MidiClient.h"
 #include "AudioJack.h"
+
 
 #define	JACK_MIDI_BUFFER_MAX 64 /* events */
 
@@ -52,7 +54,7 @@ class MidiJack : public QThread, public MidiClientRaw
 public:
 	MidiJack();
 	virtual ~MidiJack();
-
+	
 	jack_client_t* jackClient();
 
 	static QString probeDevice();
@@ -79,20 +81,16 @@ protected:
 
 
 private:
-	AudioJack *m_jackAudio;
+	//TODO: (experimental) replace this with a more efficient way
+	//also don't use sendByte but processOutEvent to get timings
+	std::mutex m_bufferLock;
+	std::vector<unsigned char> m_midibuffer;
+
 	jack_client_t *m_jackClient;
 	jack_port_t *m_input_port;
 	jack_port_t *m_output_port;
-	uint8_t m_jack_buffer[JACK_MIDI_BUFFER_MAX * 4];
-
-	void JackMidiOutEvent(uint8_t *buf, uint8_t len);
-	void lock();
-	void unlock();
-
-	void getPortInfo( const QString& sPortName, int& nClient, int& nPort );
 
 	volatile bool m_quit;
-
 };
 
 #endif // LMMS_HAVE_JACK

@@ -65,39 +65,26 @@ MidiJack::MidiJack() :
 	m_output_port( NULL ),
 	m_quit( false )
 {
-	// if jack is currently used for audio then we share the connection
-	// AudioJack creates and maintains the jack connection
-	// and also handles the callback, we pass it our address
-	// so that we can also process during the callback
+	m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
+									JackNoStartServer, NULL);
 
-	m_jackAudio = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
-	if( m_jackAudio )
+	if(m_jackClient)
 	{
-		// if a jack connection has been created for audio we use that
-		m_jackAudio->addMidiClient(this);
-	}else{
-		m_jackAudio = NULL;
-		m_jackClient = jack_client_open(probeDevice().toLatin1().data(),
-										JackNoStartServer, NULL);
-
-		if(m_jackClient)
-		{
-			jack_set_process_callback(m_jackClient,
-							JackMidiProcessCallback, this);
-			jack_on_shutdown(m_jackClient,
-							JackMidiShutdown, 0);
-		}
+		jack_set_process_callback(m_jackClient,
+						JackMidiProcessCallback, this);
+		jack_on_shutdown(m_jackClient,
+						JackMidiShutdown, 0);
 	}
 
 	if(jackClient())
 	{
 		/* jack midi out not implemented
 		   JackMidiWrite and sendByte needs to be functional
-		   before enabling this
+		   before enabling this*/
 		m_output_port = jack_port_register(
 				jackClient(), "MIDI out", JACK_DEFAULT_MIDI_TYPE,
 				JackPortIsOutput, 0);
-		*/
+
 
 		m_input_port = jack_port_register(
 				jackClient(), "MIDI in", JACK_DEFAULT_MIDI_TYPE,
@@ -145,13 +132,7 @@ MidiJack::~MidiJack()
 
 jack_client_t* MidiJack::jackClient()
 {
-	if( m_jackAudio == NULL && m_jackClient == NULL)
-		return NULL;
-
-	if( m_jackAudio == NULL && m_jackClient )
-		return m_jackClient;
-
-	return m_jackAudio->jackClient();
+	return m_jackClient;
 }
 
 QString MidiJack::probeDevice()
@@ -197,13 +178,28 @@ void MidiJack::JackMidiRead(jack_nframes_t nframes)
 
 void MidiJack::sendByte( const unsigned char c )
 {
-	//m_midiDev.putChar( c );
+	std::lock_guard<std::mutex> lock(m_bufferLock);
+	m_midibuffer.push_back(c);
 }
 
 // we write data to jack
 void MidiJack::JackMidiWrite(jack_nframes_t nframes)
 {
-	// TODO: write midi data to jack port
+	{
+		std::lock_guard<std::mutex> lock(m_bufferLock);
+		if (!m_midibuffer.empty())
+		{
+			void* portBuffer = jack_port_get_buffer(m_output_port, nframes);
+			jack_midi_clear_buffer(portBuffer);
+			void* buffer = jack_midi_event_reserve(portBuffer, 0, m_midibuffer.size());
+			if (buffer)
+			{
+				memcpy(buffer, m_midibuffer.data(), m_midibuffer.size());
+			}
+			m_midibuffer.clear();
+		}
+	}
+
 }
 
 void MidiJack::run()
