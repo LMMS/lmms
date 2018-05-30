@@ -53,7 +53,7 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 
 	QPainterPath path;
 	VectorGraphPoint * firstPoint = model()->getPoint(0);
-	path.moveTo(firstPoint->x() * m_width, (1 - firstPoint->y()) * m_height);
+	path.moveTo(qRound(firstPoint->x() * m_width), qRound((1 - firstPoint->y()) * m_height));
 
 	for (int i = 0; i < m_resolution; i++)
 	{
@@ -73,9 +73,9 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 
 	for (int i = 1; i < model()->getPointCount(); i++)
 	{
-		float xValueToDrawAt = getTensionHandleXVal(i) * m_width;
+		float xValueToDrawAt = qRound(getTensionHandleXVal(i) * m_width);
 		int ths = model()->getTensionHandleSize();
-		m_canvas.drawEllipse(QPoint(xValueToDrawAt, (1 - getTensionHandleYVal(i)) * m_height), ths, ths);
+		m_canvas.drawEllipse(QPoint(xValueToDrawAt, qRound((1 - getTensionHandleYVal(i)) * m_height)), ths, ths);
 	}
 }
 
