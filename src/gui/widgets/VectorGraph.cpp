@@ -272,10 +272,22 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 
 	//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
-	if (point->tension() < 0)
+	/*if (point->tension() < 0)
 		return qPow(input, point->tensionPower());
 	else
-		return 1 - qPow(1 - input, point->absTensionPower());
+		return 1 - qPow(1 - input, point->absTensionPower());*/
+
+
+	// based on a cycloid
+
+	float mult = 0.67502558231353759765625; // yay hard-coded values
+
+	float invInput = 1 - input;
+
+	if (point->tension() < 0)
+		return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(mult * (qAcos(1 - input / mult) - qSqrt(input * (2 * mult - input))), point->tensionPower());
+	else
+		return point->dryAmt() * input + (1 - point->dryAmt()) * (1 - qPow(mult * (qAcos(1 - invInput / mult) - qSqrt(invInput * (2 * mult - invInput))), point->absTensionPower()));
 }
 
 float VectorGraphModel::calculateSample(float input)

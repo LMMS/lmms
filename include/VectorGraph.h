@@ -240,10 +240,10 @@ public:
 		m_tension = tension;
 
 		// Variables for single curve
-		m_tensionPower = qPow(10, -1 * tension);
-		m_absTensionPower = qPow(10, qAbs(tension));
+		m_tensionPower = qPow(20, -1 * tension);
+		m_absTensionPower = qPow(20, qAbs(tension));
 
-		m_dryAmt = 0.2 * qPow(1 - qAbs(tension), 3);
+		m_dryAmt = qPow(1 - qAbs(tension), 5);
 	}
 	inline void lockX()
 	{

@@ -86,7 +86,7 @@ bool waveShaper2Effect::processAudioBuffer( sampleFrame * _buf,
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
 	//const float * samples = m_wsControls.m_wavegraphModel.samples();
-	const bool clip = m_wsControls.m_clipModel.value();
+	//const bool clip = m_wsControls.m_clipModel.value();
 
 	ValueBuffer *inputBuffer = m_wsControls.m_inputModel.valueBuffer();
 	ValueBuffer *outputBufer = m_wsControls.m_outputModel.valueBuffer();
