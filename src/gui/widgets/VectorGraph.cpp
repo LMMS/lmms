@@ -365,6 +365,10 @@ int VectorGraphModel::getPointIndexFromCoords(int x, int y, int canvasWidth, int
 	for (int i = 0; i < m_points.size(); i++)
 	{
 		VectorGraphPoint * point = getPoint(i);
+		if (point->isXLocked() && point->isYLocked())
+		{
+			continue;
+		}
 		if (arePointsWithinDistance(x, point->x() * canvasWidth, y, point->y() * canvasHeight, getPointSize()))
 		{
 			return i;
