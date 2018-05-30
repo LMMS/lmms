@@ -90,6 +90,14 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 			return;
 		}
 
+		int handleIndex = model()->getPointIndexFromTensionHandleCoords(event->x(), m_height - event->y(), m_width, m_height);
+		if (handleIndex >= 0)
+		{
+			model()->getPoint(handleIndex)->setTension(0);
+			update();
+			return;
+		}
+
 		int leftBoundIndex = model()->getSectionStartIndex((float) event->x() / m_width);
 		model()->insertPointAfter(leftBoundIndex,
 			VectorGraphPoint(
