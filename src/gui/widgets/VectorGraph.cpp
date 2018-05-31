@@ -121,7 +121,7 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 				(float) event->x() / m_width,
 				1 - (float) event->y() / m_height,
 				0,
-				VectorGraphPoint::SingleCurve
+				VectorGraph::TensionType::SingleCurve
 			)
 		);
 		model()->setCurrentDraggedPoint(leftBoundIndex + 1);
@@ -214,6 +214,13 @@ bool VectorGraph::eventFilter(QObject *watched, QEvent *event)
 			return false;
 
 		CaptionMenu contextMenu(model()->displayName(), this);
+		contextMenu.addAction(QPixmap(), tr("Hold"), this, SLOT(setTensionToHold()));
+		contextMenu.addAction(QPixmap(), tr("Single Curve"), this, SLOT(setTensionToSingle()));
+		contextMenu.addAction(QPixmap(), tr("Double Curve"), this, SLOT(setTensionToDouble()));
+		contextMenu.addAction(QPixmap(), tr("Stairs"), this, SLOT(setTensionToStairs()));
+		contextMenu.addAction(QPixmap(), tr("Pulse"), this, SLOT(setTensionToPulse()));
+		contextMenu.addAction(QPixmap(), tr("Wave"), this, SLOT(setTensionToWave()));
+		contextMenu.addSeparator();
 		contextMenu.addAction(QPixmap(), tr("&Delete"), this, SLOT(deletePoint()));
 		contextMenu.exec(QCursor::pos());
 		return true;
@@ -233,6 +240,42 @@ void VectorGraph::deletePoint()
 
 	model()->deletePoint(m_currentPoint);
 	m_currentPoint = -1;
+	update();
+}
+
+void VectorGraph::setTensionToHold()
+{
+	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Hold);
+	update();
+}
+
+void VectorGraph::setTensionToSingle()
+{
+	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::SingleCurve);
+	update();
+}
+
+void VectorGraph::setTensionToDouble()
+{
+	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::DoubleCurve);
+	update();
+}
+
+void VectorGraph::setTensionToStairs()
+{
+	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Stairs);
+	update();
+}
+
+void VectorGraph::setTensionToPulse()
+{
+	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Pulse);
+	update();
+}
+
+void VectorGraph::setTensionToWave()
+{
+	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Wave);
 	update();
 }
 
@@ -256,11 +299,11 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 {
 	m_points = QVector<VectorGraphPoint>();
 
-	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraphPoint::TensionType::SingleCurve);
+	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraph::TensionType::SingleCurve);
 	firstPoint.permaLockX();
 	firstPoint.permaLockY();
 	m_points.append(firstPoint);
-	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraphPoint::TensionType::SingleCurve);
+	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraph::TensionType::SingleCurve);
 	finalPoint.permaLockX();
 	m_points.append(finalPoint);
 
@@ -303,32 +346,60 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 
 	VectorGraphPoint * point = getPoint(sectionStartIndex + 1);
-
-	// I'm not convinced that the code below provides any sort of speedup.
-	// Might be useful for preventing edge cases though.
-	// It would if the power function is much less efficient, which I think it might be.
-	if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
+	if (point->getTensionType() == VectorGraph::TensionType::Hold)
 	{
-		return input;
+		return 0;
 	}
+	else if (point->getTensionType() == VectorGraph::TensionType::SingleCurve)
+	{
+		// I'm not convinced that the code below provides any sort of speedup.
+		// Might be useful for preventing edge cases though.
+		// It would if the power function is much less efficient, which I think it might be.
+		if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
+		{
+			return input;
+		}
 
-	//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
-	/*if (point->tension() < 0)
-		return qPow(input, point->tensionPower());
-	else
-		return 1 - qPow(1 - input, point->absTensionPower());*/
+		//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
+		/*if (point->tension() < 0)
+			return qPow(input, point->tensionPower());
+		else
+			return 1 - qPow(1 - input, point->absTensionPower());*/
 
 
-	// based on a cycloid
+		// based on a cycloid
 
-	float mult = 0.67502558231353759765625; // yay hard-coded values
+		float mult = 0.67502558231353759765625; // yay hard-coded values
 
-	float invInput = 1 - input;
+		float invInput = 1 - input;
 
-	if (point->tension() < 0)
-		return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(mult * (qAcos(1 - input / mult) - qSqrt(input * (2 * mult - input))), point->tensionPower());
-	else
-		return point->dryAmt() * input + (1 - point->dryAmt()) * (1 - qPow(mult * (qAcos(1 - invInput / mult) - qSqrt(invInput * (2 * mult - invInput))), point->absTensionPower()));
+		if (point->tension() < 0)
+			return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(mult * (qAcos(1 - input / mult) - qSqrt(input * (2 * mult - input))), point->tensionPower());
+		else
+			return point->dryAmt() * input + (1 - point->dryAmt()) * (1 - qPow(mult * (qAcos(1 - invInput / mult) - qSqrt(invInput * (2 * mult - invInput))), point->absTensionPower()));
+	}
+	else if (point->getTensionType() == VectorGraph::TensionType::DoubleCurve)
+	{
+		return input; // fill this in
+	}
+	else if (point->getTensionType() == VectorGraph::TensionType::Stairs)
+	{
+		// maybe make this one keep the tension from going below 0
+		// also maybe make this one discrete instead of continuous
+		float mult = (((point->tension() + 1)/2) * .999 + .001);
+		int scaledInput = input * (1/mult);
+		float output = (float) scaledInput * mult;
+		return output;
+	}
+	else if (point->getTensionType() == VectorGraph::TensionType::Pulse)
+	{
+		return input; // fill this in
+	}
+	else if (point->getTensionType() == VectorGraph::TensionType::Wave)
+	{
+		return input; // fill this in
+	}
+	return 0;
 }
 
 float VectorGraphModel::calculateSample(float input)
@@ -439,11 +510,16 @@ void VectorGraphModel::deletePoint(int index)
 	m_points.removeAt(index);
 }
 
+void VectorGraphModel::setTensionTypeOnPoint(int index, VectorGraph::TensionType type)
+{
+	getPoint(index)->setTensionType(type);
+}
 
 
 
 
-VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, TensionType type)
+
+VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, VectorGraph::TensionType type)
 {
 	m_x = x;
 	m_y = y;
@@ -460,7 +536,7 @@ VectorGraphPoint::VectorGraphPoint()
 	m_x = 0;
 	m_y = 0;
 	setTension(0);
-	m_tensionType = TensionType::SingleCurve;
+	m_tensionType = VectorGraph::TensionType::SingleCurve;
 	m_isXLocked = false;
 	m_isYLocked = false;
 	m_isXPermaLocked = false;

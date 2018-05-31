@@ -42,6 +42,15 @@ class EXPORT VectorGraph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
+	enum TensionType
+	{
+		Hold,
+		SingleCurve,
+		DoubleCurve,
+		Stairs,
+		Pulse,
+		Wave
+	};
 	VectorGraph( QWidget * _parent, int _width, int _height );
 	virtual ~VectorGraph() = default;
 
@@ -78,6 +87,12 @@ protected:
 
 private slots:
 	void deletePoint();
+	void setTensionToHold();
+	void setTensionToSingle();
+	void setTensionToDouble();
+	void setTensionToStairs();
+	void setTensionToPulse();
+	void setTensionToWave();
 
 private:
 	QPainter m_canvas;
@@ -148,6 +163,8 @@ public:
 		m_storedCursorPos = point;
 	}
 
+	void setTensionTypeOnPoint(int index, VectorGraph::TensionType type);
+
 	static inline bool floatEqual(float a, float b, float epsilon)
 	{
 		return qFabs(a - b) < epsilon;
@@ -195,12 +212,7 @@ private:
 class VectorGraphPoint
 {
 public:
-	enum TensionType
-	{
-		SingleCurve
-	};
-
-	VectorGraphPoint(float x, float y, float tension, TensionType type);
+	VectorGraphPoint(float x, float y, float tension, VectorGraph::TensionType type);
 	VectorGraphPoint();
 	inline float x()
 	{
@@ -222,7 +234,7 @@ public:
 	{
 		return m_tension;
 	}
-	inline TensionType tensionType()
+	inline VectorGraph::TensionType tensionType()
 	{
 		return m_tensionType;
 	}
@@ -288,6 +300,14 @@ public:
 	{
 		return m_isYLocked || m_isYPermaLocked;
 	}
+	inline void setTensionType(VectorGraph::TensionType type)
+	{
+		m_tensionType = type;
+	}
+	inline VectorGraph::TensionType getTensionType()
+	{
+		return m_tensionType;
+	}
 private:
 	float m_x;
 	float m_y;
@@ -295,7 +315,7 @@ private:
 	float m_tensionPower;
 	float m_absTensionPower;
 	float m_dryAmt;
-	TensionType m_tensionType;
+	VectorGraph::TensionType m_tensionType;
 	bool m_isXLocked;
 	bool m_isYLocked;
 	bool m_isXPermaLocked;
