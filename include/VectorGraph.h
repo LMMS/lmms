@@ -76,6 +76,7 @@ public:
 
 	float calculateSample(float input);
 	bool eventFilter(QObject *watched, QEvent *event);
+	void setLastModifiedPoint(int pointIndex);
 
 signals:
 	void drawn();
@@ -163,6 +164,26 @@ public:
 		m_storedCursorPos = point;
 	}
 
+	inline void setLastModifiedTension(float tension)
+	{
+		m_lastModifiedTension = tension;
+	}
+
+	inline float getLastModifiedTension()
+	{
+		return m_lastModifiedTension;
+	}
+
+	inline void setLastModifiedTensionType(VectorGraph::TensionType tensionType)
+	{
+		m_lastModifiedTensionType = tensionType;
+	}
+
+	inline VectorGraph::TensionType getLastModifiedTensionType()
+	{
+		return m_lastModifiedTensionType;
+	}
+
 	void setTensionTypeOnPoint(int index, VectorGraph::TensionType type);
 
 	static inline bool floatEqual(float a, float b, float epsilon)
@@ -195,6 +216,8 @@ private:
 	int m_currentDraggedPoint;
 	int m_currentDraggedTensionHandle;
 	QPoint m_storedCursorPos;
+	float m_lastModifiedTension;
+	VectorGraph::TensionType m_lastModifiedTensionType;
 
 	static inline bool arePointsWithinDistance(float x1, float x2, float y1, float y2, float distance)
 	{

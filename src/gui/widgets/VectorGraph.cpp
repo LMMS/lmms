@@ -120,16 +120,15 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 		}
 
 		int leftBoundIndex = model()->getSectionStartIndex((float) event->x() / m_width);
-		model()->insertPointAfter(leftBoundIndex,
-			VectorGraphPoint(
-				(float) event->x() / m_width,
-				1 - (float) event->y() / m_height,
-				0,
-				VectorGraph::TensionType::SingleCurve
-			)
-		);
+		VectorGraphPoint newPoint = VectorGraphPoint(
+										(float) event->x() / m_width,
+										1 - (float) event->y() / m_height,
+										model()->getLastModifiedTension(),
+										model()->getLastModifiedTensionType()
+									);
+		model()->insertPointAfter(leftBoundIndex, newPoint);
 		model()->setCurrentDraggedPoint(leftBoundIndex + 1);
-		event->accept();
+		event->accept(); // maybe unnecessary
 		update();
 	}
 	else if (event->button() == Qt::MouseButton::LeftButton)
@@ -190,6 +189,10 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 
 	if (model()->getCurrentDraggedTensionHandle() > -1)
 	{
+		VectorGraphPoint * point = model()->getPoint(model()->getCurrentDraggedTensionHandle());
+		model()->setLastModifiedTension(point->tension());
+		model()->setLastModifiedTensionType(point->tensionType());
+
 		QCursor c = cursor();
 		//c.setPos(mapToGlobal(QPoint(15, 15)));
 		//QPoint newCursorPoint = model()->getStoredCursorPos();
@@ -250,36 +253,42 @@ void VectorGraph::deletePoint()
 void VectorGraph::setTensionToHold()
 {
 	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Hold);
+	setLastModifiedPoint(m_currentPoint);
 	update();
 }
 
 void VectorGraph::setTensionToSingle()
 {
 	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::SingleCurve);
+	setLastModifiedPoint(m_currentPoint);
 	update();
 }
 
 void VectorGraph::setTensionToDouble()
 {
 	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::DoubleCurve);
+	setLastModifiedPoint(m_currentPoint);
 	update();
 }
 
 void VectorGraph::setTensionToStairs()
 {
 	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Stairs);
+	setLastModifiedPoint(m_currentPoint);
 	update();
 }
 
 void VectorGraph::setTensionToPulse()
 {
 	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Pulse);
+	setLastModifiedPoint(m_currentPoint);
 	update();
 }
 
 void VectorGraph::setTensionToWave()
 {
 	model()->setTensionTypeOnPoint(m_currentPoint, VectorGraph::TensionType::Wave);
+	setLastModifiedPoint(m_currentPoint);
 	update();
 }
 
@@ -295,7 +304,12 @@ float VectorGraph::getTensionHandleXVal(int index)
 	return (point->x() + previousPoint->x()) / 2;
 }
 
-
+void VectorGraph::setLastModifiedPoint(int pointIndex)
+{
+	VectorGraphPoint * point = model()->getPoint(pointIndex);
+	model()->setLastModifiedTension(point->tension());
+	model()->setLastModifiedTensionType(point->tensionType());
+}
 
 
 VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed):
@@ -313,6 +327,8 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 
 	m_currentDraggedPoint = -1;
 	m_currentDraggedTensionHandle = -1;
+	m_lastModifiedTension = 0;
+	m_lastModifiedTensionType = VectorGraph::TensionType::SingleCurve;
 }
 
 VectorGraphPoint * VectorGraphModel::getPoint(int index)
