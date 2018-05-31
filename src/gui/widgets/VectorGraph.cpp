@@ -37,7 +37,7 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	m_width = _width;
 	m_height = _height;
 
-	m_resolution = m_width; // Maybe find a more efficient way to make the ends appear where they should
+	m_resolution = m_width;
 	m_currentPoint = -1;
 	installEventFilter(this);
 }
@@ -70,6 +70,10 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 		path.lineTo(x * m_width,
 					(1 - y) * m_height);
 	}
+
+	auto lastPoint = model()->getPoint(currentSection + 1);
+
+	path.lineTo(lastPoint->x() * m_width, (1 - lastPoint->y()) * m_height);
 
 	m_canvas.drawPath(path);
 
