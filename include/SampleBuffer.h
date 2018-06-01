@@ -273,7 +273,8 @@ public:
 	 */
 	void reverse(bool shouldLockMixer=true);
 
-	void loadFromBase64(const QString & _data , sample_rate_t sampleRate, bool shouldLock);
+	void loadFromBase64(const QString & _data , sample_rate_t sampleRate);
+
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
@@ -301,7 +302,7 @@ protected:
 		return const_cast<sampleFrame*>(ptr);
 	}
 
-	void changeAudioFile (QString audioFile, bool shouldLock, bool shouldKeepSettings);
+	void changeAudioFile (QString audioFile);
 
 	static DataVector convertIntToFloat(int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 
@@ -354,7 +355,6 @@ protected:
 	 * @param bufferSampleRate		The new m_data's sample rate.
 	 */
 	void doneBufferChange (bool shouldUnlock,
-						   bool shouldKeepSettings,
 						   sample_rate_t bufferSampleRate,
 						   bool shouldUnlockMixer=true);
 signals:
