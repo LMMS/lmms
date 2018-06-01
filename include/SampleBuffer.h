@@ -176,7 +176,10 @@ public:
 
 	inline f_cnt_t frames() const
 	{
-		return m_data.size ();
+		dataReadLock();
+		auto size = internalFrames();
+		dataUnlock();
+		return size;
 	}
 
 	inline float amplification() const
@@ -217,7 +220,7 @@ public:
 	// dataUnlock(), out of loops for efficiency
 	inline sample_t userWaveSample( const float _sample ) const
 	{
-		f_cnt_t dataFrames = frames ();
+		f_cnt_t dataFrames = internalFrames();
 		const sampleFrame * data = this->data();
 		const float frame = _sample * dataFrames;
 		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % dataFrames;
@@ -228,18 +231,18 @@ public:
 		return linearInterpolate( data[f1][0], data[ (f1 + 1) % dataFrames ][0], fraction( frame ) );
 	}
 
-	bool tryDataReadLock ()
+	bool tryDataReadLock () const
 	{
 		return m_varLock.tryLockForRead ();
 	}
 
 
-	void dataReadLock()
+	void dataReadLock() const
 	{
 		m_varLock.lockForRead();
 	}
 
-	void dataUnlock()
+	void dataUnlock() const
 	{
 		m_varLock.unlock();
 	}
@@ -319,9 +322,15 @@ protected:
 		return m_data.data ();
 	}
 
+	size_t internalFrames() const
+	{
+		return m_data.size ();
+	}
+
+
 	QString m_audioFile;
 	DataVector m_data;
-	QReadWriteLock m_varLock;
+	mutable QReadWriteLock m_varLock;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;
 	f_cnt_t m_loopStartFrame;

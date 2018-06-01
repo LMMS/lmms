@@ -972,7 +972,7 @@ QString SampleBuffer::openAndSetWaveformFile()
 QString & SampleBuffer::toBase64( QString & _dst ) const
 {
 	base64::encode( (const char *) data (),
-					frames () * sizeof( sampleFrame ), _dst );
+					internalFrames()  * sizeof( sampleFrame ), _dst );
 
 	return _dst;
 }
@@ -1117,22 +1117,13 @@ void SampleBuffer::beginBufferChange(bool shouldLock, bool shouldLockMixer)
 }
 
 void SampleBuffer::doneBufferChange(bool shouldUnlock,
-									bool shouldKeepSettings,
 									sample_rate_t bufferSampleRate,
 									bool shouldUnlockMixer) {
 
 	setSampleRate (bufferSampleRate);
 
-	// TODO: reverse- and amplification-property is not covered
-	// by following code...
-	auto previousFrames = frames ();
-	if( shouldKeepSettings == false ) {
-		m_loopStartFrame = m_startFrame = 0;
-		m_loopEndFrame = m_endFrame = frames ();
-	} else {
-		m_data.resize (previousFrames);
-	}
-
+	m_loopStartFrame = m_startFrame = 0;
+	m_loopEndFrame = m_endFrame = internalFrames();
 	if (shouldUnlock) {
 		m_varLock.unlock ();
 	}
