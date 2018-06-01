@@ -242,7 +242,6 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
 		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) ,
-									   true,
 									   Engine::mixer ()->baseSampleRate ());
 		qWarning("Using default sampleRate. That could lead to invalid values");
 	} else {
