@@ -406,9 +406,10 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	{
 		// maybe make this one keep the tension from going below 0
 		// also maybe make this one discrete instead of continuous
-		float mult = (((point->tension() + 1)/2) * .999 + .001);
-		int scaledInput = input * (1/mult);
-		float output = (float) scaledInput * mult;
+		float mult = (1 - ((point->tension() + 1)/2)) * .499 + .001;
+		int scalar = ((int) (0.5/mult))*2;
+		int scaledInput = (int) (input * scalar);
+		float output = scaledInput * 1.0 / (scalar);
 		return output;
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::Pulse)
