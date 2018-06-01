@@ -66,7 +66,6 @@ SampleBuffer::SampleBuffer() :
 	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	beginBufferChange (false);
 	doneBufferChange (false, /* shouldLock */
-					  false, /* shouldKeepSettings */
 					  m_sampleRate);
 }
 
@@ -78,11 +77,11 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 {
 	if( _is_base64_data )
 	{
-		loadFromBase64( _audio_file, false, sampleRate );
+		loadFromBase64( _audio_file, sampleRate );
 	}
 	else
 	{
-		changeAudioFile (_audio_file, false, false);
+		changeAudioFile (_audio_file);
 	}
 }
 
@@ -90,13 +89,7 @@ SampleBuffer::SampleBuffer( const QString & _audio_file,
 SampleBuffer::SampleBuffer(SampleBuffer::DataVector &&movedData , sample_rate_t sampleRate) :
 	SampleBuffer()
 {
-	beginBufferChange (false);
-	m_data = std::move (movedData);
-	doneBufferChange (
-	/* shouldLock */				false,
-	/* shouldKeepSettings */		false,
-									sampleRate
-	);
+	resetData (std::move(movedData), sampleRate, false);
 }
 
 void SampleBuffer::saveSettings(QDomDocument &doc, QDomElement &_this) {
@@ -126,7 +119,7 @@ void SampleBuffer::loadSettings(const QDomElement &_this) {
 	}
 
 	if (_this.hasAttribute ("data")) {
-		loadFromBase64 (_this.attribute("data"), m_sampleRate, true);
+		loadFromBase64 (_this.attribute("data"), m_sampleRate);
 	}
 }
 
@@ -141,18 +134,10 @@ void SampleBuffer::sampleRateChanged() {
 	// sample rate is higher than the SampleBuffer's
 	// sample rate.
 	if (requiredSampleRate > sampleRate ()) {
-		beginBufferChange (true);
-
-		m_data = resampleData (m_data, previousSampleRate, requiredSampleRate);
-
-		doneBufferChange (
-		/* shouldLock */				true,
-		/* shouldKeepSettings */		true,
-										requiredSampleRate
-		);
+		resetData (resampleData (m_data, previousSampleRate, requiredSampleRate),
+				   requiredSampleRate,
+				   true);
 	}
-
-
 }
 
 sample_rate_t SampleBuffer::mixerSampleRate()
@@ -160,8 +145,7 @@ sample_rate_t SampleBuffer::mixerSampleRate()
 	return Engine::mixer ()->processingSampleRate ();
 }
 
-void SampleBuffer::changeAudioFile(QString audioFile, bool shouldLock,
-								   bool shouldKeepSettings)
+void SampleBuffer::changeAudioFile(QString audioFile)
 {
 	if (audioFile == "")
 		return;
@@ -235,12 +219,7 @@ void SampleBuffer::changeAudioFile(QString audioFile, bool shouldLock,
 	}
 
 	if (! fileLoadError) {
-		// Ok, we have no errors; let's update the actual data.
-		beginBufferChange (shouldLock);
-		m_data = std::move(fileData);
-		doneBufferChange (shouldLock,
-						  shouldKeepSettings,
-						  samplerate);
+		resetData (std::move(fileData), samplerate);
 	} else {
 		QString title = tr( "Fail to open file" );
 		QString message = tr( "Audio files are limited to %1 MB "
@@ -1001,13 +980,12 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 
 void SampleBuffer::setAudioFile( const QString & _audio_file )
 {
-	changeAudioFile (_audio_file, true, false);
+	changeAudioFile (_audio_file);
 }
 
 
 
-void SampleBuffer::loadFromBase64( const QString & _data , sample_rate_t sampleRate,
-								   bool shouldLock)
+void SampleBuffer::loadFromBase64( const QString & _data , sample_rate_t sampleRate)
 {
 	char * dst = NULL;
 	int dsize = 0;
@@ -1020,12 +998,8 @@ void SampleBuffer::loadFromBase64( const QString & _data , sample_rate_t sampleR
 
 	delete[] dst;
 
-	beginBufferChange (shouldLock);
-	m_data = std::move(input);
-	m_audioFile = QString();
-	doneBufferChange (shouldLock,
-					  true,
-					  sampleRate);
+	resetData (std::move(input),
+			   sampleRate);
 }
 
 
@@ -1191,7 +1165,6 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 		}
 	}
 	doneBufferChange (true, /* lock */
-					  true, /* save settings */
 					  this->sampleRate(),
 					  shouldLockMixer);
 }
@@ -1203,7 +1176,6 @@ void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate,
 		m_data = std::move (newData);
 	}
 	doneBufferChange (true, /* lock */
-					  false, /* save settings */
 					  dataSampleRate,
 					  shouldLockMixer);
 }
@@ -1214,7 +1186,6 @@ void SampleBuffer::reverse(bool shouldLockMixer) {
 		std::reverse(m_data.begin (), m_data.end ());
 	}
 	doneBufferChange (true, /* should(Un)Lock? yes! */
-					  true, /* should we restore settings? */
 					  sampleRate (), /* we have not made any change in the sample rate. */
 					  shouldLockMixer);
 }
