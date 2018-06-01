@@ -816,7 +816,7 @@ AutomationPattern * Song::tempoAutomationPattern()
 
 AutomatedValueMap Song::automatedValuesAt(MidiTime time, int tcoNum) const
 {
-	return TrackContainer::automatedValuesFromTracks(TrackList(tracks()) << m_globalAutomationTrack, time, tcoNum);
+	return TrackContainer::automatedValuesFromTracks(TrackList{m_globalAutomationTrack} << tracks(), time, tcoNum);
 }
 
 
