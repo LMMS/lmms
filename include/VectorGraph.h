@@ -228,6 +228,8 @@ private:
 		bool result = aSquared + bSquared <= cSquared;
 		return result;
 	}
+
+	float CalculateSingleCurve(float input, VectorGraphPoint * point);
 };
 
 
@@ -236,6 +238,7 @@ class VectorGraphPoint
 {
 public:
 	VectorGraphPoint(float x, float y, float tension, VectorGraph::TensionType type);
+	VectorGraphPoint(VectorGraphPoint * point);
 	VectorGraphPoint();
 	inline float x()
 	{
@@ -281,7 +284,20 @@ public:
 		m_tensionPower = qPow(20, -1 * tension);
 		m_absTensionPower = qPow(20, qAbs(tension));
 
+		m_invTensionPower = qPow(20, tension);
+		m_invAbsTensionPower = qPow(20, qAbs(-1 * tension));
+
 		m_dryAmt = qPow(1 - qAbs(tension), 5);
+	}
+	inline void invertTension()
+	{
+		auto tensionPowerStore = m_tensionPower;
+		auto absTensionPowerStore = m_absTensionPower;
+		m_tensionPower = m_invTensionPower;
+		m_absTensionPower = m_invAbsTensionPower;
+		m_invTensionPower = tensionPowerStore;
+		m_invAbsTensionPower = absTensionPowerStore;
+		m_tension = -1 * m_tension;
 	}
 	inline void lockX()
 	{
@@ -337,6 +353,8 @@ private:
 	float m_tension;
 	float m_tensionPower;
 	float m_absTensionPower;
+	float m_invTensionPower;
+	float m_invAbsTensionPower;
 	float m_dryAmt;
 	VectorGraph::TensionType m_tensionType;
 	bool m_isXLocked;

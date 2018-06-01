@@ -372,35 +372,26 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::SingleCurve)
 	{
-		// I'm not convinced that the code below provides any sort of speedup.
-		// Might be useful for preventing edge cases though.
-		// It would if the power function is much less efficient, which I think it might be.
-		if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
-		{
-			return input;
-		}
-
-		//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
-		/*if (point->tension() < 0)
-			return qPow(input, point->tensionPower());
-		else
-			return 1 - qPow(1 - input, point->absTensionPower());*/
-
-
-		// based on a cycloid
-
-		float mult = 0.67502558231353759765625; // yay hard-coded values
-
-		float invInput = 1 - input;
-
-		if (point->tension() < 0)
-			return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(mult * (qAcos(1 - input / mult) - qSqrt(input * (2 * mult - input))), point->tensionPower());
-		else
-			return point->dryAmt() * input + (1 - point->dryAmt()) * (1 - qPow(mult * (qAcos(1 - invInput / mult) - qSqrt(invInput * (2 * mult - invInput))), point->absTensionPower()));
+		return CalculateSingleCurve(input, point);
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::DoubleCurve)
 	{
-		return input; // fill this in
+		if (input < 0.5)
+		{
+			return CalculateSingleCurve(input * 2, point) * 0.5;
+		}
+		else
+		{
+			VectorGraphPoint * newPoint = new VectorGraphPoint(point);
+
+			//setTension is expensive. This is equivalent to the following, but using precomputed values:
+			//point->setTension(point->tension() * -1);
+			newPoint->invertTension();
+
+			auto result = CalculateSingleCurve((input - 0.5) * 2, newPoint);
+			delete newPoint;
+			return result * 0.5 + 0.5;
+		}
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::Stairs)
 	{
@@ -421,6 +412,35 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 		return input; // fill this in
 	}
 	return 0;
+}
+
+float VectorGraphModel::CalculateSingleCurve(float input, VectorGraphPoint * point)
+{
+	// I'm not convinced that the code below provides any sort of speedup.
+	// Might be useful for preventing edge cases though.
+	// It would if the power function is much less efficient, which I think it might be.
+	if (floatEqual(point->tension(), 0, 0.00001)) // I have no idea what epsilon to use, probably doesn't matter in this case though
+	{
+		return input;
+	}
+
+	//return point->dryAmt() * input + (1 - point->dryAmt()) * fastPow(input, point->tensionPower());
+	/*if (point->tension() < 0)
+		return qPow(input, point->tensionPower());
+	else
+		return 1 - qPow(1 - input, point->absTensionPower());*/
+
+
+	// based on a cycloid
+
+	float mult = 0.67502558231353759765625; // yay hard-coded values
+
+	float invInput = 1 - input;
+
+	if (point->tension() < 0)
+		return point->dryAmt() * input + (1 - point->dryAmt()) * qPow(mult * (qAcos(1 - input / mult) - qSqrt(input * (2 * mult - input))), point->tensionPower());
+	else
+		return point->dryAmt() * input + (1 - point->dryAmt()) * (1 - qPow(mult * (qAcos(1 - invInput / mult) - qSqrt(invInput * (2 * mult - invInput))), point->absTensionPower()));
 }
 
 float VectorGraphModel::calculateSample(float input)
@@ -550,6 +570,23 @@ VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, VectorGraph:
 	m_isYLocked = false;
 	m_isXPermaLocked = false;
 	m_isYPermaLocked = false;
+}
+
+VectorGraphPoint::VectorGraphPoint(VectorGraphPoint * point)
+{
+	m_x = point->m_x;
+	m_y = point->m_y;
+	m_tension = point->m_tension;
+	m_tensionPower = point->m_tensionPower;
+	m_absTensionPower = point->m_absTensionPower;
+	m_invTensionPower = point->m_invTensionPower;
+	m_invAbsTensionPower = point->m_invAbsTensionPower;
+	m_dryAmt = point->m_dryAmt;
+	m_tensionType = point->m_tensionType;
+	m_isXLocked = point->m_isXLocked;
+	m_isYLocked = point->m_isYLocked;
+	m_isXPermaLocked = point->m_isXPermaLocked;
+	m_isYPermaLocked = point->m_isYPermaLocked;
 }
 
 VectorGraphPoint::VectorGraphPoint()
