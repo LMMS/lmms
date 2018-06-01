@@ -414,7 +414,7 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::Pulse)
 	{
-		return input; // fill this in
+		return ((int) (input * (int) ((point->tension() + 1.05) * 50))) % 2;
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::Wave)
 	{
