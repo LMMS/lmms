@@ -131,6 +131,7 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 		if (handleIndex >= 0)
 		{
 			model()->getPoint(handleIndex)->setTension(0);
+			model()->setLastModifiedTension(0);
 			update();
 			return;
 		}
