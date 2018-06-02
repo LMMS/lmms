@@ -91,6 +91,9 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 
 		auto tensionType = thisPoint->getTensionType();
 
+		if (tensionType == Hold)
+			continue;
+
 		int ths = model()->getTensionHandleSize();
 
 		if (tensionType == DoubleCurve ||
