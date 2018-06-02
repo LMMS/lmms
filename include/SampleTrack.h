@@ -134,11 +134,13 @@ private:
 	 * @param beginOffset		Offset from the beginning of the tco.
 	 * @param totalTime			Total time we want to visualize.
 	 * @param pixelsPerTact		Current `pixelsPerTact()` result.
-	 * @param shouldAddBorder	Should we calculate border pixels?
+	 * @param isRootRect		Is this a the global rectangle?
+	 *							and we should calculate spacing and
+	 *							sample offset?
 	 */
 	QRect getRectForSampleFragment (QRect globalRect, MidiTime beginOffset,
 									MidiTime totalTime,
-									float pixelsPerTact, bool shouldAddBorder=false);
+									float pixelsPerTact, bool isRootRect=false);
 
 	SampleTCO * m_tco;
 	QPixmap m_paintPixmap;
