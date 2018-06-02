@@ -88,7 +88,20 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 	{
 		VectorGraphPoint * thisPoint = model()->getPoint(i);
 		VectorGraphPoint * prevPoint = model()->getPoint(i - 1);
+
+		auto tensionType = thisPoint->getTensionType();
+
 		int ths = model()->getTensionHandleSize();
+
+		if (tensionType == DoubleCurve ||
+			tensionType == Stairs ||
+			tensionType == Pulse ||
+			tensionType == Wave)
+		{
+			m_canvas.drawEllipse(QPoint(qRound(((thisPoint->x() + prevPoint->x()) / 2) * m_width), qRound((1 - (thisPoint->y() + prevPoint->y()) / 2) * m_height)), ths, ths);
+			continue;
+		}
+
 		if (model()->floatEqual(thisPoint->x(), prevPoint->x(), 0.00001))
 		{
 			m_canvas.drawEllipse(QPoint(qRound(thisPoint->x() * m_width + 1), qRound((1 - (thisPoint->y() + prevPoint->y()) / 2) * m_height)), ths, ths);
@@ -554,8 +567,25 @@ int VectorGraphModel::getPointIndexFromTensionHandleCoords(int x, int y, int can
 	{
 		VectorGraphPoint * startPoint = getPoint(i - 1);
 		VectorGraphPoint * endPoint = getPoint(i);
-		float tensionHandleCenterX = ((startPoint->x() + endPoint->x()) / 2) * canvasWidth;
-		float tensionHandleCenterY = calculateSample(tensionHandleCenterX / canvasWidth) * canvasHeight;
+		if (endPoint->tensionType() == VectorGraph::TensionType::Hold)
+			return -1;
+
+		float tensionHandleCenterX;
+		float tensionHandleCenterY;
+
+		if (endPoint->tensionType() == VectorGraph::TensionType::DoubleCurve ||
+				 endPoint->tensionType() == VectorGraph::TensionType::Pulse ||
+				 endPoint->tensionType() == VectorGraph::TensionType::Stairs ||
+				 endPoint->tensionType() == VectorGraph::TensionType::Wave)
+		{
+			tensionHandleCenterX = ((startPoint->x() + endPoint->x())/2) * canvasWidth;
+			tensionHandleCenterY = ((startPoint->y() + endPoint->y())/2) * canvasHeight;
+		}
+		else
+		{
+			tensionHandleCenterX = ((startPoint->x() + endPoint->x()) / 2) * canvasWidth;
+			tensionHandleCenterY = calculateSample(tensionHandleCenterX / canvasWidth) * canvasHeight;
+		}
 		if (arePointsWithinDistance(x, tensionHandleCenterX, y, tensionHandleCenterY, getTensionHandleSize() + 2))
 		{
 			return i;
