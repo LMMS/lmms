@@ -189,7 +189,7 @@ void SampleTCO::updateLength()
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
+	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick(m_sampleBuffer->sampleRate ()) );
 }
 
 
@@ -256,8 +256,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 		if (_this.hasAttribute ("data") && _this.attribute ("data") != QString()) {
 			qWarning("Using default sampleRate. That could lead to invalid values1");
 			m_sampleBuffer->loadFromBase64 (_this.attribute ("data"),
-											Engine::mixer ()->baseSampleRate (),
-											true);
+											Engine::mixer ()->baseSampleRate ());
 		} else {
 			m_sampleBuffer->restoreState (_this.firstChildElement (m_sampleBuffer->nodeName ()));
 		}
@@ -485,28 +484,72 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
 
-	const int spacing = TCO_BORDER_WIDTH + 1;
-	const float ppt = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getTact() :
-								pixelsPerTact();
+	MidiTime currentSampleTime = m_tco->sampleLength();
+	auto framesPerTick = Engine::framesPerTick(m_tco->sampleBuffer ()->sampleRate ());
+	auto currentPixelsPerTact = pixelsPerTact();
+	auto globalRect = getRectForSampleFragment (rect(),
+												0,
+												currentSampleTime,
+												currentPixelsPerTact,
+												true);
 
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * nom / den;
+	// Only TCOs that are being recorded into.
+	// Clear the cache and let it generate a new line
+	// and then visualize it.
+	if (!m_tco->isRecord () || !Engine::getSong ()->isRecording ()) {
+		m_cachedTime = 0;
+		m_paintMaps.clear ();
+	}
 
-	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
-	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
+	// We've need to visualize more frames.
+	if (currentSampleTime > m_cachedTime) {
+		PaintCacheLine cacheLine;
 
-	// Make sure our SampleBuffer is not locked, if it is,
-	// skip this frame and flag it for
-	if (m_tco->sampleBuffer ()->tryDataReadLock ()) {
-		m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
-		m_tco->m_sampleBuffer->dataUnlock ();
-	} else {
-		// We have not really did much.
-		setNeedsUpdate (true);
+		// We're visualizing the end: from the past-one we previously visualized
+		// to the last one in the buffer.
+		cacheLine.paintRect = getRectForSampleFragment (globalRect,
+														m_cachedTime,
+														currentSampleTime-m_cachedTime,
+														currentPixelsPerTact);
+		cacheLine.pixelsPerTact = currentPixelsPerTact;
+
+		if (m_tco->sampleBuffer ()->tryDataReadLock ()) {
+			// Generate the actual visualization.
+			cacheLine.paintPoly = m_tco->m_sampleBuffer->visualizeToPoly (cacheLine.paintRect,
+																		  pe->rect(),
+																		  m_cachedTime.frames (framesPerTick),
+																		  currentSampleTime.frames (framesPerTick));
+			m_tco->m_sampleBuffer->dataUnlock ();
+
+			m_paintMaps.push_back (std::move (cacheLine));
+			m_cachedTime = currentSampleTime;
+		} else {
+
+			// We have not really did much.
+			setNeedsUpdate (true);
+		}
+
+	}
+
+	p.setRenderHint (QPainter::Antialiasing);
+
+	// Draw all the cached maps.
+	for (auto &map : m_paintMaps) {
+		// Normalize cache that has been generated
+		// with different PixelsPerTact value (zoom has
+		// been changed).
+		if (map.pixelsPerTact > currentPixelsPerTact || map.pixelsPerTact < currentPixelsPerTact) {
+			QTransform transform;
+			transform.scale(static_cast<qreal>(currentPixelsPerTact) / static_cast<qreal>(map.pixelsPerTact), 1);
+
+			map.paintPoly.first = transform.map(map.paintPoly.first);
+			map.paintPoly.second = transform.map(map.paintPoly.second);
+			map.pixelsPerTact = currentPixelsPerTact;
+		}
+
+		// Paint the visualization.
+		p.drawPolyline (map.paintPoly.first);
+		p.drawPolyline (map.paintPoly.second);
 	}
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
@@ -539,6 +582,48 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	painter.drawPixmap( 0, 0, m_paintPixmap );
 }
 
+QRect SampleTCOView::getRectForSampleFragment(QRect globalRect, MidiTime beginOffset,
+											  MidiTime totalTime, float pixelsPerTact, bool shouldAddBorder) {
+	const int spacing = TCO_BORDER_WIDTH + 1;
+	float ppt;
+	if (fixedTCOs ()) {
+		auto width = globalRect.width ();
+		if (shouldAddBorder)
+			width =- 2 * TCO_BORDER_WIDTH;
+
+		ppt = ( width  )
+				/ (float) m_tco->length().getTact();
+	} else {
+		ppt = pixelsPerTact;
+	}
+
+	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+	float den = Engine::getSong()->getTimeSigModel().getDenominator();
+	float ticksPerTact = DefaultTicksPerTact * nom / den;
+
+	float offset =  (beginOffset + m_tco->startTimeOffset()) / ticksPerTact * pixelsPerTact;
+	if (shouldAddBorder) {
+			offset += TCO_BORDER_WIDTH;
+	}
+
+	float top = globalRect.top ();
+	if (shouldAddBorder) {
+		top += spacing;
+	}
+
+	float height = globalRect.height ();
+	if (shouldAddBorder) {
+		height -= spacing * 2;
+	}
+
+	QRect r = QRect( globalRect.left () + offset,
+					 top,
+					 (qMax( static_cast<int>( totalTime * ppt / ticksPerTact ), 1 )),
+					 height);
+
+	return r;
+}
+
 
 
 
@@ -552,7 +637,7 @@ SampleTrack::SampleTrack( TrackContainer* tc ) :
 							this,
 							tr ("Record channel")),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
+				   tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
 	m_effectChannelModel( 0, 0, 0, this, tr( "FX channel" ) ),
@@ -785,8 +870,9 @@ void SampleTrack::beforeRecordOn(MidiTime time)
 		for(auto &track : getTCOs ()) {
 			auto sampleTCO = static_cast<SampleTCO*>(track);
 
-			if (sampleTCO->isRecord() && !sampleTCO->isMuted())
+			if (sampleTCO->isRecord() && !sampleTCO->isMuted()) {
 				isRecordTCOExist = true;
+			}
 		}
 
 		if (! isRecordTCOExist) {

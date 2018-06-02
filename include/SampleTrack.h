@@ -126,8 +126,32 @@ protected:
 
 
 private:
+	/**
+	 * @brief Calculate the position and size for a visualization
+	 *		  of a @arg totalTime frames fragment starting from
+	 *		  @arg beginOffset.
+	 * @param globalRect		The parent rectangle.
+	 * @param beginOffset		Offset from the beginning of the tco.
+	 * @param totalTime			Total time we want to visualize.
+	 * @param pixelsPerTact		Current `pixelsPerTact()` result.
+	 * @param shouldAddBorder	Should we calculate border pixels?
+	 */
+	QRect getRectForSampleFragment (QRect globalRect, MidiTime beginOffset,
+									MidiTime totalTime,
+									float pixelsPerTact, bool shouldAddBorder=false);
+
 	SampleTCO * m_tco;
 	QPixmap m_paintPixmap;
+
+
+	struct PaintCacheLine {
+		QPair<QPolygonF, QPolygonF> paintPoly;
+		QRect paintRect;
+		float pixelsPerTact;
+	};
+
+	QVector<PaintCacheLine> m_paintMaps;
+	MidiTime m_cachedTime{0};
 } ;
 
 
