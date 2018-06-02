@@ -122,7 +122,7 @@ public:
 	/*! Returns whether the play handle plays on a certain track */
 	virtual bool isFromTrack( const Track* _track ) const;
 
-	/*! Releases the note (and plays release frames */
+	/*! Releases the note (and plays release frames) */
 	void noteOff( const f_cnt_t offset = 0 );
 
 	/*! Returns number of frames to be played until the note is going to be released */
