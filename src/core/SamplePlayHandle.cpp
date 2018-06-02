@@ -139,7 +139,10 @@ bool SamplePlayHandle::isFromTrack( const Track * _track ) const
 
 f_cnt_t SamplePlayHandle::totalFrames() const
 {
-	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / m_sampleBuffer->sampleRate ());
+	f_cnt_t total_frames = ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() );
+	qreal processingToSampleRateRatio = static_cast<qreal>(Engine::mixer()->processingSampleRate()) / static_cast<qreal>(m_sampleBuffer->sampleRate ());
+
+	return static_cast<f_cnt_t>(total_frames * processingToSampleRateRatio);
 }
 
 
