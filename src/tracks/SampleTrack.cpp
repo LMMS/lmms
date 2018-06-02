@@ -474,10 +474,9 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 												currentPixelsPerTact,
 												true);
 
-	// Only TCOs that are being recorded into.
-	// Clear the cache and let it generate a new line
-	// and then visualize it.
-	if (!m_tco->isRecord () || !Engine::getSong ()->isRecording ()) {
+
+	// We have a cache mismatch, lets clear the current one.
+	if (currentSampleTime < m_cachedTime) {
 		m_cachedTime = 0;
 		m_paintMaps.clear ();
 	}
@@ -509,7 +508,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			// We have not really did much.
 			setNeedsUpdate (true);
 		}
-
 	}
 
 	p.setRenderHint (QPainter::Antialiasing);
@@ -531,6 +529,14 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		// Paint the visualization.
 		p.drawPolyline (map.paintPoly.first);
 		p.drawPolyline (map.paintPoly.second);
+	}
+
+	// Cache only TCOs that are being recorded into.
+	// Clear the cache and let it generate a new line
+	// and then visualize it.
+	if (!m_tco->isRecord () || !Engine::getSong ()->isRecording ()) {
+		m_cachedTime = 0;
+		m_paintMaps.clear ();
 	}
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
@@ -564,12 +570,12 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 }
 
 QRect SampleTCOView::getRectForSampleFragment(QRect globalRect, MidiTime beginOffset,
-											  MidiTime totalTime, float pixelsPerTact, bool shouldAddBorder) {
+											  MidiTime totalTime, float pixelsPerTact, bool isRootRect) {
 	const int spacing = TCO_BORDER_WIDTH + 1;
 	float ppt;
 	if (fixedTCOs ()) {
 		auto width = globalRect.width ();
-		if (shouldAddBorder)
+		if (isRootRect)
 			width =- 2 * TCO_BORDER_WIDTH;
 
 		ppt = ( width  )
@@ -582,18 +588,19 @@ QRect SampleTCOView::getRectForSampleFragment(QRect globalRect, MidiTime beginOf
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
 
-	float offset =  (beginOffset + m_tco->startTimeOffset()) / ticksPerTact * pixelsPerTact;
-	if (shouldAddBorder) {
+	float offset =  (beginOffset) / ticksPerTact * pixelsPerTact;
+	if (isRootRect) {
 			offset += TCO_BORDER_WIDTH;
+			offset += m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact;
 	}
 
 	float top = globalRect.top ();
-	if (shouldAddBorder) {
+	if (isRootRect) {
 		top += spacing;
 	}
 
 	float height = globalRect.height ();
-	if (shouldAddBorder) {
+	if (isRootRect) {
 		height -= spacing * 2;
 	}
 
