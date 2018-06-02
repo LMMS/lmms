@@ -347,6 +347,14 @@ public:
 	{
 		return m_tensionType;
 	}
+	inline bool canBeDeleted()
+	{
+		return m_canBeDeleted;
+	}
+	inline void setDeletable(bool deletable)
+	{
+		m_canBeDeleted = deletable;
+	}
 private:
 	float m_x;
 	float m_y;
@@ -361,6 +369,7 @@ private:
 	bool m_isYLocked;
 	bool m_isXPermaLocked;
 	bool m_isYPermaLocked;
+	bool m_canBeDeleted;
 };
 
 #endif

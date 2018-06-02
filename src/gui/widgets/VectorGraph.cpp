@@ -243,8 +243,11 @@ bool VectorGraph::eventFilter(QObject *watched, QEvent *event)
 		contextMenu.addAction(QPixmap(), tr("Stairs"), this, SLOT(setTensionToStairs()));
 		contextMenu.addAction(QPixmap(), tr("Pulse"), this, SLOT(setTensionToPulse()));
 		contextMenu.addAction(QPixmap(), tr("Wave"), this, SLOT(setTensionToWave()));
-		contextMenu.addSeparator();
-		contextMenu.addAction(QPixmap(), tr("&Delete"), this, SLOT(deletePoint()));
+		if (model()->getPoint(m_currentPoint)->canBeDeleted())
+		{
+			contextMenu.addSeparator();
+			contextMenu.addAction(QPixmap(), tr("&Delete"), this, SLOT(deletePoint()));
+		}
 		contextMenu.exec(QCursor::pos());
 		return true;
 	}
@@ -335,10 +338,11 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 
 	auto firstPoint = VectorGraphPoint(0, 0, 0, VectorGraph::TensionType::SingleCurve);
 	firstPoint.permaLockX();
-	firstPoint.permaLockY();
+	firstPoint.setDeletable(false);
 	m_points.append(firstPoint);
 	auto finalPoint = VectorGraphPoint(1, 1, 0, VectorGraph::TensionType::SingleCurve);
 	finalPoint.permaLockX();
+	finalPoint.setDeletable(false);
 	m_points.append(finalPoint);
 
 	m_currentDraggedPoint = -1;
@@ -621,6 +625,7 @@ VectorGraphPoint::VectorGraphPoint(float x, float y, float tension, VectorGraph:
 	m_isYLocked = false;
 	m_isXPermaLocked = false;
 	m_isYPermaLocked = false;
+	m_canBeDeleted = true;
 }
 
 VectorGraphPoint::VectorGraphPoint(VectorGraphPoint * point)
@@ -638,6 +643,7 @@ VectorGraphPoint::VectorGraphPoint(VectorGraphPoint * point)
 	m_isYLocked = point->m_isYLocked;
 	m_isXPermaLocked = point->m_isXPermaLocked;
 	m_isYPermaLocked = point->m_isYPermaLocked;
+	m_canBeDeleted = point->m_canBeDeleted;
 }
 
 VectorGraphPoint::VectorGraphPoint()
@@ -650,4 +656,5 @@ VectorGraphPoint::VectorGraphPoint()
 	m_isYLocked = false;
 	m_isXPermaLocked = false;
 	m_isYPermaLocked = false;
+	m_canBeDeleted = true;
 }
