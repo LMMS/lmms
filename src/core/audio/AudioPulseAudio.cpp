@@ -58,13 +58,16 @@ AudioPulseAudio::AudioPulseAudio( bool & _success_ful, Mixer*  _mixer ) :
 {
 	_success_ful = false;
 
+	setSampleRate (Engine::mixer ()->baseSampleRate ());
 	m_sampleSpec.format = PA_SAMPLE_FLOAT32;
 	m_sampleSpec.rate = sampleRate();
 	m_sampleSpec.channels = channels();
 
 	m_recordSampleSpec = m_sampleSpec;
 
-	m_supportsCapture = true;
+	// It does work. But it has clicking noises every few seconds.
+	// have no idea way.
+	m_supportsCapture = false;
 
 	_success_ful = true;
 }
