@@ -99,6 +99,7 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 	_success_ful = true;
 
 #ifdef LMMS_HAVE_SDL2
+#ifdef LMMS_BUILD_WIN32
 	m_inputAudioHandle = m_audioHandle;
 	m_inputAudioHandle.freq = mixer ()->inputSampleRate ();
 	m_inputAudioHandle.callback = sdlInputAudioCallback;
@@ -114,7 +115,10 @@ AudioSdl::AudioSdl( bool & _success_ful, Mixer*  _mixer ) :
 		m_supportsCapture = false;
 		qWarning ( "Couldn't open SDL capture device: %s\n", SDL_GetError ());
 	}
-
+#else
+	qWarning("SDL: Recording has been disabled on Linux since it "
+			 "appears to have a growing latency");
+#endif
 #endif
 }
 
