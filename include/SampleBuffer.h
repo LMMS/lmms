@@ -28,6 +28,7 @@
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
+#include <QPolygonF>
 
 #include <samplerate.h>
 
@@ -130,6 +131,8 @@ public:
 	{
 		visualize( _p, _dr, _dr, _from_frame, _to_frame );
 	}
+
+	QPair<QPolygonF, QPolygonF>  visualizeToPoly( const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0);
 
 	inline const QString & audioFile() const
 	{
