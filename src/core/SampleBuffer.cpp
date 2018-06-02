@@ -830,39 +830,48 @@ f_cnt_t SampleBuffer::getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t
 void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 							const QRect & _clip, f_cnt_t _from_frame, f_cnt_t _to_frame )
 {
-	if( frames () == 0 ) return;
+	auto polyPair = visualizeToPoly (_dr, _clip, _from_frame, _to_frame);
 
-	const bool focus_on_range = _to_frame <= frames ()
-					&& 0 <= _from_frame && _from_frame < _to_frame;
+	_p.setRenderHint( QPainter::Antialiasing );
+	_p.drawPolyline (polyPair.first);
+	_p.drawPolyline (polyPair.second);
+}
+
+QPair<QPolygonF, QPolygonF> SampleBuffer::visualizeToPoly(const QRect &_dr, const QRect &_clip,
+														  f_cnt_t _from_frame, f_cnt_t _to_frame)
+{
+	if( internalFrames () == 0 ) return {};
+
+	const bool focus_on_range = _to_frame <= internalFrames()
+					&& _from_frame < _to_frame;
 	//_p.setClipRect( _clip );
 	const int w = _dr.width();
 	const int h = _dr.height();
 
 	const int yb = h / 2 + _dr.y();
 	const float y_space = h*0.5f;
-	const int nb_frames = focus_on_range ? _to_frame - _from_frame : frames ();
+	const int nb_frames = focus_on_range ? _to_frame - _from_frame : internalFrames();
+	if (nb_frames == 0) return {};
 
 	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
-	QPointF * l = new QPointF[nb_frames / fpp + 1];
-	QPointF * r = new QPointF[nb_frames / fpp + 1];
+	auto l = QPolygonF();
+	auto r = QPolygonF();
+
 	int n = 0;
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
-	const int last = focus_on_range ? _to_frame : frames ();
+	const int last = focus_on_range ? _to_frame : internalFrames();
 	for( int frame = first; frame < last; frame += fpp )
 	{
-		l[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-			( yb - ( m_data[frame][0] * y_space * m_amplification ) ) );
-		r[n] = QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-			( yb - ( m_data[frame][1] * y_space * m_amplification ) ) );
+		l.push_back( QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+							  ( yb - ( m_data[frame][0] * y_space * m_amplification ) ) ));
+		r.push_back(QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
+							 ( yb - ( m_data[frame][1] * y_space * m_amplification ) ) ));
+
 		++n;
 	}
 
-	_p.setRenderHint( QPainter::Antialiasing );
-	_p.drawPolyline( l, (n-first-1) );
-	_p.drawPolyline( r, (n-first-1) );
-	delete[] l;
-	delete[] r;
+	return {std::move(l), std::move(r)};
 }
 
 
