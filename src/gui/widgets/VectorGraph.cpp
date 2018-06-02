@@ -409,7 +409,25 @@ float VectorGraphModel::calculateSectionSample(float input, int sectionStartInde
 	}
 	else if (point->getTensionType() == VectorGraph::TensionType::Wave)
 	{
-		return input; // fill this in
+		// triangle case
+		if (point->tension() > 0)
+		{
+			int count = ((int) ((point->tension() + 0.05) * 25)) * 2 + 1;
+			float width = 1.0/count;
+			int currentCount = input*count;
+
+			float output = input*count - currentCount*width*count;
+
+			if (currentCount % 2 == 1)
+				output = 1 - output;
+			return output;
+		}
+		// sine case
+		else
+		{
+			int count = ((int) ((qAbs(point->tension()) + 0.05) * 25)) * 2 + 1;
+			return qCos(input * M_PI * count) * -0.5 + 0.5;
+		}
 	}
 	return 0;
 }
