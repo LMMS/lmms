@@ -28,8 +28,11 @@
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QObject>
+#include <QPolygonF>
 
 #include <samplerate.h>
+
+#include <vector>
 
 #include "export.h"
 #include "interpolation.h"
@@ -37,6 +40,7 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "MemoryManager.h"
+#include "JournallingObject.h"
 
 
 class QPainter;
@@ -48,11 +52,14 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class EXPORT SampleBuffer : public QObject, public sharedObject
+class EXPORT SampleBuffer : public QObject,
+							public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
 public:
+	typedef std::vector<sampleFrame, MmAllocator<sampleFrame>> DataVector;
+
 	enum LoopMode {
 		LoopOff = 0,
 		LoopOn,
@@ -102,15 +109,18 @@ public:
 
 	} ;
 
-
 	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
-	SampleBuffer( const sampleFrame * _data, const f_cnt_t _frames );
-	explicit SampleBuffer( const f_cnt_t _frames );
+	SampleBuffer(const QString & _audio_file, bool _is_base64_data, sample_rate_t sampleRate=0);
+	SampleBuffer(DataVector &&movedData, sample_rate_t sampleRate);
 
-	virtual ~SampleBuffer();
+	inline virtual QString nodeName() const override
+	{
+		return "samplebuffer";
+	}
+	virtual void saveSettings(QDomDocument& doc, QDomElement& _this ) override;
+	virtual void loadSettings(const QDomElement& _this ) override;
 
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
@@ -122,6 +132,8 @@ public:
 	{
 		visualize( _p, _dr, _dr, _from_frame, _to_frame );
 	}
+
+	QPair<QPolygonF, QPolygonF>  visualizeToPoly( const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0);
 
 	inline const QString & audioFile() const
 	{
@@ -168,17 +180,15 @@ public:
 
 	inline f_cnt_t frames() const
 	{
-		return m_frames;
+		dataReadLock();
+		auto size = internalFrames();
+		dataUnlock();
+		return size;
 	}
 
 	inline float amplification() const
 	{
 		return m_amplification;
-	}
-
-	inline bool reversed() const
-	{
-		return m_reversed;
 	}
 
 	inline float frequency() const
@@ -201,52 +211,42 @@ public:
 		m_frequency = _freq;
 	}
 
-	inline void setSampleRate( sample_rate_t _rate )
-	{
-		m_sampleRate = _rate;
-	}
-
 	inline const sampleFrame * data() const
 	{
-		return m_data;
+		return m_data.data ();
 	}
 
 	QString openAudioFile() const;
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
 
-	QString & toBase64( QString & _dst ) const;
-
-
-	// protect calls from the GUI to this function with dataReadLock() and
-	// dataUnlock()
-	SampleBuffer * resample( const sample_rate_t _src_sr,
-						const sample_rate_t _dst_sr );
-
-	void normalizeSampleRate( const sample_rate_t _src_sr,
-						bool _keep_settings = false );
-
 	// protect calls from the GUI to this function with dataReadLock() and
 	// dataUnlock(), out of loops for efficiency
 	inline sample_t userWaveSample( const float _sample ) const
 	{
-		f_cnt_t frames = m_frames;
-		sampleFrame * data = m_data;
-		const float frame = _sample * frames;
-		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % frames;
+		f_cnt_t dataFrames = internalFrames();
+		const sampleFrame * data = this->data();
+		const float frame = _sample * dataFrames;
+		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % dataFrames;
 		if( f1 < 0 )
 		{
-			f1 += frames;
+			f1 += dataFrames;
 		}
-		return linearInterpolate( data[f1][0], data[ (f1 + 1) % frames ][0], fraction( frame ) );
+		return linearInterpolate( data[f1][0], data[ (f1 + 1) % dataFrames ][0], fraction( frame ) );
 	}
 
-	void dataReadLock()
+	bool tryDataReadLock () const
+	{
+		return m_varLock.tryLockForRead ();
+	}
+
+
+	void dataReadLock() const
 	{
 		m_varLock.lockForRead();
 	}
 
-	void dataUnlock()
+	void dataUnlock() const
 	{
 		m_varLock.unlock();
 	}
@@ -254,49 +254,96 @@ public:
 	static QString tryToMakeRelative( const QString & _file );
 	static QString tryToMakeAbsolute(const QString & file);
 
+	/**
+	 * @brief Add data to the buffer,
+	 * @param begin	Beginning of an InputIterator.
+	 * @param end	End of an InputIterator.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 *
+	 * @warning That locks m_varLock for write.
+	 */
+	void addData(const DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer=true);
+
+	/**
+	 * @brief Reset the class and initialize it with @a newData.
+	 * @param newData	mm, that's the new data.
+	 * @param dataSampleRate	Sample rate for @a newData.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 */
+	void resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer=true);
+
+	/**
+	 * @brief Just reverse the current buffer.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 *
+	 * This function simply calls `std::reverse` on m_data.
+	 */
+	void reverse(bool shouldLockMixer=true);
+
+	void loadFromBase64(const QString & _data , sample_rate_t sampleRate);
+
 
 public slots:
 	void setAudioFile( const QString & _audio_file );
-	void loadFromBase64( const QString & _data );
 	void setStartFrame( const f_cnt_t _s );
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
-	void setReversed( bool _on );
 	void sampleRateChanged();
 
-private:
-	void update( bool _keep_settings = false );
+protected:
+	QString & toBase64( QString & _dst ) const;
+	inline void setSampleRate( sample_rate_t _rate )
+	{
+		m_sampleRate = _rate;
+	}
 
-	void convertIntToFloat ( int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
-	void directFloatWrite ( sample_t * & _fbuf, f_cnt_t _frames, int _channels);
+	static sample_rate_t mixerSampleRate();
 
-	f_cnt_t decodeSampleSF( const char * _f, sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	// HACK: libsamplerate < 0.1.8 doesn't get read-only variables
+	//	     as const. It has been fixed in 0.1.9 but has not been
+	//		 shipped for some distributions.
+	//		 This function just returns a variable that should have
+	//		 been `const` as non-const to bypass using 0.1.9.
+	inline static sampleFrame * libSampleRateSrc (const sampleFrame *ptr)
+	{
+		return const_cast<sampleFrame*>(ptr);
+	}
+
+	void changeAudioFile (QString audioFile);
+
+	static DataVector convertIntToFloat(int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
+
+	static DataVector decodeSampleSF( const char * _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
 #ifdef LMMS_HAVE_OGGVORBIS
-	f_cnt_t decodeSampleOGGVorbis( const char * _f, int_sample_t * & _buf,
+	static DataVector decodeSampleOGGVorbis( const char * _f,
 						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+						sample_rate_t & _sample_rate);
 #endif
-	f_cnt_t decodeSampleDS( const char * _f, int_sample_t * & _buf,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate );
+	static DataVector decodeSampleDS( const char * _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
+
+	inline sampleFrame * data()
+	{
+		return m_data.data ();
+	}
+
+	size_t internalFrames() const
+	{
+		return m_data.size ();
+	}
+
 
 	QString m_audioFile;
-	sampleFrame * m_origData;
-	f_cnt_t m_origFrames;
-	sampleFrame * m_data;
-	QReadWriteLock m_varLock;
-	f_cnt_t m_frames;
+	DataVector m_data;
+	mutable QReadWriteLock m_varLock;
 	f_cnt_t m_startFrame;
 	f_cnt_t m_endFrame;
 	f_cnt_t m_loopStartFrame;
 	f_cnt_t m_loopEndFrame;
 	float m_amplification;
-	bool m_reversed;
 	float m_frequency;
 	sample_rate_t m_sampleRate;
 
+	const
 	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
 						LoopMode _loopmode,
 						sampleFrame * * _tmp,
@@ -306,6 +353,23 @@ private:
 	f_cnt_t getPingPongIndex( f_cnt_t _index, f_cnt_t _startf, f_cnt_t _endf  ) const;
 
 
+	static DataVector resampleData(const DataVector &inputData, sample_rate_t inputSampleRate, sample_rate_t requiredSampleRate);
+
+	/**
+	 * @brief Do the actions necessary before changing m_data.
+	 * @param shouldLock	Is anyone else might be using m_data?
+	 */
+	void beginBufferChange (bool shouldLock, bool shouldLockMixer=true);
+
+	/**
+	 * @brief Do some actions necessary after changing m_data.
+	 * @param shouldUnlock	The same value you've used on @a beginBufferChange.
+	 * @param shouldKeepSettings	Should we keep playback settings?
+	 * @param bufferSampleRate		The new m_data's sample rate.
+	 */
+	void doneBufferChange (bool shouldUnlock,
+						   sample_rate_t bufferSampleRate,
+						   bool shouldUnlockMixer=true);
 signals:
 	void sampleUpdated();
 

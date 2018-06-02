@@ -309,8 +309,7 @@ bool Mixer::criticalXRuns() const
 
 
 
-void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
-{
+void Mixer::pushInputFrames(const sampleFrame * _ab, const f_cnt_t _frames) {
 	requestChangeInModel();
 
 	f_cnt_t frames = m_inputBufferFrames[ m_inputBufferWrite ];
@@ -331,6 +330,7 @@ void Mixer::pushInputFrames( sampleFrame * _ab, const f_cnt_t _frames )
 	}
 
 	memcpy( &buf[ frames ], _ab, _frames * sizeof( sampleFrame ) );
+
 	m_inputBufferFrames[ m_inputBufferWrite ] += _frames;
 
 	doneChangeInModel();
@@ -397,7 +397,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 
 		if( it != m_playHandles.end() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if ((*it )->audioPort())
+				( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -451,7 +452,8 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 		}
 		if( ( *it )->isFinished() )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if (( *it )->audioPort())
+				( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -574,7 +576,6 @@ void Mixer::changeQuality( const struct qualitySettings & _qs )
 
 
 
-
 void Mixer::setAudioDevice( AudioDevice * _dev )
 {
 	stopProcessing();
@@ -675,7 +676,8 @@ bool Mixer::addPlayHandle( PlayHandle* handle )
 	if( criticalXRuns() == false )
 	{
 		m_newPlayHandles.push( handle );
-		handle->audioPort()->addPlayHandle( handle );
+		if (handle->audioPort())
+			handle->audioPort()->addPlayHandle( handle );
 		return true;
 	}
 
@@ -697,7 +699,8 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 	if( _ph->affinityMatters() &&
 				_ph->affinity() == QThread::currentThread() )
 	{
-		_ph->audioPort()->removePlayHandle( _ph );
+		if (_ph->audioPort())
+			_ph->audioPort()->removePlayHandle( _ph );
 		bool removedFromList = false;
 		// Check m_newPlayHandles first because doing it the other way around
 		// creates a race condition
@@ -757,7 +760,8 @@ void Mixer::removePlayHandlesOfTypes( Track * _track, const quint8 types )
 	{
 		if( ( *it )->isFromTrack( _track ) && ( ( *it )->type() & types ) )
 		{
-			( *it )->audioPort()->removePlayHandle( ( *it ) );
+			if (( *it )->audioPort())
+				( *it )->audioPort()->removePlayHandle( ( *it ) );
 			if( ( *it )->type() == PlayHandle::TypeNotePlayHandle )
 			{
 				NotePlayHandleManager::release( (NotePlayHandle*) *it );
@@ -1058,15 +1062,15 @@ MidiClient * Mixer::tryMidiClients()
 #endif
 
 #ifdef LMMS_BUILD_APPLE
-    printf( "trying midi apple...\n" );
-    if( client_name == MidiApple::name() || client_name == "" )
-    {
-        MidiApple * mapple = new MidiApple;
-        m_midiClientName = MidiApple::name();
-        printf( "Returning midi apple\n" );
-        return mapple;
-    }
-    printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
+	printf( "trying midi apple...\n" );
+	if( client_name == MidiApple::name() || client_name == "" )
+	{
+		MidiApple * mapple = new MidiApple;
+		m_midiClientName = MidiApple::name();
+		printf( "Returning midi apple\n" );
+		return mapple;
+	}
+	printf( "midi apple didn't work: client_name=%s\n", client_name.toUtf8().constData());
 #endif
 
 	printf( "Couldn't create MIDI-client, neither with ALSA nor with "

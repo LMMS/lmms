@@ -47,15 +47,18 @@ AudioJack::AudioJack( bool & _success_ful, Mixer*  _mixer ) :
 	AudioDevice( tLimit<int>( ConfigManager::inst()->value(
 					"audiojack", "channels" ).toInt(),
 					DEFAULT_CHANNELS, SURROUND_CHANNELS ),
-								_mixer ),
+					_mixer),
 	m_client( NULL ),
 	m_active( false ),
 	m_midiClient( NULL ),
 	m_tempOutBufs( new jack_default_audio_sample_t *[channels()] ),
+	m_tempInBufs( new jack_default_audio_sample_t *[channels()] ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
 	m_framesDoneInCurBuf( 0 ),
 	m_framesToDoInCurBuf( 0 )
 {
+	m_supportsCapture = true;
+
 	_success_ful = initJackClient();
 	if( _success_ful )
 	{
@@ -88,6 +91,7 @@ AudioJack::~AudioJack()
 		jack_client_close( m_client );
 	}
 
+	delete[] m_tempInBufs;
 	delete[] m_tempOutBufs;
 
 	delete[] m_outBuf;
@@ -188,7 +192,24 @@ bool AudioJack::initJackClient()
 						JackPortIsOutput, 0 ) );
 		if( m_outputPorts.back() == NULL )
 		{
-			printf( "no more JACK-ports available!\n" );
+			printf( "no more out JACK-ports available!\n" );
+			return false;
+		}
+	}
+
+	// Register In ports
+	for( ch_cnt_t ch = 0; ch < channels(); ++ch )
+	{
+		QString name = QString( "master in " ) +
+				( ( ch % 2 ) ? "R" : "L" ) +
+				QString::number( ch / 2 + 1 );
+		m_inputPorts.push_back( jack_port_register( m_client,
+													name.toLatin1().constData(),
+													JACK_DEFAULT_AUDIO_TYPE,
+													JackPortIsInput, 0 ) );
+		if( m_inputPorts.back() == NULL )
+		{
+			printf( "no more in JACK-ports available!\n" );
 			return false;
 		}
 	}
@@ -223,30 +244,30 @@ void AudioJack::startProcessing()
 
 
 
-	const char * * ports = jack_get_ports( m_client, NULL, NULL,
+	const char * * inputPorts = jack_get_ports( m_client, NULL, NULL,
 						JackPortIsPhysical |
 						JackPortIsInput );
-	if( ports == NULL )
-	{
-		printf( "no physical playback ports. you'll have to do "
-			"connections at your own!\n" );
-	}
-	else
-	{
-		for( ch_cnt_t ch = 0; ch < channels(); ++ch )
-		{
-			if( jack_connect( m_client, jack_port_name(
-							m_outputPorts[ch] ),
-								ports[ch] ) )
-			{
-				printf( "cannot connect output ports. you'll "
-					"have to do connections at your own!\n"
-									);
-			}
+	// Connect lmms to the default playback device.
+	if (inputPorts) {
+		for (uint i = 0; i < channels (); ++i) {
+			connectJackPort (jack_port_name (m_outputPorts[i]), inputPorts[i], "playback");
 		}
+
+		free( inputPorts );
 	}
 
-	free( ports );
+	const char * * outputPorts = jack_get_ports( m_client, NULL, NULL,
+						JackPortIsPhysical |
+						JackPortIsOutput );
+	// Connect lmms to the default capture device.
+	if (outputPorts) {
+		for (uint i = 0; i < channels (); ++i) {
+			connectJackPort (outputPorts[i], jack_port_name (m_inputPorts[i]), "capture");
+		}
+
+		free( outputPorts );
+	}
+
 }
 
 
@@ -357,6 +378,10 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		m_tempOutBufs[c] =
 			(jack_default_audio_sample_t *) jack_port_get_buffer(
 												m_outputPorts[c], _nframes );
+		m_tempInBufs[c] =
+				(jack_default_audio_sample_t *) jack_port_get_buffer(
+					m_inputPorts[c], _nframes );
+
 	}
 
 #ifdef AUDIO_PORT_SUPPORT
@@ -411,6 +436,21 @@ int AudioJack::processCallback( jack_nframes_t _nframes, void * _udata )
 		}
 	}
 
+	if (! m_stopped) {
+		m_inBuffer.resize (_nframes);
+
+		for( int c = 0; c < channels(); ++c ) {
+			jack_default_audio_sample_t *channel_buffer = m_tempInBufs[c];
+
+			for( jack_nframes_t frame = 0; frame < _nframes; ++frame )
+			{
+				m_inBuffer[frame][c] = channel_buffer[frame];
+			}
+		}
+
+		mixer()->pushInputFrames (m_inBuffer.data (), _nframes);
+	}
+
 	if( _nframes != done )
 	{
 		for( int c = 0; c < channels(); ++c )
@@ -440,6 +480,27 @@ void AudioJack::shutdownCallback( void * _udata )
 	AudioJack * _this = static_cast<AudioJack *>( _udata );
 	_this->m_client = NULL;
 	_this->zombified();
+}
+
+void AudioJack::connectJackPort(const char *outputPort,
+										  const char *inputPort,
+										  const char *portName) {
+	if(outputPort == NULL || inputPort == NULL)
+	{
+		printf( "no physical %s port. you'll have to do "
+			"connections at your own!\n", portName);
+	}
+	else
+	{
+		if( jack_connect( m_client, outputPort,
+						  inputPort) )
+		{
+			printf( "cannot connect %s port. you'll "
+					"have to do connections at your own!\n",
+					portName);
+		}
+	}
+
 }
 
 

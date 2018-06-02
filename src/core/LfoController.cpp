@@ -71,7 +71,7 @@ LfoController::LfoController( Model * _parent ) :
 
 LfoController::~LfoController()
 {
-	sharedObject::unref( m_userDefSampleBuffer );
+	delete m_userDefSampleBuffer;
 	m_baseModel.disconnect( this );
 	m_speedModel.disconnect( this );
 	m_amountModel.disconnect( this );

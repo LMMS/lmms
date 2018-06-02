@@ -33,6 +33,7 @@
 #include "TrackContainerView.h"
 #include "TrackLabelButton.h"
 
+#include <QMenu>
 
 AutomationTrack::AutomationTrack( TrackContainer* tc, bool _hidden ) :
 	Track( _hidden ? HiddenAutomationTrack : Track::AutomationTrack, tc )
@@ -137,6 +138,36 @@ void AutomationTrackView::dropEvent( QDropEvent * _de )
 		}
 	}
 
+	update();
+}
+
+void AutomationTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *trackOperations) {
+	TrackView::updateTrackOperationsWidgetMenu (trackOperations);
+
+	auto toMenu = trackOperations->trackOps ()->menu ();
+
+	toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
+	toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+}
+
+void AutomationTrackView::recordingOn() {
+	const Track::tcoVector & tcov = getTrack()->getTCOs();
+	for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+	{
+		AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+		if( ap ) { ap->setRecording( true ); }
+	}
+	update();
+}
+
+
+void AutomationTrackView::recordingOff() {
+	const Track::tcoVector & tcov = getTrack()->getTCOs();
+	for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+	{
+		AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
+		if( ap ) { ap->setRecording( false ); }
+	}
 	update();
 }
 

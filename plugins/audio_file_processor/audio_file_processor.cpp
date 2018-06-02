@@ -1,4 +1,4 @@
-/*
+﻿/*
  * audio_file_processor.cpp - instrument for using audio-files
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -210,13 +210,7 @@ void audioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 void audioFileProcessor::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "src", m_sampleBuffer.audioFile() );
-	if( m_sampleBuffer.audioFile() == "" )
-	{
-		QString s;
-		_this.setAttribute( "sampledata",
-						m_sampleBuffer.toBase64( s ) );
-	}
+	m_sampleBuffer.saveState (_doc, _this);
 	m_reverseModel.saveSettings( _doc, _this, "reversed" );
 	m_loopModel.saveSettings( _doc, _this, "looped" );
 	m_ampModel.saveSettings( _doc, _this, "amp" );
@@ -247,7 +241,11 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) );
+		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) ,
+									   Engine::mixer ()->baseSampleRate ());
+		qWarning("Using default sampleRate. That could lead to invalid values");
+	} else {
+		m_sampleBuffer.restoreState (_this.firstChildElement (m_sampleBuffer.nodeName ()));
 	}
 
 	m_loopModel.loadSettings( _this, "looped" );
@@ -267,6 +265,8 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 
 	m_reverseModel.loadSettings( _this, "reversed" );
+	// The current state of m_sampleBuffer.
+	m_isCurrentlyReversed = m_reverseModel.value ();
 
 	m_stutterModel.loadSettings( _this, "stutter" );
 	if( _this.hasAttribute( "interp" ) )
@@ -343,7 +343,12 @@ void audioFileProcessor::setAudioFile( const QString & _audio_file,
 
 void audioFileProcessor::reverseModelChanged( void )
 {
-	m_sampleBuffer.setReversed( m_reverseModel.value() );
+	if (m_reverseModel.value () != m_isCurrentlyReversed) {
+		m_isCurrentlyReversed = m_reverseModel.value ();
+
+		m_sampleBuffer.reverse (true);
+	}
+
 	m_nextPlayStartPoint = m_sampleBuffer.startFrame();
 	m_nextPlayBackwards = false;
 }
@@ -644,7 +649,7 @@ void AudioFileProcessorView::newWaveView()
 		delete m_waveView;
 		m_waveView = 0;
 	}
-	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer );
+	m_waveView = new AudioFileProcessorWaveView( this, 245, 75, castModel<audioFileProcessor>()->m_sampleBuffer, castModel<audioFileProcessor>());
 	m_waveView->move( 2, 172 );
 	m_waveView->setKnobs(
 		dynamic_cast<AudioFileProcessorWaveView::knob *>( m_startKnob ),
@@ -771,8 +776,10 @@ void AudioFileProcessorWaveView::updateSampleRange()
 	}
 }
 
-AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _w, int _h, SampleBuffer& buf ) :
+AudioFileProcessorWaveView::AudioFileProcessorWaveView(QWidget * _parent, int _w, int _h, SampleBuffer& buf ,
+													   audioFileProcessor *fileProcessor) :
 	QWidget( _parent ),
+	m_audioFileProcessor{fileProcessor},
 	m_sampleBuffer( buf ),
 	m_graph( QPixmap( _w - 2 * s_padding, _h - 2 * s_padding ) ),
 	m_from( 0 ),
@@ -784,7 +791,7 @@ AudioFileProcessorWaveView::AudioFileProcessorWaveView( QWidget * _parent, int _
 	m_endKnob( 0 ),
 	m_loopKnob( 0 ),
 	m_isDragging( false ),
-	m_reversed( false ),
+	m_reversed(false),
 	m_framesPlayed( 0 ),
 	m_animation(ConfigManager::inst()->value("ui", "animateafp").toInt())
 {
@@ -1063,11 +1070,9 @@ void AudioFileProcessorWaveView::updateGraph()
 		m_to = m_sampleBuffer.endFrame();
 	}
 
-	if( m_sampleBuffer.reversed() != m_reversed )
-	{
+	if(m_audioFileProcessor->isReversed () != m_reversed) {
 		reverse();
-	}
-	else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
+	} else if( m_last_from == m_from && m_last_to == m_to && m_sampleBuffer.amplification() == m_last_amp )
 	{
 		return;
 	}
@@ -1084,11 +1089,23 @@ void AudioFileProcessorWaveView::updateGraph()
 		p,
 		QRect( 0, 0, m_graph.width(), m_graph.height() ),
 		m_from, m_to
-	);
+				);
 }
 
+void AudioFileProcessorWaveView::reverse()
+{
+	slideSampleByFrames(
+		m_sampleBuffer.frames()
+			- m_sampleBuffer.endFrame()
+			- m_sampleBuffer.startFrame()
+	);
 
+	const f_cnt_t from = m_from;
+	m_from = m_sampleBuffer.frames() - m_to;
+	m_to = m_sampleBuffer.frames() - from;
 
+	m_reversed = ! m_reversed;
+}
 
 void AudioFileProcessorWaveView::zoom( const bool _out )
 {
@@ -1239,24 +1256,6 @@ void AudioFileProcessorWaveView::slideSampleByFrames( f_cnt_t _frames )
 	if( m_loopKnob ) {
 		m_loopKnob->slideBy( v, false );
 	}
-}
-
-
-
-
-void AudioFileProcessorWaveView::reverse()
-{
-	slideSampleByFrames(
-		m_sampleBuffer.frames()
-			- m_sampleBuffer.endFrame()
-			- m_sampleBuffer.startFrame()
-	);
-
-	const f_cnt_t from = m_from;
-	m_from = m_sampleBuffer.frames() - m_to;
-	m_to = m_sampleBuffer.frames() - from;
-
-	m_reversed = ! m_reversed;
 }
 
 

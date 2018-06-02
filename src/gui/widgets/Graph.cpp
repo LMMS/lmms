@@ -23,6 +23,8 @@
  *
  */
 
+#include <memory>
+
 #include <QPaintEvent>
 #include <QFontMetrics>
 #include <QPainter>
@@ -582,7 +584,8 @@ void graphModel::setWaveToNoise()
 
 QString graphModel::setWaveToUser()
 {
-	SampleBuffer * sampleBuffer = new SampleBuffer;
+	auto sampleBuffer = std::unique_ptr<SampleBuffer>{new SampleBuffer};
+
 	QString fileName = sampleBuffer->openAndSetWaveformFile();
 	if( fileName.isEmpty() == false )
 	{
@@ -594,8 +597,6 @@ QString graphModel::setWaveToUser()
 		}
 		sampleBuffer->dataUnlock();
 	}
-
-	sharedObject::unref( sampleBuffer );
 
 	emit samplesChanged( 0, length() - 1 );
 	return fileName;

@@ -18,7 +18,7 @@ SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS   "
   \\\${IfNot} \\\${AtMostWin7}
     WriteRegDWORD HKLM \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\SideBySide\\\" \\\"PreferExternalManifest\\\" \\\"1\\\"
   \\\${EndIf}
-  " PARENT_SCOPE)
+   ExecWait '\\\"$INSTDIR\\\\Jack_v1.9.11_32_setup.exe\\\" /install'" PARENT_SCOPE)
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
   \\\${unregisterExtension} \\\".mmpz\\\" \\\"${PROJECT_NAME_UCASE} Project (compressed)\\\"

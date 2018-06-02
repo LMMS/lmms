@@ -39,6 +39,8 @@
 #include <QtCore/QMap>
 #include <QMutexLocker>
 
+#include <memory>
+
 #include "AudioDevice.h"
 #include "AudioDeviceSetupWidget.h"
 
@@ -103,6 +105,9 @@ private:
 							void * _udata );
 	static void shutdownCallback( void * _udata );
 
+	void connectJackPort	(const char *outputPort,
+							 const char *inputPort,
+							 const char *portName);
 
 	jack_client_t * m_client;
 
@@ -112,7 +117,10 @@ private:
 
 	MidiJack *m_midiClient;
 	QVector<jack_port_t *> m_outputPorts;
+	QVector<jack_port_t *> m_inputPorts;
 	jack_default_audio_sample_t * * m_tempOutBufs;
+	jack_default_audio_sample_t * * m_tempInBufs;
+	std::vector<sampleFrame> m_inBuffer;
 	surroundSampleFrame * m_outBuf;
 
 	f_cnt_t m_framesDoneInCurBuf;

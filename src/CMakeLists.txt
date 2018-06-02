@@ -199,7 +199,7 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/bin/libfftw3f-3.dll"
 					"${MINGW_PREFIX}/bin/libFLAC-8.dll"
 					"${MINGW_PREFIX}/bin/libpng16-16.dll"
-					"${MINGW_PREFIX}/bin/SDL.dll"
+					"${MINGW_PREFIX}/bin/SDL2.dll"
 					"${MINGW_PREFIX}/bin/libglib-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/libgthread-2.0-0.dll"
 					"${MINGW_PREFIX}/bin/zlib1.dll"
@@ -244,6 +244,18 @@ IF(LMMS_BUILD_WIN32)
 				DESTINATION .)
 	ENDIF()
 
+
+	SET(JACK_INSTALLER_VERSION "1.9.11")
+	# Bundle jack
+	IF (WANT_JACK)
+		ADD_CUSTOM_TARGET(jack_binary_installer ALL
+			COMMAND "curl" -OL "https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_VERSION}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe"
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		INSTALL(FILES "${CMAKE_BINARY_DIR}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe" DESTINATION .)
+		SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+  ExecWait '\\\"$INSTDIR\\\\Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\\\" /install'
+")
+	ENDIF()
 ELSE(LMMS_BUILD_WIN32)
 	IF(NOT LMMS_BUILD_APPLE)
 		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")

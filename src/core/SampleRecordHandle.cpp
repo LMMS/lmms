@@ -29,17 +29,17 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 #include "SampleBuffer.h"
-#include "SampleTrack.h"
 #include "debug.h"
 
 
-SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
+SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTimeOffset) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_framesRecorded( 0 ),
-	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
 	m_bbTrack( NULL ),
-	m_tco( tco )
+	m_tco( tco ),
+	m_recordingChannel{dynamic_cast<SampleTrack*>(m_track)->recordingChannel ()},
+	m_startRecordTimeOffset{startRecordTimeOffset}
 {
 }
 
@@ -48,19 +48,14 @@ SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
 
 SampleRecordHandle::~SampleRecordHandle()
 {
-	if( !m_buffers.empty() )
-	{
-		SampleBuffer* sb;
-		createSampleBuffer( &sb );
-		m_tco->setSampleBuffer( sb );
+	m_tco->updateLength ();
+
+	// If this is an automatically created tco,
+	// enable resizing.
+	if (m_framesRecorded != 0) {
+		m_tco->setAutoResize (false);
+		m_tco->setRecord( false );
 	}
-	
-	while( !m_buffers.empty() )
-	{
-		delete[] m_buffers.front().first;
-		m_buffers.erase( m_buffers.begin() );
-	}
-	m_tco->setRecord( false );
 }
 
 
@@ -70,15 +65,26 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
 	const sampleFrame * recbuf = Engine::mixer()->inputBuffer();
 	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
+	m_currentBuffer.clear ();
 	writeBuffer( recbuf, frames );
-	m_framesRecorded += frames;
 
-	MidiTime len = (tick_t)( m_framesRecorded / Engine::framesPerTick() );
-	if( len > m_minLength )
-	{
-//		m_tco->changeLength( len );
-		m_minLength = len;
+	// It is the first buffer.
+	if (m_framesRecorded == 0) {
+		// Make sure we don't have the previous data.
+		m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
+										   Engine::mixer ()->inputSampleRate (),
+										   false);
+		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
+	} else {
+		if (! m_currentBuffer.empty ()) {
+			m_tco->sampleBuffer ()->addData (m_currentBuffer,
+											 Engine::mixer ()->inputSampleRate (),
+											 false);
+		}
 	}
+
+	m_framesRecorded += frames;
+	m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
 }
 
 
@@ -86,7 +92,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 
 bool SampleRecordHandle::isFinished() const
 {
-	return false;
+	return !m_tco->getAutoResize () && (m_startRecordTimeOffset + m_timeRecorded) >= m_tco->length ();
 }
 
 
@@ -105,32 +111,39 @@ f_cnt_t SampleRecordHandle::framesRecorded() const
 	return( m_framesRecorded );
 }
 
-
-
-
-void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
+void SampleRecordHandle::copyBufferFromMonoLeft(const sampleFrame *inputBuffer,
+												sampleFrame *outputBuffer,
+												const f_cnt_t _frames)
 {
-	const f_cnt_t frames = framesRecorded();
-	// create buffer to store all recorded buffers in
-	sampleFrame * data = new sampleFrame[frames];
-	// make sure buffer is cleaned up properly at the end...
-	sampleFrame * data_ptr = data;
-
-
-	assert( data != NULL );
-
-	// now copy all buffers into big buffer
-	for( bufferList::const_iterator it = m_buffers.begin();
-						it != m_buffers.end(); ++it )
-	{
-		memcpy( data_ptr, ( *it ).first, ( *it ).second *
-							sizeof( sampleFrame ) );
-		data_ptr += ( *it ).second;
+	for( f_cnt_t frame = 0; frame < _frames; ++frame ) {
+		// Copy every first sample to the first and the second in the output buffer.
+		outputBuffer[frame][LEFT_CHANNEL_INDEX]  = inputBuffer[frame][LEFT_CHANNEL_INDEX];
+		outputBuffer[frame][RIGHT_CHANNEL_INDEX] = inputBuffer[frame][LEFT_CHANNEL_INDEX];
 	}
-	// create according sample-buffer out of big buffer
-	*sampleBuf = new SampleBuffer( data, frames );
-	( *sampleBuf)->setSampleRate( Engine::mixer()->inputSampleRate() );
-	delete[] data;
+}
+
+void SampleRecordHandle::copyBufferFromMonoRight(const sampleFrame *inputBuffer,
+												 sampleFrame *outputBuffer,
+												 const f_cnt_t _frames)
+{
+	for( f_cnt_t frame = 0; frame < _frames; ++frame ) {
+		// Copy every second sample to the first and the second in the output buffer.
+		outputBuffer[frame][LEFT_CHANNEL_INDEX]  = inputBuffer[frame][RIGHT_CHANNEL_INDEX];
+		outputBuffer[frame][RIGHT_CHANNEL_INDEX] = inputBuffer[frame][RIGHT_CHANNEL_INDEX];
+	}
+}
+
+void SampleRecordHandle::copyBufferFromStereo(const sampleFrame *inputBuffer,
+											  sampleFrame *outputBuffer,
+											  const f_cnt_t _frames)
+{
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	{
+		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+		{
+			outputBuffer[frame][chnl] = inputBuffer[frame][chnl];
+		}
+	}
 }
 
 
@@ -139,15 +152,30 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 void SampleRecordHandle::writeBuffer( const sampleFrame * _ab,
 					const f_cnt_t _frames )
 {
-	sampleFrame * buf = new sampleFrame[_frames];
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
-	{
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			buf[frame][chnl] = _ab[frame][chnl];
-		}
+	m_currentBuffer.resize (_frames);
+
+	// Depending on the recording channel, copy the buffer as a
+	// mono-right, mono-left or stereo.
+
+	// Note that mono doesn't mean single channel, it means
+	// empty other channel. Therefore, we would just duplicate
+	// every frame from the mono channel
+	// to the empty channel.
+
+	switch(m_recordingChannel) {
+	case SampleTrack::RecordingChannel::MonoLeft:
+		copyBufferFromMonoLeft(_ab, m_currentBuffer.data (), _frames);
+		break;
+	case SampleTrack::RecordingChannel::MonoRight:
+		copyBufferFromMonoRight(_ab, m_currentBuffer.data (), _frames);
+		break;
+	case SampleTrack::RecordingChannel::Stereo:
+		copyBufferFromStereo(_ab, m_currentBuffer.data (), _frames);
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
 	}
-	m_buffers.push_back( qMakePair( buf, _frames ) );
 }
 
 

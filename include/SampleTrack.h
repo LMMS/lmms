@@ -53,7 +53,7 @@ public:
 		return "sampletco";
 	}
 
-	SampleBuffer* sampleBuffer()
+	const std::shared_ptr<SampleBuffer> sampleBuffer()
 	{
 		return m_sampleBuffer;
 	}
@@ -67,20 +67,24 @@ public:
 	bool isPlaying() const;
 	void setIsPlaying(bool isPlaying);
 
+	/**
+	 * @brief isEmpty  Check if this TCO has not content.
+	 */
+	bool isEmpty() const;
+
 public slots:
-	void setSampleBuffer( SampleBuffer* sb );
 	void setSampleFile( const QString & _sf );
 	void updateLength();
 	void toggleRecord();
-	void playbackPositionChanged();
-	void updateTrackTcos();
 
+
+private slots:
+	void onSampleBufferChanged ();
 
 private:
-	SampleBuffer* m_sampleBuffer;
+	std::shared_ptr<SampleBuffer> m_sampleBuffer;
 	BoolModel m_recordModel;
 	bool m_isPlaying;
-
 
 	friend class SampleTCOView;
 
@@ -116,8 +120,34 @@ protected:
 
 
 private:
+	/**
+	 * @brief Calculate the position and size for a visualization
+	 *		  of a @arg totalTime frames fragment starting from
+	 *		  @arg beginOffset.
+	 * @param globalRect		The parent rectangle.
+	 * @param beginOffset		Offset from the beginning of the tco.
+	 * @param totalTime			Total time we want to visualize.
+	 * @param pixelsPerTact		Current `pixelsPerTact()` result.
+	 * @param isRootRect		Is this a the global rectangle?
+	 *							and we should calculate spacing and
+	 *							sample offset?
+	 */
+	QRect getRectForSampleFragment (QRect globalRect, MidiTime beginOffset,
+									MidiTime totalTime,
+									float pixelsPerTact, bool isRootRect=false);
+
 	SampleTCO * m_tco;
 	QPixmap m_paintPixmap;
+
+
+	struct PaintCacheLine {
+		QPair<QPolygonF, QPolygonF> paintPoly;
+		QRect paintRect;
+		float pixelsPerTact;
+	};
+
+	QVector<PaintCacheLine> m_paintMaps;
+	MidiTime m_cachedTime{0};
 } ;
 
 
@@ -126,7 +156,15 @@ private:
 class SampleTrack : public Track
 {
 	Q_OBJECT
+	mapPropertyFromModel(bool,isRecord,setRecord,m_recordModel);
 public:
+	enum RecordingChannel : int {
+		None,
+		MonoRight,
+		MonoLeft,
+		Stereo,
+	};
+
 	SampleTrack( TrackContainer* tc );
 	virtual ~SampleTrack();
 
@@ -150,11 +188,20 @@ public:
 		return "sampletrack";
 	}
 
+	RecordingChannel recordingChannel() const;
+	void setRecordingChannel(const RecordingChannel &recordingChannel);
+
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
+	void beforeRecordOn (MidiTime time);
+	void toggleRecord();
+	void playbackPositionChanged();
 
 private:
+	IntModel m_recordingChannelModel;
+
+	BoolModel m_recordModel;
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	AudioPort m_audioPort;
@@ -175,6 +222,8 @@ public:
 	virtual ~SampleTrackView();
 
 
+	virtual void updateTrackOperationsWidgetMenu (TrackOperationsWidget *trackOperations) override;
+
 public slots:
 	void showEffects();
 
@@ -187,7 +236,11 @@ protected:
 	}
 
 
+private slots:
+	void onRecordActionSelected (QAction *action);
+
 private:
+	QAction *m_toggleRecordAction;
 	EffectRackView * m_effectRack;
 	QWidget * m_effWindow;
 	Knob * m_volumeKnob;

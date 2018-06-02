@@ -61,6 +61,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	m_stopSemaphore( 1 )
 {
 	_success_ful = false;
+	m_supportsCapture = true;
 
 	m_outBufSize = mixer()->framesPerPeriod();
 
@@ -169,9 +170,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 
 	m_stopSemaphore.acquire();
 
-	// TODO: debug Mixer::pushInputFrames()
-	//m_supportsCapture = true;
-
 	_success_ful = true;
 }
 
@@ -261,7 +259,7 @@ int AudioPortAudio::process_callback(
 	float * _outputBuffer,
 	unsigned long _framesPerBuffer )
 {
-	if( supportsCapture() )
+	if( supportsCapture() && _inputBuffer)
 	{
 		mixer()->pushInputFrames( (sampleFrame*)_inputBuffer,
 												_framesPerBuffer );

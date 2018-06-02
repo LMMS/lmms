@@ -34,6 +34,7 @@
 #include <cstdint>
 #endif
 
+#include <array>
 
 typedef int32_t tact_t;
 typedef int32_t tick_t;
@@ -59,7 +60,7 @@ typedef uint32_t jo_id_t;			// (unique) ID of a journalling object
 #define likely(x)	Q_LIKELY(x)
 #define unlikely(x)	Q_UNLIKELY(x)
 
-// windows headers define "min" and "max" macros, breaking the methods bwloe
+// windows headers define "min" and "max" macros, breaking the methods below
 #undef min
 #undef max
 
@@ -121,6 +122,9 @@ const ch_cnt_t SURROUND_CHANNELS =
 				2;
 #endif
 
+// "In audio 1 is always the left" - umcaruje, 2017
+const ch_cnt_t RIGHT_CHANNEL_INDEX = 1;
+const ch_cnt_t LEFT_CHANNEL_INDEX  = 0;
 
 #ifdef LMMS_BUILD_WIN32
 #define LADSPA_PATH_SEPERATOR ';'
@@ -128,15 +132,19 @@ const ch_cnt_t SURROUND_CHANNELS =
 #define LADSPA_PATH_SEPERATOR ':'
 #endif
 
+typedef std::array<sample_t, DEFAULT_CHANNELS> sampleFrame;
 
-
-typedef sample_t sampleFrame[DEFAULT_CHANNELS];
-typedef sample_t surroundSampleFrame[SURROUND_CHANNELS];
+typedef std::array<sample_t, SURROUND_CHANNELS> surroundSampleFrame;
 #define ALIGN_SIZE 16
 #if __GNUC__
-typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN_SIZE)));
+typedef std::array<sample_t, DEFAULT_CHANNELS> sampleFrameA __attribute__((__aligned__(ALIGN_SIZE)));
 #endif
 
+
+static_assert (sizeof(sampleFrame) == sizeof(sample_t) * DEFAULT_CHANNELS,
+			   "sampleFrame's size is not equal to the sum of its parts");
+static_assert (sizeof(surroundSampleFrame) == sizeof(sample_t) * SURROUND_CHANNELS,
+			   "surroundSampleFrame's size is not equal to the sum of its parts");
 
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN

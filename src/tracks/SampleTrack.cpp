@@ -49,6 +49,7 @@
 #include "Mixer.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
+#include "SampleBuffer.h"
 
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
@@ -56,7 +57,6 @@ SampleTCO::SampleTCO( Track * _track ) :
 	m_isPlaying( false )
 {
 	saveJournallingState( false );
-	setSampleFile( "" );
 	restoreJournallingState();
 
 	// we need to receive bpm-change-events, because then we have to
@@ -66,22 +66,7 @@ SampleTCO::SampleTCO( Track * _track ) :
 	connect( Engine::getSong(), SIGNAL( timeSignatureChanged( int,int ) ),
 					this, SLOT( updateLength() ) );
 
-	//care about positionmarker
-	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
-	if( timeLine )
-	{
-		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
-	}
-	//playbutton clicked or space key / on Export Song set isPlaying to false
-	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
-	//care about loops
-	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
-	//care about mute TCOs
-	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
-	//care about mute track
-	connect( getTrack()->getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
-	//care about TCO position
-	connect( this, SIGNAL( positionChanged() ), this, SLOT( updateTrackTcos() ) );
+	connect (m_sampleBuffer.get (), SIGNAL(sampleUpdated()), this, SLOT(onSampleBufferChanged()));
 
 	switch( getTrack()->trackContainer()->type() )
 	{
@@ -95,7 +80,9 @@ SampleTCO::SampleTCO( Track * _track ) :
 			setAutoResize( false );
 			break;
 	}
-	updateTrackTcos();
+
+	//care about TCO position
+	connect( this, SIGNAL( positionChanged() ), getTrack (), SLOT( updateTcos() ) );
 }
 
 
@@ -108,7 +95,6 @@ SampleTCO::~SampleTCO()
 	{
 		sampletrack->updateTcos();
 	}
-	sharedObject::unref( m_sampleBuffer );
 }
 
 
@@ -132,25 +118,13 @@ const QString & SampleTCO::sampleFile() const
 
 
 
-void SampleTCO::setSampleBuffer( SampleBuffer* sb )
-{
-	sharedObject::unref( m_sampleBuffer );
-	m_sampleBuffer = sb;
-	updateLength();
-
-	emit sampleChanged();
-}
-
-
-
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
 	setStartTimeOffset( 0 );
 	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
 
-	emit sampleChanged();
-	emit playbackPositionChanged();
+	// Already has been has been called sampleChanged from m_sampleBuffer.
 }
 
 
@@ -164,24 +138,9 @@ void SampleTCO::toggleRecord()
 
 
 
-
-void SampleTCO::playbackPositionChanged()
+void SampleTCO::onSampleBufferChanged()
 {
-	Engine::mixer()->removePlayHandlesOfTypes( getTrack(), PlayHandle::TypeSamplePlayHandle );
-	SampleTrack * st = dynamic_cast<SampleTrack*>( getTrack() );
-	st->setPlayingTcos( false );
-}
-
-
-
-
-void SampleTCO::updateTrackTcos()
-{
-	SampleTrack * sampletrack = dynamic_cast<SampleTrack*>( getTrack() );
-	if( sampletrack)
-	{
-		sampletrack->updateTcos();
-	}
+	emit sampleChanged ();
 }
 
 
@@ -200,6 +159,11 @@ void SampleTCO::setIsPlaying(bool isPlaying)
 	m_isPlaying = isPlaying;
 }
 
+bool SampleTCO::isEmpty() const
+{
+	return (sampleLength () == 0);
+}
+
 
 
 
@@ -213,7 +177,7 @@ void SampleTCO::updateLength()
 
 MidiTime SampleTCO::sampleLength() const
 {
-	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick() );
+	return (int)( m_sampleBuffer->frames() / Engine::framesPerTick(m_sampleBuffer->sampleRate ()) );
 }
 
 
@@ -247,13 +211,11 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	}
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
-	_this.setAttribute( "src", sampleFile() );
 	_this.setAttribute( "off", startTimeOffset() );
-	if( sampleFile() == "" )
-	{
-		QString s;
-		_this.setAttribute( "data", m_sampleBuffer->toBase64( s ) );
-	}
+
+	m_sampleBuffer->saveState (_doc, _this);
+
+	_this.setAttribute ("is_record", isRecord ());
 	// TODO: start- and end-frame
 }
 
@@ -266,14 +228,35 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	{
 		movePosition( _this.attribute( "pos" ).toInt() );
 	}
-	setSampleFile( _this.attribute( "src" ) );
-	if( sampleFile().isEmpty() && _this.hasAttribute( "data" ) )
-	{
-		m_sampleBuffer->loadFromBase64( _this.attribute( "data" ) );
+
+	// Should not be happening after 1.3.
+	if (_this.hasAttribute ("src")) {
+		auto audioFile = _this.attribute ("src");
+
+		if (! audioFile.isEmpty ()) {
+			setSampleFile( _this.attribute( "src" ) );
+		}
 	}
+
+	if (sampleFile () == QString()) {
+		// Data without any other info.
+		// Should not be happening after 1.3.
+		if (_this.hasAttribute ("data") && _this.attribute ("data") != QString()) {
+			qWarning("Using default sampleRate. That could lead to invalid values1");
+			m_sampleBuffer->loadFromBase64 (_this.attribute ("data"),
+											Engine::mixer ()->baseSampleRate ());
+		} else {
+			m_sampleBuffer->restoreState (_this.firstChildElement (m_sampleBuffer->nodeName ()));
+		}
+	}
+
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
 	setStartTimeOffset( _this.attribute( "off" ).toInt() );
+
+	if (_this.hasAttribute ("is_record")) {
+		setRecord (_this.attribute ("is_record").toInt ());
+	}
 }
 
 
@@ -310,10 +293,10 @@ void SampleTCOView::updateSample()
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
 					tr( "double-click to select sample" ) );
+
+	setNeedsUpdate (true);
+
 }
-
-
-
 
 void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 {
@@ -345,9 +328,10 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 					"Ctrl"),
 					#endif
 						m_tco, SLOT( toggleMute() ) );
-	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
-				tr( "Set/clear record" ),
-						m_tco, SLOT( toggleRecord() ) );*/
+	contextMenu.addAction( embed::getIconPixmap( "record" ),
+						   tr( "Set/clear record (Shift + Ctrl + left click)" ),
+						   m_tco, SLOT( toggleRecord() ) );
+
 	constructContextMenu( &contextMenu );
 
 	contextMenu.exec( QCursor::pos() );
@@ -377,15 +361,6 @@ void SampleTCOView::dropEvent( QDropEvent * _de )
 		m_tco->setSampleFile( StringPairDrag::decodeValue( _de ) );
 		_de->accept();
 	}
-	else if( StringPairDrag::decodeKey( _de ) == "sampledata" )
-	{
-		m_tco->m_sampleBuffer->loadFromBase64(
-					StringPairDrag::decodeValue( _de ) );
-		m_tco->updateLength();
-		update();
-		_de->accept();
-		Engine::getSong()->setModified();
-	}
 	else
 	{
 		TrackContentObjectView::dropEvent( _de );
@@ -410,7 +385,7 @@ void SampleTCOView::mousePressEvent( QMouseEvent * _me )
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
 			if( sTco )
 			{
-				sTco->updateTrackTcos();
+				static_cast<SampleTrack*>(sTco->getTrack ())->updateTcos ();
 			}
 		}
 		TrackContentObjectView::mousePressEvent( _me );
@@ -427,7 +402,7 @@ void SampleTCOView::mouseReleaseEvent(QMouseEvent *_me)
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( getTrackContentObject() );
 		if( sTco )
 		{
-			sTco->playbackPositionChanged();
+			static_cast<SampleTrack*>(sTco->getTrack ())->playbackPositionChanged();
 		}
 	}
 	TrackContentObjectView::mouseReleaseEvent( _me );
@@ -472,9 +447,14 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	QColor c;
 	bool muted = m_tco->getTrack()->isMuted() || m_tco->isMuted();
 
-	// state: selected, muted, normal
-	c = isSelected() ? selectedColor() : ( muted ? mutedBackgroundColor() 
-		: painter.background().color() );
+	if (isSelected ())
+		c = selectedColor ();
+	else if (muted)
+		c = mutedBackgroundColor ();
+	else if (m_tco->isRecord ())
+		c = recordingBackgroundColor ();
+	else
+		c = painter.background ().color ();
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -493,20 +473,79 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
 
-	const int spacing = TCO_BORDER_WIDTH + 1;
-	const float ppt = fixedTCOs() ?
-			( parentWidget()->width() - 2 * TCO_BORDER_WIDTH )
-					/ (float) m_tco->length().getTact() :
-								pixelsPerTact();
+	MidiTime currentSampleTime = m_tco->sampleLength();
+	auto framesPerTick = Engine::framesPerTick(m_tco->sampleBuffer ()->sampleRate ());
+	auto currentPixelsPerTact = pixelsPerTact();
+	auto globalRect = getRectForSampleFragment (rect(),
+												0,
+												currentSampleTime,
+												currentPixelsPerTact,
+												true);
 
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * nom / den;
-	
-	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
-	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
-			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
-	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+
+	// We have a cache mismatch, lets clear the current one.
+	if (currentSampleTime < m_cachedTime) {
+		m_cachedTime = 0;
+		m_paintMaps.clear ();
+	}
+
+	// We've need to visualize more frames.
+	if (currentSampleTime > m_cachedTime) {
+		PaintCacheLine cacheLine;
+
+		// We're visualizing the end: from the past-one we previously visualized
+		// to the last one in the buffer.
+		cacheLine.paintRect = getRectForSampleFragment (globalRect,
+														m_cachedTime,
+														currentSampleTime-m_cachedTime,
+														currentPixelsPerTact);
+		cacheLine.pixelsPerTact = currentPixelsPerTact;
+
+		if (m_tco->sampleBuffer ()->tryDataReadLock ()) {
+			// Generate the actual visualization.
+			cacheLine.paintPoly = m_tco->m_sampleBuffer->visualizeToPoly (cacheLine.paintRect,
+																		  pe->rect(),
+																		  m_cachedTime.frames (framesPerTick),
+																		  currentSampleTime.frames (framesPerTick));
+			m_tco->m_sampleBuffer->dataUnlock ();
+
+			m_paintMaps.push_back (std::move (cacheLine));
+			m_cachedTime = currentSampleTime;
+		} else {
+
+			// We have not really did much.
+			setNeedsUpdate (true);
+		}
+	}
+
+	p.setRenderHint (QPainter::Antialiasing);
+
+	// Draw all the cached maps.
+	for (auto &map : m_paintMaps) {
+		// Normalize cache that has been generated
+		// with different PixelsPerTact value (zoom has
+		// been changed).
+		if (map.pixelsPerTact > currentPixelsPerTact || map.pixelsPerTact < currentPixelsPerTact) {
+			QTransform transform;
+			transform.scale(static_cast<qreal>(currentPixelsPerTact) / static_cast<qreal>(map.pixelsPerTact), 1);
+
+			map.paintPoly.first = transform.map(map.paintPoly.first);
+			map.paintPoly.second = transform.map(map.paintPoly.second);
+			map.pixelsPerTact = currentPixelsPerTact;
+		}
+
+		// Paint the visualization.
+		p.drawPolyline (map.paintPoly.first);
+		p.drawPolyline (map.paintPoly.second);
+	}
+
+	// Cache only TCOs that are being recorded into.
+	// Clear the cache and let it generate a new line
+	// and then visualize it.
+	if (!m_tco->isRecord () || !Engine::getSong ()->isRecording ()) {
+		m_cachedTime = 0;
+		m_paintMaps.clear ();
+	}
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
 	QString filename = fileInfo.fileName();
@@ -517,7 +556,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	// inner border
 	p.setPen( c.lighter( 160 ) );
-	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH, 
+	p.drawRect( 1, 1, rect().right() - TCO_BORDER_WIDTH,
 		rect().bottom() - TCO_BORDER_WIDTH );
 
 	// outer border
@@ -533,24 +572,52 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 			embed::getIconPixmap( "muted", size, size ) );
 	}
 
-	// recording sample tracks is not possible at the moment 
-
-	/* if( m_tco->isRecord() )
-	{
-		p.setFont( pointSize<7>( p.font() ) );
-
-		p.setPen( textShadowColor() );
-		p.drawText( 10, p.fontMetrics().height()+1, "Rec" );
-		p.setPen( textColor() );
-		p.drawText( 9, p.fontMetrics().height(), "Rec" );
-
-		p.setBrush( QBrush( textColor() ) );
-		p.drawEllipse( 4, 5, 4, 4 );
-	}*/
-
 	p.end();
 
 	painter.drawPixmap( 0, 0, m_paintPixmap );
+}
+
+QRect SampleTCOView::getRectForSampleFragment(QRect globalRect, MidiTime beginOffset,
+											  MidiTime totalTime, float pixelsPerTact, bool isRootRect) {
+	const int spacing = TCO_BORDER_WIDTH + 1;
+	float ppt;
+	if (fixedTCOs ()) {
+		auto width = globalRect.width ();
+		if (isRootRect)
+			width =- 2 * TCO_BORDER_WIDTH;
+
+		ppt = ( width  )
+				/ (float) m_tco->length().getTact();
+	} else {
+		ppt = pixelsPerTact;
+	}
+
+	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
+	float den = Engine::getSong()->getTimeSigModel().getDenominator();
+	float ticksPerTact = DefaultTicksPerTact * nom / den;
+
+	float offset =  (beginOffset) / ticksPerTact * pixelsPerTact;
+	if (isRootRect) {
+			offset += TCO_BORDER_WIDTH;
+			offset += m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact;
+	}
+
+	float top = globalRect.top ();
+	if (isRootRect) {
+		top += spacing;
+	}
+
+	float height = globalRect.height ();
+	if (isRootRect) {
+		height -= spacing * 2;
+	}
+
+	QRect r = QRect( globalRect.left () + offset,
+					 top,
+					 (qMax( static_cast<int>( totalTime * ppt / ticksPerTact ), 1 )),
+					 height);
+
+	return r;
 }
 
 
@@ -560,14 +627,37 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 SampleTrack::SampleTrack( TrackContainer* tc ) :
 	Track( Track::SampleTrack, tc ),
+	m_recordingChannelModel(RecordingChannel::None,
+							RecordingChannel::None,
+							RecordingChannel::Stereo,
+							this,
+							tr ("Record channel")),
 	m_volumeModel( DefaultVolume, MinVolume, MaxVolume, 0.1f, this,
-							tr( "Volume" ) ),
+				   tr( "Volume" ) ),
 	m_panningModel( DefaultPanning, PanningLeft, PanningRight, 0.1f,
 					this, tr( "Panning" ) ),
 	m_audioPort( tr( "Sample track" ), true, &m_volumeModel, &m_panningModel, &m_mutedModel )
+
 {
 	setName( tr( "Sample track" ) );
 	m_panningModel.setCenterValue( DefaultPanning );
+	connect (Engine::getSong (), SIGNAL(beforeRecordOn(MidiTime)), this, SLOT(beforeRecordOn(MidiTime)));
+
+
+	//care about positionmarker
+	TimeLineWidget * timeLine = Engine::getSong()->getPlayPos( Engine::getSong()->Mode_PlaySong ).m_timeLine;
+	if( timeLine )
+	{
+		connect( timeLine, SIGNAL( positionMarkerMoved() ), this, SLOT( playbackPositionChanged() ) );
+	}
+	//playbutton clicked or space key / on Export Song set isPlaying to false
+	connect( Engine::getSong(), SIGNAL( playbackStateChanged() ), this, SLOT( playbackPositionChanged() ) );
+	//care about loops
+	connect( Engine::getSong(), SIGNAL( updateSampleTracks() ), this, SLOT( playbackPositionChanged() ) );
+	//care about mute TCOs
+	connect( this, SIGNAL( dataChanged() ), this, SLOT( playbackPositionChanged() ) );
+	//care about mute track
+	connect( getMutedModel(), SIGNAL( dataChanged() ),this, SLOT( playbackPositionChanged() ) );
 }
 
 
@@ -584,7 +674,8 @@ SampleTrack::~SampleTrack()
 bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 					const f_cnt_t _offset, int _tco_num )
 {
-	m_audioPort.effects()->startRunning();
+	if (m_audioPort.effects())
+		m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
 
 	tcoVector tcos;
@@ -607,19 +698,30 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			TrackContentObject * tco = getTCO( i );
 			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-			float framesPerTick = Engine::framesPerTick();
+
+			// If this is an automatically created record track, resize it to the current
+			// position.
+			if (sTco->isRecord () && !sTco->isMuted () && sTco->getAutoResize ()) {
+				sTco->changeLength (_start - sTco->startPosition());
+			}
+
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
+				if( sTco->isPlaying() == false && (_start >= (sTco->startPosition() + sTco->startTimeOffset())
+												   || sTco->isRecord ()) )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
+					auto bufferFramesPerTick = Engine::framesPerTick (sTco->sampleBuffer ()->sampleRate ());
+					f_cnt_t sampleStart = bufferFramesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
+
+					f_cnt_t tcoFrameLength = bufferFramesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
+
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more
 					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
 					//we only play within the sampleBuffer limits
-					if( sampleStart < sampleBufferLength )
+					// anyway, "play" (record) this TCO if is recording.
+					if( sampleStart < sampleBufferLength || sTco->isRecord ())
 					{
 						sTco->setSampleStartFrame( sampleStart );
 						sTco->setSamplePlayLength( samplePlayLength );
@@ -647,7 +749,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 				{
 					return played_a_note;
 				}
-				SampleRecordHandle* smpHandle = new SampleRecordHandle( st );
+				SampleRecordHandle* smpHandle = new SampleRecordHandle( st , _start - st->startPosition ());
 				handle = smpHandle;
 			}
 			else
@@ -695,6 +797,8 @@ void SampleTrack::saveTrackSpecificSettings( QDomDocument & _doc,
 #endif
 	m_volumeModel.saveSettings( _doc, _this, "vol" );
 	m_panningModel.saveSettings( _doc, _this, "pan" );
+	m_recordModel.saveSettings(_doc, _this, "record");
+	m_recordingChannelModel.saveSettings (_doc, _this, "record_channel");
 }
 
 
@@ -715,8 +819,11 @@ void SampleTrack::loadTrackSpecificSettings( const QDomElement & _this )
 		}
 		node = node.nextSibling();
 	}
+
 	m_volumeModel.loadSettings( _this, "vol" );
 	m_panningModel.loadSettings( _this, "pan" );
+	m_recordModel.loadSettings (_this, "record");
+	m_recordingChannelModel.loadSettings (_this, "record_channel");
 }
 
 
@@ -741,8 +848,64 @@ void SampleTrack::setPlayingTcos( bool isPlaying )
 	}
 }
 
+void SampleTrack::beforeRecordOn(MidiTime time)
+{
+	if (isRecord ()) {
+		bool isRecordTCOExist = false;
 
+		for(auto &track : getTCOs ()) {
+			auto sampleTCO = static_cast<SampleTCO*>(track);
 
+			if (sampleTCO->isRecord() && !sampleTCO->isMuted()) {
+				isRecordTCOExist = true;
+			}
+		}
+
+		if (! isRecordTCOExist) {
+			Engine::mixer()->requestChangeInModel();
+
+			auto fallbackRecordTCO = static_cast<SampleTCO*>(createTCO (0));
+
+			fallbackRecordTCO->setRecord (true);
+			fallbackRecordTCO->movePosition (time);
+//			fallbackRecordTCO->setSamplePlayLength (Engine::framesPerTick());
+			fallbackRecordTCO->changeLength (1);
+			fallbackRecordTCO->setSampleStartFrame (0);
+			fallbackRecordTCO->setSamplePlayLength (Engine::framesPerTick());
+			fallbackRecordTCO->setIsPlaying (false);
+
+			fallbackRecordTCO->setAutoResize (true);
+			Engine::mixer()->doneChangeInModel();
+
+		}
+	}
+}
+
+void SampleTrack::toggleRecord() {
+	setRecord (! isRecord ());
+}
+
+void SampleTrack::playbackPositionChanged()
+{
+	Engine::mixer()->removePlayHandlesOfTypes( this, PlayHandle::TypeSamplePlayHandle );
+
+	setPlayingTcos( false );
+}
+
+SampleTrack::RecordingChannel SampleTrack::recordingChannel() const{
+	// If we had defined a recording channel for this track, use
+	// it. Otherwise, use the global setting.
+	if (m_recordingChannelModel.value () != static_cast<int>(RecordingChannel::None)) {
+		return static_cast<RecordingChannel>(m_recordingChannelModel.value ());
+	} else {
+		return gui->songEditor ()->globalRecordChannel ();
+	}
+}
+
+void SampleTrack::setRecordingChannel(const RecordingChannel &recordingChannel)
+{
+	m_recordingChannelModel.setValue (recordingChannel);
+}
 
 
 
@@ -752,7 +915,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	setFixedHeight( 32 );
 
 	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
+												   getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
 			this, SLOT( showEffects() ) );
 	tlb->setIcon( embed::getIconPixmap( "sample_track" ) );
@@ -760,7 +923,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	tlb->show();
 
 	m_volumeKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
-						    tr( "Track volume" ) );
+							tr( "Track volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setModel( &_t->m_volumeModel );
 	m_volumeKnob->setHintText( tr( "Channel volume:" ), "%" );
@@ -790,7 +953,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	m_effWindow = gui->mainWindow()->addWindowedWidget( m_effectRack );
 	m_effWindow->setAttribute( Qt::WA_DeleteOnClose, false );
 	m_effWindow->layout()->setSizeConstraint( QLayout::SetFixedSize );
- 	m_effWindow->setWindowTitle( _t->name() );
+	m_effWindow->setWindowTitle( _t->name() );
 	m_effWindow->hide();
 
 	setModel( _t );
@@ -802,6 +965,39 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 SampleTrackView::~SampleTrackView()
 {
 	m_effWindow->deleteLater();
+}
+
+void SampleTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *trackOperations) {
+	TrackView::updateTrackOperationsWidgetMenu (trackOperations);
+
+	SampleTrack * st = castModel<SampleTrack>();
+	auto toMenu = trackOperations->trackOps ()->menu ();
+
+	QMenu *recordMenu = toMenu->addMenu (tr ("Set record channel"));
+	auto *recordChannels = new QActionGroup(recordMenu);
+
+	recordChannels->setExclusive (true);
+
+	recordChannels->addAction(tr( "Stereo" ))->setData (SampleTrack::RecordingChannel::Stereo);
+	recordChannels->addAction(tr( "Mono left" ))->setData (SampleTrack::RecordingChannel::MonoLeft);
+	recordChannels->addAction(tr( "Mono right" ))->setData (SampleTrack::RecordingChannel::MonoRight);
+
+	for (auto *action : recordChannels->actions ()) {
+		action->setCheckable (true);
+
+		if (action->data ().value<int>() == st->m_recordingChannelModel.value ())
+		{
+			action->setChecked (true);
+		}
+	}
+
+	recordMenu->addActions (recordChannels->actions ());
+
+	connect (recordChannels, SIGNAL(triggered(QAction*)), SLOT(onRecordActionSelected(QAction*)));
+
+	auto recordAction = toMenu->addAction( tr( "Toggle record" ), st, SLOT( toggleRecord() ) );
+	recordAction->setCheckable (true);
+	recordAction->setChecked (st->isRecord ());
 }
 
 
@@ -829,4 +1025,20 @@ void SampleTrackView::modelChanged()
 	m_volumeKnob->setModel( &st->m_volumeModel );
 
 	TrackView::modelChanged();
+}
+
+void SampleTrackView::onRecordActionSelected(QAction *action) {
+	SampleTrack * st = castModel<SampleTrack>();
+	auto selectedRecordingChannel = static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>());
+
+	// If we've selected the current recording channel again, we should undo it.
+	if (selectedRecordingChannel == static_cast<SampleTrack::RecordingChannel>(st->m_recordingChannelModel.value ())) {
+		st->setRecordingChannel (SampleTrack::RecordingChannel::None);
+		action->setChecked (false);
+	} else {
+		st->setRecordingChannel (selectedRecordingChannel);
+		action->setChecked (true);
+	}
+
+
 }
