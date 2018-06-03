@@ -177,6 +177,7 @@ PianoRoll::PianoRoll() :
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
+	m_ctrlMode( ModeDraw ),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_barLineColor( 0, 0, 0 ),
@@ -3532,7 +3533,7 @@ void PianoRoll::verScrolled( int new_pos )
 
 void PianoRoll::setEditMode(int mode)
 {
-	m_editMode = (EditModes) mode;
+	m_ctrlMode = m_editMode = (EditModes) mode;
 }
 
 
