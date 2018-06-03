@@ -118,7 +118,7 @@ OpulenzInstrument::OpulenzInstrument( InstrumentTrack * _instrument_track ) :
 	op2_s_mdl(14.0, 0.0, 15.0, 1.0, this, tr( "Op 2 austain" ) ),
 	op2_r_mdl(12.0, 0.0, 15.0, 1.0, this, tr( "Op 2 release" )   ),
 	op2_lvl_mdl(63.0, 0.0, 63.0, 1.0, this, tr( "Op 2 level" )   ),
-	op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 2 level Scaling" ) ),
+	op2_scale_mdl(0.0, 0.0, 3.0, 1.0, this, tr( "Op 2 level scaling" ) ),
 	op2_mul_mdl(1.0, 0.0, 15.0, 1.0, this, tr( "Op 2 frequency multiplier" ) ),
 	op2_ksr_mdl(false, this, tr( "Op 2 key scaling rate" ) ),
 	op2_perc_mdl(false, this, tr( "Op 2 percussive envelope" )   ),

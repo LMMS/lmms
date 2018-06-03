@@ -72,9 +72,9 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	m_baseKnob->setHintText( tr( "Base:" ), "" );
 
 	m_speedKnob = new TempoSyncKnob( knobBright_26, this );
-	m_speedKnob->setLabel( tr( "SPD" ) );
+	m_speedKnob->setLabel( tr( "FREQ" ) );
 	m_speedKnob->move( CD_LFO_SPEED_CD_KNOB_X, CD_LFO_CD_KNOB_Y );
-	m_speedKnob->setHintText( tr( "Modulation speed:" ), "" );
+	m_speedKnob->setHintText( tr( "LFO frequency:" ), "" );
 
 	m_amountKnob = new Knob( knobBright_26, this );
 	m_amountKnob->setLabel( tr( "AMNT" ) );
@@ -181,7 +181,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	x1->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x1_inactive" ) );
 	ToolTip::add( x1,
-				tr( "Mutliply modulation speed by 1" ));
+				tr( "Mutliply modulation frequency by 1" ));
 
 	PixmapButton * x100 = new PixmapButton( this, NULL );
 	x100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y - 8 );
@@ -190,7 +190,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	x100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_x100_inactive" ) );
 	ToolTip::add( x100,
-				tr( "Mutliply modulation speed by 100" ));
+				tr( "Mutliply modulation frequency by 100" ));
 
 	PixmapButton * d100 = new PixmapButton( this, NULL );
 	d100->move( CD_LFO_MULTIPLIER_X, CD_LFO_SHAPES_Y + 22 );
@@ -199,7 +199,7 @@ LfoControllerDialog::LfoControllerDialog( Controller * _model, QWidget * _parent
 	d100->setInactiveGraphic( embed::getIconPixmap(
 						"lfo_d100_inactive" ) );
 	ToolTip::add( d100,
-				tr( "Divide modulation speed by 100" ));
+				tr( "Divide modulation frequency by 100" ));
 
 	m_multiplierBtnGrp = new automatableButtonGroup( this );
 	m_multiplierBtnGrp->addButton( x1 );

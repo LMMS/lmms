@@ -263,7 +263,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		tf = TextFloat::displayMessage(
 				tr( "Loading plugin" ),
-				tr( "Please wait while loading VST-plugin..." ),
+				tr( "Please wait while loading VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	}
 
@@ -425,7 +425,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"controls" ) );
 	connect( m_managePluginButton, SIGNAL( clicked() ), this,
 						SLOT( managePlugin() ) );
-	ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
+	ToolTip::add( m_managePluginButton, tr( "Control VST plugin from LMMS host" ) );
 
 
 	m_openPresetButton = new PixmapButton( this, "" );
@@ -438,7 +438,7 @@ VestigeInstrumentView::VestigeInstrumentView( Instrument * _instrument,
 							"project_open", 20, 20 ) );
 	connect( m_openPresetButton, SIGNAL( clicked() ), this,
 						SLOT( openPreset() ) );
-	ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
+	ToolTip::add( m_openPresetButton, tr( "Open VST plugin preset" ) );
 
 
 	m_rolLPresetButton = new PixmapButton( this, "" );
@@ -585,7 +585,7 @@ void VestigeInstrumentView::modelChanged()
 
 void VestigeInstrumentView::openPlugin()
 {
-	FileDialog ofd( NULL, tr( "Open VST-plugin" ) );
+	FileDialog ofd( NULL, tr( "Open VST plugin" ) );
 
 	// set filters
 	QStringList types;
@@ -791,7 +791,7 @@ void VestigeInstrumentView::paintEvent( QPaintEvent * )
 				m_vi->m_plugin->name()/* + QString::number(
 						m_plugin->version() )*/
 					:
-				tr( "No VST-plugin loaded" );
+				tr( "No VST plugin loaded" );
 	QFont f = p.font();
 	f.setBold( true );
 	p.setFont( pointSize<10>( f ) );

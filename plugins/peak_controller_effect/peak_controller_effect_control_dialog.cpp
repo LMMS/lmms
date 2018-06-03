@@ -76,7 +76,7 @@ PeakControllerEffectControlDialog::PeakControllerEffectControlDialog(
 	m_tresholdKnob->setModel( &_controls->m_tresholdModel );
 	m_tresholdKnob->setHintText( tr( "Treshold:" ) , "" );
 
-	m_muteLed = new LedCheckBox( tr( "Mute output audio" ), this );
+	m_muteLed = new LedCheckBox( tr( "Mute output" ), this );
 	m_muteLed->setModel( &_controls->m_muteModel );
 
 	m_absLed = new LedCheckBox( tr( "Absolute value" ), this );

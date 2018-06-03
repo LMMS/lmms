@@ -481,7 +481,7 @@ void MainWindow::finalize()
 	// window-toolbar
 	ToolButton * song_editor_window = new ToolButton(
 					embed::getIconPixmap( "songeditor" ),
-					tr( "Song-Editor" ) + " (F5)",
+					tr( "Song Editor" ) + " (F5)",
 					this, SLOT( toggleSongEditorWin() ),
 								m_toolBar );
 	song_editor_window->setShortcut( Qt::Key_F5 );
@@ -498,7 +498,7 @@ void MainWindow::finalize()
 
 	ToolButton * piano_roll_window = new ToolButton(
 						embed::getIconPixmap( "piano" ),
-						tr( "Piano-Roll" ) +
+						tr( "Piano Roll" ) +
 									" (F7)",
 					this, SLOT( togglePianoRollWin() ),
 								m_toolBar );

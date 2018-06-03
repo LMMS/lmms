@@ -518,7 +518,7 @@ void EnvelopeAndLfoView::lfoUserWaveChanged()
 		if( m_params->m_userWave.frames() <= 1 )
 		{
 			TextFloat::displayMessage( tr( "Hint" ),
-				tr( "Drag and drop a sample in this window." ),
+				tr( "Drag and drop a sample into this window." ),
 					embed::getIconPixmap( "hint" ), 3000 );
 		}
 	}

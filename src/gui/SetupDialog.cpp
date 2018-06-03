@@ -195,7 +195,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	bufsize_reset_btn->setGeometry( 320, 40, 28, 28 );
 	connect( bufsize_reset_btn, SIGNAL( clicked() ), this,
 						SLOT( resetBufSize() ) );
-	ToolTip::add( bufsize_reset_btn, tr( "Reset to default-value" ) );
+	ToolTip::add( bufsize_reset_btn, tr( "Reset to default value" ) );
 
 	TabWidget * misc_tw = new TabWidget( tr( "MISC" ), general );
 	const int XDelta = 10;
@@ -691,7 +691,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	autoSaveResetBtn->setGeometry( 320, 70, 28, 28 );
 	connect( autoSaveResetBtn, SIGNAL( clicked() ), this,
 						SLOT( resetAutoSave() ) );
-	ToolTip::add( autoSaveResetBtn, tr( "Reset to default-value" ) );
+	ToolTip::add( autoSaveResetBtn, tr( "Reset to default value" ) );
 
 	m_saveIntervalSlider->setEnabled( m_enableAutoSave );
 	m_runningAutoSave->setVisible( m_enableAutoSave );
