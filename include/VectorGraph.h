@@ -74,6 +74,42 @@ public:
 		return m_height;
 	}
 
+	inline int getMargin()
+	{
+		return m_margin;
+	}
+
+	inline float rawToCoordX(float input)
+	{
+		auto result = input * (m_width - 1) * (((m_width - 1) - 2 * m_margin)/(float) (m_width - 1)) + m_margin;
+		return result;
+	}
+
+	inline float rawToCoordY(float input)
+	{
+		auto result = (1 - input) * (m_height - 1) * ((m_height - 1) - 2 * m_margin)/(float) (m_height - 1) + m_margin;
+		return result;
+	}
+
+	inline float coordToRawX(float input)
+	{
+		return (input - m_margin) * ((m_width - 1)/(float) ((m_width - 1) - 2 * m_margin)) / (m_width - 1);
+	}
+
+	inline float coordToRawY(float input)
+	{
+		return ((m_height - input) - m_margin) * ((m_height - 1)/(float) ((m_height - 1) - 2 * m_margin)) / (m_height - 1);
+	}
+
+	inline void setMargin(int margin)
+	{
+		// The extra space is necessary for the
+		// 2-pixel border, and because the
+		// canvas goes from 1 to (m_width - 1) in
+		// the X and 1 to (m_height - 1) in the y
+		m_margin = margin + 3;
+	}
+
 	float calculateSample(float input);
 	bool eventFilter(QObject *watched, QEvent *event);
 	void setLastModifiedPoint(int pointIndex);
@@ -101,6 +137,7 @@ private:
 	int m_width;
 	int m_height;
 	int m_currentPoint;
+	int m_margin;
 	float getTensionHandleYVal(int index);
 	float getTensionHandleXVal(int index);
 };
@@ -210,6 +247,22 @@ public:
 	{
 		return 3;
 	}
+	inline bool isGridEnabled()
+	{
+		return m_gridEnabled;
+	}
+	inline void setIsGridEnabled(bool enabled)
+	{
+		m_gridEnabled = enabled;
+	}
+	inline int getNumGridLines()
+	{
+		return m_numGridLines;
+	}
+	inline void setNumGridLines(int num)
+	{
+		m_numGridLines = num;
+	}
 
 private:
 	QVector<VectorGraphPoint> m_points;
@@ -218,6 +271,8 @@ private:
 	QPoint m_storedCursorPos;
 	float m_lastModifiedTension;
 	VectorGraph::TensionType m_lastModifiedTensionType;
+	bool m_gridEnabled;
+	int m_numGridLines;
 
 	static inline bool arePointsWithinDistance(float x1, float x2, float y1, float y2, float distance)
 	{

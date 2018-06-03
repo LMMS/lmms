@@ -32,6 +32,7 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	QWidget( _parent ),
 	ModelView(new VectorGraphModel(NULL, true), this)
 {
+
 	resize( _width, _height );
 
 	m_width = _width;
@@ -40,20 +41,67 @@ VectorGraph::VectorGraph( QWidget * _parent, int _width, int _height ) :
 	m_resolution = m_width;
 	m_currentPoint = -1;
 	installEventFilter(this);
+	setMargin(3);
 }
 
 void VectorGraph::paintEvent( QPaintEvent * event )
 {
+	QColor lineColor = QColor(3, 147, 178);
+	QColor invisible = QColor(0, 0, 0, 0);
+	QColor backgroundColor = QColor(35, 44, 54);
+	QColor borderLight = QColor(63, 72, 83);
+	QColor borderDark = QColor(32, 40, 50);
+	QColor gridColor = QColor(56, 66, 78);
+
 	QPainter m_canvas( this );
+
+	// Background
+	m_canvas.setBrush(QBrush(backgroundColor));
+	m_canvas.drawRect(QRect(QPoint(0, 1), QPoint(m_width - 1, m_height - 1)));
+
+
+
+
+	// Grid lines
+	if (model()->isGridEnabled())
+	{
+		QPen gridPen = QPen();
+		gridPen.setWidth(1);
+		gridPen.setColor(gridColor);
+		m_canvas.setPen(gridPen);
+
+
+		int gridAreaWidth = (m_width - 2 * m_margin);
+		int gridAreaHeight = (m_height - 2 * m_margin);
+
+		m_canvas.drawLine(m_margin, m_margin, m_margin, m_margin + gridAreaHeight);
+		m_canvas.drawLine(m_margin, m_margin + gridAreaHeight, m_margin + gridAreaWidth, m_margin + gridAreaHeight);
+		m_canvas.drawLine(m_margin + gridAreaWidth, m_margin + gridAreaHeight, m_margin + gridAreaWidth, m_margin);
+		m_canvas.drawLine(m_margin + gridAreaWidth, m_margin, m_margin, m_margin);
+		for (int i = 1; i < model()->getNumGridLines(); i++)
+		{
+			int x = qRound((gridAreaWidth / (float) model()->getNumGridLines()) * i) + m_margin;
+			int y = qRound((gridAreaHeight / (float) model()->getNumGridLines()) * i) + m_margin;
+			m_canvas.drawLine(x, m_margin, x, m_margin + gridAreaHeight);
+			m_canvas.drawLine(m_margin, y, m_margin + gridAreaWidth, y);
+		}
+	}
+
+
+
 	m_canvas.setRenderHint(QPainter::Antialiasing);
+
+
 	QPen pen = QPen();
-	pen.setWidth(1.5);
-	pen.setColor(Qt::white);
+	pen.setWidthF(1.2);
+	pen.setColor(lineColor);
 	m_canvas.setPen(pen);
+
+	m_canvas.setBrush(QBrush(invisible));
 
 	QPainterPath path;
 	VectorGraphPoint * firstPoint = model()->getPoint(0);
-	path.moveTo(qRound(firstPoint->x() * m_width), qRound((1 - firstPoint->y()) * m_height));
+	path.moveTo(qRound(rawToCoordX(firstPoint->x())), qRound(rawToCoordY(firstPoint->y())));
 
 	int currentSection = -1;
 
@@ -64,25 +112,28 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 		while (potentialNewSection != currentSection)
 		{
 			currentSection++;
-			path.lineTo(x * m_width, (1 - model()->getPoint(currentSection)->y()) * m_height);
+			path.lineTo(rawToCoordX(x) - 1, rawToCoordY(model()->getPoint(currentSection)->y()));
 		}
 		auto y = model()->calculateSample(x);
-		path.lineTo(x * m_width,
-					(1 - y) * m_height);
+		path.lineTo(rawToCoordX(x), rawToCoordY(y));
 	}
 
 	auto lastPoint = model()->getPoint(currentSection + 1);
 
-	path.lineTo(lastPoint->x() * m_width, (1 - lastPoint->y()) * m_height);
+	path.lineTo(rawToCoordX(lastPoint->x()), rawToCoordY(lastPoint->y()));
 
 	m_canvas.drawPath(path);
+
+	m_canvas.setBrush(QBrush(lineColor));
 
 	for (int i = 0; i < model()->getPointCount(); i++)
 	{
 		auto point = model()->getPoint(i);
 		int ps = model()->getPointSize();
-		m_canvas.drawEllipse(QPoint(point->x() * m_width, (1 - point->y()) * m_height), ps, ps);
+		m_canvas.drawEllipse(QPointF(rawToCoordX(point->x()), rawToCoordY(point->y())), ps, ps);
 	}
+
+	m_canvas.setBrush(QBrush(invisible));
 
 	for (int i = 1; i < model()->getPointCount(); i++)
 	{
@@ -101,33 +152,58 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 			tensionType == Pulse ||
 			tensionType == Wave)
 		{
-			m_canvas.drawEllipse(QPoint(qRound(((thisPoint->x() + prevPoint->x()) / 2) * m_width), qRound((1 - (thisPoint->y() + prevPoint->y()) / 2) * m_height)), ths, ths);
+			m_canvas.drawEllipse(QPointF(rawToCoordX((thisPoint->x() + prevPoint->x()) / 2), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
 			continue;
 		}
 
 		if (model()->floatEqual(thisPoint->x(), prevPoint->x(), 0.00001))
 		{
-			m_canvas.drawEllipse(QPoint(qRound(thisPoint->x() * m_width + 1), qRound((1 - (thisPoint->y() + prevPoint->y()) / 2) * m_height)), ths, ths);
+			m_canvas.drawEllipse(QPointF(rawToCoordX(thisPoint->x()), rawToCoordY((thisPoint->y() + prevPoint->y()) / 2)), ths, ths);
 			continue;
 		}
 
-		float xValueToDrawAt = qRound(getTensionHandleXVal(i) * m_width);
-		m_canvas.drawEllipse(QPoint(xValueToDrawAt, qRound((1 - getTensionHandleYVal(i)) * m_height)), ths, ths);
+		float xValueToDrawAt = rawToCoordX(getTensionHandleXVal(i));
+		float yValueToDrawAt = rawToCoordY(getTensionHandleYVal(i));
+		m_canvas.drawEllipse(QPointF(xValueToDrawAt, yValueToDrawAt), ths, ths);
 	}
+
+
+
+	m_canvas.setRenderHint(QPainter::Antialiasing, false);
+
+	// Border
+	QPen borderPen = QPen();
+	borderPen.setWidth(1);
+	borderPen.setColor(borderLight);
+	m_canvas.setPen(borderPen);
+
+	m_canvas.drawLine(0, 0, 0, m_height - 1);
+	m_canvas.drawLine(0, m_height - 1, m_width - 1, m_height - 1);
+	m_canvas.drawLine(m_width - 1, m_height - 1, m_width - 1, 0);
+	m_canvas.drawLine(m_width - 1, 0, 0, 0);
+
+	borderPen.setColor(borderDark);
+	m_canvas.setPen(borderPen);
+
+	m_canvas.drawLine(1, 1, 1, m_height - 2);
+	m_canvas.drawLine(1, m_height - 2, m_width - 2, m_height - 2);
+	m_canvas.drawLine(m_width - 2, m_height - 2, m_width - 2, 1);
+	m_canvas.drawLine(m_width - 2, 1, 1, 1);
 }
+
 
 void VectorGraph::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::MouseButton::RightButton)
 	{
-		int pointIndex = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
+		int pointIndex = model()->getPointIndexFromCoords(coordToRawX(event->x()) * m_width, coordToRawY(event->y()) * m_height, m_width, m_height);
 		if (pointIndex >= 0)
 		{
 			event->ignore();
 			return;
 		}
 
-		int handleIndex = model()->getPointIndexFromTensionHandleCoords(event->x(), m_height - event->y(), m_width, m_height);
+		int handleIndex = model()->getPointIndexFromTensionHandleCoords(coordToRawX(event->x()) * m_width, coordToRawY(event->y()) * m_height, m_width, m_height);
 		if (handleIndex >= 0)
 		{
 			model()->getPoint(handleIndex)->setTension(0);
@@ -138,8 +214,8 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 
 		int leftBoundIndex = model()->getSectionStartIndex((float) event->x() / m_width);
 		VectorGraphPoint newPoint = VectorGraphPoint(
-										(float) event->x() / m_width,
-										1 - (float) event->y() / m_height,
+										coordToRawX(event->x()),
+										coordToRawY(event->y()),
 										model()->getLastModifiedTension(),
 										model()->getLastModifiedTensionType()
 									);
@@ -150,8 +226,8 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 	}
 	else if (event->button() == Qt::MouseButton::LeftButton)
 	{
-		int pointIndex = model()->getPointIndexFromCoords(event->x(), m_height - event->y(), m_width, m_height);
-		int tensionHandleIndex = model()->getPointIndexFromTensionHandleCoords(event->x(), m_height - event->y(), m_width, m_height);
+		int pointIndex = model()->getPointIndexFromCoords(coordToRawX(event->x()) * m_width, coordToRawY(event->y()) * m_height, m_width, m_height);
+		int tensionHandleIndex = model()->getPointIndexFromTensionHandleCoords(coordToRawX(event->x()) * m_width, coordToRawY(event->y()) * m_height, m_width, m_height);
 
 		if (pointIndex > -1)
 		{
@@ -170,7 +246,7 @@ void VectorGraph::mouseMoveEvent(QMouseEvent *event)
 {
 	if (model()->getCurrentDraggedPoint() != -1)
 	{
-		model()->tryMove(model()->getCurrentDraggedPoint(), (float) event->x() / m_width, 1 - (float) event->y() / m_height);
+		model()->tryMove(model()->getCurrentDraggedPoint(), coordToRawX(event->x()), coordToRawY(event->y()));
 		update();
 	}
 
@@ -211,11 +287,9 @@ void VectorGraph::mouseReleaseEvent(QMouseEvent * event)
 		model()->setLastModifiedTensionType(point->tensionType());
 
 		QCursor c = cursor();
-		//c.setPos(mapToGlobal(QPoint(15, 15)));
-		//QPoint newCursorPoint = model()->getStoredCursorPos();
 		QPoint newCursorPoint(
-					getTensionHandleXVal(model()->getCurrentDraggedTensionHandle()) * m_width,
-					(1 - getTensionHandleYVal(model()->getCurrentDraggedTensionHandle())) * m_height);
+					rawToCoordX(getTensionHandleXVal(model()->getCurrentDraggedTensionHandle())),
+					rawToCoordY(getTensionHandleYVal(model()->getCurrentDraggedTensionHandle())));
 		c.setPos(mapToGlobal(newCursorPoint));
 		c.setShape(Qt::ArrowCursor);
 		setCursor(c);
@@ -232,7 +306,7 @@ bool VectorGraph::eventFilter(QObject *watched, QEvent *event)
 
 		QContextMenuEvent * menuEvent = static_cast<QContextMenuEvent*>(event);
 
-		m_currentPoint = model()->getPointIndexFromCoords(menuEvent->x(), m_height - menuEvent->y(), m_width, m_height);
+		m_currentPoint = model()->getPointIndexFromCoords(coordToRawX(menuEvent->x()) * m_width, coordToRawY(menuEvent->y()) * m_height, m_width, m_height);
 
 		if (m_currentPoint < 0)
 			return false;
@@ -350,6 +424,8 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 	m_currentDraggedTensionHandle = -1;
 	m_lastModifiedTension = 0;
 	m_lastModifiedTensionType = VectorGraph::TensionType::SingleCurve;
+	m_gridEnabled = true;
+	m_numGridLines = 12;
 }
 
 VectorGraphPoint * VectorGraphModel::getPoint(int index)
