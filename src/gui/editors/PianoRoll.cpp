@@ -949,6 +949,8 @@ void PianoRoll::clearSelectedNotes()
 
 void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 {
+	if (!hasValidPattern()) {return;}
+
 	bool useAllNotes = ! isSelection();
 	for( Note *note : m_pattern->notes() )
 	{
@@ -973,6 +975,8 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 
 void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 {
+	if (!hasValidPattern()) {return;}
+
 	bool useAllNotes = ! isSelection();
 
 	bool first = true;
@@ -1112,9 +1116,12 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				else if( ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
 				{
 					// move notes
-					bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
-					int amt = quantized ? quantization() : 1;
-					shiftPos( direction * amt );
+					if (hasValidPattern())
+					{
+						bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
+						int amt = quantized ? quantization() : 1;
+						shiftPos( direction * amt );
+					}
 				}
 				else if( ke->modifiers() & Qt::AltModifier)
 				{
