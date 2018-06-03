@@ -2,6 +2,7 @@
  * Oscillator.cpp - implementation of powerful oscillator-class
  *
  * Copyright (c) 2004-2009 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *               2018      Dave French	<dave/dot/french3/at/googlemail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -28,13 +29,16 @@
 #include "Engine.h"
 #include "Mixer.h"
 #include "AutomatableModel.h"
+#include "fft_helpers.h"
+#include "fftw3.h"
 
 
 
 void Oscillator::waveTableInit()
 {
-	if(!s_waveTableBandFreqs)
+	if (!s_waveTableBandFreqs)
 	{
+		createFFtPlans();
 		s_waveTableBandFreqs = new float[127];
 		s_waveTablesPerWaveformCount = 0;
 		for (int i = 1; i < 127; i+=4)
@@ -44,7 +48,6 @@ void Oscillator::waveTableInit()
 		}
 	}
 
-//	printf("table %d\n",m_tableCount);
 	if (!s_waveTables)
 	{
 		allocWaveTables();
@@ -70,7 +73,10 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 	m_phase( _phase_offset ),
 	m_userWave( NULL ),
 	m_useWaveTable( false ),
-	m_generatedWaveTable( 0 )
+	m_generatedWaveTable( 0 ),
+	m_fftPlan( 0 ),
+	m_ifftPlan( 0 )
+
 
 {
 	waveTableInit();
@@ -144,6 +150,7 @@ void Oscillator::generateSawWaveTable(int bands)
 	}
 }
 
+
 void Oscillator::generateTriangleWaveTable(int bands)
 {
 	float max = 0;
@@ -186,6 +193,42 @@ void Oscillator::generateSquareWaveTable(int bands)
 	}
 }
 
+
+
+
+//expects sample in sample buffer
+void Oscillator::generateFromFFT(int bands, float threshold)
+{
+	float max = 0;
+	//set bands to zero
+	for (int i = bands; i < WAVETABLE_LENGTH * 2 + 1 - bands; i++)
+	{
+		m_specBuf[i][0] = 0.0f;
+		m_specBuf[i][1] = 0.0f;
+
+		for (int i = 0; i < WAVETABLE_LENGTH * 2 + 1; ++i)
+		{
+			if (m_specBuf[i][0] * m_specBuf[i][0] + m_specBuf[i][1] * m_specBuf[i][1] < threshold)
+			{
+				m_specBuf[i][0] = 0.0f;
+				m_specBuf[i][1] = 0.0f;
+			}
+		}
+		//ifft
+		fftwf_execute(m_ifftPlan);
+		//normalise
+		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+		{
+			max = fmax(max, m_sampleBuffer[i]);
+		}
+		//copy to generateWaveTable
+		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+		{
+			m_generatedWaveTable[i] = m_sampleBuffer[i] / max;
+		}
+	}
+}
+
 int Oscillator::waveTableBandFromFreq(float freq)
 {
 	int i;
@@ -213,6 +256,13 @@ void Oscillator::allocWaveTables()
 	}
 }
 
+void Oscillator::createFFtPlans()
+{
+	m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( WAVETABLE_LENGTH * 2 + 1 ) * sizeof( fftwf_complex ) );
+	m_fftPlan = fftwf_plan_dft_r2c_1d( WAVETABLE_LENGTH , m_sampleBuffer, m_specBuf, FFTW_MEASURE );
+	m_ifftPlan = fftwf_plan_dft_c2r_1d(WAVETABLE_LENGTH , m_specBuf, m_sampleBuffer, FFTW_MEASURE);
+}
+
 void Oscillator::generateWaveTables()
 {
 	//generate sine tables
@@ -238,6 +288,33 @@ void Oscillator::generateWaveTables()
 	{
 		generateTriangleWaveTable(MAX_FREQ / s_waveTableBandFreqs[i]);
 		s_waveTables[WaveShapes::TriangleWave][i] = m_generatedWaveTable;
+	}
+	//generate moogSaw tables
+	//generate singnal buffer
+	for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+	{
+		m_sampleBuffer[i] = moogSawSample( (float)i / (float)WAVETABLE_LENGTH);
+	}
+	fftwf_execute(m_fftPlan);
+	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	{
+		m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
+		generateFromFFT(MAX_FREQ / s_waveTableBandFreqs[i],0.2f);
+		s_waveTables[WaveShapes::MoogSawWave][i] = m_generatedWaveTable;
+	}
+
+	//generate Exp tables
+	//generate singnal buffer
+	for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+	{
+		m_sampleBuffer[i] = expSample((float)i / (float)WAVETABLE_LENGTH);
+	}
+	fftwf_execute(m_fftPlan);
+	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	{
+		m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
+		generateFromFFT(MAX_FREQ / s_waveTableBandFreqs[i],0.2f);
+		s_waveTables[WaveShapes::ExponentialWave][i] = m_generatedWaveTable;
 	}
 }
 
@@ -680,7 +757,10 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::MoogSawWave>(
 							const float _sample )
 {
-	return( moogSawSample( _sample ) );
+	if (m_useWaveTable)
+	{return wtSample(WaveShapes::MoogSawWave, _sample);}
+	else
+		{return( moogSawSample( _sample ) );}
 }
 
 
@@ -690,7 +770,10 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::ExponentialWave>(
 							const float _sample )
 {
-	return( expSample( _sample ) );
+	if (m_useWaveTable)
+		{return wtSample(WaveShapes::ExponentialWave, _sample);}
+	else
+		{return( expSample( _sample ) );}
 }
 
 

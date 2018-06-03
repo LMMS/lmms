@@ -2,6 +2,7 @@
  * Oscillator.h - declaration of class Oscillator
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
+ *               2018      Dave French	<dave/dot/french3/at/googlemail/dot/com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -33,8 +34,12 @@
 #include <stdlib.h>
 #endif
 
+#include <fftw3.h>
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
+#include "fft_helpers.h"
+#include "lmms_basics.h"
+#include "lmms_math.h"
 
 class IntModel;
 
@@ -77,7 +82,13 @@ public:
 	virtual ~Oscillator()
 	{
 		delete m_subOsc;
+		if (m_fftPlan) {fftwf_destroy_plan(m_fftPlan);}
+		if (m_ifftPlan) {fftwf_destroy_plan(m_ifftPlan);}
+		fftwf_free(m_specBuf);
 	}
+
+
+	void waveTableInit();
 
 
 	inline void setUseWaveTable(bool n)
@@ -213,13 +224,23 @@ private:
 	///3d array [waveform][band][frame]
 	static sample_t ***s_waveTables;
 
+	fftwf_plan m_fftPlan;
+	fftwf_plan m_ifftPlan;
+	fftwf_complex * m_specBuf;
+	float m_fftBuffer[WAVETABLE_LENGTH*2];
+	float m_sampleBuffer[WAVETABLE_LENGTH];
+
 	void generateSineWaveTable(int bands);
 	void generateSawWaveTable(int bands);
 	void generateTriangleWaveTable(int bands);
 	void generateSquareWaveTable(int bands);
+	void generateMoogSawWaveTable(int bands);
+	void generateExpWaveTable(int bands);
+	void generateFromFFT(int bands, float threshold);
 	int  waveTableBandFromFreq(float freq);
 	void generateWaveTables();
 	void allocWaveTables();
+	void createFFtPlans();
 
 	/* End Multiband wavetable */
 
@@ -265,7 +286,6 @@ private:
 
 	inline void recalcPhase();
 
-	void waveTableInit();
 } ;
 
 
