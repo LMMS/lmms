@@ -113,36 +113,5 @@ void waveShaper2Controls::setDefaultShape()
 	m_wavegraphModel.setSamples( (float*)&shp );
 }
 
-void waveShaper2Controls::resetClicked()
-{
-	setDefaultShape();
-	Engine::getSong()->setModified();
-}
-
-void waveShaper2Controls::smoothClicked()
-{
-	m_wavegraphModel.smoothNonCyclic();
-	Engine::getSong()->setModified();
-}
-
-void waveShaper2Controls::addOneClicked()
-{
-	for( int i=0; i<200; i++ )
-	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] * onedB, 1.0f ) );
-	}
-	Engine::getSong()->setModified();
-}
-
-void waveShaper2Controls::subOneClicked()
-{
-	for( int i=0; i<200; i++ )
-	{
-		m_wavegraphModel.setSampleAt( i, qBound( 0.0f, m_wavegraphModel.samples()[i] / onedB, 1.0f ) );
-	}
-	Engine::getSong()->setModified();
-}
-
-
 
 

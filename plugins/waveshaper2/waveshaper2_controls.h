@@ -66,12 +66,6 @@ public:
 private slots:
 	void samplesChanged( int, int );
 
-	void resetClicked();
-	void smoothClicked();
-
-	void addOneClicked();
-	void subOneClicked();
-
 private:
 	waveShaper2Effect * m_effect;
 	FloatModel m_inputModel;
