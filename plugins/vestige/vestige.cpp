@@ -263,7 +263,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	{
 		tf = TextFloat::displayMessage(
 				tr( "Loading plugin" ),
-				tr( "Please wait while loading VST plugin..." ),
+				tr( "Please wait while loading the VST plugin..." ),
 				PLUGIN_NAME::getIconPixmap( "logo", 24, 24 ), 0 );
 	}
 
