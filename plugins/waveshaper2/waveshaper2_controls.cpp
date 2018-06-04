@@ -41,22 +41,9 @@ waveShaper2Controls::waveShaper2Controls( waveShaper2Effect * _eff ) :
 	m_effect( _eff ),
 	m_inputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Input gain" ) ),
 	m_outputModel( 1.0f, 0.0f, 5.0f, 0.01f, this, tr( "Output gain" ) ),
-	m_wavegraphModel( 0.0f, 1.0f, 200, this ),
 	m_vectorGraphModel( this, true ),
 	m_clipModel( false, this )
 {
-	connect( &m_wavegraphModel, SIGNAL( samplesChanged( int, int ) ),
-			this, SLOT( samplesChanged( int, int ) ) );
-
-	setDefaultShape();
-}
-
-
-
-
-void waveShaper2Controls::samplesChanged( int _begin, int _end)
-{
-	Engine::getSong()->setModified();
 }
 
 
@@ -67,17 +54,8 @@ void waveShaper2Controls::loadSettings( const QDomElement & _this )
 //load input, output knobs
 	m_inputModel.loadSettings( _this, "inputGain" );
 	m_outputModel.loadSettings( _this, "outputGain" );
-	
+
 	m_clipModel.loadSettings( _this, "clipInput" );
-
-//load waveshape
-	int size = 0;
-	char * dst = 0;
-	base64::decode( _this.attribute( "waveShape"), &dst, &size );
-
-	m_wavegraphModel.setSamples( (float*) dst );
-	delete[] dst;
-
 }
 
 
@@ -92,26 +70,10 @@ void waveShaper2Controls::saveSettings( QDomDocument & _doc,
 
 	m_clipModel.saveSettings( _doc, _this, "clipInput" );
 
-//save waveshape
-	QString sampleString;
-	base64::encode( (const char *)m_wavegraphModel.samples(),
-		m_wavegraphModel.length() * sizeof(float), sampleString );
-	_this.setAttribute( "waveShape", sampleString );
-
 }
 
 
 void waveShaper2Controls::setDefaultShape()
 {
-	float shp [200] = { };
-	for ( int i = 0; i<200; i++)
-	{
-		shp[i] = ((float)i + 1.0f) / 200.0f;
-	}
-
-	m_wavegraphModel.setLength( 200 );
-	m_wavegraphModel.setSamples( (float*)&shp );
+	//
 }
-
-
-

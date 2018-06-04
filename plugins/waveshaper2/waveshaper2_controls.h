@@ -62,15 +62,10 @@ public:
 		return( new waveShaper2ControlDialog( this ) );
 	}
 
-
-private slots:
-	void samplesChanged( int, int );
-
 private:
 	waveShaper2Effect * m_effect;
 	FloatModel m_inputModel;
 	FloatModel m_outputModel;
-	graphModel m_wavegraphModel;
 	VectorGraphModel m_vectorGraphModel;
 	BoolModel  m_clipModel;
 
