@@ -600,7 +600,7 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 		}
 
 		VectorGraphPoint * leftPoint = getPoint(index - 1);
-		VectorGraphPoint * rightPoint;
+		VectorGraphPoint * rightPoint = getPoint(index); // Fixes a warning, this won't actaully be used.
 		if (checkRight)
 		{
 			rightPoint = getPoint(index + 1);
@@ -629,12 +629,9 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 			{
 				currentPoint->setX((snappedGridLineIndex + 1) / (float)m_numGridLines);
 			}
-			else if (checkRight)
+			else if (checkRight && potentialSnappedValue > rightPoint->x())
 			{
-				if (potentialSnappedValue > rightPoint->x())
-				{
-					currentPoint->setX((snappedGridLineIndex - 1) / (float)m_numGridLines);
-				}
+				currentPoint->setX((snappedGridLineIndex - 1) / (float)m_numGridLines);
 			}
 			else
 			{
