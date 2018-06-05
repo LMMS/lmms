@@ -466,14 +466,7 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 							"select_file" ) );
 	connect( m_openAudioFileButton, SIGNAL( clicked() ),
 					this, SLOT( openAudioFile() ) );
-	ToolTip::add( m_openAudioFileButton, tr( "Open other sample" ) );
-
-	m_openAudioFileButton->setWhatsThis(
-		tr( "Click here, if you want to open another audio-file. "
-			"A dialog will appear where you can select your file. "
-			"Settings like looping-mode, start and end-points, "
-			"amplify-value, and so on are not reset. So, it may not "
-			"sound like the original sample.") );
+	ToolTip::add( m_openAudioFileButton, tr( "Open sample" ) );
 
 	m_reverseButton = new PixmapButton( this );
 	m_reverseButton->setCheckable( true );
@@ -483,10 +476,6 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_reverseButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"reverse_off" ) );
 	ToolTip::add( m_reverseButton, tr( "Reverse sample" ) );
-	m_reverseButton->setWhatsThis(
-		tr( "If you enable this button, the whole sample is reversed. "
-			"This is useful for cool effects, e.g. a reversed "
-			"crash." ) );
 
 // loop button group
 
@@ -498,9 +487,6 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_loopOffButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_off_off" ) );
 	ToolTip::add( m_loopOffButton, tr( "Disable loop" ) );
-	m_loopOffButton->setWhatsThis(
-		tr( "This button disables looping. "
-			"The sample plays only once from start to end. " ) );
 
 
 	PixmapButton * m_loopOnButton = new PixmapButton( this );
@@ -511,9 +497,6 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_loopOnButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_on_off" ) );
 	ToolTip::add( m_loopOnButton, tr( "Enable loop" ) );
-	m_loopOnButton->setWhatsThis(
-		tr( "This button enables forwards-looping. "
-			"The sample loops between the end point and the loop point." ) );
 
 	PixmapButton * m_loopPingPongButton = new PixmapButton( this );
 	m_loopPingPongButton->setCheckable( true );
@@ -523,10 +506,6 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 	m_loopPingPongButton->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"loop_pingpong_off" ) );
 	ToolTip::add( m_loopPingPongButton, tr( "Enable loop" ) );
-	m_loopPingPongButton->setWhatsThis(
-		tr( "This button enables ping-pong-looping. "
-			"The sample loops backwards and forwards between the end point "
-			"and the loop point." ) );
 
 	m_loopGroup = new automatableButtonGroup( this );
 	m_loopGroup->addButton( m_loopOffButton );
@@ -542,44 +521,23 @@ AudioFileProcessorView::AudioFileProcessorView( Instrument * _instrument,
 								"stutter_off" ) );
 	ToolTip::add( m_stutterButton,
 		tr( "Continue sample playback across notes" ) );
-	m_stutterButton->setWhatsThis(
-		tr( "Enabling this option makes the sample continue playing "
-			"across different notes - if you change pitch, or the note "
-			"length stops before the end of the sample, then the next "
-			"note played will continue where it left off. To reset the "
-			"playback to the start of the sample, insert a note at the bottom "
-			"of the keyboard (< 20 Hz)") );
 
 	m_ampKnob = new Knob( knobBright_26, this );
 	m_ampKnob->setVolumeKnob( true );
 	m_ampKnob->move( 5, 108 );
 	m_ampKnob->setHintText( tr( "Amplify:" ), "%" );
-	m_ampKnob->setWhatsThis(
-		tr( "With this knob you can set the amplify ratio. When you "
-			"set a value of 100% your sample isn't changed. "
-			"Otherwise it will be amplified up or down (your "
-			"actual sample-file isn't touched!)" ) );
 
 	m_startKnob = new AudioFileProcessorWaveView::knob( this );
 	m_startKnob->move( 45, 108 );
-	m_startKnob->setHintText( tr( "Startpoint:" ), "" );
-	m_startKnob->setWhatsThis(
-		tr( "With this knob you can set the point where "
-			"AudioFileProcessor should begin playing your sample. " ) );
+	m_startKnob->setHintText( tr( "Start point:" ), "" );
 
 	m_endKnob = new AudioFileProcessorWaveView::knob( this );
 	m_endKnob->move( 125, 108 );
-	m_endKnob->setHintText( tr( "Endpoint:" ), "" );
-	m_endKnob->setWhatsThis(
-		tr( "With this knob you can set the point where "
-			"AudioFileProcessor should stop playing your sample. " ) );
+	m_endKnob->setHintText( tr( "End point:" ), "" );
 
 	m_loopKnob = new AudioFileProcessorWaveView::knob( this );
 	m_loopKnob->move( 85, 108 );
 	m_loopKnob->setHintText( tr( "Loopback point:" ), "" );
-	m_loopKnob->setWhatsThis(
-		tr( "With this knob you can set the point where "
-			"the loop starts. " ) );
 
 // interpolation selector
 	m_interpBox = new ComboBox( this );

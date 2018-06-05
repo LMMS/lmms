@@ -93,7 +93,6 @@ public:
 public slots:
 	void showString( int _string );
 	void contextMenuEvent( QContextMenuEvent * );
-	void displayHelp();
 
 protected slots:
 	void sinWaveClicked();

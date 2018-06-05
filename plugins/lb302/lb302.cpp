@@ -850,9 +850,9 @@ lb302SynthView::lb302SynthView( Instrument * _instrument, QWidget * _parent ) :
 	m_deadToggle->move( 10, 200 );
 
 	m_db24Toggle = new LedCheckBox( "", this );
-	m_db24Toggle->setWhatsThis(
-			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 	m_db24Toggle->move( 10, 150);
+	ToolTip::add( m_db24Toggle,
+			tr( "303-es-que, 24dB/octave, 3 pole filter" ) );
 
 
 	m_slideDecKnob = new Knob( knobBright_26, this );

@@ -29,7 +29,6 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QWhatsThis>
 #include <QScrollArea>
 
 #include "SetupDialog.h"

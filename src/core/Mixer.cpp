@@ -1090,6 +1090,7 @@ Mixer::fifoWriter::fifoWriter( Mixer* mixer, fifo * _fifo ) :
 	m_fifo( _fifo ),
 	m_writing( true )
 {
+	setObjectName("Mixer::fifoWriter");
 }
 
 

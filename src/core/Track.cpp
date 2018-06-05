@@ -143,7 +143,9 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 {
 	if( m_startPosition != pos )
 	{
+		Engine::mixer()->requestChangeInModel();
 		m_startPosition = pos;
+		Engine::mixer()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}
@@ -1732,7 +1734,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackView( parent )          /*!< The parent track view */
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
-				"to begin a new drag'n'drop-action." ).arg(
+				"to begin a new drag'n'drop action." ).arg(
 					#ifdef LMMS_BUILD_APPLE
 					"⌘") );
 					#else
@@ -1751,7 +1753,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->move( 12, 1 );
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
-	ToolTip::add( m_trackOps, tr( "Actions for this track" ) );
+	ToolTip::add( m_trackOps, tr( "Actions" ) );
 
 
 	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
@@ -1777,7 +1779,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	}
 
 	m_muteBtn->show();
-	ToolTip::add( m_muteBtn, tr( "Mute this track" ) );
+	ToolTip::add( m_muteBtn, tr( "Mute" ) );
 
 	m_soloBtn->show();
 	ToolTip::add( m_soloBtn, tr( "Solo" ) );

@@ -117,14 +117,14 @@ TimeLineWidget::~TimeLineWidget()
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
 	NStateButton * autoScroll = new NStateButton( _tool_bar );
-	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
+	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleAutoScroll( int ) ) );
 
 	NStateButton * loopPoints = new NStateButton( _tool_bar );
-	loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
+	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
 	connect( loopPoints, SIGNAL( changedState( int ) ), this,

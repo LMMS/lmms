@@ -54,7 +54,7 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 
 void ProcessWatcher::run()
 {
-	while( !m_quit && m_plugin->isRunning() )
+	while( !m_quit && (m_plugin->isRunning() || m_plugin->messagesLeft()) )
 	{
 		msleep( 200 );
 	}

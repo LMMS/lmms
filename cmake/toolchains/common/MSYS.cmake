@@ -2,6 +2,7 @@
 SET(CMAKE_FIND_ROOT_PATH            ${MINGW_PREFIX})
 SET(CMAKE_INSTALL_PREFIX            ${MINGW_PREFIX})
 
+
 # Windows msys mingw ships with a mostly-suitable preconfigured environment
 SET(STRIP                       ${MINGW_PREFIX}/bin/strip)
 SET(CMAKE_RC_COMPILER           ${MINGW_PREFIX}/bin/windres)
@@ -32,3 +33,5 @@ IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	# Override Qt debug libraries with release versions
 	SET(QT_LIBRARIES "${QT_OVERRIDE_LIBRARIES}")
 ENDIF()
+
+SET(LMMS_BUILD_MSYS 1)
