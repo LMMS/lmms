@@ -22,6 +22,9 @@
  *
  */
 
+// Documentation:
+// https://github.com/SecondFlight/lmms/wiki/VectorGraph
+
 #include <QMouseEvent>
 
 #include "VectorGraph.h"
@@ -244,6 +247,11 @@ void VectorGraph::mousePressEvent(QMouseEvent *event)
 
 void VectorGraph::mouseMoveEvent(QMouseEvent *event)
 {
+	if (event->modifiers() == Qt::KeyboardModifier::AltModifier)
+		model()->setIsGridSnapEnabled(true);
+	else
+		model()->setIsGridSnapEnabled(false);
+
 	if (model()->getCurrentDraggedPoint() != -1)
 	{
 		model()->tryMove(model()->getCurrentDraggedPoint(), coordToRawX(event->x()), coordToRawY(event->y()));
@@ -426,6 +434,7 @@ VectorGraphModel::VectorGraphModel(::Model * _parent, bool _default_constructed)
 	m_lastModifiedTensionType = VectorGraph::TensionType::SingleCurve;
 	m_gridEnabled = true;
 	m_numGridLines = 12;
+	m_gridSnapEnabled = false;
 }
 
 VectorGraphPoint * VectorGraphModel::getPoint(int index)
@@ -597,17 +606,41 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 			rightPoint = getPoint(index + 1);
 		}
 
+		float potentialXValue;
+
 		if (x < leftPoint->x())
 		{
-			currentPoint->setX(leftPoint->x());
+			potentialXValue = leftPoint->x();
 		}
 		else if (checkRight && x > rightPoint->x())
 		{
-			currentPoint->setX(rightPoint->x());
+			potentialXValue = rightPoint->x();
 		}
 		else
 		{
-			currentPoint->setX(x);
+			potentialXValue = x;
+		}
+
+		if (m_gridSnapEnabled)
+		{
+			int snappedGridLineIndex = qRound(potentialXValue * m_numGridLines);
+			float potentialSnappedValue = snappedGridLineIndex / (float)m_numGridLines;
+			if (potentialSnappedValue < leftPoint->x())
+			{
+				currentPoint->setX((snappedGridLineIndex + 1) / (float)m_numGridLines);
+			}
+			else if (checkRight && potentialSnappedValue > rightPoint->x())
+			{
+				currentPoint->setX((snappedGridLineIndex - 1) / (float)m_numGridLines);
+			}
+			else
+			{
+				currentPoint->setX(potentialSnappedValue);
+			}
+		}
+		else
+		{
+			currentPoint->setX(potentialXValue);
 		}
 	}
 
@@ -623,7 +656,14 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 		}
 		else
 		{
-			currentPoint->setY(y);
+			if (m_gridSnapEnabled)
+			{
+				currentPoint->setY(qRound(y * m_numGridLines) / (float)m_numGridLines);
+			}
+			else
+			{
+				currentPoint->setY(y);
+			}
 		}
 	}
 }

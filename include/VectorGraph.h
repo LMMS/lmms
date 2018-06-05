@@ -22,6 +22,9 @@
  *
  */
 
+// Documentation:
+// https://github.com/SecondFlight/lmms/wiki/VectorGraph
+
 #ifndef VECTORGRAPH_H
 #define VECTORGRAPH_H
 
@@ -112,7 +115,6 @@ public:
 
 	float calculateSample(float input);
 	bool eventFilter(QObject *watched, QEvent *event);
-	void setLastModifiedPoint(int pointIndex);
 
 signals:
 	void drawn();
@@ -140,6 +142,7 @@ private:
 	int m_margin;
 	float getTensionHandleYVal(int index);
 	float getTensionHandleXVal(int index);
+	void setLastModifiedPoint(int pointIndex);
 };
 
 
@@ -263,6 +266,14 @@ public:
 	{
 		m_numGridLines = num;
 	}
+	inline bool isGridSnapEnabled()
+	{
+		return m_gridSnapEnabled;
+	}
+	inline void setIsGridSnapEnabled(bool enabled)
+	{
+		m_gridSnapEnabled = enabled;
+	}
 
 private:
 	QVector<VectorGraphPoint> m_points;
@@ -273,6 +284,7 @@ private:
 	VectorGraph::TensionType m_lastModifiedTensionType;
 	bool m_gridEnabled;
 	int m_numGridLines;
+	bool m_gridSnapEnabled;
 
 	static inline bool arePointsWithinDistance(float x1, float x2, float y1, float y2, float distance)
 	{
