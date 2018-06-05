@@ -435,7 +435,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_fx1Knob->setFixedSize( 37, 47 );
 	m_fx1Knob->setHintText( tr( "Distortion:" ), QString() );
 	m_fx1Knob->setObjectName( "fx1Knob" );
-	m_fx1Knob->setWhatsThis( tr( "The distortion knob adds distortion to the output of the instrument. " ) );
 
 	// setup volume-knob
 	m_volKnob = new organicKnob( this );
@@ -444,8 +443,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 	m_volKnob->setFixedSize( 37, 47 );
 	m_volKnob->setHintText( tr( "Volume:" ), "%" );
 	m_volKnob->setObjectName( "volKnob" );
-	m_volKnob->setWhatsThis( tr( "The volume knob controls the volume of the output of the instrument. "
-									"It is cumulative with the instrument window's volume control. " ) );
 
 	// randomise
 	m_randBtn = new PixmapButton( this, tr( "Randomise" ) );
@@ -454,8 +451,6 @@ organicInstrumentView::organicInstrumentView( Instrument * _instrument,
 							"randomise_pressed" ) );
 	m_randBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 								"randomise" ) );
-	m_randBtn->setWhatsThis( tr( "The randomize button randomizes all knobs except the harmonics,"
-									"main volume and distortion knobs. ") );
 	
 	connect( m_randBtn, SIGNAL ( clicked() ),
 					oi, SLOT( randomiseSettings() ) );

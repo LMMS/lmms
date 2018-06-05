@@ -147,7 +147,6 @@ public slots:
 	void resetWindowTitle();
 
 	void emptySlot();
-	void enterWhatsThisMode();
 	void createNewProject();
 	void createNewProjectFromTemplate( QAction * _idx );
 	void openProject();

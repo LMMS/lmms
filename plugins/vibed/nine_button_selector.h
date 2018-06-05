@@ -74,7 +74,6 @@ public slots:
 	void button7Clicked();
 	void button8Clicked();
 	void contextMenuEvent( QContextMenuEvent * );
-	void displayHelp();
 	
 signals:
 	void nineButtonSelection( int );
