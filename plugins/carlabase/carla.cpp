@@ -492,9 +492,6 @@ CarlaInstrumentView::CarlaInstrumentView(CarlaInstrument* const instrument, QWid
     m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
     connect( m_toggleUIButton, SIGNAL( clicked(bool) ), this, SLOT( toggleUI( bool ) ) );
 
-    m_toggleUIButton->setWhatsThis(
-                tr( "Click here to show or hide the graphical user interface (GUI) of Carla." ) );
-
     l->addWidget( m_toggleUIButton );
     l->addStretch();
 

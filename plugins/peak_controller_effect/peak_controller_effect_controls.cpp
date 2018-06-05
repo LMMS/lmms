@@ -42,8 +42,8 @@ PeakControllerEffectControls( PeakControllerEffect * _eff ) :
 	m_decayModel( 0, 0, 0.999, 0.001, this, tr( "Release" ) ),
 	m_tresholdModel( 0, 0, 1.0, 0.001, this, tr( "Treshold" ) ),
 	m_muteModel( false, this, tr( "Mute output" ) ),
-	m_absModel( true, this, tr("Abs Value") ),
-	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount Multiplicator") )
+	m_absModel( true, this, tr("Absolute value") ),
+	m_amountMultModel( 1.0, 0, 32, 0.2, this, tr("Amount multiplicator") )
 {
 }
 

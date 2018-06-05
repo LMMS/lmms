@@ -313,19 +313,15 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	l->setVerticalSpacing( 10 );
 	l->setHorizontalSpacing( 23 );
 
-	m_syncButton = new QPushButton( tr( "VST Sync" ), widget );
+	m_syncButton = new QPushButton( tr( "VST sync" ), widget );
 	connect( m_syncButton, SIGNAL( clicked() ), this,
 							SLOT( syncPlugin() ) );
-	m_syncButton->setWhatsThis(
-		tr( "Click here if you want to synchronize all parameters with VST plugin." ) );
 
 	l->addWidget( m_syncButton, 0, 0, 1, 2, Qt::AlignLeft );
 
 	m_displayAutomatedOnly = new QPushButton( tr( "Automated" ), widget );
 	connect( m_displayAutomatedOnly, SIGNAL( clicked() ), this,
 							SLOT( displayAutomatedOnly() ) );
-	m_displayAutomatedOnly->setWhatsThis(
-		tr( "Click here if you want to display automated parameters only." ) );
 
 	l->addWidget( m_displayAutomatedOnly, 0, 1, 1, 2, Qt::AlignLeft );
 
@@ -333,8 +329,6 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_closeButton = new QPushButton( tr( "    Close    " ), widget );
 	connect( m_closeButton, SIGNAL( clicked() ), this,
 							SLOT( closeWindow() ) );
-	m_closeButton->setWhatsThis(
-		tr( "Close VST effect knob-controller window." ) );
 
 	l->addWidget( m_closeButton, 0, 2, 1, 7, Qt::AlignLeft );
 

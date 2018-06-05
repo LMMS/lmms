@@ -39,13 +39,6 @@ class EXPORT CaptionMenu : public QMenu
 public:
 	CaptionMenu( const QString & _title, QWidget * _parent = 0 );
 	virtual ~CaptionMenu();
-
-	///
-	/// \brief Adds a "Help" action displaying the Menu's parent's WhatsThis
-	///		   text when selected.
-	///
-	void addHelpAction();
-
 } ;
 
 

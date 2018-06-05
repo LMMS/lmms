@@ -28,7 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QWhatsThis>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -532,7 +531,6 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -846,13 +844,4 @@ void Knob::doConnections()
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
 						this, SLOT( update() ) );
 	}
-}
-
-
-
-
-void Knob::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
 }
