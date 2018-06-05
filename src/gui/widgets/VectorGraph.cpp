@@ -121,7 +121,7 @@ void VectorGraph::paintEvent( QPaintEvent * event )
 		path.lineTo(rawToCoordX(x), rawToCoordY(y));
 	}
 
-	auto lastPoint = model()->getPoint(currentSection + 1);
+	auto lastPoint = model()->getPoint(model()->getPointCount() - 1);
 
 	path.lineTo(rawToCoordX(lastPoint->x()), rawToCoordY(lastPoint->y()));
 
@@ -629,9 +629,12 @@ void VectorGraphModel::tryMove(int index, float x, float y)
 			{
 				currentPoint->setX((snappedGridLineIndex + 1) / (float)m_numGridLines);
 			}
-			else if (checkRight && potentialSnappedValue > rightPoint->x())
+			else if (checkRight)
 			{
-				currentPoint->setX((snappedGridLineIndex - 1) / (float)m_numGridLines);
+				if (potentialSnappedValue > rightPoint->x())
+				{
+					currentPoint->setX((snappedGridLineIndex - 1) / (float)m_numGridLines);
+				}
 			}
 			else
 			{
