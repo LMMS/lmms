@@ -122,9 +122,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_hp12.setParameters( sampleRate, hpFreq, hpRes, 1 );
 	m_hp24.setParameters( sampleRate, hpFreq, hpRes, 1 );
 	m_hp480.setParameters( sampleRate, hpFreq, hpRes, 1 );
-	m_lp480.setParameters( sampleRate, lpFreq, lpRes, 1 );
 	m_hp481.setParameters( sampleRate, hpFreq, hpRes, 1 );
-	m_lp481.setParameters( sampleRate, hpFreq, hpRes, 1 );
 	m_lowShelf.setParameters( sampleRate, lowShelfFreq, lowShelfRes, lowShelfGain );
 	m_para1.setParameters( sampleRate, para1Freq, para1Bw, para1Gain );
 	m_para2.setParameters( sampleRate, para2Freq, para2Bw, para2Gain );
@@ -134,7 +132,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_lp12.setParameters( sampleRate, lpFreq, lpRes, 1 );
 	m_lp24.setParameters( sampleRate, lpFreq, lpRes, 1 );
 	m_lp480.setParameters( sampleRate, lpFreq, lpRes, 1 );
-	m_lp480.setParameters( sampleRate, lpFreq, lpRes, 1 );
+	m_lp481.setParameters( sampleRate, lpFreq, lpRes, 1 );
 
 
 
