@@ -389,19 +389,9 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	QPushButton * autoSaveResetBtn = new QPushButton(
 			embed::getIconPixmap("reload"), "", auto_save_tw);
-	autoSaveResetBtn->setGeometry(290, 70, 28, 28);
+	autoSaveResetBtn->setGeometry(320, 70, 28, 28);
 	connect(autoSaveResetBtn, SIGNAL(clicked()),
 			this, SLOT(resetAutoSave()));
-	ToolTip::add(autoSaveResetBtn,
-			tr("Reset to default value"));
-
-	QPushButton * saveIntervalBtn = new QPushButton(
-			embed::getIconPixmap("help"), "", auto_save_tw);
-	saveIntervalBtn->setGeometry(320, 70, 28, 28);
-	connect(saveIntervalBtn, SIGNAL(clicked()),
-			this, SLOT(displaySaveIntervalHelp()));
-	ToolTip::add(saveIntervalBtn,
-			tr("Help"));
 
 	m_saveIntervalSlider->setEnabled(m_enableAutoSave);
 	m_runningAutoSave->setVisible(m_enableAutoSave);
@@ -506,14 +496,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 	m_audioInterfaces = new QComboBox(audioiface_tw);
 	m_audioInterfaces->setGeometry(10, 20, 240, 28);
 
-
-	QPushButton * audio_help_btn = new QPushButton(
-			embed::getIconPixmap("help"), "", audioiface_tw);
-	audio_help_btn->setGeometry(320, 20, 28, 28);
-	connect(audio_help_btn, SIGNAL(clicked()),
-			this, SLOT(displayAudioHelp()));
-	ToolTip::add(audio_help_btn,
-			tr("Help"));
 
 	// Ifaces-settings-widget.
 	QWidget * as_w = new QWidget(audio_w);
@@ -630,19 +612,11 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	QPushButton * bufferSize_reset_btn = new QPushButton(
 			embed::getIconPixmap("reload"), "", bufferSize_tw);
-	bufferSize_reset_btn->setGeometry(290, 40, 28, 28);
+	bufferSize_reset_btn->setGeometry(320, 40, 28, 28);
 	connect(bufferSize_reset_btn, SIGNAL(clicked()),
 			this, SLOT(resetBufferSize()));
 	ToolTip::add(bufferSize_reset_btn,
 			tr("Reset to default value"));
-
-	QPushButton * bufferSize_help_btn = new QPushButton(
-			embed::getIconPixmap("help"), "", bufferSize_tw);
-	bufferSize_help_btn->setGeometry(320, 40, 28, 28);
-	connect(bufferSize_help_btn, SIGNAL(clicked()),
-			this, SLOT(displayBufferSizeHelp()));
-	ToolTip::add(bufferSize_help_btn,
-			tr("Help"));
 
 
 	// Audio layout ordering.
@@ -669,15 +643,6 @@ SetupDialog::SetupDialog(ConfigTabs tab_to_open) :
 
 	m_midiInterfaces = new QComboBox(midiiface_tw);
 	m_midiInterfaces->setGeometry(10, 20, 240, 28);
-
-
-	QPushButton * midi_help_btn = new QPushButton(
-			embed::getIconPixmap("help"), "", midiiface_tw);
-	midi_help_btn->setGeometry(320, 20, 28, 28);
-	connect(midi_help_btn, SIGNAL(clicked()),
-			this, SLOT(displayMIDIHelp()));
-	ToolTip::add(midi_help_btn,
-			tr("Help"));
 
 	// Ifaces-settings-widget.
 	QWidget * ms_w = new QWidget(midi_w);
@@ -1211,17 +1176,6 @@ void SetupDialog::resetAutoSave()
 }
 
 
-void SetupDialog::displaySaveIntervalHelp()
-{
-	QWhatsThis::showText(QCursor::pos(),
-			tr("The autosave recovery file is:\n"
-				"%1.\n"
-				"Remember to also save your project manually. "
-				"You can choose to disable saving while playing, "
-				"something some older systems find difficult.").arg(ConfigManager::inst()->recoveryFile()));
-}
-
-
 void SetupDialog::toggleSmoothScroll(bool enabled)
 {
 	m_smoothScroll = enabled;
@@ -1268,17 +1222,6 @@ void SetupDialog::audioInterfaceChanged(const QString & iface)
 }
 
 
-void SetupDialog::displayAudioHelp()
-{
-	QWhatsThis::showText(QCursor::pos(),
-			tr("Here you can select your preferred audio interface. "
-				"The audio interfaces available depend on "
-				"the configuration of your system during compilation time. "
-				"Below is a box which offers controls to "
-				"setup the selected audio interface."));
-}
-
-
 void SetupDialog::setBufferSize(int value)
 {
 	const int step = DEFAULT_BUFFER_SIZE / 64;
@@ -1316,19 +1259,6 @@ void SetupDialog::resetBufferSize()
 }
 
 
-void SetupDialog::displayBufferSizeHelp()
-{
-	QWhatsThis::showText(QCursor::pos(),
-			tr("Here you can setup the internal buffer size "
-				"used by LMMS. Smaller values result "
-				"in a lower latency but also may cause "
-				"unusable sound or bad performance, "
-				"especially on older computers or "
-				"systems with a non-realtime "
-				"kernel."));
-}
-
-
 // MIDI settings slots.
 
 void SetupDialog::midiInterfaceChanged(const QString & iface)
@@ -1341,18 +1271,6 @@ void SetupDialog::midiInterfaceChanged(const QString & iface)
 
 	m_midiIfaceSetupWidgets[m_midiIfaceNames[iface]]->show();
 }
-
-
-void SetupDialog::displayMIDIHelp()
-{
-	QWhatsThis::showText(QCursor::pos(),
-			tr("Here you can select your preferred MIDI interface. "
-				"The MIDI interfaces available depend on "
-				"the configuration of your system during compilation time. "
-				"Below is a box which offers controls to "
-				"setup the selected MIDI interface."));
-}
-
 
 
 // Paths settings slots.

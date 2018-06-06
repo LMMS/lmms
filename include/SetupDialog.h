@@ -83,7 +83,6 @@ private slots:
 	// Performance settings widget.
 	void setAutoSaveInterval(int time);
 	void resetAutoSave();
-	void displaySaveIntervalHelp();
 	void toggleAutoSave(bool enabled);
 	void toggleRunningAutoSave(bool enabled);
 	void toggleSmoothScroll(bool enabled);
@@ -93,15 +92,12 @@ private slots:
 
 	// Audio settings widget.
 	void audioInterfaceChanged(const QString & driver);
-	void displayAudioHelp();
 	void toggleHQAudioDev(bool enabled);
 	void setBufferSize(int value);
 	void resetBufferSize();
-	void displayBufferSizeHelp();
 
 	// MIDI settings widget.
 	void midiInterfaceChanged(const QString & driver);
-	void displayMIDIHelp();
 
 	// Paths settings widget.
 	void openWorkingDir();
