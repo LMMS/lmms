@@ -126,7 +126,7 @@ EOL
 
 chmod +x "${APPDIR}usr/bin/lmms"
 
-# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
@@ -139,13 +139,16 @@ fi
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
-VSTLIB="${APPDIR}usr/lib/lmms/RemoteVstPlugin32.exe.so"
+VSTLIB32="${APPDIR}usr/lib/lmms/RemoteVstPlugin32.exe.so"
+VSTLIB64="${APPDIR}usr/lib/lmms/RemoteVstPlugin64.exe.so"
 
 ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
-VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
+VSTBIN32="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
+VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB" "$VSTBIN"
+mv "$VSTLIB32" "$VSTBIN32"
+mv "$VSTLIB64" "$VSTBIN64"
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
@@ -171,7 +174,8 @@ success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN" "$VSTLIB"
+ln -sr  "$VSTBIN32" "$VSTLIB32"
+ln -sr  "$VSTBIN64" "$VSTLIB64"
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"

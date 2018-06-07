@@ -854,11 +854,10 @@ protected:
 	}
 
 
+	bool m_failed;
 private:
 	void resizeSharedProcessingMemory();
 
-
-	bool m_failed;
 
 	QProcess m_process;
 	ProcessWatcher m_watcher;

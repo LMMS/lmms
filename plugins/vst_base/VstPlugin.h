@@ -139,8 +139,6 @@ private:
 	QSize m_pluginGeometry;
 	const QString m_embedMethod;
 
-	bool m_badDllFormat;
-
 	QString m_name;
 	int m_version;
 	QString m_vendorString;
