@@ -70,7 +70,6 @@ enum VstRemoteMessageIDs
 
 	// remoteVstPlugin -> vstPlugin
 	IdVstFailedLoadingPlugin,
-	IdVstBadDllFormat,
 	IdVstPluginWindowID,
 	IdVstPluginEditorGeometry,
 	IdVstPluginName,
