@@ -63,7 +63,10 @@ void ProcessWatcher::run()
 	{
 		fprintf( stderr,
 				"remote plugin died! invalidating now.\n" );
+
+#ifndef SYNC_WITH_SHM_FIFO
 		m_plugin->invalidate();
+#endif
 	}
 }
 
@@ -464,9 +467,6 @@ void RemotePlugin::processFinished( int exitCode,
 	{
 		qCritical() << "Remote plugin exit code: " << exitCode;
 	}
-#ifndef SYNC_WITH_SHM_FIFO
-	invalidate();
-#endif
 }
 
 void RemotePlugin::processErrored( QProcess::ProcessError err )

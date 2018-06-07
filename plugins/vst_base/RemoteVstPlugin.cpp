@@ -811,11 +811,6 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 	{
 		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
-		// give VstPlugin class a chance to start 32 bit version of RemoteVstPlugin
-		if( GetLastError() == ERROR_BAD_EXE_FORMAT )
-		{
-			sendMessage( IdVstBadDllFormat );
-		}
 		return false;
 	}
 
