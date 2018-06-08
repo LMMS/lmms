@@ -66,6 +66,7 @@ public:
 			"JACK (JACK Audio Connection Kit)" );
 	}
 
+	void syncTransport( bool playing );
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{

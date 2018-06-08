@@ -96,6 +96,17 @@ AudioJack::~AudioJack()
 
 
 
+void AudioJack::syncTransport( bool playing )
+{
+	if (playing) {
+		jack_transport_start(  m_client );
+	} else {
+		jack_transport_stop( m_client );
+	}
+}
+
+
+
 void AudioJack::restartAfterZombified()
 {
 	if( initJackClient() )

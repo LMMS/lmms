@@ -337,6 +337,8 @@ private slots:
 
 	void updateFramesPerTick();
 
+	void onPlaybackStateChanged();
+
 
 
 private:
