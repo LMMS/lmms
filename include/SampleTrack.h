@@ -32,6 +32,7 @@
 #include "FxMixer.h"
 #include "FxLineLcdSpinBox.h"
 #include "Track.h"
+#include "SampleBufferVisualizer.h"
 
 class EffectRackView;
 class Knob;
@@ -126,34 +127,9 @@ protected:
 
 
 private:
-	/**
-	 * @brief Calculate the position and size for a visualization
-	 *		  of a @arg totalTime frames fragment starting from
-	 *		  @arg beginOffset.
-	 * @param globalRect		The parent rectangle.
-	 * @param beginOffset		Offset from the beginning of the tco.
-	 * @param totalTime			Total time we want to visualize.
-	 * @param pixelsPerTact		Current `pixelsPerTact()` result.
-	 * @param isRootRect		Is this a the global rectangle?
-	 *							and we should calculate spacing and
-	 *							sample offset?
-	 */
-	QRect getRectForSampleFragment (QRect globalRect, MidiTime beginOffset,
-									MidiTime totalTime,
-									float pixelsPerTact, bool isRootRect=false);
-
 	SampleTCO * m_tco;
-	QPixmap m_paintPixmap;
 
-
-	struct PaintCacheLine {
-		QPair<QPolygonF, QPolygonF> paintPoly;
-		QRect paintRect;
-		float pixelsPerTact;
-	};
-
-	QVector<PaintCacheLine> m_paintMaps;
-	MidiTime m_cachedTime{0};
+	SampleBufferVisualizer m_sampleBufferVisualizer;
 } ;
 
 

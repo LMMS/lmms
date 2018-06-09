@@ -99,5 +99,7 @@ set(LMMS_SRCS
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
 
+	core/SampleBufferVisualizer.cpp
+
 	PARENT_SCOPE
 )
