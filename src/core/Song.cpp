@@ -261,8 +261,7 @@ void Song::processNextBuffer()
 		}
 	}
 
-	if (isRecording ())
-		emit beforeRecordOn (getPlayPos ());
+
 
 	f_cnt_t framesPlayed = 0;
 	const float framesPerTick = Engine::framesPerTick();
@@ -335,11 +334,14 @@ void Song::processNextBuffer()
 					setToTime(tl->loopBegin());
 
 					if (isRecording ())
-						emit beforeRecordOn (getPlayPos ());
+						emit beforeRecordOn(tl->loopBegin());
 				}
 				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
 				{
 					emit updateSampleTracks();
+
+					if (isRecording())
+						emit beforeRecordOn(tl->loopBegin());
 				}
 			}
 			else
@@ -527,6 +529,17 @@ void Song::playAndRecord()
 {
 	playSong();
 	m_recording = true;
+
+	MidiTime time = getPlayPos();
+	auto tl = getPlayPos().m_timeLine;
+	bool checkLoop =
+		tl != NULL && tl->loopPointsEnabled();
+
+	if (checkLoop && (time >= tl->loopEnd() || time < tl->loopBegin())) {
+		time = tl->loopBegin();
+	}
+
+	emit beforeRecordOn(time);
 }
 
 
