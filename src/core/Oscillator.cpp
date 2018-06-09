@@ -46,12 +46,16 @@ void Oscillator::waveTableInit()
 			s_waveTableBandFreqs[s_waveTablesPerWaveformCount] = 440.0 * powf(2.0, (i - 69.0) / 12.0);
 			s_waveTablesPerWaveformCount++;
 		}
-	}
+	
 
 	if (!s_waveTables)
 	{
 		allocWaveTables();
 		generateWaveTables();
+	}
+	fftwf_destroy_plan(m_fftPlan);
+	fftwf_destroy_plan(m_ifftPlan);
+	fftwf_free(m_specBuf);
 	}
 }
 
@@ -75,11 +79,11 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 	m_useWaveTable( false ),
 	m_generatedWaveTable( 0 ),
 	m_fftPlan( 0 ),
-	m_ifftPlan( 0 )
+	m_ifftPlan( 0 ),
+	m_specBuf( 0 )
 
 
 {
-	waveTableInit();
 }
 
 
@@ -200,34 +204,35 @@ void Oscillator::generateSquareWaveTable(int bands)
 void Oscillator::generateFromFFT(int bands, float threshold)
 {
 	float max = 0;
-	//set bands to zero
+	
+	//set unrequired bands to zero 
 	for (int i = bands; i < WAVETABLE_LENGTH * 2 + 1 - bands; i++)
 	{
 		m_specBuf[i][0] = 0.0f;
 		m_specBuf[i][1] = 0.0f;
-
-		for (int i = 0; i < WAVETABLE_LENGTH * 2 + 1; ++i)
+	}
+	for (int i = 0; i < WAVETABLE_LENGTH * 2 + 1; ++i)
+	{
+		if (m_specBuf[i][0] * m_specBuf[i][0] + m_specBuf[i][1] * m_specBuf[i][1] < threshold)
 		{
-			if (m_specBuf[i][0] * m_specBuf[i][0] + m_specBuf[i][1] * m_specBuf[i][1] < threshold)
-			{
-				m_specBuf[i][0] = 0.0f;
-				m_specBuf[i][1] = 0.0f;
-			}
-		}
-		//ifft
-		fftwf_execute(m_ifftPlan);
-		//normalise
-		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
-		{
-			max = fmax(max, m_sampleBuffer[i]);
-		}
-		//copy to generateWaveTable
-		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
-		{
-			m_generatedWaveTable[i] = m_sampleBuffer[i] / max;
+			m_specBuf[i][0] = 0.0f;
+			m_specBuf[i][1] = 0.0f;
 		}
 	}
+	//ifft
+	fftwf_execute(m_ifftPlan);
+	//normalise
+	for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+	{
+		max = fmax(max, m_sampleBuffer[i]);
+	}
+	//copy to generateWaveTable
+	for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+	{
+		m_generatedWaveTable[i] = m_sampleBuffer[i] / max;
+	}
 }
+
 
 int Oscillator::waveTableBandFromFreq(float freq)
 {
@@ -290,28 +295,28 @@ void Oscillator::generateWaveTables()
 		s_waveTables[WaveShapes::TriangleWave][i] = m_generatedWaveTable;
 	}
 	//generate moogSaw tables
-	//generate singnal buffer
-	for (int i = 0; i < WAVETABLE_LENGTH; ++i)
-	{
-		m_sampleBuffer[i] = moogSawSample( (float)i / (float)WAVETABLE_LENGTH);
-	}
-	fftwf_execute(m_fftPlan);
+	//generate signal buffer
 	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
 	{
+		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+		{
+			m_sampleBuffer[i] = moogSawSample((float)i / (float)WAVETABLE_LENGTH);
+		}
+		fftwf_execute(m_fftPlan);
 		m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
 		generateFromFFT(MAX_FREQ / s_waveTableBandFreqs[i],0.2f);
 		s_waveTables[WaveShapes::MoogSawWave][i] = m_generatedWaveTable;
 	}
 
 	//generate Exp tables
-	//generate singnal buffer
-	for (int i = 0; i < WAVETABLE_LENGTH; ++i)
-	{
-		m_sampleBuffer[i] = expSample((float)i / (float)WAVETABLE_LENGTH);
-	}
-	fftwf_execute(m_fftPlan);
+	//generate signal buffer
 	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
 	{
+		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+		{
+			m_sampleBuffer[i] = expSample((float)i / (float)WAVETABLE_LENGTH);
+		}
+		fftwf_execute(m_fftPlan);
 		m_generatedWaveTable = new sample_t[WAVETABLE_LENGTH];
 		generateFromFFT(MAX_FREQ / s_waveTableBandFreqs[i],0.2f);
 		s_waveTables[WaveShapes::ExponentialWave][i] = m_generatedWaveTable;
@@ -706,9 +711,13 @@ inline sample_t Oscillator::getSample<Oscillator::SineWave>(
 							const float _sample )
 {
 	if (m_useWaveTable)
-		{return wtSample(WaveShapes::SineWave,_sample);}
+	{
+		return wtSample(WaveShapes::SineWave,_sample);
+	}
 	else
-		{return sinSample(_sample);}
+	{
+		return sinSample(_sample);
+	}
 }
 
 
@@ -719,9 +728,13 @@ inline sample_t Oscillator::getSample<Oscillator::TriangleWave>(
 		const float _sample )
 {
 	if (m_useWaveTable)
-		{return wtSample(WaveShapes::TriangleWave,_sample);}
+	{
+		return wtSample(WaveShapes::TriangleWave,_sample);
+	}
 	else
-		{return triangleSample(_sample);}
+	{
+		return triangleSample(_sample);
+	}
 }
 
 
@@ -732,9 +745,13 @@ inline sample_t Oscillator::getSample<Oscillator::SawWave>(
 		const float _sample )
 {
 	if (m_useWaveTable)
-		{return wtSample(WaveShapes::SawWave, _sample);}
+	{
+		return wtSample(WaveShapes::SawWave, _sample);
+	}
 	else
-		{return( sawSample( _sample ) );}
+	{
+		return sawSample(_sample);
+	}
 }
 
 
@@ -745,9 +762,13 @@ inline sample_t Oscillator::getSample<Oscillator::SquareWave>(
 		const float _sample )
 {
 	if (m_useWaveTable)
-		{return wtSample(WaveShapes::SquareWave, _sample);}
+	{
+		return wtSample(WaveShapes::SquareWave, _sample);
+	}
 	else
-		{return( squareSample( _sample ) );}
+	{
+		return squareSample(_sample);
+	}
 }
 
 
@@ -758,9 +779,13 @@ inline sample_t Oscillator::getSample<Oscillator::MoogSawWave>(
 							const float _sample )
 {
 	if (m_useWaveTable)
-	{return wtSample(WaveShapes::MoogSawWave, _sample);}
+	{
+		return wtSample(WaveShapes::MoogSawWave, _sample);
+	}
 	else
-		{return( moogSawSample( _sample ) );}
+	{
+		return moogSawSample(_sample);
+	}
 }
 
 
@@ -771,9 +796,13 @@ inline sample_t Oscillator::getSample<Oscillator::ExponentialWave>(
 							const float _sample )
 {
 	if (m_useWaveTable)
-		{return wtSample(WaveShapes::ExponentialWave, _sample);}
+	{
+		return wtSample(WaveShapes::ExponentialWave, _sample);
+	}
 	else
-		{return( expSample( _sample ) );}
+	{
+		return expSample(_sample);
+	}
 }
 
 

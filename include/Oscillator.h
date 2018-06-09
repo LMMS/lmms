@@ -82,9 +82,6 @@ public:
 	virtual ~Oscillator()
 	{
 		delete m_subOsc;
-		if (m_fftPlan) {fftwf_destroy_plan(m_fftPlan);}
-		if (m_ifftPlan) {fftwf_destroy_plan(m_ifftPlan);}
-		fftwf_free(m_specBuf);
 	}
 
 
