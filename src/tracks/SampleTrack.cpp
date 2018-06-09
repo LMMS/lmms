@@ -459,7 +459,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	p.setPen( !muted ? p.pen().brush().color() : mutedColor() );
 
-	Q_ASSERT(! fixedTCOs());
 	auto timeSig = TimeSig(Engine::getSong()->getTimeSigModel());
 	auto realTicksPerDefaultTicks = float(float(MidiTime::ticksPerTact(timeSig) / MidiTime::ticksPerTact()));
 	auto normalizedPixelsPerTact = pixelsPerTact() * realTicksPerDefaultTicks;
@@ -764,6 +763,7 @@ void SampleTrack::beforeRecordOn(MidiTime time)
 			fallbackRecordTCO->setIsPlaying (false);
 
 			fallbackRecordTCO->setAutoResize (true);
+
 			Engine::mixer()->doneChangeInModel();
 
 		}
