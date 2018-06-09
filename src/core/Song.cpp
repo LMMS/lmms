@@ -126,10 +126,12 @@ Song::~Song()
 
 void Song::onPlaybackStateChanged()
 {
+	#ifdef LMMS_HAVE_JACK
 	AudioJack *device = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
 	if (device) {
 		device->syncTransport(m_playing);
 	}
+	#endif
 }
 
 void Song::masterVolumeChanged()
