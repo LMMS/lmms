@@ -41,6 +41,7 @@ SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTime
 	m_recordingChannel{dynamic_cast<SampleTrack*>(m_track)->recordingChannel ()},
 	m_startRecordTimeOffset{startRecordTimeOffset}
 {
+	m_tco->setIsRecording(true);
 }
 
 
@@ -56,6 +57,8 @@ SampleRecordHandle::~SampleRecordHandle()
 		m_tco->setAutoResize (false);
 		m_tco->setRecord( false );
 	}
+
+	m_tco->setIsRecording(false);
 }
 
 
