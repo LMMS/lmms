@@ -242,6 +242,15 @@ void TrackContentObject::setStartTimeOffset( const MidiTime &startTimeOffset )
 	m_startTimeOffset = startTimeOffset;
 }
 
+bool TrackContentObject::isRecording() const
+{
+	return m_isRecording;
+}
+
+void TrackContentObject::setIsRecording(bool value)
+{
+	m_isRecording = value;
+}
 
 
 
@@ -519,7 +528,6 @@ void TrackContentObjectView::updatePosition()
 }
 
 
-
 /*! \brief Change the trackContentObjectView's display when something
  *  being dragged enters it.
  *
@@ -714,6 +722,10 @@ void TrackContentObjectView::paintTextLabel(QString const & text, QPainter & pai
  */
 void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 {
+	// Disallow changes to a track that is being recorded into.
+	if (m_tco->isRecording())
+		return;
+
 	setInitialMousePos( me->pos() );
 	if( !fixedTCOs() && me->button() == Qt::LeftButton )
 	{
@@ -728,7 +740,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 				m_action = ToggleSelected;
 			}
 		}
-		else if( !me->modifiers() )
+		else if( !me->modifiers())
 		{
 			if( isSelected() )
 			{
