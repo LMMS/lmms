@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SampleTrack.cpp - implementation of class SampleTrack, a track which
  *                   provides arrangement of samples
  *
@@ -272,8 +272,7 @@ TrackContentObjectView * SampleTCO::createView( TrackView * _tv )
 
 SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	TrackContentObjectView( _tco, _tv ),
-	m_tco( _tco ),
-	m_paintPixmap()
+	m_tco( _tco )
 {
 	// update UI and tooltip
 	updateSample();
@@ -418,22 +417,9 @@ void SampleTCOView::mouseDoubleClickEvent( QMouseEvent * )
 
 void SampleTCOView::paintEvent( QPaintEvent * pe )
 {
-	QPainter painter( this );
-
-	if( !needsUpdate() )
-	{
-		painter.drawPixmap( 0, 0, m_paintPixmap );
-		return;
-	}
+	QPainter p( this );
 
 	setNeedsUpdate( false );
-
-	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
-	{
-		m_paintPixmap = QPixmap(size());
-	}
-
-	QPainter p( &m_paintPixmap );
 
 	QLinearGradient lingrad( 0, 0, 0, height() );
 	QColor c;
@@ -446,7 +432,7 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	else if (m_tco->isRecord ())
 		c = recordingBackgroundColor ();
 	else
-		c = painter.background ().color ();
+		c = p.background ().color ();
 
 	lingrad.setColorAt( 1, c.darker( 300 ) );
 	lingrad.setColorAt( 0, c );
@@ -463,81 +449,28 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 		p.fillRect( rect(), c );
 	}
 
-	p.setPen( !muted ? painter.pen().brush().color() : mutedColor() );
+	p.setPen( !muted ? p.pen().brush().color() : mutedColor() );
 
-	MidiTime currentSampleTime = m_tco->sampleLength();
-	auto framesPerTick = Engine::framesPerTick(m_tco->sampleBuffer ()->sampleRate ());
-	auto currentPixelsPerTact = pixelsPerTact();
-	auto globalRect = getRectForSampleFragment (rect(),
-												0,
-												currentSampleTime,
-												currentPixelsPerTact,
-												true);
+	auto timeSig = TimeSig(Engine::getSong()->getTimeSigModel());
+	auto realTicksPerDefaultTicks = float(float(MidiTime::ticksPerTact(timeSig) / MidiTime::ticksPerTact()));
+	auto normalizedPixelsPerTact = pixelsPerTact() * realTicksPerDefaultTicks;
+	auto normalizedFramesPerTick = Engine::framesPerTick(m_tco->sampleBuffer()->sampleRate()) * realTicksPerDefaultTicks;
 
+	const int spacing = TCO_BORDER_WIDTH + 1;
 
-	// We have a cache mismatch, lets clear the current one.
-	if (currentSampleTime < m_cachedTime) {
-		m_cachedTime = 0;
-		m_paintMaps.clear ();
-	}
-
-	// We've need to visualize more frames.
-	if (currentSampleTime > m_cachedTime) {
-		PaintCacheLine cacheLine;
-
-		// We're visualizing the end: from the past-one we previously visualized
-		// to the last one in the buffer.
-		cacheLine.paintRect = getRectForSampleFragment (globalRect,
-														m_cachedTime,
-														currentSampleTime-m_cachedTime,
-														currentPixelsPerTact);
-		cacheLine.pixelsPerTact = currentPixelsPerTact;
-
-		if (m_tco->sampleBuffer ()->tryDataReadLock ()) {
-			// Generate the actual visualization.
-			cacheLine.paintPoly = m_tco->m_sampleBuffer->visualizeToPoly (cacheLine.paintRect,
-																		  pe->rect(),
-																		  m_cachedTime.frames (framesPerTick),
-																		  currentSampleTime.frames (framesPerTick));
-			m_tco->m_sampleBuffer->dataUnlock ();
-
-			m_paintMaps.push_back (std::move (cacheLine));
-			m_cachedTime = currentSampleTime;
-		} else {
-
-			// We have not really did much.
-			setNeedsUpdate (true);
-		}
-	}
-
-	p.setRenderHint (QPainter::Antialiasing);
-
-	// Draw all the cached maps.
-	for (auto &map : m_paintMaps) {
-		// Normalize cache that has been generated
-		// with different PixelsPerTact value (zoom has
-		// been changed).
-		if (map.pixelsPerTact > currentPixelsPerTact || map.pixelsPerTact < currentPixelsPerTact) {
-			QTransform transform;
-			transform.scale(static_cast<qreal>(currentPixelsPerTact) / static_cast<qreal>(map.pixelsPerTact), 1);
-
-			map.paintPoly.first = transform.map(map.paintPoly.first);
-			map.paintPoly.second = transform.map(map.paintPoly.second);
-			map.pixelsPerTact = currentPixelsPerTact;
-		}
-
-		// Paint the visualization.
-		p.drawPolyline (map.paintPoly.first);
-		p.drawPolyline (map.paintPoly.second);
-	}
-
-	// Cache only TCOs that are being recorded into.
-	// Clear the cache and let it generate a new line
-	// and then visualize it.
-	if (!m_tco->isRecord () || !Engine::getSong ()->isRecording ()) {
-		m_cachedTime = 0;
-		m_paintMaps.clear ();
-	}
+	QMargins margins(spacing,
+					 TCO_BORDER_WIDTH-1,
+					 spacing,
+					 TCO_BORDER_WIDTH);
+	m_sampleBufferVisualizer.update(*m_tco->sampleBuffer(),
+									m_tco->startTimeOffset(),
+									m_tco->sampleLength(),
+									rect()-margins,
+									normalizedPixelsPerTact,
+									f_cnt_t (normalizedFramesPerTick),
+									p.pen(),
+									SampleBufferVisualizer::Operation::Append);
+	m_sampleBufferVisualizer.draw(p);
 
 	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
 	QString filename = fileInfo.fileName();
@@ -565,51 +498,6 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	}
 
 	p.end();
-
-	painter.drawPixmap( 0, 0, m_paintPixmap );
-}
-
-QRect SampleTCOView::getRectForSampleFragment(QRect globalRect, MidiTime beginOffset,
-											  MidiTime totalTime, float pixelsPerTact, bool isRootRect) {
-	const int spacing = TCO_BORDER_WIDTH + 1;
-	float ppt;
-	if (fixedTCOs ()) {
-		auto width = globalRect.width ();
-		if (isRootRect)
-			width =- 2 * TCO_BORDER_WIDTH;
-
-		ppt = ( width  )
-				/ (float) m_tco->length().getTact();
-	} else {
-		ppt = pixelsPerTact;
-	}
-
-	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
-	float den = Engine::getSong()->getTimeSigModel().getDenominator();
-	float ticksPerTact = DefaultTicksPerTact * nom / den;
-
-	float offset =  (beginOffset) / ticksPerTact * pixelsPerTact;
-	if (isRootRect) {
-			offset += TCO_BORDER_WIDTH;
-			offset += m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact;
-	}
-
-	float top = globalRect.top ();
-	if (isRootRect) {
-		top += spacing;
-	}
-
-	float height = globalRect.height ();
-	if (isRootRect) {
-		height -= spacing * 2;
-	}
-
-	QRect r = QRect( globalRect.left () + offset,
-					 top,
-					 (qMax( static_cast<int>( totalTime * ppt / ticksPerTact ), 1 )),
-					 height);
-
-	return r;
 }
 
 
@@ -870,6 +758,7 @@ void SampleTrack::beforeRecordOn(MidiTime time)
 			fallbackRecordTCO->setIsPlaying (false);
 
 			fallbackRecordTCO->setAutoResize (true);
+
 			Engine::mixer()->doneChangeInModel();
 
 		}
