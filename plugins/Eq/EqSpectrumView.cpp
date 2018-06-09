@@ -207,6 +207,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	const int LOWER_Y = -36;	// dB
 	QPainter painter( this );
 	painter.setPen( QPen( m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	if( m_analyser->getInProgress() || m_periodicalUpdate == false )
 	{
