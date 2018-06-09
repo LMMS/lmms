@@ -837,35 +837,47 @@ void SampleBuffer::visualize( QPainter & _p, const QRect & _dr,
 }
 
 QPair<QPolygonF, QPolygonF> SampleBuffer::visualizeToPoly(const QRect &_dr, const QRect &_clip,
-														  f_cnt_t _from_frame, f_cnt_t _to_frame)
+														  f_cnt_t _from_frame, f_cnt_t _to_frame) const
 {
 	if( internalFrames () == 0 ) return {};
 
-	const bool focus_on_range = _to_frame <= internalFrames()
-					&& _from_frame < _to_frame;
+	const bool focus_on_range = _from_frame < _to_frame;
+	if (_to_frame > frames())
+		_to_frame = frames();
+
 	//_p.setClipRect( _clip );
 	const int w = _dr.width();
 	const int h = _dr.height();
 
-	const int yb = h / 2 + _dr.y();
-	const float y_space = h*0.5f;
+//	const int yb = h / 2 + _dr.y();
+	int y_space = (h/2);
+
 	const int nb_frames = focus_on_range ? _to_frame - _from_frame : internalFrames();
 	if (nb_frames == 0) return {};
 
 	const int fpp = tLimit<int>( nb_frames / w, 1, 20 );
-	auto l = QPolygonF();
-	auto r = QPolygonF();
+
+	bool shouldAddAdditionalPoint  = (nb_frames % fpp) != 0;
+	int pointsCount = (nb_frames / fpp) + (shouldAddAdditionalPoint ? 1 : 0);
+	auto l = QPolygonF(pointsCount);
+	auto r = QPolygonF(pointsCount);
 
 	int n = 0;
 	const int xb = _dr.x();
 	const int first = focus_on_range ? _from_frame : 0;
 	const int last = focus_on_range ? _to_frame : internalFrames();
+
+	int zeroPoint = _dr.y() + y_space;
+	if (h % 2 != 0)
+		zeroPoint += 1;
 	for( int frame = first; frame < last; frame += fpp )
 	{
-		l.push_back( QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-							  ( yb - ( m_data[frame][0] * y_space * m_amplification ) ) ));
-		r.push_back(QPointF( xb + ( (frame - first) * double( w ) / nb_frames ),
-							 ( yb - ( m_data[frame][1] * y_space * m_amplification ) ) ));
+		double x = (xb + (frame - first) * double( w ) / nb_frames);
+
+		l[n] = QPointF(x,
+						( zeroPoint + ( m_data[frame][0] * y_space * m_amplification ) ) );
+		r[n] = QPointF(x,
+						( zeroPoint + ( m_data[frame][1] * y_space * m_amplification ) ) );
 
 		++n;
 	}
