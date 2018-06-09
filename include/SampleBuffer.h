@@ -132,7 +132,7 @@ public:
 		visualize( _p, _dr, _dr, _from_frame, _to_frame );
 	}
 
-	QPair<QPolygonF, QPolygonF>  visualizeToPoly( const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0);
+	QPair<QPolygonF, QPolygonF>  visualizeToPoly( const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0) const;
 
 	inline const QString & audioFile() const
 	{
