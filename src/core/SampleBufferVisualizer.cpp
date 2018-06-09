@@ -58,7 +58,10 @@ void SampleBufferVisualizer::update(const SampleBuffer &sampleBuffer,
 		m_currentPixmap.pixmap = QPixmap();
 		m_currentPixmap.totalTime = 0;
 		m_cachedTime = 0;
+
+#ifdef Q_FALLTHROUGH
 	Q_FALLTHROUGH();
+#endif
 	case Operation::Append:
 		appendMultipleTacts(sampleBuffer,
 							sampleLength,
