@@ -325,7 +325,7 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleSF( const char * _f,
 			_samplerate = sf_info.samplerate;
 
 			sf_close( snd_file );
-			return {};
+			return vector;
 		}
 
 		if( sf_rr < sf_info.channels * frames )
