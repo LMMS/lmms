@@ -186,6 +186,7 @@ void SampleBuffer::changeAudioFile(QString audioFile)
 		}
 	}
 
+	QString loadingWarning;
 	if( !fileLoadError ) {
 
 #ifdef LMMS_HAVE_OGGVORBIS
@@ -199,7 +200,7 @@ void SampleBuffer::changeAudioFile(QString audioFile)
 #endif
 		if(fileData.empty ())
 		{
-			fileData = decodeSampleSF( f, channels, samplerate );
+			fileData = decodeSampleSF( f, channels, samplerate, loadingWarning );
 		}
 #ifdef LMMS_HAVE_OGGVORBIS
 		if( fileData.empty () )
@@ -226,10 +227,12 @@ void SampleBuffer::changeAudioFile(QString audioFile)
 		QString message = tr( "Audio files are limited to %1 MB "
 							  "in size and %2 minutes of playing time"
 							  ).arg( fileSizeMax ).arg( sampleLengthMax );
+		if (! loadingWarning.isEmpty())
+			message = loadingWarning;
 		if( gui )
 		{
 			QMessageBox::information( NULL,
-									  title, message,	QMessageBox::Ok );
+									  title, message,	QMessageBox::Warning );
 		}
 		else
 		{
@@ -298,10 +301,10 @@ SampleBuffer::resampleData (const DataVector &inputData, sample_rate_t inputSamp
 	return outputData;
 }
 
-
 SampleBuffer::DataVector SampleBuffer::decodeSampleSF( const char * _f,
-					ch_cnt_t & _channels,
-					sample_rate_t &_samplerate)
+													   ch_cnt_t & _channels,
+													   sample_rate_t &_samplerate,
+													   QString &loadingWarning)
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
@@ -314,18 +317,16 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleSF( const char * _f,
 	{
 		frames = sf_info.frames;
 		vector.resize (frames);
-		sf_rr = sf_read_float( snd_file, vector.data ()->data (), DEFAULT_CHANNELS * frames );
+		sf_rr = sf_read_float( snd_file, vector.data ()->data (), min(DEFAULT_CHANNELS * frames, sf_info.channels * frames));
 
-		if (sf_info.channels != DEFAULT_CHANNELS) {
+		if (sf_info.channels == 1) {
 #ifdef DEBUG_LMMS
 			qDebug( "SampleBuffer::decodeSampleSF(): Not a stereo file: %s: %s", _f, sf_strerror( NULL ) );
 #endif
-
-			_channels = sf_info.channels;
-			_samplerate = sf_info.samplerate;
-
-			sf_close( snd_file );
-			return vector;
+			vector.resize(frames / 2);
+		} else if (sf_info.channels > DEFAULT_CHANNELS) {
+			loadingWarning = tr("The file you've selected has %1 channels. LMMS support "
+												  "Stereo and Mono.").arg(sf_info.channels);
 		}
 
 		if( sf_rr < sf_info.channels * frames )
@@ -346,6 +347,7 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleSF( const char * _f,
 		qDebug( "SampleBuffer::decodeSampleSF(): could not load "
 				"sample %s: %s", _f, sf_strerror( NULL ) );
 #endif
+		loadingWarning = tr("SoundFile: Could not load: %1").arg(sf_strerror( NULL ));
 	}
 
 	return vector;

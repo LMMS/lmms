@@ -313,7 +313,7 @@ protected:
 
 	static DataVector convertIntToFloat(int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 
-	static DataVector decodeSampleSF( const char * _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
+	static DataVector decodeSampleSF(const char * _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate, QString &loadingWarning);
 #ifdef LMMS_HAVE_OGGVORBIS
 	static DataVector decodeSampleOGGVorbis( const char * _f,
 						ch_cnt_t & _channels,
