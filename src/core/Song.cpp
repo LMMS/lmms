@@ -333,7 +333,8 @@ void Song::processNextBuffer()
 					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
 					setToTime(tl->loopBegin());
 
-					emit beforeRecordOn(tl->loopBegin());
+					if (isRecording())
+						emit beforeRecordOn(tl->loopBegin());
 				}
 				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
 				{
