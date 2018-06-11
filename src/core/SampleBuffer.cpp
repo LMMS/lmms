@@ -138,6 +138,18 @@ void SampleBuffer::sampleRateChanged() {
 	}
 }
 
+void SampleBuffer::internalAddData(const DataVector &vector, sample_rate_t sampleRate)
+{
+	Q_ASSERT(sampleRate == m_sampleRate);
+	m_data.insert (m_data.end (), vector.cbegin (), vector.cend ());
+}
+
+void SampleBuffer::internalResetData(DataVector &&newData, sample_rate_t dataSampleRate) {
+	Q_UNUSED(dataSampleRate);
+	m_audioFile = QString();
+	m_data = std::move (newData);
+}
+
 sample_rate_t SampleBuffer::mixerSampleRate()
 {
 	return Engine::mixer ()->processingSampleRate ();
@@ -541,7 +553,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 	bool is_backwards = _state->isBackwards();
 
 	const double freq_factor = (double) _freq / (double) m_frequency *
-		m_sampleRate / Engine::mixer()->processingSampleRate();
+		 double(m_sampleRate) / double(Engine::mixer()->processingSampleRate());
 
 	// calculate how many frames we have in requested pitch
 	const f_cnt_t total_frames_for_current_pitch = static_cast<f_cnt_t>( (
@@ -589,7 +601,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		src_data.data_out = _ab->data ();
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
-		src_data.src_ratio = 1.0 / freq_factor;
+		src_data.src_ratio =  double(Engine::mixer()->processingSampleRate())/ double(m_sampleRate);
 		src_data.end_of_input = 0;
 		int error = src_process( _state->m_resamplingData,
 								&src_data );
@@ -1136,6 +1148,23 @@ void SampleBuffer::beginBufferChange(bool shouldLock, bool shouldLockMixer)
 	}
 }
 
+bool SampleBuffer::tryBeginBufferChange(bool shouldLock, bool shouldLockMixer) {
+	bool result = true;
+
+	if (shouldLockMixer) {
+		Engine::mixer ()->requestChangeInModel ();
+	}
+
+	if (shouldLock) {
+		result = m_varLock.tryLockForWrite();
+
+		if (! result)
+			Engine::mixer ()->doneChangeInModel();
+	}
+
+	return result;
+}
+
 void SampleBuffer::doneBufferChange(bool shouldUnlock,
 									sample_rate_t bufferSampleRate,
 									bool shouldUnlockMixer) {
@@ -1155,6 +1184,34 @@ void SampleBuffer::doneBufferChange(bool shouldUnlock,
 	emit sampleUpdated();
 }
 
+bool SampleBuffer::tryAddData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer) {
+	DataVector newVector;
+
+	if (sampleRate != m_sampleRate) {
+		// We should resample this data;
+
+		newVector = resampleData (vector, sampleRate, m_sampleRate);
+		sampleRate = m_sampleRate;
+	}
+
+	// First of all, don't let anyone read.
+	if (! tryBeginBufferChange (true, shouldLockMixer))
+		return false;
+	{
+		if (newVector.empty())
+			internalAddData(vector,
+							sampleRate);
+		else
+			internalAddData(newVector,
+							sampleRate);
+	}
+	doneBufferChange (true, /* lock */
+					  this->sampleRate(),
+					  shouldLockMixer);
+
+	return true;
+}
+
 void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer) {
 	DataVector newVector;
 
@@ -1162,18 +1219,18 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 		// We should resample this data;
 
 		newVector = resampleData (vector, sampleRate, m_sampleRate);
+		sampleRate = m_sampleRate;
 	}
 
 	// First of all, don't let anyone read.
 	beginBufferChange (true, shouldLockMixer);
 	{
-		if (! newVector.empty()) {
-			// Insert to the end of the resampled vector.
-			m_data.insert (m_data.end (), newVector.cbegin (), newVector.cend ());
-		} else {
-			// Insert to the end of the vector.
-			m_data.insert (m_data.end (), vector.cbegin (), vector.cend ());
-		}
+		if (newVector.empty())
+			internalAddData(vector,
+							sampleRate);
+		else
+			internalAddData(newVector,
+							sampleRate);
 	}
 	doneBufferChange (true, /* lock */
 					  this->sampleRate(),
@@ -1183,12 +1240,24 @@ void SampleBuffer::addData(const SampleBuffer::DataVector &vector, sample_rate_t
 void SampleBuffer::resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer) {
 	beginBufferChange (true, shouldLockMixer);
 	{
-		m_audioFile = QString();
-		m_data = std::move (newData);
+		internalResetData(std::move(newData), dataSampleRate);
 	}
 	doneBufferChange (true, /* lock */
 					  dataSampleRate,
 					  shouldLockMixer);
+}
+
+bool SampleBuffer::tryResetData(SampleBuffer::DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer) {
+	if (! tryBeginBufferChange (true, shouldLockMixer))
+		return false;
+	{
+		internalResetData(std::move(newData), dataSampleRate);
+	}
+	doneBufferChange (true, /* lock */
+					  dataSampleRate,
+					  shouldLockMixer);
+
+	return true;
 }
 
 void SampleBuffer::reverse(bool shouldLockMixer) {
