@@ -70,11 +70,11 @@ namespace PE
 // Utilities for reading PE file machine type
 // See specification at https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx
 
-enum MachineType : uint16_t
+enum class MachineType : uint16_t
 {
-	IMAGE_FILE_MACHINE_UNKNOWN = 0x0,
-	IMAGE_FILE_MACHINE_AMD64 = 0x8664,
-	IMAGE_FILE_MACHINE_I386 = 0x14c,
+	unknown = 0x0,
+	amd64 = 0x8664,
+	i386 = 0x14c,
 };
 
 class FileInfo
@@ -153,15 +153,15 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 		machineType = peInfo.machineType();
 	} catch (std::runtime_error& e) {
 		qCritical() << "Error while determining PE file's machine type: " << e.what();
-		machineType = PE::IMAGE_FILE_MACHINE_UNKNOWN;
+		machineType = PE::MachineType::unknown;
 	}
 
 	switch(machineType)
 	{
-	case PE::IMAGE_FILE_MACHINE_AMD64:
+	case PE::MachineType::amd64:
 		tryLoad( "RemoteVstPlugin64" );
 		break;
-	case PE::IMAGE_FILE_MACHINE_I386:
+	case PE::MachineType::i386:
 		tryLoad( "RemoteVstPlugin32" );
 		break;
 	default:
