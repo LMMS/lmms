@@ -70,6 +70,11 @@ namespace PE
 // Utilities for reading PE file machine type
 // See specification at https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx
 
+// Work around name conflict
+#ifdef i386
+#	undef i386
+#endif
+
 enum class MachineType : uint16_t
 {
 	unknown = 0x0,
