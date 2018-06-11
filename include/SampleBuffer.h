@@ -254,12 +254,20 @@ public:
 	static QString tryToMakeAbsolute(const QString & file);
 
 	/**
+	 * @brief Try to add data to the buffer,
+	 * @param begin	Beginning of an InputIterator.
+	 * @param end	End of an InputIterator.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @return
+	 */
+	bool tryAddData(const DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer=true);
+
+	/**
 	 * @brief Add data to the buffer,
 	 * @param begin	Beginning of an InputIterator.
 	 * @param end	End of an InputIterator.
 	 * @param shouldLockMixer	Should we call requestChangeInModel?
-	 *
-	 * @warning That locks m_varLock for write.
+	 * @return
 	 */
 	void addData(const DataVector &vector, sample_rate_t sampleRate, bool shouldLockMixer=true);
 
@@ -270,6 +278,15 @@ public:
 	 * @param shouldLockMixer	Should we call requestChangeInModel?
 	 */
 	void resetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer=true);
+
+	/**
+	 * @brief A non-blocking version of resetData.
+	 * @param newData	mm, that's the new data.
+	 * @param dataSampleRate	Sample rate for @a newData.
+	 * @param shouldLockMixer	Should we call requestChangeInModel?
+	 * @return
+	 */
+	bool tryResetData(DataVector &&newData, sample_rate_t dataSampleRate, bool shouldLockMixer=true);
 
 	/**
 	 * @brief Just reverse the current buffer.
@@ -290,6 +307,9 @@ public slots:
 	void sampleRateChanged();
 
 protected:
+	void internalAddData(const DataVector &vector, sample_rate_t sampleRate);
+	void internalResetData(DataVector &&newData, sample_rate_t dataSampleRate);
+
 	QString & toBase64( QString & _dst ) const;
 	inline void setSampleRate( sample_rate_t _rate )
 	{
@@ -359,6 +379,8 @@ protected:
 	 * @param shouldLock	Is anyone else might be using m_data?
 	 */
 	void beginBufferChange (bool shouldLock, bool shouldLockMixer=true);
+
+	bool tryBeginBufferChange(bool shouldLock, bool shouldLockMixer=true);
 
 	/**
 	 * @brief Do some actions necessary after changing m_data.
