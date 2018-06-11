@@ -111,12 +111,7 @@ void SampleBufferVisualizer::appendMultipleTacts(const SampleBuffer &sampleBuffe
 
 		Q_ASSERT((offsetFromTact + totalTime) <= MidiTime::ticksPerTact());
 
-		auto result = appendTact(sampleBuffer,
-								 totalTime,
-								 parentRect,
-								 pen,
-								 isCompleteTact);
-		if (! result) {
+		if (pixelsPerTime(totalTime) < 1) {
 			// We can't paint it.
 			// totalTime is too short. skip it.
 			// or just wait until we have enough frames.
@@ -127,8 +122,15 @@ void SampleBufferVisualizer::appendMultipleTacts(const SampleBuffer &sampleBuffe
 				// Wait until we have enough frames.
 				break;
 			}
-
 		}
+
+		auto result = appendTact(sampleBuffer,
+								 totalTime,
+								 parentRect,
+								 pen,
+								 isCompleteTact);
+		if (! result)
+			break;
 
 		if (isCompleteTact) {
 			m_cachedTime += ( m_currentPixmap.totalTime );
@@ -151,14 +153,13 @@ bool SampleBufferVisualizer::appendTact(const SampleBuffer &sampleBuffer,
 														offsetFromTact,
 														totalTime,
 														isLastInTact);
-	if (currentPaintInTact.width() < 1) {
-		return false;
-	}
+	Q_ASSERT(currentPaintInTact.width() > 0);
 
 	// Generate the actual visualization.
 	auto fromFrame = MidiTime(m_cachedTime + offsetFromTact).frames (m_framesPerTact);
 
-	sampleBuffer.dataReadLock();
+	if (! sampleBuffer.tryDataReadLock())
+		return false;
 	auto poly = sampleBuffer.visualizeToPoly (currentPaintInTact,
 											  QRect(),
 											  fromFrame,
