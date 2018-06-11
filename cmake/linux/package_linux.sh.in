@@ -133,8 +133,11 @@ unset LD_LIBRARY_PATH
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
 # Handle wine linking
-if [ -d "@WINE_LIBRARY_FIX@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_LIBRARY_FIX@:@WINE_LIBRARY_FIX@wine/
+if [ -d "@WINE_32_LIBRARY_DIR@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/wine/:@WINE_32_LIBRARY_DIR@:@WINE_32_LIBRARY_DIR@wine/
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/wine/:@WINE_64_LIBRARY_DIR@:@WINE_64_LIBRARY_DIR@wine/
 fi
 
 # Move executables so linuxdeployqt can find them
