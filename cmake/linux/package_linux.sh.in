@@ -159,7 +159,8 @@ for file in "${APPDIR}usr/lib/lmms/"*.so; do
    executables="${executables} -executable=$thisfile"
 done
 executables="${executables} -executable=${ZYNBIN}"
-executables="${executables} -executable=${VSTBIN}"
+executables="${executables} -executable=${VSTBIN32}"
+executables="${executables} -executable=${VSTBIN64}"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imp_1199.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so"
