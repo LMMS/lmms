@@ -49,6 +49,22 @@ SampleRecordHandle::SampleRecordHandle(SampleTCO* tco , MidiTime startRecordTime
 
 SampleRecordHandle::~SampleRecordHandle()
 {
+	if (! m_currentBuffer.empty()) {
+		// We have data that has not been written into the buffer.
+		// force-write it into the buffer.
+
+		if (m_framesRecorded == 0) {
+			m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
+											   Engine::mixer ()->inputSampleRate (),
+											   false);
+			m_tco->setStartTimeOffset (m_startRecordTimeOffset);
+		} else {
+			m_tco->sampleBuffer ()->addData(m_currentBuffer,
+											Engine::mixer ()->inputSampleRate (),
+											false);
+		}
+	}
+
 	m_tco->updateLength ();
 
 	// If this is an automatically created tco,
@@ -68,26 +84,32 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 {
 	const sampleFrame * recbuf = Engine::mixer()->inputBuffer();
 	const f_cnt_t frames = Engine::mixer()->inputBufferFrames();
-	m_currentBuffer.clear ();
+
 	writeBuffer( recbuf, frames );
 
-	// It is the first buffer.
+	bool dataWrittenIntoSampleBuffer = true;
+
+	// Try to add data to the buffer.
+	// If we could not do that. We'll do that next time.
 	if (m_framesRecorded == 0) {
 		// Make sure we don't have the previous data.
-		m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
-										   Engine::mixer ()->inputSampleRate (),
-										   false);
+		dataWrittenIntoSampleBuffer = m_tco->sampleBuffer ()->tryResetData (std::move (m_currentBuffer),
+													   Engine::mixer ()->inputSampleRate (),
+													   false);
 		m_tco->setStartTimeOffset (m_startRecordTimeOffset);
 	} else {
 		if (! m_currentBuffer.empty ()) {
-			m_tco->sampleBuffer ()->addData (m_currentBuffer,
-											 Engine::mixer ()->inputSampleRate (),
-											 false);
+			dataWrittenIntoSampleBuffer = m_tco->sampleBuffer ()->tryAddData(m_currentBuffer,
+														Engine::mixer ()->inputSampleRate (),
+														false);
 		}
 	}
 
-	m_framesRecorded += frames;
-	m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
+	if (dataWrittenIntoSampleBuffer) {
+		m_framesRecorded += frames;
+		m_timeRecorded = m_framesRecorded / Engine::framesPerTick (Engine::mixer ()->inputSampleRate ());
+		m_currentBuffer.clear();
+	}
 }
 
 
@@ -155,7 +177,9 @@ void SampleRecordHandle::copyBufferFromStereo(const sampleFrame *inputBuffer,
 void SampleRecordHandle::writeBuffer( const sampleFrame * _ab,
 					const f_cnt_t _frames )
 {
-	m_currentBuffer.resize (_frames);
+	auto framesInBuffer = m_currentBuffer.size();
+	// Add _frames elements to the buffer.
+	m_currentBuffer.resize (framesInBuffer + _frames);
 
 	// Depending on the recording channel, copy the buffer as a
 	// mono-right, mono-left or stereo.
@@ -167,13 +191,13 @@ void SampleRecordHandle::writeBuffer( const sampleFrame * _ab,
 
 	switch(m_recordingChannel) {
 	case SampleTrack::RecordingChannel::MonoLeft:
-		copyBufferFromMonoLeft(_ab, m_currentBuffer.data (), _frames);
+		copyBufferFromMonoLeft(_ab, m_currentBuffer.data () + framesInBuffer, _frames);
 		break;
 	case SampleTrack::RecordingChannel::MonoRight:
-		copyBufferFromMonoRight(_ab, m_currentBuffer.data (), _frames);
+		copyBufferFromMonoRight(_ab, m_currentBuffer.data () + framesInBuffer, _frames);
 		break;
 	case SampleTrack::RecordingChannel::Stereo:
-		copyBufferFromStereo(_ab, m_currentBuffer.data (), _frames);
+		copyBufferFromStereo(_ab, m_currentBuffer.data () + framesInBuffer, _frames);
 		break;
 	default:
 		Q_ASSERT(false);
