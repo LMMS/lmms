@@ -565,8 +565,8 @@ ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(doc)
 
-# post-install tasks
-ADD_SUBDIRECTORY(cmake/postinstall)
+# install tasks
+ADD_SUBDIRECTORY(cmake/install)
 
 ADD_CUSTOM_COMMAND(OUTPUT "${CMAKE_BINARY_DIR}/lmms.1.gz"
 				COMMAND gzip -c ${CMAKE_SOURCE_DIR}/doc/lmms.1 > ${CMAKE_BINARY_DIR}/lmms.1.gz
