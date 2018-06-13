@@ -172,6 +172,15 @@ IF(LMMS_BUILD_WIN32)
 		LINK_FLAGS "${LINK_FLAGS} -mwindows"
 		ENABLE_EXPORTS ON
 	)
+
+	IF(LMMS_BUILD_MSYS)
+		# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
+		# Add the linker flag manually to create liblmms.dll.a import library
+		SET_PROPERTY(TARGET lmms
+			APPEND_STRING PROPERTY LINK_FLAGS -Wl,--out-implib,liblmms.dll.a
+		)
+	ENDIF()
+
 	IF(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 		ADD_CUSTOM_COMMAND(TARGET lmms POST_BUILD COMMAND "${STRIP}" "$<TARGET_FILE:lmms>")
 	ENDIF()
@@ -243,7 +252,6 @@ IF(LMMS_BUILD_WIN32)
 					"${MINGW_PREFIX}/lib/libsoundio.dll"
 				DESTINATION .)
 	ENDIF()
-
 ELSE(LMMS_BUILD_WIN32)
 	IF(NOT LMMS_BUILD_APPLE)
 		SET_TARGET_PROPERTIES(lmms PROPERTIES LINK_FLAGS "${LINK_FLAGS} -Wl,-E")
