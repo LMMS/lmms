@@ -165,14 +165,9 @@ FIND_PACKAGE(Qt5Test)
 SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
-IF(PKG_CONFIG_FOUND)
-	PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
-	IF(NOT SNDFILE_FOUND)
-		MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
-	ENDIF()
-ELSE()
-	FIND_PACKAGE(LibSndFile 1.0.18 REQUIRED)
-	SET(SNDFILE_LIBRARIES sndfile-shared)
+FIND_PACKAGE(SndFile REQUIRED)
+IF(NOT SNDFILE_FOUND)
+	MESSAGE(FATAL_ERROR "LMMS requires libsndfile1 and libsndfile1-dev >= 1.0.18 - please install, remove CMakeCache.txt and try again!")
 ENDIF()
 # check if we can use SF_SET_COMPRESSION_LEVEL
 IF(NOT SNDFILE_VERSION VERSION_LESS 1.0.26)
@@ -396,15 +391,8 @@ IF(WANT_JACK)
 	ENDIF(JACK_FOUND)
 ENDIF(WANT_JACK)
 
-
 # check for FFTW3F-library
-IF(PKG_CONFIG_FOUND)
-	PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
-ELSE()
-	#currently find_package for fftw is broken in vcpkg. Replace this when fixed
-	FIND_PATH(FFTW3F_INCLUDE_DIRS fftw3.h)
-	FIND_LIBRARY(FFTW3F_LIBRARIES fftw3f)
-ENDIF()
+FIND_PACKAGE(FFTW COMPONENTS fftw3f REQUIRED)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
@@ -486,13 +474,7 @@ ELSE()
 ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-IF(PKG_CONFIG_FOUND)
-	PKG_CHECK_MODULES(SAMPLERATE REQUIRED samplerate>=0.1.8)
-ELSE()
-	#TODO no cmake config support. Can we check the version some other way?
-	FIND_FILE(SAMPLERATE_INCLUDE_DIRS samplerate.h)
-	FIND_LIBRARY(SAMPLERATE_LIBRARIES libsamplerate-0)
-ENDIF()
+FIND_PACKAGE(Samplerate 0.1.8 REQUIRED)
 
 # set compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
