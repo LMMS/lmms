@@ -67,6 +67,7 @@ public:
 	}
 
 	void syncTransport( bool playing );
+	void repositionTransport(jack_position_t pos);
 
 	class setupWidget : public AudioDeviceSetupWidget
 	{

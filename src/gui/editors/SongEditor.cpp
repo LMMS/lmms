@@ -34,6 +34,10 @@
 #include <QPainter>
 
 #include "AutomatableSlider.h"
+#ifdef LMMS_HAVE_JACK
+#include "AudioJack.h"
+#include <jack/jack.h>
+#endif
 #include "ComboBox.h"
 #include "ConfigManager.h"
 #include "CPULoadWidget.h"
@@ -551,10 +555,26 @@ static inline void animateScroll( QScrollBar *scrollBar, int newVal, bool smooth
 }
 
 
-
-
 void SongEditor::updatePosition( const MidiTime & t )
 {
+	#ifdef LMMS_HAVE_JACK
+	AudioJack *device = dynamic_cast<AudioJack*>(Engine::mixer()->audioDev());
+	if (device && m_song->playMode() == Song::PlayModes::Mode_None) {
+		jack_position_t pos;
+		pos.valid = jack_position_bits_t::JackPositionBBT;
+		pos.bar = m_song->currentTact() + 1;
+		pos.beat = m_song->getBeat() + 1;
+		pos.tick = m_song->getBeatTicks() + 1;
+		pos.bar_start_tick = m_song->getTicks();
+		pos.beats_per_bar = m_song->getTimeSigModel().numeratorModel().value();
+		pos.beat_type = m_song->getTimeSigModel().denominatorModel().value();
+		pos.ticks_per_beat = m_song->getPlayPos().ticksPerBeat(m_song->getTimeSigModel());
+		pos.beats_per_minute = m_song->getTempo();
+		pos.frame = m_song->currentFrame();
+		device->repositionTransport(pos);
+	}
+	#endif
+
 	int widgetWidth, trackOpWidth;
 	if( ConfigManager::inst()->value( "ui", "compacttrackbuttons" ).toInt() )
 	{

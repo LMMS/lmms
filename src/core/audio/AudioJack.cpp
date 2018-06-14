@@ -105,6 +105,11 @@ void AudioJack::syncTransport( bool playing )
 	}
 }
 
+void AudioJack::repositionTransport(jack_position_t pos)
+{
+	jack_transport_reposition(m_client, &pos);
+}
+
 
 
 void AudioJack::restartAfterZombified()
