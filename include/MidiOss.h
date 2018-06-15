@@ -35,11 +35,10 @@
 #include "MidiClient.h"
 
 
-class QLineEdit;
 
-
-class MidiOss : public MidiClientRaw, public QThread
+class MidiOss : public QThread, public MidiClientRaw
 {
+	Q_OBJECT
 public:
 	MidiOss();
 	virtual ~MidiOss();

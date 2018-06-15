@@ -111,13 +111,13 @@ ZynAddSubFxInstrument::ZynAddSubFxInstrument(
 	m_plugin( NULL ),
 	m_remotePlugin( NULL ),
 	m_portamentoModel( 0, 0, 127, 1, this, tr( "Portamento" ) ),
-	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter Frequency" ) ),
-	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter Resonance" ) ),
+	m_filterFreqModel( 64, 0, 127, 1, this, tr( "Filter frequency" ) ),
+	m_filterQModel( 64, 0, 127, 1, this, tr( "Filter resonance" ) ),
 	m_bandwidthModel( 64, 0, 127, 1, this, tr( "Bandwidth" ) ),
-	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM Gain" ) ),
-	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance Center Frequency" ) ),
-	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance Bandwidth" ) ),
-	m_forwardMidiCcModel( true, this, tr( "Forward MIDI Control Change Events" ) )
+	m_fmGainModel( 127, 0, 127, 1, this, tr( "FM gain" ) ),
+	m_resCenterFreqModel( 64, 0, 127, 1, this, tr( "Resonance center frequency" ) ),
+	m_resBandwidthModel( 64, 0, 127, 1, this, tr( "Resonance bandwidth" ) ),
+	m_forwardMidiCcModel( true, this, tr( "Forward MIDI control change events" ) )
 {
 	initPlugin();
 
@@ -507,11 +507,11 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_portamento->setLabel( tr( "PORT" ) );
 
 	m_filterFreq = new Knob( knobBright_26, this );
-	m_filterFreq->setHintText( tr( "Filter Frequency:" ), "" );
+	m_filterFreq->setHintText( tr( "Filter frequency:" ), "" );
 	m_filterFreq->setLabel( tr( "FREQ" ) );
 
 	m_filterQ = new Knob( knobBright_26, this );
-	m_filterQ->setHintText( tr( "Filter Resonance:" ), "" );
+	m_filterQ->setHintText( tr( "Filter resonance:" ), "" );
 	m_filterQ->setLabel( tr( "RES" ) );
 
 	m_bandwidth = new Knob( knobBright_26, this );
@@ -519,7 +519,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_bandwidth->setLabel( tr( "BW" ) );
 
 	m_fmGain = new Knob( knobBright_26, this );
-	m_fmGain->setHintText( tr( "FM Gain:" ), "" );
+	m_fmGain->setHintText( tr( "FM gain:" ), "" );
 	m_fmGain->setLabel( tr( "FM GAIN" ) );
 
 	m_resCenterFreq = new Knob( knobBright_26, this );
@@ -530,7 +530,7 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_resBandwidth->setHintText( tr( "Resonance bandwidth:" ), "" );
 	m_resBandwidth->setLabel( tr( "RES BW" ) );
 
-	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI Control Changes" ), this );
+	m_forwardMidiCC = new LedCheckBox( tr( "Forward MIDI control changes" ), this );
 
 	m_toggleUIButton = new QPushButton( tr( "Show GUI" ), this );
 	m_toggleUIButton->setCheckable( true );
@@ -539,9 +539,6 @@ ZynAddSubFxView::ZynAddSubFxView( Instrument * _instrument, QWidget * _parent ) 
 	m_toggleUIButton->setFont( pointSize<8>( m_toggleUIButton->font() ) );
 	connect( m_toggleUIButton, SIGNAL( toggled( bool ) ), this,
 							SLOT( toggleUI() ) );
-	m_toggleUIButton->setWhatsThis(
-		tr( "Click here to show or hide the graphical user interface "
-			"(GUI) of ZynAddSubFX." ) );
 
 	l->addWidget( m_toggleUIButton, 0, 0, 1, 4 );
 	l->setRowStretch( 1, 5 );

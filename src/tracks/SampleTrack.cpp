@@ -309,7 +309,7 @@ void SampleTCOView::updateSample()
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
-					tr( "double-click to select sample" ) );
+					tr( "Double-click to open sample" ) );
 }
 
 

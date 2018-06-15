@@ -29,7 +29,6 @@
 #include <QtCore/QVector>
 #include <QWidget>
 #include <QDialog>
-#include <QtCore/QThread>
 #include <QPixmap>
 #include <QStaticText>
 

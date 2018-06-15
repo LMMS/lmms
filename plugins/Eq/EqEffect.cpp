@@ -122,9 +122,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_hp12.setParameters( sampleRate, hpFreq, hpRes, 1 );
 	m_hp24.setParameters( sampleRate, hpFreq, hpRes, 1 );
 	m_hp480.setParameters( sampleRate, hpFreq, hpRes, 1 );
-	m_lp480.setParameters( sampleRate, lpFreq, lpRes, 1 );
 	m_hp481.setParameters( sampleRate, hpFreq, hpRes, 1 );
-	m_lp481.setParameters( sampleRate, hpFreq, hpRes, 1 );
 	m_lowShelf.setParameters( sampleRate, lowShelfFreq, lowShelfRes, lowShelfGain );
 	m_para1.setParameters( sampleRate, para1Freq, para1Bw, para1Gain );
 	m_para2.setParameters( sampleRate, para2Freq, para2Bw, para2Gain );
@@ -134,7 +132,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	m_lp12.setParameters( sampleRate, lpFreq, lpRes, 1 );
 	m_lp24.setParameters( sampleRate, lpFreq, lpRes, 1 );
 	m_lp480.setParameters( sampleRate, lpFreq, lpRes, 1 );
-	m_lp480.setParameters( sampleRate, lpFreq, lpRes, 1 );
+	m_lp481.setParameters( sampleRate, lpFreq, lpRes, 1 );
 
 
 
@@ -165,7 +163,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	const float outGain =  m_outGain;
 	sampleFrame m_inPeak = { 0, 0 };
 
-	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 )
+	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 && m_eqControls.isViewVisible()  )
 	{
 		m_eqControls.m_inFftBands.analyze( buf, frames );
 	}
@@ -276,7 +274,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	checkGate( outSum / frames );
 
-	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 )
+	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate ) );

@@ -960,7 +960,6 @@ InstrumentTrackView::InstrumentTrackView( InstrumentTrack * _it, TrackContainerV
 	m_volumeKnob->move( widgetWidth-2*24, 2 );
 	m_volumeKnob->setLabel( tr( "VOL" ) );
 	m_volumeKnob->show();
-	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 	m_panningKnob = new Knob( knobSmall_17, getTrackSettingsWidget(),
 							tr( "Panning" ) );
@@ -1336,7 +1335,7 @@ class fxLineLcdSpinBox : public LcdSpinBox
 			// created inside a TabWidget inside an InstrumentTrackWindow
 			if ( InstrumentTrackWindow* window = dynamic_cast<InstrumentTrackWindow*>( (QWidget *)this->parent()->parent() ) )
 			{
-				QMenu *fxMenu = window->instrumentTrackView()->createFxMenu( tr( "Assign to:" ), tr( "New FX Channel" ) );
+				QMenu *fxMenu = window->instrumentTrackView()->createFxMenu( tr( "Assign to:" ), tr( "New FX channel" ) );
 				contextMenu->addMenu( fxMenu );
 
 				contextMenu->addSeparator();
@@ -1393,8 +1392,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 						SLOT( viewPrevInstrument() ) );
 	connect( m_leftRightNav, SIGNAL( onNavRight() ), this,
 						SLOT( viewNextInstrument() ) );
-	m_leftRightNav->setWhatsThis(
-		tr( "Use these controls to view and edit the next/previous track in the song editor." ) );
 	// m_leftRightNav->setShortcuts();
 	nameAndChangeTrackLayout->addWidget(m_leftRightNav);
 
@@ -1413,10 +1410,9 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	Qt::Alignment widgetAlignment = Qt::AlignHCenter | Qt::AlignCenter;
 
 	// set up volume knob
-	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Instrument volume" ) );
+	m_volumeKnob = new Knob( knobBright_26, NULL, tr( "Volume" ) );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->setHintText( tr( "Volume:" ), "%" );
-	m_volumeKnob->setWhatsThis( tr( volume_help ) );
 
 	basicControlsLayout->addWidget( m_volumeKnob, 0, 0 );
 	basicControlsLayout->setAlignment( m_volumeKnob, widgetAlignment );
@@ -1488,9 +1484,6 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	connect( saveSettingsBtn, SIGNAL( clicked() ), this, SLOT( saveSettingsBtnClicked() ) );
 
 	ToolTip::add( saveSettingsBtn, tr( "Save current instrument track settings in a preset file" ) );
-	saveSettingsBtn->setWhatsThis(
-		tr( "Click here, if you want to save current instrument track settings in a preset file. "
-			"Later you can load this preset by double-clicking it in the preset-browser." ) );
 
 	basicControlsLayout->addWidget( saveSettingsBtn, 0, 7 );
 
@@ -1533,7 +1526,7 @@ InstrumentTrackWindow::InstrumentTrackWindow( InstrumentTrackView * _itv ) :
 	m_tabWidget->addTab( m_ssView, tr( "Envelope, filter & LFO" ), "env_lfo_tab", 1 );
 	m_tabWidget->addTab( instrumentFunctions, tr( "Chord stacking & arpeggio" ), "func_tab", 2 );
 	m_tabWidget->addTab( m_effectView, tr( "Effects" ), "fx_tab", 3 );
-	m_tabWidget->addTab( m_midiView, tr( "MIDI settings" ), "midi_tab", 4 );
+	m_tabWidget->addTab( m_midiView, tr( "MIDI" ), "midi_tab", 4 );
 	m_tabWidget->addTab( m_miscView, tr( "Miscellaneous" ), "misc_tab", 5 );
 
 	// setup piano-widget
