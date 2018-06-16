@@ -1024,8 +1024,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
-		return true;
+		return Engine::getSong()->guiSaveProjectAs( fileName );
 	}
 }
 
