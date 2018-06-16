@@ -58,5 +58,5 @@ IF(WINE_32_LIBRARY_DIR)
 ENDIF()
 
 # Create winegcc wrapper
-configure_file(${CMAKE_CURRENT_LIST_DIR}/../linux/winegcc_wrapper.in winegcc_wrapper @ONLY)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/winegcc_wrapper.in winegcc_wrapper @ONLY)
 SET(WINEGCC "${CMAKE_CURRENT_BINARY_DIR}/winegcc_wrapper")
