@@ -1,7 +1,7 @@
 #!/bin/sh
 # Wrapper script for winegcc to remove .exe file ending automatically
 # appended by winebuild.
-# Usage: winegcc <args ...>
+# See FindWine.cmake for usage
 
 set -e
 
