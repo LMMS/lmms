@@ -496,7 +496,7 @@ QString InstrumentTrack::instrumentName() const
 	{
 		return m_instrument->displayName();
 	}
-	return QString::null;
+	return QString();
 }
 
 

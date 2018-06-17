@@ -393,7 +393,7 @@ const surroundSampleFrame * Mixer::renderNextBuffer()
 	ConstPlayHandleList::Iterator it_rem = m_playHandlesToRemove.begin();
 	while( it_rem != m_playHandlesToRemove.end() )
 	{
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(), m_playHandles.end(), *it_rem );
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(), m_playHandles.end(), *it_rem );
 
 		if( it != m_playHandles.end() )
 		{
@@ -659,7 +659,7 @@ void Mixer::restoreAudioDevice()
 void Mixer::removeAudioPort( AudioPort * _port )
 {
 	requestChangeInModel();
-	QVector<AudioPort *>::Iterator it = qFind( m_audioPorts.begin(),
+	QVector<AudioPort *>::Iterator it = std::find( m_audioPorts.begin(),
 							m_audioPorts.end(),
 							_port );
 	if( it != m_audioPorts.end() )
@@ -720,7 +720,7 @@ void Mixer::removePlayHandle( PlayHandle * _ph )
 			}
 		}
 		// Now check m_playHandles
-		PlayHandleList::Iterator it = qFind( m_playHandles.begin(),
+		PlayHandleList::Iterator it = std::find( m_playHandles.begin(),
 					m_playHandles.end(), _ph );
 		if( it != m_playHandles.end() )
 		{

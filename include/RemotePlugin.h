@@ -138,8 +138,8 @@ public:
 		m_shmID( -1 ),
 #endif
 		m_data( NULL ),
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
+		m_dataSem( QString() ),
+		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
@@ -181,8 +181,8 @@ public:
 		m_shmID( shmget( _shm_key, 0, 0 ) ),
 #endif
 		m_data( NULL ),
-		m_dataSem( QString::null ),
-		m_messageSem( QString::null ),
+		m_dataSem( QString() ),
+		m_messageSem( QString() ),
 		m_lockDepth( 0 )
 	{
 #ifdef USE_QT_SHMEM
