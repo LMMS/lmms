@@ -4090,28 +4090,13 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
 	QAction* cutAction = new QAction(embed::getIconPixmap( "edit_cut" ),
-							  tr( "Cut (%1+X)" ).arg(
-									#ifdef LMMS_BUILD_APPLE
-									"⌘" ), this );
-									#else
-									"Ctrl" ), this );
-									#endif
+								tr( "Cut (%1+X)" ).arg(UI_CTRL_KEY), this );
 
 	QAction* copyAction = new QAction(embed::getIconPixmap( "edit_copy" ),
-							   tr( "Copy (%1+C)" ).arg(
-	 								#ifdef LMMS_BUILD_APPLE
-	 								"⌘"), this);
-	 								#else
-									"Ctrl" ), this );
-	 								#endif
+								 tr( "Copy (%1+C)" ).arg(UI_CTRL_KEY), this );
 
 	QAction* pasteAction = new QAction(embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste (%1+V)" ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘" ), this );
-						#else
-						"Ctrl" ), this );
-						#endif
+					tr( "Paste (%1+V)" ).arg(UI_CTRL_KEY), this );
 
 	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
 	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );
