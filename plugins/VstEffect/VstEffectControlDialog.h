@@ -50,10 +50,12 @@ public:
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void showEvent( QShowEvent* _se ) override;
 
 private:
 	QWidget * m_pluginWidget;
 
+	QPushButton * m_togglePluginButton;
 	PixmapButton * m_openPresetButton;
 	PixmapButton * m_rolLPresetButton;
 	PixmapButton * m_rolRPresetButton;
@@ -64,7 +66,7 @@ private:
 
 	QLabel * tbLabel;
 
-private slots:
+public slots:
 	void togglePluginUI( bool checked );
 } ;
 

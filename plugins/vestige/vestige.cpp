@@ -24,6 +24,8 @@
 
 #include "vestige.h"
 
+#include <memory>
+
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QPainter>
@@ -72,6 +74,59 @@ Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
 } ;
 
 }
+
+
+class vstSubWin : public QMdiSubWindow
+{
+public:
+	vstSubWin( QWidget * _parent ) :
+		QMdiSubWindow( _parent )
+	{
+		setAttribute( Qt::WA_DeleteOnClose, false );
+		setWindowFlags( Qt::WindowCloseButtonHint );
+	}
+
+	virtual ~vstSubWin()
+	{
+	}
+
+	virtual void closeEvent( QCloseEvent * e )
+	{
+		// ignore close-events - for some reason otherwise the VST GUI
+		// remains hidden when re-opening
+		hide();
+		e->ignore();
+	}
+};
+
+
+class VstInstrumentPlugin : public VstPlugin
+{
+public:
+	using VstPlugin::VstPlugin;
+
+	void createUI( QWidget *parent ) override
+	{
+		Q_UNUSED(parent);
+		if ( embedMethod() != "none" ) {
+			m_pluginSubWindow.reset(new vstSubWin( gui->mainWindow()->workspace() ));
+			VstPlugin::createUI( m_pluginSubWindow.get() );
+			m_pluginSubWindow->setWidget(pluginWidget());
+		} else {
+			VstPlugin::createUI( nullptr );
+		}
+	}
+
+	/// Overwrite editor() to return the sub window instead of the embed widget
+	/// itself. This makes toggleUI() and related functions toggle the
+	/// sub window's visibility.
+	QWidget* editor() override
+	{
+		return m_pluginSubWindow.get();
+	}
+private:
+	unique_ptr<QMdiSubWindow> m_pluginSubWindow;
+};
 
 
 QPixmap * VestigeInstrumentView::s_artwork = NULL;
@@ -127,6 +182,12 @@ void vestigeInstrument::loadSettings( const QDomElement & _this )
 	if( m_plugin != NULL )
 	{
 		m_plugin->loadSettings( _this );
+
+		if ( _this.attribute( "guivisible" ).toInt() ) {
+			m_plugin->showUI();
+		} else {
+			m_plugin->hideUI();
+		}
 
 		const QMap<QString, QString> & dump = m_plugin->parameterDump();
 		paramCount = dump.size();
@@ -268,7 +329,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 	}
 
 	m_pluginMutex.lock();
-	m_plugin = new VstPlugin( m_pluginDLL );
+	m_plugin = new VstInstrumentPlugin( m_pluginDLL );
 	if( m_plugin->failed() )
 	{
 		m_pluginMutex.unlock();
@@ -279,6 +340,7 @@ void vestigeInstrument::loadFile( const QString & _file )
 		return;
 	}
 
+	m_plugin->createUI(nullptr);
 	m_plugin->showUI();
 
 	if( set_ch_name )

@@ -28,6 +28,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QLayout>
 
 #include "EffectView.h"
 #include "DummyEffect.h"
@@ -49,13 +50,13 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 	m_controlView( NULL )
 {
 	setFixedSize( 210, 60 );
-	
+
 	// Disable effects that are of type "DummyEffect"
 	bool isEnabled = !dynamic_cast<DummyEffect *>( effect() );
 	m_bypass = new LedCheckBox( this, "", isEnabled ? LedCheckBox::Green : LedCheckBox::Red );
 	m_bypass->move( 3, 3 );
 	m_bypass->setEnabled( isEnabled );
-	
+
 	ToolTip::add( m_bypass, tr( "On/Off" ) );
 
 
@@ -97,7 +98,9 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 		{
 			m_subWindow = gui->mainWindow()->addWindowedWidget( m_controlView );
 			m_subWindow->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-			m_subWindow->setFixedSize( m_subWindow->size() );
+			if (m_subWindow->layout()) {
+				m_subWindow->layout()->setSizeConstraint(QLayout::SetFixedSize);
+			}
 
 			Qt::WindowFlags flags = m_subWindow->windowFlags();
 			flags &= ~Qt::WindowMaximizeButtonHint;
@@ -120,18 +123,7 @@ EffectView::EffectView( Effect * _model, QWidget * _parent ) :
 
 EffectView::~EffectView()
 {
-
-#ifdef LMMS_BUILD_LINUX
-
 	delete m_subWindow;
-#else
-	if( m_subWindow )
-	{
-		// otherwise on win32 build VST GUI can get lost
-		m_subWindow->hide();
-	}
-#endif
-
 }
 
 

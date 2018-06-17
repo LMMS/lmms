@@ -1881,6 +1881,7 @@ void TrackOperationsWidget::cloneTrack()
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
+	t->addJournalCheckPoint();
 	t->lock();
 	t->deleteTCOs();
 	t->unlock();
