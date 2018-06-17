@@ -34,9 +34,9 @@
 #include <QMdiSubWindow>
 
 #ifdef LMMS_BUILD_LINUX
+#	include <QX11Info>
 #	if QT_VERSION < 0x050000
 #		include <QX11EmbedContainer>
-#		include <QX11Info>
 #	else
 #		include "X11EmbedContainer.h"
 #		include <QWindow>
@@ -62,27 +62,9 @@
 #include "templates.h"
 #include "FileDialog.h"
 
-class vstSubWin : public QMdiSubWindow
-{
-public:
-	vstSubWin( QWidget * _parent ) :
-		QMdiSubWindow( _parent )
-	{
-		setAttribute( Qt::WA_DeleteOnClose, false );
-	}
-
-	virtual ~vstSubWin()
-	{
-	}
-
-	virtual void closeEvent( QCloseEvent * e )
-	{
-		// ignore close-events - for some reason otherwise the VST GUI
-		// remains hidden when re-opening
-		hide();
-		e->ignore();
-	}
-} ;
+#ifdef LMMS_BUILD_LINUX
+#	include <X11/Xlib.h>
+#endif
 
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
@@ -124,7 +106,6 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 
 VstPlugin::~VstPlugin()
 {
-	delete m_pluginSubWindow;
 	delete m_pluginWidget;
 }
 
@@ -174,41 +155,8 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 
 
-void VstPlugin::hideEditor()
-{
-	QWidget * w = pluginWidget();
-	if( w )
-	{
-		w->hide();
-	}
-}
-
-
-
-
-void VstPlugin::toggleEditor()
-{
-	QWidget * w = pluginWidget();
-	if( w )
-	{
-		w->setVisible( !w->isVisible() );
-	}
-}
-
-
-
-
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
-	if( _this.attribute( "guivisible" ).toInt() )
-	{
-		showUI();
-	}
-	else
-	{
-		hideUI();
-	}
-
 	const int num_params = _this.attribute( "numparams" ).toInt();
 	// if it exists try to load settings chunk
 	if( _this.hasAttribute( "chunk" ) )
@@ -286,7 +234,7 @@ void VstPlugin::toggleUI()
 	}
 	else if (pluginWidget())
 	{
-		toggleEditor();
+		toggleEditorVisibility();
 	}
 }
 
@@ -362,21 +310,9 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 	unlock();
 }
 
-QWidget *VstPlugin::pluginWidget(bool _top_widget)
+QWidget *VstPlugin::pluginWidget()
 {
-	if ( m_embedMethod == "none" || !m_pluginWidget )
-	{
-		return nullptr;
-	}
-
-	if ( _top_widget && m_pluginWidget->parentWidget() == m_pluginSubWindow )
-	{
-		return m_pluginSubWindow;
-	}
-	else
-	{
-		return m_pluginWidget;
-	}
+	return m_pluginWidget;
 }
 
 
@@ -392,6 +328,22 @@ bool VstPlugin::processMessage( const message & _m )
 
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
+		if( m_embedMethod == "none" )
+		{
+#ifdef LMMS_BUILD_WIN32
+			// We're changing the owner, not the parent,
+			// so this is legal despite MSDN's warning
+			SetWindowLongPtr( (HWND)(intptr_t) m_pluginWindowID,
+					GWLP_HWNDPARENT,
+					(LONG_PTR) gui->mainWindow()->winId() );
+#endif
+
+#ifdef LMMS_BUILD_LINUX
+			XSetTransientForHint( QX11Info::display(),
+					m_pluginWindowID,
+					gui->mainWindow()->winId() );
+#endif
+		}
 		break;
 
 	case IdVstPluginEditorGeometry:
@@ -458,6 +410,10 @@ bool VstPlugin::processMessage( const message & _m )
 }
 
 
+QWidget *VstPlugin::editor()
+{
+	return m_pluginWidget;
+}
 
 
 void VstPlugin::openPreset( )
@@ -579,15 +535,10 @@ void VstPlugin::showUI()
 	}
 	else if ( m_embedMethod != "headless" )
 	{
-		if (! pluginWidget()) {
-			createUI( NULL, false );
+		if (! editor()) {
+			qWarning() << "VstPlugin::showUI called before VstPlugin::createUI";
 		}
-
-		QWidget * w = pluginWidget();
-		if( w )
-		{
-			w->show();
-		}
+		toggleEditorVisibility( true );
 	}
 }
 
@@ -599,7 +550,7 @@ void VstPlugin::hideUI()
 	}
 	else if ( pluginWidget() != nullptr )
 	{
-		hideEditor();
+		toggleEditorVisibility( false );
 	}
 }
 
@@ -654,22 +605,39 @@ QByteArray VstPlugin::saveChunk()
 	return a;
 }
 
-void VstPlugin::createUI( QWidget * parent, bool isEffect )
+void VstPlugin::toggleEditorVisibility( int visible )
 {
+	QWidget* w = editor();
+	if ( ! w ) {
+		return;
+	}
+
+	if ( visible < 0 ) {
+		visible = ! w->isVisible();
+	}
+	w->setVisible( visible );
+}
+
+void VstPlugin::createUI( QWidget * parent )
+{
+	if ( m_pluginWidget ) {
+		qWarning() << "VstPlugin::createUI called twice";
+		m_pluginWidget->setParent( parent );
+		return;
+	}
+
 	if( m_pluginWindowID == 0 )
 	{
 		return;
 	}
 
 	QWidget* container = nullptr;
-	m_pluginSubWindow = new vstSubWin( gui->mainWindow()->workspace() );
-	auto sw = m_pluginSubWindow.data();
 
 #if QT_VERSION >= 0x050100
 	if (m_embedMethod == "qt" )
 	{
 		QWindow* vw = QWindow::fromWinId(m_pluginWindowID);
-		container = QWidget::createWindowContainer(vw, sw );
+		container = QWidget::createWindowContainer(vw, parent );
 		container->installEventFilter(this);
 	} else
 #endif
@@ -708,7 +676,11 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 #ifdef LMMS_BUILD_LINUX
 	if (m_embedMethod == "xembed" )
 	{
-		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( sw );
+		if (parent)
+		{
+			parent->setAttribute(Qt::WA_NativeWindow);
+		}
+		QX11EmbedContainer * embedContainer = new QX11EmbedContainer( parent );
 		connect(embedContainer, SIGNAL(clientIsEmbedded()), this, SLOT(handleClientEmbed()));
 		embedContainer->embedClient( m_pluginWindowID );
 		container = embedContainer;
@@ -716,31 +688,13 @@ void VstPlugin::createUI( QWidget * parent, bool isEffect )
 #endif
 	{
 		qCritical() << "Unknown embed method" << m_embedMethod;
-		delete m_pluginSubWindow;
 		return;
 	}
 
 	container->setFixedSize( m_pluginGeometry );
 	container->setWindowTitle( name() );
 
-	if( parent == NULL )
-	{
-		m_pluginWidget = container;
-
-		sw->setWidget(container);
-
-		if( isEffect )
-		{
-			sw->setAttribute( Qt::WA_TranslucentBackground );
-			sw->setWindowFlags( Qt::FramelessWindowHint );
-		}
-		else
-		{
-			sw->setWindowFlags( Qt::WindowCloseButtonHint );
-		}
-	};
-
-	container->setFixedSize( m_pluginGeometry );
+	m_pluginWidget = container;
 }
 
 bool VstPlugin::eventFilter(QObject *obj, QEvent *event)

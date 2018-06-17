@@ -85,7 +85,7 @@ public:
 
 	inline ~malletsSynth()
 	{
-		m_voice->noteOff( 0.0 );
+		if (m_voice) {m_voice->noteOff(0.0);}
 		delete[] m_delay;
 		delete m_voice;
 	}

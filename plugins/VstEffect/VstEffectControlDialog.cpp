@@ -41,10 +41,10 @@
 #include <QToolBar>
 #include <QLabel>
 
-
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( NULL ),
+
 	m_plugin( NULL ),
 	tbLabel( NULL )
 {
@@ -62,24 +62,18 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		embed_vst = m_plugin->embedMethod() != "none";
 
 		if (embed_vst) {
-			m_plugin->createUI( nullptr, true );
-			m_pluginWidget = m_plugin->pluginWidget( false );
-
-#ifdef LMMS_BUILD_WIN32
-			if( !m_pluginWidget )
-			{
-				m_pluginWidget = m_plugin->pluginWidget( false );
+			if (m_plugin->hasEditor() && ! m_plugin->pluginWidget()) {
+				m_plugin->createUI(this);
 			}
-#endif
-
+			m_pluginWidget = m_plugin->pluginWidget();
 		}
 	}
 
-	if ( m_plugin && (!embed_vst || m_pluginWidget) )
+	if (m_plugin)
 	{
 		setWindowTitle( m_plugin->name() );
 
-		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
+		QPushButton * btn = new QPushButton( tr( "Show/hide" ));
 
 		if (embed_vst) {
 			btn->setCheckable( true );
@@ -87,14 +81,15 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 			connect( btn, SIGNAL( toggled( bool ) ),
 						SLOT( togglePluginUI( bool ) ) );
 		} else {
-			connect( btn, SIGNAL( clicked( bool ) ),
-						SLOT( togglePluginUI( bool ) ) );
+			connect( btn, SIGNAL( clicked() ),
+						m_plugin.data(), SLOT( toggleUI() ) );
 		}
 
 		btn->setMinimumWidth( 78 );
 		btn->setMaximumWidth( 78 );
 		btn->setMinimumHeight( 24 );
 		btn->setMaximumHeight( 24 );
+		m_togglePluginButton = btn;
 
 		m_managePluginButton = new PixmapButton( this, "" );
 		m_managePluginButton->setCheckable( false );
@@ -206,7 +201,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		int newSize = 0;
 
-		if (embed_vst) {
+		if (m_pluginWidget) {
 			newSize = m_pluginWidget->width() + 20;
 		}
 		newSize = std::max(newSize, 250);
@@ -222,7 +217,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed,
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
-		if (embed_vst) {
+		if (m_pluginWidget) {
 			l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
 		}
 		l->setRowStretch( 5, 1 );
@@ -261,12 +256,28 @@ void VstEffectControlDialog::paintEvent( QPaintEvent * )
 	}
 }
 
+void VstEffectControlDialog::showEvent(QShowEvent *_se)
+{
+	EffectControlDialog::showEvent( _se );
+	// Workaround for a (unexplained) bug where on project-load the effect
+	// control window has size 0 and would only restore to the proper size upon
+	// moving the window or interacting with it.
+	if (parentWidget()) {
+		parentWidget()->adjustSize();
+	}
+}
+
 
 
 
 VstEffectControlDialog::~VstEffectControlDialog()
 {
-	//delete m_pluginWidget;
+#if !(QT_VERSION < 0x050000 && defined(LMMS_BUILD_LINUX))
+	if (m_pluginWidget && layout()) {
+		layout()->removeWidget(m_pluginWidget);
+		m_pluginWidget->setParent(nullptr);
+	}
+#endif
 }
 
 
@@ -278,6 +289,14 @@ void VstEffectControlDialog::togglePluginUI( bool checked )
 		return;
 	}
 
-	m_plugin->toggleUI();
+	if ( m_togglePluginButton->isChecked() != checked ) {
+		m_togglePluginButton->setChecked( checked );
+	}
+
+	if ( checked ) {
+		m_plugin->showUI();
+	} else {
+		m_plugin->hideUI();
+	}
 }
 

@@ -107,7 +107,8 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		element.setAttribute( name, m_value );
 	}
 
-	if( m_controllerConnection )
+	if( m_controllerConnection && m_controllerConnection->getController()->type()
+				!= Controller::DummyController )
 	{
 		QDomElement controllerElement;
 
