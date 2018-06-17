@@ -220,7 +220,7 @@ void automatableButtonGroup::addButton( AutomatableButton * _btn )
 
 void automatableButtonGroup::removeButton( AutomatableButton * _btn )
 {
-	m_buttons.erase( qFind( m_buttons.begin(), m_buttons.end(), _btn ) );
+	m_buttons.erase( std::find( m_buttons.begin(), m_buttons.end(), _btn ) );
 	_btn->m_group = NULL;
 }
 

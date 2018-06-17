@@ -510,7 +510,7 @@ void graphModel::setSampleAt( int x, float val )
 
 void graphModel::setSamples( const float * _samples )
 {
-	qCopy( _samples, _samples + length(), m_samples.begin());
+	std::copy( _samples, _samples + length(), m_samples.begin());
 
 	emit samplesChanged( 0, length()-1 );
 }

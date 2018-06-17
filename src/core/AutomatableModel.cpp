@@ -409,7 +409,7 @@ void AutomatableModel::linkModel( AutomatableModel* model )
 
 void AutomatableModel::unlinkModel( AutomatableModel* model )
 {
-	AutoModelVector::Iterator it = qFind( m_linkedModels.begin(), m_linkedModels.end(), model );
+	AutoModelVector::Iterator it = std::find( m_linkedModels.begin(), m_linkedModels.end(), model );
 	if( it != m_linkedModels.end() )
 	{
 		m_linkedModels.erase( it );
