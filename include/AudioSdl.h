@@ -88,8 +88,8 @@ private:
 	surroundSampleFrame * m_outBuf;
 
 #ifdef LMMS_HAVE_SDL2
-	uint64_t m_currentBufferFramePos;
-	uint64_t m_currentBufferFramesCount;
+	size_t m_currentBufferFramePos;
+	size_t m_currentBufferFramesCount;
 #else
 	Uint8 * m_convertedBuf;
 	int m_convertedBufPos;
