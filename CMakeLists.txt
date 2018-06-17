@@ -474,7 +474,7 @@ ELSE()
 ENDIF(WANT_DEBUG_FPE)
 
 # check for libsamplerate
-FIND_PACKAGE(Samplerate 0.1.8 REQUIRED)
+FIND_PACKAGE(Samplerate 0.1.8 MODULE REQUIRED)
 
 # set compiler flags
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
