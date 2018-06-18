@@ -24,7 +24,7 @@
 
 #include "BassBooster.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 
 extern "C"
@@ -38,7 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT bassbooster_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -148,7 +148,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new BassBoosterEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

@@ -23,7 +23,7 @@
 #include <math.h>
 #include "ReverbSC.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 #define DB2LIN(X) pow(10, X / 20.0f);
 
@@ -151,7 +151,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new ReverbSCEffect( 
 		parent, 

@@ -54,7 +54,7 @@ ProcessWatcher::ProcessWatcher( RemotePlugin * _p ) :
 
 void ProcessWatcher::run()
 {
-	while( !m_quit && m_plugin->isRunning() )
+	while( !m_quit && (m_plugin->isRunning() || m_plugin->messagesLeft()) )
 	{
 		msleep( 200 );
 	}
@@ -196,6 +196,7 @@ bool RemotePlugin::init(const QString &pluginExecutable,
 		qWarning( "Remote plugin '%s' not found.",
 						exec.toUtf8().constData() );
 		m_failed = true;
+		invalidate();
 		unlock();
 		return failed();
 	}

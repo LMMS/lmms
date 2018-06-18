@@ -22,92 +22,58 @@
  *
  */
 
-
-#include <QImage>
-#include <QHash>
+#include <QDebug>
 #include <QImageReader>
+#include <QPixmapCache>
+#include <QResource>
 #include "embed.h"
 
-#ifndef PLUGIN_NAME
 namespace embed
-#else
-namespace PLUGIN_NAME
-#endif
 {
 
-namespace
+
+QPixmap getIconPixmap(const QString& pixmapName, int width, int height )
 {
-	static QHash<QString, QPixmap> s_pixmapCache;
-}
-
-#include "embedded_resources.h"
-
-
-QPixmap getIconPixmap( const char * pixmapName, int width, int height )
-{
-	if( width == -1 || height == -1 )
+	QString cacheName;
+	if (width > 0 && height > 0)
 	{
-		// Return cached pixmap
-		QPixmap cached = s_pixmapCache.value( pixmapName );
-		if( !cached.isNull() )
-		{
-			return cached;
-		}
-
-		// Or try to load it
-		QList<QByteArray> formats = QImageReader::supportedImageFormats();
-		QList<QString> candidates;
-		QPixmap pixmap;
-		QString name;
-		int i;
-		
-		for ( i = 0; i < formats.size() && pixmap.isNull(); ++i )  
-		{
-			candidates << QString( pixmapName ) + "." + formats.at( i ).data();
-		}
-
-#ifdef PLUGIN_NAME
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			pixmap = QPixmap( "resources:plugins/" STRINGIFY( PLUGIN_NAME ) "_" + name );
-		}
-#endif
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			pixmap = QPixmap( "resources:" + name );
-		}
-		
-		for ( i = 0; i < candidates.size() && pixmap.isNull(); ++i )  {
-			name = candidates.at( i );
-			const embed::descriptor & e = 
-				findEmbeddedData( name.toUtf8().constData() );
-			// found?
-			if( name == e.name )
-			{
-				pixmap.loadFromData( e.data, e.size );
-			}
-		}
-		
-		// Fallback
-		if( pixmap.isNull() )
-		{
-			pixmap = QPixmap( 1, 1 );
-		}
-		// Save to cache and return
-		s_pixmapCache.insert( pixmapName, pixmap );
-		return pixmap;
+		cacheName = QString("%1_%2_%3").arg(pixmapName, width, height);
+	}
+	else
+	{
+		cacheName = pixmapName;
 	}
 
-	return getIconPixmap( pixmapName ).
-		scaled( width, height, Qt::IgnoreAspectRatio,
-			Qt::SmoothTransformation );
+	// Return cached pixmap
+	QPixmap pixmap;
+	if( QPixmapCache::find(cacheName, &pixmap) )
+	{
+		return pixmap;
+	}
+	QImageReader reader(QString("artwork:%1").arg(pixmapName));
+
+	if (width > 0 && height > 0)
+	{
+		reader.setScaledSize(QSize(width, height));
+	}
+
+	pixmap = QPixmap::fromImageReader(&reader);
+	if (pixmap.isNull())
+	{
+		qWarning().nospace() << "Error loading icon pixmap " << pixmapName << ": " <<
+								reader.errorString().toLocal8Bit().data();
+		return QPixmap(1,1);
+	}
+
+	// Save to cache and return
+	QPixmapCache::insert(cacheName, pixmap);
+	return pixmap;
 }
 
 
-QString getText( const char * _name )
+QString getText( const char * name )
 {
-	const embed::descriptor & e = findEmbeddedData( _name );
-	return QString::fromUtf8( (const char *) e.data, e.size );
+	return QString::fromUtf8( (const char*) QResource(QString(":/%1").arg(name)).data());
 }
 
 

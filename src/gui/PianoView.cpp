@@ -130,19 +130,6 @@ PianoView::PianoView( QWidget * _parent ) :
 
 }
 
-
-
-
-/*! \brief Destroy this piano display view
- *
- */
-PianoView::~PianoView()
-{
-}
-
-
-
-
 /*! \brief Map a keyboard key being pressed to a note in our keyboard view
  *
  *  \param _k The keyboard scan code of the key being pressed.

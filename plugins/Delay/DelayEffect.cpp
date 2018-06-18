@@ -24,7 +24,7 @@
 
 #include "DelayEffect.h"
 #include "Engine.h"
-#include "embed.cpp"
+#include "embed.h"
 #include "interpolation.h"
 
 
@@ -39,7 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -157,7 +157,7 @@ extern "C"
 {
 
 //needed for getting plugin out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new DelayEffect( parent , static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

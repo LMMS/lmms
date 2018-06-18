@@ -30,7 +30,7 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 #include "PresetPreviewPlayHandle.h"
-
+#include "stdshims.h"
 
 
 InstrumentFunctionNoteStacking::ChordTable::Init InstrumentFunctionNoteStacking::ChordTable::s_initTable[] =
@@ -316,16 +316,16 @@ InstrumentFunctionArpeggio::InstrumentFunctionArpeggio( Model * _parent ) :
 		m_arpModel.addItem( chord_table[i].getName() );
 	}
 
-	m_arpDirectionModel.addItem( tr( "Up" ), new PixmapLoader( "arp_up" ) );
-	m_arpDirectionModel.addItem( tr( "Down" ), new PixmapLoader( "arp_down" ) );
-	m_arpDirectionModel.addItem( tr( "Up and down" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Down and up" ), new PixmapLoader( "arp_up_and_down" ) );
-	m_arpDirectionModel.addItem( tr( "Random" ), new PixmapLoader( "arp_random" ) );
+	m_arpDirectionModel.addItem( tr( "Up" ), make_unique<PixmapLoader>( "arp_up" ) );
+	m_arpDirectionModel.addItem( tr( "Down" ), make_unique<PixmapLoader>( "arp_down" ) );
+	m_arpDirectionModel.addItem( tr( "Up and down" ), make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Down and up" ), make_unique<PixmapLoader>( "arp_up_and_down" ) );
+	m_arpDirectionModel.addItem( tr( "Random" ), make_unique<PixmapLoader>( "arp_random" ) );
 	m_arpDirectionModel.setInitValue( ArpDirUp );
 
-	m_arpModeModel.addItem( tr( "Free" ), new PixmapLoader( "arp_free" ) );
-	m_arpModeModel.addItem( tr( "Sort" ), new PixmapLoader( "arp_sort" ) );
-	m_arpModeModel.addItem( tr( "Sync" ), new PixmapLoader( "arp_sync" ) );
+	m_arpModeModel.addItem( tr( "Free" ), make_unique<PixmapLoader>( "arp_free" ) );
+	m_arpModeModel.addItem( tr( "Sort" ), make_unique<PixmapLoader>( "arp_sort" ) );
+	m_arpModeModel.addItem( tr( "Sync" ), make_unique<PixmapLoader>( "arp_sync" ) );
 }
 
 
@@ -540,7 +540,6 @@ void InstrumentFunctionArpeggio::saveSettings( QDomDocument & _doc, QDomElement 
 	m_arpTimeModel.saveSettings( _doc, _this, "arptime" );
 	m_arpGateModel.saveSettings( _doc, _this, "arpgate" );
 	m_arpDirectionModel.saveSettings( _doc, _this, "arpdir" );
-
 	m_arpModeModel.saveSettings( _doc, _this, "arpmode" );
 }
 
@@ -558,14 +557,5 @@ void InstrumentFunctionArpeggio::loadSettings( const QDomElement & _this )
 	m_arpTimeModel.loadSettings( _this, "arptime" );
 	m_arpGateModel.loadSettings( _this, "arpgate" );
 	m_arpDirectionModel.loadSettings( _this, "arpdir" );
-/*
-	// Keep compatibility with version 0.2.1 file format
-	if( _this.hasAttribute( "arpsyncmode" ) )
-	{
-	 	m_arpTimeKnob->setSyncMode(
- 		( tempoSyncKnob::tempoSyncMode ) _this.attribute(
- 						 "arpsyncmode" ).toInt() );
-	}*/
-
 	m_arpModeModel.loadSettings( _this, "arpmode" );
 }

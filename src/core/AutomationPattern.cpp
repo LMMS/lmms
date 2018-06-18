@@ -98,16 +98,6 @@ AutomationPattern::AutomationPattern( const AutomationPattern & _pat_to_copy ) :
 	}
 }
 
-
-
-
-AutomationPattern::~AutomationPattern()
-{
-}
-
-
-
-
 bool AutomationPattern::addObject( AutomatableModel * _obj, bool _search_dup )
 {
 	if( _search_dup && m_objects.contains(_obj) )
@@ -629,12 +619,7 @@ const QString AutomationPattern::name() const
 	{
 		return m_objects.first()->fullDisplayName();
 	}
-	return tr( "Drag a control while pressing <%1>" ).arg(
-	#ifdef LMMS_BUILD_APPLE
-		"⌘");
-	#else
-		"Ctrl");
-	#endif
+	return tr( "Drag a control while pressing <%1>" ).arg(UI_CTRL_KEY);
 }
 
 

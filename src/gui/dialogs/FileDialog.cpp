@@ -78,6 +78,39 @@ FileDialog::FileDialog( QWidget *parent, const QString &caption,
 }
 
 
+QString FileDialog::getExistingDirectory(QWidget *parent,
+										const QString &caption,
+										const QString &directory,
+										QFileDialog::Options options)
+{
+	FileDialog dialog(parent, caption, directory, QString());
+	dialog.setFileMode(QFileDialog::Directory);
+	dialog.setOptions(dialog.options() | options);
+	if (dialog.exec() == QDialog::Accepted) {
+		return dialog.selectedFiles().value(0);
+	}
+	return QString();
+}
+
+QString FileDialog::getOpenFileName(QWidget *parent,
+									const QString &caption,
+									const QString &directory,
+									const QString &filter,
+									QString *selectedFilter,
+									QFileDialog::Options options)
+{
+	FileDialog dialog(parent, caption, directory, filter);
+	dialog.setOptions(dialog.options() | options);
+	if (selectedFilter && !selectedFilter->isEmpty())
+		dialog.selectNameFilter(*selectedFilter);
+	if (dialog.exec() == QDialog::Accepted) {
+		if (selectedFilter)
+			*selectedFilter = dialog.selectedNameFilter();
+		return dialog.selectedFiles().value(0);
+	}
+	return QString();
+}
+
 
 void FileDialog::clearSelection()
 {
@@ -85,6 +118,4 @@ void FileDialog::clearSelection()
 	Q_ASSERT( view );
 	view->clearSelection();
 }
-
-
 

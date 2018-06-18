@@ -29,7 +29,6 @@
 #include <QtCore/QTimer>
 #include <QtCore/QList>
 #include <QMainWindow>
-#include <QThread>
 
 #include "ConfigManager.h"
 #include "SubWindow.h"
@@ -148,7 +147,6 @@ public slots:
 	void resetWindowTitle();
 
 	void emptySlot();
-	void enterWhatsThisMode();
 	void createNewProject();
 	void createNewProjectFromTemplate( QAction * _idx );
 	void openProject();
@@ -175,6 +173,9 @@ public slots:
 
 	void autoSave();
 
+private slots:
+	void onExportProjectMidi();
+
 protected:
 	virtual void closeEvent( QCloseEvent * _ce );
 	virtual void focusOutEvent( QFocusEvent * _fe );
@@ -192,6 +193,11 @@ private:
 
 	void toggleWindow( QWidget *window, bool forceShow = false );
 	void refocus();
+
+	void exportProject(bool multiExport = false);
+	void handleSaveResult(QString const & filename, bool songSavedSuccessfully);
+	bool guiSaveProject();
+	bool guiSaveProjectAs( const QString & filename );
 
 	QMdiArea * m_workspace;
 
@@ -241,7 +247,12 @@ private slots:
 	void updateViewMenu( void );
 	void updateConfig( QAction * _who );
 	void onToggleMetronome();
-
+	void onExportProject();
+	void onExportProjectTracks();
+	void onImportProject();
+	void onSongStopped();
+	void onSongModified();
+	void onProjectFileNameChanged();
 
 signals:
 	void periodicUpdate();

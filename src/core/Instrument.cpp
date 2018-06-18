@@ -34,16 +34,6 @@ Instrument::Instrument( InstrumentTrack * _instrument_track,
 {
 }
 
-
-
-
-Instrument::~Instrument()
-{
-}
-
-
-
-
 void Instrument::play( sampleFrame * )
 {
 }

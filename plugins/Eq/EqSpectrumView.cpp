@@ -196,8 +196,6 @@ EqSpectrumView::EqSpectrumView(EqAnalyser *b, QWidget *_parent) :
 
 void EqSpectrumView::paintEvent(QPaintEvent *event)
 {
-	//only analyse if the view is visible
-	m_analyser->setActive( isVisible() );
 	const float energy =  m_analyser->getEnergy();
 	if( energy <= 0 && m_peakSum <= 0 )
 	{		
@@ -209,6 +207,7 @@ void EqSpectrumView::paintEvent(QPaintEvent *event)
 	const int LOWER_Y = -36;	// dB
 	QPainter painter( this );
 	painter.setPen( QPen( m_color, 1, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin ) );
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	if( m_analyser->getInProgress() || m_periodicalUpdate == false )
 	{
@@ -291,5 +290,6 @@ float EqSpectrumView::bandToFreq( int index )
 void EqSpectrumView::periodicalUpdate()
 {
 	m_periodicalUpdate = true;
+	m_analyser->setActive( isVisible() );
 	update();
 }

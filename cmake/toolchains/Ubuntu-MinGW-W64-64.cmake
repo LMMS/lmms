@@ -1,0 +1,2 @@
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/common/Win64.cmake)
+INCLUDE(${CMAKE_CURRENT_LIST_DIR}/common/Ubuntu-MinGW-W64.cmake)

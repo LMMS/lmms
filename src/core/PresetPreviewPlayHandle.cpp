@@ -22,7 +22,6 @@
  *
  */
 
-#include <QAtomicPointer>
 #include <QFileInfo>
 
 #include "PresetPreviewPlayHandle.h"
@@ -34,7 +33,7 @@
 #include "ProjectJournal.h"
 #include "TrackContainer.h"
 
-
+#include <atomic>
 
 // invisible track-container which is needed as parent for preview-channels
 class PreviewTrackContainer : public TrackContainer
@@ -67,25 +66,17 @@ public:
 
 	NotePlayHandle* previewNote()
 	{
-	#if QT_VERSION >= 0x050000
-		return m_previewNote.loadAcquire();
-	#else
-		return m_previewNote;
-	#endif
+		return m_previewNote.load(std::memory_order_acquire);
 	}
 
 	void setPreviewNote( NotePlayHandle * _note )
 	{
-	#if QT_VERSION >= 0x050000
-		m_previewNote.storeRelease( _note );
-	#else
-		m_previewNote = _note;
-	#endif
+		m_previewNote.store(_note, std::memory_order_release);
 	}
 
 	bool testAndSetPreviewNote( NotePlayHandle * expectedVal, NotePlayHandle * newVal )
 	{
-		return m_previewNote.testAndSetOrdered( expectedVal, newVal );
+		return m_previewNote.compare_exchange_strong(expectedVal, newVal);
 	}
 
 	void lockData()
@@ -111,7 +102,7 @@ public:
 
 private:
 	InstrumentTrack* m_previewInstrumentTrack;
-	QAtomicPointer<NotePlayHandle> m_previewNote;
+	std::atomic<NotePlayHandle*> m_previewNote;
 	QMutex m_dataMutex;
 
 	friend class PresetPreviewPlayHandle;
@@ -125,7 +116,7 @@ PreviewTrackContainer * PresetPreviewPlayHandle::s_previewTC;
 
 PresetPreviewPlayHandle::PresetPreviewPlayHandle( const QString & _preset_file, bool _load_by_plugin, DataFile *dataFile ) :
 	PlayHandle( TypePresetPreviewHandle ),
-	m_previewNote( NULL )
+	m_previewNote(nullptr)
 {
 	setUsesBuffer( false );
 

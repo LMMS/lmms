@@ -39,8 +39,9 @@ class LcdSpinBox;
 class QLineEdit;
 
 
-class AudioOss : public AudioDevice, public QThread
+class AudioOss : public QThread, public AudioDevice
 {
+	Q_OBJECT
 public:
 	AudioOss( bool & _success_ful, Mixer* mixer );
 	virtual ~AudioOss();

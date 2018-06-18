@@ -51,7 +51,7 @@ public:
 	FileBrowser( const QString & directories, const QString & filter,
 			const QString & title, const QPixmap & pm,
 			QWidget * parent, bool dirs_as_items = false, bool recurse = false );
-	virtual ~FileBrowser();
+	virtual ~FileBrowser() = default;
 
 private slots:
 	void reloadTree( void );
@@ -65,7 +65,7 @@ private:
 
 	void addItems( const QString & path );
 
-	FileBrowserTreeWidget * m_l;
+	FileBrowserTreeWidget * m_fileBrowserTreeWidget;
 
 	QLineEdit * m_filterEdit;
 
@@ -85,7 +85,7 @@ class FileBrowserTreeWidget : public QTreeWidget
 	Q_OBJECT
 public:
 	FileBrowserTreeWidget( QWidget * parent );
-	virtual ~FileBrowserTreeWidget();
+	virtual ~FileBrowserTreeWidget() = default;
 
 
 protected:

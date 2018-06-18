@@ -55,8 +55,7 @@ VisualizationWidget::VisualizationWidget( const QPixmap & _bg, QWidget * _p,
 	BufferManager::clear( m_buffer, frames );
 
 
-	ToolTip::add( this, tr( "click to enable/disable visualization of "
-							"master-output" ) );
+	ToolTip::add( this, tr( "Oscilloscope" ) );
 }
 
 

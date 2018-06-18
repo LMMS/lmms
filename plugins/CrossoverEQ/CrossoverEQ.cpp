@@ -26,7 +26,7 @@
  
 #include "CrossoverEQ.h"
 #include "lmms_math.h"
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -215,7 +215,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new CrossoverEQEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

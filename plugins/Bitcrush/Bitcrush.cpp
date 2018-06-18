@@ -24,7 +24,7 @@
  */
 
 #include "Bitcrush.h"
-#include "embed.cpp"
+#include "embed.h"
 
 const int OS_RATE = 5;
 const float OS_RATIO = 1.0f / OS_RATE;
@@ -244,7 +244,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model* parent, void* data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model* parent, void* data )
 {
 	return new BitcrushEffect( parent, static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>( data ) );
 }

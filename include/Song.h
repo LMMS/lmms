@@ -2,7 +2,7 @@
  * Song.h - class song - the root of the model-tree
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -102,14 +102,41 @@ public:
 	{
 		return m_nLoadingTrack;
 	}
+
 	inline int getMilliseconds() const
 	{
-		return m_elapsedMilliSeconds;
+		return m_elapsedMilliSeconds[m_playMode];
 	}
-	inline void setMilliSeconds( float ellapsedMilliSeconds )
+
+	inline int getMilliseconds(PlayModes playMode) const
 	{
-		m_elapsedMilliSeconds = ellapsedMilliSeconds;
+		return m_elapsedMilliSeconds[playMode];
 	}
+
+	inline void setToTime(MidiTime const & midiTime)
+	{
+		m_elapsedMilliSeconds[m_playMode] = midiTime.getTimeInMilliseconds(getTempo());
+		m_playPos[m_playMode].setTicks(midiTime.getTicks());
+	}
+
+	inline void setToTime(MidiTime const & midiTime, PlayModes playMode)
+	{
+		m_elapsedMilliSeconds[playMode] = midiTime.getTimeInMilliseconds(getTempo());
+		m_playPos[playMode].setTicks(midiTime.getTicks());
+	}
+
+	inline void setToTimeByTicks(tick_t ticks)
+	{
+		m_elapsedMilliSeconds[m_playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_playPos[m_playMode].setTicks(ticks);
+	}
+
+	inline void setToTimeByTicks(tick_t ticks, PlayModes playMode)
+	{
+		m_elapsedMilliSeconds[playMode] = MidiTime::ticksToMilliseconds(ticks, getTempo());
+		m_playPos[playMode].setTicks(ticks);
+	}
+
 	inline int getTacts() const
 	{
 		return currentTact();
@@ -258,7 +285,7 @@ public:
 
 	void addController( Controller * c );
 	void removeController( Controller * c );
-	
+
 
 	const ControllerVector & controllers() const
 	{
@@ -271,6 +298,9 @@ public:
 		return m_timeSigModel;
 	}
 
+	void exportProjectMidi(QString const & exportFileName) const;
+
+	inline void setLoadOnLauch(bool value) { m_loadOnLaunch = value; }
 
 public slots:
 	void playSong();
@@ -280,11 +310,6 @@ public slots:
 	void playPattern( const Pattern * patternToPlay, bool loop = true );
 	void togglePause();
 	void stop();
-
-	void importProject();
-	void exportProject( bool multiExport = false );
-	void exportProjectTracks();
-	void exportProjectMidi();
 
 	void startExport();
 	void stopExport();
@@ -329,13 +354,13 @@ private:
 	{
 		return m_playPos[m_playMode].getTicks();
 	}
-	
+
 	inline f_cnt_t currentFrame() const
 	{
-		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() + 
+		return m_playPos[m_playMode].getTicks() * Engine::framesPerTick() +
 			m_playPos[m_playMode].currentFrame();
 	}
-	
+
 	void setPlayPos( tick_t ticks, PlayModes playMode );
 
 	void saveControllerStates( QDomDocument & doc, QDomElement & element );
@@ -344,6 +369,10 @@ private:
 	void removeAllControllers();
 
 	void processAutomations(const TrackList& tracks, MidiTime timeStart, fpp_t frames);
+
+	void setModified(bool value);
+
+	void setProjectFileName(QString const & projectFileName);
 
 	AutomationTrack * m_globalAutomationTrack;
 
@@ -381,7 +410,7 @@ private:
 	const Pattern* m_patternToPlay;
 	bool m_loopPattern;
 
-	double m_elapsedMilliSeconds;
+	double m_elapsedMilliSeconds[Mode_Count];
 	tick_t m_elapsedTicks;
 	tact_t m_elapsedTacts;
 
@@ -403,7 +432,9 @@ signals:
 	void controllerAdded( Controller * );
 	void controllerRemoved( Controller * );
 	void updateSampleTracks();
-
+	void stopped();
+	void modified();
+	void projectFileNameChanged();
 } ;
 
 
