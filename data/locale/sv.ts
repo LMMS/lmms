@@ -3939,7 +3939,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
     </message>
     <message>
         <source>&amp;View</source>
-        <translation>&Visa</translation>
+        <translation>&amp;Visa</translation>
     </message>
     <message>
         <source>Toggle metronome</source>
