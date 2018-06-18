@@ -539,7 +539,7 @@ ENDIF()
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	IF(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 	ELSE(WIN32)
