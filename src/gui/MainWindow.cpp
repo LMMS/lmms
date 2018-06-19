@@ -943,15 +943,15 @@ bool MainWindow::saveProject()
 	{
 		return( saveProjectAs() );
 	}
-	else
+	else if( Engine::getSong()->guiSaveProject() )
 	{
-		Engine::getSong()->guiSaveProject();
 		if( getSession() == Recover )
 		{
 			sessionCleanup();
 		}
+		return true;
 	}
-	return( true );
+	return false;
 }
 
 
@@ -997,14 +997,16 @@ bool MainWindow::saveProjectAs()
 				}
 			}
 		}
-		Engine::getSong()->guiSaveProjectAs( fname );
-		if( getSession() == Recover )
+		if( Engine::getSong()->guiSaveProjectAs( fname ) )
 		{
-			sessionCleanup();
+			if( getSession() == Recover )
+			{
+				sessionCleanup();
+			}
+			return true;
 		}
-		return( true );
 	}
-	return( false );
+	return false;
 }
 
 
@@ -1022,8 +1024,7 @@ bool MainWindow::saveProjectAsNewVersion()
 		do 		VersionedSaveDialog::changeFileNameVersion( fileName, true );
 		while 	( QFile( fileName ).exists() );
 
-		Engine::getSong()->guiSaveProjectAs( fileName );
-		return true;
+		return Engine::getSong()->guiSaveProjectAs( fileName );
 	}
 }
 
