@@ -573,7 +573,7 @@ SampleTrack::~SampleTrack()
 
 
 bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
-					const f_cnt_t _offset, int _tco_num )
+						const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
 	bool played_a_note = false;	// will be return variable
@@ -582,47 +582,39 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	::BBTrack * bb_track = NULL;
 	if( _tco_num >= 0 )
 	{
-		if( _start != 0 )
-		{
-			return false;
-		}
-		tcos.push_back( getTCO( _tco_num ) );
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
 		}
 	}
-	else
+	for( int i = 0; i < numOfTCOs(); ++i )
 	{
-		for( int i = 0; i < numOfTCOs(); ++i )
+		TrackContentObject * tco = getTCO( i );
+		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
+		float framesPerTick = Engine::framesPerTick();
+		if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 		{
-			TrackContentObject * tco = getTCO( i );
-			SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
-			float framesPerTick = Engine::framesPerTick();
-			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
+			if( sTco->isPlaying() == false )
 			{
-				if( sTco->isPlaying() == false )
+				f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
+				f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
+				f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
+				//if the Tco smaller than the sample length we play only until Tco end
+				//else we play the sample to the end but nothing more
+				f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
+				//we only play within the sampleBuffer limits
+				if( sampleStart < sampleBufferLength )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
-					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
-					//if the Tco smaller than the sample length we play only until Tco end
-					//else we play the sample to the end but nothing more
-					f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
-					//we only play within the sampleBuffer limits
-					if( sampleStart < sampleBufferLength )
-					{
-						sTco->setSampleStartFrame( sampleStart );
-						sTco->setSamplePlayLength( samplePlayLength );
-						tcos.push_back( sTco );
-						sTco->setIsPlaying( true );
-					}
+					sTco->setSampleStartFrame( sampleStart );
+					sTco->setSamplePlayLength( samplePlayLength );
+					tcos.push_back( sTco );
+					sTco->setIsPlaying( true );
 				}
 			}
-			else
-			{
-				sTco->setIsPlaying( false );
-			}
+		}
+		else
+		{
+			sTco->setIsPlaying( false );
 		}
 	}
 
