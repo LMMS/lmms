@@ -19,5 +19,7 @@ int main(int argc, char* argv[])
 		failed += QTest::qExec(suite, argc, argv);
 	}
 	qDebug() << "<<" << failed << "out of"<<numsuites<<"test suites failed.";
+
+	Engine::destroy();
 	return failed;
 }
