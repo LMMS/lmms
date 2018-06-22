@@ -48,7 +48,8 @@
 #include "Mixer.h"
 #include "EffectRackView.h"
 #include "TrackLabelButton.h"
-
+#include <QDebug>
+#include "BBTrackContainer.h"
 SampleTCO::SampleTCO( Track * _track ) :
 	TrackContentObject( _track ),
 	m_sampleBuffer( new SampleBuffer ),
@@ -579,25 +580,42 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 	bool played_a_note = false;	// will be return variable
 
 	tcoVector tcos;
+	//Are we playing in a BBTrack?
 	::BBTrack * bb_track = NULL;
+	MidiTime bbEndPos = 0;
 	if( _tco_num >= 0 )
 	{
 		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
 		{
 			bb_track = BBTrack::findBBTrack( _tco_num );
+			TrackContentObject *bbtco = bb_track->getTCO(_tco_num);
+			if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
+			{
+				bbEndPos = bbtco->endPosition();
+			}
 		}
 	}
+
+
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
 		TrackContentObject * tco = getTCO( i );
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 		float framesPerTick = Engine::framesPerTick();
-		if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
+		MidiTime TcoEndposition = sTco->endPosition();
+		//if we play a BBTCO but not from the BBEditor,
+		//we set the endposition to the end of the BBTCO in the SongEditor
+		if(bbEndPos > 0)
+		{
+			TrackContentObject *bbtco = bb_track->getTCO(_tco_num);
+			TcoEndposition = bbEndPos - bbtco->startPosition();
+		}
+		if( _start >= sTco->startPosition() && _start < TcoEndposition )
 		{
 			if( sTco->isPlaying() == false )
 			{
 				f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
-				f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
+				f_cnt_t tcoFrameLength = framesPerTick * ( TcoEndposition - sTco->startPosition() );
 				f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 				//if the Tco smaller than the sample length we play only until Tco end
 				//else we play the sample to the end but nothing more
