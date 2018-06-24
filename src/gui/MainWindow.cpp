@@ -51,7 +51,6 @@
 #include "FxMixerView.h"
 #include "GuiApplication.h"
 #include "ImportFilter.h"
-#include "Oscillator.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "PluginFactory.h"
@@ -102,14 +101,6 @@ MainWindow::MainWindow() :
 	disableAutoKeyAccelerators(this);
 #endif
 	setAttribute( Qt::WA_DeleteOnClose );
-
-	//first instace of oscillator initilises the wavetables
-	//this should be done during the lmms setup stage
-	//TODO relocate
-
-	Oscillator *o = new Oscillator(0,0,0,0,0,0,0);
-	o->waveTableInit();
-	delete o;
 
 	QWidget * main_widget = new QWidget( this );
 	QVBoxLayout * vbox = new QVBoxLayout( main_widget );

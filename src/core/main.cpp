@@ -65,6 +65,7 @@
 #include "GuiApplication.h"
 #include "ImportFilter.h"
 #include "MainWindow.h"
+#include "Oscillator.h"
 #include "OutputSettings.h"
 #include "ProjectRenderer.h"
 #include "RenderManager.h"
@@ -236,6 +237,16 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
+void initilizeOscillator()
+{
+	//first instace of oscillator initilises the wavetables
+	//this should be done during the lmms setup stage
+
+	Oscillator *o = new Oscillator(0,0,0,0,0,0,0);
+	o->waveTableInit();
+	delete o;
+}
+
 
 int main( int argc, char * * argv )
 {
@@ -253,6 +264,9 @@ int main( int argc, char * * argv )
 
 	// initialize memory managers
 	NotePlayHandleManager::init();
+
+	//initilize oscillators
+	initilizeOscillator();
 
 	// intialize RNG
 	srand( getpid() + time( 0 ) );

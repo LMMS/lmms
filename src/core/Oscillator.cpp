@@ -46,8 +46,6 @@ void Oscillator::waveTableInit()
 			s_waveTableBandFreqs[s_waveTablesPerWaveformCount] = 440.0 * powf(2.0, (i - 69.0) / 12.0);
 			s_waveTablesPerWaveformCount++;
 		}
-	
-
 	if (!s_waveTables)
 	{
 		allocWaveTables();
