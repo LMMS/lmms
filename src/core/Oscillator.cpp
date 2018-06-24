@@ -29,7 +29,6 @@
 #include "Engine.h"
 #include "Mixer.h"
 #include "AutomatableModel.h"
-#include "fft_helpers.h"
 #include "fftw3.h"
 
 
@@ -79,8 +78,6 @@ Oscillator::Oscillator( const IntModel * _wave_shape_model,
 	m_fftPlan( 0 ),
 	m_ifftPlan( 0 ),
 	m_specBuf( 0 )
-
-
 {
 }
 

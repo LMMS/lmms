@@ -37,9 +37,7 @@
 #include <fftw3.h>
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
-#include "fft_helpers.h"
-#include "lmms_basics.h"
-#include "lmms_math.h"
+
 
 class IntModel;
 
@@ -169,7 +167,6 @@ public:
 
 	inline sample_t wtSample(const WaveShapes shape, const float _sample)
 	{
-//		printf("WTSample shape: %d \n",shape);
 		const float frame = _sample * WAVETABLE_LENGTH;
 		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % WAVETABLE_LENGTH;
 		if (f1 < 0)
@@ -200,27 +197,10 @@ private:
 	/* Multiband WaveTable */
 	static const int WAVETABLE_LENGTH = 1024;
 	static const int MAX_FREQ = 20000; //limit to the audio spectrum
-
-	///
-	/// \brief SineTable
-	/// the calculated Sine Wave Table
 	sample_t *m_generatedWaveTable;
-
-	///
-	/// \brief m_bandFreq
-	///array containing base frequency for each band
-
 	static float *s_waveTableBandFreqs;
-	///
-	/// \brief m_tableCount
-	///The number of tables the audio spectrum is split into.
 	static int s_waveTablesPerWaveformCount;
-
-	///
-	/// \brief s_waveTables
-	///3d array [waveform][band][frame]
 	static sample_t ***s_waveTables;
-
 	fftwf_plan m_fftPlan;
 	fftwf_plan m_ifftPlan;
 	fftwf_complex * m_specBuf;

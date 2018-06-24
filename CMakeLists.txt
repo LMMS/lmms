@@ -15,11 +15,6 @@ IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0020 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-#TODO move fftw3 to correct location
-#INCLUDE_DIRECTORIES(${FFTW3F_INCLUDE_DIRS})
-#LINK_DIRECTORIES(${FFTW3F_LIBRARY_DIRS})
-#LINK_LIBRARIES(${FFTW3F_LIBRARIES})
-
 INCLUDE(CheckSubmodules)
 INCLUDE(AddFileDependencies)
 INCLUDE(CheckIncludeFiles)
@@ -703,7 +698,5 @@ MESSAGE(
 "running cmake again!\n"
 "-----------------------------------------------------------------\n"
 "\n\n")
-
-
 
 INCLUDE(InstallRequiredSystemLibraries)
