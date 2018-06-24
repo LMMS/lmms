@@ -783,7 +783,7 @@ bool RemoteVstPlugin::load( const std::string & _plugin_file )
 {
 	if( ( m_libInst = LoadLibrary( _plugin_file.c_str() ) ) == NULL )
 	{
-		DWORD error	= GetLastError();
+		DWORD error = GetLastError();
 		debugMessage( "LoadLibrary failed: " + GetErrorAsString(error) );
 		return false;
 	}
