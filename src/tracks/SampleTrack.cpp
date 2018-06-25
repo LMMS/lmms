@@ -577,25 +577,51 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 						const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
-	bool played_a_note = false;	// will be return variable
+
+	//will be return variable
+	bool played_a_note = false;
 
 	tcoVector tcos;
-	//Are we playing in a BBTrack?
+
 	::BBTrack * bb_track = NULL;
 	MidiTime bbEndPos = 0;
+
+	/********************************************************************
+	* In this whole block we find our BB Track TCO in the Songeditor
+	* and so we can calculate the length of it.
+	* If _tco_num is equal or bigger than 0, we know we have a
+	* Sampletrack within a BB-Container
+	********************************************************************/
+
 	if( _tco_num >= 0 )
 	{
-		if (trackContainer() == (TrackContainer*)Engine::getBBTrackContainer())
+		//the BB-Track in Songeditor
+		bb_track = BBTrack::findBBTrack( _tco_num );
+		//Vector of BB Tcos in Songeditor. It will be filled later
+		tcoVector bbtcos;
+		//Do we play in BB-Editor or in Songeditor?
+		if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
 		{
-			bb_track = BBTrack::findBBTrack( _tco_num );
-			TrackContentObject *bbtco = bb_track->getTCO(_tco_num);
-			if( Engine::getSong()->playMode() != Song::Mode_PlayBB )
+			MidiTime currentSongPos = Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).getTicks();
+			bb_track->getTCOsInRange( bbtcos, currentSongPos, currentSongPos );
+			if( bbtcos.size() != 0 )
 			{
-				bbEndPos = bbtco->endPosition();
+				for( int i = 0; i < bbtcos.size(); ++i )
+				{
+					if( !bbtcos.at(i)->isMuted()
+					  && bbEndPos < bbtcos.at(i)->length() )
+					{
+						bbEndPos = bbtcos.at(i)->length();
+					}
+				}
 			}
 		}
 	}
 
+	/********************************************************************
+	 * Now we iterate over all TCOs in the Sampletrack
+	 * If the sampletrack is within a BB-Container we have only one TCO
+	 * *****************************************************************/
 
 	for( int i = 0; i < numOfTCOs(); ++i )
 	{
@@ -603,21 +629,25 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		SampleTCO * sTco = dynamic_cast<SampleTCO*>( tco );
 		float framesPerTick = Engine::framesPerTick();
 		MidiTime TcoEndposition = sTco->endPosition();
+
 		//if we play a BBTCO but not from the BBEditor,
-		//we set the endposition to the end of the BBTCO in the SongEditor
-		if(bbEndPos > 0)
+		//we set the endposition to the length of the BBTCO in the SongEditor
+		if( bbEndPos > 0)
 		{
-			TrackContentObject *bbtco = bb_track->getTCO(_tco_num);
-			TcoEndposition = bbEndPos - bbtco->startPosition();
+			TcoEndposition = bbEndPos;
 		}
-		if( _start >= sTco->startPosition() && _start < TcoEndposition )
+
+		//We want to play the sample if the Songposition is within our TCO
+		if( _start >= sTco->startPosition() && _start <= TcoEndposition )
 		{
+			//Play the sample only if it's not playing, yet
 			if( sTco->isPlaying() == false )
 			{
 				f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
 				f_cnt_t tcoFrameLength = framesPerTick * ( TcoEndposition - sTco->startPosition() );
 				f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
-				//if the Tco smaller than the sample length we play only until Tco end
+
+				//if the Tco is smaller than the sample length, we play only until Tco end
 				//else we play the sample to the end but nothing more
 				f_cnt_t samplePlayLength = tcoFrameLength > sampleBufferLength ? sampleBufferLength : tcoFrameLength;
 				//we only play within the sampleBuffer limits
@@ -628,6 +658,14 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 					tcos.push_back( sTco );
 					sTco->setIsPlaying( true );
 				}
+			}
+
+			//we have to setIsPlaying(false) at the end of a BB Track (Songeditor-)TCO.
+			//unfortunately this play()function is only called if the Songposition
+			//is within the BBTrack TCO.
+			if(bbEndPos > 0 && _start + 1 == TcoEndposition )
+			{
+				sTco->setIsPlaying( false );
 			}
 		}
 		else
