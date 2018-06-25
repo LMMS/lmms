@@ -691,9 +691,9 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 
 
 
-static void close_check( FILE* fd )
+static void close_check( FILE* fp )
 {
-	if( fclose( fd ) )
+	if( fclose( fp ) )
 	{
 		perror( "fclose" );
 	}
@@ -1061,13 +1061,13 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 
-			FILE* fd = fopen( _file.c_str(), "wb" );
-			if ( fwrite( chunk, 1, len, fd ) != len )
+			FILE* fp = fopen( _file.c_str(), "wb" );
+			if ( fwrite( chunk, 1, len, fp ) != len )
 			{
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
 			}
-			close_check( fd );
+			close_check( fp );
 		}
 	}
 }
@@ -1263,7 +1263,7 @@ void RemoteVstPlugin::savePreset( const std::string & _file )
 	}
 	fclose( stream );
 
-	if ( !chunky ) 
+	if ( !chunky )
 		delete[] data;
 	delete[] (sBank*)pBank;
 
@@ -1379,12 +1379,12 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 {
 	char * chunk = new char[_len];
 
-	FILE* fd = fopen( _file.c_str(), "rb" );
-	if ( fread( chunk, 1, _len, fd ) != _len )
+	FILE* fp = fopen( _file.c_str(), "rb" );
+	if ( fread( chunk, 1, _len, fp ) != _len )
 	{
 		fprintf( stderr, "Error loading chunk from file.\n" );
 	}
-	close_check( fd );
+	close_check( fp );
 
 	pluginDispatch( effSetChunk, 0, _len, chunk );
 
@@ -1524,7 +1524,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 				_timeInfo.flags |= kVstTransportCycleActive;
 			}
 
-			if( __plugin->m_vstSyncData->ppqPos != 
+			if( __plugin->m_vstSyncData->ppqPos !=
 							__plugin->m_in->m_Timestamp )
 			{
 				_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
@@ -1547,7 +1547,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			{
 				_timeInfo.flags |= kVstTransportPlaying;
 			}
-			_timeInfo.barStartPos = ( (int) ( _timeInfo.ppqPos / 
+			_timeInfo.barStartPos = ( (int) ( _timeInfo.ppqPos /
 				( 4 *__plugin->m_vstSyncData->timeSigNumer
 				/ (float) __plugin->m_vstSyncData->timeSigDenom ) ) ) *
 				( 4 * __plugin->m_vstSyncData->timeSigNumer
