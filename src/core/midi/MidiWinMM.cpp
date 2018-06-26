@@ -248,9 +248,13 @@ void MidiWinMM::closeDevices()
 	m_outputSubs.clear();
 
 	QMapIterator<HMIDIIN, QString> i( m_inputDevices );
+
+	HMIDIIN hInDev;
 	while( i.hasNext() )
 	{
-		midiInClose( i.next().key() );
+		hInDev = i.next().key();
+		midiInReset( hInDev );
+		midiInClose( hInDev );
 	}
 
 	QMapIterator<HMIDIOUT, QString> o( m_outputDevices );
