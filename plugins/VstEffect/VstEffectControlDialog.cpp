@@ -30,6 +30,7 @@
 #include "VstEffectControlDialog.h"
 #include "VstEffect.h"
 
+#include "ConfigManager.h"
 #include "PixmapButton.h"
 #include "embed.h"
 #include "ToolTip.h"
@@ -40,10 +41,10 @@
 #include <QToolBar>
 #include <QLabel>
 
-
 VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	EffectControlDialog( _ctl ),
 	m_pluginWidget( NULL ),
+
 	m_plugin( NULL ),
 	tbLabel( NULL )
 {
@@ -52,37 +53,43 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 	l->setVerticalSpacing( 2 );
 	l->setHorizontalSpacing( 2 );
 
+	bool embed_vst = false;
+
 	if( _ctl != NULL && _ctl->m_effect != NULL &&
 					_ctl->m_effect->m_plugin != NULL )
 	{
 		m_plugin = _ctl->m_effect->m_plugin;
-		m_plugin->showEditor( NULL, true );
-		m_pluginWidget = m_plugin->pluginWidget();
+		embed_vst = m_plugin->embedMethod() != "none";
 
-#ifdef LMMS_BUILD_WIN32
-
-		if( !m_pluginWidget )
-		{
-			m_pluginWidget = m_plugin->pluginWidget( false );
+		if (embed_vst) {
+			if (m_plugin->hasEditor() && ! m_plugin->pluginWidget()) {
+				m_plugin->createUI(this);
+			}
+			m_pluginWidget = m_plugin->pluginWidget();
 		}
-#endif
 	}
 
-	if( m_pluginWidget )
+	if (m_plugin)
 	{
-		setWindowTitle( m_pluginWidget->windowTitle() );
-		setMinimumWidth( 250 );
+		setWindowTitle( m_plugin->name() );
 
-		QPushButton * btn = new QPushButton( tr( "Show/hide" ) );
-		btn->setCheckable( true );
-		connect( btn, SIGNAL( toggled( bool ) ),
-					m_pluginWidget, SLOT( setVisible( bool ) ) );
-		emit btn->click();
+		QPushButton * btn = new QPushButton( tr( "Show/hide" ));
+
+		if (embed_vst) {
+			btn->setCheckable( true );
+			btn->setChecked( true );
+			connect( btn, SIGNAL( toggled( bool ) ),
+						SLOT( togglePluginUI( bool ) ) );
+		} else {
+			connect( btn, SIGNAL( clicked() ),
+						m_plugin.data(), SLOT( toggleUI() ) );
+		}
 
 		btn->setMinimumWidth( 78 );
 		btn->setMaximumWidth( 78 );
 		btn->setMinimumHeight( 24 );
 		btn->setMaximumHeight( 24 );
+		m_togglePluginButton = btn;
 
 		m_managePluginButton = new PixmapButton( this, "" );
 		m_managePluginButton->setCheckable( false );
@@ -93,10 +100,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"controls" ) );
 		connect( m_managePluginButton, SIGNAL( clicked() ),  _ctl,
 						SLOT( managePlugin() ) );
-		ToolTip::add( m_managePluginButton, tr( "Control VST-plugin from LMMS host" ) );
-
-		m_managePluginButton->setWhatsThis(
-			tr( "Click here, if you want to control VST-plugin from host." ) );
+		ToolTip::add( m_managePluginButton, tr( "Control VST plugin from LMMS host" ) );
 
 		m_managePluginButton->setMinimumWidth( 26 );
 		m_managePluginButton->setMaximumWidth( 26 );
@@ -112,10 +116,7 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 							"project_open" ) );
 		connect( m_openPresetButton, SIGNAL( clicked() ), _ctl,
 						SLOT( openPreset() ) );
-		ToolTip::add( m_openPresetButton, tr( "Open VST-plugin preset" ) );
-
-		m_openPresetButton->setWhatsThis(
-			tr( "Click here, if you want to open another *.fxp, *.fxb VST-plugin preset." ) );
+		ToolTip::add( m_openPresetButton, tr( "Open VST plugin preset" ) );
 
 		m_openPresetButton->setMinimumWidth( 16 );
 		m_openPresetButton->setMaximumWidth( 16 );
@@ -139,9 +140,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolLPresetButton->setShortcut( Qt::Key_Minus );
 
-		m_rolLPresetButton->setWhatsThis(
-			tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
-
 		m_rolLPresetButton->setMinimumWidth( 16 );
 		m_rolLPresetButton->setMaximumWidth( 16 );
 		m_rolLPresetButton->setMinimumHeight( 16 );
@@ -164,9 +162,6 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 
 		m_rolRPresetButton->setShortcut( Qt::Key_Plus );
 
-		m_rolRPresetButton->setWhatsThis(
-			tr( "Click here, if you want to switch to another VST-plugin preset program." ) );
-
 		m_rolRPresetButton->setMinimumWidth( 16 );
 		m_rolRPresetButton->setMaximumWidth( 16 );
 		m_rolRPresetButton->setMinimumHeight( 16 );
@@ -177,10 +172,11 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		_ctl->m_selPresetButton->setCheckable( false );
 		_ctl->m_selPresetButton->setCursor( Qt::PointingHandCursor );
 		_ctl->m_selPresetButton->setIcon( embed::getIconPixmap( "stepper-down" ) );
-		_ctl->m_selPresetButton->setWhatsThis(
-			tr( "Click here to select presets that are currently loaded in VST." ) );
 
- 		_ctl->m_selPresetButton->setMenu(_ctl->menu);
+		QMenu * menu = new QMenu;
+		connect( menu, SIGNAL( aboutToShow() ), _ctl, SLOT( updateMenu() ) );
+
+ 		_ctl->m_selPresetButton->setMenu(menu);
 
 		_ctl->m_selPresetButton->setMinimumWidth( 16 );
 		_ctl->m_selPresetButton->setMaximumWidth( 16 );
@@ -198,16 +194,18 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 						SLOT( savePreset() ) );
 		ToolTip::add( m_savePresetButton, tr( "Save preset" ) );
 
-		m_savePresetButton->setWhatsThis(
-			tr( "Click here, if you want to save current VST-plugin preset program." ) );
-
 		m_savePresetButton->setMinimumWidth( 21 );
 		m_savePresetButton->setMaximumWidth( 21 );
 		m_savePresetButton->setMinimumHeight( 21 );
 		m_savePresetButton->setMaximumHeight( 21 );
 
-		int newSize = m_pluginWidget->width() + 20;
-		newSize = (newSize < 250) ? 250 : newSize;
+		int newSize = 0;
+
+		if (m_pluginWidget) {
+			newSize = m_pluginWidget->width() + 20;
+		}
+		newSize = std::max(newSize, 250);
+
 		QWidget* resize = new QWidget(this);
 		resize->resize( newSize, 10 );
 		QWidget* space0 = new QWidget(this);
@@ -219,7 +217,9 @@ VstEffectControlDialog::VstEffectControlDialog( VstEffectControls * _ctl ) :
 		l->addItem( new QSpacerItem( newSize - 20, 30, QSizePolicy::Fixed,
 						QSizePolicy::Fixed ), 1, 0 );
 		l->addWidget( resize, 2, 0, 1, 1, Qt::AlignCenter );
-		l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
+		if (m_pluginWidget) {
+			l->addWidget( m_pluginWidget, 3, 0, 1, 1, Qt::AlignCenter );
+		}
 		l->setRowStretch( 5, 1 );
 		l->setColumnStretch( 1, 1 );
 
@@ -256,11 +256,47 @@ void VstEffectControlDialog::paintEvent( QPaintEvent * )
 	}
 }
 
+void VstEffectControlDialog::showEvent(QShowEvent *_se)
+{
+	EffectControlDialog::showEvent( _se );
+	// Workaround for a (unexplained) bug where on project-load the effect
+	// control window has size 0 and would only restore to the proper size upon
+	// moving the window or interacting with it.
+	if (parentWidget()) {
+		parentWidget()->adjustSize();
+	}
+}
+
 
 
 
 VstEffectControlDialog::~VstEffectControlDialog()
 {
-	//delete m_pluginWidget;
+#if !(QT_VERSION < 0x050000 && defined(LMMS_BUILD_LINUX))
+	if (m_pluginWidget && layout()) {
+		layout()->removeWidget(m_pluginWidget);
+		m_pluginWidget->setParent(nullptr);
+	}
+#endif
+}
+
+
+
+
+void VstEffectControlDialog::togglePluginUI( bool checked )
+{
+	if( !m_plugin ) {
+		return;
+	}
+
+	if ( m_togglePluginButton->isChecked() != checked ) {
+		m_togglePluginButton->setChecked( checked );
+	}
+
+	if ( checked ) {
+		m_plugin->showUI();
+	} else {
+		m_plugin->hideUI();
+	}
 }
 

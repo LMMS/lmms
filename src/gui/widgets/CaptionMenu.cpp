@@ -42,23 +42,3 @@ CaptionMenu::CaptionMenu( const QString & _title, QWidget * _parent ) :
 CaptionMenu::~CaptionMenu()
 {
 }
-
-
-
-
-void CaptionMenu::addHelpAction()
-{
-	QWidget* parent = (QWidget*) this->parent();
-
-	if (parent == NULL)
-		return;
-
-	if (! parent->whatsThis().isEmpty()) {
-		addAction( embed::getIconPixmap( "help" ), tr( "&Help" ),
-							parent, SLOT( displayHelp() ) );
-	}
-	else {
-		QAction* helpAction = addAction( embed::getIconPixmap("help"), tr("Help (not available)") );
-		helpAction->setDisabled(true);
-	}
-}

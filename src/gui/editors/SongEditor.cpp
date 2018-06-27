@@ -82,11 +82,11 @@ SongEditor::SongEditor( Song * song ) :
 {
 	m_zoomingModel->setParent(this);
 	// create time-line
-	int widgetTotal = ConfigManager::inst()->value( "ui",
+	m_widgetWidthTotal = ConfigManager::inst()->value( "ui",
 							"compacttrackbuttons" ).toInt()==1 ?
 		DEFAULT_SETTINGS_WIDGET_WIDTH_COMPACT + TRACK_OP_WIDTH_COMPACT :
 		DEFAULT_SETTINGS_WIDGET_WIDTH + TRACK_OP_WIDTH;
-	m_timeLine = new TimeLineWidget( widgetTotal, 32,
+	m_timeLine = new TimeLineWidget( m_widgetWidthTotal, 32,
 					pixelsPerTact(),
 					m_song->m_playPos[Song::Mode_PlaySong],
 					m_currentPosition,
@@ -112,16 +112,8 @@ SongEditor::SongEditor( Song * song ) :
 
 	m_tempoSpinBox = new LcdSpinBox( 3, tb, tr( "Tempo" ) );
 	m_tempoSpinBox->setModel( &m_song->m_tempoModel );
-	m_tempoSpinBox->setLabel( tr( "TEMPO/BPM" ) );
-	ToolTip::add( m_tempoSpinBox, tr( "tempo of song" ) );
-
-	m_tempoSpinBox->setWhatsThis(
-		tr( "The tempo of a song is specified in beats per minute "
-			"(BPM). If you want to change the tempo of your "
-			"song, change this value. Every measure has four beats, "
-			"so the tempo in BPM specifies, how many measures / 4 "
-			"should be played within a minute (or how many measures "
-			"should be played within four minutes)." ) );
+	m_tempoSpinBox->setLabel( tr( "TEMPO" ) );
+	ToolTip::add( m_tempoSpinBox, tr( "Tempo in BPM" ) );
 
 	int tempoSpinBoxCol = gui->mainWindow()->addWidgetToToolBar( m_tempoSpinBox, 0 );
 
@@ -158,7 +150,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterVolumeSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterVolumeSlider->setFixedSize( 26, 60 );
 	m_masterVolumeSlider->setTickInterval( 50 );
-	ToolTip::add( m_masterVolumeSlider, tr( "master volume" ) );
+	ToolTip::add( m_masterVolumeSlider, tr( "Master volume" ) );
 
 	connect( m_masterVolumeSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( setMasterVolume( int ) ) );
@@ -191,7 +183,7 @@ SongEditor::SongEditor( Song * song ) :
 	m_masterPitchSlider->setTickPosition( QSlider::TicksLeft );
 	m_masterPitchSlider->setFixedSize( 26, 60 );
 	m_masterPitchSlider->setTickInterval( 12 );
-	ToolTip::add( m_masterPitchSlider, tr( "master pitch" ) );
+	ToolTip::add( m_masterPitchSlider, tr( "Master pitch" ) );
 	connect( m_masterPitchSlider, SIGNAL( logicValueChanged( int ) ), this,
 			SLOT( setMasterPitch( int ) ) );
 	connect( m_masterPitchSlider, SIGNAL( sliderPressed() ), this,
@@ -385,6 +377,16 @@ void SongEditor::wheelEvent( QWheelEvent * we )
 			z--;
 		}
 		z = qBound( 0, z, m_zoomingModel->size() - 1 );
+
+
+		int x = (we->x() - m_widgetWidthTotal);
+		// tact based on the mouse x-position where the scroll wheel was used
+		int tact= x  / pixelsPerTact();
+		// what would be the tact in the new zoom level on the very same mouse x
+		int newTact = x / DEFAULT_PIXELS_PER_TACT / m_zoomLevels[z];
+		// scroll so the tact "selected" by the mouse x doesn't move on the screen
+		m_leftRightScroll->setValue(m_leftRightScroll->value() + tact - newTact);
+
 		// update combobox with zooming-factor
 		m_zoomingModel->setValue( z );
 
@@ -671,14 +673,6 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
-	m_playAction->setWhatsThis(
-				tr("Click here, if you want to play your whole song. "
-				   "Playing will be started at the song-position-marker (green). "
-				   "You can also move it while playing."));
-	m_stopAction->setWhatsThis(
-				tr("Click here, if you want to stop playing of your song. "
-				   "The song-position-marker will be set to the start of your song."));
-
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
@@ -729,6 +723,7 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_zoomingComboBox->setFixedSize( 80, 22 );
 	m_zoomingComboBox->move( 580, 4 );
 	m_zoomingComboBox->setModel(m_editor->m_zoomingModel);
+	m_zoomingComboBox->setToolTip(tr("Horizontal zooming"));
 
 	zoomToolBar->addWidget( zoom_lbl );
 	zoomToolBar->addWidget( m_zoomingComboBox );

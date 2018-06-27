@@ -41,10 +41,3 @@ ToolButton::ToolButton( const QPixmap & _pixmap, const QString & _tooltip,
 	ToolTip::add( this, _tooltip );
 	setIcon( _pixmap );
 }
-
-
-
-
-ToolButton::~ToolButton()
-{
-}

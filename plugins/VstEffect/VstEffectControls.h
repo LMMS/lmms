@@ -59,10 +59,7 @@ public:
 
 	virtual int controlCount();
 
-	virtual EffectControlDialog * createView()
-	{
-		return new VstEffectControlDialog( this );
-	}
+	virtual EffectControlDialog * createView();
 
 
 protected slots:
@@ -82,12 +79,10 @@ private:
 	VstEffect * m_effect;
 
 	QPushButton * m_selPresetButton;
-	QMenu *menu;
 
 	QMdiSubWindow * m_subWindow;
 	QScrollArea * m_scrollArea;
 	FloatModel ** knobFModel;
-	Knob ** vstKnobs;
 	int paramCount;
 
 	QObject * ctrHandle;
@@ -98,6 +93,7 @@ private:
 	friend class VstEffectControlDialog;
 	friend class manageVSTEffectView;
 
+	bool m_vstGuiVisible;
 } ;
 
 
@@ -133,6 +129,7 @@ private:
 	QPushButton * m_syncButton;
 	QPushButton * m_displayAutomatedOnly;
 	QPushButton * m_closeButton;
+	Knob ** vstKnobs;
 
 } ;
 

@@ -135,6 +135,7 @@ private:
 
 	bool m_scrollBack;
 	bool m_smoothScroll;
+	int m_widgetWidthTotal;
 
 	EditMode m_mode;
 	EditMode m_ctrlMode; // mode they were in before they hit ctrl

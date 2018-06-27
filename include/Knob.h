@@ -139,7 +139,6 @@ protected:
 
 private slots:
 	virtual void enterValue();
-	void displayHelp();
 	void friendlyUpdate();
 	void toggleScale();
 

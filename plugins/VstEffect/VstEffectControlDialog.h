@@ -31,6 +31,7 @@
 #include <QObject>
 #include <QPainter>
 #include <QLabel>
+#include <QSharedPointer>
 
 
 class VstEffectControls;
@@ -49,19 +50,24 @@ public:
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
+	virtual void showEvent( QShowEvent* _se ) override;
 
 private:
 	QWidget * m_pluginWidget;
 
+	QPushButton * m_togglePluginButton;
 	PixmapButton * m_openPresetButton;
 	PixmapButton * m_rolLPresetButton;
 	PixmapButton * m_rolRPresetButton;
 	PixmapButton * m_managePluginButton;
 	PixmapButton * m_savePresetButton;
 
-	VstPlugin * m_plugin;
+	QSharedPointer<VstPlugin> m_plugin;
 
 	QLabel * tbLabel;
+
+public slots:
+	void togglePluginUI( bool checked );
 } ;
 
 #endif

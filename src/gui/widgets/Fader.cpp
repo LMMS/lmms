@@ -133,12 +133,6 @@ Fader::Fader( FloatModel * model, const QString & name, QWidget * parent, QPixma
 	init(model, name);
 }
 
-
-Fader::~Fader()
-{
-}
-
-
 void Fader::init(FloatModel * model, QString const & name)
 {
 	setWindowTitle( name );
@@ -188,6 +182,13 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 	if( mouseEvent->button() == Qt::LeftButton &&
 			! ( mouseEvent->modifiers() & Qt::ControlModifier ) )
 	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->addJournalCheckPoint();
+			thisModel->saveJournallingState( false );
+		}
+
 		if( mouseEvent->y() >= knobPosY() - ( *m_knob ).height() && mouseEvent->y() < knobPosY() )
 		{
 			updateTextFloat();
@@ -218,7 +219,7 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	// TODO: dbV handling
 	if( m_displayConversion )
 	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
+		newValue = QInputDialog::getDouble( this, tr( "Set value" ),
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() * 100 ).
 							arg( model()->maxValue() * 100 ),
@@ -228,7 +229,7 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 	}
 	else
 	{
-		newValue = QInputDialog::getDouble( this, windowTitle(),
+		newValue = QInputDialog::getDouble( this, tr( "Set value" ),
 					tr( "Please enter a new value between %1 and %2:" ).
 							arg( model()->minValue() ).
 							arg( model()->maxValue() ),
@@ -245,8 +246,17 @@ void Fader::mouseDoubleClickEvent( QMouseEvent* mouseEvent )
 
 
 
-void Fader::mouseReleaseEvent( QMouseEvent * _me )
+void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 {
+	if( mouseEvent && mouseEvent->button() == Qt::LeftButton )
+	{
+		AutomatableModel *thisModel = model();
+		if( thisModel )
+		{
+			thisModel->restoreJournallingState();
+		}
+	}
+
 	s_textFloat->hide();
 }
 
@@ -323,7 +333,7 @@ void Fader::updateTextFloat()
 	if( ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() && m_displayConversion )
 	{
 		s_textFloat->setText( QString("Volume: %1 dBFS").
-				arg( 20.0 * log10( model()->value() ), 3, 'f', 2 ) );
+				arg( ampToDbfs( model()->value() ), 3, 'f', 2 ) );
 	}
 	else
 	{

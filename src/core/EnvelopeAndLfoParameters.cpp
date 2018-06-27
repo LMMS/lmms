@@ -93,13 +93,13 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 							Model * _parent ) :
 	Model( _parent ),
 	m_used( false ),
-	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Predelay" ) ),
-	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Attack" ) ),
-	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Hold" ) ),
-	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Decay" ) ),
-	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Sustain" ) ),
-	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Release" ) ),
-	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Modulation" ) ),
+	m_predelayModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env pre-delay" ) ),
+	m_attackModel( 0.0, 0.0, 2.0, 0.001, this, tr( "Env attack" ) ),
+	m_holdModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env hold" ) ),
+	m_decayModel( 0.5, 0.0, 2.0, 0.001, this, tr( "Env decay" ) ),
+	m_sustainModel( 0.5, 0.0, 1.0, 0.001, this, tr( "Env sustain" ) ),
+	m_releaseModel( 0.1, 0.0, 2.0, 0.001, this, tr( "Env release" ) ),
+	m_amountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "Env mod amount" ) ),
 	m_valueForZeroAmount( _value_for_zero_amount ),
 	m_pahdFrames( 0 ),
 	m_rFrames( 0 ),
@@ -107,15 +107,15 @@ EnvelopeAndLfoParameters::EnvelopeAndLfoParameters(
 	m_rEnv( NULL ),
 	m_pahdBufSize( 0 ),
 	m_rBufSize( 0 ),
-	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO Predelay" ) ),
-	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO Attack" ) ),
+	m_lfoPredelayModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO pre-delay" ) ),
+	m_lfoAttackModel( 0.0, 0.0, 1.0, 0.001, this, tr( "LFO attack" ) ),
 	m_lfoSpeedModel( 0.1, 0.001, 1.0, 0.0001,
 				SECS_PER_LFO_OSCILLATION * 1000.0, this,
-							tr( "LFO speed" ) ),
-	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO Modulation" ) ),
-	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO Wave Shape" ) ),
-	m_x100Model( false, this, tr( "Freq x 100" ) ),
-	m_controlEnvAmountModel( false, this, tr( "Modulate Env-Amount" ) ),
+							tr( "LFO frequency" ) ),
+	m_lfoAmountModel( 0.0, -1.0, 1.0, 0.005, this, tr( "LFO mod amount" ) ),
+	m_lfoWaveModel( SineWave, 0, NumLfoShapes, this, tr( "LFO wave shape" ) ),
+	m_x100Model( false, this, tr( "LFO frequency x 100" ) ),
+	m_controlEnvAmountModel( false, this, tr( "Modulate env amount" ) ),
 	m_lfoFrame( 0 ),
 	m_lfoAmountIsZero( false ),
 	m_lfoShapeData( NULL )
@@ -380,21 +380,11 @@ void EnvelopeAndLfoParameters::loadSettings( const QDomElement & _this )
 /*	 ### TODO:
 	Old reversed sustain kept for backward compatibility
 	with 4.15 file format*/
-
 	if( _this.hasAttribute( "sus" ) )
 	{
 		m_sustainModel.loadSettings( _this, "sus" );
 		m_sustainModel.setValue( 1.0 - m_sustainModel.value() );
 	}
-
-	// ### TODO:
-/*	// Keep compatibility with version 2.1 file format
-	if( _this.hasAttribute( "lfosyncmode" ) )
-	{
-		m_lfoSpeedKnob->setSyncMode(
-		( TempoSyncKnob::TtempoSyncMode ) _this.attribute(
-						"lfosyncmode" ).toInt() );
-	}*/
 
 	m_userWave.setAudioFile( _this.attribute( "userwavefile" ) );
 

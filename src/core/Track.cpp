@@ -143,7 +143,9 @@ void TrackContentObject::movePosition( const MidiTime & pos )
 {
 	if( m_startPosition != pos )
 	{
+		Engine::mixer()->requestChangeInModel();
 		m_startPosition = pos;
+		Engine::mixer()->doneChangeInModel();
 		Engine::getSong()->updateLength();
 		emit positionChanged();
 	}
@@ -741,30 +743,47 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 						&& !m_tco->getAutoResize() )
 				{
 					m_action = ResizeLeft;
-					m_oldTime = m_tco->startPosition();
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
-					s_textFloat->setTitle( tr( "Current length" ) );
 				}
 				else if( me->x() < width() - RESIZE_GRIP_WIDTH )
 				{
 					m_action = Move;
-					m_oldTime = m_tco->startPosition();
 					QCursor c( Qt::SizeAllCursor );
 					QApplication::setOverrideCursor( c );
-					s_textFloat->setTitle( tr( "Current position" ) );
 				}
 				else if( !m_tco->getAutoResize() )
 				{
 					m_action = Resize;
-					m_oldTime = m_tco->length();
 					QCursor c( Qt::SizeHorCursor );
 					QApplication::setOverrideCursor( c );
+				}
+
+				if( m_action == Move )
+				{
+					s_textFloat->setTitle( tr( "Current position" ) );
+					s_textFloat->setText( QString( "%1:%2" ).
+						arg( m_tco->startPosition().getTact() + 1 ).
+						arg( m_tco->startPosition().getTicks() %
+								MidiTime::ticksPerTact() ) );
+				}
+				else if( m_action == Resize || m_action == ResizeLeft )
+				{
 					s_textFloat->setTitle( tr( "Current length" ) );
+					s_textFloat->setText( tr( "%1:%2 (%3:%4 to %5:%6)" ).
+							arg( m_tco->length().getTact() ).
+							arg( m_tco->length().getTicks() %
+									MidiTime::ticksPerTact() ).
+							arg( m_tco->startPosition().getTact() + 1 ).
+							arg( m_tco->startPosition().getTicks() %
+									MidiTime::ticksPerTact() ).
+							arg( m_tco->endPosition().getTact() + 1 ).
+							arg( m_tco->endPosition().getTicks() %
+									MidiTime::ticksPerTact() ) );
 				}
 				// s_textFloat->reparent( this );
 				// setup text-float as if TCO was already moved/resized
-				mouseMoveEvent( me );
+				s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 				s_textFloat->show();
 			}
 
@@ -772,12 +791,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Move || m_action == MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(
-								#ifdef LMMS_BUILD_APPLE
-								"⌘"),
-								#else
-								"Ctrl"),
-								#endif
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -891,8 +905,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_tco->startPosition().getTact() + 1 ).
 				arg( m_tco->startPosition().getTicks() %
 						MidiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-		                                        height() + 2 ) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2 ) );
 	}
 	else if( m_action == MoveSelection )
 	{
@@ -980,8 +993,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 				arg( m_tco->endPosition().getTact() + 1 ).
 				arg( m_tco->endPosition().getTicks() %
 						MidiTime::ticksPerTact() ) );
-		s_textFloat->moveGlobal( this, QPoint( width() + 2,
-					height() + 2) );
+		s_textFloat->moveGlobal( this, QPoint( width() + 2, height() + 2) );
 	}
 	else
 	{
@@ -1076,12 +1088,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘"),
-					#else
-					"Ctrl"),
-					#endif
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
 
@@ -1717,12 +1724,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackView( parent )          /*!< The parent track view */
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
-				"to begin a new drag'n'drop-action." ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘") );
-					#else
-					"Ctrl") );
-					#endif
+				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	QMenu * toMenu = new QMenu( this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
@@ -1736,7 +1738,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackOps->move( 12, 1 );
 	m_trackOps->setFocusPolicy( Qt::NoFocus );
 	m_trackOps->setMenu( toMenu );
-	ToolTip::add( m_trackOps, tr( "Actions for this track" ) );
+	ToolTip::add( m_trackOps, tr( "Actions" ) );
 
 
 	m_muteBtn = new PixmapButton( this, tr( "Mute" ) );
@@ -1762,7 +1764,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	}
 
 	m_muteBtn->show();
-	ToolTip::add( m_muteBtn, tr( "Mute this track" ) );
+	ToolTip::add( m_muteBtn, tr( "Mute" ) );
 
 	m_soloBtn->show();
 	ToolTip::add( m_soloBtn, tr( "Solo" ) );
@@ -1879,6 +1881,7 @@ void TrackOperationsWidget::cloneTrack()
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
+	t->addJournalCheckPoint();
 	t->lock();
 	t->deleteTCOs();
 	t->unlock();
@@ -1936,35 +1939,31 @@ void TrackOperationsWidget::updateMenu()
 }
 
 
-void TrackOperationsWidget::recordingOn()
+void TrackOperationsWidget::toggleRecording( bool on )
 {
 	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
 	if( atv )
 	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
+		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
 		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( true ); }
+			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
+			if( ap ) { ap->setRecording( on ); }
 		}
 		atv->update();
 	}
 }
 
 
+
+void TrackOperationsWidget::recordingOn()
+{
+	toggleRecording( true );
+}
+
+
 void TrackOperationsWidget::recordingOff()
 {
-	AutomationTrackView * atv = dynamic_cast<AutomationTrackView *>( m_trackView );
-	if( atv )
-	{
-		const Track::tcoVector & tcov = atv->getTrack()->getTCOs();
-		for( Track::tcoVector::const_iterator it = tcov.begin(); it != tcov.end(); ++it )
-		{
-			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( *it );
-			if( ap ) { ap->setRecording( false ); }
-		}
-		atv->update();
-	}
+	toggleRecording( false );
 }
 
 

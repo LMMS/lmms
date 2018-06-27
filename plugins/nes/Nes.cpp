@@ -486,18 +486,18 @@ void NesObject::updatePitch()
 NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	Instrument( instrumentTrack, &nes_plugin_descriptor ),
 	m_ch1Enabled( true, this ),
-	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 Coarse detune" ) ),
-	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Volume" ) ),
+	m_ch1Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 1 coarse detune" ) ),
+	m_ch1Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 volume" ) ),
 	
 	m_ch1EnvEnabled( false, this ),
 	m_ch1EnvLooped( false, this ),
-	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 Envelope length" ) ),
+	m_ch1EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 1 envelope length" ) ),
 	
-	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 Duty cycle" ) ),
+	m_ch1DutyCycle( 0, 0, 3, this, tr( "Channel 1 duty cycle" ) ),
 	
 	m_ch1SweepEnabled( false, this ),
-	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 Sweep amount" ) ),
-	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 Sweep rate" ) ),
+	m_ch1SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 1 sweep amount" ) ),
+	m_ch1SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 1 sweep rate" ) ),
 	
 	m_ch2Enabled( true, this ),
 	m_ch2Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 2 Coarse detune" ) ),
@@ -505,32 +505,32 @@ NesInstrument::NesInstrument( InstrumentTrack * instrumentTrack ) :
 	
 	m_ch2EnvEnabled( false, this ),
 	m_ch2EnvLooped( false, this ),
-	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 Envelope length" ) ),
+	m_ch2EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 2 envelope length" ) ),
 	
-	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 Duty cycle" ) ),
+	m_ch2DutyCycle( 2, 0, 3, this, tr( "Channel 2 duty cycle" ) ),
 	
 	m_ch2SweepEnabled( false, this ),
-	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 Sweep amount" ) ),
-	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 Sweep rate" ) ),
+	m_ch2SweepAmt( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 2 sweep amount" ) ),
+	m_ch2SweepRate( 0.f, 0.f, 7.f, 1.f, this, tr( "Channel 2 sweep rate" ) ),
 	
 	//channel 3
 	m_ch3Enabled( true, this ),
-	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 Coarse detune" ) ),
-	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 Volume" ) ),
+	m_ch3Crs( 0.f, -24.f, 24.f, 1.f, this, tr( "Channel 3 coarse detune" ) ),
+	m_ch3Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 3 volume" ) ),
 
 	//channel 4
 	m_ch4Enabled( true, this ),
-	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Volume" ) ),
+	m_ch4Volume( 15.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 volume" ) ),
 	
 	m_ch4EnvEnabled( false, this ),
 	m_ch4EnvLooped( false, this ),
-	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Envelope length" ) ),
+	m_ch4EnvLen( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 envelope length" ) ),
 	
 	m_ch4NoiseMode( false, this ),
 	m_ch4NoiseFreqMode( false, this ),
-	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 Noise frequency" ) ), 
+	m_ch4NoiseFreq( 0.f, 0.f, 15.f, 1.f, this, tr( "Channel 4 noise frequency" ) ),
 	
-	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 Noise frequency sweep" ) ), 
+	m_ch4Sweep( 0.f, -7.f, 7.f, 1.f, this, tr( "Channel 4 noise frequency sweep" ) ),
 	m_ch4NoiseQuantize( true, this ),
 	
 	//master
@@ -842,7 +842,7 @@ NesInstrumentView::NesInstrumentView( Instrument * instrument,	QWidget * parent 
 
 	
 	//master
-	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, tr( "Master Volume" ), "", "" )
+	makeknob( m_masterVolKnob, KNOB_X4, KNOB_Y3, tr( "Master volume" ), "", "" )
 	makeknob( m_vibratoKnob, KNOB_X5, KNOB_Y3, tr( "Vibrato" ), "", "" )
 
 }

@@ -57,11 +57,6 @@ public:
 
 	void clear();
 
-	void setEnabled( bool _on )
-	{
-		m_enabledModel.setValue( _on );
-	}
-
 
 private:
 	typedef QVector<Effect *> EffectList;

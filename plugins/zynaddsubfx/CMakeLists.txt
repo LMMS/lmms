@@ -20,7 +20,7 @@ IF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 ENDIF(LMMS_HOST_X86 OR LMMS_HOST_X86_64)
 
 # build ZynAddSubFX with full optimizations
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wno-misleading-indentation -Wno-write-strings -Wno-deprecated-declarations -fpermissive")
 
 IF(LMMS_BUILD_WIN32)
 	# link system-libraries
@@ -127,9 +127,7 @@ IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore QtCore4 QtGui4 QtXml4)
 ENDIF()
 
-IF(QT5)
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
-ENDIF()
 
 IF(LMMS_BUILD_WIN32)
 	TARGET_LINK_LIBRARIES(ZynAddSubFxCore -lws2_32)
@@ -153,7 +151,7 @@ ADD_DEPENDENCIES(zynaddsubfx ZynAddSubFxCore)
 IF(WIN32)
 	SET(WINRC "${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
+				COMMAND "${CMAKE_RC_COMPILER}"
 					"-I\"${CMAKE_CURRENT_SOURCE_DIR}\""
 					"-o\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfxrc.obj\""
 					"-i\"${CMAKE_CURRENT_BINARY_DIR}/zynaddsubfx.rc\""
@@ -179,9 +177,7 @@ TARGET_LINK_LIBRARIES(RemoteZynAddSubFx zynaddsubfx_gui -lZynAddSubFxCore ${FLTK
 ADD_DEPENDENCIES(RemoteZynAddSubFx ZynAddSubFxCore)
 
 # Support qt_version_tag in Qt 5.6
-IF(QT5)
-	TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
-ENDIF(QT5)
+TARGET_LINK_LIBRARIES(RemoteZynAddSubFx Qt5::Core)
 
 # link Qt libraries when on win32
 IF(LMMS_BUILD_WIN32)

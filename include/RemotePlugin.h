@@ -415,10 +415,12 @@ private:
 enum RemoteMessageIDs
 {
 	IdUndefined,
+	IdHostInfoGotten,
 	IdInitDone,
 	IdQuit,
 	IdSampleRateInformation,
 	IdBufferSizeInformation,
+	IdInformationUpdated,
 	IdMidiEvent,
 	IdStartProcessing,
 	IdProcessingDone,
@@ -428,6 +430,8 @@ enum RemoteMessageIDs
 	IdChangeInputOutputCount,
 	IdShowUI,
 	IdHideUI,
+	IdToggleUI,
+	IdIsUIVisible,
 	IdSaveSettingsToString,
 	IdSaveSettingsToFile,
 	IdLoadSettingsFromString,
@@ -745,12 +749,10 @@ class RemotePlugin;
 
 class ProcessWatcher : public QThread
 {
+	Q_OBJECT
 public:
 	ProcessWatcher( RemotePlugin * );
-	virtual ~ProcessWatcher()
-	{
-	}
-
+	virtual ~ProcessWatcher() = default;
 
 	void quit()
 	{
@@ -782,7 +784,13 @@ public:
 #endif
 	}
 
-	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg );
+	bool init( const QString &pluginExecutable, bool waitForInitDoneMsg, QStringList extraArgs = {} );
+
+	inline void waitForHostInfoGotten()
+	{
+		m_failed = waitForMessage( IdHostInfoGotten ).id
+							!= IdHostInfoGotten;
+	}
 
 	inline void waitForInitDone( bool _busyWaiting = true )
 	{
@@ -799,21 +807,25 @@ public:
 	{
 		lock();
 		sendMessage( message( IdSampleRateInformation ).addInt( _sr ) );
+		waitForMessage( IdInformationUpdated, true );
 		unlock();
 	}
 
-	void showUI()
+
+	virtual void toggleUI()
 	{
 		lock();
-		sendMessage( IdShowUI );
+		sendMessage( IdToggleUI );
 		unlock();
 	}
 
-	void hideUI()
+	int isUIVisible()
 	{
 		lock();
-		sendMessage( IdHideUI );
+		sendMessage( IdIsUIVisible );
 		unlock();
+		message m = waitForMessage( IdIsUIVisible );
+		return m.id != IdIsUIVisible ? -1 : m.getInt() ? 1 : 0;
 	}
 
 	inline bool failed() const
@@ -831,6 +843,9 @@ public:
 		m_commMutex.unlock();
 	}
 
+public slots:
+	virtual void showUI();
+	virtual void hideUI();
 
 protected:
 	inline void setSplittedChannels( bool _on )
@@ -1207,6 +1222,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 		m_vstSyncData = (VstSyncData *) m_shmQtID.data();
 		m_bufferSize = m_vstSyncData->m_bufferSize;
 		m_sampleRate = m_vstSyncData->m_sampleRate;
+		sendMessage( IdHostInfoGotten );
 		return;
 	}
 #else
@@ -1234,6 +1250,7 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 			{
 				m_bufferSize = m_vstSyncData->m_bufferSize;
 				m_sampleRate = m_vstSyncData->m_sampleRate;
+				sendMessage( IdHostInfoGotten );
 
 				// detach segment
 				if( shmdt(m_vstSyncData) == -1 )
@@ -1249,6 +1266,12 @@ RemotePluginClient::RemotePluginClient( const char * socketPath ) :
 	// if attaching shared memory fails
 	sendMessage( IdSampleRateInformation );
 	sendMessage( IdBufferSizeInformation );
+	if( waitForMessage( IdBufferSizeInformation ).id
+						!= IdBufferSizeInformation )
+	{
+		fprintf( stderr, "Could not get buffer size information\n" );
+	}
+	sendMessage( IdHostInfoGotten );
 }
 
 
@@ -1296,9 +1319,14 @@ bool RemotePluginClient::processMessage( const message & _m )
 		case IdSampleRateInformation:
 			m_sampleRate = _m.getInt();
 			updateSampleRate();
+			reply_message.id = IdInformationUpdated;
+			reply = true;
 			break;
 
 		case IdBufferSizeInformation:
+			// Should LMMS gain the ability to change buffer size
+			// without a restart, it must wait for this message to
+			// complete processing or else risk VST crashes
 			m_bufferSize = _m.getInt();
 			updateBufferSize();
 			break;

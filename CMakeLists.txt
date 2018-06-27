@@ -22,8 +22,7 @@ INCLUDE(FindPkgConfig)
 
 STRING(TOUPPER          "${CMAKE_PROJECT_NAME}" PROJECT_NAME_UCASE)
 
-# Updated by maintenance tasks
-SET(PROJECT_YEAR 2017)
+SET(PROJECT_YEAR 2018)
 
 SET(PROJECT_AUTHOR      "LMMS Developers")
 SET(PROJECT_URL         "https://lmms.io")
@@ -33,7 +32,7 @@ SET(PROJECT_COPYRIGHT   "2008-${PROJECT_YEAR} ${PROJECT_AUTHOR}")
 SET(VERSION_MAJOR       "1")
 SET(VERSION_MINOR       "2")
 SET(VERSION_RELEASE     "0")
-SET(VERSION_STAGE       "rc4")
+SET(VERSION_STAGE       "rc6")
 SET(VERSION_BUILD       "0")
 SET(VERSION             "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}")
 IF(VERSION_STAGE)
@@ -69,7 +68,6 @@ OPTION(WANT_TAP		"Include Tom's Audio Processing LADSPA plugins" ON)
 OPTION(WANT_VST		"Include VST support" ON)
 OPTION(WANT_VST_NOWINE	"Include partial VST support (without wine)" OFF)
 OPTION(WANT_WINMM	"Include WinMM MIDI support" OFF)
-OPTION(WANT_QT5		"Build with Qt5" OFF)
 OPTION(WANT_DEBUG_FPE	"Debug floating point exceptions" OFF)
 
 
@@ -125,6 +123,7 @@ CHECK_INCLUDE_FILES(sys/types.h LMMS_HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(sys/ipc.h LMMS_HAVE_SYS_IPC_H)
 CHECK_INCLUDE_FILES(sys/shm.h LMMS_HAVE_SYS_SHM_H)
 CHECK_INCLUDE_FILES(sys/time.h LMMS_HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILES(sys/times.h LMMS_HAVE_SYS_TIMES_H)
 CHECK_INCLUDE_FILES(sched.h LMMS_HAVE_SCHED_H)
 CHECK_INCLUDE_FILES(sys/soundcard.h LMMS_HAVE_SYS_SOUNDCARD_H)
 CHECK_INCLUDE_FILES(soundcard.h LMMS_HAVE_SOUNDCARD_H)
@@ -137,53 +136,33 @@ CHECK_INCLUDE_FILES(locale.h LMMS_HAVE_LOCALE_H)
 
 LIST(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
 
-IF(WANT_QT5)
-	SET(QT5 TRUE)
+FIND_PACKAGE(Qt5 COMPONENTS Core Gui Widgets Xml REQUIRED)
+FIND_PACKAGE(Qt5 COMPONENTS LinguistTools QUIET)
 
-	FIND_PACKAGE(Qt5Core REQUIRED)
-	FIND_PACKAGE(Qt5Gui REQUIRED)
-	FIND_PACKAGE(Qt5LinguistTools)
-	FIND_PACKAGE(Qt5Widgets REQUIRED)
-	FIND_PACKAGE(Qt5Xml REQUIRED)
+INCLUDE_DIRECTORIES(
+	${Qt5Core_INCLUDE_DIRS}
+	${Qt5Gui_INCLUDE_DIRS}
+	${Qt5Widgets_INCLUDE_DIRS}
+	${Qt5Xml_INCLUDE_DIRS}
+)
 
-	INCLUDE_DIRECTORIES(
-		${Qt5Core_INCLUDE_DIRS}
-		${Qt5Gui_INCLUDE_DIRS}
-		${Qt5Widgets_INCLUDE_DIRS}
-		${Qt5Xml_INCLUDE_DIRS}
-	)
+SET(QT_LIBRARIES
+	Qt5::Core
+	Qt5::Gui
+	Qt5::Widgets
+	Qt5::Xml
+)
 
-	SET(QT_LIBRARIES
-		Qt5::Core
-		Qt5::Gui
-		Qt5::Widgets
-		Qt5::Xml
-	)
-
-	# Resolve Qt5::qmake to full path for use in packaging scripts
-	GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
-
-	FIND_PACKAGE(Qt5Test)
-	SET(QT_QTTEST_LIBRARY Qt5::Test)
-ELSE()
-	SET(QT5 FALSE)
-
-	# check for Qt4
-	SET(QT_MIN_VERSION "4.6.0" COMPONENTS QtCore QtGui QtXml)
-	FIND_PACKAGE(Qt4 REQUIRED)
-	SET(QT_USE_QTXML 1)
-	IF(WIN32)
-		SET(QT_TRANSLATIONS_DIR "${MINGW_PREFIX}/share/qt4/translations/")
-	ENDIF(WIN32)
-	IF(EXISTS "${QT_TRANSLATIONS_DIR}")
-		MESSAGE("-- Found Qt translations in ${QT_TRANSLATIONS_DIR}")
-		ADD_DEFINITIONS(-D'QT_TRANSLATIONS_DIR="${QT_TRANSLATIONS_DIR}"')
-	ENDIF()
-	IF(NOT WIN32)
-		STRING(REPLACE "-DQT_DLL" "" QT_DEFINITIONS "${QT_DEFINITIONS}")
-	ENDIF()
-	INCLUDE("${QT_USE_FILE}")
+IF(LMMS_BUILD_LINUX)
+    FIND_PACKAGE(Qt5 COMPONENTS X11Extras REQUIRED)
+    LIST(APPEND QT_LIBRARIES Qt5::X11Extras)
 ENDIF()
+
+# Resolve Qt5::qmake to full path for use in packaging scripts
+GET_TARGET_PROPERTY(QT_QMAKE_EXECUTABLE "${Qt5Core_QMAKE_EXECUTABLE}" IMPORTED_LOCATION)
+
+FIND_PACKAGE(Qt5Test)
+SET(QT_QTTEST_LIBRARY Qt5::Test)
 
 # check for libsndfile
 PKG_CHECK_MODULES(SNDFILE REQUIRED sndfile>=1.0.18)
@@ -271,7 +250,7 @@ IF(WANT_SDL AND NOT LMMS_HAVE_SDL2)
 		IF(NOT SDL_INCLUDE_DIR)
 			SET(SDL_INCLUDE_DIR "${CMAKE_FIND_ROOT_PATH}/include")
 		ENDIF()
-		
+
 	ELSE()
 		SET(STATUS_SDL "not found, please install libsdl2-dev (or similar) "
 			"if you require SDL support")
@@ -401,7 +380,7 @@ IF(WANT_JACK)
 			SET(STATUS_JACK "OK (weak linking enabled)")
 			SET(JACK_INCLUDE_DIRS "")
 			# use dlsym instead
-			SET(JACK_LIBRARIES "dl")
+			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
 		ELSE()
 			SET(STATUS_JACK "OK")
 		ENDIF()
@@ -419,7 +398,11 @@ PKG_CHECK_MODULES(FFTW3F REQUIRED fftw3f>=3.0.0)
 
 # check for FLTK
 FIND_PACKAGE(FLTK)
-
+IF(FLTK_FOUND)
+	SET(STATUS_ZYN "OK")
+ELSE()
+	SET(STATUS_ZYN "not found, please install fltk")
+ENDIF()
 
 # check for Fluidsynth
 IF(WANT_SF2)
@@ -482,7 +465,7 @@ IF(LMMS_BUILD_WIN32)
 ENDIF(LMMS_BUILD_WIN32)
 
 IF(WANT_DEBUG_FPE)
-	IF(LMMS_BUILD_LINUX)
+	IF(LMMS_BUILD_LINUX OR LMMS_BUILD_APPLE)
 		SET(LMMS_DEBUG_FPE TRUE)
 		SET (STATUS_DEBUG_FPE "Enabled")
 	ELSE()
@@ -537,10 +520,26 @@ FILE(REMOVE include/lmmsconfig.h)
 FILE(GLOB LMMS_INCLUDES "${CMAKE_SOURCE_DIR}/include/*.h")
 LIST(SORT LMMS_INCLUDES)
 
+# Get list of all committers from git history, ordered by number of commits.
+# The CONTRIBUTORS file is used by AboutDialog. This information can be provided
+# with -DCONTRIBUTORS=/path/to/CONTRIBUTORS instead. For instance, to generate
+# this file for version 1.1.3, the command is:
+# 	git shortlog -sne v1.1.3 | cut -c8-
+FIND_PACKAGE(Git)
+IF(GIT_FOUND AND NOT CONTRIBUTORS)
+	SET(CONTRIBUTORS "${CMAKE_BINARY_DIR}/CONTRIBUTORS")
+	EXECUTE_PROCESS(
+		COMMAND "${GIT_EXECUTABLE}" shortlog -sne
+		COMMAND cut -c8-
+		OUTPUT_FILE "${CONTRIBUTORS}"
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+		TIMEOUT 1)
+ENDIF()
+
 # we somehow have to make LMMS-binary depend on MOC-files
 ADD_FILE_DEPENDENCIES("${CMAKE_BINARY_DIR}/lmmsconfig.h")
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|AppleClang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	IF(WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-attributes")
 	ELSE(WIN32)
@@ -671,6 +670,7 @@ MESSAGE(
 MESSAGE(
 "Optional plugins\n"
 "----------------\n"
+"* ZynAddSubFX instrument      : ${STATUS_ZYN}\n"
 "* Carla Patchbay & Rack       : ${STATUS_CARLA}\n"
 "* SoundFont2 player           : ${STATUS_FLUIDSYNTH}\n"
 "* Stk Mallets                 : ${STATUS_STK}\n"

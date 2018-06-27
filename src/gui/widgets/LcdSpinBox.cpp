@@ -58,14 +58,6 @@ LcdSpinBox::LcdSpinBox( int numDigits, const QString& style, QWidget* parent, co
 {
 }
 
-
-
-LcdSpinBox::~LcdSpinBox()
-{
-}
-
-
-
 void LcdSpinBox::update()
 {
 	setValue( model()->value() + m_displayOffset );
@@ -172,13 +164,14 @@ void LcdSpinBox::enterValue()
 	int new_val;
 
 	new_val = QInputDialog::getInt(
-			this, windowTitle(),
+			this, tr( "Set value" ),
 			tr( "Please enter a new value between %1 and %2:" ).
 			arg( model()->minValue() ).
 			arg( model()->maxValue() ),
 			model()->value(),
 			model()->minValue(),
-			model()->maxValue(), 4, &ok );
+			model()->maxValue(),
+			model()->step<int>(), &ok );
 
 	if( ok )
 	{

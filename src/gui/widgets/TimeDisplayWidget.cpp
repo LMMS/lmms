@@ -49,7 +49,7 @@ TimeDisplayWidget::TimeDisplayWidget() :
 
 	setMaximumHeight( 32 );
 
-	ToolTip::add( this, tr( "click to change time units" ) );
+	ToolTip::add( this, tr( "Time units" ) );
 
 	// update labels of LCD spinboxes
 	setDisplayMode( m_displayMode );
@@ -57,17 +57,6 @@ TimeDisplayWidget::TimeDisplayWidget() :
 	connect( gui->mainWindow(), SIGNAL( periodicUpdate() ),
 					this, SLOT( updateTime() ) );
 }
-
-
-
-
-TimeDisplayWidget::~TimeDisplayWidget()
-{
-}
-
-
-
-
 
 void TimeDisplayWidget::setDisplayMode( DisplayMode displayMode )
 {

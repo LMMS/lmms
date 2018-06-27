@@ -32,9 +32,9 @@
 #include <QtCore/QPair>
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
+#include <QtCore/QObject>
 
 #include "export.h"
-#include "MemoryManager.h"
 
 class LmmsCore;
 
@@ -51,9 +51,9 @@ const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
-class EXPORT ConfigManager
+class EXPORT ConfigManager : public QObject
 {
-	MM_OPERATORS
+	Q_OBJECT
 public:
 	static inline ConfigManager * inst()
 	{
@@ -210,6 +210,9 @@ public:
 		return m_recentlyOpenedProjects;
 	}
 
+	static QStringList availabeVstEmbedMethods();
+	QString vstEmbedMethod() const;
+
 	// returns true if the working dir (e.g. ~/lmms) exists on disk
 	bool hasWorkingDir() const;
 
@@ -242,6 +245,8 @@ public:
 	// creates the working directory & subdirectories on disk.
 	void createWorkingDir();
 
+signals:
+	void valueChanged( QString cls, QString attribute, QString value );
 
 private:
 	static ConfigManager * s_instanceOfMe;

@@ -30,6 +30,9 @@
 #include "AutomationTrack.h"
 #include "BBTrack.h"
 #include "BBTrackContainer.h"
+#include "DetuningHelper.h"
+#include "InstrumentTrack.h"
+#include "Pattern.h"
 #include "TrackContainer.h"
 
 #include "Engine.h"
@@ -105,6 +108,55 @@ private slots:
 		QCOMPARE(song->automatedValuesAt(150)[&model], 0.5f);
 	}
 
+	void testLengthRespected()
+	{
+		FloatModel model;
+
+		auto song = Engine::getSong();
+		AutomationTrack track(song);
+
+		AutomationPattern p(&track);
+		p.setProgressionType(AutomationPattern::LinearProgression);
+		p.addObject(&model);
+
+		p.putValue(0, 0.0, false);
+		p.putValue(100, 1.0, false);
+
+		p.changeLength(100);
+		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt( 50)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(100)[&model], 1.0f);
+
+		p.changeLength(50);
+		QCOMPARE(song->automatedValuesAt(  0)[&model], 0.0f);
+		QCOMPARE(song->automatedValuesAt( 50)[&model], 0.5f);
+		QCOMPARE(song->automatedValuesAt(100)[&model], 0.5f);
+	}
+
+	void testInlineAutomation()
+	{
+		auto song = Engine::getSong();
+
+		InstrumentTrack* instrumentTrack =
+				dynamic_cast<InstrumentTrack*>(Track::create(Track::InstrumentTrack, song));
+
+		Pattern* notePattern = dynamic_cast<Pattern*>(instrumentTrack->createTCO(0));
+		notePattern->changeLength(MidiTime(4, 0));
+		Note* note = notePattern->addNote(Note(MidiTime(4, 0)), false);
+		note->createDetuning();
+
+		DetuningHelper* dh = note->detuning();
+		auto pattern = dh->automationPattern();
+		pattern->setProgressionType( AutomationPattern::LinearProgression );
+		pattern->putValue(MidiTime(0, 0), 0.0);
+		pattern->putValue(MidiTime(4, 0), 1.0);
+
+		QCOMPARE(pattern->valueAt(MidiTime(0, 0)), 0.0f);
+		QCOMPARE(pattern->valueAt(MidiTime(1, 0)), 0.25f);
+		QCOMPARE(pattern->valueAt(MidiTime(2, 0)), 0.5f);
+		QCOMPARE(pattern->valueAt(MidiTime(4, 0)), 1.0f);
+	}
+
 	void testBBTrack()
 	{
 		auto song = Engine::getSong();
@@ -141,6 +193,30 @@ private slots:
 		QCOMPARE(song->automatedValuesAt(5)[&model], 0.5f);
 		QCOMPARE(song->automatedValuesAt(MidiTime::ticksPerTact() + 5)[&model], 0.5f);
 	}
+
+	void testGlobalAutomation()
+	{
+		// Global automation should not have priority, see https://github.com/LMMS/lmms/issues/4268
+		// Tests regression caused by 75077f6200a5aee3a5821aae48a3b8466ed8714a
+		auto song = Engine::getSong();
+
+		auto globalTrack = song->globalAutomationTrack();
+		AutomationPattern globalPattern(globalTrack);
+
+		AutomationTrack localTrack(song);
+		AutomationPattern localPattern(&localTrack);
+
+		FloatModel model;
+		globalPattern.setProgressionType(AutomationPattern::DiscreteProgression);
+		localPattern.setProgressionType(AutomationPattern::DiscreteProgression);
+		globalPattern.addObject(&model);
+		localPattern.addObject(&model);
+		globalPattern.putValue(0, 100.0f, false);
+		localPattern.putValue(0, 50.0f, false);
+
+		QCOMPARE(song->automatedValuesAt(0)[&model], 50.0f);
+	}
+
 } AutomationTrackTest;
 
 #include "AutomationTrackTest.moc"

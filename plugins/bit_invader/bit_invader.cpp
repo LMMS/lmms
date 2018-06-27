@@ -138,7 +138,7 @@ sample_t bSynth::nextStringSample()
 
 bitInvader::bitInvader( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &bitinvader_plugin_descriptor ),
-	m_sampleLength( 128, 4, 200, 1, this, tr( "Samplelength" ) ),
+	m_sampleLength( 128, 4, 200, 1, this, tr( "Sample length" ) ),
 	m_graph( -1.0f, 1.0f, 128, this ),
 	m_interpolation( false, this ),
 	m_normalize( false, this )
@@ -336,7 +336,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	
 	m_sampleLengthKnob = new Knob( knobDark_28, this );
 	m_sampleLengthKnob->move( 6, 201 );
-	m_sampleLengthKnob->setHintText( tr( "Sample Length" ), "" );
+	m_sampleLengthKnob->setHintText( tr( "Sample length" ), "" );
 
 	m_graph = new Graph( this, Graph::NearestStyle, 204, 134 );
 	m_graph->move(23,59);	// 55,120 - 2px border
@@ -361,7 +361,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sinWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"sin_wave_inactive" ) );
 	ToolTip::add( m_sinWaveBtn,
-			tr( "Click for a sine-wave." ) );
+			tr( "Sine wave" ) );
 
 	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triangleWaveBtn->move( 131 + 14, 205 );
@@ -370,7 +370,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_triangleWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "triangle_wave_inactive" ) );
 	ToolTip::add( m_triangleWaveBtn,
-			tr( "Click here for a triangle-wave." ) );
+			tr( "Triangle wave" ) );
 
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
 	m_sawWaveBtn->move( 131 + 14*2, 205  );
@@ -379,7 +379,7 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sawWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"saw_wave_inactive" ) );
 	ToolTip::add( m_sawWaveBtn,
-			tr( "Click here for a saw-wave." ) );
+			tr( "Saw wave" ) );
 
 	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveBtn->move( 131 + 14*3, 205 );
@@ -388,35 +388,35 @@ bitInvaderView::bitInvaderView( Instrument * _instrument,
 	m_sqrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 					"square_wave_inactive" ) );
 	ToolTip::add( m_sqrWaveBtn,
-			tr( "Click here for a square-wave." ) );
+			tr( "Square wave" ) );
 
 	m_whiteNoiseWaveBtn = new PixmapButton( this,
-					tr( "White noise wave" ) );
+					tr( "White noise" ) );
 	m_whiteNoiseWaveBtn->move( 131 + 14*4, 205 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_active" ) );
 	m_whiteNoiseWaveBtn->setInactiveGraphic(
 		embed::getIconPixmap( "white_noise_wave_inactive" ) );
 	ToolTip::add( m_whiteNoiseWaveBtn,
-			tr( "Click here for white-noise." ) );
+			tr( "White noise" ) );
 
-	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
+	m_usrWaveBtn = new PixmapButton( this, tr( "User-defined wave" ) );
 	m_usrWaveBtn->move( 131 + 14*5, 205 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
 						"usr_wave_active" ) );
 	m_usrWaveBtn->setInactiveGraphic( embed::getIconPixmap(
 						"usr_wave_inactive" ) );
 	ToolTip::add( m_usrWaveBtn,
-			tr( "Click here for a user-defined shape." ) );
+			tr( "User-defined wave" ) );
 
-	m_smoothBtn = new PixmapButton( this, tr( "Smooth" ) );
+	m_smoothBtn = new PixmapButton( this, tr( "Smooth waveform" ) );
 	m_smoothBtn->move( 131 + 14*6, 205 );
 	m_smoothBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_active" ) );
 	m_smoothBtn->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 						"smooth_inactive" ) );
 	ToolTip::add( m_smoothBtn,
-			tr( "Click here to smooth waveform." ) );
+			tr( "Smooth waveform" ) );
 
 
 	m_interpolationToggle = new LedCheckBox( "Interpolation", this,

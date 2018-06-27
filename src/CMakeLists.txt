@@ -20,11 +20,7 @@ ADD_SUBDIRECTORY(core)
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(tracks)
 
-IF(QT5)
-	QT5_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
-ELSE()
-	QT4_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
-ENDIF()
+QT5_WRAP_UI(LMMS_UI_OUT ${LMMS_UIS})
 INCLUDE_DIRECTORIES(
 	"${CMAKE_CURRENT_BINARY_DIR}"
 	"${CMAKE_BINARY_DIR}"
@@ -38,7 +34,7 @@ IF(WIN32 AND MSVC)
 ELSEIF(WIN32)
 	SET(WINRC "${CMAKE_BINARY_DIR}/lmmsrc.obj")
 	ADD_CUSTOM_COMMAND(OUTPUT "${WINRC}"
-				COMMAND "${WINDRES}"
+				COMMAND "${CMAKE_RC_COMPILER}"
 					"-I\"${CMAKE_SOURCE_DIR}\""
 					"-o\"${CMAKE_BINARY_DIR}/lmmsrc.obj\""
 					"-i\"${CMAKE_BINARY_DIR}/lmms.rc\""
@@ -49,7 +45,7 @@ INCLUDE(GenQrc)
 ADD_GEN_QRC(LMMS_RCC_OUT lmms.qrc
 	"${CMAKE_SOURCE_DIR}/doc/AUTHORS"
 	"${CMAKE_SOURCE_DIR}/LICENSE.txt"
-	"${CMAKE_SOURCE_DIR}/doc/CONTRIBUTORS"
+	"${CMAKE_BINARY_DIR}/CONTRIBUTORS"
 )
 
 # Paths relative to lmms executable
@@ -111,6 +107,12 @@ ADD_EXECUTABLE(lmms
 	"${WINRC}"
 )
 
+# Set Visual Studio startup project to lmms
+# https://stackoverflow.com/a/37994396/8166701
+IF(NOT CMAKE_VERSION VERSION_LESS 3.6)
+	SET_PROPERTY(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT lmms)
+ENDIF()
+
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${LMMS_RCC_OUT} ${LMMS_UI_OUT} lmmsconfig.h lmms.1.gz")
 
 IF(LMMS_BUILD_WIN32)
@@ -118,7 +120,7 @@ IF(LMMS_BUILD_WIN32)
 ENDIF()
 
 IF(LMMS_BUILD_APPLE)
-	SET(EXTRA_LIBRARIES "-framework CoreMIDI")
+	SET(EXTRA_LIBRARIES "-framework CoreMIDI -framework CoreFoundation")
 ENDIF()
 
 if(LMMS_HAVE_OSS AND LMMS_BUILD_OPENBSD)
@@ -129,7 +131,7 @@ IF(LMMS_BUILD_HAIKU)
 	SET(EXTRA_LIBRARIES "-lnetwork")
 ENDIF()
 
-SET(LMMS_REQUIRED_LIBS
+SET(LMMS_REQUIRED_LIBS ${LMMS_REQUIRED_LIBS}
 	${CMAKE_THREAD_LIBS_INIT}
 	${QT_LIBRARIES}
 	${ASOUND_LIBRARY}
@@ -182,25 +184,15 @@ IF(LMMS_BUILD_WIN32)
 
 	INSTALL(TARGETS lmms RUNTIME DESTINATION "${BIN_DIR}")
 
-	IF(QT5)
-		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/Qt5Core.dll"
-					"${MINGW_PREFIX}/bin/Qt5Gui.dll"
-					"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
-					"${MINGW_PREFIX}/bin/Qt5Xml.dll"
-				DESTINATION .)
-		INSTALL(FILES
-					"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
-				DESTINATION ./platforms)
-	ELSE()
-		INSTALL(FILES
-					"${MINGW_PREFIX}/bin/QtCore4.dll"
-					"${MINGW_PREFIX}/bin/QtGui4.dll"
-					"${MINGW_PREFIX}/bin/QtSvg4.dll"
-					"${MINGW_PREFIX}/bin/QtXml4.dll"
-				DESTINATION .)
-	ENDIF()
-
+	INSTALL(FILES
+				"${MINGW_PREFIX}/bin/Qt5Core.dll"
+				"${MINGW_PREFIX}/bin/Qt5Gui.dll"
+				"${MINGW_PREFIX}/bin/Qt5Widgets.dll"
+				"${MINGW_PREFIX}/bin/Qt5Xml.dll"
+			DESTINATION .)
+	INSTALL(FILES
+				"${MINGW_PREFIX}/lib/qt5/plugins/platforms/qwindows.dll"
+			DESTINATION ./platforms)
 	INSTALL(FILES
 					"${MINGW_PREFIX}/bin/libsamplerate-0.dll"
 					"${MINGW_PREFIX}/bin/libsndfile-1.dll"
