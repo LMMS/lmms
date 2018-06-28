@@ -62,7 +62,7 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 {
 	//m_effect->closePlugin();
 	//m_effect->openPlugin( _this.attribute( "plugin" ) );
-	m_effect->m_pluginMutex.lock();
+	if (!m_effect->m_pluginMutex.tryLock()) {return;}
 	if( m_effect->m_plugin != NULL )
 	{
 		m_vstGuiVisible = _this.attribute( "guivisible" ).toInt();
