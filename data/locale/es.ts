@@ -4184,7 +4184,7 @@ Asegúrate de tener permisos de escritura tanto del archivo como del directorio 
         <translation>Configuración incompleta</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>Nos has elegido una SoundFont por defecto en el diálogo de configuración (Edición-&gt; Configuración). Por lo tanto, no se reproducirá ningún sonido luego de importar este archivo MIDI. Debes descargar una SoundFont compatible con la GM (general midi), indicar su ubicación en el diálogo de configuración e intentarlo nuevamente. </translation>
     </message>
     <message>

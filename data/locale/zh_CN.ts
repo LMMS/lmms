@@ -4179,7 +4179,7 @@ Please make sure you have write permission to the file and the directory contain
         <translation>设置不完整</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>你还没有在设置(在编辑-&gt;设置)中设置默认的 Soundfont。因此在导入此 MIDI 文件后将会没有声音。你需要下载一个通用 MIDI (GM) 的 Soundfont, 并且在设置对话框中选中后再试一次。</translation>
     </message>
     <message>

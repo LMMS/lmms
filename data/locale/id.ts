@@ -4172,7 +4172,7 @@ Please make sure you have write permission to the file and the directory contain
         <translation>Pemasangan tidak lengkap</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>Anda tidak menyetel pemutar soundfont default pada dialog pengaturan (Edit-&gt;Pengaturan). Oleh karena itu tidak ada suara yang akan diputar setelah mengimpor berkas MIDI ini. Anda harus mengunduh MIDI soundfont yang umum, tentukan di dialog pengaturan lalu coba lagi.</translation>
     </message>
     <message>
