@@ -4183,7 +4183,7 @@ Veuillez vous assurez que vous avez les droits d&apos;écriture sur le fichier e
         <translation>Paramétrage incomplet</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>Vous n&apos;avez pas choisi de SoundFont par défaut dans la boîte de dialogue de configuration (Éditer -&gt; Configuration). Par conséquent aucun son ne sera joué lorsque vous aurez importé ce fichier MIDI. Vous devriez télécharger une Soundfont General MIDI, la référencer dans la configuration et réessayer.</translation>
     </message>
     <message>

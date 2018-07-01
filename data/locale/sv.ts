@@ -4066,7 +4066,7 @@ Besök https://lmms.io/documentation/ för dokumentation (Engelska).</translatio
         <translation>Installation ofullständig</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation type="unfinished"/>
     </message>
     <message>

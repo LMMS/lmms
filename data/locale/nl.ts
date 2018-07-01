@@ -4186,7 +4186,7 @@ Zorg ervoor dat u schrijfbevoegdheid heeft voor het bestand en voor de map die h
         <translation>Setup niet voltooid</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>U heeft geen standaard soundfont ingesteld in de instellingen (Bewerken -&gt; Instellingen). Hierdoor wordt er geen geluid afgespeeld na het importeren van dit MIDI-bestand. Download een General MIDI soundfont, selecteer deze in de instellingen probeer opnieuw.</translation>
     </message>
     <message>

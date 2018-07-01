@@ -4080,7 +4080,7 @@ Visitehttp://lmms.sf.net/wiki para documentación sobre o LMMS.</translation>
         <translation>A configuración está incompleta</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>Non se indicou unha fonte de son por omisión no diálogo de configuración (Editar-&gt;Configuración). En consecuencia, non se ha de reproducir ningún son unha vez importado este ficheiro de MIDI. Debería descargar unha fonte de son de General MIDI, indicala no diálogo de configuración e tentar de novo.</translation>
     </message>
     <message>

@@ -4189,7 +4189,7 @@ Please make sure you have write permission to the file and the directory contain
         <translation>установка не завершена</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>Вы не установили SoundFont по умолчанию в параметрах (Правка-&gt;Настройки), поэтому после импорта миди файла звук воспроизводиться не будет. 
 Вам следует загрузить основной MiDi SoundFont, указать его в параметрах и попробовать снова.</translation>
     </message>

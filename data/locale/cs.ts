@@ -4186,7 +4186,7 @@ Ujistěte se prosím, zda máte povolen zápis do souboru a do složky obsahují
         <translation>Nastavení není dokončeno</translation>
     </message>
     <message>
-        <source>You do not have set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
+        <source>You have not set up a default soundfont in the settings dialog (Edit-&gt;Settings). Therefore no sound will be played back after importing this MIDI file. You should download a General MIDI soundfont, specify it in settings dialog and try again.</source>
         <translation>Nemáte nastaven výchozí soundfont v dialogovém okně (Edit-&gt; Nastavení). Z tohoto důvodu nebude po importu MIDI souboru přehráván žádný zvuk. Stáhněte si nějaký General MIDI soundfont, zadejte jej v dialogovém okně nastavení a zkuste to znovu.</translation>
     </message>
     <message>
