@@ -102,7 +102,7 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	{
 		QMessageBox::information( gui->mainWindow(),
 			tr( "Setup incomplete" ),
-			tr( "You do not have set up a default soundfont in "
+			tr( "You have not set up a default soundfont in "
 				"the settings dialog (Edit->Settings). "
 				"Therefore no sound will be played back after "
 				"importing this MIDI file. You should download "
