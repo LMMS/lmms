@@ -216,7 +216,8 @@ private:
 	void generateFromFFT(int bands, float threshold, sample_t *table);
 	int  waveTableBandFromFreq(float freq);
 	void generateWaveTables();
-	void createFFtPlans();
+	void createFFTPlans();
+	void destroyFFTPlans();
 
 	/* End Multiband wavetable */
 

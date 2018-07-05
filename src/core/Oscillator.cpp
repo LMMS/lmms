@@ -37,7 +37,7 @@ void Oscillator::waveTableInit()
 {
 	if (!s_waveTableBandFreqs)
 	{
-		createFFtPlans();
+		createFFTPlans();
 		s_waveTableBandFreqs = new float[127];
 		s_waveTablesPerWaveformCount = 0;
 		for (int i = 1; i < 127; i+=MIDI_NOTES_PER_TABLE)
@@ -46,10 +46,7 @@ void Oscillator::waveTableInit()
 			s_waveTablesPerWaveformCount++;
 		}
 		generateWaveTables();
-
-	fftwf_destroy_plan(m_fftPlan);
-	fftwf_destroy_plan(m_ifftPlan);
-	fftwf_free(m_specBuf);
+		destroyFFTPlans();
 	}
 }
 
@@ -246,11 +243,18 @@ int Oscillator::s_waveTablesPerWaveformCount = 0;
 
 
 
-void Oscillator::createFFtPlans()
+void Oscillator::createFFTPlans()
 {
 	m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( WAVETABLE_LENGTH * 2 + 1 ) * sizeof( fftwf_complex ) );
 	m_fftPlan = fftwf_plan_dft_r2c_1d( WAVETABLE_LENGTH , m_sampleBuffer, m_specBuf, FFTW_MEASURE );
 	m_ifftPlan = fftwf_plan_dft_c2r_1d(WAVETABLE_LENGTH , m_specBuf, m_sampleBuffer, FFTW_MEASURE);
+}
+
+void Oscillator::destroyFFTPlans()
+{
+	fftwf_destroy_plan(m_fftPlan);
+	fftwf_destroy_plan(m_ifftPlan);
+	fftwf_free(m_specBuf);
 }
 
 void Oscillator::generateWaveTables()
