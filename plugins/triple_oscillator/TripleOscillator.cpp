@@ -751,7 +751,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 		uwt->setInactiveGraphic( PLUGIN_NAME::getIconPixmap(
 							"wavetable_inactive" ) );
 		uwt->setCheckable(true);
-		ToolTip::add( uwt, tr( "Use multiband wave table ocillators." ) );
+		ToolTip::add( uwt, tr( "Use alias-free wavetable oscillators." ) );
 
 		automatableButtonGroup * wsbg =
 			new automatableButtonGroup( this );
