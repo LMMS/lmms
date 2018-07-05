@@ -116,6 +116,9 @@ void Oscillator::update( sampleFrame * _ab, const fpp_t _frames,
 
 void Oscillator::generateSineWaveTable(sample_t * table)
 {
+	// sinewaves are the only continuous waves containing no harmonics
+	// hence by definition all wavetables contain a single signal
+	// https://en.wikipedia.org/wiki/Sine_wave
 	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
 		table[i] = sinf(((float)i / (float)WAVETABLE_LENGTH) * F_2PI);
@@ -124,14 +127,16 @@ void Oscillator::generateSineWaveTable(sample_t * table)
 
 void Oscillator::generateSawWaveTable(int bands, sample_t * table)
 {
+	// sawtooth wave contain both even and odd harmonics
+	// hence sinewaves are added for all bands
+	// https://en.wikipedia.org/wiki/Sawtooth_wave
 	float max = 0;
 	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
 		table[i] = 0.0;
 		for (float n = 1; n <= bands; n++)
 		{
-			table[i] +=powf((float)-1.0, (float)(n + 1)) *
-					(1.0 / n) * sinf(F_2PI * i * n / (float)WAVETABLE_LENGTH);
+			table[i] += ((int)n%2 ? 1.0f : -1.0f) / n * sinf(F_2PI * i * n / (float)WAVETABLE_LENGTH);
 		}
 		max = fmax(max, table[i]);
 	}
@@ -145,16 +150,18 @@ void Oscillator::generateSawWaveTable(int bands, sample_t * table)
 
 void Oscillator::generateTriangleWaveTable(int bands, sample_t * table)
 {
+	// triangle waves contain only odd harmonics
+	// hence sinewaves are added for alternate bands
+	// https://en.wikipedia.org/wiki/Triangle_wave
 	float max = 0;
 	for (int i = 0 ; i < WAVETABLE_LENGTH; i++)
 	{
 		table[i] = 0.0;
 		for (float n = 0; n <= bands * 0.5; n++)
 		{
-			table[i] += powf((float)-1.0, (float)n) *
-					(1.0 / powf((float)(2 * n + 1),
-							   (float)2.0)) *
-					sinf(F_2PI * (2.0 * n + 1) * i / (float)WAVETABLE_LENGTH);
+			table[i] += ((int)n%2 ? -1.0f : +1.0f) / powf((float)(2 * n + 1),
+							   2.0f) *
+					sinf(F_2PI * (2.0f * n + 1) * i / (float)WAVETABLE_LENGTH);
 		}
 		max = fmax(max, table[i]);
 	}
@@ -167,13 +174,16 @@ void Oscillator::generateTriangleWaveTable(int bands, sample_t * table)
 
 void Oscillator::generateSquareWaveTable(int bands, sample_t * table)
 {
+	// square waves only contain odd harmonics,
+	// at diffrent levels when compared to triangle waves
+	// https://en.wikipedia.org/wiki/Square_wave
 	float max = 0;
 	for (int i = 0; i < WAVETABLE_LENGTH; i++)
 	{
-		table[i] = 0.0;
+		table[i] = 0.0f;
 		for (float n = 1; n <= bands; n += 2)
 		{
-			table[i] += (1.0 / n) * sinf(F_2PI * i * n / WAVETABLE_LENGTH);
+			table[i] += (1.0f / n) * sinf(F_2PI * i * n / WAVETABLE_LENGTH);
 		}
 		max = fmax(max, table[i]);
 	}
