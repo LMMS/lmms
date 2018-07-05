@@ -197,26 +197,25 @@ private:
 	/* Multiband WaveTable */
 	static const int WAVETABLE_LENGTH = 1024;
 	static const int MAX_FREQ = 20000; //limit to the audio spectrum
-	sample_t *m_generatedWaveTable;
+	static const int MIDI_NOTES_PER_TABLE = 4;
 	static float *s_waveTableBandFreqs;
 	static int s_waveTablesPerWaveformCount;
-	static sample_t ***s_waveTables;
+	static sample_t s_waveTables[WaveShapes::NumWaveShapes][128 / MIDI_NOTES_PER_TABLE][WAVETABLE_LENGTH];
 	fftwf_plan m_fftPlan;
 	fftwf_plan m_ifftPlan;
 	fftwf_complex * m_specBuf;
 	float m_fftBuffer[WAVETABLE_LENGTH*2];
 	float m_sampleBuffer[WAVETABLE_LENGTH];
 
-	void generateSineWaveTable(int bands);
-	void generateSawWaveTable(int bands);
-	void generateTriangleWaveTable(int bands);
-	void generateSquareWaveTable(int bands);
+	void generateSineWaveTable(sample_t * table);
+	void generateSawWaveTable(int bands, sample_t * table);
+	void generateTriangleWaveTable(int bands, sample_t * table);
+	void generateSquareWaveTable(int bands, sample_t * table);
 	void generateMoogSawWaveTable(int bands);
 	void generateExpWaveTable(int bands);
-	void generateFromFFT(int bands, float threshold);
+	void generateFromFFT(int bands, float threshold, sample_t *table);
 	int  waveTableBandFromFreq(float freq);
 	void generateWaveTables();
-	void allocWaveTables();
 	void createFFtPlans();
 
 	/* End Multiband wavetable */
