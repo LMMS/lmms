@@ -26,12 +26,12 @@
 
 #include "Plugin.h"
 #include "embed.h"
-
+#include "vstbase_export.h"
 
 extern "C"
 {
 
-Plugin::Descriptor PLUGIN_EXPORT vstbase_plugin_descriptor =
+Plugin::Descriptor VSTBASE_EXPORT vstbase_plugin_descriptor =
 {
 	STRINGIFY( PLUGIN_NAME ),
 	"VST Base",

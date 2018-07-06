@@ -38,7 +38,7 @@ class MidiTime;
 
 
 
-class EXPORT AutomationPattern : public TrackContentObject
+class LMMS_EXPORT AutomationPattern : public TrackContentObject
 {
 	Q_OBJECT
 public:

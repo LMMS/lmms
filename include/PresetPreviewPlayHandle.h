@@ -32,7 +32,7 @@
 class InstrumentTrack;
 class PreviewTrackContainer;
 
-class EXPORT PresetPreviewPlayHandle : public PlayHandle
+class LMMS_EXPORT PresetPreviewPlayHandle : public PlayHandle
 {
 public:
 	PresetPreviewPlayHandle( const QString& presetFile, bool loadByPlugin = false, DataFile *dataFile = 0 );

@@ -57,7 +57,7 @@
 class TextFloat;
 
 
-class EXPORT Fader : public QWidget, public FloatModelView
+class LMMS_EXPORT Fader : public QWidget, public FloatModelView
 {
 	Q_OBJECT
 public:

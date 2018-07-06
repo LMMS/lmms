@@ -11,6 +11,7 @@ ENDIF()
 
 INCLUDE_DIRECTORIES(
 	${SAMPLERATE_INCLUDE_DIRS}
+	"${CMAKE_BINARY_DIR}/src"
 )
 
 SET(PLUGIN_LIST "" CACHE STRING "List of plug-ins to build")
@@ -75,8 +76,8 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		stereo_enhancer
 		stereo_matrix
 		stk
-		vestige
 		vst_base
+		vestige
 		VstEffect
 		watsyn
 		waveshaper
@@ -94,9 +95,7 @@ IF(MSVC)
 		organic
 		ReverbSC
 		sid
-		vestige
 		vibed
-		vst_base
 		VstEffect
 		Xpressive
 		zynaddsubfx

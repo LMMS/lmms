@@ -30,7 +30,7 @@
 #include "ComboBoxModel.h"
 
 
-class EXPORT BBTrackContainer : public TrackContainer
+class LMMS_EXPORT BBTrackContainer : public TrackContainer
 {
 	Q_OBJECT
 	mapPropertyFromModel(int,currentBB,setCurrentBB,m_bbComboBoxModel);

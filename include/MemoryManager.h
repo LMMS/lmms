@@ -30,9 +30,9 @@
 #include <cstddef>
 #include <vector>
 
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT MemoryManager
+class LMMS_EXPORT MemoryManager
 {
 public:
 	struct ThreadGuard

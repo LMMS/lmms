@@ -29,9 +29,9 @@
 #include <QtCore/QMap>
 #include <QWidget>
 
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT LcdWidget : public QWidget
+class LMMS_EXPORT LcdWidget : public QWidget
 {
 	Q_OBJECT
 	
