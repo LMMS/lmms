@@ -55,7 +55,7 @@ public:
 		MoogSawWave,
 		ExponentialWave,
 		WhiteNoise,
-		UserDefinedWave,
+		UserDefinedWave, //to remain penultimate
 		NumWaveShapes
 	} ;
 
@@ -69,6 +69,10 @@ public:
 		NumModulationAlgos
 	} ;
 
+	static const int WAVETABLE_LENGTH = 1024;
+	static const int MAX_FREQ = 20000; //limit to the audio spectrum
+	static const int SEMITONES_PER_TABLE = 4;
+	static const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / Oscillator::SEMITONES_PER_TABLE;
 
 	Oscillator( const IntModel * _wave_shape_model,
 			const IntModel * _mod_algo_model,
@@ -94,6 +98,12 @@ public:
 	inline void setUserWave( const SampleBuffer * _wave )
 	{
 		m_userWave = _wave;
+
+		 //the generation of the anti alised wave tables may block
+		// as allcation, and deallocation of fft tables is perfoemed,
+		// along side the processing
+		// may require calling from the functions, when the file access is performed
+		generateAntiAliasUserWaveTable();
 	}
 
 	void update( sampleFrame * _ab, const fpp_t _frames,
@@ -165,7 +175,7 @@ public:
 		return m_userWave->userWaveSample( _sample );
 	}
 
-	inline sample_t wtSample(const WaveShapes shape, const float _sample)
+	inline sample_t wtSample(sample_t table[WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH], const float _sample)
 	{
 		const float frame = _sample * WAVETABLE_LENGTH;
 		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % WAVETABLE_LENGTH;
@@ -177,8 +187,8 @@ public:
 					f1 + 1 :
 					0;
 		int band = waveTableBandFromFreq(m_freq);
-		return linearInterpolate(s_waveTables[shape][band][f1],
-				s_waveTables[shape][waveTableBandFromFreq(m_freq)][f2], fraction(frame));
+		return linearInterpolate(table[band][f1],
+				table[band][f2], fraction(frame));
 	}
 
 	inline int  waveTableBandFromFreq(float freq)
@@ -205,12 +215,9 @@ private:
 	bool m_useWaveTable;
 
 	/* Multiband WaveTable */
-	static const int WAVETABLE_LENGTH = 1024;
-	static const int MAX_FREQ = 20000; //limit to the audio spectrum
-	static const int SEMITONES_PER_TABLE = 4;
-	static const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / Oscillator::SEMITONES_PER_TABLE;
 	static float *s_waveTableBandFreqs;
-	static sample_t s_waveTables[WaveShapes::NumWaveShapes][WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH];
+	static sample_t s_waveTables[WaveShapes::NumWaveShapes-1][WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH];
+	sample_t m_userAntiAliasWaveTable[WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH] = {0};
 	fftwf_plan m_fftPlan;
 	fftwf_plan m_ifftPlan;
 	fftwf_complex * m_specBuf;
@@ -221,8 +228,7 @@ private:
 	void generateSawWaveTable(int bands, sample_t * table);
 	void generateTriangleWaveTable(int bands, sample_t * table);
 	void generateSquareWaveTable(int bands, sample_t * table);
-	void generateMoogSawWaveTable(int bands);
-	void generateExpWaveTable(int bands);
+	void generateAntiAliasUserWaveTable();
 	void generateFromFFT(int bands, float threshold, sample_t *table);
 	void generateWaveTables();
 	void createFFTPlans();

@@ -180,6 +180,21 @@ void Oscillator::generateSquareWaveTable(int bands, sample_t * table)
 	}
 }
 
+void Oscillator::generateAntiAliasUserWaveTable()
+{
+	createFFTPlans();
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+	{
+		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
+		{
+			m_sampleBuffer[i] = userWaveSample((float)i / (float)WAVETABLE_LENGTH);
+		}
+		fftwf_execute(m_fftPlan);
+		generateFromFFT(MAX_FREQ / freqFromWaveTableBand(i), 0.2f, m_userAntiAliasWaveTable[i]);
+	}
+	destroyFFTPlans();
+}
+
 
 
 
@@ -218,7 +233,7 @@ void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 
 
 
-sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes][128 / Oscillator::SEMITONES_PER_TABLE][Oscillator::WAVETABLE_LENGTH];
+sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes-1][128 / Oscillator::SEMITONES_PER_TABLE][Oscillator::WAVETABLE_LENGTH];
 
 
 
@@ -673,7 +688,7 @@ inline sample_t Oscillator::getSample<Oscillator::SineWave>(
 {
 	if (m_useWaveTable)
 	{
-		return wtSample(WaveShapes::SineWave,_sample);
+		return wtSample(s_waveTables[WaveShapes::SineWave],_sample);
 	}
 	else
 	{
@@ -690,7 +705,7 @@ inline sample_t Oscillator::getSample<Oscillator::TriangleWave>(
 {
 	if (m_useWaveTable)
 	{
-		return wtSample(WaveShapes::TriangleWave,_sample);
+		return wtSample(s_waveTables[WaveShapes::TriangleWave],_sample);
 	}
 	else
 	{
@@ -707,7 +722,7 @@ inline sample_t Oscillator::getSample<Oscillator::SawWave>(
 {
 	if (m_useWaveTable)
 	{
-		return wtSample(WaveShapes::SawWave, _sample);
+		return wtSample(s_waveTables[WaveShapes::SawWave], _sample);
 	}
 	else
 	{
@@ -724,7 +739,7 @@ inline sample_t Oscillator::getSample<Oscillator::SquareWave>(
 {
 	if (m_useWaveTable)
 	{
-		return wtSample(WaveShapes::SquareWave, _sample);
+		return wtSample(s_waveTables[WaveShapes::SquareWave], _sample);
 	}
 	else
 	{
@@ -741,7 +756,7 @@ inline sample_t Oscillator::getSample<Oscillator::MoogSawWave>(
 {
 	if (m_useWaveTable)
 	{
-		return wtSample(WaveShapes::MoogSawWave, _sample);
+		return wtSample(s_waveTables[WaveShapes::MoogSawWave], _sample);
 	}
 	else
 	{
@@ -758,7 +773,7 @@ inline sample_t Oscillator::getSample<Oscillator::ExponentialWave>(
 {
 	if (m_useWaveTable)
 	{
-		return wtSample(WaveShapes::ExponentialWave, _sample);
+		return wtSample(s_waveTables[WaveShapes::ExponentialWave], _sample);
 	}
 	else
 	{
@@ -783,7 +798,14 @@ template<>
 inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 							const float _sample )
 {
-	return( userWaveSample( _sample ) );
+	if (m_useWaveTable)
+	{
+		return wtSample(m_userAntiAliasWaveTable, _sample);
+	}
+	else
+	{
+		return userWaveSample(_sample);
+	}
 }
 
 
