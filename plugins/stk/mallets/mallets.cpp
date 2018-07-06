@@ -620,7 +620,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+						.toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -670,7 +670,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+						.toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
@@ -718,7 +718,7 @@ malletsSynth::malletsSynth( const StkFloat _pitch,
 	{
 		Stk::setSampleRate( _sample_rate );
 		Stk::setRawwavePath( QDir( ConfigManager::inst()->stkDir() ).absolutePath()
-						.toLatin1().constData() );
+						.toLocal8Bit().constData() );
 #ifndef LMMS_DEBUG
 		Stk::showWarnings( false );
 #endif
