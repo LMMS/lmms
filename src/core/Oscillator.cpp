@@ -35,19 +35,9 @@
 
 void Oscillator::waveTableInit()
 {
-	if (!s_waveTableBandFreqs)
-	{
-		createFFTPlans();
-		s_waveTableBandFreqs = new float[127];
-		s_waveTablesPerWaveformCount = 0;
-		for (int i = 1; i < 127; i+=MIDI_NOTES_PER_TABLE)
-		{
-			s_waveTableBandFreqs[s_waveTablesPerWaveformCount] = 440.0 * powf(2.0, (i - 69.0) / 12.0);
-			s_waveTablesPerWaveformCount++;
-		}
-		generateWaveTables();
-		destroyFFTPlans();
-	}
+	createFFTPlans();
+	generateWaveTables();
+	destroyFFTPlans();
 }
 
 Oscillator::Oscillator( const IntModel * _wave_shape_model,
@@ -227,27 +217,17 @@ void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 }
 
 
-int Oscillator::waveTableBandFromFreq(float freq)
-{
-	int i;
-	for (i = 0; i < s_waveTablesPerWaveformCount; ++i)
-	{
-		if (s_waveTableBandFreqs[i] > freq) return i;
-	}
-	return i;
-}
 
-sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes][128 / Oscillator::MIDI_NOTES_PER_TABLE][Oscillator::WAVETABLE_LENGTH];
-float* Oscillator::s_waveTableBandFreqs = 0;
-int Oscillator::s_waveTablesPerWaveformCount = 0;
+sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes][128 / Oscillator::SEMITONES_PER_TABLE][Oscillator::WAVETABLE_LENGTH];
+
 
 
 
 void Oscillator::createFFTPlans()
 {
 	m_specBuf = ( fftwf_complex * ) fftwf_malloc( ( WAVETABLE_LENGTH * 2 + 1 ) * sizeof( fftwf_complex ) );
-	m_fftPlan = fftwf_plan_dft_r2c_1d( WAVETABLE_LENGTH , m_sampleBuffer, m_specBuf, FFTW_MEASURE );
-	m_ifftPlan = fftwf_plan_dft_c2r_1d(WAVETABLE_LENGTH , m_specBuf, m_sampleBuffer, FFTW_MEASURE);
+	m_fftPlan = fftwf_plan_dft_r2c_1d( WAVETABLE_LENGTH, m_sampleBuffer, m_specBuf, FFTW_MEASURE );
+	m_ifftPlan = fftwf_plan_dft_c2r_1d(WAVETABLE_LENGTH, m_specBuf, m_sampleBuffer, FFTW_MEASURE);
 }
 
 void Oscillator::destroyFFTPlans()
@@ -260,47 +240,47 @@ void Oscillator::destroyFFTPlans()
 void Oscillator::generateWaveTables()
 {
 	//generate sine tables
-	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
 		generateSineWaveTable(s_waveTables[WaveShapes::SineWave][i]);
 	}
 	//generate saw tables
-	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
-		generateSawWaveTable(MAX_FREQ / s_waveTableBandFreqs[i], s_waveTables[WaveShapes::SawWave][i]);
+		generateSawWaveTable(MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SawWave][i]);
 	}
 	//generate square tables
-	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
-		generateSquareWaveTable(MAX_FREQ / s_waveTableBandFreqs[i], s_waveTables[WaveShapes::SquareWave][i]);
+		generateSquareWaveTable(MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::SquareWave][i]);
 	}
 	//generate triangle tables
-	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
-		generateTriangleWaveTable(MAX_FREQ / s_waveTableBandFreqs[i], s_waveTables[WaveShapes::TriangleWave][i]);
+		generateTriangleWaveTable(MAX_FREQ / freqFromWaveTableBand(i), s_waveTables[WaveShapes::TriangleWave][i]);
 	}
 	//generate moogSaw tables
 	//generate signal buffer
-	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
 		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
 		{
 			m_sampleBuffer[i] = moogSawSample((float)i / (float)WAVETABLE_LENGTH);
 		}
 		fftwf_execute(m_fftPlan);
-		generateFromFFT(MAX_FREQ / s_waveTableBandFreqs[i], 0.2f, s_waveTables[WaveShapes::MoogSawWave][i]);
+		generateFromFFT(MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::MoogSawWave][i]);
 	}
 
 	//generate Exp tables
 	//generate signal buffer
-	for (int i = 0; i < s_waveTablesPerWaveformCount; ++i)
+	for (int i = 0; i < WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
 		for (int i = 0; i < WAVETABLE_LENGTH; ++i)
 		{
 			m_sampleBuffer[i] = expSample((float)i / (float)WAVETABLE_LENGTH);
 		}
 		fftwf_execute(m_fftPlan);
-		generateFromFFT(MAX_FREQ / s_waveTableBandFreqs[i], 0.2f, s_waveTables[WaveShapes::ExponentialWave][i]);
+		generateFromFFT(MAX_FREQ / freqFromWaveTableBand(i), 0.2f, s_waveTables[WaveShapes::ExponentialWave][i]);
 	}
 }
 
