@@ -78,6 +78,11 @@ protected:
 		return m_file.read( _data, _len );
 	}
 
+	inline QByteArray readAllData()
+	{
+		return m_file.readAll();
+	}
+
 	inline void ungetChar( char _ch )
 	{
 		m_file.ungetChar( _ch );

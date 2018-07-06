@@ -40,7 +40,8 @@ VstEffectControls::VstEffectControls( VstEffect * _eff ) :
 	m_subWindow( NULL ),
 	knobFModel( NULL ),
 	ctrHandle( NULL ),
-	lastPosInMenu (0)
+	lastPosInMenu (0),
+	m_vstGuiVisible ( true )
 //	m_presetLabel ( NULL )
 {
 }
@@ -64,6 +65,8 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 	m_effect->m_pluginMutex.lock();
 	if( m_effect->m_plugin != NULL )
 	{
+		m_vstGuiVisible = _this.attribute( "guivisible" ).toInt();
+
 		m_effect->m_plugin->loadSettings( _this );
 
 		const QMap<QString, QString> & dump = m_effect->m_plugin->parameterDump();
@@ -138,8 +141,16 @@ void VstEffectControls::saveSettings( QDomDocument & _doc, QDomElement & _this )
 
 int VstEffectControls::controlCount()
 {
-	return m_effect->m_plugin != NULL &&
-		m_effect->m_plugin->hasEditor() ?  1 : 0;
+	return m_effect->m_plugin != NULL ? 1 : 0;
+}
+
+
+
+EffectControlDialog *VstEffectControls::createView()
+{
+	auto dialog = new VstEffectControlDialog( this );
+	dialog->togglePluginUI( m_vstGuiVisible );
+	return dialog;
 }
 
 
@@ -306,7 +317,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 	m_vi->m_subWindow->setWidget(m_vi->m_scrollArea);
 	m_vi->m_subWindow->setWindowTitle( _eff->m_plugin->name() + tr( " - VST parameter control" ) );
 	m_vi->m_subWindow->setWindowIcon( PLUGIN_NAME::getIconPixmap( "logo" ) );
-	//m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose);
+	m_vi->m_subWindow->setAttribute(Qt::WA_DeleteOnClose, false);
 
 
 	l->setContentsMargins( 20, 10, 10, 10 );

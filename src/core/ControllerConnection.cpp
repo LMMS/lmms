@@ -162,6 +162,11 @@ void ControllerConnection::finalizeConnections()
 			c->setController( Engine::getSong()->
 					controllers().at( c->m_controllerId ) );
 		}
+		else if (c->getController()->type() == Controller::DummyController)
+		{
+			delete c;
+			--i;
+		}
 	}
 }
 
@@ -199,7 +204,7 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 	}
 	else
 	{
-		if( _this.attribute( "id" ).toInt() >= 0 )
+		if( _this.attribute( "id", "-1" ).toInt() >= 0 )
 		{
 			m_controllerId = _this.attribute( "id" ).toInt();
 		}

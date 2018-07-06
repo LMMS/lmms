@@ -178,6 +178,7 @@ PianoRoll::PianoRoll() :
 	m_startKey( INITIAL_START_KEY ),
 	m_lastKey( 0 ),
 	m_editMode( ModeDraw ),
+	m_ctrlMode( ModeDraw ),
 	m_mouseDownRight( false ),
 	m_scrollBack( false ),
 	m_barLineColor( 0, 0, 0 ),
@@ -951,6 +952,8 @@ void PianoRoll::clearSelectedNotes()
 
 void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 {
+	if (!hasValidPattern()) {return;}
+
 	bool useAllNotes = ! isSelection();
 	for( Note *note : m_pattern->notes() )
 	{
@@ -975,6 +978,8 @@ void PianoRoll::shiftSemiTone( int amount ) // shift notes by amount semitones
 
 void PianoRoll::shiftPos( int amount ) //shift notes pos by amount
 {
+	if (!hasValidPattern()) {return;}
+
 	bool useAllNotes = ! isSelection();
 
 	bool first = true;
@@ -1065,12 +1070,18 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				{
 					// shift selection up an octave
 					// if nothing selected, shift _everything_
-					shiftSemiTone( 12 * direction );
+					if (hasValidPattern())
+					{
+						shiftSemiTone( 12 * direction );
+					}
 				}
 				else if((ke->modifiers() & Qt::ShiftModifier) && m_action == ActionNone)
 				{
 					// Move selected notes up by one semitone
-					shiftSemiTone( 1 * direction );
+					if (hasValidPattern())
+					{
+						shiftSemiTone( 1 * direction );
+					}
 				}
 				else
 				{
@@ -1100,22 +1111,32 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke )
 				if( ke->modifiers() & Qt::ControlModifier && m_action == ActionNone )
 				{
 					// Move selected notes by one bar to the left
-					shiftPos( direction * MidiTime::ticksPerTact() );
+					if (hasValidPattern())
+					{
+						shiftPos( direction * MidiTime::ticksPerTact() );
+					}
 				}
 				else if( ke->modifiers() & Qt::ShiftModifier && m_action == ActionNone)
 				{
 					// move notes
-					bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
-					int amt = quantized ? quantization() : 1;
-					shiftPos( direction * amt );
+					if (hasValidPattern())
+					{
+						bool quantized = ! ( ke->modifiers() & Qt::AltModifier );
+						int amt = quantized ? quantization() : 1;
+						shiftPos( direction * amt );
+					}
 				}
 				else if( ke->modifiers() & Qt::AltModifier)
 				{
 					// switch to editing a pattern adjacent to this one in the song editor
-					Pattern * p = direction > 0 ? m_pattern->nextPattern() : m_pattern->previousPattern();
-					if(p != NULL)
+					if (hasValidPattern())
 					{
-						setCurrentPattern(p);
+						Pattern * p = direction > 0 ? m_pattern->nextPattern()
+										: m_pattern->previousPattern();
+						if(p != NULL)
+						{
+							setCurrentPattern(p);
+						}
 					}
 				}
 				else
@@ -3190,6 +3211,7 @@ void PianoRoll::wheelEvent(QWheelEvent * we )
 	if( we->x() > noteEditLeft() && we->x() < noteEditRight()
 	&& we->y() > noteEditTop() && we->y() < noteEditBottom() )
 	{
+		if (!hasValidPattern()) {return;}
 		// get values for going through notes
 		int pixel_range = 8;
 		int x = we->x() - WHITE_KEY_WIDTH;
@@ -3332,8 +3354,9 @@ void PianoRoll::focusOutEvent( QFocusEvent * )
 			m_pattern->instrumentTrack()->pianoModel()->midiEventProcessor()->processInEvent( MidiEvent( MidiNoteOff, -1, i, 0 ) );
 			m_pattern->instrumentTrack()->pianoModel()->setKeyState( i, false );
 		}
-		update();
 	}
+	m_editMode = m_ctrlMode;
+	update();
 }
 
 
@@ -3541,7 +3564,7 @@ void PianoRoll::verScrolled( int new_pos )
 
 void PianoRoll::setEditMode(int mode)
 {
-	m_editMode = (EditModes) mode;
+	m_ctrlMode = m_editMode = (EditModes) mode;
 }
 
 
@@ -4090,28 +4113,13 @@ PianoRollWindow::PianoRollWindow() :
 	DropToolBar *copyPasteActionsToolBar =  addDropToolBarToTop( tr( "Copy paste controls" ) );
 
 	QAction* cutAction = new QAction(embed::getIconPixmap( "edit_cut" ),
-							  tr( "Cut (%1+X)" ).arg(
-									#ifdef LMMS_BUILD_APPLE
-									"⌘" ), this );
-									#else
-									"Ctrl" ), this );
-									#endif
+								tr( "Cut (%1+X)" ).arg(UI_CTRL_KEY), this );
 
 	QAction* copyAction = new QAction(embed::getIconPixmap( "edit_copy" ),
-							   tr( "Copy (%1+C)" ).arg(
-	 								#ifdef LMMS_BUILD_APPLE
-	 								"⌘"), this);
-	 								#else
-									"Ctrl" ), this );
-	 								#endif
+								 tr( "Copy (%1+C)" ).arg(UI_CTRL_KEY), this );
 
 	QAction* pasteAction = new QAction(embed::getIconPixmap( "edit_paste" ),
-					tr( "Paste (%1+V)" ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘" ), this );
-						#else
-						"Ctrl" ), this );
-						#endif
+					tr( "Paste (%1+V)" ).arg(UI_CTRL_KEY), this );
 
 	cutAction->setShortcut( Qt::CTRL | Qt::Key_X );
 	copyAction->setShortcut( Qt::CTRL | Qt::Key_C );

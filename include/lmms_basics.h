@@ -141,5 +141,11 @@ typedef sample_t sampleFrameA[DEFAULT_CHANNELS] __attribute__((__aligned__(ALIGN
 #define STRINGIFY(s) STR(s)
 #define STR(PN)	#PN
 
+// Abstract away GUI CTRL key (linux/windows) vs ⌘ (apple)
+#ifdef LMMS_BUILD_APPLE
+# define UI_CTRL_KEY "⌘"
+#else
+# define UI_CTRL_KEY "Ctrl"
+#endif
 
 #endif

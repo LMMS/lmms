@@ -164,7 +164,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 	const float outGain =  m_outGain;
 	sampleFrame m_inPeak = { 0, 0 };
 
-	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 )
+	if(m_eqControls.m_analyseInModel.value( true ) &&  outSum > 0 && m_eqControls.isViewVisible()  )
 	{
 		m_eqControls.m_inFftBands.analyze( buf, frames );
 	}
@@ -275,7 +275,7 @@ bool EqEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 
 	checkGate( outSum / frames );
 
-	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 )
+	if(m_eqControls.m_analyseOutModel.value( true ) && outSum > 0 && m_eqControls.isViewVisible() )
 	{
 		m_eqControls.m_outFftBands.analyze( buf, frames );
 		setBandPeaks( &m_eqControls.m_outFftBands , ( int )( sampleRate ) );

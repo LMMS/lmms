@@ -123,8 +123,11 @@ void SubWindow::paintEvent( QPaintEvent * )
 	p.drawLine( width() - 1, m_titleBarHeight, width() - 1, height() - 1 );
 
 	// window icon
-	QPixmap winicon( widget()->windowIcon().pixmap( m_buttonSize ) );
-	p.drawPixmap( 3, 3, m_buttonSize.width(), m_buttonSize.height(), winicon );
+	if( widget() )
+	{
+		QPixmap winicon( widget()->windowIcon().pixmap( m_buttonSize ) );
+		p.drawPixmap( 3, 3, m_buttonSize.width(), m_buttonSize.height(), winicon );
+	}
 }
 
 
@@ -324,25 +327,31 @@ void SubWindow::adjustTitleBar()
 	// we're keeping the restore button around if we open projects
 	// from older versions that have saved minimized windows
 	m_restoreBtn->setVisible( isMaximized() || isMinimized() );
-
-	// title QLabel adjustments
-	m_windowTitle->setAlignment( Qt::AlignHCenter );
-	m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
-	m_windowTitle->move( menuButtonSpace,
-		( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
-
-	// if minimized we can't use widget()->width(). We have to hard code the width,
-	// as the width of all minimized windows is the same.
 	if( isMinimized() )
 	{
 		m_restoreBtn->move( m_maximizeBtn->isHidden() ?  middleButtonPos : leftButtonPos );
-		m_windowTitle->setFixedWidth( 120 );
 	}
 
-	// truncate the label string if the window is to small. Adds "..."
-	elideText( m_windowTitle, widget()->windowTitle() );
-	m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
-	m_windowTitle->adjustSize();
+	if( widget() )
+	{
+		// title QLabel adjustments
+		m_windowTitle->setAlignment( Qt::AlignHCenter );
+		m_windowTitle->setFixedWidth( widget()->width() - ( menuButtonSpace + buttonBarWidth ) );
+		m_windowTitle->move( menuButtonSpace,
+			( m_titleBarHeight / 2 ) - ( m_windowTitle->sizeHint().height() / 2 ) - 1 );
+
+		// if minimized we can't use widget()->width(). We have to hard code the width,
+		// as the width of all minimized windows is the same.
+		if( isMinimized() )
+		{
+			m_windowTitle->setFixedWidth( 120 );
+		}
+
+		// truncate the label string if the window is to small. Adds "..."
+		elideText( m_windowTitle, widget()->windowTitle() );
+		m_windowTitle->setTextInteractionFlags( Qt::NoTextInteraction );
+		m_windowTitle->adjustSize();
+	}
 }
 
 

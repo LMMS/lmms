@@ -791,12 +791,7 @@ void TrackContentObjectView::mousePressEvent( QMouseEvent * me )
 			QString hint = m_action == Move || m_action == MoveSelection
 						? tr( "Press <%1> and drag to make a copy." )
 						: tr( "Press <%1> for free resizing." );
-			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(
-								#ifdef LMMS_BUILD_APPLE
-								"⌘"),
-								#else
-								"Ctrl"),
-								#endif
+			m_hint = TextFloat::displayMessage( tr( "Hint" ), hint.arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 		}
 	}
@@ -1093,12 +1088,7 @@ void TrackContentObjectView::contextMenuEvent( QContextMenuEvent * cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘"),
-					#else
-					"Ctrl"),
-					#endif
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
 	constructContextMenu( &contextMenu );
 
@@ -1734,12 +1724,7 @@ TrackOperationsWidget::TrackOperationsWidget( TrackView * parent ) :
 	m_trackView( parent )          /*!< The parent track view */
 {
 	ToolTip::add( this, tr( "Press <%1> while clicking on move-grip "
-				"to begin a new drag'n'drop action." ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘") );
-					#else
-					"Ctrl") );
-					#endif
+				"to begin a new drag'n'drop action." ).arg(UI_CTRL_KEY) );
 
 	QMenu * toMenu = new QMenu( this );
 	toMenu->setFont( pointSize<9>( toMenu->font() ) );
@@ -1896,6 +1881,7 @@ void TrackOperationsWidget::cloneTrack()
 void TrackOperationsWidget::clearTrack()
 {
 	Track * t = m_trackView->getTrack();
+	t->addJournalCheckPoint();
 	t->lock();
 	t->deleteTCOs();
 	t->unlock();

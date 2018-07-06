@@ -337,24 +337,14 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> to disable magnetic loop points." ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘"),
-						#else
-						"Ctrl"),
-						#endif
+					tr( "Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 	else if( m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘"),
-						#else
-						"Ctrl"),
-						#endif
+					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 
