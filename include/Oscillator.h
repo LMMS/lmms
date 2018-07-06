@@ -198,7 +198,7 @@ public:
 
 	inline float freqFromWaveTableBand(int band)
 	{
-		return 440.0f * powf(2.0f, (band - 69.0f) / 12.0f);
+		return 440.0f * powf(2.0f, (band * SEMITONES_PER_TABLE - 69.0f) / 12.0f);
 	}
 
 private:
