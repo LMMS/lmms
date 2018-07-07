@@ -1074,7 +1074,7 @@ void RemoteVstPlugin::saveChunkToFile( const std::string & _file )
 		if( len > 0 )
 		{
 			FILE* fp = F_OPEN_UTF8( _file, "wb" );
-			if ( fwrite( chunk, len, 1, fp ) != len )
+			if ( fwrite( chunk, 1, len, fp ) != len )
 			{
 				fprintf( stderr,
 					"Error saving chunk to file.\n" );
