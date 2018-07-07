@@ -121,7 +121,7 @@ class FxRoute : public QObject
 };
 
 
-class EXPORT FxMixer : public Model, public JournallingObject
+class LMMS_EXPORT FxMixer : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:

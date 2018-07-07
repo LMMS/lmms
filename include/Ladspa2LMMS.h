@@ -30,7 +30,7 @@
 #include "LadspaManager.h"
 
 
-class EXPORT Ladspa2LMMS : public LadspaManager
+class LMMS_EXPORT Ladspa2LMMS : public LadspaManager
 {
 public:
 	

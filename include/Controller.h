@@ -27,7 +27,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "export.h"
+#include "lmms_export.h"
 #include "Engine.h"
 #include "Model.h"
 #include "JournallingObject.h"
@@ -41,7 +41,7 @@ class ControllerConnection;
 typedef QVector<Controller *> ControllerVector;
 
 
-class EXPORT Controller : public Model, public JournallingObject
+class LMMS_EXPORT Controller : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:

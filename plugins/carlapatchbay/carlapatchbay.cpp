@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlapatchbay_plugin_descriptor =
     NULL
 } ;
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, void* data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* data)
 {
     return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlapatchbay_plugin_descriptor, true);
 }

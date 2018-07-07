@@ -126,26 +126,32 @@ EOL
 
 chmod +x "${APPDIR}usr/bin/lmms"
 
-# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
 # Handle wine linking
-if [ -d "@WINE_LIBRARY_FIX@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_LIBRARY_FIX@:@WINE_LIBRARY_FIX@wine/
+if [ -d "@WINE_32_LIBRARY_DIR@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/wine/:@WINE_32_LIBRARY_DIR@:@WINE_32_LIBRARY_DIR@wine/
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/wine/:@WINE_64_LIBRARY_DIR@:@WINE_64_LIBRARY_DIR@wine/
 fi
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
-VSTLIB="${APPDIR}usr/lib/lmms/RemoteVstPlugin.exe.so"
+VSTLIB32="${APPDIR}usr/lib/lmms/RemoteVstPlugin32.exe.so"
+VSTLIB64="${APPDIR}usr/lib/lmms/RemoteVstPlugin64.exe.so"
 
 ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
-VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin.exe.so"
+VSTBIN32="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
+VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB" "$VSTBIN"
+mv "$VSTLIB32" "$VSTBIN32"
+mv "$VSTLIB64" "$VSTBIN64"
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
@@ -156,7 +162,8 @@ for file in "${APPDIR}usr/lib/lmms/"*.so; do
    executables="${executables} -executable=$thisfile"
 done
 executables="${executables} -executable=${ZYNBIN}"
-executables="${executables} -executable=${VSTBIN}"
+executables="${executables} -executable=${VSTBIN32}"
+executables="${executables} -executable=${VSTBIN64}"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imp_1199.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so"
@@ -171,7 +178,8 @@ success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN" "$VSTLIB"
+ln -sr  "$VSTBIN32" "$VSTLIB32"
+ln -sr  "$VSTBIN64" "$VSTLIB64"
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"

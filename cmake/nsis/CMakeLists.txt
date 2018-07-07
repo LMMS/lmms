@@ -1,4 +1,7 @@
 SET(CPACK_PACKAGE_ICON                  "${CMAKE_SOURCE_DIR}/cmake/nsis/nsis_branding.bmp")
+IF(MSVC)
+	STRING(REPLACE "/" "\\\\" CPACK_PACKAGE_ICON ${CPACK_PACKAGE_ICON})
+ENDIF(MSVC)
 SET(CPACK_NSIS_MUI_ICON                 "${CMAKE_SOURCE_DIR}/cmake/nsis/lmms.ico")
 SET(CPACK_NSIS_INSTALLED_ICON_NAME      "${CMAKE_PROJECT_NAME}.exe" PARENT_SCOPE)
 SET(CPACK_NSIS_DISPLAY_NAME             "${PROJECT_NAME_UCASE} ${VERSION}" PARENT_SCOPE)
@@ -8,7 +11,8 @@ SET(CPACK_NSIS_CONTACT                  "${PROJECT_EMAIL}" PARENT_SCOPE)
 SET(CPACK_PACKAGE_EXECUTABLES           "${CMAKE_PROJECT_NAME}.exe;${PROJECT_NAME_UCASE}" PARENT_SCOPE)
 SET(CPACK_NSIS_MENU_LINKS               "${CMAKE_PROJECT_NAME}.exe;${PROJECT_NAME_UCASE}" PARENT_SCOPE)
 SET(CPACK_NSIS_DEFINES                  "
-  !include ${CMAKE_SOURCE_DIR}/cmake/nsis/FileAssociation.nsh
+  !addincludedir ${CMAKE_SOURCE_DIR}/cmake/nsis
+  !include FileAssociation.nsh
   !include LogicLib.nsh
   !include WinVer.nsh")
 SET(CPACK_PACKAGE_FILE_NAME             "${CMAKE_PROJECT_NAME}-${VERSION}-win32")

@@ -63,7 +63,7 @@ class LedCheckBox;
 class QLabel;
 
 
-class EXPORT InstrumentTrack : public Track, public MidiEventProcessor
+class LMMS_EXPORT InstrumentTrack : public Track, public MidiEventProcessor
 {
 	Q_OBJECT
 	MM_OPERATORS
