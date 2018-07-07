@@ -59,6 +59,7 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
+	Q_PROPERTY( QColor noteTextColor READ noteTextColor WRITE setNoteTextColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
@@ -122,6 +123,8 @@ public:
 	void setNoteModeColor( const QColor & c );
 	QColor noteColor() const;
 	void setNoteColor( const QColor & c );
+	QColor noteTextColor() const;
+	void setNoteTextColor( const QColor & c );
 	QColor barColor() const;
 	void setBarColor( const QColor & c );
 	QColor selectedNoteColor() const;
@@ -157,8 +160,8 @@ protected:
 
 	int getKey( int y ) const;
 	static void drawNoteRect( QPainter & p, int x, int y,
-					int  width, const Note * n, const QColor & noteCol,
-					const QColor & selCol, const int noteOpc, const bool borderless );
+					int  width, const Note * n, const QColor & noteCol, const QColor & noteTextColor,
+					const QColor & selCol, const int noteOpc, const bool borderless, bool drawNoteName );
 	void removeSelection();
 	void selectAll();
 	NoteVector getSelectedNotes();
@@ -384,6 +387,7 @@ private:
 	QColor m_lineColor;
 	QColor m_noteModeColor;
 	QColor m_noteColor;
+	QColor m_noteTextColor;
 	QColor m_barColor;
 	QColor m_selectedNoteColor;
 	QColor m_textColor;
