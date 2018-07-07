@@ -100,7 +100,7 @@ jobs:
           command: |
             cd build
             make install
-            make appimage
+            make appimage || (cat appimage.log && false)
             cp ./lmms-*.AppImage /tmp/artifacts/
       - store_artifacts:
           path: /tmp/artifacts/

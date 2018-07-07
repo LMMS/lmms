@@ -38,7 +38,7 @@
 class graphModel;
 
 
-class EXPORT Graph : public QWidget, public ModelView
+class LMMS_EXPORT Graph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -111,7 +111,7 @@ private:
 } ;
 
 
-class EXPORT graphModel : public Model
+class LMMS_EXPORT graphModel : public Model
 {
 	Q_OBJECT
 public:

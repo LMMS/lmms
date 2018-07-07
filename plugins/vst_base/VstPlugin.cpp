@@ -24,6 +24,9 @@
 
 #include "VstPlugin.h"
 
+#include "communication.h"
+
+#include <QtCore/QtEndian>
 #include <QtCore/QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -66,6 +69,59 @@
 #	include <X11/Xlib.h>
 #endif
 
+namespace PE
+{
+// Utilities for reading PE file machine type
+// See specification at https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx
+
+// Work around name conflict
+#ifdef i386
+#	undef i386
+#endif
+
+enum class MachineType : uint16_t
+{
+	unknown = 0x0,
+	amd64 = 0x8664,
+	i386 = 0x14c,
+};
+
+class FileInfo
+{
+public:
+	FileInfo(QString filePath)
+		: m_file(filePath)
+	{
+		m_file.open(QFile::ReadOnly);
+		m_map = m_file.map(0, m_file.size());
+		if (m_map == nullptr) {
+			throw std::runtime_error("Cannot map file");
+		}
+	}
+	~FileInfo()
+	{
+		m_file.unmap(m_map);
+	}
+
+	MachineType machineType()
+	{
+		int32_t peOffset = qFromLittleEndian(* reinterpret_cast<int32_t*>(m_map + 0x3C));
+		uchar* peSignature = m_map + peOffset;
+		if (memcmp(peSignature, "PE\0\0", 4)) {
+			throw std::runtime_error("Invalid PE file");
+		}
+		uchar * coffHeader = peSignature + 4;
+		uint16_t machineType = qFromLittleEndian(* reinterpret_cast<uint16_t*>(coffHeader));
+		return static_cast<MachineType>(machineType);
+	}
+
+private:
+	QFile m_file;
+	uchar* m_map;
+};
+
+}
+
 
 VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_plugin( _plugin ),
@@ -73,20 +129,32 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_embedMethod( gui
 			? ConfigManager::inst()->vstEmbedMethod()
 			: "headless" ),
-	m_badDllFormat( false ),
 	m_version( 0 ),
 	m_currentProgram()
 {
 	setSplittedChannels( true );
 
-	tryLoad( REMOTE_VST_PLUGIN_FILEPATH );
-#ifdef LMMS_BUILD_WIN64
-	if( m_badDllFormat )
-	{
-		m_badDllFormat = false;
-		tryLoad( "32/RemoteVstPlugin32" );
+	PE::MachineType machineType;
+	try {
+		PE::FileInfo peInfo(_plugin);
+		machineType = peInfo.machineType();
+	} catch (std::runtime_error& e) {
+		qCritical() << "Error while determining PE file's machine type: " << e.what();
+		machineType = PE::MachineType::unknown;
 	}
-#endif
+
+	switch(machineType)
+	{
+	case PE::MachineType::amd64:
+		tryLoad( "RemoteVstPlugin64" );
+		break;
+	case PE::MachineType::i386:
+		tryLoad( "RemoteVstPlugin32" );
+		break;
+	default:
+		m_failed = true;
+		return;
+	}
 
 	setTempo( Engine::getSong()->getTempo() );
 
@@ -322,10 +390,6 @@ bool VstPlugin::processMessage( const message & _m )
 {
 	switch( _m.id )
 	{
-	case IdVstBadDllFormat:
-		m_badDllFormat = true;
-		break;
-
 	case IdVstPluginWindowID:
 		m_pluginWindowID = _m.getInt();
 		if( m_embedMethod == "none" )

@@ -28,9 +28,9 @@
 #include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT InstrumentPlayHandle : public PlayHandle
+class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );

@@ -36,7 +36,7 @@
 typedef struct PortDescription port_desc_t;
 
 
-class EXPORT LadspaControl : public Model, public JournallingObject
+class LMMS_EXPORT LadspaControl : public Model, public JournallingObject
 {
 	Q_OBJECT
 public:

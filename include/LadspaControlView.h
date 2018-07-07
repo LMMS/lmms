@@ -33,7 +33,7 @@
 class LadspaControl;
 
 
-class EXPORT LadspaControlView : public QWidget, public ModelView
+class LMMS_EXPORT LadspaControlView : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:

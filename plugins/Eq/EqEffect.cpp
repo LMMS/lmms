@@ -24,12 +24,13 @@
 
 #include "EqEffect.h"
 
-#include "embed.h"
 #include "Engine.h"
 #include "EqFader.h"
 #include "interpolation.h"
 #include "lmms_math.h"
 
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {

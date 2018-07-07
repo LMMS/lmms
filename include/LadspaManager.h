@@ -36,7 +36,7 @@
 #include <QtCore/QStringList>
 
 
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 
 
@@ -80,7 +80,7 @@ typedef struct ladspaManagerStorage
 } ladspaManagerDescription;
 
 
-class EXPORT LadspaManager
+class LMMS_EXPORT LadspaManager
 {
 public:
 

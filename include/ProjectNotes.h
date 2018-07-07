@@ -37,7 +37,7 @@ class QTextCharFormat;
 class QTextEdit;
 
 
-class EXPORT ProjectNotes : public QMainWindow, public SerializingObject
+class LMMS_EXPORT ProjectNotes : public QMainWindow, public SerializingObject
 {
 	Q_OBJECT
 public:
