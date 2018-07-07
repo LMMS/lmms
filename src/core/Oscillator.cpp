@@ -233,7 +233,7 @@ void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 
 
 
-sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes-1][128 / Oscillator::SEMITONES_PER_TABLE][Oscillator::WAVETABLE_LENGTH];
+sample_t Oscillator::s_waveTables[Oscillator::WaveShapes::NumWaveShapes-2][128 / Oscillator::SEMITONES_PER_TABLE][Oscillator::WAVETABLE_LENGTH];
 
 
 

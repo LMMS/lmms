@@ -69,9 +69,14 @@ public:
 		NumModulationAlgos
 	} ;
 
-	static const int WAVETABLE_LENGTH = 1024;
+	static const int WAVETABLE_LENGTH = 2446; //minimum size of table to have all bands for midi note 1
 	static const int MAX_FREQ = 20000; //limit to the audio spectrum
-	static const int SEMITONES_PER_TABLE = 4;
+
+	//SEMITONES_PER_TABLE, the smaller the value the smoother the harmonics change on frequency sweeps
+	// with the trade off of increased memory requirements to store the wave tables
+	// require memory = NumberOfWaveShapes*WAVETABLE_LENGTH*(MidiNoteCount/SEMITONES_PER_TABLE)*BytePerSample_t
+	// 7*2446*(128/1)*4 = 8766464 bytes
+	static const int SEMITONES_PER_TABLE = 1;
 	static const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / Oscillator::SEMITONES_PER_TABLE;
 
 	Oscillator( const IntModel * _wave_shape_model,
@@ -98,12 +103,7 @@ public:
 	inline void setUserWave( const SampleBuffer * _wave )
 	{
 		m_userWave = _wave;
-
-		 //the generation of the anti alised wave tables may block
-		// as allcation, and deallocation of fft tables is perfoemed,
-		// along side the processing
-		// may require calling from the functions, when the file access is performed
-		generateAntiAliasUserWaveTable();
+		//todo relocate		generateAntiAliasUserWaveTable();
 	}
 
 	void update( sampleFrame * _ab, const fpp_t _frames,
@@ -193,7 +193,11 @@ public:
 
 	inline int  waveTableBandFromFreq(float freq)
 	{
-		return (69 + static_cast<int>(ceil(12.0f * log2f(freq / 440.0f)))) / SEMITONES_PER_TABLE;
+		int band = (69 + static_cast<int>(ceil(12.0f * log2f(freq / 440.0f)))) / SEMITONES_PER_TABLE;
+		//limit the returned value
+		// qBound would require QT audio side, not a preferable option
+		// c++17 std::clamp() could be used in the future
+		return band <= 1 ? 1 : band >= WAVE_TABLES_PER_WAVEFORM_COUNT-1 ? WAVE_TABLES_PER_WAVEFORM_COUNT-1 : band;
 	}
 
 	inline float freqFromWaveTableBand(int band)
@@ -216,7 +220,7 @@ private:
 
 	/* Multiband WaveTable */
 	static float *s_waveTableBandFreqs;
-	static sample_t s_waveTables[WaveShapes::NumWaveShapes-1][WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH];
+	static sample_t s_waveTables[WaveShapes::NumWaveShapes-2][WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH];
 	sample_t m_userAntiAliasWaveTable[WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH] = {0};
 	fftwf_plan m_fftPlan;
 	fftwf_plan m_ifftPlan;
