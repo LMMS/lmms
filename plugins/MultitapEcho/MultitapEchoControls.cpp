@@ -24,6 +24,7 @@
  */
 
 #include <QDomElement>
+#include <QVarLengthArray>
 
 #include "MultitapEchoControls.h"
 #include "MultitapEcho.h"
@@ -102,7 +103,7 @@ void MultitapEchoControls::setDefaultAmpShape()
 {
 	const int length = m_steps.value();
 	
-	float samples [length];
+	QVarLengthArray<float> samples(length);
 	for( int i = 0; i < length; ++i )
 	{
 		samples[i] = 0.0f;
@@ -116,7 +117,7 @@ void MultitapEchoControls::setDefaultLpShape()
 {
 	const int length = m_steps.value();
 	
-	float samples [length];
+	QVarLengthArray<float> samples(length);
 	for( int i = 0; i < length; ++i )
 	{
 		samples[i] = 3.0f;
@@ -148,7 +149,7 @@ void MultitapEchoControls::lpSamplesChanged( int begin, int end )
 	const float * samples = m_lpGraph.samples();
 	for( int i = begin; i <= end; ++i )
 	{
-		m_effect->m_lpFreq[i] = 20.0f * exp10f( samples[i] );
+		m_effect->m_lpFreq[i] = 20.0f * exp10( samples[i] );
 	}
 	m_effect->updateFilters( begin, end );
 }

@@ -28,7 +28,6 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QWhatsThis>
 
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
@@ -532,7 +531,6 @@ void Knob::contextMenuEvent( QContextMenuEvent * )
 		model()->isScaleLogarithmic() ? tr( "Set linear" ) : tr( "Set logarithmic" ),
 		this, SLOT( toggleScale() ) );
 	contextMenu.addSeparator();
-	contextMenu.addHelpAction();
 	contextMenu.exec( QCursor::pos() );
 }
 
@@ -771,10 +769,10 @@ void Knob::enterValue()
 		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		new_val = QInputDialog::getDouble(
-			this, windowTitle(),
+			this, tr( "Set value" ),
 			tr( "Please enter a new value between "
 					"-96.0 dBFS and 6.0 dBFS:" ),
-				20.0 * log10( model()->getRoundedValue() / 100.0 ),
+				ampToDbfs( model()->getRoundedValue() / 100.0 ),
 							-96.0, 6.0, model()->getDigitCount(), &ok );
 		if( new_val <= -96.0 )
 		{
@@ -788,7 +786,7 @@ void Knob::enterValue()
 	else
 	{
 		new_val = QInputDialog::getDouble(
-				this, windowTitle(),
+				this, tr( "Set value" ),
 				tr( "Please enter a new value between "
 						"%1 and %2:" ).
 						arg( model()->minValue() ).
@@ -826,7 +824,7 @@ QString Knob::displayValue() const
 		ConfigManager::inst()->value( "app", "displaydbfs" ).toInt() )
 	{
 		return m_description.trimmed() + QString( " %1 dBFS" ).
-				arg( 20.0 * log10( model()->getRoundedValue() / volumeRatio() ),
+				arg( ampToDbfs( model()->getRoundedValue() / volumeRatio() ),
 								3, 'f', 2 );
 	}
 	return m_description.trimmed() + QString( " %1" ).
@@ -846,13 +844,4 @@ void Knob::doConnections()
 		QObject::connect( model(), SIGNAL( propertiesChanged() ),
 						this, SLOT( update() ) );
 	}
-}
-
-
-
-
-void Knob::displayHelp()
-{
-	QWhatsThis::showText( mapToGlobal( rect().bottomRight() ),
-								whatsThis() );
 }

@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 
-PACKAGES="cmake pkgconfig fftw libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio node fltk"
+set -e
 
-if [ $QT5 ]; then
-	PACKAGES="$PACKAGES qt5"
-else
-	PACKAGES="$PACKAGES cartr/qt4/qt"
+PACKAGES="cmake pkg-config libogg libvorbis lame libsndfile libsamplerate jack sdl libgig libsoundio stk fluid-synth portaudio node fltk qt5"
+
+if "${TRAVIS}"; then
+   PACKAGES="$PACKAGES ccache"
 fi
 
-brew install $PACKAGES ccache
+# removing already installed packages from the list
+for p in $(brew list); do
+	PACKAGES=${PACKAGES//$p/}
+done;
+
+# shellcheck disable=SC2086
+brew install $PACKAGES
+
+# fftw tries to install gcc which conflicts with travis
+brew install fftw --ignore-dependencies
 
 sudo npm install -g appdmg

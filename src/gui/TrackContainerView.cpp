@@ -473,6 +473,11 @@ void TrackContainerView::resizeEvent( QResizeEvent * _re )
 	QWidget::resizeEvent( _re );
 }
 
+RubberBand *TrackContainerView::rubberBand() const
+{
+    return m_rubberBand;
+}
+
 
 
 

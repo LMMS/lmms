@@ -28,6 +28,8 @@
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 
+#include "lmms_export.h"
+
 #include "MemoryManager.h"
 
 #include "ThreadableJob.h"
@@ -38,7 +40,7 @@ class QThread;
 class Track;
 class AudioPort;
 
-class PlayHandle : public ThreadableJob
+class LMMS_EXPORT PlayHandle : public ThreadableJob
 {
 public:
 	enum Types

@@ -70,7 +70,6 @@ private slots:
 	// general settings widget
 	void setBufferSize( int _value );
 	void resetBufSize();
-	void displayBufSizeHelp();
 
 	// path settings widget
 	void setWorkingDir( const QString & _wd );
@@ -86,15 +85,12 @@ private slots:
 	// performance settings widget
 	void setAutoSaveInterval( int time );
 	void resetAutoSave();
-	void displaySaveIntervalHelp();
 
 	// audio settings widget
 	void audioInterfaceChanged( const QString & _driver );
-	void displayAudioHelp();
 
 	// MIDI settings widget
 	void midiInterfaceChanged( const QString & _driver );
-	void displayMIDIHelp();
 
 
 	void toggleToolTips( bool _enabled );

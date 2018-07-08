@@ -77,6 +77,7 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		}
 
 		case INTEGER:
+		case ENUM:
 		case FLOATING:
 			knb = new Knob( knobBright_26, this, m_ctl->port()->name );
 			break;
@@ -101,7 +102,6 @@ LadspaControlView::LadspaControlView( QWidget * _parent,
 		}
 		knb->setLabel( m_ctl->port()->name );
 		knb->setHintText( tr( "Value:" ), "" );
-		knb->setWhatsThis( tr( "Sorry, no help available." ) );
 		layout->addWidget( knb );
 		if( link != NULL )
 		{

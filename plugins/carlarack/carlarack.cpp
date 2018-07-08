@@ -24,7 +24,7 @@
 
 #include "carla.h"
 
-#include "embed.cpp"
+#include "embed.h"
 
 extern "C"
 {
@@ -43,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT carlarack_plugin_descriptor =
     NULL
 } ;
 
-Plugin* PLUGIN_EXPORT lmms_plugin_main(Model*, void* data)
+PLUGIN_EXPORT Plugin* lmms_plugin_main(Model*, void* data)
 {
     return new CarlaInstrument(static_cast<InstrumentTrack*>(data), &carlarack_plugin_descriptor, false);
 }

@@ -31,8 +31,8 @@
 #include "TextFloat.h"
 #include "VstSubPluginFeatures.h"
 
-#include "embed.cpp"
-
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -46,7 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	new VstSubPluginFeatures( Plugin::Effect )
 } ;
@@ -158,7 +158,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return new VstEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

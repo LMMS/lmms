@@ -98,8 +98,7 @@ class SampleTCOView : public TrackContentObjectView
 
 public:
 	SampleTCOView( SampleTCO * _tco, TrackView * _tv );
-	virtual ~SampleTCOView();
-
+	virtual ~SampleTCOView() = default;
 
 public slots:
 	void updateSample();

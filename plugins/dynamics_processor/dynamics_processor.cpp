@@ -28,7 +28,8 @@
 #include "lmms_math.h"
 #include "interpolation.h"
 
-#include "embed.cpp"
+#include "embed.h"
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -42,7 +43,7 @@ Plugin::Descriptor PLUGIN_EXPORT dynamicsprocessor_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
-	new PluginPixmapLoader( "logo" ),
+	new PluginPixmapLoader("logo"),
 	NULL,
 	NULL
 } ;
@@ -233,7 +234,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model * _parent, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model * _parent, void * _data )
 {
 	return( new dynProcEffect( _parent,
 		static_cast<const Plugin::Descriptor::SubPluginFeatures::Key *>(

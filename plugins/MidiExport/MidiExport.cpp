@@ -37,6 +37,7 @@
 #include "BBTrack.h"
 #include "InstrumentTrack.h"
 
+#include "plugin_export.h"
 
 extern "C"
 {
@@ -347,7 +348,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new MidiExport();
 }

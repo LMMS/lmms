@@ -34,7 +34,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QObject>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class LmmsCore;
 
@@ -51,7 +51,7 @@ const QString TRACK_ICON_PATH = "track_icons/";
 const QString LOCALE_PATH = "locale/";
 
 
-class EXPORT ConfigManager : public QObject
+class LMMS_EXPORT ConfigManager : public QObject
 {
 	Q_OBJECT
 public:

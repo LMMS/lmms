@@ -224,7 +224,14 @@ private:
 	      vca_a;            // Amplifier coefficient.
 
 	// Envelope State
-	int   vca_mode;         // 0: attack, 1: decay, 2: idle, 3: never played
+	enum VCA_Mode
+	{
+		attack = 0,
+		decay = 1,
+		idle = 2,
+		never_played = 3
+	};
+	VCA_Mode vca_mode;
 
 	// My hacks
 	int   sample_cnt;

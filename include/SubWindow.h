@@ -34,14 +34,21 @@
 #include <QPushButton>
 #include <QString>
 
-#include "export.h"
+#include "lmms_export.h"
 
 class QMoveEvent;
 class QResizeEvent;
 class QWidget;
 
-
-class EXPORT SubWindow : public QMdiSubWindow
+/**
+ * @brief The SubWindow class
+ * 
+ *  Because of a bug in the QMdiSubWindow class to save the right position and size
+ *  of a subwindow in a project and because of the inability
+ *  for cusomizing the title bar appearance, lmms implements its own subwindow
+ *  class.
+ */
+class LMMS_EXPORT SubWindow : public QMdiSubWindow
 {
 	Q_OBJECT
 	Q_PROPERTY( QBrush activeColor READ activeColor WRITE setActiveColor )
@@ -65,7 +72,10 @@ protected:
 	virtual void resizeEvent( QResizeEvent * event );
 	virtual void paintEvent( QPaintEvent * pe );
 	virtual void changeEvent( QEvent * event );
-	
+
+signals:
+	void focusLost();
+
 private:
 	const QSize m_buttonSize;
 	const int m_titleBarHeight;
@@ -79,10 +89,14 @@ private:
 	QRect m_trackedNormalGeom;
 	QLabel * m_windowTitle;
 	QGraphicsDropShadowEffect * m_shadow;
+	bool m_hasFocus;
 
 	static void elideText( QLabel *label, QString text );
 	bool isMaximized();
 	void adjustTitleBar();
+
+private slots:
+	void focusChanged( QMdiSubWindow * subWindow );
 };
 
 #endif

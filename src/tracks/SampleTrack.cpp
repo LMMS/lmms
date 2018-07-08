@@ -25,6 +25,7 @@
 #include "SampleTrack.h"
 
 #include <QDropEvent>
+#include <QFileInfo>
 #include <QMenu>
 #include <QLayout>
 #include <QMdiArea>
@@ -145,6 +146,7 @@ void SampleTCO::setSampleBuffer( SampleBuffer* sb )
 void SampleTCO::setSampleFile( const QString & _sf )
 {
 	m_sampleBuffer->setAudioFile( _sf );
+	setStartTimeOffset( 0 );
 	changeLength( (int) ( m_sampleBuffer->frames() / Engine::framesPerTick() ) );
 
 	emit sampleChanged();
@@ -182,10 +184,16 @@ void SampleTCO::updateTrackTcos()
 	}
 }
 
+
+
+
 bool SampleTCO::isPlaying() const
 {
 	return m_isPlaying;
 }
+
+
+
 
 void SampleTCO::setIsPlaying(bool isPlaying)
 {
@@ -240,6 +248,7 @@ void SampleTCO::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	_this.setAttribute( "len", length() );
 	_this.setAttribute( "muted", isMuted() );
 	_this.setAttribute( "src", sampleFile() );
+	_this.setAttribute( "off", startTimeOffset() );
 	if( sampleFile() == "" )
 	{
 		QString s;
@@ -264,6 +273,7 @@ void SampleTCO::loadSettings( const QDomElement & _this )
 	}
 	changeLength( _this.attribute( "len" ).toInt() );
 	setMuted( _this.attribute( "muted" ).toInt() );
+	setStartTimeOffset( _this.attribute( "off" ).toInt() );
 }
 
 
@@ -292,16 +302,6 @@ SampleTCOView::SampleTCOView( SampleTCO * _tco, TrackView * _tv ) :
 	setStyle( QApplication::style() );
 }
 
-
-
-
-SampleTCOView::~SampleTCOView()
-{
-}
-
-
-
-
 void SampleTCOView::updateSample()
 {
 	update();
@@ -309,7 +309,7 @@ void SampleTCOView::updateSample()
 	// sample-tco contains
 	ToolTip::add( this, ( m_tco->m_sampleBuffer->audioFile() != "" ) ?
 					m_tco->m_sampleBuffer->audioFile() :
-					tr( "double-click to select sample" ) );
+					tr( "Double-click to open sample" ) );
 }
 
 
@@ -338,12 +338,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 					tr( "Paste" ), m_tco, SLOT( paste() ) );
 	contextMenu.addSeparator();
 	contextMenu.addAction( embed::getIconPixmap( "muted" ),
-				tr( "Mute/unmute (<%1> + middle click)" ).arg(
-					#ifdef LMMS_BUILD_APPLE
-					"⌘"),
-					#else
-					"Ctrl"),
-					#endif
+				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
 	/*contextMenu.addAction( embed::getIconPixmap( "record" ),
 				tr( "Set/clear record" ),
@@ -364,6 +359,8 @@ void SampleTCOView::dragEnterEvent( QDragEnterEvent * _dee )
 		TrackContentObjectView::dragEnterEvent( _dee );
 	}
 }
+
+
 
 
 
@@ -459,8 +456,10 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 
 	setNeedsUpdate( false );
 
-	m_paintPixmap = m_paintPixmap.isNull() == true || m_paintPixmap.size() != size() 
-		? QPixmap( size() ) : m_paintPixmap;
+	if (m_paintPixmap.isNull() || m_paintPixmap.size() != size())
+	{
+		m_paintPixmap = QPixmap(size());
+	}
 
 	QPainter p( &m_paintPixmap );
 
@@ -498,10 +497,15 @@ void SampleTCOView::paintEvent( QPaintEvent * pe )
 	float nom = Engine::getSong()->getTimeSigModel().getNumerator();
 	float den = Engine::getSong()->getTimeSigModel().getDenominator();
 	float ticksPerTact = DefaultTicksPerTact * nom / den;
-
-	QRect r = QRect( TCO_BORDER_WIDTH, spacing,
+	
+	float offset =  m_tco->startTimeOffset() / ticksPerTact * pixelsPerTact();
+	QRect r = QRect( TCO_BORDER_WIDTH + offset, spacing,
 			qMax( static_cast<int>( m_tco->sampleLength() * ppt / ticksPerTact ), 1 ), rect().bottom() - 2 * spacing );
 	m_tco->m_sampleBuffer->visualize( p, r, pe->rect() );
+
+	QFileInfo fileInfo(m_tco->m_sampleBuffer->audioFile());
+	QString filename = fileInfo.fileName();
+	paintTextLabel(filename, p);
 
 	// disable antialiasing for borders, since its not needed
 	p.setRenderHint( QPainter::Antialiasing, false );
@@ -601,10 +605,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			float framesPerTick = Engine::framesPerTick();
 			if( _start >= sTco->startPosition() && _start < sTco->endPosition() )
 			{
-				if( sTco->isPlaying() == false )
+				if( sTco->isPlaying() == false && _start > sTco->startPosition() + sTco->startTimeOffset() )
 				{
-					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() );
-					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() );
+					f_cnt_t sampleStart = framesPerTick * ( _start - sTco->startPosition() - sTco->startTimeOffset() );
+					f_cnt_t tcoFrameLength = framesPerTick * ( sTco->endPosition() - sTco->startPosition() - sTco->startTimeOffset() );
 					f_cnt_t sampleBufferLength = sTco->sampleBuffer()->frames();
 					//if the Tco smaller than the sample length we play only until Tco end
 					//else we play the sample to the end but nothing more

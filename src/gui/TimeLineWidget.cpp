@@ -48,7 +48,7 @@
 QPixmap * TimeLineWidget::s_posMarkerPixmap = NULL;
 
 TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
-			Song::PlayPos & pos, const MidiTime & begin,
+			Song::PlayPos & pos, const MidiTime & begin, Song::PlayModes mode,
 							QWidget * parent ) :
 	QWidget( parent ),
 	m_inactiveLoopColor( 52, 63, 53, 64 ),
@@ -69,6 +69,7 @@ TimeLineWidget::TimeLineWidget( const int xoff, const int yoff, const float ppt,
 	m_ppt( ppt ),
 	m_pos( pos ),
 	m_begin( begin ),
+	m_mode( mode ),
 	m_savedPos( -1 ),
 	m_hint( NULL ),
 	m_action( NoAction ),
@@ -116,14 +117,14 @@ TimeLineWidget::~TimeLineWidget()
 void TimeLineWidget::addToolButtons( QToolBar * _tool_bar )
 {
 	NStateButton * autoScroll = new NStateButton( _tool_bar );
-	autoScroll->setGeneralToolTip( tr( "Enable/disable auto-scrolling" ) );
+	autoScroll->setGeneralToolTip( tr( "Auto scrolling" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_on" ) );
 	autoScroll->addState( embed::getIconPixmap( "autoscroll_off" ) );
 	connect( autoScroll, SIGNAL( changedState( int ) ), this,
 					SLOT( toggleAutoScroll( int ) ) );
 
 	NStateButton * loopPoints = new NStateButton( _tool_bar );
-	loopPoints->setGeneralToolTip( tr( "Enable/disable loop-points" ) );
+	loopPoints->setGeneralToolTip( tr( "Loop points" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_off" ) );
 	loopPoints->addState( embed::getIconPixmap( "loop_points_on" ) );
 	connect( loopPoints, SIGNAL( changedState( int ) ), this,
@@ -336,24 +337,14 @@ void TimeLineWidget::mousePressEvent( QMouseEvent* event )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Press <%1> to disable magnetic loop points." ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘"),
-						#else
-						"Ctrl"),
-						#endif
+					tr( "Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 	else if( m_action == MoveLoopEnd )
 	{
 		delete m_hint;
 		m_hint = TextFloat::displayMessage( tr( "Hint" ),
-					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(
-						#ifdef LMMS_BUILD_APPLE
-						"⌘"),
-						#else
-						"Ctrl"),
-						#endif
+					tr( "Hold <Shift> to move the begin loop point; Press <%1> to disable magnetic loop points." ).arg(UI_CTRL_KEY),
 					embed::getIconPixmap( "hint" ), 0 );
 	}
 
@@ -370,10 +361,13 @@ void TimeLineWidget::mouseMoveEvent( QMouseEvent* event )
 	switch( m_action )
 	{
 		case MovePositionMarker:
-			m_pos.setTicks( t.getTicks() );
-			Engine::getSong()->setMilliSeconds( ( t.getTicks() *
-					( 60 * 1000 / 48 ) ) /
-						Engine::getSong()->getTempo() );
+			m_pos.setTicks(t.getTicks());
+			Engine::getSong()->setToTime(t, m_mode);
+			if (!( Engine::getSong()->isPlaying()))
+			{
+				//Song::Mode_None is used when nothing is being played.
+				Engine::getSong()->setToTime(t, Song::Mode_None);
+			}
 			m_pos.setCurrentFrame( 0 );
 			updatePosition();
 			positionMarkerMoved();

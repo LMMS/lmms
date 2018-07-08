@@ -28,9 +28,9 @@
 #include "PlayHandle.h"
 #include "Instrument.h"
 #include "NotePlayHandle.h"
-#include "export.h"
+#include "lmms_export.h"
 
-class EXPORT InstrumentPlayHandle : public PlayHandle
+class LMMS_EXPORT InstrumentPlayHandle : public PlayHandle
 {
 public:
 	InstrumentPlayHandle( Instrument * instrument, InstrumentTrack* instrumentTrack );
@@ -59,7 +59,8 @@ public:
 			for( const NotePlayHandle * constNotePlayHandle : nphv )
 			{
 				NotePlayHandle * notePlayHandle = const_cast<NotePlayHandle *>( constNotePlayHandle );
-				if( notePlayHandle->state() != ThreadableJob::Done && ! notePlayHandle->isFinished() )
+				if( notePlayHandle->state() != ThreadableJob::ProcessingState::Done &&
+					!notePlayHandle->isFinished())
 				{
 					nphsLeft = true;
 					notePlayHandle->process();

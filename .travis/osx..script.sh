@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-if [ $QT5 ]; then
-        # Workaround; No FindQt5.cmake module exists
-        export CMAKE_PREFIX_PATH="$(brew --prefix qt5)"
-fi
+set -e
 
-cmake $CMAKE_FLAGS -DUSE_WERROR=OFF ..
+# Workaround; No FindQt5.cmake module exists
+CMAKE_PREFIX_PATH="$(brew --prefix qt5)"
+export CMAKE_PREFIX_PATH
+
+# shellcheck disable=SC2086
+cmake -DUSE_WERROR=OFF -DCMAKE_INSTALL_PREFIX=../target $CMAKE_FLAGS ..

@@ -16,6 +16,7 @@ DESKTOPFILE="${APPDIR}usr/share/applications/lmms.desktop"
 STRIP=""
 
 # Don't strip for Debug|RelWithDebInfo builds
+# shellcheck disable=SC2193
 if [[ "@CMAKE_BUILD_TYPE@" == *"Deb"* ]]; then
 	STRIP="-no-strip"
 fi
@@ -52,27 +53,30 @@ fi
 echo -e "\nWriting verbose output to \"${LOGFILE}\""
 
 # Ensure linuxdeployqt uses the same qmake version as cmake
-export PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
+export PATH
 
-# Fetch portable linuxdeployqt if cache is older than $DAYSOLD
+# Fetch portable linuxdeployqt if not in PATH
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
-mkdir -p "$HOME/bin"
-DAYSOLD=2
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
-elif ! find "$LINUXDEPLOYQT" -mtime -$DAYSOLD 2>/dev/null|grep -q "." > /dev/null 2>&1; then
-	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -p).AppImage"
-	echo "   [.......] Couldn't find linuxdeployqt newer than $DAYSOLD days old"
+else
+	filename="linuxdeployqt-continuous-$(uname -p).AppImage"
+	url="https://github.com/probonopd/linuxdeployqt/releases/download/continuous/$filename"
+	down_file="$(pwd)/$filename"
+	if [ ! -f "$LINUXDEPLOYQT" ]; then
+		ln -s "$down_file" "$LINUXDEPLOYQT"
+	fi
 	echo "   [.......] Downloading ($(uname -p)): ${url}"
-	wget "$url" -O "$LINUXDEPLOYQT" -q || (rm "$LINUXDEPLOYQT" && false)
+	wget -N -q "$url" || (rm "$filename" && false)
 	chmod +x "$LINUXDEPLOYQT"
-	touch "$LINUXDEPLOYQT"
 	success "Downloaded $LINUXDEPLOYQT"
+	# Extract AppImage and replace LINUXDEPLOYQT variable with extracted binary
+	# to support systems without fuse
 	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
+	LINUXDEPLOYQT="squashfs-root/AppRun"
 	APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
 	success "Extracted $APPIMAGETOOL"
-else
-	skipped "$LINUXDEPLOYQT is less than $DAYSOLD days old"
 fi
 
 # Make skeleton AppDir
@@ -122,26 +126,32 @@ EOL
 
 chmod +x "${APPDIR}usr/bin/lmms"
 
-# Per https://github.com/probonopd/linuxdeployqt/issues/129 
+# Per https://github.com/probonopd/linuxdeployqt/issues/129
 unset LD_LIBRARY_PATH
 
 # Ensure linuxdeployqt can find shared objects
 export LD_LIBRARY_PATH="${APPDIR}usr/lib/lmms/":$LD_LIBRARY_PATH
 
 # Handle wine linking
-if [ -d "@WINE_LIBRARY_FIX@" ]; then
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@WINE_LIBRARY_FIX@:@WINE_LIBRARY_FIX@wine/
+if [ -d "@WINE_32_LIBRARY_DIR@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/wine/:@WINE_32_LIBRARY_DIR@:@WINE_32_LIBRARY_DIR@wine/
+fi
+if [ -d "@WINE_64_LIBRARY_DIR@" ]; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LD_LIBRARY_PATH/wine/:@WINE_64_LIBRARY_DIR@:@WINE_64_LIBRARY_DIR@wine/
 fi
 
 # Move executables so linuxdeployqt can find them
 ZYNLIB="${APPDIR}usr/lib/lmms/RemoteZynAddSubFx"
-VSTLIB="${APPDIR}usr/lib/lmms/RemoteVstPlugin.exe.so"
+VSTLIB32="${APPDIR}usr/lib/lmms/RemoteVstPlugin32.exe.so"
+VSTLIB64="${APPDIR}usr/lib/lmms/RemoteVstPlugin64.exe.so"
 
 ZYNBIN="${APPDIR}usr/bin/RemoteZynAddSubFx"
-VSTBIN="${APPDIR}usr/bin/RemoteVstPlugin.exe.so"
+VSTBIN32="${APPDIR}usr/bin/RemoteVstPlugin32.exe.so"
+VSTBIN64="${APPDIR}usr/bin/RemoteVstPlugin64.exe.so"
 
 mv "$ZYNLIB" "$ZYNBIN"
-mv "$VSTLIB" "$VSTBIN"
+mv "$VSTLIB32" "$VSTBIN32"
+mv "$VSTLIB64" "$VSTBIN64"
 
 # Patch the desktop file
 sed -i 's/.*Exec=.*/Exec=lmms.real/' "$DESKTOPFILE"
@@ -152,7 +162,8 @@ for file in "${APPDIR}usr/lib/lmms/"*.so; do
    executables="${executables} -executable=$thisfile"
 done
 executables="${executables} -executable=${ZYNBIN}"
-executables="${executables} -executable=${VSTBIN}"
+executables="${executables} -executable=${VSTBIN32}"
+executables="${executables} -executable=${VSTBIN64}"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imp_1199.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/imbeq_1197.so"
 executables="${executables} -executable=${APPDIR}usr/lib/lmms/ladspa/pitch_scale_1193.so"
@@ -167,7 +178,8 @@ success "Bundled and relinked dependencies"
 
 # Link to original location so lmms can find them
 ln -sr  "$ZYNBIN" "$ZYNLIB"
-ln -sr  "$VSTBIN" "$VSTLIB"
+ln -sr  "$VSTBIN32" "$VSTLIB32"
+ln -sr  "$VSTBIN64" "$VSTLIB64"
 
 # Remove wine library conflict
 rm -f "${APPDIR}/usr/lib/libwine.so.1"

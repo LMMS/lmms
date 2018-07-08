@@ -29,7 +29,7 @@
 
 #include <QtGlobal>
 
-#include "export.h"
+#include "lmms_export.h"
 #include "lmms_basics.h"
 
 // note: 1 "Tact" = 1 Measure
@@ -40,7 +40,7 @@ const int DefaultBeatsPerTact = DefaultTicksPerTact / DefaultStepsPerTact;
 
 class MeterModel;
 
-class EXPORT TimeSig
+class LMMS_EXPORT TimeSig
 {
 public:
 	// in a time signature,
@@ -57,7 +57,7 @@ private:
 };
 
 
-class EXPORT MidiTime
+class LMMS_EXPORT MidiTime
 {
 public:
 	MidiTime( const tact_t tact, const tick_t ticks );
@@ -90,12 +90,16 @@ public:
 	// calculate number of frame that are needed this time
 	f_cnt_t frames( const float framesPerTick ) const;
 
+	double getTimeInMilliseconds(bpm_t beatsPerMinute) const;
+
 	static MidiTime fromFrames( const f_cnt_t frames, const float framesPerTick );
 	static tick_t ticksPerTact();
 	static tick_t ticksPerTact( const TimeSig &sig );
 	static int stepsPerTact();
 	static void setTicksPerTact( tick_t tpt );
 	static MidiTime stepPosition( int step );
+	static double ticksToMilliseconds(tick_t ticks, bpm_t beatsPerMinute);
+	static double ticksToMilliseconds(double ticks, bpm_t beatsPerMinute);
 
 private:
 	tick_t m_ticks;

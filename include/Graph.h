@@ -38,7 +38,7 @@
 class graphModel;
 
 
-class EXPORT Graph : public QWidget, public ModelView
+class LMMS_EXPORT Graph : public QWidget, public ModelView
 {
 	Q_OBJECT
 public:
@@ -55,7 +55,7 @@ public:
 		int _width = 132,
 		int _height = 104
 	);
-	virtual ~Graph();
+	virtual ~Graph() = default;
 
 	void setForeground( const QPixmap & _pixmap );
 
@@ -79,7 +79,8 @@ public:
 		update();
 	}
 
-
+signals:
+	void drawn();
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
 	virtual void dropEvent( QDropEvent * _de );
@@ -110,7 +111,7 @@ private:
 } ;
 
 
-class EXPORT graphModel : public Model
+class LMMS_EXPORT graphModel : public Model
 {
 	Q_OBJECT
 public:
@@ -121,7 +122,7 @@ public:
 			bool _default_constructed = false,
 			float _step = 0.0 );
 
-	virtual ~graphModel();
+	virtual ~graphModel() = default;
 
 	// TODO: saveSettings, loadSettings?
 
@@ -145,6 +146,8 @@ public:
 		return( m_samples.data() );
 	}
 
+	void convolve(const float *convolution, const int convolutionLength, const int centerOffset);
+
 public slots:
 	void setRange( float _min, float _max );
 
@@ -165,6 +168,7 @@ public slots:
 	void normalize();
 	void invert();
 	void shiftPhase( int _deg );
+	void clear();
 
 signals:
 	void lengthChanged();

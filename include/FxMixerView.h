@@ -41,7 +41,7 @@
 class QButtonGroup;
 class FxLine;
 
-class EXPORT FxMixerView : public QWidget, public ModelView,
+class LMMS_EXPORT FxMixerView : public QWidget, public ModelView,
 					public SerializingObjectHook
 {
 	Q_OBJECT
@@ -99,6 +99,8 @@ public:
 	void moveChannelLeft(int index);
 	void moveChannelLeft(int index, int focusIndex);
 	void moveChannelRight(int index);
+
+	void renameChannel(int index);
 
 	// make sure the display syncs up with the fx mixer.
 	// useful for loading projects

@@ -32,7 +32,7 @@
 class InstrumentTrackWindow;
 
 
-class EXPORT InstrumentView : public PluginView
+class LMMS_EXPORT InstrumentView : public PluginView
 {
 public:
 	InstrumentView( Instrument * _instrument, QWidget * _parent );

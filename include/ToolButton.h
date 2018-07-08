@@ -42,7 +42,7 @@ public:
 		QToolButton(_parent)
 	{ }
 
-	virtual ~ToolButton();
+	virtual ~ToolButton() = default;
 
 } ;
 

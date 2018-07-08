@@ -37,7 +37,7 @@ class TimeDisplayWidget : public QWidget
 	Q_OBJECT
 public:
 	TimeDisplayWidget();
-	virtual ~TimeDisplayWidget();
+	virtual ~TimeDisplayWidget() = default;
 
 
 protected:

@@ -19,6 +19,8 @@
 #include "BBTrackContainer.h"
 #include "Instrument.h"
 
+#include "plugin_export.h"
+
 #define MAX_LAYERS 4
 extern "C"
 {
@@ -340,7 +342,7 @@ extern "C"
 {
 
 // necessary for getting instance out of shared lib
-Plugin * PLUGIN_EXPORT lmms_plugin_main( Model *, void * _data )
+PLUGIN_EXPORT Plugin * lmms_plugin_main( Model *, void * _data )
 {
 	return new HydrogenImport( QString::fromUtf8(
 									static_cast<const char *>( _data ) ) );

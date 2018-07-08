@@ -231,7 +231,6 @@ void EffectRackView::addEffect()
 
 	Effect * fx = esd.instantiateSelectedPlugin( fxChain() );
 
-	fxChain()->m_enabledModel.setValue( true );
 	fxChain()->appendEffect( fx );
 	update();
 

@@ -38,7 +38,7 @@ class PianoView : public QWidget, public ModelView
 	Q_OBJECT
 public:
 	PianoView( QWidget * _parent );
-	virtual ~PianoView();
+	virtual ~PianoView() = default;
 
 	static int getKeyFromKeyEvent( QKeyEvent * _ke );
 
