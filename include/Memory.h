@@ -90,7 +90,7 @@ class AlignedAllocator : _AlignedAllocator_Base
 {
 public:
 	typedef T value_type;
-	template<class U>  struct rebind { typedef MmAllocator<U> other; };
+	template<class U>  struct rebind { typedef AlignedAllocator<U> other; };
 
 	AlignedAllocator( size_t alignment = 16 )
 		: alignment(alignment) {}
