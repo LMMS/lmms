@@ -252,8 +252,8 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 
 		}
 		const uint min_frames_count = qMin( _len/sizeof(sampleFrame),
-										  m_currentBufferFramesCount
-										- m_currentBufferFramePos );
+										  static_cast<unsigned long>(m_currentBufferFramesCount
+										- m_currentBufferFramePos) );
 
 		const float gain = mixer()->masterGain();
 		for (uint f = 0; f < min_frames_count; f++)
