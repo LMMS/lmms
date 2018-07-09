@@ -894,12 +894,13 @@ void PianoRoll::drawNoteRect( QPainter & p, int x, int y,
 
 			int const distanceToBorder = 2;
 			int const xOffset = borderWidth + distanceToBorder;
+			int const yOffset = (noteHeight + noteTextHeight) / 2;
 
 			if (textSize.width() < noteWidth - xOffset)
 			{
 				p.setPen(noteTextColor);
 				p.setFont(noteFont);
-				QPoint textStart(x + xOffset, y + (noteTextHeight + (noteHeight - noteTextHeight) / 2));
+				QPoint textStart(x + xOffset, y + yOffset);
 
 				p.drawText(textStart, noteKeyString);
 			}
