@@ -640,7 +640,7 @@ void Mixer::storeAudioDevice()
 
 void Mixer::restoreAudioDevice()
 {
-	if( m_oldAudioDev != NULL )
+	if( m_oldAudioDev && m_audioDev != m_oldAudioDev )
 	{
 		stopProcessing();
 		delete m_audioDev;
@@ -648,9 +648,9 @@ void Mixer::restoreAudioDevice()
 		m_audioDev = m_oldAudioDev;
 		emit sampleRateChanged();
 
-		m_oldAudioDev = NULL;
 		startProcessing();
 	}
+	m_oldAudioDev = NULL;
 }
 
 
@@ -1127,7 +1127,9 @@ void Mixer::fifoWriter::run()
 		write( buffer );
 	}
 
+	// Let audio backend stop processing
 	write( NULL );
+	m_fifo->waitUntilRead();
 }
 
 
