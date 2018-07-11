@@ -95,7 +95,6 @@ TextFloat * TrackContentObjectView::s_textFloat = NULL;
 TrackContentObject::TrackContentObject( Track * track ) :
 	Model( track ),
 	m_track( track ),
-	m_name( QString() ),
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
