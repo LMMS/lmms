@@ -131,11 +131,11 @@ public:
 
 	inline QString fullName( QString path = QString() )
 	{
-		if( path == QString() )
+		if( path.isEmpty() )
 		{
 			path = m_directories[0];
 		}
-		if( path != QString() )
+		if( ! path.isEmpty() )
 		{
 			path += QDir::separator();
 		}
