@@ -95,9 +95,11 @@ bool VstEffect::processAudioBuffer( sampleFrame * _buf, const fpp_t _frames )
 		sampleFrame * buf = new sampleFrame[_frames];
 #endif
 		memcpy( buf, _buf, sizeof( sampleFrame ) * _frames );
-		m_pluginMutex.lock();
-		m_plugin->process( buf, buf );
-		m_pluginMutex.unlock();
+		if (m_pluginMutex.tryLock())
+		{
+			m_plugin->process( buf, buf );
+			m_pluginMutex.unlock();
+		}
 
 		double out_sum = 0.0;
 		const float w = wetLevel();
