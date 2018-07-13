@@ -18,6 +18,10 @@
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=581
 
+* Jousboxx-BuzzerBeater.mmpz
+  - Creative Commons (by-nc-sa)
+  - https://lmms.io/lsp/?action=show&file=10488
+
 * Momo64-esp.mmpz
   - Artistic 2.0
   - https://lmms.io/lsp/index.php?action=show&file=1534
