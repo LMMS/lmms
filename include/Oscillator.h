@@ -35,6 +35,7 @@
 #endif
 
 #include <fftw3.h>
+#include "OscillatorConstants.h"
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
 
@@ -69,15 +70,6 @@ public:
 		NumModulationAlgos
 	} ;
 
-	static const int WAVETABLE_LENGTH = 2446; //minimum size of table to have all bands for midi note 1
-	static const int MAX_FREQ = 20000; //limit to the audio spectrum
-
-	//SEMITONES_PER_TABLE, the smaller the value the smoother the harmonics change on frequency sweeps
-	// with the trade off of increased memory requirements to store the wave tables
-	// require memory = NumberOfWaveShapes*WAVETABLE_LENGTH*(MidiNoteCount/SEMITONES_PER_TABLE)*BytePerSample_t
-	// 7*2446*(128/1)*4 = 8766464 bytes
-	static const int SEMITONES_PER_TABLE = 1;
-	static const int WAVE_TABLES_PER_WAVEFORM_COUNT = 128 / Oscillator::SEMITONES_PER_TABLE;
 
 	Oscillator( const IntModel * _wave_shape_model,
 			const IntModel * _mod_algo_model,
@@ -91,9 +83,9 @@ public:
 		delete m_subOsc;
 	}
 
-
-	void waveTableInit();
-
+	static void waveTableInit();
+	static void destroyFFTPlans();
+	static void generateAntiAliasUserWaveTable( SampleBuffer * sampleBuffer);
 
 	inline void setUseWaveTable(bool n)
 	{
@@ -103,7 +95,6 @@ public:
 	inline void setUserWave( const SampleBuffer * _wave )
 	{
 		m_userWave = _wave;
-		//todo relocate		generateAntiAliasUserWaveTable();
 	}
 
 	void update( sampleFrame * _ab, const fpp_t _frames,
@@ -175,15 +166,15 @@ public:
 		return m_userWave->userWaveSample( _sample );
 	}
 
-	inline sample_t wtSample(sample_t table[WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH], const float _sample)
+	inline sample_t wtSample(const sample_t table[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH], const float _sample)
 	{
-		const float frame = _sample * WAVETABLE_LENGTH;
-		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % WAVETABLE_LENGTH;
+		const float frame = _sample * OscillatorConstants::WAVETABLE_LENGTH;
+		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % OscillatorConstants::WAVETABLE_LENGTH;
 		if (f1 < 0)
 		{
-			f1 += WAVETABLE_LENGTH;
+			f1 += OscillatorConstants::WAVETABLE_LENGTH;
 		}
-		f_cnt_t f2 = f1 < WAVETABLE_LENGTH - 1 ?
+		f_cnt_t f2 = f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
 					f1 + 1 :
 					0;
 		int band = waveTableBandFromFreq(m_freq);
@@ -193,16 +184,16 @@ public:
 
 	inline int  waveTableBandFromFreq(float freq)
 	{
-		int band = (69 + static_cast<int>(ceil(12.0f * log2f(freq / 440.0f)))) / SEMITONES_PER_TABLE;
+		int band = (69 + static_cast<int>(ceil(12.0f * log2f(freq / 440.0f)))) / OscillatorConstants::SEMITONES_PER_TABLE;
 		//limit the returned value
 		// qBound would require QT audio side, not a preferable option
 		// c++17 std::clamp() could be used in the future
-		return band <= 1 ? 1 : band >= WAVE_TABLES_PER_WAVEFORM_COUNT-1 ? WAVE_TABLES_PER_WAVEFORM_COUNT-1 : band;
+		return band <= 1 ? 1 : band >= OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT-1 ? OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT-1 : band;
 	}
 
-	inline float freqFromWaveTableBand(int band)
+	static inline float freqFromWaveTableBand(int band)
 	{
-		return 440.0f * powf(2.0f, (band * SEMITONES_PER_TABLE - 69.0f) / 12.0f);
+		return 440.0f * powf(2.0f, (band * OscillatorConstants::SEMITONES_PER_TABLE - 69.0f) / 12.0f);
 	}
 
 private:
@@ -219,24 +210,20 @@ private:
 	bool m_useWaveTable;
 
 	/* Multiband WaveTable */
-	static float *s_waveTableBandFreqs;
-	static sample_t s_waveTables[WaveShapes::NumWaveShapes-2][WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH];
-	sample_t m_userAntiAliasWaveTable[WAVE_TABLES_PER_WAVEFORM_COUNT][WAVETABLE_LENGTH] = {0};
-	fftwf_plan m_fftPlan;
-	fftwf_plan m_ifftPlan;
-	fftwf_complex * m_specBuf;
-	float m_fftBuffer[WAVETABLE_LENGTH*2];
-	float m_sampleBuffer[WAVETABLE_LENGTH];
+	static sample_t s_waveTables[WaveShapes::NumWaveShapes-2][OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH];
+	static fftwf_plan s_fftPlan;
+	static fftwf_plan s_ifftPlan;
+	static fftwf_complex * s_specBuf;
+	static float s_fftBuffer[OscillatorConstants::WAVETABLE_LENGTH*2];
+	static float s_sampleBuffer[OscillatorConstants::WAVETABLE_LENGTH];
 
-	void generateSineWaveTable(sample_t * table);
-	void generateSawWaveTable(int bands, sample_t * table);
-	void generateTriangleWaveTable(int bands, sample_t * table);
-	void generateSquareWaveTable(int bands, sample_t * table);
-	void generateAntiAliasUserWaveTable();
-	void generateFromFFT(int bands, float threshold, sample_t *table);
-	void generateWaveTables();
-	void createFFTPlans();
-	void destroyFFTPlans();
+	static void generateSineWaveTable(sample_t * table);
+	static void generateSawWaveTable(int bands, sample_t * table);
+	static void generateTriangleWaveTable(int bands, sample_t * table);
+	static void generateSquareWaveTable(int bands, sample_t * table);
+	static void generateFromFFT(int bands, float threshold, sample_t *table);
+	static void generateWaveTables();
+	static void createFFTPlans();
 
 	/* End Multiband wavetable */
 

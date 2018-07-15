@@ -36,6 +36,7 @@
 #include "lmms_basics.h"
 #include "lmms_math.h"
 #include "shared_object.h"
+#include "OscillatorConstants.h"
 #include "MemoryManager.h"
 
 
@@ -89,6 +90,7 @@ public:
 		{
 			return m_interpolationMode;
 		}
+
 
 
 	private:
@@ -255,6 +257,9 @@ public:
 	static QString tryToMakeAbsolute(const QString & file);
 
 
+	sample_t m_userAntiAliasWaveTable[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH] ;
+
+
 public slots:
 	void setAudioFile( const QString & _audio_file );
 	void loadFromBase64( const QString & _data );
@@ -296,6 +301,7 @@ private:
 	bool m_reversed;
 	float m_frequency;
 	sample_rate_t m_sampleRate;
+
 
 	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
 						LoopMode _loopmode,

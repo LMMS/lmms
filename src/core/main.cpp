@@ -237,17 +237,6 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
-void initilizeOscillator()
-{
-	//first instace of oscillator initilises the wavetables
-	//this should be done during the lmms setup stage
-
-	Oscillator *o = new Oscillator(0,0,0,0,0,0,0);
-	o->waveTableInit();
-	delete o;
-}
-
-
 int main( int argc, char * * argv )
 {
 #ifdef LMMS_DEBUG_FPE
@@ -266,7 +255,7 @@ int main( int argc, char * * argv )
 	NotePlayHandleManager::init();
 
 	//initilize oscillators
-	initilizeOscillator();
+	Oscillator::waveTableInit();
 
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
@@ -960,6 +949,10 @@ int main( int argc, char * * argv )
 	{
 		printf( "\n" );
 	}
+
+	// The oscillator FFT plans remain throughout the application lifecycle
+	// due to being expensive to create, and being used whenever a userwave form is changed
+	Oscillator::destroyFFTPlans();
 
 	return ret;
 }
