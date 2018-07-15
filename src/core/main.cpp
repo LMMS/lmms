@@ -254,8 +254,6 @@ int main( int argc, char * * argv )
 	// initialize memory managers
 	NotePlayHandleManager::init();
 
-	//initilize oscillators
-	Oscillator::waveTableInit();
 
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
@@ -950,9 +948,6 @@ int main( int argc, char * * argv )
 		printf( "\n" );
 	}
 
-	// The oscillator FFT plans remain throughout the application lifecycle
-	// due to being expensive to create, and being used whenever a userwave form is changed
-	Oscillator::destroyFFTPlans();
 
 	return ret;
 }

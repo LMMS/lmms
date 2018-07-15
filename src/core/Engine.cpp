@@ -33,6 +33,7 @@
 #include "ProjectJournal.h"
 #include "Song.h"
 #include "BandLimitedWave.h"
+#include "Oscillator.h"
 
 float LmmsCore::s_framesPerTick;
 Mixer* LmmsCore::s_mixer = NULL;
@@ -53,6 +54,8 @@ void LmmsCore::init( bool renderOnly )
 	emit engine->initProgress(tr("Generating wavetables"));
 	// generate (load from file) bandlimited wavetables
 	BandLimitedWave::generateWaves();
+	//initilize oscillators
+	Oscillator::waveTableInit();
 
 	emit engine->initProgress(tr("Initializing data structures"));
 	s_projectJournal = new ProjectJournal;
@@ -70,6 +73,8 @@ void LmmsCore::init( bool renderOnly )
 
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
+
+
 
 	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
@@ -101,6 +106,10 @@ void LmmsCore::destroy()
 	deleteHelper( &s_song );
 
 	delete ConfigManager::inst();
+
+	// The oscillator FFT plans remain throughout the application lifecycle
+	// due to being expensive to create, and being used whenever a userwave form is changed
+	Oscillator::destroyFFTPlans();
 }
 
 

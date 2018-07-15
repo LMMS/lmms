@@ -5,13 +5,10 @@
 #include <QDebug>
 
 #include "Engine.h"
-#include "Oscillator.h"
 
 int main(int argc, char* argv[])
 {
 	new QCoreApplication(argc, argv);
-	Oscillator::waveTableInit();
-
 
 	Engine::init(true);
 
