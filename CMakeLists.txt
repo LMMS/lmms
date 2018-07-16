@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
 PROJECT(lmms)
 
@@ -608,6 +608,15 @@ ADD_CUSTOM_TARGET(dist
 			COMMAND rm -rf `find "${TMP}" -name cmake_install.cmake` `find "${TMP}" -name Makefile` `find "${TMP}" -type d -name CMakeFiles` "${TMP}/CMakeCache.txt"
 			COMMAND tar cjf lmms-${VERSION}-src.tar.bz2 "${TMP}"
 			COMMAND rm -rf "${TMP}")
+
+
+#
+# add uninstall-target
+#
+ADD_CUSTOM_TARGET(uninstall
+	COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
+)
+
 
 #
 # display configuration information
