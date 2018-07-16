@@ -121,9 +121,6 @@ void LadspaEffect::changeSampleRate()
 	// the IDs of re-created controls have been saved and now need to be
 	// resolved again
 	AutomationPattern::resolveAllIDs();
-
-	// make sure, connections are ok
-	ControllerConnection::finalizeConnections();
 }
 
 
