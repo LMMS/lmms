@@ -1030,7 +1030,7 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
     </message>
     <message>
         <source>DELAY</source>
-        <translation>VERZÖGERUNG</translation>
+        <translation>DELAY</translation>
     </message>
     <message>
         <source>FDBK</source>
@@ -2164,7 +2164,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>DELAY</source>
-        <translation>VERZÖGERUNG</translation>
+        <translation>DELAY</translation>
     </message>
     <message>
         <source>RATE</source>
