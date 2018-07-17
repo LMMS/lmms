@@ -1034,7 +1034,7 @@ Máte-li zájem o překlad LMMS do jiného jazyka, nebo chcete-li vylepšit exis
     </message>
     <message>
         <source>FDBK</source>
-        <translation>ZP. VAZBA</translation>
+        <translation>FDBK</translation>
     </message>
     <message>
         <source>RATE</source>
@@ -2172,7 +2172,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>FDBK</source>
-        <translation>ZP. VAZBA</translation>
+        <translation>FDBK</translation>
     </message>
     <message>
         <source>NOISE</source>
