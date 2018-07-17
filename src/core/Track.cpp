@@ -95,7 +95,7 @@ TextFloat * TrackContentObjectView::s_textFloat = NULL;
 TrackContentObject::TrackContentObject( Track * track ) :
 	Model( track ),
 	m_track( track ),
-	m_name( QString::null ),
+	m_name( QString() ),
 	m_startPosition(),
 	m_length(),
 	m_mutedModel( false, this, tr( "Mute" ) ),
@@ -870,7 +870,7 @@ void TrackContentObjectView::mouseMoveEvent( QMouseEvent * me )
 			DataFile dataFile = createTCODataFiles( tcoViews );
 
 			// TODO -- thumbnail for all selected
-			QPixmap thumbnail = QPixmap::grabWidget( this ).scaled(
+			QPixmap thumbnail = grab().scaled(
 				128, 128,
 				Qt::KeepAspectRatio,
 				Qt::SmoothTransformation );
@@ -1242,7 +1242,7 @@ void TrackContentWidget::addTCOView( TrackContentObjectView * tcov )
  */
 void TrackContentWidget::removeTCOView( TrackContentObjectView * tcov )
 {
-	tcoViewVector::iterator it = qFind( m_tcoViews.begin(),
+	tcoViewVector::iterator it = std::find( m_tcoViews.begin(),
 						m_tcoViews.end(),
 						tcov );
 	if( it != m_tcoViews.end() )
@@ -1808,8 +1808,7 @@ void TrackOperationsWidget::mousePressEvent( QMouseEvent * me )
 		m_trackView->getTrack()->saveState( dataFile, dataFile.content() );
 		new StringPairDrag( QString( "track_%1" ).arg(
 					m_trackView->getTrack()->type() ),
-			dataFile.toString(), QPixmap::grabWidget(
-				m_trackView->getTrackSettingsWidget() ),
+			dataFile.toString(), m_trackView->getTrackSettingsWidget()->grab(),
 									this );
 	}
 	else if( me->button() == Qt::LeftButton )
@@ -2259,7 +2258,7 @@ TrackContentObject * Track::addTCO( TrackContentObject * tco )
  */
 void Track::removeTCO( TrackContentObject * tco )
 {
-	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
+	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
 					m_trackContentObjects.end(),
 					tco );
 	if( it != m_trackContentObjects.end() )
@@ -2331,7 +2330,7 @@ TrackContentObject * Track::getTCO( int tcoNum )
 int Track::getTCONum( const TrackContentObject * tco )
 {
 //	for( int i = 0; i < getTrackContentWidget()->numOfTCOs(); ++i )
-	tcoVector::iterator it = qFind( m_trackContentObjects.begin(),
+	tcoVector::iterator it = std::find( m_trackContentObjects.begin(),
 					m_trackContentObjects.end(),
 					tco );
 	if( it != m_trackContentObjects.end() )

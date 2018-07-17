@@ -122,11 +122,6 @@ ELSE()
 ENDIF()
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore zynaddsubfx_nio ${FFTW3F_LIBRARIES} ${QT_LIBRARIES} -lz -lpthread)
 
-# required libs for debug msys builds
-IF(LMMS_BUILD_MSYS AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-	TARGET_LINK_LIBRARIES(ZynAddSubFxCore QtCore4 QtGui4 QtXml4)
-ENDIF()
-
 TARGET_LINK_LIBRARIES(ZynAddSubFxCore Qt5::Widgets Qt5::Xml)
 
 IF(LMMS_BUILD_WIN32)

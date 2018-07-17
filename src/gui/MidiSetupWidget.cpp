@@ -36,7 +36,7 @@ MidiSetupWidget::MidiSetupWidget( const QString & caption, const QString & confi
 	m_configSection(configSection),
 	m_device(nullptr)
 {
-	// supply devName=QString::Null() (distinct from QString(""))
+	// supply devName=QString() (distinct from QString(""))
 	//   to indicate that there is no editable DEVICE field
 	if (!devName.isNull())
 	{

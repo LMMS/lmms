@@ -176,7 +176,7 @@ void ControllerRackView::onControllerRemoved( Controller * removedController )
 
 	if (viewOfRemovedController )
 	{
-		m_controllerViews.erase( qFind( m_controllerViews.begin(),
+		m_controllerViews.erase( std::find( m_controllerViews.begin(),
 					m_controllerViews.end(), viewOfRemovedController ) );
 
 		delete viewOfRemovedController;

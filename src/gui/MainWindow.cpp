@@ -69,7 +69,7 @@
 
 #include "lmmsversion.h"
 
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 //Work around an issue on KDE5 as per https://bugs.kde.org/show_bug.cgi?id=337491#c21
 void disableAutoKeyAccelerators(QWidget* mainWindow)
 {
@@ -96,7 +96,7 @@ MainWindow::MainWindow() :
 	m_metronomeToggle( 0 ),
 	m_session( Normal )
 {
-#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU) && QT_VERSION >= 0x050000
+#if !defined(LMMS_BUILD_WIN32) && !defined(LMMS_BUILD_APPLE) && !defined(LMMS_BUILD_HAIKU)
 	disableAutoKeyAccelerators(this);
 #endif
 	setAttribute( Qt::WA_DeleteOnClose );
@@ -336,7 +336,7 @@ void MainWindow::finalize()
 					Qt::CTRL + Qt::Key_M );
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	project_menu->addSeparator();
 #endif
 	project_menu->addAction( embed::getIconPixmap( "exit" ), tr( "&Quit" ),
@@ -411,7 +411,7 @@ void MainWindow::finalize()
 	}
 
 // Prevent dangling separator at end of menu per https://bugreports.qt.io/browse/QTBUG-40071
-#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
+#if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
 #endif
 	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
