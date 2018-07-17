@@ -137,7 +137,7 @@ void EffectChain::removeEffect( Effect * _effect )
 {
 	Engine::mixer()->requestChangeInModel();
 
-	Effect ** found = qFind( m_effects.begin(), m_effects.end(), _effect );
+	Effect ** found = std::find( m_effects.begin(), m_effects.end(), _effect );
 	if( found == m_effects.end() )
 	{
 		Engine::mixer()->doneChangeInModel();

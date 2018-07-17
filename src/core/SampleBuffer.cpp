@@ -1012,12 +1012,12 @@ QString SampleBuffer::openAudioFile() const
 	{
 		if( ofd.selectedFiles().isEmpty() )
 		{
-			return QString::null;
+			return QString();
 		}
 		return tryToMakeRelative( ofd.selectedFiles()[0] );
 	}
 
-	return QString::null;
+	return QString();
 }
 
 

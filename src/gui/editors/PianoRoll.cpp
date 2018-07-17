@@ -64,10 +64,6 @@
 #include "TimeLineWidget.h"
 
 
-#if QT_VERSION < 0x040800
-#define MiddleButton MidButton
-#endif
-
 using std::move;
 
 typedef AutomationPattern::timeMap timeMap;
@@ -517,7 +513,7 @@ void PianoRoll::markSemiTone( int i )
 			break;
 		case stmaMarkCurrentSemiTone:
 		{
-			QList<int>::iterator it = qFind( m_markedSemiTones.begin(), m_markedSemiTones.end(), key );
+			QList<int>::iterator it = std::find( m_markedSemiTones.begin(), m_markedSemiTones.end(), key );
 			if( it != m_markedSemiTones.end() )
 			{
 				m_markedSemiTones.erase( it );
@@ -538,7 +534,7 @@ void PianoRoll::markSemiTone( int i )
 				QList<int>::iterator i;
 				for (int ix = 0; ix < aok.size(); ++ix)
 				{
-					i = qFind(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
+					i = std::find(m_markedSemiTones.begin(), m_markedSemiTones.end(), aok.at(ix));
 					m_markedSemiTones.erase(i);
 				}
 			}
@@ -592,7 +588,7 @@ void PianoRoll::markSemiTone( int i )
 			;
 	}
 
-	qSort( m_markedSemiTones.begin(), m_markedSemiTones.end(), qGreater<int>() );
+	std::sort( m_markedSemiTones.begin(), m_markedSemiTones.end(), std::greater<int>() );
 	QList<int>::iterator new_end = std::unique( m_markedSemiTones.begin(), m_markedSemiTones.end() );
 	m_markedSemiTones.erase( new_end, m_markedSemiTones.end() );
 }

@@ -45,10 +45,10 @@ public:
 	} ;
 
 	LedCheckBox( const QString & _txt, QWidget * _parent,
-				const QString & _name = QString::null,
+				const QString & _name = QString(),
 						LedColors _color = Yellow );
 	LedCheckBox( QWidget * _parent,
-				const QString & _name = QString::null,
+				const QString & _name = QString(),
 						LedColors _color = Yellow );
 
 	virtual ~LedCheckBox();

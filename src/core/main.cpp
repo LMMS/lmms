@@ -818,22 +818,12 @@ int main( int argc, char * * argv )
 			QPushButton * discard;
 			QPushButton * exit;
 
-			#if QT_VERSION >= 0x050000
-				// setting all buttons to the same roles allows us
-				// to have a custom layout
-				discard = mb.addButton( MainWindow::tr( "Discard" ),
-									QMessageBox::AcceptRole );
-				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
-
-			# else
-				// in qt4 the button order is reversed
-				recover = mb.addButton( MainWindow::tr( "Recover" ),
-									QMessageBox::AcceptRole );
-				discard = mb.addButton( MainWindow::tr( "Discard" ),
-									QMessageBox::AcceptRole );
-
-			#endif
+			// setting all buttons to the same roles allows us
+			// to have a custom layout
+			discard = mb.addButton( MainWindow::tr( "Discard" ),
+								QMessageBox::AcceptRole );
+			recover = mb.addButton( MainWindow::tr( "Recover" ),
+								QMessageBox::AcceptRole );
 
 			// have a hidden exit button
 			exit = mb.addButton( "", QMessageBox::RejectRole);

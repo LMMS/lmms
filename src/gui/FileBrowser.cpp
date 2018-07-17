@@ -83,15 +83,13 @@ FileBrowser::FileBrowser(const QString & directories, const QString & filter,
 
 	m_filterEdit = new QLineEdit( searchWidget );
 	m_filterEdit->setPlaceholderText( tr("Search") );
-#if QT_VERSION >= 0x050000
 	m_filterEdit->setClearButtonEnabled( true );
-#endif
 	connect( m_filterEdit, SIGNAL( textEdited( const QString & ) ),
 			this, SLOT( filterItems( const QString & ) ) );
 
 	QPushButton * reload_btn = new QPushButton(
 				embed::getIconPixmap( "reload" ),
-						QString::null, searchWidget );
+						QString(), searchWidget );
 	reload_btn->setToolTip( tr( "Refresh list" ) );
 	connect( reload_btn, SIGNAL( clicked() ), this, SLOT( reloadTree() ) );
 
@@ -131,7 +129,7 @@ bool FileBrowser::filterItems( const QString & filter, QTreeWidgetItem * item )
 			{
 				// yes, then show everything below
 				it->setHidden( false );
-				filterItems( QString::null, it );
+				filterItems( QString(), it );
 				anyMatched = true;
 			}
 			else
@@ -221,7 +219,7 @@ void FileBrowser::addItems(const QString & path )
 {
 	if( m_dirsAsItems )
 	{
-		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString::null, m_filter ) );
+		m_fileBrowserTreeWidget->addTopLevelItem( new Directory( path, QString(), m_filter ) );
 		return;
 	}
 

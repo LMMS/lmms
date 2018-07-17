@@ -52,7 +52,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_borderColor = Qt::black;
 
 	// close, maximize and restore (after maximizing) buttons
-	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString::null, this );
+	m_closeBtn = new QPushButton( embed::getIconPixmap( "close" ), QString(), this );
 	m_closeBtn->resize( m_buttonSize );
 	m_closeBtn->setFocusPolicy( Qt::NoFocus );
 	m_closeBtn->setCursor( Qt::ArrowCursor );
@@ -60,7 +60,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_closeBtn->setToolTip( tr( "Close" ) );
 	connect( m_closeBtn, SIGNAL( clicked( bool ) ), this, SLOT( close() ) );
 
-	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString::null, this );
+	m_maximizeBtn = new QPushButton( embed::getIconPixmap( "maximize" ), QString(), this );
 	m_maximizeBtn->resize( m_buttonSize );
 	m_maximizeBtn->setFocusPolicy( Qt::NoFocus );
 	m_maximizeBtn->setCursor( Qt::ArrowCursor );
@@ -68,7 +68,7 @@ SubWindow::SubWindow( QWidget *parent, Qt::WindowFlags windowFlags ) :
 	m_maximizeBtn->setToolTip( tr( "Maximize" ) );
 	connect( m_maximizeBtn, SIGNAL( clicked( bool ) ), this, SLOT( showMaximized() ) );
 
-	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString::null, this );
+	m_restoreBtn = new QPushButton( embed::getIconPixmap( "restore" ), QString(), this );
 	m_restoreBtn->resize( m_buttonSize );
 	m_restoreBtn->setFocusPolicy( Qt::NoFocus );
 	m_restoreBtn->setCursor( Qt::ArrowCursor );

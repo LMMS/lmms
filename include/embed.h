@@ -60,11 +60,11 @@ class PixmapLoader
 {
 public:
 	PixmapLoader( const PixmapLoader * _ref ) :
-		m_name( _ref != NULL ? _ref->m_name : QString::null )
+		m_name( _ref != NULL ? _ref->m_name : QString() )
 	{
 	}
 
-	PixmapLoader( const QString & _name = QString::null ) :
+	PixmapLoader( const QString & _name = QString() ) :
 		m_name( _name )
 	{
 	}
@@ -96,7 +96,7 @@ protected:
 class PluginPixmapLoader : public PixmapLoader
 {
 public:
-	PluginPixmapLoader( const QString & _name = QString::null ) :
+	PluginPixmapLoader( const QString & _name = QString() ) :
 		PixmapLoader( _name )
 	{
 	}
