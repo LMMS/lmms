@@ -1,3 +1,5 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
+
 MESSAGE(STATUS "Attempting to create uninstall target for make")
 
 #Remove all of the files listed in install_manifest.txt
@@ -8,24 +10,20 @@ ENDIF()
 MESSAGE(STATUS "install_manifest.txt found")
 FILE(STRINGS ${INSTALL_MANIFEST_PATH} FILES_TO_REMOVE)
 FOREACH(FILE_TO_REMOVE ${FILES_TO_REMOVE})
-	IF(EXISTS ${FILE_TO_REMOVE})
-		EXECUTE_PROCESS(
-			COMMAND ${CMAKE_COMMAND} -E remove ${FILE_TO_REMOVE}
-			RESULT_VARIABLE EXIT_CODE
-		)
-		IF(${EXIT_CODE} EQUAL 0)
-			MESSAGE(STATUS "Successfully removed file ${FILE_TO_REMOVE}")
-		ELSE()
-			MESSAGE(FATAL_ERROR "Failed to remove file ${FILE_TO_REMOVE} with error code ${EXIT_CODE}")
-		ENDIF()
-	ELSE()
+	IF(NOT EXISTS "${FILE_TO_REMOVE}")
 		MESSAGE(WARNING "Could not find file ${FILE_TO_REMOVE}")
+		CONTINUE()
+	ENDIF()
+
+	FILE(REMOVE "${FILE_TO_REMOVE}")
+	IF(NOT EXISTS "${FILE_TO_REMOVE}")
+		MESSAGE(STATUS "Successfully removed file ${FILE_TO_REMOVE}")
+	ELSE()
+		MESSAGE(FATAL_ERROR "Failed to remove file ${FILE_TO_REMOVE}.")
 	ENDIF()
 ENDFOREACH(FILE_TO_REMOVE)
 
-#Remove empty directories created during installation
-#Required to support IN_LIST operator
-CMAKE_POLICY(SET CMP0057 NEW)
+# Remove empty directories created during installation
 
 # Checks if a directory is empty and saves the result in out_var
 FUNCTION(IS_EMPTY_DIR OUT_VAR DIR)

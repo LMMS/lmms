@@ -614,7 +614,7 @@ ADD_CUSTOM_TARGET(dist
 # add uninstall-target
 #
 ADD_CUSTOM_TARGET(uninstall
-	COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
+	COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake"
 )
 
 
