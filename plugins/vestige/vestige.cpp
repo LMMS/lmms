@@ -365,14 +365,12 @@ void vestigeInstrument::loadFile( const QString & _file )
 
 void vestigeInstrument::play( sampleFrame * _buf )
 {
-	m_pluginMutex.lock();
+	if (!m_pluginMutex.tryLock()) {return;}
 
 	const fpp_t frames = Engine::mixer()->framesPerPeriod();
 
 	if( m_plugin == NULL )
 	{
-		BufferManager::clear( _buf, frames );
-
 		m_pluginMutex.unlock();
 		return;
 	}
