@@ -145,7 +145,6 @@ private:
 	int m_outBufSize;
 
 	bool m_stopped;
-	QSemaphore m_stopSemaphore;
 
 } ;
 

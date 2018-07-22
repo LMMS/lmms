@@ -57,8 +57,7 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	m_paStream( NULL ),
 	m_wasPAInitError( false ),
 	m_outBuf( new surroundSampleFrame[mixer()->framesPerPeriod()] ),
-	m_outBufPos( 0 ),
-	m_stopSemaphore( 1 )
+	m_outBufPos( 0 )
 {
 	_success_ful = false;
 
@@ -167,8 +166,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 	printf( "Input device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( inDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( inDevIdx )->hostApi )->name );
 	printf( "Output device: '%s' backend: '%s'\n", Pa_GetDeviceInfo( outDevIdx )->name, Pa_GetHostApiInfo( Pa_GetDeviceInfo( outDevIdx )->hostApi )->name );
 
-	m_stopSemaphore.acquire();
-
 	// TODO: debug Mixer::pushInputFrames()
 	//m_supportsCapture = true;
 
@@ -181,7 +178,6 @@ AudioPortAudio::AudioPortAudio( bool & _success_ful, Mixer * _mixer ) :
 AudioPortAudio::~AudioPortAudio()
 {
 	stopProcessing();
-	m_stopSemaphore.release();
 
 	if( !m_wasPAInitError )
 	{
@@ -212,8 +208,7 @@ void AudioPortAudio::stopProcessing()
 {
 	if( m_paStream && Pa_IsStreamActive( m_paStream ) )
 	{
-		m_stopSemaphore.acquire();
-		
+		m_stopped = true;
 		PaError err = Pa_StopStream( m_paStream );
 	
 		if( err != paNoError )
@@ -283,7 +278,6 @@ int AudioPortAudio::process_callback(
 			if( !frames )
 			{
 				m_stopped = true;
-				m_stopSemaphore.release();
 				memset( _outputBuffer, 0, _framesPerBuffer *
 					channels() * sizeof(float) );
 				return paComplete;

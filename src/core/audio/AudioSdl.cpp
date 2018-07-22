@@ -278,6 +278,7 @@ void AudioSdl::sdlAudioCallback( Uint8 * _buf, int _len )
 			const fpp_t frames = getNextBuffer( m_outBuf );
 			if( !frames )
 			{
+				m_stopped = true;
 				memset( _buf, 0, _len );
 				return;
 			}
