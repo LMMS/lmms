@@ -349,8 +349,8 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		return;
 	}
 
-	// make sure note is handled as arp-base-note, even
-	// if we didn't add a sub-note so far
+	// Set master note to prevent the note to extend over skipped notes
+	// This may only be needed for lb302
 	_n->setMasterNote();
 
 	const int selected_arp = m_arpModel.value();
