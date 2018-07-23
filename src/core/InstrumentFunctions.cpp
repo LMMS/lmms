@@ -349,8 +349,7 @@ void InstrumentFunctionArpeggio::processNote( NotePlayHandle * _n )
 		return;
 	}
 
-	// Set master note to prevent the note to extend over skipped notes
-	// This may only be needed for lb302
+	// Set master note if not playing arp note or it will play as an ordinary note
 	_n->setMasterNote();
 
 	const int selected_arp = m_arpModel.value();
