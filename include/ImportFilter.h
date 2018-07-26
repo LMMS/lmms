@@ -73,6 +73,11 @@ protected:
 		return -1;
 	}
 
+	inline void resetReadPosition()
+	{
+		m_file.seek(0);
+	}
+
 	inline int readBlock( char * _data, int _len )
 	{
 		return m_file.read( _data, _len );

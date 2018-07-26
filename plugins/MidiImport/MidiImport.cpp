@@ -127,7 +127,11 @@ bool MidiImport::tryImport( TrackContainer* tc )
 	}
 #endif
 
-	switch( readID() )
+	auto id = readID();
+	// Reset the seek pointer on the file so the subsequent routines
+	// don't choke when trying to read the first 4 bytes again.
+	resetReadPosition();
+	switch( id )
 	{
 		case makeID( 'M', 'T', 'h', 'd' ):
 			printf( "MidiImport::tryImport(): found MThd\n");
