@@ -125,11 +125,16 @@ VstPlugin::VstPlugin( const QString & _plugin ) :
 	m_version( 0 ),
 	m_currentProgram()
 {
+	if( QDir::isRelativePath( m_plugin ) )
+	{
+		m_plugin = ConfigManager::inst()->vstDir()  + m_plugin;
+	}
+
 	setSplittedChannels( true );
 
 	PE::MachineType machineType;
 	try {
-		PE::FileInfo peInfo(_plugin);
+		PE::FileInfo peInfo(m_plugin);
 		machineType = peInfo.machineType();
 	} catch (std::runtime_error& e) {
 		qCritical() << "Error while determining PE file's machine type: " << e.what();
@@ -197,16 +202,7 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 		default: break;
 	}
 	sendMessage( message( IdVstSetLanguage ).addInt( hlang ) );
-
-
-	QString p = m_plugin;
-		if( QFileInfo( p ).dir().isRelative() )
-		{
-			p = ConfigManager::inst()->vstDir()  + p;
-		}
-
-
-	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( p ) ) );
+	sendMessage( message( IdVstLoadPlugin ).addString( QSTR_TO_STDSTR( m_plugin ) ) );
 
 	waitForInitDone();
 
