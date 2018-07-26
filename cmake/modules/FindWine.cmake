@@ -42,7 +42,7 @@ FOREACH(FLAG ${WINEBUILD_FLAGS})
 		# Gentoo systems
 		STRING(REPLACE "/lib/wine-" "/lib32/wine-" FLAG "${FLAG}")
 		# WineHQ (/opt/wine-stable, /opt/wine-devel, /opt/wine-staging)
-		STRING(REPLACE "/lib64/wine/" "/lib/wine/" FLAG "${FLAG}")
+		STRING(REGEX REPLACE "/lib64$" "/lib" FLAG "${FLAG}")
 
 		SET(WINE_32_LIBRARY_DIR "${FLAG}/")
 	ENDIF()

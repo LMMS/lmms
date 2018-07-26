@@ -40,7 +40,7 @@ fi
 
 # Some Wine distributions can't find their own headers. WINE_INCLUDE_DIR provided
 # by FindWine.cmake
-extra_args="-I@WINE_INCLUDE_DIR@"
+extra_args="-I@WINE_INCLUDE_DIR@ -I@WINE_INCLUDE_DIR@/wine/windows"
 
 # Apply -m32 library fix if necessary
 if [ "$win32" = true ] && [ "$no_link" != true ]; then
