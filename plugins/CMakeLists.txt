@@ -94,9 +94,7 @@ IF(MSVC)
 		monstro
 		organic
 		ReverbSC
-		sid
 		vibed
-		#VstEffect
 		Xpressive
 		zynaddsubfx
 	)
