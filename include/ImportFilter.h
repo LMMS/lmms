@@ -80,6 +80,7 @@ protected:
 
 	inline QByteArray readAllData()
 	{
+		m_file.seek(0);
 		return m_file.readAll();
 	}
 
