@@ -209,18 +209,16 @@ void VstEffectControls::updateMenu( void )
      		QMenu * to_menu = m_selPresetButton->menu();
     		to_menu->clear();
 
-    		QAction *presetActions[list1.size()];
-
      		for (int i = 0; i < list1.size(); i++) {
-			presetActions[i] = new QAction(this);
-			connect(presetActions[i], SIGNAL(triggered()), this, SLOT(selPreset()));
+			QAction* presetAction = new QAction(this);
+			connect(presetAction, SIGNAL(triggered()), this, SLOT(selPreset()));
 
-        		presetActions[i]->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
-        		presetActions[i]->setData(i);
+        		presetAction->setText(QString("%1. %2").arg(QString::number(i+1), list1.at(i)));
+        		presetAction->setData(i);
 			if (i == lastPosInMenu) {
-        			presetActions[i]->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
-			} else  presetActions[i]->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
-			to_menu->addAction( presetActions[i] );
+        			presetAction->setIcon(embed::getIconPixmap( "sample_file", 16, 16 ));
+			} else  presetAction->setIcon(embed::getIconPixmap( "edit_copy", 16, 16 ));
+			to_menu->addAction( presetAction );
      		}
 
 	}

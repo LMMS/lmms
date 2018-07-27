@@ -96,7 +96,7 @@ IF(MSVC)
 		ReverbSC
 		sid
 		vibed
-		VstEffect
+		#VstEffect
 		Xpressive
 		zynaddsubfx
 	)
