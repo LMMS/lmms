@@ -91,7 +91,6 @@ ENDIF("${PLUGIN_LIST}" STREQUAL "")
 IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
 		LadspaEffect
-		monstro
 		sid
 		#VstEffect
 		Xpressive
