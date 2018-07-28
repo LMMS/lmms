@@ -188,7 +188,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 						SLOT( setBufferSize( int ) ) );
 
 	m_bufSizeLbl = new QLabel( bufsize_tw );
-	m_bufSizeLbl->setGeometry( 10, 40, 200, 24 );
+	m_bufSizeLbl->setGeometry( 10, 40, 200, 32 );
 	setBufferSize( m_bufSizeSlider->value() );
 
 	QPushButton * bufsize_reset_btn = new QPushButton(
