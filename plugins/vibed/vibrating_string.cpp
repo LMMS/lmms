@@ -56,7 +56,7 @@ vibratingString::vibratingString(	float _pitch,
 
 	int pick = static_cast<int>( ceil( string_length * _pick ) );
 	
-	if( not _state )
+	if( ! _state )
 	{
 		m_impulse = new float[string_length];
 		resample( _impulse, _len, string_length );
