@@ -233,8 +233,8 @@ void organicInstrument::playNote( NotePlayHandle * _n,
 	
 	if( _n->totalFramesPlayed() == 0 || _n->m_pluginData == NULL )
 	{
-		Oscillator * oscs_l[m_numOscillators];
-		Oscillator * oscs_r[m_numOscillators];
+		Oscillator * oscs_l[NUM_OSCILLATORS];
+		Oscillator * oscs_r[NUM_OSCILLATORS];
 
 		_n->m_pluginData = new oscPtr;
 
