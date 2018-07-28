@@ -51,6 +51,7 @@ protected slots:
 	void resetName();
 	void changeName();
 	void disconnectObject( QAction * _a );
+	void autoRecordToggle();
 	void toggleRecording();
 	void flipY();
 	void flipX();

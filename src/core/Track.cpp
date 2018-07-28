@@ -1931,8 +1931,12 @@ void TrackOperationsWidget::updateMenu()
 	}
 	if( dynamic_cast<AutomationTrackView *>( m_trackView ) )
 	{
-		toMenu->addAction( tr( "Turn all recording on" ), this, SLOT( recordingOn() ) );
-		toMenu->addAction( tr( "Turn all recording off" ), this, SLOT( recordingOff() ) );
+		toMenu->addAction( tr( "Turn all recording on" ) +
+							" / " + tr( "Disable auto toggle" ),
+							this, SLOT( recordingOn() ) );
+		toMenu->addAction( tr( "Turn all recording off" ) +
+							" / " + tr( "Enable auto toggle" ),
+							this, SLOT( recordingOff() ) );
 	}
 }
 
@@ -1945,9 +1949,11 @@ void TrackOperationsWidget::toggleRecording( bool on )
 		for( TrackContentObject * tco : atv->getTrack()->getTCOs() )
 		{
 			AutomationPattern * ap = dynamic_cast<AutomationPattern *>( tco );
-			if( ap ) { ap->setRecording( on ); }
+			if( ap ) {
+				ap->setAutoRecordToggle ( !on );
+				ap->setRecording( on );
+			}
 		}
-		atv->update();
 	}
 }
 

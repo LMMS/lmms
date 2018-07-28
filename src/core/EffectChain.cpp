@@ -29,6 +29,8 @@
 #include "EffectChain.h"
 #include "Effect.h"
 #include "DummyEffect.h"
+#include "Engine.h"
+#include "FxMixer.h"
 #include "MixHelpers.h"
 #include "Song.h"
 

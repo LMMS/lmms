@@ -23,11 +23,32 @@
  */
 
 #include "Model.h"
+#include "Effect.h"
+#include "EffectChain.h"
+#include "Engine.h"
+#include "FxMixer.h"
 
 
 QString Model::fullDisplayName() const
 {
 	const QString & n = displayName();
+	const Effect *effect = dynamic_cast<const Effect *>( this );
+	if( effect )
+	{
+		EffectChain *chain = effect->effectChain();
+		FxMixer *mixer = Engine::fxMixer();
+		fx_ch_t numChannels = mixer->numChannels();
+
+		for( int i = 0; i < numChannels; ++i)
+		{
+			FxChannel *channel = mixer->effectChannel( i );
+
+			if( &channel->m_fxChain == chain )
+			{
+				return channel->m_name + ">" + n;
+			}
+		}
+	}
 	if( parentModel() ) 
 	{
 		const QString p = parentModel()->fullDisplayName();

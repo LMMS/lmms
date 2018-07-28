@@ -48,7 +48,8 @@ AutomationPattern::AutomationPattern( AutomationTrack * _auto_track ) :
 	m_progressionType( DiscreteProgression ),
 	m_dragging( false ),
 	m_isRecording( false ),
-	m_lastRecordedValue( 0 )
+	m_lastRecordedValue( 0 ),
+	m_autoRecordToggle( true )
 {
 	changeLength( MidiTime( 1, 0 ) );
 	if( getTrack() )

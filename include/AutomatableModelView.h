@@ -92,6 +92,9 @@ public slots:
 	void editSongGlobalAutomation();
 	void unlinkAllModels();
 	void removeSongGlobalAutomation();
+	void recordingOff();
+	void recordingOn();
+	void automate();
 
 private slots:
 	/// Copy the model's value to the clipboard.

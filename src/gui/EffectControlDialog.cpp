@@ -28,6 +28,8 @@
 
 #include "EffectControlDialog.h"
 #include "EffectControls.h"
+#include "Engine.h"
+#include "Song.h"
 
 
 EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
@@ -35,7 +37,10 @@ EffectControlDialog::EffectControlDialog( EffectControls * _controls ) :
 	ModelView( _controls, this ),
 	m_effectControls( _controls )
 {
-	setWindowTitle( m_effectControls->effect()->displayName() );
+	updateTitle();
+
+	connect( Engine::getSong(), SIGNAL( dataChanged() ),
+				this, SLOT( updateTitle() ) );
 }
 
 
@@ -52,6 +57,14 @@ void EffectControlDialog::closeEvent( QCloseEvent * _ce )
 {
 	_ce->ignore();
 	emit closed();
+}
+
+
+
+
+void EffectControlDialog::updateTitle()
+{
+	setWindowTitle( m_effectControls->effect()->fullDisplayName() );
 }
 
 

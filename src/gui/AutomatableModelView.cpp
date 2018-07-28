@@ -94,11 +94,34 @@ void AutomatableModelView::addDefaultActions( QMenu* menu )
 
 	if( model->hasLinkedModels() )
 	{
-		menu->addAction( embed::getIconPixmap( "edit-delete" ),
+		menu->addAction( embed::getIconPixmap( "edit_erase" ),
 							AutomatableModel::tr( "Remove all linked controls" ),
 							amvSlots, SLOT( unlinkAllModels() ) );
+
 		menu->addSeparator();
 	}
+
+	if( model->isAutomated() )
+	{
+		menu->addAction( embed::getIconPixmap( "record" ),
+							AutomatableModel::tr( "Turn all recording on" ) +
+							" / " + AutomatableModel::tr( "Disable auto toggle" ),
+							amvSlots, SLOT( recordingOn() ) );
+
+		menu->addAction( QPixmap(),
+							AutomatableModel::tr( "Turn all recording off" ) +
+							" / " + AutomatableModel::tr( "Enable auto toggle" ),
+							amvSlots, SLOT( recordingOff() ) );
+
+	}
+	else
+	{
+		menu->addAction( embed::getIconPixmap( "record" ),
+							AutomatableModel::tr( "Add automation-track" ),
+							amvSlots, SLOT( automate() ) );
+	}
+
+	menu->addSeparator();
 
 	QString controllerTxt;
 	if( model->controllerConnection() )
@@ -235,6 +258,8 @@ void AutomatableModelViewSlots::removeSongGlobalAutomation()
 }
 
 
+
+
 void AutomatableModelViewSlots::unlinkAllModels()
 {
 	m_amv->modelUntyped()->unlinkAllModels();
@@ -262,4 +287,30 @@ static float floatFromClipboard(bool* ok)
 	const QClipboard* clipboard = QApplication::clipboard();
 	return clipboard->text().toFloat(ok);
 }
+
+
+void AutomatableModelViewSlots::recordingOn()
+{
+	m_amv->modelUntyped()->setAutoRecordToggle( false );
+	m_amv->modelUntyped()->setRecording( true );
+}
+
+
+
+
+void AutomatableModelViewSlots::recordingOff()
+{
+	m_amv->modelUntyped()->setAutoRecordToggle( true );
+	m_amv->modelUntyped()->setRecording( false );
+}
+
+
+
+
+void AutomatableModelViewSlots::automate()
+{
+	m_amv->modelUntyped()->automate();
+}
+
+
 

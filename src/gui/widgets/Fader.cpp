@@ -54,6 +54,7 @@
 #include "embed.h"
 #include "CaptionMenu.h"
 #include "ConfigManager.h"
+#include "Song.h"
 #include "TextFloat.h"
 #include "MainWindow.h"
 
@@ -187,6 +188,17 @@ void Fader::mousePressEvent( QMouseEvent* mouseEvent )
 		{
 			thisModel->addJournalCheckPoint();
 			thisModel->saveJournallingState( false );
+
+			if( ( mouseEvent->modifiers() & Qt::AltModifier ) &&
+				!thisModel->isAutomated() )
+			{
+				thisModel->automate();
+			}
+
+			if( Engine::getSong()->isPlaying() )
+			{
+				thisModel->setRecordingWhereToggleIsAuto( true );
+			}
 		}
 
 		if( mouseEvent->y() >= knobPosY() - ( *m_knob ).height() && mouseEvent->y() < knobPosY() )
@@ -254,6 +266,11 @@ void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 		if( thisModel )
 		{
 			thisModel->restoreJournallingState();
+
+			if( Engine::getSong()->isPlaying() )
+			{
+				thisModel->setRecordingWhereToggleIsAuto( false );
+			}
 		}
 	}
 

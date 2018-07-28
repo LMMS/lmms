@@ -261,6 +261,14 @@ public:
 		s_periodCounter = 0;
 	}
 
+	void setAutoRecordToggle( bool value );
+
+	void setRecording( bool value );
+
+	void setRecordingWhereToggleIsAuto( bool value );
+
+	void automate();
+
 public slots:
 	virtual void reset();
 	void unlinkControllerConnection();

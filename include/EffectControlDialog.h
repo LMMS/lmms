@@ -50,6 +50,9 @@ protected:
 
 	EffectControls * m_effectControls;
 
+private slots:
+	void updateTitle();
+
 } ;
 
 #endif

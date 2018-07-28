@@ -588,6 +588,17 @@ void Knob::mousePressEvent( QMouseEvent * _me )
 		{
 			thisModel->addJournalCheckPoint();
 			thisModel->saveJournallingState( false );
+
+			if( ( _me->modifiers() & Qt::AltModifier ) &&
+				!thisModel->isAutomated() )
+			{
+				thisModel->automate();
+			}
+
+			if( Engine::getSong()->isPlaying() )
+			{
+				thisModel->setRecordingWhereToggleIsAuto( true );
+			}
 		}
 
 		const QPoint & p = _me->pos();
@@ -643,6 +654,11 @@ void Knob::mouseReleaseEvent( QMouseEvent* event )
 		if( thisModel )
 		{
 			thisModel->restoreJournallingState();
+
+			if( Engine::getSong()->isPlaying() )
+			{
+				thisModel->setRecordingWhereToggleIsAuto( false );
+			}
 		}
 	}
 

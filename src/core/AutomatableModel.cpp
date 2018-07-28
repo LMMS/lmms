@@ -27,9 +27,13 @@
 #include "lmms_math.h"
 
 #include "AutomationPattern.h"
+#include "AutomationTrack.h"
 #include "ControllerConnection.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
+#include "Song.h"
+#include "Track.h"
+#include "TrackContainer.h"
 
 long AutomatableModel::s_periodCounter = 0;
 
@@ -673,6 +677,121 @@ float AutomatableModel::globalAutomationValueAt( const MidiTime& time )
 		else return m_value;
 	}
 }
+
+
+
+
+void AutomatableModel::setAutoRecordToggle( bool value )
+{
+	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
+	for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+	{
+		( *it )->setAutoRecordToggle( value );
+	}
+}
+
+
+
+
+void AutomatableModel::setRecording( bool value )
+{
+	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
+	for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+	{
+		( *it )->setRecording( value );
+	}
+}
+
+
+
+
+void AutomatableModel::setRecordingWhereToggleIsAuto( bool value )
+{
+	QVector<AutomationPattern *> patterns = AutomationPattern::patternsForModel( this );
+	for( QVector<AutomationPattern *>::ConstIterator it = patterns.begin(); it != patterns.end(); it++ )
+	{
+		if( ( *it )->autoRecordToggle() )
+		{
+			( *it )->setRecording( value );
+		}
+	}
+}
+
+
+
+
+void AutomatableModel::automate()
+{
+	AutomationTrack *track = nullptr;
+	TrackContainer::TrackList l = Engine::getSong()->tracks();
+
+	// find an empty automation track, song has one by default
+	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	{
+		if( ( *it )->type() == Track::AutomationTrack &&
+			( *it )->numOfTCOs() == 0 )
+		{
+			track = dynamic_cast<AutomationTrack *>( *it );
+			break;
+		}
+	}
+
+	// or create a new automation track if no empty found
+	if( !track )
+	{
+		track = dynamic_cast<AutomationTrack *>(
+			Track::create(
+				Track::AutomationTrack,
+				Engine::getSong()
+			)
+		);
+	}
+
+	// long like the song
+	AutomationPattern *pattern = new AutomationPattern( track );
+	pattern->changeLength( MidiTime( Engine::getSong()->length(), 0 ) );
+	pattern->addObject( this );
+	QString patternName = pattern->name();
+
+	// shorten to fit meaning in default grid
+	QString trackName;
+	trackName.reserve( patternName.size() );
+	int capitalsUntilWord = 2;
+	bool hasWordAlready = false;
+	bool isPrevModelEnd = false;
+	for( const QChar& c : patternName )
+	{
+		// first model word full, then letter only, skip empty names
+		if( !c.isSpace() &&
+			( ( !hasWordAlready ) || !c.isLower() ) &&
+			( !isPrevModelEnd || c != '>' ) )
+		{
+			trackName += c;
+		}
+
+		isPrevModelEnd = c == '>';
+
+		if ( isPrevModelEnd )
+		{
+			capitalsUntilWord = 2;
+			hasWordAlready = false;
+		}
+		else if ( c.isUpper() )
+		{
+			capitalsUntilWord--;
+		}
+
+		if ( !hasWordAlready )
+		{
+			hasWordAlready = c.isSpace() || capitalsUntilWord <= 0;
+		}
+	}
+	trackName.remove( "LADSPA" );
+	track->setName( trackName );
+}
+
+
+
 
 float FloatModel::getRoundedValue() const
 {

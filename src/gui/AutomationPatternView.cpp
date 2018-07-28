@@ -142,7 +142,13 @@ void AutomationPatternView::disconnectObject( QAction * _a )
 void AutomationPatternView::toggleRecording()
 {
 	m_pat->setRecording( ! m_pat->isRecording() );
-	update();
+	m_pat->setAutoRecordToggle( false );
+}
+
+
+void AutomationPatternView::autoRecordToggle()
+{
+	m_pat->setAutoRecordToggle( true );
 }
 
 
@@ -185,9 +191,26 @@ void AutomationPatternView::constructContextMenu( QMenu * _cm )
 	_cm->addAction( embed::getIconPixmap( "edit_rename" ),
 						tr( "Change name" ),
 						this, SLOT( changeName() ) );
-	_cm->addAction( embed::getIconPixmap( "record" ),
-						tr( "Set/clear record" ),
-						this, SLOT( toggleRecording() ) );
+	_cm->addSeparator();
+
+	if( m_pat->autoRecordToggle() )
+	{
+		_cm->addAction( embed::getIconPixmap( "record" ),
+							tr( "Set/clear record" ) +
+							" / " + tr( "Disable auto toggle" ),
+							this, SLOT( toggleRecording() ) );
+	}
+	else
+	{
+		_cm->addAction( embed::getIconPixmap( "record" ),
+							tr( "Set/clear record" ),
+							this, SLOT( toggleRecording() ) );
+		_cm->addAction( QPixmap(),
+							tr( "Enable auto toggle" ),
+							this, SLOT( autoRecordToggle() ) );
+	}
+	_cm->addSeparator();
+
 	_cm->addAction( embed::getIconPixmap( "flip_y" ),
 						tr( "Flip Vertically (Visible)" ),
 						this, SLOT( flipY() ) );

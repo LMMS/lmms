@@ -155,7 +155,18 @@ public:
 	static void resolveAllIDs();
 
 	bool isRecording() const { return m_isRecording; }
-	void setRecording( const bool b ) { m_isRecording = b; }
+	void setRecording( const bool b )
+	{
+		m_isRecording = b;
+		emit dataChanged();
+	}
+
+	bool autoRecordToggle() const { return m_autoRecordToggle; }
+	void setAutoRecordToggle( const bool b )
+	{
+		m_autoRecordToggle = b;
+		emit dataChanged();
+	}
 
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
@@ -187,6 +198,7 @@ private:
 	
 	bool m_isRecording;
 	float m_lastRecordedValue;
+	bool m_autoRecordToggle;
 
 	static int s_quantization;
 
