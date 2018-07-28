@@ -92,7 +92,6 @@ IF(MSVC)
 	SET(MSVC_INCOMPATIBLE_PLUGINS
 		LadspaEffect
 		monstro
-		ReverbSC
 		sid
 		#VstEffect
 		Xpressive
