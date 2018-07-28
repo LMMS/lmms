@@ -807,8 +807,6 @@ void XpressiveView::usrWaveClicked() {
 	Engine::getSong()->setModified();
 }
 
-XpressiveHelpView* XpressiveHelpView::s_instance=0;
-
 QString XpressiveHelpView::s_helpText=
 "<b>O1, O2</b> - Two output waves. Panning is controled by PN1 and PN2.<br>"
 "<b>W1, W2, W3</b> - Wave samples evaluated by expression. In these samples, t variable ranges [0,1).<br>"
@@ -874,11 +872,6 @@ XpressiveHelpView::XpressiveHelpView():QTextEdit(s_helpText)
 void XpressiveView::helpClicked() {
 	XpressiveHelpView::getInstance()->show();
 
-}
-
-__attribute__((destructor)) static void module_destroy()
-{
-	XpressiveHelpView::finalize();
 }
 
 extern "C" {
