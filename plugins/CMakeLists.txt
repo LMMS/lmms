@@ -95,7 +95,6 @@ IF(MSVC)
 		organic
 		ReverbSC
 		sid
-		vibed
 		#VstEffect
 		Xpressive
 		zynaddsubfx
