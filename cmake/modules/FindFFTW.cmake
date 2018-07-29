@@ -11,8 +11,8 @@ if(NOT FFTW_FIND_COMPONENTS)
 endif()
 
 if(PKG_CONFIG_FOUND)
-	pkg_check_modules(FFTW_PKG fftw>=3.0.0)
-	pkg_check_modules(FFTW3_PKG fftw3>=3.0.0)
+	pkg_check_modules(FFTW_PKG QUIET fftw>=3.0.0)
+	pkg_check_modules(FFTW3_PKG QUIET fftw3>=3.0.0)
 endif()
 
 find_path(FFTW_INCLUDE_DIR
@@ -25,7 +25,7 @@ set(check_list)
 foreach(comp ${FFTW_FIND_COMPONENTS})
 	string(TOUPPER ${comp} COMP)
 	if(PKG_CONFIG_FOUND)
-		pkg_check_modules(${COMP}_PKG REQUIRED ${comp}>=3.0.0)
+		pkg_check_modules(${COMP}_PKG QUIET ${comp}>=3.0.0)
 	endif()
 
 	find_library(${COMP}_LIBRARY
