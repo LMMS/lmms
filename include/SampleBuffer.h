@@ -39,6 +39,7 @@
 #include "lmms_math.h"
 #include "shared_object.h"
 #include "MemoryManager.h"
+#include "JournallingObject.h"
 
 
 class QPainter;
@@ -50,7 +51,7 @@ class QRect;
 // may need to be higher - conversely, to optimize, some may work with lower values
 const f_cnt_t MARGIN[] = { 64, 64, 64, 4, 4 };
 
-class LMMS_EXPORT SampleBuffer : public QObject
+class LMMS_EXPORT SampleBuffer : public QObject, public JournallingObject
 {
 	Q_OBJECT
 	MM_OPERATORS
@@ -106,12 +107,18 @@ public:
 
 	} ;
 
-
 	SampleBuffer();
 	// constructor which either loads sample _audio_file or decodes
 	// base64-data out of string
-	SampleBuffer( const QString & _audio_file, bool _is_base64_data = false );
+	SampleBuffer(const QString & _audio_file, bool _is_base64_data, sample_rate_t sampleRate=0);
 	SampleBuffer(DataVector &&movedData, sample_rate_t sampleRate);
+
+	inline virtual QString nodeName() const override
+	{
+		return "samplebuffer";
+	}
+	virtual void saveSettings(QDomDocument& doc, QDomElement& _this ) override;
+	virtual void loadSettings(const QDomElement& _this ) override;
 
 	bool play( sampleFrame * _ab, handleState * _state,
 				const fpp_t _frames,
@@ -197,11 +204,6 @@ public:
 		m_frequency = _freq;
 	}
 
-	inline void setSampleRate( sample_rate_t _rate )
-	{
-		m_sampleRate = _rate;
-	}
-
 	inline const sampleFrame * data() const
 	{
 		return m_data.data ();
@@ -210,8 +212,6 @@ public:
 	QString openAudioFile() const;
 	QString openAndSetAudioFile();
 	QString openAndSetWaveformFile();
-
-	QString & toBase64( QString & _dst ) const;
 
 	void normalizeSampleRate( const sample_rate_t _src_sr,
 						bool _keep_settings = false );
@@ -276,15 +276,22 @@ public:
 	 */
 	void reverse(bool shouldLockMixer=true);
 
+	void loadFromBase64(const QString & _data , sample_rate_t sampleRate, bool shouldLock);
+
 public slots:
 	void setAudioFile( const QString & _audio_file );
-	void loadFromBase64(const QString & _data , bool shouldLock);
 	void setStartFrame( const f_cnt_t _s );
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
 	void sampleRateChanged();
 
 protected:
+	QString & toBase64( QString & _dst ) const;
+	inline void setSampleRate( sample_rate_t _rate )
+	{
+		m_sampleRate = _rate;
+	}
+
 	static sample_rate_t mixerSampleRate();
 
 	// HACK: libsamplerate < 0.1.8 doesn't get read-only variables
