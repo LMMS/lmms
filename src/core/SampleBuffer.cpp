@@ -610,7 +610,7 @@ bool SampleBuffer::play( sampleFrame * _ab, handleState * _state,
 		src_data.data_out = _ab->data ();
 		src_data.input_frames = fragment_size;
 		src_data.output_frames = _frames;
-		src_data.src_ratio =  double(Engine::mixer()->processingSampleRate())/ double(m_sampleRate);
+		src_data.src_ratio =  1.0 / freq_factor;
 		src_data.end_of_input = 0;
 		int error = src_process( _state->m_resamplingData,
 								&src_data );
