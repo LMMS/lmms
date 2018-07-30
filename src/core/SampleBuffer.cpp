@@ -30,6 +30,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
+#include <QDomElement>
 
 
 #include <sndfile.h>
@@ -72,12 +73,12 @@ SampleBuffer::SampleBuffer() :
 
 
 SampleBuffer::SampleBuffer( const QString & _audio_file,
-							bool _is_base64_data )
+							bool _is_base64_data, sample_rate_t sampleRate )
 	: SampleBuffer()
 {
 	if( _is_base64_data )
 	{
-		loadFromBase64( _audio_file, false );
+		loadFromBase64( _audio_file, false, sampleRate );
 	}
 	else
 	{
@@ -99,7 +100,36 @@ SampleBuffer::SampleBuffer(SampleBuffer::DataVector &&movedData , sample_rate_t 
 	);
 }
 
+void SampleBuffer::saveSettings(QDomDocument &doc, QDomElement &_this) {
+	{
+		QString string;
+		_this.setAttribute( "data", toBase64(string) );
+	}
 
+	_this.setAttribute ("sampleRate", sampleRate ());
+	_this.setAttribute ("amplification", amplification ());
+	_this.setAttribute ("frequency", frequency ());
+}
+
+void SampleBuffer::loadSettings(const QDomElement &_this) {
+	if (_this.hasAttribute ("sampleRate")) {
+		m_sampleRate = _this.attribute ("sampleRate").toUInt ();
+	} else {
+		qWarning("SampleBuffer::loadSettings: Using default sampleRate. That could lead to invalid values");
+	}
+
+	if (_this.hasAttribute ("amplification")) {
+		m_amplification = _this.attribute ("amplification").toFloat ();
+	}
+
+	if (_this.hasAttribute ("frequency")) {
+		m_frequency = _this.attribute ("frequency").toFloat ();
+	}
+
+	if (_this.hasAttribute ("data")) {
+		loadFromBase64 (_this.attribute("data"), m_sampleRate, true);
+	}
+}
 
 void SampleBuffer::sampleRateChanged() {
 	auto previousSampleRate = sampleRate ();
@@ -986,7 +1016,8 @@ void SampleBuffer::setAudioFile( const QString & _audio_file )
 
 
 
-void SampleBuffer::loadFromBase64( const QString & _data ,  bool shouldLock)
+void SampleBuffer::loadFromBase64( const QString & _data , sample_rate_t sampleRate,
+								   bool shouldLock)
 {
 	char * dst = NULL;
 	int dsize = 0;
@@ -1004,7 +1035,7 @@ void SampleBuffer::loadFromBase64( const QString & _data ,  bool shouldLock)
 	m_audioFile = QString();
 	doneBufferChange (shouldLock,
 					  true,
-					  sampleRate ());
+					  sampleRate);
 }
 
 
