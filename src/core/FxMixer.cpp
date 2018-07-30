@@ -170,11 +170,9 @@ void FxChannel::doProcessing()
 
 		m_stillRunning = m_fxChain.processAudioBuffer( m_buffer, fpp, m_hasInput );
 
-		float peakLeft = 0.;
-		float peakRight = 0.;
-		Engine::mixer()->getPeakValues( m_buffer, fpp, peakLeft, peakRight );
-		m_peakLeft = qMax( m_peakLeft, peakLeft * v );
-		m_peakRight = qMax( m_peakRight, peakRight * v );
+		Mixer::StereoSample peakSamples = Engine::mixer()->getPeakValues(m_buffer, fpp);
+		m_peakLeft = qMax( m_peakLeft, peakSamples.left * v );
+		m_peakRight = qMax( m_peakRight, peakSamples.right * v );
 	}
 	else
 	{

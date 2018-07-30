@@ -131,10 +131,8 @@ void VisualizationWidget::paintEvent( QPaintEvent * )
 
 
 		const fpp_t frames = mixer->framesPerPeriod();
-		float peakLeft;
-		float peakRight;
-		mixer->getPeakValues( m_buffer, frames, peakLeft, peakRight );
-		const float max_level = qMax<float>( peakLeft, peakRight );
+		Mixer::StereoSample peakValues = mixer->getPeakValues(m_buffer, frames);
+		const float max_level = qMax<float>( peakValues.left, peakValues.right );
 
 		// and set color according to that...
 		if( max_level * master_output < 0.9 )
