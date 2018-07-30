@@ -331,17 +331,22 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleSF( QString _f,
 	if( ( snd_file = sf_open_fd( f.handle(), SFM_READ, &sf_info, false ) ) != NULL )
 	{
 		frames = sf_info.frames;
-		vector.resize (frames);
-		sf_rr = sf_read_float( snd_file, vector.data ()->data (), min(DEFAULT_CHANNELS * frames, sf_info.channels * frames));
+		const auto channels = sf_info.channels;
 
-		if (sf_info.channels == 1) {
-#ifdef DEBUG_LMMS
-			qDebug( "SampleBuffer::decodeSampleSF(): Not a stereo file: %s: %s", _f, sf_strerror( NULL ) );
-#endif
-			vector.resize(frames / 2);
-		} else if (sf_info.channels > DEFAULT_CHANNELS) {
+		MmAllocator<float>::vector buffer(channels * frames);
+		sf_rr = sf_read_float( snd_file, buffer.data(), channels * frames);
+
+		if (sf_info.channels > DEFAULT_CHANNELS) {
 			loadingWarning = tr("The file you've selected has %1 channels. LMMS support "
 												  "Stereo and Mono.").arg(sf_info.channels);
+		}
+
+		// Copy buffer using stereo
+		vector.resize (frames);
+		auto rightOffset = sf_info.channels > 1 ? 1 : 0;
+		for (size_t i = 0; i < frames; i++) {
+			vector[i][0] = buffer[i * channels];
+			vector[i][1] = buffer[i * channels + rightOffset];
 		}
 
 		if( sf_rr < sf_info.channels * frames )
