@@ -121,6 +121,9 @@ const ch_cnt_t SURROUND_CHANNELS =
 				2;
 #endif
 
+// "In audio 1 is always the left" - umcaruje, 2017
+const ch_cnt_t RIGHT_CHANNEL_INDEX = 1;
+const ch_cnt_t LEFT_CHANNEL_INDEX  = 0;
 
 #ifdef LMMS_BUILD_WIN32
 #define LADSPA_PATH_SEPERATOR ';'

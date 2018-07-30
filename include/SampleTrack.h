@@ -138,6 +138,13 @@ class SampleTrack : public Track
 {
 	Q_OBJECT
 public:
+	enum RecordingChannel : int {
+		None,
+		MonoRight,
+		MonoLeft,
+		Stereo,
+	};
+
 	SampleTrack( TrackContainer* tc );
 	virtual ~SampleTrack();
 
@@ -166,12 +173,17 @@ public:
 		return "sampletrack";
 	}
 
+	RecordingChannel recordingChannel() const;
+	void setRecordingChannel(const RecordingChannel &recordingChannel);
+
 public slots:
 	void updateTcos();
 	void setPlayingTcos( bool isPlaying );
 	void updateEffectChannel();
 
 private:
+	RecordingChannel m_recordingChannel = RecordingChannel::None;
+
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	IntModel m_effectChannelModel;
@@ -212,6 +224,8 @@ public:
 	virtual QMenu * createFxMenu( QString title, QString newFxLabel );
 
 
+	virtual void updateTrackOperationsWidgetMenu (TrackOperationsWidget *trackOperations) override;
+
 public slots:
 	void showEffects();
 
@@ -225,6 +239,7 @@ protected:
 
 
 private slots:
+	void onRecordActionSelected (QAction *action);
 	void assignFxLine( int channelIndex );
 	void createFxLine();
 

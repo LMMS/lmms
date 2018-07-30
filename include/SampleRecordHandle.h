@@ -31,6 +31,8 @@
 
 #include "MidiTime.h"
 #include "PlayHandle.h"
+#include "SampleTrack.h"
+
 
 class BBTrack;
 class SampleBuffer;
@@ -54,6 +56,17 @@ public:
 
 
 private:
+	void copyBufferFromMonoLeft( const sampleFrame * inputBuffer,
+								 sampleFrame *outputBuffer,
+								 const f_cnt_t _frames);
+	void copyBufferFromMonoRight( const sampleFrame * inputBuffer,
+								  sampleFrame *outputBuffer,
+								  const f_cnt_t _frames);
+	void copyBufferFromStereo( const sampleFrame * inputBuffer,
+							   sampleFrame *outputBuffer,
+							   const f_cnt_t _frames);
+
+
 	virtual void writeBuffer( const sampleFrame * _ab,
 						const f_cnt_t _frames );
 
@@ -66,6 +79,9 @@ private:
 	BBTrack * m_bbTrack;
 	SampleTCO * m_tco;
 
+	// The recording type as it was when we started
+	// recording.
+	SampleTrack::RecordingChannel m_recordingChannel;
 } ;
 
 
