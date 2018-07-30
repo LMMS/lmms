@@ -1,4 +1,4 @@
-/*
+﻿/*
  * audio_file_processor.cpp - instrument for using audio-files
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
@@ -210,13 +210,7 @@ void audioFileProcessor::deleteNotePluginData( NotePlayHandle * _n )
 void audioFileProcessor::saveSettings( QDomDocument & _doc,
 							QDomElement & _this )
 {
-	_this.setAttribute( "src", m_sampleBuffer.audioFile() );
-	if( m_sampleBuffer.audioFile() == "" )
-	{
-		QString s;
-		_this.setAttribute( "sampledata",
-						m_sampleBuffer.toBase64( s ) );
-	}
+	m_sampleBuffer.saveState (_doc, _this);
 	m_reverseModel.saveSettings( _doc, _this, "reversed" );
 	m_loopModel.saveSettings( _doc, _this, "looped" );
 	m_ampModel.saveSettings( _doc, _this, "amp" );
@@ -247,7 +241,12 @@ void audioFileProcessor::loadSettings( const QDomElement & _this )
 	}
 	else if( _this.attribute( "sampledata" ) != "" )
 	{
-		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) , true);
+		m_sampleBuffer.loadFromBase64( _this.attribute( "srcdata" ) ,
+									   true,
+									   Engine::mixer ()->baseSampleRate ());
+		qWarning("Using default sampleRate. That could lead to invalid values");
+	} else {
+		m_sampleBuffer.restoreState (_this.firstChildElement (m_sampleBuffer.nodeName ()));
 	}
 
 	m_loopModel.loadSettings( _this, "looped" );
