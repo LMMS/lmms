@@ -382,9 +382,36 @@ IF(WANT_JACK)
 	IF(WANT_WEAKJACK)
 		SET(LMMS_HAVE_WEAKJACK TRUE)
 		SET(WEAKJACK_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/3rdparty/weakjack/weakjack)
-		SET(STATUS_JACK "OK (weak linking enabled)")
-		# use dlsym instead
-		SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+
+		# We only need Jack's header files, so finding the host's headers in the case
+		# of cross-compiling is fine.
+		find_path(JACK_INCLUDE_DIR NAMES jack/jack.h CMAKE_FIND_ROOT_PATH_BOTH)
+		IF(JACK_INCLUDE_DIR)
+			SET(STATUS_JACK "OK (weak linking enabled)")
+			# use dlsym instead
+			SET(JACK_LIBRARIES ${CMAKE_DL_LIBS})
+			SET(LMMS_HAVE_JACK TRUE)
+
+			IF(NOT CMAKE_CROSSCOMPILING)
+				SET(JACK_INCLUDE_DIRS "${JACK_INCLUDE_DIR}")
+			ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+				# We're cross-compiling but possibly using the host's jack
+				# library, so we need to use "-idirafter" to avoid conflicts
+				# between the host's and the target's header files. -idirafter
+				# will make sure that ${JACK_INCLUDE_DIR} is only considered for
+				# #include instructions after all other search directories have
+				# been exhausted. With normal "-I", we end up including the
+				# host's standard library header files, leading to confusing
+				# compilation errors due to conflicting declarations.
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -idirafter ${JACK_INCLUDE_DIR}")
+				set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -idirafter ${JACK_INCLUDE_DIR}")
+			ELSE()
+				SET(STATUS_JACK "Host's jack headers were found, but you're using an unknown cross-compiler. Try to use MinGW or supply a jack library for the target architecture at ${CMAKE_FIND_ROOT_PATHS}")
+				SET(LMMS_HAVE_JACK)
+			ENDIF()
+		ELSE()
+			SET(STATUS_JACK "no jack headers found, please install libjack0.100.0-dev (or similar) ")
+		ENDIF()
 	ELSE()
 		PKG_CHECK_MODULES(JACK jack>=0.77)
 		IF(JACK_FOUND)
