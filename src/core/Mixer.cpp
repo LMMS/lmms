@@ -534,10 +534,10 @@ void Mixer::clearInternal()
 
 
 
-void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & peakLeft, float & peakRight ) const
+Mixer::StereoSample Mixer::getPeakValues(sampleFrame * _ab, const f_cnt_t _frames) const
 {
-	peakLeft = 0.0f;
-	peakRight = 0.0f;
+	sample_t peakLeft = 0.0f;
+	sample_t peakRight = 0.0f;
 
 	for( f_cnt_t f = 0; f < _frames; ++f )
 	{
@@ -553,6 +553,8 @@ void Mixer::getPeakValues( sampleFrame * _ab, const f_cnt_t _frames, float & pea
 			peakRight = absRight;
 		}
 	}
+
+	return StereoSample(peakLeft, peakRight);
 }
 
 
