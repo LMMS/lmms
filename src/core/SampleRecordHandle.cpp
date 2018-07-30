@@ -29,7 +29,6 @@
 #include "InstrumentTrack.h"
 #include "Mixer.h"
 #include "SampleBuffer.h"
-#include "SampleTrack.h"
 #include "debug.h"
 
 
@@ -39,7 +38,8 @@ SampleRecordHandle::SampleRecordHandle( SampleTCO* tco ) :
 	m_minLength( tco->length() ),
 	m_track( tco->getTrack() ),
 	m_bbTrack( NULL ),
-	m_tco( tco )
+	m_tco( tco ),
+	m_recordingChannel{dynamic_cast<SampleTrack*>(m_track)->recordingChannel ()}
 {
 }
 
@@ -139,6 +139,41 @@ void SampleRecordHandle::createSampleBuffer( SampleBuffer** sampleBuf )
 	delete[] data;
 }
 
+void SampleRecordHandle::copyBufferFromMonoLeft(const sampleFrame *inputBuffer,
+												sampleFrame *outputBuffer,
+												const f_cnt_t _frames)
+{
+	for( f_cnt_t frame = 0; frame < _frames; ++frame ) {
+		// Copy every first sample to the first and the second in the output buffer.
+		outputBuffer[frame][LEFT_CHANNEL_INDEX]  = inputBuffer[frame][LEFT_CHANNEL_INDEX];
+		outputBuffer[frame][RIGHT_CHANNEL_INDEX] = inputBuffer[frame][LEFT_CHANNEL_INDEX];
+	}
+}
+
+void SampleRecordHandle::copyBufferFromMonoRight(const sampleFrame *inputBuffer,
+												 sampleFrame *outputBuffer,
+												 const f_cnt_t _frames)
+{
+	for( f_cnt_t frame = 0; frame < _frames; ++frame ) {
+		// Copy every second sample to the first and the second in the output buffer.
+		outputBuffer[frame][LEFT_CHANNEL_INDEX]  = inputBuffer[frame][RIGHT_CHANNEL_INDEX];
+		outputBuffer[frame][RIGHT_CHANNEL_INDEX] = inputBuffer[frame][RIGHT_CHANNEL_INDEX];
+	}
+}
+
+void SampleRecordHandle::copyBufferFromStereo(const sampleFrame *inputBuffer,
+											  sampleFrame *outputBuffer,
+											  const f_cnt_t _frames)
+{
+	for( f_cnt_t frame = 0; frame < _frames; ++frame )
+	{
+		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
+		{
+			outputBuffer[frame][chnl] = inputBuffer[frame][chnl];
+		}
+	}
+}
+
 
 
 
@@ -146,13 +181,30 @@ void SampleRecordHandle::writeBuffer( const sampleFrame * _ab,
 					const f_cnt_t _frames )
 {
 	sampleFrame * buf = new sampleFrame[_frames];
-	for( f_cnt_t frame = 0; frame < _frames; ++frame )
-	{
-		for( ch_cnt_t chnl = 0; chnl < DEFAULT_CHANNELS; ++chnl )
-		{
-			buf[frame][chnl] = _ab[frame][chnl];
-		}
+
+	// Depending on the recording channel, copy the buffer as a
+	// mono-right, mono-left or stereo.
+
+	// Note that mono doesn't mean single channel, it means
+	// empty other channel. Therefore, we would just duplicate
+	// every frame from the mono channel
+	// to the empty channel.
+
+	switch(m_recordingChannel) {
+	case SampleTrack::RecordingChannel::MonoLeft:
+		copyBufferFromMonoLeft(_ab, buf, _frames);
+		break;
+	case SampleTrack::RecordingChannel::MonoRight:
+		copyBufferFromMonoRight(_ab, buf, _frames);
+		break;
+	case SampleTrack::RecordingChannel::Stereo:
+		copyBufferFromStereo(_ab, buf, _frames);
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
 	}
+
 	m_buffers.push_back( qMakePair( buf, _frames ) );
 }
 

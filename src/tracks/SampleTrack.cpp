@@ -347,7 +347,7 @@ void SampleTCOView::contextMenuEvent( QContextMenuEvent * _cme )
 				tr( "Mute/unmute (<%1> + middle click)" ).arg(UI_CTRL_KEY),
 						m_tco, SLOT( toggleMute() ) );
 	contextMenu.addAction( embed::getIconPixmap( "record" ),
-				tr( "Set/clear record" ),
+				tr( "Set/clear record (Shift + Ctrl + left click)" ),
 						m_tco, SLOT( toggleRecord() ) );
 	constructContextMenu( &contextMenu );
 
@@ -743,8 +743,20 @@ void SampleTrack::setPlayingTcos( bool isPlaying )
 	}
 }
 
+SampleTrack::RecordingChannel SampleTrack::recordingChannel() const{
+	// If we had defined a recording channel for this track, use
+	// it. Otherwise, use the global setting.
+	if (m_recordingChannel != RecordingChannel::None) {
+		return m_recordingChannel;
+	} else {
+		return gui->songEditor ()->globalRecordChannel ();
+	}
+}
 
-
+void SampleTrack::setRecordingChannel(const RecordingChannel &recordingChannel)
+{
+	m_recordingChannel = recordingChannel;
+}
 
 
 
@@ -754,7 +766,7 @@ SampleTrackView::SampleTrackView( SampleTrack * _t, TrackContainerView* tcv ) :
 	setFixedHeight( 32 );
 
 	TrackLabelButton * tlb = new TrackLabelButton( this,
-						getTrackSettingsWidget() );
+												   getTrackSettingsWidget() );
 	connect( tlb, SIGNAL( clicked( bool ) ),
 			this, SLOT( showEffects() ) );
 	tlb->setIcon( embed::getIconPixmap( "sample_track" ) );
@@ -803,6 +815,38 @@ SampleTrackView::~SampleTrackView()
 	m_effWindow->deleteLater();
 }
 
+void SampleTrackView::updateTrackOperationsWidgetMenu(TrackOperationsWidget *trackOperations) {
+	TrackView::updateTrackOperationsWidgetMenu (trackOperations);
+
+	SampleTrack * st = castModel<SampleTrack>();
+	auto toMenu = trackOperations->trackOps ()->menu ();
+
+	QMenu *recordMenu = toMenu->addMenu (tr ("Set record type"));
+	auto *recordChannels = new QActionGroup(recordMenu);
+
+	recordChannels->setExclusive (true);
+
+	recordChannels->addAction(tr( "default" ))->setData (SampleTrack::RecordingChannel::None);
+	recordChannels->addAction(tr( "Stereo" ))->setData (SampleTrack::RecordingChannel::Stereo);
+	recordChannels->addAction(tr( "Mono left" ))->setData (SampleTrack::RecordingChannel::MonoLeft);
+	recordChannels->addAction(tr( "Mono right" ))->setData (SampleTrack::RecordingChannel::MonoRight);
+
+	for (auto *action : recordChannels->actions ()) {
+		action->setCheckable (true);
+
+		if (static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>())
+				== st->m_recordingChannel)
+		{
+			action->setChecked (true);
+		}
+
+	}
+
+	recordMenu->addActions (recordChannels->actions ());
+
+	connect (recordChannels, SIGNAL(triggered(QAction*)), SLOT(onRecordActionSelected(QAction*)));
+}
+
 
 
 
@@ -828,4 +872,11 @@ void SampleTrackView::modelChanged()
 	m_volumeKnob->setModel( &st->m_volumeModel );
 
 	TrackView::modelChanged();
+}
+
+void SampleTrackView::onRecordActionSelected(QAction *action) {
+	SampleTrack * st = castModel<SampleTrack>();
+	st->setRecordingChannel (static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>()));
+
+	action->setChecked (true);
 }
