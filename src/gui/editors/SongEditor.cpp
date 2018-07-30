@@ -32,6 +32,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QToolButton>
 
 #include "AutomatableSlider.h"
 #include "ComboBox.h"
@@ -673,6 +674,32 @@ SongEditorWindow::SongEditorWindow(Song* song) :
 	m_recordAccompanyAction->setToolTip(tr( "Record samples from Audio-device while playing song or BB track"));
 	m_stopAction->setToolTip(tr( "Stop song (Space)" ));
 
+	auto *recordMenu = new QMenu(this);
+	auto *recordGroup = new QActionGroup(this);
+	recordGroup->addAction (new QAction(tr("Stereo"), recordGroup))->setData (SampleTrack::RecordingChannel::Stereo);
+	recordGroup->addAction (new QAction(tr("Mono left"), recordGroup))->setData (SampleTrack::RecordingChannel::MonoLeft);
+	recordGroup->addAction (new QAction(tr("Mono right"), recordGroup))->setData (SampleTrack::RecordingChannel::MonoRight);
+
+	recordGroup->setExclusive (true);
+
+	for (auto *action : recordGroup->actions ()) {
+		action->setCheckable (true);
+	}
+
+	// Check stereo by default.
+	recordGroup->actions ().first ()->setChecked (true);
+
+	connect (recordGroup, SIGNAL(triggered(QAction*)), SLOT(onRecordChannelSelected(QAction*)));
+
+	recordMenu->addActions (recordGroup->actions ());
+
+	QToolButton * recordTool = new QToolButton(this);
+	recordTool->setMenu(recordMenu);
+	recordTool->setToolTip (tr ("Select default channels to record."));
+	recordTool->setPopupMode( QToolButton::InstantPopup );
+	recordTool->setFixedWidth (17);
+
+	m_toolBar->addWidget (recordTool);
 
 	// Track actions
 	DropToolBar *trackActionsToolBar = addDropToolBarToTop(tr("Track actions"));
@@ -818,6 +845,13 @@ void SongEditorWindow::adjustUiAfterProjectLoad()
 	m_editor->scrolled(0);
 }
 
+void SongEditorWindow::onRecordChannelSelected(QAction *action) {
+	action->setChecked (true);
+
+	// Set the recording channel according to the action's data.
+	m_globalRecordChannel = static_cast<SampleTrack::RecordingChannel>(action->data ().value<int>());
+}
+
 
 
 
@@ -844,4 +878,9 @@ void SongEditorWindow::keyReleaseEvent( QKeyEvent *ke )
 			m_crtlAction->trigger();
 		}
 	}
+}
+
+SampleTrack::RecordingChannel SongEditorWindow::globalRecordChannel() const
+{
+	return m_globalRecordChannel;
 }
