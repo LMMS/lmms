@@ -36,6 +36,9 @@ class VisualizationWidget : public QWidget
 {
 	Q_OBJECT
 public:
+	Q_PROPERTY( QColor normalColor READ normalColor WRITE setNormalColor )
+	Q_PROPERTY( QColor warningColor READ warningColor WRITE setWarningColor )
+	Q_PROPERTY( QColor clippingColor READ clippingColor WRITE setClippingColor )
 	enum visualizationTypes
 	{
 		Simple		// add more here
@@ -47,6 +50,15 @@ public:
 
 	void setActive( bool _active );
 
+	QColor const & normalColor() const;
+	void setNormalColor(QColor const & normalColor);
+
+	QColor const & warningColor() const;
+	void setWarningColor(QColor const & warningColor);
+
+	QColor const & clippingColor() const;
+	void setClippingColor(QColor const & clippingColor);
+
 
 protected:
 	virtual void paintEvent( QPaintEvent * _pe );
@@ -56,6 +68,8 @@ protected:
 protected slots:
 	void updateAudioBuffer( const surroundSampleFrame * buffer );
 
+private:
+	QColor const & determineLineColor(float level) const;
 
 private:
 	QPixmap s_background;
@@ -64,6 +78,9 @@ private:
 	sampleFrame * m_buffer;
 	bool m_active;
 
+	QColor m_normalColor;
+	QColor m_warningColor;
+	QColor m_clippingColor;
 } ;
 
 #endif
