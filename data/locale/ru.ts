@@ -703,11 +703,11 @@ Oe Ai &lt;oeai/at/symbiants/dot/com&gt;</translation>
     <name>BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation>ВХОД</translation>
+        <translation>IN</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation>ВЫХОД</translation>
+        <translation>OUT</translation>
     </message>
     <message>
         <source>GAIN</source>
