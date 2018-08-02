@@ -196,7 +196,7 @@ IF(NOT MSVC)
 			# ENABLE_EXPORTS property has no effect in some MSYS2 configurations.
 			# Add the linker flag manually to create liblmms.dll.a import library
 			SET_PROPERTY(TARGET lmms
-				APPEND_STRING PROPERTY LINK_FLAGS -Wl,--out-implib,liblmms.dll.a
+				APPEND_STRING PROPERTY LINK_FLAGS " -Wl,--out-implib,liblmms.dll.a"
 			)
 		ENDIF()
 
