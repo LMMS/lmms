@@ -257,7 +257,7 @@ MainWindow::~MainWindow()
 void MainWindow::finalize()
 {
 	resetWindowTitle();
-	setWindowIcon( embed::getIconPixmap( "icon" ) );
+	setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 
 
 	// project-popup-menu
@@ -408,7 +408,7 @@ void MainWindow::finalize()
 #if !(defined(LMMS_BUILD_APPLE) && (QT_VERSION >= 0x050000) && (QT_VERSION < 0x050600))
 	help_menu->addSeparator();
 #endif
-	help_menu->addAction( embed::getIconPixmap( "icon" ), tr( "About" ),
+	help_menu->addAction( embed::getIconPixmap( "icon_small" ), tr( "About" ),
 				  this, SLOT( aboutLMMS() ) );
 
 	// create tool-buttons

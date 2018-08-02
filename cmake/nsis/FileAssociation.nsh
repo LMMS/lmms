@@ -118,7 +118,8 @@ _____________________________________________________________________________
   Push $1
 
   ReadRegStr $1 HKCR $R1 ""  ; read current file association
-  StrCmp "$1" "" NoBackup  ; is it empty
+  ;StrCmp "$1" "" NoBackup  ; is it empty
+  StrCmp "" "" NoBackup  ; edited to always overwrite
   StrCmp "$1" "$R0" NoBackup  ; is it our own
     WriteRegStr HKCR $R1 "backup_val" "$1"  ; backup current value
 NoBackup:
