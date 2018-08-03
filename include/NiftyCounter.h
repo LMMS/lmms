@@ -37,7 +37,7 @@ private:
 	static void init() { C(); }
 	static void deinit() { D(); }
 	static int inc() { return T::s_count++; }
-	static int dec() { return T::s_count--; }
+	static int dec() { return --T::s_count; }
 };
 
 
