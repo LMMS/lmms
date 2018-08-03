@@ -171,6 +171,9 @@ public:
 	static int quantization() { return s_quantization; }
 	static void setQuantization(int q) { s_quantization = q; }
 
+	bool isControlled() const;
+	void connectController( ControllerConnection * cc );
+
 public slots:
 	void clear();
 	void objectDestroyed( jo_id_t );

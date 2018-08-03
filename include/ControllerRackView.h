@@ -30,6 +30,7 @@
 
 #include "SerializingObject.h"
 #include "lmms_basics.h"
+#include "AutoDetectMidiController.h"
 
 
 class QPushButton;
@@ -66,6 +67,7 @@ protected:
 
 private slots:
 	void addController();
+	void connectUncontrolledAutomationTrack();
 
 
 private:
@@ -74,6 +76,9 @@ private:
 	QScrollArea * m_scrollArea;
 	QVBoxLayout * m_scrollAreaLayout;
 	QPushButton * m_addButton;
+
+	BoolModel m_autoConnect;
+	AutoDetectMidiController * m_midiController;
 
 	// Stores the index of where to insert the next ControllerView.
 	// Needed so that the StretchItem always stays at the last position.

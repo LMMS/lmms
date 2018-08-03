@@ -1,5 +1,6 @@
 set(LMMS_SRCS
 	${LMMS_SRCS}
+	core/AutoDetectMidiController.cpp
 	core/AutomatableModel.cpp
 	core/AutomationPattern.cpp
 	core/BandLimitedWave.cpp

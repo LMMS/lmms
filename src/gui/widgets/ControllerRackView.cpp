@@ -36,13 +36,22 @@
 #include "GuiApplication.h"
 #include "MainWindow.h"
 #include "GroupBox.h"
+#include "AutoDetectMidiController.h"
+#include "AutomationPattern.h"
+#include "AutomatableModel.h"
+#include "ControllerConnection.h"
+#include "ControllerConnectionDialog.h"
 #include "ControllerRackView.h"
 #include "ControllerView.h"
+#include "LedCheckbox.h"
 #include "LfoController.h"
+#include "MidiController.h"
+#include "TrackContainer.h"
 
 
 ControllerRackView::ControllerRackView( ) :
 	QWidget(),
+	m_autoConnect( false ),
 	m_nextIndex(0)
 {
 	setWindowIcon( embed::getIconPixmap( "controller" ) );
@@ -70,9 +79,17 @@ ControllerRackView::ControllerRackView( ) :
 	connect( song, SIGNAL( controllerAdded( Controller* ) ), SLOT( onControllerAdded( Controller* ) ) );
 	connect( song, SIGNAL( controllerRemoved( Controller* ) ), SLOT( onControllerRemoved( Controller* ) ) );
 
+	LedCheckBox * autoConnectView = new LedCheckBox(
+			tr("MIDI event connects last uncontrolled automation-track"),
+			nullptr );
+
+	autoConnectView->setModel( &m_autoConnect );
+
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
+	layout->addWidget( autoConnectView );
+
 	this->setLayout( layout );
 
 	QMdiSubWindow * subWin = gui->mainWindow()->addWindowedWidget( this );
@@ -87,6 +104,11 @@ ControllerRackView::ControllerRackView( ) :
 	subWin->resize( 350, 200 );
 	subWin->setFixedWidth( 350 );
 	subWin->setMinimumHeight( 200 );
+
+	m_midiController = new AutoDetectMidiController( Engine::getSong() );
+
+	connect( m_midiController, SIGNAL( valueChanged() ),
+				this, SLOT( connectUncontrolledAutomationTrack() ) );
 }
 
 
@@ -94,6 +116,7 @@ ControllerRackView::ControllerRackView( ) :
 
 ControllerRackView::~ControllerRackView()
 {
+	delete m_midiController;
 }
 
 
@@ -196,6 +219,65 @@ void ControllerRackView::addController()
 	// fix bug which always made ControllerRackView loose focus when adding
 	// new controller
 	setFocus();
+}
+
+
+
+
+void ControllerRackView::connectUncontrolledAutomationTrack()
+{
+	if( !m_autoConnect.value() )
+        {
+		return;
+	}
+
+	TrackContainer::TrackList l = Engine::getSong()->tracks();
+
+	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	{
+		if( ( *it )->type() != Track::AutomationTrack ||
+			( *it )->numOfTCOs() == 0 )
+		{
+			continue;
+		}
+
+		AutomationPattern * pattern = nullptr;
+		const Track::tcoVector & v = ( *it )->getTCOs();
+		bool isControlled = false;
+
+		for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+		{
+			pattern = dynamic_cast<AutomationPattern *>( *j );
+
+			if( !pattern )
+			{
+				continue;
+			}
+
+			if( pattern->isControlled() )
+			{
+				isControlled = true;
+				break;
+			}
+		}
+
+		if( !pattern || isControlled )
+		{
+			continue;
+		}
+
+		m_midiController->useDetected();
+
+		MidiController * mc;
+		mc = m_midiController->copyToMidiController( Engine::getSong() );
+		mc->setPortName( pattern->firstObject()->fullDisplayName() );
+
+		ControllerConnection * cc = new ControllerConnection( mc );
+		pattern->connectController( cc );
+		pattern->setRecording( true );
+
+		return;
+	}
 }
 
 

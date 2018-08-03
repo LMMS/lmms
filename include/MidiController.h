@@ -58,6 +58,7 @@ public:
 
 	// Used by controllerConnectionDialog to copy
 	void subscribeReadablePorts( const MidiPort::Map & _map );
+	void setPortName( QString displayName );
 
 
 public slots:

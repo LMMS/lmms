@@ -29,6 +29,7 @@
 #include <QScrollArea>
 #include <QMessageBox>
 
+#include "AutoDetectMidiController.h"
 #include "ControllerConnectionDialog.h"
 #include "ControllerConnection.h"
 #include "MidiController.h"
@@ -44,83 +45,6 @@
 
 #include "gui_templates.h"
 #include "embed.h"
-
-
-class AutoDetectMidiController : public MidiController
-{
-public:
-	AutoDetectMidiController( Model* parent ) :
-		MidiController( parent ),
-		m_detectedMidiChannel( 0 ),
-		m_detectedMidiController( 0 )
-	{
-		updateName();
-	}
-
-
-	virtual ~AutoDetectMidiController()
-	{
-	}
-
-
-	virtual void processInEvent( const MidiEvent& event, const MidiTime& time, f_cnt_t offset = 0 )
-	{
-		if( event.type() == MidiControlChange &&
-			( m_midiPort.inputChannel() == 0 || m_midiPort.inputChannel() == event.channel() + 1 ) )
-		{
-			m_detectedMidiChannel = event.channel() + 1;
-			m_detectedMidiController = event.controllerNumber() + 1;
-			m_detectedMidiPort = Engine::mixer()->midiClient()->sourcePortName( event );
-
-			emit valueChanged();
-		}
-	}
-
-
-	// Would be a nice copy ctor, but too hard to add copy ctor because
-	// model has none.
-	MidiController* copyToMidiController( Model* parent )
-	{
-		MidiController* c = new MidiController( parent );
-		c->m_midiPort.setInputChannel( m_midiPort.inputChannel() );
-		c->m_midiPort.setInputController( m_midiPort.inputController() );
-		c->subscribeReadablePorts( m_midiPort.readablePorts() );
-		c->updateName();
-
-		return c;
-	}
-
-
-	void useDetected()
-	{
-		m_midiPort.setInputChannel( m_detectedMidiChannel );
-		m_midiPort.setInputController( m_detectedMidiController );
-
-		const MidiPort::Map& map = m_midiPort.readablePorts();
-		for( MidiPort::Map::ConstIterator it = map.begin(); it != map.end(); ++it )
-		{
-			m_midiPort.subscribeReadablePort( it.key(),
-									m_detectedMidiPort.isEmpty() || ( it.key() == m_detectedMidiPort ) );
-		}
-	}
-
-
-public slots:
-	void reset()
-	{
-		m_midiPort.setInputChannel( 0 );
-		m_midiPort.setInputController( 0 );
-	}
-
-
-private:
-	int m_detectedMidiChannel;
-	int m_detectedMidiController;
-	QString m_detectedMidiPort;
-
-} ;
-
-
 
 
 ControllerConnectionDialog::ControllerConnectionDialog( QWidget * _parent, 
@@ -306,16 +230,16 @@ void ControllerConnectionDialog::selectController()
 			if( m_targetModel->getTrack() && 
 					!m_targetModel->getTrack()->displayName().isEmpty() )
 			{
-				mc->m_midiPort.setName( QString( "%1 (%2)" ).
+				mc->setPortName( QString( "%1 (%2)" ).
 						arg( m_targetModel->getTrack()->displayName() ).
 						arg( m_targetModel->displayName() ) );
 			}
 			else
 			{
-				mc->m_midiPort.setName( m_targetModel->displayName() );
+				mc->setPortName( m_targetModel->displayName() );
 			}
 			*/
-			mc->m_midiPort.setName( m_targetModel->fullDisplayName() );
+			mc->setPortName( m_targetModel->fullDisplayName() );
 			m_controller = mc;
 		}
 	}
@@ -356,13 +280,6 @@ void ControllerConnectionDialog::midiToggled()
 		if( !m_midiController )
 		{
 			m_midiController = new AutoDetectMidiController( Engine::getSong() );
-
-			MidiPort::Map map = m_midiController->m_midiPort.readablePorts();
-			for( MidiPort::Map::Iterator it = map.begin(); it != map.end(); ++it )
-			{
-				it.value() = true;
-			}
-			m_midiController->subscribeReadablePorts( map );
 
 			m_midiChannelSpinBox->setModel( &m_midiController->m_midiPort.m_inputChannelModel );
 			m_midiControllerSpinBox->setModel( &m_midiController->m_midiPort.m_inputControllerModel );

@@ -882,4 +882,31 @@ void AutomationPattern::generateTangents( timeMap::const_iterator it,
 
 
 
+bool AutomationPattern::isControlled() const
+{
+	for( objectVector::const_iterator it = m_objects.begin();
+			it != m_objects.end(); ++it )
+	{
+		if( *it && ( *it )->controllerConnection() )
+		{
+			return true;
+		}
+	}
 
+	return false;
+}
+
+
+
+
+void AutomationPattern::connectController( ControllerConnection * cc )
+{
+	for( objectVector::iterator it = m_objects.begin();
+			it != m_objects.end(); ++it )
+	{
+		if( *it )
+		{
+			( * it )->setControllerConnection( cc );
+		}
+	}
+}

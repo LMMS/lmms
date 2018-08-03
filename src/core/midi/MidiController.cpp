@@ -150,6 +150,14 @@ QString MidiController::nodeName() const
 
 
 
+void MidiController::setPortName( QString displayName )
+{
+	m_midiPort.setName( displayName );
+}
+
+
+
+
 ControllerDialog * MidiController::createDialog( QWidget * _parent )
 {
 	return NULL;

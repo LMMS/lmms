@@ -31,14 +31,14 @@
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
-#include "Controller.h"
+#include "AutoDetectMidiController.h"
 #include "AutomatableModel.h"
+#include "Controller.h"
 
 
 class QLineEdit;
 class QListView;
 class QScrollArea;
-class AutoDetectMidiController;
 class ComboBox;
 class GroupBox;
 class TabWidget;
