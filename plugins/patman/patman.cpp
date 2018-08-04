@@ -378,7 +378,7 @@ patmanInstrument::LoadErrors patmanInstrument::loadPatch(
 
 void patmanInstrument::unloadCurrentPatch( void )
 {
-	m_patchFile.clear ();
+	m_patchSamples.clear();
 }
 
 
