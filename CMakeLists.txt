@@ -386,7 +386,7 @@ IF(WANT_JACK)
 
 		# We only need Jack's header files, so finding the host's headers in the case
 		# of cross-compiling is fine.
-		find_path(JACK_INCLUDE_DIR NAMES jack/jack.h CMAKE_FIND_ROOT_PATH_BOTH)
+		find_path(JACK_INCLUDE_DIR NAMES jack/jack.h PATHS /usr/include CMAKE_FIND_ROOT_PATH_BOTH)
 		IF(JACK_INCLUDE_DIR)
 			SET(STATUS_JACK "OK (weak linking enabled)")
 			# use dlsym instead
@@ -412,6 +412,7 @@ IF(WANT_JACK)
 			ENDIF()
 		ELSE()
 			SET(STATUS_JACK "no jack headers found, please install libjack0.100.0-dev (or similar) ")
+			SET(LMMS_HAVE_JACK)
 		ENDIF()
 	ELSE()
 		PKG_CHECK_MODULES(JACK jack>=0.77)
