@@ -181,6 +181,9 @@ if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
    mv "${APPDIR}/usr/lib/libjack.so.0" "${APPDIR}usr/lib/lmms/optional/"
 fi
 
+# Point the AppRun to the shim launcher
+ln -sfr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
+
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
 echo -e "\n\n>>>>> appimagetool" >> "$LOGFILE"
