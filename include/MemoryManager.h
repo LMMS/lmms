@@ -46,8 +46,11 @@ public:
 };
 
 template<typename T>
-struct MmAllocator
+class MmAllocator
 {
+public:
+	MmAllocator() = default;
+        template<class U> MmAllocator(const MmAllocator<U>& other) {}
 	typedef T value_type;
 	template<class U>  struct rebind { typedef MmAllocator<U> other; };
 
