@@ -395,9 +395,13 @@ IF(LMMS_BUILD_WIN32)
 	SET(JACK_INSTALLER_VERSION "1.9.11")
 	# Bundle jack
 	IF (WANT_JACK)
-		ADD_CUSTOM_TARGET(jack_binary_installer ALL
-			COMMAND "curl" -OL "https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_VERSION}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe"
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	INSTALL(CODE
+			"FILE(DOWNLOAD
+			\"https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_VERSION}/\
+			Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\"
+			\"${CMAKE_BINARY_DIR}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\"
+			)"
+		)
 		INSTALL(FILES "${CMAKE_BINARY_DIR}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe" DESTINATION .)
 		SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
   ExecWait '\\\"$INSTDIR\\\\Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\\\" /install'
