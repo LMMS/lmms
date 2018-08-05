@@ -267,7 +267,8 @@ void Fader::mouseReleaseEvent( QMouseEvent * mouseEvent )
 		{
 			thisModel->restoreJournallingState();
 
-			if( Engine::getSong()->isPlaying() )
+			if( Engine::getSong()->isPlaying() &&
+					!thisModel->controllerConnection() )
 			{
 				thisModel->setRecordingWhereToggleIsAuto( false );
 			}

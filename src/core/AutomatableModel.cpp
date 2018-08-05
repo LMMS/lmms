@@ -722,6 +722,11 @@ void AutomatableModel::setRecordingWhereToggleIsAuto( bool value )
 
 void AutomatableModel::automate()
 {
+	if( isAutomated() )
+	{
+		return;
+	}
+
 	AutomationTrack *track = nullptr;
 	TrackContainer::TrackList l = Engine::getSong()->tracks();
 
@@ -751,6 +756,7 @@ void AutomatableModel::automate()
 	AutomationPattern *pattern = new AutomationPattern( track );
 	pattern->changeLength( MidiTime( Engine::getSong()->length(), 0 ) );
 	pattern->addObject( this );
+	pattern->setRecording( true );
 	QString patternName = pattern->name();
 
 	// shorten to fit meaning in default grid

@@ -68,6 +68,8 @@ protected:
 private slots:
 	void addController();
 	void connectUncontrolledAutomationTrack();
+	void disconnectAutomation();
+	void resetAutoConnect();
 
 
 private:

@@ -655,7 +655,8 @@ void Knob::mouseReleaseEvent( QMouseEvent* event )
 		{
 			thisModel->restoreJournallingState();
 
-			if( Engine::getSong()->isPlaying() )
+			if( Engine::getSong()->isPlaying() &&
+					!thisModel->controllerConnection() )
 			{
 				thisModel->setRecordingWhereToggleIsAuto( false );
 			}

@@ -28,6 +28,7 @@
 
 #include "AutomationPatternView.h"
 #include "AutomationTrack.h"
+#include "ControllerConnection.h"
 #include "Note.h"
 #include "ProjectJournal.h"
 #include "BBTrackContainer.h"
@@ -907,6 +908,24 @@ void AutomationPattern::connectController( ControllerConnection * cc )
 		if( *it )
 		{
 			( * it )->setControllerConnection( cc );
+			( * it )->setRecording( true );
+		}
+	}
+}
+
+
+
+
+void AutomationPattern::disconnectController()
+{
+	for( objectVector::iterator it = m_objects.begin();
+			it != m_objects.end(); ++it )
+	{
+		if( *it && ( * it )->controllerConnection() )
+		{
+			delete ( * it )->controllerConnection();
+			( * it )->setControllerConnection( NULL );
+			( * it )->setRecording( false );
 		}
 	}
 }

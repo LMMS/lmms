@@ -79,15 +79,32 @@ ControllerRackView::ControllerRackView( ) :
 	connect( song, SIGNAL( controllerAdded( Controller* ) ), SLOT( onControllerAdded( Controller* ) ) );
 	connect( song, SIGNAL( controllerRemoved( Controller* ) ), SLOT( onControllerRemoved( Controller* ) ) );
 
+	QPushButton * resetAutoConnectView = new QPushButton( this );
+	resetAutoConnectView->setText( tr( "Rescan auto-connect ports" ) );
+
+	connect( resetAutoConnectView, SIGNAL( clicked() ),
+			this, SLOT( resetAutoConnect() ) );
+
+	QPushButton * disconnectAutomationView = new QPushButton( this );
+	disconnectAutomationView->setText( tr( "Disconnect automation") );
+
+	connect( disconnectAutomationView, SIGNAL( clicked() ),
+			this, SLOT( disconnectAutomation() ), Qt::QueuedConnection );
+
+	QHBoxLayout * autoConnectButtons = new QHBoxLayout();
+	autoConnectButtons->addWidget(resetAutoConnectView);
+	autoConnectButtons->addWidget(disconnectAutomationView);
+
 	LedCheckBox * autoConnectView = new LedCheckBox(
-			tr("MIDI event connects last uncontrolled automation-track"),
-			nullptr );
+			tr( "MIDI event connects recorded automation-track" ),
+			this );
 
 	autoConnectView->setModel( &m_autoConnect );
 
 	QVBoxLayout * layout = new QVBoxLayout();
 	layout->addWidget( m_scrollArea );
 	layout->addWidget( m_addButton );
+	layout->addLayout( autoConnectButtons );
 	layout->addWidget( autoConnectView );
 
 	this->setLayout( layout );
@@ -149,7 +166,7 @@ void ControllerRackView::deleteController( ControllerView * _view )
 		msgBox.setIcon( QMessageBox::Question );
 		msgBox.setWindowTitle( tr("Confirm Delete") );
 		msgBox.setText( tr("Confirm delete? There are existing connection(s) "
-				"associated with this controller. There is no way to undo.") );
+				"associated with this controller." ) + " " + tr( "There is no way to undo.") );
 		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 		if( msgBox.exec() != QMessageBox::Ok )
 		{
@@ -235,15 +252,14 @@ void ControllerRackView::connectUncontrolledAutomationTrack()
 
 	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
 	{
-		if( ( *it )->type() != Track::AutomationTrack ||
-			( *it )->numOfTCOs() == 0 )
+		if( ( *it )->type() != Track::AutomationTrack )
 		{
 			continue;
 		}
 
 		AutomationPattern * pattern = nullptr;
 		const Track::tcoVector & v = ( *it )->getTCOs();
-		bool isControlled = false;
+		bool isControlledOrNotRecording = false;
 
 		for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
 		{
@@ -254,14 +270,14 @@ void ControllerRackView::connectUncontrolledAutomationTrack()
 				continue;
 			}
 
-			if( pattern->isControlled() )
+			if( pattern->isControlled() || !pattern->isRecording() )
 			{
-				isControlled = true;
+				isControlledOrNotRecording = true;
 				break;
 			}
 		}
 
-		if( !pattern || isControlled )
+		if( !pattern || isControlledOrNotRecording )
 		{
 			continue;
 		}
@@ -274,10 +290,60 @@ void ControllerRackView::connectUncontrolledAutomationTrack()
 
 		ControllerConnection * cc = new ControllerConnection( mc );
 		pattern->connectController( cc );
-		pattern->setRecording( true );
+	}
+}
 
+
+
+
+void ControllerRackView::disconnectAutomation()
+{
+	QMessageBox msgBox;
+	msgBox.setIcon( QMessageBox::Question );
+	msgBox.setWindowTitle( tr("Disconnect automation") );
+	msgBox.setText( tr("Disconnect all controllers from existing automation?") + " " +
+			tr("There is no way to undo.") );
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	if( msgBox.exec() != QMessageBox::Ok )
+	{
 		return;
 	}
+
+	TrackContainer::TrackList l = Engine::getSong()->tracks();
+
+	for( TrackContainer::TrackList::ConstIterator it = l.begin(); it != l.end(); ++it )
+	{
+		if( ( *it )->type() != Track::AutomationTrack )
+		{
+			continue;
+		}
+
+		AutomationPattern * pattern = nullptr;
+		const Track::tcoVector & v = ( *it )->getTCOs();
+
+		for( Track::tcoVector::ConstIterator j = v.begin(); j != v.end(); ++j )
+		{
+			pattern = dynamic_cast<AutomationPattern *>( *j );
+
+			if( pattern )
+			{
+				pattern->disconnectController();
+			}
+		}
+	}
+}
+
+
+
+
+void ControllerRackView::resetAutoConnect()
+{
+	delete m_midiController;
+
+	m_midiController = new AutoDetectMidiController( Engine::getSong() );
+
+	connect( m_midiController, SIGNAL( valueChanged() ),
+				this, SLOT( connectUncontrolledAutomationTrack() ) );
 }
 
 

@@ -173,6 +173,7 @@ public:
 
 	bool isControlled() const;
 	void connectController( ControllerConnection * cc );
+	void disconnectController();
 
 public slots:
 	void clear();
