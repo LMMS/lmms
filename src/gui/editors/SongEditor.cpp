@@ -318,7 +318,7 @@ void SongEditor::keyPressEvent( QKeyEvent * ke )
 						ke->key() == Qt::Key_Insert )
 	{
 		m_song->insertBar();
-    #ifdef Q_OS_MACOS
+    #ifdef LMMS_BUILD_APPLE
         if( /*_ke->modifiers() & Qt::ShiftModifier*/
            gui->mainWindow()->isShiftPressed() == true &&
                             ke->key() == Qt::Key_Enter || ke->key() == Qt::Key_Return )
