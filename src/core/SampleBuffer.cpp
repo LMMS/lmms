@@ -279,6 +279,11 @@ SampleBuffer::DataVector
 SampleBuffer::resampleData (const DataVector &inputData, sample_rate_t inputSampleRate,
 							sample_rate_t requiredSampleRate)
 {
+	if (inputData.empty())
+	{
+		// no need to resample empty data
+		return SampleBuffer::DataVector{};
+	}
 	const f_cnt_t dst_frames = static_cast<f_cnt_t>( inputData.size ()/
 					(float) inputSampleRate * (float) requiredSampleRate );
 	DataVector outputData(dst_frames);
