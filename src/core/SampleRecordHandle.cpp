@@ -54,6 +54,7 @@ SampleRecordHandle::~SampleRecordHandle()
 		// force-write it into the buffer.
 
 		if (m_framesRecorded == 0) {
+			m_tco->sampleBuffer ()->resetAudioFile();
 			m_tco->sampleBuffer ()->resetData (std::move (m_currentBuffer),
 											   Engine::mixer ()->inputSampleRate (),
 											   false);
@@ -93,6 +94,7 @@ void SampleRecordHandle::play( sampleFrame * /*_working_buffer*/ )
 	// If we could not do that. We'll do that next time.
 	if (m_framesRecorded == 0) {
 		// Make sure we don't have the previous data.
+		m_tco->sampleBuffer ()->resetAudioFile();
 		dataWrittenIntoSampleBuffer = m_tco->sampleBuffer ()->tryResetData (std::move (m_currentBuffer),
 													   Engine::mixer ()->inputSampleRate (),
 													   false);

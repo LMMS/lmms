@@ -148,7 +148,6 @@ void SampleBuffer::internalAddData(const DataVector &vector, sample_rate_t sampl
 
 void SampleBuffer::internalResetData(DataVector &&newData, sample_rate_t dataSampleRate) {
 	Q_UNUSED(dataSampleRate);
-	m_audioFile = QString();
 	m_data = std::move (newData);
 }
 
@@ -1046,6 +1045,7 @@ void SampleBuffer::loadFromBase64( const QString & _data , sample_rate_t sampleR
 
 	delete[] dst;
 
+	resetAudioFile();
 	resetData (std::move(input),
 			   sampleRate);
 }
