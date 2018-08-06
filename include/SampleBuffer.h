@@ -134,6 +134,11 @@ public:
 
 	QPair<QPolygonF, QPolygonF>  visualizeToPoly( const QRect & _dr, const QRect & _clip, f_cnt_t _from_frame = 0, f_cnt_t _to_frame = 0) const;
 
+	inline void resetAudioFile()
+	{
+		m_audioFile = "";
+	}
+
 	inline const QString & audioFile() const
 	{
 		return m_audioFile;
