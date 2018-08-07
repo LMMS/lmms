@@ -1995,6 +1995,8 @@ int main( int _argc, char * * _argv )
 		return -1;
 	}
 
+        CoInitialize(nullptr);
+
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
 	// (non-portable) initialization of statically linked pthread library
@@ -2110,6 +2112,7 @@ int main( int _argc, char * * _argv )
 
 	delete __plugin;
 
+	CoUninitialize();
 
 #ifdef LMMS_BUILD_WIN32
 #ifndef __WINPTHREADS_VERSION
