@@ -51,6 +51,10 @@ ELSE()
 	SET(STRIP                       ${MINGW_TOOL_PREFIX}strip)
 	SET(WINDRES                     ${MINGW_TOOL_PREFIX}windres)
 	SET(ENV{PKG_CONFIG}             ${MINGW_TOOL_PREFIX}pkg-config)
+	IF(CMAKE_VERSION LESS 3)
+		SET(PKG_CONFIG_EXECUTABLE       $ENV{PKG_CONFIG})
+		SET(PKG_CONFIG_FOUND            TRUE)
+	ENDIF()
 	
 	# Search for programs in the build host directories
 	SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
