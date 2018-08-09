@@ -236,8 +236,7 @@ TimePos AutomationPattern::putControlPoint(timeMap::const_iterator it,
 						const int time, const float _value)
 {
 	m_controlPoints.remove( it.key() );
-	m_controlPoints[it.key()].insert( 0, time );
-	m_controlPoints[it.key()].insert( 1, _value );
+	m_controlPoints[it.key()] = {time, _value};
 	clampControlPoints();
 	return it.key();
 }
@@ -348,8 +347,8 @@ TimePos AutomationPattern::setDragValue( const TimePos & time,
 		if ( m_timeMap.contains( newTime ) )
 		{
 			// Set the offset for the control point, so it gets dragged around with the automation point
-			m_controlPointDragOffset[0] = (float)m_controlPoints[newTime][0] - (float)newTime;
-			m_controlPointDragOffset[1] = m_controlPoints[newTime][1] - m_timeMap[newTime];
+			m_controlPointDragOffset[0] = (float)m_controlPoints[newTime].first - (float)newTime;
+			m_controlPointDragOffset[1] = m_controlPoints[newTime].second - m_timeMap[newTime];
 		}
 		else
 		{
@@ -513,12 +512,12 @@ float AutomationPattern::valueAt( timeMap::const_iterator v, int offset ) const
 
 		// The x values are essentially twice the distance from their control points
 		// to make up for their range being limited.
-		int targetX1 = ( m_controlPoints[v.key()].at(0) - v.key() ) * 2;
-		int targetX2 = ( 3 * (v+1).key() - 2 * m_controlPoints[(v+1).key()].at(0) - v.key() );
+		int targetX1 = ( m_controlPoints[v.key()].first - v.key() ) * 2;
+		int targetX2 = ( 3 * (v+1).key() - 2 * m_controlPoints[(v+1).key()].first - v.key() );
 		// The y values are the actual y values. Maybe this should be doubled,
 		// but it doesn't seem necessary to me.
-		float targetY1 = m_controlPoints[v.key()].at(1);
-		float targetY2 = 2*(v+1).value() - m_controlPoints[(v+1).key()].at(1);
+		float targetY1 = m_controlPoints[v.key()].second;
+		float targetY2 = 2*(v+1).value() - m_controlPoints[(v+1).key()].second;
 
 		// To find the y value on the curve at a certain x, we first have to find the t (between 0 and 1) that gives the x
 		float t = 0;
@@ -589,15 +588,15 @@ void AutomationPattern::flipY( int min, int max )
 		{
 			tempValue = valueAt( ( iterate + i ).key() ) * -1;
 			putValue( TimePos( (iterate + i).key() ) , tempValue, false);
-			tempValue = m_controlPoints[(iterate + i).key()][1] * -1;
-			m_controlPoints[(iterate + i).key()][1] = tempValue;
+			tempValue = m_controlPoints[(iterate + i).key()].second * -1;
+			m_controlPoints[(iterate + i).key()].second = tempValue;
 		}
 		else
 		{
 			tempValue = max - valueAt( ( iterate + i ).key() );
 			putValue( TimePos( (iterate + i).key() ) , tempValue, false);
-			tempValue = max - m_controlPoints[(iterate + i).key()][1];
-			m_controlPoints[(iterate + i).key()][1] = tempValue;
+			tempValue = max - m_controlPoints[(iterate + i).key()].second;
+			m_controlPoints[(iterate + i).key()].second = tempValue;
 		}
 	}
 
@@ -644,9 +643,9 @@ void AutomationPattern::flipX( int length )
 				tempValue = valueAt( ( iterate + i ).key() );
 				TimePos newTime = TimePos( length - ( iterate + i ).key() );
 
-				int newControlPointX = -( iterate + i ).key() + m_controlPoints[( iterate + i ).key()][0] + newTime;
-				tempControlPoints[newTime].insert( 0, newControlPointX );
-				tempControlPoints[newTime].insert( 1, 2*tempValue - m_controlPoints[( iterate + i ).key()][1] );
+				int newControlPointX = -( iterate + i ).key() + m_controlPoints[( iterate + i ).key()].first + newTime;
+				tempControlPoints[newTime] = {newControlPointX,
+						2*tempValue - m_controlPoints[( iterate + i ).key()].second};
 
 				tempMap[newTime] = tempValue;
 			}
@@ -658,9 +657,9 @@ void AutomationPattern::flipX( int length )
 				tempValue = valueAt( ( iterate + i ).key() );
 				TimePos newTime;
 
-				int newControlPointX = -( iterate + i ).key() + m_controlPoints[( iterate + i ).key()][0] + newTime;
-				tempControlPoints[newTime].insert( 0, newControlPointX );
-				tempControlPoints[newTime].insert( 1, 2*tempValue - m_controlPoints[( iterate + i ).key()][1] );
+				int newControlPointX = -( iterate + i ).key() + m_controlPoints[( iterate + i ).key()].first + newTime;
+				tempControlPoints[newTime] = {newControlPointX,
+						2*tempValue - m_controlPoints[( iterate + i ).key()].second};
 
 				if ( ( iterate + i ).key() <= length )
 				{
@@ -681,11 +680,11 @@ void AutomationPattern::flipX( int length )
 			tempValue = valueAt( ( iterate + i ).key() );
 			cleanObjects();
 			TimePos newTime = TimePos( realLength - ( iterate + i ).key() );
-			int newControlPointX = -( iterate + i ).key() + m_controlPoints[( iterate + i ).key()][0] + newTime;
+			int newControlPointX = -( iterate + i ).key() + m_controlPoints[( iterate + i ).key()].first + newTime;
 
 			tempMap[newTime] = tempValue;
-			tempControlPoints[newTime].insert( 0, newControlPointX );
-			tempControlPoints[newTime].insert( 1, 2*tempValue - m_controlPoints[( iterate + i ).key()][1] );
+			tempControlPoints[newTime] = {newControlPointX,
+					2*tempValue - m_controlPoints[( iterate + i ).key()].second};
 		}
 	}
 
@@ -730,8 +729,8 @@ void AutomationPattern::saveSettings( QDomDocument & _doc, QDomElement & _this )
 	{
 		QDomElement element = _doc.createElement( "ctrlpnt" );
 		element.setAttribute( "pos", it.key() );
-		element.setAttribute( "value1", it.value()[0] );
-		element.setAttribute( "value2", it.value()[1] );
+		element.setAttribute( "value1", it.value().first );
+		element.setAttribute( "value2", it.value().second );
 		_this.appendChild( element );
 	}
 
@@ -777,8 +776,8 @@ void AutomationPattern::loadSettings( const QDomElement & _this )
 		}
 		else if( element.tagName() == "ctrlpnt" )
 		{
-			m_controlPoints[element.attribute( "pos" ).toInt()].insert( 0, element.attribute( "value1" ).toInt() );
-			m_controlPoints[element.attribute( "pos" ).toInt()].insert( 1, element.attribute( "value2" ).toFloat() );
+			m_controlPoints[element.attribute( "pos" ).toInt()] = {element.attribute( "value1" ).toInt(),
+					element.attribute( "value2" ).toFloat()};
 		}
 		else if( element.tagName() == "object" )
 		{
@@ -832,21 +831,21 @@ void AutomationPattern::clampControlPoints(bool clampVertical)
 	timeMap::const_iterator it;
 	for (it = m_timeMap.begin(); it != m_timeMap.end(); it++)
 	{
-		int new_x = m_controlPoints[it.key()][0];
-		float new_y = m_controlPoints[it.key()][1];
+		int new_x = m_controlPoints[it.key()].first;
+		float new_y = m_controlPoints[it.key()].second;
 		// Clamp X positions
 		// If the control point x is less than its automation point
-		if ( it.key() > m_controlPoints[it.key()][0] )
+		if ( it.key() > new_x )
 		{
 			new_x = it.key();
 		}
 		// The control point x must not pass the midpoints of its automation point and the automation points
 		// its left and right
-		else if ( it != m_timeMap.begin() && it.key() * 2 - m_controlPoints[it.key()][0] < ( (it-1).key() + it.key() ) / 2 )
+		else if ( it != m_timeMap.begin() && it.key() * 2 - new_x < ( (it-1).key() + it.key() ) / 2 )
 		{
 			new_x = it.key() * 2 - ( (it-1).key() + it.key() )/2;
 		}
-		else if ( it+1 != m_timeMap.end() && m_controlPoints[it.key()][0] > ( (it+1).key() + it.key() )/2 )
+		else if ( it+1 != m_timeMap.end() && new_x > ( (it+1).key() + it.key() )/2 )
 		{
 			new_x = ( (it+1).key() + it.key() )/2;
 		}
@@ -855,20 +854,20 @@ void AutomationPattern::clampControlPoints(bool clampVertical)
 		{
 			// Clamp y positions between the top and bottom of the screen
 			// Clamp the right control point (keep in mind the last control point isn't clamped)
-			if ( it+1 != m_timeMap.end() && m_controlPoints[it.key()][1] > getMax() )
+			if ( it+1 != m_timeMap.end() && new_y > getMax() )
 			{
 				new_y = getMax();
 			}
-			else if ( it+1 != m_timeMap.end() && m_controlPoints[it.key()][1] < getMin() )
+			else if ( it+1 != m_timeMap.end() && new_y < getMin() )
 			{
 				new_y = getMin();
 			}
 			// Clamp the left control point (keep in mind the first control point isn't clamped)
-			if ( it != m_timeMap.begin() && 2 * it.value() - m_controlPoints[it.key()][1] > getMax() )
+			if ( it != m_timeMap.begin() && 2 * it.value() - new_y > getMax() )
 			{
 				new_y = 2 * it.value() - getMax();
 			}
-			else if ( it != m_timeMap.begin() && 2 * it.value() - m_controlPoints[it.key()][1] < getMin() )
+			else if ( it != m_timeMap.begin() && 2 * it.value() - new_y < getMin() )
 			{
 				new_y =  2 * it.value() - getMin();
 			}
@@ -876,8 +875,7 @@ void AutomationPattern::clampControlPoints(bool clampVertical)
 
 		m_controlPoints.remove( it.key() );
 
-		m_controlPoints[it.key()].insert( 0, new_x );
-		m_controlPoints[it.key()].insert( 1, new_y );
+		m_controlPoints[it.key()] = {new_x, new_y};
 	}
 }
 
@@ -1142,8 +1140,7 @@ void AutomationPattern::cleanControlPoints()
 		}
 		else
 		{
-			m_controlPoints[it.key()].insert( 0, it.key() + 50 );
-			m_controlPoints[it.key()].insert( 1, it.value() );
+			m_controlPoints[it.key()] = {it.key() + 50, it.value()};
 		}
 	}
 

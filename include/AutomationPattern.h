@@ -27,8 +27,9 @@
 #ifndef AUTOMATION_PATTERN_H
 #define AUTOMATION_PATTERN_H
 
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
+#include <QMap>
+#include <QPair>
+#include <QPointer>
 
 #include "TrackContentObject.h"
 
@@ -51,7 +52,7 @@ public:
 	} ;
 
 	typedef QMap<int, float> timeMap;
-	typedef QMap<int, QVector<float> > controlPointTimeMap;
+	typedef QMap<int, QPair<int, float> > controlPointTimeMap;
 	typedef QVector<QPointer<AutomatableModel> > objectVector;
 
 	AutomationPattern( AutomationTrack * _auto_track );

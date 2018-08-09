@@ -540,10 +540,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				if ( m_pattern->progressionType() == AutomationPattern::BezierProgression &&
 					mouseEvent->button() == Qt::LeftButton &&
 					m_editMode == DRAW &&
-					yCoordOfLevel(level) <= yCoordOfLevel(control_points[it.key()][1]) + 16 &&
-					yCoordOfLevel(level) >= yCoordOfLevel(control_points[it.key()][1]) - 16 &&
-					xCoordOfTick(pos_ticks) <= xCoordOfTick(control_points[it.key()][0]) + 16 &&
-					xCoordOfTick(pos_ticks) >= xCoordOfTick(control_points[it.key()][0]) - 16 )
+					yCoordOfLevel(level) <= yCoordOfLevel(control_points[it.key()].second) + 16 &&
+					yCoordOfLevel(level) >= yCoordOfLevel(control_points[it.key()].second) - 16 &&
+					xCoordOfTick(pos_ticks) <= xCoordOfTick(control_points[it.key()].first) + 16 &&
+					xCoordOfTick(pos_ticks) >= xCoordOfTick(control_points[it.key()].first) - 16 )
 				{
 					controlPoint = true;
 					m_pattern->flipControlPoint(false);
@@ -553,10 +553,10 @@ void AutomationEditor::mousePressEvent( QMouseEvent* mouseEvent )
 				else if ( m_pattern->progressionType() == AutomationPattern::BezierProgression &&
 					mouseEvent->button() == Qt::LeftButton &&
 					m_editMode == DRAW &&
-					yCoordOfLevel(level) <= yCoordOfLevel(2 * it.value() - control_points[it.key()][1]) + 16 &&
-					yCoordOfLevel(level) >= yCoordOfLevel(2 * it.value() - control_points[it.key()][1]) - 16 &&
-					xCoordOfTick(pos_ticks) <= xCoordOfTick(2 * it.key() - control_points[it.key()][0]) + 16 &&
-					xCoordOfTick(pos_ticks) >= xCoordOfTick(2 * it.key() - control_points[it.key()][0]) - 16 )
+					yCoordOfLevel(level) <= yCoordOfLevel(2 * it.value() - control_points[it.key()].second) + 16 &&
+					yCoordOfLevel(level) >= yCoordOfLevel(2 * it.value() - control_points[it.key()].second) - 16 &&
+					xCoordOfTick(pos_ticks) <= xCoordOfTick(2 * it.key() - control_points[it.key()].first) + 16 &&
+					xCoordOfTick(pos_ticks) >= xCoordOfTick(2 * it.key() - control_points[it.key()].first) - 16 )
 				{
 					controlPoint = true;
 					m_pattern->flipControlPoint(true);
@@ -1212,8 +1212,8 @@ inline void AutomationEditor::drawAutomationPoint( QPainter & p, timeMap::iterat
 inline void AutomationEditor::drawControlPoint( QPainter & p, controlPointTimeMap::iterator it , float key_y )
 {
 	// The x and y of the "real" point (to the right of the automation point)
-	int x = xCoordOfTick( it.value()[0] );
-	int y = yCoordOfLevel( it.value()[1] );
+	int x = xCoordOfTick( it.value().first );
+	int y = yCoordOfLevel( it.value().second );
 	// The x and y of the "fake" point (to the left of the automation point)
 	const int outerRadius = qBound( 2, ( m_ppb * AutomationPattern::quantization() ) / 576, 5 );
 	p.setPen( QPen( controlPointColor().lighter( 200 ) ) );
