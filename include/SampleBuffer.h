@@ -337,13 +337,14 @@ protected:
 
 	static DataVector convertIntToFloat(int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 
-	static DataVector decodeSampleSF(QString _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate, QString &loadingWarning);
+	static DataVector decodeSampleSF(QString _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate, QString &loadingWarning, bool &isError);
 #ifdef LMMS_HAVE_OGGVORBIS
-	static DataVector decodeSampleOGGVorbis( QString _f,
-						ch_cnt_t & _channels,
-						sample_rate_t & _sample_rate);
+	static DataVector decodeSampleOGGVorbis(QString _f,
+											ch_cnt_t & _channels,
+											sample_rate_t & _sample_rate,
+											bool &isError);
 #endif
-	static DataVector decodeSampleDS( QString _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
+	static DataVector decodeSampleDS(QString _f, ch_cnt_t & _channels, sample_rate_t & _sample_rate);
 
 	inline sampleFrame * data()
 	{

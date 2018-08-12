@@ -31,6 +31,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QDomElement>
+#include <QDebug>
 
 
 #include <sndfile.h>
@@ -207,27 +208,27 @@ void SampleBuffer::changeAudioFile(QString audioFile)
 		// decoder first if filename extension matches "ogg"
 		if( fileInfo.suffix() == "ogg" )
 		{
-			fileData = decodeSampleOGGVorbis( file, channels, samplerate );
+			fileLoadError = false;
+			fileData = decodeSampleOGGVorbis( file, channels, samplerate, fileLoadError);
 		}
 #endif
-		if(fileData.empty ())
+		if( fileInfo.suffix() != "ogg" || fileLoadError)
 		{
-			fileData = decodeSampleSF( file, channels, samplerate, loadingWarning );
+			fileLoadError = false;
+			fileData = decodeSampleSF( file, channels, samplerate, loadingWarning, fileLoadError);
 		}
 #ifdef LMMS_HAVE_OGGVORBIS
-		if( fileData.empty () )
+		if( fileLoadError )
 		{
-			fileData = decodeSampleOGGVorbis( file, channels, samplerate );
+			fileLoadError = false;
+			fileData = decodeSampleOGGVorbis( file, channels, samplerate, fileLoadError);
 		}
 #endif
-		if( fileData.empty () )
+		if( fileLoadError )
 		{
-			fileData = decodeSampleDS( file, channels, samplerate );
+			fileLoadError = false;
+			fileData = decodeSampleDS( file, channels, samplerate);
 		}
-	}
-
-	if (fileData.empty ()) {
-		fileLoadError = true;
 	}
 
 	if (! fileLoadError) {
@@ -319,7 +320,8 @@ SampleBuffer::resampleData (const DataVector &inputData, sample_rate_t inputSamp
 SampleBuffer::DataVector SampleBuffer::decodeSampleSF( QString _f,
 					ch_cnt_t & _channels,
 					sample_rate_t &_samplerate,
-					QString &loadingWarning)
+					QString &loadingWarning,
+					bool &isError)
 {
 	SNDFILE * snd_file;
 	SF_INFO sf_info;
@@ -372,6 +374,7 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleSF( QString _f,
 				"sample %s: %s", _f, sf_strerror( NULL ) );
 #endif
 		loadingWarning = tr("SoundFile: Could not load: %1").arg(sf_strerror( NULL ));
+		isError = true;
 	}
 	f.close();
 
@@ -435,7 +438,8 @@ long qfileTellCallback( void * _udata )
 
 SampleBuffer::DataVector SampleBuffer::decodeSampleOGGVorbis(QString _f,
 						ch_cnt_t & _channels,
-						sample_rate_t & _samplerate)
+						sample_rate_t & _samplerate,
+						bool &isError)
 {
 	static ov_callbacks callbacks =
 	{
@@ -453,6 +457,7 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleOGGVorbis(QString _f,
 	if( f->open( QFile::ReadOnly ) == false )
 	{
 		delete f;
+		isError = true;
 		return {};
 	}
 
@@ -484,6 +489,8 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleOGGVorbis(QString _f,
 				break;
 		}
 		delete f;
+
+		isError = true;
 		return {};
 	}
 
@@ -519,6 +526,10 @@ SampleBuffer::DataVector SampleBuffer::decodeSampleOGGVorbis(QString _f,
 	if ( frames > 0 && _buf != NULL )
 	{
 		return convertIntToFloat ( _buf, frames, _channels);
+	}
+	else if (frames < 0)
+	{
+		isError = true;
 	}
 
 	return {};
