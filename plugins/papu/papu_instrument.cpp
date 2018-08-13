@@ -276,9 +276,6 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data += m_ch4SweepStepLengthModel.value();
 		papu->write_register( 0xff21, data );
 
-		//channel 4 init
-		papu->write_register( 0xff23, 128 );
-
 		_n->m_pluginData = papu;
 	}
 
@@ -380,6 +377,10 @@ void papuInstrument::playNote( NotePlayHandle * _n,
 		data = data << 3;
 		data += ropt;
 		papu->write_register( 0xff22, data );
+
+		//channel 4 init
+		papu->write_register( 0xff23, 128 );
+
 	}
 
 	int const buf_size = 2048;
