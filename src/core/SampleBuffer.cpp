@@ -1184,7 +1184,7 @@ bool SampleBuffer::tryBeginBufferChange(bool shouldLock, bool shouldLockMixer) {
 	if (shouldLock) {
 		result = m_varLock.tryLockForWrite();
 
-		if (! result)
+		if (!result && shouldLockMixer)
 			Engine::mixer ()->doneChangeInModel();
 	}
 
