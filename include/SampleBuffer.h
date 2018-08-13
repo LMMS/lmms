@@ -229,6 +229,9 @@ public:
 	inline sample_t userWaveSample( const float _sample ) const
 	{
 		f_cnt_t dataFrames = internalFrames();
+		if (dataFrames == 0)
+			return 0;
+
 		const sampleFrame * data = this->data();
 		const float frame = _sample * dataFrames;
 		f_cnt_t f1 = static_cast<f_cnt_t>( frame ) % dataFrames;
