@@ -400,8 +400,7 @@ IF(LMMS_BUILD_WIN32)
 	IF (WANT_JACK)
 	INSTALL(CODE
 			"FILE(DOWNLOAD
-			\"https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_VERSION}/\
-			Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\"
+			\"https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_VERSION}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\"
 			\"${CMAKE_BINARY_DIR}/Jack_v${JACK_INSTALLER_VERSION}_32_setup.exe\"
 			)"
 		)
