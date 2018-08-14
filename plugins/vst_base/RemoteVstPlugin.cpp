@@ -147,6 +147,7 @@ public:
 	// set given sample-rate for plugin
 	virtual void updateSampleRate()
 	{
+		SuspendPlugin suspend( this );
 		pluginDispatch( effSetSampleRate, 0, 0,
 						NULL, (float) sampleRate() );
 	}
@@ -154,9 +155,20 @@ public:
 	// set given buffer-size for plugin
 	virtual void updateBufferSize()
 	{
+		SuspendPlugin suspend( this );
 		pluginDispatch( effSetBlockSize, 0, bufferSize() );
 	}
 
+	void setResumed( bool resumed )
+	{
+		m_resumed = resumed;
+		pluginDispatch( effMainsChanged, 0, resumed ? 1 : 0 );
+	}
+
+	inline bool isResumed() const
+	{
+		return m_resumed;
+	}
 
 	inline bool isInitialized() const
 	{
@@ -309,6 +321,24 @@ private:
 		ClosePlugin
 	} ;
 
+	struct SuspendPlugin {
+		SuspendPlugin( RemoteVstPlugin * plugin ) :
+			m_plugin( plugin ),
+			m_resumed( plugin->isResumed() )
+		{
+			if( m_resumed ) { m_plugin->setResumed( false ); }
+		}
+
+		~SuspendPlugin()
+		{
+			if( m_resumed ) { m_plugin->setResumed( true ); }
+		}
+
+	private:
+		RemoteVstPlugin * m_plugin;
+		bool m_resumed;
+	};
+
 	// callback used by plugin for being able to communicate with it's host
 	static intptr_t hostCallback( AEffect * _effect, int32_t _opcode,
 					int32_t _index, intptr_t _value,
@@ -339,6 +369,7 @@ private:
 	int m_windowHeight;
 
 	bool m_initialized;
+	bool m_resumed;
 
 	bool m_processing;
 
@@ -390,6 +421,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 	m_windowWidth( 0 ),
 	m_windowHeight( 0 ),
 	m_initialized( false ),
+	m_resumed( false ),
 	m_processing( false ),
 	m_messageList(),
 	m_shouldGiveIdle( false ),
@@ -470,7 +502,7 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 RemoteVstPlugin::~RemoteVstPlugin()
 {
 	destroyEditor();
-	pluginDispatch( effMainsChanged, 0, 0 );
+	setResumed( false );
 	pluginDispatch( effClose );
 #ifndef USE_QT_SHMEM
 	// detach shared memory segment
@@ -648,7 +680,7 @@ void RemoteVstPlugin::init( const std::string & _plugin_file )
 	pluginDispatch( effSetProgram, 0, 0 ); */
 	// request rate and blocksize
 
-	pluginDispatch( effMainsChanged, 0, 1 );
+	setResumed( true );
 
 	debugMessage( "creating editor\n" );
 	initEditor();
