@@ -193,6 +193,8 @@ void Song::savePos()
 
 void Song::processNextBuffer()
 {
+	m_vstSyncController.setPlaybackJumped( false );
+
 	// if not playing, nothing to do
 	if( m_playing == false )
 	{
@@ -262,8 +264,19 @@ void Song::processNextBuffer()
 				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
+
+			m_vstSyncController.setAbsolutePosition(
+						tl->loopBegin().getTicks() );
+			m_vstSyncController.setPlaybackJumped( true );
+
 			emit updateSampleTracks();
 		}
+	}
+
+	if( m_playPos[m_playMode].jumped() )
+	{
+		m_vstSyncController.setPlaybackJumped( true );
+		m_playPos[m_playMode].setJumped( false );
 	}
 
 	f_cnt_t framesPlayed = 0;
@@ -320,6 +333,7 @@ void Song::processNextBuffer()
 						( ticks * 60 * 1000 / 48 ) / getTempo();
 
 					m_vstSyncController.setAbsolutePosition( ticks );
+					m_vstSyncController.setPlaybackJumped( true );
 				}
 			}
 			m_playPos[m_playMode].setTicks( ticks );
@@ -334,11 +348,14 @@ void Song::processNextBuffer()
 				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
-					m_playPos[m_playMode].setTicks( tl->loopBegin().getTicks() );
+					ticks = tl->loopBegin().getTicks();
+					m_playPos[m_playMode].setTicks( ticks );
 
 					m_elapsedMilliSeconds =
-						( ( tl->loopBegin().getTicks() ) * 60 * 1000 / 48 ) /
-							getTempo();
+						( ticks * 60 * 1000 / 48 ) / getTempo();
+
+					m_vstSyncController.setAbsolutePosition( ticks );
+					m_vstSyncController.setPlaybackJumped( true );
 				}
 				else if( m_playPos[m_playMode] == tl->loopEnd() - 1 )
 				{
@@ -609,6 +626,7 @@ void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 			getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
+	m_playPos[playMode].setJumped( true );
 
 // send a signal if playposition changes during playback
 	if( isPlaying() ) 
