@@ -118,6 +118,7 @@ class RemoteVstPlugin;
 RemoteVstPlugin * __plugin = NULL;
 
 HWND __MessageHwnd = NULL;
+DWORD __processingThreadId = 0;
 
 
 
@@ -251,7 +252,7 @@ public:
 	}
 
 	// has to be called as soon as input- or output-count changes
-	void updateInOutCount();
+	int updateInOutCount();
 
 	inline void lockShm()
 	{
@@ -1438,8 +1439,21 @@ void RemoteVstPlugin::loadChunkFromFile( const std::string & _file, int _len )
 
 
 
-void RemoteVstPlugin::updateInOutCount()
+int RemoteVstPlugin::updateInOutCount()
 {
+	if( inputCount() == RemotePluginClient::inputCount() &&
+		outputCount() == RemotePluginClient::outputCount() )
+	{
+		return 1;
+	}
+	
+	if( GetCurrentThreadId() == __processingThreadId )
+	{
+		debugMessage( "Plugin requested I/O change from processing "
+			"thread. Request denied; stability may suffer.\n" );
+		return 0;
+	}
+
 	lockShm();
 
 	setShmIsValid( false );
@@ -1467,6 +1481,8 @@ void RemoteVstPlugin::updateInOutCount()
 	{
 		m_outputs = new float * [outputCount()];
 	}
+
+	return 1;
 }
 
 
@@ -1611,10 +1627,9 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			return 0;
 
 		case audioMasterIOChanged:
-			__plugin->updateInOutCount();
 			SHOW_CALLBACK( "amc: audioMasterIOChanged\n" );
-			// numInputs and/or numOutputs has changed
-			return 0;
+			// numInputs, numOutputs, and/or latency has changed
+			return __plugin->updateInOutCount();
 
 #ifdef OLD_VST_SDK
 		case audioMasterWantMidi:
@@ -1897,6 +1912,8 @@ void RemoteVstPlugin::processUIThreadMessages()
 
 DWORD WINAPI RemoteVstPlugin::processingThread( LPVOID _param )
 {
+	__processingThreadId = GetCurrentThreadId();
+
 	RemoteVstPlugin * _this = static_cast<RemoteVstPlugin *>( _param );
 
 	RemotePluginClient::message m;
