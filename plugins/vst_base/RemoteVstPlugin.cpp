@@ -1726,6 +1726,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 #endif
 
 		case audioMasterSizeWindow:
+		{
 			SHOW_CALLBACK( "amc: audioMasterSizeWindow\n" );
 			if( __plugin->m_window == 0 )
 			{
@@ -1733,8 +1734,13 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 			}
 			__plugin->m_windowWidth = _index;
 			__plugin->m_windowHeight = _value;
-			SetWindowPos( __plugin->m_window, 0, 0, 0,
-					_index + 8, _value + 26,
+			HWND window = __plugin->m_window;
+			DWORD dwStyle = GetWindowLongPtr( window, GWL_STYLE );
+			RECT windowSize = { 0, 0, (int) _index, (int) _value };
+			AdjustWindowRect( &windowSize, dwStyle, false );
+			SetWindowPos( window, 0, 0, 0,
+					windowSize.right - windowSize.left,
+					windowSize.bottom - windowSize.top,
 					SWP_NOACTIVATE | SWP_NOMOVE |
 					SWP_NOOWNERZORDER | SWP_NOZORDER );
 			__plugin->sendMessage(
@@ -1742,6 +1748,7 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 					addInt( __plugin->m_windowWidth ).
 					addInt( __plugin->m_windowHeight ) );
 			return 1;
+		}
 
 		case audioMasterGetSampleRate:
 			SHOW_CALLBACK( "amc: audioMasterGetSampleRate\n" );
