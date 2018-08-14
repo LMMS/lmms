@@ -396,6 +396,7 @@ private:
 	{
 		float lastppqPos;
 		float m_Timestamp;
+		int32_t m_lastFlags;
 	} ;
 
 	in * m_in;
@@ -478,12 +479,14 @@ RemoteVstPlugin::RemoteVstPlugin( const char * socketPath ) :
 		m_vstSyncData->ppqPos = 0;
 		m_vstSyncData->isCycle = false;
 		m_vstSyncData->hasSHM = false;
+		m_vstSyncData->m_playbackJumped = false;
 		m_vstSyncData->m_sampleRate = sampleRate();
 	}
 
 	m_in = ( in* ) new char[ sizeof( in ) ];
 	m_in->lastppqPos = 0;
 	m_in->m_Timestamp = -1;
+	m_in->m_lastFlags = 0;
 
 	// process until we have loaded the plugin
 	while( 1 )
@@ -1588,7 +1591,6 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 							__plugin->m_in->m_Timestamp )
 			{
 				_timeInfo.ppqPos = __plugin->m_vstSyncData->ppqPos;
-				_timeInfo.flags |= kVstTransportChanged;
 				__plugin->m_in->lastppqPos = __plugin->m_vstSyncData->ppqPos;
 				__plugin->m_in->m_Timestamp = __plugin->m_vstSyncData->ppqPos;
 			}
@@ -1614,6 +1616,14 @@ intptr_t RemoteVstPlugin::hostCallback( AEffect * _effect, int32_t _opcode,
 				/ (float) __plugin->m_vstSyncData->timeSigDenom );
 
 			_timeInfo.flags |= kVstBarsValid;
+
+			if( ( _timeInfo.flags & ( kVstTransportPlaying | kVstTransportCycleActive ) ) !=
+				( __plugin->m_in->m_lastFlags & ( kVstTransportPlaying | kVstTransportCycleActive ) )
+				|| __plugin->m_vstSyncData->m_playbackJumped )
+			{
+				_timeInfo.flags |= kVstTransportChanged;
+			}
+			__plugin->m_in->m_lastFlags = _timeInfo.flags;
 
 #ifdef LMMS_BUILD_WIN64
 			return (long long) &_timeInfo;

@@ -61,6 +61,11 @@ public:
 		m_syncData->isCycle = false;
 	}
 
+	void setPlaybackJumped( bool jumped )
+	{
+		m_syncData->m_playbackJumped = jumped;
+	}
+
 	void update();
 
 
@@ -79,6 +84,7 @@ private:
 		bool hasSHM;
 		float cycleStart;
 		float cycleEnd;
+		bool m_playbackJumped;
 		int m_bufferSize;
 		int m_sampleRate;
 		int m_bpm;
