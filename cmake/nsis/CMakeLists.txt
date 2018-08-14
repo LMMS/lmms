@@ -21,8 +21,7 @@ SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS   "
   \\\${registerExtension} \\\"$INSTDIR\\\\${CMAKE_PROJECT_NAME}.exe\\\" \\\".mmpz\\\" \\\"${PROJECT_NAME_UCASE} Project (compressed)\\\"
   \\\${IfNot} \\\${AtMostWin7}
     WriteRegDWORD HKLM \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\SideBySide\\\" \\\"PreferExternalManifest\\\" \\\"1\\\"
-  \\\${EndIf}
-   ExecWait '\\\"$INSTDIR\\\\Jack_v1.9.11_32_setup.exe\\\" /install'" PARENT_SCOPE)
+  \\\${EndIf}")
 SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
   \\\${unregisterExtension} \\\".mmp\\\" \\\"${PROJECT_NAME_UCASE} Project\\\"
   \\\${unregisterExtension} \\\".mmpz\\\" \\\"${PROJECT_NAME_UCASE} Project (compressed)\\\"
@@ -73,5 +72,26 @@ IF(LMMS_HAVE_STK)
 	LIST(SORT RAWWAVES)
 	INSTALL(FILES ${RAWWAVES} DESTINATION "${DATA_DIR}/stk/rawwaves")
 ENDIF()
+
+# Bundle jack
+IF(LMMS_BUILD_WIN32 AND WANT_JACK)
+	SET(JACK_INSTALLER_TAG "1.9.11")
+	SET(JACK_INSTALLER_FILENAME "Jack_v1.9.11_32_setup.exe")
+	IF(LMMS_BUILD_WIN64)
+		SET(JACK_INSTALLER_FILENAME "Jack_v1.9.11_64_setup.exe")
+	ENDIF()
+
+	INSTALL(CODE
+		"FILE(DOWNLOAD
+		\"https://github.com/jackaudio/jackaudio.github.com/releases/download/${JACK_INSTALLER_TAG}/${JACK_INSTALLER_FILENAME}\"
+		\"${CMAKE_BINARY_DIR}/${JACK_INSTALLER_FILENAME}\"
+		)"
+	)
+	INSTALL(FILES "${CMAKE_BINARY_DIR}/${JACK_INSTALLER_FILENAME}" DESTINATION .)
+	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+  ExecWait '\\\"$INSTDIR\\\\${JACK_INSTALLER_FILENAME}\\\" /install'")
+ENDIF()
+
+SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}" PARENT_SCOPE)
 
 INSTALL(FILES "lmms.exe.manifest" DESTINATION .)
