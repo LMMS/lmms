@@ -67,6 +67,7 @@ set(LMMS_SRCS
 	core/TrackContainer.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
+	core/StepRecorder.cpp
 
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp
@@ -96,6 +97,6 @@ set(LMMS_SRCS
 	core/midi/MidiPort.cpp
 	core/midi/MidiTime.cpp
 	core/midi/MidiWinMM.cpp
-
+	
 	PARENT_SCOPE
 )

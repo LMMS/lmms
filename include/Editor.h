@@ -51,6 +51,7 @@ protected slots:
 	virtual void play() {}
 	virtual void record() {}
 	virtual void recordAccompany() {}
+	virtual void toggleStepRecording() {}	
 	virtual void stop() {}
 
 private slots:
@@ -64,7 +65,7 @@ protected:
 	///
 	/// \param	record	If set true, the editor's toolbar will contain record
 	///					buttons in addition to the play and stop buttons.
-	Editor(bool record = false);
+	Editor(bool record = false, bool record_step = false);
 	virtual ~Editor();
 
 
@@ -73,6 +74,7 @@ protected:
 	QAction* m_playAction;
 	QAction* m_recordAction;
 	QAction* m_recordAccompanyAction;
+	QAction* m_toggleStepRecordingAction;	
 	QAction* m_stopAction;
 };
 
