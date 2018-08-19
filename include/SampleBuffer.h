@@ -312,7 +312,6 @@ public slots:
 	void setStartFrame( const f_cnt_t _s );
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
-	void sampleRateChanged();
 
 protected:
 	void internalAddData(const DataVector &vector, sample_rate_t sampleRate);
