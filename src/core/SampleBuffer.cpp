@@ -63,8 +63,6 @@ SampleBuffer::SampleBuffer() :
 	m_frequency( BaseFreq ),
 	m_sampleRate( mixerSampleRate () )
 {
-
-	connect( Engine::mixer(), SIGNAL( sampleRateChanged() ), this, SLOT( sampleRateChanged() ) );
 	beginBufferChange (false);
 	doneBufferChange (false, /* shouldLock */
 					  m_sampleRate);
@@ -121,23 +119,6 @@ void SampleBuffer::loadSettings(const QDomElement &_this) {
 
 	if (_this.hasAttribute ("data")) {
 		loadFromBase64 (_this.attribute("data"), m_sampleRate);
-	}
-}
-
-void SampleBuffer::sampleRateChanged() {
-	auto previousSampleRate = sampleRate ();
-	auto requiredSampleRate = mixerSampleRate ();
-
-	if (requiredSampleRate == sampleRate ())
-		return;
-
-	// Only resample the buffer if the processing
-	// sample rate is higher than the SampleBuffer's
-	// sample rate.
-	if (requiredSampleRate > sampleRate ()) {
-		resetData (resampleData (m_data, previousSampleRate, requiredSampleRate),
-				   requiredSampleRate,
-				   true);
 	}
 }
 
