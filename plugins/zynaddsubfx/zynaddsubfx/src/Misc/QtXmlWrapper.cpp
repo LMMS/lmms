@@ -61,6 +61,7 @@
 // Include LMMS headers
 #include "lmmsconfig.h"
 #include "IoHelper.h"
+#include "LocaleHelper.h"
 
 
 struct XmlData
@@ -228,14 +229,14 @@ int QtXmlWrapper::dosavefile(const char *filename,
 
 void QtXmlWrapper::addpar(const std::string &name, int val)
 {
-    d->addparams("par", 2, "name", name.c_str(), "value", stringFrom<int>(
-                  val).c_str());
+    d->addparams("par", 2, "name", name.c_str(), "value",
+                QString::number(val).toLocal8Bit().constData());
 }
 
 void QtXmlWrapper::addparreal(const std::string &name, float val)
 {
     d->addparams("par_real", 2, "name", name.c_str(), "value",
-              stringFrom<float>(val).c_str());
+                QString::number(val, 'f').toLocal8Bit().constData());
 }
 
 void QtXmlWrapper::addparbool(const std::string &name, int val)
@@ -510,7 +511,7 @@ float QtXmlWrapper::getparreal(const char *name, float defaultpar) const
 		return defaultpar;
 	}
 
-	return QLocale().toFloat( tmp.attribute( "value" ) );
+	return LocaleHelper::toFloat( tmp.attribute( "value" ) );
 }
 
 float QtXmlWrapper::getparreal(const char *name,

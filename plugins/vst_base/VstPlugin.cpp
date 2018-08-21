@@ -56,6 +56,7 @@
 
 #include "ConfigManager.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Song.h"
@@ -299,7 +300,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
-			( *it ).section( ':', 2, -1 ).toFloat()
+			LocaleHelper::toFloat((*it).section(':', 2, -1))
 		} ;
 		m.addInt( item.index );
 		m.addString( item.shortLabel );
