@@ -23,6 +23,9 @@
  *
  */
 
+#ifndef LOCALEHELPER_H
+#define LOCALEHELPER_H
+
 #include <QLocale>
 
 #include <limits>
@@ -30,7 +33,7 @@
 
 namespace LocaleHelper
 {
-inline float toDouble(QString str, bool* ok = nullptr)
+inline double toDouble(QString str, bool* ok = nullptr)
 {
 	bool isOkay;
 	double value;
@@ -58,3 +61,5 @@ inline float toFloat(QString str, bool* ok = nullptr)
 	return static_cast<float>(d);
 }
 }
+
+#endif // LOCALEHELPER_H
