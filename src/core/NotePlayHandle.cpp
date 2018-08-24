@@ -235,13 +235,6 @@ void NotePlayHandle::play( sampleFrame * _working_buffer )
 	// decreasing release of an instrument-track while the note is active
 	if( framesLeft() > 0 )
 	{
-		// clear offset frames if we're at the first period
-		// skip for single-streamed instruments, because in their case NPH::play() could be called from an IPH without a buffer argument
-		// ... also, they don't actually render the sound in NPH's, which is an even better reason to skip...
-		if( m_totalFramesPlayed == 0 && ! ( m_instrumentTrack->instrument()->flags() & Instrument::IsSingleStreamed ) )
-		{
-			memset( _working_buffer, 0, sizeof( sampleFrame ) * offset() );
-		}
 		// play note!
 		m_instrumentTrack->playNote( this, _working_buffer );
 	}
