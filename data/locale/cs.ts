@@ -1035,7 +1035,7 @@ Chcete-li vylepšit stávající překlad, Vaše pomoc bude vítána! Stačí je
     </message>
     <message>
         <source>FDBK</source>
-        <translation>ZPVAZ</translation>
+        <translation>FDBK</translation>
     </message>
     <message>
         <source>RATE</source>
@@ -2270,7 +2270,7 @@ Ověřte si prosím, zda máte povolen zápis do souboru a do složky, ve které
     </message>
     <message>
         <source>FDBK</source>
-        <translation>ZP. VAZ</translation>
+        <translation>FDBK</translation>
     </message>
     <message>
         <source>NOISE</source>

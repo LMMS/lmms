@@ -204,16 +204,22 @@ void ControllerConnection::loadSettings( const QDomElement & _this )
 	}
 	else
 	{
-		if( _this.attribute( "id", "-1" ).toInt() >= 0 )
-		{
-			m_controllerId = _this.attribute( "id" ).toInt();
-		}
-		else
+		m_controllerId = _this.attribute( "id", "-1" ).toInt();
+		if( m_controllerId < 0 )
 		{
 			qWarning( "controller index invalid\n" );
 			m_controllerId = -1;
 		}
-		m_controller = Controller::create( Controller::DummyController, NULL );
+
+		if (!Engine::getSong()->isLoadingProject() && m_controllerId != -1)
+		{
+			setController( Engine::getSong()->
+					controllers().at( m_controllerId ) );
+		}
+		else
+		{
+			m_controller = Controller::create( Controller::DummyController, NULL );
+		}
 	}
 }
 
