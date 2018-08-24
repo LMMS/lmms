@@ -57,7 +57,7 @@ PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
 export PATH
 
 # Fetch portable linuxdeployqt if not in PATH
-APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"=
+APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
