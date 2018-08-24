@@ -3224,6 +3224,41 @@ void PianoRoll::paintEvent(QPaintEvent * pe )
 			}
 		}
 
+		//draw current step recording notes
+		for( const Note *note : m_stepRecorder.getCurStepNotes() )
+		{
+			int len_ticks = note->length();
+
+			if( len_ticks == 0 )
+			{
+				continue;
+			}
+
+			const int key = note->key() - m_startKey + 1;
+
+			int pos_ticks = note->pos();
+
+			int note_width = len_ticks * m_ppt / MidiTime::ticksPerTact();
+			const int x = ( pos_ticks - m_currentPosition ) *
+					m_ppt / MidiTime::ticksPerTact();
+			// skip this note if not in visible area at all
+			if( !( x + note_width >= 0 && x <= width() - WHITE_KEY_WIDTH ) )
+			{
+				continue;
+			}
+
+			// is the note in visible area?
+			if( key > 0 && key <= visible_keys )
+			{
+
+				// we've done and checked all, let's draw the note
+				drawNoteRect( p, x + WHITE_KEY_WIDTH,
+						y_base - key * KEY_LINE_HEIGHT,
+								note_width, note, m_stepRecorder.curStepNoteColor(), noteTextColor(), selectedNoteColor(),
+								noteOpacity(), noteBorders(), drawNoteNames );
+			}
+		}
+
 		p.setPen( QPen( noteColor(), NOTE_EDIT_LINE_WIDTH + 2 ) );
 		p.drawPoints( editHandles );
 
