@@ -641,8 +641,6 @@ void ZynAddSubFxView::toggleUI()
 			connect( model->m_remotePlugin, SIGNAL( clickedCloseButton() ),
 						m_toggleUIButton, SLOT( toggle() ) );
 		}
-
-		ControllerConnection::finalizeConnections();
 	}
 }
 

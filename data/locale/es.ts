@@ -704,11 +704,11 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     <name>BitcrushControlDialog</name>
     <message>
         <source>IN</source>
-        <translation>ENTRADA</translation>
+        <translation>IN</translation>
     </message>
     <message>
         <source>OUT</source>
-        <translation>SALIDA</translation>
+        <translation>OUT</translation>
     </message>
     <message>
         <source>GAIN</source>
@@ -728,7 +728,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>CLIP</source>
-        <translation>RECORTE</translation>
+        <translation>CLIP</translation>
     </message>
     <message>
         <source>Output Clip:</source>
@@ -1031,7 +1031,7 @@ Si te interesa traducir LMMS a otros idiomas o mejorar las traducciones existent
     </message>
     <message>
         <source>DELAY</source>
-        <translation>RETRASO</translation>
+        <translation>DELAY</translation>
     </message>
     <message>
         <source>FDBK</source>

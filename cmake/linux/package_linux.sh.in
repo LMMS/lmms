@@ -57,6 +57,7 @@ PATH="$(pwd -P)/squashfs-root/usr/bin:$(dirname "@QT_QMAKE_EXECUTABLE@")":$PATH
 export PATH
 
 # Fetch portable linuxdeployqt if not in PATH
+APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"=
 echo -e "\nDownloading linuxdeployqt to ${LINUXDEPLOYQT}..."
 if env -i which linuxdeployqt > /dev/null 2>&1; then
 	skipped "System already provides this utility"
@@ -75,7 +76,6 @@ else
 	# to support systems without fuse
 	"$LINUXDEPLOYQT" --appimage-extract > /dev/null 2>&1
 	LINUXDEPLOYQT="squashfs-root/AppRun"
-	APPIMAGETOOL="squashfs-root/usr/bin/appimagetool"
 	success "Extracted $APPIMAGETOOL"
 fi
 
@@ -192,6 +192,10 @@ if [ -e "${APPDIR}/usr/lib/libjack.so.0" ]; then
    mkdir -p "${APPDIR}usr/lib/lmms/optional/"
    mv "${APPDIR}/usr/lib/libjack.so.0" "${APPDIR}usr/lib/lmms/optional/"
 fi
+
+# Point the AppRun to the shim launcher
+rm -f "${APPDIR}/AppRun"
+ln -sr "${APPDIR}/usr/bin/lmms" "${APPDIR}/AppRun"
 
 # Create AppImage
 echo -e "\nFinishing the AppImage..."
