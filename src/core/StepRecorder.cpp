@@ -28,42 +28,13 @@
 using std::min;
 using std::max;
 
-//for debugging: uncomment to create a win32 console, and enable DBG_PRINT
-//#define DEBUG_STEP_RECORDER
-
-#ifdef DEBUG_STEP_RECORDER
-	#define DEBUG_CREATE_WIN32_CONSOLE
-	#define DRBUG_ENABLE_PRINTS
-#endif //DEBUG_STEP_RECORDER
-
-#ifdef DEBUG_CREATE_WIN32_CONSOLE
-#include <windows.h>
-#endif
-
-#ifdef DRBUG_ENABLE_PRINTS
-#include <cstdio>
-	#define DBG_PRINT(fmt, ...) printf(fmt, ##__VA_ARGS__)
-#else
-	#define DBG_PRINT(fmt, ...) 
-#endif
-
 const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70; 
-
 
 StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget)
 {
  	m_stepRecorderWidget.hide();	
-
-#if defined(DEBUG_CREATE_WIN32_CONSOLE) && defined(_WIN32)
-	//create win32 console and attach it for output 
-	if (AttachConsole(ATTACH_PARENT_PROCESS) || AllocConsole())
-	{
-		freopen("CONOUT$", "w", stdout);
-		freopen("CONOUT$", "w", stderr);
-	}	
-#endif
 }
 
 void StepRecorder::initialize()
@@ -122,8 +93,6 @@ void StepRecorder::notePressed(const Note & n)
 
 void StepRecorder::noteReleased(const Note & n)
 {
-	DBG_PRINT("%s: key[%d]... \n", __FUNCTION__, n.key());
-
 	StepNote* stepNote = findCurStepNote(n.key());
 
 	if(stepNote != nullptr && stepNote->isPressed())
@@ -136,8 +105,6 @@ void StepRecorder::noteReleased(const Note & n)
 		{
 			m_updateReleasedTimer.start(REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS);
 		}
-
-		DBG_PRINT("%s: key[%d] pressed->released \n", __FUNCTION__, key);
 
 		//check if all note are released, apply notes to pattern(or dimiss if length is zero) and prepare to record next step
 		if(allCurStepNotesReleased())
@@ -256,8 +223,6 @@ void StepRecorder::stepBackwards()
 
 void StepRecorder::applyStep()
 {
-	DBG_PRINT("%s\n", __FUNCTION__);
-	
 	m_pattern->addJournalCheckPoint();
 
 	for (const StepNote* stepNote : m_curStepNotes)
@@ -275,8 +240,6 @@ void StepRecorder::applyStep()
 
 void StepRecorder::dismissStep()
 {
-	DBG_PRINT("%s\n", __FUNCTION__);
-
 	if(!m_isStepInProgress)
 	{
 		return;
@@ -287,8 +250,6 @@ void StepRecorder::dismissStep()
 
 void StepRecorder::prepareNewStep()
 {
-	DBG_PRINT("%s\n", __FUNCTION__);
-	
 	for(StepNote* stepNote : m_curStepNotes)
 	{
 		delete stepNote;
@@ -305,8 +266,6 @@ void StepRecorder::prepareNewStep()
 
 void StepRecorder::setCurrentPattern( Pattern* newPattern )
 {
-	DBG_PRINT("%s\n", __FUNCTION__);
-
     if(m_pattern != NULL && m_pattern != newPattern)
     {
         // remove any unsaved notes from old pattern
@@ -318,8 +277,6 @@ void StepRecorder::setCurrentPattern( Pattern* newPattern )
 
 void StepRecorder::removeNotesReleasedForTooLong()
 {
-	DBG_PRINT("%s\n", __FUNCTION__);
-
 	int nextTimout = INT_MAX;
 	bool notesRemoved = false;
 
@@ -330,13 +287,9 @@ void StepRecorder::removeNotesReleasedForTooLong()
 
 		if(stepNote->isReleased())
 		{
-			DBG_PRINT("key[%d]: timeSinceReleased:[%d]\n", stepNote->m_note.key(), stepNote->timeSinceReleased());
-
 			const int timeSinceReleased = stepNote->timeSinceReleased(); // capture value to avoid wraparound when calculting nextTimout
 			if (timeSinceReleased >= REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS)
 			{
-				DBG_PRINT("removed...\n");
-
 				delete stepNote;
 				itr.remove();
 				notesRemoved = true;
