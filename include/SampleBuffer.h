@@ -256,7 +256,7 @@ public:
 	static QString tryToMakeAbsolute(const QString & file);
 
 
-	sample_t m_userAntiAliasWaveTable[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH] ;
+	sample_t **m_userAntiAliasWaveTable;
 
 
 public slots:

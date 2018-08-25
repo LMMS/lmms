@@ -163,20 +163,41 @@ public:
 		return m_userWave->userWaveSample( _sample );
 	}
 
+	struct wtSampleControl {
+		float frame;
+		f_cnt_t f1;
+		f_cnt_t f2;
+		int band;
+	};
+
+	inline wtSampleControl getWtSampleControl(const float sample)
+	{
+		wtSampleControl control;
+		control.frame = sample * OscillatorConstants::WAVETABLE_LENGTH;
+		control.f1 = static_cast<f_cnt_t>(control.frame) % OscillatorConstants::WAVETABLE_LENGTH;
+		if (control.f1 < 0)
+		{
+			control.f1 += OscillatorConstants::WAVETABLE_LENGTH;
+		}
+		control.f2 = control.f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
+					control.f1 + 1 :
+					0;
+		control.band = waveTableBandFromFreq(m_freq);
+		return control;
+	}
+
 	inline sample_t wtSample(const sample_t table[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT][OscillatorConstants::WAVETABLE_LENGTH], const float _sample)
 	{
-		const float frame = _sample * OscillatorConstants::WAVETABLE_LENGTH;
-		f_cnt_t f1 = static_cast<f_cnt_t>(frame) % OscillatorConstants::WAVETABLE_LENGTH;
-		if (f1 < 0)
-		{
-			f1 += OscillatorConstants::WAVETABLE_LENGTH;
-		}
-		f_cnt_t f2 = f1 < OscillatorConstants::WAVETABLE_LENGTH - 1 ?
-					f1 + 1 :
-					0;
-		int band = waveTableBandFromFreq(m_freq);
-		return linearInterpolate(table[band][f1],
-				table[band][f2], fraction(frame));
+		wtSampleControl control = getWtSampleControl(_sample);
+		return linearInterpolate(table[control.band][control.f1],
+				table[control.band][control.f2], fraction(control.frame));
+	}
+
+	inline sample_t wtSample( sample_t **table, const float _sample)
+	{
+		wtSampleControl control = getWtSampleControl(_sample);
+		return linearInterpolate(table[control.band][control.f1],
+				table[control.band][control.f2], fraction(control.frame));
 	}
 
 	inline int  waveTableBandFromFreq(float freq)

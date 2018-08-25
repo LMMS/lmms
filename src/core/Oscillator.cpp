@@ -217,6 +217,12 @@ void Oscillator::generateFromFFT(int bands, float threshold, sample_t * table)
 
 void Oscillator::generateAntiAliasUserWaveTable(SampleBuffer *sampleBuffer)
 {
+	delete sampleBuffer->m_userAntiAliasWaveTable;
+	sampleBuffer->m_userAntiAliasWaveTable = new sample_t *[OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT];
+	for (int i=0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
+	{
+		sampleBuffer->m_userAntiAliasWaveTable[i] = new sample_t[OscillatorConstants::WAVETABLE_LENGTH];
+	}
 	for (int i = 0; i < OscillatorConstants::WAVE_TABLES_PER_WAVEFORM_COUNT; ++i)
 	{
 		for (int i = 0; i < OscillatorConstants::WAVETABLE_LENGTH; ++i)
