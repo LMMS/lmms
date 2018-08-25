@@ -807,7 +807,6 @@ inline sample_t Oscillator::getSample<Oscillator::UserDefinedWave>(
 	{
 		return userWaveSample(_sample);
 	}
-
 }
 
 

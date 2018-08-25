@@ -92,7 +92,6 @@ public:
 		}
 
 
-
 	private:
 		f_cnt_t m_frameIndex;
 		const bool m_varyingPitch;
@@ -301,7 +300,6 @@ private:
 	bool m_reversed;
 	float m_frequency;
 	sample_rate_t m_sampleRate;
-
 
 	sampleFrame * getSampleFragment( f_cnt_t _index, f_cnt_t _frames,
 						LoopMode _loopmode,

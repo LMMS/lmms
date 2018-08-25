@@ -237,6 +237,7 @@ int noInputFileError()
 	return usageError( "No input file specified" );
 }
 
+
 int main( int argc, char * * argv )
 {
 #ifdef LMMS_DEBUG_FPE
@@ -253,7 +254,6 @@ int main( int argc, char * * argv )
 
 	// initialize memory managers
 	NotePlayHandleManager::init();
-
 
 	// intialize RNG
 	srand( getpid() + time( 0 ) );
@@ -947,7 +947,6 @@ int main( int argc, char * * argv )
 	{
 		printf( "\n" );
 	}
-
 
 	return ret;
 }

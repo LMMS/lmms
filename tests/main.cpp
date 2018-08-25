@@ -9,7 +9,6 @@
 int main(int argc, char* argv[])
 {
 	new QCoreApplication(argc, argv);
-
 	Engine::init(true);
 
 	int numsuites = QTestSuite::suites().size();

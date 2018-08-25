@@ -39,7 +39,6 @@
 #include "SampleBuffer.h"
 #include "lmms_constants.h"
 
-
 class IntModel;
 
 
@@ -119,8 +118,6 @@ public:
 		}
 		return ph * 4.0f - 4.0f;
 	}
-
-
 
 	static inline sample_t sawSample( const float _sample )
 	{

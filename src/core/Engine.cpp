@@ -74,8 +74,6 @@ void LmmsCore::init( bool renderOnly )
 	PresetPreviewPlayHandle::init();
 	s_dummyTC = new DummyTrackContainer;
 
-
-
 	emit engine->initProgress(tr("Launching mixer threads"));
 	s_mixer->startProcessing();
 }

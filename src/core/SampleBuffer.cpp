@@ -1484,7 +1484,3 @@ SampleBuffer::handleState::~handleState()
 {
 	src_delete( m_resamplingData );
 }
-
-
-
-//sample_t SampleBuffer::m_userAntiAliasWaveTable[Oscillator::WAVE_TABLES_PER_WAVEFORM_COUNT][Oscillator::WAVETABLE_LENGTH] = {0};
