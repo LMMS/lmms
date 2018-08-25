@@ -33,52 +33,54 @@ class StepRecorderWidget : public QWidget
 {
 public:
 	StepRecorderWidget(
-        QWidget * parent, 
-        const int _ppt,    
-        const int margin_top,
-        const int margin_bottom,
-        const int margin_left,
-        const int margin_right);
+		QWidget * parent, 
+		const int _ppt,    
+		const int margin_top,
+		const int margin_bottom,
+		const int margin_left,
+		const int margin_right);
 
 	//API used by PianoRoll 
 	void setPixelsPerTact(int _ppt);
 	void setCurrentPosition(MidiTime currentPosition);
-    void setBottomMargin(const int margin_bottom);
+	void setBottomMargin(const int margin_bottom);
 
 	//API used by StepRecorder
-    void setStepsLength(MidiTime stepsLength);
+	void setStepsLength(MidiTime stepsLength);
 	void setStartPosition(MidiTime pos);
-    void setEndPosition(MidiTime pos);
+	void setEndPosition(MidiTime pos);
+	
+	void showHint();
 private:
 	virtual void paintEvent(QPaintEvent * pe);
-    
-    int xCoordOfTick(int tick);
-    
-    void drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom);
-    void drawVerLine(QPainter* painter, const MidiTime& pos, const QColor& color, int top, int bottom);
-    
-    void updateBoundaries();
+	
+	int xCoordOfTick(int tick);
+	
+	void drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom);
+	void drawVerLine(QPainter* painter, const MidiTime& pos, const QColor& color, int top, int bottom);
+	
+	void updateBoundaries();
 
-    MidiTime m_stepsLength;
+	MidiTime m_stepsLength;
 	MidiTime m_curStepStartPos;
-    MidiTime m_curStepEndPos;
+	MidiTime m_curStepEndPos;
 
 	int m_ppt; // pixels per tact	
 	MidiTime m_currentPosition; // current position showed by on PianoRoll 
 
 	QColor m_colorLineStart;
-    QColor m_colorLineEnd;
+	QColor m_colorLineEnd;
 
-    // boundaries within piano roll window
-    int m_top;
-    int m_bottom;
-    int m_left;
-    int m_right;
+	// boundaries within piano roll window
+	int m_top;
+	int m_bottom;
+	int m_left;
+	int m_right;
 
-    const int m_margin_top;
-    int m_margin_bottom; // not const since can change on resize of edit-note area
-    const int m_margin_left;
-    const int m_margin_right;
+	const int m_margin_top;
+	int m_margin_bottom; // not const since can change on resize of edit-note area
+	const int m_margin_left;
+	const int m_margin_right;
 } ;
 
 #endif //_STEP_RECOREDER_WIDGET

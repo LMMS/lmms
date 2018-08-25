@@ -34,7 +34,7 @@ StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorde
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget)
 {
- 	m_stepRecorderWidget.hide();	
+	m_stepRecorderWidget.hide();	
 }
 
 void StepRecorder::initialize()
@@ -59,7 +59,9 @@ void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLe
 
 	m_stepRecorderWidget.show();
 
-	prepareNewStep();
+	m_stepRecorderWidget.showHint();
+
+	prepareNewStep();	
 }
 
 void StepRecorder::stop()
@@ -266,13 +268,13 @@ void StepRecorder::prepareNewStep()
 
 void StepRecorder::setCurrentPattern( Pattern* newPattern )
 {
-    if(m_pattern != NULL && m_pattern != newPattern)
-    {
-        // remove any unsaved notes from old pattern
-        dismissStep();
-    }
+	if(m_pattern != NULL && m_pattern != newPattern)
+	{
+		// remove any unsaved notes from old pattern
+		dismissStep();
+	}
 
-    m_pattern = newPattern;
+	m_pattern = newPattern;
 }
 
 void StepRecorder::removeNotesReleasedForTooLong()

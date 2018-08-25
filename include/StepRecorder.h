@@ -35,109 +35,109 @@ class StepRecorderWidget;
 
 class StepRecorder : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
-    StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget);
+	public:
+	StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget);
 
-    void initialize();
-    void start(const MidiTime& currentPosition,const MidiTime& stepLength);
-    void stop();     
-    void notePressed(const Note & n);
-    void noteReleased(const Note & n);
-    bool keyPressEvent(QKeyEvent* ke);
-    bool mousePressEvent(QMouseEvent* ke);
-    void setCurrentPattern(Pattern* newPattern);
-    void setStepsLength(const MidiTime& newLength);
-    
-    QVector<Note*> getCurStepNotes();
+	void initialize();
+	void start(const MidiTime& currentPosition,const MidiTime& stepLength);
+	void stop();     
+	void notePressed(const Note & n);
+	void noteReleased(const Note & n);
+	bool keyPressEvent(QKeyEvent* ke);
+	bool mousePressEvent(QMouseEvent* ke);
+	void setCurrentPattern(Pattern* newPattern);
+	void setStepsLength(const MidiTime& newLength);
+	
+	QVector<Note*> getCurStepNotes();
 
-    bool isRecording() const
-    {
-        return m_isRecording;
-    }
+	bool isRecording() const
+	{
+		return m_isRecording;
+	}
 
-    QColor curStepNoteColor() const
-    { 
-        return QColor(245,3,139); // radiant pink
-    }
+	QColor curStepNoteColor() const
+	{ 
+		return QColor(245,3,139); // radiant pink
+	}
 
-    private slots:    
-    void removeNotesReleasedForTooLong();
+	private slots:    
+	void removeNotesReleasedForTooLong();
 
-    private:
-    void stepForwards();
-    void stepBackwards();   
+	private:
+	void stepForwards();
+	void stepBackwards();   
 
-    void applyStep();
-    void dismissStep();
-    void prepareNewStep();
+	void applyStep();
+	void dismissStep();
+	void prepareNewStep();
 
-    MidiTime getCurStepEndPos();
+	MidiTime getCurStepEndPos();
 
-    void updateCurStepNotes();
-    void updateWidget();
+	void updateCurStepNotes();
+	void updateWidget();
 
-    bool allCurStepNotesReleased();
+	bool allCurStepNotesReleased();
 
-    PianoRoll& m_pianoRoll;
+	PianoRoll& m_pianoRoll;
 	StepRecorderWidget& m_stepRecorderWidget;
 
 	bool m_isRecording = false;
 	MidiTime m_curStepStartPos = 0;
 	MidiTime m_curStepEndPos = 0;
 
-    MidiTime m_stepsLength;
-    MidiTime m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
-                              // since the user can make current step larger
-    
-    QTimer m_updateReleasedTimer;   
-    
-    Pattern* m_pattern;
+	MidiTime m_stepsLength;
+	MidiTime m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
+							  // since the user can make current step larger
+	
+	QTimer m_updateReleasedTimer;   
+	
+	Pattern* m_pattern;
 
 	class StepNote
 	{
 		public:
-        StepNote(const Note & note) : m_note(note), m_pressed(true) {};
+		StepNote(const Note & note) : m_note(note), m_pressed(true) {};
 
-        void setPressed()
-        {
-            m_pressed = true;
-        }
+		void setPressed()
+		{
+			m_pressed = true;
+		}
 
-        void setReleased()
-        {
+		void setReleased()
+		{
 			m_pressed = false;
 			releasedTimer.start();
-        }
+		}
 
 		int timeSinceReleased()
 		{
 			return releasedTimer.elapsed();
 		}
 
-        bool isPressed() const
-        {
-            return m_pressed;
-        }
+		bool isPressed() const
+		{
+			return m_pressed;
+		}
 
-        bool isReleased() const
-        {
-            return !m_pressed;
-        }
+		bool isReleased() const
+		{
+			return !m_pressed;
+		}
 
-        Note m_note;
+		Note m_note;
 
 		private:
-        bool m_pressed;        
+		bool m_pressed;        
 		QTime releasedTimer;
 	} ;
 
-    QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
+	QVector<StepNote*> m_curStepNotes; // contains the current recorded step notes (i.e. while user still press the notes; before they are applied to the pattern)
 
-    StepNote* findCurStepNote(const int key);
+	StepNote* findCurStepNote(const int key);
 
-    bool m_isStepInProgress = false;
+	bool m_isStepInProgress = false;
 };
 
 #endif //STEP_RECORDER_H

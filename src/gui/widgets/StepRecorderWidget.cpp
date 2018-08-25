@@ -21,19 +21,21 @@
  */
 
 #include "StepRecorderWidget.h"
+#include "TextFloat.h"
+#include "embed.h"
 
 StepRecorderWidget::StepRecorderWidget( 
-        QWidget * parent, 
-        const int ppt,    
-        const int margin_top,
-        const int margin_bottom,
-        const int margin_left,
-        const int margin_right) : 
+		QWidget * parent, 
+		const int ppt,    
+		const int margin_top,
+		const int margin_bottom,
+		const int margin_left,
+		const int margin_right) : 
 	QWidget(parent),
 	m_margin_top(margin_top),
-    m_margin_bottom(margin_bottom),
-    m_margin_left(margin_left),
-    m_margin_right(margin_right)
+	m_margin_bottom(margin_bottom),
+	m_margin_left(margin_left),
+	m_margin_right(margin_right)
 {
 	const QColor baseColor =  QColor(255, 0, 0);// QColor(204, 163, 0); // Orange
 	m_colorLineEnd   = baseColor.lighter(150);
@@ -65,9 +67,17 @@ void StepRecorderWidget::setStartPosition(MidiTime pos)
 {
 	m_curStepStartPos = pos;	
 }
+
 void StepRecorderWidget::setEndPosition(MidiTime pos)
 {
 	m_curStepEndPos = pos;	
+}
+
+void StepRecorderWidget::showHint()
+{
+	TextFloat::displayMessage( tr( "Hint" ),
+				tr( "Move recording curser using <Left/Right> arrows"),
+				embed::getIconPixmap( "hint" ));
 }
 
 void StepRecorderWidget::setStepsLength(MidiTime stepsLength)
