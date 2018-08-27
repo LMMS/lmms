@@ -6,4 +6,4 @@
 	url = https://github.com/rampantpixels/rpmalloc.git
 [submodule "plugins/carlabase/carla"]
 	path = plugins/carlabase/carla
-	url = https://github.com/falktx/carla
+	url = https://github.com/falktx/carla.git
