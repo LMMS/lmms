@@ -229,10 +229,19 @@ ENDIF(WANT_TAP)
 
 # check for CARLA
 IF(WANT_CARLA)
+	IF(LMMS_BUILD_APPLE)
+		# compile against submodule headers.  TODO: move to homebrew
+		INCLUDE(CarlaPkgConfig)
+	ENDIF()
 	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
 	IF(CARLA_FOUND)
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
+		IF(CARLA_SUBMODULE_SOURCE)
+			# Handle additional submodule include
+			MESSAGE("-- Using additional carla headers from ${CARLA_SUBMODULE_SOURCE}/source/backend")
+			SET(CARLA_INCLUDE_DIRS "${CARLA_INCLUDE_DIRS};${CARLA_SUBMODULE_SOURCE}/source/backend")
+		ENDIF()
 	ELSE(CARLA_FOUND)
 		SET(STATUS_CARLA "not found, please install the latest carla")
 	ENDIF(CARLA_FOUND)

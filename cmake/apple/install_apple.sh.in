@@ -71,6 +71,30 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
    @loader_path/../../$zynfmk \
   "$APP/Contents/$zynlib"
   
+# Fix carla linking
+libcarla="Carla.app/Contents/MacOS/libcarla_standalone2.dylib"
+ 
+# Assume LMMS.app and Carla.app are side-by-side
+install_name_tool -change ../../bin/libcarla_standalone2.dylib \
+   @executable_path/../../../$libcarla \
+   "$APP/Contents/lib/lmms/libcarlabase.dylib"
+
+install_name_tool -change @rpath/libcarlabase.dylib \
+   @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlapatchbay.so"
+
+install_name_tool -change ../../bin/libcarla_standalone2.dylib \
+  @executable_path/../../../$libcarla \
+  "$APP/Contents/lib/lmms/libcarlapatchbay.so"
+
+install_name_tool -change @rpath/libcarlabase.dylib \
+  @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlarack.so"
+
+install_name_tool -change ../../bin/libcarla_standalone2.dylib \
+  @executable_path/../../../$libcarla \
+  "$APP/Contents/lib/lmms/libcarlarack.so"
+
 # Link lmms binary
 _executables="${_executables} -executable=$APP/Contents/$zynbin"
 _executables="${_executables} -executable=$APP/Contents/$zynfmk"
