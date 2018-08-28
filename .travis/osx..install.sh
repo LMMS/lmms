@@ -9,5 +9,6 @@ else
 fi
 
 brew install $PACKAGES ccache
+brew install https://gist.github.com/tresf/a8ffb8299227c51cf11aaf3929765264/raw/c151b761ed6ad7f37f717086188c075cc1836448/carla.rb
 
 sudo npm install -g appdmg
