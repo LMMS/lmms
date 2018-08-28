@@ -114,6 +114,9 @@ done
 # Finalize .app
 macdeployqt "$APP" $_executables
 
+# Carla should be installed separately
+rm -f "$APP/Contents/Frameworks/libcarla_standalone2.dylib"
+
 # Cleanup
 rm -rf "$APP/Contents/bin"
 echo -e "\nFinished.\n\n"
