@@ -325,6 +325,10 @@ PianoRoll::PianoRoll() :
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( updatePosition( const MidiTime & ) ) );
+	
+	//update timeline when in step-recording mode
+	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const MidiTime & ) ),
+			this, SLOT( updatePositionStepRecording( const MidiTime & ) ) );
 
 	// update timeline when in record-accompany mode
 	connect( Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).m_timeLine,
@@ -4126,6 +4130,13 @@ void PianoRoll::updatePositionAccompany( const MidiTime & t )
 }
 
 
+void PianoRoll::updatePositionStepRecording( const MidiTime & t )
+{
+	if( m_stepRecorder.isRecording() )
+	{
+		autoScroll( t );
+	}
+}
 
 
 void PianoRoll::zoomingChanged()

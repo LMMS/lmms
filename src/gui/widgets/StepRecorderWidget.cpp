@@ -71,6 +71,7 @@ void StepRecorderWidget::setStartPosition(MidiTime pos)
 void StepRecorderWidget::setEndPosition(MidiTime pos)
 {
 	m_curStepEndPos = pos;	
+	emit positionChanged( m_curStepEndPos );
 }
 
 void StepRecorderWidget::showHint()

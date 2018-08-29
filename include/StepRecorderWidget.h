@@ -31,6 +31,8 @@
 
 class StepRecorderWidget : public QWidget
 {
+	Q_OBJECT
+	
 public:
 	StepRecorderWidget(
 		QWidget * parent, 
@@ -51,6 +53,7 @@ public:
 	void setEndPosition(MidiTime pos);
 	
 	void showHint();
+
 private:
 	virtual void paintEvent(QPaintEvent * pe);
 	
@@ -81,6 +84,9 @@ private:
 	int m_margin_bottom; // not const since can change on resize of edit-note area
 	const int m_margin_left;
 	const int m_margin_right;
+
+signals:
+	void positionChanged( const MidiTime & _t );	
 } ;
 
 #endif //_STEP_RECOREDER_WIDGET

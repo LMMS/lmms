@@ -213,6 +213,7 @@ protected slots:
 
 	void updatePosition(const MidiTime & t );
 	void updatePositionAccompany(const MidiTime & t );
+	void updatePositionStepRecording(const MidiTime & t );
 
 	void zoomingChanged();
 	void quantizeChanged();
