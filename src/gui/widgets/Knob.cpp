@@ -699,11 +699,11 @@ void Knob::paintEvent( QPaintEvent * _me )
 
 
 
-
 void Knob::wheelEvent( QWheelEvent * _we )
 {
 	_we->accept();
-	const int inc = ( _we->delta() > 0 ) ? 1 : -1;
+	const float step = model()->step<float>();
+	const int inc = ( ( _we->delta() > 0 ) ? 1 : -1 ) * ( ( step < 1 ) * 999 + 1 ); // inc is -1000 or 1000 if the step size is less than 1; otherwise, inc is -1 or 1.
 	model()->incValue( inc );
 
 
