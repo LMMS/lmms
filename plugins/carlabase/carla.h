@@ -25,12 +25,22 @@
 #ifndef CARLA_H
 #define CARLA_H
 
-#include <QtCore/QMutex>
+#define CARLA_MAX_KNOBS			32
+#define CARLA_SETTING_PREFIX	"PARAM_KNOB_"
 
+// qt
+#include <QtCore/QMutex>
+#include <QScrollArea>
+#include <QGridLayout>
+#include <QList>
+
+// carla/source/includes
 #include "CarlaNative.h"
 
+// lmms/include/
 #include "Instrument.h"
 #include "InstrumentView.h"
+#include "EffectControls.h"
 
 class QPushButton;
 
@@ -67,6 +77,9 @@ signals:
 
 private slots:
     void sampleRateChanged();
+    void refreshParams();
+    void clearKnobModels();
+    void knobModelChanged(uint32_t index);
 
 private:
     const bool kIsPatchbay;
@@ -83,7 +96,12 @@ private:
     QMutex fMutex;
 
     friend class CarlaInstrumentView;
+
+    QList<FloatModel*> floatModels;
+    QDomElement settingsElem;
 };
+
+// -------------------------------------------------------------------
 
 class CarlaInstrumentView : public InstrumentView
 {
@@ -96,16 +114,33 @@ public:
 private slots:
     void toggleUI(bool);
     void uiClosed();
+    void refreshButtons();
+    void onRefreshButton();
 
 private:
     virtual void modelChanged();
     virtual void timerEvent(QTimerEvent*);
 
+    void addKnob(FloatModel& knobModel);
+	void clearKnobs();
+
     NativePluginHandle fHandle;
     const NativePluginDescriptor* fDescriptor;
     int fTimerId;
 
+    CarlaInstrument* const p_instrument;
+
+    uint32_t lMaxColumns;
+	uint32_t lCurColumn;
+	uint32_t lCurRow;
+
+    QScrollArea * m_scrollArea;
+    QGridLayout * m_scrollAreaLayout;
+
     QPushButton * m_toggleUIButton;
+    QPushButton * m_refreshParamsButton;
 };
+
+// -------------------------------------------------------------------
 
 #endif
