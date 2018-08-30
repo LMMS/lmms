@@ -70,7 +70,7 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
 install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
    @loader_path/../../$zynfmk \
   "$APP/Contents/$zynlib"
-   
+  
 # Replace @rpath with @loader_path for Carla
 # See also plugins/carlabase/CMakeLists.txt
 # This MUST be done BEFORE calling macdeployqt
