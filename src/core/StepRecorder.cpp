@@ -39,7 +39,7 @@ StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorde
 
 void StepRecorder::initialize()
 {
-	connect(&m_updateReleasedTimer, SIGNAL( timeout() ), this, SLOT( removeNotesReleasedForTooLong() ) );
+	connect(&m_updateReleasedTimer, SIGNAL(timeout()), this, SLOT(removeNotesReleasedForTooLong()));
 }
 
 void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLength)
@@ -270,7 +270,6 @@ void StepRecorder::setCurrentPattern( Pattern* newPattern )
 {
 	if(m_pattern != NULL && m_pattern != newPattern)
 	{
-		// remove any unsaved notes from old pattern
 		dismissStep();
 	}
 
@@ -282,7 +281,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	int nextTimout = INT_MAX;
 	bool notesRemoved = false;
 
-	 QMutableVectorIterator<StepNote*> itr(m_curStepNotes);
+	QMutableVectorIterator<StepNote*> itr(m_curStepNotes);
 	while (itr.hasNext()) 
 	{
 		StepNote* stepNote = itr.next();

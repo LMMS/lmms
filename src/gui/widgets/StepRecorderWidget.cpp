@@ -27,15 +27,15 @@
 StepRecorderWidget::StepRecorderWidget( 
 		QWidget * parent, 
 		const int ppt,    
-		const int margin_top,
-		const int margin_bottom,
-		const int margin_left,
-		const int margin_right) : 
+		const int marginTop,
+		const int marginBottom,
+		const int marginLeft,
+		const int marginRight) : 
 	QWidget(parent),
-	m_margin_top(margin_top),
-	m_margin_bottom(margin_bottom),
-	m_margin_left(margin_left),
-	m_margin_right(margin_right)
+	m_marginTop(marginTop),
+	m_marginBottom(marginBottom),
+	m_marginLeft(marginLeft),
+	m_marginRight(marginRight)
 {
 	const QColor baseColor =  QColor(255, 0, 0);// QColor(204, 163, 0); // Orange
 	m_colorLineEnd   = baseColor.lighter(150);
@@ -44,13 +44,13 @@ StepRecorderWidget::StepRecorderWidget(
 	setAttribute(Qt::WA_NoSystemBackground, true);
 	setPixelsPerTact(ppt);
 
-	m_top = m_margin_top;
-	m_left = m_margin_left;
+	m_top = m_marginTop;
+	m_left = m_marginLeft;
 }
 
-void StepRecorderWidget::setPixelsPerTact(int _ppt )
+void StepRecorderWidget::setPixelsPerTact(int ppt)
 {
-	m_ppt = _ppt;
+	m_ppt = ppt;
 }
 
 void StepRecorderWidget::setCurrentPosition(MidiTime currentPosition)
@@ -58,9 +58,9 @@ void StepRecorderWidget::setCurrentPosition(MidiTime currentPosition)
 	m_currentPosition = currentPosition;
 }
 
-void StepRecorderWidget::setBottomMargin(const int margin_bottom)
+void StepRecorderWidget::setBottomMargin(const int marginBottom)
 {
-	m_margin_bottom = margin_bottom;
+	m_marginBottom = marginBottom;
 }
 
 void StepRecorderWidget::setStartPosition(MidiTime pos)
@@ -71,14 +71,13 @@ void StepRecorderWidget::setStartPosition(MidiTime pos)
 void StepRecorderWidget::setEndPosition(MidiTime pos)
 {
 	m_curStepEndPos = pos;	
-	emit positionChanged( m_curStepEndPos );
+	emit positionChanged(m_curStepEndPos);
 }
 
 void StepRecorderWidget::showHint()
 {
-	TextFloat::displayMessage( tr( "Hint" ),
-				tr( "Move recording curser using <Left/Right> arrows"),
-				embed::getIconPixmap( "hint" ));
+	TextFloat::displayMessage(tr( "Hint" ), tr("Move recording curser using <Left/Right> arrows"), 
+		embed::getIconPixmap("hint"));
 }
 
 void StepRecorderWidget::setStepsLength(MidiTime stepsLength)
@@ -86,9 +85,9 @@ void StepRecorderWidget::setStepsLength(MidiTime stepsLength)
 	m_stepsLength = stepsLength;
 }
 
-void StepRecorderWidget::paintEvent( QPaintEvent * pe )
+void StepRecorderWidget::paintEvent(QPaintEvent * pe)
 {
-	QPainter painter( this );
+	QPainter painter(this);
 
 	updateBoundaries();
 
@@ -126,13 +125,13 @@ void StepRecorderWidget::paintEvent( QPaintEvent * pe )
 
 int StepRecorderWidget::xCoordOfTick(int tick)
 {
-	return m_margin_left + ((tick - m_currentPosition) * m_ppt / MidiTime::ticksPerTact() );
+	return m_marginLeft + ((tick - m_currentPosition) * m_ppt / MidiTime::ticksPerTact());
 }
 
 
 void StepRecorderWidget::drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom)
 {
-	if(x >= m_margin_left && x <= (width() - m_margin_right))
+	if(x >= m_marginLeft && x <= (width() - m_marginRight))
 	{
 		painter->setPen(color);
 		painter->drawLine( x, top, x, bottom );
@@ -148,9 +147,9 @@ void StepRecorderWidget::updateBoundaries()
 {
 	setFixedSize(parentWidget()->size());
 
-	m_bottom = height() - m_margin_bottom;
-	m_right = width() - m_margin_top;
+	m_bottom = height() - m_marginBottom;
+	m_right = width() - m_marginTop;
 
-	//(no need to change top and left - they are static)
+	//(no need to change top and left as they are static)
 }
 

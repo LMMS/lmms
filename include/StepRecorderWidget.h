@@ -19,8 +19,8 @@
  * Boston, MA 02110-1301 USA.
  *
  */
-#ifndef _STEP_RECOREDER_WIDGET
-#define _STEP_RECOREDER_WIDGET
+#ifndef STEP_RECOREDER_WIDGET_H
+#define STEP_RECOREDER_WIDGET_H
 
 #include "lmms_basics.h"
 #include "Note.h"
@@ -36,16 +36,16 @@ class StepRecorderWidget : public QWidget
 public:
 	StepRecorderWidget(
 		QWidget * parent, 
-		const int _ppt,    
-		const int margin_top,
-		const int margin_bottom,
-		const int margin_left,
-		const int margin_right);
+		const int ppt,    
+		const int marginTop,
+		const int marginBottom,
+		const int marginLeft,
+		const int marginRight);
 
 	//API used by PianoRoll 
-	void setPixelsPerTact(int _ppt);
+	void setPixelsPerTact(int ppt);
 	void setCurrentPosition(MidiTime currentPosition);
-	void setBottomMargin(const int margin_bottom);
+	void setBottomMargin(const int marginBottom);
 
 	//API used by StepRecorder
 	void setStepsLength(MidiTime stepsLength);
@@ -80,13 +80,13 @@ private:
 	int m_left;
 	int m_right;
 
-	const int m_margin_top;
-	int m_margin_bottom; // not const since can change on resize of edit-note area
-	const int m_margin_left;
-	const int m_margin_right;
+	const int m_marginTop;
+	int m_marginBottom; // not const since can change on resize of edit-note area
+	const int m_marginLeft;
+	const int m_marginRight;
 
 signals:
-	void positionChanged( const MidiTime & _t );	
+	void positionChanged(const MidiTime & t);	
 } ;
 
-#endif //_STEP_RECOREDER_WIDGET
+#endif //STEP_RECOREDER_WIDGET_H

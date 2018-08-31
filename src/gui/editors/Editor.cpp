@@ -91,7 +91,7 @@ Editor::Editor(bool record, bool stepRecord) :
 	// Set up play and record actions
 	m_playAction = new QAction(embed::getIconPixmap("play"), tr("Play (Space)"), this);
 	m_stopAction = new QAction(embed::getIconPixmap("stop"), tr("Stop (Space)"), this);
-	
+
 	m_recordAction = new QAction(embed::getIconPixmap("record"), tr("Record"), this);
 	m_recordAccompanyAction = new QAction(embed::getIconPixmap("record_accompany"), tr("Record while playing"), this);
 	m_toggleStepRecordingAction = new QAction(embed::getIconPixmap("record_step_off"), tr("Toggle Step Recording"), this);

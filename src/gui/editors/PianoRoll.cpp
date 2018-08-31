@@ -325,7 +325,7 @@ PianoRoll::PianoRoll() :
 		m_timeLine, SLOT( updatePosition( const MidiTime & ) ) );
 	connect( m_timeLine, SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( updatePosition( const MidiTime & ) ) );
-	
+
 	//update timeline when in step-recording mode
 	connect( &m_stepRecorderWidget, SIGNAL( positionChanged( const MidiTime & ) ),
 			this, SLOT( updatePositionStepRecording( const MidiTime & ) ) );
@@ -657,45 +657,51 @@ void PianoRoll::setCurrentPattern( Pattern* newPattern )
 	m_currentNote = NULL;
 	m_startKey = INITIAL_START_KEY;
 
-	if(hasValidPattern())
+	m_stepRecorder.setCurrentPattern(newPattern);
+
+	if( ! hasValidPattern() )
 	{
-		m_leftRightScroll->setValue( 0 );
+		//resizeEvent( NULL );
 
-		// determine the central key so that we can scroll to it
-		int central_key = 0;
-		int total_notes = 0;
-		for( const Note *note : m_pattern->notes() )
-		{
-			if( note->length() > 0 )
-			{
-				central_key += note->key();
-				++total_notes;
-			}
-		}
-
-		if( total_notes > 0 )
-		{
-			central_key = central_key / total_notes -
-					( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
-			m_startKey = tLimit( central_key, 0, NumOctaves * KeysPerOctave );
-		}
-
-		// resizeEvent() does the rest for us (scrolling, range-checking
-		// of start-notes and so on...)
-		resizeEvent( NULL );
-
-		// make sure to always get informed about the pattern being destroyed
-		connect( m_pattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( hidePattern( Pattern* ) ) );
-
-		connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
-		connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
-		connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
+		update();
+		emit currentPatternChanged();
+		return;
 	}
+
+	m_leftRightScroll->setValue( 0 );
+
+	// determine the central key so that we can scroll to it
+	int central_key = 0;
+	int total_notes = 0;
+	for( const Note *note : m_pattern->notes() )
+	{
+		if( note->length() > 0 )
+		{
+			central_key += note->key();
+			++total_notes;
+		}
+	}
+
+	if( total_notes > 0 )
+	{
+		central_key = central_key / total_notes -
+				( KeysPerOctave * NumOctaves - m_totalKeysToScroll ) / 2;
+		m_startKey = tLimit( central_key, 0, NumOctaves * KeysPerOctave );
+	}
+
+	// resizeEvent() does the rest for us (scrolling, range-checking
+	// of start-notes and so on...)
+	resizeEvent( NULL );
+
+	// make sure to always get informed about the pattern being destroyed
+	connect( m_pattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( hidePattern( Pattern* ) ) );
+
+	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOn( const Note& ) ), this, SLOT( startRecordNote( const Note& ) ) );
+	connect( m_pattern->instrumentTrack(), SIGNAL( midiNoteOff( const Note& ) ), this, SLOT( finishRecordNote( const Note& ) ) );
+	connect( m_pattern->instrumentTrack()->pianoModel(), SIGNAL( dataChanged() ), this, SLOT( update() ) );
 
 	update();
 	emit currentPatternChanged();
-
-	m_stepRecorder.setCurrentPattern(newPattern);
 }
 
 
@@ -1147,9 +1153,7 @@ void PianoRoll::keyPressEvent(QKeyEvent* ke)
 		bool handled = m_stepRecorder.keyPressEvent(ke);
 		if(handled)
 		{
-			//return in case event was already handled by stepRecorder,
-			//this way we allow it to override/bypass other functionality that is not allowed while recording
-			ke->accept(); //TODO remove? <-- seems to be done already by caller ( PianoView::keyPressEvent)
+			ke->accept();
 			update();
 			return; 
 		}
@@ -2136,7 +2140,7 @@ void PianoRoll::mouseMoveEvent( QMouseEvent * me )
 					NOTE_EDIT_MIN_HEIGHT,
 					height() - PR_TOP_MARGIN - NOTE_EDIT_RESIZE_BAR -
 									PR_BOTTOM_MARGIN - KEY_AREA_MIN_HEIGHT );
-		
+
 		m_stepRecorderWidget.setBottomMargin(PR_BOTTOM_MARGIN + m_notesEditHeight);
 		repaint();
 		return;
@@ -4602,7 +4606,7 @@ QSize PianoRollWindow::sizeHint() const
 void PianoRollWindow::updateAfterPatternChange()
 {
 	patternRenamed();
-	updateStepRecordingIcon(); 	//pattern change turn step recording OFF - update icon accordingly
+	updateStepRecordingIcon(); //pattern change turn step recording OFF - update icon accordingly
 }
 
 void PianoRollWindow::patternRenamed()
