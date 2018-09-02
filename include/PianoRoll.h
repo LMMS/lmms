@@ -433,7 +433,7 @@ public:
 
 	const Pattern* currentPattern() const;
 	void setCurrentPattern( Pattern* pattern );
-	void setGhostPattern( Pattern* newPattern );
+	void setGhostPattern( Pattern* pattern );
 
 	int quantization() const;
 
