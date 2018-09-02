@@ -637,6 +637,19 @@ void PatternView::openInPianoRoll()
 
 
 
+
+void PatternView::setGhostInPianoRoll()
+{
+	gui->pianoRoll()->setGhostPattern( m_pat );
+	gui->pianoRoll()->parentWidget()->show();
+	gui->pianoRoll()->show();
+	gui->pianoRoll()->setFocus();
+}
+
+
+
+
+
 void PatternView::resetName()
 {
 	m_pat->setName( m_pat->m_instrumentTrack->name() );
@@ -663,7 +676,17 @@ void PatternView::constructContextMenu( QMenu * _cm )
 	_cm->insertAction( _cm->actions()[0], a );
 	connect( a, SIGNAL( triggered( bool ) ),
 					this, SLOT( openInPianoRoll() ) );
-	_cm->insertSeparator( _cm->actions()[1] );
+
+	if( gui->pianoRoll()->currentPattern() and gui->pianoRoll()->currentPattern() != m_pat ){
+		QAction * b = new QAction( embed::getIconPixmap( "ghost_note" ),
+						tr( "Set as ghost in piano-roll" ), _cm );
+		_cm->insertAction( _cm->actions()[1], b );
+		connect( b, SIGNAL( triggered( bool ) ),
+						this, SLOT( setGhostInPianoRoll() ) );
+		_cm->insertSeparator( _cm->actions()[2] );
+	} else {
+		_cm->insertSeparator( _cm->actions()[1] );
+	}
 
 	_cm->addSeparator();
 

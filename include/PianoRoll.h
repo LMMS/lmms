@@ -59,15 +59,19 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor lineColor READ lineColor WRITE setLineColor )
 	Q_PROPERTY( QColor noteModeColor READ noteModeColor WRITE setNoteModeColor )
 	Q_PROPERTY( QColor noteColor READ noteColor WRITE setNoteColor )
+	Q_PROPERTY( QColor ghostNoteColor READ ghostNoteColor WRITE setGhostNoteColor )
 	Q_PROPERTY( QColor noteTextColor READ noteTextColor WRITE setNoteTextColor )
+	Q_PROPERTY( QColor ghostNoteTextColor READ ghostNoteTextColor WRITE setGhostNoteTextColor )
 	Q_PROPERTY( QColor barColor READ barColor WRITE setBarColor )
 	Q_PROPERTY( QColor selectedNoteColor READ selectedNoteColor WRITE setSelectedNoteColor )
 	Q_PROPERTY( QColor textColor READ textColor WRITE setTextColor )
 	Q_PROPERTY( QColor textColorLight READ textColorLight WRITE setTextColorLight )
 	Q_PROPERTY( QColor textShadow READ textShadow WRITE setTextShadow )
 	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
-	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
+	Q_PROPERTY( unsigned char noteOpacity READ noteOpacity WRITE setNoteOpacity )
 	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
+	Q_PROPERTY( unsigned char ghostNoteOpacity READ ghostNoteOpacity WRITE setGhostNoteOpacity )
+	Q_PROPERTY( bool ghostNoteBorders READ ghostNoteBorders WRITE setGhostNoteBorders )
 	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
 public:
 	enum EditModes
@@ -87,6 +91,7 @@ public:
 	void showPanTextFloat(panning_t pan, const QPoint &pos, int timeout=-1);
 
 	void setCurrentPattern( Pattern* newPattern );
+	void setGhostPattern( Pattern* newPattern );
 
 	inline void stopRecording()
 	{
@@ -137,10 +142,18 @@ public:
 	void setTextShadow( const QColor & c );
 	QColor markedSemitoneColor() const;
 	void setMarkedSemitoneColor( const QColor & c );
-	int noteOpacity() const;
-	void setNoteOpacity( const int i );
+	unsigned char noteOpacity() const;
+	void setNoteOpacity( const unsigned char i );
 	bool noteBorders() const;
 	void setNoteBorders( const bool b );
+	QColor ghostNoteColor() const;
+	void setGhostNoteColor( const QColor & c );
+	QColor ghostNoteTextColor() const;
+	void setGhostNoteTextColor( const QColor & c );
+	unsigned char ghostNoteOpacity() const;
+	void setGhostNoteOpacity( const unsigned char i );
+	bool ghostNoteBorders() const;
+	void setGhostNoteBorders( const bool b );
 	QColor backgroundShade() const;
 	void setBackgroundShade( const QColor & c );
 
@@ -205,6 +218,8 @@ protected slots:
 	void hidePattern( Pattern* pattern );
 
 	void selectRegionFromPixels( int xStart, int xEnd );
+
+	void clearGhostPattern();
 
 
 signals:
@@ -309,6 +324,7 @@ private:
 	static const QVector<double> m_zoomLevels;
 
 	Pattern* m_pattern;
+	Pattern* m_ghostPattern;
 	QScrollBar * m_leftRightScroll;
 	QScrollBar * m_topBottomScroll;
 
@@ -388,14 +404,18 @@ private:
 	QColor m_noteModeColor;
 	QColor m_noteColor;
 	QColor m_noteTextColor;
+	QColor m_ghostNoteColor;
+	QColor m_ghostNoteTextColor;
 	QColor m_barColor;
 	QColor m_selectedNoteColor;
 	QColor m_textColor;
 	QColor m_textColorLight;
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
-	int m_noteOpacity;
+	unsigned char m_noteOpacity;
+	unsigned char m_ghostNoteOpacity;
 	bool m_noteBorders;
+	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;
 
 signals:
@@ -412,7 +432,8 @@ public:
 	PianoRollWindow();
 
 	const Pattern* currentPattern() const;
-	void setCurrentPattern(Pattern* pattern);
+	void setCurrentPattern( Pattern* pattern );
+	void setGhostPattern( Pattern* newPattern );
 
 	int quantization() const;
 
@@ -456,6 +477,7 @@ private:
 	ComboBox * m_noteLenComboBox;
 	ComboBox * m_scaleComboBox;
 	ComboBox * m_chordComboBox;
+	QPushButton * m_clearGhostButton;
 
 };
 
