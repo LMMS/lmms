@@ -606,6 +606,11 @@ PianoRoll::~PianoRoll()
 void PianoRoll::setGhostPattern( Pattern* newPattern )
 {
 	m_ghostPattern = newPattern;
+	if( newPattern != nullptr )
+	{
+		// make sure to always get informed about the pattern being destroyed
+		connect( m_ghostPattern, SIGNAL( destroyedPattern( Pattern* ) ), this, SLOT( clearGhostPattern() ) );
+	}
 }
 
 
