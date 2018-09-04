@@ -428,7 +428,7 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
     </message>
     <message>
         <source>A higher tension value may make a smoother curve but overshoot some values. A low tension value will cause the slope of the curve to level off at each control point.</source>
-        <translation>Ein höherer Spannungswert erzeugt villeicht eine glattere Kurve aber schießt teilweise über. Ein niederer Spannungswert wird die Kurve über jeden Kontrollpunkt legen.</translation>
+        <translation>Ein höherer Spannungswert erzeugt vielleicht eine glattere Kurve aber schießt teilweise über. Ein niederer Spannungswert wird die Kurve über jeden Kontrollpunkt legen.</translation>
     </message>
     <message>
         <source>Click here to choose discrete progressions for this automation pattern.  The value of the connected object will remain constant between control points and be set immediately to the new value when each control point is reached.</source>
@@ -843,7 +843,7 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
     </message>
     <message>
         <source>USER CONTROLLER</source>
-        <translation>BENUTZERDEFINIETER CONTROLLER</translation>
+        <translation>BENUTZERDEFINIERTER CONTROLLER</translation>
     </message>
     <message>
         <source>MAPPING FUNCTION</source>
@@ -1580,7 +1580,7 @@ Ein Recktsklick öffnet ein Kontextmenü, in dem Sie die Reihenfolge der Effekte
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the current LFO. The bigger this value the more the selected size (e.g. volume or cutoff-frequency) will be influenced by this LFO.</source>
-        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität des aktuellen LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität des aktuellen LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cutoff-Frequenz) von diesem LFO beeinflusst.</translation>
     </message>
     <message>
         <source>Click here for a sine-wave.</source>
@@ -2570,7 +2570,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
     <message>
         <source>An arpeggio is a method playing (especially plucked) instruments, which makes the music much livelier. The strings of such instruments (e.g. harps) are plucked like chords. The only difference is that this is done in a sequential order, so the notes are not played at the same time. Typical arpeggios are major or minor triads, but there are a lot of other possible chords, you can select.</source>
-        <translation>Ein Arpeggio ist eine Art, (vorallem gezupfte) Instrumente zu spielen, die die Musik viel lebendiger macht. Die Seiten von solchen Instrumenten (z.B. Harfen) werden wie Akkorde gezupft, der einzige Unterschied besteht darin, dass dies nacheinander geschieht. Die Noten werden also nicht zur gleichen Zeit gespielt. Typische Arpeggios sind Dur- oder Moll-Dreiklänge, aber es gibt noch viele andere Akkorde, die Sie auswählen können.</translation>
+        <translation>Ein Arpeggio ist eine Art, (vor allem gezupfte) Instrumente zu spielen, die die Musik viel lebendiger macht. Die Seiten von solchen Instrumenten (z.B. Harfen) werden wie Akkorde gezupft, der einzige Unterschied besteht darin, dass dies nacheinander geschieht. Die Noten werden also nicht zur gleichen Zeit gespielt. Typische Arpeggios sind Dur- oder Moll-Dreiklänge, aber es gibt noch viele andere Akkorde, die Sie auswählen können.</translation>
     </message>
     <message>
         <source>RANGE</source>
@@ -2586,7 +2586,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
     <message>
         <source>Use this knob for setting the arpeggio range in octaves. The selected arpeggio will be played within specified number of octaves.</source>
-        <translation>Benutzen Sie diesen Regler, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewähle Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+        <translation>Benutzen Sie diesen Regler, um den Arpeggio-Bereich in Oktaven zu setzen. Das gewählte Arpeggio wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
     </message>
     <message>
         <source>TIME</source>
@@ -3080,7 +3080,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
     <message>
         <source>Use this knob for setting the chord range in octaves. The selected chord will be played within specified number of octaves.</source>
-        <translation>Benutzen Sie diesen Regler, um den Akkord-Bereich in Oktaven zu setzen. Der gewähle Akkord wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
+        <translation>Benutzen Sie diesen Regler, um den Akkord-Bereich in Oktaven zu setzen. Der gewählte Akkord wird innerhalb der angegebenen Anzahl von Oktaven abgespielt.</translation>
     </message>
     <message>
         <source>STACKING</source>
@@ -3485,7 +3485,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
     <message>
         <source>Save current instrument track settings in a preset file</source>
-        <translation>Aktuelle Instrumentenspur-Einstelungen in einer Presetdatei speichern</translation>
+        <translation>Aktuelle Instrumentenspur-Einstellungen in einer Presetdatei speichern</translation>
     </message>
     <message>
         <source>Click here, if you want to save current instrument track settings in a preset file. Later you can load this preset by double-clicking it in the preset-browser.</source>
@@ -3680,7 +3680,7 @@ Sie können FX Kanäle im Kontextmenü entfernen und verschieben, welches durch 
     </message>
     <message>
         <source>Use this knob for setting modulation amount of the LFO. The bigger this value, the more the connected control (e.g. volume or cutoff-frequency) will be influenced by the LFO.</source>
-        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität des LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cuttoff-Frequenz) von diesem LFO beeinflusst.</translation>
+        <translation>Benutzen Sie diesen Regler, um die Modulationsintensität des LFOs einzustellen. Je größer der Wert, desto mehr wird die gewählte Größe (z.B. Lautstärke oder Cutoff-Frequenz) von diesem LFO beeinflusst.</translation>
     </message>
     <message>
         <source>PHS</source>
@@ -3998,7 +3998,7 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>Project recovery</source>
-        <translation>Project wiederherstellen</translation>
+        <translation>Projekt wiederherstellen</translation>
     </message>
     <message>
         <source>There is a recovery file present. It looks like the last session did not end properly or another instance of LMMS is already running. Do you want to recover the project of this session?</source>
@@ -4026,11 +4026,11 @@ Bitte besuchen Sie http://lmms.sf.net/wiki für Dokumentationen über LMMS.</tra
     </message>
     <message>
         <source>Preparing file browsers</source>
-        <translation>Dateimanger vorbereiten</translation>
+        <translation>Dateimanager vorbereiten</translation>
     </message>
     <message>
         <source>Root directory</source>
-        <translation>Grundverzeichniss</translation>
+        <translation>Grundverzeichnis</translation>
     </message>
     <message>
         <source>Loading background artwork</source>
@@ -4289,7 +4289,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Osc 1 Pulse width</source>
-        <translation>Oszilator 1 Pulsweite</translation>
+        <translation>Oszillator 1 Pulsweite</translation>
     </message>
     <message>
         <source>Osc 1 Sync send on rise</source>
@@ -4649,7 +4649,7 @@ Please make sure you have write permission to the file and the directory contain
     </message>
     <message>
         <source>Bandlimited Triangle wave</source>
-        <translation>Bandlimittierte Dreieckwelle</translation>
+        <translation>Bandlimitierte Dreieckwelle</translation>
     </message>
     <message>
         <source>Bandlimited Saw wave</source>
@@ -4816,11 +4816,11 @@ Jedes Modulationsziel hat 4 Regler, einen für jeden Modulator. Standardmäßig 
     </message>
     <message>
         <source>Hard sync: Every time the oscillator receives a sync signal from oscillator 1, its phase is reset to 0 + whatever its phase offset is. </source>
-        <translation>Hard sync: Jedes Mal, wenn der Oszillator ein sync-Signal von Oszillator 1 empfäng, wird die Phase auf 0  zurückgesetzt, egal was die Phasendifferenz ist. </translation>
+        <translation>Hard sync: Jedes Mal, wenn der Oszillator ein sync-Signal von Oszillator 1 empfängt, wird die Phase auf 0  zurückgesetzt, egal was die Phasendifferenz ist. </translation>
     </message>
     <message>
         <source>Reverse sync: Every time the oscillator receives a sync signal from oscillator 1, the amplitude of the oscillator gets inverted. </source>
-        <translation>Reverse sync: Jedes Mal, wenn der Oszillator ein sync-Signal von Oszillator 1 empfäng, wird die Amplitude des Oszillators invertiert. </translation>
+        <translation>Reverse sync: Jedes Mal, wenn der Oszillator ein sync-Signal von Oszillator 1 empfängt, wird die Amplitude des Oszillators invertiert. </translation>
     </message>
     <message>
         <source>Choose waveform for oscillator 2. </source>
@@ -4912,7 +4912,7 @@ PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 
     </message>
     <message>
         <source>SUS, or sustain, controls the sustain level of the envelope. The decay phase will not go below this level as long as the note is held. </source>
-        <translation>SUS, oder Dauerpegel, kontrolliert den Dauerpgel der Hüllkurve. Die Abfall-Phase geht nicht unter diesen Pegel, solange die Note gehalten wird. </translation>
+        <translation>SUS, oder Dauerpegel, kontrolliert den Dauerpegel der Hüllkurve. Die Abfall-Phase geht nicht unter diesen Pegel, solange die Note gehalten wird. </translation>
     </message>
     <message>
         <source>REL, or release, controls how long the release is for the note, measured in how long it would take to fall from peak to zero. Actual release may be shorter, depending on at what phase the note is released. </source>
@@ -5436,7 +5436,7 @@ PM bedeutet Phasen-Modulation: Die Phase von Oszillator 3 wird durch Oszillator 
     </message>
     <message>
         <source>Due to a bug in older version of LMMS, the peak controllers may not be connect properly. Please ensure that peak controllers are connected properly and re-save this file. Sorry for any inconvenience caused.</source>
-        <translation>Aufgrud eines Fehlers in einer älteren Version von LMMS, sind die Peak Controller möglicherweise nicht richtig verbunden. Bitte stellen Sie sicher, dass die Peak Controller richtig verbunden sind und speichern Sie die Datei erneut. Entschuldigung für jegliche verursachte Unannehmlichkeiten.</translation>
+        <translation>Aufgrund eines Fehlers in einer älteren Version von LMMS, sind die Peak Controller möglicherweise nicht richtig verbunden. Bitte stellen Sie sicher, dass die Peak Controller richtig verbunden sind und speichern Sie die Datei erneut. Entschuldigung für jegliche verursachte Unannehmlichkeiten.</translation>
     </message>
 </context>
 <context>
@@ -6376,19 +6376,19 @@ Latenz: %2 ms</translation>
     </message>
     <message>
         <source>Themes directory</source>
-        <translation>Themen Verzeichniss</translation>
+        <translation>Themen Verzeichnis</translation>
     </message>
     <message>
         <source>GIG directory</source>
-        <translation>GIG Verzeichniss</translation>
+        <translation>GIG Verzeichnis</translation>
     </message>
     <message>
         <source>SF2 directory</source>
-        <translation>SF2 Verzeichniss</translation>
+        <translation>SF2 Verzeichnis</translation>
     </message>
     <message>
         <source>LADSPA plugin directories</source>
-        <translation>LADSPA Plugin Verzeichniss</translation>
+        <translation>LADSPA Plugin Verzeichnisse</translation>
     </message>
     <message>
         <source>Auto save</source>
@@ -7515,19 +7515,19 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     <name>WatsynView</name>
     <message>
         <source>Select oscillator A1</source>
-        <translation>Oszilator A1 auswählen</translation>
+        <translation>Oszillator A1 auswählen</translation>
     </message>
     <message>
         <source>Select oscillator A2</source>
-        <translation>Oszilator A2 auswählen</translation>
+        <translation>Oszillator A2 auswählen</translation>
     </message>
     <message>
         <source>Select oscillator B1</source>
-        <translation>Oszilator B1 auswählen</translation>
+        <translation>Oszillator B1 auswählen</translation>
     </message>
     <message>
         <source>Select oscillator B2</source>
-        <translation>Oszilator B2 auswählen</translation>
+        <translation>Oszillator B2 auswählen</translation>
     </message>
     <message>
         <source>Mix output of A2 to A1</source>
@@ -8570,7 +8570,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Bandlimited triangle wave</source>
-        <translation>Bandlimittierte Dreieckwelle</translation>
+        <translation>Bandlimitierte Dreieckwelle</translation>
     </message>
     <message>
         <source>Click here for bandlimited triangle wave.</source>
@@ -8909,7 +8909,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Op 1 Level</source>
-        <translation>Op 1 Strärke</translation>
+        <translation>Op 1 Stärke</translation>
     </message>
     <message>
         <source>Op 1 Level Scaling</source>
@@ -8961,7 +8961,7 @@ Doppelklicken auf eines der Plugins zeigt Informaitonen über die Ports an.</tra
     </message>
     <message>
         <source>Op 2 Level</source>
-        <translation>Op 2 Strärke</translation>
+        <translation>Op 2 Stärke</translation>
     </message>
     <message>
         <source>Op 2 Level Scaling</source>
@@ -9867,7 +9867,7 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     </message>
     <message>
         <source>When Filtered is on, Voice %1 will be processed through the Filter. When Filtered is off, Voice %1 appears directly at the output, and the Filter has no effect on it.</source>
-        <translation>Wenn gefilter an ist, wird Stimme %1 durch den Filter verarbeitet. Wenn gefiltert aus ist, wird Stimme %1 direckt an die Ausgabe weitergeleitet und der Filter hat keine Auswirkung darauf.</translation>
+        <translation>Wenn gefilter an ist, wird Stimme %1 durch den Filter verarbeitet. Wenn gefiltert aus ist, wird Stimme %1 direkt an die Ausgabe weitergeleitet und der Filter hat keine Auswirkung darauf.</translation>
     </message>
     <message>
         <source>Test</source>
@@ -10064,7 +10064,7 @@ Dieser Chip wurde in Commodore 64 Computern genutzt.</translation>
     </message>
     <message>
         <source>Octave</source>
-        <translation>Okatve</translation>
+        <translation>Oktave</translation>
     </message>
     <message>
         <source>The Octave selector is used to choose which harmonic of the note the string will ring at.  For example, &apos;-2&apos; means the string will ring two octaves below the fundamental, &apos;F&apos; means the string will ring at the fundamental, and &apos;6&apos; means the string will ring six octaves above the fundamental.</source>
