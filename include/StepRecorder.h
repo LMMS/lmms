@@ -42,14 +42,14 @@ class StepRecorder : public QObject
 
 	void initialize();
 	void start(const MidiTime& currentPosition,const MidiTime& stepLength);
-	void stop();     
+	void stop();
 	void notePressed(const Note & n);
 	void noteReleased(const Note & n);
 	bool keyPressEvent(QKeyEvent* ke);
 	bool mousePressEvent(QMouseEvent* ke);
 	void setCurrentPattern(Pattern* newPattern);
 	void setStepsLength(const MidiTime& newLength);
-	
+
 	QVector<Note*> getCurStepNotes();
 
 	bool isRecording() const
@@ -58,16 +58,16 @@ class StepRecorder : public QObject
 	}
 
 	QColor curStepNoteColor() const
-	{ 
+	{
 		return QColor(245,3,139); // radiant pink
 	}
 
-	private slots:    
+	private slots:
 	void removeNotesReleasedForTooLong();
 
 	private:
 	void stepForwards();
-	void stepBackwards();   
+	void stepBackwards();
 
 	void applyStep();
 	void dismissStep();
@@ -90,9 +90,9 @@ class StepRecorder : public QObject
 	MidiTime m_stepsLength;
 	MidiTime m_curStepLength; // current step length refers to the step currently recorded. it may defer from m_stepsLength
 							  // since the user can make current step larger
-	
-	QTimer m_updateReleasedTimer;   
-	
+
+	QTimer m_updateReleasedTimer;
+
 	Pattern* m_pattern;
 
 	class StepNote
@@ -129,7 +129,7 @@ class StepRecorder : public QObject
 		Note m_note;
 
 		private:
-		bool m_pressed;        
+		bool m_pressed;
 		QTime releasedTimer;
 	} ;
 

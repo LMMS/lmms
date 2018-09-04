@@ -24,13 +24,13 @@
 #include "TextFloat.h"
 #include "embed.h"
 
-StepRecorderWidget::StepRecorderWidget( 
-		QWidget * parent, 
-		const int ppt,    
+StepRecorderWidget::StepRecorderWidget(
+		QWidget * parent,
+		const int ppt,
 		const int marginTop,
 		const int marginBottom,
 		const int marginLeft,
-		const int marginRight) : 
+		const int marginRight) :
 	QWidget(parent),
 	m_marginTop(marginTop),
 	m_marginBottom(marginBottom),
@@ -65,18 +65,18 @@ void StepRecorderWidget::setBottomMargin(const int marginBottom)
 
 void StepRecorderWidget::setStartPosition(MidiTime pos)
 {
-	m_curStepStartPos = pos;	
+	m_curStepStartPos = pos;
 }
 
 void StepRecorderWidget::setEndPosition(MidiTime pos)
 {
-	m_curStepEndPos = pos;	
+	m_curStepEndPos = pos;
 	emit positionChanged(m_curStepEndPos);
 }
 
 void StepRecorderWidget::showHint()
 {
-	TextFloat::displayMessage(tr( "Hint" ), tr("Move recording curser using <Left/Right> arrows"), 
+	TextFloat::displayMessage(tr( "Hint" ), tr("Move recording curser using <Left/Right> arrows"),
 		embed::getIconPixmap("hint"));
 }
 
@@ -119,7 +119,7 @@ void StepRecorderWidget::paintEvent(QPaintEvent * pe)
 	//add another line to make it clearer
 	if(m_curStepEndPos == 0)
 	{
-		drawVerLine(&painter, xCoordOfTick(m_curStepEndPos) + 1, m_colorLineEnd, m_top, m_bottom);		
+		drawVerLine(&painter, xCoordOfTick(m_curStepEndPos) + 1, m_colorLineEnd, m_top, m_bottom);
 	}
 }
 

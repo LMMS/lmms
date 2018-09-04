@@ -28,13 +28,13 @@
 using std::min;
 using std::max;
 
-const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70; 
+const int REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS = 70;
 
 StepRecorder::StepRecorder(PianoRoll& pianoRoll, StepRecorderWidget& stepRecorderWidget):
 	m_pianoRoll(pianoRoll),
 	m_stepRecorderWidget(stepRecorderWidget)
 {
-	m_stepRecorderWidget.hide();	
+	m_stepRecorderWidget.hide();
 }
 
 void StepRecorder::initialize()
@@ -45,7 +45,7 @@ void StepRecorder::initialize()
 void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLength)
 {
 	m_isRecording = true;
-	
+
 	setStepsLength(stepLength);
 
 	// quantize current position to get start recording position
@@ -53,7 +53,7 @@ void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLe
 	const int curPosTicks = currentPosition.getTicks();
 	const int QuantizedPosTicks = (curPosTicks / q) * q;
 	const MidiTime& QuantizedPos = MidiTime(QuantizedPosTicks);
-	
+
 	m_curStepStartPos = QuantizedPos;
 	m_curStepLength = 0;
 
@@ -61,12 +61,12 @@ void StepRecorder::start(const MidiTime& currentPosition, const MidiTime& stepLe
 
 	m_stepRecorderWidget.showHint();
 
-	prepareNewStep();	
+	prepareNewStep();
 }
 
 void StepRecorder::stop()
 {
-	m_stepRecorderWidget.hide();	
+	m_stepRecorderWidget.hide();
 	m_isRecording = false;
 }
 
@@ -75,9 +75,9 @@ void StepRecorder::notePressed(const Note & n)
 	//if this is the first pressed note in step, advance position
 	if(!m_isStepInProgress)
 	{
-		m_isStepInProgress = true;		
+		m_isStepInProgress = true;
 
-		//move curser one step forwards 
+		//move curser one step forwards
 		stepForwards();
 	}
 
@@ -85,7 +85,7 @@ void StepRecorder::notePressed(const Note & n)
 	if(stepNote == nullptr)
 	{
 		m_curStepNotes.append(new StepNote(Note(m_stepsLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
-		m_pianoRoll.update();		
+		m_pianoRoll.update();
 	}
 	else if (stepNote->isReleased())
 	{
@@ -101,7 +101,7 @@ void StepRecorder::noteReleased(const Note & n)
 	{
 		stepNote->setReleased();
 
-		//if m_updateReleasedTimer is not already active, activate it 
+		//if m_updateReleasedTimer is not already active, activate it
 		//(when activated, the timer will re-set itself as long as there are released notes)
 		if(!m_updateReleasedTimer.isActive())
 		{
@@ -115,12 +115,12 @@ void StepRecorder::noteReleased(const Note & n)
 			{
 				applyStep();
 			}
-			else 
+			else
 			{
 				dismissStep();
 			}
 		}
-	}	
+	}
 }
 
 bool StepRecorder::keyPressEvent(QKeyEvent* ke)
@@ -163,7 +163,7 @@ void StepRecorder::setStepsLength(const MidiTime& newLength)
 		updateCurStepNotes();
 	}
 
-	m_stepsLength = newLength;		
+	m_stepsLength = newLength;
 
 	updateWidget();
 }
@@ -191,7 +191,7 @@ void StepRecorder::stepForwards()
 
 		updateCurStepNotes();
 	}
-	else 
+	else
 	{
 		m_curStepStartPos += m_stepsLength;
 	}
@@ -207,7 +207,7 @@ void StepRecorder::stepBackwards()
 		{
 			m_curStepLength = max(m_curStepLength - m_stepsLength, 0);
 		}
-		else 
+		else
 		{
 			//if length is already zero - move starting position backwards
 			m_curStepStartPos = max(m_curStepStartPos - m_stepsLength, 0);
@@ -215,7 +215,7 @@ void StepRecorder::stepBackwards()
 
 		updateCurStepNotes();
 	}
-	else 
+	else
 	{
 		m_curStepStartPos = max(m_curStepStartPos - m_stepsLength, 0);
 	}
@@ -257,7 +257,7 @@ void StepRecorder::prepareNewStep()
 		delete stepNote;
 	}
 	m_curStepNotes.clear();
-	
+
 	m_isStepInProgress = false;
 
 	m_curStepStartPos = getCurStepEndPos();
@@ -282,7 +282,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	bool notesRemoved = false;
 
 	QMutableVectorIterator<StepNote*> itr(m_curStepNotes);
-	while (itr.hasNext()) 
+	while (itr.hasNext())
 	{
 		StepNote* stepNote = itr.next();
 
@@ -295,7 +295,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 				itr.remove();
 				notesRemoved = true;
 			}
-			else 
+			else
 			{
 				nextTimout = min(nextTimout, REMOVE_RELEASED_NOTE_TIME_THRESHOLD_MS - timeSinceReleased);
 			}
@@ -311,7 +311,7 @@ void StepRecorder::removeNotesReleasedForTooLong()
 	{
 		m_updateReleasedTimer.start(nextTimout);
 	}
-	else 
+	else
 	{
 		// no released note found for next timout, stop timer
 		m_updateReleasedTimer.stop();
@@ -348,7 +348,7 @@ bool StepRecorder::allCurStepNotesReleased()
 		}
 	}
 
-	return true;	
+	return true;
 }
 
 StepRecorder::StepNote* StepRecorder::findCurStepNote(const int key)

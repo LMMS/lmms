@@ -32,17 +32,17 @@
 class StepRecorderWidget : public QWidget
 {
 	Q_OBJECT
-	
+
 public:
 	StepRecorderWidget(
-		QWidget * parent, 
-		const int ppt,    
+		QWidget * parent,
+		const int ppt,
 		const int marginTop,
 		const int marginBottom,
 		const int marginLeft,
 		const int marginRight);
 
-	//API used by PianoRoll 
+	//API used by PianoRoll
 	void setPixelsPerTact(int ppt);
 	void setCurrentPosition(MidiTime currentPosition);
 	void setBottomMargin(const int marginBottom);
@@ -51,25 +51,25 @@ public:
 	void setStepsLength(MidiTime stepsLength);
 	void setStartPosition(MidiTime pos);
 	void setEndPosition(MidiTime pos);
-	
+
 	void showHint();
 
 private:
 	virtual void paintEvent(QPaintEvent * pe);
-	
+
 	int xCoordOfTick(int tick);
-	
+
 	void drawVerLine(QPainter* painter, int x, const QColor& color, int top, int bottom);
 	void drawVerLine(QPainter* painter, const MidiTime& pos, const QColor& color, int top, int bottom);
-	
+
 	void updateBoundaries();
 
 	MidiTime m_stepsLength;
 	MidiTime m_curStepStartPos;
 	MidiTime m_curStepEndPos;
 
-	int m_ppt; // pixels per tact	
-	MidiTime m_currentPosition; // current position showed by on PianoRoll 
+	int m_ppt; // pixels per tact
+	MidiTime m_currentPosition; // current position showed by on PianoRoll
 
 	QColor m_colorLineStart;
 	QColor m_colorLineEnd;
@@ -86,7 +86,7 @@ private:
 	const int m_marginRight;
 
 signals:
-	void positionChanged(const MidiTime & t);	
+	void positionChanged(const MidiTime & t);
 } ;
 
 #endif //STEP_RECOREDER_WIDGET_H
