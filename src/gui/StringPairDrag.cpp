@@ -53,7 +53,7 @@ StringPairDrag::StringPairDrag( const QString & _key, const QString & _value,
 	QMimeData * m = new QMimeData();
 	m->setData( mimeType(), txt.toUtf8() );
 	setMimeData( m );
-	start( Qt::IgnoreAction );
+	exec( Qt::LinkAction, Qt::LinkAction );
 }
 
 
