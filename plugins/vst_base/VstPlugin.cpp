@@ -157,6 +157,11 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
+	if( _this.hasAttribute( "program" ) )
+	{
+		setProgram( _this.attribute( "program" ).toInt() );
+	}
+
 	const int num_params = _this.attribute( "numparams" ).toInt();
 	// if it exists try to load settings chunk
 	if( _this.hasAttribute( "chunk" ) )
@@ -175,11 +180,6 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 			dump[key] = _this.attribute( key );
 		}
 		setParameterDump( dump );
-	}
-
-	if( _this.hasAttribute( "program" ) )
-	{
-		setProgram( _this.attribute( "program" ).toInt() );
 	}
 }
 
