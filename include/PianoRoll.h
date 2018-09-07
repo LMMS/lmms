@@ -68,9 +68,9 @@ class PianoRoll : public QWidget
 	Q_PROPERTY( QColor textColorLight READ textColorLight WRITE setTextColorLight )
 	Q_PROPERTY( QColor textShadow READ textShadow WRITE setTextShadow )
 	Q_PROPERTY( QColor markedSemitoneColor READ markedSemitoneColor WRITE setMarkedSemitoneColor )
-	Q_PROPERTY( unsigned char noteOpacity READ noteOpacity WRITE setNoteOpacity )
+	Q_PROPERTY( int noteOpacity READ noteOpacity WRITE setNoteOpacity )
 	Q_PROPERTY( bool noteBorders READ noteBorders WRITE setNoteBorders )
-	Q_PROPERTY( unsigned char ghostNoteOpacity READ ghostNoteOpacity WRITE setGhostNoteOpacity )
+	Q_PROPERTY( int ghostNoteOpacity READ ghostNoteOpacity WRITE setGhostNoteOpacity )
 	Q_PROPERTY( bool ghostNoteBorders READ ghostNoteBorders WRITE setGhostNoteBorders )
 	Q_PROPERTY( QColor backgroundShade READ backgroundShade WRITE setBackgroundShade )
 public:
@@ -142,16 +142,16 @@ public:
 	void setTextShadow( const QColor & c );
 	QColor markedSemitoneColor() const;
 	void setMarkedSemitoneColor( const QColor & c );
-	unsigned char noteOpacity() const;
-	void setNoteOpacity( const unsigned char i );
+	int noteOpacity() const;
+	void setNoteOpacity( const int i );
 	bool noteBorders() const;
 	void setNoteBorders( const bool b );
 	QColor ghostNoteColor() const;
 	void setGhostNoteColor( const QColor & c );
 	QColor ghostNoteTextColor() const;
 	void setGhostNoteTextColor( const QColor & c );
-	unsigned char ghostNoteOpacity() const;
-	void setGhostNoteOpacity( const unsigned char i );
+	int ghostNoteOpacity() const;
+	void setGhostNoteOpacity( const int i );
 	bool ghostNoteBorders() const;
 	void setGhostNoteBorders( const bool b );
 	QColor backgroundShade() const;
@@ -412,8 +412,8 @@ private:
 	QColor m_textColorLight;
 	QColor m_textShadow;
 	QColor m_markedSemitoneColor;
-	unsigned char m_noteOpacity;
-	unsigned char m_ghostNoteOpacity;
+	int m_noteOpacity;
+	int m_ghostNoteOpacity;
 	bool m_noteBorders;
 	bool m_ghostNoteBorders;
 	QColor m_backgroundShade;

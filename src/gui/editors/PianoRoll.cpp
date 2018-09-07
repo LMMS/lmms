@@ -811,10 +811,10 @@ QColor PianoRoll::markedSemitoneColor() const
 void PianoRoll::setMarkedSemitoneColor( const QColor & c )
 { m_markedSemitoneColor = c; }
 
-unsigned char PianoRoll::noteOpacity() const
+int PianoRoll::noteOpacity() const
 { return m_noteOpacity; }
 
-void PianoRoll::setNoteOpacity( const unsigned char i )
+void PianoRoll::setNoteOpacity( const int i )
 { m_noteOpacity = i; }
 
 bool PianoRoll::noteBorders() const
@@ -835,10 +835,10 @@ QColor PianoRoll::ghostNoteTextColor() const
 void PianoRoll::setGhostNoteTextColor( const QColor & c )
 { m_ghostNoteTextColor = c; }
 
-unsigned char PianoRoll::ghostNoteOpacity() const
+int PianoRoll::ghostNoteOpacity() const
 { return m_ghostNoteOpacity; }
 
-void PianoRoll::setGhostNoteOpacity( const unsigned char i )
+void PianoRoll::setGhostNoteOpacity( const int i )
 { m_ghostNoteOpacity = i; }
 
 bool PianoRoll::ghostNoteBorders() const
