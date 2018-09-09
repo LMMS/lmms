@@ -68,7 +68,8 @@ f_cnt_t Instrument::beatLen( NotePlayHandle * ) const
 Instrument * Instrument::instantiate( const QString & _plugin_id,
 					InstrumentTrack * _instrument_track )
 {
-	Plugin * p = Plugin::instantiate( _plugin_id, _instrument_track,
+	Plugin * p = Plugin::instantiate( Plugin::Embedded,
+                                   _plugin_id, _instrument_track,
 							_instrument_track );
 	// check whether instantiated plugin is an instrument
 	if( dynamic_cast<Instrument *>( p ) != NULL )

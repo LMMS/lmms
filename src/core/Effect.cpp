@@ -52,7 +52,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 {
 	m_srcState[0] = m_srcState[1] = NULL;
 	reinitSRC();
-	
+
 	if( ConfigManager::inst()->value( "ui", "disableautoquit").toInt() )
 	{
 		m_autoQuitDisabled = true;
@@ -117,7 +117,10 @@ Effect * Effect::instantiate( const QString& pluginName,
 				Model * _parent,
 				Descriptor::SubPluginFeatures::Key * _key )
 {
-	Plugin * p = Plugin::instantiate( pluginName, _parent, _key );
+	Plugin * p = Plugin::instantiate(Plugin::Embedded,
+                                   pluginName,
+                                   _parent,
+                                   _key );
 	// check whether instantiated plugin is an effect
 	if( dynamic_cast<Effect *>( p ) != NULL )
 	{
@@ -168,7 +171,7 @@ PluginView * Effect::instantiateView( QWidget * _parent )
 	return new EffectView( this, _parent );
 }
 
-	
+
 
 
 void Effect::reinitSRC()

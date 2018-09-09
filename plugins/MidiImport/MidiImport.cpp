@@ -4,7 +4,7 @@
  * Copyright (c) 2005-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -64,6 +64,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiimport_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users/dot/sf/dot/net>",
 	0x0100,
 	Plugin::ImportFilter,
+  Plugin::Embedded,
 	NULL,
 	NULL,
 	NULL
@@ -151,17 +152,17 @@ public:
 		ap( NULL ),
 		lastPos( 0 )
 	{ }
-	
+
 	AutomationTrack * at;
 	AutomationPattern * ap;
 	MidiTime lastPos;
-	
+
 	smfMidiCC & create( TrackContainer* tc, QString tn )
 	{
 		if( !at )
 		{
-			// Keep LMMS responsive, for now the import runs 
-			// in the main thread. This should probably be 
+			// Keep LMMS responsive, for now the import runs
+			// in the main thread. This should probably be
 			// removed if that ever changes.
 			qApp->processEvents();
 			at = dynamic_cast<AutomationTrack *>( Track::create( Track::AutomationTrack, tc ) );
@@ -195,7 +196,7 @@ public:
 		lastPos = time;
 		time = time - ap->startPosition();
 		ap->putValue( time, value, false );
-		ap->changeLength( MidiTime( time.getTact() + 1, 0 ) ); 
+		ap->changeLength( MidiTime( time.getTact() + 1, 0 ) );
 
 		return *this;
 	}
@@ -215,15 +216,15 @@ public:
 		hasNotes( false ),
 		lastEnd( 0 )
 	{ }
-	
+
 	InstrumentTrack * it;
 	Pattern* p;
 	Instrument * it_inst;
-	bool isSF2; 
+	bool isSF2;
 	bool hasNotes;
 	MidiTime lastEnd;
 	QString trackName;
-	
+
 	smfMidiChannel * create( TrackContainer* tc, QString tn )
 	{
 		if( !it ) {
@@ -233,7 +234,7 @@ public:
 
 #ifdef LMMS_HAVE_FLUIDSYNTH
 			it_inst = it->loadInstrument( "sf2player" );
-		
+
 			if( it_inst )
 			{
 				isSF2 = true;
@@ -244,7 +245,7 @@ public:
 			else
 			{
 				it_inst = it->loadInstrument( "patman" );
-			}	
+			}
 #else
 			it_inst = it->loadInstrument( "patman" );
 #endif
@@ -296,19 +297,19 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 	pd.setMaximum( seq->tracks()  + preTrackSteps );
 	pd.setValue( 1 );
-	
+
 	// 128 CC + Pitch Bend
 	smfMidiCC ccs[129];
 	smfMidiChannel chs[256];
 
 	MeterModel & timeSigMM = Engine::getSong()->getTimeSigModel();
-	AutomationPattern * timeSigNumeratorPat = 
+	AutomationPattern * timeSigNumeratorPat =
 		AutomationPattern::globalAutomationPattern( &timeSigMM.numeratorModel() );
-	AutomationPattern * timeSigDenominatorPat = 
+	AutomationPattern * timeSigDenominatorPat =
 		AutomationPattern::globalAutomationPattern( &timeSigMM.denominatorModel() );
-	
+
 	// TODO: adjust these to Time.Sig changes
-	double beatsPerTact = 4; 
+	double beatsPerTact = 4;
 	double ticksPerBeat = DefaultTicksPerTact / beatsPerTact;
 
 	// Time-sig changes
@@ -364,7 +365,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 
 		if( evt->is_update() )
 		{
-			printf("Unhandled SONG update: %d %f %s\n", 
+			printf("Unhandled SONG update: %d %f %s\n",
 					evt->get_type_code(), evt->time, evt->get_attribute() );
 		}
 	}
@@ -423,9 +424,9 @@ bool MidiImport::readSMF( TrackContainer* tc )
 						noteEvt->get_identifier() - 12,
 						noteEvt->get_loud());
 				ch->addNote( n );
-				
+
 			}
-			
+
 			else if( evt->is_update() )
 			{
 				smfMidiChannel * ch = chs[evt->chan].create( tc, trackName );
@@ -467,7 +468,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 						double cc = evt->get_real_value();
 						AutomatableModel * objModel = NULL;
 
-						switch( ccid ) 
+						switch( ccid )
 						{
 							case 0:
 								if( ch->isSF2 && ch->it_inst )
@@ -507,8 +508,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 							{
 								if( ccs[ccid].at == NULL ) {
 									ccs[ccid].create( tc, trackName + " > " + (
-										  objModel != NULL ? 
-										  objModel->displayName() : 
+										  objModel != NULL ?
+										  objModel->displayName() :
 										  QString("CC %1").arg(ccid) ) );
 								}
 								ccs[ccid].putValue( time, objModel, cc );
@@ -517,7 +518,7 @@ bool MidiImport::readSMF( TrackContainer* tc )
 					}
 				}
 				else {
-					printf("Unhandled update: %d %d %f %s\n", (int) evt->chan, 
+					printf("Unhandled update: %d %d %f %s\n", (int) evt->chan,
 							evt->get_type_code(), evt->time, evt->get_attribute() );
 				}
 			}
@@ -525,8 +526,8 @@ bool MidiImport::readSMF( TrackContainer* tc )
 	}
 
 	delete seq;
-	
-	
+
+
 	for( int c=0; c < 256; ++c )
 	{
 		if( !chs[c].hasNotes && chs[c].it )

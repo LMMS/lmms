@@ -5,7 +5,7 @@
  * Copyright (c) 2017 Hyunjin Song <tteu.ingog/at/gmail.com>
  *
  * This file is part of LMMS - https://lmms.io
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -51,6 +51,7 @@ Plugin::Descriptor PLUGIN_EXPORT midiexport_plugin_descriptor =
 	"Hyunjin Song <tteu.ingog/at/gmail.com>",
 	0x0100,
 	Plugin::ExportFilter,
+  Plugin::Embedded,
 	NULL,
 	NULL,
 	NULL

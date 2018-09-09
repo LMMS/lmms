@@ -171,7 +171,7 @@ void Song::setTimeSignature()
 	emit dataChanged();
 	m_oldTicksPerTact = ticksPerTact();
 
-	m_vstSyncController.setTimeSignature( 
+	m_vstSyncController.setTimeSignature(
 		getTimeSigModel().getNumerator(), getTimeSigModel().getDenominator() );
 }
 
@@ -248,7 +248,7 @@ void Song::processNextBuffer()
 
 	// check for looping-mode and act if necessary
 	TimeLineWidget * tl = m_playPos[m_playMode].m_timeLine;
-	bool checkLoop = 
+	bool checkLoop =
 		tl != NULL && m_exporting == false && tl->loopPointsEnabled();
 
 	if( checkLoop )
@@ -258,7 +258,7 @@ void Song::processNextBuffer()
 		if( m_playPos[m_playMode] < tl->loopBegin() ||
 					m_playPos[m_playMode] >= tl->loopEnd() )
 		{
-			m_elapsedMilliSeconds = 
+			m_elapsedMilliSeconds =
 				( tl->loopBegin().getTicks() * 60 * 1000 / 48 ) / getTempo();
 			m_playPos[m_playMode].setTicks(
 						tl->loopBegin().getTicks() );
@@ -277,7 +277,7 @@ void Song::processNextBuffer()
 		// did we play a tick?
 		if( currentFrame >= framesPerTick )
 		{
-			int ticks = m_playPos[m_playMode].getTicks() + 
+			int ticks = m_playPos[m_playMode].getTicks() +
 				( int )( currentFrame / framesPerTick );
 
 			m_vstSyncController.setAbsolutePosition( ticks );
@@ -316,7 +316,7 @@ void Song::processNextBuffer()
 					ticks %= ( maxTact * MidiTime::ticksPerTact() );
 
 					// wrap milli second counter
-					m_elapsedMilliSeconds = 
+					m_elapsedMilliSeconds =
 						( ticks * 60 * 1000 / 48 ) / getTempo();
 
 					m_vstSyncController.setAbsolutePosition( ticks );
@@ -326,11 +326,11 @@ void Song::processNextBuffer()
 
 			if( checkLoop )
 			{
-				m_vstSyncController.startCycle( 
+				m_vstSyncController.startCycle(
 					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
 
 				// if looping-mode is enabled and we have got
-				// past the looping range, return to the 
+				// past the looping range, return to the
 				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
@@ -354,10 +354,10 @@ void Song::processNextBuffer()
 			m_playPos[m_playMode].setCurrentFrame( currentFrame );
 		}
 
-		f_cnt_t framesToPlay = 
+		f_cnt_t framesToPlay =
 			Engine::mixer()->framesPerPeriod() - framesPlayed;
 
-		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick - 
+		f_cnt_t framesLeft = ( f_cnt_t )framesPerTick -
 						( f_cnt_t )currentFrame;
 		// skip last frame fraction
 		if( framesLeft == 0 )
@@ -367,7 +367,7 @@ void Song::processNextBuffer()
 								+ 1.0f );
 			continue;
 		}
-		// do we have samples left in this tick but these are less 
+		// do we have samples left in this tick but these are less
 		// than samples we have to play?
 		if( framesLeft < framesToPlay )
 		{
@@ -393,8 +393,8 @@ void Song::processNextBuffer()
 		framesPlayed += framesToPlay;
 		m_playPos[m_playMode].setCurrentFrame( framesToPlay +
 								currentFrame );
-		m_elapsedMilliSeconds += 
-			( ( framesToPlay / framesPerTick ) * 60 * 1000 / 48 ) 
+		m_elapsedMilliSeconds +=
+			( ( framesToPlay / framesPerTick ) * 60 * 1000 / 48 )
 				/ getTempo();
 		m_elapsedTacts = m_playPos[Mode_PlaySong].getTact();
 		m_elapsedTicks = ( m_playPos[Mode_PlaySong].getTicks() % ticksPerTact() ) / 48;
@@ -604,14 +604,14 @@ void Song::updateLength()
 void Song::setPlayPos( tick_t ticks, PlayModes playMode )
 {
 	m_elapsedTicks += m_playPos[playMode].getTicks() - ticks;
-	m_elapsedMilliSeconds += 
-		( ( ( ( ticks - m_playPos[playMode].getTicks() ) ) * 60 * 1000 / 48) / 
+	m_elapsedMilliSeconds +=
+		( ( ( ( ticks - m_playPos[playMode].getTicks() ) ) * 60 * 1000 / 48) /
 			getTempo() );
 	m_playPos[playMode].setTicks( ticks );
 	m_playPos[playMode].setCurrentFrame( 0.0f );
 
 // send a signal if playposition changes during playback
-	if( isPlaying() ) 
+	if( isPlaying() )
 	{
 		emit playbackPositionChanged();
 		emit updateSampleTracks();
@@ -673,8 +673,8 @@ void Song::stop()
 				if( tl->savedPos() >= 0 )
 				{
 					m_playPos[m_playMode].setTicks( tl->savedPos().getTicks() );
-					m_elapsedMilliSeconds = 
-						( ( ( tl->savedPos().getTicks() ) * 60 * 1000 / 48 ) / 
+					m_elapsedMilliSeconds =
+						( ( ( tl->savedPos().getTicks() ) * 60 * 1000 / 48 ) /
 							getTempo() );
 					if( gui && gui->songEditor() &&
 							( tl->autoScroll() == TimeLineWidget::AutoScrollEnabled ) )
@@ -1118,7 +1118,7 @@ void Song::loadProject( const QString & fileName )
 	// BB-tracks
 	Engine::getBBTrackContainer()->fixIncorrectPositions();
 
-	// Connect controller links to their controllers 
+	// Connect controller links to their controllers
 	// now that everything is loaded
 	ControllerConnection::finalizeConnections();
 
@@ -1380,8 +1380,8 @@ void Song::exportProject( bool multiExport )
 		{
 			int stx = efd.selectedNameFilter().indexOf( "(*." );
 			int etx = efd.selectedNameFilter().indexOf( ")" );
-	
-			if ( stx > 0 && etx > stx ) 
+
+			if ( stx > 0 && etx > stx )
 			{
 				// Get first extension from selected dropdown.
 				// i.e. ".wav" from "WAV-File (*.wav), Dummy-File (*.dum)"
@@ -1417,9 +1417,9 @@ void Song::exportProjectMidi()
 	}
 
 	FileDialog efd( gui->mainWindow() );
-	
+
 	efd.setFileMode( FileDialog::AnyFile );
-	
+
 	QStringList types;
 	types << tr("MIDI File (*.mid)");
 	efd.setNameFilters( types );
@@ -1447,15 +1447,15 @@ void Song::exportProjectMidi()
 
 		QString export_filename = efd.selectedFiles()[0];
 		if (!export_filename.endsWith(suffix)) export_filename += suffix;
-		
+
 		// NOTE start midi export
-		
+
 		// instantiate midi export plugin
 		TrackContainer::TrackList tracks;
 		TrackContainer::TrackList tracks_BB;
 		tracks = Engine::getSong()->tracks();
 		tracks_BB = Engine::getBBTrackContainer()->tracks();
-		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate("midiexport", NULL, NULL));
+		ExportFilter *exf = dynamic_cast<ExportFilter *> (Plugin::instantiate(Plugin::Embedded, "midiexport", NULL, NULL));
 		if (exf==NULL) {
 			qDebug() << "failed to load midi export filter!";
 			return;

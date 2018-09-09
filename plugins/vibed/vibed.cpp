@@ -55,6 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT vibedstrings_plugin_descriptor =
 	"Danny McRae <khjklujn/at/yahoo/com>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -139,10 +140,10 @@ void vibed::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 
 	QString name;
-	
+
 	// Save plugin version
 	_this.setAttribute( "version", "0.1" );
-	
+
 	for( int i = 0; i < 9; i++ )
 	{
 		name = "active" + QString::number( i );
@@ -153,7 +154,7 @@ void vibed::saveSettings( QDomDocument & _doc, QDomElement & _this )
 		{
 			name = "volume" + QString::number( i );
 			m_volumeKnobs[i]->saveSettings( _doc, _this, name );
-	
+
 			name = "stiffness" + QString::number( i );
 			m_stiffnessKnobs[i]->saveSettings( _doc, _this, name );
 
@@ -204,37 +205,37 @@ void vibed::loadSettings( const QDomElement & _this )
 	{
 		name = "active" + QString::number( i );
 		m_powerButtons[i]->setValue( _this.attribute( name ).toInt() );
-		
+
 		if( m_powerButtons[i]->value() &&
 			_this.hasAttribute( "volume" + QString::number( i ) ) )
 		{
 			name = "volume" + QString::number( i );
 			m_volumeKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "stiffness" + QString::number( i );
 			m_stiffnessKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "pick" + QString::number( i );
 			m_pickKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "pickup" + QString::number( i );
 			m_pickupKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "octave" + QString::number( i );
 			m_harmonics[i]->loadSettings( _this, name );
-			
+
 			name = "length" + QString::number( i );
 			m_lengthKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "pan" + QString::number( i );
 			m_panKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "detune" + QString::number( i );
 			m_detuneKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "slap" + QString::number( i );
 			m_randomKnobs[i]->loadSettings( _this, name );
-		
+
 			name = "impulse" + QString::number( i );
 			m_impulses[i]->loadSettings( _this, name );
 
@@ -248,7 +249,7 @@ void vibed::loadSettings( const QDomElement & _this )
 			// otherwise me might and up in a segfault
 			m_graphs[i]->setSamples( shp );
 			delete[] shp;
-			
+
 
 			// TODO: do one of the following to avoid
 			// "uninitialized" wave-shape-buttongroup
@@ -258,7 +259,7 @@ void vibed::loadSettings( const QDomElement & _this )
 			// - save and restore selected wave-shape-button
 		}
 	}
-	
+
 //	update();
 }
 
@@ -280,7 +281,7 @@ void vibed::playNote( NotePlayHandle * _n, sampleFrame * _working_buffer )
 		_n->m_pluginData = new stringContainer( _n->frequency(),
 				Engine::mixer()->processingSampleRate(),
 						__sampleLength );
-		
+
 		for( int i = 0; i < 9; ++i )
 		{
 			if( m_powerButtons[i]->value() )
@@ -358,7 +359,7 @@ vibedView::vibedView( Instrument * _instrument,
 	pal.setBrush( backgroundRole(), PLUGIN_NAME::getIconPixmap(
 								"artwork" ) );
 	setPalette( pal );
-	
+
 	m_volumeKnob = new Knob( knobBright_26, this );
 	m_volumeKnob->setVolumeKnob( true );
 	m_volumeKnob->move( 103, 142 );
@@ -374,8 +375,8 @@ vibedView::vibedView( Instrument * _instrument,
 "The 'S' knob sets the stiffness of the selected string.  The stiffness "
 "of the string affects how long the string will ring out.  The lower "
 "the setting, the longer the string will ring." ) );
-	
-	
+
+
 	m_pickKnob = new Knob( knobBright_26, this );
 	m_pickKnob->move( 153, 142 );
 	m_pickKnob->setHintText( tr( "Pick position:" ), "" );
@@ -398,7 +399,7 @@ vibedView::vibedView( Instrument * _instrument,
 	m_panKnob->setWhatsThis( tr(
 "The Pan knob determines the location of the selected string in the stereo "
 "field." ) );
-	
+
 	m_detuneKnob = new Knob( knobBright_26, this );
 	m_detuneKnob->move( 150, 187 );
 	m_detuneKnob->setHintText( tr( "Detune:" ), "" );
@@ -464,7 +465,7 @@ vibedView::vibedView( Instrument * _instrument,
 "octaves below the fundamental, 'F' means the string will ring at the "
 "fundamental, and '6' means the string will ring six octaves above the "
 "fundamental." ) );
-	
+
 
 	m_stringSelector = new nineButtonSelector(
 			PLUGIN_NAME::getIconPixmap( "button_1_on" ),
@@ -507,7 +508,7 @@ vibedView::vibedView( Instrument * _instrument,
 "The 'S' button will smooth the waveform.\n\n"
 
 "The 'N' button will normalize the waveform.") );
-	
+
 
 	setWhatsThis( tr(
 "Vibed models up to nine independently vibrating strings.  The 'String' "
@@ -536,7 +537,7 @@ vibedView::vibedView( Instrument * _instrument,
 	ToolTip::add( m_power,
 			tr( "Click here to enable/disable waveform." ) );
 
-	
+
 	// String selector is not a part of the model
 	m_stringSelector->setWindowTitle( tr( "String" ) );
 	m_stringSelector->setWhatsThis( tr(
@@ -562,7 +563,7 @@ vibedView::vibedView( Instrument * _instrument,
 	connect( m_sinWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sinWaveClicked() ) );
 
-	
+
 	m_triangleWaveBtn = new PixmapButton( this, tr( "Triangle wave" ) );
 	m_triangleWaveBtn->move( 212, 41 );
 	m_triangleWaveBtn->setActiveGraphic(
@@ -575,7 +576,7 @@ vibedView::vibedView( Instrument * _instrument,
 	connect( m_triangleWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( triangleWaveClicked( ) ) );
 
-	
+
 	m_sawWaveBtn = new PixmapButton( this, tr( "Saw wave" ) );
 	m_sawWaveBtn->move( 212, 58 );
 	m_sawWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -588,7 +589,7 @@ vibedView::vibedView( Instrument * _instrument,
 	connect( m_sawWaveBtn, SIGNAL (clicked () ),
 			this, SLOT ( sawWaveClicked() ) );
 
-	
+
 	m_sqrWaveBtn = new PixmapButton( this, tr( "Square wave" ) );
 	m_sqrWaveBtn->move( 212, 75 );
 	m_sqrWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -601,7 +602,7 @@ vibedView::vibedView( Instrument * _instrument,
 	connect( m_sqrWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( sqrWaveClicked() ) );
 
-	
+
 	m_whiteNoiseWaveBtn = new PixmapButton( this, tr( "White noise wave" ) );
 	m_whiteNoiseWaveBtn->move( 212, 92 );
 	m_whiteNoiseWaveBtn->setActiveGraphic(
@@ -614,7 +615,7 @@ vibedView::vibedView( Instrument * _instrument,
 	connect( m_whiteNoiseWaveBtn, SIGNAL ( clicked () ),
 			this, SLOT ( noiseWaveClicked() ) );
 
-	
+
 	m_usrWaveBtn = new PixmapButton( this, tr( "User defined wave" ) );
 	m_usrWaveBtn->move( 212, 109 );
 	m_usrWaveBtn->setActiveGraphic( embed::getIconPixmap(
@@ -639,7 +640,7 @@ vibedView::vibedView( Instrument * _instrument,
 			tr( "Click here to smooth waveform." ) );
 	connect( m_smoothBtn, SIGNAL ( clicked () ),
 			this, SLOT ( smoothClicked() ) );
-	
+
 	m_normalizeBtn = new PixmapButton( this, tr( "Normalize" ) );
 	m_normalizeBtn->move( 96, 129 );
 	m_normalizeBtn->setActiveGraphic( PLUGIN_NAME::getIconPixmap(
@@ -669,7 +670,7 @@ void vibedView::modelChanged()
 void vibedView::showString( int _string )
 {
 	vibed * v = castModel<vibed>();
-	
+
 	m_pickKnob->setModel( v->m_pickKnobs[_string] );
 	m_pickupKnob->setModel( v->m_pickupKnobs[_string] );
 	m_stiffnessKnob->setModel( v->m_stiffnessKnobs[_string] );

@@ -14,58 +14,28 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
+extern "C" {
 #include <sys/stat.h>
 #include <sys/types.h>
+}
 
 #ifdef HAVE_LV2_STATE
 #    include "lv2/lv2plug.in/ns/ext/state/state.h"
 #endif
+#include "lv2/lv2plug.in/ns/ext/presets/presets.h"
 
-#include "lilv/lilv.h"
+#include <lilv/lilv.h>
 
-#include "jalv_config.h"
-#include "jalv_internal.h"
+#include "Lv2Plugin.h"
+#include "Lv2Manager.h"
+#include "log.h"
 
-#define NS_JALV "http://drobilla.net/ns/jalv#"
-#define NS_RDF  "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-#define NS_RDFS "http://www.w3.org/2000/01/rdf-schema#"
-#define NS_XSD  "http://www.w3.org/2001/XMLSchema#"
 
-extern LV2_Feature uri_map_feature;
-extern LV2_Feature map_feature;
-extern LV2_Feature unmap_feature;
-extern LV2_Feature make_path_feature;
-extern LV2_Feature sched_feature;
-extern LV2_Feature state_sched_feature;
-extern LV2_Feature safe_restore_feature;
-extern LV2_Feature log_feature;
-extern LV2_Feature options_feature;
-extern LV2_Feature def_state_feature;
-
-const LV2_Feature* state_features[9] = {
-	&uri_map_feature, &map_feature, &unmap_feature,
-	&make_path_feature,
-	&state_sched_feature,
-	&safe_restore_feature,
-	&log_feature,
-	&options_feature,
-	NULL
-};
-
-char*
-jalv_make_path(LV2_State_Make_Path_Handle handle,
-               const char*                path)
-{
-	JalvPlugin* jalv = (JalvPlugin*)handle;
-
-	// Create in save directory if saving, otherwise use temp directory
-	return jalv_strjoin(jalv->save_dir ? jalv->save_dir : jalv->temp_dir, path);
-}
 
 static const void*
 get_port_value(const char* port_symbol,
@@ -73,8 +43,8 @@ get_port_value(const char* port_symbol,
                uint32_t*   size,
                uint32_t*   type)
 {
-	JalvPlugin*        jalv = (JalvPlugin*)user_data;
-	struct Port* port = jalv_port_by_symbol(jalv, port_symbol);
+	Lv2Plugin*        jalv = (Lv2Plugin*)user_data;
+	Port* port = jalv->port_by_symbol(port_symbol);
 	if (port && port->flow == FLOW_INPUT && port->type == TYPE_CONTROL) {
 		*size = sizeof(float);
 		*type = jalv->forge.Float;
@@ -85,9 +55,9 @@ get_port_value(const char* port_symbol,
 }
 
 void
-jalv_save(JalvPlugin* jalv, const char* dir)
+lv2_save(Lv2Plugin* jalv, const char* dir)
 {
-	jalv->save_dir = jalv_strjoin(dir, "/");
+	jalv->save_dir = lv2_strjoin(dir, "/");
 
 	LilvState* const state = lilv_state_new_from_instance(
 		jalv->plugin, jalv->instance, &jalv->map,
@@ -95,7 +65,8 @@ jalv_save(JalvPlugin* jalv, const char* dir)
 		get_port_value, jalv,
 		LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE, NULL);
 
-	lilv_state_save(jalv->world, &jalv->map, &jalv->unmap, state, NULL,
+	lilv_state_save(Lv2Manager::getInstance().world,
+                  &jalv->map, &jalv->unmap, state, NULL,
 	                dir, "state.ttl");
 
 	lilv_state_free(state);
@@ -105,19 +76,20 @@ jalv_save(JalvPlugin* jalv, const char* dir)
 }
 
 int
-jalv_load_presets(JalvPlugin* jalv, PresetSink sink, void* data)
+lv2_load_presets(Lv2Plugin* jalv, PresetSink sink, void* data)
 {
 	LilvNodes* presets = lilv_plugin_get_related(jalv->plugin,
 	                                             jalv->nodes.pset_Preset);
 	LILV_FOREACH(nodes, i, presets) {
 		const LilvNode* preset = lilv_nodes_get(presets, i);
-		lilv_world_load_resource(jalv->world, preset);
+		lilv_world_load_resource(Lv2Manager::getInstance().world,
+                             preset);
 		if (!sink) {
 			continue;
 		}
 
 		LilvNodes* labels = lilv_world_find_nodes(
-			jalv->world, preset, jalv->nodes.rdfs_label, NULL);
+			Lv2Manager::getInstance().world, preset, jalv->nodes.rdfs_label, NULL);
 		if (labels) {
 			const LilvNode* label = lilv_nodes_get_first(labels);
 			sink(jalv, preset, label, data);
@@ -133,13 +105,14 @@ jalv_load_presets(JalvPlugin* jalv, PresetSink sink, void* data)
 }
 
 int
-jalv_unload_presets(JalvPlugin* jalv)
+lv2_unload_presets(Lv2Plugin* jalv)
 {
 	LilvNodes* presets = lilv_plugin_get_related(jalv->plugin,
 	                                             jalv->nodes.pset_Preset);
 	LILV_FOREACH(nodes, i, presets) {
 		const LilvNode* preset = lilv_nodes_get(presets, i);
-		lilv_world_unload_resource(jalv->world, preset);
+		lilv_world_unload_resource(Lv2Manager::getInstance().world,
+                               preset);
 	}
 	lilv_nodes_free(presets);
 
@@ -153,8 +126,8 @@ set_port_value(const char* port_symbol,
                uint32_t    size,
                uint32_t    type)
 {
-	JalvPlugin*        jalv = (JalvPlugin*)user_data;
-	struct Port* port = jalv_port_by_symbol(jalv, port_symbol);
+	Lv2Plugin*        jalv = (Lv2Plugin*)user_data;
+	Port* port = jalv->port_by_symbol(port_symbol);
 	if (!port) {
 		fprintf(stderr, "error: Preset port `%s' is missing\n", port_symbol);
 		return;
@@ -175,13 +148,13 @@ set_port_value(const char* port_symbol,
 		return;
 	}
 
-	if (jalv->play_state != JALV_RUNNING) {
+	//if (jalv->play_state != JALV_RUNNING) {
 		// Set value on port struct directly
-		port->control = fvalue;
-	} else {
+		//port->control = fvalue;
+	//} else {
 		// Send value to running plugin
-		jalv_ui_write(jalv, port->index, sizeof(fvalue), 0, &fvalue);
-	}
+		lv2_ui_write(jalv, port->index, sizeof(fvalue), 0, &fvalue);
+	//}
 
 	if (jalv->has_ui) {
 		// Update UI
@@ -196,45 +169,46 @@ set_port_value(const char* port_symbol,
 }
 
 void
-jalv_apply_state(JalvPlugin* jalv, LilvState* state)
+Lv2Plugin::apply_state(LilvState* state)
 {
-	bool must_pause = !jalv->safe_restore && jalv->play_state == JALV_RUNNING;
+	//bool must_pause = !safe_restore && play_state == JALV_RUNNING;
+  bool must_pause = 0;
 	if (state) {
 		if (must_pause) {
-			jalv->play_state = JALV_PAUSE_REQUESTED;
-			zix_sem_wait(&jalv->paused);
+			zix_sem_wait(&paused);
 		}
 
 		lilv_state_restore(
-			state, jalv->instance, set_port_value, jalv, 0, state_features);
+			state, instance, set_port_value, this, 0, state_features);
 
 		if (must_pause) {
-			jalv->request_update = true;
-			jalv->play_state     = JALV_RUNNING;
+			request_update = true;
+			//play_state     = JALV_RUNNING;
 		}
 	}
 }
 
 int
-jalv_apply_preset(JalvPlugin* jalv, const LilvNode* preset)
+Lv2Plugin::apply_preset(const LilvNode* _preset)
 {
-	lilv_state_free(jalv->preset);
-	jalv->preset = lilv_state_new_from_world(jalv->world, &jalv->map, preset);
-	jalv_apply_state(jalv, jalv->preset);
+	lilv_state_free(this->preset);
+	preset = lilv_state_new_from_world(
+        Lv2Manager::getInstance().world, &map, _preset);
+	apply_state(this->preset);
 	return 0;
 }
 
 int
-jalv_save_preset(JalvPlugin*       jalv,
+Lv2Plugin::save_preset(
                  const char* dir,
                  const char* uri,
                  const char* label,
                  const char* filename)
 {
 	LilvState* const state = lilv_state_new_from_instance(
-		jalv->plugin, jalv->instance, &jalv->map,
-		jalv->temp_dir, dir, dir, dir,
-		get_port_value, jalv,
+		plugin, instance, &map,
+		temp_dir, dir, dir, dir,
+		get_port_value, this,
 		LV2_STATE_IS_POD|LV2_STATE_IS_PORTABLE, NULL);
 
 	if (label) {
@@ -242,24 +216,27 @@ jalv_save_preset(JalvPlugin*       jalv,
 	}
 
 	int ret = lilv_state_save(
-		jalv->world, &jalv->map, &jalv->unmap, state, uri, dir, filename);
+		Lv2Manager::getInstance().world,
+    &map, &unmap, state, uri, dir, filename);
 
-	lilv_state_free(jalv->preset);
-	jalv->preset = state;
+	lilv_state_free(preset);
+	preset = state;
 
 	return ret;
 }
 
 int
-jalv_delete_current_preset(JalvPlugin* jalv)
+Lv2Plugin::delete_current_preset()
 {
-	if (!jalv->preset) {
+	if (!preset) {
 		return 1;
 	}
 
-	lilv_world_unload_resource(jalv->world, lilv_state_get_uri(jalv->preset));
-	lilv_state_delete(jalv->world, jalv->preset);
-	lilv_state_free(jalv->preset);
-	jalv->preset = NULL;
+	lilv_world_unload_resource(Lv2Manager::getInstance().world,
+                             lilv_state_get_uri(preset));
+	lilv_state_delete(Lv2Manager::getInstance().world,
+                    preset);
+	lilv_state_free(preset);
+	preset = NULL;
 	return 0;
 }

@@ -40,6 +40,7 @@ Plugin::Descriptor PLUGIN_EXPORT dualfilter_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -130,8 +131,8 @@ bool DualFilterEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames 
 	const bool enabled1 = m_dfControls.m_enabled1Model.value();
 	const bool enabled2 = m_dfControls.m_enabled2Model.value();
 
-	
-	
+
+
 
 	// buffer processing loop
 	for( fpp_t f = 0; f < frames; ++f )

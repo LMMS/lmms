@@ -71,6 +71,7 @@ Plugin::Descriptor PLUGIN_EXPORT OPL2_plugin_descriptor =
         "Raine M. Ekman <raine/at/iki/fi>",
         0x0100,
         Plugin::Instrument,
+        Plugin::Embedded,
         new PluginPixmapLoader( "logo" ),
         "sbi",
         NULL
@@ -369,7 +370,7 @@ bool opl2instrument::handleMidiEvent( const MidiEvent& event, const MidiTime& ti
 			}
 			break;
 		default:
-#ifdef LMMS_DEBUG	
+#ifdef LMMS_DEBUG
 			printf("Midi CC %02x %02x\n", event.controllerNumber(), event.controllerValue() );
 #endif
 			break;
@@ -760,7 +761,7 @@ opl2instrumentView::opl2instrumentView( Instrument * _instrument,
         setPalette( pal );
 }
 opl2instrumentView::~opl2instrumentView() {
-	// Knobs are QWidgets and our children, so they're 
+	// Knobs are QWidgets and our children, so they're
 	// destroyed automagically
 }
 
@@ -779,24 +780,24 @@ void opl2instrumentView::updateKnobHints()
 {
 	// Envelope times in ms: t[0] = 0, t[n] = ( 1<<n ) * X, X = 0.11597 for A, 0.6311 for D/R
 	// Here some rounding has been applied.
-	const float attack_times[16] = { 
-		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4, 
+	const float attack_times[16] = {
+		0.0, 0.2, 0.4, 0.9, 1.8, 3.7, 7.4,
 		15.0, 30.0, 60.0, 120.0, 240.0, 480.0,
-		950.0, 1900.0, 3800.0 
+		950.0, 1900.0, 3800.0
 	};
 
-	const float dr_times[16] = { 
-		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0, 
-		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0, 
-		5200.0, 10000.0, 20000.0 
+	const float dr_times[16] = {
+		0.0, 1.2, 2.5, 5.0, 10.0, 20.0, 40.0,
+		80.0, 160.0, 320.0, 640.0, 1300.0, 2600.0,
+		5200.0, 10000.0, 20000.0
 	};
-	
+
 	const int fmultipliers[16] = {
-		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47  
+		-12, 0, 12, 19, 24, 28, 31, 34, 36, 38, 40, 40, 43, 43, 47, 47
 	};
 
 	opl2instrument * m = castModel<opl2instrument>();
-	
+
 
 	op1_a_kn->setHintText( tr( "Attack" ),
 						   " (" + knobHintHelper(attack_times[(int)m->op1_a_mdl.value()]) + ")");
@@ -861,11 +862,11 @@ void opl2instrumentView::modelChanged()
 	connect( &m->op1_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 	connect( &m->op2_d_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
-	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
-	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op1_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_r_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
-	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
-	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );	
+	connect( &m->op1_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
+	connect( &m->op2_mul_mdl, SIGNAL( dataChanged() ), this, SLOT( updateKnobHints() ) );
 
 	updateKnobHints();
 

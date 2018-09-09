@@ -49,7 +49,7 @@
 #include "FileDialog.h"
 #include "FxMixerView.h"
 #include "GuiApplication.h"
-#include "Lv2InstrumentBrowser.h"
+#include "Lv2PluginBrowser.h"
 #include "PianoRoll.h"
 #include "PluginBrowser.h"
 #include "EmbeddedPluginFactory.h"
@@ -125,7 +125,7 @@ MainWindow::MainWindow() :
 							tr( "My Projects" ),
 					embed::getIconPixmap( "project_file" ).transformed( QTransform().rotate( 90 ) ),
 							splitter, false, true ) );
-  sideBar->appendTab( new Lv2InstrumentBrowser(
+  sideBar->appendTab( new Lv2PluginBrowser(
         tr( "LV2 Plugins" ), embed::getIconPixmap( "sample_file" ).transformed( QTransform().rotate( 90 ) ), splitter ) );
 	sideBar->appendTab( new FileBrowser(
 				confMgr->userSamplesDir() + "*" +
@@ -376,7 +376,9 @@ void MainWindow::finalize()
 	for( const Plugin::Descriptor* desc : pluginFactory->descriptors(Plugin::Tool) )
 	{
 		m_toolsMenu->addAction( desc->logo->pixmap(), desc->displayName );
-		m_tools.push_back( ToolPlugin::instantiate( desc->name, /*this*/NULL )
+		m_tools.push_back( ToolPlugin::instantiate(
+                            Plugin::Embedded,
+                             desc->name, /*this*/NULL )
 						   ->createView(this) );
 	}
 	if( !m_toolsMenu->isEmpty() )

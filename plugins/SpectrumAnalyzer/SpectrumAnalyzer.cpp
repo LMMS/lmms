@@ -38,6 +38,7 @@ Plugin::Descriptor PLUGIN_EXPORT spectrumanalyzer_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Effect,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL

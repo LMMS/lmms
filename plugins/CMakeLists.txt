@@ -55,7 +55,6 @@ IF("${PLUGIN_LIST}" STREQUAL "")
 		ladspa_browser
 		LadspaEffect
 		lb302
-        lv2
 		MidiImport
 		MidiExport
 		MultitapEcho

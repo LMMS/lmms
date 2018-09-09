@@ -44,6 +44,7 @@ Plugin::Descriptor PLUGIN_EXPORT peakcontrollereffect_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail.com>",
 	0x0100,
 	Plugin::Effect,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -94,7 +95,7 @@ bool PeakControllerEffect::processAudioBuffer( sampleFrame * _buf,
 	PeakControllerEffectControls & c = m_peakControls;
 
 	// This appears to be used for determining whether or not to continue processing
-	// audio with this effect	
+	// audio with this effect
 	if( !isEnabled() || !isRunning() )
 	{
 		return false;

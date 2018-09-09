@@ -57,6 +57,7 @@ Plugin::Descriptor PLUGIN_EXPORT organic_plugin_descriptor =
 	"Andreas Brandmaier <andreas/at/brandmaier.de>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL

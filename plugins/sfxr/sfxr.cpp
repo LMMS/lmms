@@ -66,6 +66,7 @@ Plugin::Descriptor PLUGIN_EXPORT sfxr_plugin_descriptor =
 	"Wong Cho Ching",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -700,7 +701,7 @@ sfxrInstrumentView::sfxrInstrumentView( Instrument * _instrument,
 
 
 	//preview sound on generator/random/mutate button clicked
-/*  // disabled for now	
+/*  // disabled for now
 	connect( m_pickupBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_laserBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );
 	connect( m_explosionBtn, SIGNAL ( clicked() ), this, SLOT ( previewSound() ) );

@@ -1,12 +1,10 @@
-extern "C" {
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 
-#include "jalv_internal.h"
+#include "Lv2Plugin.h"
 
 #include "lv2/lv2plug.in/ns/ext/patch/patch.h"
 #include "lv2/lv2plug.in/ns/ext/port-props/port-props.h"
-}
 
 #include <qglobal.h>
 
@@ -68,19 +66,19 @@ class PresetAction : public QAction
 	Q_OBJECT
 
 public:
-	PresetAction(QObject* parent, JalvPlugin* jalv, LilvNode* preset);
+	PresetAction(QObject* parent, Lv2Plugin* jalv, LilvNode* preset);
 
 public slots:
 	void presetChosen();
 
 private:
-	JalvPlugin*     _jalv;
+	Lv2Plugin*     _jalv;
 	LilvNode* _preset;
 };
 
 typedef struct {
-	JalvPlugin*        jalv;
-	struct Port* port;
+	Lv2Plugin*        jalv;
+	Port* port;
 } PortContainer;
 
 class Control : public QGroupBox
@@ -103,7 +101,7 @@ private:
 	float   getValue();
 
 	const LilvPlugin* plugin;
-	struct Port*      port;
+	Port*      port;
 
 	QLabel* label;
 	QString name;

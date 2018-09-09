@@ -14,7 +14,9 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include "jalv_internal.h"
+#include "control.h"
+#include "Lv2Plugin.h"
+#include "Lv2Manager.h"
 
 int
 scale_point_cmp(const ScalePoint* a, const ScalePoint* b)
@@ -28,12 +30,12 @@ scale_point_cmp(const ScalePoint* a, const ScalePoint* b)
 }
 
 ControlID*
-new_port_control(JalvPlugin* jalv, uint32_t index)
+new_port_control(Lv2Plugin* jalv, uint32_t index)
 {
-	struct Port*      port  = &jalv->ports[index];
+	Port*      port  = &jalv->ports[index];
 	const LilvPort*   lport = port->lilv_port;
 	const LilvPlugin* plug  = jalv->plugin;
-	const JalvNodes*  nodes = &jalv->nodes;
+	const Lv2Nodes * nodes = &jalv->nodes;
 
 	ControlID* id = (ControlID*)calloc(1, sizeof(ControlID));
 	id->jalv           = jalv;
@@ -56,7 +58,7 @@ new_port_control(JalvPlugin* jalv, uint32_t index)
 
 	lilv_port_get_range(plug, lport, &id->def, &id->min, &id->max);
 	if (lilv_port_has_property(plug, lport, jalv->nodes.lv2_sampleRate)) {
-		LilvWorld* world = jalv->world;
+		LilvWorld* world = Lv2Manager::getInstance().world;
 		/* Adjust range for lv2:sampleRate controls */
 		if (lilv_node_is_float(id->min) || lilv_node_is_int(id->min)) {
 			const float min = lilv_node_as_float(id->min) * jalv->sample_rate;
@@ -100,29 +102,29 @@ new_port_control(JalvPlugin* jalv, uint32_t index)
 }
 
 static bool
-has_range(JalvPlugin* jalv, const LilvNode* subject, const char* range_uri)
+has_range(Lv2Plugin* jalv, const LilvNode* subject, const char* range_uri)
 {
-	LilvNode*  range  = lilv_new_uri(jalv->world, range_uri);
+	LilvNode*  range  = lilv_new_uri(Lv2Manager::getInstance().world, range_uri);
 	const bool result = lilv_world_ask(
-		jalv->world, subject, jalv->nodes.rdfs_range, range);
+		Lv2Manager::getInstance().world, subject, jalv->nodes.rdfs_range, range);
 	lilv_node_free(range);
 	return result;
 }
 
 ControlID*
-new_property_control(JalvPlugin* jalv, const LilvNode* property)
+new_property_control(Lv2Plugin * jalv, const LilvNode* property)
 {
 	ControlID* id = (ControlID*)calloc(1, sizeof(ControlID));
 	id->jalv     = jalv;
 	id->type     = PROPERTY;
 	id->node     = lilv_node_duplicate(property);
-	id->symbol   = lilv_world_get_symbol(jalv->world, property);
-	id->label    = lilv_world_get(jalv->world, property, jalv->nodes.rdfs_label, NULL);
+	id->symbol   = lilv_world_get_symbol(Lv2Manager::getInstance().world, property);
+	id->label    = lilv_world_get(Lv2Manager::getInstance().world, property, jalv->nodes.rdfs_label, NULL);
 	id->property = jalv->map.map(jalv, lilv_node_as_uri(property));
 
-	id->min = lilv_world_get(jalv->world, property, jalv->nodes.lv2_minimum, NULL);
-	id->max = lilv_world_get(jalv->world, property, jalv->nodes.lv2_maximum, NULL);
-	id->def = lilv_world_get(jalv->world, property, jalv->nodes.lv2_default, NULL);
+	id->min = lilv_world_get(Lv2Manager::getInstance().world, property, jalv->nodes.lv2_minimum, NULL);
+	id->max = lilv_world_get(Lv2Manager::getInstance().world, property, jalv->nodes.lv2_maximum, NULL);
+	id->def = lilv_world_get(Lv2Manager::getInstance().world, property, jalv->nodes.lv2_default, NULL);
 
 	const char* const types[] = {
 		LV2_ATOM__Int, LV2_ATOM__Long, LV2_ATOM__Float, LV2_ATOM__Double,

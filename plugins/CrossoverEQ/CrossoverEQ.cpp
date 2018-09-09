@@ -1,5 +1,5 @@
 /*
- * CrossoverEQ.cpp - A native 4-band Crossover Equalizer 
+ * CrossoverEQ.cpp - A native 4-band Crossover Equalizer
  * good for simulating tonestacks or simple peakless (flat-band) equalization
  *
  * Copyright (c) 2014 Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>
@@ -23,7 +23,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 #include "CrossoverEQ.h"
 #include "lmms_math.h"
 #include "embed.cpp"
@@ -39,6 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT crossovereq_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -90,7 +91,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	{
 		return( false );
 	}
-	
+
 	// filters update
 	if( m_needsUpdate || m_controls.m_xover12.isValueChanged() )
 	{
@@ -107,7 +108,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		m_lp3.setLowpass( m_controls.m_xover34.value() );
 		m_hp4.setHighpass( m_controls.m_xover34.value() );
 	}
-	
+
 	// gain values update
 	if( m_needsUpdate || m_controls.m_gain1.isValueChanged() )
 	{
@@ -125,17 +126,17 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 	{
 		m_gain4 = dbfsToAmp( m_controls.m_gain4.value() );
 	}
-	
+
 	// mute values update
 	const bool mute1 = m_controls.m_mute1.value();
 	const bool mute2 = m_controls.m_mute2.value();
 	const bool mute3 = m_controls.m_mute3.value();
 	const bool mute4 = m_controls.m_mute4.value();
-	
+
 	m_needsUpdate = false;
-	
+
 	memset( m_work, 0, sizeof( sampleFrame ) * frames );
-	
+
 	// run temp bands
 	for( int f = 0; f < frames; ++f )
 	{
@@ -154,7 +155,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 			m_work[f][1] += m_lp1.update( m_tmp1[f][1], 1 ) * m_gain1;
 		}
 	}
-	
+
 	// run band 2
 	if( mute2 )
 	{
@@ -164,7 +165,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 			m_work[f][1] += m_hp2.update( m_tmp1[f][1], 1 ) * m_gain2;
 		}
 	}
-	
+
 	// run band 3
 	if( mute3 )
 	{
@@ -174,7 +175,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 			m_work[f][1] += m_lp3.update( m_tmp2[f][1], 1 ) * m_gain3;
 		}
 	}
-	
+
 	// run band 4
 	if( mute4 )
 	{
@@ -184,7 +185,7 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 			m_work[f][1] += m_hp4.update( m_tmp2[f][1], 1 ) * m_gain4;
 		}
 	}
-	
+
 	const float d = dryLevel();
 	const float w = wetLevel();
 	double outSum = 0.0;
@@ -194,9 +195,9 @@ bool CrossoverEQEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames
 		buf[f][0] = d * buf[f][0] + w * m_work[f][0];
 		buf[f][1] = d * buf[f][1] + w * m_work[f][1];
 	}
-	
+
 	checkGate( outSum );
-	
+
 	return isRunning();
 }
 

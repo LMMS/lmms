@@ -65,6 +65,7 @@ Plugin::Descriptor PLUGIN_EXPORT vestige_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::VST,
 	new PluginPixmapLoader( "logo" ),
 	"dll",
 	NULL

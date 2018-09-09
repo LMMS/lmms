@@ -21,7 +21,7 @@
  * Boston, MA 02110-1301 USA.
  *
  */
- 
+
 
 #include <QDomDocument>
 #include <QBitmap>
@@ -55,6 +55,7 @@ Plugin::Descriptor PLUGIN_EXPORT tripleoscillator_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0110,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -78,10 +79,10 @@ OscillatorObject::OscillatorObject( Model * _parent, int _idx ) :
 	m_fineRightModel( 0.0f, -100.0f, 100.0f, 1.0f, this,
 			tr( "Osc %1 fine detuning right" ).arg( _idx + 1 ) ),
 	m_phaseOffsetModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
-			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ), 
+			tr( "Osc %1 phase-offset" ).arg( _idx+1 ) ),
 	m_stereoPhaseDetuningModel( 0.0f, 0.0f, 360.0f, 1.0f, this,
 			tr( "Osc %1 stereo phase-detuning" ).arg( _idx+1 ) ),
-	m_waveShapeModel( Oscillator::SineWave, 0, 
+	m_waveShapeModel( Oscillator::SineWave, 0,
 			Oscillator::NumWaveShapes-1, this,
 			tr( "Osc %1 wave shape" ).arg( _idx+1 ) ),
 	m_modulationAlgoModel( Oscillator::SignalMix, 0,
@@ -207,7 +208,7 @@ void OscillatorObject::updatePhaseOffsetRight()
 }
 
 
- 
+
 
 TripleOscillator::TripleOscillator( InstrumentTrack * _instrument_track ) :
 	Instrument( _instrument_track, &tripleoscillator_plugin_descriptor )
@@ -586,7 +587,7 @@ TripleOscillatorView::TripleOscillatorView( Instrument * _instrument,
 				"useful for creating sounds with a chord." ).
 				arg( i + 1 ) );
 
-		
+
 		// setup knob for left fine-detuning
 		Knob * flk = new TripleOscKnob( this );
 		flk->move( 111, knob_y );

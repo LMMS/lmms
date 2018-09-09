@@ -41,8 +41,6 @@ class InstrumentTrack;
 class PixmapLoader;
 class PluginView;
 
-typedef struct LilvPluginImpl LilvPlugin;
-
 class EXPORT Plugin : public Model, public JournallingObject
 {
 	MM_OPERATORS
@@ -63,9 +61,10 @@ public:
 
 	enum PluginProtocol
 	{
-		Embedded,
+		Embedded, ///< FIXME, rename to Native
 		LADSPA,
-		Lv2
+		Lv2,
+    VST
 	};
 
 	// descriptor holds information about a plugin - every external plugin
@@ -79,6 +78,7 @@ public:
 		const char * author;
 		int version;
 		PluginType type;
+    PluginProtocol protocol;
 		const PixmapLoader * logo;
 		const char * supportedFileTypes;
 
@@ -173,6 +173,12 @@ public:
 		return m_descriptor;
 	}
 
+  // return plugin protocol
+  inline PluginProtocol protocol () const
+  {
+    return m_descriptor->protocol;
+  }
+
 	// can be called if a file matching supportedFileTypes should be
 	// loaded/processed with the help of this plugin
 	virtual void loadFile( const QString & file );
@@ -182,12 +188,10 @@ public:
 	virtual AutomatableModel* childModel( const QString & modelName );
 
 	// if  plugin couldn't be loaded, it creates a dummy-plugin
-	static Plugin* instantiate(const QString& plugin_id,
-			Model * parent, void * data);
-
-	// detects the plugin protocol based on the given plugin id
-	// if plugin is a uri, returns LV2, otherwise Embedded
-	static PluginProtocol detectProtocol(const QString& plugin_id);
+	static Plugin* instantiate(PluginProtocol protocol,
+                             const QString& plugin_id,
+			                       Model * parent,
+                             void * data);
 
 	// create a view for the model
 	PluginView * createView( QWidget * parent );

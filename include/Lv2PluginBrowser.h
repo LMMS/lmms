@@ -1,5 +1,5 @@
 /*
- * Lv2InstrumentBrowser.h - include file for Lv2InstrumentBrowser
+ * Lv2PluginBrowser.h - include file for Lv2PluginBrowser
  *
  * Copyright (c) 2004-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  *
@@ -34,22 +34,22 @@
 
 class QLineEdit;
 
-class Lv2InstrumentItem;
+class Lv2PluginItem;
 class InstrumentTrack;
-class Lv2InstrumentBrowserTreeWidget;
+class Lv2PluginBrowserTreeWidget;
 class PlayHandle;
 class TrackContainer;
 
 typedef struct LilvPluginImpl LilvPlugin;
 
-class Lv2InstrumentBrowser : public SideBarWidget
+class Lv2PluginBrowser : public SideBarWidget
 {
 	Q_OBJECT
 public:
-	Lv2InstrumentBrowser(
+	Lv2PluginBrowser(
 			const QString & title, const QPixmap & pm,
 			QWidget * parent);
-	virtual ~Lv2InstrumentBrowser();
+	virtual ~Lv2PluginBrowser();
 
 private slots:
 	void reloadTree( void );
@@ -61,7 +61,7 @@ private:
 
 	void addItems();
 
-	Lv2InstrumentBrowserTreeWidget * m_treeWidget;
+	Lv2PluginBrowserTreeWidget * m_treeWidget;
 
 	QLineEdit * m_filterEdit;
 
@@ -72,12 +72,12 @@ private:
 
 
 
-class Lv2InstrumentBrowserTreeWidget : public QTreeWidget
+class Lv2PluginBrowserTreeWidget : public QTreeWidget
 {
 	Q_OBJECT
 public:
-	Lv2InstrumentBrowserTreeWidget( QWidget * parent );
-	virtual ~Lv2InstrumentBrowserTreeWidget();
+	Lv2PluginBrowserTreeWidget( QWidget * parent );
+	virtual ~Lv2PluginBrowserTreeWidget();
 
 protected:
 	virtual void contextMenuEvent( QContextMenuEvent * e );
@@ -87,7 +87,7 @@ protected:
 
 
 private:
-	void handlePlugin(Lv2InstrumentItem* fi, InstrumentTrack * it );
+	void handlePlugin(Lv2PluginItem* fi, InstrumentTrack * it );
 	void openInNewInstrumentTrack( TrackContainer* tc );
 
 
@@ -96,7 +96,7 @@ private:
 
 	QMutex m_pphMutex;
 
-	Lv2InstrumentItem * m_contextMenuItem;
+	Lv2PluginItem * m_contextMenuItem;
 
 
 private slots:
@@ -107,21 +107,21 @@ private slots:
 
 } ;
 
-class Lv2InstrumentItem : public QTreeWidgetItem
+class Lv2PluginItem : public QTreeWidgetItem
 {
 public:
-	Lv2InstrumentItem (const LilvPlugin * plugin);
+	Lv2PluginItem (const QString & uri);
 
-	inline const LilvPlugin* getPlugin()
+	inline const QString & get_uri()
 	{
-		return m_plugin;
+		return plugin_uri;
 	}
 
 private:
 	void initPixmaps( void );
 
 	static QPixmap * s_Lv2PluginPixmap;
-	const LilvPlugin * m_plugin;
+	const QString & plugin_uri;
 } ;
 
 

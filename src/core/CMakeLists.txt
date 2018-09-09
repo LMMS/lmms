@@ -36,7 +36,6 @@ set(LMMS_SRCS
 	core/LfoController.cpp
 	core/LocklessAllocator.cpp
 	core/Lv2Manager.cpp
-	core/Lv2Instrument.cpp
 	core/MemoryHelper.cpp
 	core/MemoryManager.cpp
 	core/MeterModel.cpp
@@ -71,6 +70,16 @@ set(LMMS_SRCS
 	core/TrackContainer.cpp
 	core/ValueBuffer.cpp
 	core/VstSyncController.cpp
+
+	core/lv2/control.cpp
+  core/lv2/log.cpp
+  core/lv2/lv2_evbuf.c
+  core/lv2/Lv2Instrument.cpp
+  core/lv2/Lv2Plugin.cpp
+  core/lv2/state.cpp
+  core/lv2/symap.c
+  core/lv2/worker.cpp
+  core/lv2/zix/ring.c
 
 	core/audio/AudioAlsa.cpp
 	core/audio/AudioDevice.cpp

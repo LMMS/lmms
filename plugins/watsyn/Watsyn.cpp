@@ -49,6 +49,7 @@ Plugin::Descriptor PLUGIN_EXPORT watsyn_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -299,7 +300,7 @@ WatsynInstrument::WatsynInstrument( InstrumentTrack * _instrument_track ) :
 	connect( &a2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreqA2() ) );
 	connect( &b1_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreqB1() ) );
 	connect( &b2_rtune, SIGNAL( dataChanged() ), this, SLOT( updateFreqB2() ) );
-	
+
 	connect( &a1_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaveA1() ) );
 	connect( &a2_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaveA2() ) );
 	connect( &b1_graph, SIGNAL( samplesChanged( int, int ) ), this, SLOT( updateWaveB1() ) );
@@ -398,8 +399,8 @@ void WatsynInstrument::playNote( NotePlayHandle * _n,
 									( bbuf[f][1] * bmix );
 		}
 	}
-	else*/ 
-	
+	else*/
+
 	// if sample-exact is not enabled, use simpler calculations:
 	// if mix envelope is active, and we haven't gone past the envelope end, use envelope-aware calculation...
 	if( envAmt != 0.0f && tfp_ < envLen )
@@ -630,7 +631,7 @@ void WatsynInstrument::updateFreqB2()
 {
 	// calculate frequencies
 	m_lfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_ltune.value() / 1200 );
-	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );	
+	m_rfreq[B2_OSC] = ( b2_mult.value() / 8 ) * powf( 2, b2_rtune.value() / 1200 );
 }
 
 

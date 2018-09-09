@@ -48,6 +48,7 @@ static Plugin::Descriptor dummyPluginDescriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0100,
 	Plugin::Undefined,
+  Plugin::Embedded,
 	&dummyLoader,
 	NULL
 } ;
@@ -89,27 +90,13 @@ AutomatableModel * Plugin::childModel( const QString & )
 	return &fm;
 }
 
-// FIXME use regex
-Plugin::PluginProtocol Plugin::detectProtocol(const QString& _plugin_id)
-{
-	const LilvPlugin* lv2p = Lv2Manager::getInstance()
-		.find_by_uri(_plugin_id.toUtf8().constData());
-	if (lv2p == nullptr)
-	{
-		return Embedded;
-	}
-	else
-	{
-		return Lv2;
-	}
-}
-
-
 #include "EmbeddedPluginFactory.h"
-Plugin* Plugin::instantiate(const QString& _plugin_id,
-		Model * parent, void * data )
+Plugin* Plugin::instantiate(PluginProtocol protocol,
+                            const QString& _plugin_id,
+                            Model * parent,
+                            void * data )
 {
-	switch (detectProtocol(_plugin_id))
+	switch (protocol)
 	{
 		case Embedded:
 			{
@@ -148,15 +135,16 @@ Plugin* Plugin::instantiate(const QString& _plugin_id,
 			}
 		case Lv2:
 			{
-				const LilvPlugin* lv2p = Lv2Manager::getInstance()
-					.find_by_uri(_plugin_id.toUtf8().constData());
-				// FIXME only handles instruments
-				return new Lv2Instrument(lv2p, static_cast<InstrumentTrack*>(data));
+				return new Lv2Instrument(_plugin_id,
+                   static_cast<InstrumentTrack*>(data));
 				break;
 			}
 		case LADSPA:
 			//
 			break;
+    case VST:
+
+      break;
 	}
 	return nullptr;
 }

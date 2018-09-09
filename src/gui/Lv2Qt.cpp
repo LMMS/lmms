@@ -13,13 +13,13 @@
   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-#include "JalvQt.h"
+#include "Lv2Qt.h"
 #include "Lv2Manager.h"
 
 #define CONTROL_WIDTH 150
 #define DIAL_STEPS    10000
 
-static QApplication* app = NULL;
+//static QApplication* app = NULL;
 
 FlowLayout::FlowLayout(QWidget* parent, int margin, int hSpacing, int vSpacing)
 	: QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing)
@@ -192,7 +192,7 @@ FlowLayout::smartSpacing(QStyle::PixelMetric pm) const
 	}
 }
 
-PresetAction::PresetAction(QObject* parent, JalvPlugin* jalv, LilvNode* preset)
+PresetAction::PresetAction(QObject* parent, Lv2Plugin* jalv, LilvNode* preset)
 		: QAction(parent)
 		, _jalv(jalv)
 		, _preset(preset)
@@ -202,7 +202,7 @@ PresetAction::PresetAction(QObject* parent, JalvPlugin* jalv, LilvNode* preset)
 	}
 
 void PresetAction::presetChosen() {
-		jalv_apply_preset(_jalv, _preset);
+		_jalv->apply_preset(_preset);
 	}
 
 //#if QT_VERSION >= 0x050000
@@ -211,11 +211,9 @@ void PresetAction::presetChosen() {
 //#    include "jalv_qt4_meta.hpp"
 //#endif
 
-extern "C" {
-
 
 const char*
-jalv_native_ui_type(JalvPlugin* jalv)
+Lv2Plugin::native_ui_type()
 {
 #if QT_VERSION >= 0x050000
 	return "http://lv2plug.in/ns/extensions/ui#Qt5UI";
@@ -225,10 +223,10 @@ jalv_native_ui_type(JalvPlugin* jalv)
 }
 
 int
-jalv_ui_resize(JalvPlugin* jalv, int width, int height)
+Lv2Plugin::ui_resize(int width, int height)
 {
-	if (jalv->ui_instance && width > 0 && height > 0) {
-		QWidget* widget = (QWidget*)suil_instance_get_widget(jalv->ui_instance);
+	if (ui_instance && width > 0 && height > 0) {
+		QWidget* widget = (QWidget*)suil_instance_get_widget(ui_instance);
 		if (widget) {
 			widget->resize(width, height);
 		}
@@ -237,17 +235,16 @@ jalv_ui_resize(JalvPlugin* jalv, int width, int height)
 }
 
 void
-jalv_ui_port_event(JalvPlugin*       jalv,
-                   uint32_t    port_index,
+Lv2Plugin::ui_port_event(uint32_t    port_index,
                    uint32_t    buffer_size,
                    uint32_t    protocol,
                    const void* buffer)
 {
-	if (jalv->ui_instance) {
-		suil_instance_port_event(jalv->ui_instance, port_index,
+	if (ui_instance) {
+		suil_instance_port_event(ui_instance, port_index,
 		                         buffer_size, protocol, buffer);
 	} else {
-		Control* control = (Control*)jalv->ports[port_index].widget;
+		Control* control = (Control*)ports[port_index].widget;
 		if (control) {
 			control->setValue(*(const float*)buffer);
 		}
@@ -257,18 +254,18 @@ jalv_ui_port_event(JalvPlugin*       jalv,
 class Timer : public QTimer
 {
 public:
-	explicit Timer(JalvPlugin* jalv) : _jalv(jalv) {}
+	explicit Timer(Lv2Plugin* jalv) : _jalv(jalv) {}
 
 	void timerEvent(QTimerEvent* e) {
-		jalv_update(_jalv);
+		_jalv->update();
 	}
 
 private:
-	JalvPlugin* _jalv;
+	Lv2Plugin* _jalv;
 };
 
 static int
-add_preset_to_menu(JalvPlugin*           jalv,
+add_preset_to_menu(Lv2Plugin*           jalv,
                    const LilvNode* node,
                    const LilvNode* title,
                    void*           data)
@@ -289,7 +286,7 @@ Control::Control(PortContainer portContainer, QWidget* parent)
 	, port(portContainer.port)
 	, label(new QLabel())
 {
-	JalvNodes*      nodes    = &portContainer.jalv->nodes;
+	Lv2Nodes*      nodes    = &portContainer.jalv->nodes;
 	const LilvPort* lilvPort = port->lilv_port;
 
 	LilvNode* nmin;
@@ -463,7 +460,7 @@ Control::dialChanged(int dialValue)
 static bool
 portGroupLessThan(const PortContainer &p1, const PortContainer &p2)
 {
-	JalvPlugin*           jalv  = p1.jalv;
+	Lv2Plugin*           jalv  = p1.jalv;
 	const LilvPort* port1 = p1.port->lilv_port;
 	const LilvPort* port2 = p2.port->lilv_port;
 
@@ -483,7 +480,7 @@ portGroupLessThan(const PortContainer &p1, const PortContainer &p2)
 }
 
 static QWidget*
-build_control_widget(JalvPlugin* jalv)
+build_control_widget(Lv2Plugin* jalv)
 {
 	const LilvPlugin* plugin = jalv->plugin;
 	LilvWorld*        world  = Lv2Manager::getInstance().world;
@@ -546,13 +543,13 @@ build_control_widget(JalvPlugin* jalv)
 }
 
 bool
-jalv_discover_ui(JalvPlugin* jalv)
+Lv2Plugin::discover_ui()
 {
 	return true;
 }
 
 int
-jalv_open_ui(JalvPlugin* jalv)
+Lv2Plugin::open_ui()
 {
 	QMainWindow* win          = new QMainWindow();
 	QMenu*       file_menu    = win->menuBar()->addMenu("&File");
@@ -564,17 +561,17 @@ jalv_open_ui(JalvPlugin* jalv)
 	quit_action->setStatusTip("Quit Jalv");
 	file_menu->addAction(quit_action);
 
-	jalv_load_presets(jalv, add_preset_to_menu, presets_menu);
+	lv2_load_presets(this, add_preset_to_menu, presets_menu);
 
-	if (jalv->ui && !Lv2Manager::generic_ui) {
-		jalv_ui_instantiate(jalv, jalv_native_ui_type(jalv), win);
+	if (ui && !Lv2Manager::getInstance().generic_ui) {
+		ui_instantiate(native_ui_type(), win);
 	}
 
 	QWidget* widget;
-	if (jalv->ui_instance) {
-		widget = (QWidget*)suil_instance_get_widget(jalv->ui_instance);
+	if (ui_instance) {
+		widget = (QWidget*)suil_instance_get_widget(ui_instance);
 	} else {
-		QWidget* controlWidget = build_control_widget(jalv);
+		QWidget* controlWidget = build_control_widget(this);
 
 		widget = new QScrollArea();
 		((QScrollArea*)widget)->setWidget(controlWidget);
@@ -583,7 +580,7 @@ jalv_open_ui(JalvPlugin* jalv)
 		widget->setMinimumHeight(600);
 	}
 
-	LilvNode* name = lilv_plugin_get_name(jalv->plugin);
+	LilvNode* name = lilv_plugin_get_name(plugin);
 	win->setWindowTitle(lilv_node_as_string(name));
 	lilv_node_free(name);
 
@@ -591,7 +588,7 @@ jalv_open_ui(JalvPlugin* jalv)
 	//app->connect(app, SIGNAL(lastWindowClosed()), app, SLOT(quit()));
 
 	win->show();
-	//if (jalv->ui_instance && !jalv_ui_is_resizable(jalv)) {
+	//if (ui_instance && !jalv_ui_is_resizable(jalv)) {
 		//widget->setMinimumSize(widget->width(), widget->height());
 		//widget->setMaximumSize(widget->width(), widget->height());
 		//win->adjustSize();
@@ -601,19 +598,18 @@ jalv_open_ui(JalvPlugin* jalv)
 		            widget->height() + win->menuBar()->height());
 	//}
 
-	Timer* timer = new Timer(jalv);
-	timer->start(1000 / jalv->ui_update_hz);
+	Timer* timer = new Timer(this);
+	timer->start(1000 / ui_update_hz);
 
 	//int ret = app->exec();
-	//zix_sem_post(jalv->done);
+	//zix_sem_post(done);
 	return 0;
 }
 
 int
-jalv_close_ui(JalvPlugin* jalv)
+Lv2Plugin::close_ui()
 {
 	//app->quit();
 	return 0;
 }
 
-}  // extern "C"

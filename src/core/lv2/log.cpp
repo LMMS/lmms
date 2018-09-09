@@ -14,37 +14,39 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include "jalv_internal.h"
+#include "log.h"
+#include "Lv2Plugin.h"
+#include "Lv2Manager.h"
 
 int
-jalv_printf(LV2_Log_Handle handle,
+lv2_printf(LV2_Log_Handle handle,
             LV2_URID       type,
             const char*    fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	const int ret = jalv_vprintf(handle, type, fmt, args);
+	const int ret = lv2_vprintf(handle, type, fmt, args);
 	va_end(args);
 	return ret;
 }
 
 int
-jalv_vprintf(LV2_Log_Handle handle,
+lv2_vprintf(LV2_Log_Handle handle,
              LV2_URID       type,
              const char*    fmt,
              va_list        ap)
 {
 	// TODO: Lock
-	JalvPlugin* jalv  = (JalvPlugin*)handle;
+	Lv2Plugin* jalv  = (Lv2Plugin*)handle;
 	bool  fancy = true;
 	if (type == jalv->urids.log_Trace) {
-		jalv_ansi_start(stderr, 32);
+		lv2_ansi_start(stderr, 32);
 		fprintf(stderr, "trace: ");
 	} else if (type == jalv->urids.log_Error) {
-		jalv_ansi_start(stderr, 31);
+		lv2_ansi_start(stderr, 31);
 		fprintf(stderr, "error: ");
 	} else if (type == jalv->urids.log_Warning) {
-		jalv_ansi_start(stderr, 33);
+		lv2_ansi_start(stderr, 33);
 		fprintf(stderr, "warning: ");
 	} else {
 		fancy = false;
@@ -53,7 +55,7 @@ jalv_vprintf(LV2_Log_Handle handle,
 	const int st = vfprintf(stderr, fmt, ap);
 
 	if (fancy) {
-		jalv_ansi_reset(stderr);
+		lv2_ansi_reset(stderr);
 	}
 
 	return st;

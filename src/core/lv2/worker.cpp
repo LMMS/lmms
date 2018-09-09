@@ -14,14 +14,17 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include <cstdlib>
+
 #include "worker.h"
+#include "Lv2Plugin.h"
 
 static LV2_Worker_Status
-jalv_worker_respond(LV2_Worker_Respond_Handle handle,
+lv2_worker_respond(LV2_Worker_Respond_Handle handle,
                     uint32_t                  size,
                     const void*               data)
 {
-	JalvWorker* worker = (JalvWorker*)handle;
+	Lv2Worker* worker = (Lv2Worker*)handle;
 	zix_ring_write(worker->responses, (const char*)&size, sizeof(size));
 	zix_ring_write(worker->responses, (const char*)data, size);
 	return LV2_WORKER_SUCCESS;
@@ -30,8 +33,8 @@ jalv_worker_respond(LV2_Worker_Respond_Handle handle,
 static void*
 worker_func(void* data)
 {
-	JalvWorker* worker = (JalvWorker*)data;
-	JalvPlugin*       jalv   = worker->jalv;
+	Lv2Worker* worker = (Lv2Worker*)data;
+	Lv2Plugin*       jalv   = worker->plugin;
 	void*       buf    = NULL;
 	while (true) {
 		zix_sem_wait(&worker->sem);
@@ -49,7 +52,7 @@ worker_func(void* data)
 
 		zix_sem_wait(&jalv->work_lock);
 		worker->iface->work(
-			jalv->instance->lv2_handle, jalv_worker_respond, worker, size, buf);
+			jalv->instance->lv2_handle, lv2_worker_respond, worker, size, buf);
 		zix_sem_post(&jalv->work_lock);
 	}
 
@@ -58,8 +61,8 @@ worker_func(void* data)
 }
 
 void
-jalv_worker_init(JalvPlugin*                       jalv,
-                 JalvWorker*                 worker,
+lv2_worker_init(Lv2Plugin*                       jalv,
+                 Lv2Worker*                 worker,
                  const LV2_Worker_Interface* iface,
                  bool                        threaded)
 {
@@ -76,7 +79,7 @@ jalv_worker_init(JalvPlugin*                       jalv,
 }
 
 void
-jalv_worker_finish(JalvWorker* worker)
+lv2_worker_finish(Lv2Worker* worker)
 {
 	if (worker->requests) {
 		if (worker->threaded) {
@@ -90,12 +93,12 @@ jalv_worker_finish(JalvWorker* worker)
 }
 
 LV2_Worker_Status
-jalv_worker_schedule(LV2_Worker_Schedule_Handle handle,
+lv2_worker_schedule(LV2_Worker_Schedule_Handle handle,
                      uint32_t                   size,
                      const void*                data)
 {
-	JalvWorker* worker = (JalvWorker*)handle;
-	JalvPlugin*       jalv   = worker->jalv;
+	Lv2Worker* worker = (Lv2Worker*)handle;
+	Lv2Plugin*       jalv   = worker->plugin;
 	if (worker->threaded) {
 		// Schedule a request to be executed by the worker thread
 		zix_ring_write(worker->requests, (const char*)&size, sizeof(size));
@@ -105,14 +108,14 @@ jalv_worker_schedule(LV2_Worker_Schedule_Handle handle,
 		// Execute work immediately in this thread
 		zix_sem_wait(&jalv->work_lock);
 		worker->iface->work(
-			jalv->instance->lv2_handle, jalv_worker_respond, worker, size, data);
+			jalv->instance->lv2_handle, lv2_worker_respond, worker, size, data);
 		zix_sem_post(&jalv->work_lock);
 	}
 	return LV2_WORKER_SUCCESS;
 }
 
 void
-jalv_worker_emit_responses(JalvWorker* worker, LilvInstance* instance)
+lv2_worker_emit_responses(Lv2Worker* worker, LilvInstance* instance)
 {
 	if (worker->responses) {
 		uint32_t read_space = zix_ring_read_space(worker->responses);

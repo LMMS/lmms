@@ -58,6 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT sf2player_plugin_descriptor =
 	"Paul Giblock <drfaygo/at/gmail/dot/com>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	"sf2",
 	NULL

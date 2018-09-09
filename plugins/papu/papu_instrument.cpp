@@ -54,6 +54,7 @@ Plugin::Descriptor PLUGIN_EXPORT papu_plugin_descriptor =
 	"Csaba Hruska <csaba.hruska/at/gmail.com>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL
 } ;

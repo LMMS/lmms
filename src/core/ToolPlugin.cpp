@@ -41,9 +41,14 @@ ToolPlugin::~ToolPlugin()
 
 
 
-ToolPlugin * ToolPlugin::instantiate( const QString & _plugin_name, Model * _parent )
+ToolPlugin * ToolPlugin::instantiate(
+              PluginProtocol protocol,
+              const QString & _plugin_name,
+              Model * _parent )
 {
-	Plugin * p = Plugin::instantiate( _plugin_name, _parent, NULL );
+	Plugin * p = Plugin::instantiate(
+                  protocol,
+                  _plugin_name, _parent, NULL );
 	// check whether instantiated plugin is a tool
 	if( p->type() == Plugin::Tool )
 	{

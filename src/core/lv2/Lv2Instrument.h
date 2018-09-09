@@ -34,23 +34,19 @@
 #include "JournallingObject.h"
 #include "RemotePlugin.h"
 
-extern "C" {
-#include "jalv_internal.h"
+#include "Lv2Plugin.h"
 #include "zix/sem.h"
-}
 
 namespace Lilv {
 	struct Instance;
 }
 
-typedef struct JalvPlugin JalvPlugin;
-
 class Lv2Instrument : public Instrument
 {
 	Q_OBJECT
 public:
-	explicit Lv2Instrument(const LilvPlugin* _pi,
-			InstrumentTrack * _it);
+	explicit Lv2Instrument (const QString & uri,
+                  InstrumentTrack * _it);
 	~Lv2Instrument() override;
 
 	void playNote( NotePlayHandle* _note_to_play,
@@ -70,8 +66,7 @@ private:
 	//void openPlugin( const QString & _plugin );
 	//void closePlugin();
 
-	const LilvPlugin* m_plugin;
-	JalvPlugin jalvPlugin;
+	Lv2Plugin * plugin;  /* pointer to parent lv2plugin */
 	QMutex m_pluginMutex;
 	Lilv::Instance * m_instance;
 

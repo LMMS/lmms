@@ -39,6 +39,7 @@ Plugin::Descriptor PLUGIN_EXPORT delay_plugin_descriptor =
 	"Dave French <contact/dot/dave/dot/french3/at/googlemail/dot/com>",
 	0x0100,
 	Plugin::Effect,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL

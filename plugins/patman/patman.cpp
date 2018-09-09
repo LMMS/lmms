@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2007-2008 Javier Serrano Polo <jasp00/at/users.sourceforge.net>
  * Copyright (c) 2009-2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
- * 
+ *
  * This file is part of LMMS - https://lmms.io
  *
  * This program is free software; you can redistribute it and/or
@@ -58,6 +58,7 @@ Plugin::Descriptor PLUGIN_EXPORT patman_plugin_descriptor =
 	"Javier Serrano Polo <jasp00/at/users.sourceforge.net>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	"pat",
 	NULL
@@ -637,8 +638,8 @@ void PatmanView::paintEvent( QPaintEvent * )
 	QPainter p( this );
 
 	p.setFont( pointSize<8>( font() ) );
-	p.drawText( 8, 116, 235, 16, 
-			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter, 
+	p.drawText( 8, 116, 235, 16,
+			Qt::AlignLeft | Qt::TextSingleLine | Qt::AlignVCenter,
 			m_displayFilename );
 }
 

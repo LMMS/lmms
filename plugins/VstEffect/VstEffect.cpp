@@ -46,6 +46,7 @@ Plugin::Descriptor PLUGIN_EXPORT vsteffect_plugin_descriptor =
 	"Tobias Doerffel <tobydox/at/users.sf.net>",
 	0x0200,
 	Plugin::Effect,
+  Plugin::VST,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	new VstSubPluginFeatures( Plugin::Effect )

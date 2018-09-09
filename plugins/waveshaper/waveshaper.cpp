@@ -42,6 +42,7 @@ Plugin::Descriptor PLUGIN_EXPORT waveshaper_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Effect,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -116,7 +117,7 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 		for( i=0; i <= 1; ++i )
 		{
 			const int lookup = static_cast<int>( qAbs( s[i] ) * 200.0f );
-			const float frac = fraction( qAbs( s[i] ) * 200.0f ); 
+			const float frac = fraction( qAbs( s[i] ) * 200.0f );
 			const float posneg = s[i] < 0 ? -1.0f : 1.0f;
 
 			if( lookup < 1 )
@@ -124,8 +125,8 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 				s[i] = frac * samples[0] * posneg;
 			}
 			else if( lookup < 200 )
-			{	
-				s[i] = linearInterpolate( samples[ lookup - 1 ], 
+			{
+				s[i] = linearInterpolate( samples[ lookup - 1 ],
 						samples[ lookup ], frac )
 						* posneg;
 			}

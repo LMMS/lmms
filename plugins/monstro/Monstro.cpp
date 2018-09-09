@@ -50,6 +50,7 @@ Plugin::Descriptor PLUGIN_EXPORT monstro_plugin_descriptor =
 	"Vesa Kivimäki <contact/dot/diizy/at/nbl/dot/fi>",
 	0x0100,
 	Plugin::Instrument,
+  Plugin::Embedded,
 	new PluginPixmapLoader( "logo" ),
 	NULL,
 	NULL
@@ -83,7 +84,7 @@ MonstroSynth::MonstroSynth( MonstroInstrument * _i, NotePlayHandle * _nph ) :
 
 	m_lfo_next[0] = Oscillator::noiseSample( 0.0f );
 	m_lfo_next[1] = Oscillator::noiseSample( 0.0f );
-	
+
 	m_osc1l_last = 0.0f;
 	m_osc1r_last = 0.0f;
 
@@ -342,7 +343,7 @@ void MonstroSynth::renderOutput( fpp_t _frames, sampleFrame * _buf  )
 	// modulators
 	float lfo[2][ m_parent->m_fpp ];
 	float env[2][ m_parent->m_fpp ];
-	
+
 	// render modulators: envelopes, lfos
 	updateModulators( &env[0][0], &env[1][0], &lfo[0][0], &lfo[1][0], _frames );
 
@@ -652,14 +653,14 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 {
 	// frames played before
 	const f_cnt_t tfp = m_nph->totalFramesPlayed();
-	
+
 	float * lfo [2];
 	float * env [2];
 	lfo[0] = lfo1;
 	lfo[1] = lfo2;
 	env[0] = env1;
 	env[1] = env2;
-	
+
 	for( int i = 0; i < 2; ++i )
 	{
 		switch( m_lfovalue[i] )
@@ -740,7 +741,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 				{
 					const f_cnt_t tm = ( tfp + f ) % static_cast<int>( m_lfo_rate[i] );
 					if( tm == 0 )
-					{ 
+					{
 						m_lfo_last[i] = m_lfo_next[i];
 						m_lfo_next[i] = Oscillator::noiseSample( 0.0f );
 					}
@@ -755,9 +756,9 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 		{
 			if( tfp + f < m_lfoatt[i] ) lfo[i][f] *= ( static_cast<sample_t>( tfp ) / m_lfoatt[i] );
 		}
-		
-		
-		
+
+
+
 	/////////////////////////////////////////////
 	//                                         //
 	//                                         //
@@ -765,7 +766,7 @@ inline void MonstroSynth::updateModulators( float * env1, float * env2, float * 
 	//                                         //
 	//                                         //
 	/////////////////////////////////////////////
-		
+
 		for( f_cnt_t f = 0; f < frames; ++f )
 		{
 			if( m_env_phase[i] < 4.0f && m_nph->isReleased() && f >= m_nph->framesBeforeRelease() )
@@ -1419,7 +1420,7 @@ void MonstroInstrument::updateLFOAtts()
 void MonstroInstrument::updateSamplerate()
 {
 	m_samplerate = Engine::mixer()->processingSampleRate();
-	
+
 	m_integrator = 0.5f - ( 0.5f - INTEGRATOR ) * 44100.0f / m_samplerate;
 	m_fmCorrection = 44100.f / m_samplerate * FM_AMOUNT;
 	m_counterMax = ( m_samplerate * 5 ) / 44100;
