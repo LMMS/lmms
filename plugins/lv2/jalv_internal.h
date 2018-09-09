@@ -24,7 +24,7 @@
 #    include <unistd.h>
 #endif
 
-#include "lilv/lilv.h"
+#include <lilv/lilv.h>
 #include "serd/serd.h"
 #include "suil/suil.h"
 

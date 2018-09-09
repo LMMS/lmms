@@ -29,6 +29,8 @@ extern "C"
 #include "symap.h"
 }
 
+#include <cmath>
+
 #include "Engine.h"
 //#include "JalvQt.h"
 #include "Lv2Instrument.h"
