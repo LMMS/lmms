@@ -1,5 +1,7 @@
 /*
- * LocaleHelper.h - compatibility class for decimal separators
+ * LocaleHelper.h - compatibility functions for handling decimal separators
+ * Providing helper functions which handle both periods and commas
+ * for decimal separators to load old projects correctly
  *
  * Copyright (c) 2014 Tobias Doerffel <tobydox/at/users.sourceforge.net>
  * Copyright (c) 2018 Hyunjin Song <tteu.ingog/at/gmail.com>
