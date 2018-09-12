@@ -1034,8 +1034,6 @@ void Song::loadProject( const QString & fileName )
 
 	clearErrors();
 
-	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeLoad );
-
 	Engine::mixer()->requestChangeInModel();
 
 	// get the header information from the DOM
@@ -1191,8 +1189,6 @@ void Song::loadProject( const QString & fileName )
 // only save current song as _filename and do nothing else
 bool Song::saveProjectFile( const QString & filename )
 {
-	DataFile::LocaleHelper localeHelper( DataFile::LocaleHelper::ModeSave );
-
 	DataFile dataFile( DataFile::SongProject );
 
 	m_tempoModel.saveSettings( dataFile, dataFile.head(), "bpm" );

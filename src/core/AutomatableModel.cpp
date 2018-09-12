@@ -28,6 +28,7 @@
 
 #include "AutomationPattern.h"
 #include "ControllerConnection.h"
+#include "LocaleHelper.h"
 #include "Mixer.h"
 #include "ProjectJournal.h"
 
@@ -183,7 +184,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	if( node.isElement() )
 	{
 			changeID( node.toElement().attribute( "id" ).toInt() );
-			setValue( node.toElement().attribute( "value" ).toFloat() );
+			setValue( LocaleHelper::toFloat( node.toElement().attribute( "value" ) ) );
 			if( node.toElement().hasAttribute( "scale_type" ) )
 			{
 				if( node.toElement().attribute( "scale_type" ) == "linear" )
@@ -204,7 +205,7 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 		if( element.hasAttribute( name ) )
 			// attribute => read the element's value from the attribute list
 		{
-			setInitValue( element.attribute( name ).toFloat() );
+			setInitValue( LocaleHelper::toFloat( element.attribute( name ) ) );
 		}
 		else
 		{
