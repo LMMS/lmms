@@ -38,6 +38,7 @@
 #include "Effect.h"
 #include "embed.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "PluginFactory.h"
 #include "ProjectVersion.h"
 #include "SongEditor.h"
@@ -62,37 +63,6 @@ DataFile::typeDescStruct
 	{ DataFile::JournalData, "journaldata" },
 	{ DataFile::EffectSettings, "effectsettings" }
 } ;
-
-
-
-DataFile::LocaleHelper::LocaleHelper( Mode mode )
-{
-	switch( mode )
-	{
-		case ModeLoad:
-			// set a locale for which QString::fromFloat() returns valid values if
-			// floating point separator is a comma - otherwise we would fail to load
-			// older projects made by people from various countries due to their
-			// locale settings
-		    QLocale::setDefault( QLocale::German );
-			break;
-
-		case ModeSave:
-			// set default locale to C so that floating point decimals are rendered to
-			// strings with periods as decimal point instead of commas in some countries
-			QLocale::setDefault( QLocale::C );
-
-		default: break;
-	}
-}
-
-
-
-DataFile::LocaleHelper::~LocaleHelper()
-{
-	// revert to original locale
-	QLocale::setDefault( QLocale::system() );
-}
 
 
 
@@ -416,8 +386,8 @@ void DataFile::upgrade_0_2_1_20070501()
 		QDomElement el = list.item( i ).toElement();
 		if( el.attribute( "vol" ) != "" )
 		{
-			el.setAttribute( "vol", el.attribute(
-					"vol" ).toFloat() * 100.0f );
+			el.setAttribute( "vol", LocaleHelper::toFloat(
+					el.attribute( "vol" ) ) * 100.0f );
 		}
 		else
 		{
@@ -543,7 +513,7 @@ void DataFile::upgrade_0_2_1_20070508()
 		QDomElement el = list.item( i ).toElement();
 		if( el.hasAttribute( "vol" ) )
 		{
-			float value = el.attribute( "vol" ).toFloat();
+			float value = LocaleHelper::toFloat( el.attribute( "vol" ) );
 			value = roundf( value * 0.585786438f );
 			el.setAttribute( "vol", value );
 		}
