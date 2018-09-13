@@ -1,7 +1,7 @@
 /*
  * carla.h - Carla for LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -25,7 +25,8 @@
 #ifndef CARLA_H
 #define CARLA_H
 
-#include "CarlaNative.h"
+#define REAL_BUILD // FIXME this shouldn't be needed
+#include "CarlaNativePlugin.h"
 
 #include "Instrument.h"
 #include "InstrumentView.h"
@@ -42,7 +43,7 @@ public:
     CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay);
     virtual ~CarlaInstrument();
 
-    // CarlaNative functions
+    // Carla NativeHostDescriptor functions
     uint32_t handleGetBufferSize() const;
     double handleGetSampleRate() const;
     bool handleIsOffline() const;

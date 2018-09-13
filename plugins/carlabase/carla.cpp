@@ -1,7 +1,7 @@
 /*
  * carla.cpp - Carla for LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
  * This file is part of LMMS - http://lmms.io
  *
@@ -23,9 +23,6 @@
  */
 
 #include "carla.h"
-
-#define REAL_BUILD // FIXME this shouldn't be needed
-#include "CarlaHost.h"
 
 #include "engine.h"
 #include "song.h"
@@ -245,19 +242,19 @@ void CarlaInstrument::handleUiClosed()
     emit uiClosed();
 }
 
-intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt)
+intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
 {
     intptr_t ret = 0;
 
     switch (opcode)
     {
     case NATIVE_HOST_OPCODE_NULL:
-        break;
     case NATIVE_HOST_OPCODE_UPDATE_PARAMETER:
     case NATIVE_HOST_OPCODE_UPDATE_MIDI_PROGRAM:
     case NATIVE_HOST_OPCODE_RELOAD_PARAMETERS:
     case NATIVE_HOST_OPCODE_RELOAD_MIDI_PROGRAMS:
     case NATIVE_HOST_OPCODE_RELOAD_ALL:
+    case NATIVE_HOST_OPCODE_INTERNAL_PLUGIN:
         // nothing
         break;
     case NATIVE_HOST_OPCODE_UI_UNAVAILABLE:
@@ -269,9 +266,6 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
     }
 
     return ret;
-
-    // unused for now
-    (void)index; (void)value; (void)ptr; (void)opt;
 }
 
 // -------------------------------------------------------------------
