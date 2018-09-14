@@ -28,7 +28,11 @@
 #include <QtCore/QMutex>
 
 #define REAL_BUILD // FIXME this shouldn't be needed
-#include "CarlaNativePlugin.h"
+#if CARLA_VERSION_HEX >= 0x010911
+    #include "CarlaNativePlugin.h"
+#else
+    #include "CarlaNative.h"
+#endif
 
 #include "Instrument.h"
 #include "InstrumentView.h"
