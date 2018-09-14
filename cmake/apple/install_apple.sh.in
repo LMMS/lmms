@@ -99,31 +99,21 @@ macdeployqt "$APP" $_executables
 #
 # For example:
 #    /Applications/LMMS.app
-#       Contents/lib/lmms/libcarlabase.dylib
-#       Contents/lib/lmms/libcarlarack.so
-#       Contents/lib/lmms/libcarlapatchbay.so
 #    /Applications/Carla.app
-#       Conents/MacOS/libcarla_standalone2.dylib
-#
-# Note:
-#    If upstream (@falktx) moves or renames this library
-#    pkg-config won't mind, but this section MUST be updated
-#    to reflect the new library path
-#
-libcarla="Carla.app/Contents/MacOS/libcarla_standalone2.dylib"
-rm -f "$APP/Contents/Frameworks/libcarla_standalone2.dylib"
+carlalibs=$(echo "@CARLA_LIBRARIES@"|tr ";" "\n")
 
-install_name_tool -change @loader_path/../../Frameworks/libcarla_standalone2.dylib \
-  @executable_path/../../../$libcarla \
-  "$APP/Contents/lib/lmms/libcarlabase.dylib"
-   
-install_name_tool -change @loader_path/../../Frameworks/libcarla_standalone2.dylib \
-  @executable_path/../../../$libcarla \
-  "$APP/Contents/lib/lmms/libcarlarack.so"
-
-install_name_tool -change @loader_path/../../Frameworks/libcarla_standalone2.dylib \
-  @executable_path/../../../$libcarla \
-  "$APP/Contents/lib/lmms/libcarlapatchbay.so"
+# Loop over all libcarlas, fix linking
+for file in "$APP/Contents/lib/lmms/"libcarla*; do
+   _thisfile="$APP/Contents/lib/lmms/${file##*/}"
+   for lib in $carlalibs; do
+     _oldpath="../../Frameworks/lib${lib}.dylib"
+     _newpath="Carla.app/Contents/MacOS/lib${lib}.dylib"
+     install_name_tool -change @loader_path/$_oldpath \
+       @executable_path/../../../$_newpath \
+       "$_thisfile"
+     rm -f "$APP/Contents/Frameworks/lib${lib}.dylib"
+   done
+done
 
 # Cleanup
 rm -rf "$APP/Contents/bin"
