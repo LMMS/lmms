@@ -265,7 +265,7 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
         qApp->processEvents();
         break;
     default:
-	break;
+        break;
     }
 
     return ret;
@@ -531,3 +531,4 @@ void CarlaInstrumentView::timerEvent(QTimerEvent* event)
 }
 
 // -------------------------------------------------------------------
+
