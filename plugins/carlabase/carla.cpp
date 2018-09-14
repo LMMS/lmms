@@ -1,7 +1,7 @@
 /*
  * carla.cpp - Carla for LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,9 +23,6 @@
  */
 
 #include "carla.h"
-
-#define REAL_BUILD // FIXME this shouldn't be needed
-#include "CarlaHost.h"
 
 #include "Engine.h"
 #include "Song.h"
@@ -255,7 +252,7 @@ void CarlaInstrument::handleUiClosed()
     emit uiClosed();
 }
 
-intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt)
+intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
 {
     intptr_t ret = 0;
 
@@ -272,9 +269,6 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
     }
 
     return ret;
-
-    // unused for now
-    (void)index; (void)value; (void)ptr; (void)opt;
 }
 
 // -------------------------------------------------------------------
@@ -449,10 +443,15 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f
 
 PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
+// Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
+#ifdef CARLA_OS_MAC
+    fHost.uiParentId = 0;
+#else
     if (QWidget* const window = parent->window())
         fHost.uiParentId = window->winId();
     else
         fHost.uiParentId = 0;
+#endif
 
     std::free((char*)fHost.uiName);
 
@@ -532,4 +531,3 @@ void CarlaInstrumentView::timerEvent(QTimerEvent* event)
 }
 
 // -------------------------------------------------------------------
-

@@ -10,6 +10,6 @@ fi
 
 brew install $PACKAGES ccache
 # FIXME: Move "carla" to $PACKAGES once https://github.com/Homebrew/homebrew-core/pull/31560 is merged
-brew install https://github.com/tresf/homebrew-core/blob/carla/Formula/carla.rb
+brew install https://gist.githubusercontent.com/tresf/a8ffb8299227c51cf11aaf3929765264/raw/e94ad17aea63084c66bcb7e90009e3d5e848a467/carla.rb
 
 sudo npm install -g appdmg
