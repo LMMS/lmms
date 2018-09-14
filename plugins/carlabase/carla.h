@@ -32,6 +32,11 @@
     #include "CarlaNativePlugin.h"
 #else
     #include "CarlaNative.h"
+    CARLA_EXPORT
+    const NativePluginDescriptor* carla_get_native_patchbay_plugin();
+
+    CARLA_EXPORT
+    const NativePluginDescriptor* carla_get_native_rack_plugin();
 #endif
 
 #include "Instrument.h"

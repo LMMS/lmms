@@ -129,14 +129,6 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 // -----------------------------------------------------------------------
 
-CARLA_EXPORT
-const NativePluginDescriptor* carla_get_native_patchbay_plugin();
-
-CARLA_EXPORT
-const NativePluginDescriptor* carla_get_native_rack_plugin();
-
-// -----------------------------------------------------------------------
-
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
       kIsPatchbay(isPatchbay),
