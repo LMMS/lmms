@@ -231,7 +231,11 @@ ENDIF(WANT_TAP)
 
 # check for CARLA
 IF(WANT_CARLA)
-	PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	PKG_CHECK_MODULES(CARLA carla-native-plugin)
+	# look for carla under old name
+	IF(NOT CARLA_FOUND)
+		PKG_CHECK_MODULES(CARLA carla-standalone>=1.9.5)
+	ENDIF()
 	IF(CARLA_FOUND)
 		SET(LMMS_HAVE_CARLA TRUE)
 		SET(STATUS_CARLA "OK")
