@@ -436,14 +436,12 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f
 PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
 // Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
-#ifdef CARLA_OS_MAC
-    fHost.uiParentId = 0;
-#else
+#ifndef CARLA_OS_MAC
     if (QWidget* const window = parent->window())
         fHost.uiParentId = window->winId();
     else
-        fHost.uiParentId = 0;
 #endif
+        fHost.uiParentId = 0;
 
     std::free((char*)fHost.uiName);
 
