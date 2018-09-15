@@ -23,6 +23,7 @@
  *
  */
 
+#include <QDebug>
 #include <QDir>
 #include <QQueue>
 #include <QApplication>
@@ -35,6 +36,7 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QTextStream>
 
 #include "FileDialog.h"
 #include "InstrumentTrack.h"
@@ -1733,7 +1735,72 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 
 	if( type == "instrument" )
 	{
+		/*
+			This is a dirty fix to be able to update zyn
+		*/
+
+		Instrument* oldIns = m_track->instrument();
+		bool convert = value == "github.com::zynaddsubfx::osc-plugin" &&
+			!strcmp(oldIns->descriptor()->name, "zynaddsubfx");
+
+		DataFile savedSettings(DataFile::SongProject);
+		QDomDocument* newDoc;
+		const char* newNode;
+
+		if(convert)
+		{
+			qDebug() << "Trying to convert instrument";
+
+			oldIns->saveState(savedSettings,
+				savedSettings.content());
+			QDomNode xmzNode = savedSettings
+				.namedItem("lmms-project")
+				.namedItem("song")
+				.namedItem("zynaddsubfx")
+				.namedItem("ZynAddSubFX-data");
+
+			if(!xmzNode.isNull())
+			{
+				newNode = "ZASF";
+				newDoc = new QDomDocument("ZynAddSubFX-data");
+				QDomNode zasf = newDoc->createElement(newNode);
+				newDoc->appendChild(zasf);
+
+				QString str;
+				QTextStream stream(&str);
+				stream << "<?xml version=\"1.0f\" "
+					"encoding=\"UTF-8\"?>\n"
+					<< "<!DOCTYPE ZynAddSubFX-data>\n";
+				xmzNode.save(stream, 1);
+				QDomCDATASection cdata = newDoc->
+					createCDATASection(str);
+				zasf.appendChild(cdata);
+
+				// if you want to import the controller models,
+				// too, you'd need to add model for each
+				// old one into "connected-models":
+				//
+				//   <connected-models>
+				//   <quoted-model quoted-name="/Pvolume" .../>
+				//   </connected-models>
+				//
+				// The problem is that most MIDI events must be
+				// forwarded to *multiple* OSC ports at the same
+				// time
+			}
+			else {
+				qDebug() << "Failed to extract zyn data :-(";
+				qDebug() << "Saved settings: "
+					<< savedSettings.toString();
+			}
+		}
 		m_track->loadInstrument( value );
+
+		if(convert)
+		{
+			m_track->instrument()->restoreState(
+				newDoc->namedItem(newNode).toElement());
+		}
 
 		Engine::getSong()->setModified();
 
