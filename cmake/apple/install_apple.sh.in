@@ -21,14 +21,7 @@ echo -e "$MSG_COLOR\n\nCreating App Bundle \"$APP\"...$COLOR_RESET"
 # Locate macdeployqt, assume homebrew & Qt5
 which macdeployqt > /dev/null 2>&1
 if [ $? -ne 0 ]; then
-  brew --prefix qt55 > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    # Prefer Qt 5.5 (QTBUG-53533)
-    export PATH=$PATH:$(brew --prefix qt55)/bin
-  else
-    # Fallback Qt 5.6+
-  	export PATH=$PATH:$(brew --prefix qt5)/bin
-  fi
+  export PATH=$PATH:$(brew --prefix qt)/bin
 fi
  
 # Remove any old .app bundles
@@ -71,6 +64,17 @@ install_name_tool -change @rpath/libZynAddSubFxCore.dylib \
    @loader_path/../../$zynfmk \
   "$APP/Contents/$zynlib"
   
+# Replace @rpath with @loader_path for Carla
+# See also plugins/carlabase/CMakeLists.txt
+# This MUST be done BEFORE calling macdeployqt
+install_name_tool -change @rpath/libcarlabase.dylib \
+   @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlapatchbay.so"
+
+install_name_tool -change @rpath/libcarlabase.dylib \
+  @loader_path/libcarlabase.dylib \
+  "$APP/Contents/lib/lmms/libcarlarack.so"
+
 # Link lmms binary
 _executables="${_executables} -executable=$APP/Contents/$zynbin"
 _executables="${_executables} -executable=$APP/Contents/$zynfmk"
@@ -89,6 +93,27 @@ done
 
 # Finalize .app
 macdeployqt "$APP" $_executables
+
+# Carla is a standalone plugin.  Remove library, look for it side-by-side LMMS.app
+# This MUST be done AFTER calling macdeployqt
+#
+# For example:
+#    /Applications/LMMS.app
+#    /Applications/Carla.app
+carlalibs=$(echo "@CARLA_LIBRARIES@"|tr ";" "\n")
+
+# Loop over all libcarlas, fix linking
+for file in "$APP/Contents/lib/lmms/"libcarla*; do
+   _thisfile="$APP/Contents/lib/lmms/${file##*/}"
+   for lib in $carlalibs; do
+     _oldpath="../../Frameworks/lib${lib}.dylib"
+     _newpath="Carla.app/Contents/MacOS/lib${lib}.dylib"
+     install_name_tool -change @loader_path/$_oldpath \
+       @executable_path/../../../$_newpath \
+       "$_thisfile"
+     rm -f "$APP/Contents/Frameworks/lib${lib}.dylib"
+   done
+done
 
 # Cleanup
 rm -rf "$APP/Contents/bin"
