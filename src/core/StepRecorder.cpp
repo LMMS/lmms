@@ -84,7 +84,7 @@ void StepRecorder::notePressed(const Note & n)
 	StepNote* stepNote = findCurStepNote(n.key());
 	if(stepNote == nullptr)
 	{
-		m_curStepNotes.append(new StepNote(Note(m_stepsLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
+		m_curStepNotes.append(new StepNote(Note(m_curStepLength, m_curStepStartPos, n.key(), n.getVolume(), n.getPanning())));
 		m_pianoRoll.update();
 	}
 	else if (stepNote->isReleased())
@@ -328,6 +328,7 @@ void StepRecorder::updateCurStepNotes()
 	for (StepNote* stepNote : m_curStepNotes)
 	{
 		stepNote->m_note.setLength(m_curStepLength);
+		stepNote->m_note.setPos(m_curStepStartPos);
 	}
 }
 
