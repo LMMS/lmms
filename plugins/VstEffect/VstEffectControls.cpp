@@ -27,6 +27,7 @@
 #include "VstEffectControls.h"
 #include "VstEffect.h"
 
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "GuiApplication.h"
 #include <QMdiArea>
@@ -85,8 +86,8 @@ void VstEffectControls::loadSettings( const QDomElement & _this )
 			if( !( knobFModel[ i ]->isAutomated() ||
 						knobFModel[ i ]->controllerConnection() ) )
 			{
-				knobFModel[ i ]->setValue( (s_dumpValues.at( 2 ) ).toFloat() );
-				knobFModel[ i ]->setInitValue( (s_dumpValues.at( 2 ) ).toFloat() );
+				knobFModel[ i ]->setValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
+				knobFModel[ i ]->setInitValue(LocaleHelper::toFloat(s_dumpValues.at(2)));
 			}
 
 			connect( knobFModel[i], SIGNAL( dataChanged() ), this, SLOT( setParameter() ) );
@@ -373,7 +374,7 @@ manageVSTEffectView::manageVSTEffectView( VstEffect * _eff, VstEffectControls * 
 		if( !hasKnobModel )
 		{
 			sprintf( paramStr, "%d", i);
-			m_vi->knobFModel[ i ] = new FloatModel( ( s_dumpValues.at( 2 ) ).toFloat(), 
+			m_vi->knobFModel[ i ] = new FloatModel( LocaleHelper::toFloat(s_dumpValues.at(2)),
 					0.0f, 1.0f, 0.01f, _eff, tr( paramStr ) );
 		}
 		connect( m_vi->knobFModel[ i ], SIGNAL( dataChanged() ), this, 
@@ -437,7 +438,7 @@ void manageVSTEffectView::syncPlugin( void )
 		{
 			sprintf( paramStr, "param%d", i );
     			s_dumpValues = dump[ paramStr ].split( ":" );
-			f_value = ( s_dumpValues.at( 2 ) ).toFloat();
+			f_value = LocaleHelper::toFloat(s_dumpValues.at(2));
 			m_vi2->knobFModel[ i ]->setAutomatedValue( f_value );
 			m_vi2->knobFModel[ i ]->setInitValue( f_value );
 		}

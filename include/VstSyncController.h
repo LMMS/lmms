@@ -61,6 +61,11 @@ public:
 		m_syncData->isCycle = false;
 	}
 
+	void setPlaybackJumped( bool jumped )
+	{
+		m_syncData->m_playbackJumped = jumped;
+	}
+
 	void update();
 
 

@@ -46,12 +46,17 @@
 #include <QDomDocument>
 
 #ifdef LMMS_BUILD_WIN32
+#	ifndef NOMINMAX
+#		define NOMINMAX
+#	endif
+
 #	include <windows.h>
 #	include <QLayout>
 #endif
 
 #include "ConfigManager.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "Mixer.h"
 #include "Song.h"
@@ -214,6 +219,11 @@ void VstPlugin::tryLoad( const QString &remoteVstPluginExecutable )
 
 void VstPlugin::loadSettings( const QDomElement & _this )
 {
+	if( _this.hasAttribute( "program" ) )
+	{
+		setProgram( _this.attribute( "program" ).toInt() );
+	}
+
 	const int num_params = _this.attribute( "numparams" ).toInt();
 	// if it exists try to load settings chunk
 	if( _this.hasAttribute( "chunk" ) )
@@ -232,11 +242,6 @@ void VstPlugin::loadSettings( const QDomElement & _this )
 			dump[key] = _this.attribute( key );
 		}
 		setParameterDump( dump );
-	}
-
-	if( _this.hasAttribute( "program" ) )
-	{
-		setProgram( _this.attribute( "program" ).toInt() );
 	}
 }
 
@@ -356,7 +361,7 @@ void VstPlugin::setParameterDump( const QMap<QString, QString> & _pdump )
 		{
 			( *it ).section( ':', 0, 0 ).toInt(),
 			"",
-			( *it ).section( ':', 2, -1 ).toFloat()
+			LocaleHelper::toFloat((*it).section(':', 2, -1))
 		} ;
 		m.addInt( item.index );
 		m.addString( item.shortLabel );

@@ -831,14 +831,138 @@ void Mixer::runChangesInModel()
 	}
 }
 
+bool Mixer::isAudioDevNameValid(QString name)
+{
+#ifdef LMMS_HAVE_SDL
+	if (name == AudioSdl::name())
+	{
+		return true;
+	}
+#endif
 
 
+#ifdef LMMS_HAVE_ALSA
+	if (name == AudioAlsa::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PULSEAUDIO
+	if (name == AudioPulseAudio::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_OSS
+	if (name == AudioOss::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if (name == AudioSndio::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if (name == AudioJack::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_PORTAUDIO
+	if (name == AudioPortAudio::name())
+	{
+		return true;
+	}
+#endif
+
+
+#ifdef LMMS_HAVE_SOUNDIO
+	if (name == AudioSoundIo::name())
+	{
+		return true;
+	}
+#endif
+
+	if (name == AudioDummy::name())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Mixer::isMidiDevNameValid(QString name)
+{
+#ifdef LMMS_HAVE_ALSA
+	if (name == MidiAlsaSeq::name() || name == MidiAlsaRaw::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_JACK
+	if (name == MidiJack::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_OSS
+	if (name == MidiOss::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_HAVE_SNDIO
+	if (name == MidiSndio::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_BUILD_WIN32
+	if (name == MidiWinMM::name())
+	{
+		return true;
+	}
+#endif
+
+#ifdef LMMS_BUILD_APPLE
+    if (name == MidiApple::name())
+    {
+		return true;
+    }
+#endif
+
+    if (name == MidiDummy::name())
+    {
+		return true;
+    }
+
+	return false;
+}
 
 AudioDevice * Mixer::tryAudioDevices()
 {
 	bool success_ful = false;
 	AudioDevice * dev = NULL;
 	QString dev_name = ConfigManager::inst()->value( "mixer", "audiodev" );
+	if( !isAudioDevNameValid( dev_name ) )
+	{
+		dev_name = "";
+	}
 
 	m_audioDevStartFailed = false;
 
@@ -982,6 +1106,10 @@ MidiClient * Mixer::tryMidiClients()
 {
 	QString client_name = ConfigManager::inst()->value( "mixer",
 								"mididev" );
+	if( !isMidiDevNameValid( client_name ) )
+	{
+		client_name = "";
+	}
 
 #ifdef LMMS_HAVE_ALSA
 	if( client_name == MidiAlsaSeq::name() || client_name == "" )

@@ -141,65 +141,57 @@ void printHelp()
 {
 	printf( "LMMS %s\n"
 		"Copyright (c) %s\n\n"
-		"Usage: lmms [ -a ]\n"
-		"            [ -b <bitrate> ]\n"
-		"            [ -c <configfile> ]\n"
-		"            [ -d <in> ]\n"
-		"            [ -f <format> ]\n"
-		"            [ --geometry <geometry> ]\n"
-		"            [ -h ]\n"
-		"            [ -i <method> ]\n"
-		"            [ --import <in> [-e]]\n"
-		"            [ -l ]\n"
-		"            [ -m <mode>]\n"
-		"            [ -o <path> ]\n"
-		"            [ -p <out> ]\n"
-		"            [ -r <project file> ] [ options ]\n"
-		"            [ -s <samplerate> ]\n"
-		"            [ -u <in> <out> ]\n"
-		"            [ -v ]\n"
-		"            [ -x <value> ]\n"
-		"            [ <file to load> ]\n\n"
-		"-a, --float                   32bit float bit depth\n"
-		"-b, --bitrate <bitrate>       Specify output bitrate in KBit/s\n"
-		"       Default: 160.\n"
-		"-c, --config <configfile>     Get the configuration from <configfile>\n"
-		"-d, --dump <in>               Dump XML of compressed file <in>\n"
-		"-f, --format <format>         Specify format of render-output where\n"
-		"       Format is either 'wav', 'flac', 'ogg' or 'mp3'.\n"
-		"    --geometry <geometry>     Specify the size and position of the main window\n"
-		"       geometry is <xsizexysize+xoffset+yoffsety>.\n"
-		"-h, --help                    Show this usage information and exit.\n"
-		"-i, --interpolation <method>  Specify interpolation method\n"
-		"       Possible values:\n"
-		"          - linear\n"
-		"          - sincfastest (default)\n"
-		"          - sincmedium\n"
-		"          - sincbest\n"
-		"    --import <in> [-e]        Import MIDI file <in>.\n"
-		"       If -e is specified lmms exits after importing the file.\n"
-		"-l, --loop                    Render as a loop\n"
-		"-m, --mode                    Stereo mode used for MP3 export\n"
-		"       Possible values: s, j, m\n"
-		"         s: Stereo\n"
-		"         j: Joint Stereo\n"
-		"         m: Mono\n"
-		"       Default: j\n"
-		"-o, --output <path>           Render into <path>\n"
-		"       For --render, provide a file path\n"
-		"       For --rendertracks, provide a directory path\n"
-		"-p, --profile <out>           Dump profiling information to file <out>\n"
-		"-r, --render <project file>   Render given project file\n"
-		"    --rendertracks <project>  Render each track to a different file\n"
-		"-s, --samplerate <samplerate> Specify output samplerate in Hz\n"
-		"       Range: 44100 (default) to 192000\n"
-		"-u, --upgrade <in> [out]      Upgrade file <in> and save as <out>\n"
-		"       Standard out is used if no output file is specifed\n"
-		"-v, --version                 Show version information and exit.\n"
-		"    --allowroot               Bypass root user startup check (use with caution).\n"
-		"-x, --oversampling <value>    Specify oversampling\n"
-		"       Possible values: 1, 2, 4, 8\n"
-		"       Default: 2\n\n",
+		"Usage: lmms [global options...] [<action> [action parameters...]]\n\n"
+		"Actions:\n"
+		"  <no action> [options...] [<project>]  Start LMMS in normal GUI mode\n"
+		"  dump <in>                             Dump XML of compressed file <in>\n"
+		"  render <project> [options...]         Render given project file\n"
+		"  rendertracks <project> [options...]   Render each track to a different file\n"
+		"  upgrade <in> [out]                    Upgrade file <in> and save as <out>\n"
+		"                                        Standard out is used if no output file\n"
+		"                                        is specifed\n"
+		"\nGlobal options:\n"
+		"      --allowroot                Bypass root user startup check (use with\n"
+		"          caution).\n"
+		"  -c, --config <configfile>      Get the configuration from <configfile>\n"
+		"  -h, --help                     Show this usage information and exit.\n"
+		"  -v, --version                  Show version information and exit.\n"
+		"\nOptions if no action is given:\n"
+		"      --geometry <geometry>      Specify the size and position of\n"
+		"          the main window\n"
+		"          geometry is <xsizexysize+xoffset+yoffsety>.\n"
+		"      --import <in> [-e]         Import MIDI or Hydrogen file <in>.\n"
+		"          If -e is specified lmms exits after importing the file.\n"
+		"\nOptions for \"render\" and \"rendertracks\":\n"
+		"  -a, --float                    Use 32bit float bit depth\n"
+		"  -b, --bitrate <bitrate>        Specify output bitrate in KBit/s\n"
+		"          Default: 160.\n"
+		"  -f, --format <format>         Specify format of render-output where\n"
+		"          Format is either 'wav', 'flac', 'ogg' or 'mp3'.\n"
+		"  -i, --interpolation <method>   Specify interpolation method\n"
+		"          Possible values:\n"
+		"            - linear\n"
+		"            - sincfastest (default)\n"
+		"            - sincmedium\n"
+		"            - sincbest\n"
+		"  -l, --loop                     Render as a loop\n"
+		"  -m, --mode                     Stereo mode used for MP3 export\n"
+		"          Possible values: s, j, m\n"
+		"            s: Stereo\n"
+		"            j: Joint Stereo\n"
+		"            m: Mono\n"
+		"          Default: j\n"
+		"  -o, --output <path>            Render into <path>\n"
+		"          For \"render\", provide a file path\n"
+		"          For \"rendertracks\", provide a directory path\n"
+		"          If not specified, render will overwrite the input file\n"
+		"          For \"rendertracks\", this might be required\n"
+		"  -p, --profile <out>            Dump profiling information to file <out>\n"
+		"  -s, --samplerate <samplerate>  Specify output samplerate in Hz\n"
+		"          Range: 44100 (default) to 192000\n"
+		"  -x, --oversampling <value>     Specify oversampling\n"
+		"          Possible values: 1, 2, 4, 8\n"
+		"          Default: 2\n\n",
 		LMMS_VERSION, LMMS_PROJECT_COPYRIGHT );
 }
 
@@ -274,11 +266,11 @@ int main( int argc, char * * argv )
 
 		if( arg == "--help"    || arg == "-h" ||
 		    arg == "--version" || arg == "-v" ||
-		    arg == "--render"  || arg == "-r" )
+		    arg == "render" || arg == "--render" || arg == "-r" )
 		{
 			coreOnly = true;
 		}
-		else if( arg == "--rendertracks" )
+		else if( arg == "rendertracks" || arg == "--rendertracks" )
 		{
 			coreOnly = true;
 			renderTracks = true;
@@ -333,7 +325,7 @@ int main( int argc, char * * argv )
 			printHelp();
 			return EXIT_SUCCESS;
 		}
-		else if( arg == "--upgrade" || arg == "-u" )
+		else if( arg == "upgrade" || arg == "--upgrade" || arg  == "-u")
 		{
 			++i;
 
@@ -369,7 +361,7 @@ int main( int argc, char * * argv )
 #endif
 
 		}
-		else if( arg == "--dump" || arg == "-d" )
+		else if( arg == "dump" || arg == "--dump" || arg  == "-d" )
 		{
 			++i;
 
@@ -386,7 +378,8 @@ int main( int argc, char * * argv )
 
 			return EXIT_SUCCESS;
 		}
-		else if( arg == "--render" || arg == "-r" || arg == "--rendertracks" )
+		else if( arg == "render" || arg == "--render" || arg == "-r" ||
+			arg == "rendertracks" || arg == "--rendertracks" )
 		{
 			++i;
 
