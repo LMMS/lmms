@@ -314,6 +314,9 @@ public:
 	void requestChangeInModel();
 	void doneChangeInModel();
 
+	static bool isAudioDevNameValid(QString name);
+	static bool isMidiDevNameValid(QString name);
+
 
 signals:
 	void qualitySettingsChanged();
