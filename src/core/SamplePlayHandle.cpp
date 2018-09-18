@@ -32,29 +32,30 @@
 
 
 
-SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool shouldCreateAudioPort) :
+SamplePlayHandle::SamplePlayHandle( SampleBuffer* sampleBuffer , bool ownAudioPort ) :
 	PlayHandle( TypeSamplePlayHandle ),
 	m_sampleBuffer( sharedObject::ref( sampleBuffer ) ),
 	m_doneMayReturnTrue( true ),
 	m_frame( 0 ),
-	m_ownAudioPort( shouldCreateAudioPort ),
+	m_ownAudioPort( ownAudioPort ),
 	m_defaultVolumeModel( DefaultVolume, MinVolume, MaxVolume, 1 ),
 	m_volumeModel( &m_defaultVolumeModel ),
 	m_track( NULL ),
 	m_bbTrack( NULL )
 {
-	if (shouldCreateAudioPort)
+	if (ownAudioPort)
+	{
 		setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
+	}
 }
 
 
 
 
 SamplePlayHandle::SamplePlayHandle( const QString& sampleFile ) :
-	SamplePlayHandle( new SampleBuffer( sampleFile ) , false)
+	SamplePlayHandle( new SampleBuffer( sampleFile ) , true)
 {
 	sharedObject::unref( m_sampleBuffer );
-	setAudioPort( new AudioPort( "SamplePlayHandle", false ) );
 }
 
 
@@ -73,7 +74,7 @@ SamplePlayHandle::SamplePlayHandle( SampleTCO* tco ) :
 SamplePlayHandle::~SamplePlayHandle()
 {
 	sharedObject::unref( m_sampleBuffer );
-	if( m_ownAudioPort && audioPort ())
+	if( m_ownAudioPort )
 	{
 		delete audioPort();
 	}
@@ -142,3 +143,7 @@ f_cnt_t SamplePlayHandle::totalFrames() const
 {
 	return ( m_sampleBuffer->endFrame() - m_sampleBuffer->startFrame() ) * ( Engine::mixer()->processingSampleRate() / Engine::mixer()->baseSampleRate() );
 }
+
+
+
+
