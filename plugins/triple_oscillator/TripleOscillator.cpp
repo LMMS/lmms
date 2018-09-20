@@ -280,7 +280,7 @@ void TripleOscillator::loadSettings( const QDomElement & _this )
 		m_osc[i]->m_modulationAlgoModel.loadSettings( _this,
 					"modalgo" + QString::number( i+1 ) );
 		m_osc[i]->m_sampleBuffer->setAudioFile( _this.attribute(
-							"userwavefile" + is ) );
+							"userwavefile" + is ), true );
 	}
 }
 
