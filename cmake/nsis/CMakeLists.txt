@@ -71,6 +71,6 @@ IF(LMMS_HAVE_STK)
 ENDIF()
 
 INSTALL(FILES "lmms.exe.manifest" DESTINATION .)
-INSTALL(FILES "lmms.VisualElementsManifest" DESTINATION .)
+INSTALL(FILES "lmms.VisualElementsManifest.xml" DESTINATION .)
 INSTALL(DIRECTORY "assets" DESTINATION ./assets)
 
