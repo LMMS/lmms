@@ -308,7 +308,7 @@ public:
 
 
 public slots:
-	void setAudioFile( const QString & _audio_file );
+	void setAudioFile(const QString & audioFile , bool ignoreError = false);
 	void setStartFrame( const f_cnt_t _s );
 	void setEndFrame( const f_cnt_t _e );
 	void setAmplification( float _a );
@@ -335,7 +335,7 @@ protected:
 		return const_cast<sampleFrame*>(ptr);
 	}
 
-	void changeAudioFile (QString audioFile);
+	void changeAudioFile (QString audioFile, bool ignoreError);
 
 	static DataVector convertIntToFloat(int_sample_t * & _ibuf, f_cnt_t _frames, int _channels);
 

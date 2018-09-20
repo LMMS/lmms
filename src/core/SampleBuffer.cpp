@@ -138,7 +138,7 @@ sample_rate_t SampleBuffer::mixerSampleRate()
 	return Engine::mixer ()->processingSampleRate ();
 }
 
-void SampleBuffer::changeAudioFile(QString audioFile)
+void SampleBuffer::changeAudioFile(QString audioFile, bool ignoreError)
 {
 	if (audioFile == "")
 		return;
@@ -214,7 +214,7 @@ void SampleBuffer::changeAudioFile(QString audioFile)
 
 	if (! fileLoadError) {
 		resetData (std::move(fileData), samplerate);
-	} else {
+	} else if (!ignoreError) {
 		QString title = tr( "Fail to open file" );
 		QString message = tr( "Audio files are limited to %1 MB "
 							  "in size and %2 minutes of playing time"
@@ -1016,10 +1016,10 @@ QString & SampleBuffer::toBase64( QString & _dst ) const
 }
 
 
-void SampleBuffer::setAudioFile( const QString & _audio_file )
+void SampleBuffer::setAudioFile(const QString & audioFile, bool ignoreError )
 {
-	m_audioFile = tryToMakeRelative(_audio_file);
-	changeAudioFile (_audio_file);
+	m_audioFile = tryToMakeRelative(audioFile);
+	changeAudioFile (audioFile, ignoreError);
 }
 
 
