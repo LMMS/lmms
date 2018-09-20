@@ -1,62 +1,50 @@
+# Detects the best place to install bash completion support
+# - Windows is not supported
+# - TODO: macOS support can be provided through Homebrew
 IF(NOT LMMS_BUILD_WIN32 AND NOT LMMS_BUILD_APPLE)
 
-	pkg_check_modules(BASH_COMPLETION bash-completion)
-	pkg_get_variable(BASHCOMP_PKG_PATH bash-completion completionsdir)
-	
-	GET_FILENAME_COMPONENT(BINARY_ADJ_TARGET "${CMAKE_BINARY_DIR}/../target" ABSOLUTE)
-	SET(BASHCOMP_WHITELIST_PREFIX "/usr;/usr/local;${BINARY_ADJ_TARGET}")
-	SET(BASHCOMP_WHITELIST_PREFIX_NOLOCAL "/usr;${BINARY_ADJ_TARGET}")
-	
-	SET(BASHCOMP_PKG_PATH "/etc/bash_completion.d")
+	# standard install location for most distributions
+	SET(BASHCOMP_FALLBACK "/usr/share/bash-completion/completions")
 
-	IF("${BASHCOMP_PKG_PATH}" STREQUAL "/usr/share/bash-completion/completions")
-
-		# bash completion uses the "new" way of /usr/share/bash-completion
-		# this means both /usr/share/bash-completion and
-		# /usr/local/share/bash-completion are valid
-		# all other paths are user paths
-
-		# Add ../target to bash-completion whitelist for appimages
-		FOREACH(_prefix ${BASHCOMP_WHITELIST_PREFIX})
-		IF("${CMAKE_INSTALL_PREFIX}" MATCHES "^${_prefix}/?$")
-			SET(BASHCOMP_PATH_FINAL "${CMAKE_INSTALL_PREFIX}/share/bash-completion/completions")
-		ENDIF()
-		ENDFOREACH()
-		
-	ELSEIF("${BASHCOMP_PKG_PATH}" STREQUAL "/etc/bash_completion.d")
-
-		# bash completion uses the "old" way of /etc/bash_completion.d
-		# this means we can only do an install into architecture dependent paths
-		# => forbid /usr/local
-
-		FOREACH(_prefix ${BASHCOMP_WHITELIST_PREFIX_NOLOCAL})
-		IF("${CMAKE_INSTALL_PREFIX}" MATCHES "^${_prefix}/?$")
-			SET(BASHCOMP_PATH_FINAL "${CMAKE_INSTALL_PREFIX}/share/bash-completion/completions")
-		ENDIF()
-		ENDFOREACH()
-
+	# check for common portable installation (CMAKE_INSTALL_PREFIX=../target)
+	GET_FILENAME_COMPONENT(BINARY_ADJ_INSTALL "${CMAKE_BINARY_DIR}/../target" ABSOLUTE)
+	IF("${BINARY_ADJ_INSTALL}" STREQUAL "${CMAKE_INSTALL_PREFIX}")
+		SET(SKIP_PKG_CHECK TRUE)
 	ENDIF()
 
-	IF("${BASHCOMP_PATH_FINAL}" STREQUAL "")
-	
-		# maybe it's a user install?
-	
-		SET(BASHCOMP_WHITELIST_STARTSWITH "/home/;/root/;/Users/")
-
-		FOREACH(_startswith ${BASHCOMP_WHITELIST_STARTSWITH})
-		IF("${CMAKE_INSTALL_PREFIX}" MATCHES  "^${_startswith}")
-			SET(BASHCOMP_PATH_FINAL "${CMAKE_INSTALL_PREFIX}/share/bash-completion/completions")
+	# check for other signs of user-level install
+	SET(USER_LEVEL_INSTALL "/home/;/root/;/Users/")
+	FOREACH(_startswith ${USER_LEVEL_INSTALL})
+		IF("${CMAKE_INSTALL_PREFIX}" MATCHES "^${_startswith}")
+			SET(SKIP_PKG_CHECK TRUE)
+			BREAK()
 		ENDIF()
-		ENDFOREACH()
+	ENDFOREACH()
 
-	ENDIF()
-	
-	IF("${BASHCOMP_PATH_FINAL}" STREQUAL "")
-		MESSAGE("LMMS provides bash completion in completions/lmms. Please install manually if wanted.")
+	# determine BASHCOMP_PKG_PATH variable
+	IF(SKIP_PKG_CHECK)
+		SET(BASHCOMP_PKG_PATH "${CMAKE_INSTALL_PREFIX}${BASHCOMP_FALLBACK}")
 	ELSE()
-		MESSAGE(STATUS "Will install LMMS bash completion to ${BASHCOMP_PATH_FINAL}...")
-		INSTALL(FILES lmms DESTINATION "${BASHCOMP_PATH_FINAL}"
-			PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+		PKG_CHECK_MODULES(BASH_COMPLETION bash-completion)
+		PKG_GET_VARIABLE(BASHCOMP_PKG_PATH bash-completion completionsdir)
 	ENDIF()
 
+	# final fallback for non-user-level installs
+	IF("${BASHCOMP_PKG_PATH}" STREQUAL "")
+		# only fallback to whitelisted install locations
+		SET(ROOT_LEVEL_INSTALL "/usr/;/usr/local/;/opt/")
+		FOREACH(_startswith ${ROOT_LEVEL_INSTALL})
+			IF("${CMAKE_INSTALL_PREFIX}" MATCHES "^${_startswith}")
+				SET(BASHCOMP_PKG_PATH "${BASHCOMP_FALLBACK}")
+				BREAK()
+			ENDIF()
+		ENDFOREACH()
+	ENDIF()
+	
+	IF("${BASHCOMP_PKG_PATH}" STREQUAL "")
+		MESSAGE("Unable to determine BASHCOMP_PKG_PATH.  Install manually from completions/lmms if needed.")
+	ELSE()
+		MESSAGE(STATUS "Bash completions will be installed to ${BASHCOMP_PKG_PATH}")
+		INSTALL(FILES lmms DESTINATION "${BASHCOMP_PKG_PATH}" PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+	ENDIF()
 ENDIF()
