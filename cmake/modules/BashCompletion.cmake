@@ -10,8 +10,8 @@
 #
 # Usage:
 #    INCLUDE(BashCompletion)
-#    BASHCOMP_INSTALL(lmms)
-#    ... where "lmms" is a shell script adjacent to the CMakeLists.txt
+#    BASHCOMP_INSTALL(foo)
+#    ... where "foo" is a shell script adjacent to the CMakeLists.txt
 #
 # How it determines BASHCOMP_PKG_PATH, in order:
 #    1. Uses BASHCOMP_PKG_PATH if already set (e.g. -DBASHCOMP_PKG_PATH=...)
