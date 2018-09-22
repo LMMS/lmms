@@ -96,10 +96,16 @@ void AutomatableModel::saveSettings( QDomDocument& doc, QDomElement& element, co
 		// automation needs tuple of data (name, id, value)
 		// scale type also needs an extra value
 		// => it must be appended as a node
-		QDomElement me = doc.createElement( name );
+
+		QRegExp reg("^[A-Za-z0-9._-]+$");
+		bool mustQuote = !reg.exactMatch(name);
+		QDomElement me = doc.createElement( mustQuote ? QString("automatablemodel") : name );
 		me.setAttribute( "id", ProjectJournal::idToSave( id() ) );
 		me.setAttribute( "value", m_value );
 		me.setAttribute( "scale_type", m_scaleType == Logarithmic ? "log" : "linear" );
+		if(mustQuote) {
+			me.setAttribute( "nodename", name );
+		}
 		element.appendChild( me );
 	}
 	else
@@ -177,22 +183,48 @@ void AutomatableModel::loadSettings( const QDomElement& element, const QString& 
 	//   <port00 value="4.41" id="4249278"/>
 	// </ladspacontrols>
 	// element => there is automation data, or scaletype information
-	node = element.namedItem( name );
+
+	node = element.namedItem( name ); // maybe we have luck?
+
+	// either: no node with name "name" found
+	//  => look for nodes with attribute name="nodename"
+	// or: element with namedItem() "name" was found, but it's real nodename
+	// is given as attribute and does not match
+	//  => look for the right node
+	if(node.isNull() ||
+		( node.isElement() &&
+		node.toElement().hasAttribute("nodename") &&
+		node.toElement().attribute("nodename") != name))
+	{
+		for(QDomElement othernode = element.firstChildElement();
+			!othernode.isNull();
+			othernode = othernode.nextSiblingElement())
+		{
+			if((!othernode.hasAttribute("nodename") &&
+				othernode.nodeName() == name) ||
+				othernode.attribute("nodename") == name)
+			{
+				node = othernode;
+				break;
+			}
+		}
+	}
 	if( node.isElement() )
 	{
-			changeID( node.toElement().attribute( "id" ).toInt() );
-			setValue( LocaleHelper::toFloat( node.toElement().attribute( "value" ) ) );
-			if( node.toElement().hasAttribute( "scale_type" ) )
+		QDomElement nodeElement = node.toElement();
+		changeID( nodeElement.attribute( "id" ).toInt() );
+		setValue( LocaleHelper::toFloat( nodeElement.attribute( "value" ) ) );
+		if( nodeElement.hasAttribute( "scale_type" ) )
+		{
+			if( nodeElement.attribute( "scale_type" ) == "linear" )
 			{
-				if( node.toElement().attribute( "scale_type" ) == "linear" )
-				{
-					setScaleType( Linear );
-				}
-				else if( node.toElement().attribute( "scale_type" ) == "log" )
-				{
-					setScaleType( Logarithmic );
-				}
+				setScaleType( Linear );
 			}
+			else if( nodeElement.attribute( "scale_type" ) == "log" )
+			{
+				setScaleType( Logarithmic );
+			}
+		}
 	}
 	else
 	{
