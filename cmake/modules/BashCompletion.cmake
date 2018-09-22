@@ -15,7 +15,7 @@
 #
 # How it determines BASHCOMP_PKG_PATH, in order:
 #    1. Uses BASHCOMP_PKG_PATH if already set (e.g. -DBASHCOMP_PKG_PATH=...)
-#       a. Use to pkg-config's PKG_CHECK_MODULES to determine path
+#       a. If not, uses pkg-config's PKG_CHECK_MODULES to determine path
 #       b. Fallback to cmake's FIND_PACKAGE(bash-completion) path
 #       c. Fallback to hard-coded /usr/share/bash-completion/completions
 #    2. Final fallback to ${CMAKE_INSTALL_PREFIX}/share/bash-completion/completions if
