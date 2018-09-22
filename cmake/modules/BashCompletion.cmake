@@ -1,10 +1,29 @@
+# A wrapper around pkg-config-provided and cmake-provided bash completion that
+# will have dynamic behavior at INSTALL() time to allow both root-level
+# INSTALL() as well as user-level INSTALL().
+#
+# See also https://github.com/scop/bash-completion
+#
+# Copyright (c) 2018, Tres Finocchiaro, <tres.finocchiaro@gmail.com>
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
+# Usage:
+#    INCLUDE(BashCompletion)
+#    BASHCOMP_INSTALL(lmms)
+#    ... where "lmms" is a shell script adjacent to the CMakeLists.txt
+#
+# How it determines BASHCOMP_PKG_PATH, in order:
+#    1. Uses BASHCOMP_PKG_PATH if already set (e.g. -DBASHCOMP_PKG_PATH=...)
+#       a. Use to pkg-config's PKG_CHECK_MODULES to determine path
+#       b. Fallback to cmake's FIND_PACKAGE(bash-completion) path
+#       c. Fallback to hard-coded /usr/share/bash-completion/completions
+#    2. Final fallback to ${CMAKE_INSTALL_PREFIX}/share/bash-completion/completions if
+#       detected path is unwritable.
+
 IF(COMMAND CMAKE_POLICY AND NOT CMAKE_VERSION VERSION_LESS 3.1.0)
 	CMAKE_POLICY(SET CMP0053 OLD)
 ENDIF()
-
-# A wrapper around pkg-config-provided and cmake-provided bash completion that
-# will have dynamic behavior at INSTALL() time to allow both root-level
-# INSTALL() as well as user-level INSTALL()
 
 # - Windows does not support bash completion
 # - macOS support should eventually be added for Homebrew (TODO)
@@ -46,10 +65,10 @@ ELSE()
 	# (i.e. root).
 	#
 	# - Creates a script called "install_${SCRIPT_NAME}_completion.sh" into the
-	#	 working binary directory and invokes this script at install.
+	#   working binary directory and invokes this script at install.
 	# - Script handles INSTALL()-time conditional logic for sane ballback behavior
-	#	 when ${BASHCOMP_PKG_PATH} is unwritable (i.e. non-root); Something cmake
-	#	 can't handle on its own at INSTALL() time)
+	#   when ${BASHCOMP_PKG_PATH} is unwritable (i.e. non-root); Something cmake
+	#   can't handle on its own at INSTALL() time)
 	MACRO(BASHCOMP_INSTALL SCRIPT_NAME)
 		# A shell script for wrapping conditionl logic
 		SET(BASHCOMP_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_${SCRIPT_NAME}_completion.sh")
