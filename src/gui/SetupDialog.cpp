@@ -812,7 +812,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 	// If no preferred audio device is saved, save the current one
 	QString audioDevName = 
 		ConfigManager::inst()->value( "mixer", "audiodev" );
-	if( audioDevName.length() == 0 )
+	if( m_audioInterfaces->findText(audioDevName) < 0 )
 	{
 		audioDevName = Engine::mixer()->audioDevName();
 		ConfigManager::inst()->setValue(
@@ -908,7 +908,7 @@ SetupDialog::SetupDialog( ConfigTabs _tab_to_open ) :
 
 	QString midiDevName = 
 		ConfigManager::inst()->value( "mixer", "mididev" );
-	if( midiDevName.length() == 0 )
+	if( m_midiInterfaces->findText(midiDevName) < 0 )
 	{
 		midiDevName = Engine::mixer()->midiClientName();
 		ConfigManager::inst()->setValue(

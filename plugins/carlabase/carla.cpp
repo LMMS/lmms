@@ -1,7 +1,7 @@
 /*
  * carla.cpp - Carla for LMMS
  *
- * Copyright (C) 2014 Filipe Coelho <falktx@falktx.com>
+ * Copyright (C) 2014-2018 Filipe Coelho <falktx@falktx.com>
  *
  * This file is part of LMMS - https://lmms.io
  *
@@ -23,9 +23,6 @@
  */
 
 #include "carla.h"
-
-#define REAL_BUILD // FIXME this shouldn't be needed
-#include "CarlaHost.h"
 
 #include "Engine.h"
 #include "Song.h"
@@ -132,14 +129,6 @@ static const char* host_ui_save_file(NativeHostHandle, bool isDir, const char* t
 
 // -----------------------------------------------------------------------
 
-CARLA_EXPORT
-const NativePluginDescriptor* carla_get_native_patchbay_plugin();
-
-CARLA_EXPORT
-const NativePluginDescriptor* carla_get_native_rack_plugin();
-
-// -----------------------------------------------------------------------
-
 CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const Descriptor* const descriptor, const bool isPatchbay)
     : Instrument(instrumentTrack, descriptor),
       kIsPatchbay(isPatchbay),
@@ -161,8 +150,9 @@ CarlaInstrument::CarlaInstrument(InstrumentTrack* const instrumentTrack, const D
     path.cdUp();
     resourcesPath = path.absolutePath() + "/share/carla/resources";
 #elif defined(CARLA_OS_MAC)
-    // assume standard install location
-    resourcesPath = "/Applications/Carla.app/Contents/MacOS/resources";
+    // parse prefix from dll filename
+    QDir path = QFileInfo(dllName).dir();
+    resourcesPath = path.absolutePath() + "/resources";
 #elif defined(CARLA_OS_WIN32) || defined(CARLA_OS_WIN64)
     // not yet supported
 #endif
@@ -254,7 +244,7 @@ void CarlaInstrument::handleUiClosed()
     emit uiClosed();
 }
 
-intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t index, const intptr_t value, void* const ptr, const float opt)
+intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opcode, const int32_t, const intptr_t, void* const, const float)
 {
     intptr_t ret = 0;
 
@@ -267,13 +257,10 @@ intptr_t CarlaInstrument::handleDispatcher(const NativeHostDispatcherOpcode opco
         qApp->processEvents();
         break;
     default:
-	break;
+        break;
     }
 
     return ret;
-
-    // unused for now
-    (void)index; (void)value; (void)ptr; (void)opt;
 }
 
 // -------------------------------------------------------------------
@@ -448,9 +435,12 @@ bool CarlaInstrument::handleMidiEvent(const MidiEvent& event, const MidiTime&, f
 
 PluginView* CarlaInstrument::instantiateView(QWidget* parent)
 {
+// Disable plugin focus per https://bugreports.qt.io/browse/QTBUG-30181
+#ifndef CARLA_OS_MAC
     if (QWidget* const window = parent->window())
         fHost.uiParentId = window->winId();
     else
+#endif
         fHost.uiParentId = 0;
 
     std::free((char*)fHost.uiName);

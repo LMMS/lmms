@@ -239,7 +239,6 @@ void ZynAddSubFxInstrument::loadSettings( const QDomElement & _this )
 	doc.appendChild( doc.importNode( data, true ) );
 
 	QTemporaryFile tf;
-	tf.setAutoRemove( false );
 	if( tf.open() )
 	{
 		QByteArray a = doc.toString( 0 ).toUtf8();

@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH LMMS 1 "June 15, 2017"
+.TH LMMS 1 "September 10, 2018"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -19,125 +19,83 @@
 lmms \- software for easy music production
 .SH SYNOPSIS
 .B lmms
-.RB "[ \--\fBallowroot\fP ]"
+.RB "[\fBglobal options...\fP] [\fBaction\fP [\fBaction parameters\fP...]]
 .br
-.B lmms
-.RB "[ \--\fBbitrate\fP \fIbitrate\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBconfig\fP \fIconfigfile\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBdump\fP \fIin\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBfloat\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBformat\fP \fIformat\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBgeometry\fP \fIgeometry\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBhelp\fP ]"
-.br
-.B lmms
-.RB "[ \--\interpolation\fP \fImethod\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBimport\fP \fIin\fP [ \-e ] ]"
-.br
-.B lmms
-.RB "[ \--\fBloop\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBmode\fP \fIstereomode\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBoutput\fP \fIpath\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBoversampling\fP \fIvalue\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBprofile\fP \fIout\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBrender\fP \fIfile\fP ] [options]"
-.br
-.B lmms
-.RB "[ \--\fBsamplerate\fP \fIsamplerate\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBupgrade\fP \fIin\fP \fIout\fP ]"
-.br
-.B lmms
-.RB "[ \--\fBversion\fP ]"
-.br
-.B lmms
-.RI "[ file ]"
 .SH DESCRIPTION
 .PP
 .\" TeX users may be more comfortable with the \fB<whatever>\fP and
 .\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
 .\" respectively.
 .B LMMS
-LMMS is a free cross-platform alternative to commercial programs like FL Studio®, which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
+is a free cross-platform alternative to commercial programs like FL Studio®, which allow you to produce music with your computer. This includes the creation of melodies and beats, the synthesis and mixing of sounds, and arranging of samples. You can have fun with your MIDI-keyboard and much more; all in a user-friendly and modern interface.
 
 LMMS features components such as a Song Editor, a Beat+Bassline Editor, a Piano Roll, an FX Mixer as well as many powerful instruments and effects.
 
-.SH OPTIONS
-.IP "\fB\-a, --float\fP
-32bit float bit depth
-.IP "\fB\-b, --bitrate\fP \fIbitrate\fP
-Specify output bitrate in KBit/s (for OGG encoding only), default is 160
+.SH ACTIONS
+
+.IP "<no action> [\fIoptions\fP...] [\fIproject\fP]
+Start LMMS in normal GUI mode.
+.IP "\fBdump\fP \fIin\fP
+Dump XML of compressed (MMPZ) file \fIin\fP.
+.IP "\fBrender\fP \fIproject\fP [\fIoptions\fP...]
+Render given project file.
+.IP "\fBrendertracks\fP \fIproject\fP [\fIoptions\fP...]
+Render each track to a different file.
+.IP "\fBupgrade\fP \fIin\fP [\fIout\fP]
+Upgrade file \fIin\fP and save as \fIout\fP. Standard out is used if no output file is specifed.
+
+.SH GLOBAL OPTIONS
+
+.IP "\fB\    --allowroot
+Bypass root user startup check (use with caution).
 .IP "\fB\-c, --config\fP \fIconfigfile\fP
-Get the configuration from \fIconfigfile\fP instead of ~/.lmmsrc.xml (default)
-.IP "\fB\-d, --dump\fP \fIin\fP
-Dump XML of compressed file \fIin\fP (i.e. MMPZ-file)
-.IP "\fB\-f, --format\fP \fIformat\fP
-Specify format of render-output where \fIformat\fP is either 'wav', 'flac', 'ogg' or 'mp3'.
-.IP "\fB\    --geometry\fP \fIgeometry\fP
-Specify the prefered size and position of the main window
-.br
-\fIgeometry\fP syntax is <\fIxsize\fPx\fIysize\fP+\fIxoffset\fP+\fIyoffset\fP>.
-.br
-Default: full screen
+Get the configuration from \fIconfigfile\fP instead of ~/.lmmsrc.xml (default).
 .IP "\fB\-h, --help\fP
 Show usage information and exit.
-.IP "\fB\-i, --interpolation\fP \fImethod\fP
-Specify interpolation method - possible values are \fIlinear\fP, \fIsincfastest\fP (default), \fIsincmedium\fP, \fIsincbest\fP
-.IP "\fB\    --import\fP \fIin\fP \fB\-e\fP
-Import MIDI file \fIin\fP
+.IP "\fB\-v, --version
+Show version information and exit.
+
+.SH OPTIONS IF NO ACTION IS GIVEN
+
+.IP "\fB\    --geometry\fP \fIgeometry\fP
+Specify the prefered size and position of the main window.
 .br
+\fIgeometry\fP syntax is \fIxsize\fPx\fIysize\fP+\fIxoffset\fP+\fIyoffset\fP.
+.br
+Default: full screen.
+.IP "\fB\    --import\fP \fIin\fP \fB\-e\fP
+Import MIDI or Hydrogen file \fIin\fP.
+.br
+
+.SH OPTIONS FOR RENDER AND RENDERTRACKS
+
+.IP "\fB\-a, --float\fP
+Use 32bit float bit depth.
+.IP "\fB\-b, --bitrate\fP \fIbitrate\fP
+Specify output bitrate in KBit/s (for OGG encoding only), default is 160.
+.IP "\fB\-f, --format\fP \fIformat\fP
+Specify format of render-output where \fIformat\fP is either 'wav', 'flac', 'ogg' or 'mp3'.
+.IP "\fB\-i, --interpolation\fP \fImethod\fP
+Specify interpolation method - possible values are \fIlinear\fP, \fIsincfastest\fP (default), \fIsincmedium\fP, \fIsincbest\fP.
+
 If -e is specified lmms exits after importing the file.
 .IP "\fB\-l, --loop
 Render the given file as a loop, i.e. stop rendering at exactly the end of the song. Additional silence or reverb tails at the end of the song are not rendered.
 .IP "\fB\-m, --mode\fP \fIstereomode\fP
 Set the stereo mode used for the MP3 export. \fIstereomode\fP can be either 's' (stereo mode), 'j' (joint stereo) or 'm' (mono). If no mode is given 'j' is used as the default.
 .IP "\fB\-o, --output\fP \fIpath\fP
-Render into \fIpath\fP
+Render into \fIpath\fP.
 .br
 For --render, this is interpreted as a file path.
 .br
 For --render-tracks, this is interpreted as a path to an existing directory.
-IP "\fB\-p, --profile\fP \fIout\fP
-Dump profiling information to file \fIout\fP
-.IP "\fB\-r, --render\fP \fIproject-file\fP
-Render given file to either a wav\- or ogg\-file. See \fB\-f\fP for details
-.IP "\fB\-r, --rendertracks\fP \fIproject-file\fP
-Render each track into a separate wav\- or ogg\-file. See \fB\-f\fP for details
+.IP "\fB\-p, --profile\fP \fIout\fP
+Dump profiling information to file \fIout\fP.
 .IP "\fB\-s, --samplerate\fP \fIsamplerate\fP
-Specify output samplerate in Hz - range is 44100 (default) to 192000
-.IP "\fB\-u, --upgrade\fP \fIin\fP \fIout\fP
-Upgrade file \fIin\fP and save as \fIout\fP
-.IP "\fB\-v, --version
-Show version information and exit.
+Specify output samplerate in Hz - range is 44100 (default) to 192000.
 .IP "\fB\-x, --oversampling\fP \fIvalue\fP
-Specify oversampling, possible values: 1, 2 (default), 4, 8
-.IP "\fB\    --allowroot
-Bypass root user startup check (use with caution).
+Specify oversampling, possible values: 1, 2 (default), 4, 8.
+
 .SH SEE ALSO
 .BR https://lmms.io/
 .BR https://lmms.io/documentation/

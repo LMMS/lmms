@@ -41,6 +41,7 @@
 #include "embed.h"
 #include "gui_templates.h"
 #include "GuiApplication.h"
+#include "LocaleHelper.h"
 #include "MainWindow.h"
 #include "ProjectJournal.h"
 #include "Song.h"
@@ -558,7 +559,7 @@ void Knob::dropEvent( QDropEvent * _de )
 	QString val = StringPairDrag::decodeValue( _de );
 	if( type == "float_value" )
 	{
-		model()->setValue( val.toFloat() );
+		model()->setValue( LocaleHelper::toFloat(val) );
 		_de->accept();
 	}
 	else if( type == "automatable_model" )
