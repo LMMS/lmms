@@ -791,7 +791,7 @@ int main( int argc, char * * argv )
 							) );
 
 			mb.setIcon( QMessageBox::Warning );
-			mb.setWindowIcon( embed::getIconPixmap( "icon" ) );
+			mb.setWindowIcon( embed::getIconPixmap( "icon_small" ) );
 			mb.setWindowFlags( Qt::WindowCloseButtonHint );
 
 			QPushButton * recover;
