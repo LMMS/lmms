@@ -203,6 +203,19 @@ public:
 	{
 		return m_recording;
 	}
+	
+	inline void setLoopRenderCount( int count )
+	{
+		if( count < 1 )
+			m_loopRenderCount = 1;
+		else
+			m_loopRenderCount = count;
+	}
+    
+	inline int getLoopRenderCount() const
+	{
+		return m_loopRenderCount;
+	}
 
 	bool isExportDone() const;
 	std::pair<MidiTime, MidiTime> getExportEndpoints() const;
@@ -424,6 +437,8 @@ private:
 	tact_t m_elapsedTacts;
 
 	VstSyncController m_vstSyncController;
+    
+	int m_loopRenderCount;
 
 
 	friend class LmmsCore;

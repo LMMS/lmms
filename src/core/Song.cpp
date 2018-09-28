@@ -86,7 +86,8 @@ Song::Song() :
 	m_patternToPlay( NULL ),
 	m_loopPattern( false ),
 	m_elapsedTicks( 0 ),
-	m_elapsedTacts( 0 )
+	m_elapsedTacts( 0 ),
+	m_loopRenderCount ( 1 )
 {
 	for(int i = 0; i < Mode_Count; ++i) m_elapsedMilliSeconds[i] = 0;
 	connect( &m_tempoModel, SIGNAL( dataChanged() ),
@@ -330,7 +331,7 @@ void Song::processNextBuffer()
 			}
 			m_playPos[m_playMode].setTicks( ticks );
 
-			if( checkLoop )
+			if( checkLoop || m_loopRenderCount > 1 )
 			{
 				m_vstSyncController.startCycle(
 					tl->loopBegin().getTicks(), tl->loopEnd().getTicks() );
@@ -340,6 +341,8 @@ void Song::processNextBuffer()
 				// beginning of the range
 				if( m_playPos[m_playMode] >= tl->loopEnd() )
 				{
+					if( m_loopRenderCount > 1 ) 
+						m_loopRenderCount--;
 					ticks = tl->loopBegin().getTicks();
 					m_playPos[m_playMode].setTicks( ticks );
 					setToTime(tl->loopBegin());
@@ -745,6 +748,7 @@ void Song::stopExport()
 	stop();
 	m_exporting = false;
 	m_exportLoop = false;
+	m_loopRenderCount = 1;
 
 	m_vstSyncController.setPlaybackState( m_playing );
 }
