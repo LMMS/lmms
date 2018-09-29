@@ -81,8 +81,8 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 	int i = 0;
 
 	double out_sum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
+	const float d [2] = {dryLevelL(),dryLevelR()};
+	const float w [2] = {wetLevelL(),wetLevelR()};
 	float input = m_wsControls.m_inputModel.value();
 	float output = m_wsControls.m_outputModel.value();
 	const float * samples = m_wsControls.m_wavegraphModel.samples();
@@ -142,8 +142,8 @@ bool waveShaperEffect::processAudioBuffer( sampleFrame * _buf,
 
 		out_sum += _buf[f][0]*_buf[f][0] + _buf[f][1]*_buf[f][1];
 // mix wet/dry signals
-		_buf[f][0] = d * _buf[f][0] + w * s[0];
-		_buf[f][1] = d * _buf[f][1] + w * s[1];
+		_buf[f][0] = d[0] * _buf[f][0] + w[0] * s[0];
+		_buf[f][1] = d[1] * _buf[f][1] + w[1] * s[1];
 
 		outputPtr += outputInc;
 		inputPtr += inputInc;
