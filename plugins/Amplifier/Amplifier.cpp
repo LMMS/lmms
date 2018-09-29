@@ -72,8 +72,8 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 	}
 
 	double outSum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
+	const float d [2] = {dryLevelL(),dryLevelR()};
+	const float w [2] = {wetLevelL(),wetLevelR()};
 	
 	const ValueBuffer * volBuf = m_ampControls.m_volumeModel.valueBuffer();
 	const ValueBuffer * panBuf = m_ampControls.m_panModel.valueBuffer();
@@ -121,8 +121,8 @@ bool AmplifierEffect::processAudioBuffer( sampleFrame* buf, const fpp_t frames )
 		s[0] *= left1 * left2 * 0.01;
 		s[1] *= right1 * right2 * 0.01;
 
-		buf[f][0] = d * buf[f][0] + w * s[0];
-		buf[f][1] = d * buf[f][1] + w * s[1];
+		buf[f][0] = d[0] * buf[f][0] + w[0] * s[0];
+		buf[f][1] = d[1] * buf[f][1] + w[1] * s[1];
 	}
 
 	checkGate( outSum / frames );
