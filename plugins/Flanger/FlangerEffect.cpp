@@ -90,8 +90,8 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 		return( false );
 	}
 	double outSum = 0.0;
-	const float d = dryLevel();
-	const float w = wetLevel();
+	const float d [2] = {dryLevelL(),dryLevelR()};
+	const float w [2] = {wetLevelL(),wetLevelR()};
 	const float length = m_flangerControls.m_delayTimeModel.value() * Engine::mixer()->processingSampleRate();
 	const float noise = m_flangerControls.m_whiteNoiseAmountModel.value();
 	float amplitude = m_flangerControls.m_lfoAmountModel.value() * Engine::mixer()->processingSampleRate();
@@ -121,8 +121,8 @@ bool FlangerEffect::processAudioBuffer( sampleFrame *buf, const fpp_t frames )
 			m_rDelay->tick( &buf[f][1] );
 		}
 
-		buf[f][0] = ( d * dryS[0] ) + ( w * buf[f][0] );
-		buf[f][1] = ( d * dryS[1] ) + ( w * buf[f][1] );
+		buf[f][0] = ( d[0] * dryS[0] ) + ( w[0] * buf[f][0] );
+		buf[f][1] = ( d[1] * dryS[1] ) + ( w[1] * buf[f][1] );
 		outSum += buf[f][0]*buf[f][0] + buf[f][1]*buf[f][1];
 	}
 	checkGate( outSum / frames );
