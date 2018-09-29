@@ -46,6 +46,7 @@ Effect::Effect( const Plugin::Descriptor * _desc,
 	m_bufferCount( 0 ),
 	m_enabledModel( true, this, tr( "Effect enabled" ) ),
 	m_wetDryModel( 1.0f, -1.0f, 1.0f, 0.01f, this, tr( "Wet/Dry mix" ) ),
+	m_panModel( 0.0f, -100.0f, 100.0f, 0.01f, this, tr( "Panning" ) ),
 	m_gateModel( 0.0f, 0.0f, 1.0f, 0.01f, this, tr( "Gate" ) ),
 	m_autoQuitModel( 1.0f, 1.0f, 8000.0f, 100.0f, 1.0f, this, tr( "Decay" ) ),
 	m_autoQuitDisabled( false )
@@ -80,6 +81,7 @@ void Effect::saveSettings( QDomDocument & _doc, QDomElement & _this )
 {
 	m_enabledModel.saveSettings( _doc, _this, "on" );
 	m_wetDryModel.saveSettings( _doc, _this, "wet" );
+	m_panModel.saveSettings( _doc, _this, "panning" );
 	m_autoQuitModel.saveSettings( _doc, _this, "autoquit" );
 	m_gateModel.saveSettings( _doc, _this, "gate" );
 	controls()->saveState( _doc, _this );
@@ -92,6 +94,7 @@ void Effect::loadSettings( const QDomElement & _this )
 {
 	m_enabledModel.loadSettings( _this, "on" );
 	m_wetDryModel.loadSettings( _this, "wet" );
+	m_panModel.loadSettings( _this, "panning" );
 	m_autoQuitModel.loadSettings( _this, "autoquit" );
 	m_gateModel.loadSettings( _this, "gate" );
 
