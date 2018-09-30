@@ -128,6 +128,7 @@ void ExportProjectDialog::accept()
 
 void ExportProjectDialog::closeEvent( QCloseEvent * _ce )
 {
+	Engine::getSong()->setLoopRenderCount(1);
 	if( m_renderManager ) {
 		m_renderManager->abortProcessing();
 	}
