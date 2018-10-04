@@ -713,8 +713,7 @@ void PatternView::mousePressEvent( QMouseEvent * _me )
 {
 	if( _me->button() == Qt::LeftButton &&
 				m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 96 ||
-				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
+				( fixedTCOs() || pixelsPerTact() >= 96 ) &&
 				_me->y() > height() - s_stepBtnOff->height() )
 
 	// when mouse button is pressed in beat/bassline -mode
@@ -784,8 +783,7 @@ void PatternView::mouseDoubleClickEvent(QMouseEvent *_me)
 void PatternView::wheelEvent( QWheelEvent * _we )
 {
 	if( m_pat->m_patternType == Pattern::BeatPattern &&
-				( fixedTCOs() || pixelsPerTact() >= 96 ||
-				m_pat->m_steps != MidiTime::stepsPerTact() ) &&
+				( fixedTCOs() || pixelsPerTact() >= 96 ) &&
 				_we->y() > height() - s_stepBtnOff->height() )
 	{
 //	get the step number that was wheeled on and
@@ -969,8 +967,7 @@ void PatternView::paintEvent( QPaintEvent * )
 	}
 
 	// beat pattern paint event
-	else if( beatPattern &&	( fixedTCOs() || ppt >= 96
-			|| m_pat->m_steps != MidiTime::stepsPerTact() ) )
+	else if( beatPattern &&	( fixedTCOs() || ppt >= 96 ) )
 	{
 		QPixmap stepon0;
 		QPixmap stepon200;
