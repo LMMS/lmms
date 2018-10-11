@@ -507,7 +507,7 @@ Wenn Sie daran interessiert sind LMMS in eine andere Sprache zu übersetzen oder
     <name>AutomationPattern</name>
     <message>
         <source>Drag a control while pressing &lt;%1&gt;</source>
-        <translation>Ein Steuerelement mit &lt;Strg&gt; hier her ziehen</translation>
+        <translation>Ein Steuerelement mit &lt;%1&gt; hier her ziehen</translation>
     </message>
 </context>
 <context>
@@ -5977,7 +5977,7 @@ Grund: »%2«</translation>
     </message>
     <message>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
-        <translation>Stumm/Laut schalten (&lt;Strg&gt; + Mittelklick)</translation>
+        <translation>Stumm/Laut schalten (&lt;%1&gt; + Mittelklick)</translation>
     </message>
 </context>
 <context>
@@ -6808,7 +6808,7 @@ Bitte stellen Sie sicher, dass Sie Leserechte auf diese Datei sowie das Verzeich
     </message>
     <message>
         <source>Mute/unmute (&lt;%1&gt; + middle click)</source>
-        <translation>Stumm/Laut schalten (&lt;Strg&gt; + Mittelklick)</translation>
+        <translation>Stumm/Laut schalten (&lt;%1&gt; + Mittelklick)</translation>
     </message>
 </context>
 <context>
