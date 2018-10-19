@@ -613,7 +613,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 			auto startpos = 0;
 			for( const auto it : bbtcos )
 			{
-				if( it->startPosition() > startpos )
+				if( !it->isMuted() && it->startPosition() > startpos )
 				{
 					bbEndPos = it->length();
 				}
