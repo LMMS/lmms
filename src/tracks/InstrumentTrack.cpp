@@ -1744,7 +1744,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 			!strcmp(oldIns->descriptor()->name, "zynaddsubfx");
 
 		DataFile savedSettings(DataFile::SongProject);
-		QDomDocument* newDoc;
+		QDomDocument newDoc("ZynAddSubFX-data");
 		const char* newNode;
 
 		if(convert)
@@ -1762,9 +1762,8 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 			if(!xmzNode.isNull())
 			{
 				newNode = "ZASF";
-				newDoc = new QDomDocument("ZynAddSubFX-data");
-				QDomNode zasf = newDoc->createElement(newNode);
-				newDoc->appendChild(zasf);
+				QDomNode zasf = newDoc.createElement(newNode);
+				newDoc.appendChild(zasf);
 
 				QString str;
 				QTextStream stream(&str);
@@ -1772,7 +1771,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 					"encoding=\"UTF-8\"?>\n"
 					<< "<!DOCTYPE ZynAddSubFX-data>\n";
 				xmzNode.save(stream, 1);
-				QDomCDATASection cdata = newDoc->
+				QDomCDATASection cdata = newDoc.
 					createCDATASection(str);
 				zasf.appendChild(cdata);
 
@@ -1799,7 +1798,7 @@ void InstrumentTrackWindow::dropEvent( QDropEvent* event )
 		if(convert)
 		{
 			m_track->instrument()->restoreState(
-				newDoc->namedItem(newNode).toElement());
+				newDoc.namedItem(newNode).toElement());
 		}
 
 		Engine::getSong()->setModified();
