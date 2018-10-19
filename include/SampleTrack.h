@@ -159,6 +159,7 @@ private:
 	FloatModel m_volumeModel;
 	FloatModel m_panningModel;
 	AudioPort m_audioPort;
+	int m_NumOfOverlappingBB;
 
 
 

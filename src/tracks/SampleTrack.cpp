@@ -604,15 +604,18 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			MidiTime currentSongPos = Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).getTicks();
 			bb_track->getTCOsInRange( bbtcos, currentSongPos, currentSongPos );
-			if( bbtcos.size() != 0 )
+			if( bbtcos.size() != m_NumOfOverlappingBB )
 			{
-				for( int i = 0; i < bbtcos.size(); ++i )
+				m_NumOfOverlappingBB = bbtcos.size();
+				updateTcos();
+			}
+
+			auto startpos = 0;
+			for( const auto it : bbtcos )
+			{
+				if( it->startPosition() > startpos )
 				{
-					if( !bbtcos.at(i)->isMuted()
-					  && bbEndPos < bbtcos.at(i)->length() )
-					{
-						bbEndPos = bbtcos.at(i)->length();
-					}
+					bbEndPos = it->length();
 				}
 			}
 		}
