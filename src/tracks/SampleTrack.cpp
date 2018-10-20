@@ -38,6 +38,7 @@
 #include "embed.h"
 #include "ToolTip.h"
 #include "BBTrack.h"
+#include "BBTrackContainer.h"
 #include "SamplePlayHandle.h"
 #include "SampleRecordHandle.h"
 #include "SongEditor.h"
@@ -573,7 +574,7 @@ SampleTrack::~SampleTrack()
 
 
 
-bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
+bool SampleTrack::play( const MidiTime & _start, const fpp_t /*_frames*/,
 						const f_cnt_t _offset, int _tco_num )
 {
 	m_audioPort.effects()->startRunning();
@@ -583,7 +584,7 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	tcoVector tcos;
 
-	::BBTrack * bb_track = NULL;
+	::BBTrack * bb_track = nullptr;
 	MidiTime bbEndPos = 0;
 
 	/********************************************************************
@@ -595,6 +596,13 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 
 	if( _tco_num >= 0 )
 	{
+		//repeat playing when end of BB-Container is reached
+		tick_t lengthOfBB = Engine::getBBTrackContainer()->lengthOfBB( _tco_num ) * MidiTime::ticksPerTact();
+		if( _start % lengthOfBB == 0 )
+		{
+			updateTcos();
+		}
+
 		//the BB-Track in Songeditor
 		bb_track = BBTrack::findBBTrack( _tco_num );
 		//Vector of BB Tcos in Songeditor. It will be filled later
@@ -604,12 +612,13 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t _frames,
 		{
 			MidiTime currentSongPos = Engine::getSong()->getPlayPos( Song::Mode_PlaySong ).getTicks();
 			bb_track->getTCOsInRange( bbtcos, currentSongPos, currentSongPos );
+			//take care of overlapping BB-TCOs
 			if( bbtcos.size() != m_NumOfOverlappingBB )
 			{
 				m_NumOfOverlappingBB = bbtcos.size();
 				updateTcos();
 			}
-
+			//play the TCO which comes at last
 			auto startpos = 0;
 			for( const auto it : bbtcos )
 			{
