@@ -624,7 +624,10 @@ bool SampleTrack::play( const MidiTime & _start, const fpp_t /*_frames*/,
 			{
 				if( !it->isMuted() && it->startPosition() > startpos )
 				{
-					bbEndPos = it->length();
+					startpos = it->startPosition();
+					//how many times the bb is looped?
+					int loopCountBB = ( currentSongPos - startpos ) / lengthOfBB;
+					bbEndPos = it->length() - loopCountBB * lengthOfBB;
 				}
 			}
 		}
